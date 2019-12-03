@@ -1,22 +1,9 @@
 import cx from 'classnames';
 import TsxComponent, { createProps } from 'components/tsx-component';
+import { LayoutProps } from './Default';
 import { Component } from 'vue-property-decorator';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import styles from './Layouts.m.less';
-
-export class LayoutProps {
-  resizeStartHandler: () => void = () => {};
-  resizeStopHandler: () => void = () => {};
-  reconcileSizeWithinContraints: (mins: IResizeMins, isBar2Resize?: boolean) => void = () => {};
-  setBarResize: (bar: 'bar1' | 'bar2', size: number) => void = () => {};
-  resizes: { bar1: number; bar2: number } = null;
-  max: number = null;
-}
-
-export interface IResizeMins {
-  bar1: { absolute: number; reasonable: number };
-  bar2: { absolute: number; reasonable: number };
-}
 
 const RESIZE_MINS = {
   bar1: { absolute: 32, reasonable: 156 },
@@ -24,7 +11,7 @@ const RESIZE_MINS = {
 };
 
 @Component({ props: createProps(LayoutProps) })
-export default class Default extends TsxComponent<LayoutProps> {
+export default class TwoPane extends TsxComponent<LayoutProps> {
   mounted() {
     this.props.reconcileSizeWithinContraints(RESIZE_MINS);
     window.addEventListener('resize', this.windowResizeHandler);
@@ -56,10 +43,12 @@ export default class Default extends TsxComponent<LayoutProps> {
 
   render() {
     return (
-      <div class={styles.rows}>
-        <div style={{ height: `calc(100% - ${this.bar1 + this.bar2}px)` }}>{this.$slots['1']}</div>
+      <div class={cx(styles.columns, styles.sidePadded)}>
+        <div style={{ width: `calc(100% - ${this.bar1 + this.bar2}px)` }} class={styles.cell}>
+          {this.$slots['2']}
+        </div>
         <ResizeBar
-          position="top"
+          position="right"
           vModel={this.bar1}
           onResizestart={() => this.props.resizeStartHandler()}
           onResizestop={() => this.props.resizeStopHandler()}
@@ -67,11 +56,15 @@ export default class Default extends TsxComponent<LayoutProps> {
           min={32}
           reverse={true}
         />
-        <div style={{ height: `${this.bar1}px` }} class={cx(styles.cell, styles.noTopPadding)}>
-          {this.$slots['2']}
+        <div class={styles.rows} style={{ width: `${this.bar1}px`, paddingTop: '16px' }}>
+          <div style={{ height: '100%' }}>{this.$slots['1']}</div>
+          <div class={styles.segmented}>
+            <div class={styles.cell}>{this.$slots['3']}</div>
+            <div class={styles.cell}>{this.$slots['4']}</div>
+          </div>
         </div>
         <ResizeBar
-          position="top"
+          position="left"
           vModel={this.bar2}
           onResizestart={() => this.props.resizeStartHandler()}
           onResizestop={() => this.props.resizeStopHandler()}
@@ -79,10 +72,8 @@ export default class Default extends TsxComponent<LayoutProps> {
           min={50}
           reverse={true}
         />
-        <div class={styles.segmented} style={{ height: `${this.bar2}px`, padding: '0 8px' }}>
-          <div class={cx(styles.cell, styles.noTopPadding)}>{this.$slots['3']}</div>
-          <div class={cx(styles.cell, styles.noTopPadding)}>{this.$slots['4']}</div>
-          <div class={cx(styles.cell, styles.noTopPadding)}>{this.$slots['5']}</div>
+        <div style={{ width: `${this.bar2}px` }} class={styles.cell}>
+          {this.$slots['5']}
         </div>
       </div>
     );

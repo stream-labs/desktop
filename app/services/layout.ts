@@ -3,6 +3,7 @@ import { mutation } from 'services/core/stateful-service';
 
 export enum ELayout {
   Default = 'Default',
+  TwoPane = 'TwoPane',
 }
 
 export enum ELayoutElement {
@@ -24,6 +25,10 @@ const RESIZE_DEFAULTS = {
   [ELayout.Default]: {
     bar1: 156,
     bar2: 240,
+  },
+  [ELayout.TwoPane]: {
+    bar1: 650,
+    bar2: 300,
   },
 };
 

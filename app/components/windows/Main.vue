@@ -75,6 +75,7 @@
   display: grid;
   grid-template-columns: auto 1fr;
   flex-grow: 1;
+  height: 100%;
 }
 
 .main-contents--right {
@@ -95,6 +96,7 @@
   flex-direction: column;
   overflow: hidden;
   position: relative;
+  height: 100%;
 }
 
 .titlebar--error {

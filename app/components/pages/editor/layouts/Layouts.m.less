@@ -3,27 +3,29 @@
 .rows {
   display: flex;
   flex-direction: column;
+  position: relative;
+  height: 100%;
+}
+
+.columns {
+  position: relative;
+  display: flex;
+  height: 100%;
 }
 
 .segmented {
   display: flex;
   justify-content: space-between;
-  padding: 8px;
-}
-
-.cell {
   height: 100%;
 }
 
-.controls-cell {
-  .padding-h-sides();
-
+.cell {
   display: flex;
   flex-grow: 1;
   flex-direction: column;
   height: 100%;
   position: relative;
-  padding-bottom: 8px;
+  padding: 16px 8px;
   min-width: 0;
 
   > div {
@@ -31,4 +33,12 @@
     display: flex;
     flex-direction: column;
   }
+}
+
+.side-padded {
+  .padding-h-sides();
+}
+
+.no-top-padding {
+  padding-top: 0;
 }

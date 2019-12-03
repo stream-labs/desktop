@@ -1,4 +1,4 @@
-import Vue from 'vue';
+import TsxComponent from 'components/tsx-component';
 import { Component } from 'vue-property-decorator';
 import clamp from 'lodash/clamp';
 import { DragHandler } from 'util/DragHandler';
@@ -37,7 +37,7 @@ interface IResizeOptions {
 @Component({
   components: { Display, StudioModeControls },
 })
-export default class StudioEditor extends Vue {
+export default class StudioEditor extends TsxComponent {
   @Inject() private scenesService: ScenesService;
   @Inject() private windowsService: WindowsService;
   @Inject() private videoService: VideoService;

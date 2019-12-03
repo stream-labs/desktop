@@ -1,4 +1,4 @@
-import Vue from 'vue';
+import TsxComponent from 'components/tsx-component';
 import { Component } from 'vue-property-decorator';
 import StudioEditor from 'components/StudioEditor.vue';
 import { Inject } from 'services/core/injector';
@@ -11,7 +11,7 @@ import { WindowsService } from 'services/windows';
 import * as Layouts from './layouts';
 import { IResizeMins } from './layouts/Default';
 
-const COMPONENT_MAP = {
+const COMPONENT_MAP: Dictionary<typeof TsxComponent> = {
   [ELayoutElement.Display]: StudioEditor,
   [ELayoutElement.Minifeed]: RecentEvents,
   [ELayoutElement.Mixer]: Mixer,
@@ -19,12 +19,13 @@ const COMPONENT_MAP = {
   [ELayoutElement.Sources]: SourceSelector,
 };
 
-const LAYOUT_MAP = {
+const LAYOUT_MAP: Dictionary<typeof TsxComponent> = {
   [ELayout.Default]: Layouts.Default,
+  [ELayout.TwoPane]: Layouts.TwoPane,
 };
 
 @Component({})
-export default class Editor extends Vue {
+export default class Editor extends TsxComponent {
   @Inject() private layoutService: LayoutService;
   @Inject() private windowsService: WindowsService;
 
@@ -32,6 +33,10 @@ export default class Editor extends Vue {
 
   get resizes() {
     return this.layoutService.state.resizes;
+  }
+
+  get isColumns() {
+    return [ELayout.TwoPane].includes(this.layoutService.state.currentLayout);
   }
 
   /**
@@ -42,7 +47,9 @@ export default class Editor extends Vue {
    */
   reconcileSizeWithinContraints(mins: IResizeMins, isBar2Resize = false) {
     // This is the maximum size we can use
-    this.max = this.$el.getBoundingClientRect().height;
+    this.max = this.isColumns
+      ? this.$el.getBoundingClientRect().width
+      : this.$el.getBoundingClientRect().height;
     if (this.underMaxSize) return;
     // If we're resizing the controls then we should be more aggressive
     // taking size from events

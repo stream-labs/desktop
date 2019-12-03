@@ -1,4 +1,4 @@
-import Vue from 'vue';
+import TsxComponent from 'components/tsx-component';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../services/core/injector';
 import { ScenesService } from 'services/scenes';
@@ -21,7 +21,7 @@ import { ERenderingMode } from '../../obs-api';
 @Component({
   components: { DropdownMenu, HelpTip, SlVueTree },
 })
-export default class SceneSelector extends Vue {
+export default class SceneSelector extends TsxComponent {
   @Inject() scenesService: ScenesService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() appService: AppService;
