@@ -72,8 +72,7 @@ export class AuthModule {
 
         if (parsed) {
           response.writeHead(302, {
-            Location:
-              'https://streamlabs.com/msg?msg=You%27re%20all%20set%21%20You%20may%20close%20this%20window%20now',
+            Location: 'https://streamlabs.com/streamlabs-obs/login-success',
           });
           response.end();
 
@@ -88,6 +87,10 @@ export class AuthModule {
           win.show();
           win.focus();
           win.setAlwaysOnTop(false);
+
+          // We didn't use a partition for login, but we should still
+          // create a new persistent partition for everything else.
+          parsed.partition = `persist:${uuid()}`;
 
           resolve(parsed);
         } else {
