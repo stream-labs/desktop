@@ -36,6 +36,7 @@ export default class FacebookMerge extends TsxComponent<{}> {
         this.streamSettingsService.setSettings({ protectedModeEnabled: true });
         this.navigationService.navigate('Studio');
       },
+      'internal',
       true,
     );
   }
