@@ -22,10 +22,10 @@
   "Face Mask Settings": "Configurações das Máscaras Faciais",
   "Twitch Follows": "Seguidores no Twitch",
   "Youtube Follows": "Seguidores no Youtube",
-  "Mask Duration": "Mask Duration",
-  "Donation Masks": "Donation Masks",
-  "Minimum Bits to Activate": "Minimum Bits to Activate",
-  "Test Face Masks": "Test Face Masks",
-  "Collapse": "Collapse",
-  "Expand": "Expand"
+  "Mask Duration": "Duração da máscara",
+  "Donation Masks": "Máscaras de doação",
+  "Minimum Bits to Activate": "Bits mínimos para ativar",
+  "Test Face Masks": "Testar máscaras de faces",
+  "Collapse": "Recolher",
+  "Expand": "Expandir"
 }
