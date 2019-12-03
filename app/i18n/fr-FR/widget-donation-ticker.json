@@ -4,7 +4,7 @@
   "Text Scroll Speed": "Vitesse de défilement du texte",
   "Background Color": "Couleur d'arrière-plan",
   "Font": "Police",
-  "Font Size": "Taille du texte",
+  "Font Size": "Taille de la police",
   "Font Weight": "Épaisseur de la police",
   "Text Color": "Couleur du texte",
   "Name Text Color": "Couleur du nom",
@@ -14,5 +14,5 @@
   "Manage List": "Gérer la liste",
   "Font Settings": "Paramètres de la police",
   "A hex color for the text of the": "Une couleur hexadécimale pour le texte du",
-  "token": "token"
+  "token": "jeton"
 }
