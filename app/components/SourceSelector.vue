@@ -92,6 +92,7 @@ i.disabled {
 
 .sl-vue-tree.sl-vue-tree-root {
   flex-grow: 1;
+  height: 100%;
   overflow: auto;
   border-color: var(--section);
 }

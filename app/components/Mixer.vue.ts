@@ -1,4 +1,4 @@
-import Vue from 'vue';
+import TsxComponent from 'components/tsx-component';
 import { Component } from 'vue-property-decorator';
 import { AudioService } from '../services/audio';
 import { Inject } from '../services/core/injector';
@@ -10,7 +10,7 @@ import { EditorCommandsService } from 'services/editor-commands';
 @Component({
   components: { MixerItem },
 })
-export default class Mixer extends Vue {
+export default class Mixer extends TsxComponent {
   @Inject() audioService: AudioService;
   @Inject() editorCommandsService: EditorCommandsService;
 

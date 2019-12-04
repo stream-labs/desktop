@@ -1,4 +1,4 @@
-import Vue from 'vue';
+import TsxComponent from 'components/tsx-component';
 import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from '../services/core/injector';
 import { SourcesService } from 'services/sources';
@@ -59,7 +59,7 @@ interface ISceneNodeData {
 @Component({
   components: { SlVueTree },
 })
-export default class SourceSelector extends Vue {
+export default class SourceSelector extends TsxComponent {
   @Inject() private scenesService: ScenesService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private selectionService: SelectionService;
