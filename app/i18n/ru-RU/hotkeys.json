@@ -12,14 +12,14 @@
   "Unmute": "Включить звук",
   "Push to Mute": "Нажмите, чтобы заглушить",
   "Push to Talk": "Нажмите, чтобы говорить",
-  "Enable Studio Mode": "Включить режим Студии",
-  "Disable Studio Mode": "Отключить режим Студии",
-  "Transition (Studio Mode)": "Переход (режим Студии)",
+  "Enable Studio Mode": "Включить режим студии",
+  "Disable Studio Mode": "Отключить режим студии",
+  "Transition (Studio Mode)": "Переход (режим студии)",
   "Capture Foreground Window": "Захватить окно на переднем плане",
   "Deactivate Capture": "Отключить захват",
-  "Toggle overlay positioning mode": "Toggle overlay positioning mode",
-  "Play/Pause": "Play/Pause",
-  "Restart": "Restart",
-  "Next Slide": "Next Slide",
-  "Previous Slide": "Previous Slide"
+  "Toggle overlay positioning mode": "Включить/выключить режим размещения оверлея",
+  "Play/Pause": "Воспроизведение/пауза",
+  "Restart": "Перезапуск",
+  "Next Slide": "Следующий слайд",
+  "Previous Slide": "Предыдущий слайд"
 }
