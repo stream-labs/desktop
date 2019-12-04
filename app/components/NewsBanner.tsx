@@ -39,10 +39,10 @@ export default class NewsBanner extends Vue {
     return this.currentBanner.header;
   }
 
-  async closeBanner(e?: Event) {
+  async closeBanner(e?: Event, clickType: 'action' | 'dismissal' = 'dismissal') {
     if (e) e.stopPropagation();
     this.processingClose = true;
-    await this.announcementsService.closeBanner();
+    await this.announcementsService.closeBanner(clickType);
     this.processingClose = false;
   }
 
@@ -57,7 +57,7 @@ export default class NewsBanner extends Vue {
       shell.openExternal(this.currentBanner.link);
     }
     if (this.currentBanner.closeOnLink) {
-      this.closeBanner();
+      this.closeBanner(null, 'action');
     }
   }
 
