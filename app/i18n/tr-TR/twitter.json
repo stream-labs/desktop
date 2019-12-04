@@ -1,10 +1,10 @@
 {
-  "Compose Tweet": "Compose Tweet",
-  "Custom URL with": "Custom URL with",
-  "Share Your Stream": "Share Your Stream",
-  "Connect to Twitter": "Connect to Twitter",
-  "Enable Tweet Sharing": "Enable Tweet Sharing",
-  "Tweet when going live": "Tweet when going live",
-  "Unlink Twitter": "Unlink Twitter",
-  "Tweet & Go Live": "Tweet & Go Live"
+  "Compose Tweet": "Tweet Oluştur",
+  "Custom URL with": "Özel URL:",
+  "Share Your Stream": "Yayınınızı Paylaşın",
+  "Connect to Twitter": "Twitter’a Bağlan",
+  "Enable Tweet Sharing": "Tweet Paylaşımını Etkinleştir",
+  "Tweet when going live": "Canlı yayın başladığında Tweet at",
+  "Unlink Twitter": "Twitter bağlantısını kaldır",
+  "Tweet & Go Live": "Tweet Atın ve Canlı Yayına Başlayın"
 }
