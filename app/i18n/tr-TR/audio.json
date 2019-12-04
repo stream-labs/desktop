@@ -1,8 +1,8 @@
 {
   "Open advanced audio settings": "Gelişmiş ses ayarlarını aç",
   "Volume (%)": "Ses Düzeyi (%)",
-  "Downmix to Mono": "Downmixi monoya çevir",
-  "Sync Offset (ms)": "Senk. Dengesi (ms)",
+  "Downmix to Mono": "Downmix’i Mono’ya çevir",
+  "Sync Offset (ms)": "Senk. Dengesi (msn.)",
   "Audio Monitoring": "Ses Görüntüleme",
   "Monitor Off": "Görüntüleme Kapalı",
   "Monitor Only (mute output)": "Sadece Görüntüleme (çıkışı sustur)",
@@ -10,7 +10,7 @@
   "Tracks": "Parçalar",
   "Advanced Audio Settings": "Gelişmiş Ses Ayarları",
   "Volume ( % )": "Ses Düzeyi ( % )",
-  "Sync Offset ( ms )": "Senk. Dengesi (ms)",
-  "Mixer": "Karıştırıcı",
-  "Monitor audio levels. If the bars are moving you are outputting audio.": "Ses seviyelerini görüntüle. Eğer ses çubukları hareket ediyorsa ses çıkışı vardır."
+  "Sync Offset ( ms )": "Senk. Dengesi (msn.)",
+  "Mixer": "Mixer",
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "Ses seviyelerini görüntüle. Ses çubukları hareket ediyorsa ses çıkışı vardır."
 }
