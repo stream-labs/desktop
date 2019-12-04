@@ -197,6 +197,18 @@ export class ClipboardService extends StatefulService<IClipboardState>
     return !!this.state.systemClipboard.files.length;
   }
 
+  canDuplicate(): boolean {
+    if (this.hasItemsInUnloadedClipboard()) return true;
+    if (!this.hasItems()) return false;
+    const hasNoduplicapableSource =
+      this.scenesService
+        .getScene(this.state.itemsSceneId)
+        .getSelection(this.state.sceneNodesIds)
+        .getSources()
+        .filter(source => source.doNotDuplicate).length > 0;
+    return !hasNoduplicapableSource;
+  }
+
   clear() {
     this.SET_FILTERS_IDS([]);
     this.SET_SCENE_ITEMS_IDS([]);
