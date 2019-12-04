@@ -160,7 +160,7 @@
   "Visible on both Stream and Recording": "Visible à la fois sur Stream et sur Enregistrement",
   "Only visible on Stream": "Uniquement visible pendant le Stream",
   "Only visible on Recording": "Uniquement visible pendant l'Enregistrement",
-  "Interact: %{sourceName}": "Interagir: % {sourceName}",
+  "Interact: %{sourceName}": "Interagir: %{sourceName}",
   "Hide on Recording": "Masquer lors de l'enregistrement",
   "Create Stream Output Projector": "Créer la sortie projecteur Stream",
   "Create Recording Output Projector": "Créer la sortie projecteur Enregistrement",
