@@ -13,6 +13,8 @@ export class LayoutProps {
   max: number = null;
 }
 
+// the minimums here represent the asbolute minimum of a viable component (minimized to invisibility)
+// and the reasonable minimum of a still usable component
 export interface IResizeMins {
   bar1: { absolute: number; reasonable: number };
   bar2: { absolute: number; reasonable: number };

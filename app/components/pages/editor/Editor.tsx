@@ -10,6 +10,7 @@ import { LayoutService, ELayoutElement, ELayout } from 'services/layout';
 import { WindowsService } from 'services/windows';
 import * as Layouts from './layouts';
 import { IResizeMins } from './layouts/Default';
+import { throttleSetter } from 'lodash-decorators';
 
 const COMPONENT_MAP: Dictionary<typeof TsxComponent> = {
   [ELayoutElement.Display]: StudioEditor,
@@ -89,8 +90,10 @@ export default class Editor extends TsxComponent {
       <Layout
         resizeStartHandler={() => this.resizeStartHandler()}
         resizeStopHandler={() => this.resizeStopHandler()}
-        reconcileSizeWithinContraints={this.reconcileSizeWithinContraints.bind(this)}
-        setBarResize={this.setBarResize.bind(this)}
+        reconcileSizeWithinContraints={(mins: IResizeMins, isBar2Resize?: boolean) =>
+          this.reconcileSizeWithinContraints(mins, isBar2Resize)
+        }
+        setBarResize={(bar: 'bar1' | 'bar2', size: number) => this.setBarResize(bar, size)}
         max={this.max}
         resizes={this.resizes}
         class="editor-page"

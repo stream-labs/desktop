@@ -58,14 +58,14 @@ export default class StudioEditor extends TsxComponent {
   isCropping: boolean;
   canDrag = true;
   sizeCheckInterval: number;
-  stacked = false;
+  stacked = false; // If the studio mode displays are horizontally or vertically oriented
   verticalPlaceholder = false;
   showDisplay = true;
 
   $refs: {
     display: HTMLDivElement;
-    studioModeContainer: HTMLDivElement;
-    placeholder: HTMLDivElement;
+    studioModeContainer: HTMLDivElement; // Holds extra display for studio mode
+    placeholder: HTMLDivElement; // Holds placeholder image while resizing
   };
 
   mounted() {
