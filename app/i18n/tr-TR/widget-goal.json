@@ -1,12 +1,12 @@
 {
-  "Goal Amount": "Hedef Miktarı",
+  "Goal Amount": "Hedeflenen Miktar",
   "Current Amount": "Mevcut Miktar",
   "Days Remaining": "Kalan Gün",
   "Start Goal": "Hedefi Başlat",
   "Goal": "Hedef",
-  "End Goal": "End Goal",
+  "End Goal": "Hedefi Sonlandır",
   "Starting Amount": "Başlangıç Miktarı",
-  "End After": "Sonrasında Bitir",
+  "End After": "Sonrasında Bitir:",
   "Include resubs?": "Yeniden abone olanlar dahil edilsin mi?",
   "Layout": "Düzen",
   "Background Color": "Arka Plan Rengi",
@@ -16,10 +16,10 @@
   "Bar Text Color": "Çubuk Metni Rengi",
   "Bar Thickness": "Çubuk Kalınlığı",
   "Font Family": "Yazı Tipi Grubu",
-  "Stars Goal": "Stars Goal",
-  "Facebook Stars": "Facebook Stars",
-  "Supporter Goal": "Supporter Goal",
-  "Facebook Supporters": "Facebook Supporters",
-  "Facebook chat": "Facebook chat",
-  "Member Goal": "Member Goal"
+  "Stars Goal": "Yıldız Hedefi",
+  "Facebook Stars": "Facebook Yıldızları",
+  "Supporter Goal": "Destekçi Hedefi",
+  "Facebook Supporters": "Facebook Destekçileri",
+  "Facebook chat": "Facebook sohbeti",
+  "Member Goal": "Üye Hedefi"
 }
