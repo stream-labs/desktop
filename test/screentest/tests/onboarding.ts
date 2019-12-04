@@ -37,7 +37,7 @@ test('Onboarding steps', async t => {
   await app.client.click('button=Start');
   await app.client.waitForVisible('h1=Optimizing... 33%');
   await makeScreenshots(t, 'Optimization progress');
-  await app.client.waitForVisible('h1=MultiStream', 60000);
+  await app.client.waitForVisible('h1=Multistream', 60000);
   await makeScreenshots(t, 'Multistream');
   await app.client.click('p=Skip');
 

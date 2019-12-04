@@ -50,7 +50,7 @@ test('Go through the onboarding and autoconfig', async t => {
   // Start auto config
   t.true(await app.client.isExisting('button=Start'));
   await app.client.click('button=Start');
-  await app.client.waitForVisible('h1=MultiStream', 60000);
+  await app.client.waitForVisible('h1=Multistream', 60000);
 
   // Skip restream settings
   if (await t.context.app.client.isExisting('p=Skip')) {
