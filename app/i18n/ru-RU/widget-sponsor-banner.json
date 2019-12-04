@@ -1,6 +1,6 @@
 {
-  "Sponsor Banner": "Sponsor Banner",
-  "Ad Layout": "Расположение рекламы",
+  "Sponsor Banner": "Баннер спонсора",
+  "Ad Layout": "Слой рекламы",
   "Placement": "Размещение",
   "Image Layout": "Слой изображения",
   "Image Duration": "Длительность изображения",
@@ -15,11 +15,11 @@
   "Transparent": "Прозрачный",
   "Single": "Одиночный",
   "Double": "Двойной",
-  "Set to zero to show the widget permanently.": "Установите параметр на ноль для постоянного отображения виджета.",
+  "Set to zero to show the widget permanently.": "Установите нулевое значение параметра для постоянного отображения виджета.",
   "The amount of time the widget will appear.": "Время, в течение которого появится виджет.",
   "These are the animations that are used to show your banner.": "Это тип анимации, который используется для отображения вашего баннера.",
-  "Visual Settings": "Visual Settings",
+  "Visual Settings": "Настройки визуализации",
   "Image Set ": "Набор изображений ",
   "No Image": "Нет изображения",
-  "Set up a sponsor banner to be able to edit (add, remove, update) rotating sponsor logos on streamer channel.": "Set up a sponsor banner to be able to edit (add, remove, update) rotating sponsor logos on streamer channel."
+  "Set up a sponsor banner to be able to edit (add, remove, update) rotating sponsor logos on streamer channel.": "Настройте баннер спонсора так, чтобы его можно было изменять (добавлять, удалять, обновлять) при ротации логотипов спонсоров на канале стримера."
 }

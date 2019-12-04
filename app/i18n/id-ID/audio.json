@@ -1,0 +1,16 @@
+{
+  "Open advanced audio settings": "Buka pengaturan audio terbaik",
+  "Volume (%)": "Volume (%)",
+  "Downmix to Mono": "Downmix ke Mono",
+  "Sync Offset (ms)": "Sync Offset (ms)",
+  "Audio Monitoring": "Pemantauan Audio",
+  "Monitor Off": "Monitor Off",
+  "Monitor Only (mute output)": "Hanya Monitor (mute output)",
+  "Monitor and Output": "Monitor dan Output",
+  "Tracks": "Track",
+  "Advanced Audio Settings": "Pengaturan Audio Terbaik",
+  "Volume ( % )": "Volume ( % )",
+  "Sync Offset ( ms )": "Sync Offset ( ms )",
+  "Mixer": "Mixer",
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "Pantau level audio. Jika bar bergerak, Anda harus outputting audio."
+}

@@ -1,17 +1,18 @@
 {
   "Message Format": "Формат сообщения",
-  "Max Donations": "Макс Пожертвования",
+  "Max Donations": "Макс. пожертвований",
   "Text Scroll Speed": "Скорость прокрутки текста",
   "Background Color": "Цвет фона",
   "Font": "Шрифт",
   "Font Size": "Размер шрифта",
   "Font Weight": "Плотность шрифта",
   "Text Color": "Цвет текста",
-  "Name Text Color": "Цвет имени",
+  "Name Text Color": "Цвет текста имени",
   "Amount Text Color": "Цвет текста количества",
-  "The name of the donator,": "Имя жертвователя,",
-  "The amount that was donated": "Сумма, которая была пожертвована",
+  "The name of the donator,": "Имя спонсора,",
+  "The amount that was donated": "Сумма пожертвования",
   "Manage List": "Управление списком",
   "Font Settings": "Настройки шрифта",
-  "A hex color for the text of the": "Шестнадцатеричный цвет для текста"
+  "A hex color for the text of the": "Шестнадцатеричный цвет для текста",
+  "token": "токен"
 }

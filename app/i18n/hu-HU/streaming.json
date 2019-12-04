@@ -90,5 +90,11 @@
   "Learn More": "Tudj meg többet",
   "Something went wrong while going live, please try again.": "Valami elromlott élőben, próbáld újra.",
   "You must select a game": "Ki kell választania egy játékot",
-  "Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.": "Kérjük, legfeljebb 7 nappal korábban és legkésőbb 10 perccel korábban ütemezze."
+  "Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.": "Kérjük, legfeljebb 7 nappal korábban és legkésőbb 10 perccel korábban ütemezze.",
+  "No Sources": "No Sources",
+  "Enable Multistream": "Enable Multistream",
+  "Multistream allows you to stream to multiple platforms simultaneously.": "Multistream allows you to stream to multiple platforms simultaneously.",
+  "Multistream": "Multistream",
+  "Your Twitch login is expired. Please log in again to continue using Streamlabs OBS": "Your Twitch login is expired. Please log in again to continue using Streamlabs OBS",
+  "Refresh Login": "Refresh Login"
 }

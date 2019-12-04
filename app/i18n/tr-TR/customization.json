@@ -1,7 +1,7 @@
 {
-  "Show the live dock (chat) on the left side": "Canlı Sohbet penceresini sol tarafta göster",
-  "Chat Text Size": "Sohbet metin boyutu",
+  "Show the live dock (chat) on the left side": "Canlı pencereyi (sohbet) sol tarafta göster",
+  "Chat Text Size": "Sohbet Metin Boyutu",
   "Chat Width": "Sohbet Genişliği",
-  "Enable BetterTTV emotes for Twitch": "BetterTTV ifadelerini etkinleştir",
-  "Enable FrankerFaceZ emotes for Twitch": "FrankerFaceZ ifadelerini etkinleştir"
+  "Enable BetterTTV emotes for Twitch": "Twitch için BetterTTV ifadelerini etkinleştir",
+  "Enable FrankerFaceZ emotes for Twitch": "Twitch için FrankerFaceZ ifadelerini etkinleştir"
 }

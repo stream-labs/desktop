@@ -108,5 +108,12 @@
   "Rotation": "Forgás",
   "Reset": "Visszaállítás",
   "Retry": "Próbálja újra",
-  "Warning": "Figyelem"
+  "Warning": "Figyelem",
+  "Off": "Off",
+  "Low": "Low",
+  "Medium": "Medium",
+  "High": "High",
+  "Very High": "Very High",
+  "Apps": "Apps",
+  "Finish": "Finish"
 }

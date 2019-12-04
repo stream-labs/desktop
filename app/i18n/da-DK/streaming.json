@@ -90,5 +90,11 @@
   "Learn More": "Learn More",
   "Something went wrong while going live, please try again.": "Something went wrong while going live, please try again.",
   "You must select a game": "You must select a game",
-  "Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.": "Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance."
+  "Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.": "Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.",
+  "No Sources": "No Sources",
+  "Enable Multistream": "Enable Multistream",
+  "Multistream allows you to stream to multiple platforms simultaneously.": "Multistream allows you to stream to multiple platforms simultaneously.",
+  "Multistream": "Multistream",
+  "Your Twitch login is expired. Please log in again to continue using Streamlabs OBS": "Your Twitch login is expired. Please log in again to continue using Streamlabs OBS",
+  "Refresh Login": "Refresh Login"
 }

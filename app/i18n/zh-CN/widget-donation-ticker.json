@@ -13,5 +13,6 @@
   "The amount that was donated": "赞助金额",
   "Manage List": "管理列表",
   "Font Settings": "字体设置",
-  "A hex color for the text of the": "十六进制颜色的文字颜色。"
+  "A hex color for the text of the": "十六进制颜色的文字颜色。",
+  "token": "token"
 }
