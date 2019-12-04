@@ -1,16 +1,16 @@
 {
   "Open advanced audio settings": "Открыть дополнительные настройки звука",
   "Volume (%)": "Громкость (%)",
-  "Downmix to Mono": "Преобразовать Стерео в Моно",
+  "Downmix to Mono": "Преобразовать в моно",
   "Sync Offset (ms)": "Сдвиг синхронизации (мс)",
   "Audio Monitoring": "Мониторинг звука",
   "Monitor Off": "Выключить мониторинг",
-  "Monitor Only (mute output)": "Только Мониторинг (заглушить вывод звука)",
-  "Monitor and Output": "Мониторинг и Вывод Звука",
+  "Monitor Only (mute output)": "Только мониторинг (заглушить вывод звука)",
+  "Monitor and Output": "Мониторинг и вывод звука",
   "Tracks": "Дорожки",
-  "Advanced Audio Settings": "Дополнительные Настройки Звука",
-  "Volume ( % )": "Громкость ( % )",
+  "Advanced Audio Settings": "Дополнительные настройки звука",
+  "Volume ( % )": "Громкость (%)",
   "Sync Offset ( ms )": "Сдвиг синхронизации (мс)",
   "Mixer": "Микшер",
-  "Monitor audio levels. If the bars are moving you are outputting audio.": "Уровень мониторинга звука. Если ползунки двигаются, значит происходит вывод звука."
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "Уровни звука. Движение ползунков свидетельствует о наличии звука."
 }
