@@ -10,6 +10,7 @@
       <form-input
         v-model="searchStr"
         :metadata="{
+          name: 'search',
           type: 'text',
           placeholder: 'Search',
           icon: 'search'
