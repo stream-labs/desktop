@@ -86,9 +86,10 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
   }
 
   setSettings(settingsPatch: Partial<ICustomizationSettings>) {
-    const changedSettings = Utils.getChangedParams(this.state, settingsPatch);
-    this.SET_SETTINGS(changedSettings);
-    this.settingsChanged.next(changedSettings);
+    // tslint:disable-next-line:no-parameter-reassignment TODO
+    settingsPatch = Utils.getChangedParams(this.state, settingsPatch);
+    this.SET_SETTINGS(settingsPatch);
+    this.settingsChanged.next(settingsPatch);
   }
 
   getSettings(): ICustomizationSettings {

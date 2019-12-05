@@ -172,8 +172,8 @@ export class ScenesModule extends Module {
         name: node.name,
         childrenIds: node.childrenIds,
       } as ISceneItemFolder;
-    }
-    if (node.isItem()) {
+      // tslint:disable-next-line:no-else-after-return TODO
+    } else if (node.isItem()) {
       return {
         id: node.id,
         type: ESceneNodeType.SceneItem,

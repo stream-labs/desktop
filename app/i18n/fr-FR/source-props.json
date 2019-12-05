@@ -1,17 +1,17 @@
 {
     "Image": "Image",
-    "Color Source": "Couleur",
+    "Color Source": "Source de couleur",
     "Browser Source": "Source du navigateur",
-    "Media Source": "Fichier multimédia",
-    "Image Slide Show": "Diaporama d'images",
+    "Media Source": "Source de média",
+    "Image Slide Show": "Image-diaporama",
     "Text (GDI+)": "Texte (GDI+)",
     "Text (FreeType 2)": "Texte (FreeType 2)",
-    "Display Capture": "Capture d'écran",
+    "Display Capture": "Capture d’écran",
     "Window Capture": "Capture de fenêtre",
     "Game Capture": "Capture de jeu",
-    "Video Capture Device": "Dispositif de capture vidéo",
+    "Video Capture Device": "Périphérique de capture vidéo",
     "Audio Input Capture": "Capture de l'entrée audio",
     "Audio Output Capture": "Capture de la sortie audio",
-    "Blackmagic Device": "Dispositif Blackmagic",
+    "Blackmagic Device": "Périphérique Blackmagic",
     "NDI Source": "Source NDI"
 }

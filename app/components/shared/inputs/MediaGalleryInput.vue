@@ -1,21 +1,23 @@
 <template>
-  <div class="media-box">
-    <div class="url-uploader" v-if="showUrlUpload">
-      {{ $t('Image URL') }}
-      <text-input v-model="url" :metadata="{ placeholder: `${$t('Example')}: https://yoururl.com/image/Streamlabs` }" />
-      <button class="button button--action" @click="uploadUrl">{{ $t('Submit') }}</button>
-    </div>
-    <img :src="value || metadata.clearImage" v-if="!/\.webm/.test(value) && !showUrlUpload" >
-    <video v-if="/\.webm/.test(value) && !showUrlUpload && value" loop muted autoplay :key="value">
-      <source :src="value" type="video/webm" />
-    </video>
-    <div class="footer">
-      <span class="filename">{{ fileName || 'Default' }}</span>
-      <div>
-        <i @click="toggleUrlUpload" class="icon-link" />
-        <i @click="previewImage" class="fa fa-search-plus" />
-        <i @click="clearImage" class="icon-close" />
-        <span class="change-media" @click="updateValue">{{ $t('Change Media') }}</span>
+  <div>
+    <div class="media-box">
+      <div class="url-uploader" v-if="showUrlUpload">
+        {{ $t('Image URL') }}
+        <text-input v-model="url" :metadata="{ placeholder: `${$t('Example')}: https://yoururl.com/image/Streamlabs` }" />
+        <button class="button button--action" @click="uploadUrl">{{ $t('Submit') }}</button>
+      </div>
+      <img :src="value || metadata.clearImage" v-if="!/\.webm/.test(value) && !showUrlUpload" >
+      <video v-if="/\.webm/.test(value) && !showUrlUpload && value" loop muted autoplay :key="value">
+        <source :src="value" type="video/webm" />
+      </video>
+      <div class="footer">
+        <span class="filename">{{ fileName || 'Default' }}</span>
+        <div>
+          <i @click="toggleUrlUpload" class="icon-link" />
+          <i @click="previewImage" class="fa fa-search-plus" />
+          <i @click="clearImage" class="icon-close" />
+          <span class="change-media" @click="updateValue">{{ $t('Change Media') }}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -31,7 +33,6 @@
 
   position: relative;
   width: 100%;
-  max-width: 300px;
   height: 120px;
   background-color: var(--section);
 
