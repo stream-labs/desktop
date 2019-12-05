@@ -122,7 +122,7 @@ export default class StreamSettings extends TsxComponent {
                 ) : (
                   <div style={{ lineHeight: '42px' }}>
                     {this.canEditSettings && (
-                      <button onClick={this.facebookMerge} className="button button--facebook">
+                      <button onClick={this.facebookMerge} class="button button--facebook">
                         {$t('Connect')}
                       </button>
                     )}
