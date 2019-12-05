@@ -248,7 +248,7 @@ if (Utils.isDevMode()) {
 // ERRORS LOGGING
 
 function logError(...args: unknown[]) {
-  ipcRenderer.send('showErrorAlert');
+  if (Utils.isDevMode()) ipcRenderer.send('showErrorAlert');
   electronLog.error(...args);
 }
 
@@ -261,4 +261,4 @@ Object.assign(console, {
 });
 
 // catch and log unhandled errors/rejected promises:
-electronLog.catchErrors({ onError: () => ipcRenderer.send('showErrorAlert') });
+electronLog.catchErrors({ onError: () => Utils.isDevMode() && ipcRenderer.send('showErrorAlert') });
