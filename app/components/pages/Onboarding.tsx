@@ -3,23 +3,28 @@ import { Onboarding } from 'streamlabs-beaker';
 import TsxComponent from 'components/tsx-component';
 import { OnboardingService } from 'services/onboarding';
 import { Inject } from 'services/core/injector';
-import Connect from './onboarding-steps/Connect';
-import ObsImport from './onboarding-steps/ObsImport';
-import StreamlabsFeatures from './onboarding-steps/StreamlabsFeatures';
-import Optimize from './onboarding-steps/Optimize';
-import FacebookPageCreation from './onboarding-steps/FacebookPageCreation';
-import ThemeSelector from './onboarding-steps/ThemeSelector';
-import HardwareSetup from './onboarding-steps/HardwareSetup';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
+import {
+  Connect,
+  ObsImport,
+  StreamlabsFeatures,
+  HardwareSetup,
+  ThemeSelector,
+  Optimize,
+  FacebookPageCreation,
+  Multistream,
+} from './onboarding-steps';
 import { UserService } from 'services/user';
 import { $t } from 'services/i18n';
 import styles from './Onboarding.m.less';
+import { RestreamService } from 'services/restream';
 
 @Component({})
 export default class OnboardingPage extends TsxComponent<{}> {
   @Inject() onboardingService: OnboardingService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
   @Inject() userService: UserService;
+  @Inject() restreamService: RestreamService;
 
   currentStep = 1;
   importedFromObs = false;
@@ -80,6 +85,9 @@ export default class OnboardingPage extends TsxComponent<{}> {
       ) {
         this.stepsState.push({ complete: false });
       }
+      if (this.restreamService.canEnableRestream) {
+        this.stepsState.push({ complete: false });
+      }
     }
   }
 
@@ -113,6 +121,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
           setProcessing={this.setProcessing.bind(this)}
         />,
       );
+      steps.push(<Multistream slot="6" continue={() => this.continue()} />);
     } else if (this.onboardingService.isFacebookAuthed && this.fbSetupEnabled) {
       steps.push(<FacebookPageCreation slot="5" continue={this.continue.bind(this)} />);
     }
@@ -178,7 +187,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
               [1, 2].includes(this.currentStep) || (this.currentStep === 3 && this.importedFromObs)
             }
             hideButton={
-              [1, 2, 5].includes(this.currentStep) ||
+              [1, 2, 5, 6].includes(this.currentStep) ||
               (this.currentStep === 4 && !this.importedFromObs)
             }
           >
