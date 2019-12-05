@@ -47,8 +47,8 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     return this.state.id !== null;
   }
 
-  async closeBanner() {
-    await this.postBannerClose();
+  async closeBanner(clickType: 'action' | 'dismissal') {
+    await this.postBannerClose(clickType);
   }
 
   private get installDateProxyFilePath() {
@@ -135,11 +135,12 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     }
   }
 
-  private async postBannerClose() {
+  private async postBannerClose(clickType: 'action' | 'dismissal') {
     const endpoint = 'api/v5/slobs/announcement/close';
     const postData = {
       method: 'POST',
       body: JSON.stringify({
+        clickType,
         clientId: this.userService.getLocalUserId(),
         announcementId: this.state.id,
       }),
