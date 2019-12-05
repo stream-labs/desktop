@@ -17,12 +17,14 @@ import {
 import { UserService } from 'services/user';
 import { $t } from 'services/i18n';
 import styles from './Onboarding.m.less';
+import { RestreamService } from 'services/restream';
 
 @Component({})
 export default class OnboardingPage extends TsxComponent<{}> {
   @Inject() onboardingService: OnboardingService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
   @Inject() userService: UserService;
+  @Inject() restreamService: RestreamService;
 
   currentStep = 1;
   importedFromObs = false;
@@ -83,7 +85,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
       ) {
         this.stepsState.push({ complete: false });
       }
-      if (this.onboardingService.isTwitchAuthed) {
+      if (this.restreamService.canEnableRestream) {
         this.stepsState.push({ complete: false });
       }
     }

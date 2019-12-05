@@ -12,7 +12,7 @@ import { ToggleInput } from 'components/shared/inputs/inputs';
 import styles from './Multistream.m.less';
 
 class MultistreamProps {
-  continue: () => void = null;
+  continue: () => void = () => {};
 }
 
 @Component({ props: createProps(MultistreamProps) })
