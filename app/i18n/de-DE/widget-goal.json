@@ -1,10 +1,10 @@
 {
   "Goal Amount": "Zielhöhe",
-  "Current Amount": "Aktuelle Anzahl",
+  "Current Amount": "Aktueller Betrag",
   "Days Remaining": "Verbleibende Tage",
-  "Start Goal": "Anfängliches Ziel",
+  "Start Goal": "Anfangsziel",
   "Goal": "Ziel",
-  "End Goal": "End Goal",
+  "End Goal": "Endziel",
   "Starting Amount": "Start-Betrag",
   "End After": "Endet nach",
   "Include resubs?": "Wiederholte Abonnenten einschließen?",
@@ -16,10 +16,10 @@
   "Bar Text Color": "Balken-Textfarbe",
   "Bar Thickness": "Balken-Dicke",
   "Font Family": "Schriftarten-Familie",
-  "Stars Goal": "Stars Goal",
-  "Facebook Stars": "Facebook Stars",
-  "Supporter Goal": "Supporter Goal",
-  "Facebook Supporters": "Facebook Supporters",
-  "Facebook chat": "Facebook chat",
-  "Member Goal": "Member Goal"
+  "Stars Goal": "Stars-Ziel",
+  "Facebook Stars": "Facebook-Sterne",
+  "Supporter Goal": "Unterstützer-Ziel",
+  "Facebook Supporters": "Facebook-Unterstützer",
+  "Facebook chat": "Facebook-Chat",
+  "Member Goal": "Mitglieder-Ziel"
 }
