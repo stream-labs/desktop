@@ -16,6 +16,7 @@ import Chatbot from '../pages/Chatbot.vue';
 import PlatformAppStore from '../pages/PlatformAppStore.vue';
 import BrowseOverlays from 'components/pages/BrowseOverlays.vue';
 import Onboarding from '../pages/Onboarding';
+import LayoutEditor from '../pages/LayoutEditor';
 import TitleBar from '../TitleBar.vue';
 import { Inject } from '../../services/core/injector';
 import { CustomizationService } from 'services/customization';
@@ -52,6 +53,7 @@ import { getPlatformService } from 'services/platforms';
     Help,
     ResizeBar,
     FacebookMerge,
+    LayoutEditor,
   },
 })
 export default class Main extends Vue {
@@ -147,6 +149,7 @@ export default class Main extends Vue {
   }
 
   async onDropHandler(event: DragEvent) {
+    if (this.page === 'LayoutEditor') return;
     const fileList = event.dataTransfer.files;
     const files: string[] = [];
     let fi = fileList.length;

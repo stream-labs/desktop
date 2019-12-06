@@ -17,7 +17,7 @@ export enum ELayoutElement {
 
 interface ILayoutServiceState {
   currentLayout: ELayout;
-  slottedWidgets: { [key in ELayoutElement]?: '1' | '2' | '3' | '4' | '5' | '6' };
+  slottedElements: { [key in ELayoutElement]?: '1' | '2' | '3' | '4' | '5' | '6' };
   resizes: { bar1: number; bar2: number };
 }
 
@@ -35,7 +35,7 @@ const RESIZE_DEFAULTS = {
 export class LayoutService extends PersistentStatefulService<ILayoutServiceState> {
   static defaultState: ILayoutServiceState = {
     currentLayout: ELayout.Default,
-    slottedWidgets: {
+    slottedElements: {
       Display: '1',
       Minifeed: '2',
       Scenes: '3',
@@ -56,22 +56,24 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
     this.SET_RESIZE(bar, size);
   }
 
-  unslottedElements() {
-    return Object.keys(ELayoutElement).filter(
-      el => !this.state.slottedWidgets[el],
-    ) as ELayoutElement[];
+  changeLayout(layout: ELayout) {
+    this.CHANGE_LAYOUT(layout);
+  }
+
+  setSlots(slottedElements: { [key in ELayoutElement]?: '1' | '2' | '3' | '4' | '5' | '6' }) {
+    this.SET_SLOTS(slottedElements);
   }
 
   @mutation()
   CHANGE_LAYOUT(layout: ELayout) {
     this.state.currentLayout = layout;
-    this.state.slottedWidgets = {};
+    this.state.slottedElements = {};
     this.state.resizes = RESIZE_DEFAULTS[layout];
   }
 
   @mutation()
-  SLOT_ELEMENT(element: ELayoutElement, slot: '1' | '2' | '3' | '4' | '5' | '6') {
-    this.state.slottedWidgets[element] = slot;
+  SET_SLOTS(slottedElements: { [key in ELayoutElement]?: '1' | '2' | '3' | '4' | '5' | '6' }) {
+    this.state.slottedElements = slottedElements;
   }
 
   @mutation()

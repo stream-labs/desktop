@@ -97,9 +97,9 @@ export default class Studio extends TsxComponent {
         resizes={this.resizes}
         class="editor-page"
       >
-        {Object.keys(this.layoutService.state.slottedWidgets).map(widget => {
+        {Object.keys(this.layoutService.state.slottedElements).map(widget => {
           const Element = COMPONENT_MAP[widget];
-          return <Element slot={this.layoutService.state.slottedWidgets[widget]} />;
+          return <Element slot={this.layoutService.state.slottedElements[widget]} />;
         })}
       </Layout>
     );
