@@ -82,7 +82,7 @@ export default class StreamSettings extends TsxComponent {
   }
 
   get restreamRewardsUrl() {
-    return `https://beta3.streamlabs.com/multistream-rewards?token=${this.userService.apiToken}`;
+    return `https://streamlabs.com/multistream-rewards?token=${this.userService.apiToken}`;
   }
 
   render() {
