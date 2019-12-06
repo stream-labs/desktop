@@ -9,6 +9,7 @@ import cx from 'classnames';
 import styles from './NewsBanner.m.less';
 import { CustomizationService } from 'services/customization';
 import { WindowsService } from 'services/windows';
+import { SettingsService } from 'services/settings';
 
 @Component({})
 export default class NewsBanner extends Vue {
@@ -16,6 +17,7 @@ export default class NewsBanner extends Vue {
   @Inject() navigationService: NavigationService;
   @Inject() customizationService: CustomizationService;
   @Inject() windowsService: WindowsService;
+  @Inject() settingsService: SettingsService;
 
   processingClose = false;
 
@@ -49,10 +51,15 @@ export default class NewsBanner extends Vue {
   followLink() {
     if (!this.currentBanner) return;
     if (this.currentBanner.linkTarget === 'slobs') {
-      this.navigationService.navigate(
-        this.currentBanner.link as TAppPage,
-        this.currentBanner.params,
-      );
+      // This isn't actually a page, but we want to be able to open it from a banner
+      if (this.currentBanner.link === 'Settings') {
+        this.settingsService.showSettings(this.currentBanner.params.category);
+      } else {
+        this.navigationService.navigate(
+          this.currentBanner.link as TAppPage,
+          this.currentBanner.params,
+        );
+      }
     } else {
       shell.openExternal(this.currentBanner.link);
     }
