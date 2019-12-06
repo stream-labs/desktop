@@ -14,8 +14,9 @@ import { metadata } from 'components/shared/inputs';
 import { NavigationService } from 'services/navigation';
 import { WindowsService } from 'services/windows';
 import { EStreamingState, StreamingService } from 'services/streaming';
+import BrowserView from 'components/shared/BrowserView';
 
-@Component({ components: { GenericFormGroups, PlatformLogo } })
+@Component({ components: { GenericFormGroups, PlatformLogo, BrowserView } })
 export default class StreamSettings extends TsxComponent {
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private userService: UserService;
@@ -80,6 +81,10 @@ export default class StreamSettings extends TsxComponent {
     this.windowsService.closeChildWindow();
   }
 
+  get restreamRewardsUrl() {
+    return `https://streamlabs.com/multistream-rewards?token=${this.userService.apiToken}`;
+  }
+
   render() {
     return (
       <div>
@@ -136,6 +141,13 @@ export default class StreamSettings extends TsxComponent {
               </div>
             )}
           </div>
+        )}
+
+        {this.restreamService.canEnableRestream && this.protectedModeEnabled && (
+          <BrowserView
+            style={{ height: '330px', marginTop: '16px', marginBottom: '16px' }}
+            src={this.restreamRewardsUrl}
+          />
         )}
 
         {/* WARNING messages */}
