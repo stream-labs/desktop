@@ -143,6 +143,13 @@ export default class StreamSettings extends TsxComponent {
           </div>
         )}
 
+        {this.restreamService.canEnableRestream && this.protectedModeEnabled && (
+          <BrowserView
+            style={{ height: '330px', marginTop: '16px', marginBottom: '16px' }}
+            src={this.restreamRewardsUrl}
+          />
+        )}
+
         {/* WARNING messages */}
         {!this.canEditSettings && (
           <div class="section section--warning">
@@ -169,13 +176,6 @@ export default class StreamSettings extends TsxComponent {
         {/* OBS settings */}
         {!this.protectedModeEnabled && this.canEditSettings && (
           <GenericFormGroups value={this.obsSettings} onInput={this.saveObsSettings} />
-        )}
-
-        {this.restreamService.canEnableRestream && this.protectedModeEnabled && (
-          <BrowserView
-            style={{ height: '330px', marginTop: '16px' }}
-            src={this.restreamRewardsUrl}
-          />
         )}
       </div>
     );
