@@ -17,7 +17,7 @@ export class LayoutProps {
 // and the reasonable minimum of a still usable component
 export interface IResizeMins {
   bar1: { absolute: number; reasonable: number };
-  bar2: { absolute: number; reasonable: number };
+  bar2?: { absolute: number; reasonable: number };
 }
 
 const RESIZE_MINS = {

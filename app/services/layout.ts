@@ -4,6 +4,7 @@ import { mutation } from 'services/core/stateful-service';
 export enum ELayout {
   Default = 'Default',
   TwoPane = 'TwoPane',
+  Classic = 'Classic',
 }
 
 export enum ELayoutElement {
@@ -18,7 +19,7 @@ export enum ELayoutElement {
 interface ILayoutServiceState {
   currentLayout: ELayout;
   slottedElements: { [key in ELayoutElement]?: '1' | '2' | '3' | '4' | '5' | '6' };
-  resizes: { bar1: number; bar2: number };
+  resizes: { bar1: number; bar2?: number };
 }
 
 const RESIZE_DEFAULTS = {
@@ -29,6 +30,9 @@ const RESIZE_DEFAULTS = {
   [ELayout.TwoPane]: {
     bar1: 650,
     bar2: 300,
+  },
+  [ELayout.Classic]: {
+    bar1: 450,
   },
 };
 

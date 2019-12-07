@@ -22,6 +22,7 @@ const COMPONENT_MAP: Dictionary<typeof TsxComponent> = {
 const LAYOUT_MAP: Dictionary<typeof TsxComponent> = {
   [ELayout.Default]: Layouts.Default,
   [ELayout.TwoPane]: Layouts.TwoPane,
+  [ELayout.Classic]: Layouts.Classic,
 };
 
 @Component({})
@@ -50,6 +51,7 @@ export default class Studio extends TsxComponent {
     this.max = this.isColumns
       ? this.$el.getBoundingClientRect().width
       : this.$el.getBoundingClientRect().height;
+    if (!mins.bar2) return;
     if (this.underMaxSize) return;
     // If we're resizing the controls then we should be more aggressive
     // taking size from events

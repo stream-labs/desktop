@@ -12,6 +12,7 @@ import { NavigationService } from 'services/navigation';
 const TEMPLATE_MAP: Dictionary<string> = {
   [ELayout.Default]: 'default',
   [ELayout.TwoPane]: 'twoPane',
+  [ELayout.Classic]: 'classic',
 };
 
 @Component({})
@@ -35,8 +36,7 @@ export default class LayoutEditor extends TsxComponent {
   }
 
   elementInSlot(slot: '1' | '2' | '3' | '4' | '5' | '6') {
-    const element = Object.keys(this.slottedElements).find(el => this.slottedElements[el] === slot);
-    return this.elementTitles[element];
+    return Object.keys(this.slottedElements).find(el => this.slottedElements[el] === slot);
   }
 
   classForSlot(slot: '1' | '2' | '3' | '4' | '5' | '6') {
@@ -117,8 +117,15 @@ export default class LayoutEditor extends TsxComponent {
           {this.sideBar}
           <div class={cx(styles.templateContainer, styles[TEMPLATE_MAP[this.currentLayout]])}>
             {['1', '2', '3', '4', '5', '6'].map((slot: '1' | '2' | '3' | '4' | '5' | '6') => (
-              <div class={this.classForSlot(slot)} id={slot}>
-                <span>{this.elementInSlot(slot)}</span>
+              <div
+                class={this.classForSlot(slot)}
+                id={slot}
+                draggable
+                onDragend={(e: MouseEvent) =>
+                  this.handleElementDrag(e, ELayoutElement[this.elementInSlot(slot)])
+                }
+              >
+                <span>{this.elementTitles[this.elementInSlot(slot)]}</span>
               </div>
             ))}
           </div>
