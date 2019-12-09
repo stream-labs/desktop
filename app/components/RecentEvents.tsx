@@ -196,7 +196,7 @@ export default class RecentEvents extends TsxComponent<RecentEventsProps> {
             onNativeswitch={val => this.setNative(val)}
           />
         )}
-        {this.native ? this.renderNativeEvents : this.renderEmbeddedEvents}
+        {this.native || this.props.isOverlay ? this.renderNativeEvents : this.renderEmbeddedEvents}
         {!this.props.isOverlay && (
           <HelpTip
             dismissableKey={EDismissable.RecentEventsHelpTip}
@@ -351,9 +351,9 @@ class EventCell extends TsxComponent<EventCellProps> {
       >
         <span class={styles.timestamp}>{this.timestamp}</span>
         <span class={styles.name}>{getName(this.props.event)}</span>
-        <span>{this.props.eventString(this.props.event)}</span>
+        <span class={styles.message}>{this.props.eventString(this.props.event)}</span>
         {this.props.event.gifter && (
-          <span class={styles.name}>
+          <span class={cx(styles.name, styles.message)}>
             {this.props.event.from ? this.props.event.from : this.props.event.name}
           </span>
         )}

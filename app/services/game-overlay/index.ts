@@ -87,16 +87,21 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
   async init() {
     super.init();
-    if (!this.state.isEnabled) return;
-
     this.lifecycle = await this.userService.withLifecycle({
       init: this.initializeOverlay,
-      destroy: this.destroyOverlay,
+      destroy: () => this.setEnabled(false),
       context: this,
     });
   }
 
+  private overlayRunning = false;
+
   async initializeOverlay() {
+    if (!this.state.isEnabled) return;
+
+    if (this.overlayRunning) return;
+    this.overlayRunning = true;
+
     let crashHandlerLogPath = '';
     if (process.env.NODE_ENV !== 'production' || !!process.env.SLOBS_PREVIEW) {
       const overlayLogFile = '\\game-overlays.log';
@@ -128,6 +133,9 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       height: 600,
       webPreferences: chatWebPrefences,
     });
+
+    this.windows.chat.webContents.setAudioMuted(true);
+
     this.createPreviewWindows();
     await this.configureWindows();
   }
@@ -280,17 +288,16 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   async setEnabled(shouldEnable: boolean = true) {
-    if (!this.userService.isLoggedIn()) {
+    if (shouldEnable && !this.userService.isLoggedIn()) {
       return Promise.reject($t('Please log in to use the in-game overlay.'));
     }
 
     const shouldStart = shouldEnable && !this.state.isEnabled;
     const shouldStop = !shouldEnable && this.state.isEnabled;
 
+    this.SET_ENABLED(shouldEnable);
     if (shouldStart) await this.initializeOverlay();
     if (shouldStop) await this.destroyOverlay();
-
-    this.SET_ENABLED(shouldEnable);
   }
 
   async toggleWindowEnabled(window: string) {
@@ -340,19 +347,20 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
   async destroy() {
     if (!this.lifecycle) return;
-    await this.lifecycle.destroy();
+    await this.destroyOverlay();
   }
 
   async destroyOverlay() {
-    if (this.state.isEnabled) {
-      await overlay.stop();
-      if (this.onWindowsReadySubscription) await this.onWindowsReadySubscription.unsubscribe();
-      if (this.windows) await Object.values(this.windows).forEach(win => win.destroy());
-      if (this.previewWindows) {
-        await Object.values(this.previewWindows).forEach(win => win.destroy());
-      }
-      this.onChatUrlChangedSubscription.unsubscribe();
+    if (!this.overlayRunning) return;
+    this.overlayRunning = false;
+
+    await overlay.stop();
+    if (this.onWindowsReadySubscription) await this.onWindowsReadySubscription.unsubscribe();
+    if (this.windows) await Object.values(this.windows).forEach(win => win.destroy());
+    if (this.previewWindows) {
+      await Object.values(this.previewWindows).forEach(win => win.destroy());
     }
+    this.onChatUrlChangedSubscription.unsubscribe();
     this.SET_PREVIEW_MODE(false);
     this.TOGGLE_OVERLAY(false);
   }

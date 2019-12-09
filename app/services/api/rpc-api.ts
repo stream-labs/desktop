@@ -293,12 +293,14 @@ export abstract class RpcApi extends Service {
   }
 
   /**
-   * The promise that the client has been executed is resolved/rejected
+   * The promise that the client has executed is resolved/rejected
    * Send this conformation back to the client
    */
   private sendPromiseMessage(info: { isRejected: boolean; promiseId: string; data: any }) {
     // serialize errors
-    const serializedData = info.isRejected ? { message: info.data.message } : info.data;
+    const serializedData = info.isRejected
+      ? { message: info.data.message, ...info.data }
+      : info.data;
 
     this.serviceEvent.next(
       this.jsonrpc.createEvent({

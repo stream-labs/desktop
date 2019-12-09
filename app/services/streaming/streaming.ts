@@ -426,7 +426,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       if (info.signal === EOBSOutputSignal.Start) {
         this.SET_STREAMING_STATUS(EStreamingState.Live, time);
         this.streamingStatusChange.next(EStreamingState.Live);
-        this.runPlatformAfterGoLiveHook();
+        if (this.streamSettingsService.protectedModeEnabled) this.runPlatformAfterGoLiveHook();
 
         let streamEncoderInfo: Partial<IOutputSettings> = {};
         let game: string = null;
@@ -447,6 +447,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           eventMetadata.useOptimizedProfile = true;
         }
 
+        const streamSettings = this.streamSettingsService.settings;
+
+        eventMetadata.streamType = streamSettings.streamType;
+        eventMetadata.platform = streamSettings.platform;
+        eventMetadata.server = streamSettings.server;
+
         this.usageStatisticsService.recordEvent('stream_start', eventMetadata);
       } else if (info.signal === EOBSOutputSignal.Starting) {
         this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
@@ -454,7 +460,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       } else if (info.signal === EOBSOutputSignal.Stop) {
         this.SET_STREAMING_STATUS(EStreamingState.Offline, time);
         this.streamingStatusChange.next(EStreamingState.Offline);
-        this.runPlaformAfterStopStreamHook();
+        if (this.streamSettingsService.protectedModeEnabled) this.runPlaformAfterStopStreamHook();
       } else if (info.signal === EOBSOutputSignal.Stopping) {
         this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
         this.streamingStatusChange.next(EStreamingState.Ending);

@@ -14,6 +14,12 @@ export default class CustomLoader extends Vue {
     'Asking the stream gods for perfect settings...',
     'Powering up the clouds...',
     'Constructing additional widgets...',
+    "Remembering all your chatters' names...",
+    'Executing good vibes protocol...',
+    'Submitting mod thank-you notes...',
+    'Expanding audience reach with multistream...',
+    'Crafting perfect VOD with selective recording...',
+    'Calculating multistream hype multiplier coefficient...',
   ];
 
   render() {

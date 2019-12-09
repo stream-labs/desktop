@@ -129,29 +129,48 @@ export class TwitchService extends Service implements IPlatformService {
   async beforeGoLive(channelInfo?: ITwitchStartStreamOptions) {
     const key = await this.fetchStreamKey();
 
-    if (this.streamSettingsService.protectedModeEnabled) {
-      this.streamSettingsService.setSettings({ key, platform: 'twitch' });
+    if (
+      this.streamSettingsService.protectedModeEnabled &&
+      this.streamSettingsService.isSafeToModifyStreamKey()
+    ) {
+      this.streamSettingsService.setSettings({
+        key,
+        platform: 'twitch',
+        streamType: 'rtmp_common',
+      });
     }
 
     if (channelInfo) await this.putChannelInfo(channelInfo);
     return key;
   }
 
-  /**
-   * Check 2FA enabled
-   */
-  validatePlatform() {
-    return this.fetchStreamKey()
-      .then(key => {
-        return EPlatformCallResult.Success;
-      })
-      .catch((r: Response) => {
-        if (r.status === 403) {
+  async validatePlatform() {
+    try {
+      const result = await this.hasScope('channel_read');
+
+      if (!result) return EPlatformCallResult.TwitchScopeMissing;
+    } catch (e) {
+      console.error('Error checking Twitch OAuth scopes', e);
+
+      return EPlatformCallResult.Error;
+    }
+
+    try {
+      // Catch 2FA errors
+      await this.fetchStreamKey();
+    } catch (e) {
+      if (e instanceof Response) {
+        if (e.status === 403) {
           return EPlatformCallResult.TwitchTwoFactor;
         }
+      }
 
-        return EPlatformCallResult.Error;
-      });
+      console.error('Error fetching Twitch stream key', e);
+
+      return EPlatformCallResult.Error;
+    }
+
+    return EPlatformCallResult.Success;
   }
 
   fetchNewToken(): Promise<void> {

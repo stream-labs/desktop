@@ -44,11 +44,11 @@
       :onPageRender="onPageRenderHandler"
       @searchCompleted="onSearchCompletedHandler"
       @scanCompleted="settingsData = getSettingsData(categoryName)"
-      v-slot:default="{ page }"
+      v-slot:default="{ page, scanning }"
     >
       <extra-settings v-if="page === 'General'" />
       <language-settings v-if="page === 'General'" />
-      <hotkeys v-if="page === 'Hotkeys'" :globalSearchStr="searchStr" :highlightSearch="highlightSearch"/>
+      <hotkeys v-if="page === 'Hotkeys'" :globalSearchStr="scanning ? '' : searchStr" :highlightSearch="highlightSearch"/>
       <stream-settings v-if="page === 'Stream'" />
       <developer-settings v-if="page === 'Developer'" />
       <installed-apps v-if="page === 'Installed Apps'" />

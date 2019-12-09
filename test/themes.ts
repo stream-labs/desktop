@@ -31,7 +31,7 @@ test('Installing a theme', async (t: any) => {
 
   // wait for installation complete
   await focusMain(t);
-  await app.client.waitForExist('.studio-page', 60000);
+  await app.client.waitForExist('.editor-page', 60000);
 
   // Should've loaded the overlay as a new scene collection
   t.true(await app.client.isExisting(`span=${OVERLAY_NAME}`));

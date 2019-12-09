@@ -12,6 +12,7 @@ import { $t } from 'services/i18n';
 import styles from './SideNav.m.less';
 import { MagicLinkService } from 'services/magic-link';
 import { throttle } from 'lodash-decorators';
+import { RestreamService } from 'services/restream';
 
 @Component({})
 export default class SideNav extends Vue {
@@ -20,13 +21,14 @@ export default class SideNav extends Vue {
   @Inject() settingsService: SettingsService;
   @Inject() navigationService: NavigationService;
   @Inject() magicLinkService: MagicLinkService;
+  @Inject() restreamService: RestreamService;
 
   get isDevMode() {
     return Utils.isDevMode();
   }
 
-  openSettingsWindow() {
-    this.settingsService.showSettings();
+  openSettingsWindow(categoryName?: string) {
+    this.settingsService.showSettings(categoryName);
   }
 
   navigate(page: TAppPage) {
@@ -90,6 +92,16 @@ export default class SideNav extends Vue {
         {this.isDevMode && (
           <div class={styles.cell} onClick={() => this.openDevTools()} title={'Dev Tools'}>
             <i class="icon-developer" />
+          </div>
+        )}
+        {this.restreamService.canEnableRestream && (
+          <div
+            class={cx(styles.cell)}
+            onClick={() => this.openSettingsWindow('Stream')}
+            title={$t('Multistream')}
+          >
+            <i class="fas fa-globe" />
+            <div class={cx(styles.badge, styles.newBadge)}>{$t('New')}</div>
           </div>
         )}
         {this.userService.isLoggedIn() && (

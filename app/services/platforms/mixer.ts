@@ -216,7 +216,11 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
 
   async beforeGoLive(startStreamOptions?: IMixerStartStreamOptions) {
     const key = await this.fetchStreamKey();
-    this.streamSettingsService.setSettings({ key, platform: 'mixer' });
+
+    if (this.streamSettingsService.isSafeToModifyStreamKey()) {
+      this.streamSettingsService.setSettings({ key, platform: 'mixer', streamType: 'rtmp_common' });
+    }
+
     if (startStreamOptions) await this.putChannelInfo(startStreamOptions);
 
     return key;

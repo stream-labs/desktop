@@ -186,7 +186,7 @@ function getHashForRecentEvent(event: IRecentEvent) {
     case 'sticker':
       return [event.name, event.type, event.currency].join(':');
     case 'subscription':
-      return [event.type, event.name, event.message].join(':');
+      return [event.type, event.name.toLowerCase(), event.message].join(':');
     case 'superchat':
       return [event.type, event.name, event.message].join(':');
     case 'superheart':
@@ -278,7 +278,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   unsubscribeFromSocketConnection() {
-    this.socketConnection.unsubscribe();
+    if (this.socketConnection) this.socketConnection.unsubscribe();
   }
 
   onLogout() {

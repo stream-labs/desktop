@@ -16,6 +16,7 @@ export { Hotkey, HotkeysService } from 'services/hotkeys';
 export { KeyListenerService } from 'services/key-listener';
 export { ShortcutsService } from 'services/shortcuts';
 export { CustomizationService } from 'services/customization';
+export { LayoutService } from 'services/layout';
 export { NotificationsService } from 'services/notifications';
 export { OnboardingService } from 'services/onboarding';
 export { NavigationService } from 'services/navigation';

@@ -3,7 +3,10 @@ import {
   focusMain,
   focusChild,
   test,
-  skipCheckingErrorsInLog, restartApp, closeWindow, click
+  skipCheckingErrorsInLog,
+  restartApp,
+  closeWindow,
+  click,
 } from './helpers/spectron/index';
 import { setFormInput } from './helpers/spectron/forms';
 import { fillForm, formIncludes, FormMonkey } from './helpers/form-monkey';
@@ -60,6 +63,12 @@ test('Streaming to Twitch', async t => {
     game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
   });
   t.true(await chatIsVisible(t), 'Chat should be visible');
+
+  // check we can't change stream setting while live
+  await showSettings(t, 'Stream');
+  await t.true(
+    await t.context.app.client.isExisting("div=You can not change these settings when you're live"),
+  );
   t.pass();
 });
 
@@ -330,6 +339,12 @@ test('Go live error', async t => {
   await app.client.click('a=fetching the information again');
   await app.client.waitForVisible('button=Confirm & Go Live');
 
+  // test the case when the channel info has been successful fetched but can't be updated
+  await fetchMock(t, /api\.twitch\.tv/, 404);
+  await focusChild(t);
+  await click(t, 'button=Confirm & Go Live');
+  await app.client.waitForVisible('a=just go live.');
+
   t.pass();
 });
 
@@ -349,7 +364,7 @@ test('User does not have Facebook pages', async t => {
   await clickGoLive(t);
   await focusChild(t);
   t.true(
-    await t.context.app.client.isExisting('a=Facebook Page Creation'),
+    await t.context.app.client.isExisting('a=Create Page'),
     'The link for adding new facebook changes should exist',
   );
 });
