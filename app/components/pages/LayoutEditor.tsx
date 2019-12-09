@@ -8,17 +8,22 @@ import { LayoutService, ELayoutElement, ELayout } from 'services/layout';
 import styles from './LayoutEditor.m.less';
 import { $t } from 'services/i18n';
 import { NavigationService } from 'services/navigation';
+import { CustomizationService } from 'services/customization';
 
 const TEMPLATE_MAP: Dictionary<string> = {
   [ELayout.Default]: 'default',
   [ELayout.TwoPane]: 'twoPane',
   [ELayout.Classic]: 'classic',
+  [ELayout.OnePane]: 'onePane',
+  [ELayout.FourByFour]: 'fourByFour',
+  [ELayout.Triplets]: 'triplets',
 };
 
 @Component({})
 export default class LayoutEditor extends TsxComponent {
   @Inject() private layoutService: LayoutService;
   @Inject() private navigationService: NavigationService;
+  @Inject() private customizationService: CustomizationService;
 
   currentLayout = this.layoutService.state.currentLayout || ELayout.Default;
 
@@ -44,6 +49,12 @@ export default class LayoutEditor extends TsxComponent {
     return cx(styles.placementZone, styles[`${layout}${slot}`], {
       [styles.occupied]: this.elementInSlot(slot),
     });
+  }
+
+  layoutImage(layout: ELayout) {
+    const mode = this.customizationService.isDarkTheme ? 'night' : 'day';
+    const active = this.currentLayout === layout ? '-active' : '';
+    return require(`../../../media/images/layouts/${mode}-${TEMPLATE_MAP[layout]}${active}.png`);
   }
 
   slotElement(el: ELayoutElement, slot: '1' | '2' | '3' | '4' | '5' | '6') {
@@ -79,9 +90,15 @@ export default class LayoutEditor extends TsxComponent {
         <div>
           <div class={styles.title}>{$t('Layouts')}</div>
           <div class={styles.subtitle} />
-          {Object.keys(ELayout).map(layout => (
-            <div onClick={() => this.setLayout(ELayout[layout])}>{TEMPLATE_MAP[layout]}</div>
-          ))}
+          <div class={styles.layouts}>
+            {Object.keys(ELayout).map(layout => (
+              <img
+                class={this.currentLayout === layout ? styles.active : ''}
+                onClick={() => this.setLayout(ELayout[layout])}
+                src={this.layoutImage(ELayout[layout])}
+              />
+            ))}
+          </div>
         </div>
         <div>
           <div class={styles.title}>{$t('Elements')}</div>

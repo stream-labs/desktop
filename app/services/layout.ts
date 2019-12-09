@@ -5,6 +5,9 @@ export enum ELayout {
   Default = 'Default',
   TwoPane = 'TwoPane',
   Classic = 'Classic',
+  FourByFour = 'FourByFour',
+  Triplets = 'Triplets',
+  OnePane = 'OnePane',
 }
 
 export enum ELayoutElement {
