@@ -23,6 +23,9 @@ const LAYOUT_MAP: Dictionary<typeof TsxComponent> = {
   [ELayout.Default]: Layouts.Default,
   [ELayout.TwoPane]: Layouts.TwoPane,
   [ELayout.Classic]: Layouts.Classic,
+  [ELayout.OnePane]: Layouts.OnePane,
+  [ELayout.Triplets]: Layouts.Triplets,
+  [ELayout.FourByFour]: Layouts.FourByFour,
 };
 
 @Component({})

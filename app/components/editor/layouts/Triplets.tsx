@@ -6,12 +6,12 @@ import ResizeBar from 'components/shared/ResizeBar.vue';
 import styles from './Layouts.m.less';
 
 const RESIZE_MINS = {
-  bar1: { absolute: 32, reasonable: 156 },
-  bar2: { absolute: 50, reasonable: 150 },
+  bar1: { absolute: 32, reasonable: 500 },
+  bar2: { absolute: 32, reasonable: 500 },
 };
 
 @Component({ props: createProps(LayoutProps) })
-export default class TwoPane extends TsxComponent<LayoutProps> {
+export default class Triplets extends TsxComponent<LayoutProps> {
   mounted() {
     this.props.reconcileSizeWithinContraints(RESIZE_MINS);
     window.addEventListener('resize', this.windowResizeHandler);
@@ -41,25 +41,12 @@ export default class TwoPane extends TsxComponent<LayoutProps> {
     this.props.reconcileSizeWithinContraints(RESIZE_MINS, true);
   }
 
-  get midsection() {
-    return (
-      <div class={styles.rows} style={{ width: `${this.bar1}px`, paddingTop: '16px' }}>
-        <div style={{ height: '100%' }} class={styles.cell}>
-          {this.$slots['1']}
-        </div>
-        <div class={styles.segmented}>
-          <div class={styles.cell}>{this.$slots['3']}</div>
-          <div class={styles.cell}>{this.$slots['4']}</div>
-        </div>
-      </div>
-    );
-  }
-
   render() {
     return (
       <div class={cx(styles.columns, styles.sidePadded)}>
-        <div style={{ width: `calc(100% - ${this.bar1 + this.bar2}px)` }} class={styles.cell}>
-          {this.$slots['2']}
+        <div class={styles.stacked} style={{ width: `calc(100% - ${this.bar1 + this.bar2}px)` }}>
+          <div class={styles.cell}>{this.$slots['1']}</div>
+          <div class={styles.cell}>{this.$slots['4']}</div>
         </div>
         <ResizeBar
           position="right"
@@ -70,18 +57,22 @@ export default class TwoPane extends TsxComponent<LayoutProps> {
           min={32}
           reverse={true}
         />
-        {this.midsection}
+        <div class={styles.stacked} style={{ width: `${this.bar1}px)` }}>
+          <div class={styles.cell}>{this.$slots['2']}</div>
+          <div class={styles.cell}>{this.$slots['5']}</div>
+        </div>
         <ResizeBar
           position="left"
           vModel={this.bar2}
           onResizestart={() => this.props.resizeStartHandler()}
           onResizestop={() => this.props.resizeStopHandler()}
           max={this.props.max}
-          min={50}
+          min={32}
           reverse={true}
         />
-        <div style={{ width: `${this.bar2}px` }} class={styles.cell}>
-          {this.$slots['5']}
+        <div class={styles.stacked} style={{ width: `${this.bar2}px` }}>
+          <div class={styles.cell}>{this.$slots['3']}</div>
+          <div class={styles.cell}>{this.$slots['6']}</div>
         </div>
       </div>
     );
