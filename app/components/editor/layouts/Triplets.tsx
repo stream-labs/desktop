@@ -41,13 +41,20 @@ export default class Triplets extends TsxComponent<LayoutProps> {
     this.props.reconcileSizeWithinContraints(RESIZE_MINS, true);
   }
 
+  stackedSection(slots: string[], width: string) {
+    return (
+      <div class={styles.stacked} style={{ width }}>
+        {slots.map(slot => (
+          <div class={styles.cell}>{this.$slots[slot]}</div>
+        ))}
+      </div>
+    );
+  }
+
   render() {
     return (
       <div class={cx(styles.columns, styles.sidePadded)}>
-        <div class={styles.stacked} style={{ width: `calc(100% - ${this.bar1 + this.bar2}px)` }}>
-          <div class={styles.cell}>{this.$slots['1']}</div>
-          <div class={styles.cell}>{this.$slots['4']}</div>
-        </div>
+        {this.stackedSection(['1', '4'], `calc(100% - ${this.bar1 + this.bar2}px)`)}
         <ResizeBar
           position="right"
           vModel={this.bar1}
@@ -57,10 +64,7 @@ export default class Triplets extends TsxComponent<LayoutProps> {
           min={RESIZE_MINS.bar1.absolute}
           reverse={true}
         />
-        <div class={styles.stacked} style={{ width: `${this.bar1}px` }}>
-          <div class={styles.cell}>{this.$slots['2']}</div>
-          <div class={styles.cell}>{this.$slots['5']}</div>
-        </div>
+        {this.stackedSection(['2', '5'], `${this.bar1}px`)}
         <ResizeBar
           position="left"
           vModel={this.bar2}
@@ -70,10 +74,7 @@ export default class Triplets extends TsxComponent<LayoutProps> {
           min={RESIZE_MINS.bar2.absolute}
           reverse={true}
         />
-        <div class={styles.stacked} style={{ width: `${this.bar2}px` }}>
-          <div class={styles.cell}>{this.$slots['3']}</div>
-          <div class={styles.cell}>{this.$slots['6']}</div>
-        </div>
+        {this.stackedSection(['3', '6'], `${this.bar2}px`)}
       </div>
     );
   }

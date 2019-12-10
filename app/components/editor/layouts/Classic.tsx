@@ -48,9 +48,9 @@ export default class Classic extends TsxComponent<LayoutProps> {
           reverse={true}
         />
         <div class={styles.segmented} style={{ height: `${this.bar1}px`, padding: '0 8px' }}>
-          <div class={cx(styles.cell, styles.noTopPadding)}>{this.$slots['2']}</div>
-          <div class={cx(styles.cell, styles.noTopPadding)}>{this.$slots['3']}</div>
-          <div class={cx(styles.cell, styles.noTopPadding)}>{this.$slots['4']}</div>
+          {['2', '3', '4'].map(slot => (
+            <div class={cx(styles.cell, styles.noTopPadding)}>{this.$slots[slot]}</div>
+          ))}
         </div>
       </div>
     );
