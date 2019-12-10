@@ -10,7 +10,7 @@ import {
 } from './helpers/spectron/index';
 import { setFormInput } from './helpers/spectron/forms';
 import { fillForm, formIncludes, FormMonkey } from './helpers/form-monkey';
-import { logIn, logOut } from './helpers/spectron/user';
+import { logIn, logOut, reserveUserFromPool } from './helpers/spectron/user';
 import { setTemporaryRecordingPath } from './helpers/spectron/output';
 const moment = require('moment');
 import { fetchMock, resetFetchMock } from './helpers/spectron/network';
@@ -35,24 +35,20 @@ import { StreamSettingsService } from '../app/services/settings/streaming';
 
 useSpectron();
 
-// TODO obtain a valid streamkey in CI
-test.skip('Streaming to Twitch without auth', async t => {
-  if (!process.env.SLOBS_TEST_STREAM_KEY) {
-    console.warn('SLOBS_TEST_STREAM_KEY not found!  Skipping streaming test.');
-    t.pass();
-    return;
-  }
+test('Streaming to Twitch without auth', async t => {
+  const userInfo = await reserveUserFromPool('twitch');
 
   await showSettings(t, 'Stream');
 
   // This is the twitch.tv/slobstest stream key
-  await setFormInput(t, 'Stream key', process.env.SLOBS_TEST_STREAM_KEY);
+  await setFormInput(t, 'Stream key', userInfo.streamKey);
   await t.context.app.client.click('button=Done');
 
   // go live
   await prepareToGoLive(t);
   await clickGoLive(t);
   await waitForStreamStart(t);
+
   t.pass();
 });
 

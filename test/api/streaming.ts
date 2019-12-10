@@ -6,17 +6,12 @@ import {
   ERecordingState,
 } from '../../app/services/streaming/streaming-api';
 import { ISettingsServiceApi } from '../../app/services/settings';
+import { reserveUserFromPool } from '../helpers/spectron/user';
 
 useSpectron({ restartAppAfterEachTest: true });
 
-// TODO obtain a valid streamkey in CI
-test.skip('Streaming to Twitch via API', async t => {
-  if (!process.env.SLOBS_TEST_STREAM_KEY) {
-    console.warn('SLOBS_TEST_STREAM_KEY not found!  Skipping streaming test.');
-    t.pass();
-    return;
-  }
-
+test('Streaming to Twitch via API', async t => {
+  const streamKey = (await reserveUserFromPool('twitch')).streamKey;
   const client = await getClient();
   const streamingService = client.getResource<IStreamingServiceApi>('StreamingService');
   const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
@@ -25,7 +20,7 @@ test.skip('Streaming to Twitch via API', async t => {
   streamSettings.forEach(subcategory => {
     subcategory.parameters.forEach(setting => {
       if (setting.name === 'service') setting.value = 'Twitch';
-      if (setting.name === 'key') setting.value = process.env.SLOBS_TEST_STREAM_KEY;
+      if (setting.name === 'key') setting.value = streamKey;
     });
   });
   settingsService.setSettings('Stream', streamSettings);
