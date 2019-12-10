@@ -13,7 +13,7 @@
         {{ $t('If this error persists, you can try logging out and back in.') }}
       </div>
       <validated-form name="editStreamForm" ref="form" v-if="!infoLoading && !infoError">
-        <div class="pages-warning" v-if="isFacebook">
+        <div class="pages-warning" v-if="isFacebook && !hasPages">
           <i class="fab fa-facebook" />
           {{ $t('You must create a Facebook gaming page to go live.') }}
           <a class="description-link" @click="openFBPageCreateLink">{{
