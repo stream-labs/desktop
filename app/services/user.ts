@@ -453,7 +453,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     // Currently we treat generic errors as success
     if (result === EPlatformCallResult.TwitchTwoFactor) {
-      await this.logOut();
+      this.LOGOUT();
       return result;
     }
 
