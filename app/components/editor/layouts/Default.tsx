@@ -56,33 +56,32 @@ export default class Default extends TsxComponent<LayoutProps> {
     this.props.reconcileSizeWithinContraints(RESIZE_MINS, true);
   }
 
+  resizeBar(bar: 'bar1' | 'bar2') {
+    const max = bar === 'bar1' ? this.props.max - this.bar2 : this.props.max;
+    return (
+      <ResizeBar
+        position="top"
+        vModel={this[bar]}
+        onResizestart={() => this.props.resizeStartHandler()}
+        onResizestop={() => this.props.resizeStopHandler()}
+        max={max}
+        min={RESIZE_MINS[bar].absolute}
+        reverse={true}
+      />
+    );
+  }
+
   render() {
     return (
       <div class={styles.rows}>
         <div class={styles.cell} style={{ height: `calc(100% - ${this.bar1 + this.bar2}px)` }}>
           {this.$slots['1']}
         </div>
-        <ResizeBar
-          position="top"
-          vModel={this.bar1}
-          onResizestart={() => this.props.resizeStartHandler()}
-          onResizestop={() => this.props.resizeStopHandler()}
-          max={this.props.max - this.bar2}
-          min={RESIZE_MINS.bar1.absolute}
-          reverse={true}
-        />
+        {this.resizeBar('bar1')}
         <div style={{ height: `${this.bar1}px` }} class={cx(styles.cell, styles.noTopPadding)}>
           {this.$slots['2']}
         </div>
-        <ResizeBar
-          position="top"
-          vModel={this.bar2}
-          onResizestart={() => this.props.resizeStartHandler()}
-          onResizestop={() => this.props.resizeStopHandler()}
-          max={this.props.max}
-          min={RESIZE_MINS.bar2.absolute}
-          reverse={true}
-        />
+        {this.resizeBar('bar2')}
         <div class={styles.segmented} style={{ height: `${this.bar2}px`, padding: '0 8px' }}>
           {['3', '4', '5'].map(slot => (
             <div class={cx(styles.cell, styles.noTopPadding)}>{this.$slots[slot]}</div>
