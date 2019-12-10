@@ -44,7 +44,7 @@ export default class Classic extends TsxComponent<LayoutProps> {
           onResizestart={() => this.props.resizeStartHandler()}
           onResizestop={() => this.props.resizeStopHandler()}
           max={this.props.max}
-          min={32}
+          min={RESIZE_MINS.bar1.absolute}
           reverse={true}
         />
         <div class={styles.segmented} style={{ height: `${this.bar1}px`, padding: '0 8px' }}>

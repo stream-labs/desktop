@@ -6,8 +6,8 @@ import ResizeBar from 'components/shared/ResizeBar.vue';
 import styles from './Layouts.m.less';
 
 const RESIZE_MINS = {
-  bar1: { absolute: 32, reasonable: 500 },
-  bar2: { absolute: 32, reasonable: 500 },
+  bar1: { absolute: 16, reasonable: 150 },
+  bar2: { absolute: 16, reasonable: 150 },
 };
 
 @Component({ props: createProps(LayoutProps) })
@@ -54,10 +54,10 @@ export default class Triplets extends TsxComponent<LayoutProps> {
           onResizestart={() => this.props.resizeStartHandler()}
           onResizestop={() => this.props.resizeStopHandler()}
           max={this.props.max - this.bar2}
-          min={32}
+          min={RESIZE_MINS.bar1.absolute}
           reverse={true}
         />
-        <div class={styles.stacked} style={{ width: `${this.bar1}px)` }}>
+        <div class={styles.stacked} style={{ width: `${this.bar1}px` }}>
           <div class={styles.cell}>{this.$slots['2']}</div>
           <div class={styles.cell}>{this.$slots['5']}</div>
         </div>
@@ -67,7 +67,7 @@ export default class Triplets extends TsxComponent<LayoutProps> {
           onResizestart={() => this.props.resizeStartHandler()}
           onResizestop={() => this.props.resizeStopHandler()}
           max={this.props.max}
-          min={32}
+          min={RESIZE_MINS.bar2.absolute}
           reverse={true}
         />
         <div class={styles.stacked} style={{ width: `${this.bar2}px` }}>

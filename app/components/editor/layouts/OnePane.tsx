@@ -6,7 +6,7 @@ import ResizeBar from 'components/shared/ResizeBar.vue';
 import styles from './Layouts.m.less';
 
 const RESIZE_MINS = {
-  bar1: { absolute: 32, reasonable: 250 },
+  bar1: { absolute: 16, reasonable: 250 },
 };
 
 @Component({ props: createProps(LayoutProps) })
@@ -52,7 +52,7 @@ export default class OnePane extends TsxComponent<LayoutProps> {
           onResizestart={() => this.props.resizeStartHandler()}
           onResizestop={() => this.props.resizeStopHandler()}
           max={this.props.max}
-          min={32}
+          min={RESIZE_MINS.bar1.absolute}
           reverse={true}
         />
         <div class={styles.rows} style={{ width: `${this.bar1}px`, paddingTop: '16px' }}>

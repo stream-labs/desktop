@@ -6,8 +6,8 @@ import ResizeBar from 'components/shared/ResizeBar.vue';
 import styles from './Layouts.m.less';
 
 const RESIZE_MINS = {
-  bar1: { absolute: 32, reasonable: 156 },
-  bar2: { absolute: 50, reasonable: 150 },
+  bar1: { absolute: 16, reasonable: 150 },
+  bar2: { absolute: 16, reasonable: 150 },
 };
 
 @Component({ props: createProps(LayoutProps) })
@@ -67,7 +67,7 @@ export default class TwoPane extends TsxComponent<LayoutProps> {
           onResizestart={() => this.props.resizeStartHandler()}
           onResizestop={() => this.props.resizeStopHandler()}
           max={this.props.max - this.bar2}
-          min={32}
+          min={RESIZE_MINS.bar1.absolute}
           reverse={true}
         />
         {this.midsection}
@@ -77,7 +77,7 @@ export default class TwoPane extends TsxComponent<LayoutProps> {
           onResizestart={() => this.props.resizeStartHandler()}
           onResizestop={() => this.props.resizeStopHandler()}
           max={this.props.max}
-          min={50}
+          min={RESIZE_MINS.bar2.absolute}
           reverse={true}
         />
         <div style={{ width: `${this.bar2}px` }} class={styles.cell}>

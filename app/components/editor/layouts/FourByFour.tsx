@@ -51,7 +51,7 @@ export default class FourByFour extends TsxComponent<LayoutProps> {
           onResizestart={() => this.props.resizeStartHandler()}
           onResizestop={() => this.props.resizeStopHandler()}
           max={this.props.max - this.bar2}
-          min={32}
+          min={RESIZE_MINS.bar1.absolute}
           reverse={true}
         />
         <div class={styles.segmented} style={{ height: `${this.bar1}px` }}>
@@ -64,7 +64,7 @@ export default class FourByFour extends TsxComponent<LayoutProps> {
           onResizestart={() => this.props.resizeStartHandler()}
           onResizestop={() => this.props.resizeStopHandler()}
           max={this.props.max}
-          min={50}
+          min={RESIZE_MINS.bar2.absolute}
           reverse={true}
         />
         <div class={styles.segmented} style={{ height: `${this.bar2}px`, padding: '0 8px' }}>
