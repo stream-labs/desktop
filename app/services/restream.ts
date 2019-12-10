@@ -99,11 +99,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
    */
   get canEnableRestream() {
     return !!(
-      this.userService.state.auth &&
-      this.userService.state.auth.primaryPlatform === 'twitch' &&
-      (this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.restream) ||
-        Utils.isDevMode() ||
-        Utils.isPreview())
+      this.userService.state.auth && this.userService.state.auth.primaryPlatform === 'twitch'
     );
   }
 
