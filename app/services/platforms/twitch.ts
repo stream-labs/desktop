@@ -159,7 +159,7 @@ export class TwitchService extends Service implements IPlatformService {
       // Catch 2FA errors
       await this.fetchStreamKey();
     } catch (e) {
-      if (e instanceof Response) {
+      if (e && e.status) {
         if (e.status === 403) {
           return EPlatformCallResult.TwitchTwoFactor;
         }
