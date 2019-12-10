@@ -5,6 +5,7 @@ import { Inject } from 'services/core/injector';
 import RecentEvents from 'components/RecentEvents';
 import SceneSelector from 'components/SceneSelector.vue';
 import SourceSelector from 'components/SourceSelector.vue';
+import LegacyEvents from 'components/LegacyEvents';
 import Mixer from 'components/Mixer.vue';
 import { LayoutService, ELayoutElement, ELayout } from 'services/layout';
 import { WindowsService } from 'services/windows';
@@ -14,6 +15,7 @@ import { IResizeMins } from 'components/editor/layouts/Default';
 const COMPONENT_MAP: Dictionary<typeof TsxComponent> = {
   [ELayoutElement.Display]: StudioEditor,
   [ELayoutElement.Minifeed]: RecentEvents,
+  [ELayoutElement.LegacyEvents]: LegacyEvents,
   [ELayoutElement.Mixer]: Mixer,
   [ELayoutElement.Scenes]: SceneSelector,
   [ELayoutElement.Sources]: SourceSelector,
