@@ -200,12 +200,11 @@ export class ClipboardService extends StatefulService<IClipboardState>
   canDuplicate(): boolean {
     if (this.hasItemsInUnloadedClipboard()) return true;
     if (!this.hasItems()) return false;
-    const hasNoduplicapableSource =
-      this.scenesService
-        .getScene(this.state.itemsSceneId)
-        .getSelection(this.state.sceneNodesIds)
-        .getSources()
-        .filter(source => source.doNotDuplicate).length > 0;
+    const hasNoduplicapableSource = this.scenesService
+      .getScene(this.state.itemsSceneId)
+      .getSelection(this.state.sceneNodesIds)
+      .getSources()
+      .some(source => source.doNotDuplicate);
     return !hasNoduplicapableSource;
   }
 
