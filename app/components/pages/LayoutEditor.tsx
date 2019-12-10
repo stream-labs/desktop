@@ -57,19 +57,19 @@ export default class LayoutEditor extends TsxComponent {
     return require(`../../../media/images/layouts/${mode}-${TEMPLATE_MAP[layout]}${active}.png`);
   }
 
-  slotElement(el: ELayoutElement, slot: '1' | '2' | '3' | '4' | '5' | '6') {
-    const existingElement = Object.keys(this.slottedElements).find(
-      existing => this.slottedElements[existing] === slot,
-    );
-    if (existingElement) this.slottedElements[existingElement] = undefined;
-    this.slottedElements[el] = slot;
-  }
-
   handleElementDrag(event: MouseEvent, el: ELayoutElement) {
     const htmlElement = document.elementFromPoint(event.clientX, event.clientY);
+    if (!htmlElement) {
+      this.slottedElements[el] = undefined;
+      return;
+    }
     // In case the span tag is the element dropped on we check for parent element id
     const id = htmlElement.id || htmlElement.parentElement.id;
-    this.slotElement(el, id as '1' | '2' | '3' | '4' | '5' | '6');
+    const existingEl = Object.keys(this.slottedElements).find(
+      existing => this.slottedElements[existing] === id,
+    ) as ELayoutElement;
+    if (existingEl) this.slottedElements[existingEl] = this.slottedElements[el];
+    this.slottedElements[el] = id as '1' | '2' | '3' | '4' | '5' | '6';
   }
 
   setLayout(layout: ELayout) {
