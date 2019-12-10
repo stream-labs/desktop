@@ -1,5 +1,5 @@
 import { useSpectron, focusMain, focusChild, test } from './helpers/spectron/index';
-import { isLoggedIn, logIn } from './helpers/spectron/user';
+import { logIn } from './helpers/spectron/user';
 import { sleep } from './helpers/sleep';
 
 useSpectron();
@@ -17,5 +17,5 @@ test('Twitch 2FA is disabled', async t => {
   await sleep(5000); // TODO wait for MsgBox instead sleep;
 
   // Login did not work, we should still be logged out
-  t.context.app.client.isVisible('h1=Connect');
+  t.true(await t.context.app.client.isVisible('h1=Connect'));
 });
