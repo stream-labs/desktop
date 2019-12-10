@@ -20,7 +20,7 @@ export abstract class PersistentStatefulService<TState extends object> extends S
   static defaultState = {};
 
   static get initialState() {
-    const persisted = JSON.parse(localStorage.getItem(this.localStorageKey)) || {};
+    const persisted = JSON.parse(localStorage.getItem(this.localStorageKey) as string) || {};
 
     return merge({}, this.defaultState, persisted);
   }

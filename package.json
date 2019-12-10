@@ -14,6 +14,7 @@
     "compile:ci": "yarn clear && yarn compile:updater && yarn webpack-cli --config dev.config.js",
     "compile:production": "yarn clear && yarn compile:updater && yarn webpack-cli --progress --config prod.config.js",
     "compile:updater": "rimraf updater/build && tsc -p updater",
+    "compile:strictnulls": "yarn clear && yarn compile:updater && yarn webpack-cli --progress --config strict-null-check.config.js",
     "webpack-cli": "node --max-old-space-size=4096 node_modules/webpack-cli/bin/cli.js",
     "watch": "yarn clear && yarn compile:updater && yarn webpack-cli --watch --progress --config dev.config.js",
     "watch-app": "yarn clear && yarn webpack-cli --watch --progress --config dev-app.config.js",
