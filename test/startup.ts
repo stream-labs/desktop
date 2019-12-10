@@ -15,5 +15,7 @@ test('Main and child window visibility', async t => {
 test('Twitch 2FA is disabled', async t => {
   await logIn(t, 'twitch', { '2FADisabled': true }, false);
   await sleep(5000); // TODO wait for MsgBox instead sleep;
-  t.false(await isLoggedIn(t), 'User should be logged-out');
+
+  // Login did not work, we should still be logged out
+  t.context.app.client.isVisible('h1=Connect');
 });
