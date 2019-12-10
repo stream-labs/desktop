@@ -22,7 +22,7 @@ export interface IResizeMins {
 
 const RESIZE_MINS = {
   bar1: { absolute: 32, reasonable: 156 },
-  bar2: { absolute: 50, reasonable: 150 },
+  bar2: { absolute: 32, reasonable: 150 },
 };
 
 @Component({ props: createProps(LayoutProps) })

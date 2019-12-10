@@ -42,7 +42,9 @@ export default class Studio extends TsxComponent {
   }
 
   get isColumns() {
-    return [ELayout.TwoPane].includes(this.layoutService.state.currentLayout);
+    return [ELayout.TwoPane, ELayout.Triplets, ELayout.OnePane].includes(
+      this.layoutService.state.currentLayout,
+    );
   }
 
   /**
