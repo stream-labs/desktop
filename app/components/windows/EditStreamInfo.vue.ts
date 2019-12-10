@@ -173,8 +173,7 @@ export default class EditStreamInfo extends Vue {
   async onGameSearchHandler(searchString: string) {
     if (searchString !== '') {
       this.searchingGames = true;
-      const platform = this.userService.platform.type;
-      const service = getPlatformService(platform);
+      const service = getPlatformService(this.platform);
 
       this.gameOptions = [];
 
