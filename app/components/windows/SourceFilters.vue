@@ -79,7 +79,16 @@
 }
 
 .controls {
-  margin-left: 8px;
-  margin-bottom: 16px;
+  height: 48px;
+  padding: 16px;
+}
+
+.nav-menu {
+  background-color: transparent;
+
+  & /deep/ .sl-vue-tree-node-item {
+    padding: 0 16px;
+    background-color: transparent;
+  }
 }
 </style>
