@@ -1,12 +1,12 @@
 import electron from 'electron';
 import { Component } from 'vue-property-decorator';
-import TsxComponent from 'components/tsx-component';
 import BrowserView from 'components/shared/BrowserView';
-import styles from './RecentEvents.m.less';
+import styles from 'components/RecentEvents.m.less';
 import { UserService } from 'services/user';
 import { RecentEventsService } from 'services/recent-events';
 import { MagicLinkService } from 'services/magic-link';
 import { Inject } from 'services/core';
+import TsxComponent from 'components/tsx-component';
 
 @Component({})
 export default class LegacyEvents extends TsxComponent {

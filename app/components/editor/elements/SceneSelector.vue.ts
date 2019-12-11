@@ -1,13 +1,12 @@
-import TsxComponent from 'components/tsx-component';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../services/core/injector';
+import { Inject } from 'services/core/injector';
 import { ScenesService } from 'services/scenes';
-import { Menu } from '../util/menus/Menu';
+import { Menu } from 'util/menus/Menu';
 import { TransitionsService } from 'services/transitions';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { AppService } from 'services/app';
-import DropdownMenu from './shared/DropdownMenu.vue';
-import HelpTip from './shared/HelpTip';
+import DropdownMenu from 'components/shared/DropdownMenu.vue';
+import HelpTip from 'components/shared/HelpTip';
 import { EDismissable } from 'services/dismissables';
 import Fuse from 'fuse.js';
 import { SourceFiltersService } from 'services/source-filters';
@@ -16,7 +15,8 @@ import { $t } from 'services/i18n';
 import electron from 'electron';
 import { EditorCommandsService } from 'services/editor-commands';
 import SlVueTree, { ISlTreeNode } from 'sl-vue-tree';
-import { ERenderingMode } from '../../obs-api';
+import { ERenderingMode } from '../../../../obs-api';
+import TsxComponent from 'components/tsx-component';
 
 @Component({
   components: { DropdownMenu, HelpTip, SlVueTree },

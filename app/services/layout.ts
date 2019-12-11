@@ -26,28 +26,21 @@ interface ILayoutServiceState {
 }
 
 const RESIZE_DEFAULTS = {
-  [ELayout.Default]: {
-    bar1: 156,
-    bar2: 240,
-  },
-  [ELayout.TwoPane]: {
-    bar1: 650,
-    bar2: 300,
-  },
-  [ELayout.Classic]: {
-    bar1: 450,
-  },
-  [ELayout.FourByFour]: {
-    bar1: 170,
-    bar2: 170,
-  },
-  [ELayout.Triplets]: {
-    bar1: 650,
-    bar2: 300,
-  },
-  [ELayout.OnePane]: {
-    bar1: 800,
-  },
+  [ELayout.Default]: { bar1: 156, bar2: 240 },
+  [ELayout.TwoPane]: { bar1: 650, bar2: 300 },
+  [ELayout.Classic]: { bar1: 450 },
+  [ELayout.FourByFour]: { bar1: 170, bar2: 170 },
+  [ELayout.Triplets]: { bar1: 650, bar2: 300 },
+  [ELayout.OnePane]: { bar1: 800 },
+};
+
+const ELEMENT_MINS = {
+  [ELayoutElement.Display]: { x: 150, y: 150 },
+  [ELayoutElement.LegacyEvents]: { x: 150, y: 150 },
+  [ELayoutElement.Mixer]: { x: 150, y: 150 },
+  [ELayoutElement.Minifeed]: { x: 150, y: 150 },
+  [ELayoutElement.Sources]: { x: 150, y: 150 },
+  [ELayoutElement.Scenes]: { x: 150, y: 150 },
 };
 
 export class LayoutService extends PersistentStatefulService<ILayoutServiceState> {
@@ -80,6 +73,17 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   setSlots(slottedElements: { [key in ELayoutElement]?: '1' | '2' | '3' | '4' | '5' | '6' }) {
     this.SET_SLOTS(slottedElements);
+  }
+
+  calculateMinimum(orientation: 'x' | 'y', slots: ('1' | '2' | '3' | '4' | '5' | '6')[]) {
+    const components = slots.map(slot =>
+      Object.keys(this.state.slottedElements).find(
+        comp => this.state.slottedElements[comp] === slot,
+      ),
+    );
+    const minimums = components.map(comp => ELEMENT_MINS[comp] || { x: 0, y: 0 });
+    const mins = minimums.map((min: { x: number; y: number }) => min[orientation]);
+    return Math.max(...mins);
   }
 
   @mutation()

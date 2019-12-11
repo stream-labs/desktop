@@ -1,20 +1,22 @@
 import TsxComponent from 'components/tsx-component';
 import { Component } from 'vue-property-decorator';
-import StudioEditor from 'components/StudioEditor.vue';
 import { Inject } from 'services/core/injector';
-import RecentEvents from 'components/RecentEvents';
-import SceneSelector from 'components/SceneSelector.vue';
-import SourceSelector from 'components/SourceSelector.vue';
-import LegacyEvents from 'components/LegacyEvents';
-import Mixer from 'components/Mixer.vue';
+import {
+  Mixer,
+  SceneSelector,
+  SourceSelector,
+  LegacyEvents,
+  MiniFeed,
+  Display,
+} from 'components/editor/elements';
 import { LayoutService, ELayoutElement, ELayout } from 'services/layout';
 import { WindowsService } from 'services/windows';
 import * as Layouts from 'components/editor/layouts';
 import { IResizeMins } from 'components/editor/layouts/Default';
 
 const COMPONENT_MAP: Dictionary<typeof TsxComponent> = {
-  [ELayoutElement.Display]: StudioEditor,
-  [ELayoutElement.Minifeed]: RecentEvents,
+  [ELayoutElement.Display]: Display,
+  [ELayoutElement.Minifeed]: MiniFeed,
   [ELayoutElement.LegacyEvents]: LegacyEvents,
   [ELayoutElement.Mixer]: Mixer,
   [ELayoutElement.Scenes]: SceneSelector,
@@ -47,41 +49,60 @@ export default class Studio extends TsxComponent {
     );
   }
 
+  get slottedElements() {
+    return this.layoutService.state.slottedElements;
+  }
+
+  windowResizeHandler(mins: IResizeMins) {
+    // This is the maximum size we can use
+    this.max = this.isColumns
+      ? this.$el.getBoundingClientRect().width
+      : this.$el.getBoundingClientRect().height;
+
+    this.reconcileSizeWithinContraints(mins);
+  }
+
   /**
    * Makes sure both resizable elements are reasonable sizes that
    * fit within the window. If together they are larger than the
    * max, then the primary view will be reduced in size until a reasonable
    * minimum, at which point the secondary will start being reduced in size.
    */
-  reconcileSizeWithinContraints(mins: IResizeMins, isBar2Resize = false) {
-    // This is the maximum size we can use
-    this.max = this.isColumns
-      ? this.$el.getBoundingClientRect().width
-      : this.$el.getBoundingClientRect().height;
+  reconcileSizeWithinContraints(mins: IResizeMins) {
+    const functionalMax = this.calculateMax(mins.rest);
     if (!mins.bar2) return;
-    if (this.underMaxSize) return;
-    // If we're resizing the controls then we should be more aggressive
-    // taking size from events
-    const minBar1Size = isBar2Resize ? mins.bar1.absolute : mins.bar1.reasonable;
-    if (this.resizes.bar1 > minBar1Size) {
-      this.setBarResize('bar1', Math.max(this.max - this.resizes.bar2, minBar1Size));
-      if (this.underMaxSize) return;
+    if (this.underMaxSize(functionalMax)) return;
+
+    if (this.resizes.bar1 > mins.bar1) {
+      this.setBarResize('bar1', Math.max(functionalMax - this.resizes.bar2, mins.bar1));
+      if (this.underMaxSize(functionalMax)) return;
     }
-    if (this.resizes.bar2 > mins.bar2.reasonable) {
-      this.setBarResize('bar2', Math.max(this.max - this.resizes.bar1, mins.bar2.reasonable));
-      if (this.underMaxSize) return;
+    if (this.resizes.bar2 > mins.bar2) {
+      const oldBar2 = this.resizes.bar2;
+      this.setBarResize('bar2', Math.max(functionalMax - mins.bar1, mins.bar2));
+      this.setBarResize('bar1', this.resizes.bar1 - (this.resizes.bar2 - oldBar2));
+      if (this.underMaxSize(functionalMax)) return;
     }
     // The final strategy is to just split the remaining space
-    this.setBarResize('bar1', this.max / 2);
-    this.setBarResize('bar2', this.max / 2);
+    this.setBarResize('bar1', functionalMax / 2);
+    this.setBarResize('bar2', functionalMax / 2);
   }
 
-  get underMaxSize() {
-    return this.resizes.bar1 + this.resizes.bar2 + 20 <= this.max;
+  calculateMin(slots: ('1' | '2' | '3' | '4' | '5' | '6')[]) {
+    return this.layoutService.calculateMinimum(this.isColumns ? 'x' : 'y', slots);
   }
 
-  setBarResize(bar: 'bar1' | 'bar2', size: number) {
+  calculateMax(topEl: number) {
+    return this.max - topEl;
+  }
+
+  underMaxSize(max: number) {
+    return this.resizes.bar1 + this.resizes.bar2 <= max;
+  }
+
+  setBarResize(bar: 'bar1' | 'bar2', size: number, mins?: IResizeMins) {
     this.layoutService.setBarResize(bar, size);
+    if (mins) this.reconcileSizeWithinContraints(mins);
   }
 
   resizeStartHandler() {
@@ -98,11 +119,11 @@ export default class Studio extends TsxComponent {
       <Layout
         resizeStartHandler={() => this.resizeStartHandler()}
         resizeStopHandler={() => this.resizeStopHandler()}
-        reconcileSizeWithinContraints={(mins: IResizeMins, isBar2Resize?: boolean) =>
-          this.reconcileSizeWithinContraints(mins, isBar2Resize)
+        calculateMin={(slots: ('1' | '2' | '3' | '4' | '5' | '6')[]) => this.calculateMin(slots)}
+        calculateMax={(min: number) => this.calculateMax(min)}
+        setBarResize={(bar: 'bar1' | 'bar2', size: number, mins?: IResizeMins) =>
+          this.setBarResize(bar, size, mins)
         }
-        setBarResize={(bar: 'bar1' | 'bar2', size: number) => this.setBarResize(bar, size)}
-        max={this.max}
         resizes={this.resizes}
         class="editor-page"
       >

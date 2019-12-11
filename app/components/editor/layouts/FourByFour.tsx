@@ -12,17 +12,17 @@ const RESIZE_MINS = {
 
 @Component({ props: createProps(LayoutProps) })
 export default class FourByFour extends TsxComponent<LayoutProps> {
-  mounted() {
-    this.props.reconcileSizeWithinContraints(RESIZE_MINS);
-    window.addEventListener('resize', this.windowResizeHandler);
-  }
-  destroyed() {
-    window.removeEventListener('resize', this.windowResizeHandler);
-  }
+  // mounted() {
+  //   this.props.reconcileSizeWithinContraints(RESIZE_MINS);
+  //   window.addEventListener('resize', this.windowResizeHandler);
+  // }
+  // destroyed() {
+  //   window.removeEventListener('resize', this.windowResizeHandler);
+  // }
 
-  windowResizeHandler() {
-    this.props.reconcileSizeWithinContraints(RESIZE_MINS);
-  }
+  // windowResizeHandler() {
+  //   this.props.reconcileSizeWithinContraints(RESIZE_MINS);
+  // }
 
   get bar1() {
     return this.props.resizes.bar1;
@@ -30,7 +30,6 @@ export default class FourByFour extends TsxComponent<LayoutProps> {
   set bar1(size: number) {
     if (size === 0) return;
     this.props.setBarResize('bar1', size);
-    this.props.reconcileSizeWithinContraints(RESIZE_MINS);
   }
 
   get bar2() {
@@ -38,7 +37,6 @@ export default class FourByFour extends TsxComponent<LayoutProps> {
   }
   set bar2(size: number) {
     this.props.setBarResize('bar2', size);
-    this.props.reconcileSizeWithinContraints(RESIZE_MINS, true);
   }
 
   render() {
@@ -50,8 +48,8 @@ export default class FourByFour extends TsxComponent<LayoutProps> {
           vModel={this.bar1}
           onResizestart={() => this.props.resizeStartHandler()}
           onResizestop={() => this.props.resizeStopHandler()}
-          max={this.props.max - this.bar2}
-          min={RESIZE_MINS.bar1.absolute}
+          max={500}
+          min={this.props.calculateMin(['2', '3'])}
           reverse={true}
         />
         <div class={styles.segmented} style={{ height: `${this.bar1}px` }}>
@@ -63,8 +61,8 @@ export default class FourByFour extends TsxComponent<LayoutProps> {
           vModel={this.bar2}
           onResizestart={() => this.props.resizeStartHandler()}
           onResizestop={() => this.props.resizeStopHandler()}
-          max={this.props.max}
-          min={RESIZE_MINS.bar2.absolute}
+          max={500}
+          min={this.props.calculateMin(['4', '5'])}
           reverse={true}
         />
         <div class={styles.segmented} style={{ height: `${this.bar2}px`, padding: '0 8px' }}>

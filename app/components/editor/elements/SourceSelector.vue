@@ -77,7 +77,7 @@
 <script lang="ts" src="./SourceSelector.vue.ts"></script>
 
 <style lang="less">
-@import "../styles/index";
+@import "../../../styles/index";
 @import "~sl-vue-tree/dist/sl-vue-tree-dark.css";
 
 .fa.disabled,
