@@ -2,12 +2,13 @@ import cx from 'classnames';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { Component } from 'vue-property-decorator';
 import ResizeBar from 'components/shared/ResizeBar.vue';
+import { LayoutSlot } from 'services/layout';
 import styles from './Layouts.m.less';
 
 export class LayoutProps {
   resizeStartHandler: () => void = () => {};
   resizeStopHandler: () => void = () => {};
-  calculateMin: (slots: ('1' | '2' | '3' | '4' | '5' | '6')[]) => number = () => 0;
+  calculateMin: (slots: (LayoutSlot | LayoutSlot[])[]) => number = () => 0;
   calculateMax: (mins: number) => number = () => 0;
   setBarResize: (bar: 'bar1' | 'bar2', size: number, mins?: IResizeMins) => void = () => {};
   windowResizeHandler: (mins: IResizeMins) => void = () => {};

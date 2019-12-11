@@ -5,11 +5,6 @@ import { Component } from 'vue-property-decorator';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import styles from './Layouts.m.less';
 
-const RESIZE_MINS = {
-  bar1: { absolute: 16, reasonable: 150 },
-  bar2: { absolute: 16, reasonable: 150 },
-};
-
 @Component({ props: createProps(LayoutProps) })
 export default class Triplets extends TsxComponent<LayoutProps> {
   mounted() {

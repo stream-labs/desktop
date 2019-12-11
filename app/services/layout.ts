@@ -19,9 +19,11 @@ export enum ELayoutElement {
   Sources = 'Sources',
 }
 
+export type LayoutSlot = '1' | '2' | '3' | '4' | '5' | '6';
+
 interface ILayoutServiceState {
   currentLayout: ELayout;
-  slottedElements: { [key in ELayoutElement]?: '1' | '2' | '3' | '4' | '5' | '6' };
+  slottedElements: { [key in ELayoutElement]?: LayoutSlot };
   resizes: { bar1: number; bar2?: number };
 }
 
@@ -71,19 +73,35 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
     this.CHANGE_LAYOUT(layout);
   }
 
-  setSlots(slottedElements: { [key in ELayoutElement]?: '1' | '2' | '3' | '4' | '5' | '6' }) {
+  setSlots(slottedElements: { [key in ELayoutElement]?: LayoutSlot }) {
     this.SET_SLOTS(slottedElements);
   }
 
-  calculateMinimum(orientation: 'x' | 'y', slots: ('1' | '2' | '3' | '4' | '5' | '6')[]) {
+  calculateMinimum(orientation: 'x' | 'y', slots: (LayoutSlot | LayoutSlot[])[]) {
+    const aggregateMins: number[] = [];
+    const components: ELayoutElement[] = [];
+    slots.forEach(slot => {
+      if (Array.isArray(slot)) {
+        aggregateMins.push(this.aggregateMinimum(orientation, slot));
+      } else {
+        const c = Object.keys(this.state.slottedElements).find(
+          comp => this.state.slottedElements[comp] === slot,
+        );
+        if (c) components.push(ELayoutElement[c]);
+      }
+    });
+    const minimums = components.map(comp => (ELEMENT_MINS[comp] || { x: 0, y: 0 })[orientation]);
+    return Math.max(...minimums, ...aggregateMins);
+  }
+
+  aggregateMinimum(orientation: 'x' | 'y', slots: LayoutSlot[]) {
     const components = slots.map(slot =>
       Object.keys(this.state.slottedElements).find(
         comp => this.state.slottedElements[comp] === slot,
       ),
     );
-    const minimums = components.map(comp => ELEMENT_MINS[comp] || { x: 0, y: 0 });
-    const mins = minimums.map((min: { x: number; y: number }) => min[orientation]);
-    return Math.max(...mins);
+    const minimums = components.map(comp => (ELEMENT_MINS[comp] || { x: 0, y: 0 })[orientation]);
+    return minimums.reduce((a: number, b: number) => a + b);
   }
 
   @mutation()
@@ -94,7 +112,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
   }
 
   @mutation()
-  SET_SLOTS(slottedElements: { [key in ELayoutElement]?: '1' | '2' | '3' | '4' | '5' | '6' }) {
+  SET_SLOTS(slottedElements: { [key in ELayoutElement]?: LayoutSlot }) {
     this.state.slottedElements = slottedElements;
   }
 

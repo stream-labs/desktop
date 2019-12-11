@@ -1,10 +1,9 @@
-import electron from 'electron';
 import cx from 'classnames';
 import cloneDeep from 'lodash/cloneDeep';
 import TsxComponent from 'components/tsx-component';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
-import { LayoutService, ELayoutElement, ELayout } from 'services/layout';
+import { LayoutService, ELayoutElement, ELayout, LayoutSlot } from 'services/layout';
 import styles from './LayoutEditor.m.less';
 import { $t } from 'services/i18n';
 import { NavigationService } from 'services/navigation';
@@ -40,11 +39,11 @@ export default class LayoutEditor extends TsxComponent {
     };
   }
 
-  elementInSlot(slot: '1' | '2' | '3' | '4' | '5' | '6') {
+  elementInSlot(slot: LayoutSlot) {
     return Object.keys(this.slottedElements).find(el => this.slottedElements[el] === slot);
   }
 
-  classForSlot(slot: '1' | '2' | '3' | '4' | '5' | '6') {
+  classForSlot(slot: LayoutSlot) {
     const layout = TEMPLATE_MAP[this.currentLayout];
     return cx(styles.placementZone, styles[`${layout}${slot}`], {
       [styles.occupied]: this.elementInSlot(slot),
@@ -69,7 +68,7 @@ export default class LayoutEditor extends TsxComponent {
       existing => this.slottedElements[existing] === id,
     ) as ELayoutElement;
     if (existingEl) this.slottedElements[existingEl] = this.slottedElements[el];
-    this.slottedElements[el] = id as '1' | '2' | '3' | '4' | '5' | '6';
+    this.slottedElements[el] = id as LayoutSlot;
   }
 
   setLayout(layout: ELayout) {
@@ -133,7 +132,7 @@ export default class LayoutEditor extends TsxComponent {
         <div class={styles.editorContainer}>
           {this.sideBar}
           <div class={cx(styles.templateContainer, styles[TEMPLATE_MAP[this.currentLayout]])}>
-            {['1', '2', '3', '4', '5', '6'].map((slot: '1' | '2' | '3' | '4' | '5' | '6') => (
+            {['1', '2', '3', '4', '5', '6'].map((slot: LayoutSlot) => (
               <div
                 class={this.classForSlot(slot)}
                 id={slot}

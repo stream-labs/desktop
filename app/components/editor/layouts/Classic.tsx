@@ -5,10 +5,6 @@ import ResizeBar from 'components/shared/ResizeBar.vue';
 import styles from './Layouts.m.less';
 import { LayoutProps } from './Default';
 
-const RESIZE_MINS = {
-  bar1: { absolute: 32, reasonable: 300 },
-};
-
 @Component({ props: createProps(LayoutProps) })
 export default class Classic extends TsxComponent<LayoutProps> {
   mounted() {

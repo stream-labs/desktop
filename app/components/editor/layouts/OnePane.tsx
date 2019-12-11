@@ -5,10 +5,6 @@ import { Component } from 'vue-property-decorator';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import styles from './Layouts.m.less';
 
-const RESIZE_MINS = {
-  bar1: { absolute: 16, reasonable: 250 },
-};
-
 @Component({ props: createProps(LayoutProps) })
 export default class OnePane extends TsxComponent<LayoutProps> {
   mounted() {
@@ -20,7 +16,7 @@ export default class OnePane extends TsxComponent<LayoutProps> {
 
   get mins() {
     return {
-      bar1: this.props.calculateMin(['1']),
+      bar1: this.props.calculateMin(['1', ['3', '4', '5']]),
       rest: this.props.calculateMin(['2']),
     };
   }

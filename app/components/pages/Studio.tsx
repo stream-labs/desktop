@@ -9,7 +9,7 @@ import {
   MiniFeed,
   Display,
 } from 'components/editor/elements';
-import { LayoutService, ELayoutElement, ELayout } from 'services/layout';
+import { LayoutService, ELayoutElement, ELayout, LayoutSlot } from 'services/layout';
 import { WindowsService } from 'services/windows';
 import * as Layouts from 'components/editor/layouts';
 import { IResizeMins } from 'components/editor/layouts/Default';
@@ -88,7 +88,7 @@ export default class Studio extends TsxComponent {
     this.setBarResize('bar2', functionalMax / 2);
   }
 
-  calculateMin(slots: ('1' | '2' | '3' | '4' | '5' | '6')[]) {
+  calculateMin(slots: (LayoutSlot | LayoutSlot[])[]) {
     return this.layoutService.calculateMinimum(this.isColumns ? 'x' : 'y', slots);
   }
 
@@ -119,11 +119,12 @@ export default class Studio extends TsxComponent {
       <Layout
         resizeStartHandler={() => this.resizeStartHandler()}
         resizeStopHandler={() => this.resizeStopHandler()}
-        calculateMin={(slots: ('1' | '2' | '3' | '4' | '5' | '6')[]) => this.calculateMin(slots)}
+        calculateMin={(slots: (LayoutSlot)[]) => this.calculateMin(slots)}
         calculateMax={(min: number) => this.calculateMax(min)}
         setBarResize={(bar: 'bar1' | 'bar2', size: number, mins?: IResizeMins) =>
           this.setBarResize(bar, size, mins)
         }
+        windowResizeHandler={(mins: IResizeMins) => this.windowResizeHandler(mins)}
         resizes={this.resizes}
         class="editor-page"
       >

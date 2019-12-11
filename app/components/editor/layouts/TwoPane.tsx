@@ -16,7 +16,7 @@ export default class TwoPane extends TsxComponent<LayoutProps> {
 
   get mins() {
     return {
-      bar1: this.props.calculateMin(['1']),
+      bar1: this.props.calculateMin(['1', ['3', '4']]),
       bar2: this.props.calculateMin(['5']),
       rest: this.props.calculateMin(['2']),
     };
