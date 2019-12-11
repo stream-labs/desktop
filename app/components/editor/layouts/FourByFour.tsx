@@ -12,17 +12,20 @@ const RESIZE_MINS = {
 
 @Component({ props: createProps(LayoutProps) })
 export default class FourByFour extends TsxComponent<LayoutProps> {
-  // mounted() {
-  //   this.props.reconcileSizeWithinContraints(RESIZE_MINS);
-  //   window.addEventListener('resize', this.windowResizeHandler);
-  // }
-  // destroyed() {
-  //   window.removeEventListener('resize', this.windowResizeHandler);
-  // }
+  mounted() {
+    window.addEventListener('resize', () => this.props.windowResizeHandler(this.mins));
+  }
+  destroyed() {
+    window.removeEventListener('resize', () => this.props.windowResizeHandler(this.mins));
+  }
 
-  // windowResizeHandler() {
-  //   this.props.reconcileSizeWithinContraints(RESIZE_MINS);
-  // }
+  get mins() {
+    return {
+      bar1: this.props.calculateMin(['2', '3']),
+      bar2: this.props.calculateMin(['4', '5']),
+      rest: this.props.calculateMin(['1']),
+    };
+  }
 
   get bar1() {
     return this.props.resizes.bar1;
@@ -48,8 +51,8 @@ export default class FourByFour extends TsxComponent<LayoutProps> {
           vModel={this.bar1}
           onResizestart={() => this.props.resizeStartHandler()}
           onResizestop={() => this.props.resizeStopHandler()}
-          max={500}
-          min={this.props.calculateMin(['2', '3'])}
+          max={this.props.calculateMax(this.mins.rest + this.bar2)}
+          min={this.mins.bar1}
           reverse={true}
         />
         <div class={styles.segmented} style={{ height: `${this.bar1}px` }}>
@@ -61,8 +64,8 @@ export default class FourByFour extends TsxComponent<LayoutProps> {
           vModel={this.bar2}
           onResizestart={() => this.props.resizeStartHandler()}
           onResizestop={() => this.props.resizeStopHandler()}
-          max={500}
-          min={this.props.calculateMin(['4', '5'])}
+          max={this.props.calculateMax(this.mins.rest + this.mins.bar1)}
+          min={this.mins.bar2}
           reverse={true}
         />
         <div class={styles.segmented} style={{ height: `${this.bar2}px`, padding: '0 8px' }}>

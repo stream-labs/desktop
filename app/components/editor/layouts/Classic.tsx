@@ -11,17 +11,19 @@ const RESIZE_MINS = {
 
 @Component({ props: createProps(LayoutProps) })
 export default class Classic extends TsxComponent<LayoutProps> {
-  // mounted() {
-  //   this.props.reconcileSizeWithinContraints(RESIZE_MINS);
-  //   window.addEventListener('resize', this.windowResizeHandler);
-  // }
-  // destroyed() {
-  //   window.removeEventListener('resize', this.windowResizeHandler);
-  // }
+  mounted() {
+    window.addEventListener('resize', () => this.props.windowResizeHandler(this.mins));
+  }
+  destroyed() {
+    window.removeEventListener('resize', () => this.props.windowResizeHandler(this.mins));
+  }
 
-  // windowResizeHandler() {
-  //   this.props.reconcileSizeWithinContraints(RESIZE_MINS);
-  // }
+  get mins() {
+    return {
+      bar1: this.props.calculateMin(['2', '3', '4']),
+      rest: this.props.calculateMin(['1']),
+    };
+  }
 
   get bar1() {
     return this.props.resizes.bar1;
@@ -42,8 +44,8 @@ export default class Classic extends TsxComponent<LayoutProps> {
           vModel={this.bar1}
           onResizestart={() => this.props.resizeStartHandler()}
           onResizestop={() => this.props.resizeStopHandler()}
-          max={500}
-          min={this.props.calculateMin(['2', '3', '4'])}
+          max={this.props.calculateMax(this.mins.rest)}
+          min={this.mins.bar1}
           reverse={true}
         />
         <div class={styles.segmented} style={{ height: `${this.bar1}px`, padding: '0 8px' }}>

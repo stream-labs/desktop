@@ -5,24 +5,22 @@ import { Component } from 'vue-property-decorator';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import styles from './Layouts.m.less';
 
-const RESIZE_MINS = {
-  bar1: { absolute: 16, reasonable: 150 },
-  bar2: { absolute: 16, reasonable: 150 },
-};
-
 @Component({ props: createProps(LayoutProps) })
 export default class TwoPane extends TsxComponent<LayoutProps> {
-  // mounted() {
-  //   this.props.reconcileSizeWithinContraints(RESIZE_MINS);
-  //   window.addEventListener('resize', this.windowResizeHandler);
-  // }
-  // destroyed() {
-  //   window.removeEventListener('resize', this.windowResizeHandler);
-  // }
+  mounted() {
+    window.addEventListener('resize', () => this.props.windowResizeHandler(this.mins));
+  }
+  destroyed() {
+    window.removeEventListener('resize', () => this.props.windowResizeHandler(this.mins));
+  }
 
-  // windowResizeHandler() {
-  //   this.props.reconcileSizeWithinContraints(RESIZE_MINS);
-  // }
+  get mins() {
+    return {
+      bar1: this.props.calculateMin(['1']),
+      bar2: this.props.calculateMin(['5']),
+      rest: this.props.calculateMin(['2']),
+    };
+  }
 
   get bar1() {
     return this.props.resizes.bar1;
@@ -60,12 +58,12 @@ export default class TwoPane extends TsxComponent<LayoutProps> {
           {this.$slots['2']}
         </div>
         <ResizeBar
-          position="right"
+          position="left"
           vModel={this.bar1}
           onResizestart={() => this.props.resizeStartHandler()}
           onResizestop={() => this.props.resizeStopHandler()}
-          max={500}
-          min={this.props.calculateMin(['1'])}
+          max={this.props.calculateMax(this.mins.rest + this.bar2)}
+          min={this.mins.bar1}
           reverse={true}
         />
         {this.midsection}
@@ -74,8 +72,8 @@ export default class TwoPane extends TsxComponent<LayoutProps> {
           vModel={this.bar2}
           onResizestart={() => this.props.resizeStartHandler()}
           onResizestop={() => this.props.resizeStopHandler()}
-          max={500}
-          min={this.props.calculateMin(['5'])}
+          max={this.props.calculateMax(this.mins.rest + this.mins.bar1)}
+          min={this.mins.bar2}
           reverse={true}
         />
         <div style={{ width: `${this.bar2}px` }} class={styles.cell}>
