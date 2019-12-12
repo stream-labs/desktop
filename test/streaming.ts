@@ -3,7 +3,10 @@ import {
   focusMain,
   focusChild,
   test,
-  skipCheckingErrorsInLog, restartApp, closeWindow, click
+  skipCheckingErrorsInLog,
+  restartApp,
+  closeWindow,
+  click,
 } from './helpers/spectron/index';
 import { setFormInput } from './helpers/spectron/forms';
 import { fillForm, formIncludes, FormMonkey } from './helpers/form-monkey';
@@ -361,7 +364,7 @@ test('User does not have Facebook pages', async t => {
   await clickGoLive(t);
   await focusChild(t);
   t.true(
-    await t.context.app.client.isExisting('a=Facebook Page Creation'),
+    await t.context.app.client.isExisting('a=Create Page'),
     'The link for adding new facebook changes should exist',
   );
 });

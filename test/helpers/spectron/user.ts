@@ -48,8 +48,7 @@ export async function logIn(
   features?: ITestUserFeatures, // if not set, pick a random user's account from user-pool
   waitForUI = true,
   isOnboardingTest = false,
-): Promise<boolean> {
-  const app = t.context.app;
+): Promise<IUserAuth> {
   let authInfo: IUserAuth;
 
   if (user) throw 'User already logged in';
@@ -60,14 +59,22 @@ export async function logIn(
     authInfo = getAuthInfoFromEnv();
     if (!authInfo) {
       t.pass();
-      return false;
+      return null;
     }
   }
 
+  await loginWithAuthInfo(t, authInfo, waitForUI, isOnboardingTest);
+  return authInfo;
+}
+
+export async function loginWithAuthInfo(
+  t: TExecutionContext,
+  authInfo: IUserAuth,
+  waitForUI = true,
+  isOnboardingTest = false,
+) {
   await focusMain(t);
-
-  app.webContents.send('testing-fakeAuth', authInfo, isOnboardingTest);
-
+  t.context.app.webContents.send('testing-fakeAuth', authInfo, isOnboardingTest);
   if (!waitForUI) return true;
   await t.context.app.client.waitForVisible('.fa-sign-out-alt', 20000); // wait for the log-out button
   return true;

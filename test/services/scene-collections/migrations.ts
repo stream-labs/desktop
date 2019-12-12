@@ -1,5 +1,5 @@
-import { test, useSpectron } from './helpers/spectron';
-import { sceneExisting } from './helpers/spectron/scenes';
+import { test, useSpectron } from '../../helpers/spectron/index';
+import { sceneExisting } from '../../helpers/spectron/scenes';
 
 const fs = require('fs');
 const path = require('path');

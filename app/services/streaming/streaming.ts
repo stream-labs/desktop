@@ -447,6 +447,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           eventMetadata.useOptimizedProfile = true;
         }
 
+        const streamSettings = this.streamSettingsService.settings;
+
+        eventMetadata.streamType = streamSettings.streamType;
+        eventMetadata.platform = streamSettings.platform;
+        eventMetadata.server = streamSettings.server;
+
         this.usageStatisticsService.recordEvent('stream_start', eventMetadata);
       } else if (info.signal === EOBSOutputSignal.Starting) {
         this.SET_STREAMING_STATUS(EStreamingState.Starting, time);

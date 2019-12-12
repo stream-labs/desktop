@@ -23,17 +23,6 @@ test('Media backup', async t => {
   const api = await getClient();
   const collectionsService = api.getResource<SceneCollectionsService>('SceneCollectionsService');
 
-  // TODO: user-pool should return clean accounts without any scene-collections
-  // delete all collections for this account
-  const collections = await collectionsService.fetchSceneCollectionsSchema();
-  for (const collection of collections) {
-    try {
-      await collectionsService.delete(collection.id);
-    } catch (e) {
-      // could be switching to an invalid scene-collection
-    }
-  }
-
   // create an new empty collection
   const collection = await collectionsService.create({ name: 'Test collection' });
 

@@ -149,8 +149,12 @@ export default class Main extends Vue {
   }
 
   async onDropHandler(event: DragEvent) {
-    if (this.page === 'LayoutEditor') return;
+    if (this.page !== 'Studio') return;
+
     const fileList = event.dataTransfer.files;
+
+    if (fileList.length < 1) return;
+
     const files: string[] = [];
     let fi = fileList.length;
     while (fi--) files.push(fileList.item(fi).path);
