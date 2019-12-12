@@ -55,6 +55,16 @@ export default class Default extends TsxComponent<LayoutProps> {
     this.props.setBarResize('bar2', size, this.mins);
   }
 
+  get bottomSection() {
+    return (
+      <div class={styles.segmented} style={{ height: `${this.bar2}px`, padding: '0 8px' }}>
+        {['3', '4', '5'].map(slot => (
+          <div class={cx(styles.cell, styles.noTopPadding)}>{this.$slots[slot]}</div>
+        ))}
+      </div>
+    );
+  }
+
   render() {
     return (
       <div class={styles.rows}>
@@ -82,11 +92,7 @@ export default class Default extends TsxComponent<LayoutProps> {
           min={this.mins.bar2}
           reverse={true}
         />
-        <div class={styles.segmented} style={{ height: `${this.bar2}px`, padding: '0 8px' }}>
-          {['3', '4', '5'].map(slot => (
-            <div class={cx(styles.cell, styles.noTopPadding)}>{this.$slots[slot]}</div>
-          ))}
-        </div>
+        {this.bottomSection}
       </div>
     );
   }

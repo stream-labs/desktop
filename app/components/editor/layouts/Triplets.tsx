@@ -9,6 +9,7 @@ import styles from './Layouts.m.less';
 export default class Triplets extends TsxComponent<LayoutProps> {
   mounted() {
     window.addEventListener('resize', () => this.props.windowResizeHandler(this.mins));
+    this.props.windowResizeHandler(this.mins);
   }
   destroyed() {
     window.removeEventListener('resize', () => this.props.windowResizeHandler(this.mins));

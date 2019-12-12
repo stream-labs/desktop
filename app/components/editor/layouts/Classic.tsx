@@ -9,6 +9,7 @@ import { LayoutProps } from './Default';
 export default class Classic extends TsxComponent<LayoutProps> {
   mounted() {
     window.addEventListener('resize', () => this.props.windowResizeHandler(this.mins));
+    this.props.windowResizeHandler(this.mins);
   }
   destroyed() {
     window.removeEventListener('resize', () => this.props.windowResizeHandler(this.mins));
@@ -25,7 +26,7 @@ export default class Classic extends TsxComponent<LayoutProps> {
     return this.props.resizes.bar1;
   }
   set bar1(size: number) {
-    if (size === 0) return;
+    console.log(size);
     this.props.setBarResize('bar1', size);
   }
 

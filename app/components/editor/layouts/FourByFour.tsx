@@ -9,6 +9,7 @@ import { LayoutProps } from './Default';
 export default class FourByFour extends TsxComponent<LayoutProps> {
   mounted() {
     window.addEventListener('resize', () => this.props.windowResizeHandler(this.mins));
+    this.props.windowResizeHandler(this.mins);
   }
   destroyed() {
     window.removeEventListener('resize', () => this.props.windowResizeHandler(this.mins));

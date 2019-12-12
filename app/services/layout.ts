@@ -33,7 +33,7 @@ const RESIZE_DEFAULTS = {
   [ELayout.Classic]: { bar1: 450 },
   [ELayout.FourByFour]: { bar1: 170, bar2: 170 },
   [ELayout.Triplets]: { bar1: 650, bar2: 300 },
-  [ELayout.OnePane]: { bar1: 800 },
+  [ELayout.OnePane]: { bar1: 500 },
 };
 
 const ELEMENT_MINS = {
