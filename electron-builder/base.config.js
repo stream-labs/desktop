@@ -29,7 +29,8 @@ const base = {
     url: 'https://slobs-cdn.streamlabs.com'
   },
   win: {
-    rfc3161TimeStampServer: 'http://timestamp.digicert.com'
+    rfc3161TimeStampServer: 'http://timestamp.digicert.com',
+    timeStampServer: 'http://timestamp.digicert.com'
   },
   extraMetadata: {
     env: 'production'
