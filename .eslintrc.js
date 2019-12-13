@@ -109,5 +109,7 @@ module.exports = {
     "no-async-promise-executor": OFF,
     "prefer-promise-reject-errors": OFF,
     "import/first": OFF,
+    "no-script-url": OFF,
+    "import/no-named-default": OFF,
   },
 };

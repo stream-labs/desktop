@@ -42,7 +42,7 @@ export default class ListInput extends BaseInput<string, IListMetadata<string>> 
     }
 
     if (option) return option;
-    if (!!this.getOptions().allowEmpty) return null;
+    if (this.getOptions().allowEmpty) return null;
     return options[0];
   }
 

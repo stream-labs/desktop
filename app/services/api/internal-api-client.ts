@@ -82,7 +82,7 @@ export class InternalApiClient {
           );
 
           if (response.error) {
-            throw 'IPC request failed: check the errors in the main window';
+            throw new Error('IPC request failed: check the errors in the main window');
           }
 
           const result = response.result;

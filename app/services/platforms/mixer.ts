@@ -241,6 +241,6 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
    * Get user-friendly error message
    */
   getErrorDescription(error: IPlatformResponse<unknown>): string {
-    return `Can not connect to Mixer`;
+    return 'Can not connect to Mixer';
   }
 }

@@ -21,8 +21,8 @@ jobs:
     - script: yarn install --frozen-lockfile --check-files
       displayName: 'Install Dependencies'
 
-    - script: 'yarn lint'
-      displayName: 'TSLint'
+    - script: 'yarn eslint'
+      displayName: 'ESLint'
 
     - script: 'yarn compile:ci'
       displayName: 'Compile Assets'

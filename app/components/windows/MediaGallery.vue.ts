@@ -187,7 +187,9 @@ export default class MediaGallery extends Vue {
   async handleDownload() {
     const { filePath } = await electron.remote.dialog.showSaveDialog(
       electron.remote.getCurrentWindow(),
-      { defaultPath: this.selectedFile.fileName },
+      {
+        defaultPath: this.selectedFile.fileName,
+      },
     );
 
     if (!this.selectedFile) return;

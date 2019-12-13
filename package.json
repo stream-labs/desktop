@@ -21,8 +21,6 @@
     "clear-plugins": "rimraf plugins",
     "package": "yarn generate-agreement && rimraf dist && build -w --x64 --config electron-builder/base.config.js",
     "package:preview": "yarn generate-agreement && rimraf dist && build -w --x64 --config electron-builder/preview.config.js",
-    "lint": "tslint --project tsconfig.json {app,guest-api,obs-api,updater}/**/*.ts",
-    "lint:ci": "yarn lint --format json --out tslint-results.json",
     "eslint": "eslint {app,guest-api,obs-api,updater}/**/*.ts app/**/*.tsx",
     "test": "tsc -p test && ava -v",
     "test-flaky": "node ./test/helpers/runner.js",
@@ -46,11 +44,8 @@
     "trailingComma": "all"
   },
   "lint-staged": {
-    "*.ts": [
-      "prettier --write",
-      "tslint --fix",
-      "git add"
-    ]
+    "*.ts": ["eslint --fix", "git add"],
+    "*.tsx": ["eslint --fix", "git add"]
   },
   "ava": {
     "files": [
@@ -167,11 +162,6 @@
     "terser-webpack-plugin": "1.1.0",
     "traverse": "0.6.6",
     "ts-node": "7.0.1",
-    "tslint": "5.11.0",
-    "tslint-config-airbnb": "5.11.1",
-    "tslint-config-prettier": "1.14.0",
-    "tslint-loader": "3.6.0",
-    "tslint-plugin-prettier": "2.0.1",
     "typescript": "3.7.2",
     "urijs": "1.19.1",
     "v-selectpage": "2.0.2",

@@ -117,7 +117,7 @@ export default class YoutubeStreamStatus extends TsxComponent {
               <h1>{$t('Something went wrong')}</h1>
               <p class={styles.error}>
                 {$t(
-                  `Your stream has been created but we can\'t publish it in your channel. Check your internet connection or go to the `,
+                  "Your stream has been created but we can't publish it in your channel. Check your internet connection or go to the ",
                 )}
                 <a href="javascript:void(0)" onClick={this.goToDashboard}>
                   {$t('stream control page')}

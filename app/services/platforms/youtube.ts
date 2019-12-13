@@ -495,9 +495,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     return platformAuthorizedRequest<IYoutubeLiveBroadcast>('youtube', {
       method: 'POST',
       // es-lint-disable-next-line prettier/prettier
-      url: `${this.apiBase}${endpoint}&id=${broadcastId}&streamId=${streamId}&access_token=${
-        this.oauthToken
-      }`,
+      url: `${this.apiBase}${endpoint}&id=${broadcastId}&streamId=${streamId}&access_token=${this.oauthToken}`,
     });
   }
 
