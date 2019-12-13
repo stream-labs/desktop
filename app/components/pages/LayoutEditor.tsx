@@ -67,7 +67,11 @@ export default class LayoutEditor extends TsxComponent {
     const existingEl = Object.keys(this.slottedElements).find(
       existing => this.slottedElements[existing] === id,
     ) as ELayoutElement;
-    if (existingEl) this.slottedElements[existingEl] = this.slottedElements[el];
+    if (existingEl && this.slottedElements[el]) {
+      this.slottedElements[existingEl] = this.slottedElements[el];
+    } else if (existingEl) {
+      this.slottedElements[existingEl] = undefined;
+    }
     this.slottedElements[el] = id as LayoutSlot;
   }
 
