@@ -108,5 +108,6 @@ module.exports = {
     "no-confusing-arrow": OFF,
     "no-async-promise-executor": OFF,
     "prefer-promise-reject-errors": OFF,
+    "import/first": OFF,
   },
 };
