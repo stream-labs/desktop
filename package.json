@@ -122,7 +122,7 @@
     "devtron": "1.4.0",
     "dotenv": "8.0.0",
     "electron": "6.1.5",
-    "electron-builder": "20.38.5",
+    "electron-builder": "21.2.0",
     "electron-devtools-installer": "2.2.4",
     "fetch-mock": "7.3.9",
     "file-loader": "1.1.11",
