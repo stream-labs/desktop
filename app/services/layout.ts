@@ -1,5 +1,7 @@
+import { Inject } from 'services/core';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
+import { CustomizationService } from './customization';
 
 export enum ELayout {
   Default = 'Default',
@@ -61,8 +63,21 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
     },
   };
 
+  @Inject() private customizationService: CustomizationService;
+
   init() {
     super.init();
+
+    if (this.customizationService.state.legacyEvents && this.state === LayoutService.defaultState) {
+      this.setSlots({
+        Display: '1',
+        LegacyEvents: '2',
+        Scenes: '3',
+        Sources: '4',
+        Mixer: '5',
+      });
+      this.customizationService.setSettings({ legacyEvents: false });
+    }
   }
 
   setBarResize(bar: 'bar1' | 'bar2', size: number) {
