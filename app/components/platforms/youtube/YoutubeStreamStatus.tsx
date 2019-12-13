@@ -29,8 +29,7 @@ export default class YoutubeStreamStatus extends TsxComponent {
   }
 
   get progressInfo(): { msg: string; progress: number } {
-    let dictionary: { [key in TYoutubeLifecycleStep]: { msg: string; progress: number } };
-    dictionary = {
+    const dictionary: { [key in TYoutubeLifecycleStep]: { msg: string; progress: number } } = {
       idle: {
         msg: '',
         progress: 0,

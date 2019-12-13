@@ -323,6 +323,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   async fetchViewerCount(): Promise<number> {
     if (!this.activeChannel) return 0; // activeChannel is not available when streaming to custom ingest
     const endpoint = 'videos?part=snippet,liveStreamingDetails';
+    // eslint-disable-next-line prettier/prettier
     const url = `${this.apiBase}/${endpoint}&id=${this.activeChannel.broadcastId}&access_token=${
       this.oauthToken
     }`;
@@ -493,6 +494,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     const endpoint = `/liveBroadcasts/bind?part=${fields.join(',')}`;
     return platformAuthorizedRequest<IYoutubeLiveBroadcast>('youtube', {
       method: 'POST',
+      // es-lint-disable-next-line prettier/prettier
       url: `${this.apiBase}${endpoint}&id=${broadcastId}&streamId=${streamId}&access_token=${
         this.oauthToken
       }`,
@@ -504,7 +506,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
    * this LiveStream must be bounded to the Youtube LiveBroadcast before going live
    */
   private async createLiveStream(title: string): Promise<IYoutubeLiveStream> {
-    const endpoint = `liveStreams?part=cdn,snippet,contentDetails`;
+    const endpoint = 'liveStreams?part=cdn,snippet,contentDetails';
     return platformAuthorizedRequest<IYoutubeLiveStream>('youtube', {
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
       method: 'POST',
@@ -664,7 +666,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     maxResults = 50,
     fields = ['snippet', 'contentDetails', 'status'],
   ): Promise<IYoutubeLiveBroadcast[]> {
-    const filter = ids ? `&id=${ids.join(',')}` : `&broadcastStatus=upcoming`;
+    const filter = ids ? `&id=${ids.join(',')}` : '&broadcastStatus=upcoming';
     const query = `part=${fields.join(',')}${filter}&maxResults=${maxResults}&access_token=${
       this.oauthToken
     }`;

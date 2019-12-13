@@ -182,6 +182,7 @@ export class ChatService extends Service {
 
       if (settings.enableBTTVEmotes && this.userService.platform.type === 'twitch') {
         this.chatView.webContents.executeJavaScript(
+          /*eslint-disable */
           `
           localStorage.setItem('bttv_clickTwitchEmotes', true);
           localStorage.setItem('bttv_darkenedMode', ${
@@ -204,7 +205,7 @@ export class ChatService extends Service {
           }
 
           loadLazyEmotes();
-        `,
+        ` /*eslint-enable */,
           true,
         );
       }

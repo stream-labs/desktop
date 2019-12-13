@@ -268,9 +268,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
     const availableDevices = this.getInputDevicesList();
     const enabledDeviceId = this.state.settings.device ? this.state.settings.device.value : null;
     const availableDeviceSelected = enabledDeviceId
-      ? availableDevices.some(device => {
-          return enabledDeviceId === (device.value as string);
-        })
+      ? availableDevices.some(device => enabledDeviceId === (device.value as string))
       : false;
 
     return this.state.settings.enabled && availableDeviceSelected;
@@ -370,12 +368,8 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
       body: JSON.stringify(settings),
       headers: new Headers({ 'Content-Type': 'application/json' }),
     };
-    try {
-      await this.formRequest(endpoint, postData);
-      this.startup();
-    } catch (e) {
-      throw e;
-    }
+    await this.formRequest(endpoint, postData);
+    this.startup();
   }
 
   setupFilter() {
