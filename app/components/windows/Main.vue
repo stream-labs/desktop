@@ -26,7 +26,9 @@
         class="main-page-container"
         v-if="!showLoadingSpinner"
         :is="page"
-        :params="params"/>
+        :params="params"
+        @totalWidth="(width) => handleEditorWidth(width)"
+      />
       <studio-footer v-if="!applicationLoading && (page !== 'Onboarding')" />
     </div>
 

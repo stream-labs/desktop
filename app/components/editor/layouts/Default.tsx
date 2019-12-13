@@ -1,6 +1,6 @@
 import cx from 'classnames';
 import TsxComponent, { createProps } from 'components/tsx-component';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import { LayoutSlot } from 'services/layout';
 import styles from './Layouts.m.less';
@@ -13,6 +13,7 @@ export class LayoutProps {
   setBarResize: (bar: 'bar1' | 'bar2', size: number, mins?: IResizeMins) => void = () => {};
   windowResizeHandler: (mins: IResizeMins) => void = () => {};
   resizes: { bar1: number; bar2: number } = null;
+  elWidth: number = 0;
 }
 
 // the minimums here represent the asbolute minimum of a viable component (minimized to invisibility)
@@ -28,9 +29,19 @@ export default class Default extends TsxComponent<LayoutProps> {
   mounted() {
     window.addEventListener('resize', () => this.props.windowResizeHandler(this.mins));
     this.props.windowResizeHandler(this.mins);
+    this.$emit('totalWidth', ['1', '2', ['3', '4', '5']]);
   }
   destroyed() {
     window.removeEventListener('resize', () => this.props.windowResizeHandler(this.mins));
+  }
+
+  get totalWidth() {
+    return this.props.elWidth;
+  }
+
+  @Watch('totalWidth')
+  updateSize() {
+    this.props.windowResizeHandler(this.mins);
   }
 
   get mins() {

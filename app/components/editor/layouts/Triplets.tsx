@@ -1,7 +1,7 @@
 import cx from 'classnames';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { LayoutProps } from './Default';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import styles from './Layouts.m.less';
 
@@ -10,9 +10,19 @@ export default class Triplets extends TsxComponent<LayoutProps> {
   mounted() {
     window.addEventListener('resize', () => this.props.windowResizeHandler(this.mins));
     this.props.windowResizeHandler(this.mins);
+    this.$emit('totalWidth', [['1', '4'], ['2', '5'], ['3', '6']]);
   }
   destroyed() {
     window.removeEventListener('resize', () => this.props.windowResizeHandler(this.mins));
+  }
+
+  get totalWidth() {
+    return this.props.elWidth;
+  }
+
+  @Watch('totalWidth')
+  updateSize() {
+    this.props.windowResizeHandler(this.mins);
   }
 
   get mins() {

@@ -77,6 +77,8 @@ export default class Main extends Vue {
     this.handleResize();
   }
 
+  minEditorWidth = 500;
+
   get title() {
     return this.windowsService.state.main.title;
   }
@@ -227,6 +229,9 @@ export default class Main extends Vue {
     clearTimeout(this.windowResizeTimeout);
 
     this.hasLiveDock = this.windowWidth >= 1070;
+    if (this.page === 'Studio') {
+      this.hasLiveDock = this.windowWidth >= this.minEditorWidth + 100;
+    }
     this.windowResizeTimeout = window.setTimeout(
       () => this.windowsService.updateStyleBlockers('main', false),
       200,
@@ -235,6 +240,10 @@ export default class Main extends Vue {
 
   handleResize() {
     this.compactView = this.$refs.mainMiddle.clientWidth < 1200;
+  }
+
+  handleEditorWidth(width: number) {
+    this.minEditorWidth = width;
   }
 
   onResizeStartHandler() {
@@ -255,9 +264,8 @@ export default class Main extends Vue {
 
   validateWidth(width: number): number {
     const appRect = this.$root.$el.getBoundingClientRect();
-    const minEditorWidth = 500;
     const minWidth = 290;
-    const maxWidth = Math.min(appRect.width - minEditorWidth, appRect.width / 2);
+    const maxWidth = Math.min(appRect.width - this.minEditorWidth, appRect.width / 2);
     let constrainedWidth = Math.max(minWidth, width);
     constrainedWidth = Math.min(maxWidth, width);
     return constrainedWidth;

@@ -53,6 +53,11 @@ export default class Studio extends TsxComponent {
     return this.layoutService.state.slottedElements;
   }
 
+  get elWidth() {
+    if (!this.$el) return 0;
+    return this.$el.getBoundingClientRect().width;
+  }
+
   windowResizeHandler(mins: IResizeMins) {
     // This is the maximum size we can use
     this.max = this.isColumns
@@ -92,8 +97,16 @@ export default class Studio extends TsxComponent {
     return this.layoutService.calculateMinimum(this.isColumns ? 'x' : 'y', slots);
   }
 
-  calculateMax(topEl: number) {
-    return this.max - topEl;
+  totalWidthHandler(slots: (LayoutSlot | LayoutSlot[])[]) {
+    if (this.isColumns) {
+      this.$emit('totalWidth', this.layoutService.calculateColumnTotal(slots));
+    } else {
+      this.$emit('totalWidth', this.layoutService.calculateMinimum('x', slots));
+    }
+  }
+
+  calculateMax(restMin: number) {
+    return this.max - restMin;
   }
 
   underMaxSize(max: number) {
@@ -127,6 +140,8 @@ export default class Studio extends TsxComponent {
         windowResizeHandler={(mins: IResizeMins) => this.windowResizeHandler(mins)}
         resizes={this.resizes}
         class="editor-page"
+        elWidth={this.elWidth}
+        onTotalWidth={(slots: (LayoutSlot | LayoutSlot[])[]) => this.totalWidthHandler(slots)}
       >
         {Object.keys(this.layoutService.state.slottedElements).map(widget => {
           const Element = COMPONENT_MAP[widget];

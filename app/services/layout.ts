@@ -77,6 +77,22 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
     this.SET_SLOTS(slottedElements);
   }
 
+  calculateColumnTotal(slots: (LayoutSlot | LayoutSlot[])[]) {
+    let totalWidth = 0;
+    slots.forEach(slot => {
+      if (Array.isArray(slot)) {
+        totalWidth += this.calculateMinimum('x', slot);
+      } else {
+        const c = Object.keys(this.state.slottedElements).find(
+          comp => this.state.slottedElements[comp] === slot,
+        );
+        totalWidth += ELEMENT_MINS[c].x;
+      }
+    });
+
+    return totalWidth;
+  }
+
   calculateMinimum(orientation: 'x' | 'y', slots: (LayoutSlot | LayoutSlot[])[]) {
     const aggregateMins: number[] = [];
     const components: ELayoutElement[] = [];
