@@ -89,7 +89,7 @@
     "@babel/preset-env": "7.5.5",
     "@octokit/app": "3.0.2",
     "@octokit/request": "4.1.1",
-    "@octokit/rest": "16.28.7",
+    "@octokit/rest": "16.35.2",
     "@sentry/browser": "5.4.0",
     "@sentry/integrations": "5.4.1",
     "@types/archiver": "2.1.3",
