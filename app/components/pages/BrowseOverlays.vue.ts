@@ -38,8 +38,6 @@ export default class BrowseOverlays extends Vue {
 
   onBrowserViewReady(view: Electron.BrowserView) {
     view.webContents.on('did-finish-load', () => {
-      view.webContents.openDevTools();
-
       this.guestApiService.exposeApi(view.webContents.id, {
         installOverlay: this.installOverlay,
         installWidgets: this.installWidgets,

@@ -4,6 +4,7 @@ import TsxComponent from 'components/tsx-component';
 import { OnboardingService } from 'services/onboarding';
 import { Inject } from 'services/core/injector';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
+import { SceneCollectionsService } from 'services/scene-collections';
 import {
   Connect,
   ObsImport,
@@ -24,6 +25,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
   @Inject() onboardingService: OnboardingService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
   @Inject() userService: UserService;
+  @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() restreamService: RestreamService;
 
   currentStep = 1;
@@ -78,7 +80,9 @@ export default class OnboardingPage extends TsxComponent<{}> {
       this.importedFromObs = true;
     } else if (importedObs === false) {
       this.importedFromObs = false;
-      this.stepsState.push({ complete: false });
+      if (this.noExistingSceneCollections) {
+        this.stepsState.push({ complete: false });
+      }
       if (
         this.onboardingService.isTwitchAuthed ||
         (this.onboardingService.isFacebookAuthed && this.fbSetupEnabled)
@@ -101,29 +105,37 @@ export default class OnboardingPage extends TsxComponent<{}> {
       />,
     ];
 
+    return this.addOptionalSteps(steps);
+  }
+
+  addOptionalSteps(steps: JSX.Element[]) {
     if (this.importedFromObs) {
       steps.push(<StreamlabsFeatures slot="3" />);
       return steps;
     }
     steps.push(<HardwareSetup slot="3" />);
-    steps.push(
-      <ThemeSelector
-        slot="4"
-        continue={this.continue.bind(this)}
-        setProcessing={this.setProcessing.bind(this)}
-      />,
-    );
+    let nextStep = '4';
+    if (this.noExistingSceneCollections) {
+      steps.push(
+        <ThemeSelector
+          slot={nextStep}
+          continue={this.continue.bind(this)}
+          setProcessing={this.setProcessing.bind(this)}
+        />,
+      );
+      nextStep = '5';
+    }
     if (this.onboardingService.isTwitchAuthed) {
       steps.push(
         <Optimize
-          slot="5"
+          slot={nextStep}
           continue={this.continue.bind(this)}
           setProcessing={this.setProcessing.bind(this)}
         />,
       );
       steps.push(<Multistream slot="6" continue={() => this.continue()} />);
     } else if (this.onboardingService.isFacebookAuthed && this.fbSetupEnabled) {
-      steps.push(<FacebookPageCreation slot="5" continue={this.continue.bind(this)} />);
+      steps.push(<FacebookPageCreation slot={nextStep} continue={this.continue.bind(this)} />);
     }
     return steps;
   }
@@ -161,6 +173,13 @@ export default class OnboardingPage extends TsxComponent<{}> {
           </button>
         </div>
       </div>
+    );
+  }
+
+  get noExistingSceneCollections() {
+    return (
+      this.sceneCollectionsService.collections.length === 1 &&
+      this.sceneCollectionsService.collections[0].auto
     );
   }
 
