@@ -140,7 +140,7 @@ export default class LayoutEditor extends TsxComponent {
               <div
                 class={this.classForSlot(slot)}
                 id={slot}
-                draggable
+                draggable={this.elementInSlot(slot)}
                 onDragend={(e: MouseEvent) =>
                   this.handleElementDrag(e, ELayoutElement[this.elementInSlot(slot)])
                 }
