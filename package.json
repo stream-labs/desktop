@@ -3,7 +3,7 @@
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "0.19.4",
+  "version": "0.20.0-preview.0",
   "main": "main.js",
   "engines": {
     "node": ">= 10 < 12",
@@ -120,7 +120,7 @@
     "devtron": "1.4.0",
     "dotenv": "8.0.0",
     "electron": "6.1.5",
-    "electron-builder": "21.2.0",
+    "electron-builder": "20.38.5",
     "electron-devtools-installer": "2.2.4",
     "eslint": "^6.7.2",
     "eslint-config-airbnb-base": "^14.0.0",
