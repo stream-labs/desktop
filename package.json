@@ -107,7 +107,7 @@
     "@types/uuid": "3.4.6",
     "@types/webdriverio": "4.13.3",
     "@vue/babel-helper-vue-jsx-merge-props": "1.0.0",
-    "@vue/babel-preset-jsx": "1.1.0",
+    "@vue/babel-preset-jsx": "1.1.2",
     "@xkeshi/vue-qrcode": "0.3.0",
     "ava": "1.4.1",
     "awesome-typescript-loader": "5.2.1",

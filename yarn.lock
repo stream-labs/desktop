@@ -1567,10 +1567,10 @@
   resolved "https://registry.yarnpkg.com/@vue/babel-helper-vue-jsx-merge-props/-/babel-helper-vue-jsx-merge-props-1.0.0.tgz#048fe579958da408fb7a8b2a3ec050b50a661040"
   integrity sha512-6tyf5Cqm4m6v7buITuwS+jHzPlIPxbFzEhXR5JGZpbrvOcp1hiQKckd305/3C7C36wFekNTQSxAtgeM0j0yoUw==
 
-"@vue/babel-plugin-transform-vue-jsx@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@vue/babel-plugin-transform-vue-jsx/-/babel-plugin-transform-vue-jsx-1.0.0.tgz#ebcbf39c312c94114c8c4f407ee4f6c97aa45432"
-  integrity sha512-U+JNwVQSmaLKjO3lzCUC3cNXxprgezV1N+jOdqbP4xWNaqtWUCJnkjTVcgECM18A/AinDKPcUUeoyhU7yxUxXQ==
+"@vue/babel-plugin-transform-vue-jsx@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@vue/babel-plugin-transform-vue-jsx/-/babel-plugin-transform-vue-jsx-1.1.2.tgz#c0a3e6efc022e75e4247b448a8fc6b86f03e91c0"
+  integrity sha512-YfdaoSMvD1nj7+DsrwfTvTnhDXI7bsuh+Y5qWwvQXlD24uLgnsoww3qbiZvWf/EoviZMrvqkqN4CBw0W3BWUTQ==
   dependencies:
     "@babel/helper-module-imports" "^7.0.0"
     "@babel/plugin-syntax-jsx" "^7.2.0"
@@ -1579,51 +1579,51 @@
     lodash.kebabcase "^4.1.1"
     svg-tags "^1.0.0"
 
-"@vue/babel-preset-jsx@1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@vue/babel-preset-jsx/-/babel-preset-jsx-1.1.0.tgz#c8001329f5b372297a3111a251eb4f9e956c1266"
-  integrity sha512-EeZ9gwEmu79B4A6LMLAw5cPCVYIcbKWgJgJafWtLzh1S+SgERUmTkVQ9Vx4k8zYBiCuxHK3XziZ3VJIMau7THA==
+"@vue/babel-preset-jsx@1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@vue/babel-preset-jsx/-/babel-preset-jsx-1.1.2.tgz#2e169eb4c204ea37ca66c2ea85a880bfc99d4f20"
+  integrity sha512-zDpVnFpeC9YXmvGIDSsKNdL7qCG2rA3gjywLYHPCKDT10erjxF4U+6ay9X6TW5fl4GsDlJp9bVfAVQAAVzxxvQ==
   dependencies:
     "@vue/babel-helper-vue-jsx-merge-props" "^1.0.0"
-    "@vue/babel-plugin-transform-vue-jsx" "^1.0.0"
-    "@vue/babel-sugar-functional-vue" "^1.0.0"
-    "@vue/babel-sugar-inject-h" "^1.0.0"
-    "@vue/babel-sugar-v-model" "^1.0.0"
-    "@vue/babel-sugar-v-on" "^1.1.0"
+    "@vue/babel-plugin-transform-vue-jsx" "^1.1.2"
+    "@vue/babel-sugar-functional-vue" "^1.1.2"
+    "@vue/babel-sugar-inject-h" "^1.1.2"
+    "@vue/babel-sugar-v-model" "^1.1.2"
+    "@vue/babel-sugar-v-on" "^1.1.2"
 
-"@vue/babel-sugar-functional-vue@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@vue/babel-sugar-functional-vue/-/babel-sugar-functional-vue-1.0.0.tgz#17e2c4ca27b74b244da3b923240ec91d10048cb3"
-  integrity sha512-XE/jNaaorTuhWayCz+QClk5AB9OV5HzrwbzEC6sIUY0J60A28ONQKeTwxfidW42egOkqNH/UU6eE3KLfmiDj0Q==
+"@vue/babel-sugar-functional-vue@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@vue/babel-sugar-functional-vue/-/babel-sugar-functional-vue-1.1.2.tgz#f7e24fba09e6f1ee70104560a8808057555f1a9a"
+  integrity sha512-YhmdJQSVEFF5ETJXzrMpj0nkCXEa39TvVxJTuVjzvP2rgKhdMmQzlJuMv/HpadhZaRVMCCF3AEjjJcK5q/cYzQ==
   dependencies:
     "@babel/plugin-syntax-jsx" "^7.2.0"
 
-"@vue/babel-sugar-inject-h@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@vue/babel-sugar-inject-h/-/babel-sugar-inject-h-1.0.0.tgz#e5efb6c5b5b7988dc03831af6d133bf7bcde6347"
-  integrity sha512-NxWU+DqtbZgfGvd25GPoFMj+rvyQ8ZA1pHj8vIeqRij+vx3sXoKkObjA9ulZunvWw5F6uG9xYy4ytpxab/X+Hg==
+"@vue/babel-sugar-inject-h@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@vue/babel-sugar-inject-h/-/babel-sugar-inject-h-1.1.2.tgz#8a5276b6d8e2ed16ffc8078aad94236274e6edf0"
+  integrity sha512-VRSENdTvD5htpnVp7i7DNuChR5rVMcORdXjvv5HVvpdKHzDZAYiLSD+GhnhxLm3/dMuk8pSzV+k28ECkiN5m8w==
   dependencies:
     "@babel/plugin-syntax-jsx" "^7.2.0"
 
-"@vue/babel-sugar-v-model@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@vue/babel-sugar-v-model/-/babel-sugar-v-model-1.0.0.tgz#f4da56aa67f65a349bd2c269a95e72e601af4613"
-  integrity sha512-Pfg2Al0io66P1eO6zUbRIgpyKCU2qTnumiE0lao/wA/uNdb7Dx5Tfd1W6tO5SsByETPnEs8i8+gawRIXX40rFw==
+"@vue/babel-sugar-v-model@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@vue/babel-sugar-v-model/-/babel-sugar-v-model-1.1.2.tgz#1ff6fd1b800223fc9cb1e84dceb5e52d737a8192"
+  integrity sha512-vLXPvNq8vDtt0u9LqFdpGM9W9IWDmCmCyJXuozlq4F4UYVleXJ2Fa+3JsnTZNJcG+pLjjfnEGHci2339Kj5sGg==
   dependencies:
     "@babel/plugin-syntax-jsx" "^7.2.0"
     "@vue/babel-helper-vue-jsx-merge-props" "^1.0.0"
-    "@vue/babel-plugin-transform-vue-jsx" "^1.0.0"
+    "@vue/babel-plugin-transform-vue-jsx" "^1.1.2"
     camelcase "^5.0.0"
     html-tags "^2.0.0"
     svg-tags "^1.0.0"
 
-"@vue/babel-sugar-v-on@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@vue/babel-sugar-v-on/-/babel-sugar-v-on-1.1.0.tgz#1f2b35eeeabb87eaf8925931f4d34fd8e6404a45"
-  integrity sha512-8DwAj/RLpmrDP4eZ3erJcKcyuLArLUYagNODTsSQrMdG5zmLJoFFtEjODfYRh/XxM2wXv9Wxe+HAB41FQxxwQA==
+"@vue/babel-sugar-v-on@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@vue/babel-sugar-v-on/-/babel-sugar-v-on-1.1.2.tgz#b2ef99b8f2fab09fbead25aad70ef42e1cf5b13b"
+  integrity sha512-T8ZCwC8Jp2uRtcZ88YwZtZXe7eQrJcfRq0uTFy6ShbwYJyz5qWskRFoVsdTi9o0WEhmQXxhQUewodOSCUPVmsQ==
   dependencies:
     "@babel/plugin-syntax-jsx" "^7.2.0"
-    "@vue/babel-plugin-transform-vue-jsx" "^1.0.0"
+    "@vue/babel-plugin-transform-vue-jsx" "^1.1.2"
     camelcase "^5.0.0"
 
 "@webassemblyjs/ast@1.7.11":
