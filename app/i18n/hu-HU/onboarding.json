@@ -41,10 +41,10 @@
   "Something went wrong": "Valami elromlott",
   "Streamlabs OBS is ready to go": "A Streamlabs OBS készen áll az indulásra",
   "Download and Apply": "Töltse le és alkalmazza",
-  "This device is not available": "This device is not available",
-  "Select your mic": "Select your mic",
-  "Select your webcam": "Select your webcam",
-  "Setup Mic and Webcam": "Setup Mic and Webcam",
+  "This device is not available": "Ez az eszköz nem érhető el",
+  "Select your mic": "Válassza ki a mikrofont",
+  "Select your webcam": "Válassza ki a webkameráját",
+  "Setup Mic and Webcam": "A mikrofon és a webkamera beállítása",
   "Sign in with your streaming account to get started with Streamlabs OBS": "Jelentkezzen be streaming-fiókjával, hogy elkezdhesse a Streamlabs OBS használatát",
   "Welcome to Streamlabs OBS": "Üdvözöljük a Streamlabs OBS-ben",
   "Import your existing settings from OBS in less than a minute and go live": "Importálja meglévő beállításait kevesebb, mint egy perc alatt az OBS-ből, és kezdje el élőben",
@@ -77,5 +77,5 @@
   "Create Facebook Gaming Page": "Create Facebook Gaming Page",
   "Create Gaming Video Creator Page": "Create Gaming Video Creator Page",
   "Merge your Facebook Gaming Page": "Merge your Facebook Gaming Page",
-  "Merge with Facebook": "Merge with Facebook"
+  "Merge with Facebook": "Egyesülés a Facebook-lal"
 }
