@@ -12,7 +12,7 @@ import {
 import { LayoutService, ELayoutElement, ELayout, LayoutSlot } from 'services/layout';
 import { WindowsService } from 'services/windows';
 import * as Layouts from 'components/editor/layouts';
-import { IResizeMins } from 'components/editor/layouts/Default';
+import { IResizeMins } from 'components/editor/layouts/BaseLayout';
 
 const COMPONENT_MAP: Dictionary<typeof TsxComponent> = {
   [ELayoutElement.Display]: Display,

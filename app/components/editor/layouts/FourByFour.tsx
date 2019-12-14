@@ -1,28 +1,18 @@
 import cx from 'classnames';
-import TsxComponent, { createProps } from 'components/tsx-component';
-import { Component, Watch } from 'vue-property-decorator';
+import BaseLayout, { LayoutProps } from './BaseLayout';
+import { createProps } from 'components/tsx-component';
+import { Component } from 'vue-property-decorator';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import styles from './Layouts.m.less';
-import { LayoutProps } from './Default';
 
 @Component({ props: createProps(LayoutProps) })
-export default class FourByFour extends TsxComponent<LayoutProps> {
+export default class FourByFour extends BaseLayout {
   mounted() {
-    window.addEventListener('resize', () => this.props.windowResizeHandler(this.mins));
-    this.props.windowResizeHandler(this.mins);
+    super.mountResize();
     this.$emit('totalWidth', ['1', ['2', '3'], ['4', '5']]);
   }
   destroyed() {
-    window.removeEventListener('resize', () => this.props.windowResizeHandler(this.mins));
-  }
-
-  get totalWidth() {
-    return this.props.elWidth;
-  }
-
-  @Watch('totalWidth')
-  updateSize() {
-    this.props.windowResizeHandler(this.mins);
+    super.destroyResize();
   }
 
   get mins() {
