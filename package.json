@@ -100,7 +100,7 @@
     "@types/lodash": "4.14.136",
     "@types/mime": "2.0.1",
     "@types/mkdirp": "0.5.2",
-    "@types/node": "12.11.5",
+    "@types/node": "12.12.18",
     "@types/request": "2.48.3",
     "@types/semver": "6.0.2",
     "@types/socket.io-client": "1.4.32",
