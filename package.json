@@ -102,7 +102,7 @@
     "@types/mkdirp": "0.5.2",
     "@types/node": "12.12.18",
     "@types/request": "2.48.3",
-    "@types/semver": "6.0.2",
+    "@types/semver": "6.2.0",
     "@types/socket.io-client": "1.4.32",
     "@types/uuid": "3.4.6",
     "@types/webdriverio": "4.13.3",
