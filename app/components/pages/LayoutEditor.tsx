@@ -58,15 +58,19 @@ export default class LayoutEditor extends TsxComponent {
 
   handleElementDrag(event: MouseEvent, el: ELayoutElement) {
     const htmlElement = document.elementFromPoint(event.clientX, event.clientY);
+    console.log(htmlElement.id, htmlElement.parentElement.id);
     if (!htmlElement) {
       this.slottedElements[el] = undefined;
       return;
     }
     // In case the span tag is the element dropped on we check for parent element id
     const id = htmlElement.id || htmlElement.parentElement.id;
-    const existingEl = Object.keys(this.slottedElements).find(
-      existing => this.slottedElements[existing] === id,
-    ) as ELayoutElement;
+    let existingEl;
+    if (id !== '') {
+      existingEl = Object.keys(this.slottedElements).find(
+        existing => this.slottedElements[existing] === id,
+      ) as ELayoutElement;
+    }
     if (existingEl && this.slottedElements[el]) {
       this.slottedElements[existingEl] = this.slottedElements[el];
     } else if (existingEl) {
