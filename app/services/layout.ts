@@ -101,7 +101,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
         const c = Object.keys(this.state.slottedElements).find(
           comp => this.state.slottedElements[comp] === slot,
         );
-        totalWidth += ELEMENT_MINS[c].x;
+        if (c) totalWidth += ELEMENT_MINS[c].x;
       }
     });
 
