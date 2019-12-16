@@ -126,7 +126,7 @@
     "electron-devtools-installer": "2.2.4",
     "fetch-mock": "7.7.3",
     "file-loader": "1.1.11",
-    "fuse.js": "3.2.1",
+    "fuse.js": "3.4.6",
     "hard-source-webpack-plugin": "0.13.1",
     "humps": "2.0.1",
     "js-yaml": "3.13.1",
