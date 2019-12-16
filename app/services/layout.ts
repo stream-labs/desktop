@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual';
 import { Inject } from 'services/core';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
@@ -68,7 +69,10 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
   init() {
     super.init();
 
-    if (this.customizationService.state.legacyEvents && this.state === LayoutService.defaultState) {
+    if (
+      this.customizationService.state.legacyEvents &&
+      isEqual(this.state, LayoutService.defaultState)
+    ) {
       this.setSlots({
         Display: '1',
         LegacyEvents: '2',
