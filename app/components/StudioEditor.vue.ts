@@ -362,10 +362,12 @@ export default class StudioEditor extends TsxComponent {
 
     // set the game_capture's auto resize to false
     if (source.type === 'game_capture') {
-      this.editorCommandsService.executeCommand('EditSourcePropertiesCommand', source.id, [{
-        name: 'auto_fit_to_output',
-        value: false,
-      }] as TObsFormData);
+      this.editorCommandsService.executeCommand('EditSourcePropertiesCommand', source.id, [
+        {
+          name: 'auto_fit_to_output',
+          value: false,
+        },
+      ] as TObsFormData);
     }
   }
 
