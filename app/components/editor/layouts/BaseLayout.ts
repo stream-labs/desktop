@@ -1,5 +1,5 @@
-import TsxComponent, { createProps } from 'components/tsx-component';
-import { Component, Watch } from 'vue-property-decorator';
+import TsxComponent from 'components/tsx-component';
+import { Watch } from 'vue-property-decorator';
 import { LayoutSlot } from 'services/layout';
 
 export class LayoutProps {
