@@ -64,7 +64,11 @@ export default class BrowserView extends TsxComponent<BrowserViewProps> {
     this.browserView.webContents.on('did-fail-load', (event, errorCode) => {
       // ignore the ERR_ABORTED exception
       // that happens when the window has been closed before BrowserView acomplished the request
-      if (errorCode === -3) event.stopPropagation();
+      if (errorCode === -3) {
+        event.stopPropagation();
+        event.preventDefault();
+        return false;
+      }
     });
 
     electron.remote.getCurrentWindow().addBrowserView(this.browserView);
