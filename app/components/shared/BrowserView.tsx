@@ -61,6 +61,11 @@ export default class BrowserView extends TsxComponent<BrowserViewProps> {
     if (this.props.setLocale) I18nService.setBrowserViewLocale(this.browserView);
 
     this.browserView.webContents.on('did-finish-load', () => (this.loading = false));
+    this.browserView.webContents.on('did-fail-load', (event, errorCode) => {
+      // ignore the ERR_ABORTED exception
+      // that happens when the window has been closed before BrowserView acomplished the request
+      if (errorCode === -3) event.stopPropagation();
+    });
 
     electron.remote.getCurrentWindow().addBrowserView(this.browserView);
 
