@@ -125,7 +125,8 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
         if (c) components.push(ELayoutElement[c]);
       }
     });
-    const minimums = components.map(comp => (ELEMENT_MINS[comp] || { x: 0, y: 0 })[orientation]);
+    const minimums = components.map(comp => ELEMENT_MINS[comp][orientation]);
+    if (!minimums.length) minimums.push(10);
     return Math.max(...minimums, ...aggregateMins);
   }
 
@@ -135,7 +136,8 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
         comp => this.state.slottedElements[comp] === slot,
       ),
     );
-    const minimums = components.map(comp => (ELEMENT_MINS[comp] || { x: 0, y: 0 })[orientation]);
+    const minimums = components.map(comp => ELEMENT_MINS[comp][orientation]);
+    if (!minimums.length) minimums.push(10);
     return minimums.reduce((a: number, b: number) => a + b);
   }
 

@@ -75,6 +75,7 @@ export default class Studio extends TsxComponent {
    */
   reconcileSizeWithinContraints(mins: IResizeMins) {
     const functionalMax = this.calculateMax(mins.rest);
+    console.log('firing', mins);
     if (!mins.bar2) return;
     if (this.underMaxSize(functionalMax)) return;
 
