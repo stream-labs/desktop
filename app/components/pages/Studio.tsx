@@ -38,6 +38,18 @@ export default class Studio extends TsxComponent {
   @Inject() private windowsService: WindowsService;
 
   max: number = null;
+  elWidth: number = 0;
+  interval: number;
+
+  mounted() {
+    this.interval = window.setInterval(() => {
+      this.elWidth = this.$el.getBoundingClientRect().width;
+    }, 500);
+  }
+
+  destroyed() {
+    if (this.interval) clearInterval(this.interval);
+  }
 
   get resizes() {
     return this.layoutService.state.resizes;
@@ -51,11 +63,6 @@ export default class Studio extends TsxComponent {
 
   get slottedElements() {
     return this.layoutService.state.slottedElements;
-  }
-
-  get elWidth() {
-    if (!this.$el) return 0;
-    return this.$el.getBoundingClientRect().width;
   }
 
   windowResizeHandler(mins: IResizeMins) {
@@ -75,7 +82,6 @@ export default class Studio extends TsxComponent {
    */
   reconcileSizeWithinContraints(mins: IResizeMins) {
     const functionalMax = this.calculateMax(mins.rest);
-    console.log('firing', mins);
     if (!mins.bar2) return;
     if (this.underMaxSize(functionalMax)) return;
 

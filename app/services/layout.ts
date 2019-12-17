@@ -43,7 +43,7 @@ const ELEMENT_MINS = {
   [ELayoutElement.Display]: { x: 350, y: 250 },
   [ELayoutElement.LegacyEvents]: { x: 430, y: 150 },
   [ELayoutElement.Mixer]: { x: 230, y: 150 },
-  [ELayoutElement.Minifeed]: { x: 270, y: 150 },
+  [ELayoutElement.Minifeed]: { x: 330, y: 150 },
   [ELayoutElement.Sources]: { x: 220, y: 150 },
   [ELayoutElement.Scenes]: { x: 200, y: 150 },
 };
