@@ -58,7 +58,6 @@ export default class LayoutEditor extends TsxComponent {
 
   handleElementDrag(event: MouseEvent, el: ELayoutElement) {
     const htmlElement = document.elementFromPoint(event.clientX, event.clientY);
-    console.log(htmlElement.id, htmlElement.parentElement.id);
     if (!htmlElement) {
       this.slottedElements[el] = undefined;
       return;
