@@ -16,6 +16,7 @@ import { CustomizationService } from 'services/customization';
 import { v2 } from '../util/vec2';
 import { EditorCommandsService } from 'services/editor-commands';
 import { ERenderingMode } from '../../obs-api';
+import { TObsFormData } from './obs/inputs/ObsInput';
 
 interface IResizeRegion {
   name: string;
@@ -358,6 +359,14 @@ export default class StudioEditor extends TsxComponent {
       rect.crop,
       { x: rect.x, y: rect.y },
     );
+
+    // set the game_capture's auto resize to false
+    if (source.type === 'game_capture') {
+      this.editorCommandsService.executeCommand('EditSourcePropertiesCommand', source.id, [{
+        name: 'auto_fit_to_output',
+        value: false,
+      }] as TObsFormData);
+    }
   }
 
   resize(

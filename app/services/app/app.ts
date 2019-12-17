@@ -34,6 +34,7 @@ import { RecentEventsService } from 'services/recent-events';
 import Utils from 'services/utils';
 import { Subject } from 'rxjs';
 import { RestreamService } from 'services/restream';
+import { downloadFile } from '../../util/requests';
 
 interface IAppState {
   loading: boolean;
@@ -136,6 +137,7 @@ export class AppService extends StatefulService<IAppState> {
     this.crashReporterService.endStartup();
 
     this.protocolLinksService.start(this.state.argv);
+    this.downloadConfigs();
   }
 
   shutdownStarted = new Subject();
@@ -233,6 +235,14 @@ export class AppService extends StatefulService<IAppState> {
     }
     if (error) throw error;
     return returningValue;
+  }
+
+  private async downloadConfigs() {
+    // download game-list for auto game capture
+    await downloadFile(
+      'https://s3-us-west-2.amazonaws.com/streamlabs-obs/configs/game_capture_list.lst',
+      `${this.appDataDirectory}/game_capture_list.lst`,
+    );
   }
 
   @mutation()
