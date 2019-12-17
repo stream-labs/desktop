@@ -62,7 +62,7 @@ export class EditMenu extends Menu {
 
       this.append({
         label: $t('Paste (Duplicate)'),
-        enabled: this.clipboardService.hasItems(),
+        enabled: this.clipboardService.canDuplicate(),
         click: () => this.clipboardService.paste(true),
       });
     }
