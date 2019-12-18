@@ -28,14 +28,14 @@ export default class TwoPane extends BaseLayout {
   }
   set bar1(size: number) {
     if (size === 0) return;
-    this.props.setBarResize('bar1', size);
+    this.props.setBarResize('bar1', size, this.mins);
   }
 
   get bar2() {
     return this.props.resizes.bar2;
   }
   set bar2(size: number) {
-    this.props.setBarResize('bar2', size);
+    this.props.setBarResize('bar2', size, this.mins);
   }
 
   get midsection() {
