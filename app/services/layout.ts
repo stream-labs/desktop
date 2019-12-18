@@ -26,7 +26,7 @@ export type LayoutSlot = '1' | '2' | '3' | '4' | '5' | '6';
 
 interface ILayoutServiceState {
   currentLayout: ELayout;
-  slottedElements: { [key in ELayoutElement]?: LayoutSlot };
+  slottedElements: { [value in ELayoutElement]?: LayoutSlot };
   resizes: { bar1: number; bar2?: number };
 }
 
@@ -52,11 +52,11 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
   static defaultState: ILayoutServiceState = {
     currentLayout: ELayout.Default,
     slottedElements: {
-      Display: '1',
-      Minifeed: '2',
-      Scenes: '3',
-      Sources: '4',
-      Mixer: '5',
+      [ELayoutElement.Display]: '1',
+      [ELayoutElement.Minifeed]: '2',
+      [ELayoutElement.Scenes]: '3',
+      [ELayoutElement.Sources]: '4',
+      [ELayoutElement.Mixer]: '5',
     },
     resizes: {
       bar1: 156,
@@ -74,11 +74,11 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
       isEqual(this.state, LayoutService.defaultState)
     ) {
       this.setSlots({
-        Display: '1',
-        LegacyEvents: '2',
-        Scenes: '3',
-        Sources: '4',
-        Mixer: '5',
+        [ELayoutElement.Display]: '1',
+        [ELayoutElement.LegacyEvents]: '2',
+        [ELayoutElement.Scenes]: '3',
+        [ELayoutElement.Sources]: '4',
+        [ELayoutElement.Mixer]: '5',
       });
       this.customizationService.setSettings({ legacyEvents: false });
     }

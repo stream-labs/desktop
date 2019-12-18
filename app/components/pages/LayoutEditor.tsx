@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import cx from 'classnames';
 import cloneDeep from 'lodash/cloneDeep';
 import TsxComponent from 'components/tsx-component';
@@ -58,6 +59,7 @@ export default class LayoutEditor extends TsxComponent {
 
   handleElementDrag(event: MouseEvent, el: ELayoutElement) {
     const htmlElement = document.elementFromPoint(event.clientX, event.clientY);
+    if (!el) return;
     if (!htmlElement) {
       this.slottedElements[el] = undefined;
       return;
@@ -65,17 +67,19 @@ export default class LayoutEditor extends TsxComponent {
     // In case the span tag is the element dropped on we check for parent element id
     const id = htmlElement.id || htmlElement.parentElement.id;
     let existingEl;
-    if (id !== '') {
+    if (['1', '2', '3', '4', '5', '6'].includes(id)) {
       existingEl = Object.keys(this.slottedElements).find(
         existing => this.slottedElements[existing] === id,
       ) as ELayoutElement;
+      if (existingEl && this.slottedElements[el]) {
+        Vue.set(this.slottedElements, existingEl, this.slottedElements[el]);
+      } else if (existingEl) {
+        Vue.delete(this.slottedElements, existingEl);
+      }
+      Vue.set(this.slottedElements, el, id as LayoutSlot);
+    } else {
+      Vue.delete(this.slottedElements, el);
     }
-    if (existingEl && this.slottedElements[el]) {
-      this.slottedElements[existingEl] = this.slottedElements[el];
-    } else if (existingEl) {
-      this.slottedElements[existingEl] = undefined;
-    }
-    this.slottedElements[el] = id as LayoutSlot;
   }
 
   setLayout(layout: ELayout) {
