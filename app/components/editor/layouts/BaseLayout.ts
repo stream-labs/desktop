@@ -8,7 +8,7 @@ export class LayoutProps {
   calculateMin: (slots: (LayoutSlot | LayoutSlot[])[]) => number = () => 0;
   calculateMax: (mins: number) => number = () => 0;
   setBarResize: (bar: 'bar1' | 'bar2', size: number, mins?: IResizeMins) => void = () => {};
-  windowResizeHandler: (mins: IResizeMins) => void = () => {};
+  windowResizeHandler: (mins: IResizeMins, isChat?: boolean) => void = () => {};
   resizes: { bar1: number; bar2: number } = null;
   elWidth: number = 0;
 }
@@ -34,7 +34,7 @@ export default class BaseLayout extends TsxComponent<LayoutProps> {
 
   @Watch('totalWidth')
   updateSize() {
-    this.props.windowResizeHandler(this.mins);
+    this.props.windowResizeHandler(this.mins, true);
   }
 
   get mins() {

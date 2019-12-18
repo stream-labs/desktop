@@ -65,7 +65,9 @@ export default class Studio extends TsxComponent {
     return this.layoutService.state.slottedElements;
   }
 
-  windowResizeHandler(mins: IResizeMins) {
+  windowResizeHandler(mins: IResizeMins, isChat?: boolean) {
+    if (isChat && !this.isColumns) return;
+
     // This is the maximum size we can use
     this.max = this.isColumns
       ? this.$el.getBoundingClientRect().width
@@ -144,7 +146,9 @@ export default class Studio extends TsxComponent {
         setBarResize={(bar: 'bar1' | 'bar2', size: number, mins?: IResizeMins) =>
           this.setBarResize(bar, size, mins)
         }
-        windowResizeHandler={(mins: IResizeMins) => this.windowResizeHandler(mins)}
+        windowResizeHandler={(mins: IResizeMins, isChat?: boolean) =>
+          this.windowResizeHandler(mins)
+        }
         resizes={this.resizes}
         class="editor-page"
         elWidth={this.elWidth}
