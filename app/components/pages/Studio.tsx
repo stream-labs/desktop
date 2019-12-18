@@ -84,13 +84,14 @@ export default class Studio extends TsxComponent {
    */
   reconcileSizeWithinContraints(mins: IResizeMins) {
     const functionalMax = this.calculateMax(mins.rest);
-    if (!mins.bar2) return;
     if (this.underMaxSize(functionalMax)) return;
 
     if (this.resizes.bar1 > mins.bar1) {
-      this.setBarResize('bar1', Math.max(functionalMax - this.resizes.bar2, mins.bar1));
+      const remainingSpace = mins.bar2 ? functionalMax - this.resizes.bar2 : functionalMax;
+      this.setBarResize('bar1', Math.max(remainingSpace, mins.bar1));
       if (this.underMaxSize(functionalMax)) return;
     }
+    if (!mins.bar2) return;
     if (this.resizes.bar2 > mins.bar2) {
       const oldBar2 = this.resizes.bar2;
       this.setBarResize('bar2', Math.max(functionalMax - mins.bar1, mins.bar2));
