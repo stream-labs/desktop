@@ -282,10 +282,10 @@ export default class EditStreamInfo extends Vue {
           );
         })
         .catch(e => {
-          this.$toasted.show(e.error.message, {
+          this.$toasted.show(e.message, {
             position: 'bottom-center',
             className: 'toast-alert',
-            duration: 50 * e.error.message.length,
+            duration: 50 * e.message.length,
             singleton: true,
           });
         });

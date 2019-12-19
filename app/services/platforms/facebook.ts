@@ -16,6 +16,7 @@ import { IListOption } from '../../components/shared/inputs';
 import { $t } from 'services/i18n';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { Subject } from 'rxjs';
+import { promises } from 'dns';
 
 interface IFacebookPage {
   access_token: string;
@@ -238,7 +239,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     });
   }
 
-  scheduleStream(
+  async scheduleStream(
     scheduledStartTime: string,
     { title, description, game }: IFacebookChanelInfo,
   ): Promise<any> {
@@ -250,7 +251,16 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
       game_specs: { name: game },
       status: 'SCHEDULED_UNPUBLISHED',
     });
-    return platformRequest('facebook', { url, body, method: 'POST' }, this.activeToken);
+    try {
+      return await platformRequest('facebook', { url, body, method: 'POST' }, this.activeToken)
+
+    } catch(e) {
+      if (e?.result?.error?.code === 100) {
+        throw new Error($t(
+          'Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.',
+        ));
+      }
+    }
   }
 
   fetchViewerCount(): Promise<number> {
