@@ -67,7 +67,7 @@ export default class BrowserView extends TsxComponent<BrowserViewProps> {
       await this.browserView.webContents.loadURL(this.props.src);
     } catch (e) {
       // ignore the ERR_ABORTED exception
-      // that happens when the window has been closed before BrowserView acomplished the request
+      // that happens when the window has been closed before BrowserView accomplished the request
       if (e.code === 'ERR_ABORTED') return;
       throw e;
     }
