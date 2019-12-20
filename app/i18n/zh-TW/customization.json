@@ -3,5 +3,17 @@
   "Chat Text Size": "聊天室文字大小",
   "Chat Width": "聊天室顯示寬度",
   "Enable BetterTTV emotes for Twitch": "在 Twitch 聊天室啟用 BetterTTV 表情",
-  "Enable FrankerFaceZ emotes for Twitch": "在 Twitch 聊天室啟用 FrankerFaceZ 表情"
+  "Enable FrankerFaceZ emotes for Twitch": "在 Twitch 聊天室啟用 FrankerFaceZ 表情",
+  "Stream Display": "Stream Display",
+  "Mini Feed": "Mini Feed",
+  "Audio Mixer": "Audio Mixer",
+  "Scene Selector": "Scene Selector",
+  "Source Selector": "Source Selector",
+  "Legacy Events": "Legacy Events",
+  "Streamlabs OBS UI Customization": "Streamlabs OBS UI Customization",
+  "Customize the appearance of your Streamlabs OBS Studio tab": "Customize the appearance of your Streamlabs OBS Studio tab",
+  "Save Changes": "Save Changes",
+  "Elements": "Elements",
+  "Layouts": "Layouts",
+  "Drag and drop to edit.": "Drag and drop to edit."
 }

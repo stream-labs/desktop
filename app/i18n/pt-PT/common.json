@@ -92,6 +92,7 @@
   "OBSInit.ModuleNotFoundError": "Não conseguimos encontrar o DirectX no seu sistema. Instale a última versão do DirectX disponível para a sua máquina a partir de <https://www.microsoft.com/en-us/download/details.aspx?id=35?> e tente de novo.",
   "OBSInit.NotSupportedError": "Falha ao iniciar o OBS. Os seus drivers de vídeo podem estar desatualizados, ou o Streamlabs OBS pode não ser suportado pelo seu sistema.",
   "Logout %{username}": "Logout %{username}",
+  "Layout Editor": "Layout Editor",
   "Are you sure you want to import multiple files?": "Are you sure you want to import multiple files?",
   "Studio": "Studio",
   "Store": "Store",

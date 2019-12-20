@@ -1,16 +1,16 @@
 {
-  "Scene Transitions": "Переход сцены",
-  "Cut": "Обрез",
+  "Scene Transitions": "Переходы сцены",
+  "Cut": "Обрезка",
   "Fade": "Затухание",
   "Swipe": "Размах",
   "Slide": "Скольжение",
   "Fade to Color": "Затухание цвета",
-  "Luma Wipe": "Вытеснение Яркости",
+  "Luma Wipe": "Вытеснение яркости",
   "Stinger": "Файл перехода",
   "Transition": "Переход",
   "Duration": "Продолжительность",
   "Add Transition": "Добавить переход",
-  "You need at least 1 transition.": "Требуется хотя бы 1 переход.",
+  "You need at least 1 transition.": "Требуется хотя бы один переход.",
   "Add Connection": "Добавить коллекцию",
   "Beginning Scene": "Начальная сцена",
   "Ending Scene": "Конечная сцена",
@@ -21,7 +21,7 @@
   "Transition Name": "Название перехода",
   "Default": "По умолчанию",
   "Deleted": "Удалено",
-  "This connection is redundant because another connection already connects these scenes.": "Это соединение избыточно потому, что другое соединение уже соединяет эти сцены.",
-  "You need at least 2 scenes to edit transitions.": "Требуется хотябы 2 сцены для редактирования переходов.",
-  "This scene transition is managed by an App and cannot be edited.": "Этот переход сцены управляется приложением и не может быть отредактирован."
+  "This connection is redundant because another connection already connects these scenes.": "Уже есть соединение между этими сценами.",
+  "You need at least 2 scenes to edit transitions.": "Для редактирования перехода необходимо хотя бы две сцены.",
+  "This scene transition is managed by an App and cannot be edited.": "Этот переход нельзя отредактировать, поскольку он управляется приложением."
 }
