@@ -40,7 +40,7 @@ export default class BrowserView extends TsxComponent<BrowserViewProps> {
 
   shutdownSubscription: Subscription;
 
-  mounted() {
+  async mounted() {
     const options = this.props.options ? cloneDeep(this.props.options) : { webPreferences: {} };
 
     // Enforce node integration disabled to prevent security issues
@@ -61,10 +61,16 @@ export default class BrowserView extends TsxComponent<BrowserViewProps> {
     if (this.props.setLocale) I18nService.setBrowserViewLocale(this.browserView);
 
     this.browserView.webContents.on('did-finish-load', () => (this.loading = false));
-
     electron.remote.getCurrentWindow().addBrowserView(this.browserView);
 
-    this.browserView.webContents.loadURL(this.props.src);
+    try {
+      await this.browserView.webContents.loadURL(this.props.src);
+    } catch (e) {
+      // ignore the ERR_ABORTED exception
+      // that happens when the window has been closed before BrowserView accomplished the request
+      if (e.code === 'ERR_ABORTED') return;
+      throw e;
+    }
 
     this.resizeInterval = window.setInterval(() => {
       this.checkResize();
@@ -80,7 +86,7 @@ export default class BrowserView extends TsxComponent<BrowserViewProps> {
     electron.remote.getCurrentWindow().removeBrowserView(this.browserView);
     this.browserView.destroy();
     clearInterval(this.resizeInterval);
-    this.shutdownSubscription.unsubscribe();
+    this.shutdownSubscription && this.shutdownSubscription.unsubscribe();
   }
 
   get hideStyleBlockers() {
