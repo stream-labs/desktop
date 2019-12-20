@@ -3,8 +3,7 @@ import { ITransform } from 'services/scenes';
 import { Selection } from 'services/selection';
 import isEqual from 'lodash/isEqual';
 import cloneDeep from 'lodash/cloneDeep';
-import { AddFilterCommand } from './add-filter';
-import { TObsFormData } from '../../../components/obs/inputs/ObsInput';
+import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { EditSourcePropertiesCommand } from './edit-source-properties';
 
 export abstract class ModifyTransformCommand extends CombinableCommand {
