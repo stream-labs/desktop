@@ -92,6 +92,7 @@
   "OBSInit.ModuleNotFoundError": "DirectXが見つかりませんでした。最新バージョンのDirectXをお使いのマシンにインストールしてください。もう一度やり直してください<https://www.microsoft.com/en-us/download/details.aspx?id=35?>",
   "OBSInit.NotSupportedError": "OBSの初期化に失敗しました。 ビデオドライバが古くなっているか、Streamlabs OBSがシステムでサポートされていない可能性があります",
   "Logout %{username}": "Logout %{username}",
+  "Layout Editor": "Layout Editor",
   "Are you sure you want to import multiple files?": "Are you sure you want to import multiple files?",
   "Studio": "Studio",
   "Store": "Store",
