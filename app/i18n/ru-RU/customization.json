@@ -1,7 +1,19 @@
 {
-  "Show the live dock (chat) on the left side": "Показывать чат слева",
+  "Show the live dock (chat) on the left side": "Показывать живой чат слева",
   "Chat Text Size": "Размер текста в чате",
   "Chat Width": "Ширина чата",
   "Enable BetterTTV emotes for Twitch": "Включить смайлики BetterTTV для Twitch",
-  "Enable FrankerFaceZ emotes for Twitch": "Включить смайлики FrankerFaceZ для Twitch"
+  "Enable FrankerFaceZ emotes for Twitch": "Включить смайлики FrankerFaceZ для Twitch",
+  "Stream Display": "Stream Display",
+  "Mini Feed": "Мини-лента",
+  "Audio Mixer": "Audio Mixer",
+  "Scene Selector": "Scene Selector",
+  "Source Selector": "Source Selector",
+  "Legacy Events": "Legacy Events",
+  "Streamlabs OBS UI Customization": "Streamlabs OBS UI Customization",
+  "Customize the appearance of your Streamlabs OBS Studio tab": "Customize the appearance of your Streamlabs OBS Studio tab",
+  "Save Changes": "Save Changes",
+  "Elements": "Elements",
+  "Layouts": "Layouts",
+  "Drag and drop to edit.": "Drag and drop to edit."
 }
