@@ -70,7 +70,7 @@
 <script lang="ts" src="./SceneSelector.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import "../../../styles/index";
 
 .scene-collections-wrapper {
   position: relative;

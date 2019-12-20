@@ -1,10 +1,9 @@
-import TsxComponent from 'components/tsx-component';
 import { Component, Watch } from 'vue-property-decorator';
-import { Inject } from '../services/core/injector';
+import { Inject } from 'services/core/injector';
 import { SourcesService } from 'services/sources';
-import { ScenesService, ISceneItemNode, TSceneNode } from 'services/scenes';
+import { ScenesService, TSceneNode } from 'services/scenes';
 import { SelectionService } from 'services/selection';
-import { EditMenu } from '../util/menus/EditMenu';
+import { EditMenu } from 'util/menus/EditMenu';
 import SlVueTree, { ISlTreeNode, ISlTreeNodeModel, ICursorPosition } from 'sl-vue-tree';
 import { WidgetType } from 'services/widgets';
 import { $t } from 'services/i18n';
@@ -12,6 +11,7 @@ import { EditorCommandsService } from 'services/editor-commands';
 import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 import { CustomizationService } from 'services/customization';
 import { StreamingService } from 'services/streaming';
+import TsxComponent from 'components/tsx-component';
 
 const widgetIconMap = {
   [WidgetType.AlertBox]: 'fas fa-bell',

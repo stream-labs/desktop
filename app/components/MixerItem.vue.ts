@@ -1,4 +1,4 @@
-import Vue from 'vue';
+import TsxComponent, { createProps } from 'components/tsx-component';
 import { Component, Prop } from 'vue-property-decorator';
 import { EditMenu } from '../util/menus/EditMenu';
 import { AudioSource } from '../services/audio';
@@ -8,12 +8,15 @@ import MixerVolmeter from './MixerVolmeter.vue';
 import { Inject } from '../services/core/injector';
 import { EditorCommandsService } from 'services/editor-commands';
 
+class MixerItemProps {
+  audioSource: AudioSource = null;
+}
+
 @Component({
   components: { SliderInput, MixerVolmeter },
+  props: createProps(MixerItemProps),
 })
-export default class MixerItem extends Vue {
-  @Prop() audioSource: AudioSource;
-
+export default class MixerItem extends TsxComponent<MixerItemProps> {
   @Inject() private customizationService: CustomizationService;
   @Inject() private editorCommandsService: EditorCommandsService;
 
@@ -34,7 +37,7 @@ export default class MixerItem extends Vue {
   setMuted(muted: boolean) {
     this.editorCommandsService.executeCommand(
       'MuteSourceCommand',
-      this.audioSource.sourceId,
+      this.props.audioSource.sourceId,
       muted,
     );
   }
@@ -42,7 +45,7 @@ export default class MixerItem extends Vue {
   onSliderChangeHandler(newVal: number) {
     this.editorCommandsService.executeCommand(
       'SetDeflectionCommand',
-      this.audioSource.sourceId,
+      this.props.audioSource.sourceId,
       newVal,
     );
   }

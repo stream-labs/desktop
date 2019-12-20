@@ -1,4 +1,4 @@
-@import "../../../../styles/index";
+@import "../../../styles/index";
 
 .rows {
   display: flex;
@@ -19,6 +19,12 @@
   height: 100%;
 }
 
+.stacked {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+}
+
 .cell {
   display: flex;
   flex-grow: 1;
@@ -26,6 +32,7 @@
   height: 100%;
   position: relative;
   padding: 16px 8px;
+  width: 100%;
   min-width: 0;
 
   > div {

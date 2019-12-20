@@ -30,7 +30,7 @@
   <div v-else class="no-preview">
     <div class="message" v-if="performanceMode">
       {{ $t('Preview is disabled in performance mode') }}
-      <div class="button button--action button--sm" @click="enablePreview">{{ $t('Disable Performance Mode') }}</div>
+      <div class="button button--action" @click="enablePreview">{{ $t('Disable Performance Mode') }}</div>
     </div>
     <div ref="placeholder" class="placeholder" v-else>
       <div v-if="studioMode" class="placeholder-controls" :class="{ stacked }" />
@@ -176,6 +176,10 @@
     .button {
       margin-top: 20px;
       display: block;
+
+      &:hover {
+        cursor: pointer;
+      }
     }
   }
 }

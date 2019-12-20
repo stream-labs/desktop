@@ -92,6 +92,10 @@ export default class StudioEditor extends TsxComponent {
     return this.customizationService.state.performanceMode;
   }
 
+  enablePreview() {
+    this.customizationService.setSettings({ performanceMode: false });
+  }
+
   get displayEnabled() {
     return (
       !this.windowsService.state.main.hideStyleBlockers && !this.performanceMode && this.showDisplay

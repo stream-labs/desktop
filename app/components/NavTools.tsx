@@ -110,6 +110,13 @@ export default class SideNav extends Vue {
           </div>
         )}
         <div
+          class={styles.cell}
+          onClick={() => this.navigate('LayoutEditor')}
+          title={$t('Layout Editor')}
+        >
+          <i class="fas fa-th-large" />
+        </div>
+        <div
           class={cx(styles.cell, { [styles.toggleOn]: this.studioModeEnabled })}
           onClick={this.studioMode.bind(this)}
           title={$t('Studio Mode')}
