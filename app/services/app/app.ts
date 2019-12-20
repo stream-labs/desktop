@@ -116,9 +116,6 @@ export class AppService extends StatefulService<IAppState> {
       // probably the internet is disconnected
     });
 
-    this.downloadAutoGameCaptureConfig();
-    await this.userService.validateLogin();
-
     // Second, we want to start the crash reporter service.  We do this
     // after the user service because we want crashes to be associated
     // with a particular user if possible.
