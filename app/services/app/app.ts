@@ -103,9 +103,20 @@ export class AppService extends StatefulService<IAppState> {
       });
     }
 
-    // We want to start this as early as possible so that any
-    // exceptions raised while loading the configuration are
-    // associated with the user in sentry.
+    // perform several concurrent http requests
+    await Promise.all([
+      // We want to start this as early as possible so that any
+      // exceptions raised while loading the configuration are
+      // associated with the user in sentry.
+      this.userService.validateLogin(),
+
+      // this config should be downloaded before any game-capture source has been added to the scene
+      this.downloadAutoGameCaptureConfig(),
+    ]).catch(e => {
+      // probably the internet is disconnected
+    });
+
+    this.downloadAutoGameCaptureConfig();
     await this.userService.validateLogin();
 
     // Second, we want to start the crash reporter service.  We do this
@@ -137,7 +148,6 @@ export class AppService extends StatefulService<IAppState> {
     this.crashReporterService.endStartup();
 
     this.protocolLinksService.start(this.state.argv);
-    this.downloadConfigs();
   }
 
   shutdownStarted = new Subject();
@@ -237,7 +247,7 @@ export class AppService extends StatefulService<IAppState> {
     return returningValue;
   }
 
-  private async downloadConfigs() {
+  private async downloadAutoGameCaptureConfig() {
     // download game-list for auto game capture
     await downloadFile(
       'https://s3-us-west-2.amazonaws.com/streamlabs-obs/configs/game_capture_list.lst',

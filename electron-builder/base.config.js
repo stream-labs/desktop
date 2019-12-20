@@ -8,6 +8,7 @@ const base = {
     'node_modules',
     'vendor',
     'app/i18n',
+    'media/images/game-capture',
     'updater/build/bootstrap.js',
     'index.html',
     'main.js',
