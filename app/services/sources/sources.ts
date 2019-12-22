@@ -338,9 +338,10 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       );
 
       // setup the placeholder image
-      resolvedSettings.auto_placeholder_image = path.join(
+      // TODO: Only works in production
+      resolvedSettings.auto_placeholder_image = path.resolve(
         electron.remote.app.getAppPath(),
-        require('../../../media/images/game-capture/capture-placeholder.png'),
+        '../../media/images/game-capture/capture-placeholder.png',
       );
     }
 

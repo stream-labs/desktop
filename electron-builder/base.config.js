@@ -16,7 +16,8 @@ const base = {
   ],
   extraFiles: [
     'LICENSE',
-    'AGREEMENT'
+    'AGREEMENT',
+    'media/images/game-capture/*'
   ],
   nsis: {
     license: 'AGREEMENT',
