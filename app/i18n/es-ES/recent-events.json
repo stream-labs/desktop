@@ -48,5 +48,5 @@
   "Effects": "Efectos",
   "has purchased %{product} from the store": "ha comprado %{product} en la tienda",
   "Event Filters": "Filtros de evento",
-  "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, just click here.": "Hemos combinado las pestañas Editor y En directo, y hemos dado un nuevo aspecto a sus eventos. Si desea volver a la fuente de eventos anterior, simplemente haga clic aquí."
+  "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, check out the Layout Editor in the sidebar.": "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, check out the Layout Editor in the sidebar."
 }

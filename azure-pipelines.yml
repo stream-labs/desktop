@@ -24,6 +24,9 @@ jobs:
     - script: 'yarn eslint'
       displayName: 'ESLint'
 
+    - script: 'yarn compile:strictnulls'
+      displayName: 'Check regressions in files with strictNullChecks'
+
     - script: 'yarn compile:ci'
       displayName: 'Compile Assets'
 

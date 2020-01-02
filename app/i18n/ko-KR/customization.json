@@ -3,5 +3,17 @@
   "Chat Text Size": "채팅 텍스트 크기",
   "Chat Width": "채팅 폭",
   "Enable BetterTTV emotes for Twitch": "Twitch BetterTTV 이모티콘 활성화",
-  "Enable FrankerFaceZ emotes for Twitch": "Twitch FrankerFaceZ 이모티콘 활성화"
+  "Enable FrankerFaceZ emotes for Twitch": "Twitch FrankerFaceZ 이모티콘 활성화",
+  "Stream Display": "Stream Display",
+  "Mini Feed": "Mini Feed",
+  "Audio Mixer": "Audio Mixer",
+  "Scene Selector": "Scene Selector",
+  "Source Selector": "Source Selector",
+  "Legacy Events": "Legacy Events",
+  "Streamlabs OBS UI Customization": "Streamlabs OBS UI Customization",
+  "Customize the appearance of your Streamlabs OBS Studio tab": "Customize the appearance of your Streamlabs OBS Studio tab",
+  "Save Changes": "Save Changes",
+  "Elements": "Elements",
+  "Layouts": "Layouts",
+  "Drag and drop to edit.": "Drag and drop to edit."
 }
