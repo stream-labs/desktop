@@ -9,7 +9,11 @@ import styles from './Layouts.m.less';
 export default class Triplets extends BaseLayout {
   mounted() {
     super.mountResize();
-    this.$emit('totalWidth', [['1', '4'], ['2', '5'], ['3', '6']]);
+    this.$emit('totalWidth', [
+      ['1', '4'],
+      ['2', '5'],
+      ['3', '6'],
+    ]);
   }
   destroyed() {
     super.destroyResize();
