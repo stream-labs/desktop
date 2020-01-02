@@ -74,11 +74,11 @@ export default class LayoutEditor extends TsxComponent {
       if (existingEl && this.slottedElements[el]) {
         Vue.set(this.slottedElements, existingEl, this.slottedElements[el]);
       } else if (existingEl) {
-        Vue.delete(this.slottedElements, existingEl);
+        Vue.set(this.slottedElements, existingEl, null);
       }
       Vue.set(this.slottedElements, el, id as LayoutSlot);
     } else {
-      Vue.delete(this.slottedElements, el);
+      Vue.set(this.slottedElements, el, null);
     }
   }
 
