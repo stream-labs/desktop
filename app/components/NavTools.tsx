@@ -86,6 +86,10 @@ export default class SideNav extends Vue {
     this.dashboardOpening = false;
   }
 
+  openHelp() {
+    electron.remote.shell.openExternal('https://howto.streamlabs.com/');
+  }
+
   render() {
     return (
       <div class={styles.bottomTools}>
@@ -123,7 +127,7 @@ export default class SideNav extends Vue {
         >
           <i class="icon-studio-mode-3" />
         </div>
-        <div class={styles.cell} onClick={() => this.navigate('Help')} title={$t('Get Help')}>
+        <div class={styles.cell} onClick={() => this.openHelp()} title={$t('Get Help')}>
           <i class="icon-question" />
         </div>
         <div
