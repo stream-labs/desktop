@@ -45,6 +45,9 @@ export default class Studio extends TsxComponent {
     this.interval = window.setInterval(() => {
       this.elWidth = this.$el.getBoundingClientRect().width;
     }, 500);
+    this.max = this.isColumns
+      ? this.$el.getBoundingClientRect().width
+      : this.$el.getBoundingClientRect().height;
   }
 
   destroyed() {
@@ -68,12 +71,24 @@ export default class Studio extends TsxComponent {
   windowResizeHandler(mins: IResizeMins, isChat?: boolean) {
     if (isChat && !this.isColumns) return;
 
+    const oldMax = this.max;
+
     // This is the maximum size we can use
     this.max = this.isColumns
       ? this.$el.getBoundingClientRect().width
       : this.$el.getBoundingClientRect().height;
 
+    this.resizeByRatio(oldMax);
     this.reconcileSizeWithinContraints(mins);
+  }
+
+  resizeByRatio(oldMax: number) {
+    const ratio = this.max / oldMax;
+
+    this.setBarResize('bar1', Math.round(this.resizes.bar1 * ratio));
+    if (this.resizes.bar2) {
+      this.setBarResize('bar2', Math.round(this.resizes.bar2 * ratio));
+    }
   }
 
   /**

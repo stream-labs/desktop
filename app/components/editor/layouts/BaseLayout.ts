@@ -22,10 +22,14 @@ export interface IResizeMins {
 export default class BaseLayout extends TsxComponent<LayoutProps> {
   mountResize() {
     window.addEventListener('resize', () => this.props.windowResizeHandler(this.mins));
+    window.addEventListener('maximize', () => this.props.windowResizeHandler(this.mins));
+    window.addEventListener('unmaximize', () => this.props.windowResizeHandler(this.mins));
     this.props.windowResizeHandler(this.mins);
   }
   destroyResize() {
     window.removeEventListener('resize', () => this.props.windowResizeHandler(this.mins));
+    window.removeEventListener('maximize', () => this.props.windowResizeHandler(this.mins));
+    window.removeEventListener('unmaximize', () => this.props.windowResizeHandler(this.mins));
   }
 
   get totalWidth() {
