@@ -133,7 +133,8 @@ export default class OnboardingPage extends TsxComponent<{}> {
           setProcessing={this.setProcessing.bind(this)}
         />,
       );
-      steps.push(<Multistream slot="6" continue={() => this.continue()} />);
+      nextStep = `${Number(nextStep) + 1}`;
+      steps.push(<Multistream slot={nextStep} continue={() => this.continue()} />);
     } else if (this.onboardingService.isFacebookAuthed && this.fbSetupEnabled) {
       steps.push(<FacebookPageCreation slot={nextStep} continue={this.continue.bind(this)} />);
     }
