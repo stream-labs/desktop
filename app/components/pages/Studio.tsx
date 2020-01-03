@@ -45,6 +45,9 @@ export default class Studio extends TsxComponent {
     this.interval = window.setInterval(() => {
       this.elWidth = this.$el.getBoundingClientRect().width;
     }, 500);
+    this.max = this.isColumns
+      ? this.$el.getBoundingClientRect().width
+      : this.$el.getBoundingClientRect().height;
   }
 
   destroyed() {
