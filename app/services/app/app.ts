@@ -247,7 +247,7 @@ export class AppService extends StatefulService<IAppState> {
   private async downloadAutoGameCaptureConfig() {
     // download game-list for auto game capture
     await downloadFile(
-      'https://s3-us-west-2.amazonaws.com/streamlabs-obs/configs/game_capture_list.lst',
+      'https://slobs-cdn.streamlabs.com/configs/game_capture_list.lst',
       `${this.appDataDirectory}/game_capture_list.lst`,
     );
   }
