@@ -35,6 +35,7 @@ import { AudioService } from '../audio';
 import { ReplayManager } from './properties-managers/replay-manager';
 import electron from 'electron';
 import path from 'path';
+import { getSharedResource } from 'util/get-shared-resource';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -327,22 +328,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       this.defaultHardwareService.state.defaultVideoDevice
     ) {
       resolvedSettings.video_device_id = this.defaultHardwareService.state.defaultVideoDevice;
-    }
-
-    // setup game capture
-    if (type === 'game_capture') {
-      // setup the list of supported games for the auto mode in the game_capture
-      resolvedSettings.auto_capture_list_path = path.join(
-        electron.remote.app.getPath('userData'),
-        'game_capture_list.lst',
-      );
-
-      // setup the placeholder image
-      // TODO: Only works in production
-      resolvedSettings.auto_placeholder_image = path.resolve(
-        electron.remote.app.getAppPath(),
-        '../../media/images/game-capture/capture-placeholder.png',
-      );
     }
 
     return resolvedSettings;
