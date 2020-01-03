@@ -80,7 +80,7 @@ export default class Studio extends TsxComponent {
   }
 
   resizeByRatio(oldMax: number) {
-    const ratio = (this.max / oldMax) * 0.5;
+    const ratio = this.max / oldMax;
 
     this.setBarResize('bar1', Math.round(this.resizes.bar1 * ratio));
     if (this.resizes.bar2) {
