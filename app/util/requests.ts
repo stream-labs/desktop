@@ -46,43 +46,27 @@ export function authorizedHeaders(token: string, headers = new Headers()): Heade
   return headers;
 }
 
-// DEPRECATED: this is synchronous and also complex
 export async function downloadFile(srcUrl: string, dstPath: string): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
+  return new Promise<void>(resolve => {
     return fetch(srcUrl)
       .then(resp => (resp.ok ? Promise.resolve(resp) : Promise.reject(resp)))
       .then(({ body }: { body: ReadableStream }) => {
         const reader = body.getReader();
-        let result = new Uint8Array(0);
+        const fileStream = fs.createWriteStream(dstPath);
+
         const readStream = ({ done, value }: { done: boolean; value: Uint8Array }) => {
           if (done) {
-            fs.writeFileSync(dstPath, result);
+            fileStream.end();
             resolve();
           } else {
-            result = concatUint8Arrays(result, value);
+            fileStream.write(value);
             reader.read().then(readStream);
           }
         };
+
         return reader.read().then(readStream);
       });
   });
-}
-
-export async function downloadFileAlt(srcUrl: string, dstPath: string) {
-  return new Promise((resolve, reject) => {
-    const writer = fs.createWriteStream(dstPath);
-    request.get(srcUrl).pipe(writer);
-
-    writer.on('finish', resolve);
-    writer.on('error', reject);
-  });
-}
-
-function concatUint8Arrays(a: Uint8Array, b: Uint8Array) {
-  const c = new Uint8Array(a.length + b.length);
-  c.set(a, 0);
-  c.set(b, a.length);
-  return c;
 }
 
 export const isUrl = (x: string): boolean => !!x.match(/^https?:/);

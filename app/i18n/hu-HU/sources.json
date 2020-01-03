@@ -175,5 +175,7 @@
   "Projector: ": "Kivetítő: ",
   "Add files": "Fájlok hozzáadása",
   "Remove source": "Források Eltávolítása",
-  "Toggle Selective Recording": "Váltás a szelektív felvételre"
+  "Toggle Selective Recording": "Váltás a szelektív felvételre",
+  "Size": "Size",
+  "Position": "Position"
 }

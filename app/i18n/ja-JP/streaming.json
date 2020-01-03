@@ -59,8 +59,8 @@
   "Log out and back in to reauthorize additional permissions.": "ログアウトして追加のパーミッションを再認証してください",
   "Are you sure you want to start streaming?": "本当にストリーミングを開始してもよろしいですか？",
   "Please enable account for streaming to recieve a stream key": "ストリームキーを受け取るためアカウントを有効にしてください",
-  "Facebook Page Creation": "Facebookページの作成",
-  " to create a page, and then try again.": "ページを作成するためやり直してください",
+  "You must create a Facebook gaming page to go live.": "You must create a Facebook gaming page to go live.",
+  "Create Page": "Create Page",
   "Facebook Page": "フェイスブックページ",
   "Description": "概要",
   "Checking optimized setting for": "最適化された設定を確認",
@@ -90,5 +90,11 @@
   "Learn More": "Learn More",
   "Something went wrong while going live, please try again.": "Something went wrong while going live, please try again.",
   "You must select a game": "You must select a game",
-  "Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.": "Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance."
+  "Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.": "Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.",
+  "No Sources": "No Sources",
+  "Enable Multistream": "Enable Multistream",
+  "Multistream allows you to stream to multiple platforms simultaneously.": "Multistream allows you to stream to multiple platforms simultaneously.",
+  "Multistream": "Multistream",
+  "Your Twitch login is expired. Please log in again to continue using Streamlabs OBS": "Your Twitch login is expired. Please log in again to continue using Streamlabs OBS",
+  "Refresh Login": "Refresh Login"
 }

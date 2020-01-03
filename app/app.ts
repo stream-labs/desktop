@@ -247,44 +247,18 @@ if (Utils.isDevMode()) {
 
 // ERRORS LOGGING
 
-// catch and log unhandled errors/rejected promises:
-electronLog.catchErrors({ onError: e => electronLog.log(`from ${Utils.getWindowId()}`, e) });
-
-// override console.error
-const consoleError = console.error;
-console.error = function(...args: any[]) {
-  // TODO: Suppress N-API error until we upgrade electron to v4.x
-  if (/N\-API is an experimental feature/.test(args[0])) return;
-
+function logError(...args: unknown[]) {
   if (Utils.isDevMode()) ipcRenderer.send('showErrorAlert');
-  writeErrorToLog(...args);
-  consoleError.call(console, ...args);
-};
-
-/**
- * Try to serialize error arguments and stack and write them to the log file
- */
-function writeErrorToLog(...errors: (Error | string)[]) {
-  let message = '';
-
-  // format error arguments depending on the type
-  const formattedErrors = errors.map(error => {
-    if (error instanceof Error) {
-      message = error.stack;
-    } else if (typeof error === 'string') {
-      message = error;
-    } else {
-      try {
-        message = JSON.stringify(error);
-      } catch (e) {
-        message = 'UNSERIALIZABLE';
-      }
-    }
-    return message;
-  });
-
-  // send error to the main process via IPC
-  electronLog.error(`Error from ${Utils.getWindowId()} window:
-    ${formattedErrors.join('\n')}
-  `);
+  electronLog.error(...args);
 }
+
+// override console
+Object.assign(console, {
+  log: electronLog.log,
+  warn: electronLog.warn,
+  info: electronLog.info,
+  error: logError,
+});
+
+// catch and log unhandled errors/rejected promises:
+electronLog.catchErrors({ onError: () => Utils.isDevMode() && ipcRenderer.send('showErrorAlert') });

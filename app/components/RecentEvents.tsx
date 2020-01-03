@@ -3,17 +3,14 @@ import moment from 'moment';
 import { Inject } from 'services/core';
 import { $t } from 'services/i18n';
 import { IRecentEvent, RecentEventsService } from 'services/recent-events';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import styles from './RecentEvents.m.less';
 import TsxComponent, { createProps } from './tsx-component';
-import BrowserView from 'components/shared/BrowserView';
 import { UserService } from 'services/user';
-import electron from 'electron';
 import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
 import HelpTip from './shared/HelpTip';
 import { EDismissable, DismissablesService } from 'services/dismissables';
-import { MagicLinkService } from 'services/magic-link';
 
 const getName = (event: IRecentEvent) => {
   if (event.gifter) return event.gifter;
@@ -32,13 +29,8 @@ export default class RecentEvents extends TsxComponent<RecentEventsProps> {
   @Inject() navigationService: NavigationService;
   @Inject() customizationService: CustomizationService;
   @Inject() dismissablesService: DismissablesService;
-  @Inject() magicLinkService: MagicLinkService;
 
   eventsCollapsed = false;
-
-  get native() {
-    return !this.customizationService.state.legacyEvents;
-  }
 
   get recentEvents() {
     return this.recentEventsService.state.recentEvents;
@@ -99,54 +91,6 @@ export default class RecentEvents extends TsxComponent<RecentEventsProps> {
     return this.recentEventsService.toggleQueue();
   }
 
-  setNative(native: boolean) {
-    if (!native && this.customizationService.state.eventsSize < 250) {
-      // Switch to a reasonably sized events feed
-      this.customizationService.setSettings({ eventsSize: 250 });
-    }
-
-    if (!native) {
-      this.dismissablesService.dismiss(EDismissable.RecentEventsHelpTip);
-    }
-
-    if (native) {
-      this.recentEventsService.refresh();
-    }
-
-    this.customizationService.setSettings({ legacyEvents: !native });
-  }
-
-  magicLinkDisabled = false;
-
-  handleBrowserViewReady(view: Electron.BrowserView) {
-    if (view.isDestroyed()) return;
-
-    electron.ipcRenderer.send('webContents-preventPopup', view.webContents.id);
-
-    view.webContents.on('new-window', async (e, url) => {
-      const match = url.match(/dashboard\/([^\/^\?]*)/);
-
-      if (match && match[1] === 'recent-events') {
-        this.popoutRecentEvents();
-      } else if (match) {
-        // Prevent spamming our API
-        if (this.magicLinkDisabled) return;
-        this.magicLinkDisabled = true;
-
-        try {
-          const link = await this.magicLinkService.getDashboardMagicLink(match[1]);
-          electron.remote.shell.openExternal(link);
-        } catch (e) {
-          console.error('Error generating dashboard magic link', e);
-        }
-
-        this.magicLinkDisabled = false;
-      } else {
-        electron.remote.shell.openExternal(url);
-      }
-    });
-  }
-
   get renderNativeEvents() {
     return (
       <div class={cx(styles.eventContainer, this.props.isOverlay ? styles.overlay : '')}>
@@ -167,17 +111,6 @@ export default class RecentEvents extends TsxComponent<RecentEventsProps> {
     );
   }
 
-  get renderEmbeddedEvents() {
-    return (
-      <BrowserView
-        class={styles.eventContainer}
-        src={this.userService.recentEventsUrl()}
-        setLocale={true}
-        onReady={view => this.handleBrowserViewReady(view)}
-      />
-    );
-  }
-
   render() {
     return (
       <div class={styles.container}>
@@ -192,11 +125,9 @@ export default class RecentEvents extends TsxComponent<RecentEventsProps> {
             queuePaused={this.queuePaused}
             muted={this.muted}
             mediaShareEnabled={this.mediaShareEnabled}
-            native={this.native}
-            onNativeswitch={val => this.setNative(val)}
           />
         )}
-        {this.native || this.props.isOverlay ? this.renderNativeEvents : this.renderEmbeddedEvents}
+        {this.renderNativeEvents}
         {!this.props.isOverlay && (
           <HelpTip
             dismissableKey={EDismissable.RecentEventsHelpTip}
@@ -206,7 +137,7 @@ export default class RecentEvents extends TsxComponent<RecentEventsProps> {
             <div slot="title">{$t('New Events Feed')}</div>
             <div slot="content">
               {$t(
-                'We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, just click here.',
+                'We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, check out the Layout Editor in the sidebar.',
               )}
             </div>
           </HelpTip>
@@ -226,8 +157,6 @@ class ToolbarProps {
   queuePaused: boolean = false;
   muted: boolean = false;
   mediaShareEnabled: boolean = false;
-  native: boolean = true;
-  onNativeswitch: (native: boolean) => void = () => {};
 }
 
 // TODO: Refactor into stateless functional component
@@ -240,52 +169,38 @@ class Toolbar extends TsxComponent<ToolbarProps> {
     return (
       <div class={styles.topBar}>
         <h2 class="studio-controls__label">{$t('Mini Feed')}</h2>
-        <span class="action-icon" onClick={() => this.$emit('nativeswitch', !this.props.native)}>
-          <i class="icon-live-dashboard" />
-          <span style={{ marginLeft: '8px' }}>
-            {this.props.native ? 'Switch to Legacy Events View' : 'Switch to New Events View'}
-          </span>
-        </span>
-        {this.props.native && (
-          <i
-            class="icon-filter action-icon"
-            onClick={this.props.popoutFilterMenu}
-            v-tooltip={{ content: $t('Popout Event Filtering Options'), placement: 'bottom' }}
-          />
-        )}
-        {this.props.native && this.props.mediaShareEnabled && (
+        <i
+          class="icon-filter action-icon"
+          onClick={this.props.popoutFilterMenu}
+          v-tooltip={{ content: $t('Popout Event Filtering Options'), placement: 'bottom' }}
+        />
+        {this.props.mediaShareEnabled && (
           <i
             class="icon-music action-icon"
             onClick={this.props.popoutMediaShare}
             v-tooltip={{ content: $t('Popout Media Share Controls'), placement: 'bottom' }}
           />
         )}
-        {this.props.native && (
-          <i
-            class={`${this.props.queuePaused ? 'icon-media-share-2' : 'icon-pause'} action-icon`}
-            onClick={this.props.toggleQueue}
-            v-tooltip={{ content: pauseTooltip, placement: 'bottom' }}
-          />
-        )}
-        {this.props.native && (
-          <i
-            class="icon-skip action-icon"
-            onClick={this.props.skipAlert}
-            v-tooltip={{ content: $t('Skip Alert'), placement: 'bottom' }}
-          />
-        )}
-        {this.props.native && (
-          <i
-            class={cx('action-icon', {
-              [styles.red]: this.props.muted,
-              fa: !this.props.muted,
-              'fa-volume-up': !this.props.muted,
-              'icon-mute': this.props.muted,
-            })}
-            onClick={this.props.muteEvents}
-            v-tooltip={{ content: $t('Mute Event Sounds'), placement: 'bottom' }}
-          />
-        )}
+        <i
+          class={`${this.props.queuePaused ? 'icon-media-share-2' : 'icon-pause'} action-icon`}
+          onClick={this.props.toggleQueue}
+          v-tooltip={{ content: pauseTooltip, placement: 'left' }}
+        />
+        <i
+          class="icon-skip action-icon"
+          onClick={this.props.skipAlert}
+          v-tooltip={{ content: $t('Skip Alert'), placement: 'left' }}
+        />
+        <i
+          class={cx('action-icon', {
+            [styles.red]: this.props.muted,
+            fa: !this.props.muted,
+            'fa-volume-up': !this.props.muted,
+            'icon-mute': this.props.muted,
+          })}
+          onClick={this.props.muteEvents}
+          v-tooltip={{ content: $t('Mute Event Sounds'), placement: 'left' }}
+        />
       </div>
     );
   }
@@ -351,9 +266,9 @@ class EventCell extends TsxComponent<EventCellProps> {
       >
         <span class={styles.timestamp}>{this.timestamp}</span>
         <span class={styles.name}>{getName(this.props.event)}</span>
-        <span>{this.props.eventString(this.props.event)}</span>
+        <span class={styles.message}>{this.props.eventString(this.props.event)}</span>
         {this.props.event.gifter && (
-          <span class={styles.name}>
+          <span class={cx(styles.name, styles.message)}>
             {this.props.event.from ? this.props.event.from : this.props.event.name}
           </span>
         )}

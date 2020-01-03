@@ -1,7 +1,19 @@
 {
-  "Show the live dock (chat) on the left side": "Mostra la Live Dock (chat) nella parte sinistra",
+  "Show the live dock (chat) on the left side": "Mostra il dock (chat) nella parte sinistra",
   "Chat Text Size": "Dimensione del testo in chat",
   "Chat Width": "Larghezza della chat",
-  "Enable BetterTTV emotes for Twitch": "Attiva le emotes di BetterTTV per Twitch",
-  "Enable FrankerFaceZ emotes for Twitch": "Attiva le emotes di FrankerFaceZ per Twitch"
+  "Enable BetterTTV emotes for Twitch": "Attiva le emote di BetterTTV per Twitch",
+  "Enable FrankerFaceZ emotes for Twitch": "Attiva le emote di FrankerFaceZ per Twitch",
+  "Stream Display": "Stream Display",
+  "Mini Feed": "Mini Feed",
+  "Audio Mixer": "Audio Mixer",
+  "Scene Selector": "Scene Selector",
+  "Source Selector": "Source Selector",
+  "Legacy Events": "Legacy Events",
+  "Streamlabs OBS UI Customization": "Streamlabs OBS UI Customization",
+  "Customize the appearance of your Streamlabs OBS Studio tab": "Customize the appearance of your Streamlabs OBS Studio tab",
+  "Save Changes": "Save Changes",
+  "Elements": "Elements",
+  "Layouts": "Layouts",
+  "Drag and drop to edit.": "Drag and drop to edit."
 }

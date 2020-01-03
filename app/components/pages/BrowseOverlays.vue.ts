@@ -15,6 +15,7 @@ import urlLib from 'url';
 import electron from 'electron';
 import { $t, I18nService } from 'services/i18n';
 import BrowserView from 'components/shared/BrowserView';
+import { RestreamService } from 'services/restream';
 
 @Component({ components: { BrowserView } })
 export default class BrowseOverlays extends Vue {
@@ -28,6 +29,7 @@ export default class BrowseOverlays extends Vue {
   @Inject() private magicLinkService: MagicLinkService;
   @Inject() private notificationsService: NotificationsService;
   @Inject() private jsonrpcService: JsonrpcService;
+  @Inject() private restreamService: RestreamService;
 
   @Prop() params: {
     type?: 'overlay' | 'widget-theme';
@@ -39,6 +41,16 @@ export default class BrowseOverlays extends Vue {
       this.guestApiService.exposeApi(view.webContents.id, {
         installOverlay: this.installOverlay,
         installWidgets: this.installWidgets,
+        eligibleToRestream: () => {
+          if (!this.restreamService.canEnableRestream) {
+            // We raise an exception which will result in a rejected promise.
+            // This allows the themes library to catch out of date versions
+            // in the same code path as ineligable users.
+            throw new Error('User is not elgigible to restream');
+          }
+
+          return Promise.resolve(true);
+        },
       });
     });
 
@@ -57,6 +69,7 @@ export default class BrowseOverlays extends Vue {
     url: string,
     name: string,
     progressCallback?: (progress: IDownloadProgress) => void,
+    mergeFacebook = false,
   ) {
     const host = new urlLib.URL(url).hostname;
     const trustedHosts = ['cdn.streamlabs.com'];
@@ -66,8 +79,19 @@ export default class BrowseOverlays extends Vue {
       return;
     }
 
-    await this.sceneCollectionsService.installOverlay(url, name, progressCallback);
-    this.navigationService.navigate('Studio');
+    // Handle exclusive theme that requires enabling multistream first
+    // User should be eligible to enable restream for this behavior to work.
+    // If restream is already set up, then just install as normal.
+    if (
+      mergeFacebook &&
+      this.restreamService.canEnableRestream &&
+      !this.restreamService.shouldGoLiveWithRestream
+    ) {
+      this.navigationService.navigate('FacebookMerge', { overlayUrl: url, overlayName: name });
+    } else {
+      await this.sceneCollectionsService.installOverlay(url, name, progressCallback);
+      this.navigationService.navigate('Studio');
+    }
   }
 
   async installWidgets(urls: string[], progressCallback?: (progress: IDownloadProgress) => void) {

@@ -4,5 +4,6 @@
   "Toggle in-game overlay": "Показать/скрыть внутриигровой оверлей",
   "Toggle positioning mode": "Включить/выключить режим позиционирования",
   "Set a hotkey in Hotkey Settings to toggle the in-game overlay": "Задать горячую клавишу в Настройках, чтобы показать/скрыть внутриигровой оверлей",
-  "The in-game overlay is a new experimental feature that allows you to view chat and events overlayed on top of your game.  This overlay may not work with certain games running in exclusive fullscreen mode.  For best results, we recommend running your game in windowed-fullscreen mode.": "Внутриигровой оверлей - это новая, экспериментальная функция, которая позволяет вам увидеть чат и события во время игры. Этот оверлей может не работать с некоторыми играми, запущенными в полном экране. Для лучшего результата, мы рекомендуем запускать игру в оконном режиме."
+  "The in-game overlay is a new experimental feature that allows you to view chat and events overlayed on top of your game.  This overlay may not work with certain games running in exclusive fullscreen mode.  For best results, we recommend running your game in windowed-fullscreen mode.": "Внутриигровой оверлей - это новая, экспериментальная функция, которая позволяет вам увидеть чат и события во время игры. Этот оверлей может не работать с некоторыми играми, запущенными в полном экране. Для лучшего результата, мы рекомендуем запускать игру в оконном режиме.",
+  "Please log in to use the in-game overlay.": "Please log in to use the in-game overlay."
 }

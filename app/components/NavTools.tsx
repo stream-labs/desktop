@@ -12,6 +12,7 @@ import { $t } from 'services/i18n';
 import styles from './SideNav.m.less';
 import { MagicLinkService } from 'services/magic-link';
 import { throttle } from 'lodash-decorators';
+import { RestreamService } from 'services/restream';
 
 @Component({})
 export default class SideNav extends Vue {
@@ -20,13 +21,14 @@ export default class SideNav extends Vue {
   @Inject() settingsService: SettingsService;
   @Inject() navigationService: NavigationService;
   @Inject() magicLinkService: MagicLinkService;
+  @Inject() restreamService: RestreamService;
 
   get isDevMode() {
     return Utils.isDevMode();
   }
 
-  openSettingsWindow() {
-    this.settingsService.showSettings();
+  openSettingsWindow(categoryName?: string) {
+    this.settingsService.showSettings(categoryName);
   }
 
   navigate(page: TAppPage) {
@@ -84,6 +86,10 @@ export default class SideNav extends Vue {
     this.dashboardOpening = false;
   }
 
+  openHelp() {
+    electron.remote.shell.openExternal('https://howto.streamlabs.com/');
+  }
+
   render() {
     return (
       <div class={styles.bottomTools}>
@@ -92,11 +98,28 @@ export default class SideNav extends Vue {
             <i class="icon-developer" />
           </div>
         )}
+        {this.restreamService.canEnableRestream && (
+          <div
+            class={cx(styles.cell)}
+            onClick={() => this.openSettingsWindow('Stream')}
+            title={$t('Multistream')}
+          >
+            <i class="fas fa-globe" />
+            <div class={cx(styles.badge, styles.newBadge)}>{$t('New')}</div>
+          </div>
+        )}
         {this.userService.isLoggedIn() && (
           <div class={cx(styles.cell)} onClick={() => this.openDashboard()} title={$t('Dashboard')}>
             <i class="icon-dashboard" />
           </div>
         )}
+        <div
+          class={styles.cell}
+          onClick={() => this.navigate('LayoutEditor')}
+          title={$t('Layout Editor')}
+        >
+          <i class="fas fa-th-large" />
+        </div>
         <div
           class={cx(styles.cell, { [styles.toggleOn]: this.studioModeEnabled })}
           onClick={this.studioMode.bind(this)}
@@ -104,7 +127,7 @@ export default class SideNav extends Vue {
         >
           <i class="icon-studio-mode-3" />
         </div>
-        <div class={styles.cell} onClick={() => this.navigate('Help')} title={$t('Get Help')}>
+        <div class={styles.cell} onClick={() => this.openHelp()} title={$t('Get Help')}>
           <i class="icon-question" />
         </div>
         <div

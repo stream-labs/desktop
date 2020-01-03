@@ -15,8 +15,8 @@
         v-if="!isDockCollapsed"
         class="live-dock-resize-bar live-dock-resize-bar--left"
         position="right"
-        @onresizestart="onResizeStartHandler"
-        @onresizestop="onResizeStopHandler"
+        @resizestart="onResizeStartHandler"
+        @resizestop="onResizeStopHandler"
       />
     </div>
 
@@ -26,7 +26,9 @@
         class="main-page-container"
         v-if="!showLoadingSpinner"
         :is="page"
-        :params="params"/>
+        :params="params"
+        @totalWidth="(width) => handleEditorWidth(width)"
+      />
       <studio-footer v-if="!applicationLoading && (page !== 'Onboarding')" />
     </div>
 
@@ -35,8 +37,8 @@
         v-if="!isDockCollapsed"
         class="live-dock-resize-bar"
         position="left"
-        @onresizestart="onResizeStartHandler"
-        @onresizestop="onResizeStopHandler"
+        @resizestart="onResizeStartHandler"
+        @resizestop="onResizeStopHandler"
       />
       <live-dock class="live-dock" />
     </div>
@@ -75,6 +77,7 @@
   display: grid;
   grid-template-columns: auto 1fr;
   flex-grow: 1;
+  height: 100%;
 }
 
 .main-contents--right {
@@ -95,6 +98,7 @@
   flex-direction: column;
   overflow: hidden;
   position: relative;
+  height: 100%;
 }
 
 .titlebar--error {

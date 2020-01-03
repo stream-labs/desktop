@@ -47,8 +47,8 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     return this.state.id !== null;
   }
 
-  async closeBanner() {
-    await this.postBannerClose();
+  async closeBanner(clickType: 'action' | 'dismissal') {
+    await this.postBannerClose(clickType);
   }
 
   private get installDateProxyFilePath() {
@@ -113,10 +113,6 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     const req = this.formRequest(endpoint);
     try {
       const newState = await fetch(req).then(rawResp => rawResp.json());
-      // TODO: remove for next release after BE switches over
-      if (newState.link_target) {
-        newState.linkTarget = newState.link_target;
-      }
 
       // splits out params for local links eg PlatformAppStore?appId=<app-id>
       const queryString = newState.link.split('?')[1];
@@ -135,11 +131,12 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     }
   }
 
-  private async postBannerClose() {
+  private async postBannerClose(clickType: 'action' | 'dismissal') {
     const endpoint = 'api/v5/slobs/announcement/close';
     const postData = {
       method: 'POST',
       body: JSON.stringify({
+        clickType,
         clientId: this.userService.getLocalUserId(),
         announcementId: this.state.id,
       }),

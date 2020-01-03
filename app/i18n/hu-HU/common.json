@@ -92,6 +92,7 @@
   "OBSInit.ModuleNotFoundError": "A DirectX nem található a rendszerén. Telepítse a számítógépére a DirectX legújabb verzióját ide: <https://www.microsoft.com/en-us/download/details.aspx?id=35?> és próbálja újra.",
   "OBSInit.NotSupportedError": "Nem sikerült inicializálni az OBS-t. Lehet, hogy a videó illesztőprogramjai elavultak, vagy a rendszer nem támogatja a Streamlabs OBS-t.",
   "Logout %{username}": "Kijelentkezés %{username}",
+  "Layout Editor": "Layout Editor",
   "Are you sure you want to import multiple files?": "Are you sure you want to import multiple files?",
   "Studio": "Stúdió",
   "Store": "Bolt",
@@ -104,9 +105,16 @@
   "Right": "Jobb",
   "Top": "Felső",
   "Bottom": "Alsó",
-  "Crop": "Crop",
+  "Crop": "Vág",
   "Rotation": "Forgás",
   "Reset": "Visszaállítás",
   "Retry": "Próbálja újra",
-  "Warning": "Figyelem"
+  "Warning": "Figyelem",
+  "Off": "Ki",
+  "Low": "Alacsony",
+  "Medium": "Közepes",
+  "High": "Magas",
+  "Very High": "Nagyon magas",
+  "Apps": "Alkalmazások",
+  "Finish": "Befejezés"
 }

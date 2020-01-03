@@ -9,6 +9,8 @@ import path from 'path';
 import { UserService } from 'services/user';
 import { CustomizationService } from 'services/customization';
 import { TObsValue } from 'components/obs/inputs/ObsInput';
+import electron from 'electron';
+import { getSharedResource } from 'util/get-shared-resource';
 
 export interface IDefaultManagerSettings {
   mediaBackup?: {
@@ -37,6 +39,7 @@ export class DefaultManager extends PropertiesManager {
     if (!this.settings.mediaBackup) this.settings.mediaBackup = {};
     this.initializeMediaBackup();
     this.downloadGoogleFont();
+    this.setupAutomaticGameCapture();
   }
 
   handleSettingsChange(settings: Dictionary<TObsValue>) {
@@ -154,5 +157,17 @@ export class DefaultManager extends PropertiesManager {
       (fontInfo.italic ? EFontStyle.Italic : 0) | (fontInfo.bold ? EFontStyle.Bold : 0);
 
     this.obsSource.update(newSettings);
+  }
+
+  private setupAutomaticGameCapture() {
+    if (this.obsSource.id !== 'game_capture') return;
+
+    this.obsSource.update({
+      auto_capture_list_path: path.join(
+        electron.remote.app.getPath('userData'),
+        'game_capture_list.lst',
+      ),
+      auto_placeholder_image: getSharedResource('capture-placeholder.png'),
+    });
   }
 }

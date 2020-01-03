@@ -8,6 +8,7 @@ const base = {
     'node_modules',
     'vendor',
     'app/i18n',
+    'media/images/game-capture',
     'updater/build/bootstrap.js',
     'index.html',
     'main.js',
@@ -15,7 +16,9 @@ const base = {
   ],
   extraFiles: [
     'LICENSE',
-    'AGREEMENT'
+    'AGREEMENT',
+    'shared-resources/*',
+    '!shared-resources/README'
   ],
   nsis: {
     license: 'AGREEMENT',
@@ -28,7 +31,10 @@ const base = {
     provider: 'generic',
     url: 'https://slobs-cdn.streamlabs.com'
   },
-  win: {},
+  win: {
+    rfc3161TimeStampServer: 'http://timestamp.digicert.com',
+    timeStampServer: 'http://timestamp.digicert.com'
+  },
   extraMetadata: {
     env: 'production'
   }

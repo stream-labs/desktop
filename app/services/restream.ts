@@ -99,11 +99,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
    */
   get canEnableRestream() {
     return !!(
-      this.userService.state.auth &&
-      this.userService.state.auth.primaryPlatform === 'twitch' &&
-      (this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.restream) ||
-        Utils.isDevMode() ||
-        Utils.isPreview())
+      this.userService.state.auth && this.userService.state.auth.primaryPlatform === 'twitch'
     );
   }
 
@@ -221,11 +217,14 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
     await Promise.all(promises);
 
-    const promises2 = Object.keys(this.state.platforms).map(platform => {
-      return this.createTarget(platform as TPlatform, this.state.platforms[platform].streamKey);
-    });
-
-    await Promise.all(promises2);
+    await this.createTargets(
+      Object.keys(this.state.platforms).map(platform => {
+        return {
+          platform: platform as TPlatform,
+          streamKey: this.state.platforms[platform].streamKey,
+        };
+      }),
+    );
   }
 
   checkStatus(): Promise<boolean> {
@@ -241,22 +240,24 @@ export class RestreamService extends StatefulService<IRestreamState> {
       );
   }
 
-  createTarget(platform: TPlatform, streamKey: string) {
+  createTargets(targets: { platform: TPlatform; streamKey: string }[]) {
     const headers = authorizedHeaders(
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
     );
     const url = `https://${this.host}/api/v1/rst/targets`;
-    const body = JSON.stringify([
-      {
-        platform,
-        streamKey,
-        enabled: true,
-        dcProtection: false,
-        idleTimeout: 30,
-        label: `${platform} target`,
-      },
-    ]);
+    const body = JSON.stringify(
+      targets.map(target => {
+        return {
+          platform: target.platform,
+          streamKey: target.streamKey,
+          enabled: true,
+          dcProtection: false,
+          idleTimeout: 30,
+          label: `${target.platform} target`,
+        };
+      }),
+    );
     const request = new Request(url, { headers, body, method: 'POST' });
 
     return fetch(request).then(res => res.json());

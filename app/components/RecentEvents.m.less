@@ -1,8 +1,8 @@
 @import "../styles/index.less";
 
 .container {
-  padding: 0 16px;
-  height: 150px;
+  padding: 0 8px;
+  height: 100%;
   overflow: none;
   flex-shrink: 0;
   position: relative;
@@ -30,7 +30,7 @@
 .eventContainer {
   .radius();
 
-  height: calc(100% - 46px);
+  height: 100%;
   overflow-y: auto;
   position: relative;
   background: var(--section);
@@ -84,6 +84,11 @@
 .name {
   color: var(--title);
   font-weight: 500;
+}
+
+.message {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .timestamp {

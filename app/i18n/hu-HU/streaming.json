@@ -59,8 +59,8 @@
   "Log out and back in to reauthorize additional permissions.": "Jelentkezzen ki és jelentkezzen be további engedélyek újbóli hitelesítéséhez.",
   "Are you sure you want to start streaming?": "Biztosan elkezded a streamelést?",
   "Please enable account for streaming to recieve a stream key": "Please enable account for streaming to recieve a stream key",
-  "Facebook Page Creation": "Facebook oldal létrehozása",
-  " to create a page, and then try again.": " egy oldal létrehozásához, majd próbálja újra.",
+  "You must create a Facebook gaming page to go live.": "You must create a Facebook gaming page to go live.",
+  "Create Page": "Create Page",
   "Facebook Page": "Facebook Oldal",
   "Description": "Leírás",
   "Checking optimized setting for": "Az optimális beállítás ellenőrzése",
@@ -90,5 +90,11 @@
   "Learn More": "Tudj meg többet",
   "Something went wrong while going live, please try again.": "Valami elromlott élőben, próbáld újra.",
   "You must select a game": "Ki kell választania egy játékot",
-  "Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.": "Kérjük, legfeljebb 7 nappal korábban és legkésőbb 10 perccel korábban ütemezze."
+  "Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.": "Kérjük, legfeljebb 7 nappal korábban és legkésőbb 10 perccel korábban ütemezze.",
+  "No Sources": "No Sources",
+  "Enable Multistream": "Enable Multistream",
+  "Multistream allows you to stream to multiple platforms simultaneously.": "Multistream allows you to stream to multiple platforms simultaneously.",
+  "Multistream": "Multistream",
+  "Your Twitch login is expired. Please log in again to continue using Streamlabs OBS": "Your Twitch login is expired. Please log in again to continue using Streamlabs OBS",
+  "Refresh Login": "Refresh Login"
 }

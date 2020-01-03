@@ -37,7 +37,7 @@ export class ServicesManager extends Service {
 
   init() {
     // this helps to debug services from the console
-    if (Utils.isDevMode()) {
+    if (Utils.isDevMode() || process.env.SLOBS_PRODUCTION_DEBUG) {
       window['sm'] = this;
     }
 

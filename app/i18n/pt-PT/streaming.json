@@ -59,8 +59,8 @@
   "Log out and back in to reauthorize additional permissions.": "Termine a sessão e inicie novamente para renovar a autorização de permissões adicionais.",
   "Are you sure you want to start streaming?": "Pretende realmente começar a transmissão?",
   "Please enable account for streaming to recieve a stream key": "Ative a conta de streaming para receber uma chave de stream",
-  "Facebook Page Creation": "Criação de página de Facebook",
-  " to create a page, and then try again.": " para criar uma página, e depois tente de novo.",
+  "You must create a Facebook gaming page to go live.": "You must create a Facebook gaming page to go live.",
+  "Create Page": "Create Page",
   "Facebook Page": "Página de Facebook",
   "Description": "Descrição",
   "Checking optimized setting for": "A verificar as configurações optimizadas para",
@@ -90,5 +90,11 @@
   "Learn More": "Learn More",
   "Something went wrong while going live, please try again.": "Something went wrong while going live, please try again.",
   "You must select a game": "You must select a game",
-  "Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.": "Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance."
+  "Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.": "Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.",
+  "No Sources": "No Sources",
+  "Enable Multistream": "Enable Multistream",
+  "Multistream allows you to stream to multiple platforms simultaneously.": "Multistream allows you to stream to multiple platforms simultaneously.",
+  "Multistream": "Multistream",
+  "Your Twitch login is expired. Please log in again to continue using Streamlabs OBS": "Your Twitch login is expired. Please log in again to continue using Streamlabs OBS",
+  "Refresh Login": "Refresh Login"
 }
