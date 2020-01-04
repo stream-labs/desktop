@@ -398,7 +398,7 @@ test('Recording when streaming', async t => {
 
   // Stop recording
   await app.client.click('.record-button');
-  await app.client.waitForVisible('.record-button:not(.active)', 15000);
+  await app.client.waitForVisible('.record-button:not(.active)', 150000);
 
   // check that recording has been created
   const files = await readdir(tmpDir);
