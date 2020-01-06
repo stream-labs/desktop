@@ -136,7 +136,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
         comp => this.state.slottedElements[comp] === slot,
       ),
     );
-    const minimums = components.map(comp => ELEMENT_MINS[comp][orientation]);
+    const minimums = components.map(comp => (comp && ELEMENT_MINS[comp][orientation]) || 10);
     if (!minimums.length) minimums.push(10);
     return minimums.reduce((a: number, b: number) => a + b);
   }
