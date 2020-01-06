@@ -42,12 +42,12 @@ export default class Studio extends TsxComponent {
   interval: number;
 
   mounted() {
-    this.interval = window.setInterval(() => {
-      this.elWidth = this.$el.getBoundingClientRect().width;
-    }, 500);
     this.max = this.isColumns
       ? this.$el.getBoundingClientRect().width
       : this.$el.getBoundingClientRect().height;
+    this.interval = window.setInterval(() => {
+      this.elWidth = this.$el.getBoundingClientRect().width;
+    }, 500);
   }
 
   destroyed() {
@@ -83,8 +83,9 @@ export default class Studio extends TsxComponent {
   }
 
   resizeByRatio(oldMax: number) {
-    const ratio = this.max / oldMax;
+    if (this.max === oldMax || !oldMax) return;
 
+    const ratio = this.max / oldMax;
     this.setBarResize('bar1', Math.round(this.resizes.bar1 * ratio));
     if (this.resizes.bar2) {
       this.setBarResize('bar2', Math.round(this.resizes.bar2 * ratio));
