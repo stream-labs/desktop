@@ -1,4 +1,28 @@
-@import "./styles/index";
+// LESS Color Varaibles -- DO NOT REFERENCE DIRECTLY
+@teal: #31C3A2;
+@teal-semi: rgba(49, 195, 162, 0.08);
+@purple: #8736E0;
+@blue: #36ADE0;
+@purple-semi: rgba(135, 54, 224, 0.08);
+@red: #F85640;
+@red-semi: rgba(248, 86, 64, 0.08);
+@yellow: #FFC803;
+@yellow-dark: #CA9D00;
+@yellow-dark-semi: rgba(202, 157, 0, 0.08);
+@yellow-light: #FFF9E5;
+@goldenrod: #CAA368;
+
+@light-1: #ffffff;
+@light-2: #F5F8FA;
+@light-3: #E3E8EB;
+@light-4: #BDC2C4;
+@light-5: #91979A;
+
+@dark-1: #050D12;
+@dark-2: #09161D;
+@dark-3: #17242D;
+@dark-4: #2B383F;
+@dark-5: #4F5E65;
 
 // Variables for use
 :root {
@@ -8,6 +32,7 @@
   // Brand Colors
   --teal: @teal;
   --teal-semi: @teal-semi;
+  --teal-hover: lighten(@teal, 4%);
   --accent: @purple;
   --blue: @blue;
   --warning: @red;
@@ -37,17 +62,12 @@
   --link: @dark-5;
   --link-active: @dark-2;
   --input-bg: @light-1;
-  --input-border: @light-4;
   --focus-border: darken(@light-4, 4%);
   --solid-input: @light-2;
   --dropdown-bg: @light-1;
   --dropdown-alt-bg: darken(@light-1, 4%);
-  --hover: @light-4;
-  --scrollbar: @light-2;
   --midtone: @light-5;
-  --nav-border: @dark-2;
   --nav-icon-inactive: @dark-4;
-  --slider-bg: @light-5;
   --slider-progress: @dark-5;
   --shadow: rgba(55, 71, 79, 0.12);
   --new-badge: @purple-semi;
@@ -69,17 +89,12 @@
   --link: @light-4;
   --link-active: @light-1;
   --input-bg: transparent;
-  --input-border: @dark-5;
   --focus-border: lighten(@dark-5, 4%);
   --solid-input: @dark-4;
   --dropdown-bg: @dark-4;
   --dropdown-alt-bg: darken(@dark-4, 4%);
-  --hover: @dark-4;
-  --scrollbar: @dark-4;
   --midtone: @dark-5;
-  --nav-border: @light-1;
   --nav-icon-inactive: @light-5;
-  --slider-bg: @dark-4;
   --shadow: rgba(1, 2, 2, 0.16);
   --new-badge: @purple;
   --new-badge-text: @light-1;

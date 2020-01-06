@@ -48,6 +48,6 @@
 }
 
 .slider-container /deep/ .s-slider .vue-slider {
-  background-color: var(--slider-bg);
+  background-color: var(--border);
 }
 </style>

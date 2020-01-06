@@ -58,7 +58,7 @@
   color: var(--white);
 
   &:hover {
-    background-color: lighten(@teal, 4%);
+    background-color: var(--teal-hover);
     color: var(--white);
   }
 
@@ -204,14 +204,14 @@
 }
 
 .square-button--facebook,
- .button--facebook {
-   background: #3b5998;
+.button--facebook {
+  background: #3b5998;
 
-   &:hover,
-   &:active {
-     background: lighten(#3b5998, 4%) !important;
-   }
- }
+  &:hover,
+  &:active {
+    background: lighten(#3b5998, 4%) !important;
+  }
+}
 
 .square-button--twitter {
   background: #1da1f2;
@@ -226,7 +226,7 @@
   background: #ffd300;
 
   &:hover {
-    box-shadow: 0 3px 5px 0 rgba(255,211,0,.15) !important;
+    box-shadow: 0 3px 5px 0 rgba(255, 211, 0, 0.15) !important;
   }
 
   &:focus,
@@ -235,18 +235,18 @@
   }
 }
 
- .button--nimotv {
-   background: #343ed1;
+.button--nimotv {
+  background: #343ed1;
 
-   &:hover {
-     box-shadow: 0 3px 5px 0 rgba(#343ed1, .15) !important;
-   }
+  &:hover {
+    box-shadow: 0 3px 5px 0 rgba(#343ed1, 0.15) !important;
+  }
 
-   &:focus,
-   &:active {
-     background: lighten(#343ed1, 4%) !important;
-   }
- }
+  &:focus,
+  &:active {
+    background: lighten(#343ed1, 4%) !important;
+  }
+}
 
 .button--soft-warning {
   color: var(--warning);

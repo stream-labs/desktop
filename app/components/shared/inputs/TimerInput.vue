@@ -100,7 +100,7 @@
     font-size: 14px;
     background: var(--dropdown-bg);
     font-family: 'Roboto', sans-serif;
-    border: 1px solid var(--input-border);
+    border: 1px solid var(--button);
     position: relative;
     display: flex;
     justify-content: flex-start;
@@ -114,7 +114,7 @@
     &:active,
     &:focus {
       box-shadow: none;
-      border-color: var(--input-border);
+      border-color: var(--button);
       background-color: var(--dropdown-bg);
       outline: none;
     }
@@ -188,7 +188,7 @@
   }
 
   .active {
-    background: @light-3;
+    background: var(--section);
     border-radius: 4px;
   }
 
