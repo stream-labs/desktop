@@ -46,7 +46,7 @@ test('Selective Recording', async t => {
 
   // Stop recording
   await client.click('.record-button');
-  await client.waitForVisible('.record-button:not(.active)', 60000);
+  await client.waitForVisible('.record-button:not(.active)', 15000);
 
   // Check that file exists
   const files = await readdir(tmpDir);
