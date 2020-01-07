@@ -127,6 +127,15 @@ export class RestreamService extends StatefulService<IRestreamState> {
     );
   }
 
+  /**
+   * This checks to see if all platforms are staged and ready to go live.
+   * If this is false and we are about to go live, we should short circuit
+   * and do something else.
+   */
+  get allPlatformsStaged() {
+    return Object.keys(this.state.platforms).length === this.platforms.length;
+  }
+
   fetchUserSettings() {
     const headers = authorizedHeaders(this.userService.apiToken);
     const url = `https://${this.host}/api/v1/rst/user/settings`;
@@ -195,6 +204,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
   async beforeGoLive() {
     await Promise.all([this.setupIngest(), this.setupTargets()]);
+    this.unstageAllPlatforms();
   }
 
   async setupIngest() {
