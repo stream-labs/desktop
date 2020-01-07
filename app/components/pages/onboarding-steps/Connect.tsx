@@ -52,6 +52,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
           this.props.continue();
         }
       },
+      platform === 'youtube' ? 'external' : 'internal',
     );
   }
 
