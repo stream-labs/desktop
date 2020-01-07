@@ -37,7 +37,7 @@ test('Selective Recording', async t => {
   // Check that source is set to record only
   t.true(await client.isExisting('.sl-vue-tree-sidebar .source-selector-action.icon-studio'));
 
-  // Start recording
+  // Start recording and wait
   await client.click('.record-button');
   await sleep(2000);
 
@@ -46,7 +46,7 @@ test('Selective Recording', async t => {
 
   // Stop recording
   await client.click('.record-button');
-  await client.waitForVisible('.record-button:not(.active)', 60000);
+  await client.waitForVisible('.record-button:not(.active)', 15000);
 
   // Check that file exists
   const files = await readdir(tmpDir);
