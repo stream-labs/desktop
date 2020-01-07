@@ -90,7 +90,6 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   changeLayout(layout: ELayout) {
     this.CHANGE_LAYOUT(layout);
-    console.log(this.state);
   }
 
   setSlots(slottedElements: { [key in ELayoutElement]?: LayoutSlot }) {
