@@ -8,11 +8,11 @@ import styles from './Layouts.m.less';
 @Component({ props: createProps(LayoutProps) })
 export default class Triplets extends BaseLayout {
   mounted() {
-    super.mountResize();
+    this.mountResize();
     this.$emit('totalWidth', [['1', '4'], ['2', '5'], ['3', '6']]);
   }
   destroyed() {
-    super.destroyResize();
+    this.destroyResize();
   }
 
   get mins() {

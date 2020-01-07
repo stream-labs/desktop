@@ -32,11 +32,11 @@ interface ILayoutServiceState {
 
 const RESIZE_DEFAULTS = {
   [ELayout.Default]: { bar1: 156, bar2: 240 },
-  [ELayout.TwoPane]: { bar1: 650, bar2: 300 },
+  [ELayout.TwoPane]: { bar1: 700, bar2: 350 },
   [ELayout.Classic]: { bar1: 450 },
   [ELayout.FourByFour]: { bar1: 170, bar2: 170 },
-  [ELayout.Triplets]: { bar1: 650, bar2: 300 },
-  [ELayout.OnePane]: { bar1: 500 },
+  [ELayout.Triplets]: { bar1: 700, bar2: 350 },
+  [ELayout.OnePane]: { bar1: 800 },
 };
 
 const ELEMENT_MINS = {
@@ -136,7 +136,10 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
         comp => this.state.slottedElements[comp] === slot,
       ),
     );
-    const minimums = components.map(comp => (comp && ELEMENT_MINS[comp][orientation]) || 10);
+    const minimums = components.map(comp => {
+      if (comp) return ELEMENT_MINS[comp][orientation];
+      return 10;
+    });
     if (!minimums.length) minimums.push(10);
     return minimums.reduce((a: number, b: number) => a + b);
   }
