@@ -8,11 +8,11 @@ import styles from './Layouts.m.less';
 @Component({ props: createProps(LayoutProps) })
 export default class Classic extends BaseLayout {
   mounted() {
-    super.mountResize();
+    this.mountResize();
     this.$emit('totalWidth', ['1', ['2', '3', '4']]);
   }
   destroyed() {
-    super.destroyResize();
+    this.destroyResize();
   }
 
   get mins() {

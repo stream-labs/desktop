@@ -137,6 +137,9 @@ export default class Studio extends TsxComponent {
   }
 
   underMaxSize(max: number) {
+    if (this.resizes.bar2 == null) {
+      return this.resizes.bar1 <= max;
+    }
     return this.resizes.bar1 + this.resizes.bar2 <= max;
   }
 
