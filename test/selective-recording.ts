@@ -37,7 +37,7 @@ test('Selective Recording', async t => {
   // Check that source is set to record only
   t.true(await client.isExisting('.sl-vue-tree-sidebar .source-selector-action.icon-studio'));
 
-  // Start recording
+  // Start recording and wait
   await client.click('.record-button');
   await sleep(2000);
 
