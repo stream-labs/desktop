@@ -10,6 +10,7 @@ import styles from './Connect.m.less';
 import ListInput from 'components/shared/inputs/ListInput.vue';
 import ExtraPlatformConnect, { TExtraPlatform } from './ExtraPlatformConnect';
 import { IListOption } from '../../shared/inputs';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 class ConnectProps {
   continue: () => void = () => {};
@@ -19,12 +20,14 @@ class ConnectProps {
 export default class Connect extends TsxComponent<ConnectProps> {
   @Inject() userService: UserService;
   @Inject() onboardingService: OnboardingService;
+  @Inject() usageStatisticsService: UsageStatisticsService;
 
   loadingState = false;
   selectedExtraPlatform: TExtraPlatform | '' = '';
 
   authPlatform(platform: TPlatform) {
     this.loadingState = true;
+    this.usageStatisticsService.recordAnalyticsEvent('PlatformLogin', platform);
     this.userService.startAuth(
       platform,
       () => (this.loadingState = false),
@@ -92,6 +95,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
   }
 
   selectOtherPlatform(platform: TExtraPlatform) {
+    this.usageStatisticsService.recordAnalyticsEvent('PlatformLogin', platform);
     this.selectedExtraPlatform = platform;
   }
 
