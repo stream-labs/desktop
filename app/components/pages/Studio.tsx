@@ -78,8 +78,11 @@ export default class Studio extends TsxComponent {
       ? this.$el.getBoundingClientRect().width
       : this.$el.getBoundingClientRect().height;
 
+    console.log(this.resizes.bar1);
     this.resizeByRatio(oldMax);
+    console.log(this.resizes.bar1);
     this.reconcileSizeWithinContraints(mins);
+    console.log(this.resizes.bar1);
   }
 
   resizeByRatio(oldMax: number) {

@@ -90,6 +90,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   changeLayout(layout: ELayout) {
     this.CHANGE_LAYOUT(layout);
+    console.log(this.state);
   }
 
   setSlots(slottedElements: { [key in ELayoutElement]?: LayoutSlot }) {
@@ -136,7 +137,10 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
         comp => this.state.slottedElements[comp] === slot,
       ),
     );
-    const minimums = components.map(comp => (comp && ELEMENT_MINS[comp][orientation]) || 10);
+    const minimums = components.map(comp => {
+      if (comp) return ELEMENT_MINS[comp][orientation];
+      return 10;
+    });
     if (!minimums.length) minimums.push(10);
     return minimums.reduce((a: number, b: number) => a + b);
   }
