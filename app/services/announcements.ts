@@ -7,6 +7,7 @@ import { authorizedHeaders } from '../util/requests';
 import path from 'path';
 import fs from 'fs';
 import { PatchNotesService } from 'services/patch-notes';
+import { I18nService } from 'services/i18n';
 
 interface IAnnouncementsInfo {
   id: number;
@@ -25,6 +26,7 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
   @Inject() private userService: UserService;
   @Inject() private appService: AppService;
   @Inject() private patchNotesService: PatchNotesService;
+  @Inject() private i18nService: I18nService;
 
   static initialState: IAnnouncementsInfo = {
     id: null,
@@ -109,7 +111,9 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     if (!this.userService.isLoggedIn() || recentlyInstalled || this.recentlyUpdatedTo017) {
       return this.state;
     }
-    const endpoint = `api/v5/slobs/announcement/get?clientId=${this.userService.getLocalUserId()}`;
+    const endpoint = `api/v5/slobs/announcement/get?clientId=${this.userService.getLocalUserId()}&locale=${
+      this.i18nService.state.locale
+    }`;
     const req = this.formRequest(endpoint);
     try {
       const newState = await fetch(req).then(rawResp => rawResp.json());
