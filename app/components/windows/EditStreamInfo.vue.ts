@@ -368,7 +368,7 @@ export default class EditStreamInfo extends Vue {
         (this.windowQuery.platforms && this.windowQuery.platforms.includes('youtube')) ||
         this.isYoutube
       ) {
-        (this.platformService as YoutubeService).showStreamStatusWindow();
+        (getPlatformService('youtube') as YoutubeService).showStreamStatusWindow();
       }
     } catch (e) {
       const message = this.platformService.getErrorDescription(e);
