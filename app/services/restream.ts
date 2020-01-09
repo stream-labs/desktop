@@ -88,7 +88,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   get host() {
-    return 'beta.streamlabs.com';
+    return this.hostsService.streamlabs;
   }
 
   /**
