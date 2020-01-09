@@ -88,7 +88,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   get host() {
-    return this.hostsService.streamlabs;
+    return 'beta.streamlabs.com';
   }
 
   /**
@@ -98,9 +98,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
    * - Rolled out to
    */
   get canEnableRestream() {
-    return !!(
-      this.userService.state.auth && this.userService.state.auth.primaryPlatform === 'twitch'
-    );
+    return !!(this.userService.state.auth && this.restreamPlatformEligible);
   }
 
   get chatUrl() {
@@ -120,11 +118,20 @@ export class RestreamService extends StatefulService<IRestreamState> {
   get shouldGoLiveWithRestream() {
     return (
       this.userService.state.auth &&
-      this.userService.state.auth.primaryPlatform === 'twitch' &&
+      this.restreamPlatformEligible &&
       this.userService.state.auth.platforms.facebook &&
       this.state.enabled &&
       this.streamSettingsService.protectedModeEnabled
     );
+  }
+
+  /**
+   * Only users logged into these platforms as primary can multistream
+   * for the time being. Eventually all combinations of platforms will
+   * be supported.
+   */
+  get restreamPlatformEligible() {
+    return ['twitch', 'youtube'].includes(this.userService.state.auth.primaryPlatform);
   }
 
   /**
@@ -180,9 +187,8 @@ export class RestreamService extends StatefulService<IRestreamState> {
     return fetch(request).then(res => res.json());
   }
 
-  // TODO: This will eventually be based on preferences
   get platforms(): TPlatform[] {
-    return ['twitch', 'facebook'];
+    return [this.userService.state.auth.primaryPlatform, 'facebook'];
   }
 
   /**

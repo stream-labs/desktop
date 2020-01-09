@@ -364,7 +364,12 @@ export default class EditStreamInfo extends Vue {
       this.streamInfoService.createGameAssociation(this.channelInfo.game);
       this.windowsService.closeChildWindow();
       // youtube needs additional actions after the stream has been started
-      if (this.isYoutube) (this.platformService as YoutubeService).showStreamStatusWindow();
+      if (
+        (this.windowQuery.platforms && this.windowQuery.platforms.includes('youtube')) ||
+        this.isYoutube
+      ) {
+        (getPlatformService('youtube') as YoutubeService).showStreamStatusWindow();
+      }
     } catch (e) {
       const message = this.platformService.getErrorDescription(e);
       this.$toasted.show(message, {
