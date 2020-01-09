@@ -5,28 +5,45 @@ import { NicoliveProgramService, NicoliveProgramServiceFailure } from 'services/
 import { remote } from 'electron';
 import { $t } from 'services/i18n';
 
-import CommentForm from './CommentForm.vue';
 import ProgramDescription from './ProgramDescription.vue';
+import CommentViewer from './CommentViewer.vue';
+import CommentFilter from './CommentFilter.vue';
 import ProgramInfo from './ProgramInfo.vue';
 import ProgramStatistics from './ProgramStatistics.vue';
 import ToolBar from './ToolBar.vue';
 import TopNav from './TopNav.vue';
 import ControlsArrow from '../../../media/images/controls-arrow-vertical.svg';
+import AreaSwitcher from './AreaSwitcher.vue';
 
 @Component({
   components: {
+    AreaSwitcher,
     TopNav,
     ProgramInfo,
     ProgramDescription,
+    CommentViewer,
+    CommentFilter,
     ProgramStatistics,
     ToolBar,
-    CommentForm,
     ControlsArrow,
   },
 })
 export default class NicolivePanelRoot extends Vue {
   @Inject()
   nicoliveProgramService: NicoliveProgramService;
+
+  get contents() {
+    return [
+      {
+        name: 'コメント',
+        slotName: 'commentViewer'
+      },
+      {
+        name: '番組詳細',
+        slotName: 'description'
+      },
+    ]
+  }
 
   get opened(): boolean {
     return this.nicoliveProgramService.state.panelOpened;

@@ -10,10 +10,10 @@
           <program-info class="program-area-item" />
           <tool-bar class="program-area-item" />
           <program-statistics class="program-area-item" />
-          <div class="tab-area">
-            <program-description />
-          </div>
-          <comment-form />
+          <area-switcher class="switch-area" :contents="contents">
+            <template v-slot:commentViewer><comment-viewer /></template>
+            <template v-slot:description><program-description /></template>
+          </area-switcher>
         </template>
         <template v-else>
           <p class="message"><i class="icon-niconico"></i>このエリアではニコニコ生放送を<br>配信するための機能が利用できます</p>
@@ -128,10 +128,7 @@
   }
 }
 
-.tab-area {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
+.switch-area {
   flex-grow: 1;
   flex-basis: 0;
   border-top: 1px solid @bg-secondary;
