@@ -7,9 +7,9 @@
       <top-nav />
       <div class="program-area" :class="{ 'isCreate': !hasProgram }">
         <template v-if="hasProgram">
-          <program-info />
-          <tool-bar />
-          <program-statistics />
+          <program-info class="program-area-item" />
+          <tool-bar class="program-area-item" />
+          <program-statistics class="program-area-item" />
           <div class="tab-area">
             <program-description />
           </div>
@@ -107,6 +107,10 @@
       }
     }
   }
+}
+
+.program-area-item {
+  flex-shrink: 0;
 }
 
 .button-wrapper {

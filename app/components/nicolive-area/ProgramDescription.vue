@@ -22,11 +22,11 @@
 .program-description {
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
   width: 100%;
 }
 
 .program-description-header {
+  flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -68,12 +68,12 @@
       }
 
       &.dark-mode-label {
-        background-color: @bg-secondary; 
+        background-color: @bg-secondary;
       }
 
       &.light-mode-label {
        background-color: @white;
-      } 
+      }
     }
 
     &:checked {
@@ -86,7 +86,6 @@
 
 .program-description-body {
   flex-grow: 1;
-  flex-basis: 0;
   overflow-y: auto;
   overflow-x: hidden;
 

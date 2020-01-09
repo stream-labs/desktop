@@ -1,6 +1,6 @@
 <template>
 <div class="main" id="mainWrapper" @drop="onDropHandler">
-  <title-bar :title="title" />
+  <title-bar class="main-title" :title="title" />
   <div class="main-contents">
     <div class="main-middle">
       <top-nav v-if="(page !== 'Onboarding')" :locked="applicationLoading"></top-nav>
@@ -31,6 +31,10 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+}
+
+.main-title {
+  flex-shrink: 0;
 }
 
 .main-contents {
