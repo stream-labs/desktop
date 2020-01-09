@@ -1,7 +1,6 @@
 <template>
   <div class="program-description">
     <div class="program-description-header">
-      <p class="program-description-title">番組詳細</p>
       <div class="color-change-wrapper">
         <span class="color-change-label">背景色</span>　
         <input class="radio-btn" type="radio" id="change-dark-mode-btn" value="dark-mode" v-model="bgColorMode"><label for="change-dark-mode-btn" class="dark-mode-label"></label>
@@ -34,12 +33,6 @@
   height: 40px;
   padding: 0 16px;
   background-color: @bg-quinary;
-}
-
-.program-description-title {
-  font-size: 12px;
-  color: @text-primary;
-  margin: 0;
 }
 
 .color-change-wrapper {
