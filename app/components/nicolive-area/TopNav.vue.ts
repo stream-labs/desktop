@@ -45,14 +45,14 @@ export default class TopNav extends Vue {
   }
 
   hasProgramUrlCopied : boolean = false;
-  clearTimer : NodeJS.Timer | null = null; 
+  clearTimer : number = 0;
   copyProgramURL() {
     if (this.isFetching) throw new Error('fetchProgram is running');
     clipboard.writeText(`https://live.nicovideo.jp/watch/${this.nicoliveProgramService.state.programID}`);
     this.hasProgramUrlCopied = true;
-    clearTimeout(this.clearTimer)
+    window.clearTimeout(this.clearTimer)
 
-    this.clearTimer = setTimeout(() => {
+    this.clearTimer = window.setTimeout(() => {
       this.hasProgramUrlCopied = false;
       this.clearTimer = null;
     }, 1000)
