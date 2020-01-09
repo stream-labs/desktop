@@ -7,6 +7,7 @@ import { WindowsService } from 'services/windows';
 import { UserService } from 'services/user';
 import { BrowserWindow, remote } from 'electron';
 import { $t } from 'services/i18n';
+import { BehaviorSubject } from 'rxjs';
 
 type Schedules = ProgramSchedules['data'];
 type Schedule = Schedules[0];
@@ -22,6 +23,8 @@ type ProgramState = {
   communityID: string;
   communityName: string;
   communitySymbol: string;
+  roomURL: string;
+  roomThreadID: string;
   viewers: number;
   comments: number;
   adPoint: number;
@@ -72,6 +75,9 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
   @Inject()
   userService: UserService;
 
+  private stateChangeSubject = new BehaviorSubject(this.state);
+  stateChange = this.stateChangeSubject.asObservable();
+
   client: NicoliveClient = new NicoliveClient();
 
   static programInitialState: ProgramState = {
@@ -85,6 +91,8 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     communityID: '',
     communityName: '',
     communitySymbol: '',
+    roomURL: '',
+    roomThreadID: '',
     viewers: 0,
     comments: 0,
     adPoint: 0,
@@ -127,6 +135,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     this.refreshAutoExtensionTimer(this.state, nextState);
     this.refreshWindowSize(this.state, nextState);
     this.SET_STATE(nextState);
+    this.stateChangeSubject.next(nextState);
   }
 
   @mutation()
@@ -262,6 +271,9 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     const community = isOk(communityResponse) && communityResponse.value;
     const program = programResponse.value;
 
+    // アリーナのみ取得する
+    const room = program.rooms.find(r => r.id === 0);
+
     this.setState({
       programID: nicoliveProgramId,
       status: program.status,
@@ -273,6 +285,8 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       communityID: socialGroupId,
       communityName: community ? community.name : '(コミュニティの取得に失敗しました)',
       communitySymbol: community ? community.thumbnailUrl.small : '',
+      roomURL: room ? room.webSocketUri : '',
+      roomThreadID: room ? room.threadId : '',
     });
   }
 
@@ -283,6 +297,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     }
 
     const program = programResponse.value;
+    const room = program.rooms.find(r => r.id === 0);
 
     this.setState({
       status: program.status,
@@ -291,6 +306,8 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       startTime: program.beginAt,
       endTime: program.endAt,
       isMemberOnly: program.isMemberOnly,
+      roomURL: room ? room.webSocketUri : '',
+      roomThreadID: room ? room.threadId : '',
     });
   }
 
