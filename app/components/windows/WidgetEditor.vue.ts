@@ -135,7 +135,7 @@ export default class WidgetEditor extends TsxComponent<WidgetEditorProps> {
 
   get windowTitle() {
     const source = this.widget.getSource();
-    return $t('Settings for ') + source.name;
+    return $t('Settings for %{sourceName}', { sourceName: source.name });
   }
 
   get sourceProperties() {
