@@ -78,12 +78,17 @@ export default class Studio extends TsxComponent {
       ? this.$el.getBoundingClientRect().width
       : this.$el.getBoundingClientRect().height;
 
+    if (this.max === 0) {
+      this.max = oldMax;
+      return;
+    }
+
     this.resizeByRatio(oldMax);
     this.reconcileSizeWithinContraints(mins);
   }
 
   resizeByRatio(oldMax: number) {
-    if (this.max === oldMax || !oldMax) return;
+    if (this.max === oldMax || !oldMax || !this.max) return;
 
     const ratio = this.max / oldMax;
     if (ratio === 0) return;
