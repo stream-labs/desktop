@@ -124,7 +124,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       'Scene Collections',
       'Notifications',
       'Appearance',
-      'Facemasks',
+      'Face Masks',
       'Remote Control',
     ]);
 
