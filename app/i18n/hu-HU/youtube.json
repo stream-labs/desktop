@@ -1,7 +1,7 @@
 {
-  "Youtube stream status": "Youtube stream status",
-  "Waiting for YouTube to receive the video signal...": "Waiting for YouTube to receive the video signal...",
-  "Testing your broadcast...": "Testing your broadcast...",
+  "Youtube stream status": "Youtube stream állapot",
+  "Waiting for YouTube to receive the video signal...": "Várakozás arra, hogy a YouTube megkapja a videojelet...",
+  "Testing your broadcast...": "Az adás tesztelése...",
   "Finalizing broadcast testing...": "Finalizing broadcast testing...",
   "Publishing to your YouTube channel...": "Publishing to your YouTube channel...",
   "Waiting broadcast to be published...": "Waiting broadcast to be published...",
@@ -13,7 +13,7 @@
   " to publish it manually": " hogy manuálisan tegye közzé",
   "Go to Youtube Live Dashboard": "Ugrás a Youtube Élő irányítópultra",
   "Create New Event": "Hozzon létre új eseményt",
-  "YouTube Chat": "YouTube Chat",
-  "This action cannot be performed inside Streamlabs OBS. To interact with chat, you can open this chat in a web browser.": "This action cannot be performed inside Streamlabs OBS. To interact with chat, you can open this chat in a web browser.",
-  "Open In Web Browser": "Open In Web Browser"
+  "YouTube Chat": "YouTube chat",
+  "This action cannot be performed inside Streamlabs OBS. To interact with chat, you can open this chat in a web browser.": "Ezt a műveletet nem lehet végrehajtani a Streamlabs OBS-en. Ha csevegni szeretne, a böngészőben megnyithatja ezt a csevegést.",
+  "Open In Web Browser": "Nyissa meg a webböngészőben"
 }
