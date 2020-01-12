@@ -33,10 +33,10 @@
   "Unpause Alert Queue": "Unpause Alert Queue",
   "Skip Alert": "Értesítés átugrása",
   "Mute Event Sounds": "A hang elnémítása",
-  "Repeat Alert": "Repeat Alert",
-  "There are no events to display": "There are no events to display",
-  "New Events Feed": "New Events Feed",
-  "Popout Event Filtering Options": "Popout Event Filtering Options",
+  "Repeat Alert": "Értesítő Ismétlése",
+  "There are no events to display": "Nincsenek megjelenítendő események",
+  "New Events Feed": "Új események hírcsatorna",
+  "Popout Event Filtering Options": "Előugró események szűrési lehetőségei",
   "Subs": "Felíratkozók",
   "3 Months": "3 hónap",
   "6 Months": "6 hónap",
@@ -48,5 +48,5 @@
   "Effects": "Efektek",
   "has purchased %{product} from the store": "vásárolt %{product} a boltból",
   "Event Filters": "Eseményszűrők",
-  "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, check out the Layout Editor in the sidebar.": "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, check out the Layout Editor in the sidebar."
+  "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, check out the Layout Editor in the sidebar.": "Kombináltuk a Szerkesztő és az élő lapokat, és mivel az események új megjelenést adnak. Ha vissza akar térni a régi események hírcsatornájára, nézd meg az oldalsávban az Elrendezés szerkesztőjét."
 }
