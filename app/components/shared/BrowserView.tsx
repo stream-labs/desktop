@@ -63,15 +63,7 @@ export default class BrowserView extends TsxComponent<BrowserViewProps> {
     this.browserView.webContents.on('did-finish-load', () => (this.loading = false));
     electron.remote.getCurrentWindow().addBrowserView(this.browserView);
 
-    try {
-      await this.browserView.webContents.loadURL(this.props.src);
-    } catch (e) {
-      // ignore some common errors
-      // that happen when the window has been closed before BrowserView accomplished the request
-      if (e.code === 'ERR_ABORTED') return;
-      if (e.message.match(/\(\-3\) loading/)) return;
-      throw e;
-    }
+    await this.loadUrl();
 
     this.resizeInterval = window.setInterval(() => {
       this.checkResize();
@@ -121,8 +113,16 @@ export default class BrowserView extends TsxComponent<BrowserViewProps> {
   }
 
   @Watch('theme')
-  refreshBrowser() {
-    this.browserView.webContents.loadURL(this.props.src);
+  async loadUrl() {
+    try {
+      await this.browserView.webContents.loadURL(this.props.src);
+    } catch (e) {
+      // ignore some common errors
+      // that happen when the window has been closed before BrowserView accomplished the request
+      if (e.code === 'ERR_ABORTED') return;
+      if (e.message.match(/\(\-3\) loading/)) return;
+      throw e;
+    }
   }
 
   private rectChanged(rect: { left: number; top: number; width: number; height: number }) {
