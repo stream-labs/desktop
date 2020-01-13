@@ -158,9 +158,7 @@ async function isUpdaterRunning(updaterPath: string, updaterName: string) {
   for (const processItem in processes) {
     if (processes[processItem].imageName === updaterName) {
       log.info(
-        `Detected running updater process ${processes[processItem].imageName} - PID: ${
-          processes[processItem].pid
-        }`,
+        `Detected running updater process ${processes[processItem].imageName} - PID: ${processes[processItem].pid}`,
       );
 
       try {
@@ -226,7 +224,7 @@ async function getLatestVersionInfo(info: IUpdateInfo): Promise<ILatestVersionIn
   const response = await prequest(reqInfo);
 
   if (response.statusCode !== 200) {
-    log.info(`Failed to fetch version information ` + `- ${response.statusCode}`);
+    log.info(`Failed to fetch version information - ${response.statusCode}`);
 
     return null;
   }

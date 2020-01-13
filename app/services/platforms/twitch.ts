@@ -298,6 +298,7 @@ export class TwitchService extends Service implements IPlatformService {
   }
 
   hasScope(scope: TTwitchOAuthScope): Promise<boolean> {
+    // eslint-disable-next-line prettier/prettier
     return platformAuthorizedRequest('twitch', 'https://id.twitch.tv/oauth2/validate').then(
       (response: ITwitchOAuthValidateResponse) => response.scopes.includes(scope),
     );
