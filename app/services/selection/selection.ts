@@ -32,7 +32,7 @@ export class Selection {
   };
 
   constructor(public sceneId: string, itemsList: TNodesList = []) {
-    this.select(itemsList);
+    if (sceneId && itemsList) this.select(itemsList);
   }
 
   // SELECTION METHODS

@@ -141,7 +141,9 @@ class ScenesViews extends ViewHandler<IScenesState> {
   }
 
   get activeScene() {
-    return this.getScene(this.activeSceneId);
+    if (this.activeSceneId) return this.getScene(this.activeSceneId);
+
+    return null;
   }
 
   get scenes(): Scene[] {

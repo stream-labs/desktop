@@ -41,6 +41,7 @@ export class Scene {
   readonly state: IScene;
 
   constructor(sceneId: string) {
+    if (!sceneId) console.trace('undefined scene id');
     this.state = this.scenesService.state.scenes[sceneId];
     Utils.applyProxy(this, this.state);
   }
