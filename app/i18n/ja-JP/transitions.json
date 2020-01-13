@@ -23,5 +23,8 @@
   "Deleted": "削除",
   "This connection is redundant because another connection already connects these scenes.": "別の通信によって既にこれらのシーンは接続されているので、この接続は冗長です",
   "You need at least 2 scenes to edit transitions.": "切り替え効果を編集するために少なくとも２つ以上のシーンが必要です",
-  "This scene transition is managed by an App and cannot be edited.": "このシーンの切り替えはアプリによって処理されており編集はできません"
+  "This scene transition is managed by an App and cannot be edited.": "このシーンの切り替えはアプリによって処理されており編集はできません",
+  "Global Transition": "Global Transition",
+  "Edit": "編集",
+  "Live": "ライブ"
 }
