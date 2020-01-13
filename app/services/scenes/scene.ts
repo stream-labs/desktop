@@ -146,8 +146,7 @@ export class Scene {
 
     const sceneItemId = options.id || uuid();
 
-    let obsSceneItem: obs.ISceneItem;
-    obsSceneItem = this.getObsScene().add(source.getObsInput());
+    const obsSceneItem: obs.ISceneItem = this.getObsScene().add(source.getObsInput());
 
     this.ADD_SOURCE_TO_SCENE(sceneItemId, source.sourceId, obsSceneItem.id);
     const sceneItem = this.getItem(sceneItemId);

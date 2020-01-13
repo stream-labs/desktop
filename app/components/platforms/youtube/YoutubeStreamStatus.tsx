@@ -29,8 +29,7 @@ export default class YoutubeStreamStatus extends TsxComponent {
   }
 
   get progressInfo(): { msg: string; progress: number } {
-    let dictionary: { [key in TYoutubeLifecycleStep]: { msg: string; progress: number } };
-    dictionary = {
+    const dictionary: { [key in TYoutubeLifecycleStep]: { msg: string; progress: number } } = {
       idle: {
         msg: '',
         progress: 0,
@@ -118,7 +117,7 @@ export default class YoutubeStreamStatus extends TsxComponent {
               <h1>{$t('Something went wrong')}</h1>
               <p class={styles.error}>
                 {$t(
-                  `Your stream has been created but we can\'t publish it in your channel. Check your internet connection or go to the `,
+                  "Your stream has been created but we can't publish it in your channel. Check your internet connection or go to the ",
                 )}
                 <a href="javascript:void(0)" onClick={this.goToDashboard}>
                   {$t('stream control page')}

@@ -62,8 +62,10 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
 
   executeCommand<TCommand extends keyof typeof COMMANDS>(
     commandType: TCommand,
+    // eslint-disable-next-line prettier/prettier
     ...commandArgs: ConstructorParameters<(typeof COMMANDS)[TCommand]>
-  ): ReturnType<InstanceType<(typeof COMMANDS)[TCommand]>['execute']> {
+  ): // eslint-disable-next-line prettier/prettier
+    ReturnType<InstanceType<(typeof COMMANDS)[TCommand]>['execute']> {
     // Executing any command clears out the redo history, since we are
     // creating a new branch in the timeline.
     this.redoHistory = [];
