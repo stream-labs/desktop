@@ -66,7 +66,8 @@ export default class SceneSelector extends TsxComponent {
     });
     menu.append({
       label: $t('Filters'),
-      click: () => this.sourceFiltersService.showSourceFilters(this.scenesService.views.activeScene.id),
+      click: () =>
+        this.sourceFiltersService.showSourceFilters(this.scenesService.views.activeScene.id),
     });
     menu.append({
       label: $t('Create Scene Projector'),

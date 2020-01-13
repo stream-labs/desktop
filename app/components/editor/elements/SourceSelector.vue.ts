@@ -147,8 +147,9 @@ export default class SourceSelector extends TsxComponent {
       // IPC is unavoidable here, that's ok. Let's eventually put this in
       // the store as it's something that the UI cares about. Also typing
       // is weak for properties managers settings.
-      const widgetType = this.sourcesService.views.getSource(sourceId).getPropertiesManagerSettings()
-        .widgetType;
+      const widgetType = this.sourcesService.views
+        .getSource(sourceId)
+        .getPropertiesManagerSettings().widgetType;
 
       return widgetIconMap[widgetType];
     }
@@ -215,7 +216,9 @@ export default class SourceSelector extends TsxComponent {
     }
     if (!this.canShowProperties()) return;
 
-    const node = this.scene.state.nodes.find(n => n.id === this.selectionService.state.lastSelectedId);
+    const node = this.scene.state.nodes.find(
+      n => n.id === this.selectionService.state.lastSelectedId,
+    );
 
     if (node.sceneNodeType === 'item') {
       this.sourcesService.showSourceProperties(node.sourceId);
