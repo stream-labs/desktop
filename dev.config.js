@@ -41,7 +41,7 @@ module.exports = merge.smart(baseConfig, {
       {
         test: /\.tsx?$/,
         enforce: 'pre',
-        loader: 'tslint-loader',
+        loader: 'eslint-loader',
       },
     ]
   },

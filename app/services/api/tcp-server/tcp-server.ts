@@ -1,4 +1,3 @@
-import WritableStream = NodeJS.WritableStream;
 import os from 'os';
 import crypto from 'crypto';
 import { PersistentStatefulService, Inject, mutation } from 'services/core';
@@ -15,6 +14,8 @@ import { IIPAddressDescription, ITcpServerServiceApi, ITcpServersSettings } from
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { ExternalApiService } from '../external-api';
 import { SceneCollectionsService } from 'services/scene-collections';
+// eslint-disable-next-line no-undef
+import WritableStream = NodeJS.WritableStream;
 import { $t } from 'services/i18n';
 
 const net = require('net');
