@@ -8,6 +8,7 @@ import { WindowsService } from './windows';
 import { ScalableRectangle } from '../util/ScalableRectangle';
 import { Subscription } from 'rxjs';
 import { SelectionService } from 'services/selection';
+import electronLog from 'electron-log';
 
 const { remote } = electron;
 
@@ -267,6 +268,7 @@ export class VideoService extends Service {
         name,
         remderingMode,
       );
+      electronLog.log('OBS_content_createDisplay', name);
     }
   }
 
@@ -280,6 +282,7 @@ export class VideoService extends Service {
 
   moveOBSDisplay(name: string, x: number, y: number) {
     obs.NodeObs.OBS_content_moveDisplay(name, x, y);
+    electronLog.log('OBS_content_moveDisplay', name, x, y);
   }
 
   resizeOBSDisplay(name: string, width: number, height: number) {
@@ -288,6 +291,7 @@ export class VideoService extends Service {
 
   destroyOBSDisplay(name: string) {
     obs.NodeObs.OBS_content_destroyDisplay(name);
+    electronLog.log('OBS_content_destroyDisplay', name);
   }
 
   getOBSDisplayPreviewOffset(name: string): IVec2 {
