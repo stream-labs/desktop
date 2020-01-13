@@ -525,13 +525,15 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     const auth =
       mode === 'internal'
+        /* eslint-disable */
         ? await this.authModule.startInternalAuth(
-            authUrl,
-            service.authWindowOptions,
-            onWindowShow,
-            merge,
-          )
+          authUrl,
+          service.authWindowOptions,
+          onWindowShow,
+          merge,
+        )
         : await this.authModule.startExternalAuth(authUrl, onWindowShow, merge);
+        /* eslint-enable */
 
     onLoginStart();
 
