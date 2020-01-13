@@ -107,7 +107,7 @@ export function createStore(): Store<any> {
     },
     strict: false,
     state: {
-      bulkLoadFinished: Util.isWorkerWindow() ? true : false,
+      bulkLoadFinished: !!Util.isWorkerWindow(),
     },
   });
 

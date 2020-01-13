@@ -12,7 +12,7 @@ const instances: Service[] = [];
  * Makes all functions return a Promise and sets other types to never
  */
 type TPromisifyFunctions<T> = {
-  [P in keyof T]: T[P] extends (...args: any[]) => any ? TPromisifyFunction<T[P]> : never
+  [P in keyof T]: T[P] extends (...args: any[]) => any ? TPromisifyFunction<T[P]> : never;
 };
 
 /**
@@ -28,7 +28,7 @@ type TPromisifyFunction<T> = T extends (...args: infer P) => infer R
  * Makes all functions return void and sets other types to never
  */
 export type TVoidFunctions<T> = {
-  [P in keyof T]: T[P] extends (...args: any[]) => any ? TVoidFunction<T[P]> : never
+  [P in keyof T]: T[P] extends (...args: any[]) => any ? TVoidFunction<T[P]> : never;
 };
 
 /**
@@ -136,7 +136,7 @@ export abstract class Service {
    * It is an async representation of the service that discards
    * return values by default.
    */
-  get actions(): TVoidFunctions<this> & IActionsReturn<this> | null {
+  get actions(): (TVoidFunctions<this> & IActionsReturn<this>) | null {
     // The internal API client handles this via Proxies at runtime.
     // This getter is here for the type system only.
     // Attempting to call actions from the worker window will result
