@@ -7,7 +7,6 @@ import { SceneItem, ISceneHierarchy, TSceneNode, isFolder, isItem } from 'servic
 import { SceneItemNode } from './scene-node';
 import { ISceneItemFolder } from '.';
 import { TSceneNodeType } from './scenes';
-import { SceneNode } from '../api/external-api/scenes';
 
 @ServiceHelper()
 export class SceneItemFolder extends SceneItemNode {
