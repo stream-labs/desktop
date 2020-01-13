@@ -16,7 +16,7 @@ export default class Triplets extends BaseLayout {
     ]);
   }
   destroyed() {
-    super.destroyResize();
+    this.destroyResize();
   }
 
   get mins() {

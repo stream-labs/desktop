@@ -16,6 +16,7 @@ import { ExternalApiService } from '../external-api';
 import { SceneCollectionsService } from 'services/scene-collections';
 // eslint-disable-next-line no-undef
 import WritableStream = NodeJS.WritableStream;
+import { $t } from 'services/i18n';
 
 const net = require('net');
 
@@ -153,7 +154,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
           <IObsInput<string>>{
             value: settings.namedPipe.pipeName,
             name: 'pipeName',
-            description: 'Pipe Name',
+            description: $t('Pipe Name'),
             type: 'OBS_PROPERTY_TEXT',
             visible: true,
             enabled: settings.namedPipe.enabled,
@@ -167,7 +168,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
           <IObsInput<boolean>>{
             value: settings.websockets.enabled,
             name: 'enabled',
-            description: 'Enabled',
+            description: $t('Enabled'),
             type: 'OBS_PROPERTY_BOOL',
             visible: true,
             enabled: true,
@@ -176,7 +177,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
           <IObsInput<boolean>>{
             value: settings.websockets.allowRemote,
             name: 'allowRemote',
-            description: 'Allow Remote Connections',
+            description: $t('Allow Remote Connections'),
             type: 'OBS_PROPERTY_BOOL',
             visible: true,
             enabled: settings.websockets.enabled,
@@ -185,7 +186,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
           <IObsInput<number>>{
             value: settings.websockets.port,
             name: 'port',
-            description: 'Port',
+            description: $t('Port'),
             type: 'OBS_PROPERTY_INT',
             minVal: 0,
             maxVal: 65535,

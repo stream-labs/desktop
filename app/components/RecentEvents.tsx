@@ -184,12 +184,12 @@ class Toolbar extends TsxComponent<ToolbarProps> {
         <i
           class={`${this.props.queuePaused ? 'icon-media-share-2' : 'icon-pause'} action-icon`}
           onClick={this.props.toggleQueue}
-          v-tooltip={{ content: pauseTooltip, placement: 'bottom' }}
+          v-tooltip={{ content: pauseTooltip, placement: 'left' }}
         />
         <i
           class="icon-skip action-icon"
           onClick={this.props.skipAlert}
-          v-tooltip={{ content: $t('Skip Alert'), placement: 'bottom' }}
+          v-tooltip={{ content: $t('Skip Alert'), placement: 'left' }}
         />
         <i
           class={cx('action-icon', {
@@ -199,7 +199,7 @@ class Toolbar extends TsxComponent<ToolbarProps> {
             'icon-mute': this.props.muted,
           })}
           onClick={this.props.muteEvents}
-          v-tooltip={{ content: $t('Mute Event Sounds'), placement: 'bottom' }}
+          v-tooltip={{ content: $t('Mute Event Sounds'), placement: 'left' }}
         />
       </div>
     );

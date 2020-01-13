@@ -29,7 +29,6 @@ import StudioFooter from '../StudioFooter.vue';
 import CustomLoader from '../CustomLoader';
 import PatchNotes from '../pages/PatchNotes.vue';
 import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
-import Help from '../pages/Help.vue';
 import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import FacebookMerge from 'components/pages/FacebookMerge';
@@ -50,7 +49,6 @@ import { getPlatformService } from 'services/platforms';
     Chatbot,
     PlatformAppMainPage,
     PlatformAppStore,
-    Help,
     ResizeBar,
     FacebookMerge,
     LayoutEditor,

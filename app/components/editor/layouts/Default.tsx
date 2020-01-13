@@ -8,11 +8,11 @@ import { createProps } from 'components/tsx-component';
 @Component({ props: createProps(LayoutProps) })
 export default class Default extends BaseLayout {
   mounted() {
-    super.mountResize();
+    this.mountResize();
     this.$emit('totalWidth', ['1', '2', ['3', '4', '5']]);
   }
   destroyed() {
-    super.destroyResize();
+    this.destroyResize();
   }
 
   get mins() {

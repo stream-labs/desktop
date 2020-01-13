@@ -69,7 +69,7 @@ export default class Settings extends Vue {
     'Scene Collections': 'icon-themes',
     Notifications: 'icon-notifications',
     Appearance: 'icon-settings-3-1',
-    Facemasks: 'icon-face-masks-3',
+    'Face Masks': 'icon-face-masks-3',
     'Remote Control': 'fas fa-play-circle',
     Experimental: 'fas fa-flask',
     'Installed Apps': 'icon-store',

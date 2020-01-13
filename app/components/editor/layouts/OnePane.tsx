@@ -8,11 +8,11 @@ import styles from './Layouts.m.less';
 @Component({ props: createProps(LayoutProps) })
 export default class OnePane extends BaseLayout {
   mounted() {
-    super.mountResize();
+    this.mountResize();
     this.$emit('totalWidth', ['2', ['1', ['3', '4', '5']]]);
   }
   destroyed() {
-    super.destroyResize();
+    this.destroyResize();
   }
 
   get mins() {

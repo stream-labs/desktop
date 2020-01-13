@@ -45,7 +45,7 @@
   margin-bottom: 5px;
   display: grid;
   grid-template-columns: 30px 1fr 130px;
-  background: var(--hover);
+  background: var(--border);
   .border();
 
   &.has-action:hover {

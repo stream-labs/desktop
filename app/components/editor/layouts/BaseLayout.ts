@@ -22,6 +22,10 @@ export interface IResizeMins {
 export default class BaseLayout extends TsxComponent<LayoutProps> {
   mountResize() {
     window.addEventListener('resize', () => this.props.windowResizeHandler(this.mins));
+    if (this.bar1 < this.mins.bar1) this.props.setBarResize('bar1', this.mins.bar1);
+    if (this.mins.bar2 && this.bar2 < this.mins.bar2) {
+      this.props.setBarResize('bar2', this.mins.bar2);
+    }
     this.props.windowResizeHandler(this.mins);
   }
   destroyResize() {
@@ -37,7 +41,13 @@ export default class BaseLayout extends TsxComponent<LayoutProps> {
     this.props.windowResizeHandler(this.mins, true);
   }
 
-  get mins() {
+  get bar1(): number {
+    return null;
+  }
+  get bar2(): number {
+    return null;
+  }
+  get mins(): IResizeMins {
     return { bar1: 0, rest: 0 };
   }
 }

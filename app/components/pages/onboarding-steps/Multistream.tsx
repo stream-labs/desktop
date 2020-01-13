@@ -43,6 +43,7 @@ export default class Multistream extends TsxComponent<MultistreamProps> {
         this.streamSettingsService.setSettings({ protectedModeEnabled: true });
         this.props.continue();
       },
+      'internal',
       true,
     );
   }

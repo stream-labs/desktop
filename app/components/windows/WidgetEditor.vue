@@ -9,7 +9,7 @@
     </div>
 
     <div class="window-container">
-      <div class="editor-tabs" :class="{ pushed: isAlertBox }">
+      <div class="editor-tabs" :class="{ pushed: props.isAlertBox }">
         <i v-if="isSaving" class="fa fa-spinner fa-pulse saving-indicator" />
         <tabs
           :hideContent="true"
@@ -25,7 +25,7 @@
         <div class="custom-code__alert" :class="{ active: customCodeIsEnabled }" v-if="topTabs.length > 1" />
       </div>
 
-      <div class="content-container" :class="{ vertical: currentTopTab === 'code', 'has-leftbar': isAlertBox }">
+      <div class="content-container" :class="{ vertical: currentTopTab === 'code', 'has-leftbar': props.isAlertBox }">
         <div class="display">
           <display
             v-if="!animating && !hideStyleBlockers"
@@ -34,7 +34,7 @@
           />
         </div>
         <div class="sidebar">
-          <div class="subsection" v-if="slots" v-for="slot in slots" :key="slot.value">
+          <div class="subsection" v-if="props.slots" v-for="slot in props.slots" :key="slot.value">
             <h2 class="subsection__title">{{ slot.label }}</h2>
             <div class="subsection__content custom"><slot :name="slot.value" /></div>
           </div>
@@ -107,7 +107,7 @@
         </div>
       </div>
 
-      <div v-if="isAlertBox" class="left-toolbar"><slot name="leftbar" /></div>
+      <div v-if="props.isAlertBox" class="left-toolbar"><slot name="leftbar" /></div>
     </div>
   </div>
 </modal-layout>
