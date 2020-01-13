@@ -296,10 +296,12 @@ export class VideoService extends Service {
   }
 
   getOBSDisplayPreviewOffset(name: string): IVec2 {
+    electronLog.log('OBS_content_getDisplayPreviewOffset', name);
     return obs.NodeObs.OBS_content_getDisplayPreviewOffset(name);
   }
 
   getOBSDisplayPreviewSize(name: string): { width: number; height: number } {
+    electronLog.log('OBS_content_getDisplayPreviewSize', name);
     return obs.NodeObs.OBS_content_getDisplayPreviewSize(name);
   }
 
