@@ -135,7 +135,7 @@ export class Source implements ISourceApi {
     this.sourcesService.sourceUpdated.next(this.state);
   }
 
-  duplicate(newSourceId?: string): Source {
+  duplicate(newSourceId?: string): Source | null {
     if (this.doNotDuplicate) return null;
 
     return this.sourcesService.createSource(this.name, this.type, this.getSettings(), {
@@ -254,12 +254,12 @@ export class Source implements ISourceApi {
     // Enter key
     if (code === 13) normalizedText = '\r';
 
+    const altKey: number = (modifiers.alt && obs.EInteractionFlags.AltKey) || 0;
+    const ctrlKey: number = (modifiers.ctrl && obs.EInteractionFlags.ControlKey) || 0;
+    const shiftKey: number = (modifiers.shift && obs.EInteractionFlags.ShiftKey) || 0;
     this.getObsInput().sendKeyClick(
       {
-        modifiers:
-          (modifiers.alt && obs.EInteractionFlags.AltKey) |
-          (modifiers.ctrl && obs.EInteractionFlags.ControlKey) |
-          (modifiers.shift && obs.EInteractionFlags.ShiftKey),
+        modifiers: altKey | ctrlKey | shiftKey,
         text: normalizedText,
         nativeModifiers: 0,
         nativeScancode: 0,

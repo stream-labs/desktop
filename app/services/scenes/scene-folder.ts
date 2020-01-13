@@ -7,6 +7,7 @@ import { SceneItem, ISceneHierarchy, TSceneNode, isFolder, isItem } from 'servic
 import { SceneItemNode } from './scene-node';
 import { ISceneItemFolder } from '.';
 import { TSceneNodeType } from './scenes';
+import { SceneNode } from '../api/external-api/scenes';
 
 @ServiceHelper()
 export class SceneItemFolder extends SceneItemNode {
@@ -25,16 +26,14 @@ export class SceneItemFolder extends SceneItemNode {
 
     const state = this.scenesService.state.scenes[sceneId].nodes.find(item => {
       return item.id === id;
-    });
+    }) as ISceneItemFolder;
 
     Utils.applyProxy(this, state);
     this.state = state as ISceneItemFolder;
   }
 
   add(sceneNodeId: string) {
-    this.getScene()
-      .getNode(sceneNodeId)
-      .setParent(this.id);
+    (this.getScene().getNode(sceneNodeId) as SceneItemNode).setParent(this.id);
   }
 
   ungroup() {
@@ -54,7 +53,7 @@ export class SceneItemFolder extends SceneItemNode {
    */
   getNodes(): TSceneNode[] {
     const scene = this.getScene();
-    return this.childrenIds.map(nodeId => scene.getNode(nodeId));
+    return this.childrenIds.map(nodeId => scene.getNode(nodeId)) as TSceneNode[];
   }
 
   getItems(): SceneItem[] {
@@ -63,10 +62,6 @@ export class SceneItemFolder extends SceneItemNode {
 
   getFolders(): SceneItemFolder[] {
     return this.getNodes().filter(isFolder);
-  }
-
-  getScene(): Scene {
-    return this.scenesService.getScene(this.sceneId);
   }
 
   /**
@@ -101,7 +96,7 @@ export class SceneItemFolder extends SceneItemNode {
 
   getNestedNodes(traversedNodesIds: string[] = []): TSceneNode[] {
     // tslint:disable-next-line:no-parameter-reassignment TODO
-    traversedNodesIds = [].concat(traversedNodesIds);
+    traversedNodesIds = Object.assign([], traversedNodesIds);
     const nodes: TSceneNode[] = [];
     this.getNodes().forEach(node => {
       if (traversedNodesIds.includes(node.id)) {

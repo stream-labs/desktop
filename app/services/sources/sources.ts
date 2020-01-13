@@ -165,7 +165,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
     this.addSource(obsInput, name, options);
 
-    return this.getSource(id);
+    return this.getSource(id) as Source;
   }
 
   addSource(obsInput: obs.IInput, name: string, options: ISourceAddOptions = {}) {
@@ -183,7 +183,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       isTemporary: options.isTemporary,
       propertiesManagerType: managerType,
     });
-    const source = this.getSource(id);
+    const source = this.getSource(id) as Source;
     const muted = obsInput.muted;
     this.UPDATE_SOURCE({ id, muted });
     this.updateSourceFlags(source.state, obsInput.outputFlags, true);
@@ -209,7 +209,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
      * otherwise OBS thinks it's still attached
      * and won't release it. */
     if (source.channel !== void 0) {
-      obs.Global.setOutputSource(source.channel, null);
+      obs.Global.setOutputSource(source.channel, (null as unknown) as obs.ISource);
     }
 
     this.REMOVE_SOURCE(id);
@@ -219,7 +219,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     source.getObsInput().release();
   }
 
-  addFile(path: string): Source {
+  addFile(path: string): Source | null {
     const realpath = fs.realpathSync(path);
     const SUPPORTED_EXT = {
       image_source: ['png', 'jpg', 'jpeg', 'tga', 'bmp'],
@@ -248,7 +248,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     const types = Object.keys(SUPPORTED_EXT);
     for (const type of types) {
       if (!SUPPORTED_EXT[type].includes(ext)) continue;
-      let settings: Dictionary<TObsValue>;
+      let settings: Dictionary<TObsValue> | null = null;
       if (type === 'image_source') {
         settings = { file: path };
       } else if (type === 'browser_source') {
@@ -265,7 +265,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       } else if (type === 'text_gdiplus') {
         settings = { text: fs.readFileSync(path).toString() };
       }
-      return this.createSource(filename, type as TSourceType, settings);
+      if (settings) return this.createSource(filename, type as TSourceType, settings);
     }
     return null;
   }
@@ -277,7 +277,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   private onSceneItemRemovedHandler(sceneItemState: ISceneItem) {
     // remove source if it has been removed from the all scenes
     const source = this.getSource(sceneItemState.sourceId);
-
+    if (!source) return;
     if (source.type === 'scene') return;
 
     if (this.scenesService.getSourceItemCount(source.sourceId) > 0) return;
@@ -425,6 +425,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   setMuted(id: string, muted: boolean) {
     const source = this.getSource(id);
+    if (!source) return;
     source.getObsInput().muted = muted;
     this.UPDATE_SOURCE({ id, muted });
     this.sourceUpdated.next(source.state);
@@ -436,11 +437,11 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   // Utility functions / getters
 
-  getSourceById(id: string): Source {
+  getSourceById(id: string): Source | null {
     return this.getSource(id);
   }
 
-  getSourcesByName(name: string): Source[] {
+  getSourcesByName(name: string): (Source | null)[] {
     const sourceModels = Object.values(this.state.sources).filter(source => {
       return source.name === name;
     });
@@ -450,11 +451,11 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   get sources(): Source[] {
     return Object.values(this.state.sources).map(sourceModel =>
       this.getSource(sourceModel.sourceId),
-    );
+    ) as Source[];
   }
 
-  getSource(id: string): Source {
-    return this.state.sources[id] || this.state.temporarySources[id] ? new Source(id) : void 0;
+  getSource(id: string): Source | null {
+    return this.state.sources[id] || this.state.temporarySources[id] ? new Source(id) : null;
   }
 
   getSources() {
@@ -463,6 +464,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   showSourceProperties(sourceId: string) {
     const source = this.getSource(sourceId);
+    if (!source) return;
     const propertiesManagerType = source.getPropertiesManagerType();
     const isWidget = propertiesManagerType === 'widget';
 
@@ -586,6 +588,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
    */
   showInteractWindow(sourceId: string) {
     const source = this.getSourceById(sourceId);
+    if (!source) return;
 
     if (source.type !== 'browser_source') return;
 

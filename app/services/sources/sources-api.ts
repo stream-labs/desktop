@@ -58,14 +58,14 @@ export interface ISourcesServiceApi {
   getAvailableSourcesTypes(): TSourceType[];
   getAvailableSourcesTypesList(): IObsListOption<TSourceType>[];
   getSources(): ISourceApi[];
-  getSource(sourceId: string): ISourceApi;
-  getSourcesByName(name: string): ISourceApi[];
+  getSource(sourceId: string): ISourceApi | null;
+  getSourcesByName(name: string): (ISourceApi | null)[];
 
   /**
    * creates a source from a file
    * source type depends on the file extension
    */
-  addFile(path: string): ISourceApi;
+  addFile(path: string): ISourceApi | null;
   suggestName(name: string): string;
   showSourceProperties(sourceId: string): void;
   showShowcase(): void;

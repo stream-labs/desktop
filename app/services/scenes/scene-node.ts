@@ -35,7 +35,7 @@ export abstract class SceneItemNode implements ISceneItemNode {
   @Inject() protected selectionService: SelectionService;
 
   getScene(): Scene {
-    return this.scenesService.getScene(this.sceneId);
+    return this.scenesService.getScene(this.sceneId) as Scene;
   }
 
   get childrenIds(): string[] {
@@ -58,7 +58,7 @@ export abstract class SceneItemNode implements ISceneItemNode {
     if (this.parentId) this.SET_PARENT('');
   }
 
-  getParent(): SceneItemFolder {
+  getParent(): SceneItemFolder | null {
     return this.getScene().getFolder(this.parentId);
   }
 
@@ -90,25 +90,27 @@ export abstract class SceneItemNode implements ISceneItemNode {
     return this.getScene().getNodes()[nodeInd + 1];
   }
 
-  getPrevSiblingNode(): TSceneNode {
+  getPrevSiblingNode(): TSceneNode | null {
     const siblingsIds = this.parentId
-      ? this.getParent().getNestedNodesIds()
+      ? (this.getParent() as SceneItemFolder).getNestedNodesIds()
       : this.getScene().getRootNodesIds();
 
     const childInd = siblingsIds.indexOf(this.id);
     if (childInd !== 0) return this.getScene().getNode(siblingsIds[childInd - 1]);
+    return null;
   }
 
-  getNextSiblingNode(): TSceneNode {
+  getNextSiblingNode(): TSceneNode | null {
     const siblingsIds = this.parentId
-      ? this.getParent().getNestedNodesIds()
+      ? (this.getParent() as SceneItemFolder).getNestedNodesIds()
       : this.getScene().getRootNodesIds();
 
     const childInd = siblingsIds.indexOf(this.id);
     if (childInd !== 0) return this.getScene().getNode(siblingsIds[childInd + 1]);
+    return null;
   }
 
-  getPrevItem(): SceneItem {
+  getPrevItem(): SceneItem | null {
     let nodeInd = this.getNodeIndex();
     const nodes = this.getScene().getNodes();
     while (nodeInd--) {
@@ -117,13 +119,14 @@ export abstract class SceneItemNode implements ISceneItemNode {
     return null;
   }
 
-  getNextItem(): SceneItem {
+  getNextItem(): SceneItem | null {
     let nodeInd = this.getNodeIndex();
     const nodes = this.getScene().getNodes();
     while (nodeInd++) {
       if (!nodes[nodeInd]) return null;
       if (nodes[nodeInd].isItem()) return nodes[nodeInd] as SceneItem;
     }
+    return null;
   }
 
   /**

@@ -1,7 +1,7 @@
 import merge from 'lodash/merge';
 import { mutation, ServiceHelper, Inject } from 'services';
 import Utils from '../utils';
-import { SourcesService, TSourceType, ISource } from 'services/sources';
+import { SourcesService, TSourceType, ISource, Source } from 'services/sources';
 import { VideoService } from 'services/video';
 import {
   ScalableRectangle,
@@ -92,11 +92,11 @@ export class SceneItem extends SceneItemNode {
   }
 
   getScene(): Scene {
-    return this.scenesService.getScene(this.sceneId);
+    return this.scenesService.getScene(this.sceneId) as Scene;
   }
 
   get source() {
-    return this.sourcesService.getSource(this.sourceId);
+    return this.sourcesService.getSource(this.sourceId) as Source;
   }
 
   getSource() {
@@ -130,7 +130,10 @@ export class SceneItem extends SceneItemNode {
     const newSettings = merge({}, this.state, patch);
 
     if (changed.transform) {
-      const changedTransform = Utils.getChangedParams(this.state.transform, patch.transform);
+      const changedTransform = Utils.getChangedParams(
+        this.state.transform,
+        patch.transform,
+      ) as Partial<ITransform>;
 
       if (changedTransform.position) {
         obsSceneItem.position = newSettings.transform.position;
@@ -186,7 +189,7 @@ export class SceneItem extends SceneItemNode {
   }
 
   remove() {
-    this.scenesService.getScene(this.sceneId).removeItem(this.sceneItemId);
+    this.getScene().removeItem(this.sceneItemId);
   }
 
   nudgeLeft() {
@@ -292,7 +295,7 @@ export class SceneItem extends SceneItemNode {
    */
   scale(scaleDelta: IVec2, origin: IVec2 = AnchorPositions[AnchorPoint.Center]) {
     const rect = this.getRectangle();
-    let currentScale: Vec2;
+    let currentScale = v2();
     rect.normalized(() => {
       currentScale = v2(rect.scaleX, rect.scaleY);
     });
@@ -367,7 +370,7 @@ export class SceneItem extends SceneItemNode {
   setContentCrop() {
     const source = this.getSource();
     if (source.type !== 'scene') return;
-    const scene = this.scenesService.getScene(source.sourceId);
+    const scene = this.scenesService.getScene(source.sourceId) as Scene;
     const rect = scene
       .getSelection()
       .selectAll()

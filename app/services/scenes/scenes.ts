@@ -181,36 +181,38 @@ export class ScenesService extends StatefulService<IScenesState> {
     this.ADD_SCENE(id, name);
     const obsScene = obs.SceneFactory.create(id);
     this.sourcesService.addSource(obsScene.source, name, { sourceId: id });
+    const newScene = this.getScene(id) as Scene;
 
     if (options.duplicateSourcesFromScene) {
       const oldScene = this.getScene(options.duplicateSourcesFromScene);
-      const newScene = this.getScene(id);
+      if (!oldScene) return;
 
       oldScene
         .getItems()
         .slice()
         .reverse()
         .forEach(item => {
-          const newItem = newScene.addSource(item.sourceId);
+          const newItem = newScene.addSource(item.sourceId) as SceneItem;
           newItem.setSettings(item.getSettings());
         });
     }
 
     this.sceneAdded.next(this.state.scenes[id]);
     if (options.makeActive) this.makeSceneActive(id);
-    return this.getScene(id);
+    return newScene;
   }
 
   canRemoveScene() {
     return Object.keys(this.state.scenes).length > 1;
   }
 
-  removeScene(id: string, force = false): IScene {
+  removeScene(id: string, force = false): IScene | null {
     if (!force && Object.keys(this.state.scenes).length < 2) {
       return null;
     }
 
     const scene = this.getScene(id);
+    if (!scene) return null;
     const sceneModel = this.state.scenes[id];
 
     // remove all sources from scene
@@ -298,7 +300,7 @@ export class ScenesService extends StatefulService<IScenesState> {
   }
 
   get scenes(): Scene[] {
-    return uniqBy(this.state.displayOrder.map(id => this.getScene(id)), x => x.id);
+    return this.state.displayOrder.map(id => this.getScene(id)) as Scene[];
   }
 
   get activeSceneId(): string {
@@ -306,7 +308,7 @@ export class ScenesService extends StatefulService<IScenesState> {
   }
 
   get activeScene(): Scene {
-    return this.getScene(this.state.activeSceneId);
+    return this.getScene(this.state.activeSceneId) as Scene;
   }
 
   suggestName(name: string): string {
