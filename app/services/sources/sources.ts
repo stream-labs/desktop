@@ -536,7 +536,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
     this.windowsService.showWindow({
       componentName: 'SourceProperties',
-      title: $t('Settings for ') + propertiesName,
+      title: $t('Settings for %{sourceName}', { sourceName: propertiesName }),
       queryParams: { sourceId },
       size: {
         width: 600,

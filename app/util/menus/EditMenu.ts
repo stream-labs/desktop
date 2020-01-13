@@ -332,14 +332,14 @@ export class EditMenu extends Menu {
       this.append({ type: 'separator' });
 
       this.append({
-        label: 'Hide',
+        label: $t('Hide'),
         click: () => {
           this.editorCommandsService.executeCommand('HideMixerSourceCommand', this.source.sourceId);
         },
       });
 
       this.append({
-        label: 'Unhide All',
+        label: $t('Unhide All'),
         click: () => this.editorCommandsService.executeCommand('UnhideMixerSourcesCommand'),
       });
     }

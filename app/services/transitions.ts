@@ -273,7 +273,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
    */
   ensureTransition() {
     if (this.state.transitions.length === 0) {
-      this.createTransition(ETransitionType.Cut, 'Global Transition');
+      this.createTransition(ETransitionType.Cut, $t('Global Transition'));
     }
   }
 
