@@ -26,7 +26,6 @@ module.exports = {
     'prettier'
   ],
   rules: {
-    // TODO: enable prettier when the prettier plugin will support optional chaning
     "prettier/prettier": ERROR,
 
     // "variable-name": [ERROR, "ban-keywords", "check-format", "allow-leading-underscore", "allow-pascal-case"],
