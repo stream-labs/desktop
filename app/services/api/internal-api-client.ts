@@ -144,7 +144,7 @@ export class InternalApiClient {
       );
 
       if (response.error) {
-        throw 'IPC request failed: check the errors in the worker window';
+        throw new Error('IPC request failed: check the errors in the worker window');
       }
 
       const result = response.result;

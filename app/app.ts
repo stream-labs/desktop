@@ -1,5 +1,6 @@
 import { I18nService, $t } from 'services/i18n';
 
+// eslint-disable-next-line
 window['eval'] = global.eval = () => {
   throw new Error('window.eval() is disabled for security');
 };

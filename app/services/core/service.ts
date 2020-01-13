@@ -4,8 +4,8 @@
  */
 import { Subject } from 'rxjs';
 
-const singleton = Symbol();
-const singletonEnforcer = Symbol();
+const singleton = Symbol('singleton');
+const singletonEnforcer = Symbol('singletonEnforcer');
 const instances: Service[] = [];
 
 /**
@@ -85,7 +85,7 @@ export abstract class Service {
    */
   static createInstance(ServiceClass: any) {
     if (ServiceClass.hasInstance) {
-      throw 'Unable to create more than one singleton service';
+      throw new Error('Unable to create more than one singleton service');
     }
     ServiceClass.isSingleton = true;
     const instance = new ServiceClass(singletonEnforcer);
@@ -112,7 +112,7 @@ export abstract class Service {
   }
 
   constructor(enforcer: Symbol) {
-    if (enforcer !== singletonEnforcer) throw 'Cannot construct singleton';
+    if (enforcer !== singletonEnforcer) throw new Error('Cannot construct singleton');
   }
 
   /**

@@ -21,7 +21,7 @@ export default class Dashboard extends Vue {
   patchNotesOpening = false;
 
   show() {
-    const vid = <HTMLVideoElement>this.$refs.patchNotesVideo;
+    const vid = this.$refs.patchNotesVideo as HTMLVideoElement;
     vid.play();
     this.patchNotesClosing = true;
     this.patchNotesOpening = true;

@@ -398,7 +398,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const hideNav = hidenav ? 'true' : 'false';
     const i18nService = I18nService.instance as I18nService; // TODO: replace with getResource('I18nService')
     const locale = i18nService.state.locale;
-
+    // eslint-disable-next-line
     return `https://${
       this.hostsService.streamlabs
     }/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}&l=${locale}&hidenav=${hideNav}`;
@@ -525,13 +525,15 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     const auth =
       mode === 'internal'
+        /* eslint-disable */
         ? await this.authModule.startInternalAuth(
-            authUrl,
-            service.authWindowOptions,
-            onWindowShow,
-            merge,
-          )
+          authUrl,
+          service.authWindowOptions,
+          onWindowShow,
+          merge,
+        )
         : await this.authModule.startExternalAuth(authUrl, onWindowShow, merge);
+        /* eslint-enable */
 
     onLoginStart();
 

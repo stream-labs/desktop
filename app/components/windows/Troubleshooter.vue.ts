@@ -33,10 +33,7 @@ export default class Troubleshooter extends Vue {
   mounted() {
     this.getSettings();
     this.subscription = this.streamingService.streamingStatusChange
-      .pipe(
-        debounceTime(500),
-        tap(this.getSettings),
-      )
+      .pipe(debounceTime(500), tap(this.getSettings))
       .subscribe();
   }
 
