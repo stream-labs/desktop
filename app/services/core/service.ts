@@ -136,7 +136,7 @@ export abstract class Service {
    * It is an async representation of the service that discards
    * return values by default.
    */
-  get actions(): TVoidFunctions<this> & IActionsReturn<this> {
+  get actions(): TVoidFunctions<this> & IActionsReturn<this> | null {
     // The internal API client handles this via Proxies at runtime.
     // This getter is here for the type system only.
     // Attempting to call actions from the worker window will result
