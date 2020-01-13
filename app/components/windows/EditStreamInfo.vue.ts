@@ -144,10 +144,10 @@ export default class EditStreamInfo extends Vue {
         required: true,
         disabled: this.updatingInfo,
         description: this.isFacebook
-          ? $t(
-              'Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.',
-            )
+          /* eslint-disable */
+          ? $t('Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.')
           : undefined,
+          /* eslint-enable */
       }),
       time: metadata.timer({
         title: $t('Scheduled Time'),
