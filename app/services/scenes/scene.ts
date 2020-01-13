@@ -208,7 +208,7 @@ export class Scene {
     this.REMOVE_NODE_FROM_SCENE(folderId);
   }
 
-  remove(force?: boolean): IScene {
+  remove(force?: boolean): IScene | null {
     return this.scenesService.removeScene(this.id, force);
   }
 
