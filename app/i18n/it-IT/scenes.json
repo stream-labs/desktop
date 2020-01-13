@@ -38,5 +38,6 @@
   "Rename Folder": "Rinomina cartella",
   "Name Folder": "Nomina cartella",
   "Switch Scenes": "Cambia scene",
-  "Failed to load scene collection.  A new one will be created instead.": "Caricamento della raccolta scene non riuscito. Ne verrà creata una nuova."
+  "Failed to load scene collection.  A new one will be created instead.": "Caricamento della raccolta scene non riuscito. Ne verrà creata una nuova.",
+  "New Scene": "New Scene"
 }
