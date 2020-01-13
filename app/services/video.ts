@@ -257,6 +257,7 @@ export class VideoService extends Service {
     const electronWindow = remote.BrowserWindow.fromId(electronWindowId);
 
     if (sourceId) {
+      electronLog.log('OBS_content_createSourcePreviewDisplay', name);
       obs.NodeObs.OBS_content_createSourcePreviewDisplay(
         electronWindow.getNativeWindowHandle(),
         sourceId,
