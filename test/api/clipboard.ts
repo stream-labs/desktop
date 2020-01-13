@@ -170,7 +170,7 @@ test('Copy/paste scenes between scene collections', async t => {
       Item2: image_source
   `);
 
-  const scene1 = scenesService.getScenes()[0];
+  const scene1 = scenesService.views.scenes[0];
   const scene2 = scenesService.createScene('Scene2');
   scene2.makeActive();
 
@@ -199,10 +199,7 @@ test('Copy/paste scenes between scene collections', async t => {
   `),
   );
 
-  scenesService
-    .getScenes()
-    .find(scene => scene.name == 'Scene2')
-    .makeActive();
+  scenesService.views.scenes.find(scene => scene.name === 'Scene2').makeActive();
 
   t.true(
     sceneBuilder.isEqualTo(`

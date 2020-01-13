@@ -27,7 +27,7 @@ test('Selection', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const selection = client.getResource<SelectionService>('SelectionService');
-  const scene = scenesService.activeScene;
+  const scene = scenesService.views.activeScene;
 
   const color1 = scene.createAndAddSource('Color1', 'color_source');
   const color2 = scene.createAndAddSource('Color2', 'color_source');
@@ -70,7 +70,7 @@ test('Selection actions', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const selection = client.getResource<SelectionService>('SelectionService');
-  const scene = scenesService.activeScene;
+  const scene = scenesService.views.activeScene;
 
   let [color1, color2, color3] = scene.getItems();
 
@@ -91,7 +91,7 @@ test('Invalid selection', async t => {
   const selection = client.getResource<SelectionService>('SelectionService');
   const anotherScene = scenesService.createScene('Another scene');
   const colorFromAnotherScene = anotherScene.createAndAddSource('MyColor', 'color_source');
-  const [colorSource] = scenesService.activeScene.getItems();
+  const [colorSource] = scenesService.views.activeScene.getItems();
 
   // invalid ids must be ignored
   selection.select([colorSource.sceneItemId, 'this_is_an_invalid_id']);
@@ -212,9 +212,7 @@ test('Set parent', async t => {
   );
 });
 
-
 test('Scale', async t => {
-
   // create and select 2 400x400 color sources
   sceneBuilder.build(`
       Item1: color_source
@@ -229,60 +227,59 @@ test('Scale', async t => {
   const item2 = scene.getItem(getNodeId('Item2'));
 
   // set the item2 position into the bottom right corner of item 2
-  item2.setTransform({ position: { x: 400, y: 400 }});
+  item2.setTransform({ position: { x: 400, y: 400 } });
 
   // reduce the size of item2 by 2x
-  item2.setScale({ x: 0.5, y: 0.5 }, { x: 0, y: 0});
+  item2.setScale({ x: 0.5, y: 0.5 }, { x: 0, y: 0 });
 
   // check what everything is going well at this point
   t.deepEqual(item2.getModel().transform.position, {
     x: 400,
-    y: 400
+    y: 400,
   });
   t.deepEqual(item2.getModel().transform.scale, {
     x: 0.5,
-    y: 0.5
+    y: 0.5,
   });
 
   // reduce the size of selected items by 2x, use the NorthWest anchor
-  selectionService.scale({x: 0.5, y: 0.5}, { x: 0, y: 0});
+  selectionService.scale({ x: 0.5, y: 0.5 }, { x: 0, y: 0 });
   t.deepEqual(item1.getModel().transform.position, {
     x: 0,
-    y: 0
+    y: 0,
   });
   t.deepEqual(item1.getModel().transform.scale, {
     x: 0.5,
-    y: 0.5
+    y: 0.5,
   });
   t.deepEqual(item2.getModel().transform.position, {
     x: 200,
-    y: 200
+    y: 200,
   });
   t.deepEqual(item2.getModel().transform.scale, {
     x: 0.25,
-    y: 0.25
+    y: 0.25,
   });
 
   // reduce the size of selected items by 2x, use the East anchor
   // scale only X coordinate
-  selectionService.scale({x: 0.5, y: 1}, { x: 1, y: 0.5});
+  selectionService.scale({ x: 0.5, y: 1 }, { x: 1, y: 0.5 });
   t.deepEqual(item1.getModel().transform.position, {
     x: 150,
-    y: 0
+    y: 0,
   });
   t.deepEqual(item1.getModel().transform.scale, {
     x: 0.25,
-    y: 0.5
+    y: 0.5,
   });
   t.deepEqual(item2.getModel().transform.position, {
     x: 250,
-    y: 200
+    y: 200,
   });
   t.deepEqual(item2.getModel().transform.scale, {
     x: 0.125,
-    y: 0.25
+    y: 0.25,
   });
-
 });
 
 test('isSceneFolder', async t => {

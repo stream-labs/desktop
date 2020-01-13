@@ -9,7 +9,7 @@ test('Creating, fetching and removing sources', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const sourcesService = client.getResource<SourcesService>('SourcesService');
-  const scene = scenesService.activeScene;
+  const scene = scenesService.views.activeScene;
 
   const colorSource1 = sourcesService.createSource('MyColorSource1', 'color_source');
   const colorItem2 = scene.createAndAddSource('MyColorSource2', 'color_source');
@@ -37,7 +37,6 @@ test('Source events', async t => {
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const sourcesService = client.getResource<SourcesService>('SourcesService');
 
-
   sourcesService.sourceAdded.subscribe(() => void 0);
   sourcesService.sourceRemoved.subscribe(() => void 0);
   sourcesService.sourceUpdated.subscribe(() => void 0);
@@ -49,7 +48,10 @@ test('Source events', async t => {
   t.truthy(event.data.id); // id field is necessary for Streamdeck
 
   // check `sourceUpdated` event after `createAndAddSource` call
-  const item2 = scenesService.activeScene.createAndAddSource('audio2', 'wasapi_output_capture');
+  const item2 = scenesService.views.activeScene.createAndAddSource(
+    'audio2',
+    'wasapi_output_capture',
+  );
   event = await client.fetchNextEvent();
   t.is(event.data.name, 'audio2');
 

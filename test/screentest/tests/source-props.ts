@@ -32,7 +32,7 @@ afterAppStart(async t => {
   const sourcesService = client.getResource<ISourcesServiceApi>('SourcesService');
 
   types.forEach(type => {
-    scenesService.activeScene.createAndAddSource(type, type);
+    scenesService.views.activeScene.createAndAddSource(type, type);
   });
 
   showSourceProps = async (name: string) => {

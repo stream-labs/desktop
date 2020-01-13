@@ -58,7 +58,7 @@ export class SceneBuilder {
   }
 
   get scene(): Scene {
-    return this.scenesService.activeScene;
+    return this.scenesService.views.activeScene;
   }
 
   parse(sketch: string): ISceneBuilderNode[] {

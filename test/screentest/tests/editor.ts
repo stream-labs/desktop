@@ -16,7 +16,7 @@ test('Editor with sources', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const sourcesService = client.getResource<ISourcesServiceApi>('SourcesService');
-  const scene = scenesService.activeScene;
+  const scene = scenesService.views.activeScene;
 
   const colorSource1 = sourcesService.createSource('MyColorSource1', 'color_source');
   const colorItem2 = scene.createAndAddSource('MyColorSource2', 'color_source');
@@ -36,7 +36,7 @@ test('Editor with the big amount of sources and scenes', async t => {
   }
 
   while (sourcesCount--) {
-    scenesService.activeScene.createAndAddSource(
+    scenesService.views.activeScene.createAndAddSource(
       `My source with a long name ${sourcesCount}`,
       'color_source',
     );

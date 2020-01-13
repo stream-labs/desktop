@@ -11,7 +11,7 @@ useSpectron({ restartAppAfterEachTest: false });
 test('The default scene exists', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
-  const scenes = scenesService.getScenes();
+  const scenes = scenesService.views.scenes;
 
   t.true(scenes.length === 1);
 });
@@ -24,13 +24,13 @@ test('Creating, fetching and removing scenes', async t => {
 
   t.is(scene2.name, 'Scene2');
 
-  let scenes = scenesService.getScenes();
+  let scenes = scenesService.views.scenes;
   let scenesNames = scenes.map(scene => scene.name);
 
   t.deepEqual(scenesNames, ['Scene', 'Scene2']);
 
   scenesService.removeScene(scenes[1].id);
-  scenes = scenesService.getScenes();
+  scenes = scenesService.views.scenes;
   scenesNames = scenes.map(scene => scene.name);
 
   t.deepEqual(scenesNames, ['Scene']);
@@ -40,25 +40,25 @@ test('Switching between scenes', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
 
-  const scene = scenesService.getScenes().find(scene => scene.name == 'Scene');
+  const scene = scenesService.views.scenes.find(scene => scene.name === 'Scene');
   const scene2 = scenesService.createScene('Scene2');
 
-  t.is(scene.id, scenesService.activeSceneId);
+  t.is(scene.id, scenesService.views.activeSceneId);
 
   scenesService.makeSceneActive(scene2.id);
 
-  t.is(scene2.id, scenesService.activeSceneId);
+  t.is(scene2.id, scenesService.views.activeSceneId);
 
   scene2.remove();
 
-  t.is(scene.id, scenesService.activeSceneId);
+  t.is(scene.id, scenesService.views.activeSceneId);
 });
 
 test('Creating, fetching and removing scene-items', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
 
-  const scene = scenesService.getScenes().find(scene => scene.name == 'Scene');
+  const scene = scenesService.views.scenes.find(scene => scene.name == 'Scene');
   const image1 = scene.createAndAddSource('Image1', 'image_source');
   const image2 = scene.createAndAddSource('Image2', 'image_source');
   t.is(image1['name'], 'Image1');
@@ -148,7 +148,7 @@ test('Creating nested scenes', async t => {
 test('SceneItem.setSettings()', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
-  const scene = scenesService.activeScene;
+  const scene = scenesService.views.activeScene;
 
   const sceneItem = scene.createAndAddSource('MyColorSource', 'color_source');
 
@@ -181,7 +181,7 @@ test('SceneItem.setSettings()', async t => {
 test('SceneItem.resetTransform()', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
-  const scene = scenesService.activeScene;
+  const scene = scenesService.views.activeScene;
 
   const sceneItem = scene.createAndAddSource('MyColorSource', 'color_source');
 
@@ -208,7 +208,7 @@ test('SceneItem.addFile()', async t => {
   const client = await getClient();
   const sceneBuilder = new SceneBuilder(client);
   const scenesService = client.getResource<ScenesService>('ScenesService');
-  const scene = scenesService.activeScene;
+  const scene = scenesService.views.activeScene;
 
   scene.clear();
   scene.addFile(dataDir);

@@ -27,7 +27,7 @@ test('Media backup', async t => {
   const collection = await collectionsService.create({ name: 'Test collection' });
 
   try {
-    const scene = api.getResource<ScenesService>('ScenesService').activeScene;
+    const scene = api.getResource<ScenesService>('ScenesService').views.activeScene;
     const image1Path = path.resolve(tmpDir, 'moon.png');
     const image2Path = path.resolve(tmpDir, 'sun.png');
 

@@ -27,7 +27,7 @@ test('AddSource window with suggestions', async t => {
   const client = await getClient();
   const sourcesService = client.getResource<ISourcesServiceApi>('SourcesService');
   const scenesService = client.getResource<ScenesService>('ScenesService');
-  scenesService.activeScene.createAndAddSource('MySource', 'color_source');
+  scenesService.views.activeScene.createAndAddSource('MySource', 'color_source');
   sourcesService.showAddSource('color_source');
   await focusChild(t);
   t.pass();
