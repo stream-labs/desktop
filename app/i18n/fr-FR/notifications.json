@@ -5,8 +5,8 @@
   "Skipped frames detected:": "Images ignorées detectées:",
   "Detect skipped frames": "Surveiller les images ignorées",
   "Skipped frames threshold": "Seuil de détection des images ignorées",
-  "Detect lagged frames": "Surveiller les images retardées",
-  "Lagged frames threshold": "Seuil de détection des images retardées",
+  "Detect lagged frames": "Surveiller les images délayées",
+  "Lagged frames threshold": "Seuil de détection des images délayées",
   "Detect dropped frames": "Détecter les pertes d’images",
   "Dropped frames threshold": "Seuil de perte d’images",
   "Show Notifications": "Afficher les notifications",
@@ -16,5 +16,5 @@
   "Click to read your unread Notifications": "Cliquer pour lire les notifications non lues",
   "New Notifications": "Nouvelle notification",
   "Log": "Historique",
-  "Streamlabs OBS has updated! Click here to see what changed.": "Streamlabs OBS s'est mis à jour ! Cliquez ici pour voir ce qui à changé."
+  "Streamlabs OBS has updated! Click here to see what changed.": "Streamlabs OBS s'est mis à jour ! Cliquez ici pour voir ce qui a changé."
 }

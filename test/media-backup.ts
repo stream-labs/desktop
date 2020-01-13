@@ -1,4 +1,4 @@
-import { startApp, stopApp, test, useSpectron } from './helpers/spectron';
+import { startApp, stopApp, test, useSpectron, focusChild } from './helpers/spectron';
 
 import { getClient } from './helpers/api-client';
 import { ScenesService } from 'services/scenes';
@@ -9,10 +9,9 @@ import os = require('os');
 import { logIn } from './helpers/spectron/user';
 import { SceneCollectionsService } from 'services/api/external-api/scene-collections';
 
-useSpectron();
+useSpectron({ noSync: false });
 
-// TODO: Fix flaky test
-test.skip('Media backup', async t => {
+test('Media backup', async t => {
   // copy images to the temporary folder
   const imagesDir = path.resolve(__dirname, '..', '..', 'test', 'data', 'sources-files', 'images');
   const tmpDir = fs.mkdtempSync(os.tmpdir());
@@ -21,9 +20,10 @@ test.skip('Media backup', async t => {
   // media sync works only in log-in state
   await logIn(t);
 
-  // create an new empty collection
   const api = await getClient();
   const collectionsService = api.getResource<SceneCollectionsService>('SceneCollectionsService');
+
+  // create an new empty collection
   const collection = await collectionsService.create({ name: 'Test collection' });
 
   try {
@@ -44,6 +44,8 @@ test.skip('Media backup', async t => {
 
     // media-backup sync should be started
     // wait for the sync-succeed icon
+    await t.context.app.client.click('.metrics-icon');
+    await focusChild(t);
     await t.context.app.client.waitForVisible('.icon-cloud-backup-2');
 
     // restart app and delete local images

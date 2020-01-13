@@ -7,7 +7,7 @@
     :data-name="options.name"
   >
     <slider
-      :value="localValue"
+      :value="interval >= 1 ? Math.round(localValue) : localValue"
       @input="value => updateLocalValue(value)"
       :max="max"
       :min="min"
@@ -45,5 +45,9 @@
 .slider-input {
   width: 50px;
   margin-left: 16px;
+}
+
+.slider-container /deep/ .s-slider .vue-slider {
+  background-color: var(--border);
 }
 </style>

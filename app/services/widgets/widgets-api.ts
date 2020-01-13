@@ -14,7 +14,7 @@ export interface ISerializableWidget {
   scaleY: number;
 }
 
-type TUrlGenerator = (host: string, token: string, platform: TPlatform) => string;
+type TUrlGenerator = (host: string, token: string) => string;
 
 export interface IWidgetTester {
   name: string;

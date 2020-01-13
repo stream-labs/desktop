@@ -3,7 +3,8 @@ import { StatefulService } from 'services/core/stateful-service';
 import fs from 'fs';
 import path from 'path';
 import { ScenesService } from 'services/scenes';
-import { SourcesService } from 'services/sources';
+import { SourcesService, TPropertiesManager } from 'services/sources';
+import { WidgetsService } from 'services/widgets';
 import { TSourceType } from 'services/sources/sources-api';
 import { SourceFiltersService, TSourceFilterType } from 'services/source-filters';
 import { TransitionsService, ETransitionType } from 'services/transitions';
@@ -15,6 +16,7 @@ import { SettingsService } from 'services/settings';
 import { AppService } from 'services/app';
 import { RunInLoadingMode } from 'services/app/app-decorators';
 import defaultTo from 'lodash/defaultTo';
+import { $t } from 'services/i18n';
 
 interface Source {
   name?: string;
@@ -50,6 +52,7 @@ interface IOBSConfigSource {
   settings: {
     shutdown?: boolean;
     items?: IOBSConfigSceneItem[];
+    url?: string;
   };
   channel?: number;
   muted: boolean;
@@ -76,6 +79,7 @@ interface IOBSConfigJSON {
 export class ObsImporterService extends StatefulService<{ progress: number; total: number }> {
   @Inject() scenesService: ScenesService;
   @Inject() sourcesService: SourcesService;
+  @Inject() widgetsService: WidgetsService;
   @Inject('SourceFiltersService') filtersService: SourceFiltersService;
   @Inject() transitionsService: TransitionsService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
@@ -182,8 +186,16 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
 
         if (isSourceAvailable) {
           if (sourceJSON.id !== 'scene') {
+            let propertiesManager: TPropertiesManager = 'default';
+            let propertiesManagerSettings: Dictionary<any> = {};
+
             if (sourceJSON.id === 'browser_source') {
               sourceJSON.settings.shutdown = true;
+              const widgetType = this.widgetsService.getWidgetTypeByUrl(sourceJSON.settings.url);
+              if (widgetType !== -1) {
+                propertiesManager = 'widget';
+                propertiesManagerSettings = { widgetType };
+              }
             }
 
             // Check "Shutdown source when not visible" by default for browser sources
@@ -192,6 +204,8 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
               sourceJSON.id,
               sourceJSON.settings,
               {
+                propertiesManager,
+                propertiesManagerSettings,
                 channel: sourceJSON.channel !== 0 ? sourceJSON.channel : void 0,
               },
             );
@@ -338,7 +352,7 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
       this.transitionsService.deleteAllTransitions();
       this.transitionsService.createTransition(
         configJSON.transitions[0].id as ETransitionType,
-        'Global Transition',
+        $t('Global Transition'),
         { duration: configJSON.transition_duration },
       );
     }

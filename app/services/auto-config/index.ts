@@ -1,6 +1,9 @@
 import { Service } from '../core/service';
 import * as obs from '../../../obs-api';
-import { continentMap } from './continent-map';
+import { Inject } from 'services';
+import { StreamSettingsService } from 'services/settings/streaming';
+import { getPlatformService } from 'services/platforms';
+import { TwitchService } from 'services/platforms/twitch';
 
 export type TConfigEvent = 'starting_step' | 'progress' | 'stopping_step' | 'error' | 'done';
 
@@ -19,21 +22,29 @@ export interface IConfigProgress {
 type TConfigProgressCallback = (progress: IConfigProgress) => void;
 
 export class AutoConfigService extends Service {
-  start(cb: TConfigProgressCallback) {
-    this.fetchLocation(cb).then(continent => {
-      obs.NodeObs.InitializeAutoConfig(
-        (progress: IConfigProgress) => {
-          this.handleProgress(progress);
-          cb(progress);
-        },
-        {
-          continent,
-          service_name: 'Twitch',
-        },
-      );
+  @Inject() streamSettingsService: StreamSettingsService;
 
-      obs.NodeObs.StartBandwidthTest();
-    });
+  async start(cb: TConfigProgressCallback) {
+    const service = getPlatformService('twitch') as TwitchService;
+
+    try {
+      const key = await service.fetchStreamKey();
+      this.streamSettingsService.setSettings({ key, platform: 'twitch' });
+    } catch (e) {
+      console.error('Failure fetching stream key for auto config');
+      this.handleProgress({ event: 'error', description: 'error_fetching_stream_key' });
+      return;
+    }
+
+    obs.NodeObs.InitializeAutoConfig(
+      (progress: IConfigProgress) => {
+        this.handleProgress(progress);
+        cb(progress);
+      },
+      { continent: '', service_name: '' },
+    );
+
+    obs.NodeObs.StartBandwidthTest();
   }
 
   handleProgress(progress: IConfigProgress) {
@@ -60,46 +71,5 @@ export class AutoConfigService extends Service {
     if (progress.event === 'done') {
       obs.NodeObs.TerminateAutoConfig();
     }
-  }
-
-  // Uses GeoIP to detect the user's location to narrow
-  // down the number of servers we need to test.
-  fetchLocation(cb: TConfigProgressCallback) {
-    const request = new Request('http://freegeoip.net/json/');
-
-    cb({
-      event: 'starting_step',
-      description: 'detecting_location',
-      percentage: 0,
-    });
-
-    return fetch(request)
-      .then(response => {
-        cb({
-          event: 'stopping_step',
-          description: 'detecting_location',
-          percentage: 100,
-        });
-
-        return response.json();
-      })
-      .then(json => {
-        const continent = this.countryCodeToContinent(json.country_code);
-
-        cb({
-          continent,
-          event: 'stopping_step',
-          description: 'location_found',
-        });
-
-        return continent;
-      })
-      .catch(() => {
-        return 'Other';
-      });
-  }
-
-  countryCodeToContinent(code: string) {
-    return continentMap[code];
   }
 }

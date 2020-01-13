@@ -11,6 +11,7 @@ import electron from 'electron';
 import rimraf from 'rimraf';
 import without from 'lodash/without';
 import { AppService } from 'services/app';
+import { InitAfter } from '../core';
 
 interface IStreamlabelActiveSubscriptions {
   filename: string;
@@ -65,6 +66,7 @@ function isDonationTrain(train: ITrainInfo | IDonationTrainInfo): train is IDona
   return (train as IDonationTrainInfo).donationTrain;
 }
 
+@InitAfter('UserService')
 export class StreamlabelsService extends Service {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
@@ -122,8 +124,6 @@ export class StreamlabelsService extends Service {
 
   init() {
     this.ensureDirectory();
-    this.fetchInitialData();
-    this.fetchSettings();
     this.initSocketConnection();
     this.initTrainClockInterval();
 

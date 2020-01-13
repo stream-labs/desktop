@@ -112,7 +112,8 @@ export default class TimerInput extends BaseInput<number, ITimerMetadata> {
   beginHold(callback: Function, param: any) {
     callback(param);
     this.holdTimeout = window.setTimeout(() => {
-      // tslint:disable-next-line:ter-prefer-arrow-callback TODO
+      // function level scope is important for proper debounce functionality
+      // tslint:disable-next-line:ter-prefer-arrow-callback
       this.holdInterval = window.setInterval(function() {
         callback(param);
       }, 100);

@@ -23,7 +23,9 @@ import { throttle } from 'lodash-decorators';
 import * as Interfaces from './definitions';
 import { AppService } from 'services/app';
 import { propsToSettings } from 'util/obs';
+import { InitAfter } from '../core';
 
+@InitAfter('UserService')
 export class FacemasksService extends PersistentStatefulService<Interfaces.IFacemasksServiceState> {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
@@ -69,9 +71,6 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   init() {
     super.init();
     this.subscribeToSourceAdded();
-    if (this.userService.isLoggedIn) {
-      this.startup();
-    }
     this.userService.userLogin.subscribe(() => {
       this.startup();
     });

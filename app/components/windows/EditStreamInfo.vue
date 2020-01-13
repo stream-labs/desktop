@@ -1,44 +1,46 @@
 <template>
   <modal-layout :show-controls="false" :customControls="true">
     <div slot="content">
+      <h4 v-if="windowHeading">{{windowHeading}}</h4>
       <div v-if="infoLoading"><spinner/></div>
-
       <div v-if="infoError && !infoLoading" class="warning">
         {{ $t('There was an error fetching your channel information.  You can try') }}
-        <a class="description-link" @click="refreshStreamInfo">{{
+        <a class="description-link" @click="populateInfo">{{
           $t('fetching the information again')
         }}</a
         >, {{ $t('or you can') }}
-        <a class="description-link" @click="goLive">{{ $t('just go live.') }}</a>
+        <a class="description-link" @click="() => goLive(true)">{{ $t('just go live.') }}</a>
         {{ $t('If this error persists, you can try logging out and back in.') }}
       </div>
       <validated-form name="editStreamForm" ref="form" v-if="!infoLoading && !infoError">
         <div class="pages-warning" v-if="isFacebook && !hasPages">
-          {{ $t("It looks like you don't have any Pages. Head to ") }}
+          <i class="fab fa-facebook" />
+          {{ $t('You must create a Facebook gaming page to go live.') }}
           <a class="description-link" @click="openFBPageCreateLink">{{
-            $t('Facebook Page Creation')
+            $t('Create Page')
           }}</a>
-          {{ $t(' to create a page, and then try again.') }}
         </div>
         <h-form-group
           v-if="isFacebook && hasPages && !midStreamMode"
           :v-model="channelInfo.facebookPageId"
-          :metadata="{
-            type: 'list',
-            name: 'stream_page',
-            title: $t('Facebook Page'),
-            options: facebookService.state.facebookPages.options,
-          }"
+          :metadata="formMetadata.page"
         />
-        <h-form-group
-          v-model="channelInfo.title"
-          :metadata="formMetadata.title"
-        />
-        <h-form-group
-          v-if="isYoutube || isFacebook"
-          v-model="channelInfo.description"
-          :metadata="formMetadata.description"
-        />
+
+        <div v-if="isYoutube">
+          <YoutubeEditStreamInfo v-model="channelInfo" :canChangeBroadcast="!midStreamMode && !isSchedule"/>
+        </div>
+        <div v-else>
+          <h-form-group
+            v-model="channelInfo.title"
+            :metadata="formMetadata.title"
+          />
+          <h-form-group
+            v-if="isFacebook"
+            v-model="channelInfo.description"
+            :metadata="formMetadata.description"
+          />
+        </div>
+
         <h-form-group
           v-if="isTwitch || isMixer || isFacebook"
           :metadata="formMetadata.game"
@@ -90,9 +92,10 @@
           :streamTitle="channelInfo.title"
           :midStreamMode="midStreamMode"
           :updatingInfo="updatingInfo"
-          v-if="twitterIsEnabled"
+          v-if="twitterIsEnabled && !isSchedule"
           v-model="tweetModel"
         />
+
         <div class="update-warning" v-if="updateError">
           <div v-if="midStreamMode">
             {{ $t('Something went wrong while updating your stream info.  Please try again.') }}
@@ -103,13 +106,13 @@
                 'Something went wrong while updating your stream info. You can try again, or you can',
               )
             }}
-            <a @click="goLive">{{ $t('just go live') }}</a
+            <a @click="goLive(true)">{{ $t('just go live') }}</a
             >
           </div>
         </div>
       </validated-form>
     </div>
-    <div slot="controls">
+    <div slot="controls" class="controls">
       <button class="button button--default" :disabled="updatingInfo" @click="cancel">
         {{ isSchedule ? $t('Close') : $t('Cancel') }}
       </button>
@@ -129,13 +132,30 @@
 <style lang="less" scoped>
 @import '../../styles/index';
 
-.pages-warning,
 .update-warning {
   .warning();
 }
 
+.pages-warning {
+  .radius();
+
+  height: 40px;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  background-color: var(--teal-semi);
+  align-items: center;
+  color: var(--teal);
+  margin-bottom: 16px;
+
+  a {
+    color: var(--teal);
+  }
+}
+
 .description-link {
   text-decoration: underline;
+  font-weight: 600;
 }
 
 .edit-stream-info-option-desc {

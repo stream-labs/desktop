@@ -175,7 +175,7 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
   }
 
   @mutation()
-  private SET_SYSTEM_PARAM(key: keyof IBrandDeviceState, value: string) {
+  private SET_SYSTEM_PARAM(key: keyof IMsSystemInfo, value: string) {
     this.state[key] = value;
   }
 

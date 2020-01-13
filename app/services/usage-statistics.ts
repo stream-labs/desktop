@@ -18,7 +18,7 @@ interface IUsageApiData {
   data: string;
 }
 
-type TAnalyticsEvent = 'TCP_API_REQUEST' | 'FacebookLogin'; // add more types if you need
+type TAnalyticsEvent = 'TCP_API_REQUEST' | 'FacebookLogin' | 'PlatformLogin'; // add more types if you need
 
 interface IAnalyticsEvent {
   product: string;
@@ -99,6 +99,11 @@ export class UsageStatisticsService extends Service {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
+    // Don't check logged in because login may not be verified at this point
+    if (this.userService.state.auth && this.userService.state.auth.primaryPlatform) {
+      metadata['platform'] = this.userService.state.auth.primaryPlatform;
+    }
+
     const bodyData: IUsageApiData = {
       event,
       slobs_user_id: this.userService.getLocalUserId(),
@@ -106,7 +111,7 @@ export class UsageStatisticsService extends Service {
       data: JSON.stringify(metadata),
     };
 
-    if (this.userService.isLoggedIn) {
+    if (this.userService.state.auth && this.userService.state.auth.apiToken) {
       headers = authorizedHeaders(this.userService.apiToken, headers);
     }
 

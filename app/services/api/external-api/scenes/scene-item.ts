@@ -13,6 +13,8 @@ export interface ISceneItemSettings {
   transform: ITransform;
   visible: boolean;
   locked: boolean;
+  streamVisible: boolean;
+  recordingVisible: boolean;
 }
 
 interface ICrop {
@@ -87,6 +89,8 @@ export class SceneItem extends SceneNode implements ISceneItemActions {
       transform: this.sceneItem.transform,
       visible: this.sceneItem.visible,
       locked: this.sceneItem.locked,
+      streamVisible: this.sceneItem.streamVisible,
+      recordingVisible: this.sceneItem.recordingVisible,
     };
   }
 

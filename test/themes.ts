@@ -4,10 +4,10 @@ import { sleep } from './helpers/sleep';
 import { FormMonkey } from './helpers/form-monkey';
 import { sceneExisting } from './helpers/spectron/scenes';
 
-useSpectron({ appArgs: '--nosync' });
+useSpectron();
 
-const OVERLAY_NAME = 'Talon Stream Package by VBI';
-const OVERLAY_SCENES = ['Starting Soon', 'Be Right Back', 'Stream Ending', 'Intermission', 'Main'];
+const OVERLAY_NAME = 'Portals';
+const OVERLAY_SCENES = ['Live Scene', 'Starting Soon', 'Be Right Back', 'Offline'];
 
 test('Installing a theme', async (t: any) => {
   const { app } = t.context;
@@ -31,7 +31,7 @@ test('Installing a theme', async (t: any) => {
 
   // wait for installation complete
   await focusMain(t);
-  await app.client.waitForExist('.studio-page', 60000);
+  await app.client.waitForExist('.editor-page', 60000);
 
   // Should've loaded the overlay as a new scene collection
   t.true(await app.client.isExisting(`span=${OVERLAY_NAME}`));
@@ -42,7 +42,7 @@ test('Installing a theme', async (t: any) => {
   }
 
   // Should've populated sources (this checks Starting Soon scene sources)
-  for (const source of ['Talon Promo (Delete Me)', 'Starting Soon']) {
+  for (const source of ['Starting']) {
     t.true(await app.client.isExisting(`span.item-title=${source}`), `Source ${source}`);
   }
 });

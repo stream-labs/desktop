@@ -46,6 +46,7 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
   };
 
   init() {
+    super.init();
     this.userService.userLogout.subscribe(() => this.RESET_TWITTER_STATUS());
   }
 

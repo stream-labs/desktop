@@ -1,4 +1,4 @@
-import TsxComponent from 'components/tsx-component';
+import TsxComponent, { createProps } from 'components/tsx-component';
 import { Component, Prop } from 'vue-property-decorator';
 import { OnboardingStep, ProgressBar } from 'streamlabs-beaker';
 import { Inject } from '../../../services/core/injector';
@@ -11,21 +11,21 @@ interface IConfigStepPresentation {
   percentage?: number;
 }
 
-@Component({})
-export default class Optimize extends TsxComponent<{
-  continue: () => void;
-  setProcessing: (bool: boolean) => void;
-}> {
+class OptimizeProps {
+  continue: () => void = () => {};
+  setProcessing: (bool: boolean) => void = () => {};
+}
+
+@Component({ props: createProps(OptimizeProps) })
+export default class Optimize extends TsxComponent<OptimizeProps> {
   @Inject() autoConfigService: AutoConfigService;
-  @Prop() continue: () => void;
-  @Prop() setProcessing: (bool: boolean) => void;
 
   stepInfo: IConfigStepPresentation = null;
   optimizing = false;
 
   optimize() {
     this.optimizing = true;
-    this.setProcessing(true);
+    this.props.setProcessing(true);
     this.autoConfigService.start(progress => {
       if (
         progress.event === 'starting_step' ||
@@ -42,10 +42,10 @@ export default class Optimize extends TsxComponent<{
           };
         }
       } else if (progress.event === 'done') {
-        this.setProcessing(false);
-        this.continue();
+        this.props.setProcessing(false);
+        this.props.continue();
       } else {
-        this.setProcessing(false);
+        this.props.setProcessing(false);
       }
     });
   }
@@ -85,7 +85,7 @@ export default class Optimize extends TsxComponent<{
     }[progress.description];
   }
 
-  render(h: Function) {
+  render() {
     return (
       <OnboardingStep>
         <template slot="title">

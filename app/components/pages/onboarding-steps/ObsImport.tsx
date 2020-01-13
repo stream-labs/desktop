@@ -1,7 +1,7 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { OnboardingStep } from 'streamlabs-beaker';
 import Multiselect from 'vue-multiselect';
-import TsxComponent from 'components/tsx-component';
+import TsxComponent, { createProps } from 'components/tsx-component';
 import { Inject } from 'services/core/injector';
 import { ObsImporterService } from 'services/obs-importer';
 import defer from 'lodash/defer';
@@ -10,15 +10,14 @@ import styles from './ObsImport.m.less';
 import KevinSvg from './KevinSvg';
 import ObsSvg from './ObsSvg';
 
-@Component({})
-export default class ObsImport extends TsxComponent<{
-  continue: (bool: boolean) => void;
-  setProcessing: Function;
-}> {
-  @Inject() obsImporterService: ObsImporterService;
+class ObsImportProps {
+  continue: (bool: boolean) => void = () => {};
+  setProcessing: (bool: boolean) => void = () => {};
+}
 
-  @Prop() continue: (bool: boolean) => void;
-  @Prop() setProcessing: (bool: boolean) => void;
+@Component({ props: createProps(ObsImportProps) })
+export default class ObsImport extends TsxComponent<ObsImportProps> {
+  @Inject() obsImporterService: ObsImporterService;
 
   importing = false;
   pathChosen = false;
@@ -35,20 +34,20 @@ export default class ObsImport extends TsxComponent<{
     if (this.profiles.length > 1 && !forceStart) return;
 
     this.importing = true;
-    this.setProcessing(true);
+    this.props.setProcessing(true);
     defer(async () => {
       try {
         await this.obsImporterService.load(this.selectedProfile);
         this.importing = false;
-        this.setProcessing(false);
-        this.continue(true);
+        this.props.setProcessing(false);
+        this.props.continue(true);
       } catch (e) {
         this.$toasted.show($t('Something went wrong.'), {
           position: 'bottom-center',
           className: 'toast-alert',
           duration: 3000,
         });
-        this.setProcessing(false);
+        this.props.setProcessing(false);
         this.importing = false;
       }
     });
@@ -58,28 +57,28 @@ export default class ObsImport extends TsxComponent<{
     return [
       {
         title: $t('Import from OBS'),
-        time: $t('< 1 min'),
+        time: `< 1 ${$t('min')}`,
         timeColor: '--blue',
         description: $t(
           'We import all of your settings, including scenes, output, configurations, and much more',
         ),
-        image: ObsSvg,
+        image: <ObsSvg />,
         onClick: () => this.startImport(),
       },
       {
         title: $t('Start Fresh'),
-        time: $t('~2 min'),
+        time: `~2 ${$t('min')}`,
         timeColor: '--teal',
         description: $t(
           'Start with a clean copy of Streamlabs OBS and configure your settings from scratch',
         ),
-        image: KevinSvg,
-        onClick: () => this.continue(false),
+        image: <KevinSvg />,
+        onClick: () => this.props.continue(false),
       },
     ];
   }
 
-  render(h: Function) {
+  render() {
     return (
       <OnboardingStep slot="2">
         <template slot="title">{$t('Welcome to Streamlabs OBS')}</template>
@@ -98,7 +97,7 @@ export default class ObsImport extends TsxComponent<{
                 </span>
                 <h2>{data.title}</h2>
                 <span>{data.description}</span>
-                {data.image(h)}
+                {data.image}
               </div>
             ))}
           </div>

@@ -17,7 +17,7 @@
   "Create Output Projector": "Создать проектор для вывода изображения",
   "Studio Mode": "Режим Студии",
   "Are you sure you want to remove %{sceneName}?": "Вы уверены что хотите удалить %{sceneName}?",
-  "Are you sure you want to remove these %{count} items?": "Are you sure you want to remove these %{count} items?",
+  "Are you sure you want to remove these %{count} items?": "Вы уверены, что хотите удалить эти %{count} элементов?",
   "Disable Performance Mode": "Отключить режим повышенной производительности",
   "Scene Collections": "Коллекции Сцен.",
   "The building blocks of your scene. Also contains widgets.": "Строительные блоки для вашей Сцены. Также содержит виджеты.",
@@ -30,11 +30,13 @@
   "It is recommended that you wait until this finishes before going live.": "Рекомендуется дождаться завершения текущего процесса, прежде чем начинать трансляцию.",
   "Go Live Anyway": "Все равно Начать Трансляцию",
   "Wait": "Подождите",
-  "Add a new Scene.": "Add a new Scene.",
-  "Remove Scene.": "Remove Scene.",
-  "Edit Scene Transitions.": "Edit Scene Transitions.",
-  "Rename Scene": "Rename Scene",
-  "Name Scene": "Name Scene",
+  "Add a new Scene.": "Добавить новую сцену.",
+  "Remove Scene.": "Удалить сцену.",
+  "Edit Scene Transitions.": "Редактировать переходы сцены.",
+  "Rename Scene": "Переименовать сцену",
+  "Name Scene": "Название сцены",
   "Rename Folder": "Переименовать папку",
-  "Name Folder": "Назвать папку"
+  "Name Folder": "Назвать папку",
+  "Switch Scenes": "Switch Scenes",
+  "Failed to load scene collection.  A new one will be created instead.": "Failed to load scene collection.  A new one will be created instead."
 }

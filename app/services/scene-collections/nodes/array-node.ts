@@ -59,7 +59,7 @@ export abstract class ArrayNode<TSchema, TContext, TItem> extends Node<
    */
   async beforeLoad(context: TContext): Promise<void> {}
 
-    /**
+  /**
    * Will be called after all items are loaded
    * @param context the context
    */

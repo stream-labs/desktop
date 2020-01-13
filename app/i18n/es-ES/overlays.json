@@ -1,8 +1,8 @@
 {
-  "Successfully saved %{filename}": "%{filename} guardado con éxito",
-  "Successfully loaded %{filename}.overlay": "%{filename}.overlay cargado con éxito",
-  "This is an experimental feature.  Use at your own risk.": "Esta es una característica experimental. Úsala bajo tu propio riesgo.",
-  "Export Overlay File": "Exportar Archivo de Overlay",
-  "Import Overlay File": "Importar Archivo de Overlay",
-  "Import Widget File in Current Scene": "Importar Widget en la Escena Actual"
+  "Successfully saved %{filename}": "%{filename} se ha guardado correctamente",
+  "Successfully loaded %{filename}.overlay": "%{filename}.overlay se ha cargado correctamente",
+  "This is an experimental feature.  Use at your own risk.": "Ésta es una característica experimental. Si la usa, es por su cuenta y riesgo.",
+  "Export Overlay File": "Exportar archivo de superposición",
+  "Import Overlay File": "Importar archivo de superposición",
+  "Import Widget File in Current Scene": "Importar archivo de widget en escena actual"
 }

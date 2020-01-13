@@ -59,12 +59,15 @@ interface IPaginatedResponse {
  */
 const requestTags = (cursor: string): Observable<IPaginatedResponse> =>
   fromPromise(
-    platformAuthorizedRequest(
-      `https://api.twitch.tv/helix/tags/streams?first=100&after=${cursor}`,
-    ).then(response => ({
-      cursor: response.pagination.cursor,
-      items: response.data,
-    })),
+    platformAuthorizedRequest<{
+      data: TTwitchTag[];
+      pagination: { cursor: string };
+    }>('twitch', `https://api.twitch.tv/helix/tags/streams?first=100&after=${cursor}`).then(
+      response => ({
+        cursor: response.pagination.cursor,
+        items: response.data,
+      }),
+    ),
   );
 
 /**
@@ -98,6 +101,7 @@ export const getAllTags = (): Promise<TTwitchTag[]> =>
  */
 export const getStreamTags = (broadcasterId: string): Promise<TTwitchTag[]> =>
   platformAuthorizedRequest<TTwitchTagsResponse>(
+    'twitch',
     `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${broadcasterId}`,
   ).then(res => res.data.filter(tag => !tag.is_auto));
 
@@ -165,7 +169,7 @@ export const prepareOptions = (
  * @see {ITwitchRequestHeaders}
  */
 export const updateTags = () => (tags: TTwitchTag[]) => (streamId: string) =>
-  platformAuthorizedRequest({
+  platformAuthorizedRequest('twitch', {
     url: `https://api.twitch.tv/helix/streams/tags?broadcaster_id=${streamId}`,
     method: 'PUT',
     body: JSON.stringify({ tag_ids: tags ? tags.map(tag => tag.tag_id) : [] }),

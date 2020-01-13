@@ -79,7 +79,7 @@ table.sp-table {
 
 .sp-base.sp-inputs {
   background: var(--dropdown-bg) !important;
-  border-color: var(--input-border) !important;
+  border-color: var(--button) !important;
 }
 
 .v-dropdown-container {
@@ -94,7 +94,7 @@ table.sp-table {
   .sp-search .sp-search-input {
     background: var(--input-bg);
     color: var(--paragraph);
-    border-color: var(--input-border);
+    border-color: var(--button);
   }
 
   .sp-search-input:focus {
@@ -104,7 +104,7 @@ table.sp-table {
   .sp-result-area,
   .sp-search {
     background-color: var(--dropdown-bg) !important;
-    border-color: var(--input-border) !important;
+    border-color: var(--button) !important;
   }
 
   tbody tr:nth-child(odd) {
@@ -113,7 +113,7 @@ table.sp-table {
 }
 
 .sp-selected-tag {
-  background-color: @teal !important;
+  background-color: var(--teal) !important;
   box-shadow: none !important;
   border: none !important;
   color: var(--white) !important;
@@ -197,17 +197,11 @@ table.sp-table {
   background-color: transparent !important;
 }
 
-.sp-result-area::-webkit-scrollbar {
-  // TODO: add scrollbars back, personally I think it looks nice without it
-  // but since list inputs have them, consider adding for consistency.
-  display: none;
-}
-
 // HACK: specificity hack for the hover color for options
 div.sp-result-area table.sp-table tbody tr.sp-over td {
   &:nth-child(1),
   &:nth-child(2) {
-    background-color: @teal !important;
+    background-color: var(--teal) !important;
   }
 }
 

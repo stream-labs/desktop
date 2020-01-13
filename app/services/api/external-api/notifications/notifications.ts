@@ -9,6 +9,14 @@ enum ENotificationType {
   SUCCESS = 'SUCCESS',
 }
 
+enum ENotificationSubType {
+  DEFAULT = 'DEFAULT',
+  DISCONNECTED = 'DISCONNECTED',
+  DROPPED = 'DROPPED',
+  LAGGED = 'LAGGED',
+  SKIPPED = 'SKIPPED',
+}
+
 interface INotificationOptions {
   message: string;
   code?: string;
@@ -17,6 +25,7 @@ interface INotificationOptions {
   action?: IJsonRpcRequest;
   playSound?: boolean;
   data?: any;
+  subType?: ENotificationSubType;
 
   /** The notification's life time in ms. Use -1 for infinity */
   lifeTime?: number;
@@ -32,6 +41,7 @@ export interface INotificationModel extends INotificationOptions {
   playSound: boolean;
   lifeTime: number;
   showTime: boolean;
+  subType: ENotificationSubType;
 }
 
 export interface INotificationsSettings {

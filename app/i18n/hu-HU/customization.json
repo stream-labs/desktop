@@ -3,5 +3,17 @@
   "Chat Text Size": "Chat Szövegmérete",
   "Chat Width": "Chat Szélessége",
   "Enable BetterTTV emotes for Twitch": "BetterTTV hangulatjelek engedélyezése a Twitchen",
-  "Enable FrankerFaceZ emotes for Twitch": "FrankerFaceZ hangulatjelek engedélyezése a Twitchen"
+  "Enable FrankerFaceZ emotes for Twitch": "FrankerFaceZ hangulatjelek engedélyezése a Twitchen",
+  "Stream Display": "Stream megjelenítése",
+  "Mini Feed": "Mini Feed",
+  "Audio Mixer": "Audio Mixer",
+  "Scene Selector": "Jelenetválasztó",
+  "Source Selector": "Forrásválasztó",
+  "Legacy Events": "Régi események",
+  "Streamlabs OBS UI Customization": "A Streamlabs OBS UI testreszabása",
+  "Customize the appearance of your Streamlabs OBS Studio tab": "Testreszabhatja a Streamlabs OBS Studio lap megjelenését",
+  "Save Changes": "Változtatások mentése",
+  "Elements": "Elements",
+  "Layouts": "Elrendezések",
+  "Drag and drop to edit.": "Drag and drop to edit."
 }

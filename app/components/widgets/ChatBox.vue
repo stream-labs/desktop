@@ -3,7 +3,7 @@
 
   <validated-form slot="visual-properties" name="visual-properties-form" key="visual-properties" v-if="loaded" @input="save()">
     <v-form-group title="Theme" type="list" v-model="wData.settings.theme" :metadata="metadata.theme"/>
-    <v-form-group title="Badges">
+    <v-form-group title="Badges" v-if="isTwitch">
       <bool-input v-model="wData.settings.show_moderator_icons" :metadata="metadata.show_moderator_icons"/>
       <bool-input v-model="wData.settings.show_subscriber_icons" :metadata="metadata.show_subscriber_icons"/>
       <bool-input v-model="wData.settings.show_turbo_icons" :metadata="metadata.show_turbo_icons"/>
@@ -11,7 +11,7 @@
       <bool-input v-model="wData.settings.show_bits_icons" :metadata="metadata.show_bits_icons"/>
       <bool-input v-model="wData.settings.show_coin_icons" :metadata="metadata.show_coin_icons"/>
     </v-form-group>
-    <v-form-group title="Extra Emotes">
+    <v-form-group title="Extra Emotes" v-if="isTwitch">
       <bool-input v-model="wData.settings.show_bttv_emotes" :metadata="metadata.show_bttv_emotes"/>
       <bool-input v-model="wData.settings.show_franker_emotes" :metadata="metadata.show_franker_emotes"/>
     </v-form-group>

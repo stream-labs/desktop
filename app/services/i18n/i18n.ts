@@ -14,6 +14,10 @@ interface II18nState {
   locale: string;
 }
 
+/**
+ * get localized string from dictionary
+ * throw an error if string is not in the dictionary
+ */
 export function $t(...args: any[]): string {
   const vueI18nInstance = I18nService.vueI18nInstance;
 
@@ -21,6 +25,16 @@ export function $t(...args: any[]): string {
   if (!vueI18nInstance) return args[0];
 
   return vueI18nInstance.t.call(I18nService.vueI18nInstance, ...args);
+}
+
+/**
+ * get localized string from dictionary if exists
+ * returns a keypath if localized version of string doesn't exist
+ */
+export function $translateIfExist(str: string): string {
+  const vueI18nInstance = I18nService.vueI18nInstance;
+  if (vueI18nInstance.te(str)) return $t(str);
+  return str;
 }
 
 /**
@@ -191,12 +205,18 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
       .filter(fileName => fileName.split('.')[1] === 'json');
 
     const dictionary: Dictionary<string> = {};
+
     for (const fileName of dictionaryFiles) {
-      Object.assign(
-        dictionary,
-        JSON.parse(this.fileManagerService.read(`${i18nPath}/${locale}/${fileName}`)),
-      );
+      const filePath = `${i18nPath}/${locale}/${fileName}`;
+      let json: Dictionary<string>;
+      try {
+        json = JSON.parse(this.fileManagerService.read(filePath));
+      } catch (e) {
+        throw new Error(`Invalid JSON in ${filePath}`);
+      }
+      Object.assign(dictionary, json);
     }
+
     this.loadedDictionaries[locale] = dictionary;
     return dictionary;
   }

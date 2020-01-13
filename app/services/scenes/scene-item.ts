@@ -51,6 +51,8 @@ export class SceneItem extends SceneItemNode {
   transform: ITransform;
   visible: boolean;
   locked: boolean;
+  streamVisible: boolean;
+  recordingVisible: boolean;
 
   sceneNodeType: TSceneNodeType = 'item';
 
@@ -117,6 +119,8 @@ export class SceneItem extends SceneItemNode {
       transform: this.transform,
       locked: this.locked,
       visible: this.visible,
+      streamVisible: this.streamVisible,
+      recordingVisible: this.recordingVisible,
     };
   }
 
@@ -169,6 +173,14 @@ export class SceneItem extends SceneItemNode {
       this.getObsSceneItem().visible = newSettings.visible;
     }
 
+    if (changed.streamVisible !== void 0) {
+      this.getObsSceneItem().streamVisible = newSettings.streamVisible;
+    }
+
+    if (changed.recordingVisible !== void 0) {
+      this.getObsSceneItem().recordingVisible = newSettings.recordingVisible;
+    }
+
     this.UPDATE({ sceneItemId: this.sceneItemId, ...changed });
 
     this.scenesService.itemUpdated.next(this.getModel());
@@ -206,6 +218,14 @@ export class SceneItem extends SceneItemNode {
     this.setSettings({ locked });
   }
 
+  setStreamVisible(streamVisible: boolean) {
+    this.setSettings({ streamVisible });
+  }
+
+  setRecordingVisible(recordingVisible: boolean) {
+    this.setSettings({ recordingVisible });
+  }
+
   loadItemAttributes(customSceneItem: ISceneItemInfo) {
     const visible = customSceneItem.visible;
     const position = { x: customSceneItem.x, y: customSceneItem.y };
@@ -221,6 +241,8 @@ export class SceneItem extends SceneItemNode {
         rotation: customSceneItem.rotation,
       },
       locked: !!customSceneItem.locked,
+      streamVisible: !!customSceneItem.streamVisible,
+      recordingVisible: !!customSceneItem.recordingVisible,
     });
   }
 

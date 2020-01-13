@@ -36,5 +36,7 @@
   "Rename Scene": "重新命名場景",
   "Name Scene": "為場景命名",
   "Rename Folder": "重新命名資料夾",
-  "Name Folder": "為資料夾命名"
+  "Name Folder": "為資料夾命名",
+  "Switch Scenes": "Switch Scenes",
+  "Failed to load scene collection.  A new one will be created instead.": "Failed to load scene collection.  A new one will be created instead."
 }

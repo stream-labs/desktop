@@ -94,11 +94,7 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
       suggestedName,
       'browser_source',
       {
-        url: widget.url(
-          this.hostsService.streamlabs,
-          this.userService.widgetToken,
-          this.userService.platform.type,
-        ),
+        url: widget.url(this.hostsService.streamlabs, this.userService.widgetToken),
         width: widget.width,
         height: widget.height,
       },
@@ -121,17 +117,17 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
     return item;
   }
 
+  getWidgetSources(): WidgetSource[] {
+    return Object.keys(this.state.widgetSources).map(id => this.getWidgetSource(id));
+  }
+
   getWidgetSource(sourceId: string): WidgetSource {
     return this.state.widgetSources[sourceId] ? new WidgetSource(sourceId) : null;
   }
 
   getWidgetUrl(type: WidgetType) {
     if (!this.userService.isLoggedIn) return;
-    return WidgetDefinitions[type].url(
-      this.hostsService.streamlabs,
-      this.userService.widgetToken,
-      this.userService.platform.type,
-    );
+    return WidgetDefinitions[type].url(this.hostsService.streamlabs, this.userService.widgetToken);
   }
 
   getWidgetComponent(type: WidgetType): string {
@@ -212,6 +208,24 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
         }
       });
     });
+  }
+
+  /**
+   * Detects widget type by URL
+   * Used for converting browser_source to streamlabs widgets when importing OBS scene collection
+   * returns -1 if it's no type detected
+   */
+  getWidgetTypeByUrl(url: string): WidgetType {
+    const type = Number(
+      Object.keys(WidgetDefinitions).find(WidgetType => {
+        let regExpStr = WidgetDefinitions[WidgetType].url(this.hostsService.streamlabs, '')
+          .split('?')[0]
+          .replace(/\//g, '\\/');
+        regExpStr = `${regExpStr}([A-z0-9]+)?(\\?token=[A-z0-9]+)?$`; // allow only 'token' get param
+        return new RegExp(regExpStr).test(url);
+      }),
+    );
+    return isNaN(type) ? -1 : type;
   }
 
   private register(sourceId: string) {
