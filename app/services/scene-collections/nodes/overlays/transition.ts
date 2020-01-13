@@ -4,6 +4,7 @@ import { Inject } from 'services/core/injector';
 import uniqueId from 'lodash/uniqueId';
 import path from 'path';
 import fs from 'fs';
+import { $t } from 'services/i18n';
 
 interface ISchema {
   type: ETransitionType;
@@ -59,7 +60,7 @@ export class TransitionNode extends Node<ISchema, IContext> {
       this.data.settings.path = path.join(context.assetsPath, this.data.settings.path);
     }
 
-    this.transitionsService.createTransition(this.data.type, 'Global Transition', {
+    this.transitionsService.createTransition(this.data.type, $t('Global Transition'), {
       settings: this.data.settings,
       duration: this.data.duration,
     });

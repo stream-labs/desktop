@@ -40,7 +40,7 @@ export default class NameScene extends Vue {
     } else if (this.options.itemsToGroup) {
       name = `${this.scenesService.activeScene.name} Group`;
     } else {
-      name = 'New Scene';
+      name = $t('New Scene');
     }
     if (!this.options.rename) this.name = this.sourcesService.suggestName(name);
   }

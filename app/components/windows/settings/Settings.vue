@@ -58,7 +58,7 @@
       <experimental-settings v-if="page === 'Experimental'" />
       <remote-control-settings v-if="page === 'Remote Control'" />
       <game-overlay-settings v-if="page === 'Game Overlay'" />
-      <facemask-settings v-if="page === 'Facemasks'" />
+      <facemask-settings v-if="page === 'Face Masks'" />
       <GenericFormGroups
         v-if="!['Hotkeys', 'Stream', 'API', 'Overlays', 'Notifications', 'Appearance', 'Experimental', 'Remote Control'].includes(page)"
         :key="page"

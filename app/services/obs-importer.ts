@@ -16,7 +16,7 @@ import { SettingsService } from 'services/settings';
 import { AppService } from 'services/app';
 import { RunInLoadingMode } from 'services/app/app-decorators';
 import defaultTo from 'lodash/defaultTo';
-import WidgetProperties from '../components/custom-source-properties/WidgetProperties.vue';
+import { $t } from 'services/i18n';
 
 interface Source {
   name?: string;
@@ -352,7 +352,7 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
       this.transitionsService.deleteAllTransitions();
       this.transitionsService.createTransition(
         configJSON.transitions[0].id as ETransitionType,
-        'Global Transition',
+        $t('Global Transition'),
         { duration: configJSON.transition_duration },
       );
     }
