@@ -64,7 +64,12 @@ export default class BrowserView extends TsxComponent<BrowserViewProps> {
     electron.remote.getCurrentWindow().addBrowserView(this.browserView);
 
     try {
-      await this.browserView.webContents.loadURL(this.props.src);
+      await this.browserView.webContents.loadURL(this.props.src).catch(e => {
+        // These are generally from redirects. We don't really want to fail here.
+        if (!e.message.match(/\(\-3\) loading/)) {
+          throw e;
+        }
+      });
     } catch (e) {
       // ignore the ERR_ABORTED exception
       // that happens when the window has been closed before BrowserView accomplished the request
