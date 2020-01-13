@@ -63,7 +63,7 @@ export class Display {
 
     const electronWindow = remote.BrowserWindow.fromId(this.electronWindowId);
 
-    this.videoService.createOBSDisplay(
+    this.videoService.actions.createOBSDisplay(
       this.electronWindowId,
       name,
       this.renderingMode,
@@ -144,7 +144,7 @@ export class Display {
   move(x: number, y: number) {
     this.currentPosition.x = x;
     this.currentPosition.y = y;
-    this.videoService.moveOBSDisplay(this.name, x, y);
+    this.videoService.actions.moveOBSDisplay(this.name, x, y);
   }
 
   resize(width: number, height: number) {
@@ -159,7 +159,7 @@ export class Display {
     if (this.trackingInterval) clearInterval(this.trackingInterval);
     if (this.selectionSubscription) this.selectionSubscription.unsubscribe();
     if (!this.displayDestroyed) {
-      this.videoService.destroyOBSDisplay(this.name);
+      this.videoService.actions.destroyOBSDisplay(this.name);
       this.displayDestroyed = true;
     }
   }
