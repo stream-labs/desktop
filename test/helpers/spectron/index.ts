@@ -263,7 +263,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     const filePath = path.join(cacheDir, 'slobs-client', 'log.log');
     if (!fs.existsSync(filePath)) return;
     const logs = fs.readFileSync(filePath).toString();
-    console.log(logs);
     const errors = logs
       .substr(logFileLastReadingPos)
       .split('\n')
