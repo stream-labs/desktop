@@ -228,7 +228,6 @@ export class InternalApiClient {
 
     ipcRenderer.on('services-response-async', (e, response: IJsonRpcResponse<any>) => {
       if (response.error) {
-        console.log('GOT ERROR FROM WORKER: ', response);
         this.actionResponses[response.id][1](response.error);
         return;
       }
