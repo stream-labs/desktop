@@ -1,6 +1,6 @@
 {
   "Add %{filterName}": "Lägg till %{filterName}",
-  "Center ${sourceName}": "Centrera ${sourceName}",
+  "Center %{sourceName}": "Center %{sourceName}",
   "Paste %{nodeName}": "Klistra in %{nodeName}",
   "Create a new connection": "Skapa en ny anslutning",
   "Create %{sourceName}": "Skapa %{sourceName}",
