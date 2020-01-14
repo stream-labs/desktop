@@ -16,7 +16,6 @@ import { IListOption } from '../../components/shared/inputs';
 import { $t } from 'services/i18n';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { Subject } from 'rxjs';
-import { promises } from 'dns';
 
 interface IFacebookPage {
   access_token: string;
