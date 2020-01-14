@@ -33,9 +33,9 @@
     }
   },
   "plugins": {
-    "tslint": {
+    "eslint": {
       "enabled": true,
-      "config": "tslint.json",
+      "config": ".eslintrc.js",
       "checks": {
         "prettier": {
           "enabled": false
