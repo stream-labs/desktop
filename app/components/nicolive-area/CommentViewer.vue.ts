@@ -32,6 +32,7 @@ export default class CommentViewer extends Vue {
 
   isLocalFilterOpened = false;
   pinnedComment: ChatMessage = null;
+  isLatestVisible = true;
 
   get items() {
     return this.nicoliveCommentViewerService.items.filter(this.nicoliveCommentLocalFilterService.filter);
@@ -68,5 +69,18 @@ export default class CommentViewer extends Vue {
       },
     });
     menu.popup();
+  }
+
+  mounted() {
+    const sentinelEl = this.$refs.sentinel as Element;
+    const ioCallback: IntersectionObserverCallback = (entries) => {
+      this.isLatestVisible = entries[0].isIntersecting;
+    };
+    const ioOptions = {
+      rootMargin: '0px',
+      threshold: 1.0,
+    };
+    const io = new IntersectionObserver(ioCallback, ioOptions);
+    io.observe(sentinelEl);
   }
 }

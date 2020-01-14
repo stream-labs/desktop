@@ -12,6 +12,7 @@
           <div class="comment-body">{{ item.chat.content }}</div>
           <div class="comment-misc" @click.stop="showCommentMenu(item)">…</div>
         </div>
+        <div class="sentinel" ref="sentinel"></div>
       </div>
       <div class="pinned" v-if="Boolean(pinnedComment)">
         <div class="comment-body">
@@ -19,8 +20,9 @@
         </div>
         <div class="close"><i class="icon-close icon-btn" @click="pinnedComment = null"></i></div>
       </div>
+      <div class="scroll-to-latest" v-if="!isLatestVisible">↓</div>
     </div>
-    <comment-form />
+    <comment-form class="comment-form" />
     <comment-filter class="overlay" @close="isFilterOpened = false" v-if="isFilterOpened"/>
     <comment-local-filter class="overlay" @close="isLocalFilterOpened = false" v-if="isLocalFilterOpened" />
   </div>
@@ -58,6 +60,7 @@
 }
 
 .list {
+  flex-grow: 1;
   overflow-y: scroll;
 }
 
@@ -90,6 +93,11 @@
   }
 }
 
+.sentinel {
+  height: 1px;
+  margin-top: -1px;
+}
+
 .pinned {
   position: absolute;
   top: 0;
@@ -118,6 +126,25 @@
       margin: 0;
     }
   }
+}
+
+.scroll-to-latest {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 10px auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 36px;
+  line-height: 36px;
+  text-align: center;
+  background-color: @nicolive-button;
+  color: @white;
+}
+
+.comment-form {
+  flex-shrink: 0;
 }
 
 .overlay {
