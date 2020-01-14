@@ -8,7 +8,6 @@ import { WindowsService } from './windows';
 import { ScalableRectangle } from '../util/ScalableRectangle';
 import { Subscription } from 'rxjs';
 import { SelectionService } from 'services/selection';
-import electronLog from 'electron-log';
 
 const { remote } = electron;
 
@@ -261,14 +260,12 @@ export class VideoService extends Service {
     const electronWindow = remote.BrowserWindow.fromId(electronWindowId);
 
     if (sourceId) {
-      electronLog.log('OBS_content_createSourcePreviewDisplay', name);
       obs.NodeObs.OBS_content_createSourcePreviewDisplay(
         electronWindow.getNativeWindowHandle(),
         sourceId,
         name,
       );
     } else {
-      electronLog.log('OBS_content_createDisplay', name);
       obs.NodeObs.OBS_content_createDisplay(
         electronWindow.getNativeWindowHandle(),
         name,
@@ -286,7 +283,6 @@ export class VideoService extends Service {
   }
 
   moveOBSDisplay(name: string, x: number, y: number) {
-    electronLog.log('OBS_content_moveDisplay', name, x, y);
     obs.NodeObs.OBS_content_moveDisplay(name, x, y);
   }
 
@@ -295,17 +291,14 @@ export class VideoService extends Service {
   }
 
   destroyOBSDisplay(name: string) {
-    electronLog.log('OBS_content_destroyDisplay', name);
     obs.NodeObs.OBS_content_destroyDisplay(name);
   }
 
   getOBSDisplayPreviewOffset(name: string): IVec2 {
-    electronLog.log('OBS_content_getDisplayPreviewOffset', name);
     return obs.NodeObs.OBS_content_getDisplayPreviewOffset(name);
   }
 
   getOBSDisplayPreviewSize(name: string): { width: number; height: number } {
-    electronLog.log('OBS_content_getDisplayPreviewSize', name);
     return obs.NodeObs.OBS_content_getDisplayPreviewSize(name);
   }
 
