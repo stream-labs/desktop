@@ -1,17 +1,20 @@
 <template>
   <div class="container">
     <div class="header">
-      <i class="icon-settings icon-btn"></i>
-      <i class="icon-settings icon-btn"></i>
+      <i class="icon-settings icon-btn" @click="isFilterOpened = true"></i>
+      <i class="icon-settings icon-btn" @click="isLocalFilterOpened = true"></i>
     </div>
-    <div class="viewer">
+    <div class="content">
       <div class="row" v-for="(item, index) of items" :key="index">
+        <!-- TODO: 種別判定と出し分け -->
         <div class="comment-number">{{ item.chat.no }}</div>
         <div class="comment-body">{{ item.chat.content }}</div>
         <div class="comment-misc">…</div>
       </div>
     </div>
     <comment-form />
+    <comment-filter class="overlay" @close="isFilterOpened = false" v-if="isFilterOpened"/>
+    <comment-local-filter class="overlay" @close="isLocalFilterOpened = false" v-if="isLocalFilterOpened" />
   </div>
 </template>
 
@@ -39,7 +42,7 @@
   background-color: @bg-secondary;
 }
 
-.viewer {
+.content {
   flex-grow: 1;
 }
 
@@ -70,5 +73,11 @@
   width: 36px;
   flex-shrink: 0;
   text-align: center;
+}
+
+.overlay {
+  z-index: 2; // AreaSwitcherのheaderより大きく
+  position: absolute;
+  height: 100%;
 }
 </style>

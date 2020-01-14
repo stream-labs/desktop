@@ -28,6 +28,7 @@
   flex-shrink: 0;
   display: flex;
   justify-content: space-between;
+  flex-direction: row-reverse;
   align-items: center;
   width: 100%;
   height: 40px;
