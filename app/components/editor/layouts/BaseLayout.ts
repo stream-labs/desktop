@@ -60,10 +60,10 @@ export default class BaseLayout extends TsxComponent<LayoutProps> {
   }
 
   async mapVectors(slots: ILayoutSlotArray): Promise<IVec2Array> {
-    return await Promise.all(
+    return Promise.all(
       slots.map(async slot => {
-        if (Array.isArray(slot)) return await this.mapVectors(slot);
-        return await this.minsFromSlot(slot);
+        if (Array.isArray(slot)) return this.mapVectors(slot);
+        return this.minsFromSlot(slot);
       }),
     );
   }
