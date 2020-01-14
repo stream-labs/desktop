@@ -22,6 +22,8 @@ export enum ELayoutElement {
   Sources = 'Sources',
 }
 
+export interface IVec2Array extends Array<IVec2Array | IVec2> {}
+
 export type LayoutSlot = '1' | '2' | '3' | '4' | '5' | '6';
 
 interface ILayoutServiceState {
@@ -96,48 +98,36 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
     this.SET_SLOTS(slottedElements);
   }
 
-  calculateColumnTotal(slots: (LayoutSlot | LayoutSlot[])[]) {
+  calculateColumnTotal(slots: IVec2Array) {
     let totalWidth = 0;
     slots.forEach(slot => {
       if (Array.isArray(slot)) {
         totalWidth += this.calculateMinimum('x', slot);
-      } else {
-        const c = Object.keys(this.state.slottedElements).find(
-          comp => this.state.slottedElements[comp] === slot,
-        );
-        if (c) totalWidth += ELEMENT_MINS[c].x;
+      } else if (slot) {
+        totalWidth += slot.x;
       }
     });
 
     return totalWidth;
   }
 
-  calculateMinimum(orientation: 'x' | 'y', slots: (LayoutSlot | LayoutSlot[])[]) {
+  calculateMinimum(orientation: 'x' | 'y', slots: IVec2Array) {
     const aggregateMins: number[] = [];
-    const components: ELayoutElement[] = [];
+    const minimums = [];
     slots.forEach(slot => {
       if (Array.isArray(slot)) {
         aggregateMins.push(this.aggregateMinimum(orientation, slot));
       } else {
-        const c = Object.keys(this.state.slottedElements).find(
-          comp => this.state.slottedElements[comp] === slot,
-        );
-        if (c) components.push(ELayoutElement[c]);
+        minimums.push(slot[orientation]);
       }
     });
-    const minimums = components.map(comp => ELEMENT_MINS[comp][orientation]);
     if (!minimums.length) minimums.push(10);
     return Math.max(...minimums, ...aggregateMins);
   }
 
-  aggregateMinimum(orientation: 'x' | 'y', slots: LayoutSlot[]) {
-    const components = slots.map(slot =>
-      Object.keys(this.state.slottedElements).find(
-        comp => this.state.slottedElements[comp] === slot,
-      ),
-    );
-    const minimums = components.map(comp => {
-      if (comp) return ELEMENT_MINS[comp][orientation];
+  aggregateMinimum(orientation: 'x' | 'y', slots: IVec2Array) {
+    const minimums = slots.map(mins => {
+      if (mins) return mins[orientation];
       return 10;
     });
     if (!minimums.length) minimums.push(10);

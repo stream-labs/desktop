@@ -1,10 +1,16 @@
 import StudioEditor from 'components/StudioEditor.vue';
 import { Component } from 'vue-property-decorator';
-import TsxComponent from 'components/tsx-component';
+import BaseElement from './BaseElement';
 
 @Component({})
-export default class MiniFeed extends TsxComponent {
-  render() {
+export default class Display extends BaseElement {
+  mins = { x: 350, y: 250 };
+
+  get element() {
     return <StudioEditor />;
+  }
+
+  render() {
+    return this.renderElement();
   }
 }

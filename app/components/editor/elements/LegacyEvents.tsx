@@ -6,13 +6,15 @@ import { UserService } from 'services/user';
 import { RecentEventsService } from 'services/recent-events';
 import { MagicLinkService } from 'services/magic-link';
 import { Inject } from 'services/core';
-import TsxComponent from 'components/tsx-component';
+import BaseElement from './BaseElement';
 
 @Component({})
-export default class LegacyEvents extends TsxComponent {
+export default class LegacyEvents extends BaseElement {
   @Inject() userService: UserService;
   @Inject() recentEventsService: RecentEventsService;
   @Inject() magicLinkService: MagicLinkService;
+
+  mins = { x: 430, y: 150 };
 
   magicLinkDisabled = false;
 
@@ -50,7 +52,7 @@ export default class LegacyEvents extends TsxComponent {
     });
   }
 
-  render() {
+  get element() {
     return (
       <div>
         <BrowserView
@@ -61,5 +63,9 @@ export default class LegacyEvents extends TsxComponent {
         />
       </div>
     );
+  }
+
+  render() {
+    return this.renderElement();
   }
 }

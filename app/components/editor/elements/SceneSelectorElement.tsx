@@ -1,13 +1,13 @@
+import SceneSelector from './SceneSelector.vue';
 import { Component } from 'vue-property-decorator';
-import RecentEvents from 'components/RecentEvents';
 import BaseElement from './BaseElement';
 
 @Component({})
-export default class MiniFeed extends BaseElement {
-  mins = { x: 330, y: 150 };
+export default class SceneSelectorElement extends BaseElement {
+  mins = { x: 200, y: 150 };
 
   get element() {
-    return <RecentEvents isOverlay={false} />;
+    return <SceneSelector />;
   }
 
   render() {

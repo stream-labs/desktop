@@ -7,20 +7,13 @@ import styles from './Layouts.m.less';
 
 @Component({ props: createProps(LayoutProps) })
 export default class TwoPane extends BaseLayout {
-  mounted() {
+  async mounted() {
     this.mountResize();
-    this.$emit('totalWidth', ['2', '5', ['1', ['3', '4']]]);
+    this.$emit('totalWidth', await this.mapVectors(['2', '5', ['1', ['3', '4']]]));
+    this.setMins(['2'], ['1', ['3', '4']], ['5']);
   }
   destroyed() {
     this.destroyResize();
-  }
-
-  get mins() {
-    return {
-      bar1: this.props.calculateMin(['1', ['3', '4']]),
-      bar2: this.props.calculateMin(['5']),
-      rest: this.props.calculateMin(['2']),
-    };
   }
 
   get bar1() {
