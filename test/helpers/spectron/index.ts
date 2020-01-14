@@ -47,6 +47,12 @@ export async function focusWindow(t: any, regex: RegExp): Promise<boolean> {
   return false;
 }
 
+// Focuses the worker window
+// Should not usually be used
+export async function focusWorker(t: any) {
+  await focusWindow(t, /windowId=worker$/);
+}
+
 // Focuses the main window
 export async function focusMain(t: any) {
   await focusWindow(t, /windowId=main$/);
