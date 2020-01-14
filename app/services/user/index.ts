@@ -40,10 +40,16 @@ interface ISecondaryPlatformAuth {
   id: string;
 }
 
+export enum EAuthProcessState {
+  Idle = 'idle',
+  Busy = 'busy',
+}
+
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
   loginValidated: boolean;
   auth?: IUserAuth;
+  authProcessState: EAuthProcessState;
 }
 
 interface ILinkedPlatform {
@@ -137,6 +143,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @mutation()
   private VALIDATE_LOGIN(validated: boolean) {
     Vue.set(this.state, 'loginValidated', validated);
+  }
+
+  @mutation()
+  private SET_AUTH_STATE(state: EAuthProcessState) {
+    Vue.set(this.state, 'authProcessState', state);
   }
 
   /**
@@ -509,12 +520,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    */
   async startAuth(
     platform: TPlatform,
-    onWindowShow: () => void,
-    onLoginStart: () => void,
-    onLoginFinish: (result: EPlatformCallResult) => void,
     mode: 'internal' | 'external',
     merge = false,
-  ) {
+  ): Promise<EPlatformCallResult> {
     const service = getPlatformService(platform);
     const authUrl =
       merge && service.supports('account-merging') ? service.mergeUrl : service.authUrl;
@@ -522,6 +530,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (merge && !this.isLoggedIn) {
       throw new Error('Account merging can only be performed while logged in');
     }
+
+    this.SET_AUTH_STATE(EAuthProcessState.Busy);
+    const onWindowShow = () => this.SET_AUTH_STATE(EAuthProcessState.Idle);
 
     const auth =
       mode === 'internal'
@@ -535,7 +546,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         : await this.authModule.startExternalAuth(authUrl, onWindowShow, merge);
         /* eslint-enable */
 
-    onLoginStart();
+    this.SET_AUTH_STATE(EAuthProcessState.Busy);
 
     let result: EPlatformCallResult;
 
@@ -549,7 +560,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       result = EPlatformCallResult.Success;
     }
 
-    defer(() => onLoginFinish(result));
+    this.SET_AUTH_STATE(EAuthProcessState.Idle);
+    return result;
   }
 
   updatePlatformToken(platform: TPlatform, token: string) {

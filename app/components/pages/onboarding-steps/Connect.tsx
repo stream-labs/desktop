@@ -1,6 +1,6 @@
 import { Component } from 'vue-property-decorator';
 import electron from 'electron';
-import { UserService } from 'services/user';
+import { UserService, EAuthProcessState } from 'services/user';
 import { TPlatform, EPlatformCallResult } from 'services/platforms';
 import { Inject } from 'services/core/injector';
 import { OnboardingService } from 'services/onboarding';
@@ -22,45 +22,43 @@ export default class Connect extends TsxComponent<ConnectProps> {
   @Inject() onboardingService: OnboardingService;
   @Inject() usageStatisticsService: UsageStatisticsService;
 
-  loadingState = false;
   selectedExtraPlatform: TExtraPlatform | '' = '';
 
-  authPlatform(platform: TPlatform) {
-    this.loadingState = true;
+  get loading() {
+    return this.userService.state.authProcessState === EAuthProcessState.Busy;
+  }
+
+  async authPlatform(platform: TPlatform) {
     this.usageStatisticsService.recordAnalyticsEvent('PlatformLogin', platform);
-    this.userService.startAuth(
+    const result = await this.userService.startAuth(
       platform,
-      () => (this.loadingState = false),
-      () => (this.loadingState = true),
-      result => {
-        if (result === EPlatformCallResult.TwitchTwoFactor) {
-          this.loadingState = false;
-          electron.remote.dialog
-            .showMessageBox({
-              type: 'error',
-              message: $t(
-                'Twitch requires two factor authentication to be enabled on your account in order to stream to Twitch. ' +
-                  'Please enable two factor authentication and try again.',
-              ),
-              title: $t('Twitch Authentication Error'),
-              buttons: [$t('Enable Two Factor Authentication'), $t('Dismiss')],
-            })
-            .then(({ response }) => {
-              if (response === 0) {
-                electron.remote.shell.openExternal('https://twitch.tv/settings/security');
-              }
-            });
-        } else {
-          // Currently we do not have special handling for generic errors
-          this.props.continue();
-        }
-      },
       platform === 'youtube' ? 'external' : 'internal',
     );
+
+    if (result === EPlatformCallResult.TwitchTwoFactor) {
+      electron.remote.dialog
+        .showMessageBox({
+          type: 'error',
+          message: $t(
+            'Twitch requires two factor authentication to be enabled on your account in order to stream to Twitch. ' +
+              'Please enable two factor authentication and try again.',
+          ),
+          title: $t('Twitch Authentication Error'),
+          buttons: [$t('Enable Two Factor Authentication'), $t('Dismiss')],
+        })
+        .then(({ response }) => {
+          if (response === 0) {
+            electron.remote.shell.openExternal('https://twitch.tv/settings/security');
+          }
+        });
+    } else {
+      // Currently we do not have special handling for generic errors
+      this.props.continue();
+    }
   }
 
   iconForPlatform(platform: TPlatform) {
-    if (this.loadingState) return 'fas fa-spinner fa-spin';
+    if (this.loading) return 'fas fa-spinner fa-spin';
 
     return {
       twitch: 'fab fa-twitch',
@@ -90,7 +88,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
   }
 
   onSkip() {
-    if (this.loadingState) return;
+    if (this.loading) return;
     this.props.continue();
   }
 
@@ -123,7 +121,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
           {['twitch', 'youtube', 'mixer', 'facebook'].map((platform: TPlatform) => (
             <button
               class={`button button--${platform}`}
-              disabled={this.loadingState}
+              disabled={this.loading}
               onClick={() => this.authPlatform(platform)}
             >
               <i class={this.iconForPlatform(platform)} />{' '}
