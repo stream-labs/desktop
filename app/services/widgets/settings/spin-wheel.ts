@@ -18,8 +18,8 @@ export interface ISpinWheelSettings extends IWidgetSettings {
   rotationSpeed: number;
   slowRate: number;
   hideTimeout: number;
-  categories: { color: string; prize: string; key: string }[];
-  sections: { category: number; weight: number; key: string }[];
+  categories: Array<{ color: string; prize: string; key: string }>;
+  sections: Array<{ category: number; weight: number; key: string }>;
   font: string;
   fontColor: string;
   fontSize: number;
@@ -95,7 +95,7 @@ export class SpinWheelService extends WidgetSettingsService<ISpinWheelData> {
   protected patchAfterFetch(data: any): ISpinWheelData {
     data.settings.categories = JSON.parse(
       data.settings.categories,
-    ).map((category: { color: string; prize: string }[]) => ({ key: uuid(), ...category }));
+    ).map((category: Array<{ color: string; prize: string }>) => ({ key: uuid(), ...category }));
     data.settings.sections = JSON.parse(data.settings.sections).map((sect: any) => ({
       key: uuid(),
       ...sect,
