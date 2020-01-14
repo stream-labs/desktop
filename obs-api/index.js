@@ -14,7 +14,6 @@ for (const entry in obs) {
       {},
       {
         get(target, property) {
-          console.trace('Error');
           throw new Error(
             `Attempted to access OBS property ${property} outside of the worker process. OBS can only be accessed from the worker process.`,
           );
