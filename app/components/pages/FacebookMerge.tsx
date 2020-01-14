@@ -52,6 +52,7 @@ export default class FacebookMerge extends TsxComponent<FacebookMergeProps> {
           this.navigationService.navigate('Studio');
         }
       },
+      'internal',
       true,
     );
   }

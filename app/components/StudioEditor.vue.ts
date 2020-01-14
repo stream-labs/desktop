@@ -16,6 +16,7 @@ import { CustomizationService } from 'services/customization';
 import { v2 } from '../util/vec2';
 import { EditorCommandsService } from 'services/editor-commands';
 import { ERenderingMode } from '../../obs-api';
+import { TObsFormData } from './obs/inputs/ObsInput';
 
 interface IResizeRegion {
   name: string;
@@ -90,6 +91,10 @@ export default class StudioEditor extends TsxComponent {
 
   get performanceMode() {
     return this.customizationService.state.performanceMode;
+  }
+
+  enablePreview() {
+    this.customizationService.setSettings({ performanceMode: false });
   }
 
   get displayEnabled() {

@@ -165,7 +165,7 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, positionBuffer);
 
     // Vertex geometry for a unit square
-    // tslint:disable-next-line
+    // eslint-disable-next-line
     const positions = [
       0, 0,
       0, 1,
@@ -204,6 +204,7 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
 
   private setColorUniform(uniform: string, color: number[]) {
     const location = this.gl.getUniformLocation(this.program, uniform);
+    // eslint-disable-next-line
     this.gl.uniform3fv(location, color.map(c => c / 255));
   }
 

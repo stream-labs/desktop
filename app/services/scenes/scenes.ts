@@ -298,7 +298,10 @@ export class ScenesService extends StatefulService<IScenesState> {
   }
 
   get scenes(): Scene[] {
-    return uniqBy(this.state.displayOrder.map(id => this.getScene(id)), x => x.id);
+    return uniqBy(
+      this.state.displayOrder.map(id => this.getScene(id)),
+      x => x.id,
+    );
   }
 
   get activeSceneId(): string {

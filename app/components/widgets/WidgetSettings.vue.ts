@@ -57,7 +57,7 @@ export default class WidgetSettings<
 
   mounted() {
     this.dataUpdatedSubscr = this.service.dataUpdated.subscribe(newData => {
-      this.onDataUpdatedHandler(newData);
+      this.dataUpdatedHandler(newData);
     });
   }
 
@@ -69,7 +69,7 @@ export default class WidgetSettings<
     this.dataUpdatedSubscr.unsubscribe();
   }
 
-  private onDataUpdatedHandler(data: TData) {
+  private dataUpdatedHandler(data: TData) {
     this.lastSuccessfullySavedWData = data;
     if (!this.pendingRequests) {
       this.wData = cloneDeep(this.lastSuccessfullySavedWData);
@@ -85,14 +85,14 @@ export default class WidgetSettings<
       this.requestState = 'success';
     } catch (e) {
       const errorMessage = e && e.message ? e.message : $t('Save failed, something went wrong.');
-      this.onDataUpdatedHandler(this.lastSuccessfullySavedWData);
+      this.dataUpdatedHandler(this.lastSuccessfullySavedWData);
       this.requestState = 'fail';
-      this.onFailHandler(errorMessage);
+      this.failHandler(errorMessage);
     }
     this.pendingRequests--;
   }
 
-  onFailHandler(msg: string) {
+  failHandler(msg: string) {
     this.$toasted.show(msg, {
       position: 'bottom-center',
       className: 'toast-alert',

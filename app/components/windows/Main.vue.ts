@@ -16,6 +16,7 @@ import Chatbot from '../pages/Chatbot.vue';
 import PlatformAppStore from '../pages/PlatformAppStore.vue';
 import BrowseOverlays from 'components/pages/BrowseOverlays.vue';
 import Onboarding from '../pages/Onboarding';
+import LayoutEditor from '../pages/LayoutEditor';
 import TitleBar from '../TitleBar.vue';
 import { Inject } from '../../services/core/injector';
 import { CustomizationService } from 'services/customization';
@@ -28,7 +29,6 @@ import StudioFooter from '../StudioFooter.vue';
 import CustomLoader from '../CustomLoader';
 import PatchNotes from '../pages/PatchNotes.vue';
 import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
-import Help from '../pages/Help.vue';
 import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import FacebookMerge from 'components/pages/FacebookMerge';
@@ -49,9 +49,9 @@ import { getPlatformService } from 'services/platforms';
     Chatbot,
     PlatformAppMainPage,
     PlatformAppStore,
-    Help,
     ResizeBar,
     FacebookMerge,
+    LayoutEditor,
   },
 })
 export default class Main extends Vue {
@@ -74,6 +74,8 @@ export default class Main extends Vue {
     electron.remote.getCurrentWindow().show();
     this.handleResize();
   }
+
+  minEditorWidth = 500;
 
   get title() {
     return this.windowsService.state.main.title;
@@ -225,6 +227,9 @@ export default class Main extends Vue {
     clearTimeout(this.windowResizeTimeout);
 
     this.hasLiveDock = this.windowWidth >= 1070;
+    if (this.page === 'Studio') {
+      this.hasLiveDock = this.windowWidth >= this.minEditorWidth + 100;
+    }
     this.windowResizeTimeout = window.setTimeout(
       () => this.windowsService.updateStyleBlockers('main', false),
       200,
@@ -233,6 +238,10 @@ export default class Main extends Vue {
 
   handleResize() {
     this.compactView = this.$refs.mainMiddle.clientWidth < 1200;
+  }
+
+  handleEditorWidth(width: number) {
+    this.minEditorWidth = width;
   }
 
   onResizeStartHandler() {
@@ -253,9 +262,8 @@ export default class Main extends Vue {
 
   validateWidth(width: number): number {
     const appRect = this.$root.$el.getBoundingClientRect();
-    const minEditorWidth = 500;
     const minWidth = 290;
-    const maxWidth = Math.min(appRect.width - minEditorWidth, appRect.width / 2);
+    const maxWidth = Math.min(appRect.width - this.minEditorWidth, appRect.width / 2);
     let constrainedWidth = Math.max(minWidth, width);
     constrainedWidth = Math.min(maxWidth, width);
     return constrainedWidth;

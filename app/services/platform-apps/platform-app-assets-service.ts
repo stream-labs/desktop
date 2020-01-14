@@ -9,7 +9,7 @@ import { PersistentStatefulService } from '../core/persistent-stateful-service';
 import { ILoadedApp, PlatformAppsService } from './index';
 import { TransitionsService } from '../transitions';
 import { Inject } from 'services/core/injector';
-import { downloadFileAlt, getChecksum } from 'util/requests';
+import { downloadFile, getChecksum } from 'util/requests';
 import { InitAfter } from 'services/core/service-initialization-observer';
 import { AppService } from 'services/app';
 import url from 'url';
@@ -125,7 +125,7 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
    */
   async addPlatformAppAsset(appId: string, assetUrl: string) {
     const { originalUrl, filePath } = await this.getAssetDiskInfo(appId, assetUrl);
-    await downloadFileAlt(originalUrl, filePath);
+    await downloadFile(originalUrl, filePath);
 
     const checksum = await getChecksum(filePath);
 
@@ -171,7 +171,7 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
         const assetName = path.basename(asset.assetUrl);
         const tmpFile = path.join(tmpDir, assetName);
 
-        await downloadFileAlt(asset.assetUrl, tmpFile);
+        await downloadFile(asset.assetUrl, tmpFile);
 
         return {
           ...assets[asset.assetUrl],

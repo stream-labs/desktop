@@ -288,6 +288,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
 
   fetchRecentEvents(): Promise<{ data: Dictionary<IRecentEvent[]> }> {
     const typeString = this.getEventTypesString();
+    // eslint-disable-next-line
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/recentevents/${
       this.userService.widgetToken
     }?types=${typeString}`;
@@ -299,6 +300,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   async fetchConfig(): Promise<IRecentEventsConfig> {
+    // eslint-disable-next-line
     const url = `https://${
       this.hostsService.streamlabs
     }/api/v5/slobs/widget/config?widget=recent_events`;
@@ -309,6 +311,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   fetchMediaShareState() {
+    // eslint-disable-next-line
     const url = `https://${
       this.hostsService.streamlabs
     }/api/v5/slobs/widget/config?widget=media-sharing`;
@@ -767,6 +770,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
     );
+    // eslint-disable-next-line
     const url = `https://${
       this.hostsService.streamlabs
     }/api/v5/slobs/widget/recentevents/eventspanel`;

@@ -34,6 +34,7 @@ import { RecentEventsService } from 'services/recent-events';
 import Utils from 'services/utils';
 import { Subject } from 'rxjs';
 import { RestreamService } from 'services/restream';
+import { downloadFile } from '../../util/requests';
 
 interface IAppState {
   loading: boolean;
@@ -102,10 +103,18 @@ export class AppService extends StatefulService<IAppState> {
       });
     }
 
-    // We want to start this as early as possible so that any
-    // exceptions raised while loading the configuration are
-    // associated with the user in sentry.
-    await this.userService.validateLogin();
+    // perform several concurrent http requests
+    await Promise.all([
+      // We want to start this as early as possible so that any
+      // exceptions raised while loading the configuration are
+      // associated with the user in sentry.
+      this.userService.validateLogin(),
+
+      // this config should be downloaded before any game-capture source has been added to the scene
+      this.downloadAutoGameCaptureConfig(),
+    ]).catch(e => {
+      // probably the internet is disconnected
+    });
 
     // Second, we want to start the crash reporter service.  We do this
     // after the user service because we want crashes to be associated
@@ -233,6 +242,14 @@ export class AppService extends StatefulService<IAppState> {
     }
     if (error) throw error;
     return returningValue;
+  }
+
+  private async downloadAutoGameCaptureConfig() {
+    // download game-list for auto game capture
+    await downloadFile(
+      'https://slobs-cdn.streamlabs.com/configs/game_capture_list.lst',
+      `${this.appDataDirectory}/game_capture_list.lst`,
+    );
   }
 
   @mutation()

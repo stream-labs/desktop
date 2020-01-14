@@ -22,7 +22,7 @@
 </div>
 </template>
 
-<script lang="ts" src="./ListInput.vue.ts"></script>
+<script lang="ts" src="./NumberListInput.vue.ts"></script>
 
 <style lang="less" scoped>
 @import "../../../styles/index";

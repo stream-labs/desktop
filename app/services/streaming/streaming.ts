@@ -182,6 +182,13 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
             this.userService.platformType === 'twitch'
           ) {
             if (this.restreamService.shouldGoLiveWithRestream) {
+              if (!this.restreamService.allPlatformsStaged) {
+                // We don't have enough information to go live with multistream.
+                // We should gather the information in the edit stream info window.
+                this.showEditStreamInfo(this.restreamService.platforms, 0);
+                return;
+              }
+
               let ready: boolean;
 
               try {

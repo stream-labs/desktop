@@ -57,7 +57,7 @@
   }
 
   &:hover {
-    background: var(--hover);
+    background: var(--border);
 
     .editable-scene-collection--action {
       display: inline;

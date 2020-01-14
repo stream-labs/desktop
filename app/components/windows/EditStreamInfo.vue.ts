@@ -144,10 +144,10 @@ export default class EditStreamInfo extends Vue {
         required: true,
         disabled: this.updatingInfo,
         description: this.isFacebook
-          ? $t(
-              'Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.',
-            )
+          /* eslint-disable */
+          ? $t('Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.')
           : undefined,
+          /* eslint-enable */
       }),
       time: metadata.timer({
         title: $t('Scheduled Time'),
@@ -364,7 +364,12 @@ export default class EditStreamInfo extends Vue {
       this.streamInfoService.createGameAssociation(this.channelInfo.game);
       this.windowsService.closeChildWindow();
       // youtube needs additional actions after the stream has been started
-      if (this.isYoutube) (this.platformService as YoutubeService).showStreamStatusWindow();
+      if (
+        (this.windowQuery.platforms && this.windowQuery.platforms.includes('youtube')) ||
+        this.isYoutube
+      ) {
+        (getPlatformService('youtube') as YoutubeService).showStreamStatusWindow();
+      }
     } catch (e) {
       const message = this.platformService.getErrorDescription(e);
       this.$toasted.show(message, {

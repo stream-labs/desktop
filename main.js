@@ -478,7 +478,7 @@ if (!gotTheLock) {
     });
   });
 
-  /* The following 2 methods need to live in the main process
+  /* The following 3 methods need to live in the main process
      because events bound using the remote module are not
      executed synchronously and therefore default actions
      cannot be prevented. */
@@ -499,6 +499,21 @@ if (!gotTheLock) {
 
     contents.on('new-window', e => {
       e.preventDefault();
+    });
+  });
+
+  ipcMain.on('webContents-bindYTChat', (e, id) => {
+    const contents = webContents.fromId(id);
+
+    if (contents.isDestroyed()) return;
+
+    contents.on('will-navigate', (e, targetUrl) => {
+      const url = require('url');
+      const parsed = url.parse(targetUrl);
+
+      if (parsed.hostname === 'accounts.google.com') {
+        e.preventDefault();
+      }
     });
   });
 
