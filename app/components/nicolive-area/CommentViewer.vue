@@ -9,7 +9,7 @@
         <!-- TODO: 種別判定と出し分け -->
         <div class="comment-number">{{ item.chat.no }}</div>
         <div class="comment-body">{{ item.chat.content }}</div>
-        <div class="comment-misc">…</div>
+          <div class="comment-misc" @click.stop="showCommentMenu(item)">…</div>
       </div>
     </div>
     <comment-form />
