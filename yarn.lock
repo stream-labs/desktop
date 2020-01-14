@@ -7045,12 +7045,12 @@ locate-path@^3.0.0:
     p-locate "^3.0.0"
     path-exists "^3.0.0"
 
-lodash-decorators@4.3.1:
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/lodash-decorators/-/lodash-decorators-4.3.1.tgz#500d9b230a42df850a7bb289d822cdab57198584"
-  integrity sha1-UA2bIwpC34UKe7KJ2CLNq1cZhYQ=
+lodash-decorators@4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash-decorators/-/lodash-decorators-4.5.0.tgz#a4bb63dfbb512f0dd9409f7af452e4e2edcb80f4"
+  integrity sha512-isfVBBSzzXu7Z6abY/Bit5hCbM+gPhQx/DluTPAmzUPF3KRtvLLRNBgVFUxw6B8vwTMGyQFRVqbvQBli9hsXZA==
   dependencies:
-    tslib "^1.6.1"
+    tslib "^1.7.1"
 
 lodash.clone@^4.5.0:
   version "4.5.0"
@@ -10823,10 +10823,10 @@ ts-node@7.0.1:
     source-map-support "^0.5.6"
     yn "^2.0.0"
 
-tslib@^1.6.1:
-  version "1.7.1"
-  resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.7.1.tgz#bc8004164691923a79fe8378bbeb3da2017538ec"
-  integrity sha1-vIAEFkaRkjp5/oN4u+s9ogF1OOw=
+tslib@^1.7.1:
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.10.0.tgz#c3c19f95973fb0a62973fb09d90d961ee43e5c8a"
+  integrity sha512-qOebF53frne81cf0S9B41ByenJ3/IuH8yJKngAX35CmiZySA0khhkovshKK+jGCaMnVomla7gVlIcc3EvKPbTQ==
 
 tslib@^1.8.1, tslib@^1.9.0, tslib@^1.9.3:
   version "1.9.3"
