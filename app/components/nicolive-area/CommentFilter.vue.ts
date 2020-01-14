@@ -9,6 +9,7 @@ export default class CommentFilter extends Vue {
   private nicoliveCommentFilterService: NicoliveCommentFilterService;
 
   checkedSet: Set<number> = new Set();
+  checkCount = 0;
 
   hasChecked(id: number): boolean {
     return this.checkedSet.has(id);
@@ -19,6 +20,7 @@ export default class CommentFilter extends Vue {
     } else {
       this.checkedSet.delete(id);
     }
+    this.checkCount = this.checkedSet.size;
   }
 
   async reloadFilters() {
@@ -28,6 +30,7 @@ export default class CommentFilter extends Vue {
 
   clearChecked() {
     this.checkedSet.clear();
+    this.checkCount = 0;
   }
 
   async deleteFilters() {

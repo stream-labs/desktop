@@ -6,25 +6,24 @@
     </div>
     <div class="content">
       <div class="content-header">
-        <div class="choices">
-          <div @click="currentType = 'word'" class="choice" :class="{ active: currentType === 'word' }" >コメント</div>
-          <div @click="currentType = 'user_id'" class="choice" :class="{ active: currentType === 'user_id' }" >ユーザーID</div>
-          <div @click="currentType = 'command'" class="choice" :class="{ active: currentType === 'command' }" >コマンド</div>
-        </div>
+        <div @click="currentType = 'word'" class="choice" :class="{ active: currentType === 'word' }" >コメント</div>
+        <div @click="currentType = 'user_id'" class="choice" :class="{ active: currentType === 'user_id' }" >ユーザーID</div>
+        <div @click="currentType = 'command'" class="choice" :class="{ active: currentType === 'command' }" >コマンド</div>
         <div class="registrations">登録数 {{ count }}/500</div>
       </div>
-      <div class="action-area">
-        <div class="add-form">
-          <input type="text" v-model="newFilterValue" />
-          <i class="icon-plus icon-btn" @click="onAdd"></i>
-        </div>
-        <div class="delete-form">
-          <button class="button button--default" @click="clearChecked">キャンセル</button>
-          <button class="button button--action" @click="deleteFilters">削除</button>
-        </div>
+      <div class="action-area delete-form" v-if="checkCount > 0">
+        <span>{{ checkCount }}件選択しました</span>
+        <button class="button button--default" @click="clearChecked">キャンセル</button>
+        <button class="button button--action" @click="deleteFilters">削除</button>
       </div>
-      <div class="row" v-for="item of currentTypeFilters" :key="item.id">
-        <input type="checkbox" :checked="hasChecked(item.id)" @change="updateChecked(item.id, $event.target.checked)"> {{ item.body }}
+      <div class="action-area add-form" v-else>
+        <input type="text" v-model="newFilterValue" placeholder="NGコメントを入力" />
+        <i class="icon-plus icon-btn" @click="onAdd"></i>
+      </div>
+      <div class="list">
+        <label class="row" v-for="item of currentTypeFilters" :key="item.id">
+          <input type="checkbox" :checked="hasChecked(item.id)" @change="updateChecked(item.id, $event.target.checked)">{{ item.body }}
+        </label>
       </div>
     </div>
   </div>
@@ -66,6 +65,30 @@
 
 .content {
   flex-grow: 1;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.content-header {
+  flex-shrink: 0;
+
+  display: flex;
+
+  & > .registrations {
+    margin-left: auto;
+  }
+}
+
+.action-area {
+  flex-shrink: 0;
+
+  display: flex;
+}
+
+.list {
+  flex-grow: 1;
+  overflow-y: scroll;
 }
 
 .row {
