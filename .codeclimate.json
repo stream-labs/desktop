@@ -34,7 +34,7 @@
   },
   "plugins": {
     "eslint": {
-      "enabled": true,
+      "enabled": false,
       "config": ".eslintrc.js",
       "checks": {
         "prettier": {
