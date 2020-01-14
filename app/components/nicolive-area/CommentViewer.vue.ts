@@ -31,6 +31,7 @@ export default class CommentViewer extends Vue {
   isFilterOpened = false;
 
   isLocalFilterOpened = false;
+  pinnedComment: ChatMessage = null;
 
   get items() {
     return this.nicoliveCommentViewerService.items.filter(this.nicoliveCommentLocalFilterService.filter);
