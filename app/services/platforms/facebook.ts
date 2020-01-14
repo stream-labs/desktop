@@ -251,13 +251,14 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
       status: 'SCHEDULED_UNPUBLISHED',
     });
     try {
-      return await platformRequest('facebook', { url, body, method: 'POST' }, this.activeToken)
-
-    } catch(e) {
+      return await platformRequest('facebook', { url, body, method: 'POST' }, this.activeToken);
+    } catch (e) {
       if (e?.result?.error?.code === 100) {
-        throw new Error($t(
-          'Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.',
-        ));
+        throw new Error(
+          $t(
+            'Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.',
+          ),
+        );
       }
     }
   }
