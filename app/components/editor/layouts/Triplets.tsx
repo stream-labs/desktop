@@ -9,7 +9,14 @@ import styles from './Layouts.m.less';
 export default class Triplets extends BaseLayout {
   async mounted() {
     this.mountResize();
-    this.$emit('totalWidth', await this.mapVectors([['1', '4'], ['2', '5'], ['3', '6']]));
+    this.$emit(
+      'totalWidth',
+      await this.mapVectors([
+        ['1', '4'],
+        ['2', '5'],
+        ['3', '6'],
+      ]),
+    );
     this.setMins(['1', '4'], ['2', '5'], ['3', '6']);
   }
   destroyed() {

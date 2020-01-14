@@ -42,10 +42,9 @@ export default class BaseLayout extends TsxComponent<LayoutProps> {
     bar1Slots: ILayoutSlotArray,
     bar2Slots?: ILayoutSlotArray,
   ) {
-    console.log('firing setMins');
-    const rest = await this.calculateMin(restSlots);
-    const bar1 = await this.calculateMin(bar1Slots);
-    const bar2 = await this.calculateMin(bar2Slots);
+    const rest = await this.calculateMinimum(restSlots);
+    const bar1 = await this.calculateMinimum(bar1Slots);
+    const bar2 = await this.calculateMinimum(bar2Slots);
     this.mins = { rest, bar1, bar2 };
   }
 
@@ -54,11 +53,9 @@ export default class BaseLayout extends TsxComponent<LayoutProps> {
     return (this.$slots[slot][0].componentInstance as BaseElement).mins;
   }
 
-  async calculateMin(slots: ILayoutSlotArray) {
-    console.log('firing calculateMin', slots);
+  async calculateMinimum(slots: ILayoutSlotArray) {
     if (!slots) return;
     const mins = await this.mapVectors(slots);
-    console.log(mins);
     return this.props.calculateMin(mins);
   }
 

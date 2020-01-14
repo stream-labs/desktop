@@ -162,7 +162,7 @@ export default class Studio extends TsxComponent {
       <Layout
         resizeStartHandler={() => this.resizeStartHandler()}
         resizeStopHandler={() => this.resizeStopHandler()}
-        calculateMin={(slots: (IVec2)[]) => this.calculateMin(slots)}
+        calculateMin={(slots: IVec2[]) => this.calculateMin(slots)}
         calculateMax={(min: number) => this.calculateMax(min)}
         setBarResize={(bar: 'bar1' | 'bar2', size: number, mins?: IResizeMins) =>
           this.setBarResize(bar, size, mins)
