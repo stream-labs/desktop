@@ -40,7 +40,7 @@ interface ITWitchChannel {
 /**
  * Request headers that need to be sent to Twitch
  */
-export interface ITwitchRequestHeaders extends Dictionary<string> {
+export interface ITwitchRequestHeaders extends Dictionary<string | undefined> {
   Accept: 'application/vnd.twitchtv.v5+json';
   Authorization?: string;
   'Client-Id': string;
@@ -90,7 +90,7 @@ export class TwitchService extends Service implements IPlatformService {
   init() {
     // prepopulate data to make chat available after app start
     this.userService.userLogin.subscribe(_ => {
-      if (this.userService.platform.type === 'twitch') this.prepopulateInfo();
+      if (this.userService.platform?.type === 'twitch') this.prepopulateInfo();
     });
 
     // trigger `channelInfoChanged` event with new "chatUrl" based on the changed theme
@@ -113,9 +113,9 @@ export class TwitchService extends Service implements IPlatformService {
   // TODO: Refactor so this is reusable
   get userAuth(): { token: string; id: string } {
     return {
-      token: this.userService.state.auth.platforms.twitch.token,
-      id: this.userService.state.auth.platforms.twitch.id,
-    };
+      token: this.userService.state.auth?.platforms?.twitch?.token,
+      id: this.userService.state.auth?.platforms?.twitch?.id,
+    } as { token: string; id: string };
   }
 
   get oauthToken() {
@@ -176,7 +176,7 @@ export class TwitchService extends Service implements IPlatformService {
   fetchNewToken(): Promise<void> {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/twitch/refresh`;
-    const headers = authorizedHeaders(this.userService.apiToken);
+    const headers = authorizedHeaders(this.userService.apiToken as string);
     const request = new Request(url, { headers });
 
     return fetch(request)
@@ -207,8 +207,8 @@ export class TwitchService extends Service implements IPlatformService {
       this.getHasUpdateTagsPermission(),
     ]);
 
-    let tags: TTwitchTag[];
-    let availableTags: TTwitchTag[];
+    let tags: TTwitchTag[] = [];
+    let availableTags: TTwitchTag[] = [];
     if (hasUpdateTagsPermission) {
       [tags, availableTags] = await Promise.all([this.getStreamTags(), this.getAllTags()]);
     }
@@ -273,7 +273,7 @@ export class TwitchService extends Service implements IPlatformService {
   private getChatUrl(): string {
     const mode = this.customizationService.isDarkTheme ? 'night' : 'day';
     const nightMode = mode === 'day' ? 'popout' : 'darkpopout';
-    return `https://twitch.tv/popout/${this.userService.platform.username}/chat?${nightMode}`;
+    return `https://twitch.tv/popout/${this.userService.platform?.username}/chat?${nightMode}`;
   }
 
   async getAllTags(): Promise<TTwitchTag[]> {

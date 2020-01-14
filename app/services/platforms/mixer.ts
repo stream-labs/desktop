@@ -1,4 +1,4 @@
-import { StatefulService, mutation } from '../core/stateful-service';
+import { StatefulService, mutation } from 'services/core/stateful-service';
 import {
   IPlatformService,
   IGame,
@@ -71,15 +71,15 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
   }
 
   get oauthToken() {
-    return this.userService.platform.token;
+    return this.userService.platform?.token;
   }
 
   get mixerUsername() {
-    return this.userService.platform.username;
+    return this.userService.platform?.username;
   }
 
   get mixerId() {
-    return this.userService.platform.id;
+    return this.userService.platform?.id;
   }
 
   get channelId() {
@@ -89,7 +89,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
   init() {
     // prepopulate data to make chat available after app start
     this.userService.userLogin.subscribe(_ => {
-      if (this.userService.platform.type === 'mixer') this.prepopulateInfo();
+      if (this.userService.platform?.type === 'mixer') this.prepopulateInfo();
     });
 
     // trigger `channelInfoChanged` event with new "chatUrl" based on the changed theme
@@ -117,7 +117,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
   fetchNewToken(): Promise<void> {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/mixer/refresh`;
-    const headers = authorizedHeaders(this.userService.apiToken);
+    const headers = authorizedHeaders(this.userService.apiToken as string);
     const request = new Request(url, { headers });
 
     return fetch(request)
