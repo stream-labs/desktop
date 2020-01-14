@@ -49,7 +49,7 @@ test('Media backup', async t => {
     await t.context.app.client.waitForVisible('.icon-cloud-backup-2');
 
     // restart app and delete local images
-    await stopApp(false);
+    await stopApp(t, false);
     fse.removeSync(tmpDir);
     await startApp(t);
 

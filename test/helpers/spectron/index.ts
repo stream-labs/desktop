@@ -120,18 +120,18 @@ export interface ITestContext {
 export type TExecutionContext = ExecutionContext<ITestContext>;
 
 let startAppFn: (t: TExecutionContext) => Promise<any>;
-let stopAppFn: (clearCache?: boolean) => Promise<any>;
+let stopAppFn: (t: TExecutionContext, clearCache?: boolean) => Promise<any>;
 
 export async function startApp(t: TExecutionContext) {
   return startAppFn(t);
 }
 
-export async function stopApp(clearCache?: boolean) {
-  return stopAppFn(clearCache);
+export async function stopApp(t: TExecutionContext, clearCache?: boolean) {
+  return stopAppFn(t, clearCache);
 }
 
 export async function restartApp(t: TExecutionContext): Promise<Application> {
-  await stopAppFn(false);
+  await stopAppFn(t, false);
   return await startAppFn(t);
 }
 
@@ -245,9 +245,10 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     return app;
   };
 
-  stopAppFn = async function stopApp(clearCache = true) {
+  stopAppFn = async function stopApp(t: TExecutionContext, clearCache = true) {
     try {
-      await app.stop();
+      await focusMain(t);
+      t.context.app.browserWindow.close();
     } catch (e) {
       fail('Crash on shutdown');
       console.error(e);
@@ -318,7 +319,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       await releaseUserInPool();
       if (options.restartAppAfterEachTest) {
         client.disconnect();
-        await stopAppFn();
+        await stopAppFn(t);
       }
     } catch (e) {
       fail('Test finalization failed');
@@ -338,7 +339,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
   test.after.always(async t => {
     if (!appIsRunning) return;
-    await stopAppFn();
+    await stopAppFn(t);
     if (!testPassed) saveFailedTestsToFile([testName]);
   });
 
