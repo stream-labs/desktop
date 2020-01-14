@@ -1,8 +1,8 @@
 <template>
   <modal-layout :show-controls="false" :customControls="true">
     <div slot="content">
-      <h4 v-if="windowHeading">{{windowHeading}}</h4>
-      <div v-if="infoLoading"><spinner/></div>
+      <h4 v-if="windowHeading">{{ windowHeading }}</h4>
+      <div v-if="infoLoading"><spinner /></div>
       <div v-if="infoError && !infoLoading" class="warning">
         {{ $t('There was an error fetching your channel information.  You can try') }}
         <a class="description-link" @click="populateInfo">{{

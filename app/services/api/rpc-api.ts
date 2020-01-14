@@ -127,10 +127,12 @@ export abstract class RpcApi extends Service {
     // if both resource and method exist
     // execute request and record all mutations to the buffer
     if (fetchMutations) this.startBufferingMutations();
+    /* eslint-disable */
     const payload =
       typeof resource[methodName] === 'function'
         ? resource[methodName].apply(resource, args)
         : resource[methodName];
+    /* eslint-enable */
     const response = this.serializePayload(resource, payload, request);
     if (fetchMutations) response.mutations = this.stopBufferingMutations();
     return response;
