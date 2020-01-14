@@ -182,6 +182,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     super.init();
     this.MIGRATE_AUTH();
     this.VALIDATE_LOGIN(false);
+    this.SET_AUTH_STATE(EAuthProcessState.Idle);
   }
 
   mounted() {
