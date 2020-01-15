@@ -50,6 +50,14 @@ export class StreamingService implements ISerializable {
     return this.streamingService.streamingStatusChange;
   }
 
+  get recordingStatusChange(): Observable<ERecordingState> {
+    return this.streamingService.recordingStatusChange;
+  }
+
+  get replayBufferStatusChange(): Observable<EReplayBufferState> {
+    return this.streamingService.replayBufferStatusChange;
+  }
+
   /**
    * returns current streaming/recording status
    */
