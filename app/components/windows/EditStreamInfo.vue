@@ -9,7 +9,7 @@
           $t('[channelError]fetching the information again')
         }}</a
         >, {{ $t('[channelError]or you can') }}
-        <a class="description-link" @click="() => goLive(true)">{{ $t('[channelError]just go live.', {channelError: 'err'}) }}</a>
+        <a class="description-link" @click="() => goLive(true)">{{ $t('[channelError]just go live.') }}</a>
         {{ $t('If this error persists, you can try logging out and back in.') }}
       </div>
       <validated-form name="editStreamForm" ref="form" v-if="!infoLoading && !infoError">
