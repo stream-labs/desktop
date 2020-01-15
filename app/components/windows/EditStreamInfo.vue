@@ -4,12 +4,12 @@
       <h4 v-if="windowHeading">{{ windowHeading }}</h4>
       <div v-if="infoLoading"><spinner /></div>
       <div v-if="infoError && !infoLoading" class="warning">
-        {{ $t('There was an error fetching your channel information.  You can try') }}
+        {{ $t('[channelError]There was an error fetching your channel information. You can try') }}
         <a class="description-link" @click="populateInfo">{{
-          $t('fetching the information again')
+          $t('[channelError]fetching the information again')
         }}</a
-        >, {{ $t('or you can') }}
-        <a class="description-link" @click="() => goLive(true)">{{ $t('just go live.') }}</a>
+        >, {{ $t('[channelError]or you can') }}
+        <a class="description-link" @click="() => goLive(true)">{{ $t('[channelError]just go live.', {channelError: 'err'}) }}</a>
         {{ $t('If this error persists, you can try logging out and back in.') }}
       </div>
       <validated-form name="editStreamForm" ref="form" v-if="!infoLoading && !infoError">

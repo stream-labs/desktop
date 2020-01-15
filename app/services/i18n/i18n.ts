@@ -199,13 +199,14 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
   private async loadDictionary(locale: string): Promise<Dictionary<string>> {
     if (this.loadedDictionaries[locale]) return this.loadedDictionaries[locale];
 
+    // load the list of dictionary files
     const i18nPath = this.getI18nPath();
     const dictionaryFiles = fs
       .readdirSync(`${i18nPath}/${locale}`)
       .filter(fileName => fileName.split('.')[1] === 'json');
 
+    // collect strings from all json fies into a single object
     const dictionary: Dictionary<string> = {};
-
     for (const fileName of dictionaryFiles) {
       const filePath = `${i18nPath}/${locale}/${fileName}`;
       let json: Dictionary<string>;
@@ -214,7 +215,25 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
       } catch (e) {
         throw new Error(`Invalid JSON in ${filePath}`);
       }
-      Object.assign(dictionary, json);
+
+      const newStrings = {};
+      Object.keys(json).forEach(key => {
+        const str = json[key];
+        const originalString = locale === 'en-US' ? str : this.loadedDictionaries['en-US'][key];
+        newStrings[key] = str;
+
+        // the %{cut} markers indicates that we need to split this string to multiple ones
+        if (str.includes('%{cut}')) {
+          const originalParts = originalString.split(' %{cut} ');
+          const translatedParts = str.split(' %{cut} ');
+          originalParts.forEach((part, ind) => {
+            const translatedPart = translatedParts[ind];
+            newStrings[`[${key}]${part}`] = `${translatedPart}`;
+          });
+        }
+      });
+
+      Object.assign(dictionary, newStrings);
     }
 
     this.loadedDictionaries[locale] = dictionary;
