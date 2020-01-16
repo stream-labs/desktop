@@ -1,13 +1,15 @@
 import { IPatchNotes } from '.';
 
 export const notes: IPatchNotes = {
-  version: '0.17.0',
-  title: 'Streamlabs OBS Gets a New Look',
+  version: '0.19.0',
+  title: 'Redesigned YouTube and Stats',
   showChest: false,
   notes: [
-    'Added a new and improved design. Navigation that was previously on the top of the window has been made slimmer and moved to the side. Stay tuned for more aesthetic changes coming soon!',
-    'Added a new flow for first time streamers that helps you get set up even faster.',
-    'Added the "Interact" feature to the browser source, which allows you to click, scroll, and type inside a browser source.',
+    "We've redesigned the YouTube experience from the ground up to support live events and the live Studio",
+    "The stats window has been redesigned to give you a realtime picture of your stream's health, and allows you to pin individual stats to the bottom of the main window.",
+    'Day mode has been overhauled to provide better contrast and readability',
+    'Added the ability to completely hide the preview display in the editor',
+    'Settings search now additionally searches hotkeys',
     'Lots of bug and crash fixes',
   ],
 };

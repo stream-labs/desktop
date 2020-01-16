@@ -1,0 +1,19 @@
+{
+  "Youtube stream status": "Status da transmissão do YouTube",
+  "Waiting for YouTube to receive the video signal...": "Aguardando o YouTube receber o sinal de vídeo...",
+  "Testing your broadcast...": "Testando sua transmissão...",
+  "Finalizing broadcast testing...": "Finalizando o teste de transmissão...",
+  "Publishing to your YouTube channel...": "Publicando para o seu canal do YouTube...",
+  "Waiting broadcast to be published...": "Aguardando que a transmissão seja publicada...",
+  "You're live!": "Você está ao vivo!",
+  "Waiting for broadcast to be published...": "Aguardando que a transmissão seja publicada...",
+  "Working on your live stream": "Trabalhando na sua transmissão ao vivo",
+  "Your stream will start shortly. You can close this window.": "Sua transmissão começará em breve. Você pode fechar esta janela.",
+  "stream control page": "página de controle da transmissão",
+  " to publish it manually": " para publicar manualmente",
+  "Go to Youtube Live Dashboard": "Entre no Painel ao vivo do YouTube",
+  "Create New Event": "Criar novo evento",
+  "YouTube Chat": "YouTube Chat",
+  "This action cannot be performed inside Streamlabs OBS. To interact with chat, you can open this chat in a web browser.": "This action cannot be performed inside Streamlabs OBS. To interact with chat, you can open this chat in a web browser.",
+  "Open In Web Browser": "Open In Web Browser"
+}

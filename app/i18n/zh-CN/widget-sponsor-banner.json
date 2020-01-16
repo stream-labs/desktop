@@ -1,4 +1,5 @@
 {
+  "Sponsor Banner": "Sponsor Banner",
   "Ad Layout": "广告排版",
   "Placement": "位置",
   "Image Layout": "图片排版",
@@ -19,5 +20,6 @@
   "These are the animations that are used to show your banner.": "这些是用来显示横幅的特色动画。",
   "Visual Settings": "视觉设定",
   "Image Set ": "图片设置 ",
-  "No Image": "没有图片"
+  "No Image": "没有图片",
+  "Set up a sponsor banner to be able to edit (add, remove, update) rotating sponsor logos on streamer channel.": "Set up a sponsor banner to be able to edit (add, remove, update) rotating sponsor logos on streamer channel."
 }

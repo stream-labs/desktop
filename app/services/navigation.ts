@@ -9,7 +9,8 @@ export type TAppPage =
   | 'Chatbot'
   | 'PlatformAppMainPage'
   | 'PlatformAppStore'
-  | 'Help';
+  | 'FacebookMerge'
+  | 'LayoutEditor';
 
 interface INavigationState {
   currentPage: TAppPage;

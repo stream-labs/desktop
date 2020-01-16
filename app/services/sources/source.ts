@@ -59,6 +59,7 @@ export class Source implements ISourceApi {
     this.sourcesService.sourceUpdated.next(this.state);
   }
 
+  @ExecuteInWorkerProcess()
   getSettings(): Dictionary<any> {
     return this.getObsInput().settings;
   }

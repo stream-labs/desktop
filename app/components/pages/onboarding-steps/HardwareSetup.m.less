@@ -1,0 +1,38 @@
+@import "../../../styles/index";
+
+.display {
+  height: 200px;
+  margin-bottom: 8px;
+}
+
+.placeholder {
+  .radius();
+
+  position: relative;
+  width: 300px;
+  height: 200px;
+  background-color: var(--section);
+  margin-bottom: 16px;
+
+  span {
+    .center();
+
+    width: auto;
+  }
+}
+
+.volmeter {
+  position: relative;
+  background: var(--section);
+  height: 16px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.volmeter-center {
+  display: block;
+  position: absolute;
+  top: 50%;
+  transform: translate(0, -14%);
+  width: 100%;
+}

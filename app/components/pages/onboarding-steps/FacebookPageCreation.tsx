@@ -1,5 +1,5 @@
-import { Component, Prop } from 'vue-property-decorator';
-import TsxComponent from 'components/tsx-component';
+import { Component } from 'vue-property-decorator';
+import TsxComponent, { createProps } from 'components/tsx-component';
 import electron from 'electron';
 import { OnboardingStep } from 'streamlabs-beaker';
 import { UsageStatisticsService } from 'services/usage-statistics';
@@ -9,12 +9,14 @@ import { getPlatformService } from 'services/platforms';
 import { FacebookService } from 'services/platforms/facebook';
 import { $t } from 'services/i18n';
 
-@Component({})
-export default class FacebookPageCreation extends TsxComponent<{ continue: () => void }> {
+class FacebookPageCreationProps {
+  continue: () => void = () => {};
+}
+
+@Component({ props: createProps(FacebookPageCreationProps) })
+export default class FacebookPageCreation extends TsxComponent<FacebookPageCreationProps> {
   @Inject() onboardingService: OnboardingService;
   @Inject() usageStatisticsService: UsageStatisticsService;
-
-  @Prop() continue: () => void;
 
   pageCount: number = null;
   loading = true;
@@ -31,7 +33,7 @@ export default class FacebookPageCreation extends TsxComponent<{ continue: () =>
     electron.remote.shell.openExternal(
       'https://www.facebook.com/gaming/pages/create?ref=streamlabs',
     );
-    this.continue();
+    this.props.continue();
   }
 
   openStreamerDashboard() {
@@ -39,7 +41,7 @@ export default class FacebookPageCreation extends TsxComponent<{ continue: () =>
       action: 'streamer_dashboard',
     });
     electron.remote.shell.openExternal('https://fb.gg/streamer?ref=streamlabs');
-    this.continue();
+    this.props.continue();
   }
 
   async getPageCount(): Promise<number> {
@@ -71,10 +73,8 @@ export default class FacebookPageCreation extends TsxComponent<{ continue: () =>
     return this.pageCount ? () => this.openStreamerDashboard() : () => this.openPageCreation();
   }
 
-  render(h: Function) {
-    if (this.loading) {
-      return <i class="fa fa-spinner fa-pulse" />;
-    }
+  render() {
+    if (this.loading) return <i class="fa fa-spinner fa-pulse" />;
 
     return (
       <OnboardingStep>

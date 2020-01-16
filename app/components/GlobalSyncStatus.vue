@@ -23,6 +23,6 @@
 }
 
 .icon-cloud-backup-2 {
-  color: var(--icon);
+  color: var(--paragraph);
 }
 </style>

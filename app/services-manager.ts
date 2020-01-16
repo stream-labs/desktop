@@ -37,7 +37,7 @@ export class ServicesManager extends Service {
 
   init() {
     // this helps to debug services from the console
-    if (Utils.isDevMode()) {
+    if (Utils.isDevMode() || process.env.SLOBS_PRODUCTION_DEBUG) {
       window['sm'] = this;
     }
 
@@ -113,7 +113,7 @@ export class ServicesManager extends Service {
 
   private initService(serviceName: string): Service {
     const ServiceClass = this.services[serviceName];
-    if (!ServiceClass) throw `unknown service: ${serviceName}`;
+    if (!ServiceClass) throw new Error(`unknown service: ${serviceName}`);
     if (this.instances[serviceName]) return;
     this.instances[serviceName] = ServiceClass.instance;
     return ServiceClass.instance;

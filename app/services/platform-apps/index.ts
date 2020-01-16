@@ -17,6 +17,7 @@ import trim from 'lodash/trim';
 import without from 'lodash/without';
 import { PlatformContainerManager, getPageUrl, getAssetUrl } from './container-manager';
 import { NavigationService } from 'services/navigation';
+import { InitAfter } from '../core';
 
 const DEV_PORT = 8081;
 
@@ -147,6 +148,7 @@ class PlatformAppsViews extends ViewHandler<IPlatformAppServiceState> {
   }
 }
 
+@InitAfter('UserService')
 export class PlatformAppsService extends StatefulService<IPlatformAppServiceState> {
   @Inject() windowsService: WindowsService;
   @Inject() guestApiService: GuestApiService;
@@ -181,30 +183,25 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
 
   private devServer: DevServer;
 
-  /**
-   * Using initialize because it needs to be async
-   */
-  async initialize() {
+  init() {
     this.userService.userLogin.subscribe(async () => {
       this.unloadAllApps();
       this.loadProductionApps();
       this.SET_APP_STORE_VISIBILITY(await this.fetchAppStoreVisibility());
       this.SET_DEV_MODE(await this.getIsDevMode());
+
+      if (this.state.devMode && localStorage.getItem(this.unpackedLocalStorageKey)) {
+        const data = JSON.parse(localStorage.getItem(this.unpackedLocalStorageKey));
+        if (data.appPath && data.appToken) {
+          this.loadUnpackedApp(data.appPath, data.appToken);
+        }
+      }
     });
 
-    if (!this.userService.isLoggedIn) return;
-
-    this.SET_DEV_MODE(await this.getIsDevMode());
-
-    this.loadProductionApps();
-    this.SET_APP_STORE_VISIBILITY(await this.fetchAppStoreVisibility());
-
-    if (this.state.devMode && localStorage.getItem(this.unpackedLocalStorageKey)) {
-      const data = JSON.parse(localStorage.getItem(this.unpackedLocalStorageKey));
-      if (data.appPath && data.appToken) {
-        this.loadUnpackedApp(data.appPath, data.appToken);
-      }
-    }
+    this.userService.userLogout.subscribe(() => {
+      this.unloadAllApps();
+      localStorage.removeItem(this.disabledLocalStorageKey);
+    });
   }
 
   /**
@@ -571,8 +568,8 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
           width: source.initialSize.width,
           height: source.initialSize.height,
         };
-        // tslint:disable-next-line:no-else-after-return TODO
-      } else if (source.initialSize.type === ESourceSizeType.Relative) {
+      }
+      if (source.initialSize.type === ESourceSizeType.Relative) {
         return {
           width: source.initialSize.width * this.videoService.baseWidth,
           height: source.initialSize.height * this.videoService.baseHeight,

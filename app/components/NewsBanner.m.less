@@ -2,8 +2,7 @@
 
 .banner {
   width: 100%;
-  min-height: 0;
-  max-height: 0;
+  height: 0;
   background-color: var(--background);
   color: var(--white);
   display: flex;
@@ -14,8 +13,7 @@
 }
 
 .banner.show {
-  height: 92px;
-  max-height: 140px;
+  height: 65px;
   transition: none;
 }
 
@@ -43,13 +41,14 @@
   top: 0;
   object-fit: contain;
   margin-left: 10%;
-  max-width: 140px;
+  max-width: 65px;
 }
 
 .title-container {
-  position: relative;
-  margin-left: 5%;
-  padding-top: 20px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  padding-top: 2px;
 }
 
 .title {
@@ -81,6 +80,7 @@
   font-weight: 500;
   height: 40px;
   width: 180px;
+  line-height: 14px;
   padding: 0 12px;
 
   &:hover {

@@ -36,5 +36,7 @@
   "Rename Scene": "シーン名を変更する",
   "Name Scene": "シーンに名前を付ける\n",
   "Rename Folder": "フォルダ名を変更する",
-  "Name Folder": "フォルダーに名前を付ける"
+  "Name Folder": "フォルダーに名前を付ける",
+  "Switch Scenes": "Switch Scenes",
+  "Failed to load scene collection.  A new one will be created instead.": "Failed to load scene collection.  A new one will be created instead."
 }

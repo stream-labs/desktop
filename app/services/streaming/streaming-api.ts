@@ -29,6 +29,7 @@ export interface IStreamingServiceState {
   recordingStatusTime: string;
   replayBufferStatus: EReplayBufferState;
   replayBufferStatusTime: string;
+  selectiveRecording: boolean;
 }
 
 export interface IStreamingServiceApi {

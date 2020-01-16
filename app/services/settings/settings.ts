@@ -41,6 +41,7 @@ export interface ISettingsState {
     key: string;
     streamType: string;
     service: string;
+    server: string;
   };
   Output: {
     RecRB?: boolean;
@@ -123,7 +124,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       'Scene Collections',
       'Notifications',
       'Appearance',
-      'Facemasks',
+      'Face Masks',
       'Remote Control',
     ]);
 
@@ -354,7 +355,9 @@ export class SettingsService extends StatefulService<ISettingsState>
     settingsData[0].parameters.forEach((deviceForm, ind) => {
       const channel = ind + 1;
       const isOutput = [E_AUDIO_CHANNELS.OUTPUT_1, E_AUDIO_CHANNELS.OUTPUT_2].includes(channel);
-      const source = this.sourcesService.views.getSources().find(source => source.channel === channel);
+      const source = this.sourcesService.views
+        .getSources()
+        .find(source => source.channel === channel);
 
       if (source && deviceForm.value === null) {
         if (deviceForm.value === null) {

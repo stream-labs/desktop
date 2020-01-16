@@ -15,7 +15,7 @@ import { track } from 'services/usage-statistics';
 import { IpcServerService } from 'services/api/ipc-server';
 import { TcpServerService } from 'services/api/tcp-server';
 import { StreamlabelsService } from 'services/streamlabels';
-import { PerformanceMonitorService } from 'services/performance-monitor';
+import { PerformanceService } from 'services/performance';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { FileManagerService } from 'services/file-manager';
 import { PatchNotesService } from 'services/patch-notes';
@@ -35,12 +35,18 @@ import Utils from 'services/utils';
 import { Subject } from 'rxjs';
 import { I18nService } from 'services/i18n';
 import { DismissablesService } from 'services/dismissables';
+import { RestreamService } from 'services/restream';
+import { downloadFile } from '../../util/requests';
 
 interface IAppState {
   loading: boolean;
   argv: string[];
   errorAlert: boolean;
   onboarded: boolean;
+}
+
+export interface IRunInLoadingModeOptions {
+  hideStyleBlockers?: boolean;
 }
 
 /**
@@ -77,7 +83,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() streamlabelsService: StreamlabelsService;
   @Inject() private ipcServerService: IpcServerService;
   @Inject() private tcpServerService: TcpServerService;
-  @Inject() private performanceMonitorService: PerformanceMonitorService;
+  @Inject() private performanceService: PerformanceService;
   @Inject() private fileManagerService: FileManagerService;
   @Inject() private protocolLinksService: ProtocolLinksService;
   @Inject() private crashReporterService: CrashReporterService;
@@ -86,6 +92,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private recentEventsService: RecentEventsService;
   @Inject() private i18nService: I18nService;
   @Inject() private dismissablesService: DismissablesService;
+  @Inject() private restreamService: RestreamService;
 
   private loadingPromises: Dictionary<Promise<any>> = {};
 
@@ -102,21 +109,29 @@ export class AppService extends StatefulService<IAppState> {
 
     await this.i18nService.load();
 
-    // We want to start this as early as possible so that any
-    // exceptions raised while loading the configuration are
-    // associated with the user in sentry.
-    await this.userService.initialize();
+    // perform several concurrent http requests
+    await Promise.all([
+      // We want to start this as early as possible so that any
+      // exceptions raised while loading the configuration are
+      // associated with the user in sentry.
+      this.userService.validateLogin(),
+
+      // this config should be downloaded before any game-capture source has been added to the scene
+      this.downloadAutoGameCaptureConfig(),
+    ]).catch(e => {
+      // probably the internet is disconnected
+    });
 
     // Second, we want to start the crash reporter service.  We do this
     // after the user service because we want crashes to be associated
     // with a particular user if possible.
     this.crashReporterService.beginStartup();
 
-    // Initialize any apps before loading the scene collection.  This allows
-    // the apps to already be in place when their sources are created.
-    await this.platformAppsService.initialize();
-
-    await this.sceneCollectionsService.initialize();
+    if (!this.userService.isLoggedIn) {
+      // If this user is logged in, this would have already happened as part of login
+      // TODO: We should come up with a better way to handle this.
+      await this.sceneCollectionsService.initialize();
+    }
 
     this.SET_ONBOARDED(this.onboardingService.startOnboardingIfRequired());
 
@@ -125,22 +140,7 @@ export class AppService extends StatefulService<IAppState> {
       this.shutdownHandler();
     });
 
-    // Eager load services
-    const _ = [
-      this.facemasksService,
-
-      this.incrementalRolloutService,
-      this.shortcutsService,
-      this.streamlabelsService,
-
-      // Pre-fetch stream info
-      this.streamInfoService,
-
-      // Determine which tips should be shown
-      this.dismissablesService,
-    ];
-
-    this.performanceMonitorService.start();
+    this.performanceService.startMonitoringPerformance();
 
     this.ipcServerService.listen();
     this.tcpServerService.listen();
@@ -148,14 +148,9 @@ export class AppService extends StatefulService<IAppState> {
     this.patchNotesService.showPatchNotesIfRequired(this.state.onboarded);
     this.announcementsService.updateBanner();
 
-    const _outageService = this.outageNotificationsService;
-
     this.crashReporterService.endStartup();
 
     this.protocolLinksService.start(this.state.argv);
-
-    await this.gameOverlayService.initialize();
-    await this.recentEventsService.initialize();
 
     ipcRenderer.send('AppInitFinished');
   }
@@ -177,7 +172,7 @@ export class AppService extends StatefulService<IAppState> {
       this.tcpServerService.stopListening();
       await this.userService.flushUserSession();
       await this.sceneCollectionsService.deinitialize();
-      this.performanceMonitorService.stop();
+      this.performanceService.stop();
       this.transitionsService.shutdown();
       await this.gameOverlayService.destroy();
       await this.fileManagerService.flushAll();
@@ -195,9 +190,11 @@ export class AppService extends StatefulService<IAppState> {
    * Should be called for any scene-collections loading operations
    * @see RunInLoadingMode decorator
    */
-  async runInLoadingMode(fn: () => Promise<any> | void) {
+  async runInLoadingMode(fn: () => Promise<any> | void, options: IRunInLoadingModeOptions = {}) {
+    const opts: IRunInLoadingModeOptions = Object.assign({ hideStyleBlockers: true }, options);
+
     if (!this.state.loading) {
-      this.windowsService.updateStyleBlockers('main', true);
+      if (opts.hideStyleBlockers) this.windowsService.updateStyleBlockers('main', true);
       this.START_LOADING();
 
       // The scene collections window is the only one we don't close when
@@ -248,9 +245,19 @@ export class AppService extends StatefulService<IAppState> {
     this.sceneCollectionsService.enableAutoSave();
     this.FINISH_LOADING();
     // Set timeout to allow transition animation to play
-    setTimeout(() => this.windowsService.updateStyleBlockers('main', false), 500);
+    if (opts.hideStyleBlockers) {
+      setTimeout(() => this.windowsService.updateStyleBlockers('main', false), 500);
+    }
     if (error) throw error;
     return returningValue;
+  }
+
+  private async downloadAutoGameCaptureConfig() {
+    // download game-list for auto game capture
+    await downloadFile(
+      'https://slobs-cdn.streamlabs.com/configs/game_capture_list.lst',
+      `${this.appDataDirectory}/game_capture_list.lst`,
+    );
   }
 
   @mutation()

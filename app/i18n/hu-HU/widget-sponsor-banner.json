@@ -1,4 +1,5 @@
 {
+  "Sponsor Banner": "Sponsor Banner",
   "Ad Layout": "Ad Layout",
   "Placement": "Placement",
   "Image Layout": "Kép elrendezése",
@@ -19,5 +20,6 @@
   "These are the animations that are used to show your banner.": "Ezek az animációk használhatók fel a bannered megjelenítéséhez.",
   "Visual Settings": "Vizuális beállítások",
   "Image Set ": "Image Set ",
-  "No Image": "Nincs Kép"
+  "No Image": "Nincs Kép",
+  "Set up a sponsor banner to be able to edit (add, remove, update) rotating sponsor logos on streamer channel.": "Set up a sponsor banner to be able to edit (add, remove, update) rotating sponsor logos on streamer channel."
 }

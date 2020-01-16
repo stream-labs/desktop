@@ -41,6 +41,7 @@ export class Scene {
   readonly state: IScene;
 
   constructor(sceneId: string) {
+    if (!sceneId) console.trace('undefined scene id');
     this.state = this.scenesService.state.scenes[sceneId];
     Utils.applyProxy(this, this.state);
   }
@@ -146,8 +147,7 @@ export class Scene {
 
     const sceneItemId = options.id || uuid();
 
-    let obsSceneItem: obs.ISceneItem;
-    obsSceneItem = this.getObsScene().add(source.getObsInput());
+    const obsSceneItem: obs.ISceneItem = this.getObsScene().add(source.getObsInput());
 
     this.ADD_SOURCE_TO_SCENE(sceneItemId, source.sourceId, obsSceneItem.id);
     const sceneItem = this.getItem(sceneItemId);
@@ -345,6 +345,8 @@ export class Scene {
         y: sceneNode.y == null ? 0 : sceneNode.y,
         locked: sceneNode.locked,
         rotation: sceneNode.rotation || 0,
+        streamVisible: sceneNode.streamVisible,
+        recordingVisible: sceneNode.recordingVisible,
       });
       return true;
     });
@@ -494,6 +496,8 @@ export class Scene {
 
       visible: true,
       locked: false,
+      streamVisible: true,
+      recordingVisible: true,
     });
   }
 

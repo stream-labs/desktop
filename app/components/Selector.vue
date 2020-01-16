@@ -37,7 +37,7 @@
 }
 
 .sortable-drag {
-  border-color: var(--input-border);
+  border-color: var(--button);
 }
 
 .selector-list {

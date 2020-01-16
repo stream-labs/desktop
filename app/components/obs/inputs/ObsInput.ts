@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import { Prop } from 'vue-property-decorator';
 import * as obs from '../../../../obs-api';
 import {
   isEditableListProperty,
@@ -9,7 +8,7 @@ import {
   isPathProperty,
   isTextProperty,
 } from '../../../util/properties-type-guards';
-import { $t } from 'services/i18n/index';
+import { $translateIfExist } from 'services/i18n';
 
 /**
  * all possible OBS properties types
@@ -174,7 +173,6 @@ export function obsValuesToInputValues(
       obsValue = obsValue.value;
     }
 
-    prop.description = $t(prop.description);
     prop.value = obsValue;
     prop.masked = !!obsProp.masked;
     prop.enabled = !!obsProp.enabled;
@@ -191,7 +189,7 @@ export function obsValuesToInputValues(
         for (const listOption of obsProp.values || []) {
           listOptions.push({
             value: listOption[Object.keys(listOption)[0]],
-            description: $t(Object.keys(listOption)[0]),
+            description: $translateIfExist(Object.keys(listOption)[0]),
           });
         }
       }
@@ -353,7 +351,7 @@ export function getPropertiesFormData(obsSource: obs.ISource): TObsFormData {
     const formItem: IObsInput<TObsValue> = {
       value: obsProp.value,
       name: obsProp.name,
-      description: $t(obsProp.description),
+      description: $translateIfExist(obsProp.description),
       enabled: obsProp.enabled,
       visible: obsProp.visible,
       type: obsType,

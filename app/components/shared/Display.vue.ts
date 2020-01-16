@@ -10,7 +10,8 @@ interface DisplayProps {
   sourceId: string;
   paddingSize?: number;
   drawUI?: false;
-  onOutputResize: (region: IRectangle) => void;
+  renderingMode?: number;
+  onOutputResize?: (region: IRectangle) => void;
 }
 
 @Component({})
@@ -22,6 +23,7 @@ export default class Display extends TsxComponent<DisplayProps> {
   @Prop() sourceId: string;
   @Prop({ default: 0 }) paddingSize: number;
   @Prop({ default: false }) drawUI: boolean;
+  @Prop() renderingMode: number;
 
   $refs: {
     display: HTMLElement;
@@ -47,6 +49,7 @@ export default class Display extends TsxComponent<DisplayProps> {
       sourceId: this.sourceId,
       paddingSize: this.paddingSize,
       paddingColor: this.paddingColor,
+      renderingMode: this.renderingMode,
     });
     this.display.setShoulddrawUI(this.drawUI);
 

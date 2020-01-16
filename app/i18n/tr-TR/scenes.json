@@ -36,5 +36,7 @@
   "Rename Scene": "Sahneyi Yeniden Adlandır",
   "Name Scene": "Sahneyi Adlandır",
   "Rename Folder": "Klasörü Yeniden Adlandır",
-  "Name Folder": "Klasörü Adlandır"
+  "Name Folder": "Klasörü Adlandır",
+  "Switch Scenes": "Switch Scenes",
+  "Failed to load scene collection.  A new one will be created instead.": "Failed to load scene collection.  A new one will be created instead."
 }

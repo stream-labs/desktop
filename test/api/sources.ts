@@ -37,7 +37,6 @@ test('Source events', async t => {
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const sourcesService = client.getResource<SourcesService>('SourcesService');
 
-
   sourcesService.sourceAdded.subscribe(() => void 0);
   sourcesService.sourceRemoved.subscribe(() => void 0);
   sourcesService.sourceUpdated.subscribe(() => void 0);

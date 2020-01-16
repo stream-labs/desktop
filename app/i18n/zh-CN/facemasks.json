@@ -21,5 +21,11 @@
   "Unable to find face mask plugin. You will not be able to use Face Masks": "找不到Face Mask插件。您无法使用Face Masks",
   "Face Mask Settings": "Face Masks設定",
   "Twitch Follows": "Twitch 追随",
-  "Youtube Follows": "Youtube追隨"
+  "Youtube Follows": "Youtube追隨",
+  "Mask Duration": "Mask Duration",
+  "Donation Masks": "Donation Masks",
+  "Minimum Bits to Activate": "Minimum Bits to Activate",
+  "Test Face Masks": "Test Face Masks",
+  "Collapse": "Collapse",
+  "Expand": "Expand"
 }

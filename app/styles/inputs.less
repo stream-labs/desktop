@@ -76,7 +76,7 @@ textarea,
 textarea[type=text] {
   .radius();
 
-  border: 1px solid var(--input-border);
+  border: 1px solid var(--button);
   background: var(--input-bg);
   margin-bottom: 0;
   font-size: 14px;
@@ -116,7 +116,7 @@ textarea[type=text] {
 
 .multiselect__input {
   background: var(--dropdown-bg);
-  border-color: var(--dropdown-border);
+  border-color: var(--button);
 }
 
 .multiselect__select {
@@ -160,12 +160,12 @@ textarea[type=text] {
   .multiselect__input,
   .multiselect__single {
     background: var(--dropdown-bg);
-    border-color: var(--input-border);
+    border-color: var(--button);
 
     &:hover,
     &:focus {
       background: var(--dropdown-bg);
-      border-color: var(--input-border);
+      border-color: var(--button);
     }
   }
 }
@@ -177,6 +177,8 @@ textarea[type=text] {
 .multiselect__content {
   border-bottom-left-radius: @radius;
   border-bottom-right-radius: @radius;
+  border: 1px solid var(--button);
+  border-top: none;
   top: 30px;
   background: var(--dropdown-bg);
   list-style-type: none;
@@ -195,6 +197,7 @@ textarea[type=text] {
   white-space: nowrap;
   display: inline-block;
   min-width: 100%;
+  max-width: 100%; // prevent scrollbar for the 'y' coordinate
 }
 
 .multiselect__option {
@@ -218,7 +221,7 @@ textarea[type=text] {
 }
 
 .multiselect__option--highlight {
-  background: var(--border);
+  background: var(--dropdown-alt-bg);
   color: var(--paragraph);
 
   &::after {
@@ -227,11 +230,11 @@ textarea[type=text] {
 }
 
 .multiselect__option--selected {
-  background: var(--button);
+  background: var(--dropdown-bg);
   color: var(--title);
 
   &.multiselect__option--highlight {
-    background: var(--button);
+    background: var(--dropdown-alt-bg);
 
     &::after {
       display: none;
@@ -284,13 +287,13 @@ textarea[type=text] {
   .colorpicker__input {
     cursor: pointer !important;
     background: var(--dropdown-bg);
-    border-color: var(--dropdown-border);
+    border-color: var(--button);
 
     &:focus,
     &:visited,
     &:active {
       background: var(--dropdown-bg);
-      border-color: var(--dropdown-border);
+      border-color: var(--button);
     }
   }
 
@@ -310,14 +313,24 @@ textarea[type=text] {
     height: 20px;
   }
 
-  .colorpicker-menu {
-    top: -2px;
+  .colorpicker-container {
+    position: relative;
+    top: -4px;
     z-index: 10;
-    border-bottom-right-radius: @radius;
-    border-bottom-left-radius: @radius;
+    border-radius: 0 0 4px 4px;
     background: var(--dropdown-bg);
-    border-color: var(--dropdown-border);
-    .shadow() !important;
+    border: 1px solid var(--button);
+    border-top: none;
+    box-shadow: 0 8px 16px var(--shadow) !important;
+    width: auto;
+  }
+
+  .colorpicker-menu {
+    width: auto;
+    max-width: 200px;
+    margin: 0 auto;
+    background: var(--dropdown-bg);
+    box-shadow: none;
   }
 
   // hide alpha input
@@ -339,6 +352,20 @@ textarea[type=text] {
   .vc-checkerboard {
     display: none;
   }
+}
+
+.colorpicker-slide-enter,
+.colorpicker-slide-leave-to {
+  transform: translateY(-50%) scaleY(0);
+}
+
+.colorpicker-slide-enter-to {
+  transform: translateY(0) scaleY(100%);
+}
+
+.colorpicker-slide-enter-active,
+.colorpicker-slide-leave-active {
+  transition: all 0.2s linear;
 }
 
 // Path inputs

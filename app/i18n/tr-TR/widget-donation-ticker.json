@@ -1,17 +1,18 @@
 {
-  "Message Format": "Mesaj biçimi",
-  "Max Donations": "Max Bağışlar",
-  "Text Scroll Speed": "Metin kaydırma hızı",
+  "Message Format": "Mesaj Formatı",
+  "Max Donations": "Maks. Bağış",
+  "Text Scroll Speed": "Metin Kaydırma Hızı",
   "Background Color": "Arka Plan Rengi",
-  "Font": "Yazı tipi",
-  "Font Size": "Yazı tipi boyutu",
-  "Font Weight": "Yazı tipi genişliği",
+  "Font": "Yazı Tipi",
+  "Font Size": "Yazı Tipi Boyutu",
+  "Font Weight": "Yazı Tipi Genişliği",
   "Text Color": "Metin Rengi",
-  "Name Text Color": "Metin rengini adlandırma",
-  "Amount Text Color": "Metin rengi miktarı",
+  "Name Text Color": "Metin Rengini Adı",
+  "Amount Text Color": "Metin Rengi Miktarı",
   "The name of the donator,": "Bağışçının adı,",
   "The amount that was donated": "Bağışlanan miktar",
   "Manage List": "Listeyi Yönet",
-  "Font Settings": "Yazı tipi ayarları",
-  "A hex color for the text of the": "Metni için hex rengi"
+  "Font Settings": "Yazı Tipi Ayarları",
+  "A hex color for the text of the": "Belirteç metni için",
+  "token": "Hex rengi"
 }

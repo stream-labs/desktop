@@ -1,6 +1,6 @@
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import { IHotkey, IBinding } from 'services/hotkeys';
-import TsxComponent from 'components/tsx-component';
+import TsxComponent, { createProps } from 'components/tsx-component';
 
 /**
  * Represents a binding that has a unique key for CSS animations
@@ -10,18 +10,24 @@ interface IKeyedBinding {
   key: string;
 }
 
-@Component({})
-export default class HotkeyComponent extends TsxComponent<{ hotkey: IHotkey }> {
-  @Prop() hotkey: IHotkey;
+class HotkeyProps {
+  hotkey: IHotkey = {} as IHotkey;
+}
 
-  description = this.hotkey.description;
+@Component({ props: createProps(HotkeyProps) })
+export default class HotkeyComponent extends TsxComponent<HotkeyProps> {
+  description: string;
   bindings: IKeyedBinding[] = [];
 
+  hotkey: IHotkey;
+
   created() {
-    if (this.hotkey.bindings.length === 0) {
+    this.hotkey = this.props.hotkey;
+    this.description = this.props.hotkey.description;
+    if (this.props.hotkey.bindings.length === 0) {
       this.bindings = [this.createBindingWithKey(this.getBlankBinding())];
     } else {
-      this.bindings = Array.from(this.hotkey.bindings).map(binding => {
+      this.bindings = Array.from(this.props.hotkey.bindings).map(binding => {
         return this.createBindingWithKey(binding);
       });
     }
@@ -39,6 +45,7 @@ export default class HotkeyComponent extends TsxComponent<{ hotkey: IHotkey }> {
     const binding = this.bindings[index];
 
     const key =
+      /*eslint-disable*/
       event instanceof MouseEvent
         ? {
             1: 'MiddleMouseButton',
@@ -46,7 +53,6 @@ export default class HotkeyComponent extends TsxComponent<{ hotkey: IHotkey }> {
             4: 'X2MouseButton',
           }[event.button]
         : event.code;
-
     binding.binding = {
       key,
       modifiers: this.getModifiers(event),
@@ -126,7 +132,7 @@ export default class HotkeyComponent extends TsxComponent<{ hotkey: IHotkey }> {
       if (binding.binding.key) bindings.push(binding.binding);
     });
 
-    this.hotkey.bindings = bindings;
+    this.props.hotkey.bindings = bindings;
   }
 
   /**

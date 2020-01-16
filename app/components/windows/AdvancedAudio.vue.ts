@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../../services/core/injector';
 import { WindowsService } from '../../services/windows';
-import { IAudioServiceApi, IAudioSourceApi } from '../../services/audio';
+import { AudioService, AudioSource } from '../../services/audio';
 import { propertyComponentForType } from 'components/obs/inputs/Components';
 import ModalLayout from '../ModalLayout.vue';
 import { TObsValue } from 'components/obs/inputs/ObsInput';
@@ -12,17 +12,17 @@ import { EditorCommandsService } from 'services/editor-commands';
   components: { ModalLayout },
 })
 export default class AdvancedAudio extends Vue {
-  @Inject() audioService: IAudioServiceApi;
+  @Inject() audioService: AudioService;
   @Inject() windowsService: WindowsService;
   @Inject() editorCommandsService: EditorCommandsService;
 
   propertyComponentForType = propertyComponentForType;
 
   get audioSources() {
-    return this.audioService.getSourcesForCurrentScene();
+    return this.audioService.views.sourcesForCurrentScene;
   }
 
-  onInputHandler(audioSource: IAudioSourceApi, name: string, value: TObsValue) {
+  onInputHandler(audioSource: AudioSource, name: string, value: TObsValue) {
     if (name === 'deflection') {
       this.editorCommandsService.executeCommand(
         'SetDeflectionCommand',

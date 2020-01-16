@@ -33,6 +33,8 @@ interface ISceneItem extends INode {
   visible: boolean;
   locked: boolean;
   transform: ITransform;
+  streamVisible: boolean;
+  recordingVisible: boolean;
 }
 
 interface ISceneItemFolder extends INode {
@@ -170,8 +172,8 @@ export class ScenesModule extends Module {
         name: node.name,
         childrenIds: node.childrenIds,
       } as ISceneItemFolder;
-      // tslint:disable-next-line:no-else-after-return TODO
-    } else if (node.isItem()) {
+    }
+    if (node.isItem()) {
       return {
         id: node.id,
         type: ESceneNodeType.SceneItem,

@@ -11,7 +11,7 @@
           v-if="!$slots.default"
           :value="value"
           :metadata="formInputMetadata"
-          @input="value => $emit('input', value)"
+          @input="(value, event) => emitInput(value, event)"
         />
         <div v-if="$slots.default" class="slots">
           <slot></slot>

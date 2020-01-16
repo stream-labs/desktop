@@ -41,6 +41,8 @@ export interface ISceneItemInfo {
   crop: ICrop;
   locked?: boolean;
   rotation?: number;
+  streamVisible?: boolean;
+  recordingVisible?: boolean;
 }
 
 export interface IScenesState {
@@ -73,12 +75,16 @@ export interface ISceneItemSettings {
   transform: ITransform;
   visible: boolean;
   locked: boolean;
+  streamVisible: boolean;
+  recordingVisible: boolean;
 }
 
 export interface IPartialSettings {
   transform?: IPartialTransform;
   visible?: boolean;
   locked?: boolean;
+  streamVisible?: boolean;
+  recordingVisible?: boolean;
 }
 
 export interface ISceneItem extends ISceneItemSettings, ISceneItemNode {
@@ -102,6 +108,8 @@ export interface ISceneItemActions {
   remove(): void;
   scale(scale: IVec2, origin: IVec2): void;
   scaleWithOffset(scale: IVec2, offset: IVec2): void;
+  setStreamVisible(streamVisible: boolean): void;
+  setRecordingVisible(recordingVisible: boolean): void;
 
   /**
    * only for scene sources
@@ -133,11 +141,16 @@ class ScenesViews extends ViewHandler<IScenesState> {
   }
 
   get activeScene() {
-    return this.getScene(this.activeSceneId);
+    if (this.activeSceneId) return this.getScene(this.activeSceneId);
+
+    return null;
   }
 
   get scenes(): Scene[] {
-    return uniqBy(this.state.displayOrder.map(id => this.getScene(id)), x => x.id);
+    return uniqBy(
+      this.state.displayOrder.map(id => this.getScene(id)),
+      x => x.id,
+    );
   }
 
   getSceneItems(): SceneItem[] {

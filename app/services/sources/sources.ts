@@ -29,7 +29,7 @@ import { $t } from 'services/i18n';
 import { SourceDisplayData } from './sources-data';
 import { NavigationService } from 'services/navigation';
 import { PlatformAppsService } from 'services/platform-apps';
-import { HardwareService } from 'services/hardware';
+import { HardwareService, DefaultHardwareService } from 'services/hardware';
 import { AudioService } from '../audio';
 import { ReplayManager } from './properties-managers/replay-manager';
 
@@ -94,6 +94,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
   @Inject() private platformAppsService: PlatformAppsService;
   @Inject() private hardwareService: HardwareService;
   @Inject() private audioService: AudioService;
+  @Inject() private defaultHardwareService: DefaultHardwareService;
 
   get views() {
     return new SourcesViews(this.state);
@@ -225,7 +226,9 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
     this.sourceAdded.next(source.state);
 
-    if (options.audioSettings) this.audioService.views.getSource(id).setSettings(options.audioSettings);
+    if (options.audioSettings) {
+      this.audioService.views.getSource(id).setSettings(options.audioSettings);
+    }
   }
 
   removeSource(id: string) {
@@ -300,7 +303,10 @@ export class SourcesService extends StatefulService<ISourcesState> {
   }
 
   suggestName(name: string): string {
-    return namingHelpers.suggestName(name, (name: string) => this.views.getSourcesByName(name).length);
+    return namingHelpers.suggestName(
+      name,
+      (name: string) => this.views.getSourcesByName(name).length,
+    );
   }
 
   private onSceneItemRemovedHandler(sceneItemState: ISceneItem) {
@@ -344,9 +350,18 @@ export class SourcesService extends StatefulService<ISourcesState> {
       }
     }
 
-    if (type === 'text_gdiplus') {
-      if (resolvedSettings.text === void 0) resolvedSettings.text = name;
+    if (type === 'text_gdiplus' && resolvedSettings.text === void 0) {
+      resolvedSettings.text = name;
     }
+
+    if (
+      type === 'dshow_input' &&
+      resolvedSettings.video_device_id === void 0 &&
+      this.defaultHardwareService.state.defaultVideoDevice
+    ) {
+      resolvedSettings.video_device_id = this.defaultHardwareService.state.defaultVideoDevice;
+    }
+
     return resolvedSettings;
   }
 
@@ -477,6 +492,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       WidgetType.MediaShare,
       WidgetType.SponsorBanner,
       WidgetType.AlertBox,
+      WidgetType.SpinWheel,
     ];
 
     if (isWidget && this.userService.isLoggedIn) {
@@ -528,7 +544,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
     this.windowsService.showWindow({
       componentName: 'SourceProperties',
-      title: $t('Settings for ') + propertiesName,
+      title: $t('Settings for %{sourceName}', { sourceName: propertiesName }),
       queryParams: { sourceId },
       size: {
         width: 600,

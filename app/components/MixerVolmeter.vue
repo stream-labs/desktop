@@ -1,6 +1,6 @@
 <template>
 <div class="volmeter-container">
-  <canvas class="volmeter" ref="canvas" />
+  <canvas class="volmeter" ref="canvas" v-show="renderingInitialized" :key="canvasId" />
   <div class="volmeter-spacer" ref="spacer" />
 </div>
 </template>
@@ -13,7 +13,7 @@
 .volmeter {
   position: absolute;
   overflow: hidden;
-  background-color: var(--slider-bg);
+  background-color: var(--border);
 }
 
 .volmeter-spacer {

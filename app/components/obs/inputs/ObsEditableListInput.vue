@@ -34,7 +34,7 @@
 
 .editable-list__list {
   background: var(--input-bg);
-  border-color: var(--input-border);
+  border-color: var(--button);
   border: 0;
 }
 

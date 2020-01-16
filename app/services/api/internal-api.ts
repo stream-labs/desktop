@@ -24,12 +24,9 @@ export class InternalApiService extends RpcApi {
     errors
       .filter(e => e instanceof Error)
       .forEach(e => {
-        const isChildWindowRequest = request.params && request.params.fetchMutations;
-        if (isChildWindowRequest) {
-          setTimeout(() => {
-            throw e;
-          }, 0);
-        }
+        setTimeout(() => {
+          throw e;
+        }, 0);
       });
 
     // we are not going to change the response

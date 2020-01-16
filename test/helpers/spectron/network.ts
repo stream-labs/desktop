@@ -1,4 +1,4 @@
-import { TExecutionContext } from './index';
+import { focusMain, TExecutionContext } from './index';
 
 /**
  * install the fetch-mock lib
@@ -13,6 +13,7 @@ export async function installFetchMock(t: TExecutionContext) {
  * mock fetch requests
  */
 export async function fetchMock(t: TExecutionContext, regExp: RegExp, code: number) {
+  await focusMain(t);
   await t.context.app.webContents.executeJavaScript(`
     fetchMock.mock(${regExp.toString()}, ${code});
   `);
@@ -22,6 +23,7 @@ export async function fetchMock(t: TExecutionContext, regExp: RegExp, code: numb
  * reset all mocks
  */
 export async function resetFetchMock(t: TExecutionContext) {
+  await focusMain(t);
   await t.context.app.webContents.executeJavaScript(`
     fetchMock.reset();
   `);

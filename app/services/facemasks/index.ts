@@ -23,7 +23,9 @@ import { throttle } from 'lodash-decorators';
 import * as Interfaces from './definitions';
 import { AppService } from 'services/app';
 import { propsToSettings } from 'util/obs';
+import { InitAfter } from '../core';
 
+@InitAfter('UserService')
 export class FacemasksService extends PersistentStatefulService<Interfaces.IFacemasksServiceState> {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
@@ -69,9 +71,6 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   init() {
     super.init();
     this.subscribeToSourceAdded();
-    if (this.userService.isLoggedIn) {
-      this.startup();
-    }
     this.userService.userLogin.subscribe(() => {
       this.startup();
     });
@@ -269,9 +268,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
     const availableDevices = this.getInputDevicesList();
     const enabledDeviceId = this.state.settings.device ? this.state.settings.device.value : null;
     const availableDeviceSelected = enabledDeviceId
-      ? availableDevices.some(device => {
-          return enabledDeviceId === (device.value as string);
-        })
+      ? availableDevices.some(device => enabledDeviceId === (device.value as string))
       : false;
 
     return this.state.settings.enabled && availableDeviceSelected;
@@ -371,12 +368,8 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
       body: JSON.stringify(settings),
       headers: new Headers({ 'Content-Type': 'application/json' }),
     };
-    try {
-      await this.formRequest(endpoint, postData);
-      this.startup();
-    } catch (e) {
-      throw e;
-    }
+    await this.formRequest(endpoint, postData);
+    this.startup();
   }
 
   setupFilter() {

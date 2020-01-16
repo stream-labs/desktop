@@ -37,8 +37,8 @@ export default class MediaGallery extends Vue {
 
   dragOver = false;
   selectedFile: IMediaGalleryFile = null;
-  type: string = null;
-  category: string = null;
+  type: 'image' | 'audio' = null;
+  category: 'stock' | 'uploads' = null;
   galleryInfo: IMediaGalleryInfo = null;
   busy: IToast = null;
 
@@ -46,6 +46,7 @@ export default class MediaGallery extends Vue {
 
   async mounted() {
     this.galleryInfo = await this.mediaGalleryService.fetchGalleryInfo();
+    if (this.filter) this.type = this.filter;
   }
 
   get promiseId() {
@@ -133,7 +134,7 @@ export default class MediaGallery extends Vue {
     this.upload(mappedFiles);
   }
 
-  handleTypeFilter(type: string, category: string) {
+  handleTypeFilter(type: 'audio' | 'image', category: 'stock' | 'uploads') {
     if (type !== this.type || category !== this.category) {
       this.type = type;
       this.category = category;
@@ -186,7 +187,9 @@ export default class MediaGallery extends Vue {
   async handleDownload() {
     const { filePath } = await electron.remote.dialog.showSaveDialog(
       electron.remote.getCurrentWindow(),
-      { defaultPath: this.selectedFile.fileName },
+      {
+        defaultPath: this.selectedFile.fileName,
+      },
     );
 
     if (!this.selectedFile) return;

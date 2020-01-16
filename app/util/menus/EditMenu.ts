@@ -14,6 +14,7 @@ import { AudioService } from 'services/audio';
 import electron from 'electron';
 import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
+import { ERenderingMode } from '../../../obs-api';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;
@@ -61,7 +62,7 @@ export class EditMenu extends Menu {
 
       this.append({
         label: $t('Paste (Duplicate)'),
-        enabled: this.clipboardService.hasItems(),
+        enabled: this.clipboardService.canDuplicate(),
         click: () => this.clipboardService.paste(true),
       });
     }
@@ -101,6 +102,12 @@ export class EditMenu extends Menu {
 
       if (selectedItem) {
         const visibilityLabel = selectedItem.visible ? $t('Hide') : $t('Show');
+        const streamVisLabel = selectedItem.streamVisible
+          ? $t('Hide on Stream')
+          : $t('Show on Stream');
+        const recordingVisLabel = selectedItem.recordingVisible
+          ? $t('Hide on Recording')
+          : $t('Show on Recording');
 
         if (!isMultipleSelection) {
           this.append({
@@ -110,9 +117,24 @@ export class EditMenu extends Menu {
             },
           });
           this.append({
+            label: streamVisLabel,
+            click: () => {
+              selectedItem.setStreamVisible(!selectedItem.streamVisible);
+            },
+          });
+          this.append({
+            label: recordingVisLabel,
+            click: () => {
+              selectedItem.setRecordingVisible(!selectedItem.recordingVisible);
+            },
+          });
+          this.append({
             label: $t('Create Source Projector'),
             click: () => {
-              this.projectorService.createProjector(selectedItem.sourceId);
+              this.projectorService.createProjector(
+                ERenderingMode.OBS_MAIN_RENDERING,
+                selectedItem.sourceId,
+              );
             },
           });
         } else {
@@ -277,7 +299,17 @@ export class EditMenu extends Menu {
 
     this.append({
       label: $t('Create Output Projector'),
-      click: () => this.projectorService.createProjector(),
+      click: () => this.projectorService.createProjector(ERenderingMode.OBS_MAIN_RENDERING),
+    });
+
+    this.append({
+      label: $t('Create Stream Output Projector'),
+      click: () => this.projectorService.createProjector(ERenderingMode.OBS_STREAMING_RENDERING),
+    });
+
+    this.append({
+      label: $t('Create Recording Output Projector'),
+      click: () => this.projectorService.createProjector(ERenderingMode.OBS_RECORDING_RENDERING),
     });
 
     this.append({ type: 'separator' });
@@ -300,14 +332,14 @@ export class EditMenu extends Menu {
       this.append({ type: 'separator' });
 
       this.append({
-        label: 'Hide',
+        label: $t('Hide'),
         click: () => {
           this.editorCommandsService.executeCommand('HideMixerSourceCommand', this.source.sourceId);
         },
       });
 
       this.append({
-        label: 'Unhide All',
+        label: $t('Unhide All'),
         click: () => this.editorCommandsService.executeCommand('UnhideMixerSourcesCommand'),
       });
     }

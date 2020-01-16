@@ -94,7 +94,7 @@ export function inheritMutations(target: any) {
       registerMutation(
         target.prototype,
         methodName,
-        Object.getOwnPropertyDescriptor(target.prototype, methodName),
+        Object.getOwnPropertyDescriptor(target.prototype, methodName) as PropertyDescriptor,
         baseClassProto.mutationOptions[methodName],
       );
     });
@@ -112,7 +112,7 @@ export abstract class StatefulService<TState extends object> extends Service {
   }
 
   static getStore() {
-    if (!this.store) throw 'vuex store is not set';
+    if (!this.store) throw new Error('vuex store is not set');
     return this.store;
   }
 

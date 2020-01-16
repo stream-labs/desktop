@@ -109,7 +109,7 @@ export abstract class RpcApi extends Service {
         code: E_JSON_RPC_ERROR.INVALID_PARAMS,
         message: `resource not found: ${resourceId}`,
       });
-    } else if (!resource[methodName]) {
+    } else if (resource[methodName] === void 0) {
       errorResponse = this.jsonrpc.createError(request, {
         code: E_JSON_RPC_ERROR.METHOD_NOT_FOUND,
         message: methodName,
@@ -128,10 +128,12 @@ export abstract class RpcApi extends Service {
     // if both resource and method exist
     // execute request and record all mutations to the buffer
     if (fetchMutations) this.startBufferingMutations();
+    /* eslint-disable */
     const payload =
       typeof resource[methodName] === 'function'
         ? resource[methodName].apply(resource, args)
         : resource[methodName];
+    /* eslint-enable */
     const response = this.serializePayload(resource, payload, request);
     if (fetchMutations) response.mutations = this.stopBufferingMutations();
     return response;
@@ -204,7 +206,7 @@ export abstract class RpcApi extends Service {
     }
 
     // if responsePayload is a ServiceHelper then serialize it
-    if (responsePayload._isHelper) {
+    if (responsePayload._isHelper === true) {
       return this.jsonrpc.createResponse(request.id, {
         _type: 'HELPER',
         resourceId: responsePayload._resourceId,
@@ -215,7 +217,7 @@ export abstract class RpcApi extends Service {
     // payload may contain arrays or objects that may have ServiceHelper objects inside
     // so we have to try to find these ServiceHelpers and serialize them too
     traverse(responsePayload).forEach((item: any) => {
-      if (item && item._isHelper) {
+      if (item && item._isHelper === true) {
         const helper = this.getResource(item._resourceId);
         return {
           _type: 'HELPER',
@@ -294,14 +296,19 @@ export abstract class RpcApi extends Service {
   }
 
   /**
-   * The promise that the client has been executed is resolved/rejected
+   * The promise that the client has executed is resolved/rejected
    * Send this conformation back to the client
    */
   private sendPromiseMessage(info: { isRejected: boolean; promiseId: string; data: any }) {
+    // serialize errors
+    const serializedData = info.isRejected
+      ? { message: info.data.message, ...info.data }
+      : info.data;
+
     this.serviceEvent.next(
       this.jsonrpc.createEvent({
         emitter: 'PROMISE',
-        data: info.data,
+        data: serializedData,
         resourceId: info.promiseId,
         isRejected: info.isRejected,
       }),

@@ -26,6 +26,8 @@ const rimraf = require('rimraf');
 const ALMOST_INFINITY = Math.pow(2, 31) - 1; // max 32bit int
 const FAILED_TESTS_PATH = 'test-dist/failed-tests.json';
 
+let activeWindow: string | RegExp;
+
 const afterStartCallbacks: ((t: TExecutionContext) => any)[] = [];
 export function afterAppStart(cb: (t: TExecutionContext) => any) {
   afterStartCallbacks.push(cb);
@@ -37,9 +39,18 @@ export async function focusWindow(t: any, regex: RegExp): Promise<boolean> {
   for (const handle of handles.value) {
     await t.context.app.client.window(handle);
     const url = await t.context.app.client.getUrl();
-    if (url.match(regex)) return true;
+    if (url.match(regex)) {
+      activeWindow = regex;
+      return true;
+    }
   }
   return false;
+}
+
+// Focuses the worker window
+// Should not usually be used
+export async function focusWorker(t: any) {
+  await focusWindow(t, /windowId=worker$/);
 }
 
 // Focuses the main window
@@ -75,6 +86,11 @@ interface ITestRunnerOptions {
   appArgs?: string;
 
   /**
+   * disable synchronisation of scene-collections and media-backup
+   */
+  noSync?: boolean;
+
+  /**
    * Enable this to show network logs if test failed
    */
   networkLogging?: boolean;
@@ -91,6 +107,7 @@ interface ITestRunnerOptions {
 const DEFAULT_OPTIONS: ITestRunnerOptions = {
   skipOnboarding: true,
   restartAppAfterEachTest: true,
+  noSync: true,
   networkLogging: false,
   pauseIfFailed: false,
 };
@@ -103,18 +120,18 @@ export interface ITestContext {
 export type TExecutionContext = ExecutionContext<ITestContext>;
 
 let startAppFn: (t: TExecutionContext) => Promise<any>;
-let stopAppFn: (clearCache?: boolean) => Promise<any>;
+let stopAppFn: (t: TExecutionContext, clearCache?: boolean) => Promise<any>;
 
 export async function startApp(t: TExecutionContext) {
   return startAppFn(t);
 }
 
-export async function stopApp(clearCache?: boolean) {
-  return stopAppFn(clearCache);
+export async function stopApp(t: TExecutionContext, clearCache?: boolean) {
+  return stopAppFn(t, clearCache);
 }
 
 export async function restartApp(t: TExecutionContext): Promise<Application> {
-  await stopAppFn(false);
+  await stopAppFn(t, false);
   return await startAppFn(t);
 }
 
@@ -143,6 +160,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     t.context.cacheDir = cacheDir;
     const appArgs = options.appArgs ? options.appArgs.split(' ') : [];
     if (options.networkLogging) appArgs.push('--network-logging');
+    if (options.noSync) appArgs.push('--nosync');
     app = t.context.app = new Application({
       path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
       args: [
@@ -198,6 +216,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         await t.context.app.client.click('span=Skip');
         await t.context.app.client.click('h2=Start Fresh');
         await t.context.app.client.click('p=Skip');
+        if (await t.context.app.client.isVisible('p=Skip')) {
+          await t.context.app.client.click('p=Skip');
+        }
       } else {
         // Wait for the connect screen before moving on
         await t.context.app.client.isExisting('button=Twitch');
@@ -224,9 +245,10 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     return app;
   };
 
-  stopAppFn = async function stopApp(clearCache = true) {
+  stopAppFn = async function stopApp(t: TExecutionContext, clearCache = true) {
     try {
-      await app.stop();
+      await focusMain(t);
+      t.context.app.browserWindow.close();
     } catch (e) {
       fail('Crash on shutdown');
       console.error(e);
@@ -297,7 +319,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       await releaseUserInPool();
       if (options.restartAppAfterEachTest) {
         client.disconnect();
-        await stopAppFn();
+        await stopAppFn(t);
       }
     } catch (e) {
       fail('Test finalization failed');
@@ -317,7 +339,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
   test.after.always(async t => {
     if (!appIsRunning) return;
-    await stopAppFn();
+    await stopAppFn(t);
     if (!testPassed) saveFailedTestsToFile([testName]);
   });
 
@@ -343,5 +365,18 @@ function removeFailedTestFromFile(testName: string) {
     const failedTests = JSON.parse(fs.readFileSync(FAILED_TESTS_PATH));
     failedTests.splice(failedTests.indexOf(testName), 1);
     fs.writeFileSync(FAILED_TESTS_PATH, JSON.stringify(failedTests));
+  }
+}
+
+// the built-in 'click' method doesn't show selector in the error message
+// wrap this method to achieve this functionality
+
+export async function click(t: TExecutionContext, selector: string) {
+  try {
+    return await t.context.app.client.click(selector);
+  } catch (e) {
+    const windowId = String(activeWindow);
+    const message = `click to "${selector}" failed in window ${windowId}: ${e.message} ${e.type}`;
+    throw new Error(message);
   }
 }

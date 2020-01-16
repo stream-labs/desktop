@@ -101,7 +101,7 @@ export default class BrowserSourceInteraction extends TsxComponent<{}> {
     this.$refs.eventDiv.focus();
   }
 
-  render(h: Function) {
+  render() {
     return (
       <ModalLayout showControls={false} contentStyles={{ padding: '0px' }}>
         <div

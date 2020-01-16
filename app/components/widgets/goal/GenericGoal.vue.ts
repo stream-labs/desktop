@@ -4,7 +4,7 @@ import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from 'components/widgets/WidgetSettings.vue';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n';
-import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import {
   GenericGoalService,
   IGoalCreateOptions,
@@ -50,7 +50,7 @@ export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalSe
       await this.service.saveGoal(this.goalCreateOptions);
       this.requestState = 'success';
     } catch (e) {
-      this.onFailHandler(e.message);
+      this.failHandler(e.message);
       this.requestState = 'fail';
     }
   }

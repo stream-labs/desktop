@@ -5,6 +5,7 @@ import { JsonrpcService, IJsonRpcRequest } from 'services/api/jsonrpc';
 import electron from 'electron';
 import { UserService } from 'services/user';
 import { TPlatform } from 'services/platforms';
+import { InitAfter } from './core';
 
 interface IOutageNotification {
   /**
@@ -37,6 +38,7 @@ const S3_BUCKET = 'streamlabs-obs';
 const S3_KEY = 'outage-notification.json';
 const POLLING_INTERVAL = 5 * 60 * 1000;
 
+@InitAfter('UserService')
 export class OutageNotificationsService extends Service {
   @Inject() notificationsService: NotificationsService;
   @Inject() jsonrpcService: JsonrpcService;
@@ -46,7 +48,7 @@ export class OutageNotificationsService extends Service {
   currentNotificationId: number = null;
 
   init() {
-    this.checkForNotification();
+    this.userService.userLogin.subscribe(() => this.checkForNotification());
     setInterval(() => this.checkForNotification(), POLLING_INTERVAL);
   }
 

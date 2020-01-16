@@ -20,5 +20,10 @@
   "Filter name": "필터 이름",
   "Add source filter": "소스 필터 추가",
   "No filters applied": "적용된 필터가 없음",
-  "Source filters": "소스 필터"
+  "Source filters": "소스 필터",
+  "Invert Polarity": "Invert Polarity",
+  "Limiter": "Limiter",
+  "Expander": "Expander",
+  "Shader": "Shader",
+  "No settings are available for this filter": "No settings are available for this filter"
 }

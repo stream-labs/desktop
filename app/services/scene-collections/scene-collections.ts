@@ -34,6 +34,7 @@ import { Subject } from 'rxjs';
 import { TransitionsService } from 'services/transitions';
 import { $t } from '../i18n';
 import { StreamingService, EStreamingState } from 'services/streaming';
+import { DefaultHardwareService } from 'services/hardware';
 
 const uuid = window['require']('uuid/v4');
 
@@ -79,17 +80,13 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   @Inject() tcpServerService: TcpServerService;
   @Inject() transitionsService: TransitionsService;
   @Inject() streamingService: StreamingService;
+  @Inject() private defaultHardwareService: DefaultHardwareService;
 
   collectionAdded = new Subject<ISceneCollectionsManifestEntry>();
   collectionRemoved = new Subject<ISceneCollectionsManifestEntry>();
   collectionSwitched = new Subject<ISceneCollectionsManifestEntry>();
   collectionWillSwitch = new Subject<void>();
   collectionUpdated = new Subject<ISceneCollectionsManifestEntry>();
-
-  /**
-   * Whether the service has been initialized
-   */
-  private initialized = false;
 
   /**
    * Whether a valid collection is currently loaded.
@@ -127,7 +124,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     } else {
       await this.create({ auto: true });
     }
-    this.initialized = true;
   }
 
   /**
@@ -232,7 +228,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     const removingActiveCollection = id === this.activeCollection.id;
 
     if (removingActiveCollection) {
-      this.appService.runInLoadingMode(async () => {
+      await this.appService.runInLoadingMode(async () => {
         await this.removeCollection(id);
 
         if (this.collections.length > 0) {
@@ -266,6 +262,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * Instead, it will log an error and continue.
    */
   async safeSync(retries = 2) {
+    if (!this.canSync()) return;
+
     if (this.syncPending) {
       console.error(
         'Unable to start the scenes-collection sync process while prev process is not finished',
@@ -276,12 +274,13 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     this.syncPending = true;
     try {
       await this.sync();
+      this.syncPending = false;
     } catch (e) {
+      this.syncPending = false;
+
       console.error(`Scene collection sync failed (Attempt ${3 - retries}/3)`, e);
       if (retries > 0) await this.safeSync(retries - 1);
     }
-
-    this.syncPending = false;
   }
 
   /**
@@ -306,7 +305,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * @param name the name of the overlay
    * @param progressCallback a callback that receives progress of the download
    */
-  @RunInLoadingMode()
+  @RunInLoadingMode({ hideStyleBlockers: false })
   async installOverlay(
     url: string,
     name: string,
@@ -543,8 +542,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * performed while the application is already in a "LOADING" state.
    */
   private async deloadCurrentApplicationState() {
-    if (!this.initialized) return;
-
     this.tcpServerService.stopRequestsHandling();
 
     this.collectionWillSwitch.next();
@@ -569,6 +566,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
       this.transitionsService.deleteAllTransitions();
       this.transitionsService.deleteAllConnections();
+
+      this.streamingService.setSelectiveRecording(false);
     } catch (e) {
       console.error('Error deloading application state', e);
     }
@@ -597,11 +596,13 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       {},
       { channel: E_AUDIO_CHANNELS.OUTPUT_1 },
     );
-
+    const defaultId = this.defaultHardwareService.state.defaultAudioDevice
+      ? this.defaultHardwareService.state.defaultAudioDevice
+      : undefined;
     this.sourcesService.createSource(
       'Mic/Aux',
       'wasapi_input_capture',
-      {},
+      { device_id: defaultId },
       { channel: E_AUDIO_CHANNELS.INPUT_1 },
     );
   }

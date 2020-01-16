@@ -1,7 +1,8 @@
-import TsxComponent from 'components/tsx-component';
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import Mark from 'mark.js';
 import styles from './SearchablePages.m.less';
+import { Spinner } from 'streamlabs-beaker';
+import TsxComponent, { createProps } from 'components/tsx-component';
 
 interface IPageInfo {
   /**
@@ -14,20 +15,40 @@ interface IPageInfo {
   inputs: string[];
 }
 
+class SearchablePagesProps {
+  page: string = '';
+  pages: string[] = [];
+  searchStr: string = '';
+
+  /**
+   * this event is called when page has been switched but before it has been rendered
+   * can be used for preparing data for rendering
+   */
+  onBeforePageScan?: (page: string) => any = () => null;
+
+  /**
+   * this event is called when page has been rendered but before it has been parsed
+   * if returns a promise, scanning won't start unless it will be resolved
+   */
+  onPageRender?: (page: string) => Promise<any> | any = () => null;
+}
+
 /**
  * A component for the client-side text search
  */
-@Component({})
-export default class SearchablePages extends TsxComponent<{
-  page: string;
-  pages: string[];
-}> {
-  @Prop() page: string;
-  @Prop() pages: string[];
-  @Prop() searchStr: string;
-  currentPage: string = this.page || '';
+@Component({
+  components: { Spinner },
+  props: createProps(SearchablePagesProps),
+})
+export default class SearchablePages extends TsxComponent<SearchablePagesProps> {
+  currentPage: string = '';
   pagesInfo: Dictionary<IPageInfo> = null;
-  searchResultPages: string[];
+  searchResultPages: string[] = [];
+  loading = false;
+
+  created() {
+    this.currentPage = this.props.page || '';
+  }
 
   $refs: {
     pageSlot: HTMLDivElement;
@@ -35,7 +56,9 @@ export default class SearchablePages extends TsxComponent<{
 
   @Watch('searchStr')
   private async onSearchHandler(searchStr: string) {
-    // build the pages cache if it's empty
+    if (this.loading) return;
+
+    // build the pages cache if it's Can
     if (!this.pagesInfo) await this.scanPages();
 
     // find pages matches to the search string in the cache
@@ -52,7 +75,10 @@ export default class SearchablePages extends TsxComponent<{
     // after we sent `searchCompleted` event to the external component, it may re-render the slot content
     // so call `$nextTick` before `highlightPage()` to highlight the relevant content
     await this.$nextTick();
-    await this.highlightPage();
+    await this.highlightPage(this.props.searchStr);
+
+    // if search request has been updated while searching then search again
+    if (searchStr !== this.props.searchStr) await this.onSearchHandler(this.props.searchStr);
   }
 
   @Watch('page')
@@ -60,24 +86,29 @@ export default class SearchablePages extends TsxComponent<{
     this.currentPage = page;
 
     // if search is active then highlight the current page
-    if (this.searchStr && this.pagesInfo) {
+    if (this.props.searchStr && this.pagesInfo) {
       await this.$nextTick();
-      await this.highlightPage();
+      await (this.props.onPageRender && this.props.onPageRender(page));
+      await this.highlightPage(this.props.searchStr);
     }
   }
 
   /**
    * fetch and cache all text information from the page
    */
-  async scanPages() {
+  private async scanPages() {
+    this.loading = true;
     this.pagesInfo = {};
 
     // switch and render each page
-    for (const page of this.pages) {
-      this.$emit('beforePageScan', page);
+    for (const page of this.props.pages) {
+      this.props.onBeforePageScan && this.props.onBeforePageScan(page);
+
       // render the page
       this.currentPage = page;
       await this.$nextTick();
+
+      await (this.props.onPageRender && this.props.onPageRender(page));
 
       // collect the page text and text from inputs
       this.pagesInfo[page] = {
@@ -99,9 +130,10 @@ export default class SearchablePages extends TsxComponent<{
     }
 
     // don't forget to switch back to the original page from the `page` property
-    this.currentPage = this.page;
+    this.currentPage = this.props.page;
     await this.$nextTick();
 
+    this.loading = false;
     this.$emit('scanCompleted');
   }
 
@@ -110,22 +142,21 @@ export default class SearchablePages extends TsxComponent<{
    * this is not a recommended way to interact with elements in Vue.js
    * so it should be used carefully
    */
-  private async highlightPage() {
+  async highlightPage(searchStr: string) {
     // highlight the page text via Mark.js
     const mark = new Mark(this.$refs.pageSlot);
     mark.unmark();
-    if (this.searchStr) {
-      mark.mark(this.searchStr);
-    }
+    if (searchStr) mark.mark(searchStr);
 
     // highlight inputs
-    const pageInfo = this.pagesInfo[this.page];
-    this.getPageInputs().forEach(($input, ind) => {
-      $input.classList.remove('search-highlight');
-      const needHighlight =
-        this.searchStr && pageInfo.inputs[ind].match(new RegExp(this.searchStr, 'i'));
-      if (needHighlight) $input.classList.add('search-highlight');
-    });
+    const pageInfo = this.pagesInfo && this.pagesInfo[this.props.page];
+    if (pageInfo) {
+      this.getPageInputs().forEach(($input, ind) => {
+        $input.classList.remove('search-highlight');
+        const needHighlight = searchStr && pageInfo.inputs[ind].match(new RegExp(searchStr, 'i'));
+        if (needHighlight) $input.classList.add('search-highlight');
+      });
+    }
 
     // highlight buttons
     this.$refs.pageSlot.querySelectorAll('button').forEach($btn => {
@@ -140,13 +171,20 @@ export default class SearchablePages extends TsxComponent<{
   }
 
   private getPageInputs(): HTMLDivElement[] {
-    return Array.from(this.$refs.pageSlot.querySelectorAll('[data-role="input"]'));
+    return Array.from(
+      this.$refs.pageSlot.querySelectorAll('[data-role="input"]'),
+    ).filter(($el: HTMLDivElement) =>
+      $el.matches(':not([data-search-exclude])'),
+    ) as HTMLDivElement[];
   }
 
-  private render(h: Function) {
+  private render() {
     return (
       <div class={styles.searchablePages}>
-        <div ref="pageSlot">{this.$scopedSlots.default({ page: this.currentPage })}</div>
+        {this.loading && <Spinner />}
+        <div ref="pageSlot">
+          {this.$scopedSlots.default({ page: this.currentPage, scanning: this.loading })}
+        </div>
       </div>
     );
   }

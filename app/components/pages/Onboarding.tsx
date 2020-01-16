@@ -3,21 +3,30 @@ import { Onboarding } from 'streamlabs-beaker';
 import TsxComponent from 'components/tsx-component';
 import { OnboardingService } from 'services/onboarding';
 import { Inject } from 'services/core/injector';
-import Connect from './onboarding-steps/Connect';
-import ObsImport from './onboarding-steps/ObsImport';
-import StreamlabsFeatures from './onboarding-steps/StreamlabsFeatures';
-import Optimize from './onboarding-steps/Optimize';
-import FacebookPageCreation from './onboarding-steps/FacebookPageCreation';
-import ThemeSelector from './onboarding-steps/ThemeSelector';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
+import { SceneCollectionsService } from 'services/scene-collections';
+import {
+  Connect,
+  ObsImport,
+  StreamlabsFeatures,
+  HardwareSetup,
+  ThemeSelector,
+  Optimize,
+  FacebookPageCreation,
+  Multistream,
+} from './onboarding-steps';
 import { UserService } from 'services/user';
+import { $t } from 'services/i18n';
 import styles from './Onboarding.m.less';
+import { RestreamService } from 'services/restream';
 
 @Component({})
 export default class OnboardingPage extends TsxComponent<{}> {
   @Inject() onboardingService: OnboardingService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
   @Inject() userService: UserService;
+  @Inject() sceneCollectionsService: SceneCollectionsService;
+  @Inject() restreamService: RestreamService;
 
   currentStep = 1;
   importedFromObs = false;
@@ -71,16 +80,22 @@ export default class OnboardingPage extends TsxComponent<{}> {
       this.importedFromObs = true;
     } else if (importedObs === false) {
       this.importedFromObs = false;
+      if (this.noExistingSceneCollections) {
+        this.stepsState.push({ complete: false });
+      }
       if (
         this.onboardingService.isTwitchAuthed ||
         (this.onboardingService.isFacebookAuthed && this.fbSetupEnabled)
       ) {
         this.stepsState.push({ complete: false });
       }
+      if (this.restreamService.canEnableRestream) {
+        this.stepsState.push({ complete: false });
+      }
     }
   }
 
-  steps(h: Function) {
+  get steps() {
     const steps = [
       <Connect slot="1" continue={this.continue.bind(this)} />,
       <ObsImport
@@ -90,32 +105,43 @@ export default class OnboardingPage extends TsxComponent<{}> {
       />,
     ];
 
+    return this.addOptionalSteps(steps);
+  }
+
+  addOptionalSteps(steps: JSX.Element[]) {
     if (this.importedFromObs) {
       steps.push(<StreamlabsFeatures slot="3" />);
       return steps;
     }
-    steps.push(
-      <ThemeSelector
-        slot="3"
-        continue={this.continue.bind(this)}
-        setProcessing={this.setProcessing.bind(this)}
-      />,
-    );
-    if (this.onboardingService.isTwitchAuthed) {
+    steps.push(<HardwareSetup slot="3" />);
+    let nextStep = '4';
+    if (this.noExistingSceneCollections) {
       steps.push(
-        <Optimize
-          slot="4"
+        <ThemeSelector
+          slot={nextStep}
           continue={this.continue.bind(this)}
           setProcessing={this.setProcessing.bind(this)}
         />,
       );
+      nextStep = '5';
+    }
+    if (this.onboardingService.isTwitchAuthed) {
+      steps.push(
+        <Optimize
+          slot={nextStep}
+          continue={this.continue.bind(this)}
+          setProcessing={this.setProcessing.bind(this)}
+        />,
+      );
+      nextStep = `${Number(nextStep) + 1}`;
+      steps.push(<Multistream slot={nextStep} continue={() => this.continue()} />);
     } else if (this.onboardingService.isFacebookAuthed && this.fbSetupEnabled) {
-      steps.push(<FacebookPageCreation slot="4" continue={this.continue.bind(this)} />);
+      steps.push(<FacebookPageCreation slot={nextStep} continue={this.continue.bind(this)} />);
     }
     return steps;
   }
 
-  loginPage(h: Function) {
+  get loginPage() {
     return (
       <div>
         <div class={styles.container}>
@@ -125,7 +151,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
     );
   }
 
-  optimizePage(h: Function) {
+  get optimizePage() {
     return (
       <div>
         <div class={styles.container}>
@@ -138,15 +164,30 @@ export default class OnboardingPage extends TsxComponent<{}> {
     );
   }
 
-  render(h: Function) {
-    const steps = this.steps(h);
+  get hardwarePage() {
+    return (
+      <div>
+        <div class={styles.container}>
+          <HardwareSetup />
+          <button class="button button--action" onClick={this.complete}>
+            {$t('Complete')}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-    if (this.onboardingService.options.isLogin) {
-      return this.loginPage(h);
-    }
-    if (this.onboardingService.options.isOptimize) {
-      return this.optimizePage(h);
-    }
+  get noExistingSceneCollections() {
+    return (
+      this.sceneCollectionsService.collections.length === 1 &&
+      this.sceneCollectionsService.collections[0].auto
+    );
+  }
+
+  render() {
+    if (this.onboardingService.options.isLogin) return this.loginPage;
+    if (this.onboardingService.options.isOptimize) return this.optimizePage;
+    if (this.onboardingService.options.isHardware) return this.hardwarePage;
 
     return (
       <div>
@@ -166,11 +207,11 @@ export default class OnboardingPage extends TsxComponent<{}> {
               [1, 2].includes(this.currentStep) || (this.currentStep === 3 && this.importedFromObs)
             }
             hideButton={
-              [1, 2, 4].includes(this.currentStep) ||
-              (this.currentStep === 3 && !this.importedFromObs)
+              [1, 2, 5, 6].includes(this.currentStep) ||
+              (this.currentStep === 4 && !this.importedFromObs)
             }
           >
-            {steps}
+            {this.steps}
           </Onboarding>
         </div>
       </div>

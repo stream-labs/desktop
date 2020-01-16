@@ -39,7 +39,6 @@ test('Creating, fetching and removing scenes', async t => {
 test('Switching between scenes', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
-
   const scene = scenesService.getScenes().find(scene => scene.name === 'Scene');
   const scene2 = scenesService.createScene('Scene2');
 
@@ -57,7 +56,6 @@ test('Switching between scenes', async t => {
 test('Creating, fetching and removing scene-items', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
-
   const scene = scenesService.getScenes().find(scene => scene.name === 'Scene');
   const image1 = scene.createAndAddSource('Image1', 'image_source');
   const image2 = scene.createAndAddSource('Image2', 'image_source');

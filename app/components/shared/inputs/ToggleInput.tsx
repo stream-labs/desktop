@@ -5,7 +5,7 @@ import BoolInput from './BoolInput';
 
 @Component({})
 export default class ToggleInput extends BoolInput {
-  render(h: Function) {
+  render() {
     return (
       <div
         onClick={this.handleClick}

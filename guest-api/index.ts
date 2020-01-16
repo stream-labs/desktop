@@ -43,6 +43,7 @@ enum EResponseResultProcessing {
     throw new Error('Alert and Confirm are disabled in this context');
   };
 
+  // eslint-disable-next-line no-eval
   global.eval = function() {
     throw new Error('Eval is disabled for security');
   };
