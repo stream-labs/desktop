@@ -2,6 +2,7 @@ import { SceneItem as InternalSceneItem } from 'services/scenes';
 import { InjectFromExternalApi, Fallback } from 'services/api/external-api';
 import { Source, SourcesService } from 'services/api/external-api/sources';
 import { ISceneNodeModel, SceneNode } from './scene-node';
+import Utils from '../../../utils';
 
 export interface ISceneItemModel extends ISceneItemSettings, ISceneNodeModel {
   sceneItemId: string;
@@ -58,13 +59,21 @@ export interface ISceneItemActions {
 /**
  * API for scene-items
  */
-export class SceneItem extends SceneNode implements ISceneItemActions {
+export class SceneItem extends SceneNode implements ISceneItemActions, ISceneItemModel {
   @Fallback() private sceneItem: InternalSceneItem;
   @InjectFromExternalApi() private sourcesService: SourcesService;
+
+  sourceId: string;
+  sceneItemId: string;
+  name: string;
+  transform: ITransform;
+  visible: boolean;
+  locked: boolean;
 
   constructor(public sceneId: string, public nodeId: string, sourceId: string) {
     super(sceneId, nodeId);
     this.sceneItem = this.internalScenesService.views.getSceneItem(this.nodeId);
+    Utils.applyProxy(this, () => this.getModel());
   }
 
   /**

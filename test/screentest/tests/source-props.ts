@@ -2,8 +2,8 @@ import { useSpectron, test, afterAppStart, focusChild } from '../../helpers/spec
 import { getClient } from '../../helpers/api-client';
 import { ISourcesServiceApi, TSourceType } from '../../../app/services/sources/sources-api';
 import { useScreentest } from '../screenshoter';
-import { ScenesService } from '../../../app/services/scenes/';
 import { sleep } from '../../helpers/sleep';
+import { ScenesService } from '../../../app/services/api/external-api/scenes';
 
 let showSourceProps: (name: string) => void;
 

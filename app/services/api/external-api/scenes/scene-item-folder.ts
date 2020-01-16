@@ -4,6 +4,7 @@ import { SourcesService } from 'services/api/external-api/sources/sources';
 import { SceneItem } from './scene-item';
 import { ISceneNodeModel, SceneNode } from './scene-node';
 import { Selection } from './selection';
+import Utils from '../../../utils';
 
 export interface ISceneItemFolderModel extends ISceneNodeModel {
   name: string;
@@ -12,13 +13,16 @@ export interface ISceneItemFolderModel extends ISceneNodeModel {
 /**
  * API for folders
  */
-export class SceneItemFolder extends SceneNode {
+export class SceneItemFolder extends SceneNode implements ISceneItemFolderModel{
   @Fallback() private sceneFolder: InternalSceneItemFolder;
   @InjectFromExternalApi() private sourcesService: SourcesService;
+
+  name: string;
 
   constructor(public sceneId: string, public nodeId: string) {
     super(sceneId, nodeId);
     this.sceneFolder = this.internalScenesService.views.getScene(sceneId).getFolder(this.nodeId);
+    Utils.applyProxy(this, () => this.getModel());
   }
 
   /**
@@ -26,9 +30,9 @@ export class SceneItemFolder extends SceneNode {
    */
   getModel(): ISceneItemFolderModel {
     return {
+      ...super.getModel(),
       name: this.sceneFolder.name,
       childrenIds: this.sceneNode.childrenIds,
-      ...super.getModel(),
     };
   }
 

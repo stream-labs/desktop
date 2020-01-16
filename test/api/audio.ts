@@ -1,9 +1,8 @@
 import { useSpectron, test } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { IAudioServiceApi } from 'services/audio';
-import { ScenesService } from 'services/scenes';
 import { ISceneCollectionsServiceApi } from 'services/scene-collections';
-import { IJsonRpcEvent } from '../../app/services/api/jsonrpc';
+import { ScenesService } from '../../app/services/api/external-api/scenes';
 
 useSpectron({ restartAppAfterEachTest: false });
 

@@ -2,7 +2,7 @@ import { useSpectron, test, focusChild } from '../../helpers/spectron';
 import { getClient } from '../../helpers/api-client';
 import { ISourcesServiceApi } from '../../../app/services/sources/sources-api';
 import { makeScreenshots, useScreentest } from '../screenshoter';
-import { ScenesService } from '../../../app/services/scenes';
+import { ScenesService } from 'services/api/external-api/scenes';
 
 useSpectron({ restartAppAfterEachTest: false });
 useScreentest();

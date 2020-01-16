@@ -8,15 +8,17 @@ export const enum EBit {
 }
 
 export default class Utils {
-  static applyProxy(target: Object, source: Object) {
+  static applyProxy(target: Object, source: Object | Function) {
     // TODO: Figure out why this is happening
     if (!source) return;
 
-    Object.keys(source).forEach(propName => {
+    const sourceObj = typeof source === 'function' ? source() : source;
+
+    Object.keys(sourceObj).forEach(propName => {
       Object.defineProperty(target, propName, {
         configurable: true,
         get() {
-          return source[propName];
+          return sourceObj[propName];
         },
       });
     });

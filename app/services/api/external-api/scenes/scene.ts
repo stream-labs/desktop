@@ -8,6 +8,7 @@ import { ISceneNodeAddOptions, ScenesService } from './scenes';
 import { ISceneNodeModel, SceneNode } from './scene-node';
 import { SceneItem } from './scene-item';
 import { SceneItemFolder } from './scene-item-folder';
+import Utils from '../../../utils';
 
 export interface ISceneModel {
   id: string;
@@ -16,16 +17,20 @@ export interface ISceneModel {
 }
 
 @ServiceHelper()
-export class Scene {
+export class Scene implements ISceneModel {
   @InjectFromExternalApi() private scenesService: ScenesService;
   @InjectFromExternalApi() private sourcesService: SourcesService;
   @Inject('ScenesService')
   private internalScenesService: InternalScenesService;
+  name: string;
+  id: string;
+  nodes: ISceneNodeModel[];
 
   @Fallback() private scene: InternalScene;
 
   constructor(private sceneId: string) {
     this.scene = this.internalScenesService.views.getScene(sceneId);
+    Utils.applyProxy(this, () => this.getModel());
   }
 
   getModel(): ISceneModel {

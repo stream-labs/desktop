@@ -31,6 +31,10 @@ export abstract class SceneNode {
   @Fallback() protected sceneNode: InternalSceneNode;
   protected scene: InternalScene;
 
+  id: string;
+  sceneNodeType: TSceneNodeType;
+  parentId: string;
+
   constructor(public sceneId: string, public nodeId: string) {
     this.scene = this.internalScenesService.views.getScene(sceneId);
     this.sceneNode = this.scene.getNode(this.nodeId);
@@ -99,14 +103,14 @@ export abstract class SceneNode {
   /**
    * Check the node is scene item
    */
-  isItem(): boolean {
+  isItem(): this is SceneItem {
     return this.sceneNode.isItem();
   }
 
   /**
    * Check the node is scene folder
    */
-  isFolder(): boolean {
+  isFolder(): this is SceneItemFolder {
     return this.sceneNode.isFolder();
   }
 
