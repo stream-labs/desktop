@@ -81,6 +81,7 @@
 
   & > .comment-body {
     overflow-x: hidden;
+    white-space: nowrap;
     text-overflow: ellipsis;
     flex-grow: 1;
     color: @white;
@@ -94,8 +95,9 @@
 }
 
 .sentinel {
-  height: 1px;
-  margin-top: -1px;
+  pointer-events: none;
+  height: 4px;
+  margin-top: -4px;
 }
 
 .pinned {
