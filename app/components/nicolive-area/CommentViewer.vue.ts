@@ -10,6 +10,7 @@ import { ChatMessage } from 'services/nicolive-program/MessageServerClient';
 import { Menu } from 'util/menus/Menu';
 import { clipboard } from 'electron';
 import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
+import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
 
 @Component({
   components: {
@@ -19,6 +20,9 @@ import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive
   }
 })
 export default class CommentViewer extends Vue {
+  @Inject()
+  private nicoliveProgramService: NicoliveProgramService;
+
   @Inject()
   private nicoliveCommentViewerService: NicoliveCommentViewerService;
 
@@ -36,6 +40,14 @@ export default class CommentViewer extends Vue {
 
   get items() {
     return this.nicoliveCommentViewerService.items.filter(this.nicoliveCommentLocalFilterService.filter);
+  }
+
+  getItemTitle(item: ChatMessage) {
+    const { vpos, content } = item.chat;
+    const { vposBaseTime, startTime } = this.nicoliveProgramService.state;
+    const vposTime = vposBaseTime + Math.floor(vpos / 100);
+    const diffTime = vposTime - startTime;
+    return `${content} (${NicoliveProgramService.format(diffTime)})`;
   }
 
   showCommentMenu(item: ChatMessage) {

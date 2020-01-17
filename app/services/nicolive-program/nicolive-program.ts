@@ -19,6 +19,7 @@ type ProgramState = {
   description: string;
   endTime: number;
   startTime: number;
+  vposBaseTime: number;
   isMemberOnly: boolean;
   communityID: string;
   communityName: string;
@@ -87,6 +88,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
     description: '',
     endTime: NaN,
     startTime: NaN,
+    vposBaseTime: NaN,
     isMemberOnly: false,
     communityID: '',
     communityName: '',
@@ -280,6 +282,7 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
       title: program.title,
       description: program.description,
       startTime: program.beginAt,
+      vposBaseTime: program.vposBaseAt,
       endTime: program.endAt,
       isMemberOnly: program.isMemberOnly,
       communityID: socialGroupId,

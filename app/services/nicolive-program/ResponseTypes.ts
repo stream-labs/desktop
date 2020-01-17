@@ -76,7 +76,7 @@ export interface ProgramInfo {
     /** メンバー限定放送であるか */
     isMemberOnly: boolean;
     /** vpos基準時刻 */
-    vposBaseTime: number;
+    vposBaseAt: number;
     /** 開演時間 */
     beginAt: number;
     /** 終了時間 */

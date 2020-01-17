@@ -6,7 +6,7 @@
     </div>
     <div class="content">
       <div class="list">
-        <div class="row" v-for="(item, index) of items" :key="index" @click="pinnedComment = item">
+        <div class="row" v-for="(item, index) of items" :key="index" @click="pinnedComment = item" :title="getItemTitle(item)">
           <!-- TODO: 種別判定と出し分け -->
           <div class="comment-number">{{ item.chat.no }}</div>
           <div class="comment-body">{{ item.chat.content }}</div>
@@ -20,7 +20,7 @@
         </div>
         <div class="close"><i class="icon-close icon-btn" @click="pinnedComment = null"></i></div>
       </div>
-      <div class="scroll-to-latest" v-if="!isLatestVisible">↓</div>
+      <div class="scroll-to-latest" v-if="!isLatestVisible && items.length > 0">↓</div>
     </div>
     <comment-form class="comment-form" />
     <comment-filter class="overlay" @close="isFilterOpened = false" v-if="isFilterOpened"/>
