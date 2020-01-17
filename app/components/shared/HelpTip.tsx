@@ -31,7 +31,7 @@ export default class HelpTip extends TsxComponent<HelpTipProps> {
   render() {
     return (
       this.shouldShow && (
-        <div class={styles.helpTip} style="position">
+        <div class={styles.helpTip} style={this.props.position}>
           <div
             class={cx(styles.helpTipArrow, {
               [styles.helpTipArrowRight]: this.props.tipPosition === 'right',
