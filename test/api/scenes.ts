@@ -1,8 +1,8 @@
 import { useSpectron, test } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
-import { ScenesService } from '../../app/services/scenes';
 import { SceneBuilder } from '../helpers/scene-builder';
 import { sleep } from '../helpers/sleep';
+import { ScenesService } from '../../app/services/api/external-api/scenes';
 
 const path = require('path');
 
@@ -11,7 +11,7 @@ useSpectron({ restartAppAfterEachTest: false });
 test('The default scene exists', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
-  const scenes = scenesService.views.scenes;
+  const scenes = scenesService.getScenes();
 
   t.true(scenes.length === 1);
 });
@@ -24,13 +24,13 @@ test('Creating, fetching and removing scenes', async t => {
 
   t.is(scene2.name, 'Scene2');
 
-  let scenes = scenesService.views.scenes;
+  let scenes = scenesService.getScenes();
   let scenesNames = scenes.map(scene => scene.name);
 
   t.deepEqual(scenesNames, ['Scene', 'Scene2']);
 
   scenesService.removeScene(scenes[1].id);
-  scenes = scenesService.views.scenes;
+  scenes = scenesService.getScenes();
   scenesNames = scenes.map(scene => scene.name);
 
   t.deepEqual(scenesNames, ['Scene']);
@@ -39,26 +39,24 @@ test('Creating, fetching and removing scenes', async t => {
 test('Switching between scenes', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
-
-  const scene = scenesService.views.scenes.find(scene => scene.name === 'Scene');
+  const scene = scenesService.getScenes().find(scene => scene.name === 'Scene');
   const scene2 = scenesService.createScene('Scene2');
 
-  t.is(scene.id, scenesService.views.activeSceneId);
+  t.is(scene.id, scenesService.activeSceneId);
 
   scenesService.makeSceneActive(scene2.id);
 
-  t.is(scene2.id, scenesService.views.activeSceneId);
+  t.is(scene2.id, scenesService.activeSceneId);
 
   scene2.remove();
 
-  t.is(scene.id, scenesService.views.activeSceneId);
+  t.is(scene.id, scenesService.activeSceneId);
 });
 
 test('Creating, fetching and removing scene-items', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
-
-  const scene = scenesService.views.scenes.find(scene => scene.name == 'Scene');
+  const scene = scenesService.getScenes().find(scene => scene.name === 'Scene');
   const image1 = scene.createAndAddSource('Image1', 'image_source');
   const image2 = scene.createAndAddSource('Image2', 'image_source');
   t.is(image1['name'], 'Image1');
@@ -148,7 +146,7 @@ test('Creating nested scenes', async t => {
 test('SceneItem.setSettings()', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
-  const scene = scenesService.views.activeScene;
+  const scene = scenesService.activeScene;
 
   const sceneItem = scene.createAndAddSource('MyColorSource', 'color_source');
 
@@ -165,8 +163,8 @@ test('SceneItem.setSettings()', async t => {
       top: 1.2,
       bottom: 5.6,
       left: 7.1,
-      right: 10
-    }
+      right: 10,
+    },
   });
 
   // crop values must be rounded
@@ -174,14 +172,14 @@ test('SceneItem.setSettings()', async t => {
     top: 1,
     bottom: 6,
     left: 7,
-    right: 10
+    right: 10,
   });
 });
 
 test('SceneItem.resetTransform()', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
-  const scene = scenesService.views.activeScene;
+  const scene = scenesService.activeScene;
 
   const sceneItem = scene.createAndAddSource('MyColorSource', 'color_source');
 
@@ -189,7 +187,7 @@ test('SceneItem.resetTransform()', async t => {
     position: { x: 100, y: 100 },
     scale: { x: 100, y: 100 },
     crop: { top: 100, right: 100, bottom: 100, left: 100 },
-    rotation: 100
+    rotation: 100,
   });
 
   sceneItem.resetTransform();
@@ -198,7 +196,7 @@ test('SceneItem.resetTransform()', async t => {
     position: { x: 0, y: 0 },
     scale: { x: 1, y: 1 },
     crop: { top: 0, right: 0, bottom: 0, left: 0 },
-    rotation: 0
+    rotation: 0,
   });
 });
 
@@ -208,7 +206,7 @@ test('SceneItem.addFile()', async t => {
   const client = await getClient();
   const sceneBuilder = new SceneBuilder(client);
   const scenesService = client.getResource<ScenesService>('ScenesService');
-  const scene = scenesService.views.activeScene;
+  const scene = scenesService.activeScene;
 
   scene.clear();
   scene.addFile(dataDir);
@@ -226,6 +224,6 @@ test('SceneItem.addFile()', async t => {
         chatbox.mp4: ffmpeg_source
       text
         hello.txt: text_gdiplus
-  `)
+  `),
   );
 });

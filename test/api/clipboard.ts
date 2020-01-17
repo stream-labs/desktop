@@ -1,17 +1,17 @@
 import { useSpectron, test, afterAppStart } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { SceneBuilder } from '../helpers/scene-builder';
-import { SceneItem, SceneItemNode, ScenesService } from 'services/scenes';
 import { SelectionService } from 'services/selection';
 import { IClipboardServiceApi } from 'services/clipboard';
 import { ISceneCollectionsServiceApi } from 'services/scene-collections';
 import { ISourcesServiceApi } from 'services/sources';
 import { SourceFiltersService } from 'services/source-filters';
+import { SceneItem, SceneNode, ScenesService } from '../../app/services/api/external-api/scenes';
 
 useSpectron({ restartAppAfterEachTest: false });
 
 let sceneBuilder: SceneBuilder;
-let getNode: (name: string) => SceneItemNode;
+let getNode: (name: string) => SceneNode;
 let getNodeId: (name: string) => string;
 let selectionService: SelectionService;
 let clipboardService: IClipboardServiceApi;
@@ -170,7 +170,7 @@ test('Copy/paste scenes between scene collections', async t => {
       Item2: image_source
   `);
 
-  const scene1 = scenesService.views.scenes[0];
+  const scene1 = scenesService.getScenes()[0];
   const scene2 = scenesService.createScene('Scene2');
   scene2.makeActive();
 
@@ -199,7 +199,10 @@ test('Copy/paste scenes between scene collections', async t => {
   `),
   );
 
-  scenesService.views.scenes.find(scene => scene.name === 'Scene2').makeActive();
+  scenesService
+    .getScenes()
+    .find(scene => scene.name === 'Scene2')
+    .makeActive();
 
   t.true(
     sceneBuilder.isEqualTo(`

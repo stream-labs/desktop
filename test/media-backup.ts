@@ -1,13 +1,13 @@
 import { startApp, stopApp, test, useSpectron, focusChild } from './helpers/spectron';
 
 import { getClient } from './helpers/api-client';
-import { ScenesService } from 'services/scenes';
 const path = require('path');
 import fse = require('fs-extra');
 import fs = require('fs');
 import os = require('os');
 import { logIn } from './helpers/spectron/user';
 import { SceneCollectionsService } from 'services/api/external-api/scene-collections';
+import { ScenesService } from '../app/services/api/external-api/scenes';
 
 useSpectron({ noSync: false });
 
@@ -27,7 +27,7 @@ test('Media backup', async t => {
   const collection = await collectionsService.create({ name: 'Test collection' });
 
   try {
-    const scene = api.getResource<ScenesService>('ScenesService').views.activeScene;
+    const scene = api.getResource<ScenesService>('ScenesService').activeScene;
     const image1Path = path.resolve(tmpDir, 'moon.png');
     const image2Path = path.resolve(tmpDir, 'sun.png');
 

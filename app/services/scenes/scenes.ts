@@ -265,16 +265,15 @@ export class ScenesService extends StatefulService<IScenesState> {
       sceneItem.getScene().removeItem(sceneItem.sceneItemId);
     });
 
-    this.REMOVE_SCENE(id);
-
     if (this.state.activeSceneId === id) {
-      const sceneIds = Object.keys(this.state.scenes);
+      const sceneIds = Object.keys(this.state.scenes).filter(sceneId => sceneId !== id);
 
       if (sceneIds[0]) {
         this.makeSceneActive(sceneIds[0]);
       }
     }
 
+    this.REMOVE_SCENE(id);
     this.sceneRemoved.next(sceneModel);
     return sceneModel;
   }

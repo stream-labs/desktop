@@ -1,8 +1,8 @@
 import { useSpectron, test } from '../../helpers/spectron';
 import { getClient } from '../../helpers/api-client';
-import { ScenesService } from '../../../app/services/scenes';
 import { ISourcesServiceApi } from '../../../app/services/sources/sources-api';
 import { useScreentest } from '../screenshoter';
+import { ScenesService } from '../../../app/services/api/external-api/scenes';
 
 useSpectron({ restartAppAfterEachTest: false });
 useScreentest();
@@ -16,7 +16,7 @@ test('Editor with sources', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const sourcesService = client.getResource<ISourcesServiceApi>('SourcesService');
-  const scene = scenesService.views.activeScene;
+  const scene = scenesService.activeScene;
 
   const colorSource1 = sourcesService.createSource('MyColorSource1', 'color_source');
   const colorItem2 = scene.createAndAddSource('MyColorSource2', 'color_source');
@@ -36,7 +36,7 @@ test('Editor with the big amount of sources and scenes', async t => {
   }
 
   while (sourcesCount--) {
-    scenesService.views.activeScene.createAndAddSource(
+    scenesService.activeScene.createAndAddSource(
       `My source with a long name ${sourcesCount}`,
       'color_source',
     );

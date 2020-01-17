@@ -1,16 +1,16 @@
 import { useSpectron, test, afterAppStart } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
-import { ScenesService } from 'services/scenes';
-import { SelectionService } from '../../app/services/selection';
+
 import { SceneBuilder } from '../helpers/scene-builder';
-import { Scene, SceneItemNode } from 'services/scenes';
 import { sleep } from '../helpers/sleep';
+import { SelectionService } from '../../app/services/api/external-api/selection';
+import { Scene, SceneNode, ScenesService } from '../../app/services/api/external-api/scenes';
 
 useSpectron({ restartAppAfterEachTest: false });
 
 let sceneBuilder: SceneBuilder;
 let scene: Scene;
-let getNode: (name: string) => SceneItemNode;
+let getNode: (name: string) => SceneNode;
 let getNodeId: (name: string) => string;
 let selectionService: SelectionService;
 
@@ -27,25 +27,25 @@ test('Selection', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const selection = client.getResource<SelectionService>('SelectionService');
-  const scene = scenesService.views.activeScene;
+  const scene = scenesService.activeScene;
 
   const color1 = scene.createAndAddSource('Color1', 'color_source');
   const color2 = scene.createAndAddSource('Color2', 'color_source');
   const color3 = scene.createAndAddSource('Color3', 'color_source');
 
-  selection.select(color2.sceneItemId);
+  selection.select([color2.id]);
 
   t.true(!selection.isSelected(color1.sceneItemId));
   t.true(selection.isSelected(color2.sceneItemId));
   t.true(!selection.isSelected(color3.sceneItemId));
 
-  selection.add(color3.sceneItemId);
+  selection.add([color3.id]);
 
   t.true(!selection.isSelected(color1.sceneItemId));
   t.true(selection.isSelected(color2.sceneItemId));
   t.true(selection.isSelected(color3.sceneItemId));
 
-  selection.deselect(color3.sceneItemId);
+  selection.deselect([color3.id]);
 
   t.true(!selection.isSelected(color1.sceneItemId));
   t.true(selection.isSelected(color2.sceneItemId));
@@ -70,7 +70,7 @@ test('Selection actions', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const selection = client.getResource<SelectionService>('SelectionService');
-  const scene = scenesService.views.activeScene;
+  const scene = scenesService.activeScene;
 
   let [color1, color2, color3] = scene.getItems();
 
@@ -91,7 +91,7 @@ test('Invalid selection', async t => {
   const selection = client.getResource<SelectionService>('SelectionService');
   const anotherScene = scenesService.createScene('Another scene');
   const colorFromAnotherScene = anotherScene.createAndAddSource('MyColor', 'color_source');
-  const [colorSource] = scenesService.views.activeScene.getItems();
+  const [colorSource] = scenesService.activeScene.getItems();
 
   // invalid ids must be ignored
   selection.select([colorSource.sceneItemId, 'this_is_an_invalid_id']);
@@ -152,7 +152,7 @@ test('Place after folder with deep nesting', async t => {
     Item4:
   `);
 
-  selectionService.select(getNodeId('Folder1'));
+  selectionService.select([getNodeId('Folder1')]);
   selectionService.placeAfter(getNodeId('Item4'));
 
   t.true(

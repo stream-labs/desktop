@@ -1,6 +1,6 @@
 import { useSpectron, test } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
-import { ScenesService } from 'services/scenes';
+import { ScenesService } from 'services/api/external-api/scenes/scenes';
 import { SourcesService } from 'services/api/external-api/sources/sources';
 
 useSpectron({ restartAppAfterEachTest: false });
@@ -9,7 +9,7 @@ test('Creating, fetching and removing sources', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const sourcesService = client.getResource<SourcesService>('SourcesService');
-  const scene = scenesService.views.activeScene;
+  const scene = scenesService.activeScene;
 
   const colorSource1 = sourcesService.createSource('MyColorSource1', 'color_source');
   const colorItem2 = scene.createAndAddSource('MyColorSource2', 'color_source');
@@ -25,7 +25,7 @@ test('Creating, fetching and removing sources', async t => {
 
   t.deepEqual(sceneItemNames, ['MyColorSource1', 'MyColorSource2']);
 
-  scene.removeItem(colorItem1.sceneItemId);
+  scene.removeItem(colorItem1.id);
   colorItem2.remove();
   sceneItemNames = scene.getItems().map(item => item['name']);
 
@@ -48,10 +48,7 @@ test('Source events', async t => {
   t.truthy(event.data.id); // id field is necessary for Streamdeck
 
   // check `sourceUpdated` event after `createAndAddSource` call
-  const item2 = scenesService.views.activeScene.createAndAddSource(
-    'audio2',
-    'wasapi_output_capture',
-  );
+  const item2 = scenesService.activeScene.createAndAddSource('audio2', 'wasapi_output_capture');
   event = await client.fetchNextEvent();
   t.is(event.data.name, 'audio2');
 

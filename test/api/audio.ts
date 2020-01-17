@@ -1,9 +1,9 @@
 import { useSpectron, test } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { IAudioServiceApi } from 'services/audio';
-import { ScenesService } from 'services/scenes';
 import { ISceneCollectionsServiceApi } from 'services/scene-collections';
-import { IJsonRpcEvent } from '../../app/services/api/jsonrpc';
+import { ScenesService } from '../../app/services/api/external-api/scenes';
+import { sleep } from '../helpers/sleep';
 
 useSpectron({ restartAppAfterEachTest: false });
 
@@ -20,7 +20,7 @@ test('The sources with audio have to be appeared in AudioService', async t => {
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const audioService = client.getResource<IAudioServiceApi>('AudioService');
 
-  const scene = scenesService.views.activeScene;
+  const scene = scenesService.activeScene;
   scene.createAndAddSource('MyAudio', 'wasapi_output_capture');
   const audioSources = audioService.getSourcesForCurrentScene();
 
@@ -35,7 +35,7 @@ test('The audio sources have to keep settings after application restart', async 
     'SceneCollectionsService',
   );
 
-  const scene = scenesService.views.activeScene;
+  const scene = scenesService.activeScene;
   const source = scene.createAndAddSource('MyMic', 'wasapi_input_capture');
   const audioSource = audioService.getSource(source.sourceId);
 
@@ -62,7 +62,7 @@ test('Events are emitted when the audio source is updated', async t => {
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const audioService = client.getResource<IAudioServiceApi>('AudioService');
 
-  const scene = scenesService.views.activeScene;
+  const scene = scenesService.activeScene;
   const sceneItem = scene.createAndAddSource('MyAudio', 'wasapi_output_capture');
   const sourceId = sceneItem.getSource().sourceId;
 
