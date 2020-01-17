@@ -267,6 +267,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
    * test should be considered as failed if it writes exceptions in to the log file
    */
   async function checkErrorsInLogFile() {
+    await sleep(1000); // electron-log needs some time to write down logs
     const filePath = path.join(cacheDir, 'slobs-client', 'log.log');
     if (!fs.existsSync(filePath)) return;
     const logs = fs.readFileSync(filePath).toString();
@@ -339,6 +340,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
   test.after.always(async t => {
     if (!appIsRunning) return;
+    t.context = context;
     await stopAppFn(t);
     if (!testPassed) saveFailedTestsToFile([testName]);
   });

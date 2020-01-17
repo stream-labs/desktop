@@ -3,6 +3,7 @@ import { getClient } from '../helpers/api-client';
 import { IAudioServiceApi } from 'services/audio';
 import { ISceneCollectionsServiceApi } from 'services/scene-collections';
 import { ScenesService } from '../../app/services/api/external-api/scenes';
+import { sleep } from '../helpers/sleep';
 
 useSpectron({ restartAppAfterEachTest: false });
 

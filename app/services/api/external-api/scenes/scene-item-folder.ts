@@ -5,6 +5,7 @@ import { SceneItem } from './scene-item';
 import { ISceneNodeModel, SceneNode } from './scene-node';
 import { Selection } from './selection';
 import Utils from '../../../utils';
+import { ServiceHelper } from '../../../core';
 
 export interface ISceneItemFolderModel extends ISceneNodeModel {
   name: string;
@@ -13,6 +14,7 @@ export interface ISceneItemFolderModel extends ISceneNodeModel {
 /**
  * API for folders
  */
+@ServiceHelper()
 export class SceneItemFolder extends SceneNode implements ISceneItemFolderModel{
   @Fallback() private sceneFolder: InternalSceneItemFolder;
   @InjectFromExternalApi() private sourcesService: SourcesService;
