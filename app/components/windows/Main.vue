@@ -1,10 +1,10 @@
 <template>
 <div class="main" :class="theme" id="mainWrapper" @drop="onDropHandler">
-  <title-bar :title="title" :class="{ 'titlebar--error': errorAlert }" v-if="$store.state.bulkLoadFinished" />
-  <news-banner v-if="$store.state.bulkLoadFinished" />
+  <title-bar :title="title" :class="{ 'titlebar--error': errorAlert }" v-if="bulkLoadFinished" />
+  <news-banner v-if="bulkLoadFinished" />
   <div
     class="main-contents"
-    v-if="$store.state.bulkLoadFinished"
+    v-if="bulkLoadFinished"
     :class="{
       'main-contents--right': renderDock && leftDock && hasLiveDock,
       'main-contents--left': renderDock && !leftDock && hasLiveDock,
@@ -45,7 +45,7 @@
     </div>
   </div>
   <transition name="loader">
-    <div class="main-loading" v-if="!$store.state.bulkLoadFinished || showLoadingSpinner"><custom-loader></custom-loader></div>
+    <div class="main-loading" v-if="!bulkLoadFinished || showLoadingSpinner"><custom-loader></custom-loader></div>
   </transition>
 </div>
 </template>
