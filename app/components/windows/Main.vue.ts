@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import SideNav from '../SideNav';
 import NewsBanner from '../NewsBanner';
 import { ScenesService } from 'services/scenes';
@@ -68,13 +68,20 @@ export default class Main extends Vue {
     window.addEventListener('resize', this.windowSizeHandler);
   }
 
-  mounted() {
-    // const dockWidth = this.customizationService.state.livedockSize;
-    // if (dockWidth < 1) {
-    //   // migrate from old percentage value to the pixel value
-    //   this.resetWidth();
-    // }
-    // this.handleResize();
+  get bulkLoadFinished() {
+    return this.$store.state.bulkLoadFinished;
+  }
+
+  @Watch('bulkLoadFinished')
+  initializeResize() {
+    this.$nextTick(() => {
+      const dockWidth = this.customizationService.state.livedockSize;
+      if (dockWidth < 1) {
+        // migrate from old percentage value to the pixel value
+        this.resetWidth();
+      }
+      this.handleResize();
+    });
   }
 
   destroyed() {
