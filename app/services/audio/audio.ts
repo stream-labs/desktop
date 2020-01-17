@@ -41,6 +41,7 @@ interface IAudioSourceData {
   volmeter?: obs.IVolmeter;
   callbackInfo?: obs.ICallbackData;
   stream?: Observable<IVolmeter>;
+  timeoutId?: number;
 }
 
 class AudioViews extends ViewHandler<IAudioSourcesState> {
@@ -263,7 +264,6 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
 
     let gotEvent = false;
     let lastVolmeterValue: IVolmeter;
-    let volmeterCheckTimeoutId: number;
     this.sourceData[sourceId].callbackInfo = this.sourceData[sourceId].volmeter.addCallback(
       (magnitude: number[], peak: number[], inputPeak: number[]) => {
         const volmeter: IVolmeter = { magnitude, peak, inputPeak };
@@ -295,7 +295,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
       }
 
       gotEvent = false;
-      volmeterCheckTimeoutId = window.setTimeout(volmeterCheck, 100);
+      this.sourceData[sourceId].timeoutId = window.setTimeout(volmeterCheck, 100);
     };
 
     volmeterCheck();
@@ -313,6 +313,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
 
   private removeAudioSource(sourceId: string) {
     this.sourceData[sourceId].volmeter.removeCallback(this.sourceData[sourceId].callbackInfo);
+    if (this.sourceData[sourceId].timeoutId) clearTimeout(this.sourceData[sourceId].timeoutId);
     delete this.sourceData[sourceId];
     this.REMOVE_AUDIO_SOURCE(sourceId);
   }
