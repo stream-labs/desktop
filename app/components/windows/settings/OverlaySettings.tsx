@@ -86,7 +86,7 @@ export default class OverlaySettings extends Vue {
     });
   }
 
-  button(title: string, fn: Function) {
+  button(title: string, fn: () => void) {
     return (
       <button class="button button--action" disabled={this.busy} onClick={fn}>
         {title}
