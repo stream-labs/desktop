@@ -4,15 +4,15 @@ import { Subscription, Observer, PartialObserver, Subscriber } from 'rxjs';
 /** chatメッセージ（取得形のみ） */
 export type ChatMessage = {
   chat: {
-    content: string;
-    date: number;
-    date_usec: number;
-    no: number;
+    content?: string;
+    date?: number;
+    date_usec?: number;
+    no?: number;
     premium?: number;
-    thread: number;
-    user_id: string;
-    vpos: number;
-    anonymity: number;
+    thread?: number;
+    user_id?: string;
+    vpos?: number;
+    anonymity?: number;
     mail?: string;
     score?: number;
   };
@@ -92,13 +92,7 @@ export class MessageServerClient {
       url,
       protocol: 'msg.nicovideo.jp#json',
     });
-    this.subscription = this.socket.subscribe(this.messageObserver);
-  }
-
-  disconnect() {
-    if (this.subscription && !this.subscription.closed) {
-      this.subscription.unsubscribe();
-    }
+    return this.socket.asObservable();
   }
 
   requestLatestMessages(thread: string = this.roomThreadID) {
