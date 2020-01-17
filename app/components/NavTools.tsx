@@ -98,16 +98,6 @@ export default class SideNav extends Vue {
             <i class="icon-developer" />
           </div>
         )}
-        {this.restreamService.canEnableRestream && (
-          <div
-            class={cx(styles.cell)}
-            onClick={() => this.openSettingsWindow('Stream')}
-            title={$t('Multistream')}
-          >
-            <i class="fas fa-globe" />
-            <div class={cx(styles.badge, styles.newBadge)}>{$t('New')}</div>
-          </div>
-        )}
         {this.userService.isLoggedIn() && (
           <div class={cx(styles.cell)} onClick={() => this.openDashboard()} title={$t('Dashboard')}>
             <i class="icon-dashboard" />
@@ -119,6 +109,7 @@ export default class SideNav extends Vue {
           title={$t('Layout Editor')}
         >
           <i class="fas fa-th-large" />
+          <div class={cx(styles.badge, styles.newBadge)}>{$t('New')}</div>
         </div>
         <div
           class={cx(styles.cell, { [styles.toggleOn]: this.studioModeEnabled })}
