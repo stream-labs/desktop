@@ -263,7 +263,10 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
           looping: true,
         };
       } else if (type === 'text_gdiplus') {
-        settings = { text: fs.readFileSync(path).toString() };
+        settings = {
+          read_from_file: true,
+          file: path,
+        };
       }
       return this.createSource(filename, type as TSourceType, settings);
     }
