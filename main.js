@@ -103,11 +103,9 @@ function startApp() {
   const bt = require('backtrace-node');
 
   function handleFinishedReport() {
-    dialog.showErrorBox(`Unhandled Exception`,
-    'An unexpected error occured and the application must be shut down.\n' +
-    'Information concerning this occasion has been sent for debugging purposes.\n' +
-    'Sorry for the inconvenience and thanks for your patience as we work out the bugs!\n' +
-    'Please restart the application.');
+    dialog.showErrorBox(`予期せぬエラー`,
+    '予期しないエラーが発生したため、アプリケーションをシャットダウンします。ご不便をおかけして申し訳ありません。\n' +
+    'この件に関する情報はデバッグ目的で送信されました。不具合を解決するためにご協力いただきありがとうございます。');
 
     if (app) {
       app.quit();
