@@ -7,7 +7,6 @@ import { Subject } from 'rxjs';
 import { WindowsService } from 'services/windows';
 import { Inject } from 'services/core/injector';
 import { EApiPermissions } from './api/modules/module';
-import { GuestApiService } from 'services/guest-api';
 import { VideoService } from 'services/video';
 import { DevServer } from './dev-server';
 import { HostsService } from 'services/hosts';
@@ -151,7 +150,6 @@ class PlatformAppsViews extends ViewHandler<IPlatformAppServiceState> {
 @InitAfter('UserService')
 export class PlatformAppsService extends StatefulService<IPlatformAppServiceState> {
   @Inject() windowsService: WindowsService;
-  @Inject() guestApiService: GuestApiService;
   @Inject() videoService: VideoService;
   @Inject() hostsService: HostsService;
   @Inject() userService: UserService;
