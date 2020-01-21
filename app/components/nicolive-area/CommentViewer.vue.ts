@@ -42,12 +42,14 @@ export default class CommentViewer extends Vue {
     return this.nicoliveCommentViewerService.items.filter(this.nicoliveCommentLocalFilterService.filter);
   }
 
-  getItemTitle(item: ChatMessage) {
+  format = NicoliveProgramService.format;
+
+  itemToString(item: ChatMessage) {
     const { vpos, content } = item.chat;
     const { vposBaseTime, startTime } = this.nicoliveProgramService.state;
     const vposTime = vposBaseTime + Math.floor(vpos / 100);
     const diffTime = vposTime - startTime;
-    return `${content} (${NicoliveProgramService.format(diffTime)})`;
+    return `${content} (${this.format(diffTime)})`;
   }
 
   showCommentMenu(item: ChatMessage) {
@@ -65,6 +67,16 @@ export default class CommentViewer extends Vue {
       click: () => {
         clipboard.writeText(item.chat.user_id);
       },
+    });
+    menu.append({
+      id: 'Pin this comment',
+      label: 'コメントをピン留め',
+      click: () => {
+        this.pinnedComment = item;
+      },
+    });
+    menu.append({
+      type: 'separator',
     });
     menu.append({
       id: 'Add ',
