@@ -83,7 +83,7 @@ export class ChatService extends Service {
     win.removeBrowserView(this.chatView);
   }
 
-  private initChat() {
+  private async initChat() {
     if (this.chatView) return;
 
     const partition = this.userService.state.auth.partition;
@@ -94,8 +94,9 @@ export class ChatService extends Service {
         nodeIntegration: false,
       },
     });
-
-    this.navigateToChat();
+    this.windowsService.updateStyleBlockers('main', true);
+    await this.navigateToChat();
+    this.windowsService.updateStyleBlockers('main', false);
     this.bindWindowListener();
     this.bindDomReadyListener();
 
@@ -112,7 +113,7 @@ export class ChatService extends Service {
 
   private async navigateToChat() {
     if (!this.chatUrl) return; // user has logged out
-    this.chatView.webContents.loadURL(this.chatUrl).catch(this.handleRedirectError);
+    await this.chatView.webContents.loadURL(this.chatUrl).catch(this.handleRedirectError);
 
     // mount chat if electronWindowId is set and it has not been mounted yet
     if (this.electronWindowId) this.mountChat(this.electronWindowId);
@@ -234,7 +235,6 @@ export class ChatService extends Service {
 
   private handleSettingsChanged(changed: Partial<ICustomizationSettings>) {
     if (!this.chatView) return;
-
     if (changed.chatZoomFactor) {
       this.chatView.webContents.setZoomFactor(changed.chatZoomFactor);
     }
