@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
+import Popper from 'vue-popperjs';
 
 interface IArea{
   name: string;
@@ -7,7 +8,9 @@ interface IArea{
   defaultSelected?: boolean;
 }
 
-@Component({})
+@Component({
+  components: { Popper }
+})
 export default class AreaSwitcher extends Vue {
 
   @Prop()

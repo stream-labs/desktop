@@ -4,19 +4,28 @@
     <slot :name="activeContent.slotName"/>
   </div>
   <div class="header">
-    <div class="indicator" @click="select(contents[(contents.findIndex(c => c.slotName === activeContent.slotName) + 1) % contents.length].slotName)">
-      {{ activeContent.name }}
-    </div>
-    <ul class="selector">
-      <li
-        class="item"
-        :class="{ active: content.slotName === activeContent.slotName }"
-        :key="content.slotName"
-        v-for="content in contents"
-        @click="select(content.slotName)">
-        {{ content.name }}
-      </li>
-    </ul>
+    <popper
+      trigger="click"
+      :options="{ placement: 'bottom-end' }"
+    >
+      <div class="popper">
+        <ul class="selector">
+          <li
+            class="item"
+            :class="{ active: content.slotName === activeContent.slotName }"
+            :key="content.slotName"
+            v-for="content in contents"
+            @click="select(content.slotName)">
+            {{ content.name }}
+          </li>
+        </ul>
+      </div>
+
+      <div class="indicator" slot="reference">
+        {{ activeContent.name }}
+      </div>
+
+    </popper>
   </div>
 </div>
 </template>
@@ -55,7 +64,20 @@
 }
 
 .selector {
-  display: none;
+  border-radius: 4px;
+  margin: 0;
+  padding: 8px 0;
+  width: 240px;
+  background-color: @bg-secondary;
+
+  & > .item {
+    list-style: none;
+    height: 40px;
+
+    &:hover {
+      background-color: @bg-quinary;
+    }
+  }
 }
 
 .contentContainer {
