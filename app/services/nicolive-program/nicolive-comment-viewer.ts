@@ -7,6 +7,8 @@ import { Subscription } from 'rxjs';
 
 interface INicoliveCommentViewerState {
   messages: ChatMessage[];
+  popoutMessages: number;
+  arrivalMessages: number;
 }
 
 export class NicoliveCommentViewerService extends StatefulService<INicoliveCommentViewerState> {
@@ -15,6 +17,8 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
 
   static initialState: INicoliveCommentViewerState = {
     messages: [],
+    popoutMessages: 0,
+    arrivalMessages: 0,
   };
 
   get items() {
@@ -56,11 +60,18 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   }
 
   private onMessage(values: ChatMessage[]) {
-    this.SET_STATE({ messages: this.state.messages.concat(values).slice(-200) })
+    const arrivalLength = values.length;
+    const concatMessages = this.state.messages.concat(values);
+    const concatLength = concatMessages.length;
+    this.SET_STATE({
+      messages: concatMessages,
+      popoutMessages: Math.max(concatLength - 200, 0),
+      arrivalMessages: arrivalLength,
+    });
   }
 
   private clearState() {
-    this.SET_STATE({ messages: [] });
+    this.SET_STATE({ messages: [], popoutMessages: 0, arrivalMessages: 0 });
   }
 
   @mutation()
