@@ -60,21 +60,20 @@ enum EResponseResultProcessing {
     [requestId: string]: IRequest;
   } = {};
 
-  const workerWindowContents = electron.remote.webContents.fromId(
-    electron.ipcRenderer.sendSync('getWorkerWindowId'),
-  );
+  let hostWebContents: Electron.WebContents;
+  let ipcChannel: string;
   const webContentsId = electron.remote.getCurrentWebContents().id;
-
   const requestBuffer: IGuestApiRequest[] = [];
 
-  let ready = false;
   let readyFunc: Function;
   const readyPromise = new Promise<boolean>(resolve => {
-    readyFunc = () => {
+    readyFunc = (webContentsId: number, ipc: string) => {
+      hostWebContents = electron.remote.webContents.fromId(webContentsId);
+      ipcChannel = ipc;
+
       requestBuffer.forEach(req => {
-        workerWindowContents.send('guestApiRequest', req);
+        hostWebContents.send(ipcChannel, req);
       });
-      ready = true;
       resolve();
     };
   });
@@ -113,7 +112,12 @@ enum EResponseResultProcessing {
     }
   });
 
-  electron.ipcRenderer.on('guestApiReady', () => readyFunc());
+  electron.ipcRenderer.on(
+    'guestApiReady',
+    (e: Electron.Event, info: { webContentsId: number; ipcChannel: string }) => {
+      readyFunc(info.webContentsId, info.ipcChannel);
+    },
+  );
 
   /**
    * Returns a proxy rooted at the given path
@@ -162,8 +166,8 @@ enum EResponseResultProcessing {
           args: mappedArgs,
         };
 
-        if (ready) {
-          workerWindowContents.send('guestApiRequest', apiRequest);
+        if (hostWebContents && ipcChannel) {
+          hostWebContents.send(ipcChannel, apiRequest);
         } else {
           requestBuffer.push(apiRequest);
         }

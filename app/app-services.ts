@@ -60,7 +60,6 @@ export { TwitterService } from 'services/integrations/twitter';
 export { UsageStatisticsService } from './services/usage-statistics';
 
 export { MediaGalleryService } from 'services/media-gallery';
-export { GuestApiService } from 'services/guest-api';
 export { MediaBackupService } from 'services/media-backup';
 export { OutageNotificationsService } from 'services/outage-notifications';
 export { AnnouncementsService } from 'services/announcements';

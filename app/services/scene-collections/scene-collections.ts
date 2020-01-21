@@ -299,6 +299,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     this.enableAutoSave();
   }
 
+  downloadProgress = new Subject<IDownloadProgress>();
+
   /**
    * Install a new overlay from a URL
    * @param url the URL of the overlay file
@@ -306,12 +308,13 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * @param progressCallback a callback that receives progress of the download
    */
   @RunInLoadingMode({ hideStyleBlockers: false })
-  async installOverlay(
-    url: string,
-    name: string,
-    progressCallback?: (info: IDownloadProgress) => void,
-  ) {
-    const pathName = await this.overlaysPersistenceService.downloadOverlay(url, progressCallback);
+  async installOverlay(url: string, name: string) {
+    const pathName = await this.overlaysPersistenceService.downloadOverlay(
+      url,
+      (progress: IDownloadProgress) => {
+        this.downloadProgress.next(progress);
+      },
+    );
     const collectionName = this.suggestName(name);
     await this.loadOverlay(pathName, collectionName);
   }

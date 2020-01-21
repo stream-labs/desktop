@@ -2,7 +2,6 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { UserService } from '../../services/user';
 import { Inject, Service } from 'services';
-import { GuestApiService } from 'services/guest-api';
 import { NavigationService } from 'services/navigation';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { IDownloadProgress, OverlaysPersistenceService } from 'services/scene-collections/overlays';
@@ -16,11 +15,11 @@ import electron from 'electron';
 import { $t, I18nService } from 'services/i18n';
 import BrowserView from 'components/shared/BrowserView';
 import { RestreamService } from 'services/restream';
+import { GuestApiHandler } from 'util/guest-api-handler';
 
 @Component({ components: { BrowserView } })
 export default class BrowseOverlays extends Vue {
   @Inject() userService: UserService;
-  @Inject() guestApiService: GuestApiService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() navigationService: NavigationService;
   @Inject() overlaysPersistenceService: OverlaysPersistenceService;
@@ -38,7 +37,7 @@ export default class BrowseOverlays extends Vue {
 
   onBrowserViewReady(view: Electron.BrowserView) {
     view.webContents.on('did-finish-load', () => {
-      this.guestApiService.exposeApi(view.webContents.id, {
+      new GuestApiHandler().exposeApi(view.webContents.id, {
         installOverlay: this.installOverlay,
         installWidgets: this.installWidgets,
         eligibleToRestream: () => {
@@ -89,7 +88,9 @@ export default class BrowseOverlays extends Vue {
     ) {
       this.navigationService.navigate('FacebookMerge', { overlayUrl: url, overlayName: name });
     } else {
-      await this.sceneCollectionsService.installOverlay(url, name, progressCallback);
+      const sub = this.sceneCollectionsService.downloadProgress.subscribe(progressCallback);
+      await this.sceneCollectionsService.installOverlay(url, name);
+      sub.unsubscribe();
       this.navigationService.navigate('Studio');
     }
   }
