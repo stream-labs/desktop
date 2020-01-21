@@ -366,7 +366,7 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
     electron.ipcRenderer.on(
       `volmeter-${this.props.audioSource.sourceId}`,
       (e, volmeter: IVolmeter) => {
-        if (volmeter.peak.length) {
+        if (this.$refs.canvas && volmeter.peak.length) {
           this.initRenderingContext();
           this.setChannelCount(volmeter.peak.length);
 
