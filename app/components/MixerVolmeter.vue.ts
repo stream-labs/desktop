@@ -81,9 +81,6 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
 
   beforeDestroy() {
     this.$refs.canvas.removeEventListener('webglcontextlost', this.handleLostWebglContext);
-  }
-
-  destroyed() {
     if (this.gl) window['activeWebglContexts'] -= 1;
     clearInterval(this.canvasWidthInterval);
     this.unsubscribeVolmeter();
