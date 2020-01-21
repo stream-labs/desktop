@@ -50,7 +50,7 @@
 
   padding-right: 16px;
 
-  background-color: @bg-secondary;
+  background-color: @bg-quinary;
 }
 
 .content {
