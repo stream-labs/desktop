@@ -44,7 +44,6 @@ export { ProjectorService } from 'services/projector';
 export { I18nService } from 'services/i18n';
 export { ObsUserPluginsService } from 'services/obs-user-plugins';
 export { HardwareService, DefaultHardwareService } from 'services/hardware';
-export { Prefab, PrefabsService } from 'services/prefabs';
 export { EditorCommandsService } from 'services/editor-commands';
 export { StreamSettingsService } from 'services/settings/streaming';
 
@@ -63,7 +62,6 @@ export { GuestApiService } from 'services/guest-api';
 export { MediaBackupService } from 'services/media-backup';
 export { OutageNotificationsService } from 'services/outage-notifications';
 export { AnnouncementsService } from 'services/announcements';
-export { BrandDeviceService } from 'services/auto-config/brand-device';
 export { WebsocketService } from 'services/websocket';
 export { IncrementalRolloutService } from 'services/incremental-rollout';
 export { CrashReporterService } from 'services/crash-reporter';
