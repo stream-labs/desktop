@@ -509,6 +509,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoVideo: true,
     demoFilename: 'source-credits.mp4',
     supportList: [$t('New Followers'), $t('New Subscribers'), $t('Cheers'), $t('Donations')],
+    platforms: new Set(['twitch', 'youtube', 'mixer']),
   },
   [WidgetType.SponsorBanner]: {
     name: $t('Sponsor Banner'),

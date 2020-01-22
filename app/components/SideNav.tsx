@@ -51,7 +51,7 @@ export default class SideNav extends Vue {
   }
 
   get appStoreVisible() {
-    return this.platformAppsService.state.storeVisible;
+    return this.userService.isLoggedIn() && this.platformAppsService.state.storeVisible;
   }
 
   get chatbotVisible() {
