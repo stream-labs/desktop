@@ -26,9 +26,7 @@ class DismissablesViews extends ViewHandler<IDismissablesServiceState> {
 export class DismissablesService extends PersistentStatefulService<IDismissablesServiceState> {
   @Inject() appService: AppService;
 
-  init() {
-    super.init();
-
+  initialize() {
     Object.values(EDismissable).forEach(key => {
       // Some keys have extra show criteria
       if (key === EDismissable.RecentEventsHelpTip && !this.state[key]) {
