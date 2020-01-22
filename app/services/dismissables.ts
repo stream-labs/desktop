@@ -27,8 +27,6 @@ export class DismissablesService extends PersistentStatefulService<IDismissables
   @Inject() appService: AppService;
 
   initialize() {
-    console.log('DISMISSIBLES INIT');
-
     Object.values(EDismissable).forEach(key => {
       // Some keys have extra show criteria
       if (key === EDismissable.RecentEventsHelpTip && !this.state[key]) {
