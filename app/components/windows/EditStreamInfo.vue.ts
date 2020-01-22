@@ -408,7 +408,6 @@ export default class EditStreamInfo extends Vue {
 
     // check available profiles for the selected game
     await this.loadAvailableProfiles();
-    this.infoError = true;
   }
 
   get platformService() {
