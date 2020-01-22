@@ -362,22 +362,23 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
 
   workerId: number;
 
-  subscribeVolmeter() {
-    electron.ipcRenderer.on(
-      `volmeter-${this.props.audioSource.sourceId}`,
-      (e, volmeter: IVolmeter) => {
-        if (this.$refs.canvas && volmeter.peak.length) {
-          this.initRenderingContext();
-          this.setChannelCount(volmeter.peak.length);
+  listener: (e: Electron.Event, volmeter: IVolmeter) => void;
 
-          if (this.gl) {
-            this.drawVolmeterWebgl(volmeter.peak);
-          } else {
-            this.drawVolmeterC2d(volmeter.peak);
-          }
+  subscribeVolmeter() {
+    this.listener = (e: Electron.Event, volmeter: IVolmeter) => {
+      if (this.$refs.canvas && volmeter.peak.length) {
+        this.initRenderingContext();
+        this.setChannelCount(volmeter.peak.length);
+
+        if (this.gl) {
+          this.drawVolmeterWebgl(volmeter.peak);
+        } else {
+          this.drawVolmeterC2d(volmeter.peak);
         }
-      },
-    );
+      }
+    };
+
+    electron.ipcRenderer.on(`volmeter-${this.props.audioSource.sourceId}`, this.listener);
 
     // TODO: Remove sync
     this.workerId = electron.ipcRenderer.sendSync('getWorkerWindowId');
@@ -390,6 +391,10 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
   }
 
   unsubscribeVolmeter() {
+    electron.ipcRenderer.removeListener(
+      `volmeter-${this.props.audioSource.sourceId}`,
+      this.listener,
+    );
     electron.ipcRenderer.sendTo(
       this.workerId,
       'volmeterUnsubscribe',
