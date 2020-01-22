@@ -134,6 +134,7 @@ export class AppService extends StatefulService<IAppState> {
     }
 
     this.SET_ONBOARDED(this.onboardingService.startOnboardingIfRequired());
+    this.dismissablesService.initialize();
 
     electron.ipcRenderer.on('shutdown', () => {
       electron.ipcRenderer.send('acknowledgeShutdown');
