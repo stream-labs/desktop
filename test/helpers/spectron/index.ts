@@ -200,6 +200,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     // allow usage of fetch-mock library
     await installFetchMock(t);
+    await focusMain(t);
 
     // Wait up to 2 seconds before giving up looking for an element.
     // This will slightly slow down negative assertions, but makes
