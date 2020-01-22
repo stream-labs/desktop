@@ -12,17 +12,17 @@ import { sleep } from './helpers/sleep';
 useSpectron();
 
 const sourceTypes = [
-  // 'Video Capture Device',
-  // 'Audio Output Capture',
-  // 'Audio Input Capture',
-  // 'Game Capture',
-  // 'Window Capture',
-  // 'Display Capture',
-  // 'Image',
-  // 'Image Slide Show',
-  // 'Media Source',
-  // 'Text (GDI+)',
-  // 'Color Source',
+  'Video Capture Device',
+  'Audio Output Capture',
+  'Audio Input Capture',
+  'Game Capture',
+  'Window Capture',
+  'Display Capture',
+  'Image',
+  'Image Slide Show',
+  'Media Source',
+  'Text (GDI+)',
+  'Color Source',
   'Browser Source'
 ];
 
