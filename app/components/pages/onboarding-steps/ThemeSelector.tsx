@@ -56,11 +56,11 @@ export default class ObsImport extends TsxComponent<ThemeSelectorProps> {
   async installTheme(url: string, name: string) {
     this.installing = true;
     this.props.setProcessing(true);
-    await this.sceneCollectionsService.installOverlay(
-      url,
-      name,
+    const sub = this.sceneCollectionsService.downloadProgress.subscribe(
       progress => (this.progress = progress.percent),
     );
+    await this.sceneCollectionsService.installOverlay(url, name);
+    sub.unsubscribe();
     this.installing = false;
     this.props.setProcessing(false);
     this.props.continue();

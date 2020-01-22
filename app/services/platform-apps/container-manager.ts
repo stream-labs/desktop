@@ -9,7 +9,7 @@ import url from 'url';
 import path from 'path';
 import { PlatformAppsApi } from './api';
 import { lazyModule } from 'util/lazy-module';
-import { GuestApiService } from 'services/guest-api';
+import { GuestApiHandler } from 'util/guest-api-handler';
 import { BehaviorSubject } from 'rxjs';
 import { IBrowserViewTransform } from './api/modules/module';
 
@@ -62,7 +62,6 @@ export class PlatformContainerManager {
   containers: IContainerInfo[] = [];
 
   @Inject() private userService: UserService;
-  @Inject() private guestApiService: GuestApiService;
 
   @lazyModule(PlatformAppsApi) private apiManager: PlatformAppsApi;
 
@@ -365,6 +364,6 @@ export class PlatformContainerManager {
 
     // Namespace under v1 for now.  Eventually we may want to add
     // a v2 API.
-    this.guestApiService.exposeApi(webContentsId, { v1: api });
+    new GuestApiHandler().exposeApi(webContentsId, { v1: api });
   }
 }
