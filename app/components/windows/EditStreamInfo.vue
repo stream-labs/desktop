@@ -4,11 +4,11 @@
       <h4 v-if="windowHeading">{{ windowHeading }}</h4>
       <div v-if="infoLoading"><spinner /></div>
       <div v-if="infoError && !infoLoading" class="warning">
-        {{ $t('[channelError]There was an error fetching your channel information. You can try') }}
+        {{ $t('[channelError]There was an error fetching your channel information. You can try ') }}
         <a class="description-link" @click="populateInfo">{{
           $t('[channelError]fetching the information again')
         }}</a
-        >, {{ $t('[channelError]or you can') }}
+        >, {{ $t('[channelError] or you can ') }}
         <a class="description-link" @click="() => goLive(true)">{{ $t('[channelError]just go live.') }}</a>
         {{ $t('If this error persists, you can try logging out and back in.') }}
       </div>

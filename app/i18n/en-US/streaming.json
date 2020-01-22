@@ -15,7 +15,7 @@
   "You can re-enable this from the settings.": "You can re-enable this from the settings.",
   "Confirm & Go Live": "Confirm & Go Live",
   "Update Stream Info": "Update Stream Info",
-  "channelError": "There was an error fetching your channel information. You can try %{cut} fetching the information again %{cut} or you can %{cut} just go live.",
+  "channelError": "There was an error fetching your channel information. You can try <link>fetching the information again</link> or you can <link>just go live.</link>",
   "If this error persists, you can try logging out and back in.": "If this error persists, you can try logging out and back in.",
   "Use optimized encoder settings": "Use optimized encoder settings",
   "Optimized encoder gives equivalent quality while reducing usage. Game specific encoders for Fortnite, PUBG, Destiny 2, and League Of Legends": "Optimized encoder gives equivalent quality while reducing usage. Game specific encoders for Fortnite, PUBG, Destiny 2, and League Of Legends",

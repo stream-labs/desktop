@@ -222,10 +222,12 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
         const originalString = locale === 'en-US' ? str : this.loadedDictionaries['en-US'][key];
         newStrings[key] = str;
 
-        // the %{cut} markers indicates that we need to split this string to multiple ones
-        if (str.includes('%{cut}')) {
-          const originalParts = originalString.split(' %{cut} ');
-          const translatedParts = str.split(' %{cut} ');
+        // tags inside string indicate that we need to split this string to multiple ones
+        const textBetweenTags = this.getTextBetweenTags(str);
+
+        if (textBetweenTags.length > 1) {
+          const originalParts = this.getTextBetweenTags(originalString);
+          const translatedParts = textBetweenTags;
           originalParts.forEach((part, ind) => {
             const translatedPart = translatedParts[ind];
             newStrings[`[${key}]${part}`] = `${translatedPart}`;
@@ -238,6 +240,13 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
 
     this.loadedDictionaries[locale] = dictionary;
     return dictionary;
+  }
+
+  /**
+   * returns text between xml tags in the given string
+   */
+  private getTextBetweenTags(str: string): string[] {
+    return str.split(/(<\/?[a-zA-Z]+>)/).filter(chunk => chunk.charAt(0) !== '<');
   }
 
   private localeIsSupported(locale: string) {
