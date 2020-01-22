@@ -327,6 +327,7 @@ test('Go live error', async t => {
   skipCheckingErrorsInLog();
 
   // open EditStreamInfo window
+  await focusMain(t);
   await app.client.click('button=Go Live');
   await focusChild(t);
 
