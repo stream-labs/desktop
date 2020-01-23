@@ -1,7 +1,8 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
-import { NicoliveCommentFilterService, FilterType } from 'services/nicolive-program/nicolive-comment-filter';
+import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
+import { FilterType } from 'services/nicolive-program/ResponseTypes';
 
 @Component({})
 export default class CommentFilter extends Vue {
