@@ -57,6 +57,7 @@ export { FacebookService } from 'services/platforms/facebook';
 export { RestreamService } from 'services/restream';
 export { TwitterService } from 'services/integrations/twitter';
 export { UsageStatisticsService } from './services/usage-statistics';
+export { GameOverlayService } from 'services/game-overlay';
 
 export { MediaGalleryService } from 'services/media-gallery';
 export { MediaBackupService } from 'services/media-backup';
