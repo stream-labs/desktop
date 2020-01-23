@@ -26,7 +26,7 @@ import { SceneItemNode } from './scene-node';
 import { v2, Vec2 } from '../../util/vec2';
 import { Rect } from '../../util/rect';
 import { TSceneNodeType } from './scenes';
-import { ServiceHelper } from 'services/core';
+import { ServiceHelper, ExecuteInWorkerProcess } from 'services/core';
 /**
  * A SceneItem is a source that contains
  * all of the information about that source, and
@@ -124,6 +124,7 @@ export class SceneItem extends SceneItemNode {
     };
   }
 
+  @ExecuteInWorkerProcess()
   setSettings(patch: IPartialSettings) {
     // update only changed settings to reduce the amount of IPC calls
     const obsSceneItem = this.getObsSceneItem();
