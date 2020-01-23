@@ -3,6 +3,7 @@ import { NicoliveClient } from './NicoliveClient';
 import { Inject } from 'util/injector';
 import { NicoliveProgramService } from './nicolive-program';
 import { map, distinctUntilChanged } from 'rxjs/operators';
+import { remote } from 'electron';
 
 export type FilterRecord = {
   id: number;
@@ -16,79 +17,66 @@ interface INicoliveCommentFilterState {
   filters: FilterRecord[];
 }
 
-// TODO: replace with public api(after api's release)
 class CommentFilterClient {
-  private token: string = '';
-  private lastProgramID: string = '';
-
-  private async ensureToken(programID: string) {
-    if (this.lastProgramID == programID && this.token) return;
-    const resp = await fetch(`${NicoliveClient.live2BaseURL}/watch/${programID}`, {
-      mode: 'cors',
-      credentials: 'include',
-      headers: {
-        'Content-type': 'text/html',
-      },
-    });
-    const text = await resp.text();
-    const parsed = new DOMParser().parseFromString(text, 'text/html');
-    const embedded = parsed.querySelector<HTMLElement>('#embedded-data');
-    const props = JSON.parse(embedded.dataset.props);
-    const token = props.site.relive.csrfToken;
-    this.token = token;
-    this.lastProgramID = programID;
-  }
 
   private buildEndpoint(programID: string): string {
-    return `${NicoliveClient.live2BaseURL}/unama/api/v3/programs/${programID}/comment_filters`;
+    return `${NicoliveClient.live2BaseURL}/unama/tool/v2/programs/${programID}/ssng`;
   }
 
-  private createRequest(method: 'GET' | 'POST' | 'PUT' | 'DELETE', requestInit?: RequestInit): RequestInit {
+  private async createRequest(
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+    requestInit?: RequestInit
+  ): Promise<RequestInit> {
+    const session = await this.getSession();
     return {
       method,
       mode: 'cors',
       credentials: 'include',
       ...(requestInit || {}),
       headers: {
-        'X-Public-Api-Token': this.token,
+        'X-Niconico-Session': session,
         'Content-Type': 'application/json',
         ...((requestInit && requestInit.headers) || {}),
       },
     };
   }
 
+  private async getSession(): Promise<string> {
+    const { session } = remote.getCurrentWebContents();
+    return new Promise((resolve, reject) =>
+      session.cookies.get({ url: 'https://.nicovideo.jp', name: 'user_session' }, (err, cookies) => {
+        if (err) return reject(err);
+        resolve(cookies[0].value);
+      })
+    );
+  }
+
   async get(programID: string) {
-    await this.ensureToken(programID);
-    const resp = await fetch(this.buildEndpoint(programID), this.createRequest('GET'));
+    const requestInit = await this.createRequest('GET');
+    const resp = await fetch(this.buildEndpoint(programID), requestInit);
     return resp.json();
   }
 
-  async post(programID: string, { type, body }: Omit<FilterRecord, 'id'>) {
-    await this.ensureToken(programID);
+  async post(programID: string, records: Omit<FilterRecord, 'id'>[]) {
+    const requestInit = await this.createRequest('POST', {
+      body: JSON.stringify(records)
+    });
     const resp = await fetch(
       this.buildEndpoint(programID),
-      this.createRequest('POST', {
-        body: JSON.stringify({
-          type,
-          body,
-          _method: 'POST',
-        }),
-      })
+      requestInit
     );
     return resp.json();
   }
 
-  async delete(programID: string, { type, body }: FilterRecord) {
-    await this.ensureToken(programID);
+  async delete(programID: string, ids: FilterRecord['id'][]) {
+    const requestInit = await this.createRequest('DELETE', {
+      body: JSON.stringify({
+        id: ids,
+      })
+    });
     const resp = await fetch(
       this.buildEndpoint(programID),
-      this.createRequest('POST', {
-        body: JSON.stringify({
-          type,
-          body,
-          _method: 'DELETE',
-        }),
-      })
+      requestInit
     );
     return resp.json();
   }
@@ -120,25 +108,23 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
 
   async fetchFilters() {
     const result = await this.client.get(this.programID);
-    const filters = result.data.filters.map((record: any, id: number) => ({ ...record, id }));
-    this.UPDATE_FILTERS(filters);
+    this.UPDATE_FILTERS(result.data);
   }
 
   async addFilter(record: Omit<FilterRecord, 'id'>) {
-    const result = await this.client.post(this.programID, record);
+    const result = await this.client.post(this.programID, [record]);
     if (result && result.meta && result.meta.status === 200) {
-      const resultRecord = { ...record, id: this.state.filters.length };
+      const resultRecord = result.data.find(
+        (rec: FilterRecord) => rec.type === record.type && rec.body === record.body
+      );
       const filters = this.state.filters.concat(resultRecord);
       this.UPDATE_FILTERS(filters);
     }
   }
 
   async deleteFilters(ids: number[]) {
-    const records = ids.map(id => this.state.filters[id]);
-    return Promise.all(records.map(async record => {
-      const result = await this.client.delete(this.programID, record);
-      return result && result.meta && result.meta.status === 200;
-    }));
+    const result = await this.client.delete(this.programID, ids);
+    return result && result.meta && result.meta.status === 200;
   }
 
   @mutation()
