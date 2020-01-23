@@ -10,7 +10,7 @@
   "lowerYourBitrate": "これらのどれもうまく動作しない場合は、ビットレートを下げてください",
   "skippedFramesAreDetected": "スキップしたフレームを検出しました",
   "meaningOfSkippedFramesAreDetected1": "いくつかのフレームはエンコードされていません。",
-  "meaningOfSkippedFramesAreDetected2": "この問題は通常、CPU使用率が高いか、不適切なエンコーダ設定が原因で発生します。",
+  "meaningOfSkippedFramesAreDetected2": "この問題は通常、CPU使用率が高いか、不適切なエンコーダー設定が原因で発生します。",
   "lowerYourEncoderPreset": "エンコーダー設定を下げる（プリセット）",
   "closeOtherHeavyApplication": "あなたのCPUに重い他のアプリケーションを開いていないことを確認してください",
   "enablePerformanceModeInTheEditorContextMenu": "エディターのコンテキスト メニューでパフォーマンス モードを有効にします。",
