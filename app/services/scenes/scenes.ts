@@ -298,9 +298,9 @@ export class ScenesService extends StatefulService<IScenesState> {
     const scene = this.views.getScene(id);
     if (!scene) return false;
 
-    this.MAKE_SCENE_ACTIVE(id);
-
     const activeScene = this.views.activeScene;
+
+    this.MAKE_SCENE_ACTIVE(id);
 
     this.transitionsService.transition(activeScene && activeScene.id, scene.id);
     this.sceneSwitched.next(scene.getModel());
