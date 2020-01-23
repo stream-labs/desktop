@@ -1,33 +1,38 @@
 <template>
-<div class="container">
-  <div class="contentContainer">
-    <slot :name="activeContent.slotName"/>
-  </div>
-  <div class="header">
-    <popper
-      trigger="click"
-      :options="{ placement: 'bottom-end' }"
-    >
-      <div class="popper">
-        <ul class="selector">
-          <li
-            class="item"
-            :class="{ active: content.slotName === activeContent.slotName }"
-            :key="content.slotName"
-            v-for="content in contents"
-            @click="select(content.slotName)">
-            {{ content.name }}
-          </li>
-        </ul>
-      </div>
+  <div class="container">
+    <div class="contentContainer">
+      <slot :name="activeContent.slotName" />
+    </div>
+    <div class="header">
+      <popper trigger="click" :options="{ placement: 'bottom-end' }">
+        <div class="popper">
+          <ul class="selector">
+            <li
+              class="item"
+              :class="{ active: content.slotName === activeContent.slotName }"
+              :key="content.slotName"
+              v-for="content in contents"
+              @click="select(content.slotName)"
+            >
+              <!-- TODO: 後でアイコンを差し替える -->
+              <i
+                class="item-icon"
+                :class="content.slotName === 'commentViewer' ? 'icon-comment' : 'icon-file'"
+              ></i>
+              <p class="item-name">{{ content.name }}</p>
+              <p class="item-text">{{ content.text }}</p>
+              <i class="icon-check" v-if="content.slotName === activeContent.slotName"></i>
+            </li>
+          </ul>
+        </div>
 
-      <div class="indicator" slot="reference">
-        {{ activeContent.name }}
-      </div>
-
-    </popper>
+        <div class="indicator" slot="reference">
+          {{ activeContent.name }}
+          <i class="icon-down-arrow"></i>
+        </div>
+      </popper>
+    </div>
   </div>
-</div>
 </template>
 
 <script lang="ts" src="./AreaSwitcher.vue.ts"></script>
@@ -51,32 +56,78 @@
 }
 
 .indicator {
+  font-size: 12px;
   color: @white;
-  margin: 4px 16px;
-  width: 80px;
+  margin: 8px;
   height: 32px;
   line-height: 32px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  cursor: pointer;
 
-  &::after {
-    content: "▼";
-    font-size: xx-small;
+  &:hover {
+     background-color: @bg-secondary;
+  }
+
+  > i {
+    font-size: 10px;
+    margin-left: 8px;
   }
 }
 
 .selector {
   border-radius: 4px;
-  margin: 0;
-  padding: 8px 0;
-  width: 240px;
-  background-color: @bg-secondary;
+  margin: 0 0 0 8px; 
+  padding: 8px 1px;
+  width: 300px;
+  background-color: @bg-quinary;
+  box-shadow: 0 0 4px rgba(@black, 0.5), inset 0 0 0 1px rgba(@bg-quaternary, 0.8);
 
   & > .item {
     list-style: none;
-    height: 40px;
+    height: 56px;
+    position: relative;
+    padding: 0 32px 0 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    cursor: pointer;
 
     &:hover {
-      background-color: @bg-quinary;
+      background-color: @bg-secondary;
     }
+
+    i {
+      position: absolute;
+      transform: translateY(-50%);
+      top: 50%;
+    }
+  }
+
+  .item-name {
+    font-size: 12px;
+    margin: 0;
+    color: @white;
+  }
+
+  .item-text {
+    font-size: 10px;
+    margin: 0;
+    color: @light-grey;
+  }
+
+  .item-icon {
+    font-size: 16px;
+    left: 16px;
+    color: @light-grey;
+  }
+
+  .icon-check {
+    font-size: 12px;
+    right: 16px;
+    color: @accent;
   }
 }
 
@@ -86,5 +137,4 @@
   display: flex;
   flex-direction: column;
 }
-
 </style>

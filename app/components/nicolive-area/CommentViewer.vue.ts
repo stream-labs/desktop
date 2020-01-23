@@ -32,6 +32,10 @@ export default class CommentViewer extends Vue {
   @Inject()
   private nicoliveCommentFilterService: NicoliveCommentFilterService;
 
+  // TODO: 後で言語ファイルに移動する
+  filterTooltip = 'NG設定';
+  localFilterTooltip = 'フィルター';
+
   isFilterOpened = false;
 
   isLocalFilterOpened = false;
