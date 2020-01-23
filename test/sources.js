@@ -42,7 +42,6 @@ test('Adding and removing some sources', async t => {
     await clickRemoveSource(t);
     await waitForSourceExist(t, sourceName, true);
   }
-  t.pass();
 });
 
 test('Viewing source properties', async t => {
