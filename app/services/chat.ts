@@ -38,6 +38,8 @@ export class ChatService extends Service {
 
       if (!this.chatUrl) return;
 
+      this.customizationService.setLiveDockCollapsed(true);
+
       // chat url changed to a new valid url, init or reload chat
       if (oldChatUrl) {
         this.deinitChat();
@@ -94,9 +96,7 @@ export class ChatService extends Service {
         nodeIntegration: false,
       },
     });
-    this.windowsService.updateStyleBlockers('main', true);
     await this.navigateToChat();
-    this.windowsService.updateStyleBlockers('main', false);
     this.bindWindowListener();
     this.bindDomReadyListener();
 
