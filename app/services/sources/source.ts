@@ -13,6 +13,7 @@ import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import Utils from 'services/utils';
 import * as obs from '../../../obs-api';
 import isEqual from 'lodash/isEqual';
+import omitBy from 'lodash/omitBy';
 import { cloneDeep } from 'lodash';
 
 @ServiceHelper()
@@ -72,7 +73,10 @@ export class Source implements ISourceApi {
   isSameType(comparison: ISourceComparison): boolean {
     if (this.channel) return false;
 
-    return isEqual(this.getComparisonDetails(), comparison);
+    return isEqual(
+      omitBy(this.getComparisonDetails(), v => v == null),
+      omitBy(comparison, v => v == null),
+    );
   }
 
   getComparisonDetails(): ISourceComparison {
