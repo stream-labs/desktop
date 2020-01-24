@@ -54,7 +54,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
       bufferTime(1000),
       filter(arr => arr.length > 0)
     ).subscribe(values => {
-      this.onMessage(values.filter(isChatMessage));
+      this.onMessage(values.filter(isChatMessage).map(x => x.chat));
     })
     this.client.requestLatestMessages();
   }

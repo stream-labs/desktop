@@ -1,24 +1,26 @@
 import { WebSocketSubject, webSocket } from 'rxjs/webSocket';
-import { Subscription, Observer, PartialObserver, Subscriber } from 'rxjs';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+
+type MessageResponse = { chat: ChatMessage } | { leave_thread: LeaveThreadMessage };
+export type Message = ChatMessage | LeaveThreadMessage;
 
 /** chatメッセージ（取得形のみ） */
 export type ChatMessage = {
-  chat: {
-    content?: string;
-    date?: number;
-    date_usec?: number;
-    no?: number;
-    premium?: number;
-    thread?: number;
-    user_id?: string;
-    vpos?: number;
-    anonymity?: number;
-    mail?: string;
-    score?: number;
-  };
+  content?: string;
+  date?: number;
+  date_usec?: number;
+  no?: number;
+  premium?: number;
+  thread?: number;
+  user_id?: string;
+  vpos?: number;
+  anonymity?: number;
+  mail?: string;
+  score?: number;
 };
 
-export function isChatMessage(msg: Message): msg is ChatMessage {
+export function isChatMessage(msg: MessageResponse): msg is { chat: ChatMessage } {
   return msg.hasOwnProperty('chat');
 }
 
@@ -32,18 +34,9 @@ export type LeaveThreadMessage = {
   }
 };
 
-export function isLeaveThreadMessage(msg: Message): msg is LeaveThreadMessage {
+export function isLeaveThreadMessage(msg: MessageResponse): msg is { leave_thread: LeaveThreadMessage } {
   return msg.hasOwnProperty('leave_thread');
 }
-
-export type Message = ChatMessage | LeaveThreadMessage | {
-  thread: {
-    resultCode: number;
-    thread: string;
-    revision: number;
-    server_time: number;
-  };
-};
 
 export type MessageServerConfig = {
   roomURL: string,
@@ -53,9 +46,7 @@ export type MessageServerConfig = {
 export class MessageServerClient {
   private roomURL: string | null = null;
   private roomThreadID: string | null = null;
-  private socket: WebSocketSubject<Message> | null = null;
-  private subscription: Subscription | null = null;
-  private messageObserver: Observer<Message>;
+  private socket: WebSocketSubject<MessageResponse> | null = null;
 
   constructor({
     roomURL,
@@ -68,31 +59,12 @@ export class MessageServerClient {
     this.roomThreadID = roomThreadID;
   }
 
-  onMessage(observer: PartialObserver<Message> | ((v: Message) => void)) {
-    this.messageObserver = this.createObserver(observer);
-  }
-
-  private createObserver(observer: PartialObserver<Message> | ((v: Message) => void)) {
-    const next = typeof observer === 'function' ? observer : observer.next ?? (() => {});
-    const error = typeof observer !== 'function' && observer.error || undefined;
-    const complete = typeof observer !== 'function' && observer.complete || undefined;
-    const wrapped = (msg: Message) => {
-      if (isLeaveThreadMessage(msg)) {
-        const reason = msg.leave_thread.reason ?? 0;
-        // 再接続したいけど
-      }
-      next(msg);
-    };
-
-    return new Subscriber(wrapped, error, complete);
-  }
-
-  connect(url: string = this.roomURL) {
+  connect(url: string = this.roomURL): Observable<MessageResponse> {
     this.socket = webSocket({
       url,
       protocol: 'msg.nicovideo.jp#json',
     });
-    return this.socket.asObservable();
+    return this.socket.asObservable().pipe(tap({ next: console.log }));
   }
 
   requestLatestMessages(thread: string = this.roomThreadID) {
