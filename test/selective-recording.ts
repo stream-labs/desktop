@@ -20,7 +20,7 @@ test('Selective Recording', async t => {
   await client.click('.studio-controls-top .icon-smart-record');
 
   // Check that selective recording icon is active
-  t.true(await client.isExisting('.icon-smart-record.icon--active'));
+  await client.waitForExist('.icon-smart-record.icon--active');
 
   // Check that browser source has a selective recording toggle
   t.true(await client.isExisting('.sl-vue-tree-sidebar .source-selector-action.icon-smart-record'));
@@ -29,13 +29,13 @@ test('Selective Recording', async t => {
   await client.click('.sl-vue-tree-sidebar .source-selector-action.icon-smart-record');
 
   // Check that source is set to stream only
-  t.true(await client.isExisting('.sl-vue-tree-sidebar .source-selector-action.icon-broadcast'));
+  await client.waitForExist('.sl-vue-tree-sidebar .source-selector-action.icon-broadcast');
 
   // Cycle selective recording mode to record only
   await client.click('.sl-vue-tree-sidebar .source-selector-action.icon-broadcast');
 
   // Check that source is set to record only
-  t.true(await client.isExisting('.sl-vue-tree-sidebar .source-selector-action.icon-studio'));
+  await client.waitForExist('.sl-vue-tree-sidebar .source-selector-action.icon-studio');
 
   // Start recording and wait
   await client.click('.record-button');
