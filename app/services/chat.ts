@@ -38,8 +38,6 @@ export class ChatService extends Service {
 
       if (!this.chatUrl) return;
 
-      this.customizationService.setLiveDockCollapsed(true);
-
       // chat url changed to a new valid url, init or reload chat
       if (oldChatUrl) {
         this.deinitChat();
@@ -60,8 +58,7 @@ export class ChatService extends Service {
 
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
 
-    // This method was added in our fork
-    (win as any).addBrowserView(this.chatView);
+    win.addBrowserView(this.chatView);
   }
 
   setChatBounds(position: IVec2, size: IVec2) {
@@ -81,7 +78,6 @@ export class ChatService extends Service {
 
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
 
-    // @ts-ignore: this method was added in our fork
     win.removeBrowserView(this.chatView);
   }
 
@@ -96,7 +92,11 @@ export class ChatService extends Service {
         nodeIntegration: false,
       },
     });
+
+    const win = this.windowsService.getWindowIdFromElectronId(this.electronWindowId);
+    if (win) this.windowsService.updateHideChat(win, true);
     await this.navigateToChat();
+    if (win) this.windowsService.updateHideChat(win, false);
     this.bindWindowListener();
     this.bindDomReadyListener();
 
