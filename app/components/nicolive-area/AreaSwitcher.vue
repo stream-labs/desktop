@@ -28,7 +28,7 @@
 
         <div class="indicator" slot="reference">
           {{ activeContent.name }}
-          <i class="icon-down-arrow"></i>
+          <i class="icon-drop-down-arrow"></i>
         </div>
       </popper>
     </div>
@@ -68,7 +68,7 @@
   cursor: pointer;
 
   &:hover {
-     background-color: @bg-secondary;
+     background-color: rgba(@black, .26);
   }
 
   > i {
@@ -81,7 +81,7 @@
   border-radius: 4px;
   margin: 0 0 0 8px; 
   padding: 8px 1px;
-  width: 300px;
+  width: 330px;
   background-color: @bg-quinary;
   box-shadow: 0 0 4px rgba(@black, 0.5), inset 0 0 0 1px rgba(@bg-quaternary, 0.8);
 
@@ -89,17 +89,21 @@
     list-style: none;
     height: 56px;
     position: relative;
-    padding: 0 32px 0 48px;
+    padding: 0 48px 0 48px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     cursor: pointer;
 
-    &:hover {
-      background-color: @bg-secondary;
+    &.active {
+      background-color: rgba(@black, .26);
     }
 
-    i {
+    &:not(.active):hover {
+      background-color: rgba(@white, .06);
+    }
+
+    > i {
       position: absolute;
       transform: translateY(-50%);
       top: 50%;

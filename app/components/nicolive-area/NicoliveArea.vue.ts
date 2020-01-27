@@ -36,12 +36,12 @@ export default class NicolivePanelRoot extends Vue {
     return [
       {
         name: 'コメント',
-        text: 'コメント閲覧機能の説明文',
+        text: '番組に投稿されたコメントを閲覧します',
         slotName: 'commentViewer'
       },
       {
-        name: '番組詳細',
-        text: '番組詳細機能の説明文',
+        name: '番組説明文',
+        text: '番組作成時に設定した説明文の表示を確認します',
         slotName: 'description'
       },
     ]
