@@ -10,9 +10,6 @@ export default class ProgramDescription extends Vue {
   @Inject()
   nicoliveProgramService: NicoliveProgramService;
 
-  // デフォルトカラー
-  bgColorMode = 'dark-mode';
-
   get programDescription(): string {
     return applyAutoLink(this.nicoliveProgramService.state.description);
   }
