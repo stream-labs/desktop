@@ -24,6 +24,7 @@ interface ILayoutSlotArray extends Array<ILayoutSlotArray | LayoutSlot> {}
 
 export default class BaseLayout extends TsxComponent<LayoutProps> {
   mins: IResizeMins = { rest: null, bar1: null };
+  firstRender: boolean;
 
   mountResize() {
     window.addEventListener('resize', () => this.props.windowResizeHandler(this.mins));
@@ -49,7 +50,9 @@ export default class BaseLayout extends TsxComponent<LayoutProps> {
   }
 
   async minsFromSlot(slot: LayoutSlot) {
-    await this.$nextTick();
+    // Before we can access the componentInstance at least one render cycle needs to run
+    if (!this.firstRender) await this.$nextTick();
+    this.firstRender = true;
     return (this.$slots[slot][0].componentInstance as BaseElement).mins;
   }
 

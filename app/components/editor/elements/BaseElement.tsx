@@ -7,7 +7,7 @@ import styles from './BaseElement.m.less';
 export default class BaseElement extends TsxComponent {
   mins = { x: 0, y: 0 };
   interval: number;
-  belowMins = true;
+  belowMins = false;
   height = 0;
   width = 0;
 
