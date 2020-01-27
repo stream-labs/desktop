@@ -10,18 +10,16 @@
           <!-- TODO: 種別判定と出し分け -->
           <div class="comment-number">{{ item.chat.no }}</div>
           <div class="comment-body">{{ item.chat.content }}</div>
-          <div class="comment-misc" @click.stop="showCommentMenu(item)">…</div>
+          <div class="comment-misc" @click.stop="showCommentMenu(item)"><i class="icon-btn icon-ellipsis-vertical"></i></div>
         </div>
         <div class="sentinel" ref="sentinel"></div>
       </div>
       <div class="pinned" v-if="Boolean(pinnedComment)">
-        <div class="comment-body">
-          <div class="comment-number">{{ pinnedComment.chat.no }}</div>
-          {{ itemToString(pinnedComment) }}
-        </div>
+        <div class="comment-number">{{ pinnedComment.chat.no }}</div>
+        <div class="comment-body">{{ itemToString(pinnedComment) }}</div>
         <div class="close"><i class="icon-close icon-btn" @click="pinnedComment = null"></i></div>
       </div>
-      <div class="scroll-to-latest" v-if="!isLatestVisible && items.length > 0">↓</div>
+      <div class="scroll-to-latest" v-if="!isLatestVisible && items.length > 0">最新のコメントへ移動<i class="icon-down-arrow"></i></div>
     </div>
     <comment-form class="comment-form" />
     <comment-filter class="overlay" @close="isFilterOpened = false" v-if="isFilterOpened"/>
@@ -66,30 +64,54 @@
 }
 
 .row {
-  height: 36px;
-  line-height: 36px;
+  font-size: 12px;
+  height: 32px;
+  line-height: 32px;
   width: 100%;
 
   display: flex;
   flex-direction: row;
 
+  &:hover {
+    background-color: @hover;
+
+     > .comment-body {
+       color: @white;
+     }
+
+    > .comment-misc {
+      display: flex;
+      align-items: center;
+      padding-left: 8px;
+      color: @light-grey;
+    }
+  }
+
+  &:first-child {
+    margin-top: 8px;
+  }
+
   & > .comment-number {
-    width: 48px;
-    padding-right: 8px;
+    min-width: 40px;
+    padding-left: 16px;
     text-align: right;
     flex-shrink: 0;
+    box-sizing: border-box;
+    color: @grey;
   }
 
   & > .comment-body {
+    margin-left: 16px;
     overflow-x: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
     flex-grow: 1;
-    color: @white;
+    color: @light-grey;
   }
 
   & > .comment-misc {
-    width: 36px;
+    display: none;
+    width: 32px;
     flex-shrink: 0;
     text-align: center;
   }
@@ -102,48 +124,65 @@
 }
 
 .pinned {
+  font-size: 12px;
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  background-color: @bg-quinary;
-
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  border: 1px solid @text-secondary;
+  background-color: rgba(@border, .9);
+  border-radius: 4px; 
   display: flex;
+  padding: 12px 16px;
+
+  & > .comment-number {
+    color: @light-grey;
+    flex-shrink: 0;
+  }
 
   & > .comment-body {
     color: @white;
-    margin: 16px;
+    margin-left: 16px;
     flex-grow: 1;
     word-break: break-word;
   }
 
-& > .close {
-    margin: 16px;
+  & > .close {
+    height: 18px;
     flex-shrink: 0;
-
     display: flex;
     align-items: center;
+    margin-left: 16px;
 
     & > .icon-btn {
       margin: 0;
+      font-size: 10px;
     }
   }
 }
 
 .scroll-to-latest {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  transform: translateX(-50%);
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: 10px auto;
-  width: 36px;
-  height: 36px;
-  border-radius: 36px;
-  line-height: 36px;
+  left: 50%;
+  bottom: 16px;
+  height: 32px;
+  line-height: 32px;
+  padding: 0 16px;
   text-align: center;
-  background-color: @nicolive-button;
+  background-color: @text-secondary;
   color: @white;
+  border-radius: 16px;
+  box-shadow: 0 0 4px rgba(@black, .5);
+  cursor: pointer;
+
+  > i {
+    font-size: 10px;
+    margin-left: 8px;
+  }
 }
 
 .comment-form {

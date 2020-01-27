@@ -4,13 +4,13 @@
       type="text"
       :readonly="isCommentSending"
       :disabled="isCommentSending"
-      placeholder="Ctrl+Enterで固定表示"
+      placeholder="コメントを入力"
       v-model="operatorCommentValue"
       @keydown.enter="sendOperatorComment($event)"
       class="comment-input"
       maxlength="80"
     />
-    <button type="submit" :disabled="isCommentSending || operatorCommentValue.length === 0" @click="sendOperatorComment($event)" class="button comment-button">コメント</button>
+    <button type="submit" :disabled="isCommentSending || operatorCommentValue.length === 0" @click="sendOperatorComment($event)" class="comment-button"><i class="icon-comment-send"></i></button>
     <div class="comment-disabled-message" v-if="programStatus === 'end'">
       番組が終了したため、放送者コメントを投稿できません
     </div>
@@ -23,6 +23,7 @@
 @import "../../styles/mixins";
 
 .comment-form {
+  height: 52px;
   display: flex;
   justify-content: center;
   padding: 8px;
@@ -31,24 +32,45 @@
 }
 
 .comment-input {
+  font-size: 12px;
   flex-grow: 1;
   width: auto;
-  margin-right: 8px;
-  background-color: @bg-secondary;
-  border-radius: 4px;
+  border: none;
+  border-radius: 4px 0 0 4px;
+
+  &:focus {
+    background-color: @bg-secondary;
+  }
 
   &::placeholder {
-    color: @grey;
+    color: @light-grey;
+    opacity: .5;
   }
 }
 
 .comment-button {
+  width: 36px;
+  height: 36px;
   padding: 0 8px;
-  background-color: @nicolive-button;
-  border-radius: 4px;
+  background-color: @bg-secondary;
+  border-radius: 0 4px 4px 0;
+
+  > i {
+    font-size: 14px;
+    color: @text-secondary;
+  }
 
   &:hover {
-    background-color: @nicolive-button-hover;
+    > i {
+      color: @text-primary;
+    }
+  }
+
+  &:disabled {
+    > i {
+      color: @light-grey;
+      opacity: .26;
+    }
   }
 }
 
