@@ -45,7 +45,7 @@ export default class CommentViewer extends Vue {
   format = NicoliveProgramService.format;
 
   itemToString(item: ChatMessage) {
-    const { vpos, content } = item.chat;
+    const { vpos, content } = item;
     const { vposBaseTime, startTime } = this.nicoliveProgramService.state;
     const vposTime = vposBaseTime + Math.floor(vpos / 100);
     const diffTime = vposTime - startTime;
@@ -58,14 +58,14 @@ export default class CommentViewer extends Vue {
       id: 'Copy comment',
       label: 'コメントをコピー',
       click: () => {
-        clipboard.writeText(item.chat.content);
+        clipboard.writeText(item.content);
       },
     });
     menu.append({
       id: 'Copy id of comment owner',
       label: 'ユーザーIDをコピー',
       click: () => {
-        clipboard.writeText(item.chat.user_id);
+        clipboard.writeText(item.user_id);
       },
     });
     menu.append({
@@ -82,14 +82,14 @@ export default class CommentViewer extends Vue {
       id: 'Add ',
       label: 'コメントをNGに追加',
       click: () => {
-        this.nicoliveCommentFilterService.addFilter({ type: 'word', body: item.chat.content });
+        this.nicoliveCommentFilterService.addFilter({ type: 'word', body: item.content });
       },
     });
     menu.append({
       id: 'Copy id of comment owner',
       label: 'ユーザーIDをNGに追加',
       click: () => {
-        this.nicoliveCommentFilterService.addFilter({ type: 'user_id', body: item.chat.user_id });
+        this.nicoliveCommentFilterService.addFilter({ type: 'user_id', body: item.user_id });
       },
     });
     menu.popup();

@@ -1,5 +1,5 @@
 import { mutation, StatefulService } from 'services/stateful-service';
-import { Message, isChatMessage } from './MessageServerClient';
+import { ChatMessage } from './MessageServerClient';
 
 export type NGSharingLevel = 'none' | 'low' | 'mid' | 'high';
 
@@ -45,13 +45,10 @@ export class NicoliveCommentLocalFilterService extends StatefulService<INicolive
     this.SET_SHOW_ANONYMOUS(showAnonymous);
   }
 
-  filter = (message: Message): boolean => {
-    if (isChatMessage(message)) {
-      const ngSharingOk = this.threshold < (message.chat.score ?? 0);
-      const anonymityOk = this.showAnonymous || message.chat.anonymity !== 1;
-      return ngSharingOk && anonymityOk;
-    }
-    return true;
+  filter = (message: ChatMessage): boolean => {
+    const ngSharingOk = this.threshold < (message.score ?? 0);
+    const anonymityOk = this.showAnonymous || message.anonymity !== 1;
+    return ngSharingOk && anonymityOk;
   };
 
   @mutation() private SET_LEVEL(level: NGSharingLevel) {

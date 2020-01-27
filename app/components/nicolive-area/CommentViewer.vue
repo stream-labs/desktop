@@ -8,15 +8,17 @@
       <div class="list">
         <div class="row" v-for="(item, index) of items" :key="index" @dblclick="pinnedComment = item" :title="itemToString(item)">
           <!-- TODO: 種別判定と出し分け -->
-          <div class="comment-number">{{ item.chat.no }}</div>
-          <div class="comment-body">{{ item.chat.content }}</div>
+          <div class="comment-number">{{ item.no }}</div>
+          <div class="comment-body">{{ item.content }}</div>
           <div class="comment-misc" @click.stop="showCommentMenu(item)"><i class="icon-btn icon-ellipsis-vertical"></i></div>
         </div>
         <div class="sentinel" ref="sentinel"></div>
       </div>
       <div class="pinned" v-if="Boolean(pinnedComment)">
-        <div class="comment-number">{{ pinnedComment.chat.no }}</div>
-        <div class="comment-body">{{ itemToString(pinnedComment) }}</div>
+        <div class="comment-number">{{ pinnedComment.no }}</div>
+        <div class="comment-body">
+          {{ itemToString(pinnedComment) }}
+        </div>
         <div class="close"><i class="icon-close icon-btn" @click="pinnedComment = null"></i></div>
       </div>
       <div class="scroll-to-latest" v-if="!isLatestVisible && items.length > 0">最新のコメントへ移動<i class="icon-down-arrow"></i></div>

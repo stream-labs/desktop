@@ -183,3 +183,18 @@ export interface Communities {
     }[];
   };
 }
+
+export type FilterRecord = {
+  id: number;
+  type: 'word' | 'user_id' | 'command';
+  body: string;
+};
+
+export type FilterType = FilterRecord['type'];
+
+export interface Filters {
+  meta: {
+    status: 200;
+  };
+  data: FilterRecord[];
+}
