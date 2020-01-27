@@ -1,8 +1,9 @@
 <template>
   <div class="container">
     <div class="header">
-      <i class="icon-settings icon-btn" @click="isFilterOpened = true"></i>
-      <i class="icon-settings icon-btn" @click="isLocalFilterOpened = true"></i>
+      <i class="icon-comment-ng icon-btn" v-tooltip.bottom="filterTooltip" @click="isFilterOpened = true"></i>
+      <!-- TODO: 後で差し替える -->
+      <i class="icon-settings icon-btn" v-tooltip.bottom="localFilterTooltip" @click="isLocalFilterOpened = true"></i>
     </div>
     <div class="content">
       <div class="list">
@@ -44,13 +45,20 @@
 
 .header {
   flex-shrink: 0;
-  height: 40px;
-  line-height: 40px;
-  text-align: right;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 48px;
+  padding: 4px 16px;
+  background-color: @bg-primary;
 
-  padding-right: 16px;
+  > .icon-btn {
+     margin-left: 16px;
 
-  background-color: @bg-quinary;
+    &:first-child {
+      margin-left: auto;
+    }
+  }
 }
 
 .content {
