@@ -7,6 +7,7 @@ import { RecentEventsService } from 'services/recent-events';
 import { MagicLinkService } from 'services/magic-link';
 import { Inject } from 'services/core';
 import BaseElement from './BaseElement';
+import { $t } from 'services/i18n';
 
 @Component({})
 export default class LegacyEvents extends BaseElement {
@@ -53,6 +54,14 @@ export default class LegacyEvents extends BaseElement {
   }
 
   get element() {
+    if (!this.userService.isLoggedIn()) {
+      return (
+        <div class={styles.eventContainer}>
+          <div class={styles.empty}>{$t('There are no events to display')}</div>
+        </div>
+      );
+    }
+
     return (
       <div>
         <BrowserView
