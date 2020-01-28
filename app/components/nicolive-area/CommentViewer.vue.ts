@@ -64,7 +64,9 @@ export default class CommentViewer extends Vue {
   isLatestVisible = true;
 
   pin(item: WrappedChat): void {
-    this.pinnedComment = item;
+    if (item.type === 'normal') {
+      this.pinnedComment = item;
+    }
   }
 
   componentMap = componentMap;
@@ -84,6 +86,10 @@ export default class CommentViewer extends Vue {
   }
 
   showCommentMenu(item: WrappedChat) {
+    if (!(item.type === 'normal' || item.type === 'operator')) {
+      return;
+    }
+
     const menu = new Menu();
     menu.append({
       id: 'Copy comment',
@@ -99,30 +105,33 @@ export default class CommentViewer extends Vue {
         clipboard.writeText(item.value.user_id);
       },
     });
-    menu.append({
-      id: 'Pin this comment',
-      label: 'コメントをピン留め',
-      click: () => {
-        this.pin(item);
-      },
-    });
-    menu.append({
-      type: 'separator',
-    });
-    menu.append({
-      id: 'Add ',
-      label: 'コメントをNGに追加',
-      click: () => {
-        this.nicoliveCommentFilterService.addFilter({ type: 'word', body: item.value.content });
-      },
-    });
-    menu.append({
-      id: 'Copy id of comment owner',
-      label: 'ユーザーIDをNGに追加',
-      click: () => {
-        this.nicoliveCommentFilterService.addFilter({ type: 'user_id', body: item.value.user_id });
-      },
-    });
+
+    if (item.type === 'normal') {
+      menu.append({
+        id: 'Pin this comment',
+        label: 'コメントをピン留め',
+        click: () => {
+          this.pin(item);
+        },
+      });
+      menu.append({
+        type: 'separator',
+      });
+      menu.append({
+        id: 'Add ',
+        label: 'コメントをNGに追加',
+        click: () => {
+          this.nicoliveCommentFilterService.addFilter({ type: 'word', body: item.value.content });
+        },
+      });
+      menu.append({
+        id: 'Copy id of comment owner',
+        label: 'ユーザーIDをNGに追加',
+        click: () => {
+          this.nicoliveCommentFilterService.addFilter({ type: 'user_id', body: item.value.user_id });
+        },
+      });
+    }
     menu.popup();
   }
 
