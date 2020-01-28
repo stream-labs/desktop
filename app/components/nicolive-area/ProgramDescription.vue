@@ -28,7 +28,7 @@
   width: 100%;
   height: 48px;
   padding: 4px 16px;
-  background-color: @bg-quinary;
+  background-color: @bg-primary;
 }
 
 .program-description-body {

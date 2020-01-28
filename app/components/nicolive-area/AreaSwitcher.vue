@@ -68,7 +68,7 @@
   cursor: pointer;
 
   &:hover {
-     background-color: rgba(@black, .26);
+     background-color: rgba(@black, .2);
   }
 
   > i {
@@ -82,8 +82,8 @@
   margin: 0 0 0 8px; 
   padding: 8px 1px;
   width: 330px;
-  background-color: @bg-quinary;
-  box-shadow: 0 0 4px rgba(@black, 0.5), inset 0 0 0 1px rgba(@bg-quaternary, 0.8);
+  background-color: @bg-primary;
+  box-shadow: 0 0 4px rgba(@black, 0.5), inset 0 0 0 1px rgba(@white, 0.1);
 
   & > .item {
     list-style: none;
@@ -96,11 +96,11 @@
     cursor: pointer;
 
     &.active {
-      background-color: rgba(@black, .26);
+      background-color: rgba(@black, .2);
     }
 
     &:not(.active):hover {
-      background-color: rgba(@white, .06);
+      background-color: rgba(@white, .04);
     }
 
     > i {
