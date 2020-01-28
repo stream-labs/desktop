@@ -587,7 +587,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           errorText = info.error;
         } else {
           errorText = $t(
-            'An error occurred with the output.',
+            'An error occurred with the output. Please check your streaming and recording settings',
           );
         }
       }
