@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
-import { NicoliveCommentViewerService } from 'services/nicolive-program/nicolive-comment-viewer';
+import { NicoliveCommentViewerService, WrappedChat } from 'services/nicolive-program/nicolive-comment-viewer';
 import CommentForm from './CommentForm.vue';
 import CommentFilter from './CommentFilter.vue';
 import CommentLocalFilter from './CommentLocalFilter.vue';
@@ -39,44 +39,50 @@ export default class CommentViewer extends Vue {
   isFilterOpened = false;
 
   isLocalFilterOpened = false;
-  pinnedComment: ChatMessage = null;
+  pinnedComment: WrappedChat = null;
   isLatestVisible = true;
 
-  get items() {
-    return this.nicoliveCommentViewerService.items.filter(this.nicoliveCommentLocalFilterService.filter);
+  pin(item: WrappedChat): void {
+    this.pinnedComment = item;
   }
+
+  get items() {
+    return this.nicoliveCommentViewerService.items.filter(this.applyLocalFilter);
+  }
+
+  private applyLocalFilter = ({ value }: WrappedChat) => this.nicoliveCommentLocalFilterService.filter(value);
 
   format = NicoliveProgramService.format;
 
-  itemToString(item: ChatMessage) {
-    const { vpos, content } = item;
+  itemToString(item: WrappedChat) {
+    const { vpos, content } = item.value;
     const { vposBaseTime, startTime } = this.nicoliveProgramService.state;
     const vposTime = vposBaseTime + Math.floor(vpos / 100);
     const diffTime = vposTime - startTime;
     return `${content} (${this.format(diffTime)})`;
   }
 
-  showCommentMenu(item: ChatMessage) {
+  showCommentMenu(item: WrappedChat) {
     const menu = new Menu();
     menu.append({
       id: 'Copy comment',
       label: 'コメントをコピー',
       click: () => {
-        clipboard.writeText(item.content);
+        clipboard.writeText(item.value.content);
       },
     });
     menu.append({
       id: 'Copy id of comment owner',
       label: 'ユーザーIDをコピー',
       click: () => {
-        clipboard.writeText(item.user_id);
+        clipboard.writeText(item.value.user_id);
       },
     });
     menu.append({
       id: 'Pin this comment',
       label: 'コメントをピン留め',
       click: () => {
-        this.pinnedComment = item;
+        this.pin(item);
       },
     });
     menu.append({
@@ -86,14 +92,14 @@ export default class CommentViewer extends Vue {
       id: 'Add ',
       label: 'コメントをNGに追加',
       click: () => {
-        this.nicoliveCommentFilterService.addFilter({ type: 'word', body: item.content });
+        this.nicoliveCommentFilterService.addFilter({ type: 'word', body: item.value.content });
       },
     });
     menu.append({
       id: 'Copy id of comment owner',
       label: 'ユーザーIDをNGに追加',
       click: () => {
-        this.nicoliveCommentFilterService.addFilter({ type: 'user_id', body: item.user_id });
+        this.nicoliveCommentFilterService.addFilter({ type: 'user_id', body: item.value.user_id });
       },
     });
     menu.popup();

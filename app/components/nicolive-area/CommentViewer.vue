@@ -7,16 +7,16 @@
     </div>
     <div class="content">
       <div class="list">
-        <div class="row" v-for="(item, index) of items" :key="index" @dblclick="pinnedComment = item" :title="itemToString(item)">
+        <div class="row" v-for="(item, index) of items" :key="index" @dblclick="pin(item)" :title="itemToString(item)">
           <!-- TODO: 種別判定と出し分け -->
-          <div class="comment-number">{{ item.no }}</div>
-          <div class="comment-body">{{ item.content }}</div>
+          <div class="comment-number">{{ item.value.no }}</div>
+          <div class="comment-body">{{ item.value.content }}</div>
           <div class="comment-misc" @click.stop="showCommentMenu(item)"><i class="icon-btn icon-ellipsis-vertical"></i></div>
         </div>
         <div class="sentinel" ref="sentinel"></div>
       </div>
       <div class="pinned" v-if="Boolean(pinnedComment)">
-        <div class="comment-number">{{ pinnedComment.no }}</div>
+        <div class="comment-number">{{ pinnedComment.value.no }}</div>
         <div class="comment-body">
           {{ itemToString(pinnedComment) }}
         </div>
@@ -141,7 +141,7 @@
   right: 8px;
   border: 1px solid @text-secondary;
   background-color: rgba(@border, .9);
-  border-radius: 4px; 
+  border-radius: 4px;
   display: flex;
   padding: 12px 16px;
 
