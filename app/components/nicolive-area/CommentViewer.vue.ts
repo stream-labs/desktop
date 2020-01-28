@@ -11,12 +11,33 @@ import { Menu } from 'util/menus/Menu';
 import { clipboard } from 'electron';
 import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
+import { ChatMessageType } from 'services/nicolive-program/ChatMessage/classifier';
+import CommonComment from './comment/CommonComment.vue';
+import SystemMessage from './comment/SystemMessage.vue';
+import GiftComment from './comment/GiftComment.vue';
+import NicoadComment from './comment/NicoadComment.vue';
+
+const componentMap: { [type in ChatMessageType]: Vue.Component } = {
+  normal: CommonComment,
+  operator: CommonComment,
+  nicoad: NicoadComment,
+  gift: GiftComment,
+  spi: SystemMessage,
+  quote: SystemMessage,
+  cruise: SystemMessage,
+  info: SystemMessage,
+  unknown: CommonComment,
+};
 
 @Component({
   components: {
     CommentForm,
     CommentFilter,
     CommentLocalFilter,
+    CommonComment,
+    NicoadComment,
+    GiftComment,
+    SystemMessage,
   }
 })
 export default class CommentViewer extends Vue {
@@ -46,20 +67,20 @@ export default class CommentViewer extends Vue {
     this.pinnedComment = item;
   }
 
+  componentMap = componentMap;
+
   get items() {
     return this.nicoliveCommentViewerService.items.filter(this.applyLocalFilter);
   }
 
   private applyLocalFilter = ({ value }: WrappedChat) => this.nicoliveCommentLocalFilterService.filter(value);
 
-  format = NicoliveProgramService.format;
-
   itemToString(item: WrappedChat) {
     const { vpos, content } = item.value;
     const { vposBaseTime, startTime } = this.nicoliveProgramService.state;
     const vposTime = vposBaseTime + Math.floor(vpos / 100);
     const diffTime = vposTime - startTime;
-    return `${content} (${this.format(diffTime)})`;
+    return `${content} (${NicoliveProgramService.format(diffTime)})`;
   }
 
   showCommentMenu(item: WrappedChat) {

@@ -7,12 +7,16 @@
     </div>
     <div class="content">
       <div class="list">
-        <div class="row" v-for="(item, index) of items" :key="index" @dblclick="pin(item)" :title="itemToString(item)">
-          <!-- TODO: 種別判定と出し分け -->
-          <div class="comment-number">{{ item.value.no }}</div>
-          <div class="comment-body">{{ item.value.content }}</div>
-          <div class="comment-misc" @click.stop="showCommentMenu(item)"><i class="icon-btn icon-ellipsis-vertical"></i></div>
-        </div>
+        <component
+          class="row"
+          v-for="(item, index) of items"
+          :key="index"
+          :title="itemToString(item)"
+          :is="componentMap[item.type]"
+          :chat="item"
+          @pinned="pin(item)"
+          @commentMenu="showCommentMenu(item)"
+        />
         <div class="sentinel" ref="sentinel"></div>
       </div>
       <div class="pinned" v-if="Boolean(pinnedComment)">
@@ -79,51 +83,8 @@
   line-height: 32px;
   width: 100%;
 
-  display: flex;
-  flex-direction: row;
-
-  &:hover {
-    background-color: @hover;
-
-     > .comment-body {
-       color: @white;
-     }
-
-    > .comment-misc {
-      display: flex;
-      align-items: center;
-      padding-left: 8px;
-      color: @light-grey;
-    }
-  }
-
   &:first-child {
     margin-top: 8px;
-  }
-
-  & > .comment-number {
-    min-width: 40px;
-    padding-left: 16px;
-    text-align: right;
-    flex-shrink: 0;
-    box-sizing: border-box;
-    color: @grey;
-  }
-
-  & > .comment-body {
-    margin-left: 16px;
-    overflow-x: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    flex-grow: 1;
-    color: @light-grey;
-  }
-
-  & > .comment-misc {
-    display: none;
-    width: 32px;
-    flex-shrink: 0;
-    text-align: center;
   }
 }
 
