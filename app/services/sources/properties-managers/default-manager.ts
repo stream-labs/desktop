@@ -1,7 +1,8 @@
 import { PropertiesManager } from './properties-manager';
 import { Inject } from 'services/core/injector';
 import { MediaBackupService } from 'services/media-backup';
-import * as fi from 'node-fontinfo';
+// MAC-TODO
+// import * as fi from 'node-fontinfo';
 import { FontLibraryService } from 'services/font-library';
 import { EFontStyle } from 'obs-studio-node';
 import fs from 'fs';
@@ -136,27 +137,28 @@ export class DefaultManager extends PropertiesManager {
     // Make sure this wasn't destroyed while fetching the font
     if (this.destroyed) return;
 
-    const fontInfo = fi.getFontInfo(fontPath);
+    // MAC-TODO: Support Google fonts
+    // const fontInfo = fi.getFontInfo(fontPath);
 
-    if (!fontInfo) {
-      // Fallback to Arial
-      newSettings['custom_font'] = null;
-      newSettings['font'] = {
-        face: 'Arial',
-        flags: 0,
-      };
-      this.obsSource.update(newSettings);
-      return;
-    }
+    // if (!fontInfo) {
+    //   // Fallback to Arial
+    //   newSettings['custom_font'] = null;
+    //   newSettings['font'] = {
+    //     face: 'Arial',
+    //     flags: 0,
+    //   };
+    //   this.obsSource.update(newSettings);
+    //   return;
+    // }
 
-    newSettings['custom_font'] = fontPath;
-    newSettings['font'] = { ...settings['font'] };
-    newSettings['font'] = newSettings['font'] || {};
-    newSettings['font']['face'] = fontInfo.family_name;
-    newSettings['font']['flags'] =
-      (fontInfo.italic ? EFontStyle.Italic : 0) | (fontInfo.bold ? EFontStyle.Bold : 0);
+    // newSettings['custom_font'] = fontPath;
+    // newSettings['font'] = { ...settings['font'] };
+    // newSettings['font'] = newSettings['font'] || {};
+    // newSettings['font']['face'] = fontInfo.family_name;
+    // newSettings['font']['flags'] =
+    //   (fontInfo.italic ? EFontStyle.Italic : 0) | (fontInfo.bold ? EFontStyle.Bold : 0);
 
-    this.obsSource.update(newSettings);
+    // this.obsSource.update(newSettings);
   }
 
   private setupAutomaticGameCapture() {

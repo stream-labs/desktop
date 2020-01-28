@@ -354,7 +354,15 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       { description: 'OpenVR Capture', value: 'openvr_capture' },
       { description: 'LIV Client Capture', value: 'liv_capture' },
       { description: 'OvrStream', value: 'ovrstream_dc_source' },
-      { description: 'VLC Source', value: 'vlc_source' },
+      // MAC-TODO
+      // { description: 'VLC Source', value: 'vlc_source' },
+      { description: 'Audio Input Capture', value: 'coreaudio_input_capture' },
+      { description: 'Audio Output Capture', value: 'coreaudio_output_capture' },
+      { description: 'Video Capture Device', value: 'av_capture_input' },
+      { description: 'Display Capture', value: 'display_capture' },
+      // { description: 'Syphon Client', value: 'syphon-input' },
+      { description: 'Text (FreeType 2)', value: 'text_ft2_source' },
+      { description: 'JACK Input Client', value: 'audio_line' },
     ];
 
     const availableWhitelistedType = whitelistedTypes.filter(type =>

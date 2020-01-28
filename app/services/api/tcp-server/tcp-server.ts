@@ -82,7 +82,8 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
 
   listen() {
     this.listenConnections(this.createTcpServer());
-    if (this.state.namedPipe.enabled) this.listenConnections(this.createNamedPipeServer());
+    // MAC-TODO: Named pipe is windows only
+    // if (this.state.namedPipe.enabled) this.listenConnections(this.createNamedPipeServer());
     if (this.state.websockets.enabled) this.listenConnections(this.createWebsoketsServer());
   }
 
@@ -234,18 +235,19 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     });
   }
 
-  private createNamedPipeServer(): IServer {
-    const settings = this.state.namedPipe;
-    const server = net.createServer();
-    server.listen(`\\\\.\\pipe\\${settings.pipeName}`);
-    return {
-      type: 'namedPipe',
-      nativeServer: server,
-      close() {
-        server.close();
-      },
-    };
-  }
+  // MAC-TODO: Named pipe is windows only
+  // private createNamedPipeServer(): IServer {
+  //   const settings = this.state.namedPipe;
+  //   const server = net.createServer();
+  //   server.listen(`\\\\.\\pipe\\${settings.pipeName}`);
+  //   return {
+  //     type: 'namedPipe',
+  //     nativeServer: server,
+  //     close() {
+  //       server.close();
+  //     },
+  //   };
+  // }
 
   private createTcpServer(): IServer {
     const server = net.createServer();

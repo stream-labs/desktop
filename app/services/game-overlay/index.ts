@@ -15,7 +15,8 @@ const { BrowserWindow } = electron.remote;
 // We remote.require because this module needs to live in the main
 // process so we can paint to it from there. We are doing this to
 // work around an electron bug: https://github.com/electron/electron/issues/20559
-const overlay = electron.remote.require('@streamlabs/game-overlay');
+// MAC-TODO
+// const overlay = electron.remote.require('@streamlabs/game-overlay');
 
 interface IWindowProperties {
   chat: { position: IVec2; id: number; enabled: boolean };
@@ -108,7 +109,8 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       crashHandlerLogPath = electron.remote.app.getPath('userData') + overlayLogFile;
     }
 
-    overlay.start(crashHandlerLogPath);
+    // MAC-TODO
+    // overlay.start(crashHandlerLogPath);
 
     this.onWindowsReadySubscription = this.onWindowsReady
       .pipe(
@@ -246,7 +248,8 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
       this.windows[key].setBounds({ ...pos, ...size });
       this.previewWindows[key].setBounds({ ...pos, ...size });
-      overlay.setPosition(overlayId, pos.x, pos.y, size.width, size.height);
+      // MAC-TODO
+      // overlay.setPosition(overlayId, pos.x, pos.y, size.width, size.height);
     });
   }
 
@@ -258,7 +261,8 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   showOverlay() {
-    overlay.show();
+    // MAC-TODO
+    // overlay.show();
     this.TOGGLE_OVERLAY(true);
 
     // Force a refresh to trigger a paint event
@@ -266,15 +270,17 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   hideOverlay() {
-    overlay.hide();
+    // MAC-TODO
+    // overlay.hide();
     this.TOGGLE_OVERLAY(false);
   }
 
   toggleOverlay() {
     // This is a typo in the module: "runing"
-    if (overlay.getStatus() !== 'runing' || !this.state.isEnabled) {
-      return;
-    }
+    // MAC-TODO
+    // if (overlay.getStatus() !== 'runing' || !this.state.isEnabled) {
+    //   return;
+    // }
 
     if (this.state.previewMode) this.setPreviewMode(false);
 
@@ -305,7 +311,8 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
     const id = this.state.windowProperties[window].id;
 
-    overlay.setVisibility(id, this.state.windowProperties[window].enabled);
+    // MAC-TODO
+    // overlay.setVisibility(id, this.state.windowProperties[window].enabled);
 
     if (!this.state.windowProperties[window].enabled) {
       this.previewWindows[window].hide();
@@ -329,7 +336,8 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
         this.SET_WINDOW_POSITION(key, { x, y });
         const { width, height } = win.getBounds();
 
-        await overlay.setPosition(overlayId, x, y, width, height);
+        // MAC-TODO
+        // await overlay.setPosition(overlayId, x, y, width, height);
         win.hide();
       });
     }
@@ -341,7 +349,8 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     Object.keys(this.windows).forEach(key => {
       const overlayId = this.state.windowProperties[key].id;
 
-      overlay.setTransparency(overlayId, percentage * 2.55);
+      // MAC-TODO
+      // overlay.setTransparency(overlayId, percentage * 2.55);
     });
   }
 
@@ -354,7 +363,8 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     if (!this.overlayRunning) return;
     this.overlayRunning = false;
 
-    await overlay.stop();
+    // MAC-TODO
+    // await overlay.stop();
     if (this.onWindowsReadySubscription) await this.onWindowsReadySubscription.unsubscribe();
     if (this.windows) await Object.values(this.windows).forEach(win => win.destroy());
     if (this.previewWindows) {
@@ -371,28 +381,33 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       // Fix race condition in screen tests
       if (win.isDestroyed()) return;
 
-      const overlayId = overlay.addHWND(win.getNativeWindowHandle());
+      // MAC-TODO
+      // const overlayId = overlay.addHWND(win.getNativeWindowHandle());
 
-      if (overlayId === -1 || overlayId == null) {
-        win.hide();
-        throw new Error('Error creating overlay');
-      }
+      // MAC-TODO
+      // if (overlayId === -1 || overlayId == null) {
+      //   win.hide();
+      //   throw new Error('Error creating overlay');
+      // }
 
-      this.SET_WINDOW_ID(key, overlayId);
+      // MAC-TODO
+      // this.SET_WINDOW_ID(key, overlayId);
 
       const position = this.getPosition(key, win);
       const { width, height } = win.getBounds();
 
-      overlay.setPosition(overlayId, position.x, position.y, width, height);
-      overlay.setTransparency(overlayId, this.state.opacity * 2.55);
-      overlay.setVisibility(overlayId, this.state.windowProperties[key].enabled);
+      // MAC-TODO
+      // overlay.setPosition(overlayId, position.x, position.y, width, height);
+      // overlay.setTransparency(overlayId, this.state.opacity * 2.55);
+      // overlay.setVisibility(overlayId, this.state.windowProperties[key].enabled);
 
       win.webContents.executeJavaScript(hideInteraction);
 
       // We bind the paint callback in the main process to avoid a memory
       // leak in electron. This can be moved back to the renderer process
       // when the leak is fixed: https://github.com/electron/electron/issues/20559
-      ipcRenderer.send('gameOverlayPaintCallback', { overlayId, contentsId: win.webContents.id });
+      // MAC-TODO
+      // ipcRenderer.send('gameOverlayPaintCallback', { overlayId, contentsId: win.webContents.id });
       win.webContents.setFrameRate(1);
     });
   }

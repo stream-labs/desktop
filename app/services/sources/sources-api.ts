@@ -84,6 +84,15 @@ export interface ISourceAddOptions<TPropertiesManagerSettings = Dictionary<any>>
   isTemporary?: boolean;
 }
 
+export type TSourceTypeMacOnly =
+  | 'coreaudio_input_capture'
+  | 'coreaudio_output_capture'
+  | 'av_capture_input'
+  | 'display_capture'
+  | 'text_ft2_source'
+  | 'audio_line';
+
+// MAC-TODO: Refactor into shared and windows-only
 export type TSourceType =
   | 'image_source'
   | 'color_source'
@@ -104,7 +113,8 @@ export type TSourceType =
   | 'openvr_capture'
   | 'liv_capture'
   | 'ovrstream_dc_source'
-  | 'vlc_source';
+  | 'vlc_source'
+  | TSourceTypeMacOnly;
 
 // Register new properties managers here
 export type TPropertiesManager = 'default' | 'widget' | 'streamlabels' | 'platformApp' | 'replay';

@@ -143,4 +143,45 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     name: $t('VLC Source'),
     description: $t('Add playlists of videos to your scene.'),
   },
+  // MAC-TODO
+  coreaudio_input_capture: {
+    name: $t('Audio Input Capture'),
+    description: $t(
+      'Any device that attaches to a computer for the purpose of capturing sound, such as music or speech.',
+    ),
+    demoFilename: 'audio-input.png',
+    supportList: [$t('Built in microphones'), $t('USB microphones'), $t('Other USB devices')],
+  },
+  coreaudio_output_capture: {
+    name: $t('Audio Output Capture'),
+    description: $t(
+      'Captures your desktop audio for the purpose of playing sound, such as music or speech.',
+    ),
+    demoFilename: 'audio-output.png',
+    supportList: [$t('Desktop audio')],
+  },
+  av_capture_input: {
+    name: $t('Video Capture Device'),
+    description: $t('Select from your build in USB webcam or an external.'),
+    demoFilename: 'video-capture.png',
+    supportList: [
+      $t('Built in webcam'),
+      $t('Logitech webcam'),
+      $t('Capture cards (Elgato, Avermedia, BlackMagic)'),
+    ],
+  },
+  display_capture: {
+    name: $t('Display Capture'),
+    description: $t('Capture your entire computer monitor.'),
+    demoFilename: 'display-capture.png',
+    supportList: [$t('Primary monitor'), $t('Secondary monitor')],
+  },
+  // syphon_input: {
+  //   name: $t(''),
+  //   description: $t(''),
+  // },
+  audio_line: {
+    name: $t(''),
+    description: $t(''),
+  },
 });

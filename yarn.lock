@@ -1383,12 +1383,6 @@
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.14.0.tgz#9fb3a3cf3132328151f353de4632e01e52102bea"
   integrity sha512-9NET910DNaIPngYnLLPeg+Ogzqsi9uM4mSboU5y6p8S5DzMTVEsJZrawi+BoDNUVBa2DhJqQYUFvMDfgU062LQ==
 
-"@streamlabs/game-overlay@https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.41.tar.gz":
-  version "0.0.41"
-  resolved "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.41.tar.gz#a87241ac7b821b415f9b08ea1f80f8fde1a5b43b"
-  dependencies:
-    nan "^2.14.0"
-
 "@szmarczak/http-timer@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@szmarczak/http-timer/-/http-timer-1.1.2.tgz#b1665e2c461a2cd92f4c1bbf50d5454de0d4b421"
@@ -7701,11 +7695,6 @@ nan@^2.12.1:
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.12.1.tgz#7b1aa193e9aa86057e3c7bbd0ac448e770925552"
   integrity sha512-JY7V6lRkStKcKTvHO5NVSQRv+RV+FIL5pvDoLiAtSL9pKlC5x9PKQcZDsq7m4FO4d57mkhC6Z+QhAh3Jdk5JFw==
 
-nan@^2.14.0:
-  version "2.14.0"
-  resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.0.tgz#7818f722027b2459a86f0295d434d1fc2336c52c"
-  integrity sha512-INOFj37C7k3AfaNTtX8RhsTw7qRy7eLET14cROi9+5HAVbbHuIWUHEauBv5qT4Av2tWasiTY1Jw6puUNqRJXQg==
-
 nan@^2.9.2:
   version "2.10.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.10.0.tgz#96d0cd610ebd58d4b4de9cc0c6828cda99c7548f"
@@ -7878,11 +7867,6 @@ node-releases@^1.1.42:
   integrity sha512-OQ/ESmUqGawI2PRX+XIRao44qWYBBfN54ImQYdWVTQqUckuejOg76ysSqDBK8NG3zwySRVnX36JwDQ6x+9GxzA==
   dependencies:
     semver "^6.3.0"
-
-node-win32-np@1.0.6:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/node-win32-np/-/node-win32-np-1.0.6.tgz#761237777e8b222ef4dba3a2b622b7a53d2b4b97"
-  integrity sha512-SVLiJ07vkLEpuQpJAh9HbUHlmUbpbtoini9V9aBNs+VbJCJl80nVSxmy+aQW34fQxLW60z35hi9ePpqJT6Hekw==
 
 nopt@^4.0.1:
   version "4.0.1"
@@ -8090,9 +8074,9 @@ object.values@^1.1.0:
     function-bind "^1.1.1"
     has "^1.0.3"
 
-"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.59-iojs-v6.0.3-release.tar.gz":
+"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.121-iojs-v6.0.3-osx-debug.tar.gz":
   version "0.3.99"
-  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.59-iojs-v6.0.3-release.tar.gz#00e2a5ba57e00993aeccc20cfa4b9e8447933045"
+  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.121-iojs-v6.0.3-osx-debug.tar.gz#26ec0a80336b3f25b4a5d8dc01df679d1db64997"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"

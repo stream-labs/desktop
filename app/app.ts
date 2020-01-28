@@ -30,7 +30,8 @@ import * as obs from '../obs-api';
 import path from 'path';
 import uuid from 'uuid/v4';
 
-const crashHandler = window['require']('crash-handler');
+// MAC-TODO
+// const crashHandler = window['require']('crash-handler');
 
 const { ipcRenderer, remote } = electron;
 const slobsVersion = remote.process.env.SLOBS_VERSION;
@@ -166,7 +167,8 @@ document.addEventListener('DOMContentLoaded', () => {
         ),
       );
 
-      crashHandler.registerProcess(appService.pid, false);
+      // MAC-TODO
+      // crashHandler.registerProcess(appService.pid, false);
 
       await obsUserPluginsService.initialize();
 
@@ -181,7 +183,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const message = apiInitErrorResultToMessage(apiResult);
         showDialog(message);
 
-        crashHandler.unregisterProcess(appService.pid);
+        // MAC-TODO
+        // crashHandler.unregisterProcess(appService.pid);
 
         obs.NodeObs.StopCrashHandler();
         obs.IPC.disconnect();

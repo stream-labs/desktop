@@ -23,7 +23,8 @@ const path = require('path');
 const rimraf = require('rimraf');
 const electronLog = require('electron-log');
 
-const overlay = require('@streamlabs/game-overlay');
+// MAC-TODO
+// const overlay = require('@streamlabs/game-overlay');
 
 // We use a special cache directory for running tests
 if (process.env.SLOBS_CACHE_DIR) {
@@ -53,7 +54,8 @@ if (!gotTheLock) {
   const semver = require('semver');
   const windowStateKeeper = require('electron-window-state');
   const pid = require('process').pid;
-  const crashHandler = require('crash-handler');
+  // MAC-TODO
+  // const crashHandler = require('crash-handler');
 
   app.commandLine.appendSwitch('force-ui-direction', 'ltr');
 
@@ -136,8 +138,9 @@ if (!gotTheLock) {
       crashHandlerLogPath = app.getPath('userData');
     }
 
-    crashHandler.startCrashHandler(app.getAppPath(), process.env.SLOBS_VERSION, isDevMode.toString(), crashHandlerLogPath);
-    crashHandler.registerProcess(pid, false);
+    // MAC-TODO
+    // crashHandler.startCrashHandler(app.getAppPath(), process.env.SLOBS_VERSION, isDevMode.toString(), crashHandlerLogPath);
+    // crashHandler.registerProcess(pid, false);
 
     const Raven = require('raven');
 
@@ -190,6 +193,8 @@ if (!gotTheLock) {
       webPreferences: { nodeIntegration: true, webviewTag: true }
     });
 
+    mainWindow.openDevTools({ mode: 'detach' });
+
     mainWindowState.manage(mainWindow);
 
     mainWindow.removeMenu();
@@ -228,10 +233,12 @@ if (!gotTheLock) {
     });
 
     // Initialize the keylistener
-    require('node-libuiohook').startHook();
+    // MAC-TODO
+    // require('node-libuiohook').startHook();
 
     mainWindow.on('closed', () => {
-      require('node-libuiohook').stopHook();
+      // MAC-TODO
+      // require('node-libuiohook').stopHook();
       session.defaultSession.flushStorageData();
       session.defaultSession.cookies.flushStore(() => app.quit());
     });
@@ -532,22 +539,23 @@ if (!gotTheLock) {
     }
   });
 
-  ipcMain.on('gameOverlayPaintCallback', (e, { contentsId, overlayId }) => {
-    const contents = webContents.fromId(contentsId);
+  // MAC-TODO
+  // ipcMain.on('gameOverlayPaintCallback', (e, { contentsId, overlayId }) => {
+  //   const contents = webContents.fromId(contentsId);
 
-    if (contents.isDestroyed()) return;
+  //   if (contents.isDestroyed()) return;
 
-    contents.on('paint', (event, dirty, image) => {
-      if (
-        overlay.paintOverlay(
-          overlayId,
-          image.getSize().width,
-          image.getSize().height,
-          image.getBitmap(),
-        ) === 0
-      ) {
-        contents.invalidate();
-      }
-    });
-  });
+  //   contents.on('paint', (event, dirty, image) => {
+  //     if (
+  //       overlay.paintOverlay(
+  //         overlayId,
+  //         image.getSize().width,
+  //         image.getSize().height,
+  //         image.getBitmap(),
+  //       ) === 0
+  //     ) {
+  //       contents.invalidate();
+  //     }
+  //   });
+  // });
 }
