@@ -31,6 +31,20 @@ const plugins: any[] = [];
 let mutationId = 1;
 const isWorkerWindow = Util.isWorkerWindow();
 let storeCanReceiveMutations = isWorkerWindow;
+const mutationsQueue: IMutation[] = [];
+
+/**
+ * Add mutation to the queue so we can send it to the renderer windows along with other
+ * pending mutations.
+ * This prevents multiple re-renders of Vue components for each single mutation.
+ */
+function sendMutationToRenderWindows(mutation: IMutation) {
+  mutationsQueue.push(mutation);
+  setTimeout(() => {
+    ipcRenderer.send('vuex-mutation', JSON.stringify(mutationsQueue));
+    mutationsQueue.length = 0;
+  });
+}
 
 // This plugin will keep all vuex stores in sync via IPC
 plugins.push((store: Store<any>) => {
@@ -43,7 +57,7 @@ plugins.push((store: Store<any>) => {
         payload: mutation.payload,
       };
       internalApiService.handleMutation(mutationToSend);
-      ipcRenderer.send('vuex-mutation', JSON.stringify(mutationToSend));
+      sendMutationToRenderWindows(mutationToSend);
     }
   });
 
@@ -68,17 +82,18 @@ plugins.push((store: Store<any>) => {
   ipcRenderer.on('vuex-mutation', (event: Electron.Event, mutationString: string) => {
     if (!storeCanReceiveMutations) return;
 
-    const mutation = JSON.parse(mutationString);
+    const mutations = JSON.parse(mutationString);
+    for (const mutation of mutations) {
+      // for worker window commit mutation directly
+      if (isWorkerWindow) {
+        commitMutation(mutation);
+        return;
+      }
 
-    // for worker window commit mutation directly
-    if (isWorkerWindow) {
-      commitMutation(mutation);
-      return;
+      // for renderer windows commit mutations via api-client
+      const servicesManager: ServicesManager = ServicesManager.instance;
+      servicesManager.internalApiClient.handleMutation(mutation);
     }
-
-    // for renderer windows commit mutations via api-client
-    const servicesManager: ServicesManager = ServicesManager.instance;
-    servicesManager.internalApiClient.handleMutation(mutation);
   });
 
   ipcRenderer.send('vuex-register');
@@ -117,6 +132,9 @@ export function createStore(): Store<any> {
 }
 
 export function commitMutation(mutation: IMutation) {
+  if (mutation.type !== 'PerformanceService.SET_PERFORMANCE_STATS') {
+    console.log('mutation', mutation);
+  }
   store.commit(
     mutation.type,
     Object.assign({}, mutation.payload, {

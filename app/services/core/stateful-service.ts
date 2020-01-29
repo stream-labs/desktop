@@ -74,6 +74,9 @@ function registerMutation(
 
     value(...args: any[]) {
       const constructorArgs = this['_constructorArgs'];
+      if (mutationName !== 'PerformanceService.SET_PERFORMANCE_STATS') {
+        console.log('mutation ss', mutationName, args, constructorArgs);
+      }
       const store = StatefulService.getStore();
       store.commit(mutationName, {
         args,

@@ -112,6 +112,7 @@ export default class SourceSelector extends TsxComponent {
     };
 
     const nodes = this.scene.state.nodes.filter(n => !n.parentId);
+    console.log('get nodes', nodes);
     return getSlVueTreeNodes(nodes);
   }
 
