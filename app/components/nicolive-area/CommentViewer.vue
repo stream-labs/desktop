@@ -14,6 +14,7 @@
           :title="itemToString(item)"
           :is="componentMap[item.type]"
           :chat="item"
+          :commentMenuOpened="commentMenuTarget === item"
           @pinned="pin(item)"
           @commentMenu="showCommentMenu(item)"
         />

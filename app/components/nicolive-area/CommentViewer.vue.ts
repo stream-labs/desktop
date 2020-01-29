@@ -85,6 +85,7 @@ export default class CommentViewer extends Vue {
     return `${content} (${NicoliveProgramService.format(diffTime)})`;
   }
 
+  commentMenuTarget: WrappedChat | null = null;
   showCommentMenu(item: WrappedChat) {
     if (!(item.type === 'normal' || item.type === 'operator')) {
       return;
@@ -132,6 +133,16 @@ export default class CommentViewer extends Vue {
         },
       });
     }
+
+    // コンテキストメニューが出るとホバー判定が消えるので、外観を維持するために注目している要素を保持しておく
+    menu.menu.once('menu-will-show', () => {
+      this.commentMenuTarget = item;
+    });
+    menu.menu.once('menu-will-close', () => {
+      if (this.commentMenuTarget === item) {
+        this.commentMenuTarget = null;
+      }
+    });
     menu.popup();
   }
 
