@@ -74,7 +74,7 @@ export default class StudioEditor extends TsxComponent {
 
   // Not reactive, don't cache
   getStudioTransitionName() {
-    return this.transitionsService.studioTransitionName;
+    return this.transitionsService.getStudioTransitionName();
   }
 
   onOutputResize(region: IRectangle) {
