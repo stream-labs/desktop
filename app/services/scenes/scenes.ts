@@ -198,9 +198,7 @@ export class ScenesService extends StatefulService<IScenesState> {
       resourceId: `Scene${JSON.stringify([id])}`,
       nodes: [],
     });
-    console.log('ADD_SCENE', id);
     this.state.displayOrder.push(id);
-    console.log('Oder', JSON.stringify(this.state.displayOrder));
   }
 
   @mutation()
@@ -217,7 +215,6 @@ export class ScenesService extends StatefulService<IScenesState> {
 
   @mutation()
   private SET_SCENE_ORDER(order: string[]) {
-    console.log('set display order', order);
     this.state.displayOrder = order;
   }
 
