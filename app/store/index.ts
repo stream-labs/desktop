@@ -38,7 +38,7 @@ const mutationsQueue: IMutation[] = [];
  * pending mutations.
  * This prevents multiple re-renders of Vue components for each single mutation.
  */
-function sendMutationToRenderWindows(mutation: IMutation) {
+function sendMutationToRendererWindows(mutation: IMutation) {
   mutationsQueue.push(mutation);
   setTimeout(() => {
     ipcRenderer.send('vuex-mutation', JSON.stringify(mutationsQueue));
@@ -57,14 +57,18 @@ plugins.push((store: Store<any>) => {
         payload: mutation.payload,
       };
       internalApiService.handleMutation(mutationToSend);
-      sendMutationToRenderWindows(mutationToSend);
+      sendMutationToRendererWindows(mutationToSend);
     }
   });
 
   // Only the worker window should ever receive this
   ipcRenderer.on('vuex-sendState', (event: Electron.Event, windowId: number) => {
     const win = remote.BrowserWindow.fromId(windowId);
-    win.webContents.send('vuex-loadState', JSON.stringify(store.state));
+    setTimeout(() => {
+      // some mutations can be in the mutationsQueue
+      // use setTimeout to ensure that mutationsQueue is empty here
+      win.webContents.send('vuex-loadState', JSON.stringify(store.state));
+    });
   });
 
   // Only renderer windows should ever receive this
