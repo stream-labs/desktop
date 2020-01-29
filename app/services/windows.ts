@@ -193,8 +193,12 @@ export class WindowsService extends StatefulService<IWindowsState> {
   init() {
     const windows = BrowserWindow.getAllWindows();
 
-    this.windows.main = windows[0];
-    this.windows.child = windows[1];
+    // this.windows.main = windows[0];
+    // this.windows.child = windows[1];
+
+    // MAC-TODO This is a hack to identify windows
+    this.windows.main = electron.remote.getCurrentWindow();
+    this.windows.child = windows.find(w => w.id !== this.windows.main.id);
 
     this.updateScaleFactor('main');
     this.updateScaleFactor('child');
@@ -208,6 +212,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     if (window && !window.isDestroyed()) {
       const bounds = window.getBounds();
       const currentDisplay = electron.remote.screen.getDisplayMatching(bounds);
+      console.log('SCALE FACTOR', windowId, currentDisplay.scaleFactor);
       this.UPDATE_SCALE_FACTOR(windowId, currentDisplay.scaleFactor);
     }
   }

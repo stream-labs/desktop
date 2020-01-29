@@ -89,8 +89,9 @@ export default class StudioEditor extends TsxComponent {
       {
         type: 0,
         callback: (event: any) => {
-          console.log('MOUSE DOWN');
+          console.log('RAW MOUSE DOWN', event);
           const translatedEvent = this.convertBackendEvent(event);
+          console.log('TRANSLATED MOUSE DOWN', translatedEvent);
           if (translatedEvent) {
             this.handleMouseDown(translatedEvent as MouseEvent);
           }
@@ -99,8 +100,9 @@ export default class StudioEditor extends TsxComponent {
       {
         type: 1,
         callback: (event: any) => {
-          console.log('MOUSE UP');
+          console.log('RAW MOUSE UP', event);
           const translatedEvent = this.convertBackendEvent(event);
+          console.log('TRANSLATED MOUSE UP', translatedEvent);
           if (translatedEvent) {
             this.handleMouseUp(translatedEvent as MouseEvent);
           }
@@ -120,12 +122,12 @@ export default class StudioEditor extends TsxComponent {
       {
         type: 3,
         callback: (event: any) => {
-          console.log('RAW MOUSE MOVE', event);
-          const translatedEvent = this.convertBackendEvent(event);
-          console.log('TRANLSATED MOUSE MOVE', translatedEvent);
-          if (translatedEvent) {
-            this.handleMouseMove(translatedEvent as MouseEvent);
-          }
+          // console.log('RAW MOUSE MOVE', event);
+          // const translatedEvent = this.convertBackendEvent(event);
+          // console.log('TRANLSATED MOUSE MOVE', translatedEvent);
+          // if (translatedEvent) {
+          //   this.handleMouseMove(translatedEvent as MouseEvent);
+          // }
         },
       },
       {
@@ -337,11 +339,16 @@ export default class StudioEditor extends TsxComponent {
     const mousePosX = event.offsetX - this.renderedOffsetX;
     const mousePosY = event.offsetY - this.renderedOffsetY;
 
-    const factor = this.windowsService.getMainWindowDisplay().scaleFactor;
+    const factor = this.windowsService.state.main.scaleFactor;
+
     const converted = this.convertScalarToBaseSpace(mousePosX * factor, mousePosY * factor);
 
     if (this.resizeRegion) {
       const name = this.resizeRegion.name;
+
+      console.log('RESIZE REGION', name);
+
+      console.log('RENDERED OFFSET', this.renderedOffsetX, this.renderedOffsetY);
 
       // We choose an anchor point opposite the resize region
       const optionsMap = {
@@ -457,6 +464,8 @@ export default class StudioEditor extends TsxComponent {
       ...options,
     };
 
+    console.log('RESIZE STARTED', arguments);
+
     let scaleXDelta = 1;
     let scaleYDelta = 1;
     const rect = this.selectionService.getBoundingRect();
@@ -536,7 +545,7 @@ export default class StudioEditor extends TsxComponent {
   // Takes the given mouse event, and determines if it is
   // over the given box in base resolution space.
   isOverBox(event: MouseEvent, x: number, y: number, width: number, height: number) {
-    const factor = this.windowsService.getMainWindowDisplay().scaleFactor;
+    const factor = this.windowsService.state.main.scaleFactor;
 
     const mouse = this.convertVectorToBaseSpace(event.offsetX * factor, event.offsetY * factor);
 
@@ -660,7 +669,7 @@ export default class StudioEditor extends TsxComponent {
 
   generateResizeRegionsForItem(item: SceneItem): IResizeRegion[] {
     const renderedRegionRadius = 5;
-    const factor = this.windowsService.getMainWindowDisplay().scaleFactor;
+    const factor = this.windowsService.state.main.scaleFactor;
     const regionRadius = (renderedRegionRadius * factor * this.baseWidth) / this.renderedWidth;
     const width = regionRadius * 2;
     const height = regionRadius * 2;
