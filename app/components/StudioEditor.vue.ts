@@ -84,14 +84,11 @@ export default class StudioEditor extends TsxComponent {
       }
     }, 1000);
 
-    console.log('REGISTER');
     obs.NodeObs.RegisterMouseEventsCallbacks([
       {
         type: 0,
         callback: (event: any) => {
-          console.log('RAW MOUSE DOWN', event);
           const translatedEvent = this.convertBackendEvent(event);
-          console.log('TRANSLATED MOUSE DOWN', translatedEvent);
           if (translatedEvent) {
             this.handleMouseDown(translatedEvent as MouseEvent);
           }
@@ -100,9 +97,7 @@ export default class StudioEditor extends TsxComponent {
       {
         type: 1,
         callback: (event: any) => {
-          console.log('RAW MOUSE UP', event);
           const translatedEvent = this.convertBackendEvent(event);
-          console.log('TRANSLATED MOUSE UP', translatedEvent);
           if (translatedEvent) {
             this.handleMouseUp(translatedEvent as MouseEvent);
           }
@@ -111,9 +106,7 @@ export default class StudioEditor extends TsxComponent {
       {
         type: 2,
         callback: (event: any) => {
-          console.log('RAW MOUSE DRAG', event);
           const translatedEvent = this.convertBackendEvent(event);
-          console.log('TRANSLATED MOUSE DRAG', translatedEvent);
           if (translatedEvent) {
             this.handleMouseMove(translatedEvent as MouseEvent);
           }
@@ -122,6 +115,8 @@ export default class StudioEditor extends TsxComponent {
       {
         type: 3,
         callback: (event: any) => {
+          // MAC-TODO: This can be commented back in when Eddy's cursor API is ready
+
           // console.log('RAW MOUSE MOVE', event);
           // const translatedEvent = this.convertBackendEvent(event);
           // console.log('TRANLSATED MOUSE MOVE', translatedEvent);
@@ -133,7 +128,6 @@ export default class StudioEditor extends TsxComponent {
       {
         type: 4,
         callback: (event: any) => {
-          console.log('MOUSE ENTER');
           const translatedEvent = this.convertBackendEvent(event);
           if (translatedEvent) {
             this.handleMouseEnter(translatedEvent as MouseEvent);
@@ -145,7 +139,6 @@ export default class StudioEditor extends TsxComponent {
 
   destroyed() {
     clearInterval(this.sizeCheckInterval);
-    console.log('REMOVE');
     obs.NodeObs.RemoveMouseEventsCallbacks();
   }
 
@@ -346,10 +339,6 @@ export default class StudioEditor extends TsxComponent {
     if (this.resizeRegion) {
       const name = this.resizeRegion.name;
 
-      console.log('RESIZE REGION', name);
-
-      console.log('RENDERED OFFSET', this.renderedOffsetX, this.renderedOffsetY);
-
       // We choose an anchor point opposite the resize region
       const optionsMap = {
         nw: { anchor: AnchorPoint.SouthEast },
@@ -463,8 +452,6 @@ export default class StudioEditor extends TsxComponent {
       lockY: false,
       ...options,
     };
-
-    console.log('RESIZE STARTED', arguments);
 
     let scaleXDelta = 1;
     let scaleYDelta = 1;
