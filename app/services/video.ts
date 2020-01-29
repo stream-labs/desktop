@@ -52,7 +52,10 @@ export class Display {
   boundClose: any;
   displayDestroyed: boolean;
 
-  hidden = false;
+  focusListener: () => void;
+  unfocusListener: () => void;
+  movedListener: () => void;
+  movedTimeout: number;
 
   constructor(public name: string, options: IDisplayOptions = {}) {
     this.sourceId = options.sourceId;
@@ -100,19 +103,39 @@ export class Display {
 
     this.electronWindow.on('close', this.boundClose);
 
-    // MAC-TODO: Clean all this up
-    this.electronWindow.on('focus', () => this.setFocused(true));
-    this.electronWindow.on('blur', () => this.setFocused(false));
-
     // this.electronWindow.on('moved', (e: Electron.Event, newBounds: Electron.Rectangle) => {
     //   console.log('MOVED');
     //   this.hidden = false;
     //   this.trackingFun();
     // });
 
-    document.addEventListener('mousedown', () => {
-      this.setFocused(true);
-    });
+    // MAC-TODO: Clean all this up
+    this.focusListener = () => this.setFocused(true);
+    this.unfocusListener = () => this.setFocused(false);
+
+    document.addEventListener('mousedown', this.focusListener);
+    this.electronWindow.on('focus', this.focusListener);
+    this.electronWindow.on('blur', this.unfocusListener);
+
+    this.movedListener = () => {
+      // We already knew about this move from the listeners in the TitleBar component,
+      // so we don't need to handle it here.
+      if (window['moveInProgress']) return;
+
+      if (!this.windowsService.state[this.slobsWindowId].hideStyleBlockers) {
+        this.windowsService.updateStyleBlockers(this.slobsWindowId, true);
+      }
+
+      if (this.movedTimeout) {
+        clearTimeout(this.movedTimeout);
+      }
+
+      this.movedTimeout = window.setTimeout(() => {
+        this.windowsService.updateStyleBlockers(this.slobsWindowId, false);
+      }, 500);
+    };
+
+    this.electronWindow.on('moved', this.movedListener);
   }
 
   trackingFun: () => void;
@@ -125,7 +148,6 @@ export class Display {
     if (this.trackingInterval) clearInterval(this.trackingInterval);
 
     this.trackingFun = () => {
-      if (this.hidden) return;
       const rect = this.getScaledRectangle(element.getBoundingClientRect());
 
       if (
@@ -151,7 +173,7 @@ export class Display {
 
     return {
       x: winBounds.x + rect.left, // * factor,
-      y: winBounds.y + rect.bottom - 21, // * factor,
+      y: winBounds.y + rect.bottom, // * factor,
       width: rect.width, // * factor,
       height: rect.height, // * factor,
     };
@@ -182,7 +204,13 @@ export class Display {
 
   destroy() {
     const win = this.electronWindow;
-    if (win) win.removeListener('close', this.boundClose);
+    if (win) {
+      win.removeListener('close', this.boundClose);
+      win.removeListener('focus', this.focusListener);
+      win.removeListener('blur', this.unfocusListener);
+      win.removeListener('moved', this.movedListener);
+    }
+    document.removeEventListener('mousedown', this.focusListener);
     this.remoteClose();
   }
 
@@ -314,7 +342,6 @@ export class VideoService extends Service {
   }
 
   moveOBSDisplay(name: string, x: number, y: number) {
-    console.log('MOVE', x, y);
     obs.NodeObs.OBS_content_moveDisplay(name, x, y);
   }
 

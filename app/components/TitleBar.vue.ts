@@ -26,10 +26,13 @@ export default class TitleBar extends Vue {
 
   handleMousedown() {
     this.windowsService.updateStyleBlockers(Utils.getWindowId(), true);
+    // MAC-TODO: This is a bad hack - handle in a better way before we release
+    window['moveInProgress'] = true;
   }
 
   handleMouseup() {
     this.windowsService.updateStyleBlockers(Utils.getWindowId(), false);
+    setTimeout(() => (window['moveInProgress'] = false), 1000);
   }
 
   maximize() {
