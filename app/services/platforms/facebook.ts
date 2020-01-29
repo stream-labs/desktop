@@ -61,7 +61,7 @@ export interface IFacebookStartStreamOptions {
   description: string;
 }
 
-export interface IFacebookChanelInfo extends IFacebookStartStreamOptions {
+export interface IFacebookChannelInfo extends IFacebookStartStreamOptions {
   chatUrl: string;
   streamUrl: string;
 }
@@ -80,12 +80,12 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     'account-merging',
   ]);
 
-  channelInfoChanged = new Subject<IFacebookChanelInfo>();
+  channelInfoChanged = new Subject<IFacebookChannelInfo>();
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = { width: 800, height: 800 };
 
   static initialState: IFacebookServiceState = {
-    activePage: null,
+    activePage: { id: null, access_token: null, name: null },
     liveVideoId: null,
     streamUrl: null,
     streamProperties: { title: null, description: null, game: null },
@@ -205,7 +205,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   async prepopulateInfo(): Promise<IFacebookStartStreamOptions> {
     await this.fetchActivePage();
     if (!this.state.activePage || !this.state.activePage.id) {
-      return {} as IFacebookStartStreamOptions; // TODO: should resolve this case smarter
+      return { facebookPageId: null } as IFacebookStartStreamOptions;
     }
     const url =
       `${this.apiBase}/${this.state.activePage.id}/live_videos?` +
@@ -240,7 +240,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
 
   scheduleStream(
     scheduledStartTime: string,
-    { title, description, game }: IFacebookChanelInfo,
+    { title, description, game }: IFacebookChannelInfo,
   ): Promise<any> {
     const url = `${this.apiBase}/${this.state.activePage.id}/live_videos`;
     const body = JSON.stringify({

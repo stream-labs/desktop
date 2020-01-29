@@ -7,13 +7,13 @@ import { HostsService } from 'services/hosts';
 import { authorizedHeaders } from 'util/requests';
 import { Subject, Subscription } from 'rxjs';
 import { ITwitchChannelInfo, TwitchService } from './platforms/twitch';
-import { FacebookService, IFacebookChanelInfo } from './platforms/facebook';
+import { FacebookService, IFacebookChannelInfo } from './platforms/facebook';
 import { InitAfter } from './core';
 import { IYoutubeChannelInfo, TYoutubeLifecycleStep } from './platforms/youtube';
 import { IMixerChannelInfo } from './platforms/mixer';
 import { isEqual, pick, reduce } from 'lodash';
 
-export type TCombinedChannelInfo = IFacebookChanelInfo &
+export type TCombinedChannelInfo = IFacebookChannelInfo &
   ITwitchChannelInfo &
   IYoutubeChannelInfo &
   IMixerChannelInfo;
