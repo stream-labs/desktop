@@ -40,7 +40,7 @@ export class Display {
     height: 0,
   };
 
-  electronWindowId: number;
+  electronWindow: Electron.BrowserWindow;
   slobsWindowId: string;
 
   private readonly selectionSubscription: Subscription;
@@ -52,22 +52,19 @@ export class Display {
   boundClose: any;
   displayDestroyed: boolean;
 
+  hidden = false;
+
   constructor(public name: string, options: IDisplayOptions = {}) {
     this.sourceId = options.sourceId;
-    this.electronWindowId = options.electronWindowId || remote.getCurrentWindow().id;
+    const electronWindowId = options.electronWindowId || remote.getCurrentWindow().id;
     this.slobsWindowId = options.slobsWindowId || Utils.getCurrentUrlParams().windowId;
     this.renderingMode = options.renderingMode
       ? options.renderingMode
       : obs.ERenderingMode.OBS_MAIN_RENDERING;
 
-    const electronWindow = remote.BrowserWindow.fromId(this.electronWindowId);
+    this.electronWindow = remote.BrowserWindow.fromId(electronWindowId);
 
-    this.videoService.createOBSDisplay(
-      this.electronWindowId,
-      name,
-      this.renderingMode,
-      this.sourceId,
-    );
+    this.videoService.createOBSDisplay(electronWindowId, name, this.renderingMode, this.sourceId);
 
     this.displayDestroyed = false;
 
@@ -101,8 +98,24 @@ export class Display {
 
     this.boundClose = this.remoteClose.bind(this);
 
-    electronWindow.on('close', this.boundClose);
+    this.electronWindow.on('close', this.boundClose);
+
+    // MAC-TODO: Clean all this up
+    this.electronWindow.on('focus', () => this.setFocused(true));
+    this.electronWindow.on('blur', () => this.setFocused(false));
+
+    // this.electronWindow.on('moved', (e: Electron.Event, newBounds: Electron.Rectangle) => {
+    //   console.log('MOVED');
+    //   this.hidden = false;
+    //   this.trackingFun();
+    // });
+
+    document.addEventListener('mousedown', () => {
+      this.setFocused(true);
+    });
   }
+
+  trackingFun: () => void;
 
   /**
    * Will keep the display positioned on top of the passed HTML element
@@ -111,7 +124,8 @@ export class Display {
   trackElement(element: HTMLElement) {
     if (this.trackingInterval) clearInterval(this.trackingInterval);
 
-    const trackingFun = () => {
+    this.trackingFun = () => {
+      if (this.hidden) return;
       const rect = this.getScaledRectangle(element.getBoundingClientRect());
 
       if (
@@ -125,18 +139,21 @@ export class Display {
       }
     };
 
-    trackingFun();
-    this.trackingInterval = window.setInterval(trackingFun, DISPLAY_ELEMENT_POLLING_INTERVAL);
+    this.trackingFun();
+    this.trackingInterval = window.setInterval(this.trackingFun, DISPLAY_ELEMENT_POLLING_INTERVAL);
   }
 
   getScaledRectangle(rect: ClientRect): IRectangle {
     const factor: number = this.windowsService.state[this.slobsWindowId].scaleFactor;
 
+    // MAC-TODO: Window bounds are only taken into account on mac
+    const winBounds = this.electronWindow.getBounds();
+
     return {
-      x: rect.left * factor,
-      y: rect.top * factor,
-      width: rect.width * factor,
-      height: rect.height * factor,
+      x: winBounds.x + rect.left, // * factor,
+      y: winBounds.y + rect.bottom - 21, // * factor,
+      width: rect.width, // * factor,
+      height: rect.height, // * factor,
     };
   }
 
@@ -164,7 +181,7 @@ export class Display {
   }
 
   destroy() {
-    const win = remote.BrowserWindow.fromId(this.electronWindowId);
+    const win = this.electronWindow;
     if (win) win.removeListener('close', this.boundClose);
     this.remoteClose();
   }
@@ -198,6 +215,11 @@ export class Display {
     // This function does nothing if we aren't drawing the UI
     if (!this.drawingUI) return;
     this.videoService.setOBSDisplayDrawGuideLines(this.name, enabled);
+  }
+
+  setFocused(focus: boolean) {
+    console.log('FOCUS', focus);
+    this.videoService.setOBSDisplayFocused(this.name, focus);
   }
 }
 
@@ -292,6 +314,7 @@ export class VideoService extends Service {
   }
 
   moveOBSDisplay(name: string, x: number, y: number) {
+    console.log('MOVE', x, y);
     obs.NodeObs.OBS_content_moveDisplay(name, x, y);
   }
 
@@ -317,5 +340,9 @@ export class VideoService extends Service {
 
   setOBSDisplayDrawGuideLines(name: string, drawGuideLines: boolean) {
     obs.NodeObs.OBS_content_setDrawGuideLines(name, drawGuideLines);
+  }
+
+  setOBSDisplayFocused(name: string, focus: boolean) {
+    obs.NodeObs.OBS_content_setFocused(name, focus);
   }
 }

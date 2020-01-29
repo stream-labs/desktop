@@ -1,7 +1,7 @@
 <template>
 <div class="titlebar" :class="theme">
   <img class="titlebar-icon" src="../../media/images/icon.ico" />
-  <div class="titlebar-title">
+  <div class="titlebar-title" @mousedown="handleMousedown" @mouseup="handleMouseup">
     {{ title }}
   </div>
   <div class="titlebar-actions">

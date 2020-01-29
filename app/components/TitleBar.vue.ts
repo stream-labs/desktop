@@ -6,11 +6,13 @@ import { Inject } from 'services/core/injector';
 import { StreamingService } from 'services/streaming';
 import Utils from 'services/utils';
 import { $t } from 'services/i18n';
+import { WindowsService } from 'services/windows';
 
 @Component({})
 export default class TitleBar extends Vue {
   @Inject() customizationService: CustomizationService;
   @Inject() streamingService: StreamingService;
+  @Inject() windowsService: WindowsService;
 
   @Prop() title: string;
 
@@ -20,6 +22,14 @@ export default class TitleBar extends Vue {
 
   get isMaximizable() {
     return electron.remote.getCurrentWindow().isMaximizable() !== false;
+  }
+
+  handleMousedown() {
+    this.windowsService.updateStyleBlockers(Utils.getWindowId(), true);
+  }
+
+  handleMouseup() {
+    this.windowsService.updateStyleBlockers(Utils.getWindowId(), false);
   }
 
   maximize() {
