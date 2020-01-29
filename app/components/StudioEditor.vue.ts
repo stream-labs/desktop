@@ -84,10 +84,12 @@ export default class StudioEditor extends TsxComponent {
       }
     }, 1000);
 
+    console.log('REGISTER');
     obs.NodeObs.RegisterMouseEventsCallbacks([
       {
         type: 0,
         callback: (event: any) => {
+          console.log('MOUSE DOWN');
           const translatedEvent = this.convertBackendEvent(event);
           if (translatedEvent) {
             this.handleMouseDown(translatedEvent as MouseEvent);
@@ -97,6 +99,7 @@ export default class StudioEditor extends TsxComponent {
       {
         type: 1,
         callback: (event: any) => {
+          console.log('MOUSE UP');
           const translatedEvent = this.convertBackendEvent(event);
           if (translatedEvent) {
             this.handleMouseUp(translatedEvent as MouseEvent);
@@ -106,7 +109,9 @@ export default class StudioEditor extends TsxComponent {
       {
         type: 2,
         callback: (event: any) => {
+          console.log('RAW MOUSE DRAG', event);
           const translatedEvent = this.convertBackendEvent(event);
+          console.log('TRANSLATED MOUSE DRAG', translatedEvent);
           if (translatedEvent) {
             this.handleMouseMove(translatedEvent as MouseEvent);
           }
@@ -115,7 +120,9 @@ export default class StudioEditor extends TsxComponent {
       {
         type: 3,
         callback: (event: any) => {
+          console.log('RAW MOUSE MOVE', event);
           const translatedEvent = this.convertBackendEvent(event);
+          console.log('TRANLSATED MOUSE MOVE', translatedEvent);
           if (translatedEvent) {
             this.handleMouseMove(translatedEvent as MouseEvent);
           }
@@ -124,6 +131,7 @@ export default class StudioEditor extends TsxComponent {
       {
         type: 4,
         callback: (event: any) => {
+          console.log('MOUSE ENTER');
           const translatedEvent = this.convertBackendEvent(event);
           if (translatedEvent) {
             this.handleMouseEnter(translatedEvent as MouseEvent);
@@ -135,6 +143,7 @@ export default class StudioEditor extends TsxComponent {
 
   destroyed() {
     clearInterval(this.sizeCheckInterval);
+    console.log('REMOVE');
     obs.NodeObs.RemoveMouseEventsCallbacks();
   }
 
