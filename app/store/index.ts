@@ -132,9 +132,6 @@ export function createStore(): Store<any> {
 }
 
 export function commitMutation(mutation: IMutation) {
-  if (mutation.type !== 'PerformanceService.SET_PERFORMANCE_STATS') {
-    console.log('mutation', mutation);
-  }
   store.commit(
     mutation.type,
     Object.assign({}, mutation.payload, {
