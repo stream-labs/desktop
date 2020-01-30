@@ -80,4 +80,9 @@
   color: @light-grey;
   flex-grow: 1;
 }
+
+.value {
+  display: flex;
+  align-items: center;
+}
 </style>
