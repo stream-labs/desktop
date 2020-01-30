@@ -489,6 +489,7 @@ export default class EditStreamInfo extends Vue {
   }
 
   get sharePageUrl() {
+    if (!this.isFacebook) return;
     const pageName = this.facebookService.state.facebookPages.options.find(
       option => option.value === this.channelInfo.facebookPageId,
     )?.title;
