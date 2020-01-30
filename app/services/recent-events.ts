@@ -47,6 +47,10 @@ export interface IRecentEvent {
   repeat?: boolean;
   // uuid is local and will NOT persist across app restarts/ fetches
   uuid: string;
+  skill_amount?: string;
+  sender_name?: string;
+  skill_currency?: string;
+  skill_name?: string;
 }
 
 interface IRecentEventsConfig {
@@ -726,6 +730,12 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
         msg.uuid = uuid();
         msg.read = false;
         msg.iso8601Created = new Date().toISOString();
+        if (msg.type === 'sticker' || msg.type === 'effect') {
+          msg.amount = msg.skill_amount;
+          msg.name = msg.sender_name;
+          msg.currency = msg.skill_currency;
+          msg.skill = msg.skill_name;
+        }
         return msg;
       })
       .filter(msg => this.isAllowed(msg));
