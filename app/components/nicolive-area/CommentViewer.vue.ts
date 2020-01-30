@@ -153,7 +153,7 @@ export default class CommentViewer extends Vue {
     };
     const ioOptions = {
       rootMargin: '0px',
-      threshold: [0.75, 1],
+      threshold: 0,
     };
     const io = new IntersectionObserver(ioCallback, ioOptions);
     io.observe(sentinelEl);
