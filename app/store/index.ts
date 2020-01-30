@@ -7,6 +7,7 @@ import { ServicesManager } from '../services-manager';
 import { IMutation } from 'services/api/jsonrpc';
 import Util from 'services/utils';
 import { InternalApiService } from 'services/api/internal-api';
+import cloneDeep from 'lodash/cloneDeep';
 
 Vue.use(Vuex);
 
@@ -31,20 +32,6 @@ const plugins: any[] = [];
 let mutationId = 1;
 const isWorkerWindow = Util.isWorkerWindow();
 let storeCanReceiveMutations = isWorkerWindow;
-const mutationsQueue: IMutation[] = [];
-
-/**
- * Add mutation to the queue so we can send it to the renderer windows along with other
- * pending mutations.
- * This prevents multiple re-renders of Vue components for each single mutation.
- */
-function sendMutationToRendererWindows(mutation: IMutation) {
-  mutationsQueue.push(mutation);
-  setTimeout(() => {
-    ipcRenderer.send('vuex-mutation', JSON.stringify(mutationsQueue));
-    mutationsQueue.length = 0;
-  });
-}
 
 // This plugin will keep all vuex stores in sync via IPC
 plugins.push((store: Store<any>) => {
@@ -64,11 +51,8 @@ plugins.push((store: Store<any>) => {
   // Only the worker window should ever receive this
   ipcRenderer.on('vuex-sendState', (event: Electron.Event, windowId: number) => {
     const win = remote.BrowserWindow.fromId(windowId);
-    setTimeout(() => {
-      // some mutations can be in the mutationsQueue
-      // use setTimeout to ensure that mutationsQueue is empty here
-      win.webContents.send('vuex-loadState', JSON.stringify(store.state));
-    });
+    flushMutations();
+    win.webContents.send('vuex-loadState', JSON.stringify(store.state));
   });
 
   // Only renderer windows should ever receive this
@@ -142,4 +126,22 @@ export function commitMutation(mutation: IMutation) {
       __vuexSyncIgnore: true,
     }),
   );
+}
+
+const mutationsQueue: IMutation[] = [];
+
+/**
+ * Add mutation to the queue so we can send it to the renderer windows along with other
+ * pending mutations.
+ * This prevents multiple re-renders of Vue components for each single mutation.
+ */
+function sendMutationToRendererWindows(mutation: IMutation) {
+  // we need to `cloneDeep` to avoid sending modified data from the state
+  mutationsQueue.push(cloneDeep(mutation));
+  setTimeout(() => flushMutations());
+}
+
+function flushMutations() {
+  ipcRenderer.send('vuex-mutation', JSON.stringify(mutationsQueue));
+  mutationsQueue.length = 0;
 }
