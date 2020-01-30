@@ -46,13 +46,22 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
       const resultRecord = result.value.find(
         (rec: FilterRecord) => rec.type === record.type && rec.body === record.body
       );
+
+      if (!resultRecord) {
+        // conflictしているので再取得しないとIDがわからない
+        return this.fetchFilters();
+      }
       const filters = this.state.filters.concat(resultRecord);
       this.UPDATE_FILTERS(filters);
     }
   }
 
   async deleteFilters(ids: number[]) {
-    await this.client.deleteFilters(this.programID, ids);
+    const result = await this.client.deleteFilters(this.programID, ids);
+    if (isOk(result)) {
+      const filters = this.state.filters.filter(rec => !ids.includes(rec.id));
+      this.UPDATE_FILTERS(filters);
+    }
   }
 
   @mutation()
