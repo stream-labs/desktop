@@ -4,7 +4,7 @@
       <slot :name="activeContent.slotName" />
     </div>
     <div class="header">
-      <popper trigger="click" :options="{ placement: 'bottom-end' }">
+      <popper trigger="hover" :options="{ placement: 'bottom-end' }">
         <div class="popper">
           <ul class="selector">
             <li
@@ -79,7 +79,7 @@
 
 .selector {
   border-radius: 4px;
-  margin: 0 0 0 8px; 
+  margin: 0 0 0 8px;
   padding: 8px 1px;
   width: 330px;
   background-color: @bg-primary;
