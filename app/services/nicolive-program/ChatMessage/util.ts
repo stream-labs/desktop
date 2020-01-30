@@ -9,7 +9,7 @@ export function isPremium(chat: ChatMessage): boolean {
 }
 
 export function isOperator(chat: ChatMessage): boolean {
-  return checkPremiumBit(chat.premium, 0b110);
+  return checkPremiumBit(chat.premium, 0b10) || checkPremiumBit(chat.premium, 0b100);
 }
 
 export function isCommandContent(chat: ChatMessage): boolean {
