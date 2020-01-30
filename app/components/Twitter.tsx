@@ -18,6 +18,8 @@ class TwitterProps {
   midStreamMode: boolean = false;
   updatingInfo: boolean = false;
   value: string = '';
+  sharePageUrl?: string = '';
+  isFacebook?: boolean = false;
 }
 
 @Component({ props: createProps(TwitterProps) })
@@ -128,6 +130,23 @@ export class Twitter extends TsxComponent<TwitterProps> {
     );
   }
 
+  shareToFacebook() {
+    shell.openExternal(`https://www.facebook.com/sharer/sharer.php?u=${this.props.sharePageUrl}`);
+  }
+
+  get facebookButton() {
+    return (
+      this.props.isFacebook && (
+        <button
+          class={cx('button button--facebook', styles.fbButton)}
+          onClick={this.shareToFacebook}
+        >
+          {$t('Share on Facebook')}
+        </button>
+      )
+    );
+  }
+
   get unlinkedView() {
     return (
       <div class={styles.section}>
@@ -140,6 +159,7 @@ export class Twitter extends TsxComponent<TwitterProps> {
         >
           {$t('Connect to Twitter')} <i class="fab fa-twitter" />
         </button>
+        {this.facebookButton}
       </div>
     );
   }
@@ -170,6 +190,7 @@ export class Twitter extends TsxComponent<TwitterProps> {
             {$t('Unlink Twitter')}
           </button>
         </div>
+        {this.facebookButton}
       </div>
     );
   }
