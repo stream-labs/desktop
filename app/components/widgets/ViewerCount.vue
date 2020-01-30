@@ -5,6 +5,7 @@
         <bool-input title="Twitch Viewers" v-model="wData.settings.twitch "/>
         <bool-input title="Youtube Viewers" v-model="wData.settings.youtube"/>
         <bool-input title="Mixer Viewers" v-model="wData.settings.mixer"/>
+        <bool-input title="Facebook Viewers" v-model="wData.settings.facebook"/>
       </v-form-group>
       <v-form-group title="Background Color" type="color" v-model="wData.settings.background_color" />
     </validated-form>
