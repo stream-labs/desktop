@@ -12,7 +12,7 @@
       <div class="row">
         <div class="name">NG共有設定</div>
         <div class="value">
-          <select v-model="level" class="nicolive-area__select">
+          <select v-model="level" class="nl-select">
             <option v-for="lv in NG_SHARING_LEVELS" :key="lv" :value="lv" :label="lv" :selected="lv === level"></option>
           </select>
         </div>
@@ -71,7 +71,6 @@
 
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
   align-items: center;
 }
 
@@ -84,5 +83,23 @@
 .value {
   display: flex;
   align-items: center;
+}
+
+.nl-select {
+  font-size: 12px;
+  color: @white;
+  min-width: 80px;
+  height: 32px;
+  line-height: 32px;
+  margin: 0;
+  padding: 0 24px 0 8px;
+  background-color: @bg-primary;
+  border-color: transparent;
+  outline: none;
+  cursor: pointer;
+
+  &:focus {
+    border: 1px solid @text-primary;
+  }
 }
 </style>
