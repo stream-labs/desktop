@@ -86,10 +86,11 @@
           :streamTitle="channelInfo.title"
           :midStreamMode="midStreamMode"
           :updatingInfo="updatingInfo"
+          :sharePageUrl="sharePageUrl"
+          :isFacebook="isFacebook"
           v-if="twitterIsEnabled && !isSchedule"
           v-model="tweetModel"
         />
-
         <div class="update-warning" v-if="updateError">
           <div v-if="midStreamMode">
             {{ $t('Something went wrong while updating your stream info.  Please try again.') }}
