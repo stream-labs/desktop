@@ -495,9 +495,9 @@ export default class EditStreamInfo extends Vue {
       option => option.value === this.channelInfo.facebookPageId,
     )?.title;
     const formattedPageName = pageName
-      .match(/(.*?)\s\|.*/)[1]
-      .split(' ')
-      .join('-');
+      ?.match(/(.*?)\s\|.*/)[1]
+      ?.split(' ')
+      ?.join('-');
     return `facebook.com/${formattedPageName}-${this.channelInfo.facebookPageId}`;
   }
 
