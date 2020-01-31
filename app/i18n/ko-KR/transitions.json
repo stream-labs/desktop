@@ -17,14 +17,14 @@
   "Scene Transition": "Scene Transition",
   "Type": "Type",
   "Transition Type": "Transition Type",
-  "Name": "이름",
+  "Name": "Name",
   "Transition Name": "Transition Name",
-  "Default": "기본값",
+  "Default": "Default",
   "Deleted": "Deleted",
   "This connection is redundant because another connection already connects these scenes.": "This connection is redundant because another connection already connects these scenes.",
   "You need at least 2 scenes to edit transitions.": "You need at least 2 scenes to edit transitions.",
   "This scene transition is managed by an App and cannot be edited.": "This scene transition is managed by an App and cannot be edited.",
   "Global Transition": "Global Transition",
   "Edit": "Edit",
-  "Live": "라이브"
+  "Live": "Live"
 }
