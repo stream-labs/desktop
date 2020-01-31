@@ -17,14 +17,14 @@
   "Scene Transition": "场景转换",
   "Type": "类型",
   "Transition Type": "转换类型",
-  "Name": "名称",
+  "Name": "Name",
   "Transition Name": "转换名称",
-  "Default": "默认",
+  "Default": "Default",
   "Deleted": "已删除",
   "This connection is redundant because another connection already connects these scenes.": "这些场景已经有其他的连接",
   "You need at least 2 scenes to edit transitions.": "您需要至少两个场景才能修改场景转换",
   "This scene transition is managed by an App and cannot be edited.": "这个场景转换特效被其他程式控制下，无法被更改。",
   "Global Transition": "Global Transition",
-  "Edit": "编辑",
-  "Live": "直播中"
+  "Edit": "Edit",
+  "Live": "Live"
 }
