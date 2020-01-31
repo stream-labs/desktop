@@ -1,5 +1,6 @@
 import { mutation, StatefulService } from 'services/stateful-service';
 import { ChatMessage } from './MessageServerClient';
+import { isAnonymous, getScore } from './ChatMessage/util';
 
 export type NGSharingLevel = 'none' | 'low' | 'mid' | 'high';
 
@@ -46,8 +47,8 @@ export class NicoliveCommentLocalFilterService extends StatefulService<INicolive
   }
 
   filter = (message: ChatMessage): boolean => {
-    const ngSharingOk = this.threshold < (message.score ?? 0);
-    const anonymityOk = this.showAnonymous || message.anonymity !== 1;
+    const ngSharingOk = this.threshold < getScore(message);
+    const anonymityOk = this.showAnonymous || !isAnonymous(message);
     return ngSharingOk && anonymityOk;
   };
 

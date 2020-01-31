@@ -2,44 +2,26 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
-import { FilterType } from 'services/nicolive-program/ResponseTypes';
+import { FilterType, FilterRecord } from 'services/nicolive-program/ResponseTypes';
 
 @Component({})
 export default class CommentFilter extends Vue {
   @Inject()
   private nicoliveCommentFilterService: NicoliveCommentFilterService;
 
-  checkedSet: Set<number> = new Set();
-  checkCount = 0;
-
-  hasChecked(id: number): boolean {
-    return this.checkedSet.has(id);
-  }
-  updateChecked(id: number, checked: boolean) {
-    if (checked) {
-      this.checkedSet.add(id);
-    } else {
-      this.checkedSet.delete(id);
-    }
-    this.checkCount = this.checkedSet.size;
-  }
-
   async reloadFilters() {
-    this.clearChecked();
     return this.nicoliveCommentFilterService.fetchFilters();
   }
 
-  clearChecked() {
-    this.checkedSet.clear();
-    this.checkCount = 0;
-  }
-
-  async deleteFilters() {
+  deleting: boolean = false;
+  async deleteFilter(record: FilterRecord) {
     try {
-      await this.nicoliveCommentFilterService.deleteFilters([...this.checkedSet]);
-      return this.reloadFilters();
+      this.deleting = true;
+      await this.nicoliveCommentFilterService.deleteFilters([ record.id ]);
     } catch (e) {
       console.error(e);
+    } finally {
+      this.deleting = false;
     }
   }
 
@@ -50,14 +32,23 @@ export default class CommentFilter extends Vue {
     return this.filters.length;
   }
 
-  onAdd() {
+  adding: boolean = false;
+  async onAdd() {
     const body = this.newFilterValue;
-    this.nicoliveCommentFilterService.addFilter({
-      type: this.currentType,
-      body,
-    }).then(() => {
+    if (body.length === 0) return;
+
+    try {
+      this.adding = true;
+      await this.nicoliveCommentFilterService.addFilter({
+        type: this.currentType,
+        body,
+      });
       this.newFilterValue = '';
-    }, e => console.error(e));
+    } catch (e) {
+      console.error(e);
+    } finally {
+      this.adding = false;
+    }
   }
 
   close() {

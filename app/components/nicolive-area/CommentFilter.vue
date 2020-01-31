@@ -6,24 +6,20 @@
     </div>
     <div class="content">
       <div class="content-header">
-        <div @click="currentType = 'word'" class="choice" :class="{ active: currentType === 'word' }" >コメント</div>
-        <div @click="currentType = 'user_id'" class="choice" :class="{ active: currentType === 'user_id' }" >ユーザーID</div>
-        <div @click="currentType = 'command'" class="choice" :class="{ active: currentType === 'command' }" >コマンド</div>
+        <button type="button" @click="currentType = 'word'" class="choice" :class="{ active: currentType === 'word' }" >コメント</button>
+        <button type="button" @click="currentType = 'user_id'" class="choice" :class="{ active: currentType === 'user_id' }" >ユーザーID</button>
+        <button type="button" @click="currentType = 'command'" class="choice" :class="{ active: currentType === 'command' }" >コマンド</button>
         <div class="registrations">登録数 {{ count }}/500</div>
       </div>
-      <div class="action-area delete-form" v-if="checkCount > 0">
-        <span>{{ checkCount }}件選択しました</span>
-        <button class="button button--default" @click="clearChecked">キャンセル</button>
-        <button class="button button--action" @click="deleteFilters">削除</button>
-      </div>
-      <div class="action-area add-form" v-else>
-        <input type="text" v-model="newFilterValue" placeholder="NGコメントを入力" />
-        <i class="icon-plus icon-btn" @click="onAdd"></i>
-      </div>
+      <form class="add-form" @submit.prevent="onAdd">
+        <input type="text" v-model="newFilterValue" placeholder="NGコメントを入力" :disabled="adding" :readonly="adding" />
+        <button type="submit" :disabled="adding">追加</button>
+      </form>
       <div class="list">
-        <label class="row" v-for="item of currentTypeFilters" :key="item.id">
-          <input type="checkbox" :checked="hasChecked(item.id)" @change="updateChecked(item.id, $event.target.checked)">{{ item.body }}
-        </label>
+        <div class="row" v-for="item of currentTypeFilters" :key="item.id">
+          <div class="item-body" :title="item.body">{{ item.body }}</div>
+          <button type="button" class="item-misc icon-btn icon-delete" :disabled="deleting" @click="deleteFilter(item)"></button>
+        </div>
       </div>
     </div>
   </div>
@@ -72,18 +68,52 @@
 
 .content-header {
   flex-shrink: 0;
+  height: 40px;
+  font-size: 12px;
+  color: @light-grey;
 
   display: flex;
 
-  & > .registrations {
+  > button {
+    width: 80px;
+    padding-top: 2px;
+    border-bottom: 2px solid transparent;
+
+    &:hover {
+      color: @text-primary;
+      border-bottom: 2px solid @text-primary;
+    }
+  }
+
+  > .registrations {
     margin-left: auto;
+    height: 40px;
+    line-height: 40px;
   }
 }
 
-.action-area {
+.add-form {
   flex-shrink: 0;
 
   display: flex;
+  padding: 8px;
+
+  > input {
+    flex-grow: 1;
+  }
+
+  > button {
+    flex-shrink: 0;
+    width: 48px;
+    border-radius: 2px;
+
+    color: @white;
+    background-color: @nicolive-button;
+
+    &:hover {
+      background-color: @nicolive-button-hover;
+    }
+  }
 }
 
 .list {
@@ -92,11 +122,32 @@
 }
 
 .row {
-  height: 36px;
-  line-height: 36px;
+  height: 32px;
+  line-height: 32px;
   width: 100%;
 
   display: flex;
   flex-direction: row;
+
+  &:hover .item-misc {
+    display: flex;
+  }
+}
+
+.item-body {
+  margin-left: 16px;
+  overflow-x: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  flex-grow: 1;
+  color: @light-grey;
+}
+
+.item-misc {
+  display: none;
+  width: 32px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
 }
 </style>

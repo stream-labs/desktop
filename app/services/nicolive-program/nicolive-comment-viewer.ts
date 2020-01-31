@@ -4,9 +4,15 @@ import { map, distinctUntilChanged, bufferTime, filter } from 'rxjs/operators';
 import { StatefulService, mutation } from 'services/stateful-service';
 import { MessageServerClient, MessageServerConfig, isChatMessage, ChatMessage } from './MessageServerClient';
 import { Subscription } from 'rxjs';
+import { ChatMessageType, classify } from './ChatMessage/classifier';
+
+export type WrappedChat = {
+  type: ChatMessageType;
+  value: ChatMessage;
+};
 
 interface INicoliveCommentViewerState {
-  messages: ChatMessage[];
+  messages: WrappedChat[];
   popoutMessages: number;
   arrivalMessages: number;
 }
@@ -54,12 +60,15 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
       bufferTime(1000),
       filter(arr => arr.length > 0)
     ).subscribe(values => {
-      this.onMessage(values.filter(isChatMessage).map(x => x.chat));
-    })
+      this.onMessage(values.filter(isChatMessage).map(x => ({
+        type: classify(x.chat),
+        value: x.chat,
+      })));
+  })
     this.client.requestLatestMessages();
   }
 
-  private onMessage(values: ChatMessage[]) {
+  private onMessage(values: WrappedChat[]) {
     const arrivalLength = values.length;
     const concatMessages = this.state.messages.concat(values);
     const concatLength = concatMessages.length;

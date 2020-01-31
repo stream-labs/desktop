@@ -1,8 +1,8 @@
 <template>
   <div class="container">
     <div class="header">
-      <div class="header-item">フィルター設定</div>
-      <div class="header-item"><i class="icon-close icon-btn" @click="close"></i></div>
+      <div class="header-item-center">フィルター設定</div>
+      <div class="header-item-right" v-tooltip.left="closeTooltip"><i class="icon-close icon-btn" @click="close"></i></div>
     </div>
     <div class="content">
       <div class="row">
@@ -12,7 +12,7 @@
       <div class="row">
         <div class="name">NG共有設定</div>
         <div class="value">
-          <select v-model="level">
+          <select v-model="level" class="nl-select">
             <option v-for="lv in NG_SHARING_LEVELS" :key="lv" :value="lv" :label="lv" :selected="lv === level"></option>
           </select>
         </div>
@@ -33,43 +33,73 @@
   flex-grow: 1;
   flex-basis: 0;
   overflow-y: auto;
-  background-color: @bg-tertiary;
+  background-color: @bg-secondary;
 }
 
 .header {
-  flex-shrink: 0;
   display: flex;
-  justify-content: space-between;
-  height: 40px;
-  line-height: 40px;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: 4px 16px;
+  background-color: @bg-secondary;
+  border-bottom: 1px solid @bg-primary;
 
-  padding-right: 16px;
-
-  background-color: @bg-quinary;
-
-  & > .header-item {
+  > .header-item-center {
+    font-size: 12px;
     color: @white;
-    margin: 4px;
-    height: 32px;
-    line-height: 32px;
+    text-align: center;
+  }
+
+  > .header-item-right {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    right: 16px;
   }
 }
 
 .content {
   flex-grow: 1;
+  padding-top: 8px;
+  background-color: @bg-secondary;
 }
 
 .row {
-  height: 36px;
-  line-height: 36px;
   width: 100%;
+  padding: 16px;
 
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  align-items: center;
 }
 
 .name {
+  font-size: 12px;
+  color: @light-grey;
   flex-grow: 1;
+}
+
+.value {
+  display: flex;
+  align-items: center;
+}
+
+.nl-select {
+  font-size: 12px;
+  color: @white;
+  min-width: 80px;
+  height: 32px;
+  line-height: 32px;
+  margin: 0;
+  padding: 0 24px 0 8px;
+  background-color: @bg-primary;
+  border-color: transparent;
+  outline: none;
+  cursor: pointer;
+
+  &:focus {
+    border: 1px solid @text-primary;
+  }
 }
 </style>

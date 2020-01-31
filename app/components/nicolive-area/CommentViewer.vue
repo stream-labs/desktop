@@ -7,16 +7,21 @@
     </div>
     <div class="content">
       <div class="list">
-        <div class="row" v-for="(item, index) of items" :key="index" @dblclick="pinnedComment = item" :title="itemToString(item)">
-          <!-- TODO: 種別判定と出し分け -->
-          <div class="comment-number">{{ item.no }}</div>
-          <div class="comment-body">{{ item.content }}</div>
-          <div class="comment-misc" @click.stop="showCommentMenu(item)"><i class="icon-btn icon-ellipsis-vertical"></i></div>
-        </div>
+        <component
+          class="row"
+          v-for="(item, index) of items"
+          :key="index"
+          :title="itemToString(item)"
+          :is="componentMap[item.type]"
+          :chat="item"
+          :commentMenuOpened="commentMenuTarget === item"
+          @pinned="pin(item)"
+          @commentMenu="showCommentMenu(item)"
+        />
         <div class="sentinel" ref="sentinel"></div>
       </div>
       <div class="pinned" v-if="Boolean(pinnedComment)">
-        <div class="comment-number">{{ pinnedComment.no }}</div>
+        <div class="comment-number">{{ pinnedComment.value.no }}</div>
         <div class="comment-body">
           {{ itemToString(pinnedComment) }}
         </div>
@@ -79,51 +84,8 @@
   line-height: 32px;
   width: 100%;
 
-  display: flex;
-  flex-direction: row;
-
-  &:hover {
-    background-color: @hover;
-
-     > .comment-body {
-       color: @white;
-     }
-
-    > .comment-misc {
-      display: flex;
-      align-items: center;
-      padding-left: 8px;
-      color: @light-grey;
-    }
-  }
-
   &:first-child {
     margin-top: 8px;
-  }
-
-  & > .comment-number {
-    min-width: 40px;
-    padding-left: 16px;
-    text-align: right;
-    flex-shrink: 0;
-    box-sizing: border-box;
-    color: @grey;
-  }
-
-  & > .comment-body {
-    margin-left: 16px;
-    overflow-x: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    flex-grow: 1;
-    color: @light-grey;
-  }
-
-  & > .comment-misc {
-    display: none;
-    width: 32px;
-    flex-shrink: 0;
-    text-align: center;
   }
 }
 
@@ -141,7 +103,7 @@
   right: 8px;
   border: 1px solid @text-secondary;
   background-color: rgba(@border, .9);
-  border-radius: 4px; 
+  border-radius: 4px;
   display: flex;
   padding: 12px 16px;
 
