@@ -17,7 +17,7 @@
   "Scene Transition": "Scene Transition",
   "Type": "Type",
   "Transition Type": "Transition Type",
-  "Name": "Naam",
+  "Name": "Name",
   "Transition Name": "Transition Name",
   "Default": "Default",
   "Deleted": "Deleted",
@@ -25,6 +25,6 @@
   "You need at least 2 scenes to edit transitions.": "You need at least 2 scenes to edit transitions.",
   "This scene transition is managed by an App and cannot be edited.": "This scene transition is managed by an App and cannot be edited.",
   "Global Transition": "Global Transition",
-  "Edit": "Wijzig",
+  "Edit": "Edit",
   "Live": "Live"
 }
