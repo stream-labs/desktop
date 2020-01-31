@@ -134,7 +134,7 @@ export default class LayoutEditor extends TsxComponent {
         <div class={styles.topBar}>
           <div>
             <div>{$t('Streamlabs OBS UI Customization')}</div>
-            <div>{$t('Customize the appearance of your Streamlabs OBS Studio tab')}</div>
+            <div>{$t('Customize the appearance of your Streamlabs OBS Editor tab')}</div>
           </div>
           <button class="button button--action" onClick={() => this.save()}>
             {$t('Save Changes')}

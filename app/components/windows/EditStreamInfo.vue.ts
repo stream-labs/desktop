@@ -93,8 +93,7 @@ export default class EditStreamInfo extends Vue {
     return (
       !this.infoLoading &&
       this.isFacebook &&
-      this.facebookService.state.facebookPages &&
-      this.facebookService.state.facebookPages.pages.length
+      this.facebookService.state?.facebookPages?.pages?.length
     );
   }
 
