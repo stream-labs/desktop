@@ -193,7 +193,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     }
   }
 
-  get studioTransitionName() {
+  getStudioTransitionName() {
     if (this.studioModeTransition) {
       return this.studioModeTransition.name;
     }
