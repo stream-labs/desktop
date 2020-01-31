@@ -86,8 +86,8 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
     const concatMessages = this.state.messages.concat(values);
     const concatLength = concatMessages.length;
     this.SET_STATE({
-      messages: concatMessages,
-      popoutMessages: Math.max(concatLength - 200, 0),
+      messages: concatMessages.slice(-100),
+      popoutMessages: Math.max(concatLength - 100, 0),
       arrivalMessages: arrivalLength,
     });
   }

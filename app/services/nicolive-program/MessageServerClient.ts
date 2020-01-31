@@ -68,7 +68,7 @@ export class MessageServerClient {
   }
 
   requestLatestMessages(thread: string = this.roomThreadID) {
-    this.joinThread(-200, thread);
+    this.joinThread(-100, thread);
   }
 
   joinThread(resFrom: number, thread: string = this.roomThreadID) {
