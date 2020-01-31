@@ -12,7 +12,14 @@ export default class CommentLocalFilter extends Vue {
   private nicoliveCommentLocalFilterService: NicoliveCommentLocalFilterService;
 
   // TODO: 後で言語ファイルに移動する
-  closeTooltip = '閉じる'; 
+  closeTooltip = '閉じる';
+
+  NG_SHARING_LEVEL_LABELS = {
+    none: 'OFF',
+    low: '弱',
+    mid: '中',
+    high: '強',
+  };
 
   close() {
     this.$emit('close');

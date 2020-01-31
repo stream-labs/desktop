@@ -13,7 +13,7 @@
         <div class="name">NG共有設定</div>
         <div class="value">
           <select v-model="level" class="nl-select">
-            <option v-for="lv in NG_SHARING_LEVELS" :key="lv" :value="lv" :label="lv" :selected="lv === level"></option>
+            <option v-for="lv in NG_SHARING_LEVELS" :key="lv" :value="lv" :label="NG_SHARING_LEVEL_LABELS[lv]" :selected="lv === level"></option>
           </select>
         </div>
       </div>
