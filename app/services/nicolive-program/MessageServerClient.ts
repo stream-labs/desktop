@@ -2,8 +2,8 @@ import { WebSocketSubject, webSocket } from 'rxjs/webSocket';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
-type MessageResponse = { chat: ChatMessage } | { leave_thread: LeaveThreadMessage };
-export type Message = ChatMessage | LeaveThreadMessage;
+export type MessageResponse = { chat: ChatMessage } | { leave_thread: LeaveThreadMessage } | { thread: ThreadMessage };
+export type Message = ChatMessage | LeaveThreadMessage | ThreadMessage;
 
 /** chatメッセージ（取得形のみ） */
 export type ChatMessage = {
@@ -25,17 +25,25 @@ export function isChatMessage(msg: MessageResponse): msg is { chat: ChatMessage 
 }
 
 export type LeaveThreadMessage = {
-  leave_thread: {
-    thread: string;
-    service: string;
-    fork: number;
-    language: number;
-    reason?: 0 | 1 | 2 | 3;
-  }
+  thread?: string;
+  service?: string;
+  fork?: number;
+  language?: number;
+  reason?: 0 | 1 | 2 | 3;
 };
 
 export function isLeaveThreadMessage(msg: MessageResponse): msg is { leave_thread: LeaveThreadMessage } {
   return msg.hasOwnProperty('leave_thread');
+}
+
+export type ThreadMessage = {
+  resultcode?: number;
+  server_time?: number;
+  // 使わないので省略
+}
+
+export function isThreadMessage(msg: MessageResponse): msg is { thread: ThreadMessage } {
+  return msg.hasOwnProperty('thread');
 }
 
 export type MessageServerConfig = {
@@ -64,7 +72,7 @@ export class MessageServerClient {
       url,
       protocol: 'msg.nicovideo.jp#json',
     });
-    return this.socket.asObservable().pipe(tap({ next: console.log }));
+    return this.socket.asObservable();
   }
 
   requestLatestMessages(thread: string = this.roomThreadID) {

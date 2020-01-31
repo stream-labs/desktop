@@ -10,8 +10,8 @@
       <div class="list">
         <component
           class="row"
-          v-for="(item, index) of items"
-          :key="index"
+          v-for="item of items"
+          :key="item.seqId"
           :is="componentMap[item.type]"
           :chat="item"
           :vposToLiveTime="vposToLiveTime"

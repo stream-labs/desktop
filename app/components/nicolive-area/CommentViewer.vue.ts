@@ -27,6 +27,7 @@ const componentMap: { [type in ChatMessageType]: Vue.Component } = {
   cruise: SystemMessage,
   info: SystemMessage,
   unknown: SystemMessage,
+  'n-air-emulated': SystemMessage,
 };
 
 @Component({
