@@ -17,14 +17,14 @@
   "Scene Transition": "Transición de escenas",
   "Type": "Tipo",
   "Transition Type": "Tipo de transición",
-  "Name": "Nombre",
+  "Name": "Name",
   "Transition Name": "Nombre de la transición",
-  "Default": "Predeterminado",
+  "Default": "Default",
   "Deleted": "Eliminado",
   "This connection is redundant because another connection already connects these scenes.": "Esta conexión es redundante porque otra conexión ya conecta estas escenas.",
   "You need at least 2 scenes to edit transitions.": "Necesita por lo menos dos escenas para editar transiciones.",
   "This scene transition is managed by an App and cannot be edited.": "La transición de la escena la gestiona una aplicación y no se puede editar.",
   "Global Transition": "Global Transition",
-  "Edit": "Editar",
-  "Live": "Directo"
+  "Edit": "Edit",
+  "Live": "Live"
 }
