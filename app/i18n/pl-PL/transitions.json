@@ -17,14 +17,14 @@
   "Scene Transition": "Scene Transition",
   "Type": "Rodzaj",
   "Transition Type": "Transition Type",
-  "Name": "Nazwa",
+  "Name": "Name",
   "Transition Name": "Transition Name",
-  "Default": "Domyślne",
+  "Default": "Default",
   "Deleted": "Deleted",
   "This connection is redundant because another connection already connects these scenes.": "This connection is redundant because another connection already connects these scenes.",
   "You need at least 2 scenes to edit transitions.": "You need at least 2 scenes to edit transitions.",
   "This scene transition is managed by an App and cannot be edited.": "This scene transition is managed by an App and cannot be edited.",
   "Global Transition": "Global Transition",
-  "Edit": "Edytuj",
-  "Live": "Na żywo"
+  "Edit": "Edit",
+  "Live": "Live"
 }
