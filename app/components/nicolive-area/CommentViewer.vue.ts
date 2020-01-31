@@ -26,7 +26,7 @@ const componentMap: { [type in ChatMessageType]: Vue.Component } = {
   quote: SystemMessage,
   cruise: SystemMessage,
   info: SystemMessage,
-  unknown: CommonComment,
+  unknown: SystemMessage,
 };
 
 @Component({

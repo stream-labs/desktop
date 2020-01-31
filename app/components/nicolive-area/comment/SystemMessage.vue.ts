@@ -10,6 +10,9 @@ export default class CommonComment extends Vue {
 
   get computedContent() {
     const parsed = parseContent(this.chat.value);
+    if (this.chat.type === 'unknown') {
+      return `${parsed.commandName} ${parsed.values.join(' ')}`;
+    }
     if (this.chat.type === 'info') {
       // info種別を除去
       parsed.values.shift();

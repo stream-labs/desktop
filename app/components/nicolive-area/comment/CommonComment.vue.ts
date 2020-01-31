@@ -11,9 +11,6 @@ export default class CommonComment extends Vue {
 
   get computedContent() {
     const parsed = parseContent(this.chat.value);
-    if (this.chat.type === 'unknown') {
-      return `${parsed.commandName} ${parsed.values.join(' ')}`;
-    }
     return parsed.values.join(' ');
   }
 
