@@ -82,12 +82,11 @@ export default class CommentViewer extends Vue {
 
   private applyLocalFilter = ({ value }: WrappedChat) => this.nicoliveCommentLocalFilterService.filter(value);
 
-  itemToString(item: WrappedChat) {
-    const { vpos, content } = item.value;
+  vposToLiveTime = (vpos: number = 0): string => {
     const { vposBaseTime, startTime } = this.nicoliveProgramService.state;
     const vposTime = vposBaseTime + Math.floor(vpos / 100);
     const diffTime = vposTime - startTime;
-    return `${content} (${NicoliveProgramService.format(diffTime)})`;
+    return NicoliveProgramService.format(diffTime);
   }
 
   commentMenuTarget: WrappedChat | null = null;
