@@ -127,7 +127,7 @@ export class SelectionService extends StatefulService<ISelectionState> {
         : $t('Are you sure you want to remove %{sceneName}?', { sceneName: name });
 
     electron.remote.dialog
-      .showMessageBox(electron.remote.getCurrentWindow(), {
+      .showMessageBox(Utils.getMainWindow(), {
         message,
         type: 'warning',
         buttons: [$t('Cancel'), $t('OK')],
