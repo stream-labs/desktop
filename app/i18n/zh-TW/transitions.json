@@ -17,14 +17,14 @@
   "Scene Transition": "場景轉換",
   "Type": "類型",
   "Transition Type": "轉換類型",
-  "Name": "名稱",
+  "Name": "Name",
   "Transition Name": "轉換名稱",
-  "Default": "預設裝置",
+  "Default": "Default",
   "Deleted": "已刪除",
   "This connection is redundant because another connection already connects these scenes.": "這些場景已經有其他的連接",
   "You need at least 2 scenes to edit transitions.": "您需要至少兩個場景才能修改場景轉換",
   "This scene transition is managed by an App and cannot be edited.": "這個場景轉換特效被其他程式控制下，無法被更改。",
   "Global Transition": "Global Transition",
-  "Edit": "編輯",
-  "Live": "直播中"
+  "Edit": "Edit",
+  "Live": "Live"
 }
