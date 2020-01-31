@@ -5,7 +5,7 @@
   "Min. Amount to Share": "共有分の量",
   "Max Duration": "最長時間",
   "Buffer Time": "バッファ時間",
-  "Spam Security": "スパムセキュリティ",
+  "Spam Security": "Spam Security",
   "The time between videos the next video has to buffer.": "次のビデオをバッファするためにかかる時間",
   "Manage Media Settings": "メディア設定の管理",
   "The maximum duration in seconds that media can be played, regardless of amount donated. The default value is 60 seconds.": "The maximum duration in seconds that media can be played, regardless of amount donated. The default value is 60 seconds.",
