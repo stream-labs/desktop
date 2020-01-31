@@ -294,8 +294,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
       return;
     }
 
-    // // This prevents you from seeing the previous contents
-    // // of the window for a split second after it is shown.
+    // This prevents you from seeing the previous contents
+    // of the window for a split second after it is shown.
     this.updateChildWindowOptions({ componentName: '', isShown: false });
     await new Promise(r => setTimeout(r, 50));
 
