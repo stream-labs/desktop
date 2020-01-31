@@ -18,7 +18,7 @@ const LEVEL_TABLE = {
 
 export class NicoliveCommentLocalFilterService extends StatefulService<INicoliveCommentLocalFilterState> {
   static initialState = {
-    level: 'none',
+    level: 'mid',
     showAnonymous: true,
   };
 
