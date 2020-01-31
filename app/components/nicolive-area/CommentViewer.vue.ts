@@ -54,6 +54,7 @@ export default class CommentViewer extends Vue {
   private nicoliveCommentFilterService: NicoliveCommentFilterService;
 
   // TODO: 後で言語ファイルに移動する
+  commentReloadTooltip = 'コメント再取得';
   filterTooltip = 'NG設定';
   localFilterTooltip = 'フィルター';
 
@@ -73,6 +74,10 @@ export default class CommentViewer extends Vue {
 
   get items() {
     return this.nicoliveCommentViewerService.items.filter(this.applyLocalFilter);
+  }
+
+  refreshConnection() {
+    this.nicoliveCommentViewerService.refreshConnection();
   }
 
   private applyLocalFilter = ({ value }: WrappedChat) => this.nicoliveCommentLocalFilterService.filter(value);
