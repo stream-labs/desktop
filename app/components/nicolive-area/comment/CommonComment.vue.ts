@@ -7,6 +7,7 @@ import { parseContent } from 'services/nicolive-program/ChatMessage/util';
 export default class CommonComment extends Vue {
   @Prop() chat: WrappedChat;
   @Prop({ default: false }) commentMenuOpened: boolean;
+  @Prop() vposToLiveTime: (vpos: number) => string;
 
   get computedContent() {
     const parsed = parseContent(this.chat.value);
@@ -14,5 +15,9 @@ export default class CommonComment extends Vue {
       return `${parsed.commandName} ${parsed.values.join(' ')}`;
     }
     return parsed.values.join(' ');
+  }
+
+  get computedTitle() {
+    return `${this.computedContent} (${this.$props.vposToLiveTime(this.chat.value.vpos)})`
   }
 }

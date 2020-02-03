@@ -53,9 +53,22 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
     roomURL,
     roomThreadID,
   }: MessageServerConfig): void {
+    this.reset();
+    this.client = new MessageServerClient({ roomURL, roomThreadID });
+    this.connect();
+  }
+
+  refreshConnection() {
+    this.reset();
+    this.connect();
+  }
+
+  private reset() {
     this.lastSubscription?.unsubscribe();
     this.clearState();
-    this.client = new MessageServerClient({ roomURL, roomThreadID });
+  }
+
+  private connect() {
     this.lastSubscription = this.client.connect().pipe(
       bufferTime(1000),
       filter(arr => arr.length > 0)
@@ -64,7 +77,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
         type: classify(x.chat),
         value: x.chat,
       })));
-  })
+    });
     this.client.requestLatestMessages();
   }
 

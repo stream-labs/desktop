@@ -1,5 +1,5 @@
 <template>
-  <div class="root" :class="[chat.type, { pseudoHover: commentMenuOpened }]" @dblclick="$emit('pinned')">
+  <div class="root" :class="[chat.type, { pseudoHover: commentMenuOpened }]" :title="computedTitle" @dblclick="$emit('pinned')">
     <div class="comment-number">{{ chat.value.no }}</div>
     <div class="comment-body">{{ computedContent }}</div>
     <div class="comment-misc" @click.stop="$emit('commentMenu')"><i class="icon-btn icon-ellipsis-vertical"></i></div>

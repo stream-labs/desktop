@@ -54,6 +54,7 @@ export default class CommentViewer extends Vue {
   private nicoliveCommentFilterService: NicoliveCommentFilterService;
 
   // TODO: 後で言語ファイルに移動する
+  commentReloadTooltip = 'コメント再取得';
   filterTooltip = 'NG設定';
   localFilterTooltip = 'フィルター';
 
@@ -75,14 +76,17 @@ export default class CommentViewer extends Vue {
     return this.nicoliveCommentViewerService.items.filter(this.applyLocalFilter);
   }
 
+  refreshConnection() {
+    this.nicoliveCommentViewerService.refreshConnection();
+  }
+
   private applyLocalFilter = ({ value }: WrappedChat) => this.nicoliveCommentLocalFilterService.filter(value);
 
-  itemToString(item: WrappedChat) {
-    const { vpos, content } = item.value;
+  vposToLiveTime = (vpos: number = 0): string => {
     const { vposBaseTime, startTime } = this.nicoliveProgramService.state;
     const vposTime = vposBaseTime + Math.floor(vpos / 100);
     const diffTime = vposTime - startTime;
-    return `${content} (${NicoliveProgramService.format(diffTime)})`;
+    return NicoliveProgramService.format(diffTime);
   }
 
   commentMenuTarget: WrappedChat | null = null;

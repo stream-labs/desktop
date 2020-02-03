@@ -1,6 +1,7 @@
 <template>
   <div class="container">
     <div class="header">
+      <i class="icon-reload icon-btn" v-tooltip.bottom="commentReloadTooltip" @click="refreshConnection"></i>
       <i class="icon-comment-ng icon-btn" v-tooltip.bottom="filterTooltip" @click="isFilterOpened = true"></i>
       <!-- TODO: 後で差し替える -->
       <i class="icon-settings icon-btn" v-tooltip.bottom="localFilterTooltip" @click="isLocalFilterOpened = true"></i>
@@ -11,9 +12,9 @@
           class="row"
           v-for="(item, index) of items"
           :key="index"
-          :title="itemToString(item)"
           :is="componentMap[item.type]"
           :chat="item"
+          :vposToLiveTime="vposToLiveTime"
           :commentMenuOpened="commentMenuTarget === item"
           @pinned="pin(item)"
           @commentMenu="showCommentMenu(item)"
