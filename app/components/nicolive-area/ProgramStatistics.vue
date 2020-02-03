@@ -41,9 +41,10 @@
 
 .program-statistics {
     display: flex;
-    height: 40px;
+    height: 48px;
     padding: 0 16px;
-    justify-content: space-between;
+    jus
+    tify-content: space-between;
 }
 
 .program-statistics-list {
@@ -64,6 +65,11 @@
 
 .program-statistics-icon {
     margin-right: 8px;
+    color: @grey;
+}
+
+.program-statistics-value {
+    color: @light-grey;
 }
 
 .program-menu {
@@ -97,31 +103,36 @@
  }
 
  .popup-menu-list {
-    min-width: 200px;
+    min-width: 220px;
     list-style: none;
     position: absolute;
     top: 6px;
     right: 0;
-    box-shadow: 0 0 4px rgba(0,0,0,.1);
+    
+    border-radius: 4px;
+    padding: 8px 1px;
+    background-color: @bg-primary;
+    box-shadow: 0 0 4px rgba(@black, 0.5), inset 0 0 0 1px rgba(@white, 0.1);
  }
 
 .popup-menu-item {
-    background-color: @bg-quaternary;
-
-    &:not(:last-child) {
-        border-bottom: 1px solid @bg-primary;
-    }
-
     i {
+        color: @white;
         font-size: 14px;
-        margin-right: 8px;
+        margin-right: 16px;
+        color: @light-grey;
     }
 
     a {
+        color: @white;
         display: flex;
         font-size: 12px;
-        padding: 12px;
+        padding: 8px 16px;
         text-decoration: none;
+
+        &:hover {
+            .bg-hover();
+        }
     }
 }
 

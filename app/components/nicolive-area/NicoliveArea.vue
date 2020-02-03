@@ -77,7 +77,7 @@
   flex-grow: 1;
   align-items: center;
   background-color: @bg-primary;
-  border-left: 1px solid @bg-secondary;
+  border-left: 1px solid @bg-tertiary;
 }
 
 .program-area {
@@ -131,7 +131,6 @@
 .switch-area {
   flex-grow: 1;
   flex-basis: 0;
-  border-top: 1px solid @bg-secondary;
 }
 
 </style>
