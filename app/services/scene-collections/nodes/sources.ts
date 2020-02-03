@@ -42,6 +42,51 @@ export interface ISourceInfo {
   propertiesManagerSettings?: Dictionary<any>;
 }
 
+// MAC-TODO: Move these elsewhere
+
+/**
+ * These sources are valid on windows
+ */
+export const windowsSources: TSourceType[] = [
+  'image_source',
+  'color_source',
+  'browser_source',
+  'slideshow',
+  'ffmpeg_source',
+  'text_gdiplus',
+  'monitor_capture',
+  'window_capture',
+  'game_capture',
+  'dshow_input',
+  'wasapi_input_capture',
+  'wasapi_output_capture',
+  'decklink-input',
+  'scene',
+  'ndi_source',
+  'openvr_capture',
+  'liv_capture',
+  'ovrstream_dc_source',
+  'vlc_source',
+];
+
+/**
+ * These sources are valid on windows
+ */
+export const macSources: TSourceType[] = [
+  'image_source',
+  'color_source',
+  'browser_source',
+  'slideshow',
+  'ffmpeg_source',
+  'text_ft2_source',
+  'scene',
+  'coreaudio_input_capture',
+  'coreaudio_output_capture',
+  'av_capture_input',
+  'display_capture',
+  'audio_line',
+];
+
 export class SourcesNode extends Node<ISchema, {}> {
   schemaVersion = 4;
 
@@ -163,24 +208,30 @@ export class SourcesNode extends Node<ISchema, {}> {
     this.sanitizeSources();
 
     // This shit is complicated, IPC sucks
-    const sourceCreateData = this.data.items.map(source => {
-      return {
-        name: source.id,
-        type: source.type,
-        muted: source.muted || false,
-        settings: source.settings,
-        volume: source.volume,
-        syncOffset: source.syncOffset,
-        filters: source.filters.items.map(filter => {
-          return {
-            name: filter.name,
-            type: filter.type,
-            settings: filter.settings,
-            enabled: filter.enabled === void 0 ? true : filter.enabled,
-          };
-        }),
-      };
-    });
+    const sourceCreateData = this.data.items
+      .filter(source => {
+        // MAC-TODO: Filter based on platform
+        // Also make this non-destructive
+        return macSources.includes(source.type);
+      })
+      .map(source => {
+        return {
+          name: source.id,
+          type: source.type,
+          muted: source.muted || false,
+          settings: source.settings,
+          volume: source.volume,
+          syncOffset: source.syncOffset,
+          filters: source.filters.items.map(filter => {
+            return {
+              name: filter.name,
+              type: filter.type,
+              settings: filter.settings,
+              enabled: filter.enabled === void 0 ? true : filter.enabled,
+            };
+          }),
+        };
+      });
 
     // This ensures we have bound the source size callback
     // before creating any sources in OBS.

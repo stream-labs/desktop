@@ -16,6 +16,7 @@
         >
         <display
           class="studio-editor-display"
+          ref="actualDisplay"
           :drawUI="true"
           :paddingSize="10"
           :sourceId="studioMode ? getStudioTransitionName() : void 0"

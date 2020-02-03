@@ -17,6 +17,7 @@ import { v2 } from '../util/vec2';
 import { EditorCommandsService } from 'services/editor-commands';
 import { TObsFormData } from './obs/inputs/ObsInput';
 import * as obs from '../../obs-api';
+import electron from 'electron';
 
 interface IResizeRegion {
   name: string;
@@ -65,6 +66,7 @@ export default class StudioEditor extends TsxComponent {
 
   $refs: {
     display: HTMLDivElement;
+    actualDisplay: Display;
     studioModeContainer: HTMLDivElement; // Holds extra display for studio mode
     placeholder: HTMLDivElement; // Holds placeholder image while resizing
   };
@@ -88,6 +90,10 @@ export default class StudioEditor extends TsxComponent {
       {
         type: 0,
         callback: (event: any) => {
+          // Bring everything properly into focus when the display is clicked from out of focus
+          electron.remote.getCurrentWindow().focus();
+          this.$refs.actualDisplay.display.setFocused(true);
+
           const translatedEvent = this.convertBackendEvent(event);
           if (translatedEvent) {
             this.handleMouseDown(translatedEvent as MouseEvent);
