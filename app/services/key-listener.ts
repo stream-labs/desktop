@@ -37,8 +37,7 @@ export class KeyListenerService extends Service {
   bindings: Dictionary<Dictionary<IKeyBinding>> = {};
 
   init() {
-    // MAC-TODO
-    // this.libuiohook = electron.remote.require('node-libuiohook');
+    this.libuiohook = electron.remote.require('node-libuiohook');
   }
 
   unregisterAll(namespace = 'global') {
@@ -57,17 +56,16 @@ export class KeyListenerService extends Service {
     // If no other namespaces have bound this key, create a new key object
     // and binding it with libuiohook.
     if (!this.bindings[keystr]) {
-      // MAC-TODO: Node-libuiohook does not work on mac
-      // const success = this.libuiohook.registerCallback({
-      //   ...binding,
-      //   callback: () => {
-      //     Object.keys(this.bindings[keystr]).forEach(namespace => {
-      //       this.bindings[keystr][namespace].callback();
-      //     });
-      //   },
-      // });
+      const success = this.libuiohook.registerCallback({
+        ...binding,
+        callback: () => {
+          Object.keys(this.bindings[keystr]).forEach(namespace => {
+            this.bindings[keystr][namespace].callback();
+          });
+        },
+      });
 
-      // if (!success) return;
+      if (!success) return;
 
       this.bindings[keystr] = {};
     }

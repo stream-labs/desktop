@@ -233,12 +233,10 @@ if (!gotTheLock) {
     });
 
     // Initialize the keylistener
-    // MAC-TODO
-    // require('node-libuiohook').startHook();
+    require('node-libuiohook').startHook();
 
     mainWindow.on('closed', () => {
-      // MAC-TODO
-      // require('node-libuiohook').stopHook();
+      require('node-libuiohook').stopHook();
       session.defaultSession.flushStorageData();
       session.defaultSession.cookies.flushStore(() => app.quit());
     });
