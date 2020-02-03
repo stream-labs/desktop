@@ -24,7 +24,7 @@
       <div class="pinned" v-if="Boolean(pinnedComment)">
         <div class="comment-number">{{ pinnedComment.value.no }}</div>
         <div class="comment-body">
-          {{ itemToString(pinnedComment) }}
+          {{ pinnedItemComtent(pinnedComment) }}
         </div>
         <div class="close"><i class="icon-close icon-btn" @click="pinnedComment = null"></i></div>
       </div>

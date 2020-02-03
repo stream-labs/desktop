@@ -78,10 +78,14 @@ export default class CommentViewer extends Vue {
     }
   }
 
+  pinnedItemComtent(item: WrappedChat): string {
+    return `${item.value.content}  (${this.vposToLiveTime(item.value.vpos)})`;
+  }
+
   componentMap = componentMap;
 
   get items() {
-    return this.nicoliveCommentViewerService.items.filter(this.applyLocalFilter);
+    return this.nicoliveCommentViewerService.items;
   }
 
   refreshConnection() {
