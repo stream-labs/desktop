@@ -5,7 +5,7 @@
   "Min. Amount to Share": "共享最小额度",
   "Max Duration": "最长持续时间",
   "Buffer Time": "缓冲时间",
-  "Spam Security": "垃圾防御",
+  "Spam Security": "Spam Security",
   "The time between videos the next video has to buffer.": "换下一个影片的缓冲时间",
   "Manage Media Settings": "管理媒体设定",
   "The maximum duration in seconds that media can be played, regardless of amount donated. The default value is 60 seconds.": "The maximum duration in seconds that media can be played, regardless of amount donated. The default value is 60 seconds.",

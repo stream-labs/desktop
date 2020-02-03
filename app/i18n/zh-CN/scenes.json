@@ -38,5 +38,6 @@
   "Rename Folder": "重新命名资料夹",
   "Name Folder": "为资料夹命名",
   "Switch Scenes": "Switch Scenes",
-  "Failed to load scene collection.  A new one will be created instead.": "Failed to load scene collection.  A new one will be created instead."
+  "Failed to load scene collection.  A new one will be created instead.": "Failed to load scene collection.  A new one will be created instead.",
+  "New Scene": "New Scene"
 }
