@@ -256,11 +256,12 @@ export default class StudioEditor extends TsxComponent {
   }
 
   handleMouseMove(event: MouseEvent) {
-    const mousePosX = event.offsetX - this.renderedOffsetX;
-    const mousePosY = event.offsetY - this.renderedOffsetY;
-
     const factor = this.windowsService.state.main.scaleFactor;
-    const converted = this.convertScalarToBaseSpace(mousePosX * factor, mousePosY * factor);
+
+    const mousePosX = event.offsetX * factor - this.renderedOffsetX;
+    const mousePosY = event.offsetY * factor - this.renderedOffsetY;
+
+    const converted = this.convertScalarToBaseSpace(mousePosX, mousePosY);
 
     if (this.resizeRegion) {
       const name = this.resizeRegion.name;
