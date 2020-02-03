@@ -43,7 +43,8 @@
     display: flex;
     height: 48px;
     padding: 0 16px;
-    justify-content: space-between;
+    jus
+    tify-content: space-between;
 }
 
 .program-statistics-list {
@@ -64,7 +65,7 @@
 
 .program-statistics-icon {
     margin-right: 8px;
-    color: @light-grey;
+    color: @grey;
 }
 
 .program-statistics-value {
@@ -130,7 +131,7 @@
         text-decoration: none;
 
         &:hover {
-            .hover;
+            .bg-hover();
         }
     }
 }

@@ -44,7 +44,7 @@
 .container {
   width: 100%;
   flex-grow: 1;
-  background-color: @bg-tertiary;
+  background-color: @bg-secondary;
 
   display: flex;
 }
@@ -56,7 +56,7 @@
   width: 100%;
   height: 48px;
   padding: 4px 16px;
-  background-color: @bg-primary;
+  border-bottom: 1px solid @bg-primary;
 
   > .icon-btn {
      margin-left: 16px;
@@ -76,7 +76,7 @@
 
 .list {
   flex-grow: 1;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .row {

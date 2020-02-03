@@ -39,6 +39,7 @@
 
 <style lang="less" scoped>
 @import "../../styles/_colors";
+@import "../../styles/mixins";
 
 .container {
   position: relative;
@@ -68,7 +69,7 @@
   cursor: pointer;
 
   &:hover {
-     background-color: rgba(@black, .2);
+     .bg-hover();
   }
 
   > i {
@@ -96,11 +97,11 @@
     cursor: pointer;
 
     &.active {
-      background-color: rgba(@black, .2);
+      .bg-active();
     }
 
     &:not(.active):hover {
-      background-color: rgba(@white, .04);
+      .bg-hover();
     }
 
     > i {

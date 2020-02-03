@@ -23,11 +23,10 @@
 @import "../../styles/mixins";
 
 .comment-form {
-  height: 52px;
   display: flex;
   justify-content: center;
   padding: 8px;
-  background-color: @bg-primary;
+  background-color: @bg-secondary;
   position: relative;
 }
 
@@ -35,15 +34,26 @@
   font-size: 12px;
   flex-grow: 1;
   width: auto;
-  border: none;
-  border-radius: 4px 0 0 4px;
+  background-color: @bg-primary;
+  padding-right: 36px;
+  box-sizing: border-box;
 
   &:focus {
     background-color: @bg-secondary;
+
+    &::placeholder {
+      opacity: .5;
+    }
+  }
+
+  &:hover {
+    &:not(:focus)::placeholder {
+      opacity: 1;
+    }
   }
 
   &::placeholder {
-    color: @light-grey;
+    color: @white;
     opacity: .5;
   }
 }
@@ -51,9 +61,11 @@
 .comment-button {
   width: 36px;
   height: 36px;
-  padding: 0 8px;
-  background-color: @bg-secondary;
-  border-radius: 0 4px 4px 0;
+  border-radius: 4px;
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
 
   > i {
     font-size: 14px;
@@ -68,7 +80,7 @@
 
   &:disabled {
     > i {
-      color: @light-grey;
+      color: @white;
       opacity: .26;
     }
   }

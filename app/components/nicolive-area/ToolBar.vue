@@ -29,11 +29,10 @@
 
 .status-indicator {
   color: @white;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: bold;
   padding: 0 4px;
-  line-height: 18px;
-  border-radius: 2px;
+  line-height: 20px;
   opacity: .2;
 
   &.is-live {
@@ -52,12 +51,11 @@
 .program-time {
   color: @white;
   font-size: 12px;
-  margin-left: 12px;
+  margin-left: 16px;
 }
 
 .manual-extention {
-  margin-left: 12px;
-
+  margin-left: 16px;
   i {
     font-size: 14px;
     margin-left: 0;
