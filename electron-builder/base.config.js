@@ -35,6 +35,9 @@ const base = {
     rfc3161TimeStampServer: 'http://timestamp.digicert.com',
     timeStampServer: 'http://timestamp.digicert.com'
   },
+  mac: {
+    icon: 'media/images/icon-mac.icns'
+  },
   extraMetadata: {
     env: 'production'
   }

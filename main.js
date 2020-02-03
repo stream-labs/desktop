@@ -353,7 +353,8 @@ if (!gotTheLock) {
 
   app.on('ready', () => {
     if (
-      !process.argv.includes('--skip-update') &&
+      // MAC-TODO: Re-enable updater
+      !process.argv.includes('--skip-update') && false &&
       ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE)) {
       const updateInfo = {
         baseUrl: 'https://slobs-cdn.streamlabs.com',
