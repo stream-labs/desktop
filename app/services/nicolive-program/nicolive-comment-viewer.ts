@@ -22,8 +22,7 @@ export type WrappedChat = {
 
 interface INicoliveCommentViewerState {
   messages: WrappedChat[];
-  popoutMessages: number;
-  arrivalMessages: number;
+  popoutMessages: WrappedChat[];
 }
 
 export class NicoliveCommentViewerService extends StatefulService<INicoliveCommentViewerState> {
@@ -34,12 +33,15 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
 
   static initialState: INicoliveCommentViewerState = {
     messages: [],
-    popoutMessages: 0,
-    arrivalMessages: 0,
+    popoutMessages: [],
   };
 
   get items() {
     return this.state.messages;
+  }
+
+  get recentPopouts() {
+    return this.state.popoutMessages;
   }
 
   init() {
@@ -130,18 +132,16 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   }
 
   private onMessage(values: WrappedChat[]) {
-    const arrivalLength = values.length;
     const concatMessages = this.state.messages.concat(values);
-    const concatLength = concatMessages.length;
+    const popoutMessages = concatMessages.slice(100);
     this.SET_STATE({
       messages: concatMessages.slice(-100),
-      popoutMessages: Math.max(concatLength - 100, 0),
-      arrivalMessages: arrivalLength,
+      popoutMessages,
     });
   }
 
   private clearState() {
-    this.SET_STATE({ messages: [], popoutMessages: 0, arrivalMessages: 0 });
+    this.SET_STATE({ messages: [], popoutMessages: [] });
   }
 
   @mutation()

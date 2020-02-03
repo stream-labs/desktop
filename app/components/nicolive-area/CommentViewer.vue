@@ -7,7 +7,7 @@
       <i class="icon-settings icon-btn" v-tooltip.bottom="localFilterTooltip" @click="isLocalFilterOpened = true"></i>
     </div>
     <div class="content">
-      <div class="list">
+      <div class="list" ref="scroll">
         <component
           class="row"
           v-for="item of items"
@@ -28,7 +28,7 @@
         </div>
         <div class="close"><i class="icon-close icon-btn" @click="pinnedComment = null"></i></div>
       </div>
-      <div class="scroll-to-latest" v-if="!isLatestVisible && items.length > 0">最新のコメントへ移動<i class="icon-down-arrow"></i></div>
+      <button type="button" @click="scrollToLatest" class="scroll-to-latest" v-if="!isLatestVisible && items.length > 0">最新のコメントへ移動<i class="icon-down-arrow"></i></button>
     </div>
     <comment-form class="comment-form" />
     <comment-filter class="overlay" @close="isFilterOpened = false" v-if="isFilterOpened"/>
