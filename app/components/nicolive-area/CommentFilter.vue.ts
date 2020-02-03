@@ -51,6 +51,10 @@ export default class CommentFilter extends Vue {
       console.error(e);
     } finally {
       this.adding = false;
+
+      this.$nextTick(() => {
+        (this.$refs.input as HTMLElement)?.focus();
+      });
     }
   }
 

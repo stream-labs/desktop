@@ -12,7 +12,7 @@
         <div class="registrations">登録数 {{ count }}/500</div>
       </div>
       <form class="add-form" @submit.prevent="onAdd">
-        <input type="text" v-model="newFilterValue" placeholder="NGコメントを入力" :disabled="adding" :readonly="adding" />
+        <input type="text" ref="input" v-model="newFilterValue" placeholder="NGコメントを入力" :disabled="adding" :readonly="adding" />
         <button type="submit" :disabled="adding" class="button button--dark">追加</button>
       </form>
       <div class="list">
