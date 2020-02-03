@@ -36,7 +36,7 @@ export default class CommentForm extends Vue {
     }
   }
 
-  get programStatus(): string {
-    return this.nicoliveProgramService.state.status;
+  get programEnded(): boolean {
+    return this.nicoliveProgramService.state.status === 'end';
   }
 }

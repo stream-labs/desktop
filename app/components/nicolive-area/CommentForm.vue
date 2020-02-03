@@ -11,7 +11,7 @@
       maxlength="80"
     />
     <button type="submit" :disabled="isCommentSending || operatorCommentValue.length === 0" class="comment-button"><i class="icon-comment-send"></i></button>
-    <div class="comment-disabled-message" v-if="programStatus === 'end'">
+    <div class="comment-disabled-message" v-if="programEnded">
       番組が終了したため、放送者コメントを投稿できません
     </div>
   </form>
