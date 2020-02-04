@@ -41,7 +41,7 @@
   "Enable %{filterName}": "Activar %{filterName}",
   "Disable %{filterName}": "Desactivar %{filterName}",
   "Ungroup %{sourceName}": "Desagrupar %{sourceName}",
-  "Unhide mixer items": "Mostar objetos de Mixer",
+  "Unhide mixer items": "Mostrar objetos de Mixer",
   "Undo %{action}": "Deshacer %{action}",
   "Redo %{action}": "Rehacer %{action}"
 }
