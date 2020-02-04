@@ -1,8 +1,8 @@
 <template>
   <div class="container">
     <div class="header">
-      <div class="header-item">放送者NG設定</div>
-      <div class="header-item"><i class="icon-close icon-btn" @click="close"></i></div>
+      <div class="header-item-center">放送者NG設定</div>
+      <div class="header-item-right" v-tooltip.left="closeTooltip"><i class="icon-close icon-btn" @click="close"></i></div>
     </div>
     <div class="content">
       <div class="content-header">
@@ -13,7 +13,7 @@
       </div>
       <form class="add-form" @submit.prevent="onAdd">
         <input type="text" v-model="newFilterValue" placeholder="NGコメントを入力" :disabled="adding" :readonly="adding" />
-        <button type="submit" :disabled="adding">追加</button>
+        <button type="submit" :disabled="adding" class="button button--dark">追加</button>
       </form>
       <div class="list">
         <div class="row" v-for="item of currentTypeFilters" :key="item.id">
@@ -37,100 +37,146 @@
   flex-grow: 1;
   flex-basis: 0;
   overflow-y: auto;
-  background-color: @bg-tertiary;
 }
 
 .header {
-  flex-shrink: 0;
   display: flex;
-  justify-content: space-between;
-  height: 40px;
-  line-height: 40px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: 4px 16px;
+  background-color: @bg-secondary;
+  border-bottom: 1px solid @bg-primary;
 
-  padding-right: 16px;
-
-  background-color: @bg-quinary;
-
-  & > .header-item {
+  > .header-item-center {
+    font-size: 12px;
     color: @white;
-    margin: 4px;
-    height: 32px;
-    line-height: 32px;
+    text-align: center;
+  }
+
+  > .header-item-right {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    right: 16px;
   }
 }
 
 .content {
   flex-grow: 1;
-
   display: flex;
   flex-direction: column;
+  background-color: @bg-tertiary;
 }
 
 .content-header {
-  flex-shrink: 0;
-  height: 40px;
-  font-size: 12px;
-  color: @light-grey;
-
   display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  font-size: 12px;
+  padding: 0 8px;
 
   > button {
-    width: 80px;
-    padding-top: 2px;
-    border-bottom: 2px solid transparent;
+    font-size: 12px;
+    color: @grey;
+    margin-right: 8px;
+    padding: 16px 8px;
+    position: relative;
+
+    &:after {
+      display: block;
+      content: '';
+      width: 100%;
+      height: 2px;
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      background-color: transparent;
+    }
 
     &:hover {
+      color: @white;
+    }
+
+    &.active {
       color: @text-primary;
-      border-bottom: 2px solid @text-primary;
+
+      &:after {
+        background-color: @text-primary;
+      }
     }
   }
 
   > .registrations {
+    color: @light-grey;
     margin-left: auto;
-    height: 40px;
-    line-height: 40px;
+    margin-right: 16px;
   }
 }
 
 .add-form {
-  flex-shrink: 0;
-
   display: flex;
+  justify-content: center;
   padding: 8px;
+  flex-shrink: 0;
+  .bg-hover();
 
   > input {
+    font-size: 12px;
     flex-grow: 1;
+    width: auto;
+    background-color: @bg-tertiary;
+    padding-right: 36px;
+    box-sizing: border-box;
+    border-radius: 2px 0 0 2px;
+
+    &:focus {
+      background-color: @bg-tertiary;
+
+      &::placeholder {
+        opacity: .5;
+      }
+    }
+
+    &:hover {
+      &:not(:focus)::placeholder {
+        opacity: 1;
+      }
+    }
+
+    &::placeholder {
+      color: @white;
+      opacity: .5;
+    }
   }
 
   > button {
     flex-shrink: 0;
-    width: 48px;
-    border-radius: 2px;
-
-    color: @white;
-    background-color: @nicolive-button;
-
-    &:hover {
-      background-color: @nicolive-button-hover;
-    }
+    border-radius: 0 2px 2px 0;
+    margin-left: -2px;
   }
 }
 
 .list {
   flex-grow: 1;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .row {
-  height: 32px;
-  line-height: 32px;
-  width: 100%;
+  font-size: 12px;
+  height: 40px;
+  line-height: 40px;
 
   display: flex;
   flex-direction: row;
 
-  &:hover .item-misc {
-    display: flex;
+  &:hover {
+    .bg-hover();
+
+    .item-misc {
+      display: flex;
+    }
   }
 }
 
@@ -144,10 +190,10 @@
 }
 
 .item-misc {
-  display: none;
-  width: 32px;
+  display: flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
+  margin-right: 16px;
 }
 </style>

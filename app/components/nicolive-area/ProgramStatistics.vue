@@ -43,8 +43,7 @@
     display: flex;
     height: 48px;
     padding: 0 16px;
-    jus
-    tify-content: space-between;
+    justify-content: space-between;
 }
 
 .program-statistics-list {
