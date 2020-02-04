@@ -46,8 +46,8 @@
   justify-content: center;
   height: 48px;
   padding: 4px 16px;
-  background-color: @bg-secondary;
-  border-bottom: 1px solid @bg-primary;
+  background-color: rgba(@black,.5);
+  border-bottom: 1px solid rgba(@black,.5);
 
   > .header-item-center {
     font-size: 12px;
@@ -67,7 +67,7 @@
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  background-color: @bg-tertiary;
+  background-color: rgba(@black,.5);
 }
 
 .content-header {
@@ -76,6 +76,8 @@
   flex-shrink: 0;
   font-size: 12px;
   padding: 0 8px;
+  border-bottom: 1px solid @border;
+  margin-bottom: 8px;
 
   > button {
     font-size: 12px;
@@ -96,14 +98,14 @@
     }
 
     &:hover {
-      color: @white;
+      color: @text-secondary;
     }
 
     &.active {
-      color: @text-primary;
+      color: @text-secondary;
 
       &:after {
-        background-color: @text-primary;
+        background-color: @text-secondary;
       }
     }
   }
@@ -111,7 +113,7 @@
   > .registrations {
     color: @light-grey;
     margin-left: auto;
-    margin-right: 16px;
+    margin-right: 8px;
   }
 }
 
@@ -120,13 +122,12 @@
   justify-content: center;
   padding: 8px;
   flex-shrink: 0;
-  .bg-hover();
 
   > input {
     font-size: 12px;
     flex-grow: 1;
     width: auto;
-    background-color: @bg-tertiary;
+    background-color: @bg-secondary;
     padding-right: 36px;
     box-sizing: border-box;
     border-radius: 2px 0 0 2px;
