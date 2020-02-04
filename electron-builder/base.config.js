@@ -15,8 +15,8 @@ const base = {
     'obs-api'
   ],
   extraFiles: [
-    'LICENSE',
-    'AGREEMENT',
+    // 'LICENSE',
+    // 'AGREEMENT',
     'shared-resources/*',
     '!shared-resources/README'
   ],
@@ -36,11 +36,16 @@ const base = {
     timeStampServer: 'http://timestamp.digicert.com'
   },
   mac: {
-    icon: 'media/images/icon-mac.icns'
+    icon: 'media/images/icon-mac.icns',
+    hardenedRuntime: true,
+    entitlements: 'electron-builder/entitlements.plist',
+    entitlementsInherit: 'electron-builder/entitlements.plist'
   },
   extraMetadata: {
     env: 'production'
-  }
+  },
+  afterPack: './electron-builder/afterPack.js',
+  afterSign: './electron-builder/notarize.js'
 };
 
 if (!process.env.SLOBS_NO_SIGN) base.win.certificateSubjectName = 'Streamlabs (General Workings, Inc.)';
