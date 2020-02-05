@@ -166,5 +166,6 @@
   z-index: 2; // AreaSwitcherのheaderより大きく
   position: absolute;
   height: 100%;
+  background-color: @bg-primary;
 }
 </style>

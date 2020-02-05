@@ -33,7 +33,6 @@
   flex-grow: 1;
   flex-basis: 0;
   overflow-y: auto;
-  background-color: @bg-secondary;
 }
 
 .header {
@@ -42,8 +41,8 @@
   justify-content: center;
   height: 48px;
   padding: 4px 16px;
-  background-color: @bg-secondary;
-  border-bottom: 1px solid @bg-primary;
+  background-color: rgba(@black,.5);
+  border-bottom: 1px solid rgba(@black,.5);
 
   > .header-item-center {
     font-size: 12px;
@@ -62,7 +61,7 @@
 .content {
   flex-grow: 1;
   padding-top: 8px;
-  background-color: @bg-secondary;
+  background-color: rgba(@black,.5);
 }
 
 .row {

@@ -9,6 +9,9 @@ export default class CommentFilter extends Vue {
   @Inject()
   private nicoliveCommentFilterService: NicoliveCommentFilterService;
 
+  // TODO: 後で言語ファイルに移動する
+  closeTooltip = '閉じる'; 
+
   async reloadFilters() {
     return this.nicoliveCommentFilterService.fetchFilters();
   }
