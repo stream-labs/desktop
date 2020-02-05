@@ -5,7 +5,7 @@
   "Min. Amount to Share": "Мин. сумма для показа",
   "Max Duration": "Макс. длительность",
   "Buffer Time": "Время буфера",
-  "Spam Security": "Spam Security",
+  "Spam Security": "Защита от спама",
   "The time between videos the next video has to buffer.": "Интервал времени между видео для буферизации следующего видео.",
   "Manage Media Settings": "Управление медианастройками",
   "The maximum duration in seconds that media can be played, regardless of amount donated. The default value is 60 seconds.": "Максимальная длительность воспроизведения медиафайлов в секундах, независимо от суммы пожертвования. По умолчанию: 60 секунд.",
