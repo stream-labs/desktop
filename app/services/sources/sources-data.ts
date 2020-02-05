@@ -181,7 +181,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
   //   description: $t(''),
   // },
   audio_line: {
-    name: $t(''),
+    name: $t('JACK Input Client'),
     description: $t(''),
   },
 });

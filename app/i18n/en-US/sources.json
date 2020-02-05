@@ -178,5 +178,6 @@
   "Remove source": "Remove source",
   "Toggle Selective Recording": "Toggle Selective Recording",
   "Size": "Size",
-  "Position": "Position"
+  "Position": "Position",
+  "JACK Input Client": "JACK Input Client"
 }

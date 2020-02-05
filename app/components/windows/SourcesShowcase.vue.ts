@@ -142,7 +142,8 @@ export default class SourcesShowcase extends Vue {
     const sourcesList: ISourceDefinition[] = this.sourcesService
       .getAvailableSourcesTypesList()
       .filter(type => {
-        if (type.value === 'text_ft2_source') return false;
+        // MAC-TODO: Hide this on windows only, not on mac
+        // if (type.value === 'text_ft2_source') return false;
         return !(type.value === 'scene' && this.scenesService.scenes.length <= 1);
       })
       .map(listItem => {

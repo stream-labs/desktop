@@ -5348,9 +5348,9 @@ flush-write-stream@^1.0.0:
     inherits "^2.0.1"
     readable-stream "^2.0.4"
 
-"font-manager@https://github.com/stream-labs/font-manager/releases/download/v1.0.8electron6/iojs-v6.0.3-font-manager.tar.gz":
+"font-manager@https://github.com/stream-labs/font-manager/releases/download/v1.0.12/iojs-v6.0.3-font-manager-osx.tar.gz":
   version "1.0.8"
-  resolved "https://github.com/stream-labs/font-manager/releases/download/v1.0.8electron6/iojs-v6.0.3-font-manager.tar.gz#9d37074abecdc7b9ae66a041c085bd6b652bd4d3"
+  resolved "https://github.com/stream-labs/font-manager/releases/download/v1.0.12/iojs-v6.0.3-font-manager-osx.tar.gz#f33b5ad7fd13c9f06fbd8fa9e7c33400a866493d"
 
 for-in@^1.0.2:
   version "1.0.2"
