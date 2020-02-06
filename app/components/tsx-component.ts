@@ -22,6 +22,7 @@ export default abstract class TsxComponent<
     style?: string | Dictionary<string>;
     vModel?: unknown;
     scopedSlots?: Dictionary<Function>;
+    name?: string;
   }> &
     Readonly<TProps>;
 
