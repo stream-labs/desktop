@@ -156,6 +156,10 @@ export class Display {
         rect.width !== this.currentPosition.width ||
         rect.height !== this.currentPosition.height
       ) {
+        this.videoService.setOBSDisplayScale(
+          this.name,
+          this.windowsService.state[this.slobsWindowId].scaleFactor,
+        );
         this.move(rect.x, rect.y);
         this.resize(rect.width, rect.height);
       }
@@ -371,5 +375,9 @@ export class VideoService extends Service {
 
   setOBSDisplayFocused(name: string, focus: boolean) {
     obs.NodeObs.OBS_content_setFocused(name, focus);
+  }
+
+  setOBSDisplayScale(name: string, scaleFactor: number) {
+    obs.NodeObs.OBS_content_setDisplayScale(name, scaleFactor);
   }
 }
