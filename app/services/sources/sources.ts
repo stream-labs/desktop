@@ -361,7 +361,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       { description: 'Video Capture Device', value: 'av_capture_input' },
       { description: 'Display Capture', value: 'display_capture' },
       // { description: 'Syphon Client', value: 'syphon-input' },
-      { description: 'Text (FreeType 2)', value: 'text_ft2_source' },
       { description: 'JACK Input Client', value: 'audio_line' },
     ];
 
