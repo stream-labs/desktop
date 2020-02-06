@@ -1,4 +1,5 @@
-import { mutation, StatefulService } from 'services/stateful-service';
+import { PersistentStatefulService } from 'services/persistent-stateful-service';
+import { mutation } from 'services/stateful-service';
 import { ChatMessage } from './MessageServerClient';
 import { isAnonymous, getScore } from './ChatMessage/util';
 
@@ -10,14 +11,15 @@ interface INicoliveCommentLocalFilterState {
 }
 
 const LEVEL_TABLE = {
-  none: -Infinity,
+  // Number.NEGATIVE_INFINITY はJSONにできない
+  none: Number.MIN_SAFE_INTEGER,
   low: -10000,
   mid: -4800,
   high: -1000,
 };
 
-export class NicoliveCommentLocalFilterService extends StatefulService<INicoliveCommentLocalFilterState> {
-  static initialState = {
+export class NicoliveCommentLocalFilterService extends PersistentStatefulService<INicoliveCommentLocalFilterState> {
+  static defaultState = {
     level: 'mid',
     showAnonymous: true,
   };
