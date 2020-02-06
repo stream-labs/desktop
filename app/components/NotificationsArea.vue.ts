@@ -140,6 +140,7 @@ export default class NotificationsArea extends Vue {
   private hideOutdated() {
     this.notifications.forEach(uiNotify => {
       const notify = this.notificationsService.views.getNotification(uiNotify.id);
+      if (!notify) return;
       const now = Date.now();
       if (!notify.unread || (notify.lifeTime !== -1 && now - notify.date > notify.lifeTime)) {
         uiNotify.outdated = true;
