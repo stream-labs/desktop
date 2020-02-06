@@ -116,5 +116,6 @@
   "Audio - Track 5": "Audio - Piste 5",
   "Audio - Track 6": "Audio - Piste 6",
   "Stream Key": "Clé de stream",
-  "You can not change these settings when you're live": "Vous ne pouvez pas modifier ces paramètres lorsque vous êtes en direct"
+  "You can not change these settings when you're live": "Vous ne pouvez pas modifier ces paramètres lorsque vous êtes en direct",
+  "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.": "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk."
 }
