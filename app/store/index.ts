@@ -7,6 +7,7 @@ import { ServicesManager } from '../services-manager';
 import { IMutation } from 'services/api/jsonrpc';
 import Util from 'services/utils';
 import { InternalApiService } from 'services/api/internal-api';
+import cloneDeep from 'lodash/cloneDeep';
 
 Vue.use(Vuex);
 
@@ -43,13 +44,14 @@ plugins.push((store: Store<any>) => {
         payload: mutation.payload,
       };
       internalApiService.handleMutation(mutationToSend);
-      ipcRenderer.send('vuex-mutation', JSON.stringify(mutationToSend));
+      sendMutationToRendererWindows(mutationToSend);
     }
   });
 
   // Only the worker window should ever receive this
   ipcRenderer.on('vuex-sendState', (event: Electron.Event, windowId: number) => {
     const win = remote.BrowserWindow.fromId(windowId);
+    flushMutations();
     win.webContents.send('vuex-loadState', JSON.stringify(store.state));
   });
 
@@ -68,17 +70,18 @@ plugins.push((store: Store<any>) => {
   ipcRenderer.on('vuex-mutation', (event: Electron.Event, mutationString: string) => {
     if (!storeCanReceiveMutations) return;
 
-    const mutation = JSON.parse(mutationString);
+    const mutations = JSON.parse(mutationString);
+    for (const mutation of mutations) {
+      // for worker window commit mutation directly
+      if (isWorkerWindow) {
+        commitMutation(mutation);
+        return;
+      }
 
-    // for worker window commit mutation directly
-    if (isWorkerWindow) {
-      commitMutation(mutation);
-      return;
+      // for renderer windows commit mutations via api-client
+      const servicesManager: ServicesManager = ServicesManager.instance;
+      servicesManager.internalApiClient.handleMutation(mutation);
     }
-
-    // for renderer windows commit mutations via api-client
-    const servicesManager: ServicesManager = ServicesManager.instance;
-    servicesManager.internalApiClient.handleMutation(mutation);
   });
 
   ipcRenderer.send('vuex-register');
@@ -123,4 +126,22 @@ export function commitMutation(mutation: IMutation) {
       __vuexSyncIgnore: true,
     }),
   );
+}
+
+const mutationsQueue: IMutation[] = [];
+
+/**
+ * Add mutation to the queue so we can send it to the renderer windows along with other
+ * pending mutations.
+ * This prevents multiple re-renders of Vue components for each single mutation.
+ */
+function sendMutationToRendererWindows(mutation: IMutation) {
+  // we need to `cloneDeep` to avoid sending modified data from the state
+  mutationsQueue.push(cloneDeep(mutation));
+  setTimeout(() => flushMutations());
+}
+
+function flushMutations() {
+  ipcRenderer.send('vuex-mutation', JSON.stringify(mutationsQueue));
+  mutationsQueue.length = 0;
 }
