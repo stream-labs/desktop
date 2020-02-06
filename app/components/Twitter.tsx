@@ -131,7 +131,9 @@ export class Twitter extends TsxComponent<TwitterProps> {
   }
 
   shareToFacebook() {
-    shell.openExternal(`https://www.facebook.com/sharer/sharer.php?u=${this.props.sharePageUrl}`);
+    const base = 'https://www.facebook.com/dialog/share?';
+    const id = '806726706158427';
+    shell.openExternal(`${base}app_id=${id}&href=${this.props.sharePageUrl}`);
   }
 
   get facebookButton() {
