@@ -116,5 +116,6 @@
   "Audio - Track 5": "Áudio - Faixa 5",
   "Audio - Track 6": "Áudio - Faixa 6",
   "Stream Key": "Chave da transmissão",
-  "You can not change these settings when you're live": "Não pode alterar estas definições quando transmite em direto"
+  "You can not change these settings when you're live": "Não pode alterar estas definições quando transmite em direto",
+  "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.": "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk."
 }
