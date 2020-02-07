@@ -5,7 +5,7 @@
   "Min. Amount to Share": "Valor mínimo para compartilhar",
   "Max Duration": "Duração máxima",
   "Buffer Time": "Tempo de buffer",
-  "Spam Security": "Spam Security",
+  "Spam Security": "Proteção contra spam",
   "The time between videos the next video has to buffer.": "O tempo entre vídeos para que carregue o próximo.",
   "Manage Media Settings": "Gerenciar as Configurações de Mídia",
   "The maximum duration in seconds that media can be played, regardless of amount donated. The default value is 60 seconds.": "A duração máxima em segundos em que a mídia pode ser reproduzida, independentemente do valor doado. O valor padrão é 60 segundos.",

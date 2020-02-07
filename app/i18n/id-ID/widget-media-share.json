@@ -5,7 +5,7 @@
   "Min. Amount to Share": "Jumlah Min. untuk Dibagi",
   "Max Duration": "Durasi Maks.",
   "Buffer Time": "Waktu Buffer",
-  "Spam Security": "Spam Security",
+  "Spam Security": "Keamanan Spam",
   "The time between videos the next video has to buffer.": "Waktu antara video dan video berikutnya harus ada buffer.",
   "Manage Media Settings": "Kelola Pengaturan Media",
   "The maximum duration in seconds that media can be played, regardless of amount donated. The default value is 60 seconds.": "Durasi maksimum dalam detik yang bisa dimainkan media, berapa pun jumlah yang didonasikan. Nilai default adalah 60 detik.",

@@ -92,7 +92,7 @@
   "OBSInit.ModuleNotFoundError": "No se pudo encontrar DirectX en el sistema. Instale la versión más reciente de DirectX en su equipo desde <https://www.microsoft.com/en-us/download/details.aspx?id=35?> y vuelva a intentarlo.",
   "OBSInit.NotSupportedError": "No se pudo inicializar OBS. Es posible que sus controladores de vídeo estén desfasados, o que su sistema no sea compatible con Streamlabs OBS.",
   "Logout %{username}": "Cerrar sesión de %{username}",
-  "Layout Editor": "Layout Editor",
+  "Layout Editor": "Editor de diseño",
   "Are you sure you want to import multiple files?": "¿Confirma que desea importar varios archivos?",
   "Studio": "Studio",
   "Store": "Tienda",

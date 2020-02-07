@@ -18,7 +18,7 @@
   "Prime": "Prime",
   "has sponsored since %{date}": "ist Sponsor seit %{date}",
   "has liked": "gefällt",
-  "has supported for %{mounths} months": "ist Unterstützer seit %{months} Monaten",
+  "has supported for %{mounths} months": "ist Unterstützer seit %{mounths} Monaten",
   "has shared": "hat geteilt",
   "has superchatted": "hat einen Super Chat gepostet:",
   "has pledged on Patreon": "hat ein Versprechen auf Patreon gegeben",
@@ -48,5 +48,5 @@
   "Effects": "Effekte",
   "has purchased %{product} from the store": "hat %{product} im Shop gekauft",
   "Event Filters": "Ereignisfilter",
-  "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, check out the Layout Editor in the sidebar.": "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, check out the Layout Editor in the sidebar."
+  "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, check out the Layout Editor in the sidebar.": "Wir haben die Editor- und Live-Registerkarten zusammengefasst und den Ereignis-Feed neu gestaltet. Wenn Sie zum bisherigen Ereignis-Feed zurückkehren möchten, sehen Sie im Layout-Editor in der Seitenleiste nach."
 }
