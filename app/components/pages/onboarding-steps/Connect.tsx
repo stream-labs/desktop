@@ -78,7 +78,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
     return (
       <span>
         {$t(
-          'We are improving our backend systems. As part of the migration process, we will need to you log in again. If you have any questions, you can ',
+          'We are improving our backend systems. As part of the migration process, we will need you to log in again. If you have any questions, you can ',
         )}
         <a onClick="contactSupport">{$t('contact support.')}</a>
       </span>
