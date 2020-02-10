@@ -29,7 +29,7 @@
 }
 
 .comment-number {
-  .common__comment-number;
+  .common__comment-number();
   color: @grey;
 }
 
