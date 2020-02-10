@@ -39,7 +39,7 @@
 }
 
 .comment-misc {
-  .common__comment-misc;
+  .common__comment-misc();
   display: none;
 }
 
