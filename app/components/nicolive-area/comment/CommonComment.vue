@@ -34,7 +34,7 @@
 }
 
 .comment-body {
-  .common__comment-body;
+  .common__comment-body();
   color: @white;
 }
 
