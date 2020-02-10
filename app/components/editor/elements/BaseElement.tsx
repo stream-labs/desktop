@@ -39,6 +39,7 @@ export default class BaseElement extends TsxComponent {
   @Watch('width')
   calcBelowMins() {
     if (!this.$el) return;
+    // 20px added to account for size of the resize bars and padding
     this.belowMins = this.height + 20 < this.mins.y || this.width + 20 < this.mins.x;
   }
 
