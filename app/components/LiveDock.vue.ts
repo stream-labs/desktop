@@ -65,9 +65,9 @@ export default class LiveDock extends Vue {
     this.underlyingSelectedChat = val;
   }
 
-  viewStreamTooltip = $t('Go to Youtube to view your live stream');
+  viewStreamTooltip = $t('Go to YouTube to view your live stream');
   editStreamInfoTooltip = $t('Edit your stream title and description');
-  controlRoomTooltip = $t('Go to Youtube Live Dashboard');
+  controlRoomTooltip = $t('Go to YouTube Live Dashboard');
 
   mounted() {
     this.elapsedInterval = window.setInterval(() => {
