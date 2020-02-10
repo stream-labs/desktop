@@ -757,7 +757,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       superchat: $t('has superchatted'),
       // Integrations
       pledge: $t('has pledged on Patreon'),
-      eldonation: $t('has donated to ExtraLife'),
+      eldonation: $t('has donated to Extra Life'),
       tiltifydonation: $t('has donated to Tiltify'),
       donordrivedonation: $t('has donated to Donor Drive'),
       justgivingdonation: $t('has donated to Just Giving'),
