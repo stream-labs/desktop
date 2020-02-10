@@ -26,6 +26,7 @@
   display: flex;
   justify-content: center;
   padding: 8px;
+  border-top: 1px solid @bg-primary;
   background-color: @bg-secondary;
   position: relative;
 }
@@ -34,12 +35,12 @@
   font-size: 12px;
   flex-grow: 1;
   width: auto;
-  background-color: @bg-primary;
+  background-color: @bg-quaternary;
   padding-right: 36px;
   box-sizing: border-box;
 
   &:focus {
-    background-color: @bg-secondary;
+    background-color: @bg-primary;
 
     &::placeholder {
       opacity: .5;

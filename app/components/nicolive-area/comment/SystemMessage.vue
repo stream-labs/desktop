@@ -1,6 +1,5 @@
 <template>
   <div class="root" :class="chat.type" :title="computedTitle">
-    <div class="comment-header"></div>
     <div class="comment-body">{{ computedContent }}</div>
   </div>
 </template>
@@ -9,27 +8,15 @@
 <style lang="less" scoped>
 @import "../../../styles/_colors";
 @import "../../../styles/mixins";
+@import "./comment";
 
 .root {
   display: flex;
   flex-direction: row;
 }
 
-.comment-header {
-  min-width: 40px;
-  padding-left: 16px;
-  text-align: right;
-  flex-shrink: 0;
-  box-sizing: border-box;
-  color: @grey;
-}
-
 .comment-body {
-  margin-left: 16px;
-  overflow-x: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  flex-grow: 1;
+  .common__comment-body();
   color: @light-grey;
 }
 </style>
