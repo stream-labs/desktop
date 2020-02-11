@@ -573,13 +573,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           ) + $t('Please check your settings and try again.');
       } else if (info.code === obs.EOutputCode.OutdatedDriver) {
         linkToDriverInfo = true;
-        if (info.error) {
-          errorText = info.error;
-        } else { 
-          errorText = $t(
-            'An error occurred with the output. This is usually caused by out of date video drivers. Please ensure your Nvidia or AMD drivers are up to date and try again.',
-          ); 
-        }
+        errorText = $t(
+          'An error occurred with the output. This is usually caused by out of date video drivers. Please ensure your Nvidia or AMD drivers are up to date and try again.',
+        ); 
       } else {
         // -4 is used for generic unknown messages in OBS. Both -4 and any other code
         // we don't recognize should fall into this branch and show a generic error.
