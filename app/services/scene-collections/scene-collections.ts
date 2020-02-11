@@ -591,7 +591,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * Creates the default audio sources
    */
   private setupDefaultAudio() {
-    // MAC-TODO: This uses windows source types
     this.sourcesService.createSource(
       'Desktop Audio',
       byOS({ [OS.Windows]: 'wasapi_output_capture', [OS.Mac]: 'coreaudio_output_capture' }),

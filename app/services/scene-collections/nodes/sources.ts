@@ -1,11 +1,18 @@
 import { Node } from './node';
 import { HotkeysNode } from './hotkeys';
-import { SourcesService, TSourceType, TPropertiesManager } from 'services/sources';
+import {
+  SourcesService,
+  TSourceType,
+  TPropertiesManager,
+  macSources,
+  windowsSources,
+} from 'services/sources';
 import { AudioService } from 'services/audio';
 import { Inject } from '../../core/injector';
 import * as obs from '../../../../obs-api';
 import { ScenesService } from 'services/scenes';
 import defaultTo from 'lodash/defaultTo';
+import { byOS, OS } from 'util/operating-systems';
 
 interface ISchema {
   items: ISourceInfo[];
@@ -41,51 +48,6 @@ export interface ISourceInfo {
   propertiesManager?: TPropertiesManager;
   propertiesManagerSettings?: Dictionary<any>;
 }
-
-// MAC-TODO: Move these elsewhere
-
-/**
- * These sources are valid on windows
- */
-export const windowsSources: TSourceType[] = [
-  'image_source',
-  'color_source',
-  'browser_source',
-  'slideshow',
-  'ffmpeg_source',
-  'text_gdiplus',
-  'monitor_capture',
-  'window_capture',
-  'game_capture',
-  'dshow_input',
-  'wasapi_input_capture',
-  'wasapi_output_capture',
-  'decklink-input',
-  'scene',
-  'ndi_source',
-  'openvr_capture',
-  'liv_capture',
-  'ovrstream_dc_source',
-  'vlc_source',
-];
-
-/**
- * These sources are valid on windows
- */
-export const macSources: TSourceType[] = [
-  'image_source',
-  'color_source',
-  'browser_source',
-  'slideshow',
-  'ffmpeg_source',
-  'text_ft2_source',
-  'scene',
-  'coreaudio_input_capture',
-  'coreaudio_output_capture',
-  'av_capture_input',
-  'display_capture',
-  'audio_line',
-];
 
 export class SourcesNode extends Node<ISchema, {}> {
   schemaVersion = 4;
@@ -210,9 +172,11 @@ export class SourcesNode extends Node<ISchema, {}> {
     // This shit is complicated, IPC sucks
     const sourceCreateData = this.data.items
       .filter(source => {
-        // MAC-TODO: Filter based on platform
-        // Also make this non-destructive
-        return macSources.includes(source.type);
+        // MAC-TODO: Make this non-destructive
+        return byOS({
+          [OS.Windows]: () => windowsSources.includes(source.type),
+          [OS.Mac]: () => macSources.includes(source.type),
+        });
       })
       .map(source => {
         return {

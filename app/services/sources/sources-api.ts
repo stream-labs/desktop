@@ -84,7 +84,6 @@ export interface ISourceAddOptions<TPropertiesManagerSettings = Dictionary<any>>
   isTemporary?: boolean;
 }
 
-// MAC-TODO: Refactor into shared and windows-only
 export type TSourceType =
   | 'image_source'
   | 'color_source'

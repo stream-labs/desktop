@@ -54,6 +54,49 @@ interface IObsSourceCallbackInfo {
   flags: number;
 }
 
+/**
+ * These sources are valid on windows
+ */
+export const windowsSources: TSourceType[] = [
+  'image_source',
+  'color_source',
+  'browser_source',
+  'slideshow',
+  'ffmpeg_source',
+  'text_gdiplus',
+  'monitor_capture',
+  'window_capture',
+  'game_capture',
+  'dshow_input',
+  'wasapi_input_capture',
+  'wasapi_output_capture',
+  'decklink-input',
+  'scene',
+  'ndi_source',
+  'openvr_capture',
+  'liv_capture',
+  'ovrstream_dc_source',
+  'vlc_source',
+];
+
+/**
+ * These sources are valid on windows
+ */
+export const macSources: TSourceType[] = [
+  'image_source',
+  'color_source',
+  'browser_source',
+  'slideshow',
+  'ffmpeg_source',
+  'text_ft2_source',
+  'scene',
+  'coreaudio_input_capture',
+  'coreaudio_output_capture',
+  'av_capture_input',
+  'display_capture',
+  'audio_line',
+];
+
 export class SourcesService extends StatefulService<ISourcesState> implements ISourcesServiceApi {
   static initialState = {
     sources: {},

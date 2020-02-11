@@ -143,7 +143,6 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     name: $t('VLC Source'),
     description: $t('Add playlists of videos to your scene.'),
   },
-  // MAC-TODO
   coreaudio_input_capture: {
     name: $t('Audio Input Capture'),
     description: $t(

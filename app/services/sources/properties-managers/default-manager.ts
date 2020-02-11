@@ -1,7 +1,6 @@
 import { PropertiesManager } from './properties-manager';
 import { Inject } from 'services/core/injector';
 import { MediaBackupService } from 'services/media-backup';
-// MAC-TODO
 // import * as fi from 'node-fontinfo';
 import { FontLibraryService } from 'services/font-library';
 import { EFontStyle } from 'obs-studio-node';
@@ -137,7 +136,6 @@ export class DefaultManager extends PropertiesManager {
     // Make sure this wasn't destroyed while fetching the font
     if (this.destroyed) return;
 
-    // MAC-TODO: Support Google fonts
     // const fontInfo = fi.getFontInfo(fontPath);
 
     // if (!fontInfo) {

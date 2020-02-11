@@ -16,6 +16,7 @@ import { WidgetsService, WidgetType, WidgetDisplayData } from 'services/widgets'
 import { PlatformAppsService, IAppSource } from 'services/platform-apps';
 import omit from 'lodash/omit';
 import { CustomizationService } from 'services/customization';
+import { byOS, OS } from 'util/operating-systems';
 
 type TInspectableSource = TSourceType | WidgetType | 'streamlabel' | 'app_source' | string;
 
@@ -142,8 +143,10 @@ export default class SourcesShowcase extends Vue {
     const sourcesList: ISourceDefinition[] = this.sourcesService
       .getAvailableSourcesTypesList()
       .filter(type => {
-        // MAC-TODO: Hide this on windows only, not on mac
-        // if (type.value === 'text_ft2_source') return false;
+        // Freetype on windows is hidden
+        if (type.value === 'text_ft2_source' && byOS({ [OS.Windows]: true, [OS.Mac]: false })) {
+          return;
+        }
         return !(type.value === 'scene' && this.scenesService.scenes.length <= 1);
       })
       .map(listItem => {

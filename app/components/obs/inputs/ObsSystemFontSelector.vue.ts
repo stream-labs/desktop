@@ -2,7 +2,6 @@ import { Component, Prop } from 'vue-property-decorator';
 import { IObsFont, IObsInput, ObsInput } from './ObsInput';
 import { ListInput } from 'components/shared/inputs/inputs';
 import ObsFontSizeSelector from './ObsFontSizeSelector.vue';
-// MAC-TODO
 import fontManager from 'font-manager';
 import { EFontStyle } from 'obs-studio-node';
 
@@ -31,7 +30,6 @@ export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>>
   fonts: IFontDescriptor[] = [];
 
   mounted() {
-    // MAC-TODO
     fontManager.getAvailableFonts((fonts: IFontDescriptor[]) => (this.fonts = fonts));
   }
 
