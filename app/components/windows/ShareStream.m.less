@@ -52,7 +52,7 @@
   width: 100%;
   padding: 16px;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
 }
 
 .share-buttons {
@@ -92,19 +92,11 @@
 }
 
 .share-button {
-  width: 150px;
+  width: 175px;
   position: relative;
   overflow: hidden;
-}
-
-.share-button.shared,
-.share-button.shared:hover {
-  background: #08213f !important;
-  color: #005fed !important;
-}
-
-.share-button.big {
   height: 64px;
+  border-radius: 32px !important;
 
   i {
     display: block;
@@ -116,6 +108,12 @@
     opacity: 0.2;
   }
 }
+
+// .share-button.shared,
+// .share-button.shared:hover {
+//   background: #08213f !important;
+//   color: #005fed !important;
+// }
 
 .blur {
   filter: blur(5px);

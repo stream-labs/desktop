@@ -19,7 +19,6 @@ interface IQRCodeData {
   port: number;
   token: string;
   version: string;
-  user: string;
 }
 
 const testimonialData = () => [
@@ -69,7 +68,6 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
     port: 0,
     addresses: [],
     version: '',
-    user: this.userService.widgetToken,
   };
 
   mounted() {
@@ -106,7 +104,6 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
       token: settings.token,
       port: settings.websockets.port,
       version: remote.process.env.SLOBS_VERSION,
-      user: this.userService.widgetToken,
     };
   }
 
@@ -121,7 +118,7 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
   get qrcodeVal(): string {
     if (!this.qrcodeIsVisible) return 'nothing to show yet';
     const encodedData = encodeURIComponent(JSON.stringify(this.qrcodeData));
-    return `https:/streamlabs.link/remotecontrol?data=${encodedData}`;
+    return `https:/streamlabs.page.link/?link=https://streamlabs.com/mobile-app?user=${this.userService.widgetToken}?data=${encodedData}`;
   }
 
   get sharePageUrl() {
@@ -184,21 +181,21 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
   get shareButtons() {
     return (
       <div class={styles.shareButtons}>
-        <button
-          class={cx('button button--facebook', styles.shareButton, {
-            [styles.shared]: this.sharedToFacebook,
-            [styles.big]: this.linkedToTwitter,
-          })}
-          onClick={() => this.shareToFacebook()}
-        >
-          {this.linkedToTwitter && <i class="fab fa-facebook-f" />}
-          {this.sharedToFacebook ? $t('Shared') : $t('Share to Facebook')}
-        </button>
-        {!this.linkedToTwitter && (
+        {!this.sharedToFacebook && (
+          <button
+            class={cx('button button--facebook', styles.shareButton)}
+            onClick={() => this.shareToFacebook()}
+          >
+            <i class="fab fa-facebook-f" />
+            {$t('Share to Facebook')}
+          </button>
+        )}
+        {!this.linkedToTwitter && this.sharedToFacebook && (
           <button
             class={cx('button button--twitter', styles.shareButton)}
             onClick={() => this.linkTwitter()}
           >
+            <i class="fab fa-twitter" />
             {$t('Connect to Twitter')}
           </button>
         )}
@@ -210,20 +207,24 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
     return (
       <div class={styles.ctaContainer}>
         {this.shareButtons}
-        <div style="width: 150px">
-          <span class={styles.deckCta}>
-            {$t('Get the free Streamlabs Deck App and grow your viewership')}
-          </span>
-          <img class={styles.deckArrow} src={require('../../../media/images/chalk-arrow.png')} />
-        </div>
-        <div class={styles.fader} onClick={() => this.clickQRCode()}>
-          <QRCode
-            value={this.qrcodeVal}
-            options={{ size: 100 }}
-            class={cx({ [styles.blur]: !this.qrcodeIsVisible })}
-          />
-          {!this.qrcodeIsVisible && <span>{$t('Click to show')}</span>}
-        </div>
+        {this.sharedToFacebook && this.linkedToTwitter && (
+          <div style="width: 250px">
+            <span class={styles.deckCta}>
+              {$t('Get the free Streamlabs Deck App and grow your viewership')}
+            </span>
+            <img class={styles.deckArrow} src={require('../../../media/images/chalk-arrow.png')} />
+          </div>
+        )}
+        {this.sharedToFacebook && this.linkedToTwitter && (
+          <div class={styles.fader} onClick={() => this.clickQRCode()}>
+            <QRCode
+              value={this.qrcodeVal}
+              options={{ size: 100 }}
+              class={cx({ [styles.blur]: !this.qrcodeIsVisible })}
+            />
+            {!this.qrcodeIsVisible && <span>{$t('Click to show')}</span>}
+          </div>
+        )}
       </div>
     );
   }
