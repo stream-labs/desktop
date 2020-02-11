@@ -69,6 +69,7 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
   };
 
   mounted() {
+    this.facebookService.fetchActivePage();
     this.facebookService.sendPushNotif();
     this.updateQrcodeData();
     this.updateNetworkInterval = window.setInterval(() => this.updateQrcodeData(), 1000);
@@ -85,6 +86,8 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
       .getIPAddresses()
       .filter(address => !address.internal)
       .map(address => address.address);
+
+    if (JSON.stringify(this.qrcodeData.addresses) === JSON.stringify(addresses)) return;
 
     this.qrcodeData = {
       addresses,
@@ -109,10 +112,14 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
     return `https:/streamlabs.link/remotecontrol?data=${encodedData}`;
   }
 
+  get sharePageUrl() {
+    return `facebook.com/${this.facebookService.state.activePage.name}-${this.facebookService.state.activePage.id}`;
+  }
+
   shareToFacebook() {
     const base = 'https://www.facebook.com/dialog/share?';
     const id = '806726706158427';
-    shell.openExternal(`${base}app_id=${id}&href=${this.props.sharePageUrl}`);
+    shell.openExternal(`${base}app_id=${id}&href=${this.sharePageUrl}`);
     this.sharedToFacebook = true;
   }
 

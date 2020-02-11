@@ -489,18 +489,6 @@ export default class EditStreamInfo extends Vue {
     return !this.channelInfo && !this.infoError;
   }
 
-  get sharePageUrl() {
-    if (!this.isFacebook) return;
-    const pageName = this.facebookService.state.facebookPages.options.find(
-      option => option.value === this.channelInfo.facebookPageId,
-    )?.title;
-    const formattedPageName = pageName
-      ?.match(/(.*?)\s\|.*/)[1]
-      ?.split(' ')
-      ?.join('-');
-    return `facebook.com/${formattedPageName}-${this.channelInfo.facebookPageId}`;
-  }
-
   openFBPageCreateLink() {
     shell.openExternal('https://www.facebook.com/gaming/pages/create?ref=streamlabs');
     this.windowsService.closeChildWindow();
