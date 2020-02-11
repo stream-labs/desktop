@@ -118,7 +118,7 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
   get qrcodeVal(): string {
     if (!this.qrcodeIsVisible) return 'nothing to show yet';
     const encodedData = encodeURIComponent(JSON.stringify(this.qrcodeData));
-    return `https:/streamlabs.page.link/?link=https://streamlabs.com/mobile-app?user=${this.userService.widgetToken}?data=${encodedData}`;
+    return `https://streamlabs.page.link/?link=https://streamlabs.com/mobile-app?user=${this.userService.widgetToken}?data=${encodedData}&apn=com.streamlabs.slobsrc&isi=1476615877&ibi=com.streamlabs.slobsrc&utm_source=slobs`;
   }
 
   get sharePageUrl() {
