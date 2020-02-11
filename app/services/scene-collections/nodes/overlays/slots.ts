@@ -219,7 +219,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
     } else if (obj.content instanceof TextNode) {
       sceneItem = context.scene.createAndAddSource(
         obj.name,
-        'text_gdiplus',
+        byOS({ [OS.Windows]: 'text_gdiplus', [OS.Mac]: 'text_ft2_source' }),
         {},
         { id, select: false },
       );
@@ -233,7 +233,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
     } else if (obj.content instanceof StreamlabelNode) {
       sceneItem = context.scene.createAndAddSource(
         obj.name,
-        'text_gdiplus',
+        byOS({ [OS.Windows]: 'text_gdiplus', [OS.Mac]: 'text_ft2_source' }),
         {},
         { id, select: false },
       );

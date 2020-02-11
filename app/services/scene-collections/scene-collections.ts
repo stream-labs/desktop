@@ -35,6 +35,7 @@ import { TransitionsService } from 'services/transitions';
 import { $t } from '../i18n';
 import { StreamingService, EStreamingState } from 'services/streaming';
 import { DefaultHardwareService } from 'services/hardware';
+import { byOS, OS } from 'util/operating-systems';
 
 const uuid = window['require']('uuid/v4');
 
@@ -591,21 +592,21 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    */
   private setupDefaultAudio() {
     // MAC-TODO: This uses windows source types
-    // this.sourcesService.createSource(
-    //   'Desktop Audio',
-    //   'wasapi_output_capture',
-    //   {},
-    //   { channel: E_AUDIO_CHANNELS.OUTPUT_1 },
-    // );
-    // const defaultId = this.defaultHardwareService.state.defaultAudioDevice
-    //   ? this.defaultHardwareService.state.defaultAudioDevice
-    //   : undefined;
-    // this.sourcesService.createSource(
-    //   'Mic/Aux',
-    //   'wasapi_input_capture',
-    //   { device_id: defaultId },
-    //   { channel: E_AUDIO_CHANNELS.INPUT_1 },
-    // );
+    this.sourcesService.createSource(
+      'Desktop Audio',
+      byOS({ [OS.Windows]: 'wasapi_output_capture', [OS.Mac]: 'coreaudio_output_capture' }),
+      {},
+      { channel: E_AUDIO_CHANNELS.OUTPUT_1 },
+    );
+    const defaultId = this.defaultHardwareService.state.defaultAudioDevice
+      ? this.defaultHardwareService.state.defaultAudioDevice
+      : undefined;
+    this.sourcesService.createSource(
+      'Mic/Aux',
+      byOS({ [OS.Windows]: 'wasapi_input_capture', [OS.Mac]: 'coreaudio_input_capture' }),
+      { device_id: defaultId },
+      { channel: E_AUDIO_CHANNELS.INPUT_1 },
+    );
   }
 
   /**

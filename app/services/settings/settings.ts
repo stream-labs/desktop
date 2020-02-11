@@ -22,6 +22,7 @@ import { ISettingsServiceApi, ISettingsSubCategory } from './settings-api';
 import { PlatformAppsService } from 'services/platform-apps';
 import { EDeviceType } from 'services/hardware';
 import { StreamingService } from 'services/streaming';
+import { byOS, OS } from 'util/operating-systems';
 
 export interface ISettingsState {
   General: {
@@ -355,7 +356,7 @@ export class SettingsService extends StatefulService<ISettingsState>
     settingsData[0].parameters.forEach((deviceForm, ind) => {
       const channel = ind + 1;
       const isOutput = [E_AUDIO_CHANNELS.OUTPUT_1, E_AUDIO_CHANNELS.OUTPUT_2].includes(channel);
-      const source = this.sourcesService.getSources().find(source => source.channel === channel);
+      let source = this.sourcesService.getSources().find(source => source.channel === channel);
 
       if (source && deviceForm.value === null) {
         if (deviceForm.value === null) {
@@ -367,16 +368,20 @@ export class SettingsService extends StatefulService<ISettingsState>
         const displayName = device.id === 'default' ? deviceForm.name : device.description;
 
         if (!source) {
-          this.sourcesService.createSource(
+          source = this.sourcesService.createSource(
             displayName,
-            isOutput ? 'wasapi_output_capture' : 'wasapi_input_capture',
-            {},
+            byOS({
+              [OS.Windows]: isOutput ? 'wasapi_output_capture' : 'wasapi_input_capture',
+              [OS.Mac]: isOutput ? 'coreaudio_output_capture' : 'coreaudio_input_capture',
+            }),
+            { device_id: deviceForm.value },
             { channel },
           );
         } else {
-          source.setName(displayName);
           source.updateSettings({ device_id: deviceForm.value });
         }
+
+        source.setName(displayName);
       }
     });
   }
