@@ -4,12 +4,16 @@ import { Inject } from 'services/core/injector';
 import GenericForm from 'components/obs/inputs/GenericForm';
 import { TObsFormData, TObsValue } from 'components/obs/inputs/ObsInput';
 import { ICustomizationServiceApi } from 'services/customization';
+import { ScenesService } from 'services/scenes';
+import { $t } from '../../../services/i18n';
+import electron from 'electron';
 
 @Component({
   components: { GenericForm },
 })
 export default class ExperimentalSettings extends Vue {
   @Inject() private customizationService: ICustomizationServiceApi;
+  @Inject() private scenesService: ScenesService;
 
   settingsFormData: TObsFormData = null;
 
@@ -24,5 +28,14 @@ export default class ExperimentalSettings extends Vue {
     });
     this.customizationService.setSettings({ experimental: settings });
     this.settingsFormData = this.customizationService.getExperimentalSettingsFormData();
+  }
+
+  repairSceneCollection() {
+    console.log('start repair');
+    this.scenesService.repair();
+    console.log('finish repair');
+    electron.remote.dialog.showMessageBox(electron.remote.getCurrentWindow(), {
+      message: 'Repair finished. See details in the log file',
+    });
   }
 }
