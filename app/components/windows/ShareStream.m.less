@@ -1,3 +1,10 @@
+@font-face {
+  font-family: 'FontAwesome';
+  src: url('../../../vendor/fontawesome-free-5.1.0-web/webfonts/fa-brands-400.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .container {
   width: 100%;
   height: 100%;
@@ -81,6 +88,32 @@
     background: rgba(0, 0, 0, 0.7);
     padding: 10px;
     box-shadow: 0 0 10px 6px rgba(0, 0, 0, 0.7);
+  }
+}
+
+.share-button {
+  width: 150px;
+  position: relative;
+  overflow: hidden;
+}
+
+.share-button.shared,
+.share-button.shared:hover {
+  background: #08213f !important;
+  color: #005fed !important;
+}
+
+.share-button.big {
+  height: 64px;
+
+  i {
+    display: block;
+    position: absolute;
+    color: white;
+    bottom: -24px;
+    font-size: 64px;
+    left: 4px;
+    opacity: 0.2;
   }
 }
 

@@ -181,17 +181,35 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
     );
   }
 
+  get shareButtons() {
+    return (
+      <div class={styles.shareButtons}>
+        <button
+          class={cx('button button--facebook', styles.shareButton, {
+            [styles.shared]: this.sharedToFacebook,
+            [styles.big]: this.linkedToTwitter,
+          })}
+          onClick={() => this.shareToFacebook()}
+        >
+          {this.linkedToTwitter && <i class="fab fa-facebook-f" />}
+          {this.sharedToFacebook ? $t('Shared') : $t('Share to Facebook')}
+        </button>
+        {!this.linkedToTwitter && (
+          <button
+            class={cx('button button--twitter', styles.shareButton)}
+            onClick={() => this.linkTwitter()}
+          >
+            {$t('Connect to Twitter')}
+          </button>
+        )}
+      </div>
+    );
+  }
+
   get cta() {
     return (
       <div class={styles.ctaContainer}>
-        <div class={styles.shareButtons}>
-          <button class="button button--facebook" onClick={() => this.shareToFacebook()}>
-            {this.sharedToFacebook ? $t('Shared') : $t('Share to Facebook')}
-          </button>
-          <button class="button button--twitter" onClick={() => this.linkTwitter()}>
-            {this.linkedToTwitter ? $t('Connected') : $t('Connect to Twitter')}
-          </button>
-        </div>
+        {this.shareButtons}
         <div style="width: 150px">
           <span class={styles.deckCta}>
             {$t('Get the free Streamlabs Deck App and grow your viewership')}
