@@ -386,9 +386,9 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
       }),
     );
     const postData = {
+      headers,
       method: 'POST',
       body: '',
-      headers,
     };
     const req = new Request(url, postData);
     fetch(req);
