@@ -330,6 +330,17 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     });
   }
 
+  openShareStream() {
+    this.windowsService.showWindow({
+      componentName: 'ShareStream',
+      title: $t('Share your Stream'),
+      size: {
+        height: 450,
+        width: 520,
+      },
+    });
+  }
+
   get twitterIsEnabled() {
     return this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.twitter);
   }

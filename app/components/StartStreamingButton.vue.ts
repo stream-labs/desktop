@@ -29,6 +29,9 @@ export default class StartStreamingButton extends Vue {
     if (this.streamingService.isStreaming) {
       this.streamingService.toggleStreaming();
     } else {
+      if (this.isFacebook || this.restreamService.platforms.includes('facebook')) {
+        return this.streamingService.openShareStream();
+      }
       if (this.mediaBackupService.globalSyncStatus === EGlobalSyncStatus.Syncing) {
         const goLive = await electron.remote.dialog
           .showMessageBox(electron.remote.getCurrentWindow(), {
@@ -123,6 +126,8 @@ export default class StartStreamingButton extends Vue {
       );
     }
   }
+
+  openStreamShare() {}
 
   getStreamButtonLabel() {
     if (this.streamingStatus === EStreamingState.Live) {

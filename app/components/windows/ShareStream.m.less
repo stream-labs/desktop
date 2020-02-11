@@ -1,3 +1,94 @@
+.container {
+  width: 100%;
+  height: 100%;
+  background: var(--background);
+}
+
+.quote-container {
+  position: relative;
+  height: 215px;
+  margin: 16px 16px 0 16px;
+}
+
+.quote {
+  display: block;
+  color: var(--title);
+  font-size: 16px;
+  margin: 24px 0;
+  width: 270px;
+}
+
+.author {
+  display: block;
+  color: var(--paragraph);
+  font-size: 12px;
+}
+
+.author-img {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  top: 0;
+}
+
+.quote-bg {
+  position: absolute;
+  height: 215px;
+  right: -24px;
+  top: 0;
+  bottom: 0;
+}
+
+.cta-container {
+  background: var(--section);
+  width: 100%;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.share-buttons {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.deck-cta {
+  color: var(--button);
+  font-size: 14px;
+  text-align: right;
+}
+
+.deck-arrow {
+  float: right;
+  margin-top: 8px;
+  display: block;
+}
+
+.fader {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+
+  span {
+    position: absolute;
+    top: 100px;
+    left: 70px;
+    display: block;
+    color: white;
+    font-size: 16px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    box-shadow: 0 0 10px 6px rgba(0, 0, 0, 0.7);
+  }
+}
+
+.blur {
+  filter: blur(5px);
+}
+
 .go-live-button {
-  background-color: var(--button);
+  margin-top: 8px !important;
+  margin-right: 16px !important;
+  float: right;
 }
