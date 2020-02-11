@@ -1,13 +1,13 @@
+import SourceSelector from './SourceSelector.vue';
 import { Component } from 'vue-property-decorator';
-import RecentEvents from 'components/RecentEvents';
 import BaseElement from './BaseElement';
 
 @Component({})
-export default class MiniFeed extends BaseElement {
-  mins = { x: 330, y: 150 };
+export default class SourceSelectorElement extends BaseElement {
+  mins = { x: 220, y: 150 };
 
   get element() {
-    return <RecentEvents isOverlay={false} />;
+    return <SourceSelector />;
   }
 
   render() {
