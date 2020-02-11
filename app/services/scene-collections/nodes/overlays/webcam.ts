@@ -7,6 +7,7 @@ import { IListProperty } from '../../../../../obs-api';
 import { ScalableRectangle } from '../../../../util/ScalableRectangle';
 import { Inject } from 'services/core';
 import { DefaultHardwareService } from 'services/hardware';
+import { byOS, OS } from 'util/operating-systems';
 
 interface ISchema {
   width: number;
@@ -51,7 +52,20 @@ export class WebcamNode extends Node<ISchema, IContext> {
     let resolution: IResolution;
 
     if (context.existing) {
-      resolution = this.resStringToResolution(input.settings['resolution']);
+      resolution = byOS({
+        [OS.Windows]: () =>
+          this.resStringToResolution(input.settings['resolution'], input.settings['resolution']),
+        [OS.Mac]: () => {
+          const selectedResolution = (input.properties.get(
+            'preset',
+          ) as IListProperty).details.items.find(i => i.value === input.settings['preset']);
+
+          return this.resStringToResolution(
+            selectedResolution.name as string,
+            selectedResolution.value as string,
+          );
+        },
+      });
     } else {
       resolution = this.performInitialSetup(context.sceneItem);
     }
@@ -98,25 +112,36 @@ export class WebcamNode extends Node<ISchema, IContext> {
     // TODO: Maybe do some string matching to figure out which
     // one is actually the webcam.  For most users, their webcam
     // will be the only option here.
-    const deviceProperty = input.properties.get('video_device_id');
+    const deviceProperty = byOS({
+      [OS.Windows]: () => input.properties.get('video_device_id') as IListProperty,
+      [OS.Mac]: () => input.properties.get('device') as IListProperty,
+    });
 
     // Stop loading if there aren't any devices
     if ((deviceProperty as IListProperty).details.items.length === 0) return;
 
     const device = this.defaultHardwareService.state.defaultVideoDevice
       ? this.defaultHardwareService.state.defaultVideoDevice
-      : (deviceProperty as IListProperty).details.items[0]['value'];
+      : deviceProperty.details.items.find(i => i.value)?.value;
 
-    input.update({
-      video_device_id: device,
-      res_type: 1,
-    });
+    if (!device) return;
 
     // Figure out which resolutions this device can run at
-    const resolutionOptions = (input.properties.get(
-      'resolution',
-    ) as IListProperty).details.items.map(item => {
-      return this.resStringToResolution(item.value as string);
+    const resolutionOptions = byOS({
+      [OS.Windows]: () => {
+        input.update({ video_device_id: device, res_type: 1 });
+
+        return (input.properties.get('resolution') as IListProperty).details.items.map(item => {
+          return this.resStringToResolution(item.value as string, item.value as string);
+        });
+      },
+      [OS.Mac]: () => {
+        input.update({ device, use_preset: true });
+
+        return (input.properties.get('preset') as IListProperty).details.items.map(item => {
+          return this.resStringToResolution(item.name as string, item.value as string);
+        });
+      },
     });
 
     // Group resolutions by aspect ratio
@@ -163,7 +188,11 @@ export class WebcamNode extends Node<ISchema, IContext> {
 
   applyResolution(sceneItem: SceneItem, resolution: string) {
     const input = sceneItem.getObsInput();
-    input.update({ resolution });
+
+    byOS({
+      [OS.Windows]: () => input.update({ resolution }),
+      [OS.Mac]: () => input.update({ preset: resolution }),
+    });
   }
 
   applyScaleAndCrop(item: SceneItem, scale: number, crop: ICrop) {
@@ -180,10 +209,10 @@ export class WebcamNode extends Node<ISchema, IContext> {
     });
   }
 
-  resStringToResolution(resString: string): IResolution {
+  resStringToResolution(resString: string, value: string): IResolution {
     const parts = resString.split('x');
     return {
-      value: resString,
+      value,
       width: parseInt(parts[0], 10),
       height: parseInt(parts[1], 10),
     };

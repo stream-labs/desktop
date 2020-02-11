@@ -1,7 +1,7 @@
 import { ArrayNode } from '../array-node';
 import { SceneItem, Scene, TSceneNode, ScenesService } from 'services/scenes';
 import { VideoService } from 'services/video';
-import { SourcesService } from 'services/sources';
+import { SourcesService, TSourceType } from 'services/sources';
 import { SourceFiltersService, TSourceFilterType } from 'services/source-filters';
 import { Inject } from 'services/core/injector';
 import { ImageNode } from './image';
@@ -14,6 +14,7 @@ import { SceneSourceNode } from './scene';
 import { AudioService } from 'services/audio';
 import * as obs from '../../../../../obs-api';
 import { WidgetType } from '../../../widgets';
+import { byOS, OS } from 'util/operating-systems';
 
 type TContent =
   | ImageNode
@@ -171,9 +172,14 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       return;
     }
 
+    const webcamSourceType = byOS<TSourceType>({
+      [OS.Windows]: 'dshow_input',
+      [OS.Mac]: 'av_capture_input',
+    });
+
     if (obj.content instanceof WebcamNode) {
       const existingWebcam = this.sourcesService.sources.find(source => {
-        return source.type === 'dshow_input';
+        return source.type === webcamSourceType;
       });
 
       if (existingWebcam) {
@@ -181,7 +187,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       } else {
         sceneItem = context.scene.createAndAddSource(
           obj.name,
-          'dshow_input',
+          webcamSourceType,
           {},
           { id, select: false },
         );
