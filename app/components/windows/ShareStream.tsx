@@ -11,6 +11,8 @@ import { FacebookService } from 'services/platforms/facebook';
 import { UserService } from 'services/user';
 import { TwitterService } from 'services/integrations/twitter';
 import { ITcpServerServiceApi } from 'services/api/tcp-server/index';
+import { RestreamService } from 'services/restream';
+import { StreamingService } from 'services/streaming';
 
 interface IQRCodeData {
   addresses: string[];
@@ -54,6 +56,8 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
   @Inject() facebookService: FacebookService;
   @Inject() userService: UserService;
   @Inject() twitterService: TwitterService;
+  @Inject() restreamService: RestreamService;
+  @Inject() streamingService: StreamingService;
   @Inject() private tcpServerService: ITcpServerServiceApi;
 
   sharedToFacebook = false;
@@ -78,6 +82,14 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
 
   beforeDestroy() {
     clearInterval(this.updateNetworkInterval);
+  }
+
+  goLive() {
+    if (this.restreamService.shouldGoLiveWithRestream) {
+      this.streamingService.showEditStreamInfo(this.restreamService.platforms, 0);
+    } else {
+      this.streamingService.showEditStreamInfo();
+    }
   }
 
   updateQrcodeData() {
@@ -204,6 +216,7 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
         {this.quoteArea}
         {this.cta}
         <button
+          onClick={() => this.goLive()}
           class={cx(
             styles.goLiveButton,
             'button',
