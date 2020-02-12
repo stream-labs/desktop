@@ -31,9 +31,7 @@ export default class ExperimentalSettings extends Vue {
   }
 
   repairSceneCollection() {
-    console.log('start repair');
     this.scenesService.repair();
-    console.log('finish repair');
     electron.remote.dialog.showMessageBox(electron.remote.getCurrentWindow(), {
       message: 'Repair finished. See details in the log file',
     });
