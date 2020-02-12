@@ -365,7 +365,7 @@ export class ScenesService extends StatefulService<IScenesState> {
 
   /**
    * Repair the scene collection from different potential issues
-   * This is an excremental feature
+   * This is an experimental feature
    */
   repair(): number {
     const scenes = this.getScenes();
