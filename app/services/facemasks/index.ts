@@ -69,14 +69,15 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   };
 
   init() {
-    super.init();
-    this.subscribeToSourceAdded();
-    this.userService.userLogin.subscribe(() => {
-      this.startup();
-    });
-    this.streamingService.streamingStatusChange.subscribe(status => {
-      if (status === 'starting' && this.userService.isLoggedIn()) this.startup();
-    });
+    // MAC-TODO: We are not supporting facemasks on mac at launch
+    // super.init();
+    // this.subscribeToSourceAdded();
+    // this.userService.userLogin.subscribe(() => {
+    //   this.startup();
+    // });
+    // this.streamingService.streamingStatusChange.subscribe(status => {
+    //   if (status === 'starting' && this.userService.isLoggedIn()) this.startup();
+    // });
   }
 
   startup() {
