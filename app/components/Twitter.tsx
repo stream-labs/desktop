@@ -18,8 +18,6 @@ class TwitterProps {
   midStreamMode: boolean = false;
   updatingInfo: boolean = false;
   value: string = '';
-  sharePageUrl?: string = '';
-  isFacebook?: boolean = false;
 }
 
 @Component({ props: createProps(TwitterProps) })

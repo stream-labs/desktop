@@ -127,8 +127,6 @@ export default class StartStreamingButton extends Vue {
     }
   }
 
-  openStreamShare() {}
-
   getStreamButtonLabel() {
     if (this.streamingStatus === EStreamingState.Live) {
       return $t('End Stream');
