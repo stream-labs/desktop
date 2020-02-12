@@ -366,9 +366,16 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
 
   subscribeVolmeter() {
     this.listener = (e: Electron.Event, volmeter: IVolmeter) => {
-      if (this.$refs.canvas && volmeter.peak.length) {
+      if (this.$refs.canvas) {
+        // don't init context for inactive sources
+        if (volmeter.peak.length && !this.renderingInitialized) return;
+
         this.initRenderingContext();
         this.setChannelCount(volmeter.peak.length);
+
+        // don't render sources then channelsCount is 0
+        // happens when the browser source stop playing audio
+        if (!volmeter.peak.length) return;
 
         if (this.gl) {
           this.drawVolmeterWebgl(volmeter.peak);
