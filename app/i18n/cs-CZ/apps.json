@@ -1,6 +1,6 @@
 {
-  "Vers": "Vers",
-  "Reload": "Reload",
-  "Unpacked vers loaded": "Unpacked vers loaded",
-  "You must unload unpacked version before enabling this app.": "You must unload unpacked version before enabling this app."
+  "Vers": "Verze",
+  "Reload": "Znovu načíst",
+  "Unpacked vers loaded": "Rozbalené verze byly načteny",
+  "You must unload unpacked version before enabling this app.": "Před povolením této aplikace musíte z paměti uvolnit rozbalenou verzi."
 }
