@@ -1,5 +1,5 @@
 import cx from 'classnames';
-import BaseLayout, { LayoutProps } from './BaseLayout';
+import BaseLayout, { LayoutProps, IResizeMins } from './BaseLayout';
 import { Component } from 'vue-property-decorator';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import styles from './Layouts.m.less';
@@ -7,20 +7,13 @@ import { createProps } from 'components/tsx-component';
 
 @Component({ props: createProps(LayoutProps) })
 export default class Default extends BaseLayout {
-  mounted() {
+  async mounted() {
     this.mountResize();
-    this.$emit('totalWidth', ['1', '2', ['3', '4', '5']]);
+    this.$emit('totalWidth', await this.mapVectors(['1', '2', ['3', '4', '5']]));
+    this.setMins(['1'], ['2'], ['3', '4', '5']);
   }
   destroyed() {
     this.destroyResize();
-  }
-
-  get mins() {
-    return {
-      bar1: this.props.calculateMin(['2']),
-      bar2: this.props.calculateMin(['3', '4', '5']),
-      rest: this.props.calculateMin(['1']),
-    };
   }
 
   get bar1() {

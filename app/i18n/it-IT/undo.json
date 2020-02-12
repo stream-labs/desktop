@@ -43,5 +43,5 @@
   "Ungroup %{sourceName}": "Separa %{sourceName}",
   "Unhide mixer items": "Mostra elementi mixer",
   "Undo %{action}": "Annulla %{action}",
-  "Redo %{action}": "Ripristina %{azione}"
+  "Redo %{action}": "Ripristina %{action}"
 }

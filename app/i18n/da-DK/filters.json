@@ -9,10 +9,10 @@
   "Color Key": "Farvenøgle",
   "Apply LUT": "Anvend LUT",
   "Sharpen": "Gør skarpere",
-  "Chroma Key": "Chroma nøgle",
+  "Chroma Key": "Chroma-nøgle",
   "Video Delay (Async)": "Videoforsinkelse (asynkron)",
   "Noise Suppression": "Støjdæmpning",
-  "Noise Gate": "Noise gate",
+  "Noise Gate": "Støjport",
   "Compressor": "Kompressor",
   "VST 2.x Plugin": "VST 2.x Plugin",
   "Face Mask Plugin": "Face-Mask Plugin",
@@ -20,10 +20,10 @@
   "Filter name": "Filternavn",
   "Add source filter": "Tilføj kildefilter",
   "No filters applied": "Ingen filtre anvendt",
-  "Source filters": "Kilde filtre",
-  "Invert Polarity": "Invert Polarity",
+  "Source filters": "Kildefiltre",
+  "Invert Polarity": "Inverter polaritet",
   "Limiter": "Limiter",
   "Expander": "Expander",
   "Shader": "Shader",
-  "No settings are available for this filter": "No settings are available for this filter"
+  "No settings are available for this filter": "Der findes ingen indstillinger for dette filter"
 }
