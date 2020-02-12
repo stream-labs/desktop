@@ -29,6 +29,8 @@ export default class LayoutEditor extends TsxComponent {
 
   slottedElements = cloneDeep(this.layoutService.state.slottedElements) || {};
 
+  private highlightedSlot: LayoutSlot = null;
+
   get elementTitles() {
     return {
       [ELayoutElement.Display]: $t('Stream Display'),
@@ -48,6 +50,7 @@ export default class LayoutEditor extends TsxComponent {
     const layout = TEMPLATE_MAP[this.currentLayout];
     return cx(styles.placementZone, styles[`${layout}${slot}`], {
       [styles.occupied]: this.elementInSlot(slot),
+      [styles.highlight]: this.highlightedSlot === slot,
     });
   }
 
@@ -148,6 +151,8 @@ export default class LayoutEditor extends TsxComponent {
                 class={this.classForSlot(slot)}
                 id={slot}
                 draggable={this.elementInSlot(slot)}
+                ondragenter={(): unknown => (this.highlightedSlot = slot)}
+                ondragexit={(): unknown => (this.highlightedSlot = null)}
                 onDragend={(e: MouseEvent) =>
                   this.handleElementDrag(e, ELayoutElement[this.elementInSlot(slot)])
                 }
