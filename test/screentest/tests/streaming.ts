@@ -44,7 +44,7 @@ platforms.forEach(platform => {
     await focusMain(t);
     await app.client.click('button=Go Live');
     await focusChild(t);
-    if (await app.client.waitForExist('button=Go Live')) await app.client.click('button=Go Live');
+    if (await app.client.isExisting('button=Go Live')) await app.client.click('button=Go Live');
 
     // fill streaming data
     switch (platform) {
