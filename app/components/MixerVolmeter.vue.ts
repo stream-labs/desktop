@@ -210,7 +210,10 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
   private setChannelCount(channels: number) {
     if (channels !== this.channelCount) {
       this.channelCount = channels;
-      this.canvasHeight = channels * (CHANNEL_HEIGHT + PADDING_HEIGHT) - PADDING_HEIGHT;
+      this.canvasHeight = Math.max(
+        channels * (CHANNEL_HEIGHT + PADDING_HEIGHT) - PADDING_HEIGHT,
+        0,
+      );
 
       if (!this.$refs.canvas) return;
 
