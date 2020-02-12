@@ -92,7 +92,7 @@
   "OBSInit.ModuleNotFoundError": "Не найден DirectX в вашей системе. Установите последнюю версию DirectX для вашего компьютера, загрузив ее по ссылке <https://www.microsoft.com/ru-ru/download/details.aspx?id=35?>, и попробуйте снова.",
   "OBSInit.NotSupportedError": "Не удалось инициализировать OBS. Возможно, используются устаревшие видеодрайверы или система не поддерживает Streamlabs OBS.",
   "Logout %{username}": "Выход из учетной записи %{username}",
-  "Layout Editor": "Layout Editor",
+  "Layout Editor": "Редактор макета",
   "Are you sure you want to import multiple files?": "Импортировать несколько файлов?",
   "Studio": "Студия",
   "Store": "Магазин",

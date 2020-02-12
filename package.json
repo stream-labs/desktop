@@ -5,10 +5,6 @@
   "license": "GPL-3.0",
   "version": "0.20.3",
   "main": "main.js",
-  "engines": {
-    "node": ">= 10 < 12",
-    "yarn": ">= 1.5.2"
-  },
   "scripts": {
     "compile": "yarn clear && yarn compile:updater && yarn webpack-cli --progress --config dev.config.js",
     "compile:ci": "yarn clear && yarn compile:updater && yarn webpack-cli --config dev.config.js",

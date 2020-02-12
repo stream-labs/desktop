@@ -83,7 +83,7 @@
   "Open FrankerFaceZ Settings": "Buka Pengaturan FrankerFaceZ",
   "FrankerFaceZ Settings": "Pengaturan FrankerFaceZ",
   "API Token": "Token API",
-  "Face Mask Settings": "Face Mask Settings",
+  "Face Mask Settings": "Pengaturan Masker Wajah",
   "Navigate to Live tab when going live": "Navigasi ke tab Live ketika akan live",
   "Save Replay": "Simpan Replay",
   "Disable hardware acceleration": "Nonaktifkan akselerasi hardware",
@@ -116,5 +116,6 @@
   "Audio - Track 5": "Audio - Track 5",
   "Audio - Track 6": "Audio - Track 6",
   "Stream Key": "Tombol Streaming",
-  "You can not change these settings when you're live": "Anda tidak dapat mengganti pengaturan ini ketika sedang live"
+  "You can not change these settings when you're live": "Anda tidak dapat mengganti pengaturan ini ketika sedang live",
+  "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.": "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk."
 }
