@@ -170,7 +170,9 @@ export class AppService extends StatefulService<IAppState> {
       await this.fileManagerService.flushAll();
       obs.NodeObs.RemoveSourceCallback();
       obs.NodeObs.OBS_service_removeCallback();
-      obs.IPC.disconnect();
+      // MAC-TODO: This hangs forever, but we should cleanly disconnect
+      // when that is fixed.
+      // obs.IPC.disconnect();
       this.crashReporterService.endShutdown();
       electron.ipcRenderer.send('shutdownComplete');
     }, 300);

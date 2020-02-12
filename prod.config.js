@@ -5,7 +5,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 module.exports = merge.smart(baseConfig, {
   entry: {
     renderer: './app/app.ts',
-    updater: './updater/ui.js',
+    updater: './updater/mac/ui.js',
     'guest-api': './guest-api'
   },
 

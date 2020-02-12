@@ -10,7 +10,7 @@ const plugins = process.env.SLOBS_FORKED_TYPECHECKING ?
 module.exports = merge.smart(baseConfig, {
   entry: {
     renderer: './app/app.ts',
-    updater: './updater/ui.js',
+    updater: './updater/mac/ui.js',
     'guest-api': './guest-api',
   },
 

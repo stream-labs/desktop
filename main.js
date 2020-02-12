@@ -15,6 +15,8 @@ if (pjson.name === 'slobs-client-ipc') {
 }
 process.env.SLOBS_VERSION = pjson.version;
 
+const { Updater } = require('./updater/mac/Updater.js');
+
 ////////////////////////////////////////////////////////////////////////////////
 // Modules and other Requires
 ////////////////////////////////////////////////////////////////////////////////
@@ -353,22 +355,25 @@ if (!gotTheLock) {
 
   app.on('ready', () => {
     if (
-      // MAC-TODO: Re-enable updater
-      !process.argv.includes('--skip-update') && false &&
+      !process.argv.includes('--skip-update') &&
       ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE)) {
-      const updateInfo = {
-        baseUrl: 'https://slobs-cdn.streamlabs.com',
-        version: pjson.version,
-        exec: process.argv,
-        cwd: process.cwd(),
-        waitPids: [ process.pid ],
-        appDir: path.dirname(app.getPath('exe')),
-        tempDir: path.join(app.getPath('temp'), 'slobs-updater'),
-        cacheDir: app.getPath('userData'),
-        versionFileName: `${releaseChannel}.json`
-      };
+      // MAC-TODO
 
-      bootstrap(updateInfo, startApp, app.exit);
+      // const updateInfo = {
+      //   baseUrl: 'https://slobs-cdn.streamlabs.com',
+      //   version: pjson.version,
+      //   exec: process.argv,
+      //   cwd: process.cwd(),
+      //   waitPids: [ process.pid ],
+      //   appDir: path.dirname(app.getPath('exe')),
+      //   tempDir: path.join(app.getPath('temp'), 'slobs-updater'),
+      //   cacheDir: app.getPath('userData'),
+      //   versionFileName: `${releaseChannel}.json`
+      // };
+
+      // bootstrap(updateInfo, startApp, app.exit);
+
+      (new Updater(startApp)).run();
     } else {
       startApp();
     }

@@ -12,7 +12,9 @@ const base = {
     'updater/build/bootstrap.js',
     'index.html',
     'main.js',
-    'obs-api'
+    'obs-api',
+    'updater/mac/index.html',
+    'updater/mac/Updater.js'
   ],
   extraFiles: [
     // 'LICENSE',
