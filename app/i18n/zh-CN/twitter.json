@@ -1,10 +1,10 @@
 {
-  "Compose Tweet": "Compose Tweet",
-  "Custom URL with": "Custom URL with",
-  "Share Your Stream": "Share Your Stream",
-  "Connect to Twitter": "Connect to Twitter",
-  "Enable Tweet Sharing": "Enable Tweet Sharing",
-  "Tweet when going live": "Tweet when going live",
-  "Unlink Twitter": "Unlink Twitter",
-  "Tweet & Go Live": "Tweet & Go Live"
+  "Compose Tweet": "撰写推文",
+  "Custom URL with": "自定义网址",
+  "Share Your Stream": "分享您的直播",
+  "Connect to Twitter": "连接到 Twitter",
+  "Enable Tweet Sharing": "启用推文共享",
+  "Tweet when going live": "上线时发推",
+  "Unlink Twitter": "取消链接 Twitter",
+  "Tweet & Go Live": "发推并上线"
 }
