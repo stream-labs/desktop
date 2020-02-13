@@ -77,7 +77,7 @@ export default class StartStreamingButton extends Vue {
       }
 
       if (this.shouldShowGoLiveWindow()) {
-        if ((this.isFacebook || this.restreamService.shouldGoLiveWithRestream) && this.hasPages) {
+        if (this.hasPages) {
           return this.streamingService.openShareStream();
         }
         if (this.restreamService.shouldGoLiveWithRestream) {
@@ -96,7 +96,7 @@ export default class StartStreamingButton extends Vue {
 
   get hasPages() {
     return (
-      this.isFacebook &&
+      (this.isFacebook || this.restreamService.shouldGoLiveWithRestream) &&
       this.facebookService.state.facebookPages &&
       this.facebookService.state.facebookPages.pages.length
     );
