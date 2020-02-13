@@ -12,7 +12,8 @@ export default class BaseElement extends TsxComponent {
   width = 0;
 
   mounted() {
-    this.calcBelowMins();
+    this.height = this.$el.getBoundingClientRect().height;
+    this.width = this.$el.getBoundingClientRect().width;
     window.setInterval(() => {
       this.height = this.$el.getBoundingClientRect().height;
       this.width = this.$el.getBoundingClientRect().width;
@@ -40,7 +41,7 @@ export default class BaseElement extends TsxComponent {
   calcBelowMins() {
     if (!this.$el) return;
     // 20px added to account for size of the resize bars and padding
-    this.belowMins = this.height + 20 < this.mins.y || this.width + 20 < this.mins.x;
+    this.belowMins = this.height + 26 < this.mins.y || this.width + 26 < this.mins.x;
   }
 
   renderElement() {
