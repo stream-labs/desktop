@@ -376,4 +376,21 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   getErrorDescription(error: IPlatformResponse<unknown>): string {
     return `Can not connect to Facebook: ${error.message}`;
   }
+
+  sendPushNotif() {
+    const url = 'https://streamlabs.com/api/v5/slobs/remote/notify';
+    const headers = authorizedHeaders(
+      this.userService.apiToken,
+      new Headers({
+        'Content-Type': 'application/json',
+      }),
+    );
+    const postData = {
+      headers,
+      method: 'POST',
+      body: '',
+    };
+    const req = new Request(url, postData);
+    fetch(req);
+  }
 }
