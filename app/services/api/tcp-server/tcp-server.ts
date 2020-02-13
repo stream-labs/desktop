@@ -104,6 +104,10 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     Object.keys(this.clients).forEach(clientId => this.disconnectClient(Number(clientId)));
   }
 
+  get websocketRemoteConnectionEnabled() {
+    return this.state.websockets.enabled && this.state.websockets.allowRemote;
+  }
+
   enableWebsoketsRemoteConnections() {
     this.stopListening();
 

@@ -362,6 +362,7 @@ test('User does not have Facebook pages', async t => {
   await logIn(t, 'facebook', { noFacebookPages: true });
   await prepareToGoLive(t);
   await clickGoLive(t);
+  if (await t.context.app.client.isExisting('button=Go Live')) await t.context.app.client.click('button=Go Live');
   await focusChild(t);
   t.true(
     await t.context.app.client.isExisting('a=Create Page'),

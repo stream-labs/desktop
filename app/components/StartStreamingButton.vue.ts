@@ -71,6 +71,9 @@ export default class StartStreamingButton extends Vue {
       }
 
       if (this.shouldShowGoLiveWindow()) {
+        if (this.isFacebook || this.restreamService.shouldGoLiveWithRestream) {
+          return this.streamingService.openShareStream();
+        }
         if (this.restreamService.shouldGoLiveWithRestream) {
           this.streamingService.showEditStreamInfo(this.restreamService.platforms, 0);
         } else {
