@@ -117,13 +117,17 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
 
   get qrcodeVal(): string {
     if (!this.qrcodeIsVisible) return 'nothing to show yet';
-    const encodedUser = encodeURIComponent(`user=${this.userService.widgetToken}`)
-    const encodedData = encodeURIComponent(`&data=${encodeURIComponent(JSON.stringify(this.qrcodeData))}`);
+    const encodedUser = encodeURIComponent(`user=${this.userService.widgetToken}`);
+    const encodedData = encodeURIComponent(
+      `&data=${encodeURIComponent(JSON.stringify(this.qrcodeData))}`,
+    );
     return `https://streamlabs.page.link/?link=https://streamlabs.com/mobile-app?${encodedUser}${encodedData}&apn=com.streamlabs.slobsrc&isi=1476615877&ibi=com.streamlabs.slobsrc&utm_source=slobs`;
   }
 
   get sharePageUrl() {
-    return `facebook.com/${this.facebookService.state.activePage.name}-${this.facebookService.state.activePage.id}`;
+    return `facebook.com/${this.facebookService.state.activePage.name}-${
+      this.facebookService.state.activePage.id
+    }`;
   }
 
   shareToFacebook() {
@@ -217,16 +221,15 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
           </div>
         )}
         {this.sharedToFacebook && this.linkedToTwitter && (
-          <div
-            class={styles.fader}
-            onClick={() => this.clickQRCode()}
-          >
+          <div class={styles.fader} onClick={() => this.clickQRCode()}>
             <QRCode
               value={this.qrcodeVal}
               options={{ size: 100 }}
               class={cx({ [styles.blur]: !this.qrcodeIsVisible })}
             />
-            {!this.qrcodeIsVisible && <span>{$t('Don\'t show this code on stream. Click to reveal')}</span>}
+            {!this.qrcodeIsVisible && (
+              <span>{$t("Don't show this code on stream. Click to reveal")}</span>
+            )}
           </div>
         )}
       </div>

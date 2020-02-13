@@ -28,7 +28,9 @@ export default class StartStreamingButton extends Vue {
   @Prop() disabled: boolean;
 
   mounted() {
-    if (this.isFacebook || this.restreamService.shouldGoLiveWithRestream) this.facebookService.fetchActivePage();
+    if (this.isFacebook || this.restreamService.shouldGoLiveWithRestream) {
+      this.facebookService.fetchActivePage();
+    }
   }
 
   async toggleStreaming() {
