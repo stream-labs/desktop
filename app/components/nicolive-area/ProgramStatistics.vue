@@ -3,7 +3,7 @@
         <ul class="program-statistics-list">
             <li class="program-statistics-item" v-tooltip.bottom="visitorTooltip"><i class="program-statistics-icon icon-visitor"></i><span class="program-statistics-value">{{ viewers }}</span></li>
             <li class="program-statistics-item" v-tooltip.bottom="commentTooltip"><i class="program-statistics-icon icon-comment"></i><span class="program-statistics-value">{{ comments }}</span></li>
-            <li class="program-statistics-item" v-tooltip.bottom="adPointTooltip"><i class="program-statistics-icon icon-uad"></i><span class="program-statistics-value">{{ adPoint }}</span></li>
+            <li class="program-statistics-item" v-tooltip.bottom="adPointTooltip"><i class="program-statistics-icon icon-nicoad"></i><span class="program-statistics-value">{{ adPoint }}</span></li>
             <li class="program-statistics-item" v-tooltip.bottom="giftPointTooltip"><i class="program-statistics-icon icon-gift"></i><span class="program-statistics-value">{{ giftPoint }}</span></li>
         </ul>
         <div class="program-menu">

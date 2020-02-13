@@ -1,6 +1,5 @@
 import { WebSocketSubject, webSocket } from 'rxjs/webSocket';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
 
 export type MessageResponse = { chat: ChatMessage } | { leave_thread: LeaveThreadMessage } | { thread: ThreadMessage };
 export type Message = ChatMessage | LeaveThreadMessage | ThreadMessage;

@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
 import { FilterType, FilterRecord } from 'services/nicolive-program/ResponseTypes';
@@ -26,6 +26,12 @@ export default class CommentFilter extends Vue {
   }
 
   currentType: FilterType = 'word';
+
+  @Watch('currentType')
+  onTypeChange() {
+    this.newFilterValue = '';
+  }
+
   newFilterValue: string = '';
 
   FILTER_VALUE = {
@@ -54,6 +60,10 @@ export default class CommentFilter extends Vue {
       console.error(e);
     } finally {
       this.adding = false;
+
+      this.$nextTick(() => {
+        (this.$refs.input as HTMLElement)?.focus();
+      });
     }
   }
 

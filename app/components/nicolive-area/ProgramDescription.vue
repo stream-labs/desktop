@@ -29,6 +29,7 @@
   height: 48px;
   padding: 4px 16px;
   background-color: @bg-secondary;
+  border-bottom: 1px solid @bg-primary;
 }
 
 .program-description-body {

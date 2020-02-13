@@ -44,7 +44,6 @@
 .container {
   width: 100%;
   flex-grow: 1;
-  background-color: @bg-secondary;
 
   display: flex;
 }
@@ -56,6 +55,7 @@
   width: 100%;
   height: 48px;
   padding: 4px 16px;
+  background-color: @bg-secondary;
   border-bottom: 1px solid @bg-primary;
 
   > .icon-btn {
@@ -72,11 +72,13 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  background-color: @bg-secondary;
 }
 
 .list {
   flex-grow: 1;
   overflow-y: auto;
+  padding-top: 8px;
 }
 
 .row {
@@ -84,10 +86,6 @@
   height: 32px;
   line-height: 32px;
   width: 100%;
-
-  &:first-child {
-    margin-top: 8px;
-  }
 }
 
 .sentinel {

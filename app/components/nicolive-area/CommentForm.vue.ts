@@ -22,7 +22,6 @@ export default class CommentForm extends Vue {
       await this.nicoliveProgramService.sendOperatorComment(text, isPermanent);
       this.operatorCommentValue = '';
     } catch (caught) {
-      
       if (caught instanceof NicoliveProgramServiceFailure) {
         await NicoliveProgramService.openErrorDialogFromFailure(caught);
       } else {
@@ -30,10 +29,14 @@ export default class CommentForm extends Vue {
       }
     } finally {
       this.isCommentSending = false;
+
+      this.$nextTick(() => {
+        (this.$refs.input as HTMLElement)?.focus();
+      });
     }
   }
 
-  get programStatus(): string {
-    return this.nicoliveProgramService.state.status;
+  get programEnded(): boolean {
+    return this.nicoliveProgramService.state.status === 'end';
   }
 }

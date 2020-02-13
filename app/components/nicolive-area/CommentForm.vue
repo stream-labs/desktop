@@ -1,20 +1,20 @@
 <template>
-  <div class="comment-form">
+  <form class="comment-form" @submit.prevent="sendOperatorComment($event)">
     <input
       type="text"
+      ref="input"
       :readonly="isCommentSending"
       :disabled="isCommentSending"
       placeholder="コメントを入力"
       v-model="operatorCommentValue"
-      @keydown.enter="sendOperatorComment($event)"
       class="comment-input"
       maxlength="80"
     />
-    <button type="submit" :disabled="isCommentSending || operatorCommentValue.length === 0" @click="sendOperatorComment($event)" class="comment-button"><i class="icon-comment-send"></i></button>
-    <div class="comment-disabled-message" v-if="programStatus === 'end'">
+    <button type="submit" :disabled="isCommentSending || operatorCommentValue.length === 0" class="comment-button"><i class="icon-comment-send"></i></button>
+    <div class="comment-disabled-message" v-if="programEnded">
       番組が終了したため、放送者コメントを投稿できません
     </div>
-  </div>
+  </form>
 </template>
 
 <script lang="ts" src="./CommentForm.vue.ts"></script>
@@ -26,6 +26,7 @@
   display: flex;
   justify-content: center;
   padding: 8px;
+  border-top: 1px solid @bg-primary;
   background-color: @bg-secondary;
   position: relative;
 }
@@ -34,12 +35,12 @@
   font-size: 12px;
   flex-grow: 1;
   width: auto;
-  background-color: @bg-primary;
+  background-color: @bg-quaternary;
   padding-right: 36px;
   box-sizing: border-box;
 
   &:focus {
-    background-color: @bg-secondary;
+    background-color: @bg-primary;
 
     &::placeholder {
       opacity: .5;

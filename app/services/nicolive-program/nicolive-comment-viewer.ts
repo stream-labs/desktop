@@ -1,17 +1,26 @@
 import { Inject } from 'util/injector';
 import { NicoliveProgramService } from './nicolive-program';
-import { map, distinctUntilChanged, bufferTime, filter, finalize, merge, tap } from 'rxjs/operators';
+import {
+  map,
+  distinctUntilChanged,
+  bufferTime,
+  filter,
+  catchError,
+  mergeMap,
+  groupBy,
+  mapTo,
+  endWith,
+  tap,
+} from 'rxjs/operators';
 import { StatefulService, mutation } from 'services/stateful-service';
 import {
   MessageServerClient,
   MessageServerConfig,
   isChatMessage,
   ChatMessage,
-  MessageResponse,
   isThreadMessage,
-  isLeaveThreadMessage,
 } from './MessageServerClient';
-import { Subscription, Subject } from 'rxjs';
+import { Subscription, EMPTY, Observable, of } from 'rxjs';
 import { ChatMessageType, classify } from './ChatMessage/classifier';
 
 export type WrappedChat = {
@@ -28,8 +37,6 @@ interface INicoliveCommentViewerState {
 export class NicoliveCommentViewerService extends StatefulService<INicoliveCommentViewerState> {
   private client: MessageServerClient | null = null;
   @Inject() private nicoliveProgramService: NicoliveProgramService;
-
-  private backdoorSubject: Subject<Omit<WrappedChat, 'seqId'>> = new Subject();
 
   static initialState: INicoliveCommentViewerState = {
     messages: [],
@@ -88,42 +95,56 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   private connect() {
     this.lastSubscription = this.client.connect()
       .pipe(
-        finalize(() => {
-          // FIXME: 動かない（流せてもコンポーネントに反映できない）
-          this.backdoorSubject.next({
-            type: 'n-air-emulated',
-            value: {
-              content: 'コメントサーバーから切断されました',
-            },
-          });
-        }),
-        tap(msg => {
-          if (isThreadMessage(msg) && (msg.thread.resultcode ?? 0 === 0)) {
-            this.backdoorSubject.next({
-              type: 'n-air-emulated',
-              value: {
-                content: 'スレッドへの参加に失敗しました',
-              },
-            });
-            setTimeout(() => this.unsubscribe(), 3000);
-          } else if (isLeaveThreadMessage(msg)) {
-            this.backdoorSubject.next({
-              type: 'n-air-emulated',
-              value: {
-                content: 'スレッドから追い出されました',
-              },
-            });
-            setTimeout(() => this.unsubscribe(), 3000);
-          } else if (isChatMessage(msg) && (msg.chat.content === '/disconnect')) {
-            setTimeout(() => this.unsubscribe(), 3000);
+        groupBy(msg => Object.keys(msg)[0]),
+        mergeMap((group$): Observable<Pick<WrappedChat, 'type' | 'value'>> => {
+          switch (group$.key) {
+            case 'chat':
+              return group$
+                .pipe(
+                  filter(isChatMessage),
+                  map(({ chat }) => ({
+                    type: classify(chat),
+                    value: chat,
+                  })),
+                );
+            case 'thread':
+              return group$
+                .pipe(
+                  filter(isThreadMessage),
+                  filter(msg => (msg.thread.resultcode ?? 0) !== 0),
+                  mapTo({
+                    type: 'n-air-emulated',
+                    value: {
+                      content: 'スレッドへの参加に失敗しました',
+                    },
+                  })
+                );
+            case 'leave_thread':
+              return group$
+                .pipe(
+                  mapTo({
+                    type: 'n-air-emulated',
+                    value: {
+                      content: 'スレッドから追い出されました',
+                    },
+                  })
+                );
+            default: EMPTY;
           }
         }),
-        filter(isChatMessage),
-        map(({ chat }) => ({
-          type: classify(chat),
-          value: chat,
+        catchError(err => of({
+          type: 'n-air-emulated' as const,
+          value: {
+            content: `エラーが発生しました: ${err.message}`,
+          },
         })),
-        merge(this.backdoorSubject.asObservable()),
+        endWith({
+          type: 'n-air-emulated' as const,
+          value: {
+            content: 'サーバーとの接続が終了しました',
+          },
+        }),
+        tap(v => v.value.content === '/disconnect' && setTimeout(() => this.unsubscribe(), 1000)),
         map(({ type, value }, seqId) => ({ type, value, seqId })),
         bufferTime(1000),
         filter(arr => arr.length > 0),
