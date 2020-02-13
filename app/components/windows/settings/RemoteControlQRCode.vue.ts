@@ -4,13 +4,14 @@ import { Component } from 'vue-property-decorator';
 import qrcode from '@xkeshi/vue-qrcode';
 import { Inject } from 'services/core/injector';
 import { ITcpServerServiceApi } from 'services/api/tcp-server/index';
-import { HostsService } from 'services/hosts';
+import { UserService } from 'services/user';
 
 interface IQRCodeData {
   addresses: string[];
   port: number;
   token: string;
   version: string;
+  user: string;
 }
 
 @Component({
@@ -22,13 +23,14 @@ export default class RemoteControlQRCodeVue extends Vue {
   private updateNetworkInterval = 0;
 
   @Inject() private tcpServerService: ITcpServerServiceApi;
-  @Inject() private hostsService: HostsService;
+  @Inject() private userService: UserService;
 
   qrcodeData: IQRCodeData = {
     token: '',
     port: 0,
     addresses: [],
     version: '',
+    user: this.userService.widgetToken,
   };
 
   mounted() {
@@ -52,13 +54,14 @@ export default class RemoteControlQRCodeVue extends Vue {
       token: settings.token,
       port: settings.websockets.port,
       version: remote.process.env.SLOBS_VERSION,
+      user: this.userService.widgetToken,
     };
   }
 
   get qrcodeVal(): string {
     if (!this.qrcodeIsVisible) return 'nothing to show yet';
     const encodedData = encodeURIComponent(JSON.stringify(this.qrcodeData));
-    return `https://${this.hostsService.streamlabs}/remotecontrol?data=${encodedData}`;
+    return `https://streamlabs.page.link/?link=https://streamlabs.com/mobile-app?${encodedData}&apn=com.streamlabs.slobsrc&isi=1476615877&ibi=com.streamlabs.slobsrc&utm_source=slobs_settings`;
   }
 
   showQrcode() {
