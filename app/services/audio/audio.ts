@@ -279,18 +279,20 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
      * sending events in the case of hiding the source. It might be better
      * to eventually just hide the mixer item as well though */
     const volmeterCheck = () => {
-      if (!gotEvent) {
+      if (!gotEvent && lastVolmeterValue) {
         // volmeterStream.next({
         //   ...lastVolmeterValue,
         //   magnitude: [-Infinity],
         //   peak: [-Infinity],
         //   inputPeak: [-Infinity],
         // });
+        const channelsCount = lastVolmeterValue.peak.length || 1;
+        const channelsValue = Array(channelsCount).fill(-Infinity);
         this.sendVolmeterData(sourceId, {
           ...lastVolmeterValue,
-          magnitude: [-Infinity],
-          peak: [-Infinity],
-          inputPeak: [-Infinity],
+          magnitude: channelsValue,
+          peak: channelsValue,
+          inputPeak: channelsValue,
         });
       }
 
