@@ -1,10 +1,10 @@
 {
-  "Compose Tweet": "Compose Tweet",
-  "Custom URL with": "Custom URL with",
-  "Share Your Stream": "Share Your Stream",
-  "Connect to Twitter": "Connect to Twitter",
-  "Enable Tweet Sharing": "Enable Tweet Sharing",
-  "Tweet when going live": "Tweet when going live",
-  "Unlink Twitter": "Unlink Twitter",
-  "Tweet & Go Live": "Tweet & Go Live"
+  "Compose Tweet": "ツイートを書く",
+  "Custom URL with": "カスタム URL",
+  "Share Your Stream": "ストリームを共有",
+  "Connect to Twitter": "Twitter に接続",
+  "Enable Tweet Sharing": "Tweet 共有を有効化",
+  "Tweet when going live": "ライブ配信の開始時にツイート",
+  "Unlink Twitter": "Twitter のリンクを解除",
+  "Tweet & Go Live": "Tweet & ライブ配信を開始"
 }

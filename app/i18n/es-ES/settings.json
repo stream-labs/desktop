@@ -83,7 +83,7 @@
   "Open FrankerFaceZ Settings": "Abrir ajustes de FrankerFaceZ",
   "FrankerFaceZ Settings": "Ajustes de FrankerFaceZ",
   "API Token": "Token de API",
-  "Face Mask Settings": "Face Mask Settings",
+  "Face Mask Settings": "Ajustes de máscaras de cara",
   "Navigate to Live tab when going live": "Navegar a la pestaña En directo al emitir en directo",
   "Save Replay": "Guardar repetición",
   "Disable hardware acceleration": "Desactivar aceleración de hardware",
@@ -116,5 +116,6 @@
   "Audio - Track 5": "Audio - Pista 5",
   "Audio - Track 6": "Audio - Pista 6",
   "Stream Key": "Clave de stream",
-  "You can not change these settings when you're live": "No puede cambiar estos ajustes estando en directo"
+  "You can not change these settings when you're live": "No puede cambiar estos ajustes estando en directo",
+  "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.": "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk."
 }

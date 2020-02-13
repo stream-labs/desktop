@@ -216,12 +216,10 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   }
 
   handleMouseMove(event: IMouseEvent) {
-    // console.log('HANDLING MOUSE MOVE', event);
-
-    const mousePosX = event.offsetX - this.renderedOffsetX;
-    const mousePosY = event.offsetY - this.renderedOffsetY;
-
     const factor = this.windowsService.state.main.scaleFactor;
+    const mousePosX = event.offsetX * factor - this.renderedOffsetX;
+    const mousePosY = event.offsetY * factor - this.renderedOffsetY;
+
     const converted = this.convertScalarToBaseSpace(mousePosX * factor, mousePosY * factor);
 
     if (this.resizeRegion) {

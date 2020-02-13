@@ -83,7 +83,7 @@
   "Open FrankerFaceZ Settings": "FrankerFaceZ Ayarlarını Aç",
   "FrankerFaceZ Settings": "FrankerFaceZ Ayarları",
   "API Token": "API Belirteci",
-  "Face Mask Settings": "Face Mask Settings",
+  "Face Mask Settings": "Yüz Maskesi Ayarları",
   "Navigate to Live tab when going live": "Yayındayken Canlı sekmesine gidin",
   "Save Replay": "Tekrarı Kaydet",
   "Disable hardware acceleration": "Donanım hızlandırmayı devre dışı bırak",
@@ -116,5 +116,6 @@
   "Audio - Track 5": "Ses - Parça 5",
   "Audio - Track 6": "Ses - Parça 6",
   "Stream Key": "Yayın Anahtarı",
-  "You can not change these settings when you're live": "Canlı yayındayken bu ayarları değiştiremezsiniz"
+  "You can not change these settings when you're live": "Canlı yayındayken bu ayarları değiştiremezsiniz",
+  "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.": "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk."
 }
