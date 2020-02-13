@@ -116,5 +116,6 @@
   "Audio - Track 5": "Audio - 5. szám",
   "Audio - Track 6": "Audio - 6. szám",
   "Stream Key": "Stream kulcs",
-  "You can not change these settings when you're live": "Ezeket a beállításokat élőben nem módosíthatja"
+  "You can not change these settings when you're live": "Ezeket a beállításokat élőben nem módosíthatja",
+  "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.": "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk."
 }

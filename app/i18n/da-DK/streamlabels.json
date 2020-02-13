@@ -1,6 +1,6 @@
 {
-  "Label Type": "Etikettype",
-  "Label Template": "Etiketskabelon",
+  "Label Type": "Labeltype",
+  "Label Template": "Labelskabelon",
   "Item Template": "Elementskabelon",
   "Item Separator": "Elementseparator",
   "Item Limit": "Elementbegrænsning",
@@ -9,11 +9,11 @@
   "Always, show 0:00 when inactive": "Vis altid, 0:00 hvis inaktiv",
   "Hide when inactive": "Skjul hvis inaktiv",
   "Show Count": "Vis antal",
-  "Always, show 0 when inactive": "Vis altid, 0 hvis inaktive",
+  "Always, show 0 when inactive": "Vis altid, 0 hvis inaktiv",
   "Show Latest": "Vis seneste",
   "Always, show last person when inactive": "Vis altid, vis sidste person hvis inaktiv",
-  "Include Resubs": "Omfat genabbonenter",
+  "Include Resubs": "Medtag abonnementsforlængelser",
   "Preview": "Forhåndsvisning",
   "Note:": "Bemærk:",
-  "Actual label text may take up to 60 seconds to update": "Det kan tage op til 60 sekunder før etiketteksten er opdateret"
+  "Actual label text may take up to 60 seconds to update": "Det kan tage op til 60 sekunder før den opdaterede labeltekst vises"
 }
