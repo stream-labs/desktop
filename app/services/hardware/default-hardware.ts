@@ -5,6 +5,7 @@ import { AudioService, E_AUDIO_CHANNELS } from 'services/audio';
 import { SourcesService, ISourceAddOptions } from 'services/sources';
 import { mutation } from 'services/core';
 import { SceneCollectionsService } from 'services/scene-collections';
+import { byOS, OS } from 'util/operating-systems';
 
 interface IDefaultHardwareServiceState {
   defaultVideoDevice: string;
@@ -32,7 +33,7 @@ export class DefaultHardwareService extends PersistentStatefulService<
     this.audioDevices.forEach(device => {
       this.sourcesService.createSource(
         device.id,
-        'wasapi_input_capture',
+        byOS({ [OS.Windows]: 'wasapi_input_capture', [OS.Mac]: 'coreaudio_input_capture' }),
         { device_id: device.id },
         {
           isTemporary: true,
@@ -46,23 +47,34 @@ export class DefaultHardwareService extends PersistentStatefulService<
         source => source.deviceId === device.id,
       );
       if (existingSource) return;
-      this.sourcesService.createSource(device.id, 'dshow_input', { video_device_id: device.id }, {
-        isTemporary: true,
-        sourceId: device.id,
-      } as ISourceAddOptions);
+      if (!device.id) return;
+      this.sourcesService.createSource(
+        device.id,
+        byOS({ [OS.Windows]: 'dshow_input', [OS.Mac]: 'av_capture_input' }),
+        byOS({ [OS.Windows]: { video_device_id: device.id }, [OS.Mac]: { device: device.id } }),
+        {
+          isTemporary: true,
+          sourceId: device.id,
+        } as ISourceAddOptions,
+      );
     });
 
     if (this.videoDevices[0]) this.SET_DEVICE('video', this.videoDevices[0].id);
   }
 
   get existingVideoDeviceSources() {
+    const deviceProperty = byOS({ [OS.Windows]: 'video_device_id', [OS.Mac]: 'device' });
+
     return this.sourcesService.sources
       .filter(
         source =>
-          this.videoDevices.find(device => device.id === source.getSettings().video_device_id) &&
-          source.type === 'dshow_input',
+          this.videoDevices.find(device => device.id === source.getSettings()[deviceProperty]) &&
+          source.type === byOS({ [OS.Windows]: 'dshow_input', [OS.Mac]: 'av_capture_input' }),
       )
-      .map(source => ({ source, deviceId: source.getSettings().video_device_id }));
+      .map(source => ({
+        source,
+        deviceId: source.getSettings()[deviceProperty],
+      }));
   }
 
   clearTemporarySources() {
