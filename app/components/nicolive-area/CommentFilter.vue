@@ -2,7 +2,7 @@
   <div class="container">
     <div class="header">
       <div class="header-item-center">放送者NG設定</div>
-      <div class="header-item-right" v-tooltip.left="closeTooltip"><i class="icon-close icon-btn" @click="close"></i></div>
+      <div class="header-item-right"><i class="icon-close icon-btn" @click="close"></i></div>
     </div>
     <div class="content">
       <div class="content-header">
@@ -12,7 +12,7 @@
         <div class="registrations">登録数 {{ count }}/500</div>
       </div>
       <form class="add-form" @submit.prevent="onAdd">
-        <input type="text" v-model="newFilterValue" placeholder="NGコメントを入力" :disabled="adding" :readonly="adding" />
+        <input type="text" v-model="newFilterValue" :placeholder="`${FILTER_VALUE[currentType]}：NGに登録する${FILTER_VALUE[currentType]}を入力`" :disabled="adding" :readonly="adding" />
         <button type="submit" :disabled="adding" class="button button--dark">追加</button>
       </form>
       <div class="list">
@@ -137,12 +137,6 @@
 
       &::placeholder {
         opacity: .5;
-      }
-    }
-
-    &:hover {
-      &:not(:focus)::placeholder {
-        opacity: 1;
       }
     }
 

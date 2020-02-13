@@ -9,9 +9,6 @@ export default class CommentFilter extends Vue {
   @Inject()
   private nicoliveCommentFilterService: NicoliveCommentFilterService;
 
-  // TODO: 後で言語ファイルに移動する
-  closeTooltip = '閉じる'; 
-
   async reloadFilters() {
     return this.nicoliveCommentFilterService.fetchFilters();
   }
@@ -30,6 +27,12 @@ export default class CommentFilter extends Vue {
 
   currentType: FilterType = 'word';
   newFilterValue: string = '';
+
+  FILTER_VALUE = {
+    word: 'コメント',
+    user_id: 'ID',
+    command: 'コマンド',
+  };
 
   get count() {
     return this.filters.length;
