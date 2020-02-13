@@ -72,7 +72,6 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
   };
 
   mounted() {
-    this.facebookService.fetchActivePage();
     this.facebookService.sendPushNotif();
     this.updateQrcodeData();
     this.updateNetworkInterval = window.setInterval(() => this.updateQrcodeData(), 1000);
