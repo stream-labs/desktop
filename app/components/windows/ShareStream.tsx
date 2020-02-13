@@ -19,7 +19,6 @@ interface IQRCodeData {
   port: number;
   token: string;
   version: string;
-  user: string;
 }
 
 const testimonialData = () => [
@@ -70,7 +69,6 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
     port: 0,
     addresses: [],
     version: '',
-    user: this.userService.widgetToken,
   };
 
   mounted() {
@@ -106,7 +104,6 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
       token: settings.token,
       port: settings.websockets.port,
       version: remote.process.env.SLOBS_VERSION,
-      user: this.userService.widgetToken,
     };
   }
 
@@ -121,8 +118,9 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
 
   get qrcodeVal(): string {
     if (!this.qrcodeIsVisible) return 'nothing to show yet';
-    const encodedData = encodeURIComponent(JSON.stringify(this.qrcodeData));
-    return `https://streamlabs.page.link/?link=https://streamlabs.com/mobile-app?${encodedData}&apn=com.streamlabs.slobsrc&isi=1476615877&ibi=com.streamlabs.slobsrc&utm_source=slobs`;
+    const encodedUser = encodeURIComponent(`user=${this.userService.widgetToken}`)
+    const encodedData = encodeURIComponent(`&data=${JSON.stringify(this.qrcodeData)}`);
+    return `https://streamlabs.page.link/?link=https://streamlabs.com/mobile-app?${encodedUser}${encodedData}&apn=com.streamlabs.slobsrc&isi=1476615877&ibi=com.streamlabs.slobsrc&utm_source=slobs`;
   }
 
   get sharePageUrl() {

@@ -11,7 +11,6 @@ interface IQRCodeData {
   port: number;
   token: string;
   version: string;
-  user: string;
 }
 
 @Component({
@@ -30,7 +29,6 @@ export default class RemoteControlQRCodeVue extends Vue {
     port: 0,
     addresses: [],
     version: '',
-    user: this.userService.widgetToken,
   };
 
   mounted() {
@@ -54,14 +52,14 @@ export default class RemoteControlQRCodeVue extends Vue {
       token: settings.token,
       port: settings.websockets.port,
       version: remote.process.env.SLOBS_VERSION,
-      user: this.userService.widgetToken,
     };
   }
 
   get qrcodeVal(): string {
     if (!this.qrcodeIsVisible) return 'nothing to show yet';
-    const encodedData = encodeURIComponent(JSON.stringify(this.qrcodeData));
-    return `https://streamlabs.page.link/?link=https://streamlabs.com/mobile-app?${encodedData}&apn=com.streamlabs.slobsrc&isi=1476615877&ibi=com.streamlabs.slobsrc&utm_source=slobs_settings`;
+    const encodedUser = encodeURIComponent(`user=${this.userService.widgetToken}`)
+    const encodedData = encodeURIComponent(`&data=${JSON.stringify(this.qrcodeData)}`);
+    return `https://streamlabs.page.link/?link=https://streamlabs.com/mobile-app?${encodedUser}${encodedData}&apn=com.streamlabs.slobsrc&isi=1476615877&ibi=com.streamlabs.slobsrc&utm_source=slobs`;
   }
 
   showQrcode() {
