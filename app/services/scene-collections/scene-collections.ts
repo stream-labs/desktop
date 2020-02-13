@@ -491,7 +491,19 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * @param data Scene collection JSON data
    */
   private async loadDataIntoApplicationState(data: string) {
-    const root = parse(data, NODE_TYPES);
+    const root: RootNode = parse(data, NODE_TYPES);
+
+    if (!root.data.sources.isAllSupported()) {
+      const backupName = `${this.activeCollection.name} - Backup`;
+
+      await this.duplicate(backupName);
+      await electron.remote.dialog.showMessageBox(electron.remote.getCurrentWindow(), {
+        title: 'Unsupported Sources',
+        type: 'warning',
+        message: `The scene collection you are loading has sources that are not supported by your current operating system. These sources will be removed before loading the scene collection. A backup of this collection with the original sources preserved has been created with the name: ${backupName}`,
+      });
+    }
+
     await root.load();
     this.hotkeysService.bindHotkeys();
   }

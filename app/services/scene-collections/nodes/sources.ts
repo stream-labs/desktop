@@ -166,36 +166,44 @@ export class SourcesNode extends Node<ISchema, {}> {
     });
   }
 
+  /**
+   * Returns true if this scene collection only contains sources
+   * supported by the current operating system.
+   */
+  isAllSupported() {
+    const supportedSources = byOS({ [OS.Windows]: windowsSources, [OS.Mac]: macSources });
+    return this.data.items.every(source => supportedSources.includes(source.type));
+  }
+
   load(context: {}): Promise<void> {
     this.sanitizeSources();
 
-    // This shit is complicated, IPC sucks
-    const sourceCreateData = this.data.items
-      .filter(source => {
-        // MAC-TODO: Make this non-destructive
-        return byOS({
-          [OS.Windows]: () => windowsSources.includes(source.type),
-          [OS.Mac]: () => macSources.includes(source.type),
-        });
-      })
-      .map(source => {
-        return {
-          name: source.id,
-          type: source.type,
-          muted: source.muted || false,
-          settings: source.settings,
-          volume: source.volume,
-          syncOffset: source.syncOffset,
-          filters: source.filters.items.map(filter => {
-            return {
-              name: filter.name,
-              type: filter.type,
-              settings: filter.settings,
-              enabled: filter.enabled === void 0 ? true : filter.enabled,
-            };
-          }),
-        };
+    const supportedSources = this.data.items.filter(source => {
+      return byOS({
+        [OS.Windows]: () => windowsSources.includes(source.type),
+        [OS.Mac]: () => macSources.includes(source.type),
       });
+    });
+
+    // This shit is complicated, IPC sucks
+    const sourceCreateData = supportedSources.map(source => {
+      return {
+        name: source.id,
+        type: source.type,
+        muted: source.muted || false,
+        settings: source.settings,
+        volume: source.volume,
+        syncOffset: source.syncOffset,
+        filters: source.filters.items.map(filter => {
+          return {
+            name: filter.name,
+            type: filter.type,
+            settings: filter.settings,
+            enabled: filter.enabled === void 0 ? true : filter.enabled,
+          };
+        }),
+      };
+    });
 
     // This ensures we have bound the source size callback
     // before creating any sources in OBS.
@@ -205,9 +213,9 @@ export class SourcesNode extends Node<ISchema, {}> {
     const promises: Promise<void>[] = [];
 
     sources.forEach((source, index) => {
-      const sourceInfo = this.data.items[index];
+      const sourceInfo = supportedSources[index];
 
-      this.sourcesService.addSource(source, this.data.items[index].name, {
+      this.sourcesService.addSource(source, supportedSources[index].name, {
         channel: sourceInfo.channel,
         propertiesManager: sourceInfo.propertiesManager,
         propertiesManagerSettings: sourceInfo.propertiesManagerSettings || {},
@@ -235,7 +243,7 @@ export class SourcesNode extends Node<ISchema, {}> {
       }
 
       if (sourceInfo.hotkeys) {
-        promises.push(this.data.items[index].hotkeys.load({ sourceId: sourceInfo.id }));
+        promises.push(supportedSources[index].hotkeys.load({ sourceId: sourceInfo.id }));
       }
     });
 
