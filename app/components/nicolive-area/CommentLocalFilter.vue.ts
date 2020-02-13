@@ -11,9 +11,6 @@ export default class CommentLocalFilter extends Vue {
   @Inject()
   private nicoliveCommentLocalFilterService: NicoliveCommentLocalFilterService;
 
-  // TODO: 後で言語ファイルに移動する
-  closeTooltip = '閉じる';
-
   NG_SHARING_LEVEL_LABELS = {
     none: 'OFF',
     low: '弱',

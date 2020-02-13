@@ -57,7 +57,7 @@ export default class CommentViewer extends Vue {
   // TODO: 後で言語ファイルに移動する
   commentReloadTooltip = 'コメント再取得';
   filterTooltip = 'NG設定';
-  localFilterTooltip = 'フィルター';
+  localFilterTooltip = 'フィルター設定';
 
   isFilterOpened = false;
 

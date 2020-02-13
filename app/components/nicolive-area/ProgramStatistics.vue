@@ -98,7 +98,7 @@
 
  .popper {
     //TODO: 重なり順を変数で管理したい
-    z-index: 2;
+    z-index: 3;
  }
 
  .popup-menu-list {

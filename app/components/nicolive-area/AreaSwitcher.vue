@@ -14,10 +14,9 @@
               v-for="content in contents"
               @click="select(content.slotName)"
             >
-              <!-- TODO: 後でアイコンを差し替える -->
               <i
                 class="item-icon"
-                :class="content.slotName === 'commentViewer' ? 'icon-comment' : 'icon-file'"
+                :class="content.slotName === 'commentViewer' ? 'icon-comment' : 'icon-program-text'"
               ></i>
               <p class="item-name">{{ content.name }}</p>
               <p class="item-text">{{ content.text }}</p>
