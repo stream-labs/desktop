@@ -425,7 +425,13 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
     /** 放送状態が変化しなかった前提で、放送状態が次に変化するであろう時刻 */
     const prevTargetTime: number = prevState[NicoliveProgramService.REFRESH_TARGET_TIME_TABLE[nextState.status]];
-    const nextTargetTime: number = nextState[NicoliveProgramService.REFRESH_TARGET_TIME_TABLE[nextState.status]];
+    /*: 予約番組で現在時刻が開始時刻より30分以上前なら、30分を切ったときに再取得するための補正項 */
+    const readyTimeTermIfReserved =
+      nextState.status === 'reserved' && nextState.startTime - Math.floor(Date.now() / 1000) > 30 * 60
+        ? -30 * 60
+        : 0;
+    const nextTargetTime: number =
+      nextState[NicoliveProgramService.REFRESH_TARGET_TIME_TABLE[nextState.status]] + readyTimeTermIfReserved;
     const targetTimeUpdated = !statusUpdated && prevTargetTime !== nextTargetTime;
 
     const prev = prevState.status !== 'end';
@@ -433,12 +439,13 @@ export class NicoliveProgramService extends StatefulService<INicoliveProgramStat
 
     if (next && (!prev || programUpdated || statusUpdated || targetTimeUpdated)) {
       const now = Date.now();
+      const waitTime = (nextTargetTime + NicoliveProgramService.TIMER_PADDING_SECONDS) * 1000 - now;
 
       // 次に放送状態が変化する予定の時刻（より少し後）に放送情報を更新するタイマーを仕込む
       clearTimeout(this.refreshProgramTimer);
       this.refreshProgramTimer = window.setTimeout(() => {
         this.refreshProgram();
-      }, (nextTargetTime + NicoliveProgramService.TIMER_PADDING_SECONDS) * 1000 - now);
+      }, waitTime);
     } else if (prev && !next) {
       clearTimeout(this.refreshProgramTimer);
     }
