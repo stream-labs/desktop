@@ -2,12 +2,13 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { WrappedChat } from 'services/nicolive-program/nicolive-comment-viewer';
 import { parseContent } from 'services/nicolive-program/ChatMessage/util';
+import { ChatMessage } from 'services/nicolive-program/MessageServerClient';
 
 @Component({})
 export default class CommonComment extends Vue {
   @Prop() chat: WrappedChat;
   @Prop({ default: false }) commentMenuOpened: boolean;
-  @Prop() vposToLiveTime: (vpos: number) => string;
+  @Prop() getFormattedLiveTime: (chat: ChatMessage) => string;
 
   get computedContent() {
     const parsed = parseContent(this.chat.value);
@@ -15,6 +16,6 @@ export default class CommonComment extends Vue {
   }
 
   get computedTitle() {
-    return `${this.computedContent} (${this.$props.vposToLiveTime(this.chat.value.vpos)})`
+    return `${this.computedContent} (${this.$props.getFormattedLiveTime(this.chat.value)})`
   }
 }

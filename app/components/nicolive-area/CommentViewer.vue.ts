@@ -79,7 +79,7 @@ export default class CommentViewer extends Vue {
   }
 
   pinnedItemComtent(item: WrappedChat): string {
-    return `${item.value.content}  (${this.vposToLiveTime(item.value.vpos)})`;
+    return `${item.value.content}  (${this.getFormattedLiveTime(item.value)})`;
   }
 
   componentMap = componentMap;
@@ -91,11 +91,14 @@ export default class CommentViewer extends Vue {
   refreshConnection() {
     this.nicoliveCommentViewerService.refreshConnection();
   }
-  vposToLiveTime = (vpos: number = 0): string => {
-    const { vposBaseTime, startTime } = this.nicoliveProgramService.state;
-    const vposTime = vposBaseTime + Math.floor(vpos / 100);
-    const diffTime = vposTime - startTime;
-    return NicoliveProgramService.format(diffTime);
+
+  // getterにして関数を返さないと全コメントに対してrerenderが走る
+  get getFormattedLiveTime() {
+    return (chat: ChatMessage): string => {
+      const { startTime } = this.nicoliveProgramService.state;
+      const diffTime = (chat.date ?? 0) - startTime;
+      return NicoliveProgramService.format(diffTime);
+    };
   }
 
   commentMenuTarget: WrappedChat | null = null;

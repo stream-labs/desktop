@@ -14,7 +14,7 @@
           :key="item.seqId"
           :is="componentMap[item.type]"
           :chat="item"
-          :vposToLiveTime="vposToLiveTime"
+          :getFormattedLiveTime="getFormattedLiveTime"
           :commentMenuOpened="commentMenuTarget === item"
           @pinned="pin(item)"
           @commentMenu="showCommentMenu(item)"
