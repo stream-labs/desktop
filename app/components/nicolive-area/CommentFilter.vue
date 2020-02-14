@@ -7,7 +7,7 @@
     <div class="content">
       <div class="content-header">
         <button type="button" @click="currentType = 'word'" class="choice" :class="{ active: currentType === 'word' }" >コメント</button>
-        <button type="button" @click="currentType = 'user_id'" class="choice" :class="{ active: currentType === 'user_id' }" >ユーザーID</button>
+        <button type="button" @click="currentType = 'user'" class="choice" :class="{ active: currentType === 'user' }" >ユーザーID</button>
         <button type="button" @click="currentType = 'command'" class="choice" :class="{ active: currentType === 'command' }" >コマンド</button>
         <div class="registrations">登録数 {{ count }}/500</div>
       </div>

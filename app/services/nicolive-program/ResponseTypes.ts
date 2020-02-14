@@ -186,7 +186,7 @@ export interface Communities {
 
 export type FilterRecord = {
   id: number;
-  type: 'word' | 'user_id' | 'command';
+  type: 'word' | 'user' | 'command';
   body: string;
 };
 

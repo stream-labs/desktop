@@ -142,7 +142,7 @@ export default class CommentViewer extends Vue {
         id: 'Copy id of comment owner',
         label: 'ユーザーIDをNGに追加',
         click: () => {
-          this.nicoliveCommentFilterService.addFilter({ type: 'user_id', body: item.value.user_id });
+          this.nicoliveCommentFilterService.addFilter({ type: 'user', body: item.value.user_id });
         },
       });
     }
