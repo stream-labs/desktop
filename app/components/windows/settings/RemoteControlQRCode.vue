@@ -4,7 +4,7 @@
     <div class="input-container">
       <div class="fader" @click="showQrcode">
         <qrcode :value="qrcodeVal" :options="{ size: 250 }" :class="{ blur: !qrcodeIsVisible }"></qrcode>
-        <span v-if="!qrcodeIsVisible">{{ $t('Click to show')}}</span>
+        <span v-if="!qrcodeIsVisible">{{ $t('Don\'t show this code on stream. Click to reveal')}}</span>
       </div>
 
       <div v-if="qrcodeIsVisible">
@@ -61,7 +61,6 @@ input {
   span {
     position: absolute;
     top: 100px;
-    left: 70px;
     display: block;
     color: white;
     font-size: 16px;
