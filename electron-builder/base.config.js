@@ -14,40 +14,59 @@ const base = {
     'main.js',
     'obs-api',
     'updater/mac/index.html',
-    'updater/mac/Updater.js'
+    'updater/mac/Updater.js',
   ],
   extraFiles: [
     // 'LICENSE',
     // 'AGREEMENT',
     'shared-resources/*',
-    '!shared-resources/README'
+    '!shared-resources/README',
   ],
+  directories: {
+    buildResources: '.'
+  },
   nsis: {
     license: 'AGREEMENT',
     oneClick: false,
     perMachine: true,
     allowToChangeInstallationDirectory: true,
-    include: 'installer.nsh'
+    include: 'installer.nsh',
   },
   publish: {
     provider: 'generic',
-    url: 'https://slobs-cdn.streamlabs.com'
+    url: 'https://slobs-cdn.streamlabs.com',
   },
   win: {
     rfc3161TimeStampServer: 'http://timestamp.digicert.com',
-    timeStampServer: 'http://timestamp.digicert.com'
+    timeStampServer: 'http://timestamp.digicert.com',
   },
   mac: {
     icon: 'media/images/icon-mac.icns',
     hardenedRuntime: true,
     entitlements: 'electron-builder/entitlements.plist',
-    entitlementsInherit: 'electron-builder/entitlements.plist'
+    entitlementsInherit: 'electron-builder/entitlements.plist',
+  },
+  dmg: {
+    background: 'media/images/dmg-bg.png',
+    iconSize: 100,
+    contents: [
+      {
+        x: 112,
+        y: 165,
+      },
+      {
+        type: 'link',
+        path: '/Applications',
+        x: 396,
+        y: 165,
+      },
+    ],
   },
   extraMetadata: {
-    env: 'production'
+    env: 'production',
   },
   afterPack: './electron-builder/afterPack.js',
-  afterSign: './electron-builder/notarize.js'
+  afterSign: './electron-builder/notarize.js',
 };
 
 if (!process.env.SLOBS_NO_SIGN) base.win.certificateSubjectName = 'Streamlabs (General Workings, Inc.)';
