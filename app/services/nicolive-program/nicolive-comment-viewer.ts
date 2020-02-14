@@ -74,6 +74,10 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
     roomThreadID,
   }: MessageServerConfig): void {
     this.reset();
+
+    // 予約番組は30分前にならないとURLが来ない
+    if (!roomURL || !roomThreadID) return;
+
     this.client = new MessageServerClient({ roomURL, roomThreadID });
     this.connect();
   }
