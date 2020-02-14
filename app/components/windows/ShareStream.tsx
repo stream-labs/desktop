@@ -125,9 +125,7 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
   }
 
   get sharePageUrl() {
-    return `facebook.com/${this.facebookService.state.activePage.name}-${
-      this.facebookService.state.activePage.id
-    }`;
+    return `facebook.com/${this.facebookService.state.activePage.name}-${this.facebookService.state.activePage.id}`;
   }
 
   shareToFacebook() {
