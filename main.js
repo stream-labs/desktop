@@ -196,8 +196,6 @@ if (!gotTheLock) {
       webPreferences: { nodeIntegration: true, webviewTag: true }
     });
 
-    mainWindow.openDevTools({ mode: 'detach' });
-
     mainWindowState.manage(mainWindow);
 
     mainWindow.removeMenu();
@@ -248,6 +246,7 @@ if (!gotTheLock) {
     childWindow = new BrowserWindow({
       show: false,
       frame: false,
+      fullscreenable: false,
       titleBarStyle: 'hidden',
       backgroundColor: '#17242D',
       webPreferences: { nodeIntegration: true }

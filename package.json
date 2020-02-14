@@ -1,9 +1,10 @@
 {
   "name": "slobs-client",
+  "productName": "Streamlabs OBS",
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "0.20.3",
+  "version": "0.0.1-macbeta",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && yarn compile:updater && yarn webpack-cli --progress --config dev.config.js",

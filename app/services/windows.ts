@@ -171,7 +171,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       isShown: true,
       hideStyleBlockers: true,
       hideChat: false,
-      title: `Streamlabs OBS - ${remote.process.env.SLOBS_VERSION}`,
+      title: `Streamlabs OBS - ${remote.process.env.SLOBS_VERSION} - INTERNAL USE ONLY`,
     },
     child: {
       componentName: '',
@@ -309,6 +309,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     const newWindow = (this.windows[windowId] = new BrowserWindow({
       frame: false,
       titleBarStyle: 'hidden',
+      fullscreenable: false,
       width: 400,
       height: 400,
       title: 'New Window',
