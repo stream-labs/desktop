@@ -190,6 +190,7 @@ if (!gotTheLock) {
       y: mainWindowState.y,
       show: false,
       frame: false,
+      titleBarStyle: 'hidden',
       title: 'Streamlabs OBS',
       backgroundColor: '#17242D',
       webPreferences: { nodeIntegration: true, webviewTag: true }

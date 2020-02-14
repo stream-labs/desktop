@@ -7,6 +7,7 @@ import { StreamingService } from 'services/streaming';
 import Utils from 'services/utils';
 import { $t } from 'services/i18n';
 import { WindowsService } from 'services/windows';
+import { byOS, OS } from 'util/operating-systems';
 
 @Component({})
 export default class TitleBar extends Vue {
@@ -55,5 +56,13 @@ export default class TitleBar extends Vue {
 
   get theme() {
     return this.customizationService.currentTheme;
+  }
+
+  get titlebarClasses() {
+    return { [this.customizationService.currentTheme]: true, 'titlebar-mac': this.isMac };
+  }
+
+  get isMac() {
+    return byOS({ [OS.Windows]: false, [OS.Mac]: true });
   }
 }
