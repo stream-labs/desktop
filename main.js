@@ -248,6 +248,7 @@ if (!gotTheLock) {
     childWindow = new BrowserWindow({
       show: false,
       frame: false,
+      titleBarStyle: 'hidden',
       backgroundColor: '#17242D',
       webPreferences: { nodeIntegration: true }
     });

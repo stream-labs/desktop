@@ -308,6 +308,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
     const newWindow = (this.windows[windowId] = new BrowserWindow({
       frame: false,
+      titleBarStyle: 'hidden',
       width: 400,
       height: 400,
       title: 'New Window',
