@@ -48,11 +48,13 @@ export class NicoliveCommentLocalFilterService extends PersistentStatefulService
     this.SET_SHOW_ANONYMOUS(showAnonymous);
   }
 
-  filter = (message: ChatMessage): boolean => {
-    const ngSharingOk = this.threshold < getScore(message);
-    const anonymityOk = this.showAnonymous || !isAnonymous(message);
-    return ngSharingOk && anonymityOk;
-  };
+  get filter() {
+    return (message: ChatMessage): boolean => {
+      const ngSharingOk = this.threshold < getScore(message);
+      const anonymityOk = this.showAnonymous || !isAnonymous(message);
+      return ngSharingOk && anonymityOk;
+    };
+  }
 
   @mutation() private SET_LEVEL(level: NGSharingLevel) {
     this.state = { ...this.state, level };

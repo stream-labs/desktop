@@ -65,7 +65,9 @@ export default class CommentViewer extends Vue {
   pinnedComment: WrappedChat = null;
   isLatestVisible = true;
 
-  private applyLocalFilter = ({ value }: WrappedChat) => this.nicoliveCommentLocalFilterService.filter(value);
+  private get applyLocalFilter() {
+    return ({ value }: WrappedChat) => this.nicoliveCommentLocalFilterService.filter(value);
+  }
 
   scrollToLatest() {
     const scrollEl = this.$refs.scroll as HTMLElement;
@@ -85,7 +87,7 @@ export default class CommentViewer extends Vue {
   componentMap = componentMap;
 
   get items() {
-    return this.nicoliveCommentViewerService.items;
+    return this.nicoliveCommentViewerService.items.filter(this.applyLocalFilter);
   }
 
   refreshConnection() {
