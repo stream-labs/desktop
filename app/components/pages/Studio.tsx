@@ -148,8 +148,8 @@ export default class Studio extends TsxComponent {
     return this.resizes.bar1 + this.resizes.bar2 <= max;
   }
 
-  async setBarResize(bar: 'bar1' | 'bar2', size: number, mins?: IResizeMins) {
-    await this.layoutService.actions.return.setBarResize(bar, size);
+  setBarResize(bar: 'bar1' | 'bar2', size: number, mins?: IResizeMins) {
+    this.layoutService.setBarResize(bar, size);
     if (mins) this.reconcileSizeWithinContraints(mins);
   }
 
