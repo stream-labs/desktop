@@ -87,14 +87,14 @@ export default class Studio extends TsxComponent {
     this.reconcileSizeWithinContraints(mins);
   }
 
-  resizeByRatio(oldMax: number) {
+  async resizeByRatio(oldMax: number) {
     if (this.max === oldMax || !oldMax || !this.max) return;
 
     const ratio = this.max / oldMax;
     if (ratio === 0) return;
-    this.setBarResize('bar1', Math.round(this.resizes.bar1 * ratio));
+    await this.setBarResize('bar1', Math.round(this.resizes.bar1 * ratio));
     if (this.resizes.bar2) {
-      this.setBarResize('bar2', Math.round(this.resizes.bar2 * ratio));
+      await this.setBarResize('bar2', Math.round(this.resizes.bar2 * ratio));
     }
   }
 
@@ -148,8 +148,8 @@ export default class Studio extends TsxComponent {
     return this.resizes.bar1 + this.resizes.bar2 <= max;
   }
 
-  async setBarResize(bar: 'bar1' | 'bar2', size: number, mins?: IResizeMins) {
-    await this.layoutService.actions.return.setBarResize(bar, size);
+  setBarResize(bar: 'bar1' | 'bar2', size: number, mins?: IResizeMins) {
+    this.layoutService.setBarResize(bar, size);
     if (mins) this.reconcileSizeWithinContraints(mins);
   }
 
