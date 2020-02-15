@@ -87,14 +87,14 @@ export default class Studio extends TsxComponent {
     this.reconcileSizeWithinContraints(mins);
   }
 
-  async resizeByRatio(oldMax: number) {
+  resizeByRatio(oldMax: number) {
     if (this.max === oldMax || !oldMax || !this.max) return;
 
     const ratio = this.max / oldMax;
     if (ratio === 0) return;
-    await this.setBarResize('bar1', Math.round(this.resizes.bar1 * ratio));
+    this.setBarResize('bar1', Math.round(this.resizes.bar1 * ratio));
     if (this.resizes.bar2) {
-      await this.setBarResize('bar2', Math.round(this.resizes.bar2 * ratio));
+      this.setBarResize('bar2', Math.round(this.resizes.bar2 * ratio));
     }
   }
 
