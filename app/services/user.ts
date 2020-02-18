@@ -173,11 +173,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
   }
 
-  private async login(service: IPlatformService, auth: IPlatformAuth) {
+  private login(service: IPlatformService, auth: IPlatformAuth) {
     this.LOGIN(auth);
     this.userLogin.next(auth);
     this.setRavenContext();
-    await this.sceneCollectionsService.setupNewUser();
   }
 
   async logOut() {
@@ -203,14 +202,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    */
   startAuth({
     platform,
-    onAuthStart,
-    onAuthCancel,
+    onAuthClose,
     onAuthFinish,
   }: {
     platform: TPlatform,
-    onAuthStart: (...args: any[]) => any,
-    onAuthCancel: (...args: any[]) => any,
-    onAuthFinish: (...args: any[]) => any
+    onAuthClose: (...args: any[]) => any,
+    onAuthFinish: (...args: any[]) => any,
   }) {
     const service = getPlatformService(platform);
     console.log('startAuth service = ' + JSON.stringify(service));
@@ -226,24 +223,24 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       }
     });
 
-    authWindow.webContents.on('did-navigate', async (e, url) => {
+    authWindow.webContents.on('did-navigate', (e, url) => {
       const parsed = this.parseAuthFromUrl(url);
       console.log('parsed = ' + JSON.stringify(parsed)); // DEBUG
 
       if (parsed) {
+        // OAuthの認可が確認できたとき
         authWindow.close();
-        onAuthStart();
-        await this.login(service, parsed);
-        defer(onAuthFinish);
+        this.login(service, parsed);
+
+        onAuthFinish();
+      } else {
+        // 未ログイン時のログイン画面、または認可画面のとき
+        authWindow.show();
       }
     });
 
-    authWindow.once('ready-to-show', () => {
-      authWindow.show();
-    });
-
     authWindow.once('close', () => {
-      onAuthCancel();
+      onAuthClose();
     });
 
     authWindow.setMenu(null);
@@ -257,35 +254,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   private updatePlatformUserInfo() {
     if (!this.isLoggedIn()) return;
 
-    const service = getPlatformService(this.platform.type);
-
-    const authWindow = new electron.remote.BrowserWindow({
-      ...service.authWindowOptions,
-      alwaysOnTop: false,
-      show: false,
-      webPreferences: {
-        nodeIntegration: false,
-        nativeWindowOpen: true,
-        sandbox: true
-      }
+    this.startAuth({
+      platform: this.platform.type,
+      onAuthFinish: () => {},
+      onAuthClose: () => {},
     });
-
-    authWindow.webContents.on('did-navigate', (e, url) => {
-      const parsed = this.parseAuthFromUrl(url);
-
-      if (parsed) {
-        authWindow.close();
-        this.LOGIN(parsed);
-        this.userLogin.next(parsed);
-        this.setRavenContext();
-      } else {
-        // 認可されていない場合は画面を出して操作可能にする
-        authWindow.show();
-      }
-    });
-
-    authWindow.setMenu(null);
-    authWindow.loadURL(service.authUrl);
   }
 
   updatePlatformToken(token: string) {
