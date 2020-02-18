@@ -201,12 +201,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    * Starts the authentication process.  Multiple callbacks
    * can be passed for various events.
    */
-  startAuth(
+  startAuth({
+    platform,
+    onAuthStart,
+    onAuthCancel,
+    onAuthFinish,
+  }: {
     platform: TPlatform,
     onAuthStart: (...args: any[]) => any,
     onAuthCancel: (...args: any[]) => any,
     onAuthFinish: (...args: any[]) => any
-  ) {
+  }) {
     const service = getPlatformService(platform);
     console.log('startAuth service = ' + JSON.stringify(service));
 

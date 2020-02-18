@@ -19,18 +19,18 @@ export default class Connect extends Vue {
 
   authPlatform(platform: TPlatform) {
     this.loadingState = true;
-    this.userService.startAuth(
+    this.userService.startAuth({
       platform,
-      () => {
+      onAuthStart: () => {
         this.loadingState = true;
       },
-      () => {
+      onAuthCancel: () => {
         this.loadingState = false;
       },
-      () => {
+      onAuthFinish: () => {
         this.onboardingService.next();
       }
-    );
+    });
   }
 
   iconForPlatform(platform: TPlatform) {
