@@ -36,7 +36,7 @@ export default class CommentFilter extends Vue {
 
   FILTER_VALUE = {
     word: 'コメント',
-    user_id: 'ユーザーID',
+    user: 'ユーザーID',
     command: 'コマンド',
   };
 
