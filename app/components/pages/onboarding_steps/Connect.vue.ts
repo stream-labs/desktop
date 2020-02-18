@@ -21,7 +21,6 @@ export default class Connect extends Vue {
     this.loadingState = true;
     this.userService.startAuth(
       platform,
-      () => {},
       () => {
         this.loadingState = true;
       },

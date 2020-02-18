@@ -203,7 +203,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    */
   startAuth(
     platform: TPlatform,
-    onWindowShow: (...args: any[]) => any,
     onAuthStart: (...args: any[]) => any,
     onAuthCancel: (...args: any[]) => any,
     onAuthFinish: (...args: any[]) => any
@@ -236,7 +235,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     authWindow.once('ready-to-show', () => {
       authWindow.show();
-      defer(onWindowShow);
     });
 
     authWindow.once('close', () => {
