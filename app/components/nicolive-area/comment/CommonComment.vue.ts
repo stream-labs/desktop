@@ -11,6 +11,9 @@ export default class CommonComment extends Vue {
   @Prop() getFormattedLiveTime: (chat: ChatMessage) => string;
 
   get computedContent() {
+    if (this.chat.type === 'normal') {
+      return this.chat.value.content ?? '';
+    }
     const parsed = parseContent(this.chat.value);
     return parsed.values.join(' ');
   }
