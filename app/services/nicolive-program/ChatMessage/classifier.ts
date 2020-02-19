@@ -1,6 +1,10 @@
 import { ChatMessage } from '../MessageServerClient';
-import { isOperatorCommand, parseCommandName, isOperatorComment } from './util';
+import { isOperatorCommand, parseCommandName, isOperatorComment, parseContent } from './util';
 
+/**
+ * chatメッセージの表示パターン及び文言組み立てパターン振り分け用識別器
+ * @param chat ChatMessage
+ */
 export function classify(chat: ChatMessage) {
   if (isOperatorComment(chat)) {
     return 'operator' as const;
@@ -13,8 +17,20 @@ export function classify(chat: ChatMessage) {
       case 'spi': return 'spi' as const;
       case 'quote': return 'quote' as const;
       case 'cruise': return 'cruise' as const;
-      case 'info': return 'info' as const;
+      case 'info': {
+        const parsed = parseContent(chat);
+        // コミュニティ参加通知は非表示
+        if (parsed.values[0] === '2') {
+          return 'invisible' as const;
+        }
+        return 'info' as const;
+      }
       case 'perm': return 'operator' as const;
+      case 'disconnect': // 切断メッセージ
+      case 'vote': // アンケート
+      case 'coe': // 新市場
+      case 'uadpoint': // ニコニ広告
+        return 'invisible' as const;
     }
     return 'unknown' as const;
   }

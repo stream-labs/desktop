@@ -28,6 +28,8 @@ const componentMap: { [type in ChatMessageType]: Vue.Component } = {
   info: SystemMessage,
   unknown: SystemMessage,
   'n-air-emulated': SystemMessage,
+  // コンポーネントに届く前にフィルタされて表示されないが念のため対応させておく
+  invisible: SystemMessage,
 };
 
 @Component({
@@ -69,7 +71,7 @@ export default class CommentViewer extends Vue {
   }
 
   private get applyLocalFilter() {
-    return ({ value }: WrappedChat) => this.nicoliveCommentLocalFilterService.filter(value);
+    return (item: WrappedChat) => this.nicoliveCommentLocalFilterService.filter(item);
   }
 
   scrollToLatest() {
