@@ -325,6 +325,7 @@ export class FormMonkey {
   }
 
   async setInputValue(selector: string, value: string) {
+    await this.client.waitForVisible(selector);
     await this.client.click(selector);
     await ((this.client.keys(['Control', 'a']) as any) as Promise<any>); // clear
     await ((this.client.keys('Control') as any) as Promise<any>); // release ctrl key

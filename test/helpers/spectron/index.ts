@@ -27,6 +27,7 @@ const ALMOST_INFINITY = Math.pow(2, 31) - 1; // max 32bit int
 const FAILED_TESTS_PATH = 'test-dist/failed-tests.json';
 
 let activeWindow: string | RegExp;
+let mustWaitBeforeChildWindowFocus = false;
 
 const afterStartCallbacks: ((t: TExecutionContext) => any)[] = [];
 export function afterAppStart(cb: (t: TExecutionContext) => any) {
@@ -60,6 +61,15 @@ export async function focusMain(t: any) {
 
 // Focuses the child window
 export async function focusChild(t: any) {
+  // If we try to focus the child window right after the app restarts
+  // it may cause a lost connection to the Selenium server when we call client.getUrl().
+  // the workaround is to add a delay before the first time when we showed it
+  // probably it's related to https://github.com/electron-userland/spectron/issues/139
+  if (!mustWaitBeforeChildWindowFocus) {
+    mustWaitBeforeChildWindowFocus = false;
+    await sleep(5000);
+  }
+  mustWaitBeforeChildWindowFocus = true;
   await focusWindow(t, /windowId=child/);
 }
 
@@ -262,6 +272,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     await new Promise(resolve => {
       rimraf(cacheDir, resolve);
     });
+    mustWaitBeforeChildWindowFocus = true;
   };
 
   /**
