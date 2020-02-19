@@ -57,7 +57,7 @@ export default class SceneTransitions extends TsxComponent<SceneTransitionProps>
   get sceneOptions() {
     return [
       { title: $t('All'), value: 'ALL' },
-      ...this.scenesService.scenes.map(scene => ({
+      ...this.scenesService.views.scenes.map(scene => ({
         title: scene.name,
         value: scene.id,
       })),

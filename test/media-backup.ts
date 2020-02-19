@@ -1,13 +1,13 @@
 import { startApp, stopApp, test, useSpectron, focusChild } from './helpers/spectron';
 
 import { getClient } from './helpers/api-client';
-import { ScenesService } from 'services/scenes';
 const path = require('path');
 import fse = require('fs-extra');
 import fs = require('fs');
 import os = require('os');
 import { logIn } from './helpers/spectron/user';
 import { SceneCollectionsService } from 'services/api/external-api/scene-collections';
+import { ScenesService } from '../app/services/api/external-api/scenes';
 
 useSpectron({ noSync: false });
 
@@ -49,7 +49,7 @@ test('Media backup', async t => {
     await t.context.app.client.waitForVisible('.icon-cloud-backup-2');
 
     // restart app and delete local images
-    await stopApp(false);
+    await stopApp(t, false);
     fse.removeSync(tmpDir);
     await startApp(t);
 

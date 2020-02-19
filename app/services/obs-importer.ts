@@ -136,7 +136,7 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
         this.importMixerSources(configJSON);
         this.importTransitions(configJSON);
 
-        return this.scenesService.scenes.length !== 0;
+        return this.scenesService.views.scenes.length !== 0;
       },
     });
   }
@@ -149,7 +149,7 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
         });
 
         if (isFilterAvailable) {
-          const sourceId = this.sourcesService.getSourcesByName(source.name)[0].sourceId;
+          const sourceId = this.sourcesService.views.getSourcesByName(source.name)[0].sourceId;
 
           const filter = this.filtersService.add(sourceId, filterJSON.id, filterJSON.name);
           filter.enabled = filterJSON.enabled;
@@ -216,9 +216,9 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
                   ? obs.EMonitoringType.MonitoringOnly
                   : obs.EMonitoringType.None;
 
-              this.audioService.getSource(source.sourceId).setMuted(sourceJSON.muted);
-              this.audioService.getSource(source.sourceId).setMul(sourceJSON.volume);
-              this.audioService.getSource(source.sourceId).setSettings({
+              this.audioService.views.getSource(source.sourceId).setMuted(sourceJSON.muted);
+              this.audioService.views.getSource(source.sourceId).setMul(sourceJSON.volume);
+              this.audioService.views.getSource(source.sourceId).setSettings({
                 audioMixers: defaultTo(sourceJSON.mixers, 255),
                 monitoringType: defaultTo(sourceJSON.monitoring_type, defaultMonitoring),
                 syncOffset: defaultTo(sourceJSON.sync / 1000000, 0),
@@ -259,14 +259,14 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
       // Add all the sceneItems to every scene
       sourcesJSON.forEach(sourceJSON => {
         if (sourceJSON.id === 'scene') {
-          const scene = this.scenesService.getScene(nameToIdMap[sourceJSON.name]);
+          const scene = this.scenesService.views.getScene(nameToIdMap[sourceJSON.name]);
           if (!scene) return;
 
           const sceneItems = sourceJSON.settings.items;
           if (Array.isArray(sceneItems)) {
             // Looking for the source to add to the scene
             sceneItems.forEach(item => {
-              const sourceToAdd = this.sourcesService.getSources().find(source => {
+              const sourceToAdd = this.sourcesService.views.getSources().find(source => {
                 return source.name === item.name;
               });
               if (sourceToAdd) {
@@ -300,7 +300,7 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
   importSceneOrder(configJSON: IOBSConfigJSON) {
     const sceneNames: string[] = [];
     const sceneOrderJSON = configJSON.scene_order;
-    const listScene = this.scenesService.scenes;
+    const listScene = this.scenesService.views.scenes;
 
     if (Array.isArray(sceneOrderJSON)) {
       sceneOrderJSON.forEach(obsScene => {
@@ -332,9 +332,9 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
           { channel: i + 1 },
         );
 
-        this.audioService.getSource(newSource.sourceId).setMuted(audioSource.muted);
-        this.audioService.getSource(newSource.sourceId).setMul(audioSource.volume);
-        this.audioService.getSource(newSource.sourceId).setSettings({
+        this.audioService.views.getSource(newSource.sourceId).setMuted(audioSource.muted);
+        this.audioService.views.getSource(newSource.sourceId).setMul(audioSource.volume);
+        this.audioService.views.getSource(newSource.sourceId).setSettings({
           ['audioMixers']: audioSource.mixers,
           ['monitoringType']: audioSource.monitoring_type,
           ['syncOffset']: audioSource.sync / 1000000,

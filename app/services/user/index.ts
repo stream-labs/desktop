@@ -40,10 +40,16 @@ interface ISecondaryPlatformAuth {
   id: string;
 }
 
+export enum EAuthProcessState {
+  Idle = 'idle',
+  Busy = 'busy',
+}
+
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
   loginValidated: boolean;
   auth?: IUserAuth;
+  authProcessState: EAuthProcessState;
 }
 
 interface ILinkedPlatform {
@@ -139,6 +145,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     Vue.set(this.state, 'loginValidated', validated);
   }
 
+  @mutation()
+  private SET_AUTH_STATE(state: EAuthProcessState) {
+    Vue.set(this.state, 'authProcessState', state);
+  }
+
   /**
    * Checks for v1 auth schema and migrates if needed
    */
@@ -171,6 +182,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     super.init();
     this.MIGRATE_AUTH();
     this.VALIDATE_LOGIN(false);
+    this.SET_AUTH_STATE(EAuthProcessState.Idle);
   }
 
   mounted() {
@@ -218,7 +230,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    * to support name changes on Twitch.
    */
   async refreshUserInfo() {
-    if (!this.isLoggedIn()) return;
+    if (!this.isLoggedIn) return;
 
     // Make a best attempt to refresh the user data
     try {
@@ -283,7 +295,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   fetchLinkedPlatforms(): Promise<ILinkedPlatformsResponse> {
-    if (!this.isLoggedIn()) return;
+    if (!this.isLoggedIn) return;
 
     const host = this.hostsService.streamlabs;
     const headers = authorizedHeaders(this.apiToken);
@@ -301,7 +313,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    * Attempts to flush the user's session to disk if it exists
    */
   flushUserSession(): Promise<void> {
-    if (this.isLoggedIn() && this.state.auth.partition) {
+    if (this.isLoggedIn && this.state.auth.partition) {
       return new Promise(resolve => {
         const session = electron.remote.session.fromPartition(this.state.auth.partition);
 
@@ -313,7 +325,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return Promise.resolve();
   }
 
-  isLoggedIn() {
+  get isLoggedIn() {
     return !!(this.state.auth && this.state.auth.widgetToken && this.state.loginValidated);
   }
 
@@ -339,7 +351,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   get widgetToken() {
-    if (this.isLoggedIn()) {
+    if (this.isLoggedIn) {
       return this.state.auth.widgetToken;
     }
   }
@@ -348,37 +360,37 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    * Returns the auth for the primary platform
    */
   get platform() {
-    if (this.isLoggedIn()) {
+    if (this.isLoggedIn) {
       return this.state.auth.platforms[this.state.auth.primaryPlatform];
     }
   }
 
   get platformType(): TPlatform {
-    if (this.isLoggedIn()) {
+    if (this.isLoggedIn) {
       return this.state.auth.primaryPlatform;
     }
   }
 
   get username() {
-    if (this.isLoggedIn()) {
+    if (this.isLoggedIn) {
       return this.platform.username;
     }
   }
 
   get platformId() {
-    if (this.isLoggedIn()) {
+    if (this.isLoggedIn) {
       return this.platform.id;
     }
   }
 
   get channelId() {
-    if (this.isLoggedIn()) {
+    if (this.isLoggedIn) {
       return this.platform.channelId;
     }
   }
 
   recentEventsUrl() {
-    if (this.isLoggedIn()) {
+    if (this.isLoggedIn) {
       const host = this.hostsService.streamlabs;
       const token = this.widgetToken;
       const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
@@ -421,7 +433,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const uiTheme = this.customizationService.isDarkTheme ? 'night' : 'day';
     let url = `https://${this.hostsService.streamlabs}/library?mode=${uiTheme}&slobs`;
 
-    if (this.isLoggedIn()) {
+    if (this.isLoggedIn) {
       url += `&oauth_token=${this.apiToken}`;
     }
 
@@ -442,7 +454,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   async showLogin() {
-    if (this.isLoggedIn()) await this.logOut();
+    if (this.isLoggedIn) await this.logOut();
     this.onboardingService.start({ isLogin: true });
   }
 
@@ -509,19 +521,19 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    */
   async startAuth(
     platform: TPlatform,
-    onWindowShow: () => void,
-    onLoginStart: () => void,
-    onLoginFinish: (result: EPlatformCallResult) => void,
     mode: 'internal' | 'external',
     merge = false,
-  ) {
+  ): Promise<EPlatformCallResult> {
     const service = getPlatformService(platform);
     const authUrl =
       merge && service.supports('account-merging') ? service.mergeUrl : service.authUrl;
 
-    if (merge && !this.isLoggedIn()) {
+    if (merge && !this.isLoggedIn) {
       throw new Error('Account merging can only be performed while logged in');
     }
+
+    this.SET_AUTH_STATE(EAuthProcessState.Busy);
+    const onWindowShow = () => this.SET_AUTH_STATE(EAuthProcessState.Idle);
 
     const auth =
       mode === 'internal'
@@ -535,7 +547,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         : await this.authModule.startExternalAuth(authUrl, onWindowShow, merge);
         /* eslint-enable */
 
-    onLoginStart();
+    this.SET_AUTH_STATE(EAuthProcessState.Busy);
 
     let result: EPlatformCallResult;
 
@@ -549,7 +561,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       result = EPlatformCallResult.Success;
     }
 
-    defer(() => onLoginFinish(result));
+    this.SET_AUTH_STATE(EAuthProcessState.Idle);
+    return result;
   }
 
   updatePlatformToken(platform: TPlatform, token: string) {
@@ -565,7 +578,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    * we can view more detailed information.
    */
   setSentryContext() {
-    if (!this.isLoggedIn()) return;
+    if (!this.isLoggedIn) return;
 
     setSentryContext(this.getSentryContext());
 
@@ -573,7 +586,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   getSentryContext(): ISentryContext {
-    if (!this.isLoggedIn()) return null;
+    if (!this.isLoggedIn) return null;
 
     return {
       username: this.username,
@@ -617,7 +630,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const userLoginSubscription = this.userLogin.subscribe(() => doInit());
     const userLogoutSubscription = this.userLogout.subscribe(() => doDestroy());
 
-    if (this.isLoggedIn()) {
+    if (this.isLoggedIn) {
       await doInit();
     }
 

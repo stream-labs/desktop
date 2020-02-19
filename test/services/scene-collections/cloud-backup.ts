@@ -20,7 +20,7 @@ test('Scene-collections cloud-backup', async t => {
   sceneBuilder.build(sketch);
 
   // restart the app and delete the cache dir
-  await stopApp(true);
+  await stopApp(t, true);
   await startApp(t);
 
   // since we deleted the cache dir we need to login again
