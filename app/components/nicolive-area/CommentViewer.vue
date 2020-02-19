@@ -25,7 +25,7 @@
         <div class="comment-body">
           {{ pinnedItemComtent(pinnedComment) }}
         </div>
-        <div class="close"><i class="icon-close icon-btn" @click="pinnedComment = null"></i></div>
+        <div class="close"><i class="icon-close icon-btn" @click="pin(null)"></i></div>
       </div>
       <button type="button" @click="scrollToLatest" class="scroll-to-latest" v-if="!isLatestVisible && items.length > 0">最新のコメントへ移動<i class="icon-down-arrow"></i></button>
     </div>

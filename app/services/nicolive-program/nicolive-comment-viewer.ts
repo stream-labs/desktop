@@ -32,6 +32,7 @@ export type WrappedChat = {
 interface INicoliveCommentViewerState {
   messages: WrappedChat[];
   popoutMessages: WrappedChat[];
+  pinnedMessage: WrappedChat | null;
 }
 
 export class NicoliveCommentViewerService extends StatefulService<INicoliveCommentViewerState> {
@@ -41,6 +42,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   static initialState: INicoliveCommentViewerState = {
     messages: [],
     popoutMessages: [],
+    pinnedMessage: null,
   };
 
   get items() {
@@ -73,7 +75,8 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
     roomURL,
     roomThreadID,
   }: MessageServerConfig): void {
-    this.reset();
+    this.unsubscribe();
+    this.clearList();
 
     // 予約番組は30分前にならないとURLが来ない
     if (!roomURL || !roomThreadID) return;
@@ -83,13 +86,9 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   }
 
   refreshConnection() {
-    this.reset();
-    this.connect();
-  }
-
-  private reset() {
     this.unsubscribe();
-    this.clearState();
+    this.clearList();
+    this.connect();
   }
 
   private unsubscribe() {
@@ -165,13 +164,17 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
     });
   }
 
-  private clearState() {
+  private clearList() {
     this.SET_STATE({ messages: [], popoutMessages: [] });
   }
 
+  pinComment(pinnedMessage: WrappedChat | null) {
+    this.SET_STATE({ pinnedMessage });
+  }
+
   @mutation()
-  private SET_STATE(nextState: INicoliveCommentViewerState) {
-    this.state = nextState;
+  private SET_STATE(nextState: Partial<INicoliveCommentViewerState>) {
+    this.state = { ...this.state, ...nextState };
   }
 
 }

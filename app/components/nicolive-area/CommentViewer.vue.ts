@@ -62,8 +62,11 @@ export default class CommentViewer extends Vue {
   isFilterOpened = false;
 
   isLocalFilterOpened = false;
-  pinnedComment: WrappedChat = null;
   isLatestVisible = true;
+
+  get pinnedComment(): WrappedChat | null {
+    return this.nicoliveCommentViewerService.state.pinnedMessage;
+  }
 
   private get applyLocalFilter() {
     return ({ value }: WrappedChat) => this.nicoliveCommentLocalFilterService.filter(value);
@@ -74,9 +77,9 @@ export default class CommentViewer extends Vue {
     scrollEl.scrollTop = scrollEl.scrollHeight;
   }
 
-  pin(item: WrappedChat): void {
-    if (item.type === 'normal') {
-      this.pinnedComment = item;
+  pin(item: WrappedChat | null): void {
+    if (!item || item.type === 'normal') {
+      this.nicoliveCommentViewerService.pinComment(item);
     }
   }
 
