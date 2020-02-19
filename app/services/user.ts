@@ -173,7 +173,15 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
   }
 
-  private login(service: IPlatformService, auth: IPlatformAuth) {
+  get isPremium() {
+    if (this.isLoggedIn()) {
+      return this.state.auth.platform.isPremium;
+    }
+  }
+
+  private async login(service: IPlatformService, rawAuth: IPlatformAuth) {
+    const isPremium = await service.isPremium(rawAuth.platform.token);
+    const auth = { ...rawAuth, platform: { ...rawAuth.platform, isPremium } };
     this.LOGIN(auth);
     this.userLogin.next(auth);
     this.setRavenContext();
@@ -223,16 +231,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       }
     });
 
-    authWindow.webContents.on('did-navigate', (e, url) => {
+    authWindow.webContents.on('did-navigate', async (e, url) => {
       const parsed = this.parseAuthFromUrl(url);
       console.log('parsed = ' + JSON.stringify(parsed)); // DEBUG
 
       if (parsed) {
         // OAuthの認可が確認できたとき
-        authWindow.close();
-        this.login(service, parsed);
+        await this.login(service, parsed);
 
         onAuthFinish();
+        authWindow.close();
       } else {
         // 未ログイン時のログイン画面、または認可画面のとき
         authWindow.show();

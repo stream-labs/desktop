@@ -10,7 +10,7 @@ export class HostsService extends Service {
     return 'https://account.nicovideo.jp';
   }
   get niconicoOAuth() {
-    return 'https://oauth.nicovideo.jp/oauth2';
+    return 'https://oauth.nicovideo.jp';
   }
   get niconicoFlapi() {
     return 'http://flapi.nicovideo.jp/api';
