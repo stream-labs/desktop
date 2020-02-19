@@ -7,7 +7,7 @@ import { ServicesManager } from '../services-manager';
 import { IMutation } from 'services/api/jsonrpc';
 import Util from 'services/utils';
 import { InternalApiService } from 'services/api/internal-api';
-import { InternalApiClient } from '../services/api/internal-api-client';
+import cloneDeep from 'lodash/cloneDeep';
 
 Vue.use(Vuex);
 
@@ -20,6 +20,7 @@ const mutations = {
   BULK_LOAD_STATE(state: any, data: any) {
     each(data.state, (value, key) => {
       state[key] = value;
+      state.bulkLoadFinished = true;
     });
   },
 };
@@ -29,15 +30,10 @@ const actions = {};
 const plugins: any[] = [];
 
 let mutationId = 1;
-let makeStoreReady: Function;
-let storeCanReceiveMutations = Util.isMainWindow();
+const isWorkerWindow = Util.isWorkerWindow();
+let storeCanReceiveMutations = isWorkerWindow;
 
-const storeReady = new Promise<Store<any>>(resolve => {
-  makeStoreReady = resolve;
-});
-
-// This plugin will keep all vuex stores in sync via
-// IPC with the main process.
+// This plugin will keep all vuex stores in sync via IPC
 plugins.push((store: Store<any>) => {
   store.subscribe((mutation: Dictionary<any>) => {
     const internalApiService: InternalApiService = InternalApiService.instance;
@@ -48,44 +44,44 @@ plugins.push((store: Store<any>) => {
         payload: mutation.payload,
       };
       internalApiService.handleMutation(mutationToSend);
-      ipcRenderer.send('vuex-mutation', JSON.stringify(mutationToSend));
+      sendMutationToRendererWindows(mutationToSend);
     }
   });
 
-  // Only the main window should ever receive this
+  // Only the worker window should ever receive this
   ipcRenderer.on('vuex-sendState', (event: Electron.Event, windowId: number) => {
     const win = remote.BrowserWindow.fromId(windowId);
+    flushMutations();
     win.webContents.send('vuex-loadState', JSON.stringify(store.state));
   });
 
-  // Only child windows should ever receive this
+  // Only renderer windows should ever receive this
   ipcRenderer.on('vuex-loadState', (event: Electron.Event, state: any) => {
     store.commit('BULK_LOAD_STATE', {
       state: JSON.parse(state),
       __vuexSyncIgnore: true,
     });
 
-    // child window can't receive mutations until BULK_LOAD_STATE event
+    // renderer windows can't receive mutations until after the BULK_LOAD_STATE event
     storeCanReceiveMutations = true;
-
-    makeStoreReady(store);
   });
 
   // All windows can receive this
   ipcRenderer.on('vuex-mutation', (event: Electron.Event, mutationString: string) => {
     if (!storeCanReceiveMutations) return;
 
-    const mutation = JSON.parse(mutationString);
+    const mutations = JSON.parse(mutationString);
+    for (const mutation of mutations) {
+      // for worker window commit mutation directly
+      if (isWorkerWindow) {
+        commitMutation(mutation);
+        return;
+      }
 
-    // for main window commit mutation directly
-    if (Util.isMainWindow()) {
-      commitMutation(mutation);
-      return;
+      // for renderer windows commit mutations via api-client
+      const servicesManager: ServicesManager = ServicesManager.instance;
+      servicesManager.internalApiClient.handleMutation(mutation);
     }
-
-    // for child and one-offs windows commit mutations via api-client
-    const servicesManager: ServicesManager = ServicesManager.instance;
-    servicesManager.internalApiClient.handleMutation(mutation);
   });
 
   ipcRenderer.send('vuex-register');
@@ -93,9 +89,13 @@ plugins.push((store: Store<any>) => {
 
 let store: Store<any> = null;
 
-export function createStore(): Promise<Store<any>> {
+export function createStore(): Store<any> {
   const statefulServiceModules = {};
   const servicesManager: ServicesManager = ServicesManager.instance;
+
+  // TODO: This is bad and I should feel bad
+  window['servicesManager'] = servicesManager;
+
   const statefulServices = servicesManager.getStatefulServicesAndMutators();
   Object.keys(statefulServices).forEach(serviceName => {
     statefulServiceModules[serviceName] = getModule(statefulServices[serviceName]);
@@ -108,14 +108,15 @@ export function createStore(): Promise<Store<any>> {
     modules: {
       ...statefulServiceModules,
     },
-    strict: debug,
+    strict: false,
+    state: {
+      bulkLoadFinished: !!Util.isWorkerWindow(),
+    },
   });
 
   StatefulService.setupVuexStore(store);
 
-  if (Util.isMainWindow()) makeStoreReady(store);
-
-  return storeReady;
+  return store;
 }
 
 export function commitMutation(mutation: IMutation) {
@@ -125,4 +126,22 @@ export function commitMutation(mutation: IMutation) {
       __vuexSyncIgnore: true,
     }),
   );
+}
+
+const mutationsQueue: IMutation[] = [];
+
+/**
+ * Add mutation to the queue so we can send it to the renderer windows along with other
+ * pending mutations.
+ * This prevents multiple re-renders of Vue components for each single mutation.
+ */
+function sendMutationToRendererWindows(mutation: IMutation) {
+  // we need to `cloneDeep` to avoid sending modified data from the state
+  mutationsQueue.push(cloneDeep(mutation));
+  setTimeout(() => flushMutations());
+}
+
+function flushMutations() {
+  ipcRenderer.send('vuex-mutation', JSON.stringify(mutationsQueue));
+  mutationsQueue.length = 0;
 }

@@ -19,7 +19,7 @@ export class RemoveFolderCommand extends Command {
   }
 
   execute() {
-    const folder = this.scenesService.getScene(this.sceneId).getFolder(this.folderId);
+    const folder = this.scenesService.views.getScene(this.sceneId).getFolder(this.folderId);
     this.name = folder.name;
     this.childrenIds = folder.childrenIds;
     this.parentId = folder.parentId;
@@ -27,7 +27,7 @@ export class RemoveFolderCommand extends Command {
   }
 
   rollback() {
-    const scene = this.scenesService.getScene(this.sceneId);
+    const scene = this.scenesService.views.getScene(this.sceneId);
     const folder = scene.createFolder(this.name, { id: this.folderId });
     scene.getSelection(this.childrenIds).setParent(this.folderId);
     if (this.parentId) folder.setParent(this.parentId);

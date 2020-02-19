@@ -37,11 +37,11 @@ export default class SceneSelector extends TsxComponent {
   showTransitionsTooltip = $t('Edit Scene Transitions.');
 
   get scenes() {
-    return this.scenesService.scenes.map(scene => {
+    return this.scenesService.views.scenes.map(scene => {
       return {
         title: scene.name,
         isLeaf: true,
-        isSelected: scene.id === this.scenesService.activeSceneId,
+        isSelected: scene.id === this.scenesService.views.activeSceneId,
         data: { id: scene.id },
       };
     });
@@ -51,13 +51,13 @@ export default class SceneSelector extends TsxComponent {
     const menu = new Menu();
     menu.append({
       label: $t('Duplicate'),
-      click: () => this.scenesService.showDuplicateScene(this.scenesService.activeScene.id),
+      click: () => this.scenesService.showDuplicateScene(this.scenesService.views.activeScene.id),
     });
     menu.append({
       label: $t('Rename'),
       click: () =>
         this.scenesService.showNameScene({
-          rename: this.scenesService.activeScene.id,
+          rename: this.scenesService.views.activeScene.id,
         }),
     });
     menu.append({
@@ -66,14 +66,15 @@ export default class SceneSelector extends TsxComponent {
     });
     menu.append({
       label: $t('Filters'),
-      click: () => this.sourceFiltersService.showSourceFilters(this.scenesService.activeScene.id),
+      click: () =>
+        this.sourceFiltersService.showSourceFilters(this.scenesService.views.activeScene.id),
     });
     menu.append({
       label: $t('Create Scene Projector'),
       click: () =>
         this.projectorService.createProjector(
           ERenderingMode.OBS_MAIN_RENDERING,
-          this.scenesService.activeScene.id,
+          this.scenesService.views.activeScene.id,
         ),
     });
     menu.popup();
@@ -92,7 +93,7 @@ export default class SceneSelector extends TsxComponent {
   }
 
   removeScene() {
-    const name = this.scenesService.activeScene.name;
+    const name = this.scenesService.views.activeScene.name;
     electron.remote.dialog
       .showMessageBox(electron.remote.getCurrentWindow(), {
         type: 'warning',
@@ -110,7 +111,7 @@ export default class SceneSelector extends TsxComponent {
 
         this.editorCommandsService.executeCommand(
           'RemoveSceneCommand',
-          this.scenesService.activeSceneId,
+          this.scenesService.views.activeSceneId,
         );
       });
   }
@@ -143,8 +144,8 @@ export default class SceneSelector extends TsxComponent {
   }
 
   get activeSceneId() {
-    if (this.scenesService.activeScene) {
-      return this.scenesService.activeScene.id;
+    if (this.scenesService.views.activeScene) {
+      return this.scenesService.views.activeScene.id;
     }
 
     return null;

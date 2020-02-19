@@ -33,7 +33,7 @@ export default class SideNav extends Vue {
   @Prop() locked: boolean;
 
   navigate(page: TAppPage) {
-    if (!this.userService.isLoggedIn() && page !== 'Studio') return;
+    if (!this.userService.isLoggedIn && page !== 'Studio') return;
 
     this.navigationService.navigate(page);
   }
@@ -51,12 +51,12 @@ export default class SideNav extends Vue {
   }
 
   get appStoreVisible() {
-    return this.userService.isLoggedIn() && this.platformAppsService.state.storeVisible;
+    return this.userService.isLoggedIn && this.platformAppsService.state.storeVisible;
   }
 
   get chatbotVisible() {
     return (
-      this.userService.isLoggedIn() &&
+      this.userService.isLoggedIn &&
       this.availableChatbotPlatforms.indexOf(this.userService.platform.type) !== -1
     );
   }
@@ -84,7 +84,7 @@ export default class SideNav extends Vue {
           <div
             class={cx(styles.mainCell, {
               [styles.active]: this.page === page.target,
-              [styles.disabled]: !this.userService.isLoggedIn() && page.target !== 'Studio',
+              [styles.disabled]: !this.userService.isLoggedIn && page.target !== 'Studio',
             })}
             onClick={() => this.navigate(page.target as TAppPage)}
             title={page.title}

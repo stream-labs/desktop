@@ -8,6 +8,38 @@ const singleton = Symbol('singleton');
 const singletonEnforcer = Symbol('singletonEnforcer');
 const instances: Service[] = [];
 
+/**
+ * Makes all functions return a Promise and sets other types to never
+ */
+type TPromisifyFunctions<T> = {
+  [P in keyof T]: T[P] extends (...args: any[]) => any ? TPromisifyFunction<T[P]> : never;
+};
+
+/**
+ * Wraps the return type in a promise if it doesn't already return a promise
+ */
+type TPromisifyFunction<T> = T extends (...args: infer P) => infer R
+  ? T extends (...args: any) => Promise<any>
+    ? (...args: P) => R
+    : (...args: P) => Promise<R>
+  : T;
+
+/**
+ * Makes all functions return void and sets other types to never
+ */
+export type TVoidFunctions<T> = {
+  [P in keyof T]: T[P] extends (...args: any[]) => any ? TVoidFunction<T[P]> : never;
+};
+
+/**
+ * Takes a function and makes its return type void
+ */
+type TVoidFunction<T> = T extends (...args: infer P) => any ? (...args: P) => void : T;
+
+export interface IActionsReturn<T> {
+  return: TPromisifyFunctions<T>;
+}
+
 export abstract class Service {
   static isSingleton = true;
 
@@ -98,4 +130,19 @@ export abstract class Service {
    * all observers are ready to listen service's events
    */
   protected afterInit() {}
+
+  /**
+   * Actions are a restricted way to call methods on a service.
+   * It is an async representation of the service that discards
+   * return values by default.
+   */
+  get actions(): (TVoidFunctions<this> & IActionsReturn<this>) | null {
+    // The internal API client handles this via Proxies at runtime.
+    // This getter is here for the type system only.
+    // Attempting to call actions from the worker window will result
+    // in a poor experience.
+
+    // TODO: Make a dummy synchronous aciton handler here
+    return null;
+  }
 }

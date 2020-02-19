@@ -19,7 +19,7 @@ export default class WidgetProperties extends Vue {
   @Inject() magicLinkService: MagicLinkService;
 
   get isLoggedIn() {
-    return this.userService.isLoggedIn();
+    return this.userService.isLoggedIn;
   }
 
   login() {

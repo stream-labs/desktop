@@ -33,6 +33,7 @@ import OverlayWindow from 'components/windows/OverlayWindow.vue';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
 import YoutubeStreamStatus from 'components/platforms/youtube/YoutubeStreamStatus';
+import ShareStream from 'components/windows/ShareStream';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import electron from 'electron';
 import Vue from 'vue';
@@ -116,6 +117,7 @@ export function getComponents() {
     AlertBox,
     SpinWheel,
     YoutubeStreamStatus,
+    ShareStream,
   };
 }
 
@@ -192,9 +194,9 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
   init() {
     const windows = BrowserWindow.getAllWindows();
-
-    this.windows.main = windows[0];
-    this.windows.child = windows[1];
+    this.windows.worker = windows[0];
+    this.windows.main = windows[1];
+    this.windows.child = windows[2];
 
     this.updateScaleFactor('main');
     this.updateScaleFactor('child');
@@ -244,8 +246,43 @@ export class WindowsService extends StatefulService<IWindowsState> {
       }
     }
 
-    ipcRenderer.send('window-showChildWindow', options);
-    this.updateChildWindowOptions(options);
+    const mainWindow = this.windows.main;
+    const childWindow = this.windows.child;
+
+    // Center the child window on the main window
+
+    // For some unknown reason, electron sometimes gets into a
+    // weird state where this will always fail.  Instead, we
+    // should recover by simply setting the size and forgetting
+    // about the bounds.
+    try {
+      const bounds = mainWindow.getBounds();
+      const childX = bounds.x + bounds.width / 2 - options.size.width / 2;
+      const childY = bounds.y + bounds.height / 2 - options.size.height / 2;
+
+      this.updateChildWindowOptions(options);
+      childWindow.setMinimumSize(options.size.width, options.size.height);
+      if (options.center) {
+        childWindow.setBounds({
+          x: Math.floor(childX),
+          y: Math.floor(childY),
+          width: options.size.width,
+          height: options.size.height,
+        });
+      }
+    } catch (err) {
+      console.error('Recovering from error:', err);
+
+      childWindow.setMinimumSize(options.size.width, options.size.height);
+      childWindow.setSize(options.size.width, options.size.height);
+      childWindow.center();
+      childWindow.focus();
+    }
+  }
+
+  makeChildWindowVisible() {
+    this.windows.child.show();
+    this.windows.child.restore();
   }
 
   getMainWindowDisplay() {
@@ -254,7 +291,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     return electron.remote.screen.getDisplayMatching(bounds);
   }
 
-  closeChildWindow() {
+  async closeChildWindow() {
     const windowOptions = this.state.child;
 
     // show previous window if `preservePrevWindow` flag is true
@@ -272,6 +309,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     // This prevents you from seeing the previous contents
     // of the window for a split second after it is shown.
     this.updateChildWindowOptions({ componentName: '', isShown: false });
+    await new Promise(r => setTimeout(r, 50));
 
     // Refocus the main window
     ipcRenderer.send('window-focusMain');
@@ -358,6 +396,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
   closeAllOneOffs(): Promise<any> {
     const closingPromises: Promise<void>[] = [];
     Object.keys(this.windows).forEach(windowId => {
+      if (windowId === 'worker') return;
       if (windowId === 'main') return;
       if (windowId === 'child') return;
       closingPromises.push(this.closeOneOffWindow(windowId));

@@ -75,7 +75,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
       this.startup();
     });
     this.streamingService.streamingStatusChange.subscribe(status => {
-      if (status === 'starting' && this.userService.isLoggedIn()) this.startup();
+      if (status === 'starting' && this.userService.isLoggedIn) this.startup();
     });
   }
 
@@ -373,7 +373,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   }
 
   setupFilter() {
-    const sources = this.sourcesService.getSources();
+    const sources = this.sourcesService.views.getSources();
 
     const dshowInputs = sources.filter(source => {
       return source.type === 'dshow_input';

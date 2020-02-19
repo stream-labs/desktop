@@ -55,7 +55,7 @@ export default class RecentEvents extends TsxComponent<RecentEventsProps> {
   }
 
   eventString(event: IRecentEvent) {
-    return this.recentEventsService.getEventString(event);
+    return this.recentEventsService.views.getEventString(event);
   }
 
   repeatAlert(event: IRecentEvent) {
