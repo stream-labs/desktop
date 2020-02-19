@@ -25,17 +25,6 @@ export default class TitleBar extends Vue {
     return electron.remote.getCurrentWindow().isMaximizable() !== false;
   }
 
-  handleMousedown() {
-    this.windowsService.updateStyleBlockers(Utils.getWindowId(), true);
-    // MAC-TODO: This is a bad hack - handle in a better way before we release
-    window['moveInProgress'] = true;
-  }
-
-  handleMouseup() {
-    this.windowsService.updateStyleBlockers(Utils.getWindowId(), false);
-    setTimeout(() => (window['moveInProgress'] = false), 1000);
-  }
-
   maximize() {
     const win = electron.remote.getCurrentWindow();
 

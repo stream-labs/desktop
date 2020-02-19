@@ -92,7 +92,7 @@ export default class StudioEditor extends TsxComponent {
         callback: (event: any) => {
           // Bring everything properly into focus when the display is clicked from out of focus
           electron.remote.getCurrentWindow().focus();
-          this.$refs.actualDisplay.display.setFocused(true);
+          // this.$refs.actualDisplay.display.setFocused(true);
 
           const translatedEvent = this.convertBackendEvent(event);
           if (translatedEvent) {
