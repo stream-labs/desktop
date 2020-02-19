@@ -9,7 +9,7 @@
         <button type="button" @click="currentType = 'word'" class="choice" :class="{ active: currentType === 'word' }" >コメント</button>
         <button type="button" @click="currentType = 'user'" class="choice" :class="{ active: currentType === 'user' }" >ユーザーID</button>
         <button type="button" @click="currentType = 'command'" class="choice" :class="{ active: currentType === 'command' }" >コマンド</button>
-        <div class="registrations">登録数 {{ count }}/500</div>
+        <div class="registrations">登録数 {{ count }}/{{ maxCount }}</div>
       </div>
       <form class="add-form" @submit.prevent="onAdd">
         <input type="text" ref="input" v-model="newFilterValue" :placeholder="`NGに登録する${FILTER_VALUE[currentType]}を入力`" :disabled="adding" :readonly="adding" />

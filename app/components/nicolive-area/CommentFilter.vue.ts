@@ -3,11 +3,15 @@ import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
 import { FilterType, FilterRecord } from 'services/nicolive-program/ResponseTypes';
+import { UserService } from 'services/user';
 
 @Component({})
 export default class CommentFilter extends Vue {
   @Inject()
   private nicoliveCommentFilterService: NicoliveCommentFilterService;
+
+  @Inject()
+  private userService: UserService;
 
   async reloadFilters() {
     return this.nicoliveCommentFilterService.fetchFilters();
@@ -42,6 +46,10 @@ export default class CommentFilter extends Vue {
 
   get count() {
     return this.filters.length;
+  }
+
+  get maxCount() {
+    return this.userService.isPremium ? 500 : 40;
   }
 
   adding: boolean = false;
