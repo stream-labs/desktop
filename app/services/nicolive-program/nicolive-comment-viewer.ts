@@ -77,6 +77,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   }: MessageServerConfig): void {
     this.unsubscribe();
     this.clearList();
+    this.pinComment(null);
 
     // 予約番組は30分前にならないとURLが来ない
     if (!roomURL || !roomThreadID) return;
@@ -88,6 +89,8 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   refreshConnection() {
     this.unsubscribe();
     this.clearList();
+    // 再接続ではピン止めは解除しない
+
     this.connect();
   }
 
