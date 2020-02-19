@@ -4,7 +4,7 @@ import { Component } from 'vue-property-decorator';
 import qrcode from '@xkeshi/vue-qrcode';
 import { Inject } from 'services/core/injector';
 import { ITcpServerServiceApi } from 'services/api/tcp-server/index';
-import { HostsService } from 'services/hosts';
+import { UserService } from 'services/user';
 
 interface IQRCodeData {
   addresses: string[];
@@ -22,7 +22,7 @@ export default class RemoteControlQRCodeVue extends Vue {
   private updateNetworkInterval = 0;
 
   @Inject() private tcpServerService: ITcpServerServiceApi;
-  @Inject() private hostsService: HostsService;
+  @Inject() private userService: UserService;
 
   qrcodeData: IQRCodeData = {
     token: '',
@@ -57,8 +57,11 @@ export default class RemoteControlQRCodeVue extends Vue {
 
   get qrcodeVal(): string {
     if (!this.qrcodeIsVisible) return 'nothing to show yet';
-    const encodedData = encodeURIComponent(JSON.stringify(this.qrcodeData));
-    return `https://${this.hostsService.streamlabs}/remotecontrol?data=${encodedData}`;
+    const encodedUser = encodeURIComponent(`user=${this.userService.widgetToken}`);
+    const encodedData = encodeURIComponent(
+      `&data=${encodeURIComponent(JSON.stringify(this.qrcodeData))}`,
+    );
+    return `https://streamlabs.page.link/?link=https://streamlabs.com/mobile-app?${encodedUser}${encodedData}&apn=com.streamlabs.slobsrc&isi=1476615877&ibi=com.streamlabs.slobsrc&utm_source=slobs`;
   }
 
   showQrcode() {

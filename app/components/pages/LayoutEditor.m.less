@@ -34,9 +34,12 @@
   justify-content: space-between;
   padding: 8px;
   align-items: center;
+  transition: transform 0.05s;
 
   &:hover {
     cursor: grab;
+    color: var(--title);
+    transform: translateX(-2px) translateY(-2px);
   }
 }
 
@@ -102,10 +105,16 @@
 .placement-zone.occupied {
   background-color: var(--section);
   border: 4px solid var(--button);
+  transition: border 0.3s, box-shadow 0.3s;
 
   &:hover {
     cursor: grab;
   }
+}
+
+.placement-zone.highlight {
+  border-color: (var(--paragraph));
+  box-shadow: 0 0 50px rgba(255,255,255, 0.2) inset;
 }
 
 // layout templates

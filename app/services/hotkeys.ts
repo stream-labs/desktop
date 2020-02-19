@@ -43,6 +43,11 @@ const isSourceType = (type: TSourceType) => (sourceId: string) => {
   return source ? source.type === type : false;
 };
 
+function getHotkeyHash(hotkey: IHotkey): string {
+  return `${hotkey.actionName}/${hotkey.sceneId || ''}${hotkey.sourceId ||
+    ''}/${hotkey.sceneItemId || ''}`;
+}
+
 /**
  * Process a hotkey by sending it directly to OBS backend
  *
@@ -392,7 +397,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
   }
 
   private updateRegisteredHotkeys() {
-    const hotkeys: IHotkey[] = [];
+    const hotkeys: Dictionary<IHotkey> = {};
     /*
      * Since we're hybrid at this point, track already-added hotkeys so OBS
      * hotkeys don't duplicate them
@@ -400,30 +405,33 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     const addedHotkeys = new Set<string>();
 
     Object.values(GENERAL_ACTIONS).forEach(action => {
-      hotkeys.push({
+      const hotkey: IHotkey = {
         actionName: action.name,
         bindings: [],
-      });
+      };
+      hotkeys[getHotkeyHash(hotkey)] = hotkey;
       addedHotkeys.add(action.name);
     });
 
     this.scenesService.scenes.forEach(scene => {
       Object.values(SCENE_ACTIONS).forEach(action => {
-        hotkeys.push({
+        const hotkey: IHotkey = {
           actionName: action.name,
           bindings: [],
           sceneId: scene.id,
-        });
+        };
+        hotkeys[getHotkeyHash(hotkey)] = hotkey;
         addedHotkeys.add(`${action.name}-${scene.id}`);
       });
 
       scene.getItems().forEach(sceneItem => {
         Object.values(SCENE_ITEM_ACTIONS).forEach(action => {
-          hotkeys.push({
+          const hotkey: IHotkey = {
             actionName: action.name,
             bindings: [],
             sceneItemId: sceneItem.sceneItemId,
-          });
+          };
+          hotkeys[getHotkeyHash(hotkey)] = hotkey;
           addedHotkeys.add(`${action.name}-${sceneItem.sceneItemId}`);
         });
       });
@@ -437,31 +445,25 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
         const action = this.getActionForHotkey(hotkey);
 
         if (action && action.name) {
-          const key = `${action.name}-${hotkey.ObjectName}`;
+          const hk: IHotkey = {
+            sourceId: hotkey.ObjectName,
+            actionName: action.name,
+            bindings: [] as IBinding[],
+            hotkeyId: hotkey.HotkeyId,
+          };
 
-          if (!addedHotkeys.has(key)) {
-            hotkeys.push({
-              sourceId: hotkey.ObjectName,
-              actionName: action.name,
-              bindings: [] as IBinding[],
-              hotkeyId: hotkey.HotkeyId,
-            });
-            addedHotkeys.add(key);
+          if (!hotkeys[getHotkeyHash(hk)]) {
+            hotkeys[getHotkeyHash(hk)] = hk;
           }
         }
       });
 
-    // Set up bindings from saved hotkeys
-    // This is a slow O(n^2) process, and may need to
-    // be optimized later.
     this.state.hotkeys.forEach(savedHotkey => {
-      const hotkey = hotkeys.find(blankHotkey => {
-        return this.getHotkey(blankHotkey).equals(savedHotkey);
-      });
+      const hotkey = hotkeys[getHotkeyHash(savedHotkey)];
       if (hotkey) hotkey.bindings = [].concat(savedHotkey.bindings);
     });
 
-    this.registeredHotkeys = hotkeys.map(hotkeyModel => this.getHotkey(hotkeyModel));
+    this.registeredHotkeys = Object.keys(hotkeys).map(key => this.getHotkey(hotkeys[key]));
   }
 
   getHotkey(obj: IHotkey): Hotkey {

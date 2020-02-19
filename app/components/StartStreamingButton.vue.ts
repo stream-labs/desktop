@@ -11,6 +11,7 @@ import { $t } from 'services/i18n';
 import { SourcesService } from 'services/sources';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { RestreamService } from 'services/restream';
+import { FacebookService } from 'services/platforms/facebook';
 
 @Component({})
 export default class StartStreamingButton extends Vue {
@@ -22,8 +23,15 @@ export default class StartStreamingButton extends Vue {
   @Inject() videoEncodingOptimizationService: VideoEncodingOptimizationService;
   @Inject() sourcesService: SourcesService;
   @Inject() restreamService: RestreamService;
+  @Inject() facebookService: FacebookService;
 
   @Prop() disabled: boolean;
+
+  mounted() {
+    if (this.isFacebook || this.restreamService.shouldGoLiveWithRestream) {
+      this.facebookService.fetchActivePage();
+    }
+  }
 
   async toggleStreaming() {
     if (this.streamingService.isStreaming) {
@@ -71,6 +79,9 @@ export default class StartStreamingButton extends Vue {
       }
 
       if (this.shouldShowGoLiveWindow()) {
+        if (this.hasPages) {
+          return this.streamingService.openShareStream();
+        }
         if (this.restreamService.shouldGoLiveWithRestream) {
           this.streamingService.showEditStreamInfo(this.restreamService.platforms, 0);
         } else {
@@ -83,6 +94,14 @@ export default class StartStreamingButton extends Vue {
         this.streamingService.toggleStreaming();
       }
     }
+  }
+
+  get hasPages() {
+    return (
+      (this.isFacebook || this.restreamService.shouldGoLiveWithRestream) &&
+      this.facebookService.state.facebookPages &&
+      this.facebookService.state.facebookPages.pages.length
+    );
   }
 
   get streamingStatus() {
