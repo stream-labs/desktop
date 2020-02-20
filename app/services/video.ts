@@ -8,6 +8,7 @@ import { WindowsService } from './windows';
 import { ScalableRectangle } from '../util/ScalableRectangle';
 import { Subscription } from 'rxjs';
 import { SelectionService } from 'services/selection';
+import { byOS, OS } from 'util/operating-systems';
 
 const nwr = electron.remote.require('node-window-rendering');
 
@@ -105,40 +106,6 @@ export class Display {
     this.boundClose = this.remoteClose.bind(this);
 
     this.electronWindow.on('close', this.boundClose);
-
-    // this.electronWindow.on('moved', (e: Electron.Event, newBounds: Electron.Rectangle) => {
-    //   console.log('MOVED');
-    //   this.hidden = false;
-    //   this.trackingFun();
-    // });
-
-    // MAC-TODO: Clean all this up
-    // this.focusListener = () => this.setFocused(true);
-    // this.unfocusListener = () => this.setFocused(false);
-
-    // document.addEventListener('mousedown', this.focusListener);
-    // this.electronWindow.on('focus', this.focusListener);
-    // this.electronWindow.on('blur', this.unfocusListener);
-
-    // this.movedListener = () => {
-    //   // We already knew about this move from the listeners in the TitleBar component,
-    //   // so we don't need to handle it here.
-    //   if (window['moveInProgress']) return;
-
-    //   if (!this.windowsService.state[this.slobsWindowId].hideStyleBlockers) {
-    //     this.windowsService.updateStyleBlockers(this.slobsWindowId, true);
-    //   }
-
-    //   if (this.movedTimeout) {
-    //     clearTimeout(this.movedTimeout);
-    //   }
-
-    //   this.movedTimeout = window.setTimeout(() => {
-    //     this.windowsService.updateStyleBlockers(this.slobsWindowId, false);
-    //   }, 500);
-    // };
-
-    // this.electronWindow.on('moved', this.movedListener);
   }
 
   trackingFun: () => void;
@@ -169,13 +136,21 @@ export class Display {
   }
 
   getScaledRectangle(rect: ClientRect): IRectangle {
-    const factor: number = this.windowsService.state[this.slobsWindowId].scaleFactor;
+    // On Mac we don't need to adjust for scaling factor
+    const factor = byOS({
+      [OS.Windows]: this.windowsService.state[this.slobsWindowId].scaleFactor,
+      [OS.Mac]: 1,
+    });
+
+    // Windows: Top-left origin
+    // Mac: Bottom-left origin
+    const yCoord = byOS({ [OS.Windows]: rect.top, [OS.Mac]: window.innerHeight - rect.bottom });
 
     return {
-      x: rect.left, // * factor,
-      y: window.innerHeight - rect.bottom, // * factor,
-      width: rect.width, // * factor,
-      height: rect.height, // * factor,
+      x: rect.left * factor,
+      y: yCoord * factor,
+      width: rect.width * factor,
+      height: rect.height * factor,
     };
   }
 
@@ -183,9 +158,12 @@ export class Display {
     this.currentPosition.x = x;
     this.currentPosition.y = y;
 
-    // MAC-TODO: Conditionals
-    // this.videoService.moveOBSDisplay(this.name, x, y);
-    nwr.moveWindow(x, y);
+    console.log('move', x, y);
+
+    byOS({
+      [OS.Windows]: () => this.videoService.moveOBSDisplay(this.name, x, y),
+      [OS.Mac]: () => nwr.moveWindow(x, y),
+    });
   }
 
   existingWindow = false;
@@ -193,22 +171,26 @@ export class Display {
   resize(width: number, height: number) {
     this.currentPosition.width = width;
     this.currentPosition.height = height;
+    console.log('resize', width, height);
     this.videoService.resizeOBSDisplay(this.name, width, height);
     if (this.outputRegionCallbacks.length) this.refreshOutputRegion();
 
-    // Additional steps on Mac when the display is resized
-    // MAC-TODO: OS-specific casing, proxy via services
-    if (this.existingWindow) {
-      console.log('NWR DESTROY');
-      nwr.destroyWindow();
-      nwr.destroyIOSurface();
-    }
+    byOS({
+      [OS.Windows]: () => {},
+      [OS.Mac]: () => {
+        if (this.existingWindow) {
+          console.log('NWR DESTROY');
+          nwr.destroyWindow();
+          nwr.destroyIOSurface();
+        }
 
-    console.log('NWR CREATE');
-    const surface = obs.NodeObs.OBS_content_createIOSurface(this.name);
-    nwr.createWindow();
-    nwr.connectIOSurface(surface);
-    this.existingWindow = true;
+        console.log('NWR CREATE');
+        const surface = this.videoService.createOBSIOSurface(this.name);
+        nwr.createWindow();
+        nwr.connectIOSurface(surface);
+        this.existingWindow = true;
+      },
+    });
   }
 
   remoteClose() {
@@ -220,8 +202,13 @@ export class Display {
       this.videoService.destroyOBSDisplay(this.name);
       // MAC-TODO
       console.log('NWR DESTROY');
-      nwr.destroyWindow();
-      nwr.destroyIOSurface();
+      byOS({
+        [OS.Windows]: () => {},
+        [OS.Mac]: () => {
+          nwr.destroyWindow();
+          nwr.destroyIOSurface();
+        },
+      });
       this.displayDestroyed = true;
     }
   }
@@ -382,5 +369,14 @@ export class VideoService extends Service {
 
   setOBSDisplayDrawGuideLines(name: string, drawGuideLines: boolean) {
     obs.NodeObs.OBS_content_setDrawGuideLines(name, drawGuideLines);
+  }
+
+  /**
+   * Creates a shared IOSurface for a display that can be passed to
+   * node-window-rendering for embedded in electron. (Mac Only)
+   * @param name The name of the display
+   */
+  createOBSIOSurface(name: string) {
+    return obs.NodeObs.OBS_content_createIOSurface(name);
   }
 }

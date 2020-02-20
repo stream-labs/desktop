@@ -17,7 +17,7 @@ import { v2 } from '../util/vec2';
 import { EditorCommandsService } from 'services/editor-commands';
 import { TObsFormData } from './obs/inputs/ObsInput';
 import * as obs from '../../obs-api';
-import electron from 'electron';
+import { byOS, OS } from 'util/operating-systems';
 
 interface IResizeRegion {
   name: string;
@@ -66,7 +66,6 @@ export default class StudioEditor extends TsxComponent {
 
   $refs: {
     display: HTMLDivElement;
-    actualDisplay: Display;
     studioModeContainer: HTMLDivElement; // Holds extra display for studio mode
     placeholder: HTMLDivElement; // Holds placeholder image while resizing
   };
@@ -86,59 +85,27 @@ export default class StudioEditor extends TsxComponent {
       }
     }, 1000);
 
+    // MAC-TODO: Remove this when NodeOBS no longer chokes
     obs.NodeObs.RegisterMouseEventsCallbacks([
       {
         type: 0,
-        callback: (event: any) => {
-          // Bring everything properly into focus when the display is clicked from out of focus
-          electron.remote.getCurrentWindow().focus();
-          // this.$refs.actualDisplay.display.setFocused(true);
-
-          const translatedEvent = this.convertBackendEvent(event);
-          if (translatedEvent) {
-            this.handleMouseDown(translatedEvent as MouseEvent);
-          }
-        },
+        callback: () => {},
       },
       {
         type: 1,
-        callback: (event: any) => {
-          const translatedEvent = this.convertBackendEvent(event);
-          if (translatedEvent) {
-            this.handleMouseUp(translatedEvent as MouseEvent);
-          }
-        },
+        callback: () => {},
       },
       {
         type: 2,
-        callback: (event: any) => {
-          const translatedEvent = this.convertBackendEvent(event);
-          if (translatedEvent) {
-            this.handleMouseMove(translatedEvent as MouseEvent);
-          }
-        },
+        callback: () => {},
       },
       {
         type: 3,
-        callback: (event: any) => {
-          // MAC-TODO: This can be commented back in when Eddy's cursor API is ready
-
-          // console.log('RAW MOUSE MOVE', event);
-          // const translatedEvent = this.convertBackendEvent(event);
-          // console.log('TRANLSATED MOUSE MOVE', translatedEvent);
-          // if (translatedEvent) {
-          //   this.handleMouseMove(translatedEvent as MouseEvent);
-          // }
-        },
+        callback: () => {},
       },
       {
         type: 4,
-        callback: (event: any) => {
-          const translatedEvent = this.convertBackendEvent(event);
-          if (translatedEvent) {
-            this.handleMouseEnter(translatedEvent as MouseEvent);
-          }
-        },
+        callback: () => {},
       },
     ]);
   }
@@ -146,26 +113,6 @@ export default class StudioEditor extends TsxComponent {
   destroyed() {
     clearInterval(this.sizeCheckInterval);
     obs.NodeObs.RemoveMouseEventsCallbacks();
-  }
-
-  convertBackendEvent(event: any): any {
-    if (!this.$refs.display) {
-      return null;
-    }
-
-    const rect = this.$refs.display.getBoundingClientRect();
-
-    return {
-      altKey: event.altKey,
-      ctrlKey: event.ctrlKey,
-      shiftKey: event.shiftKey,
-      button: event.button,
-      buttons: event.buttons,
-      offsetX: event.x,
-      offsetY: rect.height - event.y,
-      pageX: rect.left + event.x,
-      pageY: rect.height - event.y + rect.top,
-    };
   }
 
   get performanceMode() {
@@ -335,7 +282,8 @@ export default class StudioEditor extends TsxComponent {
   }
 
   handleMouseMove(event: MouseEvent) {
-    const factor = this.windowsService.state.main.scaleFactor;
+    // We don't need to adjust mac coordinates for scale factor
+    const factor = byOS({ [OS.Windows]: this.windowsService.state.main.scaleFactor, [OS.Mac]: 1 });
 
     const mousePosX = event.offsetX * factor - this.renderedOffsetX;
     const mousePosY = event.offsetY * factor - this.renderedOffsetY;
@@ -538,7 +486,8 @@ export default class StudioEditor extends TsxComponent {
   // Takes the given mouse event, and determines if it is
   // over the given box in base resolution space.
   isOverBox(event: MouseEvent, x: number, y: number, width: number, height: number) {
-    const factor = this.windowsService.state.main.scaleFactor;
+    // We don't need to adjust mac coordinates for scale factor
+    const factor = byOS({ [OS.Windows]: this.windowsService.state.main.scaleFactor, [OS.Mac]: 1 });
 
     const mouse = this.convertVectorToBaseSpace(event.offsetX * factor, event.offsetY * factor);
 
@@ -662,7 +611,8 @@ export default class StudioEditor extends TsxComponent {
 
   generateResizeRegionsForItem(item: SceneItem): IResizeRegion[] {
     const renderedRegionRadius = 5;
-    const factor = this.windowsService.state.main.scaleFactor;
+    // We don't need to adjust mac coordinates for scale factor
+    const factor = byOS({ [OS.Windows]: this.windowsService.state.main.scaleFactor, [OS.Mac]: 1 });
     const regionRadius = (renderedRegionRadius * factor * this.baseWidth) / this.renderedWidth;
     const width = regionRadius * 2;
     const height = regionRadius * 2;
