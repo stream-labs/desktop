@@ -16,6 +16,7 @@ test('Installing a theme', async (t: any) => {
   await logIn(t);
 
   // await app.client.waitForExist('button=themes', 5000, true);
+  console.log('try click themes');
   await app.client.click('div[title=Themes]');
   console.log('themes clicked');
 

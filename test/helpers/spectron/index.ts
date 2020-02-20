@@ -67,7 +67,7 @@ export async function focusChild(t: any) {
   // probably it's related to https://github.com/electron-userland/spectron/issues/139
   if (!mustWaitBeforeChildWindowFocus) {
     mustWaitBeforeChildWindowFocus = false;
-    await sleep(5000);
+    await sleep(5000, true);
   }
   mustWaitBeforeChildWindowFocus = true;
   await focusWindow(t, /windowId=child/);
