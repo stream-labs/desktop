@@ -433,7 +433,7 @@ if (!gotTheLock) {
 
 
   ipcMain.on('window-focusMain', () => {
-    mainWindow.focus();
+    if (!mainWindow.isDestroyed()) mainWindow.focus();
   });
 
   // The main process acts as a hub for various windows
