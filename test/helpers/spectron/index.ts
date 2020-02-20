@@ -69,7 +69,6 @@ export async function focusChild(t: any) {
     mustWaitBeforeChildWindowFocus = false;
     await sleep(5000, true);
   }
-  mustWaitBeforeChildWindowFocus = true;
   await focusWindow(t, /windowId=child/);
 }
 
@@ -142,6 +141,7 @@ export async function stopApp(t: TExecutionContext, clearCache?: boolean) {
 
 export async function restartApp(t: TExecutionContext): Promise<Application> {
   await stopAppFn(t, false);
+  mustWaitBeforeChildWindowFocus = true;
   return await startAppFn(t);
 }
 
@@ -267,12 +267,12 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     appIsRunning = false;
     await checkErrorsInLogFile();
     logFileLastReadingPos = 0;
+    mustWaitBeforeChildWindowFocus = false;
 
     if (!clearCache) return;
     await new Promise(resolve => {
       rimraf(cacheDir, resolve);
     });
-    mustWaitBeforeChildWindowFocus = true;
   };
 
   /**
