@@ -39,7 +39,9 @@ export async function focusWindow(t: any, regex: RegExp): Promise<boolean> {
 
   for (const handle of handles.value) {
     await t.context.app.client.window(handle);
+    console.log('try get url');
     const url = await t.context.app.client.getUrl();
+    console.log('got', url);
     if (url.match(regex)) {
       activeWindow = regex;
       return true;

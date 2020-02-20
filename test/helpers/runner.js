@@ -16,7 +16,7 @@ const TIMEOUT = 3; // timeout in minutes
 (function main() {
   try {
     rimraf.sync(failedTestsFile);
-    execSync(`yarn test --timeout=${TIMEOUT}m  --match="*protected*" --match="Youtube should show error*" ` + args.join(' '), { stdio: [0, 1, 2] });
+    execSync(`yarn test --timeout=${TIMEOUT}m  test-dist/test/themes.js test-dist/test/streaming.js ` + args.join(' '), { stdio: [0, 1, 2] });
   } catch (e) {
     retryTests();
   }
