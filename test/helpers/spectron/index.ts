@@ -65,7 +65,7 @@ export async function focusChild(t: any) {
   // it may cause a lost connection to the Selenium server when we call client.getUrl().
   // the workaround is to add a delay before the first time when we showed it
   // probably it's related to https://github.com/electron-userland/spectron/issues/139
-  if (!mustWaitBeforeChildWindowFocus) {
+  if (mustWaitBeforeChildWindowFocus) {
     mustWaitBeforeChildWindowFocus = false;
     await sleep(5000, true);
   }
