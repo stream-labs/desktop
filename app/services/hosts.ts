@@ -26,7 +26,7 @@ export class HostsService extends Service {
     const scopes = [
       'openid',
       'profile',
-      'user.premium'
+      'user.premium',
     ];
 
     const url = new URL('https://n-air-app.nicovideo.jp/authorize');
