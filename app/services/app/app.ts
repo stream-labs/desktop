@@ -18,7 +18,6 @@ import { FileManagerService } from 'services/file-manager';
 import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { WindowsService } from 'services/windows';
-import { OutageNotificationsService } from 'services/outage-notifications';
 import { QuestionaireService } from 'services/questionaire';
 import { InformationsService } from 'services/informations';
 
@@ -39,7 +38,6 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() shortcutsService: ShortcutsService;
   @Inject() patchNotesService: PatchNotesService;
   @Inject() windowsService: WindowsService;
-  @Inject() outageNotificationsService: OutageNotificationsService;
 
   static initialState: IAppState = {
     loading: true,

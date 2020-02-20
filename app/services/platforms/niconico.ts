@@ -149,6 +149,17 @@ export class NiconicoService extends Service implements IPlatformService {
     return this.getUserKey().then(userkey => userkey !== '');
   }
 
+  isPremium(token: string): Promise<boolean> {
+    const url = `${this.hostsService.niconicoOAuth}/v1/user/premium.json`;
+    const headers = authorizedHeaders(token);
+    const request = new Request(url, { headers });
+    return fetch(request)
+      .then(res => res.json())
+      .then(({ data }) => {
+        return data.type === 'premium';
+      });
+  }
+
   logout(): Promise<void> {
     const url = `${this.hostsService.niconicoAccount}/logout`;
     const request = new Request(url, { credentials: 'same-origin' });
@@ -298,7 +309,7 @@ export class NiconicoService extends Service implements IPlatformService {
 
   // TODO ニコニコOAuthのtoken更新に使う
   fetchNewToken(): Promise<void> {
-    const url = `${this.hostsService.niconicoOAuth}/token`;
+    const url = `${this.hostsService.niconicoOAuth}/oauth2/token`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 

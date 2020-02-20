@@ -55,7 +55,6 @@ import { ProtocolLinksService } from 'services/protocol-links';
 import { ProjectorService } from 'services/projector';
 import { ProfanityFilterService } from 'util/profanity';
 import { I18nService } from 'services/i18n';
-import { OutageNotificationsService } from 'services/outage-notifications';
 import { QuestionaireService } from 'services/questionaire';
 import { MonitorCaptureCroppingService } from 'services/sources/monitor-capture-cropping';
 import { InformationsService } from 'services/informations';
@@ -125,7 +124,6 @@ export class ServicesManager extends Service {
     TransitionsService,
     ProfanityFilterService,
     I18nService,
-    OutageNotificationsService,
     QuestionaireService,
     MonitorCaptureCroppingService,
     InformationsService,
