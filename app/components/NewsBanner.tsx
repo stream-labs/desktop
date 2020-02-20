@@ -31,9 +31,9 @@ export default class NewsBanner extends Vue {
 
   @Watch('bannerExists')
   toggleAnimation() {
-    this.windowsService.updateStyleBlockers('main', true);
+    this.windowsService.actions.updateStyleBlockers('main', true);
     window.setTimeout(() => {
-      this.windowsService.updateStyleBlockers('main', false);
+      this.windowsService.actions.updateStyleBlockers('main', false);
     }, 500);
   }
 

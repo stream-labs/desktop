@@ -61,7 +61,7 @@ export default class StreamSettings extends TsxComponent {
   }
 
   get needToShowWarning() {
-    return this.userService.isLoggedIn() && !this.protectedModeEnabled;
+    return this.userService.isLoggedIn && !this.protectedModeEnabled;
   }
 
   get canEditSettings() {

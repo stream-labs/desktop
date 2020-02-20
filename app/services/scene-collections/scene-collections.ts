@@ -300,6 +300,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     this.enableAutoSave();
   }
 
+  downloadProgress = new Subject<IDownloadProgress>();
+
   /**
    * Install a new overlay from a URL
    * @param url the URL of the overlay file
@@ -307,12 +309,13 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * @param progressCallback a callback that receives progress of the download
    */
   @RunInLoadingMode({ hideStyleBlockers: false })
-  async installOverlay(
-    url: string,
-    name: string,
-    progressCallback?: (info: IDownloadProgress) => void,
-  ) {
-    const pathName = await this.overlaysPersistenceService.downloadOverlay(url, progressCallback);
+  async installOverlay(url: string, name: string) {
+    const pathName = await this.overlaysPersistenceService.downloadOverlay(
+      url,
+      (progress: IDownloadProgress) => {
+        this.downloadProgress.next(progress);
+      },
+    );
     const collectionName = this.suggestName(name);
     await this.loadOverlay(pathName, collectionName);
   }
@@ -474,7 +477,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         await this.loadDataIntoApplicationState(data);
       }
 
-      if (this.scenesService.scenes.length === 0) {
+      if (this.scenesService.views.scenes.length === 0) {
         throw new Error('Scene collection was loaded but there were no scenes.');
       }
 
@@ -529,7 +532,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     // Check if the server has a copy
     const collection = this.collections.find(coll => coll.id === id);
 
-    if (collection.serverId && this.userService.isLoggedIn()) {
+    if (collection.serverId && this.userService.isLoggedIn) {
       const coll = await this.serverApi.fetchSceneCollection(collection.serverId);
 
       if (coll.scene_collection.data) {
@@ -564,16 +567,16 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
     // we should remove inactive scenes first to avoid the switching between scenes
     try {
-      this.scenesService.scenes.forEach(scene => {
-        if (scene.id === this.scenesService.activeSceneId) return;
+      this.scenesService.views.scenes.forEach(scene => {
+        if (scene.id === this.scenesService.views.activeSceneId) return;
         scene.remove(true);
       });
 
-      if (this.scenesService.activeScene) {
-        this.scenesService.activeScene.remove(true);
+      if (this.scenesService.views.activeScene) {
+        this.scenesService.views.activeScene.remove(true);
       }
 
-      this.sourcesService.sources.forEach(source => {
+      this.sourcesService.views.sources.forEach(source => {
         if (source.type !== 'scene') source.remove();
       });
 
@@ -675,7 +678,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     const collection = this.collections.find(coll => coll.id === id);
 
     if (collection) {
-      if (collection.serverId && this.userService.isLoggedIn()) {
+      if (collection.serverId && this.userService.isLoggedIn) {
         try {
           await this.serverApi.makeSceneCollectionActive(collection.serverId);
         } catch (e) {
@@ -918,6 +921,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   }
 
   canSync(): boolean {
-    return this.userService.isLoggedIn() && !this.appService.state.argv.includes('--nosync');
+    return this.userService.isLoggedIn && !this.appService.state.argv.includes('--nosync');
   }
 }

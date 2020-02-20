@@ -31,7 +31,7 @@ export default class Mixer extends BaseElement {
   }
 
   get audioSources() {
-    return this.audioService.getSourcesForCurrentScene().filter(source => {
+    return this.audioService.views.sourcesForCurrentScene.filter(source => {
       return !source.mixerHidden;
     });
   }

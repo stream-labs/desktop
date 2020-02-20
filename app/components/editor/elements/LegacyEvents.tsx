@@ -54,7 +54,7 @@ export default class LegacyEvents extends BaseElement {
   }
 
   get element() {
-    if (!this.userService.isLoggedIn()) {
+    if (!this.userService.isLoggedIn) {
       return (
         <div class={styles.eventContainer}>
           <div class={styles.empty}>{$t('There are no events to display')}</div>

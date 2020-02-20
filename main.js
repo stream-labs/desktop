@@ -116,10 +116,11 @@ if (!gotTheLock) {
   }
 
   // Windows
+  let workerWindow;
   let mainWindow;
   let childWindow;
 
-  // Somewhat annoyingly, this is needed so that the child window
+  // Somewhat annoyingly, this is needed so that the main window
   // can differentiate between a user closing it vs the app
   // closing the windows before exit.
   let allowMainWindowClose = false;
@@ -132,6 +133,11 @@ if (!gotTheLock) {
     childWindow.webContents.openDevTools({ mode: 'undocked' });
     mainWindow.webContents.openDevTools({ mode: 'undocked' });
   }
+
+  // TODO: Clean this up
+  // These windows are waiting for services to be ready
+  let waitingVuexStores = [];
+  let workerInitFinished = false;
 
   function startApp() {
     const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
@@ -176,6 +182,25 @@ if (!gotTheLock) {
       });
     }
 
+    workerWindow = new BrowserWindow({
+      show: false,
+      webPreferences: { nodeIntegration: true }
+    });
+
+    workerWindow.openDevTools({ mode: 'detach' });
+
+    // setTimeout(() => {
+      workerWindow.loadURL(`${global.indexUrl}?windowId=worker`);
+    // }, 10 * 1000);
+
+    // All renderers should use ipcRenderer.sendTo to send to communicate with
+    // the worker.  This still gets proxied via the main process, but eventually
+    // we will refactor this to not use electron IPC, which will make it much
+    // more efficient.
+    ipcMain.on('getWorkerWindowId', event => {
+      event.returnValue = workerWindow.webContents.id;
+    });
+
     const mainWindowState = windowStateKeeper({
       defaultWidth: 1600,
       defaultHeight: 1000
@@ -196,30 +221,29 @@ if (!gotTheLock) {
       webPreferences: { nodeIntegration: true, webviewTag: true }
     });
 
+    mainWindow.openDevTools({ mode: 'detach' });
+
+    // setTimeout(() => {
+      mainWindow.loadURL(`${global.indexUrl}?windowId=main`);
+    // }, 5 * 1000)
+
     mainWindowState.manage(mainWindow);
 
     mainWindow.removeMenu();
 
     mainWindow.openDevTools({ mode: 'detach' });
 
-    // wait until devtools will be opened and load app into window
-    // it allows to start application with clean cache
-    // and handle breakpoints on startup
-    const LOAD_DELAY = 2000;
-    setTimeout(() => {
-      mainWindow.loadURL(`${global.indexUrl}?windowId=main`);
-    }, isDevMode ? LOAD_DELAY : 0);
-
     mainWindow.on('close', e => {
       if (!shutdownStarted) {
         shutdownStarted = true;
-        mainWindow.send('shutdown');
+        workerWindow.send('shutdown');
 
-        // We give the main window 10 seconds to acknowledge a request
+        // We give the worker window 10 seconds to acknowledge a request
         // to shut down.  Otherwise, we just close it.
         appShutdownTimeout = setTimeout(() => {
           allowMainWindowClose = true;
           if (!mainWindow.isDestroyed()) mainWindow.close();
+          if (!workerWindow.isDestroyed()) workerWindow.close();
         }, 10 * 1000);
       }
 
@@ -233,12 +257,13 @@ if (!gotTheLock) {
     ipcMain.on('shutdownComplete', () => {
       allowMainWindowClose = true;
       mainWindow.close();
+      workerWindow.close();
     });
 
     // Initialize the keylistener
     // require('node-libuiohook').startHook();
 
-    mainWindow.on('closed', () => {
+    workerWindow.on('closed', () => {
       // require('node-libuiohook').stopHook();
       session.defaultSession.flushStorageData();
       session.defaultSession.cookies.flushStore(() => app.quit());
@@ -256,6 +281,8 @@ if (!gotTheLock) {
 
     childWindow.removeMenu();
 
+    childWindow.loadURL(`${global.indexUrl}?windowId=child`);
+
     // The child window is never closed, it just hides in the
     // background until it is needed.
     childWindow.on('close', e => {
@@ -270,14 +297,14 @@ if (!gotTheLock) {
     if (process.env.SLOBS_PRODUCTION_DEBUG) openDevTools();
 
     // simple messaging system for services between windows
-    // WARNING! the child window use synchronous requests and will be frozen
-    // until main window asynchronous response
+    // WARNING! renderer windows use synchronous requests and will be frozen
+    // until the worker window's asynchronous response
     const requests = { };
 
-    function sendRequest(request, event = null) {
-      mainWindow.webContents.send('services-request', request);
+    function sendRequest(request, event = null, async = false) {
+      workerWindow.webContents.send('services-request', request);
       if (!event) return;
-      requests[request.id] = Object.assign({}, request, { event });
+      requests[request.id] = Object.assign({}, request, { event, async });
     }
 
     // use this function to call some service method from the main process
@@ -292,30 +319,42 @@ if (!gotTheLock) {
       });
     }
 
-    ipcMain.on('services-ready', () => {
-      if (!childWindow.isDestroyed()) {
-        childWindow.loadURL(`${global.indexUrl}?windowId=child`);
-      }
+    ipcMain.on('AppInitFinished', () => {
+      workerInitFinished = true;
+
+      BrowserWindow.getAllWindows().forEach(window => window.send('initFinished'));
+
+      waitingVuexStores.forEach(windowId => {
+        workerWindow.webContents.send('vuex-sendState', windowId);
+      });
     });
 
     ipcMain.on('services-request', (event, payload) => {
       sendRequest(payload, event);
     });
 
+    ipcMain.on('services-request-async', (event, payload) => {
+      sendRequest(payload, event, true);
+    });
+
     ipcMain.on('services-response', (event, response) => {
       if (!requests[response.id]) return;
-      requests[response.id].event.returnValue = response;
+
+      if (requests[response.id].async) {
+        requests[response.id].event.reply('services-response-async', response);
+      } else {
+        requests[response.id].event.returnValue = response;
+      }
       delete requests[response.id];
     });
 
     ipcMain.on('services-message', (event, payload) => {
       const windows = BrowserWindow.getAllWindows();
       windows.forEach(window => {
-        if (window.id === mainWindow.id || window.isDestroyed()) return;
+        if (window.id === workerWindow.id || window.isDestroyed()) return;
         window.webContents.send('services-message', payload);
       });
     });
-
 
     if (isDevMode) {
       require('devtron').install();
@@ -358,7 +397,7 @@ if (!gotTheLock) {
 
   app.on('ready', () => {
     if (
-      !process.argv.includes('--skip-update') &&
+      !process.argv.includes('--skip-update') && false &&
       ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE)) {
       // MAC-TODO
 
@@ -384,44 +423,6 @@ if (!gotTheLock) {
 
   ipcMain.on('openDevTools', () => {
     openDevTools();
-  });
-
-  ipcMain.on('window-showChildWindow', (event, windowOptions) => {
-    if (windowOptions.size.width && windowOptions.size.height) {
-      // Center the child window on the main window
-
-      // For some unknown reason, electron sometimes gets into a
-      // weird state where this will always fail.  Instead, we
-      // should recover by simply setting the size and forgetting
-      // about the bounds.
-      try {
-        const bounds = mainWindow.getBounds();
-        const childX = (bounds.x + (bounds.width / 2)) - (windowOptions.size.width / 2);
-        const childY = (bounds.y + (bounds.height / 2)) - (windowOptions.size.height / 2);
-
-        childWindow.show();
-        childWindow.restore();
-        childWindow.setMinimumSize(windowOptions.size.width, windowOptions.size.height);
-
-        if (windowOptions.center) {
-          childWindow.setBounds({
-            x: Math.floor(childX),
-            y: Math.floor(childY),
-            width: windowOptions.size.width,
-            height: windowOptions.size.height
-          });
-        }
-      } catch (err) {
-        log('Recovering from error:', err);
-
-        childWindow.setMinimumSize(windowOptions.size.width, windowOptions.size.height);
-        childWindow.setSize(windowOptions.size.width, windowOptions.size.height);
-        childWindow.center();
-      }
-
-      childWindow.focus();
-    }
-
   });
 
 
@@ -456,11 +457,15 @@ if (!gotTheLock) {
       });
     }
 
-    if (windowId !== mainWindow.id) {
-      // Tell the mainWindow to send its current store state
+    if (windowId !== workerWindow.id) {
+      // Tell the worker window to send its current store state
       // to the newly registered window
 
-      mainWindow.webContents.send('vuex-sendState', windowId);
+      if (workerInitFinished) {
+        workerWindow.webContents.send('vuex-sendState', windowId);
+      } else {
+        waitingVuexStores.push(windowId);
+      }
     }
   });
 
@@ -544,6 +549,14 @@ if (!gotTheLock) {
     if (!mainWindow.isDestroyed()) { // main window may be destroyed on shutdown
       mainWindow.send('showErrorAlert');
     }
+  });
+
+  ipcMain.on('getWindowIds', e => {
+    e.returnValue = {
+      worker: workerWindow.id,
+      main: mainWindow.id,
+      child: childWindow.id
+    };
   });
 
   // MAC-TODO

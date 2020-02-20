@@ -219,7 +219,7 @@ export class StreamlabelsService extends Service {
   }
 
   restartSession(): Promise<boolean> {
-    if (!this.userService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn) return;
 
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/restart-session`;
     const headers = authorizedHeaders(this.userService.apiToken);
@@ -239,7 +239,7 @@ export class StreamlabelsService extends Service {
    * for a socket event
    */
   private fetchInitialData(): void {
-    if (!this.userService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn) return;
 
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/files`;
     const headers = authorizedHeaders(this.userService.apiToken);
@@ -251,7 +251,7 @@ export class StreamlabelsService extends Service {
   }
 
   private fetchSettings(): void {
-    if (!this.userService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn) return;
 
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/settings`;
     const headers = authorizedHeaders(this.userService.apiToken);

@@ -8,12 +8,17 @@ export const enum EBit {
 }
 
 export default class Utils {
-  static applyProxy(target: Object, source: Object) {
-    Object.keys(source).forEach(propName => {
+  static applyProxy(target: Object, source: Object | Function) {
+    // TODO: Figure out why this is happening
+    if (!source) return;
+
+    const sourceObj = typeof source === 'function' ? source() : source;
+
+    Object.keys(sourceObj).forEach(propName => {
       Object.defineProperty(target, propName, {
         configurable: true,
         get() {
-          return source[propName];
+          return sourceObj[propName];
         },
       });
     });
@@ -31,8 +36,18 @@ export default class Utils {
     return URI.parseQuery(URI.parse(url).query) as Dictionary<string>;
   }
 
+  static isWorkerWindow(): boolean {
+    return this.getWindowId() === 'worker';
+  }
+
   static isMainWindow(): boolean {
     return this.getWindowId() === 'main';
+  }
+
+  static getMainWindow(): Electron.BrowserWindow {
+    return electron.remote.BrowserWindow.getAllWindows().find(
+      win => Utils.getUrlParams(win.webContents.getURL()).windowId === 'main',
+    );
   }
 
   static isChildWindow(): boolean {

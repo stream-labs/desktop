@@ -32,13 +32,13 @@ export class Selection {
   };
 
   constructor(public sceneId: string, itemsList: TNodesList = []) {
-    this.select(itemsList);
+    if (sceneId && itemsList) this.select(itemsList);
   }
 
   // SELECTION METHODS
 
   getScene(): Scene {
-    return this.scenesService.getScene(this.sceneId);
+    return this.scenesService.views.getScene(this.sceneId);
   }
 
   add(itemsList: TNodesList): Selection {
@@ -216,7 +216,7 @@ export class Selection {
 
   copyTo(sceneId: string, folderId?: string, duplicateSources = false): TSceneNode[] {
     const insertedNodes: TSceneNode[] = [];
-    const scene = this.scenesService.getScene(sceneId);
+    const scene = this.scenesService.views.getScene(sceneId);
     const foldersMap: Dictionary<string> = {};
     let prevInsertedNode: TSceneNode;
     let insertedNode: TSceneNode;

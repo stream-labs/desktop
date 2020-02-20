@@ -61,12 +61,12 @@ export default class ChildWindow extends Vue {
 
   windowSizeHandler() {
     if (!this.windowsService.state.child.hideStyleBlockers) {
-      this.windowsService.updateStyleBlockers('child', true);
+      this.windowsService.actions.updateStyleBlockers('child', true);
     }
     clearTimeout(this.windowResizeTimeout);
 
     this.windowResizeTimeout = window.setTimeout(
-      () => this.windowsService.updateStyleBlockers('child', false),
+      () => this.windowsService.actions.updateStyleBlockers('child', false),
       200,
     );
   }
@@ -96,6 +96,7 @@ export default class ChildWindow extends Vue {
     // that will do a bunch of synchronous IO.
     clearTimeout(this.refreshingTimeout);
     this.refreshingTimeout = window.setTimeout(() => {
+      this.windowsService.makeChildWindowVisible();
       this.components.push({
         name: options.componentName,
         isShown: true,

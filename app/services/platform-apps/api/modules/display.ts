@@ -78,7 +78,7 @@ export class DisplayModule extends Module {
     // The display is mounted to the wrong window, destroy it
     if (
       displayEntry.display &&
-      displayEntry.display.electronWindow.id !== transform.electronWindowId
+      displayEntry.display.electronWindowId !== transform.electronWindowId
     ) {
       this.removeDisplay(displayEntry);
     }

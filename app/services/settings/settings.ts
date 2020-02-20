@@ -250,7 +250,7 @@ export class SettingsService extends StatefulService<ISettingsState>
 
   private getAudioSettingsFormData(OBSsettings: ISettingsSubCategory): ISettingsSubCategory[] {
     const audioDevices = this.audioService.getDevices();
-    const sourcesInChannels = this.sourcesService
+    const sourcesInChannels = this.sourcesService.views
       .getSources()
       .filter(source => source.channel !== void 0);
 
@@ -356,7 +356,9 @@ export class SettingsService extends StatefulService<ISettingsState>
     settingsData[0].parameters.forEach((deviceForm, ind) => {
       const channel = ind + 1;
       const isOutput = [E_AUDIO_CHANNELS.OUTPUT_1, E_AUDIO_CHANNELS.OUTPUT_2].includes(channel);
-      let source = this.sourcesService.getSources().find(source => source.channel === channel);
+      let source = this.sourcesService.views
+        .getSources()
+        .find(source => source.channel === channel);
 
       if (source && deviceForm.value === null) {
         if (deviceForm.value === null) {

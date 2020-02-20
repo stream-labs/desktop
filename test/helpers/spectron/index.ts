@@ -47,6 +47,12 @@ export async function focusWindow(t: any, regex: RegExp): Promise<boolean> {
   return false;
 }
 
+// Focuses the worker window
+// Should not usually be used
+export async function focusWorker(t: any) {
+  await focusWindow(t, /windowId=worker$/);
+}
+
 // Focuses the main window
 export async function focusMain(t: any) {
   await focusWindow(t, /windowId=main$/);
@@ -114,18 +120,18 @@ export interface ITestContext {
 export type TExecutionContext = ExecutionContext<ITestContext>;
 
 let startAppFn: (t: TExecutionContext) => Promise<any>;
-let stopAppFn: (clearCache?: boolean) => Promise<any>;
+let stopAppFn: (t: TExecutionContext, clearCache?: boolean) => Promise<any>;
 
 export async function startApp(t: TExecutionContext) {
   return startAppFn(t);
 }
 
-export async function stopApp(clearCache?: boolean) {
-  return stopAppFn(clearCache);
+export async function stopApp(t: TExecutionContext, clearCache?: boolean) {
+  return stopAppFn(t, clearCache);
 }
 
 export async function restartApp(t: TExecutionContext): Promise<Application> {
-  await stopAppFn(false);
+  await stopAppFn(t, false);
   return await startAppFn(t);
 }
 
@@ -194,6 +200,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     // allow usage of fetch-mock library
     await installFetchMock(t);
+    await focusMain(t);
 
     // Wait up to 2 seconds before giving up looking for an element.
     // This will slightly slow down negative assertions, but makes
@@ -239,9 +246,10 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     return app;
   };
 
-  stopAppFn = async function stopApp(clearCache = true) {
+  stopAppFn = async function stopApp(t: TExecutionContext, clearCache = true) {
     try {
-      await app.stop();
+      await focusMain(t);
+      t.context.app.browserWindow.close();
     } catch (e) {
       fail('Crash on shutdown');
       console.error(e);
@@ -260,6 +268,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
    * test should be considered as failed if it writes exceptions in to the log file
    */
   async function checkErrorsInLogFile() {
+    await sleep(1000); // electron-log needs some time to write down logs
     const filePath = path.join(cacheDir, 'slobs-client', 'log.log');
     if (!fs.existsSync(filePath)) return;
     const logs = fs.readFileSync(filePath).toString();
@@ -312,7 +321,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       await releaseUserInPool();
       if (options.restartAppAfterEachTest) {
         client.disconnect();
-        await stopAppFn();
+        await stopAppFn(t);
       }
     } catch (e) {
       fail('Test finalization failed');
@@ -332,7 +341,8 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
   test.after.always(async t => {
     if (!appIsRunning) return;
-    await stopAppFn();
+    t.context = context;
+    await stopAppFn(t);
     if (!testPassed) saveFailedTestsToFile([testName]);
   });
 

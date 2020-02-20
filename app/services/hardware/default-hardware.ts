@@ -65,7 +65,7 @@ export class DefaultHardwareService extends PersistentStatefulService<
   get existingVideoDeviceSources() {
     const deviceProperty = byOS({ [OS.Windows]: 'video_device_id', [OS.Mac]: 'device' });
 
-    return this.sourcesService.sources
+    return this.sourcesService.views.sources
       .filter(
         source =>
           this.videoDevices.find(device => device.id === source.getSettings()[deviceProperty]) &&
@@ -103,7 +103,7 @@ export class DefaultHardwareService extends PersistentStatefulService<
 
   get selectedAudioSource() {
     if (!this.state.defaultAudioDevice) return;
-    return this.audioService.getSource(this.state.defaultAudioDevice);
+    return this.audioService.views.getSource(this.state.defaultAudioDevice);
   }
 
   get selectedVideoSource() {
@@ -112,7 +112,7 @@ export class DefaultHardwareService extends PersistentStatefulService<
       source => source.deviceId === this.state.defaultVideoDevice,
     );
     if (existingSource) return existingSource.source;
-    return this.sourcesService.getSource(this.state.defaultVideoDevice);
+    return this.sourcesService.views.getSource(this.state.defaultVideoDevice);
   }
 
   setSceneCollectionAudio(id: string) {
@@ -120,7 +120,7 @@ export class DefaultHardwareService extends PersistentStatefulService<
       collection => collection.auto,
     );
 
-    const audioSource = this.sourcesService.sources.find(
+    const audioSource = this.sourcesService.views.sources.find(
       source => source.channel === E_AUDIO_CHANNELS.INPUT_1,
     );
     if (

@@ -43,6 +43,7 @@ export async function tryToGoLive(t: TExecutionContext, prefillData?: Dictionary
   await prepareToGoLive(t);
   await clickGoLive(t);
   await focusChild(t);
+  if (await t.context.app.client.isExisting('button=Go Live')) await click(t, 'button=Go Live');
   if (prefillData) {
     await fillForm(t, 'form[name=editStreamForm]', prefillData);
   }

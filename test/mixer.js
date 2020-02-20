@@ -20,7 +20,7 @@ test('Adding and removing a AudioSource', async t => {
   await selectSource(t, 'Source With Audio');
   await clickRemoveSource(t);
 
-  t.false(await app.client.$('.mixer-panel').isExisting('div=Source With Audio'));
+  await app.client.$('.mixer-panel').waitForExist('div=Source With Audio', 5000, true);
 });
 
 

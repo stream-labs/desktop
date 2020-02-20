@@ -18,7 +18,7 @@ export default class ObsImport extends TsxComponent<{}> {
   }
 
   get isIrlStreamer() {
-    return this.scenesService.scenes.find(scene => /irl/i.test(scene.name));
+    return this.scenesService.views.scenes.find(scene => /irl/i.test(scene.name));
   }
 
   get recommendedFeatures() {

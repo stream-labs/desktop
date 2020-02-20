@@ -154,11 +154,11 @@ export default class Studio extends TsxComponent {
   }
 
   resizeStartHandler() {
-    this.windowsService.updateStyleBlockers('main', true);
+    this.windowsService.actions.updateStyleBlockers('main', true);
   }
 
   resizeStopHandler() {
-    this.windowsService.updateStyleBlockers('main', false);
+    this.windowsService.actions.updateStyleBlockers('main', false);
   }
 
   render() {
