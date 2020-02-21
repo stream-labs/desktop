@@ -187,8 +187,6 @@ if (!gotTheLock) {
       webPreferences: { nodeIntegration: true }
     });
 
-    workerWindow.openDevTools({ mode: 'detach' });
-
     // setTimeout(() => {
       workerWindow.loadURL(`${global.indexUrl}?windowId=worker`);
     // }, 10 * 1000);
@@ -221,8 +219,6 @@ if (!gotTheLock) {
       webPreferences: { nodeIntegration: true, webviewTag: true }
     });
 
-    mainWindow.openDevTools({ mode: 'detach' });
-
     // setTimeout(() => {
       mainWindow.loadURL(`${global.indexUrl}?windowId=main`);
     // }, 5 * 1000)
@@ -230,8 +226,6 @@ if (!gotTheLock) {
     mainWindowState.manage(mainWindow);
 
     mainWindow.removeMenu();
-
-    mainWindow.openDevTools({ mode: 'detach' });
 
     mainWindow.on('close', e => {
       if (!shutdownStarted) {
