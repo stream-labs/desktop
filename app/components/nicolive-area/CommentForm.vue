@@ -1,5 +1,5 @@
 <template>
-  <form class="comment-form" @submit.prevent="sendOperatorComment($event)">
+  <div class="comment-form">
     <input
       type="text"
       ref="input"
@@ -9,12 +9,13 @@
       v-model="operatorCommentValue"
       class="comment-input"
       maxlength="80"
+      @keydown.enter="sendOperatorComment($event)"
     />
-    <button type="submit" :disabled="isCommentSending || operatorCommentValue.length === 0" class="comment-button"><i class="icon-comment-send"></i></button>
+    <button @click="sendOperatorComment($event)" :disabled="isCommentSending || operatorCommentValue.length === 0" class="comment-button"><i class="icon-comment-send"></i></button>
     <div class="comment-disabled-message" v-if="programEnded">
       番組が終了したため、放送者コメントを投稿できません
     </div>
-  </form>
+  </div>
 </template>
 
 <script lang="ts" src="./CommentForm.vue.ts"></script>
