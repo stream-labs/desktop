@@ -11,8 +11,7 @@ interface INicoliveCommentLocalFilterState {
 }
 
 const LEVEL_TABLE = {
-  // Number.NEGATIVE_INFINITY はJSONにできない
-  none: Number.MIN_SAFE_INTEGER,
+  none: Number.NEGATIVE_INFINITY,
   low: -10000,
   mid: -4800,
   high: -1000,
