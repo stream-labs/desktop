@@ -42,6 +42,7 @@ export class Display {
     width: 0,
     height: 0,
   };
+  currentScale: number;
 
   electronWindowId: number;
   slobsWindowId: string;
@@ -73,6 +74,8 @@ export class Display {
     const electronWindow = remote.BrowserWindow.fromId(this.electronWindowId);
 
     this.nativeWindowHandle = electronWindow.getNativeWindowHandle();
+
+    this.currentScale = this.windowsService.state[this.slobsWindowId].scaleFactor;
 
     this.videoService.actions.createOBSDisplay(
       this.electronWindowId,
@@ -128,11 +131,27 @@ export class Display {
     this.trackingFun = () => {
       const rect = this.getScaledRectangle(element.getBoundingClientRect());
 
+      // On Mac, we need to perform a move/resize when the display scale changes,
+      // even though from our perspective the size didn't change. We should eventually
+      // fix this on the backend.
+      const shouldMoveResize = byOS({
+        [OS.Windows]: false,
+        [OS.Mac]: () => {
+          const scaleFactor = this.windowsService.state[this.slobsWindowId].scaleFactor;
+          const ret = this.currentScale !== scaleFactor;
+
+          this.currentScale = scaleFactor;
+
+          return ret;
+        },
+      });
+
       if (
         rect.x !== this.currentPosition.x ||
         rect.y !== this.currentPosition.y ||
         rect.width !== this.currentPosition.width ||
-        rect.height !== this.currentPosition.height
+        rect.height !== this.currentPosition.height ||
+        shouldMoveResize
       ) {
         this.resize(rect.width, rect.height);
         this.move(rect.x, rect.y);
