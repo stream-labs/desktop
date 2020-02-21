@@ -1,7 +1,7 @@
 import { PersistentStatefulService } from 'services/persistent-stateful-service';
 import { mutation } from 'services/stateful-service';
 import { isAnonymous, getScore } from './ChatMessage/util';
-type WrappedChat = import('./nicolive-comment-viewer').WrappedChat;
+import { ChatMessage } from './MessageServerClient';
 
 export type NGSharingLevel = 'none' | 'low' | 'mid' | 'high';
 
@@ -48,14 +48,13 @@ export class NicoliveCommentLocalFilterService extends PersistentStatefulService
     this.SET_SHOW_ANONYMOUS(showAnonymous);
   }
 
-  get filter() {
-    return (message: WrappedChat): boolean => {
-      if (message.type === 'invisible') return false;
+  get filterFn() {
+    return (message: ChatMessage): boolean => {
 
-      const ngSharingOk = this.threshold < getScore(message.value);
+      const ngSharingOk = this.threshold < getScore(message);
       if (!ngSharingOk) return false;
 
-      const anonymityOk = this.showAnonymous || !isAnonymous(message.value);
+      const anonymityOk = this.showAnonymous || !isAnonymous(message);
       if (!anonymityOk) return false;
 
       return true;

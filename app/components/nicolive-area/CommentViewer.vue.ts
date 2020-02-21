@@ -68,8 +68,10 @@ export default class CommentViewer extends Vue {
     return this.nicoliveCommentViewerService.state.pinnedMessage;
   }
 
-  private get applyLocalFilter() {
-    return (item: WrappedChat) => this.nicoliveCommentLocalFilterService.filter(item);
+  private get filterFn() {
+    return (item: WrappedChat) => {
+      return item.type !== 'invisible' && this.nicoliveCommentLocalFilterService.filterFn(item.value);
+    };
   }
 
   scrollToLatest() {
@@ -90,7 +92,7 @@ export default class CommentViewer extends Vue {
   componentMap = componentMap;
 
   get items() {
-    return this.nicoliveCommentViewerService.items.filter(this.applyLocalFilter);
+    return this.nicoliveCommentViewerService.items.filter(this.filterFn);
   }
 
   refreshConnection() {
@@ -185,7 +187,7 @@ export default class CommentViewer extends Vue {
     if (this.isLatestVisible) {
       this.scrollToLatest();
     } else {
-      const popouts = this.nicoliveCommentViewerService.recentPopouts.filter(this.applyLocalFilter);
+      const popouts = this.nicoliveCommentViewerService.recentPopouts.filter(this.filterFn);
       const opt = {
         top: -popouts.length * 32 /* item's height */
       };
