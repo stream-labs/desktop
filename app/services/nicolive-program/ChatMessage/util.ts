@@ -12,7 +12,7 @@ export function isOperator(chat: ChatMessage): boolean {
   return checkPremiumBit(chat.premium, 0b10) || checkPremiumBit(chat.premium, 0b100);
 }
 
-export function isCommandContent(chat: ChatMessage): boolean {
+function isCommandContent(chat: ChatMessage): boolean {
   return Boolean(chat.content?.startsWith('/'));
 }
 
