@@ -70,7 +70,6 @@ export class Display {
 
     const electronWindow = remote.BrowserWindow.fromId(this.electronWindowId);
 
-    console.log('DISPLAY CREATE');
     this.videoService.actions.createOBSDisplay(
       this.electronWindowId,
       name,
@@ -162,8 +161,6 @@ export class Display {
   move(x: number, y: number) {
     this.currentPosition.x = x;
     this.currentPosition.y = y;
-
-    console.log('move', x, y);
 
     byOS({
       [OS.Windows]: () => this.videoService.actions.moveOBSDisplay(this.name, x, y),
