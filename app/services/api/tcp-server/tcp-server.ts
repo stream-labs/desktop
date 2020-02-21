@@ -17,6 +17,7 @@ import { SceneCollectionsService } from 'services/scene-collections';
 // eslint-disable-next-line no-undef
 import WritableStream = NodeJS.WritableStream;
 import { $t } from 'services/i18n';
+import { byOS, OS } from 'util/operating-systems';
 
 const net = require('net');
 
@@ -82,8 +83,14 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
 
   listen() {
     this.listenConnections(this.createTcpServer());
-    // MAC-TODO: Named pipe is windows only
-    // if (this.state.namedPipe.enabled) this.listenConnections(this.createNamedPipeServer());
+    // Named pipe is windows only
+    byOS({
+      [OS.Windows]: () => {
+        if (this.state.namedPipe.enabled) this.listenConnections(this.createNamedPipeServer());
+      },
+      [OS.Mac]: () => {},
+    });
+
     if (this.state.websockets.enabled) this.listenConnections(this.createWebsoketsServer());
   }
 
@@ -239,19 +246,18 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     });
   }
 
-  // MAC-TODO: Named pipe is windows only
-  // private createNamedPipeServer(): IServer {
-  //   const settings = this.state.namedPipe;
-  //   const server = net.createServer();
-  //   server.listen(`\\\\.\\pipe\\${settings.pipeName}`);
-  //   return {
-  //     type: 'namedPipe',
-  //     nativeServer: server,
-  //     close() {
-  //       server.close();
-  //     },
-  //   };
-  // }
+  private createNamedPipeServer(): IServer {
+    const settings = this.state.namedPipe;
+    const server = net.createServer();
+    server.listen(`\\\\.\\pipe\\${settings.pipeName}`);
+    return {
+      type: 'namedPipe',
+      nativeServer: server,
+      close() {
+        server.close();
+      },
+    };
+  }
 
   private createTcpServer(): IServer {
     const server = net.createServer();
