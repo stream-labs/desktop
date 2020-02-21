@@ -114,14 +114,14 @@ export default class CommentViewer extends Vue {
 
     const menu = new Menu();
     menu.append({
-      id: 'Copy comment',
+      id: 'Copy comment content',
       label: 'コメントをコピー',
       click: () => {
         clipboard.writeText(item.value.content);
       },
     });
     menu.append({
-      id: 'Copy id of comment owner',
+      id: 'Copy comment owner\'s id',
       label: 'ユーザーIDをコピー',
       click: () => {
         clipboard.writeText(item.value.user_id);
@@ -130,7 +130,7 @@ export default class CommentViewer extends Vue {
 
     if (item.type === 'normal') {
       menu.append({
-        id: 'Pin this comment',
+        id: 'Pin the comment',
         label: 'コメントをピン留め',
         click: () => {
           this.pin(item);
@@ -140,14 +140,14 @@ export default class CommentViewer extends Vue {
         type: 'separator',
       });
       menu.append({
-        id: 'Add ',
+        id: 'Ban comment content',
         label: 'コメントをNGに追加',
         click: () => {
           this.nicoliveCommentFilterService.addFilter({ type: 'word', body: item.value.content });
         },
       });
       menu.append({
-        id: 'Copy id of comment owner',
+        id: 'Ban comment owner',
         label: 'ユーザーIDをNGに追加',
         click: () => {
           this.nicoliveCommentFilterService.addFilter({ type: 'user', body: item.value.user_id });
