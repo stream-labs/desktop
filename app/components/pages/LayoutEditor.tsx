@@ -25,9 +25,9 @@ export default class LayoutEditor extends TsxComponent {
   @Inject() private navigationService: NavigationService;
   @Inject() private customizationService: CustomizationService;
 
-  currentLayout = this.layoutService.state.currentLayout || ELayout.Default;
+  currentLayout = this.layoutService.currentTab.currentLayout || ELayout.Default;
 
-  slottedElements = cloneDeep(this.layoutService.state.slottedElements) || {};
+  slottedElements = cloneDeep(this.layoutService.currentTab.slottedElements) || {};
 
   private highlightedSlot: LayoutSlot = null;
 
@@ -90,7 +90,7 @@ export default class LayoutEditor extends TsxComponent {
   }
 
   save() {
-    if (this.currentLayout !== this.layoutService.state.currentLayout) {
+    if (this.currentLayout !== this.layoutService.currentTab.currentLayout) {
       this.layoutService.changeLayout(this.currentLayout);
     }
     this.layoutService.setSlots(this.slottedElements);

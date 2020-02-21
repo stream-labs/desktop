@@ -13,12 +13,14 @@ import { AppService } from '../services/app';
 import { $t } from 'services/i18n';
 import NavTools from './NavTools';
 import styles from './SideNav.m.less';
+import { LayoutService } from 'services/layout';
 
 @Component({})
 export default class SideNav extends Vue {
   @Inject() appService: AppService;
   @Inject() customizationService: CustomizationService;
   @Inject() navigationService: NavigationService;
+  @Inject() layoutService: LayoutService;
   @Inject() userService: UserService;
   @Inject() windowsService: WindowsService;
   @Inject() platformAppsService: PlatformAppsService;
@@ -36,6 +38,11 @@ export default class SideNav extends Vue {
     if (!this.userService.isLoggedIn && page !== 'Studio') return;
 
     this.navigationService.navigate(page);
+  }
+
+  navigateToStudioTab(tabId: string) {
+    this.navigate('Studio');
+    this.layoutService.setCurrentTab(tabId);
   }
 
   featureIsEnabled(feature: EAvailableFeatures) {
@@ -65,11 +72,16 @@ export default class SideNav extends Vue {
     return this.appService.state.loading;
   }
 
+  get studioTabs() {
+    return Object.keys(this.layoutService.state.tabs).map(tab => ({
+      target: tab,
+      title: this.layoutService.state.tabs[tab].name,
+      icon: this.layoutService.state.tabs[tab].icon,
+    }));
+  }
+
   render() {
-    const pageData = [
-      { target: 'Studio', icon: 'icon-studio', title: $t('Editor') },
-      { target: 'BrowseOverlays', icon: 'icon-themes', title: $t('Themes') },
-    ];
+    const pageData = [{ target: 'BrowseOverlays', icon: 'icon-themes', title: $t('Themes') }];
 
     if (this.chatbotVisible) {
       pageData.push({ target: 'Chatbot', icon: 'icon-cloudbot', title: $t('Cloudbot') });
@@ -80,6 +92,18 @@ export default class SideNav extends Vue {
 
     return (
       <div class={cx('side-nav', styles.container, { [styles.leftDock]: this.leftDock })}>
+        {this.studioTabs.map(page => (
+          <div
+            class={cx(styles.mainCell, {
+              [styles.active]:
+                this.page === 'Studio' && this.layoutService.state.currentTab === page.target,
+            })}
+            onClick={() => this.navigateToStudioTab(page.target)}
+            title={page.title}
+          >
+            <i class={page.icon} />
+          </div>
+        ))}
         {pageData.map(page => (
           <div
             class={cx(styles.mainCell, {

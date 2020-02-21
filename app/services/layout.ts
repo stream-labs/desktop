@@ -3,6 +3,7 @@ import { Inject } from 'services/core';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
 import { CustomizationService } from './customization';
+import { $t } from './i18n';
 
 export enum ELayout {
   Default = 'Default',
@@ -26,10 +27,19 @@ export interface IVec2Array extends Array<IVec2Array | IVec2> {}
 
 export type LayoutSlot = '1' | '2' | '3' | '4' | '5' | '6';
 
-interface ILayoutServiceState {
+interface ILayoutState {
+  name: string;
+  icon: string;
   currentLayout: ELayout;
   slottedElements: { [value in ELayoutElement]?: LayoutSlot };
   resizes: { bar1: number; bar2?: number };
+}
+
+interface ILayoutServiceState {
+  currentTab: string;
+  tabs: {
+    [key: string]: ILayoutState;
+  };
 }
 
 const RESIZE_DEFAULTS = {
@@ -43,17 +53,24 @@ const RESIZE_DEFAULTS = {
 
 export class LayoutService extends PersistentStatefulService<ILayoutServiceState> {
   static defaultState: ILayoutServiceState = {
-    currentLayout: ELayout.Default,
-    slottedElements: {
-      [ELayoutElement.Display]: '1',
-      [ELayoutElement.Minifeed]: '2',
-      [ELayoutElement.Scenes]: '3',
-      [ELayoutElement.Sources]: '4',
-      [ELayoutElement.Mixer]: '5',
-    },
-    resizes: {
-      bar1: 156,
-      bar2: 240,
+    currentTab: 'default',
+    tabs: {
+      default: {
+        name: null,
+        icon: 'icon-studio',
+        currentLayout: ELayout.Default,
+        slottedElements: {
+          [ELayoutElement.Display]: '1',
+          [ELayoutElement.Minifeed]: '2',
+          [ELayoutElement.Scenes]: '3',
+          [ELayoutElement.Sources]: '4',
+          [ELayoutElement.Mixer]: '5',
+        },
+        resizes: {
+          bar1: 156,
+          bar2: 240,
+        },
+      },
     },
   };
 
@@ -62,6 +79,10 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
   init() {
     super.init();
 
+    // Hack since defaultState can't take a translated string
+    if (!this.state.tabs.default.name) {
+      this.SET_TAB_NAME('default', $t('Editor'));
+    }
     if (
       this.customizationService.state.legacyEvents &&
       isEqual(this.state, LayoutService.defaultState)
@@ -75,6 +96,14 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
       });
       this.customizationService.setSettings({ legacyEvents: false });
     }
+  }
+
+  get currentTab() {
+    return this.state.tabs[this.state.currentTab];
+  }
+
+  setCurrentTab(id: string) {
+    this.SET_CURRENT_TAB(id);
   }
 
   setBarResize(bar: 'bar1' | 'bar2', size: number) {
@@ -127,18 +156,28 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   @mutation()
   CHANGE_LAYOUT(layout: ELayout) {
-    this.state.currentLayout = layout;
-    this.state.slottedElements = {};
-    this.state.resizes = RESIZE_DEFAULTS[layout];
+    this.state.tabs[this.state.currentTab].currentLayout = layout;
+    this.state.tabs[this.state.currentTab].slottedElements = {};
+    this.state.tabs[this.state.currentTab].resizes = RESIZE_DEFAULTS[layout];
   }
 
   @mutation()
   SET_SLOTS(slottedElements: { [key in ELayoutElement]?: LayoutSlot }) {
-    this.state.slottedElements = slottedElements;
+    this.state.tabs[this.state.currentTab].slottedElements = slottedElements;
   }
 
   @mutation()
   SET_RESIZE(bar: 'bar1' | 'bar2', size: number) {
-    this.state.resizes[bar] = size;
+    this.state.tabs[this.state.currentTab].resizes[bar] = size;
+  }
+
+  @mutation()
+  SET_TAB_NAME(id: string, name: string) {
+    this.state.tabs[id].name = name;
+  }
+
+  @mutation()
+  SET_CURRENT_TAB(id: string) {
+    this.state.currentTab = id;
   }
 }

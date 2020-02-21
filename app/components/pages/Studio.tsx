@@ -55,17 +55,17 @@ export default class Studio extends TsxComponent {
   }
 
   get resizes() {
-    return this.layoutService.state.resizes;
+    return this.layoutService.currentTab.resizes;
   }
 
   get isColumns() {
     return [ELayout.TwoPane, ELayout.Triplets, ELayout.OnePane].includes(
-      this.layoutService.state.currentLayout,
+      this.layoutService.currentTab.currentLayout,
     );
   }
 
   get slottedElements() {
-    return this.layoutService.state.slottedElements;
+    return this.layoutService.currentTab.slottedElements;
   }
 
   windowResizeHandler(mins: IResizeMins, isChat?: boolean) {
@@ -162,7 +162,7 @@ export default class Studio extends TsxComponent {
   }
 
   render() {
-    const Layout = LAYOUT_MAP[this.layoutService.state.currentLayout];
+    const Layout = LAYOUT_MAP[this.layoutService.currentTab.currentLayout];
     return (
       <Layout
         resizeStartHandler={() => this.resizeStartHandler()}
@@ -180,9 +180,9 @@ export default class Studio extends TsxComponent {
         elWidth={this.elWidth}
         onTotalWidth={(slots: IVec2Array) => this.totalWidthHandler(slots)}
       >
-        {Object.keys(this.layoutService.state.slottedElements).map(widget => {
+        {Object.keys(this.layoutService.currentTab.slottedElements).map(widget => {
           const Element = COMPONENT_MAP[widget];
-          return <Element slot={this.layoutService.state.slottedElements[widget]} />;
+          return <Element slot={this.layoutService.currentTab.slottedElements[widget]} />;
         })}
       </Layout>
     );
