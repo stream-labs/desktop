@@ -33,7 +33,7 @@ import { sleep } from './helpers/sleep';
 import { getClient } from './helpers/api-client';
 import { StreamSettingsService } from '../app/services/settings/streaming';
 
-useSpectron();
+useSpectron({ pauseIfFailed: true });
 
 // TODO obtain a valid streamkey in CI
 test.skip('Streaming to Twitch without auth', async t => {
@@ -207,14 +207,17 @@ test('Stream with disabled confirmation', async t => {
 
 test('Migrate the twitch account to the protected mode', async t => {
   await logIn(t, 'twitch');
+  console.log('auth completed');
 
   // change stream key before go live
   const streamSettings = (await getClient()).getResource<StreamSettingsService>(
     'StreamSettingsService',
   );
   streamSettings.setSettings({ key: 'fake key', protectedModeMigrationRequired: true });
+  console.log('fake key applied');
 
   await restartApp(t); // restarting the app should call migration again
+  console.log('app restarted');
 
   // go live
   await tryToGoLive(t, {
@@ -222,6 +225,7 @@ test('Migrate the twitch account to the protected mode', async t => {
     game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
   });
   await waitForStreamStop(t); // can't go live with a fake key
+  console.log('stream finished');
 
   // check that settings have been switched to the Custom Ingest mode
   await showSettings(t, 'Stream');
@@ -229,6 +233,7 @@ test('Migrate the twitch account to the protected mode', async t => {
     await t.context.app.client.isVisible('button=Use recommended settings'),
     'Protected mode should be disabled',
   );
+  console.log('settings checked');
 
   // use recommended settings
   await t.context.app.client.click('button=Use recommended settings');
@@ -239,18 +244,22 @@ test('Migrate the twitch account to the protected mode', async t => {
   });
 
   await restartApp(t); // restarting the app should call migration again
+  console.log('restarted again');
   await tryToGoLive(t, {
     title: 'SLOBS Test Stream',
     game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
   });
   await waitForStreamStop(t);
+  console.log('streamed again');
 
   // check that settings have been switched to the Custom Ingest mode
   await showSettings(t, 'Stream');
+  console.log('settings are shown');
   t.true(
     await t.context.app.client.isVisible('button=Use recommended settings'),
     'Protected mode should be disabled',
   );
+  console.log('settings are shown');
 });
 
 // test scheduling for each platform
