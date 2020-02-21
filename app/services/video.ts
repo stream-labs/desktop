@@ -46,6 +46,8 @@ export class Display {
   electronWindowId: number;
   slobsWindowId: string;
 
+  nativeWindowHandle: Buffer;
+
   private readonly selectionSubscription: Subscription;
 
   sourceId: string;
@@ -69,6 +71,8 @@ export class Display {
       : obs.ERenderingMode.OBS_MAIN_RENDERING;
 
     const electronWindow = remote.BrowserWindow.fromId(this.electronWindowId);
+
+    this.nativeWindowHandle = electronWindow.getNativeWindowHandle();
 
     this.videoService.actions.createOBSDisplay(
       this.electronWindowId,
@@ -164,10 +168,7 @@ export class Display {
 
     byOS({
       [OS.Windows]: () => this.videoService.actions.moveOBSDisplay(this.name, x, y),
-      [OS.Mac]: () => {
-        const electronWindow = remote.BrowserWindow.fromId(this.electronWindowId);
-        nwr.moveWindow(electronWindow.getNativeWindowHandle(), x, y);
-      },
+      [OS.Mac]: () => nwr.moveWindow(this.nativeWindowHandle, x, y),
     });
   }
 
@@ -182,16 +183,14 @@ export class Display {
     byOS({
       [OS.Windows]: () => {},
       [OS.Mac]: () => {
-        const electronWindow = remote.BrowserWindow.fromId(this.electronWindowId);
-
         if (this.existingWindow) {
-          nwr.destroyWindow(electronWindow.getNativeWindowHandle());
-          nwr.destroyIOSurface(electronWindow.getNativeWindowHandle());
+          nwr.destroyWindow(this.nativeWindowHandle);
+          nwr.destroyIOSurface(this.nativeWindowHandle);
         }
 
         const surface = this.videoService.createOBSIOSurface(this.name);
-        nwr.createWindow(electronWindow.getNativeWindowHandle());
-        nwr.connectIOSurface(electronWindow.getNativeWindowHandle(), surface);
+        nwr.createWindow(this.nativeWindowHandle);
+        nwr.connectIOSurface(this.nativeWindowHandle, surface);
         this.existingWindow = true;
       },
     });
@@ -207,9 +206,8 @@ export class Display {
       byOS({
         [OS.Windows]: () => {},
         [OS.Mac]: () => {
-          const electronWindow = remote.BrowserWindow.fromId(this.electronWindowId);
-          nwr.destroyWindow(electronWindow.getNativeWindowHandle());
-          nwr.destroyIOSurface(electronWindow.getNativeWindowHandle());
+          nwr.destroyWindow(this.nativeWindowHandle);
+          nwr.destroyIOSurface(this.nativeWindowHandle);
         },
       });
       this.displayDestroyed = true;
