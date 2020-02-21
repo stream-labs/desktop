@@ -2,12 +2,12 @@ import { StatefulService, mutation } from 'services/stateful-service';
 import { NicoliveClient, isOk } from './NicoliveClient';
 import { FilterRecord } from './ResponseTypes';
 import { Inject } from 'util/injector';
-import { NicoliveProgramService } from './nicolive-program';
+import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
 import { map, distinctUntilChanged } from 'rxjs/operators';
 
 interface INicoliveCommentFilterState {
   filters: FilterRecord[];
-}
+};
 
 export class NicoliveCommentFilterService extends StatefulService<INicoliveCommentFilterState> {
   @Inject() private nicoliveProgramService: NicoliveProgramService;
@@ -26,6 +26,8 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
   }
 
   init() {
+    super.init();
+
     this.nicoliveProgramService.stateChange.pipe(
       map(({ programID }) => programID),
       distinctUntilChanged()
