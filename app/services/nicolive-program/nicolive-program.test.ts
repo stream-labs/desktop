@@ -203,7 +203,7 @@ test('fetchProgramで結果が空ならエラー', async () => {
   (instance as any).setState = jest.fn();
 
   await expect(instance.fetchProgram()).rejects.toMatchInlineSnapshot(`
-                              NicoliveProgramServiceFailure {
+                              NicoliveFailure {
                                 "additionalMessage": "",
                                 "method": "fetchProgram",
                                 "reason": "no_suitable_program",
@@ -278,7 +278,7 @@ test('fetchProgramで番組があったが取りに行ったらエラー', async
   (instance as any).setState = jest.fn();
 
   await expect(instance.fetchProgram()).rejects.toMatchInlineSnapshot(`
-                              NicoliveProgramServiceFailure {
+                              NicoliveFailure {
                                 "additionalMessage": "",
                                 "method": "fetchProgram",
                                 "reason": "404",
@@ -371,7 +371,7 @@ test('refreshProgram:失敗', async () => {
   (instance as any).setState = jest.fn();
 
   await expect(instance.refreshProgram()).rejects.toMatchInlineSnapshot(`
-                              NicoliveProgramServiceFailure {
+                              NicoliveFailure {
                                 "additionalMessage": "",
                                 "method": "fetchProgram",
                                 "reason": "500",
@@ -415,7 +415,7 @@ test('endProgram:失敗', async () => {
   (instance as any).setState = jest.fn();
 
   await expect(instance.endProgram()).rejects.toMatchInlineSnapshot(`
-                              NicoliveProgramServiceFailure {
+                              NicoliveFailure {
                                 "additionalMessage": "",
                                 "method": "endProgram",
                                 "reason": "500",
@@ -458,7 +458,7 @@ test('extendProgram:失敗', async () => {
   (instance as any).setState = jest.fn();
 
   await expect(instance.extendProgram()).rejects.toMatchInlineSnapshot(`
-                              NicoliveProgramServiceFailure {
+                              NicoliveFailure {
                                 "additionalMessage": "",
                                 "method": "extendProgram",
                                 "reason": "500",

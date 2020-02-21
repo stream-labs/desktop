@@ -1,10 +1,11 @@
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
-import { NicoliveProgramService, NicoliveProgramServiceFailure } from 'services/nicolive-program/nicolive-program';
+import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
 import { remote } from 'electron';
 import { $t } from 'services/i18n';
 import { StreamingService } from 'services/streaming';
+import { NicoliveFailure, openErrorDialogFromFailure } from 'services/nicolive-program/NicoliveFailure';
 
 @Component({})
 export default class ProgramInfo extends Vue {
@@ -22,8 +23,8 @@ export default class ProgramInfo extends Vue {
       this.isCreating = true;
       return await this.nicoliveProgramService.createProgram();
     } catch (caught) {
-      if (caught instanceof NicoliveProgramServiceFailure) {
-        await NicoliveProgramService.openErrorDialogFromFailure(caught);
+      if (caught instanceof NicoliveFailure) {
+        await openErrorDialogFromFailure(caught);
       } else {
         throw caught;
       }
@@ -39,8 +40,8 @@ export default class ProgramInfo extends Vue {
       this.isFetching = true;
       await this.nicoliveProgramService.fetchProgram();
     } catch (caught) {
-      if (caught instanceof NicoliveProgramServiceFailure) {
-        await NicoliveProgramService.openErrorDialogFromFailure(caught);
+      if (caught instanceof NicoliveFailure) {
+        await openErrorDialogFromFailure(caught);
       } else {
         throw caught;
       }
@@ -77,8 +78,8 @@ export default class ProgramInfo extends Vue {
         }
       }
     } catch (caught) {
-      if (caught instanceof NicoliveProgramServiceFailure) {
-        await NicoliveProgramService.openErrorDialogFromFailure(caught);
+      if (caught instanceof NicoliveFailure) {
+        await openErrorDialogFromFailure(caught);
       } else {
         throw caught;
       }
@@ -110,12 +111,12 @@ export default class ProgramInfo extends Vue {
         return await this.nicoliveProgramService.endProgram();
       }
     } catch (caught) {
-      if (caught instanceof NicoliveProgramServiceFailure) {
+      if (caught instanceof NicoliveFailure) {
         // 終了済み番組を終了しようとした場合は黙って番組情報を更新する
         if (caught.type === 'http_error' && caught.reason === '409') {
           return this.refreshProgram();
         }
-        await NicoliveProgramService.openErrorDialogFromFailure(caught);
+        await openErrorDialogFromFailure(caught);
       } else {
         throw caught;
       }
@@ -128,8 +129,8 @@ export default class ProgramInfo extends Vue {
     try {
       return await this.nicoliveProgramService.refreshProgram();
     } catch (caught) {
-      if (caught instanceof NicoliveProgramServiceFailure) {
-        await NicoliveProgramService.openErrorDialogFromFailure(caught);
+      if (caught instanceof NicoliveFailure) {
+        await openErrorDialogFromFailure(caught);
       } else {
         throw caught;
       }
