@@ -11,7 +11,12 @@ interface INicoliveCommentFilterState {
 
 export class NicoliveCommentFilterService extends StatefulService<INicoliveCommentFilterState> {
   @Inject() private nicoliveProgramService: NicoliveProgramService;
-  private client = new NicoliveClient()
+  private client = new NicoliveClient();
+
+  static initialState = {
+    filters: [] as FilterRecord[],
+  };
+
   private get programID() {
     return this.nicoliveProgramService.state.programID;
   }
@@ -25,12 +30,8 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
       map(({ programID }) => programID),
       distinctUntilChanged()
     ).subscribe(() => {
-      this.clear();
+      this.fetchFilters();
     });
-  }
-
-  clear() {
-    this.UPDATE_FILTERS([]);
   }
 
   async fetchFilters() {
