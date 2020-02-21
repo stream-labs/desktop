@@ -397,7 +397,7 @@ if (!gotTheLock) {
 
   app.on('ready', () => {
     if (
-      !process.argv.includes('--skip-update') && false &&
+      !process.argv.includes('--skip-update') &&
       ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE)) {
       // MAC-TODO
 
