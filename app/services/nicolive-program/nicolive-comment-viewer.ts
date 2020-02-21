@@ -1,5 +1,7 @@
 import { Inject } from 'util/injector';
-import { NicoliveProgramService } from './nicolive-program';
+import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
+import { StatefulService, mutation } from 'services/stateful-service';
+import { Subscription, EMPTY, Observable, of } from 'rxjs';
 import {
   map,
   distinctUntilChanged,
@@ -12,7 +14,6 @@ import {
   endWith,
   tap,
 } from 'rxjs/operators';
-import { StatefulService, mutation } from 'services/stateful-service';
 import {
   MessageServerClient,
   MessageServerConfig,
@@ -20,8 +21,8 @@ import {
   ChatMessage,
   isThreadMessage,
 } from './MessageServerClient';
-import { Subscription, EMPTY, Observable, of } from 'rxjs';
 import { ChatMessageType, classify } from './ChatMessage/classifier';
+import { isOperatorCommand } from './ChatMessage/util';
 
 export type WrappedChat = {
   type: ChatMessageType;
@@ -54,6 +55,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   }
 
   init() {
+    super.init();
     this.nicoliveProgramService.stateChange
       .pipe(
         map(({
@@ -141,7 +143,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
         catchError(err => of({
           type: 'n-air-emulated' as const,
           value: {
-            content: `エラーが発生しました: ${err.message}`,
+            content: `エラーが発生しました: ${err.message} ${err.stack}`,
           },
         })),
         endWith({
@@ -150,7 +152,11 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
             content: 'サーバーとの接続が終了しました',
           },
         }),
-        tap(v => v.value.content === '/disconnect' && setTimeout(() => this.unsubscribe(), 1000)),
+        tap(v => {
+          if (isOperatorCommand(v.value) && v.value.content === '/disconnect') {
+            window.setTimeout(() => this.unsubscribe(), 1000);
+          }
+        }),
         map(({ type, value }, seqId) => ({ type, value, seqId })),
         bufferTime(1000),
         filter(arr => arr.length > 0),
