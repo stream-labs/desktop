@@ -167,7 +167,10 @@ export class Display {
 
     byOS({
       [OS.Windows]: () => this.videoService.actions.moveOBSDisplay(this.name, x, y),
-      [OS.Mac]: () => nwr.moveWindow(x, y),
+      [OS.Mac]: () => {
+        const electronWindow = remote.BrowserWindow.fromId(this.electronWindowId);
+        nwr.moveWindow(electronWindow.getNativeWindowHandle(), x, y);
+      },
     });
   }
 
@@ -176,23 +179,22 @@ export class Display {
   resize(width: number, height: number) {
     this.currentPosition.width = width;
     this.currentPosition.height = height;
-    console.log('resize', width, height);
     this.videoService.actions.resizeOBSDisplay(this.name, width, height);
     if (this.outputRegionCallbacks.length) this.refreshOutputRegion();
 
     byOS({
       [OS.Windows]: () => {},
       [OS.Mac]: () => {
+        const electronWindow = remote.BrowserWindow.fromId(this.electronWindowId);
+
         if (this.existingWindow) {
-          console.log('NWR DESTROY');
-          nwr.destroyWindow();
-          nwr.destroyIOSurface();
+          nwr.destroyWindow(electronWindow.getNativeWindowHandle());
+          nwr.destroyIOSurface(electronWindow.getNativeWindowHandle());
         }
 
-        console.log('NWR CREATE');
         const surface = this.videoService.createOBSIOSurface(this.name);
-        nwr.createWindow();
-        nwr.connectIOSurface(surface);
+        nwr.createWindow(electronWindow.getNativeWindowHandle());
+        nwr.connectIOSurface(electronWindow.getNativeWindowHandle(), surface);
         this.existingWindow = true;
       },
     });
@@ -203,15 +205,14 @@ export class Display {
     if (this.trackingInterval) clearInterval(this.trackingInterval);
     if (this.selectionSubscription) this.selectionSubscription.unsubscribe();
     if (!this.displayDestroyed) {
-      console.log('DISPLAY DESTROY');
       this.videoService.actions.destroyOBSDisplay(this.name);
-      // MAC-TODO
-      console.log('NWR DESTROY');
+
       byOS({
         [OS.Windows]: () => {},
         [OS.Mac]: () => {
-          nwr.destroyWindow();
-          nwr.destroyIOSurface();
+          const electronWindow = remote.BrowserWindow.fromId(this.electronWindowId);
+          nwr.destroyWindow(electronWindow.getNativeWindowHandle());
+          nwr.destroyIOSurface(electronWindow.getNativeWindowHandle());
         },
       });
       this.displayDestroyed = true;
