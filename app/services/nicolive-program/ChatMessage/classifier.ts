@@ -12,11 +12,12 @@ export function classify(chat: ChatMessage) {
   if (isOperatorCommand(chat)) {
     const commandName = parseCommandName(chat).toLowerCase();
     switch (commandName) {
-      case 'nicoad': return 'nicoad' as const;
-      case 'gift': return 'gift' as const;
-      case 'spi': return 'spi' as const;
-      case 'quote': return 'quote' as const;
-      case 'cruise': return 'cruise' as const;
+      case 'nicoad':
+        return 'nicoad' as const;
+
+      case 'gift':
+        return 'gift' as const;
+
       case 'info': {
         const parsed = parseContent(chat);
         // コミュニティ参加通知は非表示
@@ -25,7 +26,15 @@ export function classify(chat: ChatMessage) {
         }
         return 'info' as const;
       }
-      case 'perm': return 'operator' as const;
+
+      case 'perm':
+        return 'operator' as const;
+
+      case 'spi':
+      case 'quote':
+      case 'cruise':
+        return 'system' as const;
+
       case 'disconnect': // 切断メッセージ
       case 'vote': // アンケート
       case 'coe': // 新市場
