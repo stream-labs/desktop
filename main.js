@@ -128,6 +128,7 @@ if (!gotTheLock) {
   function openDevTools() {
     childWindow.webContents.openDevTools({ mode: 'undocked' });
     mainWindow.webContents.openDevTools({ mode: 'undocked' });
+    workerWindow.webContents.openDevTools({ mode: 'undocked' });
   }
 
   // TODO: Clean this up
@@ -181,8 +182,6 @@ if (!gotTheLock) {
       show: false,
       webPreferences: { nodeIntegration: true }
     });
-
-    workerWindow.openDevTools({ mode: 'detach' });
 
     // setTimeout(() => {
       workerWindow.loadURL(`${global.indexUrl}?windowId=worker`);
@@ -240,6 +239,16 @@ if (!gotTheLock) {
       }
 
       if (!allowMainWindowClose) e.preventDefault();
+    });
+
+    // prevent worker window to be closed before other windows
+    // we need it to properly handle App.stop() in tests
+    // since it tries to close all windows
+    workerWindow.on('close', e => {
+      if (!shutdownStarted) {
+        e.preventDefault();
+        mainWindow.close();
+      }
     });
 
     ipcMain.on('acknowledgeShutdown', () => {
