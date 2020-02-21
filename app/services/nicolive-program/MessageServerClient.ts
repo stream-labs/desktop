@@ -75,16 +75,12 @@ export class MessageServerClient {
   }
 
   requestLatestMessages(thread: string = this.roomThreadID) {
-    this.joinThread(-100, thread);
-  }
-
-  joinThread(resFrom: number, thread: string = this.roomThreadID) {
     this.socket.next({
       thread: {
         thread,
         version: '20061206',
         fork: 0,
-        res_from: resFrom,
+        res_from: -100,
         with_global: 1,
         scores: 1,
         nicoru: 0
