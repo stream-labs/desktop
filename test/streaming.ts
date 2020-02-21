@@ -33,7 +33,7 @@ import { sleep } from './helpers/sleep';
 import { getClient } from './helpers/api-client';
 import { StreamSettingsService } from '../app/services/settings/streaming';
 
-useSpectron({ pauseIfFailed: true });
+useSpectron();
 
 // TODO obtain a valid streamkey in CI
 test.skip('Streaming to Twitch without auth', async t => {
