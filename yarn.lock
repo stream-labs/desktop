@@ -7854,6 +7854,11 @@ nan@^2.12.1:
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.12.1.tgz#7b1aa193e9aa86057e3c7bbd0ac448e770925552"
   integrity sha512-JY7V6lRkStKcKTvHO5NVSQRv+RV+FIL5pvDoLiAtSL9pKlC5x9PKQcZDsq7m4FO4d57mkhC6Z+QhAh3Jdk5JFw==
 
+nan@^2.14.0:
+  version "2.14.0"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.0.tgz#7818f722027b2459a86f0295d434d1fc2336c52c"
+  integrity sha512-INOFj37C7k3AfaNTtX8RhsTw7qRy7eLET14cROi9+5HAVbbHuIWUHEauBv5qT4Av2tWasiTY1Jw6puUNqRJXQg==
+
 nan@^2.9.2:
   version "2.10.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.10.0.tgz#96d0cd610ebd58d4b4de9cc0c6828cda99c7548f"
@@ -8026,6 +8031,12 @@ node-releases@^1.1.42:
   integrity sha512-OQ/ESmUqGawI2PRX+XIRao44qWYBBfN54ImQYdWVTQqUckuejOg76ysSqDBK8NG3zwySRVnX36JwDQ6x+9GxzA==
   dependencies:
     semver "^6.3.0"
+
+"node-window-rendering@https://github.com/stream-labs/node-window-rendering/releases/download/1.0.0/iojs-v6.0.3-node-window-rendering-osx.tar.gz":
+  version "1.0.0"
+  resolved "https://github.com/stream-labs/node-window-rendering/releases/download/1.0.0/iojs-v6.0.3-node-window-rendering-osx.tar.gz#9035ef193477cde1fbe1215bf1d9fe7de6fc21ec"
+  dependencies:
+    nan "^2.14.0"
 
 nopt@^4.0.1:
   version "4.0.1"
@@ -8233,9 +8244,9 @@ object.values@^1.1.0:
     function-bind "^1.1.1"
     has "^1.0.3"
 
-"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.140-iojs-v6.0.3-osx-debug.tar.gz":
+"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.141-iojs-v6.0.3-osx-debug.tar.gz":
   version "0.3.99"
-  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.140-iojs-v6.0.3-osx-debug.tar.gz#8e1ef02aea4940b1cd6ef49632647011c0a389f8"
+  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.141-iojs-v6.0.3-osx-debug.tar.gz#f0943ca0b173958145398a81858dad98460b4bd6"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
