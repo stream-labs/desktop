@@ -32,6 +32,7 @@ test('Installing a theme', async (t: any) => {
   await app.client.click('.market-item');
   console.log('item clicked');
   // install overlay
+  await app.client.waitForVisible('button=Install Overlay');
   await app.client.click('button=Install Overlay');
   console.log('install clicked');
 
