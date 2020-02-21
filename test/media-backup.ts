@@ -20,7 +20,7 @@ useSpectron({ noSync: false });
 
 test('Media backup', async t => {
 
-  // sometimes this test caused a console error from Electron's code that is difficult to catch
+  // sometimes this test causes a console error from Electron's code that is difficult to catch
   //
   // [error] Error: Object has been destroyed
   //       at C:\agent\_work\1\s\node_modules\electron\dist\resources\electron.asar\browser\rpc-server.js:392:52
