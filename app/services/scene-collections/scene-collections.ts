@@ -35,6 +35,7 @@ import { TransitionsService } from 'services/transitions';
 import { $t } from '../i18n';
 import { StreamingService, EStreamingState } from 'services/streaming';
 import { DefaultHardwareService } from 'services/hardware';
+import Utils from 'services/utils';
 
 const uuid = window['require']('uuid/v4');
 
@@ -179,7 +180,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         await this.attemptRecovery(id);
       } else {
         console.warn(`Unsuccessful recovery of scene collection ${id} attempted`);
-        electron.remote.dialog.showMessageBox({
+        electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
           message: $t('Failed to load scene collection.  A new one will be created instead.'),
         });
         await this.create();
