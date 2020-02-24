@@ -196,10 +196,6 @@ export default class SourceSelector extends TsxComponent {
     this.selectionService.remove();
   }
 
-  isScene() {
-    return this.activeItems[0].type === 'scene';
-  }
-
   sourceProperties(nodeId: string) {
     if (!nodeId) return;
 
