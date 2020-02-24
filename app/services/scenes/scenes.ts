@@ -166,6 +166,14 @@ class ScenesViews extends ViewHandler<IScenesState> {
     }
     return null;
   }
+
+  getSceneNode(nodeId: string) {
+    for (const scene of this.scenes) {
+      const sceneNode = scene.getNode(nodeId);
+      if (sceneNode) return sceneNode;
+    }
+    return null;
+  }
 }
 
 export class ScenesService extends StatefulService<IScenesState> {
