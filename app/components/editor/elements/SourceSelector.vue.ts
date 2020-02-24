@@ -200,6 +200,9 @@ export default class SourceSelector extends TsxComponent {
     if (!nodeId) return;
 
     const node = this.scenesService.views.getSceneNode(nodeId);
+
+    if (!node) return;
+
     const item = node.isItem() ? node : node.getNestedItems()[0];
 
     if (!item) return;
