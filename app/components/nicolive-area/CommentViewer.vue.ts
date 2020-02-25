@@ -70,7 +70,7 @@ export default class CommentViewer extends Vue {
 
   private get filterFn() {
     return (item: WrappedChat) => {
-      return item.type !== 'invisible' && this.nicoliveCommentLocalFilterService.filterFn(item.value);
+      return item.type !== 'invisible' && this.nicoliveCommentLocalFilterService.filterFn(item);
     };
   }
 

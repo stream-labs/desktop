@@ -10,6 +10,14 @@ const setup = createSetupFunction({
   },
 });
 
+function makeWrapper(value: object, type: 'normal' | 'system' = 'normal') {
+  return {
+    type,
+    value,
+    seqId: 0,
+  }
+}
+
 beforeEach(() => {
   jest.doMock('services/stateful-service');
   jest.doMock('util/injector');
@@ -27,10 +35,11 @@ test('filterFn/初期値', async () => {
   const { NicoliveCommentLocalFilterService } = require('./nicolive-comment-local-filter');
   const instance = NicoliveCommentLocalFilterService.instance as NicoliveCommentLocalFilterService;
 
-  expect(instance.filterFn({})).toBe(true);
-  expect(instance.filterFn({ score: -4799 })).toBe(true);
-  expect(instance.filterFn({ score: -4800 })).toBe(false);
-  expect(instance.filterFn({ anonymity: 1 })).toBe(true);
+  expect(instance.filterFn(makeWrapper({}))).toBe(true);
+  expect(instance.filterFn(makeWrapper({ score: -4799 }))).toBe(true);
+  expect(instance.filterFn(makeWrapper({ score: -4800 }))).toBe(false);
+  expect(instance.filterFn(makeWrapper({ anonymity: 1 }))).toBe(true);
+  expect(instance.filterFn(makeWrapper({ anonymity: 1 }, 'system'))).toBe(true);
 });
 
 test('filterFn/184非表示', async () => {
@@ -40,6 +49,7 @@ test('filterFn/184非表示', async () => {
 
   instance.showAnonymous = false;
 
-  expect(instance.filterFn({})).toBe(true);
-  expect(instance.filterFn({ anonymity: 1 })).toBe(false);
+  expect(instance.filterFn(makeWrapper({}))).toBe(true);
+  expect(instance.filterFn(makeWrapper({ anonymity: 1 }))).toBe(false);
+  expect(instance.filterFn(makeWrapper({ anonymity: 1 }, 'system'))).toBe(true);
 });
