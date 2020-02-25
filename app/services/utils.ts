@@ -180,7 +180,8 @@ export default class Utils {
   }
 
   static makeChildWindowVisible() {
-    const childWindow = BrowserWindow.getAllWindows()[2];
+    const childWindowId: number = electron.ipcRenderer.sendSync('getWindowIds').child;
+    const childWindow = BrowserWindow.fromId(childWindowId);
     childWindow.show();
     childWindow.restore();
   }

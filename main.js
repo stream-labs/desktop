@@ -563,6 +563,14 @@ if (!gotTheLock) {
     });
   });
 
+  ipcMain.on('getWindowIds', e => {
+    e.returnValue = {
+      worker: workerWindow.id,
+      main: mainWindow.id,
+      child: childWindow.id,
+    };
+  });
+
   let lastEventTime = 0;
   ipcMain.on('measure-time', (e, msg, time) => {
     const delta = lastEventTime ? time - lastEventTime : 0;
