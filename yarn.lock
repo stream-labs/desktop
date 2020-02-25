@@ -8032,9 +8032,9 @@ node-releases@^1.1.42:
   dependencies:
     semver "^6.3.0"
 
-"node-window-rendering@https://github.com/stream-labs/node-window-rendering/releases/download/1.0.0/iojs-v6.0.3-node-window-rendering-osx.tar.gz":
+"node-window-rendering@https://github.com/stream-labs/node-window-rendering/releases/download/1.0.1/iojs-v6.0.3-node-window-rendering-osx.tar.gz":
   version "1.0.0"
-  resolved "https://github.com/stream-labs/node-window-rendering/releases/download/1.0.0/iojs-v6.0.3-node-window-rendering-osx.tar.gz#9035ef193477cde1fbe1215bf1d9fe7de6fc21ec"
+  resolved "https://github.com/stream-labs/node-window-rendering/releases/download/1.0.1/iojs-v6.0.3-node-window-rendering-osx.tar.gz#a919bc12671c047256aa4332f312083d5c8d82dc"
   dependencies:
     nan "^2.14.0"
 
@@ -8244,9 +8244,9 @@ object.values@^1.1.0:
     function-bind "^1.1.1"
     has "^1.0.3"
 
-"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.141-iojs-v6.0.3-osx-release.tar.gz":
+"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.142-iojs-v6.0.3-osx-debug.tar.gz":
   version "0.3.99"
-  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.141-iojs-v6.0.3-osx-release.tar.gz#196adb52575049bba019bc4153498b3b990bd9f9"
+  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.142-iojs-v6.0.3-osx-debug.tar.gz#cded3d21fc329639550235686bd099291a2a7239"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
