@@ -8,6 +8,7 @@ import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
 import { StreamInfoService } from './stream-info';
 import { InitAfter } from './core';
+import Utils from './utils';
 
 @InitAfter('StreamInfoService')
 export class ChatService extends Service {
@@ -138,7 +139,7 @@ export class ChatService extends Service {
 
         if (parsed.hostname === 'accounts.google.com') {
           electron.remote.dialog
-            .showMessageBox({
+            .showMessageBox(Utils.getMainWindow(), {
               title: $t('YouTube Chat'),
               message: $t(
                 'This action cannot be performed inside Streamlabs OBS. To interact with chat, you can open this chat in a web browser.',
