@@ -3,9 +3,12 @@ import cx from 'classnames';
 import cloneDeep from 'lodash/cloneDeep';
 import TsxComponent from 'components/tsx-component';
 import { Component } from 'vue-property-decorator';
+import styles from './LayoutEditor.m.less';
+import AddTabModal from './AddTabModal';
+import { EInputType } from 'components/shared/inputs/index';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { Inject } from 'services/core/injector';
 import { LayoutService, ELayoutElement, ELayout, LayoutSlot } from 'services/layout';
-import styles from './LayoutEditor.m.less';
 import { $t } from 'services/i18n';
 import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
@@ -33,12 +36,14 @@ export default class LayoutEditor extends TsxComponent {
 
   get elementTitles() {
     return {
-      [ELayoutElement.Display]: $t('Stream Display'),
+      [ELayoutElement.Display]: $t('Editor Display'),
       [ELayoutElement.Minifeed]: $t('Mini Feed'),
       [ELayoutElement.Mixer]: $t('Audio Mixer'),
       [ELayoutElement.Scenes]: $t('Scene Selector'),
       [ELayoutElement.Sources]: $t('Source Selector'),
       [ELayoutElement.LegacyEvents]: $t('Legacy Events'),
+      [ELayoutElement.StreamPreview]: $t('Stream Preview'),
+      [ELayoutElement.RecordingPreview]: $t('Recording Preview'),
     };
   }
 
@@ -97,6 +102,19 @@ export default class LayoutEditor extends TsxComponent {
     this.navigationService.navigate('Studio');
   }
 
+  get tabMetadata() {
+    const tabs = this.layoutService.state.tabs;
+    return {
+      type: EInputType.list,
+      title: $t('Editing this Tab'),
+      options: Object.keys(tabs).map(tab => ({ value: tab, title: tabs[tab].name })),
+    };
+  }
+
+  setTab(tab: string) {
+    this.layoutService.setCurrentTab(tab);
+  }
+
   get sideBar() {
     return (
       <div class={styles.sideBar}>
@@ -135,10 +153,15 @@ export default class LayoutEditor extends TsxComponent {
     return (
       <div style={{ flexDirection: 'column' }}>
         <div class={styles.topBar}>
-          <div>
-            <div>{$t('Streamlabs OBS UI Customization')}</div>
-            <div>{$t('Customize the appearance of your Streamlabs OBS Editor tab')}</div>
-          </div>
+          <HFormGroup
+            value={this.layoutService.state.currentTab}
+            onInput={(tab: string) => this.setTab(tab)}
+            metadata={this.tabMetadata}
+          />
+          <button class="button button--default">
+            <i class="icon-add" />
+            {$t('Add Tab')}
+          </button>
           <button class="button button--action" onClick={() => this.save()}>
             {$t('Save Changes')}
           </button>

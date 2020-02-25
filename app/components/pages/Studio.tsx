@@ -8,6 +8,8 @@ import {
   LegacyEvents,
   MiniFeed,
   Display,
+  StreamPreview,
+  RecordingPreview,
 } from 'components/editor/elements';
 import { LayoutService, ELayoutElement, ELayout, IVec2Array } from 'services/layout';
 import { WindowsService } from 'services/windows';
@@ -21,6 +23,8 @@ const COMPONENT_MAP: Dictionary<typeof TsxComponent> = {
   [ELayoutElement.Mixer]: Mixer,
   [ELayoutElement.Scenes]: SceneSelector,
   [ELayoutElement.Sources]: SourceSelector,
+  [ELayoutElement.StreamPreview]: StreamPreview,
+  [ELayoutElement.RecordingPreview]: RecordingPreview,
 };
 
 const LAYOUT_MAP: Dictionary<typeof TsxComponent> = {

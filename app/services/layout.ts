@@ -4,6 +4,7 @@ import { PersistentStatefulService } from 'services/core/persistent-stateful-ser
 import { mutation } from 'services/core/stateful-service';
 import { CustomizationService } from './customization';
 import { $t } from './i18n';
+import uuid from 'uuid';
 
 export enum ELayout {
   Default = 'Default',
@@ -21,6 +22,8 @@ export enum ELayoutElement {
   Mixer = 'Mixer',
   Scenes = 'Scenes',
   Sources = 'Sources',
+  StreamPreview = 'StreamPreview',
+  RecordingPreview = 'RecordingPreview',
 }
 
 export interface IVec2Array extends Array<IVec2Array | IVec2> {}
@@ -118,6 +121,10 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
     this.SET_SLOTS(slottedElements);
   }
 
+  addTab(name: string, icon: string) {
+    this.ADD_TAB(name, icon);
+  }
+
   calculateColumnTotal(slots: IVec2Array) {
     let totalWidth = 0;
     slots.forEach(slot => {
@@ -179,5 +186,26 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
   @mutation()
   SET_CURRENT_TAB(id: string) {
     this.state.currentTab = id;
+  }
+
+  @mutation()
+  ADD_TAB(name: string, icon: string) {
+    this.state.tabs[uuid()] = {
+      name,
+      icon,
+      currentLayout: ELayout.Default,
+
+      slottedElements: {
+        [ELayoutElement.Display]: '1',
+        [ELayoutElement.Minifeed]: '2',
+        [ELayoutElement.Scenes]: '3',
+        [ELayoutElement.Sources]: '4',
+        [ELayoutElement.Mixer]: '5',
+      },
+      resizes: {
+        bar1: 156,
+        bar2: 240,
+      },
+    };
   }
 }
