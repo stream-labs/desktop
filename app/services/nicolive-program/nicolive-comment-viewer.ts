@@ -30,6 +30,19 @@ export type WrappedChat = {
   seqId: number;
 };
 
+function makeEmulatedChat(
+  content: string,
+  date: number = Math.floor(Date.now() / 1000)
+): Pick<WrappedChat, 'type' | 'value'> {
+  return {
+    type: 'n-air-emulated' as const,
+    value: {
+      content,
+      date,
+    },
+  }
+}
+
 interface INicoliveCommentViewerState {
   messages: WrappedChat[];
   popoutMessages: WrappedChat[];
@@ -120,41 +133,21 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
                 .pipe(
                   filter(isThreadMessage),
                   filter(msg => (msg.thread.resultcode ?? 0) !== 0),
-                  mapTo({
-                    type: 'n-air-emulated',
-                    value: {
-                      content: 'スレッドへの参加に失敗しました',
-                    },
-                  })
+                  mapTo(makeEmulatedChat('スレッドへの参加に失敗しました'))
                 );
             case 'leave_thread':
               return group$
                 .pipe(
-                  mapTo({
-                    type: 'n-air-emulated',
-                    value: {
-                      content: 'スレッドから追い出されました',
-                    },
-                  })
+                  mapTo(makeEmulatedChat('スレッドから追い出されました'))
                 );
             default: EMPTY;
           }
         }),
         catchError(err => {
           console.error(err);
-          return of({
-            type: 'n-air-emulated' as const,
-            value: {
-              content: `エラーが発生しました: ${err.message}`,
-            },
-          })
+          return of(makeEmulatedChat(`エラーが発生しました: ${err.message}`))
         }),
-        endWith({
-          type: 'n-air-emulated' as const,
-          value: {
-            content: 'サーバーとの接続が終了しました',
-          },
-        }),
+        endWith(makeEmulatedChat('サーバーとの接続が終了しました')),
         tap(v => {
           if (isOperatorCommand(v.value) && v.value.content === '/disconnect') {
             window.setTimeout(() => this.unsubscribe(), 1000);
@@ -163,7 +156,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
         map(({ type, value }, seqId) => ({ type, value, seqId })),
         bufferTime(1000),
         filter(arr => arr.length > 0),
-      ).subscribe(values => this.onMessage(values));
+      ).subscribe(values => this.onMessage(values as any));
     this.client.requestLatestMessages();
   }
 
