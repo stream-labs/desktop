@@ -33,6 +33,7 @@ import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService } from 'services/restream';
 import { ITwitchStartStreamOptions } from 'services/platforms/twitch';
 import { IFacebookStartStreamOptions } from 'services/platforms/facebook';
+import Utils from 'services/utils';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -205,7 +206,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
               } else {
                 // Restream service is down, just go live to Twitch for now
 
-                electron.remote.dialog.showMessageBox({
+                electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
                   type: 'error',
                   message: $t(
                     'Multistream is temporarily unavailable. Your stream is being sent to Twitch only.',
@@ -578,7 +579,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       this.outputErrorOpen = true;
 
       electron.remote.dialog
-        .showMessageBox({
+        .showMessageBox(Utils.getMainWindow(), {
           buttons,
           title,
           type: 'error',

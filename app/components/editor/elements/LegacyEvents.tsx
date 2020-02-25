@@ -63,7 +63,7 @@ export default class LegacyEvents extends BaseElement {
     }
 
     return (
-      <div>
+      <div style="height: 100%;">
         <BrowserView
           class={styles.eventContainer}
           src={this.userService.recentEventsUrl()}

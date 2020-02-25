@@ -248,8 +248,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
   stopAppFn = async function stopApp(t: TExecutionContext, clearCache = true) {
     try {
-      await focusMain(t);
-      t.context.app.browserWindow.close();
+      await app.stop();
     } catch (e) {
       fail('Crash on shutdown');
       console.error(e);
