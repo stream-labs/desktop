@@ -121,7 +121,7 @@ export class DefaultManager extends PropertiesManager {
   }
 
   private async downloadGoogleFont() {
-    if (this.obsSource.id !== 'text_gdiplus') return;
+    if (!['text_gdiplus', 'text_ft2_source'].includes(this.obsSource.id)) return;
 
     const settings = this.obsSource.settings;
     const newSettings: Dictionary<any> = {};
