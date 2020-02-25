@@ -562,4 +562,12 @@ if (!gotTheLock) {
       }
     });
   });
+
+  let lastEventTime = 0;
+  ipcMain.on('measure-time', (e, msg, time) => {
+    const delta = lastEventTime ? time - lastEventTime : 0;
+    lastEventTime = time;
+    if (delta > 2000) console.log('------------------');
+    console.log(msg, delta + 'ms');
+  });
 }
