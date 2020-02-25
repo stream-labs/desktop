@@ -196,30 +196,19 @@ export default class SourceSelector extends TsxComponent {
     this.selectionService.remove();
   }
 
-  isScene() {
-    return this.activeItems[0].type === 'scene';
-  }
+  sourceProperties(nodeId: string) {
+    const node =
+      this.scenesService.views.getSceneNode(nodeId) || this.selectionService.getNodes()[0];
+    const item = node.isItem() ? node : node.getNestedItems()[0];
 
-  makeSceneActive() {
-    this.scenesService.makeSceneActive(this.activeItems[0].source.sourceId);
-  }
+    if (!item) return;
 
-  sourceProperties() {
-    if (this.activeItems.length === 0) return;
-
-    if (this.isScene()) {
-      this.makeSceneActive();
+    if (item.type === 'scene') {
+      this.scenesService.actions.makeSceneActive(item.sourceId);
       return;
     }
-    if (!this.canShowProperties()) return;
 
-    const node = this.scene.state.nodes.find(
-      n => n.id === this.selectionService.state.lastSelectedId,
-    );
-
-    if (node.sceneNodeType === 'item') {
-      this.sourcesService.showSourceProperties(node.sourceId);
-    }
+    this.sourcesService.actions.showSourceProperties(item.sourceId);
   }
 
   canShowProperties(): boolean {
