@@ -86,7 +86,7 @@ export function setSentryContext(ctx: ISentryContext) {
     scope.setExtra('platform', ctx.platform);
   });
 
-  if (Utils.isMainWindow()) {
+  if (Utils.isWorkerWindow()) {
     obs.NodeObs.SetUsername(ctx.username);
   }
 }
