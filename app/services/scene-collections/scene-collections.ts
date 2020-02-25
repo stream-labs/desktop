@@ -501,7 +501,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       const backupName = `${this.activeCollection.name} - Backup`;
 
       await this.duplicate(backupName);
-      await electron.remote.dialog.showMessageBox(electron.remote.getCurrentWindow(), {
+      await electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
         title: 'Unsupported Sources',
         type: 'warning',
         message: `The scene collection you are loading has sources that are not supported by your current operating system. These sources will be removed before loading the scene collection. A backup of this collection with the original sources preserved has been created with the name: ${backupName}`,
