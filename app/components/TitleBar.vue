@@ -1,7 +1,7 @@
 <template>
 <div class="titlebar" :class="titlebarClasses">
   <img v-if="!isMac" class="titlebar-icon" src="../../media/images/icon.ico" />
-  <div class="titlebar-title">
+  <div class="titlebar-title" @dblclick="maximize">
     {{ title }}
   </div>
   <div v-if="!isMac" class="titlebar-actions">
