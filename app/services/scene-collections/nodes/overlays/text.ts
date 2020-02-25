@@ -58,7 +58,8 @@ export class TextNode extends Node<ISchema, IContext> {
         input.update({
           color1: this.data.settings.color,
           // MAC-TODO: Support Google fonts on freetype
-          font: { ...input.settings.font, size: this.data.settings.font.size },
+          // font: { ...input.settings.font, size: this.data.settings.font.size },
+          font: this.data.settings.font,
           text: this.data.settings.text,
         });
       },

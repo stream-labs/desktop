@@ -6,7 +6,7 @@ import { SourcesService } from '../../../services/sources';
 import { ObsInput, IGoogleFont } from './ObsInput';
 import ObsFontSizeSelector from './ObsFontSizeSelector.vue';
 // MAC-TODO
-// import * as fi from 'node-fontinfo';
+import * as fi from 'node-fontinfo';
 import { EFontStyle } from 'obs-studio-node';
 
 @Component({
@@ -99,23 +99,22 @@ export default class GoogleFontSelector extends ObsInput<IGoogleFont> {
 
     this.fontLibraryService.findStyle(this.selectedFamily, styleName).then(style => {
       this.fontLibraryService.downloadFont(style.file).then(fontPath => {
-        // MAC-TODO
-        // const fontInfo = fi.getFontInfo(fontPath);
+        const fontInfo = fi.getFontInfo(fontPath);
 
-        // if (!fontInfo) {
-        //   this.actualFamily = 'Arial';
-        //   this.actualStyle = 0;
-        // } else {
-        //   this.actualFamily = fontInfo.family_name;
+        if (!fontInfo) {
+          this.actualFamily = 'Arial';
+          this.actualStyle = 0;
+        } else {
+          this.actualFamily = fontInfo.family_name;
 
-        //   this.actualStyle =
-        //     (fontInfo.italic ? EFontStyle.Italic : 0) | (fontInfo.bold ? EFontStyle.Bold : 0);
-        // }
+          this.actualStyle =
+            (fontInfo.italic ? EFontStyle.Italic : 0) | (fontInfo.bold ? EFontStyle.Bold : 0);
+        }
 
-        // this.value.face = this.actualFamily;
-        // this.value.flags = this.actualStyle;
+        this.value.face = this.actualFamily;
+        this.value.flags = this.actualStyle;
 
-        // this.emitInput({ ...this.value, path: fontPath });
+        this.emitInput({ ...this.value, path: fontPath });
         this.isLoading = false;
       });
     });

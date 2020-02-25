@@ -7944,9 +7944,9 @@ node-fetch@^2.3.0:
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.0.tgz#e633456386d4aa55863f676a7ab0daa8fdecb0fd"
   integrity sha512-8dG4H5ujfvFiqDmVu9fQ5bOHUC15JMjMY/Zumv26oOvvVJjM67KF8koCWIabKQ1GJIa9r2mMZscBq/TbdOcmNA==
 
-"node-fontinfo@https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.13/iojs-v6.0.3-node-fontinfo-osx.tar.gz":
+"node-fontinfo@https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.16/iojs-v6.0.3-node-fontinfo-osx.tar.gz":
   version "0.0.12"
-  resolved "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.13/iojs-v6.0.3-node-fontinfo-osx.tar.gz#6b197b07f564528b6a6e024595d5d992d0f1be38"
+  resolved "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.16/iojs-v6.0.3-node-fontinfo-osx.tar.gz#06602c767482eff50d601a2069066159a1d4f336"
 
 node-libs-browser@^2.0.0:
   version "2.0.0"
