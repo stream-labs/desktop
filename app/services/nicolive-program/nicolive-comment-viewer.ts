@@ -140,12 +140,15 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
             default: EMPTY;
           }
         }),
-        catchError(err => of({
-          type: 'n-air-emulated' as const,
-          value: {
-            content: `エラーが発生しました: ${err.message} ${err.stack}`,
-          },
-        })),
+        catchError(err => {
+          console.error(err);
+          return of({
+            type: 'n-air-emulated' as const,
+            value: {
+              content: `エラーが発生しました: ${err.message}`,
+            },
+          })
+        }),
         endWith({
           type: 'n-air-emulated' as const,
           value: {
