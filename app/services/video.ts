@@ -187,7 +187,7 @@ export class Display {
 
     byOS({
       [OS.Windows]: () => this.videoService.actions.moveOBSDisplay(this.name, x, y),
-      [OS.Mac]: () => nwr.moveWindow(this.nativeWindowHandle, x, y),
+      [OS.Mac]: () => nwr.moveWindow(this.name, x, y),
     });
   }
 
@@ -203,13 +203,13 @@ export class Display {
       [OS.Windows]: () => {},
       [OS.Mac]: () => {
         if (this.existingWindow) {
-          nwr.destroyWindow(this.nativeWindowHandle);
-          nwr.destroyIOSurface(this.nativeWindowHandle);
+          nwr.destroyWindow(this.name);
+          nwr.destroyIOSurface(this.name);
         }
 
         const surface = this.videoService.createOBSIOSurface(this.name);
-        nwr.createWindow(this.nativeWindowHandle);
-        nwr.connectIOSurface(this.nativeWindowHandle, surface);
+        nwr.createWindow(this.name, this.nativeWindowHandle);
+        nwr.connectIOSurface(this.name, surface);
         this.existingWindow = true;
       },
     });
@@ -225,8 +225,8 @@ export class Display {
       byOS({
         [OS.Windows]: () => {},
         [OS.Mac]: () => {
-          nwr.destroyWindow(this.nativeWindowHandle);
-          nwr.destroyIOSurface(this.nativeWindowHandle);
+          nwr.destroyWindow(this.name);
+          nwr.destroyIOSurface(this.name);
         },
       });
       this.displayDestroyed = true;
