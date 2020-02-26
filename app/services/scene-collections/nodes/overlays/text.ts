@@ -4,6 +4,7 @@ import { FontLibraryService } from 'services/font-library';
 import { Inject } from 'services/core/injector';
 import path from 'path';
 import { byOS, OS } from 'util/operating-systems';
+import Utils from 'services/utils';
 
 interface ISchema {
   settings: {
@@ -11,6 +12,9 @@ interface ISchema {
     color: number;
     custom_font: string;
     font: { size: number };
+    gradient: boolean;
+    gradient_color: number;
+    outline: true;
   };
 }
 
@@ -55,14 +59,30 @@ export class TextNode extends Node<ISchema, IContext> {
         input.update(this.data.settings);
       },
       [OS.Mac]: () => {
+        // Translate GDI+ settings to Freetype settings
+        const color1 = this.resetAlpha(this.data.settings.color);
+        const color2 = this.data.settings.gradient
+          ? this.resetAlpha(this.data.settings.gradient_color)
+          : this.resetAlpha(this.data.settings.color);
+
         input.update({
-          color1: this.data.settings.color,
-          // MAC-TODO: Support Google fonts on freetype
-          // font: { ...input.settings.font, size: this.data.settings.font.size },
+          color1,
+          color2,
+          custom_font: this.data.settings.custom_font,
           font: this.data.settings.font,
           text: this.data.settings.text,
+          outline: this.data.settings.outline,
         });
       },
     });
+  }
+
+  /**
+   * Forces 100% alpha on a color (used by mac)
+   * @param color An integer color
+   */
+  private resetAlpha(color: number) {
+    const rgba = Utils.intToRgba(color);
+    return Utils.rgbaToInt(rgba.r, rgba.g, rgba.b, 255);
   }
 }
