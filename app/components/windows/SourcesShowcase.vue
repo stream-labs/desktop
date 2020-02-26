@@ -134,7 +134,7 @@
             class="source source--widget"
             :class="{'source--active': inspectedSource === 'streamlabel'}"
             @click="inspectSource('streamlabel')"
-            @dblclick="selectSource('text_gdiplus', { propertiesManager: 'streamlabels' })">
+            @dblclick="selectStreamlabel">
             <div>{{ $t('Stream Label') }}</div>
           </div>
           <div
