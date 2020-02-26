@@ -93,9 +93,9 @@
   "Facebook Follows": "Facebook Follows",
   "Facebook Likes": "Facebook Likes",
   "Facebook Shares": "Facebook Shares",
-  "Facebook Stars": "Facebook Stars",
+  "Facebook Stars": "Facebook Csillagok",
   "Facebook Supports": "Facebook Supports",
-  "Note: This background color is for preview purposes only.It will not be shown in your stream.": "Note: This background color is for preview purposes only.It will not be shown in your stream.",
-  "This background color is for preview purposes only. It will not be shown in your stream.": "This background color is for preview purposes only. It will not be shown in your stream.",
-  "Invalid JSON": "Invalid JSON"
+  "Note: This background color is for preview purposes only.It will not be shown in your stream.": "Megjegyzés: Ez a háttér szín csak előnézeti célokat szolgál. Nem jelenik meg a streamben.",
+  "This background color is for preview purposes only. It will not be shown in your stream.": "Ez a háttér szín csak előnézeti célokat szolgál. Ez nem jelenik meg a streamben.",
+  "Invalid JSON": "Érvénytelen JSON"
 }
