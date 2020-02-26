@@ -266,10 +266,10 @@ if (!gotTheLock) {
     });
 
     // Initialize the keylistener
-    // require('node-libuiohook').startHook();
+    require('node-libuiohook').startHook();
 
     workerWindow.on('closed', () => {
-      // require('node-libuiohook').stopHook();
+      require('node-libuiohook').stopHook();
       session.defaultSession.flushStorageData();
       session.defaultSession.cookies.flushStore(() => app.quit());
     });

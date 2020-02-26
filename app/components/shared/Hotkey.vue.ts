@@ -1,6 +1,7 @@
 import { Component } from 'vue-property-decorator';
 import { IHotkey, IBinding } from 'services/hotkeys';
 import TsxComponent, { createProps } from 'components/tsx-component';
+import { byOS, OS } from 'util/operating-systems';
 
 /**
  * Represents a binding that has a unique key for CSS animations
@@ -144,7 +145,7 @@ export default class HotkeyComponent extends TsxComponent<HotkeyProps> {
     if (binding.modifiers.alt) keys.push('Alt');
     if (binding.modifiers.ctrl) keys.push('Ctrl');
     if (binding.modifiers.shift) keys.push('Shift');
-    if (binding.modifiers.meta) keys.push('Win');
+    if (binding.modifiers.meta) keys.push(byOS({ [OS.Windows]: 'Win', [OS.Mac]: 'Cmd' }));
 
     let key = binding.key;
 
