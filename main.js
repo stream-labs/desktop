@@ -255,6 +255,14 @@ if (!gotTheLock) {
       }
     });
 
+    // This needs to be explicitly handled on Mac
+    app.on('before-quit', e => {
+      if (!shutdownStarted) {
+        e.preventDefault();
+        mainWindow.close();
+      }
+    });
+
     ipcMain.on('acknowledgeShutdown', () => {
       if (appShutdownTimeout) clearTimeout(appShutdownTimeout);
     });
