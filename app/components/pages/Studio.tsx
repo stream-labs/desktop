@@ -34,6 +34,8 @@ const LAYOUT_MAP: Dictionary<typeof TsxComponent> = {
   [ELayout.OnePane]: Layouts.OnePane,
   [ELayout.Triplets]: Layouts.Triplets,
   [ELayout.FourByFour]: Layouts.FourByFour,
+  [ELayout.OnePaneR]: Layouts.OnePaneR,
+  [ELayout.Pyramid]: Layouts.Pyramid,
 };
 
 @Component({})
@@ -63,9 +65,7 @@ export default class Studio extends TsxComponent {
   }
 
   get isColumns() {
-    return [ELayout.TwoPane, ELayout.Triplets, ELayout.OnePane].includes(
-      this.layoutService.currentTab.currentLayout,
-    );
+    return this.layoutService.isColumnLayout;
   }
 
   get slottedElements() {

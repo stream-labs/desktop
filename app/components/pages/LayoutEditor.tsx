@@ -5,8 +5,7 @@ import TsxComponent from 'components/tsx-component';
 import { Component } from 'vue-property-decorator';
 import styles from './LayoutEditor.m.less';
 import AddTabModal from './AddTabModal';
-import { EInputType } from 'components/shared/inputs/index';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import { ListInput } from 'components/shared/inputs/inputs';
 import { Inject } from 'services/core/injector';
 import { LayoutService, ELayoutElement, ELayout, LayoutSlot } from 'services/layout';
 import { $t } from 'services/i18n';
@@ -20,6 +19,8 @@ const TEMPLATE_MAP: Dictionary<string> = {
   [ELayout.OnePane]: 'onePane',
   [ELayout.FourByFour]: 'fourByFour',
   [ELayout.Triplets]: 'triplets',
+  [ELayout.OnePaneR]: 'onePaneR',
+  [ELayout.Pyramid]: 'pyramid',
 };
 
 @Component({})
@@ -33,6 +34,7 @@ export default class LayoutEditor extends TsxComponent {
   slottedElements = cloneDeep(this.layoutService.currentTab.slottedElements) || {};
 
   private highlightedSlot: LayoutSlot = null;
+  private showModal = false;
 
   get elementTitles() {
     return {
@@ -102,11 +104,13 @@ export default class LayoutEditor extends TsxComponent {
     this.navigationService.navigate('Studio');
   }
 
+  handleAddTab() {
+    this.showModal = false;
+  }
+
   get tabMetadata() {
     const tabs = this.layoutService.state.tabs;
     return {
-      type: EInputType.list,
-      title: $t('Editing this Tab'),
       options: Object.keys(tabs).map(tab => ({ value: tab, title: tabs[tab].name })),
     };
   }
@@ -131,20 +135,30 @@ export default class LayoutEditor extends TsxComponent {
             ))}
           </div>
         </div>
-        <div>
+        <div style="display: flex; flex-direction: column;">
           <div class={styles.title}>{$t('Elements')}</div>
           <div class={styles.subtitle}>{$t('Drag and drop to edit.')}</div>
-          {Object.keys(ELayoutElement).map(element => (
-            <div
-              draggable
-              class={styles.elementCell}
-              onDragend={(e: MouseEvent) => this.handleElementDrag(e, ELayoutElement[element])}
-            >
-              <i class="fas fa-ellipsis-v" />
-              {this.elementTitles[element]}
-            </div>
-          ))}
+          <div class={styles.elementContainer}>
+            {Object.keys(ELayoutElement).map(element => (
+              <div
+                draggable
+                class={styles.elementCell}
+                onDragend={(e: MouseEvent) => this.handleElementDrag(e, ELayoutElement[element])}
+              >
+                <i class="fas fa-ellipsis-v" />
+                {this.elementTitles[element]}
+              </div>
+            ))}
+          </div>
         </div>
+      </div>
+    );
+  }
+
+  get modal() {
+    return (
+      <div class={styles.modalBackdrop}>
+        <AddTabModal />
       </div>
     );
   }
@@ -153,14 +167,18 @@ export default class LayoutEditor extends TsxComponent {
     return (
       <div style={{ flexDirection: 'column' }}>
         <div class={styles.topBar}>
-          <HFormGroup
+          <ListInput
+            style="z-index: 1;"
             value={this.layoutService.state.currentTab}
             onInput={(tab: string) => this.setTab(tab)}
             metadata={this.tabMetadata}
+            v-tooltip={{ content: $t('Current Tab'), placement: 'bottom' }}
           />
-          <button class="button button--default">
+          <button
+            class={cx('button button--default', styles.addButton)}
+            v-tooltip={{ content: $t('Add Tab'), placement: 'bottom' }}
+          >
             <i class="icon-add" />
-            {$t('Add Tab')}
           </button>
           <button class="button button--action" onClick={() => this.save()}>
             {$t('Save Changes')}
@@ -185,6 +203,7 @@ export default class LayoutEditor extends TsxComponent {
             ))}
           </div>
         </div>
+        {this.showModal && this.modal}
       </div>
     );
   }

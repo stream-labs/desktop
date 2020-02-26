@@ -53,7 +53,6 @@ export default class BaseLayout extends TsxComponent<LayoutProps> {
     // Before we can access the componentInstance at least one render cycle needs to run
     if (!this.firstRender) await this.$nextTick();
     this.firstRender = true;
-    console.log(this.$slots);
     return (this.$slots[slot][0].componentInstance as BaseElement).mins;
   }
 

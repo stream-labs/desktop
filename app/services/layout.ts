@@ -13,6 +13,8 @@ export enum ELayout {
   FourByFour = 'FourByFour',
   Triplets = 'Triplets',
   OnePane = 'OnePane',
+  OnePaneR = 'OnePaneR',
+  Pyramid = 'Pyramid',
 }
 
 export enum ELayoutElement {
@@ -52,6 +54,8 @@ const RESIZE_DEFAULTS = {
   [ELayout.FourByFour]: { bar1: 170, bar2: 170 },
   [ELayout.Triplets]: { bar1: 700, bar2: 350 },
   [ELayout.OnePane]: { bar1: 800 },
+  [ELayout.OnePaneR]: { bar1: 350 },
+  [ELayout.Pyramid]: { bar1: 450 },
 };
 
 export class LayoutService extends PersistentStatefulService<ILayoutServiceState> {
@@ -103,6 +107,12 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   get currentTab() {
     return this.state.tabs[this.state.currentTab];
+  }
+
+  get isColumnLayout() {
+    return [ELayout.TwoPane, ELayout.Triplets, ELayout.OnePane, ELayout.OnePaneR].includes(
+      this.currentTab.currentLayout,
+    );
   }
 
   setCurrentTab(id: string) {
