@@ -1,7 +1,7 @@
 import { Service } from './core/service';
 import { SettingsService } from './settings';
 import * as obs from '../../obs-api';
-import electron from 'electron';
+import electron, { BrowserWindow } from 'electron';
 import { Inject } from './core/injector';
 import Utils from './utils';
 import { WindowsService } from './windows';
@@ -47,8 +47,6 @@ export class Display {
   electronWindowId: number;
   slobsWindowId: string;
 
-  nativeWindowHandle: Buffer;
-
   private readonly selectionSubscription: Subscription;
 
   sourceId: string;
@@ -72,8 +70,6 @@ export class Display {
       : obs.ERenderingMode.OBS_MAIN_RENDERING;
 
     const electronWindow = remote.BrowserWindow.fromId(this.electronWindowId);
-
-    this.nativeWindowHandle = electronWindow.getNativeWindowHandle();
 
     this.currentScale = this.windowsService.state[this.slobsWindowId].scaleFactor;
 
@@ -208,7 +204,10 @@ export class Display {
         }
 
         const surface = this.videoService.createOBSIOSurface(this.name);
-        nwr.createWindow(this.name, this.nativeWindowHandle);
+        nwr.createWindow(
+          this.name,
+          remote.BrowserWindow.fromId(this.electronWindowId).getNativeWindowHandle(),
+        );
         nwr.connectIOSurface(this.name, surface);
         this.existingWindow = true;
       },

@@ -8032,9 +8032,9 @@ node-releases@^1.1.42:
   dependencies:
     semver "^6.3.0"
 
-"node-window-rendering@https://github.com/stream-labs/node-window-rendering/releases/download/1.0.2/iojs-v6.0.3-node-window-rendering-osx.tar.gz":
+"node-window-rendering@https://github.com/stream-labs/node-window-rendering/releases/download/1.0.3/iojs-v6.0.3-node-window-rendering-osx.tar.gz":
   version "1.0.0"
-  resolved "https://github.com/stream-labs/node-window-rendering/releases/download/1.0.2/iojs-v6.0.3-node-window-rendering-osx.tar.gz#4333a9d09f60ad1b6aadc7b4be9f4502c9cda5e0"
+  resolved "https://github.com/stream-labs/node-window-rendering/releases/download/1.0.3/iojs-v6.0.3-node-window-rendering-osx.tar.gz#9f4b0bc3909c3e498382584fb2c98163aef0639e"
   dependencies:
     nan "^2.14.0"
 
