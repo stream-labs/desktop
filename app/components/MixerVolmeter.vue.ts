@@ -128,7 +128,7 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
   private onRequestAnimationFrameHandler() {
     // don't render sources then channelsCount is 0
     // happens when the browser source stops playing audio
-    if (this.currentPeaks && this.currentPeaks.length) {
+    if (this.renderingInitialized && this.currentPeaks && this.currentPeaks.length) {
       if (this.gl) {
         this.drawVolmeterWebgl(this.currentPeaks);
       } else {
