@@ -4,6 +4,7 @@ import { FilterRecord } from './ResponseTypes';
 import { Inject } from 'util/injector';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
 import { map, distinctUntilChanged } from 'rxjs/operators';
+import { NicoliveFailure, openErrorDialogFromFailure } from './NicoliveFailure';
 
 interface INicoliveCommentFilterState {
   filters: FilterRecord[];
@@ -32,39 +33,51 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
       map(({ programID }) => programID),
       distinctUntilChanged()
     ).subscribe(() => {
-      this.fetchFilters();
+      this.fetchFilters().catch(caught => {
+        if (caught instanceof NicoliveFailure) {
+          // ignore
+        } else {
+          throw caught;
+        }
+      });
     });
   }
 
   async fetchFilters() {
     const result = await this.client.fetchFilters(this.programID);
-    if (isOk(result)) {
-      this.UPDATE_FILTERS(result.value);
+    if (!isOk(result)) {
+      throw NicoliveFailure.fromClientError('fetchFilters', result);
     }
+
+    this.UPDATE_FILTERS(result.value);
   }
 
   async addFilter(record: Omit<FilterRecord, 'id'>) {
     const result = await this.client.addFilters(this.programID, [record]);
-    if (isOk(result)) {
-      const resultRecord = result.value.find(
-        (rec: FilterRecord) => rec.type === record.type && rec.body === record.body
-      );
-
-      if (!resultRecord) {
-        // conflictしているので再取得しないとIDがわからない
-        return this.fetchFilters();
-      }
-      const filters = this.state.filters.concat(resultRecord);
-      this.UPDATE_FILTERS(filters);
+    if (!isOk(result)) {
+      throw NicoliveFailure.fromClientError('addFilters', result);
     }
+
+    const resultRecord = result.value.find(
+      (rec: FilterRecord) => rec.type === record.type && rec.body === record.body
+    );
+
+    if (!resultRecord) {
+      // conflictしているので再取得しないとIDがわからない
+      return this.fetchFilters();
+    }
+    const filters = this.state.filters.concat(resultRecord);
+    this.UPDATE_FILTERS(filters);
   }
 
   async deleteFilters(ids: number[]) {
     const result = await this.client.deleteFilters(this.programID, ids);
-    if (isOk(result)) {
-      const filters = this.state.filters.filter(rec => !ids.includes(rec.id));
-      this.UPDATE_FILTERS(filters);
+    if (!isOk(result)) {
+      throw NicoliveFailure.fromClientError('deleteFilters', result);
     }
+
+    const filters = this.state.filters.filter(rec => !ids.includes(rec.id));
+    this.UPDATE_FILTERS(filters);
   }
 
   @mutation()
