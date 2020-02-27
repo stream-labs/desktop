@@ -9,6 +9,7 @@ import { I18nServiceApi } from './i18n-api';
 import * as obs from '../../../obs-api';
 import * as fs from 'fs';
 import path from 'path';
+import Utils from '../utils';
 
 interface II18nState {
   locale: string;
