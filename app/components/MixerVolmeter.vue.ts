@@ -412,7 +412,7 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
 
         // save peaks value to render it in the next animationFrame
         this.prevPeaks = this.interpolatedPeaks;
-        this.currentPeaks = volmeter.peak;
+        this.currentPeaks = Array.from(volmeter.peak);
         this.lastEventTime = performance.now();
       }
     };
