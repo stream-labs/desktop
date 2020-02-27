@@ -2,7 +2,7 @@ import Vue from 'vue';
 import cx from 'classnames';
 import cloneDeep from 'lodash/cloneDeep';
 import TsxComponent from 'components/tsx-component';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import styles from './LayoutEditor.m.less';
 import AddTabModal from './AddTabModal';
 import { ListInput } from 'components/shared/inputs/inputs';
@@ -22,6 +22,11 @@ export default class LayoutEditor extends TsxComponent {
 
   slottedElements = cloneDeep(this.layoutService.views.currentTab.slottedElements) || {};
 
+  tabOptions = Object.keys(this.layoutService.state.tabs).map(tab => ({
+    value: tab,
+    title: this.layoutService.state.tabs[tab].name,
+  }));
+
   private highlightedSlot: LayoutSlot = null;
   private showModal = false;
 
@@ -32,7 +37,7 @@ export default class LayoutEditor extends TsxComponent {
   }
 
   classForSlot(slot: LayoutSlot) {
-    const layout = this.layoutService.className(this.currentLayout);
+    const layout = this.layoutService.views.className(this.currentLayout);
     return cx(styles.placementZone, styles[`${layout}${slot}`], {
       [styles.occupied]: this.elementInSlot(slot),
       [styles.highlight]: this.highlightedSlot === slot,
@@ -42,7 +47,7 @@ export default class LayoutEditor extends TsxComponent {
   layoutImage(layout: ELayout) {
     const mode = this.customizationService.isDarkTheme ? 'night' : 'day';
     const active = this.currentLayout === layout ? '-active' : '';
-    const className = this.layoutService.className(layout);
+    const className = this.layoutService.views.className(layout);
     return require(`../../../media/images/layouts/${mode}-${className}${active}.png`);
   }
 
@@ -84,7 +89,6 @@ export default class LayoutEditor extends TsxComponent {
   }
 
   closeModal() {
-    console.log('firing');
     this.showModal = false;
   }
 
@@ -92,15 +96,34 @@ export default class LayoutEditor extends TsxComponent {
     this.showModal = true;
   }
 
-  get tabMetadata() {
-    const tabs = this.layoutService.state.tabs;
-    return {
-      options: Object.keys(tabs).map(tab => ({ value: tab, title: tabs[tab].name })),
-    };
+  get numberOfTabs() {
+    return Object.keys(this.layoutService.state.tabs).length;
+  }
+
+  @Watch('numberOfTabs')
+  updateTabs() {
+    this.tabOptions = Object.keys(this.layoutService.state.tabs).map(tab => ({
+      value: tab,
+      title: this.layoutService.state.tabs[tab].name,
+    }));
+  }
+
+  get currentTab() {
+    return this.layoutService.views.currentTab;
+  }
+
+  @Watch('currentTab')
+  updateUI() {
+    this.currentLayout = this.layoutService.views.currentTab.currentLayout;
+    this.slottedElements = cloneDeep(this.layoutService.views.currentTab.slottedElements);
   }
 
   setTab(tab: string) {
     this.layoutService.setCurrentTab(tab);
+  }
+
+  removeCurrentTab() {
+    this.layoutService.removeCurrentTab();
   }
 
   get sideBar() {
@@ -155,7 +178,7 @@ export default class LayoutEditor extends TsxComponent {
             style="z-index: 1;"
             value={this.layoutService.state.currentTab}
             onInput={(tab: string) => this.setTab(tab)}
-            metadata={this.tabMetadata}
+            metadata={{ options: this.tabOptions }}
             v-tooltip={{ content: $t('Current Tab'), placement: 'bottom' }}
           />
           <button
@@ -165,6 +188,15 @@ export default class LayoutEditor extends TsxComponent {
           >
             <i class="icon-add" />
           </button>
+          {this.layoutService.state.currentTab !== 'default' && (
+            <button
+              class={cx('button button--warn', styles.removeButton)}
+              v-tooltip={{ content: $t('Delete Current Tab'), placement: 'bottom' }}
+              onClick={() => this.removeCurrentTab()}
+            >
+              <i class="icon-trash" />
+            </button>
+          )}
           <button class="button button--action" onClick={() => this.save()}>
             {$t('Save Changes')}
           </button>
@@ -174,7 +206,7 @@ export default class LayoutEditor extends TsxComponent {
           <div
             class={cx(
               styles.templateContainer,
-              styles[this.layoutService.className(this.currentLayout)],
+              styles[this.layoutService.views.className(this.currentLayout)],
             )}
           >
             {['1', '2', '3', '4', '5', '6'].map((slot: LayoutSlot) => (

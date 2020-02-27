@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import cx from 'classnames';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { CustomizationService } from 'services/customization';
 import { NavigationService, TAppPage } from 'services/navigation';
@@ -31,6 +31,12 @@ export default class SideNav extends Vue {
   get availableFeatures() {
     return EAvailableFeatures;
   }
+
+  studioTabs = Object.keys(this.layoutService.state.tabs).map(tab => ({
+    target: tab,
+    title: this.layoutService.state.tabs[tab].name,
+    icon: this.layoutService.state.tabs[tab].icon,
+  }));
 
   @Prop() locked: boolean;
 
@@ -68,16 +74,21 @@ export default class SideNav extends Vue {
     );
   }
 
-  get loading() {
-    return this.appService.state.loading;
+  get numberOfTabs() {
+    return Object.keys(this.layoutService.state.tabs).length;
   }
 
-  get studioTabs() {
-    return Object.keys(this.layoutService.state.tabs).map(tab => ({
+  @Watch('numberOfTabs')
+  updateTabs() {
+    this.studioTabs = Object.keys(this.layoutService.state.tabs).map(tab => ({
       target: tab,
       title: this.layoutService.state.tabs[tab].name,
       icon: this.layoutService.state.tabs[tab].icon,
     }));
+  }
+
+  get loading() {
+    return this.appService.state.loading;
   }
 
   render() {

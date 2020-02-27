@@ -9,6 +9,21 @@ import { Inject } from 'services/core/injector';
 import { LayoutService } from 'services/layout';
 import { $t } from 'services/i18n';
 
+const ICONS = [
+  { title: '', value: 'icon-studio', description: 'icon-studio' },
+  { title: '', value: 'icon-widgets', description: 'icon-widgets' },
+  { title: '', value: 'icon-settings-3-1', description: 'icon-settings-3-1' },
+  { title: '', value: 'icon-graph', description: 'icon-graph' },
+  { title: '', value: 'icon-lock', description: 'icon-lock' },
+  { title: '', value: 'icon-live-dashboard', description: 'icon-live-dashboard' },
+  { title: '', value: 'icon-ideas', description: 'icon-ideas' },
+  { title: '', value: 'icon-wish-list', description: 'icon-wish-list' },
+  { title: '', value: 'icon-framed-poster', description: 'icon-framed-poster' },
+  { title: '', value: 'icon-integrations-2', description: 'icon-integrations-2' },
+  { title: '', value: 'icon-camera', description: 'icon-camera' },
+  { title: '', value: 'icon-audio', description: 'icon-audio' },
+];
+
 class AddTabModalProps {
   onClose: () => void;
 }
@@ -17,13 +32,11 @@ class AddTabModalProps {
 export default class AddTabModal extends TsxComponent<AddTabModalProps> {
   @Inject() private layoutService: LayoutService;
 
-  newTabName = '';
+  name = '';
   icon = '';
 
-  icons = [{ title: '', value: '', description: '' }];
-
   createTab() {
-    this.layoutService.addTab(this.newTabName, this.icon);
+    this.layoutService.addTab(this.name, this.icon);
     this.$emit('close');
   }
 
@@ -32,7 +45,7 @@ export default class AddTabModal extends TsxComponent<AddTabModalProps> {
   }
 
   get canSave() {
-    return this.icon && this.newTabName;
+    return !!this.icon && !!this.name;
   }
 
   render() {
@@ -45,12 +58,9 @@ export default class AddTabModal extends TsxComponent<AddTabModalProps> {
       >
         <div slot="content">
           <VFormGroup metadata={{ title: $t('Icon') }}>
-            <ImagePickerInput vModel={this.icon} metadata={{ options: this.icons }} />
+            <ImagePickerInput vModel={this.icon} metadata={{ options: ICONS, isIcons: true }} />
           </VFormGroup>
-          <VFormGroup
-            vModel={this.newTabName}
-            metadata={{ title: $t('Name'), type: EInputType.text }}
-          />
+          <VFormGroup vModel={this.name} metadata={{ title: $t('Name'), type: EInputType.text }} />
         </div>
         <div slot="controls">
           <button class="button button--default" onClick={() => this.cancel()}>
@@ -59,7 +69,7 @@ export default class AddTabModal extends TsxComponent<AddTabModalProps> {
           <button
             class="button button--action"
             onClick={() => this.createTab()}
-            disabled={this.canSave}
+            disabled={!this.canSave}
           >
             {$t('Save New Tab')}
           </button>

@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import isEqual from 'lodash/isEqual';
 import { Inject, ViewHandler } from 'services/core';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
@@ -49,6 +50,10 @@ class LayoutViews extends ViewHandler<ILayoutServiceState> {
   elementComponent(element: ELayoutElement) {
     if (!element) return;
     return ELEMENT_DATA()[element].component;
+  }
+
+  className(layout: ELayout) {
+    return LAYOUT_DATA[layout].className;
   }
 }
 
@@ -123,8 +128,8 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
     this.ADD_TAB(name, icon);
   }
 
-  className(layout: ELayout) {
-    return LAYOUT_DATA[layout].className;
+  removeCurrentTab() {
+    this.REMOVE_TAB(this.state.currentTab);
   }
 
   calculateColumnTotal(slots: IVec2Array) {
@@ -191,8 +196,18 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
   }
 
   @mutation()
+  REMOVE_TAB(id: string) {
+    if (this.state.currentTab === id) {
+      this.state.currentTab = 'default';
+    }
+    Vue.delete(this.state.tabs, id);
+  }
+
+  @mutation()
   ADD_TAB(name: string, icon: string) {
-    this.state.tabs[uuid()] = {
+    const id = uuid();
+
+    Vue.set(this.state.tabs, id, {
       name,
       icon,
       currentLayout: ELayout.Default,
@@ -208,6 +223,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
         bar1: 156,
         bar2: 240,
       },
-    };
+    });
+    this.state.currentTab = id;
   }
 }

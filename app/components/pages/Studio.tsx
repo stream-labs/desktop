@@ -1,5 +1,5 @@
 import TsxComponent from 'components/tsx-component';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { LayoutService, ELayoutElement, IVec2Array } from 'services/layout';
 import { WindowsService } from 'services/windows';
@@ -37,6 +37,17 @@ export default class Studio extends TsxComponent {
 
   get slottedElements() {
     return this.layoutService.views.currentTab.slottedElements;
+  }
+
+  get currentTab() {
+    return this.layoutService.views.currentTab;
+  }
+
+  @Watch('currentTab')
+  syncMax() {
+    this.max = this.isColumns
+      ? this.$el.getBoundingClientRect().width
+      : this.$el.getBoundingClientRect().height;
   }
 
   windowResizeHandler(mins: IResizeMins, isChat?: boolean) {
