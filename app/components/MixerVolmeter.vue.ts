@@ -283,7 +283,7 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
     this.gl.uniform1f(this.bgMultiplierLocation, this.getBgMultiplier());
 
     peaks.forEach((peak, channel) => {
-      this.drawVolmeterChannelWebgl(peak, channel);
+      this.drawVolmeterChannelWebgl(peak || 0, channel);
     });
   }
 
@@ -293,7 +293,7 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
     this.gl.uniform2f(this.scaleLocation, 1, CHANNEL_HEIGHT);
     this.gl.uniform2f(this.translationLocation, 0, channel * (CHANNEL_HEIGHT + PADDING_HEIGHT));
 
-    const prevPeak = this.prevPeaks ? this.prevPeaks[channel] : peak;
+    const prevPeak = this.prevPeaks ? this.prevPeaks[channel] || peak : peak;
     const timeDelta = performance.now() - this.lastEventTime;
     let alpha = timeDelta / this.interpolationTime;
     if (alpha > 1) alpha = 1;
