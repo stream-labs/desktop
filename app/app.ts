@@ -153,7 +153,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // setup VueI18n plugin
   Vue.use(VueI18n);
 
-  // const dictData = loadDictionaries('en-US');
   const i18n = new VueI18n({
     locale: 'en-US',
     fallbackLocale: 'en-US',
