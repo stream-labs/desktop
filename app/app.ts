@@ -150,6 +150,23 @@ const showDialog = (message: string): void => {
 document.addEventListener('DOMContentLoaded', async () => {
   const store = createStore();
 
+  // setup VueI18n plugin
+  Vue.use(VueI18n);
+
+  // const dictData = loadDictionaries('en-US');
+  const i18n = new VueI18n({
+    locale: 'en-US',
+    fallbackLocale: 'en-US',
+    messages: {},
+    // TODO: Make this not silent
+    silentTranslationWarn: true,
+    missing: (language: string, key: string) => {
+      if (isProduction) return;
+      console.error(`Missing translation found for ${language} -- "${key}"`);
+    },
+  });
+  I18nService.setVuei18nInstance(i18n);
+
   // The worker window can safely access services immediately
   if (Utils.isWorkerWindow()) {
     const windowsService: WindowsService = WindowsService.instance;
@@ -196,6 +213,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     ipcRenderer.on('closeWindow', () => windowsService.closeMainWindow());
+    I18nService.instance.load();
     AppService.instance.load();
   }
 
@@ -205,22 +223,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       windowsService.closeChildWindow();
     });
   }
-
-  // setup VueI18n plugin
-  Vue.use(VueI18n);
-
-  // This won't be fully initialized until services are ready
-  const i18n = new VueI18n({
-    locale: 'en-US',
-    fallbackLocale: 'en-US',
-    messages: {},
-    // TODO: Make this not silent
-    silentTranslationWarn: true,
-    missing: (language: string, key: string) => {
-      if (isProduction) return;
-      console.error(`Missing translation found for ${language} -- "${key}"`);
-    },
-  });
 
   // create a root Vue component
   const windowId = Utils.getCurrentUrlParams().windowId;
@@ -248,16 +250,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Perform some final initialization now that services are ready
   ipcRenderer.on('initFinished', () => {
-    const i18nService: I18nService = I18nService.instance;
-    const dictionaries = i18nService.getLoadedDictionaries();
-
-    Object.keys(dictionaries).forEach(locale => {
-      i18n.setLocaleMessage(locale, dictionaries[locale]);
-    });
-
-    i18n.locale = i18nService.state.locale;
-    i18n.fallbackLocale = i18nService.getFallbackLocale();
-    I18nService.setVuei18nInstance(i18n);
+    // setup translations for the current window
+    if (!Utils.isWorkerWindow()) {
+      I18nService.uploadTranslationsToVueI18n();
+    }
 
     if (usingSentry) {
       const userService = getResource<UserService>('UserService');
