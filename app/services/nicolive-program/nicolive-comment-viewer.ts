@@ -155,7 +155,9 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
         endWith(makeEmulatedChat('サーバーとの接続が終了しました')),
         tap(v => {
           if (isOperatorCommand(v.value) && v.value.content === '/disconnect') {
-            window.setTimeout(() => this.unsubscribe(), 1000);
+            // completeが発生しないのでサーバーとの接続終了メッセージは出ない
+            // `/disconnect` の代わりのメッセージは出さない仕様なので問題ない
+            this.unsubscribe();
           }
         }),
         map(({ type, value }, seqId) => ({ type, value, seqId })),
