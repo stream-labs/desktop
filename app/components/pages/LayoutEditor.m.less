@@ -93,6 +93,18 @@
   }
 }
 
+.modal-backdrop {
+  background: var(--modal-overlay);
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  z-index: 10;
+
+  & > div {
+    .center();
+  }
+}
+
 .template-container {
   position: relative;
   margin: 32px;

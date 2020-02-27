@@ -83,8 +83,13 @@ export default class LayoutEditor extends TsxComponent {
     this.navigationService.navigate('Studio');
   }
 
-  handleAddTab() {
+  closeModal() {
+    console.log('firing');
     this.showModal = false;
+  }
+
+  openModal() {
+    this.showModal = true;
   }
 
   get tabMetadata() {
@@ -137,7 +142,7 @@ export default class LayoutEditor extends TsxComponent {
   get modal() {
     return (
       <div class={styles.modalBackdrop}>
-        <AddTabModal />
+        <AddTabModal onClose={() => this.closeModal()} />
       </div>
     );
   }
@@ -156,6 +161,7 @@ export default class LayoutEditor extends TsxComponent {
           <button
             class={cx('button button--default', styles.addButton)}
             v-tooltip={{ content: $t('Add Tab'), placement: 'bottom' }}
+            onClick={() => this.openModal()}
           >
             <i class="icon-add" />
           </button>
