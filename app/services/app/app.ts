@@ -37,6 +37,7 @@ import { I18nService } from 'services/i18n';
 import { DismissablesService } from 'services/dismissables';
 import { RestreamService } from 'services/restream';
 import { downloadFile } from '../../util/requests';
+import { TouchBarService } from 'services/touch-bar';
 
 interface IAppState {
   loading: boolean;
@@ -66,6 +67,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() outageNotificationsService: OutageNotificationsService;
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() gameOverlayService: GameOverlayService;
+  @Inject() touchBarService: TouchBarService;
 
   static initialState: IAppState = {
     loading: true,
@@ -152,6 +154,9 @@ export class AppService extends StatefulService<IAppState> {
     this.crashReporterService.endStartup();
 
     this.protocolLinksService.start(this.state.argv);
+
+    // MAC-TODO
+    this.touchBarService;
 
     ipcRenderer.send('AppInitFinished');
   }

@@ -50,6 +50,12 @@ export default class Utils {
     );
   }
 
+  static getChildWindow(): Electron.BrowserWindow {
+    return electron.remote.BrowserWindow.getAllWindows().find(
+      win => Utils.getUrlParams(win.webContents.getURL()).windowId === 'child',
+    );
+  }
+
   static isChildWindow(): boolean {
     return this.getWindowId() === 'child';
   }
