@@ -38,6 +38,7 @@ export class ApplicationMenuService extends Service {
             label: 'Undo',
             accelerator: 'Command+Z',
             click: () => {
+              if (this.appService.state.loading) return;
               this.editorCommandsService.undo();
             },
           },
@@ -46,6 +47,7 @@ export class ApplicationMenuService extends Service {
             label: 'Redo',
             accelerator: 'Command+Shift+Z',
             click: () => {
+              if (this.appService.state.loading) return;
               this.editorCommandsService.redo();
             },
           },
@@ -55,6 +57,7 @@ export class ApplicationMenuService extends Service {
             label: 'Copy',
             accelerator: 'Command+C',
             click: () => {
+              if (this.appService.state.loading) return;
               this.clipboardService.copy();
             },
           },
@@ -63,6 +66,7 @@ export class ApplicationMenuService extends Service {
             label: 'Paste',
             accelerator: 'Command+V',
             click: () => {
+              if (this.appService.state.loading) return;
               this.clipboardService.paste();
             },
           },
@@ -70,6 +74,7 @@ export class ApplicationMenuService extends Service {
             id: 'delete',
             label: 'Delete',
             click: () => {
+              if (this.appService.state.loading) return;
               this.selectionService.remove();
             },
           },
@@ -77,7 +82,45 @@ export class ApplicationMenuService extends Service {
             label: 'Select All',
             accelerator: 'Command+A',
             click: () => {
+              if (this.appService.state.loading) return;
               this.selectionService.selectAll();
+            },
+          },
+          { type: 'separator' },
+          {
+            id: 'nudgeUp',
+            label: 'Nudge Selection Up',
+            accelerator: 'Up',
+            click: () => {
+              if (this.appService.state.loading) return;
+              this.editorCommandsService.nudgeActiveItemsUp();
+            },
+          },
+          {
+            id: 'nudgeDown',
+            label: 'Nudge Selection Down',
+            accelerator: 'Down',
+            click: () => {
+              if (this.appService.state.loading) return;
+              this.editorCommandsService.nudgeActiveItemsDown();
+            },
+          },
+          {
+            id: 'nudgeLeft',
+            label: 'Nudge Selection Left',
+            accelerator: 'Left',
+            click: () => {
+              if (this.appService.state.loading) return;
+              this.editorCommandsService.nudgeActiveItemsLeft();
+            },
+          },
+          {
+            id: 'nudgeRight',
+            label: 'Nudge Selection Right',
+            accelerator: 'Right',
+            click: () => {
+              if (this.appService.state.loading) return;
+              this.editorCommandsService.nudgeActiveItemsRight();
             },
           },
           { type: 'separator' },
@@ -118,6 +161,10 @@ export class ApplicationMenuService extends Service {
     this.selectionService.updated.subscribe(state => {
       appMenu.getMenuItemById('copy').enabled = !!state.selectedIds.length;
       appMenu.getMenuItemById('delete').enabled = !!state.selectedIds.length;
+      appMenu.getMenuItemById('nudgeUp').enabled = !!state.selectedIds.length;
+      appMenu.getMenuItemById('nudgeDown').enabled = !!state.selectedIds.length;
+      appMenu.getMenuItemById('nudgeLeft').enabled = !!state.selectedIds.length;
+      appMenu.getMenuItemById('nudgeRight').enabled = !!state.selectedIds.length;
     });
   }
 }

@@ -229,7 +229,7 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
   }
 
   @shortcut('ArrowRight')
-  nudgeActiveItemRight() {
+  nudgeActiveItemsRight() {
     this.nudgeActiveItems(ENudgeDirection.Right);
   }
 
