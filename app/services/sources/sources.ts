@@ -79,7 +79,7 @@ export const windowsSources: TSourceType[] = [
 ];
 
 /**
- * These sources are valid on windows
+ * These sources are valid on mac
  */
 export const macSources: TSourceType[] = [
   'image_source',
