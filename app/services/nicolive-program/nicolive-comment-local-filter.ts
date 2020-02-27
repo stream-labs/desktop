@@ -27,10 +27,6 @@ export class NicoliveCommentLocalFilterService extends PersistentStatefulService
     return ['none', 'low', 'mid', 'high'];
   }
 
-  private get threshold() {
-    return LEVEL_TABLE[this.state.level];
-  }
-
   get level() {
     return this.state.level;
   }
@@ -48,10 +44,11 @@ export class NicoliveCommentLocalFilterService extends PersistentStatefulService
   }
 
   get filterFn() {
+    const threshold = LEVEL_TABLE[this.state.level];
     return (message: WrappedChat): boolean => {
       if (message.type !== 'normal') return true;
 
-      const ngSharingOk = this.threshold < getScore(message.value);
+      const ngSharingOk = threshold < getScore(message.value);
       if (!ngSharingOk) return false;
 
       const anonymityOk = this.showAnonymous || !isAnonymous(message.value);
