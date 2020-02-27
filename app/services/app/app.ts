@@ -38,6 +38,7 @@ import { DismissablesService } from 'services/dismissables';
 import { RestreamService } from 'services/restream';
 import { downloadFile } from '../../util/requests';
 import { TouchBarService } from 'services/touch-bar';
+import { ApplicationMenuService } from 'services/application-menu';
 
 interface IAppState {
   loading: boolean;
@@ -95,6 +96,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private i18nService: I18nService;
   @Inject() private dismissablesService: DismissablesService;
   @Inject() private restreamService: RestreamService;
+  @Inject() private applicationMenuService: ApplicationMenuService;
 
   private loadingPromises: Dictionary<Promise<any>> = {};
 
@@ -157,6 +159,7 @@ export class AppService extends StatefulService<IAppState> {
 
     // MAC-TODO
     this.touchBarService;
+    this.applicationMenuService;
 
     ipcRenderer.send('AppInitFinished');
   }

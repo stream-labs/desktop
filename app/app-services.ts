@@ -48,6 +48,7 @@ export { EditorCommandsService } from 'services/editor-commands';
 export { EditorService } from 'services/editor';
 export { StreamSettingsService } from 'services/settings/streaming';
 export { TouchBarService } from 'services/touch-bar';
+export { ApplicationMenuService } from 'services/application-menu';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';
