@@ -12,49 +12,27 @@ import { $t } from 'services/i18n';
 import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
 
-const TEMPLATE_MAP: Dictionary<string> = {
-  [ELayout.Default]: 'default',
-  [ELayout.TwoPane]: 'twoPane',
-  [ELayout.Classic]: 'classic',
-  [ELayout.OnePane]: 'onePane',
-  [ELayout.FourByFour]: 'fourByFour',
-  [ELayout.Triplets]: 'triplets',
-  [ELayout.OnePaneR]: 'onePaneR',
-  [ELayout.Pyramid]: 'pyramid',
-};
-
 @Component({})
 export default class LayoutEditor extends TsxComponent {
   @Inject() private layoutService: LayoutService;
   @Inject() private navigationService: NavigationService;
   @Inject() private customizationService: CustomizationService;
 
-  currentLayout = this.layoutService.currentTab.currentLayout || ELayout.Default;
+  currentLayout = this.layoutService.views.currentTab.currentLayout || ELayout.Default;
 
-  slottedElements = cloneDeep(this.layoutService.currentTab.slottedElements) || {};
+  slottedElements = cloneDeep(this.layoutService.views.currentTab.slottedElements) || {};
 
   private highlightedSlot: LayoutSlot = null;
   private showModal = false;
 
-  get elementTitles() {
-    return {
-      [ELayoutElement.Display]: $t('Editor Display'),
-      [ELayoutElement.Minifeed]: $t('Mini Feed'),
-      [ELayoutElement.Mixer]: $t('Audio Mixer'),
-      [ELayoutElement.Scenes]: $t('Scene Selector'),
-      [ELayoutElement.Sources]: $t('Source Selector'),
-      [ELayoutElement.LegacyEvents]: $t('Legacy Events'),
-      [ELayoutElement.StreamPreview]: $t('Stream Preview'),
-      [ELayoutElement.RecordingPreview]: $t('Recording Preview'),
-    };
-  }
-
   elementInSlot(slot: LayoutSlot) {
-    return Object.keys(this.slottedElements).find(el => this.slottedElements[el] === slot);
+    return Object.keys(this.slottedElements).find(
+      el => this.slottedElements[el] === slot,
+    ) as ELayoutElement;
   }
 
   classForSlot(slot: LayoutSlot) {
-    const layout = TEMPLATE_MAP[this.currentLayout];
+    const layout = this.layoutService.className(this.currentLayout);
     return cx(styles.placementZone, styles[`${layout}${slot}`], {
       [styles.occupied]: this.elementInSlot(slot),
       [styles.highlight]: this.highlightedSlot === slot,
@@ -64,7 +42,8 @@ export default class LayoutEditor extends TsxComponent {
   layoutImage(layout: ELayout) {
     const mode = this.customizationService.isDarkTheme ? 'night' : 'day';
     const active = this.currentLayout === layout ? '-active' : '';
-    return require(`../../../media/images/layouts/${mode}-${TEMPLATE_MAP[layout]}${active}.png`);
+    const className = this.layoutService.className(layout);
+    return require(`../../../media/images/layouts/${mode}-${className}${active}.png`);
   }
 
   handleElementDrag(event: MouseEvent, el: ELayoutElement) {
@@ -97,7 +76,7 @@ export default class LayoutEditor extends TsxComponent {
   }
 
   save() {
-    if (this.currentLayout !== this.layoutService.currentTab.currentLayout) {
+    if (this.currentLayout !== this.layoutService.views.currentTab.currentLayout) {
       this.layoutService.changeLayout(this.currentLayout);
     }
     this.layoutService.setSlots(this.slottedElements);
@@ -139,14 +118,14 @@ export default class LayoutEditor extends TsxComponent {
           <div class={styles.title}>{$t('Elements')}</div>
           <div class={styles.subtitle}>{$t('Drag and drop to edit.')}</div>
           <div class={styles.elementContainer}>
-            {Object.keys(ELayoutElement).map(element => (
+            {Object.keys(ELayoutElement).map((element: ELayoutElement) => (
               <div
                 draggable
                 class={styles.elementCell}
                 onDragend={(e: MouseEvent) => this.handleElementDrag(e, ELayoutElement[element])}
               >
                 <i class="fas fa-ellipsis-v" />
-                {this.elementTitles[element]}
+                {this.layoutService.views.elementTitle(element)}
               </div>
             ))}
           </div>
@@ -186,7 +165,12 @@ export default class LayoutEditor extends TsxComponent {
         </div>
         <div class={styles.editorContainer}>
           {this.sideBar}
-          <div class={cx(styles.templateContainer, styles[TEMPLATE_MAP[this.currentLayout]])}>
+          <div
+            class={cx(
+              styles.templateContainer,
+              styles[this.layoutService.className(this.currentLayout)],
+            )}
+          >
             {['1', '2', '3', '4', '5', '6'].map((slot: LayoutSlot) => (
               <div
                 class={this.classForSlot(slot)}
@@ -198,7 +182,7 @@ export default class LayoutEditor extends TsxComponent {
                   this.handleElementDrag(e, ELayoutElement[this.elementInSlot(slot)])
                 }
               >
-                <span>{this.elementTitles[this.elementInSlot(slot)]}</span>
+                <span>{this.layoutService.views.elementTitle(this.elementInSlot(slot))}</span>
               </div>
             ))}
           </div>

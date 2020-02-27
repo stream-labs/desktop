@@ -1,42 +1,9 @@
 import TsxComponent from 'components/tsx-component';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
-import {
-  Mixer,
-  SceneSelector,
-  SourceSelector,
-  LegacyEvents,
-  MiniFeed,
-  Display,
-  StreamPreview,
-  RecordingPreview,
-} from 'components/editor/elements';
-import { LayoutService, ELayoutElement, ELayout, IVec2Array } from 'services/layout';
+import { LayoutService, ELayoutElement, IVec2Array } from 'services/layout';
 import { WindowsService } from 'services/windows';
-import * as Layouts from 'components/editor/layouts';
 import { IResizeMins } from 'components/editor/layouts/BaseLayout';
-
-const COMPONENT_MAP: Dictionary<typeof TsxComponent> = {
-  [ELayoutElement.Display]: Display,
-  [ELayoutElement.Minifeed]: MiniFeed,
-  [ELayoutElement.LegacyEvents]: LegacyEvents,
-  [ELayoutElement.Mixer]: Mixer,
-  [ELayoutElement.Scenes]: SceneSelector,
-  [ELayoutElement.Sources]: SourceSelector,
-  [ELayoutElement.StreamPreview]: StreamPreview,
-  [ELayoutElement.RecordingPreview]: RecordingPreview,
-};
-
-const LAYOUT_MAP: Dictionary<typeof TsxComponent> = {
-  [ELayout.Default]: Layouts.Default,
-  [ELayout.TwoPane]: Layouts.TwoPane,
-  [ELayout.Classic]: Layouts.Classic,
-  [ELayout.OnePane]: Layouts.OnePane,
-  [ELayout.Triplets]: Layouts.Triplets,
-  [ELayout.FourByFour]: Layouts.FourByFour,
-  [ELayout.OnePaneR]: Layouts.OnePaneR,
-  [ELayout.Pyramid]: Layouts.Pyramid,
-};
 
 @Component({})
 export default class Studio extends TsxComponent {
@@ -61,15 +28,15 @@ export default class Studio extends TsxComponent {
   }
 
   get resizes() {
-    return this.layoutService.currentTab.resizes;
+    return this.layoutService.views.currentTab.resizes;
   }
 
   get isColumns() {
-    return this.layoutService.isColumnLayout;
+    return this.layoutService.views.isColumnLayout;
   }
 
   get slottedElements() {
-    return this.layoutService.currentTab.slottedElements;
+    return this.layoutService.views.currentTab.slottedElements;
   }
 
   windowResizeHandler(mins: IResizeMins, isChat?: boolean) {
@@ -166,7 +133,7 @@ export default class Studio extends TsxComponent {
   }
 
   render() {
-    const Layout = LAYOUT_MAP[this.layoutService.currentTab.currentLayout];
+    const Layout = this.layoutService.views.component;
     return (
       <Layout
         resizeStartHandler={() => this.resizeStartHandler()}
@@ -184,10 +151,12 @@ export default class Studio extends TsxComponent {
         elWidth={this.elWidth}
         onTotalWidth={(slots: IVec2Array) => this.totalWidthHandler(slots)}
       >
-        {Object.keys(this.layoutService.currentTab.slottedElements).map(widget => {
-          const Element = COMPONENT_MAP[widget];
-          return <Element slot={this.layoutService.currentTab.slottedElements[widget]} />;
-        })}
+        {Object.keys(this.layoutService.views.currentTab.slottedElements).map(
+          (widget: ELayoutElement) => {
+            const Element = this.layoutService.views.elementComponent(widget);
+            return <Element slot={this.layoutService.views.currentTab.slottedElements[widget]} />;
+          },
+        )}
       </Layout>
     );
   }
