@@ -1,6 +1,7 @@
 import URI from 'urijs';
 import isEqual from 'lodash/isEqual';
 import electron from 'electron';
+const BrowserWindow = electron.remote.BrowserWindow;
 
 export const enum EBit {
   ZERO,
@@ -168,5 +169,20 @@ export default class Utils {
         derivedCtor.prototype[name] = baseCtor.prototype[name];
       });
     });
+  }
+
+  /**
+   * Measure time in ms between events and print in to the main process stdout
+   * It's helpful for measuring the time between events in different windows
+   */
+  static measure(msg: string) {
+    electron.ipcRenderer.send('measure-time', msg, Date.now());
+  }
+
+  static makeChildWindowVisible() {
+    const childWindowId: number = electron.ipcRenderer.sendSync('getWindowIds').child;
+    const childWindow = BrowserWindow.fromId(childWindowId);
+    childWindow.show();
+    childWindow.restore();
   }
 }

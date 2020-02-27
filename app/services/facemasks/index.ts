@@ -24,6 +24,7 @@ import * as Interfaces from './definitions';
 import { AppService } from 'services/app';
 import { propsToSettings } from 'util/obs';
 import { InitAfter } from '../core';
+import Utils from 'services/utils';
 
 @InitAfter('UserService')
 export class FacemasksService extends PersistentStatefulService<Interfaces.IFacemasksServiceState> {
@@ -101,7 +102,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   notifyFailure() {
     this.SET_ACTIVE(false);
     electron.remote.dialog
-      .showMessageBox(electron.remote.getCurrentWindow(), {
+      .showMessageBox(Utils.getMainWindow(), {
         type: 'warning',
         message: $t('We encountered an issue setting up your Face Mask Library'),
         detail: $t('Click Retry to try again'),
@@ -115,7 +116,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   }
 
   notifyPluginMissing() {
-    const ok = electron.remote.dialog.showMessageBox(electron.remote.getCurrentWindow(), {
+    const ok = electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
       type: 'warning',
       message: $t('Unable to find face mask plugin. You will not be able to use Face Masks'),
       buttons: ['OK'],
