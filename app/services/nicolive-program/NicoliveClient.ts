@@ -126,6 +126,10 @@ export class NicoliveClient {
     };
   }
 
+  /**
+   * ニコニコのセッションを読みだし
+   * rendererのdocument.cookieからはローカル扱いになって読めないので、mainプロセスで取る
+   */
   private async fetchSession(): Promise<string> {
     const { session } = remote.getCurrentWebContents();
     return new Promise((resolve, reject) =>

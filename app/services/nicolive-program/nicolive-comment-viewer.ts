@@ -44,7 +44,12 @@ function makeEmulatedChat(
 }
 
 interface INicoliveCommentViewerState {
+  /** 表示対象のコメント */
   messages: WrappedChat[];
+  /**
+   * 直前の更新で表示対象から押し出されたコメント
+   * ローカルフィルターとスクロール位置維持のために実体を持っている
+   */
   popoutMessages: WrappedChat[];
   pinnedMessage: WrappedChat | null;
 }
