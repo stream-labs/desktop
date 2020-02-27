@@ -15,7 +15,9 @@ export class NicoliveFailure {
       console.error(res.value);
       return new this('network_error', method, 'network_error');
     }
-    return new this('http_error', method, res.value.meta.status.toString(10), res.value.meta.errorMessage);
+    const { errorCode, errorMessage } = res.value.meta;
+    const additionalMessage = `${errorCode ?? ''}${errorMessage ? `: ${errorMessage}` : ''}`;
+    return new this('http_error', method, res.value.meta.status.toString(10), additionalMessage);
   }
 
   static fromConditionalError(method: string, reason: string) {
