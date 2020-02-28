@@ -126,6 +126,60 @@ export default class LayoutEditor extends TsxComponent {
     this.layoutService.removeCurrentTab();
   }
 
+  get topBar() {
+    return (
+      <div class={styles.topBar}>
+        <ListInput
+          style="z-index: 1;"
+          value={this.layoutService.state.currentTab}
+          onInput={(tab: string) => this.setTab(tab)}
+          metadata={{ options: this.tabOptions }}
+          v-tooltip={{ content: $t('Current Tab'), placement: 'bottom' }}
+        />
+        <button
+          class={cx('button button--default', styles.addButton)}
+          v-tooltip={{ content: $t('Add Tab'), placement: 'bottom' }}
+          onClick={() => this.openModal()}
+        >
+          <i class="icon-add" />
+        </button>
+        {this.layoutService.state.currentTab !== 'default' && (
+          <button
+            class={cx('button button--warn', styles.removeButton)}
+            v-tooltip={{ content: $t('Delete Current Tab'), placement: 'bottom' }}
+            onClick={() => this.removeCurrentTab()}
+          >
+            <i class="icon-trash" />
+          </button>
+        )}
+        <button class="button button--action" onClick={() => this.save()}>
+          {$t('Save Changes')}
+        </button>
+      </div>
+    );
+  }
+
+  get elementList() {
+    return (
+      <div style="display: flex; flex-direction: column;">
+        <div class={styles.title}>{$t('Elements')}</div>
+        <div class={styles.subtitle}>{$t('Drag and drop to edit.')}</div>
+        <div class={styles.elementContainer}>
+          {Object.keys(ELayoutElement).map((element: ELayoutElement) => (
+            <div
+              draggable
+              class={styles.elementCell}
+              onDragend={(e: MouseEvent) => this.handleElementDrag(e, ELayoutElement[element])}
+            >
+              <i class="fas fa-ellipsis-v" />
+              {this.layoutService.views.elementTitle(element)}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   get sideBar() {
     return (
       <div class={styles.sideBar}>
@@ -142,22 +196,7 @@ export default class LayoutEditor extends TsxComponent {
             ))}
           </div>
         </div>
-        <div style="display: flex; flex-direction: column;">
-          <div class={styles.title}>{$t('Elements')}</div>
-          <div class={styles.subtitle}>{$t('Drag and drop to edit.')}</div>
-          <div class={styles.elementContainer}>
-            {Object.keys(ELayoutElement).map((element: ELayoutElement) => (
-              <div
-                draggable
-                class={styles.elementCell}
-                onDragend={(e: MouseEvent) => this.handleElementDrag(e, ELayoutElement[element])}
-              >
-                <i class="fas fa-ellipsis-v" />
-                {this.layoutService.views.elementTitle(element)}
-              </div>
-            ))}
-          </div>
-        </div>
+        {this.elementList}
       </div>
     );
   }
@@ -173,34 +212,7 @@ export default class LayoutEditor extends TsxComponent {
   render() {
     return (
       <div style={{ flexDirection: 'column' }}>
-        <div class={styles.topBar}>
-          <ListInput
-            style="z-index: 1;"
-            value={this.layoutService.state.currentTab}
-            onInput={(tab: string) => this.setTab(tab)}
-            metadata={{ options: this.tabOptions }}
-            v-tooltip={{ content: $t('Current Tab'), placement: 'bottom' }}
-          />
-          <button
-            class={cx('button button--default', styles.addButton)}
-            v-tooltip={{ content: $t('Add Tab'), placement: 'bottom' }}
-            onClick={() => this.openModal()}
-          >
-            <i class="icon-add" />
-          </button>
-          {this.layoutService.state.currentTab !== 'default' && (
-            <button
-              class={cx('button button--warn', styles.removeButton)}
-              v-tooltip={{ content: $t('Delete Current Tab'), placement: 'bottom' }}
-              onClick={() => this.removeCurrentTab()}
-            >
-              <i class="icon-trash" />
-            </button>
-          )}
-          <button class="button button--action" onClick={() => this.save()}>
-            {$t('Save Changes')}
-          </button>
-        </div>
+        {this.topBar}
         <div class={styles.editorContainer}>
           {this.sideBar}
           <div

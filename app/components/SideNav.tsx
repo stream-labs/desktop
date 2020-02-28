@@ -91,6 +91,21 @@ export default class SideNav extends Vue {
     return this.appService.state.loading;
   }
 
+  get studioTabElements() {
+    return this.studioTabs.map(page => (
+      <div
+        class={cx(styles.mainCell, {
+          [styles.active]:
+            this.page === 'Studio' && this.layoutService.state.currentTab === page.target,
+        })}
+        onClick={() => this.navigateToStudioTab(page.target)}
+        title={page.title}
+      >
+        <i class={page.icon} />
+      </div>
+    ));
+  }
+
   render() {
     const pageData = [{ target: 'BrowseOverlays', icon: 'icon-themes', title: $t('Themes') }];
 
@@ -103,18 +118,7 @@ export default class SideNav extends Vue {
 
     return (
       <div class={cx('side-nav', styles.container, { [styles.leftDock]: this.leftDock })}>
-        {this.studioTabs.map(page => (
-          <div
-            class={cx(styles.mainCell, {
-              [styles.active]:
-                this.page === 'Studio' && this.layoutService.state.currentTab === page.target,
-            })}
-            onClick={() => this.navigateToStudioTab(page.target)}
-            title={page.title}
-          >
-            <i class={page.icon} />
-          </div>
-        ))}
+        {this.studioTabElements}
         {pageData.map(page => (
           <div
             class={cx(styles.mainCell, {
