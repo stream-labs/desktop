@@ -49,6 +49,7 @@ export { EditorCommandsService } from 'services/editor-commands';
 export { EditorService } from 'services/editor';
 export { StreamSettingsService } from 'services/settings/streaming';
 export { MetricsService } from 'services/metrics';
+export { MacPermissionsService } from 'services/mac-permissions';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';

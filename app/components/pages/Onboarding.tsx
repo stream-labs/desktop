@@ -14,11 +14,13 @@ import {
   Optimize,
   FacebookPageCreation,
   Multistream,
+  MacPermissions,
 } from './onboarding-steps';
 import { UserService } from 'services/user';
 import { $t } from 'services/i18n';
 import styles from './Onboarding.m.less';
 import { RestreamService } from 'services/restream';
+import { OS } from 'util/operating-systems';
 
 interface IOnboardingStep {
   element: JSX.Element;
@@ -82,6 +84,20 @@ export default class OnboardingPage extends TsxComponent<{}> {
 
   get steps() {
     const steps: IOnboardingStep[] = [];
+
+    if (process.platform === OS.Mac) {
+      steps.push({
+        element: (
+          <MacPermissions
+            slot={(steps.length + 1).toString()}
+            continue={this.continue.bind(this)}
+          />
+        ),
+        disableControls: false,
+        hideSkip: true,
+        hideButton: true,
+      });
+    }
 
     steps.push({
       element: <Connect slot={(steps.length + 1).toString()} continue={this.continue.bind(this)} />,
