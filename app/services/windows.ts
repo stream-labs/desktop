@@ -281,11 +281,6 @@ export class WindowsService extends StatefulService<IWindowsState> {
     }
   }
 
-  makeChildWindowVisible() {
-    this.windows.child.show();
-    this.windows.child.restore();
-  }
-
   getMainWindowDisplay() {
     const window = this.windows.main;
     const bounds = window.getBounds();

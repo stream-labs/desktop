@@ -12,7 +12,7 @@
   "Remote Control": "Távirányítás",
   "Experimental": "Kísérleti",
   "Developer": "Fejlesztő",
-  "Face Masks": "Face Masks",
+  "Face Masks": "Arc Maszkok",
   "Night mode": "Éjszakai mód",
   "Game Overlay": "Játékon belüli átfedés",
   "Installed Apps": "Telepített alkalmazások",
@@ -83,7 +83,7 @@
   "Open FrankerFaceZ Settings": "Nyissa meg a FrankerFaceZ Beállításokat",
   "FrankerFaceZ Settings": "FrankerFaceZ Beállítások",
   "API Token": "API tokenek",
-  "Face Mask Settings": "Face Mask Settings",
+  "Face Mask Settings": "Arcmaszk beállításai",
   "Navigate to Live tab when going live": "Nyissa meg az Élő fület, amikor élőben jelenik meg",
   "Save Replay": "Visszajátszás Mentése",
   "Disable hardware acceleration": "Kapcsolja ki a hardveres gyorsítást",
@@ -117,5 +117,5 @@
   "Audio - Track 6": "Audio - 6. szám",
   "Stream Key": "Stream kulcs",
   "You can not change these settings when you're live": "Ezeket a beállításokat élőben nem módosíthatja",
-  "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.": "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk."
+  "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.": "Ez a szolgáltatás az overlay tervezők számára készült, hogy munkájukat a Theme Store-ba exportálhassák. Nem minden forrás kerül exportálásra, használja a saját felelősségére."
 }
