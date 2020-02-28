@@ -1,10 +1,10 @@
 {
-  "Compose Tweet": "Compose Tweet",
-  "Custom URL with": "Custom URL with",
-  "Share Your Stream": "Share Your Stream",
-  "Connect to Twitter": "Connect to Twitter",
-  "Enable Tweet Sharing": "Enable Tweet Sharing",
-  "Tweet when going live": "Tweet when going live",
-  "Unlink Twitter": "Unlink Twitter",
-  "Tweet & Go Live": "Tweet & Go Live"
+  "Compose Tweet": "트윗 작성",
+  "Custom URL with": "커스텀 URL:",
+  "Share Your Stream": "스트리밍 공유",
+  "Connect to Twitter": "Twitter에 연결",
+  "Enable Tweet Sharing": "트윗 공유 활성화",
+  "Tweet when going live": "라이브 시 트윗",
+  "Unlink Twitter": "Twitter 연결 해제",
+  "Tweet & Go Live": "트윗 및 라이브 하기"
 }
