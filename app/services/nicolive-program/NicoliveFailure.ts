@@ -41,6 +41,14 @@ async function openErrorDialog({ title, message }: { title: string; message: str
   });
 }
 
+function fallbackToX00(reason: string): string {
+  const matched = reason.match(/^(\d)\d\d$/);
+  if (matched) {
+    return `${matched[1]}00`;
+  }
+  return reason;
+}
+
 export async function openErrorDialogFromFailure(failure: NicoliveFailure): Promise<void> {
   if (failure.type === 'logic') {
     return openErrorDialog({
@@ -49,10 +57,16 @@ export async function openErrorDialogFromFailure(failure: NicoliveFailure): Prom
     });
   }
 
+  /** 4xx, 5xxエラーに対する文言がなかったら400や500向けの文言を出す */
   return openErrorDialog({
-    title: $t(`nicolive-program.errors.api.${failure.method}.${failure.reason}.title`),
+    title: $t(`nicolive-program.errors.api.${failure.method}.${failure.reason}.title`, {
+      fallback: $t(`nicolive-program.errors.api.${failure.method}.${fallbackToX00(failure.reason)}.title`),
+    }),
     message: $t(`nicolive-program.errors.api.${failure.method}.${failure.reason}.message`, {
       additionalMessage: failure.additionalMessage,
+      fallback: $t(`nicolive-program.errors.api.${failure.method}.${fallbackToX00(failure.reason)}.message`, {
+        additionalMessage: failure.additionalMessage,
+      }),
     }),
   });
 }
