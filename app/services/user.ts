@@ -118,11 +118,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   /**
+   * @deprecated
    * This is a uuid that persists across the application lifetime and uniquely
    * identifies this particular installation of N Air, even when the user is
    * not logged in.
    */
-  getLocalUserId() {
+  private getLocalUserId() {
     const localStorageKey = 'NAirLocalUserId';
     let userId = localStorage.getItem(localStorageKey);
 
