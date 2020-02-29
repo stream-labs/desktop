@@ -475,28 +475,3 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
     return result.x;
   }
 }
-
-class FpsCtrl {
-  time: number = null; // start time
-  frame = -1; // frame count
-  tref: unknown; // rAF time reference
-  delay: number;
-
-  constructor(
-    private fps: number,
-    private callback: (timestamp: number, frame: number) => unknown,
-  ) {
-    this.delay = 1000 / fps; // calc. time per frame
-  }
-
-  loop(timestamp: number) {
-    if (this.time === null) this.time = timestamp; // init start time
-    const seg = Math.floor((timestamp - this.time) / this.delay); // calc frame no.
-    if (seg > this.frame) {
-      // moved to next frame?
-      this.frame = seg; // update
-      this.callback(timestamp, this.frame);
-    }
-    this.tref = requestAnimationFrame(() => this.loop(null));
-  }
-}
