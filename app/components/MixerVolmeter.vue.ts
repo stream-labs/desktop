@@ -10,6 +10,7 @@ import fShaderSrc from 'util/webgl/shaders/volmeter.frag';
 import electron from 'electron';
 import TsxComponent, { createProps } from './tsx-component';
 import { v2 } from '../util/vec2';
+import uuid from 'uuid';
 
 // Configuration
 const CHANNEL_HEIGHT = 3;
@@ -23,6 +24,7 @@ const DANGER_LEVEL = -9;
 const GREEN = [49, 195, 162];
 const YELLOW = [255, 205, 71];
 const RED = [252, 62, 63];
+const FPS_LIMIT = 60;
 
 class MixerVolmeterProps {
   audioSource: AudioSource = null;
@@ -82,6 +84,10 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
   // time between 2 received peaks.
   // Used to render extra interpolated frames
   interpolationTime = 35;
+  bg: { r: number; g: number; b: number };
+
+  firstFrameTime: number;
+  frameNumber: number;
 
   mounted() {
     this.subscribeVolmeter();
@@ -125,14 +131,32 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
     requestAnimationFrame(() => this.onRequestAnimationFrameHandler());
   }
 
+  /**
+   * Render volmeters with FPS capping
+   */
   private onRequestAnimationFrameHandler() {
-    // don't render sources then channelsCount is 0
-    // happens when the browser source stops playing audio
-    if (this.renderingInitialized && this.currentPeaks && this.currentPeaks.length) {
-      if (this.gl) {
-        this.drawVolmeterWebgl(this.currentPeaks);
-      } else {
-        this.drawVolmeterC2d(this.currentPeaks);
+    // init first rendering frame
+    if (!this.frameNumber) {
+      this.frameNumber = -1;
+      this.firstFrameTime = performance.now();
+    }
+
+    const now = performance.now();
+    const timeElapsed = now - this.firstFrameTime;
+    const timeBetweenFrames = 1000 / FPS_LIMIT;
+    const currentFrameNumber = Math.ceil(timeElapsed / timeBetweenFrames);
+
+    if (currentFrameNumber !== this.frameNumber) {
+      // it's time to render next frame
+      this.frameNumber = currentFrameNumber;
+      // don't render sources then channelsCount is 0
+      // happens when the browser source stops playing audio
+      if (this.renderingInitialized && this.currentPeaks && this.currentPeaks.length) {
+        if (this.gl) {
+          this.drawVolmeterWebgl(this.currentPeaks);
+        } else {
+          this.drawVolmeterC2d(this.currentPeaks);
+        }
       }
     }
     requestAnimationFrame(() => this.onRequestAnimationFrameHandler());
@@ -265,7 +289,7 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
   }
 
   private drawVolmeterWebgl(peaks: number[]) {
-    const bg = this.customizationService.themeBackground;
+    const bg = this.bg;
 
     this.gl.clearColor(bg.r / 255, bg.g / 255, bg.b / 255, 1);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
@@ -414,6 +438,7 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
         this.prevPeaks = this.interpolatedPeaks;
         this.currentPeaks = Array.from(volmeter.peak);
         this.lastEventTime = performance.now();
+        this.bg = this.customizationService.themeBackground;
       }
     };
 
@@ -448,5 +473,30 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
   lerp(val1: number, val2: number, alpha: number) {
     const result = v2(val1, 0).lerp(v2(val2, 0), alpha);
     return result.x;
+  }
+}
+
+class FpsCtrl {
+  time: number = null; // start time
+  frame = -1; // frame count
+  tref: unknown; // rAF time reference
+  delay: number;
+
+  constructor(
+    private fps: number,
+    private callback: (timestamp: number, frame: number) => unknown,
+  ) {
+    this.delay = 1000 / fps; // calc. time per frame
+  }
+
+  loop(timestamp: number) {
+    if (this.time === null) this.time = timestamp; // init start time
+    const seg = Math.floor((timestamp - this.time) / this.delay); // calc frame no.
+    if (seg > this.frame) {
+      // moved to next frame?
+      this.frame = seg; // update
+      this.callback(timestamp, this.frame);
+    }
+    this.tref = requestAnimationFrame(() => this.loop(null));
   }
 }
