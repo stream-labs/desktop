@@ -10,6 +10,7 @@ import mapValues from 'lodash/mapValues';
 import { $t } from 'services/i18n';
 import * as obs from '../../obs-api';
 import { GameOverlayService } from './game-overlay';
+import Utils from './utils';
 
 function getScenesService(): ScenesService {
   return ScenesService.instance;
