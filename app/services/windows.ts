@@ -190,7 +190,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
   windowUpdated = new Subject<{ windowId: string; options: IWindowOptions }>();
   windowDestroyed = new Subject<string>();
-  private windows: Dictionary<Electron.BrowserWindow> = {};
+  windows: Dictionary<Electron.BrowserWindow> = {};
 
   init() {
     const windowIds = ipcRenderer.sendSync('getWindowIds');

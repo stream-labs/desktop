@@ -5,6 +5,8 @@ import { ClipboardService } from './clipboard';
 import { OS } from 'util/operating-systems';
 import { SelectionService } from './selection';
 import { AppService } from './app';
+import { WindowsService } from './windows';
+import { NavigationService } from './navigation';
 
 /**
  * Manages the application menuy and shortcuts on Mac OS
@@ -14,6 +16,8 @@ export class ApplicationMenuService extends Service {
   @Inject() clipboardService: ClipboardService;
   @Inject() selectionService: SelectionService;
   @Inject() appService: AppService;
+  @Inject() windowsService: WindowsService;
+  @Inject() navigationService: NavigationService;
 
   init() {
     if (process.platform !== OS.Mac) return;
@@ -24,7 +28,7 @@ export class ApplicationMenuService extends Service {
     this.bindDynamicMenuItems();
   }
 
-  buildMenu(): electron.Menu {
+  private buildMenu(): electron.Menu {
     // TODO: i18n
     return electron.remote.Menu.buildFromTemplate([
       { role: 'appMenu' },
@@ -38,8 +42,12 @@ export class ApplicationMenuService extends Service {
             label: 'Undo',
             accelerator: 'Command+Z',
             click: () => {
-              if (this.appService.state.loading) return;
-              this.editorCommandsService.undo();
+              if (this.isEditorFocused()) {
+                if (this.appService.state.loading) return;
+                this.editorCommandsService.undo();
+              } else {
+                electron.remote.Menu.sendActionToFirstResponder('undo:');
+              }
             },
           },
           {
@@ -47,8 +55,12 @@ export class ApplicationMenuService extends Service {
             label: 'Redo',
             accelerator: 'Command+Shift+Z',
             click: () => {
-              if (this.appService.state.loading) return;
-              this.editorCommandsService.redo();
+              if (this.isEditorFocused()) {
+                if (this.appService.state.loading) return;
+                this.editorCommandsService.redo();
+              } else {
+                electron.remote.Menu.sendActionToFirstResponder('redo:');
+              }
             },
           },
           { type: 'separator' },
@@ -57,8 +69,12 @@ export class ApplicationMenuService extends Service {
             label: 'Copy',
             accelerator: 'Command+C',
             click: () => {
-              if (this.appService.state.loading) return;
-              this.clipboardService.copy();
+              if (this.isEditorFocused()) {
+                if (this.appService.state.loading) return;
+                this.clipboardService.copy();
+              } else {
+                electron.remote.Menu.sendActionToFirstResponder('copy:');
+              }
             },
           },
           {
@@ -66,24 +82,34 @@ export class ApplicationMenuService extends Service {
             label: 'Paste',
             accelerator: 'Command+V',
             click: () => {
-              if (this.appService.state.loading) return;
-              this.clipboardService.paste();
+              if (this.isEditorFocused()) {
+                if (this.appService.state.loading) return;
+                this.clipboardService.paste();
+              } else {
+                electron.remote.Menu.sendActionToFirstResponder('paste:');
+              }
             },
           },
           {
             id: 'delete',
             label: 'Delete',
             click: () => {
-              if (this.appService.state.loading) return;
-              this.selectionService.remove();
+              if (this.isEditorFocused()) {
+                if (this.appService.state.loading) return;
+                this.selectionService.remove();
+              }
             },
           },
           {
             label: 'Select All',
             accelerator: 'Command+A',
             click: () => {
-              if (this.appService.state.loading) return;
-              this.selectionService.selectAll();
+              if (this.isEditorFocused()) {
+                if (this.appService.state.loading) return;
+                this.selectionService.selectAll();
+              } else {
+                electron.remote.Menu.sendActionToFirstResponder('selectAll:');
+              }
             },
           },
           { type: 'separator' },
@@ -92,8 +118,10 @@ export class ApplicationMenuService extends Service {
             label: 'Nudge Selection Up',
             accelerator: 'Up',
             click: () => {
-              if (this.appService.state.loading) return;
-              this.editorCommandsService.nudgeActiveItemsUp();
+              if (this.isEditorFocused()) {
+                if (this.appService.state.loading) return;
+                this.editorCommandsService.nudgeActiveItemsUp();
+              }
             },
           },
           {
@@ -101,8 +129,10 @@ export class ApplicationMenuService extends Service {
             label: 'Nudge Selection Down',
             accelerator: 'Down',
             click: () => {
-              if (this.appService.state.loading) return;
-              this.editorCommandsService.nudgeActiveItemsDown();
+              if (this.isEditorFocused()) {
+                if (this.appService.state.loading) return;
+                this.editorCommandsService.nudgeActiveItemsDown();
+              }
             },
           },
           {
@@ -110,8 +140,10 @@ export class ApplicationMenuService extends Service {
             label: 'Nudge Selection Left',
             accelerator: 'Left',
             click: () => {
-              if (this.appService.state.loading) return;
-              this.editorCommandsService.nudgeActiveItemsLeft();
+              if (this.isEditorFocused()) {
+                if (this.appService.state.loading) return;
+                this.editorCommandsService.nudgeActiveItemsLeft();
+              }
             },
           },
           {
@@ -119,8 +151,10 @@ export class ApplicationMenuService extends Service {
             label: 'Nudge Selection Right',
             accelerator: 'Right',
             click: () => {
-              if (this.appService.state.loading) return;
-              this.editorCommandsService.nudgeActiveItemsRight();
+              if (this.isEditorFocused()) {
+                if (this.appService.state.loading) return;
+                this.editorCommandsService.nudgeActiveItemsRight();
+              }
             },
           },
           { type: 'separator' },
@@ -150,17 +184,17 @@ export class ApplicationMenuService extends Service {
     ]);
   }
 
-  bindDynamicMenuItems() {
+  private isEditorFocused() {
+    return (
+      this.windowsService.windows.main.webContents.isFocused() &&
+      this.navigationService.state.currentPage === 'Studio'
+    );
+  }
+
+  private bindDynamicMenuItems() {
     const appMenu = electron.remote.Menu.getApplicationMenu();
 
-    this.editorCommandsService.undoHistorySize.subscribe(sizes => {
-      appMenu.getMenuItemById('undo').enabled = !!sizes.undoLength;
-      appMenu.getMenuItemById('redo').enabled = !!sizes.redoLength;
-    });
-
     this.selectionService.updated.subscribe(state => {
-      appMenu.getMenuItemById('copy').enabled = !!state.selectedIds.length;
-      appMenu.getMenuItemById('delete').enabled = !!state.selectedIds.length;
       appMenu.getMenuItemById('nudgeUp').enabled = !!state.selectedIds.length;
       appMenu.getMenuItemById('nudgeDown').enabled = !!state.selectedIds.length;
       appMenu.getMenuItemById('nudgeLeft').enabled = !!state.selectedIds.length;
