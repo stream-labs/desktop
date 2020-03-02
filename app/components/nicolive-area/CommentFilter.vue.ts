@@ -4,6 +4,7 @@ import { Inject } from 'util/injector';
 import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
 import { FilterType, FilterRecord } from 'services/nicolive-program/ResponseTypes';
 import { UserService } from 'services/user';
+import { NicoliveFailure, openErrorDialogFromFailure } from 'services/nicolive-program/NicoliveFailure';
 
 @Component({})
 export default class CommentFilter extends Vue {
@@ -14,7 +15,15 @@ export default class CommentFilter extends Vue {
   private userService: UserService;
 
   async reloadFilters() {
-    return this.nicoliveCommentFilterService.fetchFilters();
+    try {
+      return this.nicoliveCommentFilterService.fetchFilters();
+    } catch (caught) {
+      if (caught instanceof NicoliveFailure) {
+        await openErrorDialogFromFailure(caught);
+      } else {
+        throw caught;
+      }
+    }
   }
 
   deleting: boolean = false;
@@ -22,8 +31,12 @@ export default class CommentFilter extends Vue {
     try {
       this.deleting = true;
       await this.nicoliveCommentFilterService.deleteFilters([ record.id ]);
-    } catch (e) {
-      console.error(e);
+    } catch (caught) {
+      if (caught instanceof NicoliveFailure) {
+        await openErrorDialogFromFailure(caught);
+      } else {
+        throw caught;
+      }
     } finally {
       this.deleting = false;
     }
@@ -64,8 +77,12 @@ export default class CommentFilter extends Vue {
         body,
       });
       this.newFilterValue = '';
-    } catch (e) {
-      console.error(e);
+    } catch (caught) {
+      if (caught instanceof NicoliveFailure) {
+        await openErrorDialogFromFailure(caught);
+      } else {
+        throw caught;
+      }
     } finally {
       this.adding = false;
 
