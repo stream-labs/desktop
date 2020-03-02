@@ -4,7 +4,7 @@ import BaseElement from './BaseElement';
 
 @Component({})
 export default class SourceSelectorElement extends BaseElement {
-  mins = { x: 220, y: 150 };
+  mins = { x: 230, y: 120 };
 
   get element() {
     return <SourceSelector />;
