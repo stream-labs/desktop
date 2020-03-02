@@ -6,7 +6,7 @@
     </div>
 
     <button slot="reference" class="dropdown-menu__toggle">
-      <span class="scene-name">{{ title }}</span><i class="icon-down-arrow"/>
+      <span class="scene-name">{{ title }}</span><i class="icon-drop-down-arrow"/>
     </button>
 
   </popper>

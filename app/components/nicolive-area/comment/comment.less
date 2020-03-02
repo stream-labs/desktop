@@ -1,0 +1,64 @@
+.common__comment-header() {
+  padding-left: 16px;
+  text-align: center;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+
+  > i {
+    font-size: 14px;
+  }
+}
+
+.common__comment-number() {
+  min-width: 40px;
+  padding-left: 16px;
+  text-align: right;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.common__comment-body() {
+  margin-left: 16px;
+  overflow-x: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  flex-grow: 1;
+  color: @light-grey;
+}
+
+.common__comment-misc() {
+  width: 32px;
+  text-align: center;
+  flex-shrink: 0;
+
+  > i {
+    line-height: 32px;
+  }
+}
+
+.comment-row-fade(@bg-color) {
+  animation-name: comment-row-fade-in, comment-row-fade-out;
+  animation-duration: 200ms, 900ms;
+  animation-timing-function: ease, cubic-bezier(.54,.19,.47,1);
+  animation-delay: 0ms, 200ms;
+
+  @keyframes comment-row-fade-in {
+    0% {
+      background-color: rgba(@bg-color, 0);
+    }
+    100% {
+      background-color: rgba(@bg-color, .75);
+    }
+  }
+  
+  @keyframes comment-row-fade-out {
+    0% {
+      background-color: rgba(@bg-color, .75);
+    }
+    100% {
+      background-color: rgba(@bg-color, .0);
+    }
+  }
+}

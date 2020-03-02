@@ -1,14 +1,8 @@
 <template>
   <div class="program-description">
     <div class="program-description-header">
-      <p class="program-description-title">番組詳細</p>
-      <div class="color-change-wrapper">
-        <span class="color-change-label">背景色</span>　
-        <input class="radio-btn" type="radio" id="change-dark-mode-btn" value="dark-mode" v-model="bgColorMode"><label for="change-dark-mode-btn" class="dark-mode-label"></label>
-        <input class="radio-btn" type="radio" id="change-light-mode-btn" value="light-mode" v-model="bgColorMode"><label for="change-light-mode-btn" class="light-mode-label"></label>
-      </div>
     </div>
-    <div @click="handleAnchorClick" :class="bgColorMode" class="program-description-body">
+    <div class="program-description-body">
       <div v-html="programDescription" class="program-description-text"></div>
     </div>
   </div>
@@ -27,99 +21,39 @@
 }
 
 .program-description-header {
+  flex-shrink: 0;
   display: flex;
-  justify-content: space-between;
+  flex-direction: row-reverse;
   align-items: center;
   width: 100%;
-  height: 40px;
-  padding: 0 16px;
-  background-color: @bg-quinary;
-}
-
-.program-description-title {
-  font-size: 12px;
-  color: @text-primary;
-  margin: 0;
-}
-
-.color-change-wrapper {
-  display: flex;
-  align-items: center;
-
-  .color-change-label {
-    font-size: 11px;
-    color: @text-secondary;
-    margin-right: 12px;
-  }
-
-  .radio-btn {
-    display: none;
-
-    & + label {
-      position: relative;
-      width: 16px;
-      height: 16px;
-      margin: 0;
-      border: 1px solid @white;
-      border-radius: 100%;
-
-      &:not(:last-child) {
-        margin-right: 8px;
-      }
-
-      &.dark-mode-label {
-        background-color: @bg-secondary; 
-      }
-
-      &.light-mode-label {
-       background-color: @white;
-      } 
-    }
-
-    &:checked {
-      & + label {
-        border-color: @text-active;
-      }
-    }
-  }
+  height: 48px;
+  padding: 4px 16px;
+  background-color: @bg-secondary;
+  border-bottom: 1px solid @bg-primary;
 }
 
 .program-description-body {
   flex-grow: 1;
-  flex-basis: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  background-color: @white;
 
-  &.dark-mode {
-    background-color: @bg-tertiary;
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+    border: none;
   }
 
-  &.light-mode {
-    background-color: @white;
-
-    &::-webkit-scrollbar-track {
-      background-color: transparent;
-      border: none;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background-color: @grey;
-      border-color: @white;
-    }
+  &::-webkit-scrollbar-thumb {
+    background-color: @grey;
+    border-color: @white;
   }
+  
 }
 
 .program-description-text {
   padding: 16px;
+  color: @black;
   overflow-wrap: break-word;
-
-  .dark-mode & {
-    color: @text-secondary;
-  }
-
-  .light-mode & {
-    color: @black;
-  }
 }
 
 </style>

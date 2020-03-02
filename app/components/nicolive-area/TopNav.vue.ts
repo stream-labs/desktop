@@ -1,8 +1,9 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
-import { NicoliveProgramService, NicoliveProgramServiceFailure } from 'services/nicolive-program/nicolive-program';
+import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
 import { clipboard } from 'electron';
+import { NicoliveFailure, openErrorDialogFromFailure } from 'services/nicolive-program/NicoliveFailure';
 
 @Component({})
 export default class TopNav extends Vue {
@@ -20,8 +21,8 @@ export default class TopNav extends Vue {
       this.isFetching = true;
       await this.nicoliveProgramService.fetchProgram();
     } catch (caught) {
-      if (caught instanceof NicoliveProgramServiceFailure) {
-        await NicoliveProgramService.openErrorDialogFromFailure(caught);
+      if (caught instanceof NicoliveFailure) {
+        await openErrorDialogFromFailure(caught);
       } else {
         throw caught;
       }
@@ -45,14 +46,14 @@ export default class TopNav extends Vue {
   }
 
   hasProgramUrlCopied : boolean = false;
-  clearTimer : NodeJS.Timer | null = null; 
+  clearTimer : number = 0;
   copyProgramURL() {
     if (this.isFetching) throw new Error('fetchProgram is running');
     clipboard.writeText(`https://live.nicovideo.jp/watch/${this.nicoliveProgramService.state.programID}`);
     this.hasProgramUrlCopied = true;
-    clearTimeout(this.clearTimer)
+    window.clearTimeout(this.clearTimer)
 
-    this.clearTimer = setTimeout(() => {
+    this.clearTimer = window.setTimeout(() => {
       this.hasProgramUrlCopied = false;
       this.clearTimer = null;
     }, 1000)

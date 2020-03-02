@@ -61,6 +61,9 @@ import { InformationsService } from 'services/informations';
 import { InformationsStateService } from 'services/informations/state';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
 import { NicoliveProgramStateService } from 'services/nicolive-program/state';
+import { NicoliveCommentViewerService } from 'services/nicolive-program/nicolive-comment-viewer';
+import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
+import { NicoliveCommentLocalFilterService } from 'services/nicolive-program/nicolive-comment-local-filter';
 
 const { ipcRenderer } = electron;
 
@@ -127,6 +130,9 @@ export class ServicesManager extends Service {
     InformationsStateService,
     NicoliveProgramService,
     NicoliveProgramStateService,
+    NicoliveCommentViewerService,
+    NicoliveCommentFilterService,
+    NicoliveCommentLocalFilterService,
   };
 
   private instances: Dictionary<Service> = {};

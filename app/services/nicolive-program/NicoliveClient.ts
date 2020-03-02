@@ -9,6 +9,8 @@ import {
   Communities,
   CommonErrorResponse,
   Community,
+  Filters,
+  FilterRecord
 } from './ResponseTypes';
 const { BrowserWindow } = remote;
 
@@ -122,6 +124,20 @@ export class NicoliveClient {
       ok: false,
       value: err,
     };
+  }
+
+  /**
+   * ニコニコのセッションを読みだし
+   * rendererのdocument.cookieからはローカル扱いになって読めないので、mainプロセスで取る
+   */
+  private async fetchSession(): Promise<string> {
+    const { session } = remote.getCurrentWebContents();
+    return new Promise((resolve, reject) =>
+      session.cookies.get({ url: 'https://.nicovideo.jp', name: 'user_session' }, (err, cookies) => {
+        if (err) return reject(err);
+        resolve(cookies[0].value);
+      })
+    );
   }
 
   private get(url: string | URL, options: RequestInit = {}): Promise<Response> {
@@ -244,6 +260,67 @@ export class NicoliveClient {
       const res = await this.get(`${NicoliveClient.nicoadBaseURL}/v1/live/statusarea/${programID}`, { headers });
 
       return NicoliveClient.wrapResult<NicoadStatistics['data']>(res);
+    } catch (err) {
+      return NicoliveClient.wrapFetchError(err);
+    }
+  }
+
+  async fetchFilters(programID: string): Promise<WrappedResult<Filters['data']>> {
+    const session = await this.fetchSession();
+    const requestInit = NicoliveClient.createRequest('GET', {
+      headers: {
+        'X-Niconico-Session': session,
+        'Content-Type': 'application/json',
+      },
+    });
+    try {
+      const resp = await fetch(
+        `${NicoliveClient.live2BaseURL}/unama/tool/v2/programs/${programID}/ssng`,
+        requestInit
+      );
+      return NicoliveClient.wrapResult<Filters['data']>(resp);
+    } catch (err) {
+      return NicoliveClient.wrapFetchError(err);
+    }
+  }
+
+  async addFilters(programID: string, records: Omit<FilterRecord, 'id'>[]): Promise<WrappedResult<Filters['data']>> {
+    const session = await this.fetchSession();
+    const requestInit = NicoliveClient.createRequest('POST', {
+      body: JSON.stringify(records),
+      headers: {
+        'X-Niconico-Session': session,
+        'Content-Type': 'application/json',
+      },
+    });
+    try {
+      const resp = await fetch(
+        `${NicoliveClient.live2BaseURL}/unama/tool/v2/programs/${programID}/ssng`,
+        requestInit
+      );
+      return NicoliveClient.wrapResult<Filters['data']>(resp);
+    } catch (err) {
+      return NicoliveClient.wrapFetchError(err);
+    }
+  }
+
+  async deleteFilters(programID: string, ids: FilterRecord['id'][]): Promise<WrappedResult<void>> {
+    const session = await this.fetchSession();
+    const requestInit = NicoliveClient.createRequest('DELETE', {
+      body: JSON.stringify({
+        id: ids,
+      }),
+      headers: {
+        'X-Niconico-Session': session,
+        'Content-Type': 'application/json',
+      },
+    });
+    try {
+      const resp = await fetch(
+        `${NicoliveClient.live2BaseURL}/unama/tool/v2/programs/${programID}/ssng`,
+        requestInit
+      );
+      return NicoliveClient.wrapResult<void>(resp);
     } catch (err) {
       return NicoliveClient.wrapFetchError(err);
     }

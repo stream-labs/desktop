@@ -15,10 +15,10 @@
       />
       <div class="arrows" @mousewheel="onMouseWheelHandler">
         <div class="arrow arrow-up" @click="increment">
-          <i class="icon-up-arrow"></i>
+          <i class="icon-drop-up-arrow"></i>
         </div>
         <div class="arrow arrow-down" @click="decrement">
-          <i class="icon-down-arrow"></i>
+          <i class="icon-drop-down-arrow"></i>
         </div>
       </div>
     </div>

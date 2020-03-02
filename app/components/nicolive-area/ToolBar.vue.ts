@@ -2,7 +2,8 @@ import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { $t } from 'services/i18n';
-import { NicoliveProgramService, NicoliveProgramServiceFailure } from 'services/nicolive-program/nicolive-program';
+import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
+import { NicoliveFailure, openErrorDialogFromFailure } from 'services/nicolive-program/NicoliveFailure';
 
 @Component({})
 export default class ToolBar extends Vue {
@@ -22,8 +23,8 @@ export default class ToolBar extends Vue {
       this.isExtending = true;
       return await this.nicoliveProgramService.extendProgram();
     } catch (caught) {
-      if (caught instanceof NicoliveProgramServiceFailure) {
-        await NicoliveProgramService.openErrorDialogFromFailure(caught);
+      if (caught instanceof NicoliveFailure) {
+        await openErrorDialogFromFailure(caught);
       } else {
         throw caught;
       }
