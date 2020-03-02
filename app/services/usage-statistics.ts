@@ -104,6 +104,8 @@ export class UsageStatisticsService extends Service {
       metadata['platform'] = this.userService.state.auth.primaryPlatform;
     }
 
+    metadata['os'] = process.platform;
+
     const bodyData: IUsageApiData = {
       event,
       slobs_user_id: this.userService.getLocalUserId(),
