@@ -27,6 +27,7 @@ interface IOnboardingStep {
   disableControls: boolean;
   hideSkip: boolean;
   hideButton: boolean;
+  requiresHack?: boolean;
 }
 
 @Component({})
@@ -78,6 +79,12 @@ export default class OnboardingPage extends TsxComponent<{}> {
 
   get stepsState() {
     return this.steps.map((step, index) => {
+      // Work around a bug in Beacker Onboarding
+      // TODO: Remove beaker from onboarding during redesign
+      if (index + 1 === this.currentStep && step.requiresHack) {
+        return { complete: true };
+      }
+
       return { complete: index + 1 < this.currentStep };
     });
   }
@@ -125,6 +132,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
         disableControls: false,
         hideSkip: true,
         hideButton: false,
+        requiresHack: true,
       });
     } else {
       steps.push({
