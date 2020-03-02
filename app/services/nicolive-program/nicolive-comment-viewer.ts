@@ -138,12 +138,12 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
                 .pipe(
                   filter(isThreadMessage),
                   filter(msg => (msg.thread.resultcode ?? 0) !== 0),
-                  mapTo(makeEmulatedChat('スレッドへの参加に失敗しました'))
+                  mapTo(makeEmulatedChat('コメントの取得に失敗しました'))
                 );
             case 'leave_thread':
               return group$
                 .pipe(
-                  mapTo(makeEmulatedChat('スレッドから追い出されました'))
+                  mapTo(makeEmulatedChat('コメントの取得に失敗しました'))
                 );
             default: EMPTY;
           }

@@ -219,7 +219,7 @@ test('スレッドの参加失敗時にメッセージを表示する', () => {
             "seqId": 0,
             "type": "n-air-emulated",
             "value": Object {
-              "content": "スレッドへの参加に失敗しました",
+              "content": "コメントの取得に失敗しました",
               "date": 1582175622,
             },
           },
@@ -252,7 +252,7 @@ test('スレッドからの追い出し発生時にメッセージを表示す�
             "seqId": 0,
             "type": "n-air-emulated",
             "value": Object {
-              "content": "スレッドから追い出されました",
+              "content": "コメントの取得に失敗しました",
               "date": 1582175622,
             },
           },
