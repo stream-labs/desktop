@@ -33,6 +33,7 @@ import {
   release as nodeOsRelease,
 } from 'os';
 import { memoryUsage as nodeMemUsage } from 'process';
+import { QuestionaireService } from './questionaire';
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
@@ -46,6 +47,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() windowsService: WindowsService;
   @Inject() settingsService: SettingsService;
+  @Inject() questionaireService: QuestionaireService;
 
   @mutation()
   LOGIN(auth: IPlatformAuth) {
@@ -116,11 +118,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   /**
+   * @deprecated
    * This is a uuid that persists across the application lifetime and uniquely
    * identifies this particular installation of N Air, even when the user is
    * not logged in.
    */
-  getLocalUserId() {
+  private getLocalUserId() {
     const localStorageKey = 'NAirLocalUserId';
     let userId = localStorage.getItem(localStorageKey);
 
@@ -325,6 +328,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       ]);
 
       return {
+        cacheId: this.questionaireService.uuid,
         platform: this.platform ? this.platform.type : 'not logged in',
         cpuModel: nodeCpus()[0].model,
         cpuCores: `physical:${cpu.physicalCores} logical:${cpu.cores}`,
@@ -337,6 +341,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       };
     } catch (err) {
       return {
+        cacheId: this.questionaireService.uuid,
         platform: this.platform ? this.platform.type : 'not logged in',
         cpuModel: nodeCpus()[0].model,
         cpuCores: `logical:${nodeCpus().length}`,
@@ -344,7 +349,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         memTotal: nodeTotalMem(),
         memAvailable: nodeFreeMem(),
         memUsage: nodeMemUsage(),
-        exceptionWhenGetSystemInfo: err
+        exceptionWhenGetSystemInfo: err,
       };
     }
   }
