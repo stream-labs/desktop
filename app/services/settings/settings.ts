@@ -119,7 +119,7 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   getCategories(): string[] {
-    let categories = obs.NodeObs.OBS_settings_getListCategories();
+    let categories: string[] = obs.NodeObs.OBS_settings_getListCategories();
     categories = categories.concat([
       'Game Overlay',
       'Scene Collections',
@@ -128,6 +128,10 @@ export class SettingsService extends StatefulService<ISettingsState>
       'Face Masks',
       'Remote Control',
     ]);
+
+    categories = categories.filter(cat => {
+      return !(['Game Overlay', 'Face Masks'].includes(cat) && process.platform === OS.Mac);
+    });
 
     if (this.advancedSettingEnabled() || this.platformAppsService.state.devMode) {
       categories = categories.concat('Developer');
