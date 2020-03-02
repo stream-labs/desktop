@@ -140,6 +140,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
         disableControls: false,
         hideSkip: false,
         hideButton: false,
+        requiresHack: true,
       });
     }
 
