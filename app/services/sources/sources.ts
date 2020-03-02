@@ -94,6 +94,9 @@ export const macSources: TSourceType[] = [
   'av_capture_input',
   'display_capture',
   'audio_line',
+  'ndi_source',
+  'vlc_source',
+  'window_capture',
 ];
 
 class SourcesViews extends ViewHandler<ISourcesState> {
