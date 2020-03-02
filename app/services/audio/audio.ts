@@ -136,13 +136,11 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
    */
   initVolmeterRelay() {
     ipcRenderer.on('volmeterSubscribe', (e, sourceId: string) => {
-      console.log(`Window ${e.senderId} subscribing to volmeter for source ${sourceId}`);
       this.volmeterSubscriptions[sourceId] = this.volmeterSubscriptions[sourceId] || [];
       this.volmeterSubscriptions[sourceId].push(e.senderId);
     });
 
     ipcRenderer.on('volmeterUnsubscribe', (e, sourceId: string) => {
-      console.log(`Window ${e.senderId} unsubscribing from volmeter for source ${sourceId}`);
       this.volmeterSubscriptions[sourceId] = without(
         this.volmeterSubscriptions[sourceId],
         e.senderId,

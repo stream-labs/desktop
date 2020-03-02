@@ -33,7 +33,6 @@ import { RunInLoadingMode } from './app-decorators';
 import { RecentEventsService } from 'services/recent-events';
 import Utils from 'services/utils';
 import { Subject } from 'rxjs';
-import { I18nService } from 'services/i18n';
 import { DismissablesService } from 'services/dismissables';
 import { RestreamService } from 'services/restream';
 import { downloadFile } from '../../util/requests';
@@ -95,7 +94,6 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private announcementsService: AnnouncementsService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private recentEventsService: RecentEventsService;
-  @Inject() private i18nService: I18nService;
   @Inject() private dismissablesService: DismissablesService;
   @Inject() private restreamService: RestreamService;
   @Inject() private applicationMenuService: ApplicationMenuService;
@@ -112,8 +110,6 @@ export class AppService extends StatefulService<IAppState> {
         this.SET_ERROR_ALERT(true);
       });
     }
-
-    await this.i18nService.load();
 
     // perform several concurrent http requests
     await Promise.all([

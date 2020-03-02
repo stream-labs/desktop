@@ -335,7 +335,9 @@ if (!gotTheLock) {
     ipcMain.on('AppInitFinished', () => {
       workerInitFinished = true;
 
-      BrowserWindow.getAllWindows().forEach(window => window.send('initFinished'));
+      waitingVuexStores.forEach(winId => {
+        BrowserWindow.fromId(winId).send('initFinished');
+      });
 
       waitingVuexStores.forEach(windowId => {
         workerWindow.webContents.send('vuex-sendState', windowId);
@@ -477,6 +479,7 @@ if (!gotTheLock) {
       // to the newly registered window
 
       if (workerInitFinished) {
+        win.send('initFinished');
         workerWindow.webContents.send('vuex-sendState', windowId);
       } else {
         waitingVuexStores.push(windowId);
