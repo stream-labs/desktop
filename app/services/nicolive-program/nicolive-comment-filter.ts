@@ -4,7 +4,7 @@ import { FilterRecord } from './ResponseTypes';
 import { Inject } from 'util/injector';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
 import { map, distinctUntilChanged } from 'rxjs/operators';
-import { NicoliveFailure, openErrorDialogFromFailure } from './NicoliveFailure';
+import { NicoliveFailure } from './NicoliveFailure';
 
 interface INicoliveCommentFilterState {
   filters: FilterRecord[];
