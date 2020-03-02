@@ -79,6 +79,8 @@ export class AppService extends StatefulService<IAppState> {
 
   readonly appDataDirectory = electron.remote.app.getPath('userData');
 
+  loadingChanged = new Subject<boolean>();
+
   @Inject() transitionsService: TransitionsService;
   @Inject() sourcesService: SourcesService;
   @Inject() scenesService: ScenesService;
@@ -169,6 +171,7 @@ export class AppService extends StatefulService<IAppState> {
   @track('app_close')
   private shutdownHandler() {
     this.START_LOADING();
+    this.loadingChanged.next(true);
     obs.NodeObs.StopCrashHandler();
     this.crashReporterService.beginShutdown();
 
@@ -207,6 +210,7 @@ export class AppService extends StatefulService<IAppState> {
     if (!this.state.loading) {
       if (opts.hideStyleBlockers) this.windowsService.updateStyleBlockers('main', true);
       this.START_LOADING();
+      this.loadingChanged.next(true);
 
       // The scene collections window is the only one we don't close when
       // switching scene collections, because it results in poor UX.
@@ -255,6 +259,7 @@ export class AppService extends StatefulService<IAppState> {
     this.tcpServerService.startRequestsHandling();
     this.sceneCollectionsService.enableAutoSave();
     this.FINISH_LOADING();
+    this.loadingChanged.next(false);
     // Set timeout to allow transition animation to play
     if (opts.hideStyleBlockers) {
       setTimeout(() => this.windowsService.updateStyleBlockers('main', false), 500);

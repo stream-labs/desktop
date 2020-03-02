@@ -2,24 +2,48 @@ import { Service, Inject } from 'services/core';
 import { StreamingService, EStreamingState } from 'services/streaming';
 import Utils from './utils';
 import electron from 'electron';
+import { NavigationService } from './navigation';
+import { AppService } from './app';
 
 const TB = electron.remote.TouchBar;
 
 export class TouchBarService extends Service {
   @Inject() streamingService: StreamingService;
+  @Inject() navigationService: NavigationService;
+  @Inject() appService: AppService;
 
   goLiveButton: electron.TouchBarButton;
   liveTimer: electron.TouchBarLabel;
 
+  mainTb: electron.TouchBar;
+  blankTb: electron.TouchBar;
+
   init() {
     this.setupGoLive();
 
-    const tb = new TB({
+    this.mainTb = new TB({
       items: [this.goLiveButton, this.liveTimer],
     });
 
-    Utils.getMainWindow().setTouchBar(tb);
-    Utils.getChildWindow().setTouchBar(tb);
+    this.blankTb = new TB({ items: [] });
+
+    this.setTb();
+
+    this.navigationService.navigated.subscribe(() => this.setTb());
+    this.appService.loadingChanged.subscribe(() => this.setTb());
+  }
+
+  setTb() {
+    if (
+      this.navigationService.state.currentPage === 'Onboarding' ||
+      this.appService.state.loading
+    ) {
+      Utils.getMainWindow().setTouchBar(this.blankTb);
+      Utils.getChildWindow().setTouchBar(this.blankTb);
+    } else {
+      Utils.getMainWindow().setTouchBar(this.mainTb);
+      Utils.getChildWindow().setTouchBar(this.mainTb);
+    }
   }
 
   setupGoLive() {
