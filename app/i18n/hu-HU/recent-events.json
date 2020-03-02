@@ -4,7 +4,7 @@
   " with %{name}": " a %{name}",
   "has followed": "bekövetett",
   "has resubscribed (%{tier}) for %{streak} months in a row! (%{months} total)": "újra feliratkozott (%{tier}) %{streak} hónapig egymás után! (%{months} összesen)",
-  "has gifted a sub (%{tier}) to": "ajándékozott feliratkozást (%{tier}) nak",
+  "has gifted a sub (%{tier}) to": "ajándékozott feliratkozást (%{tier}) nak nek",
   "has resubscribed (%{tier}) for %{months} months": "újra feliratkozott (%{tier}) %{months} hónapja",
   "has subscribed (%{tier})": "feliratkozott (%{tier})",
   "has subscribed": "feliratkozott",
