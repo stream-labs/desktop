@@ -14,7 +14,9 @@ const setup = createSetupFunction({
 });
 
 jest.mock('services/nicolive-program/nicolive-program', () => ({ NicoliveProgramStateService: {} }));
-jest.mock('./NicoliveFailure', () => ({}));
+
+// NicoliveFailureが依存している
+jest.mock('services/i18n', () => ({}));
 
 beforeEach(() => {
   jest.doMock('services/stateful-service');
@@ -23,6 +25,49 @@ beforeEach(() => {
 
 afterEach(() => {
   jest.resetModules();
+});
+
+test('fetchFilters/通常成功', async () => {
+  setup();
+  const { NicoliveCommentFilterService } = require('./nicolive-comment-filter');
+  const instance = NicoliveCommentFilterService.instance as NicoliveCommentFilterService;
+
+  const fetchFilters = jest.fn().mockResolvedValue({ ok: true, value: [{ type: 'word', body: '810', id: 114514 }] });
+  (instance as any).client.fetchFilters = fetchFilters;
+
+  const UPDATE_FILTERS = jest.fn();
+  (instance as any).UPDATE_FILTERS = UPDATE_FILTERS;
+
+  await instance.fetchFilters();
+
+  expect(UPDATE_FILTERS).toHaveBeenCalledTimes(1);
+  expect(UPDATE_FILTERS).toHaveBeenCalledWith([{ type: 'word', body: '810', id: 114514 }]);
+});
+
+test('fetchFilters/失敗', async () => {
+  setup();
+  const { NicoliveCommentFilterService } = require('./nicolive-comment-filter');
+  const instance = NicoliveCommentFilterService.instance as NicoliveCommentFilterService;
+
+  const fetchFilters = jest.fn().mockResolvedValue({
+    ok: false,
+    value: { meta: { status: 400, errorCode: 'ERROR_CODE', errorMessage: 'simple description' } },
+  });
+  (instance as any).client.fetchFilters = fetchFilters;
+
+  const UPDATE_FILTERS = jest.fn();
+  (instance as any).UPDATE_FILTERS = UPDATE_FILTERS;
+
+  await expect(instance.fetchFilters()).rejects.toMatchInlineSnapshot(`
+          NicoliveFailure {
+            "additionalMessage": "ERROR_CODE: simple description",
+            "method": "fetchFilters",
+            "reason": "400",
+            "type": "http_error",
+          }
+        `);
+
+  expect(UPDATE_FILTERS).toHaveBeenCalledTimes(0);
 });
 
 test('addFilters/通常成功', async () => {
@@ -62,6 +107,32 @@ test('addFilters/既に追加済みのとき', async () => {
   expect(UPDATE_FILTERS).toHaveBeenCalledTimes(0);
 });
 
+test('addFilters/失敗', async () => {
+  setup();
+  const { NicoliveCommentFilterService } = require('./nicolive-comment-filter');
+  const instance = NicoliveCommentFilterService.instance as NicoliveCommentFilterService;
+
+  const addFilters = jest.fn().mockResolvedValue({
+    ok: false,
+    value: { meta: { status: 400, errorCode: 'ERROR_CODE', errorMessage: 'simple description' } },
+  });
+  (instance as any).client.addFilters = addFilters;
+
+  const UPDATE_FILTERS = jest.fn();
+  (instance as any).UPDATE_FILTERS = UPDATE_FILTERS;
+
+  await expect(instance.addFilter({ type: 'word', body: '810' })).rejects.toMatchInlineSnapshot(`
+                    NicoliveFailure {
+                      "additionalMessage": "ERROR_CODE: simple description",
+                      "method": "addFilters",
+                      "reason": "400",
+                      "type": "http_error",
+                    }
+                `);
+
+  expect(UPDATE_FILTERS).toHaveBeenCalledTimes(0);
+});
+
 test('deleteFilters', async () => {
   setup();
   const { NicoliveCommentFilterService } = require('./nicolive-comment-filter');
@@ -78,4 +149,31 @@ test('deleteFilters', async () => {
 
   expect(UPDATE_FILTERS).toHaveBeenCalledTimes(1);
   expect(UPDATE_FILTERS).toHaveBeenCalledWith([{ type: 'word', body: 'yay', id: 114515 }]);
+});
+
+test('deleteFilters/失敗', async () => {
+  setup();
+  const { NicoliveCommentFilterService } = require('./nicolive-comment-filter');
+  const instance = NicoliveCommentFilterService.instance as NicoliveCommentFilterService;
+  instance.state.filters = [{ type: 'word', body: '810', id: 114514 }, { type: 'word', body: 'yay', id: 114515 }];
+
+  const deleteFilters = jest.fn().mockResolvedValue({
+    ok: false,
+    value: { meta: { status: 400, errorCode: 'ERROR_CODE', errorMessage: 'simple description' } },
+  });
+  (instance as any).client.deleteFilters = deleteFilters;
+
+  const UPDATE_FILTERS = jest.fn();
+  (instance as any).UPDATE_FILTERS = UPDATE_FILTERS;
+
+  await expect(instance.deleteFilters([114514])).rejects.toMatchInlineSnapshot(`
+                    NicoliveFailure {
+                      "additionalMessage": "ERROR_CODE: simple description",
+                      "method": "deleteFilters",
+                      "reason": "400",
+                      "type": "http_error",
+                    }
+                `);
+
+  expect(UPDATE_FILTERS).toHaveBeenCalledTimes(0);
 });
