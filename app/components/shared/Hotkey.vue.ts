@@ -142,7 +142,7 @@ export default class HotkeyComponent extends TsxComponent<HotkeyProps> {
   getBindingString(binding: IBinding) {
     const keys: string[] = [];
 
-    if (binding.modifiers.alt) keys.push('Alt');
+    if (binding.modifiers.alt) keys.push(byOS({ [OS.Windows]: 'Alt', [OS.Mac]: 'Opt' }));
     if (binding.modifiers.ctrl) keys.push('Ctrl');
     if (binding.modifiers.shift) keys.push('Shift');
     if (binding.modifiers.meta) keys.push(byOS({ [OS.Windows]: 'Win', [OS.Mac]: 'Cmd' }));
