@@ -170,8 +170,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
   setEnabled(enabled: boolean) {
     this.SET_ENABLED(enabled);
 
-    if (!enabled) this.deinitChat();
-
     const headers = authorizedHeaders(
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
@@ -341,6 +339,9 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
     // @ts-ignore: this method was added in our fork
     win.removeBrowserView(this.chatView);
+
+    // Automatically destroy the chat if restream has been disabled
+    if (!this.state.enabled) this.deinitChat();
   }
 
   private initChat() {
