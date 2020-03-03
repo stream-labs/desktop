@@ -82,7 +82,7 @@ export default class SideNav extends Vue {
   updateTabs() {
     this.studioTabs = Object.keys(this.layoutService.state.tabs).map(tab => ({
       target: tab,
-      title: this.layoutService.state.tabs[tab].name,
+      title: this.layoutService.state.tabs[tab].name || $t('Editor'),
       icon: this.layoutService.state.tabs[tab].icon,
     }));
   }
@@ -92,18 +92,22 @@ export default class SideNav extends Vue {
   }
 
   get studioTabElements() {
-    return this.studioTabs.map(page => (
-      <div
-        class={cx(styles.mainCell, {
-          [styles.active]:
-            this.page === 'Studio' && this.layoutService.state.currentTab === page.target,
-        })}
-        onClick={() => this.navigateToStudioTab(page.target)}
-        title={page.title}
-      >
-        <i class={page.icon} />
+    return (
+      <div class={styles.studioTabs}>
+        {this.studioTabs.map(page => (
+          <div
+            class={cx(styles.mainCell, {
+              [styles.active]:
+                this.page === 'Studio' && this.layoutService.state.currentTab === page.target,
+            })}
+            onClick={() => this.navigateToStudioTab(page.target)}
+            title={page.title}
+          >
+            <i class={page.icon} />
+          </div>
+        ))}
       </div>
-    ));
+    );
   }
 
   render() {

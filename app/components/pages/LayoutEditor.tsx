@@ -123,6 +123,7 @@ export default class LayoutEditor extends TsxComponent {
   }
 
   removeCurrentTab() {
+    if (this.layoutService.state.currentTab === 'default') return;
     this.layoutService.removeCurrentTab();
   }
 
