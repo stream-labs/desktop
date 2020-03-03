@@ -81,6 +81,13 @@
   &.active {
     color: var(--title);
   }
+
+  &.dropdown-menu__disabled {
+    &:hover,
+    &.active {
+      color: var(--midtone);
+    }
+  }
 }
 
 .popper .popper__arrow {

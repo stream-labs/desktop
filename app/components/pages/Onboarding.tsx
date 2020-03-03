@@ -64,7 +64,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
 
   proceed() {
     if (this.processing) return;
-    if (this.currentStep === this.stepsState.length) return this.complete();
+    if (this.currentStep >= this.stepsState.length) return this.complete();
 
     this.currentStep = this.currentStep + 1;
   }
@@ -238,8 +238,8 @@ export default class OnboardingPage extends TsxComponent<{}> {
 
   get noExistingSceneCollections() {
     return (
-      this.sceneCollectionsService.collections.length === 1 &&
-      this.sceneCollectionsService.collections[0].auto
+      this.sceneCollectionsService.loadableCollections.length === 1 &&
+      this.sceneCollectionsService.loadableCollections[0].auto
     );
   }
 

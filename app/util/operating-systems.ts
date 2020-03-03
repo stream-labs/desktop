@@ -12,3 +12,7 @@ export function byOS<TReturn>(handlers: TOSHandlerMap<TReturn>): TReturn {
 
   return handler;
 }
+
+export function getOS() {
+  return process.platform as OS;
+}
