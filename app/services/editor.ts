@@ -44,6 +44,7 @@ export interface IMouseEvent {
   altKey: boolean;
   ctrlKey: boolean;
   shiftKey: boolean;
+  metaKey: boolean;
   button: number;
   buttons: number;
 }
@@ -158,8 +159,8 @@ export class EditorService extends StatefulService<IEditorServiceState> {
             overNode = overSources[0].hasParent() ? overSources[0].getParent() : overSources[0];
           }
 
-          // Ctrl adds or removes from a multiselection
-          if (event.ctrlKey) {
+          // Ctrl/Cmd adds or removes from a multiselection
+          if (byOS({ [OS.Windows]: event.ctrlKey, [OS.Mac]: event.metaKey })) {
             if (overNode.isSelected()) {
               overNode.deselect();
             } else {
