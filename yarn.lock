@@ -8244,9 +8244,9 @@ object.values@^1.1.0:
     function-bind "^1.1.1"
     has "^1.0.3"
 
-"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.154-iojs-v6.0.3-osx-release.tar.gz":
+"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.155-iojs-v6.0.3-osx-release.tar.gz":
   version "0.3.99"
-  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.154-iojs-v6.0.3-osx-release.tar.gz#7efad6c65d41a8cdb77e4b11ab9e09e0c2ab096c"
+  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.155-iojs-v6.0.3-osx-release.tar.gz#95c002d12b75a50accb771f9596485a1836e9c21"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
