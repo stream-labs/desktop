@@ -165,7 +165,9 @@ export default class Studio extends TsxComponent {
         {Object.keys(this.layoutService.views.currentTab.slottedElements).map(
           (widget: ELayoutElement) => {
             const Element = this.layoutService.views.elementComponent(widget);
-            return <Element slot={this.layoutService.views.currentTab.slottedElements[widget]} />;
+            return (
+              <Element slot={this.layoutService.views.currentTab.slottedElements[widget].slot} />
+            );
           },
         )}
       </Layout>

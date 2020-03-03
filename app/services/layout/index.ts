@@ -18,7 +18,7 @@ interface ILayoutState {
   name: string;
   icon: string;
   currentLayout: ELayout;
-  slottedElements: { [Element in ELayoutElement]?: LayoutSlot };
+  slottedElements: { [Element in ELayoutElement]?: { slot: LayoutSlot } };
   resizes: { bar1: number; bar2?: number };
 }
 
@@ -66,11 +66,11 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
         icon: 'icon-studio',
         currentLayout: ELayout.Default,
         slottedElements: {
-          [ELayoutElement.Display]: '1',
-          [ELayoutElement.Minifeed]: '2',
-          [ELayoutElement.Scenes]: '3',
-          [ELayoutElement.Sources]: '4',
-          [ELayoutElement.Mixer]: '5',
+          [ELayoutElement.Display]: { slot: '1' },
+          [ELayoutElement.Minifeed]: { slot: '2' },
+          [ELayoutElement.Scenes]: { slot: '3' },
+          [ELayoutElement.Sources]: { slot: '4' },
+          [ELayoutElement.Mixer]: { slot: '5' },
         },
         resizes: {
           bar1: 156,
@@ -84,6 +84,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   init() {
     super.init();
+    this.migrateSlots();
 
     // Hack since defaultState can't take a translated string
     if (!this.state.tabs.default.name) {
@@ -94,14 +95,27 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
       isEqual(this.state, LayoutService.defaultState)
     ) {
       this.setSlots({
-        [ELayoutElement.Display]: '1',
-        [ELayoutElement.LegacyEvents]: '2',
-        [ELayoutElement.Scenes]: '3',
-        [ELayoutElement.Sources]: '4',
-        [ELayoutElement.Mixer]: '5',
+        [ELayoutElement.Display]: { slot: '1' },
+        [ELayoutElement.LegacyEvents]: { slot: '2' },
+        [ELayoutElement.Scenes]: { slot: '3' },
+        [ELayoutElement.Sources]: { slot: '4' },
+        [ELayoutElement.Mixer]: { slot: '5' },
       });
       this.customizationService.setSettings({ legacyEvents: false });
     }
+  }
+
+  migrateSlots() {
+    const slottedElements = {};
+    Object.keys(this.state.tabs.default.slottedElements).forEach(el => {
+      if (typeof this.state.tabs.default.slottedElements[el] === 'string') {
+        slottedElements[el] = { slot: this.state.tabs.default.slottedElements[el] };
+      } else if (this.state.tabs.default.slottedElements[el]) {
+        slottedElements[el] = this.state.tabs.default.slottedElements[el];
+      }
+    });
+    this.SET_SLOTS(slottedElements);
+    console.log(this.state.tabs.default.slottedElements);
   }
 
   get views() {
@@ -120,7 +134,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
     this.CHANGE_LAYOUT(layout);
   }
 
-  setSlots(slottedElements: { [key in ELayoutElement]?: LayoutSlot }) {
+  setSlots(slottedElements: { [key in ELayoutElement]?: { slot: LayoutSlot } }) {
     this.SET_SLOTS(slottedElements);
   }
 
@@ -176,7 +190,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
   }
 
   @mutation()
-  SET_SLOTS(slottedElements: { [key in ELayoutElement]?: LayoutSlot }) {
+  SET_SLOTS(slottedElements: { [key in ELayoutElement]?: { slot: LayoutSlot } }) {
     this.state.tabs[this.state.currentTab].slottedElements = slottedElements;
   }
 

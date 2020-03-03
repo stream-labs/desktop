@@ -32,7 +32,7 @@ export default class LayoutEditor extends TsxComponent {
 
   elementInSlot(slot: LayoutSlot) {
     return Object.keys(this.slottedElements).find(
-      el => this.slottedElements[el] === slot,
+      el => this.slottedElements[el].slot === slot,
     ) as ELayoutElement;
   }
 
@@ -55,7 +55,7 @@ export default class LayoutEditor extends TsxComponent {
     const htmlElement = document.elementFromPoint(event.clientX, event.clientY);
     if (!el) return;
     if (!htmlElement) {
-      this.slottedElements[el] = undefined;
+      Vue.delete(this.slottedElements, el);
       return;
     }
     // In case the span tag is the element dropped on we check for parent element id
@@ -63,16 +63,16 @@ export default class LayoutEditor extends TsxComponent {
     let existingEl;
     if (['1', '2', '3', '4', '5', '6'].includes(id)) {
       existingEl = Object.keys(this.slottedElements).find(
-        existing => this.slottedElements[existing] === id,
+        existing => this.slottedElements[existing].slot === id,
       ) as ELayoutElement;
       if (existingEl && this.slottedElements[el]) {
         Vue.set(this.slottedElements, existingEl, this.slottedElements[el]);
       } else if (existingEl) {
-        Vue.set(this.slottedElements, existingEl, null);
+        Vue.delete(this.slottedElements, existingEl);
       }
-      Vue.set(this.slottedElements, el, id as LayoutSlot);
+      Vue.set(this.slottedElements, el, { slot: id as LayoutSlot });
     } else {
-      Vue.set(this.slottedElements, el, null);
+      Vue.delete(this.slottedElements, el);
     }
   }
 
