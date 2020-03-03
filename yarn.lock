@@ -7977,9 +7977,9 @@ node-libs-browser@^2.0.0:
     util "^0.10.3"
     vm-browserify "0.0.4"
 
-"node-libuiohook@https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.32/iojs-v6.0.3-node-libuiohook-osx.tar.gz":
+"node-libuiohook@https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.33/iojs-v6.0.3-node-libuiohook-osx.tar.gz":
   version "0.0.9"
-  resolved "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.32/iojs-v6.0.3-node-libuiohook-osx.tar.gz#e76a5731fe0d81c61d0b32cf5c9481ca55dae2b3"
+  resolved "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.33/iojs-v6.0.3-node-libuiohook-osx.tar.gz#5e1cfbb9b9f395ec9b0cbfdf148ad3ce493446d3"
 
 node-object-hash@^1.2.0:
   version "1.4.2"
@@ -8244,9 +8244,9 @@ object.values@^1.1.0:
     function-bind "^1.1.1"
     has "^1.0.3"
 
-"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.150-iojs-v6.0.3-osx-release.tar.gz":
+"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.153-iojs-v6.0.3-osx-release.tar.gz":
   version "0.3.99"
-  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.150-iojs-v6.0.3-osx-release.tar.gz#df999e7a68107eabadbc3de91fe64e639e928fb8"
+  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.153-iojs-v6.0.3-osx-release.tar.gz#4f6556cae648109545bf85d92f7a7d02fcad0886"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
