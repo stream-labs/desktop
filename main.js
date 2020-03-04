@@ -73,15 +73,51 @@ if (!gotTheLock) {
   ////////////////////////////////////////////////////////////////////////////////
 
   (function setupLogger() {
+    const logDir = path.join(app.getPath('userData'), 'logs');
+
+    if (!fs.existsSync(logDir)) {
+      fs.mkdirSync(logDir);
+    }
+
     // save logs to the cache directory
-    electronLog.transports.file.file = path.join(app.getPath('userData'), 'log.log');
-    electronLog.transports.file.level = 'info';
+    electronLog.transports.file.file = path.join(logDir, 'electron-main.log');
     // Set approximate maximum log size in bytes. When it exceeds,
     // the archived log will be saved as the log.old.log file
     electronLog.transports.file.maxSize = 5 * 1024 * 1024;
 
     // catch and log unhandled errors/rejected promises
     electronLog.catchErrors();
+
+    const os = require('os');
+    const cpus = os.cpus();
+
+    // Source: https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string/10420404
+    function humanFileSize(bytes, si) {
+      var thresh = si ? 1000 : 1024;
+      if(Math.abs(bytes) < thresh) {
+          return bytes + ' B';
+      }
+      var units = si
+          ? ['kB','MB','GB','TB','PB','EB','ZB','YB']
+          : ['KiB','MiB','GiB','TiB','PiB','EiB','ZiB','YiB'];
+      var u = -1;
+      do {
+          bytes /= thresh;
+          ++u;
+      } while(Math.abs(bytes) >= thresh && u < units.length - 1);
+      return bytes.toFixed(1)+' '+units[u];
+    }
+
+    electronLog.log('=================================');
+    electronLog.log(`Streamlabs OBS`);
+    electronLog.log(`Version: ${process.env.SLOBS_VERSION}`);
+    electronLog.log(`OS: ${os.platform()} ${os.release()}`);
+    electronLog.log(`Arch: ${process.arch}`);
+    electronLog.log(`CPU: ${cpus[0].model}`);
+    electronLog.log(`Cores: ${cpus.length}`);
+    electronLog.log(`Memory: ${humanFileSize(os.totalmem(), false)}`);
+    electronLog.log(`Free: ${humanFileSize(os.freemem(), false)}`);
+    electronLog.log('=================================');
 
     // network logging is disabled by default
     if (!process.argv.includes('--network-logging')) return;
