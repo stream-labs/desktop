@@ -313,7 +313,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   });
 
   test.afterEach.always(async t => {
-    await checkErrorsInLogFile();
+    await checkErrorsInAllLogFiles();
     if (!testPassed && options.pauseIfFailed) {
       console.log('Test execution has been paused due `pauseIfFailed` enabled');
       await sleep(ALMOST_INFINITY);
