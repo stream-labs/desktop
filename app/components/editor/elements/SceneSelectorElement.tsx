@@ -4,7 +4,7 @@ import BaseElement from './BaseElement';
 
 @Component({})
 export default class SceneSelectorElement extends BaseElement {
-  mins = { x: 200, y: 150 };
+  mins = { x: 200, y: 120 };
 
   get element() {
     return <SceneSelector />;
