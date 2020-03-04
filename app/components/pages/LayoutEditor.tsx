@@ -211,6 +211,30 @@ export default class LayoutEditor extends TsxComponent {
     );
   }
 
+  get layout() {
+    return ['1', '2', '3', '4', '5', '6'].map((slot: LayoutSlot) => (
+      <div
+        class={this.classForSlot(slot)}
+        id={slot}
+        draggable={this.elementInSlot(slot)}
+        ondragenter={(): unknown => (this.highlightedSlot = slot)}
+        ondragexit={(): unknown => (this.highlightedSlot = null)}
+        onDragend={(e: MouseEvent) =>
+          this.handleElementDrag(e, ELayoutElement[this.elementInSlot(slot)])
+        }
+      >
+        <span>{this.layoutService.views.elementTitle(this.elementInSlot(slot))}</span>
+        {this.elementInSlot(slot) === ELayoutElement.Browser && (
+          <TextInput
+            class={styles.urlTextBox}
+            vModel={this.browserUrl}
+            metadata={{ placeholder: $t('Enter Target URL') }}
+          />
+        )}
+      </div>
+    ));
+  }
+
   get modal() {
     return (
       <div class={styles.modalBackdrop}>
@@ -231,27 +255,7 @@ export default class LayoutEditor extends TsxComponent {
               styles[this.layoutService.views.className(this.currentLayout)],
             )}
           >
-            {['1', '2', '3', '4', '5', '6'].map((slot: LayoutSlot) => (
-              <div
-                class={this.classForSlot(slot)}
-                id={slot}
-                draggable={this.elementInSlot(slot)}
-                ondragenter={(): unknown => (this.highlightedSlot = slot)}
-                ondragexit={(): unknown => (this.highlightedSlot = null)}
-                onDragend={(e: MouseEvent) =>
-                  this.handleElementDrag(e, ELayoutElement[this.elementInSlot(slot)])
-                }
-              >
-                <span>{this.layoutService.views.elementTitle(this.elementInSlot(slot))}</span>
-                {this.elementInSlot(slot) === ELayoutElement.Browser && (
-                  <TextInput
-                    class={styles.urlTextBox}
-                    vModel={this.browserUrl}
-                    metadata={{ placeholder: $t('Enter Target URL') }}
-                  />
-                )}
-              </div>
-            ))}
+            {this.layout}
           </div>
         </div>
         {this.showModal && this.modal}
