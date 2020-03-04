@@ -126,7 +126,6 @@ export class AppService extends StatefulService<IAppState> {
     if (!this.userService.isLoggedIn) {
       // If this user is logged in, this would have already happened as part of login
       // TODO: We should come up with a better way to handle this.
-      console.log('Init: scene collections');
       await this.sceneCollectionsService.initialize();
     }
 
