@@ -64,8 +64,11 @@ if (isProduction) {
 let usingSentry = false;
 
 const logDir = path.join(electron.remote.app.getPath('userData'), 'logs');
+const windowId = Utils.getWindowId();
 
-electronLog.transports.file.file = path.join(logDir, `${Utils.getWindowId()}.log`);
+if (['worker', 'main', 'child'].includes(windowId)) {
+  electronLog.transports.file.file = path.join(logDir, `${Utils.getWindowId()}.log`);
+}
 
 console.log = electronLog.log;
 console.warn = electronLog.warn;
