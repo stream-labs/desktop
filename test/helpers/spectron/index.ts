@@ -254,7 +254,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       console.error(e);
     }
     appIsRunning = false;
-    await checkErrorsInLogFile();
+    await checkErrorsInAllLogFiles();
     logFileLastReadingPos = 0;
 
     if (!clearCache) return;
@@ -263,12 +263,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     });
   };
 
-  /**
-   * test should be considered as failed if it writes exceptions in to the log file
-   */
-  async function checkErrorsInLogFile() {
-    await sleep(1000); // electron-log needs some time to write down logs
-    const filePath = path.join(cacheDir, 'slobs-client', 'log.log');
+  async function checkErrorsInLogFile(filePath: string) {
     if (!fs.existsSync(filePath)) return;
     const logs = fs.readFileSync(filePath).toString();
     const errors = logs
@@ -284,6 +279,18 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     } else if (options.networkLogging && !testPassed) {
       fail(`log-file: \n ${logs}`);
     }
+  }
+
+  /**
+   * test should be considered as failed if it writes exceptions in to the log file
+   */
+  async function checkErrorsInAllLogFiles() {
+    await sleep(1000); // electron-log needs some time to write down logs
+    const logDir = path.join(cacheDir, 'logs');
+
+    fs.readdirSync(logDir).forEach((logFile: string) => {
+      checkErrorsInLogFile(path.join(logDir, logFile));
+    });
   }
 
   test.before(async t => {
