@@ -72,6 +72,10 @@ export default class StudioEditor extends TsxComponent {
     return ERenderingMode.OBS_MAIN_RENDERING;
   }
 
+  enablePreview() {
+    this.customizationService.setSettings({ performanceMode: false });
+  }
+
   // Not reactive, don't cache
   getStudioTransitionName() {
     return this.transitionsService.getStudioTransitionName();
