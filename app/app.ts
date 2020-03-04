@@ -27,6 +27,7 @@ import electronLog from 'electron-log';
 import { UserService, setSentryContext } from 'services/user';
 import { getResource } from 'services';
 import * as obs from '../obs-api';
+import fs from 'fs';
 import path from 'path';
 import uuid from 'uuid/v4';
 import Blank from 'components/windows/Blank.vue';
@@ -62,6 +63,18 @@ if (isProduction) {
 }
 
 let usingSentry = false;
+
+const logDir = path.join(electron.remote.app.getPath('userData'), 'logs');
+
+electronLog.transports.file.file = path.join(logDir, `${Utils.getWindowId()}.log`);
+
+console.log = electronLog.log;
+console.warn = electronLog.warn;
+console.error = electronLog.error;
+
+console.log('=================================');
+console.log(`Streamlabs OBS: ${slobsVersion}`);
+console.log('=================================');
 
 if (
   (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) &&
@@ -275,40 +288,4 @@ if (Utils.isDevMode()) {
 // ERRORS LOGGING
 
 // catch and log unhandled errors/rejected promises:
-electronLog.catchErrors({ onError: e => electronLog.log(`from ${Utils.getWindowId()}`, e) });
-
-// override console.error
-const consoleError = console.error;
-console.error = function(...args: any[]) {
-  if (Utils.isDevMode()) ipcRenderer.send('showErrorAlert');
-  writeErrorToLog(...args);
-  consoleError.call(console, ...args);
-};
-
-/**
- * Try to serialize error arguments and stack and write them to the log file
- */
-function writeErrorToLog(...errors: (Error | string)[]) {
-  let message = '';
-
-  // format error arguments depending on the type
-  const formattedErrors = errors.map(error => {
-    if (error instanceof Error) {
-      message = error.stack;
-    } else if (typeof error === 'string') {
-      message = error;
-    } else {
-      try {
-        message = JSON.stringify(error);
-      } catch (e) {
-        message = 'UNSERIALIZABLE';
-      }
-    }
-    return message;
-  });
-
-  // send error to the main process via IPC
-  electronLog.error(`Error from ${Utils.getWindowId()} window:
-    ${formattedErrors.join('\n')}
-  `);
-}
+electronLog.catchErrors();

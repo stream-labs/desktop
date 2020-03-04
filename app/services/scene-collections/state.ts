@@ -93,7 +93,6 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
    */
   flushManifestFile() {
     const data = JSON.stringify(omit(this.state, 'auto'), null, 2);
-    console.log('flush', data);
     this.writeDataToCollectionFile('manifest', data);
   }
 
@@ -238,7 +237,6 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
 
   @mutation()
   LOAD_STATE(state: ISceneCollectionsManifest) {
-    console.log('LOAD STATE', state);
     Object.keys(state).forEach(key => {
       Vue.set(this.state, key, state[key]);
     });
