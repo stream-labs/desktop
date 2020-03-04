@@ -18,7 +18,7 @@ interface ILayoutState {
   name: string;
   icon: string;
   currentLayout: ELayout;
-  slottedElements: { [Element in ELayoutElement]?: { slot: LayoutSlot } };
+  slottedElements: { [Element in ELayoutElement]?: { slot: LayoutSlot; src?: string } };
   resizes: { bar1: number; bar2?: number };
 }
 
@@ -115,7 +115,6 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
       }
     });
     this.SET_SLOTS(slottedElements);
-    console.log(this.state.tabs.default.slottedElements);
   }
 
   get views() {
@@ -136,6 +135,10 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   setSlots(slottedElements: { [key in ELayoutElement]?: { slot: LayoutSlot } }) {
     this.SET_SLOTS(slottedElements);
+  }
+
+  setUrl(url: string) {
+    this.SET_URL(url);
   }
 
   addTab(name: string, icon: string) {
@@ -192,6 +195,15 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
   @mutation()
   SET_SLOTS(slottedElements: { [key in ELayoutElement]?: { slot: LayoutSlot } }) {
     this.state.tabs[this.state.currentTab].slottedElements = slottedElements;
+  }
+
+  @mutation()
+  SET_URL(url: string) {
+    Vue.set(
+      this.state.tabs[this.state.currentTab].slottedElements[ELayoutElement.Browser],
+      'src',
+      url,
+    );
   }
 
   @mutation()

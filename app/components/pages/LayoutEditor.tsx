@@ -5,7 +5,7 @@ import TsxComponent from 'components/tsx-component';
 import { Component, Watch } from 'vue-property-decorator';
 import styles from './LayoutEditor.m.less';
 import AddTabModal from './AddTabModal';
-import { ListInput } from 'components/shared/inputs/inputs';
+import { ListInput, TextInput } from 'components/shared/inputs/inputs';
 import { Inject } from 'services/core/injector';
 import { LayoutService, ELayoutElement, ELayout, LayoutSlot } from 'services/layout';
 import { $t } from 'services/i18n';
@@ -19,8 +19,8 @@ export default class LayoutEditor extends TsxComponent {
   @Inject() private customizationService: CustomizationService;
 
   currentLayout = this.layoutService.views.currentTab.currentLayout || ELayout.Default;
-
   slottedElements = cloneDeep(this.layoutService.views.currentTab.slottedElements) || {};
+  browserUrl: string = '';
 
   tabOptions = Object.keys(this.layoutService.state.tabs).map(tab => ({
     value: tab,
@@ -29,6 +29,12 @@ export default class LayoutEditor extends TsxComponent {
 
   private highlightedSlot: LayoutSlot = null;
   private showModal = false;
+
+  mounted() {
+    if (this.slottedElements[ELayoutElement.Browser]) {
+      this.browserUrl = this.slottedElements[ELayoutElement.Browser].src || '';
+    }
+  }
 
   elementInSlot(slot: LayoutSlot) {
     return Object.keys(this.slottedElements).find(
@@ -55,7 +61,7 @@ export default class LayoutEditor extends TsxComponent {
     const htmlElement = document.elementFromPoint(event.clientX, event.clientY);
     if (!el) return;
     if (!htmlElement) {
-      Vue.delete(this.slottedElements, el);
+      Vue.set(this.slottedElements, el, { slot: null });
       return;
     }
     // In case the span tag is the element dropped on we check for parent element id
@@ -68,11 +74,11 @@ export default class LayoutEditor extends TsxComponent {
       if (existingEl && this.slottedElements[el]) {
         Vue.set(this.slottedElements, existingEl, this.slottedElements[el]);
       } else if (existingEl) {
-        Vue.delete(this.slottedElements, existingEl);
+        Vue.set(this.slottedElements, existingEl, { slot: null });
       }
       Vue.set(this.slottedElements, el, { slot: id as LayoutSlot });
     } else {
-      Vue.delete(this.slottedElements, el);
+      Vue.set(this.slottedElements, el, { slot: null });
     }
   }
 
@@ -85,6 +91,9 @@ export default class LayoutEditor extends TsxComponent {
       this.layoutService.changeLayout(this.currentLayout);
     }
     this.layoutService.setSlots(this.slottedElements);
+    if (this.browserUrl && this.slottedElements[ELayoutElement.Browser]) {
+      this.layoutService.setUrl(this.browserUrl);
+    }
     this.navigationService.navigate('Studio');
   }
 
@@ -234,6 +243,13 @@ export default class LayoutEditor extends TsxComponent {
                 }
               >
                 <span>{this.layoutService.views.elementTitle(this.elementInSlot(slot))}</span>
+                {this.elementInSlot(slot) === ELayoutElement.Browser && (
+                  <TextInput
+                    class={styles.urlTextBox}
+                    vModel={this.browserUrl}
+                    metadata={{ placeholder: $t('Enter Target URL') }}
+                  />
+                )}
               </div>
             ))}
           </div>

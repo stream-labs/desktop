@@ -12,6 +12,7 @@
   "Legacy Events": "Legacy Events",
   "Stream Preview": "Stream Preview",
   "Recording Preview": "Recording Preview",
+  "Website": "Website",
   "Save Changes": "Save Changes",
   "Elements": "Elements",
   "Layouts": "Layouts",
@@ -19,5 +20,6 @@
   "Save New Tab": "Save New Tab",
   "Add Tab": "Add Tab",
   "Current Tab": "Current Tab",
-  "Delete Current Tab": "Delete Current Tab"
+  "Delete Current Tab": "Delete Current Tab",
+  "Enter Target URL": "Enter Target URL"
 }

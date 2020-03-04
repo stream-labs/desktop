@@ -23,6 +23,7 @@ export enum ELayoutElement {
   Sources = 'Sources',
   StreamPreview = 'StreamPreview',
   RecordingPreview = 'RecordingPreview',
+  Browser = 'Browser',
 }
 
 type ILayoutData = {
@@ -103,5 +104,9 @@ export const ELEMENT_DATA = (): IElementData => ({
   [ELayoutElement.RecordingPreview]: {
     title: $t('Recording Preview'),
     component: Elements.RecordingPreview,
+  },
+  [ELayoutElement.Browser]: {
+    title: $t('Website'),
+    component: Elements.Browser,
   },
 });
