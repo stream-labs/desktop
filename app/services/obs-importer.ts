@@ -323,22 +323,24 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
       'AuxAudioDevice3',
     ];
     channelNames.forEach((channelName, i) => {
-      const audioSource = configJSON[channelName];
-      if (audioSource) {
+      const obsAudioSource = configJSON[channelName];
+      if (obsAudioSource) {
         const newSource = this.sourcesService.createSource(
-          audioSource.name,
-          audioSource.id,
-          {},
+          obsAudioSource.name,
+          obsAudioSource.id,
+          { device_id: obsAudioSource.settings.device_id },
           { channel: i + 1 },
         );
 
-        this.audioService.views.getSource(newSource.sourceId).setMuted(audioSource.muted);
-        this.audioService.views.getSource(newSource.sourceId).setMul(audioSource.volume);
-        this.audioService.views.getSource(newSource.sourceId).setSettings({
-          ['audioMixers']: audioSource.mixers,
-          ['monitoringType']: audioSource.monitoring_type,
-          ['syncOffset']: audioSource.sync / 1000000,
-          ['forceMono']: !!(audioSource.flags & obs.ESourceFlags.ForceMono),
+        const audioSource = this.audioService.views.getSource(newSource.sourceId);
+
+        audioSource.setMuted(obsAudioSource.muted);
+        audioSource.setMul(obsAudioSource.volume);
+        audioSource.setSettings({
+          audioMixers: obsAudioSource.mixers,
+          monitoringType: obsAudioSource.monitoring_type,
+          syncOffset: obsAudioSource.sync / 1000000,
+          forceMono: !!(obsAudioSource.flags & obs.ESourceFlags.ForceMono),
         });
       }
     });
