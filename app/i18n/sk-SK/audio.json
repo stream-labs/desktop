@@ -10,7 +10,7 @@
   "Tracks": "Skladby",
   "Advanced Audio Settings": "Rozšírené nastavenia zvuku",
   "Volume ( % )": "Objem (%)",
-  "Sync Offset ( ms )": "Sync Offset ( ms )",
+  "Sync Offset ( ms )": "Synchronizačný posun (ms)",
   "Mixer": "Mixer",
-  "Monitor audio levels. If the bars are moving you are outputting audio.": "Monitor audio levels. If the bars are moving you are outputting audio."
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "Monitorujte úrovne zvuku. Ak sa pruhy pohybujú, reprodukujete zvuk."
 }
