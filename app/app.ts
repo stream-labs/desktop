@@ -93,7 +93,6 @@ window.addEventListener('error', e => {
 });
 
 window.addEventListener('unhandledrejection', e => {
-  console.log(e);
   sendLogMsg('error', e.reason);
 });
 
