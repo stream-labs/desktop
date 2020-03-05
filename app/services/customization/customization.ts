@@ -157,7 +157,6 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
         options: [
           { value: 'night-theme', description: $t('Night') },
           { value: 'day-theme', description: $t('Day') },
-          { value: 'prime-dark', description: $t('Prime Dark') },
         ],
         visible: true,
         enabled: true,
