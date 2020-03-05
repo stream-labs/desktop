@@ -16,14 +16,14 @@
   "Compressor": "Compressor",
   "VST 2.x Plugin": "VST 2.x Plugin",
   "Face Mask Plugin": "Doplnok Face Mask",
-  "Filter type": "Filter type",
-  "Filter name": "Filter name",
-  "Add source filter": "Add source filter",
-  "No filters applied": "No filters applied",
-  "Source filters": "Source filters",
-  "Invert Polarity": "Invert Polarity",
-  "Limiter": "Limiter",
+  "Filter type": "Typ filtra",
+  "Filter name": "Názov filtra",
+  "Add source filter": "Pridajte zdrojový filter",
+  "No filters applied": "Nie sú použité žiadne filtre",
+  "Source filters": "Zdrojové filtre",
+  "Invert Polarity": "Invertovať polaritu",
+  "Limiter": "Obmedzovač",
   "Expander": "Expander",
   "Shader": "Shader",
-  "No settings are available for this filter": "No settings are available for this filter"
+  "No settings are available for this filter": "Pre tento filter nie sú k dispozícii žiadne nastavenia"
 }
