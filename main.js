@@ -368,8 +368,6 @@ if (!gotTheLock) {
 
     if (process.env.SLOBS_PRODUCTION_DEBUG) openDevTools();
 
-    openDevTools();
-
     // simple messaging system for services between windows
     // WARNING! renderer windows use synchronous requests and will be frozen
     // until the worker window's asynchronous response
