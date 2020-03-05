@@ -23,7 +23,6 @@ const { Updater } = require('./updater/mac/Updater.js');
 const { app, BrowserWindow, ipcMain, session, crashReporter, dialog, webContents } = require('electron');
 const path = require('path');
 const rimraf = require('rimraf');
-const electronLog = require('electron-log');
 
 // MAC-TODO
 // const overlay = require('@streamlabs/game-overlay');
@@ -31,11 +30,6 @@ const electronLog = require('electron-log');
 // We use a special cache directory for running tests
 if (process.env.SLOBS_CACHE_DIR) {
   app.setPath('appData', process.env.SLOBS_CACHE_DIR);
-  electronLog.transports.file.file = path.join(
-    process.env.SLOBS_CACHE_DIR,
-    'slobs-client',
-    'log.log'
-  );
 }
 
 app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
@@ -76,80 +70,125 @@ if (!gotTheLock) {
   // Main Program
   ////////////////////////////////////////////////////////////////////////////////
 
-  (function setupLogger() {
-    const logDir = path.join(app.getPath('userData'), 'logs');
+  const util = require('util');
+  const logFile = path.join(app.getPath('userData'), 'app.log');
+  const maxLogBytes = 16384;
 
-    if (!fs.existsSync(logDir)) {
-      fs.mkdirSync(logDir);
+  // Truncate the log file if it is too long
+  if (fs.existsSync(logFile) && fs.statSync(logFile).size > maxLogBytes) {
+    const content = fs.readFileSync(logFile);
+    fs.writeFileSync(logFile, '[LOG TRUNCATED]\n');
+    fs.writeFileSync(logFile, content.slice(content.length - maxLogBytes), { flag: 'a' });
+  }
+
+  ipcMain.on('logmsg', (e, msg) => {
+    logFromRemote(msg.level, msg.sender, msg.message);
+  });
+
+  function logFromRemote(level, sender, msg) {
+    msg.split('\n').forEach(line => {
+      writeLogLine(`[${new Date().toISOString()}] [${level}] [${sender}] - ${line}`);
+    });
+  }
+
+  const consoleLog = console.log;
+  console.log = (...args) => {
+    if (!process.env.SLOBS_DISABLE_MAIN_LOGGING) {
+      const serialized = args
+        .map(arg => {
+          if (typeof arg === 'string') return arg;
+    
+          return util.inspect(arg);
+        })
+        .join(' ');
+
+      logFromRemote('info', 'electron-main', serialized);
     }
+  };
 
-    // save logs to the cache directory
-    electronLog.transports.file.file = path.join(logDir, 'electron-main.log');
-    // Set approximate maximum log size in bytes. When it exceeds,
-    // the archived log will be saved as the log.old.log file
-    electronLog.transports.file.maxSize = 5 * 1024 * 1024;
+  const lineBuffer = [];
 
-    // catch and log unhandled errors/rejected promises
-    electronLog.catchErrors();
+  function writeLogLine(line) {
+    // Also print to stdout
+    consoleLog(line);
 
-    const os = require('os');
-    const cpus = os.cpus();
+    lineBuffer.push(`${line}\n`);
+    flushNextLine();
+  }
 
-    // Source: https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string/10420404
-    function humanFileSize(bytes, si) {
-      var thresh = si ? 1000 : 1024;
-      if(Math.abs(bytes) < thresh) {
-          return bytes + ' B';
+  let writeInProgress = false;
+
+  function flushNextLine() {
+    if (lineBuffer.length === 0) return;
+    if (writeInProgress) return;
+
+    const nextLine = lineBuffer.shift();
+
+    writeInProgress = true;
+
+    fs.writeFile(logFile, nextLine, { flag: 'a' }, (e) => {
+      writeInProgress = false;
+
+      if (e) {
+        consoleLog('Error writing to log file', e);
+        return;
       }
-      var units = si
-          ? ['kB','MB','GB','TB','PB','EB','ZB','YB']
-          : ['KiB','MiB','GiB','TiB','PiB','EiB','ZiB','YiB'];
-      var u = -1;
-      do {
-          bytes /= thresh;
-          ++u;
-      } while(Math.abs(bytes) >= thresh && u < units.length - 1);
-      return bytes.toFixed(1)+' '+units[u];
+
+      flushNextLine();
+    });
+  }
+
+  const os = require('os');
+  const cpus = os.cpus();
+
+  // Source: https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string/10420404
+  function humanFileSize(bytes, si) {
+    var thresh = si ? 1000 : 1024;
+    if(Math.abs(bytes) < thresh) {
+        return bytes + ' B';
     }
+    var units = si
+        ? ['kB','MB','GB','TB','PB','EB','ZB','YB']
+        : ['KiB','MiB','GiB','TiB','PiB','EiB','ZiB','YiB'];
+    var u = -1;
+    do {
+        bytes /= thresh;
+        ++u;
+    } while(Math.abs(bytes) >= thresh && u < units.length - 1);
+    return bytes.toFixed(1)+' '+units[u];
+  }
 
-    electronLog.log('=================================');
-    electronLog.log(`Streamlabs OBS`);
-    electronLog.log(`Version: ${process.env.SLOBS_VERSION}`);
-    electronLog.log(`OS: ${os.platform()} ${os.release()}`);
-    electronLog.log(`Arch: ${process.arch}`);
-    electronLog.log(`CPU: ${cpus[0].model}`);
-    electronLog.log(`Cores: ${cpus.length}`);
-    electronLog.log(`Memory: ${humanFileSize(os.totalmem(), false)}`);
-    electronLog.log(`Free: ${humanFileSize(os.freemem(), false)}`);
-    electronLog.log('=================================');
+  console.log('=================================');
+  console.log(`Streamlabs OBS`);
+  console.log(`Version: ${process.env.SLOBS_VERSION}`);
+  console.log(`OS: ${os.platform()} ${os.release()}`);
+  console.log(`Arch: ${process.arch}`);
+  console.log(`CPU: ${cpus[0].model}`);
+  console.log(`Cores: ${cpus.length}`);
+  console.log(`Memory: ${humanFileSize(os.totalmem(), false)}`);
+  console.log(`Free: ${humanFileSize(os.freemem(), false)}`);
+  console.log('=================================');
 
+  app.on('ready', () => {
     // network logging is disabled by default
     if (!process.argv.includes('--network-logging')) return;
-    app.on('ready', () => {
 
-      // ignore fs requests
-      const filter = { urls: ['https://*', 'http://*'] };
+    // ignore fs requests
+    const filter = { urls: ['https://*', 'http://*'] };
 
-      session.defaultSession.webRequest.onBeforeRequest(filter, (details, callback) => {
-        log('HTTP REQUEST', details.method, details.url);
-        callback(details);
-      });
-
-      session.defaultSession.webRequest.onErrorOccurred(filter, (details) => {
-        log('HTTP REQUEST FAILED', details.method, details.url);
-      });
-
-      session.defaultSession.webRequest.onCompleted(filter, (details) => {
-        log('HTTP REQUEST COMPLETED', details.method, details.url, details.statusCode);
-      });
+    session.defaultSession.webRequest.onBeforeRequest(filter, (details, callback) => {
+      console.log('HTTP REQUEST', details.method, details.url);
+      callback(details);
     });
-  })();
 
-  function log(...args) {
-    if (!process.env.SLOBS_DISABLE_MAIN_LOGGING) {
-      electronLog.log(...args);
-    }
-  }
+    session.defaultSession.webRequest.onErrorOccurred(filter, (details) => {
+      console.log('HTTP REQUEST FAILED', details.method, details.url);
+    });
+
+    session.defaultSession.webRequest.onCompleted(filter, (details) => {
+      console.log('HTTP REQUEST COMPLETED', details.method, details.url, details.statusCode);
+    });
+  });
 
   // Windows
   let workerWindow;
@@ -345,6 +384,8 @@ if (!gotTheLock) {
 
     if (process.env.SLOBS_PRODUCTION_DEBUG) openDevTools();
 
+    openDevTools();
+
     // simple messaging system for services between windows
     // WARNING! renderer windows use synchronous requests and will be frozen
     // until the worker window's asynchronous response
@@ -501,12 +542,12 @@ if (!gotTheLock) {
     // refreshed.  We only want to register it once.
     if (!registeredStores[windowId]) {
       registeredStores[windowId] = win;
-      log('Registered vuex stores: ', Object.keys(registeredStores));
+      console.log('Registered vuex stores: ', Object.keys(registeredStores));
 
       // Make sure we unregister is when it is closed
       win.on('closed', () => {
         delete registeredStores[windowId];
-        log('Registered vuex stores: ', Object.keys(registeredStores));
+        console.log('Registered vuex stores: ', Object.keys(registeredStores));
       });
     }
 
