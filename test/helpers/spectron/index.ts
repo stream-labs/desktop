@@ -268,7 +268,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
    */
   async function checkErrorsInLogFile() {
     await sleep(1000); // electron-log needs some time to write down logs
-    const filePath = path.join(cacheDir, 'slobs-client', 'log.log');
+    const filePath = path.join(cacheDir, 'slobs-client', 'app.log');
     if (!fs.existsSync(filePath)) return;
     const logs = fs.readFileSync(filePath).toString();
     const errors = logs

@@ -1,4 +1,3 @@
-import electronLog from 'electron-log';
 import { Service } from './core/service';
 import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
@@ -148,7 +147,7 @@ export class WebsocketService extends Service {
     console.debug(`WS: ${message}`, ...args);
 
     if (this.appService.state.argv.includes('--network-logging')) {
-      electronLog.log(`WS: ${message}`);
+      console.log(`WS: ${message}`);
     }
   }
 }

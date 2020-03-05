@@ -68,7 +68,7 @@ export class CacheUploaderService extends Service {
       this.addDirIfExists(archive, 'SceneConfigs');
       this.addDirIfExists(archive, 'SceneCollections');
       this.addDirIfExists(archive, 'Streamlabels');
-      this.addFileIfExists(archive, 'log.log');
+      this.addFileIfExists(archive, 'app.log');
       this.addFileIfExists(archive, 'crash-handler.log');
       this.addFileIfExists(archive, 'crash-handler.log.old');
       this.addFileIfExists(archive, 'game-overlays.log');

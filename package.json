@@ -65,7 +65,6 @@
     "archiver": "2.1.1",
     "aws-sdk": "^2.344.0",
     "crash-handler": "https://github.com/stream-labs/crash-handler/releases/download/v0.0.41/iojs-v6.0.3-crash-handler.tar.gz",
-    "electron-log": "^3.0.4",
     "electron-window-state": "5.0.3",
     "eslint-loader": "^3.0.3",
     "extract-zip": "^1.6.7",
