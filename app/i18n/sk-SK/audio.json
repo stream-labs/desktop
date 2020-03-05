@@ -7,9 +7,9 @@
   "Monitor Off": "Monitor vypnutý",
   "Monitor Only (mute output)": "Iba monitor (stlmiť výstup)",
   "Monitor and Output": "Monitor a výstup",
-  "Tracks": "Tracks",
-  "Advanced Audio Settings": "Advanced Audio Settings",
-  "Volume ( % )": "Volume ( % )",
+  "Tracks": "Skladby",
+  "Advanced Audio Settings": "Rozšírené nastavenia zvuku",
+  "Volume ( % )": "Objem (%)",
   "Sync Offset ( ms )": "Sync Offset ( ms )",
   "Mixer": "Mixer",
   "Monitor audio levels. If the bars are moving you are outputting audio.": "Monitor audio levels. If the bars are moving you are outputting audio."
