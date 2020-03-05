@@ -23,12 +23,11 @@ import VModal from 'vue-js-modal';
 import VeeValidate from 'vee-validate';
 import ChildWindow from 'components/windows/ChildWindow.vue';
 import OneOffWindow from 'components/windows/OneOffWindow.vue';
-import electronLog from 'electron-log';
 import { UserService, setSentryContext } from 'services/user';
 import { getResource } from 'services';
 import * as obs from '../obs-api';
-import fs from 'fs';
 import path from 'path';
+import util from 'util';
 import uuid from 'uuid/v4';
 import Blank from 'components/windows/Blank.vue';
 import Main from 'components/windows/Main.vue';
@@ -62,21 +61,41 @@ if (isProduction) {
 }
 
 let usingSentry = false;
-
-const logDir = path.join(electron.remote.app.getPath('userData'), 'logs');
 const windowId = Utils.getWindowId();
 
-if (['worker', 'main', 'child'].includes(windowId)) {
-  electronLog.transports.file.file = path.join(logDir, `${Utils.getWindowId()}.log`);
+function wrapLogFn(fn: string) {
+  const old: Function = console[fn];
+  console[fn] = (...args: any[]) => {
+    old.apply(console, args);
+
+    const level = fn === 'log' ? 'info' : fn;
+
+    sendLogMsg(level, ...args);
+  };
 }
 
-console.log = electronLog.log;
-console.warn = electronLog.warn;
-console.error = electronLog.error;
+function sendLogMsg(level: string, ...args: any[]) {
+  const serialized = args
+    .map(arg => {
+      if (typeof arg === 'string') return arg;
 
-console.log('=================================');
-console.log(`Streamlabs OBS: ${slobsVersion}`);
-console.log('=================================');
+      return util.inspect(arg);
+    })
+    .join(' ');
+
+  ipcRenderer.send('logmsg', { level, sender: windowId, message: serialized });
+}
+
+['log', 'info', 'warn', 'error'].forEach(wrapLogFn);
+
+window.addEventListener('error', e => {
+  sendLogMsg('error', e.error);
+});
+
+window.addEventListener('unhandledrejection', e => {
+  console.log(e);
+  sendLogMsg('error', e.reason);
+});
 
 if (
   (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) &&
@@ -284,8 +303,3 @@ if (Utils.isDevMode()) {
     if (ev.key === 'F12') electron.ipcRenderer.send('openDevTools');
   });
 }
-
-// ERRORS LOGGING
-
-// catch and log unhandled errors/rejected promises:
-electronLog.catchErrors();
