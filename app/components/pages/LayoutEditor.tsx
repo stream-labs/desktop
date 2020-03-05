@@ -22,11 +22,6 @@ export default class LayoutEditor extends TsxComponent {
   slottedElements = cloneDeep(this.layoutService.views.currentTab.slottedElements) || {};
   browserUrl: string = '';
 
-  tabOptions = Object.keys(this.layoutService.state.tabs).map(tab => ({
-    value: tab,
-    title: this.layoutService.state.tabs[tab].name,
-  }));
-
   private highlightedSlot: LayoutSlot = null;
   private showModal = false;
 
@@ -105,13 +100,8 @@ export default class LayoutEditor extends TsxComponent {
     this.showModal = true;
   }
 
-  get numberOfTabs() {
-    return Object.keys(this.layoutService.state.tabs).length;
-  }
-
-  @Watch('numberOfTabs')
-  updateTabs() {
-    this.tabOptions = Object.keys(this.layoutService.state.tabs).map(tab => ({
+  get tabOptions() {
+    return Object.keys(this.layoutService.state.tabs).map(tab => ({
       value: tab,
       title: this.layoutService.state.tabs[tab].name,
     }));

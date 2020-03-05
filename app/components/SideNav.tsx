@@ -32,12 +32,6 @@ export default class SideNav extends Vue {
     return EAvailableFeatures;
   }
 
-  studioTabs = Object.keys(this.layoutService.state.tabs).map(tab => ({
-    target: tab,
-    title: this.layoutService.state.tabs[tab].name,
-    icon: this.layoutService.state.tabs[tab].icon,
-  }));
-
   @Prop() locked: boolean;
 
   navigate(page: TAppPage) {
@@ -74,13 +68,8 @@ export default class SideNav extends Vue {
     );
   }
 
-  get numberOfTabs() {
-    return Object.keys(this.layoutService.state.tabs).length;
-  }
-
-  @Watch('numberOfTabs')
-  updateTabs() {
-    this.studioTabs = Object.keys(this.layoutService.state.tabs).map(tab => ({
+  get studioTabs() {
+    return Object.keys(this.layoutService.state.tabs).map(tab => ({
       target: tab,
       title: this.layoutService.state.tabs[tab].name || $t('Editor'),
       icon: this.layoutService.state.tabs[tab].icon,
