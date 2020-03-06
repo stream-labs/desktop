@@ -36,18 +36,21 @@ class Updater {
 
   bindListeners() {
     autoUpdater.on('update-available', info => {
+      console.log('Updater: Update available', info);
       this.updateState.version = info.version;
       this.updateState.percent = 0;
       this.pushState();
     });
 
     autoUpdater.on('update-not-available', () => {
+      console.log('Updater: Update not found');
       this.startApp();
       this.finished = true;
       this.browserWindow.close();
     });
 
     autoUpdater.on('download-progress', progress => {
+      console.log('Updater: Download progress', progress);
       this.updateState.percent = progress.percent;
 
       if (progress.percent === 100) {
@@ -58,12 +61,14 @@ class Updater {
     });
 
     autoUpdater.on('update-downloaded', () => {
+      console.log('Updater: Update successfully downloaded');
       this.updateState.installing = true;
       this.pushState();
       autoUpdater.quitAndInstall();
     });
 
-    autoUpdater.on('error', () => {
+    autoUpdater.on('error', error => {
+      console.log('Updater: Error', error);
       this.updateState.error = true;
       this.pushState();
     });
