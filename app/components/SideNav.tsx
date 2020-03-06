@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import cx from 'classnames';
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { CustomizationService } from 'services/customization';
 import { NavigationService, TAppPage } from 'services/navigation';

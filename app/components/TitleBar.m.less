@@ -1,0 +1,48 @@
+@import '../styles/index';
+
+.titlebar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 30px;
+  flex: 0 0 30px;
+  background: var(--titlebar);
+}
+
+.titlebar-icon {
+  padding-left: 16px;
+  width: 32px;
+}
+
+.titlebar svg {
+  width: auto;
+  height: 20px;
+  padding: 0.2%;
+  margin-left: 2px;
+  margin-bottom: 4px;
+  overflow: visible;
+
+  g {
+    opacity: 1;
+    fill: var(--prime);
+  }
+}
+
+.titlebar-title {
+  flex-grow: 1;
+  padding-left: 10px;
+  -webkit-app-region: drag;
+  color: var(--icon);
+}
+
+.titlebar-actions {
+  -webkit-app-region: no-drag;
+}
+
+.titlebar-action {
+  .icon-hover();
+
+  color: var(--icon);
+  cursor: pointer;
+  margin-right: 16px;
+}
