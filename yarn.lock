@@ -9855,8 +9855,8 @@ single-line-log@^1.1.2:
     string-width "^1.0.1"
 
 "sl-vue-tree@https://github.com/stream-labs/sl-vue-tree.git":
-  version "1.5.1"
-  resolved "https://github.com/stream-labs/sl-vue-tree.git#03ff989b20e4d3441afa3f9c47839d4b7fcc37d8"
+  version "1.8.3"
+  resolved "https://github.com/stream-labs/sl-vue-tree.git#30627b72cdac4755e82816a2bf00737a7c5806e4"
 
 slash@^1.0.0:
   version "1.0.0"
