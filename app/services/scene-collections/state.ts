@@ -238,7 +238,6 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
 
   @mutation()
   LOAD_STATE(state: ISceneCollectionsManifest) {
-    console.log('LOAD STATE', state);
     Object.keys(state).forEach(key => {
       Vue.set(this.state, key, state[key]);
     });

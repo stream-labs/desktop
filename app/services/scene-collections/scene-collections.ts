@@ -669,7 +669,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   }
 
   private async setActiveCollection(id: string) {
-    console.log('SET ACTIVE EARLIER', id);
     const collection = this.collections.find(coll => coll.id === id);
 
     if (collection) {
@@ -680,7 +679,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
           console.warn('Failed setting active collection');
         }
       }
-      console.log('SET ACTIVE', id);
       this.stateService.SET_ACTIVE_COLLECTION(id);
       this.collectionSwitched.next(collection);
     }
