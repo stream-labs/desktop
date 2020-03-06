@@ -59,6 +59,10 @@ export interface IListMetadata<TValueType> extends IInputMetadata {
   fullWidth?: boolean;
 }
 
+export interface IImagePickerMetadata<TValueType> extends IListMetadata<TValueType> {
+  isIcons: boolean;
+}
+
 export interface ITextMetadata extends IInputMetadata {
   placeholder?: string;
   max?: number;

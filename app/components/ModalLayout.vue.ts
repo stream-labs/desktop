@@ -18,6 +18,7 @@ export default class ModalLayout extends TsxComponent<{
   contentStyles?: Dictionary<string>;
   fixedSectionHeight?: number;
   customControls?: boolean;
+  hasTitleBar?: boolean;
 }> {
   contentStyle: Object = {};
   fixedStyle: Object = {};
