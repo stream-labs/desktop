@@ -25,7 +25,7 @@
       :value="localValue"
       @input="updateLocalValue($event.target.value)"
       @keydown="handleKeydown"
-    >
+    />
   </div>
 </template>
 
@@ -49,5 +49,13 @@
 
 .slider-container /deep/ .s-slider .vue-slider {
   background-color: var(--border);
+
+  /deep/ .vue-slider-process {
+    background-color: var(--teal);
+  }
+
+  /deep/ .vue-slider-dot-handle {
+    background-color: var(--section);
+  }
 }
 </style>

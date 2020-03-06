@@ -7,7 +7,7 @@ import { CustomizationService } from 'services/customization';
 import uuid from 'uuid/v4';
 
 interface DisplayProps {
-  sourceId: string;
+  sourceId?: string;
   paddingSize?: number;
   drawUI?: false;
   renderingMode?: number;

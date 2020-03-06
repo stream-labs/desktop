@@ -1,21 +1,21 @@
 <template>
-<div class="titlebar" :class="titlebarClasses">
-  <img v-if="!isMac" class="titlebar-icon" src="../../media/images/icon.ico" />
-  <div class="titlebar-title" @dblclick="maximize">
-    {{ title }}
+  <div class="titlebar" :class="titlebarClasses">
+    <img v-if="!isMac" class="titlebar-icon" src="../../media/images/icon.ico" />
+    <div class="titlebar-title" @dblclick="maximize">
+      {{ title }}
+    </div>
+    <div v-if="!isMac" class="titlebar-actions">
+      <i class="icon-subtract titlebar-action" @click="minimize" />
+      <i v-if="isMaximizable" class="icon-expand-1 titlebar-action" @click="maximize" />
+      <i class="icon-close titlebar-action" @click="close" />
+    </div>
   </div>
-  <div v-if="!isMac" class="titlebar-actions">
-    <i class="icon-subtract titlebar-action" @click="minimize" />
-    <i v-if="isMaximizable" class="icon-expand-1 titlebar-action" @click="maximize" />
-    <i class="icon-close titlebar-action" @click="close" />
-  </div>
-</div>
 </template>
 
 <script lang="ts" src="./TitleBar.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import '../styles/index';
 
 .titlebar {
   display: flex;
@@ -45,7 +45,7 @@
   flex-grow: 1;
   padding-left: 10px;
   -webkit-app-region: drag;
-  color: var(--icon);
+  color: var(--titlebar-title);
 }
 
 .titlebar-actions {
@@ -55,6 +55,7 @@
 .titlebar-action {
   .icon-hover();
 
+  color: var(--titlebar-title);
   cursor: pointer;
   margin-right: 16px;
 }
