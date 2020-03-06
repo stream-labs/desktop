@@ -136,13 +136,13 @@ export default class LayoutEditor extends TsxComponent {
           metadata={{ options: this.tabOptions }}
           v-tooltip={{ content: $t('Current Tab'), placement: 'bottom' }}
         />
-        <button
+        {/* <button
           class={cx('button button--default', styles.addButton)}
           v-tooltip={{ content: $t('Add Tab'), placement: 'bottom' }}
           onClick={() => this.openModal()}
         >
           <i class="icon-add" />
-        </button>
+        </button> */}
         {this.layoutService.state.currentTab !== 'default' && (
           <button
             class={cx('button button--warn', styles.removeButton)}
