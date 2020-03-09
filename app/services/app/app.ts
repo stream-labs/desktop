@@ -38,6 +38,7 @@ import { RestreamService } from 'services/restream';
 import { downloadFile } from '../../util/requests';
 import { TouchBarService } from 'services/touch-bar';
 import { ApplicationMenuService } from 'services/application-menu';
+import { KeyListenerService } from 'services/key-listener';
 
 interface IAppState {
   loading: boolean;
@@ -97,6 +98,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private dismissablesService: DismissablesService;
   @Inject() private restreamService: RestreamService;
   @Inject() private applicationMenuService: ApplicationMenuService;
+  @Inject() private keyListenerService: KeyListenerService;
 
   private loadingPromises: Dictionary<Promise<any>> = {};
 
@@ -188,6 +190,7 @@ export class AppService extends StatefulService<IAppState> {
 
     window.setTimeout(async () => {
       this.shutdownStarted.next();
+      this.keyListenerService.shutdown();
       this.platformAppsService.unloadAllApps();
       this.windowsService.closeChildWindow();
       await this.windowsService.closeAllOneOffs();
