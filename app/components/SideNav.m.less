@@ -41,9 +41,32 @@
   }
 }
 
+.primary-tab {
+  position: relative;
+
+  .studio-dropdown {
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    font-size: 10px;
+    color: var(--title);
+  }
+
+  &.active {
+    .studio-dropdown {
+      color: var(--background);
+    }
+  }
+}
+
 .studio-tabs {
   max-height: 230px;
+  position: absolute;
+  top: 46px;
+  left: 0;
   overflow-y: auto;
+  background-color: var(--background);
+  z-index: 10;
 
   &::-webkit-scrollbar {
     display: none;

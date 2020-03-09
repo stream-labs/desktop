@@ -27,6 +27,7 @@ export default class SideNav extends Vue {
   @Inject() incrementalRolloutService: IncrementalRolloutService;
 
   availableChatbotPlatforms = ['twitch', 'mixer', 'youtube'];
+  showTabDropdown = false;
 
   get availableFeatures() {
     return EAvailableFeatures;
@@ -80,21 +81,49 @@ export default class SideNav extends Vue {
     return this.appService.state.loading;
   }
 
-  get studioTabElements() {
+  get primaryStudioTab() {
     return (
-      <div class={styles.studioTabs}>
-        {this.studioTabs.map(page => (
-          <div
-            class={cx(styles.mainCell, {
-              [styles.active]:
-                this.page === 'Studio' && this.layoutService.state.currentTab === page.target,
-            })}
-            onClick={() => this.navigateToStudioTab(page.target)}
-            title={page.title}
-          >
-            <i class={page.icon} />
+      <div
+        onMouseenter={() => (this.showTabDropdown = true)}
+        onMouseleave={() => (this.showTabDropdown = false)}
+      >
+        <div
+          class={cx(styles.primaryTab, {
+            [styles.active]:
+              this.page === 'Studio' && this.layoutService.state.currentTab === 'default',
+          })}
+        >
+          {this.studioTab(this.studioTabs[0])}
+          {this.studioTabs.length > 1 && <i class={cx('icon-down', styles.studioDropdown)} />}
+        </div>
+        {this.additionalStudioTabs}
+      </div>
+    );
+  }
+
+  get additionalStudioTabs() {
+    return (
+      <transition name="sidenav-slide">
+        {this.showTabDropdown && (
+          <div class={styles.studioTabs}>
+            {this.studioTabs.slice(1).map(page => this.studioTab(page))}
           </div>
-        ))}
+        )}
+      </transition>
+    );
+  }
+
+  studioTab(page: { target: string; title: string; icon: string }) {
+    return (
+      <div
+        class={cx(styles.mainCell, {
+          [styles.active]:
+            this.page === 'Studio' && this.layoutService.state.currentTab === page.target,
+        })}
+        onClick={() => this.navigateToStudioTab(page.target)}
+        title={page.title}
+      >
+        <i class={page.icon} />
       </div>
     );
   }
@@ -111,7 +140,7 @@ export default class SideNav extends Vue {
 
     return (
       <div class={cx('side-nav', styles.container, { [styles.leftDock]: this.leftDock })}>
-        {this.studioTabElements}
+        {this.primaryStudioTab}
         {pageData.map(page => (
           <div
             class={cx(styles.mainCell, {
