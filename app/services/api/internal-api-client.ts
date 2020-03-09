@@ -6,6 +6,7 @@ import { Service } from '../core/service';
 import { ServicesManager } from '../../services-manager';
 import { commitMutation } from '../../store';
 import { ServiceHelper } from 'services/core';
+import Utils from 'services/utils';
 const { ipcRenderer } = electron;
 
 /**
@@ -127,11 +128,13 @@ export class InternalApiClient {
         return;
       }
 
-      console.warn(
-        `Calling synchronous service method from renderer process: ${
-          isHelper ? target['_resourceId'] : serviceName
-        }.${methodName} - Consider calling as an action instead`,
-      );
+      if (Utils.isDevMode()) {
+        console.warn(
+          `Calling synchronous service method from renderer process: ${
+            isHelper ? target['_resourceId'] : serviceName
+          }.${methodName} - Consider calling as an action instead`,
+        );
+      }
 
       const response: IJsonRpcResponse<any> = electron.ipcRenderer.sendSync(
         'services-request',
