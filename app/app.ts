@@ -32,6 +32,7 @@ import uuid from 'uuid/v4';
 import Blank from 'components/windows/Blank.vue';
 import Main from 'components/windows/Main.vue';
 import CustomLoader from 'components/CustomLoader';
+import { getOS, OS } from 'util/operating-systems';
 
 // MAC-TODO
 // const crashHandler = window['require']('crash-handler');
@@ -106,7 +107,7 @@ if (
   Sentry.init({
     dsn: sentryDsn,
     release: slobsVersion,
-    sampleRate: isPreview ? 1.0 : 0.1,
+    sampleRate: isPreview || getOS() === OS.Mac ? 1.0 : 0.1,
     beforeSend: event => {
       // Because our URLs are local files and not publicly
       // accessible URLs, we simply truncate and send only
