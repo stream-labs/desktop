@@ -11,6 +11,7 @@
 @yellow-dark-semi: rgba(202, 157, 0, 0.08);
 @yellow-light: #FFF9E5;
 @goldenrod: #CAA368;
+@goldenrod-dark: #8F6F3F;
 
 @light-1: #ffffff;
 @light-2: #F5F8FA;
@@ -24,17 +25,17 @@
 @dark-4: #2B383F;
 @dark-5: #4F5E65;
 
-@primedark-1: #111;
-@primedark-2: #222;
-@primedark-3: #333;
-@primedark-4: #444;
-@primedark-5: #666;
+@primedark-1: #0D0D0D;
+@primedark-2: #000000;
+@primedark-3: #111111;
+@primedark-4: #252525;
+@primedark-5: #969696;
 
-@primelight-1: #fff;
-@primelight-2: #ccc;
-@primelight-3: #aaa;
-@primelight-4: #888;
-@primelight-5: #666;
+@primelight-1: #F3F3F3;
+@primelight-2: #FFFFFF;
+@primelight-3: #D3D3D3;
+@primelight-4: #C3C4C6;
+@primelight-5: #767676;
 
 // Variables for use
 :root {
@@ -150,4 +151,39 @@
   --accent: @goldenrod;
   --new: @goldenrod;
   --icon: @goldenrod;
+}
+
+.prime-light {
+  --background: @light-2;
+  --section: @light-3;
+  --section-alt: @light-3;
+  --titlebar: @dark-4;
+  --title: @dark-2;
+  --titlebar-title: @light-5;
+  --paragraph: @dark-4;
+  --border: @light-4;
+  --button: @light-4;
+  --action-buton-text: @light-1;
+  --button-hover: darken(@light-4, 8%);
+  --link: @dark-5;
+  --link-active: @dark-2;
+  --input-bg: @light-1;
+  --focus-border: darken(@light-4, 4%);
+  --solid-input: @light-2;
+  --dropdown-bg: @light-1;
+  --dropdown-alt-bg: darken(@light-1, 4%);
+  --midtone: @light-5;
+  --nav-icon-inactive: @dark-4;
+  --slider-progress: @dark-5;
+  --shadow: rgba(55, 71, 79, 0.12);
+  --new-badge: @goldenrod-dark;
+  --new-badge-text: @primelight-1;
+  --modal-overlay: rgba(0, 0, 0, 0.3);
+  --prime-hover: lighten(@goldenrod-dark, 8%);
+  --teal: @goldenrod-dark;
+  --teal-hover: lighten(@goldenrod-dark, 4%);
+  --teal-semi: fade(@goldenrod-dark, 8%);
+  --accent: @goldenrod-dark;
+  --new: @goldenrod-dark;
+  --icon: @goldenrod-dark;
 }

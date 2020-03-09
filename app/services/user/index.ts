@@ -170,6 +170,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   userLogin = new Subject<IUserAuth>();
   userLogout = new Subject();
+  isPrime: boolean = null;
 
   /**
    * Used by child and 1-off windows to update their sentry contexts
@@ -183,6 +184,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.MIGRATE_AUTH();
     this.VALIDATE_LOGIN(false);
     this.SET_AUTH_STATE(EAuthProcessState.Idle);
+    this.setPrimeStatus();
   }
 
   mounted() {
@@ -307,6 +309,20 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         return res.json();
       })
       .catch(() => {});
+  }
+
+  async setPrimeStatus() {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/twitter/status`;
+    const headers = authorizedHeaders(this.apiToken);
+    const request = new Request(url, { headers });
+    return fetch(request)
+      .then(handleResponse)
+      .then(response => {
+        console.log(response);
+        this.isPrime = response.prime;
+      })
+      .catch(() => null);
   }
 
   /**
