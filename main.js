@@ -24,6 +24,11 @@ const { app, BrowserWindow, ipcMain, session, crashReporter, dialog, webContents
 const path = require('path');
 const rimraf = require('rimraf');
 
+if (process.argv0.match(/^\/Volumes\/Streamlabs OBS/)) {
+  dialog.showErrorBox('Streamlabs OBS', 'Please run Streamlabs OBS from your Applications folder. Streamlabs OBS cannot run directly from this disk image.');
+  app.exit();
+}
+
 // MAC-TODO
 // const overlay = require('@streamlabs/game-overlay');
 
