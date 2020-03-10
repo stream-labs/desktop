@@ -22,11 +22,17 @@ const { Updater } = require('./updater/mac/Updater.js');
 ////////////////////////////////////////////////////////////////////////////////
 const { app, BrowserWindow, ipcMain, session, crashReporter, dialog, webContents } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const rimraf = require('rimraf');
 
-if (process.argv0.match(/^\/Volumes\/Streamlabs OBS/)) {
-  dialog.showErrorBox('Streamlabs OBS', 'Please run Streamlabs OBS from your Applications folder. Streamlabs OBS cannot run directly from this disk image.');
-  app.exit();
+// Detect when running from an unwritable location like a DMG image (will break updater)
+if (process.platform === 'darwin') {
+  try {
+    fs.accessSync(app.getPath('exe'), fs.constants.W_OK);
+  } catch (e) {
+    dialog.showErrorBox('Streamlabs OBS', 'Please run Streamlabs OBS from your Applications folder. Streamlabs OBS cannot run directly from this disk image.');
+    app.exit();
+  }
 }
 
 // MAC-TODO
@@ -49,7 +55,6 @@ const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
   app.quit();
 } else {
-  const fs = require('fs');
   const bootstrap = require('./updater/build/bootstrap.js');
   const uuid = require('uuid/v4');
   const semver = require('semver');
