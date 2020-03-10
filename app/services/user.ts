@@ -35,7 +35,7 @@ import {
 } from 'os';
 import { memoryUsage as nodeMemUsage } from 'process';
 import { QuestionaireService } from './questionaire';
-import { $t } from './i18n';
+import { addClipboardMenu } from 'util/addClipboardMenu';
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
@@ -256,47 +256,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       onAuthClose();
     });
 
-    authWindow.webContents.on('context-menu', (e, params) => {
-      if (params.isEditable) {
-        const menu = new Menu();
-
-        menu.append({
-          id: 'Cut',
-          label: $t('common.cut'),
-          role: 'cut',
-          accelerator: 'CommandOrControl+X',
-          enabled: params.editFlags.canCut,
-        });
-        menu.append({
-          id: 'Copy',
-          label: $t('common.copy'),
-          role: 'copy',
-          accelerator: 'CommandOrControl+C',
-          enabled: params.editFlags.canCopy,
-        });
-        menu.append({
-          id: 'Paste',
-          label: $t('common.paste'),
-          role: 'paste',
-          accelerator: 'CommandOrControl+V',
-          enabled: params.editFlags.canPaste,
-        });
-
-        menu.popup();
-      } else if (params.selectionText) {
-        const menu = new Menu();
-
-        menu.append({
-          id: 'Copy',
-          label: $t('common.copy'),
-          role: 'copy',
-          accelerator: 'CommandOrControl+C',
-          enabled: params.editFlags.canCopy,
-        });
-
-        menu.popup();
-      }
-    });
+    addClipboardMenu(authWindow);
 
     authWindow.setMenu(null);
     authWindow.loadURL(service.authUrl);
