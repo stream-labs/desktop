@@ -22,18 +22,7 @@ const { Updater } = require('./updater/mac/Updater.js');
 ////////////////////////////////////////////////////////////////////////////////
 const { app, BrowserWindow, ipcMain, session, crashReporter, dialog, webContents } = require('electron');
 const path = require('path');
-const fs = require('fs');
 const rimraf = require('rimraf');
-
-// Detect when running from an unwritable location like a DMG image (will break updater)
-if (process.platform === 'darwin') {
-  try {
-    fs.accessSync(app.getPath('exe'), fs.constants.W_OK);
-  } catch (e) {
-    dialog.showErrorBox('Streamlabs OBS', 'Please run Streamlabs OBS from your Applications folder. Streamlabs OBS cannot run directly from this disk image.');
-    app.exit();
-  }
-}
 
 // MAC-TODO
 // const overlay = require('@streamlabs/game-overlay');
@@ -60,6 +49,7 @@ if (!gotTheLock) {
   const semver = require('semver');
   const windowStateKeeper = require('electron-window-state');
   const pid = require('process').pid;
+  const fs = require('fs');
   // MAC-TODO
   // const crashHandler = require('crash-handler');
 
@@ -180,6 +170,19 @@ if (!gotTheLock) {
   console.log('=================================');
 
   app.on('ready', () => {
+    // Detect when running from an unwritable location like a DMG image (will break updater)
+    if (process.platform === 'darwin') {
+      try {
+        fs.accessSync(app.getPath('exe'), fs.constants.W_OK);
+      } catch (e) {
+        // This error code indicates a read only file system
+        if (e.code === 'EROFS') {
+          dialog.showErrorBox('Streamlabs OBS', 'Please run Streamlabs OBS from your Applications folder. Streamlabs OBS cannot run directly from this disk image.');
+          app.exit();
+        }
+      }
+    }
+
     // network logging is disabled by default
     if (!process.argv.includes('--network-logging')) return;
 
