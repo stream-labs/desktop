@@ -30,6 +30,7 @@ jest.mock('services-manager', () => ({}));
 jest.mock('services/ipc-server', () => ({}));
 jest.mock('services/jsonrpc/jsonrpc', () => ({}));
 jest.mock('services/jsonrpc', () => ({}));
+jest.mock('util/menus/Menu', () => ({}));
 
 const setup = createSetupFunction({
     injectee: {
