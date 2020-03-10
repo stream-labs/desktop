@@ -18,6 +18,8 @@ jest.mock('services/nicolive-program/nicolive-program', () => ({ NicoliveProgram
 // NicoliveFailureが依存している
 jest.mock('services/i18n', () => ({}));
 
+jest.mock('util/menus/Menu', () => ({}));
+
 beforeEach(() => {
   jest.doMock('services/stateful-service');
   jest.doMock('util/injector');
