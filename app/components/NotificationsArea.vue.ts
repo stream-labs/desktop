@@ -50,10 +50,6 @@ export default class NotificationsArea extends Vue {
 
       this.showExtendedNotifications = this.$refs.notificationsContainer.offsetWidth >= 150;
     }, 1000);
-
-    if (this.notificationsService.state.notifications.length) {
-      this.notificationsService.state.notifications.forEach(this.onNotificationHandler);
-    }
   }
 
   destroyed() {
