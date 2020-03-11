@@ -1,4 +1,5 @@
 import cx from 'classnames';
+import { Component } from 'vue-property-decorator';
 import TsxComponent from 'components/tsx-component';
 import styles from './WelcomeToPrime.m.less';
 import { $t } from 'services/i18n';
@@ -6,6 +7,7 @@ import { Inject } from 'services/core';
 import { NavigationService, TAppPage } from 'services/navigation';
 import { WindowsService } from 'services/windows';
 
+@Component({})
 export default class WelcomeToPrime extends TsxComponent {
   @Inject() navigationService: NavigationService;
   @Inject() windowsService: WindowsService;
@@ -41,10 +43,10 @@ export default class WelcomeToPrime extends TsxComponent {
   panel(panel: Dictionary<string>) {
     return (
       <div class={styles.panel}>
-        <div>
+        <h2 class={styles.subtitle}>
           <i class={cx(panel.icon, styles.icon)} />
-          <h2 class={styles.subtitle}>{panel.title}</h2>
-        </div>
+          {panel.title}
+        </h2>
         <p>{panel.description}</p>
         <img src={require(`../../../media/images/${panel.img}`)} />
         <button class="button button--action" onClick={() => this.navigate(panel.link as TAppPage)}>

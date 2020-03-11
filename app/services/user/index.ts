@@ -408,7 +408,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.windowsService.showWindow({
       componentName: 'WelcomeToPrime',
       title: '',
-      size: { width: 700, height: 500 },
+      size: { width: 1000, height: 700 },
     });
   }
 
