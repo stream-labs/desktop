@@ -538,7 +538,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       }
 
       let errorText = '';
-      let linkToDriverInfo = false;
+      let contactSupport = false;
 
       if (info.code === obs.EOutputCode.BadPath) {
         errorText = $t(
@@ -569,9 +569,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         if (info.error) {
           errorText = info.error;
         } else {
-          linkToDriverInfo = true;
+          contactSupport = true;
           errorText = $t(
-            'An error occurred with the output. This is usually caused by out of date video drivers. Please ensure your Nvidia or AMD drivers are up to date and try again.',
+            'There was an error starting the streaming output. Check your settings and try again. If this issue persists, please contact Streamlabs support.',
           );
         }
       }
@@ -583,7 +583,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         [EOBSOutputType.ReplayBuffer]: $t('Replay Buffer Error'),
       }[info.type];
 
-      if (linkToDriverInfo) buttons.push($t('Learn More'));
+      if (contactSupport) buttons.push($t('Contact Support'));
 
       this.outputErrorOpen = true;
 
@@ -597,10 +597,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         .then(({ response }) => {
           this.outputErrorOpen = false;
 
-          if (linkToDriverInfo && response === 1) {
-            electron.remote.shell.openExternal(
-              'https://howto.streamlabs.com/streamlabs-obs-19/nvidia-graphics-driver-clean-install-tutorial-7000',
-            );
+          if (contactSupport && response === 1) {
+            electron.remote.shell.openExternal('https://support.streamlabs.com/');
           }
         })
         .catch(() => {
