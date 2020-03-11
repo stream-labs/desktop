@@ -319,7 +319,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return fetch(request)
       .then(handleResponse)
       .then(response => {
-        console.log(response);
         this.isPrime = response.prime;
       })
       .catch(() => null);
@@ -403,6 +402,14 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (this.isLoggedIn) {
       return this.platform.channelId;
     }
+  }
+
+  showPrimeWindow() {
+    this.windowsService.showWindow({
+      componentName: 'WelcomeToPrime',
+      title: '',
+      size: { width: 700, height: 500 },
+    });
   }
 
   recentEventsUrl() {
