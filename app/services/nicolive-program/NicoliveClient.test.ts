@@ -1,6 +1,9 @@
 import * as fetchMock from 'fetch-mock';
 const { NicoliveClient } = require('./NicoliveClient');
 
+jest.mock('services/i18n', () => ({
+  $t: (x: any) => x,
+}));
 jest.mock('util/menus/Menu', () => ({}));
 
 afterEach(() => {

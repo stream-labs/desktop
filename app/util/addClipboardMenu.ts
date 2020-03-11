@@ -1,5 +1,5 @@
 import { Menu } from 'util/menus/Menu';
-import { $t } from '../services/i18n';
+import { $t } from 'services/i18n';
 
 export function addClipboardMenu(window: Electron.BrowserWindow) {
   window.webContents.on('context-menu', (e, params) => {
