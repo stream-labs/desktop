@@ -571,7 +571,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         } else {
           contactSupport = true;
           errorText = $t(
-            'There was an error starting the streaming output. Check your settings and try again. If this issue persists, please contact Streamlabs support.',
+            'There was an error starting the output. Check your settings and try again. If this issue persists, please contact Streamlabs support.',
           );
         }
       }
