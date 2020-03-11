@@ -107,6 +107,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   migrateSlots() {
     const slottedElements = {};
+    if (this.state.currentTab !== 'default') return;
     Object.keys(this.state.tabs.default.slottedElements).forEach(el => {
       if (typeof this.state.tabs.default.slottedElements[el] === 'string') {
         slottedElements[el] = { slot: this.state.tabs.default.slottedElements[el] };
