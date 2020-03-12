@@ -97,6 +97,7 @@ export const macSources: TSourceType[] = [
   'ndi_source',
   'vlc_source',
   'window_capture',
+  'syphon-input',
 ];
 
 class SourcesViews extends ViewHandler<ISourcesState> {
