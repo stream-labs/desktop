@@ -25,6 +25,7 @@ const base = {
     oneClick: false,
     perMachine: true,
     allowToChangeInstallationDirectory: true,
+    uninstallDisplayName: "Streamlabs OBS",
     include: 'installer.nsh'
   },
   publish: {
@@ -37,7 +38,9 @@ const base = {
   },
   extraMetadata: {
     env: 'production'
-  }
+  },
+  afterPack: 'node_modules/streamlabs-obs-launcher/after_pack.js',
+  afterSign: 'node_modules/streamlabs-obs-launcher/after_sign.js'
 };
 
 if (!process.env.SLOBS_NO_SIGN) base.win.certificateSubjectName = 'Streamlabs (General Workings, Inc.)';

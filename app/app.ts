@@ -210,26 +210,46 @@ document.addEventListener('DOMContentLoaded', async () => {
     // This is used for debugging
     window['obs'] = obs;
 
-    // Host a new OBS server instance
-    obs.IPC.host(`slobs-${uuid()}`);
-    obs.NodeObs.SetWorkingDirectory(
-      path.join(
-        electron.remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
-        'node_modules',
-        'obs-studio-node',
-      ),
-    );
-
-    crashHandler.registerProcess(appService.pid, false);
-
     await obsUserPluginsService.initialize();
 
-    // Initialize OBS API
-    const apiResult = obs.NodeObs.OBS_API_initAPI(
-      'en-US',
-      appService.appDataDirectory,
-      electron.remote.process.env.SLOBS_VERSION,
-    );
+    let apiResult;
+    let obs_instance_reused = false;
+    const pipe_uuid = process.env['OBS_PIPE_UUID'];
+    if (pipe_uuid) {
+      obs.IPC.connect(`slobs-${pipe_uuid}`);
+
+      apiResult = obs.NodeObs.OBS_API_initAPI(
+        'en-US',
+        appService.appDataDirectory,
+        electron.remote.process.env.SLOBS_VERSION,
+      );
+
+      if (apiResult === obs.EVideoCodes.Success) {
+        obs_instance_reused = true;
+      }
+    }
+
+    if (!obs_instance_reused) {
+      // Host a new OBS server instance
+      obs.IPC.host(`slobs-${uuid()}`);
+
+      obs.NodeObs.SetWorkingDirectory(
+        path.join(
+          electron.remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
+          'node_modules',
+          'obs-studio-node',
+        ),
+      );
+
+      // Initialize OBS API
+      apiResult = obs.NodeObs.OBS_API_initAPI(
+        'en-US',
+        appService.appDataDirectory,
+        electron.remote.process.env.SLOBS_VERSION,
+      );
+    }
+
+    crashHandler.registerProcess(appService.pid, false);
 
     if (apiResult !== obs.EVideoCodes.Success) {
       const message = apiInitErrorResultToMessage(apiResult);
