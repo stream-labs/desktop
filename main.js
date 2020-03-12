@@ -374,6 +374,13 @@ if (!gotTheLock) {
     const requests = { };
 
     function sendRequest(request, event = null, async = false) {
+      // If the worker window is destroyed when a services request goes
+      // through (due to crash or other fatal error) it's best to just shut down.
+      if (workerWindow.isDestroyed()) {
+        app.quit();
+        return;
+      }
+
       workerWindow.webContents.send('services-request', request);
       if (!event) return;
       requests[request.id] = Object.assign({}, request, { event, async });
