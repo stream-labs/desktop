@@ -12,6 +12,7 @@ import {
   Filters,
   FilterRecord
 } from './ResponseTypes';
+import { addClipboardMenu } from 'util/addClipboardMenu';
 const { BrowserWindow } = remote;
 
 export enum CreateResult {
@@ -407,6 +408,7 @@ export class NicoliveClient {
       },
     });
     return new Promise<CreateResult>((resolve, _reject) => {
+      addClipboardMenu(win);
       win.on('closed', () => resolve(CreateResult.OTHER));
       win.webContents.on('did-navigate', (_event, url) => {
         if (NicoliveClient.isProgramPage(url)) {
@@ -439,6 +441,7 @@ export class NicoliveClient {
       },
     });
     return new Promise<EditResult>((resolve, _reject) => {
+      addClipboardMenu(win);
       win.on('closed', () => resolve(EditResult.OTHER));
       win.webContents.on('did-navigate', (_event, url) => {
         if (NicoliveClient.isProgramPage(url) || NicoliveClient.isMyPage(url)) {

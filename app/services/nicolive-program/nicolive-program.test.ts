@@ -114,6 +114,7 @@ jest.mock('services/nicolive-program/state', () => ({ NicoliveProgramStateServic
 jest.mock('services/i18n', () => ({
   $t: (x: any) => x,
 }));
+jest.mock('util/menus/Menu', () => ({}));
 
 beforeEach(() => {
   jest.doMock('services/stateful-service');
