@@ -377,6 +377,7 @@ if (!gotTheLock) {
       // If the worker window is destroyed when a services request goes
       // through (due to crash or other fatal error) it's best to just shut down.
       if (workerWindow.isDestroyed()) {
+        console.log('Tried to send request but worker window was missing... shutting down.');
         app.quit();
         return;
       }
