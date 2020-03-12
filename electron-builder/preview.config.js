@@ -7,5 +7,6 @@ base.extraFiles.push({
   from: 'scripts/debug-launcher.bat',
   to: 'Streamlabs OBS Preview Debug Mode.bat'
 });
+base.nsis.uninstallDisplayName = base.productName;
 
 module.exports = base;
