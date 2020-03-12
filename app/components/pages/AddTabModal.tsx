@@ -8,6 +8,8 @@ import { ImagePickerInput } from 'components/shared/inputs/inputs';
 import { Inject } from 'services/core/injector';
 import { LayoutService } from 'services/layout';
 import { $t } from 'services/i18n';
+import { UserService } from 'services/user';
+import { MagicLinkService } from 'services/magic-link';
 
 const ICONS = [
   { title: '', value: 'icon-studio', description: 'icon-studio' },
@@ -31,6 +33,8 @@ class AddTabModalProps {
 @Component({ props: createProps(AddTabModalProps) })
 export default class AddTabModal extends TsxComponent<AddTabModalProps> {
   @Inject() private layoutService: LayoutService;
+  @Inject() private userService: UserService;
+  @Inject() private magicLinkService: MagicLinkService;
 
   name = '';
   icon = '';
@@ -38,6 +42,7 @@ export default class AddTabModal extends TsxComponent<AddTabModalProps> {
   createTab() {
     this.layoutService.addTab(this.name, this.icon);
     this.$emit('close');
+    if (!this.userService.isPrime) return;
   }
 
   cancel() {
@@ -46,6 +51,12 @@ export default class AddTabModal extends TsxComponent<AddTabModalProps> {
 
   get canSave() {
     return !!this.icon && !!this.name;
+  }
+
+  get buttonInfo() {
+    return this.userService.isPrime
+      ? { text: $t('Save New Tab'), class: 'button button--action' }
+      : { text: $t('Add New Tab With Prime'), class: 'button button--prime' };
   }
 
   render() {
@@ -67,11 +78,11 @@ export default class AddTabModal extends TsxComponent<AddTabModalProps> {
             {$t('Cancel')}
           </button>
           <button
-            class="button button--action"
+            class={this.buttonInfo.class}
             onClick={() => this.createTab()}
             disabled={!this.canSave}
           >
-            {$t('Save New Tab')}
+            {this.buttonInfo.text}
           </button>
         </div>
       </ModalLayout>

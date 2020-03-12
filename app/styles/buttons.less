@@ -74,6 +74,28 @@
   }
 }
 
+.button--prime {
+  background-color: var(--prime);
+  border-color: var(--prime);
+  color: var(--action-button-text);
+
+  &:hover {
+    background-color: var(--prime-hover);
+    color: var(--action-button-text);
+  }
+
+  &:focus {
+    background-color: var(--prime);
+  }
+
+  &.is-disabled,
+  &:disabled {
+    &:hover {
+      background-color: var(--prime);
+    }
+  }
+}
+
 .button--trans {
   background: transparent;
   color: var(--paragraph);

@@ -6,11 +6,14 @@ import { $t } from 'services/i18n';
 import { Inject } from 'services/core';
 import { NavigationService, TAppPage } from 'services/navigation';
 import { WindowsService } from 'services/windows';
+import { ToggleInput } from 'components/shared/inputs/inputs';
+import { CustomizationService } from 'services/customization';
 
 @Component({})
 export default class WelcomeToPrime extends TsxComponent {
   @Inject() navigationService: NavigationService;
   @Inject() windowsService: WindowsService;
+  @Inject() customizationService: CustomizationService;
 
   panelData = [
     {
@@ -40,6 +43,25 @@ export default class WelcomeToPrime extends TsxComponent {
     this.windowsService.closeChildWindow();
   }
 
+  get theme() {
+    return this.customizationService.currentTheme;
+  }
+
+  toggleTheme() {
+    if (this.theme === 'prime-dark') {
+      return this.customizationService.setTheme('night-theme');
+    }
+    if (this.theme === 'night-theme') {
+      return this.customizationService.setTheme('prime-dark');
+    }
+    if (this.theme === 'prime-light') {
+      return this.customizationService.setTheme('day-theme');
+    }
+    if (this.theme === 'day-theme') {
+      return this.customizationService.setTheme('prime-light');
+    }
+  }
+
   panel(panel: Dictionary<string>) {
     return (
       <div class={styles.panel}>
@@ -62,6 +84,12 @@ export default class WelcomeToPrime extends TsxComponent {
         <h1 class={styles.title}>{$t('Welcome to Prime!')}</h1>
         <p>{$t("We've picked out a few Prime benefits to get you started:")}</p>
         <div class={styles.panelContainer}>{this.panelData.map(this.panel)}</div>
+        <p class={styles.themeToggle}>
+          {$t("We've added a new UI theme exclusive to Prime members:")}
+          <span>{$t('Classic Theme')}</span>
+          <ToggleInput value={/prime/.test(this.theme)} onInput={() => this.toggleTheme()} />
+          <span>{$t('Prime Theme')}</span>
+        </p>
       </div>
     );
   }

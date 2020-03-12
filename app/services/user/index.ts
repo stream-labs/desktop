@@ -313,13 +313,13 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   async setPrimeStatus() {
     const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/twitter/status`;
+    const url = `https://${host}/api/v5/slobs/prime`;
     const headers = authorizedHeaders(this.apiToken);
     const request = new Request(url, { headers });
     return fetch(request)
       .then(handleResponse)
       .then(response => {
-        this.isPrime = response.prime;
+        this.isPrime = response.is_prime;
       })
       .catch(() => null);
   }
@@ -408,7 +408,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.windowsService.showWindow({
       componentName: 'WelcomeToPrime',
       title: '',
-      size: { width: 1000, height: 700 },
+      size: { width: 1000, height: 720 },
     });
   }
 
