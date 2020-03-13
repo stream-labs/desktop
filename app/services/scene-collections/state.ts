@@ -93,7 +93,6 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
    */
   flushManifestFile() {
     const data = JSON.stringify(omit(this.state, 'auto'), null, 2);
-    console.log('flush', data);
     this.writeDataToCollectionFile('manifest', data);
   }
 
