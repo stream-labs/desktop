@@ -435,6 +435,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   onSocketEvent(e: TSocketEvent) {
     if (e.type !== 'streamlabs_prime_subscribe') return;
     this.SET_PRIME(true);
+    const theme = this.customizationService.currentTheme === 'night' ? 'prime-dark' : 'prime-light';
+    this.customizationService.setTheme(theme);
     this.showPrimeWindow();
   }
 

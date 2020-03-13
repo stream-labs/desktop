@@ -1,4 +1,4 @@
-import cx from 'classnames';
+import electron from 'electron';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { Component } from 'vue-property-decorator';
 import ModalLayout from 'components/ModalLayout.vue';
@@ -39,10 +39,17 @@ export default class AddTabModal extends TsxComponent<AddTabModalProps> {
   name = '';
   icon = '';
 
-  createTab() {
+  async createTab() {
     this.layoutService.addTab(this.name, this.icon);
     this.$emit('close');
-    if (!this.userService.isPrime) return;
+    if (!this.userService.isPrime) {
+      try {
+        const link = await this.magicLinkService.getDashboardMagicLink('prime');
+        electron.remote.shell.openExternal(link);
+      } catch (e) {
+        console.error('Error generating dashboard magic link', e);
+      }
+    }
   }
 
   cancel() {
