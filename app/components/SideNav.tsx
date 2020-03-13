@@ -94,7 +94,9 @@ export default class SideNav extends Vue {
           })}
         >
           {this.studioTab(this.studioTabs[0])}
-          {this.studioTabs.length > 1 && <i class={cx('icon-down', styles.studioDropdown)} />}
+          {this.studioTabs.length > 1 && this.userService.isPrime && (
+            <i class={cx('icon-down', styles.studioDropdown)} />
+          )}
         </div>
         {this.additionalStudioTabs}
       </div>
@@ -104,7 +106,7 @@ export default class SideNav extends Vue {
   get additionalStudioTabs() {
     return (
       <transition name="sidenav-slide">
-        {this.showTabDropdown && (
+        {this.userService.isPrime && this.showTabDropdown && (
           <div class={styles.studioTabs}>
             {this.studioTabs.slice(1).map(page => this.studioTab(page))}
           </div>

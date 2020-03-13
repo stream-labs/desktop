@@ -21,7 +21,7 @@ import { CustomizationService } from 'services/customization';
 import * as Sentry from '@sentry/browser';
 import { RunInLoadingMode } from 'services/app/app-decorators';
 import { SceneCollectionsService } from 'services/scene-collections';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import Utils from 'services/utils';
 import { WindowsService } from 'services/windows';
 import { $t, I18nService } from 'services/i18n';
@@ -33,6 +33,7 @@ import * as obs from '../../../obs-api';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { lazyModule } from 'util/lazy-module';
 import { AuthModule } from './auth-module';
+import { WebsocketService, TSocketEvent } from 'services/websocket';
 
 interface ISecondaryPlatformAuth {
   username: string;
@@ -101,6 +102,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private settingsService: SettingsService;
   @Inject() private streamSettingsService: StreamSettingsService;
+  @Inject() private websocketService: WebsocketService;
 
   @mutation()
   LOGIN(auth: IUserAuth) {
@@ -170,6 +172,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   userLogin = new Subject<IUserAuth>();
   userLogout = new Subject();
+  private lifecycle: LoginLifecycle;
+  private socketConnection: Subscription = null;
+
   isPrime: boolean = null;
 
   /**
@@ -179,12 +184,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   @lazyModule(AuthModule) private authModule: AuthModule;
 
-  init() {
+  async init() {
     super.init();
     this.MIGRATE_AUTH();
     this.VALIDATE_LOGIN(false);
     this.SET_AUTH_STATE(EAuthProcessState.Idle);
     this.setPrimeStatus();
+    this.lifecycle = await this.withLifecycle({
+      init: this.subscribeToSocketConnection,
+      destroy: this.unsubscribeFromSocketConnection,
+      context: this,
+    });
   }
 
   mounted() {
@@ -200,6 +210,18 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         if (!isOnboardingTest) this.onboardingService.finish();
       },
     );
+  }
+
+  subscribeToSocketConnection() {
+    this.socketConnection = this.websocketService.socketEvent.subscribe(ev =>
+      this.onSocketEvent(ev),
+    );
+    return Promise.resolve();
+  }
+
+  unsubscribeFromSocketConnection() {
+    if (this.socketConnection) this.socketConnection.unsubscribe();
+    return Promise.resolve();
   }
 
   // Makes sure the user's login is still good
@@ -410,6 +432,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       title: '',
       size: { width: 1000, height: 720 },
     });
+  }
+
+  onSocketEvent(e: TSocketEvent) {
+    if (e.type !== 'streamlabs_prime_subscribe') return;
+    this.isPrime = true;
+    this.showPrimeWindow();
   }
 
   recentEventsUrl() {
