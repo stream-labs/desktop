@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import defer from 'lodash/defer';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { Inject } from 'services/core/injector';
 import { handleResponse, authorizedHeaders } from 'util/requests';
@@ -8,7 +7,6 @@ import { Service } from 'services/core';
 import electron from 'electron';
 import { HostsService } from 'services/hosts';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
-import { PlatformAppsService } from 'services/platform-apps';
 import {
   getPlatformService,
   IUserAuth,
@@ -35,12 +33,6 @@ import { lazyModule } from 'util/lazy-module';
 import { AuthModule } from './auth-module';
 import { WebsocketService, TSocketEvent } from 'services/websocket';
 
-interface ISecondaryPlatformAuth {
-  username: string;
-  token: string;
-  id: string;
-}
-
 export enum EAuthProcessState {
   Idle = 'idle',
   Busy = 'busy',
@@ -51,6 +43,7 @@ interface IUserServiceState {
   loginValidated: boolean;
   auth?: IUserAuth;
   authProcessState: EAuthProcessState;
+  isPrime: boolean;
 }
 
 interface ILinkedPlatform {
@@ -128,6 +121,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   @mutation()
+  SET_PRIME(isPrime: boolean) {
+    this.state.isPrime = isPrime;
+  }
+
+  @mutation()
   private SET_PLATFORM_TOKEN(platform: TPlatform, token: string) {
     this.state.auth.platforms[platform].token = token;
   }
@@ -175,8 +173,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   private lifecycle: LoginLifecycle;
   private socketConnection: Subscription = null;
 
-  isPrime: boolean = null;
-
   /**
    * Used by child and 1-off windows to update their sentry contexts
    */
@@ -189,7 +185,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.MIGRATE_AUTH();
     this.VALIDATE_LOGIN(false);
     this.SET_AUTH_STATE(EAuthProcessState.Idle);
-    this.setPrimeStatus();
+    await this.setPrimeStatus();
     this.lifecycle = await this.withLifecycle({
       init: this.subscribeToSocketConnection,
       destroy: this.unsubscribeFromSocketConnection,
@@ -333,6 +329,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       .catch(() => {});
   }
 
+  get isPrime() {
+    return this.state.isPrime;
+  }
+
   async setPrimeStatus() {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/prime`;
@@ -340,9 +340,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const request = new Request(url, { headers });
     return fetch(request)
       .then(handleResponse)
-      .then(response => {
-        this.isPrime = response.is_prime;
-      })
+      .then(response => this.SET_PRIME(response.is_prime))
       .catch(() => null);
   }
 
@@ -436,7 +434,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   onSocketEvent(e: TSocketEvent) {
     if (e.type !== 'streamlabs_prime_subscribe') return;
-    this.isPrime = true;
+    this.SET_PRIME(true);
     this.showPrimeWindow();
   }
 

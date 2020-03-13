@@ -4,6 +4,7 @@ import { Inject, ViewHandler } from 'services/core';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
 import { CustomizationService } from 'services/customization';
+import { UserService } from 'services/user';
 import { $t } from 'services/i18n';
 import uuid from 'uuid';
 import { LAYOUT_DATA, ELEMENT_DATA, ELayout, ELayoutElement } from './layout-data';
@@ -81,6 +82,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
   };
 
   @Inject() private customizationService: CustomizationService;
+  @Inject() private userService: UserService;
 
   init() {
     super.init();
@@ -251,6 +253,6 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
         bar2: 240,
       },
     });
-    this.state.currentTab = id;
+    if (this.userService.isPrime) this.state.currentTab = id;
   }
 }

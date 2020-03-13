@@ -134,6 +134,14 @@ export default class LayoutEditor extends TsxComponent {
   get topBar() {
     return (
       <div class={styles.topBar}>
+        <img class={styles.arrow} src={require('../../../media/images/chalk-arrow.png')} />
+        <button
+          class="button button--prime"
+          style="margin: 0 16px;"
+          onClick={() => this.openModal()}
+        >
+          {$t('Add Tab')}
+        </button>
         <ListInput
           style="z-index: 1;"
           value={this.layoutService.state.currentTab}
@@ -141,13 +149,6 @@ export default class LayoutEditor extends TsxComponent {
           metadata={{ options: this.tabOptions }}
           v-tooltip={{ content: $t('Current Tab'), placement: 'bottom' }}
         />
-        <button
-          class={cx('button button--default', styles.addButton)}
-          v-tooltip={{ content: $t('Add Tab'), placement: 'bottom' }}
-          onClick={() => this.openModal()}
-        >
-          <i class="icon-add" />
-        </button>
         {this.layoutService.state.currentTab !== 'default' && (
           <button
             class={cx('button button--warn', styles.removeButton)}
