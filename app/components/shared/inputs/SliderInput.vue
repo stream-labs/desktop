@@ -25,7 +25,7 @@
       :value="localValue"
       @input="updateLocalValue($event.target.value)"
       @keydown="handleKeydown"
-    >
+    />
   </div>
 </template>
 

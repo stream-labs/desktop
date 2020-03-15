@@ -2,22 +2,15 @@ import Vue from 'vue';
 import cx from 'classnames';
 import cloneDeep from 'lodash/cloneDeep';
 import TsxComponent from 'components/tsx-component';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
+import styles from './LayoutEditor.m.less';
+import AddTabModal from './AddTabModal';
+import { ListInput, TextInput } from 'components/shared/inputs/inputs';
 import { Inject } from 'services/core/injector';
 import { LayoutService, ELayoutElement, ELayout, LayoutSlot } from 'services/layout';
-import styles from './LayoutEditor.m.less';
 import { $t } from 'services/i18n';
 import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
-
-const TEMPLATE_MAP: Dictionary<string> = {
-  [ELayout.Default]: 'default',
-  [ELayout.TwoPane]: 'twoPane',
-  [ELayout.Classic]: 'classic',
-  [ELayout.OnePane]: 'onePane',
-  [ELayout.FourByFour]: 'fourByFour',
-  [ELayout.Triplets]: 'triplets',
-};
 
 @Component({})
 export default class LayoutEditor extends TsxComponent {
@@ -25,29 +18,27 @@ export default class LayoutEditor extends TsxComponent {
   @Inject() private navigationService: NavigationService;
   @Inject() private customizationService: CustomizationService;
 
-  currentLayout = this.layoutService.state.currentLayout || ELayout.Default;
-
-  slottedElements = cloneDeep(this.layoutService.state.slottedElements) || {};
+  currentLayout = this.layoutService.views.currentTab.currentLayout || ELayout.Default;
+  slottedElements = cloneDeep(this.layoutService.views.currentTab.slottedElements) || {};
+  browserUrl: string = '';
 
   private highlightedSlot: LayoutSlot = null;
+  private showModal = false;
 
-  get elementTitles() {
-    return {
-      [ELayoutElement.Display]: $t('Stream Display'),
-      [ELayoutElement.Minifeed]: $t('Mini Feed'),
-      [ELayoutElement.Mixer]: $t('Audio Mixer'),
-      [ELayoutElement.Scenes]: $t('Scene Selector'),
-      [ELayoutElement.Sources]: $t('Source Selector'),
-      [ELayoutElement.LegacyEvents]: $t('Legacy Events'),
-    };
+  mounted() {
+    if (this.slottedElements[ELayoutElement.Browser]) {
+      this.browserUrl = this.slottedElements[ELayoutElement.Browser].src || '';
+    }
   }
 
   elementInSlot(slot: LayoutSlot) {
-    return Object.keys(this.slottedElements).find(el => this.slottedElements[el] === slot);
+    return Object.keys(this.slottedElements).find(
+      el => this.slottedElements[el].slot === slot,
+    ) as ELayoutElement;
   }
 
   classForSlot(slot: LayoutSlot) {
-    const layout = TEMPLATE_MAP[this.currentLayout];
+    const layout = this.layoutService.views.className(this.currentLayout);
     return cx(styles.placementZone, styles[`${layout}${slot}`], {
       [styles.occupied]: this.elementInSlot(slot),
       [styles.highlight]: this.highlightedSlot === slot,
@@ -57,14 +48,15 @@ export default class LayoutEditor extends TsxComponent {
   layoutImage(layout: ELayout) {
     const mode = this.customizationService.isDarkTheme ? 'night' : 'day';
     const active = this.currentLayout === layout ? '-active' : '';
-    return require(`../../../media/images/layouts/${mode}-${TEMPLATE_MAP[layout]}${active}.png`);
+    const className = this.layoutService.views.className(layout);
+    return require(`../../../media/images/layouts/${mode}-${className}${active}.png`);
   }
 
   handleElementDrag(event: MouseEvent, el: ELayoutElement) {
     const htmlElement = document.elementFromPoint(event.clientX, event.clientY);
     if (!el) return;
     if (!htmlElement) {
-      this.slottedElements[el] = undefined;
+      Vue.set(this.slottedElements, el, { slot: null });
       return;
     }
     // In case the span tag is the element dropped on we check for parent element id
@@ -72,16 +64,16 @@ export default class LayoutEditor extends TsxComponent {
     let existingEl;
     if (['1', '2', '3', '4', '5', '6'].includes(id)) {
       existingEl = Object.keys(this.slottedElements).find(
-        existing => this.slottedElements[existing] === id,
+        existing => this.slottedElements[existing].slot === id,
       ) as ELayoutElement;
       if (existingEl && this.slottedElements[el]) {
         Vue.set(this.slottedElements, existingEl, this.slottedElements[el]);
       } else if (existingEl) {
-        Vue.set(this.slottedElements, existingEl, null);
+        Vue.set(this.slottedElements, existingEl, { slot: null });
       }
-      Vue.set(this.slottedElements, el, id as LayoutSlot);
+      Vue.set(this.slottedElements, el, { slot: id as LayoutSlot });
     } else {
-      Vue.set(this.slottedElements, el, null);
+      Vue.set(this.slottedElements, el, { slot: null });
     }
   }
 
@@ -90,11 +82,102 @@ export default class LayoutEditor extends TsxComponent {
   }
 
   save() {
-    if (this.currentLayout !== this.layoutService.state.currentLayout) {
+    if (this.currentLayout !== this.layoutService.views.currentTab.currentLayout) {
       this.layoutService.changeLayout(this.currentLayout);
     }
     this.layoutService.setSlots(this.slottedElements);
+    if (this.browserUrl && this.slottedElements[ELayoutElement.Browser]) {
+      this.layoutService.setUrl(this.browserUrl);
+    }
     this.navigationService.navigate('Studio');
+  }
+
+  closeModal() {
+    this.showModal = false;
+  }
+
+  openModal() {
+    this.showModal = true;
+  }
+
+  get tabOptions() {
+    return Object.keys(this.layoutService.state.tabs).map(tab => ({
+      value: tab,
+      title: this.layoutService.state.tabs[tab].name,
+    }));
+  }
+
+  get currentTab() {
+    return this.layoutService.views.currentTab;
+  }
+
+  @Watch('currentTab')
+  updateUI() {
+    this.currentLayout = this.layoutService.views.currentTab.currentLayout;
+    this.slottedElements = cloneDeep(this.layoutService.views.currentTab.slottedElements);
+  }
+
+  setTab(tab: string) {
+    this.layoutService.setCurrentTab(tab);
+  }
+
+  removeCurrentTab() {
+    if (this.layoutService.state.currentTab === 'default') return;
+    this.layoutService.removeCurrentTab();
+  }
+
+  get topBar() {
+    return (
+      <div class={styles.topBar}>
+        <ListInput
+          style="z-index: 1;"
+          value={this.layoutService.state.currentTab}
+          onInput={(tab: string) => this.setTab(tab)}
+          metadata={{ options: this.tabOptions }}
+          v-tooltip={{ content: $t('Current Tab'), placement: 'bottom' }}
+        />
+        {/* <button
+          class={cx('button button--default', styles.addButton)}
+          v-tooltip={{ content: $t('Add Tab'), placement: 'bottom' }}
+          onClick={() => this.openModal()}
+        >
+          <i class="icon-add" />
+        </button> */}
+        {this.layoutService.state.currentTab !== 'default' && (
+          <button
+            class={cx('button button--warn', styles.removeButton)}
+            v-tooltip={{ content: $t('Delete Current Tab'), placement: 'bottom' }}
+            onClick={() => this.removeCurrentTab()}
+          >
+            <i class="icon-trash" />
+          </button>
+        )}
+        <button class="button button--action" onClick={() => this.save()}>
+          {$t('Save Changes')}
+        </button>
+      </div>
+    );
+  }
+
+  get elementList() {
+    return (
+      <div style="display: flex; flex-direction: column;">
+        <div class={styles.title}>{$t('Elements')}</div>
+        <div class={styles.subtitle}>{$t('Drag and drop to edit.')}</div>
+        <div class={styles.elementContainer}>
+          {Object.keys(ELayoutElement).map((element: ELayoutElement) => (
+            <div
+              draggable
+              class={styles.elementCell}
+              onDragend={(e: MouseEvent) => this.handleElementDrag(e, ELayoutElement[element])}
+            >
+              <i class="fas fa-ellipsis-v" />
+              {this.layoutService.views.elementTitle(element)}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   get sideBar() {
@@ -113,20 +196,39 @@ export default class LayoutEditor extends TsxComponent {
             ))}
           </div>
         </div>
-        <div>
-          <div class={styles.title}>{$t('Elements')}</div>
-          <div class={styles.subtitle}>{$t('Drag and drop to edit.')}</div>
-          {Object.keys(ELayoutElement).map(element => (
-            <div
-              draggable
-              class={styles.elementCell}
-              onDragend={(e: MouseEvent) => this.handleElementDrag(e, ELayoutElement[element])}
-            >
-              <i class="fas fa-ellipsis-v" />
-              {this.elementTitles[element]}
-            </div>
-          ))}
-        </div>
+        {this.elementList}
+      </div>
+    );
+  }
+
+  get layout() {
+    return ['1', '2', '3', '4', '5', '6'].map((slot: LayoutSlot) => (
+      <div
+        class={this.classForSlot(slot)}
+        id={slot}
+        draggable={this.elementInSlot(slot)}
+        ondragenter={(): unknown => (this.highlightedSlot = slot)}
+        ondragexit={(): unknown => (this.highlightedSlot = null)}
+        onDragend={(e: MouseEvent) =>
+          this.handleElementDrag(e, ELayoutElement[this.elementInSlot(slot)])
+        }
+      >
+        <span>{this.layoutService.views.elementTitle(this.elementInSlot(slot))}</span>
+        {this.elementInSlot(slot) === ELayoutElement.Browser && (
+          <TextInput
+            class={styles.urlTextBox}
+            vModel={this.browserUrl}
+            metadata={{ placeholder: $t('Enter Target URL') }}
+          />
+        )}
+      </div>
+    ));
+  }
+
+  get modal() {
+    return (
+      <div class={styles.modalBackdrop}>
+        <AddTabModal onClose={() => this.closeModal()} />
       </div>
     );
   }
@@ -134,34 +236,19 @@ export default class LayoutEditor extends TsxComponent {
   render() {
     return (
       <div style={{ flexDirection: 'column' }}>
-        <div class={styles.topBar}>
-          <div>
-            <div>{$t('Streamlabs OBS UI Customization')}</div>
-            <div>{$t('Customize the appearance of your Streamlabs OBS Editor tab')}</div>
-          </div>
-          <button class="button button--action" onClick={() => this.save()}>
-            {$t('Save Changes')}
-          </button>
-        </div>
+        {this.topBar}
         <div class={styles.editorContainer}>
           {this.sideBar}
-          <div class={cx(styles.templateContainer, styles[TEMPLATE_MAP[this.currentLayout]])}>
-            {['1', '2', '3', '4', '5', '6'].map((slot: LayoutSlot) => (
-              <div
-                class={this.classForSlot(slot)}
-                id={slot}
-                draggable={this.elementInSlot(slot)}
-                ondragenter={(): unknown => (this.highlightedSlot = slot)}
-                ondragexit={(): unknown => (this.highlightedSlot = null)}
-                onDragend={(e: MouseEvent) =>
-                  this.handleElementDrag(e, ELayoutElement[this.elementInSlot(slot)])
-                }
-              >
-                <span>{this.elementTitles[this.elementInSlot(slot)]}</span>
-              </div>
-            ))}
+          <div
+            class={cx(
+              styles.templateContainer,
+              styles[this.layoutService.views.className(this.currentLayout)],
+            )}
+          >
+            {this.layout}
           </div>
         </div>
+        {this.showModal && this.modal}
       </div>
     );
   }

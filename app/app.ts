@@ -25,11 +25,11 @@ import VModal from 'vue-js-modal';
 import VeeValidate from 'vee-validate';
 import ChildWindow from 'components/windows/ChildWindow.vue';
 import OneOffWindow from 'components/windows/OneOffWindow.vue';
-import electronLog from 'electron-log';
 import { UserService, setSentryContext } from 'services/user';
 import { getResource } from 'services';
 import * as obs from '../obs-api';
 import path from 'path';
+import util from 'util';
 import uuid from 'uuid/v4';
 import Blank from 'components/windows/Blank.vue';
 import Main from 'components/windows/Main.vue';
@@ -70,6 +70,40 @@ if (isProduction) {
 }
 
 let usingSentry = false;
+const windowId = Utils.getWindowId();
+
+function wrapLogFn(fn: string) {
+  const old: Function = console[fn];
+  console[fn] = (...args: any[]) => {
+    old.apply(console, args);
+
+    const level = fn === 'log' ? 'info' : fn;
+
+    sendLogMsg(level, ...args);
+  };
+}
+
+function sendLogMsg(level: string, ...args: any[]) {
+  const serialized = args
+    .map(arg => {
+      if (typeof arg === 'string') return arg;
+
+      return util.inspect(arg);
+    })
+    .join(' ');
+
+  ipcRenderer.send('logmsg', { level, sender: windowId, message: serialized });
+}
+
+['log', 'info', 'warn', 'error'].forEach(wrapLogFn);
+
+window.addEventListener('error', e => {
+  sendLogMsg('error', e.error);
+});
+
+window.addEventListener('unhandledrejection', e => {
+  sendLogMsg('error', e.reason);
+});
 
 if (
   (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) &&
@@ -199,16 +233,44 @@ document.addEventListener('DOMContentLoaded', async () => {
     );
     Utils.measure('working directory is set');
 
+    let apiResult;
+    let obs_instance_reused = false;
+    const pipe_uuid = process.env['OBS_PIPE_UUID'];
+    if (pipe_uuid) {
+      obs.IPC.connect(`slobs-${pipe_uuid}`);
+
+      apiResult = obs.NodeObs.OBS_API_initAPI(
+        'en-US',
+        appService.appDataDirectory,
+        electron.remote.process.env.SLOBS_VERSION,
+      );
+
+      if (apiResult === obs.EVideoCodes.Success) {
+        obs_instance_reused = true;
+      }
+    }
+
+    if (!obs_instance_reused) {
+      // Host a new OBS server instance
+      obs.IPC.host(`slobs-${uuid()}`);
+
+      obs.NodeObs.SetWorkingDirectory(
+        path.join(
+          electron.remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
+          'node_modules',
+          'obs-studio-node',
+        ),
+      );
+
+      // Initialize OBS API
+      apiResult = obs.NodeObs.OBS_API_initAPI(
+        'en-US',
+        appService.appDataDirectory,
+        electron.remote.process.env.SLOBS_VERSION,
+      );
+    }
+
     crashHandler.registerProcess(appService.pid, false);
-
-    await obsUserPluginsService.initialize();
-
-    // Initialize OBS API
-    const apiResult = obs.NodeObs.OBS_API_initAPI(
-      'en-US',
-      appService.appDataDirectory,
-      electron.remote.process.env.SLOBS_VERSION,
-    );
 
     if (apiResult !== obs.EVideoCodes.Success) {
       const message = apiInitErrorResultToMessage(apiResult);
@@ -283,45 +345,4 @@ if (Utils.isDevMode()) {
   window.addEventListener('keyup', ev => {
     if (ev.key === 'F12') electron.ipcRenderer.send('openDevTools');
   });
-}
-
-// ERRORS LOGGING
-
-// catch and log unhandled errors/rejected promises:
-electronLog.catchErrors({ onError: e => electronLog.log(`from ${Utils.getWindowId()}`, e) });
-
-// override console.error
-const consoleError = console.error;
-console.error = function(...args: any[]) {
-  if (Utils.isDevMode()) ipcRenderer.send('showErrorAlert');
-  writeErrorToLog(...args);
-  consoleError.call(console, ...args);
-};
-
-/**
- * Try to serialize error arguments and stack and write them to the log file
- */
-function writeErrorToLog(...errors: (Error | string)[]) {
-  let message = '';
-
-  // format error arguments depending on the type
-  const formattedErrors = errors.map(error => {
-    if (error instanceof Error) {
-      message = error.stack;
-    } else if (typeof error === 'string') {
-      message = error;
-    } else {
-      try {
-        message = JSON.stringify(error);
-      } catch (e) {
-        message = 'UNSERIALIZABLE';
-      }
-    }
-    return message;
-  });
-
-  // send error to the main process via IPC
-  electronLog.error(`Error from ${Utils.getWindowId()} window:
-    ${formattedErrors.join('\n')}
-  `);
 }

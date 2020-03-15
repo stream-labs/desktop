@@ -266,7 +266,6 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
       (magnitude: number[], peak: number[], inputPeak: number[]) => {
         const volmeter: IVolmeter = { magnitude, peak, inputPeak };
 
-        // volmeterStream.next(volmeter);
         this.sendVolmeterData(sourceId, volmeter);
         lastVolmeterValue = volmeter;
         gotEvent = true;
@@ -278,14 +277,8 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
      * to eventually just hide the mixer item as well though */
     const volmeterCheck = () => {
       if (!gotEvent && lastVolmeterValue) {
-        // volmeterStream.next({
-        //   ...lastVolmeterValue,
-        //   magnitude: [-Infinity],
-        //   peak: [-Infinity],
-        //   inputPeak: [-Infinity],
-        // });
-        const channelsCount = lastVolmeterValue.peak.length || 1;
-        const channelsValue = Array(channelsCount).fill(-Infinity);
+        const channelsCount = lastVolmeterValue.peak.length;
+        const channelsValue = Array(channelsCount).fill(-60);
         this.sendVolmeterData(sourceId, {
           ...lastVolmeterValue,
           magnitude: channelsValue,

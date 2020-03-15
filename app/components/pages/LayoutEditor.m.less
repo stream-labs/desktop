@@ -6,10 +6,27 @@
   width: 100%;
   padding: 8px;
   display: flex;
+  align-items: center;
   background-color: var(--section);
 
   button {
     margin-left: auto;
+  }
+
+  .add-button {
+    height: 32px;
+    width: 32px;
+    margin-left: -5px;
+
+    i {
+      margin-left: 2px;
+    }
+  }
+
+  .remove-button {
+    height: 32px;
+    width: 32px;
+    margin-left: 2px;
   }
 }
 
@@ -24,7 +41,13 @@
   border-right: 1px solid var(--border);
 }
 
-.elementCell {
+.element-container {
+  position: relative;
+  height: 200px;
+  overflow-y: auto;
+}
+
+.element-cell {
   .radius();
 
   height: 40px;
@@ -47,23 +70,23 @@
 .subtitle {
   font-size: 14px;
   margin-left: 8px;
-  margin-bottom: 16px;
 }
 
 .title {
   font-weight: 500;
-  margin-bottom: 4px;
+  margin: 4px 8px;
 }
 
 .layouts {
   display: flex;
   justify-content: space-around;
   flex-wrap: wrap;
+  height: 220px;
+  overflow-y: auto;
 
   img {
     margin: 8px;
     position: relative;
-    height: 100%;
     border: 2px transparent solid;
 
     &:hover {
@@ -73,6 +96,18 @@
 
   img.active {
     border: none;
+  }
+}
+
+.modal-backdrop {
+  background: var(--modal-overlay);
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  z-index: 10;
+
+  & > div {
+    .center();
   }
 }
 
@@ -100,6 +135,10 @@
     font-weight: 700;
     color: var(--border);
   }
+
+  .url-text-box {
+    margin-top: 2rem;
+  }
 }
 
 .placement-zone.occupied {
@@ -114,7 +153,7 @@
 
 .placement-zone.highlight {
   border-color: (var(--paragraph));
-  box-shadow: 0 0 50px rgba(255,255,255, 0.2) inset;
+  box-shadow: 0 0 50px rgba(255, 255, 255, 0.2) inset;
 }
 
 // layout templates
@@ -139,7 +178,8 @@
   grid-template-rows: 40% 30% 30%;
 }
 
-.template-container.one-pane {
+.template-container.one-pane,
+.template-container.one-pane-r {
   grid-template-columns: 25% 25% 25% 25%;
   grid-template-rows: 60% 40%;
 }
@@ -149,10 +189,16 @@
   grid-template-rows: 50% 50%;
 }
 
+.template-container.pyramid {
+  grid-template-columns: 50% 50%;
+  grid-template-rows: 60% 40%;
+}
+
 // component positions
 
 .default-1,
-.classic-1 {
+.classic-1,
+.one-pane-r-1 {
   grid-column: 1 / span 3;
   grid-row: 1 / span 1;
 }
@@ -180,7 +226,9 @@
 
 .classic-2,
 .four-by-four-2,
-.triplets-4 {
+.triplets-4,
+.one-pane-r-3,
+.pyramid-2 {
   grid-column: 1 / span 1;
   grid-row: 2 / span 1;
 }
@@ -189,12 +237,15 @@
 .two-pane-3,
 .four-by-four-3,
 .one-pane-3,
-.triplets-5 {
+.triplets-5,
+.one-pane-r-4,
+.pyramid-3 {
   grid-column: 2 / span 1;
   grid-row: 2 / span 1;
 }
 
-.classic-4 {
+.classic-4,
+.one-pane-r-5 {
   grid-column: 3 / span 1;
   grid-row: 2 / span 1;
 }
@@ -222,7 +273,8 @@
   grid-row: 1 / span 2;
 }
 
-.four-by-four-1 {
+.four-by-four-1,
+.pyramid-1 {
   grid-column: 1 / span 2;
   grid-row: 1 / span 1;
 }
@@ -257,11 +309,20 @@
   grid-row: 1 / span 1;
 }
 
+.one-pane-r-2 {
+  grid-column: 4 / span 1;
+  grid-row: 1 / span 2;
+}
+
 .default-6,
 .two-pane-6,
 .classic-5,
 .classic-6,
 .four-by-four-6,
-.one-pane-6 {
+.one-pane-6,
+.one-pane-r-6,
+.pyramid-4,
+.pyramid-5,
+.pyramid-6 {
   display: none;
 }

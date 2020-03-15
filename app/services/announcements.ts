@@ -54,7 +54,7 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
   }
 
   private get installDateProxyFilePath() {
-    return path.join(this.appService.appDataDirectory, 'log.log');
+    return path.join(this.appService.appDataDirectory, 'app.log');
   }
 
   private async fileExists(path: string): Promise<boolean> {

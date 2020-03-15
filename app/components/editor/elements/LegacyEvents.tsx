@@ -15,7 +15,7 @@ export default class LegacyEvents extends BaseElement {
   @Inject() recentEventsService: RecentEventsService;
   @Inject() magicLinkService: MagicLinkService;
 
-  mins = { x: 430, y: 150 };
+  mins = { x: 360, y: 150 };
 
   magicLinkDisabled = false;
 
