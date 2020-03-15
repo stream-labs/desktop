@@ -1,3 +1,5 @@
+console.log('app script');
+const appScriptTime = Date.now();
 import { I18nService, $t } from 'services/i18n';
 
 // eslint-disable-next-line
@@ -36,9 +38,16 @@ import CustomLoader from 'components/CustomLoader';
 const crashHandler = window['require']('crash-handler');
 
 const { ipcRenderer, remote } = electron;
-const slobsVersion = remote.process.env.SLOBS_VERSION;
-const isProduction = process.env.NODE_ENV === 'production';
-const isPreview = !!remote.process.env.SLOBS_PREVIEW;
+const slobsVersion = Utils.env.SLOBS_VERSION;
+const isProduction = Utils.env.NODE_ENV === 'production';
+const isPreview = !!Utils.env.SLOBS_PREVIEW;
+
+if (Utils.isWorkerWindow()) {
+  Utils.measure('first script', window['firstScriptTime']);
+  Utils.measure('renderer parsed', window['parsedTime']);
+  Utils.measure('app.ts executed', appScriptTime);
+  Utils.measure('app deps loaded');
+}
 
 // This is the development DSN
 let sentryDsn = 'https://8f444a81edd446b69ce75421d5e91d4d@sentry.io/252950';
@@ -148,6 +157,7 @@ const showDialog = (message: string): void => {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
+  if (Utils.isWorkerWindow()) Utils.measure('DOMContentLoaded');
   const store = createStore();
 
   // setup VueI18n plugin
@@ -164,6 +174,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     },
   });
   I18nService.setVuei18nInstance(i18n);
+  if (Utils.isWorkerWindow()) Utils.measure('i18n initialized');
 
   // The worker window can safely access services immediately
   if (Utils.isWorkerWindow()) {
@@ -172,6 +183,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Services
     const appService: AppService = AppService.instance;
     const obsUserPluginsService: ObsUserPluginsService = ObsUserPluginsService.instance;
+    Utils.measure('first services initialized');
 
     // This is used for debugging
     window['obs'] = obs;
@@ -185,6 +197,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'obs-studio-node',
       ),
     );
+    Utils.measure('working directory is set');
 
     crashHandler.registerProcess(appService.pid, false);
 
@@ -209,6 +222,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       electron.ipcRenderer.send('shutdownComplete');
       return;
     }
+    Utils.measure('ObS API initialized');
 
     ipcRenderer.on('closeWindow', () => windowsService.closeMainWindow());
     I18nService.instance.load();
@@ -259,6 +273,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (ctx) setSentryContext(ctx);
       userService.sentryContext.subscribe(setSentryContext);
     }
+
+    if (Utils.isWorkerWindow()) Utils.measure('Init finished event');
   });
 });
 

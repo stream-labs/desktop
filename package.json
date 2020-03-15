@@ -62,6 +62,7 @@
   },
   "dependencies": {
     "@streamlabs/game-overlay": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.41.tar.gz",
+    "@types/node-fetch": "^2.5.5",
     "archiver": "2.1.1",
     "aws-sdk": "^2.344.0",
     "crash-handler": "https://github.com/stream-labs/crash-handler/releases/download/v0.0.41/iojs-v6.0.3-crash-handler.tar.gz",
@@ -71,6 +72,7 @@
     "extract-zip": "^1.6.7",
     "facemask-plugin": "https://s3-us-west-2.amazonaws.com/faces-internal.streamlabs.com/facemask-plugin-deployment/facemask-plugin-0.9.1.tar.gz",
     "font-manager": "https://github.com/stream-labs/font-manager/releases/download/v1.0.8electron6/iojs-v6.0.3-font-manager.tar.gz",
+    "node-fetch": "^2.6.0",
     "node-fontinfo": "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.12electron6/iojs-v6.0.3-node-fontinfo.tar.gz",
     "node-libuiohook": "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.14/iojs-v6.0.3-node-libuiohook.tar.gz",
     "obs-studio-node": "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.137-iojs-v6.0.3-release.tar.gz",

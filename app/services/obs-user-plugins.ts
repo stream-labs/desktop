@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import electron from 'electron';
 import * as obs from '../../obs-api';
+import Utils from './utils';
 
 // WARNING: This service is initialized extremely early
 // and should not import any other services.
@@ -11,13 +12,17 @@ export class ObsUserPluginsService extends Service {
   async initialize() {
     // Make a best effort but don't stop SLOBS from loading
     try {
-      await this.ensureDirectory(this.pluginsBaseDir);
-      await this.ensureDirectory(this.obsPluginsDir);
-      await this.ensureDirectory(this.pluginsDir);
-      await this.ensureDirectory(this.dataBaseDir);
-      await this.ensureDirectory(this.dataDir);
+      Utils.measure('Ensure plugins start');
+      await Promise.all([
+        this.ensureDirectory(this.pluginsBaseDir),
+        this.ensureDirectory(this.obsPluginsDir),
+        this.ensureDirectory(this.pluginsDir),
+        this.ensureDirectory(this.dataBaseDir),
+        this.ensureDirectory(this.dataDir),
+      ]);
+      Utils.measure('Ensure plugins finish');
     } catch (e) {
-      console.error('Error creating plugin directories', e);
+      console.error('Error creating plugin directories', ...e);
     }
   }
 

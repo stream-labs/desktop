@@ -37,7 +37,7 @@ import ShareStream from 'components/windows/ShareStream';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import electron from 'electron';
 import Vue from 'vue';
-import Util from 'services/utils';
+import Utils from 'services/utils';
 import { Subject } from 'rxjs';
 
 import BitGoal from 'components/widgets/goal/BitGoal.vue';
@@ -173,7 +173,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       isShown: true,
       hideStyleBlockers: true,
       hideChat: false,
-      title: `Streamlabs OBS - Version: ${remote.process.env.SLOBS_VERSION}`,
+      title: `Streamlabs OBS - Version: ${Utils.env.SLOBS_VERSION}`,
     },
     child: {
       componentName: '',
@@ -230,7 +230,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
      * We do not do this on CI since it runs at 1024x768 and it break tests that aren't easy
      * to workaround.
      */
-    if (options.size && !remote.process.env.CI) {
+    if (options.size && !Utils.env.CI) {
       const {
         width: screenWidth,
         height: screenHeight,
@@ -356,7 +356,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.updateScaleFactor(windowId);
     newWindow.on('move', () => this.updateScaleFactor(windowId));
 
-    if (Util.isDevMode()) newWindow.webContents.openDevTools({ mode: 'detach' });
+    if (Utils.isDevMode()) newWindow.webContents.openDevTools({ mode: 'detach' });
 
     const indexUrl = remote.getGlobal('indexUrl');
     newWindow.loadURL(`${indexUrl}?windowId=${windowId}`);

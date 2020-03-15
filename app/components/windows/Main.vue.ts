@@ -33,6 +33,7 @@ import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import FacebookMerge from 'components/pages/FacebookMerge';
 import { getPlatformService } from 'services/platforms';
+import Utils from '../../services/utils';
 
 @Component({
   components: {
@@ -67,6 +68,10 @@ export default class Main extends Vue {
   created() {
     window.addEventListener('resize', this.windowSizeHandler);
   }
+
+  // mounted() {
+  //   Utils.measure('main mounted');
+  // }
 
   get bulkLoadFinished() {
     return this.$store.state.bulkLoadFinished;

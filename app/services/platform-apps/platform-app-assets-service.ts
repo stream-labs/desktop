@@ -13,7 +13,7 @@ import { downloadFile, getChecksum } from 'util/requests';
 import { InitAfter } from 'services/core/service-initialization-observer';
 import { AppService } from 'services/app';
 import url from 'url';
-import rimraf from 'rimraf';
+import { importRimraf } from '../../util/slow-imports';
 
 const mkdirp = util.promisify(mkdirpModule);
 const mkdtemp = util.promisify(fs.mkdtemp);
@@ -187,7 +187,9 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
       await this.updateAssetResource(appId, asset);
     });
 
-    await new Promise(resolve => {
+    await new Promise(async resolve => {
+      // rimraf takes to much time when it's imported on startup
+      const rimraf = (await importRimraf()).default;
       rimraf(tmpDir, resolve);
     });
   }

@@ -88,6 +88,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   collectionSwitched = new Subject<ISceneCollectionsManifestEntry>();
   collectionWillSwitch = new Subject<void>();
   collectionUpdated = new Subject<ISceneCollectionsManifestEntry>();
+  collectionInitialized = new Subject<void>();
 
   /**
    * Whether a valid collection is currently loaded.
@@ -105,9 +106,11 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * initialization.
    */
   async initialize() {
+    Utils.measure('Collection initialize start');
     await this.migrate();
     await this.stateService.loadManifestFile();
     await this.safeSync();
+    Utils.measure('Sync finished');
     if (this.activeCollection) {
       await this.load(this.activeCollection.id);
     } else if (this.collections.length > 0) {
@@ -125,6 +128,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     } else {
       await this.create({ auto: true });
     }
+    Utils.measure('Collection initialize finish');
+    this.collectionInitialized.next();
   }
 
   /**

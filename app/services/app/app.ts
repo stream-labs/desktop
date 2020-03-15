@@ -99,6 +99,7 @@ export class AppService extends StatefulService<IAppState> {
   @track('app_start')
   @RunInLoadingMode()
   async load() {
+    Utils.measure('app load');
     if (Utils.isDevMode()) {
       electron.ipcRenderer.on('showErrorAlert', () => {
         this.SET_ERROR_ALERT(true);
@@ -118,6 +119,8 @@ export class AppService extends StatefulService<IAppState> {
       // probably the internet is disconnected
     });
 
+    Utils.measure('logged in');
+
     // Second, we want to start the crash reporter service.  We do this
     // after the user service because we want crashes to be associated
     // with a particular user if possible.
@@ -126,7 +129,9 @@ export class AppService extends StatefulService<IAppState> {
     if (!this.userService.isLoggedIn) {
       // If this user is logged in, this would have already happened as part of login
       // TODO: We should come up with a better way to handle this.
+      Utils.measure('init collection');
       await this.sceneCollectionsService.initialize();
+      Utils.measure('init collection finish');
     }
 
     this.SET_ONBOARDED(this.onboardingService.startOnboardingIfRequired());
@@ -149,6 +154,7 @@ export class AppService extends StatefulService<IAppState> {
 
     this.protocolLinksService.start(this.state.argv);
 
+    Utils.measure('load finished');
     ipcRenderer.send('AppInitFinished');
   }
 

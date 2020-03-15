@@ -202,6 +202,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   // Makes sure the user's login is still good
   async validateLogin() {
+    Utils.measure('Validate login start');
     if (!this.state.auth) return;
 
     const host = this.hostsService.streamlabs;
@@ -222,7 +223,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
 
     const service = getPlatformService(this.state.auth.primaryPlatform);
+
+    Utils.measure('validated, try to login into platform');
     await this.login(service, this.state.auth);
+    Utils.measure('Validate login finish');
   }
 
   /**
@@ -464,6 +468,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.VALIDATE_LOGIN(true);
     await this.updateLinkedPlatforms();
     const result = await service.validatePlatform();
+    Utils.measure('platform validated');
 
     // Currently we treat generic errors as success
     if (result === EPlatformCallResult.TwitchTwoFactor) {
@@ -487,10 +492,14 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       return result;
     }
 
+    Utils.measure('refreshUserInfo');
     this.refreshUserInfo();
+    Utils.measure('setSentryContext');
     this.setSentryContext();
 
+    Utils.measure('next');
     this.userLogin.next(auth);
+    Utils.measure('Setup new user');
     await this.sceneCollectionsService.setupNewUser();
 
     return result;
