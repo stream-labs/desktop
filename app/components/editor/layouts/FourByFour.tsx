@@ -34,7 +34,9 @@ export default class FourByFour extends BaseLayout {
   render() {
     return (
       <div class={styles.rows}>
-        <div style={{ height: `calc(100% - ${this.bar1 + this.bar2}px)` }}>{this.$slots['1']}</div>
+        <div class={styles.cell} style={{ height: `calc(100% - ${this.bar1 + this.bar2}px)` }}>
+          {this.$slots['1']}
+        </div>
         <ResizeBar
           position="top"
           vModel={this.bar1}

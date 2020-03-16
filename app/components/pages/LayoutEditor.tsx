@@ -161,7 +161,7 @@ export default class LayoutEditor extends TsxComponent {
 
   get elementList() {
     return (
-      <div style="display: flex; flex-direction: column;">
+      <div class={styles.elementList}>
         <div class={styles.title}>{$t('Elements')}</div>
         <div class={styles.subtitle}>{$t('Drag and drop to edit.')}</div>
         <div class={styles.elementContainer}>
