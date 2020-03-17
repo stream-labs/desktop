@@ -38,12 +38,25 @@
 .side-bar {
   width: 200px;
   height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
   border-right: 1px solid var(--border);
 }
 
-.element-container {
+.element-list {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
   position: relative;
-  height: 200px;
+}
+
+.element-container {
+  position: absolute;
+  top: 50px;
+  bottom: 0;
+  right: 0;
+  left: 0;
   overflow-y: auto;
 }
 
@@ -81,7 +94,6 @@
   display: flex;
   justify-content: space-around;
   flex-wrap: wrap;
-  height: 220px;
   overflow-y: auto;
 
   img {
