@@ -6,7 +6,6 @@ import { mutation } from 'services/core/stateful-service';
 import { Service } from 'services/core';
 import electron from 'electron';
 import { HostsService } from 'services/hosts';
-import { IncrementalRolloutService } from 'services/incremental-rollout';
 import {
   getPlatformService,
   IUserAuth,
@@ -92,7 +91,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private windowsService: WindowsService;
   @Inject() private onboardingService: OnboardingService;
   @Inject() private navigationService: NavigationService;
-  @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private settingsService: SettingsService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private websocketService: WebsocketService;
@@ -118,6 +116,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @mutation()
   LOGOUT() {
     Vue.delete(this.state, 'auth');
+    this.state.isPrime = false;
   }
 
   @mutation()
@@ -170,7 +169,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   userLogin = new Subject<IUserAuth>();
   userLogout = new Subject();
-  private lifecycle: LoginLifecycle;
   private socketConnection: Subscription = null;
 
   /**
@@ -185,12 +183,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.MIGRATE_AUTH();
     this.VALIDATE_LOGIN(false);
     this.SET_AUTH_STATE(EAuthProcessState.Idle);
-    await this.setPrimeStatus();
-    this.lifecycle = await this.withLifecycle({
-      init: this.subscribeToSocketConnection,
-      destroy: this.unsubscribeFromSocketConnection,
-      context: this,
-    });
   }
 
   mounted() {
@@ -534,7 +526,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         ),
         buttons: [$t('Refresh Login')],
       });
-
       return result;
     }
 
@@ -543,6 +534,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     this.userLogin.next(auth);
     await this.sceneCollectionsService.setupNewUser();
+    this.setPrimeStatus();
+    this.subscribeToSocketConnection();
 
     return result;
   }
@@ -562,6 +555,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     session.clearStorageData({ storages: ['cookies'] });
     this.settingsService.setSettingValue('Stream', 'key', '');
 
+    this.unsubscribeFromSocketConnection();
     this.LOGOUT();
     this.userLogout.next();
   }
