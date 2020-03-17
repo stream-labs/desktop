@@ -223,6 +223,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     window['obs'] = obs;
 
     await obsUserPluginsService.initialize();
+    Utils.measure('Plugins inited');
 
     let apiResult;
     let obs_instance_reused = false;
