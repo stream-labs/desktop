@@ -17,6 +17,7 @@ import { EditorCommandsService } from 'services/editor-commands';
 import SlVueTree, { ISlTreeNode } from 'sl-vue-tree';
 import { ERenderingMode } from '../../../../obs-api';
 import TsxComponent from 'components/tsx-component';
+import { getOS } from 'util/operating-systems';
 
 @Component({
   components: { DropdownMenu, HelpTip, SlVueTree },
@@ -151,7 +152,13 @@ export default class SceneSelector extends TsxComponent {
     return null;
   }
 
+  get os() {
+    return getOS();
+  }
+
   loadCollection(id: string) {
+    if (this.sceneCollectionsService.getCollection(id).operatingSystem !== this.os) return;
+
     this.sceneCollectionsService.load(id);
   }
 
