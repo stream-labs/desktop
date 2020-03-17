@@ -228,10 +228,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let obs_instance_reused = false;
     const pipe_uuid = process.env['OBS_PIPE_UUID'];
     if (pipe_uuid) {
-      console.log('try connect to api');
       obs.IPC.connect(`slobs-${pipe_uuid}`);
-
-      console.log('connected');
 
       apiResult = obs.NodeObs.OBS_API_initAPI(
         'en-US',
@@ -242,8 +239,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (apiResult === obs.EVideoCodes.Success) {
         obs_instance_reused = true;
       }
-
-      console.log('inited');
     }
 
     if (!obs_instance_reused) {

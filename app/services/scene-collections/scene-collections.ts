@@ -35,6 +35,7 @@ import { TransitionsService } from 'services/transitions';
 import { $t } from '../i18n';
 import { StreamingService, EStreamingState } from 'services/streaming';
 import { DefaultHardwareService } from 'services/hardware';
+import { OS, getOS } from 'util/operating-systems';
 import Utils from 'services/utils';
 
 const uuid = window['require']('uuid/v4');
@@ -109,15 +110,16 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     Utils.measure('Collection initialize start');
     await this.migrate();
     await this.stateService.loadManifestFile();
+    await this.migrateOS();
     await this.safeSync();
     Utils.measure('Sync finished');
-    if (this.activeCollection) {
+    if (this.activeCollection && this.activeCollection.operatingSystem === getOS()) {
       await this.load(this.activeCollection.id);
-    } else if (this.collections.length > 0) {
-      let latestId = this.collections[0].id;
-      let latestModified = this.collections[0].modified;
+    } else if (this.loadableCollections.length > 0) {
+      let latestId = this.loadableCollections[0].id;
+      let latestModified = this.loadableCollections[0].modified;
 
-      this.collections.forEach(collection => {
+      this.loadableCollections.forEach(collection => {
         if (collection.modified > latestModified) {
           latestModified = collection.modified;
           latestId = collection.id;
@@ -208,7 +210,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     const name = options.name || this.suggestName(DEFAULT_COLLECTION_NAME);
     const id = uuid();
 
-    await this.insertCollection(id, name, options.auto || false);
+    await this.insertCollection(id, name, getOS(), options.auto || false);
     await this.setActiveCollection(id);
     if (options.needsRename) this.stateService.SET_NEEDS_RENAME(id);
 
@@ -237,8 +239,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       await this.appService.runInLoadingMode(async () => {
         await this.removeCollection(id);
 
-        if (this.collections.length > 0) {
-          await this.load(this.collections[0].id);
+        if (this.loadableCollections.length > 0) {
+          await this.load(this.loadableCollections[0].id);
         } else {
           await this.create();
         }
@@ -300,7 +302,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     // tslint:disable-next-line:no-parameter-reassignment TODO
     id = id || this.activeCollection.id;
     const newId = uuid();
-    await this.insertCollection(newId, name, false, id);
+    await this.insertCollection(newId, name, this.getCollection(id).operatingSystem, false, id);
     this.stateService.SET_NEEDS_RENAME(newId);
     this.enableAutoSave();
   }
@@ -335,7 +337,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     await this.deloadCurrentApplicationState();
 
     const id: string = uuid();
-    await this.insertCollection(id, name);
+    await this.insertCollection(id, name, getOS());
     await this.setActiveCollection(id);
 
     try {
@@ -379,6 +381,10 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         height: 800,
       },
     });
+  }
+
+  get loadableCollections() {
+    return this.collections.filter(c => c.operatingSystem === getOS());
   }
 
   /**
@@ -620,14 +626,14 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * Creates and persists new collection from the current application state
    * or from another scene collection's contents.
    */
-  private async insertCollection(id: string, name: string, auto = false, fromId?: string) {
+  private async insertCollection(id: string, name: string, os: OS, auto = false, fromId?: string) {
     if (fromId) {
       await this.stateService.copyCollectionFile(fromId, id);
     } else {
       await this.saveCurrentApplicationStateAs(id);
     }
 
-    this.stateService.ADD_COLLECTION(id, name, new Date().toISOString(), auto);
+    this.stateService.ADD_COLLECTION(id, name, new Date().toISOString(), os, auto);
     await this.safeSync();
     this.collectionAdded.next(this.collections.find(coll => coll.id === id));
   }
@@ -767,6 +773,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
           const id: string = uuid();
           const response = await this.serverApi.fetchSceneCollection(onServer.id);
 
+          let operatingSystem = getOS();
+
           // Empty data means that the collection was created from the Streamlabs
           // dashboard and does not currently have any scenes assoicated with it.
           // The first time we try to load this collection, we will initialize it
@@ -774,9 +782,18 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
           if (response.scene_collection.data != null) {
             this.stateService.writeDataToCollectionFile(id, response.scene_collection.data);
+
+            // Attempt to pull the OS out of the data, assuming Windows if it is not marked
+            operatingSystem =
+              JSON.parse(response.scene_collection.data).operatingSystem || OS.Windows;
           }
 
-          this.stateService.ADD_COLLECTION(id, onServer.name, onServer.last_updated_at);
+          this.stateService.ADD_COLLECTION(
+            id,
+            onServer.name,
+            onServer.last_updated_at,
+            operatingSystem,
+          );
           this.stateService.SET_SERVER_ID(id, onServer.id);
         });
 
@@ -792,7 +809,10 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         if (!inManifest.serverId) {
           // Delete any auto collections if there are any collections that were
           // downloaded from the server.
-          if (serverCollections.length && inManifest.auto) {
+          if (
+            this.loadableCollections.filter(c => c.id !== inManifest.id).length &&
+            inManifest.auto
+          ) {
             const success = this.performSyncStep('Delete from server', async () => {
               this.stateService.HARD_DELETE_COLLECTION(inManifest.id);
             });
@@ -893,6 +913,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
             id,
             file.replace(/\.[^/.]+$/, ''),
             new Date().toISOString(),
+            OS.Windows,
           );
         }
       }
@@ -911,6 +932,15 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         }
       }
     }
+  }
+
+  migrateOS() {
+    // Assume all unmarked scene collections are Windows
+    this.collections
+      .filter(c => !c.operatingSystem)
+      .forEach(c => {
+        this.stateService.SET_OPERATING_SYSTEM(c.id, OS.Windows);
+      });
   }
 
   canSync(): boolean {
