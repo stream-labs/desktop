@@ -110,10 +110,9 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
 
   linkTwitter() {
     this.pressedTwitterButton = true;
-    this.usageStatisticsService.recordAnalyticsEvent(
-      'ClickedLinkTwitterButton',
-      this.userService.username,
-    );
+    this.usageStatisticsService.recordAnalyticsEvent('SocialShare', {
+      action: 'clicked_link_twitter',
+    });
     this.twitterService.openLinkTwitterDialog();
   }
 
@@ -139,10 +138,9 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
     const id = '806726706158427';
     shell.openExternal(`${base}app_id=${id}&href=${this.sharePageUrl}`);
     this.sharedToFacebook = true;
-    this.usageStatisticsService.recordAnalyticsEvent(
-      'ClickedShareToFbButton',
-      this.userService.username,
-    );
+    this.usageStatisticsService.recordAnalyticsEvent('SocialShare', {
+      action: 'clicked_facebook_share',
+    });
   }
 
   showQrcode() {

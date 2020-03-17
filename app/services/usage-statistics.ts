@@ -18,11 +18,7 @@ interface IUsageApiData {
   data: string;
 }
 
-type TAnalyticsEvent =
-  | 'FacebookLogin'
-  | 'PlatformLogin'
-  | 'ClickedShareToFbButton'
-  | 'ClickedLinkTwitterButton'; // add more types if you need
+type TAnalyticsEvent = 'FacebookLogin' | 'PlatformLogin' | 'SocialShare'; // add more types if you need
 
 interface IAnalyticsEvent {
   product: string;
