@@ -37,7 +37,7 @@ import CustomLoader from 'components/CustomLoader';
 
 const crashHandler = window['require']('crash-handler');
 
-const { ipcRenderer, remote } = electron;
+const { ipcRenderer, remote, app, contentTracing } = electron;
 const slobsVersion = Utils.env.SLOBS_VERSION;
 const isProduction = Utils.env.NODE_ENV === 'production';
 const isPreview = !!Utils.env.SLOBS_PREVIEW;
@@ -222,22 +222,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     // This is used for debugging
     window['obs'] = obs;
 
-    // Host a new OBS server instance
-    obs.IPC.host(`slobs-${uuid()}`);
-    obs.NodeObs.SetWorkingDirectory(
-      path.join(
-        electron.remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
-        'node_modules',
-        'obs-studio-node',
-      ),
-    );
-    Utils.measure('working directory is set');
+    await obsUserPluginsService.initialize();
 
     let apiResult;
     let obs_instance_reused = false;
     const pipe_uuid = process.env['OBS_PIPE_UUID'];
     if (pipe_uuid) {
+      console.log('try connect to api');
       obs.IPC.connect(`slobs-${pipe_uuid}`);
+
+      console.log('connected');
 
       apiResult = obs.NodeObs.OBS_API_initAPI(
         'en-US',
@@ -248,6 +242,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (apiResult === obs.EVideoCodes.Success) {
         obs_instance_reused = true;
       }
+
+      console.log('inited');
     }
 
     if (!obs_instance_reused) {

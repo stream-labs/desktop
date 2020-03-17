@@ -1,0 +1,8 @@
+{
+  "startup_duration": 20,
+  "result_file": "./trace.json",
+  "trace_config": {
+    "included_categories": ["blink,cc,gpu,renderer.scheduler,sequence_manager,v8,toplevel,viz,ipc,input"],
+    "excluded_categories": ["*"]
+  }
+}
