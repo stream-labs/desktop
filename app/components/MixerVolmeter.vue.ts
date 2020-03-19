@@ -128,20 +128,19 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
 
     this.setCanvasWidth();
     this.canvasWidthInterval = window.setInterval(() => this.setCanvasWidth(), 500);
-    requestAnimationFrame(() => this.onRequestAnimationFrameHandler());
+    requestAnimationFrame(t => this.onRequestAnimationFrameHandler(t));
   }
 
   /**
    * Render volmeters with FPS capping
    */
-  private onRequestAnimationFrameHandler() {
+  private onRequestAnimationFrameHandler(now: DOMHighResTimeStamp) {
     // init first rendering frame
     if (!this.frameNumber) {
       this.frameNumber = -1;
-      this.firstFrameTime = performance.now();
+      this.firstFrameTime = now;
     }
 
-    const now = performance.now();
     const timeElapsed = now - this.firstFrameTime;
     const timeBetweenFrames = 1000 / FPS_LIMIT;
     const currentFrameNumber = Math.ceil(timeElapsed / timeBetweenFrames);
@@ -159,7 +158,7 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
         }
       }
     }
-    requestAnimationFrame(() => this.onRequestAnimationFrameHandler());
+    requestAnimationFrame(t => this.onRequestAnimationFrameHandler(t));
   }
 
   private initRenderingContext() {
