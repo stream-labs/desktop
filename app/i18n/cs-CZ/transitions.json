@@ -24,7 +24,7 @@
   "This connection is redundant because another connection already connects these scenes.": "Toto spojení je nadbytečné, protože tyto scény jsou již propojeny pomocí jiného spojení.",
   "You need at least 2 scenes to edit transitions.": "K úpravě přechodů potřebujete alespoň 2 scény.",
   "This scene transition is managed by an App and cannot be edited.": "Tento přechod scény spravuje aplikace a nelze jej upravovat.",
-  "Global Transition": "Global Transition",
-  "Edit": "Edit",
-  "Live": "Live"
+  "Global Transition": "Globální přechod",
+  "Edit": "Upravit",
+  "Live": "Živě"
 }
