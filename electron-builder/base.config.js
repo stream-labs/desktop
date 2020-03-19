@@ -19,7 +19,7 @@ const base = {
   extraFiles: [
     // 'LICENSE',
     // 'AGREEMENT',
-    'shared-resources/*',
+    'shared-resources/**/*',
     '!shared-resources/README',
   ],
   directories: {

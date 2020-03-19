@@ -30,7 +30,7 @@ import { SourceDisplayData } from './sources-data';
 import { NavigationService } from 'services/navigation';
 import { PlatformAppsService } from 'services/platform-apps';
 import { HardwareService, DefaultHardwareService } from 'services/hardware';
-import { AudioService } from '../audio';
+import { AudioService, E_AUDIO_CHANNELS } from '../audio';
 import { ReplayManager } from './properties-managers/replay-manager';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
@@ -109,6 +109,14 @@ class SourcesViews extends ViewHandler<ISourcesState> {
 
   getSource(id: string): Source {
     return this.state.sources[id] || this.state.temporarySources[id] ? new Source(id) : void 0;
+  }
+
+  getSourceByChannel(channel: E_AUDIO_CHANNELS): Source {
+    const id = Object.values(this.state.sources).find(s => {
+      return s.channel === channel;
+    })?.sourceId;
+
+    return this.getSource(id);
   }
 
   getSources() {
