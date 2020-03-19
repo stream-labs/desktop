@@ -4,6 +4,7 @@ import { Inject, ViewHandler } from 'services/core';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
 import { CustomizationService } from 'services/customization';
+import { UserService } from 'services/user';
 import { $t } from 'services/i18n';
 import uuid from 'uuid';
 import { LAYOUT_DATA, ELEMENT_DATA, ELayout, ELayoutElement } from './layout-data';
@@ -81,6 +82,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
   };
 
   @Inject() private customizationService: CustomizationService;
+  @Inject() private userService: UserService;
 
   init() {
     super.init();
@@ -107,6 +109,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   migrateSlots() {
     const slottedElements = {};
+    if (this.state.currentTab !== 'default') return;
     Object.keys(this.state.tabs.default.slottedElements).forEach(el => {
       if (typeof this.state.tabs.default.slottedElements[el] === 'string') {
         slottedElements[el] = { slot: this.state.tabs.default.slottedElements[el] };
@@ -142,7 +145,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
   }
 
   addTab(name: string, icon: string) {
-    this.ADD_TAB(name, icon);
+    this.ADD_TAB(name, icon, this.userService.isPrime);
   }
 
   removeCurrentTab() {
@@ -230,7 +233,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
   }
 
   @mutation()
-  ADD_TAB(name: string, icon: string) {
+  ADD_TAB(name: string, icon: string, switchTab = false) {
     const id = uuid();
 
     Vue.set(this.state.tabs, id, {
@@ -250,6 +253,6 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
         bar2: 240,
       },
     });
-    this.state.currentTab = id;
+    if (switchTab) this.state.currentTab = id;
   }
 }

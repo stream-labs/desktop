@@ -2,6 +2,12 @@
 // This singleton class provides a renderer-space API
 // for spawning various child windows.
 import cloneDeep from 'lodash/cloneDeep';
+import { mutation, StatefulService } from 'services/core/stateful-service';
+import electron from 'electron';
+import Vue from 'vue';
+import Utils from 'services/utils';
+import { Subject } from 'rxjs';
+import { throttle } from 'lodash-decorators';
 
 import Main from 'components/windows/Main.vue';
 import Settings from 'components/windows/settings/Settings.vue';
@@ -34,11 +40,7 @@ import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
 import YoutubeStreamStatus from 'components/platforms/youtube/YoutubeStreamStatus';
 import ShareStream from 'components/windows/ShareStream';
-import { mutation, StatefulService } from 'services/core/stateful-service';
-import electron from 'electron';
-import Vue from 'vue';
-import Utils from 'services/utils';
-import { Subject } from 'rxjs';
+import WelcomeToPrime from 'components/windows/WelcomeToPrime';
 
 import BitGoal from 'components/widgets/goal/BitGoal.vue';
 import DonationGoal from 'components/widgets/goal/DonationGoal.vue';
@@ -59,7 +61,6 @@ import AlertBox from 'components/widgets/AlertBox.vue';
 import SpinWheel from 'components/widgets/SpinWheel.vue';
 
 import PerformanceMetrics from 'components/PerformanceMetrics.vue';
-import { throttle } from 'lodash-decorators';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -118,6 +119,7 @@ export function getComponents() {
     SpinWheel,
     YoutubeStreamStatus,
     ShareStream,
+    WelcomeToPrime,
   };
 }
 

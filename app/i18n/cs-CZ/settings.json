@@ -12,7 +12,7 @@
   "Remote Control": "Dálkové ovládání",
   "Experimental": "Experimentální",
   "Developer": "Vývojové jednotky",
-  "Face Masks": "Face Masks",
+  "Face Masks": "Masky",
   "Night mode": "Noční režim",
   "Game Overlay": "Překrytí ve hře",
   "Installed Apps": "Nainstalované aplikace",
@@ -104,10 +104,10 @@
   "Show Recent Events": "Zobrazit poslední události",
   "Overlay Opacity": "Průhlednost překrytí",
   "Named Pipe": "Pojmenovaná roura",
-  "Pipe Name": "Pipe Name",
+  "Pipe Name": "Název potrubí",
   "Websockets": "WebSockety",
-  "Enabled": "Enabled",
-  "Allow Remote Connections": "Allow Remote Connections",
+  "Enabled": "Povoleno",
+  "Allow Remote Connections": "Povolit vzdálené připojení",
   "Port": "Port",
   "Audio - Track 1": "Zvuk – stopa 1",
   "Audio - Track 2": "Zvuk – stopa 2",
@@ -117,5 +117,5 @@
   "Audio - Track 6": "Zvuk – stopa 6",
   "Stream Key": "Klíč pro stream",
   "You can not change these settings when you're live": "Tato nastavení není možné změnit během živého vysílání",
-  "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.": "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk."
+  "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.": "Tato funkce je určena designérům překryvů k exportu jejich práce do našeho obchodu se zábavou. Ne všechny zdroje budou exportovány, používejte je na vlastní nebezpečí."
 }
