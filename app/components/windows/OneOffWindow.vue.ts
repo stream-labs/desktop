@@ -4,7 +4,7 @@ import { Inject } from 'services/core/injector';
 import { getComponents, WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
 import Util from 'services/utils';
-import TitleBar from '../TitleBar.vue';
+import TitleBar from '../TitleBar';
 
 @Component({
   components: {
