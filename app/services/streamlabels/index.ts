@@ -5,13 +5,12 @@ import { HostsService } from 'services/hosts';
 import { authorizedHeaders, handleResponse } from 'util/requests';
 import { TSocketEvent, WebsocketService } from 'services/websocket';
 import uuid from 'uuid/v4';
-import fs from 'fs';
+import fs from 'fs-extra';
 import path from 'path';
 import electron from 'electron';
 import without from 'lodash/without';
 import { AppService } from 'services/app';
 import { InitAfter } from '../core';
-import { importRimraf } from '../../util/slow-imports';
 
 interface IStreamlabelActiveSubscriptions {
   filename: string;
@@ -123,7 +122,7 @@ export class StreamlabelsService extends Service {
   };
 
   async init() {
-    await this.ensureDirectory();
+    this.ensureDirectory();
     this.initSocketConnection();
     this.initTrainClockInterval();
 
@@ -377,13 +376,9 @@ export class StreamlabelsService extends Service {
     }
   }
 
-  private async ensureDirectory() {
+  private ensureDirectory() {
     try {
-      if (fs.existsSync(this.streamlabelsDirectory)) {
-        const rimraf = (await importRimraf()).default;
-        rimraf.sync(this.streamlabelsDirectory);
-      }
-
+      fs.removeSync(this.streamlabelsDirectory);
       fs.mkdirSync(this.streamlabelsDirectory);
     } catch (e) {
       console.error('Error ensuring streamlabels directory!');

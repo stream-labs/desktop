@@ -17,10 +17,6 @@ export function importSocketIOClient() {
   return import('socket.io-client');
 }
 
-export function importRimraf() {
-  return import('rimraf');
-}
-
 export function importBeaker() {
   return import('streamlabs-beaker');
 }

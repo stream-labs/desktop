@@ -3,7 +3,6 @@ import path from 'path';
 import util from 'util';
 import mkdirpModule from 'mkdirp';
 import { tmpdir } from 'os';
-import fs from 'fs';
 import { mutation } from '../core/stateful-service';
 import { PersistentStatefulService } from '../core/persistent-stateful-service';
 import { ILoadedApp, PlatformAppsService } from './index';
@@ -13,7 +12,7 @@ import { downloadFile, getChecksum } from 'util/requests';
 import { InitAfter } from 'services/core/service-initialization-observer';
 import { AppService } from 'services/app';
 import url from 'url';
-import { importRimraf } from '../../util/slow-imports';
+import fs from 'fs-extra';
 
 const mkdirp = util.promisify(mkdirpModule);
 const mkdtemp = util.promisify(fs.mkdtemp);
@@ -187,11 +186,7 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
       await this.updateAssetResource(appId, asset);
     });
 
-    await new Promise(async resolve => {
-      // rimraf takes to much time when it's imported on startup
-      const rimraf = (await importRimraf()).default;
-      rimraf(tmpDir, resolve);
-    });
+    await fs.remove(tmpDir);
   }
 
   /**

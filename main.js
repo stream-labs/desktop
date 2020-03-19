@@ -51,6 +51,7 @@ if (!gotTheLock) {
   const crashHandler = require('crash-handler');
 
   app.commandLine.appendSwitch('force-ui-direction', 'ltr');
+  app.commandLine.appendSwitch('ignore-connections-limit', 'streamlabs.com,youtube.com,twitch.tv,facebook.com,mixer.com');
 
   /* Determine the current release channel we're
    * on based on name. The channel will always be
