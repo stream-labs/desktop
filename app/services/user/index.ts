@@ -201,6 +201,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   autoLogin() {
+    if (!this.state.auth) return;
     const service = getPlatformService(this.state.auth.primaryPlatform);
     return this.login(service, this.state.auth);
   }

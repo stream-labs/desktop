@@ -13,16 +13,15 @@ export class ObsUserPluginsService extends Service {
     // Make a best effort but don't stop SLOBS from loading
     try {
       Utils.measure('Ensure plugins start');
+      await this.ensureDirectory(this.pluginsBaseDir);
       await Promise.all([
-        this.ensureDirectory(this.pluginsBaseDir),
         this.ensureDirectory(this.obsPluginsDir),
         this.ensureDirectory(this.pluginsDir),
         this.ensureDirectory(this.dataBaseDir),
         this.ensureDirectory(this.dataDir),
       ]);
-      Utils.measure('Ensure plugins finish');
     } catch (e) {
-      console.error('Error creating plugin directories', ...e);
+      console.error('Error creating plugin directories', e);
     }
   }
 
