@@ -304,13 +304,11 @@ export class Scene {
    * Makes sure all scene items are in the correct order in OBS.
    */
   private reconcileNodeOrderWithObs() {
+    let orderedIDs: number[] = [];
     this.getItems().forEach((item, index) => {
-      const currentIndex = this.getObsScene()
-        .getItems()
-        .reverse()
-        .findIndex(obsItem => obsItem.id === item.obsSceneItemId);
-      this.getObsScene().moveItem(currentIndex, index);
+      orderedIDs.push(item.obsSceneItemId);
     });
+    this.getObsScene().orderItems(orderedIDs);
   }
 
   placeBefore(sourceNodeId: string, destNodeId: string) {
