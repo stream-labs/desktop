@@ -10,7 +10,8 @@ export type TAppPage =
   | 'PlatformAppMainPage'
   | 'PlatformAppStore'
   | 'FacebookMerge'
-  | 'LayoutEditor';
+  | 'LayoutEditor'
+  | 'CommunityHub';
 
 interface INavigationState {
   currentPage: TAppPage;

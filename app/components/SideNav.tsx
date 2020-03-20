@@ -108,6 +108,11 @@ export default class SideNav extends Vue {
     if (this.appStoreVisible) {
       pageData.push({ target: 'PlatformAppStore', icon: 'icon-store', title: $t('App Store') });
     }
+    pageData.push({
+      target: 'CommunityHub',
+      icon: 'icon-media-share-3',
+      title: $t('Community Hub'),
+    });
 
     return (
       <div class={cx('side-nav', styles.container, { [styles.leftDock]: this.leftDock })}>
