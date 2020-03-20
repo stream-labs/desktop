@@ -13,6 +13,7 @@ import { TwitterService } from 'services/integrations/twitter';
 import { ITcpServerServiceApi } from 'services/api/tcp-server/index';
 import { RestreamService } from 'services/restream';
 import { StreamingService } from 'services/streaming';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 interface IQRCodeData {
   addresses: string[];
@@ -58,6 +59,7 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
   @Inject() restreamService: RestreamService;
   @Inject() streamingService: StreamingService;
   @Inject() private tcpServerService: ITcpServerServiceApi;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
 
   sharedToFacebook = false;
   pressedTwitterButton = false;
@@ -108,6 +110,9 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
 
   linkTwitter() {
     this.pressedTwitterButton = true;
+    this.usageStatisticsService.recordAnalyticsEvent('SocialShare', {
+      action: 'clicked_link_twitter',
+    });
     this.twitterService.openLinkTwitterDialog();
   }
 
@@ -133,6 +138,9 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
     const id = '806726706158427';
     shell.openExternal(`${base}app_id=${id}&href=${this.sharePageUrl}`);
     this.sharedToFacebook = true;
+    this.usageStatisticsService.recordAnalyticsEvent('SocialShare', {
+      action: 'clicked_facebook_share',
+    });
   }
 
   showQrcode() {
