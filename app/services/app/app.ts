@@ -123,6 +123,7 @@ export class AppService extends StatefulService<IAppState> {
       this.downloadAutoGameCaptureConfig(),
     ]).catch(e => {
       // probably the internet is disconnected
+      console.error('Auto login failed', e);
     });
 
     Utils.measure('logged in');
