@@ -16,13 +16,13 @@ export default class MatchmakeForm extends TsxComponent {
         <h2>{$t('Find other streamers to play with in real time!')}</h2>
         <ValidatedForm class={styles.matchmakeDropdowns}>
           <VFormGroup metadata={metadata.list({ options: [], title: $t('Game') })} />
-          <VFormGroup metadata={metadata.list({ options: [], title: $t('Platform') })} />
           <VFormGroup
             metadata={metadata.number({
               min: 2,
               max: 6,
               title: $t('Max Room Size'),
               description: $t('2-6 people per room'),
+              isInteger: true,
             })}
           />
         </ValidatedForm>
