@@ -2,7 +2,6 @@ import { StatefulService, mutation } from 'services/core/stateful-service';
 import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
-import { authorizedHeaders } from 'util/requests';
 import { I18nService } from 'services/i18n';
 
 interface ICommunityHubState {}

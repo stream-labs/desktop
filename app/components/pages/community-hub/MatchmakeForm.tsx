@@ -13,7 +13,7 @@ export default class MatchmakeForm extends TsxComponent {
     return (
       <div class={styles.matchmakeFormContainer}>
         <img src={require('../../../../media/images/community-hub/matchmake.png')} />
-        <h2>{$t('Find other streamers to play with in real time!')}</h2>
+        <h2>{$t('Meet other streamers to connect with!')}</h2>
         <ValidatedForm class={styles.matchmakeDropdowns}>
           <VFormGroup metadata={metadata.list({ options: [], title: $t('Game') })} />
           <VFormGroup
