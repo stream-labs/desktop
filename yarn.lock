@@ -3831,9 +3831,9 @@ cosmiconfig@^5.2.0:
     js-yaml "^3.13.1"
     parse-json "^4.0.0"
 
-"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.41/iojs-v6.0.3-crash-handler.tar.gz":
+"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.61/iojs-v6.0.3-crash-handler-osx.tar.gz":
   version "0.0.1"
-  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.41/iojs-v6.0.3-crash-handler.tar.gz#1f84ff98bdc8befd5e39c9f5e8d6e9a0026de87b"
+  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.61/iojs-v6.0.3-crash-handler-osx.tar.gz#5dabd1adf8704c24cf01e0fba58de64e8a196862"
 
 crc32-stream@^2.0.0:
   version "2.0.0"
@@ -8239,9 +8239,9 @@ object.values@^1.1.0:
     function-bind "^1.1.1"
     has "^1.0.3"
 
-"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.205-iojs-v6.0.3-osx-release.tar.gz":
+"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.207-iojs-v6.0.3-osx-release.tar.gz":
   version "0.3.99"
-  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.205-iojs-v6.0.3-osx-release.tar.gz#9b10361a5aceb9f875ddf406be14e03535c1e298"
+  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.207-iojs-v6.0.3-osx-release.tar.gz#290aeb1def71b8973d77e853c7fab8d62958a81c"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"

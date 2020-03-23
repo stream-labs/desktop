@@ -51,7 +51,7 @@ if (!gotTheLock) {
   const pid = require('process').pid;
   const fs = require('fs');
   // MAC-TODO
-  // const crashHandler = require('crash-handler');
+  const crashHandler = require('crash-handler');
 
   app.commandLine.appendSwitch('force-ui-direction', 'ltr');
 
@@ -235,9 +235,8 @@ if (!gotTheLock) {
       crashHandlerLogPath = app.getPath('userData');
     }
 
-    // MAC-TODO
-    // crashHandler.startCrashHandler(app.getAppPath(), process.env.SLOBS_VERSION, isDevMode.toString(), crashHandlerLogPath);
-    // crashHandler.registerProcess(pid, false);
+    crashHandler.startCrashHandler(app.getAppPath(), process.env.SLOBS_VERSION, isDevMode.toString(), crashHandlerLogPath);
+    crashHandler.registerProcess(pid, false);
 
     const Raven = require('raven');
 
