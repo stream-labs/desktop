@@ -17,7 +17,8 @@ export type TSocketEvent =
   | IEventPanelSettingsChangedSocketEvent
   | IMediaSharingSettingsUpdateSocketEvent
   | IPauseEventQueueSocketEvent
-  | IUnpauseEventQueueSocketEvent;
+  | IUnpauseEventQueueSocketEvent
+  | IPrimeSubEvent;
 
 interface IStreamlabelsSocketEvent {
   type: 'streamlabels';
@@ -50,6 +51,15 @@ export interface IEventSocketEvent {
     | 'justgivingdonation'
     | 'treat';
   message: IRecentEvent[];
+}
+
+interface IPrimeSubEvent {
+  type: 'streamlabs_prime_subscribe';
+  message: {
+    expires_at: string;
+    for: string;
+    type: 'streamlabs_prime_subscribe';
+  };
 }
 
 interface IFmExtEnabledSocketEvent {

@@ -145,6 +145,21 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     this.setSettings({ pinnedStatistics: pinned });
   }
 
+  get themeOptions() {
+    const options = [
+      { value: 'night-theme', description: $t('Night') },
+      { value: 'day-theme', description: $t('Day') },
+    ];
+
+    if (this.userService.isPrime) {
+      options.push(
+        { value: 'prime-dark', description: $t('Obsidian Prime') },
+        { value: 'prime-light', description: $t('Alabaster Prime') },
+      );
+    }
+    return options;
+  }
+
   getSettingsFormData(): TObsFormData {
     const settings = this.getSettings();
 
@@ -154,10 +169,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
         name: 'theme',
         description: $t('Theme'),
         type: 'OBS_PROPERTY_LIST',
-        options: [
-          { value: 'night-theme', description: $t('Night') },
-          { value: 'day-theme', description: $t('Day') },
-        ],
+        options: this.themeOptions,
         visible: true,
         enabled: true,
       },

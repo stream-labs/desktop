@@ -37,6 +37,7 @@ export default class SideNav extends Vue {
 
   openDevTools() {
     electron.ipcRenderer.send('openDevTools');
+    this.userService.showPrimeWindow();
   }
 
   handleAuth() {

@@ -10,7 +10,7 @@ import { $t } from 'services/i18n';
 import fs from 'fs';
 Vue.use(VueResize);
 
-import TitleBar from '../TitleBar.vue';
+import TitleBar from '../TitleBar';
 import { Inject } from '../../services/core/injector';
 import { CustomizationService } from 'services/customization';
 import { NavigationService } from 'services/navigation';
