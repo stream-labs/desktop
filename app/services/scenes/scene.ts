@@ -290,25 +290,15 @@ export class Scene {
     sceneNodesIds.splice(firstNodeIndex, nodesToMoveIds.length);
     sceneNodesIds.splice(newNodeIndex, 0, ...nodesToMoveIds);
 
-    this.SET_NODES_ORDER(sceneNodesIds);
-
-    this.reconcileNodeOrderWithObs();
+    this.setNodesOrder(sceneNodesIds);
   }
 
   setNodesOrder(order: string[]) {
     this.SET_NODES_ORDER(order);
-    this.reconcileNodeOrderWithObs();
-  }
 
-  /**
-   * Makes sure all scene items are in the correct order in OBS.
-   */
-  private reconcileNodeOrderWithObs() {
-    let orderedIDs: number[] = [];
-    this.getItems().forEach((item, index) => {
-      orderedIDs.push(item.obsSceneItemId);
-    });
-    this.getObsScene().orderItems(orderedIDs);
+    // reconcile order with OBS
+    const obsIds = this.getItems().map(item => item.obsSceneItemId);
+    this.getObsScene().orderItems(obsIds);
   }
 
   placeBefore(sourceNodeId: string, destNodeId: string) {
