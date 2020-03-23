@@ -34,8 +34,7 @@ import Main from 'components/windows/Main.vue';
 import CustomLoader from 'components/CustomLoader';
 import { getOS, OS } from 'util/operating-systems';
 
-// MAC-TODO
-// const crashHandler = window['require']('crash-handler');
+const crashHandler = window['require']('crash-handler');
 
 const { ipcRenderer, remote } = electron;
 const slobsVersion = remote.process.env.SLOBS_VERSION;
@@ -201,12 +200,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   I18nService.setVuei18nInstance(i18n);
 
+  const appService: AppService = AppService.instance;
+  crashHandler.registerProcess(appService.pid, false);
+
   // The worker window can safely access services immediately
   if (Utils.isWorkerWindow()) {
     const windowsService: WindowsService = WindowsService.instance;
 
     // Services
-    const appService: AppService = AppService.instance;
     const obsUserPluginsService: ObsUserPluginsService = ObsUserPluginsService.instance;
 
     // This is used for debugging
@@ -222,9 +223,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       ),
     );
 
-    // MAC-TODO
-    // crashHandler.registerProcess(appService.pid, false);
-
     await obsUserPluginsService.initialize();
 
     // Initialize OBS API
@@ -238,8 +236,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const message = apiInitErrorResultToMessage(apiResult);
       showDialog(message);
 
-      // MAC-TODO
-      // crashHandler.unregisterProcess(appService.pid);
+      crashHandler.unregisterProcess(appService.pid);
 
       obs.NodeObs.StopCrashHandler();
       obs.IPC.disconnect();
