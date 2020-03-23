@@ -10,13 +10,6 @@ import { $t } from 'services/i18n';
 import fs from 'fs';
 Vue.use(VueResize);
 
-// Pages
-import Studio from '../pages/Studio';
-import Chatbot from '../pages/Chatbot.vue';
-import PlatformAppStore from '../pages/PlatformAppStore.vue';
-import BrowseOverlays from 'components/pages/BrowseOverlays.vue';
-import Onboarding from '../pages/Onboarding';
-import LayoutEditor from '../pages/LayoutEditor';
 import TitleBar from '../TitleBar';
 import { Inject } from '../../services/core/injector';
 import { CustomizationService } from 'services/customization';
@@ -27,31 +20,21 @@ import { WindowsService } from 'services/windows';
 import LiveDock from '../LiveDock.vue';
 import StudioFooter from '../StudioFooter.vue';
 import CustomLoader from '../CustomLoader';
-import PatchNotes from '../pages/PatchNotes.vue';
-import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
 import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
-import FacebookMerge from 'components/pages/FacebookMerge';
 import { getPlatformService } from 'services/platforms';
+import * as pages from 'components/pages';
 
 @Component({
   components: {
+    ...pages,
     TitleBar,
     SideNav,
-    Studio,
-    BrowseOverlays,
-    Onboarding,
     LiveDock,
     StudioFooter,
     CustomLoader,
-    PatchNotes,
     NewsBanner,
-    Chatbot,
-    PlatformAppMainPage,
-    PlatformAppStore,
     ResizeBar,
-    FacebookMerge,
-    LayoutEditor,
   },
 })
 export default class Main extends Vue {

@@ -1,0 +1,64 @@
+.main-header {
+  background: var(--section);
+  height: 59px;
+  display: flex;
+  align-items: center;
+  padding-left: 24px;
+  font-size: 20px;
+  color: var(--title);
+}
+
+.sidebar {
+  width: 435px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: var(--section);
+  border-bottom: 1px solid var(--border);
+}
+
+.main-tab,
+.chat-header {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  color: var(--paragraph);
+}
+
+.main-tab {
+  border-bottom: 1px solid var(--border);
+
+  i {
+    margin-right: 20px;
+  }
+}
+
+.chat-header i {
+  margin-left: auto;
+}
+
+.matchmake-form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 80px;
+}
+
+.matchmake-dropdowns {
+  display: flex;
+  width: 576px;
+  justify-content: space-between;
+
+  > div {
+    width: 176px;
+  }
+}
+
+.matchmake-button {
+  width: 175px;
+  position: relative;
+  height: 64px;
+  border-radius: 32px !important;
+}
