@@ -33,10 +33,82 @@
   i {
     margin-right: 20px;
   }
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.main-tab.active {
+  background: var(--title);
+  color: var(--section);
 }
 
 .chat-header i {
   margin-left: auto;
+}
+
+.avatar {
+  height: 48px;
+  width: 48px;
+  border-radius: 100%;
+  overflow: hidden;
+  background: var(--section);
+}
+
+.friends-page-header {
+  padding: 12px 24px;
+  color: var(--paragraph);
+  font-size: 16px;
+}
+
+.friend {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  height: 72px;
+  color: var(--title);
+
+  &:hover {
+    background: var(--section-alt);
+    cursor: pointer;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+}
+
+.friend-name {
+  font-size: 16px;
+  margin-left: 16px;
+}
+
+.status {
+  height: 14px;
+  width: 14px;
+  border-radius: 100%;
+  position: absolute;
+  background: var(--button);
+  border: 2px solid var(--background);
+  left: 60px;
+  bottom: 12px;
+}
+
+.status.online {
+  background: var(--teal);
+}
+
+.status.streaming {
+  background: var(--accent);
+}
+
+.friend-streaming {
+  color: var(--paragraph);
+  opacity: 0.7;
+  margin-left: 16px;
+  font-style: italic;
 }
 
 .matchmake-form-container {
