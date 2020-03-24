@@ -38,7 +38,7 @@ export default class SideBar extends TsxComponent {
           onClick={() => this.setPage('friendsPage')}
         >
           <i class="icon-team-2" />
-          {$t('Friends (%{friendCount})', { friendCount: this.onlineFriendCount })}
+          {$t('Friends (%{friendCount} Online)', { friendCount: this.onlineFriendCount })}
         </span>
         <span class={styles.chatHeader}>
           {$t('Group Chats')}

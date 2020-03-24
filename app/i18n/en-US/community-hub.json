@@ -5,7 +5,7 @@
   "2-6 people per room": "2-6 people per room",
   "Matchmake": "Matchmake",
   "Matchmaking": "Matchmaking",
-  "Friends (%{friendCount})": "Friends (%{friendCount})",
+  "Friends (%{friendCount} Online)": "Friends (%{friendCount} Online)",
   "Friends": "Friends",
   "Group Chats": "Group Chats",
   "Direct Messages": "Direct Messages",

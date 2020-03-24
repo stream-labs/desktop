@@ -41,7 +41,7 @@ export default class FriendsPage extends TsxComponent {
     return (
       <div>
         <div class={styles.friendsPageHeader}>
-          {$t('Friends (%{friendCount})', { friendCount: this.onlineFriendCount })}
+          {$t('Friends (%{friendCount} Online)', { friendCount: this.onlineFriendCount })}
         </div>
         {this.friends.map(friend => this.friendRow(friend))}
       </div>
