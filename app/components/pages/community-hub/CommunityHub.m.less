@@ -8,6 +8,14 @@
   color: var(--title);
 }
 
+.avatar {
+  height: 48px;
+  width: 48px;
+  border-radius: 100%;
+  overflow: hidden;
+  background: var(--section);
+}
+
 .sidebar {
   width: 435px;
   height: 100%;
@@ -16,6 +24,11 @@
   position: relative;
   background: var(--section);
   border-bottom: 1px solid var(--border);
+}
+
+.avatar.sidebar-avatar {
+  width: 32px;
+  height: 32px;
 }
 
 .main-tab,
@@ -48,12 +61,35 @@
   margin-left: auto;
 }
 
-.avatar {
-  height: 48px;
-  width: 48px;
-  border-radius: 100%;
-  overflow: hidden;
-  background: var(--section);
+.chat-row {
+  display: flex;
+  padding: 8px 16px;
+  align-items: center;
+  position: relative;
+
+  .status {
+    left: 40px;
+    bottom: 6px;
+    border-color: var(--section);
+  }
+
+  &:hover {
+    background: var(--section-alt);
+    cursor: pointer;
+
+    .status {
+      border-color: var(--section-alt);
+    }
+  }
+
+  &.active {
+    background: var(--title);
+    color: var(--section);
+  }
+}
+
+.chat-name {
+  margin-left: 16px;
 }
 
 .friends-page-header {
@@ -73,6 +109,10 @@
   &:hover {
     background: var(--section-alt);
     cursor: pointer;
+
+    .status {
+      border-color: var(--section-alt);
+    }
   }
 
   a {
