@@ -69,10 +69,6 @@ export default class Main extends Vue {
     window.addEventListener('resize', this.windowSizeHandler);
   }
 
-  // mounted() {
-  //   Utils.measure('main mounted');
-  // }
-
   get bulkLoadFinished() {
     return this.$store.state.bulkLoadFinished;
   }

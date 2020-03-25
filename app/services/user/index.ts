@@ -508,9 +508,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.LOGIN(auth);
     this.VALIDATE_LOGIN(true);
     this.setSentryContext();
-    Utils.measure('login event start');
     this.userLogin.next(auth);
-    Utils.measure('login event finish');
 
     const [validateLoginResult, validatePlatformResult] = await Promise.all([
       this.validateLogin(),
@@ -521,8 +519,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       this.setPrimeStatus(),
     ]);
     this.subscribeToSocketConnection();
-
-    Utils.measure('platform validated');
 
     if (!validateLoginResult) {
       this.logOut();

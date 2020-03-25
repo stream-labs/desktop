@@ -128,7 +128,6 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
   @Inject() fileManagerService: FileManagerService;
 
   load() {
-    Utils.measure('start loading translations');
     if (this.isLoaded) return;
     const i18nPath = this.getI18nPath();
 
@@ -171,7 +170,6 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
 
     I18nService.uploadTranslationsToVueI18n();
     this.isLoaded = true;
-    Utils.measure('finish loading translations');
   }
 
   getFallbackLocale() {

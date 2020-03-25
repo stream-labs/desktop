@@ -101,16 +101,11 @@ export class AppService extends StatefulService<IAppState> {
   @track('app_start')
   @RunInLoadingMode()
   async load() {
-    Utils.measure('app load');
     if (Utils.isDevMode()) {
       electron.ipcRenderer.on('showErrorAlert', () => {
         this.SET_ERROR_ALERT(true);
       });
     }
-
-    Utils.measure('Init settings start');
-    this.settingsService;
-    Utils.measure('Init settings finish');
 
     // perform several concurrent http requests
     await Promise.all([
@@ -126,8 +121,6 @@ export class AppService extends StatefulService<IAppState> {
       console.error('Auto login failed', e);
     });
 
-    Utils.measure('logged in');
-
     // Second, we want to start the crash reporter service.  We do this
     // after the user service because we want crashes to be associated
     // with a particular user if possible.
@@ -136,9 +129,7 @@ export class AppService extends StatefulService<IAppState> {
     if (!this.userService.isLoggedIn) {
       // If this user is logged in, this would have already happened as part of login
       // TODO: We should come up with a better way to handle this.
-      Utils.measure('init collection');
       await this.sceneCollectionsService.initialize();
-      Utils.measure('init collection finish');
     }
 
     this.SET_ONBOARDED(this.onboardingService.startOnboardingIfRequired());
@@ -161,7 +152,6 @@ export class AppService extends StatefulService<IAppState> {
 
     this.protocolLinksService.start(this.state.argv);
 
-    Utils.measure('load finished');
     ipcRenderer.send('AppInitFinished');
   }
 
@@ -263,7 +253,6 @@ export class AppService extends StatefulService<IAppState> {
   }
 
   private async downloadAutoGameCaptureConfig() {
-    Utils.measure('game capture requested');
     // download game-list for auto game capture
     await downloadFile(
       'https://slobs-cdn.streamlabs.com/configs/game_capture_list.lst',

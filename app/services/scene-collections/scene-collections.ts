@@ -107,18 +107,12 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * initialization.
    */
   async initialize() {
-    Utils.measure('Collection initialize start');
     await this.migrate();
-    Utils.measure('Migrated config');
     await this.stateService.loadManifestFile();
-    Utils.measure('Manifest loaded');
     await this.migrateOS();
-    Utils.measure('Sync start');
     await this.safeSync();
-    Utils.measure('Sync finished');
     if (this.activeCollection && this.activeCollection.operatingSystem === getOS()) {
-      await this.load(this.activeCollection.id, true, false);
-      Utils.measure('Load 1 finished');
+      await this.load(this.activeCollection.id, true);
     } else if (this.loadableCollections.length > 0) {
       let latestId = this.loadableCollections[0].id;
       let latestModified = this.loadableCollections[0].modified;
@@ -131,11 +125,9 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       });
 
       await this.load(latestId);
-      Utils.measure('Load 2 finished');
     } else {
       await this.create({ auto: true });
     }
-    Utils.measure('Collection initialize finish');
     this.collectionInitialized.next();
   }
 
@@ -178,18 +170,14 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * @param id The id of the colleciton to load
    * @param shouldAttemptRecovery whether a new copy of the file should
    * be downloaded from the server if loading fails.
-   * @param informServer send an http request to the server to update active collection ID
    */
   @RunInLoadingMode()
-  async load(id: string, shouldAttemptRecovery = true, informServer = true): Promise<void> {
+  async load(id: string, shouldAttemptRecovery = true): Promise<void> {
     await this.deloadCurrentApplicationState();
-    Utils.measure('app state is deloaded');
     try {
-      await this.setActiveCollection(id, informServer);
+      await this.setActiveCollection(id);
 
-      Utils.measure('ActiveCollection is set');
       await this.readCollectionDataAndLoadIntoApplicationState(id);
-      Utils.measure('State is set');
     } catch (e) {
       console.error('Error loading collection!', e);
 
@@ -686,12 +674,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     const collection = this.collections.find(coll => coll.id === id);
 
     if (collection) {
-      if (informServer && collection.serverId && this.userService.isLoggedIn) {
-        try {
-          await this.serverApi.makeSceneCollectionActive(collection.serverId);
-        } catch (e) {
-          console.warn('Failed setting active collection');
-        }
+      if (collection.serverId && this.userService.isLoggedIn) {
+        this.serverApi.makeSceneCollectionActive(collection.serverId);
       }
       this.stateService.SET_ACTIVE_COLLECTION(id);
       this.collectionSwitched.next(collection);
@@ -740,7 +724,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
           if (!success) failed = true;
         } else if (new Date(inManifest.modified) > new Date(onServer.last_updated_at)) {
-          Utils.measure(`need to update on server ${inManifest.name}`);
           const success = await this.performSyncStep('Update on server', async () => {
             const exists = await this.stateService.collectionFileExists(inManifest.id);
 
@@ -810,7 +793,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         if (!success) failed = true;
       }
     }
-    Utils.measure('Step 1 finished');
 
     for (const inManifest of this.stateService.state.collections) {
       const onServer = serverCollections.find(coll => coll.id === inManifest.serverId);
