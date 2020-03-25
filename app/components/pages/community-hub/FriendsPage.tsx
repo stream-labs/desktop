@@ -16,7 +16,7 @@ export default class FriendsPage extends TsxComponent {
   }
 
   get friends() {
-    return this.communityHubService.sortedFriends;
+    return this.communityHubService.views.sortedFriends;
   }
 
   friendRow(friend: IFriend) {

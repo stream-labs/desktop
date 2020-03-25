@@ -22,6 +22,7 @@ interface IChatRoom {
   id: string;
   name: string;
   members: Array<string>;
+  avatar: string;
 }
 
 interface ICommunityHubState {
@@ -39,6 +40,27 @@ const PAGES = () => ({
 class CommunityHubViews extends ViewHandler<ICommunityHubState> {
   get currentPage() {
     return PAGES()[this.state.currentPage];
+  }
+
+  get sortedFriends() {
+    return this.state.friends.sort((a, b) => {
+      if (a.status === b.status) return 0;
+      if (a.status === 'streaming' && b.status !== 'streaming') return -1;
+      if (a.status === 'online' && b.status !== 'streaming') return -1;
+      return 1;
+    });
+  }
+
+  get groupChats() {
+    return this.state.chatrooms.filter(chatroom => chatroom.members.length > 1);
+  }
+
+  get directMessages() {
+    return this.state.chatrooms.filter(chatroom => chatroom.members.length < 2);
+  }
+
+  findFriend(friendId: string) {
+    return this.state.friends.find(friend => friend.id === friendId);
   }
 }
 
@@ -81,14 +103,5 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
 
   get views() {
     return new CommunityHubViews(this.state);
-  }
-
-  get sortedFriends() {
-    return this.state.friends.sort((a, b) => {
-      if (a.status === b.status) return 0;
-      if (a.status === 'streaming' && b.status !== 'streaming') return -1;
-      if (a.status === 'online' && b.status !== 'streaming') return -1;
-      return 1;
-    });
   }
 }

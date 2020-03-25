@@ -23,6 +23,46 @@ export default class SideBar extends TsxComponent {
     this.communityHubService.setPage(page);
   }
 
+  get groupChatRows() {
+    const groupChats = this.communityHubService.views.groupChats;
+    return (
+      <div>
+        <span class={styles.chatHeader}>
+          {$t('Group Chats')}
+          <i class="icon-add-circle" />
+        </span>
+        {groupChats.map(chat => (
+          <div class={cx(styles.chatRow, { [styles.active]: this.currentTab === chat.id })}>
+            <img class={cx(styles.avatar, styles.sidebarAvatar)} src={chat.avatar} />
+            <div class={styles.chatName}>{chat.name}</div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  get directMessageRows() {
+    const directMessages = this.communityHubService.views.directMessages;
+    return (
+      <div>
+        <span class={styles.chatHeader}>
+          {$t('Direct Messages')}
+          <i class="icon-add-circle" />
+        </span>
+        {directMessages.map(chat => {
+          const friend = this.communityHubService.views.findFriend(chat.members[0]);
+          return (
+            <div class={cx(styles.chatRow, { [styles.active]: this.currentTab === chat.id })}>
+              <img class={cx(styles.avatar, styles.sidebarAvatar)} src={chat.avatar} />
+              <div class={cx(styles.status, styles[friend.status])} />
+              <div class={styles.chatName}>{chat.name}</div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
   render() {
     return (
       <div class={styles.sidebar}>
@@ -40,14 +80,8 @@ export default class SideBar extends TsxComponent {
           <i class="icon-team-2" />
           {$t('Friends (%{friendCount} Online)', { friendCount: this.onlineFriendCount })}
         </span>
-        <span class={styles.chatHeader}>
-          {$t('Group Chats')}
-          <i class="icon-add-circle" />
-        </span>
-        <span class={styles.chatHeader}>
-          {$t('Direct Messages')}
-          <i class="icon-add-circle" />
-        </span>
+        {this.groupChatRows}
+        {this.directMessageRows}
       </div>
     );
   }
