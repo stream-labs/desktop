@@ -2,15 +2,11 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" >
-    <link rel="stylesheet" type="text/css" href="vendor/foundation.min.css" />
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self'">
+    <link rel="stylesheet" type="text/css" href="vendor/foundation.min.css"  />
     <link href="vendor/roboto.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="vendor/fontawesome-free-5.1.0-web/css/all.css" />
     <link rel="stylesheet" href="vendor/flexboxgrid.min.css" type="text/css" >
-    <script>
-      console.log('first script');
-      window['firstScriptTime'] = Date.now();
-    </script>
     <script src="bundles/renderer.js"></script>
   </head>
   <body style="background-color: transparent;">

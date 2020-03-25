@@ -1,6 +1,5 @@
 'use strict';
 let lastEventTime = 0;
-measure('Main js started');
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Environment Variables
@@ -263,7 +262,6 @@ if (!gotTheLock) {
 
     // setTimeout(() => {
       workerWindow.loadURL(`${global.indexUrl}?windowId=worker`).then(() => measure('workerLoaded'));
-      measure('Worker window created');
     // }, 10 * 1000);
 
     // All renderers should use ipcRenderer.sendTo to send to communicate with
@@ -295,7 +293,6 @@ if (!gotTheLock) {
 
     // setTimeout(() => {
       mainWindow.loadURL(`${global.indexUrl}?windowId=main`);
-      measure('Main window created');
     // }, 5 * 1000)
 
     mainWindowState.manage(mainWindow);
@@ -359,7 +356,6 @@ if (!gotTheLock) {
     childWindow.removeMenu();
 
     childWindow.loadURL(`${global.indexUrl}?windowId=child`);
-    measure('Child window created');
 
     // The child window is never closed, it just hides in the
     // background until it is needed.
@@ -476,7 +472,6 @@ if (!gotTheLock) {
   });
 
   app.on('ready', () => {
-    measure('App ready');
     if (
       !process.argv.includes('--skip-update') &&
       ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE)) {
