@@ -201,7 +201,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   I18nService.setVuei18nInstance(i18n);
 
   const appService: AppService = AppService.instance;
-  crashHandler.registerProcess(appService.pid, false);
+
+  if (!Utils.isOneOffWindow()) {
+    crashHandler.registerProcess(appService.pid, false);
+  }
 
   // The worker window can safely access services immediately
   if (Utils.isWorkerWindow()) {
