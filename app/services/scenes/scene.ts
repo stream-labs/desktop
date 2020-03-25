@@ -60,6 +60,8 @@ export class Scene {
   }
 
   getNode(sceneNodeId: string): TSceneNode {
+    if (!this.state.nodesMap[sceneNodeId]) return null;
+
     // try to get a node instance from cache
     const cachedNode = this.scenesService.getNodeFromCache(sceneNodeId);
     if (cachedNode) return cachedNode;
