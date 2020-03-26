@@ -60,6 +60,13 @@ export class Scene {
   }
 
   getNode(sceneNodeId: string): TSceneNode {
+    if (!this.state.nodesMap[sceneNodeId]) return null;
+
+    // try to get a node instance from cache
+    const cachedNode = this.scenesService.getNodeFromCache(sceneNodeId);
+    if (cachedNode) return cachedNode;
+
+    // otherwise create a new instance
     const nodeModel = this.state.nodes.find(
       sceneItemModel => sceneItemModel.id === sceneNodeId,
     ) as ISceneItem;
@@ -290,25 +297,15 @@ export class Scene {
     sceneNodesIds.splice(firstNodeIndex, nodesToMoveIds.length);
     sceneNodesIds.splice(newNodeIndex, 0, ...nodesToMoveIds);
 
-    this.SET_NODES_ORDER(sceneNodesIds);
-
-    this.reconcileNodeOrderWithObs();
+    this.setNodesOrder(sceneNodesIds);
   }
 
   setNodesOrder(order: string[]) {
     this.SET_NODES_ORDER(order);
-    this.reconcileNodeOrderWithObs();
-  }
 
-  /**
-   * Makes sure all scene items are in the correct order in OBS.
-   */
-  private reconcileNodeOrderWithObs() {
-    let orderedIDs: number[] = [];
-    this.getItems().forEach((item, index) => {
-      orderedIDs.push(item.obsSceneItemId);
-    });
-    this.getObsScene().orderItems(orderedIDs);
+    // reconcile order with OBS
+    const obsIds = this.getItems().map(item => item.obsSceneItemId);
+    this.getObsScene().orderItems(obsIds);
   }
 
   placeBefore(sourceNodeId: string, destNodeId: string) {
@@ -357,10 +354,15 @@ export class Scene {
       if (nodeModel.sceneNodeType === 'folder') {
         this.createFolder(nodeModel.name, { id: nodeModel.id });
       } else {
-        this.ADD_SOURCE_TO_SCENE(nodeModel.id, nodeModel.sourceId, obsSceneItems[itemIndex].id);
-        this.getItem(nodeModel.id).loadItemAttributes(nodeModel);
+        this.ADD_SOURCE_TO_SCENE(
+          nodeModel.id,
+          nodeModel.sourceId,
+          obsSceneItems[itemIndex].id,
+          nodeModel,
+        );
         itemIndex++;
       }
+      this.scenesService.addItemToCache(this.id, nodeModel.id);
     });
 
     // add items to folders
@@ -464,8 +466,42 @@ export class Scene {
   }
 
   @mutation()
-  private ADD_SOURCE_TO_SCENE(sceneItemId: string, sourceId: string, obsSceneItemId: number) {
-    this.state.nodes.unshift({
+  private ADD_SOURCE_TO_SCENE(
+    sceneItemId: string,
+    sourceId: string,
+    obsSceneItemId: number,
+    customSceneItem?: ISceneItemInfo,
+  ) {
+    // define default attributes
+    let visible = true;
+    // Position in video space
+    let position = { x: 0, y: 0 };
+    let crop = {
+      top: 0,
+      bottom: 0,
+      left: 0,
+      right: 0,
+    };
+    let locked = false;
+    // Scale between 0 and 1
+    let scale = { x: 1.0, y: 1.0 };
+    let rotation = 0;
+    let streamVisible = true;
+    let recordingVisible = true;
+
+    // set custom attributes if provided
+    if (customSceneItem) {
+      visible = customSceneItem.visible;
+      position = { x: customSceneItem.x, y: customSceneItem.y };
+      crop = customSceneItem.crop;
+      scale = { x: customSceneItem.scaleX, y: customSceneItem.scaleY };
+      rotation = customSceneItem.rotation;
+      locked = !!customSceneItem.locked;
+      streamVisible = !!customSceneItem.streamVisible;
+      recordingVisible = !!customSceneItem.recordingVisible;
+    }
+
+    const sceneItem: ISceneItem = {
       sceneItemId,
       sourceId,
       obsSceneItemId,
@@ -477,31 +513,26 @@ export class Scene {
 
       transform: {
         // Position in video space
-        position: { x: 0, y: 0 },
-
+        position,
         // Scale between 0 and 1
-        scale: { x: 1.0, y: 1.0 },
-
-        crop: {
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
-        },
-
-        rotation: 0,
+        scale,
+        crop,
+        rotation,
       },
+      visible,
+      locked,
+      streamVisible,
+      recordingVisible,
+    };
 
-      visible: true,
-      locked: false,
-      streamVisible: true,
-      recordingVisible: true,
-    });
+    this.state.nodes.unshift(sceneItem);
+    this.state.nodesMap[sceneItemId] = sceneItem;
   }
 
   @mutation()
   private ADD_FOLDER_TO_SCENE(folderModel: ISceneItemFolder) {
     this.state.nodes.unshift(folderModel);
+    this.state.nodesMap[folderModel.id] = folderModel;
   }
 
   @mutation()
@@ -509,15 +540,11 @@ export class Scene {
     this.state.nodes = this.state.nodes.filter(item => {
       return item.id !== nodeId;
     });
+    delete this.state.nodesMap[nodeId];
   }
 
   @mutation()
   private SET_NODES_ORDER(order: string[]) {
-    // TODO: This is O(n^2)
-    this.state.nodes = order.map(id => {
-      return this.state.nodes.find(item => {
-        return item.id === id;
-      });
-    });
+    this.state.nodes = order.map(id => this.state.nodesMap[id]);
   }
 }

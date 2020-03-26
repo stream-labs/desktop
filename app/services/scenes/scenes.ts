@@ -5,7 +5,7 @@ import { Subject } from 'rxjs';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import { TransitionsService } from 'services/transitions';
 import { WindowsService } from 'services/windows';
-import { Scene, SceneItem } from './index';
+import { Scene, SceneItem, TSceneNode } from './index';
 import { ISource, SourcesService, ISourceAddOptions } from 'services/sources';
 import { Inject } from 'services/core/injector';
 import * as obs from '../../../obs-api';
@@ -20,7 +20,12 @@ export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 export interface IScene extends IResource {
   id: string;
   name: string;
+
+  // array of nodes with preserved order
   nodes: (ISceneItem | ISceneItemFolder)[];
+
+  // dictionary of nodes where key is nodeId
+  nodesMap: Dictionary<ISceneItem | ISceneItemFolder>;
 }
 
 export interface ISceneNodeAddOptions {
@@ -183,6 +188,16 @@ export class ScenesService extends StatefulService<IScenesState> {
     scenes: {},
   };
 
+  // keeps instances of SceneItem and SceneFolder to speed-up API calls
+  private cachedNodes: Dictionary<TSceneNode> = {};
+
+  /**
+   * return TSceneNode from the cache
+   */
+  getNodeFromCache(id: string): TSceneNode {
+    return this.cachedNodes[id];
+  }
+
   get views() {
     return new ScenesViews(this.state);
   }
@@ -198,6 +213,20 @@ export class ScenesService extends StatefulService<IScenesState> {
   @Inject() private sourcesService: SourcesService;
   @Inject() private transitionsService: TransitionsService;
 
+  protected init() {
+    // subscribe to itemAdded and itemRemoved event to sync cachedNodes
+    this.itemAdded.subscribe(itemModel => {
+      this.addItemToCache(itemModel.sceneId, itemModel.id);
+    });
+    this.itemRemoved.subscribe(itemModel => {
+      delete this.cachedNodes[itemModel.id];
+    });
+  }
+
+  addItemToCache(sceneId: string, itemId: string) {
+    this.cachedNodes[itemId] = this.views.getScene(sceneId).getNode(itemId);
+  }
+
   @mutation()
   private ADD_SCENE(id: string, name: string) {
     Vue.set<IScene>(this.state.scenes, id, {
@@ -205,6 +234,7 @@ export class ScenesService extends StatefulService<IScenesState> {
       name,
       resourceId: `Scene${JSON.stringify([id])}`,
       nodes: [],
+      nodesMap: {},
     });
     this.state.displayOrder.push(id);
   }
