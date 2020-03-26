@@ -21,7 +21,7 @@ export interface IFriend {
 interface IChatRoom {
   id: string;
   name: string;
-  members: Array<string>;
+  members: Array<IFriend>;
   avatar: string;
 }
 

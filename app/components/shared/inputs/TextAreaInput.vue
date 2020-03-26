@@ -12,7 +12,7 @@
       :value="value"
       @input="handleInput"
       class="text-area radius"
-      :class="{ 'full-width': options.fullWidth  }"
+      :class="{ 'full-width': options.fullWidth, fixed: options.fixedSize }"
       :name="options.uuid"
       :disabled="metadata.disabled"
       :rows="metadata.rows || 2"
@@ -25,15 +25,18 @@
 <script lang="ts" src="./TextAreaInput.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../../styles/index";
+@import '../../../styles/index';
 
 .text-area-container.full-width,
 .text-area.full-width {
   width: 100%;
 }
 
+.text-area.fixed {
+  resize: none;
+}
+
 .text-area:focus {
   background-color: var(--border);
 }
 </style>
-

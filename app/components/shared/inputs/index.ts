@@ -109,10 +109,12 @@ export interface IFileMetadata extends IInputMetadata {
 
 export interface ITextAreaMetadata extends IInputMetadata {
   placeholder: string;
-  max: number;
-  min: number;
+  max?: number;
+  min?: number;
   blockReturn: boolean;
   rows: number;
+  fullWidth?: boolean;
+  fixedSize?: boolean;
 }
 
 // a helper for creating metadata for inputs

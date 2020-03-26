@@ -11,5 +11,9 @@
   "Direct Messages": "Direct Messages",
   "Streaming %{gameTitle}": "Streaming %{gameTitle}",
   "Direct Message": "Direct Message",
-  "Unfriend": "Unfriend"
+  "Unfriend": "Unfriend",
+  "Members (%{numberOfMembers})": "Members (%{numberOfMembers})",
+  "Chat Info": "Chat Info",
+  "Message %{chatName}": "Message %{chatName}",
+  "Send": "Send"
 }

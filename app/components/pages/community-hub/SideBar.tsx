@@ -53,13 +53,13 @@ export default class SideBar extends TsxComponent {
           <i class="icon-add-circle" />
         </span>
         {directMessages.map(chat => {
-          const friend = this.communityHubService.views.findFriend(chat.members[0]);
+          const friend = chat.members[0];
           return (
             <div
               class={cx(styles.chatRow, { [styles.active]: this.currentTab === chat.id })}
               onClick={() => this.setPage(chat.id)}
             >
-              <img class={cx(styles.avatar, styles.sidebarAvatar)} src={chat.avatar} />
+              <img class={styles.avatar} src={chat.avatar} />
               <div class={cx(styles.status, styles[friend.status])} />
               <div class={styles.chatName}>{chat.name}</div>
               {friend.is_prime && <i class={cx('icon-prime', styles.primeIcon)} />}
