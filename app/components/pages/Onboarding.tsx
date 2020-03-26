@@ -173,14 +173,14 @@ export default class OnboardingPage extends TsxComponent<{}> {
         hideButton: true,
       });
 
-      steps.push({
-        element: (
-          <Multistream slot={(steps.length + 1).toString()} continue={() => this.continue()} />
-        ),
-        disableControls: false,
-        hideSkip: false,
-        hideButton: true,
-      });
+      // steps.push({
+      //   element: (
+      //     <Multistream slot={(steps.length + 1).toString()} continue={() => this.continue()} />
+      //   ),
+      //   disableControls: false,
+      //   hideSkip: false,
+      //   hideButton: true,
+      // });
     }
 
     if (this.onboardingService.isFacebookAuthed && this.fbSetupEnabled) {
