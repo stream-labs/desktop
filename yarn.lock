@@ -3831,9 +3831,9 @@ cosmiconfig@^5.2.0:
     js-yaml "^3.13.1"
     parse-json "^4.0.0"
 
-"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.64/iojs-v6.0.3-crash-handler-osx.tar.gz":
+"crash-handler@https://github.com/stream-labs/crash-handler/releases/download/v0.0.65/iojs-v6.0.3-crash-handler-osx.tar.gz":
   version "0.0.1"
-  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.64/iojs-v6.0.3-crash-handler-osx.tar.gz#645a030aa9790456ef9e9f76512352bbbbd17b2e"
+  resolved "https://github.com/stream-labs/crash-handler/releases/download/v0.0.65/iojs-v6.0.3-crash-handler-osx.tar.gz#d6f8d2b9a3371de98746dab85da89658fca98adb"
 
 crc32-stream@^2.0.0:
   version "2.0.0"
@@ -5381,9 +5381,9 @@ flush-write-stream@^1.0.0:
     inherits "^2.0.1"
     readable-stream "^2.0.4"
 
-"font-manager@https://github.com/stream-labs/font-manager/releases/download/v1.0.12/iojs-v6.0.3-font-manager-osx.tar.gz":
+"font-manager@https://github.com/stream-labs/font-manager/releases/download/v1.0.13/iojs-v6.0.3-font-manager-osx.tar.gz":
   version "1.0.8"
-  resolved "https://github.com/stream-labs/font-manager/releases/download/v1.0.12/iojs-v6.0.3-font-manager-osx.tar.gz#f33b5ad7fd13c9f06fbd8fa9e7c33400a866493d"
+  resolved "https://github.com/stream-labs/font-manager/releases/download/v1.0.13/iojs-v6.0.3-font-manager-osx.tar.gz#188c8002585b05cbbbe2a381c59e9673f400e194"
 
 for-in@^1.0.2:
   version "1.0.2"
@@ -7939,9 +7939,9 @@ node-fetch@^2.3.0:
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.0.tgz#e633456386d4aa55863f676a7ab0daa8fdecb0fd"
   integrity sha512-8dG4H5ujfvFiqDmVu9fQ5bOHUC15JMjMY/Zumv26oOvvVJjM67KF8koCWIabKQ1GJIa9r2mMZscBq/TbdOcmNA==
 
-"node-fontinfo@https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.16/iojs-v6.0.3-node-fontinfo-osx.tar.gz":
+"node-fontinfo@https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.17/iojs-v6.0.3-node-fontinfo-osx.tar.gz":
   version "0.0.12"
-  resolved "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.16/iojs-v6.0.3-node-fontinfo-osx.tar.gz#06602c767482eff50d601a2069066159a1d4f336"
+  resolved "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.17/iojs-v6.0.3-node-fontinfo-osx.tar.gz#949d9f0b8e66ba216d7c1a0d1d9660383482eaeb"
 
 node-libs-browser@^2.0.0:
   version "2.0.0"
@@ -7972,9 +7972,9 @@ node-libs-browser@^2.0.0:
     util "^0.10.3"
     vm-browserify "0.0.4"
 
-"node-libuiohook@https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.39/iojs-v6.0.3-node-libuiohook-osx.tar.gz":
+"node-libuiohook@https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.40/iojs-v6.0.3-node-libuiohook-osx.tar.gz":
   version "0.0.9"
-  resolved "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.39/iojs-v6.0.3-node-libuiohook-osx.tar.gz#2f841b76395a771fd508eac566ea0ca8479a086a"
+  resolved "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.40/iojs-v6.0.3-node-libuiohook-osx.tar.gz#c761e548aec373d76fcd7ed4de2c92b5544dbb3c"
 
 node-object-hash@^1.2.0:
   version "1.4.2"
@@ -8027,9 +8027,9 @@ node-releases@^1.1.42:
   dependencies:
     semver "^6.3.0"
 
-"node-window-rendering@https://github.com/stream-labs/node-window-rendering/releases/download/1.0.7/iojs-v6.0.3-node-window-rendering-osx.tar.gz":
+"node-window-rendering@https://github.com/stream-labs/node-window-rendering/releases/download/1.0.8/iojs-v6.0.3-node-window-rendering-osx.tar.gz":
   version "1.0.0"
-  resolved "https://github.com/stream-labs/node-window-rendering/releases/download/1.0.7/iojs-v6.0.3-node-window-rendering-osx.tar.gz#f5f87d7bb86a2c7078c230bf5759358fd5a78240"
+  resolved "https://github.com/stream-labs/node-window-rendering/releases/download/1.0.8/iojs-v6.0.3-node-window-rendering-osx.tar.gz#62c21ab7888bbd68435ad978b3a959f828587b2d"
   dependencies:
     nan "^2.14.0"
 
