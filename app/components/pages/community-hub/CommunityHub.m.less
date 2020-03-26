@@ -16,6 +16,11 @@
   background: var(--section);
 }
 
+.prime-icon {
+  color: var(--prime);
+  margin-left: 8px;
+}
+
 .sidebar {
   width: 435px;
   height: 100%;
@@ -173,4 +178,80 @@
   position: relative;
   height: 64px;
   border-radius: 32px !important;
+}
+
+.chat-container {
+  padding: 24px;
+  overflow-y: auto;
+  font-size: 14px;
+}
+
+.message-container {
+  position: relative;
+  display: flex;
+  margin-bottom: 16px;
+  width: 100%;
+
+  .status {
+    left: 36px;
+    top: 36px;
+    bottom: auto;
+  }
+
+  .name-and-bubble {
+    margin-left: 20px;
+  }
+}
+
+.message-container.self {
+  flex-direction: row-reverse;
+
+  .status {
+    left: auto;
+    right: -4px;
+  }
+
+  .name-and-bubble {
+    margin-right: 20px;
+
+    span {
+      justify-content: flex-end;
+    }
+  }
+}
+
+.chat-bubble {
+  position: relative;
+  padding: 12px;
+  left: 12px;
+  max-width: 624px;
+  height: auto;
+  background: var(--section-alt);
+  box-shadow: 0 2px 8px rgba(9, 22, 29, 0.32);
+  border-radius: 8px;
+
+  &::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    left: -12px;
+    width: 0;
+    height: 0;
+    box-sizing: content-box;
+    border-top: 32px solid var(--section-alt);
+    border-left: 24px solid transparent;
+  }
+}
+
+.chat-bubble.self {
+  right: 12px;
+  left: auto;
+
+  &::before {
+    left: auto;
+    right: -12px;
+    border-right: 24px solid transparent;
+    border-left: 1px solid transparent;
+  }
 }

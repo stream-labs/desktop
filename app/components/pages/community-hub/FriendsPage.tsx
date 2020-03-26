@@ -25,7 +25,7 @@ export default class FriendsPage extends TsxComponent {
         <img class={styles.avatar} src={friend.avatar} />
         <div class={cx(styles.status, styles[friend.status])} />
         <div class={styles.friendName}>{friend.username}</div>
-        {friend.is_prime && <i class="icon-prime" />}
+        {friend.is_prime && <i class={cx('icon-prime', styles.primeIcon)} />}
         {friend.game_streamed && (
           <div class={styles.friendStreaming}>
             {$t('Streaming %{gameTitle}', { gameTitle: friend.game_streamed })}

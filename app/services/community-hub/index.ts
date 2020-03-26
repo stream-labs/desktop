@@ -7,7 +7,7 @@ import { InitAfter } from 'services/core';
 import * as pages from 'components/pages/community-hub/pages';
 
 // TODO: replace with real data
-import { friends, chatRooms } from './STUB_DATA';
+import { friends, chatRooms, self } from './STUB_DATA';
 
 export interface IFriend {
   id: string;
@@ -39,7 +39,7 @@ const PAGES = () => ({
 
 class CommunityHubViews extends ViewHandler<ICommunityHubState> {
   get currentPage() {
-    return PAGES()[this.state.currentPage];
+    return PAGES()[this.state.currentPage] || { component: pages.ChatPage };
   }
 
   get sortedFriends() {
@@ -57,6 +57,10 @@ class CommunityHubViews extends ViewHandler<ICommunityHubState> {
 
   get directMessages() {
     return this.state.chatrooms.filter(chatroom => chatroom.members.length < 2);
+  }
+
+  get currentChat() {
+    return this.state.chatrooms.find(chatroom => chatroom.id === this.state.currentPage);
   }
 
   findFriend(friendId: string) {
@@ -103,5 +107,9 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
 
   get views() {
     return new CommunityHubViews(this.state);
+  }
+
+  get self(): IFriend {
+    return self;
   }
 }

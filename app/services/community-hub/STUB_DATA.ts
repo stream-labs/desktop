@@ -35,6 +35,7 @@ export const friends = [
     username: 'Sypher',
     avatar: 'https://uploads.twitchalerts.com/000/115/861/060/DcfBcp6U0AA3qDy.png',
     status: 'online',
+    is_prime: true,
   },
   {
     id: '7',
@@ -47,8 +48,17 @@ export const friends = [
     username: 'jamaicanbacn',
     avatar: 'https://uploads.twitchalerts.com/000/115/861/060/DcfBcp6U0AA3qDy.png',
     status: 'online',
+    is_prime: true,
   },
 ];
+
+export const self = {
+  id: '0',
+  username: 'gettin_toasty',
+  avatar: 'https://uploads.twitchalerts.com/000/115/861/060/DcfBcp6U0AA3qDy.png',
+  status: 'online',
+  is_prime: true,
+};
 
 export const chatRooms = [
   {
@@ -82,3 +92,98 @@ export const chatRooms = [
     avatar: 'https://uploads.twitchalerts.com/000/115/861/060/DcfBcp6U0AA3qDy.png',
   },
 ];
+
+export const messages = {
+  1: [
+    {
+      id: '1',
+      user_id: '3',
+      chat_id: '1',
+      content: 'SJKFHDJKSF',
+      username: 'awkraccoon',
+      avatar: 'https://uploads.twitchalerts.com/000/115/861/060/DcfBcp6U0AA3qDy.png',
+    },
+    {
+      id: '1',
+      user_id: '5',
+      chat_id: '1',
+      content: 'SJ ksjhfdkshfjkw oiweuy osa oa udohnlfkljhal',
+      username: 'ZaM',
+      avatar: 'https://uploads.twitchalerts.com/000/115/861/060/DcfBcp6U0AA3qDy.png',
+    },
+    {
+      id: '1',
+      user_id: '3',
+      chat_id: '1',
+      content:
+        'akjhsgdsahj jhgfdsfjhkoie oszyiusy eiuw yriu ajhgsdjhag jag ewg j jskdhfjksd kfhrk krhgfks ahkjs he khsfkjdshfre khreh augshdgf siuyy kjhfds',
+      username: 'awkraccoon',
+      avatar: 'https://uploads.twitchalerts.com/000/115/861/060/DcfBcp6U0AA3qDy.png',
+    },
+    {
+      id: '1',
+      user_id: '5',
+      chat_id: '1',
+      content: ':)',
+      username: 'ZaM',
+      avatar: 'https://uploads.twitchalerts.com/000/115/861/060/DcfBcp6U0AA3qDy.png',
+    },
+    {
+      id: '1',
+      user_id: '3',
+      chat_id: '1',
+      content: 'skjh lkdjhgl asd?',
+      username: 'awkraccoon',
+      avatar: 'https://uploads.twitchalerts.com/000/115/861/060/DcfBcp6U0AA3qDy.png',
+    },
+    {
+      id: '1',
+      user_id: '1',
+      chat_id: '1',
+      content: 'Sskjhfks akuhsahn lks lgf jkld jlfdsadf',
+      username: 'swang36',
+      avatar: 'https://uploads.twitchalerts.com/000/115/861/060/DcfBcp6U0AA3qDy.png',
+    },
+    {
+      id: '1',
+      user_id: '0',
+      chat_id: '1',
+      content: 'sdfhs alk hfsahjf roijh asljkhnd',
+      username: 'gettin_toasty',
+      avatar: 'https://uploads.twitchalerts.com/000/115/861/060/DcfBcp6U0AA3qDy.png',
+    },
+    {
+      id: '1',
+      user_id: '0',
+      chat_id: '1',
+      content:
+        'asuidk ofgdluigoild lksdjflk ansm lgfjdlkgjfd ldnmtrnrd, aphsflkjs lahfrelkj slkdhnjf sdf losgfu',
+      username: 'gettin_toasty',
+      avatar: 'https://uploads.twitchalerts.com/000/115/861/060/DcfBcp6U0AA3qDy.png',
+    },
+    {
+      id: '1',
+      user_id: '3',
+      chat_id: '1',
+      content: 'safds',
+      username: 'awkraccoon',
+      avatar: 'https://uploads.twitchalerts.com/000/115/861/060/DcfBcp6U0AA3qDy.png',
+    },
+    {
+      id: '1',
+      user_id: '3',
+      chat_id: '1',
+      content: 'dfjklgh osiudsiouf jshd dflkghjfkdl sas',
+      username: 'awkraccoon',
+      avatar: 'https://uploads.twitchalerts.com/000/115/861/060/DcfBcp6U0AA3qDy.png',
+    },
+    {
+      id: '1',
+      user_id: '1',
+      chat_id: '1',
+      content: 'Ssdfdsf sdfsfe sfgruk flkSF',
+      username: 'swang36',
+      avatar: 'https://uploads.twitchalerts.com/000/115/861/060/DcfBcp6U0AA3qDy.png',
+    },
+  ],
+};
