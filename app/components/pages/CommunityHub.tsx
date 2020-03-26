@@ -13,13 +13,24 @@ export default class CommunityHub extends TsxComponent {
     return this.communityHubService.views.currentPage;
   }
 
+  get title() {
+    if (this.currentTab.title) return this.currentTab.title;
+    const chatroom = this.communityHubService.views.currentChat;
+    return (
+      <div style="display: flex; align-items: center;">
+        <img class={styles.avatar} src={chatroom.avatar} />
+        <div style="margin-left: 16px;">{chatroom.name}</div>
+      </div>
+    );
+  }
+
   render() {
     const PageComponent = this.currentTab.component;
     return (
       <div style="width: 100%; height: 100%; display: flex;">
         <SideBar />
-        <div style="width: 100%; height: 100%;">
-          <div class={styles.mainHeader}>{this.currentTab.title}</div>
+        <div style="width: 100%; height: 100%; display: flex; flex-direction: column;">
+          <div class={styles.mainHeader}>{this.title}</div>
           <PageComponent />
         </div>
       </div>
