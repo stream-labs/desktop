@@ -8100,9 +8100,15 @@ object.values@^1.1.0:
     function-bind "^1.1.1"
     has "^1.0.3"
 
+<<<<<<< HEAD
 "obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.137-spu1-iojs-v6.0.3-release.tar.gz":
   version "0.3.99"
   resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.137-spu1-iojs-v6.0.3-release.tar.gz#931a264edabb5aa24f9b4416b0da102a883ab348"
+=======
+"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.137-fro1-iojs-v6.0.3-release.tar.gz":
+  version "0.3.99"
+  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.137-fro1-iojs-v6.0.3-release.tar.gz#d8c61e2810081c7bdf557074a23a05d090db9cca"
+>>>>>>> fast_items_reorder
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
