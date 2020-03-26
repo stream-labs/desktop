@@ -63,6 +63,7 @@ export class HardwareService extends StatefulService<IHardwareServiceState> {
     const obsVideoInput = obs.InputFactory.create('dshow_input', uuid(), {
       audio_device_id: 'does_not_exist',
       video_device_id: 'does_not_exist',
+      active: false,
     });
 
     (obsAudioInput.properties.get('device_id') as obs.IListProperty).details.items.forEach(
