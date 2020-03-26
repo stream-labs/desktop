@@ -8101,6 +8101,7 @@ object.values@^1.1.0:
     has "^1.0.3"
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 "obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.137-spu1-iojs-v6.0.3-release.tar.gz":
   version "0.3.99"
   resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.137-spu1-iojs-v6.0.3-release.tar.gz#931a264edabb5aa24f9b4416b0da102a883ab348"
@@ -8109,6 +8110,11 @@ object.values@^1.1.0:
   version "0.3.99"
   resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.137-fro1-iojs-v6.0.3-release.tar.gz#d8c61e2810081c7bdf557074a23a05d090db9cca"
 >>>>>>> fast_items_reorder
+=======
+"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.137-dna1-iojs-v6.0.3-release.tar.gz":
+  version "0.3.99"
+  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.137-dna1-iojs-v6.0.3-release.tar.gz#47d53e3b44ce2f58b47adf1fa909d06e039a60cd"
+>>>>>>> update-osn-v0.5.137-dna1
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
