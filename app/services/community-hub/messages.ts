@@ -27,7 +27,7 @@ interface IMessagesState {
 
 class MessagesViews extends ViewHandler<IMessagesState> {
   messages(chatId: string) {
-    if (!this.state.messages[chatId]) return;
+    if (!this.state.messages[chatId]) return [];
     return this.state.messages[chatId];
   }
 }

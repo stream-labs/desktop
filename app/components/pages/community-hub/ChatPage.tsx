@@ -68,7 +68,7 @@ export default class ChatPage extends TsxComponent {
 
   render() {
     return (
-      <div style="display: flex; flex-direction: column; height: 100%;">
+      <div style="display: flex; flex-direction: column; height: calc(100% - 30px);">
         <div class={styles.chatContainer} ref="messages">
           {this.messages.map(message => this.chatMessage(message))}
         </div>

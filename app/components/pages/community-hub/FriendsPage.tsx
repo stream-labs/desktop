@@ -19,9 +19,20 @@ export default class FriendsPage extends TsxComponent {
     return this.communityHubService.views.sortedFriends;
   }
 
+  goToDm(friendId: string) {
+    const existingDm = this.communityHubService.views.directMessages.find(
+      dm => dm.members[0].id === friendId,
+    );
+    if (existingDm) {
+      this.communityHubService.setPage(existingDm.id);
+    } else {
+      this.communityHubService.addDm(friendId);
+    }
+  }
+
   friendRow(friend: IFriend) {
     return (
-      <div class={styles.friend}>
+      <div class={styles.friend} onClick={() => this.goToDm(friend.id)}>
         <img class={styles.avatar} src={friend.avatar} />
         <div class={cx(styles.status, styles[friend.status])} />
         <div class={styles.friendName}>{friend.username}</div>
