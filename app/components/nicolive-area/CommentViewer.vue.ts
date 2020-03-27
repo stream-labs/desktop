@@ -9,7 +9,7 @@ import { NicoliveCommentLocalFilterService } from 'services/nicolive-program/nic
 import { ChatMessage } from 'services/nicolive-program/MessageServerClient';
 import { Menu } from 'util/menus/Menu';
 import { clipboard } from 'electron';
-import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
+import { NicoliveCommentFilterService, getContentWithFilter } from 'services/nicolive-program/nicolive-comment-filter';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
 import { ChatMessageType } from 'services/nicolive-program/ChatMessage/classifier';
 import CommonComment from './comment/CommonComment.vue';
@@ -88,7 +88,7 @@ export default class CommentViewer extends Vue {
   }
 
   pinnedItemComtent(item: WrappedChat): string {
-    return `${item.value.content}  (${this.getFormattedLiveTime(item.value)})`;
+    return `${getContentWithFilter(item)}  (${this.getFormattedLiveTime(item.value)})`;
   }
 
   componentMap = componentMap;

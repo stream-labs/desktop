@@ -5,6 +5,13 @@ import { Inject } from 'util/injector';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
 import { map, distinctUntilChanged } from 'rxjs/operators';
 import { NicoliveFailure } from './NicoliveFailure';
+type WrappedChat = import('./nicolive-comment-viewer').WrappedChat;
+import { Subject } from 'rxjs';
+
+export function getContentWithFilter(wrapped: WrappedChat): string {
+  if (wrapped.filtered) return '##このコメントは表示されません##';
+  return wrapped.value.content ?? '';
+}
 
 interface INicoliveCommentFilterState {
   filters: FilterRecord[];
@@ -17,6 +24,23 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
   static initialState = {
     filters: [] as FilterRecord[],
   };
+
+  private stateChangeSubject = new Subject<INicoliveCommentFilterState>();
+  stateChange = this.stateChangeSubject.asObservable();
+
+  applyFilter(wrapped: WrappedChat) {
+    if (wrapped.type === 'normal') {
+      for (const record of this.state.filters) {
+        if (
+          (record.type === 'word' && wrapped.value.content?.includes(record.body))
+          || (record.type === 'user' && wrapped.value.user_id === record.body)
+          || (record.type === 'command' && wrapped.value.mail?.split(/\s/).includes(record.body))
+        ) return {...wrapped, filtered: true};
+      }
+    }
+    if (wrapped.filtered) return { ...wrapped, filtered: false };
+    return wrapped;
+  }
 
   private get programID() {
     return this.nicoliveProgramService.state.programID;
@@ -49,7 +73,7 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
       throw NicoliveFailure.fromClientError('fetchFilters', result);
     }
 
-    this.UPDATE_FILTERS(result.value);
+    this.updateFilters(result.value);
   }
 
   async addFilter(record: Omit<FilterRecord, 'id'>) {
@@ -67,7 +91,7 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
       return this.fetchFilters();
     }
     const filters = this.state.filters.concat(resultRecord);
-    this.UPDATE_FILTERS(filters);
+    this.updateFilters(filters);
   }
 
   async deleteFilters(ids: number[]) {
@@ -77,7 +101,12 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
     }
 
     const filters = this.state.filters.filter(rec => !ids.includes(rec.id));
+    this.updateFilters(filters);
+  }
+
+  private updateFilters(filters: FilterRecord[]) {
     this.UPDATE_FILTERS(filters);
+    this.stateChangeSubject.next({ filters });
   }
 
   @mutation()
