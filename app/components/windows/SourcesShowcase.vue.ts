@@ -148,8 +148,6 @@ export default class SourcesShowcase extends Vue {
     const sourcesList: ISourceDefinition[] = this.sourcesService
       .getAvailableSourcesTypesList()
       .filter(type => {
-        if (type.value === 'syphon-input') return false;
-
         // Freetype on windows is hidden
         if (type.value === 'text_ft2_source' && byOS({ [OS.Windows]: true, [OS.Mac]: false })) {
           return;
