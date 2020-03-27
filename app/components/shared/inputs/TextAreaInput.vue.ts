@@ -28,7 +28,8 @@ export default class TextAreaInput extends BaseInput<string, ITextAreaMetadata> 
     this.emitInput(val);
   }
 
-  handleEnter(ev: Event) {
+  handleEnter(ev: KeyboardEvent) {
     if (this.options.blockReturn) ev.preventDefault();
+    if (ev.code === 'Enter') this.$emit('enter');
   }
 }

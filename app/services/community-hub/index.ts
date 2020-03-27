@@ -1,3 +1,4 @@
+import uuid from 'uuid/v4';
 import { StatefulService, mutation, ViewHandler } from 'services/core/stateful-service';
 import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
@@ -21,7 +22,7 @@ export interface IFriend {
 interface IChatRoom {
   id: string;
   name: string;
-  members: Array<string>;
+  members: Array<IFriend>;
   avatar: string;
 }
 
@@ -92,6 +93,11 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
   }
 
   @mutation()
+  ADD_CHATROOM(chatroom: IChatRoom) {
+    this.state.chatrooms.push(chatroom);
+  }
+
+  @mutation()
   SET_CURRENT_PAGE(page: string) {
     this.state.currentPage = page;
   }
@@ -103,6 +109,18 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
 
   setPage(page: string) {
     this.SET_CURRENT_PAGE(page);
+  }
+
+  addDm(friendId: string) {
+    const friend = this.views.findFriend(friendId);
+    const id = uuid();
+    this.ADD_CHATROOM({
+      id,
+      members: [friend],
+      name: friend.username,
+      avatar: friend.avatar,
+    });
+    this.setPage(id);
   }
 
   get views() {
