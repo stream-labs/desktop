@@ -227,18 +227,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     let obs_instance_reused = false;
     const pipe_uuid = process.env['OBS_PIPE_UUID'];
     if (pipe_uuid) {
-      obs.IPC.connect(`slobs-${pipe_uuid}`);
-      process.env['OBS_PIPE_UUID'] = '';
+      try {
+        obs.IPC.connect(`slobs-${pipe_uuid}`);
 
-      apiResult = obs.NodeObs.OBS_API_initAPI(
-        'en-US',
-        appService.appDataDirectory,
-        electron.remote.process.env.SLOBS_VERSION,
-      );
+        apiResult = obs.NodeObs.OBS_API_initAPI(
+          'en-US',
+          appService.appDataDirectory,
+          electron.remote.process.env.SLOBS_VERSION,
+        );
 
-      if (apiResult === obs.EVideoCodes.Success) {
-        obs_instance_reused = true;
+        if (apiResult === obs.EVideoCodes.Success) {
+          obs_instance_reused = true;
+        }
+      } catch (error) {
+        console.error('Failed to reconnect to existing instance of obs.IPC');
       }
+      process.env['OBS_PIPE_UUID'] = '';
     }
 
     if (!obs_instance_reused) {
