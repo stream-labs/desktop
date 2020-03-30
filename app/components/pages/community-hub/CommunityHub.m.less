@@ -1,3 +1,5 @@
+@import '../../../styles/index.less';
+
 .page-container {
   width: 100%;
   height: 100%;
@@ -74,6 +76,11 @@
 
 .chat-header i {
   margin-left: auto;
+
+  &:hover {
+    color: var(--title);
+    cursor: pointer;
+  }
 }
 
 .right-bar-header {
@@ -168,11 +175,11 @@
 }
 
 .status.online {
-  background: var(--teal);
+  background: var(--online);
 }
 
 .status.streaming {
-  background: var(--accent);
+  background: var(--purple);
 }
 
 .friend-streaming {
@@ -254,7 +261,7 @@
   max-width: 624px;
   height: auto;
   background: var(--section-alt);
-  box-shadow: 0 2px 8px rgba(9, 22, 29, 0.32);
+  box-shadow: 0 2px 8px var(--shadow);
   border-radius: 8px;
 
   &::before {
@@ -303,4 +310,37 @@
   padding: 8px 12px;
   background: var(--teal-semi);
   color: var(--teal);
+}
+
+.add-chat-container {
+  background: var(--modal-overlay);
+  height: 100%;
+  width: 100%;
+  position: absolute;
+}
+
+.add-chat-modal {
+  .center();
+
+  position: absolute;
+  width: 640px;
+  height: 720px;
+  padding: 32px;
+  background: var(--background);
+  overflow: hidden;
+}
+
+.selected-friends {
+  display: flex;
+  height: auto;
+  overflow: auto;
+
+  li {
+    width: auto;
+    font-size: 14px;
+    padding: 4px;
+    white-space: nowrap;
+    background: var(--border);
+    color: var(--title);
+  }
 }

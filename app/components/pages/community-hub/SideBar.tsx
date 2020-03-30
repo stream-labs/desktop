@@ -7,7 +7,7 @@ import { Inject } from 'services';
 import { CommunityHubService } from 'services/community-hub';
 
 @Component({})
-export default class SideBar extends TsxComponent {
+export default class SideBar extends TsxComponent<{ onShowAddChatModal: () => void }> {
   @Inject() communityHubService: CommunityHubService;
 
   get currentTab() {
@@ -29,7 +29,7 @@ export default class SideBar extends TsxComponent {
       <div>
         <span class={styles.chatHeader}>
           {$t('Group Chats')}
-          <i class="icon-add-circle" />
+          <i class="icon-add-circle" onClick={() => this.$emit('showAddChatModal')} />
         </span>
         {groupChats.map(chat => (
           <div
@@ -50,7 +50,7 @@ export default class SideBar extends TsxComponent {
       <div>
         <span class={styles.chatHeader}>
           {$t('Direct Messages')}
-          <i class="icon-add-circle" />
+          <i class="icon-add-circle" onClick={() => this.$emit('showAddChatModal')} />
         </span>
         {directMessages.map(chat => {
           const friend = chat.members[0];
