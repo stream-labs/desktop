@@ -43,7 +43,9 @@ export default class CommunityHub extends TsxComponent {
             <ChatInfo onHideChat={() => (this.chatInfoVisible = false)} />
           )}
         </div>
-        {this.addChatModalVisible && <AddChatModal />}
+        {this.addChatModalVisible && (
+          <AddChatModal onCloseAddChatModal={() => (this.addChatModalVisible = false)} />
+        )}
       </div>
     );
   }

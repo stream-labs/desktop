@@ -9,6 +9,11 @@
   flex-grow: 1;
 }
 
+.row {
+  display: flex;
+  align-items: center;
+}
+
 .main-header {
   background: var(--section);
   height: 59px;
@@ -328,6 +333,12 @@
   padding: 32px;
   background: var(--background);
   overflow: hidden;
+
+  :global('icon-close') {
+    position: absolute;
+    right: 32px;
+    top: 32px;
+  }
 }
 
 .selected-friends {

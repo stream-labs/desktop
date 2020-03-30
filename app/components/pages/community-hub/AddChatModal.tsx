@@ -9,7 +9,7 @@ import { Inject } from 'services';
 import { CommunityHubService, IFriend } from 'services/community-hub';
 
 @Component({})
-export default class AddChatModal extends TsxComponent {
+export default class AddChatModal extends TsxComponent<{ onCloseAddChatModal: () => void }> {
   @Inject() communityHubService: CommunityHubService;
   @Inject() i18nService: I18nService;
 
@@ -29,12 +29,17 @@ export default class AddChatModal extends TsxComponent {
     );
   }
 
+  selectFriend(friend: IFriend) {
+    this.selectedFriends.push(friend);
+  }
+
   handleRemove(friendId: string) {
     this.selectedFriends = this.selectedFriends.filter(friend => friend.id !== friendId);
   }
 
   addChat() {
     this.communityHubService.addChat(this.selectedFriends, this.chatName, this.avatar);
+    this.$emit('closeAddChatModal');
   }
 
   render() {
@@ -42,13 +47,18 @@ export default class AddChatModal extends TsxComponent {
       <div class={styles.addChatContainer}>
         <div class={styles.addChatModal}>
           <h2>{$t('New Message')}</h2>
+          <i class="icon-close" onClick={() => this.$emit('closeAddChatModal')} />
           <TextInput vModel={this.chatName} />
-          <TextInput
-            onInput={(val: string) => this.updateSearch(val)}
-            value={this.searchValue}
-            metadata={{ placeholder: $t('Search Friends'), icon: 'icon-search' }}
-          />
-          <button class="button button--default">{$t('Go')}</button>
+          <div class={styles.row}>
+            <TextInput
+              onInput={(val: string) => this.updateSearch(val)}
+              value={this.searchValue}
+              metadata={{ placeholder: $t('Search Friends'), icon: 'search', fullWidth: true }}
+            />
+            <button class="button button--default" onClick={() => this.addChat()}>
+              {$t('Go')}
+            </button>
+          </div>
           <ul class={styles.selectedFriends}>
             {this.selectedFriends.map((friend, i) => (
               <li key={i} onClick={() => this.handleRemove(friend.id)}>
@@ -56,10 +66,10 @@ export default class AddChatModal extends TsxComponent {
               </li>
             ))}
           </ul>
-          {$t('Recent Conversations')}
+          <h2>{$t('Recent Conversations')}</h2>
           <ul>
             {this.friends.map(friend => (
-              <div class={styles.friend} onClick={() => {}}>
+              <div class={styles.friend} onClick={() => this.selectFriend(friend)}>
                 <img class={styles.avatar} src={friend.avatar} />
                 <div class={cx(styles.status, styles[friend.status])} />
                 <div class={styles.friendName}>{friend.username}</div>
