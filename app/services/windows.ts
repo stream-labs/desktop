@@ -173,7 +173,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       isShown: true,
       hideStyleBlockers: true,
       hideChat: false,
-      title: `Streamlabs OBS - ${remote.process.env.SLOBS_VERSION} - Private Beta`,
+      title: `Streamlabs OBS - ${remote.process.env.SLOBS_VERSION}`,
     },
     child: {
       componentName: '',
