@@ -30,6 +30,7 @@
     "typedoc": "typedoc --out docs/dist ./app/services/api/external-api/ --mode modules --theme ./docs/theme --readme ./docs/README.md --ignoreCompilerErrors --excludePrivate --excludeProtected --excludeExternals --hideGenerator",
     "compile-tests": "tsc -p test",
     "screentest": "node test/screentest/runner.js",
+    "performancetest": "node test/performance/performance-test-runner.js",
     "commit": "commit",
     "postinstall": "scripts/facemask-plugin-move.bat",
     "tail-obs-logs": "yarn install --cwd bin && node bin/tail-obs-logs.js",
