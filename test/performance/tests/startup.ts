@@ -42,7 +42,7 @@ function measureStartupTime(api: ApiClient) {
   const meter = getMeter();
   const metricsService = api.getResource<MetricsService>('MetricsService');
   const appMetrics = metricsService.getMetrics();
-  meter.addMeasurement('mainWindowLoad', appMetrics.mainWindowShowTime - appMetrics.appStartTime);
+  meter.addMeasurement('mainWindowShow', appMetrics.mainWindowShowTime - appMetrics.appStartTime);
   meter.addMeasurement(
     'sceneCollectionLoad',
     appMetrics.sceneCollectionLoadingTime - appMetrics.mainWindowShowTime,

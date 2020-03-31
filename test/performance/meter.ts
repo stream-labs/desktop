@@ -1,4 +1,11 @@
-type TMeterEvent = 'mainWindowShow' | 'sceneCollectionLoad' | 'CPU' | 'memory' | 'bundleSize';
+type TMeterEvent =
+  | 'mainWindowShow'
+  | 'sceneCollectionLoad'
+  | 'CPU'
+  | 'memory'
+  | 'bundleSize'
+  | 'addSources'
+  | 'removeSources';
 
 const units: { [key in TMeterEvent]: string } = {
   mainWindowShow: 'ms',
@@ -6,6 +13,8 @@ const units: { [key in TMeterEvent]: string } = {
   CPU: 'percent',
   memory: 'bite',
   bundleSize: 'bite',
+  addSources: 'ms',
+  removeSources: 'ms',
 };
 
 /**
@@ -35,14 +44,14 @@ class Meter {
     return this.recordedEvents;
   }
 
-  startMeasure(eventName: string) {
+  startMeasure(eventName: TMeterEvent) {
     if (this.pendingEvents[eventName]) {
       throw new Error(`Measurement of "${eventName}" has been already started`);
     }
     this.pendingEvents[eventName] = Date.now();
   }
 
-  stopMeasure(eventName: string) {
+  stopMeasure(eventName: TMeterEvent) {
     const eventStartTime = this.pendingEvents[eventName];
 
     if (!eventStartTime) {
@@ -56,7 +65,7 @@ class Meter {
     this.addMeasurement(eventName, duration);
   }
 
-  addMeasurement(eventName: string, duration: number) {
+  addMeasurement(eventName: TMeterEvent, duration: number) {
     if (!this.recordedEvents[eventName]) {
       this.recordedEvents[eventName] = { units: units[eventName], values: [] };
     }

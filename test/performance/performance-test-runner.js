@@ -9,6 +9,7 @@ const commitSHA = getCommitSHA();
 const args = process.argv.slice(2);
 const rimraf = require('rimraf');
 const Table = require('cli-table');
+const colors = require('colors');
 
 (async function main() {
   // prepare the dist dir
@@ -34,16 +35,47 @@ const Table = require('cli-table');
   const currentBranchResults = fs.readJsonSync(resultsPath);
   console.log('currentBranchResults', currentBranchResults);
 
-  printResults(baseBranchResults, currentBranchResults);
+  // const baseBranchResults = {
+  //   'Empty collection': {
+  //     mainWindowShow: { values: [1, 2, 3], units: 'ms' },
+  //     sceneCollectionLoad: { units: 'ms', values: [1, 2, 3, 4] },
+  //     bundleSize: { units: 'bite', values: [1, 2, 3, 4] },
+  //   },
+  //   'Empty collection 2': {
+  //     mainWindowShow: { values: [1, 2, 3], units: 'ms' },
+  //     sceneCollectionLoad: { units: 'ms', values: [1, 2, 3, 4, 5] },
+  //     bundleSize: { units: 'bite', values: [1, 2, 3, 4, 1, 1] },
+  //   },
+  // };
+  //
+  // const currentBranchResults = {
+  //   'Empty collection': {
+  //     mainWindowShow: { values: [1, 2, 3], units: 'ms' },
+  //     sceneCollectionLoad: { units: 'ms', values: [1, 2, 3, 4, 5] },
+  //     bundleSize: { units: 'bite', values: [1, 2, 3, 4, 1, 1] },
+  //   },
+  //   'Empty collection 2': {
+  //     mainWindowShow: { values: [1, 2, 3], units: 'ms' },
+  //     sceneCollectionLoad: { units: 'ms', values: [1, 2, 3, 4, 5] },
+  //     bundleSize: { units: 'bite', values: [1, 2, 3, 4, 1, 1] },
+  //   },
+  // };
+
+  const performanceDelta = printResults(baseBranchResults, currentBranchResults);
+  console.log('PERFORMANCE DELTA IS', `${formatPerformanceValue(performanceDelta)}%`);
 })();
 
 function printResults(baseBranchResults, currentBranchResults) {
   const comparisonResults = {};
+  let performanceDelta = 0;
   Object.keys(baseBranchResults).forEach(testName => {
     const baseBranchMetrics = baseBranchResults[testName];
-    console.log(`TEST ${testName}`);
-    const table = new Table();
-    table.push(['METRIC', 'BASE BRANCH AVG', 'CURRENT BRANCH AVG', 'UNIT', 'DIFF %']);
+    console.log(`${testName}`);
+    const table = new Table({
+      head: ['METRIC', 'UNITS', 'RECORDS', 'BASE BRANCH AVG', 'CURRENT BRANCH AVG', 'DIFF %'],
+      colWidths: [35, 10, 9, 17, 20, 20],
+    });
+
     Object.keys(baseBranchMetrics).forEach(metricName => {
       if (!comparisonResults[testName]) comparisonResults[testName] = {};
       const baseMetric = baseBranchMetrics[metricName];
@@ -57,15 +89,28 @@ function printResults(baseBranchResults, currentBranchResults) {
       const baseMetricValues = baseMetric.values;
       const baseMetricAvg = baseMetricValues.reduce((v1, v2) => v1 + v2) / baseMetricValues.length;
       const currentMetricValues = currentMetric.values;
-      const currentMetricAvg = currentMetricValues.reduce((v1, v2) => v1 + v2) / currentMetricValues.length;
+      const currentMetricAvg =
+        currentMetricValues.reduce((v1, v2) => v1 + v2) / currentMetricValues.length;
       const diff = baseMetricAvg / currentMetricAvg;
       const diffPercent = (1 - diff) * 100;
-      table.push([metricName, baseMetricAvg, currentMetricAvg, baseMetric.units, diffPercent]);
-
-      //console.log('Base', baseMetricAvg, 'Current', currentMetricAvg, 'diff', diffPercent);
+      performanceDelta += diffPercent;
+      table.push([
+        metricName,
+        baseMetric.units,
+        baseMetricValues.length,
+        baseMetricAvg,
+        currentMetricAvg,
+        formatPerformanceValue(diffPercent),
+      ]);
     });
     console.log(table.toString());
   });
+  return performanceDelta;
+}
+
+function formatPerformanceValue(val) {
+  val = Number(val.toFixed(5));
+  return val > 0 ? colors.red(`+${val}`) : colors.green(val);
 }
 
 async function updateCheck() {
