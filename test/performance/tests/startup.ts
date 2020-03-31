@@ -18,8 +18,9 @@ const path = require('path');
 
 usePerformanceTest();
 
-const RELOAD_ATTEMPTS = 2;
-const CPU_ATTEMPTS = 10;
+const RELOAD_ATTEMPTS = 20;
+const CPU_ATTEMPTS = 100;
+const ADD_SOURCES_ATTEMPTS = 30;
 
 /**
  * unzip a sample of a large scene collection to the SceneCollection folder
@@ -141,7 +142,7 @@ test('Add and remove sources', async t => {
   ];
 
   // create and delete 10 instances for each source type 3 times
-  let attempts = 3;
+  let attempts = ADD_SOURCES_ATTEMPTS;
   while (attempts--) {
     meter.startMeasure('addSources');
     let sourcesCount = 10;
