@@ -2,6 +2,7 @@ import { Component } from 'vue-property-decorator';
 import TsxComponent from 'components/tsx-component';
 import SideBar from './community-hub/SideBar';
 import ChatInfo from './community-hub/ChatInfo';
+import AddChatModal from './community-hub/AddChatModal';
 import styles from './community-hub/CommunityHub.m.less';
 import { Inject } from 'services';
 import { CommunityHubService } from 'services/community-hub';
@@ -11,6 +12,7 @@ export default class CommunityHub extends TsxComponent {
   @Inject() communityHubService: CommunityHubService;
 
   chatInfoVisible = true;
+  addChatModalVisible = false;
 
   get currentTab() {
     return this.communityHubService.views.currentPage;
@@ -30,14 +32,19 @@ export default class CommunityHub extends TsxComponent {
   render() {
     const PageComponent = this.currentTab.component;
     return (
-      <div style="width: 100%; height: 100%; display: flex;">
-        <SideBar />
-        <div class={styles.pageContainer}>
-          <div class={styles.mainHeader}>{this.title}</div>
-          <PageComponent />
+      <div style="width: 100%; height: 100%;">
+        <div style="width: 100%; height: 100%; display: flex;">
+          <SideBar onShowAddChatModal={() => (this.addChatModalVisible = true)} />
+          <div class={styles.pageContainer}>
+            <div class={styles.mainHeader}>{this.title}</div>
+            <PageComponent />
+          </div>
+          {!this.currentTab.title && this.chatInfoVisible && (
+            <ChatInfo onHideChat={() => (this.chatInfoVisible = false)} />
+          )}
         </div>
-        {!this.currentTab.title && this.chatInfoVisible && (
-          <ChatInfo onHideChat={() => (this.chatInfoVisible = false)} />
+        {this.addChatModalVisible && (
+          <AddChatModal onCloseAddChatModal={() => (this.addChatModalVisible = false)} />
         )}
       </div>
     );

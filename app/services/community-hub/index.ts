@@ -123,6 +123,12 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
     this.setPage(id);
   }
 
+  addChat(members: Array<IFriend>, name: string, avatar: string) {
+    const id = uuid();
+    this.ADD_CHATROOM({ id, members, name, avatar });
+    this.setPage(id);
+  }
+
   get views() {
     return new CommunityHubViews(this.state);
   }

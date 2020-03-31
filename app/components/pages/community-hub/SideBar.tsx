@@ -7,7 +7,7 @@ import { Inject } from 'services';
 import { CommunityHubService } from 'services/community-hub';
 
 @Component({})
-export default class SideBar extends TsxComponent {
+export default class SideBar extends TsxComponent<{ onShowAddChatModal: () => void }> {
   @Inject() communityHubService: CommunityHubService;
 
   get currentTab() {
@@ -29,12 +29,13 @@ export default class SideBar extends TsxComponent {
       <div>
         <span class={styles.chatHeader}>
           {$t('Group Chats')}
-          <i class="icon-add-circle" />
+          <i class="icon-add-circle" onClick={() => this.$emit('showAddChatModal')} />
         </span>
         {groupChats.map(chat => (
           <div
             class={cx(styles.chatRow, { [styles.active]: this.currentTab === chat.id })}
             onClick={() => this.setPage(chat.id)}
+            key={chat.id}
           >
             <img class={cx(styles.avatar, styles.sidebarAvatar)} src={chat.avatar} />
             <div class={styles.chatName}>{chat.name}</div>
@@ -50,7 +51,7 @@ export default class SideBar extends TsxComponent {
       <div>
         <span class={styles.chatHeader}>
           {$t('Direct Messages')}
-          <i class="icon-add-circle" />
+          <i class="icon-add-circle" onClick={() => this.$emit('showAddChatModal')} />
         </span>
         {directMessages.map(chat => {
           const friend = chat.members[0];
@@ -58,6 +59,7 @@ export default class SideBar extends TsxComponent {
             <div
               class={cx(styles.chatRow, { [styles.active]: this.currentTab === chat.id })}
               onClick={() => this.setPage(chat.id)}
+              key={chat.id}
             >
               <img class={styles.avatar} src={chat.avatar} />
               <div class={cx(styles.status, styles[friend.status])} />
