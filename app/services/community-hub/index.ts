@@ -107,6 +107,19 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
     this.SET_CHATROOMS(chatRooms);
   }
 
+  stringToHex(val: string) {
+    let hex: string;
+    let result = '';
+    val.split('').forEach(char => {
+      hex = char.charCodeAt(0).toString(16);
+      result += hex;
+    });
+    while (result.length < 6) {
+      result += '0';
+    }
+    return result.slice(0, 6);
+  }
+
   setPage(page: string) {
     this.SET_CURRENT_PAGE(page);
   }
@@ -123,9 +136,10 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
     this.setPage(id);
   }
 
-  addChat(members: Array<IFriend>, name: string, avatar: string) {
+  addChat(members: Array<IFriend>, name: string, avatar?: string) {
+    const imageOrCode = avatar || `#${this.stringToHex(name)}`;
     const id = uuid();
-    this.ADD_CHATROOM({ id, members, name, avatar });
+    this.ADD_CHATROOM({ id, members, name, avatar: imageOrCode });
     this.setPage(id);
   }
 

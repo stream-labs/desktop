@@ -31,16 +31,28 @@ export default class SideBar extends TsxComponent<{ onShowAddChatModal: () => vo
           {$t('Group Chats')}
           <i class="icon-add-circle" onClick={() => this.$emit('showAddChatModal')} />
         </span>
-        {groupChats.map(chat => (
-          <div
-            class={cx(styles.chatRow, { [styles.active]: this.currentTab === chat.id })}
-            onClick={() => this.setPage(chat.id)}
-            key={chat.id}
-          >
-            <img class={cx(styles.avatar, styles.sidebarAvatar)} src={chat.avatar} />
-            <div class={styles.chatName}>{chat.name}</div>
-          </div>
-        ))}
+        {groupChats.map(chat => {
+          const noImg = /^#/.test(chat.avatar);
+          console.log(chat.name, chat.avatar);
+          return (
+            <div
+              class={cx(styles.chatRow, { [styles.active]: this.currentTab === chat.id })}
+              onClick={() => this.setPage(chat.id)}
+              key={chat.id}
+            >
+              {!noImg && <img class={cx(styles.avatar, styles.sidebarAvatar)} src={chat.avatar} />}
+              {noImg && (
+                <div
+                  class={cx(styles.avatar, styles.sidebarAvatar, styles.noImgAvatar)}
+                  style={`background: ${chat.avatar};`}
+                >
+                  {chat.name.slice(0, 2)}
+                </div>
+              )}
+              <div class={styles.chatName}>{chat.name}</div>
+            </div>
+          );
+        })}
       </div>
     );
   }
