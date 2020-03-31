@@ -32,6 +32,7 @@ import uuid from 'uuid/v4';
 import Blank from 'components/windows/Blank.vue';
 import Main from 'components/windows/Main.vue';
 import CustomLoader from 'components/CustomLoader';
+import { MetricsService } from 'services/metrics';
 
 const crashHandler = window['require']('crash-handler');
 
@@ -276,8 +277,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     },
   });
 
+  let mainWindowShowTime = 0;
   if (Utils.isMainWindow()) {
     electron.remote.getCurrentWindow().show();
+    mainWindowShowTime = Date.now();
   }
 
   // Perform some final initialization now that services are ready
@@ -285,6 +288,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // setup translations for the current window
     if (!Utils.isWorkerWindow()) {
       I18nService.uploadTranslationsToVueI18n();
+    }
+
+    if (Utils.isMainWindow()) {
+      const metricsService: MetricsService = MetricsService.instance;
+      metricsService.actions.recordMetric('mainWindowShowTime', mainWindowShowTime);
     }
 
     if (usingSentry) {

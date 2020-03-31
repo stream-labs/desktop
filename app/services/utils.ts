@@ -1,7 +1,6 @@
 import URI from 'urijs';
 import isEqual from 'lodash/isEqual';
 import electron from 'electron';
-const BrowserWindow = electron.remote.BrowserWindow;
 
 export const enum EBit {
   ZERO,
@@ -181,7 +180,7 @@ export default class Utils {
 
   static makeChildWindowVisible() {
     const childWindowId: number = electron.ipcRenderer.sendSync('getWindowIds').child;
-    const childWindow = BrowserWindow.fromId(childWindowId);
+    const childWindow = electron.remote.BrowserWindow.fromId(childWindowId);
     childWindow.show();
     childWindow.restore();
   }

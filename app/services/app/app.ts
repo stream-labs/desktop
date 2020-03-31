@@ -36,6 +36,7 @@ import { Subject } from 'rxjs';
 import { DismissablesService } from 'services/dismissables';
 import { RestreamService } from 'services/restream';
 import { downloadFile } from '../../util/requests';
+import { MetricsService } from '../metrics';
 
 interface IAppState {
   loading: boolean;
@@ -91,6 +92,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private recentEventsService: RecentEventsService;
   @Inject() private dismissablesService: DismissablesService;
   @Inject() private restreamService: RestreamService;
+  @Inject() private metricsService: MetricsService;
 
   private loadingPromises: Dictionary<Promise<any>> = {};
 
@@ -150,6 +152,7 @@ export class AppService extends StatefulService<IAppState> {
     this.protocolLinksService.start(this.state.argv);
 
     ipcRenderer.send('AppInitFinished');
+    this.metricsService.recordMetric('sceneCollectionLoadingTime');
   }
 
   shutdownStarted = new Subject();

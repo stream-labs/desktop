@@ -1,4 +1,5 @@
 'use strict';
+const appStartTime = Date.now();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Environment Variables
@@ -93,7 +94,7 @@ if (!gotTheLock) {
       const serialized = args
         .map(arg => {
           if (typeof arg === 'string') return arg;
-    
+
           return util.inspect(arg);
         })
         .join(' ');
@@ -374,6 +375,7 @@ if (!gotTheLock) {
     const requests = { };
 
     function sendRequest(request, event = null, async = false) {
+      if (workerWindow.isDestroyed()) return;
       workerWindow.webContents.send('services-request', request);
       if (!event) return;
       requests[request.id] = Object.assign({}, request, { event, async });
@@ -647,6 +649,10 @@ if (!gotTheLock) {
       main: mainWindow.id,
       child: childWindow.id,
     };
+  });
+
+  ipcMain.on('getAppStartTime', e => {
+    e.returnValue = appStartTime;
   });
 
   let lastEventTime = 0;

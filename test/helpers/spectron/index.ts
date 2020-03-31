@@ -315,12 +315,14 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     // wrap in try/catch for the situation when we have a crash
     // so we still can read the logs after the crash
     try {
-      const client = await getClient();
-      await client.unsubscribeAll();
       await releaseUserInPool();
       if (options.restartAppAfterEachTest) {
-        client.disconnect();
-        await stopAppFn(t);
+        if (appIsRunning) {
+          const client = await getClient();
+          await client.unsubscribeAll();
+          client.disconnect();
+          await stopAppFn(t);
+        }
       }
     } catch (e) {
       fail('Test finalization failed');

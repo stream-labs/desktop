@@ -3,6 +3,7 @@ import { focusChild, focusMain, test, useSpectron } from './helpers/spectron';
 import { setFormDropdown } from './helpers/spectron/forms';
 import { sleep } from './helpers/sleep';
 import { setTemporaryRecordingPath } from './helpers/spectron/output';
+import { startRecording, stopRecording } from './helpers/spectron/streaming';
 
 useSpectron();
 
@@ -24,17 +25,9 @@ test('Recording', async t => {
     await app.client.click('button=Done');
     await focusMain(t);
 
-    // Start recording
-    await app.client.click('.record-button');
+    await startRecording(t);
     await sleep(2000);
-
-    // Ensure recording indicator is active
-    await focusMain(t);
-    t.true(await app.client.isExisting('.record-button.active'));
-
-    // Stop recording
-    await app.client.click('.record-button');
-    await app.client.waitForVisible('.record-button:not(.active)', 15000);
+    await stopRecording(t);
 
     // Wait to ensure that output setting are editable
     await sleep(2000);
