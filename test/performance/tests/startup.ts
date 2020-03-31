@@ -18,9 +18,9 @@ const path = require('path');
 
 usePerformanceTest();
 
-const RELOAD_ATTEMPTS = 20;
-const CPU_ATTEMPTS = 100;
-const ADD_SOURCES_ATTEMPTS = 30;
+const RELOAD_ATTEMPTS = 40;
+const CPU_ATTEMPTS = 200;
+const ADD_SOURCES_ATTEMPTS = 60;
 
 /**
  * unzip a sample of a large scene collection to the SceneCollection folder
@@ -88,7 +88,7 @@ test('Large collection', async t => {
   const meter = getMeter();
 
   // measure startup time
-  let i = 2;
+  let i = RELOAD_ATTEMPTS;
   while (i--) {
     await startApp(t);
     const api = await getClient();
