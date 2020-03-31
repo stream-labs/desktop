@@ -19,7 +19,7 @@ const rimraf = require('rimraf');
   const resultsPath = path.resolve(CONFIG.dist, 'performance-results.json');
 
   // checkout the base branch
-  checkoutBranch(CONFIG.baseBranch);
+  checkoutBranch(CONFIG.baseBranch, CONFIG);
   exec(runTestsCmd);
 
   // read test results
@@ -27,7 +27,7 @@ const rimraf = require('rimraf');
 
   // return to the current branch
   fs.removeSync(resultsPath);
-  checkoutBranch('current');
+  checkoutBranch('current', CONFIG);
   exec(runTestsCmd);
   const currentBranchResults = fs.readJsonSync(resultsPath);
 
