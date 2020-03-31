@@ -24,12 +24,14 @@ const rimraf = require('rimraf');
 
   // read test results
   const baseBranchResults = fs.readJsonSync(resultsPath);
+  console.log('baseBranchResults', baseBranchResults);
 
   // return to the current branch
   fs.removeSync(resultsPath);
   checkoutBranch('current', CONFIG);
   exec(runTestsCmd);
   const currentBranchResults = fs.readJsonSync(resultsPath);
+  console.log('currentBranchResults', currentBranchResults);
 
   printResults(baseBranchResults, currentBranchResults);
 })();
