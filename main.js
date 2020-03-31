@@ -43,6 +43,7 @@ if (!gotTheLock) {
 } else {
   const fs = require('fs');
   const bootstrap = require('./updater/build/bootstrap.js');
+  const bundleUpdater = require('./updater/build/bundle-updater.js');
   const uuid = require('uuid/v4');
   const semver = require('semver');
   const windowStateKeeper = require('electron-window-state');
@@ -211,12 +212,14 @@ if (!gotTheLock) {
   let waitingVuexStores = [];
   let workerInitFinished = false;
 
-  function startApp() {
+  async function startApp() {
     const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
     let crashHandlerLogPath = "";
     if (process.env.NODE_ENV !== 'production' || !!process.env.SLOBS_PREVIEW) {
       crashHandlerLogPath = app.getPath('userData');
     }
+
+    await bundleUpdater(__dirname);
 
     crashHandler.startCrashHandler(app.getAppPath(), process.env.SLOBS_VERSION, isDevMode.toString(), crashHandlerLogPath);
     crashHandler.registerProcess(pid, false);
