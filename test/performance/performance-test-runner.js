@@ -43,7 +43,7 @@ function printResults(baseBranchResults, currentBranchResults) {
     console.log(`TEST ${testName}`);
     Object.keys(baseBranchMetrics).forEach(metricName => {
       if (!comparisonResults[testName]) comparisonResults[testName] = {};
-      const baseMetric = baseBranchMetrics[testName][metricName];
+      const baseMetric = baseBranchMetrics[metricName];
       const currentMetric = currentBranchResults[testName]
         ? currentBranchResults[testName][metricName]
         : null;
