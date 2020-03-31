@@ -15,7 +15,7 @@ const colors = require('colors');
   // prepare the dist dir
   fs.removeSync(CONFIG.dist);
   fs.mkdirSync(CONFIG.dist, { recursive: true });
-  const runTestsCmd = `yarn test-flaky ${
+  const runTestsCmd = `yarn test ${
     CONFIG.compiledTestsDist
   }/performance/tests/**/*.js ${args.join(' ')}`;
   const resultsPath = path.resolve(CONFIG.dist, 'performance-results.json');
