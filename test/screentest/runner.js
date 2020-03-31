@@ -32,11 +32,11 @@ const args = process.argv.slice(2);
     CONFIG.baseBranch
   ];
   for (const branchName of branches) {
-    checkoutBranch(branchName);
+    checkoutBranch(branchName, CONFIG);
     exec(`yarn test-flaky ${CONFIG.compiledTestsDist}/screentest/tests/**/*.js ${args.join(' ')}`);
   }
   // return to the current branch
-  checkoutBranch('current');
+  checkoutBranch('current', CONFIG);
 
   // compile the test folder
   exec(`tsc -p test`);

@@ -33,22 +33,22 @@ function getCommitSHA() {
   return CI ? lastCommits[1] : lastCommits[0];
 }
 
-function checkoutBranch(branchName) {
-  const branchPath = `${CONFIG.dist}/${branchName}`;
+function checkoutBranch(branchName, config) {
+  const branchPath = `${config.dist}/${branchName}`;
   if (!fs.existsSync(branchPath)) fs.mkdirSync(branchPath);
   const checkoutTarget = branchName === 'current' ? getCommitSHA() : branchName;
-  fs.removeSync(CONFIG.compiledTestsDist);
+  fs.removeSync(config.compiledTestsDist);
   exec('git reset --hard');
   exec(`git checkout ${checkoutTarget}`);
-  if (branchName !== CONFIG.baseBranch) {
+  if (branchName !== config.baseBranch) {
     // the base branch may have changes, so merge it
-    exec(`git pull origin ${CONFIG.baseBranch}`);
+    exec(`git pull origin ${config.baseBranch}`);
   }
   exec('yarn install --frozen-lockfile --check-files');
   exec('yarn compile:ci');
   // save current branch name to the file
   // screenshoter.js will use this value
-  fs.writeFileSync(`${CONFIG.dist}/current-branch.txt`, branchName);
+  fs.writeFileSync(`${config.dist}/current-branch.txt`, branchName);
 }
 
 module.exports = {
