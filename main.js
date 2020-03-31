@@ -479,7 +479,7 @@ if (!gotTheLock) {
     // Check for protocol links in the argv of the other process
     argv.forEach(arg => {
       if (arg.match(/^slobs:\/\//)) {
-        mainWindow.send('protocolLink', arg);
+        workerWindow.send('protocolLink', arg);
       }
     });
 
@@ -491,6 +491,23 @@ if (!gotTheLock) {
 
       mainWindow.focus();
     }
+  });
+
+  let protocolLinkReady = false;
+  let pendingLink;
+
+  // For mac os, this event will fire when a protocol link is triggered
+  app.on('open-url', (e, url) => {
+    if (protocolLinkReady) {
+      workerWindow.send('protocolLink', url);
+    } else {
+      pendingLink = url;
+    }
+  });
+
+  ipcMain.on('protocolLinkReady', () => {
+    protocolLinkReady = true;
+    if (pendingLink) workerWindow.send('protocolLink', pendingLink);
   });
 
   app.on('ready', () => {

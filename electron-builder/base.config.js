@@ -45,6 +45,14 @@ const base = {
     hardenedRuntime: true,
     entitlements: 'electron-builder/entitlements.plist',
     entitlementsInherit: 'electron-builder/entitlements.plist',
+    extendInfo: {
+      CFBundleURLTypes: [
+        {
+          CFBundleURLName: 'Streamlabs OBS Link',
+          CFBundleURLSchemes: ['slobs'],
+        },
+      ],
+    },
   },
   dmg: {
     background: 'media/images/dmg-bg.png',
