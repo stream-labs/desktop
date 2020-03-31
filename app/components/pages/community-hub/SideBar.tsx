@@ -35,6 +35,7 @@ export default class SideBar extends TsxComponent<{ onShowAddChatModal: () => vo
           <div
             class={cx(styles.chatRow, { [styles.active]: this.currentTab === chat.id })}
             onClick={() => this.setPage(chat.id)}
+            key={chat.id}
           >
             <img class={cx(styles.avatar, styles.sidebarAvatar)} src={chat.avatar} />
             <div class={styles.chatName}>{chat.name}</div>
@@ -58,6 +59,7 @@ export default class SideBar extends TsxComponent<{ onShowAddChatModal: () => vo
             <div
               class={cx(styles.chatRow, { [styles.active]: this.currentTab === chat.id })}
               onClick={() => this.setPage(chat.id)}
+              key={chat.id}
             >
               <img class={styles.avatar} src={chat.avatar} />
               <div class={cx(styles.status, styles[friend.status])} />

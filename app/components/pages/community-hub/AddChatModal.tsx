@@ -16,11 +16,11 @@ export default class AddChatModal extends TsxComponent<{ onCloseAddChatModal: ()
   chatName = '';
   searchValue = '';
   avatar = '';
-  friends = cloneDeep(this.communityHubService.state.friends);
+  friends = cloneDeep(this.communityHubService.views.sortedFriends);
   selectedFriends: Array<IFriend> = [];
 
   updateSearch(val: string) {
-    const allFriends = cloneDeep(this.communityHubService.state.friends);
+    const allFriends = cloneDeep(this.communityHubService.views.sortedFriends);
     const locale = this.i18nService.state.locale;
     this.searchValue = val;
     if (val === '') return (this.friends = allFriends);
@@ -30,6 +30,7 @@ export default class AddChatModal extends TsxComponent<{ onCloseAddChatModal: ()
   }
 
   selectFriend(friend: IFriend) {
+    if (this.selectedFriends.find((fr: IFriend) => fr.id === friend.id)) return;
     this.selectedFriends.push(friend);
   }
 
@@ -42,46 +43,70 @@ export default class AddChatModal extends TsxComponent<{ onCloseAddChatModal: ()
     this.$emit('closeAddChatModal');
   }
 
+  get friendList() {
+    return (
+      <div style="display: flex; flex-direction: column; height: 0; flex-grow: 1;">
+        <h2 style="margin-bottom: 16px;">{$t('Recent Conversations')}</h2>
+        <ul style="height: 100%; overflow-y: auto; margin: 0;">
+          {this.friends.map(friend => (
+            <div class={styles.friend} onClick={() => this.selectFriend(friend)} key={friend.id}>
+              <img class={styles.avatar} src={friend.avatar} />
+              <div class={cx(styles.status, styles[friend.status])} />
+              <div class={styles.friendName}>{friend.username}</div>
+              {friend.is_prime && <i class={cx('icon-prime', styles.primeIcon)} />}
+              {friend.game_streamed && (
+                <div class={styles.friendStreaming}>
+                  {$t('Streaming %{gameTitle}', { gameTitle: friend.game_streamed })}
+                </div>
+              )}
+            </div>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+
+  get friendSearch() {
+    return (
+      <div style="margin-bottom: 16px;">
+        <div class={styles.row}>
+          <TextInput
+            onInput={(val: string) => this.updateSearch(val)}
+            value={this.searchValue}
+            metadata={{ placeholder: $t('Search Friends'), icon: 'search', fullWidth: true }}
+            style="margin-right: 16px;"
+          />
+          <button class="button button--default" onClick={() => this.addChat()}>
+            {$t('Go')}
+          </button>
+        </div>
+        <ul class={styles.selectedFriends}>
+          {this.selectedFriends.map(friend => (
+            <li key={friend.id} onClick={() => this.handleRemove(friend.id)}>
+              {friend.username}
+              <i class="icon-close" />
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+
   render() {
     return (
-      <div class={styles.addChatContainer}>
+      <div class={styles.addChatContainer} styles="background: transparent;">
+        <div class={styles.addChatContainer} onClick={() => this.$emit('closeAddChatModal')} />
         <div class={styles.addChatModal}>
           <h2>{$t('New Message')}</h2>
-          <i class="icon-close" onClick={() => this.$emit('closeAddChatModal')} />
-          <TextInput vModel={this.chatName} />
-          <div class={styles.row}>
-            <TextInput
-              onInput={(val: string) => this.updateSearch(val)}
-              value={this.searchValue}
-              metadata={{ placeholder: $t('Search Friends'), icon: 'search', fullWidth: true }}
-            />
-            <button class="button button--default" onClick={() => this.addChat()}>
-              {$t('Go')}
-            </button>
-          </div>
-          <ul class={styles.selectedFriends}>
-            {this.selectedFriends.map((friend, i) => (
-              <li key={i} onClick={() => this.handleRemove(friend.id)}>
-                {friend.username}
-              </li>
-            ))}
-          </ul>
-          <h2>{$t('Recent Conversations')}</h2>
-          <ul>
-            {this.friends.map(friend => (
-              <div class={styles.friend} onClick={() => this.selectFriend(friend)}>
-                <img class={styles.avatar} src={friend.avatar} />
-                <div class={cx(styles.status, styles[friend.status])} />
-                <div class={styles.friendName}>{friend.username}</div>
-                {friend.is_prime && <i class={cx('icon-prime', styles.primeIcon)} />}
-                {friend.game_streamed && (
-                  <div class={styles.friendStreaming}>
-                    {$t('Streaming %{gameTitle}', { gameTitle: friend.game_streamed })}
-                  </div>
-                )}
-              </div>
-            ))}
-          </ul>
+          <i
+            class={cx('icon-close', styles.closeIcon)}
+            onClick={() => this.$emit('closeAddChatModal')}
+          />
+          {this.selectedFriends.length > 1 && (
+            <TextInput vModel={this.chatName} style="margin-bottom: 16px;" />
+          )}
+          {this.friendSearch}
+          {this.friendList}
         </div>
       </div>
     );

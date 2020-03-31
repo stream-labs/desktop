@@ -32,7 +32,7 @@ export default class FriendsPage extends TsxComponent {
 
   friendRow(friend: IFriend) {
     return (
-      <div class={styles.friend} onClick={() => this.goToDm(friend.id)}>
+      <div class={styles.friend} onClick={() => this.goToDm(friend.id)} key={friend.id}>
         <img class={styles.avatar} src={friend.avatar} />
         <div class={cx(styles.status, styles[friend.status])} />
         <div class={styles.friendName}>{friend.username}</div>

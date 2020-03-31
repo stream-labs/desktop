@@ -326,6 +326,7 @@
 
 .add-chat-modal {
   .center();
+  .radius(2);
 
   position: absolute;
   width: 640px;
@@ -333,11 +334,17 @@
   padding: 32px;
   background: var(--background);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 
-  :global('icon-close') {
+  .close-icon {
     position: absolute;
     right: 32px;
     top: 32px;
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 }
 
@@ -345,13 +352,34 @@
   display: flex;
   height: auto;
   overflow: auto;
+  margin: 0;
 
   li {
     width: auto;
     font-size: 14px;
-    padding: 4px;
+    padding: 4px 8px;
     white-space: nowrap;
     background: var(--border);
     color: var(--title);
+    margin: 8px 4px;
+    margin-bottom: 0;
+    list-style: none;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+      cursor: pointer;
+    }
+
+    i {
+      margin-left: 8px;
+      font-size: 8px;
+      color: var(--nav-icon-inactive);
+    }
+  }
+
+  li:first-of-type {
+    margin-left: 0;
   }
 }
