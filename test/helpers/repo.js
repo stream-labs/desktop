@@ -3,11 +3,6 @@ const path = require('path');
 const { execSync } = require('child_process');
 const { CI } = process.env;
 
-const CONFIG = {
-  dist: 'test-dist',
-  compiledTestsDist: path.resolve('test-dist', 'test'),
-};
-
 /**
  * exec sync or die
  */
@@ -44,8 +39,11 @@ function checkoutBranch(branchName, config) {
     // the base branch may have changes, so merge it
     exec(`git pull origin ${config.baseBranch}`);
   }
-  exec('yarn install --frozen-lockfile --check-files');
-  exec('yarn compile:ci');
+
+  // TODO: enable
+  // exec('yarn install --frozen-lockfile --check-files');
+  // exec('yarn compile:ci');
+
   // save current branch name to the file
   // screenshoter.js will use this value
   fs.writeFileSync(`${config.dist}/current-branch.txt`, branchName);

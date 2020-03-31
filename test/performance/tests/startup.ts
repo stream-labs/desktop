@@ -18,6 +18,9 @@ const path = require('path');
 
 usePerformanceTest();
 
+const RELOAD_ATTEMPTS = 2;
+const CPU_ATTEMPTS = 10;
+
 /**
  * unzip a sample of a large scene collection to the SceneCollection folder
  */
@@ -46,7 +49,7 @@ function measureStartupTime(api: ApiClient) {
   );
 }
 
-async function measureMemoryAndCPU(attempts = 10) {
+async function measureMemoryAndCPU(attempts = CPU_ATTEMPTS) {
   const meter = getMeter();
   while (attempts--) {
     meter.addMeasurement('CPU', await getCPUUsage());
@@ -57,10 +60,11 @@ async function measureMemoryAndCPU(attempts = 10) {
 
 test('Empty collection', async t => {
   const meter = getMeter();
+  await stopApp(t);
 
   // measure startup time
-  let i = 2;
-  while (i--) {
+  let attempts = RELOAD_ATTEMPTS;
+  while (attempts--) {
     await startApp(t);
     const api = await getClient();
     measureStartupTime(api);
