@@ -1,5 +1,5 @@
 {
-  "baseBranch": "staging",
+  "baseBranch": "perfanalitics",
   "dist": "test-dist/performance",
   "compiledTestsDist": "test-dist/test"
 }
