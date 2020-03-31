@@ -79,89 +79,89 @@ test('Empty collection', async t => {
   meter.printResults();
   t.pass();
 });
-//
-// test('Large collection', async t => {
-//   // extract large scene-collection
-//   await stopApp(t, false);
-//   await unzipLargeSceneCollection(t);
-//   const meter = getMeter();
-//
-//   // measure startup time
-//   let i = 2;
-//   while (i--) {
-//     await startApp(t);
-//     const api = await getClient();
-//     measureStartupTime(api);
-//     await stopApp(t);
-//   }
-//
-//   // measure memory and CPU
-//   await startApp(t);
-//   await measureMemoryAndCPU();
-//
-//   meter.printResults();
-//   t.pass();
-// });
-//
-// test('Recording', async t => {
-//   await setTemporaryRecordingPath(t);
-//   await setOutputResolution(t, '100x100');
-//   const api = await getClient();
-//   const scenesService = api.getResource<ScenesService>('ScenesService');
-//   const meter = getMeter();
-//   scenesService.activeScene.createAndAddSource('Color', 'color_source');
-//
-//   await startRecording(t);
-//   await measureMemoryAndCPU();
-//   await startRecording(t);
-//
-//   meter.printResults();
-//   t.pass();
-// });
-//
-// test('Add and remove sources', async t => {
-//   const api = await getClient();
-//   const scenesService = api.getResource<ScenesService>('ScenesService');
-//   const meter = getMeter();
-//   scenesService.activeScene.createAndAddSource('Color', 'color_source');
-//
-//   const sourceTypes = [
-//     'Video Capture Device',
-//     'Audio Output Capture',
-//     'Audio Input Capture',
-//     'Game Capture',
-//     'Window Capture',
-//     'Display Capture',
-//     'Image',
-//     'Image Slide Show',
-//     'Media Source',
-//     'Text (GDI+)',
-//     'Color Source',
-//     'Browser Source',
-//   ];
-//
-//   // create and delete 10 instances for each source type 3 times
-//   let attempts = 3;
-//   while (attempts--) {
-//     meter.startMeasure('addSources');
-//     let sourcesCount = 10;
-//     while (sourcesCount--) {
-//       sourceTypes.forEach(type => {
-//         scenesService.activeScene.createAndAddSource(type, type as TSourceType);
-//       });
-//     }
-//     meter.stopMeasure('addSources');
-//
-//     meter.startMeasure('removeSources');
-//     scenesService.activeScene.getNodes().forEach(node => {
-//       node.remove();
-//     });
-//     meter.stopMeasure('removeSources');
-//
-//     // give some time to unfreeze UI
-//     await sleep(2000);
-//   }
-//
-//   meter.printResults();
-//   t.pass();
-// });
+
+test('Large collection', async t => {
+  // extract large scene-collection
+  await stopApp(t, false);
+  await unzipLargeSceneCollection(t);
+  const meter = getMeter();
+
+  // measure startup time
+  let i = 2;
+  while (i--) {
+    await startApp(t);
+    const api = await getClient();
+    measureStartupTime(api);
+    await stopApp(t);
+  }
+
+  // measure memory and CPU
+  await startApp(t);
+  await measureMemoryAndCPU();
+
+  meter.printResults();
+  t.pass();
+});
+
+test('Recording', async t => {
+  await setTemporaryRecordingPath(t);
+  await setOutputResolution(t, '100x100');
+  const api = await getClient();
+  const scenesService = api.getResource<ScenesService>('ScenesService');
+  const meter = getMeter();
+  scenesService.activeScene.createAndAddSource('Color', 'color_source');
+
+  await startRecording(t);
+  await measureMemoryAndCPU();
+  await startRecording(t);
+
+  meter.printResults();
+  t.pass();
+});
+
+test('Add and remove sources', async t => {
+  const api = await getClient();
+  const scenesService = api.getResource<ScenesService>('ScenesService');
+  const meter = getMeter();
+  scenesService.activeScene.createAndAddSource('Color', 'color_source');
+
+  const sourceTypes = [
+    'Video Capture Device',
+    'Audio Output Capture',
+    'Audio Input Capture',
+    'Game Capture',
+    'Window Capture',
+    'Display Capture',
+    'Image',
+    'Image Slide Show',
+    'Media Source',
+    'Text (GDI+)',
+    'Color Source',
+    'Browser Source',
+  ];
+
+  // create and delete 10 instances for each source type 3 times
+  let attempts = 3;
+  while (attempts--) {
+    meter.startMeasure('addSources');
+    let sourcesCount = 10;
+    while (sourcesCount--) {
+      sourceTypes.forEach(type => {
+        scenesService.activeScene.createAndAddSource(type, type as TSourceType);
+      });
+    }
+    meter.stopMeasure('addSources');
+
+    meter.startMeasure('removeSources');
+    scenesService.activeScene.getNodes().forEach(node => {
+      node.remove();
+    });
+    meter.stopMeasure('removeSources');
+
+    // give some time to unfreeze UI
+    await sleep(2000);
+  }
+
+  meter.printResults();
+  t.pass();
+});

@@ -66,6 +66,7 @@
     "@streamlabs/game-overlay": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.41.tar.gz",
     "archiver": "2.1.1",
     "aws-sdk": "^2.344.0",
+    "cli-table": "^0.3.1",
     "crash-handler": "https://github.com/stream-labs/crash-handler/releases/download/v0.0.41/iojs-v6.0.3-crash-handler.tar.gz",
     "electron-window-state": "5.0.3",
     "eslint-loader": "^3.0.3",

@@ -8,6 +8,7 @@ const CONFIG = require('./config.json');
 const commitSHA = getCommitSHA();
 const args = process.argv.slice(2);
 const rimraf = require('rimraf');
+const Table = require('cli-table');
 
 (async function main() {
   // prepare the dist dir
@@ -41,6 +42,8 @@ function printResults(baseBranchResults, currentBranchResults) {
   Object.keys(baseBranchResults).forEach(testName => {
     const baseBranchMetrics = baseBranchResults[testName];
     console.log(`TEST ${testName}`);
+    const table = new Table();
+    table.push('METRIC', 'BASE BRANCH AVG', 'CURRENT BRANCH AVG', 'UNIT', 'DIFF %');
     Object.keys(baseBranchMetrics).forEach(metricName => {
       if (!comparisonResults[testName]) comparisonResults[testName] = {};
       const baseMetric = baseBranchMetrics[metricName];
@@ -57,8 +60,11 @@ function printResults(baseBranchResults, currentBranchResults) {
       const currentMetricAvg = currentMetricValues.reduce((v1, v2) => v1 + v2) / currentMetricValues.length;
       const diff = baseMetricAvg / currentMetricAvg;
       const diffPercent = (1 - diff) * 100;
-      console.log('Base', baseMetricAvg, 'Current', currentMetricAvg, 'diff', diffPercent);
+      table.push([metricName, baseMetricAvg, currentMetricAvg, baseMetric.units, diffPercent]);
+
+      //console.log('Base', baseMetricAvg, 'Current', currentMetricAvg, 'diff', diffPercent);
     });
+    console.log(table.toString());
   });
 }
 
