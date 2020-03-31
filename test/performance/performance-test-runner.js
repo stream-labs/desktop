@@ -43,7 +43,7 @@ function printResults(baseBranchResults, currentBranchResults) {
     const baseBranchMetrics = baseBranchResults[testName];
     console.log(`TEST ${testName}`);
     const table = new Table();
-    table.push('METRIC', 'BASE BRANCH AVG', 'CURRENT BRANCH AVG', 'UNIT', 'DIFF %');
+    table.push(['METRIC', 'BASE BRANCH AVG', 'CURRENT BRANCH AVG', 'UNIT', 'DIFF %']);
     Object.keys(baseBranchMetrics).forEach(metricName => {
       if (!comparisonResults[testName]) comparisonResults[testName] = {};
       const baseMetric = baseBranchMetrics[metricName];
