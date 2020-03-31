@@ -1,6 +1,6 @@
 require('dotenv').config();
-import { checkoutBranch, getCommitSHA, exec } from '../helpers/repo';
-const fs = require('fs');
+const { checkoutBranch, getCommitSHA, exec } = require('../helpers/repo');
+const fs = require('fs-extra');
 const { GithubClient } = require('../../scripts/github-client');
 const path = require('path');
 const { CI, STREAMLABS_BOT_ID, STREAMLABS_BOT_KEY, BUILD_REPOSITORY_NAME } = process.env;
