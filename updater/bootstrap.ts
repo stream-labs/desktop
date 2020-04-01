@@ -246,7 +246,6 @@ async function entry(info: IUpdateInfo) {
   console.log('Starting update check:', info);
 
   const latestVersion = await getLatestVersionInfo(info);
-  console.log('latestVersion', latestVersion);
 
   if (!latestVersion) {
     console.log('Aborting update to due failure fetching latest version information.');

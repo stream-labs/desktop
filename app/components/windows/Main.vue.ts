@@ -33,7 +33,6 @@ import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import FacebookMerge from 'components/pages/FacebookMerge';
 import { getPlatformService } from 'services/platforms';
-import Utils from '../../services/utils';
 
 @Component({
   components: {

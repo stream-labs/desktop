@@ -490,7 +490,8 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       return true;
     }
 
-    // set client name
+    // set forceRequests flag
+    // when forceRequest is true API responds even while loading a SceneCollection
     if (request.method === 'forceRequests' && request.params.resource === 'TcpServerService') {
       this.forceRequests = request.params.args[0];
       this.sendResponse(client, {
