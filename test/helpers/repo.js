@@ -4,7 +4,7 @@ const { execSync } = require('child_process');
 const { CI } = process.env;
 
 /**
- * exec sync or die
+ * exec sync and redirect output to stdio
  */
 function exec(cmd) {
   try {
@@ -28,6 +28,21 @@ function getCommitSHA() {
   return CI ? lastCommits[1] : lastCommits[0];
 }
 
+/**
+ * fetch info about commit using cmd
+ */
+function getCommitInfo(SHA) {
+  const lines = execSync(`git show ${SHA}`).toString();
+  const [shaLine, author, dateLine, empty, comment] = lines.split('\n');
+  const date = new Date(dateLine).valueOf();
+  return {
+    SHA,
+    author,
+    date,
+    comment,
+  };
+}
+
 function checkoutBranch(branchName, config) {
   const branchPath = `${config.dist}/${branchName}`;
   if (!fs.existsSync(branchPath)) fs.mkdirSync(branchPath);
@@ -39,7 +54,6 @@ function checkoutBranch(branchName, config) {
     // the base branch may have changes, so merge it
     exec(`git pull origin ${config.baseBranch}`);
   }
-
   exec('yarn install --frozen-lockfile --check-files');
   exec('yarn compile:ci');
 
@@ -51,5 +65,6 @@ function checkoutBranch(branchName, config) {
 module.exports = {
   exec,
   getCommitSHA,
+  getCommitInfo,
   checkoutBranch,
 };
