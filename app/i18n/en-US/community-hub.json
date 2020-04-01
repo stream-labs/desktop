@@ -15,5 +15,9 @@
   "Members (%{numberOfMembers})": "Members (%{numberOfMembers})",
   "Chat Info": "Chat Info",
   "Message %{chatName}": "Message %{chatName}",
-  "Send": "Send"
+  "Send": "Send",
+  "Go": "Go",
+  "Search Friends": "Search Friends",
+  "New Message": "New Message",
+  "Recent Conversations": "Recent Conversations"
 }

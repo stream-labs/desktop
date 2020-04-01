@@ -15,7 +15,6 @@ export default class AddChatModal extends TsxComponent<{ onCloseAddChatModal: ()
 
   chatName = '';
   searchValue = '';
-  avatar = '';
   friends = cloneDeep(this.communityHubService.views.sortedFriends);
   selectedFriends: Array<IFriend> = [];
 
@@ -39,7 +38,7 @@ export default class AddChatModal extends TsxComponent<{ onCloseAddChatModal: ()
   }
 
   addChat() {
-    this.communityHubService.addChat(this.selectedFriends, this.chatName, this.avatar);
+    this.communityHubService.addChat(this.selectedFriends, this.chatName);
     this.$emit('closeAddChatModal');
   }
 

@@ -1,3 +1,4 @@
+import cx from 'classnames';
 import { Component } from 'vue-property-decorator';
 import TsxComponent from 'components/tsx-component';
 import SideBar from './community-hub/SideBar';
@@ -21,9 +22,18 @@ export default class CommunityHub extends TsxComponent {
   get title() {
     if (this.currentTab.title) return this.currentTab.title;
     const chatroom = this.communityHubService.views.currentChat;
+    const noImg = /^#/.test(chatroom.avatar);
     return (
       <div style="display: flex; align-items: center;">
-        <img class={styles.avatar} src={chatroom.avatar} />
+        {!noImg && <img class={styles.avatar} src={chatroom.avatar} />}
+        {noImg && (
+          <div
+            class={cx(styles.avatar, styles.sidebarAvatar, styles.noImgAvatar)}
+            style={`background: ${chatroom.avatar};`}
+          >
+            {chatroom.name.slice(0, 2)}
+          </div>
+        )}
         <div style="margin-left: 16px;">{chatroom.name}</div>
       </div>
     );
