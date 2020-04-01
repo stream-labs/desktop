@@ -89,6 +89,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   collectionSwitched = new Subject<ISceneCollectionsManifestEntry>();
   collectionWillSwitch = new Subject<void>();
   collectionUpdated = new Subject<ISceneCollectionsManifestEntry>();
+  collectionInitialized = new Subject<void>();
 
   /**
    * Whether a valid collection is currently loaded.
@@ -111,7 +112,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     await this.migrateOS();
     await this.safeSync();
     if (this.activeCollection && this.activeCollection.operatingSystem === getOS()) {
-      await this.load(this.activeCollection.id);
+      await this.load(this.activeCollection.id, true);
     } else if (this.loadableCollections.length > 0) {
       let latestId = this.loadableCollections[0].id;
       let latestModified = this.loadableCollections[0].modified;
@@ -127,6 +128,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     } else {
       await this.create({ auto: true });
     }
+    this.collectionInitialized.next();
   }
 
   /**
@@ -174,6 +176,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     await this.deloadCurrentApplicationState();
     try {
       await this.setActiveCollection(id);
+
       await this.readCollectionDataAndLoadIntoApplicationState(id);
     } catch (e) {
       console.error('Error loading collection!', e);
@@ -462,7 +465,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       try {
         data = this.stateService.readCollectionFile(id);
         if (data == null) throw new Error('Got blank data from collection file');
-
         await this.loadDataIntoApplicationState(data);
       } catch (e) {
         /*
@@ -668,16 +670,12 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     if (this.autoSavePromise) await this.autoSavePromise;
   }
 
-  private async setActiveCollection(id: string) {
+  private async setActiveCollection(id: string, informServer = true) {
     const collection = this.collections.find(coll => coll.id === id);
 
     if (collection) {
       if (collection.serverId && this.userService.isLoggedIn) {
-        try {
-          await this.serverApi.makeSceneCollectionActive(collection.serverId);
-        } catch (e) {
-          console.warn('Failed setting active collection');
-        }
+        this.serverApi.makeSceneCollectionActive(collection.serverId);
       }
       this.stateService.SET_ACTIVE_COLLECTION(id);
       this.collectionSwitched.next(collection);
@@ -862,13 +860,14 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * Migrates to V2 scene collections if needed.
    */
   private async migrate() {
-    const legacyExists = await new Promise<boolean>(resolve => {
-      fs.exists(this.legacyDirectory, exists => resolve(exists));
-    });
-
-    const newExists = await new Promise<boolean>(resolve => {
-      fs.exists(this.stateService.collectionsDirectory, exists => resolve(exists));
-    });
+    const [legacyExists, newExists] = await Promise.all([
+      new Promise<boolean>(resolve => {
+        fs.exists(this.legacyDirectory, exists => resolve(exists));
+      }),
+      new Promise<boolean>(resolve => {
+        fs.exists(this.stateService.collectionsDirectory, exists => resolve(exists));
+      }),
+    ]);
 
     if (legacyExists && !newExists) {
       const files = await new Promise<string[]>((resolve, reject) => {

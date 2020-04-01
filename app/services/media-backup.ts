@@ -1,12 +1,10 @@
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import path from 'path';
 import fs from 'fs';
-import request from 'request';
 import { Inject } from 'services/core/injector';
 import { HostsService } from 'services/hosts';
 import { UserService } from 'services/user';
-import electron from 'electron';
-import { getChecksum, isUrl, handleErrors } from 'util/requests';
+import { getChecksum, isUrl, downloadFile } from 'util/requests';
 import { AppService } from 'services/app';
 
 const uuid = window['require']('uuid/v4');
@@ -250,29 +248,26 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
 
   private async uploadFile(filePath: string) {
     const checksum = await getChecksum(filePath);
-    const file = fs.createReadStream(filePath);
-
-    const formData = {
-      checksum,
-      file,
-      modified: new Date().toISOString(),
-    };
+    const file = await new Promise<Blob>(r => {
+      fs.readFile(filePath, (err, data) => r(new Blob([data])));
+    });
+    const formData = new FormData();
+    formData.append('checksum', checksum);
+    formData.append('file', file);
+    formData.append('modified', new Date().toISOString());
 
     return await new Promise<{ id: number }>((resolve, reject) => {
-      const req = request.post(
-        {
-          formData,
-          url: `${this.apiBase}/upload`,
-          headers: this.authedHeaders,
-        },
-        (err, res, body) => {
-          if (Math.floor(res.statusCode / 100) === 2) {
-            resolve(JSON.parse(body));
-          } else {
-            reject(res);
-          }
-        },
-      );
+      fetch(`${this.apiBase}/upload`, {
+        method: 'POST',
+        headers: this.authedHeaders,
+        body: formData,
+      }).then(res => {
+        if (Math.floor(res.status / 100) === 2) {
+          res.json().then(json => resolve(json));
+        } else {
+          reject(res);
+        }
+      });
     });
   }
 
@@ -283,17 +278,11 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
       .then(r => r.json());
   }
 
-  private downloadFile(url: string, serverId: number, filename: string) {
+  private async downloadFile(url: string, serverId: number, filename: string) {
     this.ensureMediaDirectory();
     const filePath = this.getMediaFilePath(serverId, filename);
-
-    return new Promise<string>((resolve, reject) => {
-      const stream = fs.createWriteStream(filePath);
-      request(url).pipe(stream);
-
-      stream.on('finish', () => resolve(filePath));
-      stream.on('error', e => reject(e));
-    });
+    await downloadFile(url, filePath);
+    return filePath;
   }
 
   private async withRetry<T>(executor: () => Promise<T>): Promise<T> {

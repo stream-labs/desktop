@@ -72,6 +72,9 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   private servers: IServer[] = [];
   private isRequestsHandlingStopped = false;
 
+  // if true then execute API request even if "isRequestsHandlingStopped" flag is set
+  private forceRequests = false;
+
   // enable to debug
   private enableLogs = false;
 
@@ -297,7 +300,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       this.authorizeClient(client);
     }
 
-    socket.on('data', (data: any) => {
+    socket.on('data', (data: Buffer) => {
       this.onRequestHandler(client, data.toString());
     });
 
@@ -334,13 +337,14 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   private onRequestHandler(client: IClient, data: string) {
     this.log('tcp request', data);
 
-    if (this.isRequestsHandlingStopped) {
+    if (this.isRequestsHandlingStopped && !this.forceRequests) {
       this.sendResponse(
         client,
         this.jsonrpcService.createError(null, {
           code: E_JSON_RPC_ERROR.INTERNAL_JSON_RPC_ERROR,
           message: 'API server is busy. Try again later',
         }),
+        true,
       );
 
       return;
@@ -485,6 +489,17 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       });
       return true;
     }
+
+    // set client name
+    if (request.method === 'forceRequests' && request.params.resource === 'TcpServerService') {
+      this.forceRequests = request.params.args[0];
+      this.sendResponse(client, {
+        jsonrpc: '2.0',
+        id: request.id,
+        result: true,
+      });
+      return true;
+    }
   }
 
   private onDisconnectHandler(client: IClient) {
@@ -493,7 +508,9 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   }
 
   private sendResponse(client: IClient, response: IJsonRpcResponse<any>, force = false) {
-    if (this.isRequestsHandlingStopped && !force) return;
+    if (this.isRequestsHandlingStopped) {
+      if (!force && !this.forceRequests) return;
+    }
 
     this.log('send response', response);
 

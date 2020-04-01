@@ -151,7 +151,7 @@ export class ApiClient {
         completed: false,
       };
       const rawMessage = `${JSON.stringify(requestBody)}\n`;
-      this.log('Sent:', rawMessage);
+      this.log('Send async:', rawMessage);
       this.socket.write(rawMessage);
     });
   }
@@ -169,7 +169,7 @@ export class ApiClient {
     if (!requestBody.id) throw 'id is required';
 
     const rawMessage = `${JSON.stringify(requestBody)}\n`;
-    this.log('Sent:', rawMessage);
+    this.log('Send sync:', rawMessage);
 
     const client = new snp.Client(PIPE_PATH);
     client.write(Buffer.from(rawMessage));
@@ -321,6 +321,8 @@ export async function getClient() {
 
   if (clientInstance.getConnectionStatus() === 'disconnected') {
     await clientInstance.connect();
+    // Execute API requests even if API stopped receiving requests (when a scene collection is loading)
+    await clientInstance.request('TcpServerService', 'forceRequests', [true]);
     await clientInstance.request('TcpServerService', 'listenAllSubscriptions');
   }
 
