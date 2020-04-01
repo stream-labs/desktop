@@ -46,7 +46,7 @@ export default class SideBar extends TsxComponent<{ onShowAddChatModal: () => vo
                   class={cx(styles.avatar, styles.sidebarAvatar, styles.noImgAvatar)}
                   style={`background: ${chat.avatar};`}
                 >
-                  {chat.name.slice(0, 2)}
+                  {chat.name[0]}
                 </div>
               )}
               <div class={styles.chatName}>{chat.name}</div>

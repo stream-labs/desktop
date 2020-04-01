@@ -1,4 +1,5 @@
 import uuid from 'uuid/v4';
+import sample from 'lodash/sample';
 import { StatefulService, mutation, ViewHandler } from 'services/core/stateful-service';
 import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
@@ -107,17 +108,17 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
     this.SET_CHATROOMS(chatRooms);
   }
 
-  stringToHex(val: string) {
-    let hex: string;
-    let result = '';
-    val.split('').forEach(char => {
-      hex = char.charCodeAt(0).toString(16);
-      result += hex;
-    });
-    while (result.length < 6) {
-      result += '0';
-    }
-    return result.slice(0, 6);
+  chatBgColor() {
+    return sample([
+      '#2B5BD7',
+      '#C22571',
+      '#5E3BEC',
+      '#758D14',
+      '#36ADE0',
+      '#EB7777',
+      '#C57BFF',
+      '#D5FF7B',
+    ]);
   }
 
   setPage(page: string) {
@@ -137,7 +138,7 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
   }
 
   addChat(members: Array<IFriend>, name: string, avatar?: string) {
-    const imageOrCode = avatar || `#${this.stringToHex(name)}`;
+    const imageOrCode = avatar || this.chatBgColor();
     const id = uuid();
     this.ADD_CHATROOM({ id, members, name, avatar: imageOrCode });
     this.setPage(id);
