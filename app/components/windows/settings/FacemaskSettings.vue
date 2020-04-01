@@ -21,7 +21,7 @@
     </div>
     <div class="row">
       <h-form-group :title="$t('Mask Duration')">
-        <slider-input v-model="durationModel" @input="handleSubmit" :metadata="{min: 8, max: 60}"/>
+        <slider-input v-model="durationModel" @input="throttledSubmit" :metadata="{min: 8, max: 60}"/>
       </h-form-group>
     </div>
     <div class="row">
