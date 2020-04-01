@@ -18,9 +18,9 @@ const path = require('path');
 
 usePerformanceTest();
 
-const RELOAD_ATTEMPTS = 40;
+const RELOAD_ATTEMPTS = 20;
 const CPU_ATTEMPTS = 200;
-const ADD_SOURCES_ATTEMPTS = 20;
+const ADD_SOURCES_ATTEMPTS = 10;
 
 /**
  * unzip a sample of a large scene collection to the SceneCollection folder
