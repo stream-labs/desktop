@@ -8136,9 +8136,9 @@ object.values@^1.1.0:
     function-bind "^1.1.1"
     has "^1.0.3"
 
-"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.137l2-iojs-v6.0.3-release.tar.gz":
+"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.137l3-iojs-v6.0.3-release.tar.gz":
   version "0.3.99"
-  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.137l2-iojs-v6.0.3-release.tar.gz#5eb77afd060032484711ee801e8ecf6c48971b17"
+  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.137l3-iojs-v6.0.3-release.tar.gz#ce3a4c4165ce6bd05924b0c79a0bc2a50fe2b18a"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
@@ -10242,9 +10242,9 @@ streamlabs-beaker@0.9.4:
   resolved "https://registry.yarnpkg.com/streamlabs-beaker/-/streamlabs-beaker-0.9.4.tgz#270507d029369e0bbc3414c86b3d66f0a8536f54"
   integrity sha512-9Krd5Lsw9wOK5SZASyqplG7W25CEPxrwMsjNO1FKvGTU7W+YwHqAhRf+g8htYo1BdVvRWugbNPz1i4ARz4UErQ==
 
-"streamlabs-obs-launcher@https://obs-studio-deployment.s3-us-west-2.amazonaws.com/streamlabs-obs-launcher-0.0.1j.tar.gz":
+"streamlabs-obs-launcher@https://obs-studio-deployment.s3-us-west-2.amazonaws.com/streamlabs-obs-launcher-0.0.1k.tar.gz":
   version "0.0.1"
-  resolved "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/streamlabs-obs-launcher-0.0.1j.tar.gz#a7c1e76ac122179e60e2f50ebd316bf4830fc096"
+  resolved "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/streamlabs-obs-launcher-0.0.1k.tar.gz#0b1028efc112f94785425319de9681b8968f8f58"
 
 string-width@^1.0.1:
   version "1.0.2"

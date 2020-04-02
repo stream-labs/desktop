@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const pipe_uuid = process.env['OBS_PIPE_UUID'];
     if (pipe_uuid) {
       try {
-        obs.IPC.connect(`slobs-${pipe_uuid}`);
+        obs.IPC.holdon(`slobs-${pipe_uuid}`);
 
         apiResult = obs.NodeObs.OBS_API_initAPI(
           'en-US',
