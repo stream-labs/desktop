@@ -6,6 +6,7 @@ import { ListInput, ToggleInput, SliderInput, NumberInput } from 'components/sha
 import { ProgressBar, ItemGrid, VirtualItem, Accordion } from 'streamlabs-beaker';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { FacemasksService } from 'services/facemasks/index';
+import throttle from 'lodash/throttle';
 
 interface IInputDeviceSelection {
   name: string;
@@ -72,6 +73,12 @@ export default class FacemaskSettings extends Vue {
       value: option,
     };
   });
+
+  throttledSubmit: () => void;
+
+  created() {
+    this.throttledSubmit = throttle(() => this.handleSubmit(), 1000);
+  }
 
   createSettingsObject(): IFormSettings {
     return {
