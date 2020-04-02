@@ -32,15 +32,17 @@ module.exports = async (basePath: string) => {
 
   // Check if bundle updates are available
   // TODO: In the future, support other bundles than just renderer.js
-  try {
-    const response = await prequest({ uri: `${cdnBase}renderer.js`, method: 'HEAD' });
-    if (response.statusCode / 100 >= 4) {
-      console.log('Bundle update not available, using local bundles');
+  if (!useLocalBundles) {
+    try {
+      const response = await prequest({ uri: `${cdnBase}renderer.js`, method: 'HEAD' });
+      if (response.statusCode / 100 >= 4) {
+        console.log('Bundle update not available, using local bundles');
+        useLocalBundles = true;
+      }
+    } catch (e) {
+      console.log('Bundle prefetch error', e);
       useLocalBundles = true;
     }
-  } catch (e) {
-    console.log('Bundle prefetch error', e);
-    useLocalBundles = true;
   }
 
   electron.session.defaultSession?.webRequest.onBeforeRequest(
