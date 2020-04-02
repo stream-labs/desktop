@@ -12,6 +12,8 @@ const colors = require('colors');
 const fetch = require('node-fetch');
 const { execSync } = require('child_process');
 
+const TESTS_SERVICE_URL = CI ? 'https://slobs-users-pool.herokuapp.com' : 'http://localhost:5000';
+
 (async function main() {
   // prepare the dist dir
   fs.removeSync(CONFIG.dist);
@@ -45,26 +47,19 @@ const { execSync } = require('child_process');
   //   },
   // };
 
-  // // checkout the base branch
-  // checkoutBranch(CONFIG.baseBranch, CONFIG);
-  // exec(runTestsCmd);
-  //
-  // // read test results
-  // const baseBranchResults = fs.readJsonSync(resultsPath);
-  // console.log('baseBranchResults', baseBranchResults);
-  //
-  // // return to the current branch
-  // fs.removeSync(resultsPath);
-  // checkoutBranch('current', CONFIG);
-  // exec(runTestsCmd);
-  // const currentBranchResults = fs.readJsonSync(resultsPath);
   exec(runTestsCmd);
   const testResults = fs.readJsonSync(resultsPath);
-  const needToSaveResults = true; // baseBranchHasCommit(getCommitSHA());
-  if (needToSaveResults) saveResults(testResults);
 
-  // const performanceDelta = printResults(baseBranchResults, currentBranchResults);
-  // console.log('PERFORMANCE DELTA IS', `${formatPerformanceValue(performanceDelta)}%`);
+  const baseBranchTestResults = await fetchLastResultsForBaseBranch();
+  if (baseBranchTestResults) {
+    console.log('Comparing testing results with last base branch results');
+    console.log(baseBranchTestResults.commit);
+    printResults(baseBranchTestResults.tests, testResults);
+  }
+
+  const needToSaveResults = true; // baseBranchHasCommit(getCommitSHA());
+  if (needToSaveResults) await sendResults(testResults);
+
 })();
 
 function printResults(baseBranchResults, currentBranchResults) {
@@ -115,7 +110,7 @@ function formatPerformanceValue(val) {
   return val > 0 ? colors.red(`+${val}`) : colors.green(val);
 }
 
-async function saveResults(tests) {
+async function sendResults(tests) {
   const url = CI ? 'https://slobs-users-pool.herokuapp.com' : 'http://localhost:5000';
   const commit = getCommitInfo(getCommitSHA());
   const body = {
@@ -124,6 +119,7 @@ async function saveResults(tests) {
     commit,
     tests,
   };
+  console.log('Send results for commit', commit);
   fetch(`${url}/performance`, {
     method: 'POST',
     body: JSON.stringify(body),
@@ -134,6 +130,16 @@ async function saveResults(tests) {
   })
     .then(_ => console.log('Testing results for the base bch have been sent to analytics'))
     .catch(e => console.error('Sending results to analytics failed', e));
+}
+
+async function fetchLastResultsForBaseBranch() {
+  const resp = await fetch(`${TESTS_SERVICE_URL}/performance?includeTestingData=true&limit=1`, {
+    headers: {
+      Authorization: `Bearer ${SLOBS_TEST_USER_POOL_TOKEN}`,
+    },
+  });
+  const results = await resp.json();
+  return results[0];
 }
 
 function baseBranchHasCommit(commitSHA) {
