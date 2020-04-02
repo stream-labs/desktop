@@ -1,6 +1,3 @@
-@import './index';
-@import './badges';
-
 // Overwrites styling in the v-selectpage library
 .tags-container {
   flex-direction: row;
@@ -31,6 +28,18 @@
 table.sp-table {
   font-family: 'Roboto', sans-serif !important;
 
+  th {
+    color: var(--paragraph) !important;
+  }
+
+  th:last-of-type {
+    text-align: right !important;
+  }
+
+  tbody tr {
+    color: var(--paragraph);
+  }
+
   // Tag descriptions
   tbody tr td:nth-child(2) {
     font-size: 12px;
@@ -56,7 +65,8 @@ table.sp-table {
   .sp-search .sp-search-input {
     background: var(--input-bg);
     color: var(--paragraph);
-    border-color: var(--button);
+    border: 1px solid var(--button);
+    border-radius: 4px;
   }
 
   .sp-search-input:focus {
