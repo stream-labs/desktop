@@ -13,6 +13,7 @@ import { TwitterService } from 'services/integrations/twitter';
 import { ITcpServerServiceApi } from 'services/api/tcp-server/index';
 import { RestreamService } from 'services/restream';
 import { StreamingService } from 'services/streaming';
+import Utils from 'services/utils';
 import { UsageStatisticsService } from 'services/usage-statistics';
 
 interface IQRCodeData {
@@ -104,7 +105,7 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
       addresses,
       token: settings.token,
       port: settings.websockets.port,
-      version: remote.process.env.SLOBS_VERSION,
+      version: Utils.env.SLOBS_VERSION,
     };
   }
 

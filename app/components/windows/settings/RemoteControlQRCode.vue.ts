@@ -5,6 +5,7 @@ import qrcode from '@xkeshi/vue-qrcode';
 import { Inject } from 'services/core/injector';
 import { ITcpServerServiceApi } from 'services/api/tcp-server/index';
 import { UserService } from 'services/user';
+import Utils from '../../../services/utils';
 
 interface IQRCodeData {
   addresses: string[];
@@ -51,7 +52,7 @@ export default class RemoteControlQRCodeVue extends Vue {
       addresses,
       token: settings.token,
       port: settings.websockets.port,
-      version: remote.process.env.SLOBS_VERSION,
+      version: Utils.env.SLOBS_VERSION,
     };
   }
 

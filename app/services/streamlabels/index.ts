@@ -5,10 +5,9 @@ import { HostsService } from 'services/hosts';
 import { authorizedHeaders, handleResponse } from 'util/requests';
 import { TSocketEvent, WebsocketService } from 'services/websocket';
 import uuid from 'uuid/v4';
-import fs from 'fs';
+import fs from 'fs-extra';
 import path from 'path';
 import electron from 'electron';
-import rimraf from 'rimraf';
 import without from 'lodash/without';
 import { AppService } from 'services/app';
 import { InitAfter } from '../core';
@@ -122,7 +121,7 @@ export class StreamlabelsService extends Service {
     },
   };
 
-  init() {
+  async init() {
     this.ensureDirectory();
     this.initSocketConnection();
     this.initTrainClockInterval();
@@ -379,10 +378,7 @@ export class StreamlabelsService extends Service {
 
   private ensureDirectory() {
     try {
-      if (fs.existsSync(this.streamlabelsDirectory)) {
-        rimraf.sync(this.streamlabelsDirectory);
-      }
-
+      fs.removeSync(this.streamlabelsDirectory);
       fs.mkdirSync(this.streamlabelsDirectory);
     } catch (e) {
       console.error('Error ensuring streamlabels directory!');
