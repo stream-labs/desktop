@@ -18,7 +18,7 @@ test('Replay Buffer', async t => {
   await client.isVisible('button .icon-replay-buffer');
 
   // Check that the replay-buffer file has been created
-  await sleep(1000);
+  await sleep(3000);
   const files = await readdir(tmpDir);
   t.is(files.length, 1);
 
