@@ -10,41 +10,40 @@ const rimraf = require('rimraf');
 const Table = require('cli-table');
 const colors = require('colors');
 const fetch = require('node-fetch');
+const { execSync } = require('child_process');
 
 (async function main() {
   // prepare the dist dir
   fs.removeSync(CONFIG.dist);
   fs.mkdirSync(CONFIG.dist, { recursive: true });
-  const runTestsCmd = `yarn test ${CONFIG.compiledTestsDist}/performance/tests/**/*.js ${args.join(
-    ' ',
-  )}`;
+  const runTestsCmd = `yarn test ${CONFIG.compiledTestsDist}/performance/tests/**/*.js ${args.join(' ',)}`;
   const resultsPath = path.resolve(CONFIG.dist, 'performance-results.json');
 
-  const baseBranchResults = {
-    'Empty collection': {
-      mainWindowShow: { values: [1, 2, 3], units: 'ms' },
-      sceneCollectionLoad: { units: 'ms', values: [1, 2, 3, 4] },
-      bundleSize: { units: 'bite', values: [1, 2, 3, 4] },
-    },
-    'Empty collection 2': {
-      mainWindowShow: { values: [1, 2, 3], units: 'ms' },
-      sceneCollectionLoad: { units: 'ms', values: [1, 2, 3, 4, 5] },
-      bundleSize: { units: 'bite', values: [1, 2, 3, 4, 1, 1] },
-    },
-  };
-
-  const currentBranchResults = {
-    'Empty collection': {
-      mainWindowShow: { values: [1, 2, 3], units: 'ms' },
-      sceneCollectionLoad: { units: 'ms', values: [1, 2, 3, 4, 5] },
-      bundleSize: { units: 'bite', values: [1, 2, 3, 4, 1, 1] },
-    },
-    'Empty collection 2': {
-      mainWindowShow: { values: [1, 2, 3], units: 'ms' },
-      sceneCollectionLoad: { units: 'ms', values: [1, 2, 3, 4, 5] },
-      bundleSize: { units: 'bite', values: [1, 2, 3, 4, 1, 1] },
-    },
-  };
+  // const baseBranchResults = {
+  //   'Empty collection': {
+  //     mainWindowShow: { values: [1, 2, 3], units: 'ms' },
+  //     sceneCollectionLoad: { units: 'ms', values: [1, 2, 3, 4] },
+  //     bundleSize: { units: 'bite', values: [1, 2, 3, 4] },
+  //   },
+  //   'Empty collection 2': {
+  //     mainWindowShow: { values: [1, 2, 3], units: 'ms' },
+  //     sceneCollectionLoad: { units: 'ms', values: [1, 2, 3, 4, 5] },
+  //     bundleSize: { units: 'bite', values: [1, 2, 3, 4, 1, 1] },
+  //   },
+  // };
+  //
+  // const currentBranchResults = {
+  //   'Empty collection': {
+  //     mainWindowShow: { values: [1, 2, 3], units: 'ms' },
+  //     sceneCollectionLoad: { units: 'ms', values: [1, 2, 3, 4, 5] },
+  //     bundleSize: { units: 'bite', values: [1, 2, 3, 4, 1, 1] },
+  //   },
+  //   'Empty collection 2': {
+  //     mainWindowShow: { values: [1, 2, 3], units: 'ms' },
+  //     sceneCollectionLoad: { units: 'ms', values: [1, 2, 3, 4, 5] },
+  //     bundleSize: { units: 'bite', values: [1, 2, 3, 4, 1, 1] },
+  //   },
+  // };
 
   // // checkout the base branch
   // checkoutBranch(CONFIG.baseBranch, CONFIG);
@@ -59,11 +58,13 @@ const fetch = require('node-fetch');
   // checkoutBranch('current', CONFIG);
   // exec(runTestsCmd);
   // const currentBranchResults = fs.readJsonSync(resultsPath);
+  exec(runTestsCmd);
+  const testResults = fs.readJsonSync(resultsPath);
+  const needToSaveResults = true; // baseBranchHasCommit(getCommitSHA());
+  if (needToSaveResults) saveResults(testResults);
 
-  sendBaseBranchResults(baseBranchResults);
-
-  const performanceDelta = printResults(baseBranchResults, currentBranchResults);
-  console.log('PERFORMANCE DELTA IS', `${formatPerformanceValue(performanceDelta)}%`);
+  // const performanceDelta = printResults(baseBranchResults, currentBranchResults);
+  // console.log('PERFORMANCE DELTA IS', `${formatPerformanceValue(performanceDelta)}%`);
 })();
 
 function printResults(baseBranchResults, currentBranchResults) {
@@ -114,7 +115,7 @@ function formatPerformanceValue(val) {
   return val > 0 ? colors.red(`+${val}`) : colors.green(val);
 }
 
-async function sendBaseBranchResults(tests) {
+async function saveResults(tests) {
   const url = CI ? 'https://slobs-users-pool.herokuapp.com' : 'http://localhost:5000';
   const commit = getCommitInfo(getCommitSHA());
   const body = {
@@ -133,4 +134,12 @@ async function sendBaseBranchResults(tests) {
   })
     .then(_ => console.log('Testing results for the base bch have been sent to analytics'))
     .catch(e => console.error('Sending results to analytics failed', e));
+}
+
+function baseBranchHasCommit(commitSHA) {
+  return (
+    execSync(`git branch --contains ${commitSHA}`)
+      .toString()
+      .indexOf(`* ${CONFIG.baseBranch}`) !== -1
+  );
 }
