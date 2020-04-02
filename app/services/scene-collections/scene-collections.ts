@@ -107,7 +107,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * initialization.
    */
   async initialize() {
-    await this.migrate();
     await this.stateService.loadManifestFile();
     await this.migrateOS();
     await this.safeSync();
@@ -670,12 +669,14 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     if (this.autoSavePromise) await this.autoSavePromise;
   }
 
-  private async setActiveCollection(id: string, informServer = true) {
+  private async setActiveCollection(id: string) {
     const collection = this.collections.find(coll => coll.id === id);
 
     if (collection) {
       if (collection.serverId && this.userService.isLoggedIn) {
-        this.serverApi.makeSceneCollectionActive(collection.serverId);
+        this.serverApi
+          .makeSceneCollectionActive(collection.serverId)
+          .catch(e => console.warn('Failed setting active collection'));
       }
       this.stateService.SET_ACTIVE_COLLECTION(id);
       this.collectionSwitched.next(collection);
@@ -853,78 +854,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     } catch (e) {
       console.error(`Sync step failed: ${name}`, e);
       return false;
-    }
-  }
-
-  /**
-   * Migrates to V2 scene collections if needed.
-   */
-  private async migrate() {
-    const [legacyExists, newExists] = await Promise.all([
-      new Promise<boolean>(resolve => {
-        fs.exists(this.legacyDirectory, exists => resolve(exists));
-      }),
-      new Promise<boolean>(resolve => {
-        fs.exists(this.stateService.collectionsDirectory, exists => resolve(exists));
-      }),
-    ]);
-
-    if (legacyExists && !newExists) {
-      const files = await new Promise<string[]>((resolve, reject) => {
-        fs.readdir(this.legacyDirectory, (err, files) => {
-          if (err) {
-            reject(err);
-            return;
-          }
-
-          resolve(files);
-        });
-      });
-
-      const filtered = files.filter(file => {
-        if (file.match(/\.bak$/)) return false;
-        const name = file.replace(/\.[^/.]+$/, '');
-        return !!name;
-      });
-
-      for (const file of filtered) {
-        const oldData = await new Promise<string>((resolve, reject) => {
-          fs.readFile(path.join(this.legacyDirectory, file), (err, data) => {
-            if (err) {
-              console.error(`Failed migrating file ${file}`);
-              resolve('');
-            }
-
-            resolve(data.toString());
-          });
-        });
-
-        if (oldData) {
-          await this.stateService.ensureDirectory();
-          const id: string = uuid();
-          await this.stateService.writeDataToCollectionFile(id, oldData);
-          this.stateService.ADD_COLLECTION(
-            id,
-            file.replace(/\.[^/.]+$/, ''),
-            new Date().toISOString(),
-            OS.Windows,
-          );
-        }
-      }
-
-      // Try to import the active collection
-      const data = localStorage.getItem('PersistentStatefulService-ScenesCollectionsService');
-
-      if (data) {
-        const parsed = JSON.parse(data);
-
-        if (parsed['activeCollection']) {
-          const name = parsed['activeCollection'];
-          const collection = this.collections.find(coll => coll.name === name);
-
-          if (collection) await this.setActiveCollection(collection.id);
-        }
-      }
     }
   }
 
