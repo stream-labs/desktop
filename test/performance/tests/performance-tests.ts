@@ -64,8 +64,9 @@ async function measureMemoryAndCPU(attempts = CPU_ATTEMPTS) {
 }
 
 test('Empty collection', async t => {
+  console.log('test started');
   const meter = getMeter();
-  await stopApp(t);
+  await stopApp(t, false);
 
   // measure startup time
   let attempts = RELOAD_ATTEMPTS;
@@ -73,7 +74,7 @@ test('Empty collection', async t => {
     await startApp(t);
     const api = await getClient();
     measureStartupTime(api);
-    await stopApp(t);
+    await stopApp(t, false);
   }
 
   // measure the bundle size
@@ -97,7 +98,7 @@ test('Large collection', async t => {
     await startApp(t);
     const api = await getClient();
     measureStartupTime(api);
-    await stopApp(t);
+    await stopApp(t, false);
   }
 
   // measure memory and CPU
