@@ -5,16 +5,6 @@
  * error situations, the application will start up normally.
  */
 
-// Measure time between events
-let lastEventTime = 0;
-function measure(msg: string, time?: number) {
-  if (!time) time = Date.now();
-  const delta = lastEventTime ? time - lastEventTime : 0;
-  lastEventTime = time;
-  if (delta > 2000) console.log('------------------');
-  console.log(msg, delta + 'ms');
-}
-
 import * as util from 'util';
 import * as path from 'path';
 import * as tasklist from 'tasklist';
