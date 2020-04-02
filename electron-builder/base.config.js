@@ -26,6 +26,7 @@ const base = {
     oneClick: false,
     perMachine: true,
     allowToChangeInstallationDirectory: true,
+    uninstallDisplayName: "Streamlabs OBS",
     include: 'installer.nsh'
   },
   publish: {
