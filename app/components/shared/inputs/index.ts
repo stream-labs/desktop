@@ -63,6 +63,11 @@ export interface IImagePickerMetadata<TValueType> extends IListMetadata<TValueTy
   isIcons: boolean;
 }
 
+export interface IGenericTagMetadata<TValueType> extends IListMetadata<TValueType> {
+  placeholder?: string;
+  noPermission?: boolean;
+}
+
 export interface ITextMetadata extends IInputMetadata {
   placeholder?: string;
   max?: number;

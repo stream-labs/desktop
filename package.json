@@ -168,7 +168,7 @@
     "ts-node": "7.0.1",
     "typescript": "3.7.2",
     "urijs": "1.19.1",
-    "v-selectpage": "2.0.2",
+    "v-selectpage": "2.1.2",
     "v-tooltip": "2.0.0-rc.33",
     "vee-validate": "2.2.0",
     "vue": "2.6.9",

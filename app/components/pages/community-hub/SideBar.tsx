@@ -33,7 +33,6 @@ export default class SideBar extends TsxComponent<{ onShowAddChatModal: () => vo
         </span>
         {groupChats.map(chat => {
           const noImg = /^#/.test(chat.avatar);
-          console.log(chat.name, chat.avatar);
           return (
             <div
               class={cx(styles.chatRow, { [styles.active]: this.currentTab === chat.id })}
