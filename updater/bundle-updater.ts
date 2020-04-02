@@ -17,12 +17,16 @@ const prequest = (info: request.UriOptions & request.CoreOptions) => {
 };
 
 module.exports = async (basePath: string) => {
-  const cdnBase = `https://streamlabs-obs-dev.s3-us-west-2.amazonaws.com/${process.env.SLOBS_VERSION}/bundles/`;
+  const cdnBase = `https://slobs-cdn.streamlabs.com/${process.env.SLOBS_VERSION}/bundles/`;
   const localBase = `file://${basePath}/bundles/`;
 
   let useLocalBundles = false;
 
   if (process.argv.includes('--localBundles')) {
+    useLocalBundles = true;
+  }
+
+  if (process.env.NODE_ENV !== 'production') {
     useLocalBundles = true;
   }
 
