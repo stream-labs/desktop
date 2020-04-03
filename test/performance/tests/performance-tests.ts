@@ -8,7 +8,7 @@ import { spawnSync } from 'child_process';
 import { sleep } from '../../helpers/sleep';
 import { PerformanceService } from '../../../app/app-services';
 import { setOutputResolution, setTemporaryRecordingPath } from '../../helpers/spectron/output';
-import { startRecording } from '../../helpers/spectron/streaming';
+import { startRecording, stopRecording } from '../../helpers/spectron/streaming';
 import { getCPUUsage, getMemoryUsage, usePerformanceTest } from '../tools';
 import { logIn } from '../../helpers/spectron/user';
 const fs = require('fs-extra');
@@ -17,13 +17,13 @@ const path = require('path');
 
 usePerformanceTest();
 
-const RELOAD_ATTEMPTS = 20;
-const CPU_ATTEMPTS = 200;
-const ADD_SOURCES_ATTEMPTS = 5;
+// const RELOAD_ATTEMPTS = 20;
+// const CPU_ATTEMPTS = 200;
+// const ADD_SOURCES_ATTEMPTS = 5;
 
-// const RELOAD_ATTEMPTS = 2;
-// const CPU_ATTEMPTS = 10;
-// const ADD_SOURCES_ATTEMPTS = 1;
+const RELOAD_ATTEMPTS = 2;
+const CPU_ATTEMPTS = 10;
+const ADD_SOURCES_ATTEMPTS = 1;
 
 /**
  * unzip a sample of a large scene collection to the SceneCollection folder
@@ -62,7 +62,7 @@ async function measureMemoryAndCPU(attempts = CPU_ATTEMPTS) {
   }
 }
 
-test.skip('Bundle size', async t => {
+test('Bundle size', async t => {
   const meter = getMeter();
   const bundlePath = path.resolve(__dirname, '..', '..', '..', '..', 'bundles');
   const rendererPath = path.resolve(bundlePath, 'renderer.js');
@@ -74,7 +74,7 @@ test.skip('Bundle size', async t => {
   t.pass();
 });
 
-test.skip('Empty collection', async t => {
+test('Empty collection', async t => {
   const meter = getMeter();
   await stopApp(t, false);
 
@@ -115,7 +115,7 @@ test('Large collection', async t => {
   t.pass();
 });
 
-test.skip('Empty collection (logged-in twitch)', async t => {
+test('Empty collection (logged-in twitch)', async t => {
   const meter = getMeter();
   await logIn(t, 'twitch');
   await sleep(2000);
@@ -132,7 +132,7 @@ test.skip('Empty collection (logged-in twitch)', async t => {
   t.pass();
 });
 
-test.skip('Large collection (logged-in twitch)', async t => {
+test('Large collection (logged-in twitch)', async t => {
   await logIn(t, 'twitch');
   await sleep(2000);
   await stopApp(t, false);
@@ -157,7 +157,7 @@ test.skip('Large collection (logged-in twitch)', async t => {
   t.pass();
 });
 
-test.skip('Recording', async t => {
+test('Recording', async t => {
   await setTemporaryRecordingPath(t);
   await setOutputResolution(t, '100x100');
   const api = await getClient();
@@ -167,12 +167,12 @@ test.skip('Recording', async t => {
 
   await startRecording(t);
   await measureMemoryAndCPU();
-  await startRecording(t);
+  await stopRecording(t);
 
   t.pass();
 });
 
-test.skip('Add and remove sources', async t => {
+test('Add and remove sources', async t => {
   const api = await getClient();
   const scenesService = api.getResource<ScenesService>('ScenesService');
   const meter = getMeter();

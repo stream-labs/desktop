@@ -22,6 +22,8 @@ const TESTS_SERVICE_URL = CI ? 'https://slobs-users-pool.herokuapp.com' : 'http:
     ' ',
   )}`;
   const resultsPath = path.resolve(CONFIG.dist, 'performance-results.json');
+  fs.removeSync(resultsPath);
+  fs.removeSync(CONFIG.compiledTestsDist);
 
   // const baseBranchTestResults = {
   //   'Empty collection': {
