@@ -18,7 +18,9 @@ const TESTS_SERVICE_URL = CI ? 'https://slobs-users-pool.herokuapp.com' : 'http:
   // prepare the dist dir
   fs.removeSync(CONFIG.dist);
   fs.mkdirSync(CONFIG.dist, { recursive: true });
-  const runTestsCmd = `yarn test ${CONFIG.compiledTestsDist}/performance/tests/**/*.js ${args.join(' ',)}`;
+  const runTestsCmd = `yarn test ${CONFIG.compiledTestsDist}/performance/tests/**/*.js ${args.join(
+    ' ',
+  )}`;
   const resultsPath = path.resolve(CONFIG.dist, 'performance-results.json');
 
   // const baseBranchResults = {
@@ -59,20 +61,27 @@ const TESTS_SERVICE_URL = CI ? 'https://slobs-users-pool.herokuapp.com' : 'http:
 
   const needToSaveResults = true; // baseBranchHasCommit(getCommitSHA());
   if (needToSaveResults) await sendResults(testResults);
-
 })();
 
+/**
+ * Compare results from 2 branches and show them as a table
+ */
 function printResults(baseBranchResults, currentBranchResults) {
   const comparisonResults = {};
   let performanceDelta = 0;
+
+  // iterate throw each test
   Object.keys(baseBranchResults).forEach(testName => {
     const baseBranchMetrics = baseBranchResults[testName];
     console.log(`${testName}`);
+
+    // define table columns
     const table = new Table({
       head: ['METRIC', 'UNITS', 'RECORDS', 'BASE BRANCH AVG', 'CURRENT BRANCH AVG', 'DIFF %'],
       colWidths: [35, 10, 9, 17, 20, 20],
     });
 
+    // iterate thow each metric
     Object.keys(baseBranchMetrics).forEach(metricName => {
       if (!comparisonResults[testName]) comparisonResults[testName] = {};
       const baseMetric = baseBranchMetrics[metricName];
@@ -91,6 +100,8 @@ function printResults(baseBranchResults, currentBranchResults) {
       const diff = baseMetricAvg / currentMetricAvg;
       const diffPercent = (1 - diff) * 100;
       performanceDelta += diffPercent;
+
+      // create table row
       table.push([
         metricName,
         baseMetric.units,
