@@ -4,7 +4,7 @@ import { SelectPage } from 'v-selectpage';
 import { Inject } from 'services/core/injector';
 import { $t, I18nService } from 'services/i18n';
 import { CustomizationService } from 'services/customization';
-import { IGenericTagMetadata } from '.';
+import { ITagsInputMetadata } from '.';
 
 export interface ITag {
   value: string;
@@ -13,16 +13,20 @@ export interface ITag {
 
 // TODO: Port TwitchTagsInput to use this
 @Component({})
-export default class GenericTagInput extends BaseInput<Array<ITag>, IGenericTagMetadata<string>> {
+export default class TagsInput extends BaseInput<Array<ITag>, ITagsInputMetadata<string>> {
   @Inject() i18nService: I18nService;
   @Inject() customizationService: CustomizationService;
 
   @Prop() readonly value: Array<ITag>;
 
   @Prop({ default: () => ({}) })
-  readonly metadata: IGenericTagMetadata<string>;
+  readonly metadata: ITagsInputMetadata<string>;
 
   @Prop() readonly title: string;
+
+  $refs: { inputContainer: HTMLElement };
+
+  width = 0;
 
   mounted() {
     const search = document.getElementsByClassName('sp-search');
@@ -32,6 +36,7 @@ export default class GenericTagInput extends BaseInput<Array<ITag>, IGenericTagM
     Array.from(search).forEach(el => el.classList.add(cssClass));
     Array.from(searchInput).forEach(el => el.classList.add(cssClass));
     Array.from(results).forEach(el => el.classList.add(cssClass));
+    this.width = this.$refs.inputContainer.clientWidth;
   }
 
   tableColumns = [
@@ -61,7 +66,7 @@ export default class GenericTagInput extends BaseInput<Array<ITag>, IGenericTagM
 
   render() {
     return (
-      <div data-role="input" data-type="twitchTags" data-name={this.metadata.name}>
+      <div data-role="input" data-type="tags" data-name={this.metadata.name} ref="inputContainer">
         {!this.metadata.noPermission && (
           <SelectPage
             data={this.metadata.options}
@@ -75,8 +80,8 @@ export default class GenericTagInput extends BaseInput<Array<ITag>, IGenericTagM
             tb-columns={this.tableColumns}
             max-select-limit={5}
             onValues={(tags: Array<ITag>) => this.handleInput(tags)}
-            width={398}
             language="en"
+            width={this.width}
             disabled={this.shouldDisable}
           />
         )}

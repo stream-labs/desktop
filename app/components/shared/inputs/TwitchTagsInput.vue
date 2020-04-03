@@ -17,6 +17,7 @@
       language="en"
       :width="398"
       :disabled="shouldDisable"
+      style="width: 70%;"
     />
 
     <div class="update-tags-notice" v-else>

@@ -15,4 +15,4 @@ export { default as SoundInput } from './SoundInput.vue';
 export { default as ToggleInput } from './ToggleInput';
 export { default as ImageMediaInput } from './ImageMediaInput.vue';
 export { default as TimerInput } from './TimerInput.vue';
-export { default as GenericTagInput } from './GenericTagInput';
+export { default as TagsInput } from './TagsInput';

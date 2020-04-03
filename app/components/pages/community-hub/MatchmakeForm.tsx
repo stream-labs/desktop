@@ -3,15 +3,14 @@ import cx from 'classnames';
 import TsxComponent from 'components/tsx-component';
 import styles from './CommunityHub.m.less';
 import { $t } from 'services/i18n';
-import GenericTagInput, { ITag } from 'components/shared/inputs/GenericTagInput';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
-import { metadata } from 'components/shared/inputs';
+import { metadata, IListOption } from 'components/shared/inputs';
 
 @Component({})
 export default class MatchmakeForm extends TsxComponent {
-  selectedCategories: Array<ITag> = [];
-  selectedTags: Array<ITag> = [];
+  selectedCategories: Array<IListOption<string>> = [];
+  selectedTags: Array<IListOption<string>> = [];
   roomSize: number = 2;
 
   stubTags = [
@@ -28,11 +27,12 @@ export default class MatchmakeForm extends TsxComponent {
         <img src={require('../../../../media/images/community-hub/matchmake.png')} />
         <h2>{$t('Meet other streamers to connect with!')}</h2>
         <ValidatedForm class={styles.matchmakeDropdowns}>
-          <GenericTagInput
+          <VFormGroup
             vModel={this.selectedCategories}
-            metadata={{ title: $t('I Like to Play'), options: this.stubTags }}
+            metadata={metadata.tags({ title: $t('I Like to Play'), options: this.stubTags })}
           />
           <VFormGroup
+            style="margin-left: 24px;"
             vModel={this.roomSize}
             metadata={metadata.number({
               min: 2,
@@ -43,10 +43,12 @@ export default class MatchmakeForm extends TsxComponent {
             })}
           />
         </ValidatedForm>
-        <GenericTagInput
-          value={this.selectedTags}
-          metadata={{ title: $t('I Want to Talk About'), options: this.stubTags }}
-        />
+        <div class={styles.matchmakeDropdowns}>
+          <VFormGroup
+            value={this.selectedTags}
+            metadata={metadata.tags({ title: $t('I Want to Talk About'), options: this.stubTags })}
+          />
+        </div>
         <button class={cx('button button--action', styles.matchmakeButton)}>
           {$t('Matchmake')}
         </button>
