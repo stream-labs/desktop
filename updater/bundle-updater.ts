@@ -17,13 +17,27 @@ module.exports = async (basePath: string) => {
 
   // Check if bundle updates are available
   // TODO: In the future, support other bundles than just renderer.js
+  // TODO: Cache the latest bundle name for offline use?
+  let latestBundle: string | undefined;
+
   if (!useLocalBundles) {
     try {
-      const response = await fetch(`${cdnBase}renderer.js`, { method: 'HEAD' });
+      const response = await fetch(`${cdnBase}latest.json`);
 
       if (response.status / 100 >= 4) {
         console.log('Bundle update not available, using local bundles');
         useLocalBundles = true;
+      } else {
+        const parsed = await response.json();
+        console.log('Latest bundle info:', parsed);
+
+        latestBundle = parsed.renderer;
+
+        if (parsed.renderer) {
+          latestBundle = parsed.renderer;
+        } else {
+          useLocalBundles = true;
+        }
       }
     } catch (e) {
       console.log('Bundle prefetch error', e);
@@ -37,7 +51,7 @@ module.exports = async (basePath: string) => {
       if (useLocalBundles) {
         cb({ redirectURL: `${localBase}renderer.js` });
       } else {
-        cb({ redirectURL: `${cdnBase}renderer.js` });
+        cb({ redirectURL: `${cdnBase}${latestBundle}` });
       }
     },
   );
@@ -56,26 +70,28 @@ module.exports = async (basePath: string) => {
     electron.app.quit();
   }
 
-  electron.session.defaultSession?.webRequest.onHeadersReceived(
-    { urls: [`${cdnBase}renderer.js`] },
-    (info, cb) => {
-      if (info.statusCode / 100 < 4) {
-        cb({});
-        return;
-      }
+  if (!useLocalBundles && latestBundle) {
+    electron.session.defaultSession?.webRequest.onHeadersReceived(
+      { urls: [`${cdnBase}${latestBundle}`] },
+      (info, cb) => {
+        if (info.statusCode / 100 < 4) {
+          cb({});
+          return;
+        }
 
-      console.log(`Caught error fetching bundle with status ${info.statusCode}`);
+        console.log(`Caught error fetching bundle with status ${info.statusCode}`);
 
-      revertToLocalBundles();
-    },
-  );
+        revertToLocalBundles();
+      },
+    );
 
-  electron.session.defaultSession?.webRequest.onErrorOccurred(
-    { urls: [`${cdnBase}renderer.js`] },
-    info => {
-      console.log('Caught error fetching bundle', info.error);
+    electron.session.defaultSession?.webRequest.onErrorOccurred(
+      { urls: [`${cdnBase}${latestBundle}`] },
+      info => {
+        console.log('Caught error fetching bundle', info.error);
 
-      revertToLocalBundles();
-    },
-  );
+        revertToLocalBundles();
+      },
+    );
+  }
 };

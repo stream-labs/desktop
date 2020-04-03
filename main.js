@@ -70,7 +70,7 @@ if (!gotTheLock) {
 
   const util = require('util');
   const logFile = path.join(app.getPath('userData'), 'app.log');
-  const maxLogBytes = 16384;
+  const maxLogBytes = 131072;
 
   // Truncate the log file if it is too long
   if (fs.existsSync(logFile) && fs.statSync(logFile).size > maxLogBytes) {
