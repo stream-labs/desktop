@@ -32,6 +32,12 @@ module.exports = async (basePath: string) => {
         console.log('Latest bundle info:', parsed);
 
         latestBundle = parsed.renderer;
+
+        if (parsed.renderer) {
+          latestBundle = parsed.renderer;
+        } else {
+          useLocalBundles = true;
+        }
       }
     } catch (e) {
       console.log('Bundle prefetch error', e);
