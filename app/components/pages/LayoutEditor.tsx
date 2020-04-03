@@ -26,6 +26,7 @@ export default class LayoutEditor extends TsxComponent {
 
   private highlightedSlot: LayoutSlot = null;
   private showModal = false;
+  canDragSlot = true;
 
   mounted() {
     if (this.slottedElements[ELayoutElement.Browser]) {
@@ -212,7 +213,7 @@ export default class LayoutEditor extends TsxComponent {
       <div
         class={this.classForSlot(slot)}
         id={slot}
-        draggable={this.elementInSlot(slot)}
+        draggable={this.elementInSlot(slot) && this.canDragSlot}
         ondragenter={(): unknown => (this.highlightedSlot = slot)}
         ondragexit={(): unknown => (this.highlightedSlot = null)}
         onDragend={(e: MouseEvent) =>
@@ -224,6 +225,8 @@ export default class LayoutEditor extends TsxComponent {
           <TextInput
             class={styles.urlTextBox}
             vModel={this.browserUrl}
+            onFocus={() => (this.canDragSlot = false)}
+            onBlur={() => (this.canDragSlot = true)}
             metadata={{ placeholder: $t('Enter Target URL') }}
           />
         )}
