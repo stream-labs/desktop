@@ -30,6 +30,8 @@ const ADD_SOURCES_ATTEMPTS = 1;
  */
 function unzipLargeSceneCollection(t: TExecutionContext) {
   const cacheDir = t.context.cacheDir;
+  console.log('cacheDirIs', cacheDir);
+  console.log('contextIs', t.context);
   const sceneCollectionPath = path.resolve(cacheDir, 'SceneCollections');
   fs.removeSync(sceneCollectionPath);
 
@@ -94,7 +96,7 @@ test('Empty collection', async t => {
   t.pass();
 });
 
-test('Large collection', async t => {
+test.skip('Large collection', async t => {
   // extract large scene-collection
   await stopApp(t, false);
   await unzipLargeSceneCollection(t);
