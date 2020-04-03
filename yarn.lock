@@ -10242,9 +10242,9 @@ streamlabs-beaker@0.9.4:
   resolved "https://registry.yarnpkg.com/streamlabs-beaker/-/streamlabs-beaker-0.9.4.tgz#270507d029369e0bbc3414c86b3d66f0a8536f54"
   integrity sha512-9Krd5Lsw9wOK5SZASyqplG7W25CEPxrwMsjNO1FKvGTU7W+YwHqAhRf+g8htYo1BdVvRWugbNPz1i4ARz4UErQ==
 
-"streamlabs-obs-launcher@https://obs-studio-deployment.s3-us-west-2.amazonaws.com/streamlabs-obs-launcher-0.0.1l.tar.gz":
-  version "0.0.1"
-  resolved "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/streamlabs-obs-launcher-0.0.1l.tar.gz#e42c0f40a97d160ea3e44eeb8f8aa8004446dbdb"
+"streamlabs-obs-launcher@https://obs-studio-deployment.s3-us-west-2.amazonaws.com/streamlabs-obs-launcher-0.0.2a.tar.gz":
+  version "0.0.2"
+  resolved "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/streamlabs-obs-launcher-0.0.2a.tar.gz#052acebdb2bb8b0938ed07e38d114493fdd488af"
 
 string-width@^1.0.1:
   version "1.0.2"
