@@ -76,8 +76,8 @@ test('Bundle size', async t => {
   const updaterPath = path.resolve(bundlePath, 'updater.js');
   const rendererSize = fs.statSync(rendererPath).size;
   const updaterSize = fs.statSync(updaterPath).size;
-  meter.addMeasurement('renderer.js', rendererSize);
-  meter.addMeasurement('updater.js', updaterSize);
+  meter.addMeasurement('renderer-js', rendererSize);
+  meter.addMeasurement('updater-js', updaterSize);
   t.pass();
 });
 

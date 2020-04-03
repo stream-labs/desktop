@@ -5,8 +5,8 @@ type TMeterEvent =
   | 'sceneCollectionLoad'
   | 'CPU'
   | 'memory'
-  | 'renderer.js'
-  | 'updater.js'
+  | 'renderer-js'
+  | 'updater-js'
   | 'addSources'
   | 'removeSources';
 
@@ -15,8 +15,8 @@ const units: { [key in TMeterEvent]: string } = {
   sceneCollectionLoad: 'ms',
   CPU: 'percent',
   memory: 'bite',
-  'renderer.js': 'bite',
-  'updater.js': 'bite',
+  'renderer-js': 'bite',
+  'updater-js': 'bite',
   addSources: 'ms',
   removeSources: 'ms',
 };
