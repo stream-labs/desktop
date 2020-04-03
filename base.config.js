@@ -1,5 +1,5 @@
 const path = require('path');
-const { CheckerPlugin } = require('awesome-typescript-loader')
+const { CheckerPlugin } = require('awesome-typescript-loader');
 
 const plugins = process.env.SLOBS_FORKED_TYPECHECKING ? [new CheckerPlugin()] : [];
 
@@ -141,6 +141,12 @@ module.exports = {
         loader: 'raw-loader'
       }
     ]
+  },
+
+  optimization: {
+    splitChunks: {
+      chunks: chunk => chunk.name === 'renderer'
+    }
   },
 
   plugins
