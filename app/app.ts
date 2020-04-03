@@ -1,3 +1,5 @@
+/*global SLOBS_BUNDLE_ID*/
+
 import { I18nService, $t } from 'services/i18n';
 
 // eslint-disable-next-line
@@ -56,6 +58,7 @@ if (isProduction) {
     extra: {
       'sentry[release]': slobsVersion,
       processType: 'renderer',
+      bundleId: SLOBS_BUNDLE_ID,
     },
   });
 }
@@ -87,6 +90,10 @@ function sendLogMsg(level: string, ...args: any[]) {
 }
 
 ['log', 'info', 'warn', 'error'].forEach(wrapLogFn);
+
+if (windowId === 'worker') {
+  console.log(`Bundle Id: ${SLOBS_BUNDLE_ID}`);
+}
 
 window.addEventListener('error', e => {
   sendLogMsg('error', e.error);
