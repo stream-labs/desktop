@@ -32,7 +32,7 @@ test('Twitch Tags', async t => {
   await clearTags(app);
 
   // Add a couple of tags
-  await app.client.click(tagsControlSelector);
+  await app.client.waitForVisible('td=100%');
   await app.client.click('td=100%');
   await app.client.click('td=AMA');
 
@@ -86,7 +86,7 @@ const clearTags = async (app: any) => {
   for (const removeButton of removeTagButtons.reverse()) {
     await app.client.click(
       // @ts-ignore
-      `.tags-container .sp-selected-tag:nth-child(${removeButton.index + 2}) .sp-icon-close`,
+      `.tags-container .sp-selected-tag:nth-child(${removeButton.index + 1}) .sp-icon-close`,
     );
   }
 };
