@@ -136,6 +136,7 @@ export async function restartApp(t: TExecutionContext): Promise<Application> {
 }
 
 let skipCheckingErrorsInLogFlag = false;
+let cacheDir: string;
 
 /**
  * Disable checking errors in the log file for a single test
@@ -154,7 +155,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   let failMsg = '';
   let testName = '';
   let logFileLastReadingPos = 0;
-  const cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
+  cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
 
   startAppFn = async function startApp(t: TExecutionContext): Promise<Application> {
     t.context.cacheDir = cacheDir;
@@ -382,4 +383,8 @@ export async function click(t: TExecutionContext, selector: string) {
     const message = `click to "${selector}" failed in window ${windowId}: ${e.message} ${e.type}`;
     throw new Error(message);
   }
+}
+
+export function getCacheDir() {
+  return cacheDir;
 }

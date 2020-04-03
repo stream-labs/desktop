@@ -30,8 +30,6 @@ const ADD_SOURCES_ATTEMPTS = 5;
  */
 function unzipLargeSceneCollection(t: TExecutionContext) {
   const cacheDir = t.context.cacheDir;
-  console.log('cacheDirIs', cacheDir);
-  console.log('contextIs', t.context);
   const sceneCollectionPath = path.resolve(cacheDir, 'SceneCollections');
   fs.removeSync(sceneCollectionPath);
 
