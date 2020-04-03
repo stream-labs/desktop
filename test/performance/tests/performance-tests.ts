@@ -71,6 +71,7 @@ test('Bundle size', async t => {
   const updaterSize = fs.statSync(updaterPath).size;
   meter.addMeasurement('renderer.js', rendererSize);
   meter.addMeasurement('updater.js', updaterSize);
+  t.pass();
 });
 
 test('Empty collection', async t => {
