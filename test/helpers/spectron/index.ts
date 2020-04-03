@@ -161,7 +161,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     const appArgs = options.appArgs ? options.appArgs.split(' ') : [];
     if (options.networkLogging) appArgs.push('--network-logging');
     if (options.noSync) appArgs.push('--nosync');
-    console.log('define app');
     app = t.context.app = new Application({
       path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
       args: [
@@ -186,10 +185,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     });
 
     if (options.beforeAppStartCb) await options.beforeAppStartCb(t);
-
-    console.log('try to start app');
     await t.context.app.start();
-    console.log('app started');
 
     // Disable CSS transitions while running tests to allow for eager test clicks
     const disableTransitionsCode = `

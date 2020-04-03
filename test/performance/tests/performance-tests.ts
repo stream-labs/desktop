@@ -12,19 +12,20 @@ import { PerformanceService } from '../../../app/app-services';
 import { setOutputResolution, setTemporaryRecordingPath } from '../../helpers/spectron/output';
 import { startRecording } from '../../helpers/spectron/streaming';
 import { getCPUUsage, getMemoryUsage, usePerformanceTest } from '../tools';
+import { logIn } from '../../helpers/spectron/user';
 const fs = require('fs-extra');
 const _7z = require('7zip')['7z'];
 const path = require('path');
 
 usePerformanceTest();
 
-// const RELOAD_ATTEMPTS = 20;
-// const CPU_ATTEMPTS = 200;
-// const ADD_SOURCES_ATTEMPTS = 10;
+const RELOAD_ATTEMPTS = 20;
+const CPU_ATTEMPTS = 200;
+const ADD_SOURCES_ATTEMPTS = 5;
 
-const RELOAD_ATTEMPTS = 2;
-const CPU_ATTEMPTS = 10;
-const ADD_SOURCES_ATTEMPTS = 1;
+// const RELOAD_ATTEMPTS = 2;
+// const CPU_ATTEMPTS = 10;
+// const ADD_SOURCES_ATTEMPTS = 1;
 
 /**
  * unzip a sample of a large scene collection to the SceneCollection folder
@@ -63,8 +64,18 @@ async function measureMemoryAndCPU(attempts = CPU_ATTEMPTS) {
   }
 }
 
+test('Bundle size', async t => {
+  const meter = getMeter();
+  const bundlePath = path.resolve(__dirname, '..', '..', '..', '..', 'bundles');
+  const rendererPath = path.resolve(bundlePath, 'renderer.js');
+  const updaterPath = path.resolve(bundlePath, 'updater.js');
+  const rendererSize = fs.statSync(rendererPath).size;
+  const updaterSize = fs.statSync(updaterPath).size;
+  meter.addMeasurement('renderer.js', rendererSize);
+  meter.addMeasurement('updater.js', updaterSize);
+});
+
 test('Empty collection', async t => {
-  console.log('test started');
   const meter = getMeter();
   await stopApp(t, false);
 
@@ -77,12 +88,10 @@ test('Empty collection', async t => {
     await stopApp(t, false);
   }
 
-  // measure the bundle size
-  const bundlePath = path.resolve(__dirname, '..', '..', '..', '..', 'bundles', 'renderer.js');
-  const bundleSize = fs.statSync(bundlePath).size;
-  meter.addMeasurement('bundleSize', bundleSize);
+  // measure memory and CPU
+  await startApp(t);
+  await measureMemoryAndCPU();
 
-  meter.printResults();
   t.pass();
 });
 
@@ -104,8 +113,45 @@ test('Large collection', async t => {
   // measure memory and CPU
   await startApp(t);
   await measureMemoryAndCPU();
+  t.pass();
+});
 
-  meter.printResults();
+test('Empty collection (logged-in twitch)', async t => {
+  const meter = getMeter();
+  await logIn(t, 'twitch');
+  await sleep(2000);
+  await stopApp(t, false);
+
+  // measure startup time
+  let attempts = RELOAD_ATTEMPTS;
+  while (attempts--) {
+    await startApp(t);
+    const api = await getClient();
+    measureStartupTime(api);
+    await stopApp(t, false);
+  }
+  t.pass();
+});
+
+test('Large collection (logged-in twitch)', async t => {
+  await logIn(t, 'twitch');
+  await sleep(2000);
+  await stopApp(t, false);
+  await unzipLargeSceneCollection(t);
+  const meter = getMeter();
+
+  // measure startup time
+  let i = RELOAD_ATTEMPTS;
+  while (i--) {
+    await startApp(t);
+    const api = await getClient();
+    measureStartupTime(api);
+    await stopApp(t, false);
+  }
+
+  // measure memory and CPU
+  await startApp(t);
+  await measureMemoryAndCPU();
   t.pass();
 });
 
@@ -121,7 +167,6 @@ test('Recording', async t => {
   await measureMemoryAndCPU();
   await startRecording(t);
 
-  meter.printResults();
   t.pass();
 });
 
@@ -168,6 +213,5 @@ test('Add and remove sources', async t => {
     await sleep(2000);
   }
 
-  meter.printResults();
   t.pass();
 });

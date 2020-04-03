@@ -1,9 +1,12 @@
+const fs = require('fs-extra');
+
 type TMeterEvent =
   | 'mainWindowShow'
   | 'sceneCollectionLoad'
   | 'CPU'
   | 'memory'
-  | 'bundleSize'
+  | 'renderer.js'
+  | 'updater.js'
   | 'addSources'
   | 'removeSources';
 
@@ -12,7 +15,8 @@ const units: { [key in TMeterEvent]: string } = {
   sceneCollectionLoad: 'ms',
   CPU: 'percent',
   memory: 'bite',
-  bundleSize: 'bite',
+  'renderer.js': 'bite',
+  'updater.js': 'bite',
   addSources: 'ms',
   removeSources: 'ms',
 };
@@ -72,20 +76,24 @@ class Meter {
     this.recordedEvents[eventName].values.push(duration);
   }
 
-  printResults() {
+  writeReportToFile(testName: string, path: string) {
+    let reportText = `# ${testName}`;
     Object.keys(this.recordedEvents).forEach(eventName => {
       const values = this.recordedEvents[eventName].values;
       const average = values.reduce((v1: number, v2: number) => v1 + v2) / values.length;
       const min = Math.min(...values);
       const max = Math.max(...values);
       const dispersion = max - min;
-      console.log(`-------${eventName}`);
-      console.log('records:', values);
-      console.log('average:', average);
-      console.log('min:', min);
-      console.log('max:', max);
-      console.log('dispersion:', dispersion);
+      reportText += `
+        ##${eventName}
+        records: ${JSON.stringify(values)}
+        average: ${average}
+        min: ${min}
+        max: ${max}
+        dispersion: ${dispersion}
+      `;
     });
+    fs.appendFileSync(path, reportText);
   }
 }
 
