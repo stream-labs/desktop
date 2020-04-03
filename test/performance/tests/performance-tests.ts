@@ -62,7 +62,7 @@ async function measureMemoryAndCPU(attempts = CPU_ATTEMPTS) {
   }
 }
 
-test('Bundle size', async t => {
+test.skip('Bundle size', async t => {
   const meter = getMeter();
   const bundlePath = path.resolve(__dirname, '..', '..', '..', '..', 'bundles');
   const rendererPath = path.resolve(bundlePath, 'renderer.js');
@@ -74,7 +74,7 @@ test('Bundle size', async t => {
   t.pass();
 });
 
-test('Empty collection', async t => {
+test.skip('Empty collection', async t => {
   const meter = getMeter();
   await stopApp(t, false);
 
@@ -115,7 +115,7 @@ test('Large collection', async t => {
   t.pass();
 });
 
-test('Empty collection (logged-in twitch)', async t => {
+test.skip('Empty collection (logged-in twitch)', async t => {
   const meter = getMeter();
   await logIn(t, 'twitch');
   await sleep(2000);
@@ -132,12 +132,15 @@ test('Empty collection (logged-in twitch)', async t => {
   t.pass();
 });
 
-test('Large collection (logged-in twitch)', async t => {
+test.skip('Large collection (logged-in twitch)', async t => {
   await logIn(t, 'twitch');
   await sleep(2000);
   await stopApp(t, false);
   await unzipLargeSceneCollection(t);
-  const meter = getMeter();
+
+  // start and stop app to sync the scene collection
+  await startApp(t);
+  await stopApp(t);
 
   // measure startup time
   let i = RELOAD_ATTEMPTS;
@@ -154,7 +157,7 @@ test('Large collection (logged-in twitch)', async t => {
   t.pass();
 });
 
-test('Recording', async t => {
+test.skip('Recording', async t => {
   await setTemporaryRecordingPath(t);
   await setOutputResolution(t, '100x100');
   const api = await getClient();
@@ -169,7 +172,7 @@ test('Recording', async t => {
   t.pass();
 });
 
-test('Add and remove sources', async t => {
+test.skip('Add and remove sources', async t => {
   const api = await getClient();
   const scenesService = api.getResource<ScenesService>('ScenesService');
   const meter = getMeter();
