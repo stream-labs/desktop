@@ -1,13 +1,15 @@
 const path = require('path');
 const { CheckerPlugin } = require('awesome-typescript-loader');
 const webpack = require('webpack');
-const uuid = require('uuid/v4');
+const cp = require('child_process');
 
 const plugins = process.env.SLOBS_FORKED_TYPECHECKING ? [new CheckerPlugin()] : [];
 
+const commit = cp.execSync('git rev-parse --short HEAD');
+
 plugins.push(
   new webpack.DefinePlugin({
-    SLOBS_BUNDLE_ID: JSON.stringify(uuid()),
+    SLOBS_BUNDLE_ID: JSON.stringify(commit),
   }),
 );
 
