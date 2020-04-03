@@ -1,20 +1,5 @@
-import * as request from 'request';
+import fetch from 'node-fetch';
 import * as electron from 'electron';
-
-/**
- * Use our own promisify for request, has better typings
- */
-const prequest = (info: request.UriOptions & request.CoreOptions) => {
-  return new Promise<request.Response>((resolve, reject) => {
-    request(info, (err, response) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(response);
-      }
-    });
-  });
-};
 
 module.exports = async (basePath: string) => {
   const cdnBase = `https://slobs-cdn.streamlabs.com/${process.env.SLOBS_VERSION}/bundles/`;
@@ -34,8 +19,9 @@ module.exports = async (basePath: string) => {
   // TODO: In the future, support other bundles than just renderer.js
   if (!useLocalBundles) {
     try {
-      const response = await prequest({ uri: `${cdnBase}renderer.js`, method: 'HEAD' });
-      if (response.statusCode / 100 >= 4) {
+      const response = await fetch(`${cdnBase}renderer.js`, { method: 'HEAD' });
+
+      if (response.status / 100 >= 4) {
         console.log('Bundle update not available, using local bundles');
         useLocalBundles = true;
       }
