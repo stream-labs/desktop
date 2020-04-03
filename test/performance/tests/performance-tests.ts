@@ -17,13 +17,13 @@ const path = require('path');
 
 usePerformanceTest();
 
-// const RELOAD_ATTEMPTS = 20;
-// const CPU_ATTEMPTS = 200;
-// const ADD_SOURCES_ATTEMPTS = 5;
+const RELOAD_ATTEMPTS = 20;
+const CPU_ATTEMPTS = 200;
+const ADD_SOURCES_ATTEMPTS = 5;
 
-const RELOAD_ATTEMPTS = 2;
-const CPU_ATTEMPTS = 10;
-const ADD_SOURCES_ATTEMPTS = 1;
+// const RELOAD_ATTEMPTS = 2;
+// const CPU_ATTEMPTS = 10;
+// const ADD_SOURCES_ATTEMPTS = 1;
 
 /**
  * unzip a sample of a large scene collection to the SceneCollection folder
@@ -77,7 +77,6 @@ test('Bundle size', async t => {
 });
 
 test('Empty collection', async t => {
-  const meter = getMeter();
   await stopApp(t, false);
 
   // measure startup time
@@ -96,11 +95,10 @@ test('Empty collection', async t => {
   t.pass();
 });
 
-test.skip('Large collection', async t => {
-  // extract large scene-collection
+test('Large collection', async t => {
+  await sleep(2000);
   await stopApp(t, false);
   await unzipLargeSceneCollection(t);
-  const meter = getMeter();
 
   // measure startup time
   let i = RELOAD_ATTEMPTS;
