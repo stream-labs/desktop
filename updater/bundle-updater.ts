@@ -17,13 +17,21 @@ module.exports = async (basePath: string) => {
 
   // Check if bundle updates are available
   // TODO: In the future, support other bundles than just renderer.js
+  // TODO: Cache the latest bundle name for offline use?
+  let latestBundle: string;
+
   if (!useLocalBundles) {
     try {
-      const response = await fetch(`${cdnBase}renderer.js`, { method: 'HEAD' });
+      const response = await fetch(`${cdnBase}latest.json`);
 
       if (response.status / 100 >= 4) {
         console.log('Bundle update not available, using local bundles');
         useLocalBundles = true;
+      } else {
+        const parsed = await response.json();
+        console.log('Latest bundle info:', parsed);
+
+        latestBundle = parsed.renderer;
       }
     } catch (e) {
       console.log('Bundle prefetch error', e);
@@ -37,8 +45,25 @@ module.exports = async (basePath: string) => {
       if (useLocalBundles) {
         cb({ redirectURL: `${localBase}renderer.js` });
       } else {
-        cb({ redirectURL: `${cdnBase}renderer.js` });
+        cb({ redirectURL: `${cdnBase}${latestBundle}` });
       }
+    },
+  );
+
+  electron.session.defaultSession?.webRequest.onBeforeSendHeaders(
+    { urls: [`${cdnBase}renderer.js`] },
+    (details, cb) => {
+      console.log('Before Send Headers');
+      console.log(details);
+      cb({});
+    },
+  );
+
+  electron.session.defaultSession?.webRequest.onResponseStarted(
+    { urls: [`${cdnBase}renderer.js`] },
+    details => {
+      console.log('Response Started');
+      console.log(details);
     },
   );
 
