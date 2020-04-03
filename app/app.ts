@@ -36,10 +36,10 @@ import { MetricsService } from 'services/metrics';
 
 const crashHandler = window['require']('crash-handler');
 
-const { ipcRenderer, remote } = electron;
-const slobsVersion = remote.process.env.SLOBS_VERSION;
-const isProduction = process.env.NODE_ENV === 'production';
-const isPreview = !!remote.process.env.SLOBS_PREVIEW;
+const { ipcRenderer, remote, app, contentTracing } = electron;
+const slobsVersion = Utils.env.SLOBS_VERSION;
+const isProduction = Utils.env.NODE_ENV === 'production';
+const isPreview = !!Utils.env.SLOBS_PREVIEW;
 
 // This is the development DSN
 let sentryDsn = 'https://8f444a81edd446b69ce75421d5e91d4d@sentry.io/252950';

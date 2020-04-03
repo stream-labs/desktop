@@ -200,6 +200,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     );
   }
 
+  autoLogin() {
+    if (!this.state.auth) return;
+    const service = getPlatformService(this.state.auth.primaryPlatform);
+    return this.login(service, this.state.auth);
+  }
+
   subscribeToSocketConnection() {
     this.socketConnection = this.websocketService.socketEvent.subscribe(ev =>
       this.onSocketEvent(ev),
@@ -213,7 +219,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   // Makes sure the user's login is still good
-  async validateLogin() {
+  async validateLogin(): Promise<boolean> {
     if (!this.state.auth) return;
 
     const host = this.hostsService.streamlabs;
@@ -226,15 +232,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     });
 
     if (valid.match(/false/)) {
-      this.LOGOUT();
-      electron.remote.dialog.showMessageBox({
-        message: $t('You have been logged out'),
-      });
-      return;
+      return false;
     }
 
-    const service = getPlatformService(this.state.auth.primaryPlatform);
-    await this.login(service, this.state.auth);
+    return true;
   }
 
   /**
@@ -502,19 +503,38 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   @RunInLoadingMode()
-  private async login(service: IPlatformService, auth: IUserAuth) {
+  private async login(service: IPlatformService, auth?: IUserAuth) {
+    if (!auth) auth = this.state.auth;
     this.LOGIN(auth);
     this.VALIDATE_LOGIN(true);
-    await this.updateLinkedPlatforms();
-    const result = await service.validatePlatform();
+    this.setSentryContext();
+    this.userLogin.next(auth);
 
-    // Currently we treat generic errors as success
-    if (result === EPlatformCallResult.TwitchTwoFactor) {
-      this.LOGOUT();
-      return result;
+    const [validateLoginResult, validatePlatformResult] = await Promise.all([
+      this.validateLogin(),
+      service.validatePlatform(),
+      this.updateLinkedPlatforms(),
+      this.refreshUserInfo(),
+      this.sceneCollectionsService.setupNewUser(),
+      this.setPrimeStatus(),
+    ]);
+    this.subscribeToSocketConnection();
+
+    if (!validateLoginResult) {
+      this.logOut();
+      electron.remote.dialog.showMessageBox({
+        message: $t('You have been logged out'),
+      });
+      return;
     }
 
-    if (result === EPlatformCallResult.TwitchScopeMissing) {
+    // Currently we treat generic errors as success
+    if (validatePlatformResult === EPlatformCallResult.TwitchTwoFactor) {
+      this.logOut();
+      return validatePlatformResult;
+    }
+
+    if (validatePlatformResult === EPlatformCallResult.TwitchScopeMissing) {
       await this.logOut();
       this.showLogin();
 
@@ -526,18 +546,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         ),
         buttons: [$t('Refresh Login')],
       });
-      return result;
+
+      return validatePlatformResult;
     }
-
-    this.refreshUserInfo();
-    this.setSentryContext();
-
-    this.userLogin.next(auth);
-    await this.sceneCollectionsService.setupNewUser();
-    this.setPrimeStatus();
-    this.subscribeToSocketConnection();
-
-    return result;
   }
 
   @RunInLoadingMode()

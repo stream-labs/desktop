@@ -7,7 +7,26 @@ export const enum EBit {
   ONE,
 }
 
+export interface IEnv {
+  NODE_ENV: 'production' | 'development';
+  SLOBS_PREVIEW: boolean;
+  SLOBS_IPC: boolean;
+  SLOBS_USE_LOCAL_HOST: boolean;
+  SLOBS_VERSION: string;
+  CI: boolean;
+}
+
 export default class Utils {
+  /**
+   * cache env variables
+   * since electron.remote.process takes to much time to fetch
+   */
+  static _env: IEnv;
+  static get env() {
+    if (!Utils._env) Utils._env = electron.remote.process.env;
+    return Utils._env;
+  }
+
   static applyProxy(target: Object, source: Object | Function) {
     // TODO: Figure out why this is happening
     if (!source) return;
@@ -55,19 +74,19 @@ export default class Utils {
   }
 
   static isDevMode() {
-    return process.env.NODE_ENV !== 'production';
+    return Utils.env.NODE_ENV !== 'production';
   }
 
   static isPreview(): boolean {
-    return electron.remote.process.env.SLOBS_PREVIEW;
+    return Utils.env.SLOBS_PREVIEW as boolean;
   }
 
   static isIpc(): boolean {
-    return electron.remote.process.env.SLOBS_IPC;
+    return Utils.env.SLOBS_IPC as boolean;
   }
 
   static useLocalHost(): boolean {
-    return electron.remote.process.env.SLOBS_USE_LOCAL_HOST;
+    return Utils.env.SLOBS_USE_LOCAL_HOST as boolean;
   }
 
   /**
@@ -174,8 +193,8 @@ export default class Utils {
    * Measure time in ms between events and print in to the main process stdout
    * It's helpful for measuring the time between events in different windows
    */
-  static measure(msg: string) {
-    electron.ipcRenderer.send('measure-time', msg, Date.now());
+  static measure(msg: string, timestamp?: number) {
+    electron.ipcRenderer.send('measure-time', msg, timestamp || Date.now());
   }
 
   static makeChildWindowVisible() {

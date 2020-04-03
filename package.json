@@ -64,6 +64,7 @@
   },
   "dependencies": {
     "@streamlabs/game-overlay": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.41.tar.gz",
+    "@types/node-fetch": "^2.5.5",
     "archiver": "2.1.1",
     "aws-sdk": "^2.344.0",
     "cli-table": "^0.3.1",
@@ -73,6 +74,7 @@
     "extract-zip": "^1.6.7",
     "facemask-plugin": "https://s3-us-west-2.amazonaws.com/faces-internal.streamlabs.com/facemask-plugin-deployment/facemask-plugin-0.9.1.tar.gz",
     "font-manager": "https://github.com/stream-labs/font-manager/releases/download/v1.0.8electron6/iojs-v6.0.3-font-manager.tar.gz",
+    "node-fetch": "^2.6.0",
     "node-fontinfo": "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.12electron6/iojs-v6.0.3-node-fontinfo.tar.gz",
     "node-libuiohook": "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.14/iojs-v6.0.3-node-libuiohook.tar.gz",
     "obs-studio-node": "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.137-iojs-v6.0.3-release.tar.gz",
@@ -82,7 +84,8 @@
     "semver": "^5.5.1",
     "socket.io-client": "2.1.1",
     "tasklist": "^3.1.1",
-    "uuid": "^3.0.1"
+    "uuid": "^3.0.1",
+    "vuejs-datepicker": "^1.6.2"
   },
   "devDependencies": {
     "7zip-bin": "2.4.1",

@@ -1,5 +1,6 @@
 'use strict';
 const appStartTime = Date.now();
+let lastEventTime = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Environment Variables
@@ -22,7 +23,6 @@ process.env.SLOBS_VERSION = pjson.version;
 const { app, BrowserWindow, ipcMain, session, crashReporter, dialog, webContents } = require('electron');
 const path = require('path');
 const rimraf = require('rimraf');
-
 const overlay = require('@streamlabs/game-overlay');
 
 // We use a special cache directory for running tests
@@ -51,6 +51,7 @@ if (!gotTheLock) {
   const crashHandler = require('crash-handler');
 
   app.commandLine.appendSwitch('force-ui-direction', 'ltr');
+  app.commandLine.appendSwitch('ignore-connections-limit', 'streamlabs.com,youtube.com,twitch.tv,facebook.com,mixer.com');
 
   /* Determine the current release channel we're
    * on based on name. The channel will always be
@@ -655,11 +656,16 @@ if (!gotTheLock) {
     e.returnValue = appStartTime;
   });
 
-  let lastEventTime = 0;
   ipcMain.on('measure-time', (e, msg, time) => {
-    const delta = lastEventTime ? time - lastEventTime : 0;
-    lastEventTime = time;
-    if (delta > 2000) console.log('------------------');
-    console.log(msg, delta + 'ms');
+    measure(msg, time);
   });
+}
+
+// Measure time between events
+function measure(msg, time) {
+  if (!time) time = Date.now();
+  const delta = lastEventTime ? time - lastEventTime : 0;
+  lastEventTime = time;
+  if (delta > 2000) console.log('------------------');
+  console.log(msg, delta + 'ms');
 }
