@@ -18,7 +18,7 @@ module.exports = async (basePath: string) => {
   // Check if bundle updates are available
   // TODO: In the future, support other bundles than just renderer.js
   // TODO: Cache the latest bundle name for offline use?
-  let latestBundle: string;
+  let latestBundle: string | undefined;
 
   if (!useLocalBundles) {
     try {
@@ -50,23 +50,6 @@ module.exports = async (basePath: string) => {
     },
   );
 
-  electron.session.defaultSession?.webRequest.onBeforeSendHeaders(
-    { urls: [`${cdnBase}renderer.js`] },
-    (details, cb) => {
-      console.log('Before Send Headers');
-      console.log(details);
-      cb({});
-    },
-  );
-
-  electron.session.defaultSession?.webRequest.onResponseStarted(
-    { urls: [`${cdnBase}renderer.js`] },
-    details => {
-      console.log('Response Started');
-      console.log(details);
-    },
-  );
-
   // The following handlers should rarely be used and are a failsafe.
   // If something goes wrong while fetching bundles even when the pre-fetch
   // succeeded, then we restart the app and force it to use local bundles.
@@ -81,26 +64,28 @@ module.exports = async (basePath: string) => {
     electron.app.quit();
   }
 
-  electron.session.defaultSession?.webRequest.onHeadersReceived(
-    { urls: [`${cdnBase}renderer.js`] },
-    (info, cb) => {
-      if (info.statusCode / 100 < 4) {
-        cb({});
-        return;
-      }
+  if (!useLocalBundles && latestBundle) {
+    electron.session.defaultSession?.webRequest.onHeadersReceived(
+      { urls: [`${cdnBase}${latestBundle}`] },
+      (info, cb) => {
+        if (info.statusCode / 100 < 4) {
+          cb({});
+          return;
+        }
 
-      console.log(`Caught error fetching bundle with status ${info.statusCode}`);
+        console.log(`Caught error fetching bundle with status ${info.statusCode}`);
 
-      revertToLocalBundles();
-    },
-  );
+        revertToLocalBundles();
+      },
+    );
 
-  electron.session.defaultSession?.webRequest.onErrorOccurred(
-    { urls: [`${cdnBase}renderer.js`] },
-    info => {
-      console.log('Caught error fetching bundle', info.error);
+    electron.session.defaultSession?.webRequest.onErrorOccurred(
+      { urls: [`${cdnBase}${latestBundle}`] },
+      info => {
+        console.log('Caught error fetching bundle', info.error);
 
-      revertToLocalBundles();
-    },
-  );
+        revertToLocalBundles();
+      },
+    );
+  }
 };
