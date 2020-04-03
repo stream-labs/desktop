@@ -5,7 +5,10 @@ const cp = require('child_process');
 
 const plugins = process.env.SLOBS_FORKED_TYPECHECKING ? [new CheckerPlugin()] : [];
 
-const commit = cp.execSync('git rev-parse --short HEAD').toString();
+const commit = cp
+  .execSync('git rev-parse --short HEAD')
+  .toString()
+  .replace('\n', '');
 
 plugins.push(
   new webpack.DefinePlugin({
