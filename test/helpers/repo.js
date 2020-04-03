@@ -32,8 +32,8 @@ function getCommitSHA() {
  * fetch info about commit using cmd
  */
 function getCommitInfo(SHA) {
-  const lines = execSync(`git show ${SHA}`).toString();
-  const [shaLine, author, dateLine, empty, comment] = lines.split('\n');
+  const lines = execSync(`git show ${SHA} -s --format="%an|||%ci|||%s"`).toString();
+  const [author, dateLine, comment] = lines.split('|||');
   const date = new Date(dateLine).valueOf();
   return {
     SHA,

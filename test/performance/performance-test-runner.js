@@ -23,7 +23,7 @@ const TESTS_SERVICE_URL = CI ? 'https://slobs-users-pool.herokuapp.com' : 'http:
   )}`;
   const resultsPath = path.resolve(CONFIG.dist, 'performance-results.json');
 
-  // const baseBranchResults = {
+  // const baseBranchTestResults = {
   //   'Empty collection': {
   //     mainWindowShow: { values: [1, 2, 3], units: 'ms' },
   //     sceneCollectionLoad: { units: 'ms', values: [1, 2, 3, 4] },
@@ -36,7 +36,7 @@ const TESTS_SERVICE_URL = CI ? 'https://slobs-users-pool.herokuapp.com' : 'http:
   //   },
   // };
   //
-  // const currentBranchResults = {
+  // const testResults = {
   //   'Empty collection': {
   //     mainWindowShow: { values: [1, 2, 3], units: 'ms' },
   //     sceneCollectionLoad: { units: 'ms', values: [1, 2, 3, 4, 5] },
@@ -44,7 +44,7 @@ const TESTS_SERVICE_URL = CI ? 'https://slobs-users-pool.herokuapp.com' : 'http:
   //   },
   //   'Empty collection 2': {
   //     mainWindowShow: { values: [1, 2, 3], units: 'ms' },
-  //     sceneCollectionLoad: { units: 'ms', values: [1, 2, 3, 4, 5] },
+  //     // sceneCollectionLoad: { units: 'ms', values: [1, 2, 3, 4, 5] },
   //     bundleSize: { units: 'bite', values: [1, 2, 3, 4, 1, 1] },
   //   },
   // };
@@ -52,11 +52,12 @@ const TESTS_SERVICE_URL = CI ? 'https://slobs-users-pool.herokuapp.com' : 'http:
   exec(runTestsCmd);
   const testResults = fs.readJsonSync(resultsPath);
 
-  const baseBranchTestResults = await fetchLastResultsForBaseBranch();
+  const baseBranchTestResults = (await fetchLastResultsForBaseBranch()).tests;
+
   if (baseBranchTestResults) {
     console.log('Comparing testing results with last base branch results');
     console.log(baseBranchTestResults.commit);
-    printResults(baseBranchTestResults.tests, testResults);
+    printResults(baseBranchTestResults, testResults);
   }
 
   const needToSaveResults = true; // baseBranchHasCommit(getCommitSHA());
@@ -68,7 +69,6 @@ const TESTS_SERVICE_URL = CI ? 'https://slobs-users-pool.herokuapp.com' : 'http:
  */
 function printResults(baseBranchResults, currentBranchResults) {
   const comparisonResults = {};
-  let performanceDelta = 0;
 
   // iterate throw each test
   Object.keys(baseBranchResults).forEach(testName => {
@@ -94,12 +94,17 @@ function printResults(baseBranchResults, currentBranchResults) {
       };
       const baseMetricValues = baseMetric.values;
       const baseMetricAvg = baseMetricValues.reduce((v1, v2) => v1 + v2) / baseMetricValues.length;
-      const currentMetricValues = currentMetric.values;
-      const currentMetricAvg =
-        currentMetricValues.reduce((v1, v2) => v1 + v2) / currentMetricValues.length;
-      const diff = baseMetricAvg / currentMetricAvg;
-      const diffPercent = (1 - diff) * 100;
-      performanceDelta += diffPercent;
+      let currentMetricValues = 'null';
+      let currentMetricAvg = 'null';
+      let diff = 'null';
+      let diffPercent = 'null';
+      if (currentMetric) {
+        currentMetricValues = currentMetric.values;
+        currentMetricAvg =
+          currentMetricValues.reduce((v1, v2) => v1 + v2) / currentMetricValues.length;
+        diff = baseMetricAvg / currentMetricAvg;
+        diffPercent = (1 - diff) * 100;
+      }
 
       // create table row
       table.push([
@@ -113,10 +118,10 @@ function printResults(baseBranchResults, currentBranchResults) {
     });
     console.log(table.toString());
   });
-  return performanceDelta;
 }
 
 function formatPerformanceValue(val) {
+  if (val === 'null') return 'null';
   val = Number(val.toFixed(5));
   return val > 0 ? colors.red(`+${val}`) : colors.green(val);
 }
