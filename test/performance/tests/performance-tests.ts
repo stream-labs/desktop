@@ -1,6 +1,4 @@
 import { MetricsService } from '../../../app/services/metrics';
-
-console.log('include startup');
 import { useSpectron, test, stopApp, startApp, TExecutionContext } from '../../helpers/spectron';
 import { ApiClient, getClient } from '../../helpers/api-client';
 import { ISourcesServiceApi, TSourceType } from '../../../app/services/sources/sources-api';
