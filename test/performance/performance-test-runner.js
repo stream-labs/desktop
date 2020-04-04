@@ -15,54 +15,32 @@ const { execSync } = require('child_process');
 const TESTS_SERVICE_URL = CI ? 'https://slobs-users-pool.herokuapp.com' : 'http://localhost:5000';
 
 (async function main() {
-  // prepare the dist dir
+  console.log('Start performance test on', getCommitSHA());
+
+  // prepare dirs
+  const resultsPath = path.resolve(CONFIG.dist, 'performance-results.json');
   fs.removeSync(CONFIG.dist);
   fs.mkdirSync(CONFIG.dist, { recursive: true });
-  const runTestsCmd = `yarn test ${CONFIG.compiledTestsDist}/performance/tests/**/*.js ${args.join(
-    ' ',
-  )}`;
-  const resultsPath = path.resolve(CONFIG.dist, 'performance-results.json');
   fs.removeSync(resultsPath);
   fs.removeSync(CONFIG.compiledTestsDist);
 
-  // const baseBranchTestResults = {
-  //   'Empty collection': {
-  //     mainWindowShow: { values: [1, 2, 3], units: 'ms' },
-  //     sceneCollectionLoad: { units: 'ms', values: [1, 2, 3, 4] },
-  //     bundleSize: { units: 'bite', values: [1, 2, 3, 4] },
-  //   },
-  //   'Empty collection 2': {
-  //     mainWindowShow: { values: [1, 2, 3], units: 'ms' },
-  //     sceneCollectionLoad: { units: 'ms', values: [1, 2, 3, 4, 5] },
-  //     bundleSize: { units: 'bite', values: [1, 2, 3, 4, 1, 1] },
-  //   },
-  // };
-  //
-  // const testResults = {
-  //   'Empty collection': {
-  //     mainWindowShow: { values: [1, 2, 3], units: 'ms' },
-  //     sceneCollectionLoad: { units: 'ms', values: [1, 2, 3, 4, 5] },
-  //     bundleSize: { units: 'bite', values: [1, 2, 3, 4, 1, 1] },
-  //   },
-  //   'Empty collection 2': {
-  //     mainWindowShow: { values: [1, 2, 3], units: 'ms' },
-  //     // sceneCollectionLoad: { units: 'ms', values: [1, 2, 3, 4, 5] },
-  //     bundleSize: { units: 'bite', values: [1, 2, 3, 4, 1, 1] },
-  //   },
-  // };
-
+  // run tests
+  const runTestsCmd = `yarn test ${CONFIG.compiledTestsDist}/performance/tests/**/*.js ${args.join(
+    ' ',
+  )}`;
   exec(runTestsCmd);
+
+  // get tests results and compare with DB data
   const testResults = fs.readJsonSync(resultsPath);
-
-  const baseBranchTestResults = (await fetchLastResultsForBaseBranch()).tests;
-
+  const baseBranchTestResults = await fetchLastResultsForBaseBranch();
   if (baseBranchTestResults) {
     console.log('Comparing testing results with last base branch results');
     console.log(baseBranchTestResults.commit);
-    printResults(baseBranchTestResults, testResults);
+    printResults(baseBranchTestResults.tests, testResults);
   }
 
-  const needToSaveResults = true; // baseBranchHasCommit(getCommitSHA());
+  // save results to DB if needed
+  const needToSaveResults = baseBranchHasCommit(getCommitSHA());
   if (needToSaveResults) await sendResults(testResults);
 })();
 
@@ -128,6 +106,9 @@ function formatPerformanceValue(val) {
   return val > 0 ? colors.red(`+${val}`) : colors.green(val);
 }
 
+/**
+ * Send tests results to performance-analytics
+ */
 async function sendResults(tests) {
   const url = CI ? 'https://slobs-users-pool.herokuapp.com' : 'http://localhost:5000';
   const commit = getCommitInfo(getCommitSHA());
@@ -151,7 +132,7 @@ async function sendResults(tests) {
 }
 
 async function fetchLastResultsForBaseBranch() {
-  const resp = await fetch(`${TESTS_SERVICE_URL}/performance?includeTestingData=true&limit=1`, {
+  const resp = await fetch(`${TESTS_SERVICE_URL}/performance?includeTestingData=false&limit=1`, {
     headers: {
       Authorization: `Bearer ${SLOBS_TEST_USER_POOL_TOKEN}`,
     },

@@ -1,6 +1,5 @@
 import { MetricsService } from '../../../app/services/metrics';
 import {
-  useSpectron,
   test,
   stopApp,
   startApp,
@@ -8,12 +7,11 @@ import {
   getCacheDir,
 } from '../../helpers/spectron';
 import { ApiClient, getClient } from '../../helpers/api-client';
-import { ISourcesServiceApi, TSourceType } from '../../../app/services/sources/sources-api';
+import { TSourceType } from '../../../app/services/sources/sources-api';
 import { ScenesService } from '../../../app/services/api/external-api/scenes';
 import { getMeter } from '../meter';
 import { spawnSync } from 'child_process';
 import { sleep } from '../../helpers/sleep';
-import { PerformanceService } from '../../../app/app-services';
 import { setOutputResolution, setTemporaryRecordingPath } from '../../helpers/spectron/output';
 import { startRecording, stopRecording } from '../../helpers/spectron/streaming';
 import { getCPUUsage, getMemoryUsage, usePerformanceTest } from '../tools';
@@ -24,13 +22,9 @@ const path = require('path');
 
 usePerformanceTest();
 
-const RELOAD_ATTEMPTS = 20;
+const RELOAD_ATTEMPTS = 15;
 const CPU_ATTEMPTS = 200;
 const ADD_SOURCES_ATTEMPTS = 5;
-
-// const RELOAD_ATTEMPTS = 2;
-// const CPU_ATTEMPTS = 10;
-// const ADD_SOURCES_ATTEMPTS = 1;
 
 /**
  * unzip a sample of a large scene collection to the SceneCollection folder
