@@ -113,7 +113,7 @@
     "@vue/babel-helper-vue-jsx-merge-props": "1.0.0",
     "@vue/babel-preset-jsx": "1.1.2",
     "@xkeshi/vue-qrcode": "0.3.0",
-    "ava": "1.4.1",
+    "ava": "3.6.0",
     "awesome-typescript-loader": "5.2.1",
     "babel-helper-vue-jsx-merge-props": "2.0.3",
     "babel-loader": "8.0.6",
