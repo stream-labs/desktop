@@ -78,15 +78,10 @@ export default class Utils {
     );
   }
 
-<<<<<<< HEAD
-  static isChildWindow(): boolean {
-    return this.getWindowId() === 'child';
-=======
   static getChildWindow(): Electron.BrowserWindow {
     return electron.remote.BrowserWindow.getAllWindows().find(
       win => Utils.getUrlParams(win.webContents.getURL()).windowId === 'child',
     );
->>>>>>> b47ed4010... don't register one-off windows with the crash handler
   }
 
   static isDevMode() {
