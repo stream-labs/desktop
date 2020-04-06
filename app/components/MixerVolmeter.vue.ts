@@ -9,8 +9,6 @@ import vShaderSrc from 'util/webgl/shaders/volmeter.vert';
 import fShaderSrc from 'util/webgl/shaders/volmeter.frag';
 import electron from 'electron';
 import TsxComponent, { createProps } from './tsx-component';
-import { v2 } from '../util/vec2';
-import uuid from 'uuid';
 
 // Configuration
 const CHANNEL_HEIGHT = 3;
@@ -24,7 +22,6 @@ const DANGER_LEVEL = -9;
 const GREEN = [49, 195, 162];
 const YELLOW = [255, 205, 71];
 const RED = [252, 62, 63];
-const FPS_LIMIT = 60;
 
 class MixerVolmeterProps {
   audioSource: AudioSource = null;
@@ -74,21 +71,6 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
   // Used for lazy initialization of the canvas rendering
   renderingInitialized = false;
 
-  // Current peak values
-  currentPeaks: number[];
-  // Store prevPeaks and interpolatedPeaks values for smooth interpolated rendering
-  prevPeaks: number[];
-  interpolatedPeaks: number[];
-  // the time of last received peaks
-  lastEventTime: number;
-  // time between 2 received peaks.
-  // Used to render extra interpolated frames
-  interpolationTime = 35;
-  bg: { r: number; g: number; b: number };
-
-  firstFrameTime: number;
-  frameNumber: number;
-
   mounted() {
     this.subscribeVolmeter();
     this.peakHoldCounters = [];
@@ -128,37 +110,6 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
 
     this.setCanvasWidth();
     this.canvasWidthInterval = window.setInterval(() => this.setCanvasWidth(), 500);
-    requestAnimationFrame(t => this.onRequestAnimationFrameHandler(t));
-  }
-
-  /**
-   * Render volmeters with FPS capping
-   */
-  private onRequestAnimationFrameHandler(now: DOMHighResTimeStamp) {
-    // init first rendering frame
-    if (!this.frameNumber) {
-      this.frameNumber = -1;
-      this.firstFrameTime = now;
-    }
-
-    const timeElapsed = now - this.firstFrameTime;
-    const timeBetweenFrames = 1000 / FPS_LIMIT;
-    const currentFrameNumber = Math.ceil(timeElapsed / timeBetweenFrames);
-
-    if (currentFrameNumber !== this.frameNumber) {
-      // it's time to render next frame
-      this.frameNumber = currentFrameNumber;
-      // don't render sources then channelsCount is 0
-      // happens when the browser source stops playing audio
-      if (this.renderingInitialized && this.currentPeaks && this.currentPeaks.length) {
-        if (this.gl) {
-          this.drawVolmeterWebgl(this.currentPeaks);
-        } else {
-          this.drawVolmeterC2d(this.currentPeaks);
-        }
-      }
-    }
-    requestAnimationFrame(t => this.onRequestAnimationFrameHandler(t));
   }
 
   private initRenderingContext() {
@@ -288,7 +239,7 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
   }
 
   private drawVolmeterWebgl(peaks: number[]) {
-    const bg = this.bg;
+    const bg = this.customizationService.themeBackground;
 
     this.gl.clearColor(bg.r / 255, bg.g / 255, bg.b / 255, 1);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
@@ -306,7 +257,7 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
     this.gl.uniform1f(this.bgMultiplierLocation, this.getBgMultiplier());
 
     peaks.forEach((peak, channel) => {
-      this.drawVolmeterChannelWebgl(peak || 0, channel);
+      this.drawVolmeterChannelWebgl(peak, channel);
     });
   }
 
@@ -315,15 +266,7 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
 
     this.gl.uniform2f(this.scaleLocation, 1, CHANNEL_HEIGHT);
     this.gl.uniform2f(this.translationLocation, 0, channel * (CHANNEL_HEIGHT + PADDING_HEIGHT));
-
-    const prevPeak = this.prevPeaks && this.prevPeaks[channel] ? this.prevPeaks[channel] : peak;
-    const timeDelta = performance.now() - this.lastEventTime;
-    let alpha = timeDelta / this.interpolationTime;
-    if (alpha > 1) alpha = 1;
-    const interpolatedPeak = this.lerp(prevPeak, peak, alpha);
-    if (!this.interpolatedPeaks) this.interpolatedPeaks = [];
-    this.interpolatedPeaks[channel] = interpolatedPeak;
-    this.gl.uniform1f(this.volumeLocation, this.dbToUnitScalar(interpolatedPeak));
+    this.gl.uniform1f(this.volumeLocation, this.dbToUnitScalar(peak));
 
     // X component is the location of peak hold from 0 to 1
     // Y component is width of the peak hold from 0 to 1
@@ -433,11 +376,15 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
         this.initRenderingContext();
         this.setChannelCount(volmeter.peak.length);
 
-        // save peaks value to render it in the next animationFrame
-        this.prevPeaks = this.interpolatedPeaks;
-        this.currentPeaks = Array.from(volmeter.peak);
-        this.lastEventTime = performance.now();
-        this.bg = this.customizationService.themeBackground;
+        // don't render sources then channelsCount is 0
+        // happens when the browser source stops playing audio
+        if (!volmeter.peak.length) return;
+
+        if (this.gl) {
+          this.drawVolmeterWebgl(volmeter.peak);
+        } else {
+          this.drawVolmeterC2d(volmeter.peak);
+        }
       }
     };
 
@@ -463,14 +410,5 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
       'volmeterUnsubscribe',
       this.props.audioSource.sourceId,
     );
-  }
-
-  /**
-   * Linearly interpolates between val1 and val2
-   * alpha = 0 will be val1, and alpha = 1 will be val2.
-   */
-  lerp(val1: number, val2: number, alpha: number) {
-    const result = v2(val1, 0).lerp(v2(val2, 0), alpha);
-    return result.x;
   }
 }

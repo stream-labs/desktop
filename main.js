@@ -44,6 +44,7 @@ if (!gotTheLock) {
 } else {
   const fs = require('fs');
   const bootstrap = require('./updater/build/bootstrap.js');
+  const bundleUpdater = require('./updater/build/bundle-updater.js');
   const uuid = require('uuid/v4');
   const semver = require('semver');
   const windowStateKeeper = require('electron-window-state');
@@ -70,7 +71,7 @@ if (!gotTheLock) {
 
   const util = require('util');
   const logFile = path.join(app.getPath('userData'), 'app.log');
-  const maxLogBytes = 16384;
+  const maxLogBytes = 131072;
 
   // Truncate the log file if it is too long
   if (fs.existsSync(logFile) && fs.statSync(logFile).size > maxLogBytes) {
@@ -213,12 +214,14 @@ if (!gotTheLock) {
   let waitingVuexStores = [];
   let workerInitFinished = false;
 
-  function startApp() {
+  async function startApp() {
     const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
     let crashHandlerLogPath = "";
     if (process.env.NODE_ENV !== 'production' || !!process.env.SLOBS_PREVIEW) {
       crashHandlerLogPath = app.getPath('userData');
     }
+
+    await bundleUpdater(__dirname);
 
     crashHandler.startCrashHandler(app.getAppPath(), process.env.SLOBS_VERSION, isDevMode.toString(), crashHandlerLogPath);
     crashHandler.registerProcess(pid, false);
@@ -376,7 +379,10 @@ if (!gotTheLock) {
     const requests = { };
 
     function sendRequest(request, event = null, async = false) {
-      if (workerWindow.isDestroyed()) return;
+      if (workerWindow.isDestroyed()) {
+        console.log('Tried to send request but worker window was missing...');
+        return;
+      }
       workerWindow.webContents.send('services-request', request);
       if (!event) return;
       requests[request.id] = Object.assign({}, request, { event, async });

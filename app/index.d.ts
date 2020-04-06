@@ -4,6 +4,8 @@
 
 // all global interfaces here
 
+declare const SLOBS_BUNDLE_ID: string;
+
 interface Dictionary<TItemType> {
   [key: string]: TItemType;
 }
