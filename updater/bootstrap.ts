@@ -293,7 +293,7 @@ async function entry(info: IUpdateInfo) {
     '--version',
     `"${latestVersion.version}"`,
     '--exec',
-    `"${info.exec}"`,
+    `"${info.exec.join(' ')}"`,
     '--cwd',
     `"${info.cwd}"`,
     '--app-dir',

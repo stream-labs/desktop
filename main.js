@@ -482,10 +482,28 @@ if (!gotTheLock) {
     if (
       !process.argv.includes('--skip-update') &&
       ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE)) {
+
+      const exe_arg_tag = '--main-exe';
+      let after_update_restart = process.argv
+
+      if (process.argv.includes(exe_arg_tag)) {
+        let main_exe_path = '';
+        after_update_restart = process.argv.slice(1);
+        for ( var i = 0; i < after_update_restart.length; i++) {
+          if (after_update_restart[i] === exe_arg_tag) {
+            main_exe_path = after_update_restart[i+1];
+            after_update_restart.splice(i,2);
+          }
+        }
+        if (main_exe_path) {
+          after_update_restart.unshift(main_exe_path);
+        }
+      }
+
       const updateInfo = {
         baseUrl: 'https://slobs-cdn.streamlabs.com',
         version: pjson.version,
-        exec: process.argv,
+        exec: after_update_restart,
         cwd: process.cwd(),
         waitPids: [ process.pid ],
         appDir: path.dirname(app.getPath('exe')),

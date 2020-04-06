@@ -166,7 +166,7 @@
     "sockjs-client": "1.1.5",
     "spectron": "5.0.0",
     "streamlabs-beaker": "0.9.4",
-    "streamlabs-obs-launcher": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/streamlabs-obs-launcher-0.0.2a.tar.gz",
+    "streamlabs-obs-launcher": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/streamlabs-obs-launcher-0.0.2c.tar.gz",
     "style-loader": "0.21.0",
     "stylelint": "10.0.1",
     "stylelint-config-css-modules": "1.3.0",
