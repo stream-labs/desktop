@@ -8,17 +8,14 @@ import { I18nService, $t } from 'services/i18n';
 import { InitAfter } from 'services/core';
 import * as pages from 'components/pages/community-hub/pages';
 
-// TODO: replace with real data
-import { friends, chatRooms, self } from './STUB_DATA';
-
 export interface IFriend {
-  id: string;
-  username: string;
+  id: number;
+  name: string;
   avatar: string;
-  status: string;
+  is_prime?: boolean;
+  status?: string;
   date_friended?: string;
   game_streamed?: string;
-  is_prime?: boolean;
 }
 interface IChatRoom {
   id: string;
@@ -32,6 +29,7 @@ interface ICommunityHubState {
   chatrooms: Array<IChatRoom>;
   status: string;
   currentPage: string;
+  self: IFriend;
 }
 
 const PAGES = () => ({
@@ -65,7 +63,7 @@ class CommunityHubViews extends ViewHandler<ICommunityHubState> {
     return this.state.chatrooms.find(chatroom => chatroom.id === this.state.currentPage);
   }
 
-  findFriend(friendId: string) {
+  findFriend(friendId: number) {
     return this.state.friends.find(friend => friend.id === friendId);
   }
 }
@@ -81,6 +79,7 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
     chatrooms: [],
     status: 'online',
     currentPage: 'matchmaking',
+    self: {} as IFriend,
   };
 
   @mutation()
@@ -103,10 +102,12 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
     this.state.currentPage = page;
   }
 
-  init() {
-    this.SET_FRIENDS(friends);
-    this.SET_CHATROOMS(chatRooms);
+  @mutation()
+  SET_SELF(self: IFriend) {
+    this.state.self = self;
   }
+
+  init() {}
 
   chatBgColor() {
     return sample([
@@ -125,13 +126,13 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
     this.SET_CURRENT_PAGE(page);
   }
 
-  addDm(friendId: string) {
+  addDm(friendId: number) {
     const friend = this.views.findFriend(friendId);
     const id = uuid();
     this.ADD_CHATROOM({
       id,
       members: [friend],
-      name: friend.username,
+      name: friend.name,
       avatar: friend.avatar,
     });
     this.setPage(id);
@@ -149,6 +150,10 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
   }
 
   get self(): IFriend {
-    return self;
+    return this.state.self;
+  }
+
+  set self(self: IFriend) {
+    this.SET_SELF(self);
   }
 }

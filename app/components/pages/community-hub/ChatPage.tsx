@@ -5,13 +5,13 @@ import styles from './CommunityHub.m.less';
 import { $t } from 'services/i18n';
 import { Inject } from 'services';
 import { CommunityHubService } from 'services/community-hub';
-import { MessagesService, IMessage } from 'services/community-hub/messages';
+import { LiveChatService, IMessage } from 'services/community-hub/live-chat';
 import { TextAreaInput } from 'components/shared/inputs/inputs';
 
 @Component({})
 export default class ChatPage extends TsxComponent {
   @Inject() communityHubService: CommunityHubService;
-  @Inject() messagesService: MessagesService;
+  @Inject() liveChatService: LiveChatService;
 
   $refs: { messages: HTMLElement };
 
@@ -34,7 +34,7 @@ export default class ChatPage extends TsxComponent {
   }
 
   get messages() {
-    return this.messagesService.views.messages(this.chatroom.id);
+    return this.liveChatService.views.messages(this.chatroom.id);
   }
 
   get messagesLength() {
@@ -52,7 +52,7 @@ export default class ChatPage extends TsxComponent {
         <div class={cx(styles.status, styles[chatter.status])} />
         <div class={styles.nameAndBubble}>
           <span style="display: flex; align-items: center; margin-bottom: 8px;">
-            {message.username}
+            {message.name}
             {chatter.is_prime && <i class={cx('icon-prime', styles.primeIcon)} />}
           </span>
           <div class={cx(styles.chatBubble, { [styles.self]: isSelf })}>{message.content}</div>
@@ -62,7 +62,7 @@ export default class ChatPage extends TsxComponent {
   }
 
   handleEnter() {
-    this.messagesService.sendMessage(this.chatroom.id, this.message);
+    this.liveChatService.sendMessage(this.chatroom.id, this.message);
     this.message = '';
   }
 
