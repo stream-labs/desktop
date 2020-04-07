@@ -7,6 +7,7 @@ import electron from 'electron';
 import { authorizedHeaders, handleResponse } from 'util/requests';
 import throttle from 'lodash/throttle';
 import { Service } from './core/service';
+import Utils from './utils';
 
 export type TUsageEvent = 'stream_start' | 'stream_end' | 'app_start' | 'app_close' | 'crash';
 
@@ -22,7 +23,7 @@ type TAnalyticsEvent = 'FacebookLogin' | 'PlatformLogin' | 'SocialShare'; // add
 
 interface IAnalyticsEvent {
   product: string;
-  version: number;
+  version: string;
   event: string;
   value?: any;
   time?: string;
@@ -48,7 +49,7 @@ export class UsageStatisticsService extends Service {
   @Inject() hostsService: HostsService;
 
   installerId: string;
-  version = electron.remote.process.env.SLOBS_VERSION;
+  version = Utils.env.SLOBS_VERSION;
 
   private anaiticsEvents: IAnalyticsEvent[] = [];
 

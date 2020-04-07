@@ -1,4 +1,5 @@
 'use strict';
+let lastEventTime = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Environment Variables
@@ -21,7 +22,6 @@ process.env.SLOBS_VERSION = pjson.version;
 const { app, BrowserWindow, ipcMain, session, crashReporter, dialog, webContents } = require('electron');
 const path = require('path');
 const rimraf = require('rimraf');
-
 const overlay = require('@streamlabs/game-overlay');
 
 // We use a special cache directory for running tests
@@ -43,6 +43,7 @@ if (!gotTheLock) {
 } else {
   const fs = require('fs');
   const bootstrap = require('./updater/build/bootstrap.js');
+  const bundleUpdater = require('./updater/build/bundle-updater.js');
   const uuid = require('uuid/v4');
   const semver = require('semver');
   const windowStateKeeper = require('electron-window-state');
@@ -50,6 +51,7 @@ if (!gotTheLock) {
   const crashHandler = require('crash-handler');
 
   app.commandLine.appendSwitch('force-ui-direction', 'ltr');
+  app.commandLine.appendSwitch('ignore-connections-limit', 'streamlabs.com,youtube.com,twitch.tv,facebook.com,mixer.com');
 
   /* Determine the current release channel we're
    * on based on name. The channel will always be
@@ -68,7 +70,7 @@ if (!gotTheLock) {
 
   const util = require('util');
   const logFile = path.join(app.getPath('userData'), 'app.log');
-  const maxLogBytes = 16384;
+  const maxLogBytes = 131072;
 
   // Truncate the log file if it is too long
   if (fs.existsSync(logFile) && fs.statSync(logFile).size > maxLogBytes) {
@@ -93,7 +95,7 @@ if (!gotTheLock) {
       const serialized = args
         .map(arg => {
           if (typeof arg === 'string') return arg;
-    
+
           return util.inspect(arg);
         })
         .join(' ');
@@ -211,12 +213,14 @@ if (!gotTheLock) {
   let waitingVuexStores = [];
   let workerInitFinished = false;
 
-  function startApp() {
+  async function startApp() {
     const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
     let crashHandlerLogPath = "";
     if (process.env.NODE_ENV !== 'production' || !!process.env.SLOBS_PREVIEW) {
       crashHandlerLogPath = app.getPath('userData');
     }
+
+    await bundleUpdater(__dirname);
 
     crashHandler.startCrashHandler(app.getAppPath(), process.env.SLOBS_VERSION, isDevMode.toString(), crashHandlerLogPath);
     crashHandler.registerProcess(pid, false);
@@ -374,6 +378,11 @@ if (!gotTheLock) {
     const requests = { };
 
     function sendRequest(request, event = null, async = false) {
+      if (workerWindow.isDestroyed()) {
+        console.log('Tried to send request but worker window was missing...');
+        return;
+      }
+
       workerWindow.webContents.send('services-request', request);
       if (!event) return;
       requests[request.id] = Object.assign({}, request, { event, async });
@@ -649,11 +658,16 @@ if (!gotTheLock) {
     };
   });
 
-  let lastEventTime = 0;
   ipcMain.on('measure-time', (e, msg, time) => {
-    const delta = lastEventTime ? time - lastEventTime : 0;
-    lastEventTime = time;
-    if (delta > 2000) console.log('------------------');
-    console.log(msg, delta + 'ms');
+    measure(msg, time);
   });
+}
+
+// Measure time between events
+function measure(msg, time) {
+  if (!time) time = Date.now();
+  const delta = lastEventTime ? time - lastEventTime : 0;
+  lastEventTime = time;
+  if (delta > 2000) console.log('------------------');
+  console.log(msg, delta + 'ms');
 }

@@ -4,6 +4,7 @@ export { default as FontSizeInput } from './FontSize.vue';
 export { default as ListInput } from './ListInput.vue';
 export { default as SliderInput } from './SliderInput.vue';
 export { default as TextInput } from './TextInput';
+export { default as DateInput } from './DateInput';
 export { default as NumberInput } from './NumberInput.vue';
 export { default as TextAreaInput } from './TextAreaInput.vue';
 export { default as BoolInput } from './BoolInput';
