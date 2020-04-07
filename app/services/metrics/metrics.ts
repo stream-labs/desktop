@@ -2,6 +2,7 @@ import { Service } from 'services/core/service';
 import { ipcRenderer } from 'electron';
 import { Inject } from '../core';
 import { PerformanceService } from 'services/performance';
+import Utils from '../utils';
 
 export interface IMetricsState {
   appStartTime: number;
@@ -17,6 +18,7 @@ export class MetricsService extends Service {
   @Inject() performanceService: PerformanceService;
 
   protected init() {
+    if (!Utils.isDevMode()) return;
     const appStarTime = ipcRenderer.sendSync('getAppStartTime');
     this.recordMetric('appStartTime', appStarTime);
   }
