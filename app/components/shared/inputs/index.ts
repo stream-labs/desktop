@@ -22,6 +22,7 @@ export enum EInputType {
   toggle = 'toggle',
   mediaGallery = 'mediaGallery',
   sound = 'sound',
+  tags = 'tags',
 }
 
 /**
@@ -62,6 +63,11 @@ export interface IListMetadata<TValueType> extends IInputMetadata {
 
 export interface IImagePickerMetadata<TValueType> extends IListMetadata<TValueType> {
   isIcons: boolean;
+}
+
+export interface ITagsInputMetadata<TValueType> extends IListMetadata<TValueType> {
+  placeholder?: string;
+  noPermission?: boolean;
 }
 
 export interface ITextMetadata extends IInputMetadata {
@@ -148,6 +154,8 @@ export const metadata = {
     ({ type: EInputType.mediaGallery, ...options } as IMediaGalleryMetadata),
   sound: (options: IMediaGalleryMetadata) =>
     ({ type: EInputType.sound, ...options } as IMediaGalleryMetadata),
+  tags: (options: ITagsInputMetadata<string>) =>
+    ({ type: EInputType.tags, ...options } as ITagsInputMetadata<string>),
 };
 
 // a helper for creating metadata for forms

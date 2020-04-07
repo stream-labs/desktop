@@ -11264,20 +11264,18 @@ uuid@^3.0.1:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.0.1.tgz#6544bba2dfda8c1cf17e629a3a305e2bb1fee6c1"
   integrity sha1-ZUS7ot/ajBzxfmKaOjBeK7H+5sE=
 
-v-dropdown@^1.0.7:
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/v-dropdown/-/v-dropdown-1.0.7.tgz#ce1efb9f53ecd6180959189d66136d1490113e30"
-  integrity sha512-clX2Dt3WX8dQrd4UBTUWRJAj02FozVKLyLbB4cvKziZ2/Urxk1P48/mE0C26LXFSMROR0BCQOEVchsP+hFX6/w==
-  dependencies:
-    vue "^2.5.21"
+v-dropdown@^2.0.6:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/v-dropdown/-/v-dropdown-2.1.1.tgz#5e1a49d61c2913a6abdda3ccb462e2647f9d69ed"
+  integrity sha512-Rc+LairgIJENvLQCBpl4QAcen8h0EIffKaLeb+W5G2dPrW8HbPLDqQhxKOdXPQB4dcCIePie/Os6TN4K5i0a0Q==
 
-v-selectpage@2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/v-selectpage/-/v-selectpage-2.0.2.tgz#f96dfba050d57cc958b674030d5185f4d96c9a15"
-  integrity sha512-8dAKJjEDc1k3aj6fYF8vDjDqgJrneeQ3CDHe5ux1ZOrRMko212GG4sKd5BvFpvS2p4nKgk3Gn9o7dX6esUMzzA==
+v-selectpage@2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/v-selectpage/-/v-selectpage-2.1.2.tgz#c56e65bbfab17a3b7061757d7a565749849c1d43"
+  integrity sha512-/nTqvi3ZNBE/YwMapD0pLDj34GFGpzZmybRoTTLSIiQw5LB1p5PlvY3ATjBP0ix5DjfVPfmLHCZyHxRAVck1vg==
   dependencies:
-    v-dropdown "^1.0.7"
-    vue "^2.5.11"
+    v-dropdown "^2.0.6"
+    vue "^2.6.10"
 
 v-tooltip@2.0.0-rc.33:
   version "2.0.0-rc.33"
@@ -11494,10 +11492,15 @@ vue-tsx-support@2.2.2:
   resolved "https://registry.yarnpkg.com/vue-tsx-support/-/vue-tsx-support-2.2.2.tgz#318f6dd25e5f1ee451a7bc5bcb4669eb7810460c"
   integrity sha512-VykX5OnMYUCyJje7Ke2cVMk0c22eCzuyCQjchRsMpRg72SLZ0eDicT4oTZTJRGAHJ/7TDV+Pwtnpt+LHVr62jg==
 
-vue@2.6.9, vue@^2.5.11, vue@^2.5.21:
+vue@2.6.9:
   version "2.6.9"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.9.tgz#415c1cc1a5ed00c8f0acdd0a948139d12b7ea6b3"
   integrity sha512-t1+tvH8hybPM86oNne3ZozCD02zj/VoZIiojOBPJLjwBn7hxYU5e1gBObFpq8ts1NEn1VhPf/hVXBDAJ3X5ljg==
+
+vue@^2.6.10:
+  version "2.6.11"
+  resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.11.tgz#76594d877d4b12234406e84e35275c6d514125c5"
+  integrity sha512-VfPwgcGABbGAue9+sfrD4PuwFar7gPb1yl1UK1MwXoQPAw0BKSqWfoYCT/ThFrdEVWoI51dBuyCoiNU9bZDZxQ==
 
 vuedraggable@2.8.5:
   version "2.8.5"
