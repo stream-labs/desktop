@@ -493,6 +493,7 @@ if (!gotTheLock) {
           if (after_update_restart[i] === exe_arg_tag) {
             main_exe_path = after_update_restart[i+1];
             after_update_restart.splice(i,2);
+            break;
           }
         }
         if (main_exe_path) {
