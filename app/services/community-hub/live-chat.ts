@@ -6,26 +6,24 @@ import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
 import { I18nService } from 'services/i18n';
 import { InitAfter } from 'services/core';
-
-// TODO: replace with real data
-import { messages } from './STUB_DATA';
+import { ChatWebsocketService } from './chat-websocket';
 import { CommunityHubService } from '.';
 
 export interface IMessage {
   id: string;
-  user_id: string;
+  user_id: number;
   chat_id: string;
   content: string;
-  username: string;
+  name: string;
   avatar: string;
   date_posted?: string;
 }
 
-interface IMessagesState {
+interface ILiveChatState {
   messages: Dictionary<Array<IMessage>>;
 }
 
-class MessagesViews extends ViewHandler<IMessagesState> {
+class LiveChatViews extends ViewHandler<ILiveChatState> {
   messages(chatId: string) {
     if (!this.state.messages[chatId]) return [];
     return this.state.messages[chatId];
@@ -33,13 +31,13 @@ class MessagesViews extends ViewHandler<IMessagesState> {
 }
 
 @InitAfter('UserService')
-export class MessagesService extends StatefulService<IMessagesState> {
+export class LiveChatService extends StatefulService<ILiveChatState> {
   @Inject() private hostsService: HostsService;
   @Inject() private userService: UserService;
   @Inject() private i18nService: I18nService;
   @Inject() private communityHubService: CommunityHubService;
 
-  static initialState: IMessagesState = {
+  static initialState: ILiveChatState = {
     messages: {},
   };
 
@@ -59,12 +57,10 @@ export class MessagesService extends StatefulService<IMessagesState> {
     this.state.messages = messages;
   }
 
-  init() {
-    this.LOAD_MESSAGES(messages);
-  }
+  init() {}
 
   get views() {
-    return new MessagesViews(this.state);
+    return new LiveChatViews(this.state);
   }
 
   sendMessage(chatId: string, content: string) {
@@ -72,7 +68,7 @@ export class MessagesService extends StatefulService<IMessagesState> {
       id: uuid(),
       user_id: this.communityHubService.self.id,
       chat_id: chatId,
-      username: this.communityHubService.self.username,
+      name: this.communityHubService.self.name,
       avatar: this.communityHubService.self.avatar,
       content,
     };

@@ -392,7 +392,7 @@ export class FormMonkey {
     for (const removeButton of removeTagButtons.reverse()) {
       await this.client.click(
         // @ts-ignore
-        `.tags-container .sp-selected-tag:nth-child(${removeButton.index + 2}) .sp-icon-close`,
+        `.tags-container .sp-selected-tag:nth-child(${removeButton.index + 1}) .sp-icon-close`,
       );
     }
 

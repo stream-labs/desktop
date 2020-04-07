@@ -19,7 +19,7 @@ export default class FriendsPage extends TsxComponent {
     return this.communityHubService.views.sortedFriends;
   }
 
-  goToDm(friendId: string) {
+  goToDm(friendId: number) {
     const existingDm = this.communityHubService.views.directMessages.find(
       dm => dm.members[0].id === friendId,
     );
@@ -35,7 +35,7 @@ export default class FriendsPage extends TsxComponent {
       <div class={styles.friend} onClick={() => this.goToDm(friend.id)} key={friend.id}>
         <img class={styles.avatar} src={friend.avatar} />
         <div class={cx(styles.status, styles[friend.status])} />
-        <div class={styles.friendName}>{friend.username}</div>
+        <div class={styles.friendName}>{friend.name}</div>
         {friend.is_prime && <i class={cx('icon-prime', styles.primeIcon)} />}
         {friend.game_streamed && (
           <div class={styles.friendStreaming}>

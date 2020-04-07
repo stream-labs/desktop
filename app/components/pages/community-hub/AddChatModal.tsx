@@ -24,7 +24,7 @@ export default class AddChatModal extends TsxComponent<{ onCloseAddChatModal: ()
     this.searchValue = val;
     if (val === '') return (this.friends = allFriends);
     this.friends = allFriends.filter(friend =>
-      friend.username.toLocaleLowerCase(locale).includes(val.toLocaleLowerCase(locale)),
+      friend.name.toLocaleLowerCase(locale).includes(val.toLocaleLowerCase(locale)),
     );
   }
 
@@ -33,7 +33,7 @@ export default class AddChatModal extends TsxComponent<{ onCloseAddChatModal: ()
     this.selectedFriends.push(friend);
   }
 
-  handleRemove(friendId: string) {
+  handleRemove(friendId: number) {
     this.selectedFriends = this.selectedFriends.filter(friend => friend.id !== friendId);
   }
 
@@ -51,7 +51,7 @@ export default class AddChatModal extends TsxComponent<{ onCloseAddChatModal: ()
             <div class={styles.friend} onClick={() => this.selectFriend(friend)} key={friend.id}>
               <img class={styles.avatar} src={friend.avatar} />
               <div class={cx(styles.status, styles[friend.status])} />
-              <div class={styles.friendName}>{friend.username}</div>
+              <div class={styles.friendName}>{friend.name}</div>
               {friend.is_prime && <i class={cx('icon-prime', styles.primeIcon)} />}
               {friend.game_streamed && (
                 <div class={styles.friendStreaming}>
@@ -82,7 +82,7 @@ export default class AddChatModal extends TsxComponent<{ onCloseAddChatModal: ()
         <ul class={styles.selectedFriends}>
           {this.selectedFriends.map(friend => (
             <li key={friend.id} onClick={() => this.handleRemove(friend.id)}>
-              {friend.username}
+              {friend.name}
               <i class="icon-close" />
             </li>
           ))}
