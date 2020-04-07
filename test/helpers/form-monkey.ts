@@ -385,20 +385,19 @@ export class FormMonkey {
 
   async setTwitchTagsValue(selector: string, values: string[]) {
     // clear tags
-    const closeSelector = `${selector} .sp-icon-close`;
-    while (await this.client.isExisting(closeSelector)) {
-      await this.client.click(closeSelector);
+    const removeTagButtons = await this.client.$$(
+      '.tags-container .sp-selected-tag .sp-icon-close',
+    );
+
+    for (const removeButton of removeTagButtons.reverse()) {
+      await this.client.click(
+        // @ts-ignore
+        `.tags-container .sp-selected-tag:nth-child(${removeButton.index + 2}) .sp-icon-close`,
+      );
     }
 
-    // click to open the popup
-    await this.client.click(selector);
-
-    // select values
-    const inputSelector = `.v-dropdown-container .sp-search-input`;
     for (const value of values) {
-      await this.setInputValue(inputSelector, value);
-      await ((this.client.keys('ArrowDown') as any) as Promise<any>);
-      await ((this.client.keys('Enter') as any) as Promise<any>);
+      await this.client.click(`td=${value}`);
     }
 
     // click away and wait for the control to dismiss
