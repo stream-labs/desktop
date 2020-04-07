@@ -5,12 +5,12 @@ import styles from './CommunityHub.m.less';
 import { $t } from 'services/i18n';
 import { Inject } from 'services';
 import { CommunityHubService, IFriend } from 'services/community-hub';
-import { MessagesService } from 'services/community-hub/messages';
+import { LiveChatService } from 'services/community-hub/live-chat';
 
 @Component({})
 export default class ChatPage extends TsxComponent<{ onHideChat: () => void }> {
   @Inject() communityHubService: CommunityHubService;
-  @Inject() messagesService: MessagesService;
+  @Inject() liveChatService: LiveChatService;
 
   get chatroom() {
     return this.communityHubService.views.currentChat;
@@ -21,7 +21,7 @@ export default class ChatPage extends TsxComponent<{ onHideChat: () => void }> {
   }
 
   get members() {
-    return this.messagesService.views.messages(this.chatroom.id);
+    return this.liveChatService.views.messages(this.chatroom.id);
   }
 
   contextButton(chatter: IFriend) {
@@ -35,7 +35,7 @@ export default class ChatPage extends TsxComponent<{ onHideChat: () => void }> {
         <div class={styles.chatRow}>
           <img class={styles.avatar} src={friend.avatar} />
           <div class={cx(styles.status, styles[friend.status])} />
-          <div class={styles.chatName}>{friend.username}</div>
+          <div class={styles.chatName}>{friend.name}</div>
           {friend.is_prime && <i class={cx('icon-prime', styles.primeIcon)} />}
         </div>
         <div style="margin-left: auto">{this.contextButton(friend)}</div>
