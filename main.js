@@ -70,7 +70,7 @@ if (!gotTheLock) {
 
   const util = require('util');
   const logFile = path.join(app.getPath('userData'), 'app.log');
-  const maxLogBytes = 16384;
+  const maxLogBytes = 131072;
 
   // Truncate the log file if it is too long
   if (fs.existsSync(logFile) && fs.statSync(logFile).size > maxLogBytes) {
@@ -378,6 +378,11 @@ if (!gotTheLock) {
     const requests = { };
 
     function sendRequest(request, event = null, async = false) {
+      if (workerWindow.isDestroyed()) {
+        console.log('Tried to send request but worker window was missing...');
+        return;
+      }
+
       workerWindow.webContents.send('services-request', request);
       if (!event) return;
       requests[request.id] = Object.assign({}, request, { event, async });

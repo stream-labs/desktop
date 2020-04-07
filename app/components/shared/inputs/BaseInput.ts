@@ -15,6 +15,8 @@ export abstract class BaseInput<
   type?: EInputType;
   onInput?: Function;
   onEnter?: () => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }> {
   abstract readonly value: TValueType;
   abstract readonly title: string;
