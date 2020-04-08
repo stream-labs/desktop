@@ -1,16 +1,10 @@
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import { Subscription } from 'rxjs';
 import { AudioSource, AudioService, IVolmeter } from 'services/audio';
 import { Inject } from 'services/core/injector';
 import { CustomizationService } from 'services/customization';
-import { compileShader, createProgram } from 'util/webgl/utils';
-import vShaderSrc from 'util/webgl/shaders/volmeter.vert';
-import fShaderSrc from 'util/webgl/shaders/volmeter.frag';
 import electron from 'electron';
 import TsxComponent, { createProps } from './tsx-component';
-import { v2 } from '../util/vec2';
-import uuid from 'uuid';
 
 // Configuration
 const CHANNEL_HEIGHT = 3;
@@ -33,7 +27,7 @@ class MixerVolmeterProps {
 
 /**
  * Render volmeters on canvas
- * for rendering multiple volmeters use more optimized Volmeters.tsx
+ * To render multiple volmeters use more optimized Volmeters.tsx instead
  */
 @Component({ props: createProps(MixerVolmeterProps) })
 export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {

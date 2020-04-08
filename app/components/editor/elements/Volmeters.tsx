@@ -345,6 +345,7 @@ export default class MixerVolmeter extends TsxComponent<VolmetersProps> {
 
     this.gl.uniform1f(this.bgMultiplierLocation, this.getBgMultiplier());
 
+    // calculate offsetRop and render each volmeter
     let offsetTop = 0;
     this.sourcesOrder.forEach((sourceId, ind) => {
       offsetTop += PADDING_TOP;
