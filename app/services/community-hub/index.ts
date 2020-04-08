@@ -136,9 +136,9 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
   }
 
   async fetchUserData() {
-    this.getFriends();
-    this.getFriendRequests();
-    this.getChatrooms();
+    // this.getFriends();
+    // this.getFriendRequests();
+    // this.getChatrooms();
   }
 
   async getResponse(endpoint: string) {
