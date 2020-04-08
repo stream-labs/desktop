@@ -8,7 +8,7 @@ import { importSocketIOClient } from 'util/slow-imports';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { CommunityHubService } from './index';
 
-type TSocketEvent = '';
+type TSocketEvent = 'status_update';
 
 interface IBearerAuth {
   path: string;
