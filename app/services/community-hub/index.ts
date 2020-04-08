@@ -1,12 +1,13 @@
 import uuid from 'uuid/v4';
 import sample from 'lodash/sample';
 import { StatefulService, mutation, ViewHandler } from 'services/core/stateful-service';
-import { UserService } from 'services/user';
+import { UserService, LoginLifecycle } from 'services/user';
 import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
 import { I18nService, $t } from 'services/i18n';
 import { InitAfter } from 'services/core';
 import * as pages from 'components/pages/community-hub/pages';
+import { handleResponse, authorizedHeaders } from 'util/requests';
 
 export interface IFriend {
   id: number;
@@ -26,6 +27,7 @@ interface IChatRoom {
 
 interface ICommunityHubState {
   friends: Array<IFriend>;
+  friendRequests: Array<IFriend>;
   chatrooms: Array<IChatRoom>;
   status: string;
   currentPage: string;
@@ -76,6 +78,7 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
 
   static initialState: ICommunityHubState = {
     friends: [],
+    friendRequests: [],
     chatrooms: [],
     status: 'online',
     currentPage: 'matchmaking',
@@ -85,6 +88,16 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
   @mutation()
   SET_FRIENDS(friends: Array<IFriend>) {
     this.state.friends = friends;
+  }
+
+  @mutation()
+  REMOVE_FRIEND(friendId: number) {
+    this.state.friends = this.state.friends.filter(friend => friend.id !== friendId);
+  }
+
+  @mutation()
+  SET_FRIEND_REQUESTS(friendRequests: Array<IFriend>) {
+    this.state.friendRequests = friendRequests;
   }
 
   @mutation()
@@ -98,6 +111,11 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
   }
 
   @mutation()
+  LEAVE_CHATROOM(chatroomName: string) {
+    this.state.chatrooms = this.state.chatrooms.filter(chatroom => chatroom.id !== chatroomName);
+  }
+
+  @mutation()
   SET_CURRENT_PAGE(page: string) {
     this.state.currentPage = page;
   }
@@ -107,7 +125,77 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
     this.state.self = self;
   }
 
-  init() {}
+  lifecycle: LoginLifecycle;
+
+  async init() {
+    this.lifecycle = await this.userService.withLifecycle({
+      init: this.fetchUserData,
+      destroy: () => Promise.resolve(),
+      context: this,
+    });
+  }
+
+  async fetchUserData() {
+    this.getFriends();
+    this.getFriendRequests();
+    this.getChatrooms();
+  }
+
+  async getResponse(endpoint: string) {
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs-chat/${endpoint}`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers });
+    return await fetch(request).then(handleResponse);
+  }
+
+  async postResponse(endpoint: string, body?: any) {
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs-chat/${endpoint}`;
+    const headers = authorizedHeaders(
+      this.userService.apiToken,
+      new Headers({ 'Content-Type': 'application/json' }),
+    );
+    const request = new Request(url, { headers, body, method: 'POST' });
+    return await fetch(request).then(handleResponse);
+  }
+
+  async getFriends() {
+    const resp = await this.getResponse('friends');
+    this.SET_FRIENDS(resp.data);
+  }
+
+  async getChatMembers(chatroomName: string) {
+    const resp = await this.getResponse(`group/members?groupId=${chatroomName}`);
+    return resp.data;
+  }
+
+  async sendFriendRequest(friendId: number) {
+    this.postResponse('friend/request', { friendId });
+  }
+
+  async getFriendRequests() {
+    const resp = await this.getResponse('friend/request');
+    this.SET_FRIEND_REQUESTS(resp.data);
+  }
+
+  async respondToFriendRequest(requestId: number, accepted: boolean) {
+    const endpoint = `friend/${accepted ? 'accept' : 'reject'}`;
+    this.postResponse(endpoint, { requestId });
+  }
+
+  async unfriend(friendId: number) {
+    this.postResponse('friend/remove', { friendId });
+    this.REMOVE_FRIEND(friendId);
+  }
+
+  async getChatrooms() {
+    const resp = await this.getResponse('settings');
+    this.SET_CHATROOMS(resp.chatrooms);
+  }
+
+  async leaveChatroom(groupId: string) {
+    this.postResponse('group/leave', { groupId });
+    this.LEAVE_CHATROOM(groupId);
+  }
 
   chatBgColor() {
     return sample([
