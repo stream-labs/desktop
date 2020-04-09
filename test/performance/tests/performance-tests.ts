@@ -23,7 +23,7 @@ const path = require('path');
 usePerformanceTest();
 
 const RELOAD_ATTEMPTS = 15;
-const CPU_ATTEMPTS = 200;
+const CPU_ATTEMPTS = 100;
 const ADD_SOURCES_ATTEMPTS = 5;
 
 /**
