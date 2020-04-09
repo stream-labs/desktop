@@ -1,4 +1,5 @@
-import { TExecutionContext, useSpectron } from '../helpers/spectron';
+let lastEventTime = 0;
+import { afterAppStart, TExecutionContext, useSpectron } from '../helpers/spectron';
 import test from 'ava';
 import { getClient } from '../helpers/api-client';
 import { PerformanceService } from '../../app/services/performance';
@@ -13,8 +14,17 @@ useSpectron({ restartAppAfterEachTest: false });
 export function usePerformanceTest() {
   let testName = '';
 
+  afterAppStart(() => {
+    logTiming(`App started`);
+  });
+
+  afterAppStart(() => {
+    logTiming(`App stopped`);
+  });
+
   test.beforeEach(async t => {
     testName = t.title.replace('beforeEach hook for ', '');
+    logTiming(`Test "${testName}" started`);
     getMeter().reset();
     if (!fs.pathExistsSync(CONFIG.dist)) fs.mkdirpSync(CONFIG.dist);
   });
@@ -26,6 +36,7 @@ export function usePerformanceTest() {
     const savedEvents = fs.pathExistsSync(savedEventsFile) ? fs.readJsonSync(savedEventsFile) : {};
     savedEvents[testName] = meter.getRecordedEvents();
     fs.writeJsonSync(savedEventsFile, savedEvents);
+    logTiming(`Test "${testName}" finished`);
   });
 }
 
@@ -56,4 +67,16 @@ export async function getCPUUsage(): Promise<number> {
   const performanceService = api.getResource<PerformanceService>('PerformanceService');
   const cpuUsage = performanceService.state.CPU;
   return cpuUsage;
+}
+
+
+/**
+ * log time passed from the last logTiming call
+ * @param msg
+ */
+export function logTiming(msg: string, time = Date.now()) {
+  const delta = lastEventTime ? time - lastEventTime : 0;
+  lastEventTime = time;
+  if (delta > 2000) console.log('------------------');
+  console.log(msg, delta + 'ms');
 }

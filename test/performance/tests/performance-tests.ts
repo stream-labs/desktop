@@ -14,7 +14,7 @@ import { spawnSync } from 'child_process';
 import { sleep } from '../../helpers/sleep';
 import { setOutputResolution, setTemporaryRecordingPath } from '../../helpers/spectron/output';
 import { startRecording, stopRecording } from '../../helpers/spectron/streaming';
-import { getCPUUsage, getMemoryUsage, usePerformanceTest } from '../tools';
+import { getCPUUsage, getMemoryUsage, logTiming, usePerformanceTest } from '../tools';
 import { logIn } from '../../helpers/spectron/user';
 const fs = require('fs-extra');
 const _7z = require('7zip')['7z'];
@@ -55,12 +55,14 @@ function measureStartupTime(api: ApiClient) {
 }
 
 async function measureMemoryAndCPU(attempts = CPU_ATTEMPTS) {
+  logTiming('Start recodring CPU and Memory');
   const meter = getMeter();
   while (attempts--) {
     meter.addMeasurement('CPU', await getCPUUsage());
     meter.addMeasurement('memory', await getMemoryUsage());
     await sleep(2000);
   }
+  logTiming('Stop recodring CPU and Memory');
 }
 
 test('Bundle size', async t => {

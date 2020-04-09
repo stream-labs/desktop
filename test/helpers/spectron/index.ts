@@ -32,6 +32,10 @@ const afterStartCallbacks: ((t: TExecutionContext) => any)[] = [];
 export function afterAppStart(cb: (t: TExecutionContext) => any) {
   afterStartCallbacks.push(cb);
 }
+const afterStopCallbacks: ((t: TExecutionContext) => any)[] = [];
+export function afterAppStop(cb: (t: TExecutionContext) => any) {
+  afterStopCallbacks.push(cb);
+}
 
 export async function focusWindow(t: any, regex: RegExp): Promise<boolean> {
   const handles = await t.context.app.client.windowHandles();
@@ -261,6 +265,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     await new Promise(resolve => {
       rimraf(cacheDir, resolve);
     });
+    for (const callback of afterStopCallbacks) {
+      await callback(t);
+    }
   };
 
   /**
