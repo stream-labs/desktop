@@ -21,6 +21,7 @@ export interface ITcpServerServiceApi {
   listen(): void;
   stopListening(): void;
   enableWebsoketsRemoteConnections(): void;
+  websocketRemoteConnectionEnabled: boolean;
   getIPAddresses(): IIPAddressDescription[];
   generateToken(): string;
   state: ITcpServersSettings;

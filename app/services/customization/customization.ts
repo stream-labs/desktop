@@ -21,12 +21,14 @@ import { UserService } from 'services/user';
 // Maps to --background
 const THEME_BACKGROUNDS = {
   'night-theme': { r: 9, g: 22, b: 29 },
+  'prime-dark': { r: 51, g: 51, b: 51 },
   'day-theme': { r: 245, g: 248, b: 250 },
 };
 
 // Maps to --section
 const DISPLAY_BACKGROUNDS = {
   'night-theme': { r: 11, g: 22, b: 28 },
+  'prime-dark': { r: 34, g: 34, b: 34 },
   'day-theme': { r: 227, g: 232, b: 235 },
 };
 
@@ -112,7 +114,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
   }
 
   get isDarkTheme() {
-    return ['night-theme'].includes(this.currentTheme);
+    return ['night-theme', 'prime-dark'].includes(this.currentTheme);
   }
 
   setUpdateStreamInfoOnLive(update: boolean) {
@@ -143,6 +145,21 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     this.setSettings({ pinnedStatistics: pinned });
   }
 
+  get themeOptions() {
+    const options = [
+      { value: 'night-theme', description: $t('Night') },
+      { value: 'day-theme', description: $t('Day') },
+    ];
+
+    if (this.userService.isPrime) {
+      options.push(
+        { value: 'prime-dark', description: $t('Obsidian Prime') },
+        { value: 'prime-light', description: $t('Alabaster Prime') },
+      );
+    }
+    return options;
+  }
+
   getSettingsFormData(): TObsFormData {
     const settings = this.getSettings();
 
@@ -152,10 +169,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
         name: 'theme',
         description: $t('Theme'),
         type: 'OBS_PROPERTY_LIST',
-        options: [
-          { value: 'night-theme', description: $t('Night') },
-          { value: 'day-theme', description: $t('Day') },
-        ],
+        options: this.themeOptions,
         visible: true,
         enabled: true,
       },
@@ -199,7 +213,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
       },
     ];
 
-    if (this.userService.isLoggedIn() && this.userService.platform.type === 'twitch') {
+    if (this.userService.isLoggedIn && this.userService.platform.type === 'twitch') {
       formData.push(<IObsInput<boolean>>{
         value: settings.enableBTTVEmotes,
         name: 'enableBTTVEmotes',

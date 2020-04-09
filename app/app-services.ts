@@ -44,8 +44,8 @@ export { ProjectorService } from 'services/projector';
 export { I18nService } from 'services/i18n';
 export { ObsUserPluginsService } from 'services/obs-user-plugins';
 export { HardwareService, DefaultHardwareService } from 'services/hardware';
-export { Prefab, PrefabsService } from 'services/prefabs';
 export { EditorCommandsService } from 'services/editor-commands';
+export { EditorService } from 'services/editor';
 export { StreamSettingsService } from 'services/settings/streaming';
 
 // ONLINE SERVICES
@@ -57,13 +57,12 @@ export { FacebookService } from 'services/platforms/facebook';
 export { RestreamService } from 'services/restream';
 export { TwitterService } from 'services/integrations/twitter';
 export { UsageStatisticsService } from './services/usage-statistics';
+export { GameOverlayService } from 'services/game-overlay';
 
 export { MediaGalleryService } from 'services/media-gallery';
-export { GuestApiService } from 'services/guest-api';
 export { MediaBackupService } from 'services/media-backup';
 export { OutageNotificationsService } from 'services/outage-notifications';
 export { AnnouncementsService } from 'services/announcements';
-export { BrandDeviceService } from 'services/auto-config/brand-device';
 export { WebsocketService } from 'services/websocket';
 export { IncrementalRolloutService } from 'services/incremental-rollout';
 export { CrashReporterService } from 'services/crash-reporter';
@@ -100,5 +99,3 @@ export { SubGoalService } from 'services/widgets/settings/sub-goal';
 export { MediaShareService } from 'services/widgets/settings/media-share';
 export { AlertBoxService } from 'services/widgets/settings/alert-box';
 export { SpinWheelService } from 'services/widgets/settings/spin-wheel';
-
-export { GameOverlayService } from 'services/game-overlay';

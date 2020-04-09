@@ -12,6 +12,7 @@ import {
   JsonrpcService,
 } from 'services/api/jsonrpc';
 import { ServicesManager } from '../../services-manager';
+import { ServiceHelper } from 'services/core';
 
 export interface ISerializable {
   // really wish to have something like

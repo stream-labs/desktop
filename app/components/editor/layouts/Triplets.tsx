@@ -7,24 +7,20 @@ import styles from './Layouts.m.less';
 
 @Component({ props: createProps(LayoutProps) })
 export default class Triplets extends BaseLayout {
-  mounted() {
-    super.mountResize();
-    this.$emit('totalWidth', [
-      ['1', '4'],
-      ['2', '5'],
-      ['3', '6'],
-    ]);
+  async mounted() {
+    this.mountResize();
+    this.$emit(
+      'totalWidth',
+      await this.mapVectors([
+        ['1', '4'],
+        ['2', '5'],
+        ['3', '6'],
+      ]),
+    );
+    this.setMins(['1', '4'], ['2', '5'], ['3', '6']);
   }
   destroyed() {
     this.destroyResize();
-  }
-
-  get mins() {
-    return {
-      bar1: this.props.calculateMin(['2', '5']),
-      bar2: this.props.calculateMin(['3', '6']),
-      rest: this.props.calculateMin(['1', '4']),
-    };
   }
 
   get bar1() {

@@ -1,7 +1,7 @@
 import { readdir } from 'fs-extra';
 import { focusMain, test, useSpectron } from './helpers/spectron';
 import { sleep } from './helpers/sleep';
-import { setTemporaryRecordingPath } from './helpers/spectron/output';
+import { setOutputResolution, setTemporaryRecordingPath } from './helpers/spectron/output';
 import { addSource } from './helpers/spectron/sources';
 
 useSpectron();
@@ -12,6 +12,9 @@ test('Selective Recording', async t => {
   const { client } = t.context.app;
   const tmpDir = await setTemporaryRecordingPath(t);
 
+  // set lower resolution for better performance in CI
+  await setOutputResolution(t, '100x100');
+
   // Add a browser source
   await addSource(t, sourceType, sourceName);
 
@@ -20,7 +23,7 @@ test('Selective Recording', async t => {
   await client.click('.studio-controls-top .icon-smart-record');
 
   // Check that selective recording icon is active
-  t.true(await client.isExisting('.icon-smart-record.icon--active'));
+  await client.waitForExist('.icon-smart-record.icon--active');
 
   // Check that browser source has a selective recording toggle
   t.true(await client.isExisting('.sl-vue-tree-sidebar .source-selector-action.icon-smart-record'));
@@ -29,13 +32,13 @@ test('Selective Recording', async t => {
   await client.click('.sl-vue-tree-sidebar .source-selector-action.icon-smart-record');
 
   // Check that source is set to stream only
-  t.true(await client.isExisting('.sl-vue-tree-sidebar .source-selector-action.icon-broadcast'));
+  await client.waitForExist('.sl-vue-tree-sidebar .source-selector-action.icon-broadcast');
 
   // Cycle selective recording mode to record only
   await client.click('.sl-vue-tree-sidebar .source-selector-action.icon-broadcast');
 
   // Check that source is set to record only
-  t.true(await client.isExisting('.sl-vue-tree-sidebar .source-selector-action.icon-studio'));
+  await client.waitForExist('.sl-vue-tree-sidebar .source-selector-action.icon-studio');
 
   // Start recording and wait
   await client.click('.record-button');

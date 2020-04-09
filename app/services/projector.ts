@@ -17,7 +17,7 @@ export class ProjectorService extends Service {
    * @param sourceId       The id of the source
    */
   createProjector(renderingMode: number, sourceId?: string) {
-    let title = sourceId ? this.sourcesService.getSource(sourceId).name : $t('Output');
+    let title = sourceId ? this.sourcesService.views.getSource(sourceId).name : $t('Output');
     if (renderingMode === ERenderingMode.OBS_STREAMING_RENDERING) title = $t('Streaming Output');
     if (renderingMode === ERenderingMode.OBS_RECORDING_RENDERING) title = $t('Recording Output');
 

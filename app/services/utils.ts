@@ -1,19 +1,44 @@
 import URI from 'urijs';
 import isEqual from 'lodash/isEqual';
 import electron from 'electron';
+const BrowserWindow = electron.remote.BrowserWindow;
 
 export const enum EBit {
   ZERO,
   ONE,
 }
 
+export interface IEnv {
+  NODE_ENV: 'production' | 'development';
+  SLOBS_PREVIEW: boolean;
+  SLOBS_IPC: boolean;
+  SLOBS_USE_LOCAL_HOST: boolean;
+  SLOBS_VERSION: string;
+  CI: boolean;
+}
+
 export default class Utils {
-  static applyProxy(target: Object, source: Object) {
-    Object.keys(source).forEach(propName => {
+  /**
+   * cache env variables
+   * since electron.remote.process takes to much time to fetch
+   */
+  static _env: IEnv;
+  static get env() {
+    if (!Utils._env) Utils._env = electron.remote.process.env;
+    return Utils._env;
+  }
+
+  static applyProxy(target: Object, source: Object | Function) {
+    // TODO: Figure out why this is happening
+    if (!source) return;
+
+    const sourceObj = typeof source === 'function' ? source() : source;
+
+    Object.keys(sourceObj).forEach(propName => {
       Object.defineProperty(target, propName, {
         configurable: true,
         get() {
-          return source[propName];
+          return sourceObj[propName];
         },
       });
     });
@@ -31,8 +56,18 @@ export default class Utils {
     return URI.parseQuery(URI.parse(url).query) as Dictionary<string>;
   }
 
+  static isWorkerWindow(): boolean {
+    return this.getWindowId() === 'worker';
+  }
+
   static isMainWindow(): boolean {
     return this.getWindowId() === 'main';
+  }
+
+  static getMainWindow(): Electron.BrowserWindow {
+    return electron.remote.BrowserWindow.getAllWindows().find(
+      win => Utils.getUrlParams(win.webContents.getURL()).windowId === 'main',
+    );
   }
 
   static isChildWindow(): boolean {
@@ -40,19 +75,19 @@ export default class Utils {
   }
 
   static isDevMode() {
-    return process.env.NODE_ENV !== 'production';
+    return Utils.env.NODE_ENV !== 'production';
   }
 
   static isPreview(): boolean {
-    return electron.remote.process.env.SLOBS_PREVIEW;
+    return Utils.env.SLOBS_PREVIEW as boolean;
   }
 
   static isIpc(): boolean {
-    return electron.remote.process.env.SLOBS_IPC;
+    return Utils.env.SLOBS_IPC as boolean;
   }
 
   static useLocalHost(): boolean {
-    return electron.remote.process.env.SLOBS_USE_LOCAL_HOST;
+    return Utils.env.SLOBS_USE_LOCAL_HOST as boolean;
   }
 
   /**
@@ -153,5 +188,20 @@ export default class Utils {
         derivedCtor.prototype[name] = baseCtor.prototype[name];
       });
     });
+  }
+
+  /**
+   * Measure time in ms between events and print in to the main process stdout
+   * It's helpful for measuring the time between events in different windows
+   */
+  static measure(msg: string, timestamp?: number) {
+    electron.ipcRenderer.send('measure-time', msg, timestamp || Date.now());
+  }
+
+  static makeChildWindowVisible() {
+    const childWindowId: number = electron.ipcRenderer.sendSync('getWindowIds').child;
+    const childWindow = BrowserWindow.fromId(childWindowId);
+    childWindow.show();
+    childWindow.restore();
   }
 }

@@ -93,8 +93,7 @@ export default class EditStreamInfo extends Vue {
     return (
       !this.infoLoading &&
       this.isFacebook &&
-      this.facebookService.state.facebookPages &&
-      this.facebookService.state.facebookPages.pages.length
+      this.facebookService.state?.facebookPages?.pages?.length
     );
   }
 
@@ -137,10 +136,9 @@ export default class EditStreamInfo extends Vue {
         disabled: this.updatingInfo,
         fullWidth: true,
       }),
-      date: metadata.text({
+      date: metadata.date({
         title: $t('Scheduled Date'),
-        dateFormat: 'MM/dd/yyyy',
-        placeholder: 'MM/DD/YYYY',
+        disablePastDates: true,
         required: true,
         disabled: this.updatingInfo,
         description: this.isFacebook
@@ -255,7 +253,9 @@ export default class EditStreamInfo extends Vue {
   async scheduleStream() {
     this.updatingInfo = true;
 
-    const scheduledStartTime = this.formatDateString();
+    const scheduledStartTime = new Date(
+      this.startTimeModel.date + this.startTimeModel.time * 1000,
+    ).toISOString();
     const service = getPlatformService(this.userService.platform.type);
     if (scheduledStartTime) {
       await service
@@ -503,25 +503,5 @@ export default class EditStreamInfo extends Vue {
           'resolution may be changed for a better quality of experience',
       ),
     };
-  }
-
-  private formatDateString() {
-    try {
-      const dateArray = this.startTimeModel.date.split('/');
-      let hours: string | number = Math.floor(this.startTimeModel.time / 3600);
-      hours = hours < 10 ? `0${hours}` : hours;
-      let minutes: string | number = (this.startTimeModel.time % 3600) / 60;
-      minutes = minutes < 10 ? `0${minutes}` : minutes;
-      return `${dateArray[2]}-${dateArray[0]}-${
-        dateArray[1]
-      }T${hours}:${minutes}:00.0${moment().format('Z')}`;
-    } catch {
-      this.$toasted.show($t('Please enter a valid date'), {
-        position: 'bottom-center',
-        className: 'toast-alert',
-        duration: 1000,
-        singleton: true,
-      });
-    }
   }
 }

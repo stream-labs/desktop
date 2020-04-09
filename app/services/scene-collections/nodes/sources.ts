@@ -50,11 +50,11 @@ export class SourcesNode extends Node<ISchema, {}> {
   @Inject() private scenesService: ScenesService;
 
   getItems() {
-    const linkedSourcesIds = this.scenesService
+    const linkedSourcesIds = this.scenesService.views
       .getSceneItems()
       .map(sceneItem => sceneItem.sourceId);
 
-    return this.sourcesService.sources.filter(source => {
+    return this.sourcesService.views.sources.filter(source => {
       // we store scenes in separated config
       if (source.type === 'scene') return false;
 
@@ -72,7 +72,7 @@ export class SourcesNode extends Node<ISchema, {}> {
         const hotkeys = new HotkeysNode();
 
         return hotkeys.save({ sourceId: source.sourceId }).then(() => {
-          const audioSource = this.audioService.getSource(source.sourceId);
+          const audioSource = this.audioService.views.getSource(source.sourceId);
 
           const obsInput = source.getObsInput();
 
@@ -199,7 +199,7 @@ export class SourcesNode extends Node<ISchema, {}> {
       });
 
       if (source.audioMixers) {
-        this.audioService
+        this.audioService.views
           .getSource(sourceInfo.id)
           .setMul(sourceInfo.volume != null ? sourceInfo.volume : 1);
 
@@ -208,7 +208,7 @@ export class SourcesNode extends Node<ISchema, {}> {
             ? obs.EMonitoringType.MonitoringOnly
             : obs.EMonitoringType.None;
 
-        this.audioService.getSource(sourceInfo.id).setSettings({
+        this.audioService.views.getSource(sourceInfo.id).setSettings({
           forceMono: defaultTo(sourceInfo.forceMono, false),
           syncOffset: AudioService.timeSpecToMs(
             defaultTo(sourceInfo.syncOffset, { sec: 0, nsec: 0 }),
@@ -216,7 +216,7 @@ export class SourcesNode extends Node<ISchema, {}> {
           audioMixers: defaultTo(sourceInfo.audioMixers, 255),
           monitoringType: defaultTo(sourceInfo.monitoringType, defaultMonitoring),
         });
-        this.audioService.getSource(sourceInfo.id).setHidden(!!sourceInfo.mixerHidden);
+        this.audioService.views.getSource(sourceInfo.id).setHidden(!!sourceInfo.mixerHidden);
       }
 
       if (sourceInfo.hotkeys) {

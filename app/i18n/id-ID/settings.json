@@ -12,7 +12,7 @@
   "Remote Control": "Remote Control",
   "Experimental": "Eksperimental",
   "Developer": "Pengembang",
-  "Facemasks": "Masker wajah",
+  "Face Masks": "Face Masks",
   "Night mode": "Mode malam",
   "Game Overlay": "Tampilan Game",
   "Installed Apps": "Aplikasi yang Diinstal",
@@ -104,7 +104,11 @@
   "Show Recent Events": "Tampilkan Acara Terbaru",
   "Overlay Opacity": "Opasitas Tampilan",
   "Named Pipe": "Pipa Bernama",
+  "Pipe Name": "Pipe Name",
   "Websockets": "Websocket",
+  "Enabled": "Enabled",
+  "Allow Remote Connections": "Allow Remote Connections",
+  "Port": "Port",
   "Audio - Track 1": "Audio - Track 1",
   "Audio - Track 2": "Audio - Track 2",
   "Audio - Track 3": "Audio - Track 3",
@@ -112,5 +116,6 @@
   "Audio - Track 5": "Audio - Track 5",
   "Audio - Track 6": "Audio - Track 6",
   "Stream Key": "Tombol Streaming",
-  "You can not change these settings when you're live": "Anda tidak dapat mengganti pengaturan ini ketika sedang live"
+  "You can not change these settings when you're live": "Anda tidak dapat mengganti pengaturan ini ketika sedang live",
+  "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.": "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk."
 }

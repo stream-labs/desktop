@@ -16,12 +16,12 @@ export class EditSourcePropertiesCommand extends CombinableCommand {
     super();
 
     this.description = $t('Edit %{sourceName}', {
-      sourceName: this.sourcesService.getSource(this.sourceId).name,
+      sourceName: this.sourcesService.views.getSource(this.sourceId).name,
     });
   }
 
   execute() {
-    const source = this.sourcesService.getSource(this.sourceId);
+    const source = this.sourcesService.views.getSource(this.sourceId);
 
     this.beforeFormData = source.getPropertiesFormData();
     source.setPropertiesFormData(this.afterFormData || this.formData);
@@ -29,7 +29,7 @@ export class EditSourcePropertiesCommand extends CombinableCommand {
   }
 
   rollback() {
-    this.sourcesService.getSource(this.sourceId).setPropertiesFormData(this.beforeFormData);
+    this.sourcesService.views.getSource(this.sourceId).setPropertiesFormData(this.beforeFormData);
   }
 
   shouldCombine(other: EditSourcePropertiesCommand) {
