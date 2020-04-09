@@ -18,7 +18,7 @@ const DANGER_LEVEL = -9;
 const GREEN = [49, 195, 162];
 const YELLOW = [255, 205, 71];
 const RED = [252, 62, 63];
-const FPS_LIMIT = 60;
+const FPS_LIMIT = 40;
 
 class MixerVolmeterProps {
   audioSource: AudioSource = null;
