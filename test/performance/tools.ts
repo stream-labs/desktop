@@ -1,5 +1,5 @@
 let lastEventTime = 0;
-import { afterAppStart, TExecutionContext, useSpectron } from '../helpers/spectron';
+import { afterAppStart, afterAppStop, TExecutionContext, useSpectron } from '../helpers/spectron';
 import test from 'ava';
 import { getClient } from '../helpers/api-client';
 import { PerformanceService } from '../../app/services/performance';
@@ -18,7 +18,7 @@ export function usePerformanceTest() {
     logTiming(`App started`);
   });
 
-  afterAppStart(() => {
+  afterAppStop(() => {
     logTiming(`App stopped`);
   });
 
