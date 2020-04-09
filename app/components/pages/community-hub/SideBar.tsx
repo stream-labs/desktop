@@ -14,11 +14,6 @@ export default class SideBar extends TsxComponent<{ onShowAddChatModal: () => vo
     return this.communityHubService.state.currentPage;
   }
 
-  get onlineFriendCount() {
-    return this.communityHubService.state.friends.filter(friend => friend.status !== 'offline')
-      .length;
-  }
-
   setPage(page: string) {
     this.communityHubService.setPage(page);
   }
@@ -65,7 +60,7 @@ export default class SideBar extends TsxComponent<{ onShowAddChatModal: () => vo
           <i class="icon-add-circle" onClick={() => this.$emit('showAddChatModal')} />
         </span>
         {directMessages.map(chat => {
-          const friend = chat.members[0];
+          const friend = this.communityHubService.views.usersInRoom(chat.id)[0];
           return (
             <div
               class={cx(styles.chatRow, { [styles.active]: this.currentTab === chat.id })}
@@ -98,7 +93,9 @@ export default class SideBar extends TsxComponent<{ onShowAddChatModal: () => vo
           onClick={() => this.setPage('friendsPage')}
         >
           <i class="icon-team-2" />
-          {$t('Friends (%{friendCount} Online)', { friendCount: this.onlineFriendCount })}
+          {$t('Friends (%{friendCount} Online)', {
+            friendCount: this.communityHubService.views.onlineFriendCount,
+          })}
         </span>
         {this.groupChatRows}
         {this.directMessageRows}

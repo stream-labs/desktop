@@ -33,6 +33,10 @@ export default class ChatPage extends TsxComponent {
     return this.communityHubService.views.currentChat;
   }
 
+  get members() {
+    return this.communityHubService.views.usersInRoom(this.chatroom.id);
+  }
+
   get messages() {
     return this.liveChatService.views.messages(this.chatroom.id);
   }
@@ -43,8 +47,7 @@ export default class ChatPage extends TsxComponent {
 
   chatMessage(message: IMessage) {
     const chatter =
-      this.chatroom.members.find(chatter => message.user_id === chatter.id) ||
-      this.communityHubService.self;
+      this.members.find(chatter => message.user_id === chatter.id) || this.communityHubService.self;
     const isSelf = chatter.id === this.communityHubService.self.id;
     return (
       <div class={cx(styles.messageContainer, { [styles.self]: isSelf })}>

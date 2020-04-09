@@ -8,8 +8,6 @@ import { importSocketIOClient } from 'util/slow-imports';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { CommunityHubService } from './index';
 
-type TSocketEvent = 'status_update';
-
 interface IBearerAuth {
   path: string;
   settings: {
@@ -35,7 +33,10 @@ export class ChatWebsocketService extends Service {
 
   socket: SocketIOClient.Socket;
 
-  socketEvent = new Subject<TSocketEvent>();
+  statusUpdateEvent = new Subject<'status_update'>();
+  roomUpdateEvent = new Subject<'room_update'>();
+  chatMessageEvent = new Subject<'chat_message'>();
+  internalEvent = new Subject<'internal_event'>();
   io: SocketIOClientStatic;
 
   init() {
@@ -49,6 +50,12 @@ export class ChatWebsocketService extends Service {
 
   get canReconnect() {
     return this.reconnectAttempts > 0 && this.reconnectDelayReached === true;
+  }
+
+  connect() {
+    this.log('Connection Opened');
+
+    this.socket.emit('join_rooms', this.communityHubService.views.roomsToJoin);
   }
 
   reconnect(type: string, e?: any) {
@@ -80,25 +87,41 @@ export class ChatWebsocketService extends Service {
     fetch(request)
       .then(handleResponse)
       .then((json: IBearerAuth) => {
-        const url = json.path;
-        this.socket = this.io(url, { transports: json.settings.transports });
+        this.socket = this.io(json.path, { transports: json.settings.transports });
         this.communityHubService.self = json.user;
 
         this.reconnectAttempts = json.settings.reconnect_attempts;
         window.setTimeout(() => (this.reconnectDelayReached = true), json.settings.reconnect_delay);
 
         // These are useful for debugging
-        this.socket.on('connect', () => this.log('Connection Opened'));
+        this.socket.on('connect', () => this.connect());
         this.socket.on('connect_error', (e?: any) => this.reconnect('Connection Error', e));
         this.socket.on('connect_timeout', () => this.reconnect('Connection Timeout'));
         this.socket.on('error', () => this.log('Error'));
         this.socket.on('disconnect', () => this.log('Connection Closed'));
 
-        this.socket.on('event', (e: any) => {
-          this.log('event', e);
-          this.socketEvent.next(e);
-        });
+        this.listenForEvents();
       });
+  }
+
+  listenForEvents() {
+    if (!this.socket) return;
+    this.socket.on('status_update', (e: any) => {
+      this.log('status_update', e);
+      this.statusUpdateEvent.next(e);
+    });
+    this.socket.on('room_update', (e: any) => {
+      this.log('room_update', e);
+      this.statusUpdateEvent.next(e);
+    });
+    this.socket.on('chat_message', (e: any) => {
+      this.log('chat_message', e);
+      this.statusUpdateEvent.next(e);
+    });
+    this.socket.on('internal_event', (e: any) => {
+      this.log('internal_event', e);
+      this.statusUpdateEvent.next(e);
+    });
   }
 
   private log(message: string, ...args: any[]) {
