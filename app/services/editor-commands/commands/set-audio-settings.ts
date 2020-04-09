@@ -22,7 +22,7 @@ export class SetAudioSettingsCommand extends CombinableCommand {
   constructor(private sourceId: string, private changes: IChangableAudioSettings) {
     super();
     this.description = $t('Edit %{sourceName}', {
-      sourceName: this.audioService.getSource(this.sourceId).name,
+      sourceName: this.audioService.views.getSource(this.sourceId).name,
     });
   }
 
@@ -45,7 +45,7 @@ export class SetAudioSettingsCommand extends CombinableCommand {
   }
 
   private getAudioSettings() {
-    const source = this.audioService.getSource(this.sourceId);
+    const source = this.audioService.views.getSource(this.sourceId);
     return {
       forceMono: source.forceMono,
       syncOffset: source.syncOffset,

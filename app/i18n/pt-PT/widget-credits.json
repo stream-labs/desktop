@@ -1,11 +1,11 @@
 {
-  "Roll Credits": "Passar créditos",
+  "Roll Credits": "Mostrar créditos",
   "Includes": "Inclui",
   "Show Followers": "Mostrar seguidores",
   "Show Subscribers": "Mostrar subscritores",
   "Show donations": "Mostrar donativos",
   "Show Cheers": "Mostrar cumprimentos",
-  "Show Moderators": "Mostrar Moderadores",
+  "Show Moderators": "Mostrar moderadores",
   "Followers": "Seguidores",
   "Subscribers & Resubs": "Subscritores e Resubs",
   "Donors": "Doadores",
@@ -24,8 +24,8 @@
   "Text Color": "Cor do texto",
   "Delay Time": "Tempo de atraso",
   "Wait time before rerunning the credit reel.": "Tempo de espera antes de passar novamente os créditos finais.",
-  "Roll Speed": "Velocidade de exibição",
-  "Speed of the rolling credits.": "Velocidade de exibição dos créditos.",
-  "Roll Time": "Tempo de exibição",
-  "Duration of the rolling credits.": "Duração de exibição dos créditos."
+  "Roll Speed": "Velocidade de apresentação",
+  "Speed of the rolling credits.": "Velocidade de apresentação dos créditos.",
+  "Roll Time": "Tempo de apresentação",
+  "Duration of the rolling credits.": "Duração de apresentação dos créditos."
 }

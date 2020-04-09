@@ -3,7 +3,7 @@ import TsxComponent, { createProps } from 'components/tsx-component';
 import electron from 'electron';
 import { OnboardingStep } from 'streamlabs-beaker';
 import { Inject } from 'services';
-import { UserService } from 'services/user';
+import { UserService, EAuthProcessState } from 'services/user';
 import { NavigationService } from 'services/navigation';
 import { $t } from 'services/i18n';
 import { RestreamService } from 'services/restream';
@@ -24,7 +24,10 @@ export default class Multistream extends TsxComponent<MultistreamProps> {
 
   showLogin = false;
   multistreamEnabled = false;
-  loading = false;
+
+  get loading() {
+    return this.userService.state.authProcessState === EAuthProcessState.Busy;
+  }
 
   openPageCreation() {
     electron.remote.shell.openExternal(
@@ -33,19 +36,11 @@ export default class Multistream extends TsxComponent<MultistreamProps> {
     this.showLogin = true;
   }
 
-  mergeFacebook() {
-    this.loading = true;
-    this.userService.startAuth(
-      'facebook',
-      () => (this.loading = false),
-      () => (this.loading = true),
-      () => {
-        this.streamSettingsService.setSettings({ protectedModeEnabled: true });
-        this.props.continue();
-      },
-      'internal',
-      true,
-    );
+  async mergeFacebook() {
+    await this.userService.startAuth('facebook', 'internal', true);
+
+    this.streamSettingsService.setSettings({ protectedModeEnabled: true });
+    this.props.continue();
   }
 
   setMultistream(val: boolean) {

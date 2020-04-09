@@ -3,9 +3,10 @@
 .container {
   padding: 0 8px;
   height: 100%;
-  overflow: none;
   flex-shrink: 0;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .container:global(.perf-mode) {
@@ -30,7 +31,7 @@
 .eventContainer {
   .radius();
 
-  height: 100%;
+  flex-grow: 1;
   overflow-y: auto;
   position: relative;
   background: var(--section);

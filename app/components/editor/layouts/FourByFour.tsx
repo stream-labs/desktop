@@ -7,20 +7,13 @@ import styles from './Layouts.m.less';
 
 @Component({ props: createProps(LayoutProps) })
 export default class FourByFour extends BaseLayout {
-  mounted() {
+  async mounted() {
     this.mountResize();
-    this.$emit('totalWidth', ['1', ['2', '3'], ['4', '5']]);
+    this.$emit('totalWidth', await this.mapVectors(['1', ['2', '3'], ['4', '5']]));
+    this.setMins(['1'], ['2', '3'], ['4', '5']);
   }
   destroyed() {
     this.destroyResize();
-  }
-
-  get mins() {
-    return {
-      bar1: this.props.calculateMin(['2', '3']),
-      bar2: this.props.calculateMin(['4', '5']),
-      rest: this.props.calculateMin(['1']),
-    };
   }
 
   get bar1() {
@@ -41,7 +34,9 @@ export default class FourByFour extends BaseLayout {
   render() {
     return (
       <div class={styles.rows}>
-        <div style={{ height: `calc(100% - ${this.bar1 + this.bar2}px)` }}>{this.$slots['1']}</div>
+        <div class={styles.cell} style={{ height: `calc(100% - ${this.bar1 + this.bar2}px)` }}>
+          {this.$slots['1']}
+        </div>
         <ResizeBar
           position="top"
           vModel={this.bar1}

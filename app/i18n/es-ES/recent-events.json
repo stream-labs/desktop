@@ -11,7 +11,7 @@
   "has used": "ha usado",
   "has hosted you with %{viewers} viewers": "ha sido su host con %{viewers} espectadores",
   "has raided you with a party of %{viewers}": "te ha asaltado con un grupo de %{viewers}",
-  "has used %{skill} for": "ha utilizado % {skill} durante",
+  "has used %{skill} for": "ha utilizado %{skill} durante",
   "Tier 1": "Nivel 1",
   "Tier 2": "Nivel 2",
   "Tier 3": "Nivel 3",
@@ -48,5 +48,5 @@
   "Effects": "Efectos",
   "has purchased %{product} from the store": "ha comprado %{product} en la tienda",
   "Event Filters": "Filtros de evento",
-  "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, check out the Layout Editor in the sidebar.": "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, check out the Layout Editor in the sidebar."
+  "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, check out the Layout Editor in the sidebar.": "Hemos combinado las pestañas Editor y En directo, y hemos dado un nuevo aspecto a su fuente de eventos. Si desea volver a la fuente de eventos anterior, vea el Editor de diseño en la barra lateral."
 }

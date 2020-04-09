@@ -1,6 +1,6 @@
 {
-  "Vers": "Vers",
-  "Reload": "Reload",
-  "Unpacked vers loaded": "Unpacked vers loaded",
-  "You must unload unpacked version before enabling this app.": "You must unload unpacked version before enabling this app."
+  "Vers": "버전",
+  "Reload": "리로드",
+  "Unpacked vers loaded": "언팩 버전 로드됨",
+  "You must unload unpacked version before enabling this app.": "이 앱을 활성화하기 전에 언팩 버전을 없애야 합니다."
 }
