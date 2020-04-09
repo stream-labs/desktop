@@ -114,7 +114,7 @@ export default class LayoutEditor extends TsxComponent {
   }
 
   get currentTab() {
-    return this.layoutService.views.currentTab;
+    return this.layoutService.state.currentTab;
   }
 
   @Watch('currentTab')
