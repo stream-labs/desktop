@@ -6,7 +6,7 @@ import { mutation } from 'services/core/stateful-service';
 import { CustomizationService } from 'services/customization';
 import { UserService } from 'services/user';
 import { $t } from 'services/i18n';
-import uuid from 'uuid';
+import uuid from 'uuid/v4';
 import { LAYOUT_DATA, ELEMENT_DATA, ELayout, ELayoutElement } from './layout-data';
 
 export { ELayout, ELayoutElement };
@@ -145,7 +145,8 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
   }
 
   addTab(name: string, icon: string) {
-    this.ADD_TAB(name, icon, this.userService.isPrime);
+    const id = uuid();
+    this.ADD_TAB(name, icon, id, this.userService.isPrime);
   }
 
   removeCurrentTab() {
@@ -233,20 +234,18 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
   }
 
   @mutation()
-  ADD_TAB(name: string, icon: string, switchTab = false) {
-    const id = uuid();
-
+  ADD_TAB(name: string, icon: string, id: string, switchTab = false) {
     Vue.set(this.state.tabs, id, {
       name,
       icon,
       currentLayout: ELayout.Default,
 
       slottedElements: {
-        [ELayoutElement.Display]: '1',
-        [ELayoutElement.Minifeed]: '2',
-        [ELayoutElement.Scenes]: '3',
-        [ELayoutElement.Sources]: '4',
-        [ELayoutElement.Mixer]: '5',
+        [ELayoutElement.Display]: { slot: '1' },
+        [ELayoutElement.Minifeed]: { slot: '2' },
+        [ELayoutElement.Scenes]: { slot: '3' },
+        [ELayoutElement.Sources]: { slot: '4' },
+        [ELayoutElement.Mixer]: { slot: '5' },
       },
       resizes: {
         bar1: 156,
