@@ -4,6 +4,7 @@ import { Inject } from 'services';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { getPlatformService } from 'services/platforms';
 import { TwitchService } from 'services/platforms/twitch';
+import { Subject } from 'rxjs';
 
 export type TConfigEvent = 'starting_step' | 'progress' | 'stopping_step' | 'error' | 'done';
 
@@ -19,12 +20,12 @@ export interface IConfigProgress {
   continent?: string;
 }
 
-type TConfigProgressCallback = (progress: IConfigProgress) => void;
-
 export class AutoConfigService extends Service {
   @Inject() streamSettingsService: StreamSettingsService;
 
-  async start(cb: TConfigProgressCallback) {
+  configProgress = new Subject<IConfigProgress>();
+
+  async start() {
     const service = getPlatformService('twitch') as TwitchService;
 
     try {
@@ -39,7 +40,7 @@ export class AutoConfigService extends Service {
     obs.NodeObs.InitializeAutoConfig(
       (progress: IConfigProgress) => {
         this.handleProgress(progress);
-        cb(progress);
+        this.configProgress.next(progress);
       },
       { continent: '', service_name: '' },
     );

@@ -1,36 +1,9 @@
 import TsxComponent from 'components/tsx-component';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
-import {
-  Mixer,
-  SceneSelector,
-  SourceSelector,
-  LegacyEvents,
-  MiniFeed,
-  Display,
-} from 'components/editor/elements';
-import { LayoutService, ELayoutElement, ELayout, LayoutSlot } from 'services/layout';
+import { LayoutService, ELayoutElement, IVec2Array } from 'services/layout';
 import { WindowsService } from 'services/windows';
-import * as Layouts from 'components/editor/layouts';
 import { IResizeMins } from 'components/editor/layouts/BaseLayout';
-
-const COMPONENT_MAP: Dictionary<typeof TsxComponent> = {
-  [ELayoutElement.Display]: Display,
-  [ELayoutElement.Minifeed]: MiniFeed,
-  [ELayoutElement.LegacyEvents]: LegacyEvents,
-  [ELayoutElement.Mixer]: Mixer,
-  [ELayoutElement.Scenes]: SceneSelector,
-  [ELayoutElement.Sources]: SourceSelector,
-};
-
-const LAYOUT_MAP: Dictionary<typeof TsxComponent> = {
-  [ELayout.Default]: Layouts.Default,
-  [ELayout.TwoPane]: Layouts.TwoPane,
-  [ELayout.Classic]: Layouts.Classic,
-  [ELayout.OnePane]: Layouts.OnePane,
-  [ELayout.Triplets]: Layouts.Triplets,
-  [ELayout.FourByFour]: Layouts.FourByFour,
-};
 
 @Component({})
 export default class Studio extends TsxComponent {
@@ -55,17 +28,26 @@ export default class Studio extends TsxComponent {
   }
 
   get resizes() {
-    return this.layoutService.state.resizes;
+    return this.layoutService.views.currentTab.resizes;
   }
 
   get isColumns() {
-    return [ELayout.TwoPane, ELayout.Triplets, ELayout.OnePane].includes(
-      this.layoutService.state.currentLayout,
-    );
+    return this.layoutService.views.isColumnLayout;
   }
 
   get slottedElements() {
-    return this.layoutService.state.slottedElements;
+    return this.layoutService.views.currentTab.slottedElements;
+  }
+
+  get currentTab() {
+    return this.layoutService.views.currentTab;
+  }
+
+  @Watch('currentTab')
+  syncMax() {
+    this.max = this.isColumns
+      ? this.$el.getBoundingClientRect().width
+      : this.$el.getBoundingClientRect().height;
   }
 
   windowResizeHandler(mins: IResizeMins, isChat?: boolean) {
@@ -125,11 +107,11 @@ export default class Studio extends TsxComponent {
     this.setBarResize('bar2', functionalMax / 2);
   }
 
-  calculateMin(slots: (LayoutSlot | LayoutSlot[])[]) {
+  calculateMin(slots: IVec2Array) {
     return this.layoutService.calculateMinimum(this.isColumns ? 'x' : 'y', slots);
   }
 
-  totalWidthHandler(slots: (LayoutSlot | LayoutSlot[])[]) {
+  totalWidthHandler(slots: IVec2Array) {
     if (this.isColumns) {
       this.$emit('totalWidth', this.layoutService.calculateColumnTotal(slots));
     } else {
@@ -154,20 +136,20 @@ export default class Studio extends TsxComponent {
   }
 
   resizeStartHandler() {
-    this.windowsService.updateStyleBlockers('main', true);
+    this.windowsService.actions.updateStyleBlockers('main', true);
   }
 
   resizeStopHandler() {
-    this.windowsService.updateStyleBlockers('main', false);
+    this.windowsService.actions.updateStyleBlockers('main', false);
   }
 
   render() {
-    const Layout = LAYOUT_MAP[this.layoutService.state.currentLayout];
+    const Layout = this.layoutService.views.component;
     return (
       <Layout
         resizeStartHandler={() => this.resizeStartHandler()}
         resizeStopHandler={() => this.resizeStopHandler()}
-        calculateMin={(slots: LayoutSlot[]) => this.calculateMin(slots)}
+        calculateMin={(slots: IVec2[]) => this.calculateMin(slots)}
         calculateMax={(min: number) => this.calculateMax(min)}
         setBarResize={(bar: 'bar1' | 'bar2', size: number, mins?: IResizeMins) =>
           this.setBarResize(bar, size, mins)
@@ -178,12 +160,16 @@ export default class Studio extends TsxComponent {
         resizes={this.resizes}
         class="editor-page"
         elWidth={this.elWidth}
-        onTotalWidth={(slots: (LayoutSlot | LayoutSlot[])[]) => this.totalWidthHandler(slots)}
+        onTotalWidth={(slots: IVec2Array) => this.totalWidthHandler(slots)}
       >
-        {Object.keys(this.layoutService.state.slottedElements).map(widget => {
-          const Element = COMPONENT_MAP[widget];
-          return <Element slot={this.layoutService.state.slottedElements[widget]} />;
-        })}
+        {Object.keys(this.layoutService.views.currentTab.slottedElements).map(
+          (widget: ELayoutElement) => {
+            const Element = this.layoutService.views.elementComponent(widget);
+            return (
+              <Element slot={this.layoutService.views.currentTab.slottedElements[widget].slot} />
+            );
+          },
+        )}
       </Layout>
     );
   }

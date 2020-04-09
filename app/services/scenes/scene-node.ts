@@ -35,7 +35,7 @@ export abstract class SceneItemNode implements ISceneItemNode {
   @Inject() protected selectionService: SelectionService;
 
   getScene(): Scene {
-    return this.scenesService.getScene(this.sceneId);
+    return this.scenesService.views.getScene(this.sceneId);
   }
 
   get childrenIds(): string[] {

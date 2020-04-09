@@ -1,7 +1,7 @@
 {
   "Mini Feed": "Mini Feed",
   "has donated": "ha donato",
-  " with %{name}": " con %{nome}",
+  " with %{name}": " con %{name}",
   "has followed": "è diventato follower di",
   "has resubscribed (%{tier}) for %{streak} months in a row! (%{months} total)": "si è iscritto nuovamente (%{tier}) per %{streak} mesi consecutivi. (%{months} mesi in totale)",
   "has gifted a sub (%{tier}) to": "ha regalato un'iscrizione (%{tier}) a",
@@ -48,5 +48,5 @@
   "Effects": "Effetti",
   "has purchased %{product} from the store": "ha acquistato %{product} dallo store",
   "Event Filters": "Filtri eventi",
-  "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, check out the Layout Editor in the sidebar.": "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, check out the Layout Editor in the sidebar."
+  "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, check out the Layout Editor in the sidebar.": "Abbiamo unito le schede Editor e Live e dato un nuovo look al feed degli eventi. Se desideri tornare alla visualizzazione precedente del feed di eventi, puoi farlo dall'Editor layout nella barra laterale."
 }

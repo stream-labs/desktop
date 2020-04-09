@@ -4,8 +4,9 @@ import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { getComponents, IWindowOptions, WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
-import TitleBar from '../TitleBar.vue';
+import TitleBar from '../TitleBar';
 import { AppService } from 'services/app';
+import Utils from 'services/utils';
 
 @Component({
   components: {
@@ -19,7 +20,7 @@ export default class ChildWindow extends Vue {
   @Inject() private appService: AppService;
 
   components: { name: string; isShown: boolean; title: string; hideStyleBlockers: boolean }[] = [];
-  private refreshingTimeout = 0;
+  private refreshingTimeout: number;
 
   mounted() {
     this.onWindowUpdatedHandler(this.options);
@@ -61,12 +62,12 @@ export default class ChildWindow extends Vue {
 
   windowSizeHandler() {
     if (!this.windowsService.state.child.hideStyleBlockers) {
-      this.windowsService.updateStyleBlockers('child', true);
+      this.windowsService.actions.updateStyleBlockers('child', true);
     }
     clearTimeout(this.windowResizeTimeout);
 
     this.windowResizeTimeout = window.setTimeout(
-      () => this.windowsService.updateStyleBlockers('child', false),
+      () => this.windowsService.actions.updateStyleBlockers('child', false),
       200,
     );
   }
@@ -95,7 +96,8 @@ export default class ChildWindow extends Vue {
     // at having a successful paint cycle before loading a component
     // that will do a bunch of synchronous IO.
     clearTimeout(this.refreshingTimeout);
-    this.refreshingTimeout = window.setTimeout(() => {
+    Utils.makeChildWindowVisible();
+    this.refreshingTimeout = window.setTimeout(async () => {
       this.components.push({
         name: options.componentName,
         isShown: true,

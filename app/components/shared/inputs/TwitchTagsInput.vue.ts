@@ -57,10 +57,7 @@ export default class TwitchTagsInput extends Vue {
   }
 
   get options() {
-    return prepareOptions(
-      this.i18nService.state.locale || this.i18nService.getFallbackLocale(),
-      this.tags,
-    );
+    return prepareOptions(this.i18nService.state.locale, this.tags);
   }
 
   onInput(tags: TTwitchTagWithLabel[]) {

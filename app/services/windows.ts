@@ -2,6 +2,12 @@
 // This singleton class provides a renderer-space API
 // for spawning various child windows.
 import cloneDeep from 'lodash/cloneDeep';
+import { mutation, StatefulService } from 'services/core/stateful-service';
+import electron from 'electron';
+import Vue from 'vue';
+import Utils from 'services/utils';
+import { Subject } from 'rxjs';
+import { throttle } from 'lodash-decorators';
 
 import Main from 'components/windows/Main.vue';
 import Settings from 'components/windows/settings/Settings.vue';
@@ -33,11 +39,8 @@ import OverlayWindow from 'components/windows/OverlayWindow.vue';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
 import YoutubeStreamStatus from 'components/platforms/youtube/YoutubeStreamStatus';
-import { mutation, StatefulService } from 'services/core/stateful-service';
-import electron from 'electron';
-import Vue from 'vue';
-import Util from 'services/utils';
-import { Subject } from 'rxjs';
+import ShareStream from 'components/windows/ShareStream';
+import WelcomeToPrime from 'components/windows/WelcomeToPrime';
 
 import BitGoal from 'components/widgets/goal/BitGoal.vue';
 import DonationGoal from 'components/widgets/goal/DonationGoal.vue';
@@ -58,7 +61,6 @@ import AlertBox from 'components/widgets/AlertBox.vue';
 import SpinWheel from 'components/widgets/SpinWheel.vue';
 
 import PerformanceMetrics from 'components/PerformanceMetrics.vue';
-import { throttle } from 'lodash-decorators';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -116,6 +118,8 @@ export function getComponents() {
     AlertBox,
     SpinWheel,
     YoutubeStreamStatus,
+    ShareStream,
+    WelcomeToPrime,
   };
 }
 
@@ -171,7 +175,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       isShown: true,
       hideStyleBlockers: true,
       hideChat: false,
-      title: `Streamlabs OBS - Version: ${remote.process.env.SLOBS_VERSION}`,
+      title: `Streamlabs OBS - Version: ${Utils.env.SLOBS_VERSION}`,
     },
     child: {
       componentName: '',
@@ -192,9 +196,9 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
   init() {
     const windows = BrowserWindow.getAllWindows();
-
-    this.windows.main = windows[0];
-    this.windows.child = windows[1];
+    this.windows.worker = windows[0];
+    this.windows.main = windows[1];
+    this.windows.child = windows[2];
 
     this.updateScaleFactor('main');
     this.updateScaleFactor('child');
@@ -228,7 +232,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
      * We do not do this on CI since it runs at 1024x768 and it break tests that aren't easy
      * to workaround.
      */
-    if (options.size && !remote.process.env.CI) {
+    if (options.size && !Utils.env.CI) {
       const {
         width: screenWidth,
         height: screenHeight,
@@ -244,8 +248,38 @@ export class WindowsService extends StatefulService<IWindowsState> {
       }
     }
 
-    ipcRenderer.send('window-showChildWindow', options);
-    this.updateChildWindowOptions(options);
+    const mainWindow = this.windows.main;
+    const childWindow = this.windows.child;
+
+    // Center the child window on the main window
+
+    // For some unknown reason, electron sometimes gets into a
+    // weird state where this will always fail.  Instead, we
+    // should recover by simply setting the size and forgetting
+    // about the bounds.
+    try {
+      const bounds = mainWindow.getBounds();
+      const childX = bounds.x + bounds.width / 2 - options.size.width / 2;
+      const childY = bounds.y + bounds.height / 2 - options.size.height / 2;
+
+      this.updateChildWindowOptions(options);
+      childWindow.setMinimumSize(options.size.width, options.size.height);
+      if (options.center) {
+        childWindow.setBounds({
+          x: Math.floor(childX),
+          y: Math.floor(childY),
+          width: options.size.width,
+          height: options.size.height,
+        });
+      }
+    } catch (err) {
+      console.error('Recovering from error:', err);
+
+      childWindow.setMinimumSize(options.size.width, options.size.height);
+      childWindow.setSize(options.size.width, options.size.height);
+      childWindow.center();
+      childWindow.focus();
+    }
   }
 
   getMainWindowDisplay() {
@@ -254,7 +288,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     return electron.remote.screen.getDisplayMatching(bounds);
   }
 
-  closeChildWindow() {
+  async closeChildWindow() {
     const windowOptions = this.state.child;
 
     // show previous window if `preservePrevWindow` flag is true
@@ -272,6 +306,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     // This prevents you from seeing the previous contents
     // of the window for a split second after it is shown.
     this.updateChildWindowOptions({ componentName: '', isShown: false });
+    await new Promise(r => setTimeout(r, 50));
 
     // Refocus the main window
     ipcRenderer.send('window-focusMain');
@@ -323,7 +358,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.updateScaleFactor(windowId);
     newWindow.on('move', () => this.updateScaleFactor(windowId));
 
-    if (Util.isDevMode()) newWindow.webContents.openDevTools({ mode: 'detach' });
+    if (Utils.isDevMode()) newWindow.webContents.openDevTools({ mode: 'detach' });
 
     const indexUrl = remote.getGlobal('indexUrl');
     newWindow.loadURL(`${indexUrl}?windowId=${windowId}`);
@@ -358,6 +393,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
   closeAllOneOffs(): Promise<any> {
     const closingPromises: Promise<void>[] = [];
     Object.keys(this.windows).forEach(windowId => {
+      if (windowId === 'worker') return;
       if (windowId === 'main') return;
       if (windowId === 'child') return;
       closingPromises.push(this.closeOneOffWindow(windowId));

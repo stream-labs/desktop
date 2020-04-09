@@ -17,13 +17,13 @@ export class RenameFolderCommand extends Command {
   }
 
   execute() {
-    const folder = this.scenesService.getScene(this.sceneId).getFolder(this.folderId);
+    const folder = this.scenesService.views.getScene(this.sceneId).getFolder(this.folderId);
     this.oldName = folder.name;
     folder.setName(this.name);
   }
 
   rollback() {
-    this.scenesService
+    this.scenesService.views
       .getScene(this.sceneId)
       .getFolder(this.folderId)
       .setName(this.oldName);
