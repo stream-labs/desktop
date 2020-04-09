@@ -6,13 +6,16 @@ import { UserService } from 'services/user';
 import { RecentEventsService } from 'services/recent-events';
 import { MagicLinkService } from 'services/magic-link';
 import { Inject } from 'services/core';
-import TsxComponent from 'components/tsx-component';
+import BaseElement from './BaseElement';
+import { $t } from 'services/i18n';
 
 @Component({})
-export default class LegacyEvents extends TsxComponent {
+export default class LegacyEvents extends BaseElement {
   @Inject() userService: UserService;
   @Inject() recentEventsService: RecentEventsService;
   @Inject() magicLinkService: MagicLinkService;
+
+  mins = { x: 360, y: 150 };
 
   magicLinkDisabled = false;
 
@@ -50,9 +53,17 @@ export default class LegacyEvents extends TsxComponent {
     });
   }
 
-  render() {
+  get element() {
+    if (!this.userService.isLoggedIn) {
+      return (
+        <div class={styles.eventContainer}>
+          <div class={styles.empty}>{$t('There are no events to display')}</div>
+        </div>
+      );
+    }
+
     return (
-      <div>
+      <div style="height: 100%;">
         <BrowserView
           class={styles.eventContainer}
           src={this.userService.recentEventsUrl()}
@@ -61,5 +72,9 @@ export default class LegacyEvents extends TsxComponent {
         />
       </div>
     );
+  }
+
+  render() {
+    return this.renderElement();
   }
 }

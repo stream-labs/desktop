@@ -7,12 +7,13 @@ import {
   ISourceComparison,
   PROPERTIES_MANAGER_TYPES,
 } from './index';
-import { mutation, ServiceHelper, Inject } from 'services';
+import { mutation, ServiceHelper, Inject, ExecuteInWorkerProcess } from 'services';
 import { ScenesService } from 'services/scenes';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import Utils from 'services/utils';
 import * as obs from '../../../obs-api';
 import isEqual from 'lodash/isEqual';
+import omitBy from 'lodash/omitBy';
 import { cloneDeep } from 'lodash';
 
 @ServiceHelper()
@@ -26,6 +27,7 @@ export class Source implements ISourceApi {
   muted: boolean;
   width: number;
   height: number;
+  configurable: boolean;
   doNotDuplicate: boolean;
   channel?: number;
   resourceId: string;
@@ -36,6 +38,9 @@ export class Source implements ISourceApi {
   @Inject()
   scenesService: ScenesService;
 
+  /**
+   * Should only be called by functions with the ExecuteInWorkerProcess() decorator
+   */
   getObsInput(): obs.IInput {
     return obs.InputFactory.fromName(this.sourceId);
   }
@@ -44,6 +49,8 @@ export class Source implements ISourceApi {
     return this.state;
   }
 
+  // TODO: propertiesMangers should be private
+  @ExecuteInWorkerProcess()
   updateSettings(settings: Dictionary<any>) {
     const obsInputSettings = this.sourcesService.getObsSourceSettings(this.type, settings);
     this.getObsInput().update(obsInputSettings);
@@ -53,6 +60,7 @@ export class Source implements ISourceApi {
     this.sourcesService.sourceUpdated.next(this.state);
   }
 
+  @ExecuteInWorkerProcess()
   getSettings(): Dictionary<any> {
     return this.getObsInput().settings;
   }
@@ -65,7 +73,10 @@ export class Source implements ISourceApi {
   isSameType(comparison: ISourceComparison): boolean {
     if (this.channel) return false;
 
-    return isEqual(this.getComparisonDetails(), comparison);
+    return isEqual(
+      omitBy(this.getComparisonDetails(), v => v == null),
+      omitBy(comparison, v => v == null),
+    );
   }
 
   getComparisonDetails(): ISourceComparison {
@@ -93,10 +104,14 @@ export class Source implements ISourceApi {
     return this.propertiesManagerType;
   }
 
+  // TODO: propertiesMangers should be private
+  @ExecuteInWorkerProcess()
   getPropertiesManagerSettings(): Dictionary<any> {
     return cloneDeep(this.sourcesService.propertiesManagers[this.sourceId].manager.settings);
   }
 
+  // TODO: propertiesMangers should be private
+  @ExecuteInWorkerProcess()
   getPropertiesManagerUI(): string {
     return this.sourcesService.propertiesManagers[this.sourceId].manager.customUIComponent;
   }
@@ -106,6 +121,8 @@ export class Source implements ISourceApi {
    * @param type the type of the new properties manager
    * @param settings the properties manager settings
    */
+  // TODO: propertiesMangers should be private
+  @ExecuteInWorkerProcess()
   replacePropertiesManager(type: TPropertiesManager, settings: Dictionary<any>) {
     const oldManager = this.sourcesService.propertiesManagers[this.sourceId].manager;
     oldManager.destroy();
@@ -120,15 +137,21 @@ export class Source implements ISourceApi {
     this.sourcesService.sourceUpdated.next(this.getModel());
   }
 
+  // TODO: propertiesMangers should be private
+  @ExecuteInWorkerProcess()
   setPropertiesManagerSettings(settings: Dictionary<any>) {
     this.sourcesService.propertiesManagers[this.sourceId].manager.applySettings(settings);
   }
 
+  // TODO: propertiesMangers should be private
+  @ExecuteInWorkerProcess()
   getPropertiesFormData(): TObsFormData {
     const manager = this.sourcesService.propertiesManagers[this.sourceId].manager;
     return manager.getPropertiesFormData();
   }
 
+  // TODO: propertiesMangers should be private
+  @ExecuteInWorkerProcess()
   setPropertiesFormData(properties: TObsFormData) {
     const manager = this.sourcesService.propertiesManagers[this.sourceId].manager;
     manager.setPropertiesFormData(properties);
@@ -155,12 +178,13 @@ export class Source implements ISourceApi {
   }
 
   hasProps(): boolean {
-    return this.getObsInput().configurable;
+    return this.configurable;
   }
 
   /**
    * works only for browser_source
    */
+  @ExecuteInWorkerProcess()
   refresh() {
     const obsInput = this.getObsInput();
     (obsInput.properties.get('refreshnocache') as obs.IButtonProperty).buttonClicked(obsInput);
@@ -170,6 +194,7 @@ export class Source implements ISourceApi {
    * Used for browser source interaction
    * @param pos the cursor position in source space
    */
+  @ExecuteInWorkerProcess()
   mouseMove(pos: IVec2) {
     this.getObsInput().sendMouseMove(
       {
@@ -187,6 +212,7 @@ export class Source implements ISourceApi {
    * @param pos the cursor position in source space
    * @param mouseUp whether this is a mouseup (false for mousedown)
    */
+  @ExecuteInWorkerProcess()
   mouseClick(button: number, pos: IVec2, mouseUp: boolean) {
     let obsFlags: obs.EInteractionFlags;
     let obsButton: obs.EMouseButtonType;
@@ -222,6 +248,7 @@ export class Source implements ISourceApi {
    * @param pos the cursor position in source space
    * @param delta the amount the wheel was scrolled
    */
+  @ExecuteInWorkerProcess()
   mouseWheel(pos: IVec2, delta: IVec2) {
     console.log(pos, delta);
 
@@ -243,6 +270,7 @@ export class Source implements ISourceApi {
    * @param keyup whether this is a keyup (false for keydown)
    * @param modifiers an object representing which modifiers were pressed
    */
+  @ExecuteInWorkerProcess()
   keyInput(
     key: string,
     code: number,

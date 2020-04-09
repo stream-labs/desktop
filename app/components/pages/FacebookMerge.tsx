@@ -2,7 +2,7 @@ import { Component } from 'vue-property-decorator';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import electron from 'electron';
 import { Inject } from 'services';
-import { UserService } from 'services/user';
+import { UserService, EAuthProcessState } from 'services/user';
 import { NavigationService } from 'services/navigation';
 import { $t } from 'services/i18n';
 import { RestreamService } from 'services/restream';
@@ -26,7 +26,10 @@ export default class FacebookMerge extends TsxComponent<FacebookMergeProps> {
 
   showOverlay = false;
   showLogin = false;
-  loading = false;
+
+  get loading() {
+    return this.userService.state.authProcessState === EAuthProcessState.Busy;
+  }
 
   openPageCreation() {
     electron.remote.shell.openExternal(
@@ -35,26 +38,17 @@ export default class FacebookMerge extends TsxComponent<FacebookMergeProps> {
     this.showLogin = true;
   }
 
-  mergeFacebook() {
-    this.loading = true;
-    this.userService.startAuth(
-      'facebook',
-      () => (this.loading = false),
-      () => (this.loading = true),
-      () => {
-        this.restreamService.setEnabled(true);
-        this.streamSettingsService.setSettings({ protectedModeEnabled: true });
+  async mergeFacebook() {
+    await this.userService.startAuth('facebook', 'internal', true);
 
-        if (this.props.params.overlayUrl) {
-          this.loading = false;
-          this.showOverlay = true;
-        } else {
-          this.navigationService.navigate('Studio');
-        }
-      },
-      'internal',
-      true,
-    );
+    this.restreamService.setEnabled(true);
+    this.streamSettingsService.setSettings({ protectedModeEnabled: true });
+
+    if (this.props.params.overlayUrl) {
+      this.showOverlay = true;
+    } else {
+      this.navigationService.navigate('Studio');
+    }
   }
 
   async installOverlay() {

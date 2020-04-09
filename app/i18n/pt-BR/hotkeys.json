@@ -1,8 +1,8 @@
 {
-  "Start Streaming": "Iniciar Transmissão",
-  "Stop Streaming": "Parar Transmissão",
-  "Start Recording": "Iniciar Gravação",
-  "Stop Recording": "Parar Gravação",
+  "Start Streaming": "Iniciar transmissão",
+  "Stop Streaming": "Parar transmissão",
+  "Start Recording": "Iniciar gravação",
+  "Stop Recording": "Parar gravação",
   "Switch to scene": "Trocar para a Cena",
   "Show %{sourcename}": "Mostrar %{sourcename}",
   "Hide %{sourcename}": "Ocultar %{sourcename}",
@@ -17,9 +17,9 @@
   "Transition (Studio Mode)": "Transição (Modo Estúdio)",
   "Capture Foreground Window": "Capturar Janela em primeiro plano",
   "Deactivate Capture": "Desativar a captura",
-  "Toggle overlay positioning mode": "Toggle overlay positioning mode",
-  "Play/Pause": "Play/Pause",
-  "Restart": "Restart",
-  "Next Slide": "Next Slide",
-  "Previous Slide": "Previous Slide"
+  "Toggle overlay positioning mode": "Alternar modo de posicionamento sobreposto",
+  "Play/Pause": "Reproduzir/Pausar",
+  "Restart": "Reiniciar",
+  "Next Slide": "Próximo slide",
+  "Previous Slide": "Slide anterior"
 }

@@ -33,7 +33,7 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
       this.onNotificationHandler(notify);
     });
 
-    this.notifications = this.notificationsService
+    this.notifications = this.notificationsService.views
       .getAll()
       .filter(notification => notification.subType !== ENotificationSubType.DEFAULT);
     // update the time labels

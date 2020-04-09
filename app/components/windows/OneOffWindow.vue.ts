@@ -4,7 +4,7 @@ import { Inject } from 'services/core/injector';
 import { getComponents, WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
 import Util from 'services/utils';
-import TitleBar from '../TitleBar.vue';
+import TitleBar from '../TitleBar';
 
 @Component({
   components: {
@@ -40,12 +40,12 @@ export default class OneOffWindow extends Vue {
 
   windowSizeHandler() {
     if (!this.windowsService.state[this.windowId].hideStyleBlockers) {
-      this.windowsService.updateStyleBlockers(this.windowId, true);
+      this.windowsService.actions.updateStyleBlockers(this.windowId, true);
     }
     clearTimeout(this.windowResizeTimeout);
 
     this.windowResizeTimeout = window.setTimeout(
-      () => this.windowsService.updateStyleBlockers(this.windowId, false),
+      () => this.windowsService.actions.updateStyleBlockers(this.windowId, false),
       200,
     );
   }

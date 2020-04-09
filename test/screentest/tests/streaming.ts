@@ -13,6 +13,7 @@ import { setOutputResolution } from '../../helpers/spectron/output';
 import { fetchMock, resetFetchMock } from '../../helpers/spectron/network';
 import { getClient } from '../../helpers/api-client';
 import { ScenesService } from 'services/api/external-api/scenes';
+import { sleep } from '../../helpers/sleep';
 
 useSpectron();
 useScreentest();
@@ -44,6 +45,7 @@ platforms.forEach(platform => {
     await focusMain(t);
     await app.client.click('button=Go Live');
     await focusChild(t);
+    if (await app.client.isExisting('button=Go Live')) await app.client.click('button=Go Live');
 
     // fill streaming data
     switch (platform) {
@@ -144,6 +146,7 @@ test('Go live error', async t => {
   skipCheckingErrorsInLog();
 
   // open EditStreamInfo window
+  await focusMain(t);
   await app.client.click('button=Go Live');
   await focusChild(t);
 

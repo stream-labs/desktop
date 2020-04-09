@@ -8,6 +8,7 @@ import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
 import { StreamInfoService } from './stream-info';
 import { InitAfter } from './core';
+import Utils from './utils';
 
 @InitAfter('StreamInfoService')
 export class ChatService extends Service {
@@ -58,8 +59,7 @@ export class ChatService extends Service {
 
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
 
-    // This method was added in our fork
-    (win as any).addBrowserView(this.chatView);
+    win.addBrowserView(this.chatView);
   }
 
   setChatBounds(position: IVec2, size: IVec2) {
@@ -79,11 +79,10 @@ export class ChatService extends Service {
 
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
 
-    // @ts-ignore: this method was added in our fork
     win.removeBrowserView(this.chatView);
   }
 
-  private initChat() {
+  private async initChat() {
     if (this.chatView) return;
 
     const partition = this.userService.state.auth.partition;
@@ -95,7 +94,10 @@ export class ChatService extends Service {
       },
     });
 
-    this.navigateToChat();
+    const win = this.windowsService.getWindowIdFromElectronId(this.electronWindowId);
+    if (win) this.windowsService.updateHideChat(win, true);
+    await this.navigateToChat();
+    if (win) this.windowsService.updateHideChat(win, false);
     this.bindWindowListener();
     this.bindDomReadyListener();
 
@@ -112,7 +114,7 @@ export class ChatService extends Service {
 
   private async navigateToChat() {
     if (!this.chatUrl) return; // user has logged out
-    this.chatView.webContents.loadURL(this.chatUrl).catch(this.handleRedirectError);
+    await this.chatView.webContents.loadURL(this.chatUrl).catch(this.handleRedirectError);
 
     // mount chat if electronWindowId is set and it has not been mounted yet
     if (this.electronWindowId) this.mountChat(this.electronWindowId);
@@ -137,7 +139,7 @@ export class ChatService extends Service {
 
         if (parsed.hostname === 'accounts.google.com') {
           electron.remote.dialog
-            .showMessageBox({
+            .showMessageBox(Utils.getMainWindow(), {
               title: $t('YouTube Chat'),
               message: $t(
                 'This action cannot be performed inside Streamlabs OBS. To interact with chat, you can open this chat in a web browser.',
@@ -234,7 +236,6 @@ export class ChatService extends Service {
 
   private handleSettingsChanged(changed: Partial<ICustomizationSettings>) {
     if (!this.chatView) return;
-
     if (changed.chatZoomFactor) {
       this.chatView.webContents.setZoomFactor(changed.chatZoomFactor);
     }

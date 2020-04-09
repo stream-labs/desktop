@@ -1,12 +1,13 @@
 import { ScenesService, Scene } from './index';
 import merge from 'lodash/merge';
-import { mutation, ServiceHelper, Inject } from 'services';
+import { mutation, Inject } from 'services';
 import Utils from '../utils';
 import { Selection, SelectionService } from 'services/selection';
 import { SceneItem, ISceneHierarchy, TSceneNode, isFolder, isItem } from 'services/scenes';
 import { SceneItemNode } from './scene-node';
 import { ISceneItemFolder } from '.';
 import { TSceneNodeType } from './scenes';
+import { ServiceHelper } from 'services/core';
 
 @ServiceHelper()
 export class SceneItemFolder extends SceneItemNode {
@@ -61,6 +62,10 @@ export class SceneItemFolder extends SceneItemNode {
 
   getFolders(): SceneItemFolder[] {
     return this.getNodes().filter(isFolder);
+  }
+
+  getScene(): Scene {
+    return this.scenesService.views.getScene(this.sceneId);
   }
 
   /**

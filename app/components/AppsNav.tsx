@@ -69,7 +69,7 @@ export default class AppsNav extends Vue {
   }
 
   iconSrc(appId: string, path: string) {
-    return this.platformAppsService.getAssetUrl(appId, path);
+    return this.platformAppsService.views.getAssetUrl(appId, path);
   }
 
   scrollUp() {

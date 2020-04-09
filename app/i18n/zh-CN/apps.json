@@ -1,6 +1,6 @@
 {
   "Vers": "版本",
-  "Reload": "刷新",
-  "Unpacked vers loaded": "已加载解压缩版本",
-  "You must unload unpacked version before enabling this app.": "您必须在启用此应用程序之前卸载解压缩的版本。"
+  "Reload": "重新载入",
+  "Unpacked vers loaded": "解压版本已载入",
+  "You must unload unpacked version before enabling this app.": "您必须先卸载解压后的版本，然后才能启用此应用程序。"
 }

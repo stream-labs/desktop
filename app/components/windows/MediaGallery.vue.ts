@@ -213,6 +213,7 @@ export default class MediaGallery extends Vue {
   }
 
   private setNotBusy() {
+    if (!this.busy) return;
     this.busy.goAway();
     this.busy = null;
   }

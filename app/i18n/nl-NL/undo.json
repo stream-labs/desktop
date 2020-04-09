@@ -1,6 +1,6 @@
 {
   "Add %{filterName}": "Voeg %{filterName} toe",
-  "Center ${sourceName}": "Centreer ${sourceName}",
+  "Center %{sourceName}": "Center %{sourceName}",
   "Paste %{nodeName}": "Plak %{nodeName}",
   "Create a new connection": "Maak een nieuwe verbinding",
   "Create %{sourceName}": "Creëer %{sourceName}",

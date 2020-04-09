@@ -1,5 +1,5 @@
 import merge from 'lodash/merge';
-import { mutation, ServiceHelper, Inject } from 'services';
+import { mutation, Inject } from 'services';
 import Utils from '../utils';
 import { SourcesService, TSourceType, ISource, Source } from 'services/sources';
 import { VideoService } from 'services/video';
@@ -26,6 +26,7 @@ import { SceneItemNode } from './scene-node';
 import { v2, Vec2 } from '../../util/vec2';
 import { Rect } from '../../util/rect';
 import { TSceneNodeType } from './scenes';
+import { ServiceHelper, ExecuteInWorkerProcess } from 'services/core';
 /**
  * A SceneItem is a source that contains
  * all of the information about that source, and
@@ -92,11 +93,11 @@ export class SceneItem extends SceneItemNode {
   }
 
   getScene(): Scene {
-    return this.scenesService.getScene(this.sceneId) as Scene;
+    return this.scenesService.views.getScene(this.sceneId) as Scene;
   }
 
   get source() {
-    return this.sourcesService.getSource(this.sourceId) as Source;
+    return this.sourcesService.views.getSource(this.sourceId) as Source;
   }
 
   getSource() {
@@ -123,6 +124,7 @@ export class SceneItem extends SceneItemNode {
     };
   }
 
+  @ExecuteInWorkerProcess()
   setSettings(patch: IPartialSettings) {
     // update only changed settings to reduce the amount of IPC calls
     const obsSceneItem = this.getObsSceneItem();
@@ -189,7 +191,7 @@ export class SceneItem extends SceneItemNode {
   }
 
   remove() {
-    this.getScene().removeItem(this.sceneItemId);
+    this.scenesService.views.getScene(this.sceneId).removeItem(this.sceneItemId);
   }
 
   nudgeLeft() {
@@ -270,7 +272,7 @@ export class SceneItem extends SceneItemNode {
    * set scale and adjust the item position according to the origin parameter
    */
   setScale(newScaleModel: IVec2, origin: IVec2 = AnchorPositions[AnchorPoint.Center]) {
-    const rect = new ScalableRectangle(this.getRectangle());
+    const rect = new ScalableRectangle(this.rectangle);
     rect.normalized(() => {
       rect.withOrigin(origin, () => {
         rect.scaleX = newScaleModel.x;
@@ -294,7 +296,7 @@ export class SceneItem extends SceneItemNode {
    * set a new scale relative to the current scale
    */
   scale(scaleDelta: IVec2, origin: IVec2 = AnchorPositions[AnchorPoint.Center]) {
-    const rect = this.getRectangle();
+    const rect = new ScalableRectangle(this.rectangle);
     let currentScale = v2();
     rect.normalized(() => {
       currentScale = v2(rect.scaleX, rect.scaleY);
@@ -314,7 +316,7 @@ export class SceneItem extends SceneItemNode {
 
   flipY() {
     this.preservePosition(() => {
-      const rect = this.getRectangle();
+      const rect = new ScalableRectangle(this.rectangle);
       rect.flipY();
       this.setRect(rect);
     });
@@ -322,32 +324,32 @@ export class SceneItem extends SceneItemNode {
 
   flipX() {
     this.preservePosition(() => {
-      const rect = this.getRectangle();
+      const rect = new ScalableRectangle(this.rectangle);
       rect.flipX();
       this.setRect(rect);
     });
   }
 
   stretchToScreen() {
-    const rect = this.getRectangle();
+    const rect = new ScalableRectangle(this.rectangle);
     rect.stretchAcross(this.videoService.getScreenRectangle());
     this.setRect(rect);
   }
 
   fitToScreen() {
-    const rect = this.getRectangle();
+    const rect = new ScalableRectangle(this.rectangle);
     rect.fitTo(this.videoService.getScreenRectangle());
     this.setRect(rect);
   }
 
   centerOnScreen() {
-    const rect = this.getRectangle();
+    const rect = new ScalableRectangle(this.rectangle);
     rect.centerOn(this.videoService.getScreenRectangle());
     this.setRect(rect);
   }
 
   centerOnAxis(axis: CenteringAxis) {
-    const rect = this.getRectangle();
+    const rect = new ScalableRectangle(this.rectangle);
     rect.centerOn(this.videoService.getScreenRectangle(), axis);
     this.setRect(rect);
   }
@@ -370,7 +372,7 @@ export class SceneItem extends SceneItemNode {
   setContentCrop() {
     const source = this.getSource();
     if (source.type !== 'scene') return;
-    const scene = this.scenesService.getScene(source.sourceId) as Scene;
+    const scene = this.scenesService.views.getScene(source.sourceId);
     const rect = scene
       .getSelection()
       .selectAll()
@@ -404,8 +406,8 @@ export class SceneItem extends SceneItemNode {
   /**
    * A rectangle representing this sceneItem
    */
-  getRectangle(): ScalableRectangle {
-    return new ScalableRectangle({
+  get rectangle(): IScalableRectangle {
+    return {
       x: this.transform.position.x,
       y: this.transform.position.y,
       scaleX: this.transform.scale.x,
@@ -414,14 +416,14 @@ export class SceneItem extends SceneItemNode {
       height: this.height,
       crop: this.transform.crop,
       rotation: this.transform.rotation,
-    });
+    };
   }
 
   /**
    * returns a simple bounding rectangle
    */
   getBoundingRect(): Rect {
-    const rect = this.getRectangle();
+    const rect = new ScalableRectangle(this.rectangle);
     rect.normalize();
     return new Rect({
       x: rect.x,
@@ -438,14 +440,14 @@ export class SceneItem extends SceneItemNode {
    *   that position after the operation has been performed.
    */
   private preservePosition(fun: Function) {
-    const rect = this.getRectangle();
+    const rect = new ScalableRectangle(this.rectangle);
     rect.normalize();
     const x = rect.x;
     const y = rect.y;
 
     fun();
 
-    const newRect = this.getRectangle();
+    const newRect = new ScalableRectangle(this.rectangle);
     newRect.normalized(() => {
       newRect.x = x;
       newRect.y = y;

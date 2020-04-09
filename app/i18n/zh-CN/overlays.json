@@ -1,8 +1,8 @@
 {
-  "Successfully saved %{filename}": "已成功保存 %{filename}",
-  "Successfully loaded %{filename}.overlay": "已成功载入 %{filename}.overlay",
-  "This is an experimental feature.  Use at your own risk.": "当前为实验性功能。请斟酌使用。",
-  "Export Overlay File": "导出直播面板",
-  "Import Overlay File": "导入直播面板",
-  "Import Widget File in Current Scene": "于当前场景中导入插件"
+  "Successfully saved %{filename}": "成功保存 %{filename}",
+  "Successfully loaded %{filename}.overlay": "成功载入 %{filename}.叠加",
+  "This is an experimental feature.  Use at your own risk.": "这是一项实验功能。使用风险自负。",
+  "Export Overlay File": "导出叠加文件",
+  "Import Overlay File": "导入叠加文件",
+  "Import Widget File in Current Scene": "在当前场景中导入小工具文件"
 }

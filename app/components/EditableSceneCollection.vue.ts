@@ -5,6 +5,7 @@ import { Inject } from 'services/core/injector';
 import moment from 'moment';
 import { $t } from 'services/i18n';
 import electron from 'electron';
+import { getOS } from 'util/operating-systems';
 
 @Component({})
 export default class EditableSceneCollection extends Vue {
@@ -52,6 +53,12 @@ export default class EditableSceneCollection extends Vue {
   }
 
   makeActive() {
+    if (
+      this.sceneCollectionsService.getCollection(this.collection.id).operatingSystem !== getOS()
+    ) {
+      return;
+    }
+
     this.sceneCollectionsService.load(this.collection.id);
   }
 

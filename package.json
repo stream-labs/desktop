@@ -3,12 +3,8 @@
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "0.20.0-preview.4",
+  "version": "0.21.0-preview.5",
   "main": "main.js",
-  "engines": {
-    "node": ">= 10 < 12",
-    "yarn": ">= 1.5.2"
-  },
   "scripts": {
     "compile": "yarn clear && yarn compile:updater && yarn webpack-cli --progress --config dev.config.js",
     "compile:ci": "yarn clear && yarn compile:updater && yarn webpack-cli --config dev.config.js",
@@ -17,6 +13,7 @@
     "compile:strictnulls": "yarn clear && yarn compile:updater && yarn webpack-cli --progress --config strict-null-check.config.js",
     "webpack-cli": "node --max-old-space-size=4096 node_modules/webpack-cli/bin/cli.js",
     "watch": "yarn clear && yarn compile:updater && yarn webpack-cli --watch --progress --config dev.config.js",
+    "watch-strictnulls": "yarn clear && yarn compile:updater && yarn webpack-cli --watch --progress --config strict-null-check.config.js",
     "watch-app": "yarn clear && yarn webpack-cli --watch --progress --config dev-app.config.js",
     "start": "electron .",
     "clear-plugins": "rimraf plugins",
@@ -66,25 +63,27 @@
   },
   "dependencies": {
     "@streamlabs/game-overlay": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.41.tar.gz",
+    "@types/node-fetch": "^2.5.5",
     "archiver": "2.1.1",
     "aws-sdk": "^2.344.0",
-    "crash-handler": "https://github.com/stream-labs/crash-handler/releases/download/v0.0.41/iojs-v6.0.3-crash-handler.tar.gz",
-    "electron-log": "^3.0.4",
+    "crash-handler": "https://github.com/stream-labs/crash-handler/releases/download/v0.0.41c/iojs-v6.0.3-crash-handler.tar.gz",
     "electron-window-state": "5.0.3",
     "eslint-loader": "^3.0.3",
     "extract-zip": "^1.6.7",
     "facemask-plugin": "https://s3-us-west-2.amazonaws.com/faces-internal.streamlabs.com/facemask-plugin-deployment/facemask-plugin-0.9.1.tar.gz",
     "font-manager": "https://github.com/stream-labs/font-manager/releases/download/v1.0.8electron6/iojs-v6.0.3-font-manager.tar.gz",
+    "node-fetch": "^2.6.0",
     "node-fontinfo": "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.12electron6/iojs-v6.0.3-node-fontinfo.tar.gz",
     "node-libuiohook": "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.14/iojs-v6.0.3-node-libuiohook.tar.gz",
-    "obs-studio-node": "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.51-iojs-v6.0.3-release.tar.gz",
+    "obs-studio-node": "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.137-iojs-v6.0.3-release.tar.gz",
     "raven": "^2.6.4",
     "request": "^2.88.0",
     "rimraf": "^2.6.1",
     "semver": "^5.5.1",
     "socket.io-client": "2.1.1",
     "tasklist": "^3.1.1",
-    "uuid": "^3.0.1"
+    "uuid": "^3.0.1",
+    "vuejs-datepicker": "^1.6.2"
   },
   "devDependencies": {
     "7zip-bin": "2.4.1",

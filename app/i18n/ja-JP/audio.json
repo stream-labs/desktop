@@ -1,16 +1,16 @@
 {
-  "Open advanced audio settings": "高度なオーディオ設定を開く",
+  "Open advanced audio settings": "詳細オーディオ設定を開く",
   "Volume (%)": "音量 (%)",
-  "Downmix to Mono": "モノにダウンミックス",
-  "Sync Offset (ms)": "同期オフセット (ミリ秒)",
-  "Audio Monitoring": "オーディオモニタリング",
-  "Monitor Off": "モニターオフ",
-  "Monitor Only (mute output)": "モニターのみ (出力をミュート)",
+  "Downmix to Mono": "モノラルにダウンミックス",
+  "Sync Offset (ms)": "同期オフセット (ms)",
+  "Audio Monitoring": "オーディオ モニタリング",
+  "Monitor Off": "モニター オフ",
+  "Monitor Only (mute output)": "モニターのみ（出力をミュート）",
   "Monitor and Output": "モニターと出力",
   "Tracks": "トラック",
-  "Advanced Audio Settings": "高度なオーディオ設定",
+  "Advanced Audio Settings": "詳細オーディオ設定",
   "Volume ( % )": "音量 ( % )",
-  "Sync Offset ( ms )": "同期オフセット (ミリ秒)",
-  "Mixer": "ミキサー",
-  "Monitor audio levels. If the bars are moving you are outputting audio.": "オーディオレベルを監視します。バーが動いていれば、オーディオが出力されています。"
+  "Sync Offset ( ms )": "同期オフセット ( ms )",
+  "Mixer": "Mixer",
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "オーディオレベルをモニターします。バーが動いている場合、オーディオが出力されています。"
 }
