@@ -4,6 +4,7 @@ import electron from 'electron';
 import defer from 'lodash/defer';
 import URI from 'urijs';
 import http from 'http';
+import Utils from 'services/utils';
 
 /**
  * Responsible for secure handling of platform OAuth flows.
@@ -80,7 +81,7 @@ export class AuthModule {
           this.authServer.unref();
           this.authServer = null;
 
-          const win = electron.remote.getCurrentWindow();
+          const win = Utils.getMainWindow();
 
           // A little hack to bring the window back to the front
           win.setAlwaysOnTop(true);

@@ -95,7 +95,7 @@ label {
 
   background: var(--accent);
   font-size: 12px;
-  color: var(--white);
+  color: var(--action-button-text);
   padding: 0 4px;
   line-height: 16px;
 }
@@ -418,6 +418,17 @@ select {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
+}
+
+.sidenav-slide-enter,
+.sidenav-slide-leave-to {
+  transform: translateY(-20px);
+  opacity: 0;
+}
+
+.sidenav-slide-enter-active,
+.sidenav-slide-leave-active {
+  transition: all 0.3s ease;
 }
 
 .v--modal-overlay {

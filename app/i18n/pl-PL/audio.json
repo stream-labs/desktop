@@ -9,8 +9,8 @@
   "Monitor and Output": "Monitor i wyjście",
   "Tracks": "Ścieżki",
   "Advanced Audio Settings": "Zaawansowane ustawienia dźwięku",
-  "Volume ( % )": "Głośność ( % )",
+  "Volume ( % )": "Głośność (%)",
   "Sync Offset ( ms )": "Przesunięcie synchronizacji (ms)",
-  "Mixer": "Mikser audio",
-  "Monitor audio levels. If the bars are moving you are outputting audio.": "Monitorowanie poziomów audio. Jeśli słupki są ruchome, wydawany jest dźwięk."
+  "Mixer": "Mikser",
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "Monitorowanie poziomów audio. Jeśli słupki się ruszają, wydawany jest dźwięk."
 }

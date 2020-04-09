@@ -1,6 +1,6 @@
 {
-  "Vers": "Vers",
-  "Reload": "Reload",
-  "Unpacked vers loaded": "Unpacked vers loaded",
-  "You must unload unpacked version before enabling this app.": "You must unload unpacked version before enabling this app."
+  "Vers": "Wersje",
+  "Reload": "Załaduj ponownie",
+  "Unpacked vers loaded": "Rozpakowane wersje zostały załadowane",
+  "You must unload unpacked version before enabling this app.": "Musisz rozładować rozpakowaną wersję przed włączeniem tej aplikacji."
 }

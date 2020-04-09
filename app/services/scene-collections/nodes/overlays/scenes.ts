@@ -19,7 +19,7 @@ export class ScenesNode extends ArrayNode<ISchema, IContext, Scene> {
   scenesService: ScenesService = ScenesService.instance;
 
   getItems() {
-    return this.scenesService.scenes;
+    return this.scenesService.views.scenes;
   }
 
   async saveItem(scene: Scene, context: IContext): Promise<ISchema> {

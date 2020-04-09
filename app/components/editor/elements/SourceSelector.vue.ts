@@ -1,7 +1,13 @@
 import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { SourcesService } from 'services/sources';
-import { ScenesService, TSceneNode } from 'services/scenes';
+import {
+  ScenesService,
+  ISceneItemNode,
+  TSceneNode,
+  ISceneItemFolder,
+  ISceneItem,
+} from 'services/scenes';
 import { SelectionService } from 'services/selection';
 import { EditMenu } from 'util/menus/EditMenu';
 import SlVueTree, { ISlTreeNode, ISlTreeNodeModel, ICursorPosition } from 'sl-vue-tree';
@@ -84,48 +90,81 @@ export default class SourceSelector extends TsxComponent {
 
   get nodes(): ISlTreeNodeModel<ISceneNodeData>[] {
     // recursive function for transform SceneNode[] to ISlTreeNodeModel[]
-    const getSlVueTreeNodes = (sceneNodes: TSceneNode[]): ISlTreeNodeModel<ISceneNodeData>[] => {
+    const getSlVueTreeNodes = (
+      sceneNodes: (ISceneItem | ISceneItemFolder)[],
+    ): ISlTreeNodeModel<ISceneNodeData>[] => {
       return sceneNodes.map(sceneNode => {
         return {
-          title: sceneNode.name,
-          isSelected: sceneNode.isSelected(),
-          isLeaf: sceneNode.isItem(),
+          title: this.getNameForNode(sceneNode),
+          isSelected: this.isSelected(sceneNode),
+          isLeaf: sceneNode.sceneNodeType === 'item',
           isExpanded: this.expandedFoldersIds.indexOf(sceneNode.id) !== -1,
           data: {
             id: sceneNode.id,
-            sourceId: sceneNode.isItem() ? sceneNode.sourceId : null,
+            sourceId: sceneNode.sceneNodeType === 'item' ? sceneNode.sourceId : null,
           },
-          children: sceneNode.isFolder() ? getSlVueTreeNodes(sceneNode.getNodes()) : null,
+          children:
+            sceneNode.sceneNodeType === 'folder'
+              ? getSlVueTreeNodes(this.getChildren(sceneNode))
+              : null,
         };
       });
     };
 
-    return getSlVueTreeNodes(this.scene.getRootNodes());
+    const nodes = this.scene.state.nodes.filter(n => !n.parentId);
+    return getSlVueTreeNodes(nodes);
+  }
+
+  // TODO: Clean this up.  These only access state, no helpers
+  getNameForNode(node: ISceneItem | ISceneItemFolder) {
+    if (node.sceneNodeType === 'item') {
+      return this.sourcesService.state.sources[node.sourceId].name;
+    }
+
+    return node.name;
+  }
+
+  isSelected(node: ISceneItem | ISceneItemFolder) {
+    return this.selectionService.state.selectedIds.includes(node.id);
+  }
+
+  getChildren(node: ISceneItemFolder) {
+    return this.scene.state.nodes.filter(n => n.parentId === node.id);
   }
 
   determineIcon(isLeaf: boolean, sourceId: string) {
     if (!isLeaf) {
       return 'fa fa-folder';
     }
-    const sourceDetails = this.sourcesService.getSource(sourceId).getComparisonDetails();
-    if (sourceDetails.isStreamlabel) {
+
+    const source = this.sourcesService.state.sources[sourceId];
+
+    if (source.propertiesManagerType === 'streamlabels') {
       return 'fas fa-file-alt';
     }
-    // We want simple equality here to also check for undefined
-    if (sourceDetails.widgetType != null) {
-      return widgetIconMap[sourceDetails.widgetType];
+
+    if (source.propertiesManagerType === 'widget') {
+      // IPC is unavoidable here, that's ok. Let's eventually put this in
+      // the store as it's something that the UI cares about. Also typing
+      // is weak for properties managers settings.
+      const widgetType = this.sourcesService.views
+        .getSource(sourceId)
+        .getPropertiesManagerSettings().widgetType;
+
+      return widgetIconMap[widgetType];
     }
-    return sourceIconMap[sourceDetails.type] || 'fas fa-file';
+
+    return sourceIconMap[source.type] || 'fas fa-file';
   }
 
   addSource() {
-    if (this.scenesService.activeScene) {
+    if (this.scenesService.views.activeScene) {
       this.sourcesService.showShowcase();
     }
   }
 
   addFolder() {
-    if (this.scenesService.activeScene) {
+    if (this.scenesService.views.activeScene) {
       let itemsToGroup: string[] = [];
       let parentId: string;
       if (this.selectionService.canGroupIntoFolder()) {
@@ -136,7 +175,7 @@ export default class SourceSelector extends TsxComponent {
       this.scenesService.showNameFolder({
         itemsToGroup,
         parentId,
-        sceneId: this.scenesService.activeScene.id,
+        sceneId: this.scenesService.views.activeScene.id,
       });
     }
   }
@@ -157,30 +196,31 @@ export default class SourceSelector extends TsxComponent {
     this.selectionService.remove();
   }
 
-  isScene() {
-    return this.activeItems[0].type === 'scene';
-  }
+  sourceProperties(nodeId: string) {
+    const node =
+      this.scenesService.views.getSceneNode(nodeId) || this.selectionService.getNodes()[0];
 
-  makeSceneActive() {
-    this.scenesService.makeSceneActive(this.activeItems[0].source.sourceId);
-  }
+    if (!node) return;
 
-  sourceProperties() {
-    if (this.activeItems.length === 0) return;
+    const item = node.isItem() ? node : node.getNestedItems()[0];
 
-    if (this.isScene()) {
-      this.makeSceneActive();
+    if (!item) return;
+
+    if (item.type === 'scene') {
+      this.scenesService.actions.makeSceneActive(item.sourceId);
       return;
     }
-    if (!this.canShowProperties()) return;
-    this.sourcesService.showSourceProperties(this.activeItems[0].sourceId);
+
+    this.sourcesService.actions.showSourceProperties(item.sourceId);
   }
 
   canShowProperties(): boolean {
     if (this.activeItemIds.length === 0) return false;
-    const sceneNode = this.selectionService.getLastSelected();
+    const sceneNode = this.scene.state.nodes.find(
+      n => n.id === this.selectionService.state.lastSelectedId,
+    );
     return sceneNode && sceneNode.sceneNodeType === 'item'
-      ? sceneNode.getSource().hasProps()
+      ? this.sourcesService.views.getSource(sceneNode.sourceId).hasProps()
       : false;
   }
 
@@ -220,7 +260,7 @@ export default class SourceSelector extends TsxComponent {
   makeActive(treeNodes: ISlTreeNode<ISceneNodeData>[], ev: MouseEvent) {
     const ids = treeNodes.map(treeNode => treeNode.data.id);
     this.callCameFromInsideTheHouse = true;
-    this.selectionService.select(ids);
+    this.selectionService.actions.select(ids);
   }
 
   toggleFolder(treeNode: ISlTreeNode<ISceneNodeData>) {
@@ -233,8 +273,7 @@ export default class SourceSelector extends TsxComponent {
   }
 
   canShowActions(sceneNodeId: string) {
-    const node = this.scene.getNode(sceneNodeId);
-    return node.isItem() || node.getNestedItems().length;
+    return this.getItemsForNode(sceneNodeId).length > 0;
   }
 
   get lastSelectedId() {
@@ -247,7 +286,7 @@ export default class SourceSelector extends TsxComponent {
       this.callCameFromInsideTheHouse = false;
       return;
     }
-    const node = this.scenesService.activeScene.getNode(this.lastSelectedId);
+    const node = this.scenesService.views.activeScene.getNode(this.lastSelectedId);
     if (!node || this.selectionService.state.selectedIds.length > 1) return;
     this.expandedFoldersIds = this.expandedFoldersIds.concat(node.getPath().slice(0, -1));
 
@@ -257,7 +296,7 @@ export default class SourceSelector extends TsxComponent {
   }
 
   get activeItemIds() {
-    return this.selectionService.getIds();
+    return this.selectionService.state.selectedIds;
   }
 
   get activeItems() {
@@ -268,6 +307,22 @@ export default class SourceSelector extends TsxComponent {
     const selection = this.scene.getSelection(sceneNodeId);
     const visible = !selection.isVisible();
     this.editorCommandsService.executeCommand('HideItemsCommand', selection, !visible);
+  }
+
+  // TODO: Refactor into elsewhere
+  getItemsForNode(sceneNodeId: string): ISceneItem[] {
+    const node = this.scene.state.nodes.find(n => n.id === sceneNodeId);
+
+    if (node.sceneNodeType === 'item') {
+      return [node];
+    }
+
+    const children = this.scene.state.nodes.filter(n => n.parentId === sceneNodeId);
+    let childrenItems: ISceneItem[] = [];
+
+    children.forEach(c => (childrenItems = childrenItems.concat(this.getItemsForNode(c.id))));
+
+    return childrenItems;
   }
 
   get selectiveRecordingEnabled() {
@@ -324,8 +379,10 @@ export default class SourceSelector extends TsxComponent {
   }
 
   visibilityClassesForSource(sceneNodeId: string) {
-    const selection = this.scene.getSelection(sceneNodeId);
-    const visible = selection.isVisible();
+    // TODO: Clean up - need views or similar
+    const items = this.getItemsForNode(sceneNodeId);
+    // Visible if at least 1 item is visible
+    const visible = !!items.find(i => i.visible);
 
     return {
       'icon-view': visible,
@@ -334,8 +391,10 @@ export default class SourceSelector extends TsxComponent {
   }
 
   lockClassesForSource(sceneNodeId: string) {
-    const selection = this.scene.getSelection(sceneNodeId);
-    const locked = selection.isLocked();
+    // TODO: Clean up - need views or similar
+    const items = this.getItemsForNode(sceneNodeId);
+    // Locked if all items are locked
+    const locked = !items.find(i => !i.locked);
 
     return {
       'icon-lock': locked,
@@ -355,6 +414,6 @@ export default class SourceSelector extends TsxComponent {
   }
 
   get scene() {
-    return this.scenesService.activeScene;
+    return this.scenesService.views.activeScene;
   }
 }

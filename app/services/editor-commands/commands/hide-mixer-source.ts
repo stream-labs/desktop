@@ -11,15 +11,15 @@ export class HideMixerSourceCommand extends Command {
   constructor(private sourceId: string) {
     super();
     this.description = $t('Hide %{sourceName}', {
-      sourceName: this.audioService.getSource(this.sourceId).name,
+      sourceName: this.audioService.views.getSource(this.sourceId).name,
     });
   }
 
   execute() {
-    this.audioService.getSource(this.sourceId).setHidden(true);
+    this.audioService.views.getSource(this.sourceId).setHidden(true);
   }
 
   rollback() {
-    this.audioService.getSource(this.sourceId).setHidden(false);
+    this.audioService.views.getSource(this.sourceId).setHidden(false);
   }
 }

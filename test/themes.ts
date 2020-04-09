@@ -14,19 +14,20 @@ test('Installing a theme', async (t: any) => {
   const formMonkey = new FormMonkey(t);
 
   await logIn(t);
-
-  // await app.client.waitForExist('button=themes', 5000, true);
   await app.client.click('div[title=Themes]');
 
   await focusLibrary(t);
 
   // search a theme
   await formMonkey.setInputValue('input', OVERLAY_NAME);
+
   // the input field has a debounce search
   await sleep(2000);
   // wait items load
   await app.client.click('.market-item');
+
   // install overlay
+  await app.client.waitForVisible('button=Install Overlay');
   await app.client.click('button=Install Overlay');
 
   // wait for installation complete

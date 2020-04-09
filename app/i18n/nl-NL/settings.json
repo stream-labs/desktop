@@ -116,5 +116,6 @@
   "Audio - Track 5": "Audio - Track 5",
   "Audio - Track 6": "Audio - Track 6",
   "Stream Key": "Stream Key",
-  "You can not change these settings when you're live": "You can not change these settings when you're live"
+  "You can not change these settings when you're live": "You can not change these settings when you're live",
+  "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.": "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk."
 }

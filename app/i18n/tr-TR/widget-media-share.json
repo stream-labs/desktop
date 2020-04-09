@@ -5,7 +5,7 @@
   "Min. Amount to Share": "Paylaşılacak Min. Miktar",
   "Max Duration": "Maks. Süre",
   "Buffer Time": "Arabelleğe Alma Süresi",
-  "Spam Security": "Spam Security",
+  "Spam Security": "Spam Güvenliği",
   "The time between videos the next video has to buffer.": "Bir sonraki videonun arabelleğe alınması için videolar arasındaki süre.",
   "Manage Media Settings": "Medya Ayarlarını Düzenle",
   "The maximum duration in seconds that media can be played, regardless of amount donated. The default value is 60 seconds.": "Bağış yapılan miktardan bağımsız olarak, medyanın oynatılabileceği saniye cinsinden maksimum süre. Varsayılan değer 60 saniyedir.",
