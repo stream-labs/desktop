@@ -206,6 +206,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   I18nService.setVuei18nInstance(i18n);
 
+  if (!Utils.isOneOffWindow()) {
+    crashHandler.registerProcess(process.pid, false);
+  }
+
   // The worker window can safely access services immediately
   if (Utils.isWorkerWindow()) {
     const windowsService: WindowsService = WindowsService.instance;
@@ -226,8 +230,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         'obs-studio-node',
       ),
     );
-
-    crashHandler.registerProcess(appService.pid, false);
 
     await obsUserPluginsService.initialize();
 

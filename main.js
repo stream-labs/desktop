@@ -464,7 +464,7 @@ if (!gotTheLock) {
     // Check for protocol links in the argv of the other process
     argv.forEach(arg => {
       if (arg.match(/^slobs:\/\//)) {
-        mainWindow.send('protocolLink', arg);
+        workerWindow.send('protocolLink', arg);
       }
     });
 

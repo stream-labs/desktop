@@ -63,14 +63,24 @@ export default class Utils {
     return this.getWindowId() === 'main';
   }
 
+  static isChildWindow(): boolean {
+    return this.getWindowId() === 'child';
+  }
+
+  static isOneOffWindow(): boolean {
+    return !['worker', 'main', 'child'].includes(this.getWindowId());
+  }
+
   static getMainWindow(): Electron.BrowserWindow {
     return electron.remote.BrowserWindow.getAllWindows().find(
       win => Utils.getUrlParams(win.webContents.getURL()).windowId === 'main',
     );
   }
 
-  static isChildWindow(): boolean {
-    return this.getWindowId() === 'child';
+  static getChildWindow(): Electron.BrowserWindow {
+    return electron.remote.BrowserWindow.getAllWindows().find(
+      win => Utils.getUrlParams(win.webContents.getURL()).windowId === 'child',
+    );
   }
 
   static isDevMode() {
