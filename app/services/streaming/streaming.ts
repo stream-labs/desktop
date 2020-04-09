@@ -142,10 +142,19 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.toggleStreaming();
   }
 
-  private finishStartStreaming() {
+  private async finishStartStreaming() {
     const shouldConfirm = this.streamSettingsService.settings.warnBeforeStartingStream;
-    const confirmText = $t('Are you sure you want to start streaming?');
-    if (shouldConfirm && !confirm(confirmText)) return;
+
+    if (shouldConfirm) {
+      const goLive = await electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
+        title: $t('Go Live'),
+        type: 'warning',
+        message: $t('Are you sure you want to start streaming?'),
+        buttons: [$t('Cancel'), $t('Go Live')],
+      });
+
+      if (!goLive) return;
+    }
 
     this.powerSaveId = electron.remote.powerSaveBlocker.start('prevent-display-sleep');
 
@@ -168,7 +177,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     if (this.state.streamingStatus === EStreamingState.Offline) {
       // in the "force" mode just try to start streaming without updating channel info
       if (force) {
-        this.finishStartStreaming();
+        await this.finishStartStreaming();
         return Promise.resolve();
       }
       try {
@@ -222,7 +231,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
             }
           }
         }
-        this.finishStartStreaming();
+        await this.finishStartStreaming();
         return Promise.resolve();
       } catch (e) {
         return Promise.reject(e);
@@ -235,9 +244,17 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       this.state.streamingStatus === EStreamingState.Reconnecting
     ) {
       const shouldConfirm = this.streamSettingsService.settings.warnBeforeStoppingStream;
-      const confirmText = $t('Are you sure you want to stop streaming?');
 
-      if (shouldConfirm && !confirm(confirmText)) return Promise.resolve();
+      if (shouldConfirm) {
+        const endStream = await electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
+          title: $t('End Stream'),
+          type: 'warning',
+          message: $t('Are you sure you want to stop streaming?'),
+          buttons: [$t('Cancel'), $t('End Stream')],
+        });
+
+        if (!endStream) return;
+      }
 
       if (this.powerSaveId) {
         electron.remote.powerSaveBlocker.stop(this.powerSaveId);

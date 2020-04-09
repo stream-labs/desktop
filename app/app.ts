@@ -1,3 +1,5 @@
+/*global SLOBS_BUNDLE_ID*/
+
 import { I18nService, $t } from 'services/i18n';
 
 // eslint-disable-next-line
@@ -35,10 +37,10 @@ import CustomLoader from 'components/CustomLoader';
 
 const crashHandler = window['require']('crash-handler');
 
-const { ipcRenderer, remote } = electron;
-const slobsVersion = remote.process.env.SLOBS_VERSION;
-const isProduction = process.env.NODE_ENV === 'production';
-const isPreview = !!remote.process.env.SLOBS_PREVIEW;
+const { ipcRenderer, remote, app, contentTracing } = electron;
+const slobsVersion = Utils.env.SLOBS_VERSION;
+const isProduction = Utils.env.NODE_ENV === 'production';
+const isPreview = !!Utils.env.SLOBS_PREVIEW;
 
 // This is the development DSN
 let sentryDsn = 'https://8f444a81edd446b69ce75421d5e91d4d@sentry.io/252950';
@@ -54,7 +56,7 @@ if (isProduction) {
     submitURL:
       'https://sentry.io/api/1283430/minidump/?sentry_key=01fc20f909124c8499b4972e9a5253f2',
     extra: {
-      'sentry[release]': slobsVersion,
+      'sentry[release]': `${slobsVersion}-${SLOBS_BUNDLE_ID}`,
       processType: 'renderer',
     },
   });
@@ -87,6 +89,10 @@ function sendLogMsg(level: string, ...args: any[]) {
 }
 
 ['log', 'info', 'warn', 'error'].forEach(wrapLogFn);
+
+if (windowId === 'worker') {
+  console.log(`Bundle Id: ${SLOBS_BUNDLE_ID}`);
+}
 
 window.addEventListener('error', e => {
   sendLogMsg('error', e.error);
@@ -199,6 +205,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   I18nService.setVuei18nInstance(i18n);
 
+  if (!Utils.isOneOffWindow()) {
+    crashHandler.registerProcess(process.pid, false);
+  }
+
   // The worker window can safely access services immediately
   if (Utils.isWorkerWindow()) {
     const windowsService: WindowsService = WindowsService.instance;
@@ -219,8 +229,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         'obs-studio-node',
       ),
     );
-
-    crashHandler.registerProcess(appService.pid, false);
 
     await obsUserPluginsService.initialize();
 

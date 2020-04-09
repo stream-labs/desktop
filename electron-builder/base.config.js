@@ -10,6 +10,7 @@ const base = {
     'app/i18n',
     'media/images/game-capture',
     'updater/build/bootstrap.js',
+    'updater/build/bundle-updater.js',
     'index.html',
     'main.js',
     'obs-api'
@@ -25,6 +26,7 @@ const base = {
     oneClick: false,
     perMachine: true,
     allowToChangeInstallationDirectory: true,
+    uninstallDisplayName: "Streamlabs OBS",
     include: 'installer.nsh'
   },
   publish: {

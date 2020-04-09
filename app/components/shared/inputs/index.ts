@@ -9,6 +9,7 @@ export enum EInputType {
   bool = 'bool',
   number = 'number',
   text = 'text',
+  date = 'date',
   slider = 'slider',
   color = 'color',
   list = 'list',
@@ -80,6 +81,10 @@ export interface ITextMetadata extends IInputMetadata {
   emitOnChange?: boolean;
 }
 
+export interface IDateMetadata extends IInputMetadata {
+  disablePastDates?: boolean;
+}
+
 export interface ISliderMetadata extends IInputMetadata {
   min?: number;
   max?: number;
@@ -122,6 +127,7 @@ export const metadata = {
   number: (options: INumberMetadata) =>
     ({ type: EInputType.number, ...options } as INumberMetadata),
   text: (options: ITextMetadata) => ({ type: EInputType.text, ...options } as ITextMetadata),
+  date: (options: IDateMetadata) => ({ type: EInputType.date, ...options } as IDateMetadata),
   list: (options: IListMetadata<string>) =>
     ({ type: EInputType.list, ...options } as IListMetadata<string>),
   color: (options: IInputMetadata) => ({ type: EInputType.color, ...options } as IInputMetadata),
