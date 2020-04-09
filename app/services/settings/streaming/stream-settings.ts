@@ -94,7 +94,6 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
    * setup all stream-settings via single object
    */
   setSettings(patch: Partial<IStreamSettings>) {
-    console.log('save settings', patch);
     // save settings to localStorage
     Object.keys(this.state).forEach(prop => {
       if (prop in patch) {
