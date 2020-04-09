@@ -163,7 +163,6 @@ test('Recording', async t => {
   await setOutputResolution(t, '100x100');
   const api = await getClient();
   const scenesService = api.getResource<ScenesService>('ScenesService');
-  const meter = getMeter();
   scenesService.activeScene.createAndAddSource('Color', 'color_source');
 
   await startRecording(t);

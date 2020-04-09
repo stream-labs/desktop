@@ -77,6 +77,5 @@ export async function getCPUUsage(): Promise<number> {
 export function logTiming(msg: string, time = Date.now()) {
   const delta = lastEventTime ? time - lastEventTime : 0;
   lastEventTime = time;
-  if (delta > 2000) console.log('------------------');
   console.log(msg, delta + 'ms');
 }
