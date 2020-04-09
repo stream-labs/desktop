@@ -215,6 +215,5 @@ test('Add and remove sources', async t => {
     // give some time to unfreeze UI
     await sleep(2000);
   }
-
   t.pass();
 });
