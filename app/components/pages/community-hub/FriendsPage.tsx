@@ -10,18 +10,13 @@ import { CommunityHubService, IFriend } from 'services/community-hub';
 export default class FriendsPage extends TsxComponent {
   @Inject() communityHubService: CommunityHubService;
 
-  get onlineFriendCount() {
-    return this.communityHubService.state.friends.filter(friend => friend.status !== 'offline')
-      .length;
-  }
-
   get friends() {
     return this.communityHubService.views.sortedFriends;
   }
 
   goToDm(friendId: number) {
     const existingDm = this.communityHubService.views.directMessages.find(
-      dm => dm.members[0].id === friendId,
+      dm => this.communityHubService.views.usersInRoom(dm.id)[0].id === friendId,
     );
     if (existingDm) {
       this.communityHubService.setPage(existingDm.id);
@@ -52,7 +47,9 @@ export default class FriendsPage extends TsxComponent {
     return (
       <div>
         <div class={styles.friendsPageHeader}>
-          {$t('Friends (%{friendCount} Online)', { friendCount: this.onlineFriendCount })}
+          {$t('Friends (%{friendCount} Online)', {
+            friendCount: this.communityHubService.views.onlineFriendCount,
+          })}
         </div>
         {this.friends.map(friend => this.friendRow(friend))}
       </div>

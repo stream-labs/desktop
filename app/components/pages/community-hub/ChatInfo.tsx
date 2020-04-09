@@ -17,11 +17,11 @@ export default class ChatPage extends TsxComponent<{ onHideChat: () => void }> {
   }
 
   get friends() {
-    return this.communityHubService.state.friends;
+    return this.communityHubService.views.sortedFriends;
   }
 
   get members() {
-    return this.liveChatService.views.messages(this.chatroom.id);
+    return this.communityHubService.views.usersInRoom(this.chatroom.id);
   }
 
   contextButton(chatter: IFriend) {
@@ -52,9 +52,9 @@ export default class ChatPage extends TsxComponent<{ onHideChat: () => void }> {
           <i class="icon-close" style="margin-left: 20px;" onClick={() => this.$emit('hideChat')} />
         </div>
         <div class={styles.chatHeader}>
-          {$t('Members (%{numberOfMembers})', { numberOfMembers: this.chatroom.members.length })}
+          {$t('Members (%{numberOfMembers})', { numberOfMembers: this.members.length })}
         </div>
-        {this.chatroom.members.map(chatter => this.friendRow(chatter))}
+        {this.members.map(chatter => this.friendRow(chatter))}
       </div>
     );
   }

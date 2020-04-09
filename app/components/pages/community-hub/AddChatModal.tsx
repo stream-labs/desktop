@@ -38,7 +38,7 @@ export default class AddChatModal extends TsxComponent<{ onCloseAddChatModal: ()
   }
 
   addChat() {
-    this.communityHubService.addChat(this.selectedFriends, this.chatName);
+    this.communityHubService.addChat(this.chatName);
     this.$emit('closeAddChatModal');
   }
 
