@@ -70,34 +70,26 @@ export default class MixerVolmeter extends TsxComponent<VolmetersProps> {
 
   subscriptions: Dictionary<IVolmeterSubscription> = {};
 
-  // Used for Canvas 2D rendering
-  ctx: CanvasRenderingContext2D;
-
   // Used for WebGL rendering
-  gl: WebGLRenderingContext;
-  program: WebGLProgram;
+  private gl: WebGLRenderingContext;
+  private program: WebGLProgram;
 
   // GL Attribute locations
-  positionLocation: number;
+  private positionLocation: number;
 
   // GL Uniform locations
-  resolutionLocation: WebGLUniformLocation;
-  translationLocation: WebGLUniformLocation;
-  scaleLocation: WebGLUniformLocation;
-  volumeLocation: WebGLUniformLocation;
-  peakHoldLocation: WebGLUniformLocation;
-  bgMultiplierLocation: WebGLUniformLocation;
+  private resolutionLocation: WebGLUniformLocation;
+  private translationLocation: WebGLUniformLocation;
+  private scaleLocation: WebGLUniformLocation;
+  private volumeLocation: WebGLUniformLocation;
+  private peakHoldLocation: WebGLUniformLocation;
+  private bgMultiplierLocation: WebGLUniformLocation;
 
-  canvasWidth: number;
-  canvasWidthInterval: number;
-  channelCount: number;
-  canvasHeight: number;
-
-  // Used to force recreation of the canvas element
-  canvasId = 1;
-
-  // Used for lazy initialization of the canvas rendering
-  renderingInitialized = false;
+  private canvasWidth: number;
+  private canvasWidthInterval: number;
+  private channelCount: number;
+  private canvasHeight: number;
+  private renderingInitialized: boolean;
 
   // time between 2 received peaks.
   // Used to render extra interpolated frames
@@ -108,6 +100,7 @@ export default class MixerVolmeter extends TsxComponent<VolmetersProps> {
   private sourcesOrder: string[];
   private workerId: number;
   private requestedFrameId: number;
+  private bgMultiplier = this.customizationService.isDarkTheme ? 0.2 : 0.5;
 
   mounted() {
     this.workerId = electron.ipcRenderer.sendSync('getWorkerWindowId');
@@ -199,7 +192,6 @@ export default class MixerVolmeter extends TsxComponent<VolmetersProps> {
 
   private setupNewCanvas() {
     // Make sure all state is cleared out
-    this.ctx = null;
     this.gl = null;
     this.program = null;
     this.positionLocation = null;
@@ -212,8 +204,6 @@ export default class MixerVolmeter extends TsxComponent<VolmetersProps> {
     this.canvasWidth = null;
     this.channelCount = null;
     this.canvasHeight = null;
-
-    this.renderingInitialized = false;
 
     this.setCanvasSize();
     this.canvasWidthInterval = window.setInterval(() => this.setCanvasSize(), 500);
@@ -320,11 +310,8 @@ export default class MixerVolmeter extends TsxComponent<VolmetersProps> {
     }
 
     this.bg = this.customizationService.themeBackground;
-  }
-
-  private getBgMultiplier() {
     // Volmeter backgrounds appear brighter against a darker background
-    return this.customizationService.isDarkTheme ? 0.2 : 0.5;
+    this.bgMultiplier = this.customizationService.isDarkTheme ? 0.2 : 0.5;
   }
 
   private drawVolmeters() {
@@ -343,7 +330,7 @@ export default class MixerVolmeter extends TsxComponent<VolmetersProps> {
     // Set uniforms
     this.gl.uniform2f(this.resolutionLocation, 1, this.canvasHeight);
 
-    this.gl.uniform1f(this.bgMultiplierLocation, this.getBgMultiplier());
+    this.gl.uniform1f(this.bgMultiplierLocation, this.bgMultiplier);
 
     // calculate offsetRop and render each volmeter
     let offsetTop = 0;
@@ -414,7 +401,6 @@ export default class MixerVolmeter extends TsxComponent<VolmetersProps> {
    * alpha = 0 will be val1, and alpha = 1 will be val2.
    */
   lerp(val1: number, val2: number, alpha: number) {
-    const result = v2(val1, 0).lerp(v2(val2, 0), alpha);
-    return result.x;
+    return val1 + (val2 - val1) * alpha;
   }
 }

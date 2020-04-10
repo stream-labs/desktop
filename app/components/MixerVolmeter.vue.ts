@@ -164,6 +164,7 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
       this.$refs.canvas.width = width;
       this.$refs.canvas.style.width = `${width}px`;
     }
+    this.bg = this.customizationService.themeBackground;
   }
 
   private getBgMultiplier() {
@@ -268,7 +269,6 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
         this.prevPeaks = this.interpolatedPeaks;
         this.currentPeaks = Array.from(volmeter.peak);
         this.lastEventTime = performance.now();
-        this.bg = this.customizationService.themeBackground;
       }
     };
 
