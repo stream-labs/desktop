@@ -6,7 +6,28 @@ import { handleResponse, authorizedHeaders } from 'util/requests';
 import { Subject } from 'rxjs';
 import { importSocketIOClient } from 'util/slow-imports';
 import { SceneCollectionsService } from 'services/scene-collections';
-import { CommunityHubService } from './index';
+import { CommunityHubService, IFriend } from './index';
+
+interface IChatMessageEvent {
+  data: {
+    room: string;
+    merssage: string;
+  };
+  user: IFriend;
+}
+
+interface IInternalEvent {
+  action: 'status_update';
+  data: {
+    user: {
+      id: number;
+      avatar: string;
+      name: string;
+      is_prime: boolean;
+    };
+    status: string;
+  };
+}
 
 interface IBearerAuth {
   path: string;
@@ -31,13 +52,12 @@ export class ChatWebsocketService extends Service {
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private communityHubService: CommunityHubService;
 
-  socket: SocketIOClient.Socket;
+  private socket: SocketIOClient.Socket;
+  private io: SocketIOClientStatic;
 
-  statusUpdateEvent = new Subject<'status_update'>();
   roomUpdateEvent = new Subject<'room_update'>();
-  chatMessageEvent = new Subject<'chat_message'>();
-  internalEvent = new Subject<'internal_event'>();
-  io: SocketIOClientStatic;
+  chatMessageEvent = new Subject<IChatMessageEvent>();
+  internalEvent = new Subject<IInternalEvent>();
 
   init() {
     this.sceneCollectionsService.collectionInitialized.subscribe(() => {
@@ -63,6 +83,14 @@ export class ChatWebsocketService extends Service {
     if (this.canReconnect) {
       this.openSocketConnection();
     }
+  }
+
+  sendMessage(message: { room: string; message: string }) {
+    this.socket.emit('chat_message', message);
+  }
+
+  sendStatusUpdate(status: string, game?: string) {
+    this.socket.emit('internal_event', { action: 'status_update', status, game });
   }
 
   async openSocketConnection() {
@@ -106,21 +134,17 @@ export class ChatWebsocketService extends Service {
 
   listenForEvents() {
     if (!this.socket) return;
-    this.socket.on('status_update', (e: any) => {
-      this.log('status_update', e);
-      this.statusUpdateEvent.next(e);
-    });
     this.socket.on('room_update', (e: any) => {
       this.log('room_update', e);
-      this.statusUpdateEvent.next(e);
+      this.roomUpdateEvent.next(e);
     });
     this.socket.on('chat_message', (e: any) => {
       this.log('chat_message', e);
-      this.statusUpdateEvent.next(e);
+      this.chatMessageEvent.next(e);
     });
     this.socket.on('internal_event', (e: any) => {
       this.log('internal_event', e);
-      this.statusUpdateEvent.next(e);
+      this.internalEvent.next(e);
     });
   }
 
