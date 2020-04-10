@@ -1,6 +1,7 @@
 import URI from 'urijs';
 import isEqual from 'lodash/isEqual';
 import electron from 'electron';
+import cloneDeep from 'lodash/cloneDeep';
 const BrowserWindow = electron.remote.BrowserWindow;
 
 export const enum EBit {
@@ -155,7 +156,7 @@ export default class Utils {
   static getChangedParams<T>(obj: T, patch: T): Partial<T> {
     const result: Dictionary<any> = {};
     Object.keys(patch).forEach(key => {
-      if (!isEqual(obj[key], patch[key])) result[key] = patch[key];
+      if (!isEqual(obj[key], patch[key])) result[key] = cloneDeep(patch[key]);
     });
     return result as Partial<T>;
   }
