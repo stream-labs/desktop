@@ -49,13 +49,20 @@ class VolmetersProps {}
  * Renders volmeters for the current scene via WebGL
  */
 @Component({ props: createProps(VolmetersProps) })
-export default class MixerVolmeter extends TsxComponent<VolmetersProps> {
+export default class Volmeters extends TsxComponent<VolmetersProps> {
   render() {
     return (
       <div style={{ position: 'absolute' }}>
         <canvas
           ref="canvas"
-          style={{ position: 'absolute', top: 0, right: 0, left: 0, height: '100%' }}
+          style={{
+            display: 'block',
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            left: 0,
+            height: '100%',
+          }}
         />
       </div>
     );
