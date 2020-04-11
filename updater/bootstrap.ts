@@ -175,19 +175,23 @@ async function fetchUpdater(info: IUpdateInfo): Promise<string | null> {
 
   const outStream = fs.createWriteStream(updaterPath);
   return new Promise((resolve, reject) => {
-    fetch(`${info.baseUrl}/${updaterName}`).then(response => {
-      if (response.status !== 200) {
-        reject(`Failed to fetch updater: status ${response.status}`);
-      }
-      const outPipe = response.body.pipe(outStream);
-      outPipe.on('close', () => {
-        resolve(updaterPath);
-      });
+    fetch(`${info.baseUrl}/${updaterName}`)
+      .then(response => {
+        if (response.status !== 200) {
+          reject(`Failed to fetch updater: status ${response.status}`);
+        }
+        const outPipe = response.body.pipe(outStream);
+        outPipe.on('close', () => {
+          resolve(updaterPath);
+        });
 
-      outPipe.on('error', error => {
-        reject(error);
+        outPipe.on('error', error => {
+          reject(error);
+        });
+      })
+      .catch(e => {
+        reject(e);
       });
-    });
   });
 }
 
