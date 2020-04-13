@@ -29,6 +29,7 @@
   z-index: -1;
   font-size: 24px;
   text-align: center;
+  background: var(--background);
 }
 
 .blank-slate,
