@@ -1,20 +1,17 @@
 import Vue from 'vue';
-import uuid from 'uuid/v4';
+import { Subscription } from 'rxjs';
 import { StatefulService, mutation, ViewHandler } from 'services/core/stateful-service';
-import { UserService } from 'services/user';
-import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
-import { I18nService } from 'services/i18n';
 import { InitAfter } from 'services/core';
 import { ChatWebsocketService } from './chat-websocket';
-import { CommunityHubService } from '.';
+import { CommunityHubService, IFriend } from '.';
+import { UserService, LoginLifecycle } from 'services/user';
 
 export interface IMessage {
-  id: string;
   user_id: number;
-  chat_id: string;
-  content: string;
-  name: string;
+  room: string;
+  message: string;
+  display_name: string;
   avatar: string;
   date_posted?: string;
 }
@@ -32,10 +29,9 @@ class LiveChatViews extends ViewHandler<ILiveChatState> {
 
 @InitAfter('UserService')
 export class LiveChatService extends StatefulService<ILiveChatState> {
-  @Inject() private hostsService: HostsService;
-  @Inject() private userService: UserService;
-  @Inject() private i18nService: I18nService;
+  @Inject() private chatWebsocketService: ChatWebsocketService;
   @Inject() private communityHubService: CommunityHubService;
+  @Inject() private userService: UserService;
 
   static initialState: ILiveChatState = {
     messages: {},
@@ -57,22 +53,70 @@ export class LiveChatService extends StatefulService<ILiveChatState> {
     this.state.messages = messages;
   }
 
-  init() {}
+  async init() {
+    // this.lifecycle = await this.userService.withLifecycle({
+    //   init: this.subscribeToSocketConnections,
+    //   destroy: this.unsubscribeFromSocketConnections,
+    //   context: this,
+    // });
+  }
 
   get views() {
     return new LiveChatViews(this.state);
   }
 
-  sendMessage(chatId: string, content: string) {
+  lifecycle: LoginLifecycle;
+  messageSocketConnection: Subscription = null;
+  internalEventSocketConnection: Subscription = null;
+
+  async subscribeToSocketConnections() {
+    this.messageSocketConnection = this.chatWebsocketService.chatMessageEvent.subscribe(ev =>
+      this.recieveMessage(ev.data, ev.user),
+    );
+    this.internalEventSocketConnection = this.chatWebsocketService.internalEvent.subscribe(ev => {
+      if (ev.action === 'status_update') {
+        this.updateStatus(ev.data.user, ev.data.status);
+      }
+    });
+  }
+
+  async unsubscribeFromSocketConnections() {
+    if (this.messageSocketConnection) this.messageSocketConnection.unsubscribe();
+    if (this.internalEventSocketConnection) this.internalEventSocketConnection.unsubscribe();
+  }
+
+  updateStatus(user: IFriend, status: string) {
+    this.communityHubService.updateUsers([{ ...user, status }]);
+  }
+
+  sendStatusUpdate(status: string, game?: string) {
+    this.chatWebsocketService.sendStatusUpdate(status, game);
+  }
+
+  recieveMessage(messageObj: Partial<IMessage>, user: IFriend) {
+    const message = {
+      user_id: user.id,
+      display_name: user.name,
+      room: messageObj.room,
+      message: messageObj.message,
+      avatar: user.avatar,
+      date_posted: Date.now().toLocaleString(),
+    };
+
+    this.ADD_MESSAGE(messageObj.room, message);
+  }
+
+  sendMessage(chatId: string, message: string) {
     const messageObj = {
-      id: uuid(),
       user_id: this.communityHubService.self.id,
-      chat_id: chatId,
-      name: this.communityHubService.self.name,
+      room: chatId,
+      display_name: this.communityHubService.self.name,
       avatar: this.communityHubService.self.avatar,
-      content,
+      date_posted: Date.now().toLocaleString(),
+      message,
     };
 
     this.ADD_MESSAGE(chatId, messageObj);
+    this.chatWebsocketService.sendMessage({ room: chatId, message });
   }
 }

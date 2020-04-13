@@ -55,10 +55,10 @@ export default class ChatPage extends TsxComponent {
         <div class={cx(styles.status, styles[chatter.status])} />
         <div class={styles.nameAndBubble}>
           <span style="display: flex; align-items: center; margin-bottom: 8px;">
-            {message.name}
+            {message.display_name}
             {chatter.is_prime && <i class={cx('icon-prime', styles.primeIcon)} />}
           </span>
-          <div class={cx(styles.chatBubble, { [styles.self]: isSelf })}>{message.content}</div>
+          <div class={cx(styles.chatBubble, { [styles.self]: isSelf })}>{message.message}</div>
         </div>
       </div>
     );
