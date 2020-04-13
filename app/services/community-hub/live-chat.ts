@@ -54,11 +54,11 @@ export class LiveChatService extends StatefulService<ILiveChatState> {
   }
 
   async init() {
-    this.lifecycle = await this.userService.withLifecycle({
-      init: this.subscribeToSocketConnections,
-      destroy: this.unsubscribeFromSocketConnections,
-      context: this,
-    });
+    // this.lifecycle = await this.userService.withLifecycle({
+    //   init: this.subscribeToSocketConnections,
+    //   destroy: this.unsubscribeFromSocketConnections,
+    //   context: this,
+    // });
   }
 
   get views() {
