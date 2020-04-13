@@ -239,7 +239,7 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
   }
 
   private drawVolmeterWebgl(peaks: number[]) {
-    const bg = this.customizationService.themeBackground;
+    const bg = this.customizationService.displayBackground;
 
     this.gl.clearColor(bg.r / 255, bg.g / 255, bg.b / 255, 1);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
