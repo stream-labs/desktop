@@ -396,6 +396,23 @@ select {
   border-radius: 10px;
 }
 
+// Loader TODO: move off of Beaker
+.s-loader__bg {
+  background: var(--background) !important;
+}
+
+.s-spinner__bar {
+  fill: var(--title) !important;
+
+  &.s-spinner--modeswap {
+    fill: var(--section) !important;
+  }
+}
+
+.s-loader__text {
+  color: var(--title) !important;
+}
+
 // Vue transitions
 .slide-fade-enter-active,
 .slide-fade-leave-active {
