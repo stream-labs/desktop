@@ -2,9 +2,16 @@ import { createSetupFunction } from 'util/test-setup';
 import { Subject } from 'rxjs';
 type NicoliveCommentViewerService = import('./nicolive-comment-viewer').NicoliveCommentViewerService;
 
-const setup = createSetupFunction();
+const setup = createSetupFunction({
+  injectee: {
+    NicoliveCommentFilterService: {
+      stateChange: new Subject(),
+    },
+  },
+});
 
-jest.mock('services/nicolive-program/nicolive-program', () => ({ NicoliveProgramStateService: {} }));
+jest.mock('services/nicolive-program/nicolive-program', () => ({ NicoliveProgramService: {} }));
+jest.mock('services/nicolive-program/nicolive-comment-filter', () => ({ NicoliveCommentFilterService: {} }));
 
 beforeEach(() => {
   jest.doMock('services/stateful-service');

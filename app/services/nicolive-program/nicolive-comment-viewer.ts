@@ -23,11 +23,14 @@ import {
 } from './MessageServerClient';
 import { ChatMessageType, classify } from './ChatMessage/classifier';
 import { isOperatorCommand } from './ChatMessage/util';
+import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
 
 export type WrappedChat = {
   type: ChatMessageType;
   value: ChatMessage;
   seqId: number;
+  /** NG追加したときに手元でフィルタをかけた結果 */
+  filtered?: boolean;
 };
 
 function makeEmulatedChat(
@@ -57,6 +60,7 @@ interface INicoliveCommentViewerState {
 export class NicoliveCommentViewerService extends StatefulService<INicoliveCommentViewerState> {
   private client: MessageServerClient | null = null;
   @Inject() private nicoliveProgramService: NicoliveProgramService;
+  @Inject() private nicoliveCommentFilterService: NicoliveCommentFilterService;
 
   static initialState: INicoliveCommentViewerState = {
     messages: [],
@@ -88,6 +92,12 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
           && prev.roomThreadID === curr.roomThreadID
         ))
       ).subscribe(state => this.onNextConfig(state));
+
+    this.nicoliveCommentFilterService.stateChange.subscribe(() => {
+      this.SET_STATE({
+        messages: this.items.map(chat => this.nicoliveCommentFilterService.applyFilter(chat))
+      });
+    })
   }
 
   lastSubscription: Subscription = null;

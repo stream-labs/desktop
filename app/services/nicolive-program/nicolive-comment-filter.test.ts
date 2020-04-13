@@ -179,3 +179,30 @@ test('deleteFilters/失敗', async () => {
 
   expect(UPDATE_FILTERS).toHaveBeenCalledTimes(0);
 });
+
+test('applyFilter', async () => {
+  setup();
+  const { NicoliveCommentFilterService } = require('./nicolive-comment-filter');
+  const instance = NicoliveCommentFilterService.instance as NicoliveCommentFilterService;
+  instance.state.filters = [
+    { type: 'word', body: 'needle', id: 1 },
+    { type: 'command', body: 'needle', id: 2 },
+    { type: 'user', body: 'user needle', id: 3 },
+  ];
+
+  const chats = [
+    { seqId: 0, type: 'normal', value: { content: 'content needle' } },
+    { seqId: 1, type: 'normal', value: { user_id: 'user needle' } },
+    { seqId: 2, type: 'normal', value: { mail: 'mail needle' } },
+    { seqId: 3, type: 'operator', value: { content: 'content needle' } },
+    { seqId: 4, type: 'operator', value: { user_id: 'user needle' } },
+  ] as const;
+
+  const after = chats.map(c => instance.applyFilter(c));
+
+  expect(after[0].filtered).toBe(true);
+  expect(after[1].filtered).toBe(true);
+  expect(after[2].filtered).toBe(true);
+  expect(after[3].filtered).toBeFalsy();
+  expect(after[4].filtered).toBeFalsy();
+});
