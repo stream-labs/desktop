@@ -13,7 +13,6 @@ import { CustomizationService } from 'services/customization';
 import { v2 } from '../util/vec2';
 import { EditorCommandsService } from 'services/editor-commands';
 import { mutation } from './core';
-import { TcpServerService } from './api/tcp-server';
 
 interface IResizeRegion {
   name: string;
@@ -56,7 +55,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   @Inject() private transitionsService: TransitionsService;
   @Inject() private customizationService: CustomizationService;
   @Inject() private editorCommandsService: EditorCommandsService;
-  @Inject() private tcpServerService: TcpServerService;
 
   static initialState: IEditorServiceState = {
     cursor: 'default',
@@ -129,7 +127,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
         y: this.renderedOffsetY,
       },
     });
-    this.tcpServerService.stopRequestsHandling();
   }
 
   startResizing(event: IMouseEvent, region: IResizeRegion) {
@@ -138,7 +135,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     this.currentY = event.pageY;
 
     if (event.altKey) this.isCropping = true;
-    this.tcpServerService.stopRequestsHandling();
   }
 
   handleMouseUp(event: IMouseEvent) {
@@ -208,7 +204,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     this.dragHandler = null;
     this.resizeRegion = null;
     this.isCropping = false;
-    this.tcpServerService.startRequestsHandling();
 
     this.updateCursor(event);
   }
