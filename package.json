@@ -36,7 +36,10 @@
     "commit": "commit",
     "postinstall": "scripts/facemask-plugin-move.bat",
     "tail-obs-logs": "yarn install --cwd bin && node bin/tail-obs-logs.js",
-    "generate-agreement": "cat BASEAGREEMENT > AGREEMENT && yarn licenses generate-disclaimer --ignore-platform >> AGREEMENT"
+    "generate-agreement": "cat BASEAGREEMENT > AGREEMENT && yarn licenses generate-disclaimer --ignore-platform >> AGREEMENT",
+
+    "performancetest": "node test/performance/performance-test-runner.js",
+    "cli-table": "^0.3.1"
   },
   "prettier": {
     "singleQuote": true,

@@ -1,5 +1,5 @@
 'use strict';
-
+const appStartTime = Date.now();
 ////////////////////////////////////////////////////////////////////////////////
 // Set Up Environment Variables
 ////////////////////////////////////////////////////////////////////////////////
@@ -530,6 +530,10 @@ if (!gotTheLock) {
     if (!mainWindow.isDestroyed()) { // main window may be destroyed on shutdown
       mainWindow.send('showErrorAlert');
     }
+  });
+
+  ipcMain.on('getAppStartTime', e => {
+    e.returnValue = appStartTime;
   });
 
   ipcMain.on('gameOverlayPaintCallback', (e, { contentsId, overlayId }) => {

@@ -89,6 +89,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private recentEventsService: RecentEventsService;
   @Inject() private restreamService: RestreamService;
+  @Inject() private metricsService: MetricsService;
 
   private loadingPromises: Dictionary<Promise<any>> = {};
 
@@ -145,6 +146,7 @@ export class AppService extends StatefulService<IAppState> {
     this.crashReporterService.endStartup();
 
     this.protocolLinksService.start(this.state.argv);
+    this.metricsService.recordMetric('sceneCollectionLoadingTime');
   }
 
   shutdownStarted = new Subject();

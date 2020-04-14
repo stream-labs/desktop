@@ -110,3 +110,15 @@ export async function chatIsVisible(t: TExecutionContext) {
   await focusMain(t);
   return await t.context.app.client.isVisible('a=Refresh Chat'); // TODO: it's better to check the content of the chat browser-view
 }
+
+export async function startRecording(t: TExecutionContext) {
+  const client = t.context.app.client;
+  await client.click('.record-button');
+  await client.waitForVisible('.record-button.active');
+}
+
+export async function stopRecording(t: TExecutionContext) {
+  const client = t.context.app.client;
+  await client.click('.record-button');
+  await client.waitForVisible('.record-button:not(.active)', 15000);
+}

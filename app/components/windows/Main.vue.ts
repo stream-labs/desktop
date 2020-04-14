@@ -9,6 +9,7 @@ import VueResize from 'vue-resize';
 import { $t } from 'services/i18n';
 import fs from 'fs';
 Vue.use(VueResize);
+import { MetricsService } from 'services/metrics';
 
 // Pages
 import Studio from '../pages/Studio';
@@ -72,6 +73,10 @@ export default class Main extends Vue {
     }
 
     electron.remote.getCurrentWindow().show();
+
+    const metricsService: MetricsService = MetricsService.instance;
+    metricsService.actions.recordMetric('mainWindowShowTime', Date.now());
+
     this.handleResize();
   }
 

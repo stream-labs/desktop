@@ -29,6 +29,7 @@ import { getResource } from 'services';
 import * as obs from '../obs-api';
 import path from 'path';
 import uuid from 'uuid/v4';
+import { MetricsService } from 'services/metrics';
 
 const crashHandler = window['require']('crash-handler');
 
