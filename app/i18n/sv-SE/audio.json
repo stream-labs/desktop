@@ -1,0 +1,16 @@
+{
+  "Open advanced audio settings": "Öppna avancerade ljudinställningar",
+  "Volume (%)": "Volym (%)",
+  "Downmix to Mono": "Omvandla till Mono",
+  "Sync Offset (ms)": "Korrigeringstid (ms)",
+  "Audio Monitoring": "Ljudavlyssning",
+  "Monitor Off": "Ingen avlyssning",
+  "Monitor Only (mute output)": "Bara avlyssning (tysta utgående)",
+  "Monitor and Output": "Avlyssning och Utgående",
+  "Tracks": "Spår",
+  "Advanced Audio Settings": "Avancerade ljudinställningar",
+  "Volume ( % )": "Volym (%)",
+  "Sync Offset ( ms )": "Korrigeringstid (ms )",
+  "Mixer": "Mixer",
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "Övervaka ljudnivåerna. Om mätarna flyttar sig sänder du ut ljud."
+}

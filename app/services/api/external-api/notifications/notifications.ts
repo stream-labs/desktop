@@ -9,6 +9,14 @@ enum ENotificationType {
   SUCCESS = 'SUCCESS',
 }
 
+enum ENotificationSubType {
+  DEFAULT = 'DEFAULT',
+  DISCONNECTED = 'DISCONNECTED',
+  DROPPED = 'DROPPED',
+  LAGGED = 'LAGGED',
+  SKIPPED = 'SKIPPED',
+}
+
 interface INotificationOptions {
   message: string;
   code?: string;
@@ -17,6 +25,7 @@ interface INotificationOptions {
   action?: IJsonRpcRequest;
   playSound?: boolean;
   data?: any;
+  subType?: ENotificationSubType;
 
   /** The notification's life time in ms. Use -1 for infinity */
   lifeTime?: number;
@@ -32,6 +41,7 @@ export interface INotificationModel extends INotificationOptions {
   playSound: boolean;
   lifeTime: number;
   showTime: boolean;
+  subType: ENotificationSubType;
 }
 
 export interface INotificationsSettings {
@@ -50,7 +60,7 @@ export class NotificationsService {
   }
 
   getNotification(id: number): INotificationModel {
-    return this.notificationsService.getNotification(id);
+    return this.notificationsService.views.getNotification(id);
   }
 
   applyAction(notificationId: number) {
@@ -58,15 +68,15 @@ export class NotificationsService {
   }
 
   getAll(type: ENotificationType): INotificationModel[] {
-    return this.notificationsService.getAll(type);
+    return this.notificationsService.views.getAll(type);
   }
 
   getUnread(type: ENotificationType): INotificationModel[] {
-    return this.notificationsService.getUnread(type);
+    return this.notificationsService.views.getUnread(type);
   }
 
   getRead(type: ENotificationType): INotificationModel[] {
-    return this.notificationsService.getRead(type);
+    return this.notificationsService.views.getRead(type);
   }
 
   markAsRead(id: number): void {
@@ -78,7 +88,7 @@ export class NotificationsService {
   }
 
   getSettings(): INotificationsSettings {
-    return this.notificationsService.getSettings();
+    return this.notificationsService.views.getSettings();
   }
 
   setSettings(patch: Partial<INotificationsSettings>): void {

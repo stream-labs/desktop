@@ -4,25 +4,34 @@ import { Component } from 'vue-property-decorator';
 import ModalLayout from '../ModalLayout.vue';
 import { BoolInput, ListInput } from 'components/shared/inputs/inputs';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
-import { StreamInfoService } from 'services/stream-info';
-import { UserService } from '../../services/user';
-import { Inject } from '../../services/core/injector';
-import debounce from 'lodash/debounce';
-import { getPlatformService, IChannelInfo } from 'services/platforms';
+import { StreamInfoService, TCombinedChannelInfo } from 'services/stream-info';
+import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
+import { UserService } from 'services/user';
+import { Inject } from 'services/core/injector';
+import { getPlatformService, TPlatform } from 'services/platforms';
 import { StreamingService } from 'services/streaming';
 import { WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
 import { $t, I18nService } from 'services/i18n';
-import { IStreamlabsFacebookPage, IStreamlabsFacebookPages } from 'services/platforms/facebook';
+import { FacebookService } from 'services/platforms/facebook';
 import {
   VideoEncodingOptimizationService,
   IEncoderProfile,
 } from 'services/video-encoding-optimizations';
-import { shell } from 'electron';
-import { IListOption } from '../shared/inputs';
+import electron, { shell } from 'electron';
+import { formMetadata, IListOption, metadata } from '../shared/inputs';
 import TwitchTagsInput from 'components/shared/inputs/TwitchTagsInput.vue';
 import { TwitchService } from 'services/platforms/twitch';
-import { prepareOptions, TTwitchTag, TTwitchTagWithLabel } from 'services/platforms/twitch/tags';
+import { TwitterService } from 'services/integrations/twitter';
+import { Twitter } from '../Twitter';
+import { cloneDeep } from 'lodash';
+import { Debounce } from 'lodash-decorators';
+import { Spinner, ProgressBar } from 'streamlabs-beaker';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm';
+import Utils from 'services/utils';
+import YoutubeEditStreamInfo from 'components/platforms/youtube/YoutubeEditStreamInfo';
+import { YoutubeService } from 'services/platforms/youtube';
+import { RestreamService } from 'services/restream';
 
 @Component({
   components: {
@@ -31,6 +40,10 @@ import { prepareOptions, TTwitchTag, TTwitchTagWithLabel } from 'services/platfo
     BoolInput,
     ListInput,
     TwitchTagsInput,
+    ValidatedForm,
+    Spinner,
+    Twitter,
+    YoutubeEditStreamInfo,
   },
 })
 export default class EditStreamInfo extends Vue {
@@ -41,27 +54,19 @@ export default class EditStreamInfo extends Vue {
   @Inject() customizationService: CustomizationService;
   @Inject() videoEncodingOptimizationService: VideoEncodingOptimizationService;
   @Inject() twitchService: TwitchService;
+  @Inject() twitterService: TwitterService;
+  @Inject() facebookService: FacebookService;
   @Inject() i18nService: I18nService;
+  @Inject() incrementalRolloutService: IncrementalRolloutService;
+  @Inject() restreamService: RestreamService;
 
   // UI State Flags
   searchingGames = false;
   updatingInfo = false;
   updateError = false;
   selectedProfile: IEncoderProfile = null;
-  hasPages = false;
-  populatingModels = false;
 
-  // Form Models:
-
-  streamTitleModel: string = '';
-
-  streamDescriptionModel: string = '';
-
-  gameModel: string = '';
   gameOptions: IListOption<string>[] = [];
-
-  pageModel: string = '';
-  pageOptions: IListOption<string>[] = [];
 
   doNotShowAgainModel: boolean = false;
 
@@ -70,18 +75,85 @@ export default class EditStreamInfo extends Vue {
     date: null,
   };
 
-  facebookPages: IStreamlabsFacebookPages;
-
-  // Debounced Functions:
-  debouncedGameSearch: (search: string) => void;
+  tweetModel: string = '';
 
   searchProfilesPending = false;
+  channelInfo: TCombinedChannelInfo = null;
+  infoError = false;
 
-  allTwitchTags: TTwitchTag[] = null;
+  $refs: {
+    form: ValidatedForm;
+  };
 
-  twitchTags: TTwitchTagWithLabel[] = null;
+  get hasUpdateTagsPermission() {
+    return this.channelInfo.hasUpdateTagsPermission;
+  }
 
-  hasUpdateTagsPermission: boolean = true;
+  get hasPages() {
+    return (
+      !this.infoLoading &&
+      this.isFacebook &&
+      this.facebookService.state?.facebookPages?.pages?.length
+    );
+  }
+
+  get shouldPostTweet() {
+    return (
+      this.twitterService.state.linked &&
+      this.twitterService.state.tweetWhenGoingLive &&
+      !this.isSchedule &&
+      !this.midStreamMode
+    );
+  }
+
+  get formMetadata() {
+    return formMetadata({
+      page: metadata.list({
+        name: 'stream_page',
+        title: $t('Facebook Page'),
+        fullWidth: true,
+        options: this.isFacebook && this.facebookService.state.facebookPages.options,
+      }),
+      game: metadata.list({
+        title: $t('Game'),
+        placeholder: $t('Start typing to search'),
+        options: this.gameOptions,
+        loading: this.searchingGames,
+        internalSearch: false,
+        allowEmpty: true,
+        noResult: $t('No matching game(s) found.'),
+        required: true,
+        disabled: this.updatingInfo,
+      }),
+      title: metadata.text({
+        title: $t('Title'),
+        fullWidth: true,
+        required: true,
+        disabled: this.updatingInfo,
+      }),
+      description: metadata.textArea({
+        title: $t('Description'),
+        disabled: this.updatingInfo,
+        fullWidth: true,
+      }),
+      date: metadata.date({
+        title: $t('Scheduled Date'),
+        disablePastDates: true,
+        required: true,
+        disabled: this.updatingInfo,
+        description: this.isFacebook
+          /* eslint-disable */
+          ? $t('Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.')
+          : undefined,
+          /* eslint-enable */
+      }),
+      time: metadata.timer({
+        title: $t('Scheduled Time'),
+        format: 'hm',
+        max: 24 * 3600,
+      }),
+    });
+  }
 
   get useOptimizedProfile() {
     return this.videoEncodingOptimizationService.state.useOptimizedProfile;
@@ -92,84 +164,18 @@ export default class EditStreamInfo extends Vue {
   }
 
   async created() {
-    this.debouncedGameSearch = debounce((search: string) => this.onGameSearchChange(search), 500);
-
-    this.streamInfoService.streamInfoChanged.subscribe(() => {
-      if (this.isTwitch && this.streamInfoService.state.channelInfo) {
-        if (!this.allTwitchTags && !this.twitchTags) {
-          this.allTwitchTags = this.streamInfoService.state.channelInfo.availableTags;
-          this.twitchTags = prepareOptions(
-            this.i18nService.state.locale || this.i18nService.getFallbackLocale(),
-            this.streamInfoService.state.channelInfo.tags,
-          );
-        }
-      }
-    });
-
-    this.populatingModels = true;
-    // If the stream info pre-fetch failed, we should try again now
-    if (!this.streamInfoService.state.channelInfo) {
-      await this.refreshStreamInfo();
-    }
-    if (this.isServicedPlatform) {
-      const service = getPlatformService(this.userService.platform.type);
-      await service
-        .prepopulateInfo()
-        .then((info: IChannelInfo) => {
-          if (!info) return;
-          return this.streamInfoService.setStreamInfo(info.title, info.description, info.game);
-        })
-        .then(() => this.populateModels());
-    } else {
-      await this.populateModels();
-    }
-    this.populatingModels = false;
-
-    if (this.isTwitch && this.streamInfoService.state.channelInfo) {
-      this.twitchService
-        .hasScope('user:edit:broadcast')
-        .then(hasScope => (this.hasUpdateTagsPermission = hasScope));
-
-      this.allTwitchTags = this.streamInfoService.state.channelInfo.availableTags;
-      this.twitchTags = prepareOptions(
-        this.i18nService.state.locale || this.i18nService.getFallbackLocale(),
-        this.streamInfoService.state.channelInfo.tags,
-      );
-    }
+    await this.populateInfo();
   }
 
-  async populateModels() {
-    this.facebookPages = await this.fetchFacebookPages();
-    this.streamTitleModel = this.streamInfoService.state.channelInfo.title;
-    this.gameModel = this.streamInfoService.state.channelInfo.game || '';
-    this.streamDescriptionModel = this.streamInfoService.state.channelInfo.description;
-    this.gameOptions = [
-      {
-        title: this.streamInfoService.state.channelInfo.game,
-        value: this.streamInfoService.state.channelInfo.game,
-      },
-    ];
-
-    if (this.facebookPages) {
-      this.pageModel = this.facebookPages.page_id;
-      this.pageOptions = this.facebookPages.pages.map((page: IStreamlabsFacebookPage) => ({
-        value: page.id,
-        title: `${page.name} | ${page.category}`,
-      }));
-      this.hasPages = !!this.facebookPages.pages.length;
-    }
-    await this.loadAvailableProfiles();
-  }
-
-  onGameSearchChange(searchString: string) {
+  @Debounce(500)
+  async onGameSearchHandler(searchString: string) {
     if (searchString !== '') {
       this.searchingGames = true;
-      const platform = this.userService.platform.type;
-      const service = getPlatformService(platform);
+      const service = getPlatformService(this.platform);
 
       this.gameOptions = [];
 
-      service.searchGames(searchString).then(games => {
+      return service.searchGames(searchString).then(games => {
         this.searchingGames = false;
         if (games && games.length) {
           games.forEach(game => {
@@ -187,14 +193,14 @@ export default class EditStreamInfo extends Vue {
     if (this.midStreamMode) return;
     this.searchProfilesPending = true;
     this.selectedProfile = await this.videoEncodingOptimizationService.fetchOptimizedProfile(
-      this.gameModel,
+      this.channelInfo.game,
     );
     this.searchProfilesPending = false;
   }
 
   // For some reason, v-model doesn't work with ListInput
   onGameInput(gameModel: string) {
-    this.gameModel = gameModel;
+    this.channelInfo.game = gameModel;
     this.loadAvailableProfiles();
   }
 
@@ -202,63 +208,58 @@ export default class EditStreamInfo extends Vue {
     this.updatingInfo = true;
 
     if (this.doNotShowAgainModel) {
-      alert(
-        $t('You will not be asked again to update your stream info when going live. ') +
+      electron.remote.dialog.showMessageBox({
+        message:
+          $t('You will not be asked again to update your stream info when going live. ') +
           $t('You can re-enable this from the settings.'),
-      );
+      });
 
       this.customizationService.setUpdateStreamInfoOnLive(false);
     }
 
     this.videoEncodingOptimizationService.useOptimizedProfile(this.useOptimizedProfile);
 
-    this.streamInfoService
-      .setStreamInfo(
-        this.streamTitleModel,
-        this.streamDescriptionModel,
-        this.gameModel,
-        this.isTwitch && this.twitchTags && this.twitchTags.length ? this.twitchTags : undefined,
-      )
-      .then(success => {
-        if (success) {
-          if (this.midStreamMode) {
+    if (this.midStreamMode) {
+      const platform = getPlatformService(this.userService.platform.type);
+      platform
+        .putChannelInfo(this.channelInfo)
+        .then(success => {
+          if (success) {
             this.windowsService.closeChildWindow();
           } else {
-            this.goLive();
+            this.updateError = true;
+            this.updatingInfo = false;
           }
-        } else {
-          this.updateError = true;
+        })
+        .catch(e => {
+          this.$toasted.show(e.message, {
+            position: 'bottom-center',
+            className: 'toast-alert',
+            duration: 5000,
+            singleton: true,
+          });
           this.updatingInfo = false;
-        }
-      })
-      .catch(e => {
-        this.$toasted.show(e, {
-          position: 'bottom-center',
-          className: 'toast-alert',
-          duration: 1000,
-          singleton: true,
         });
-        this.updatingInfo = false;
-      });
+      return;
+    }
 
     if (this.selectedProfile && this.useOptimizedProfile) {
       this.videoEncodingOptimizationService.applyProfile(this.selectedProfile);
     }
+
+    this.goLive();
   }
 
   async scheduleStream() {
     this.updatingInfo = true;
 
-    const scheduledStartTime = this.formatDateString();
+    const scheduledStartTime = new Date(
+      this.startTimeModel.date + this.startTimeModel.time * 1000,
+    ).toISOString();
     const service = getPlatformService(this.userService.platform.type);
-    const streamInfo = {
-      title: this.streamTitleModel,
-      description: this.streamDescriptionModel,
-      game: this.gameModel,
-    };
     if (scheduledStartTime) {
       await service
-        .scheduleStream(scheduledStartTime, streamInfo)
+        .scheduleStream(scheduledStartTime, this.channelInfo)
         .then(() => (this.startTimeModel = { time: null, date: null }))
         .then(() => {
           this.$toasted.show(
@@ -281,10 +282,10 @@ export default class EditStreamInfo extends Vue {
           );
         })
         .catch(e => {
-          this.$toasted.show(e.error.message, {
+          this.$toasted.show(e.message, {
             position: 'bottom-center',
             className: 'toast-alert',
-            duration: 50 * e.error.message.length,
+            duration: 50 * e.message.length,
             singleton: true,
           });
         });
@@ -293,101 +294,208 @@ export default class EditStreamInfo extends Vue {
     this.updatingInfo = false;
   }
 
-  handleSubmit() {
+  async handleSubmit() {
+    if (this.infoError || this.updateError) {
+      await this.goLive(true);
+      return;
+    }
+
+    if (await this.$refs.form.validateAndGetErrorsCount()) return;
+    if (this.isFacebook && !this.channelInfo.game) {
+      this.showGameError();
+      return;
+    }
     if (this.isSchedule) return this.scheduleStream();
+    if (this.twitterIsEnabled && this.shouldPostTweet) {
+      const tweetedSuccessfully = await this.handlePostTweet();
+      if (!tweetedSuccessfully) return;
+    }
+
+    if (this.restreamService.shouldGoLiveWithRestream) {
+      this.updatingInfo = true;
+      await this.restreamService.stagePlatform(this.platform, this.channelInfo);
+
+      if (!this.isFinalStep) {
+        this.streamingService.showEditStreamInfo(
+          this.windowQuery.platforms,
+          this.windowQuery.platformStep + 1,
+        );
+        return;
+      }
+    }
+
     this.updateAndGoLive();
   }
 
-  goLive() {
-    this.streamingService.toggleStreaming();
-    this.windowsService.closeChildWindow();
+  showGameError() {
+    this.$toasted.show($t('You must select a game'), {
+      position: 'bottom-center',
+      className: 'toast-alert',
+      duration: 2500,
+      singleton: true,
+    });
+    this.updatingInfo = false;
+  }
+
+  async handlePostTweet() {
+    this.updatingInfo = true;
+    let success = false;
+    try {
+      await this.twitterService.postTweet(this.tweetModel);
+      success = true;
+    } catch (e) {
+      this.$toasted.show(`Twitter: ${e.error}`, {
+        position: 'bottom-center',
+        className: 'toast-alert',
+        duration: 2000,
+        singleton: true,
+      });
+      success = false;
+      this.updateError = true;
+    }
+    this.updatingInfo = false;
+    return success;
+  }
+
+  async goLive(force = false) {
+    try {
+      this.updatingInfo = true;
+      await this.streamingService.toggleStreaming(this.channelInfo, force);
+      this.streamInfoService.createGameAssociation(this.channelInfo.game);
+      this.windowsService.closeChildWindow();
+      // youtube needs additional actions after the stream has been started
+      if (
+        (this.windowQuery.platforms && this.windowQuery.platforms.includes('youtube')) ||
+        this.isYoutube
+      ) {
+        (getPlatformService('youtube') as YoutubeService).showStreamStatusWindow();
+      }
+    } catch (e) {
+      const message = this.platformService.getErrorDescription(e);
+      this.$toasted.show(message, {
+        position: 'bottom-center',
+        className: 'toast-alert',
+        duration: 1000,
+        singleton: true,
+      });
+      this.infoError = true;
+      this.updatingInfo = false;
+    }
   }
 
   cancel() {
     this.windowsService.closeChildWindow();
   }
 
-  // This should have been pre-fetched, but we can force a refresh
-  refreshStreamInfo() {
-    return this.streamInfoService.refreshStreamInfo().then(() => {
-      if (this.streamInfoService.state.channelInfo) this.populateModels();
-    });
+  async populateInfo() {
+    // set the local state of the channelInfo
+    this.channelInfo = null;
+    this.infoError = false;
+    try {
+      this.channelInfo = cloneDeep(
+        await this.platformService.prepopulateInfo(),
+      ) as TCombinedChannelInfo;
+      this.infoError = false;
+    } catch (e) {
+      this.infoError = true;
+      return;
+    }
+
+    // the ListInput component requires the selected game to be in the options list
+    if (this.channelInfo.game) {
+      this.gameOptions = [{ value: this.channelInfo.game, title: this.channelInfo.game }];
+    }
+
+    // check available profiles for the selected game
+    await this.loadAvailableProfiles();
   }
 
-  setTags(tags: TTwitchTagWithLabel[]) {
-    this.twitchTags = tags;
+  get platformService() {
+    return getPlatformService(this.platform);
+  }
+
+  get windowHeading() {
+    if (this.windowQuery.platforms) {
+      return `Setup ${this.platform.charAt(0).toUpperCase() + this.platform.slice(1)} (${this
+        .windowQuery.platformStep + 1}/${this.windowQuery.platforms.length})`;
+    }
+  }
+
+  get windowQuery() {
+    return this.windowsService.getChildWindowQueryParams();
+  }
+
+  get isFinalStep() {
+    if (!this.windowQuery.platforms) return true;
+
+    return this.windowQuery.platforms.length === this.windowQuery.platformStep + 1;
+  }
+
+  get platform(): TPlatform {
+    if (this.windowQuery.platforms) {
+      return this.windowQuery.platforms[this.windowQuery.platformStep];
+    }
+
+    return this.userService.platform.type;
   }
 
   get isTwitch() {
-    return this.userService.platform.type === 'twitch';
+    return this.platform === 'twitch';
   }
 
   get isYoutube() {
-    return this.userService.platform.type === 'youtube';
+    return this.platform === 'youtube';
   }
 
   get isMixer() {
-    return this.userService.platform.type === 'mixer';
+    return this.platform === 'mixer';
   }
 
   get isFacebook() {
-    return this.userService.platform.type === 'facebook';
+    return this.platform === 'facebook';
   }
 
   get isServicedPlatform() {
     return this.isFacebook || this.isYoutube || this.isTwitch || this.isMixer;
   }
 
+  get twitterIsEnabled() {
+    // Twitter is always done on the final step
+    if (!this.isFinalStep) return false;
+
+    return (
+      Utils.isPreview() ||
+      this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.twitter)
+    );
+  }
+
   get submitText() {
+    if (!this.isFinalStep) return $t('Next');
     if (this.midStreamMode) return $t('Update');
     if (this.isSchedule) return $t('Schedule');
+    if (this.twitterIsEnabled && this.shouldPostTweet) return $t('Tweet & Go Live');
 
+    if (this.infoError || this.updateError) return $t('Go Live');
     return $t('Confirm & Go Live');
   }
 
-  get midStreamMode() {
-    return this.streamingService.isStreaming;
-  }
+  midStreamMode = this.streamingService.isStreaming;
 
   get isSchedule() {
     return this.windowsService.getChildWindowQueryParams().isSchedule;
   }
 
   get infoLoading() {
-    return this.streamInfoService.state.fetching;
-  }
-
-  get infoError() {
-    return this.streamInfoService.state.error;
-  }
-
-  get gameMetadata() {
-    return {
-      name: 'game',
-      loading: this.searchingGames,
-      internalSearch: false,
-      allowEmpty: true,
-      options: this.gameOptions,
-      noResult: $t('No matching game(s) found.'),
-    };
-  }
-
-  fetchFacebookPages() {
-    return this.userService.getFacebookPages();
-  }
-
-  setFacebookPageId(value: string) {
-    this.pageModel = value;
-    this.userService.postFacebookPage(value);
+    return !this.channelInfo && !this.infoError;
   }
 
   openFBPageCreateLink() {
-    shell.openExternal('https://www.facebook.com/pages/creation/');
+    shell.openExternal('https://www.facebook.com/gaming/pages/create?ref=streamlabs');
     this.windowsService.closeChildWindow();
   }
 
   get optimizedProfileMetadata() {
-    const game = this.selectedProfile.game !== 'DEFAULT' ? `for ${this.gameModel}` : '';
+    const game = this.selectedProfile.game !== 'DEFAULT' ? `for ${this.channelInfo.game}` : '';
     return {
       title: $t('Use optimized encoder settings ') + game,
       tooltip: $t(
@@ -395,42 +503,5 @@ export default class EditStreamInfo extends Vue {
           'resolution may be changed for a better quality of experience',
       ),
     };
-  }
-
-  get dateMetadata() {
-    return {
-      title: $t('Scheduled Date'),
-      dateFormat: 'MM/dd/yyyy',
-      placeholder: 'MM/DD/YYYY',
-      description: this.isFacebook
-        ? $t(
-            'Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.',
-          )
-        : undefined,
-    };
-  }
-
-  get timeMetadata() {
-    return { title: $t('Scheduled Time'), format: 'hm', max: 24 * 3600 };
-  }
-
-  private formatDateString() {
-    try {
-      const dateArray = this.startTimeModel.date.split('/');
-      let hours: string | number = Math.floor(this.startTimeModel.time / 3600);
-      hours = hours < 10 ? `0${hours}` : hours;
-      let minutes: string | number = (this.startTimeModel.time % 3600) / 60;
-      minutes = minutes < 10 ? `0${minutes}` : minutes;
-      return `${dateArray[2]}-${dateArray[0]}-${
-        dateArray[1]
-      }T${hours}:${minutes}:00.0${moment().format('Z')}`;
-    } catch {
-      this.$toasted.show($t('Please enter a valid date'), {
-        position: 'bottom-center',
-        className: 'toast-alert',
-        duration: 1000,
-        singleton: true,
-      });
-    }
   }
 }

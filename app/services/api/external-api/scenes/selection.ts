@@ -30,12 +30,15 @@ export class Selection implements ISceneItemActions {
   @InjectFromExternalApi() private scenesService: ScenesService;
   @Fallback() private internalSelection: InternalSelection;
 
-  constructor(public sceneId?: string, itemsList: string[] = []) {
-    if (!this.sceneId) return;
+  constructor(sceneId: string, itemsList: string[] = []) {
     this.internalSelection = new InternalSelection(sceneId, itemsList);
   }
 
-  get selection(): InternalSelection | InternalSelectionService {
+  get sceneId() {
+    return this.internalSelection.sceneId;
+  }
+
+  protected get selection(): InternalSelection | InternalSelectionService {
     return this.internalSelection;
   }
 
@@ -258,6 +261,14 @@ export class Selection implements ISceneItemActions {
     return this.selection.setVisibility(visible);
   }
 
+  setStreamVisible(streamVisible: boolean): void {
+    return this.selection.setStreamVisible(streamVisible);
+  }
+
+  setRecordingVisible(recordingVisible: boolean): void {
+    return this.selection.setRecordingVisible(recordingVisible);
+  }
+
   setTransform(transform: IPartialTransform): void {
     return this.selection.setTransform(transform);
   }
@@ -307,5 +318,19 @@ export class Selection implements ISceneItemActions {
 
   scaleWithOffset(scale: IVec2, offset: IVec2) {
     return this.selection.scale(scale, offset);
+  }
+
+  /**
+   * returns true if selection contains only one SceneFolder
+   */
+  isSceneFolder(): boolean {
+    return this.selection.isSceneFolder();
+  }
+
+  /**
+   * returns true if selection contains only one SceneItem
+   */
+  isSceneItem(): boolean {
+    return this.selection.isSceneFolder();
   }
 }

@@ -6,10 +6,9 @@ import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { IAlertBoxData, AlertBoxService } from 'services/widgets/settings/alert-box';
 import { $t } from 'services/i18n';
 
-import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import { Inject } from 'services/core/injector';
 import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
-import { FacemasksService } from 'services/facemasks';
 
 const alertNameMap = () => ({
   bits: $t('Bits'),
@@ -36,7 +35,9 @@ const alertNameMap = () => ({
   likes: $t('Likes'),
   shares: $t('Shares'),
   fbfollows: $t('Follows'),
-  facemasks: $t('Facemask Donations'),
+  loyaltystore: $t('Cloudbot Store'),
+  stickers: $t('Stickers'),
+  effects: $t('Effects/Rallies'),
 });
 
 const triggerAmountMap = {
@@ -46,7 +47,7 @@ const triggerAmountMap = {
   raids: 'raid_raider_minimum',
 };
 
-const HAS_ALERT_SETTINGS = ['donations', 'bits', 'hosts', 'raids'];
+const HAS_ALERT_SETTINGS = ['donations', 'bits', 'hosts', 'raids', 'effects', 'stickers'];
 const HAS_DONOR_MESSAGE = [
   'donations',
   'bits',
@@ -71,7 +72,6 @@ const HAS_DONOR_MESSAGE = [
 })
 export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxService> {
   @Inject() alertBoxService: AlertBoxService;
-  @Inject() facemasksService: FacemasksService;
 
   $refs: { [key: string]: HTMLElement };
 
@@ -101,10 +101,12 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
   editingName: string = null;
   languages: any[] = [];
 
-  facemaskEnabled = this.facemasksService.getEnabledStatus();
-
   get metadata() {
-    return this.service.getMetadata(this.selectedAlert, this.languages);
+    return this.service.getMetadata(
+      this.selectedAlert,
+      this.languages,
+      this.selectedVariation.condition,
+    );
   }
 
   get selectedVariation() {
@@ -135,7 +137,7 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
         label: this.selectedAlert === 'subs' ? $t('Resub Message') : $t('Donor Message'),
       });
     }
-    if (HAS_ALERT_SETTINGS.includes(this.selectedAlert) || this.selectedId !== 'default') {
+    if (HAS_ALERT_SETTINGS.includes(this.selectedAlert) || this.selectedId.match('default')) {
       baseItems.push({ value: 'alert', label: $t('Alert Settings') });
     }
     return baseItems;
@@ -143,6 +145,10 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
 
   get conditions() {
     return this.alertBoxService.conditionsByType(this.selectedAlert);
+  }
+
+  get conditionData() {
+    return this.alertBoxService.conditionDataByCondition(this.selectedVariation);
   }
 
   get minTriggerAmount() {
@@ -167,9 +173,17 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
     }
   }
 
+  handleUnlimitedModerationDelay(value: boolean) {
+    if (value) {
+      this.wData.settings.moderation_delay = -1;
+    } else {
+      this.wData.settings.moderation_delay = 0;
+    }
+  }
+
   selectAlertType(alertName: string) {
-    this.selectedId = 'default';
     this.selectedAlert = this.selectedAlert === alertName ? 'general' : alertName;
+    this.selectedId = `default-${this.selectedAlert}`;
   }
 
   selectVariation(id: string) {
@@ -190,7 +204,7 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
   }
 
   removeVariation(id: string) {
-    this.selectedId = 'default';
+    this.selectedId = `default-${this.selectedAlert}`;
     this.wData.settings[this.selectedAlert].variations = this.wData.settings[
       this.selectedAlert
     ].variations.filter((variation: IAlertBoxVariation) => variation.id !== id);
@@ -202,7 +216,7 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
     this.selectedId = id;
     // Above is done here with a stop propagation in the input to avoid possible race conditions which would lead to
     // this.selectedVariation potentially being incorrect
-    const field = <HTMLInputElement>this.$refs[`${id}-name-input`][0];
+    const field: HTMLInputElement = this.$refs[`${id}-name-input`][0];
     this.$nextTick(() => field.focus());
   }
 
@@ -213,23 +227,5 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
   nameBlurHandler(id: string) {
     this.save();
     this.editingName = null;
-  }
-
-  handleFacemaskInput() {
-    if (this.selectedAlert === 'facemasks') {
-      const { duration } = this.selectedVariation.settings;
-      this.facemasksService
-        .updateFacemaskSettings({
-          duration,
-          enabled: this.facemaskEnabled,
-          device: this.facemasksService.getEnabledDevice(),
-          donations_enabled: this.facemasksService.state.settings.donations_enabled,
-          subs_enabled: this.facemasksService.state.settings.donations_enabled,
-          bits_enabled: this.facemasksService.state.settings.donations_enabled,
-          bits_price: this.facemasksService.state.settings.bits_price,
-        })
-        .catch(() => this.onFailHandler($t('Something went wrong updating Facemask settings')));
-    }
-    this.save();
   }
 }

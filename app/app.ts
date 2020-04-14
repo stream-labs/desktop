@@ -1,5 +1,8 @@
-import { I18nService } from 'services/i18n';
+/*global SLOBS_BUNDLE_ID*/
 
+import { I18nService, $t } from 'services/i18n';
+
+// eslint-disable-next-line
 window['eval'] = global.eval = () => {
   throw new Error('window.eval() is disabled for security');
 };
@@ -9,6 +12,7 @@ import Vue from 'vue';
 
 import { createStore } from './store';
 import { WindowsService } from './services/windows';
+import { ObsUserPluginsService } from 'services/obs-user-plugins';
 import { AppService } from './services/app';
 import Utils from './services/utils';
 import electron from 'electron';
@@ -21,14 +25,22 @@ import VModal from 'vue-js-modal';
 import VeeValidate from 'vee-validate';
 import ChildWindow from 'components/windows/ChildWindow.vue';
 import OneOffWindow from 'components/windows/OneOffWindow.vue';
-import electronLog from 'electron-log';
 import { UserService, setSentryContext } from 'services/user';
 import { getResource } from 'services';
+import * as obs from '../obs-api';
+import path from 'path';
+import util from 'util';
+import uuid from 'uuid/v4';
+import Blank from 'components/windows/Blank.vue';
+import Main from 'components/windows/Main.vue';
+import CustomLoader from 'components/CustomLoader';
 
-const { ipcRenderer, remote } = electron;
-const slobsVersion = remote.process.env.SLOBS_VERSION;
-const isProduction = process.env.NODE_ENV === 'production';
-const isPreview = !!remote.process.env.SLOBS_PREVIEW;
+const crashHandler = window['require']('crash-handler');
+
+const { ipcRenderer, remote, app, contentTracing } = electron;
+const slobsVersion = Utils.env.SLOBS_VERSION;
+const isProduction = Utils.env.NODE_ENV === 'production';
+const isPreview = !!Utils.env.SLOBS_PREVIEW;
 
 // This is the development DSN
 let sentryDsn = 'https://8f444a81edd446b69ce75421d5e91d4d@sentry.io/252950';
@@ -44,13 +56,51 @@ if (isProduction) {
     submitURL:
       'https://sentry.io/api/1283430/minidump/?sentry_key=01fc20f909124c8499b4972e9a5253f2',
     extra: {
-      version: slobsVersion,
+      'sentry[release]': `${slobsVersion}-${SLOBS_BUNDLE_ID}`,
       processType: 'renderer',
     },
   });
 }
 
 let usingSentry = false;
+const windowId = Utils.getWindowId();
+
+function wrapLogFn(fn: string) {
+  const old: Function = console[fn];
+  console[fn] = (...args: any[]) => {
+    old.apply(console, args);
+
+    const level = fn === 'log' ? 'info' : fn;
+
+    sendLogMsg(level, ...args);
+  };
+}
+
+function sendLogMsg(level: string, ...args: any[]) {
+  const serialized = args
+    .map(arg => {
+      if (typeof arg === 'string') return arg;
+
+      return util.inspect(arg);
+    })
+    .join(' ');
+
+  ipcRenderer.send('logmsg', { level, sender: windowId, message: serialized });
+}
+
+['log', 'info', 'warn', 'error'].forEach(wrapLogFn);
+
+if (windowId === 'worker') {
+  console.log(`Bundle Id: ${SLOBS_BUNDLE_ID}`);
+}
+
+window.addEventListener('error', e => {
+  sendLogMsg('error', e.error);
+});
+
+window.addEventListener('unhandledrejection', e => {
+  sendLogMsg('error', e.reason);
+});
 
 if (
   (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) &&
@@ -73,10 +123,14 @@ if (
         return splitArray[splitArray.length - 1];
       };
 
-      if (event.exception) {
+      if (event.exception && event.exception.values[0].stacktrace) {
         event.exception.values[0].stacktrace.frames.forEach(frame => {
           frame.filename = normalize(frame.filename);
         });
+      }
+
+      if (event.request) {
+        event.request.url = normalize(event.request.url);
       }
 
       return event;
@@ -115,100 +169,144 @@ document.addEventListener('dragover', event => event.preventDefault());
 document.addEventListener('dragenter', event => event.preventDefault());
 document.addEventListener('drop', event => event.preventDefault());
 
-document.addEventListener('DOMContentLoaded', () => {
-  createStore().then(async store => {
-    // handle closeWindow event from the main process
+export const apiInitErrorResultToMessage = (resultCode: obs.EVideoCodes) => {
+  switch (resultCode) {
+    case obs.EVideoCodes.NotSupported: {
+      return $t('OBSInit.NotSupportedError');
+    }
+    case obs.EVideoCodes.ModuleNotFound: {
+      return $t('OBSInit.ModuleNotFoundError');
+    }
+    default: {
+      return $t('OBSInit.UnknownError');
+    }
+  }
+};
+
+const showDialog = (message: string): void => {
+  electron.remote.dialog.showErrorBox($t('OBSInit.ErrorTitle'), message);
+};
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const store = createStore();
+
+  // setup VueI18n plugin
+  Vue.use(VueI18n);
+
+  const i18n = new VueI18n({
+    locale: 'en-US',
+    fallbackLocale: 'en-US',
+    messages: {},
+    silentTranslationWarn: false,
+    missing: (language: string, key: string) => {
+      if (isProduction) return;
+      console.error(`Missing translation found for ${language} -- "${key}"`);
+    },
+  });
+  I18nService.setVuei18nInstance(i18n);
+
+  if (!Utils.isOneOffWindow()) {
+    crashHandler.registerProcess(process.pid, false);
+  }
+
+  // The worker window can safely access services immediately
+  if (Utils.isWorkerWindow()) {
     const windowsService: WindowsService = WindowsService.instance;
-    if (Utils.isMainWindow()) {
-      ipcRenderer.on('closeWindow', () => windowsService.closeMainWindow());
-      AppService.instance.load();
-    } else {
-      if (Utils.isChildWindow()) {
-        ipcRenderer.on('closeWindow', () => windowsService.closeChildWindow());
-      }
 
-      if (usingSentry) {
-        const userService = getResource<UserService>('UserService');
+    // Services
+    const appService: AppService = AppService.instance;
+    const obsUserPluginsService: ObsUserPluginsService = ObsUserPluginsService.instance;
 
-        const ctx = userService.getSentryContext();
-        if (ctx) setSentryContext(ctx);
-        userService.sentryContext.subscribe(setSentryContext);
-      }
+    // This is used for debugging
+    window['obs'] = obs;
+
+    // Host a new OBS server instance
+    obs.IPC.host(`slobs-${uuid()}`);
+    obs.NodeObs.SetWorkingDirectory(
+      path.join(
+        electron.remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
+        'node_modules',
+        'obs-studio-node',
+      ),
+    );
+
+    await obsUserPluginsService.initialize();
+
+    // Initialize OBS API
+    const apiResult = obs.NodeObs.OBS_API_initAPI(
+      'en-US',
+      appService.appDataDirectory,
+      electron.remote.process.env.SLOBS_VERSION,
+    );
+
+    if (apiResult !== obs.EVideoCodes.Success) {
+      const message = apiInitErrorResultToMessage(apiResult);
+      showDialog(message);
+
+      crashHandler.unregisterProcess(appService.pid);
+
+      obs.NodeObs.StopCrashHandler();
+      obs.IPC.disconnect();
+
+      electron.ipcRenderer.send('shutdownComplete');
+      return;
     }
 
-    // setup VueI18n plugin
-    Vue.use(VueI18n);
-    const i18nService: I18nService = I18nService.instance;
-    await i18nService.load(); // load translations from a disk
-    const i18n = new VueI18n({
-      locale: i18nService.state.locale,
-      fallbackLocale: i18nService.getFallbackLocale(),
-      messages: i18nService.getLoadedDictionaries(),
-      silentTranslationWarn: true,
-    });
-    I18nService.setVuei18nInstance(i18n);
+    ipcRenderer.on('closeWindow', () => windowsService.closeMainWindow());
+    I18nService.instance.load();
+    AppService.instance.load();
+  }
 
-    // create a root Vue component
-    const windowId = Utils.getCurrentUrlParams().windowId;
-    const vm = new Vue({
-      i18n,
-      store,
-      el: '#app',
-      render: h => {
-        if (windowId === 'child') return h(ChildWindow);
-        if (windowId === 'main') {
-          const componentName = windowsService.state[windowId].componentName;
-          return h(windowsService.components[componentName]);
-        }
-        return h(OneOffWindow);
-      },
+  if (Utils.isChildWindow()) {
+    ipcRenderer.on('closeWindow', () => {
+      const windowsService: WindowsService = WindowsService.instance;
+      windowsService.closeChildWindow();
     });
+  }
+
+  // create a root Vue component
+  const windowId = Utils.getCurrentUrlParams().windowId;
+  const vm = new Vue({
+    i18n,
+    store,
+    el: '#app',
+    render: h => {
+      if (windowId === 'worker') return h(Blank);
+      if (windowId === 'child') {
+        if (store.state.bulkLoadFinished) {
+          return h(ChildWindow);
+        }
+
+        return h(CustomLoader);
+      }
+      if (windowId === 'main') return h(Main);
+      return h(OneOffWindow);
+    },
+  });
+
+  if (Utils.isMainWindow()) {
+    electron.remote.getCurrentWindow().show();
+  }
+
+  // Perform some final initialization now that services are ready
+  ipcRenderer.on('initFinished', () => {
+    // setup translations for the current window
+    if (!Utils.isWorkerWindow()) {
+      I18nService.uploadTranslationsToVueI18n();
+    }
+
+    if (usingSentry) {
+      const userService = getResource<UserService>('UserService');
+      const ctx = userService.getSentryContext();
+      if (ctx) setSentryContext(ctx);
+      userService.sentryContext.subscribe(setSentryContext);
+    }
   });
 });
 
 if (Utils.isDevMode()) {
   window.addEventListener('error', () => ipcRenderer.send('showErrorAlert'));
-}
-
-// ERRORS LOGGING
-
-// catch and log unhandled errors/rejected promises:
-electronLog.catchErrors({ onError: e => electronLog.log(`from ${Utils.getWindowId()}`, e) });
-
-// override console.error
-const consoleError = console.error;
-console.error = function(...args: any[]) {
-  // TODO: Suppress N-API error until we upgrade electron to v4.x
-  if (/N\-API is an experimental feature/.test(args[0])) return;
-  if (Utils.isDevMode()) ipcRenderer.send('showErrorAlert');
-  writeErrorToLog(...args);
-  consoleError.call(console, ...args);
-};
-
-/**
- * Try to serialize error arguments and stack and write them to the log file
- */
-function writeErrorToLog(...errors: (Error | string)[]) {
-  let message = '';
-
-  // format error arguments depending on the type
-  const formattedErrors = errors.map(error => {
-    if (error instanceof Error) {
-      message = error.stack;
-    } else if (typeof error === 'string') {
-      message = error;
-    } else {
-      try {
-        message = JSON.stringify(error);
-      } catch (e) {
-        message = 'UNSERIALIZABLE';
-      }
-    }
-    return message;
+  window.addEventListener('keyup', ev => {
+    if (ev.key === 'F12') electron.ipcRenderer.send('openDevTools');
   });
-
-  // send error to the main process via IPC
-  electronLog.error(`Error from ${Utils.getWindowId()} window:
-    ${formattedErrors.join('\n')}
-  `);
 }

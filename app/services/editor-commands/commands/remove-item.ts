@@ -3,9 +3,9 @@ import { ScenesService } from 'services/scenes';
 import { Inject } from 'services/core/injector';
 import { SourcesNode } from 'services/scene-collections/nodes/sources';
 import { Source } from 'services/sources';
-import { ResetTransformCommand } from './reset-transform';
 import { ReorderNodesCommand, EPlaceType } from './reorder-nodes';
 import { $t } from 'services/i18n';
+import { ISceneItemSettings } from 'services/api/external-api/scenes';
 
 // Removing and recreating a source is a very complex event.
 // We can save a lot of time by leveraging the scene collection system.
@@ -28,8 +28,9 @@ export class RemoveItemCommand extends Command {
   private sourceId: string;
   private sourceReviver: SourceReviver;
 
-  private resetTransformSubcommand: ResetTransformCommand;
   private reorderNodesSubcommand: ReorderNodesCommand;
+
+  private settings: ISceneItemSettings;
 
   constructor(private sceneItemId: string) {
     super();
@@ -37,20 +38,17 @@ export class RemoveItemCommand extends Command {
 
   get description() {
     return $t('Remove %{sourceName}', {
-      sourceName: this.scenesService.getSceneItem(this.sceneItemId).name,
+      sourceName: this.scenesService.views.getSceneItem(this.sceneItemId).name,
     });
   }
 
   async execute() {
-    const item = this.scenesService.getSceneItem(this.sceneItemId);
-    const scene = this.scenesService.getScene(item.sceneId);
+    const item = this.scenesService.views.getSceneItem(this.sceneItemId);
+    const scene = this.scenesService.views.getScene(item.sceneId);
     this.sceneId = item.sceneId;
     this.sourceId = item.sourceId;
 
-    // We can save some work by resetting the transform first
-    // and then rolling it back to restore it later.
-    this.resetTransformSubcommand = new ResetTransformCommand(scene.getSelection(this.sceneItemId));
-    this.resetTransformSubcommand.execute();
+    this.settings = item.getSettings();
 
     // Save even more work by moving this item top the top of the
     // stack and then rolling it back to restore.
@@ -80,11 +78,11 @@ export class RemoveItemCommand extends Command {
       await this.sourceReviver.load({});
     }
 
-    const scene = this.scenesService.getScene(this.sceneId);
+    const scene = this.scenesService.views.getScene(this.sceneId);
 
-    scene.addSource(this.sourceId, { id: this.sceneItemId, select: false });
+    const item = scene.addSource(this.sourceId, { id: this.sceneItemId, select: false });
 
     this.reorderNodesSubcommand.rollback();
-    this.resetTransformSubcommand.rollback();
+    item.setSettings(this.settings);
   }
 }

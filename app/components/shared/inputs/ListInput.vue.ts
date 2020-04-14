@@ -2,15 +2,19 @@ import { Component, Prop } from 'vue-property-decorator';
 import { Multiselect } from 'vue-multiselect';
 import { IListMetadata, IListOption } from './index';
 import { BaseInput } from './BaseInput';
+import { Spinner } from 'streamlabs-beaker';
 
 @Component({
-  components: { Multiselect },
+  components: { Multiselect, Spinner },
 })
 export default class ListInput extends BaseInput<string, IListMetadata<string>> {
   @Prop() readonly value: string;
   @Prop() readonly metadata: IListMetadata<string>;
   @Prop() readonly title: string;
-  @Prop({ default: 'Select Option' }) readonly placeholder: string;
+
+  get placeholder() {
+    return this.options.placeholder || 'Select Option';
+  }
 
   onInputHandler(option: IListOption<string>) {
     // Fixes a render issue when reselecting the same option as currently selected
@@ -38,7 +42,7 @@ export default class ListInput extends BaseInput<string, IListMetadata<string>> 
     }
 
     if (option) return option;
-    if (!!this.getOptions().allowEmpty) return null;
+    if (this.getOptions().allowEmpty) return null;
     return options[0];
   }
 

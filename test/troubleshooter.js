@@ -7,7 +7,7 @@ useSpectron();
 test('Troubleshooter notifications', async t => {
   const app = t.context.app;
   const client = await getClient();
-  const performanceMonitor = client.getResource('PerformanceMonitorService');
+  const performanceMonitor = client.getResource('PerformanceService');
 
   t.false(await app.client.isExisting('.notification.warning'));
 

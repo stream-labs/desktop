@@ -21,6 +21,7 @@ export default class HScroll extends Vue {
   };
 
   mounted() {
+    // eslint-disable-next-line no-new
     new ResizeSensor(this.$el, () => {
       this.onInvalidateHandler();
     });

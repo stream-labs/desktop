@@ -38,9 +38,10 @@ export class Scene {
   @Inject() private sourcesService: SourcesService;
   @Inject() private selectionService: SelectionService;
 
-  private readonly state: IScene;
+  readonly state: IScene;
 
   constructor(sceneId: string) {
+    if (!sceneId) console.trace('undefined scene id');
     this.state = this.scenesService.state.scenes[sceneId];
     Utils.applyProxy(this, this.state);
   }
@@ -122,7 +123,7 @@ export class Scene {
   }
 
   setName(newName: string) {
-    const sceneSource = this.sourcesService.getSource(this.id);
+    const sceneSource = this.sourcesService.views.getSource(this.id);
     sceneSource.setName(newName);
     this.SET_NAME(newName);
   }
@@ -139,15 +140,14 @@ export class Scene {
   }
 
   addSource(sourceId: string, options: ISceneNodeAddOptions = {}): SceneItem {
-    const source = this.sourcesService.getSource(sourceId);
+    const source = this.sourcesService.views.getSource(sourceId);
     if (!source) throw new Error(`Source ${sourceId} not found`);
 
     if (!this.canAddSource(sourceId)) return null;
 
     const sceneItemId = options.id || uuid();
 
-    let obsSceneItem: obs.ISceneItem;
-    obsSceneItem = this.getObsScene().add(source.getObsInput());
+    const obsSceneItem: obs.ISceneItem = this.getObsScene().add(source.getObsInput());
 
     this.ADD_SOURCE_TO_SCENE(sceneItemId, source.sourceId, obsSceneItem.id);
     const sceneItem = this.getItem(sceneItemId);
@@ -304,20 +304,12 @@ export class Scene {
    * Makes sure all scene items are in the correct order in OBS.
    */
   private reconcileNodeOrderWithObs() {
-    const obsScene = this.getObsScene();
-    const destOrder = this.getItems().map(item => item.obsSceneItemId);
-    const currentOrder = this.getObsScene()
-      .getItems()
-      .reverse()
-      .map(item => item.id);
-
-    destOrder.forEach(ind => {
-      if (destOrder[ind] === currentOrder[ind]) return;
-      const itemToMoveInd = currentOrder.indexOf(destOrder[ind]);
-      const itemToMove = currentOrder[itemToMoveInd];
-      currentOrder.splice(itemToMoveInd, 1);
-      currentOrder.splice(ind, 0, itemToMove);
-      obsScene.moveItem(itemToMoveInd, ind);
+    this.getItems().forEach((item, index) => {
+      const currentIndex = this.getObsScene()
+        .getItems()
+        .reverse()
+        .findIndex(obsItem => obsItem.id === item.obsSceneItemId);
+      this.getObsScene().moveItem(currentIndex, index);
     });
   }
 
@@ -339,7 +331,7 @@ export class Scene {
     // tslint:disable-next-line:no-parameter-reassignment TODO
     nodes = nodes.filter(sceneNode => {
       if (sceneNode.sceneNodeType === 'folder') return true;
-      const source = this.sourcesService.getSource(sceneNode.sourceId);
+      const source = this.sourcesService.views.getSource(sceneNode.sourceId);
       if (!source) return false;
       arrayItems.push({
         name: source.sourceId,
@@ -353,6 +345,8 @@ export class Scene {
         y: sceneNode.y == null ? 0 : sceneNode.y,
         locked: sceneNode.locked,
         rotation: sceneNode.rotation || 0,
+        streamVisible: sceneNode.streamVisible,
+        recordingVisible: sceneNode.recordingVisible,
       });
       return true;
     });
@@ -379,14 +373,14 @@ export class Scene {
   }
 
   canAddSource(sourceId: string): boolean {
-    const source = this.sourcesService.getSource(sourceId);
+    const source = this.sourcesService.views.getSource(sourceId);
     if (!source) return false;
 
     // if source is scene then traverse the scenes tree to detect possible infinity scenes loop
     if (source.type !== 'scene') return true;
     if (this.id === source.sourceId) return false;
 
-    const sceneToAdd = this.scenesService.getScene(source.sourceId);
+    const sceneToAdd = this.scenesService.views.getScene(source.sourceId);
 
     if (!sceneToAdd) return true;
 
@@ -396,7 +390,7 @@ export class Scene {
   hasNestedScene(sceneId: string) {
     const childScenes = this.getItems()
       .filter(sceneItem => sceneItem.type === 'scene')
-      .map(sceneItem => this.scenesService.getScene(sceneItem.sourceId));
+      .map(sceneItem => this.scenesService.views.getScene(sceneItem.sourceId));
 
     for (const childScene of childScenes) {
       if (childScene.id === sceneId) return true;
@@ -414,7 +408,7 @@ export class Scene {
     result
       .filter(sceneItem => sceneItem.type === 'scene')
       .map(sceneItem => {
-        return this.scenesService.getScene(sceneItem.sourceId).getNestedItems();
+        return this.scenesService.views.getScene(sceneItem.sourceId).getNestedItems();
       })
       .forEach(sceneItems => {
         result = result.concat(sceneItems);
@@ -442,7 +436,7 @@ export class Scene {
   getNestedScenes(): Scene[] {
     const scenes = this.getNestedSources()
       .filter(source => source.type === 'scene')
-      .map(sceneSource => this.scenesService.getScene(sceneSource.sourceId));
+      .map(sceneSource => this.scenesService.views.getScene(sceneSource.sourceId));
     const resultScenes: Scene[] = [];
 
     scenes.forEach(scene => {
@@ -459,7 +453,7 @@ export class Scene {
    * returns the source linked to scene
    */
   getSource(): Source {
-    return this.sourcesService.getSource(this.id);
+    return this.sourcesService.views.getSource(this.id);
   }
 
   getResourceId() {
@@ -502,6 +496,8 @@ export class Scene {
 
       visible: true,
       locked: false,
+      streamVisible: true,
+      recordingVisible: true,
     });
   }
 

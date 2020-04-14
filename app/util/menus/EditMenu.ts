@@ -14,6 +14,7 @@ import { AudioService } from 'services/audio';
 import electron from 'electron';
 import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
+import { ERenderingMode } from '../../../obs-api';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;
@@ -34,7 +35,7 @@ export class EditMenu extends Menu {
   @Inject() private audioService: AudioService;
   @Inject() private editorCommandsService: EditorCommandsService;
 
-  private scene = this.scenesService.getScene(this.options.selectedSceneId);
+  private scene = this.scenesService.views.getScene(this.options.selectedSceneId);
 
   private readonly source: Source;
 
@@ -42,7 +43,7 @@ export class EditMenu extends Menu {
     super();
 
     if (this.options.selectedSourceId) {
-      this.source = this.sourcesService.getSource(this.options.selectedSourceId);
+      this.source = this.sourcesService.views.getSource(this.options.selectedSourceId);
     } else if (this.options.showSceneItemMenu && this.selectionService.isSceneItem()) {
       this.source = this.selectionService.getItems()[0].getSource();
     }
@@ -61,7 +62,7 @@ export class EditMenu extends Menu {
 
       this.append({
         label: $t('Paste (Duplicate)'),
-        enabled: this.clipboardService.hasItems(),
+        enabled: this.clipboardService.canDuplicate(),
         click: () => this.clipboardService.paste(true),
       });
     }
@@ -90,14 +91,6 @@ export class EditMenu extends Menu {
       this.append({ type: 'separator' });
 
       this.append({
-        label: $t('Remove'),
-        accelerator: 'Delete',
-        click: () => {
-          this.selectionService.remove();
-        },
-      });
-
-      this.append({
         label: $t('Transform'),
         submenu: this.transformSubmenu().menu,
       });
@@ -109,6 +102,12 @@ export class EditMenu extends Menu {
 
       if (selectedItem) {
         const visibilityLabel = selectedItem.visible ? $t('Hide') : $t('Show');
+        const streamVisLabel = selectedItem.streamVisible
+          ? $t('Hide on Stream')
+          : $t('Show on Stream');
+        const recordingVisLabel = selectedItem.recordingVisible
+          ? $t('Hide on Recording')
+          : $t('Show on Recording');
 
         if (!isMultipleSelection) {
           this.append({
@@ -118,9 +117,24 @@ export class EditMenu extends Menu {
             },
           });
           this.append({
+            label: streamVisLabel,
+            click: () => {
+              selectedItem.setStreamVisible(!selectedItem.streamVisible);
+            },
+          });
+          this.append({
+            label: recordingVisLabel,
+            click: () => {
+              selectedItem.setRecordingVisible(!selectedItem.recordingVisible);
+            },
+          });
+          this.append({
             label: $t('Create Source Projector'),
             click: () => {
-              this.projectorService.createProjector(selectedItem.sourceId);
+              this.projectorService.createProjector(
+                ERenderingMode.OBS_MAIN_RENDERING,
+                selectedItem.sourceId,
+              );
             },
           });
         } else {
@@ -143,13 +157,15 @@ export class EditMenu extends Menu {
         this.append({
           label: $t('Export Widget'),
           click: () => {
-            const chosenPath = electron.remote.dialog.showSaveDialog({
-              filters: [{ name: 'Widget File', extensions: ['widget'] }],
-            });
+            electron.remote.dialog
+              .showSaveDialog({
+                filters: [{ name: 'Widget File', extensions: ['widget'] }],
+              })
+              .then(({ filePath }) => {
+                if (!filePath) return;
 
-            if (!chosenPath) return;
-
-            this.widgetsService.saveWidgetFile(chosenPath, selectedItem.sceneItemId);
+                this.widgetsService.saveWidgetFile(filePath, selectedItem.sceneItemId);
+              });
           },
         });
       }
@@ -160,10 +176,60 @@ export class EditMenu extends Menu {
         label: $t('Rename'),
         click: () =>
           this.scenesService.showNameFolder({
-            sceneId: this.scenesService.activeSceneId,
+            sceneId: this.scenesService.views.activeSceneId,
             renameId: this.selectionService.getFolders()[0].id,
           }),
       });
+    }
+
+    if (this.source) {
+      this.append({
+        label: $t('Remove'),
+        accelerator: 'Delete',
+        click: () => {
+          // if scene items are selected than remove the selection
+          if (this.options.showSceneItemMenu) {
+            this.selectionService.remove();
+          } else {
+            // if no items are selected we are in the MixerSources context menu
+            // if a simple source is selected than remove all sources from the current scene
+            if (!this.source.channel) {
+              const scene = this.scenesService.views.activeScene;
+              const itemsToRemoveIds = scene
+                .getItems()
+                .filter(item => item.sourceId === this.source.sourceId)
+                .map(item => item.id);
+
+              this.editorCommandsService.executeCommand(
+                'RemoveNodesCommand',
+                scene.getSelection(itemsToRemoveIds),
+              );
+            } else {
+              // remove a global source
+              electron.remote.dialog
+                .showMessageBox(electron.remote.getCurrentWindow(), {
+                  message: $t('This source will be removed from all of your scenes'),
+                  type: 'warning',
+                  buttons: [$t('Cancel'), $t('OK')],
+                })
+                .then(({ response }) => {
+                  if (!response) return;
+                  this.editorCommandsService.executeCommand(
+                    'RemoveSourceCommand',
+                    this.source.sourceId,
+                  );
+                });
+            }
+          }
+        },
+      });
+
+      if (this.source.type === 'browser_source') {
+        this.append({
+          label: $t('Interact'),
+          click: () => this.sourcesService.showInteractWindow(this.source.sourceId),
+        });
+      }
     }
 
     if (this.source && !isMultipleSelection) {
@@ -185,12 +251,12 @@ export class EditMenu extends Menu {
 
       this.append({
         label: $t('Copy Filters'),
-        click: () => this.clipboardService.copyFilters(),
+        click: () => this.clipboardService.copyFilters(this.source.sourceId),
       });
 
       this.append({
         label: $t('Paste Filters'),
-        click: () => this.clipboardService.pasteFilters(),
+        click: () => this.clipboardService.pasteFilters(this.source.sourceId),
         enabled: this.clipboardService.hasFilters(),
       });
 
@@ -233,7 +299,17 @@ export class EditMenu extends Menu {
 
     this.append({
       label: $t('Create Output Projector'),
-      click: () => this.projectorService.createProjector(),
+      click: () => this.projectorService.createProjector(ERenderingMode.OBS_MAIN_RENDERING),
+    });
+
+    this.append({
+      label: $t('Create Stream Output Projector'),
+      click: () => this.projectorService.createProjector(ERenderingMode.OBS_STREAMING_RENDERING),
+    });
+
+    this.append({
+      label: $t('Create Recording Output Projector'),
+      click: () => this.projectorService.createProjector(ERenderingMode.OBS_RECORDING_RENDERING),
     });
 
     this.append({ type: 'separator' });
@@ -256,14 +332,14 @@ export class EditMenu extends Menu {
       this.append({ type: 'separator' });
 
       this.append({
-        label: 'Hide',
+        label: $t('Hide'),
         click: () => {
           this.editorCommandsService.executeCommand('HideMixerSourceCommand', this.source.sourceId);
         },
       });
 
       this.append({
-        label: 'Unhide All',
+        label: $t('Unhide All'),
         click: () => this.editorCommandsService.executeCommand('UnhideMixerSourcesCommand'),
       });
     }

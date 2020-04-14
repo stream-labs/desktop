@@ -1,0 +1,8 @@
+{
+  "Successfully saved %{filename}": "%{filename} berhasil disimpan",
+  "Successfully loaded %{filename}.overlay": "Tampilan %{filename} berhasil dimuat",
+  "This is an experimental feature.  Use at your own risk.": "Ini adalah fitur eksperimental. Gunakan dengan risiko sendiri.",
+  "Export Overlay File": "Ekspor File Tampilan",
+  "Import Overlay File": "Impor File Tampilan",
+  "Import Widget File in Current Scene": "Impor File Widget di Scene Saat Ini"
+}

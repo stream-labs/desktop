@@ -8,7 +8,7 @@ import { inputComponents } from './inputs';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 
 import { $t } from 'services/i18n';
-import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 
 @Component({
   components: {
@@ -62,5 +62,6 @@ export default class SponsorBanner extends WidgetSettings<
     this.wData.settings[`placement_${placement}_images`] = this.wData.settings[
       `placement_${placement}_images`
     ].filter((image: { href: string }) => image.href !== href);
+    this.save();
   }
 }

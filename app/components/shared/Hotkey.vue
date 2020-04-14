@@ -12,7 +12,8 @@
             type="text"
             class="Hotkey-input"
             :value="getBindingString(binding.binding)"
-            @keydown="e => handleKeydown(e, index)"
+            @keydown="e => handlePress(e, index)"
+            @mousedown="e => handlePress(e, index)"
           />
           <i class="Hotkey-control fa fa-plus" @click="addBinding(index);" />
           <i class="Hotkey-control fa fa-minus" @click="removeBinding(index);" />

@@ -1,33 +1,33 @@
 import { focusChild, focusMain, test, useSpectron } from '../helpers/spectron';
 import { logIn } from '../helpers/spectron/user';
 import { getFormInput } from '../helpers/spectron/forms';
+import { goLive, stopStream } from '../helpers/spectron/streaming';
+import { showSettings } from '../helpers/spectron/settings';
 
-useSpectron({ appArgs: '--nosync' });
+useSpectron();
 
-test('Populates stream settings while logged in', async t => {
+test('Populates stream settings after go live', async t => {
   const { app } = t.context;
 
   await logIn(t);
-  await app.client.waitForExist('.top-nav.loading', 5000, true);
-  await app.client.click('.top-nav .icon-settings');
-
-  await focusChild(t);
-  await app.client.click('li=Stream');
+  await goLive(t);
+  await stopStream(t);
+  await showSettings(t, 'Stream');
+  await app.client.click('a=Stream to custom ingest');
 
   t.is('Streaming Services', await getFormInput(t, 'Stream Type'));
   t.is('Twitch', await getFormInput(t, 'Service'));
   t.is('Auto (Recommended)', await getFormInput(t, 'Server'));
 });
 
-test('Populates stream key when logged in', async t => {
+test('Populates stream key after go live', async t => {
   const { app } = t.context;
 
   await logIn(t);
-  await app.client.waitForExist('.top-nav.loading', 5000, true);
-  await app.client.click('.top-nav .icon-settings');
-
-  await focusChild(t);
-  await app.client.click('li=Stream');
+  await goLive(t);
+  await stopStream(t);
+  await showSettings(t, 'Stream');
+  await app.client.click('a=Stream to custom ingest');
 
   // Test that we can toggle show stream key, also helps us fetch the value
   await app.client.click('button=Show');

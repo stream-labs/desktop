@@ -1,82 +1,86 @@
 <template>
-<div
-  class="live-dock"
-  :class="{ collapsed, 'can-animate': canAnimate, 'live-dock--left': onLeft }"
-  :style="{ width: (liveDockSize) + 'px' }">
   <div
-    class="live-dock-chevron icon-button"
-    v-if="collapsed"
-    @click="setCollapsed(false)">
-    <i :class="{
-      'icon-down icon-left': !onLeft,
-      'icon-down icon-right': onLeft
-    }" />
-  </div>
+    class="live-dock"
+    :class="{ collapsed, 'can-animate': canAnimate, 'live-dock--left': onLeft }"
+    :style="{ width: liveDockSize + 'px' }"
+  >
+    <div class="live-dock-chevron" @click="collapsed ? setCollapsed(false) : setCollapsed(true)">
+      <i
+        :class="{
+          'icon-back': (!onLeft && collapsed) || (onLeft && !collapsed),
+          'icon-down icon-right': (onLeft && collapsed) || (!onLeft && !collapsed),
+        }"
+      />
+    </div>
 
-  <transition name="slide-fade">
-    <div
-      v-if="!collapsed"
-      class="live-dock-expanded-contents">
-      <div
-        class="live-dock-chevron icon-button"
-        @click="setCollapsed(true)">
-        <i
-          :class="{
-          'icon-down icon-left': onLeft,
-          'icon-down icon-right': !onLeft
-          }" />
-      </div>
-      <div class="live-dock-header">
-        <div class="flex flex--center">
-          <div :class="{ 'live-dock-pulse': true, 'live-dock-offline': !isStreaming  }" />
-          <span class="live-dock-text">
-            {{ liveText }}
-          </span>
-          <span class="live-dock-timer">
-            {{ elapsedStreamTime }}
-          </span>
+    <transition name="slide-fade">
+      <div v-if="!collapsed" class="live-dock-expanded-contents">
+        <div class="live-dock-header">
+          <div class="flex flex--center">
+            <div :class="{ 'live-dock-pulse': true, 'live-dock-offline': !isStreaming }" />
+            <span class="live-dock-text">
+              {{ liveText }}
+            </span>
+            <span class="live-dock-timer">
+              {{ elapsedStreamTime }}
+            </span>
+          </div>
+          <div class="live-dock-viewer-count">
+            <i
+              :class="{
+                'icon-view': !hideViewerCount,
+                'icon-hide': hideViewerCount,
+              }"
+              @click="toggleViewerCount"
+            />
+            <span class="live-dock-viewer-count__count">{{ viewerCount }}</span
+            ><span v-if="viewerCount >= 0">{{ $t('viewers') }}</span>
+          </div>
         </div>
-        <div class="live-dock-viewer-count">
-          <i
-            :class="{
-              'icon-view': !hideViewerCount,
-              'icon-hide': hideViewerCount
-            }"
-            @click="toggleViewerCount"/>
-          <span class="live-dock-viewer-count__count">{{ viewerCount }}</span><span v-if="viewerCount >= 0">{{ $t('viewers')}}</span>
-        </div>
-      </div>
 
-      <div class="live-dock-info">
-        <div class="live-dock-platform-tools">
-          <a
-            @click="showEditStreamInfo"
-            v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook"
-            v-tooltip="editStreamInfoTooltip">
-            <i class="icon-edit" />
-          </a>
-          <a
-            @click="openYoutubeStreamUrl"
-            v-if="isYoutube && isStreaming"
-            v-tooltip="viewStreamTooltip">
-            <i class="icon-studio" />
-          </a>
-          <a
-            @click="openYoutubeControlRoom"
-            v-if="isYoutube && isStreaming"
-            v-tooltip="controlRoomTooltip">
-            <i class="icon-settings" />
-          </a>
+        <div class="live-dock-info">
+          <div class="live-dock-platform-tools">
+            <a
+              @click="showEditStreamInfo"
+              v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook"
+              v-tooltip.right="editStreamInfoTooltip"
+            >
+              <i class="icon-edit" />
+            </a>
+            <a
+              @click="openYoutubeStreamUrl"
+              v-if="isYoutube && isStreaming"
+              v-tooltip="viewStreamTooltip"
+            >
+              <i class="icon-studio" />
+            </a>
+            <a
+              @click="openYoutubeControlRoom"
+              v-if="isYoutube && isStreaming"
+              v-tooltip.top="controlRoomTooltip"
+            >
+              <i class="icon-settings" />
+            </a>
+          </div>
+          <div class="flex">
+            <a
+              @click="refreshChat"
+              v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook"
+            >
+              {{ $t('Refresh Chat') }}
+            </a>
+          </div>
         </div>
-        <div class="flex">
-          <a @click="refreshChat" v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook">
-            {{ $t('Refresh Chat') }}
-          </a>
-        </div>
-      </div>
 
-      <div class="live-dock-chat" v-if="!hideStyleBlockers && (isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook)">
-          <div v-if="hasChatApps" class="flex">
+        <div
+          class="live-dock-chat"
+          v-if="
+            !hideStyleBlockers &&
+              !chatHidden &&
+              (isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook)
+          "
+        >
+          <div v-if="hasChatTabs" class="flex">
             <tabs :tabs="chatTabs" v-model="selectedChat" :hideContent="true" />
             <i
               class="live-dock-chat-apps__popout icon-pop-out-1"
@@ -85,23 +89,24 @@
               @click="popOut"
             />
           </div>
-        <!-- v-if is required because left-side chat will not properly load on application startup -->
-        <chat v-if="!applicationLoading && selectedChat === 'default'" />
-        <PlatformAppPageView
-          v-if="selectedChat !== 'default'"
-          class="live-dock-platform-app-webview"
-          :appId="selectedChat"
-          :pageSlot="slot"
-          :key="selectedChat"
-        />
+          <!-- v-if is required because left-side chat will not properly load on application startup -->
+          <chat v-if="!applicationLoading && selectedChat === 'default'" />
+          <chat v-if="selectedChat === 'restream'" :restream="true" />
+          <PlatformAppPageView
+            v-if="selectedChat !== 'default' && selectedChat !== 'restream'"
+            class="live-dock-platform-app-webview"
+            :appId="selectedChat"
+            :pageSlot="slot"
+            :key="selectedChat"
+          />
+        </div>
+        <div class="flex flex--center flex--column live-dock-chat--offline" v-else>
+          <img class="live-dock-chat__img--offline" :src="offlineImageSrc" />
+          <span v-if="!hideStyleBlockers">{{ $t('Your chat is currently offline') }}</span>
+        </div>
       </div>
-      <div class="flex flex--center flex--column live-dock-chat--offline" v-else >
-        <img class="live-dock-chat__img--offline" :src="offlineImageSrc">
-        <span v-if="!hideStyleBlockers">{{ $t('Your chat is currently offline') }}</span>
-      </div>
-    </div>
-  </transition>
-</div>
+    </transition>
+  </div>
 </template>
 
 <script lang="ts" src="./LiveDock.vue.ts"></script>
@@ -110,8 +115,7 @@
 @import '../styles/index';
 
 .live-dock {
-  .padding(2);
-
+  padding-left: 16px;
   position: relative;
   z-index: 1000;
   width: 28%;
@@ -123,39 +127,56 @@
   }
 
   &.live-dock--left {
+    padding-left: 0;
+    padding-right: 16px;
     border-right: 1px solid var(--border);
-
-    .live-dock-chevron {
-      right: 5px;
-      left: inherit;
-    }
   }
 
-  &.collapsed {
-    width: 20px !important;
-    padding: 0;
-  }
-
-  @media (max-width: 1100px) {
+  @media (max-width: 1070px) {
     display: none;
   }
 }
 
-.live-dock-chevron {
-  .absolute(@top: 0, @bottom: 0, @left: 0);
-
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  height: 100%;
-  padding-left: 4px;
-
-  &:hover {
-    opacity: 1;
+.live-dock--left {
+  .live-dock-chevron {
+    right: 0;
+    left: auto;
   }
 
+  .live-dock-expanded-contents {
+    border-right: 1px solid var(--border);
+    border-left: none;
+  }
+}
+
+.live-dock.collapsed {
+  width: 20px !important;
+  padding: 0;
+
+  .live-dock-chevron {
+    .center();
+
+    border: none;
+  }
+}
+
+.live-dock-chevron {
+  width: 16px;
+  height: 20px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+
   i {
-    font-size: 10px;
+    .center();
+
+    font-size: 12px;
+
+    &.icon-right {
+      transform: translate(-50%, -50%) rotate(-90deg);
+    }
   }
 }
 
@@ -182,6 +203,8 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  padding: 16px;
+  border-left: 1px solid var(--border);
 }
 
 .live-dock-info {

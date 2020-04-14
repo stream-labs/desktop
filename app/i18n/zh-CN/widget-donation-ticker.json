@@ -1,0 +1,18 @@
+{
+  "Message Format": "信息格式",
+  "Max Donations": "最高打赏",
+  "Text Scroll Speed": "文字滚动速度",
+  "Background Color": "背景颜色",
+  "Font": "字体",
+  "Font Size": "字体大小",
+  "Font Weight": "字体粗细",
+  "Text Color": "文字颜色",
+  "Name Text Color": "名称文字颜色",
+  "Amount Text Color": "金额文字颜色",
+  "The name of the donator,": "打赏者名称，",
+  "The amount that was donated": "打赏金额",
+  "Manage List": "管理名单",
+  "Font Settings": "字体设置",
+  "A hex color for the text of the": "文字的十六进制颜色",
+  "token": "令牌"
+}

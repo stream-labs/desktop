@@ -1,9 +1,10 @@
 import electron from 'electron';
-import { Service } from 'services/core/service';
+import { StatefulService } from 'services/core/stateful-service';
 import fs from 'fs';
 import path from 'path';
 import { ScenesService } from 'services/scenes';
-import { SourcesService } from 'services/sources';
+import { SourcesService, TPropertiesManager } from 'services/sources';
+import { WidgetsService } from 'services/widgets';
 import { TSourceType } from 'services/sources/sources-api';
 import { SourceFiltersService, TSourceFilterType } from 'services/source-filters';
 import { TransitionsService, ETransitionType } from 'services/transitions';
@@ -14,6 +15,8 @@ import * as obs from '../../obs-api';
 import { SettingsService } from 'services/settings';
 import { AppService } from 'services/app';
 import { RunInLoadingMode } from 'services/app/app-decorators';
+import defaultTo from 'lodash/defaultTo';
+import { $t } from 'services/i18n';
 
 interface Source {
   name?: string;
@@ -49,6 +52,7 @@ interface IOBSConfigSource {
   settings: {
     shutdown?: boolean;
     items?: IOBSConfigSceneItem[];
+    url?: string;
   };
   channel?: number;
   muted: boolean;
@@ -72,9 +76,10 @@ interface IOBSConfigJSON {
   transition_duration: number;
 }
 
-export class ObsImporterService extends Service {
+export class ObsImporterService extends StatefulService<{ progress: number; total: number }> {
   @Inject() scenesService: ScenesService;
   @Inject() sourcesService: SourcesService;
+  @Inject() widgetsService: WidgetsService;
   @Inject('SourceFiltersService') filtersService: SourceFiltersService;
   @Inject() transitionsService: TransitionsService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
@@ -131,7 +136,7 @@ export class ObsImporterService extends Service {
         this.importMixerSources(configJSON);
         this.importTransitions(configJSON);
 
-        return this.scenesService.scenes.length !== 0;
+        return this.scenesService.views.scenes.length !== 0;
       },
     });
   }
@@ -144,7 +149,7 @@ export class ObsImporterService extends Service {
         });
 
         if (isFilterAvailable) {
-          const sourceId = this.sourcesService.getSourcesByName(source.name)[0].sourceId;
+          const sourceId = this.sourcesService.views.getSourcesByName(source.name)[0].sourceId;
 
           const filter = this.filtersService.add(sourceId, filterJSON.id, filterJSON.name);
           filter.enabled = filterJSON.enabled;
@@ -181,8 +186,16 @@ export class ObsImporterService extends Service {
 
         if (isSourceAvailable) {
           if (sourceJSON.id !== 'scene') {
+            let propertiesManager: TPropertiesManager = 'default';
+            let propertiesManagerSettings: Dictionary<any> = {};
+
             if (sourceJSON.id === 'browser_source') {
               sourceJSON.settings.shutdown = true;
+              const widgetType = this.widgetsService.getWidgetTypeByUrl(sourceJSON.settings.url);
+              if (widgetType !== -1) {
+                propertiesManager = 'widget';
+                propertiesManagerSettings = { widgetType };
+              }
             }
 
             // Check "Shutdown source when not visible" by default for browser sources
@@ -191,18 +204,25 @@ export class ObsImporterService extends Service {
               sourceJSON.id,
               sourceJSON.settings,
               {
+                propertiesManager,
+                propertiesManagerSettings,
                 channel: sourceJSON.channel !== 0 ? sourceJSON.channel : void 0,
               },
             );
 
             if (source.audio) {
-              this.audioService.getSource(source.sourceId).setMuted(sourceJSON.muted);
-              this.audioService.getSource(source.sourceId).setMul(sourceJSON.volume);
-              this.audioService.getSource(source.sourceId).setSettings({
-                ['audioMixers']: sourceJSON.mixers,
-                ['monitoringType']: sourceJSON.monitoring_type,
-                ['syncOffset']: sourceJSON.sync / 1000000,
-                ['forceMono']: !!(sourceJSON.flags & obs.ESourceFlags.ForceMono),
+              const defaultMonitoring =
+                source.type === 'browser_source'
+                  ? obs.EMonitoringType.MonitoringOnly
+                  : obs.EMonitoringType.None;
+
+              this.audioService.views.getSource(source.sourceId).setMuted(sourceJSON.muted);
+              this.audioService.views.getSource(source.sourceId).setMul(sourceJSON.volume);
+              this.audioService.views.getSource(source.sourceId).setSettings({
+                audioMixers: defaultTo(sourceJSON.mixers, 255),
+                monitoringType: defaultTo(sourceJSON.monitoring_type, defaultMonitoring),
+                syncOffset: defaultTo(sourceJSON.sync / 1000000, 0),
+                forceMono: !!(sourceJSON.flags & obs.ESourceFlags.ForceMono),
               });
             }
 
@@ -239,14 +259,14 @@ export class ObsImporterService extends Service {
       // Add all the sceneItems to every scene
       sourcesJSON.forEach(sourceJSON => {
         if (sourceJSON.id === 'scene') {
-          const scene = this.scenesService.getScene(nameToIdMap[sourceJSON.name]);
+          const scene = this.scenesService.views.getScene(nameToIdMap[sourceJSON.name]);
           if (!scene) return;
 
           const sceneItems = sourceJSON.settings.items;
           if (Array.isArray(sceneItems)) {
             // Looking for the source to add to the scene
             sceneItems.forEach(item => {
-              const sourceToAdd = this.sourcesService.getSources().find(source => {
+              const sourceToAdd = this.sourcesService.views.getSources().find(source => {
                 return source.name === item.name;
               });
               if (sourceToAdd) {
@@ -280,7 +300,7 @@ export class ObsImporterService extends Service {
   importSceneOrder(configJSON: IOBSConfigJSON) {
     const sceneNames: string[] = [];
     const sceneOrderJSON = configJSON.scene_order;
-    const listScene = this.scenesService.scenes;
+    const listScene = this.scenesService.views.scenes;
 
     if (Array.isArray(sceneOrderJSON)) {
       sceneOrderJSON.forEach(obsScene => {
@@ -303,22 +323,24 @@ export class ObsImporterService extends Service {
       'AuxAudioDevice3',
     ];
     channelNames.forEach((channelName, i) => {
-      const audioSource = configJSON[channelName];
-      if (audioSource) {
+      const obsAudioSource = configJSON[channelName];
+      if (obsAudioSource) {
         const newSource = this.sourcesService.createSource(
-          audioSource.name,
-          audioSource.id,
-          {},
+          obsAudioSource.name,
+          obsAudioSource.id,
+          { device_id: obsAudioSource.settings.device_id },
           { channel: i + 1 },
         );
 
-        this.audioService.getSource(newSource.sourceId).setMuted(audioSource.muted);
-        this.audioService.getSource(newSource.sourceId).setMul(audioSource.volume);
-        this.audioService.getSource(newSource.sourceId).setSettings({
-          ['audioMixers']: audioSource.mixers,
-          ['monitoringType']: audioSource.monitoring_type,
-          ['syncOffset']: audioSource.sync / 1000000,
-          ['forceMono']: !!(audioSource.flags & obs.ESourceFlags.ForceMono),
+        const audioSource = this.audioService.views.getSource(newSource.sourceId);
+
+        audioSource.setMuted(obsAudioSource.muted);
+        audioSource.setMul(obsAudioSource.volume);
+        audioSource.setSettings({
+          audioMixers: obsAudioSource.mixers,
+          monitoringType: obsAudioSource.monitoring_type,
+          syncOffset: obsAudioSource.sync / 1000000,
+          forceMono: !!(obsAudioSource.flags & obs.ESourceFlags.ForceMono),
         });
       }
     });
@@ -332,7 +354,7 @@ export class ObsImporterService extends Service {
       this.transitionsService.deleteAllTransitions();
       this.transitionsService.createTransition(
         configJSON.transitions[0].id as ETransitionType,
-        'Global Transition',
+        $t('Global Transition'),
         { duration: configJSON.transition_duration },
       );
     }

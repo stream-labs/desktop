@@ -1,0 +1,19 @@
+{
+  "Youtube stream status": "YouTube-stream-status",
+  "Waiting for YouTube to receive the video signal...": "Venter på at YouTubemodtager videosignalet ...",
+  "Testing your broadcast...": "Tester din udsendelse ...",
+  "Finalizing broadcast testing...": "Afslutter transmissionstest ...",
+  "Publishing to your YouTube channel...": "Udgiver på din YouTube-kanal ...",
+  "Waiting broadcast to be published...": "Ventetid før udsendelsen bliver offentliggjort ...",
+  "You're live!": "Du er live!",
+  "Waiting for broadcast to be published...": "Venter på at udsendelsen bliver offentliggjort ...",
+  "Working on your live stream": "Arbejder med din live stream",
+  "Your stream will start shortly. You can close this window.": "Din stream starter snart. Du kan lukke dette vindue.",
+  "stream control page": "stream-kontrolside",
+  " to publish it manually": " for at offentliggøre det manuelt",
+  "Go to Youtube Live Dashboard": "Gå til YouTube Live Dashboard",
+  "Create New Event": "Opret ny begivenhed",
+  "YouTube Chat": "YouTube chat",
+  "This action cannot be performed inside Streamlabs OBS. To interact with chat, you can open this chat in a web browser.": "Denne handling kan ikke udføres i Streamlabs OBS. For at interagere med chatten kan du åbne denne chat i en webbrowser.",
+  "Open In Web Browser": "Åbn i webbrowser"
+}

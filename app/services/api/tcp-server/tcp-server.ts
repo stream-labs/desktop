@@ -1,4 +1,3 @@
-import WritableStream = NodeJS.WritableStream;
 import os from 'os';
 import crypto from 'crypto';
 import { PersistentStatefulService, Inject, mutation } from 'services/core';
@@ -15,6 +14,9 @@ import { IIPAddressDescription, ITcpServerServiceApi, ITcpServersSettings } from
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { ExternalApiService } from '../external-api';
 import { SceneCollectionsService } from 'services/scene-collections';
+// eslint-disable-next-line no-undef
+import WritableStream = NodeJS.WritableStream;
+import { $t } from 'services/i18n';
 
 const net = require('net');
 
@@ -70,6 +72,9 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   private servers: IServer[] = [];
   private isRequestsHandlingStopped = false;
 
+  // if true then execute API request even if "isRequestsHandlingStopped" flag is set
+  private forceRequests = false;
+
   // enable to debug
   private enableLogs = false;
 
@@ -100,6 +105,10 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   stopListening() {
     this.servers.forEach(server => server.close());
     Object.keys(this.clients).forEach(clientId => this.disconnectClient(Number(clientId)));
+  }
+
+  get websocketRemoteConnectionEnabled() {
+    return this.state.websockets.enabled && this.state.websockets.allowRemote;
   }
 
   enableWebsoketsRemoteConnections() {
@@ -152,7 +161,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
           <IObsInput<string>>{
             value: settings.namedPipe.pipeName,
             name: 'pipeName',
-            description: 'Pipe Name',
+            description: $t('Pipe Name'),
             type: 'OBS_PROPERTY_TEXT',
             visible: true,
             enabled: settings.namedPipe.enabled,
@@ -166,7 +175,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
           <IObsInput<boolean>>{
             value: settings.websockets.enabled,
             name: 'enabled',
-            description: 'Enabled',
+            description: $t('Enabled'),
             type: 'OBS_PROPERTY_BOOL',
             visible: true,
             enabled: true,
@@ -175,7 +184,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
           <IObsInput<boolean>>{
             value: settings.websockets.allowRemote,
             name: 'allowRemote',
-            description: 'Allow Remote Connections',
+            description: $t('Allow Remote Connections'),
             type: 'OBS_PROPERTY_BOOL',
             visible: true,
             enabled: settings.websockets.enabled,
@@ -184,7 +193,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
           <IObsInput<number>>{
             value: settings.websockets.port,
             name: 'port',
-            description: 'Port',
+            description: $t('Port'),
             type: 'OBS_PROPERTY_INT',
             minVal: 0,
             maxVal: 65535,
@@ -291,7 +300,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       this.authorizeClient(client);
     }
 
-    socket.on('data', (data: any) => {
+    socket.on('data', (data: Buffer) => {
       this.onRequestHandler(client, data.toString());
     });
 
@@ -301,6 +310,16 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
 
     socket.on('close', () => {
       this.onDisconnectHandler(client);
+    });
+
+    socket.on('error', e => {
+      if (e.code === 'EPIPE') {
+        // Client has silently disconnected
+        console.debug('TCP Server: Socket was disconnected', e);
+        this.onDisconnectHandler(client);
+      } else {
+        throw e;
+      }
     });
   }
 
@@ -318,13 +337,14 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   private onRequestHandler(client: IClient, data: string) {
     this.log('tcp request', data);
 
-    if (this.isRequestsHandlingStopped) {
+    if (this.isRequestsHandlingStopped && !this.forceRequests) {
       this.sendResponse(
         client,
         this.jsonrpcService.createError(null, {
           code: E_JSON_RPC_ERROR.INTERNAL_JSON_RPC_ERROR,
           message: 'API server is busy. Try again later',
         }),
+        true,
       );
 
       return;
@@ -335,7 +355,6 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       if (!requestString) return;
       try {
         const request: IJsonRpcRequest = JSON.parse(requestString);
-        this.usageStatisticsService.recordAnalyticsEvent('TCP_API_REQUEST', request);
 
         const errorMessage = this.validateRequest(request);
 
@@ -470,6 +489,18 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       });
       return true;
     }
+
+    // set forceRequests flag
+    // when forceRequest is true API responds even while loading a SceneCollection
+    if (request.method === 'forceRequests' && request.params.resource === 'TcpServerService') {
+      this.forceRequests = request.params.args[0];
+      this.sendResponse(client, {
+        jsonrpc: '2.0',
+        id: request.id,
+        result: true,
+      });
+      return true;
+    }
   }
 
   private onDisconnectHandler(client: IClient) {
@@ -478,7 +509,9 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   }
 
   private sendResponse(client: IClient, response: IJsonRpcResponse<any>, force = false) {
-    if (this.isRequestsHandlingStopped && !force) return;
+    if (this.isRequestsHandlingStopped) {
+      if (!force && !this.forceRequests) return;
+    }
 
     this.log('send response', response);
 

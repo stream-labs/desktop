@@ -33,6 +33,7 @@ choco install yarn
 
 echo "Install Git for Windows"
 choco install git.install
+git config --global core.autocrlf false # setup line-ednings transform
 
 echo "Install 7zip"
 choco install 7zip
@@ -54,7 +55,7 @@ echo "Configure Azure Agent"
 $publicIp = (Invoke-RestMethod ipinfo.io/ip).trim()
 .\config --unattended --url https://dev.azure.com/streamlabs --auth pat --token $token --agent "$env:computername $publicIp" --pool $pool
 
-# Disable the lock screen to prevent the PC locking after end of the RDP session
+# Disable the lock screen to prevent the PC locking after the end of the RDP session
 Set-ItemProperty "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Personalization" -Name 'NoLockScreen' -Value 1;
 
 # Azure Agent has --AutoLogon option to add Anget to autostartup
@@ -66,8 +67,17 @@ Set-ItemProperty $RegPath "AutoAdminLogon" -Value "1" -type String
 Set-ItemProperty $RegPath "DefaultUsername" -Value $username -type String
 Set-ItemProperty $RegPath "DefaultPassword" -Value "$password" -type String
 
-# -once argument gracefuly stops Agent after first job
+# Setup WinRM for remote connections
+# Trusted hosts and ports must be confgured on the level above
+# Use the example below to run scripts on several agents:
+#   $LiveCred = Get-Credential
+#   Invoke-Command -Computer Agent1, Agent2, Agent3 -Credential $LiveCred -ScriptBlock {Get-Process}
+Enable-PSRemoting -Force
+Set-Item -Force wsman:\localhost\client\trustedhosts *
+New-NetFirewallRule -DisplayName "Allow inbound TCP port 5985" -Direction inbound -LocalPort 5985 -Protocol TCP -Action Allow
+Restart-Service WinRM
+
 echo "Add agent to startup"
-Set-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Name 'StartAsureAgent' -Value "$agentPath --once";
+Set-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Name 'StartAsureAgent' -Value $agentPath;
 
 echo "Installation completed. Restart PC to take effect"

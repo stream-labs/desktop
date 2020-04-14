@@ -346,25 +346,25 @@ const youtubeDefinitions: IStreamlabelSet = {
     ],
   },
   sponsors: {
-    label: 'Sponsors',
+    label: 'Members',
     files: [
       {
         name: 'total_youtube_sponsor_count',
-        label: 'Total Sponsor Count',
+        label: 'Total Member Count',
         settings: {
           format: { tokens: ['{count}'] },
         },
       },
       {
         name: 'most_recent_youtube_sponsor',
-        label: 'Most Recent Sponsor',
+        label: 'Most Recent Member',
         settings: {
           format: { tokens: ['{name}'] },
         },
       },
       {
         name: 'session_youtube_sponsors',
-        label: 'Session Sponsors (Max 100)',
+        label: 'Session Members (Max 100)',
         settings: {
           format: { tokens: ['{list}'] },
           item_format: { tokens: ['{name}'] },
@@ -373,14 +373,14 @@ const youtubeDefinitions: IStreamlabelSet = {
       },
       {
         name: 'session_youtube_sponsor_count',
-        label: 'Session Sponsor Count',
+        label: 'Session Member Count',
         settings: {
           format: { tokens: ['{count}'] },
         },
       },
       {
         name: 'session_most_recent_youtube_sponsor',
-        label: 'Session Most Recent Sponsor',
+        label: 'Session Most Recent Member',
         settings: {
           format: { tokens: ['{name}'] },
         },

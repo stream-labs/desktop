@@ -14,7 +14,7 @@ export interface ISerializableWidget {
   scaleY: number;
 }
 
-type TUrlGenerator = (host: string, token: string, platform: TPlatform) => string;
+type TUrlGenerator = (host: string, token: string) => string;
 
 export interface IWidgetTester {
   name: string;
@@ -104,6 +104,7 @@ export interface IWidgetSettingsGenericState {
   loadingState: TWIdgetLoadingState;
   data: IWidgetData;
   rawData: Dictionary<any>; // widget data before patching
+  pendingRequests: number; // amount of pending requests to the widget API
 }
 
 export interface IWidgetSettingsState<TWidgetData extends IWidgetData>

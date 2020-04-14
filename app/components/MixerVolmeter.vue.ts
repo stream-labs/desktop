@@ -1,12 +1,14 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Subscription } from 'rxjs';
-import { AudioSource } from 'services/audio';
+import { AudioSource, AudioService, IVolmeter } from 'services/audio';
 import { Inject } from 'services/core/injector';
 import { CustomizationService } from 'services/customization';
 import { compileShader, createProgram } from 'util/webgl/utils';
 import vShaderSrc from 'util/webgl/shaders/volmeter.vert';
 import fShaderSrc from 'util/webgl/shaders/volmeter.frag';
+import electron from 'electron';
+import TsxComponent, { createProps } from './tsx-component';
 
 // Configuration
 const CHANNEL_HEIGHT = 3;
@@ -21,11 +23,14 @@ const GREEN = [49, 195, 162];
 const YELLOW = [255, 205, 71];
 const RED = [252, 62, 63];
 
-@Component({})
-export default class MixerVolmeter extends Vue {
-  @Prop() audioSource: AudioSource;
+class MixerVolmeterProps {
+  audioSource: AudioSource = null;
+}
 
+@Component({ props: createProps(MixerVolmeterProps) })
+export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
   @Inject() customizationService: CustomizationService;
+  @Inject() audioService: AudioService;
 
   volmeterSubscription: Subscription;
 
@@ -54,32 +59,100 @@ export default class MixerVolmeter extends Vue {
 
   peakHoldCounters: number[];
   peakHolds: number[];
+
   canvasWidth: number;
   canvasWidthInterval: number;
   channelCount: number;
   canvasHeight: number;
 
+  // Used to force recreation of the canvas element
+  canvasId = 1;
+
+  // Used for lazy initialization of the canvas rendering
+  renderingInitialized = false;
+
   mounted() {
     this.subscribeVolmeter();
     this.peakHoldCounters = [];
     this.peakHolds = [];
-    this.setChannelCount(1);
+
+    this.setupNewCanvas();
+  }
+
+  beforeDestroy() {
+    this.$refs.canvas.removeEventListener('webglcontextlost', this.handleLostWebglContext);
+    if (this.gl) window['activeWebglContexts'] -= 1;
+    clearInterval(this.canvasWidthInterval);
+    this.unsubscribeVolmeter();
+  }
+
+  private setupNewCanvas() {
+    // Make sure all state is cleared out
+    this.ctx = null;
+    this.gl = null;
+    this.program = null;
+    this.positionLocation = null;
+    this.resolutionLocation = null;
+    this.translationLocation = null;
+    this.scaleLocation = null;
+    this.volumeLocation = null;
+    this.peakHoldLocation = null;
+    this.bgMultiplierLocation = null;
+    this.canvasWidth = null;
+    this.channelCount = null;
+    this.canvasHeight = null;
+
+    this.renderingInitialized = false;
+
+    // Assume 2 channels until we know otherwise. This prevents too much
+    // visual jank as the volmeters are initializing.
+    this.setChannelCount(2);
+
+    this.setCanvasWidth();
     this.canvasWidthInterval = window.setInterval(() => this.setCanvasWidth(), 500);
+  }
+
+  private initRenderingContext() {
+    if (this.renderingInitialized) return;
 
     this.gl = this.$refs.canvas.getContext('webgl', { alpha: false });
 
     if (this.gl) {
       this.initWebglRendering();
+
+      // Get ready to lose this conext if too many are created
+      if (window['activeWebglContexts'] == null) window['activeWebglContexts'] = 0;
+      window['activeWebglContexts'] += 1;
+      this.$refs.canvas.addEventListener('webglcontextlost', this.handleLostWebglContext);
     } else {
-      // This machine does not support hardware acceleration, or it has been
-      // disabled, so we fall back to canvas 2D rendering.
+      // This machine does not support hardware acceleration, or it has been disabled
+      // Fall back to canvas 2d rendering instead.
       this.ctx = this.$refs.canvas.getContext('2d', { alpha: false });
     }
+
+    this.renderingInitialized = true;
   }
 
-  destroyed() {
-    clearInterval(this.canvasWidthInterval);
-    this.unsubscribeVolmeter();
+  private handleLostWebglContext() {
+    // Only do this if there are free contexts, otherwise we will churn forever
+    if (window['activeWebglContexts'] < 16) {
+      console.warn('Lost WebGL context and attempting restore.');
+
+      if (this.canvasWidthInterval) {
+        clearInterval(this.canvasWidthInterval);
+        this.canvasWidthInterval = null;
+      }
+      this.$refs.canvas.removeEventListener('webglcontextlost', this.handleLostWebglContext);
+      window['activeWebglContexts'] -= 1;
+
+      this.canvasId += 1;
+
+      this.$nextTick(() => {
+        this.setupNewCanvas();
+      });
+    } else {
+      console.warn('Lost WebGL context and not attempting restore due to too many active contexts');
+    }
   }
 
   private initWebglRendering() {
@@ -91,7 +164,7 @@ export default class MixerVolmeter extends Vue {
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, positionBuffer);
 
     // Vertex geometry for a unit square
-    // tslint:disable-next-line
+    // eslint-disable-next-line
     const positions = [
       0, 0,
       0, 1,
@@ -130,13 +203,20 @@ export default class MixerVolmeter extends Vue {
 
   private setColorUniform(uniform: string, color: number[]) {
     const location = this.gl.getUniformLocation(this.program, uniform);
+    // eslint-disable-next-line
     this.gl.uniform3fv(location, color.map(c => c / 255));
   }
 
   private setChannelCount(channels: number) {
     if (channels !== this.channelCount) {
       this.channelCount = channels;
-      this.canvasHeight = channels * (CHANNEL_HEIGHT + PADDING_HEIGHT) - PADDING_HEIGHT;
+      this.canvasHeight = Math.max(
+        channels * (CHANNEL_HEIGHT + PADDING_HEIGHT) - PADDING_HEIGHT,
+        0,
+      );
+
+      if (!this.$refs.canvas) return;
+
       this.$refs.canvas.height = this.canvasHeight;
       this.$refs.canvas.style.height = `${this.canvasHeight}px`;
       this.$refs.spacer.style.height = `${this.canvasHeight}px`;
@@ -159,7 +239,7 @@ export default class MixerVolmeter extends Vue {
   }
 
   private drawVolmeterWebgl(peaks: number[]) {
-    const bg = this.customizationService.themeBackground;
+    const bg = this.customizationService.sectionBackground;
 
     this.gl.clearColor(bg.r / 255, bg.g / 255, bg.b / 255, 1);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
@@ -283,19 +363,52 @@ export default class MixerVolmeter extends Vue {
     this.peakHoldCounters[channel] -= 1;
   }
 
-  subscribeVolmeter() {
-    this.volmeterSubscription = this.audioSource.subscribeVolmeter(volmeter => {
-      this.setChannelCount(volmeter.peak.length);
+  workerId: number;
 
-      if (this.gl) {
-        this.drawVolmeterWebgl(volmeter.peak);
-      } else {
-        this.drawVolmeterC2d(volmeter.peak);
+  listener: (e: Electron.Event, volmeter: IVolmeter) => void;
+
+  subscribeVolmeter() {
+    this.listener = (e: Electron.Event, volmeter: IVolmeter) => {
+      if (this.$refs.canvas) {
+        // don't init context for inactive sources
+        if (!volmeter.peak.length && !this.renderingInitialized) return;
+
+        this.initRenderingContext();
+        this.setChannelCount(volmeter.peak.length);
+
+        // don't render sources then channelsCount is 0
+        // happens when the browser source stops playing audio
+        if (!volmeter.peak.length) return;
+
+        if (this.gl) {
+          this.drawVolmeterWebgl(volmeter.peak);
+        } else {
+          this.drawVolmeterC2d(volmeter.peak);
+        }
       }
-    });
+    };
+
+    electron.ipcRenderer.on(`volmeter-${this.props.audioSource.sourceId}`, this.listener);
+
+    // TODO: Remove sync
+    this.workerId = electron.ipcRenderer.sendSync('getWorkerWindowId');
+
+    electron.ipcRenderer.sendTo(
+      this.workerId,
+      'volmeterSubscribe',
+      this.props.audioSource.sourceId,
+    );
   }
 
   unsubscribeVolmeter() {
-    this.volmeterSubscription && this.volmeterSubscription.unsubscribe();
+    electron.ipcRenderer.removeListener(
+      `volmeter-${this.props.audioSource.sourceId}`,
+      this.listener,
+    );
+    electron.ipcRenderer.sendTo(
+      this.workerId,
+      'volmeterUnsubscribe',
+      this.props.audioSource.sourceId,
+    );
   }
 }

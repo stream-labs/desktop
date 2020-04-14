@@ -9,6 +9,7 @@ import { IInputMetadata, inputComponents, metadata } from 'components/shared/inp
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { debounce } from 'lodash-decorators';
 import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
+import electron from 'electron';
 
 const { ToggleInput } = inputComponents;
 
@@ -47,7 +48,7 @@ const DEFAULT_CUSTOM_FIELDS: Dictionary<ICustomField> = {
   customField2: {
     label: 'Slider Example',
     type: 'slider',
-    value: 3,
+    value: 100,
     max: 200,
     min: 100,
     steps: 4,
@@ -76,18 +77,17 @@ const DEFAULT_CUSTOM_FIELDS: Dictionary<ICustomField> = {
     value: 'optionB',
   },
 
-  // TODO:
-  // customField6: {
-  //   label: 'Image Input Example',
-  //   type: 'image-input',
-  //   value: null
-  // },
-  //
-  // customField7: {
-  //   label: 'Sound Input Example',
-  //   type: 'sound-input',
-  //   value: null
-  // }
+  customField6: {
+    label: 'Image Input Example',
+    type: 'image-input',
+    value: null,
+  },
+
+  customField7: {
+    label: 'Sound Input Example',
+    type: 'sound-input',
+    value: null,
+  },
 };
 
 @Component({
@@ -167,7 +167,16 @@ export default class CustomFieldsEditor extends Vue {
           });
           break;
 
-        // TODO: add image-input and sound-input
+        case 'sound-input':
+          inputMetadata = metadata.sound({
+            title: field.label,
+          });
+          break;
+        case 'image-input':
+          inputMetadata = metadata.mediaGallery({
+            title: field.label,
+          });
+          break;
         default:
           inputMetadata = null;
           break;
@@ -219,7 +228,7 @@ export default class CustomFieldsEditor extends Vue {
     try {
       newCustomFields = JSON.parse(this.editorInputValue);
     } catch (e) {
-      alert('Invalid JSON');
+      electron.remote.dialog.showErrorBox($t('Error'), $t('Invalid JSON'));
       return;
     }
 

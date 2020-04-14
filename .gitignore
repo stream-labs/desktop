@@ -2,6 +2,7 @@
 .idea/
 node_modules/
 build/
+updater/build/
 npm-debug.log
 lib/
 rtmp-services/
@@ -20,3 +21,4 @@ yarn-error.log
 .opt-in
 .env
 .awcache/
+AGREEMENT

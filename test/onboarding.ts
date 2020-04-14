@@ -1,10 +1,13 @@
-import { useSpectron, focusMain, focusChild, test } from './helpers/spectron/index';
+import { focusChild, focusMain, test, useSpectron } from './helpers/spectron/index';
 import { logIn } from './helpers/spectron/user';
-import { spawn, execSync, spawnSync } from 'child_process';
+import { spawnSync } from 'child_process';
 import { sleep } from './helpers/sleep';
-import { switchCollection, sceneExisting } from './helpers/spectron/scenes';
-import { sourceIsExisting, selectSource, clickSourceProperties } from './helpers/spectron/sources';
+import { sceneExisting, switchCollection } from './helpers/spectron/scenes';
+import { sourceIsExisting } from './helpers/spectron/sources';
 import { getFormInput } from './helpers/spectron/forms';
+import { getClient } from './helpers/api-client';
+import { WidgetsService } from '../app/services/widgets';
+import { EWidgetType } from './helpers/widget-helpers';
 
 const path = require('path');
 const _7z = require('7zip')['7z'];
@@ -18,22 +21,41 @@ test('Go through the onboarding and autoconfig', async t => {
   // Wait for the auth screen to appear
   await app.client.isExisting('button=Twitch');
 
-  await logIn(t);
+  await logIn(t, 'twitch', null, false, true);
+  await sleep(1000);
 
-  // This will show up if there are scene collections to import
-  if (await t.context.app.client.isExisting('button=Continue')) {
-    await t.context.app.client.click('button=Continue');
+  if (await t.context.app.client.isExisting('span=Skip')) {
+    await t.context.app.client.click('span=Skip');
+    await sleep(1000);
   }
 
-  // This will only show up if OBS is installed
-  if (await t.context.app.client.isExisting('button=Start Fresh')) {
-    await t.context.app.client.click('button=Start Fresh');
+  // Don't Import from OBS
+  if (await t.context.app.client.isExisting('h2=Start Fresh')) {
+    await t.context.app.client.click('h2=Start Fresh');
+    await sleep(1000);
+  }
+
+  // Skip hardware config
+  if (await t.context.app.client.isExisting('p=Skip')) {
+    await t.context.app.client.click('p=Skip');
+    await sleep(1000);
+  }
+
+  // Skip picking a theme
+  if (await t.context.app.client.isExisting('p=Skip')) {
+    await t.context.app.client.click('p=Skip');
+    await sleep(1000);
   }
 
   // Start auto config
+  t.true(await app.client.isExisting('button=Start'));
   await app.client.click('button=Start');
-  await app.client.waitForVisible('.button--action:not([disabled])', 60000);
-  await app.client.click('button=Next');
+  await app.client.waitForVisible('h1=Multistream', 60000);
+
+  // Skip restream settings
+  if (await t.context.app.client.isExisting('p=Skip')) {
+    await t.context.app.client.click('p=Skip');
+  }
 
   // success?
   t.true(await app.client.isVisible('h2=Sources'), 'Sources selector is visible');
@@ -49,13 +71,22 @@ test('OBS Importer', async t => {
   spawnSync(_7z, ['x', obsCacheZipPath, `-o${cacheDir}`]);
 
   // skip auth
-  await client.click('a=Setup later');
+  if (await t.context.app.client.isExisting('span=Skip')) {
+    await t.context.app.client.click('span=Skip');
+    await sleep(1000);
+  }
 
   // import from OBS
-  t.true(await client.isExisting('button=Import from OBS'), 'OBS detected');
-  await client.click('button=Import from OBS');
-  await client.waitForVisible('button=Continue');
-  await client.click('button=Continue');
+  if (await t.context.app.client.isExisting('h2=Import from OBS')) {
+    await t.context.app.client.click('h2=Import from OBS');
+    await sleep(10000);
+  }
+
+  // Complete onboarding
+  if (await t.context.app.client.isExisting('button=Complete')) {
+    await t.context.app.client.click('button=Complete');
+    await sleep(1000);
+  }
 
   // check collection 1 and sources
   await switchCollection(t, 'Collection 1');
@@ -69,9 +100,20 @@ test('OBS Importer', async t => {
   await switchCollection(t, 'Collection 2');
 
   // check settings
-  await client.click('.top-nav .icon-settings');
+  await client.click('.side-nav .icon-settings');
   await focusChild(t);
   await client.click('li=Output');
   t.is(await getFormInput(t, 'Video Bitrate'), '5000');
   t.is(await getFormInput(t, 'Encoder'), 'Software (x264)');
+
+  // check that widgets have been migrated
+  await focusMain(t);
+  await switchCollection(t, 'Widgets');
+  const api = await getClient();
+  const widgetsService = api.getResource<WidgetsService>('WidgetsService');
+
+  t.deepEqual(
+    [EWidgetType.DonationGoal, EWidgetType.EventList, EWidgetType.AlertBox],
+    widgetsService.getWidgetSources().map(widget => (widget.type as unknown) as EWidgetType),
+  );
 });

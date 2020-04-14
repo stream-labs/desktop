@@ -1,5 +1,10 @@
 import uuid from 'uuid/v4';
-import { IWidgetData, WidgetSettingsService, WidgetType } from 'services/widgets';
+import {
+  IWidgetData,
+  WidgetDefinitions,
+  WidgetSettingsService,
+  WidgetType,
+} from 'services/widgets';
 import { WIDGET_INITIAL_STATE } from '../widget-settings';
 import { InheritMutations } from 'services/core/stateful-service';
 import {
@@ -8,7 +13,13 @@ import {
   IAlertBoxSettings,
   IAlertBoxVariation,
 } from './alert-box-api';
-import { API_NAME_MAP, conditions, newVariation, REGEX_TESTERS } from './alert-box-data';
+import {
+  API_NAME_MAP,
+  conditions,
+  newVariation,
+  REGEX_TESTERS,
+  conditionData,
+} from './alert-box-data';
 import { IWidgetSettings } from '../../widgets-api';
 import { $t } from 'services/i18n';
 import { metadata } from 'components/widgets/inputs';
@@ -30,7 +41,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   getApiSettings() {
     return {
       type: WidgetType.AlertBox,
-      url: `https://${this.getHost()}/alert-box/v3/${this.getWidgetToken()}`,
+      url: WidgetDefinitions[WidgetType.AlertBox].url(this.getHost(), this.getWidgetToken()),
       previewUrl: `https://${this.getHost()}/alert-box/v3/${this.getWidgetToken()}`,
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/alertbox?include_linked_integrations_only=true`,
       settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/alertbox`,
@@ -45,6 +56,10 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     return conditions().base.concat(conditions()[type]);
   }
 
+  conditionDataByCondition(type: string) {
+    return conditionData()[type] || metadata.number({ title: $t('Variation Amount') });
+  }
+
   newVariation(type: string): IAlertBoxVariation {
     return newVariation(type);
   }
@@ -52,7 +67,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   toggleCustomCode(enabled: boolean, data: IWidgetSettings, variation: IAlertBoxVariation) {
     const newSettings = { ...data };
     Object.keys(newSettings).forEach(type => {
-      const variations = newSettings[type].variations;
+      const variations = newSettings[type] && newSettings[type].variations;
       const found =
         variations && variations.find((vari: IAlertBoxVariation) => variation.id === vari.id);
       if (found) {
@@ -62,7 +77,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     this.saveSettings(newSettings);
   }
 
-  getMetadata(type: string, languages: any[]) {
+  getMetadata(type: string, languages: any[], condition?: string) {
     return {
       moderationDelay: metadata.slider({ title: $t('Alert Moderation delay'), min: 0, max: 600 }),
       alertDelay: metadata.slider({ title: $t('Global Alert Delay'), min: 0, max: 30 }),
@@ -104,6 +119,10 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       conditionData: metadata.number({ title: $t('Variation Amount') }),
       minTriggerAmount: metadata.number({ title: $t('Min. Amount to Trigger Alert') }),
       minRecentEvents: metadata.number({ title: $t('Min. Amount to Show in Recent Events') }),
+      sparksEnabled: metadata.toggle({ title: $t('Sparks Enabled') }),
+      minSparksTrigger: metadata.number({ title: $t('Min. Sparks for Alert') }),
+      embersEnabled: metadata.toggle({ title: $t('Embers Enabled') }),
+      minEmbersTrigger: metadata.number({ title: $t('Min. Embers for Alert') }),
       ttsMinAmount: metadata.number({ title: $t('Min. Amount to Read') }),
       showAnimation: metadata.animation({ title: $t('Show Animation'), filter: 'in' }),
       hideAnimation: metadata.animation({ title: $t('Hide Animation'), filter: 'out' }),
@@ -119,10 +138,11 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       unlimitedMediaMod: metadata.toggle({
         title: $t('Unlimited Media Sharing Alert Moderation Delay'),
       }),
+      skillImage: metadata.toggle({ title: $t('Use Skill Image') }),
       imageFile: metadata.mediaGallery({ title: $t('Image/Video File') }),
       soundFile: metadata.sound({ title: $t('Sound File') }),
-      variationFrequency: metadata.frequency({ title: $t('Variation Frequency') }),
       template: metadata.textArea({ title: $t('Message Template') }),
+      variations: this.conditionDataByCondition(condition),
     };
   }
 
@@ -146,13 +166,16 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     const triagedSettings = this.triageSettings(settings);
     Object.keys(triagedSettings).forEach(key => {
       if (key === 'subs') {
-        triagedSettings['subs'] = this.varifySetting({
-          showResubMessage: triagedSettings['resubs'].show_message,
-          ...triagedSettings['subs'],
-          ...triagedSettings['resubs'],
-        });
+        triagedSettings['subs'] = this.varifySetting(
+          {
+            showResubMessage: triagedSettings['resubs'].show_message,
+            ...triagedSettings['subs'],
+            ...triagedSettings['resubs'],
+          },
+          key,
+        );
       } else if (this.apiNames().includes(key) && key !== 'resubs') {
-        triagedSettings[key] = this.varifySetting(triagedSettings[key]);
+        triagedSettings[key] = this.varifySetting(triagedSettings[key], key);
       }
     });
     // resubs are folded into the sub settings
@@ -166,9 +189,10 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     Object.keys(settings).forEach(key => {
       let testSuccess = false;
       REGEX_TESTERS.forEach(test => {
-        const newKey = /show/.test(key)
-          ? key.replace(test.tester, 'show_')
-          : key.replace(test.tester, '');
+        const newKey =
+          /show/.test(key) && !/show_animation/.test(key)
+            ? key.replace(test.tester, 'show_')
+            : key.replace(test.tester, '');
         if (test.tester.test(key)) {
           testSuccess = true;
           if (!newSettings[test.name]) {
@@ -195,10 +219,10 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     return newSettings;
   }
 
-  private varifySetting(setting: any): IAlertBoxSetting {
+  private varifySetting(setting: any, type: string): IAlertBoxSetting {
     const { show_message, enabled, showResubMessage, ...rest } = setting;
     const variations = setting.variations || [];
-    const defaultVariation = this.reshapeVariation(rest);
+    const defaultVariation = this.reshapeVariation(rest, type);
     const idVariations = variations.map((variation: IAlertBoxVariation) => ({
       id: uuid(),
       ...variation,
@@ -207,7 +231,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     return { enabled, showResubMessage, showMessage: show_message, variations: idVariations };
   }
 
-  private reshapeVariation(setting: any): IAlertBoxVariation {
+  private reshapeVariation(setting: any, type: string): IAlertBoxVariation {
     const imgHref =
       setting.image_href === '/images/gallery/default.gif'
         ? 'http://uploads.twitchalerts.com/image-defaults/1n9bK4w.gif'
@@ -221,7 +245,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       conditionData: null,
       conditions: [],
       name: 'Default',
-      id: 'default',
+      id: `default-${type}`,
       settings: {
         customCss: setting.custom_css,
         customHtml: setting.custom_html,
@@ -231,6 +255,11 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
         duration: constrainedDuration,
         hideAnimation: setting.hide_animation,
         image: { href: imgHref },
+        useSkillImage: setting.skill_image,
+        embersEnabled: setting.embers_enabled,
+        minEmbersTrigger: setting.embers_min,
+        sparksEnabled: setting.sparks_enabled,
+        minSparksTrigger: setting.sparks_min,
         layout: setting.layout,
         showAnimation: setting.show_animation,
         sound: { href: setting.sound_href, volume: setting.sound_volume },
@@ -322,6 +351,12 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       [`${prefix}_gif_library_enabled`]: settings.gif.libraryEnabled,
       [`${prefix}_gifs_min_amount_to_share`]: settings.gif.minAmount,
       [`${prefix}_max_gif_duration`]: settings.gif.duration,
+      // Mixer stuff
+      [`${prefix}_skill_image`]: settings.useSkillImage,
+      [`${prefix}_embers_enabled`]: settings.embersEnabled,
+      [`${prefix}_embers_min`]: settings.minEmbersTrigger,
+      [`${prefix}_sparks_enabled`]: settings.sparksEnabled,
+      [`${prefix}_sparks_min`]: settings.minSparksTrigger,
     };
   }
 

@@ -1,14 +1,12 @@
 import { Component } from 'vue-property-decorator';
 import { SpinWheelService, ISpinWheelData } from 'services/widgets/settings/spin-wheel';
-
 import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
-
 import { inputComponents } from './inputs';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
-
 import { $t } from 'services/i18n';
-import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm';
+import uuid from 'uuid/v4';
 
 @Component({
   components: {
@@ -40,14 +38,12 @@ export default class SpinWheel extends WidgetSettings<ISpinWheelData, SpinWheelS
   }
 
   addCategory() {
-    this.wData.settings.categories.push({ color: '#ffffff', prize: 'Donut' });
+    this.wData.settings.categories.push({ color: '#ffffff', prize: 'Donut', key: uuid() });
     this.save();
   }
 
-  removeCategory(prize: string) {
-    this.wData.settings.categories = this.wData.settings.categories.filter(
-      cat => cat.prize !== prize,
-    );
+  removeCategory(key: string) {
+    this.wData.settings.categories = this.wData.settings.categories.filter(cat => cat.key !== key);
     this.save();
   }
 
@@ -63,7 +59,11 @@ export default class SpinWheel extends WidgetSettings<ISpinWheelData, SpinWheelS
   moveSection(key: string, idxMod: number) {
     const sections = this.wData.settings.sections;
     const idx = sections.findIndex(sect => sect.key === key);
-    [sections[idx], sections[idx + idxMod]] = [sections[idx + idxMod], sections[idx]];
+    if (idxMod > 0) {
+      sections.splice(idx, 2, sections[idx + idxMod], sections[idx]);
+    } else {
+      sections.splice(idx + idxMod, 2, sections[idx], sections[idx + idxMod]);
+    }
     this.save();
   }
 }

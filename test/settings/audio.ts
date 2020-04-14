@@ -12,7 +12,7 @@ test('Populates audio settings', async t => {
   const assertOptions = createOptionsAssertion(t, form);
 
   await focusMain(t);
-  await app.client.click('.top-nav .icon-settings');
+  await app.client.click('.side-nav .icon-settings');
 
   await focusChild(t);
   await app.client.click('li=Audio');

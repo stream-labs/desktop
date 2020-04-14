@@ -1,0 +1,19 @@
+{
+  "Visual Settings": "비주얼 설정",
+  "Font Settings": "폰트 설정",
+  "Chatter": "채터",
+  "Always Show Messages": "언제나 메시지 표시",
+  "Show Moderator Badges": "모더레이터 배지 표시",
+  "Show Subscriber Badges": "구독자 배지 표시",
+  "Show Turbo Badges": "Turbo 배지 표시",
+  "Show Twitch Prime Badges": "Twitch Prime 배지 표시",
+  "Show Bits Badges": "비트 배지 표시",
+  "Show Top Coin Holder Badges": "최다 코인 보유자 배지 표시",
+  "Enable BetterTTV Emotes": "BetterTTV 이모티콘 활성화",
+  "Enable FrankerFaceZ Emotes": "FrankerFaceZ 이모티콘 활성화",
+  "Text Color": "텍스트 색상",
+  "Font Size": "폰트 사이즈",
+  "Muted Chatters": "음소거된 채터",
+  "Hide Commands": "명령 숨김",
+  "Background Color": "배경색"
+}

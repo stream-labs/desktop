@@ -7,7 +7,7 @@ import { inputComponents } from 'components/shared/inputs';
 import { AnimationInput } from './inputs';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n';
-import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
 

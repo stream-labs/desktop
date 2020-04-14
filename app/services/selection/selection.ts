@@ -32,13 +32,13 @@ export class Selection {
   };
 
   constructor(public sceneId: string, itemsList: TNodesList = []) {
-    this.select(itemsList);
+    if (sceneId && itemsList) this.select(itemsList);
   }
 
   // SELECTION METHODS
 
   getScene(): Scene {
-    return this.scenesService.getScene(this.sceneId);
+    return this.scenesService.views.getScene(this.sceneId);
   }
 
   add(itemsList: TNodesList): Selection {
@@ -127,11 +127,8 @@ export class Selection {
    * true if selections has only one folder
    */
   isSceneFolder(): boolean {
-    const folders = this.getFolders();
-    if (folders.length !== 1) return false;
-    const folder = folders[0];
-    const isNotFolderChild = this.getItems().find(item => item.parentId !== folder.id);
-    return !isNotFolderChild;
+    const rootNodes = this.getRootNodes();
+    return rootNodes.length === 1 && rootNodes[0].sceneNodeType === 'folder';
   }
 
   getVisualItems(): SceneItem[] {
@@ -219,7 +216,7 @@ export class Selection {
 
   copyTo(sceneId: string, folderId?: string, duplicateSources = false): TSceneNode[] {
     const insertedNodes: TSceneNode[] = [];
-    const scene = this.scenesService.getScene(sceneId);
+    const scene = this.scenesService.views.getScene(sceneId);
     const foldersMap: Dictionary<string> = {};
     let prevInsertedNode: TSceneNode;
     let insertedNode: TSceneNode;
@@ -287,7 +284,7 @@ export class Selection {
    * in the selection is visible.
    */
   isVisible(): boolean {
-    return !!this.getItems().find(item => item.visible);
+    return this.getItems().some(item => item.visible);
   }
 
   /**
@@ -295,7 +292,23 @@ export class Selection {
    * selection are locked.
    */
   isLocked(): boolean {
-    return !this.getItems().find(item => !item.locked);
+    return this.getItems().every(item => item.locked);
+  }
+
+  /**
+   * Helper method to check if any items in the selection
+   * are locked.
+   */
+  isAnyLocked(): boolean {
+    return this.getItems().some(item => item.locked);
+  }
+
+  isStreamVisible(): boolean {
+    return this.getItems().every(item => item.streamVisible);
+  }
+
+  isRecordingVisible(): boolean {
+    return this.getItems().every(item => item.recordingVisible);
   }
 
   /**
@@ -369,6 +382,14 @@ export class Selection {
   }
 
   // SCENE_ITEM METHODS
+
+  setStreamVisible(streamVisible: boolean) {
+    this.getItems().forEach(item => item.setStreamVisible(streamVisible));
+  }
+
+  setRecordingVisible(recordingVisible: boolean) {
+    this.getItems().forEach(item => item.setRecordingVisible(recordingVisible));
+  }
 
   setSettings(settings: Partial<ISceneItemSettings>) {
     this.getItems().forEach(item => item.setSettings(settings));

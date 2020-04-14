@@ -3,6 +3,13 @@ import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { overArgs } from 'lodash-decorators';
 import Display from 'components/shared/Display.vue';
 
+export interface IPinnedStatistics {
+  cpu: boolean;
+  fps: boolean;
+  droppedFrames: boolean;
+  bandwidth: boolean;
+}
+
 export interface ICustomizationServiceState {
   nightMode?: string;
   theme: string;
@@ -13,7 +20,8 @@ export interface ICustomizationServiceState {
   folderSelection: boolean;
   livedockCollapsed: boolean;
   livedockSize: number;
-  bottomdockSize: number;
+  eventsSize: number;
+  controlsSize: number;
   performanceMode: boolean;
   chatZoomFactor: number;
   enableBTTVEmotes: boolean;
@@ -21,6 +29,8 @@ export interface ICustomizationServiceState {
   mediaBackupOptOut: boolean;
   navigateToLiveOnStreamStart: boolean;
   experimental: any;
+  legacyEvents: boolean;
+  pinnedStatistics: IPinnedStatistics;
 }
 
 export interface ICustomizationSettings extends ICustomizationServiceState {}

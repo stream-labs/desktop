@@ -4,6 +4,8 @@
 
 // all global interfaces here
 
+declare const SLOBS_BUNDLE_ID: string;
+
 interface Dictionary<TItemType> {
   [key: string]: TItemType;
 }
@@ -73,6 +75,9 @@ declare module '*.m.less';
 declare module 'streamlabs-beaker';
 declare module '*.vert';
 declare module '*.frag';
+declare module 'mark.js';
+declare module 'vuejs-datepicker';
+declare module 'vuejs-datepicker/dist/locale';
 
 // uncomment to allow TS to import components without type definitions
 // webpack still checks the module existence

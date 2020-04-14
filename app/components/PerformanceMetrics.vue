@@ -1,6 +1,12 @@
 <template>
 <div class="performance-metrics flex flex--center">
-  <span class="performance-metric-wrapper">
+  <span
+    :class="[
+      'performance-metric-wrapper', classForStat('cpu')]"
+    @click="() => (updatePinnedStats('cpu', !pinnedStats.cpu))"
+    v-tooltip="pinTooltip('CPU')"
+    v-if="showCPU"
+  >
     <i class="performance-metric-icon icon-cpu"></i>
     <span class="performance-metric">
       <span class="performance-metric__value">{{ cpuPercent }}%</span>
@@ -8,24 +14,39 @@
     </span>
   </span>
 
-  <span class="performance-metric-wrapper">
-    <img class="performance-metric-icon" src="../../media/images/icons/fps.png">
+  <span
+    :class="['performance-metric-wrapper', classForStat('fps')]"
+    @click="() => (updatePinnedStats('fps', !pinnedStats.fps))"
+    v-tooltip="pinTooltip('FPS')"
+    v-if="showFPS"
+  >
+    <i class="performance-metric-icon icon-fps"></i>
     <span class="performance-metric">
       <span class="performance-metric__value">{{ frameRate }}</span>
       <span class="performance-metric__label">FPS</span>
     </span>
   </span>
 
-  <span class="performance-metric-wrapper">
-    <img class="performance-metric-icon" src="../../media/images/icons/dropped-frames.png">
+  <span
+    :class="['performance-metric-wrapper', classForStat('droppedFrames')]"
+    @click="() => (updatePinnedStats('droppedFrames', !pinnedStats.droppedFrames))"
+    v-tooltip="pinTooltip('dropped frames')"
+    v-if="showDroppedFrames"
+  >
+    <i class="performance-metric-icon icon-dropped-frames"></i>
     <span class="performance-metric">
       <span class="performance-metric__value">{{ droppedFrames }} ({{ percentDropped }}%)</span>
-      <span class="performance-metric__label">{{ $t('Dropped Frames') }}</span>
+      <span v-if="mode === 'full'" class="performance-metric__label">{{ $t('Dropped Frames') }}</span>
     </span>
   </span>
 
-  <span class="performance-metric-wrapper">
-    <img class="performance-metric-icon" src="../../media/images/icons/speed.png">
+  <span
+    :class="['performance-metric-wrapper', classForStat('bandwidth')]"
+    @click="() => (updatePinnedStats('bandwidth', !pinnedStats.bandwidth))"
+    v-tooltip="pinTooltip('bandwidth')"
+    v-if="showBandwidth"
+  >
+    <i class="performance-metric-icon icon-bitrate"></i>
     <span class="performance-metric">
       <span class="performance-metric__value">{{ bandwidth }}</span>
       <span class="performance-metric__label">kb/s</span>
@@ -40,20 +61,14 @@
 @import '../styles/index';
 
 .performance-metrics {
-  .performance-metric-wrapper {
-    &:first-child {
-      &::before {
-        content: '';
-        padding-right: 0;
-      }
-    }
-  }
+  background: var(--background);
+  height: calc(100% - 30px);
 }
 
 .performance-metric-wrapper {
   .padding-right();
 
-  color: var(--icon);
+  color: var(--paragraph);
   white-space: nowrap;
   display: flex;
   align-items: center;
@@ -64,10 +79,14 @@
     content: '|';
     opacity: 0.5;
   }
+}
 
-  // @media (max-width: 1300px) {
-  //   font-size: 12px;
-  // }
+.performance-metric-wrapper.active {
+  background: var(--button);
+}
+
+.performance-metric-wrapper.clickable {
+  cursor: pointer;
 }
 
 .performance-metric {

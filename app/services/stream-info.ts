@@ -1,23 +1,29 @@
-import { StatefulService, mutation } from 'services/core/stateful-service';
-import { IChannelInfo, getPlatformService, Tag } from 'services/platforms';
+import { mutation, StatefulService } from 'services/core/stateful-service';
+import { getPlatformService } from 'services/platforms';
 import { UserService } from './user';
 import { Inject } from 'services/core/injector';
 import { StreamingService } from './streaming';
 import { HostsService } from 'services/hosts';
 import { authorizedHeaders } from 'util/requests';
-import { BehaviorSubject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
+import { ITwitchChannelInfo, TwitchService } from './platforms/twitch';
+import { FacebookService, IFacebookChannelInfo } from './platforms/facebook';
+import { InitAfter } from './core';
+import { IYoutubeChannelInfo, TYoutubeLifecycleStep } from './platforms/youtube';
+import { IMixerChannelInfo } from './platforms/mixer';
+import { isEqual, pick, reduce } from 'lodash';
 
-interface IStreamInfoServiceState {
+export type TCombinedChannelInfo = IFacebookChannelInfo &
+  ITwitchChannelInfo &
+  IYoutubeChannelInfo &
+  IMixerChannelInfo;
+
+type TStreamInfoServiceState = {
   fetching: boolean;
-  error: boolean;
+  error: string;
   viewerCount: number;
-  channelInfo: IChannelInfo;
-}
-
-interface IStreamInfo {
-  viewerCount: number;
-  channelInfo: IChannelInfo;
-}
+  lifecycleStep: TYoutubeLifecycleStep;
+} & TCombinedChannelInfo;
 
 const VIEWER_COUNT_UPDATE_INTERVAL = 60 * 1000;
 
@@ -27,82 +33,73 @@ const VIEWER_COUNT_UPDATE_INTERVAL = 60 * 1000;
  * channel and current stream in the Vuex store for
  * components to make use of.
  */
-export class StreamInfoService extends StatefulService<IStreamInfoServiceState> {
+@InitAfter('UserService')
+export class StreamInfoService extends StatefulService<TStreamInfoServiceState> {
   @Inject() userService: UserService;
   @Inject() streamingService: StreamingService;
   @Inject() hostsService: HostsService;
+  @Inject() twitchService: TwitchService;
+  @Inject() facebookService: FacebookService;
 
-  static initialState: IStreamInfoServiceState = {
-    fetching: false,
-    error: false,
-    viewerCount: 0,
-    channelInfo: null,
-  };
+  static initialState: TStreamInfoServiceState = null;
 
   viewerCountInterval: number;
 
-  streamInfoChanged = new BehaviorSubject<IStreamInfo>(StreamInfoService.initialState);
+  streamInfoChanged = new Subject<Partial<TStreamInfoServiceState>>();
 
   init() {
-    this.refreshStreamInfo().catch(e => null);
+    // handle log-in and log-out to subscribe/re-subscribe on channelInfo event from
+    // the active platform service
+    this.RESET();
+    this.userService.userLogin.subscribe(_ => this.onLoginHandler());
+    this.userService.userLogout.subscribe(_ => this.onLogoutHandler());
 
+    // update viewers count
     this.viewerCountInterval = window.setInterval(() => {
-      if (!this.userService.isLoggedIn()) return;
+      if (!this.userService.isLoggedIn) return;
 
       if (this.streamingService.isStreaming) {
         const platform = getPlatformService(this.userService.platform.type);
 
         platform.fetchViewerCount().then(viewers => {
-          this.SET_VIEWER_COUNT(viewers);
-          this.streamInfoChanged.next({
-            viewerCount: this.state.viewerCount,
-            channelInfo: this.state.channelInfo,
-          });
+          this.updateInfo({ viewerCount: viewers });
         });
       }
     }, VIEWER_COUNT_UPDATE_INTERVAL);
   }
 
-  refreshStreamInfo(): Promise<void> {
-    if (!this.userService.isLoggedIn()) return Promise.reject('failed to fetch stream info');
+  private channelInfoSubsc: Subscription = null;
 
-    this.SET_ERROR(false);
-    this.SET_FETCHING(true);
-
+  private onLoginHandler() {
     const platform = getPlatformService(this.userService.platform.type);
-    return platform
-      .fetchChannelInfo()
-      .then(info => {
-        this.SET_CHANNEL_INFO(info);
-        this.streamInfoChanged.next({
-          viewerCount: this.state.viewerCount,
-          channelInfo: this.state.channelInfo,
-        });
-        this.SET_FETCHING(false);
-      })
-      .catch(() => {
-        this.SET_FETCHING(false);
-        this.SET_ERROR(true);
-      });
+    this.channelInfoSubsc = platform.channelInfoChanged.subscribe(channelInfo =>
+      this.updateInfo(channelInfo),
+    );
   }
 
-  setStreamInfo(title: string, description: string, game: string, tags?: Tag[]): Promise<boolean> {
-    const platform = getPlatformService(this.userService.platform.type);
-    if (this.userService.platform.type === 'facebook' && game === '') {
-      return Promise.reject('You must select a game.');
-    }
+  private onLogoutHandler() {
+    if (this.channelInfoSubsc) this.channelInfoSubsc.unsubscribe();
+    this.RESET();
+    this.streamInfoChanged.next(this.state);
+  }
 
-    return platform
-      .putChannelInfo({ title, game, description, tags })
-      .then(success => {
-        this.refreshStreamInfo();
-        this.createGameAssociation(game);
-        return success;
-      })
-      .catch(() => {
-        this.refreshStreamInfo();
-        return false;
-      });
+  private updateInfo(streamInfoPatch: Partial<TStreamInfoServiceState>) {
+    const newStreamInfo = {
+      ...this.state,
+      ...streamInfoPatch,
+    };
+
+    // emit the "streamInfoChanged" only with updated values
+    const changedProps = reduce(
+      this.state,
+      (result, value, key) => {
+        return isEqual(value, newStreamInfo[key]) ? result : result.concat(key);
+      },
+      [],
+    );
+    const changedData = pick(newStreamInfo, changedProps);
+    this.UPDATE_STREAM_INFO(changedData);
+    this.streamInfoChanged.next(changedData);
   }
 
   /**
@@ -125,22 +122,35 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
   }
 
   @mutation()
-  SET_FETCHING(fetching: boolean) {
-    this.state.fetching = fetching;
-  }
-
-  @mutation()
-  SET_ERROR(error: boolean) {
-    this.state.error = error;
-  }
-
-  @mutation()
-  SET_CHANNEL_INFO(info: IChannelInfo) {
-    this.state.channelInfo = info;
+  UPDATE_STREAM_INFO(info: Partial<TStreamInfoServiceState>) {
+    Object.keys(info).forEach(prop => (this.state[prop] = info[prop]));
   }
 
   @mutation()
   SET_VIEWER_COUNT(viewers: number) {
     this.state.viewerCount = viewers;
+  }
+
+  @mutation()
+  RESET() {
+    this.state = {
+      fetching: false,
+      error: '',
+      viewerCount: 0,
+      title: '',
+      game: '',
+      description: '',
+      tags: [],
+      availableTags: [],
+      hasUpdateTagsPermission: false,
+      facebookPageId: '',
+      broadcastId: '',
+      streamId: '',
+      channelId: '',
+      chatUrl: '',
+      streamUrl: '',
+      dashboardUrl: '',
+      lifecycleStep: 'idle',
+    };
   }
 }

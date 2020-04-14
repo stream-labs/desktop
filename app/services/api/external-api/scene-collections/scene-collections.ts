@@ -56,6 +56,15 @@ export class SceneCollectionsService {
     return this.sceneCollectionsService.rename(newName, id);
   }
 
+  /**
+   * Deletes a scene collection.  If no id is specified, it
+   * will delete the current collection.
+   * @param id the id of the collection to delete
+   */
+  async delete(id?: string): Promise<void> {
+    return this.sceneCollectionsService.delete(id);
+  }
+
   get collectionAdded(): Observable<ISceneCollectionsManifestEntry> {
     return this.sceneCollectionsService.collectionAdded;
   }

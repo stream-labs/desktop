@@ -8,6 +8,7 @@
       @input="save()"
       :metadata="{ type: metadata.type }"
       v-model="editorInputValue"
+      class="code-input"
     />
   </div>
 </template>
@@ -30,5 +31,11 @@
         cursor: pointer;
       }
     }
+  }
+
+  .code-input {
+    height: calc(100% - 32px);
+    overflow-y: auto;
+    background: #263238; // Not color variabled here to match CodeMirror's background color
   }
 </style>

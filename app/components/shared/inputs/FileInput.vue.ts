@@ -9,7 +9,7 @@ export default class FileInput extends BaseInput<string, IFileMetadata> {
   @Prop() readonly metadata: IFileMetadata;
   @Prop() readonly title: string;
 
-  showFileDialog() {
+  async showFileDialog() {
     const options: Electron.OpenDialogOptions = {
       defaultPath: this.value,
       filters: this.metadata.filters,
@@ -22,10 +22,10 @@ export default class FileInput extends BaseInput<string, IFileMetadata> {
       options.properties.push('openFile');
     }
 
-    const paths = electron.remote.dialog.showOpenDialog(options);
+    const { filePaths } = await electron.remote.dialog.showOpenDialog(options);
 
-    if (paths) {
-      this.emitInput(paths[0]);
+    if (filePaths[0]) {
+      this.emitInput(filePaths[0]);
     }
   }
 }

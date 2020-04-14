@@ -20,5 +20,10 @@
   "Filter name": "Filter naam",
   "Add source filter": "Bron filter toevoegen",
   "No filters applied": "Geen filters toegepast",
-  "Source filters": "Bron filters"
+  "Source filters": "Bron filters",
+  "Invert Polarity": "Invert Polarity",
+  "Limiter": "Limiter",
+  "Expander": "Expander",
+  "Shader": "Shader",
+  "No settings are available for this filter": "No settings are available for this filter"
 }

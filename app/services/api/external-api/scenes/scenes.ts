@@ -20,7 +20,7 @@ export class ScenesService {
   }
 
   getScenes(): Scene[] {
-    return this.scenesService.getScenes().map(scene => this.getScene(scene.id));
+    return this.scenesService.views.scenes.map(scene => this.getScene(scene.id));
   }
 
   createScene(name: string): Scene {
@@ -43,7 +43,7 @@ export class ScenesService {
   }
 
   get activeSceneId(): string {
-    return this.scenesService.activeSceneId;
+    return this.scenesService.views.activeSceneId;
   }
 
   get sceneSwitched(): Observable<ISceneModel> {

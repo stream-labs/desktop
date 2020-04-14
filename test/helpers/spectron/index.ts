@@ -6,6 +6,7 @@ import { DismissablesService } from 'services/dismissables';
 import { getUser, releaseUserInPool } from './user';
 import { sleep } from '../sleep';
 import { uniq } from 'lodash';
+import { installFetchMock } from './network';
 
 // save names of all running tests to use them in the retrying mechanism
 const pendingTests: string[] = [];
@@ -25,15 +26,31 @@ const rimraf = require('rimraf');
 const ALMOST_INFINITY = Math.pow(2, 31) - 1; // max 32bit int
 const FAILED_TESTS_PATH = 'test-dist/failed-tests.json';
 
+let activeWindow: string | RegExp;
+
+const afterStartCallbacks: ((t: TExecutionContext) => any)[] = [];
+export function afterAppStart(cb: (t: TExecutionContext) => any) {
+  afterStartCallbacks.push(cb);
+}
+
 export async function focusWindow(t: any, regex: RegExp): Promise<boolean> {
   const handles = await t.context.app.client.windowHandles();
 
   for (const handle of handles.value) {
     await t.context.app.client.window(handle);
     const url = await t.context.app.client.getUrl();
-    if (url.match(regex)) return true;
+    if (url.match(regex)) {
+      activeWindow = regex;
+      return true;
+    }
   }
   return false;
+}
+
+// Focuses the worker window
+// Should not usually be used
+export async function focusWorker(t: any) {
+  await focusWindow(t, /windowId=worker$/);
 }
 
 // Focuses the main window
@@ -67,7 +84,11 @@ interface ITestRunnerOptions {
   restartAppAfterEachTest?: boolean;
   pauseIfFailed?: boolean;
   appArgs?: string;
-  afterStartCb?(t: any): Promise<any>;
+
+  /**
+   * disable synchronisation of scene-collections and media-backup
+   */
+  noSync?: boolean;
 
   /**
    * Enable this to show network logs if test failed
@@ -86,6 +107,7 @@ interface ITestRunnerOptions {
 const DEFAULT_OPTIONS: ITestRunnerOptions = {
   skipOnboarding: true,
   restartAppAfterEachTest: true,
+  noSync: true,
   networkLogging: false,
   pauseIfFailed: false,
 };
@@ -97,12 +119,29 @@ export interface ITestContext {
 
 export type TExecutionContext = ExecutionContext<ITestContext>;
 
-let startApp: (t: TExecutionContext) => Promise<any>;
-let stopApp: (clearCache?: boolean) => Promise<any>;
+let startAppFn: (t: TExecutionContext) => Promise<any>;
+let stopAppFn: (t: TExecutionContext, clearCache?: boolean) => Promise<any>;
+
+export async function startApp(t: TExecutionContext) {
+  return startAppFn(t);
+}
+
+export async function stopApp(t: TExecutionContext, clearCache?: boolean) {
+  return stopAppFn(t, clearCache);
+}
 
 export async function restartApp(t: TExecutionContext): Promise<Application> {
-  await stopApp(false);
-  return await startApp(t);
+  await stopAppFn(t, false);
+  return await startAppFn(t);
+}
+
+let skipCheckingErrorsInLogFlag = false;
+
+/**
+ * Disable checking errors in the log file for a single test
+ */
+export function skipCheckingErrorsInLog() {
+  skipCheckingErrorsInLogFlag = true;
 }
 
 export function useSpectron(options: ITestRunnerOptions = {}) {
@@ -117,10 +156,11 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   let logFileLastReadingPos = 0;
   const cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
 
-  startApp = async function startApp(t: TExecutionContext): Promise<Application> {
+  startAppFn = async function startApp(t: TExecutionContext): Promise<Application> {
     t.context.cacheDir = cacheDir;
     const appArgs = options.appArgs ? options.appArgs.split(' ') : [];
     if (options.networkLogging) appArgs.push('--network-logging');
+    if (options.noSync) appArgs.push('--nosync');
     app = t.context.app = new Application({
       path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
       args: [
@@ -158,6 +198,10 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     await focusMain(t);
     await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
 
+    // allow usage of fetch-mock library
+    await installFetchMock(t);
+    await focusMain(t);
+
     // Wait up to 2 seconds before giving up looking for an element.
     // This will slightly slow down negative assertions, but makes
     // the tests much more stable, especially on slow systems.
@@ -168,13 +212,13 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
     await waitForLoader(t);
-    if (await t.context.app.client.isExisting('a=Setup later')) {
+    if (await t.context.app.client.isExisting('span=Skip')) {
       if (options.skipOnboarding) {
-        await t.context.app.client.click('a=Setup later');
-
-        // This will only show up if OBS is installed
-        if (await t.context.app.client.isExisting('button=Start Fresh')) {
-          await t.context.app.client.click('button=Start Fresh');
+        await t.context.app.client.click('span=Skip');
+        await t.context.app.client.click('h2=Start Fresh');
+        await t.context.app.client.click('p=Skip');
+        if (await t.context.app.client.isVisible('p=Skip')) {
+          await t.context.app.client.click('p=Skip');
         }
       } else {
         // Wait for the connect screen before moving on
@@ -195,14 +239,14 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     context = t.context;
     appIsRunning = true;
 
-    if (options.afterStartCb) {
-      await options.afterStartCb(t);
+    for (const callback of afterStartCallbacks) {
+      await callback(t);
     }
 
     return app;
   };
 
-  stopApp = async function stopApp(clearCache = true) {
+  stopAppFn = async function stopApp(t: TExecutionContext, clearCache = true) {
     try {
       await app.stop();
     } catch (e) {
@@ -215,7 +259,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     if (!clearCache) return;
     await new Promise(resolve => {
-      rimraf(context.cacheDir, resolve);
+      rimraf(cacheDir, resolve);
     });
   };
 
@@ -223,7 +267,8 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
    * test should be considered as failed if it writes exceptions in to the log file
    */
   async function checkErrorsInLogFile() {
-    const filePath = path.join(cacheDir, 'slobs-client', 'log.log');
+    await sleep(1000); // electron-log needs some time to write down logs
+    const filePath = path.join(cacheDir, 'slobs-client', 'app.log');
     if (!fs.existsSync(filePath)) return;
     const logs = fs.readFileSync(filePath).toString();
     const errors = logs
@@ -234,7 +279,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     // save the last reading position, to skip already read records next time
     logFileLastReadingPos = logs.length - 1;
 
-    if (errors.length) {
+    if (errors.length && !skipCheckingErrorsInLogFlag) {
       fail(`The log-file has errors \n ${logs}`);
     } else if (options.networkLogging && !testPassed) {
       fail(`log-file: \n ${logs}`);
@@ -250,9 +295,10 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   test.beforeEach(async t => {
     testName = t.title.replace('beforeEach hook for ', '');
     testPassed = false;
+    skipCheckingErrorsInLogFlag = false;
 
     t.context.app = app;
-    if (options.restartAppAfterEachTest || !appIsRunning) await startApp(t);
+    if (options.restartAppAfterEachTest || !appIsRunning) await startAppFn(t);
   });
 
   test.afterEach(async t => {
@@ -274,7 +320,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       await releaseUserInPool();
       if (options.restartAppAfterEachTest) {
         client.disconnect();
-        await stopApp();
+        await stopAppFn(t);
       }
     } catch (e) {
       fail('Test finalization failed');
@@ -294,7 +340,8 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
   test.after.always(async t => {
     if (!appIsRunning) return;
-    await stopApp();
+    t.context = context;
+    await stopAppFn(t);
     if (!testPassed) saveFailedTestsToFile([testName]);
   });
 
@@ -320,5 +367,18 @@ function removeFailedTestFromFile(testName: string) {
     const failedTests = JSON.parse(fs.readFileSync(FAILED_TESTS_PATH));
     failedTests.splice(failedTests.indexOf(testName), 1);
     fs.writeFileSync(FAILED_TESTS_PATH, JSON.stringify(failedTests));
+  }
+}
+
+// the built-in 'click' method doesn't show selector in the error message
+// wrap this method to achieve this functionality
+
+export async function click(t: TExecutionContext, selector: string) {
+  try {
+    return await t.context.app.client.click(selector);
+  } catch (e) {
+    const windowId = String(activeWindow);
+    const message = `click to "${selector}" failed in window ${windowId}: ${e.message} ${e.type}`;
+    throw new Error(message);
   }
 }

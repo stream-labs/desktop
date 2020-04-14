@@ -2,6 +2,7 @@ import { Service } from './core/service';
 import Utils from './utils';
 import { AppService } from './app';
 import { Inject } from './core/injector';
+import { InitAfter } from './core';
 
 type TShortcutHandler = (event: KeyboardEvent) => void;
 
@@ -14,6 +15,7 @@ export function shortcut(key: string) {
   };
 }
 
+@InitAfter('AppService')
 export class ShortcutsService extends Service {
   shortcuts: Map<string, TShortcutHandler> = new Map();
 

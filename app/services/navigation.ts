@@ -3,17 +3,14 @@ import { Subject } from 'rxjs';
 
 export type TAppPage =
   | 'Studio'
-  | 'Dashboard'
-  | 'Live'
   | 'Onboarding'
   | 'BrowseOverlays'
   | 'PatchNotes'
   | 'Chatbot'
-  | 'DesignSystem'
   | 'PlatformAppMainPage'
   | 'PlatformAppStore'
-  | 'Help'
-  | 'CreatorSites';
+  | 'FacebookMerge'
+  | 'LayoutEditor';
 
 interface INavigationState {
   currentPage: TAppPage;

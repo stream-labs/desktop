@@ -1,0 +1,18 @@
+{
+  "Message Format": "メッセージ形式",
+  "Max Donations": "最大ドネーション",
+  "Text Scroll Speed": "テキストスクロール速度",
+  "Background Color": "背景色",
+  "Font": "フォント",
+  "Font Size": "フォントサイズ",
+  "Font Weight": "フォント太さ",
+  "Text Color": "テキスト色",
+  "Name Text Color": "テキスト色に名前を付ける",
+  "Amount Text Color": "金額テキスト色",
+  "The name of the donator,": "寄付者の名前",
+  "The amount that was donated": "寄付された金額",
+  "Manage List": "リストを管理",
+  "Font Settings": "フォント設定",
+  "A hex color for the text of the": "テキストの 16 進数の色",
+  "token": "トークン"
+}

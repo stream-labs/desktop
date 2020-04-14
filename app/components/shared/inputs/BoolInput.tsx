@@ -13,7 +13,7 @@ export default class BoolInput extends BaseInput<boolean, IInputMetadata> {
     this.emitInput(!this.value, e);
   }
 
-  render(h: Function) {
+  render() {
     return (
       <div
         class={cx('input-wrapper', { disabled: this.options.disabled })}

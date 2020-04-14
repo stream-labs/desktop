@@ -29,6 +29,7 @@ export interface IStreamingServiceState {
   recordingStatusTime: string;
   replayBufferStatus: EReplayBufferState;
   replayBufferStatusTime: string;
+  selectiveRecording: boolean;
 }
 
 export interface IStreamingServiceApi {
@@ -66,7 +67,7 @@ export interface IStreamingServiceApi {
   /**
    * Toggle the streaming state
    */
-  toggleStreaming(): void;
+  toggleStreaming(): Promise<never> | Promise<void>;
 
   /**
    * @deprecated

@@ -1,4 +1,10 @@
-import { IWidgetData, IWidgetSettings, WidgetSettingsService, WidgetType } from 'services/widgets';
+import {
+  IWidgetData,
+  IWidgetSettings,
+  WidgetDefinitions,
+  WidgetSettingsService,
+  WidgetType,
+} from 'services/widgets';
 import { metadata } from 'components/widgets/inputs/index';
 import { InheritMutations } from 'services/core/stateful-service';
 import { WIDGET_INITIAL_STATE } from './widget-settings';
@@ -36,7 +42,7 @@ export class ChatBoxService extends WidgetSettingsService<IChatBoxData> {
   getApiSettings() {
     return {
       type: WidgetType.ChatBox,
-      url: `https://${this.getHost()}/widgets/chat-box/v1/${this.getWidgetToken()}`,
+      url: WidgetDefinitions[WidgetType.ChatBox].url(this.getHost(), this.getWidgetToken()),
       previewUrl: `https://${this.getHost()}/widgets/chat-box/v1/${this.getWidgetToken()}?simulate=1`,
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/chatbox`,
       settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/chatbox`,
@@ -82,11 +88,11 @@ export class ChatBoxService extends WidgetSettingsService<IChatBoxData> {
       background_color: metadata.color({
         title: $t('Background Color'),
         description: $t(
-          'Note: This background color is for preview purposes only.' +
+          'This background color is for preview purposes only. ' +
             'It will not be shown in your stream.',
         ),
         tooltip: $t(
-          'A hex code for the widget background. This is for preview purposes only.' +
+          'A hex code for the widget background. This is for preview purposes only. ' +
             'It will not be shown in your stream.',
         ),
       }),

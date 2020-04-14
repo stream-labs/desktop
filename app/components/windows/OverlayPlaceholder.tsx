@@ -6,7 +6,7 @@ import styles from './OverlayPlaceholder.m.less';
 export default class OverlayPlaceholder extends TsxComponent<{}> {
   @Prop() title: string;
 
-  render(h: Function) {
+  render() {
     return (
       <div class={styles.container}>
         <div class={styles.outline}>

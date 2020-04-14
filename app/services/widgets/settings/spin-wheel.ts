@@ -1,4 +1,10 @@
-import { IWidgetData, IWidgetSettings, WidgetSettingsService, WidgetType } from 'services/widgets';
+import {
+  IWidgetData,
+  IWidgetSettings,
+  WidgetDefinitions,
+  WidgetSettingsService,
+  WidgetType,
+} from 'services/widgets';
 import { WIDGET_INITIAL_STATE } from './widget-settings';
 import { InheritMutations } from 'services/core/stateful-service';
 import { $t } from 'services/i18n';
@@ -12,8 +18,8 @@ export interface ISpinWheelSettings extends IWidgetSettings {
   rotationSpeed: number;
   slowRate: number;
   hideTimeout: number;
-  categories: { color: string; prize: string }[];
-  sections: { category: number; weight: number; key: string }[];
+  categories: Array<{ color: string; prize: string; key: string }>;
+  sections: Array<{ category: number; weight: number; key: string }>;
   font: string;
   fontColor: string;
   fontSize: number;
@@ -42,8 +48,8 @@ export class SpinWheelService extends WidgetSettingsService<ISpinWheelData> {
   getApiSettings() {
     return {
       type: WidgetType.SpinWheel,
-      url: `https://${this.getHost()}/widgets/spin-wheel?token=${this.getWidgetToken()}`,
-      previewUrl: `https://${this.getHost()}/widgets/spin-wheel?token=${this.getWidgetToken()}&simulate=1`,
+      url: WidgetDefinitions[WidgetType.SpinWheel].url(this.getHost(), this.getWidgetToken()),
+      previewUrl: `https://${this.getHost()}/widgets/wheel?token=${this.getWidgetToken()}`,
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/wheel`,
       settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/wheel`,
       settingsUpdateEvent: 'spinwheelSettingsUpdate',
@@ -87,7 +93,9 @@ export class SpinWheelService extends WidgetSettingsService<ISpinWheelData> {
   }
 
   protected patchAfterFetch(data: any): ISpinWheelData {
-    data.settings.categories = JSON.parse(data.settings.categories);
+    data.settings.categories = JSON.parse(
+      data.settings.categories,
+    ).map((category: Array<{ color: string; prize: string }>) => ({ key: uuid(), ...category }));
     data.settings.sections = JSON.parse(data.settings.sections).map((sect: any) => ({
       key: uuid(),
       ...sect,
@@ -97,8 +105,6 @@ export class SpinWheelService extends WidgetSettingsService<ISpinWheelData> {
 
   protected patchBeforeSend(settings: ISpinWheelSettings): any {
     const newSettings: any = { ...settings };
-    newSettings.categories = JSON.stringify(settings.categories);
-    newSettings.sections = JSON.stringify(settings.sections);
     return newSettings;
   }
 }

@@ -1,4 +1,4 @@
-import TsxComponent from 'components/tsx-component';
+import TsxComponent, { createProps } from 'components/tsx-component';
 import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { TransitionsService } from 'services/transitions';
@@ -8,20 +8,22 @@ import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
 import { metadata } from './shared/inputs';
 
-@Component({})
-export default class SceneTransitions extends TsxComponent<{ connectionId: string }> {
+class SceneTransitionProps {
+  connectionId: string = '';
+}
+
+@Component({ props: createProps(SceneTransitionProps) })
+export default class SceneTransitions extends TsxComponent<SceneTransitionProps> {
   @Inject() transitionsService: TransitionsService;
   @Inject() scenesService: ScenesService;
   @Inject() private editorCommandsService: EditorCommandsService;
-
-  @Prop() connectionId: string;
 
   get fromSceneModel(): string {
     return this.connection.fromSceneId;
   }
 
   setFromSceneModel(value: string) {
-    this.editorCommandsService.executeCommand('EditConnectionCommand', this.connectionId, {
+    this.editorCommandsService.executeCommand('EditConnectionCommand', this.props.connectionId, {
       fromSceneId: value,
     });
   }
@@ -31,7 +33,7 @@ export default class SceneTransitions extends TsxComponent<{ connectionId: strin
   }
 
   setToSceneModel(value: string) {
-    this.editorCommandsService.executeCommand('EditConnectionCommand', this.connectionId, {
+    this.editorCommandsService.executeCommand('EditConnectionCommand', this.props.connectionId, {
       toSceneId: value,
     });
   }
@@ -41,19 +43,21 @@ export default class SceneTransitions extends TsxComponent<{ connectionId: strin
   }
 
   setTransitionModel(value: string) {
-    this.editorCommandsService.executeCommand('EditConnectionCommand', this.connectionId, {
+    this.editorCommandsService.executeCommand('EditConnectionCommand', this.props.connectionId, {
       transitionId: value,
     });
   }
 
   get connection() {
-    return this.transitionsService.state.connections.find(conn => conn.id === this.connectionId);
+    return this.transitionsService.state.connections.find(
+      conn => conn.id === this.props.connectionId,
+    );
   }
 
   get sceneOptions() {
     return [
       { title: $t('All'), value: 'ALL' },
-      ...this.scenesService.scenes.map(scene => ({
+      ...this.scenesService.views.scenes.map(scene => ({
         title: scene.name,
         value: scene.id,
       })),
@@ -67,7 +71,7 @@ export default class SceneTransitions extends TsxComponent<{ connectionId: strin
     }));
   }
 
-  render(h: Function) {
+  render() {
     return (
       <div>
         <VFormGroup

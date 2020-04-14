@@ -44,8 +44,8 @@ export class SelectionService extends StatefulService<ISelectionState> {
 
   updated = new Subject<ISelectionState>();
 
-  private get sceneId() {
-    return this.scenesService.activeSceneId;
+  get sceneId() {
+    return this.scenesService.views.activeSceneId;
   }
 
   @Inject() private scenesService: ScenesService;
@@ -86,6 +86,8 @@ export class SelectionService extends StatefulService<ISelectionState> {
   getClosestParent: () => SceneItemFolder;
   getRootNodes: () => TSceneNode[];
   getSources: () => Source[];
+  setStreamVisible: (streamVisible: boolean) => void;
+  setRecordingVisible: (recordingVisible: boolean) => void;
 
   // SCENE_ITEM METHODS
 
@@ -124,18 +126,16 @@ export class SelectionService extends StatefulService<ISelectionState> {
         ? $t('Are you sure you want to remove these %{count} items?', { count: selectionLength })
         : $t('Are you sure you want to remove %{sceneName}?', { sceneName: name });
 
-    electron.remote.dialog.showMessageBox(
-      electron.remote.getCurrentWindow(),
-      {
+    electron.remote.dialog
+      .showMessageBox(Utils.getMainWindow(), {
         message,
         type: 'warning',
         buttons: [$t('Cancel'), $t('OK')],
-      },
-      ok => {
-        if (!ok) return;
+      })
+      .then(({ response }) => {
+        if (!response) return;
         this.editorCommandsService.executeCommand('RemoveNodesCommand', this.getActiveSelection());
-      },
-    );
+      });
   }
 
   openEditTransform() {
@@ -174,7 +174,7 @@ export class SelectionService extends StatefulService<ISelectionState> {
    * @override Selection.getScene
    */
   private getScene(): Scene {
-    return this.scenesService.activeScene;
+    return this.scenesService.views.activeScene;
   }
 
   private getSelection(): Selection {

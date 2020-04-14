@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "strict": true,
+    "outDir": "./build"
+  },
+  "files": [
+    "bootstrap.ts",
+    "bundle-updater.ts",
+    "updater.d.ts"
+  ]
+}

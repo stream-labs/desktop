@@ -1,0 +1,18 @@
+{
+  "Message Format": "메시지 폰트",
+  "Max Donations": "최대 후원",
+  "Text Scroll Speed": "텍스트 스크롤 속도",
+  "Background Color": "배경색",
+  "Font": "폰트",
+  "Font Size": "폰트 사이즈",
+  "Font Weight": "폰트 두께",
+  "Text Color": "텍스트 색상",
+  "Name Text Color": "텍스트 색상 이름 짓기",
+  "Amount Text Color": "금액 텍스트 색상",
+  "The name of the donator,": "후원자의 이름,",
+  "The amount that was donated": "후원된 금액",
+  "Manage List": "관리 목록",
+  "Font Settings": "폰트 설정",
+  "A hex color for the text of the": "다음에 대한 16진수 색상:",
+  "token": "토큰"
+}

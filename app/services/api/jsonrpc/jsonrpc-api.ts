@@ -19,6 +19,7 @@ export interface IJsonRpcRequest {
     args?: any[];
     fetchMutations?: boolean;
     compactMode?: boolean;
+    noReturn?: boolean;
   };
 }
 
@@ -44,6 +45,7 @@ export interface IJsonRpcEvent {
 }
 
 export interface IMutation {
+  id: number;
   type: string;
   payload: any;
 }

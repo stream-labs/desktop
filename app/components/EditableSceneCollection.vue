@@ -12,6 +12,7 @@
       <i class="icon-times" @click.stop="cancelRename" v-if="!needsRename" />
     </div>
     <div v-else>
+      <i class="fab" :class="{ 'fa-apple': collection.operatingSystem === 'darwin', 'fa-windows': collection.operatingSystem === 'win32' }" />
       {{ collection.name }}
     </div>
   </span>
@@ -57,7 +58,7 @@
   }
 
   &:hover {
-    background: var(--hover);
+    background: var(--border);
 
     .editable-scene-collection--action {
       display: inline;

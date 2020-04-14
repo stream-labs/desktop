@@ -68,7 +68,7 @@ export default class AddSourceFilter extends Vue {
     this.form.name = this.filtersService.suggestName(this.sourceId, name);
   }
 
-  render(h: Function) {
+  render() {
     return (
       <ModalLayout doneHandler={this.done} cancelHandler={this.cancel}>
         <div slot="content">

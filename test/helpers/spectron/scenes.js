@@ -30,6 +30,12 @@ export async function rightClickScene(t, name) {
   await t.context.app.client.rightClick(`div=${name}`);
 }
 
+export async function duplicateScene(t, sourceName, targetName) {
+  await openDuplicateWindow(t, sourceName);
+  await t.context.app.client.setValue('input', targetName);
+  await t.context.app.client.click('button=Done');
+}
+
 export async function addScene(t, name) {
   const app = t.context.app;
 
@@ -63,5 +69,5 @@ export async function switchCollection(t, collectionName) {
 }
 
 export async function sceneExisting(t, name) {
-  return await t.context.app.client.$(`.studio-controls-selector`).isExisting(`div=${name}`);
+  return await t.context.app.client.$(`[data-name=scene-selector]`).isExisting(`div=${name}`);
 }

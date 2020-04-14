@@ -1,6 +1,7 @@
 import uuid from 'uuid/v4';
 import { IAlertBoxVariation } from './alert-box-api';
 import { $t } from 'services/i18n';
+import { metadata } from 'components/widgets/inputs';
 
 export const API_NAME_MAP = {
   bit: 'bits',
@@ -27,7 +28,9 @@ export const API_NAME_MAP = {
   facebook_stars: 'stars',
   facebook_share: 'shares',
   facebook_follow: 'fbfollows',
-  facemaskdonation: 'facemasks',
+  loyalty_store_redemption: 'loyaltystore',
+  effect: 'effects',
+  sticker: 'stickers',
 };
 
 export const REGEX_TESTERS = Object.keys(API_NAME_MAP).map(key => ({
@@ -111,6 +114,35 @@ export const conditions = () => ({
     { value: 'MERCH_PRODUCT', title: $t('Product') },
     { value: 'MERCH_PREORDER', title: $t('Preorder') },
   ],
+  loyaltystore: [
+    { value: 'LOYALTY_STORE_REDEMPTION_ITEM_TYPE', title: $t('Item type is <type>') },
+    { value: 'LOYALTY_STORE_REDEMPTION_ITEM_NAME', title: $t('Item name is <name>') },
+  ],
+  effects: [
+    { value: 'MIN_SPARKS_USED', title: $t('Sparks sent are at least <amount>') },
+    { value: 'EXACT_SPARKS_AMOUNT', title: $t('Sparks sent are exactly <amount>') },
+    { value: 'MIN_EMBERS_USED', title: $t('Ember amount is at least <amount>') },
+    { value: 'EXACT_EMBERS_AMOUNT', title: $t('Ember amount is exactly <amopunt>') },
+  ],
+  stickers: [
+    { value: 'MIN_SPARKS_USED', title: $t('Sparks sent are at least <amount>') },
+    { value: 'EXACT_SPARKS_AMOUNT', title: $t('Sparks sent are exactly <amount>') },
+    { value: 'MIN_EMBERS_USED', title: $t('Ember amount is at least <amount>') },
+    { value: 'EXACT_EMBERS_AMOUNT', title: $t('Ember amount is exactly <amopunt>') },
+  ],
+});
+
+export const conditionData = () => ({
+  RANDOM: metadata.frequency({ title: $t('Variation Frequency') }),
+  LOYALTY_STORE_REDEMPTION_ITEM_TYPE: metadata.list({
+    title: $t('Item Type'),
+    options: [
+      { value: 'perk', title: 'Perk' },
+      { value: 'sound', title: 'Sound' },
+      { value: 'code', title: 'Code' },
+    ],
+  }),
+  LOYALTY_STORE_REDEMPTION_ITEM_NAME: metadata.text({ title: $t('Item Name'), max: 50 }),
 });
 
 export const newVariation = (type: string): IAlertBoxVariation => ({
@@ -126,9 +158,14 @@ export const newVariation = (type: string): IAlertBoxVariation => ({
     customHtmlEnabled: false,
     customJs: '',
     customJson: '',
-    duration: 2,
+    duration: 8,
     hideAnimation: 'fadeOut',
-    image: { href: 'http://uploads.twitchalerts.com/image-defaults/1n9bK4w.gif' },
+    image: {
+      href:
+        type === 'merch'
+          ? 'https://cdn.streamlabs.com/merch/Mug_mockup.png'
+          : 'http://uploads.twitchalerts.com/image-defaults/1n9bK4w.gif',
+    },
     layout: 'above',
     showAnimation: 'fadeIn',
     sound: { href: '', volume: 80 },
@@ -137,7 +174,7 @@ export const newVariation = (type: string): IAlertBoxVariation => ({
       color: '#FFFFFF',
       color2: '#32C3A6',
       font: 'Open Sans',
-      format: '',
+      format: DEFAULT_ALERT_FORMATS[type] || '',
       resubFormat: null,
       tierUpgradeFormat: null,
       size: 32,
@@ -149,3 +186,33 @@ export const newVariation = (type: string): IAlertBoxVariation => ({
     moderation: null,
   },
 });
+
+const DEFAULT_ALERT_FORMATS = {
+  bits: '{name} Cheered! x{amount}',
+  donations: '{name} has just donated {amount}!',
+  donordrive: '{name} has just donated {amount} via Charity Streaming!',
+  patreon: '{name} has just pledged {amount} via Patreon!',
+  extraLife: '{name} has just donated {amount} via ExtraLife!',
+  justGiving: '{name} has just donated {amount} via JustGiving!',
+  merch: '{name} bought {product}!',
+  resubs: '{name} just resubbed for {months} months!',
+  gamewisp: '{name} just subscribed via Gamewisp!',
+  subs: '{name} just subscribed!',
+  tiltify: '{name} has just donated {amount} via Tiltify!',
+  treat: '{name} bought you a {title} treat via Treatstream!',
+  follows: '{name} is now following!',
+  hosts: '{name} just hosted for {count} viewers!',
+  raids: '{name} is raiding with a party of {count}!',
+  superhearts: '{name} gifted {style} worth {amount} coins!',
+  fanfunding: '{name} has just donated {amount} through Super Chat!',
+  subscribers: '{name} just subscribed!', // YouTube
+  sponsors: '{name} has sponsored you {months} months in a row!',
+  support: '{name} has supported for {months} months!',
+  likes: '{name} has liked!',
+  stars: '{name} has given {amount} stars!',
+  shares: '{name} has shared!',
+  fbfollows: '{name} has followed!',
+  loyaltystore: '{name} redeemed {product}',
+  effects: '{name} sent {skill} worth {currency_image} {amount}!',
+  stickers: '{name} sent {skill} worth {currency_image} {amount}!',
+};

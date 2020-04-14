@@ -9,6 +9,7 @@ import cx from 'classnames';
 import styles from './NewsBanner.m.less';
 import { CustomizationService } from 'services/customization';
 import { WindowsService } from 'services/windows';
+import { SettingsService } from 'services/settings';
 
 @Component({})
 export default class NewsBanner extends Vue {
@@ -16,6 +17,7 @@ export default class NewsBanner extends Vue {
   @Inject() navigationService: NavigationService;
   @Inject() customizationService: CustomizationService;
   @Inject() windowsService: WindowsService;
+  @Inject() settingsService: SettingsService;
 
   processingClose = false;
 
@@ -29,9 +31,9 @@ export default class NewsBanner extends Vue {
 
   @Watch('bannerExists')
   toggleAnimation() {
-    this.windowsService.updateStyleBlockers('main', true);
+    this.windowsService.actions.updateStyleBlockers('main', true);
     window.setTimeout(() => {
-      this.windowsService.updateStyleBlockers('main', false);
+      this.windowsService.actions.updateStyleBlockers('main', false);
     }, 500);
   }
 
@@ -39,41 +41,43 @@ export default class NewsBanner extends Vue {
     return this.currentBanner.header;
   }
 
-  async closeBanner(e?: Event) {
+  async closeBanner(e?: Event, clickType: 'action' | 'dismissal' = 'dismissal') {
     if (e) e.stopPropagation();
     this.processingClose = true;
-    await this.announcementsService.closeBanner();
+    await this.announcementsService.closeBanner(clickType);
     this.processingClose = false;
   }
 
   followLink() {
     if (!this.currentBanner) return;
     if (this.currentBanner.linkTarget === 'slobs') {
-      this.navigationService.navigate(
-        this.currentBanner.link as TAppPage,
-        this.currentBanner.params,
-      );
+      // This isn't actually a page, but we want to be able to open it from a banner
+      if (this.currentBanner.link === 'Settings') {
+        this.settingsService.showSettings(this.currentBanner.params.category);
+      } else {
+        this.navigationService.navigate(
+          this.currentBanner.link as TAppPage,
+          this.currentBanner.params,
+        );
+      }
     } else {
       shell.openExternal(this.currentBanner.link);
     }
     if (this.currentBanner.closeOnLink) {
-      this.closeBanner();
+      this.closeBanner(null, 'action');
     }
   }
 
-  render(h: Function) {
+  render() {
     return (
       <div>
         <div
           class={cx({ [styles.banner]: true, [styles.show]: this.bannerExists })}
           onClick={this.followLink}
         >
-          <img class={styles.bgImage} src={this.currentBanner.thumbnail} />
-          <div class={styles.imageContainer}>
-            <img class={styles.shadowImageLeft} src={this.currentBanner.thumbnail} />
-            <img class={styles.shadowImageRight} src={this.currentBanner.thumbnail} />
-            <img class={styles.mainImage} src={this.currentBanner.thumbnail} />
-          </div>
+          <div class={styles.leftBlock} />
+          <div class={styles.rightBlock} />
+          <img class={styles.mainImage} src={this.currentBanner.thumbnail} />
           <div class={styles.titleContainer}>
             <h3 class={styles.title}>{this.headerText}</h3>
             <span class={styles.subheading}>{this.currentBanner.subHeader}</span>

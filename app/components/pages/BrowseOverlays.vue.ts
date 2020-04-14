@@ -2,7 +2,6 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { UserService } from '../../services/user';
 import { Inject, Service } from 'services';
-import { GuestApiService } from 'services/guest-api';
 import { NavigationService } from 'services/navigation';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { IDownloadProgress, OverlaysPersistenceService } from 'services/scene-collections/overlays';
@@ -10,55 +9,66 @@ import { ScenesService } from 'services/scenes';
 import { WidgetsService } from 'services/widgets';
 import { NotificationsService, ENotificationType } from 'services/notifications';
 import { JsonrpcService } from 'services/api/jsonrpc/jsonrpc';
+import { MagicLinkService } from 'services/magic-link';
 import urlLib from 'url';
 import electron from 'electron';
 import { $t, I18nService } from 'services/i18n';
+import BrowserView from 'components/shared/BrowserView';
+import { RestreamService } from 'services/restream';
+import { GuestApiHandler } from 'util/guest-api-handler';
 
-@Component({})
+@Component({ components: { BrowserView } })
 export default class BrowseOverlays extends Vue {
   @Inject() userService: UserService;
-  @Inject() guestApiService: GuestApiService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() navigationService: NavigationService;
   @Inject() overlaysPersistenceService: OverlaysPersistenceService;
   @Inject() widgetsService: WidgetsService;
   @Inject() scenesService: ScenesService;
+  @Inject() private magicLinkService: MagicLinkService;
   @Inject() private notificationsService: NotificationsService;
   @Inject() private jsonrpcService: JsonrpcService;
-  @Inject() private i18nService: I18nService;
+  @Inject() private restreamService: RestreamService;
 
   @Prop() params: {
     type?: 'overlay' | 'widget-theme';
     id?: string;
   };
 
-  $refs: {
-    overlaysWebview: Electron.WebviewTag;
-  };
-
-  mounted() {
-    this.$refs.overlaysWebview.addEventListener('did-finish-load', () => {
-      this.guestApiService.exposeApi(this.$refs.overlaysWebview.getWebContents().id, {
+  onBrowserViewReady(view: Electron.BrowserView) {
+    view.webContents.on('did-finish-load', () => {
+      new GuestApiHandler().exposeApi(view.webContents.id, {
         installOverlay: this.installOverlay,
         installWidgets: this.installWidgets,
+        eligibleToRestream: () => {
+          if (!this.restreamService.canEnableRestream) {
+            // We raise an exception which will result in a rejected promise.
+            // This allows the themes library to catch out of date versions
+            // in the same code path as ineligable users.
+            throw new Error('User is not elgigible to restream');
+          }
+
+          return Promise.resolve(true);
+        },
       });
     });
 
-    this.$refs.overlaysWebview.addEventListener('new-window', e => {
-      const protocol = urlLib.parse(e.url).protocol;
+    electron.ipcRenderer.send('webContents-preventPopup', view.webContents.id);
+
+    view.webContents.on('new-window', (e, url) => {
+      const protocol = urlLib.parse(url).protocol;
 
       if (protocol === 'http:' || protocol === 'https:') {
-        electron.remote.shell.openExternal(e.url);
+        electron.remote.shell.openExternal(url);
       }
     });
-
-    I18nService.setWebviewLocale(this.$refs.overlaysWebview);
   }
 
   async installOverlay(
     url: string,
     name: string,
     progressCallback?: (progress: IDownloadProgress) => void,
+    mergeFacebook = false,
   ) {
     const host = new urlLib.URL(url).hostname;
     const trustedHosts = ['cdn.streamlabs.com'];
@@ -68,8 +78,21 @@ export default class BrowseOverlays extends Vue {
       return;
     }
 
-    await this.sceneCollectionsService.installOverlay(url, name, progressCallback);
-    this.navigationService.navigate('Studio');
+    // Handle exclusive theme that requires enabling multistream first
+    // User should be eligible to enable restream for this behavior to work.
+    // If restream is already set up, then just install as normal.
+    if (
+      mergeFacebook &&
+      this.restreamService.canEnableRestream &&
+      !this.restreamService.shouldGoLiveWithRestream
+    ) {
+      this.navigationService.navigate('FacebookMerge', { overlayUrl: url, overlayName: name });
+    } else {
+      const sub = this.sceneCollectionsService.downloadProgress.subscribe(progressCallback);
+      await this.sceneCollectionsService.installOverlay(url, name);
+      sub.unsubscribe();
+      this.navigationService.navigate('Studio');
+    }
   }
 
   async installWidgets(urls: string[], progressCallback?: (progress: IDownloadProgress) => void) {
@@ -83,7 +106,7 @@ export default class BrowseOverlays extends Vue {
       }
 
       const path = await this.overlaysPersistenceService.downloadOverlay(url, progressCallback);
-      await this.widgetsService.loadWidgetFile(path, this.scenesService.activeSceneId);
+      await this.widgetsService.loadWidgetFile(path, this.scenesService.views.activeSceneId);
     }
 
     this.navigationService.navigate('Studio');
@@ -94,10 +117,8 @@ export default class BrowseOverlays extends Vue {
       showTime: false,
       message: $t('Widget Theme installed & activated. Click here to manage your Widget Profiles.'),
       action: this.jsonrpcService.createRequest(
-        Service.getResourceId(this.navigationService),
-        'navigate',
-        'Dashboard',
-        { subPage: 'widgetthemes' },
+        Service.getResourceId(this.magicLinkService),
+        'openWidgetThemesMagicLink',
       ),
     });
   }

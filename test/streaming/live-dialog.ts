@@ -4,7 +4,7 @@ import { sleep } from '../helpers/sleep';
 import { logIn } from '../helpers/spectron/user';
 import { setOutputResolution } from '../helpers/spectron/output';
 
-useSpectron({ appArgs: '--nosync' });
+useSpectron();
 
 // TODO: flaky on CI
 test.skip('Shows optimized encoder for specific games', async t => {
@@ -66,7 +66,7 @@ test.skip('Shows optimized encoder for specific games', async t => {
   await focusMain(t);
   await app.client.waitForExist('button=End Stream', 20000);
   await sleep(1000);
-  await app.client.click('.top-nav .icon-settings');
+  await app.client.click('.side-nav .icon-settings');
 
   await focusChild(t);
   await app.client.click('li=Output');

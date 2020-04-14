@@ -1,21 +1,13 @@
-import { TwitchService } from './twitch';
-import { YoutubeService } from './youtube';
-import { MixerService } from './mixer';
-import { FacebookService } from './facebook';
-import { StreamingContext } from '../streaming';
+import { ITwitchChannelInfo, ITwitchStartStreamOptions, TwitchService } from './twitch';
+import { IYoutubeChannelInfo, IYoutubeStartStreamOptions, YoutubeService } from './youtube';
+import { IMixerChannelInfo, IMixerStartStreamOptions, MixerService } from './mixer';
+import { FacebookService, IFacebookChannelInfo, IFacebookStartStreamOptions } from './facebook';
 import { TTwitchTag } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
+import { Observable } from 'rxjs';
+import { IPlatformResponse } from './utils';
 
 export type Tag = TTwitchTag;
-
-export interface IChannelInfo {
-  title: string;
-  game?: string;
-  description?: string;
-  tags?: Tag[];
-  availableTags?: Tag[];
-}
-
 export interface IGame {
   name: string;
 }
@@ -37,6 +29,8 @@ export type TPlatformCapabilityMap = {
   'stream-schedule': IPlatformCapabilityScheduleStream;
   /** Ability to check whether we're authorized to perform actions under a given scope **/
   'scope-validation': IPlatformCapabilityScopeValidation;
+  /** This service supports Streamlabs account merging within SLOBS **/
+  'account-merging': IPlatformCapabilityAccountMerging;
 };
 
 export type TPlatformCapability = keyof TPlatformCapabilityMap;
@@ -60,12 +54,59 @@ interface IPlatformCapabilityUserInfo {
 }
 
 interface IPlatformCapabilityScheduleStream {
-  scheduleStream: (startTime: string, info: IChannelInfo) => Promise<any>;
+  scheduleStream: (startTime: string, info: TChannelInfo) => Promise<any>;
 }
 
 interface IPlatformCapabilityScopeValidation {
   hasScope: (scope: TOAuthScope) => Promise<boolean>;
 }
+
+interface IPlatformCapabilityAccountMerging {
+  mergeUrl: string;
+}
+
+/**
+ * Returned from certain platform methods where particular errors
+ * may require special handling.
+ */
+export enum EPlatformCallResult {
+  /**
+   * The call succeeded
+   */
+  Success,
+
+  /**
+   * A generic error occurred
+   */
+  Error,
+
+  /**
+   * The user does not have 2FA enabled on their Twitch account
+   */
+  TwitchTwoFactor,
+
+  /**
+   * The user does not have live-streaming enabled on their Youtube account
+   */
+  YoutubeStreamingDisabled,
+
+  /**
+   * The user is missing an essential Twitch scope.
+   */
+  TwitchScopeMissing,
+}
+
+export type TStartStreamOptions =
+  | ITwitchStartStreamOptions
+  | IYoutubeStartStreamOptions
+  | IFacebookStartStreamOptions
+  | IMixerStartStreamOptions;
+
+export type TChannelInfo =
+  | IYoutubeChannelInfo
+  | ITwitchChannelInfo
+  | IFacebookChannelInfo
+  | IMixerChannelInfo;
 
 // All platform services should implement this interface.
 export interface IPlatformService {
@@ -75,53 +116,84 @@ export interface IPlatformService {
     capability: T,
   ): this is TPlatformCapabilityMap[T] & IPlatformService;
 
+  channelInfoChanged: Observable<TChannelInfo>;
+
   authWindowOptions: Electron.BrowserWindowConstructorOptions;
 
   authUrl: string;
 
-  // This function is responsible for setting up stream
-  // settings for this platform, given an auth.
-  setupStreamSettings: (auth: IPlatformAuth) => void;
+  /**
+   * Check the user's ability to stream for the current platform
+   */
+  validatePlatform: () => Promise<EPlatformCallResult>;
 
   fetchViewerCount: () => Promise<number>;
 
-  fetchStreamKey: () => Promise<string>;
-
-  fetchChannelInfo: () => Promise<IChannelInfo>;
-
   fetchUserInfo: () => Promise<IUserInfo>;
 
-  putChannelInfo: (channelInfo: IChannelInfo) => Promise<boolean>;
+  putChannelInfo: (channelInfo: TStartStreamOptions) => Promise<boolean>;
 
   searchGames: (searchString: string) => Promise<IGame[]>;
 
-  getChatUrl: (mode: string) => Promise<string>;
+  /**
+   * Sets up the stream key and live broadcast info required to go live.
+   * Returns the stream key.
+   */
+  beforeGoLive: (options?: TStartStreamOptions) => Promise<string>;
 
-  beforeGoLive: () => Promise<any>;
+  afterGoLive?: () => Promise<void>;
 
-  afterGoLive?: (context?: StreamingContext) => Promise<void>;
+  afterStopStream?: () => Promise<void>;
 
-  prepopulateInfo: () => Promise<any>;
+  prepopulateInfo: () => Promise<TStartStreamOptions>;
 
-  scheduleStream?: (startTime: string, info: IChannelInfo) => Promise<any>;
+  scheduleStream?: (startTime: string, info: TChannelInfo) => Promise<any>;
+
+  fetchNewToken: () => Promise<void>;
+
+  getHeaders: (req: IPlatformRequest, useToken: boolean | string) => Dictionary<string>;
+
+  liveDockEnabled: () => boolean;
+
+  /**
+   * Get user-friendly error message
+   */
+  getErrorDescription: (error: IPlatformResponse<unknown>) => string;
 }
 
-export interface IPlatformAuth {
+export interface IUserAuth {
   widgetToken: string;
   apiToken: string; // Streamlabs API Token
-  platform: {
-    type: TPlatform;
-    username: string;
-    token: string;
-    id: string;
-    channelId?: string;
-  };
+
+  /**
+   * Old key from when SLOBS only supported a single platform account
+   * @deprecated Use `platforms` instead
+   */
+  platform?: IPlatformAuth;
+
+  /**
+   * The primary platform used for chat, go live window, etc
+   */
+  primaryPlatform: TPlatform;
+
+  /**
+   * New key that supports multiple logged in platforms
+   */
+  platforms?: { [platform in TPlatform]?: IPlatformAuth };
 
   /**
    * Session partition used to separate cookies associated
    * with this user login.
    */
   partition?: string;
+}
+
+export interface IPlatformAuth {
+  type: TPlatform;
+  username: string;
+  token: string;
+  id: string;
+  channelId?: string;
 }
 
 export interface IUserInfo {
@@ -137,4 +209,8 @@ export function getPlatformService(platform: TPlatform): IPlatformService {
     mixer: MixerService.instance,
     facebook: FacebookService.instance,
   }[platform];
+}
+
+export interface IPlatformRequest extends RequestInit {
+  url: string;
 }

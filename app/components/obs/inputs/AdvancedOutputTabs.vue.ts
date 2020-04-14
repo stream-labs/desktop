@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { ISettingsSubCategory } from 'services/settings';
 import Tabs, { ITab } from 'components/Tabs.vue';
-import GenericForm from './GenericForm.vue';
+import GenericForm from './GenericForm';
 
 @Component({ components: { GenericForm, Tabs } })
 export default class AdvancedOutputTabs extends Vue {

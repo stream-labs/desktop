@@ -13,14 +13,13 @@ import { WidgetNode } from './nodes/overlays/widget';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import unzip from 'unzip-stream';
-import archiver from 'archiver';
 import https from 'https';
 import { ScenesService } from 'services/scenes';
 import { SelectionService } from 'services/selection';
 import uuid from 'uuid/v4';
 import { SceneSourceNode } from './nodes/overlays/scene';
 import { AppService } from 'services/app';
+import { importExtractZip } from '../../util/slow-imports';
 
 const NODE_TYPES = {
   RootNode,
@@ -87,12 +86,16 @@ export class OverlaysPersistenceService extends Service {
 
     this.ensureOverlaysDirectory();
 
-    await new Promise((resolve, reject) => {
-      const inStream = fs.createReadStream(overlayFilePath);
-      const outStream = unzip.Extract({ path: assetsPath });
-
-      outStream.on('close', resolve);
-      inStream.pipe(outStream);
+    await new Promise(async (resolve, reject) => {
+      // import of extractZip takes to much time on startup, so import it dynamically
+      const extractZip = (await importExtractZip()).default;
+      extractZip(overlayFilePath, { dir: assetsPath }, err => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
     });
 
     const configPath = path.join(assetsPath, 'config.json');
@@ -100,7 +103,7 @@ export class OverlaysPersistenceService extends Service {
     const root = parse(data, NODE_TYPES);
     await root.load({ assetsPath });
 
-    this.scenesService.makeSceneActive(this.scenesService.scenes[0].id);
+    this.scenesService.makeSceneActive(this.scenesService.views.scenes[0].id);
     this.selectionService.reset();
   }
 
@@ -114,6 +117,8 @@ export class OverlaysPersistenceService extends Service {
     fs.writeFileSync(configPath, config);
 
     const output = fs.createWriteStream(overlayFilePath);
+    // import of archiver takes to much time on startup, so import it dynamically
+    const archiver = (await import('archiver')).default;
     const archive = archiver('zip', { zlib: { level: 9 } });
 
     await new Promise(resolve => {

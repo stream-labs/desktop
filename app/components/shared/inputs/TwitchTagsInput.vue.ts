@@ -13,6 +13,8 @@ export default class TwitchTagsInput extends Vue {
   @Inject() i18nService: I18nService;
   @Inject() customizationService: CustomizationService;
 
+  @Prop() name: string;
+
   @Prop() value: TTwitchTagWithLabel[];
 
   @Prop() tags: TTwitchTag[];
@@ -55,10 +57,7 @@ export default class TwitchTagsInput extends Vue {
   }
 
   get options() {
-    return prepareOptions(
-      this.i18nService.state.locale || this.i18nService.getFallbackLocale(),
-      this.tags,
-    );
+    return prepareOptions(this.i18nService.state.locale, this.tags);
   }
 
   onInput(tags: TTwitchTagWithLabel[]) {

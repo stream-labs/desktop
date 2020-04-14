@@ -9,7 +9,8 @@
     </div>
 
     <div class="window-container">
-      <div class="editor-tabs" :class="{ pushed: isAlertBox }">
+      <div class="editor-tabs" :class="{ pushed: props.isAlertBox }">
+        <i v-if="isSaving" class="fa fa-spinner fa-pulse saving-indicator" />
         <tabs
           :hideContent="true"
           className="widget-editor__top-tabs"
@@ -24,7 +25,7 @@
         <div class="custom-code__alert" :class="{ active: customCodeIsEnabled }" v-if="topTabs.length > 1" />
       </div>
 
-      <div class="content-container" :class="{ vertical: currentTopTab === 'code', 'has-leftbar': isAlertBox }">
+      <div class="content-container" :class="{ vertical: currentTopTab === 'code', 'has-leftbar': props.isAlertBox }">
         <div class="display">
           <display
             v-if="!animating && !hideStyleBlockers"
@@ -33,7 +34,7 @@
           />
         </div>
         <div class="sidebar">
-          <div class="subsection" v-if="slots" v-for="slot in slots" :key="slot.value">
+          <div class="subsection" v-if="props.slots" v-for="slot in props.slots" :key="slot.value">
             <h2 class="subsection__title">{{ slot.label }}</h2>
             <div class="subsection__content custom"><slot :name="slot.value" /></div>
           </div>
@@ -59,55 +60,54 @@
               </div>
             </div>
             <div class="subsection__content" v-if="currentSetting === 'source'">
-              <generic-form v-model="sourceProperties" @input="onPropsInputHandler"/>
+              <generic-form :value="sourceProperties" @input="onPropsInputHandler"/>
             </div>
           </div>
         </div>
 
-        <div class="code-editor" v-if="loaded">
-          <div v-if="customCodeIsEnabled && !loadingFailed">
-            <tabs
-              :hideConent="true"
-              className="widget-editor__top-tabs"
-              :tabs="codeTabs"
-              v-model="currentCodeTab"
-              @input="value => updateCodeTab(value)"
-            />
-          <div v-if="canShowEditor">
-            <code-editor
-              v-if="apiSettings.customCodeAllowed && currentCodeTab === 'HTML'"
-              key="html"
-              :value="wData"
-              :metadata="{ type: 'html', selectedId, selectedAlert }"
-            />
-            <code-editor
-              v-if="apiSettings.customCodeAllowed && currentCodeTab === 'CSS'"
-              key="css"
-              :value="wData"
-              :metadata="{ type: 'css', selectedId, selectedAlert }"
-            />
-            <code-editor
-              v-if="apiSettings.customCodeAllowed && currentCodeTab === 'JS'"
-              key="js"
-              :value="wData"
-              :metadata="{ type: 'js', selectedId, selectedAlert }"
-            />
-            <custom-fields-editor
-              v-if="apiSettings.customFieldsAllowed && currentCodeTab === 'customFields'"
-              key="customFields"
-              :value="wData"
-              :metadata="{ selectedId, selectedAlert }"
-            />
-          </div>
-          </div>
-          <div v-else-if="loadingFailed" style="padding: 8px;">
-            <div>{{ $t('Failed to load settings') }}</div>
-            <button class="button button--warn retry-button" @click="retryDataFetch()">{{ $t('Retry') }}</button>
-          </div>
+        <div class="code-editor" v-if="loaded && customCodeIsEnabled && !loadingFailed">
+          <tabs
+            :hideConent="true"
+            :tabs="codeTabs"
+            v-model="currentCodeTab"
+            @input="value => updateCodeTab(value)"
+          />
+          <code-editor
+            v-if="canShowEditor && apiSettings.customCodeAllowed && currentCodeTab === 'HTML'"
+            key="html"
+            class="code-tab"
+            :value="wData"
+            :metadata="{ type: 'html', selectedId, selectedAlert }"
+          />
+          <code-editor
+            v-if="canShowEditor && apiSettings.customCodeAllowed && currentCodeTab === 'CSS'"
+            key="css"
+            class="code-tab"
+            :value="wData"
+            :metadata="{ type: 'css', selectedId, selectedAlert }"
+          />
+          <code-editor
+            v-if="canShowEditor && apiSettings.customCodeAllowed && currentCodeTab === 'JS'"
+            key="js"
+            class="code-tab"
+            :value="wData"
+            :metadata="{ type: 'js', selectedId, selectedAlert }"
+          />
+          <custom-fields-editor
+            v-if="canShowEditor && apiSettings.customFieldsAllowed && currentCodeTab === 'customFields'"
+            key="customFields"
+            class="code-tab"
+            :value="wData"
+            :metadata="{ selectedId, selectedAlert }"
+          />
+        </div>
+        <div v-else-if="customCodeIsEnabled && loadingFailed" style="padding: 8px;">
+          <div>{{ $t('Failed to load settings') }}</div>
+          <button class="button button--warn retry-button" @click="retryDataFetch()">{{ $t('Retry') }}</button>
         </div>
       </div>
 
-      <div v-if="isAlertBox" class="left-toolbar"><slot name="leftbar" /></div>
+      <div v-if="props.isAlertBox" class="left-toolbar"><slot name="leftbar" /></div>
     </div>
   </div>
 </modal-layout>
@@ -124,7 +124,7 @@
 
   .top-settings {
     .row.alignable-input {
-      width: 80px;
+      width: 100px;
       flex-direction: column;
 
       .input-body {
@@ -134,10 +134,16 @@
       .input-footer {
         display: none;
       }
+
+      .checkbox label {
+        width: 160px;
+      }
     }
   }
 
   .subsection__content {
+    flex: 1;
+
     .input-wrapper {
       width: 100%;
     }
@@ -166,6 +172,10 @@
 
     overflow: hidden;
     height: calc(~"100% - 66px");
+  }
+
+  .saving-indicator {
+    .absolute(15px, 15px);
   }
 
   .top-settings {
@@ -211,7 +221,7 @@
   .content-container {
     display: flex;
     width: 100%;
-    height: calc(~"100% - 36px");
+    height: calc(~"100% - 48px");
     position: relative;
     background-color: var(--section);
     overflow: hidden;
@@ -298,6 +308,7 @@
     flex-direction: column;
     flex-grow: 0;
     flex-shrink: 0;
+    overflow-y: auto;
 
     &:last-of-type {
       flex-shrink: 1;
@@ -371,6 +382,10 @@
     border-top: 1px solid var(--border);
     background-color: var(--background);
     .transition();
+  }
+
+  .code-tab {
+    height: calc(100% - 48px);
   }
 
   .custom-code {

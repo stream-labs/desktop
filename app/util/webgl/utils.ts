@@ -24,7 +24,7 @@ export function compileShader(gl: WebGLRenderingContext, shaderSource: string, s
 
   if (!success) {
     // Something went wrong during compilation; get the error
-    throw `could not compile shader: ${gl.getShaderInfoLog(shader)}`;
+    throw new Error(`could not compile shader: ${gl.getShaderInfoLog(shader)}`);
   }
 
   return shader;
@@ -58,7 +58,7 @@ export function createProgram(
 
   if (!success) {
     // something went wrong with the link
-    throw `program filed to link: ${gl.getProgramInfoLog(program)}`;
+    throw new Error(`program filed to link: ${gl.getProgramInfoLog(program)}`);
   }
 
   return program;

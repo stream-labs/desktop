@@ -1,0 +1,38 @@
+@import "../../../styles/index";
+@import '../../../styles/badges';
+
+.option-card {
+  .radius();
+
+  position: relative;
+  background: var(--button);
+  padding: 16px;
+  width: 45%;
+  overflow: hidden;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  svg {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  }
+}
+
+.time-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
+.profile-select--title,
+.profile-select {
+  margin-bottom: 8px;
+  display: block;
+}
+
+.profile-select {
+  width: 30%;
+}

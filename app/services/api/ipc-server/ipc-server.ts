@@ -12,14 +12,15 @@ const { ipcRenderer } = electron;
  */
 export class IpcServerService extends Service {
   servicesEventsSubscription: Subscription;
-  requestHandler: Function;
+  requestHandler: (event: Electron.Event, request: IJsonRpcRequest) => void;
 
   @Inject() private internalApiService: InternalApiService;
 
   listen() {
     this.requestHandler = (event: Electron.Event, request: IJsonRpcRequest) => {
       const response: IJsonRpcResponse<any> = this.exec(request);
-      ipcRenderer.send('services-response', response);
+
+      if (!request.params.noReturn) ipcRenderer.send('services-response', response);
     };
     ipcRenderer.on('services-request', this.requestHandler);
     ipcRenderer.send('services-ready');

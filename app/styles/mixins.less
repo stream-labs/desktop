@@ -13,6 +13,13 @@
   left: @left;
 }
 
+.center() {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .flex() {
   display: flex;
 }
@@ -168,125 +175,6 @@
   padding-left: (@spacing * 8px);
 }
 
-.padding--5 {
-  padding: 5px;
-}
-
-.padding--10 {
-  padding: 10px;
-}
-
-.padding--20 {
-  padding: 20px;
-}
-
-.padding-vertical--20 {
-  padding: 20px 0;
-}
-
-// Text aligns
-.text-align(@left: @left) {
-  text-align: @left;
-}
-
-// margins
-.margin--none {
-  margin: 0 0 0 0;
-}
-
-.margin--10 {
-  margin: 10px;
-}
-
-.margin-top--10 {
-  margin-top: 10px;
-}
-
-.margin--20 {
-  margin: 20px;
-}
-
-.margin-vertical--10 {
-  margin: 10px 0;
-}
-
-.margin-horizontal--10 {
-  margin: 0 10px;
-}
-
-// widths
-.width--100 {
-  width: 100%;
-}
-
-.max-width--100 {
-  max-width: 100% !important;
-}
-
-.width--auto {
-  width: auto !important;
-}
-
-.height--100 {
-  height: 100%;
-}
-
-// flex helpers
-.flex {
-  display: flex;
-}
-
-.flex--start {
-  justify-content: flex-start;
-}
-
-.flex--end {
-  justify-content: flex-end;
-}
-
-.flex--v-center {
-  align-items: center;
-}
-
-.flex--v-start {
-  align-items: flex-start;
-}
-
-.flex--v-end {
-  align-items: flex-end;
-}
-
-.flex--space-between {
-  justify-content: space-between;
-}
-
-.flex--space-around {
-  justify-content: space-around;
-}
-
-// text align
-.text-align--right {
-  text-align: right !important;
-}
-
-.text-align--center {
-  text-align: center !important;
-}
-
-// align items
-.align-items--inline {
-  & > * {
-    display: inline-block;
-    vertical-align: middle;
-  }
-}
-
-.align-items--top {
-  & > * {
-    vertical-align: top;
-  }
-}
-
 // Shadows
 .shadow() {
   box-shadow: 0 8px 16px var(--shadow);
@@ -302,22 +190,12 @@
   font-weight: @normal;
 }
 
-//cursors
-
-.cursor--pointer {
-  cursor: pointer;
+.text-align(@left: @left) {
+  text-align: @left;
 }
-
-// text transforms
 
 .text-transform(@capitalize: @capitalize) {
   text-transform: @capitalize;
-}
-
-// overflows
-
-.overflow--auto {
-  overflow: auto;
 }
 
 .teal() {
@@ -332,6 +210,6 @@
   letter-spacing: 0.6px;
 }
 
-.position--relative {
-  position: relative;
+.cursor--pointer() {
+  cursor: pointer;
 }

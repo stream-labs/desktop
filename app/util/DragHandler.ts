@@ -1,14 +1,12 @@
 import { SettingsService } from 'services/settings';
 import { Inject } from 'services/core/injector';
-import { ScenesService, SceneItem } from 'services/scenes';
+import { SceneItem } from 'services/scenes';
 import { VideoService } from 'services/video';
 import { WindowsService } from 'services/windows';
 import { ScalableRectangle } from 'util/ScalableRectangle';
 import { SelectionService } from 'services/selection';
 import { EditorCommandsService } from 'services/editor-commands';
-import electron from 'electron';
-
-const { webFrame, screen } = electron;
+import { IMouseEvent } from 'services/editor';
 
 /*
  * An edge looks like:
@@ -91,7 +89,7 @@ export class DragHandler {
    * @param startEvent the mouse event for this drag
    * @param options drag handler options
    */
-  constructor(startEvent: MouseEvent, options: IDragHandlerOptions) {
+  constructor(startEvent: IMouseEvent, options: IDragHandlerOptions) {
     // Load some settings we care about
     this.snapEnabled = this.settingsService.state.General.SnappingEnabled;
     this.renderedSnapDistance = this.settingsService.state.General.SnapDistance;
@@ -116,7 +114,7 @@ export class DragHandler {
       .getItems()
       .filter(item => item.isVisualSource);
 
-    const rect = this.draggedSource.getRectangle();
+    const rect = new ScalableRectangle(this.draggedSource.rectangle);
     rect.normalize();
 
     const pos = this.mousePositionInCanvasSpace(startEvent);
@@ -129,8 +127,8 @@ export class DragHandler {
   }
 
   // Should be called when the mouse moves
-  move(event: MouseEvent) {
-    const rect = this.draggedSource.getRectangle();
+  move(event: IMouseEvent) {
+    const rect = new ScalableRectangle(this.draggedSource.rectangle);
     const denormalize = rect.normalize();
 
     const mousePos = this.mousePositionInCanvasSpace(event);
@@ -185,7 +183,7 @@ export class DragHandler {
     );
   }
 
-  private mousePositionInCanvasSpace(event: MouseEvent): IVec2 {
+  private mousePositionInCanvasSpace(event: IMouseEvent): IVec2 {
     return this.pageSpaceToCanvasSpace({
       x: event.pageX - this.displayOffset.x,
       y: event.pageY - this.displayOffset.y,
@@ -279,7 +277,7 @@ export class DragHandler {
     // Source edge snapping:
     if (this.sourceSnapping) {
       this.otherSources.forEach(source => {
-        const edges = this.generateSourceEdges(source.getRectangle());
+        const edges = this.generateSourceEdges(new ScalableRectangle(source.rectangle));
 
         // The dragged source snaps to the adjacent edge
         // of other sources.  So the right edge snaps to

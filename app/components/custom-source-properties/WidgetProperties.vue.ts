@@ -6,6 +6,8 @@ import { NavigationService } from 'services/navigation';
 import { WindowsService } from 'services/windows';
 import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
+import { MagicLinkService } from 'services/magic-link';
+import electron from 'electron';
 
 @Component({})
 export default class WidgetProperties extends Vue {
@@ -14,9 +16,10 @@ export default class WidgetProperties extends Vue {
   @Inject() navigationService: NavigationService;
   @Inject() windowsService: WindowsService;
   @Inject() userService: UserService;
+  @Inject() magicLinkService: MagicLinkService;
 
   get isLoggedIn() {
-    return this.userService.isLoggedIn();
+    return this.userService.isLoggedIn;
   }
 
   login() {
@@ -24,7 +27,9 @@ export default class WidgetProperties extends Vue {
     this.userService.showLogin();
   }
 
-  navigateWidgetSettings() {
+  disabled = false;
+
+  async navigateWidgetSettings() {
     const widgetType = this.source.getPropertiesManagerSettings().widgetType;
 
     const subPage = {
@@ -33,6 +38,8 @@ export default class WidgetProperties extends Vue {
       [WidgetType.FollowerGoal]: 'followergoal',
       [WidgetType.SubscriberGoal]: 'followergoal',
       [WidgetType.BitGoal]: 'bitgoal',
+      [WidgetType.StarsGoal]: 'starsgoal',
+      [WidgetType.SupporterGoal]: 'supportergoal',
       [WidgetType.DonationTicker]: 'donationticker',
       [WidgetType.ChatBox]: 'chatbox',
       [WidgetType.EventList]: 'eventlist',
@@ -43,7 +50,15 @@ export default class WidgetProperties extends Vue {
       [WidgetType.SpinWheel]: 'wheel',
     }[widgetType.toString()];
 
-    this.navigationService.navigate('Dashboard', { subPage });
+    this.disabled = true;
+
+    try {
+      const link = await this.magicLinkService.getDashboardMagicLink(subPage);
+      electron.remote.shell.openExternal(link);
+    } catch (e) {
+      console.error('Error generating dashboard magic link', e);
+    }
+
     this.windowsService.closeChildWindow();
   }
 }

@@ -3,10 +3,11 @@ import { ISceneCollectionsManifestEntry } from '.';
 import Vue from 'vue';
 import fs from 'fs';
 import path from 'path';
-import electron from 'electron';
 import { FileManagerService } from 'services/file-manager';
 import { Inject } from 'services/core/injector';
 import { AppService } from 'services/app';
+import omit from 'lodash/omit';
+import { OS } from 'util/operating-systems';
 
 interface ISceneCollectionsManifest {
   activeId: string;
@@ -91,7 +92,7 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
    * service, persisted to disk.
    */
   flushManifestFile() {
-    const data = JSON.stringify(this.state, null, 2);
+    const data = JSON.stringify(omit(this.state, 'auto'), null, 2);
     this.writeDataToCollectionFile('manifest', data);
   }
 
@@ -180,11 +181,13 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
   }
 
   @mutation()
-  ADD_COLLECTION(id: string, name: string, modified: string) {
+  ADD_COLLECTION(id: string, name: string, modified: string, os: OS, auto = false) {
     this.state.collections.unshift({
       id,
       name,
       modified,
+      auto,
+      operatingSystem: os,
       deleted: false,
       needsRename: false,
     });
@@ -193,6 +196,15 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
   @mutation()
   SET_NEEDS_RENAME(id: string) {
     this.state.collections.find(coll => coll.id === id).needsRename = true;
+  }
+
+  @mutation()
+  SET_OPERATING_SYSTEM(id: string, os: OS) {
+    Vue.set(
+      this.state.collections.find(coll => coll.id === id),
+      'operatingSystem',
+      os,
+    );
   }
 
   @mutation()

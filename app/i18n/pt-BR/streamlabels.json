@@ -11,8 +11,8 @@
   "Show Count": "Mostrar Contagem",
   "Always, show 0 when inactive": "Sempre exibir 0 quando inativo",
   "Show Latest": "Exibir Mais Recente",
-  "Always, show last person when inactive": "Sempre exibir a última pessoa quando inativo",
-  "Include Resubs": "Incluir Resubs",
+  "Always, show last person when inactive": "Sempre exibir a última pessoa quando ativo",
+  "Include Resubs": "Incluir Reinscrições",
   "Preview": "Visualizar",
   "Note:": "Nota:",
   "Actual label text may take up to 60 seconds to update": "O texto atual pode demorar até 60 segundos para atualizar"

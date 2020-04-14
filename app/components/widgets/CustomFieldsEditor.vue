@@ -48,5 +48,7 @@
 
   .custom-fields-container {
     padding: 16px;
+    height: calc(100% - 32px);
+    overflow-y: auto;
   }
 </style>

@@ -8,7 +8,6 @@ interface IBaseGoalData extends IWidgetData {
 
 interface IGoalWidgetApiSettings extends IWidgetApiSettings {
   goalUrl: string;
-  goalResetUrl?: string; // if not set use `goalUrl`
   goalCreateEvent: string;
   goalResetEvent: string;
 }
@@ -48,13 +47,6 @@ export abstract class BaseGoalService<
 
   async resetGoal() {
     const apiSettings = this.getApiSettings();
-
-    if (apiSettings.goalResetUrl) {
-      return await this.request({
-        url: apiSettings.goalResetUrl,
-        method: 'POST',
-      });
-    }
 
     return await this.request({
       url: apiSettings.goalUrl,

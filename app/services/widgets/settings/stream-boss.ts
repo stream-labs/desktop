@@ -1,5 +1,5 @@
 import { WIDGET_INITIAL_STATE } from './widget-settings';
-import { IWidgetData, IWidgetSettings, WidgetType } from 'services/widgets';
+import { IWidgetData, IWidgetSettings, WidgetDefinitions, WidgetType } from 'services/widgets';
 import { $t } from 'services/i18n';
 import { metadata } from 'components/widgets/inputs/index';
 import { InheritMutations } from 'services/core/stateful-service';
@@ -58,7 +58,7 @@ export abstract class StreamBossService extends BaseGoalService<
   getApiSettings() {
     return {
       type: WidgetType.StreamBoss,
-      url: `https://${this.getHost()}/widgets/streamboss?token=${this.getWidgetToken()}`,
+      url: WidgetDefinitions[WidgetType.StreamBoss].url(this.getHost(), this.getWidgetToken()),
       previewUrl: `https://${this.getHost()}/widgets/streamboss?token=${this.getWidgetToken()}`,
       settingsUpdateEvent: 'streambossSettingsUpdate',
       goalCreateEvent: 'newStreamboss',
@@ -101,11 +101,7 @@ export abstract class StreamBossService extends BaseGoalService<
             title: $t('Overkill'),
             value: 'overkill',
             description: $t(
-              "The boss' health will change depending on how much damage is dealt on the killing blow." +
-                "Excess damage multiplied by the multiplier will be the boss' new health. I.e. 150 damage with 100 " +
-                // tslint:disable-next-line:max-line-length
-                'health remaining and a set multiplier of 3 would result in the new boss having 150 health on spawn. \n' +
-                'Set your multiplier below.',
+              "The boss' health will change depending on how much damage is dealt on the killing blow. Excess damage multiplied by the multiplier will be the boss' new health. I.e. 150 damage with 100 health remaining and a set multiplier of 3 would result in the new boss having 150 health on spawn. \n Set your multiplier below.",
             ),
           },
         ],

@@ -1,0 +1,34 @@
+@import "../../../styles/index";
+
+.container {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+.cell {
+  .radius();
+
+  width: 250px;
+  position: relative;
+  margin-top: 16px;
+  overflow: hidden;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.title {
+  position: absolute;
+  background: var(--section);
+  width: 100%;
+  bottom: -1px;
+  padding: 8px;
+}
+
+.thumbnail {
+  width: 100%;
+  height: auto;
+}

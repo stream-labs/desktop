@@ -19,6 +19,8 @@ export interface ISceneItemInfo extends ISceneNodeInfo {
   hotkeys?: HotkeysNode;
   locked?: boolean;
   rotation?: number;
+  streamVisible?: boolean;
+  recordingVisible?: boolean;
   sceneNodeType: 'item';
 }
 
@@ -75,6 +77,8 @@ export class SceneItemsNode extends Node<ISchema, {}> {
               crop: transform.crop,
               locked: sceneItem.locked,
               rotation: transform.rotation,
+              streamVisible: sceneItem.streamVisible,
+              recordingVisible: sceneItem.recordingVisible,
               sceneNodeType: 'item',
             });
           });
@@ -112,6 +116,13 @@ export class SceneItemsNode extends Node<ISchema, {}> {
 
   load(context: IContext): Promise<void> {
     this.sanitizeIds();
+
+    this.data.items.forEach(item => {
+      if (item.sceneNodeType === 'item') {
+        if (item.streamVisible == null) item.streamVisible = true;
+        if (item.recordingVisible == null) item.recordingVisible = true;
+      }
+    });
 
     context.scene.addSources(this.data.items);
 

@@ -1,6 +1,7 @@
-import { focusMain, TExecutionContext } from './index';
-import { IPlatformAuth, TPlatform } from '../../../app/services/platforms';
+import { focusMain, TExecutionContext, focusWorker } from './index';
+import { IUserAuth, IPlatformAuth, TPlatform } from '../../../app/services/platforms';
 import { sleep } from '../sleep';
+import { dialogDismiss } from './dialog';
 const request = require('request');
 
 const USER_POOL_URL = `https://slobs-users-pool.herokuapp.com`;
@@ -18,11 +19,21 @@ interface ITestUser {
   apiToken: string; // Streamlabs API token
   widgetToken: string; // needs for widgets showing
   channelId?: string; // for the Mixer and Facebook only
+  features?: ITestUserFeatures; // user-specific features
+}
+
+interface ITestUserFeatures {
+  streamingIsDisabled?: boolean;
+  noFacebookPages?: boolean;
+  hasLinkedTwitter?: boolean;
+  '2FADisabled'?: boolean;
 }
 
 export async function logOut(t: TExecutionContext) {
   await focusMain(t);
-  await t.context.app.client.click('.icon-logout');
+  await t.context.app.client.click('.fa-sign-out-alt');
+  await dialogDismiss(t, 'Yes');
+  await t.context.app.client.waitForVisible('.fa-sign-in-alt'); // wait for the log-in button
   await releaseUserInPool();
 }
 
@@ -34,26 +45,44 @@ export async function logOut(t: TExecutionContext) {
 export async function logIn(
   t: TExecutionContext,
   platform: TPlatform = 'twitch',
-  email?: string, // if not set, pick a random user's account from user-pool
-): Promise<boolean> {
-  const app = t.context.app;
-  let authInfo: IPlatformAuth;
+  features?: ITestUserFeatures, // if not set, pick a random user's account from user-pool
+  waitForUI = true,
+  isOnboardingTest = false,
+): Promise<IUserAuth> {
+  let authInfo: IUserAuth;
 
-  if (email) throw 'User already logged in';
+  if (user) throw 'User already logged in';
 
   if (USER_POOL_TOKEN) {
-    authInfo = await reserveUserFromPool(USER_POOL_TOKEN, platform, email);
+    authInfo = await reserveUserFromPool(USER_POOL_TOKEN, platform, features);
   } else {
     authInfo = getAuthInfoFromEnv();
     if (!authInfo) {
       t.pass();
-      return false;
+      return null;
     }
   }
 
+  await loginWithAuthInfo(t, authInfo, waitForUI, isOnboardingTest);
+  return authInfo;
+}
+
+export async function loginWithAuthInfo(
+  t: TExecutionContext,
+  authInfo: IUserAuth,
+  waitForUI = true,
+  isOnboardingTest = false,
+) {
+  await focusWorker(t);
+  t.context.app.webContents.send('testing-fakeAuth', authInfo, isOnboardingTest);
   await focusMain(t);
-  await app.webContents.send('testing-fakeAuth', authInfo);
+  if (!waitForUI) return true;
+  await t.context.app.client.waitForVisible('.fa-sign-out-alt', 20000); // wait for the log-out button
   return true;
+}
+
+export async function isLoggedIn(t: TExecutionContext) {
+  return t.context.app.client.isVisible('.fa-sign-out-alt');
 }
 
 /**
@@ -70,7 +99,7 @@ export async function releaseUserInPool() {
 /**
  * fetch credentials from ENV variables
  */
-function getAuthInfoFromEnv(): IPlatformAuth {
+function getAuthInfoFromEnv(): IUserAuth {
   const env = process.env;
 
   const authInfo = {
@@ -98,11 +127,14 @@ function getAuthInfoFromEnv(): IPlatformAuth {
   return {
     widgetToken: authInfo.SLOBS_TEST_WIDGET_TOKEN,
     apiToken: authInfo.SLOBS_TEST_API_TOKEN,
-    platform: {
-      type: authInfo.SLOBS_TEST_PLATFORM_TYPE as TPlatform,
-      id: authInfo.SLOBS_TEST_PLATFORM_USER_ID,
-      token: authInfo.SLOBS_TEST_PLATFORM_TOKEN,
-      username: authInfo.SLOBS_TEST_USERNAME,
+    primaryPlatform: authInfo.SLOBS_TEST_PLATFORM_TYPE as TPlatform,
+    platforms: {
+      [authInfo.SLOBS_TEST_PLATFORM_TYPE as TPlatform]: {
+        type: authInfo.SLOBS_TEST_PLATFORM_TYPE as TPlatform,
+        id: authInfo.SLOBS_TEST_PLATFORM_USER_ID,
+        token: authInfo.SLOBS_TEST_PLATFORM_TOKEN,
+        username: authInfo.SLOBS_TEST_USERNAME,
+      },
     },
   };
 }
@@ -113,16 +145,18 @@ function getAuthInfoFromEnv(): IPlatformAuth {
 async function reserveUserFromPool(
   token: string,
   platformType: TPlatform,
-  email = '',
-): Promise<IPlatformAuth> {
+  features: ITestUserFeatures = null,
+): Promise<IUserAuth> {
   // try to get a user account from users-pool service
   // give it several attempts
   let attempts = 3;
   while (attempts--) {
     try {
       let urlPath = 'reserve';
-      if (platformType) urlPath += `/${platformType}`; // request a specific platform
-      if (email) urlPath += `/${email}`; // request a specific account
+      // request a specific platform
+      if (platformType) urlPath += `/${platformType}`;
+      // request a user with a specific feature
+      if (features) urlPath += `?features=${JSON.stringify(features)}`;
       user = await requestUserPool(urlPath);
       break;
     } catch (e) {
@@ -139,12 +173,15 @@ async function reserveUserFromPool(
   return {
     widgetToken: user.widgetToken,
     apiToken: user.apiToken,
-    platform: {
-      username: user.username,
-      type: user.type,
-      id: user.id,
-      token: user.token,
-      channelId: user.channelId,
+    primaryPlatform: user.type,
+    platforms: {
+      [user.type]: {
+        username: user.username,
+        type: user.type,
+        id: user.id,
+        token: user.token,
+        channelId: user.channelId,
+      },
     },
   };
 }

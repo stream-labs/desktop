@@ -1,9 +1,9 @@
 <template>
-  <AdvancedOutputTabs v-model="value" v-if="isAdvancedOutput" @input="onInputHandler" />
+  <AdvancedOutputTabs v-model="props.value" v-if="isAdvancedOutput" @input="onInputHandler" />
   <div class="form-groups" v-else>
     <div
       class="section"
-      v-for="(formGroup, groupIndex) in value"
+      v-for="(formGroup, groupIndex) in props.value"
       :key="formGroup.nameSubCategory + groupIndex"
       v-if="hasAnyVisibleSettings(formGroup)"
       ref="container"

@@ -1,22 +1,23 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
-import TopNav from '../TopNav.vue';
-import AppsNav from '../AppsNav.vue';
+import { Component, Watch } from 'vue-property-decorator';
+import SideNav from '../SideNav';
 import NewsBanner from '../NewsBanner';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService } from 'services/platform-apps';
+import { EditorCommandsService } from '../../app-services';
 import VueResize from 'vue-resize';
+import { $t } from 'services/i18n';
+import fs from 'fs';
 Vue.use(VueResize);
 
 // Pages
-import Studio from '../pages/Studio.vue';
-import Dashboard from '../pages/Dashboard.vue';
+import Studio from '../pages/Studio';
 import Chatbot from '../pages/Chatbot.vue';
 import PlatformAppStore from '../pages/PlatformAppStore.vue';
 import BrowseOverlays from 'components/pages/BrowseOverlays.vue';
-import Live from '../pages/Live.vue';
-import Onboarding from '../pages/Onboarding.vue';
-import TitleBar from '../TitleBar.vue';
+import Onboarding from '../pages/Onboarding';
+import LayoutEditor from '../pages/LayoutEditor';
+import TitleBar from '../TitleBar';
 import { Inject } from '../../services/core/injector';
 import { CustomizationService } from 'services/customization';
 import { NavigationService } from 'services/navigation';
@@ -27,22 +28,18 @@ import LiveDock from '../LiveDock.vue';
 import StudioFooter from '../StudioFooter.vue';
 import CustomLoader from '../CustomLoader';
 import PatchNotes from '../pages/PatchNotes.vue';
-import DesignSystem from '../pages/DesignSystem.vue';
 import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
-import Help from '../pages/Help.vue';
 import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
-import CreatorSites from 'components/pages/CreatorSites';
+import FacebookMerge from 'components/pages/FacebookMerge';
+import { getPlatformService } from 'services/platforms';
 
 @Component({
   components: {
     TitleBar,
-    TopNav,
-    AppsNav,
+    SideNav,
     Studio,
-    Dashboard,
     BrowseOverlays,
-    Live,
     Onboarding,
     LiveDock,
     StudioFooter,
@@ -50,12 +47,11 @@ import CreatorSites from 'components/pages/CreatorSites';
     PatchNotes,
     NewsBanner,
     Chatbot,
-    DesignSystem,
     PlatformAppMainPage,
     PlatformAppStore,
-    Help,
     ResizeBar,
-    CreatorSites,
+    FacebookMerge,
+    LayoutEditor,
   },
 })
 export default class Main extends Vue {
@@ -66,17 +62,33 @@ export default class Main extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() scenesService: ScenesService;
   @Inject() platformAppsService: PlatformAppsService;
+  @Inject() editorCommandsService: EditorCommandsService;
 
-  mounted() {
-    const dockWidth = this.customizationService.state.livedockSize;
-    if (dockWidth < 1) {
-      // migrate from old percentage value to the pixel value
-      this.resetWidth();
-    }
-
-    electron.remote.getCurrentWindow().show();
-    this.handleResize();
+  created() {
+    window.addEventListener('resize', this.windowSizeHandler);
   }
+
+  get bulkLoadFinished() {
+    return this.$store.state.bulkLoadFinished;
+  }
+
+  @Watch('bulkLoadFinished')
+  initializeResize() {
+    this.$nextTick(() => {
+      const dockWidth = this.customizationService.state.livedockSize;
+      if (dockWidth < 1) {
+        // migrate from old percentage value to the pixel value
+        this.resetWidth();
+      }
+      this.handleResize();
+    });
+  }
+
+  destroyed() {
+    window.removeEventListener('resize', this.windowSizeHandler);
+  }
+
+  minEditorWidth = 500;
 
   get title() {
     return this.windowsService.state.main.title;
@@ -91,7 +103,11 @@ export default class Main extends Vue {
   }
 
   get theme() {
-    return this.customizationService.currentTheme;
+    if (this.$store.state.bulkLoadFinished) {
+      return this.customizationService.currentTheme;
+    }
+
+    return 'night-theme';
   }
 
   get applicationLoading() {
@@ -105,11 +121,17 @@ export default class Main extends Vue {
   }
 
   get isLoggedIn() {
-    return this.userService.isLoggedIn();
+    return this.userService.isLoggedIn;
   }
 
   get renderDock() {
-    return this.isLoggedIn && !this.isOnboarding && this.hasLiveDock;
+    return (
+      this.isLoggedIn &&
+      !this.isOnboarding &&
+      this.hasLiveDock &&
+      getPlatformService(this.userService.platform.type).liveDockEnabled() &&
+      !this.showLoadingSpinner
+    );
   }
 
   get isDockCollapsed() {
@@ -132,14 +154,55 @@ export default class Main extends Vue {
     return this.appService.state.errorAlert;
   }
 
-  onDropHandler(event: DragEvent) {
-    const files = event.dataTransfer.files;
+  async isDirectory(path: string) {
+    return new Promise<boolean>((resolve, reject) => {
+      fs.lstat(path, (err, stats) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(stats.isDirectory());
+      });
+    });
+  }
 
-    let fi = files.length;
-    while (fi--) {
-      const file = files.item(fi);
-      this.scenesService.activeScene.addFile(file.path);
+  async onDropHandler(event: DragEvent) {
+    if (this.page !== 'Studio') return;
+
+    const fileList = event.dataTransfer.files;
+
+    if (fileList.length < 1) return;
+
+    const files: string[] = [];
+    let fi = fileList.length;
+    while (fi--) files.push(fileList.item(fi).path);
+
+    const isDirectory = await this.isDirectory(files[0]).catch(err => {
+      console.error(err);
+      return false;
+    });
+
+    if (files.length > 1 || isDirectory) {
+      electron.remote.dialog
+        .showMessageBox(electron.remote.getCurrentWindow(), {
+          message: $t('Are you sure you want to import multiple files?'),
+          type: 'warning',
+          buttons: [$t('Cancel'), $t('OK')],
+        })
+        .then(({ response }) => {
+          if (!response) return;
+          this.executeFileDrop(files);
+        });
+    } else {
+      this.executeFileDrop(files);
     }
+  }
+
+  executeFileDrop(files: string[]) {
+    this.editorCommandsService.executeCommand(
+      'AddFilesCommand',
+      this.scenesService.views.activeSceneId,
+      files,
+    );
   }
 
   $refs: {
@@ -158,14 +221,6 @@ export default class Main extends Vue {
     return classes.join(' ');
   }
 
-  created() {
-    window.addEventListener('resize', this.windowSizeHandler);
-  }
-
-  destroyed() {
-    window.removeEventListener('resize', this.windowSizeHandler);
-  }
-
   windowWidth: number;
 
   hasLiveDock = true;
@@ -180,9 +235,12 @@ export default class Main extends Vue {
 
     clearTimeout(this.windowResizeTimeout);
 
-    this.hasLiveDock = this.windowWidth >= 1100;
+    this.hasLiveDock = this.windowWidth >= 1070;
+    if (this.page === 'Studio') {
+      this.hasLiveDock = this.windowWidth >= this.minEditorWidth + 100;
+    }
     this.windowResizeTimeout = window.setTimeout(
-      () => this.windowsService.updateStyleBlockers('main', false),
+      () => this.windowsService.actions.updateStyleBlockers('main', false),
       200,
     );
   }
@@ -191,33 +249,33 @@ export default class Main extends Vue {
     this.compactView = this.$refs.mainMiddle.clientWidth < 1200;
   }
 
+  handleEditorWidth(width: number) {
+    this.minEditorWidth = width;
+  }
+
   onResizeStartHandler() {
-    this.windowsService.updateStyleBlockers('main', true);
+    this.windowsService.actions.updateStyleBlockers('main', true);
   }
 
   onResizeStopHandler(offset: number) {
-    // tslint:disable-next-line:no-parameter-reassignment TODO
-    offset = this.leftDock ? offset : -offset;
-    this.setWidth(this.customizationService.state.livedockSize + offset);
-    this.windowsService.updateStyleBlockers('main', false);
+    const adjustedOffset = this.leftDock ? offset : -offset;
+    this.setWidth(this.customizationService.state.livedockSize + adjustedOffset);
+    this.windowsService.actions.updateStyleBlockers('main', false);
   }
 
   setWidth(width: number) {
-    this.customizationService.setSettings({
+    this.customizationService.actions.setSettings({
       livedockSize: this.validateWidth(width),
     });
   }
 
   validateWidth(width: number): number {
     const appRect = this.$root.$el.getBoundingClientRect();
-    const minEditorWidth = 860;
     const minWidth = 290;
-    const maxWidth = Math.min(appRect.width - minEditorWidth, appRect.width / 2);
-    // tslint:disable-next-line:no-parameter-reassignment TODO
-    width = Math.max(minWidth, width);
-    // tslint:disable-next-line:no-parameter-reassignment
-    width = Math.min(maxWidth, width);
-    return width;
+    const maxWidth = Math.min(appRect.width - this.minEditorWidth, appRect.width / 2);
+    let constrainedWidth = Math.max(minWidth, width);
+    constrainedWidth = Math.min(maxWidth, width);
+    return constrainedWidth;
   }
 
   updateWidth() {

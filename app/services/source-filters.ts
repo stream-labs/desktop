@@ -37,7 +37,8 @@ export type TSourceFilterType =
   | 'face_mask_filter'
   | 'invert_polarity_filter'
   | 'limiter_filter'
-  | 'expander_filter';
+  | 'expander_filter'
+  | 'shader_filter';
 
 interface ISourceFilterType {
   type: TSourceFilterType;
@@ -94,6 +95,7 @@ export class SourceFiltersService extends Service {
       { description: $t('Invert Polarity'), value: 'invert_polarity_filter' },
       { description: $t('Limiter'), value: 'limiter_filter' },
       { description: $t('Expander'), value: 'expander_filter' },
+      { description: $t('Shader'), value: 'shader_filter' },
     ];
 
     return whitelistedTypes.filter(type => obsAvailableTypes.includes(type.value));
@@ -124,7 +126,7 @@ export class SourceFiltersService extends Service {
   }
 
   getTypesForSource(sourceId: string): ISourceFilterType[] {
-    const source = this.sourcesService.getSource(sourceId);
+    const source = this.sourcesService.views.getSource(sourceId);
     return this.getTypes().filter(filterType => {
       /* Audio filters can be applied to audio sources. */
       if (source.audio && filterType.audio) {
@@ -152,7 +154,7 @@ export class SourceFiltersService extends Service {
     filterName: string,
     settings?: Dictionary<TObsValue>,
   ) {
-    const source = this.sourcesService.getSource(sourceId);
+    const source = this.sourcesService.views.getSource(sourceId);
     const obsFilter = obs.FilterFactory.create(filterType, filterName, settings || {});
 
     const obsSource = source.getObsInput();
@@ -175,7 +177,7 @@ export class SourceFiltersService extends Service {
 
   remove(sourceId: string, filterName: string) {
     const obsFilter = this.getObsFilter(sourceId, filterName);
-    const source = this.sourcesService.getSource(sourceId);
+    const source = this.sourcesService.views.getSource(sourceId);
     source.getObsInput().removeFilter(obsFilter);
     this.filterRemoved.next({ sourceId, name: filterName });
   }
@@ -187,7 +189,7 @@ export class SourceFiltersService extends Service {
   }
 
   getFilters(sourceId: string): ISourceFilter[] {
-    return this.sourcesService
+    return this.sourcesService.views
       .getSource(sourceId)
       .getObsInput()
       .filters.map(obsFilter => ({
@@ -225,7 +227,7 @@ export class SourceFiltersService extends Service {
         (input as IObsListInput<string>).options.forEach(option => {
           if (option.value === 'none') return;
 
-          const source = this.sourcesService.getSourceById(option.value);
+          const source = this.sourcesService.views.getSource(option.value);
           if (source) option.description = source.name;
         });
       }
@@ -236,7 +238,7 @@ export class SourceFiltersService extends Service {
 
   setOrder(sourceId: string, filterName: string, delta: number) {
     const obsFilter = this.getObsFilter(sourceId, filterName);
-    const obsInput = this.sourcesService.getSource(sourceId).getObsInput();
+    const obsInput = this.sourcesService.views.getSource(sourceId).getObsInput();
     const movement = delta > 0 ? EOrderMovement.Down : EOrderMovement.Up;
     let i = Math.abs(delta);
     while (i--) {
@@ -246,7 +248,7 @@ export class SourceFiltersService extends Service {
   }
 
   showSourceFilters(sourceId: string, selectedFilterName = '') {
-    const sourceDisplayName = this.sourcesService.getSource(sourceId).name;
+    const sourceDisplayName = this.sourcesService.views.getSource(sourceId).name;
     this.windowsService.showWindow({
       componentName: 'SourceFilters',
       title: `${$t('Source filters')} (${sourceDisplayName})`,
@@ -271,7 +273,7 @@ export class SourceFiltersService extends Service {
   }
 
   private getObsFilter(sourceId: string, filterName: string): obs.IFilter {
-    return this.sourcesService
+    return this.sourcesService.views
       .getSource(sourceId)
       .getObsInput()
       .findFilter(filterName);

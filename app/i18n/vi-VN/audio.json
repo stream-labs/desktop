@@ -1,6 +1,6 @@
 {
   "Open advanced audio settings": "Open advanced audio settings",
-  "Volume (%)": "Volume (%)",
+  "Volume (%)": "Âm lượng (%)",
   "Downmix to Mono": "Downmix to Mono",
   "Sync Offset (ms)": "Sync Offset (ms)",
   "Audio Monitoring": "Audio Monitoring",
@@ -9,7 +9,7 @@
   "Monitor and Output": "Monitor and Output",
   "Tracks": "Tracks",
   "Advanced Audio Settings": "Advanced Audio Settings",
-  "Volume ( % )": "Volume ( % )",
+  "Volume ( % )": "Âm lượng ( % )",
   "Sync Offset ( ms )": "Sync Offset ( ms )",
   "Mixer": "Mixer",
   "Monitor audio levels. If the bars are moving you are outputting audio.": "Monitor audio levels. If the bars are moving you are outputting audio."

@@ -1,0 +1,19 @@
+{
+  "Label Type": "Jenis Label",
+  "Label Template": "Templat Label",
+  "Item Template": "Templat Item",
+  "Item Separator": "Pemisah Item",
+  "Item Limit": "Batas Item",
+  "Duration (seconds)": "Durasi (detik)",
+  "Show Clock": "Tampilkan Jam",
+  "Always, show 0:00 when inactive": "Selalu tampilkan 0:00 ketika tidak aktif",
+  "Hide when inactive": "Sembunyikan ketika tidak aktif",
+  "Show Count": "Tampilkan Hitungan",
+  "Always, show 0 when inactive": "Selalu tampilkan 0 ketika tidak aktif",
+  "Show Latest": "Tampilkan yang Terbaru",
+  "Always, show last person when inactive": "Selalu tampilkan orang terakhir ketika tidak aktif",
+  "Include Resubs": "Sertakan Berlangganan Ulang",
+  "Preview": "Pratinjau",
+  "Note:": "Catatan:",
+  "Actual label text may take up to 60 seconds to update": "Pembaruan teks label aktual dapat membutuhkan waktu 60 detik"
+}

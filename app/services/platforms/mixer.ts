@@ -1,30 +1,52 @@
 import { StatefulService, mutation } from '../core/stateful-service';
 import {
   IPlatformService,
-  IPlatformAuth,
-  IChannelInfo,
   IGame,
   TPlatformCapability,
   TPlatformCapabilityMap,
+  EPlatformCallResult,
+  IPlatformRequest,
 } from '.';
 import { HostsService } from '../hosts';
-import { SettingsService } from '../settings';
-import { Inject } from '../core/injector';
-import { authorizedHeaders } from '../../util/requests';
+import { Inject } from 'services/core/injector';
+import { authorizedHeaders, handleResponse } from '../../util/requests';
 import { UserService } from '../user';
 import { integer } from 'aws-sdk/clients/cloudfront';
-import { handlePlatformResponse, requiresToken } from './utils';
+import { IPlatformResponse, platformAuthorizedRequest, platformRequest } from './utils';
+import { StreamSettingsService } from 'services/settings/streaming';
+import { Subject } from 'rxjs';
+import { CustomizationService } from 'services/customization';
 
 interface IMixerServiceState {
   typeIdMap: object;
 }
 
+interface IMixerRawChannel {
+  id: string;
+  streamKey: string;
+  name: string;
+  type?: { name: string }; // game name
+}
+
+export interface IMixerStartStreamOptions {
+  title: string;
+  game: string;
+}
+
+export interface IMixerChannelInfo extends IMixerStartStreamOptions {
+  channelId: string;
+  chatUrl: string;
+}
+
 export class MixerService extends StatefulService<IMixerServiceState> implements IPlatformService {
-  @Inject() hostsService: HostsService;
-  @Inject() settingsService: SettingsService;
-  @Inject() userService: UserService;
+  @Inject() private hostsService: HostsService;
+  @Inject() private userService: UserService;
+  @Inject() private streamSettingsService: StreamSettingsService;
+  @Inject() private customizationService: CustomizationService;
 
   capabilities = new Set<TPlatformCapability>(['chat', 'viewer-count']);
+  channelInfoChanged = new Subject<IMixerChannelInfo>();
+  private activeChannel: IMixerChannelInfo;
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 800,
@@ -64,34 +86,28 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     return this.userService.channelId;
   }
 
-  getHeaders(authorized = false): Headers {
-    const headers = new Headers();
+  init() {
+    // prepopulate data to make chat available after app start
+    this.userService.userLogin.subscribe(_ => {
+      if (this.userService.platform.type === 'mixer') this.prepopulateInfo();
+    });
 
-    headers.append('Content-Type', 'application/json');
-
-    if (authorized) headers.append('Authorization', `Bearer ${this.oauthToken}`);
-
-    return headers;
+    // trigger `channelInfoChanged` event with new "chatUrl" based on the changed theme
+    this.customizationService.settingsChanged.subscribe(updatedSettings => {
+      if (updatedSettings.theme) this.updateActiveChannel({});
+    });
   }
 
-  setupStreamSettings(auth: IPlatformAuth) {
-    this.fetchStreamKey().then(key => {
-      const settings = this.settingsService.getSettingsFormData('Stream');
+  getHeaders(req: IPlatformRequest, authorized = false) {
+    return {
+      'Content-Type': 'application/json',
+      ...(authorized ? { Authorization: `Bearer ${this.oauthToken}` } : {}),
+    };
+  }
 
-      settings.forEach(subCategory => {
-        subCategory.parameters.forEach(parameter => {
-          if (parameter.name === 'service') {
-            parameter.value = 'Mixer.com - FTL';
-          }
-
-          if (parameter.name === 'key') {
-            parameter.value = key;
-          }
-        });
-      });
-
-      this.settingsService.setSettings('Stream', settings);
-    });
+  validatePlatform() {
+    // there is nothing to validate for Mixer
+    return Promise.resolve(EPlatformCallResult.Success);
   }
 
   fetchUserInfo() {
@@ -105,107 +121,109 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     const request = new Request(url, { headers });
 
     return fetch(request)
-      .then(handlePlatformResponse)
+      .then(handleResponse)
       .then(response => {
-        this.userService.updatePlatformToken(response.access_token);
-        this.setupStreamSettings(this.userService.state.auth);
+        this.userService.updatePlatformToken('mixer', response.access_token);
       });
   }
 
-  @requiresToken()
   fetchRawChannelInfo() {
-    const headers = this.getHeaders(true);
-    const request = new Request(`${this.apiBase}channels/${this.mixerUsername}/details`, {
-      headers,
+    return platformAuthorizedRequest<IMixerRawChannel>(
+      'mixer',
+      `${this.apiBase}channels/${this.mixerUsername}/details`,
+    ).then(json => {
+      this.userService.updatePlatformChannelId('mixer', json.id);
+      return json;
     });
-
-    return fetch(request)
-      .then(handlePlatformResponse)
-      .then(json => {
-        this.userService.updatePlatformChannelId(json.id);
-        return json;
-      });
   }
 
   fetchStreamKey(): Promise<string> {
     return this.fetchRawChannelInfo().then(json => `${json.id}-${json.streamKey}`);
   }
 
-  fetchChannelInfo(): Promise<IChannelInfo> {
-    return this.fetchRawChannelInfo().then(json => {
-      let gameTitle = '';
+  /**
+   * obtain channel info for the GoLive window
+   */
+  async prepopulateInfo() {
+    const json = await this.fetchRawChannelInfo();
+    let gameTitle = '';
 
-      if (json.type && json.type.name) {
-        gameTitle = json.type.name;
-      }
+    if (json.type && json.type.name) {
+      gameTitle = json.type.name;
+    }
 
-      return {
-        title: json.name,
-        game: gameTitle,
-      };
+    this.updateActiveChannel({
+      channelId: json.id,
+      title: json.name,
+      game: gameTitle,
     });
+
+    return this.activeChannel;
   }
 
-  prepopulateInfo() {
-    return this.fetchChannelInfo();
+  /**
+   * update the local info for current channel and emit the "channelInfoChanged" event
+   */
+  private updateActiveChannel(patch: Partial<IMixerChannelInfo>) {
+    if (!this.activeChannel) this.activeChannel = {} as IMixerChannelInfo;
+    const channelId = patch.channelId || this.activeChannel.channelId;
+    this.activeChannel = {
+      ...this.activeChannel,
+      chatUrl: this.getChatUrl(channelId),
+      ...patch,
+    };
+    this.channelInfoChanged.next(this.activeChannel);
   }
 
-  @requiresToken()
   fetchViewerCount(): Promise<number> {
-    const headers = this.getHeaders();
-    const request = new Request(`${this.apiBase}channels/${this.mixerUsername}`, { headers });
-
-    return fetch(request)
-      .then(handlePlatformResponse)
-      .then(json => json.viewersCurrent);
+    return platformRequest<{ viewersCurrent: number }>(
+      'mixer',
+      `${this.apiBase}channels/${this.mixerUsername}`,
+    ).then(json => json.viewersCurrent);
   }
 
-  @requiresToken()
-  putChannelInfo({ title, game }: IChannelInfo): Promise<boolean> {
-    const headers = this.getHeaders(true);
+  async putChannelInfo({ title, game }: IMixerStartStreamOptions): Promise<boolean> {
     const data = { name: title };
 
     if (this.state.typeIdMap[game]) {
       data['typeId'] = this.state.typeIdMap[game];
     }
 
-    const request = new Request(`${this.apiBase}channels/${this.channelId}`, {
-      headers,
+    await platformAuthorizedRequest('mixer', {
+      url: `${this.apiBase}channels/${this.channelId}`,
       method: 'PATCH',
       body: JSON.stringify(data),
     });
-
-    return fetch(request).then(handlePlatformResponse);
+    this.updateActiveChannel({ title, game });
+    return true;
   }
 
-  @requiresToken()
   searchGames(searchString: string): Promise<IGame[]> {
-    const headers = this.getHeaders();
-    const request = new Request(
+    return platformRequest<{ id: number; name: string }[]>(
+      'mixer',
       `${this.apiBase}types?limit=10&noCount=1&scope=all&query=${searchString}`,
-      { headers },
-    );
-
-    return fetch(request)
-      .then(handlePlatformResponse)
-      .then(response => {
-        response.forEach((game: any) => {
-          this.ADD_GAME_MAPPING(game.name, game.id);
-        });
-        return response;
+    ).then(response => {
+      response.forEach(game => {
+        this.ADD_GAME_MAPPING(game.name, game.id);
       });
-  }
-
-  getChatUrl(mode: string): Promise<string> {
-    return new Promise(resolve => {
-      this.fetchRawChannelInfo().then(json => {
-        resolve(`https://mixer.com/embed/chat/${json.id}`);
-      });
+      return response;
     });
   }
 
-  beforeGoLive() {
-    return Promise.resolve();
+  private getChatUrl(channelId: string): string {
+    return `https://mixer.com/embed/chat/${channelId}`;
+  }
+
+  async beforeGoLive(startStreamOptions?: IMixerStartStreamOptions) {
+    const key = await this.fetchStreamKey();
+
+    if (this.streamSettingsService.isSafeToModifyStreamKey()) {
+      this.streamSettingsService.setSettings({ key, platform: 'mixer', streamType: 'rtmp_common' });
+    }
+
+    if (startStreamOptions) await this.putChannelInfo(startStreamOptions);
+
+    return key;
   }
 
   // TODO: dedup
@@ -213,5 +231,16 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     capability: T,
   ): this is TPlatformCapabilityMap[T] & IPlatformService {
     return this.capabilities.has(capability);
+  }
+
+  liveDockEnabled(): boolean {
+    return true;
+  }
+
+  /**
+   * Get user-friendly error message
+   */
+  getErrorDescription(error: IPlatformResponse<unknown>): string {
+    return 'Can not connect to Mixer';
   }
 }

@@ -1,0 +1,58 @@
+@import "../../styles/index";
+
+.help-tip {
+  .radius();
+
+  position: absolute;
+  background: var(--teal);
+  color: var(--white);
+  width: 260px;
+  padding: 10px;
+  font-size: 14px;
+  z-index: 9999;
+}
+
+.help-tip__arrow {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 8px 8px 8px 0;
+  border-color: transparent var(--teal) transparent transparent;
+  position: absolute;
+  left: -8px;
+
+  &.help-tip__arrow-right {
+    left: auto;
+    right: -8px;
+    transform: rotate(180deg);
+  }
+}
+
+.help-tip__close {
+  .transition();
+
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  opacity: 0.6;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.help-tip__title {
+  .weight(@medium);
+
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+
+  i {
+    margin-right: 8px;
+    font-size: 16px;
+  }
+}

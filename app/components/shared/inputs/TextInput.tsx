@@ -30,7 +30,7 @@ export default class TextInput extends BaseInput<string, ITextMetadata> {
     };
   }
 
-  toggleVisibleButton(h: Function) {
+  get toggleVisibleButton() {
     return (
       this.metadata.masked && (
         <button
@@ -43,7 +43,15 @@ export default class TextInput extends BaseInput<string, ITextMetadata> {
     );
   }
 
-  render(h: Function) {
+  handleInput(value: string) {
+    if (!this.metadata.emitOnChange) this.emitInput(value);
+  }
+
+  handleChange(value: string) {
+    if (this.metadata.emitOnChange) this.emitInput(value);
+  }
+
+  render() {
     return (
       <span
         class={cx(styles.textInput, {
@@ -54,16 +62,20 @@ export default class TextInput extends BaseInput<string, ITextMetadata> {
         data-type="text"
         data-name={this.options.name}
       >
+        {this.options.icon && <i class={`fa fa-${this.options.icon}`} />}
         <input
           type={this.textVisible ? 'text' : 'password'}
           placeholder={this.options.placeholder}
           value={this.value}
-          onInput={(e: { target: { value: string } }) => this.emitInput(e.target.value)}
+          onInput={(e: { target: { value: string } }) => this.handleInput(e.target.value)}
+          onChange={(e: { target: { value: string } }) => this.handleChange(e.target.value)}
           name={this.options.uuid}
           v-validate={this.validate}
           disabled={this.options.disabled}
+          onFocus={() => this.$emit('focus')}
+          onBlur={() => this.$emit('blur')}
         />
-        {this.toggleVisibleButton(h)}
+        {this.toggleVisibleButton}
         {this.$slots.default}
       </span>
     );

@@ -5,7 +5,7 @@ import WidgetSettings from 'components/widgets/WidgetSettings.vue';
 import { inputComponents } from 'components/widgets/inputs';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n/index';
-import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import {
   IStreamBossCreateOptions,
   IStreamBossData,

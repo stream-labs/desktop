@@ -1,7 +1,6 @@
 import { PropertiesManager } from './properties-manager';
 import { Inject } from 'services/core/injector';
 import { MediaBackupService } from 'services/media-backup';
-import * as input from 'components/obs/inputs/ObsInput';
 import * as fi from 'node-fontinfo';
 import { FontLibraryService } from 'services/font-library';
 import { EFontStyle } from 'obs-studio-node';
@@ -9,6 +8,9 @@ import fs from 'fs';
 import path from 'path';
 import { UserService } from 'services/user';
 import { CustomizationService } from 'services/customization';
+import { TObsValue } from 'components/obs/inputs/ObsInput';
+import electron from 'electron';
+import { getSharedResource } from 'util/get-shared-resource';
 
 export interface IDefaultManagerSettings {
   mediaBackup?: {
@@ -37,23 +39,23 @@ export class DefaultManager extends PropertiesManager {
     if (!this.settings.mediaBackup) this.settings.mediaBackup = {};
     this.initializeMediaBackup();
     this.downloadGoogleFont();
+    this.setupAutomaticGameCapture();
   }
 
-  setPropertiesFormData(properties: input.TObsFormData) {
-    super.setPropertiesFormData(properties);
+  handleSettingsChange(settings: Dictionary<TObsValue>) {
     if (this.obsSource.settings[this.mediaBackupFileSetting] !== this.currentMediaPath) {
       this.currentMediaPath = this.obsSource.settings[this.mediaBackupFileSetting];
       this.uploadNewMediaFile();
     }
   }
 
-  initializeMediaBackup() {
+  private initializeMediaBackup() {
     if (this.customizationService.state.mediaBackupOptOut) {
       this.settings.mediaBackup = {};
       return;
     }
 
-    if (!this.userService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn) return;
 
     if (this.obsSource.id === 'ffmpeg_source') {
       this.mediaBackupFileSetting = 'local_file';
@@ -86,7 +88,7 @@ export class DefaultManager extends PropertiesManager {
     }
   }
 
-  uploadNewMediaFile() {
+  private uploadNewMediaFile() {
     if (!this.mediaBackupFileSetting) return;
     if (!this.obsSource.settings[this.mediaBackupFileSetting]) return;
 
@@ -95,11 +97,12 @@ export class DefaultManager extends PropertiesManager {
 
     this.mediaBackupService
       .createNewFile(
-        this.settings.mediaBackup.localId,
+        this.mediaBackupService.getLocalFileId(),
         this.obsSource.settings[this.mediaBackupFileSetting],
       )
       .then(file => {
         if (file) {
+          this.settings.mediaBackup.localId = file.id;
           this.settings.mediaBackup.serverId = file.serverId;
           this.settings.mediaBackup.originalPath = this.obsSource.settings[
             this.mediaBackupFileSetting
@@ -108,7 +111,7 @@ export class DefaultManager extends PropertiesManager {
       });
   }
 
-  ensureMediaBackupId() {
+  private ensureMediaBackupId() {
     if (this.settings.mediaBackup.localId) return;
     this.settings.mediaBackup.localId = this.mediaBackupService.getLocalFileId();
   }
@@ -117,7 +120,7 @@ export class DefaultManager extends PropertiesManager {
     return this.obsSource.id === 'ffmpeg_source';
   }
 
-  async downloadGoogleFont() {
+  private async downloadGoogleFont() {
     if (this.obsSource.id !== 'text_gdiplus') return;
 
     const settings = this.obsSource.settings;
@@ -154,5 +157,17 @@ export class DefaultManager extends PropertiesManager {
       (fontInfo.italic ? EFontStyle.Italic : 0) | (fontInfo.bold ? EFontStyle.Bold : 0);
 
     this.obsSource.update(newSettings);
+  }
+
+  private setupAutomaticGameCapture() {
+    if (this.obsSource.id !== 'game_capture') return;
+
+    this.obsSource.update({
+      auto_capture_list_path: path.join(
+        electron.remote.app.getPath('userData'),
+        'game_capture_list.lst',
+      ),
+      auto_placeholder_image: getSharedResource('capture-placeholder.png'),
+    });
   }
 }

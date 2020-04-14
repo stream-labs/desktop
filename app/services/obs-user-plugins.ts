@@ -3,9 +3,14 @@ import fs from 'fs';
 import path from 'path';
 import electron from 'electron';
 import * as obs from '../../obs-api';
+import Utils from './utils';
+
+// WARNING: This service is initialized extremely early
+// and should not import any other services.
 
 export class ObsUserPluginsService extends Service {
   async initialize() {
+    // Make a best effort but don't stop SLOBS from loading
     // Make a best effort but don't stop SLOBS from loading
     try {
       await this.ensureDirectory(this.pluginsBaseDir);

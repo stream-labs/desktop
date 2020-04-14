@@ -1,0 +1,30 @@
+@import "../../../styles/index";
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo {
+  margin: 110px auto 120px;
+  animation: float 6s ease-in-out infinite;
+}
+
+.error {
+  color: var(--warning);
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}

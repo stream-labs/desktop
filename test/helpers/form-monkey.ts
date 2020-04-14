@@ -1,20 +1,31 @@
-import { IInputMetadata } from '../../app/components/shared/inputs';
 import { sleep } from './sleep';
 import { cloneDeep, isMatch } from 'lodash';
-import { TExecutionContext } from './spectron';
-
-interface IFormMonkeyFillOptions {
-  metadata?: Dictionary<IInputMetadata>;
-}
+import { click, TExecutionContext } from './spectron';
 
 interface IUIInput {
   id: string;
   type: string;
   name: string;
   selector: string;
+  loading: boolean;
 }
 
 const DEFAULT_SELECTOR = 'body';
+
+const months = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
 
 /**
  * helper for simulating user input into SLOBS forms
@@ -22,9 +33,11 @@ const DEFAULT_SELECTOR = 'body';
 export class FormMonkey {
   constructor(
     private t: TExecutionContext,
-    private formSelector = DEFAULT_SELECTOR,
+    private formSelector?: string,
     private showLogs = false,
-  ) {}
+  ) {
+    if (!formSelector) this.formSelector = DEFAULT_SELECTOR;
+  }
 
   get client() {
     return this.t.context.app.client;
@@ -34,7 +47,7 @@ export class FormMonkey {
     const formSelector = this.formSelector;
 
     if (formSelector !== DEFAULT_SELECTOR) {
-      await this.client.waitForExist(formSelector, 10000);
+      await this.client.waitForExist(formSelector, 15000);
     }
 
     const result = [];
@@ -44,17 +57,27 @@ export class FormMonkey {
     for (const $input of $inputs) {
       const id = ($input as any).ELEMENT;
       const name = (await this.client.elementIdAttribute(id, 'data-name')).value;
-      const type = (await this.client.elementIdAttribute(id, 'data-type')).value;
-      const selector = `${formSelector} [data-name="${name}"]`;
-      result.push({ id, name, type, selector });
+      if (!name) continue;
+      result.push(await this.getInput(name));
     }
     return result;
+  }
+
+  async getInput(name: string): Promise<IUIInput> {
+    const selector = `${this.formSelector} [data-name="${name}"]`;
+    const $el = await this.client.$(selector);
+    const id = ($el as any).value.ELEMENT;
+    const type = await this.getAttribute(selector, 'data-type');
+    const loadingAttr = await this.getAttribute(selector, 'data-loading');
+    const loading = loadingAttr === 'true';
+    return { id, name, type, selector, loading };
   }
 
   /**
    * fill the form with values
    */
-  async fill(formData: Dictionary<any>, options: IFormMonkeyFillOptions = {}) {
+  async fill(formData: Dictionary<any>) {
+    await this.waitForLoading();
     const inputs = await this.getInputs();
 
     // tslint:disable-next-line:no-parameter-reassignment TODO
@@ -90,6 +113,12 @@ export class FormMonkey {
         case 'fontWeight':
           await this.setSliderValue(input.selector, value);
           break;
+        case 'date':
+          await this.setDateValue(input.selector, value);
+          break;
+        case 'twitchTags':
+          await this.setTwitchTagsValue(input.selector, value);
+          break;
         default:
           throw new Error(`No setter found for input type = ${input.type}`);
       }
@@ -107,6 +136,7 @@ export class FormMonkey {
    * returns all input values from the form
    */
   async read(): Promise<Dictionary<any>> {
+    await this.waitForLoading();
     const inputs = await this.getInputs();
     const formData = {};
 
@@ -202,6 +232,7 @@ export class FormMonkey {
     await sleep(100); // give colorpicker some time to be opened
     await this.setInputValue(inputSelector, value);
     await this.client.click(`${selector} .colorpicker__input`); // close colorpicker
+    await sleep(100); // give colorpicker some time to be closed
   }
 
   async getColorValue(selector: string) {
@@ -215,11 +246,41 @@ export class FormMonkey {
     );
   }
 
+  /**
+   * return ListInput options
+   */
+  async getListOptions(fieldName: string): Promise<{ value: string; title: string }[]> {
+    await this.waitForLoading(fieldName);
+    const input = await this.getInput(fieldName);
+    const optionsEls = await this.client.$$(`${input.selector} [data-option-value]`);
+    const values: { value: string; title: string }[] = [];
+    for (const el of optionsEls) {
+      const id = (el as any).ELEMENT;
+      const value = (await this.client.elementIdAttribute(id, 'data-option-value')).value;
+      const title = (await this.client.elementIdAttribute(id, 'data-option-title')).value;
+      values.push({ value, title });
+    }
+    return values;
+  }
+
+  async getOptionByTitle(fieldName: string, optionTitle: string | RegExp) {
+    const options = await this.getListOptions(fieldName);
+    const option = options.find(option => {
+      return typeof optionTitle === 'string'
+        ? option.title === optionTitle
+        : !!option.title.match(optionTitle);
+    });
+    return option.value;
+  }
+
   async setBoolValue(selector: string, value: boolean) {
     const checkboxSelector = `${selector} input`;
+
+    // click to change the checkbox state
     await this.client.click(checkboxSelector);
 
-    if (!value && (await this.client.isSelected(checkboxSelector))) {
+    // if the current value is not what we need than click one more time
+    if (value !== (await this.getBoolValue(selector))) {
       await this.client.click(checkboxSelector);
     }
   }
@@ -268,20 +329,95 @@ export class FormMonkey {
       await sleep(100);
 
       moveOffset = moveOffset / 2;
-      if (moveOffset < 0.5) throw new Error('Slider position setup failed');
+      if (moveOffset < 0.3) throw new Error('Slider position setup failed');
     }
   }
 
   async getSliderValue(sliderInputSelector: string): Promise<number> {
     // fetch the value from the slider's tooltip
-    return Number(await this.client.getText(`${sliderInputSelector} .vue-slider-tooltip-bottom .vue-slider-tooltip`));
+    return Number(
+      await this.client.getText(
+        `${sliderInputSelector} .vue-slider-tooltip-bottom .vue-slider-tooltip`,
+      ),
+    );
+  }
+
+  async setDateValue(selector: string, date: Date | number) {
+    date = new Date(date);
+    const day = date.getDate();
+    const month = date.getMonth();
+    const year = date.getFullYear();
+
+    // open calendar
+    await click(this.t, selector);
+
+    // switch to month selection
+    await click(this.t, `${selector} .day__month_btn`);
+
+    // switch to year selection
+    await click(this.t, `${selector} .month__year_btn`);
+
+    // select year
+    let els: any[];
+    els = await this.client.$(selector).$$(`span.year=${year}`);
+    this.client.elementIdClick(els[1].ELEMENT);
+
+    // select month
+    await this.client
+      .$(selector)
+      .$(`span.month=${months[month]}`)
+      .click();
+
+    // select day
+    await this.client
+      .$(selector)
+      .$(`span.day=${day}`)
+      .click();
   }
 
   async setInputValue(selector: string, value: string) {
+    await this.client.waitForVisible(selector);
     await this.client.click(selector);
     await ((this.client.keys(['Control', 'a']) as any) as Promise<any>); // clear
     await ((this.client.keys('Control') as any) as Promise<any>); // release ctrl key
     await ((this.client.keys(value) as any) as Promise<any>); // type text
+  }
+
+  async setTwitchTagsValue(selector: string, values: string[]) {
+    // clear tags
+    const closeSelector = `${selector} .sp-icon-close`;
+    while (await this.client.isExisting(closeSelector)) {
+      await this.client.click(closeSelector);
+    }
+
+    // click to open the popup
+    await this.client.click(selector);
+
+    // select values
+    const inputSelector = `.v-dropdown-container .sp-search-input`;
+    for (const value of values) {
+      await this.setInputValue(inputSelector, value);
+      await ((this.client.keys('ArrowDown') as any) as Promise<any>);
+      await ((this.client.keys('Enter') as any) as Promise<any>);
+    }
+
+    // click away and wait for the control to dismiss
+    await this.client.click('.tags-container .input-label');
+    await this.client.waitForExist('.sp-input-container.sp-open', 500, true);
+  }
+
+  /**
+   * wait for input to be loaded
+   * if no field name provided then wait for all inputs
+   */
+  async waitForLoading(fieldName?: string) {
+    const loadingInputs = (await this.getInputs()).filter(input => {
+      return input.loading && (!fieldName || fieldName === input.name);
+    });
+    const watchers = loadingInputs.map(input => {
+      return this.client.waitUntil(async () => (await this.getInput(input.name)).loading === false);
+    });
+    return Promise.all(watchers);
   }
 
   private async getAttribute(selector: string, attrName: string) {
@@ -300,8 +436,18 @@ export class FormMonkey {
  */
 export async function fillForm(
   t: TExecutionContext,
-  selector: string,
+  selector = DEFAULT_SELECTOR,
   formData: Dictionary<any>,
 ): Promise<any> {
   return new FormMonkey(t, selector).fill(formData);
+}
+
+/**
+ * a shortcut for FormMonkey.includes()
+ */
+export async function formIncludes(
+  t: TExecutionContext,
+  formData: Dictionary<string>,
+): Promise<boolean> {
+  return new FormMonkey(t).includes(formData);
 }

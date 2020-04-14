@@ -1,0 +1,18 @@
+{
+  "Message Format": "Format wiadomości",
+  "Max Donations": "Maksymalne dotacje",
+  "Text Scroll Speed": "Prędkość przesuwania tekstu",
+  "Background Color": "Kolor tła",
+  "Font": "Czcionka",
+  "Font Size": "Rozmiar czcionki",
+  "Font Weight": "Grubość czcionki",
+  "Text Color": "Kolor tekstu",
+  "Name Text Color": "Kolor tekstu nazwy",
+  "Amount Text Color": "Kolor tekstu ilości",
+  "The name of the donator,": "Nazwa darczyńcy,",
+  "The amount that was donated": "Kwota przekazana w ramach dotacji",
+  "Manage List": "Zarządzaj listą",
+  "Font Settings": "Ustawienia czcionki",
+  "A hex color for the text of the": "Kolor w formacie szesnastkowym dla tekstu",
+  "token": "tokenów"
+}

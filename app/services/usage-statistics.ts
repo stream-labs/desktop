@@ -7,6 +7,7 @@ import electron from 'electron';
 import { authorizedHeaders, handleResponse } from 'util/requests';
 import throttle from 'lodash/throttle';
 import { Service } from './core/service';
+import Utils from './utils';
 
 export type TUsageEvent = 'stream_start' | 'stream_end' | 'app_start' | 'app_close' | 'crash';
 
@@ -18,11 +19,11 @@ interface IUsageApiData {
   data: string;
 }
 
-type TAnalyticsEvent = 'TCP_API_REQUEST'; // add more types if you need
+type TAnalyticsEvent = 'FacebookLogin' | 'PlatformLogin' | 'SocialShare'; // add more types if you need
 
 interface IAnalyticsEvent {
   product: string;
-  version: number;
+  version: string;
   event: string;
   value?: any;
   time?: string;
@@ -48,7 +49,7 @@ export class UsageStatisticsService extends Service {
   @Inject() hostsService: HostsService;
 
   installerId: string;
-  version = electron.remote.process.env.SLOBS_VERSION;
+  version = Utils.env.SLOBS_VERSION;
 
   private anaiticsEvents: IAnalyticsEvent[] = [];
 
@@ -99,6 +100,11 @@ export class UsageStatisticsService extends Service {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
+    // Don't check logged in because login may not be verified at this point
+    if (this.userService.state.auth && this.userService.state.auth.primaryPlatform) {
+      metadata['platform'] = this.userService.state.auth.primaryPlatform;
+    }
+
     const bodyData: IUsageApiData = {
       event,
       slobs_user_id: this.userService.getLocalUserId(),
@@ -106,7 +112,7 @@ export class UsageStatisticsService extends Service {
       data: JSON.stringify(metadata),
     };
 
-    if (this.userService.isLoggedIn()) {
+    if (this.userService.state.auth && this.userService.state.auth.apiToken) {
       headers = authorizedHeaders(this.userService.apiToken, headers);
     }
 

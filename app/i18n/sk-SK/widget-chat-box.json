@@ -1,0 +1,19 @@
+{
+  "Visual Settings": "Vizuálne nastavenia",
+  "Font Settings": "Nastavenia písma",
+  "Chatter": "Chatter",
+  "Always Show Messages": "Vždy zobrazovať správy",
+  "Show Moderator Badges": "Zobraziť odznaky moderátora",
+  "Show Subscriber Badges": "Zobraziť odznaky odberateľa",
+  "Show Turbo Badges": "Zobraziť odznaky Turbo",
+  "Show Twitch Prime Badges": "Zobraziť odznaky Twitch Prime",
+  "Show Bits Badges": "Zobraziť odznaky bitov",
+  "Show Top Coin Holder Badges": "Zobraziť odznaky najlepších držiteľov mincí",
+  "Enable BetterTTV Emotes": "Povoľte BetterTTV Emotes",
+  "Enable FrankerFaceZ Emotes": "Povoľte BetterTTV Emotes",
+  "Text Color": "Farba textu",
+  "Font Size": "Veľkosť písma",
+  "Muted Chatters": "Stlmené Chatters",
+  "Hide Commands": "Skryť príkazy",
+  "Background Color": "Farba pozadia"
+}

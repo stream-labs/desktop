@@ -33,11 +33,11 @@ export class AudioSource implements ISerializable {
   @Fallback() private audioSource: InternalAudioSource;
 
   constructor(private sourceId: string) {
-    this.audioSource = this.audioService.getSource(sourceId);
+    this.audioSource = this.audioService.views.getSource(sourceId);
   }
 
   getModel(): IAudioSourceModel {
-    const sourceModel = this.sourcesService.getSource(this.sourceId).getModel();
+    const sourceModel = this.sourcesService.views.getSource(this.sourceId).getModel();
     return {
       name: sourceModel.name,
       sourceId: this.audioSource.sourceId,
@@ -52,10 +52,10 @@ export class AudioSource implements ISerializable {
   }
 
   setDeflection(deflection: number) {
-    return this.audioSource.setDeflection(deflection);
+    this.audioSource.setDeflection(deflection);
   }
 
   setMuted(muted: boolean) {
-    return this.audioSource.setMuted(muted);
+    this.audioSource.setMuted(muted);
   }
 }

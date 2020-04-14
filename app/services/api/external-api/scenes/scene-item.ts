@@ -1,8 +1,9 @@
-import { ServiceHelper } from 'services/core';
 import { SceneItem as InternalSceneItem } from 'services/scenes';
 import { InjectFromExternalApi, Fallback } from 'services/api/external-api';
 import { Source, SourcesService } from 'services/api/external-api/sources';
 import { ISceneNodeModel, SceneNode } from './scene-node';
+import Utils from '../../../utils';
+import { ServiceHelper } from '../../../core';
 
 export interface ISceneItemModel extends ISceneItemSettings, ISceneNodeModel {
   sceneItemId: string;
@@ -14,6 +15,8 @@ export interface ISceneItemSettings {
   transform: ITransform;
   visible: boolean;
   locked: boolean;
+  streamVisible: boolean;
+  recordingVisible: boolean;
 }
 
 interface ICrop {
@@ -60,13 +63,23 @@ export interface ISceneItemActions {
  * API for scene-items
  */
 @ServiceHelper()
-export class SceneItem extends SceneNode implements ISceneItemActions {
+export class SceneItem extends SceneNode implements ISceneItemActions, ISceneItemModel {
   @Fallback() private sceneItem: InternalSceneItem;
   @InjectFromExternalApi() private sourcesService: SourcesService;
 
+  sourceId: string;
+  sceneItemId: string;
+  name: string;
+  transform: ITransform;
+  visible: boolean;
+  locked: boolean;
+  streamVisible: boolean;
+  recordingVisible: boolean;
+
   constructor(public sceneId: string, public nodeId: string, sourceId: string) {
     super(sceneId, nodeId);
-    this.sceneItem = this.internalScenesService.getSceneItem(this.nodeId);
+    this.sceneItem = this.internalScenesService.views.getSceneItem(this.nodeId);
+    Utils.applyProxy(this, () => this.getModel());
   }
 
   /**
@@ -89,6 +102,8 @@ export class SceneItem extends SceneNode implements ISceneItemActions {
       transform: this.sceneItem.transform,
       visible: this.sceneItem.visible,
       locked: this.sceneItem.locked,
+      streamVisible: this.sceneItem.streamVisible,
+      recordingVisible: this.sceneItem.recordingVisible,
     };
   }
 

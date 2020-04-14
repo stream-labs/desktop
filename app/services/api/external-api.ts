@@ -26,7 +26,7 @@ export function InjectFromExternalApi(serviceName?: string): PropertyDecorator {
         const name = serviceName || key.charAt(0).toUpperCase() + key.slice(1);
         const externalApiService = getResource<ExternalApiService>('ExternalApiService');
         const singletonInstance = externalApiService.getResource(name);
-        if (!singletonInstance) throw `Resource not found: ${name}`;
+        if (!singletonInstance) throw new Error(`Resource not found: ${name}`);
         return singletonInstance;
       },
     });

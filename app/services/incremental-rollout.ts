@@ -4,17 +4,22 @@ import { mutation, StatefulService } from 'services/core/stateful-service';
 import { UserService } from 'services/user';
 import { HostsService } from './hosts';
 import Utils from 'services/utils';
+import { InitAfter } from './core';
 
 export enum EAvailableFeatures {
   chatbot = 'slobs--chatbot',
   platform = 'slobs--platform',
   creatorSites = 'slobs--creator-sites',
+  facebookOnboarding = 'slobs--facebook-onboarding',
+  twitter = 'slobs--twitter',
+  restream = 'slobs--restream',
 }
 
 interface IIncrementalRolloutServiceState {
   availableFeatures: string[];
 }
 
+@InitAfter('UserService')
 export class IncrementalRolloutService extends StatefulService<IIncrementalRolloutServiceState> {
   @Inject() private userService: UserService;
   @Inject() private hostsService: HostsService;
@@ -44,7 +49,7 @@ export class IncrementalRolloutService extends StatefulService<IIncrementalRollo
   }
 
   fetchAvailableFeatures() {
-    if (this.userService.isLoggedIn()) {
+    if (this.userService.isLoggedIn) {
       const host = this.hostsService.streamlabs;
       const url = `https://${host}/api/v5/slobs/available-features`;
       const headers = authorizedHeaders(this.userService.apiToken);

@@ -9,6 +9,7 @@ export enum EInputType {
   bool = 'bool',
   number = 'number',
   text = 'text',
+  date = 'date',
   slider = 'slider',
   color = 'color',
   list = 'list',
@@ -55,6 +56,12 @@ export interface IListMetadata<TValueType> extends IInputMetadata {
   internalSearch?: boolean;
   allowCustom?: Function;
   noResult?: string;
+  placeholder?: string;
+  fullWidth?: boolean;
+}
+
+export interface IImagePickerMetadata<TValueType> extends IListMetadata<TValueType> {
+  isIcons: boolean;
 }
 
 export interface ITextMetadata extends IInputMetadata {
@@ -66,6 +73,16 @@ export interface ITextMetadata extends IInputMetadata {
   masked?: boolean;
   fullWidth?: boolean;
   blockReturn?: boolean;
+  icon?: string;
+
+  /**
+   * When true will only emit on change events instead of input events
+   */
+  emitOnChange?: boolean;
+}
+
+export interface IDateMetadata extends IInputMetadata {
+  disablePastDates?: boolean;
 }
 
 export interface ISliderMetadata extends IInputMetadata {
@@ -81,6 +98,7 @@ export interface IListOption<TValue> {
   value: TValue;
   title: string;
   description?: string;
+  icon?: string;
   options?: { label: string; value: string }[];
 }
 
@@ -94,6 +112,14 @@ export interface IFileMetadata extends IInputMetadata {
   directory?: boolean;
 }
 
+export interface ITextAreaMetadata extends IInputMetadata {
+  placeholder: string;
+  max: number;
+  min: number;
+  blockReturn: boolean;
+  rows: number;
+}
+
 // a helper for creating metadata for inputs
 export const metadata = {
   timer: (options: ITimerMetadata) => ({ type: EInputType.timer, ...options } as ITimerMetadata),
@@ -101,6 +127,7 @@ export const metadata = {
   number: (options: INumberMetadata) =>
     ({ type: EInputType.number, ...options } as INumberMetadata),
   text: (options: ITextMetadata) => ({ type: EInputType.text, ...options } as ITextMetadata),
+  date: (options: IDateMetadata) => ({ type: EInputType.date, ...options } as IDateMetadata),
   list: (options: IListMetadata<string>) =>
     ({ type: EInputType.list, ...options } as IListMetadata<string>),
   color: (options: IInputMetadata) => ({ type: EInputType.color, ...options } as IInputMetadata),

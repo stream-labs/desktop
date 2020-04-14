@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { metadata } from 'components/shared/inputs';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
-import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import { PlatformAppsService } from 'services/platform-apps';
 import { Inject } from 'services/core/injector';
 
@@ -26,7 +26,7 @@ export default class AppPlatformDeveloperSettings extends Vue {
     title: 'App Token',
     description:
       'This token allows you app to authenticate with the ' +
-      'streamlabs API.  Visit dev-platform.streamlabs.com to create a developer account ' +
+      'streamlabs API.  Visit platform.streamlabs.com to create a developer account ' +
       'and get a test app token.',
   });
 

@@ -81,7 +81,7 @@ export class AuthorizationModule extends Module {
       eventHandler({ type: EAuthWindowEventType.Show });
     });
 
-    win.setMenu(null);
+    win.removeMenu();
     win.loadURL(authUrl);
 
     this.windowHandles[ctx.app.id] = win;

@@ -8,47 +8,86 @@ import { MediaBackupService, EGlobalSyncStatus } from 'services/media-backup';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import electron from 'electron';
 import { $t } from 'services/i18n';
+import { SourcesService } from 'services/sources';
+import { StreamSettingsService } from 'services/settings/streaming';
+import { RestreamService } from 'services/restream';
+import { FacebookService } from 'services/platforms/facebook';
 
 @Component({})
 export default class StartStreamingButton extends Vue {
   @Inject() streamingService: StreamingService;
+  @Inject() streamSettingsService: StreamSettingsService;
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() mediaBackupService: MediaBackupService;
   @Inject() videoEncodingOptimizationService: VideoEncodingOptimizationService;
+  @Inject() sourcesService: SourcesService;
+  @Inject() restreamService: RestreamService;
+  @Inject() facebookService: FacebookService;
 
   @Prop() disabled: boolean;
+
+  mounted() {
+    if (this.isFacebook || this.restreamService.shouldGoLiveWithRestream) {
+      this.facebookService.fetchActivePage();
+    }
+  }
 
   async toggleStreaming() {
     if (this.streamingService.isStreaming) {
       this.streamingService.toggleStreaming();
     } else {
       if (this.mediaBackupService.globalSyncStatus === EGlobalSyncStatus.Syncing) {
-        const goLive = await new Promise<boolean>(resolve => {
-          electron.remote.dialog.showMessageBox(
-            electron.remote.getCurrentWindow(),
-            {
-              title: $t('Cloud Backup'),
-              type: 'warning',
-              message:
-                $t('Your media files are currently being synced with the cloud. ') +
-                $t('It is recommended that you wait until this finishes before going live.'),
-              buttons: [$t('Wait'), $t('Go Live Anyway')],
-            },
-            goLive => {
-              resolve(!!goLive);
-            },
-          );
-        });
+        const goLive = await electron.remote.dialog
+          .showMessageBox(electron.remote.getCurrentWindow(), {
+            title: $t('Cloud Backup'),
+            type: 'warning',
+            message:
+              $t('Your media files are currently being synced with the cloud. ') +
+              $t('It is recommended that you wait until this finishes before going live.'),
+            buttons: [$t('Wait'), $t('Go Live Anyway')],
+          })
+          .then(({ response }) => !!response);
 
         if (!goLive) return;
       }
 
-      if (
-        this.userService.isLoggedIn() &&
-        (this.customizationService.state.updateStreamInfoOnLive || this.isFacebook)
-      ) {
-        this.streamingService.showEditStreamInfo();
+      const needToShowNoSourcesWarning =
+        this.streamSettingsService.settings.warnNoVideoSources &&
+        this.sourcesService.views
+          .getSources()
+          .filter(source => source.type !== 'scene' && source.video).length === 0;
+
+      if (needToShowNoSourcesWarning) {
+        const goLive = await electron.remote.dialog
+          .showMessageBox(electron.remote.getCurrentWindow(), {
+            title: $t('No Sources'),
+            type: 'warning',
+            message:
+              // tslint:disable-next-line prefer-template
+              $t(
+                "It looks like you haven't added any video sources yet, so you will only be outputting a black screen.",
+              ) +
+              ' ' +
+              $t('Are you sure you want to do this?') +
+              '\n\n' +
+              $t('You can add sources by clicking the + icon near the Sources box at any time'),
+            buttons: [$t('Cancel'), $t('Go Live Anyway')],
+          })
+          .then(({ response }) => !!response);
+
+        if (!goLive) return;
+      }
+
+      if (this.shouldShowGoLiveWindow()) {
+        if (this.hasPages) {
+          return this.streamingService.openShareStream();
+        }
+        if (this.restreamService.shouldGoLiveWithRestream) {
+          this.streamingService.showEditStreamInfo(this.restreamService.platforms, 0);
+        } else {
+          this.streamingService.showEditStreamInfo();
+        }
       } else {
         if (this.videoEncodingOptimizationService.canApplyProfileFromCache()) {
           await this.videoEncodingOptimizationService.applyProfileFromCache();
@@ -58,8 +97,51 @@ export default class StartStreamingButton extends Vue {
     }
   }
 
+  get hasPages() {
+    return (
+      (this.isFacebook || this.restreamService.shouldGoLiveWithRestream) &&
+      this.facebookService.state.facebookPages &&
+      this.facebookService.state.facebookPages.pages.length
+    );
+  }
+
   get streamingStatus() {
     return this.streamingService.state.streamingStatus;
+  }
+
+  shouldShowGoLiveWindow() {
+    if (!this.userService.isLoggedIn) return false;
+
+    if (this.isTwitch) {
+      // For Twitch, we can show the Go Live window even with protected mode off
+      // This is mainly for legacy reasons.
+      return (
+        this.restreamService.shouldGoLiveWithRestream ||
+        this.customizationService.state.updateStreamInfoOnLive
+      );
+    }
+
+    if (this.isMixer) {
+      return (
+        this.streamSettingsService.protectedModeEnabled &&
+        this.customizationService.state.updateStreamInfoOnLive &&
+        this.streamSettingsService.isSafeToModifyStreamKey()
+      );
+    }
+
+    if (this.isFacebook) {
+      return (
+        this.streamSettingsService.protectedModeEnabled &&
+        this.streamSettingsService.isSafeToModifyStreamKey()
+      );
+    }
+
+    if (this.isYoutube) {
+      return (
+        this.streamSettingsService.protectedModeEnabled &&
+        this.streamSettingsService.isSafeToModifyStreamKey()
+      );
+    }
   }
 
   getStreamButtonLabel() {
@@ -99,7 +181,19 @@ export default class StartStreamingButton extends Vue {
   }
 
   get isFacebook() {
-    return this.userService.isLoggedIn() && this.userService.platform.type === 'facebook';
+    return this.userService.isLoggedIn && this.userService.platformType === 'facebook';
+  }
+
+  get isYoutube() {
+    return this.userService.isLoggedIn && this.userService.platformType === 'youtube';
+  }
+
+  get isTwitch() {
+    return this.userService.isLoggedIn && this.userService.platformType === 'twitch';
+  }
+
+  get isMixer() {
+    return this.userService.isLoggedIn && this.userService.platformType === 'mixer';
   }
 
   get isDisabled() {
