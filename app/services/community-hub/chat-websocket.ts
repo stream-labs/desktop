@@ -113,7 +113,7 @@ export class ChatWebsocketService extends Service {
       this.socket.disconnect();
     }
 
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs-chat/io/info`;
+    const url = `https://stage2.${this.hostsService.streamlabs}/api/v5/slobs-chat/io/info`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 

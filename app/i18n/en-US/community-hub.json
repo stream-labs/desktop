@@ -19,5 +19,11 @@
   "Go": "Go",
   "Search Friends": "Search Friends",
   "New Message": "New Message",
-  "Recent Conversations": "Recent Conversations"
+  "Recent Conversations": "Recent Conversations",
+  "No user found with that name": "No user found with that name",
+  "Add Friends": "Add Friends",
+  "Send Friend Request": "Send Friend Request",
+  "Your friend request was sent successfully!": "Your friend request was sent successfully!",
+  "Friend Request Sent": "Friend Request Sent",
+  "Received Requests (%{friendCount})": "Received Requests (%{friendCount})"
 }
