@@ -235,6 +235,10 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
     this.SET_FRIEND_REQUESTS(filteredRequests);
   }
 
+  addFriendRequest(friendRequest: IFriend) {
+    this.SET_FRIEND_REQUESTS([friendRequest, ...this.state.friendRequests]);
+  }
+
   async unfriend(friendId: number) {
     this.postResponse('friend/remove', { friendId });
     this.REMOVE_FRIEND(friendId);
