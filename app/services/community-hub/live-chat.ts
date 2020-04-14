@@ -81,6 +81,11 @@ export class LiveChatService extends StatefulService<ILiveChatState> {
       if (ev.action === 'new_friend_request') {
         this.communityHubService.addFriendRequest(ev.data.request);
       }
+      if (ev.action === 'friend_request_accepted') {
+        this.communityHubService.updateUsers([
+          { is_friend: true, status: 'online', chat_names: [], ...ev.data.user },
+        ]);
+      }
     });
     this.roomUpdateSocketConnection = this.chatWebsocketService.roomUpdateEvent.subscribe(ev => {
       if (ev.action === 'new_member') {

@@ -17,7 +17,7 @@ interface IChatMessageEvent {
 }
 
 interface IInternalEvent {
-  action: 'status_update' | 'new_friend_request';
+  action: 'status_update' | 'new_friend_request' | 'friend_request_accepted';
   data: {
     request?: IFriend;
     user?: IFriend;
