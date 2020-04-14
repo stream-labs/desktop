@@ -68,6 +68,7 @@ export class LiveChatService extends StatefulService<ILiveChatState> {
   lifecycle: LoginLifecycle;
   messageSocketConnection: Subscription = null;
   internalEventSocketConnection: Subscription = null;
+  roomUpdateSocketConnection: Subscription = null;
 
   async subscribeToSocketConnections() {
     this.messageSocketConnection = this.chatWebsocketService.chatMessageEvent.subscribe(ev =>
@@ -78,11 +79,19 @@ export class LiveChatService extends StatefulService<ILiveChatState> {
         this.updateStatus(ev.data.user, ev.data.status);
       }
     });
+    this.roomUpdateSocketConnection = this.chatWebsocketService.roomUpdateEvent.subscribe(ev => {
+      if (ev.action === 'new_member') {
+        this.chatWebsocketService.sendStatusUpdate('online', null, ev.room.name);
+      }
+
+      this.communityHubService.getChatMembers(ev.room.name);
+    });
   }
 
   async unsubscribeFromSocketConnections() {
     if (this.messageSocketConnection) this.messageSocketConnection.unsubscribe();
     if (this.internalEventSocketConnection) this.internalEventSocketConnection.unsubscribe();
+    if (this.roomUpdateSocketConnection) this.roomUpdateSocketConnection.unsubscribe();
   }
 
   updateStatus(user: IFriend, status: string) {

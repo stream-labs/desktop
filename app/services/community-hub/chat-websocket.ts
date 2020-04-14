@@ -6,7 +6,7 @@ import { handleResponse, authorizedHeaders } from 'util/requests';
 import { Subject } from 'rxjs';
 import { importSocketIOClient } from 'util/slow-imports';
 import { SceneCollectionsService } from 'services/scene-collections';
-import { CommunityHubService, IFriend } from './index';
+import { CommunityHubService, IFriend, IChatRoom } from './index';
 
 interface IChatMessageEvent {
   data: {
@@ -27,6 +27,11 @@ interface IInternalEvent {
     };
     status: string;
   };
+}
+
+interface IRoomUpdate {
+  action: 'new_member';
+  room: IChatRoom;
 }
 
 interface IBearerAuth {
@@ -55,7 +60,7 @@ export class ChatWebsocketService extends Service {
   private socket: SocketIOClient.Socket;
   private io: SocketIOClientStatic;
 
-  roomUpdateEvent = new Subject<'room_update'>();
+  roomUpdateEvent = new Subject<IRoomUpdate>();
   chatMessageEvent = new Subject<IChatMessageEvent>();
   internalEvent = new Subject<IInternalEvent>();
 
@@ -89,8 +94,8 @@ export class ChatWebsocketService extends Service {
     this.socket.emit('chat_message', message);
   }
 
-  sendStatusUpdate(status: string, game?: string) {
-    this.socket.emit('internal_event', { action: 'status_update', status, game });
+  sendStatusUpdate(status: string, game?: string, room?: string) {
+    this.socket.emit('internal_event', { action: 'status_update', status, game, room });
   }
 
   async openSocketConnection() {
