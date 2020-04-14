@@ -21,7 +21,7 @@ export interface IFriend {
   chat_names?: Array<string>;
   game_streamed?: string;
 }
-interface IChatRoom {
+export interface IChatRoom {
   id: string;
   name: string;
   avatar: string;
