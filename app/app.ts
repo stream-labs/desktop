@@ -235,12 +235,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           appService.appDataDirectory,
           electron.remote.process.env.SLOBS_VERSION,
         );
-
-        if (apiResult === obs.EVideoCodes.Success) {
-          obs_instance_reused = true;
-        }
       } catch (error) {
         console.error('Failed to reconnect to existing instance of obs.IPC');
+      }
+
+      if (apiResult === obs.EVideoCodes.Success) {
+        obs_instance_reused = true;
       }
       process.env['OBS_PIPE_UUID'] = '';
     }
