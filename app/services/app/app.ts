@@ -35,6 +35,7 @@ import Utils from 'services/utils';
 import { Subject } from 'rxjs';
 import { RestreamService } from 'services/restream';
 import { downloadFile } from '../../util/requests';
+import { MetricsService } from '../metrics';
 
 interface IAppState {
   loading: boolean;

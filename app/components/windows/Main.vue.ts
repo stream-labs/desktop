@@ -75,7 +75,7 @@ export default class Main extends Vue {
     electron.remote.getCurrentWindow().show();
 
     const metricsService: MetricsService = MetricsService.instance;
-    metricsService.actions.recordMetric('mainWindowShowTime', Date.now());
+    metricsService.recordMetric('mainWindowShowTime', Date.now());
 
     this.handleResize();
   }
