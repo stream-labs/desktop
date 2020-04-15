@@ -21,8 +21,10 @@ export default class StreamPreview extends BaseElement {
   }
 
   get element() {
-    return (
-      !this.hideStyleBlockers && <Display rendering-mode={ERenderingMode.OBS_STREAMING_RENDERING} />
+    return this.hideStyleBlockers ? (
+      <div />
+    ) : (
+      <Display rendering-mode={ERenderingMode.OBS_STREAMING_RENDERING} />
     );
   }
 
