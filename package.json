@@ -34,8 +34,7 @@
     "tail-obs-logs": "yarn install --cwd bin && node bin/tail-obs-logs.js",
     "generate-agreement": "cat BASEAGREEMENT > AGREEMENT && yarn licenses generate-disclaimer --ignore-platform >> AGREEMENT",
 
-    "performancetest": "node test/performance/performance-test-runner.js",
-    "cli-table": "^0.3.1"
+    "performancetest": "node test/performance/performance-test-runner.js"
   },
   "prettier": {
     "singleQuote": true,
@@ -86,6 +85,7 @@
     "uuid": "^3.0.1"
   },
   "devDependencies": {
+    "cli-table": "^0.3.1",
     "7zip-bin": "2.4.1",
     "@babel/core": "7.7.5",
     "@babel/plugin-proposal-decorators": "7.7.4",
