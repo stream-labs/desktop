@@ -11,21 +11,17 @@ import { CommunityHubService, IFriend, IChatRoom } from './index';
 interface IChatMessageEvent {
   data: {
     room: string;
-    merssage: string;
+    message: string;
   };
   user: IFriend;
 }
 
 interface IInternalEvent {
-  action: 'status_update';
+  action: 'status_update' | 'new_friend_request' | 'friend_request_accepted';
   data: {
-    user: {
-      id: number;
-      avatar: string;
-      name: string;
-      is_prime: boolean;
-    };
-    status: string;
+    request?: IFriend;
+    user?: IFriend;
+    status?: string;
   };
 }
 
@@ -113,7 +109,7 @@ export class ChatWebsocketService extends Service {
       this.socket.disconnect();
     }
 
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs-chat/io/info`;
+    const url = `https://stage2.${this.hostsService.streamlabs}/api/v5/slobs-chat/io/info`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 

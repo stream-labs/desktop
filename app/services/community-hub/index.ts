@@ -1,11 +1,10 @@
 import uuid from 'uuid/v4';
 import sample from 'lodash/sample';
-import uniqBy from 'lodash/uniqBy';
 import { StatefulService, mutation, ViewHandler } from 'services/core/stateful-service';
 import { UserService, LoginLifecycle } from 'services/user';
 import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
-import { I18nService, $t } from 'services/i18n';
+import { $t } from 'services/i18n';
 import { InitAfter } from 'services/core';
 import * as pages from 'components/pages/community-hub/pages';
 import { handleResponse, authorizedHeaders } from 'util/requests';
@@ -180,14 +179,14 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
   }
 
   async getResponse(endpoint: string) {
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs-chat/${endpoint}`;
+    const url = `https://stage2.${this.hostsService.streamlabs}/api/v5/slobs-chat/${endpoint}`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
     return await fetch(request).then(handleResponse);
   }
 
   async postResponse(endpoint: string, body?: any) {
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs-chat/${endpoint}`;
+    const url = `https://stage2.${this.hostsService.streamlabs}/api/v5/slobs-chat/${endpoint}`;
     const headers = authorizedHeaders(
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
@@ -215,6 +214,15 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
     this.postResponse('friend/request', { friendId });
   }
 
+  async sendFriendRequestByName(name: string) {
+    const platform = this.userService.platform.type;
+    try {
+      this.postResponse('friend/request', { [`${platform}Id`]: name });
+    } catch (e) {
+      return Promise.reject($t('No user found with that name'));
+    }
+  }
+
   async getFriendRequests() {
     const resp = await this.getResponse('friend/request');
     this.SET_FRIEND_REQUESTS(resp.data);
@@ -223,6 +231,12 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
   async respondToFriendRequest(requestId: number, accepted: boolean) {
     const endpoint = `friend/${accepted ? 'accept' : 'reject'}`;
     this.postResponse(endpoint, { requestId });
+    const filteredRequests = this.state.friendRequests.filter(req => req.id !== requestId);
+    this.SET_FRIEND_REQUESTS(filteredRequests);
+  }
+
+  addFriendRequest(friendRequest: IFriend) {
+    this.SET_FRIEND_REQUESTS([friendRequest, ...this.state.friendRequests]);
   }
 
   async unfriend(friendId: number) {

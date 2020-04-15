@@ -4,9 +4,11 @@ import TsxComponent from 'components/tsx-component';
 import SideBar from './community-hub/SideBar';
 import ChatInfo from './community-hub/ChatInfo';
 import AddChatModal from './community-hub/AddChatModal';
+import AddFriendModal from './community-hub/AddFriendModal';
 import styles from './community-hub/CommunityHub.m.less';
 import { Inject } from 'services';
 import { CommunityHubService } from 'services/community-hub';
+import { $t } from 'services/i18n';
 
 @Component({})
 export default class CommunityHub extends TsxComponent {
@@ -14,6 +16,7 @@ export default class CommunityHub extends TsxComponent {
 
   chatInfoVisible = true;
   addChatModalVisible = false;
+  addFriendModalVisible = false;
 
   get currentTab() {
     return this.communityHubService.views.currentPage;
@@ -39,6 +42,20 @@ export default class CommunityHub extends TsxComponent {
     );
   }
 
+  get header() {
+    return (
+      <div class={styles.mainHeader}>
+        {this.title}
+        {this.communityHubService.state.currentPage === 'friendsPage' && (
+          <div onClick={() => (this.addFriendModalVisible = true)}>
+            <i class="icon-add" />
+            {$t('Add Friends')}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   render() {
     const PageComponent = this.currentTab.component;
     return (
@@ -46,7 +63,7 @@ export default class CommunityHub extends TsxComponent {
         <div style="width: 100%; height: 100%; display: flex;">
           <SideBar onShowAddChatModal={() => (this.addChatModalVisible = true)} />
           <div class={styles.pageContainer}>
-            <div class={styles.mainHeader}>{this.title}</div>
+            {this.header}
             <PageComponent />
           </div>
           {!this.currentTab.title && this.chatInfoVisible && (
@@ -55,6 +72,9 @@ export default class CommunityHub extends TsxComponent {
         </div>
         {this.addChatModalVisible && (
           <AddChatModal onCloseAddChatModal={() => (this.addChatModalVisible = false)} />
+        )}
+        {this.addFriendModalVisible && (
+          <AddFriendModal onCloseAddFriendModal={() => (this.addFriendModalVisible = false)} />
         )}
       </div>
     );
