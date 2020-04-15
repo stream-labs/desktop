@@ -19,6 +19,7 @@ export default class PlatformLogo extends TsxComponent<LogoProps> {
       facebook: 'fab fa-facebook',
       dlive: 'dlive',
       nimotv: 'nimotv',
+      wasdtv: 'wasdtv',
     }[this.props.platform];
   }
 

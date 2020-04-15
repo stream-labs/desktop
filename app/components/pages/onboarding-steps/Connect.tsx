@@ -147,6 +147,11 @@ export default class Connect extends TsxComponent<ConnectProps> {
                 title: 'NimoTV',
                 icon: require('../../../../media/images/platforms/nimo-logo-small.png'),
               },
+              {
+                value: 'wasdtv',
+                title: 'WasdTV',
+                icon: require('../../../../media/images/platforms/wasd-logo-small.png'),
+              },
             ] as IListOption<TExtraPlatform>[],
           }}
         />

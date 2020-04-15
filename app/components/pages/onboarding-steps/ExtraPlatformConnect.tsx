@@ -39,6 +39,12 @@ export default class ExtraPlatformConnect extends TsxComponent<ConnectProps> {
       helpUrl: 'https://article.nimo.tv/p/1033/streamlabsprotocol.html',
       icon: 'nimo-logo.png',
     },
+    wasdtv: {
+      name: 'Wasd.TV',
+      ingestUrl: 'rtmp://push.rtmp.wasd.tv/live/',
+      helpUrl: 'https://wasd.tv/faq/streams',
+      icon: 'wasd-logo.svg',
+    },
   };
 
   get platformDefinition() {
