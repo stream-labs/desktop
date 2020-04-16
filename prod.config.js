@@ -10,7 +10,10 @@ module.exports = merge.smart(baseConfig, {
   },
 
   output: {
-    filename: '[name].[contenthash].js',
+    filename: chunkData => {
+      return chunkData.chunk.name === 'renderer' ? '[name].[contenthash].js' : '[name].js';
+    },
+    chunkFilename: '[name].[contenthash].js',
   },
 
   mode: 'production',
