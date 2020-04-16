@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import sample from 'lodash/sample';
 import { StatefulService, mutation, ViewHandler } from 'services/core/stateful-service';
 import { UserService, LoginLifecycle } from 'services/user';
@@ -15,14 +16,15 @@ export interface IFriend {
   name: string;
   avatar: string;
   is_prime?: boolean;
+  user_id?: number;
   status?: string;
   is_friend?: boolean;
   chat_names?: Array<string>;
   game_streamed?: string;
 }
 export interface IChatRoom {
-  id: string;
   name: string;
+  title: string;
   avatar: string;
   token?: string;
 }
@@ -77,15 +79,15 @@ class CommunityHubViews extends ViewHandler<ICommunityHubState> {
   }
 
   get groupChats() {
-    return this.state.chatrooms.filter(chatroom => this.usersInRoom(chatroom.id).length > 1);
+    return this.state.chatrooms.filter(chatroom => this.usersInRoom(chatroom.name).length > 1);
   }
 
   get directMessages() {
-    return this.state.chatrooms.filter(chatroom => this.usersInRoom(chatroom.id).length < 2);
+    return this.state.chatrooms.filter(chatroom => this.usersInRoom(chatroom.name).length < 2);
   }
 
   get currentChat() {
-    return this.state.chatrooms.find(chatroom => chatroom.id === this.state.currentPage);
+    return this.state.chatrooms.find(chatroom => chatroom.name === this.state.currentPage);
   }
 
   findFriend(friendId: number) {
@@ -94,7 +96,11 @@ class CommunityHubViews extends ViewHandler<ICommunityHubState> {
 
   get roomsToJoin() {
     if (!this.state.chatrooms) return [];
-    return this.state.chatrooms.map(chatroom => ({ name: chatroom.name, token: chatroom.token }));
+    return this.state.chatrooms.map(chatroom => ({
+      name: chatroom.name,
+      token: chatroom.token,
+      type: 'dm',
+    }));
   }
 }
 
@@ -115,22 +121,17 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
 
   @mutation()
   ADD_USER(user: IFriend) {
-    this.state.connectedUsers[user.id] = user;
+    Vue.set(this.state.connectedUsers, user.id, user);
   }
 
   @mutation()
   EDIT_USER(userId: number, patch: Partial<IFriend>) {
     const changedParams = Utils.getChangedParams(this.state.connectedUsers[userId], patch);
-    this.state.connectedUsers[userId] = {
+    Vue.set(this.state.connectedUsers, userId, {
       ...this.state.connectedUsers[userId],
       ...changedParams,
       chat_names: this.state.connectedUsers[userId].chat_names.concat(patch.chat_names),
-    };
-  }
-
-  @mutation()
-  REMOVE_FRIEND(friendId: number) {
-    this.state.connectedUsers[friendId].is_friend = false;
+    });
   }
 
   @mutation()
@@ -150,7 +151,7 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
 
   @mutation()
   LEAVE_CHATROOM(chatroomName: string) {
-    this.state.chatrooms = this.state.chatrooms.filter(chatroom => chatroom.id !== chatroomName);
+    this.state.chatrooms = this.state.chatrooms.filter(chatroom => chatroom.name !== chatroomName);
   }
 
   @mutation()
@@ -174,10 +175,10 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
   }
 
   async fetchUserData() {
-    this.getFriends();
-    this.getFriendRequests();
-    this.getChatrooms();
-    Promise.all(this.state.chatrooms.map(async room => await this.getChatMembers(room.id)));
+    await this.getFriends();
+    await this.getFriendRequests();
+    await this.getChatrooms();
+    Promise.all(this.state.chatrooms.map(room => this.getChatMembers(room.name)));
   }
 
   async getResponse(endpoint: string) {
@@ -200,16 +201,19 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
   async getFriends() {
     const resp = await this.getResponse('friends');
     const mappedFriends = resp.data.map((friend: IFriend) => ({
+      ...friend,
       chat_names: [] as Array<string>,
       is_friend: true,
-      ...friend,
     }));
     this.updateUsers(mappedFriends);
   }
 
   async getChatMembers(chatroomName: string) {
     const resp = await this.getResponse(`dm/members?dmName=${chatroomName}`);
-    this.updateUsers(resp.data.map((user: IFriend) => ({ chat_names: [chatroomName], ...user })));
+    if (resp.data) {
+      const notSelf = resp.data.filter((user: IFriend) => user.id !== this.self.id);
+      this.updateUsers(notSelf.map((user: IFriend) => ({ ...user, chat_names: [chatroomName] })));
+    }
   }
 
   async sendFriendRequest(friendId: number) {
@@ -230,10 +234,15 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
     this.SET_FRIEND_REQUESTS(resp.data);
   }
 
-  async respondToFriendRequest(requestId: number, accepted: boolean) {
+  async respondToFriendRequest(request: IFriend, accepted: boolean) {
     const endpoint = `friend/${accepted ? 'accept' : 'reject'}`;
-    this.postResponse(endpoint, { requestId });
-    const filteredRequests = this.state.friendRequests.filter(req => req.id !== requestId);
+    this.postResponse(endpoint, { requestId: request.id });
+    if (accepted) {
+      this.updateUsers([
+        { ...request, is_friend: true, chat_names: [], status: 'offline', id: request.user_id },
+      ]);
+    }
+    const filteredRequests = this.state.friendRequests.filter(req => req.id !== request.id);
     this.SET_FRIEND_REQUESTS(filteredRequests);
   }
 
@@ -241,9 +250,9 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
     this.SET_FRIEND_REQUESTS([friendRequest, ...this.state.friendRequests]);
   }
 
-  async unfriend(friendId: number) {
-    this.postResponse('friend/remove', { friendId });
-    this.REMOVE_FRIEND(friendId);
+  async unfriend(friend: IFriend) {
+    this.postResponse('friend/remove', { friendId: friend.id });
+    this.updateUsers([{ ...friend, is_friend: false }]);
   }
 
   async getChatrooms() {
@@ -258,6 +267,7 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
 
   updateUsers(users: Array<IFriend>) {
     users.forEach(user => {
+      if (user.id === this.self.id) return;
       if (!this.state.connectedUsers[user.id]) {
         this.ADD_USER(user);
       } else {
@@ -274,14 +284,15 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
     const queryMembers = members.map(member => `friends[]=${member.id}`).join('&');
     const resp = await this.getResponse(`dm?${queryMembers}&title=${title}`);
     const dmAvatar = members.length === 1 ? members[0].avatar : null;
-    this.chatWebsocketService.joinRoom({ name: resp.name, token: resp.token });
+    this.chatWebsocketService.joinRoom(resp);
+    this.updateUsers(members.map(member => ({ ...member, chat_names: [resp.name] })));
     this.addChat(resp.name, resp.token, title, dmAvatar);
   }
 
-  addChat(id: string, token: string, name: string, avatar?: string) {
+  addChat(name: string, token: string, title: string, avatar?: string) {
     const imageOrCode = avatar || chatBgColor();
-    this.ADD_CHATROOM({ id, name, avatar: imageOrCode, token });
-    this.setPage(id);
+    this.ADD_CHATROOM({ name, title, avatar: imageOrCode, token });
+    this.setPage(name);
   }
 
   get views() {

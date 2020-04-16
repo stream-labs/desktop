@@ -90,7 +90,7 @@ export class ChatWebsocketService extends Service {
     }
   }
 
-  joinRoom(chat: { name: string; token: string }) {
+  joinRoom(chat: { name: string; token: string; type: 'dm' }) {
     this.socket.emit('join_rooms', [chat]);
   }
 
@@ -125,7 +125,7 @@ export class ChatWebsocketService extends Service {
       .then(handleResponse)
       .then((json: IBearerAuth) => {
         this.socket = this.io(json.path, { transports: json.settings.transports });
-        this.communityHubService.self = json.user;
+        this.communityHubService.self = { ...json.user, status: 'online' };
 
         this.reconnectAttempts = json.settings.reconnect_attempts;
         window.setTimeout(() => (this.reconnectDelayReached = true), json.settings.reconnect_delay);

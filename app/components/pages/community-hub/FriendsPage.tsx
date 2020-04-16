@@ -20,17 +20,17 @@ export default class FriendsPage extends TsxComponent {
 
   goToDm(friend: IFriend) {
     const existingDm = this.communityHubService.views.directMessages.find(
-      dm => this.communityHubService.views.usersInRoom(dm.id)[0].id === friend.id,
+      dm => this.communityHubService.views.usersInRoom(dm.name)[0].id === friend.id,
     );
     if (existingDm) {
-      this.communityHubService.setPage(existingDm.id);
+      this.communityHubService.setPage(existingDm.name);
     } else {
       this.communityHubService.createChat(friend.name, [friend]);
     }
   }
 
-  respondToRequest(requestId: number, accepted: boolean) {
-    this.communityHubService.respondToFriendRequest(requestId, accepted);
+  respondToRequest(request: IFriend, accepted: boolean) {
+    this.communityHubService.respondToFriendRequest(request, accepted);
   }
 
   basicInfo(friend: IFriend) {
@@ -39,7 +39,7 @@ export default class FriendsPage extends TsxComponent {
         <img class={styles.avatar} src={friend.avatar} />
         <div class={cx(styles.status, styles[friend.status])} />
         <div class={styles.friendName}>{friend.name}</div>
-        {friend.is_prime && <i class={cx('icon-prime', styles.primeIcon)} />}
+        {!!friend.is_prime && <i class={cx('icon-prime', styles.primeIcon)} />}
         {friend.game_streamed && (
           <div class={styles.friendStreaming}>
             {$t('Streaming %{gameTitle}', { gameTitle: friend.game_streamed })}
@@ -67,14 +67,14 @@ export default class FriendsPage extends TsxComponent {
           <div style="margin-left: auto; display: flex;">
             <button
               class="button button--action"
-              onClick={() => this.respondToRequest(friend.id, true)}
+              onClick={() => this.respondToRequest(friend, true)}
             >
               {$t('Accept')}
             </button>
             <button
               style="margin-left: 16px;"
               class="button button--warning"
-              onClick={() => this.respondToRequest(friend.id, false)}
+              onClick={() => this.respondToRequest(friend, false)}
             >
               {$t('Decline')}
             </button>

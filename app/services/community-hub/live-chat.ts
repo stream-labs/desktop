@@ -80,9 +80,8 @@ export class LiveChatService extends StatefulService<ILiveChatState> {
     this.roomUpdateSocketConnection = this.chatWebsocketService.roomUpdateEvent.subscribe(ev => {
       if (ev.action === 'new_member') {
         this.chatWebsocketService.sendStatusUpdate('online', null, ev.room.name);
+        this.communityHubService.getChatMembers(ev.room.name);
       }
-
-      this.communityHubService.getChatMembers(ev.room.name);
     });
   }
 
@@ -92,7 +91,7 @@ export class LiveChatService extends StatefulService<ILiveChatState> {
     if (this.roomUpdateSocketConnection) this.roomUpdateSocketConnection.unsubscribe();
   }
 
-  handleInternalEvent(ev: IInternalEvent) {
+  async handleInternalEvent(ev: IInternalEvent) {
     if (ev.action === 'status_update') {
       this.updateStatus(ev.data.user, ev.data.status);
     }
@@ -105,9 +104,10 @@ export class LiveChatService extends StatefulService<ILiveChatState> {
       ]);
     }
     if (ev.action === 'added_to_dm') {
-      this.communityHubService.addChat(ev.data.name, ev.data.token, ev.data.title);
-      this.communityHubService.getChatMembers(ev.data.name);
-      this.chatWebsocketService.joinRoom({ name: ev.data.name, token: ev.data.token });
+      await this.communityHubService.getChatMembers(ev.data.name);
+      const members = this.communityHubService.views.usersInRoom(ev.data.name);
+      const title = ev.data.title || members[0]?.name;
+      this.communityHubService.addChat(ev.data.name, ev.data.token, title);
     }
   }
 
@@ -133,16 +133,6 @@ export class LiveChatService extends StatefulService<ILiveChatState> {
   }
 
   sendMessage(chatId: string, message: string) {
-    const messageObj = {
-      user_id: this.communityHubService.self.id,
-      room: chatId,
-      display_name: this.communityHubService.self.name,
-      avatar: this.communityHubService.self.avatar,
-      date_posted: Date.now().toLocaleString(),
-      message,
-    };
-
-    this.ADD_MESSAGE(chatId, messageObj);
     this.chatWebsocketService.sendMessage({ room: chatId, message });
   }
 }

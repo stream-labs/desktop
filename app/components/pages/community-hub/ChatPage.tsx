@@ -34,11 +34,11 @@ export default class ChatPage extends TsxComponent {
   }
 
   get members() {
-    return this.communityHubService.views.usersInRoom(this.chatroom.id);
+    return this.communityHubService.views.usersInRoom(this.chatroom.name);
   }
 
   get messages() {
-    return this.liveChatService.views.messages(this.chatroom.id);
+    return this.liveChatService.views.messages(this.chatroom.name);
   }
 
   get messagesLength() {
@@ -56,7 +56,7 @@ export default class ChatPage extends TsxComponent {
         <div class={styles.nameAndBubble}>
           <span style="display: flex; align-items: center; margin-bottom: 8px;">
             {message.display_name}
-            {chatter.is_prime && <i class={cx('icon-prime', styles.primeIcon)} />}
+            {!!chatter.is_prime && <i class={cx('icon-prime', styles.primeIcon)} />}
           </span>
           <div class={cx(styles.chatBubble, { [styles.self]: isSelf })}>{message.message}</div>
         </div>
@@ -65,7 +65,8 @@ export default class ChatPage extends TsxComponent {
   }
 
   handleEnter() {
-    this.liveChatService.sendMessage(this.chatroom.id, this.message);
+    if (!this.message) return;
+    this.liveChatService.sendMessage(this.chatroom.name, this.message);
     this.message = '';
   }
 
@@ -80,7 +81,7 @@ export default class ChatPage extends TsxComponent {
             vModel={this.message}
             onEnter={() => this.handleEnter()}
             metadata={{
-              placeholder: $t('Message %{chatName}', { chatName: this.chatroom.name }),
+              placeholder: $t('Message %{chatName}', { chatName: this.chatroom.title }),
               fullWidth: true,
               fixedSize: true,
               blockReturn: true,

@@ -34,10 +34,10 @@ export default class CommunityHub extends TsxComponent {
             class={cx(styles.avatar, styles.sidebarAvatar, styles.noImgAvatar)}
             style={`background: ${chatroom.avatar};`}
           >
-            {chatroom.name.slice(0, 2)}
+            {chatroom.title.slice(0, 1)}
           </div>
         )}
-        <div style="margin-left: 16px;">{chatroom.name}</div>
+        <div style="margin-left: 16px;">{chatroom.title}</div>
       </div>
     );
   }

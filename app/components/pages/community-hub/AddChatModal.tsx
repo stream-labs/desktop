@@ -28,6 +28,17 @@ export default class AddChatModal extends TsxComponent<{ onCloseAddChatModal: ()
     );
   }
 
+  goToDm(friend: IFriend) {
+    const existingDm = this.communityHubService.views.directMessages.find(
+      dm => this.communityHubService.views.usersInRoom(dm.name)[0].id === friend.id,
+    );
+    if (existingDm) {
+      this.communityHubService.setPage(existingDm.name);
+    } else {
+      this.communityHubService.createChat(friend.name, [friend]);
+    }
+  }
+
   selectFriend(friend: IFriend) {
     if (this.selectedFriends.find((fr: IFriend) => fr.id === friend.id)) return;
     this.selectedFriends.push(friend);
@@ -38,8 +49,15 @@ export default class AddChatModal extends TsxComponent<{ onCloseAddChatModal: ()
   }
 
   addChat() {
-    this.communityHubService.createChat(this.chatName, this.selectedFriends);
-    this.$emit('closeAddChatModal');
+    if ((this.selectedFriends.length > 1 && !this.chatName) || this.selectedFriends.length < 1) {
+      return;
+    }
+    if (this.selectedFriends.length === 1) {
+      this.goToDm(this.selectedFriends[0]);
+    } else {
+      this.communityHubService.createChat(this.chatName, this.selectedFriends);
+      this.$emit('closeAddChatModal');
+    }
   }
 
   get friendList() {

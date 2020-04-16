@@ -21,7 +21,7 @@ export default class ChatPage extends TsxComponent<{ onHideChat: () => void }> {
   }
 
   get members() {
-    return this.communityHubService.views.usersInRoom(this.chatroom.id);
+    return this.communityHubService.views.usersInRoom(this.chatroom.name);
   }
 
   contextButton(chatter: IFriend) {
