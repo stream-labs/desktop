@@ -163,7 +163,7 @@ export class NotificationsService extends PersistentStatefulService<INotificatio
 
   @mutation()
   private CLEAR() {
-    this.state.notifications.length = 0;
+    this.state.notifications = [];
   }
 
   @mutation()
