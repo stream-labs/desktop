@@ -6,18 +6,24 @@ module.exports = merge.smart(baseConfig, {
   entry: {
     renderer: './app/app.ts',
     updater: './updater/ui.js',
-    'guest-api': './guest-api'
+    'guest-api': './guest-api',
+  },
+
+  output: {
+    filename: '[name].[contenthash].js',
   },
 
   mode: 'production',
   devtool: 'source-map',
 
   optimization: {
-    minimizer: [new TerserPlugin({
-      parallel: true,
-      sourceMap: true,
-      terserOptions: { mangle: false }
-    })],
+    minimizer: [
+      new TerserPlugin({
+        parallel: true,
+        sourceMap: true,
+        terserOptions: { mangle: false },
+      }),
+    ],
     usedExports: true,
-  }
+  },
 });

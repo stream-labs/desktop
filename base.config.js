@@ -2,6 +2,7 @@ const path = require('path');
 const { CheckerPlugin } = require('awesome-typescript-loader');
 const webpack = require('webpack');
 const cp = require('child_process');
+const ManifestPlugin = require('webpack-manifest-plugin');
 
 const plugins = process.env.SLOBS_FORKED_TYPECHECKING ? [new CheckerPlugin()] : [];
 
@@ -13,6 +14,12 @@ const commit = cp
 plugins.push(
   new webpack.DefinePlugin({
     SLOBS_BUNDLE_ID: JSON.stringify(commit),
+  }),
+);
+
+plugins.push(
+  new ManifestPlugin({
+    filter: file => file.isChunk,
   }),
 );
 
@@ -170,6 +177,7 @@ module.exports = {
     splitChunks: {
       chunks: chunk => chunk.name === 'renderer',
     },
+    moduleIds: 'hashed',
   },
 
   plugins,
