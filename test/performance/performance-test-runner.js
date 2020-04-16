@@ -40,7 +40,7 @@ const TESTS_SERVICE_URL = CI ? 'https://slobs-users-pool.herokuapp.com' : 'http:
   }
 
   // save results to DB if needed
-  const needToSaveResults = baseBranchHasCommit(getCommitSHA());
+  const needToSaveResults = true; // baseBranchHasCommit(getCommitSHA());
   if (needToSaveResults) await sendResults(testResults);
 })();
 
