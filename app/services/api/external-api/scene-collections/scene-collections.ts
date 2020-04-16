@@ -2,6 +2,7 @@ import { SceneCollectionsService as InternalSceneCollectionsService } from 'serv
 import { Inject } from 'services/core/injector';
 import { Fallback, Singleton } from 'services/api/external-api';
 import { Observable } from 'rxjs';
+import { Expensive } from 'services/api/external-api-limits';
 
 interface ISceneCollectionsManifestEntry {
   id: string;
@@ -40,6 +41,7 @@ export class SceneCollectionsService {
     return this.sceneCollectionsService.activeCollection;
   }
 
+  @Expensive()
   fetchSceneCollectionsSchema(): Promise<ISceneCollectionSchema[]> {
     return this.sceneCollectionsService.fetchSceneCollectionsSchema();
   }

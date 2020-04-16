@@ -129,7 +129,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
         y: this.renderedOffsetY,
       },
     });
-    this.tcpServerService.stopRequestsHandling();
+    this.tcpServerService.stopRequestsHandling(false);
   }
 
   startResizing(event: IMouseEvent, region: IResizeRegion) {
@@ -138,7 +138,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     this.currentY = event.pageY;
 
     if (event.altKey) this.isCropping = true;
-    this.tcpServerService.stopRequestsHandling();
+    this.tcpServerService.stopRequestsHandling(false);
   }
 
   handleMouseUp(event: IMouseEvent) {

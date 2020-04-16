@@ -4,6 +4,13 @@ import { InternalApiService } from './internal-api';
 import * as apiResources from './external-api/resources';
 import { Service } from 'services/core/service';
 import * as traverse from 'traverse';
+import { ExternalApiLimitsService } from './external-api-limits';
+import { E_JSON_RPC_ERROR, IJsonRpcRequest, IJsonRpcResponse } from './jsonrpc';
+
+/**
+ * Maximum points amount for API calls per second
+ */
+const MAX_POINTS_PER_SECOND = 2;
 
 /**
  * A decorator to mark class as a singleton
@@ -58,6 +65,7 @@ export class ExternalApiService extends RpcApi {
    * InternalApiService is for fallback calls
    */
   @Inject() internalApiService: InternalApiService;
+  @Inject() externalApiLimitsService: ExternalApiLimitsService;
   /**
    * List of all API resources
    * @see RpcApi.getResource()
@@ -68,12 +76,22 @@ export class ExternalApiService extends RpcApi {
    */
   instances: Dictionary<Service> = {};
 
+  /**
+   * keeps current amount of free points for expensive API calls
+   */
+  private points = MAX_POINTS_PER_SECOND;
+
   init() {
     // initialize all singletons
     Object.keys(this.resources).forEach(resourceName => {
       const Resource = this.resources[resourceName];
       if (Resource.isSingleton) this.instances[resourceName] = new Resource();
     });
+
+    // restore the amount of points for each second
+    setInterval(() => {
+      this.points = MAX_POINTS_PER_SECOND;
+    }, 1000);
   }
 
   /**
@@ -136,5 +154,30 @@ export class ExternalApiService extends RpcApi {
         };
       },
     });
+  }
+
+  protected handleServiceRequest(request: IJsonRpcRequest): IJsonRpcResponse<any> {
+    // handle calls for expensive API methods
+    const methodName = request.method;
+    const resourceId = request.params.resource;
+    const resourceName = resourceId.split('[')[0];
+    const { costPerSecond, comment } = this.externalApiLimitsService.getMethodCost(
+      resourceName,
+      methodName,
+    );
+
+    // return error if there are not enough points
+    if (this.points < costPerSecond) {
+      return this.jsonrpc.createError(request, {
+        code: E_JSON_RPC_ERROR.INVALID_REQUEST,
+        message: `Reached the limit of calls for "${resourceName}.${methodName}"${
+          comment ? ' ' + comment : ''
+        }`,
+      });
+    }
+
+    // extract points and call the base method
+    this.points -= costPerSecond;
+    return super.handleServiceRequest(request);
   }
 }

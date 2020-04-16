@@ -71,12 +71,13 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   private nextClientId = 1;
   private servers: IServer[] = [];
   private isRequestsHandlingStopped = false;
+  private isEventsSendingStopped = true;
 
   // if true then execute API request even if "isRequestsHandlingStopped" flag is set
   private forceRequests = false;
 
   // enable to debug
-  private enableLogs = false;
+  private enableLogs = true;
 
   init() {
     super.init();
@@ -92,14 +93,15 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   /**
    * stop handle any requests
    * each API request will be responded with "API is busy" error
-   * this method doesn't stop event emitting
    */
-  stopRequestsHandling() {
+  stopRequestsHandling(stopEventsToo = true) {
     this.isRequestsHandlingStopped = true;
+    this.isEventsSendingStopped = stopEventsToo;
   }
 
   startRequestsHandling() {
     this.isRequestsHandlingStopped = false;
+    this.isEventsSendingStopped = false;
   }
 
   stopListening() {
@@ -509,7 +511,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   }
 
   private sendResponse(client: IClient, response: IJsonRpcResponse<any>, force = false) {
-    if (this.isRequestsHandlingStopped) {
+    if (this.isEventsSendingStopped) {
       if (!force && !this.forceRequests) return;
     }
 
