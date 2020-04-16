@@ -175,7 +175,7 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
   private drawVolmeterC2d(peaks: number[]) {
     if (this.canvasWidth < 0 || this.canvasHeight < 0) return;
 
-    const bg = this.customizationService.themeBackground;
+    const bg = this.customizationService.sectionBackground;
     this.ctx.fillStyle = this.rgbToCss([bg.r, bg.g, bg.b]);
     this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
 

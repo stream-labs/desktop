@@ -112,7 +112,7 @@ export default class Volmeters extends TsxComponent<VolmetersProps> {
   mounted() {
     this.workerId = electron.ipcRenderer.sendSync('getWorkerWindowId');
     this.subscribeVolmeters();
-    this.bg = this.customizationService.themeBackground;
+    this.bg = this.customizationService.sectionBackground;
     this.setupNewCanvas();
   }
 
