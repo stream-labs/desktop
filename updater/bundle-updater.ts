@@ -65,39 +65,38 @@ module.exports = async (basePath: string) => {
   // If something goes wrong while fetching bundles even when the pre-fetch
   // succeeded, then we restart the app and force it to use local bundles.
 
-  // TODO
-  // let appRelaunching = false;
+  let appRelaunching = false;
 
-  // function revertToLocalBundles() {
-  //   if (appRelaunching) return;
-  //   appRelaunching = true;
-  //   console.log('Reverting to local bundles and restarting app');
-  //   electron.app.relaunch({ args: ['--localBundles'] });
-  //   electron.app.quit();
-  // }
+  function revertToLocalBundles() {
+    if (appRelaunching) return;
+    appRelaunching = true;
+    console.log('Reverting to local bundles and restarting app');
+    electron.app.relaunch({ args: ['--localBundles'] });
+    electron.app.quit();
+  }
 
-  // if (!useLocalBundles && latestBundle) {
-  //   electron.session.defaultSession?.webRequest.onHeadersReceived(
-  //     { urls: [`${cdnBase}${latestBundle}`] },
-  //     (info, cb) => {
-  //       if (info.statusCode / 100 < 4) {
-  //         cb({});
-  //         return;
-  //       }
+  if (!useLocalBundles) {
+    electron.session.defaultSession?.webRequest.onHeadersReceived(
+      { urls: [`${cdnBase}*.js`] },
+      (info, cb) => {
+        if (info.statusCode / 100 < 4) {
+          cb({});
+          return;
+        }
 
-  //       console.log(`Caught error fetching bundle with status ${info.statusCode}`);
+        console.log(`Caught error fetching bundle with status ${info.statusCode}`);
 
-  //       revertToLocalBundles();
-  //     },
-  //   );
+        revertToLocalBundles();
+      },
+    );
 
-  //   electron.session.defaultSession?.webRequest.onErrorOccurred(
-  //     { urls: [`${cdnBase}${latestBundle}`] },
-  //     info => {
-  //       console.log('Caught error fetching bundle', info.error);
+    electron.session.defaultSession?.webRequest.onErrorOccurred(
+      { urls: [`${cdnBase}*.js`] },
+      info => {
+        console.log('Caught error fetching bundle', info.error);
 
-  //       revertToLocalBundles();
-  //     },
-  //   );
-  // }
+        revertToLocalBundles();
+      },
+    );
+  }
 };
