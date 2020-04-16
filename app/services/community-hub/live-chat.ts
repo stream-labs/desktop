@@ -3,7 +3,7 @@ import { Subscription } from 'rxjs';
 import { StatefulService, mutation, ViewHandler } from 'services/core/stateful-service';
 import { Inject } from 'services/core/injector';
 import { InitAfter } from 'services/core';
-import { ChatWebsocketService } from './chat-websocket';
+import { ChatWebsocketService, IInternalEvent } from './chat-websocket';
 import { CommunityHubService, IFriend } from '.';
 import { UserService, LoginLifecycle } from 'services/user';
 
@@ -54,11 +54,11 @@ export class LiveChatService extends StatefulService<ILiveChatState> {
   }
 
   async init() {
-    // this.lifecycle = await this.userService.withLifecycle({
-    //   init: this.subscribeToSocketConnections,
-    //   destroy: this.unsubscribeFromSocketConnections,
-    //   context: this,
-    // });
+    this.lifecycle = await this.userService.withLifecycle({
+      init: this.subscribeToSocketConnections,
+      destroy: this.unsubscribeFromSocketConnections,
+      context: this,
+    });
   }
 
   get views() {
@@ -75,17 +75,7 @@ export class LiveChatService extends StatefulService<ILiveChatState> {
       this.recieveMessage(ev.data, ev.user),
     );
     this.internalEventSocketConnection = this.chatWebsocketService.internalEvent.subscribe(ev => {
-      if (ev.action === 'status_update') {
-        this.updateStatus(ev.data.user, ev.data.status);
-      }
-      if (ev.action === 'new_friend_request') {
-        this.communityHubService.addFriendRequest(ev.data.request);
-      }
-      if (ev.action === 'friend_request_accepted') {
-        this.communityHubService.updateUsers([
-          { is_friend: true, status: 'online', chat_names: [], ...ev.data.user },
-        ]);
-      }
+      this.handleInternalEvent(ev);
     });
     this.roomUpdateSocketConnection = this.chatWebsocketService.roomUpdateEvent.subscribe(ev => {
       if (ev.action === 'new_member') {
@@ -100,6 +90,25 @@ export class LiveChatService extends StatefulService<ILiveChatState> {
     if (this.messageSocketConnection) this.messageSocketConnection.unsubscribe();
     if (this.internalEventSocketConnection) this.internalEventSocketConnection.unsubscribe();
     if (this.roomUpdateSocketConnection) this.roomUpdateSocketConnection.unsubscribe();
+  }
+
+  handleInternalEvent(ev: IInternalEvent) {
+    if (ev.action === 'status_update') {
+      this.updateStatus(ev.data.user, ev.data.status);
+    }
+    if (ev.action === 'new_friend_request') {
+      this.communityHubService.addFriendRequest(ev.data.request);
+    }
+    if (ev.action === 'friend_request_accepted') {
+      this.communityHubService.updateUsers([
+        { is_friend: true, status: 'online', chat_names: [], ...ev.data.user },
+      ]);
+    }
+    if (ev.action === 'added_to_dm') {
+      this.communityHubService.addChat(ev.data.name, ev.data.token, ev.data.title);
+      this.communityHubService.getChatMembers(ev.data.name);
+      this.chatWebsocketService.joinRoom({ name: ev.data.name, token: ev.data.token });
+    }
   }
 
   updateStatus(user: IFriend, status: string) {

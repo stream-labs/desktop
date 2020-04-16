@@ -61,6 +61,7 @@ export { UsageStatisticsService } from './services/usage-statistics';
 export { GameOverlayService } from 'services/game-overlay';
 export { CommunityHubService } from 'services/community-hub';
 export { LiveChatService } from 'services/community-hub/live-chat';
+export { ChatWebsocketService } from 'services/community-hub/chat-websocket';
 
 export { MediaGalleryService } from 'services/media-gallery';
 export { MediaBackupService } from 'services/media-backup';

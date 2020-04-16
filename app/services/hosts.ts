@@ -7,10 +7,11 @@ import { Inject } from './core/injector';
 // are just keeping the value in one place.
 export class HostsService extends Service {
   get streamlabs() {
-    if (Util.useLocalHost()) {
-      return 'streamlabs.site';
-    }
-    return 'streamlabs.com';
+    return 'stage2.streamlabs.com';
+    // if (Util.useLocalHost()) {
+    //   return 'streamlabs.site';
+    // }
+    // return 'streamlabs.com';
   }
 
   get overlays() {

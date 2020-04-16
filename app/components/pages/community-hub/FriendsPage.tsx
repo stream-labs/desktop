@@ -18,14 +18,14 @@ export default class FriendsPage extends TsxComponent {
     return this.communityHubService.state.friendRequests;
   }
 
-  goToDm(friendId: number) {
+  goToDm(friend: IFriend) {
     const existingDm = this.communityHubService.views.directMessages.find(
-      dm => this.communityHubService.views.usersInRoom(dm.id)[0].id === friendId,
+      dm => this.communityHubService.views.usersInRoom(dm.id)[0].id === friend.id,
     );
     if (existingDm) {
       this.communityHubService.setPage(existingDm.id);
     } else {
-      this.communityHubService.addDm(friendId);
+      this.communityHubService.createChat(friend.name, [friend]);
     }
   }
 
@@ -51,7 +51,7 @@ export default class FriendsPage extends TsxComponent {
 
   friendRow(friend: IFriend) {
     return (
-      <div class={styles.friend} onClick={() => this.goToDm(friend.id)} key={friend.id}>
+      <div class={styles.friend} onClick={() => this.goToDm(friend)} key={friend.id}>
         {this.basicInfo(friend)}
         <a style="margin-left: auto">{$t('Direct Message')}</a>
         <a style="margin-left: 16px">{$t('Unfriend')}</a>
@@ -61,7 +61,7 @@ export default class FriendsPage extends TsxComponent {
 
   friendRequestRow(friend: IFriend, sent?: boolean) {
     return (
-      <div class={styles.friend} onClick={() => this.goToDm(friend.id)} key={friend.id}>
+      <div class={styles.friend} key={friend.id}>
         {this.basicInfo(friend)}
         {!sent && (
           <div style="margin-left: auto; display: flex;">

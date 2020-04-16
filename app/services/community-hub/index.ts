@@ -1,4 +1,3 @@
-import uuid from 'uuid/v4';
 import sample from 'lodash/sample';
 import { StatefulService, mutation, ViewHandler } from 'services/core/stateful-service';
 import { UserService, LoginLifecycle } from 'services/user';
@@ -9,6 +8,7 @@ import { InitAfter } from 'services/core';
 import * as pages from 'components/pages/community-hub/pages';
 import { handleResponse, authorizedHeaders } from 'util/requests';
 import Utils from 'services/utils';
+import { ChatWebsocketService } from './chat-websocket';
 
 export interface IFriend {
   id: number;
@@ -93,6 +93,7 @@ class CommunityHubViews extends ViewHandler<ICommunityHubState> {
   }
 
   get roomsToJoin() {
+    if (!this.state.chatrooms) return [];
     return this.state.chatrooms.map(chatroom => ({ name: chatroom.name, token: chatroom.token }));
   }
 }
@@ -101,6 +102,7 @@ class CommunityHubViews extends ViewHandler<ICommunityHubState> {
 export class CommunityHubService extends StatefulService<ICommunityHubState> {
   @Inject() private hostsService: HostsService;
   @Inject() private userService: UserService;
+  @Inject() private chatWebsocketService: ChatWebsocketService;
 
   static initialState: ICommunityHubState = {
     connectedUsers: {},
@@ -172,26 +174,26 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
   }
 
   async fetchUserData() {
-    // this.getFriends();
-    // this.getFriendRequests();
-    // this.getChatrooms();
-    // Promise.all(this.state.chatrooms.map(async room => await this.getChatMembers(room.id)));
+    this.getFriends();
+    this.getFriendRequests();
+    this.getChatrooms();
+    Promise.all(this.state.chatrooms.map(async room => await this.getChatMembers(room.id)));
   }
 
   async getResponse(endpoint: string) {
-    const url = `https://stage2.${this.hostsService.streamlabs}/api/v5/slobs-chat/${endpoint}`;
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs-chat/${endpoint}`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
     return await fetch(request).then(handleResponse);
   }
 
   async postResponse(endpoint: string, body?: any) {
-    const url = `https://stage2.${this.hostsService.streamlabs}/api/v5/slobs-chat/${endpoint}`;
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs-chat/${endpoint}`;
     const headers = authorizedHeaders(
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
     );
-    const request = new Request(url, { headers, body, method: 'POST' });
+    const request = new Request(url, { headers, body: JSON.stringify(body), method: 'POST' });
     return await fetch(request).then(handleResponse);
   }
 
@@ -206,7 +208,7 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
   }
 
   async getChatMembers(chatroomName: string) {
-    const resp = await this.getResponse(`group/members?groupId=${chatroomName}`);
+    const resp = await this.getResponse(`dm/members?dmName=${chatroomName}`);
     this.updateUsers(resp.data.map((user: IFriend) => ({ chat_names: [chatroomName], ...user })));
   }
 
@@ -246,7 +248,7 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
 
   async getChatrooms() {
     const resp = await this.getResponse('settings');
-    this.SET_CHATROOMS(resp.chatrooms);
+    this.SET_CHATROOMS(resp.chatrooms || []);
   }
 
   async leaveChatroom(groupId: string) {
@@ -268,21 +270,17 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
     this.SET_CURRENT_PAGE(page);
   }
 
-  addDm(friendId: number) {
-    const friend = this.views.findFriend(friendId);
-    const id = uuid();
-    this.ADD_CHATROOM({
-      id,
-      name: friend.name,
-      avatar: friend.avatar,
-    });
-    this.setPage(id);
+  async createChat(title: string, members: Array<IFriend>) {
+    const queryMembers = members.map(member => `friends[]=${member.id}`).join('&');
+    const resp = await this.getResponse(`dm?${queryMembers}&title=${title}`);
+    const dmAvatar = members.length === 1 ? members[0].avatar : null;
+    this.chatWebsocketService.joinRoom({ name: resp.name, token: resp.token });
+    this.addChat(resp.name, resp.token, title, dmAvatar);
   }
 
-  addChat(name: string, avatar?: string) {
+  addChat(id: string, token: string, name: string, avatar?: string) {
     const imageOrCode = avatar || chatBgColor();
-    const id = uuid();
-    this.ADD_CHATROOM({ id, name, avatar: imageOrCode });
+    this.ADD_CHATROOM({ id, name, avatar: imageOrCode, token });
     this.setPage(id);
   }
 

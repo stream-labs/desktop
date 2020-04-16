@@ -47,10 +47,14 @@ export default class CommunityHub extends TsxComponent {
       <div class={styles.mainHeader}>
         {this.title}
         {this.communityHubService.state.currentPage === 'friendsPage' && (
-          <div onClick={() => (this.addFriendModalVisible = true)}>
-            <i class="icon-add" />
+          <button
+            class="button button--trans"
+            style="margin-left: auto;"
+            onClick={() => (this.addFriendModalVisible = true)}
+          >
+            <i class="icon-add-circle" />
             {$t('Add Friends')}
-          </div>
+          </button>
         )}
       </div>
     );

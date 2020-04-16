@@ -6,7 +6,7 @@ import { TextInput } from 'components/shared/inputs/inputs';
 import styles from './CommunityHub.m.less';
 import { $t, I18nService } from 'services/i18n';
 import { Inject } from 'services';
-import { CommunityHubService, IFriend } from 'services/community-hub';
+import { CommunityHubService } from 'services/community-hub';
 
 @Component({})
 export default class AddChatModal extends TsxComponent<{ onCloseAddFriendModal: () => void }> {
@@ -18,6 +18,7 @@ export default class AddChatModal extends TsxComponent<{ onCloseAddFriendModal: 
   success = false;
 
   async addFriend() {
+    if (this.success) return this.$emit('closeAddFriendModal');
     try {
       await this.communityHubService.sendFriendRequestByName(this.name);
       this.success = true;
@@ -29,12 +30,12 @@ export default class AddChatModal extends TsxComponent<{ onCloseAddFriendModal: 
   render() {
     return (
       <div class={styles.addChatContainer} styles="background: transparent;">
-        <div class={styles.addChatContainer} onClick={() => this.$emit('closeAddChatModal')} />
+        <div class={styles.addChatContainer} onClick={() => this.$emit('closeAddFriendModal')} />
         <div class={styles.addChatModal}>
           <h2>{this.success ? $t('Friend Request Sent') : $t('Add Friends')}</h2>
           <i
             class={cx('icon-close', styles.closeIcon)}
-            onClick={() => this.$emit('closeAddChatModal')}
+            onClick={() => this.$emit('closeAddFriendModal')}
           />
           {this.success && $t('Your friend request was sent successfully!')}
           {!this.success && <TextInput vModel={this.name} style="margin-bottom: 16px;" />}

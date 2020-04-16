@@ -16,12 +16,16 @@ interface IChatMessageEvent {
   user: IFriend;
 }
 
-interface IInternalEvent {
-  action: 'status_update' | 'new_friend_request' | 'friend_request_accepted';
+export interface IInternalEvent {
+  action: 'status_update' | 'new_friend_request' | 'friend_request_accepted' | 'added_to_dm';
   data: {
     request?: IFriend;
     user?: IFriend;
     status?: string;
+    name?: string;
+    title?: string;
+    token?: string;
+    type?: 'dm';
   };
 }
 
@@ -86,6 +90,10 @@ export class ChatWebsocketService extends Service {
     }
   }
 
+  joinRoom(chat: { name: string; token: string }) {
+    this.socket.emit('join_rooms', [chat]);
+  }
+
   sendMessage(message: { room: string; message: string }) {
     this.socket.emit('chat_message', message);
   }
@@ -109,7 +117,7 @@ export class ChatWebsocketService extends Service {
       this.socket.disconnect();
     }
 
-    const url = `https://stage2.${this.hostsService.streamlabs}/api/v5/slobs-chat/io/info`;
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs-chat/io/info`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 
