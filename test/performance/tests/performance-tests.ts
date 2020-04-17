@@ -30,7 +30,7 @@ const ADD_SOURCES_ATTEMPTS = 5;
  * unzip a sample of a large scene collection to the SceneCollection folder
  */
 function unzipLargeSceneCollection(t: TExecutionContext) {
-  const cacheDir = getCacheDir();
+  const cacheDir = path.resolve(getCacheDir(), 'slobs-client');
   const sceneCollectionPath = path.resolve(cacheDir, 'SceneCollections');
   fs.removeSync(sceneCollectionPath);
 
@@ -130,31 +130,6 @@ test('Empty collection (logged-in twitch)', async t => {
     measureStartupTime(api);
     await stopApp(t, false);
   }
-  t.pass();
-});
-
-test('Large collection (logged-in twitch)', async t => {
-  await logIn(t, 'twitch');
-  await sleep(2000);
-  await stopApp(t, false);
-  await unzipLargeSceneCollection(t);
-
-  // start and stop app to sync the scene collection
-  await startApp(t);
-  await stopApp(t);
-
-  // measure startup time
-  let i = RELOAD_ATTEMPTS;
-  while (i--) {
-    await startApp(t);
-    const api = await getClient();
-    measureStartupTime(api);
-    await stopApp(t, false);
-  }
-
-  // measure memory and CPU
-  await startApp(t);
-  await measureMemoryAndCPU();
   t.pass();
 });
 
