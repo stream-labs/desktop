@@ -36,7 +36,7 @@ export default class ChatPage extends TsxComponent<{ onHideChat: () => void }> {
           <img class={styles.avatar} src={friend.avatar} />
           <div class={cx(styles.status, styles[friend.status])} />
           <div class={styles.chatName}>{friend.name}</div>
-          {friend.is_prime && <i class={cx('icon-prime', styles.primeIcon)} />}
+          {!!friend.is_prime && <i class={cx('icon-prime', styles.primeIcon)} />}
         </div>
         <div style="margin-left: auto">{this.contextButton(friend)}</div>
       </div>
