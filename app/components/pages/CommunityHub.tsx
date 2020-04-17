@@ -34,10 +34,10 @@ export default class CommunityHub extends TsxComponent {
             class={cx(styles.avatar, styles.sidebarAvatar, styles.noImgAvatar)}
             style={`background: ${chatroom.avatar};`}
           >
-            {chatroom.name.slice(0, 2)}
+            {chatroom.title.slice(0, 1)}
           </div>
         )}
-        <div style="margin-left: 16px;">{chatroom.name}</div>
+        <div style="margin-left: 16px;">{chatroom.title}</div>
       </div>
     );
   }
@@ -47,10 +47,14 @@ export default class CommunityHub extends TsxComponent {
       <div class={styles.mainHeader}>
         {this.title}
         {this.communityHubService.state.currentPage === 'friendsPage' && (
-          <div onClick={() => (this.addFriendModalVisible = true)}>
-            <i class="icon-add" />
+          <button
+            class="button button--trans"
+            style="margin-left: auto;"
+            onClick={() => (this.addFriendModalVisible = true)}
+          >
+            <i class="icon-add-circle" />
             {$t('Add Friends')}
-          </div>
+          </button>
         )}
       </div>
     );

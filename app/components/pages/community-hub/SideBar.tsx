@@ -30,9 +30,9 @@ export default class SideBar extends TsxComponent<{ onShowAddChatModal: () => vo
           const noImg = /^#/.test(chat.avatar);
           return (
             <div
-              class={cx(styles.chatRow, { [styles.active]: this.currentTab === chat.id })}
-              onClick={() => this.setPage(chat.id)}
-              key={chat.id}
+              class={cx(styles.chatRow, { [styles.active]: this.currentTab === chat.name })}
+              onClick={() => this.setPage(chat.name)}
+              key={chat.name}
             >
               {!noImg && <img class={cx(styles.avatar, styles.sidebarAvatar)} src={chat.avatar} />}
               {noImg && (
@@ -60,17 +60,17 @@ export default class SideBar extends TsxComponent<{ onShowAddChatModal: () => vo
           <i class="icon-add-circle" onClick={() => this.$emit('showAddChatModal')} />
         </span>
         {directMessages.map(chat => {
-          const friend = this.communityHubService.views.usersInRoom(chat.id)[0];
+          const friend = this.communityHubService.views.usersInRoom(chat.name)[0];
           return (
             <div
-              class={cx(styles.chatRow, { [styles.active]: this.currentTab === chat.id })}
-              onClick={() => this.setPage(chat.id)}
-              key={chat.id}
+              class={cx(styles.chatRow, { [styles.active]: this.currentTab === chat.name })}
+              onClick={() => this.setPage(chat.name)}
+              key={chat.name}
             >
               <img class={styles.avatar} src={chat.avatar} />
               <div class={cx(styles.status, styles[friend.status])} />
-              <div class={styles.chatName}>{chat.name}</div>
-              {friend.is_prime && <i class={cx('icon-prime', styles.primeIcon)} />}
+              <div class={styles.chatName}>{chat.title}</div>
+              {!!friend.is_prime && <i class={cx('icon-prime', styles.primeIcon)} />}
             </div>
           );
         })}

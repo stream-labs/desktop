@@ -16,12 +16,16 @@ interface IChatMessageEvent {
   user: IFriend;
 }
 
-interface IInternalEvent {
-  action: 'status_update' | 'new_friend_request' | 'friend_request_accepted';
+export interface IInternalEvent {
+  action: 'status_update' | 'new_friend_request' | 'friend_request_accepted' | 'added_to_dm';
   data: {
     request?: IFriend;
     user?: IFriend;
     status?: string;
+    name?: string;
+    title?: string;
+    token?: string;
+    type?: 'dm';
   };
 }
 
@@ -61,9 +65,9 @@ export class ChatWebsocketService extends Service {
   internalEvent = new Subject<IInternalEvent>();
 
   init() {
-    this.sceneCollectionsService.collectionInitialized.subscribe(() => {
-      this.openSocketConnection();
-    });
+    // this.sceneCollectionsService.collectionInitialized.subscribe(() => {
+    //   this.openSocketConnection();
+    // });
   }
 
   reconnectDelayReached = false;
@@ -84,6 +88,10 @@ export class ChatWebsocketService extends Service {
     if (this.canReconnect) {
       this.openSocketConnection();
     }
+  }
+
+  joinRoom(chat: { name: string; token: string; type: 'dm' }) {
+    this.socket.emit('join_rooms', [chat]);
   }
 
   sendMessage(message: { room: string; message: string }) {
@@ -109,7 +117,7 @@ export class ChatWebsocketService extends Service {
       this.socket.disconnect();
     }
 
-    const url = `https://stage2.${this.hostsService.streamlabs}/api/v5/slobs-chat/io/info`;
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs-chat/io/info`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 
@@ -117,7 +125,7 @@ export class ChatWebsocketService extends Service {
       .then(handleResponse)
       .then((json: IBearerAuth) => {
         this.socket = this.io(json.path, { transports: json.settings.transports });
-        this.communityHubService.self = json.user;
+        this.communityHubService.self = { ...json.user, status: 'online' };
 
         this.reconnectAttempts = json.settings.reconnect_attempts;
         window.setTimeout(() => (this.reconnectDelayReached = true), json.settings.reconnect_delay);

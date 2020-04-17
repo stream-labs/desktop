@@ -18,28 +18,28 @@ export default class FriendsPage extends TsxComponent {
     return this.communityHubService.state.friendRequests;
   }
 
-  goToDm(friendId: number) {
+  goToDm(friend: IFriend) {
     const existingDm = this.communityHubService.views.directMessages.find(
-      dm => this.communityHubService.views.usersInRoom(dm.id)[0].id === friendId,
+      dm => this.communityHubService.views.usersInRoom(dm.name)[0].id === friend.id,
     );
     if (existingDm) {
-      this.communityHubService.setPage(existingDm.id);
+      this.communityHubService.setPage(existingDm.name);
     } else {
-      this.communityHubService.addDm(friendId);
+      this.communityHubService.createChat(friend.name, [friend]);
     }
   }
 
-  respondToRequest(requestId: number, accepted: boolean) {
-    this.communityHubService.respondToFriendRequest(requestId, accepted);
+  respondToRequest(request: IFriend, accepted: boolean) {
+    this.communityHubService.respondToFriendRequest(request, accepted);
   }
 
   basicInfo(friend: IFriend) {
     return (
-      <div>
+      <div style="display: flex; align-items: center;">
         <img class={styles.avatar} src={friend.avatar} />
         <div class={cx(styles.status, styles[friend.status])} />
         <div class={styles.friendName}>{friend.name}</div>
-        {friend.is_prime && <i class={cx('icon-prime', styles.primeIcon)} />}
+        {!!friend.is_prime && <i class={cx('icon-prime', styles.primeIcon)} />}
         {friend.game_streamed && (
           <div class={styles.friendStreaming}>
             {$t('Streaming %{gameTitle}', { gameTitle: friend.game_streamed })}
@@ -51,7 +51,7 @@ export default class FriendsPage extends TsxComponent {
 
   friendRow(friend: IFriend) {
     return (
-      <div class={styles.friend} onClick={() => this.goToDm(friend.id)} key={friend.id}>
+      <div class={styles.friend} onClick={() => this.goToDm(friend)} key={friend.id}>
         {this.basicInfo(friend)}
         <a style="margin-left: auto">{$t('Direct Message')}</a>
         <a style="margin-left: 16px">{$t('Unfriend')}</a>
@@ -61,20 +61,20 @@ export default class FriendsPage extends TsxComponent {
 
   friendRequestRow(friend: IFriend, sent?: boolean) {
     return (
-      <div class={styles.friend} onClick={() => this.goToDm(friend.id)} key={friend.id}>
+      <div class={styles.friend} key={friend.id}>
         {this.basicInfo(friend)}
         {!sent && (
           <div style="margin-left: auto; display: flex;">
             <button
               class="button button--action"
-              onClick={() => this.respondToRequest(friend.id, true)}
+              onClick={() => this.respondToRequest(friend, true)}
             >
               {$t('Accept')}
             </button>
             <button
               style="margin-left: 16px;"
-              class="button button--warning"
-              onClick={() => this.respondToRequest(friend.id, false)}
+              class="button button--warn"
+              onClick={() => this.respondToRequest(friend, false)}
             >
               {$t('Decline')}
             </button>
