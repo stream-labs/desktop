@@ -58,9 +58,7 @@ class CommunityHubViews extends ViewHandler<ICommunityHubState> {
   }
 
   userInRoom(userId: number, roomName: string) {
-    return Object.values(this.state.connectedUsers).find(
-      user => user.id === userId && user.chat_names.includes(roomName),
-    );
+    return this.state.connectedUsers[userId]?.chat_names?.includes(roomName);
   }
 
   get sortedFriends() {

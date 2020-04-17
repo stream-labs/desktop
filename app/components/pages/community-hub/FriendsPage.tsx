@@ -35,7 +35,7 @@ export default class FriendsPage extends TsxComponent {
 
   basicInfo(friend: IFriend) {
     return (
-      <div>
+      <div style="display: flex; align-items: center;">
         <img class={styles.avatar} src={friend.avatar} />
         <div class={cx(styles.status, styles[friend.status])} />
         <div class={styles.friendName}>{friend.name}</div>
@@ -73,7 +73,7 @@ export default class FriendsPage extends TsxComponent {
             </button>
             <button
               style="margin-left: 16px;"
-              class="button button--warning"
+              class="button button--warn"
               onClick={() => this.respondToRequest(friend, false)}
             >
               {$t('Decline')}
