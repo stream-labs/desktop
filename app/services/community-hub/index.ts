@@ -52,8 +52,8 @@ class CommunityHubViews extends ViewHandler<ICommunityHubState> {
   }
 
   usersInRoom(roomName: string) {
-    return Object.values(this.state.connectedUsers).filter(user =>
-      user.chat_names.includes(roomName),
+    return Object.values(this.state.connectedUsers).filter(
+      user => user.chat_names.includes(roomName) && user.id !== this.state.self.id,
     );
   }
 
@@ -125,21 +125,17 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
   @mutation()
   EDIT_USER(userId: number, patch: Partial<IFriend>) {
     const changedParams = Utils.getChangedParams(this.state.connectedUsers[userId], patch);
+    const chatNames = this.state.connectedUsers[userId].chat_names;
     Vue.set(this.state.connectedUsers, userId, {
       ...this.state.connectedUsers[userId],
       ...changedParams,
-      chat_names: this.state.connectedUsers[userId].chat_names.concat(patch.chat_names),
+      chat_names: chatNames ? chatNames.concat(patch.chat_names) : [],
     });
   }
 
   @mutation()
   SET_FRIEND_REQUESTS(friendRequests: Array<IFriend>) {
     this.state.friendRequests = friendRequests;
-  }
-
-  @mutation()
-  SET_CHATROOMS(chatrooms: Array<IChatRoom>) {
-    this.state.chatrooms = chatrooms;
   }
 
   @mutation()
@@ -254,8 +250,8 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
   }
 
   async getChatrooms() {
-    const resp = await this.getResponse('settings');
-    this.SET_CHATROOMS(resp.chatrooms || []);
+    const resp = await this.getResponse('dms');
+    resp?.forEach((chatroom: IChatRoom) => this.addChat(chatroom, false));
   }
 
   async leaveChatroom(groupId: string) {
@@ -281,16 +277,17 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
   async createChat(title: string, members: Array<IFriend>) {
     const queryMembers = members.map(member => `friends[]=${member.id}`).join('&');
     const resp = await this.getResponse(`dm?${queryMembers}&title=${title}`);
-    const dmAvatar = members.length === 1 ? members[0].avatar : null;
     this.chatWebsocketService.joinRoom(resp);
     this.updateUsers(members.map(member => ({ ...member, chat_names: [resp.name] })));
-    this.addChat(resp.name, resp.token, title, dmAvatar);
+    this.addChat(resp);
   }
 
-  addChat(name: string, token: string, title: string, avatar?: string) {
-    const imageOrCode = avatar || chatBgColor();
-    this.ADD_CHATROOM({ name, title, avatar: imageOrCode, token });
-    this.setPage(name);
+  addChat(chatroom: IChatRoom, navigate = true) {
+    const imageOrCode = chatroom.avatar || chatBgColor();
+    this.ADD_CHATROOM({ ...chatroom, avatar: imageOrCode });
+    if (navigate) {
+      this.setPage(chatroom.name);
+    }
   }
 
   get views() {

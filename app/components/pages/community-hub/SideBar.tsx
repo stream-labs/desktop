@@ -27,7 +27,7 @@ export default class SideBar extends TsxComponent<{ onShowAddChatModal: () => vo
           <i class="icon-add-circle" onClick={() => this.$emit('showAddChatModal')} />
         </span>
         {groupChats.map(chat => {
-          const noImg = /^#/.test(chat.avatar);
+          const noImg = /^#/.test(chat.avatar) || !chat.avatar;
           return (
             <div
               class={cx(styles.chatRow, { [styles.active]: this.currentTab === chat.name })}
@@ -40,10 +40,10 @@ export default class SideBar extends TsxComponent<{ onShowAddChatModal: () => vo
                   class={cx(styles.avatar, styles.sidebarAvatar, styles.noImgAvatar)}
                   style={`background: ${chat.avatar};`}
                 >
-                  {chat.name[0]}
+                  {chat.title[0]}
                 </div>
               )}
-              <div class={styles.chatName}>{chat.name}</div>
+              <div class={styles.chatName}>{chat.title}</div>
             </div>
           );
         })}
@@ -67,9 +67,9 @@ export default class SideBar extends TsxComponent<{ onShowAddChatModal: () => vo
               onClick={() => this.setPage(chat.name)}
               key={chat.name}
             >
-              <img class={styles.avatar} src={chat.avatar} />
+              <img class={styles.avatar} src={friend.avatar} />
               <div class={cx(styles.status, styles[friend.status])} />
-              <div class={styles.chatName}>{chat.title}</div>
+              <div class={styles.chatName}>{friend.name}</div>
               {!!friend.is_prime && <i class={cx('icon-prime', styles.primeIcon)} />}
             </div>
           );

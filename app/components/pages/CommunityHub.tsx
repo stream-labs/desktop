@@ -25,19 +25,22 @@ export default class CommunityHub extends TsxComponent {
   get title() {
     if (this.currentTab.title) return this.currentTab.title;
     const chatroom = this.communityHubService.views.currentChat;
-    const noImg = /^#/.test(chatroom.avatar);
+    const members = this.communityHubService.views.usersInRoom(chatroom.name);
+    const noImg = members.length > 1 && (!chatroom.avatar || /^#/.test(chatroom.avatar));
     return (
       <div style="display: flex; align-items: center;">
-        {!noImg && <img class={styles.avatar} src={chatroom.avatar} />}
+        {!noImg && <img class={styles.avatar} src={members[0].avatar} />}
         {noImg && (
           <div
             class={cx(styles.avatar, styles.sidebarAvatar, styles.noImgAvatar)}
             style={`background: ${chatroom.avatar};`}
           >
-            {chatroom.title.slice(0, 1)}
+            {chatroom.title[0]}
           </div>
         )}
-        <div style="margin-left: 16px;">{chatroom.title}</div>
+        <div style="margin-left: 16px;">
+          {members.length === 1 ? members[0].name : chatroom.title}
+        </div>
       </div>
     );
   }

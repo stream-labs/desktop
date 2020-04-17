@@ -4,7 +4,7 @@ import { StatefulService, mutation, ViewHandler } from 'services/core/stateful-s
 import { Inject } from 'services/core/injector';
 import { InitAfter } from 'services/core';
 import { ChatWebsocketService, IInternalEvent } from './chat-websocket';
-import { CommunityHubService, IFriend } from '.';
+import { CommunityHubService, IFriend, IChatRoom } from '.';
 import { UserService, LoginLifecycle } from 'services/user';
 
 export interface IMessage {
@@ -107,7 +107,18 @@ export class LiveChatService extends StatefulService<ILiveChatState> {
       await this.communityHubService.getChatMembers(ev.data.name);
       const members = this.communityHubService.views.usersInRoom(ev.data.name);
       const title = ev.data.title || members[0]?.name;
-      this.communityHubService.addChat(ev.data.name, ev.data.token, title);
+      const existingChat = this.communityHubService.state.chatrooms.find(
+        chat => chat.name === ev.data.name,
+      );
+      if (!existingChat) {
+        this.communityHubService.addChat(
+          {
+            ...(ev.data as IChatRoom),
+            title,
+          },
+          false,
+        );
+      }
     }
   }
 
