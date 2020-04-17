@@ -65,9 +65,9 @@ export class ChatWebsocketService extends Service {
   internalEvent = new Subject<IInternalEvent>();
 
   init() {
-    this.sceneCollectionsService.collectionInitialized.subscribe(() => {
-      this.openSocketConnection();
-    });
+    // this.sceneCollectionsService.collectionInitialized.subscribe(() => {
+    //   this.openSocketConnection();
+    // });
   }
 
   reconnectDelayReached = false;

@@ -173,10 +173,10 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
   }
 
   async fetchUserData() {
-    await this.getFriends();
-    await this.getFriendRequests();
-    await this.getChatrooms();
-    Promise.all(this.state.chatrooms.map(room => this.getChatMembers(room.name)));
+    // await this.getFriends();
+    // await this.getFriendRequests();
+    // await this.getChatrooms();
+    // Promise.all(this.state.chatrooms.map(room => this.getChatMembers(room.name)));
   }
 
   async getResponse(endpoint: string) {
