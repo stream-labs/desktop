@@ -80,7 +80,7 @@ export async function closeWindow(t: any) {
 }
 
 export async function waitForLoader(t: any) {
-  await t.context.app.client.waitForExist('.main-loading', 20000, true);
+  await t.context.app.client.waitForExist('.main-loading', 90000, true);
 }
 
 interface ITestRunnerOptions {
