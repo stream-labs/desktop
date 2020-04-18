@@ -85,7 +85,7 @@ export class ExternalApiService extends RpcApi {
     // initialize all singletons
     Object.keys(this.resources).forEach(resourceName => {
       const Resource = this.resources[resourceName];
-      if (Resource.isSingleton) this.instances[resourceName] = new Resource();
+      if (Resource && Resource.isSingleton) this.instances[resourceName] = new Resource();
     });
 
     // restore the amount of points for each second

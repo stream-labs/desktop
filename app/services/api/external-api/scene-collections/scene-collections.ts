@@ -3,6 +3,7 @@ import { Inject } from 'services/core/injector';
 import { Fallback, Singleton } from 'services/api/external-api';
 import { Observable } from 'rxjs';
 import { Expensive } from 'services/api/external-api-limits';
+import { createProgram } from '../../../../util/webgl/utils';
 
 interface ISceneCollectionsManifestEntry {
   id: string;
@@ -38,7 +39,11 @@ export class SceneCollectionsService {
   protected sceneCollectionsService: InternalSceneCollectionsService;
 
   get activeCollection(): ISceneCollectionsManifestEntry {
-    return this.sceneCollectionsService.activeCollection;
+    const collection = this.sceneCollectionsService.activeCollection;
+    return {
+      id: collection.id,
+      name: collection.name,
+    };
   }
 
   @Expensive()

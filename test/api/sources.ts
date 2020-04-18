@@ -2,6 +2,7 @@ import { useSpectron, test } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { ScenesService } from 'services/api/external-api/scenes/scenes';
 import { SourcesService } from 'services/api/external-api/sources/sources';
+import { sleep } from '../helpers/sleep';
 
 useSpectron({ restartAppAfterEachTest: false });
 
@@ -9,6 +10,7 @@ test('Creating, fetching and removing sources', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const sourcesService = client.getResource<SourcesService>('SourcesService');
+  // await sleep(15000, true);
   const scene = scenesService.activeScene;
 
   const colorSource1 = sourcesService.createSource('MyColorSource1', 'color_source');
@@ -27,6 +29,7 @@ test('Creating, fetching and removing sources', async t => {
 
   scene.removeItem(colorItem1.id);
   colorItem2.remove();
+  // await sleep(999999, true);
   sceneItemNames = scene.getItems().map(item => item['name']);
 
   t.deepEqual(sceneItemNames, []);

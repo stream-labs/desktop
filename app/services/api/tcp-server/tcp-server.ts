@@ -17,6 +17,7 @@ import { SceneCollectionsService } from 'services/scene-collections';
 // eslint-disable-next-line no-undef
 import WritableStream = NodeJS.WritableStream;
 import { $t } from 'services/i18n';
+import set = Reflect.set;
 
 const net = require('net');
 
@@ -77,7 +78,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   private forceRequests = false;
 
   // enable to debug
-  private enableLogs = true;
+  private enableLogs = false;
 
   init() {
     super.init();
@@ -286,7 +287,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   }
 
   private onConnectionHandler(socket: WritableStream, server: IServer) {
-    this.log('new connection', socket);
+    this.log('new connection');
 
     const id = this.nextClientId++;
     const client: IClient = {
@@ -297,6 +298,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       isAuthorized: false,
     };
     this.clients[id] = client;
+    this.log(`Id assigned ${id}`);
 
     if (server.type === 'namedPipe' || this.isLocalClient(client)) {
       this.authorizeClient(client);
@@ -323,6 +325,8 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
         throw e;
       }
     });
+
+    this.log(`Client ${id} ready`);
   }
 
   private authorizeClient(client: IClient) {
@@ -336,8 +340,9 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     return localAddresses.includes((client.socket as any).remoteAddress);
   }
 
-  private onRequestHandler(client: IClient, data: string) {
-    this.log('tcp request', data);
+  private async onRequestHandler(client: IClient, data: string) {
+    this.log(`tcp request from ${client.id}`, data);
+    await new Promise(r => setTimeout(r, 500));
 
     if (this.isRequestsHandlingStopped && !this.forceRequests) {
       this.sendResponse(
@@ -506,7 +511,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   }
 
   private onDisconnectHandler(client: IClient) {
-    this.log('client disconnected');
+    this.log(`client disconnected ${client.id}`);
     delete this.clients[client.id];
   }
 

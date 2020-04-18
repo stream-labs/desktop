@@ -1,11 +1,17 @@
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { Singleton, Fallback, InjectFromExternalApi } from 'services/api/external-api';
-import { ScenesService as InternalScenesService } from 'services/scenes/index';
+import {
+  ScenesService as InternalScenesService,
+  ISceneItem as IInternalSceneItemModel,
+  IScene as IInternalSceneModel,
+} from 'services/scenes/index';
 import { ISourceAddOptions, SourcesService } from 'services/api/external-api/sources/sources';
 import { Inject } from 'services/core/injector';
 import { ISceneModel, Scene } from './scene';
-import { ISceneItemModel } from './scene-item';
+import { getExternalSceneItemModel, ISceneItemModel } from './scene-item';
 import { Expensive } from 'services/api/external-api-limits';
+import { EditorService } from '../../../editor';
+import { map } from 'rxjs/operators';
 
 /**
  * Api for scenes management
@@ -16,9 +22,49 @@ export class ScenesService {
   @Inject()
   private scenesService: InternalScenesService;
 
+  @Inject() editorService: EditorService;
   @InjectFromExternalApi() sourcesService: SourcesService;
 
+  private convertToExternalSceneItemModel(
+    internalItemModel: IInternalSceneItemModel,
+  ): ISceneItemModel {
+    const source = this.sourcesService.getSource(internalItemModel.sourceId);
+    const name = source ? source.name : '';
+    return getExternalSceneItemModel(internalItemModel, name);
+  }
+
+  private convertToExternalSceneModel(internalSceneModel: IInternalSceneModel): ISceneModel {
+    const scene = this.getScene(internalSceneModel.id);
+    if (scene) {
+      return scene.getModel();
+    } else {
+      // if the scene not found it's than this model is a result of "sceneRemoved" event
+      return {
+        id: internalSceneModel.id,
+        name: internalSceneModel.name,
+        nodes: [],
+      };
+    }
+  }
+
+  // convert internal models from events to external models
+  itemUpdated = this.scenesService.itemUpdated.pipe(
+    map(m => this.convertToExternalSceneItemModel(m)),
+  );
+  itemRemoved = this.scenesService.itemRemoved.pipe(
+    map(m => this.convertToExternalSceneItemModel(m)),
+  );
+  itemAdded = this.scenesService.itemAdded.pipe(map(m => this.convertToExternalSceneItemModel(m)));
+  sceneAdded = this.scenesService.sceneAdded.pipe(map(m => this.convertToExternalSceneModel(m)));
+  sceneRemoved = this.scenesService.sceneRemoved.pipe(
+    map(m => this.convertToExternalSceneModel(m)),
+  );
+  sceneSwitched = this.scenesService.sceneSwitched.pipe(
+    map(m => this.convertToExternalSceneModel(m)),
+  );
+
   getScene(id: string): Scene {
+    if (!this.scenesService.state.scenes[id]) return null;
     return new Scene(id);
   }
 
@@ -55,30 +101,6 @@ export class ScenesService {
 
   get activeSceneId(): string {
     return this.scenesService.views.activeSceneId;
-  }
-
-  get sceneSwitched(): Observable<ISceneModel> {
-    return this.scenesService.sceneSwitched;
-  }
-
-  get sceneAdded(): Observable<ISceneModel> {
-    return this.scenesService.sceneAdded;
-  }
-
-  get sceneRemoved(): Observable<ISceneModel> {
-    return this.scenesService.sceneRemoved;
-  }
-
-  get itemAdded(): Observable<ISceneItemModel> {
-    return this.scenesService.itemAdded;
-  }
-
-  get itemRemoved(): Observable<ISceneItemModel> {
-    return this.scenesService.itemRemoved;
-  }
-
-  get itemUpdated(): Observable<ISceneItemModel> {
-    return this.scenesService.itemUpdated;
   }
 }
 
