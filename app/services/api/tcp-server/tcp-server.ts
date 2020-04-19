@@ -342,7 +342,6 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
 
   private async onRequestHandler(client: IClient, data: string) {
     this.log(`tcp request from ${client.id}`, data);
-    await new Promise(r => setTimeout(r, 500));
 
     if (this.isRequestsHandlingStopped && !this.forceRequests) {
       this.sendResponse(
