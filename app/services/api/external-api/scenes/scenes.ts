@@ -4,6 +4,7 @@ import {
   ScenesService as InternalScenesService,
   ISceneItem as IInternalSceneItemModel,
   IScene as IInternalSceneModel,
+  ISceneItem,
 } from 'services/scenes/index';
 import { ISourceAddOptions, SourcesService } from 'services/api/external-api/sources/sources';
 import { Inject } from 'services/core/injector';
@@ -12,6 +13,7 @@ import { getExternalSceneItemModel, ISceneItemModel } from './scene-item';
 import { Expensive } from 'services/api/external-api-limits';
 import { EditorService } from '../../../editor';
 import { map } from 'rxjs/operators';
+import { SelectionService } from 'services/selection';
 
 /**
  * Api for scenes management
@@ -23,6 +25,7 @@ export class ScenesService {
   private scenesService: InternalScenesService;
 
   @Inject() editorService: EditorService;
+  @Inject() selectionService: SelectionService;
   @InjectFromExternalApi() sourcesService: SourcesService;
 
   private convertToExternalSceneItemModel(
@@ -48,13 +51,6 @@ export class ScenesService {
   }
 
   // convert internal models from events to external models
-  itemUpdated = this.scenesService.itemUpdated.pipe(
-    map(m => this.convertToExternalSceneItemModel(m)),
-  );
-  itemRemoved = this.scenesService.itemRemoved.pipe(
-    map(m => this.convertToExternalSceneItemModel(m)),
-  );
-  itemAdded = this.scenesService.itemAdded.pipe(map(m => this.convertToExternalSceneItemModel(m)));
   sceneAdded = this.scenesService.sceneAdded.pipe(map(m => this.convertToExternalSceneModel(m)));
   sceneRemoved = this.scenesService.sceneRemoved.pipe(
     map(m => this.convertToExternalSceneModel(m)),
@@ -62,6 +58,29 @@ export class ScenesService {
   sceneSwitched = this.scenesService.sceneSwitched.pipe(
     map(m => this.convertToExternalSceneModel(m)),
   );
+  itemRemoved = this.scenesService.itemRemoved.pipe(
+    map(m => this.convertToExternalSceneItemModel(m)),
+  );
+  itemAdded = this.scenesService.itemAdded.pipe(map(m => this.convertToExternalSceneItemModel(m)));
+
+  itemUpdated = (() => {
+    const itemUpdated = new Subject<ISceneItemModel>();
+
+    // prevent sending events if dragging or resize in progress
+    this.scenesService.itemUpdated.subscribe(m => {
+      if (this.editorService.state.changingPositionInProgress) return;
+      itemUpdated.next(this.convertToExternalSceneItemModel(m));
+    });
+
+    // if user has stopped dragging or resizing then send ItemUpdated event
+    this.editorService.positionUpdateFinished.subscribe(() => {
+      const updatedItems = this.selectionService.getItems();
+      updatedItems.forEach(item =>
+        itemUpdated.next(this.convertToExternalSceneItemModel(item as ISceneItem)),
+      );
+    });
+    return itemUpdated;
+  })();
 
   getScene(id: string): Scene {
     if (!this.scenesService.state.scenes[id]) return null;

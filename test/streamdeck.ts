@@ -1,15 +1,11 @@
 import { test, TExecutionContext, useSpectron } from './helpers/spectron';
-import { setOutputResolution, setTemporaryRecordingPath } from './helpers/spectron/output';
 import { ApiClient, getClient } from './helpers/api-client';
-import { ScenesService } from '../app/services/api/external-api/scenes';
-import { startRecording, stopRecording } from './helpers/spectron/streaming';
-import { sleep } from './helpers/sleep';
 import { IJsonRpcResponse } from '../app/services/api/jsonrpc';
 import { cloneDeep } from 'lodash';
 
 useSpectron({ pauseIfFailed: true });
 
-// Test all API request that streamdeck device does after connection
+// Test all API requests that streamdeck device does right after connection
 // tested on Streamdeck v4.5.0
 test('Connect streamdeck device', async t => {
   const api = await getClient();

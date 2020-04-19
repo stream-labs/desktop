@@ -208,11 +208,8 @@ test('SceneItem.addFile()', async t => {
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const scene = scenesService.activeScene;
 
-  console.log('inited');
   scene.clear();
-  console.log('cleared');
   scene.addFile(dataDir);
-  console.log('added');
 
   t.true(
     sceneBuilder.isEqualTo(`
@@ -229,8 +226,6 @@ test('SceneItem.addFile()', async t => {
         hello.txt: text_gdiplus
   `),
   );
-
-  console.log('compared');
 });
 
 test('Try to make a not existing scene active', async t => {

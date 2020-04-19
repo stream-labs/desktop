@@ -340,7 +340,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     return localAddresses.includes((client.socket as any).remoteAddress);
   }
 
-  private async onRequestHandler(client: IClient, data: string) {
+  private onRequestHandler(client: IClient, data: string) {
     this.log(`tcp request from ${client.id}`, data);
 
     if (this.isRequestsHandlingStopped && !this.forceRequests) {

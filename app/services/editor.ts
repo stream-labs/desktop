@@ -63,7 +63,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   /**
    * emit this event when drag or resize have been finished
    */
-  positionUpdateFinished = new Subject<string[]>();
+  positionUpdateFinished = new Subject<void>();
 
   static initialState: IEditorServiceState = {
     cursor: 'default',
@@ -219,7 +219,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     this.resizeRegion = null;
     this.isCropping = false;
     this.SET_CHANGING_POSITION_IN_PROGRESS(false);
-    this.positionUpdateFinished.next(this.selectionService.getItems().map(item => item.id));
+    this.positionUpdateFinished.next();
     this.tcpServerService.startRequestsHandling();
 
     this.updateCursor(event);

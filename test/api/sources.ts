@@ -29,7 +29,6 @@ test('Creating, fetching and removing sources', async t => {
 
   scene.removeItem(colorItem1.id);
   colorItem2.remove();
-  // await sleep(999999, true);
   sceneItemNames = scene.getItems().map(item => item['name']);
 
   t.deepEqual(sceneItemNames, []);
