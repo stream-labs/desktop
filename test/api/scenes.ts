@@ -231,7 +231,6 @@ test('SceneItem.addFile()', async t => {
 test('Try to make a not existing scene active', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
-  await sleep(30000);
   const sceneHasBeenSwitched = scenesService.makeSceneActive('This id does not exist');
   t.false(sceneHasBeenSwitched);
 });

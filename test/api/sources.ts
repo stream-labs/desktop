@@ -10,7 +10,6 @@ test('Creating, fetching and removing sources', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const sourcesService = client.getResource<SourcesService>('SourcesService');
-  // await sleep(15000, true);
   const scene = scenesService.activeScene;
 
   const colorSource1 = sourcesService.createSource('MyColorSource1', 'color_source');
