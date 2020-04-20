@@ -258,8 +258,6 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
   }
 
   private initVolmeterStream(sourceId: string) {
-    // const volmeterStream = new Subject<IVolmeter>();
-
     let gotEvent = false;
     let lastVolmeterValue: IVolmeter;
     this.sourceData[sourceId].callbackInfo = this.sourceData[sourceId].volmeter.addCallback(
@@ -276,6 +274,8 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
      * sending events in the case of hiding the source. It might be better
      * to eventually just hide the mixer item as well though */
     const volmeterCheck = () => {
+      if (!this.sourceData[sourceId]) return;
+
       if (!gotEvent && lastVolmeterValue) {
         const channelsCount = lastVolmeterValue.peak.length;
         const channelsValue = Array(channelsCount).fill(-60);
@@ -292,8 +292,6 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
     };
 
     volmeterCheck();
-
-    // this.sourceData[sourceId].stream = volmeterStream;
   }
 
   private sendVolmeterData(sourceId: string, data: IVolmeter) {
