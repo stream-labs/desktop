@@ -67,7 +67,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
 
   static initialState: IEditorServiceState = {
     cursor: 'default',
-    changingPositionInProgress: true,
+    changingPositionInProgress: false,
   };
 
   renderedWidth = 0;
