@@ -1,4 +1,4 @@
-import { focusMain, TExecutionContext } from './index';
+import { focusMain, TExecutionContext, focusWorker } from './index';
 import { IUserAuth, IPlatformAuth, TPlatform } from '../../../app/services/platforms';
 import { sleep } from '../sleep';
 import { dialogDismiss } from './dialog';
@@ -84,8 +84,9 @@ export async function loginWithAuthInfo(
       },
     },
   };
-  await focusMain(t);
+  await focusWorker(t);
   t.context.app.webContents.send('testing-fakeAuth', authInfo, isOnboardingTest);
+  await focusMain(t);
   if (!waitForUI) return true;
   await t.context.app.client.waitForVisible('.fa-sign-out-alt', 20000); // wait for the log-out button
   return true;

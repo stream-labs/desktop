@@ -95,7 +95,7 @@ label {
 
   background: var(--accent);
   font-size: 12px;
-  color: var(--white);
+  color: var(--action-button-text);
   padding: 0 4px;
   line-height: 16px;
 }
@@ -325,7 +325,7 @@ a,
     &.checkbox input:checked ~ label,
     &.checkbox input ~ label {
       &::before {
-        border-color: var(--input-border);
+        border-color: var(--button);
         background: transparent;
       }
 
@@ -389,10 +389,27 @@ select {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--scrollbar);
+  background-color: var(--solid-input);
   border: 2px solid var(--border);
   border-right: 1px solid var(--border);
   border-radius: 10px;
+}
+
+// Loader TODO: move off of Beaker
+.s-loader__bg {
+  background: var(--background) !important;
+}
+
+.s-spinner__bar {
+  fill: var(--title) !important;
+
+  &.s-spinner--modeswap {
+    fill: var(--section) !important;
+  }
+}
+
+.s-loader__text {
+  color: var(--title) !important;
 }
 
 // Vue transitions
@@ -420,6 +437,17 @@ select {
   opacity: 0;
 }
 
+.sidenav-slide-enter,
+.sidenav-slide-leave-to {
+  transform: translateY(-20px);
+  opacity: 0;
+}
+
+.sidenav-slide-enter-active,
+.sidenav-slide-leave-active {
+  transition: all 0.3s ease;
+}
+
 .v--modal-overlay {
   background: var(--modal-overlay);
 }
@@ -431,16 +459,16 @@ select {
 
 // Toasts
 .toast-alert {
-  background-color: @red !important;
+  background-color: var(--warning) !important;
 }
 
 .toast-busy {
-  background-color: @yellow !important;
+  background-color: var(--new) !important;
   margin-top: 250px !important;
 }
 
 .toast-success {
-  background-color: @teal !important;
+  background-color: var(--teal) !important;
 }
 
 .toast-success__schedule {

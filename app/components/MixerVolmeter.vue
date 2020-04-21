@@ -13,7 +13,7 @@
 .volmeter {
   position: absolute;
   overflow: hidden;
-  background-color: var(--slider-bg);
+  background-color: var(--border);
 }
 
 .volmeter-spacer {

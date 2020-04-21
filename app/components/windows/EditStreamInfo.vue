@@ -1,8 +1,8 @@
 <template>
   <modal-layout :show-controls="false" :customControls="true">
     <div slot="content">
-      <h4 v-if="windowHeading">{{windowHeading}}</h4>
-      <div v-if="infoLoading"><spinner/></div>
+      <h4 v-if="windowHeading">{{ windowHeading }}</h4>
+      <div v-if="infoLoading"><spinner /></div>
       <div v-if="infoError && !infoLoading" class="warning">
         {{ $t('There was an error fetching your channel information.  You can try') }}
         <a class="description-link" @click="populateInfo">{{
@@ -16,24 +16,21 @@
         <div class="pages-warning" v-if="isFacebook && !hasPages">
           <i class="fab fa-facebook" />
           {{ $t('You must create a Facebook gaming page to go live.') }}
-          <a class="description-link" @click="openFBPageCreateLink">{{
-            $t('Create Page')
-          }}</a>
+          <a class="description-link" @click="openFBPageCreateLink">{{ $t('Create Page') }}</a>
         </div>
-        <h-form-group
-          v-if="isFacebook && hasPages && !midStreamMode"
-          :v-model="channelInfo.facebookPageId"
-          :metadata="formMetadata.page"
-        />
-
         <div v-if="isYoutube">
-          <YoutubeEditStreamInfo v-model="channelInfo" :canChangeBroadcast="!midStreamMode && !isSchedule"/>
+          <YoutubeEditStreamInfo
+            v-model="channelInfo"
+            :canChangeBroadcast="!midStreamMode && !isSchedule"
+          />
         </div>
         <div v-else>
           <h-form-group
-            v-model="channelInfo.title"
-            :metadata="formMetadata.title"
+            v-if="isFacebook && hasPages && !midStreamMode"
+            v-model="channelInfo.facebookPageId"
+            :metadata="formMetadata.page"
           />
+          <h-form-group v-model="channelInfo.title" :metadata="formMetadata.title" />
           <h-form-group
             v-if="isFacebook"
             v-model="channelInfo.description"
@@ -41,10 +38,7 @@
           />
         </div>
 
-        <h-form-group
-          v-if="isTwitch || isMixer || isFacebook"
-          :metadata="formMetadata.game"
-        >
+        <h-form-group v-if="isTwitch || isMixer || isFacebook" :metadata="formMetadata.game">
           <list-input
             @search-change="value => onGameSearchHandler(value)"
             @input="onGameInput"
@@ -63,8 +57,8 @@
           {{ $t('Checking optimized setting for') }} {{ channelInfo.game }}...
         </h-form-group>
         <div v-if="isSchedule">
-          <h-form-group type="text" v-model="startTimeModel.date" :metadata="formMetadata.date" />
-          <h-form-group type="timer" v-model="startTimeModel.time" :metadata="formMetadata.time" />
+          <h-form-group v-model="startTimeModel.date" :metadata="formMetadata.date" />
+          <h-form-group v-model="startTimeModel.time" :metadata="formMetadata.time" />
         </div>
         <div
           v-if="selectedProfile"
@@ -106,8 +100,7 @@
                 'Something went wrong while updating your stream info. You can try again, or you can',
               )
             }}
-            <a @click="goLive(true)">{{ $t('just go live') }}</a
-            >
+            <a @click="goLive(true)">{{ $t('just go live') }}</a>
           </div>
         </div>
       </validated-form>

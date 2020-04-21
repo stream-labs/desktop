@@ -12,11 +12,11 @@
     <v-form-group>
       <button class="button button--action" @click="addCategory()">{{ $t('Add Category') }}</button>
       <button class="button button--default" @click="clearCategories()">{{ $t('Clear All') }}</button>
-      <div v-for="category in wData.settings.categories" :key="category.prize" class="category-container">
+      <div v-for="category in wData.settings.categories" :key="category.key" class="category-container">
         <text-input v-model="category.prize" />
         <div class="category-box">
           <color-input v-model="category.color" />
-          <i class="icon-close" @click="removeCategory(category.prize)" />
+          <i class="icon-close" @click="removeCategory(category.key)" />
         </div>
       </div>
     </v-form-group>

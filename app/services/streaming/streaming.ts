@@ -33,6 +33,7 @@ import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService } from 'services/restream';
 import { ITwitchStartStreamOptions } from 'services/platforms/twitch';
 import { IFacebookStartStreamOptions } from 'services/platforms/facebook';
+import Utils from 'services/utils';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -141,10 +142,19 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.toggleStreaming();
   }
 
-  private finishStartStreaming() {
+  private async finishStartStreaming() {
     const shouldConfirm = this.streamSettingsService.settings.warnBeforeStartingStream;
-    const confirmText = $t('Are you sure you want to start streaming?');
-    if (shouldConfirm && !confirm(confirmText)) return;
+
+    if (shouldConfirm) {
+      const goLive = await electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
+        title: $t('Go Live'),
+        type: 'warning',
+        message: $t('Are you sure you want to start streaming?'),
+        buttons: [$t('Cancel'), $t('Go Live')],
+      });
+
+      if (!goLive) return;
+    }
 
     this.powerSaveId = electron.remote.powerSaveBlocker.start('prevent-display-sleep');
 
@@ -167,7 +177,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     if (this.state.streamingStatus === EStreamingState.Offline) {
       // in the "force" mode just try to start streaming without updating channel info
       if (force) {
-        this.finishStartStreaming();
+        await this.finishStartStreaming();
         return Promise.resolve();
       }
       try {
@@ -182,6 +192,13 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
             this.userService.platformType === 'twitch'
           ) {
             if (this.restreamService.shouldGoLiveWithRestream) {
+              if (!this.restreamService.allPlatformsStaged) {
+                // We don't have enough information to go live with multistream.
+                // We should gather the information in the edit stream info window.
+                this.showEditStreamInfo(this.restreamService.platforms, 0);
+                return;
+              }
+
               let ready: boolean;
 
               try {
@@ -198,7 +215,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
               } else {
                 // Restream service is down, just go live to Twitch for now
 
-                electron.remote.dialog.showMessageBox({
+                electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
                   type: 'error',
                   message: $t(
                     'Multistream is temporarily unavailable. Your stream is being sent to Twitch only.',
@@ -214,7 +231,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
             }
           }
         }
-        this.finishStartStreaming();
+        await this.finishStartStreaming();
         return Promise.resolve();
       } catch (e) {
         return Promise.reject(e);
@@ -227,9 +244,17 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       this.state.streamingStatus === EStreamingState.Reconnecting
     ) {
       const shouldConfirm = this.streamSettingsService.settings.warnBeforeStoppingStream;
-      const confirmText = $t('Are you sure you want to stop streaming?');
 
-      if (shouldConfirm && !confirm(confirmText)) return Promise.resolve();
+      if (shouldConfirm) {
+        const endStream = await electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
+          title: $t('End Stream'),
+          type: 'warning',
+          message: $t('Are you sure you want to stop streaming?'),
+          buttons: [$t('Cancel'), $t('End Stream')],
+        });
+
+        if (!endStream) return;
+      }
 
       if (this.powerSaveId) {
         electron.remote.powerSaveBlocker.stop(this.powerSaveId);
@@ -323,6 +348,17 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     });
   }
 
+  openShareStream() {
+    this.windowsService.showWindow({
+      componentName: 'ShareStream',
+      title: $t('Share Your Stream'),
+      size: {
+        height: 450,
+        width: 520,
+      },
+    });
+  }
+
   get twitterIsEnabled() {
     return this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.twitter);
   }
@@ -357,7 +393,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const formattedTime = this.formattedDurationSince(this.streamingStateChangeTime);
     if (formattedTime === '07:50:00' && this.userService.platform.type === 'facebook') {
       const msg = $t('You are 10 minutes away from the 8 hour stream limit');
-      const existingTimeupNotif = this.notificationsService
+      const existingTimeupNotif = this.notificationsService.views
         .getUnread()
         .filter((notice: INotification) => notice.message === msg);
       if (existingTimeupNotif.length !== 0) return formattedTime;
@@ -381,7 +417,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   private sendReconnectingNotification() {
     const msg = $t('Stream has disconnected, attempting to reconnect.');
-    const existingReconnectNotif = this.notificationsService
+    const existingReconnectNotif = this.notificationsService.views
       .getUnread()
       .filter((notice: INotification) => notice.message === msg);
     if (existingReconnectNotif.length !== 0) return;
@@ -395,7 +431,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   private clearReconnectingNotification() {
-    const notice = this.notificationsService
+    const notice = this.notificationsService.views
       .getAll()
       .find(
         (notice: INotification) =>
@@ -560,7 +596,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       this.outputErrorOpen = true;
 
       electron.remote.dialog
-        .showMessageBox({
+        .showMessageBox(Utils.getMainWindow(), {
           buttons,
           title,
           type: 'error',
@@ -605,7 +641,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   private async runPlatformAfterGoLiveHook() {
-    if (this.userService.isLoggedIn() && this.userService.platform) {
+    if (this.userService.isLoggedIn && this.userService.platform) {
       const service = getPlatformService(this.userService.platform.type);
       if (typeof service.afterGoLive === 'function') {
         await service.afterGoLive();
@@ -614,7 +650,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   private async runPlaformAfterStopStreamHook() {
-    if (!this.userService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn) return;
     const service = getPlatformService(this.userService.platform.type);
     if (typeof service.afterStopStream === 'function') {
       await service.afterStopStream();

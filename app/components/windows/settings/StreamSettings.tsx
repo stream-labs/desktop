@@ -61,7 +61,7 @@ export default class StreamSettings extends TsxComponent {
   }
 
   get needToShowWarning() {
-    return this.userService.isLoggedIn() && !this.protectedModeEnabled;
+    return this.userService.isLoggedIn && !this.protectedModeEnabled;
   }
 
   get canEditSettings() {
@@ -79,10 +79,6 @@ export default class StreamSettings extends TsxComponent {
   facebookMerge() {
     this.navigationService.navigate('FacebookMerge');
     this.windowsService.closeChildWindow();
-  }
-
-  get restreamRewardsUrl() {
-    return `https://streamlabs.com/multistream-rewards?token=${this.userService.apiToken}`;
   }
 
   render() {
@@ -141,13 +137,6 @@ export default class StreamSettings extends TsxComponent {
               </div>
             )}
           </div>
-        )}
-
-        {this.restreamService.canEnableRestream && this.protectedModeEnabled && (
-          <BrowserView
-            style={{ height: '330px', marginTop: '16px', marginBottom: '16px' }}
-            src={this.restreamRewardsUrl}
-          />
         )}
 
         {/* WARNING messages */}

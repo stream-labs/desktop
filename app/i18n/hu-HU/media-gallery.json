@@ -3,7 +3,7 @@
   "All Files": "Minden Fájl",
   "Images": "Képek",
   "Sounds": "Hangok",
-  "Drag & Drop Upload": "Drag & Drop Upload",
+  "Drag & Drop Upload": "Húz & Kidob Feltöltés",
   "Copy URL": "URL másolása",
   "Browse the Gallery": "Keresse meg a Galériát",
   "Cancel": "Mégse",
@@ -25,6 +25,6 @@
   "Failed to copy URL": "Nem sikerült az URL másolása",
   "Image URL": "Kép URL",
   "Example": "Példa",
-  "Change Media": "Change Media",
+  "Change Media": "Média Változtatása",
   "No Sound": "Nincs hang"
 }

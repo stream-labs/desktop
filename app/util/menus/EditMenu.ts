@@ -35,7 +35,7 @@ export class EditMenu extends Menu {
   @Inject() private audioService: AudioService;
   @Inject() private editorCommandsService: EditorCommandsService;
 
-  private scene = this.scenesService.getScene(this.options.selectedSceneId);
+  private scene = this.scenesService.views.getScene(this.options.selectedSceneId);
 
   private readonly source: Source;
 
@@ -43,7 +43,7 @@ export class EditMenu extends Menu {
     super();
 
     if (this.options.selectedSourceId) {
-      this.source = this.sourcesService.getSource(this.options.selectedSourceId);
+      this.source = this.sourcesService.views.getSource(this.options.selectedSourceId);
     } else if (this.options.showSceneItemMenu && this.selectionService.isSceneItem()) {
       this.source = this.selectionService.getItems()[0].getSource();
     }
@@ -62,7 +62,7 @@ export class EditMenu extends Menu {
 
       this.append({
         label: $t('Paste (Duplicate)'),
-        enabled: this.clipboardService.hasItems(),
+        enabled: this.clipboardService.canDuplicate(),
         click: () => this.clipboardService.paste(true),
       });
     }
@@ -176,7 +176,7 @@ export class EditMenu extends Menu {
         label: $t('Rename'),
         click: () =>
           this.scenesService.showNameFolder({
-            sceneId: this.scenesService.activeSceneId,
+            sceneId: this.scenesService.views.activeSceneId,
             renameId: this.selectionService.getFolders()[0].id,
           }),
       });
@@ -194,7 +194,7 @@ export class EditMenu extends Menu {
             // if no items are selected we are in the MixerSources context menu
             // if a simple source is selected than remove all sources from the current scene
             if (!this.source.channel) {
-              const scene = this.scenesService.activeScene;
+              const scene = this.scenesService.views.activeScene;
               const itemsToRemoveIds = scene
                 .getItems()
                 .filter(item => item.sourceId === this.source.sourceId)
@@ -332,14 +332,14 @@ export class EditMenu extends Menu {
       this.append({ type: 'separator' });
 
       this.append({
-        label: 'Hide',
+        label: $t('Hide'),
         click: () => {
           this.editorCommandsService.executeCommand('HideMixerSourceCommand', this.source.sourceId);
         },
       });
 
       this.append({
-        label: 'Unhide All',
+        label: $t('Unhide All'),
         click: () => this.editorCommandsService.executeCommand('UnhideMixerSourcesCommand'),
       });
     }

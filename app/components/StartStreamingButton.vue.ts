@@ -11,6 +11,7 @@ import { $t } from 'services/i18n';
 import { SourcesService } from 'services/sources';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { RestreamService } from 'services/restream';
+import { FacebookService } from 'services/platforms/facebook';
 
 @Component({})
 export default class StartStreamingButton extends Vue {
@@ -22,8 +23,15 @@ export default class StartStreamingButton extends Vue {
   @Inject() videoEncodingOptimizationService: VideoEncodingOptimizationService;
   @Inject() sourcesService: SourcesService;
   @Inject() restreamService: RestreamService;
+  @Inject() facebookService: FacebookService;
 
   @Prop() disabled: boolean;
+
+  mounted() {
+    if (this.isFacebook || this.restreamService.shouldGoLiveWithRestream) {
+      this.facebookService.fetchActivePage();
+    }
+  }
 
   async toggleStreaming() {
     if (this.streamingService.isStreaming) {
@@ -46,8 +54,9 @@ export default class StartStreamingButton extends Vue {
 
       const needToShowNoSourcesWarning =
         this.streamSettingsService.settings.warnNoVideoSources &&
-        this.sourcesService.getSources().filter(source => source.type !== 'scene' && source.video)
-          .length === 0;
+        this.sourcesService.views
+          .getSources()
+          .filter(source => source.type !== 'scene' && source.video).length === 0;
 
       if (needToShowNoSourcesWarning) {
         const goLive = await electron.remote.dialog
@@ -71,6 +80,9 @@ export default class StartStreamingButton extends Vue {
       }
 
       if (this.shouldShowGoLiveWindow()) {
+        if (this.hasPages) {
+          return this.streamingService.openShareStream();
+        }
         if (this.restreamService.shouldGoLiveWithRestream) {
           this.streamingService.showEditStreamInfo(this.restreamService.platforms, 0);
         } else {
@@ -85,12 +97,20 @@ export default class StartStreamingButton extends Vue {
     }
   }
 
+  get hasPages() {
+    return (
+      (this.isFacebook || this.restreamService.shouldGoLiveWithRestream) &&
+      this.facebookService.state.facebookPages &&
+      this.facebookService.state.facebookPages.pages.length
+    );
+  }
+
   get streamingStatus() {
     return this.streamingService.state.streamingStatus;
   }
 
   shouldShowGoLiveWindow() {
-    if (!this.userService.isLoggedIn()) return false;
+    if (!this.userService.isLoggedIn) return false;
 
     if (this.isTwitch) {
       // For Twitch, we can show the Go Live window even with protected mode off
@@ -161,19 +181,19 @@ export default class StartStreamingButton extends Vue {
   }
 
   get isFacebook() {
-    return this.userService.isLoggedIn() && this.userService.platformType === 'facebook';
+    return this.userService.isLoggedIn && this.userService.platformType === 'facebook';
   }
 
   get isYoutube() {
-    return this.userService.isLoggedIn() && this.userService.platformType === 'youtube';
+    return this.userService.isLoggedIn && this.userService.platformType === 'youtube';
   }
 
   get isTwitch() {
-    return this.userService.isLoggedIn() && this.userService.platformType === 'twitch';
+    return this.userService.isLoggedIn && this.userService.platformType === 'twitch';
   }
 
   get isMixer() {
-    return this.userService.isLoggedIn() && this.userService.platformType === 'mixer';
+    return this.userService.isLoggedIn && this.userService.platformType === 'mixer';
   }
 
   get isDisabled() {

@@ -5,7 +5,7 @@ import { $t } from 'services/i18n';
 import cx from 'classnames';
 import styles from './AdvancedStatistics.m.less';
 import ModalLayout from 'components/ModalLayout.vue';
-import PerformanceMetrics from './../PerformanceMetrics.vue';
+import PerformanceMetrics from '../PerformanceMetrics.vue';
 import { StreamingService, EStreamingState } from 'services/streaming';
 import GlobalSyncStatus from 'components/GlobalSyncStatus.vue';
 import moment from 'moment';
@@ -33,7 +33,7 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
       this.onNotificationHandler(notify);
     });
 
-    this.notifications = this.notificationsService
+    this.notifications = this.notificationsService.views
       .getAll()
       .filter(notification => notification.subType !== ENotificationSubType.DEFAULT);
     // update the time labels

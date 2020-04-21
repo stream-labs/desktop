@@ -1,8 +1,8 @@
 import { useSpectron, test } from '../../helpers/spectron';
 import { getClient } from '../../helpers/api-client';
-import { ScenesService } from '../../../app/services/scenes';
 import { ISourcesServiceApi } from '../../../app/services/sources/sources-api';
 import { useScreentest } from '../screenshoter';
+import { ScenesService } from '../../../app/services/api/external-api/scenes';
 
 useSpectron({ restartAppAfterEachTest: false });
 useScreentest();

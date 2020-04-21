@@ -6,9 +6,9 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import compact from 'lodash/compact';
-import archiver from 'archiver';
-import AWS from 'aws-sdk';
 import { AppService } from 'services/app';
+import { Archiver } from 'archiver';
+import { importArchiver, importAwsSdk } from '../util/slow-imports';
 
 export class CacheUploaderService extends Service {
   @Inject() userService: UserService;
@@ -19,18 +19,22 @@ export class CacheUploaderService extends Service {
   }
 
   uploadCache(): Promise<string> {
-    return new Promise(resolve => {
+    return new Promise(async resolve => {
       const cacheDir = this.cacheDir;
       const dateStr = new Date().toISOString();
       const username = this.userService.username;
       const keyname = `${compact([dateStr, username]).join('-')}.zip`;
       const cacheFile = path.join(os.tmpdir(), 'slobs-cache.zip');
       const output = fs.createWriteStream(cacheFile);
+
+      // import of archiver takes to much time on startup so make a dynamic import
+      const archiver = (await importArchiver()).default;
       const archive = archiver('zip', { zlib: { level: 9 } });
 
-      output.on('close', () => {
+      output.on('close', async () => {
         const file = fs.createReadStream(cacheFile);
-
+        // import of aws-sdk takes ~400-500ms so make a dynamic import
+        const AWS = await importAwsSdk();
         AWS.config.region = 'us-west-2';
 
         // This is a restricted cache upload account
@@ -68,7 +72,7 @@ export class CacheUploaderService extends Service {
       this.addDirIfExists(archive, 'SceneConfigs');
       this.addDirIfExists(archive, 'SceneCollections');
       this.addDirIfExists(archive, 'Streamlabels');
-      this.addFileIfExists(archive, 'log.log');
+      this.addFileIfExists(archive, 'app.log');
       this.addFileIfExists(archive, 'crash-handler.log');
       this.addFileIfExists(archive, 'crash-handler.log.old');
       this.addFileIfExists(archive, 'game-overlays.log');
@@ -83,7 +87,7 @@ export class CacheUploaderService extends Service {
     });
   }
 
-  private addDirIfExists(archive: archiver.Archiver, name: string) {
+  private addDirIfExists(archive: Archiver, name: string) {
     const dirPath = path.join(this.cacheDir, name);
 
     if (fs.existsSync(dirPath)) {
@@ -91,7 +95,7 @@ export class CacheUploaderService extends Service {
     }
   }
 
-  private addFileIfExists(archive: archiver.Archiver, name: string) {
+  private addFileIfExists(archive: Archiver, name: string) {
     const dirPath = path.join(this.cacheDir, name);
 
     if (fs.existsSync(dirPath)) {

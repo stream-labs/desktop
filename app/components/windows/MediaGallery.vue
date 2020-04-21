@@ -164,7 +164,7 @@
   height: 6px;
   margin-bottom: 0;
   margin-top: 6px;
-  background-color: var(--slider-bg);
+  background-color: var(--border);
 }
 
 .progress-slider__fill {

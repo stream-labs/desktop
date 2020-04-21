@@ -27,7 +27,7 @@ export default class NameFolder extends Vue {
 
   mounted() {
     if (this.options.renameId) {
-      this.name = this.scenesService
+      this.name = this.scenesService.views
         .getScene(this.options.sceneId)
         .getFolder(this.options.renameId).name;
     } else {
@@ -47,7 +47,7 @@ export default class NameFolder extends Vue {
       );
       this.windowsService.closeChildWindow();
     } else {
-      const scene = this.scenesService.getScene(this.options.sceneId);
+      const scene = this.scenesService.views.getScene(this.options.sceneId);
 
       this.editorCommandsService.executeCommand(
         'CreateFolderCommand',

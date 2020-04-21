@@ -171,8 +171,10 @@ export default class SearchablePages extends TsxComponent<SearchablePagesProps> 
   }
 
   private getPageInputs(): HTMLDivElement[] {
-    return Array.from(this.$refs.pageSlot.querySelectorAll('[data-role="input"]')).filter(
-      ($el: HTMLDivElement) => $el.matches(':not([data-search-exclude])'),
+    return Array.from(
+      this.$refs.pageSlot.querySelectorAll('[data-role="input"]'),
+    ).filter(($el: HTMLDivElement) =>
+      $el.matches(':not([data-search-exclude])'),
     ) as HTMLDivElement[];
   }
 

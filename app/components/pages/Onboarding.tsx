@@ -4,6 +4,7 @@ import TsxComponent from 'components/tsx-component';
 import { OnboardingService } from 'services/onboarding';
 import { Inject } from 'services/core/injector';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
+import { SceneCollectionsService } from 'services/scene-collections';
 import {
   Connect,
   ObsImport,
@@ -24,6 +25,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
   @Inject() onboardingService: OnboardingService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
   @Inject() userService: UserService;
+  @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() restreamService: RestreamService;
 
   currentStep = 1;
@@ -34,7 +36,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
   stepsState = [{ complete: false }, { complete: false }, { complete: false }];
 
   checkFbPageEnabled() {
-    if (this.fbSetupEnabled !== null || !this.userService.isLoggedIn()) return;
+    if (this.fbSetupEnabled !== null || !this.userService.isLoggedIn) return;
     // This will do a second unnecessary fetch, but it's the only
     // way to be sure we have fetched features
     this.incrementalRolloutService.fetchAvailableFeatures().then(() => {
@@ -55,7 +57,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
 
   proceed() {
     if (this.processing) return;
-    if (this.currentStep === this.stepsState.length) return this.complete();
+    if (this.currentStep >= this.stepsState.length) return this.complete();
 
     this.stepsState[this.currentStep - 1].complete = true;
     this.currentStep = this.currentStep + 1;
@@ -78,7 +80,9 @@ export default class OnboardingPage extends TsxComponent<{}> {
       this.importedFromObs = true;
     } else if (importedObs === false) {
       this.importedFromObs = false;
-      this.stepsState.push({ complete: false });
+      if (this.noExistingSceneCollections) {
+        this.stepsState.push({ complete: false });
+      }
       if (
         this.onboardingService.isTwitchAuthed ||
         (this.onboardingService.isFacebookAuthed && this.fbSetupEnabled)
@@ -101,29 +105,38 @@ export default class OnboardingPage extends TsxComponent<{}> {
       />,
     ];
 
+    return this.addOptionalSteps(steps);
+  }
+
+  addOptionalSteps(steps: JSX.Element[]) {
     if (this.importedFromObs) {
       steps.push(<StreamlabsFeatures slot="3" />);
       return steps;
     }
     steps.push(<HardwareSetup slot="3" />);
-    steps.push(
-      <ThemeSelector
-        slot="4"
-        continue={this.continue.bind(this)}
-        setProcessing={this.setProcessing.bind(this)}
-      />,
-    );
-    if (this.onboardingService.isTwitchAuthed) {
+    let nextStep = '4';
+    if (this.noExistingSceneCollections) {
       steps.push(
-        <Optimize
-          slot="5"
+        <ThemeSelector
+          slot={nextStep}
           continue={this.continue.bind(this)}
           setProcessing={this.setProcessing.bind(this)}
         />,
       );
-      steps.push(<Multistream slot="6" continue={() => this.continue()} />);
+      nextStep = '5';
+    }
+    if (this.onboardingService.isTwitchAuthed) {
+      steps.push(
+        <Optimize
+          slot={nextStep}
+          continue={this.continue.bind(this)}
+          setProcessing={this.setProcessing.bind(this)}
+        />,
+      );
+      nextStep = `${Number(nextStep) + 1}`;
+      steps.push(<Multistream slot={nextStep} continue={() => this.continue()} />);
     } else if (this.onboardingService.isFacebookAuthed && this.fbSetupEnabled) {
-      steps.push(<FacebookPageCreation slot="5" continue={this.continue.bind(this)} />);
+      steps.push(<FacebookPageCreation slot={nextStep} continue={this.continue.bind(this)} />);
     }
     return steps;
   }
@@ -161,6 +174,13 @@ export default class OnboardingPage extends TsxComponent<{}> {
           </button>
         </div>
       </div>
+    );
+  }
+
+  get noExistingSceneCollections() {
+    return (
+      this.sceneCollectionsService.loadableCollections.length === 1 &&
+      this.sceneCollectionsService.loadableCollections[0].auto
     );
   }
 

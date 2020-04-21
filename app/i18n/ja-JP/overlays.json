@@ -1,8 +1,8 @@
 {
-  "Successfully saved %{filename}": "%{filename} を保存しました",
-  "Successfully loaded %{filename}.overlay": "%{filename}.overlay を読み込みました",
-  "This is an experimental feature.  Use at your own risk.": "試験的な機能です。自己責任で使用して下さい。",
-  "Export Overlay File": "オーバーレイをエクスポートします",
-  "Import Overlay File": "オーバーレイをインポートします",
-  "Import Widget File in Current Scene": "現在のシーンにウィジェットをインポートします"
+  "Successfully saved %{filename}": "%{filename} が正常に保存されました",
+  "Successfully loaded %{filename}.overlay": "%{filename}.オーバーレイが正常に読み込まれました",
+  "This is an experimental feature.  Use at your own risk.": "これは実験的な機能です。自己責任で使用してください。",
+  "Export Overlay File": "オーバーレイ ファイルをエクスポート",
+  "Import Overlay File": "オーバーレイ ファイルをインポート",
+  "Import Widget File in Current Scene": "現在のシーンのウィジェットファイルをインポート"
 }

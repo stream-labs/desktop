@@ -103,7 +103,7 @@ export default class CodeEditor extends Vue {
 
   restoreDefaults() {
     const type = this.metadata.type;
-    if (!!this.value.custom_defaults) {
+    if (this.value.custom_defaults) {
       this.editorInputValue = this.value.custom_defaults[type];
     } else {
       this.onFailHandler($t('This widget does not have defaults.'));

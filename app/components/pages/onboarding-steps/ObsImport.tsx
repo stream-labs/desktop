@@ -7,7 +7,7 @@ import { ObsImporterService } from 'services/obs-importer';
 import defer from 'lodash/defer';
 import { $t } from 'services/i18n';
 import styles from './ObsImport.m.less';
-import KevinSvg from './KevinSvg';
+import KevinSvg from 'components/shared/KevinSvg';
 import ObsSvg from './ObsSvg';
 
 class ObsImportProps {

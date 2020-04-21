@@ -14,8 +14,8 @@
         v-model="wData.settings[event.key]"
       />
     </v-form-group>
-    <v-form-group v-if="isMixer" :title="$('Min. Sparks')" type="number" v-model="wData.settings.mixer_account.sparks_min" />
-    <v-form-group v-if="isMixer" :title="$('Min. Embers')" type="number" v-model="wData.settings.mixer_account.embers_min" />
+    <v-form-group v-if="isMixer" :title="$t('Min. Sparks')" type="number" v-model="wData.settings.mixer_account.sparks_min" />
+    <v-form-group v-if="isMixer" :title="$t('Min. Embers')" type="number" v-model="wData.settings.mixer_account.embers_min" />
     <v-form-group v-if="isTwitch" :title="$t('Min. Bits')" type="number" v-model="wData.settings.bits_minimum" :metadata="{ tooltip: minBitsTooltip }" />
     <v-form-group :title="$t('Max Events')" type="slider" v-model="wData.settings.max_events" :metadata="{ max: 10, interval: 1 }" />
   </validated-form>

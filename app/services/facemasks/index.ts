@@ -24,6 +24,7 @@ import * as Interfaces from './definitions';
 import { AppService } from 'services/app';
 import { propsToSettings } from 'util/obs';
 import { InitAfter } from '../core';
+import Utils from 'services/utils';
 
 @InitAfter('UserService')
 export class FacemasksService extends PersistentStatefulService<Interfaces.IFacemasksServiceState> {
@@ -75,7 +76,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
       this.startup();
     });
     this.streamingService.streamingStatusChange.subscribe(status => {
-      if (status === 'starting' && this.userService.isLoggedIn()) this.startup();
+      if (status === 'starting' && this.userService.isLoggedIn) this.startup();
     });
   }
 
@@ -101,7 +102,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   notifyFailure() {
     this.SET_ACTIVE(false);
     electron.remote.dialog
-      .showMessageBox(electron.remote.getCurrentWindow(), {
+      .showMessageBox(Utils.getMainWindow(), {
         type: 'warning',
         message: $t('We encountered an issue setting up your Face Mask Library'),
         detail: $t('Click Retry to try again'),
@@ -115,7 +116,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   }
 
   notifyPluginMissing() {
-    const ok = electron.remote.dialog.showMessageBox(electron.remote.getCurrentWindow(), {
+    const ok = electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
       type: 'warning',
       message: $t('Unable to find face mask plugin. You will not be able to use Face Masks'),
       buttons: ['OK'],
@@ -268,9 +269,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
     const availableDevices = this.getInputDevicesList();
     const enabledDeviceId = this.state.settings.device ? this.state.settings.device.value : null;
     const availableDeviceSelected = enabledDeviceId
-      ? availableDevices.some(device => {
-          return enabledDeviceId === (device.value as string);
-        })
+      ? availableDevices.some(device => enabledDeviceId === (device.value as string))
       : false;
 
     return this.state.settings.enabled && availableDeviceSelected;
@@ -370,16 +369,12 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
       body: JSON.stringify(settings),
       headers: new Headers({ 'Content-Type': 'application/json' }),
     };
-    try {
-      await this.formRequest(endpoint, postData);
-      this.startup();
-    } catch (e) {
-      throw e;
-    }
+    await this.formRequest(endpoint, postData);
+    this.startup();
   }
 
   setupFilter() {
-    const sources = this.sourcesService.getSources();
+    const sources = this.sourcesService.views.getSources();
 
     const dshowInputs = sources.filter(source => {
       return source.type === 'dshow_input';

@@ -108,11 +108,11 @@ export default class LiveDock extends Vue {
 
   setCollapsed(livedockCollapsed: boolean) {
     this.canAnimate = true;
-    this.windowsService.updateStyleBlockers('main', true);
+    this.windowsService.actions.updateStyleBlockers('main', true);
     this.customizationService.setSettings({ livedockCollapsed });
     setTimeout(() => {
       this.canAnimate = false;
-      this.windowsService.updateStyleBlockers('main', false);
+      this.windowsService.actions.updateStyleBlockers('main', false);
     }, 300);
   }
 
@@ -142,7 +142,11 @@ export default class LiveDock extends Vue {
   }
 
   showEditStreamInfo() {
-    this.streamingService.showEditStreamInfo();
+    if (!this.isStreaming && this.restreamService.shouldGoLiveWithRestream) {
+      this.streamingService.showEditStreamInfo(this.restreamService.platforms, 0);
+    } else {
+      this.streamingService.showEditStreamInfo();
+    }
   }
 
   openYoutubeStreamUrl() {
@@ -201,6 +205,10 @@ export default class LiveDock extends Vue {
     return this.windowsService.state.main.hideStyleBlockers;
   }
 
+  get chatHidden() {
+    return this.windowsService.state.main.hideChat;
+  }
+
   get hasChatTabs() {
     return this.chatTabs.length > 1;
   }
@@ -252,7 +260,7 @@ export default class LiveDock extends Vue {
     if (this.showDefaultPlatformChat) return false;
     if (this.selectedChat === 'restream') return false;
 
-    const chatPage = this.platformAppsService
+    const chatPage = this.platformAppsService.views
       .getApp(this.selectedChat)
       .manifest.pages.find(page => page.slot === EAppPageSlot.Chat);
     if (!chatPage) return false;

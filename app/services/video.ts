@@ -62,7 +62,7 @@ export class Display {
 
     const electronWindow = remote.BrowserWindow.fromId(this.electronWindowId);
 
-    this.videoService.createOBSDisplay(
+    this.videoService.actions.createOBSDisplay(
       this.electronWindowId,
       name,
       this.renderingMode,
@@ -83,18 +83,18 @@ export class Display {
     });
 
     if (options.paddingColor) {
-      this.videoService.setOBSDisplayPaddingColor(
+      this.videoService.actions.setOBSDisplayPaddingColor(
         name,
         options.paddingColor.r,
         options.paddingColor.g,
         options.paddingColor.b,
       );
     } else {
-      this.videoService.setOBSDisplayPaddingColor(name, 11, 22, 28);
+      this.videoService.actions.setOBSDisplayPaddingColor(name, 11, 22, 28);
     }
 
     if (options.paddingSize != null) {
-      this.videoService.setOBSDisplayPaddingSize(name, options.paddingSize);
+      this.videoService.actions.setOBSDisplayPaddingSize(name, options.paddingSize);
     }
 
     this.outputRegionCallbacks = [];
@@ -143,13 +143,13 @@ export class Display {
   move(x: number, y: number) {
     this.currentPosition.x = x;
     this.currentPosition.y = y;
-    this.videoService.moveOBSDisplay(this.name, x, y);
+    this.videoService.actions.moveOBSDisplay(this.name, x, y);
   }
 
   resize(width: number, height: number) {
     this.currentPosition.width = width;
     this.currentPosition.height = height;
-    this.videoService.resizeOBSDisplay(this.name, width, height);
+    this.videoService.actions.resizeOBSDisplay(this.name, width, height);
     if (this.outputRegionCallbacks.length) this.refreshOutputRegion();
   }
 
@@ -158,7 +158,7 @@ export class Display {
     if (this.trackingInterval) clearInterval(this.trackingInterval);
     if (this.selectionSubscription) this.selectionSubscription.unsubscribe();
     if (!this.displayDestroyed) {
-      this.videoService.destroyOBSDisplay(this.name);
+      this.videoService.actions.destroyOBSDisplay(this.name);
       this.displayDestroyed = true;
     }
   }
@@ -173,9 +173,13 @@ export class Display {
     this.outputRegionCallbacks.push(cb);
   }
 
-  refreshOutputRegion() {
-    const position = this.videoService.getOBSDisplayPreviewOffset(this.name);
-    const size = this.videoService.getOBSDisplayPreviewSize(this.name);
+  async refreshOutputRegion() {
+    const position = await this.videoService.actions.return.getOBSDisplayPreviewOffset(this.name);
+
+    // This can happen while we were async fetching the offset
+    if (this.displayDestroyed) return;
+
+    const size = await this.videoService.actions.return.getOBSDisplayPreviewSize(this.name);
 
     this.outputRegion = {
       ...position,
@@ -191,13 +195,13 @@ export class Display {
 
   setShoulddrawUI(drawUI: boolean) {
     this.drawingUI = drawUI;
-    this.videoService.setOBSDisplayShouldDrawUI(this.name, drawUI);
+    this.videoService.actions.setOBSDisplayShouldDrawUI(this.name, drawUI);
   }
 
   switchGridlines(enabled: boolean) {
     // This function does nothing if we aren't drawing the UI
     if (!this.drawingUI) return;
-    this.videoService.setOBSDisplayDrawGuideLines(this.name, enabled);
+    this.videoService.actions.setOBSDisplayDrawGuideLines(this.name, enabled);
   }
 }
 
@@ -206,19 +210,6 @@ export class VideoService extends Service {
 
   init() {
     this.settingsService.loadSettingsIntoStore();
-  }
-
-  // Generates a random string:
-  // https://gist.github.com/6174/6062387
-  getRandomDisplayId() {
-    return (
-      Math.random()
-        .toString(36)
-        .substring(2, 15) +
-      Math.random()
-        .toString(36)
-        .substring(2, 15)
-    );
   }
 
   getScreenRectangle() {

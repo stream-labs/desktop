@@ -1,71 +1,85 @@
 <template>
-<div
-  class="live-dock"
-  :class="{ collapsed, 'can-animate': canAnimate, 'live-dock--left': onLeft }"
-  :style="{ width: (liveDockSize) + 'px' }">
   <div
-    class="live-dock-chevron"
-    @click="collapsed ? setCollapsed(false) : setCollapsed(true)">
-    <i :class="{
-      'icon-back': (!onLeft && collapsed) || (onLeft && !collapsed),
-      'icon-down icon-right': (onLeft && collapsed) || (!onLeft && !collapsed)
-    }" />
-  </div>
+    class="live-dock"
+    :class="{ collapsed, 'can-animate': canAnimate, 'live-dock--left': onLeft }"
+    :style="{ width: liveDockSize + 'px' }"
+  >
+    <div class="live-dock-chevron" @click="collapsed ? setCollapsed(false) : setCollapsed(true)">
+      <i
+        :class="{
+          'icon-back': (!onLeft && collapsed) || (onLeft && !collapsed),
+          'icon-down icon-right': (onLeft && collapsed) || (!onLeft && !collapsed),
+        }"
+      />
+    </div>
 
-  <transition name="slide-fade">
-    <div
-      v-if="!collapsed"
-      class="live-dock-expanded-contents">
-      <div class="live-dock-header">
-        <div class="flex flex--center">
-          <div :class="{ 'live-dock-pulse': true, 'live-dock-offline': !isStreaming  }" />
-          <span class="live-dock-text">
-            {{ liveText }}
-          </span>
-          <span class="live-dock-timer">
-            {{ elapsedStreamTime }}
-          </span>
+    <transition name="slide-fade">
+      <div v-if="!collapsed" class="live-dock-expanded-contents">
+        <div class="live-dock-header">
+          <div class="flex flex--center">
+            <div :class="{ 'live-dock-pulse': true, 'live-dock-offline': !isStreaming }" />
+            <span class="live-dock-text">
+              {{ liveText }}
+            </span>
+            <span class="live-dock-timer">
+              {{ elapsedStreamTime }}
+            </span>
+          </div>
+          <div class="live-dock-viewer-count">
+            <i
+              :class="{
+                'icon-view': !hideViewerCount,
+                'icon-hide': hideViewerCount,
+              }"
+              @click="toggleViewerCount"
+            />
+            <span class="live-dock-viewer-count__count">{{ viewerCount }}</span
+            ><span v-if="viewerCount >= 0">{{ $t('viewers') }}</span>
+          </div>
         </div>
-        <div class="live-dock-viewer-count">
-          <i
-            :class="{
-              'icon-view': !hideViewerCount,
-              'icon-hide': hideViewerCount
-            }"
-            @click="toggleViewerCount"/>
-          <span class="live-dock-viewer-count__count">{{ viewerCount }}</span><span v-if="viewerCount >= 0">{{ $t('viewers')}}</span>
-        </div>
-      </div>
 
-      <div class="live-dock-info">
-        <div class="live-dock-platform-tools">
-          <a
-            @click="showEditStreamInfo"
-            v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook"
-            v-tooltip.right="editStreamInfoTooltip">
-            <i class="icon-edit" />
-          </a>
-          <a
-            @click="openYoutubeStreamUrl"
-            v-if="isYoutube && isStreaming"
-            v-tooltip="viewStreamTooltip">
-            <i class="icon-studio" />
-          </a>
-          <a
-            @click="openYoutubeControlRoom"
-            v-if="isYoutube && isStreaming"
-            v-tooltip.top="controlRoomTooltip">
-            <i class="icon-settings" />
-          </a>
+        <div class="live-dock-info">
+          <div class="live-dock-platform-tools">
+            <a
+              @click="showEditStreamInfo"
+              v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook"
+              v-tooltip.right="editStreamInfoTooltip"
+            >
+              <i class="icon-edit" />
+            </a>
+            <a
+              @click="openYoutubeStreamUrl"
+              v-if="isYoutube && isStreaming"
+              v-tooltip="viewStreamTooltip"
+            >
+              <i class="icon-studio" />
+            </a>
+            <a
+              @click="openYoutubeControlRoom"
+              v-if="isYoutube && isStreaming"
+              v-tooltip.top="controlRoomTooltip"
+            >
+              <i class="icon-settings" />
+            </a>
+          </div>
+          <div class="flex">
+            <a
+              @click="refreshChat"
+              v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook"
+            >
+              {{ $t('Refresh Chat') }}
+            </a>
+          </div>
         </div>
-        <div class="flex">
-          <a @click="refreshChat" v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook">
-            {{ $t('Refresh Chat') }}
-          </a>
-        </div>
-      </div>
 
-      <div class="live-dock-chat" v-if="!hideStyleBlockers && (isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook)">
+        <div
+          class="live-dock-chat"
+          v-if="
+            !hideStyleBlockers &&
+              !chatHidden &&
+              (isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook)
+          "
+        >
           <div v-if="hasChatTabs" class="flex">
             <tabs :tabs="chatTabs" v-model="selectedChat" :hideContent="true" />
             <i
@@ -75,26 +89,24 @@
               @click="popOut"
             />
           </div>
-        <!-- v-if is required because left-side chat will not properly load on application startup -->
-        <chat v-if="!applicationLoading && selectedChat === 'default'" />
-        <chat
-          v-if="selectedChat === 'restream'"
-          :restream="true"/>
-        <PlatformAppPageView
-          v-if="selectedChat !== 'default' && selectedChat !== 'restream'"
-          class="live-dock-platform-app-webview"
-          :appId="selectedChat"
-          :pageSlot="slot"
-          :key="selectedChat"
-        />
+          <!-- v-if is required because left-side chat will not properly load on application startup -->
+          <chat v-if="!applicationLoading && selectedChat === 'default'" />
+          <chat v-if="selectedChat === 'restream'" :restream="true" />
+          <PlatformAppPageView
+            v-if="selectedChat !== 'default' && selectedChat !== 'restream'"
+            class="live-dock-platform-app-webview"
+            :appId="selectedChat"
+            :pageSlot="slot"
+            :key="selectedChat"
+          />
+        </div>
+        <div class="flex flex--center flex--column live-dock-chat--offline" v-else>
+          <img class="live-dock-chat__img--offline" :src="offlineImageSrc" />
+          <span v-if="!hideStyleBlockers">{{ $t('Your chat is currently offline') }}</span>
+        </div>
       </div>
-      <div class="flex flex--center flex--column live-dock-chat--offline" v-else >
-        <img class="live-dock-chat__img--offline" :src="offlineImageSrc">
-        <span v-if="!hideStyleBlockers">{{ $t('Your chat is currently offline') }}</span>
-      </div>
-    </div>
-  </transition>
-</div>
+    </transition>
+  </div>
 </template>
 
 <script lang="ts" src="./LiveDock.vue.ts"></script>

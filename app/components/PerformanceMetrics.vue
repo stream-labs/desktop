@@ -82,7 +82,7 @@
 }
 
 .performance-metric-wrapper.active {
-  background: var(--input-border);
+  background: var(--button);
 }
 
 .performance-metric-wrapper.clickable {

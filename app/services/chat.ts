@@ -1,15 +1,14 @@
 import { Service } from 'services/core/service';
 import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
-import { getPlatformService } from 'services/platforms';
 import { CustomizationService, ICustomizationSettings } from 'services/customization';
-import electron from 'electron';
-import { YoutubeService } from 'services/platforms/youtube';
+import electron, { ipcRenderer } from 'electron';
 import url from 'url';
 import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
 import { StreamInfoService } from './stream-info';
 import { InitAfter } from './core';
+import Utils from './utils';
 
 @InitAfter('StreamInfoService')
 export class ChatService extends Service {
@@ -60,8 +59,7 @@ export class ChatService extends Service {
 
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
 
-    // This method was added in our fork
-    (win as any).addBrowserView(this.chatView);
+    win.addBrowserView(this.chatView);
   }
 
   setChatBounds(position: IVec2, size: IVec2) {
@@ -81,11 +79,10 @@ export class ChatService extends Service {
 
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
 
-    // @ts-ignore: this method was added in our fork
     win.removeBrowserView(this.chatView);
   }
 
-  private initChat() {
+  private async initChat() {
     if (this.chatView) return;
 
     const partition = this.userService.state.auth.partition;
@@ -97,7 +94,10 @@ export class ChatService extends Service {
       },
     });
 
-    this.navigateToChat();
+    const win = this.windowsService.getWindowIdFromElectronId(this.electronWindowId);
+    if (win) this.windowsService.updateHideChat(win, true);
+    await this.navigateToChat();
+    if (win) this.windowsService.updateHideChat(win, false);
     this.bindWindowListener();
     this.bindDomReadyListener();
 
@@ -113,22 +113,8 @@ export class ChatService extends Service {
   }
 
   private async navigateToChat() {
-    const service = getPlatformService(this.userService.platform.type);
-
-    // Youtube requires some special redirecting
-    if (service instanceof YoutubeService) {
-      this.chatView.webContents
-        .loadURL('https://youtube.com/signin')
-        .catch(this.handleRedirectError);
-
-      this.chatView.webContents.once('did-navigate', () => {
-        if (!this.chatUrl) return; // user has logged out
-        this.chatView.webContents.loadURL(this.chatUrl).catch(this.handleRedirectError);
-      });
-    } else {
-      if (!this.chatUrl) return; // user has logged out
-      this.chatView.webContents.loadURL(this.chatUrl).catch(this.handleRedirectError);
-    }
+    if (!this.chatUrl) return; // user has logged out
+    await this.chatView.webContents.loadURL(this.chatUrl).catch(this.handleRedirectError);
 
     // mount chat if electronWindowId is set and it has not been mounted yet
     if (this.electronWindowId) this.mountChat(this.electronWindowId);
@@ -143,6 +129,31 @@ export class ChatService extends Service {
 
   private bindWindowListener() {
     electron.ipcRenderer.send('webContents-preventPopup', this.chatView.webContents.id);
+
+    if (this.userService.platformType === 'youtube') {
+      // Preventing navigation has to be done in the main process
+      ipcRenderer.send('webContents-bindYTChat', this.chatView.webContents.id);
+
+      this.chatView.webContents.on('will-navigate', (e, targetUrl) => {
+        const parsed = url.parse(targetUrl);
+
+        if (parsed.hostname === 'accounts.google.com') {
+          electron.remote.dialog
+            .showMessageBox(Utils.getMainWindow(), {
+              title: $t('YouTube Chat'),
+              message: $t(
+                'This action cannot be performed inside Streamlabs OBS. To interact with chat, you can open this chat in a web browser.',
+              ),
+              buttons: [$t('OK'), $t('Open In Web Browser')],
+            })
+            .then(({ response }) => {
+              if (response === 1) {
+                electron.remote.shell.openExternal(this.chatUrl);
+              }
+            });
+        }
+      });
+    }
 
     this.chatView.webContents.on('new-window', (evt, targetUrl) => {
       const parsedUrl = url.parse(targetUrl);
@@ -182,6 +193,7 @@ export class ChatService extends Service {
 
       if (settings.enableBTTVEmotes && this.userService.platform.type === 'twitch') {
         this.chatView.webContents.executeJavaScript(
+          /*eslint-disable */
           `
           localStorage.setItem('bttv_clickTwitchEmotes', true);
           localStorage.setItem('bttv_darkenedMode', ${
@@ -204,7 +216,7 @@ export class ChatService extends Service {
           }
 
           loadLazyEmotes();
-        `,
+        ` /*eslint-enable */,
           true,
         );
       }
@@ -224,7 +236,6 @@ export class ChatService extends Service {
 
   private handleSettingsChanged(changed: Partial<ICustomizationSettings>) {
     if (!this.chatView) return;
-
     if (changed.chatZoomFactor) {
       this.chatView.webContents.setZoomFactor(changed.chatZoomFactor);
     }

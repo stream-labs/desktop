@@ -1,8 +1,8 @@
 {
-  "Successfully saved %{filename}": "%{filename} gemt korrekt",
-  "Successfully loaded %{filename}.overlay": "%{filename}.overlay blev indlæst korrekt",
-  "This is an experimental feature.  Use at your own risk.": "Dette er en eksperimentel funktion. Brug på egen risiko.",
-  "Export Overlay File": "Exporter overlay fil",
-  "Import Overlay File": "Importer overlay fil",
-  "Import Widget File in Current Scene": "Importer widget i nuværende scene"
+  "Successfully saved %{filename}": "%{filename} gemt",
+  "Successfully loaded %{filename}.overlay": "%{filename}.overlay er blevet indlæst",
+  "This is an experimental feature.  Use at your own risk.": "Dette er en testfunktion. Brug på egen risiko.",
+  "Export Overlay File": "Eksportér overlay-fil",
+  "Import Overlay File": "Importér overlay-fil",
+  "Import Widget File in Current Scene": "Importér widget i nuværende scene"
 }

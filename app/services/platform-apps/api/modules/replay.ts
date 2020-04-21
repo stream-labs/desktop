@@ -3,7 +3,7 @@ import { StreamingService, EReplayBufferState } from 'services/streaming';
 import { SettingsService } from 'services/settings';
 import { Inject } from 'services/core/injector';
 import { Subject } from 'rxjs';
-import { FileReturnWrapper } from 'services/guest-api';
+import { FileReturnWrapper } from 'util/guest-api-handler';
 import uuid from 'uuid/v4';
 
 interface IReplayBufferState {

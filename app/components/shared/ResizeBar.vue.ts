@@ -31,6 +31,8 @@ export default class ResizeBar extends TsxComponent<ResizeBarProps> {
   }
 
   onMouseDownHandler(event: MouseEvent) {
+    // Handle cases where the window size is too small to allow resizing
+    if (this.props.max <= this.props.min) return;
     this.startMouseTracking(event);
   }
 
