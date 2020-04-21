@@ -7,6 +7,7 @@ import { SliderInput } from 'components/shared/inputs/inputs';
 import MixerVolmeter from './MixerVolmeter.vue';
 import { Inject } from '../services/core/injector';
 import { EditorCommandsService } from 'services/editor-commands';
+import { SourcesService } from 'services/sources';
 
 class MixerItemProps {
   audioSource: AudioSource = null;
@@ -19,6 +20,7 @@ class MixerItemProps {
 export default class MixerItem extends TsxComponent<MixerItemProps> {
   @Inject() private customizationService: CustomizationService;
   @Inject() private editorCommandsService: EditorCommandsService;
+  @Inject() private sourcesService: SourcesService;
 
   get performanceMode() {
     return this.customizationService.state.performanceMode;
@@ -32,6 +34,10 @@ export default class MixerItem extends TsxComponent<MixerItemProps> {
       displayValue: 'false',
       simpleTheme: true,
     };
+  }
+
+  get sourceName() {
+    return this.sourcesService.state.sources[this.props.audioSource.sourceId].name;
   }
 
   setMuted(muted: boolean) {

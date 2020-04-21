@@ -19,7 +19,8 @@ export class IpcServerService extends Service {
   listen() {
     this.requestHandler = (event: Electron.Event, request: IJsonRpcRequest) => {
       const response: IJsonRpcResponse<any> = this.exec(request);
-      ipcRenderer.send('services-response', response);
+
+      if (!request.params.noReturn) ipcRenderer.send('services-response', response);
     };
     ipcRenderer.on('services-request', this.requestHandler);
     ipcRenderer.send('services-ready');

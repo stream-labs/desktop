@@ -31,7 +31,6 @@ interface ISourceDefinition {
   type: TInspectableSource;
   name: string;
   description: string;
-  prefabId?: string; // if is defined than the source wil be created from the prefab
 }
 
 @Component({
@@ -106,7 +105,7 @@ export default class SourcesShowcase extends Vue {
   }
 
   get loggedIn() {
-    return this.userService.isLoggedIn();
+    return this.userService.isLoggedIn;
   }
 
   get platform() {
@@ -143,7 +142,7 @@ export default class SourcesShowcase extends Vue {
       .getAvailableSourcesTypesList()
       .filter(type => {
         if (type.value === 'text_ft2_source') return false;
-        return !(type.value === 'scene' && this.scenesService.scenes.length <= 1);
+        return !(type.value === 'scene' && this.scenesService.views.scenes.length <= 1);
       })
       .map(listItem => {
         return {
@@ -184,6 +183,6 @@ export default class SourcesShowcase extends Vue {
   }
 
   getAppAssetUrl(appId: string, asset: string) {
-    return this.platformAppsService.getAssetUrl(appId, asset);
+    return this.platformAppsService.views.getAssetUrl(appId, asset);
   }
 }

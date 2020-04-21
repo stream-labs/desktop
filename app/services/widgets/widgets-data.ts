@@ -455,7 +455,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     platforms: new Set(['facebook']),
   },
   [WidgetType.DonationTicker]: {
-    name: $t('Donation Ticker'),
+    name: $t('Tip Ticker'),
     description: $t('Show off your most recent donations to your viewers.'),
     demoVideo: true,
     demoFilename: 'source-donation-ticker.mp4',

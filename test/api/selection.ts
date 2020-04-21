@@ -1,16 +1,16 @@
 import { useSpectron, test, afterAppStart } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
-import { ScenesService } from 'services/scenes';
-import { SelectionService } from '../../app/services/selection';
+
 import { SceneBuilder } from '../helpers/scene-builder';
-import { Scene, SceneItemNode } from 'services/scenes';
 import { sleep } from '../helpers/sleep';
+import { SelectionService } from '../../app/services/api/external-api/selection';
+import { Scene, SceneNode, ScenesService } from '../../app/services/api/external-api/scenes';
 
 useSpectron({ restartAppAfterEachTest: false });
 
 let sceneBuilder: SceneBuilder;
 let scene: Scene;
-let getNode: (name: string) => SceneItemNode;
+let getNode: (name: string) => SceneNode;
 let getNodeId: (name: string) => string;
 let selectionService: SelectionService;
 
@@ -33,19 +33,19 @@ test('Selection', async t => {
   const color2 = scene.createAndAddSource('Color2', 'color_source');
   const color3 = scene.createAndAddSource('Color3', 'color_source');
 
-  selection.select(color2.sceneItemId);
+  selection.select([color2.id]);
 
   t.true(!selection.isSelected(color1.sceneItemId));
   t.true(selection.isSelected(color2.sceneItemId));
   t.true(!selection.isSelected(color3.sceneItemId));
 
-  selection.add(color3.sceneItemId);
+  selection.add([color3.id]);
 
   t.true(!selection.isSelected(color1.sceneItemId));
   t.true(selection.isSelected(color2.sceneItemId));
   t.true(selection.isSelected(color3.sceneItemId));
 
-  selection.deselect(color3.sceneItemId);
+  selection.deselect([color3.id]);
 
   t.true(!selection.isSelected(color1.sceneItemId));
   t.true(selection.isSelected(color2.sceneItemId));
@@ -152,7 +152,7 @@ test('Place after folder with deep nesting', async t => {
     Item4:
   `);
 
-  selectionService.select(getNodeId('Folder1'));
+  selectionService.select([getNodeId('Folder1')]);
   selectionService.placeAfter(getNodeId('Item4'));
 
   t.true(
@@ -212,9 +212,7 @@ test('Set parent', async t => {
   );
 });
 
-
 test('Scale', async t => {
-
   // create and select 2 400x400 color sources
   sceneBuilder.build(`
       Item1: color_source
@@ -229,60 +227,59 @@ test('Scale', async t => {
   const item2 = scene.getItem(getNodeId('Item2'));
 
   // set the item2 position into the bottom right corner of item 2
-  item2.setTransform({ position: { x: 400, y: 400 }});
+  item2.setTransform({ position: { x: 400, y: 400 } });
 
   // reduce the size of item2 by 2x
-  item2.setScale({ x: 0.5, y: 0.5 }, { x: 0, y: 0});
+  item2.setScale({ x: 0.5, y: 0.5 }, { x: 0, y: 0 });
 
   // check what everything is going well at this point
   t.deepEqual(item2.getModel().transform.position, {
     x: 400,
-    y: 400
+    y: 400,
   });
   t.deepEqual(item2.getModel().transform.scale, {
     x: 0.5,
-    y: 0.5
+    y: 0.5,
   });
 
   // reduce the size of selected items by 2x, use the NorthWest anchor
-  selectionService.scale({x: 0.5, y: 0.5}, { x: 0, y: 0});
+  selectionService.scale({ x: 0.5, y: 0.5 }, { x: 0, y: 0 });
   t.deepEqual(item1.getModel().transform.position, {
     x: 0,
-    y: 0
+    y: 0,
   });
   t.deepEqual(item1.getModel().transform.scale, {
     x: 0.5,
-    y: 0.5
+    y: 0.5,
   });
   t.deepEqual(item2.getModel().transform.position, {
     x: 200,
-    y: 200
+    y: 200,
   });
   t.deepEqual(item2.getModel().transform.scale, {
     x: 0.25,
-    y: 0.25
+    y: 0.25,
   });
 
   // reduce the size of selected items by 2x, use the East anchor
   // scale only X coordinate
-  selectionService.scale({x: 0.5, y: 1}, { x: 1, y: 0.5});
+  selectionService.scale({ x: 0.5, y: 1 }, { x: 1, y: 0.5 });
   t.deepEqual(item1.getModel().transform.position, {
     x: 150,
-    y: 0
+    y: 0,
   });
   t.deepEqual(item1.getModel().transform.scale, {
     x: 0.25,
-    y: 0.5
+    y: 0.5,
   });
   t.deepEqual(item2.getModel().transform.position, {
     x: 250,
-    y: 200
+    y: 200,
   });
   t.deepEqual(item2.getModel().transform.scale, {
     x: 0.125,
-    y: 0.25
+    y: 0.25,
   });
-
 });
 
 test('isSceneFolder', async t => {

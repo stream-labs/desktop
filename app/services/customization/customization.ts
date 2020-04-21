@@ -20,14 +20,26 @@ import { UserService } from 'services/user';
 
 // Maps to --background
 const THEME_BACKGROUNDS = {
-  'night-theme': { r: 9, g: 22, b: 29 },
+  'night-theme': { r: 23, g: 36, b: 45 },
+  'prime-dark': { r: 17, g: 17, b: 17 },
   'day-theme': { r: 245, g: 248, b: 250 },
+  'prime-light': { r: 243, g: 243, b: 243 },
 };
 
 // Maps to --section
-const DISPLAY_BACKGROUNDS = {
-  'night-theme': { r: 11, g: 22, b: 28 },
+const SECTION_BACKGROUNDS = {
+  'night-theme': { r: 11, g: 22, b: 29 },
+  'prime-dark': { r: 0, g: 0, b: 0 },
   'day-theme': { r: 227, g: 232, b: 235 },
+  'prime-light': { r: 255, g: 255, b: 255 },
+};
+
+// Doesn't map 1:1
+const DISPLAY_BACKGROUNDS = {
+  'night-theme': { r: 11, g: 22, b: 29 },
+  'prime-dark': { r: 37, g: 37, b: 37 },
+  'day-theme': { r: 227, g: 232, b: 235 },
+  'prime-light': { r: 255, g: 255, b: 255 },
 };
 
 /**
@@ -107,12 +119,16 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     return THEME_BACKGROUNDS[this.currentTheme];
   }
 
+  get sectionBackground() {
+    return SECTION_BACKGROUNDS[this.currentTheme];
+  }
+
   get displayBackground() {
     return DISPLAY_BACKGROUNDS[this.currentTheme];
   }
 
   get isDarkTheme() {
-    return ['night-theme'].includes(this.currentTheme);
+    return ['night-theme', 'prime-dark'].includes(this.currentTheme);
   }
 
   setUpdateStreamInfoOnLive(update: boolean) {
@@ -143,6 +159,21 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     this.setSettings({ pinnedStatistics: pinned });
   }
 
+  get themeOptions() {
+    const options = [
+      { value: 'night-theme', description: $t('Night') },
+      { value: 'day-theme', description: $t('Day') },
+    ];
+
+    if (this.userService.isPrime) {
+      options.push(
+        { value: 'prime-dark', description: $t('Obsidian Prime') },
+        { value: 'prime-light', description: $t('Alabaster Prime') },
+      );
+    }
+    return options;
+  }
+
   getSettingsFormData(): TObsFormData {
     const settings = this.getSettings();
 
@@ -152,10 +183,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
         name: 'theme',
         description: $t('Theme'),
         type: 'OBS_PROPERTY_LIST',
-        options: [
-          { value: 'night-theme', description: $t('Night') },
-          { value: 'day-theme', description: $t('Day') },
-        ],
+        options: this.themeOptions,
         visible: true,
         enabled: true,
       },
@@ -199,7 +227,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
       },
     ];
 
-    if (this.userService.isLoggedIn() && this.userService.platform.type === 'twitch') {
+    if (this.userService.isLoggedIn && this.userService.platform.type === 'twitch') {
       formData.push(<IObsInput<boolean>>{
         value: settings.enableBTTVEmotes,
         name: 'enableBTTVEmotes',

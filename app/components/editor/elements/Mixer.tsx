@@ -12,7 +12,7 @@ export default class Mixer extends BaseElement {
   @Inject() audioService: AudioService;
   @Inject() editorCommandsService: EditorCommandsService;
 
-  mins = { x: 230, y: 150 };
+  mins = { x: 150, y: 120 };
 
   advancedSettingsTooltip = $t('Open advanced audio settings');
   mixerTooltip = $t('Monitor audio levels. If the bars are moving you are outputting audio.');
@@ -31,7 +31,7 @@ export default class Mixer extends BaseElement {
   }
 
   get audioSources() {
-    return this.audioService.getSourcesForCurrentScene().filter(source => {
+    return this.audioService.views.sourcesForCurrentScene.filter(source => {
       return !source.mixerHidden;
     });
   }

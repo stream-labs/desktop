@@ -1,6 +1,6 @@
-import { Service } from 'services/core/service';
 import electron from 'electron';
 import { Subscription, Observable } from 'rxjs';
+import uuid from 'uuid/v4';
 
 /**
  * Shared message interchange format
@@ -58,40 +58,10 @@ export class FileReturnWrapper {
 /**
  * This class allows injection of functions into webviews.
  */
-export class GuestApiService extends Service {
-  handlers: Dictionary<Function> = {};
-
-  init() {
-    electron.ipcRenderer.on(
-      'guestApiRequest',
-      (event: Electron.Event, request: IGuestApiRequest) => {
-        const { webContentsId } = request;
-
-        if (this.handlers[webContentsId]) {
-          this.handlers[webContentsId](request);
-        } else {
-          console.error(
-            `Received guest API request from unregistered webContents ${webContentsId}`,
-          );
-        }
-      },
-    );
-  }
-
-  /**
-   * Exposes the passed functions to the webview.  You should be careful
-   * what functions you expose, as the caller is considered un-trusted.
-   * @param webContentsId the webContents id of the target webview
-   * @param requestHandler an object with the API you want to expose
-   */
-  exposeApi(webContentsId: number, requestHandler: IRequestHandler) {
-    const webContents = electron.remote.webContents.fromId(webContentsId);
-
-    // Do not expose an API twice for the same webview
-    if (this.handlers[webContentsId]) {
-      this.safeSend(webContents, 'guestApiReady');
-      return;
-    }
+export class GuestApiHandler {
+  exposeApi(targetWebContentsId: number, api: IRequestHandler) {
+    const ipcChannel = `guestApiRequest-${uuid()}`;
+    const webContents = electron.remote.webContents.fromId(targetWebContentsId);
 
     // Tracks rxjs subscriptions for this webview so they can be unsubscribed
     let subscriptions: Subscription[] = [];
@@ -99,17 +69,17 @@ export class GuestApiService extends Service {
     // To avoid leaks, automatically unregister this API when the webContents
     // is destroyed.
     webContents.on('destroyed', () => {
-      delete this.handlers[webContentsId];
-
       subscriptions.forEach(sub => {
         sub.unsubscribe();
       });
       subscriptions = [];
+
+      electron.ipcRenderer.removeAllListeners(ipcChannel);
     });
 
-    this.handlers[webContentsId] = (request: IGuestApiRequest) => {
+    const requestHandler = (request: IGuestApiRequest) => {
       const mappedArgs = this.getMappedArgs(request, webContents);
-      const endpoint = this.getEndpointFromPath(requestHandler, request.methodPath);
+      const endpoint = this.getEndpointFromPath(api, request.methodPath);
 
       if (!endpoint) {
         // The path requested does not exist
@@ -124,7 +94,14 @@ export class GuestApiService extends Service {
       }
     };
 
-    this.safeSend(webContents, 'guestApiReady');
+    electron.ipcRenderer.on(ipcChannel, (event: Electron.Event, request: IGuestApiRequest) => {
+      requestHandler(request);
+    });
+
+    this.safeSend(webContents, 'guestApiReady', {
+      webContentsId: electron.remote.getCurrentWebContents().id,
+      ipcChannel,
+    });
   }
 
   /**

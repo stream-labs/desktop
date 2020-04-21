@@ -7,6 +7,7 @@ import { FileManagerService } from 'services/file-manager';
 import { Inject } from 'services/core/injector';
 import { AppService } from 'services/app';
 import omit from 'lodash/omit';
+import { OS } from 'util/operating-systems';
 
 interface ISceneCollectionsManifest {
   activeId: string;
@@ -180,12 +181,13 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
   }
 
   @mutation()
-  ADD_COLLECTION(id: string, name: string, modified: string, auto = false) {
+  ADD_COLLECTION(id: string, name: string, modified: string, os: OS, auto = false) {
     this.state.collections.unshift({
       id,
       name,
       modified,
       auto,
+      operatingSystem: os,
       deleted: false,
       needsRename: false,
     });
@@ -194,6 +196,15 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
   @mutation()
   SET_NEEDS_RENAME(id: string) {
     this.state.collections.find(coll => coll.id === id).needsRename = true;
+  }
+
+  @mutation()
+  SET_OPERATING_SYSTEM(id: string, os: OS) {
+    Vue.set(
+      this.state.collections.find(coll => coll.id === id),
+      'operatingSystem',
+      os,
+    );
   }
 
   @mutation()

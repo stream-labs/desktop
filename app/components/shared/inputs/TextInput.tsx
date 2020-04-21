@@ -72,6 +72,8 @@ export default class TextInput extends BaseInput<string, ITextMetadata> {
           name={this.options.uuid}
           v-validate={this.validate}
           disabled={this.options.disabled}
+          onFocus={() => this.$emit('focus')}
+          onBlur={() => this.$emit('blur')}
         />
         {this.toggleVisibleButton}
         {this.$slots.default}

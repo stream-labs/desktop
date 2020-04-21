@@ -56,7 +56,7 @@ export class StreamInfoService extends StatefulService<TStreamInfoServiceState> 
 
     // update viewers count
     this.viewerCountInterval = window.setInterval(() => {
-      if (!this.userService.isLoggedIn()) return;
+      if (!this.userService.isLoggedIn) return;
 
       if (this.streamingService.isStreaming) {
         const platform = getPlatformService(this.userService.platform.type);
