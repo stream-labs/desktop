@@ -143,7 +143,7 @@
     "hard-source-webpack-plugin": "0.13.1",
     "humps": "2.0.1",
     "js-yaml": "3.13.1",
-    "less": "3.9.0",
+    "less": "3.11.1",
     "less-loader": "4.1.0",
     "lodash": "4.17.14",
     "lodash-decorators": "4.5.0",
