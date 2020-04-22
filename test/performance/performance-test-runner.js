@@ -3,7 +3,7 @@ const { checkoutBranch, getCommitSHA, getCommitInfo, exec } = require('../helper
 const fs = require('fs-extra');
 const { GithubClient } = require('../../scripts/github-client');
 const path = require('path');
-const { CI, SLOBS_TEST_USER_POOL_TOKEN } = process.env;
+const { CI, SLOBS_TEST_USER_POOL_TOKEN, BUILD_REASON } = process.env;
 const CONFIG = require('./config.json');
 const args = process.argv.slice(2);
 const rimraf = require('rimraf');
@@ -15,7 +15,7 @@ const { execSync } = require('child_process');
 const TESTS_SERVICE_URL = CI ? 'https://slobs-users-pool.herokuapp.com' : 'http://localhost:5000';
 
 (async function main() {
-  console.log('Start performance test on', getCommitSHA());
+  console.log('Start performance test on', getCommitSHA(), 'build reason is ', BUILD_REASON);
 
   // prepare dirs
   const resultsPath = path.resolve(CONFIG.dist, 'performance-results.json');
