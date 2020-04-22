@@ -4,7 +4,7 @@ import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { getComponents, IWindowOptions, WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
-import TitleBar from '../TitleBar.vue';
+import TitleBar from '../TitleBar';
 import { AppService } from 'services/app';
 import Utils from 'services/utils';
 

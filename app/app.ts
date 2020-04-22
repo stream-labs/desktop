@@ -1,3 +1,5 @@
+/*global SLOBS_BUNDLE_ID*/
+
 import { I18nService, $t } from 'services/i18n';
 
 // eslint-disable-next-line
@@ -37,10 +39,10 @@ import process from 'process';
 
 const crashHandler = window['require']('crash-handler');
 
-const { ipcRenderer, remote } = electron;
-const slobsVersion = remote.process.env.SLOBS_VERSION;
-const isProduction = process.env.NODE_ENV === 'production';
-const isPreview = !!remote.process.env.SLOBS_PREVIEW;
+const { ipcRenderer, remote, app, contentTracing } = electron;
+const slobsVersion = Utils.env.SLOBS_VERSION;
+const isProduction = Utils.env.NODE_ENV === 'production';
+const isPreview = !!Utils.env.SLOBS_PREVIEW;
 
 // TODO: Used by Eddy for debugging. Remove later.
 if (!isProduction) {
@@ -96,6 +98,10 @@ function sendLogMsg(level: string, ...args: any[]) {
 
 ['log', 'info', 'warn', 'error'].forEach(wrapLogFn);
 
+if (windowId === 'worker') {
+  console.log(`Bundle Id: ${SLOBS_BUNDLE_ID}`);
+}
+
 window.addEventListener('error', e => {
   sendLogMsg('error', e.error);
 });
@@ -112,7 +118,7 @@ if (
 
   Sentry.init({
     dsn: sentryDsn,
-    release: slobsVersion,
+    release: `${slobsVersion}-${SLOBS_BUNDLE_ID}`,
     sampleRate: isPreview || getOS() === OS.Mac ? 1.0 : 0.1,
     beforeSend: event => {
       // Because our URLs are local files and not publicly
@@ -207,10 +213,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   I18nService.setVuei18nInstance(i18n);
 
-  const appService: AppService = AppService.instance;
-
   if (!Utils.isOneOffWindow()) {
-    crashHandler.registerProcess(appService.pid, false);
+    crashHandler.registerProcess(process.pid, false);
   }
 
   // The worker window can safely access services immediately
@@ -218,6 +222,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const windowsService: WindowsService = WindowsService.instance;
 
     // Services
+    const appService: AppService = AppService.instance;
     const obsUserPluginsService: ObsUserPluginsService = ObsUserPluginsService.instance;
 
     // This is used for debugging
@@ -246,7 +251,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const message = apiInitErrorResultToMessage(apiResult);
       showDialog(message);
 
-      crashHandler.unregisterProcess(appService.pid);
+      crashHandler.unregisterProcess(process.pid);
 
       obs.NodeObs.StopCrashHandler();
       obs.IPC.disconnect();

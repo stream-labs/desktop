@@ -39,6 +39,7 @@ import { downloadFile } from '../../util/requests';
 import { TouchBarService } from 'services/touch-bar';
 import { ApplicationMenuService } from 'services/application-menu';
 import { KeyListenerService } from 'services/key-listener';
+import { SettingsService } from '../settings';
 
 interface IAppState {
   loading: boolean;
@@ -99,6 +100,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private restreamService: RestreamService;
   @Inject() private applicationMenuService: ApplicationMenuService;
   @Inject() private keyListenerService: KeyListenerService;
+  @Inject() private settingsService: SettingsService;
 
   private loadingPromises: Dictionary<Promise<any>> = {};
 
@@ -121,12 +123,13 @@ export class AppService extends StatefulService<IAppState> {
       // We want to start this as early as possible so that any
       // exceptions raised while loading the configuration are
       // associated with the user in sentry.
-      this.userService.validateLogin(),
+      this.userService.autoLogin(),
 
       // this config should be downloaded before any game-capture source has been added to the scene
       this.downloadAutoGameCaptureConfig(),
     ]).catch(e => {
       // probably the internet is disconnected
+      console.error('Auto login failed', e);
     });
 
     // Second, we want to start the crash reporter service.  We do this

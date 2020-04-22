@@ -10,6 +10,7 @@ import * as obs from '../../../obs-api';
 import * as fs from 'fs';
 import path from 'path';
 import Utils from '../utils';
+import fallback from '../../i18n/fallback';
 
 interface II18nState {
   locale: string;
@@ -213,6 +214,13 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
 
   private loadDictionary(locale: string): Dictionary<string> {
     if (this.loadedDictionaries[locale]) return this.loadedDictionaries[locale];
+
+    if (locale === 'en-US') {
+      // en-US is included in the webpack bundle, so we don't
+      // load it from disk on demand.
+      this.loadedDictionaries['en-US'] = fallback;
+      return fallback;
+    }
 
     const i18nPath = this.getI18nPath();
     const dictionaryFiles = fs

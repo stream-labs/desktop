@@ -244,9 +244,17 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       this.state.streamingStatus === EStreamingState.Reconnecting
     ) {
       const shouldConfirm = this.streamSettingsService.settings.warnBeforeStoppingStream;
-      const confirmText = $t('Are you sure you want to stop streaming?');
 
-      if (shouldConfirm && !confirm(confirmText)) return Promise.resolve();
+      if (shouldConfirm) {
+        const endStream = await electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
+          title: $t('End Stream'),
+          type: 'warning',
+          message: $t('Are you sure you want to stop streaming?'),
+          buttons: [$t('Cancel'), $t('End Stream')],
+        });
+
+        if (!endStream) return;
+      }
 
       if (this.powerSaveId) {
         electron.remote.powerSaveBlocker.stop(this.powerSaveId);

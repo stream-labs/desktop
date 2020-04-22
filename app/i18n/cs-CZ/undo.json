@@ -1,6 +1,6 @@
 {
   "Add %{filterName}": "Přidat filtr %{filterName}",
-  "Center %{sourceName}": "Center %{sourceName}",
+  "Center %{sourceName}": "Střed %{sourceName}",
   "Paste %{nodeName}": "Vložit uzel %{nodeName}",
   "Create a new connection": "Vytvořit nové připojení",
   "Create %{sourceName}": "Vytvořit zdroj %{sourceName}",

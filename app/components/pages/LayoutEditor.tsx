@@ -11,12 +11,14 @@ import { LayoutService, ELayoutElement, ELayout, LayoutSlot } from 'services/lay
 import { $t } from 'services/i18n';
 import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
+import { UserService } from 'services/user';
 
 @Component({})
 export default class LayoutEditor extends TsxComponent {
   @Inject() private layoutService: LayoutService;
   @Inject() private navigationService: NavigationService;
   @Inject() private customizationService: CustomizationService;
+  @Inject() private userService: UserService;
 
   currentLayout = this.layoutService.views.currentTab.currentLayout || ELayout.Default;
   slottedElements = cloneDeep(this.layoutService.views.currentTab.slottedElements) || {};
@@ -24,6 +26,7 @@ export default class LayoutEditor extends TsxComponent {
 
   private highlightedSlot: LayoutSlot = null;
   private showModal = false;
+  canDragSlot = true;
 
   mounted() {
     if (this.slottedElements[ELayoutElement.Browser]) {
@@ -101,6 +104,9 @@ export default class LayoutEditor extends TsxComponent {
   }
 
   get tabOptions() {
+    if (!this.userService.isPrime) {
+      return [{ value: 'default', title: this.layoutService.state.tabs.default.name }];
+    }
     return Object.keys(this.layoutService.state.tabs).map(tab => ({
       value: tab,
       title: this.layoutService.state.tabs[tab].name,
@@ -108,7 +114,7 @@ export default class LayoutEditor extends TsxComponent {
   }
 
   get currentTab() {
-    return this.layoutService.views.currentTab;
+    return this.layoutService.state.currentTab;
   }
 
   @Watch('currentTab')
@@ -129,6 +135,14 @@ export default class LayoutEditor extends TsxComponent {
   get topBar() {
     return (
       <div class={styles.topBar}>
+        <img class={styles.arrow} src={require('../../../media/images/chalk-arrow.png')} />
+        <button
+          class="button button--prime"
+          style="margin: 0 16px;"
+          onClick={() => this.openModal()}
+        >
+          {$t('Add Tab')}
+        </button>
         <ListInput
           style="z-index: 1;"
           value={this.layoutService.state.currentTab}
@@ -136,13 +150,6 @@ export default class LayoutEditor extends TsxComponent {
           metadata={{ options: this.tabOptions }}
           v-tooltip={{ content: $t('Current Tab'), placement: 'bottom' }}
         />
-        {/* <button
-          class={cx('button button--default', styles.addButton)}
-          v-tooltip={{ content: $t('Add Tab'), placement: 'bottom' }}
-          onClick={() => this.openModal()}
-        >
-          <i class="icon-add" />
-        </button> */}
         {this.layoutService.state.currentTab !== 'default' && (
           <button
             class={cx('button button--warn', styles.removeButton)}
@@ -161,7 +168,7 @@ export default class LayoutEditor extends TsxComponent {
 
   get elementList() {
     return (
-      <div style="display: flex; flex-direction: column;">
+      <div class={styles.elementList}>
         <div class={styles.title}>{$t('Elements')}</div>
         <div class={styles.subtitle}>{$t('Drag and drop to edit.')}</div>
         <div class={styles.elementContainer}>
@@ -206,7 +213,7 @@ export default class LayoutEditor extends TsxComponent {
       <div
         class={this.classForSlot(slot)}
         id={slot}
-        draggable={this.elementInSlot(slot)}
+        draggable={this.elementInSlot(slot) && this.canDragSlot}
         ondragenter={(): unknown => (this.highlightedSlot = slot)}
         ondragexit={(): unknown => (this.highlightedSlot = null)}
         onDragend={(e: MouseEvent) =>
@@ -218,6 +225,8 @@ export default class LayoutEditor extends TsxComponent {
           <TextInput
             class={styles.urlTextBox}
             vModel={this.browserUrl}
+            onFocus={() => (this.canDragSlot = false)}
+            onBlur={() => (this.canDragSlot = true)}
             metadata={{ placeholder: $t('Enter Target URL') }}
           />
         )}

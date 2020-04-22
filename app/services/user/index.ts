@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import defer from 'lodash/defer';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { Inject } from 'services/core/injector';
 import { handleResponse, authorizedHeaders } from 'util/requests';
@@ -7,8 +6,6 @@ import { mutation } from 'services/core/stateful-service';
 import { Service } from 'services/core';
 import electron from 'electron';
 import { HostsService } from 'services/hosts';
-import { IncrementalRolloutService } from 'services/incremental-rollout';
-import { PlatformAppsService } from 'services/platform-apps';
 import {
   getPlatformService,
   IUserAuth,
@@ -21,7 +18,7 @@ import { CustomizationService } from 'services/customization';
 import * as Sentry from '@sentry/browser';
 import { RunInLoadingMode } from 'services/app/app-decorators';
 import { SceneCollectionsService } from 'services/scene-collections';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import Utils from 'services/utils';
 import { WindowsService } from 'services/windows';
 import { $t, I18nService } from 'services/i18n';
@@ -33,12 +30,7 @@ import * as obs from '../../../obs-api';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { lazyModule } from 'util/lazy-module';
 import { AuthModule } from './auth-module';
-
-interface ISecondaryPlatformAuth {
-  username: string;
-  token: string;
-  id: string;
-}
+import { WebsocketService, TSocketEvent } from 'services/websocket';
 
 export enum EAuthProcessState {
   Idle = 'idle',
@@ -50,6 +42,7 @@ interface IUserServiceState {
   loginValidated: boolean;
   auth?: IUserAuth;
   authProcessState: EAuthProcessState;
+  isPrime: boolean;
 }
 
 interface ILinkedPlatform {
@@ -98,9 +91,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private windowsService: WindowsService;
   @Inject() private onboardingService: OnboardingService;
   @Inject() private navigationService: NavigationService;
-  @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private settingsService: SettingsService;
   @Inject() private streamSettingsService: StreamSettingsService;
+  @Inject() private websocketService: WebsocketService;
 
   @mutation()
   LOGIN(auth: IUserAuth) {
@@ -123,6 +116,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @mutation()
   LOGOUT() {
     Vue.delete(this.state, 'auth');
+    this.state.isPrime = false;
+  }
+
+  @mutation()
+  SET_PRIME(isPrime: boolean) {
+    this.state.isPrime = isPrime;
   }
 
   @mutation()
@@ -170,6 +169,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   userLogin = new Subject<IUserAuth>();
   userLogout = new Subject();
+  private socketConnection: Subscription = null;
 
   /**
    * Used by child and 1-off windows to update their sentry contexts
@@ -178,7 +178,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   @lazyModule(AuthModule) private authModule: AuthModule;
 
-  init() {
+  async init() {
     super.init();
     this.MIGRATE_AUTH();
     this.VALIDATE_LOGIN(false);
@@ -200,8 +200,26 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     );
   }
 
+  autoLogin() {
+    if (!this.state.auth) return;
+    const service = getPlatformService(this.state.auth.primaryPlatform);
+    return this.login(service, this.state.auth);
+  }
+
+  subscribeToSocketConnection() {
+    this.socketConnection = this.websocketService.socketEvent.subscribe(ev =>
+      this.onSocketEvent(ev),
+    );
+    return Promise.resolve();
+  }
+
+  unsubscribeFromSocketConnection() {
+    if (this.socketConnection) this.socketConnection.unsubscribe();
+    return Promise.resolve();
+  }
+
   // Makes sure the user's login is still good
-  async validateLogin() {
+  async validateLogin(): Promise<boolean> {
     if (!this.state.auth) return;
 
     const host = this.hostsService.streamlabs;
@@ -214,15 +232,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     });
 
     if (valid.match(/false/)) {
-      this.LOGOUT();
-      electron.remote.dialog.showMessageBox({
-        message: $t('You have been logged out'),
-      });
-      return;
+      return false;
     }
 
-    const service = getPlatformService(this.state.auth.primaryPlatform);
-    await this.login(service, this.state.auth);
+    return true;
   }
 
   /**
@@ -309,6 +322,21 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       .catch(() => {});
   }
 
+  get isPrime() {
+    return this.state.isPrime;
+  }
+
+  async setPrimeStatus() {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/prime`;
+    const headers = authorizedHeaders(this.apiToken);
+    const request = new Request(url, { headers });
+    return fetch(request)
+      .then(handleResponse)
+      .then(response => this.SET_PRIME(response.is_prime))
+      .catch(() => null);
+  }
+
   /**
    * Attempts to flush the user's session to disk if it exists
    */
@@ -389,6 +417,22 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
   }
 
+  showPrimeWindow() {
+    this.windowsService.showWindow({
+      componentName: 'WelcomeToPrime',
+      title: '',
+      size: { width: 1000, height: 720 },
+    });
+  }
+
+  onSocketEvent(e: TSocketEvent) {
+    if (e.type !== 'streamlabs_prime_subscribe') return;
+    this.SET_PRIME(true);
+    const theme = this.customizationService.isDarkTheme ? 'prime-dark' : 'prime-light';
+    this.customizationService.setTheme(theme);
+    this.showPrimeWindow();
+  }
+
   recentEventsUrl() {
     if (this.isLoggedIn) {
       const host = this.hostsService.streamlabs;
@@ -459,19 +503,38 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   @RunInLoadingMode()
-  private async login(service: IPlatformService, auth: IUserAuth) {
+  private async login(service: IPlatformService, auth?: IUserAuth) {
+    if (!auth) auth = this.state.auth;
     this.LOGIN(auth);
     this.VALIDATE_LOGIN(true);
-    await this.updateLinkedPlatforms();
-    const result = await service.validatePlatform();
+    this.setSentryContext();
+    this.userLogin.next(auth);
 
-    // Currently we treat generic errors as success
-    if (result === EPlatformCallResult.TwitchTwoFactor) {
-      this.LOGOUT();
-      return result;
+    const [validateLoginResult, validatePlatformResult] = await Promise.all([
+      this.validateLogin(),
+      service.validatePlatform(),
+      this.updateLinkedPlatforms(),
+      this.refreshUserInfo(),
+      this.sceneCollectionsService.setupNewUser(),
+      this.setPrimeStatus(),
+    ]);
+    this.subscribeToSocketConnection();
+
+    if (!validateLoginResult) {
+      this.logOut();
+      electron.remote.dialog.showMessageBox({
+        message: $t('You have been logged out'),
+      });
+      return;
     }
 
-    if (result === EPlatformCallResult.TwitchScopeMissing) {
+    // Currently we treat generic errors as success
+    if (validatePlatformResult === EPlatformCallResult.TwitchTwoFactor) {
+      this.logOut();
+      return validatePlatformResult;
+    }
+
+    if (validatePlatformResult === EPlatformCallResult.TwitchScopeMissing) {
       await this.logOut();
       this.showLogin();
 
@@ -484,16 +547,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         buttons: [$t('Refresh Login')],
       });
 
-      return result;
+      return validatePlatformResult;
     }
-
-    this.refreshUserInfo();
-    this.setSentryContext();
-
-    this.userLogin.next(auth);
-    await this.sceneCollectionsService.setupNewUser();
-
-    return result;
   }
 
   @RunInLoadingMode()
@@ -511,6 +566,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     session.clearStorageData({ storages: ['cookies'] });
     this.settingsService.setSettingValue('Stream', 'key', '');
 
+    this.unsubscribeFromSocketConnection();
     this.LOGOUT();
     this.userLogout.next();
   }

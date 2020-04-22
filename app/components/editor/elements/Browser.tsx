@@ -1,4 +1,3 @@
-import StudioEditor from 'components/StudioEditor.vue';
 import { Component } from 'vue-property-decorator';
 import BaseElement from './BaseElement';
 import BrowserView from 'components/shared/BrowserView';
