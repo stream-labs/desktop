@@ -57,7 +57,7 @@ if (isProduction) {
     submitURL:
       'https://sentry.io/api/1283430/minidump/?sentry_key=01fc20f909124c8499b4972e9a5253f2',
     extra: {
-      'sentry[release]': `${slobsVersion}-${SLOBS_BUNDLE_ID}`,
+      'sentry[release]': slobsVersion,
       processType: 'renderer',
     },
   });
@@ -111,7 +111,7 @@ if (
 
   Sentry.init({
     dsn: sentryDsn,
-    release: slobsVersion,
+    release: `${slobsVersion}-${SLOBS_BUNDLE_ID}`,
     sampleRate: isPreview ? 1.0 : 0.1,
     beforeSend: event => {
       // Because our URLs are local files and not publicly

@@ -5,10 +5,14 @@ import Util from 'services/utils';
 import BaseElement from './BaseElement';
 import { ERenderingMode } from '../../../../obs-api';
 import { WindowsService } from 'services/windows';
+import styles from './BaseElement.m.less';
+import { $t } from 'services/i18n';
+import { StreamingService } from 'services/streaming';
 
 @Component({})
 export default class StreamPreview extends BaseElement {
   @Inject() windowsService: WindowsService;
+  @Inject() streamingService: StreamingService;
 
   mins = { x: 0, y: 0 };
 
@@ -20,10 +24,20 @@ export default class StreamPreview extends BaseElement {
     return Util.getCurrentUrlParams().windowId;
   }
 
-  get element() {
+  get selectiveRecordingMessage() {
     return (
-      !this.hideStyleBlockers && <Display rendering-mode={ERenderingMode.OBS_STREAMING_RENDERING} />
+      <div class={styles.container}>
+        <span class={styles.empty}>
+          {$t('This element requires Selective Recording to be enabled')}
+        </span>
+      </div>
     );
+  }
+
+  get element() {
+    if (!this.streamingService.state.selectiveRecording) return this.selectiveRecordingMessage;
+    if (this.hideStyleBlockers) return <div />;
+    return <Display rendering-mode={ERenderingMode.OBS_STREAMING_RENDERING} />;
   }
 
   render() {
