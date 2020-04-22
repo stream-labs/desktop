@@ -50,17 +50,12 @@ export default class TagsInput extends BaseInput<Array<ITag>, ITagsInputMetadata
     },
   ];
 
-  /*
-   * VSelectPage doesn't accept an array as initial value, so we have to provide
-   * it a string.
-   */
-  currentTags = this.value ? this.value.map(tag => tag.value).join(',') : null;
-
   get shouldDisable() {
     return this.value === null || this.metadata.noPermission;
   }
 
   handleInput(tags: Array<ITag>) {
+    if (!tags.length) return;
     this.emitInput(tags);
   }
 
@@ -76,7 +71,6 @@ export default class TagsInput extends BaseInput<Array<ITag>, ITagsInputMetadata
             pagination={false}
             title={this.metadata.title}
             placeholder={this.metadata.placeholder}
-            vModel={this.currentTags}
             tb-columns={this.tableColumns}
             max-select-limit={5}
             onValues={(tags: Array<ITag>) => this.handleInput(tags)}
