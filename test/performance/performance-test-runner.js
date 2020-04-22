@@ -48,8 +48,6 @@ const TESTS_SERVICE_URL = CI ? 'https://slobs-users-pool.herokuapp.com' : 'http:
  * Compare results from 2 branches and show them as a table
  */
 function printResults(baseBranchResults, currentBranchResults) {
-  const comparisonResults = {};
-
   // iterate throw each test
   Object.keys(baseBranchResults).forEach(testName => {
     const baseBranchMetrics = baseBranchResults[testName];
@@ -61,17 +59,12 @@ function printResults(baseBranchResults, currentBranchResults) {
       colWidths: [35, 10, 9, 17, 20, 20],
     });
 
-    // iterate thow each metric
+    // iterate through each metric
     Object.keys(baseBranchMetrics).forEach(metricName => {
-      if (!comparisonResults[testName]) comparisonResults[testName] = {};
       const baseMetric = baseBranchMetrics[metricName];
       const currentMetric = currentBranchResults[testName]
         ? currentBranchResults[testName][metricName]
         : null;
-      comparisonResults[testName][metricName] = {
-        baseMetric,
-        currentMetric,
-      };
       const baseMetricValues = baseMetric.values;
       const baseMetricAvg = baseMetricValues.reduce((v1, v2) => v1 + v2) / baseMetricValues.length;
       let currentMetricValues = 'null';
@@ -100,6 +93,9 @@ function printResults(baseBranchResults, currentBranchResults) {
   });
 }
 
+/**
+ * Round value to max 5 digits after point and add color
+ */
 function formatPerformanceValue(val) {
   if (val === 'null') return 'null';
   val = Number(val.toFixed(5));
