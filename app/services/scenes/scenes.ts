@@ -422,7 +422,7 @@ export class ScenesService extends StatefulService<IScenesState> {
     for (const scene of scenes) {
       // delete loops in the parent->child relationships
       const visitedNodeIds: string[] = [];
-      this.traversScene(scene.id, node => {
+      this.traverseScene(scene.id, node => {
         if (visitedNodeIds.includes(node.id)) {
           console.log('Remove looped item', node.name);
           node.setParent('');
@@ -465,7 +465,7 @@ export class ScenesService extends StatefulService<IScenesState> {
    * Apply a callback for each sceneNode
    * Stop travers if the callback returns false
    */
-  private traversScene(
+  private traverseScene(
     sceneId: string,
     cb: (node: TSceneNode) => boolean,
     nodeId?: string,
@@ -477,7 +477,7 @@ export class ScenesService extends StatefulService<IScenesState> {
     if (!nodeId) {
       const rootNodes = scene.getRootNodes();
       for (const node of rootNodes) {
-        canContinue = this.traversScene(sceneId, cb, node.id);
+        canContinue = this.traverseScene(sceneId, cb, node.id);
         if (!canContinue) return false;
       }
       return true;
@@ -492,7 +492,7 @@ export class ScenesService extends StatefulService<IScenesState> {
       canContinue = cb(node);
       if (!canContinue) return false;
       for (const childId of node.childrenIds) {
-        canContinue = this.traversScene(sceneId, cb, childId);
+        canContinue = this.traverseScene(sceneId, cb, childId);
         if (!canContinue) return false;
       }
     }
