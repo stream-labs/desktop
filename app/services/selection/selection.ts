@@ -469,7 +469,7 @@ export class Selection {
   }
 
   remove() {
-    this.getNodes().forEach(node => node.remove());
+    this.getNodes().forEach(node => !node.isDestroyed() && node.remove());
   }
 
   nudgeLeft() {

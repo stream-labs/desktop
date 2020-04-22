@@ -32,7 +32,7 @@ export function ServiceHelper(): ClassDecorator {
       }
       return new Proxy(this, {
         get: (target, key: string) => {
-          if (typeof target[key] === 'function' && target.isDestroyed()) {
+          if (typeof target[key] === 'function' && key !== 'isDestroyed' && target.isDestroyed()) {
             throw new Error(
               `Trying to call the method "${key}" on destroyed object "${this._resourceId}"`,
             );

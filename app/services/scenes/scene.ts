@@ -512,6 +512,8 @@ export class Scene {
 
   @mutation()
   private REMOVE_NODE_FROM_SCENE(nodeId: string) {
+    const item = this.state.nodes.find(item => item.id === nodeId);
+    item.isRemoved = true;
     this.state.nodes = this.state.nodes.filter(item => {
       return item.id !== nodeId;
     });

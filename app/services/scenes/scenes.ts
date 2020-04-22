@@ -124,6 +124,7 @@ export interface ISceneItemNode extends IResource {
   sceneId: string;
   sceneNodeType: TSceneNodeType;
   parentId?: string;
+  isRemoved?: boolean;
 }
 
 export interface ISceneItemFolder extends ISceneItemNode {

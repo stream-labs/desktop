@@ -35,10 +35,7 @@ export abstract class SceneItemNode implements ISceneItemNode {
   @Inject() protected selectionService: SelectionService;
 
   isDestroyed(): boolean {
-    const scene = this.getScene();
-    if (!scene) return true;
-    // TODO: this is too slow
-    return !scene.state.nodes.find(node => node.id === this.id);
+    return this.state.isRemoved;
   }
 
   getScene(): Scene {
@@ -175,5 +172,10 @@ export abstract class SceneItemNode implements ISceneItemNode {
   @mutation()
   protected SET_PARENT(parentId?: string) {
     this.state.parentId = parentId;
+  }
+
+  @mutation()
+  protected MARK_AS_DESTROYED() {
+    this.state.isRemoved = false;
   }
 }
