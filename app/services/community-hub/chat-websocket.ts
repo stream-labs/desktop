@@ -25,7 +25,7 @@ export interface IInternalEvent {
     name?: string;
     title?: string;
     token?: string;
-    type?: 'dm';
+    type?: 'dm' | 'lfg';
   };
 }
 
@@ -90,7 +90,7 @@ export class ChatWebsocketService extends Service {
     }
   }
 
-  joinRoom(chat: { name: string; token: string; type: 'dm' }) {
+  joinRoom(chat: { name: string; token?: string; type: 'dm' | 'lfg' }) {
     this.socket.emit('join_rooms', [chat]);
   }
 

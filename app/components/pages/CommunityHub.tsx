@@ -5,6 +5,7 @@ import SideBar from './community-hub/SideBar';
 import ChatInfo from './community-hub/ChatInfo';
 import AddChatModal from './community-hub/AddChatModal';
 import AddFriendModal from './community-hub/AddFriendModal';
+import { ChatPage } from './community-hub/pages';
 import styles from './community-hub/CommunityHub.m.less';
 import { Inject } from 'services';
 import { CommunityHubService } from 'services/community-hub';

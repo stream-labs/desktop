@@ -27,12 +27,14 @@ export interface IChatRoom {
   title: string;
   avatar: string;
   token?: string;
+  type: 'dm' | 'lfg';
 }
 
 interface ICommunityHubState {
   connectedUsers: Dictionary<IFriend>;
   friendRequests: Array<IFriend>;
   chatrooms: Array<IChatRoom>;
+  lfgChat: IChatRoom;
   status: string;
   currentPage: string;
   self: IFriend;
@@ -48,6 +50,8 @@ const PAGES = () => ({
 
 class CommunityHubViews extends ViewHandler<ICommunityHubState> {
   get currentPage() {
+    const isLfgChat = this.state.currentPage === 'matchmaking' && this.state.lfgChat;
+    if (isLfgChat) return { title: $t('Matchmaking'), component: pages.ChatPage };
     return PAGES()[this.state.currentPage] || { component: pages.ChatPage };
   }
 
@@ -85,6 +89,7 @@ class CommunityHubViews extends ViewHandler<ICommunityHubState> {
   }
 
   get currentChat() {
+    if (this.state.currentPage === 'matchmaking') return this.state.lfgChat;
     return this.state.chatrooms.find(chatroom => chatroom.name === this.state.currentPage);
   }
 
@@ -112,6 +117,7 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
     connectedUsers: {},
     friendRequests: [],
     chatrooms: [],
+    lfgChat: null,
     status: 'online',
     currentPage: 'matchmaking',
     self: {} as IFriend,
@@ -136,6 +142,11 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
   @mutation()
   SET_FRIEND_REQUESTS(friendRequests: Array<IFriend>) {
     this.state.friendRequests = friendRequests;
+  }
+
+  @mutation()
+  SET_LFG_CHAT(room: IChatRoom) {
+    this.state.lfgChat = room;
   }
 
   @mutation()
@@ -252,6 +263,10 @@ export class CommunityHubService extends StatefulService<ICommunityHubState> {
   async getChatrooms() {
     const resp = await this.getResponse('dms');
     resp?.forEach((chatroom: IChatRoom) => this.addChat(chatroom, false));
+  }
+
+  setLfgChat(room: IChatRoom) {
+    this.SET_LFG_CHAT(room);
   }
 
   async leaveChatroom(groupId: string) {

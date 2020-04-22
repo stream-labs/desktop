@@ -18,6 +18,8 @@ export interface IMessage {
 
 interface ILiveChatState {
   messages: Dictionary<Array<IMessage>>;
+  matchmakingInterval: number;
+  matchFound: string;
 }
 
 class LiveChatViews extends ViewHandler<ILiveChatState> {
@@ -35,6 +37,8 @@ export class LiveChatService extends StatefulService<ILiveChatState> {
 
   static initialState: ILiveChatState = {
     messages: {},
+    matchmakingInterval: Infinity,
+    matchFound: null,
   };
 
   @mutation()
@@ -51,6 +55,16 @@ export class LiveChatService extends StatefulService<ILiveChatState> {
   @mutation()
   LOAD_MESSAGES(messages: Dictionary<Array<IMessage>>) {
     this.state.messages = messages;
+  }
+
+  @mutation()
+  SET_POLLING_INTERVAL(interval: number) {
+    this.state.matchmakingInterval = interval;
+  }
+
+  @mutation()
+  SET_MATCH_FOUND(timestamp: string) {
+    this.state.matchFound = timestamp;
   }
 
   async init() {
@@ -104,21 +118,36 @@ export class LiveChatService extends StatefulService<ILiveChatState> {
       ]);
     }
     if (ev.action === 'added_to_dm') {
-      await this.communityHubService.getChatMembers(ev.data.name);
-      const members = this.communityHubService.views.usersInRoom(ev.data.name);
-      const title = ev.data.title || members[0]?.name;
+      this.addRoomToState(ev.data as IChatRoom);
+    }
+  }
+
+  async matchmake(game: string, tags: Array<string>, size: number) {
+    const resp = await this.communityHubService.postResponse('lfg', { game, size, tags });
+    this.SET_POLLING_INTERVAL(resp.interval);
+    if (resp.success && resp.room) {
+      this.chatWebsocketService.joinRoom(resp.room);
+      this.addRoomToState(resp.room);
+      this.SET_MATCH_FOUND(resp.group.created_at);
+    }
+    if (resp.success && this.state.matchmakingInterval) {
+      window.setTimeout(() => this.matchmake(game, tags, size), this.state.matchmakingInterval);
+    }
+  }
+
+  async addRoomToState(roomData: IChatRoom, lfg = false) {
+    await this.communityHubService.getChatMembers(roomData.name);
+    if (roomData.type === 'dm') {
+      const members = this.communityHubService.views.usersInRoom(roomData.name);
+      const title = roomData.title || members[0]?.name;
       const existingChat = this.communityHubService.state.chatrooms.find(
-        chat => chat.name === ev.data.name,
+        chat => chat.name === roomData.name,
       );
       if (!existingChat) {
-        this.communityHubService.addChat(
-          {
-            ...(ev.data as IChatRoom),
-            title,
-          },
-          false,
-        );
+        this.communityHubService.addChat({ ...(roomData as IChatRoom), title }, false);
       }
+    } else {
+      this.communityHubService.setLfgChat(roomData);
     }
   }
 

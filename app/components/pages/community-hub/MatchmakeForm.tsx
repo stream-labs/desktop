@@ -7,9 +7,13 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { metadata, IListOption } from 'components/shared/inputs';
 import { categoryTags, conversationTags } from 'services/community-hub/tag-data';
+import { Inject } from 'services';
+import { LiveChatService } from 'services/community-hub/live-chat';
 
 @Component({})
 export default class MatchmakeForm extends TsxComponent {
+  @Inject() liveChatService: LiveChatService;
+
   roomSize: number = 2;
 
   selectedTags = {
@@ -17,16 +21,22 @@ export default class MatchmakeForm extends TsxComponent {
     conversation: [] as Array<IListOption<string>>,
   };
 
-  stubTags = [
-    { description: 'tag1', value: 'tag1', title: 'tag1' },
-    { description: 'tag2', value: 'tag2', title: 'tag2' },
-    { description: 'tag3', value: 'tag3', title: 'tag3' },
-    { description: 'tag4', value: 'tag4', title: 'tag4' },
-    { description: 'tag5', value: 'tag5', title: 'tag5' },
-  ];
-
   handleTagSelect(key: string, tags: any) {
     this.selectedTags[key] = tags;
+  }
+
+  get validTags() {
+    const catLength = this.selectedTags.category.length;
+    const convLength = this.selectedTags.conversation.length;
+    return catLength > 2 && convLength > 2;
+  }
+
+  handleSubmit() {
+    if (!this.validTags) return;
+    const game = this.selectedTags.category[0].value;
+    const tags = [...this.selectedTags.category.slice(1), ...this.selectedTags.conversation];
+    const tagValues = tags.map(tag => tag.value);
+    this.liveChatService.matchmake(game, tagValues, this.roomSize);
   }
 
   render() {
