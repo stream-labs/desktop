@@ -357,6 +357,10 @@ export class AudioSource implements IAudioSourceApi {
     Utils.applyProxy(this, sourceState);
   }
 
+  isDestroyed(): boolean {
+    return !this.audioService.state.audioSources[this.sourceId];
+  }
+
   getModel(): IAudioSource & ISource {
     return { ...this.source.state, ...this.audioSourceState };
   }

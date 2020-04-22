@@ -34,6 +34,13 @@ export abstract class SceneItemNode implements ISceneItemNode {
   @Inject() protected scenesService: ScenesService;
   @Inject() protected selectionService: SelectionService;
 
+  isDestroyed(): boolean {
+    const scene = this.getScene();
+    if (!scene) return true;
+    // TODO: this is too slow
+    return !scene.state.nodes.find(node => node.id === this.id);
+  }
+
   getScene(): Scene {
     return this.scenesService.views.getScene(this.sceneId);
   }

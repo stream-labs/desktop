@@ -46,6 +46,10 @@ export class Scene {
     Utils.applyProxy(this, this.state);
   }
 
+  isDestroyed() {
+    return !this.scenesService.state.scenes[this.id];
+  }
+
   // getter for backward compatibility with previous version of API
   get items(): ISceneItem[] {
     return this.nodes.filter(node => node.sceneNodeType === 'item') as ISceneItem[];

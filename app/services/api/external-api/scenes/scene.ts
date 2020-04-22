@@ -33,6 +33,10 @@ export class Scene implements ISceneModel {
     Utils.applyProxy(this, () => this.getModel());
   }
 
+  private isDestroyed(): boolean {
+    return this.scene.isDestroyed();
+  }
+
   getModel(): ISceneModel {
     return {
       id: this.scene.id,

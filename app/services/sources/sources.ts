@@ -244,11 +244,11 @@ export class SourcesService extends StatefulService<ISourcesState> {
       obs.Global.setOutputSource(source.channel, null);
     }
 
-    this.REMOVE_SOURCE(id);
+    source.getObsInput().release();
     this.propertiesManagers[id].manager.destroy();
     delete this.propertiesManagers[id];
+    this.REMOVE_SOURCE(id);
     this.sourceRemoved.next(source.state);
-    source.getObsInput().release();
   }
 
   addFile(path: string): Source {

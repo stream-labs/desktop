@@ -315,6 +315,13 @@ export class Source implements ISourceApi {
     }
   }
 
+  isDestroyed(): boolean {
+    return (
+      !this.sourcesService.state.sources[this.sourceId] &&
+      !this.sourcesService.state.temporarySources[this.sourceId]
+    );
+  }
+
   @mutation()
   private SET_NAME(newName: string) {
     this.state.name = newName;

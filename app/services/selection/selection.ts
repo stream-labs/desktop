@@ -35,6 +35,10 @@ export class Selection {
     if (sceneId && itemsList) this.select(itemsList);
   }
 
+  isDestroyed(): boolean {
+    return !this.scenesService.views.getScene(this.sceneId);
+  }
+
   // SELECTION METHODS
 
   getScene(): Scene {
