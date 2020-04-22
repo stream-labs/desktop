@@ -2,6 +2,8 @@ const path = require('path');
 const { CheckerPlugin } = require('awesome-typescript-loader');
 const webpack = require('webpack');
 const cp = require('child_process');
+const ManifestPlugin = require('webpack-manifest-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const plugins = process.env.SLOBS_FORKED_TYPECHECKING ? [new CheckerPlugin()] : [];
 
@@ -15,6 +17,14 @@ plugins.push(
     SLOBS_BUNDLE_ID: JSON.stringify(commit),
   }),
 );
+
+plugins.push(
+  new ManifestPlugin({
+    filter: file => file.isChunk,
+  }),
+);
+
+plugins.push(new CleanWebpackPlugin());
 
 // uncomment and install to watch circular dependencies
 // const CircularDependencyPlugin = require('circular-dependency-plugin');
@@ -170,6 +180,7 @@ module.exports = {
     splitChunks: {
       chunks: chunk => chunk.name === 'renderer',
     },
+    moduleIds: 'hashed',
   },
 
   plugins,
