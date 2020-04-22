@@ -12,7 +12,6 @@ import * as obs from '../../../obs-api';
 import { $t } from 'services/i18n';
 import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
-import log from 'electron-log';
 import { ViewHandler } from 'services/core';
 import { lazyModule } from 'util/lazy-module';
 
@@ -415,8 +414,8 @@ export class ScenesService extends StatefulService<IScenesState> {
    * Repair the scene collection from different potential issues
    * This is an experimental feature
    */
-  repair(): number {
-    const scenes = this.getScenes();
+  repair() {
+    const scenes = this.views.scenes;
     const visitedSourcesIds: string[] = [];
 
     // validate sceneItems for each scene
@@ -425,7 +424,7 @@ export class ScenesService extends StatefulService<IScenesState> {
       const visitedNodeIds: string[] = [];
       this.traversScene(scene.id, node => {
         if (visitedNodeIds.includes(node.id)) {
-          log.log('Remove looped item', node.name);
+          console.log('Remove looped item', node.name);
           node.setParent('');
           node.remove();
           this.repair();
@@ -440,7 +439,7 @@ export class ScenesService extends StatefulService<IScenesState> {
       const allNodes = scene.getNodes();
       for (const node of allNodes) {
         if (!visitedNodeIds.includes(node.id)) {
-          log.log('Remove unreachable item', node.name, node.id);
+          console.log('Remove unreachable item', node.name, node.id);
           node.setParent('');
           node.remove();
           this.repair();
@@ -450,16 +449,16 @@ export class ScenesService extends StatefulService<IScenesState> {
     }
 
     // delete unreachable sources which don't belong any scene
-    this.sourcesService
+    this.sourcesService.views
       .getSources()
       .filter(source => !source.channel && source.type !== 'scene')
       .forEach(source => {
         if (!visitedSourcesIds.includes(source.sourceId)) {
-          log.log('Remove Unreachable source', source.name, source.sourceId);
+          console.log('Remove Unreachable source', source.name, source.sourceId);
           source.remove();
         }
       });
-    log.log('repairing finished');
+    console.log('repairing finished');
   }
 
   /**
@@ -472,7 +471,7 @@ export class ScenesService extends StatefulService<IScenesState> {
     nodeId?: string,
   ): boolean {
     let canContinue = true;
-    const scene = this.getScene(sceneId);
+    const scene = this.views.getScene(sceneId);
 
     // traverse root-level
     if (!nodeId) {
