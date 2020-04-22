@@ -25,5 +25,7 @@
   "Send Friend Request": "Send Friend Request",
   "Your friend request was sent successfully!": "Your friend request was sent successfully!",
   "Friend Request Sent": "Friend Request Sent",
-  "Received Requests (%{friendCount})": "Received Requests (%{friendCount})"
+  "Received Requests (%{friendCount})": "Received Requests (%{friendCount})",
+  "I Like to Stream...": "I Like to Stream...",
+  "I Want to Talk About...": "I Want to Talk About..."
 }

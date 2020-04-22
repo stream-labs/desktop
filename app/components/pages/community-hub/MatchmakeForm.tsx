@@ -6,12 +6,16 @@ import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { metadata, IListOption } from 'components/shared/inputs';
+import { categoryTags, conversationTags } from 'services/community-hub/tag-data';
 
 @Component({})
 export default class MatchmakeForm extends TsxComponent {
-  selectedCategories: Array<IListOption<string>> = [];
-  selectedTags: Array<IListOption<string>> = [];
   roomSize: number = 2;
+
+  selectedTags = {
+    category: [] as Array<IListOption<string>>,
+    conversation: [] as Array<IListOption<string>>,
+  };
 
   stubTags = [
     { description: 'tag1', value: 'tag1', title: 'tag1' },
@@ -21,6 +25,10 @@ export default class MatchmakeForm extends TsxComponent {
     { description: 'tag5', value: 'tag5', title: 'tag5' },
   ];
 
+  handleTagSelect(key: string, tags: any) {
+    this.selectedTags[key] = tags;
+  }
+
   render() {
     return (
       <div class={styles.matchmakeFormContainer}>
@@ -28,8 +36,8 @@ export default class MatchmakeForm extends TsxComponent {
         <h2>{$t('Meet other streamers to connect with!')}</h2>
         <ValidatedForm class={styles.matchmakeDropdowns}>
           <VFormGroup
-            vModel={this.selectedCategories}
-            metadata={metadata.tags({ title: $t('I Like to Play'), options: this.stubTags })}
+            metadata={metadata.tags({ title: $t('I Like to Stream...'), options: categoryTags() })}
+            onInput={(tags: any) => this.handleTagSelect('category', tags)}
           />
           <VFormGroup
             style="margin-left: 24px;"
@@ -45,8 +53,11 @@ export default class MatchmakeForm extends TsxComponent {
         </ValidatedForm>
         <div class={styles.matchmakeDropdowns}>
           <VFormGroup
-            value={this.selectedTags}
-            metadata={metadata.tags({ title: $t('I Want to Talk About'), options: this.stubTags })}
+            metadata={metadata.tags({
+              title: $t('I Want to Talk About...'),
+              options: conversationTags(),
+            })}
+            onInput={(tags: any) => this.handleTagSelect('conversation', tags)}
           />
         </div>
         <button class={cx('button button--action', styles.matchmakeButton)}>
