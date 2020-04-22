@@ -6,14 +6,14 @@
   "Item Limit": "Limit elementów",
   "Duration (seconds)": "Czas trwania (w sekundach)",
   "Show Clock": "Pokaż zegar",
-  "Always, show 0:00 when inactive": "Zawsze, Pokaż 0:00 gdy nieaktywny",
+  "Always, show 0:00 when inactive": "Zawsze, pokaż 0:00 gdy nieaktywny",
   "Hide when inactive": "Ukryj, gdy nieaktywny",
-  "Show Count": "Pokaż liczbę",
-  "Always, show 0 when inactive": "Zawsze pokaż 0 gdy nieaktywny",
+  "Show Count": "Pokaż licznik",
+  "Always, show 0 when inactive": "Zawsze, pokaż 0 gdy nieaktywny",
   "Show Latest": "Pokaż najnowsze",
-  "Always, show last person when inactive": "Zawsze pokaż ostatnią osobę, gdy nieaktywny",
-  "Include Resubs": "Obejmij ponowne subskrypcje",
+  "Always, show last person when inactive": "Zawsze, pokaż ostatnią osobę, gdy nieaktywny",
+  "Include Resubs": "Uwzględnij ponowne subskrypcje",
   "Preview": "Podgląd",
   "Note:": "Uwaga:",
-  "Actual label text may take up to 60 seconds to update": "Zaktualizowanie tekstu ankiety może trwać do 60 sekund"
+  "Actual label text may take up to 60 seconds to update": "Zaktualizowanie tekstu etykiety może trwać do 60 sekund"
 }

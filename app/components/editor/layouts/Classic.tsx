@@ -7,26 +7,19 @@ import styles from './Layouts.m.less';
 
 @Component({ props: createProps(LayoutProps) })
 export default class Classic extends BaseLayout {
-  mounted() {
+  async mounted() {
     this.mountResize();
-    this.$emit('totalWidth', ['1', ['2', '3', '4']]);
+    this.$emit('totalWidth', await this.mapVectors(['1', ['2', '3', '4']]));
+    this.setMins(['1'], ['2', '3', '4']);
   }
   destroyed() {
     this.destroyResize();
-  }
-
-  get mins() {
-    return {
-      bar1: this.props.calculateMin(['2', '3', '4']),
-      rest: this.props.calculateMin(['1']),
-    };
   }
 
   get bar1() {
     return this.props.resizes.bar1;
   }
   set bar1(size: number) {
-    console.log(size);
     this.props.setBarResize('bar1', size);
   }
 

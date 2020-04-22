@@ -1,10 +1,10 @@
 {
     "Image": "Изображение",
-    "Color Source": "Источник цвета",
+    "Color Source": "Цвет",
     "Browser Source": "Браузер",
-    "Media Source": "Источник мультимедиа",
+    "Media Source": "Мультимедиа",
     "Image Slide Show": "Слайд-шоу изображений",
-    "Text (GDI+)": "Текст (GDI +)",
+    "Text (GDI+)": "Текст (GDI+)",
     "Text (FreeType 2)": "Текст (FreeType 2)",
     "Display Capture": "Захват экрана",
     "Window Capture": "Захват окна",
@@ -13,5 +13,5 @@
     "Audio Input Capture": "Захват аудиовхода",
     "Audio Output Capture": "Захват аудиовыхода",
     "Blackmagic Device": "Устройство Blackmagic",
-    "NDI Source": "NDI Источник"
+    "NDI Source": "Источник NDI"
 }

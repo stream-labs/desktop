@@ -8,7 +8,8 @@
     },
     "similar-code": {
       "config": {
-        "threshold": 150
+        "threshold": 150,
+        "count_threshold": 3
       }
     },
     "identical-code": {
@@ -33,9 +34,9 @@
     }
   },
   "plugins": {
-    "tslint": {
-      "enabled": true,
-      "config": "tslint.json",
+    "eslint": {
+      "enabled": false,
+      "config": ".eslintrc.js",
       "checks": {
         "prettier": {
           "enabled": false

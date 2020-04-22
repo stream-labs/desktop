@@ -9,6 +9,7 @@ export enum EInputType {
   bool = 'bool',
   number = 'number',
   text = 'text',
+  date = 'date',
   slider = 'slider',
   color = 'color',
   list = 'list',
@@ -59,6 +60,10 @@ export interface IListMetadata<TValueType> extends IInputMetadata {
   fullWidth?: boolean;
 }
 
+export interface IImagePickerMetadata<TValueType> extends IListMetadata<TValueType> {
+  isIcons: boolean;
+}
+
 export interface ITextMetadata extends IInputMetadata {
   placeholder?: string;
   max?: number;
@@ -74,6 +79,10 @@ export interface ITextMetadata extends IInputMetadata {
    * When true will only emit on change events instead of input events
    */
   emitOnChange?: boolean;
+}
+
+export interface IDateMetadata extends IInputMetadata {
+  disablePastDates?: boolean;
 }
 
 export interface ISliderMetadata extends IInputMetadata {
@@ -118,6 +127,7 @@ export const metadata = {
   number: (options: INumberMetadata) =>
     ({ type: EInputType.number, ...options } as INumberMetadata),
   text: (options: ITextMetadata) => ({ type: EInputType.text, ...options } as ITextMetadata),
+  date: (options: IDateMetadata) => ({ type: EInputType.date, ...options } as IDateMetadata),
   list: (options: IListMetadata<string>) =>
     ({ type: EInputType.list, ...options } as IListMetadata<string>),
   color: (options: IInputMetadata) => ({ type: EInputType.color, ...options } as IInputMetadata),

@@ -55,7 +55,7 @@ export class DefaultManager extends PropertiesManager {
       return;
     }
 
-    if (!this.userService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn) return;
 
     if (this.obsSource.id === 'ffmpeg_source') {
       this.mediaBackupFileSetting = 'local_file';

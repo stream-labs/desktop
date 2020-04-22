@@ -8,6 +8,7 @@ import { Inject } from 'services/core/injector';
 import { ENudgeDirection } from './commands/nudge-items';
 import { SceneCollectionsService } from 'services/scene-collections';
 import electron from 'electron';
+import Utils from 'services/utils';
 
 const COMMANDS = { ...commands };
 
@@ -173,7 +174,7 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
 
   private handleUndoRedoError(undo: boolean, e: any) {
     console.error(`Error performing ${undo ? 'undo' : 'redo'} operation`, e);
-    electron.remote.dialog.showMessageBox({
+    electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
       title: 'Error',
       message: `An error occurred while ${undo ? 'undoing' : 'redoing'} the operation.`,
       type: 'error',

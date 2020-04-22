@@ -3,7 +3,6 @@ import path from 'path';
 import util from 'util';
 import mkdirpModule from 'mkdirp';
 import { tmpdir } from 'os';
-import fs from 'fs';
 import { mutation } from '../core/stateful-service';
 import { PersistentStatefulService } from '../core/persistent-stateful-service';
 import { ILoadedApp, PlatformAppsService } from './index';
@@ -13,7 +12,7 @@ import { downloadFile, getChecksum } from 'util/requests';
 import { InitAfter } from 'services/core/service-initialization-observer';
 import { AppService } from 'services/app';
 import url from 'url';
-import rimraf from 'rimraf';
+import fs from 'fs-extra';
 
 const mkdirp = util.promisify(mkdirpModule);
 const mkdtemp = util.promisify(fs.mkdtemp);
@@ -187,9 +186,7 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
       await this.updateAssetResource(appId, asset);
     });
 
-    await new Promise(resolve => {
-      rimraf(tmpDir, resolve);
-    });
+    await fs.remove(tmpDir);
   }
 
   /**
@@ -238,7 +235,7 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
     if (url.parse(assetPathOrUrl).protocol) return assetPathOrUrl;
 
     // This is a relative path instead
-    return this.platformAppsService.getAssetUrl(appId, assetPathOrUrl);
+    return this.platformAppsService.views.getAssetUrl(appId, assetPathOrUrl);
   }
 
   @mutation()
@@ -280,7 +277,7 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
   }
 
   private getApp(appId: string): ILoadedApp {
-    const app = this.platformAppsService.getApp(appId);
+    const app = this.platformAppsService.views.getApp(appId);
 
     if (!app) {
       throw new Error(`Invalid app: ${appId}`);

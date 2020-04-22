@@ -47,7 +47,7 @@ export function authorizedHeaders(token: string, headers = new Headers()): Heade
 }
 
 export async function downloadFile(srcUrl: string, dstPath: string): Promise<void> {
-  return new Promise<void>(resolve => {
+  return new Promise<void>((resolve, reject) => {
     return fetch(srcUrl)
       .then(resp => (resp.ok ? Promise.resolve(resp) : Promise.reject(resp)))
       .then(({ body }: { body: ReadableStream }) => {
@@ -65,7 +65,8 @@ export async function downloadFile(srcUrl: string, dstPath: string): Promise<voi
         };
 
         return reader.read().then(readStream);
-      });
+      })
+      .catch(e => reject(e));
   });
 }
 

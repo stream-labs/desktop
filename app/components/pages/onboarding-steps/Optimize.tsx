@@ -26,7 +26,8 @@ export default class Optimize extends TsxComponent<OptimizeProps> {
   optimize() {
     this.optimizing = true;
     this.props.setProcessing(true);
-    this.autoConfigService.start(progress => {
+
+    const sub = this.autoConfigService.configProgress.subscribe(progress => {
       if (
         progress.event === 'starting_step' ||
         progress.event === 'progress' ||
@@ -43,11 +44,14 @@ export default class Optimize extends TsxComponent<OptimizeProps> {
         }
       } else if (progress.event === 'done') {
         this.props.setProcessing(false);
+        sub.unsubscribe();
         this.props.continue();
       } else {
         this.props.setProcessing(false);
       }
     });
+
+    this.autoConfigService.start();
   }
 
   get steps() {

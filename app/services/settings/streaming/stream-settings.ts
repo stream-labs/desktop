@@ -174,7 +174,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
   }
 
   get protectedModeEnabled(): boolean {
-    return this.userService.isLoggedIn() && this.state.protectedModeEnabled;
+    return this.userService.isLoggedIn && this.state.protectedModeEnabled;
   }
 
   /**

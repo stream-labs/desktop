@@ -23,7 +23,7 @@ export class RemoveSourceCommand extends Command {
   }
 
   execute() {
-    const source = this.sourcesService.getSource(this.sourceId);
+    const source = this.sourcesService.views.getSource(this.sourceId);
     this.name = source.name;
     this.type = source.type;
     this.addSourceOptions = {
