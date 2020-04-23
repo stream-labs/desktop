@@ -242,7 +242,7 @@ export class ScenesService extends StatefulService<IScenesState> {
         .slice()
         .reverse()
         .forEach(item => {
-          const newItem = newScene.addSource(item.sourceId) as SceneItem;
+          const newItem = newScene.addSource(item.sourceId);
           newItem.setSettings(item.getSettings());
         });
     }
@@ -364,7 +364,7 @@ export class ScenesService extends StatefulService<IScenesState> {
 
   suggestName(name: string): string {
     if (!this.views.activeScene) return name;
-    const activeScene = this.views.activeScene as Scene;
+    const activeScene = this.views.activeScene!;
     return namingHelpers.suggestName(name, (name: string) => {
       const ind = activeScene.getNodes().findIndex(node => node.name === name);
       return ind !== -1;

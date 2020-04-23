@@ -91,9 +91,8 @@ export abstract class SceneItemNode implements ISceneItemNode {
   }
 
   getPrevSiblingNode(): TSceneNode | null {
-    const siblingsIds = this.parentId
-      ? this.getParent().getNestedNodesIds()
-      : this.getScene().getRootNodesIds();
+    const parent = this.getParent();
+    const siblingsIds = parent ? parent.getNestedNodesIds() : this.getScene().getRootNodesIds();
 
     const childInd = siblingsIds.indexOf(this.id);
     if (childInd !== 0) return this.getScene().getNode(siblingsIds[childInd - 1]);
@@ -101,9 +100,8 @@ export abstract class SceneItemNode implements ISceneItemNode {
   }
 
   getNextSiblingNode(): TSceneNode | null {
-    const siblingsIds = this.parentId
-      ? this.getParent().getNestedNodesIds()
-      : this.getScene().getRootNodesIds();
+    const parent = this.getParent();
+    const siblingsIds = parent ? parent.getNestedNodesIds() : this.getScene().getRootNodesIds();
 
     const childInd = siblingsIds.indexOf(this.id);
     if (childInd !== 0) return this.getScene().getNode(siblingsIds[childInd + 1]);

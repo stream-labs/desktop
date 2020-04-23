@@ -27,6 +27,7 @@ import { v2, Vec2 } from '../../util/vec2';
 import { Rect } from '../../util/rect';
 import { TSceneNodeType } from './scenes';
 import { ServiceHelper, ExecuteInWorkerProcess } from 'services/core';
+import { assertIsDefined } from '../../util/properties-type-guards';
 /**
  * A SceneItem is a source that contains
  * all of the information about that source, and
@@ -93,11 +94,15 @@ export class SceneItem extends SceneItemNode {
   }
 
   getScene(): Scene {
-    return this.scenesService.views.getScene(this.sceneId) as Scene;
+    const scene = this.scenesService.views.getScene(this.sceneId);
+    assertIsDefined(scene);
+    return scene;
   }
 
   get source() {
-    return this.sourcesService.views.getSource(this.sourceId) as Source;
+    const source = this.sourcesService.views.getSource(this.sourceId);
+    assertIsDefined(source);
+    return source;
   }
 
   getSource() {

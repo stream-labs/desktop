@@ -27,14 +27,20 @@ export class SceneItemFolder extends SceneItemNode {
 
     const state = this.scenesService.state.scenes[sceneId].nodes.find(item => {
       return item.id === id;
-    }) as ISceneItemFolder;
+    })!;
 
     Utils.applyProxy(this, state);
     this.state = state as ISceneItemFolder;
   }
 
   add(sceneNodeId: string) {
-    (this.getScene().getNode(sceneNodeId) as SceneItemNode).setParent(this.id);
+    const node = this.getScene().getNode(sceneNodeId);
+    if (!node) {
+      throw new Error(
+        `Can not add a non-existing ${sceneNodeId} item to the folder ${this.name}:{${this.id}`,
+      );
+    }
+    node.setParent(this.id);
   }
 
   ungroup() {

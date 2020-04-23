@@ -21,6 +21,7 @@ import * as fs from 'fs';
 import uuid from 'uuid/v4';
 import { SceneNode } from '../api/external-api/scenes';
 import compact from 'lodash/compact';
+import { assertIsDefined } from 'util/properties-type-guards';
 
 export type TSceneNode = SceneItem | SceneItemFolder;
 
@@ -92,27 +93,21 @@ export class Scene {
   }
 
   getItems(): SceneItem[] {
-    return compact(
-      this.state.nodes
-        .filter(node => node.sceneNodeType === 'item')
-        .map(item => this.getItem(item.id)),
-    );
+    return this.state.nodes
+      .filter(node => node.sceneNodeType === 'item')
+      .map(item => this.getItem(item.id)!);
   }
 
   getFolders(): SceneItemFolder[] {
-    return compact(
-      this.state.nodes
-        .filter(node => node.sceneNodeType === 'folder')
-        .map(item => this.getFolder(item.id)),
-    );
+    return this.state.nodes
+      .filter(node => node.sceneNodeType === 'folder')
+      .map(item => this.getFolder(item.id)!);
   }
 
   getNodes(): TSceneNode[] {
-    return compact(
-      this.state.nodes.map(node => {
-        return node.sceneNodeType === 'folder' ? this.getFolder(node.id) : this.getItem(node.id);
-      }),
-    );
+    return this.state.nodes.map(node => {
+      return node.sceneNodeType === 'folder' ? this.getFolder(node.id)! : this.getItem(node.id)!;
+    });
   }
 
   getRootNodes(): TSceneNode[] {
@@ -132,7 +127,7 @@ export class Scene {
   }
 
   setName(newName: string) {
-    const sceneSource = this.sourcesService.views.getSource(this.id) as Source;
+    const sceneSource = this.getSource();
     sceneSource.setName(newName);
     this.SET_NAME(newName);
   }
@@ -148,11 +143,13 @@ export class Scene {
     return this.addSource(source.sourceId, options);
   }
 
-  addSource(sourceId: string, options: ISceneNodeAddOptions = {}): SceneItem | null {
+  addSource(sourceId: string, options: ISceneNodeAddOptions = {}): SceneItem {
     const source = this.sourcesService.views.getSource(sourceId);
     if (!source) throw new Error(`Source ${sourceId} not found`);
 
-    if (!this.canAddSource(sourceId)) return null;
+    if (!this.canAddSource(sourceId)) {
+      throw new Error('Can not add this source to the scene');
+    }
 
     const sceneItemId = options.id || uuid();
 
@@ -465,7 +462,9 @@ export class Scene {
    */
   getSource(): Source {
     // scene must always have a linked source
-    return this.sourcesService.views.getSource(this.id) as Source;
+    const source = this.sourcesService.views.getSource(this.id);
+    assertIsDefined(source);
+    return source;
   }
 
   getResourceId() {

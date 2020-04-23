@@ -476,7 +476,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
   }
 
   showSourceProperties(sourceId: string) {
-    const source = this.views.getSource(sourceId) as Source;
+    const source = this.views.getSource(sourceId);
+    if (!source) return;
     const propertiesManagerType = source.getPropertiesManagerType();
     const isWidget = propertiesManagerType === 'widget';
 
