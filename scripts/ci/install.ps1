@@ -5,16 +5,19 @@ $token=$args[0]
 $username=$args[1]
 $password=$args[2]
 $pool=$args[3]
-if (-Not $pool) { $pool = 'Default' }
-
-$agentPath = "C:\agent\run.cmd"
-
 
 if (-Not($token) -Or -Not($username) -Or -Not($password)) {
   echo "Provide a token, system user name and password";
   echo "Installation canceled";
   exit;
 }
+
+$workingDir = "C:\agent"
+$agentPath = "$workingDir\run.cmd"
+$registerAgentScriptName = "register-agent.ps1"
+
+#copy register-agent script to the workingDir
+Copy-Item $registerAgentScriptName -Destination $workingDir
 
 echo "Install Chocolately"
 if (-NOT(Get-Command "choco" -errorAction SilentlyContinue)) {
@@ -51,14 +54,17 @@ mkdir agent ; cd agent;
 Invoke-WebRequest -Uri https://vstsagentpackage.azureedge.net/agent/2.150.3/vsts-agent-win-x64-2.150.3.zip -OutFile "$PWD\agent.zip"
 Add-Type -AssemblyName System.IO.Compression.FileSystem ; [System.IO.Compression.ZipFile]::ExtractToDirectory("$PWD\agent.zip", "$PWD")
 
+# save token to env variable
+[System.Environment]::SetEnvironmentVariable('AZURE_PIPELINES_TOKEN', $token)
+
+# run registration script
 echo "Configure Azure Agent"
-$publicIp = (Invoke-RestMethod ipinfo.io/ip).trim()
-.\config --unattended --url https://dev.azure.com/streamlabs --auth pat --token $token --agent "$env:computername $publicIp" --pool $pool
+."$workingDir\$registerAgentScriptName"
 
 # Disable the lock screen to prevent the PC locking after the end of the RDP session
 Set-ItemProperty "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Personalization" -Name 'NoLockScreen' -Value 1;
 
-# Azure Agent has --AutoLogon option to add Anget to autostartup
+# Azure Agent has --AutoLogon option to add Agent to autostartup
 # But it doesn't allow to pass any arguments to the Agent
 # So call own implementation of AutoLogon here
 echo "Setup auto-login when system starts"
@@ -77,7 +83,12 @@ Set-Item -Force wsman:\localhost\client\trustedhosts *
 New-NetFirewallRule -DisplayName "Allow inbound TCP port 5985" -Direction inbound -LocalPort 5985 -Protocol TCP -Action Allow
 Restart-Service WinRM
 
+echo "Add agent registration script to startup"
+$autoStartupRegPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run"
+Set-ItemProperty autoStartupRegPath -Name 'RegisterAzureAgent' -Value "$workingDir\$registerAgentScriptName";
+
 echo "Add agent to startup"
-Set-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Name 'StartAsureAgent' -Value $agentPath;
+Set-ItemProperty autoStartupRegPath  -Name 'StartAsureAgent' -Value $agentPath;
+
 
 echo "Installation completed. Restart PC to take effect"
