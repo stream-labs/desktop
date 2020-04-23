@@ -2,9 +2,15 @@ import { StatefulService, mutation } from 'services/core';
 import * as obs from '../../obs-api';
 import fs from 'fs';
 import util from 'util';
+import electron from 'electron';
+import path from 'path';
+import { getChecksum } from 'util/requests';
 
 const PLUGIN_PLIST_PATH =
   '/Library/CoreMediaIO/Plug-Ins/DAL/vcam-plugin.plugin/Contents/Info.plist';
+
+const INTERNAL_PLIST_PATH =
+  'node_modules/obs-studio-node/data/obs-plugins/slobs-virtual-cam/Info.plist';
 
 export enum EVirtualWebcamPluginInstallStatus {
   Installed = 'installed',
@@ -22,10 +28,22 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
   getInstallStatus(): Promise<EVirtualWebcamPluginInstallStatus> {
     return util
       .promisify(fs.exists)(PLUGIN_PLIST_PATH)
-      .then(exists => {
+      .then(async exists => {
         if (exists) {
-          // TODO: Check if update is required
-          return EVirtualWebcamPluginInstallStatus.Installed;
+          try {
+            const latest = await this.getCurrentChecksum();
+            const installed = await getChecksum(PLUGIN_PLIST_PATH);
+
+            if (latest === installed) {
+              return EVirtualWebcamPluginInstallStatus.Installed;
+            }
+
+            return EVirtualWebcamPluginInstallStatus.Outdated;
+          } catch (e) {
+            console.error('Error comparing checksums on virtual webcam', e);
+            // Assume outdated
+            return EVirtualWebcamPluginInstallStatus.Outdated;
+          }
         }
 
         return EVirtualWebcamPluginInstallStatus.NotPresent;
@@ -58,8 +76,13 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
     this.SET_RUNNING(false);
   }
 
+  private getCurrentChecksum() {
+    const internalPlistPath = path.join(electron.remote.app.getAppPath(), INTERNAL_PLIST_PATH);
+    return getChecksum(internalPlistPath);
+  }
+
   @mutation()
-  SET_RUNNING(running: boolean) {
+  private SET_RUNNING(running: boolean) {
     this.state.running = running;
   }
 }

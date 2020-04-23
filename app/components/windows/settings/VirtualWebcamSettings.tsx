@@ -38,17 +38,22 @@ export default class AppearanceSettings extends Vue {
     return this.virtualWebcamService.state.running;
   }
 
-  needsInstallSection() {
+  needsInstallSection(isUpdate: boolean) {
+    const message = isUpdate
+      ? 'The Virtual Webcam plugin needs to be updated before it can be started. This requires administrator privileges.'
+      : 'Virtual Webcam requires administrator privileges to be installed on your system.';
+    const buttonText = isUpdate ? 'Update Virtual Webcam' : 'Install Virtual Webcam';
+
     return (
       <div class="section">
         <div class="section-content">
-          <p>Virtual Webcam requires administrator privileges to be installed on your system.</p>
+          <p>{message}</p>
           <button
             class="button button--action"
             style={{ marginBottom: '16px' }}
             onClick={this.install}
           >
-            Install Virtual Webcam
+            {buttonText}
           </button>
         </div>
       </div>
@@ -80,9 +85,15 @@ export default class AppearanceSettings extends Vue {
   }
 
   getSection(status: EVirtualWebcamPluginInstallStatus) {
-    if (status === EVirtualWebcamPluginInstallStatus.NotPresent) return this.needsInstallSection();
-    if (status === EVirtualWebcamPluginInstallStatus.Installed) return this.isInstalledSection();
-    return <div>Out of Date</div>;
+    if (status === EVirtualWebcamPluginInstallStatus.NotPresent) {
+      return this.needsInstallSection(false);
+    }
+    if (status === EVirtualWebcamPluginInstallStatus.Outdated) {
+      return this.needsInstallSection(true);
+    }
+    if (status === EVirtualWebcamPluginInstallStatus.Installed) {
+      return this.isInstalledSection();
+    }
   }
 
   render() {
