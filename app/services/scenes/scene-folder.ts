@@ -9,6 +9,7 @@ import { ISceneItemFolder } from '.';
 import { TSceneNodeType } from './scenes';
 import { ServiceHelper } from 'services/core';
 import compact from 'lodash/compact';
+import { assertIsDefined } from '../../util/properties-type-guards';
 
 @ServiceHelper()
 export class SceneItemFolder extends SceneItemNode {
@@ -28,7 +29,7 @@ export class SceneItemFolder extends SceneItemNode {
     const state = this.scenesService.state.scenes[sceneId].nodes.find(item => {
       return item.id === id;
     })!;
-
+    assertIsDefined(state);
     Utils.applyProxy(this, state);
     this.state = state as ISceneItemFolder;
   }
