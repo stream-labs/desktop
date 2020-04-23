@@ -8,6 +8,7 @@ import { SceneItemNode } from './scene-node';
 import { ISceneItemFolder } from '.';
 import { TSceneNodeType } from './scenes';
 import { ServiceHelper } from 'services/core';
+import compact from 'lodash/compact';
 
 @ServiceHelper()
 export class SceneItemFolder extends SceneItemNode {
@@ -53,7 +54,7 @@ export class SceneItemFolder extends SceneItemNode {
    */
   getNodes(): TSceneNode[] {
     const scene = this.getScene();
-    return this.childrenIds.map(nodeId => scene.getNode(nodeId)) as TSceneNode[];
+    return compact(this.childrenIds.map(nodeId => scene.getNode(nodeId)));
   }
 
   getItems(): SceneItem[] {
@@ -110,14 +111,14 @@ export class SceneItemFolder extends SceneItemNode {
       }
       nodes.push(node);
       traversedNodesIds.push(node.id);
-      if (node.sceneNodeType !== 'folder') return;
-      nodes.push(...(node as SceneItemFolder).getNestedNodes(traversedNodesIds));
+      if (!node.isFolder()) return;
+      nodes.push(...node.getNestedNodes(traversedNodesIds));
     });
     return nodes;
   }
 
   getNestedItems(): SceneItem[] {
-    return this.getNestedNodes().filter(node => node.sceneNodeType === 'item') as SceneItem[];
+    return this.getNestedNodes().filter(isItem);
   }
 
   getNestedFolders(): SceneItemFolder[] {

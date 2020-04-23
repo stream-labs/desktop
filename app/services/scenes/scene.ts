@@ -10,6 +10,7 @@ import {
   ISceneItemFolder,
   SceneItemFolder,
   ISceneItemNode,
+  isItem,
 } from './index';
 import Utils from 'services/utils';
 import * as obs from '../../../obs-api';
@@ -19,6 +20,7 @@ import { TSceneNodeInfo } from 'services/scene-collections/nodes/scene-items';
 import * as fs from 'fs';
 import uuid from 'uuid/v4';
 import { SceneNode } from '../api/external-api/scenes';
+import compact from 'lodash/compact';
 
 export type TSceneNode = SceneItem | SceneItemFolder;
 
@@ -90,21 +92,27 @@ export class Scene {
   }
 
   getItems(): SceneItem[] {
-    return this.state.nodes
-      .filter(node => node.sceneNodeType === 'item')
-      .map(item => this.getItem(item.id)) as SceneItem[];
+    return compact(
+      this.state.nodes
+        .filter(node => node.sceneNodeType === 'item')
+        .map(item => this.getItem(item.id)),
+    );
   }
 
   getFolders(): SceneItemFolder[] {
-    return this.state.nodes
-      .filter(node => node.sceneNodeType === 'folder')
-      .map(item => this.getFolder(item.id)) as SceneItemFolder[];
+    return compact(
+      this.state.nodes
+        .filter(node => node.sceneNodeType === 'folder')
+        .map(item => this.getFolder(item.id)),
+    );
   }
 
   getNodes(): TSceneNode[] {
-    return this.state.nodes.map(node => {
-      return node.sceneNodeType === 'folder' ? this.getFolder(node.id) : this.getItem(node.id);
-    }) as TSceneNode[];
+    return compact(
+      this.state.nodes.map(node => {
+        return node.sceneNodeType === 'folder' ? this.getFolder(node.id) : this.getItem(node.id);
+      }),
+    );
   }
 
   getRootNodes(): TSceneNode[] {
@@ -137,7 +145,7 @@ export class Scene {
   ): SceneItem {
     const sourceAddOptions = options.sourceAddOptions || {};
     const source = this.sourcesService.createSource(sourceName, type, settings, sourceAddOptions);
-    return this.addSource(source.sourceId, options) as SceneItem;
+    return this.addSource(source.sourceId, options);
   }
 
   addSource(sourceId: string, options: ISceneNodeAddOptions = {}): SceneItem | null {
@@ -180,7 +188,7 @@ export class Scene {
 
     const source = this.sourcesService.addFile(path);
     if (!source) return null;
-    const item = this.addSource(source.sourceId) as SceneItem;
+    const item = this.addSource(source.sourceId);
     if (folderId) item.setParent(folderId);
     return item;
   }
@@ -429,7 +437,7 @@ export class Scene {
    * result also includes nested scenes
    */
   getNestedSources(options = { excludeScenes: false }): Source[] {
-    const sources = this.getNestedItems(options).map(sceneItem => sceneItem.getSource() as Source);
+    const sources = this.getNestedItems(options).map(sceneItem => sceneItem.getSource());
     return uniqBy(sources, 'sourceId');
   }
 
@@ -456,6 +464,7 @@ export class Scene {
    * returns the source linked to scene
    */
   getSource(): Source {
+    // scene must always have a linked source
     return this.sourcesService.views.getSource(this.id) as Source;
   }
 
