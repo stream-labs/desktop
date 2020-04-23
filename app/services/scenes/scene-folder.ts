@@ -73,7 +73,9 @@ export class SceneItemFolder extends SceneItemNode {
   }
 
   getScene(): Scene {
-    return this.scenesService.views.getScene(this.sceneId);
+    const scene = this.scenesService.views.getScene(this.sceneId);
+    assertIsDefined(scene);
+    return scene;
   }
 
   /**

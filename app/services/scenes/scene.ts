@@ -399,7 +399,7 @@ export class Scene {
   hasNestedScene(sceneId: string) {
     const childScenes = this.getItems()
       .filter(sceneItem => sceneItem.type === 'scene')
-      .map(sceneItem => this.scenesService.views.getScene(sceneItem.sourceId));
+      .map(sceneItem => sceneItem.getScene());
 
     for (const childScene of childScenes) {
       if (childScene.id === sceneId) return true;
@@ -417,7 +417,7 @@ export class Scene {
     result
       .filter(sceneItem => sceneItem.type === 'scene')
       .map(sceneItem => {
-        return this.scenesService.views.getScene(sceneItem.sourceId).getNestedItems();
+        return sceneItem.getScene().getNestedItems();
       })
       .forEach(sceneItems => {
         result = result.concat(sceneItems);
@@ -445,7 +445,7 @@ export class Scene {
   getNestedScenes(): Scene[] {
     const scenes = this.getNestedSources()
       .filter(source => source.type === 'scene')
-      .map(sceneSource => this.scenesService.views.getScene(sceneSource.sourceId));
+      .map(sceneSource => this.scenesService.views.getScene(sceneSource.sourceId)!);
     const resultScenes: Scene[] = [];
 
     scenes.forEach(scene => {

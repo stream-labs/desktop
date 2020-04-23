@@ -197,7 +197,7 @@ export class SceneItem extends SceneItemNode {
   }
 
   remove() {
-    this.scenesService.views.getScene(this.sceneId).removeItem(this.sceneItemId);
+    this.getScene().removeItem(this.sceneItemId);
   }
 
   nudgeLeft() {
@@ -378,7 +378,7 @@ export class SceneItem extends SceneItemNode {
   setContentCrop() {
     const source = this.getSource();
     if (source.type !== 'scene') return;
-    const scene = this.scenesService.views.getScene(source.sourceId);
+    const scene = this.getScene();
     const rect = scene
       .getSelection()
       .selectAll()

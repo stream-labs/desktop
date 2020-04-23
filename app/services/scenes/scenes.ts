@@ -132,8 +132,12 @@ export interface ISceneItemFolder extends ISceneItemNode {
 }
 
 class ScenesViews extends ViewHandler<IScenesState> {
-  getScene(sceneId: string) {
-    return new Scene(sceneId);
+  @Inject() private scenesService: ScenesService;
+
+  getScene(sceneId: string): Scene | null {
+    const sceneModel = this.state.scenes[sceneId];
+    if (!sceneModel) return null;
+    return new Scene(sceneModel.id);
   }
 
   get activeSceneId() {
@@ -147,10 +151,7 @@ class ScenesViews extends ViewHandler<IScenesState> {
   }
 
   get scenes(): Scene[] {
-    return uniqBy(
-      this.state.displayOrder.map(id => this.getScene(id)),
-      x => x.id,
-    );
+    return this.state.displayOrder.map(id => this.getScene(id)!);
   }
 
   getSceneItems(): SceneItem[] {
@@ -234,8 +235,9 @@ export class ScenesService extends StatefulService<IScenesState> {
     this.sourcesService.addSource(obsScene.source, name, { sourceId: id });
 
     if (options.duplicateSourcesFromScene) {
+      const newScene = this.views.getScene(id)!;
       const oldScene = this.views.getScene(options.duplicateSourcesFromScene);
-      const newScene = this.views.getScene(id);
+      if (!oldScene) return;
 
       oldScene
         .getItems()
