@@ -47,6 +47,7 @@ export class Scene {
   constructor(sceneId: string) {
     if (!sceneId) console.trace('undefined scene id');
     this.state = this.scenesService.state.scenes[sceneId];
+    assertIsDefined(this.state);
     Utils.applyProxy(this, this.state);
   }
 
