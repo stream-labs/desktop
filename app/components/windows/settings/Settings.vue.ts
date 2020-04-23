@@ -22,6 +22,7 @@ import FacemaskSettings from './FacemaskSettings.vue';
 import SearchablePages from 'components/shared/SearchablePages';
 import FormInput from 'components/shared/inputs/FormInput.vue';
 import StreamSettings from './StreamSettings';
+import VirtualWebcamSettings from './VirtualWebcamSettings';
 
 @Component({
   components: {
@@ -44,6 +45,7 @@ import StreamSettings from './StreamSettings';
     FacemaskSettings,
     FormInput,
     StreamSettings,
+    VirtualWebcamSettings,
   },
 })
 export default class Settings extends Vue {
@@ -64,6 +66,7 @@ export default class Settings extends Vue {
     Audio: 'icon-audio',
     Hotkeys: 'icon-settings',
     'Game Overlay': 'icon-full-screen',
+    'Virtual Webcam': 'fas fa-camera',
     Advanced: 'fas fa-cogs',
     Developer: 'far fa-file-code',
     'Scene Collections': 'icon-themes',
