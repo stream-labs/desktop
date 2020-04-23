@@ -56,7 +56,7 @@ interface IObsSourceCallbackInfo {
 class SourcesViews extends ViewHandler<ISourcesState> {
   get sources(): Source[] {
     return Object.values(this.state.sources).map(
-      sourceModel => this.getSource(sourceModel.sourceId) as Source,
+      sourceModel => this.getSource(sourceModel.sourceId)!,
     );
   }
 
@@ -72,7 +72,7 @@ class SourcesViews extends ViewHandler<ISourcesState> {
     const sourceModels = Object.values(this.state.sources).filter(source => {
       return source.name === name;
     });
-    return sourceModels.map(sourceModel => this.getSource(sourceModel.sourceId) as Source);
+    return sourceModels.map(sourceModel => this.getSource(sourceModel.sourceId)!);
   }
 }
 
@@ -193,7 +193,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
     const obsInput = obs.InputFactory.create(type, id, obsInputSettings);
 
     this.addSource(obsInput, name, options);
-    return this.views.getSource(id) as Source;
+    return this.views.getSource(id)!;
   }
 
   addSource(obsInput: obs.IInput, name: string, options: ISourceAddOptions = {}) {
@@ -212,7 +212,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       isTemporary: options.isTemporary,
       propertiesManagerType: managerType,
     });
-    const source = this.views.getSource(id) as Source;
+    const source = this.views.getSource(id)!;
     const muted = obsInput.muted;
     this.UPDATE_SOURCE({ id, muted });
     this.updateSourceFlags(source.state, obsInput.outputFlags, true);
