@@ -405,36 +405,6 @@ export class SourcesService extends StatefulService<ISourcesState> {
     return this.getAvailableSourcesTypesList().map(listItem => listItem.value);
   }
 
-  refreshSourceAttributes() {
-    const activeScene = this.scenesService.views.activeScene as Scene;
-    if (!activeScene) return;
-    const activeItems = activeScene.getItems();
-    const sourcesNames: string[] = [];
-
-    activeItems.forEach(activeItem => {
-      sourcesNames.push(activeItem.name);
-    });
-
-    const sourcesSize = obs.getSourcesSize(sourcesNames);
-
-    activeItems.forEach((item, index) => {
-      const source = this.state.sources[item.sourceId];
-
-      if (
-        source.width !== sourcesSize[index].width ||
-        source.height !== sourcesSize[index].height
-      ) {
-        const size = {
-          id: item.sourceId,
-          width: sourcesSize[index].width,
-          height: sourcesSize[index].height,
-        };
-        this.UPDATE_SOURCE(size);
-      }
-      this.updateSourceFlags(source, sourcesSize[index].outputFlags);
-    });
-  }
-
   private handleSourceCallback(objs: IObsSourceCallbackInfo[]) {
     objs.forEach(info => {
       const source = this.views.getSource(info.name);
