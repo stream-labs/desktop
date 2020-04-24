@@ -12,12 +12,30 @@ if (-Not($token) -Or -Not($username) -Or -Not($password)) {
   exit;
 }
 
+# change dir to the script's dir
+cd $PSScriptRoot;
+
+# define paths
 $workingDir = "C:\agent"
 $agentPath = "$workingDir\run.cmd"
 $registerAgentScriptName = "register-agent.ps1"
 
-#copy register-agent script to the workingDir
-Copy-Item $registerAgentScriptName -Destination $workingDir
+
+# save token and working dir to env variable
+[System.Environment]::SetEnvironmentVariable('AZURE_PIPELINES_TOKEN', $token, [System.EnvironmentVariableTarget]::User)
+[System.Environment]::SetEnvironmentVariable('AZURE_PIPELINES_WORKING_DIR', $workingDir, [System.EnvironmentVariableTarget]::User)
+
+echo "Donwload and install Azure Agent"
+cd /
+Remove-Item -Recurse -Force -ErrorAction Ignore agent
+mkdir agent ; cd agent;
+Invoke-WebRequest -Uri https://vstsagentpackage.azureedge.net/agent/2.150.3/vsts-agent-win-x64-2.150.3.zip -OutFile "$PWD\agent.zip"
+Add-Type -AssemblyName System.IO.Compression.FileSystem ; [System.IO.Compression.ZipFile]::ExtractToDirectory("$PWD\agent.zip", "$PWD")
+
+
+#copy scripts to the workingDir
+Copy-Item -Path "$PSScriptRoot\*" -Destination $workingDir
+
 
 echo "Install Chocolately"
 if (-NOT(Get-Command "choco" -errorAction SilentlyContinue)) {
@@ -29,7 +47,7 @@ echo "Install Visual C++ Redistributable (required for node-win32-np module)"
 choco install vcredist2015
 
 echo "Install Nodejs"
-choco install nodejs --version=10.15.3
+choco install nodejs --version=12.16.2
 
 echo "Install Yarn"
 choco install yarn
@@ -46,16 +64,6 @@ choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
 
 echo "Install Visual Studio 2017 Build Tools"
 choco install visualstudio2017buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools;includeRecommended;includeOptional"
-
-echo "Donwload and install Azure Agent"
-cd /
-Remove-Item -Recurse -Force -ErrorAction Ignore agent
-mkdir agent ; cd agent;
-Invoke-WebRequest -Uri https://vstsagentpackage.azureedge.net/agent/2.150.3/vsts-agent-win-x64-2.150.3.zip -OutFile "$PWD\agent.zip"
-Add-Type -AssemblyName System.IO.Compression.FileSystem ; [System.IO.Compression.ZipFile]::ExtractToDirectory("$PWD\agent.zip", "$PWD")
-
-# save token to env variable
-[System.Environment]::SetEnvironmentVariable('AZURE_PIPELINES_TOKEN', $token)
 
 # run registration script
 echo "Configure Azure Agent"
@@ -83,12 +91,9 @@ Set-Item -Force wsman:\localhost\client\trustedhosts *
 New-NetFirewallRule -DisplayName "Allow inbound TCP port 5985" -Direction inbound -LocalPort 5985 -Protocol TCP -Action Allow
 Restart-Service WinRM
 
-echo "Add agent registration script to startup"
+echo "Setup agent autostart"
 $autoStartupRegPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run"
-Set-ItemProperty autoStartupRegPath -Name 'RegisterAzureAgent' -Value "$workingDir\$registerAgentScriptName";
-
-echo "Add agent to startup"
-Set-ItemProperty autoStartupRegPath  -Name 'StartAsureAgent' -Value $agentPath;
+Set-ItemProperty $autoStartupRegPath -Name 'RegisterAzureAgent' -Value "powershell $workingDir\startup.ps1";
 
 
 echo "Installation completed. Restart PC to take effect"
