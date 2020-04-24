@@ -21,14 +21,12 @@ class Updater {
 
     this.bindListeners();
 
-    this.browserWindow = this.initWindow();
-
     autoUpdater.checkForUpdates().catch(() => {
       // This usually means there is no internet connection.
       // In this case, we shouldn't prevent starting the app.
       this.startApp();
       this.finished = true;
-      this.browserWindow.close();
+      if (this.browserWindow) this.browserWindow.close();
     });
   }
 
@@ -37,6 +35,7 @@ class Updater {
   bindListeners() {
     autoUpdater.on('update-available', info => {
       console.log('Updater: Update available', info);
+      this.browserWindow = this.initWindow();
       this.updateState.version = info.version;
       this.updateState.percent = 0;
       this.pushState();
@@ -46,7 +45,7 @@ class Updater {
       console.log('Updater: Update not found');
       this.startApp();
       this.finished = true;
-      this.browserWindow.close();
+      if (this.browserWindow) this.browserWindow.close();
     });
 
     autoUpdater.on('download-progress', progress => {
@@ -103,7 +102,7 @@ class Updater {
   }
 
   pushState() {
-    if (!this.browserWindow.isDestroyed()) {
+    if (this.browserWindow && !this.browserWindow.isDestroyed()) {
       this.browserWindow.webContents.send('autoUpdate-pushState', this.updateState);
     }
   }
