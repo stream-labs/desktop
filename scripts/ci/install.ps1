@@ -83,9 +83,9 @@ Set-ItemProperty $RegPath "DefaultPassword" -Value "$password" -type String
 
 # Setup WinRM for remote connections
 # Trusted hosts and ports must be confgured on the level above
-# Use the example below to run scripts on several agents:
+# Use the example below to run restart all agents
 #   $LiveCred = Get-Credential
-#   Invoke-Command -Computer Agent1, Agent2, Agent3 -Credential $LiveCred -ScriptBlock {Get-Process}
+#   Invoke-Command -Computer Agent1, Agent2, Agent3 -Credential $LiveCred -ScriptBlock {Restart-Computer -Force}
 Enable-PSRemoting -Force
 Set-Item -Force wsman:\localhost\client\trustedhosts *
 New-NetFirewallRule -DisplayName "Allow inbound TCP port 5985" -Direction inbound -LocalPort 5985 -Protocol TCP -Action Allow

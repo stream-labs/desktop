@@ -10,3 +10,5 @@ cd $PSScriptRoot;
 
 # unregister agent
 ."./register-agent.ps1 remove";
+
+Restart-Computer -Force

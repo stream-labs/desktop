@@ -5,4 +5,4 @@ if (-Not($workingDir)) {
   echo "Working dir is not set. Did you run the installation script?";
   exit -1;
 }
-."$workingDir/run.cmd --once"
+Start-Process -NoNewWindow -Wait -FilePath "$workingDir\run.cmd" -ArgumentList "--once"
