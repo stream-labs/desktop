@@ -122,6 +122,7 @@ export class SettingsService extends StatefulService<ISettingsState>
     let categories: string[] = obs.NodeObs.OBS_settings_getListCategories();
     categories = categories.concat([
       'Game Overlay',
+      'Virtual Webcam',
       'Scene Collections',
       'Notifications',
       'Appearance',

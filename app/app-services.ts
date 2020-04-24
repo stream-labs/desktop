@@ -50,6 +50,7 @@ export { StreamSettingsService } from 'services/settings/streaming';
 export { TouchBarService } from 'services/touch-bar';
 export { ApplicationMenuService } from 'services/application-menu';
 export { MacPermissionsService } from 'services/mac-permissions';
+export { VirtualWebcamService } from 'services/virtual-webcam';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';
