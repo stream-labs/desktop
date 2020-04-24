@@ -9,6 +9,6 @@ cd $PSScriptRoot;
 ."./start-agent.ps1";
 
 # unregister agent
-."./register-agent.ps1 remove";
+Start-Process -NoNewWindow -Wait "powershell" -ArgumentList "./register-agent.ps1", "remove"
 
 Restart-Computer -Force
