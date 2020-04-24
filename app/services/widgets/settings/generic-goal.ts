@@ -62,10 +62,11 @@ export abstract class GenericGoalService extends BaseGoalService<IGoalData, IGoa
         min: 0,
       }),
 
-      ends_at: metadata.date({
+      ends_at: metadata.text({
         title: $t('End After'),
-        disablePastDates: true,
         required: true,
+        dateFormat: 'MM/dd/yyyy',
+        placeholder: 'MM/DD/YYYY',
       }),
 
       include_resubs: metadata.toggle({ title: $t('Include resubs?') }),

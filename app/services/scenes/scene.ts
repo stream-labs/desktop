@@ -199,7 +199,6 @@ export class Scene {
       name,
       sceneNodeType: 'folder',
       sceneId: this.id,
-      resourceId: `SceneItemFolder${JSON.stringify([this.id, id])}`,
       parentId: '',
     });
     return this.getFolder(id) as SceneItemFolder;
@@ -487,7 +486,6 @@ export class Scene {
       parentId: '',
       sceneNodeType: 'item',
       sceneId: this.state.id,
-      resourceId: `SceneItem${JSON.stringify([this.state.id, sceneItemId, sourceId])}`,
 
       transform: {
         // Position in video space
