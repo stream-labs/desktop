@@ -117,7 +117,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
 
     // We need to refresh the data in case there are additional fields
     const mustUpdateObsSettings = Object.keys(patch).find(key =>
-      ['service', 'key', 'server'].includes(key),
+      ['platform', 'key', 'server'].includes(key),
     );
     if (!mustUpdateObsSettings) return;
     streamFormData = this.getObsStreamSettings();
