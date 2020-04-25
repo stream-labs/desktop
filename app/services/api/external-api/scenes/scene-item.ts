@@ -1,9 +1,13 @@
-import { SceneItem as InternalSceneItem } from 'services/scenes';
+import {
+  SceneItem as InternalSceneItem,
+  ISceneItem as IInternalSceneItemModel,
+  ISceneItem,
+} from 'services/scenes';
 import { InjectFromExternalApi, Fallback } from 'services/api/external-api';
 import { Source, SourcesService } from 'services/api/external-api/sources';
-import { ISceneNodeModel, SceneNode } from './scene-node';
+import { getExternalNodeModel, ISceneNodeModel, SceneNode } from './scene-node';
 import Utils from '../../../utils';
-import { ServiceHelper } from '../../../core';
+import { Inject, ServiceHelper } from '../../../core';
 
 export interface ISceneItemModel extends ISceneItemSettings, ISceneNodeModel {
   sceneItemId: string;
@@ -94,17 +98,7 @@ export class SceneItem extends SceneNode implements ISceneItemActions, ISceneIte
    */
   getModel(): ISceneItemModel {
     const sourceModel = this.getSource().getModel();
-    return {
-      ...super.getModel(),
-      sourceId: this.getSource().sourceId,
-      sceneItemId: this.sceneItem.sceneItemId,
-      name: sourceModel.name,
-      transform: this.sceneItem.transform,
-      visible: this.sceneItem.visible,
-      locked: this.sceneItem.locked,
-      streamVisible: this.sceneItem.streamVisible,
-      recordingVisible: this.sceneItem.recordingVisible,
-    };
+    return getExternalSceneItemModel(this.sceneItem as ISceneItem, sourceModel.name);
   }
 
   setSettings(settings: Partial<ISceneItemSettings>): void {
@@ -164,4 +158,21 @@ export class SceneItem extends SceneNode implements ISceneItemActions, ISceneIte
   setContentCrop(): void {
     return this.setContentCrop();
   }
+}
+
+export function getExternalSceneItemModel(
+  internalModel: IInternalSceneItemModel,
+  name: string,
+): ISceneItemModel {
+  return {
+    ...getExternalNodeModel(internalModel),
+    sourceId: internalModel.sourceId,
+    sceneItemId: internalModel.sceneItemId,
+    name,
+    transform: internalModel.transform,
+    visible: internalModel.visible,
+    locked: internalModel.locked,
+    streamVisible: internalModel.streamVisible,
+    recordingVisible: internalModel.recordingVisible,
+  };
 }

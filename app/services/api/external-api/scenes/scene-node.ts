@@ -1,6 +1,7 @@
 import { Inject } from 'services/core/injector';
 import {
   Scene as InternalScene,
+  ISceneItemNode as IInternalNodeModel,
   SceneItemNode as InternalSceneNode,
   ScenesService as InternalScenesService,
 } from 'services/scenes';
@@ -48,12 +49,7 @@ export abstract class SceneNode {
    * returns serialized representation on scene-node
    */
   getModel(): ISceneNodeModel {
-    return {
-      id: this.sceneNode.id,
-      sceneId: this.sceneNode.sceneId,
-      sceneNodeType: this.sceneNode.sceneNodeType,
-      parentId: this.sceneNode.parentId,
-    };
+    return getExternalNodeModel(this.sceneNode);
   }
 
   getScene(): Scene {
@@ -225,4 +221,13 @@ export abstract class SceneNode {
   getPath(): string[] {
     return this.sceneNode.getPath();
   }
+}
+
+export function getExternalNodeModel(internalModel: IInternalNodeModel): ISceneNodeModel {
+  return {
+    id: internalModel.id,
+    sceneId: internalModel.sceneId,
+    sceneNodeType: internalModel.sceneNodeType,
+    parentId: internalModel.parentId,
+  };
 }
