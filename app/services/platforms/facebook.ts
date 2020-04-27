@@ -85,7 +85,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   authWindowOptions: Electron.BrowserWindowConstructorOptions = { width: 800, height: 800 };
 
   static initialState: IFacebookServiceState = {
-    activePage: { id: null, access_token: null, name: null },
+    activePage: null,
     liveVideoId: null,
     streamUrl: null,
     streamProperties: { title: null, description: null, game: null },
@@ -162,7 +162,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
       'facebook',
       `${this.apiBase}/me/accounts`,
     ).then(async json => {
-      const pageId = this.userService.platform?.channelId || this.state.facebookPages?.page_id;
+      const pageId = this.userService.platform?.channelId || this.state.facebookPages?.page_id!;
       const activePage = json.data.filter(page => pageId === page.id)[0] || json.data[0];
       this.userService.updatePlatformChannelId('facebook', pageId as string);
       this.SET_ACTIVE_PAGE(activePage);
@@ -202,10 +202,10 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   /**
    * fetch prefill data
    */
-  async prepopulateInfo(): Promise<IFacebookStartStreamOptions> {
+  async prepopulateInfo(): Promise<Partial<IFacebookStartStreamOptions>> {
     await this.fetchActivePage();
     if (!this.state.activePage || !this.state.activePage.id) {
-      return { facebookPageId: null } as IFacebookStartStreamOptions;
+      return { facebookPageId: undefined };
     }
     const url =
       `${this.apiBase}/${this.state.activePage.id}/live_videos?` +
@@ -393,6 +393,9 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
 
   sendPushNotif() {
     const url = 'https://streamlabs.com/api/v5/slobs/remote/notify';
+    if (!this.userService.apiToken) {
+      throw new Error('API token must be defined');
+    }
     const headers = authorizedHeaders(
       this.userService.apiToken,
       new Headers({

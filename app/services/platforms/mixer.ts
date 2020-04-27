@@ -117,7 +117,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
   fetchNewToken(): Promise<void> {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/mixer/refresh`;
-    const headers = authorizedHeaders(this.userService.apiToken as string);
+    const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 
     return fetch(request)

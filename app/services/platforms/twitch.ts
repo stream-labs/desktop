@@ -111,11 +111,11 @@ export class TwitchService extends Service implements IPlatformService {
   }
 
   // TODO: Refactor so this is reusable
-  get userAuth(): { token: string; id: string } {
+  get userAuth(): { token?: string; id?: string } {
     return {
       token: this.userService.state.auth?.platforms?.twitch?.token,
       id: this.userService.state.auth?.platforms?.twitch?.id,
-    } as { token: string; id: string };
+    };
   }
 
   get oauthToken() {

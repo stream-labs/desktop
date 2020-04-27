@@ -99,7 +99,7 @@ export enum EPlatformCallResult {
 export type TStartStreamOptions =
   | ITwitchStartStreamOptions
   | IYoutubeStartStreamOptions
-  | IFacebookStartStreamOptions
+  | Partial<IFacebookStartStreamOptions>
   | IMixerStartStreamOptions;
 
 export type TChannelInfo =
