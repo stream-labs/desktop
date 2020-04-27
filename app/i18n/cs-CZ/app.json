@@ -1,5 +1,9 @@
 {
   "You have been logged out": "Byli jste odhlášeni",
   "This element is too small to be displayed": "Tento prvek je příliš malý na to, aby byl zobrazen",
-  "This element requires Selective Recording to be enabled": "Tento prvek vyžaduje, aby bylo povoleno selektivní nahrávání"
+  "This element requires Selective Recording to be enabled": "Tento prvek vyžaduje, aby bylo povoleno selektivní nahrávání",
+  "Grant Permissions": "Grant Permissions",
+  "Streamlabs OBS needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs OBS needs additional permissions. Grant permissions in the pop-up dialogs to continue.",
+  "Microphone": "Microphone",
+  "Webcam": "Webcam"
 }
