@@ -26,7 +26,7 @@ export default class NotificationsSettings extends Vue {
       settings[formInput.name] = formInput.value;
     });
     this.notificationsService.setSettings(settings);
-    this.settingsFormData = this.notificationsService.getSettingsFormData();
+    this.settingsFormData = this.notificationsService.views.getSettingsFormData();
   }
 
   saveTroubleshooterSettings(formData: TObsFormData) {
@@ -49,7 +49,7 @@ export default class NotificationsSettings extends Vue {
   }
 
   private updateForms() {
-    this.settingsFormData = this.notificationsService.getSettingsFormData();
+    this.settingsFormData = this.notificationsService.views.getSettingsFormData();
     this.troubleshooterFormData = this.troubleshooterService.getSettingsFormData();
   }
 }

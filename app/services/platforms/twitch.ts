@@ -1,11 +1,11 @@
 import { Service } from 'services/core/service';
 import {
-  IPlatformService,
+  EPlatformCallResult,
   IGame,
+  IPlatformRequest,
+  IPlatformService,
   TPlatformCapability,
   TPlatformCapabilityMap,
-  EPlatformCallResult,
-  IPlatformRequest,
 } from '.';
 import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
@@ -145,31 +145,33 @@ export class TwitchService extends Service implements IPlatformService {
   }
 
   async validatePlatform() {
-    try {
-      const result = await this.hasScope('channel_read');
+    const hasScopeCheck = this.hasScope('channel_read')
+      .then(result => {
+        if (!result) return EPlatformCallResult.TwitchScopeMissing;
+        return EPlatformCallResult.Success;
+      })
+      .catch(e => {
+        console.error('Error checking Twitch OAuth scopes', e);
+        return EPlatformCallResult.Error;
+      });
 
-      if (!result) return EPlatformCallResult.TwitchScopeMissing;
-    } catch (e) {
-      console.error('Error checking Twitch OAuth scopes', e);
-
-      return EPlatformCallResult.Error;
-    }
-
-    try {
-      // Catch 2FA errors
-      await this.fetchStreamKey();
-    } catch (e) {
-      if (e && e.status) {
-        if (e.status === 403) {
-          return EPlatformCallResult.TwitchTwoFactor;
+    const twitchTwoFactorCheck = this.fetchStreamKey()
+      .then(key => {
+        return EPlatformCallResult.Success;
+      })
+      .catch(e => {
+        if (e && e.status) {
+          if (e.status === 403) {
+            return EPlatformCallResult.TwitchTwoFactor;
+          }
         }
-      }
+        console.error('Error fetching Twitch stream key', e);
+        return EPlatformCallResult.Error;
+      });
 
-      console.error('Error fetching Twitch stream key', e);
-
-      return EPlatformCallResult.Error;
-    }
-
+    const results = await Promise.all([hasScopeCheck, twitchTwoFactorCheck]);
+    const failedResults = results.filter(result => result !== EPlatformCallResult.Success);
+    if (failedResults.length) return failedResults[0];
     return EPlatformCallResult.Success;
   }
 

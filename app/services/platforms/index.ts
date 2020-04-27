@@ -1,7 +1,7 @@
 import { ITwitchChannelInfo, ITwitchStartStreamOptions, TwitchService } from './twitch';
 import { IYoutubeChannelInfo, IYoutubeStartStreamOptions, YoutubeService } from './youtube';
 import { IMixerChannelInfo, IMixerStartStreamOptions, MixerService } from './mixer';
-import { FacebookService, IFacebookChanelInfo, IFacebookStartStreamOptions } from './facebook';
+import { FacebookService, IFacebookChannelInfo, IFacebookStartStreamOptions } from './facebook';
 import { TTwitchTag } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
 import { Observable } from 'rxjs';
@@ -105,7 +105,7 @@ export type TStartStreamOptions =
 export type TChannelInfo =
   | IYoutubeChannelInfo
   | ITwitchChannelInfo
-  | IFacebookChanelInfo
+  | IFacebookChannelInfo
   | IMixerChannelInfo;
 
 // All platform services should implement this interface.

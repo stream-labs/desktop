@@ -1,12 +1,12 @@
 <template>
 <div style="height: 100%" :class="theme">
-  <title-bar :title="options.title" class="child-window-titlebar" v-if="!options.isFullScreen" />
+  <title-bar :title="options.title" class="child-window-titlebar" v-if="$store.state.bulkLoadFinished && !options.isFullScreen" />
   <div class="blank-slate">
     <div class="spinner-spacer" />
     <i class="fa fa-spinner fa-pulse" />
     <div class="spinner-spacer" />
   </div>
-  <component :is="options.componentName" :title="options.title" />
+  <component v-if="$store.state.bulkLoadFinished" :is="options.componentName" :title="options.title" />
 </div>
 </template>
 

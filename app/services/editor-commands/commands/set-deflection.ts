@@ -12,20 +12,20 @@ export class SetDeflectionCommand extends CombinableCommand {
 
   constructor(private sourceId: string, private deflection: number) {
     super();
-    const source = this.audioService.getSource(this.sourceId);
+    const source = this.audioService.views.getSource(this.sourceId);
     this.description = $t('Adjust %{sourceName} volume', { sourceName: source.name });
     this.initialValue = source.fader.deflection;
   }
 
   execute() {
-    const source = this.audioService.getSource(this.sourceId);
+    const source = this.audioService.views.getSource(this.sourceId);
     const deflection = this.endValue || this.deflection;
     source.setDeflection(deflection);
     this.endValue = deflection;
   }
 
   rollback() {
-    const source = this.audioService.getSource(this.sourceId);
+    const source = this.audioService.views.getSource(this.sourceId);
     source.setDeflection(this.initialValue);
   }
 

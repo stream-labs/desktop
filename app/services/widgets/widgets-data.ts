@@ -455,7 +455,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     platforms: new Set(['facebook']),
   },
   [WidgetType.DonationTicker]: {
-    name: $t('Donation Ticker'),
+    name: $t('Tip Ticker'),
     description: $t('Show off your most recent donations to your viewers.'),
     demoVideo: true,
     demoFilename: 'source-donation-ticker.mp4',
@@ -509,6 +509,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoVideo: true,
     demoFilename: 'source-credits.mp4',
     supportList: [$t('New Followers'), $t('New Subscribers'), $t('Cheers'), $t('Donations')],
+    platforms: new Set(['twitch', 'youtube', 'mixer']),
   },
   [WidgetType.SponsorBanner]: {
     name: $t('Sponsor Banner'),

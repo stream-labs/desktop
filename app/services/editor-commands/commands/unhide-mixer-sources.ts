@@ -15,8 +15,7 @@ export class UnhideMixerSourcesCommand extends Command {
   }
 
   execute() {
-    this.hiddenSources = this.audioService
-      .getSourcesForCurrentScene()
+    this.hiddenSources = this.audioService.views.sourcesForCurrentScene
       .filter(s => s.mixerHidden)
       .map(s => s.sourceId);
 
@@ -25,7 +24,7 @@ export class UnhideMixerSourcesCommand extends Command {
 
   rollback() {
     this.hiddenSources.forEach(sourceId => {
-      this.audioService.getSource(sourceId).setHidden(true);
+      this.audioService.views.getSource(sourceId).setHidden(true);
     });
   }
 }

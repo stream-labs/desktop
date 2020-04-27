@@ -17,9 +17,10 @@
           v-for="sceneCollection in sceneCollections"
           :key="sceneCollection.id"
           class="dropdown-menu__item"
-          :class="{ active: activeId === sceneCollection.id }"
+          :class="{ active: activeId === sceneCollection.id, 'dropdown-menu__disabled': sceneCollection.operatingSystem !== os }"
           @click="loadCollection(sceneCollection.id)"
         >
+          <i class="fab" :class="{ 'fa-apple': sceneCollection.operatingSystem === 'darwin', 'fa-windows': sceneCollection.operatingSystem === 'win32' }" />
           {{ sceneCollection.name }}
         </div>
       </DropdownMenu>

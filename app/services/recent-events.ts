@@ -1,5 +1,5 @@
 import { HostsService } from 'services/hosts';
-import { StatefulService, Inject, mutation, InitAfter } from 'services/core';
+import { StatefulService, Inject, mutation, InitAfter, ViewHandler } from 'services/core';
 import { UserService, LoginLifecycle } from 'services/user';
 import { authorizedHeaders, handleResponse } from 'util/requests';
 import { $t } from 'services/i18n';
@@ -7,6 +7,7 @@ import { WindowsService } from 'services/windows';
 import { WebsocketService, TSocketEvent, IEventSocketEvent } from 'services/websocket';
 import { pick, cloneDeep } from 'lodash';
 import uuid from 'uuid/v4';
+import ExecuteInCurrentWindow from 'util/execute-in-current-window';
 import { Subscription } from 'rxjs';
 import mapValues from 'lodash/mapValues';
 
@@ -47,6 +48,10 @@ export interface IRecentEvent {
   repeat?: boolean;
   // uuid is local and will NOT persist across app restarts/ fetches
   uuid: string;
+  skill_amount?: string;
+  sender_name?: string;
+  skill_currency?: string;
+  skill_name?: string;
 }
 
 interface IRecentEventsConfig {
@@ -234,6 +239,65 @@ const SUPPORTED_EVENTS = [
   'treat',
 ];
 
+class RecentEventsViews extends ViewHandler<IRecentEventsState> {
+  getEventString(event: IRecentEvent) {
+    return {
+      donation:
+        $t('has donated') +
+        (event.crate_item ? $t(' with %{name}', { name: event.crate_item.name }) : ''),
+      merch: $t('has purchased %{product} from the store', { product: event.product }),
+      follow: event.platform === 'youtube_account' ? $t('has subscribed') : $t('has followed'),
+      subscription: this.getSubString(event),
+      // Twitch
+      bits: $t('has used'),
+      host: $t('has hosted you with %{viewers} viewers', { viewers: event.viewers }),
+      raid: $t('has raided you with a party of %{viewers}', { viewers: event.raiders }),
+      // Mixer
+      sticker: $t('has used %{skill} for', { skill: event.skill }),
+      effect: $t('has used %{skill} for', { skill: event.skill }),
+      // Facebook
+      like: $t('has liked'),
+      stars: $t('has used'),
+      support: $t('has supported for %{mounths} months', { months: event.months }),
+      share: $t('has shared'),
+      // Youtube
+      superchat: $t('has superchatted'),
+      // Integrations
+      pledge: $t('has pledged on Patreon'),
+      eldonation: $t('has donated to ExtraLife'),
+      tiltifydonation: $t('has donated to Tiltify'),
+      donordrivedonation: $t('has donated to Donor Drive'),
+      justgivingdonation: $t('has donated to Just Giving'),
+      treat: $t('has given a treat %{title}', { title: event.title }),
+    }[event.type];
+  }
+
+  getSubString(event: IRecentEvent) {
+    if (event.platform === 'youtube_account') {
+      return $t('has sponsored since %{date}', { date: event.since });
+    }
+    if (event.gifter) {
+      return $t('has gifted a sub (%{tier}) to', {
+        tier: subscriptionMap(event.sub_plan),
+      });
+    }
+    if (event.months > 1 && event.streak_months && event.streak_months > 1) {
+      return $t('has resubscribed (%{tier}) for %{streak} months in a row! (%{months} total)', {
+        tier: subscriptionMap(event.sub_plan),
+        streak: event.streak_months,
+        months: event.months,
+      });
+    }
+    if (event.months > 1) {
+      return $t('has resubscribed (%{tier}) for %{months} months', {
+        tier: subscriptionMap(event.sub_plan),
+        months: event.months,
+      });
+    }
+    return $t('has subscribed (%{tier})', { tier: subscriptionMap(event.sub_plan) });
+  }
+}
+
 @InitAfter('UserService')
 export class RecentEventsService extends StatefulService<IRecentEventsState> {
   @Inject() private hostsService: HostsService;
@@ -251,6 +315,10 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     },
     queuePaused: false,
   };
+
+  get views() {
+    return new RecentEventsViews(this.state);
+  }
 
   lifecycle: LoginLifecycle;
   socketConnection: Subscription = null;
@@ -566,31 +634,6 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     this.SET_FILTER_CONFIG(config.settings);
   }
 
-  getSubString(event: IRecentEvent) {
-    if (event.platform === 'youtube_account') {
-      return $t('has sponsored since %{date}', { date: event.since });
-    }
-    if (event.gifter) {
-      return $t('has gifted a sub (%{tier}) to', {
-        tier: subscriptionMap(event.sub_plan),
-      });
-    }
-    if (event.months > 1 && event.streak_months && event.streak_months > 1) {
-      return $t('has resubscribed (%{tier}) for %{streak} months in a row! (%{months} total)', {
-        tier: subscriptionMap(event.sub_plan),
-        streak: event.streak_months,
-        months: event.months,
-      });
-    }
-    if (event.months > 1) {
-      return $t('has resubscribed (%{tier}) for %{months} months', {
-        tier: subscriptionMap(event.sub_plan),
-        months: event.months,
-      });
-    }
-    return $t('has subscribed (%{tier})', { tier: subscriptionMap(event.sub_plan) });
-  }
-
   onSocketEvent(e: TSocketEvent) {
     if (e.type === 'eventsPanelSettingsUpdate') {
       if (e.message.muted != null) {
@@ -726,43 +769,17 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
         msg.uuid = uuid();
         msg.read = false;
         msg.iso8601Created = new Date().toISOString();
+        if (msg.type === 'sticker' || msg.type === 'effect') {
+          msg.amount = msg.skill_amount;
+          msg.name = msg.sender_name;
+          msg.currency = msg.skill_currency;
+          msg.skill = msg.skill_name;
+        }
         return msg;
       })
       .filter(msg => this.isAllowed(msg));
 
     this.ADD_RECENT_EVENT(messages);
-  }
-
-  getEventString(event: IRecentEvent) {
-    return {
-      donation:
-        $t('has donated') +
-        (event.crate_item ? $t(' with %{name}', { name: event.crate_item.name }) : ''),
-      merch: $t('has purchased %{product} from the store', { product: event.product }),
-      follow: event.platform === 'youtube_account' ? $t('has subscribed') : $t('has followed'),
-      subscription: this.getSubString(event),
-      // Twitch
-      bits: $t('has used'),
-      host: $t('has hosted you with %{viewers} viewers', { viewers: event.viewers }),
-      raid: $t('has raided you with a party of %{viewers}', { viewers: event.raiders }),
-      // Mixer
-      sticker: $t('has used %{skill} for', { skill: event.skill }),
-      effect: $t('has used %{skill} for', { skill: event.skill }),
-      // Facebook
-      like: $t('has liked'),
-      stars: $t('has used'),
-      support: $t('has supported for %{mounths} months', { months: event.months }),
-      share: $t('has shared'),
-      // Youtube
-      superchat: $t('has superchatted'),
-      // Integrations
-      pledge: $t('has pledged on Patreon'),
-      eldonation: $t('has donated to ExtraLife'),
-      tiltifydonation: $t('has donated to Tiltify'),
-      donordrivedonation: $t('has donated to Donor Drive'),
-      justgivingdonation: $t('has donated to Just Giving'),
-      treat: $t('has given a treat %{title}', { title: event.title }),
-    }[event.type];
   }
 
   async toggleMuteEvents() {

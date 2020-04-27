@@ -4,7 +4,7 @@ import { Inject } from '../../services/core/injector';
 import ModalLayout from '../ModalLayout.vue';
 import { WindowsService } from '../../services/windows';
 import { ScenesService } from 'services/scenes';
-import { ISourcesServiceApi } from '../../services/sources';
+import { SourcesService } from '../../services/sources';
 import { WidgetsService } from '../../services/widgets';
 import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
@@ -13,7 +13,7 @@ import { EditorCommandsService } from 'services/editor-commands';
   components: { ModalLayout },
 })
 export default class RenameSource extends Vue {
-  @Inject() sourcesService: ISourcesServiceApi;
+  @Inject() sourcesService: SourcesService;
   @Inject() scenesService: ScenesService;
   @Inject() widgetsService: WidgetsService;
   @Inject() windowsService: WindowsService;
@@ -27,7 +27,7 @@ export default class RenameSource extends Vue {
   error = '';
 
   mounted() {
-    const source = this.sourcesService.getSource(this.options.sourceId);
+    const source = this.sourcesService.views.getSource(this.options.sourceId);
     this.name = source.name;
   }
 

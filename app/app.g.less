@@ -95,7 +95,7 @@ label {
 
   background: var(--accent);
   font-size: 12px;
-  color: var(--white);
+  color: var(--action-button-text);
   padding: 0 4px;
   line-height: 16px;
 }
@@ -395,6 +395,23 @@ select {
   border-radius: 10px;
 }
 
+// Loader TODO: move off of Beaker
+.s-loader__bg {
+  background: var(--background) !important;
+}
+
+.s-spinner__bar {
+  fill: var(--title) !important;
+
+  &.s-spinner--modeswap {
+    fill: var(--section) !important;
+  }
+}
+
+.s-loader__text {
+  color: var(--title) !important;
+}
+
 // Vue transitions
 .slide-fade-enter-active,
 .slide-fade-leave-active {
@@ -418,6 +435,17 @@ select {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
+}
+
+.sidenav-slide-enter,
+.sidenav-slide-leave-to {
+  transform: translateY(-20px);
+  opacity: 0;
+}
+
+.sidenav-slide-enter-active,
+.sidenav-slide-leave-active {
+  transition: all 0.3s ease;
 }
 
 .v--modal-overlay {

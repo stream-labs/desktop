@@ -61,7 +61,7 @@ export interface IFacebookStartStreamOptions {
   description: string;
 }
 
-export interface IFacebookChanelInfo extends IFacebookStartStreamOptions {
+export interface IFacebookChannelInfo extends IFacebookStartStreamOptions {
   chatUrl: string;
   streamUrl: string;
 }
@@ -80,12 +80,12 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     'account-merging',
   ]);
 
-  channelInfoChanged = new Subject<IFacebookChanelInfo>();
+  channelInfoChanged = new Subject<IFacebookChannelInfo>();
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = { width: 800, height: 800 };
 
   static initialState: IFacebookServiceState = {
-    activePage: null,
+    activePage: { id: null, access_token: null, name: null },
     liveVideoId: null,
     streamUrl: null,
     streamProperties: { title: null, description: null, game: null },
@@ -205,7 +205,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   async prepopulateInfo(): Promise<IFacebookStartStreamOptions> {
     await this.fetchActivePage();
     if (!this.state.activePage || !this.state.activePage.id) {
-      return {} as IFacebookStartStreamOptions; // TODO: should resolve this case smarter
+      return { facebookPageId: null } as IFacebookStartStreamOptions;
     }
     const url =
       `${this.apiBase}/${this.state.activePage.id}/live_videos?` +
@@ -242,9 +242,9 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     });
   }
 
-  scheduleStream(
+  async scheduleStream(
     scheduledStartTime: string,
-    { title, description, game }: IFacebookChanelInfo,
+    { title, description, game }: IFacebookChannelInfo,
   ): Promise<any> {
     const url = `${this.apiBase}/${this.state.activePage!.id}/live_videos`;
     const body = JSON.stringify({
@@ -254,7 +254,17 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
       game_specs: { name: game },
       status: 'SCHEDULED_UNPUBLISHED',
     });
-    return platformRequest('facebook', { url, body, method: 'POST' }, this.activeToken);
+    try {
+      return await platformRequest('facebook', { url, body, method: 'POST' }, this.activeToken);
+    } catch (e) {
+      if (e?.result?.error?.code === 100) {
+        throw new Error(
+          $t(
+            'Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.',
+          ),
+        );
+      }
+    }
   }
 
   fetchViewerCount(): Promise<number> {
@@ -379,5 +389,22 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
    */
   getErrorDescription(error: IPlatformResponse<unknown>): string {
     return `Can not connect to Facebook: ${error.message}`;
+  }
+
+  sendPushNotif() {
+    const url = 'https://streamlabs.com/api/v5/slobs/remote/notify';
+    const headers = authorizedHeaders(
+      this.userService.apiToken,
+      new Headers({
+        'Content-Type': 'application/json',
+      }),
+    );
+    const postData = {
+      headers,
+      method: 'POST',
+      body: '',
+    };
+    const req = new Request(url, postData);
+    fetch(req);
   }
 }

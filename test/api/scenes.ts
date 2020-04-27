@@ -1,8 +1,8 @@
 import { useSpectron, test } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
-import { ScenesService } from '../../app/services/scenes';
 import { SceneBuilder } from '../helpers/scene-builder';
 import { sleep } from '../helpers/sleep';
+import { ScenesService } from '../../app/services/api/external-api/scenes';
 
 const path = require('path');
 
@@ -39,8 +39,7 @@ test('Creating, fetching and removing scenes', async t => {
 test('Switching between scenes', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
-
-  const scene = scenesService.getScenes().find(scene => scene.name == 'Scene');
+  const scene = scenesService.getScenes().find(scene => scene.name === 'Scene');
   const scene2 = scenesService.createScene('Scene2');
 
   t.is(scene.id, scenesService.activeSceneId);
@@ -57,8 +56,7 @@ test('Switching between scenes', async t => {
 test('Creating, fetching and removing scene-items', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
-
-  const scene = scenesService.getScenes().find(scene => scene.name == 'Scene');
+  const scene = scenesService.getScenes().find(scene => scene.name === 'Scene');
   const image1 = scene.createAndAddSource('Image1', 'image_source');
   const image2 = scene.createAndAddSource('Image2', 'image_source');
   t.is(image1['name'], 'Image1');
@@ -165,8 +163,8 @@ test('SceneItem.setSettings()', async t => {
       top: 1.2,
       bottom: 5.6,
       left: 7.1,
-      right: 10
-    }
+      right: 10,
+    },
   });
 
   // crop values must be rounded
@@ -174,7 +172,7 @@ test('SceneItem.setSettings()', async t => {
     top: 1,
     bottom: 6,
     left: 7,
-    right: 10
+    right: 10,
   });
 });
 
@@ -189,7 +187,7 @@ test('SceneItem.resetTransform()', async t => {
     position: { x: 100, y: 100 },
     scale: { x: 100, y: 100 },
     crop: { top: 100, right: 100, bottom: 100, left: 100 },
-    rotation: 100
+    rotation: 100,
   });
 
   sceneItem.resetTransform();
@@ -198,7 +196,7 @@ test('SceneItem.resetTransform()', async t => {
     position: { x: 0, y: 0 },
     scale: { x: 1, y: 1 },
     crop: { top: 0, right: 0, bottom: 0, left: 0 },
-    rotation: 0
+    rotation: 0,
   });
 });
 
@@ -226,6 +224,13 @@ test('SceneItem.addFile()', async t => {
         chatbox.mp4: ffmpeg_source
       text
         hello.txt: text_gdiplus
-  `)
+  `),
   );
+});
+
+test('Try to make a not existing scene active', async t => {
+  const client = await getClient();
+  const scenesService = client.getResource<ScenesService>('ScenesService');
+  const sceneHasBeenSwitched = scenesService.makeSceneActive('This id does not exist');
+  t.false(sceneHasBeenSwitched);
 });

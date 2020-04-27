@@ -4,7 +4,7 @@ import SlVueTree, { ISlTreeNodeModel, ICursorPosition } from 'sl-vue-tree';
 import { Inject } from 'services/core/injector';
 import { WindowsService } from 'services/windows';
 import { SourceFiltersService } from 'services/source-filters';
-import { ISourcesServiceApi } from 'services/sources';
+import { SourcesService } from 'services/sources';
 import { EditorCommandsService } from 'services/editor-commands';
 
 import ModalLayout from 'components/ModalLayout.vue';
@@ -30,7 +30,7 @@ interface IFilterNodeData {
 })
 export default class SourceFilters extends Vue {
   @Inject() sourceFiltersService: SourceFiltersService;
-  @Inject() sourcesService: ISourcesServiceApi;
+  @Inject() sourcesService: SourcesService;
   @Inject() windowsService: WindowsService;
   @Inject() private editorCommandsService: EditorCommandsService;
 
@@ -106,7 +106,7 @@ export default class SourceFilters extends Vue {
   }
 
   get sourceDisplayName() {
-    return this.sourcesService.getSource(this.sourceId).name;
+    return this.sourcesService.views.getSource(this.sourceId).name;
   }
 
   get nodes() {

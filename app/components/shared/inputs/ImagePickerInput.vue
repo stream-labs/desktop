@@ -1,21 +1,22 @@
 <template>
-<div class="widget-layout-picker">
-  <div
-    v-for="option in metadata.options"
-    :key="option.value"
-    class="widget-layout-picker__option"
-    :class="[value === option.value ? 'active' : '']"
-    @click="emitInput(option.value)"
-  >
-    <img :src="option.description" >
+  <div class="widget-layout-picker">
+    <div
+      v-for="option in metadata.options"
+      :key="option.value"
+      class="widget-layout-picker__option"
+      :class="[value === option.value ? 'active' : '']"
+      @click="emitInput(option.value)"
+    >
+      <img v-if="!metadata.isIcons" :src="option.description" />
+      <i v-if="metadata.isIcons" :class="option.description" />
+    </div>
   </div>
-</div>
 </template>
 
 <script lang="ts" src="./ImagePickerInput.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../../styles/index";
+@import '../../../styles/index';
 
 .widget-layout-picker {
   width: 100%;
@@ -37,8 +38,11 @@
   position: relative;
   cursor: pointer;
 
-  img {
+  img,
+  i {
     height: 48px;
+    font-size: 48px;
+    color: var(--title);
     width: auto;
     position: absolute;
     top: 50%;
@@ -49,6 +53,10 @@
   &.active {
     background-color: var(--link-active);
     border-color: var(--link-active);
+
+    i {
+      color: var(--background);
+    }
   }
 }
 </style>

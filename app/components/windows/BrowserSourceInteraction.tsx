@@ -22,7 +22,7 @@ export default class BrowserSourceInteraction extends TsxComponent<{}> {
   }
 
   get source() {
-    return this.sourcesService.getSource(this.sourceId);
+    return this.sourcesService.views.getSource(this.sourceId);
   }
 
   currentRegion: IRectangle = { x: 0, y: 0, width: 1, height: 1 };

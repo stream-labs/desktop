@@ -12,7 +12,7 @@
   "Remote Control": "Control remoto",
   "Experimental": "Experimental",
   "Developer": "Desarrollador",
-  "Facemasks": "Máscaras de cara",
+  "Face Masks": "Face Masks",
   "Night mode": "Modo Noche",
   "Game Overlay": "Superposición de juego",
   "Installed Apps": "Aplicaciones instaladas",
@@ -104,7 +104,11 @@
   "Show Recent Events": "Mostrar eventos recientes",
   "Overlay Opacity": "Opacidad de superposición",
   "Named Pipe": "Canalización con nombre",
+  "Pipe Name": "Pipe Name",
   "Websockets": "Websockets",
+  "Enabled": "Enabled",
+  "Allow Remote Connections": "Allow Remote Connections",
+  "Port": "Port",
   "Audio - Track 1": "Audio - Pista 1",
   "Audio - Track 2": "Audio - Pista 2",
   "Audio - Track 3": "Audio - Pista 3",
@@ -112,5 +116,6 @@
   "Audio - Track 5": "Audio - Pista 5",
   "Audio - Track 6": "Audio - Pista 6",
   "Stream Key": "Clave de stream",
-  "You can not change these settings when you're live": "No puede cambiar estos ajustes estando en directo"
+  "You can not change these settings when you're live": "No puede cambiar estos ajustes estando en directo",
+  "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.": "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk."
 }

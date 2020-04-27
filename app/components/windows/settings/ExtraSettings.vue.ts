@@ -103,7 +103,7 @@ export default class ExtraSettings extends Vue {
   }
 
   get isLoggedIn() {
-    return this.userService.isLoggedIn();
+    return this.userService.isLoggedIn;
   }
 
   get isTwitch() {
