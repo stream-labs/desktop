@@ -6,3 +6,4 @@ export { default as FacebookPageCreation } from './FacebookPageCreation';
 export { default as ThemeSelector } from './ThemeSelector';
 export { default as HardwareSetup } from './HardwareSetup';
 export { default as Multistream } from './Multistream';
+export { default as MacPermissions } from './MacPermissions';

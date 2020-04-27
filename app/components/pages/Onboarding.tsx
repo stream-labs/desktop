@@ -14,11 +14,21 @@ import {
   Optimize,
   FacebookPageCreation,
   Multistream,
+  MacPermissions,
 } from './onboarding-steps';
 import { UserService } from 'services/user';
 import { $t } from 'services/i18n';
 import styles from './Onboarding.m.less';
 import { RestreamService } from 'services/restream';
+import { OS } from 'util/operating-systems';
+
+interface IOnboardingStep {
+  element: JSX.Element;
+  disableControls: boolean;
+  hideSkip: boolean;
+  hideButton: boolean;
+  requiresHack?: boolean;
+}
 
 @Component({})
 export default class OnboardingPage extends TsxComponent<{}> {
@@ -32,8 +42,6 @@ export default class OnboardingPage extends TsxComponent<{}> {
   importedFromObs = false;
   processing = false;
   fbSetupEnabled: boolean = null;
-
-  stepsState = [{ complete: false }, { complete: false }, { complete: false }];
 
   checkFbPageEnabled() {
     if (this.fbSetupEnabled !== null || !this.userService.isLoggedIn) return;
@@ -49,9 +57,8 @@ export default class OnboardingPage extends TsxComponent<{}> {
   }
 
   continue(importedObs?: boolean) {
+    if (importedObs != null) this.importedFromObs = importedObs;
     this.checkFbPageEnabled();
-    this.adjustStepsState(importedObs);
-
     this.proceed();
   }
 
@@ -59,12 +66,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
     if (this.processing) return;
     if (this.currentStep >= this.stepsState.length) return this.complete();
 
-    this.stepsState[this.currentStep - 1].complete = true;
     this.currentStep = this.currentStep + 1;
-
-    if (this.currentStep === this.stepsState.length) {
-      this.stepsState[this.currentStep - 1].complete = true;
-    }
   }
 
   complete() {
@@ -75,69 +77,126 @@ export default class OnboardingPage extends TsxComponent<{}> {
     this.processing = bool;
   }
 
-  adjustStepsState(importedObs?: boolean) {
-    if (importedObs === true) {
-      this.importedFromObs = true;
-    } else if (importedObs === false) {
-      this.importedFromObs = false;
-      if (this.noExistingSceneCollections) {
-        this.stepsState.push({ complete: false });
+  get stepsState() {
+    return this.steps.map((step, index) => {
+      // Work around a bug in Beacker Onboarding
+      // TODO: Remove beaker from onboarding during redesign
+      if (index + 1 === this.currentStep && step.requiresHack) {
+        return { complete: true };
       }
-      if (
-        this.onboardingService.isTwitchAuthed ||
-        (this.onboardingService.isFacebookAuthed && this.fbSetupEnabled)
-      ) {
-        this.stepsState.push({ complete: false });
-      }
-      if (this.restreamService.canEnableRestream) {
-        this.stepsState.push({ complete: false });
-      }
-    }
+
+      return { complete: index + 1 < this.currentStep };
+    });
   }
 
   get steps() {
-    const steps = [
-      <Connect slot="1" continue={this.continue.bind(this)} />,
-      <ObsImport
-        slot="2"
-        continue={this.continue.bind(this)}
-        setProcessing={this.setProcessing.bind(this)}
-      />,
-    ];
+    const steps: IOnboardingStep[] = [];
 
-    return this.addOptionalSteps(steps);
-  }
+    if (process.platform === OS.Mac) {
+      steps.push({
+        element: (
+          <MacPermissions
+            slot={(steps.length + 1).toString()}
+            continue={this.continue.bind(this)}
+          />
+        ),
+        disableControls: false,
+        hideSkip: true,
+        hideButton: true,
+      });
+    }
 
-  addOptionalSteps(steps: JSX.Element[]) {
+    steps.push({
+      element: <Connect slot={(steps.length + 1).toString()} continue={this.continue.bind(this)} />,
+      disableControls: false,
+      hideSkip: true,
+      hideButton: true,
+    });
+
+    steps.push({
+      element: (
+        <ObsImport
+          slot={(steps.length + 1).toString()}
+          continue={this.continue.bind(this)}
+          setProcessing={this.setProcessing.bind(this)}
+        />
+      ),
+      disableControls: true,
+      hideSkip: true,
+      hideButton: true,
+    });
+
     if (this.importedFromObs) {
-      steps.push(<StreamlabsFeatures slot="3" />);
-      return steps;
+      steps.push({
+        element: <StreamlabsFeatures slot={(steps.length + 1).toString()} />,
+        disableControls: false,
+        hideSkip: true,
+        hideButton: false,
+        requiresHack: true,
+      });
+    } else {
+      steps.push({
+        element: <HardwareSetup slot={(steps.length + 1).toString()} />,
+        disableControls: false,
+        hideSkip: false,
+        hideButton: false,
+        requiresHack: true,
+      });
     }
-    steps.push(<HardwareSetup slot="3" />);
-    let nextStep = '4';
+
     if (this.noExistingSceneCollections) {
-      steps.push(
-        <ThemeSelector
-          slot={nextStep}
-          continue={this.continue.bind(this)}
-          setProcessing={this.setProcessing.bind(this)}
-        />,
-      );
-      nextStep = '5';
+      steps.push({
+        element: (
+          <ThemeSelector
+            slot={(steps.length + 1).toString()}
+            continue={this.continue.bind(this)}
+            setProcessing={this.setProcessing.bind(this)}
+          />
+        ),
+        disableControls: false,
+        hideSkip: false,
+        hideButton: true,
+      });
     }
+
     if (this.onboardingService.isTwitchAuthed) {
-      steps.push(
-        <Optimize
-          slot={nextStep}
-          continue={this.continue.bind(this)}
-          setProcessing={this.setProcessing.bind(this)}
-        />,
-      );
-      nextStep = `${Number(nextStep) + 1}`;
-      steps.push(<Multistream slot={nextStep} continue={() => this.continue()} />);
-    } else if (this.onboardingService.isFacebookAuthed && this.fbSetupEnabled) {
-      steps.push(<FacebookPageCreation slot={nextStep} continue={this.continue.bind(this)} />);
+      steps.push({
+        element: (
+          <Optimize
+            slot={(steps.length + 1).toString()}
+            continue={this.continue.bind(this)}
+            setProcessing={this.setProcessing.bind(this)}
+          />
+        ),
+        disableControls: false,
+        hideSkip: false,
+        hideButton: true,
+      });
+
+      // steps.push({
+      //   element: (
+      //     <Multistream slot={(steps.length + 1).toString()} continue={() => this.continue()} />
+      //   ),
+      //   disableControls: false,
+      //   hideSkip: false,
+      //   hideButton: true,
+      // });
     }
+
+    if (this.onboardingService.isFacebookAuthed && this.fbSetupEnabled) {
+      steps.push({
+        element: (
+          <FacebookPageCreation
+            slot={(steps.length + 1).toString()}
+            continue={this.continue.bind(this)}
+          />
+        ),
+        disableControls: false,
+        hideSkip: false,
+        hideButton: true,
+      });
+    }
+
     return steps;
   }
 
@@ -197,21 +256,16 @@ export default class OnboardingPage extends TsxComponent<{}> {
             stepLocation="top"
             skippable={true}
             currentStep={this.currentStep}
-            disableControls={this.processing || this.currentStep === 2}
+            disableControls={this.processing || this.steps[this.currentStep - 1].disableControls}
             continueHandler={this.continue.bind(this)}
             completeHandler={this.complete.bind(this)}
             skipHandler={this.proceed.bind(this)}
             prevHandler={() => {}}
             hideBack={true}
-            hideSkip={
-              [1, 2].includes(this.currentStep) || (this.currentStep === 3 && this.importedFromObs)
-            }
-            hideButton={
-              [1, 2, 5, 6].includes(this.currentStep) ||
-              (this.currentStep === 4 && !this.importedFromObs)
-            }
+            hideSkip={this.steps[this.currentStep - 1].hideSkip}
+            hideButton={this.steps[this.currentStep - 1].hideButton}
           >
-            {this.steps}
+            {this.steps.map(step => step.element)}
           </Onboarding>
         </div>
       </div>
