@@ -157,7 +157,7 @@ export class Scene {
     const obsSceneItem: obs.ISceneItem = this.getObsScene().add(source.getObsInput());
 
     this.ADD_SOURCE_TO_SCENE(sceneItemId, source.sourceId, obsSceneItem.id);
-    const sceneItem = this.getItem(sceneItemId) as SceneItem;
+    const sceneItem = this.getItem(sceneItemId)!;
 
     // Default is to select
     if (options.select == null) options.select = true;
@@ -201,7 +201,7 @@ export class Scene {
       sceneId: this.id,
       parentId: '',
     });
-    return this.getFolder(id) as SceneItemFolder;
+    return this.getFolder(id)!;
   }
 
   removeFolder(folderId: string) {
@@ -276,7 +276,7 @@ export class Scene {
       sourceNode.sceneNodeType === 'folder'
         ? [sourceNode.id].concat((sourceNode as SceneItemFolder).getNestedNodesIds())
         : [sourceNode.id];
-    const firstNodeIndex = (this.getNode(nodesToMoveIds[0]) as TSceneNode).getNodeIndex();
+    const firstNodeIndex = (this.getNode(nodesToMoveIds[0])!).getNodeIndex();
 
     let newNodeIndex = 0;
 
@@ -327,7 +327,9 @@ export class Scene {
     if (newDestNode) {
       this.placeAfter(sourceNodeId, newDestNode.id);
     } else if (destNode.parentId) {
-      (this.getNode(sourceNodeId) as TSceneNode).setParent(destNode.parentId); // place to the top of folder
+      const sourceNode = this.getNode(sourceNodeId);
+      assertIsDefined(sourceNode);
+      sourceNode.setParent(destNode.parentId); // place to the top of folder
     } else {
       this.placeAfter(sourceNodeId); // place to the top of scene
     }
@@ -368,7 +370,8 @@ export class Scene {
         this.createFolder(nodeModel.name, { id: nodeModel.id });
       } else {
         this.ADD_SOURCE_TO_SCENE(nodeModel.id, nodeModel.sourceId, obsSceneItems[itemIndex].id);
-        (this.getItem(nodeModel.id) as SceneItem).loadItemAttributes(nodeModel);
+        const item = this.getItem(nodeModel.id)!;
+        item.loadItemAttributes(nodeModel);
         itemIndex++;
       }
     });
@@ -529,7 +532,7 @@ export class Scene {
     this.state.nodes = order.map(id => {
       return this.state.nodes.find(item => {
         return item.id === id;
-      });
-    }) as (ISceneItem | ISceneItemFolder)[];
+      })!;
+    });
   }
 }
