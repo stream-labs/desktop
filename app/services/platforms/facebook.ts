@@ -165,7 +165,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     ).then(async json => {
       const pageId = this.userService.platform?.channelId || this.state.facebookPages?.page_id!;
       const activePage = json.data.filter(page => pageId === page.id)[0] || json.data[0];
-      this.userService.updatePlatformChannelId('facebook', pageId as string);
+      this.userService.updatePlatformChannelId('facebook', pageId);
       this.SET_ACTIVE_PAGE(activePage);
     });
   }
@@ -352,7 +352,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   private fetchPages(): Promise<IStreamlabsFacebookPages> {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
-    const headers = authorizedHeaders(this.userService.apiToken as string);
+    const headers = authorizedHeaders(this.userService.apiToken!);
     const request = new Request(url, { headers });
     return fetch(request)
       .then(handleResponse)
@@ -370,7 +370,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   private postPage(pageId: string) {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
-    const headers = authorizedHeaders(this.userService.apiToken as string);
+    const headers = authorizedHeaders(this.userService.apiToken!);
     headers.append('Content-Type', 'application/json');
     const request = new Request(url, {
       headers,

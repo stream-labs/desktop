@@ -361,7 +361,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   async fetchNewToken(): Promise<void> {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/youtube/token`;
-    const headers = authorizedHeaders(this.userService.apiToken as string);
+    const headers = authorizedHeaders(this.userService.apiToken!);
     const request = new Request(url, { headers });
 
     return fetch(request)
