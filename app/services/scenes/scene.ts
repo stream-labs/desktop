@@ -67,7 +67,10 @@ export class Scene {
   getNode(sceneNodeId: string): TSceneNode | null {
     // try to get a node instance from cache
     const cachedNode = this.scenesService.getNodeFromCache(sceneNodeId);
-    if (cachedNode) return cachedNode;
+    if (cachedNode) {
+      if (cachedNode.sceneId !== this.id) return null;
+      return cachedNode;
+    }
 
     // otherwise create a new instance
     const nodeModel = this.state.nodes.find(
