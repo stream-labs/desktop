@@ -136,7 +136,13 @@ test('Creating nested scenes', async t => {
   t.deepEqual(itemsCNames, ['SceneA']);
 
   // Unable to add a source when the scene you are trying to add already contains your current scene
-  sceneA.addSource(sceneC.id);
+  let errorIsThrew = false;
+  try {
+    sceneA.addSource(sceneC.id);
+  } catch (e) {
+    errorIsThrew = true;
+  }
+  t.true(errorIsThrew);
   sceneAItems = sceneA.getItems();
   itemsANames = sceneAItems.map(item => item['name']);
 

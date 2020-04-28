@@ -37,12 +37,9 @@ test('Onboarding steps', async t => {
   await app.client.click('button=Start');
   await app.client.waitForVisible('h1=Optimizing... 33%');
   await makeScreenshots(t, 'Optimization progress');
-  await app.client.waitForVisible('h1=Multistream', 60000);
-  await makeScreenshots(t, 'Multistream');
-  await app.client.click('p=Skip');
 
   // success?
-  await app.client.waitForVisible('h2=Sources');
+  await app.client.waitForVisible('h2=Sources', 60000);
   await makeScreenshots(t, 'Onboarding completed');
   t.pass();
 });
@@ -52,9 +49,14 @@ test('OBS Importer', async t => {
 
   // extract OBS config to the cache dir
   const cacheDir = path.resolve(await t.context.app.electron.remote.app.getPath('userData'), '..');
-  const dataDir = path.resolve(__dirname, '..', '..', 'test', 'data');
+  const dataDir = path.resolve(__dirname, '..', '..', '..', '..', 'test', 'data');
   const obsCacheZipPath = path.resolve(dataDir, 'obs-studio.zip');
-  spawnSync(_7z, ['x', obsCacheZipPath, `-o${cacheDir}`]);
+  const result = spawnSync(_7z, ['x', obsCacheZipPath, `-o${cacheDir}`]);
+
+  if (result.status) {
+    console.error(result.stderr.toString());
+    throw new Error('Error setting up OBS Studio cache directory!');
+  }
 
   // skip auth
   await client.waitForVisible('button=Twitch');

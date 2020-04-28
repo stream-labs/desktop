@@ -1,7 +1,7 @@
 import merge from 'lodash/merge';
 import { mutation, Inject } from 'services';
 import Utils from '../utils';
-import { SourcesService, TSourceType, ISource } from 'services/sources';
+import { SourcesService, TSourceType, ISource, Source } from 'services/sources';
 import { VideoService } from 'services/video';
 import {
   ScalableRectangle,
@@ -27,6 +27,7 @@ import { v2, Vec2 } from '../../util/vec2';
 import { Rect } from '../../util/rect';
 import { TSceneNodeType } from './scenes';
 import { ServiceHelper, ExecuteInWorkerProcess } from 'services/core';
+import { assertIsDefined } from '../../util/properties-type-guards';
 /**
  * A SceneItem is a source that contains
  * all of the information about that source, and
@@ -82,6 +83,7 @@ export class SceneItem extends SceneItemNode {
     const sceneItemState = this.scenesService.state.scenes[sceneId].nodes.find(item => {
       return item.id === sceneItemId;
     }) as ISceneItem;
+    assertIsDefined(sceneItemState);
     const sourceState = this.sourcesService.state.sources[sourceId];
     this.state = sceneItemState;
     Utils.applyProxy(this, sourceState);
@@ -93,11 +95,15 @@ export class SceneItem extends SceneItemNode {
   }
 
   getScene(): Scene {
-    return this.scenesService.views.getScene(this.sceneId);
+    const scene = this.scenesService.views.getScene(this.sceneId);
+    assertIsDefined(scene);
+    return scene;
   }
 
   get source() {
-    return this.sourcesService.views.getSource(this.sourceId);
+    const source = this.sourcesService.views.getSource(this.sourceId);
+    assertIsDefined(source);
+    return source;
   }
 
   getSource() {
@@ -132,7 +138,10 @@ export class SceneItem extends SceneItemNode {
     const newSettings = merge({}, this.state, patch);
 
     if (changed.transform) {
-      const changedTransform = Utils.getChangedParams(this.state.transform, patch.transform);
+      const changedTransform = Utils.getChangedParams(
+        this.state.transform,
+        patch.transform,
+      ) as Partial<ITransform>;
 
       if (changedTransform.position) {
         obsSceneItem.position = newSettings.transform.position;
@@ -188,7 +197,7 @@ export class SceneItem extends SceneItemNode {
   }
 
   remove() {
-    this.scenesService.views.getScene(this.sceneId).removeItem(this.sceneItemId);
+    this.getScene().removeItem(this.sceneItemId);
   }
 
   nudgeLeft() {
@@ -294,7 +303,7 @@ export class SceneItem extends SceneItemNode {
    */
   scale(scaleDelta: IVec2, origin: IVec2 = AnchorPositions[AnchorPoint.Center]) {
     const rect = new ScalableRectangle(this.rectangle);
-    let currentScale: Vec2;
+    let currentScale = v2();
     rect.normalized(() => {
       currentScale = v2(rect.scaleX, rect.scaleY);
     });
@@ -369,7 +378,7 @@ export class SceneItem extends SceneItemNode {
   setContentCrop() {
     const source = this.getSource();
     if (source.type !== 'scene') return;
-    const scene = this.scenesService.views.getScene(source.sourceId);
+    const scene = this.getScene();
     const rect = scene
       .getSelection()
       .selectAll()
