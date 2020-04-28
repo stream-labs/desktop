@@ -240,6 +240,18 @@ export class EditMenu extends Menu {
 
       this.append({ type: 'separator' });
 
+      this.append({
+        label: $t('Performance Mode'),
+        type: 'checkbox',
+        checked: this.customizationService.state.performanceMode,
+        click: () =>
+          this.customizationService.setSettings({
+            performanceMode: !this.customizationService.state.performanceMode,
+          }),
+      });
+
+      this.append({ type: 'separator' });
+
       const filtersCount = this.sourceFiltersService.getFilters(this.source.sourceId).length;
 
       this.append({
