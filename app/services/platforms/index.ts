@@ -105,7 +105,7 @@ export type TStartStreamOptions =
 export type TChannelInfo =
   | IYoutubeChannelInfo
   | ITwitchChannelInfo
-  | IFacebookChannelInfo
+  | Partial<IFacebookChannelInfo>
   | IMixerChannelInfo;
 
 // All platform services should implement this interface.
