@@ -276,7 +276,7 @@ export class Scene {
       sourceNode.sceneNodeType === 'folder'
         ? [sourceNode.id].concat((sourceNode as SceneItemFolder).getNestedNodesIds())
         : [sourceNode.id];
-    const firstNodeIndex = (this.getNode(nodesToMoveIds[0])!).getNodeIndex();
+    const firstNodeIndex = this.getNode(nodesToMoveIds[0])!.getNodeIndex();
 
     let newNodeIndex = 0;
 
