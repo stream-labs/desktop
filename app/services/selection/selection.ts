@@ -36,7 +36,7 @@ export class Selection {
   }
 
   isDestroyed(): boolean {
-    return !this.scenesService.views.getScene(this.sceneId);
+    return false;
   }
 
   // SELECTION METHODS
