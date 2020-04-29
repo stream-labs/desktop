@@ -11,7 +11,7 @@ import { reserveUserFromPool } from '../helpers/spectron/user';
 useSpectron({ restartAppAfterEachTest: true });
 
 test('Streaming to Twitch via API', async t => {
-  const streamKey = (await reserveUserFromPool('twitch')).streamKey;
+  const streamKey = (await reserveUserFromPool(t, 'twitch')).streamKey;
   const client = await getClient();
   const streamingService = client.getResource<IStreamingServiceApi>('StreamingService');
   const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');

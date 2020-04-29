@@ -1,6 +1,9 @@
 trigger:
 - staging
 
+variables:
+  CI: true
+
 jobs:
   - job: Tests
 
@@ -18,7 +21,7 @@ jobs:
     - powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
       displayName: 'Setup Screen Resolution'
 
-    - script: yarn install --frozen-lockfile --check-files
+    - script: yarn install --frozen-lockfile --check-files 2>&1
       displayName: 'Install Dependencies'
 
     - script: 'yarn eslint'
@@ -34,7 +37,6 @@ jobs:
       displayName: 'Run Tests'
       env:
         SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
-        CI: true
         BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
         SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
 
@@ -54,13 +56,12 @@ jobs:
     - powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
       displayName: 'Setup Screen Resolution'
 
-    - script: yarn install --frozen-lockfile --check-files
+    - script: yarn install --frozen-lockfile --check-files 2>&1
       displayName: 'Install Dependencies'
 
     - script: 'yarn screentest'
       displayName: 'Snapshot testing'
       env:
-        CI: true
         BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
         SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
         STREAMLABS_BOT_ID: $(streamlabsBotId)
@@ -90,7 +91,7 @@ jobs:
       - powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
         displayName: 'Setup Screen Resolution'
 
-      - script: yarn install --frozen-lockfile --check-files
+      - script: yarn install --frozen-lockfile --check-files 2>&1
         displayName: 'Install Dependencies'
 
       - script: 'yarn compile:ci'
@@ -99,6 +100,5 @@ jobs:
       - script: 'yarn performancetest'
         displayName: 'Performance testing'
         env:
-          CI: true
           BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
           SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
