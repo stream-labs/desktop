@@ -9,7 +9,7 @@ const { CI } = process.env;
 function exec(cmd) {
   try {
     console.log('RUN', cmd);
-    return execSync(cmd, { stdio: [0, 1, 2] });
+    return execSync(cmd, { stdio: [0, 1, 1] });
   } catch (e) {
     console.error(e);
     process.exit(1);
