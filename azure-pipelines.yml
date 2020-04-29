@@ -1,6 +1,9 @@
 trigger:
 - staging
 
+env:
+  CI: true
+
 jobs:
   - job: Tests
 
@@ -34,7 +37,6 @@ jobs:
       displayName: 'Run Tests'
       env:
         SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
-        CI: true
         BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
         SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
 
@@ -60,7 +62,6 @@ jobs:
     - script: 'yarn screentest'
       displayName: 'Snapshot testing'
       env:
-        CI: true
         BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
         SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
         STREAMLABS_BOT_ID: $(streamlabsBotId)
@@ -99,6 +100,5 @@ jobs:
       - script: 'yarn performancetest'
         displayName: 'Performance testing'
         env:
-          CI: true
           BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
           SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
