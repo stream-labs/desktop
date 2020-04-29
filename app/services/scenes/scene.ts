@@ -17,6 +17,7 @@ import { SelectionService, Selection, TNodesList } from 'services/selection';
 import uniqBy from 'lodash/uniqBy';
 import { TSceneNodeInfo } from 'services/scene-collections/nodes/scene-items';
 import * as fs from 'fs';
+import * as path from 'path';
 import uuid from 'uuid/v4';
 
 export type TSceneNode = SceneItem | SceneItemFolder;
@@ -164,20 +165,20 @@ export class Scene {
     return sceneItem;
   }
 
-  addFile(path: string, folderId?: string): TSceneNode {
-    const fstat = fs.lstatSync(path);
+  addFile(addPath: string, folderId?: string): TSceneNode {
+    const fstat = fs.lstatSync(addPath);
     if (!fstat) return null;
-    const fname = path.split('\\').slice(-1)[0];
+    const fname = path.parse(addPath).name;
 
     if (fstat.isDirectory()) {
       const folder = this.createFolder(fname);
       if (folderId) folder.setParent(folderId);
-      const files = fs.readdirSync(path).reverse();
-      files.forEach(filePath => this.addFile(`${path}\\${filePath}`, folder.id));
+      const files = fs.readdirSync(addPath).reverse();
+      files.forEach(filePath => this.addFile(path.join(addPath, filePath), folder.id));
       return folder;
     }
 
-    const source = this.sourcesService.addFile(path);
+    const source = this.sourcesService.addFile(addPath);
     if (!source) return null;
     const item = this.addSource(source.sourceId);
     if (folderId) item.setParent(folderId);
