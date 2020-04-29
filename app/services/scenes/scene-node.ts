@@ -36,7 +36,7 @@ export abstract class SceneItemNode implements ISceneItemNode {
   @Inject() protected selectionService: SelectionService;
 
   isDestroyed(): boolean {
-    return this.state.isRemoved;
+    return !!this.state.isRemoved;
   }
 
   getScene(): Scene {
