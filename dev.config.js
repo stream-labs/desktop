@@ -4,8 +4,9 @@ const path = require('path');
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 const { CheckerPlugin } = require('awesome-typescript-loader');
 
-const plugins = process.env.SLOBS_FORKED_TYPECHECKING ? [new CheckerPlugin()] : [];
+const plugins = [];
 
+if (process.env.SLOBS_FORKED_TYPECHECKING) plugins.push(new CheckerPlugin());
 if (!process.env.CI) plugins.push(new HardSourceWebpackPlugin());
 
 module.exports = merge.smart(baseConfig, {
