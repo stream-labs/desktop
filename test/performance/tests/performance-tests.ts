@@ -16,6 +16,7 @@ import { setOutputResolution, setTemporaryRecordingPath } from '../../helpers/sp
 import { startRecording, stopRecording } from '../../helpers/spectron/streaming';
 import { getCPUUsage, getMemoryUsage, logTiming, usePerformanceTest } from '../tools';
 import { logIn } from '../../helpers/spectron/user';
+import { ExecutionContext } from 'ava';
 const fs = require('fs-extra');
 const _7z = require('7zip')['7z'];
 const path = require('path');
@@ -54,7 +55,7 @@ function measureStartupTime(api: ApiClient) {
   );
 }
 
-async function measureMemoryAndCPU(t, attempts = CPU_ATTEMPTS) {
+async function measureMemoryAndCPU(t: ExecutionContext, attempts = CPU_ATTEMPTS) {
   logTiming(t, 'Start recodring CPU and Memory');
   const meter = getMeter();
   while (attempts--) {
