@@ -36,13 +36,13 @@ test('Creating, fetching and removing scenes', async t => {
   t.deepEqual(scenesNames, ['Scene']);
 
   // check the correct error message on removed item
-  let errorMessage = '';
+  let gotError = false;
   try {
     scene2.remove();
   } catch (e) {
-    errorMessage = e.message;
+    gotError = true;
   }
-  t.truthy(errorMessage.match('destroyed object'));
+  t.true(gotError);
 });
 
 test('Switching between scenes', async t => {
