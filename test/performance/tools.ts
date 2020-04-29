@@ -9,7 +9,7 @@ const path = require('path');
 const fs = require('fs-extra');
 const CONFIG = fs.readJsonSync('test/performance/config.json');
 
-useSpectron({ restartAppAfterEachTest: false });
+useSpectron({ restartAppAfterEachTest: false, pauseIfFailed: true });
 
 export function usePerformanceTest() {
   let testName = '';
