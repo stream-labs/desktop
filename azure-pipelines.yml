@@ -1,7 +1,7 @@
 trigger:
 - staging
 
-env:
+variables:
   CI: true
 
 jobs:
