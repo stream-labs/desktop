@@ -54,15 +54,15 @@ function measureStartupTime(api: ApiClient) {
   );
 }
 
-async function measureMemoryAndCPU(attempts = CPU_ATTEMPTS) {
-  logTiming('Start recodring CPU and Memory');
+async function measureMemoryAndCPU(t, attempts = CPU_ATTEMPTS) {
+  logTiming(t, 'Start recodring CPU and Memory');
   const meter = getMeter();
   while (attempts--) {
     meter.addMeasurement('CPU', await getCPUUsage());
     meter.addMeasurement('memory', await getMemoryUsage());
     await sleep(2000);
   }
-  logTiming('Stop recodring CPU and Memory');
+  logTiming(t, 'Stop recodring CPU and Memory');
 }
 
 test('Bundle size', async t => {
@@ -91,7 +91,7 @@ test('Empty collection', async t => {
 
   // measure memory and CPU
   await startApp(t);
-  await measureMemoryAndCPU();
+  await measureMemoryAndCPU(t);
 
   t.pass();
 });
@@ -112,7 +112,7 @@ test('Large collection', async t => {
 
   // measure memory and CPU
   await startApp(t);
-  await measureMemoryAndCPU();
+  await measureMemoryAndCPU(t);
   t.pass();
 });
 
@@ -154,7 +154,7 @@ test('Large collection (logged-in twitch)', async t => {
 
   // measure memory and CPU
   await startApp(t);
-  await measureMemoryAndCPU();
+  await measureMemoryAndCPU(t);
   t.pass();
 });
 
@@ -166,7 +166,7 @@ test('Recording', async t => {
   scenesService.activeScene.createAndAddSource('Color', 'color_source');
 
   await startRecording(t);
-  await measureMemoryAndCPU();
+  await measureMemoryAndCPU(t);
   await stopRecording(t);
 
   t.pass();
