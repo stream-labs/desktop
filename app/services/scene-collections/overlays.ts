@@ -56,7 +56,7 @@ export class OverlaysPersistenceService extends Service {
 
     await new Promise((resolve, reject) => {
       https.get(url).on('response', response => {
-        const totalSize = parseInt(response.headers['content-length'], 10);
+        const totalSize = parseInt(response.headers['content-length']!, 10);
         let downloaded = 0;
 
         response.on('data', (chunk: any) => {
