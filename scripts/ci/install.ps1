@@ -65,6 +65,9 @@ choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
 echo "Install Visual Studio 2017 Build Tools"
 choco install visualstudio2017buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools;includeRecommended;includeOptional"
 
+echo "Install Visual Studio 2019 Build Tools"
+choco install visualstudio2019buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools;includeRecommended;includeOptional"
+
 # run registration script
 echo "Configure Azure Agent"
 ."$workingDir\$registerAgentScriptName"
