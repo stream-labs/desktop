@@ -18,7 +18,7 @@ jobs:
     - powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
       displayName: 'Setup Screen Resolution'
 
-    - script: yarn install --frozen-lockfile --check-files 2> nul
+    - script: yarn install --frozen-lockfile --check-files 2>&1
       displayName: 'Install Dependencies'
 
     - script: 'yarn eslint'
@@ -54,7 +54,7 @@ jobs:
     - powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
       displayName: 'Setup Screen Resolution'
 
-    - script: yarn install --frozen-lockfile --check-files
+    - script: yarn install --frozen-lockfile --check-files 2>&1
       displayName: 'Install Dependencies'
 
     - script: 'yarn screentest'
@@ -90,7 +90,7 @@ jobs:
       - powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
         displayName: 'Setup Screen Resolution'
 
-      - script: yarn install --frozen-lockfile --check-files
+      - script: yarn install --frozen-lockfile --check-files 2>&1
         displayName: 'Install Dependencies'
 
       - script: 'yarn compile:ci'
