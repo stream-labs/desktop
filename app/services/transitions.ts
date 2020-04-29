@@ -199,7 +199,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     }
   }
 
-  transition(sceneAId: string, sceneBId: string) {
+  transition(sceneAId: string | null, sceneBId: string) {
     if (this.state.studioMode) {
       const scene = this.scenesService.views.getScene(sceneBId);
       this.studioModeTransition.set(scene.getObsScene());

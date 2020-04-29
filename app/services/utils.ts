@@ -1,7 +1,7 @@
 import URI from 'urijs';
 import isEqual from 'lodash/isEqual';
 import electron from 'electron';
-const BrowserWindow = electron.remote.BrowserWindow;
+import cloneDeep from 'lodash/cloneDeep';
 
 export const enum EBit {
   ZERO,
@@ -155,7 +155,7 @@ export default class Utils {
   static getChangedParams<T>(obj: T, patch: T): Partial<T> {
     const result: Dictionary<any> = {};
     Object.keys(patch).forEach(key => {
-      if (!isEqual(obj[key], patch[key])) result[key] = patch[key];
+      if (!isEqual(obj[key], patch[key])) result[key] = cloneDeep(patch[key]);
     });
     return result as Partial<T>;
   }
@@ -210,7 +210,7 @@ export default class Utils {
 
   static makeChildWindowVisible() {
     const childWindowId: number = electron.ipcRenderer.sendSync('getWindowIds').child;
-    const childWindow = BrowserWindow.fromId(childWindowId);
+    const childWindow = electron.remote.BrowserWindow.fromId(childWindowId);
     childWindow.show();
     childWindow.restore();
   }

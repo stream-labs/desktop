@@ -34,6 +34,13 @@ import ResizeBar from 'components/shared/ResizeBar.vue';
 import FacebookMerge from 'components/pages/FacebookMerge';
 import { getPlatformService } from 'services/platforms';
 
+const loadedTheme = () => {
+  const customizationState = localStorage.getItem('PersistentStatefulService-CustomizationService');
+  if (customizationState) {
+    return JSON.parse(customizationState)?.theme;
+  }
+};
+
 @Component({
   components: {
     TitleBar,
@@ -107,7 +114,7 @@ export default class Main extends Vue {
       return this.customizationService.currentTheme;
     }
 
-    return 'night-theme';
+    return loadedTheme() || 'night-theme';
   }
 
   get applicationLoading() {

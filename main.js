@@ -1,4 +1,5 @@
 'use strict';
+const appStartTime = Date.now();
 let lastEventTime = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -382,7 +383,6 @@ if (!gotTheLock) {
         console.log('Tried to send request but worker window was missing...');
         return;
       }
-
       workerWindow.webContents.send('services-request', request);
       if (!event) return;
       requests[request.id] = Object.assign({}, request, { event, async });
@@ -656,6 +656,10 @@ if (!gotTheLock) {
       main: mainWindow.id,
       child: childWindow.id,
     };
+  });
+
+  ipcMain.on('getAppStartTime', e => {
+    e.returnValue = appStartTime;
   });
 
   ipcMain.on('measure-time', (e, msg, time) => {

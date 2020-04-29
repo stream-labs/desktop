@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import * as electron from 'electron';
+import * as path from 'path';
 
 module.exports = async (basePath: string) => {
   const cdnBase = `https://slobs-cdn.streamlabs.com/${process.env.SLOBS_VERSION}/bundles/`;
@@ -15,32 +16,29 @@ module.exports = async (basePath: string) => {
     useLocalBundles = true;
   }
 
+  const localManifest = require(path.join(`${basePath}/bundles/manifest.json`));
+
+  console.log('Local bundle info:', localManifest);
+
   // Check if bundle updates are available
-  // TODO: In the future, support other bundles than just renderer.js
   // TODO: Cache the latest bundle name for offline use?
-  let latestBundle: string | undefined;
+  let serverManifest: { [bundle: string]: string } | undefined;
 
   if (!useLocalBundles) {
     try {
-      const response = await fetch(`${cdnBase}latest.json`);
+      const response = await fetch(`${cdnBase}manifest.json`);
 
       if (response.status / 100 >= 4) {
-        console.log('Bundle update not available, using local bundles');
+        console.log('Bundle manifest not available, using local bundles');
         useLocalBundles = true;
       } else {
         const parsed = await response.json();
         console.log('Latest bundle info:', parsed);
 
-        latestBundle = parsed.renderer;
-
-        if (parsed.renderer) {
-          latestBundle = parsed.renderer;
-        } else {
-          useLocalBundles = true;
-        }
+        serverManifest = parsed;
       }
     } catch (e) {
-      console.log('Bundle prefetch error', e);
+      console.log('Bundle manifest fetch error', e);
       useLocalBundles = true;
     }
   }
@@ -48,11 +46,18 @@ module.exports = async (basePath: string) => {
   electron.session.defaultSession?.webRequest.onBeforeRequest(
     { urls: ['https://slobs-cdn.streamlabs.com/bundles/*.js'] },
     (request, cb) => {
-      if (useLocalBundles) {
-        cb({ redirectURL: `${localBase}renderer.js` });
-      } else {
-        cb({ redirectURL: `${cdnBase}${latestBundle}` });
+      const bundleName = request.url.split('/')[4];
+
+      if (!useLocalBundles && serverManifest && serverManifest[bundleName]) {
+        if (serverManifest[bundleName] !== localManifest[bundleName]) {
+          console.log(`Newer version of ${bundleName} is available`);
+          cb({ redirectURL: `${cdnBase}${serverManifest[bundleName]}` });
+          return;
+        }
       }
+
+      console.log(`Using local bundle for ${bundleName}`);
+      cb({ redirectURL: `${localBase}${localManifest[bundleName]}` });
     },
   );
 
@@ -70,9 +75,9 @@ module.exports = async (basePath: string) => {
     electron.app.quit();
   }
 
-  if (!useLocalBundles && latestBundle) {
+  if (!useLocalBundles) {
     electron.session.defaultSession?.webRequest.onHeadersReceived(
-      { urls: [`${cdnBase}${latestBundle}`] },
+      { urls: [`${cdnBase}*.js`] },
       (info, cb) => {
         if (info.statusCode / 100 < 4) {
           cb({});
@@ -86,7 +91,7 @@ module.exports = async (basePath: string) => {
     );
 
     electron.session.defaultSession?.webRequest.onErrorOccurred(
-      { urls: [`${cdnBase}${latestBundle}`] },
+      { urls: [`${cdnBase}*.js`] },
       info => {
         console.log('Caught error fetching bundle', info.error);
 
