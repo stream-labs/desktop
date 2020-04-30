@@ -16,6 +16,7 @@ import { setOutputResolution, setTemporaryRecordingPath } from '../../helpers/sp
 import { startRecording, stopRecording } from '../../helpers/spectron/streaming';
 import { getCPUUsage, getMemoryUsage, logTiming, usePerformanceTest } from '../tools';
 import { logIn } from '../../helpers/spectron/user';
+import { ExecutionContext } from 'ava';
 const fs = require('fs-extra');
 const _7z = require('7zip')['7z'];
 const path = require('path');
@@ -54,15 +55,15 @@ function measureStartupTime(api: ApiClient) {
   );
 }
 
-async function measureMemoryAndCPU(attempts = CPU_ATTEMPTS) {
-  logTiming('Start recodring CPU and Memory');
+async function measureMemoryAndCPU(t: ExecutionContext, attempts = CPU_ATTEMPTS) {
+  logTiming(t, 'Start recodring CPU and Memory');
   const meter = getMeter();
   while (attempts--) {
     meter.addMeasurement('CPU', await getCPUUsage());
     meter.addMeasurement('memory', await getMemoryUsage());
     await sleep(2000);
   }
-  logTiming('Stop recodring CPU and Memory');
+  logTiming(t, 'Stop recodring CPU and Memory');
 }
 
 test('Bundle size', async t => {
@@ -91,7 +92,7 @@ test('Empty collection', async t => {
 
   // measure memory and CPU
   await startApp(t);
-  await measureMemoryAndCPU();
+  await measureMemoryAndCPU(t);
 
   t.pass();
 });
@@ -112,7 +113,7 @@ test('Large collection', async t => {
 
   // measure memory and CPU
   await startApp(t);
-  await measureMemoryAndCPU();
+  await measureMemoryAndCPU(t);
   t.pass();
 });
 
@@ -141,7 +142,7 @@ test('Recording', async t => {
   scenesService.activeScene.createAndAddSource('Color', 'color_source');
 
   await startRecording(t);
-  await measureMemoryAndCPU();
+  await measureMemoryAndCPU(t);
   await stopRecording(t);
 
   t.pass();
@@ -174,8 +175,10 @@ test('Add and remove sources', async t => {
     meter.startMeasure('addSources');
     let sourcesCount = 10;
     while (sourcesCount--) {
+      const folder = scenesService.activeScene.createFolder(`folder ${sourcesCount}`);
       sourceTypes.forEach(type => {
-        scenesService.activeScene.createAndAddSource(type, type as TSourceType);
+        const item = scenesService.activeScene.createAndAddSource(type, type as TSourceType);
+        folder.add(item.id);
       });
     }
     meter.stopMeasure('addSources');

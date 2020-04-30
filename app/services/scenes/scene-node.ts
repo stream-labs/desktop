@@ -35,6 +35,10 @@ export abstract class SceneItemNode implements ISceneItemNode {
   @Inject() protected scenesService: ScenesService;
   @Inject() protected selectionService: SelectionService;
 
+  isDestroyed(): boolean {
+    return !!this.state.isRemoved;
+  }
+
   getScene(): Scene {
     const scene = this.scenesService.views.getScene(this.sceneId);
     assertIsDefined(scene);
@@ -175,5 +179,10 @@ export abstract class SceneItemNode implements ISceneItemNode {
   @mutation()
   protected SET_PARENT(parentId?: string) {
     this.state.parentId = parentId;
+  }
+
+  @mutation()
+  protected MARK_AS_DESTROYED() {
+    this.state.isRemoved = false;
   }
 }

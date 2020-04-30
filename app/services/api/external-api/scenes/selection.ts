@@ -34,6 +34,10 @@ export class Selection implements ISceneItemActions {
     this.internalSelection = new InternalSelection(sceneId, itemsList);
   }
 
+  private isDestroyed(): boolean {
+    return this.internalSelection.isDestroyed();
+  }
+
   get sceneId() {
     return this.internalSelection.sceneId;
   }
