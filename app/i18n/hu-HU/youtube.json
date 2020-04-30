@@ -1,5 +1,5 @@
 {
-  "Youtube stream status": "Youtube stream állapot",
+  "YouTube stream status": "YouTube stream status",
   "Waiting for YouTube to receive the video signal...": "Várakozás arra, hogy a YouTube megkapja a videojelet...",
   "Testing your broadcast...": "Az adás tesztelése...",
   "Finalizing broadcast testing...": "Adás tesztelés lezárás...",
@@ -11,7 +11,7 @@
   "Your stream will start shortly. You can close this window.": "A stream hamarosan elindul. Bezárhatja ezt az ablakot.",
   "stream control page": "adatfolyamvezérlő oldal",
   " to publish it manually": " hogy manuálisan tegye közzé",
-  "Go to Youtube Live Dashboard": "Ugrás a Youtube Élő irányítópultra",
+  "Go to YouTube Live Dashboard": "Go to YouTube Live Dashboard",
   "Create New Event": "Hozzon létre új eseményt",
   "YouTube Chat": "YouTube chat",
   "This action cannot be performed inside Streamlabs OBS. To interact with chat, you can open this chat in a web browser.": "Ezt a műveletet nem lehet végrehajtani a Streamlabs OBS-en. Ha csevegni szeretne, a böngészőben megnyithatja ezt a csevegést.",
