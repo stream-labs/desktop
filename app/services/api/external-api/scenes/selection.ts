@@ -71,7 +71,6 @@ export class Selection implements ISceneItemActions {
    * Select items. Previous selected items will be unselected
    */
   select(ids: string[]): Selection {
-    console.log('try to select');
     this.selection.select(ids);
     return this;
   }
