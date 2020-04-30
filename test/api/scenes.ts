@@ -34,6 +34,15 @@ test('Creating, fetching and removing scenes', async t => {
   scenesNames = scenes.map(scene => scene.name);
 
   t.deepEqual(scenesNames, ['Scene']);
+
+  // check the correct error message on removed item
+  let gotError = false;
+  try {
+    scene2.remove();
+  } catch (e) {
+    gotError = true;
+  }
+  t.true(gotError);
 });
 
 test('Switching between scenes', async t => {
