@@ -22,6 +22,7 @@ function exec(cmd) {
 function getCommitSHA() {
   // the repo is in the detached state for CI
   // we need to take one commit before to take a commit that has been associated to the PR
+  console.log('is CI', CI);
   return CI
     ? execSync('git rev-parse HEAD^').toString()
     : execSync('git rev-parse HEAD').toString();
