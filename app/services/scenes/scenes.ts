@@ -17,7 +17,7 @@ import { lazyModule } from 'util/lazy-module';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
-export interface IScene extends IResource {
+export interface IScene {
   id: string;
   name: string;
   nodes: (ISceneItem | ISceneItemFolder)[];
@@ -119,7 +119,7 @@ export interface ISceneItemActions {
 
 export type TSceneNodeType = 'item' | 'folder';
 
-export interface ISceneItemNode extends IResource {
+export interface ISceneItemNode {
   id: string;
   sceneId: string;
   sceneNodeType: TSceneNodeType;
@@ -132,8 +132,12 @@ export interface ISceneItemFolder extends ISceneItemNode {
 }
 
 class ScenesViews extends ViewHandler<IScenesState> {
-  getScene(sceneId: string) {
-    return new Scene(sceneId);
+  @Inject() private scenesService: ScenesService;
+
+  getScene(sceneId: string): Scene | null {
+    const sceneModel = this.state.scenes[sceneId];
+    if (!sceneModel) return null;
+    return new Scene(sceneModel.id);
   }
 
   get activeSceneId() {
@@ -147,10 +151,7 @@ class ScenesViews extends ViewHandler<IScenesState> {
   }
 
   get scenes(): Scene[] {
-    return uniqBy(
-      this.state.displayOrder.map(id => this.getScene(id)),
-      x => x.id,
-    );
+    return this.state.displayOrder.map(id => this.getScene(id)!);
   }
 
   getSceneItems(): SceneItem[] {
@@ -203,7 +204,6 @@ export class ScenesService extends StatefulService<IScenesState> {
     Vue.set<IScene>(this.state.scenes, id, {
       id,
       name,
-      resourceId: `Scene${JSON.stringify([id])}`,
       nodes: [],
     });
     this.state.displayOrder.push(id);
@@ -234,8 +234,9 @@ export class ScenesService extends StatefulService<IScenesState> {
     this.sourcesService.addSource(obsScene.source, name, { sourceId: id });
 
     if (options.duplicateSourcesFromScene) {
+      const newScene = this.views.getScene(id)!;
       const oldScene = this.views.getScene(options.duplicateSourcesFromScene);
-      const newScene = this.views.getScene(id);
+      if (!oldScene) return;
 
       oldScene
         .getItems()
@@ -249,6 +250,7 @@ export class ScenesService extends StatefulService<IScenesState> {
 
     this.sceneAdded.next(this.state.scenes[id]);
     if (options.makeActive) this.makeSceneActive(id);
+
     return this.views.getScene(id);
   }
 
@@ -256,12 +258,13 @@ export class ScenesService extends StatefulService<IScenesState> {
     return Object.keys(this.state.scenes).length > 1;
   }
 
-  removeScene(id: string, force = false): IScene {
+  removeScene(id: string, force = false): IScene | null {
     if (!force && Object.keys(this.state.scenes).length < 2) {
       return null;
     }
 
     const scene = this.views.getScene(id);
+    if (!scene) return null;
     const sceneModel = this.state.scenes[id];
 
     // remove all sources from scene
@@ -361,8 +364,10 @@ export class ScenesService extends StatefulService<IScenesState> {
   // }
 
   suggestName(name: string): string {
+    if (!this.views.activeScene) return name;
+    const activeScene = this.views.activeScene!;
     return namingHelpers.suggestName(name, (name: string) => {
-      const ind = this.views.activeScene.getNodes().findIndex(node => node.name === name);
+      const ind = activeScene.getNodes().findIndex(node => node.name === name);
       return ind !== -1;
     });
   }

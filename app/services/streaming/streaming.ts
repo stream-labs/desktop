@@ -391,7 +391,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
    */
   get formattedDurationInCurrentStreamingState() {
     const formattedTime = this.formattedDurationSince(this.streamingStateChangeTime);
-    if (formattedTime === '07:50:00' && this.userService.platform.type === 'facebook') {
+    if (formattedTime === '07:50:00' && this.userService?.platform?.type === 'facebook') {
       const msg = $t('You are 10 minutes away from the 8 hour stream limit');
       const existingTimeupNotif = this.notificationsService.views
         .getUnread()
@@ -465,7 +465,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         if (this.streamSettingsService.protectedModeEnabled) this.runPlatformAfterGoLiveHook();
 
         let streamEncoderInfo: Partial<IOutputSettings> = {};
-        let game: string = null;
+        let game: string = '';
 
         try {
           streamEncoderInfo = this.outputSettingsService.getSettings();
@@ -651,7 +651,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   private async runPlaformAfterStopStreamHook() {
     if (!this.userService.isLoggedIn) return;
-    const service = getPlatformService(this.userService.platform.type);
+    const service = getPlatformService(this.userService!.platform!.type);
     if (typeof service.afterStopStream === 'function') {
       await service.afterStopStream();
     }

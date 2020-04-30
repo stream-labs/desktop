@@ -15,6 +15,7 @@ import * as obs from '../../../obs-api';
 import isEqual from 'lodash/isEqual';
 import omitBy from 'lodash/omitBy';
 import { cloneDeep } from 'lodash';
+import { assertIsDefined } from '../../util/properties-type-guards';
 
 @ServiceHelper()
 export class Source implements ISourceApi {
@@ -158,7 +159,7 @@ export class Source implements ISourceApi {
     this.sourcesService.sourceUpdated.next(this.state);
   }
 
-  duplicate(newSourceId?: string): Source {
+  duplicate(newSourceId?: string): Source | null {
     if (this.doNotDuplicate) return null;
 
     return this.sourcesService.createSource(this.name, this.type, this.getSettings(), {
@@ -282,12 +283,12 @@ export class Source implements ISourceApi {
     // Enter key
     if (code === 13) normalizedText = '\r';
 
+    const altKey: number = (modifiers.alt && obs.EInteractionFlags.AltKey) || 0;
+    const ctrlKey: number = (modifiers.ctrl && obs.EInteractionFlags.ControlKey) || 0;
+    const shiftKey: number = (modifiers.shift && obs.EInteractionFlags.ShiftKey) || 0;
     this.getObsInput().sendKeyClick(
       {
-        modifiers:
-          (modifiers.alt && obs.EInteractionFlags.AltKey) |
-          (modifiers.ctrl && obs.EInteractionFlags.ControlKey) |
-          (modifiers.shift && obs.EInteractionFlags.ShiftKey),
+        modifiers: altKey | ctrlKey | shiftKey,
         text: normalizedText,
         nativeModifiers: 0,
         nativeScancode: 0,
@@ -305,14 +306,12 @@ export class Source implements ISourceApi {
     // is always up-to-date, and essentially acts
     // as a view into the store.  It also enforces
     // the read-only nature of this data
-    const isTemporarySource = !!this.sourcesService.state.temporarySources[sourceId];
-    if (isTemporarySource) {
-      this.state = this.sourcesService.state.temporarySources[sourceId];
-      Utils.applyProxy(this, this.sourcesService.state.temporarySources[sourceId]);
-    } else {
-      this.state = this.sourcesService.state.sources[sourceId];
-      Utils.applyProxy(this, this.sourcesService.state.sources[sourceId]);
-    }
+    const state =
+      this.sourcesService.state.sources[sourceId] ||
+      this.sourcesService.state.temporarySources[sourceId];
+    assertIsDefined(state);
+    Utils.applyProxy(this, state);
+    this.state = state;
   }
 
   @mutation()
