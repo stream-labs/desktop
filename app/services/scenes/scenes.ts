@@ -504,7 +504,7 @@ export class ScenesService extends StatefulService<IScenesState> {
 
   /**
    * Apply a callback for each sceneNode
-   * Stop travers if the callback returns false
+   * Stop traversing if the callback returns false
    */
   private traverseScene(
     sceneId: string,
@@ -513,6 +513,7 @@ export class ScenesService extends StatefulService<IScenesState> {
   ): boolean {
     let canContinue = true;
     const scene = this.views.getScene(sceneId);
+    if (!scene) return false;
 
     // traverse root-level
     if (!nodeId) {
@@ -526,6 +527,8 @@ export class ScenesService extends StatefulService<IScenesState> {
 
     // traverse a scene-node
     const node = scene.getNode(nodeId);
+    if (!node) return false;
+
     if (node.isItem()) {
       canContinue = cb(node);
       if (!canContinue) return false;
