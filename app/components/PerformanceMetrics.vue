@@ -4,7 +4,7 @@
     :class="[
       'performance-metric-wrapper', classForStat('cpu')]"
     @click="() => (updatePinnedStats('cpu', !pinnedStats.cpu))"
-    v-tooltip="pinTooltip"
+    v-tooltip="pinTooltip('CPU')"
     v-if="showCPU"
   >
     <i class="performance-metric-icon icon-cpu"></i>
@@ -17,7 +17,7 @@
   <span
     :class="['performance-metric-wrapper', classForStat('fps')]"
     @click="() => (updatePinnedStats('fps', !pinnedStats.fps))"
-    v-tooltip="pinTooltip"
+    v-tooltip="pinTooltip('FPS')"
     v-if="showFPS"
   >
     <i class="performance-metric-icon icon-fps"></i>
@@ -30,7 +30,7 @@
   <span
     :class="['performance-metric-wrapper', classForStat('droppedFrames')]"
     @click="() => (updatePinnedStats('droppedFrames', !pinnedStats.droppedFrames))"
-    v-tooltip="pinTooltip"
+    v-tooltip="pinTooltip('dropped frames')"
     v-if="showDroppedFrames"
   >
     <i class="performance-metric-icon icon-dropped-frames"></i>
@@ -43,7 +43,7 @@
   <span
     :class="['performance-metric-wrapper', classForStat('bandwidth')]"
     @click="() => (updatePinnedStats('bandwidth', !pinnedStats.bandwidth))"
-    v-tooltip="pinTooltip"
+    v-tooltip="pinTooltip('bandwidth')"
     v-if="showBandwidth"
   >
     <i class="performance-metric-icon icon-bitrate"></i>
@@ -82,7 +82,7 @@
 }
 
 .performance-metric-wrapper.active {
-  background: var(--input-border);
+  background: var(--button);
 }
 
 .performance-metric-wrapper.clickable {

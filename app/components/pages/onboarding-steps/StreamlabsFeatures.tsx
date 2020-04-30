@@ -18,7 +18,7 @@ export default class ObsImport extends TsxComponent<{}> {
   }
 
   get isIrlStreamer() {
-    return this.scenesService.scenes.find(scene => /irl/i.test(scene.name));
+    return this.scenesService.views.scenes.find(scene => /irl/i.test(scene.name));
   }
 
   get recommendedFeatures() {
@@ -56,7 +56,7 @@ export default class ObsImport extends TsxComponent<{}> {
         image: 'game-overlay',
       },
       facemasks: {
-        title: $t('Facemasks'),
+        title: $t('Face Masks'),
         description: $t(
           'Enjoy interacting with your viewers via IRL streams? Take that interaction to the next level with ' +
             'Streamlabs Facemasks, a tool that lets your viewers add 3-D masks to your face when they donate. ' +

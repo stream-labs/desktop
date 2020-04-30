@@ -49,9 +49,14 @@ test('OBS Importer', async t => {
 
   // extract OBS config to the cache dir
   const cacheDir = path.resolve(await t.context.app.electron.remote.app.getPath('userData'), '..');
-  const dataDir = path.resolve(__dirname, '..', '..', 'test', 'data');
+  const dataDir = path.resolve(__dirname, '..', '..', '..', '..', 'test', 'data');
   const obsCacheZipPath = path.resolve(dataDir, 'obs-studio.zip');
-  spawnSync(_7z, ['x', obsCacheZipPath, `-o${cacheDir}`]);
+  const result = spawnSync(_7z, ['x', obsCacheZipPath, `-o${cacheDir}`]);
+
+  if (result.status) {
+    console.error(result.stderr.toString());
+    throw new Error('Error setting up OBS Studio cache directory!');
+  }
 
   // skip auth
   await client.waitForVisible('button=Twitch');

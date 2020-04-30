@@ -1,6 +1,6 @@
 {
   "Add %{filterName}": "Aggiungi %{filterName}",
-  "Center ${sourceName}": "Centra %{sourceName}",
+  "Center %{sourceName}": "Center %{sourceName}",
   "Paste %{nodeName}": "Incolla %{nodeName}",
   "Create a new connection": "Crea una nuova connessione",
   "Create %{sourceName}": "Crea %{sourceName}",
@@ -43,5 +43,5 @@
   "Ungroup %{sourceName}": "Separa %{sourceName}",
   "Unhide mixer items": "Mostra elementi mixer",
   "Undo %{action}": "Annulla %{action}",
-  "Redo %{action}": "Ripristina %{azione}"
+  "Redo %{action}": "Ripristina %{action}"
 }

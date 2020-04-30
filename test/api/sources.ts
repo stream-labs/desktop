@@ -1,7 +1,8 @@
 import { useSpectron, test } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
-import { ScenesService } from 'services/scenes';
+import { ScenesService } from 'services/api/external-api/scenes/scenes';
 import { SourcesService } from 'services/api/external-api/sources/sources';
+import { sleep } from '../helpers/sleep';
 
 useSpectron({ restartAppAfterEachTest: false });
 
@@ -25,7 +26,7 @@ test('Creating, fetching and removing sources', async t => {
 
   t.deepEqual(sceneItemNames, ['MyColorSource1', 'MyColorSource2']);
 
-  scene.removeItem(colorItem1.sceneItemId);
+  scene.removeItem(colorItem1.id);
   colorItem2.remove();
   sceneItemNames = scene.getItems().map(item => item['name']);
 
@@ -36,7 +37,6 @@ test('Source events', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const sourcesService = client.getResource<SourcesService>('SourcesService');
-
 
   sourcesService.sourceAdded.subscribe(() => void 0);
   sourcesService.sourceRemoved.subscribe(() => void 0);

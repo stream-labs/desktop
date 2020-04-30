@@ -1,0 +1,2 @@
+This directory is for resources that need to be accessed by both the Frontend and Backend.
+Use app/util/get-shared-resource.ts to get a fully qualified path to a shared resource.

@@ -59,10 +59,6 @@ export class Twitter extends TsxComponent<TwitterProps> {
     return $t('Compose Tweet');
   }
 
-  openPrime() {
-    shell.openExternal('https://streamlabs.com/editor/domain?ref=slobs_twitter&redirect=false');
-  }
-
   linkTwitter() {
     this.twitterService.openLinkTwitterDialog();
   }
@@ -113,18 +109,6 @@ export class Twitter extends TsxComponent<TwitterProps> {
       this.onTweetChange(newTweet);
     }
     this.priorTitle = title;
-  }
-
-  get primeButton() {
-    if (!this.isPrime) {
-      return (
-        <a onClick={this.openPrime} class={styles.primeLink}>
-          {$t('Custom URL with')}
-          &nbsp;
-          <strong>{$t('Prime')}</strong>
-        </a>
-      );
-    }
   }
 
   get tweetInput() {
@@ -178,7 +162,6 @@ export class Twitter extends TsxComponent<TwitterProps> {
         </div>
         {this.tweetInput}
         <div class={styles.twitterButtons}>
-          {this.primeButton}
           <button
             class={cx('button', 'button--default', styles.adjustButton)}
             disabled={this.props.updatingInfo}

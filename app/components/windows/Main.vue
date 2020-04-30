@@ -1,14 +1,17 @@
 <template>
 <div class="main" :class="theme" id="mainWrapper" @drop="onDropHandler">
-  <title-bar :title="title" :class="{ 'titlebar--error': errorAlert }" />
-  <news-banner/>
+  <title-bar :title="title" :class="{ 'titlebar--error': errorAlert }" v-if="bulkLoadFinished" />
+  <news-banner v-if="bulkLoadFinished" />
   <div
     class="main-contents"
+    v-if="bulkLoadFinished"
     :class="{
       'main-contents--right': renderDock && leftDock && hasLiveDock,
       'main-contents--left': renderDock && !leftDock && hasLiveDock,
-      'main-contents--onboarding': page === 'Onboarding' }">
-    <side-nav v-if="(page !== 'Onboarding') && !showLoadingSpinner" :locked="applicationLoading" />
+      'main-contents--onboarding': page === 'Onboarding',
+    }"
+  >
+    <side-nav v-if="page !== 'Onboarding' && !showLoadingSpinner" :locked="applicationLoading" />
     <div class="live-dock-wrapper" v-if="renderDock && leftDock">
       <live-dock :onLeft="true" />
       <resize-bar
@@ -26,8 +29,10 @@
         class="main-page-container"
         v-if="!showLoadingSpinner"
         :is="page"
-        :params="params"/>
-      <studio-footer v-if="!applicationLoading && (page !== 'Onboarding')" />
+        :params="params"
+        @totalWidth="width => handleEditorWidth(width)"
+      />
+      <studio-footer v-if="!applicationLoading && page !== 'Onboarding'" />
     </div>
 
     <div class="live-dock-wrapper" v-if="renderDock && !leftDock">
@@ -42,7 +47,9 @@
     </div>
   </div>
   <transition name="loader">
-    <div class="main-loading" v-if="showLoadingSpinner"><custom-loader></custom-loader></div>
+    <div class="main-loading" v-if="!bulkLoadFinished || showLoadingSpinner">
+      <custom-loader></custom-loader>
+    </div>
   </transition>
 </div>
 </template>
@@ -123,6 +130,8 @@
   right: 0;
   z-index: 999999;
   background-color: var(--background);
+  -webkit-app-region: drag;
+
   // Loader component is a fixed element that obscures the top bar
   /deep/ .s-loader__bg {
     top: 30px;

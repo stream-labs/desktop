@@ -33,7 +33,7 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
    * Updates the local value that is used during the display processs.
    * @param value The value that will be displayed on the interface.
    */
-  updateLocalValue(value: number) {
+  updateLocalValue(value: number | string) {
     if (this.timeout) this.timeout = window.clearTimeout(this.timeout);
 
     const parsedValue = Number(value);
@@ -47,7 +47,7 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata> {
     } else if (parsedValue > this.max) {
       this.localValue = this.max;
       this.updateValue(this.max);
-    } else if (value != null && !isNaN(value) && this.localValue !== parsedValue) {
+    } else if (value != null && !isNaN(parsedValue) && this.localValue !== parsedValue) {
       // Otherwise use the provided number value if it has changed and is properly constrained
       this.localValue = parsedValue;
       this.updateValue(parsedValue);

@@ -116,6 +116,10 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     });
 
     // We need to refresh the data in case there are additional fields
+    const mustUpdateObsSettings = Object.keys(patch).find(key =>
+      ['platform', 'key', 'server'].includes(key),
+    );
+    if (!mustUpdateObsSettings) return;
     streamFormData = this.getObsStreamSettings();
 
     streamFormData.forEach(subCategory => {
@@ -174,7 +178,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
   }
 
   get protectedModeEnabled(): boolean {
-    return this.userService.isLoggedIn() && this.state.protectedModeEnabled;
+    return this.userService.isLoggedIn && this.state.protectedModeEnabled;
   }
 
   /**

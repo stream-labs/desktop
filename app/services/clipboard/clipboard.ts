@@ -106,7 +106,7 @@ export class ClipboardService extends StatefulService<IClipboardState>
   @shortcut('Ctrl+C')
   copy() {
     this.SET_SCENE_ITEMS_IDS(this.selectionService.getIds());
-    this.SET_SCENE_ITEMS_SCENE(this.scenesService.activeScene.id);
+    this.SET_SCENE_ITEMS_SCENE(this.scenesService.views.activeScene.id);
   }
 
   @shortcut('Ctrl+V')
@@ -128,8 +128,10 @@ export class ClipboardService extends StatefulService<IClipboardState>
 
       const insertedItems = this.editorCommandsService.executeCommand(
         'CopyNodesCommand',
-        this.scenesService.getScene(this.state.itemsSceneId).getSelection(this.state.sceneNodesIds),
-        this.scenesService.activeSceneId,
+        this.scenesService.views
+          .getScene(this.state.itemsSceneId)
+          .getSelection(this.state.sceneNodesIds),
+        this.scenesService.views.activeSceneId,
         duplicateSources,
       );
 
@@ -141,7 +143,7 @@ export class ClipboardService extends StatefulService<IClipboardState>
 
   copyFilters(sourceId?: string) {
     const source = sourceId
-      ? this.sourcesService.getSource(sourceId)
+      ? this.sourcesService.views.getSource(sourceId)
       : this.selectionService.getLastSelected();
 
     if (!source) return;
@@ -151,7 +153,7 @@ export class ClipboardService extends StatefulService<IClipboardState>
 
   pasteFilters(sourceId?: string) {
     const source = sourceId
-      ? this.sourcesService.getSource(sourceId)
+      ? this.sourcesService.views.getSource(sourceId)
       : this.selectionService.getLastSelected();
     if (!source) return;
 
@@ -197,6 +199,17 @@ export class ClipboardService extends StatefulService<IClipboardState>
     return !!this.state.systemClipboard.files.length;
   }
 
+  canDuplicate(): boolean {
+    if (this.hasItemsInUnloadedClipboard()) return true;
+    if (!this.hasItems()) return false;
+    const hasNoduplicapableSource = this.scenesService.views
+      .getScene(this.state.itemsSceneId)
+      .getSelection(this.state.sceneNodesIds)
+      .getSources()
+      .some(source => source.doNotDuplicate);
+    return !hasNoduplicapableSource;
+  }
+
   clear() {
     this.SET_FILTERS_IDS([]);
     this.SET_SCENE_ITEMS_IDS([]);
@@ -218,7 +231,7 @@ export class ClipboardService extends StatefulService<IClipboardState>
   private pasteItemsFromUnloadedClipboard() {
     const sourceIdMap: Dictionary<string> = {};
     const sources = this.state.unloadedCollectionClipboard.sources;
-    const scene = this.scenesService.activeScene;
+    const scene = this.scenesService.views.activeScene;
 
     // create sources
     Object.keys(sources).forEach(sourceId => {
@@ -279,8 +292,8 @@ export class ClipboardService extends StatefulService<IClipboardState>
   ): string[] {
     const scene =
       sceneId === 'current'
-        ? this.scenesService.activeScene
-        : this.scenesService.getScene(sourceIdMap[sceneId]);
+        ? this.scenesService.views.activeScene
+        : this.scenesService.views.getScene(sourceIdMap[sceneId]);
 
     const insertedNodesIds: string[] = [];
     const folderIdMap: Dictionary<string> = {};
@@ -324,7 +337,7 @@ export class ClipboardService extends StatefulService<IClipboardState>
 
   private pasteFromSystemClipboard() {
     const clipboard = this.state.systemClipboard;
-    const scene = this.scenesService.activeScene;
+    const scene = this.scenesService.views.activeScene;
     if (clipboard.files.length) {
       clipboard.files.forEach(filePath => scene.addFile(filePath));
       return;
@@ -335,7 +348,7 @@ export class ClipboardService extends StatefulService<IClipboardState>
     // save nodes to unloaded clipboard
     if (!this.hasItemsInUnloadedClipboard() && this.hasItems()) {
       let sourcesInfo: Dictionary<ISourceInfo> = {};
-      const scenes = this.scenesService.activeScene.getNestedScenes();
+      const scenes = this.scenesService.views.activeScene.getNestedScenes();
       const scenesNodes: IScenesNodes = { current: [] };
 
       scenes.forEach(scene => {
@@ -345,7 +358,7 @@ export class ClipboardService extends StatefulService<IClipboardState>
       });
 
       const sceneInfo = this.getSceneInfo(
-        this.scenesService.getScene(this.state.itemsSceneId),
+        this.scenesService.views.getScene(this.state.itemsSceneId),
         sourcesInfo,
         this.state.sceneNodesIds,
       );

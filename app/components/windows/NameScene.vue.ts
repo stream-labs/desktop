@@ -3,8 +3,8 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from '../../services/core/injector';
 import ModalLayout from '../ModalLayout.vue';
 import { WindowsService } from '../../services/windows';
-import { ScenesService, Scene } from 'services/scenes';
-import { ISourcesServiceApi } from '../../services/sources';
+import { ScenesService } from 'services/scenes';
+import { SourcesService } from '../../services/sources';
 import { SelectionService } from 'services/selection';
 import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
@@ -18,7 +18,7 @@ export default class NameScene extends Vue {
   error = '';
 
   @Inject() private scenesService: ScenesService;
-  @Inject() private sourcesService: ISourcesServiceApi;
+  @Inject() private sourcesService: SourcesService;
   @Inject() private windowsService: WindowsService;
   @Inject() private selectionService: SelectionService;
   @Inject() private editorCommandsService: EditorCommandsService;
@@ -33,14 +33,14 @@ export default class NameScene extends Vue {
     let name = '';
 
     if (this.options.rename) {
-      name = this.scenesService.getScene(this.options.rename).name;
+      name = this.scenesService.views.getScene(this.options.rename).name;
       this.name = name;
     } else if (this.options.sceneToDuplicate) {
-      name = this.scenesService.getScene(this.options.sceneToDuplicate).name;
+      name = this.scenesService.views.getScene(this.options.sceneToDuplicate).name;
     } else if (this.options.itemsToGroup) {
-      name = `${this.scenesService.activeScene.name} Group`;
+      name = `${this.scenesService.views.activeScene.name} Group`;
     } else {
-      name = 'New Scene';
+      name = $t('New Scene');
     }
     if (!this.options.rename) this.name = this.sourcesService.suggestName(name);
   }
@@ -65,7 +65,7 @@ export default class NameScene extends Vue {
 
       if (this.options.itemsToGroup) {
         options.groupFromOrigin = {
-          originSceneId: this.scenesService.activeSceneId,
+          originSceneId: this.scenesService.views.activeSceneId,
           originItemIds: this.options.itemsToGroup,
         };
       }
@@ -76,7 +76,7 @@ export default class NameScene extends Vue {
         options,
       );
 
-      this.scenesService.getScene(newSceneId).makeActive();
+      this.scenesService.views.getScene(newSceneId).makeActive();
 
       this.windowsService.closeChildWindow();
     }

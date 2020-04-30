@@ -1,8 +1,8 @@
 <template>
   <modal-layout :show-controls="false" :customControls="true">
     <div slot="content">
-      <h4 v-if="windowHeading">{{windowHeading}}</h4>
-      <div v-if="infoLoading"><spinner/></div>
+      <h4 v-if="windowHeading">{{ windowHeading }}</h4>
+      <div v-if="infoLoading"><spinner /></div>
       <div v-if="infoError && !infoLoading" class="warning">
         {{ $t('There was an error fetching your channel information.  You can try') }}
         <a class="description-link" @click="populateInfo">{{
@@ -14,26 +14,23 @@
       </div>
       <validated-form name="editStreamForm" ref="form" v-if="!infoLoading && !infoError">
         <div class="pages-warning" v-if="isFacebook && !hasPages">
-          {{ $t("It looks like you don't have any Pages. Head to ") }}
-          <a class="description-link" @click="openFBPageCreateLink">{{
-            $t('Facebook Page Creation')
-          }}</a>
-          {{ $t(' to create a page, and then try again.') }}
+          <i class="fab fa-facebook" />
+          {{ $t('You must create a Facebook gaming page to go live.') }}
+          <a class="description-link" @click="openFBPageCreateLink">{{ $t('Create Page') }}</a>
         </div>
-        <h-form-group
-          v-if="isFacebook && hasPages && !midStreamMode"
-          :v-model="channelInfo.facebookPageId"
-          :metadata="formMetadata.page"
-        />
-
         <div v-if="isYoutube">
-          <YoutubeEditStreamInfo v-model="channelInfo" :canChangeBroadcast="!midStreamMode && !isSchedule"/>
+          <YoutubeEditStreamInfo
+            v-model="channelInfo"
+            :canChangeBroadcast="!midStreamMode && !isSchedule"
+          />
         </div>
         <div v-else>
           <h-form-group
-            v-model="channelInfo.title"
-            :metadata="formMetadata.title"
+            v-if="isFacebook && hasPages && !midStreamMode"
+            v-model="channelInfo.facebookPageId"
+            :metadata="formMetadata.page"
           />
+          <h-form-group v-model="channelInfo.title" :metadata="formMetadata.title" />
           <h-form-group
             v-if="isFacebook"
             v-model="channelInfo.description"
@@ -41,10 +38,7 @@
           />
         </div>
 
-        <h-form-group
-          v-if="isTwitch || isMixer || isFacebook"
-          :metadata="formMetadata.game"
-        >
+        <h-form-group v-if="isTwitch || isMixer || isFacebook" :metadata="formMetadata.game">
           <list-input
             @search-change="value => onGameSearchHandler(value)"
             @input="onGameInput"
@@ -63,8 +57,8 @@
           {{ $t('Checking optimized setting for') }} {{ channelInfo.game }}...
         </h-form-group>
         <div v-if="isSchedule">
-          <h-form-group type="text" v-model="startTimeModel.date" :metadata="formMetadata.date" />
-          <h-form-group type="timer" v-model="startTimeModel.time" :metadata="formMetadata.time" />
+          <h-form-group v-model="startTimeModel.date" :metadata="formMetadata.date" />
+          <h-form-group v-model="startTimeModel.time" :metadata="formMetadata.time" />
         </div>
         <div
           v-if="selectedProfile"
@@ -106,8 +100,7 @@
                 'Something went wrong while updating your stream info. You can try again, or you can',
               )
             }}
-            <a @click="goLive(true)">{{ $t('just go live') }}</a
-            >
+            <a @click="goLive(true)">{{ $t('just go live') }}</a>
           </div>
         </div>
       </validated-form>
@@ -132,13 +125,30 @@
 <style lang="less" scoped>
 @import '../../styles/index';
 
-.pages-warning,
 .update-warning {
   .warning();
 }
 
+.pages-warning {
+  .radius();
+
+  height: 40px;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  background-color: var(--teal-semi);
+  align-items: center;
+  color: var(--teal);
+  margin-bottom: 16px;
+
+  a {
+    color: var(--teal);
+  }
+}
+
 .description-link {
   text-decoration: underline;
+  font-weight: 600;
 }
 
 .edit-stream-info-option-desc {

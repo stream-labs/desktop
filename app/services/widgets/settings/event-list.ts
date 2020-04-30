@@ -50,6 +50,17 @@ export interface IEventListSettings extends IWidgetSettings {
   text_size: number;
   theme: string;
   theme_color: string;
+  mixer_account?: {
+    embers_minimum: number;
+    host_show_auto_hosts: boolean;
+    host_viewer_minimum: number;
+    show_effects: boolean;
+    show_follows: boolean;
+    show_hosts: boolean;
+    show_stickers: boolean;
+    show_subscriptions: boolean;
+    sparks_minimum: number;
+  };
 }
 
 export interface IEventListData extends IWidgetData {
@@ -113,5 +124,9 @@ export class EventListService extends WidgetSettingsService<IEventListData> {
       ],
       mixer: [{ key: 'show_resubs', title: $t('Show Resubs') }],
     }[platform];
+  }
+
+  protected patchBeforeSend(data: IEventListSettings): any {
+    return { ...data, ...data.mixer_account };
   }
 }

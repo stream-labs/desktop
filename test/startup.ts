@@ -1,5 +1,5 @@
 import { useSpectron, focusMain, focusChild, test } from './helpers/spectron/index';
-import { isLoggedIn, logIn } from './helpers/spectron/user';
+import { logIn } from './helpers/spectron/user';
 import { sleep } from './helpers/sleep';
 
 useSpectron();
@@ -16,5 +16,7 @@ test('Main and child window visibility', async t => {
 test.skip('Twitch 2FA is disabled', async t => {
   await logIn(t, 'twitch', { '2FADisabled': true }, false);
   await sleep(5000); // TODO wait for MsgBox instead sleep;
-  t.false(await isLoggedIn(t), 'User should be logged-out');
+
+  // Login did not work, we should still be logged out
+  t.true(await t.context.app.client.isVisible('h1=Connect'));
 });

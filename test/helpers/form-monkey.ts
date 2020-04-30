@@ -1,6 +1,6 @@
 import { sleep } from './sleep';
 import { cloneDeep, isMatch } from 'lodash';
-import { TExecutionContext } from './spectron';
+import { click, TExecutionContext } from './spectron';
 
 interface IUIInput {
   id: string;
@@ -11,6 +11,21 @@ interface IUIInput {
 }
 
 const DEFAULT_SELECTOR = 'body';
+
+const months = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
 
 /**
  * helper for simulating user input into SLOBS forms
@@ -97,6 +112,9 @@ export class FormMonkey {
         case 'fontSize':
         case 'fontWeight':
           await this.setSliderValue(input.selector, value);
+          break;
+        case 'date':
+          await this.setDateValue(input.selector, value);
           break;
         case 'twitchTags':
           await this.setTwitchTagsValue(input.selector, value);
@@ -324,7 +342,41 @@ export class FormMonkey {
     );
   }
 
+  async setDateValue(selector: string, date: Date | number) {
+    date = new Date(date);
+    const day = date.getDate();
+    const month = date.getMonth();
+    const year = date.getFullYear();
+
+    // open calendar
+    await click(this.t, selector);
+
+    // switch to month selection
+    await click(this.t, `${selector} .day__month_btn`);
+
+    // switch to year selection
+    await click(this.t, `${selector} .month__year_btn`);
+
+    // select year
+    let els: any[];
+    els = await this.client.$(selector).$$(`span.year=${year}`);
+    this.client.elementIdClick(els[1].ELEMENT);
+
+    // select month
+    await this.client
+      .$(selector)
+      .$(`span.month=${months[month]}`)
+      .click();
+
+    // select day
+    await this.client
+      .$(selector)
+      .$(`span.day=${day}`)
+      .click();
+  }
+
   async setInputValue(selector: string, value: string) {
+    await this.client.waitForVisible(selector);
     await this.client.click(selector);
     await ((this.client.keys(['Control', 'a']) as any) as Promise<any>); // clear
     await ((this.client.keys('Control') as any) as Promise<any>); // release ctrl key

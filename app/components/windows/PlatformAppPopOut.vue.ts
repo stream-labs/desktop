@@ -29,7 +29,7 @@ export default class PlatformAppPopOut extends Vue {
   }
 
   get title() {
-    const app = this.platformAppsService.getApp(this.params.appId);
+    const app = this.platformAppsService.views.getApp(this.params.appId);
     return app ? app.manifest.name : '';
   }
 

@@ -2,10 +2,12 @@ const merge = require('webpack-merge');
 const baseConfig = require('./base.config.js');
 const path = require('path');
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
-const { CheckerPlugin } = require('awesome-typescript-loader')
+const { CheckerPlugin } = require('awesome-typescript-loader');
 
-const plugins = process.env.SLOBS_FORKED_TYPECHECKING ?
-  [new HardSourceWebpackPlugin(), new CheckerPlugin()] : [new HardSourceWebpackPlugin()];
+const plugins = [];
+
+if (process.env.SLOBS_FORKED_TYPECHECKING) plugins.push(new CheckerPlugin());
+if (!process.env.CI) plugins.push(new HardSourceWebpackPlugin());
 
 module.exports = merge.smart(baseConfig, {
   entry: {
@@ -41,7 +43,7 @@ module.exports = merge.smart(baseConfig, {
       {
         test: /\.tsx?$/,
         enforce: 'pre',
-        loader: 'tslint-loader',
+        loader: 'eslint-loader',
       },
     ]
   },

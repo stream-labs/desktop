@@ -4,13 +4,13 @@
   "Downmix to Mono": "Passer en mono",
   "Sync Offset (ms)": "Décalage de la synchronisation (ms)",
   "Audio Monitoring": "Surveillance audio",
-  "Monitor Off": "Désactiver la surveillance",
+  "Monitor Off": "Surveillance désactivée",
   "Monitor Only (mute output)": "Surveillance uniquement (couper le son de la sortie)",
   "Monitor and Output": "Surveillance et sortie",
   "Tracks": "Pistes",
-  "Advanced Audio Settings": "Propriétés audio avancées",
-  "Volume ( % )": "Volume ( % )",
+  "Advanced Audio Settings": "Paramètres audio avancés",
+  "Volume ( % )": "Volume (%)",
   "Sync Offset ( ms )": "Décalage de la synchronisation (ms)",
   "Mixer": "Table de mixage",
-  "Monitor audio levels. If the bars are moving you are outputting audio.": "Surveillance des niveaux audio. Le mouvement des barres signifient qu’un signal audio est emit."
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "Surveillance des niveaux audio. Le mouvement des barres signifie que vous émettez un signal audio."
 }

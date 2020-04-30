@@ -4,12 +4,13 @@ import { mkdtemp, readdir } from 'fs-extra';
 import { focusChild, focusMain, test, useSpectron } from './helpers/spectron';
 import { setFormDropdown, setFormInput } from './helpers/spectron/forms';
 import { sleep } from './helpers/sleep';
-import { setTemporaryRecordingPath } from './helpers/spectron/output';
+import { setOutputResolution, setTemporaryRecordingPath } from './helpers/spectron/output';
 
 useSpectron();
 
 test('Replay Buffer', async t => {
   const tmpDir = await setTemporaryRecordingPath(t);
+  await setOutputResolution(t, '100x100');
   const { client } = t.context.app;
 
   await client.click('button .icon-replay-buffer');
@@ -18,7 +19,7 @@ test('Replay Buffer', async t => {
   await client.isVisible('button .icon-replay-buffer');
 
   // Check that the replay-buffer file has been created
-  await sleep(1000);
+  await sleep(3000);
   const files = await readdir(tmpDir);
   t.is(files.length, 1);
 

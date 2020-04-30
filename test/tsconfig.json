@@ -23,6 +23,7 @@
   },
   "exclude": [
     "node_modules",
-    "screentest/runner.js"
+    "screentest/runner.js",
+    "performance/performance-test-runner.js"
   ]
 }

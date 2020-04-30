@@ -26,7 +26,7 @@ export class GroupMenu extends Menu {
       label: $t('Group into Folder'),
       click: () => {
         this.scenesService.showNameFolder({
-          sceneId: this.scenesService.activeSceneId,
+          sceneId: this.scenesService.views.activeSceneId,
           itemsToGroup: this.selectionService.getIds(),
           parentId: nodesFolders[0],
         });
@@ -39,7 +39,7 @@ export class GroupMenu extends Menu {
       click: () => {
         this.editorCommandsService.executeCommand(
           'RemoveFolderCommand',
-          this.scenesService.activeSceneId,
+          this.scenesService.views.activeSceneId,
           this.selectionService.getFolders()[0].id,
         );
       },
@@ -62,7 +62,7 @@ export class GroupMenu extends Menu {
         this.editorCommandsService.executeCommand(
           'UngroupSceneCommand',
           selectedItem.id,
-          this.scenesService.activeSceneId,
+          this.scenesService.views.activeSceneId,
         );
       },
       enabled: (() => {

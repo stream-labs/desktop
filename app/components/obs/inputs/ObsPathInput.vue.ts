@@ -1,6 +1,7 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { IObsPathInputValue, TObsType, ObsInput } from './ObsInput';
 import electron from 'electron';
+// eslint-disable-next-line
 import OpenDialogOptions = Electron.OpenDialogOptions;
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { TextInput } from 'components/shared/inputs/inputs';

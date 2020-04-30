@@ -1,17 +1,17 @@
 <template>
 <div class="studio-mode-controls" :class="{ stacked }">
   <span class="studio-mode-control">
-    Edit
+    {{$t('Edit')}}
   </span>
   <button
     class="button button--default"
     @click="studioModeTransition">
-    Transition
+    {{$t('Transition')}}
     <i class="fa fa-arrow-down" v-if="stacked" />
     <i class="fa fa-arrow-right" v-else />
   </button>
   <span class="studio-mode-control">
-    Live
+    {{$t('Live')}}
   </span>
 </div>
 </template>

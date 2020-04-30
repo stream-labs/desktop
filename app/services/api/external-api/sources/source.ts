@@ -6,7 +6,8 @@ import {
 import { ServiceHelper, Inject } from 'services';
 import { ISerializable } from '../../rpc-api';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
-import { Fallback } from '../../external-api';
+import { Fallback, InjectFromExternalApi } from '../../external-api';
+import { SourcesService } from './sources';
 
 export interface ISourceModel {
   sourceId: string;
@@ -25,7 +26,9 @@ export interface ISourceModel {
 
 @ServiceHelper()
 export class Source implements ISourceModel, ISerializable {
-  @Inject() private sourcesService: InternalSourcesService;
+  @Inject('SourcesService') private internalSourcesService: InternalSourcesService;
+  @Fallback() private source: InternalSource;
+  @InjectFromExternalApi() private sourcesService: SourcesService;
   readonly id: string;
   readonly name: string;
   readonly type: TSourceType;
@@ -39,10 +42,12 @@ export class Source implements ISourceModel, ISerializable {
   readonly channel?: number;
   readonly resourceId: string;
 
-  @Fallback() private source: InternalSource;
-
   constructor(public readonly sourceId: string) {
-    this.source = this.sourcesService.getSource(sourceId);
+    this.source = this.internalSourcesService.views.getSource(sourceId);
+  }
+
+  private isDestroyed(): boolean {
+    return this.source.isDestroyed();
   }
 
   getModel(): ISourceModel {
@@ -88,5 +93,9 @@ export class Source implements ISourceModel, ISerializable {
 
   refresh(): void {
     this.source.refresh();
+  }
+
+  duplicate(): Source {
+    return this.sourcesService.getSource(this.source.duplicate().sourceId);
   }
 }

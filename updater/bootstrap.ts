@@ -9,30 +9,14 @@ import * as util from 'util';
 import * as path from 'path';
 import * as tasklist from 'tasklist';
 import * as fs from 'fs';
-import * as request from 'request';
+import fetch from 'node-fetch';
 import * as cp from 'child_process';
 import * as semver from 'semver';
-import * as log from 'electron-log';
 import * as crypto from 'crypto';
 
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
 const mkdir = util.promisify(fs.mkdir);
-
-/**
- * Use our own promisify for request, has better typings
- */
-const prequest = (info: request.UriOptions & request.CoreOptions) => {
-  return new Promise<request.Response>((resolve, reject) => {
-    request(info, (err, response) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(response);
-      }
-    });
-  });
-};
 
 /**
  * The main process provides this to the bootstrap module. It describes
@@ -108,14 +92,14 @@ async function getUpdateId(info: IUpdateInfo): Promise<string> {
   try {
     updateId = (await readFile(updateIdPath)).toString();
   } catch (e) {
-    log.info('Error reading update id. Assigning a new random update id.');
+    console.log('Error reading update id. Assigning a new random update id.');
 
     updateId = crypto.randomBytes(8).toString('hex');
 
     await writeFile(updateIdPath, updateId);
   }
 
-  log.info('Update id is', updateId);
+  console.log('Update id is', updateId);
 
   return updateId;
 }
@@ -126,14 +110,14 @@ async function isInRolloutGroup(info: IUpdateInfo, latestVersion: ILatestVersion
   // Useful for debugging. This update id will always induce
   // an update regardless of rollout or seed.
   if (updateId === 'updateplz') {
-    log.info('Detected update id short circuit code.');
+    console.log('Detected update id short circuit code.');
     return true;
   }
 
   // Combine the update id with the seed from the server and hash into 1 of 100 buckets
   const bucket = hashToInt(`${updateId}${latestVersion.seed}`) % 100;
 
-  log.info(`Assigned update group: ${updateId} + ${latestVersion.seed} => ${bucket}`);
+  console.log(`Assigned update group: ${updateId} + ${latestVersion.seed} => ${bucket}`);
 
   // Use version-specific rollout but fall back to default rollout
   const rollout =
@@ -141,7 +125,7 @@ async function isInRolloutGroup(info: IUpdateInfo, latestVersion: ILatestVersion
       ? latestVersion.rollout[info.version]
       : latestVersion.rollout.default;
 
-  log.info(`Current rollout for ${info.version} is ${rollout}%`);
+  console.log(`Current rollout for ${info.version} is ${rollout}%`);
 
   return bucket < rollout;
 }
@@ -157,10 +141,8 @@ async function isUpdaterRunning(updaterPath: string, updaterName: string) {
 
   for (const processItem in processes) {
     if (processes[processItem].imageName === updaterName) {
-      log.info(
-        `Detected running updater process ${processes[processItem].imageName} - PID: ${
-          processes[processItem].pid
-        }`,
+      console.log(
+        `Detected running updater process ${processes[processItem].imageName} - PID: ${processes[processItem].pid}`,
       );
 
       try {
@@ -185,74 +167,64 @@ async function fetchUpdater(info: IUpdateInfo): Promise<string | null> {
     updaterName = 'preview-updater.exe';
   }
 
-  const reqInfo = {
-    baseUrl: info.baseUrl,
-    uri: `/${updaterName}`,
-  };
   const updaterPath = path.resolve(info.tempDir, updaterName);
   if (await isUpdaterRunning(updaterPath, updaterName)) {
-    log.info('Updater is already running, aborting fetch.');
+    console.log('Updater is already running, aborting fetch.');
     return null;
   }
 
   const outStream = fs.createWriteStream(updaterPath);
-
   return new Promise((resolve, reject) => {
-    const outPipe = request(reqInfo)
-      .on('response', response => {
-        if (response.statusCode !== 200) {
-          reject(`Failed to fetch updater: status ${response.statusCode}`);
+    fetch(`${info.baseUrl}/${updaterName}`)
+      .then(response => {
+        if (response.status !== 200) {
+          reject(`Failed to fetch updater: status ${response.status}`);
         }
+        const outPipe = response.body.pipe(outStream);
+        outPipe.on('close', () => {
+          resolve(updaterPath);
+        });
+
+        outPipe.on('error', error => {
+          reject(error);
+        });
       })
-      .pipe(outStream);
-
-    outPipe.on('close', () => {
-      resolve(updaterPath);
-    });
-
-    outPipe.on('error', error => {
-      reject(error);
-    });
+      .catch(e => {
+        reject(e);
+      });
   });
 }
 
 async function getLatestVersionInfo(info: IUpdateInfo): Promise<ILatestVersionInfo | null> {
-  const reqInfo = {
-    baseUrl: info.baseUrl,
-    uri: `/${info.versionFileName}`,
-    json: true,
-  };
+  const response = await fetch(`${info.baseUrl}/${info.versionFileName}`);
 
-  const response = await prequest(reqInfo);
-
-  if (response.statusCode !== 200) {
-    log.info(`Failed to fetch version information ` + `- ${response.statusCode}`);
-
+  if (response.status !== 200) {
+    console.log(`Failed to fetch version information - ${response.status}`);
     return null;
   }
 
-  return response.body;
+  return response.json();
 }
 
 async function shouldUpdate(latestVersion: ILatestVersionInfo, info: IUpdateInfo) {
   if (!latestVersion) {
-    log.info('Failed to fetch latest version.');
+    console.log('Failed to fetch latest version.');
     return false;
   }
 
   if (semver.eq(info.version, latestVersion.version)) {
-    log.info('Already latest version.');
+    console.log('Already latest version.');
     return false;
   }
 
   if (semver.gt(info.version, latestVersion.version)) {
     // Rollbacks are not currently supported
-    log.info('Latest version is less than current version. Update will not be applied.');
+    console.log('Latest version is less than current version. Update will not be applied.');
     return false;
   }
 
   if (!(await isInRolloutGroup(info, latestVersion))) {
-    log.info('User is not in rollout group. Update will not be applied.');
+    console.log('User is not in rollout group. Update will not be applied.');
     return false;
   }
 
@@ -265,12 +237,12 @@ async function shouldUpdate(latestVersion: ILatestVersionInfo, info: IUpdateInfo
  * should exit or continue with its startup procedure.
  */
 async function entry(info: IUpdateInfo) {
-  log.info('Starting update check:', info);
+  console.log('Starting update check:', info);
 
   const latestVersion = await getLatestVersionInfo(info);
 
   if (!latestVersion) {
-    log.info('Aborting update to due failure fetching latest version information.');
+    console.log('Aborting update to due failure fetching latest version information.');
     return false;
   }
 
@@ -283,7 +255,7 @@ async function entry(info: IUpdateInfo) {
   const updaterPath = await fetchUpdater(info);
 
   if (!updaterPath) {
-    log.info('Aborting update due to updater already running.');
+    console.log('Aborting update due to updater already running.');
     return true;
   }
 
@@ -311,7 +283,7 @@ async function entry(info: IUpdateInfo) {
 
   const updaterStartCommand = `start "" "${updaterPath}"`;
 
-  log.info('Spawning updater with args:', updaterArgs);
+  console.log('Spawning updater with args:', updaterArgs);
 
   const updaterProcess = cp.spawn(updaterStartCommand, updaterArgs, {
     cwd: info.tempDir,
@@ -319,14 +291,14 @@ async function entry(info: IUpdateInfo) {
     shell: true,
   });
 
-  log.info(`Spawning updater - PID: ${updaterProcess.pid}`);
+  console.log(`Spawning updater - PID: ${updaterProcess.pid}`);
 
   const returnCode = await new Promise<number>(resolve => {
     updaterProcess.on('exit', resolve);
     updaterProcess.on('error', resolve);
   });
 
-  log.info(`Updater spawn result: ${returnCode}`);
+  console.log(`Updater spawn result: ${returnCode}`);
 
   // Allow SLOBS to exit whil the updater keeps running
   updaterProcess.unref();
@@ -338,15 +310,15 @@ module.exports = (info: IUpdateInfo, startApp: () => void, exit: () => void) => 
   return entry(info)
     .then(shouldExit => {
       if (shouldExit) {
-        log.info('Closing for update...');
+        console.log('Closing for update...');
         exit();
       } else {
-        log.info('App will start without updating.');
+        console.log('App will start without updating.');
         startApp();
       }
     })
     .catch(error => {
-      log.info(error);
+      console.log(error);
       startApp();
     });
 };

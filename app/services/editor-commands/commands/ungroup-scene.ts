@@ -28,13 +28,13 @@ export class UngroupSceneCommand extends Command {
 
   constructor(private sourceSceneItemId: string, private destSceneId: string) {
     super();
-    const sceneItem = this.scenesService.getSceneItem(sourceSceneItemId);
+    const sceneItem = this.scenesService.views.getSceneItem(sourceSceneItemId);
     this.description = $t('Ungroup %{sourceName}', { sourceName: sceneItem.name });
   }
 
   async execute() {
-    const sourceItem = this.scenesService.getSceneItem(this.sourceSceneItemId);
-    const sourceScene = this.scenesService.getScene(sourceItem.sourceId);
+    const sourceItem = this.scenesService.views.getSceneItem(this.sourceSceneItemId);
+    const sourceScene = this.scenesService.views.getScene(sourceItem.sourceId);
 
     this.copyNodesSubcommand =
       this.copyNodesSubcommand ||

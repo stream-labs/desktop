@@ -7,6 +7,7 @@ import path from 'path';
 import fs from 'fs';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { AppService } from 'services/app';
+import Utils from './utils';
 
 /**
  * If we start up and the app is in anything other than the
@@ -124,6 +125,6 @@ export class CrashReporterService extends Service {
   }
 
   private get version(): string {
-    return electron.remote.process.env.SLOBS_VERSION;
+    return Utils.env.SLOBS_VERSION;
   }
 }
