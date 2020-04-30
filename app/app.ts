@@ -199,6 +199,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     fallbackLocale: 'en-US',
     messages: {},
     silentTranslationWarn: false,
+    silentFallbackWarn: true,
     missing: (language: string, key: string) => {
       if (isProduction) return;
       console.error(`Missing translation found for ${language} -- "${key}"`);
