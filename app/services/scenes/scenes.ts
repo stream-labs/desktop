@@ -450,4 +450,93 @@ export class ScenesService extends StatefulService<IScenesState> {
       },
     });
   }
+
+  /**
+   * Repair the scene collection from different potential issues
+   * This is an experimental feature
+   */
+  repair() {
+    const scenes = this.views.scenes;
+    const visitedSourcesIds: string[] = [];
+
+    // validate sceneItems for each scene
+    for (const scene of scenes) {
+      // delete loops in the parent->child relationships
+      const visitedNodeIds: string[] = [];
+      this.traverseScene(scene.id, node => {
+        if (visitedNodeIds.includes(node.id)) {
+          console.log('Remove looped item', node.name);
+          node.setParent('');
+          node.remove();
+          this.repair();
+          return false;
+        }
+        visitedNodeIds.push(node.id);
+        if (node.isItem()) visitedSourcesIds.push(node.sourceId);
+        return true;
+      });
+
+      // delete unreachable items
+      const allNodes = scene.getNodes();
+      for (const node of allNodes) {
+        if (!visitedNodeIds.includes(node.id)) {
+          console.log('Remove unreachable item', node.name, node.id);
+          node.setParent('');
+          node.remove();
+          this.repair();
+          return;
+        }
+      }
+    }
+
+    // delete unreachable sources which don't belong any scene
+    this.sourcesService.views
+      .getSources()
+      .filter(source => !source.channel && source.type !== 'scene')
+      .forEach(source => {
+        if (!visitedSourcesIds.includes(source.sourceId)) {
+          console.log('Remove Unreachable source', source.name, source.sourceId);
+          source.remove();
+        }
+      });
+    console.log('repairing finished');
+  }
+
+  /**
+   * Apply a callback for each sceneNode
+   * Stop travers if the callback returns false
+   */
+  private traverseScene(
+    sceneId: string,
+    cb: (node: TSceneNode) => boolean,
+    nodeId?: string,
+  ): boolean {
+    let canContinue = true;
+    const scene = this.views.getScene(sceneId);
+
+    // traverse root-level
+    if (!nodeId) {
+      const rootNodes = scene.getRootNodes();
+      for (const node of rootNodes) {
+        canContinue = this.traverseScene(sceneId, cb, node.id);
+        if (!canContinue) return false;
+      }
+      return true;
+    }
+
+    // traverse a scene-node
+    const node = scene.getNode(nodeId);
+    if (node.isItem()) {
+      canContinue = cb(node);
+      if (!canContinue) return false;
+    } else if (node.isFolder()) {
+      canContinue = cb(node);
+      if (!canContinue) return false;
+      for (const childId of node.childrenIds) {
+        canContinue = this.traverseScene(sceneId, cb, childId);
+        if (!canContinue) return false;
+      }
+    }
+    return true;
+  }
 }
