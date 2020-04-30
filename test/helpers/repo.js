@@ -54,7 +54,7 @@ function checkoutBranch(branchName, config) {
     exec(`git pull origin ${config.baseBranch}`);
   }
   exec('yarn install --frozen-lockfile --check-files');
-  exec('yarn compile:ci');
+  exec('yarn ci:compile');
 
   // save current branch name to the file
   // screenshoter.js will use this value
