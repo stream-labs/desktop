@@ -129,6 +129,7 @@ export function commitMutation(mutation: IMutation) {
 }
 
 const mutationsQueue: IMutation[] = [];
+let timeoutId = 0;
 
 /**
  * Add mutation to the queue so we can send it to the renderer windows along with other
@@ -138,10 +139,11 @@ const mutationsQueue: IMutation[] = [];
 function sendMutationToRendererWindows(mutation: IMutation) {
   // we need to `cloneDeep` to avoid sending modified data from the state
   mutationsQueue.push(cloneDeep(mutation));
-  setTimeout(() => flushMutations());
+  if (!timeoutId) timeoutId = setTimeout(() => flushMutations());
 }
 
 function flushMutations() {
   ipcRenderer.send('vuex-mutation', JSON.stringify(mutationsQueue));
   mutationsQueue.length = 0;
+  timeoutId = 0;
 }
