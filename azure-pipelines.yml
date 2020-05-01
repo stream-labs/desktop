@@ -24,6 +24,9 @@ jobs:
     - script: yarn install --frozen-lockfile --check-files 2>&1
       displayName: 'Install Dependencies'
 
+    - script: node node_modules/electron/install.js
+      displayName: 'Ensure Electron is installed'
+
     - script: 'yarn eslint'
       displayName: 'ESLint'
 
@@ -58,6 +61,9 @@ jobs:
 
     - script: yarn install --frozen-lockfile --check-files 2>&1
       displayName: 'Install Dependencies'
+
+    - script: node node_modules/electron/install.js
+      displayName: 'Ensure Electron is installed'
 
     - script: 'yarn ci:screentests'
       displayName: 'Snapshot testing'
@@ -94,6 +100,9 @@ jobs:
       - script: yarn install --frozen-lockfile --check-files 2>&1
         displayName: 'Install Dependencies'
 
+      - script: node node_modules/electron/install.js
+        displayName: 'Ensure Electron is installed'
+
       - script: 'yarn ci:compile'
         displayName: 'Compile Assets'
 
@@ -102,7 +111,6 @@ jobs:
         env:
           BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
           SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
-
   - job: Tests2
 
     pool:
@@ -122,6 +130,9 @@ jobs:
       - script: yarn install --frozen-lockfile --check-files 2>&1
         displayName: 'Install Dependencies'
 
+      - script: node node_modules/electron/install.js
+        displayName: 'Ensure Electron is installed'
+
       - script: 'yarn eslint'
         displayName: 'ESLint'
 
@@ -137,7 +148,6 @@ jobs:
           SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
           BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
           SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
-
   - job: Tests3
 
     pool:
@@ -157,22 +167,24 @@ jobs:
       - script: yarn install --frozen-lockfile --check-files 2>&1
         displayName: 'Install Dependencies'
 
-      - script: 'yarn ci:screentests'
-        displayName: 'Snapshot testing'
+      - script: node node_modules/electron/install.js
+        displayName: 'Ensure Electron is installed'
+
+      - script: 'yarn eslint'
+        displayName: 'ESLint'
+
+      - script: 'yarn compile:strictnulls'
+        displayName: 'Check regressions in files with strictNullChecks'
+
+      - script: 'yarn ci:compile'
+        displayName: 'Compile Assets'
+
+      - script: 'yarn ci:tests'
+        displayName: 'Run Tests'
         env:
-          BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
           SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
-          STREAMLABS_BOT_ID: $(streamlabsBotId)
-          STREAMLABS_BOT_KEY: $(streamlabsBotKey)
-          AWS_BUCKET: $(awsBucket)
-          AWS_ACCESS_KEY: $(awsAccessKey)
-          AWS_SECRET_KEY: $(awsSecretKey)
-
-      - task: PublishPipelineArtifact@0
-        inputs:
-          artifactName: 'SnapshotsResults'
-          targetPath: $(Build.SourcesDirectory)/test-dist/screentest
-
+          BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
+          SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
 
   - job: Tests4
 
@@ -193,21 +205,24 @@ jobs:
       - script: yarn install --frozen-lockfile --check-files 2>&1
         displayName: 'Install Dependencies'
 
-      - script: 'yarn ci:screentests'
-        displayName: 'Snapshot testing'
-        env:
-          BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
-          SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
-          STREAMLABS_BOT_ID: $(streamlabsBotId)
-          STREAMLABS_BOT_KEY: $(streamlabsBotKey)
-          AWS_BUCKET: $(awsBucket)
-          AWS_ACCESS_KEY: $(awsAccessKey)
-          AWS_SECRET_KEY: $(awsSecretKey)
+      - script: node node_modules/electron/install.js
+        displayName: 'Ensure Electron is installed'
 
-      - task: PublishPipelineArtifact@0
-        inputs:
-          artifactName: 'SnapshotsResults'
-          targetPath: $(Build.SourcesDirectory)/test-dist/screentest
+      - script: 'yarn eslint'
+        displayName: 'ESLint'
+
+      - script: 'yarn compile:strictnulls'
+        displayName: 'Check regressions in files with strictNullChecks'
+
+      - script: 'yarn ci:compile'
+        displayName: 'Compile Assets'
+
+      - script: 'yarn ci:tests'
+        displayName: 'Run Tests'
+        env:
+          SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
+          BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
+          SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
 
   - job: Tests5
 
@@ -228,54 +243,21 @@ jobs:
       - script: yarn install --frozen-lockfile --check-files 2>&1
         displayName: 'Install Dependencies'
 
-      - script: 'yarn ci:screentests'
-        displayName: 'Snapshot testing'
+      - script: node node_modules/electron/install.js
+        displayName: 'Ensure Electron is installed'
+
+      - script: 'yarn eslint'
+        displayName: 'ESLint'
+
+      - script: 'yarn compile:strictnulls'
+        displayName: 'Check regressions in files with strictNullChecks'
+
+      - script: 'yarn ci:compile'
+        displayName: 'Compile Assets'
+
+      - script: 'yarn ci:tests'
+        displayName: 'Run Tests'
         env:
-          BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
           SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
-          STREAMLABS_BOT_ID: $(streamlabsBotId)
-          STREAMLABS_BOT_KEY: $(streamlabsBotKey)
-          AWS_BUCKET: $(awsBucket)
-          AWS_ACCESS_KEY: $(awsAccessKey)
-          AWS_SECRET_KEY: $(awsSecretKey)
-
-      - task: PublishPipelineArtifact@0
-        inputs:
-          artifactName: 'SnapshotsResults'
-          targetPath: $(Build.SourcesDirectory)/test-dist/screentest
-
-
-  - job: Tests6
-
-    pool:
-      name: 'Default'
-
-    workspace:
-      clean: resources
-
-    steps:
-
-      - powershell: echo "IP for RDP connections:" $(Invoke-RestMethod ipinfo.io/ip)
-        displayName: 'Get RDP address'
-
-      - powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
-        displayName: 'Setup Screen Resolution'
-
-      - script: yarn install --frozen-lockfile --check-files 2>&1
-        displayName: 'Install Dependencies'
-
-      - script: 'yarn ci:screentests'
-        displayName: 'Snapshot testing'
-        env:
           BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
-          SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
-          STREAMLABS_BOT_ID: $(streamlabsBotId)
-          STREAMLABS_BOT_KEY: $(streamlabsBotKey)
-          AWS_BUCKET: $(awsBucket)
-          AWS_ACCESS_KEY: $(awsAccessKey)
-          AWS_SECRET_KEY: $(awsSecretKey)
-
-      - task: PublishPipelineArtifact@0
-        inputs:
-          artifactName: 'SnapshotsResults'
-          targetPath: $(Build.SourcesDirectory)/test-dist/screentest
+          SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
