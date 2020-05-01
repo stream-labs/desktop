@@ -6,10 +6,12 @@ import { SceneCollectionsService } from 'services/scene-collections';
 import * as onboardingSteps from 'components/pages/onboarding-steps';
 import TsxComponent from 'components/tsx-component';
 import { OS } from 'util/operating-systems';
+import { $t } from './i18n';
 
 enum EOnboardingSteps {
   MacPermissions = 'MacPermissions',
   Connect = 'Connect',
+  ChooseYourAdventure = 'ChooseYourAdventure',
   ObsImport = 'ObsImport',
   StreamlabsFeatures = 'StreamlabsFeatures',
   HardwareSetup = 'HardwareSetup',
@@ -19,18 +21,27 @@ enum EOnboardingSteps {
   FacebookPageCreation = 'FacebookPageCreation',
 }
 
-const ONBOARDING_STEPS = {
+const ONBOARDING_STEPS = () => ({
   [EOnboardingSteps.MacPermissions]: {
     element: onboardingSteps.MacPermissions,
     disableControls: false,
     hideSkip: true,
     hideButton: true,
+    isPreboarding: true,
   },
   [EOnboardingSteps.Connect]: {
     element: onboardingSteps.Connect,
     disableControls: false,
     hideSkip: true,
     hideButton: true,
+    isPreboarding: true,
+  },
+  [EOnboardingSteps.ChooseYourAdventure]: {
+    element: onboardingSteps.ObsImport,
+    disableControls: true,
+    hideSkip: true,
+    hideButton: true,
+    isPreboarding: true,
   },
   [EOnboardingSteps.ObsImport]: {
     element: onboardingSteps.ObsImport,
@@ -43,14 +54,12 @@ const ONBOARDING_STEPS = {
     disableControls: false,
     hideSkip: true,
     hideButton: false,
-    requiresHack: true,
   },
   [EOnboardingSteps.HardwareSetup]: {
     element: onboardingSteps.HardwareSetup,
     disableControls: false,
     hideSkip: false,
     hideButton: false,
-    requiresHack: true,
   },
   [EOnboardingSteps.ThemeSelector]: {
     element: onboardingSteps.ThemeSelector,
@@ -76,14 +85,15 @@ const ONBOARDING_STEPS = {
     hideSkip: false,
     hideButton: true,
   },
-};
+});
 
 interface IOnboardingStep {
   element: typeof TsxComponent;
   disableControls: boolean;
   hideSkip: boolean;
   hideButton: boolean;
-  requiresHack?: boolean;
+  label?: string;
+  isPreboarding?: boolean;
 }
 
 interface IOnboardingOptions {
@@ -111,25 +121,25 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
     const steps: IOnboardingStep[] = [];
 
     if (process.platform === OS.Mac) {
-      steps.push(ONBOARDING_STEPS[EOnboardingSteps.MacPermissions]);
+      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.MacPermissions]);
     }
 
-    steps.push(ONBOARDING_STEPS[EOnboardingSteps.Connect]);
-    steps.push(ONBOARDING_STEPS[EOnboardingSteps.ObsImport]);
+    steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Connect]);
+    steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ObsImport]);
 
     if (this.state.importedFromObs) {
-      steps.push(ONBOARDING_STEPS[EOnboardingSteps.StreamlabsFeatures]);
+      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.StreamlabsFeatures]);
     } else {
-      steps.push(ONBOARDING_STEPS[EOnboardingSteps.HardwareSetup]);
+      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.HardwareSetup]);
     }
 
     if (!this.state.existingSceneCollections) {
-      steps.push(ONBOARDING_STEPS[EOnboardingSteps.ThemeSelector]);
+      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ThemeSelector]);
     }
 
     if (this.getServiceViews(UserService).isTwitchAuthed) {
-      steps.push(ONBOARDING_STEPS[EOnboardingSteps.Optimize]);
-      steps.push(ONBOARDING_STEPS[EOnboardingSteps.Multistream]);
+      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Optimize]);
+      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Multistream]);
     }
 
     return steps;
