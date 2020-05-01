@@ -113,7 +113,7 @@ const DEFAULT_OPTIONS: ITestRunnerOptions = {
   restartAppAfterEachTest: true,
   noSync: true,
   networkLogging: false,
-  pauseIfFailed: false,
+  pauseIfFailed: true,
 };
 
 export interface ITestContext {
