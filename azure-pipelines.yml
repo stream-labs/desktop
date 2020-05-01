@@ -24,6 +24,9 @@ jobs:
     - script: yarn install --frozen-lockfile --check-files 2>&1
       displayName: 'Install Dependencies'
 
+    - script: node node_modules/electron/install.js
+      displayName: 'Install Electron'
+
     - script: 'yarn eslint'
       displayName: 'ESLint'
 
@@ -59,6 +62,9 @@ jobs:
     - script: yarn install --frozen-lockfile --check-files 2>&1
       displayName: 'Install Dependencies'
 
+    - script: node node_modules/electron/install.js
+      displayName: 'Install Electron'
+
     - script: 'yarn ci:screentests'
       displayName: 'Snapshot testing'
       env:
@@ -93,6 +99,9 @@ jobs:
 
       - script: yarn install --frozen-lockfile --check-files 2>&1
         displayName: 'Install Dependencies'
+
+      - script: node node_modules/electron/install.js
+        displayName: 'Install Electron'
 
       - script: 'yarn ci:compile'
         displayName: 'Compile Assets'
