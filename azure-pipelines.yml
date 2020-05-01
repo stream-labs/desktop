@@ -103,7 +103,7 @@ jobs:
           BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
           SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
 
-  - job: Tests
+  - job: Tests2
 
     pool:
       name: 'Default'
@@ -138,7 +138,7 @@ jobs:
           BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
           SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
 
-  - job: Tests2
+  - job: Tests3
 
     pool:
       name: 'Default'
@@ -174,7 +174,7 @@ jobs:
           targetPath: $(Build.SourcesDirectory)/test-dist/screentest
 
 
-  - job: Tests3
+  - job: Tests4
 
     pool:
       name: 'Default'
