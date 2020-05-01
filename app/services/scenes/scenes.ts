@@ -5,7 +5,7 @@ import { Subject } from 'rxjs';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import { TransitionsService } from 'services/transitions';
 import { WindowsService } from 'services/windows';
-import { Scene, SceneItem } from './index';
+import { Scene, SceneItem, TSceneNode } from './index';
 import { ISource, SourcesService, ISourceAddOptions } from 'services/sources';
 import { Inject } from 'services/core/injector';
 import * as obs from '../../../obs-api';
@@ -14,13 +14,19 @@ import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
 import { ViewHandler } from 'services/core';
 import { lazyModule } from 'util/lazy-module';
+import { assertIsDefined } from '../../util/properties-type-guards';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
-export interface IScene extends IResource {
+export interface IScene {
   id: string;
   name: string;
+
+  // array of nodes with preserved order
   nodes: (ISceneItem | ISceneItemFolder)[];
+
+  // dictionary of nodes where key is nodeId
+  nodesMap: Dictionary<ISceneItem | ISceneItemFolder>;
 }
 
 export interface ISceneNodeAddOptions {
@@ -119,11 +125,12 @@ export interface ISceneItemActions {
 
 export type TSceneNodeType = 'item' | 'folder';
 
-export interface ISceneItemNode extends IResource {
+export interface ISceneItemNode {
   id: string;
   sceneId: string;
   sceneNodeType: TSceneNodeType;
   parentId?: string;
+  isRemoved?: boolean;
 }
 
 export interface ISceneItemFolder extends ISceneItemNode {
@@ -132,8 +139,12 @@ export interface ISceneItemFolder extends ISceneItemNode {
 }
 
 class ScenesViews extends ViewHandler<IScenesState> {
-  getScene(sceneId: string) {
-    return new Scene(sceneId);
+  @Inject() private scenesService: ScenesService;
+
+  getScene(sceneId: string): Scene | null {
+    const sceneModel = this.state.scenes[sceneId];
+    if (!sceneModel) return null;
+    return new Scene(sceneModel.id);
   }
 
   get activeSceneId() {
@@ -147,10 +158,7 @@ class ScenesViews extends ViewHandler<IScenesState> {
   }
 
   get scenes(): Scene[] {
-    return uniqBy(
-      this.state.displayOrder.map(id => this.getScene(id)),
-      x => x.id,
-    );
+    return this.state.displayOrder.map(id => this.getScene(id)!);
   }
 
   getSceneItems(): SceneItem[] {
@@ -183,6 +191,16 @@ export class ScenesService extends StatefulService<IScenesState> {
     scenes: {},
   };
 
+  // keeps instances of SceneItem and SceneFolder to speed-up API calls
+  private cachedNodes: Dictionary<TSceneNode> = {};
+
+  /**
+   * return TSceneNode from the cache
+   */
+  getNodeFromCache(id: string): TSceneNode {
+    return this.cachedNodes[id];
+  }
+
   get views() {
     return new ScenesViews(this.state);
   }
@@ -198,13 +216,31 @@ export class ScenesService extends StatefulService<IScenesState> {
   @Inject() private sourcesService: SourcesService;
   @Inject() private transitionsService: TransitionsService;
 
+  protected init() {
+    // subscribe to itemAdded and itemRemoved event to sync cachedNodes
+    this.itemAdded.subscribe(itemModel => {
+      this.addItemToCache(itemModel.sceneId, itemModel.id);
+    });
+    this.itemRemoved.subscribe(itemModel => {
+      delete this.cachedNodes[itemModel.id];
+    });
+  }
+
+  addItemToCache(sceneId: string, itemId: string) {
+    const scene = this.views.getScene(sceneId);
+    assertIsDefined(scene);
+    const node = scene.getNode(itemId);
+    assertIsDefined(node);
+    this.cachedNodes[itemId] = node;
+  }
+
   @mutation()
   private ADD_SCENE(id: string, name: string) {
     Vue.set<IScene>(this.state.scenes, id, {
       id,
       name,
-      resourceId: `Scene${JSON.stringify([id])}`,
       nodes: [],
+      nodesMap: {},
     });
     this.state.displayOrder.push(id);
   }
@@ -234,8 +270,9 @@ export class ScenesService extends StatefulService<IScenesState> {
     this.sourcesService.addSource(obsScene.source, name, { sourceId: id });
 
     if (options.duplicateSourcesFromScene) {
+      const newScene = this.views.getScene(id)!;
       const oldScene = this.views.getScene(options.duplicateSourcesFromScene);
-      const newScene = this.views.getScene(id);
+      if (!oldScene) return;
 
       oldScene
         .getItems()
@@ -249,6 +286,7 @@ export class ScenesService extends StatefulService<IScenesState> {
 
     this.sceneAdded.next(this.state.scenes[id]);
     if (options.makeActive) this.makeSceneActive(id);
+
     return this.views.getScene(id);
   }
 
@@ -256,12 +294,13 @@ export class ScenesService extends StatefulService<IScenesState> {
     return Object.keys(this.state.scenes).length > 1;
   }
 
-  removeScene(id: string, force = false): IScene {
+  removeScene(id: string, force = false): IScene | null {
     if (!force && Object.keys(this.state.scenes).length < 2) {
       return null;
     }
 
     const scene = this.views.getScene(id);
+    if (!scene) return null;
     const sceneModel = this.state.scenes[id];
 
     // remove all sources from scene
@@ -361,8 +400,10 @@ export class ScenesService extends StatefulService<IScenesState> {
   // }
 
   suggestName(name: string): string {
+    if (!this.views.activeScene) return name;
+    const activeScene = this.views.activeScene!;
     return namingHelpers.suggestName(name, (name: string) => {
-      const ind = this.views.activeScene.getNodes().findIndex(node => node.name === name);
+      const ind = activeScene.getNodes().findIndex(node => node.name === name);
       return ind !== -1;
     });
   }
@@ -408,5 +449,94 @@ export class ScenesService extends StatefulService<IScenesState> {
         height: 250,
       },
     });
+  }
+
+  /**
+   * Repair the scene collection from different potential issues
+   * This is an experimental feature
+   */
+  repair() {
+    const scenes = this.views.scenes;
+    const visitedSourcesIds: string[] = [];
+
+    // validate sceneItems for each scene
+    for (const scene of scenes) {
+      // delete loops in the parent->child relationships
+      const visitedNodeIds: string[] = [];
+      this.traverseScene(scene.id, node => {
+        if (visitedNodeIds.includes(node.id)) {
+          console.log('Remove looped item', node.name);
+          node.setParent('');
+          node.remove();
+          this.repair();
+          return false;
+        }
+        visitedNodeIds.push(node.id);
+        if (node.isItem()) visitedSourcesIds.push(node.sourceId);
+        return true;
+      });
+
+      // delete unreachable items
+      const allNodes = scene.getNodes();
+      for (const node of allNodes) {
+        if (!visitedNodeIds.includes(node.id)) {
+          console.log('Remove unreachable item', node.name, node.id);
+          node.setParent('');
+          node.remove();
+          this.repair();
+          return;
+        }
+      }
+    }
+
+    // delete unreachable sources which don't belong any scene
+    this.sourcesService.views
+      .getSources()
+      .filter(source => !source.channel && source.type !== 'scene')
+      .forEach(source => {
+        if (!visitedSourcesIds.includes(source.sourceId)) {
+          console.log('Remove Unreachable source', source.name, source.sourceId);
+          source.remove();
+        }
+      });
+    console.log('repairing finished');
+  }
+
+  /**
+   * Apply a callback for each sceneNode
+   * Stop travers if the callback returns false
+   */
+  private traverseScene(
+    sceneId: string,
+    cb: (node: TSceneNode) => boolean,
+    nodeId?: string,
+  ): boolean {
+    let canContinue = true;
+    const scene = this.views.getScene(sceneId);
+
+    // traverse root-level
+    if (!nodeId) {
+      const rootNodes = scene.getRootNodes();
+      for (const node of rootNodes) {
+        canContinue = this.traverseScene(sceneId, cb, node.id);
+        if (!canContinue) return false;
+      }
+      return true;
+    }
+
+    // traverse a scene-node
+    const node = scene.getNode(nodeId);
+    if (node.isItem()) {
+      canContinue = cb(node);
+      if (!canContinue) return false;
+    } else if (node.isFolder()) {
+      canContinue = cb(node);
+      if (!canContinue) return false;
+      for (const childId of node.childrenIds) {
+        canContinue = this.traverseScene(sceneId, cb, childId);
+        if (!canContinue) return false;
+      }
+    }
+    return true;
   }
 }

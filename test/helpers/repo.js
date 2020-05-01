@@ -9,7 +9,7 @@ const { CI } = process.env;
 function exec(cmd) {
   try {
     console.log('RUN', cmd);
-    return execSync(cmd, { stdio: [0, 1, 2] });
+    return execSync(cmd, { stdio: [0, 1, 1] });
   } catch (e) {
     console.error(e);
     process.exit(1);
@@ -54,7 +54,7 @@ function checkoutBranch(branchName, config) {
     exec(`git pull origin ${config.baseBranch}`);
   }
   exec('yarn install --frozen-lockfile --check-files');
-  exec('yarn compile:ci');
+  exec('yarn ci:compile');
 
   // save current branch name to the file
   // screenshoter.js will use this value

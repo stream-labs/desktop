@@ -81,10 +81,6 @@ export default class StreamSettings extends TsxComponent {
     this.windowsService.closeChildWindow();
   }
 
-  get restreamRewardsUrl() {
-    return `https://streamlabs.com/multistream-rewards?token=${this.userService.apiToken}`;
-  }
-
   render() {
     return (
       <div>
@@ -141,13 +137,6 @@ export default class StreamSettings extends TsxComponent {
               </div>
             )}
           </div>
-        )}
-
-        {this.restreamService.canEnableRestream && this.protectedModeEnabled && (
-          <BrowserView
-            style={{ height: '330px', marginTop: '16px', marginBottom: '16px' }}
-            src={this.restreamRewardsUrl}
-          />
         )}
 
         {/* WARNING messages */}
