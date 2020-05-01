@@ -99,13 +99,13 @@ export enum EPlatformCallResult {
 export type TStartStreamOptions =
   | ITwitchStartStreamOptions
   | IYoutubeStartStreamOptions
-  | IFacebookStartStreamOptions
+  | Partial<IFacebookStartStreamOptions>
   | IMixerStartStreamOptions;
 
 export type TChannelInfo =
   | IYoutubeChannelInfo
   | ITwitchChannelInfo
-  | IFacebookChannelInfo
+  | Partial<IFacebookChannelInfo>
   | IMixerChannelInfo;
 
 // All platform services should implement this interface.
@@ -139,7 +139,7 @@ export interface IPlatformService {
    * Sets up the stream key and live broadcast info required to go live.
    * Returns the stream key.
    */
-  beforeGoLive: (options?: TStartStreamOptions) => Promise<string>;
+  beforeGoLive: (options?: TStartStreamOptions) => Promise<string | null>;
 
   afterGoLive?: () => Promise<void>;
 
@@ -151,7 +151,10 @@ export interface IPlatformService {
 
   fetchNewToken: () => Promise<void>;
 
-  getHeaders: (req: IPlatformRequest, useToken: boolean | string) => Dictionary<string>;
+  getHeaders: (
+    req: IPlatformRequest,
+    useToken?: boolean | string,
+  ) => Dictionary<string | undefined>;
 
   liveDockEnabled: () => boolean;
 

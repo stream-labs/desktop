@@ -16,6 +16,7 @@ import { IListOption } from '../../components/shared/inputs';
 import { $t } from 'services/i18n';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { Subject } from 'rxjs';
+import { assertIsDefined } from '../../util/properties-type-guards';
 
 interface IFacebookPage {
   access_token: string;
@@ -47,18 +48,18 @@ export interface IStreamlabsFacebookPages {
 }
 
 interface IFacebookServiceState {
-  activePage: IFacebookPage;
-  liveVideoId: number;
-  streamUrl: string;
-  streamProperties: { title: string; description: string; game: string };
-  facebookPages: IStreamlabsFacebookPages;
+  activePage: IFacebookPage | null;
+  liveVideoId: number | null;
+  streamUrl: string | null;
+  streamProperties: { title?: string; description?: string; game?: string };
+  facebookPages: IStreamlabsFacebookPages | null;
 }
 
 export interface IFacebookStartStreamOptions {
-  facebookPageId: string;
-  title: string;
-  game: string;
-  description: string;
+  facebookPageId?: string;
+  title?: string;
+  game?: string;
+  description?: string;
 }
 
 export interface IFacebookChannelInfo extends IFacebookStartStreamOptions {
@@ -80,15 +81,15 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     'account-merging',
   ]);
 
-  channelInfoChanged = new Subject<IFacebookChannelInfo>();
+  channelInfoChanged = new Subject<Partial<IFacebookChannelInfo>>();
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = { width: 800, height: 800 };
 
   static initialState: IFacebookServiceState = {
-    activePage: { id: null, access_token: null, name: null },
+    activePage: null,
     liveVideoId: null,
     streamUrl: null,
-    streamProperties: { title: null, description: null, game: null },
+    streamProperties: { title: undefined, description: undefined, game: undefined },
     facebookPages: null,
   };
 
@@ -98,17 +99,17 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   }
 
   @mutation()
-  private SET_LIVE_VIDEO_ID(id: number) {
+  private SET_LIVE_VIDEO_ID(id: number | null) {
     this.state.liveVideoId = id;
   }
 
   @mutation()
-  private SET_STREAM_URL(url: string) {
+  private SET_STREAM_URL(url: string | null) {
     this.state.streamUrl = url;
   }
 
   @mutation()
-  private SET_STREAM_PROPERTIES(title: string, description: string, game: string) {
+  private SET_STREAM_PROPERTIES(title?: string, description?: string, game?: string) {
     this.state.streamProperties = { title, description, game };
   }
 
@@ -132,11 +133,11 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   }
 
   get oauthToken() {
-    return this.userService.state.auth.platforms.facebook.token;
+    return this.userService.state.auth?.platforms?.facebook?.token;
   }
 
   get activeToken() {
-    return this.state.activePage.access_token;
+    return this.state.activePage?.access_token;
   }
 
   validatePlatform() {
@@ -162,7 +163,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
       'facebook',
       `${this.apiBase}/me/accounts`,
     ).then(async json => {
-      const pageId = this.userService.platform.channelId || this.state.facebookPages.page_id;
+      const pageId = this.userService.platform?.channelId || this.state.facebookPages?.page_id!;
       const activePage = json.data.filter(page => pageId === page.id)[0] || json.data[0];
       this.userService.updatePlatformChannelId('facebook', pageId);
       this.SET_ACTIVE_PAGE(activePage);
@@ -179,11 +180,13 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
       method: 'POST',
       body: JSON.stringify({ title, description, game_specs: { name: game } }),
     };
+    const pageId = this.state.activePage?.id;
+    assertIsDefined(pageId);
 
     return platformRequest<{ stream_url: string; id: number }>(
       'facebook',
       {
-        url: `${this.apiBase}/${this.state.activePage.id}/live_videos`,
+        url: `${this.apiBase}/${pageId}/live_videos`,
         ...data,
       },
       this.activeToken,
@@ -202,10 +205,10 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   /**
    * fetch prefill data
    */
-  async prepopulateInfo(): Promise<IFacebookStartStreamOptions> {
+  async prepopulateInfo(): Promise<Partial<IFacebookStartStreamOptions>> {
     await this.fetchActivePage();
     if (!this.state.activePage || !this.state.activePage.id) {
-      return { facebookPageId: null } as IFacebookStartStreamOptions;
+      return { facebookPageId: undefined };
     }
     const url =
       `${this.apiBase}/${this.state.activePage.id}/live_videos?` +
@@ -223,7 +226,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
         this.emitChannelInfo();
         return {
           ...info,
-          facebookPageId: this.state.activePage.id,
+          facebookPageId: this.state.activePage!.id,
         };
       },
     );
@@ -231,9 +234,9 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
 
   emitChannelInfo() {
     this.channelInfoChanged.next({
-      ...this.state.streamProperties,
-      facebookPageId: this.state.activePage.id,
-      streamUrl: this.state.streamUrl,
+      ...(this.state.streamProperties as IFacebookChannelInfo),
+      facebookPageId: this.state.activePage!.id,
+      streamUrl: this.state.streamUrl!,
       chatUrl: this.getChatUrl(),
     });
   }
@@ -242,7 +245,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     scheduledStartTime: string,
     { title, description, game }: IFacebookChannelInfo,
   ): Promise<any> {
-    const url = `${this.apiBase}/${this.state.activePage.id}/live_videos`;
+    const url = `${this.apiBase}/${this.state.activePage!.id}/live_videos`;
     const body = JSON.stringify({
       title,
       description,
@@ -303,6 +306,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   async putChannelInfo(info: IFacebookStartStreamOptions): Promise<boolean> {
     const { title, description, game, facebookPageId } = info;
     this.SET_STREAM_PROPERTIES(title, description, game);
+    assertIsDefined(facebookPageId);
     await this.postPage(facebookPageId);
     if (this.state.liveVideoId && game) {
       return platformRequest(
@@ -312,14 +316,14 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
           method: 'POST',
           body: JSON.stringify({ title, description, game_specs: { name: game } }),
         },
-        this.state.activePage.access_token,
+        this.state.activePage!.access_token,
       ).then(() => true);
     }
     return Promise.resolve(true);
   }
 
   async searchGames(searchString: string): Promise<IGame[]> {
-    if (searchString.length < 2) return;
+    if (searchString.length < 2) return [];
     return platformAuthorizedRequest<{ data: IGame[] }>(
       'facebook',
       `${this.apiBase}/v3.2/search?type=game&q=${searchString}`,
@@ -348,7 +352,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   private fetchPages(): Promise<IStreamlabsFacebookPages> {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
-    const headers = authorizedHeaders(this.userService.apiToken);
+    const headers = authorizedHeaders(this.userService.apiToken!);
     const request = new Request(url, { headers });
     return fetch(request)
       .then(handleResponse)
@@ -366,7 +370,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   private postPage(pageId: string) {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
-    const headers = authorizedHeaders(this.userService.apiToken);
+    const headers = authorizedHeaders(this.userService.apiToken!);
     headers.append('Content-Type', 'application/json');
     const request = new Request(url, {
       headers,
@@ -389,6 +393,9 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
 
   sendPushNotif() {
     const url = 'https://streamlabs.com/api/v5/slobs/remote/notify';
+    if (!this.userService.apiToken) {
+      throw new Error('API token must be defined');
+    }
     const headers = authorizedHeaders(
       this.userService.apiToken,
       new Headers({
