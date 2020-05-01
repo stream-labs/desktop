@@ -1,5 +1,3 @@
-import { getResource } from '../core';
-import { UserService } from '../user';
 import { IPlatformRequest, TPlatform, getPlatformService } from './index';
 
 export interface IPlatformResponse<TResult = unknown> {
@@ -41,7 +39,9 @@ export async function platformRequest<T = unknown>(
 
   // create a request function with required headers
   const requestFn = () => {
-    const headers = new Headers(platformService.getHeaders(req, useToken));
+    const headers = new Headers(
+      platformService.getHeaders(req, useToken) as Record<string, string>,
+    );
     return fetch(new Request(req.url, { ...req, headers })).then(handlePlatformResponse);
   };
 

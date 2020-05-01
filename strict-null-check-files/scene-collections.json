@@ -1,0 +1,8 @@
+{
+  "ts": [
+    "app/services/scene-collections/*.ts"
+  ],
+  "tsx": [
+
+  ]
+}

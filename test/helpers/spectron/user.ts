@@ -2,6 +2,7 @@ import { focusMain, TExecutionContext, focusWorker } from './index';
 import { IUserAuth, IPlatformAuth, TPlatform } from '../../../app/services/platforms';
 import { sleep } from '../sleep';
 import { dialogDismiss } from './dialog';
+import { ExecutionContext } from 'ava';
 const request = require('request');
 
 const USER_POOL_URL = `https://slobs-users-pool.herokuapp.com`;
@@ -55,7 +56,7 @@ export async function logIn(
   if (user) throw 'User already logged in';
 
   if (USER_POOL_TOKEN) {
-    authInfo = await reserveUserFromPool(platform, features);
+    authInfo = await reserveUserFromPool(t, platform, features);
   } else {
     throw new Error('Setup env variable USER_POOL_TOKEN to run this test');
   }
@@ -111,6 +112,7 @@ export async function releaseUserInPool() {
  * Fetch credentials from slobs-users-pool service, and reserve these credentials
  */
 export async function reserveUserFromPool(
+  t: ExecutionContext,
   platformType: TPlatform,
   features: ITestUserFeatures = null,
 ): Promise<ITestUser> {
@@ -127,9 +129,9 @@ export async function reserveUserFromPool(
       user = await requestUserPool(urlPath);
       break;
     } catch (e) {
-      console.log(e);
+      t.log(e);
       if (attempts) {
-        console.log('retrying in 20 sec...');
+        t.log('retrying in 20 sec...');
         await sleep(20000);
       }
     }

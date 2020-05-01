@@ -10,7 +10,7 @@ import omit from 'lodash/omit';
 import { OS } from 'util/operating-systems';
 
 interface ISceneCollectionsManifest {
-  activeId: string;
+  activeId: string | null;
   collections: ISceneCollectionsManifestEntry[];
 }
 
@@ -68,7 +68,7 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
    */
   async checkAndRecoverManifest(
     obj: ISceneCollectionsManifest,
-  ): Promise<ISceneCollectionsManifest> {
+  ): Promise<ISceneCollectionsManifest | undefined> {
     // If there is no collections array, this is unrecoverable
     if (!Array.isArray(obj.collections)) return;
 
@@ -195,39 +195,43 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
 
   @mutation()
   SET_NEEDS_RENAME(id: string) {
-    this.state.collections.find(coll => coll.id === id).needsRename = true;
+    const coll = this.state.collections.find(coll => coll.id === id);
+    if (coll) coll.needsRename = true;
   }
 
   @mutation()
   SET_OPERATING_SYSTEM(id: string, os: OS) {
-    Vue.set(
-      this.state.collections.find(coll => coll.id === id),
-      'operatingSystem',
-      os,
-    );
+    const coll = this.state.collections.find(coll => coll.id === id);
+    if (coll) Vue.set(coll, 'operatingSystem', os);
   }
 
   @mutation()
   SET_MODIFIED(id: string, modified: string) {
-    this.state.collections.find(coll => coll.id === id).modified = modified;
+    const coll = this.state.collections.find(coll => coll.id === id);
+    if (coll) coll.modified = modified;
   }
 
   @mutation()
   SET_SERVER_ID(id: string, serverId: number) {
-    this.state.collections.find(coll => coll.id === id).serverId = serverId;
+    const coll = this.state.collections.find(coll => coll.id === id);
+    if (coll) coll.serverId = serverId;
   }
 
   @mutation()
   RENAME_COLLECTION(id: string, name: string, modified: string) {
     const coll = this.state.collections.find(coll => coll.id === id);
-    coll.name = name;
-    coll.modified = modified;
-    coll.needsRename = false;
+
+    if (coll) {
+      coll.name = name;
+      coll.modified = modified;
+      coll.needsRename = false;
+    }
   }
 
   @mutation()
   DELETE_COLLECTION(id: string) {
-    this.state.collections.find(coll => coll.id === id).deleted = true;
+    const coll = this.state.collections.find(coll => coll.id === id);
+    if (coll) coll.deleted = true;
   }
 
   @mutation()

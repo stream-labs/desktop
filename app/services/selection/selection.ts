@@ -35,6 +35,10 @@ export class Selection {
     if (sceneId && itemsList) this.select(itemsList);
   }
 
+  isDestroyed(): boolean {
+    return false;
+  }
+
   // SELECTION METHODS
 
   getScene(): Scene {
@@ -465,7 +469,7 @@ export class Selection {
   }
 
   remove() {
-    this.getNodes().forEach(node => node.remove());
+    this.getNodes().forEach(node => !node.isDestroyed() && node.remove());
   }
 
   nudgeLeft() {
