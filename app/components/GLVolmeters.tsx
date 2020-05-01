@@ -49,7 +49,7 @@ class VolmetersProps {}
  * Renders volmeters for the current scene via WebGL
  */
 @Component({ props: createProps(VolmetersProps) })
-export default class Volmeters extends TsxComponent<VolmetersProps> {
+export default class GLVolmeters extends TsxComponent<VolmetersProps> {
   render() {
     return (
       <div style={{ position: 'absolute' }}>
@@ -316,7 +316,7 @@ export default class Volmeters extends TsxComponent<VolmetersProps> {
       this.$refs.canvas.style.height = `${this.canvasHeight}px`;
     }
 
-    this.bg = this.customizationService.themeBackground;
+    this.bg = this.customizationService.sectionBackground;
     // Volmeter backgrounds appear brighter against a darker background
     this.bgMultiplier = this.customizationService.isDarkTheme ? 0.2 : 0.5;
   }
