@@ -644,13 +644,13 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     } catch (e) {
       message = `Can not connect to platform: ${error.message}`;
     }
-    return `Youtube: ${message}`;
+    return `YouTube: ${message}`;
   }
 
   showStreamStatusWindow() {
     this.windowsService.showWindow({
       componentName: 'YoutubeStreamStatus',
-      title: $t('Youtube stream status'),
+      title: $t('YouTube stream status'),
       size: {
         width: 550,
         height: 600,
