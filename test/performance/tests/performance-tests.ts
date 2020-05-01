@@ -1,11 +1,5 @@
 import { MetricsService } from '../../../app/services/metrics';
-import {
-  test,
-  stopApp,
-  startApp,
-  TExecutionContext,
-  getCacheDir,
-} from '../../helpers/spectron';
+import { test, stopApp, startApp, TExecutionContext, getCacheDir } from '../../helpers/spectron';
 import { ApiClient, getClient } from '../../helpers/api-client';
 import { TSourceType } from '../../../app/services/sources/sources-api';
 import { ScenesService } from '../../../app/services/api/external-api/scenes';
@@ -17,6 +11,7 @@ import { startRecording, stopRecording } from '../../helpers/spectron/streaming'
 import { getCPUUsage, getMemoryUsage, logTiming, usePerformanceTest } from '../tools';
 import { logIn } from '../../helpers/spectron/user';
 import { ExecutionContext } from 'ava';
+import { CustomizationService } from '../../../app/services/customization';
 const fs = require('fs-extra');
 const _7z = require('7zip')['7z'];
 const path = require('path');
@@ -26,6 +21,7 @@ usePerformanceTest();
 const RELOAD_ATTEMPTS = 15;
 const CPU_ATTEMPTS = 100;
 const ADD_SOURCES_ATTEMPTS = 5;
+const MAX_SOURCES_COUNT = 40;
 
 /**
  * unzip a sample of a large scene collection to the SceneCollection folder
@@ -66,131 +62,171 @@ async function measureMemoryAndCPU(t: ExecutionContext, attempts = CPU_ATTEMPTS)
   logTiming(t, 'Stop recodring CPU and Memory');
 }
 
-test('Bundle size', async t => {
-  const meter = getMeter();
-  const bundlePath = path.resolve(__dirname, '..', '..', '..', '..', 'bundles');
-  const rendererPath = path.resolve(bundlePath, 'renderer.js');
-  const updaterPath = path.resolve(bundlePath, 'updater.js');
-  const rendererSize = fs.statSync(rendererPath).size;
-  const updaterSize = fs.statSync(updaterPath).size;
-  meter.addMeasurement('renderer-js', rendererSize);
-  meter.addMeasurement('updater-js', updaterSize);
-  t.pass();
-});
+// test('Bundle size', async t => {
+//   const meter = getMeter();
+//   const bundlePath = path.resolve(__dirname, '..', '..', '..', '..', 'bundles');
+//   const rendererPath = path.resolve(bundlePath, 'renderer.js');
+//   const updaterPath = path.resolve(bundlePath, 'updater.js');
+//   const rendererSize = fs.statSync(rendererPath).size;
+//   const updaterSize = fs.statSync(updaterPath).size;
+//   meter.addMeasurement('renderer-js', rendererSize);
+//   meter.addMeasurement('updater-js', updaterSize);
+//   t.pass();
+// });
+//
+// test('Empty collection', async t => {
+//   await stopApp(t, false);
+//
+//   // measure startup time
+//   let attempts = RELOAD_ATTEMPTS;
+//   while (attempts--) {
+//     await startApp(t);
+//     const api = await getClient();
+//     measureStartupTime(api);
+//     await stopApp(t, false);
+//   }
+//
+//   // measure memory and CPU
+//   await startApp(t);
+//   await measureMemoryAndCPU(t);
+//
+//   t.pass();
+// });
+//
+// test('Large collection', async t => {
+//   await sleep(2000);
+//   await stopApp(t, false);
+//   await unzipLargeSceneCollection(t);
+//
+//   // measure startup time
+//   let i = RELOAD_ATTEMPTS;
+//   while (i--) {
+//     await startApp(t);
+//     const api = await getClient();
+//     measureStartupTime(api);
+//     await stopApp(t, false);
+//   }
+//
+//   // measure memory and CPU
+//   await startApp(t);
+//   await measureMemoryAndCPU(t);
+//   t.pass();
+// });
+//
+// test('Empty collection (logged-in twitch)', async t => {
+//   const meter = getMeter();
+//   await logIn(t, 'twitch');
+//   await sleep(2000);
+//   await stopApp(t, false);
+//
+//   // measure startup time
+//   let attempts = RELOAD_ATTEMPTS;
+//   while (attempts--) {
+//     await startApp(t);
+//     const api = await getClient();
+//     measureStartupTime(api);
+//     await stopApp(t, false);
+//   }
+//   t.pass();
+// });
+//
+// test('Recording', async t => {
+//   await setTemporaryRecordingPath(t);
+//   await setOutputResolution(t, '100x100');
+//   const api = await getClient();
+//   const scenesService = api.getResource<ScenesService>('ScenesService');
+//   scenesService.activeScene.createAndAddSource('Color', 'color_source');
+//
+//   await startRecording(t);
+//   await measureMemoryAndCPU(t);
+//   await stopRecording(t);
+//
+//   t.pass();
+// });
 
-test('Empty collection', async t => {
-  await stopApp(t, false);
-
-  // measure startup time
-  let attempts = RELOAD_ATTEMPTS;
-  while (attempts--) {
-    await startApp(t);
-    const api = await getClient();
-    measureStartupTime(api);
-    await stopApp(t, false);
-  }
-
-  // measure memory and CPU
-  await startApp(t);
-  await measureMemoryAndCPU(t);
-
-  t.pass();
-});
-
-test('Large collection', async t => {
-  await sleep(2000);
-  await stopApp(t, false);
-  await unzipLargeSceneCollection(t);
-
-  // measure startup time
-  let i = RELOAD_ATTEMPTS;
-  while (i--) {
-    await startApp(t);
-    const api = await getClient();
-    measureStartupTime(api);
-    await stopApp(t, false);
-  }
-
-  // measure memory and CPU
-  await startApp(t);
-  await measureMemoryAndCPU(t);
-  t.pass();
-});
-
-test('Empty collection (logged-in twitch)', async t => {
-  const meter = getMeter();
-  await logIn(t, 'twitch');
-  await sleep(2000);
-  await stopApp(t, false);
-
-  // measure startup time
-  let attempts = RELOAD_ATTEMPTS;
-  while (attempts--) {
-    await startApp(t);
-    const api = await getClient();
-    measureStartupTime(api);
-    await stopApp(t, false);
-  }
-  t.pass();
-});
-
-test('Recording', async t => {
-  await setTemporaryRecordingPath(t);
-  await setOutputResolution(t, '100x100');
-  const api = await getClient();
-  const scenesService = api.getResource<ScenesService>('ScenesService');
-  scenesService.activeScene.createAndAddSource('Color', 'color_source');
-
-  await startRecording(t);
-  await measureMemoryAndCPU(t);
-  await stopRecording(t);
-
-  t.pass();
-});
-
-test('Add and remove sources', async t => {
-  const api = await getClient();
-  const scenesService = api.getResource<ScenesService>('ScenesService');
-  const meter = getMeter();
-  scenesService.activeScene.createAndAddSource('Color', 'color_source');
-
+test('Create sources', async t => {
   const sourceTypes = [
-    'Video Capture Device',
-    'Audio Output Capture',
-    'Audio Input Capture',
-    'Game Capture',
-    'Window Capture',
-    'Display Capture',
-    'Image',
-    'Image Slide Show',
-    'Media Source',
-    'Text (GDI+)',
-    'Color Source',
-    'Browser Source',
+    'image_source',
+    'color_source',
+    'browser_source',
+    'slideshow',
+    'ffmpeg_source',
+    'text_gdiplus',
+    'text_ft2_source',
+    'monitor_capture',
+    'window_capture',
+    'game_capture',
+    'dshow_input',
+    'wasapi_input_capture',
+    'wasapi_output_capture',
+    'decklink-input',
+    'scene',
+    'ndi_source',
+    'openvr_capture',
+    'liv_capture',
+    'ovrstream_dc_source',
+    'vlc_source',
   ];
 
-  // create and delete 10 instances for each source type 3 times
+  const api = await getClient();
+  const scenesService = api.getResource<ScenesService>('ScenesService');
+  const cs = api.getResource<CustomizationService>('CustomizationService');
+  cs.setSettings({ performanceMode: true });
+  const meter = getMeter();
+
+  await sleep(100, true);
+
+  // create and sources of different types
   let attempts = ADD_SOURCES_ATTEMPTS;
   while (attempts--) {
     meter.startMeasure('addSources');
-    let sourcesCount = 10;
-    while (sourcesCount--) {
-      const folder = scenesService.activeScene.createFolder(`folder ${sourcesCount}`);
-      sourceTypes.forEach(type => {
-        const item = scenesService.activeScene.createAndAddSource(type, type as TSourceType);
-        folder.add(item.id);
-      });
+    for (let ind = 0; ind < MAX_SOURCES_COUNT; ind++) {
+      // create item and insert it into a folder
+      const sourceType = sourceTypes[ind % sourceTypes.length];
+      console.log('create source', sourceType);
+      scenesService.activeScene.createAndAddSource(sourceType, sourceType as TSourceType);
+      // await sleep(500, true);
     }
     meter.stopMeasure('addSources');
 
-    meter.startMeasure('removeSources');
+    // remove all created sources
     scenesService.activeScene.getNodes().forEach(node => {
       node.remove();
     });
-    meter.stopMeasure('removeSources');
 
-    // give some time to unfreeze UI
-    await sleep(2000);
+    // give SLOBS some time to unfreeze UI
+    await sleep(50000, true);
+  }
+  t.pass();
+});
+
+test('Add and remove items and folders', async t => {
+  const api = await getClient();
+  const scenesService = api.getResource<ScenesService>('ScenesService');
+  const meter = getMeter();
+
+  // create and delete a bunch of folders and items
+  let attempts = ADD_SOURCES_ATTEMPTS;
+  while (attempts--) {
+    meter.startMeasure('addNodes');
+    let sourcesCount = MAX_SOURCES_COUNT;
+    while (sourcesCount--) {
+      // create item and insert it into a folder
+      const item = scenesService.activeScene.createAndAddSource('color', 'color_source');
+      const folder = scenesService.activeScene.createFolder(`folder for ${item.nodeId}`);
+      folder.add(item.id);
+    }
+    meter.stopMeasure('addNodes');
+
+    // remove all created nodes
+    meter.startMeasure('removeNodes');
+    scenesService.activeScene.getFolders().forEach(node => {
+      node.remove();
+    });
+    meter.stopMeasure('removeNodes');
+
+    // give SLOBS some time to unfreeze UI
+    await sleep(2000, true);
   }
   t.pass();
 });
