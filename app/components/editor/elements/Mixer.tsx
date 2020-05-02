@@ -49,6 +49,7 @@ export default class Mixer extends BaseElement {
   }
 
   get element() {
+    window['mixer'] = this;
     return (
       <div onContextmenu={() => this.handleRightClick()}>
         <div class="studio-controls-top">
