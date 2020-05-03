@@ -21,8 +21,6 @@ const commitSHA = getCommitSHA();
 const args = process.argv.slice(2);
 
 (async function main() {
-  console.log('pause');
-  await new Promise(r => setTimeout(r, 9999999));
 
   // prepare the dist dir
   rimraf.sync(CONFIG.dist);
