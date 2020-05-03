@@ -22,6 +22,9 @@ const args = process.argv.slice(2);
 
 (async function main() {
 
+  console.log('pause');
+  await new Promise(r => setTimeout(r));
+
   // prepare the dist dir
   rimraf.sync(CONFIG.dist);
   fs.mkdirSync(CONFIG.dist, { recursive: true });
