@@ -1,3 +1,5 @@
+import { sleep } from '../helpers/sleep';
+
 require('dotenv').config();
 const rimraf = require('rimraf');
 const fs = require('fs');
@@ -21,6 +23,8 @@ const commitSHA = getCommitSHA();
 const args = process.argv.slice(2);
 
 (async function main() {
+
+  await sleep(99999999);
 
   // prepare the dist dir
   rimraf.sync(CONFIG.dist);
