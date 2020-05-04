@@ -26,7 +26,9 @@ module.exports = async (basePath: string) => {
 
   if (!useLocalBundles) {
     try {
-      const remoteManifestName = process.argv.includes('--bundle-qa') ? 'manifest-qa.json' : 'manifest.json';
+      const remoteManifestName = process.argv.includes('--bundle-qa')
+        ? 'manifest-qa.json'
+        : 'manifest.json';
       const response = await fetch(`${cdnBase}${remoteManifestName}`);
 
       if (response.status / 100 >= 4) {
