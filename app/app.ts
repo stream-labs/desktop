@@ -35,6 +35,7 @@ import Blank from 'components/windows/Blank.vue';
 import Main from 'components/windows/Main.vue';
 import CustomLoader from 'components/CustomLoader';
 import { MetricsService } from 'services/metrics';
+import { updateMemoryUsageCrashParameters } from 'util/CrashReportingHelpers';
 
 const crashHandler = window['require']('crash-handler');
 
@@ -61,6 +62,10 @@ if (isProduction) {
       processType: 'renderer',
     },
   });
+
+  // Because crashReporter doesn't add any memoryUsage stats,
+  // need to update them regularly to have better picture of memory usage
+  setInterval(updateMemoryUsageCrashParameters, 1000, electron.crashReporter);
 }
 
 let usingSentry = false;
