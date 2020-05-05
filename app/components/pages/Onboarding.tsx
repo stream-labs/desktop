@@ -1,9 +1,9 @@
+import cx from 'classnames';
 import { Component } from 'vue-property-decorator';
 import TsxComponent from 'components/tsx-component';
 import { OnboardingService } from 'services/onboarding';
 import { Inject } from 'services/core/injector';
 import styles from './Onboarding.m.less';
-import { OS } from 'util/operating-systems';
 
 @Component({})
 export default class OnboardingPage extends TsxComponent<{}> {
@@ -42,16 +42,28 @@ export default class OnboardingPage extends TsxComponent<{}> {
   }
 
   get topBar() {
+    // if (this.currentStepIndex <= this.preboardingOffset) return null;
     const offset = this.preboardingOffset;
+    const stepIdx = this.currentStepIndex - offset;
+    const filteredSteps = this.steps.filter(step => !step.isPreboarding);
     return (
-      <div>
-        {this.steps
-          .filter(step => !step.isPreboarding)
-          .map((_step, i) => {
-            if (i === this.currentStepIndex - offset) return <div class={styles.currentStep} />;
-            if (i < this.currentStepIndex - offset) return <div class={styles.completedStep} />;
-            return <div class={styles.incompleteStep} />;
-          })}
+      <div class={styles.topBarContainer}>
+        {filteredSteps.map((_step, i) => {
+          let stepClass;
+          if (i === stepIdx) stepClass = styles.current;
+          if (i < stepIdx) stepClass = styles.completed;
+          if (i > stepIdx) stepClass = styles.incomplete;
+          return (
+            <div class={styles.topBarSegment}>
+              <div class={cx(styles.topBarStep, stepClass)}>
+                {i < stepIdx && <i class="icon-check-mark" />}
+              </div>
+              {i < filteredSteps.length - 1 && (
+                <div class={cx(styles.topBarSeperator, stepClass)} />
+              )}
+            </div>
+          );
+        })}
       </div>
     );
   }
@@ -84,10 +96,11 @@ export default class OnboardingPage extends TsxComponent<{}> {
 
   render() {
     if (this.singletonStep) return this.singletonStep;
+    console.log(this.steps);
 
     return (
       <div>
-        {this.currentStepIndex > this.preboardingOffset && this.topBar}
+        {this.topBar}
         <div class={styles.container}>{this.currentStep}</div>
       </div>
     );
