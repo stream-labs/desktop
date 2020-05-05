@@ -522,7 +522,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   async showLogin() {
     if (this.isLoggedIn) await this.logOut();
-    this.onboardingService.start({ isLogin: true });
+    this.onboardingService.start();
+    // this.onboardingService.start({ isLogin: true });
   }
 
   @RunInLoadingMode()

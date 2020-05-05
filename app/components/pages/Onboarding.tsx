@@ -5,20 +5,19 @@ import { OnboardingService } from 'services/onboarding';
 import { Inject } from 'services/core/injector';
 import styles from './Onboarding.m.less';
 
+export class OnboardingStepProps {
+  continue: () => void = () => {};
+  setProcessing: (bool: boolean) => void = () => {};
+}
+
 @Component({})
 export default class OnboardingPage extends TsxComponent<{}> {
   @Inject() onboardingService: OnboardingService;
 
   currentStepIndex = 0;
-  importedFromObs = false;
   processing = false;
 
-  continue(importedObs?: boolean) {
-    if (importedObs != null) this.importedFromObs = importedObs;
-    this.proceed();
-  }
-
-  proceed() {
+  continue() {
     if (this.processing) return;
     if (this.currentStepIndex >= this.steps.length - 1) return this.complete();
 
@@ -42,7 +41,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
   }
 
   get topBar() {
-    // if (this.currentStepIndex <= this.preboardingOffset) return null;
+    if (this.currentStepIndex <= this.preboardingOffset) return null;
     const offset = this.preboardingOffset;
     const stepIdx = this.currentStepIndex - offset;
     const filteredSteps = this.steps.filter(step => !step.isPreboarding);
@@ -69,13 +68,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
   }
 
   get currentStep() {
-    const Component = this.steps[this.currentStepIndex].element;
-    return (
-      <Component
-        continue={this.complete.bind(this)}
-        setProcessing={this.setProcessing.bind(this)}
-      />
-    );
+    return this.steps[this.currentStepIndex];
   }
 
   get singletonStep() {
@@ -96,12 +89,17 @@ export default class OnboardingPage extends TsxComponent<{}> {
 
   render() {
     if (this.singletonStep) return this.singletonStep;
-    console.log(this.steps);
+    const Component = this.currentStep.element;
 
     return (
       <div>
         {this.topBar}
-        <div class={styles.container}>{this.currentStep}</div>
+        <div class={styles.container}>
+          <Component
+            continue={this.continue.bind(this)}
+            setProcessing={this.setProcessing.bind(this)}
+          />
+        </div>
       </div>
     );
   }

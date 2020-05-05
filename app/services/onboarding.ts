@@ -37,7 +37,7 @@ const ONBOARDING_STEPS = () => ({
     isPreboarding: true,
   },
   [EOnboardingSteps.ChooseYourAdventure]: {
-    element: onboardingSteps.ObsImport,
+    element: onboardingSteps.ChooseYourAdventure,
     disableControls: true,
     hideSkip: true,
     hideButton: true,
@@ -125,9 +125,10 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
     }
 
     steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Connect]);
-    steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ObsImport]);
+    steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ChooseYourAdventure]);
 
     if (this.state.importedFromObs) {
+      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ObsImport]);
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.StreamlabsFeatures]);
     } else {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.HardwareSetup]);
@@ -176,7 +177,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
 
   @mutation()
   SET_EXISTING_COLLECTIONS(val: boolean) {
-    this.state.existingSceneCollections = val;
+    // this.state.existingSceneCollections = val;
   }
 
   get views() {
@@ -196,6 +197,10 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
 
   init() {
     this.SET_EXISTING_COLLECTIONS(this.existingSceneCollections);
+  }
+
+  setObsImport(val: boolean) {
+    this.SET_OBS_IMPORTED(val);
   }
 
   // A login attempt is an abbreviated version of the onboarding process,
