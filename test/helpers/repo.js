@@ -22,9 +22,12 @@ function exec(cmd) {
 function getCommitSHA() {
   // the repo is in the detached state for CI
   // we need to take one commit before to take a commit that has been associated to the PR
-  return CI
-    ? execSync('git rev-parse HEAD^').toString()
-    : execSync('git rev-parse HEAD').toString();
+  const lastCommits = execSync('git log -n 2 --pretty=oneline')
+    .toString()
+    .split('\n')
+    .map(log => log.split(' ')[0]);
+
+  return CI ? lastCommits[1] : lastCommits[0];
 }
 
 /**
@@ -42,16 +45,16 @@ function getCommitInfo(SHA) {
   };
 }
 
-function checkoutBranch(branchName, config) {
+function checkoutBranch(branchName, baseBranch, config) {
   const branchPath = `${config.dist}/${branchName}`;
   if (!fs.existsSync(branchPath)) fs.mkdirSync(branchPath);
   const checkoutTarget = branchName === 'current' ? getCommitSHA() : branchName;
   fs.removeSync(config.compiledTestsDist);
   exec('git reset --hard');
   exec(`git checkout ${checkoutTarget}`);
-  if (branchName !== config.baseBranch) {
+  if (branchName !== baseBranch) {
     // the base branch may have changes, so merge it
-    exec(`git pull origin ${config.baseBranch}`);
+    exec(`git pull origin ${baseBranch}`);
   }
   exec('yarn install --frozen-lockfile --check-files');
   exec('yarn ci:compile');
