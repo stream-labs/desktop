@@ -1,6 +1,5 @@
 import { Component, Watch } from 'vue-property-decorator';
 import TsxComponent, { createProps } from 'components/tsx-component';
-import xmlParser from 'fast-xml-parser';
 import { camelize } from 'humps';
 
 class TranslateProps {
