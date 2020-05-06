@@ -3,6 +3,7 @@ import { Component } from 'vue-property-decorator';
 import TsxComponent from 'components/tsx-component';
 import { OnboardingService } from 'services/onboarding';
 import { Inject } from 'services/core/injector';
+import { $t } from 'services/i18n';
 import styles from './Onboarding.m.less';
 
 export class OnboardingStepProps {
@@ -19,7 +20,9 @@ export default class OnboardingPage extends TsxComponent<{}> {
 
   continue() {
     if (this.processing) return;
-    if (this.currentStepIndex >= this.steps.length - 1) return this.complete();
+    if (this.currentStepIndex >= this.steps.length - 1 || this.singletonStep) {
+      return this.complete();
+    }
 
     this.currentStepIndex = this.currentStepIndex + 1;
   }
@@ -40,8 +43,17 @@ export default class OnboardingPage extends TsxComponent<{}> {
     return this.onboardingService.views.steps;
   }
 
+  get singletonStep() {
+    return this.onboardingService.views.singletonStep;
+  }
+
+  get currentStep() {
+    if (this.singletonStep) return this.singletonStep;
+    return this.steps[this.currentStepIndex];
+  }
+
   get topBar() {
-    if (this.currentStepIndex <= this.preboardingOffset) return null;
+    if (this.currentStepIndex <= this.preboardingOffset || this.singletonStep) return null;
     const offset = this.preboardingOffset;
     const stepIdx = this.currentStepIndex - offset;
     const filteredSteps = this.steps.filter(step => !step.isPreboarding);
@@ -67,38 +79,27 @@ export default class OnboardingPage extends TsxComponent<{}> {
     );
   }
 
-  get currentStep() {
-    return this.steps[this.currentStepIndex];
-  }
-
-  get singletonStep() {
-    if (this.onboardingService.views.singletonStep) {
-      const Component = this.onboardingService.views.singletonStep;
-      return (
-        <div>
-          <div class={styles.container}>
-            <Component
-              continue={this.complete.bind(this)}
-              setProcessing={this.setProcessing.bind(this)}
-            />
-          </div>
-        </div>
-      );
-    }
-  }
-
   render() {
-    if (this.singletonStep) return this.singletonStep;
     const Component = this.currentStep.element;
 
     return (
       <div>
         {this.topBar}
-        <div class={styles.container}>
-          <Component
-            continue={this.continue.bind(this)}
-            setProcessing={this.setProcessing.bind(this)}
-          />
+        <Component
+          continue={() => this.continue()}
+          setProcessing={(processing: boolean) => this.setProcessing(processing)}
+        />
+        <div style="display: flex; justify-content: flex-end;">
+          {!this.currentStep.hideSkip && (
+            <button class="button button--trans" onClick={() => this.continue()}>
+              {$t('Skip')}
+            </button>
+          )}
+          {!this.currentStep.hideButton && (
+            <button class="button button--action" onClick={() => this.continue()}>
+              {$t('Continue')}
+            </button>
+          )}
         </div>
       </div>
     );

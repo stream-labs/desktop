@@ -111,10 +111,10 @@ interface IOnboardingServiceState {
 }
 
 class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
-  get singletonStep() {
-    if (this.state.options.isLogin) return onboardingSteps.Connect;
-    if (this.state.options.isOptimize) return onboardingSteps.Optimize;
-    if (this.state.options.isHardware) return onboardingSteps.HardwareSetup;
+  get singletonStep(): IOnboardingStep {
+    if (this.state.options.isLogin) return ONBOARDING_STEPS()[EOnboardingSteps.Connect];
+    if (this.state.options.isOptimize) return ONBOARDING_STEPS()[EOnboardingSteps.Optimize];
+    if (this.state.options.isHardware) return ONBOARDING_STEPS()[EOnboardingSteps.HardwareSetup];
   }
 
   get steps() {
