@@ -3,15 +3,12 @@
     <div slot="content">
       <h4 v-if="windowHeading">{{ windowHeading }}</h4>
       <div v-if="infoLoading"><spinner /></div>
-      <div v-if="infoError && !infoLoading" class="warning">
-        {{ $t('There was an error fetching your channel information.  You can try') }}
-        <a class="description-link" @click="populateInfo">{{
-          $t('fetching the information again')
-        }}</a
-        >, {{ $t('or you can') }}
-        <a class="description-link" @click="() => goLive(true)">{{ $t('just go live.') }}</a>
-        {{ $t('If this error persists, you can try logging out and back in.') }}
-      </div>
+
+      <translate :message="$t('goLiveError')">
+        <a slot="fetchAgainLink" slot-scope="text" @click="populateInfo" class="description-link">{{ text }}</a>
+        <a slot="justGoLiveLink" slot-scope="text" @click="() => goLive(true)" class="description-link">{{ text }}</a>
+      </translate>
+
       <validated-form name="editStreamForm" ref="form" v-if="!infoLoading && !infoError">
         <div class="pages-warning" v-if="isFacebook && !hasPages">
           <i class="fab fa-facebook" />
