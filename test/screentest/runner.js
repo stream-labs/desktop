@@ -34,11 +34,11 @@ const args = process.argv.slice(2);
     baseBranch,
   ];
   for (const branchName of branches) {
-    checkoutBranch(branchName, CONFIG);
+    checkoutBranch(branchName, baseBranch, CONFIG);
     exec(`yarn ci:tests ${CONFIG.compiledTestsDist}/screentest/tests/**/*.js ${args.join(' ')}`);
   }
   // return to the current branch
-  checkoutBranch('current', CONFIG);
+  checkoutBranch('current', baseBranch, CONFIG);
 
   // compile the test folder
   exec(`tsc -p test`);
