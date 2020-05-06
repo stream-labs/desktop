@@ -109,53 +109,55 @@ export default class Connect extends TsxComponent<ConnectProps> {
     }
 
     return (
-      <div class={styles.container}>
-        <div class={styles.progressCover} />
-        <h1>{this.isSecurityUpgrade ? $t('Re-Authorize') : $t('Connect')}</h1>
-        <p>
-          {this.isSecurityUpgrade
-            ? this.securityUpgradeLink
-            : $t('Sign in with your streaming account to get started with Streamlabs OBS')}
-        </p>
-        <div class={styles.signupButtons}>
-          {['twitch', 'youtube', 'mixer', 'facebook'].map((platform: TPlatform) => (
-            <button
-              class={`button button--${platform}`}
-              disabled={this.loading}
-              onClick={() => this.authPlatform(platform)}
-            >
-              <i class={this.iconForPlatform(platform)} />{' '}
-              {platform.charAt(0).toUpperCase() + platform.slice(1)}
-            </button>
-          ))}
+      <div class={styles.pageContainer}>
+        <div class={styles.container}>
+          <div class={styles.progressCover} />
+          <h1>{this.isSecurityUpgrade ? $t('Re-Authorize') : $t('Connect')}</h1>
+          <p>
+            {this.isSecurityUpgrade
+              ? this.securityUpgradeLink
+              : $t('Sign in with your streaming account to get started with Streamlabs OBS')}
+          </p>
+          <div class={styles.signupButtons}>
+            {['twitch', 'youtube', 'mixer', 'facebook'].map((platform: TPlatform) => (
+              <button
+                class={`button button--${platform}`}
+                disabled={this.loading}
+                onClick={() => this.authPlatform(platform)}
+              >
+                <i class={this.iconForPlatform(platform)} />{' '}
+                {platform.charAt(0).toUpperCase() + platform.slice(1)}
+              </button>
+            ))}
+          </div>
+          <p class={styles['select-another']}> {$t('or select another platform')} </p>
+          <ListInput
+            onInput={this.selectOtherPlatform}
+            metadata={{
+              allowEmpty: true,
+              name: 'otherPlatform',
+              placeholder: $t('Select platform'),
+              options: [
+                {
+                  value: 'dlive',
+                  title: 'Dlive',
+                  icon: require('../../../../media/images/platforms/dlive-logo-small.png'),
+                },
+                {
+                  value: 'nimotv',
+                  title: 'NimoTV',
+                  icon: require('../../../../media/images/platforms/nimo-logo-small.png'),
+                },
+              ] as IListOption<TExtraPlatform>[],
+            }}
+          />
+          <p>
+            <br />
+            <span class={styles['link-button']} onClick={this.onSkip}>
+              {$t('Skip')}
+            </span>
+          </p>
         </div>
-        <p class={styles['select-another']}> {$t('or select another platform')} </p>
-        <ListInput
-          onInput={this.selectOtherPlatform}
-          metadata={{
-            allowEmpty: true,
-            name: 'otherPlatform',
-            placeholder: $t('Select platform'),
-            options: [
-              {
-                value: 'dlive',
-                title: 'Dlive',
-                icon: require('../../../../media/images/platforms/dlive-logo-small.png'),
-              },
-              {
-                value: 'nimotv',
-                title: 'NimoTV',
-                icon: require('../../../../media/images/platforms/nimo-logo-small.png'),
-              },
-            ] as IListOption<TExtraPlatform>[],
-          }}
-        />
-        <p>
-          <br />
-          <span class={styles['link-button']} onClick={this.onSkip}>
-            {$t('Skip')}
-          </span>
-        </p>
       </div>
     );
   }

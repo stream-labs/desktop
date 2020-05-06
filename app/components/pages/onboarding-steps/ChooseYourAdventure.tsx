@@ -68,7 +68,7 @@ export default class ChooseYourAdventure extends TsxComponent<OnboardingStepProp
 }
 
 const SvgBackground = () => (
-  <svg width="1083" height="720" viewBox="0 0 1083 720" xmlns="http://www.w3.org/2000/svg">
+  <svg width="100%" height="100%" viewBox="0 0 1083 720" xmlns="http://www.w3.org/2000/svg">
     <path d="M918.999 140.5C971.667 9.75951 1187.91 -68.6629 1230.5 -54.9996L1253.58 124.762L1253.58 819.511L-0.000563148 726C81.0237 473.471 374.649 724.719 519 457C604.999 297.5 776.499 494.238 918.999 140.5Z" />
   </svg>
 );
