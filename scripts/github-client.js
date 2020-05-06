@@ -20,12 +20,12 @@ module.exports.GithubClient = class GithubClient {
 
     // GET an individual installation
     // https://developer.github.com/v3/apps/#find-repository-installation
-    const { data } = await request("GET /repos/:owner/:repo/installation", {
+    const { data } = await request('GET /repos/:owner/:repo/installation', {
       owner: this.owner,
       repo: this.repo,
       headers: {
         authorization: `Bearer ${jwt}`,
-        accept: "application/vnd.github.machine-man-preview+json"
+        accept: 'application/vnd.github.machine-man-preview+json',
       }
     });
     const installationId = data.id;

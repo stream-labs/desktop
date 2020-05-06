@@ -31,7 +31,7 @@ const args = process.argv.slice(2);
   // make screenshots for each branch
   const branches = [
     'current',
-    CONFIG.baseBranch
+    baseBranch,
   ];
   for (const branchName of branches) {
     checkoutBranch(branchName, CONFIG);
@@ -52,9 +52,14 @@ const args = process.argv.slice(2);
 
 async function detectBaseBranchName() {
   const commit = getCommitSHA();
-  const github = await getGithubClient();
-  const prs = github.getPullRequestsForCommit(commit);
-  console.log('prs are', prs);
+  let prs = [];
+  try {
+    const github = await getGithubClient();
+    const res = await github.getPullRequestsForCommit(commit);
+    prs = res.data;
+  } catch (e) {
+    console.error(e);
+  }
   if (!prs.length) {
     throw new Error(`No pull requests found for ${commit}`);
   }
