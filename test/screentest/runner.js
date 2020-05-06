@@ -26,6 +26,8 @@ const args = process.argv.slice(2);
   rimraf.sync(CONFIG.dist);
   fs.mkdirSync(CONFIG.dist, { recursive: true });
 
+  const baseBranch = await detectBaseBranchName();
+
   // make screenshots for each branch
   const branches = [
     'current',
@@ -48,6 +50,16 @@ const args = process.argv.slice(2);
   await updateCheck();
 })();
 
+async function detectBaseBranchName() {
+  const commit = getCommitSHA();
+  const github = await getGithubClient();
+  const prs = github.getPullRequestsForCommit(commit);
+  console.log('prs are', prs);
+  if (!prs.length) {
+    throw new Error(`No pull requests found for ${commit}`);
+  }
+  return prs[0].base.ref;
+}
 
 async function updateCheck() {
 
@@ -87,14 +99,8 @@ async function updateCheck() {
 
   console.info('Updating the GithubCheck', conclusion, title);
 
-  // AzurePipelines doesn't support multiline variables.
-  // All new-line characters are replaced with `;`
-  const botKey = STREAMLABS_BOT_KEY.replace(/;/g, '\n');
-
-  const [owner, repo] = BUILD_REPOSITORY_NAME.split('/');
-  const github = new GithubClient(STREAMLABS_BOT_ID, botKey, owner, repo);
-
   try {
+    const github = getGithubClient();
     await github.login();
     await github.postCheck({
       name: 'Screenshots',
@@ -151,4 +157,18 @@ async function uploadScreenshots() {
     console.error(e);
   }
 
+}
+
+/**
+ * returns github client in the logged-in state
+ */
+async function getGithubClient() {
+  // AzurePipelines doesn't support multiline variables.
+  // All new-line characters are replaced with `;`
+  const botKey = STREAMLABS_BOT_KEY.replace(/;/g, '\n');
+
+  const [owner, repo] = BUILD_REPOSITORY_NAME.split('/');
+  const github = new GithubClient(STREAMLABS_BOT_ID, botKey, owner, repo);
+  await github.login();
+  return github;
 }

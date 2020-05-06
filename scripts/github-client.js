@@ -49,16 +49,33 @@ module.exports.GithubClient = class GithubClient {
    * https://developer.github.com/v3/checks/runs/#create-a-check-run
    */
   async postCheck(params) {
-    return await request("POST /repos/:owner/:repo/check-runs", {
+    return await request('POST /repos/:owner/:repo/check-runs', {
       owner: this.owner,
       repo: this.repo,
       ...params,
       headers: {
         authorization: `token ${this.installationAccessToken}`,
-        accept: "application/vnd.github.antiope-preview+json"
+        accept: 'application/vnd.github.antiope-preview+json',
+      },
+    });
+  }
+
+  /**
+   * Get a list of PRs associated with the commit
+   *
+   * @see
+   * https://developer.github.com/v3/repos/commits/#list-pull-requests-associated-with-commit
+   */
+  async getPullRequestsForCommit(sha) {
+    return await request('GET /repos/:owner/:repo/commits/:sha/pulls', {
+      owner: this.owner,
+      repo: this.repo,
+      sha,
+      headers: {
+        authorization: `token ${this.installationAccessToken}`,
+        accept: 'application/vnd.github.groot-preview+json',
       },
     });
   }
 };
-
 
