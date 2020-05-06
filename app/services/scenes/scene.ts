@@ -408,8 +408,7 @@ export class Scene {
     if (this.id === source.sourceId) return false;
 
     const sceneToAdd = this.scenesService.views.getScene(source.sourceId);
-
-    if (!sceneToAdd) return true;
+    if (!sceneToAdd) return false;
 
     return !sceneToAdd.hasNestedScene(this.id);
   }

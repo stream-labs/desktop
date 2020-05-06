@@ -32,6 +32,7 @@ import Utils from 'services/utils';
 import YoutubeEditStreamInfo from 'components/platforms/youtube/YoutubeEditStreamInfo';
 import { YoutubeService } from 'services/platforms/youtube';
 import { RestreamService } from 'services/restream';
+import Translate from 'components/shared/translate';
 
 @Component({
   components: {
@@ -44,6 +45,7 @@ import { RestreamService } from 'services/restream';
     Spinner,
     Twitter,
     YoutubeEditStreamInfo,
+    Translate,
   },
 })
 export default class EditStreamInfo extends Vue {

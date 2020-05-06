@@ -1646,10 +1646,10 @@
     "@types/minimatch" "*"
     "@types/node" "*"
 
-"@types/humps@1.1.2":
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/@types/humps/-/humps-1.1.2.tgz#fbcaf596d20ff2ed78f8f511c5d6a943b51101d6"
-  integrity sha1-+8r1ltIP8u14+PURxdapQ7URAdY=
+"@types/humps@1.1.3":
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/@types/humps/-/humps-1.1.3.tgz#5a824883eddafe11ffd3b6d44e213698813e2c71"
+  integrity sha512-o7MN6qHSmdQKbM+HSDXPk7kUlJP+rMiAAenFwe0VPmUn7XeFwGdWx9eWhUJUPxY7IUk+Ko4UyP89kptj9unY4A==
 
 "@types/json-schema@^7.0.3":
   version "7.0.4"
