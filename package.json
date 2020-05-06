@@ -106,7 +106,7 @@
     "@types/mime": "2.0.1",
     "@types/mkdirp": "0.5.2",
     "@types/node": "12.12.38",
-    "@types/request": "2.48.3",
+    "@types/request": "2.48.4",
     "@types/semver": "6.2.1",
     "@types/socket.io-client": "1.4.32",
     "@types/uuid": "3.4.9",
