@@ -105,7 +105,7 @@ async function updateCheck() {
   console.info('Updating the GithubCheck', conclusion, title);
 
   try {
-    const github = getGithubClient();
+    const github = await getGithubClient();
     await github.login();
     await github.postCheck({
       name: 'Screenshots',
