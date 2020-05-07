@@ -13,12 +13,9 @@ enum EOnboardingSteps {
   Connect = 'Connect',
   ChooseYourAdventure = 'ChooseYourAdventure',
   ObsImport = 'ObsImport',
-  StreamlabsFeatures = 'StreamlabsFeatures',
   HardwareSetup = 'HardwareSetup',
   ThemeSelector = 'ThemeSelector',
   Optimize = 'Optimize',
-  Multistream = 'Multistream',
-  FacebookPageCreation = 'FacebookPageCreation',
 }
 
 const ONBOARDING_STEPS = () => ({
@@ -48,42 +45,28 @@ const ONBOARDING_STEPS = () => ({
     disableControls: true,
     hideSkip: true,
     hideButton: true,
-  },
-  [EOnboardingSteps.StreamlabsFeatures]: {
-    element: onboardingSteps.StreamlabsFeatures,
-    disableControls: false,
-    hideSkip: true,
-    hideButton: false,
+    label: $t('Import'),
   },
   [EOnboardingSteps.HardwareSetup]: {
     element: onboardingSteps.HardwareSetup,
     disableControls: false,
     hideSkip: false,
     hideButton: false,
+    label: $t('Set Up Mic and Webcam'),
   },
   [EOnboardingSteps.ThemeSelector]: {
     element: onboardingSteps.ThemeSelector,
     disableControls: false,
     hideSkip: false,
     hideButton: true,
+    label: $t('Add a Theme'),
   },
   [EOnboardingSteps.Optimize]: {
     element: onboardingSteps.Optimize,
     disableControls: false,
     hideSkip: false,
     hideButton: true,
-  },
-  [EOnboardingSteps.Multistream]: {
-    element: onboardingSteps.Multistream,
-    disableControls: false,
-    hideSkip: false,
-    hideButton: true,
-  },
-  [EOnboardingSteps.FacebookPageCreation]: {
-    element: onboardingSteps.FacebookPageCreation,
-    disableControls: false,
-    hideSkip: false,
-    hideButton: true,
+    label: $t('Optimize'),
   },
 });
 
@@ -129,7 +112,6 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
 
     if (this.state.importedFromObs) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ObsImport]);
-      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.StreamlabsFeatures]);
     } else {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.HardwareSetup]);
     }
@@ -140,7 +122,6 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
 
     if (this.getServiceViews(UserService).isTwitchAuthed) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Optimize]);
-      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Multistream]);
     }
 
     return steps;
