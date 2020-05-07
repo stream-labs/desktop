@@ -15,7 +15,7 @@
   "You can re-enable this from the settings.": "Ezt újra bekapcsolhatod a beállításokban.",
   "Confirm & Go Live": "Megerősítés & Adás Kezdése",
   "Update Stream Info": "Stream Információ Frissítése",
-  "goLiveError": "There was an error fetching your channel information. You can try <fetch-again-link>fetching the information again</fetch-again-link> or you can <just-go-live-link>just go live</just-go-live-link>. If this error persists, you can try logging out and back in.",
+  "goLiveError": "Hiba történt a csatornád adatainak beolvasásakor. Kipróbálhatja az <fetch-again-link> az információ ismételt lekérése</fetch-again-link>, vagy megteheti a <just-go-live-link>csak menj élő adásba</just-go-live-link>. Ha ez a hiba továbbra is fennáll, próbáljon ki kijelentkezni és újra bejelentkezni.",
   "If this error persists, you can try logging out and back in.": "Amennyiben a hiba máskor is felmerül, jelentkezz ki, majd vissza.",
   "Use optimized encoder settings": "Optimalizált kódoló beállítás használata",
   "Optimized encoder gives equivalent quality while reducing usage. Game specific encoders for Fortnite, PUBG, Destiny 2, and League Of Legends": "Az optimalizált kódoló a leterheltség csökkentése mellett közel azonos minőséget ad. Játékspecifikus kódoló a Fortnite, PUBG, Destiny 2, és League Of Legends játékokhoz",
