@@ -1,7 +1,6 @@
 import { Component } from 'vue-property-decorator';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import electron from 'electron';
-import { OnboardingStep } from 'streamlabs-beaker';
 import { Inject } from 'services';
 import { UserService, EAuthProcessState } from 'services/user';
 import { NavigationService } from 'services/navigation';
@@ -107,17 +106,17 @@ export default class Multistream extends TsxComponent<MultistreamProps> {
 
   render() {
     return (
-      <OnboardingStep>
-        <template slot="title">{$t('Multistream')}</template>
-        <template slot="desc">
+      <div class={styles.pageContainer}>
+        <h1>{$t('Multistream')}</h1>
+        <div>
           {$t(
             'Enable multistream to grow your audience, build your brand, and earn great prizes - with no extra effort. Available for Facebook today, and other platforms coming soon.',
           )}
-        </template>
+        </div>
         {this.enableStep}
         {this.multistreamEnabled && this.createPageStep}
         {this.multistreamEnabled && this.showLogin && this.loginStep}
-      </OnboardingStep>
+      </div>
     );
   }
 }

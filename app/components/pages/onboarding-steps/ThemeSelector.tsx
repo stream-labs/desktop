@@ -1,5 +1,5 @@
-import { Component, Prop } from 'vue-property-decorator';
-import { OnboardingStep, ProgressBar } from 'streamlabs-beaker';
+import { Component } from 'vue-property-decorator';
+import { ProgressBar } from 'streamlabs-beaker';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { $t } from 'services/i18n';
 import { Inject } from 'services';
@@ -68,9 +68,9 @@ export default class ObsImport extends TsxComponent<ThemeSelectorProps> {
 
   render() {
     return (
-      <OnboardingStep slot="2">
-        <template slot="title">{$t('Add a Theme')}</template>
-        <template slot="desc">
+      <div class={styles.pageContainer}>
+        <h1>{$t('Add a Theme')}</h1>
+        <div>
           {$t(
             'Not seeing a theme that catches your eye? Our theme library has hundreds of free choices available',
           )}
@@ -89,8 +89,8 @@ export default class ObsImport extends TsxComponent<ThemeSelectorProps> {
           ) : (
             <ProgressBar progressComplete={Math.floor(this.progress * 100)} />
           )}
-        </template>
-      </OnboardingStep>
+        </div>
+      </div>
     );
   }
 }

@@ -1,5 +1,4 @@
 import { Component } from 'vue-property-decorator';
-import { OnboardingStep } from 'streamlabs-beaker';
 import Multiselect from 'vue-multiselect';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { Inject } from 'services/core/injector';
@@ -53,11 +52,13 @@ export default class ObsImport extends TsxComponent<ObsImportProps> {
 
   render() {
     return (
-      <OnboardingStep slot="2">
-        <template slot="title">{$t('Welcome to Streamlabs OBS')}</template>
-        <template slot="desc">
-          {$t('Import your existing settings from OBS in less than a minute and go live')}
-        </template>
+      <div class={styles.pageContainer}>
+        <h1>{$t('Importing Your Existing Settings From OBS')}</h1>
+        <div>
+          {$t(
+            'It takes about one minute to import your settings, so you have some time to look at some of our features',
+          )}
+        </div>
         <div>
           {this.profiles.length > 1 && !this.importing && (
             <div>
@@ -77,7 +78,7 @@ export default class ObsImport extends TsxComponent<ObsImportProps> {
           )}
           {this.importing && <i class="fa fa-spinner fa-pulse" />}
         </div>
-      </OnboardingStep>
+      </div>
     );
   }
 }

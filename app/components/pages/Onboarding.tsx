@@ -89,18 +89,20 @@ export default class OnboardingPage extends TsxComponent<{}> {
           continue={() => this.continue()}
           setProcessing={(processing: boolean) => this.setProcessing(processing)}
         />
-        <div style="display: flex; justify-content: flex-end;">
-          {!this.currentStep.hideSkip && (
-            <button class="button button--trans" onClick={() => this.continue()}>
-              {$t('Skip')}
-            </button>
-          )}
-          {!this.currentStep.hideButton && (
-            <button class="button button--action" onClick={() => this.continue()}>
-              {$t('Continue')}
-            </button>
-          )}
-        </div>
+        {(!this.currentStep.hideSkip || !this.currentStep.hideButton) && (
+          <div class={styles.footer}>
+            {!this.currentStep.hideSkip && (
+              <button class="button button--trans" onClick={() => this.continue()}>
+                {$t('Skip')}
+              </button>
+            )}
+            {!this.currentStep.hideButton && (
+              <button class="button button--action" onClick={() => this.continue()}>
+                {$t('Continue')}
+              </button>
+            )}
+          </div>
+        )}
       </div>
     );
   }

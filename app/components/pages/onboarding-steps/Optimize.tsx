@@ -1,9 +1,10 @@
 import TsxComponent, { createProps } from 'components/tsx-component';
-import { Component, Prop } from 'vue-property-decorator';
-import { OnboardingStep, ProgressBar } from 'streamlabs-beaker';
-import { Inject } from '../../../services/core/injector';
-import { AutoConfigService, IConfigProgress } from '../../../services/auto-config';
+import { Component } from 'vue-property-decorator';
+import { ProgressBar } from 'streamlabs-beaker';
+import { Inject } from 'services/core/injector';
+import { AutoConfigService, IConfigProgress } from 'services/auto-config';
 import { $t } from 'services/i18n';
+import styles from './ObsImport.m.less';
 
 interface IConfigStepPresentation {
   description: string;
@@ -91,17 +92,17 @@ export default class Optimize extends TsxComponent<OptimizeProps> {
 
   render() {
     return (
-      <OnboardingStep>
-        <template slot="title">
+      <div class={styles.pageContainer}>
+        <h1>
           {this.optimizing
             ? `${$t('Optimizing...')} ${Math.floor(this.percentage * 100)}%`
             : $t('Optimize')}
-        </template>
-        <template slot="desc">
+        </h1>
+        <div>
           {$t(
             "Click below and we'll analyze your internet speed and computer hardware to give you the best settings possible.",
           )}
-        </template>
+        </div>
         {this.optimizing ? (
           <div>
             <ProgressBar progressComplete={Math.floor(this.percentage * 100)} />
@@ -112,7 +113,7 @@ export default class Optimize extends TsxComponent<OptimizeProps> {
             {$t('Start')}
           </button>
         )}
-      </OnboardingStep>
+      </div>
     );
   }
 }

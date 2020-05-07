@@ -1,5 +1,4 @@
 import { Component } from 'vue-property-decorator';
-import { OnboardingStep } from 'streamlabs-beaker';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { Inject } from 'services/core/injector';
 import { $t } from 'services/i18n';

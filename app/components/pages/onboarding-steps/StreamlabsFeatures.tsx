@@ -1,6 +1,5 @@
 import electron from 'electron';
 import { Component } from 'vue-property-decorator';
-import { OnboardingStep } from 'streamlabs-beaker';
 import TsxComponent from 'components/tsx-component';
 import { $t } from 'services/i18n';
 import { Inject } from 'services';
@@ -78,11 +77,11 @@ export default class ObsImport extends TsxComponent<{}> {
 
   render() {
     return (
-      <OnboardingStep slot="2">
-        <template slot="title">{$t('A few benefits of using Streamlabs OBS')}</template>
-        <template slot="desc">
+      <div class={styles.pageContainer}>
+        <h1>{$t('A few benefits of using Streamlabs OBS')}</h1>
+        <div>
           {$t('Some exclusive features we recommend to take your stream to the next level')}
-        </template>
+        </div>
         <div class={styles.container}>
           {this.recommendedFeatures.map(feature => {
             const data = this.featuresMetadata[feature];
@@ -95,7 +94,7 @@ export default class ObsImport extends TsxComponent<{}> {
             );
           })}
         </div>
-      </OnboardingStep>
+      </div>
     );
   }
 }

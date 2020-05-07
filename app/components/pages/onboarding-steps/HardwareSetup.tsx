@@ -1,5 +1,4 @@
 import { Component } from 'vue-property-decorator';
-import { OnboardingStep } from 'streamlabs-beaker';
 import TsxComponent from 'components/tsx-component';
 import { Inject } from 'services/core/injector';
 import { $t } from 'services/i18n';
@@ -71,8 +70,8 @@ export default class HardwareSetup extends TsxComponent {
 
   render() {
     return (
-      <OnboardingStep slot="2">
-        <template slot="title">{$t('Setup Mic and Webcam')}</template>
+      <div class={styles.pageContainer}>
+        <h1>{$t('Setup Mic and Webcam')}</h1>
         <div style="width: 60%;">
           {this.displayRender}
           {!!this.videoDevices.length && (
@@ -103,7 +102,7 @@ export default class HardwareSetup extends TsxComponent {
             onInput={(id: string) => (this.selectedAudioDevice = id)}
           />
         </div>
-      </OnboardingStep>
+      </div>
     );
   }
 }
