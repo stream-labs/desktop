@@ -135,12 +135,13 @@ test('Empty collection (logged-in twitch)', async t => {
 });
 
 test('Recording', async t => {
+  console.log('set temporary path');
   await setTemporaryRecordingPath(t);
+  console.log('set resolution');
   await setOutputResolution(t, '100x100');
   const api = await getClient();
   const scenesService = api.getResource<ScenesService>('ScenesService');
   scenesService.activeScene.createAndAddSource('Color', 'color_source');
-
   await startRecording(t);
 
   console.log('record started');
