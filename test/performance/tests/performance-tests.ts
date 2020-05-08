@@ -209,7 +209,7 @@ test('Add and remove items and folders', async t => {
       // create item and insert it into a folder
       const item = scenesService.activeScene.createAndAddSource('color', 'color_source');
       const folder = scenesService.activeScene.createFolder(`folder for ${item.nodeId}`);
-      folder.add(item.id);
+      folder.add(item['id']);
     }
     meter.stopMeasure('addNodes');
 
