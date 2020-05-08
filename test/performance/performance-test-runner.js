@@ -3,7 +3,7 @@ const { checkoutBranch, getCommitSHA, getCommitInfo, exec } = require('../helper
 const fs = require('fs-extra');
 const { GithubClient } = require('../../scripts/github-client');
 const path = require('path');
-const { CI, SLOBS_TEST_USER_POOL_TOKEN } = process.env;
+const { CI, SLOBS_TEST_USER_POOL_TOKEN, BUILD_REASON } = process.env;
 const CONFIG = require('./config.json');
 const args = process.argv.slice(2);
 const rimraf = require('rimraf');
@@ -15,7 +15,7 @@ const { execSync } = require('child_process');
 const TESTS_SERVICE_URL = CI ? 'https://slobs-users-pool.herokuapp.com' : 'http://localhost:5000';
 
 (async function main() {
-  console.log('Start performance test on', getCommitSHA());
+  console.log('Start performance test on', getCommitSHA(), 'build reason is ', BUILD_REASON);
 
   // prepare dirs
   const resultsPath = path.resolve(CONFIG.dist, 'performance-results.json');
@@ -40,7 +40,7 @@ const TESTS_SERVICE_URL = CI ? 'https://slobs-users-pool.herokuapp.com' : 'http:
   }
 
   // save results to DB if needed
-  const needToSaveResults = true; // baseBranchHasCommit(getCommitSHA());
+  const needToSaveResults = BUILD_REASON === 'IndividualCI';
   if (needToSaveResults) await sendResults(testResults);
 })();
 
@@ -48,8 +48,6 @@ const TESTS_SERVICE_URL = CI ? 'https://slobs-users-pool.herokuapp.com' : 'http:
  * Compare results from 2 branches and show them as a table
  */
 function printResults(baseBranchResults, currentBranchResults) {
-  const comparisonResults = {};
-
   // iterate throw each test
   Object.keys(baseBranchResults).forEach(testName => {
     const baseBranchMetrics = baseBranchResults[testName];
@@ -61,17 +59,12 @@ function printResults(baseBranchResults, currentBranchResults) {
       colWidths: [35, 10, 9, 17, 20, 20],
     });
 
-    // iterate thow each metric
+    // iterate through each metric
     Object.keys(baseBranchMetrics).forEach(metricName => {
-      if (!comparisonResults[testName]) comparisonResults[testName] = {};
       const baseMetric = baseBranchMetrics[metricName];
       const currentMetric = currentBranchResults[testName]
         ? currentBranchResults[testName][metricName]
         : null;
-      comparisonResults[testName][metricName] = {
-        baseMetric,
-        currentMetric,
-      };
       const baseMetricValues = baseMetric.values;
       const baseMetricAvg = baseMetricValues.reduce((v1, v2) => v1 + v2) / baseMetricValues.length;
       let currentMetricValues = 'null';
@@ -100,6 +93,9 @@ function printResults(baseBranchResults, currentBranchResults) {
   });
 }
 
+/**
+ * Round value to max 5 digits after point and add color
+ */
 function formatPerformanceValue(val) {
   if (val === 'null') return 'null';
   val = Number(val.toFixed(5));
