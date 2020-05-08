@@ -1,6 +1,9 @@
 trigger:
 - staging
 
+variables:
+  CI: true
+
 jobs:
   - job: Tests
 
@@ -18,8 +21,11 @@ jobs:
     - powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
       displayName: 'Setup Screen Resolution'
 
-    - script: yarn install --frozen-lockfile --check-files
+    - script: yarn install --frozen-lockfile --check-files 2>&1
       displayName: 'Install Dependencies'
+
+    - script: node node_modules/electron/install.js
+      displayName: 'Install Electron'
 
     - script: 'yarn eslint'
       displayName: 'ESLint'
@@ -27,14 +33,13 @@ jobs:
     - script: 'yarn compile:strictnulls'
       displayName: 'Check regressions in files with strictNullChecks'
 
-    - script: 'yarn compile:ci'
+    - script: 'yarn ci:compile'
       displayName: 'Compile Assets'
 
-    - script: 'yarn test-flaky'
+    - script: 'yarn ci:tests'
       displayName: 'Run Tests'
       env:
         SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
-        CI: true
         BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
         SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
 
@@ -54,13 +59,15 @@ jobs:
     - powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
       displayName: 'Setup Screen Resolution'
 
-    - script: yarn install --frozen-lockfile --check-files
+    - script: yarn install --frozen-lockfile --check-files 2>&1
       displayName: 'Install Dependencies'
 
-    - script: 'yarn screentest'
+    - script: node node_modules/electron/install.js
+      displayName: 'Install Electron'
+
+    - script: 'yarn ci:screentests'
       displayName: 'Snapshot testing'
       env:
-        CI: true
         BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
         SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
         STREAMLABS_BOT_ID: $(streamlabsBotId)
@@ -90,15 +97,17 @@ jobs:
       - powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
         displayName: 'Setup Screen Resolution'
 
-      - script: yarn install --frozen-lockfile --check-files
+      - script: yarn install --frozen-lockfile --check-files 2>&1
         displayName: 'Install Dependencies'
 
-      - script: 'yarn compile:ci'
+      - script: node node_modules/electron/install.js
+        displayName: 'Install Electron'
+
+      - script: 'yarn ci:compile'
         displayName: 'Compile Assets'
 
-      - script: 'yarn performancetest'
+      - script: 'yarn ci:performance'
         displayName: 'Performance testing'
         env:
-          CI: true
           BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
           SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)

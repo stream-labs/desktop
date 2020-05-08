@@ -1,0 +1,8 @@
+{
+  "ts": [
+    "app/services/streaming/*.ts"
+  ],
+  "tsx": [
+
+  ]
+}

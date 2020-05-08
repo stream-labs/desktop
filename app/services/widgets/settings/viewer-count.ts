@@ -17,7 +17,6 @@ interface IViewerCountSettings extends IWidgetSettings {
   twitch: boolean;
   youtube: boolean;
   mixer: boolean;
-  facebook: boolean;
 }
 
 export interface IViewerCountData extends IWidgetData {
@@ -50,7 +49,6 @@ export class ViewerCountService extends WidgetSettingsService<IViewerCountData> 
         twitch: data.settings.types.twitch.enabled,
         youtube: data.settings.types.youtube.enabled,
         mixer: data.settings.types.mixer.enabled,
-        facebook: data.settings.types.facebook.enabled,
       },
     };
   }
@@ -63,7 +61,6 @@ export class ViewerCountService extends WidgetSettingsService<IViewerCountData> 
         youtube: { enabled: settings.youtube },
         mixer: { enabled: settings.mixer },
         twitch: { enabled: settings.twitch },
-        facebook: { enabled: settings.facebook },
       },
     };
   }

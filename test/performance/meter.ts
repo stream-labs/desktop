@@ -8,7 +8,9 @@ type TMeterEvent =
   | 'renderer-js'
   | 'updater-js'
   | 'addSources'
-  | 'removeSources';
+  | 'removeSources'
+  | 'addNodes'
+  | 'removeNodes';
 
 const units: { [key in TMeterEvent]: string } = {
   mainWindowShow: 'ms',
@@ -19,6 +21,8 @@ const units: { [key in TMeterEvent]: string } = {
   'updater-js': 'bite',
   addSources: 'ms',
   removeSources: 'ms',
+  addNodes: 'ms',
+  removeNodes: 'removeNodes',
 };
 
 /**

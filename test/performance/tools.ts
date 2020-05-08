@@ -1,6 +1,6 @@
 let lastEventTime = 0;
 import { afterAppStart, afterAppStop, TExecutionContext, useSpectron } from '../helpers/spectron';
-import test from 'ava';
+import test, { ExecutionContext } from 'ava';
 import { getClient } from '../helpers/api-client';
 import { PerformanceService } from '../../app/services/performance';
 import { getMeter } from './meter';
@@ -9,22 +9,22 @@ const path = require('path');
 const fs = require('fs-extra');
 const CONFIG = fs.readJsonSync('test/performance/config.json');
 
-useSpectron({ restartAppAfterEachTest: false });
+useSpectron({});
 
 export function usePerformanceTest() {
   let testName = '';
 
-  afterAppStart(() => {
-    logTiming(`App started`);
+  afterAppStart(t => {
+    logTiming(t, 'App started');
   });
 
-  afterAppStop(() => {
-    logTiming(`App stopped`);
+  afterAppStop(t => {
+    logTiming(t, 'App stopped');
   });
 
   test.beforeEach(async t => {
     testName = t.title.replace('beforeEach hook for ', '');
-    logTiming(`Test "${testName}" started`);
+    logTiming(t, `Test "${testName}" started`);
     getMeter().reset();
     if (!fs.pathExistsSync(CONFIG.dist)) fs.mkdirpSync(CONFIG.dist);
   });
@@ -36,7 +36,7 @@ export function usePerformanceTest() {
     const savedEvents = fs.pathExistsSync(savedEventsFile) ? fs.readJsonSync(savedEventsFile) : {};
     savedEvents[testName] = meter.getRecordedEvents();
     fs.writeJsonSync(savedEventsFile, savedEvents);
-    logTiming(`Test "${testName}" finished`);
+    logTiming(t, `Test "${testName}" finished`);
   });
 }
 
@@ -69,13 +69,12 @@ export async function getCPUUsage(): Promise<number> {
   return cpuUsage;
 }
 
-
 /**
  * log time passed from the last logTiming call
  * @param msg
  */
-export function logTiming(msg: string, time = Date.now()) {
+export function logTiming(t: ExecutionContext, msg: string, time = Date.now()) {
   const delta = lastEventTime ? time - lastEventTime : 0;
   lastEventTime = time;
-  console.log(msg, delta + 'ms');
+  t.log(msg, delta + 'ms');
 }

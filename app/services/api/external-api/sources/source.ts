@@ -46,6 +46,10 @@ export class Source implements ISourceModel, ISerializable {
     this.source = this.internalSourcesService.views.getSource(sourceId);
   }
 
+  private isDestroyed(): boolean {
+    return this.source.isDestroyed();
+  }
+
   getModel(): ISourceModel {
     return {
       sourceId: this.sourceId,

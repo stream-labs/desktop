@@ -41,6 +41,10 @@ export abstract class SceneNode {
     this.sceneNode = this.scene.getNode(this.nodeId);
   }
 
+  private isDestroyed(): boolean {
+    return this.sceneNode.isDestroyed();
+  }
+
   /**
    * returns serialized representation on scene-node
    */
