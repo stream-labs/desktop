@@ -1,14 +1,56 @@
 import fetch from 'node-fetch';
 import * as electron from 'electron';
 import * as path from 'path';
+import * as fs from 'fs';
+
+let updaterWindow: electron.BrowserWindow;
+
+function spawnUpdaterWindow(basePath: string) {
+  updaterWindow = new electron.BrowserWindow({
+    width: 400,
+    height: 180,
+    frame: false,
+    resizable: false,
+    show: false,
+    alwaysOnTop: true,
+    webPreferences: { nodeIntegration: true },
+  });
+
+  updaterWindow.on('ready-to-show', () => {
+    updaterWindow.show();
+  });
+
+  updaterWindow.loadURL(`file://${basePath}/updater/index.html`);
+
+  updaterWindow.webContents.openDevTools();
+}
+
+function downloadFile(srcUrl: string, dstPath: string): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    return fetch(srcUrl)
+      .then(resp => (resp.ok ? Promise.resolve(resp) : Promise.reject(resp)))
+      .then(({ body }) => {
+        const fileStream = fs.createWriteStream(dstPath);
+
+        body.pipe(fileStream);
+
+
+      })
+      .catch(e => reject(e));
+  });
+}
+
 
 module.exports = async (basePath: string) => {
   const cdnBase = `https://slobs-cdn.streamlabs.com/${process.env.SLOBS_VERSION}/bundles/`;
   const localBase = `file://${basePath}/bundles/`;
 
+  spawnUpdaterWindow(basePath);
+  await new Promise(r => setTimeout(r, 999999));
+
   let useLocalBundles = false;
 
-  if (process.argv.includes('--localBundles')) {
+  if (process.argv.includes('--local-bundles')) {
     useLocalBundles = true;
   }
 
@@ -46,6 +88,12 @@ module.exports = async (basePath: string) => {
     }
   }
 
+  // const bundleDownloadDirectory = 
+
+  // const bundleMap = {
+
+  // }
+
   electron.session.defaultSession?.webRequest.onBeforeRequest(
     { urls: ['https://slobs-cdn.streamlabs.com/bundles/*.js'] },
     (request, cb) => {
@@ -74,7 +122,7 @@ module.exports = async (basePath: string) => {
     if (appRelaunching) return;
     appRelaunching = true;
     console.log('Reverting to local bundles and restarting app');
-    electron.app.relaunch({ args: ['--localBundles'] });
+    electron.app.relaunch({ args: ['--local-bundles'] });
     electron.app.quit();
   }
 
