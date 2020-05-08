@@ -40,7 +40,7 @@ const TESTS_SERVICE_URL = CI ? 'https://slobs-users-pool.herokuapp.com' : 'http:
   }
 
   // save results to DB if needed
-  const needToSaveResults = BUILD_REASON === 'IndividualCI';
+  const needToSaveResults = true; // BUILD_REASON === 'IndividualCI';
   if (needToSaveResults) await sendResults(testResults);
 })();
 
