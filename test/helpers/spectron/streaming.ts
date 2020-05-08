@@ -121,5 +121,5 @@ export async function startRecording(t: TExecutionContext) {
 export async function stopRecording(t: TExecutionContext) {
   const client = t.context.app.client;
   await client.click('.record-button');
-  await client.waitForVisible('.record-button:not(.active)', 15000);
+  await client.waitForVisible('.record-button:not(.active)', 30000);
 }

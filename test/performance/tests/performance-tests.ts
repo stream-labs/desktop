@@ -52,9 +52,13 @@ function measureStartupTime(api: ApiClient) {
 }
 
 async function measureMemoryAndCPU(t: ExecutionContext, attempts = CPU_ATTEMPTS) {
+  console.log('start measure');
   logTiming(t, 'Start recodring CPU and Memory');
+  console.log('start measure 2');
   const meter = getMeter();
   while (attempts--) {
+
+    console.log('start measure attempts');
     meter.addMeasurement('CPU', await getCPUUsage());
     meter.addMeasurement('memory', await getMemoryUsage());
     await sleep(2000);
@@ -138,6 +142,8 @@ test('Recording', async t => {
   scenesService.activeScene.createAndAddSource('Color', 'color_source');
 
   await startRecording(t);
+
+  console.log('record started');
   await measureMemoryAndCPU(t);
   await stopRecording(t);
 
