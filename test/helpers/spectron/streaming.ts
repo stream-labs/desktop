@@ -112,6 +112,7 @@ export async function chatIsVisible(t: TExecutionContext) {
 }
 
 export async function startRecording(t: TExecutionContext) {
+  await focusMain(t);
   const client = t.context.app.client;
   await client.click('.record-button');
   await client.waitForVisible('.record-button.active');
