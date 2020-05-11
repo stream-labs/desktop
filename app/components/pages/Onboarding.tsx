@@ -83,7 +83,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
     const Component = this.currentStep.element;
 
     return (
-      <div>
+      <div class={styles.onboardingContainer}>
         {this.topBar}
         <Component
           continue={() => this.continue()}

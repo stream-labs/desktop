@@ -16,6 +16,7 @@ enum EOnboardingSteps {
   HardwareSetup = 'HardwareSetup',
   ThemeSelector = 'ThemeSelector',
   Optimize = 'Optimize',
+  Prime = 'Prime',
 }
 
 const ONBOARDING_STEPS = () => ({
@@ -67,6 +68,13 @@ const ONBOARDING_STEPS = () => ({
     hideSkip: false,
     hideButton: true,
     label: $t('Optimize'),
+  },
+  [EOnboardingSteps.Prime]: {
+    element: onboardingSteps.Prime,
+    disableControls: false,
+    hideSkip: false,
+    hideButton: true,
+    label: $t('Prime'),
   },
 });
 
@@ -123,6 +131,8 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
     if (this.getServiceViews(UserService).isTwitchAuthed) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Optimize]);
     }
+
+    steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Prime]);
 
     return steps;
   }
