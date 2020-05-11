@@ -133,102 +133,102 @@ test('Empty collection (logged-in twitch)', async t => {
   }
   t.pass();
 });
-
-test('Recording', async t => {
-  console.log('set temporary path');
-  await setTemporaryRecordingPath(t);
-  console.log('set resolution');
-  await setOutputResolution(t, '100x100');
-  const api = await getClient();
-  const scenesService = api.getResource<ScenesService>('ScenesService');
-  scenesService.activeScene.createAndAddSource('Color', 'color_source');
-  await startRecording(t);
-
-  console.log('record started');
-  await measureMemoryAndCPU(t);
-  await stopRecording(t);
-
-  t.pass();
-});
-
-test('Create sources', async t => {
-  const sourceTypes = [
-    'image_source',
-    'color_source',
-    'slideshow',
-    'text_gdiplus',
-    'text_ft2_source',
-    'monitor_capture',
-    'window_capture',
-    'game_capture',
-    'decklink-input',
-    'ndi_source',
-    'openvr_capture',
-    'liv_capture',
-    'ovrstream_dc_source',
-    'vlc_source',
-    'browser_source',
-    'wasapi_input_capture',
-    'wasapi_output_capture',
-    'ffmpeg_source',
-    'dshow_input',
-  ];
-
-  const api = await getClient();
-  const scenesService = api.getResource<ScenesService>('ScenesService');
-  const cs = api.getResource<CustomizationService>('CustomizationService');
-  cs.setSettings({ performanceMode: false });
-  const meter = getMeter();
-
-  // create sources of different types
-  let attempts = ADD_SOURCES_ATTEMPTS;
-  while (attempts--) {
-    meter.startMeasure('addSources');
-    for (let ind = 0; ind < MAX_SOURCES_COUNT; ind++) {
-      // create item and insert it into a folder
-      const sourceType = sourceTypes[ind % sourceTypes.length];
-      scenesService.activeScene.createAndAddSource(sourceType, sourceType as TSourceType);
-    }
-    meter.stopMeasure('addSources');
-
-    // remove all created sources
-    scenesService.activeScene.getNodes().forEach(node => {
-      node.remove();
-    });
-
-    // give SLOBS some time to unfreeze UI
-    await sleep(2000, true);
-  }
-  t.pass();
-});
-
-test('Add and remove items and folders', async t => {
-  const api = await getClient();
-  const scenesService = api.getResource<ScenesService>('ScenesService');
-  const meter = getMeter();
-
-  // create and delete a bunch of folders and items
-  let attempts = ADD_SOURCES_ATTEMPTS;
-  while (attempts--) {
-    meter.startMeasure('addNodes');
-    let sourcesCount = MAX_SOURCES_COUNT;
-    while (sourcesCount--) {
-      // create item and insert it into a folder
-      const item = scenesService.activeScene.createAndAddSource('color', 'color_source');
-      const folder = scenesService.activeScene.createFolder(`folder for ${item.nodeId}`);
-      folder.add(item['id']);
-    }
-    meter.stopMeasure('addNodes');
-
-    // remove all created nodes
-    meter.startMeasure('removeNodes');
-    scenesService.activeScene.getFolders().forEach(node => {
-      node.remove();
-    });
-    meter.stopMeasure('removeNodes');
-
-    // give SLOBS some time to unfreeze UI
-    await sleep(2000, true);
-  }
-  t.pass();
-});
+//
+// test('Recording', async t => {
+//   console.log('set temporary path');
+//   await setTemporaryRecordingPath(t);
+//   console.log('set resolution');
+//   await setOutputResolution(t, '100x100');
+//   const api = await getClient();
+//   const scenesService = api.getResource<ScenesService>('ScenesService');
+//   scenesService.activeScene.createAndAddSource('Color', 'color_source');
+//   await startRecording(t);
+//
+//   console.log('record started');
+//   await measureMemoryAndCPU(t);
+//   await stopRecording(t);
+//
+//   t.pass();
+// });
+//
+// test('Create sources', async t => {
+//   const sourceTypes = [
+//     'image_source',
+//     'color_source',
+//     'slideshow',
+//     'text_gdiplus',
+//     'text_ft2_source',
+//     'monitor_capture',
+//     'window_capture',
+//     'game_capture',
+//     'decklink-input',
+//     'ndi_source',
+//     'openvr_capture',
+//     'liv_capture',
+//     'ovrstream_dc_source',
+//     'vlc_source',
+//     'browser_source',
+//     'wasapi_input_capture',
+//     'wasapi_output_capture',
+//     'ffmpeg_source',
+//     'dshow_input',
+//   ];
+//
+//   const api = await getClient();
+//   const scenesService = api.getResource<ScenesService>('ScenesService');
+//   const cs = api.getResource<CustomizationService>('CustomizationService');
+//   cs.setSettings({ performanceMode: false });
+//   const meter = getMeter();
+//
+//   // create sources of different types
+//   let attempts = ADD_SOURCES_ATTEMPTS;
+//   while (attempts--) {
+//     meter.startMeasure('addSources');
+//     for (let ind = 0; ind < MAX_SOURCES_COUNT; ind++) {
+//       // create item and insert it into a folder
+//       const sourceType = sourceTypes[ind % sourceTypes.length];
+//       scenesService.activeScene.createAndAddSource(sourceType, sourceType as TSourceType);
+//     }
+//     meter.stopMeasure('addSources');
+//
+//     // remove all created sources
+//     scenesService.activeScene.getNodes().forEach(node => {
+//       node.remove();
+//     });
+//
+//     // give SLOBS some time to unfreeze UI
+//     await sleep(2000, true);
+//   }
+//   t.pass();
+// });
+//
+// test('Add and remove items and folders', async t => {
+//   const api = await getClient();
+//   const scenesService = api.getResource<ScenesService>('ScenesService');
+//   const meter = getMeter();
+//
+//   // create and delete a bunch of folders and items
+//   let attempts = ADD_SOURCES_ATTEMPTS;
+//   while (attempts--) {
+//     meter.startMeasure('addNodes');
+//     let sourcesCount = MAX_SOURCES_COUNT;
+//     while (sourcesCount--) {
+//       // create item and insert it into a folder
+//       const item = scenesService.activeScene.createAndAddSource('color', 'color_source');
+//       const folder = scenesService.activeScene.createFolder(`folder for ${item.nodeId}`);
+//       folder.add(item['id']);
+//     }
+//     meter.stopMeasure('addNodes');
+//
+//     // remove all created nodes
+//     meter.startMeasure('removeNodes');
+//     scenesService.activeScene.getFolders().forEach(node => {
+//       node.remove();
+//     });
+//     meter.stopMeasure('removeNodes');
+//
+//     // give SLOBS some time to unfreeze UI
+//     await sleep(2000, true);
+//   }
+//   t.pass();
+// });
