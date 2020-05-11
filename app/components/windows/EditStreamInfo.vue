@@ -4,10 +4,12 @@
       <h4 v-if="windowHeading">{{ windowHeading }}</h4>
       <div v-if="infoLoading"><spinner /></div>
 
-      <translate :message="$t('goLiveError')">
-        <a slot="fetchAgainLink" slot-scope="text" @click="populateInfo" class="description-link">{{ text }}</a>
-        <a slot="justGoLiveLink" slot-scope="text" @click="() => goLive(true)" class="description-link">{{ text }}</a>
-      </translate>
+      <div v-if="infoError && !infoLoading" class="warning">
+        <translate :message="$t('goLiveError')">
+          <a slot="fetchAgainLink" slot-scope="text" @click="populateInfo" class="description-link">{{ text }}</a>
+          <a slot="justGoLiveLink" slot-scope="text" @click="() => goLive(true)" class="description-link">{{ text }}</a>
+        </translate>
+      </div>
 
       <validated-form name="editStreamForm" ref="form" v-if="!infoLoading && !infoError">
         <div class="pages-warning" v-if="isFacebook && !hasPages">

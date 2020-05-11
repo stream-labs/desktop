@@ -1656,10 +1656,10 @@
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.4.tgz#38fd73ddfd9b55abb1e1b2ed578cb55bd7b7d339"
   integrity sha512-8+KAKzEvSUdeo+kmqnKrqgeE+LcA0tjYWFY7RPProVYwnqDjukzO+3b6dLD56rYX5TdWejnEOLJYOIeh4CXKuA==
 
-"@types/lodash@4.14.149":
-  version "4.14.149"
-  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.149.tgz#1342d63d948c6062838fbf961012f74d4e638440"
-  integrity sha512-ijGqzZt/b7BfzcK9vTrS6MFljQRPn5BFWOx8oE0GYxribu6uV+aA9zZuXI1zc/etK9E8nrgdoF2+LgUw7+9tJQ==
+"@types/lodash@4.14.150":
+  version "4.14.150"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.150.tgz#649fe44684c3f1fcb6164d943c5a61977e8cf0bd"
+  integrity sha512-kMNLM5JBcasgYscD9x/Gvr6lTAv2NVgsKtet/hm93qMyf/D1pt+7jeEZklKJKxMVmXjxbRVQQGfqDSfipYCO6w==
 
 "@types/mime@2.0.1":
   version "2.0.1"
@@ -1691,10 +1691,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.48.tgz#4e7da6e849d9e50be5865effaa55b1870ae4eede"
   integrity sha512-DCAQnwnI9fMZOSUJP2rFdjz2itD/FyCyP6ETopqspy0AvkykpOgMC/W5xCPlmLAQo79GmmligyLbgVQTcnDMzg==
 
-"@types/node@12.12.18":
-  version "12.12.18"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.12.18.tgz#8d16634797d63c2af5bc647ce879f8de20b56469"
-  integrity sha512-DBkZuIMFuAfjJHiunyRc+aNvmXYNwV1IPMgGKGlwCp6zh6MKrVtmvjSWK/axWcD25KJffkXgkfvFra8ndenXAw==
+"@types/node@12.12.38":
+  version "12.12.38"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.12.38.tgz#58841a382f231ad005dbb935c36d44aa1118a26b"
+  integrity sha512-75eLjX0pFuTcUXnnWmALMzzkYorjND0ezNEycaKesbUBg9eGZp4GHPuDmkRc4mQQvIpe29zrzATNRA6hkYqwmA==
 
 "@types/node@>= 8":
   version "12.12.17"
@@ -1706,20 +1706,20 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.14.9.tgz#2e8d678039d27943ce53a1913386133227fd9066"
   integrity sha512-NelG/dSahlXYtSoVPErrp06tYFrvzj8XLWmKA+X8x0W//4MqbUyZu++giUG/v0bjAT6/Qxa8IjodrfdACyb0Fg==
 
-"@types/request@2.48.3":
-  version "2.48.3"
-  resolved "https://registry.yarnpkg.com/@types/request/-/request-2.48.3.tgz#970b8ed2317568c390361d29c555a95e74bd6135"
-  integrity sha512-3Wo2jNYwqgXcIz/rrq18AdOZUQB8cQ34CXZo+LUwPJNpvRAL86+Kc2wwI8mqpz9Cr1V+enIox5v+WZhy/p3h8w==
+"@types/request@2.48.4":
+  version "2.48.4"
+  resolved "https://registry.yarnpkg.com/@types/request/-/request-2.48.4.tgz#df3d43d7b9ed3550feaa1286c6eabf0738e6cf7e"
+  integrity sha512-W1t1MTKYR8PxICH+A4HgEIPuAC3sbljoEVfyZbeFJJDbr30guDspJri2XOaM2E+Un7ZjrihaDi7cf6fPa2tbgw==
   dependencies:
     "@types/caseless" "*"
     "@types/node" "*"
     "@types/tough-cookie" "*"
     form-data "^2.5.0"
 
-"@types/semver@6.2.0":
-  version "6.2.0"
-  resolved "https://registry.yarnpkg.com/@types/semver/-/semver-6.2.0.tgz#d688d574400d96c5b0114968705366f431831e1a"
-  integrity sha512-1OzrNb4RuAzIT7wHSsgZRlMBlNsJl+do6UblR7JMW4oB7bbR+uBEYtUh7gEc/jM84GGilh68lSOokyM/zNUlBA==
+"@types/semver@6.2.1":
+  version "6.2.1"
+  resolved "https://registry.yarnpkg.com/@types/semver/-/semver-6.2.1.tgz#a236185670a7860f1597cf73bea2e16d001461ba"
+  integrity sha512-+beqKQOh9PYxuHvijhVl+tIHvT6tuwOrE9m14zd+MT2A38KoKZhh7pYJ0SNleLtwDsiIxHDsIk9bv01oOxvSvA==
 
 "@types/socket.io-client@1.4.32":
   version "1.4.32"
@@ -1753,12 +1753,10 @@
   resolved "https://registry.yarnpkg.com/@types/unist/-/unist-2.0.3.tgz#9c088679876f374eb5983f150d4787aa6fb32d7e"
   integrity sha512-FvUupuM3rlRsRtCN+fDudtmytGO6iHJuuRKS1Ss0pG5z8oX0diNEw94UEL7hgDbpN94rgaK5R7sWm6RrSkZuAQ==
 
-"@types/uuid@3.4.6":
-  version "3.4.6"
-  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-3.4.6.tgz#d2c4c48eb85a757bf2927f75f939942d521e3016"
-  integrity sha512-cCdlC/1kGEZdEglzOieLDYBxHsvEOIg7kp/2FYyVR9Pxakq+Qf/inL3RKQ+PA8gOlI/NnL+fXmQH12nwcGzsHw==
-  dependencies:
-    "@types/node" "*"
+"@types/uuid@3.4.9":
+  version "3.4.9"
+  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-3.4.9.tgz#fcf01997bbc9f7c09ae5f91383af076d466594e1"
+  integrity sha512-XDwyIlt/47l2kWLTzw/mtrpLdB+GPSskR2n/PIcPn+VYhVO77rGhRncIR5GPU0KRzXuqkDO+J5qqrG0Y8P6jzQ==
 
 "@types/vfile-message@*":
   version "1.0.1"
@@ -3899,7 +3897,7 @@ configstore@^4.0.0:
     write-file-atomic "^2.0.0"
     xdg-basedir "^3.0.0"
 
-confusing-browser-globals@^1.0.7:
+confusing-browser-globals@^1.0.9:
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/confusing-browser-globals/-/confusing-browser-globals-1.0.9.tgz#72bc13b483c0276801681871d4898516f8f54fdd"
   integrity sha512-KbS1Y0jMtyPgIxjO7ZzMAuUpAKMt1SzCL9fsrKsX6b0zJPTaT0SiSPmewwVZg9UAO83HVIlEhZF84LIjZ0lmAw==
@@ -4141,10 +4139,10 @@ crypto-random-string@^1.0.0:
   resolved "https://registry.yarnpkg.com/crypto-random-string/-/crypto-random-string-1.0.0.tgz#a230f64f568310e1498009940790ec99545bca7e"
   integrity sha1-ojD2T1aDEOFJgAmUB5DsmVRbyn4=
 
-css-element-queries@1.2.2:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/css-element-queries/-/css-element-queries-1.2.2.tgz#e80ce4c523e41079152b1a3a8ec5b7afb0b45c96"
-  integrity sha512-mpzx/1w9qqu5WLrxvX/wRP+ZwU2ZZ0yRiBkQ9jf4QjStaNuiDbejw9KcvfW3me5f4MZRAnAsctGRECrSf1PBYw==
+css-element-queries@1.2.3:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/css-element-queries/-/css-element-queries-1.2.3.tgz#e14940b1fcd4bf0da60ea4145d05742d7172e516"
+  integrity sha512-QK9uovYmKTsV2GXWQiMOByVNrLn2qz6m3P7vWpOR4IdD6I3iXoDw5qtgJEN3Xq7gIbdHVKvzHjdAtcl+4Arc4Q==
 
 css-loader@2.1.1:
   version "2.1.1"
@@ -4709,10 +4707,10 @@ electron-window-state@5.0.3:
     jsonfile "^4.0.0"
     mkdirp "^0.5.1"
 
-electron@6.1.10:
-  version "6.1.10"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-6.1.10.tgz#b2a875f5c8f3c3e7954dfa11c05083e49d2fb8c2"
-  integrity sha512-mOrV4jm0O6HSktLbUYPNAQdOAses1p8XGSad/lR5koBcI0fvBbUWV2EMnZipGwMADFXneTW6LaOpuiuL/67gzQ==
+electron@6.1.11:
+  version "6.1.11"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-6.1.11.tgz#a14a97b70f065bbb486992610a5e007fde1eeb0f"
+  integrity sha512-HCXp6GT0PIRjYWzRvA/M8XX76K511TRM63SmcPtmcOAjZ9sopVYC5abSojdcGHbcT6BUKBMXSsPxoyZ+SZUFEg==
   dependencies:
     "@types/node" "^10.12.18"
     electron-download "^4.1.0"
@@ -4922,14 +4920,14 @@ escape-string-regexp@^1.0.2, escape-string-regexp@^1.0.4, escape-string-regexp@^
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz#1b61c0562190a8dff6ae3bb2cf0200ca130b86d4"
   integrity sha1-G2HAViGQqN/2rjuyzwIAyhMLhtQ=
 
-eslint-config-airbnb-base@14.0.0:
-  version "14.0.0"
-  resolved "https://registry.yarnpkg.com/eslint-config-airbnb-base/-/eslint-config-airbnb-base-14.0.0.tgz#8a7bcb9643d13c55df4dd7444f138bf4efa61e17"
-  integrity sha512-2IDHobw97upExLmsebhtfoD3NAKhV4H0CJWP3Uprd/uk+cHuWYOczPVxQ8PxLFUAw7o3Th1RAU8u1DoUpr+cMA==
+eslint-config-airbnb-base@14.1.0:
+  version "14.1.0"
+  resolved "https://registry.yarnpkg.com/eslint-config-airbnb-base/-/eslint-config-airbnb-base-14.1.0.tgz#2ba4592dd6843258221d9bff2b6831bd77c874e4"
+  integrity sha512-+XCcfGyCnbzOnktDVhwsCAx+9DmrzEmuwxyHUJpw+kqBVT744OUBrB09khgFKlK1lshVww6qXGsYPZpavoNjJw==
   dependencies:
-    confusing-browser-globals "^1.0.7"
+    confusing-browser-globals "^1.0.9"
     object.assign "^4.1.0"
-    object.entries "^1.1.0"
+    object.entries "^1.1.1"
 
 eslint-import-resolver-node@^0.3.2:
   version "0.3.3"
@@ -8416,7 +8414,7 @@ object.assign@^4.1.0:
     has-symbols "^1.0.0"
     object-keys "^1.0.11"
 
-object.entries@^1.1.0:
+object.entries@^1.1.0, object.entries@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/object.entries/-/object.entries-1.1.1.tgz#ee1cf04153de02bb093fec33683900f57ce5399b"
   integrity sha512-ilqR7BgdyZetJutmDPfXCDffGa0/Yzl2ivVNpbx/g4UeWrCdRnFDUBrKJGLhGieRHDATnyZXWBeCb29k9CJysQ==
@@ -8443,9 +8441,9 @@ object.values@^1.1.0:
     function-bind "^1.1.1"
     has "^1.0.3"
 
-"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.137-iojs-v6.0.3-release.tar.gz":
+"obs-studio-node@https://obsstudionodes3.streamlabs.com/obs-studio-node-0.6.8-iojs-v6.0.3-release.tar.gz":
   version "0.3.99"
-  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.5.137-iojs-v6.0.3-release.tar.gz#90d397eabe662bda7bbd03e9e277472706cfa3d6"
+  resolved "https://obsstudionodes3.streamlabs.com/obs-studio-node-0.6.8-iojs-v6.0.3-release.tar.gz#0f848cefc6379a46d9fd7fd63b635bfb77f8a841"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
