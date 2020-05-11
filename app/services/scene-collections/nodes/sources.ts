@@ -11,6 +11,7 @@ import { Inject } from '../../../util/injector';
 import * as obs from '../../../../obs-api';
 import * as fi from 'node-fontinfo';
 import { $t } from 'services/i18n';
+import { unapplyPathConvertForPreset, applyPathConvertForPreset } from './sources-util';
 
 interface ISchema {
   items: ISourceInfo[];
@@ -82,7 +83,7 @@ export class SourcesNode extends Node<ISchema, {}> {
             id: source.sourceId,
             name: source.name,
             type: source.type,
-            settings: obsInput.settings,
+            settings: unapplyPathConvertForPreset(source.type, obsInput.settings),
             volume: obsInput.volume,
             channel: source.channel,
             hotkeys,
@@ -209,7 +210,7 @@ export class SourcesNode extends Node<ISchema, {}> {
         name: source.id,
         type: source.type,
         muted: source.muted || false,
-        settings: source.settings,
+        settings: applyPathConvertForPreset(source.type, source.settings),
         volume: source.volume,
         filters: source.filters.items.map(filter => {
           return {
