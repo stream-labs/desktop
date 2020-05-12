@@ -1,10 +1,12 @@
 import cx from 'classnames';
+import electron from 'electron';
 import { Component } from 'vue-property-decorator';
 import TsxComponent from 'components/tsx-component';
 import { OnboardingService } from 'services/onboarding';
 import { Inject } from 'services/core/injector';
 import { $t } from 'services/i18n';
 import styles from './Onboarding.m.less';
+import { MagicLinkService } from 'services/magic-link';
 
 export class OnboardingStepProps {
   continue: () => void = () => {};
@@ -14,6 +16,7 @@ export class OnboardingStepProps {
 @Component({})
 export default class OnboardingPage extends TsxComponent<{}> {
   @Inject() onboardingService: OnboardingService;
+  @Inject() magicLinkService: MagicLinkService;
 
   currentStepIndex = 0;
   processing = false;
@@ -28,7 +31,21 @@ export default class OnboardingPage extends TsxComponent<{}> {
   }
 
   complete() {
+    this.linkToPrime();
     this.onboardingService.finish();
+  }
+
+  async linkToPrime() {
+    const isPrimeStep = this.currentStep.label === $t('Prime');
+
+    if (isPrimeStep) {
+      try {
+        const link = await this.magicLinkService.getDashboardMagicLink('prime');
+        electron.remote.shell.openExternal(link);
+      } catch (e) {
+        console.error('Error generating dashboard magic link', e);
+      }
+    }
   }
 
   setProcessing(bool: boolean) {
@@ -81,6 +98,19 @@ export default class OnboardingPage extends TsxComponent<{}> {
     );
   }
 
+  get button() {
+    if (this.currentStep.hideButton) return null;
+    const isPrimeStep = this.currentStep.label === $t('Prime');
+    return (
+      <button
+        class={cx('button button--action', { ['button--prime']: isPrimeStep })}
+        onClick={() => this.continue()}
+      >
+        {isPrimeStep ? $t('Go Prime') : $t('Continue')}
+      </button>
+    );
+  }
+
   render() {
     const Component = this.currentStep.element;
 
@@ -98,11 +128,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
                 {$t('Skip')}
               </button>
             )}
-            {!this.currentStep.hideButton && (
-              <button class="button button--action" onClick={() => this.continue()}>
-                {$t('Continue')}
-              </button>
-            )}
+            {this.button}
           </div>
         )}
       </div>
