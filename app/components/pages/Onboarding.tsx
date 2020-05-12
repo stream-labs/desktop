@@ -53,7 +53,9 @@ export default class OnboardingPage extends TsxComponent<{}> {
   }
 
   get topBar() {
-    if (this.currentStepIndex <= this.preboardingOffset || this.singletonStep) return null;
+    if (this.currentStepIndex < this.preboardingOffset || this.singletonStep) {
+      return <div class={styles.topBarContainer} />;
+    }
     const offset = this.preboardingOffset;
     const stepIdx = this.currentStepIndex - offset;
     const filteredSteps = this.steps.filter(step => !step.isPreboarding);

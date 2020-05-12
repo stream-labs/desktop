@@ -4,7 +4,7 @@ import { ProgressBar } from 'streamlabs-beaker';
 import { Inject } from 'services/core/injector';
 import { AutoConfigService, IConfigProgress } from 'services/auto-config';
 import { $t } from 'services/i18n';
-import styles from './ObsImport.m.less';
+import commonStyles from './Common.m.less';
 
 interface IConfigStepPresentation {
   description: string;
@@ -92,13 +92,13 @@ export default class Optimize extends TsxComponent<OptimizeProps> {
 
   render() {
     return (
-      <div class={styles.pageContainer}>
-        <h1>
+      <div>
+        <h1 class={commonStyles.titleContainer}>
           {this.optimizing
             ? `${$t('Optimizing...')} ${Math.floor(this.percentage * 100)}%`
             : $t('Optimize')}
         </h1>
-        <div>
+        <div style="width: 60%; margin: auto;">
           {$t(
             "Click below and we'll analyze your internet speed and computer hardware to give you the best settings possible.",
           )}
@@ -109,8 +109,12 @@ export default class Optimize extends TsxComponent<OptimizeProps> {
             <span>{this.stepInfo && this.stepInfo.summary}</span>
           </div>
         ) : (
-          <button class="button button--action button--lg" onClick={this.optimize}>
-            {$t('Start')}
+          <button
+            class={commonStyles.optionCard}
+            onClick={this.optimize}
+            style="margin: auto; margin-top: 24px;"
+          >
+            <h2>{$t('Start')}</h2>
           </button>
         )}
       </div>

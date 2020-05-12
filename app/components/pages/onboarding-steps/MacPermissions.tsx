@@ -4,7 +4,7 @@ import { $t } from 'services/i18n';
 import { Inject } from 'services';
 import { MacPermissionsService, IPermissionsStatus } from 'services/mac-permissions';
 import { Subscription } from 'rxjs';
-import styles from './Multistream.m.less';
+import commonStyles from './Common.m.less';
 
 class MacPermissionsProps {
   continue: () => void = () => {};
@@ -32,8 +32,8 @@ export default class MacPermissions extends TsxComponent<MacPermissionsProps> {
 
   render() {
     return (
-      <div class={styles.pageContainer}>
-        <h1>{$t('Grant Permissions')}</h1>
+      <div>
+        <h1 class={commonStyles.titleContainer}>{$t('Grant Permissions')}</h1>
         <div>
           {$t(
             'Streamlabs OBS needs additional permissions. Grant permissions in the pop-up dialogs to continue.',

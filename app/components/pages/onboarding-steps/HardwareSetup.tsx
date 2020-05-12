@@ -8,6 +8,7 @@ import Display from 'components/shared/Display.vue';
 import { ERenderingMode } from '../../../../obs-api';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { metadata } from 'components/widgets/inputs';
+import commonStyles from './Common.m.less';
 import styles from './HardwareSetup.m.less';
 
 @Component({})
@@ -70,20 +71,22 @@ export default class HardwareSetup extends TsxComponent {
 
   render() {
     return (
-      <div class={styles.pageContainer}>
-        <h1>{$t('Setup Mic and Webcam')}</h1>
-        <div style="width: 60%;">
-          {this.displayRender}
+      <div style="width: 100%;">
+        <h1 class={commonStyles.titleContainer}>{$t('Setup Mic and Webcam')}</h1>
+        <div style="width: 40%; margin: auto;">
           {!!this.videoDevices.length && (
             <VFormGroup
-              metadata={metadata.list({
-                options: this.videoDevices,
-                title: $t('Select your webcam'),
-              })}
+              metadata={metadata.list({ options: this.videoDevices })}
               value={this.selectedVideoDevice}
               onInput={(id: string) => this.setVideoDevice(id)}
             />
           )}
+          {this.displayRender}
+          <VFormGroup
+            metadata={metadata.list({ options: this.audioDevices })}
+            value={this.selectedAudioDevice}
+            onInput={(id: string) => (this.selectedAudioDevice = id)}
+          />
           {this.defaultHardwareService.selectedAudioSource && (
             <div
               class={styles.volmeter}
@@ -96,11 +99,6 @@ export default class HardwareSetup extends TsxComponent {
               />
             </div>
           )}
-          <VFormGroup
-            metadata={metadata.list({ options: this.audioDevices, title: $t('Select your mic') })}
-            value={this.selectedAudioDevice}
-            onInput={(id: string) => (this.selectedAudioDevice = id)}
-          />
         </div>
       </div>
     );

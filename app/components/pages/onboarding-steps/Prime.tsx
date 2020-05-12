@@ -1,6 +1,7 @@
 import { Component } from 'vue-property-decorator';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { $t } from 'services/i18n';
+import commonStyles from './Common.m.less';
 import styles from './Prime.m.less';
 import { OnboardingStepProps } from '../Onboarding';
 import Translate from 'components/shared/translate';
@@ -45,7 +46,7 @@ export default class ChooseYourAdventure extends TsxComponent<OnboardingStepProp
   render() {
     return (
       <div style="width: 100%;">
-        <h1 class={styles.titleContainer}>
+        <h1 class={commonStyles.titleContainer}>
           <Translate message={$t('primeTitle')} scopedSlots={this.scopedSlots} />
         </h1>
         <div class={styles.primeCardContainer}>

@@ -9,18 +9,19 @@
 }
 
 .container {
-  display: flex;
+  display: grid;
+  gap: 24px 24px;
+  grid-template-columns: auto 33% auto;
+  grid-template-rows: auto auto;
+  grid-auto-flow: row;
+  padding: 40px;
   width: 100%;
-  justify-content: space-around;
-  flex-wrap: wrap;
 }
 
 .cell {
-  .radius();
+  .radius(2);
 
-  width: 250px;
   position: relative;
-  margin-top: 16px;
   overflow: hidden;
 
   &:hover {

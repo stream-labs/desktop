@@ -8,6 +8,7 @@ import { $t } from 'services/i18n';
 import { RestreamService } from 'services/restream';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { ToggleInput } from 'components/shared/inputs/inputs';
+import commonStyles from './Common.m.less';
 import styles from './Multistream.m.less';
 
 class MultistreamProps {
@@ -106,8 +107,8 @@ export default class Multistream extends TsxComponent<MultistreamProps> {
 
   render() {
     return (
-      <div class={styles.pageContainer}>
-        <h1>{$t('Multistream')}</h1>
+      <div>
+        <h1 class={commonStyles.titleContainer}>{$t('Multistream')}</h1>
         <div>
           {$t(
             'Enable multistream to grow your audience, build your brand, and earn great prizes - with no extra effort. Available for Facebook today, and other platforms coming soon.',

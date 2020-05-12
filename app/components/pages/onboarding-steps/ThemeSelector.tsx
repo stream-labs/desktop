@@ -4,6 +4,7 @@ import TsxComponent, { createProps } from 'components/tsx-component';
 import { $t } from 'services/i18n';
 import { Inject } from 'services';
 import { SceneCollectionsService } from 'services/scene-collections';
+import commonStyles from './Common.m.less';
 import styles from './ThemeSelector.m.less';
 
 class ThemeSelectorProps {
@@ -68,12 +69,9 @@ export default class ObsImport extends TsxComponent<ThemeSelectorProps> {
 
   render() {
     return (
-      <div class={styles.pageContainer}>
-        <h1>{$t('Add a Theme')}</h1>
+      <div>
+        <h1 class={commonStyles.titleContainer}>{$t('Add a Theme')}</h1>
         <div>
-          {$t(
-            'Not seeing a theme that catches your eye? Our theme library has hundreds of free choices available',
-          )}
           {!this.installing ? (
             <div class={styles.container}>
               {this.themesMetadata.map(theme => (

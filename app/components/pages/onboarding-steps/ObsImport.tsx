@@ -7,6 +7,7 @@ import { ObsImporterService } from 'services/obs-importer';
 import { ScenesService } from 'services/scenes';
 import defer from 'lodash/defer';
 import { $t } from 'services/i18n';
+import commonStyles from './Common.m.less';
 import styles from './ObsImport.m.less';
 
 class ObsImportProps {
@@ -140,7 +141,9 @@ export default class ObsImport extends TsxComponent<ObsImportProps> {
   render() {
     return (
       <div style="width: 100%;">
-        <h1>{$t('Importing Your Existing Settings From OBS')}</h1>
+        <h1 class={commonStyles.titleContainer}>
+          {$t('Importing Your Existing Settings From OBS')}
+        </h1>
         <div>
           {$t(
             'It takes about one minute to import your settings, so you have some time to look at some of our features',

@@ -3,6 +3,7 @@ import TsxComponent, { createProps } from 'components/tsx-component';
 import { Inject } from 'services/core/injector';
 import { $t } from 'services/i18n';
 import { OnboardingService } from 'services/onboarding';
+import commonStyles from './Common.m.less';
 import styles from './ChooseYourAdventure.m.less';
 import KevinSvg from 'components/shared/KevinSvg';
 import ObsSvg from './ObsSvg';
@@ -51,7 +52,7 @@ export default class ChooseYourAdventure extends TsxComponent<OnboardingStepProp
         <div class={styles.optionContainer}>
           {this.optionsMetadata.map(data => (
             <div
-              class={styles.optionCard}
+              class={commonStyles.optionCard}
               onClick={() => data.onClick()}
               vTooltip={{ content: data.description, placement: 'bottom' }}
               style={{ background: `var(${data.color})` }}
