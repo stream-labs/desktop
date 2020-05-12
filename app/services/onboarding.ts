@@ -73,7 +73,7 @@ const ONBOARDING_STEPS = () => ({
     element: onboardingSteps.Prime,
     disableControls: false,
     hideSkip: false,
-    hideButton: true,
+    hideButton: false,
     label: $t('Prime'),
   },
 });

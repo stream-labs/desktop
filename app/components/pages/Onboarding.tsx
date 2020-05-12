@@ -21,17 +21,17 @@ export default class OnboardingPage extends TsxComponent<{}> {
   currentStepIndex = 0;
   processing = false;
 
-  continue() {
+  continue(skipped?: boolean) {
     if (this.processing) return;
     if (this.currentStepIndex >= this.steps.length - 1 || this.singletonStep) {
-      return this.complete();
+      return this.complete(skipped);
     }
 
     this.currentStepIndex = this.currentStepIndex + 1;
   }
 
-  complete() {
-    this.linkToPrime();
+  complete(skipped?: boolean) {
+    if (!skipped) this.linkToPrime();
     this.onboardingService.finish();
   }
 
@@ -124,7 +124,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
         {(!this.currentStep.hideSkip || !this.currentStep.hideButton) && (
           <div class={styles.footer}>
             {!this.currentStep.hideSkip && (
-              <button class="button button--trans" onClick={() => this.continue()}>
+              <button class="button button--trans" onClick={() => this.continue(true)}>
                 {$t('Skip')}
               </button>
             )}
