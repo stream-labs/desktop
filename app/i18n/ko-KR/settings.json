@@ -12,7 +12,7 @@
   "Remote Control": "원격 제어",
   "Experimental": "Experimental",
   "Developer": "Developer",
-  "Facemasks": "Facemasks",
+  "Face Masks": "Face Masks",
   "Night mode": "야간 모드",
   "Game Overlay": "Game Overlay",
   "Installed Apps": "Installed Apps",
@@ -104,7 +104,11 @@
   "Show Recent Events": "Show Recent Events",
   "Overlay Opacity": "Overlay Opacity",
   "Named Pipe": "Named Pipe",
+  "Pipe Name": "Pipe Name",
   "Websockets": "Websockets",
+  "Enabled": "Enabled",
+  "Allow Remote Connections": "Allow Remote Connections",
+  "Port": "Port",
   "Audio - Track 1": "Audio - Track 1",
   "Audio - Track 2": "Audio - Track 2",
   "Audio - Track 3": "Audio - Track 3",
@@ -112,5 +116,6 @@
   "Audio - Track 5": "Audio - Track 5",
   "Audio - Track 6": "Audio - Track 6",
   "Stream Key": "Stream Key",
-  "You can not change these settings when you're live": "You can not change these settings when you're live"
+  "You can not change these settings when you're live": "You can not change these settings when you're live",
+  "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.": "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk."
 }

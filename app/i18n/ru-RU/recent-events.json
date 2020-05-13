@@ -48,5 +48,5 @@
   "Effects": "Эффекты",
   "has purchased %{product} from the store": "покупает %{product} в магазине",
   "Event Filters": "Фильтры событий",
-  "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, check out the Layout Editor in the sidebar.": "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, check out the Layout Editor in the sidebar."
+  "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, check out the Layout Editor in the sidebar.": "Мы объединили вкладки \"Редактор\" и \"Трансляция\" и обновили вид ленты событий. Чтобы переключиться к старому виду ленты событий, используйте редактор макета на боковой панели."
 }

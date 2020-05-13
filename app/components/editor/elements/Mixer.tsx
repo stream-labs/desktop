@@ -5,12 +5,14 @@ import MixerItem from 'components/MixerItem.vue';
 import { $t } from 'services/i18n';
 import { Menu } from 'util/menus/Menu';
 import { EditorCommandsService } from 'services/editor-commands';
-import TsxComponent from 'components/tsx-component';
+import BaseElement from './BaseElement';
 
 @Component({})
-export default class Mixer extends TsxComponent {
+export default class Mixer extends BaseElement {
   @Inject() audioService: AudioService;
   @Inject() editorCommandsService: EditorCommandsService;
+
+  mins = { x: 230, y: 150 };
 
   advancedSettingsTooltip = $t('Open advanced audio settings');
   mixerTooltip = $t('Monitor audio levels. If the bars are moving you are outputting audio.');
@@ -29,12 +31,12 @@ export default class Mixer extends TsxComponent {
   }
 
   get audioSources() {
-    return this.audioService.getSourcesForCurrentScene().filter(source => {
+    return this.audioService.views.sourcesForCurrentScene.filter(source => {
       return !source.mixerHidden;
     });
   }
 
-  render() {
+  get element() {
     return (
       <div onContextmenu={() => this.handleRightClick()}>
         <div class="studio-controls-top">
@@ -59,5 +61,9 @@ export default class Mixer extends TsxComponent {
         </div>
       </div>
     );
+  }
+
+  render() {
+    return this.renderElement();
   }
 }

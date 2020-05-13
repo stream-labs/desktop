@@ -9,7 +9,7 @@ import {
   MiniFeed,
   Display,
 } from 'components/editor/elements';
-import { LayoutService, ELayoutElement, ELayout, LayoutSlot } from 'services/layout';
+import { LayoutService, ELayoutElement, ELayout, IVec2Array } from 'services/layout';
 import { WindowsService } from 'services/windows';
 import * as Layouts from 'components/editor/layouts';
 import { IResizeMins } from 'components/editor/layouts/BaseLayout';
@@ -125,11 +125,11 @@ export default class Studio extends TsxComponent {
     this.setBarResize('bar2', functionalMax / 2);
   }
 
-  calculateMin(slots: (LayoutSlot | LayoutSlot[])[]) {
+  calculateMin(slots: IVec2Array) {
     return this.layoutService.calculateMinimum(this.isColumns ? 'x' : 'y', slots);
   }
 
-  totalWidthHandler(slots: (LayoutSlot | LayoutSlot[])[]) {
+  totalWidthHandler(slots: IVec2Array) {
     if (this.isColumns) {
       this.$emit('totalWidth', this.layoutService.calculateColumnTotal(slots));
     } else {
@@ -148,17 +148,17 @@ export default class Studio extends TsxComponent {
     return this.resizes.bar1 + this.resizes.bar2 <= max;
   }
 
-  setBarResize(bar: 'bar1' | 'bar2', size: number, mins?: IResizeMins) {
-    this.layoutService.setBarResize(bar, size);
+  async setBarResize(bar: 'bar1' | 'bar2', size: number, mins?: IResizeMins) {
+    await this.layoutService.actions.return.setBarResize(bar, size);
     if (mins) this.reconcileSizeWithinContraints(mins);
   }
 
   resizeStartHandler() {
-    this.windowsService.updateStyleBlockers('main', true);
+    this.windowsService.actions.updateStyleBlockers('main', true);
   }
 
   resizeStopHandler() {
-    this.windowsService.updateStyleBlockers('main', false);
+    this.windowsService.actions.updateStyleBlockers('main', false);
   }
 
   render() {
@@ -167,7 +167,7 @@ export default class Studio extends TsxComponent {
       <Layout
         resizeStartHandler={() => this.resizeStartHandler()}
         resizeStopHandler={() => this.resizeStopHandler()}
-        calculateMin={(slots: LayoutSlot[]) => this.calculateMin(slots)}
+        calculateMin={(slots: IVec2[]) => this.calculateMin(slots)}
         calculateMax={(min: number) => this.calculateMax(min)}
         setBarResize={(bar: 'bar1' | 'bar2', size: number, mins?: IResizeMins) =>
           this.setBarResize(bar, size, mins)
@@ -178,7 +178,7 @@ export default class Studio extends TsxComponent {
         resizes={this.resizes}
         class="editor-page"
         elWidth={this.elWidth}
-        onTotalWidth={(slots: (LayoutSlot | LayoutSlot[])[]) => this.totalWidthHandler(slots)}
+        onTotalWidth={(slots: IVec2Array) => this.totalWidthHandler(slots)}
       >
         {Object.keys(this.layoutService.state.slottedElements).map(widget => {
           const Element = COMPONENT_MAP[widget];

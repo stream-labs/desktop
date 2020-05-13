@@ -42,11 +42,11 @@ export class SourcesModule extends Module {
   constructor() {
     super();
     this.sourcesService.sourceAdded.subscribe(sourceData => {
-      const source = this.sourcesService.getSourceById(sourceData.sourceId);
+      const source = this.sourcesService.views.getSource(sourceData.sourceId);
       this.sourceAdded.next(this.serializeSource(source));
     });
     this.sourcesService.sourceUpdated.subscribe(sourceData => {
-      const source = this.sourcesService.getSourceById(sourceData.sourceId);
+      const source = this.sourcesService.views.getSource(sourceData.sourceId);
       this.sourceUpdated.next(this.serializeSource(source));
     });
     this.sourcesService.sourceRemoved.subscribe(sourceData => {
@@ -70,12 +70,12 @@ export class SourcesModule extends Module {
 
   @apiMethod()
   getSources() {
-    return this.sourcesService.getSources().map(source => this.serializeSource(source));
+    return this.sourcesService.views.getSources().map(source => this.serializeSource(source));
   }
 
   @apiMethod()
   getSource(_ctx: IApiContext, id: string): ISource | null {
-    const source = this.sourcesService.getSource(id);
+    const source = this.sourcesService.views.getSource(id);
 
     return source ? this.serializeSource(source) : null;
   }
@@ -104,7 +104,7 @@ export class SourcesModule extends Module {
   }
 
   private getAppSourceForApp(sourceId: string, appId: string) {
-    const source = this.sourcesService.getSource(sourceId);
+    const source = this.sourcesService.views.getSource(sourceId);
 
     if (!source) {
       throw new Error(`The source with id ${sourceId} does not exist!`);
@@ -149,25 +149,25 @@ export class SourcesModule extends Module {
     const requiredKeys = ['id'];
     this.validatePatch(requiredKeys, patch);
 
-    const source = this.sourcesService.getSource(patch.id);
+    const source = this.sourcesService.views.getSource(patch.id);
 
     if (patch.name) {
       source.setName(patch.name);
     }
 
     if (patch.muted != null) {
-      this.audioService.getSource(patch.id).setMuted(patch.muted);
+      this.audioService.views.getSource(patch.id).setMuted(patch.muted);
     }
 
     if (patch.volume != null) {
-      this.audioService.getSource(patch.id).setDeflection(patch.volume);
+      this.audioService.views.getSource(patch.id).setDeflection(patch.volume);
     }
   }
 
   @apiMethod()
   removeSource(ctx: IApiContext, sourceId: string) {
     // Make sure this source doesn't exist in any scenes
-    const item = this.scenesService.getSceneItems().find(sceneItem => {
+    const item = this.scenesService.views.getSceneItems().find(sceneItem => {
       return sceneItem.sourceId === sourceId;
     });
 
@@ -180,12 +180,12 @@ export class SourcesModule extends Module {
 
   @apiMethod()
   getObsSettings(ctx: IApiContext, sourceId: string) {
-    return this.sourcesService.getSource(sourceId).getSettings();
+    return this.sourcesService.views.getSource(sourceId).getSettings();
   }
 
   @apiMethod()
   setObsSettings(ctx: IApiContext, sourceId: string, settingsPatch: Dictionary<any>) {
-    return this.sourcesService.getSource(sourceId).updateSettings(settingsPatch);
+    return this.sourcesService.views.getSource(sourceId).updateSettings(settingsPatch);
   }
 
   private serializeSource(source: Source): ISource {
@@ -212,7 +212,7 @@ export class SourcesModule extends Module {
     }
 
     if (source.audio) {
-      const audioSource = this.audioService.getSource(source.sourceId);
+      const audioSource = this.audioService.views.getSource(source.sourceId);
       serialized.volume = audioSource.fader.deflection;
       serialized.muted = audioSource.muted;
     }

@@ -12,7 +12,7 @@
   "The boss will spawn with the set amount of health everytime.": "Il boss sarà generato ogni volta con lo stato di salute impostato.",
   "Incremental": "Incrementale",
   "Overkill": "Overkill",
-  "Fade Time (s)": "Tempo di dissolvenza",
+  "Fade Time (s)": "Tempo di dissolvenza (s)",
   "Set to 0 to always appear on screen": "Imposta su 0 per mostrare sempre sullo schermo",
   "Damage From Boss Heals": "Guarigione danno boss",
   "Theme": "Tema",

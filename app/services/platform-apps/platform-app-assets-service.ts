@@ -238,7 +238,7 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
     if (url.parse(assetPathOrUrl).protocol) return assetPathOrUrl;
 
     // This is a relative path instead
-    return this.platformAppsService.getAssetUrl(appId, assetPathOrUrl);
+    return this.platformAppsService.views.getAssetUrl(appId, assetPathOrUrl);
   }
 
   @mutation()
@@ -280,7 +280,7 @@ export class PlatformAppAssetsService extends PersistentStatefulService<AssetsSe
   }
 
   private getApp(appId: string): ILoadedApp {
-    const app = this.platformAppsService.getApp(appId);
+    const app = this.platformAppsService.views.getApp(appId);
 
     if (!app) {
       throw new Error(`Invalid app: ${appId}`);

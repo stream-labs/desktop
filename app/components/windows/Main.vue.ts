@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import SideNav from '../SideNav';
 import NewsBanner from '../NewsBanner';
 import { ScenesService } from 'services/scenes';
@@ -65,19 +65,28 @@ export default class Main extends Vue {
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() editorCommandsService: EditorCommandsService;
 
-  mounted() {
-    const dockWidth = this.customizationService.state.livedockSize;
-    if (dockWidth < 1) {
-      // migrate from old percentage value to the pixel value
-      this.resetWidth();
-    }
+  created() {
+    window.addEventListener('resize', this.windowSizeHandler);
+  }
 
-    electron.remote.getCurrentWindow().show();
+  get bulkLoadFinished() {
+    return this.$store.state.bulkLoadFinished;
+  }
 
-    const metricsService: MetricsService = MetricsService.instance;
-    metricsService.recordMetric('mainWindowShowTime', Date.now());
+  @Watch('bulkLoadFinished')
+  initializeResize() {
+    this.$nextTick(() => {
+      const dockWidth = this.customizationService.state.livedockSize;
+      if (dockWidth < 1) {
+        // migrate from old percentage value to the pixel value
+        this.resetWidth();
+      }
+      this.handleResize();
+    });
+  }
 
-    this.handleResize();
+  destroyed() {
+    window.removeEventListener('resize', this.windowSizeHandler);
   }
 
   minEditorWidth = 500;
@@ -95,7 +104,11 @@ export default class Main extends Vue {
   }
 
   get theme() {
-    return this.customizationService.currentTheme;
+    if (this.$store.state.bulkLoadFinished) {
+      return this.customizationService.currentTheme;
+    }
+
+    return 'night-theme';
   }
 
   get applicationLoading() {
@@ -109,7 +122,7 @@ export default class Main extends Vue {
   }
 
   get isLoggedIn() {
-    return this.userService.isLoggedIn();
+    return this.userService.isLoggedIn;
   }
 
   get renderDock() {
@@ -188,7 +201,7 @@ export default class Main extends Vue {
   executeFileDrop(files: string[]) {
     this.editorCommandsService.executeCommand(
       'AddFilesCommand',
-      this.scenesService.activeSceneId,
+      this.scenesService.views.activeSceneId,
       files,
     );
   }
@@ -207,14 +220,6 @@ export default class Main extends Vue {
     }
 
     return classes.join(' ');
-  }
-
-  created() {
-    window.addEventListener('resize', this.windowSizeHandler);
-  }
-
-  destroyed() {
-    window.removeEventListener('resize', this.windowSizeHandler);
   }
 
   windowWidth: number;
@@ -236,7 +241,7 @@ export default class Main extends Vue {
       this.hasLiveDock = this.windowWidth >= this.minEditorWidth + 100;
     }
     this.windowResizeTimeout = window.setTimeout(
-      () => this.windowsService.updateStyleBlockers('main', false),
+      () => this.windowsService.actions.updateStyleBlockers('main', false),
       200,
     );
   }
@@ -250,17 +255,17 @@ export default class Main extends Vue {
   }
 
   onResizeStartHandler() {
-    this.windowsService.updateStyleBlockers('main', true);
+    this.windowsService.actions.updateStyleBlockers('main', true);
   }
 
   onResizeStopHandler(offset: number) {
     const adjustedOffset = this.leftDock ? offset : -offset;
     this.setWidth(this.customizationService.state.livedockSize + adjustedOffset);
-    this.windowsService.updateStyleBlockers('main', false);
+    this.windowsService.actions.updateStyleBlockers('main', false);
   }
 
   setWidth(width: number) {
-    this.customizationService.setSettings({
+    this.customizationService.actions.setSettings({
       livedockSize: this.validateWidth(width),
     });
   }

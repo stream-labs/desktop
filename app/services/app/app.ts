@@ -5,7 +5,7 @@ import { HotkeysService } from 'services/hotkeys';
 import { UserService } from 'services/user';
 import { ShortcutsService } from 'services/shortcuts';
 import { Inject } from 'services/core/injector';
-import electron from 'electron';
+import electron, { ipcRenderer } from 'electron';
 import { TransitionsService } from 'services/transitions';
 import { SourcesService } from 'services/sources';
 import { ScenesService } from 'services/scenes';
@@ -33,6 +33,8 @@ import { RunInLoadingMode } from './app-decorators';
 import { RecentEventsService } from 'services/recent-events';
 import Utils from 'services/utils';
 import { Subject } from 'rxjs';
+import { I18nService } from 'services/i18n';
+import { DismissablesService } from 'services/dismissables';
 import { RestreamService } from 'services/restream';
 import { downloadFile } from '../../util/requests';
 import { MetricsService } from '../metrics';
@@ -89,6 +91,8 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private announcementsService: AnnouncementsService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private recentEventsService: RecentEventsService;
+  @Inject() private i18nService: I18nService;
+  @Inject() private dismissablesService: DismissablesService;
   @Inject() private restreamService: RestreamService;
   @Inject() private metricsService: MetricsService;
 
@@ -104,6 +108,8 @@ export class AppService extends StatefulService<IAppState> {
         this.SET_ERROR_ALERT(true);
       });
     }
+
+    await this.i18nService.load();
 
     // perform several concurrent http requests
     await Promise.all([
@@ -123,13 +129,14 @@ export class AppService extends StatefulService<IAppState> {
     // with a particular user if possible.
     this.crashReporterService.beginStartup();
 
-    if (!this.userService.isLoggedIn()) {
+    if (!this.userService.isLoggedIn) {
       // If this user is logged in, this would have already happened as part of login
       // TODO: We should come up with a better way to handle this.
       await this.sceneCollectionsService.initialize();
     }
 
     this.SET_ONBOARDED(this.onboardingService.startOnboardingIfRequired());
+    this.dismissablesService.initialize();
 
     electron.ipcRenderer.on('shutdown', () => {
       electron.ipcRenderer.send('acknowledgeShutdown');
@@ -147,6 +154,8 @@ export class AppService extends StatefulService<IAppState> {
     this.crashReporterService.endStartup();
 
     this.protocolLinksService.start(this.state.argv);
+
+    ipcRenderer.send('AppInitFinished');
     this.metricsService.recordMetric('sceneCollectionLoadingTime');
   }
 

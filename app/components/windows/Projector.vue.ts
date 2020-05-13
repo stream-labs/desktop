@@ -4,7 +4,7 @@ import ModalLayout from 'components/ModalLayout.vue';
 import Display from 'components/shared/Display.vue';
 import { Inject } from 'services/core/injector';
 import { WindowsService } from 'services/windows';
-import { ISourcesServiceApi } from 'services/sources';
+import { SourcesService } from 'services/sources';
 import electron from 'electron';
 import Util from 'services/utils';
 import { Subscription } from 'rxjs';
@@ -17,7 +17,7 @@ import { Subscription } from 'rxjs';
 })
 export default class Projector extends Vue {
   @Inject() windowsService: WindowsService;
-  @Inject() sourcesService: ISourcesServiceApi;
+  @Inject() sourcesService: SourcesService;
 
   oldBounds: electron.Rectangle;
 

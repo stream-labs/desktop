@@ -327,6 +327,7 @@ test('Go live error', async t => {
   skipCheckingErrorsInLog();
 
   // open EditStreamInfo window
+  await focusMain(t);
   await app.client.click('button=Go Live');
   await focusChild(t);
 
@@ -337,7 +338,7 @@ test('Go live error', async t => {
   await resetFetchMock(t);
   await focusChild(t);
   await app.client.click('a=fetching the information again');
-  await app.client.waitForVisible('button=Confirm & Go Live');
+  await app.client.waitForEnabled('button=Confirm & Go Live');
 
   // test the case when the channel info has been successful fetched but can't be updated
   await fetchMock(t, /api\.twitch\.tv/, 404);

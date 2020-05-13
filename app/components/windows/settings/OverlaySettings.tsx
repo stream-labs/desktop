@@ -81,8 +81,49 @@ export default class OverlaySettings extends Vue {
 
     this.busy = true;
 
-    this.widgetsService.loadWidgetFile(chosenPath[0], this.scenesService.activeSceneId).then(() => {
-      this.busy = false;
-    });
+    this.widgetsService
+      .loadWidgetFile(chosenPath[0], this.scenesService.views.activeSceneId)
+      .then(() => {
+        this.busy = false;
+      });
+  }
+
+  button(title: string, fn: () => void) {
+    return (
+      <button class="button button--action" disabled={this.busy} onClick={fn}>
+        {title}
+        {this.busy && <i class="fa fa-spinner fa-pulse" />}
+      </button>
+    );
+  }
+
+  render() {
+    return (
+      <div>
+        <div class="section">
+          <p>
+            {$t(
+              'This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.',
+            )}
+          </p>
+          {this.button($t('Export Overlay File'), () => this.saveOverlay())}
+          {this.button($t('Import Overlay File'), () => this.loadOverlay())}
+          <br />
+          {this.message}
+        </div>
+        <div class="section">
+          {this.button($t('Import Widget File in Current Scene'), () => this.loadWidget())}
+        </div>
+        <div class="section">
+          <div class="section-content">
+            <BoolInput
+              vModel={this.mediaBackupOptOut}
+              title={$t('Do not back up my media files in the cloud (requires app restart)')}
+              name="media_backup_opt_out"
+            />
+          </div>
+        </div>
+      </div>
+    );
   }
 }

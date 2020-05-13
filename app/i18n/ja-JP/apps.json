@@ -1,6 +1,6 @@
 {
   "Vers": "バージョン",
-  "Reload": "リロード",
-  "Unpacked vers loaded": "解凍済みのバージョンがロードされました",
-  "You must unload unpacked version before enabling this app.": "アプリを有効化する前に解凍したバージョンをアンロードする必要があります"
+  "Reload": "再読み込み",
+  "Unpacked vers loaded": "解凍されたバージョンがロードされました",
+  "You must unload unpacked version before enabling this app.": "このアプリを有効化する前に、解凍されたバージョンをアンロードする必要があります。"
 }

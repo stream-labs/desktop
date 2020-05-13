@@ -46,8 +46,9 @@ export default class StartStreamingButton extends Vue {
 
       const needToShowNoSourcesWarning =
         this.streamSettingsService.settings.warnNoVideoSources &&
-        this.sourcesService.getSources().filter(source => source.type !== 'scene' && source.video)
-          .length === 0;
+        this.sourcesService.views
+          .getSources()
+          .filter(source => source.type !== 'scene' && source.video).length === 0;
 
       if (needToShowNoSourcesWarning) {
         const goLive = await electron.remote.dialog
@@ -90,7 +91,7 @@ export default class StartStreamingButton extends Vue {
   }
 
   shouldShowGoLiveWindow() {
-    if (!this.userService.isLoggedIn()) return false;
+    if (!this.userService.isLoggedIn) return false;
 
     if (this.isTwitch) {
       // For Twitch, we can show the Go Live window even with protected mode off
@@ -161,19 +162,19 @@ export default class StartStreamingButton extends Vue {
   }
 
   get isFacebook() {
-    return this.userService.isLoggedIn() && this.userService.platformType === 'facebook';
+    return this.userService.isLoggedIn && this.userService.platformType === 'facebook';
   }
 
   get isYoutube() {
-    return this.userService.isLoggedIn() && this.userService.platformType === 'youtube';
+    return this.userService.isLoggedIn && this.userService.platformType === 'youtube';
   }
 
   get isTwitch() {
-    return this.userService.isLoggedIn() && this.userService.platformType === 'twitch';
+    return this.userService.isLoggedIn && this.userService.platformType === 'twitch';
   }
 
   get isMixer() {
-    return this.userService.isLoggedIn() && this.userService.platformType === 'mixer';
+    return this.userService.isLoggedIn && this.userService.platformType === 'mixer';
   }
 
   get isDisabled() {
