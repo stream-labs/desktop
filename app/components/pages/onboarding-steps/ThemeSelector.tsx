@@ -7,7 +7,7 @@ import { Inject } from 'services';
 import { SceneCollectionsService } from 'services/scene-collections';
 import commonStyles from './Common.m.less';
 import styles from './ThemeSelector.m.less';
-import { throttleSetter } from 'lodash-decorators';
+import { OnboardingService } from 'services/onboarding';
 
 class ThemeSelectorProps {
   continue: () => void = () => {};
@@ -17,65 +17,36 @@ class ThemeSelectorProps {
 @Component({ props: createProps(ThemeSelectorProps) })
 export default class ObsImport extends TsxComponent<ThemeSelectorProps> {
   @Inject() sceneCollectionsService: SceneCollectionsService;
+  @Inject() onboardingService: OnboardingService;
 
   installing = false;
   showDetail: string = null;
   progress = 0;
+  // Bad typing until we get typechecked APIs
+  themesMetadata: any[] = [];
 
-  get themesMetadata() {
-    return [
-      {
-        title: 'Borderline [Red Yellow] - by Nerd or Die',
-        url: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/ea91062/ea91062.overlay',
-        thumbnail: 'borderline',
-        detail: {},
-      },
-      {
-        title: 'Dark Matter by VBI',
-        url: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/3205db0/3205db0.overlay',
-        thumbnail: 'darkmatter',
-        detail: {},
-      },
-      {
-        title: 'Geometic Madness',
-        url: 'https://cdn.streamlabs.com/marketplace/overlays/2116872/17f7cb5/17f7cb5.overlay',
-        thumbnail: 'geometric',
-        detail: {},
-      },
-      {
-        title: 'Nexus',
-        url: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/dd96270/dd96270.overlay',
-        thumbnail: 'nexus',
-        detail: {},
-      },
-      {
-        title: 'Relative Minds',
-        url: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/0d2e611/0d2e611.overlay',
-        thumbnail: 'relativeminds',
-        detail: {},
-      },
-      {
-        title: 'Facebook Gaming Pure Hexagons',
-        url: 'https://cdn.streamlabs.com/marketplace/overlays/8062844/4a0582e/4a0582e.overlay',
-        thumbnail: 'purehexagon',
-        detail: {},
-      },
-    ];
-  }
-
-  get detailInfo() {
-    const index = this.themesMetadata.findIndex(data => data.title === this.showDetail);
-    if (index === -1) return null;
-    return { index, ...this.themesMetadata[index] };
+  async mounted() {
+    this.themesMetadata = await this.onboardingService.fetchThemes();
   }
 
   get filteredMetadata() {
-    if (!this.detailInfo) return this.themesMetadata;
-    if ([2, 5].includes(this.detailInfo.index)) {
+    if (!this.showDetail) return this.themesMetadata;
+    if ([2, 5].includes(this.detailIndex)) {
       return [this.themesMetadata[0], this.themesMetadata[3]];
     } else {
       return [this.themesMetadata[2], this.themesMetadata[5]];
     }
+  }
+
+  get detailIndex() {
+    return this.themesMetadata.findIndex(theme => theme.data.id === this.showDetail);
+  }
+
+  thumbnail(theme: any) {
+    if (!theme) return '';
+    return Object.values(theme.custom_images).find((img: string) =>
+      /\.png$|\.jpg$|\.jpeg$/.test(img),
+    );
   }
 
   focusTheme(title: string) {
@@ -103,19 +74,16 @@ export default class ObsImport extends TsxComponent<ThemeSelectorProps> {
           {!this.installing ? (
             <div class={styles.container}>
               {this.filteredMetadata.map(theme => (
-                <div class={styles.cell} onClick={() => this.focusTheme(theme.title)}>
-                  <img
-                    class={styles.thumbnail}
-                    src={require(`../../../../media/images/onboarding/${theme.thumbnail}.png`)}
-                  />
-                  <div class={styles.title}>{theme.title}</div>
+                <div class={styles.cell} onClick={() => this.focusTheme(theme.data.id)}>
+                  <img class={styles.thumbnail} src={this.thumbnail(theme.data)} />
+                  <div class={styles.title}>{theme.data.name}</div>
                 </div>
               ))}
               {this.showDetail && (
                 <div
                   class={cx(
                     styles.detailPanel,
-                    [2, 5].includes(this.detailInfo.index) ? styles.right : styles.left,
+                    [2, 5].includes(this.detailIndex) ? styles.right : styles.left,
                   )}
                   onClick={() => this.focusTheme(null)}
                 >

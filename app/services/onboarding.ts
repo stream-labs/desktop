@@ -7,6 +7,7 @@ import * as onboardingSteps from 'components/pages/onboarding-steps';
 import TsxComponent from 'components/tsx-component';
 import { OS } from 'util/operating-systems';
 import { $t } from './i18n';
+import { handleResponse } from 'util/requests';
 
 enum EOnboardingSteps {
   MacPermissions = 'MacPermissions',
@@ -77,6 +78,33 @@ const ONBOARDING_STEPS = () => ({
     label: $t('Prime'),
   },
 });
+
+const THEME_METADATA = [
+  {
+    id: '1246',
+    url: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/ea91062/ea91062.overlay',
+  },
+  {
+    id: '1248',
+    url: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/3205db0/3205db0.overlay',
+  },
+  {
+    id: '668',
+    url: 'https://cdn.streamlabs.com/marketplace/overlays/2116872/17f7cb5/17f7cb5.overlay',
+  },
+  {
+    id: '1144',
+    url: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/dd96270/dd96270.overlay',
+  },
+  {
+    id: '1100',
+    url: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/0d2e611/0d2e611.overlay',
+  },
+  {
+    id: '1190',
+    url: 'https://cdn.streamlabs.com/marketplace/overlays/8062844/4a0582e/4a0582e.overlay',
+  },
+];
 
 interface IOnboardingStep {
   element: typeof TsxComponent;
@@ -169,6 +197,15 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   @mutation()
   SET_EXISTING_COLLECTIONS(val: boolean) {
     // this.state.existingSceneCollections = val;
+  }
+
+  async fetchThemeData(id: string) {
+    const url = `https://overlays.streamlabs.com/api/overlay/${id}`;
+    return await fetch(new Request(url)).then(handleResponse);
+  }
+
+  async fetchThemes() {
+    return await Promise.all(THEME_METADATA.map(theme => this.fetchThemeData(theme.id)));
   }
 
   get views() {
