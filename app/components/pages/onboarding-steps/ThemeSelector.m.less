@@ -43,9 +43,43 @@
   grid-column: 1 / span 2;
   grid-row: 1 / span 2;
   background: var(--section);
+  padding: 16px;
+
+  h1 {
+    margin-bottom: 0;
+  }
 }
 
 .detail-panel.right {
   grid-column: 2 / span 2;
   grid-row: 1 / span 2;
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: calc(75% - 16px) calc(25% - 16px);
+  grid-template-rows: auto auto auto;
+  gap: 8px 16px;
+  grid-auto-flow: row;
+  width: 100%;
+  margin-top: 32px;
+}
+
+.big-preview {
+  grid-column: 1 / span 1;
+  grid-row: 1 / span 3;
+  border-radius: 8px;
+}
+
+.preview {
+  border-radius: 8px;
+  box-sizing: border-box;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.preview.active {
+  border: 1px solid var(--teal);
 }

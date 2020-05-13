@@ -208,6 +208,10 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     return await Promise.all(THEME_METADATA.map(theme => this.fetchThemeData(theme.id)));
   }
 
+  themeUrl(id: string) {
+    return THEME_METADATA.find(theme => theme.id === id)?.url;
+  }
+
   get views() {
     return new OnboardingViews(this.state);
   }

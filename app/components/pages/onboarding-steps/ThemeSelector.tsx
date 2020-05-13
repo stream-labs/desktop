@@ -15,15 +15,16 @@ class ThemeSelectorProps {
 }
 
 @Component({ props: createProps(ThemeSelectorProps) })
-export default class ObsImport extends TsxComponent<ThemeSelectorProps> {
+export default class ThemeSelector extends TsxComponent<ThemeSelectorProps> {
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() onboardingService: OnboardingService;
 
   installing = false;
   showDetail: string = null;
+  bigPreview: string = null;
   progress = 0;
   // Bad typing until we get typechecked APIs
-  themesMetadata: any[] = [];
+  themesMetadata: Array<any> = [];
 
   async mounted() {
     this.themesMetadata = await this.onboardingService.fetchThemes();
@@ -42,18 +43,53 @@ export default class ObsImport extends TsxComponent<ThemeSelectorProps> {
     return this.themesMetadata.findIndex(theme => theme.data.id === this.showDetail);
   }
 
-  thumbnail(theme: any) {
-    if (!theme) return '';
-    return Object.values(theme.custom_images).find((img: string) =>
-      /\.png$|\.jpg$|\.jpeg$/.test(img),
+  get detailTheme() {
+    return this.themesMetadata[this.detailIndex];
+  }
+
+  preview(src: string, className: string) {
+    const isVideo = /\.mp4$/.test(src);
+    return isVideo ? (
+      <video
+        autoplay
+        muted
+        loop
+        src={src}
+        class={className}
+        onClick={(e: MouseEvent) => this.focusPreview(e, src)}
+      />
+    ) : (
+      <img src={src} class={className} onClick={(e: MouseEvent) => this.focusPreview(e, src)} />
     );
   }
 
-  focusTheme(title: string) {
-    this.showDetail = title;
+  focusPreview(event: MouseEvent, src: string) {
+    event.stopPropagation();
+    this.bigPreview = src;
   }
 
-  async installTheme(url: string, name: string) {
+  thumbnail(theme: any) {
+    return this.previewImages(theme).find((img: string) => /\.png$|\.jpg$|\.jpeg$/.test(img));
+  }
+
+  focusTheme(theme: any) {
+    if (!theme) {
+      this.showDetail = null;
+      this.bigPreview = null;
+    } else {
+      this.showDetail = theme.data.id;
+      this.bigPreview = this.previewImages(theme)[0];
+    }
+  }
+
+  previewImages(theme: any): Array<string> {
+    if (!theme?.data) return [];
+    return (Object.values(theme.data.custom_images) as Array<string>).slice(0, 3);
+  }
+
+  async installTheme(event: MouseEvent) {
+    event.stopPropagation();
+    const url = this.onboardingService.themeUrl(this.detailTheme.data.id);
     this.installing = true;
     this.props.setProcessing(true);
     const sub = this.sceneCollectionsService.downloadProgress.subscribe(
@@ -74,8 +110,8 @@ export default class ObsImport extends TsxComponent<ThemeSelectorProps> {
           {!this.installing ? (
             <div class={styles.container}>
               {this.filteredMetadata.map(theme => (
-                <div class={styles.cell} onClick={() => this.focusTheme(theme.data.id)}>
-                  <img class={styles.thumbnail} src={this.thumbnail(theme.data)} />
+                <div class={styles.cell} onClick={() => this.focusTheme(theme)}>
+                  <img class={styles.thumbnail} src={this.thumbnail(theme)} />
                   <div class={styles.title}>{theme.data.name}</div>
                 </div>
               ))}
@@ -87,7 +123,24 @@ export default class ObsImport extends TsxComponent<ThemeSelectorProps> {
                   )}
                   onClick={() => this.focusTheme(null)}
                 >
-                  {/* <img /> */}
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h1>{this.detailTheme.data.name}</h1>
+                    <button
+                      class="button button--action"
+                      onClick={(e: MouseEvent) => this.installTheme(e)}
+                    >
+                      {$t('Install')}
+                    </button>
+                  </div>
+                  <div class={styles.previewGrid}>
+                    {this.preview(this.bigPreview, styles.bigPreview)}
+                    {this.previewImages(this.detailTheme).map((src: string) =>
+                      this.preview(
+                        src,
+                        cx(styles.preview, { [styles.active]: src === this.bigPreview }),
+                      ),
+                    )}
+                  </div>
                 </div>
               )}
             </div>
