@@ -36,21 +36,27 @@ test('Go through the onboarding and autoconfig', async t => {
   }
 
   // Skip hardware config
-  if (await t.context.app.client.isExisting('p=Skip')) {
-    await t.context.app.client.click('p=Skip');
+  if (await t.context.app.client.isExisting('button=Skip')) {
+    await t.context.app.client.click('button=Skip');
     await sleep(1000);
   }
 
   // Skip picking a theme
-  if (await t.context.app.client.isExisting('p=Skip')) {
-    await t.context.app.client.click('p=Skip');
+  if (await t.context.app.client.isExisting('button=Skip')) {
+    await t.context.app.client.click('button=Skip');
     await sleep(1000);
   }
 
   // Start auto config
   t.true(await app.client.isExisting('button=Start'));
   await app.client.click('button=Start');
-  await app.client.waitForVisible('h2=Sources', 60000);
+  await app.client.waitForVisible('h2=Overlay, Widget & Site Themes', 60000);
+
+  // Skip purchasing prime
+  if (await t.context.app.client.isExisting('button=Skip')) {
+    await t.context.app.client.click('button=Skip');
+    await sleep(1000);
+  }
 
   // success?
   t.true(await app.client.isVisible('h2=Sources'), 'Sources selector is visible');
@@ -74,12 +80,19 @@ test('OBS Importer', async t => {
   // import from OBS
   if (await t.context.app.client.isExisting('h2=Import from OBS')) {
     await t.context.app.client.click('h2=Import from OBS');
+    await t.context.app.client.click('h2=Start');
     await sleep(10000);
   }
 
-  // Complete onboarding
-  if (await t.context.app.client.isExisting('button=Complete')) {
-    await t.context.app.client.click('button=Complete');
+  // Skip choosing a theme
+  if (await t.context.app.client.isExisting('button=Skip')) {
+    await t.context.app.client.click('button=Skip');
+    await sleep(1000);
+  }
+
+  // Skip purchasing prime
+  if (await t.context.app.client.isExisting('button=Skip')) {
+    await t.context.app.client.click('button=Skip');
     await sleep(1000);
   }
 

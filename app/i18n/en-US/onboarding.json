@@ -42,9 +42,7 @@
   "Streamlabs OBS is ready to go": "Streamlabs OBS is ready to go",
   "Download and Apply": "Download and Apply",
   "This device is not available": "This device is not available",
-  "Select your mic": "Select your mic",
-  "Select your webcam": "Select your webcam",
-  "Setup Mic and Webcam": "Setup Mic and Webcam",
+  "Set Up Mic and Webcam": "Set Up Mic and Webcam",
   "Sign in with your streaming account to get started with Streamlabs OBS": "Sign in with your streaming account to get started with Streamlabs OBS",
   "Welcome to Streamlabs OBS": "Welcome to Streamlabs OBS",
   "Import your existing settings from OBS in less than a minute and go live": "Import your existing settings from OBS in less than a minute and go live",
@@ -85,5 +83,8 @@
   "Custom Merch Store": "Custom Merch Store",
   "Stream on Mobile": "Stream on Mobile",
   "Gold Status + FREE T-shirt": "Gold Status + FREE T-shirt",
-  "Go Prime": "Go Prime"
+  "Go Prime": "Go Prime",
+  "Import": "Import",
+  "It takes up to one minute to import your settings, so you have some time to look at some of our features": "It takes up to one minute to import your settings, so you have some time to look at some of our features",
+  "Importing Your Existing Settings From OBS": "Importing Your Existing Settings From OBS"
 }

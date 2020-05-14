@@ -105,6 +105,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
       <button
         class={cx('button button--action', { ['button--prime']: isPrimeStep })}
         onClick={() => this.continue()}
+        disabled={this.processing}
       >
         {isPrimeStep ? $t('Go Prime') : $t('Continue')}
       </button>
@@ -124,7 +125,11 @@ export default class OnboardingPage extends TsxComponent<{}> {
         {(!this.currentStep.hideSkip || !this.currentStep.hideButton) && (
           <div class={styles.footer}>
             {!this.currentStep.hideSkip && (
-              <button class="button button--trans" onClick={() => this.continue(true)}>
+              <button
+                class="button button--trans"
+                onClick={() => this.continue(true)}
+                disabled={this.processing}
+              >
                 {$t('Skip')}
               </button>
             )}

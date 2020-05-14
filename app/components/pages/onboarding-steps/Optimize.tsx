@@ -1,6 +1,6 @@
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { Component } from 'vue-property-decorator';
-import { ProgressBar } from 'streamlabs-beaker';
+import SmoothProgressBar from 'components/shared/SmoothProgressBar';
 import { Inject } from 'services/core/injector';
 import { AutoConfigService, IConfigProgress } from 'services/auto-config';
 import { $t } from 'services/i18n';
@@ -105,7 +105,7 @@ export default class Optimize extends TsxComponent<OptimizeProps> {
         </div>
         {this.optimizing ? (
           <div>
-            <ProgressBar progressComplete={Math.floor(this.percentage * 100)} />
+            <SmoothProgressBar value={this.percentage} timeLimit={1000 * 60} />
             <span>{this.stepInfo && this.stepInfo.summary}</span>
           </div>
         ) : (

@@ -31,14 +31,6 @@
   }
 }
 
-.page-container {
-  position: absolute;
-  width: 800px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
 .profile-select--title,
 .profile-select {
   margin-bottom: 8px;
@@ -47,4 +39,32 @@
 
 .profile-select {
   width: 30%;
+}
+
+.text-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 40px;
+}
+
+.text-container svg {
+  width: auto;
+  height: 40px;
+  padding: 10px;
+  margin-right: 32px;
+  margin-bottom: 24px;
+  overflow: visible;
+
+  path {
+    opacity: 1;
+    fill: var(--paragraph);
+  }
+}
+
+.progress-bar {
+  position: relative;
+  display: block !important;
+  width: 80% !important;
+  margin: 0 auto;
 }
