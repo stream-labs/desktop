@@ -24,7 +24,7 @@ test('Onboarding steps', async t => {
   await makeScreenshots(t, 'Start fresh or import from OBS');
   await app.client.click('h2=Start Fresh');
 
-  await app.client.waitForVisible('h1=Setup Mic and Webcam');
+  await app.client.waitForVisible('h1=Set Up Mic and Webcam');
   await makeScreenshots(t, 'Setup Mic and Webcam');
   await app.client.click('button=Skip');
 
