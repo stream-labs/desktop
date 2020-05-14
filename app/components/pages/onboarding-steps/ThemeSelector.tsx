@@ -1,7 +1,7 @@
 import cx from 'classnames';
 import { Component } from 'vue-property-decorator';
-import { ProgressBar } from 'streamlabs-beaker';
 import TsxComponent, { createProps } from 'components/tsx-component';
+import SmoothProgressBar from 'components/shared/SmoothProgressBar';
 import { $t } from 'services/i18n';
 import { Inject } from 'services';
 import { SceneCollectionsService } from 'services/scene-collections';
@@ -95,7 +95,7 @@ export default class ThemeSelector extends TsxComponent<ThemeSelectorProps> {
     const sub = this.sceneCollectionsService.downloadProgress.subscribe(
       progress => (this.progress = progress.percent),
     );
-    await this.sceneCollectionsService.installOverlay(url, name);
+    await this.sceneCollectionsService.installOverlay(url, this.detailTheme.data.name);
     sub.unsubscribe();
     this.installing = false;
     this.props.setProcessing(false);
@@ -104,7 +104,7 @@ export default class ThemeSelector extends TsxComponent<ThemeSelectorProps> {
 
   render() {
     return (
-      <div>
+      <div style="width: 100%;">
         <h1 class={commonStyles.titleContainer}>{$t('Add a Theme')}</h1>
         <div>
           {!this.installing ? (
@@ -145,7 +145,11 @@ export default class ThemeSelector extends TsxComponent<ThemeSelectorProps> {
               )}
             </div>
           ) : (
-            <ProgressBar progressComplete={Math.floor(this.progress * 100)} />
+            <SmoothProgressBar
+              value={this.progress}
+              timeLimit={60 * 1000}
+              class={styles.progressBar}
+            />
           )}
         </div>
       </div>

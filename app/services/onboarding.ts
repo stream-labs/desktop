@@ -79,32 +79,14 @@ const ONBOARDING_STEPS = () => ({
   },
 });
 
-const THEME_METADATA = [
-  {
-    id: '1246',
-    url: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/ea91062/ea91062.overlay',
-  },
-  {
-    id: '1248',
-    url: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/3205db0/3205db0.overlay',
-  },
-  {
-    id: '668',
-    url: 'https://cdn.streamlabs.com/marketplace/overlays/2116872/17f7cb5/17f7cb5.overlay',
-  },
-  {
-    id: '1144',
-    url: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/dd96270/dd96270.overlay',
-  },
-  {
-    id: '1100',
-    url: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/0d2e611/0d2e611.overlay',
-  },
-  {
-    id: '1190',
-    url: 'https://cdn.streamlabs.com/marketplace/overlays/8062844/4a0582e/4a0582e.overlay',
-  },
-];
+const THEME_METADATA = {
+  1246: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/ea91062/ea91062.overlay',
+  1248: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/3205db0/3205db0.overlay',
+  668: 'https://cdn.streamlabs.com/marketplace/overlays/2116872/17f7cb5/17f7cb5.overlay',
+  1144: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/dd96270/dd96270.overlay',
+  1100: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/0d2e611/0d2e611.overlay',
+  1190: 'https://cdn.streamlabs.com/marketplace/overlays/8062844/4a0582e/4a0582e.overlay',
+};
 
 interface IOnboardingStep {
   element: typeof TsxComponent;
@@ -205,11 +187,11 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   }
 
   async fetchThemes() {
-    return await Promise.all(THEME_METADATA.map(theme => this.fetchThemeData(theme.id)));
+    return await Promise.all(Object.keys(THEME_METADATA).map(id => this.fetchThemeData(id)));
   }
 
   themeUrl(id: string) {
-    return THEME_METADATA.find(theme => theme.id === id)?.url;
+    return THEME_METADATA[id];
   }
 
   get views() {
@@ -265,10 +247,10 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   }
 
   startOnboardingIfRequired() {
-    // if (localStorage.getItem(this.localStorageKey)) {
-    //   this.forceLoginForSecurityUpgradeIfRequired();
-    //   return false;
-    // }
+    if (localStorage.getItem(this.localStorageKey)) {
+      this.forceLoginForSecurityUpgradeIfRequired();
+      return false;
+    }
 
     this.start();
     return true;

@@ -74,6 +74,7 @@ export default class HardwareSetup extends TsxComponent {
       <div style="width: 100%;">
         <h1 class={commonStyles.titleContainer}>{$t('Setup Mic and Webcam')}</h1>
         <div style="width: 40%; margin: auto;">
+          {this.displayRender}
           {!!this.videoDevices.length && (
             <VFormGroup
               metadata={metadata.list({ options: this.videoDevices })}
@@ -81,12 +82,6 @@ export default class HardwareSetup extends TsxComponent {
               onInput={(id: string) => this.setVideoDevice(id)}
             />
           )}
-          {this.displayRender}
-          <VFormGroup
-            metadata={metadata.list({ options: this.audioDevices })}
-            value={this.selectedAudioDevice}
-            onInput={(id: string) => (this.selectedAudioDevice = id)}
-          />
           {this.defaultHardwareService.selectedAudioSource && (
             <div
               class={styles.volmeter}
@@ -99,6 +94,11 @@ export default class HardwareSetup extends TsxComponent {
               />
             </div>
           )}
+          <VFormGroup
+            metadata={metadata.list({ options: this.audioDevices })}
+            value={this.selectedAudioDevice}
+            onInput={(id: string) => (this.selectedAudioDevice = id)}
+          />
         </div>
       </div>
     );
