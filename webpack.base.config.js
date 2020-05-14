@@ -70,6 +70,7 @@ module.exports = {
     archiver: 'require("archiver")',
     '@streamlabs/game-overlay': 'require("@streamlabs/game-overlay")',
     'extract-zip': 'require("extract-zip")',
+    'fs-extra': 'require("fs-extra")',
   },
 
   module: {
