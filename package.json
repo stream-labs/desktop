@@ -3,7 +3,7 @@
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "0.22.0-preview.6",
+  "version": "0.22.0-preview.7",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && yarn compile:updater && yarn webpack-cli --progress --config dev.config.js",
@@ -135,7 +135,7 @@
     "electron-devtools-installer": "2.2.4",
     "eslint": "6.8.0",
     "eslint-config-airbnb-base": "14.1.0",
-    "eslint-plugin-import": "2.20.1",
+    "eslint-plugin-import": "2.20.2",
     "eslint-plugin-prettier": "3.1.2",
     "eslint-plugin-vue": "6.1.2",
     "fetch-mock": "7.7.3",
