@@ -38,12 +38,12 @@ test('Onboarding steps', async t => {
   await app.client.waitForVisible('h1=Optimizing... 33%');
   await makeScreenshots(t, 'Optimization progress');
 
-  await app.client.waitForVisible('h2=Overlay, Widget & Site Themes');
+  await app.client.waitForVisible('h2=Overlay, Widget & Site Themes', 60000);
   await makeScreenshots(t, 'Prime');
   await app.client.click('button=Skip');
 
   // success?
-  await app.client.waitForVisible('h2=Sources', 60000);
+  await app.client.waitForVisible('h2=Sources');
   await makeScreenshots(t, 'Onboarding completed');
   t.pass();
 });
