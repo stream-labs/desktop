@@ -118,9 +118,6 @@ module.exports = async (basePath: string) => {
     return downloadPath;
   }
 
-  // spawnUpdaterWindow();
-  // await new Promise(r => setTimeout(r, 999999));
-
   let useLocalBundles = false;
 
   if (process.argv.includes('--local-bundles')) {
