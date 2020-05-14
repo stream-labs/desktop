@@ -134,7 +134,7 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.HardwareSetup]);
     }
 
-    if (!this.state.existingSceneCollections) {
+    if (!this.state.existingSceneCollections && !this.state.importedFromObs) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ThemeSelector]);
     }
 

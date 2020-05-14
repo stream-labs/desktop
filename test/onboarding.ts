@@ -84,12 +84,6 @@ test('OBS Importer', async t => {
     await sleep(10000);
   }
 
-  // Skip choosing a theme
-  if (await t.context.app.client.isExisting('button=Skip')) {
-    await t.context.app.client.click('button=Skip');
-    await sleep(1000);
-  }
-
   // Skip purchasing prime
   if (await t.context.app.client.isExisting('button=Skip')) {
     await t.context.app.client.click('button=Skip');
