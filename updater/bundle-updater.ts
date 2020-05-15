@@ -32,8 +32,6 @@ module.exports = async (basePath: string) => {
     });
 
     updaterWindow.loadURL(`file://${basePath}/updater/index.html`);
-
-    updaterWindow.webContents.openDevTools();
   }
 
   function closeUpdaterWindow() {
