@@ -36,6 +36,7 @@ import { Subject } from 'rxjs';
 import { DismissablesService } from 'services/dismissables';
 import { RestreamService } from 'services/restream';
 import { downloadFile } from '../../util/requests';
+import { MetricsService } from '../metrics';
 import { SettingsService } from '../settings';
 
 interface IAppState {
@@ -92,6 +93,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private recentEventsService: RecentEventsService;
   @Inject() private dismissablesService: DismissablesService;
   @Inject() private restreamService: RestreamService;
+  @Inject() private metricsService: MetricsService;
   @Inject() private settingsService: SettingsService;
 
   private loadingPromises: Dictionary<Promise<any>> = {};
@@ -153,6 +155,7 @@ export class AppService extends StatefulService<IAppState> {
     this.protocolLinksService.start(this.state.argv);
 
     ipcRenderer.send('AppInitFinished');
+    this.metricsService.recordMetric('sceneCollectionLoadingTime');
   }
 
   shutdownStarted = new Subject();
@@ -160,6 +163,7 @@ export class AppService extends StatefulService<IAppState> {
   @track('app_close')
   private shutdownHandler() {
     this.START_LOADING();
+    this.tcpServerService.stopListening();
     obs.NodeObs.StopCrashHandler();
     this.crashReporterService.beginShutdown();
 
@@ -169,7 +173,6 @@ export class AppService extends StatefulService<IAppState> {
       this.windowsService.closeChildWindow();
       await this.windowsService.closeAllOneOffs();
       this.ipcServerService.stopListening();
-      this.tcpServerService.stopListening();
       await this.userService.flushUserSession();
       await this.sceneCollectionsService.deinitialize();
       this.performanceService.stop();

@@ -36,6 +36,10 @@ export class AudioSource implements ISerializable {
     this.audioSource = this.audioService.views.getSource(sourceId);
   }
 
+  private isDestroyed(): boolean {
+    return this.audioSource.isDestroyed();
+  }
+
   getModel(): IAudioSourceModel {
     const sourceModel = this.sourcesService.views.getSource(this.sourceId).getModel();
     return {

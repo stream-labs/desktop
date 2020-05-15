@@ -34,6 +34,7 @@ import uuid from 'uuid/v4';
 import Blank from 'components/windows/Blank.vue';
 import Main from 'components/windows/Main.vue';
 import CustomLoader from 'components/CustomLoader';
+import { MetricsService } from 'services/metrics';
 
 const crashHandler = window['require']('crash-handler');
 
@@ -57,7 +58,7 @@ if (isProduction) {
       'https://sentry.io/api/1283430/minidump/?sentry_key=01fc20f909124c8499b4972e9a5253f2',
     extra: {
       'sentry[release]': slobsVersion,
-      processType: 'renderer',
+      windowId: Utils.getWindowId(),
     },
   });
 }
@@ -284,8 +285,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     },
   });
 
+  let mainWindowShowTime = 0;
   if (Utils.isMainWindow()) {
     electron.remote.getCurrentWindow().show();
+    mainWindowShowTime = Date.now();
   }
 
   // Perform some final initialization now that services are ready
@@ -293,6 +296,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // setup translations for the current window
     if (!Utils.isWorkerWindow()) {
       I18nService.uploadTranslationsToVueI18n();
+    }
+
+    if (Utils.isMainWindow()) {
+      const metricsService: MetricsService = MetricsService.instance;
+      metricsService.actions.recordMetric('mainWindowShowTime', mainWindowShowTime);
     }
 
     if (usingSentry) {

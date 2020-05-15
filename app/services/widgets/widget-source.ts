@@ -21,6 +21,10 @@ export class WidgetSource implements IWidgetSource {
     Utils.applyProxy(this, this.state);
   }
 
+  private isDestroyed() {
+    return !this.widgetsService.state.widgetSources[this.sourceId];
+  }
+
   getSource() {
     return this.sourcesService.views.getSource(this.sourceId);
   }
