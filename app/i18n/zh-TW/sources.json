@@ -155,6 +155,7 @@
   "Directly capture the OpenVR monitoring video buffer of your HMD.": "直接擷取您 HMD 的 OpenVR 監控視訊緩衝。",
   "LIV Client Capture": "LIV 用戶端擷取",
   "Directly capture the LIV compositor output, reducing load and simplifying setup for Mixed Reality.": "直接擷取 LIV 合成器輸出，減少負載並減化混合實境的設定工作。",
+  "Looking for a game to capture": "Looking for a game to capture",
   "VLC Source": "VLC 來源",
   "Add playlists of videos to your scene.": "新增視訊播放清單到您的場景。",
   "Settings for %{sourceName}": "Settings for %{sourceName}",
