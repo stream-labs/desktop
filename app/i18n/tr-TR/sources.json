@@ -155,6 +155,7 @@
   "Directly capture the OpenVR monitoring video buffer of your HMD.": "HMD’nizin OpenVR izleme video arabelleğini doğrudan yakalayın.",
   "LIV Client Capture": "LIV İstemcisi Yakalama",
   "Directly capture the LIV compositor output, reducing load and simplifying setup for Mixed Reality.": "Karma Gerçeklik için yükü azaltıp kurulumu kolaylaştırarak doğrudan LIV oluşturucu çıkışını yakalayın.",
+  "Looking for a game to capture": "Looking for a game to capture",
   "VLC Source": "VLC Kaynağı",
   "Add playlists of videos to your scene.": "Sahnenize videoların oynatma listelerini ekleyin.",
   "Settings for %{sourceName}": "Settings for %{sourceName}",
