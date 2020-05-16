@@ -155,6 +155,7 @@
   "Directly capture the OpenVR monitoring video buffer of your HMD.": "내 HMD의 OpenVR 모니터링 비디오 버퍼를 직접 캡처합니다.",
   "LIV Client Capture": "LIV 클라이언트 캡처",
   "Directly capture the LIV compositor output, reducing load and simplifying setup for Mixed Reality.": "로드를 줄이고 혼합 현실의 설정을 간소화하며 LIV 구성기 출력을 직접 캡처합니다.",
+  "Looking for a game to capture": "Looking for a game to capture",
   "VLC Source": "VLC 소스",
   "Add playlists of videos to your scene.": "장면에 비디오 플레이리스트를 추가합니다.",
   "Settings for %{sourceName}": "%{sourceName}에 대한 설정",
