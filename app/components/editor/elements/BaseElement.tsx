@@ -10,33 +10,18 @@ export default class BaseElement extends TsxComponent {
   belowMins = false;
   height = 0;
   width = 0;
-  sizeWatcher: Function;
-
-  static sizeWatcherId: number;
-  static sizeWatcherCallbacks: Function[] = [];
-  static addSizeWatcher(cb: Function) {
-    this.sizeWatcherCallbacks.push(cb);
-    if (this.sizeWatcherId) return;
-    this.sizeWatcherId = window.setInterval(() => {
-      this.sizeWatcherCallbacks.forEach(cb => cb());
-    }, 500);
-  }
-  static removeSizeWatcher(watcherFunc: Function) {
-    const ind = this.sizeWatcherCallbacks.findIndex(cb => cb === watcherFunc);
-    if (ind !== -1) this.sizeWatcherCallbacks.splice(ind, 1);
-  }
 
   mounted() {
-    this.sizeWatcher = () => {
+    this.height = this.$el.getBoundingClientRect().height;
+    this.width = this.$el.getBoundingClientRect().width;
+    window.setInterval(() => {
       this.height = this.$el.getBoundingClientRect().height;
       this.width = this.$el.getBoundingClientRect().width;
-    };
-    this.sizeWatcher();
-    BaseElement.addSizeWatcher(this.sizeWatcher);
+    }, 500);
   }
 
   destroyed() {
-    BaseElement.removeSizeWatcher(this.sizeWatcher);
+    if (this.interval) clearInterval(this.interval);
   }
 
   get belowMinWarning() {
