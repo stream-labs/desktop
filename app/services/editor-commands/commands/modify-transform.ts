@@ -39,19 +39,6 @@ export abstract class ModifyTransformCommand extends CombinableCommand {
       this.endTransforms = {};
       this.selection.getItems().forEach(item => {
         this.endTransforms[item.id] = cloneDeep(item.state.transform);
-
-        // set the game_capture's auto resize to false
-        const source = item.getSource();
-        if (source.type === 'game_capture' && source.getSettings()['auto_fit_to_output'] === true) {
-          const subCommand = new EditSourcePropertiesCommand(source.sourceId, [
-            {
-              name: 'auto_fit_to_output',
-              value: false,
-            },
-          ] as TObsFormData);
-          subCommand.execute();
-          this.modifyTransformSubCommands.push(subCommand);
-        }
       });
     }
   }
