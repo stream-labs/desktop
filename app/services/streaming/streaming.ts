@@ -153,7 +153,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         buttons: [$t('Cancel'), $t('Go Live')],
       });
 
-      if (!goLive) return;
+      if (!goLive.response) return;
     }
 
     this.powerSaveId = electron.remote.powerSaveBlocker.start('prevent-display-sleep');
@@ -253,7 +253,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           buttons: [$t('Cancel'), $t('End Stream')],
         });
 
-        if (!endStream) return;
+        if (!endStream.response) return;
       }
 
       if (this.powerSaveId) {

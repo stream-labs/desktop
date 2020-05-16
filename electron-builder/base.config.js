@@ -11,6 +11,7 @@ const base = {
     'media/images/game-capture',
     'updater/build/bootstrap.js',
     'updater/build/bundle-updater.js',
+    'updater/index.html',
     'index.html',
     'main.js',
     'obs-api'
