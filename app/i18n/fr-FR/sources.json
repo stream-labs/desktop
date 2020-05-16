@@ -155,6 +155,7 @@
   "Directly capture the OpenVR monitoring video buffer of your HMD.": "Capturez directement le tampon vidéo de suivi OpenVR de votre casque de réalité virtuelle.",
   "LIV Client Capture": "Capture de clients LIV",
   "Directly capture the LIV compositor output, reducing load and simplifying setup for Mixed Reality.": "Capturez directement la sortie du compositeur LIV, en réduisant ainsi la charge et en simplifiant la configuration de Mixed Reality.",
+  "Looking for a game to capture": "Looking for a game to capture",
   "VLC Source": "Source VLC",
   "Add playlists of videos to your scene.": "Ajoutez des listes de lecture vidéo à votre scène.",
   "Settings for %{sourceName}": "Settings for %{sourceName}",
