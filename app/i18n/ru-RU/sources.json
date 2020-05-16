@@ -155,6 +155,7 @@
   "Directly capture the OpenVR monitoring video buffer of your HMD.": "Прямой захват видеобуфера мониторинга OpenVR с вашего HMD.",
   "LIV Client Capture": "Захват клиента LIV",
   "Directly capture the LIV compositor output, reducing load and simplifying setup for Mixed Reality.": "Прямой захват выходных данных компоновщика LIV для уменьшения нагрузки и упрощения настройки для смешанной реальности.",
+  "Looking for a game to capture": "Looking for a game to capture",
   "VLC Source": "Источник VLC",
   "Add playlists of videos to your scene.": "Добавить плей-лист видео на вашу сцену.",
   "Settings for %{sourceName}": "Settings for %{sourceName}",
