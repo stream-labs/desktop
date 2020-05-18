@@ -1,3 +1,4 @@
+import cx from 'classnames';
 import { Component } from 'vue-property-decorator';
 import electron from 'electron';
 import { UserService, EAuthProcessState } from 'services/user';
@@ -7,6 +8,7 @@ import { OnboardingService } from 'services/onboarding';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { $t } from 'services/i18n';
 import styles from './Connect.m.less';
+import commonStyles from './Common.m.less';
 import ListInput from 'components/shared/inputs/ListInput.vue';
 import ExtraPlatformConnect, { TExtraPlatform } from './ExtraPlatformConnect';
 import { IListOption } from '../../shared/inputs';
@@ -63,7 +65,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
     return {
       twitch: 'fab fa-twitch',
       youtube: 'fab fa-youtube',
-      mixer: 'fas fa-times',
+      mixer: 'fab fa-mixer',
       facebook: 'fab fa-facebook',
     }[platform];
   }
@@ -111,9 +113,10 @@ export default class Connect extends TsxComponent<ConnectProps> {
     return (
       <div class={styles.pageContainer}>
         <div class={styles.container}>
-          <div class={styles.progressCover} />
-          <h1>{this.isSecurityUpgrade ? $t('Re-Authorize') : $t('Connect')}</h1>
-          <p>
+          <h1 class={commonStyles.titleContainer}>
+            {this.isSecurityUpgrade ? $t('Re-Authorize') : $t('Connect')}
+          </h1>
+          <p style="margin-bottom: 80px;">
             {this.isSecurityUpgrade
               ? this.securityUpgradeLink
               : $t('Sign in with your streaming account to get started with Streamlabs OBS')}
@@ -121,12 +124,11 @@ export default class Connect extends TsxComponent<ConnectProps> {
           <div class={styles.signupButtons}>
             {['twitch', 'youtube', 'mixer', 'facebook'].map((platform: TPlatform) => (
               <button
-                class={`button button--${platform}`}
+                class={cx(`button button--${platform}`, styles.loginButton)}
                 disabled={this.loading}
                 onClick={() => this.authPlatform(platform)}
               >
-                <i class={this.iconForPlatform(platform)} />{' '}
-                {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                <i class={this.iconForPlatform(platform)} />
               </button>
             ))}
           </div>
