@@ -14,7 +14,7 @@ test('Onboarding steps', async t => {
   await focusMain(t);
 
   // Wait for the auth screen to appear
-  await app.client.waitForVisible('button=Twitch');
+  await app.client.waitForVisible('h1=Connect');
 
   await logIn(t, 'twitch', null, false, true);
   await sleep(1000);
@@ -63,7 +63,7 @@ test('OBS Importer', async t => {
   }
 
   // skip auth
-  await client.waitForVisible('button=Twitch');
+  await client.waitForVisible('h1=Connect');
   await t.context.app.client.click('span=Skip');
 
   // import from OBS
