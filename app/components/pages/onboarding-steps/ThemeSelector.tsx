@@ -1,10 +1,13 @@
-import { Component, Prop } from 'vue-property-decorator';
-import { OnboardingStep, ProgressBar } from 'streamlabs-beaker';
+import cx from 'classnames';
+import { Component } from 'vue-property-decorator';
 import TsxComponent, { createProps } from 'components/tsx-component';
+import SmoothProgressBar from 'components/shared/SmoothProgressBar';
 import { $t } from 'services/i18n';
 import { Inject } from 'services';
 import { SceneCollectionsService } from 'services/scene-collections';
+import commonStyles from './Common.m.less';
 import styles from './ThemeSelector.m.less';
+import { OnboardingService } from 'services/onboarding';
 
 class ThemeSelectorProps {
   continue: () => void = () => {};
@@ -12,54 +15,87 @@ class ThemeSelectorProps {
 }
 
 @Component({ props: createProps(ThemeSelectorProps) })
-export default class ObsImport extends TsxComponent<ThemeSelectorProps> {
+export default class ThemeSelector extends TsxComponent<ThemeSelectorProps> {
   @Inject() sceneCollectionsService: SceneCollectionsService;
+  @Inject() onboardingService: OnboardingService;
 
   installing = false;
+  showDetail: string = null;
+  bigPreview: string = null;
   progress = 0;
+  // Bad typing until we get typechecked APIs
+  themesMetadata: Array<any> = [];
 
-  get themesMetadata() {
-    return [
-      {
-        title: 'Borderline [Red Yellow] - by Nerd or Die',
-        url: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/ea91062/ea91062.overlay',
-        thumbnail: 'borderline',
-      },
-      {
-        title: 'Dark Matter by VBI',
-        url: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/3205db0/3205db0.overlay',
-        thumbnail: 'darkmatter',
-      },
-      {
-        title: 'Geometic Madness',
-        url: 'https://cdn.streamlabs.com/marketplace/overlays/2116872/17f7cb5/17f7cb5.overlay',
-        thumbnail: 'geometric',
-      },
-      {
-        title: 'Nexus',
-        url: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/dd96270/dd96270.overlay',
-        thumbnail: 'nexus',
-      },
-      {
-        title: 'Relative Minds',
-        url: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/0d2e611/0d2e611.overlay',
-        thumbnail: 'relativeminds',
-      },
-      {
-        title: 'Facebook Gaming Pure Hexagons',
-        url: 'https://cdn.streamlabs.com/marketplace/overlays/8062844/4a0582e/4a0582e.overlay',
-        thumbnail: 'purehexagon',
-      },
-    ];
+  async mounted() {
+    this.themesMetadata = await this.onboardingService.fetchThemes();
   }
 
-  async installTheme(url: string, name: string) {
+  get filteredMetadata() {
+    if (!this.showDetail) return this.themesMetadata;
+    if ([2, 5].includes(this.detailIndex)) {
+      return [this.themesMetadata[0], this.themesMetadata[3]];
+    } else {
+      return [this.themesMetadata[2], this.themesMetadata[5]];
+    }
+  }
+
+  get detailIndex() {
+    return this.themesMetadata.findIndex(theme => theme.data.id === this.showDetail);
+  }
+
+  get detailTheme() {
+    return this.themesMetadata[this.detailIndex];
+  }
+
+  preview(src: string, className: string) {
+    const isVideo = /\.mp4$/.test(src);
+    return isVideo ? (
+      <video
+        autoplay
+        muted
+        loop
+        src={src}
+        class={className}
+        onClick={(e: MouseEvent) => this.focusPreview(e, src)}
+      />
+    ) : (
+      <img src={src} class={className} onClick={(e: MouseEvent) => this.focusPreview(e, src)} />
+    );
+  }
+
+  focusPreview(event: MouseEvent, src: string) {
+    event.stopPropagation();
+    this.bigPreview = src;
+  }
+
+  thumbnail(theme: any) {
+    return this.previewImages(theme).find((img: string) => /\.png$|\.jpg$|\.jpeg$/.test(img));
+  }
+
+  focusTheme(theme: any) {
+    if (!theme) {
+      this.showDetail = null;
+      this.bigPreview = null;
+    } else {
+      this.showDetail = theme.data.id;
+      this.bigPreview = this.previewImages(theme)[0];
+    }
+  }
+
+  previewImages(theme: any): Array<string> {
+    if (!theme?.data) return [];
+    return (Object.values(theme.data.custom_images) as Array<string>).slice(0, 3);
+  }
+
+  async installTheme(event: MouseEvent) {
+    event.stopPropagation();
+    const url = this.onboardingService.themeUrl(this.detailTheme.data.id);
     this.installing = true;
     this.props.setProcessing(true);
     const sub = this.sceneCollectionsService.downloadProgress.subscribe(
       progress => (this.progress = progress.percent),
     );
-    await this.sceneCollectionsService.installOverlay(url, name);
+    await this.sceneCollectionsService.installOverlay(url, this.detailTheme.data.name);
     sub.unsubscribe();
     this.installing = false;
     this.props.setProcessing(false);
@@ -68,29 +104,55 @@ export default class ObsImport extends TsxComponent<ThemeSelectorProps> {
 
   render() {
     return (
-      <OnboardingStep slot="2">
-        <template slot="title">{$t('Add a Theme')}</template>
-        <template slot="desc">
-          {$t(
-            'Not seeing a theme that catches your eye? Our theme library has hundreds of free choices available',
-          )}
+      <div style="width: 100%;">
+        <h1 class={commonStyles.titleContainer}>{$t('Add a Theme')}</h1>
+        <div>
           {!this.installing ? (
             <div class={styles.container}>
-              {this.themesMetadata.map(theme => (
-                <div class={styles.cell} onClick={() => this.installTheme(theme.url, theme.title)}>
-                  <img
-                    class={styles.thumbnail}
-                    src={require(`../../../../media/images/onboarding/${theme.thumbnail}.png`)}
-                  />
-                  <div class={styles.title}>{theme.title}</div>
+              {this.filteredMetadata.map(theme => (
+                <div class={styles.cell} onClick={() => this.focusTheme(theme)}>
+                  <img class={styles.thumbnail} src={this.thumbnail(theme)} />
+                  <div class={styles.title}>{theme.data.name}</div>
                 </div>
               ))}
+              {this.showDetail && (
+                <div
+                  class={cx(
+                    styles.detailPanel,
+                    [2, 5].includes(this.detailIndex) ? styles.right : styles.left,
+                  )}
+                  onClick={() => this.focusTheme(null)}
+                >
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h1>{this.detailTheme.data.name}</h1>
+                    <button
+                      class="button button--action"
+                      onClick={(e: MouseEvent) => this.installTheme(e)}
+                    >
+                      {$t('Install')}
+                    </button>
+                  </div>
+                  <div class={styles.previewGrid}>
+                    {this.preview(this.bigPreview, styles.bigPreview)}
+                    {this.previewImages(this.detailTheme).map((src: string) =>
+                      this.preview(
+                        src,
+                        cx(styles.preview, { [styles.active]: src === this.bigPreview }),
+                      ),
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
-            <ProgressBar progressComplete={Math.floor(this.progress * 100)} />
+            <SmoothProgressBar
+              value={this.progress}
+              timeLimit={60 * 1000}
+              class={styles.progressBar}
+            />
           )}
-        </template>
-      </OnboardingStep>
+        </div>
+      </div>
     );
   }
 }
