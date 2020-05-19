@@ -1,0 +1,37 @@
+@import "../../styles/index.less";
+
+.platform-logo-twitch { font-size: 40px; }
+.platform-logo-youtube { font-size: 32px; margin-top: 5px }
+.platform-logo-mixer { font-size: 48px; margin-top: -3px; }
+.platform-logo-facebook { font-size: 40px; }
+
+.platform-disabled {
+  opacity: .5;
+}
+
+.platform-switcher {
+  .radius();
+  .margin-bottom();
+  .padding();
+
+  display: flex;
+  height: 60px;
+  background-color: var(--section);
+  transition: transform 0.05s;
+
+  .col-input {
+    padding-top: 14px;
+    padding-right: 16px;
+    padding-left: 8px;
+  }
+  .col-logo {}
+  .col-account {}
+}
+
+.platform-name {
+  color: var(--title);
+}
+
+.manage-platforms-link {
+  color: #1585cf;
+}

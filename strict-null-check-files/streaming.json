@@ -3,6 +3,6 @@
     "app/services/streaming/*.ts"
   ],
   "tsx": [
-
+    "app/components/windows/GoLive.tsx"
   ]
 }

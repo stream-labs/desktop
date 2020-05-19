@@ -41,6 +41,7 @@ import BrowserSourceInteraction from 'components/windows/BrowserSourceInteractio
 import YoutubeStreamStatus from 'components/platforms/youtube/YoutubeStreamStatus';
 import ShareStream from 'components/windows/ShareStream';
 import WelcomeToPrime from 'components/windows/WelcomeToPrime';
+import GoLiveWindow from 'components/windows/GoLive';
 
 import BitGoal from 'components/widgets/goal/BitGoal.vue';
 import DonationGoal from 'components/widgets/goal/DonationGoal.vue';
@@ -120,6 +121,7 @@ export function getComponents() {
     YoutubeStreamStatus,
     ShareStream,
     WelcomeToPrime,
+    GoLiveWindow,
   };
 }
 

@@ -19,6 +19,8 @@ import { StreamSettingsService } from 'services/settings/streaming';
 import { Subject } from 'rxjs';
 import { CustomizationService } from 'services/customization';
 import { assertIsDefined } from '../../util/properties-type-guards';
+import { metadata, formMetadata } from 'components/shared/inputs';
+import { $t } from '../i18n';
 
 export interface ITwitchStartStreamOptions {
   title: string;
@@ -347,5 +349,29 @@ export class TwitchService extends Service implements IPlatformService {
    */
   getErrorDescription(error: IPlatformResponse<unknown>): string {
     return `Can not connect to Twitch: ${error.message}`;
+  }
+
+  getStreamFields() {
+    return formMetadata({
+      title: metadata.text({
+        title: $t('Title'),
+        fullWidth: true,
+        required: true,
+      }),
+      description: metadata.textArea({
+        title: $t('Description'),
+        fullWidth: true,
+      }),
+
+      twitchGame: metadata.list({
+        title: $t('Game on Twitch'),
+        placeholder: $t('Start typing to search'),
+        options: [],
+        internalSearch: false,
+        allowEmpty: true,
+        noResult: $t('No matching game(s) found.'),
+        required: true,
+      }),
+    });
   }
 }

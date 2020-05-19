@@ -658,6 +658,10 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     });
   }
 
+  getStreamFields() {
+    return {};
+  }
+
   /**
    * Fetch the list of upcoming broadcasts
    * If ids specified than return broadcast in any state

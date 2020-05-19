@@ -16,6 +16,7 @@ import { IPlatformResponse, platformAuthorizedRequest, platformRequest } from '.
 import { StreamSettingsService } from 'services/settings/streaming';
 import { Subject } from 'rxjs';
 import { CustomizationService } from 'services/customization';
+import { IInputMetadata } from '../../components/shared/inputs';
 
 interface IMixerServiceState {
   typeIdMap: object;
@@ -139,6 +140,10 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
 
   fetchStreamKey(): Promise<string> {
     return this.fetchRawChannelInfo().then(json => `${json.id}-${json.streamKey}`);
+  }
+
+  getStreamFields(): Dictionary<IInputMetadata> {
+    return {};
   }
 
   /**

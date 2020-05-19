@@ -140,6 +140,10 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     return this.state.activePage?.access_token;
   }
 
+  getStreamFields() {
+    return {};
+  }
+
   validatePlatform() {
     return Promise.resolve(EPlatformCallResult.Success);
   }

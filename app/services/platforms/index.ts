@@ -6,6 +6,7 @@ import { TTwitchTag } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
 import { Observable } from 'rxjs';
 import { IPlatformResponse } from './utils';
+import { IInputMetadata } from '../../components/shared/inputs';
 
 export type Tag = TTwitchTag;
 export interface IGame {
@@ -162,6 +163,8 @@ export interface IPlatformService {
    * Get user-friendly error message
    */
   getErrorDescription: (error: IPlatformResponse<unknown>) => string;
+
+  getStreamFields(): Dictionary<IInputMetadata>;
 }
 
 export interface IUserAuth {
