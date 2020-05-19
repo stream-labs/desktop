@@ -66,7 +66,7 @@ export default class ObsImport extends TsxComponent<ObsImportProps> {
         title: $t('App Store'),
         description: $t(
           'Check out 50+ amazing apps from independent developers, ranging from DMCA-compliant music ' +
-            'to stunning overlays to more tools to engage with your community. Head over to the app store in the main ' +
+            'to stunning overlays to more tools to engage with your community. Head over to the app store in the left ' +
             'navigation to browse our selection of free and paid apps.',
         ),
         image: 'app-store',
@@ -148,7 +148,7 @@ export default class ObsImport extends TsxComponent<ObsImportProps> {
           <KevinSvg />
           <div>
             {$t(
-              'It takes up to one minute to import your settings, so you have some time to look at some of our features',
+              'While we import your settings and scenes from OBS Studio, check out these great features unique to Streamlabs OBS',
             )}
           </div>
         </div>
