@@ -1,17 +1,101 @@
-import { StatefulService, mutation } from './core/stateful-service';
-import { NavigationService } from './navigation';
-import { UserService } from './user';
-import { Inject } from './core/injector';
+import { StatefulService, mutation } from 'services/core/stateful-service';
+import { NavigationService } from 'services/navigation';
+import { UserService } from 'services/user';
+import { Inject, ViewHandler } from 'services/core/';
+import { SceneCollectionsService } from 'services/scene-collections';
+import * as onboardingSteps from 'components/pages/onboarding-steps';
+import TsxComponent from 'components/tsx-component';
+import { OS } from 'util/operating-systems';
+import { $t } from './i18n';
+import { handleResponse } from 'util/requests';
 
-type TOnboardingStep =
-  | 'Connect'
-  | 'OptimizeA'
-  | 'OptimizeB'
-  | 'OptimizeC'
-  | 'OptimizeBrandDevice'
-  | 'SceneCollectionsImport'
-  | 'ObsImport'
-  | 'FacebookPageCreation';
+enum EOnboardingSteps {
+  MacPermissions = 'MacPermissions',
+  Connect = 'Connect',
+  ChooseYourAdventure = 'ChooseYourAdventure',
+  ObsImport = 'ObsImport',
+  HardwareSetup = 'HardwareSetup',
+  ThemeSelector = 'ThemeSelector',
+  Optimize = 'Optimize',
+  Prime = 'Prime',
+}
+
+const ONBOARDING_STEPS = () => ({
+  [EOnboardingSteps.MacPermissions]: {
+    element: onboardingSteps.MacPermissions,
+    disableControls: false,
+    hideSkip: true,
+    hideButton: true,
+    isPreboarding: true,
+  },
+  [EOnboardingSteps.Connect]: {
+    element: onboardingSteps.Connect,
+    disableControls: false,
+    hideSkip: true,
+    hideButton: true,
+    isPreboarding: true,
+  },
+  [EOnboardingSteps.ChooseYourAdventure]: {
+    element: onboardingSteps.ChooseYourAdventure,
+    disableControls: true,
+    hideSkip: true,
+    hideButton: true,
+    isPreboarding: true,
+  },
+  [EOnboardingSteps.ObsImport]: {
+    element: onboardingSteps.ObsImport,
+    disableControls: true,
+    hideSkip: true,
+    hideButton: true,
+    label: $t('Import'),
+  },
+  [EOnboardingSteps.HardwareSetup]: {
+    element: onboardingSteps.HardwareSetup,
+    disableControls: false,
+    hideSkip: false,
+    hideButton: false,
+    label: $t('Set Up Mic and Webcam'),
+  },
+  [EOnboardingSteps.ThemeSelector]: {
+    element: onboardingSteps.ThemeSelector,
+    disableControls: false,
+    hideSkip: false,
+    hideButton: true,
+    label: $t('Add a Theme'),
+  },
+  [EOnboardingSteps.Optimize]: {
+    element: onboardingSteps.Optimize,
+    disableControls: false,
+    hideSkip: false,
+    hideButton: true,
+    label: $t('Optimize'),
+  },
+  [EOnboardingSteps.Prime]: {
+    element: onboardingSteps.Prime,
+    disableControls: false,
+    hideSkip: false,
+    hideButton: false,
+    label: $t('Prime'),
+  },
+});
+
+const THEME_METADATA = {
+  1246: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/ea91062/ea91062.overlay',
+  1248: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/3205db0/3205db0.overlay',
+  668: 'https://cdn.streamlabs.com/marketplace/overlays/2116872/17f7cb5/17f7cb5.overlay',
+  1144: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/dd96270/dd96270.overlay',
+  1100: 'https://cdn.streamlabs.com/marketplace/overlays/7684923/0d2e611/0d2e611.overlay',
+  1190: 'https://cdn.streamlabs.com/marketplace/overlays/8062844/4a0582e/4a0582e.overlay',
+};
+
+interface IOnboardingStep {
+  element: typeof TsxComponent;
+  disableControls: boolean;
+  hideSkip: boolean;
+  hideButton: boolean;
+  label?: string;
+  isPreboarding?: boolean;
+}
 
 interface IOnboardingOptions {
   isLogin: boolean; // When logging into a new account after onboarding
@@ -23,17 +107,45 @@ interface IOnboardingOptions {
 
 interface IOnboardingServiceState {
   options: IOnboardingOptions;
+  importedFromObs: boolean;
+  existingSceneCollections: boolean;
 }
 
-// Represents a single step in the onboarding flow.
-// Implemented as a linked list.
-interface IOnboardingStep {
-  // Whether this step should run.  The service is
-  // passed in as an argument.
-  isEligible: (service: OnboardingService) => boolean;
+class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
+  get singletonStep(): IOnboardingStep {
+    if (this.state.options.isLogin) return ONBOARDING_STEPS()[EOnboardingSteps.Connect];
+    if (this.state.options.isOptimize) return ONBOARDING_STEPS()[EOnboardingSteps.Optimize];
+    if (this.state.options.isHardware) return ONBOARDING_STEPS()[EOnboardingSteps.HardwareSetup];
+  }
 
-  // The next step in the flow
-  next?: TOnboardingStep;
+  get steps() {
+    const steps: IOnboardingStep[] = [];
+
+    if (process.platform === OS.Mac) {
+      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.MacPermissions]);
+    }
+
+    steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Connect]);
+    steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ChooseYourAdventure]);
+
+    if (this.state.importedFromObs) {
+      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ObsImport]);
+    } else {
+      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.HardwareSetup]);
+    }
+
+    if (!this.state.existingSceneCollections && !this.state.importedFromObs) {
+      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ThemeSelector]);
+    }
+
+    if (this.getServiceViews(UserService).isTwitchAuthed) {
+      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Optimize]);
+    }
+
+    steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Prime]);
+
+    return steps;
+  }
 }
 
 export class OnboardingService extends StatefulService<IOnboardingServiceState> {
@@ -44,20 +156,65 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
       isSecurityUpgrade: false,
       isHardware: false,
     },
+    importedFromObs: false,
+    existingSceneCollections: false,
   };
 
   localStorageKey = 'UserHasBeenOnboarded';
 
   @Inject() navigationService: NavigationService;
   @Inject() userService: UserService;
+  @Inject() sceneCollectionsService: SceneCollectionsService;
 
   @mutation()
   SET_OPTIONS(options: Partial<IOnboardingOptions>) {
     Object.assign(this.state.options, options);
   }
 
+  @mutation()
+  SET_OBS_IMPORTED(val: boolean) {
+    this.state.importedFromObs = val;
+  }
+
+  @mutation()
+  SET_EXISTING_COLLECTIONS(val: boolean) {
+    // this.state.existingSceneCollections = val;
+  }
+
+  async fetchThemeData(id: string) {
+    const url = `https://overlays.streamlabs.com/api/overlay/${id}`;
+    return await fetch(new Request(url)).then(handleResponse);
+  }
+
+  async fetchThemes() {
+    return await Promise.all(Object.keys(THEME_METADATA).map(id => this.fetchThemeData(id)));
+  }
+
+  themeUrl(id: string) {
+    return THEME_METADATA[id];
+  }
+
+  get views() {
+    return new OnboardingViews(this.state);
+  }
+
   get options() {
     return this.state.options;
+  }
+
+  get existingSceneCollections() {
+    return !(
+      this.sceneCollectionsService.loadableCollections.length === 1 &&
+      this.sceneCollectionsService.loadableCollections[0].auto
+    );
+  }
+
+  init() {
+    this.SET_EXISTING_COLLECTIONS(this.existingSceneCollections);
+  }
+
+  setObsImport(val: boolean) {
+    this.SET_OBS_IMPORTED(val);
   }
 
   // A login attempt is an abbreviated version of the onboarding process,
