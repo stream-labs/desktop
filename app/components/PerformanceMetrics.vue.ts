@@ -40,7 +40,7 @@ export default class PerformanceMetrics extends TsxComponent<{
   }
 
   get bandwidth() {
-    return this.performanceService.state.bandwidth.toFixed(0);
+    return this.performanceService.state.streamingBandwidth.toFixed(0);
   }
 
   get showCPU() {
