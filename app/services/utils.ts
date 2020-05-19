@@ -8,6 +8,8 @@ export const enum EBit {
 }
 
 export default class Utils {
+  static mainWindowShowTime = 0;
+
   static applyProxy(target: Object, source: Object | Function) {
     // TODO: Figure out why this is happening
     if (!source) return;

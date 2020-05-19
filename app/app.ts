@@ -245,11 +245,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (Utils.isMainWindow()) {
     electron.remote.getCurrentWindow().show();
-    const showMainWindowTime = Date.now();
-    setTimeout(() => {
-      const metricsService: MetricsService = MetricsService.instance;
-      metricsService.recordMetric('mainWindowShowTime', showMainWindowTime);
-    }, 5000);
+    Utils.mainWindowShowTime = Date.now();
   }
 
   // Perform some final initialization now that services are ready

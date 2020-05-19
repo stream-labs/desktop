@@ -157,6 +157,7 @@ export class AppService extends StatefulService<IAppState> {
 
     ipcRenderer.send('AppInitFinished');
     this.metricsService.recordMetric('sceneCollectionLoadingTime');
+    this.metricsService.recordMetric('mainWindowShowTime', Utils.mainWindowShowTime);
   }
 
   shutdownStarted = new Subject();
