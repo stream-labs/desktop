@@ -56,28 +56,8 @@ export default class ObsImport extends TsxComponent<ObsImportProps> {
     });
   }
 
-  get hasExternalMonitor() {
-    return electron.remote.screen
-      .getAllDisplays()
-      .find(display => display.bounds.x !== 0 || display.bounds.y !== 0);
-  }
-
-  get isIrlStreamer() {
-    return this.scenesService.views.scenes.find(scene => /irl/i.test(scene.name));
-  }
-
   get recommendedFeatures() {
-    const featureList = ['appStore'];
-
-    if (!this.hasExternalMonitor) {
-      featureList.push('gameOverlay');
-    } else if (this.isIrlStreamer) {
-      featureList.push('facemasks');
-    } else {
-      featureList.push('videoEncoding');
-    }
-
-    return featureList;
+    return ['appStore', 'gameOverlay'];
   }
 
   get featuresMetadata() {
@@ -99,24 +79,6 @@ export default class ObsImport extends TsxComponent<ObsImportProps> {
             'tab of the settings menu.',
         ),
         image: 'game-overlay',
-      },
-      facemasks: {
-        title: $t('Face Masks'),
-        description: $t(
-          'Enjoy interacting with your viewers via IRL streams? Take that interaction to the next level with ' +
-            'Streamlabs Facemasks, a tool that lets your viewers add 3-D masks to your face when they donate. ' +
-            'Head over to the facemask settings to get started.',
-        ),
-        image: 'facemasks',
-      },
-      videoEncoding: {
-        title: $t('Optimized Video Encoding'),
-        description: $t(
-          'Stream at higher quality and lower CPU usage by enabling video encoding optimization. We achieve these ' +
-            'improvements because we tune Streamlabs OBS specifically for your game of choice and your bandwidth. ' +
-            'To enable, check the box ‘Use optimized encoder settings’ while editing your stream information.',
-        ),
-        image: 'video-encoding',
       },
     };
   }
