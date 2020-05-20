@@ -40,7 +40,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
 
     if (isPrimeStep) {
       try {
-        const link = await this.magicLinkService.getDashboardMagicLink('prime');
+        const link = await this.magicLinkService.getDashboardMagicLink('prime', 'slobs-onboarding');
         electron.remote.shell.openExternal(link);
       } catch (e) {
         console.error('Error generating dashboard magic link', e);
