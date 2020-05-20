@@ -42,7 +42,7 @@
   "Streamlabs OBS is ready to go": "A Streamlabs OBS készen áll az indulásra",
   "Download and Apply": "Töltse le és alkalmazza",
   "This device is not available": "Ez az eszköz nem érhető el",
-  "Set Up Mic and Webcam": "Set Up Mic and Webcam",
+  "Set Up Mic and Webcam": "Állítsa be a mikrofont és a webkamerát",
   "Sign in with your streaming account to get started with Streamlabs OBS": "Jelentkezzen be streaming-fiókjával, hogy elkezdhesse a Streamlabs OBS használatát",
   "Welcome to Streamlabs OBS": "Üdvözöljük a Streamlabs OBS-ben",
   "Import your existing settings from OBS in less than a minute and go live": "Importálja meglévő beállításait kevesebb, mint egy perc alatt az OBS-ből, és kezdje el élőben",
@@ -75,14 +75,14 @@
   "Merge your Facebook Gaming Page": "Egyesítse a Facebook játékoldalát",
   "Merge with Facebook": "Egyesülés a Facebook-lal",
   "primeTitle": "Join <prime-title>Prime</prime-title> for Exclusive Features",
-  "Overlay, Widget & Site Themes": "Overlay, Widget & Site Themes",
-  "Custom Domain + Website": "Custom Domain + Website",
-  "More Than 40 FREE Apps": "More Than 40 FREE Apps",
+  "Overlay, Widget & Site Themes": "Átfedés, Widget & Webhely Témák",
+  "Custom Domain + Website": "Egyéni Domain + Webhely",
+  "More Than 40 FREE Apps": "Több mint 40 ingyenes alkalmazás",
   "Custom Merch Store": "Custom Merch Store",
   "Stream on Mobile": "Stream on Mobile",
   "Gold Status + FREE T-shirt": "Gold Status + FREE T-shirt",
   "Go Prime": "Go Prime",
   "Import": "Importálás",
   "While we import your settings and scenes from OBS Studio, check out these great features unique to Streamlabs OBS": "While we import your settings and scenes from OBS Studio, check out these great features unique to Streamlabs OBS",
-  "Importing Your Existing Settings From OBS": "Importing Your Existing Settings From OBS"
+  "Importing Your Existing Settings From OBS": "Meglévő beállítások importálása az OBS-ből"
 }
