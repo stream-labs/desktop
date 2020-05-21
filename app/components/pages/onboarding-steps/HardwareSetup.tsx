@@ -73,7 +73,7 @@ export default class HardwareSetup extends TsxComponent {
     return (
       <div style="width: 100%;">
         <h1 class={commonStyles.titleContainer}>{$t('Set Up Mic and Webcam')}</h1>
-        <div style="width: 40%; margin: auto;">
+        <div class={styles.contentContainer}>
           {this.displayRender}
           {!!this.videoDevices.length && (
             <VFormGroup

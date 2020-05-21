@@ -6,6 +6,7 @@ import { OnboardingService } from 'services/onboarding';
 import { Inject } from 'services/core/injector';
 import { $t } from 'services/i18n';
 import styles from './Onboarding.m.less';
+import commonStyles from './onboarding-steps/Common.m.less';
 import { MagicLinkService } from 'services/magic-link';
 
 export class OnboardingStepProps {
@@ -103,7 +104,9 @@ export default class OnboardingPage extends TsxComponent<{}> {
     const isPrimeStep = this.currentStep.label === $t('Prime');
     return (
       <button
-        class={cx('button button--action', { ['button--prime']: isPrimeStep })}
+        class={cx('button button--action', commonStyles.onboardingButton, {
+          ['button--prime']: isPrimeStep,
+        })}
         onClick={() => this.continue()}
         disabled={this.processing}
       >
@@ -118,15 +121,18 @@ export default class OnboardingPage extends TsxComponent<{}> {
     return (
       <div class={styles.onboardingContainer}>
         {this.topBar}
-        <Component
-          continue={() => this.continue()}
-          setProcessing={(processing: boolean) => this.setProcessing(processing)}
-        />
+        <div class={styles.onboardingContent}>
+          <Component
+            class={styles.scroll}
+            continue={() => this.continue()}
+            setProcessing={(processing: boolean) => this.setProcessing(processing)}
+          />
+        </div>
         {(!this.currentStep.hideSkip || !this.currentStep.hideButton) && (
           <div class={styles.footer}>
             {!this.currentStep.hideSkip && (
               <button
-                class="button button--trans"
+                class={cx('button button--trans', commonStyles.onboardingButton)}
                 onClick={() => this.continue(true)}
                 disabled={this.processing}
               >

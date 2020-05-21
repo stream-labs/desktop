@@ -120,6 +120,7 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
 
   get steps() {
     const steps: IOnboardingStep[] = [];
+    const userViews = this.getServiceViews(UserService);
 
     if (process.platform === OS.Mac) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.MacPermissions]);
@@ -138,11 +139,13 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ThemeSelector]);
     }
 
-    if (this.getServiceViews(UserService).isTwitchAuthed) {
+    if (userViews.isTwitchAuthed) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Optimize]);
     }
 
-    steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Prime]);
+    if (userViews.isLoggedIn && !userViews.isPrime) {
+      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Prime]);
+    }
 
     return steps;
   }
