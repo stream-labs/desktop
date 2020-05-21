@@ -57,7 +57,6 @@ export default class AddSourceFilter extends Vue {
   get typeOptions() {
     return this.filtersService
       .getTypesForSource(this.sourceId)
-      .filter(filter => filter.type !== 'face_mask_filter')
       .map(filterType => ({ title: filterType.description, value: filterType.type }));
   }
 
