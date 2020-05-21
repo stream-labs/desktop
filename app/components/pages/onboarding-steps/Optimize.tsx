@@ -98,13 +98,13 @@ export default class Optimize extends TsxComponent<OptimizeProps> {
             ? `${$t('Optimizing...')} ${Math.floor(this.percentage * 100)}%`
             : $t('Optimize')}
         </h1>
-        <div style="width: 60%; margin: auto;">
+        <div style="width: 60%; margin: auto; text-align: center;">
           {$t(
             "Click below and we'll analyze your internet speed and computer hardware to give you the best settings possible.",
           )}
         </div>
         {this.optimizing ? (
-          <div>
+          <div style="margin: auto; margin-top: 24px; width: 80%;">
             <SmoothProgressBar value={this.percentage} timeLimit={1000 * 60} />
             <span>{this.stepInfo && this.stepInfo.summary}</span>
           </div>
