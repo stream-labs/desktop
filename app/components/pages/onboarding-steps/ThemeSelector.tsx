@@ -123,7 +123,7 @@ export default class ThemeSelector extends TsxComponent<ThemeSelectorProps> {
                   )}
                   onClick={() => this.focusTheme(null)}
                 >
-                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div class={styles.detailHeader}>
                     <h1>{this.detailTheme.data.name}</h1>
                     <button
                       class={cx('button button--action', commonStyles.onboardingButton)}
@@ -131,6 +131,7 @@ export default class ThemeSelector extends TsxComponent<ThemeSelectorProps> {
                     >
                       {$t('Install')}
                     </button>
+                    <i class="icon-close" />
                   </div>
                   <div class={styles.previewGrid}>
                     {this.preview(this.bigPreview, styles.bigPreview)}

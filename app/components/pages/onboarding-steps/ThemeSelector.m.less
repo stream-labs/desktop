@@ -54,6 +54,21 @@
   grid-row: 1 / span 2;
 }
 
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  i:hover {
+    cursor: pointer;
+  }
+
+  button {
+    margin-left: auto;
+    margin-right: 32px;
+  }
+}
+
 .preview-grid {
   display: grid;
   grid-template-columns: calc(75% - 16px) calc(25% - 16px);
