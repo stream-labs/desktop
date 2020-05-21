@@ -54,15 +54,32 @@
   background-color: var(--nav-icon-inactive);
 }
 
+.onboarding-content {
+  height: 0;
+  flex-grow: 1;
+  flex-basis: 0;
+  overflow: hidden;
+  width: 100%;
+
+  .scroll {
+    overflow-y: auto;
+    height: 100%;
+  }
+}
+
 .footer {
   display: flex;
   justify-content: flex-end;
-  position: absolute;
+  position: relative;
+  background: var(--background);
   left: 0;
   right: 0;
   bottom: 0;
+  width: calc(100% - 80px);
   padding: 24px 0;
   margin: 0 40px;
+  z-index: 10;
+  flex-shrink: 0;
   border-top: 1px solid var(--border);
 
   button {

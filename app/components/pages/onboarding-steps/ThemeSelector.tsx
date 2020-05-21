@@ -126,7 +126,7 @@ export default class ThemeSelector extends TsxComponent<ThemeSelectorProps> {
                   <div style="display: flex; justify-content: space-between; align-items: center;">
                     <h1>{this.detailTheme.data.name}</h1>
                     <button
-                      class="button button--action"
+                      class={cx('button button--action', commonStyles.onboardingButton)}
                       onClick={(e: MouseEvent) => this.installTheme(e)}
                     >
                       {$t('Install')}

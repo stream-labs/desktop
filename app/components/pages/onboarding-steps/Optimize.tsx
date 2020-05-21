@@ -104,7 +104,7 @@ export default class Optimize extends TsxComponent<OptimizeProps> {
           )}
         </div>
         {this.optimizing ? (
-          <div>
+          <div style="margin-top: 24px">
             <SmoothProgressBar value={this.percentage} timeLimit={1000 * 60} />
             <span>{this.stepInfo && this.stepInfo.summary}</span>
           </div>

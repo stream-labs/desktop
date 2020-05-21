@@ -88,6 +88,10 @@ class UserViews extends ViewHandler<IUserServiceState> {
     return !!(this.state.auth && this.state.auth.widgetToken && this.state.loginValidated);
   }
 
+  get isPrime() {
+    return this.state.isPrime;
+  }
+
   get platform() {
     if (this.isLoggedIn) {
       return this.state.auth.platforms[this.state.auth.primaryPlatform];
