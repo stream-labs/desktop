@@ -74,9 +74,6 @@ test('OBS Importer', async t => {
   await makeScreenshots(t, 'Import button');
   await client.click('h2=Start');
 
-  await client.waitForVisible('h2=Overlay, Widget & Site Themes');
-  await client.click('button=Skip');
-
   // success?
   await client.waitForVisible('h2=Sources', 60000);
   await makeScreenshots(t, 'Import from OBS is completed');
