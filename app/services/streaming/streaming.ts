@@ -336,25 +336,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
    * @param platformStep The current index in the platforms array
    */
   showEditStreamInfo(platforms?: TPlatform[], platformStep = 0) {
-    this.windowsService.showWindow({
-      componentName: 'GoLiveWindow',
-      title: $t('Update Stream Info'),
-      size: {
-        height: 550,
-        width: 900,
-      },
-    });
-
-    // const height = this.twitterIsEnabled ? 620 : 550;
-    // this.windowsService.showWindow({
-    //   componentName: 'EditStreamInfo',
-    //   title: $t('Update Stream Info'),
-    //   queryParams: { platforms, platformStep },
-    //   size: {
-    //     height,
-    //     width: 600,
-    //   },
-    // });
+    this.streamInfoService.showEditStreamInfo();
   }
 
   openShareStream() {

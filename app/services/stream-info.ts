@@ -12,6 +12,8 @@ import { InitAfter } from './core';
 import { IYoutubeChannelInfo, TYoutubeLifecycleStep } from './platforms/youtube';
 import { IMixerChannelInfo } from './platforms/mixer';
 import { isEqual, pick, reduce } from 'lodash';
+import { $t } from './i18n';
+import { WindowsService } from './windows';
 
 export type TCombinedChannelInfo = IFacebookChannelInfo &
   ITwitchChannelInfo &
@@ -19,6 +21,7 @@ export type TCombinedChannelInfo = IFacebookChannelInfo &
   IMixerChannelInfo;
 
 type TStreamInfoServiceState = {
+  advancedMode: boolean;
   fetching: boolean;
   error: string;
   viewerCount: number;
@@ -40,6 +43,7 @@ export class StreamInfoService extends StatefulService<TStreamInfoServiceState> 
   @Inject() hostsService: HostsService;
   @Inject() twitchService: TwitchService;
   @Inject() facebookService: FacebookService;
+  @Inject() windowsService: WindowsService;
 
   static initialState: TStreamInfoServiceState = null;
 
@@ -68,6 +72,25 @@ export class StreamInfoService extends StatefulService<TStreamInfoServiceState> 
     }, VIEWER_COUNT_UPDATE_INTERVAL);
   }
 
+  showEditStreamInfo() {
+    const mainWinBounds = this.windowsService.getBounds('main');
+    const height = this.state.advancedMode ? 1080 : 550;
+    const width = 900;
+
+    this.windowsService.showWindow({
+      componentName: 'GoLiveWindow',
+      title: $t('Update Stream Info'),
+      size: {
+        height,
+        width,
+      },
+      position: {
+        x: mainWinBounds.x + mainWinBounds.width - width,
+        y: mainWinBounds.y + mainWinBounds.height - height,
+      },
+    });
+  }
+
   private channelInfoSubsc: Subscription = null;
 
   private onLoginHandler() {
@@ -83,7 +106,7 @@ export class StreamInfoService extends StatefulService<TStreamInfoServiceState> 
     this.streamInfoChanged.next(this.state);
   }
 
-  private updateInfo(streamInfoPatch: Partial<TStreamInfoServiceState>) {
+  updateInfo(streamInfoPatch: Partial<TStreamInfoServiceState>) {
     const newStreamInfo = {
       ...this.state,
       ...streamInfoPatch,
@@ -135,6 +158,7 @@ export class StreamInfoService extends StatefulService<TStreamInfoServiceState> 
   RESET() {
     this.state = {
       fetching: false,
+      advancedMode: false,
       error: '',
       viewerCount: 0,
       title: '',

@@ -1,13 +1,9 @@
-@import "../../styles/index.less";
+@import "../../../styles/index.less";
 
 .platform-logo-twitch { font-size: 40px; }
 .platform-logo-youtube { font-size: 32px; margin-top: 5px }
 .platform-logo-mixer { font-size: 48px; margin-top: -3px; }
 .platform-logo-facebook { font-size: 40px; }
-
-.platform-disabled {
-  opacity: .5;
-}
 
 .platform-switcher {
   .radius();
@@ -16,7 +12,8 @@
 
   display: flex;
   height: 60px;
-  background-color: var(--section);
+  // background-color: var(--section);
+  background: var(--dropdown-bg);
   transition: transform 0.05s;
 
   .col-input {
@@ -34,4 +31,36 @@
 
 .manage-platforms-link {
   color: #1585cf;
+}
+
+.section {
+  border-top: 1px solid var(--border);
+  .margin-bottom(2);
+  &:first-child {
+    border-top: none;
+  }
+  h2 {
+    .margin-top(2);
+  }
+}
+
+.mode-toggle {
+  width: 400px;
+  margin-right: -250px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.platform-disabled {
+  opacity: .7;
+  background: rgba(#2b383f, 0.3);
+}
+
+.right-text {
+  .margin-top(4);
+  text-align: right;
+}
+
+.go-live-button {
+  .margin-left(5);
 }

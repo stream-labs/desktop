@@ -13,8 +13,10 @@ import {
   IYoutubeStartStreamOptions,
   YoutubeService,
 } from 'services/platforms/youtube';
+import StreamTitleAndDescription from '../StreamTitleAndDescription';
 
 class YoutubeEditStreamInfoProps {
+  showOnlyRequiredFields? = false;
   value: IYoutubeStartStreamOptions = {
     description: '',
     title: '',
@@ -77,7 +79,7 @@ export default class YoutubeEditStreamInfo extends TsxComponent<YoutubeEditStrea
 
   render() {
     return (
-      this.channelInfo && (
+      !this.props.showOnlyRequiredFields && (
         <ValidatedForm onInput={this.emitInput}>
           {this.props.canChangeBroadcast && (
             <HFormGroup title={$t('Event')}>
@@ -88,11 +90,7 @@ export default class YoutubeEditStreamInfo extends TsxComponent<YoutubeEditStrea
               />
             </HFormGroup>
           )}
-          <HFormGroup vModel={this.channelInfo.title} metadata={this.formMetadata.title} />
-          <HFormGroup
-            vModel={this.channelInfo.description}
-            metadata={this.formMetadata.description}
-          />
+          <StreamTitleAndDescription vModel={this.channelInfo} allowCustom={true} />
         </ValidatedForm>
       )
     );

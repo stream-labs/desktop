@@ -7,10 +7,15 @@ import { Spinner } from 'streamlabs-beaker';
 @Component({
   components: { Multiselect, Spinner },
 })
-export default class ListInput extends BaseInput<string, IListMetadata<string>> {
+export default class ListInput extends BaseInput<
+  string,
+  IListMetadata<string>,
+  { onSearchChange?: (val: string) => unknown }
+> {
   @Prop() readonly value: string;
   @Prop() readonly metadata: IListMetadata<string>;
   @Prop() readonly title: string;
+  @Prop() readonly onSearchChange?: (val: string) => unknown;
 
   get placeholder() {
     return this.options.placeholder || 'Select Option';
@@ -50,7 +55,8 @@ export default class ListInput extends BaseInput<string, IListMetadata<string>> 
     return this.options.options.find(option => option.value === this.value);
   }
 
-  onSearchChange(value: string) {
+  private onSearchChangeHandler(value: string) {
     this.$emit('search-change', value);
+    this.$props.onSearchChange && this.$props.onSearchChange(value);
   }
 }

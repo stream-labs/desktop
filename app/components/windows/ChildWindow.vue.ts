@@ -80,6 +80,12 @@ export default class ChildWindow extends Vue {
       return;
     }
 
+    // don't update component if the name has not been changed
+    const currentComponent = this.components[this.components.length - 1];
+    if (currentComponent && currentComponent.name === options.componentName) {
+      return;
+    }
+
     if (options.preservePrevWindow) {
       this.handlePreservePrevWindow(options);
       return;

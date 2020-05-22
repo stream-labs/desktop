@@ -438,6 +438,16 @@ select {
   transition: all 0.3s ease;
 }
 
+.slidedown-enter-active, .slidedown-leave-active {
+  transition: opacity .5s, max-height .5s;
+  max-height: 100px;
+  overflow: hidden;
+}
+.slidedown-enter, .slidedown-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+}
 .v--modal-overlay {
   background: var(--modal-overlay);
 }

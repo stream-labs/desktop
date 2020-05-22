@@ -41,7 +41,7 @@ import BrowserSourceInteraction from 'components/windows/BrowserSourceInteractio
 import YoutubeStreamStatus from 'components/platforms/youtube/YoutubeStreamStatus';
 import ShareStream from 'components/windows/ShareStream';
 import WelcomeToPrime from 'components/windows/WelcomeToPrime';
-import GoLiveWindow from 'components/windows/GoLive';
+import GoLiveWindow from 'components/windows/go-live/GoLive';
 
 import BitGoal from 'components/widgets/goal/BitGoal.vue';
 import DonationGoal from 'components/widgets/goal/DonationGoal.vue';
@@ -134,6 +134,7 @@ export interface IWindowOptions extends Electron.BrowserWindowConstructorOptions
     minWidth?: number;
     minHeight?: number;
   };
+  position?: { x: number; y: number };
   scaleFactor: number;
   isShown: boolean;
   title?: string;
@@ -222,6 +223,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
     return Object.keys(this.windows).find(win => this.windows[win].id === electronWindowId);
   }
 
+  getBounds(windowId: string): Electron.Rectangle {
+    return this.windows[windowId].getBounds();
+  }
+
   showWindow(options: Partial<IWindowOptions>) {
     // Don't center the window if it's the same component
     // This prevents "snapping" behavior when navigating settings
@@ -253,7 +258,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     const mainWindow = this.windows.main;
     const childWindow = this.windows.child;
 
-    // Center the child window on the main window
+    // Set position of the child window on the main window
 
     // For some unknown reason, electron sometimes gets into a
     // weird state where this will always fail.  Instead, we
@@ -261,12 +266,17 @@ export class WindowsService extends StatefulService<IWindowsState> {
     // about the bounds.
     try {
       const bounds = mainWindow.getBounds();
-      const childX = bounds.x + bounds.width / 2 - options.size.width / 2;
-      const childY = bounds.y + bounds.height / 2 - options.size.height / 2;
+      // place the child window on the center of the main window if "position" is not provided
+      const childX = options.position
+        ? options.position.x
+        : bounds.x + bounds.width / 2 - options.size.width / 2;
+      const childY = options.position
+        ? options.position.y
+        : bounds.y + bounds.height / 2 - options.size.height / 2;
 
-      this.updateChildWindowOptions(options);
+      this.updateChildWindowOptions({ ...options, isShown: true });
       childWindow.setMinimumSize(options.size.width, options.size.height);
-      if (options.center) {
+      if (options.center || options.position) {
         childWindow.setBounds({
           x: Math.floor(childX),
           y: Math.floor(childY),
@@ -435,14 +445,14 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
   updateChildWindowOptions(optionsPatch: Partial<IWindowOptions>) {
+    const currentOptions = cloneDeep(this.state.child);
     const newOptions: IWindowOptions = {
       ...DEFAULT_WINDOW_OPTIONS,
+      ...currentOptions,
       ...optionsPatch,
       scaleFactor: this.state.child.scaleFactor,
     };
     if (newOptions.preservePrevWindow) {
-      const currentOptions = cloneDeep(this.state.child);
-
       if (currentOptions.preservePrevWindow) {
         throw new Error(
           "You can't use preservePrevWindow option for more that 1 window in the row",
