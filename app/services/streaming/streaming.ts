@@ -518,6 +518,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         [EOBSOutputSignal.Stopping]: ERecordingState.Stopping,
       }[info.signal];
 
+      if (info.signal === EOBSOutputSignal.Start) {
+        this.usageStatisticsService.recordAnalyticsEvent('Recording', { action: 'start' });
+      }
+
       this.SET_RECORDING_STATUS(nextState, time);
       this.recordingStatusChange.next(nextState);
     } else if (info.type === EOBSOutputType.ReplayBuffer) {
@@ -535,6 +539,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       }
 
       if (info.signal === EOBSOutputSignal.Wrote) {
+        this.usageStatisticsService.recordAnalyticsEvent('ReplayBuffer', { action: 'captured' });
         this.replayBufferFileWrite.next(obs.NodeObs.OBS_service_getLastReplay());
       }
     }

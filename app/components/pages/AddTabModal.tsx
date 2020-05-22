@@ -44,7 +44,10 @@ export default class AddTabModal extends TsxComponent<AddTabModalProps> {
     this.$emit('close');
     if (!this.userService.isPrime) {
       try {
-        const link = await this.magicLinkService.getDashboardMagicLink('prime');
+        const link = await this.magicLinkService.getDashboardMagicLink(
+          'prime',
+          'slobs-layout-editor',
+        );
         electron.remote.shell.openExternal(link);
       } catch (e) {
         console.error('Error generating dashboard magic link', e);
