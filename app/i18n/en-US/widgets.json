@@ -97,5 +97,8 @@
   "Facebook Supports": "Facebook Supports",
   "Note: This background color is for preview purposes only.It will not be shown in your stream.": "Note: This background color is for preview purposes only.It will not be shown in your stream.",
   "This background color is for preview purposes only. It will not be shown in your stream.": "This background color is for preview purposes only. It will not be shown in your stream.",
-  "Invalid JSON": "Invalid JSON"
+  "Invalid JSON": "Invalid JSON",
+  "Increment Amount": "Increment Amount",
+  "Overkill Multiplier": "Overkill Multiplier",
+  "Overkill Min Health": "Overkill Min Health"
 }
