@@ -1,8 +1,8 @@
 {
-  "Successfully saved %{filename}": "%{filename} Başarılı bir şekilde kaydedildi",
-  "Successfully loaded %{filename}.overlay": "%{filename}.overlay Başarılı bir şekilde yüklendi",
-  "This is an experimental feature.  Use at your own risk.": "Deney aşamasında bir içerik. Sizin sorumluluğunuz altında.",
-  "Export Overlay File": "Arayüz Dosyasını Dışa Aktar",
-  "Import Overlay File": "Arayüz Dosyasını İçe Aktar",
-  "Import Widget File in Current Scene": "Güncel Sahneye Eklenti Dosyası Aktar"
+  "Successfully saved %{filename}": "%{filename} başarıyla kaydedildi",
+  "Successfully loaded %{filename}.overlay": "%{filename}.overlay başarıyla yüklendi",
+  "This is an experimental feature.  Use at your own risk.": "Bu, deneysel bir özelliktir. Riski göz önünde bulundurarak kullanın.",
+  "Export Overlay File": "Katman Dosyasını Dışa Aktar",
+  "Import Overlay File": "Katman Dosyasını İçe Aktar",
+  "Import Widget File in Current Scene": "Geçerli Sahneye Pencere Ögesi Dosyası Aktar"
 }

@@ -21,8 +21,12 @@ export class WidgetSource implements IWidgetSource {
     Utils.applyProxy(this, this.state);
   }
 
+  private isDestroyed() {
+    return !this.widgetsService.state.widgetSources[this.sourceId];
+  }
+
   getSource() {
-    return this.sourcesService.getSource(this.sourceId);
+    return this.sourcesService.views.getSource(this.sourceId);
   }
 
   getSettingsService(): WidgetSettingsService<IWidgetData> {
@@ -64,12 +68,12 @@ export class WidgetSource implements IWidgetSource {
   }
 
   getPreviewSource() {
-    return this.sourcesService.getSource(this.previewSourceId);
+    return this.sourcesService.views.getSource(this.previewSourceId);
   }
 
   destroyPreviewSource() {
     this.widgetsService.stopSyncPreviewSource(this.previewSourceId);
-    this.sourcesService.getSource(this.previewSourceId).remove();
+    this.sourcesService.views.getSource(this.previewSourceId).remove();
     this.SET_PREVIEW_SOURCE_ID('');
   }
 

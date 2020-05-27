@@ -77,12 +77,12 @@
   }
 
   &.warning {
-    background-color: fade(@red, 20%);
+    background-color: var(--warning-bg);
     color: var(--warning);
   }
 
   &.success {
-    background-color: fade(@teal, 20%);
+    background-color: var(--teal-semi);
     color: var(--teal);
   }
 

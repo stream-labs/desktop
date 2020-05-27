@@ -50,7 +50,6 @@ h1 {
 
   font-family: 'Roboto', sans-serif;
   font-size: 20px;
-  text-transform: capitalize;
   color: var(--title);
   margin-bottom: 24px;
 }
@@ -61,7 +60,6 @@ h2 {
 
   font-family: 'Roboto', sans-serif;
   font-size: 16px;
-  text-transform: capitalize;
   color: var(--title);
 }
 
@@ -74,7 +72,6 @@ h3 {
 }
 
 h4 {
-  .text-transform();
   .weight(@medium);
   .margin-bottom(2);
 
@@ -95,7 +92,7 @@ label {
 
   background: var(--accent);
   font-size: 12px;
-  color: var(--white);
+  color: var(--action-button-text);
   padding: 0 4px;
   line-height: 16px;
 }
@@ -129,12 +126,6 @@ a,
 
 .link {
   display: flex;
-}
-
-.link--capitalize() {
-  .link();
-
-  text-transform: capitalize;
 }
 
 .link--pointer {
@@ -280,7 +271,6 @@ a,
   border-bottom: 1px solid transparent;
   height: 48px;
   .margin-right(2);
-  .link--capitalize();
 
   &:focus {
     outline: 0;
@@ -318,7 +308,6 @@ a,
   }
 }
 
-// TODO: add "disable" and "enable" styles for form controls to styleguide
 .input {
   &.disabled {
     opacity: 0.5;
@@ -326,13 +315,49 @@ a,
     &.checkbox input:checked ~ label,
     &.checkbox input ~ label {
       &::before {
-        border-color: var(--input-border);
+        border-color: var(--button);
         background: transparent;
       }
 
       &::after { color: var(--paragraph); }
     }
   }
+}
+
+.studio-controls {
+  position: relative;
+}
+
+.studio-controls-panel {
+  .padding-h-sides();
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+}
+
+.studio-controls-top {
+  .margin-bottom();
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex: 0 0 20px;
+}
+
+.studio-controls__label {
+  color: var(--title);
+  margin-bottom: 0;
+}
+
+.studio-controls-selector {
+  .radius();
+
+  background: var(--section);
+  flex-grow: 1;
+  overflow-y: auto;
 }
 
 // Make select boxes look similar to input boxes
@@ -354,10 +379,27 @@ select {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--scrollbar);
+  background-color: var(--solid-input);
   border: 2px solid var(--border);
   border-right: 1px solid var(--border);
   border-radius: 10px;
+}
+
+// Loader TODO: move off of Beaker
+.s-loader__bg {
+  background: var(--background) !important;
+}
+
+.s-spinner__bar {
+  fill: var(--title) !important;
+
+  &.s-spinner--modeswap {
+    fill: var(--section) !important;
+  }
+}
+
+.s-loader__text {
+  color: var(--title) !important;
 }
 
 // Vue transitions
@@ -385,6 +427,17 @@ select {
   opacity: 0;
 }
 
+.sidenav-slide-enter,
+.sidenav-slide-leave-to {
+  transform: translateY(-20px);
+  opacity: 0;
+}
+
+.sidenav-slide-enter-active,
+.sidenav-slide-leave-active {
+  transition: all 0.3s ease;
+}
+
 .v--modal-overlay {
   background: var(--modal-overlay);
 }
@@ -396,16 +449,16 @@ select {
 
 // Toasts
 .toast-alert {
-  background-color: @red !important;
+  background-color: var(--warning) !important;
 }
 
 .toast-busy {
-  background-color: @yellow !important;
+  background-color: var(--new) !important;
   margin-top: 250px !important;
 }
 
 .toast-success {
-  background-color: @teal !important;
+  background-color: var(--teal) !important;
 }
 
 .toast-success__schedule {

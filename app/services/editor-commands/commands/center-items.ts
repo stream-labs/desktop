@@ -14,7 +14,7 @@ export class CenterItemsCommand extends ModifyTransformCommand {
   }
 
   get description() {
-    return $t('Center ${sourceName}', { sourceName: this.selection.getNodes()[0].name });
+    return $t('Center %{sourceName}', { sourceName: this.selection.getNodes()[0].name });
   }
 
   modifyTransform() {

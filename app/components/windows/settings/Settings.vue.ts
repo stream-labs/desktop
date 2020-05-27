@@ -11,7 +11,7 @@ import ExtraSettings from './ExtraSettings.vue';
 import DeveloperSettings from './DeveloperSettings';
 import InstalledApps from 'components/InstalledApps.vue';
 import Hotkeys from './Hotkeys.vue';
-import OverlaySettings from './OverlaySettings.vue';
+import OverlaySettings from './OverlaySettings';
 import NotificationsSettings from './NotificationsSettings.vue';
 import AppearanceSettings from './AppearanceSettings';
 import ExperimentalSettings from './ExperimentalSettings.vue';
@@ -69,7 +69,7 @@ export default class Settings extends Vue {
     'Scene Collections': 'icon-themes',
     Notifications: 'icon-notifications',
     Appearance: 'icon-settings-3-1',
-    Facemasks: 'icon-face-masks-3',
+    'Face Masks': 'icon-face-masks-3',
     'Remote Control': 'fas fa-play-circle',
     Experimental: 'fas fa-flask',
     'Installed Apps': 'icon-store',

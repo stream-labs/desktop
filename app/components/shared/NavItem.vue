@@ -22,7 +22,6 @@
 
 .nav-item {
   .margin-bottom();
-  .text-transform();
 
   cursor: pointer;
   list-style: none;
@@ -42,7 +41,7 @@
     .weight(@medium);
 
     opacity: 1;
-    border-color: var(--nav-border);
+    border-color: var(--title);
     color: var(--title);
 
     .fa,

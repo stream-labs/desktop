@@ -1,11 +1,12 @@
 @import "../styles/index.less";
 
 .container {
-  padding: 0 16px;
-  height: 150px;
-  overflow: none;
+  padding: 0 8px;
+  height: 100%;
   flex-shrink: 0;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .container:global(.perf-mode) {
@@ -30,7 +31,7 @@
 .eventContainer {
   .radius();
 
-  height: calc(100% - 46px);
+  flex-grow: 1;
   overflow-y: auto;
   position: relative;
   background: var(--section);
@@ -46,6 +47,8 @@
   display: flex;
   align-items: center;
   padding: 8px 16px;
+  flex-wrap: wrap;
+  position: relative;
 
   span {
     margin-right: 8px;
@@ -53,7 +56,9 @@
   }
 
   i {
-    margin-left: auto;
+    position: absolute;
+    top: 10px;
+    right: 16px;
   }
 }
 
@@ -86,6 +91,11 @@
   font-weight: 500;
 }
 
+.message {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .timestamp {
   opacity: 0.7;
 }
@@ -95,6 +105,7 @@
   opacity: 0.7;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: normal !important;
 }
 
 :global(.action-icon).red {

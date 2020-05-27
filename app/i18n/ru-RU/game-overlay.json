@@ -1,8 +1,9 @@
 {
   "Enable in-game overlay": "Включить внутриигровой оверлей",
-  "Enable stream preview in overlay": "Включить стрим превью в оверлее",
+  "Enable stream preview in overlay": "Включить предпросмотр трансляции в оверлее",
   "Toggle in-game overlay": "Показать/скрыть внутриигровой оверлей",
   "Toggle positioning mode": "Включить/выключить режим позиционирования",
-  "Set a hotkey in Hotkey Settings to toggle the in-game overlay": "Задать горячую клавишу в Настройках, чтобы показать/скрыть внутриигровой оверлей",
-  "The in-game overlay is a new experimental feature that allows you to view chat and events overlayed on top of your game.  This overlay may not work with certain games running in exclusive fullscreen mode.  For best results, we recommend running your game in windowed-fullscreen mode.": "Внутриигровой оверлей - это новая, экспериментальная функция, которая позволяет вам увидеть чат и события во время игры. Этот оверлей может не работать с некоторыми играми, запущенными в полном экране. Для лучшего результата, мы рекомендуем запускать игру в оконном режиме."
+  "Set a hotkey in Hotkey Settings to toggle the in-game overlay": "Установите в настройках горячую клавишу для скрытия/отображения внутриигрового оверлея",
+  "The in-game overlay is a new experimental feature that allows you to view chat and events overlayed on top of your game.  This overlay may not work with certain games running in exclusive fullscreen mode.  For best results, we recommend running your game in windowed-fullscreen mode.": "Внутриигровой оверлей - это новая экспериментальная функция, позволяющая видеть чат и события во время игры. Не все игры с монопольным полноэкранным режимом поддерживают оверлей. Для совместимости рекомендуется запускать игры в оконном полноэкранном режиме.",
+  "Please log in to use the in-game overlay.": "Войдите в учетную запись, чтобы использовать внутриигровой оверлей."
 }

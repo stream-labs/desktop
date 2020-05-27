@@ -2,7 +2,6 @@
   .transition();
   .radius();
   .weight(@medium);
-  .text-transform();
   .padding-h-sides();
   .padding-v-sides(@0);
 
@@ -55,11 +54,11 @@
 .button--action {
   background-color: var(--teal);
   border-color: var(--teal);
-  color: var(--white);
+  color: var(--action-button-text);
 
   &:hover {
-    background-color: lighten(@teal, 4%);
-    color: var(--white);
+    background-color: var(--teal-hover);
+    color: var(--action-button-text);
   }
 
   &:focus {
@@ -70,6 +69,28 @@
   &:disabled {
     &:hover {
       background-color: var(--teal);
+    }
+  }
+}
+
+.button--prime {
+  background-color: var(--prime);
+  border-color: var(--prime);
+  color: var(--action-button-text);
+
+  &:hover {
+    background-color: var(--prime-hover);
+    color: var(--action-button-text);
+  }
+
+  &:focus {
+    background-color: var(--prime);
+  }
+
+  &.is-disabled,
+  &:disabled {
+    &:hover {
+      background-color: var(--prime);
     }
   }
 }
@@ -204,14 +225,14 @@
 }
 
 .square-button--facebook,
- .button--facebook {
-   background: #3b5998;
+.button--facebook {
+  background: #4267b2;
 
-   &:hover,
-   &:active {
-     background: lighten(#3b5998, 4%) !important;
-   }
- }
+  &:hover,
+  &:active {
+    background: lighten(#4267b2, 4%) !important;
+  }
+}
 
 .square-button--twitter {
   background: #1da1f2;
@@ -226,7 +247,7 @@
   background: #ffd300;
 
   &:hover {
-    box-shadow: 0 3px 5px 0 rgba(255,211,0,.15) !important;
+    box-shadow: 0 3px 5px 0 rgba(255, 211, 0, 0.15) !important;
   }
 
   &:focus,
@@ -235,18 +256,18 @@
   }
 }
 
- .button--nimotv {
-   background: #343ed1;
+.button--nimotv {
+  background: #343ed1;
 
-   &:hover {
-     box-shadow: 0 3px 5px 0 rgba(#343ed1, .15) !important;
-   }
+  &:hover {
+    box-shadow: 0 3px 5px 0 rgba(#343ed1, 0.15) !important;
+  }
 
-   &:focus,
-   &:active {
-     background: lighten(#343ed1, 4%) !important;
-   }
- }
+  &:focus,
+  &:active {
+    background: lighten(#343ed1, 4%) !important;
+  }
+}
 
 .button--soft-warning {
   color: var(--warning);

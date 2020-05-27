@@ -19,6 +19,22 @@ import CodeEditor from 'components/widgets/CodeEditor.vue';
 import { WindowsService } from 'services/windows';
 import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
 import { ERenderingMode } from '../../../obs-api';
+import TsxComponent, { createProps } from 'components/tsx-component';
+
+class WidgetEditorProps {
+  isAlertBox?: boolean = false;
+  selectedId?: string = null;
+  selectedAlert?: string = null;
+  /**
+   * Declaration of additional sections in the right panel
+   * @see example of usage in TipJar.vue.ts
+   */
+  slots?: IWidgetNavItem[] = null;
+  /**
+   * Navigation items for the right panel
+   */
+  navItems: IWidgetNavItem[] = null;
+}
 
 @Component({
   components: {
@@ -33,26 +49,12 @@ import { ERenderingMode } from '../../../obs-api';
     CustomFieldsEditor,
     CodeEditor,
   },
+  props: createProps(WidgetEditorProps),
 })
-export default class WidgetEditor extends Vue {
+export default class WidgetEditor extends TsxComponent<WidgetEditorProps> {
   @Inject() private widgetsService: IWidgetsServiceApi;
   @Inject() private windowsService: WindowsService;
   @Inject() private projectorService: ProjectorService;
-
-  @Prop() isAlertBox?: boolean;
-  @Prop() selectedId?: string;
-  @Prop() selectedAlert?: string;
-
-  /**
-   * Declaration of additional sections in the right panel
-   * @see example of usage in TipJar.vue.ts
-   */
-  @Prop() slots?: IWidgetNavItem[];
-
-  /**
-   * Navigation items for the right panel
-   */
-  @Prop() navItems: IWidgetNavItem[];
 
   $refs: { content: HTMLElement; sidebar: HTMLElement; code: HTMLElement };
 
@@ -67,7 +69,7 @@ export default class WidgetEditor extends Vue {
   ];
   currentTopTab = 'editor';
   currentCodeTab = 'HTML';
-  currentSetting = this.navItems[0].value;
+  currentSetting: string = null;
   readonly settingsState = this.widget.getSettingsService().state;
   animating = false;
   canShowEditor = false;
@@ -90,9 +92,15 @@ export default class WidgetEditor extends Vue {
   }
 
   get selectedVariation() {
-    if (!this.selectedAlert || !this.selectedId || this.selectedAlert === 'general') return;
-    return this.wData.settings[this.selectedAlert].variations.find(
-      (variation: IAlertBoxVariation) => variation.id === this.selectedId,
+    if (
+      !this.props.selectedAlert ||
+      !this.props.selectedId ||
+      this.props.selectedAlert === 'general'
+    ) {
+      return;
+    }
+    return this.wData.settings[this.props.selectedAlert].variations.find(
+      (variation: IAlertBoxVariation) => variation.id === this.props.selectedId,
     );
   }
 
@@ -109,6 +117,7 @@ export default class WidgetEditor extends Vue {
 
   mounted() {
     const source = this.widget.getSource();
+    this.currentSetting = this.props.navItems[0].value;
     this.properties = source ? source.getPropertiesFormData() : [];
 
     // create a temporary previewSource while current window is shown
@@ -126,7 +135,7 @@ export default class WidgetEditor extends Vue {
 
   get windowTitle() {
     const source = this.widget.getSource();
-    return $t('Settings for ') + source.name;
+    return $t('Settings for %{sourceName}', { sourceName: source.name });
   }
 
   get sourceProperties() {
@@ -157,7 +166,7 @@ export default class WidgetEditor extends Vue {
 
   get topTabs() {
     const firstTab = [{ value: 'editor', name: $t('Widget Editor') }];
-    if (this.selectedAlert === 'general') {
+    if (this.props.selectedAlert === 'general') {
       return firstTab;
     }
     return this.apiSettings.customCodeAllowed
@@ -186,7 +195,7 @@ export default class WidgetEditor extends Vue {
 
   @Watch('selectedAlert')
   autoselectCurrentSetting() {
-    this.currentSetting = this.navItems[0].value;
+    this.currentSetting = this.props.navItems[0].value;
   }
 
   toggleCustomCode(enabled: boolean) {

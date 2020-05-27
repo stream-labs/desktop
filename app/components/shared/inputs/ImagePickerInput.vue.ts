@@ -1,14 +1,14 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { BaseInput } from './BaseInput';
-import { IListOption } from './index';
+import { IImagePickerMetadata } from './index';
 
 @Component({})
-export default class ImagePickerInput extends BaseInput<string, IListOption<string>> {
+export default class ImagePickerInput extends BaseInput<string, IImagePickerMetadata<string>> {
   @Prop({ default: '' })
   readonly value: string;
 
   @Prop({ default: {} })
-  readonly metadata: IListOption<string>;
+  readonly metadata: IImagePickerMetadata<string>;
 
   @Prop() readonly title: string;
 }

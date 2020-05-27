@@ -98,9 +98,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
    * - Rolled out to
    */
   get canEnableRestream() {
-    return !!(
-      this.userService.state.auth && this.userService.state.auth.primaryPlatform === 'twitch'
-    );
+    return !!(this.userService.state.auth && this.restreamPlatformEligible);
   }
 
   get chatUrl() {
@@ -120,11 +118,29 @@ export class RestreamService extends StatefulService<IRestreamState> {
   get shouldGoLiveWithRestream() {
     return (
       this.userService.state.auth &&
-      this.userService.state.auth.primaryPlatform === 'twitch' &&
+      this.restreamPlatformEligible &&
       this.userService.state.auth.platforms.facebook &&
       this.state.enabled &&
       this.streamSettingsService.protectedModeEnabled
     );
+  }
+
+  /**
+   * Only users logged into these platforms as primary can multistream
+   * for the time being. Eventually all combinations of platforms will
+   * be supported.
+   */
+  get restreamPlatformEligible() {
+    return ['twitch', 'youtube'].includes(this.userService.state.auth.primaryPlatform);
+  }
+
+  /**
+   * This checks to see if all platforms are staged and ready to go live.
+   * If this is false and we are about to go live, we should short circuit
+   * and do something else.
+   */
+  get allPlatformsStaged() {
+    return Object.keys(this.state.platforms).length === this.platforms.length;
   }
 
   fetchUserSettings() {
@@ -171,9 +187,8 @@ export class RestreamService extends StatefulService<IRestreamState> {
     return fetch(request).then(res => res.json());
   }
 
-  // TODO: This will eventually be based on preferences
   get platforms(): TPlatform[] {
-    return ['twitch', 'facebook'];
+    return [this.userService.state.auth.primaryPlatform, 'facebook'];
   }
 
   /**
@@ -195,6 +210,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
   async beforeGoLive() {
     await Promise.all([this.setupIngest(), this.setupTargets()]);
+    this.unstageAllPlatforms();
   }
 
   async setupIngest() {
@@ -217,11 +233,14 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
     await Promise.all(promises);
 
-    const promises2 = Object.keys(this.state.platforms).map(platform => {
-      return this.createTarget(platform as TPlatform, this.state.platforms[platform].streamKey);
-    });
-
-    await Promise.all(promises2);
+    await this.createTargets(
+      Object.keys(this.state.platforms).map(platform => {
+        return {
+          platform: platform as TPlatform,
+          streamKey: this.state.platforms[platform].streamKey,
+        };
+      }),
+    );
   }
 
   checkStatus(): Promise<boolean> {
@@ -237,22 +256,24 @@ export class RestreamService extends StatefulService<IRestreamState> {
       );
   }
 
-  createTarget(platform: TPlatform, streamKey: string) {
+  createTargets(targets: { platform: TPlatform; streamKey: string }[]) {
     const headers = authorizedHeaders(
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
     );
     const url = `https://${this.host}/api/v1/rst/targets`;
-    const body = JSON.stringify([
-      {
-        platform,
-        streamKey,
-        enabled: true,
-        dcProtection: false,
-        idleTimeout: 30,
-        label: `${platform} target`,
-      },
-    ]);
+    const body = JSON.stringify(
+      targets.map(target => {
+        return {
+          platform: target.platform,
+          streamKey: target.streamKey,
+          enabled: true,
+          dcProtection: false,
+          idleTimeout: 30,
+          label: `${target.platform} target`,
+        };
+      }),
+    );
     const request = new Request(url, { headers, body, method: 'POST' });
 
     return fetch(request).then(res => res.json());

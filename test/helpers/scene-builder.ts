@@ -4,8 +4,8 @@ import {
   Scene,
   TSceneNodeType,
   SceneItem,
-  SceneItemNode,
-} from '../../app/services/scenes';
+  SceneNode,
+} from '../../app/services/api/external-api/scenes';
 import { TSourceType } from '../../app/services/sources';
 
 interface ISceneBuilderNode {
@@ -163,13 +163,16 @@ export class SceneBuilder {
           children: this.getSceneSchema(sceneNode.id),
         };
       }
-
-      return {
-        name: sceneNode.name,
-        id: sceneNode.id,
-        type: 'item' as TSceneNodeType,
-        sourceType: (sceneNode as SceneItem).getSource().type,
-      };
+      if (sceneNode.isItem()) {
+        return {
+          name: sceneNode.name,
+          id: sceneNode.id,
+          type: 'item' as TSceneNodeType,
+          sourceType: (
+            sceneNode as SceneItem
+          ).getSource().type,
+        };
+      }
     });
   }
 
@@ -204,7 +207,7 @@ export class SceneBuilder {
 
   private buildNodes(nodes: ISceneBuilderNode[], parentId?: string): ISceneBuilderNode[] {
     nodes.reverse().forEach(node => {
-      let sceneNode: SceneItemNode;
+      let sceneNode: SceneNode;
 
       if (node.type === 'item') {
         sceneNode = this.scene.createAndAddSource(node.name, node.sourceType);

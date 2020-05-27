@@ -1,4 +1,5 @@
 import { Observable } from 'rxjs';
+import { OS } from 'util/operating-systems';
 
 export interface ISceneCollectionsServiceApi {
   /**
@@ -34,7 +35,7 @@ export interface ISceneCollectionsServiceApi {
   /**
    * Contains the active collection
    */
-  activeCollection: ISceneCollectionsManifestEntry;
+  activeCollection: ISceneCollectionsManifestEntry | undefined;
 
   /**
    * Subscribe to receive notifications when a new collection is added
@@ -92,6 +93,11 @@ export interface ISceneCollectionsManifestEntry {
   deleted: boolean;
   modified: string;
   needsRename: boolean;
+
+  /**
+   * We don't support bi-directional sync between operating systems.
+   */
+  operatingSystem: OS;
 
   /**
    * This scene collection was created automatically this session because

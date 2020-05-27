@@ -419,7 +419,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     description: $t('Set a goal for your viewers to help you reach.'),
     demoVideo: false,
     demoFilename: 'source-follower-goal.png',
-    supportList: [$t('Youtube Subscribers')],
+    supportList: [$t('YouTube Subscribers')],
     platforms: new Set(['youtube']),
   },
   [WidgetType.SubGoal]: {
@@ -427,7 +427,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     description: $t('Set a goal for your viewers to help you reach.'),
     demoVideo: false,
     demoFilename: 'source-follower-goal.png',
-    supportList: [$t('Twitch Subscribers'), $t('Youtube Members'), $t('Mixer Subscriptions')],
+    supportList: [$t('Twitch Subscribers'), $t('YouTube Members'), $t('Mixer Subscriptions')],
     platforms: new Set(['twitch', 'youtube', 'mixer']),
   },
   [WidgetType.BitGoal]: {
@@ -455,7 +455,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     platforms: new Set(['facebook']),
   },
   [WidgetType.DonationTicker]: {
-    name: $t('Donation Ticker'),
+    name: $t('Tip Ticker'),
     description: $t('Show off your most recent donations to your viewers.'),
     demoVideo: true,
     demoFilename: 'source-donation-ticker.mp4',
@@ -466,7 +466,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     description: $t("Include your channel's chat into your stream."),
     demoVideo: true,
     demoFilename: 'source-chatbox.mp4',
-    supportList: [$t('Twitch chat'), $t('Youtube chat'), $t('Mixer chat'), $t('Facebook chat')],
+    supportList: [$t('Twitch chat'), $t('YouTube chat'), $t('Mixer chat'), $t('Facebook chat')],
   },
   [WidgetType.EventList]: {
     name: $t('Event List'),
@@ -494,7 +494,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     description: $t('Show off your viewers from multiple platforms.'),
     demoVideo: false,
     demoFilename: 'source-viewer-count.png',
-    supportList: ['Youtube', 'Twitch', 'Mixer'],
+    supportList: ['YouTube', 'Twitch', 'Mixer'],
   },
   [WidgetType.StreamBoss]: {
     name: $t('Stream Boss'),
@@ -509,6 +509,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoVideo: true,
     demoFilename: 'source-credits.mp4',
     supportList: [$t('New Followers'), $t('New Subscribers'), $t('Cheers'), $t('Donations')],
+    platforms: new Set(['twitch', 'youtube', 'mixer']),
   },
   [WidgetType.SponsorBanner]: {
     name: $t('Sponsor Banner'),

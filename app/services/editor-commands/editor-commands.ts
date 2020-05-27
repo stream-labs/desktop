@@ -8,6 +8,7 @@ import { Inject } from 'services/core/injector';
 import { ENudgeDirection } from './commands/nudge-items';
 import { SceneCollectionsService } from 'services/scene-collections';
 import electron from 'electron';
+import Utils from 'services/utils';
 
 const COMMANDS = { ...commands };
 
@@ -62,8 +63,10 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
 
   executeCommand<TCommand extends keyof typeof COMMANDS>(
     commandType: TCommand,
+    // eslint-disable-next-line prettier/prettier
     ...commandArgs: ConstructorParameters<(typeof COMMANDS)[TCommand]>
-  ): ReturnType<InstanceType<(typeof COMMANDS)[TCommand]>['execute']> {
+  ): // eslint-disable-next-line prettier/prettier
+    ReturnType<InstanceType<(typeof COMMANDS)[TCommand]>['execute']> {
     // Executing any command clears out the redo history, since we are
     // creating a new branch in the timeline.
     this.redoHistory = [];
@@ -171,7 +174,7 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
 
   private handleUndoRedoError(undo: boolean, e: any) {
     console.error(`Error performing ${undo ? 'undo' : 'redo'} operation`, e);
-    electron.remote.dialog.showMessageBox({
+    electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
       title: 'Error',
       message: `An error occurred while ${undo ? 'undoing' : 'redoing'} the operation.`,
       type: 'error',

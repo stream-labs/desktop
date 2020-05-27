@@ -1,6 +1,20 @@
 {
-  "You can access your Facebook Streamer Dashboard here.": "You can access your Facebook Streamer Dashboard here.",
-  "You need a Facebook page to stream to Facebook. You can create one now.": "You need a Facebook page to stream to Facebook. You can create one now.",
-  "Create a Page": "Create a Page",
-  "Facebook Setup": "Facebook Setup"
+  "You can access your Facebook Streamer Dashboard here.": "Na panel Streamer Facebook máte prístup tu.",
+  "You need a Facebook page to stream to Facebook. You can create one now.": "Na streamovanie na Facebook potrebujete Facebook stránku. Teraz si môžete vytvoriť.",
+  "Create a Page": "Vytvorte stránku",
+  "Facebook Setup": "Nastavenie Facebooku",
+  "Streamer Dashboard": "Streamer Dashboard",
+  "It looks like you don't have any Pages. Head to ": "Zdá sa, že nemáte žiadne stránky. Choďte na ",
+  "Share": "Zdieľam",
+  "Like": "Páči sa mi to",
+  "Step": "Krok",
+  "Create a Facebook Gaming page to get started.": "Ak chcete začať, vytvorte si stránku s hrami na Facebooku.",
+  "Create a Gaming Page": "Vytvorte stránku Gaming",
+  "Connect Facebook to Streamlabs OBS.": "Pripojte Facebook k Streamlabs OBS.",
+  "All of your scenes, sources, and settings will be preserved.": "Všetky vaše scény, zdroje a nastavenia sa zachovajú.",
+  "Connect Facebook": "Pripojte Facebook",
+  "Multistream To Facebook": "Multistream na Facebook",
+  "Connect": "Pripojiť",
+  "Install Your Theme": "Nainštalujte si tému",
+  "Install": "Inštalácia"
 }

@@ -8,27 +8,36 @@ const base = {
     'node_modules',
     'vendor',
     'app/i18n',
+    'media/images/game-capture',
     'updater/build/bootstrap.js',
+    'updater/build/bundle-updater.js',
+    'updater/index.html',
     'index.html',
     'main.js',
     'obs-api'
   ],
   extraFiles: [
     'LICENSE',
-    'AGREEMENT'
+    'AGREEMENT',
+    'shared-resources/*',
+    '!shared-resources/README'
   ],
   nsis: {
     license: 'AGREEMENT',
     oneClick: false,
     perMachine: true,
     allowToChangeInstallationDirectory: true,
+    uninstallDisplayName: "Streamlabs OBS",
     include: 'installer.nsh'
   },
   publish: {
     provider: 'generic',
     url: 'https://slobs-cdn.streamlabs.com'
   },
-  win: {},
+  win: {
+    rfc3161TimeStampServer: 'http://timestamp.digicert.com',
+    timeStampServer: 'http://timestamp.digicert.com'
+  },
   extraMetadata: {
     env: 'production'
   }

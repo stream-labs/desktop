@@ -32,6 +32,7 @@ import Utils from 'services/utils';
 import YoutubeEditStreamInfo from 'components/platforms/youtube/YoutubeEditStreamInfo';
 import { YoutubeService } from 'services/platforms/youtube';
 import { RestreamService } from 'services/restream';
+import Translate from 'components/shared/translate';
 
 @Component({
   components: {
@@ -44,6 +45,7 @@ import { RestreamService } from 'services/restream';
     Spinner,
     Twitter,
     YoutubeEditStreamInfo,
+    Translate,
   },
 })
 export default class EditStreamInfo extends Vue {
@@ -93,8 +95,7 @@ export default class EditStreamInfo extends Vue {
     return (
       !this.infoLoading &&
       this.isFacebook &&
-      this.facebookService.state.facebookPages &&
-      this.facebookService.state.facebookPages.pages.length
+      this.facebookService.state?.facebookPages?.pages?.length
     );
   }
 
@@ -137,17 +138,16 @@ export default class EditStreamInfo extends Vue {
         disabled: this.updatingInfo,
         fullWidth: true,
       }),
-      date: metadata.text({
+      date: metadata.date({
         title: $t('Scheduled Date'),
-        dateFormat: 'MM/dd/yyyy',
-        placeholder: 'MM/DD/YYYY',
+        disablePastDates: true,
         required: true,
         disabled: this.updatingInfo,
         description: this.isFacebook
-          ? $t(
-              'Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.',
-            )
+          /* eslint-disable */
+          ? $t('Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.')
           : undefined,
+          /* eslint-enable */
       }),
       time: metadata.timer({
         title: $t('Scheduled Time'),
@@ -173,8 +173,7 @@ export default class EditStreamInfo extends Vue {
   async onGameSearchHandler(searchString: string) {
     if (searchString !== '') {
       this.searchingGames = true;
-      const platform = this.userService.platform.type;
-      const service = getPlatformService(platform);
+      const service = getPlatformService(this.platform);
 
       this.gameOptions = [];
 
@@ -256,7 +255,9 @@ export default class EditStreamInfo extends Vue {
   async scheduleStream() {
     this.updatingInfo = true;
 
-    const scheduledStartTime = this.formatDateString();
+    const scheduledStartTime = new Date(
+      this.startTimeModel.date + this.startTimeModel.time * 1000,
+    ).toISOString();
     const service = getPlatformService(this.userService.platform.type);
     if (scheduledStartTime) {
       await service
@@ -283,10 +284,10 @@ export default class EditStreamInfo extends Vue {
           );
         })
         .catch(e => {
-          this.$toasted.show(e.error.message, {
+          this.$toasted.show(e.message, {
             position: 'bottom-center',
             className: 'toast-alert',
-            duration: 50 * e.error.message.length,
+            duration: 50 * e.message.length,
             singleton: true,
           });
         });
@@ -365,7 +366,12 @@ export default class EditStreamInfo extends Vue {
       this.streamInfoService.createGameAssociation(this.channelInfo.game);
       this.windowsService.closeChildWindow();
       // youtube needs additional actions after the stream has been started
-      if (this.isYoutube) (this.platformService as YoutubeService).showStreamStatusWindow();
+      if (
+        (this.windowQuery.platforms && this.windowQuery.platforms.includes('youtube')) ||
+        this.isYoutube
+      ) {
+        (getPlatformService('youtube') as YoutubeService).showStreamStatusWindow();
+      }
     } catch (e) {
       const message = this.platformService.getErrorDescription(e);
       this.$toasted.show(message, {
@@ -499,25 +505,5 @@ export default class EditStreamInfo extends Vue {
           'resolution may be changed for a better quality of experience',
       ),
     };
-  }
-
-  private formatDateString() {
-    try {
-      const dateArray = this.startTimeModel.date.split('/');
-      let hours: string | number = Math.floor(this.startTimeModel.time / 3600);
-      hours = hours < 10 ? `0${hours}` : hours;
-      let minutes: string | number = (this.startTimeModel.time % 3600) / 60;
-      minutes = minutes < 10 ? `0${minutes}` : minutes;
-      return `${dateArray[2]}-${dateArray[0]}-${
-        dateArray[1]
-      }T${hours}:${minutes}:00.0${moment().format('Z')}`;
-    } catch {
-      this.$toasted.show($t('Please enter a valid date'), {
-        position: 'bottom-center',
-        className: 'toast-alert',
-        duration: 1000,
-        singleton: true,
-      });
-    }
   }
 }

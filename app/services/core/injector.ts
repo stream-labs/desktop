@@ -24,7 +24,7 @@ export function Inject(serviceName?: string) {
       get() {
         const name = serviceName || key.charAt(0).toUpperCase() + key.slice(1);
         const service = ServicesManager.instance.getService(name);
-        if (!service) throw `Service not found: ${name}`;
+        if (!service) throw new Error(`Service not found: ${name}`);
         return service.instance;
       },
     });

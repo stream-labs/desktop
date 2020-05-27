@@ -41,7 +41,6 @@
     .margin--none();
 
     color: var(--title);
-    text-transform: capitalize;
   }
 
   .icon-down {

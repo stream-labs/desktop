@@ -25,7 +25,7 @@
       :value="localValue"
       @input="updateLocalValue($event.target.value)"
       @keydown="handleKeydown"
-    >
+    />
   </div>
 </template>
 
@@ -36,6 +36,25 @@
   width: 100%;
   display: flex;
   position: relative;
+
+  & /deep/ .s-slider {
+    .vue-slider {
+      background-color: var(--border);
+    }
+
+    .vue-slider-process {
+      background-color: var(--slider-bg);
+    }
+
+    .vue-slider-dot-handle {
+      background-color: var(--paragraph);
+
+      &::before,
+      &::after {
+        color: var(--button);
+      }
+    }
+  }
 }
 
 .slider-container.has-tooltip {
@@ -45,9 +64,5 @@
 .slider-input {
   width: 50px;
   margin-left: 16px;
-}
-
-.slider-container /deep/ .s-slider .vue-slider {
-  background-color: var(--slider-bg);
 }
 </style>

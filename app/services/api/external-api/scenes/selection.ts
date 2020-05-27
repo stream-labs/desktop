@@ -34,6 +34,10 @@ export class Selection implements ISceneItemActions {
     this.internalSelection = new InternalSelection(sceneId, itemsList);
   }
 
+  private isDestroyed(): boolean {
+    return this.internalSelection.isDestroyed();
+  }
+
   get sceneId() {
     return this.internalSelection.sceneId;
   }
@@ -318,5 +322,19 @@ export class Selection implements ISceneItemActions {
 
   scaleWithOffset(scale: IVec2, offset: IVec2) {
     return this.selection.scale(scale, offset);
+  }
+
+  /**
+   * returns true if selection contains only one SceneFolder
+   */
+  isSceneFolder(): boolean {
+    return this.selection.isSceneFolder();
+  }
+
+  /**
+   * returns true if selection contains only one SceneItem
+   */
+  isSceneItem(): boolean {
+    return this.selection.isSceneFolder();
   }
 }

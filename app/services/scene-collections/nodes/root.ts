@@ -6,6 +6,7 @@ import { HotkeysNode } from './hotkeys';
 import { Inject } from 'services/core';
 import { VideoService } from 'services/video';
 import { StreamingService } from 'services/streaming';
+import { OS } from 'util/operating-systems';
 
 interface ISchema {
   baseResolution: {
@@ -17,6 +18,8 @@ interface ISchema {
   scenes: ScenesNode;
   hotkeys?: HotkeysNode;
   transitions?: TransitionsNode; // V2 Transitions
+
+  operatingSystem?: OS;
 }
 
 // This is the root node of the config file
@@ -44,6 +47,7 @@ export class RootNode extends Node<ISchema, {}> {
       hotkeys,
       baseResolution: this.videoService.baseResolution,
       selectiveRecording: this.streamingService.state.selectiveRecording,
+      operatingSystem: process.platform as OS,
     };
   }
 

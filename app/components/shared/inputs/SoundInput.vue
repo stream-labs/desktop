@@ -1,19 +1,17 @@
 <template>
-  <div>
-    <div class="media-box">
-      <div class="url-uploader" v-if="showUrlUpload">
-        {{ $t('Image URL') }}
-        <text-input v-model="url" :metadata="{ placeholder: `${$t('Example')}: https://yoururl.com/image/Streamlabs` }" />
-        <button class="button button--action" @click="uploadUrl">{{ $t('Submit') }}</button>
-      </div>
-      <div class="footer">
-        <span class="filename">{{ fileName || $t('No Sound') }}</span>
-        <div>
-          <i @click="toggleUrlUpload" class="icon-link" />
-          <i @click="previewSound" class="fa fa-search-plus" />
-          <i @click="clearSound" class="icon-close" />
-          <span @click="updateValue" class="change-media">{{ $t('Change Media') }}</span>
-        </div>
+  <div class="media-box">
+    <div class="url-uploader" v-if="showUrlUpload">
+      {{ $t('Image URL') }}
+      <text-input v-model="url" :metadata="{ placeholder: `${$t('Example')}: https://yoururl.com/image/Streamlabs` }" />
+      <button class="button button--action" @click="uploadUrl">{{ $t('Submit') }}</button>
+    </div>
+    <div class="footer">
+      <span class="filename">{{ fileName || $t('No Sound') }}</span>
+      <div>
+        <i @click="toggleUrlUpload" class="icon-link" />
+        <i @click="previewSound" class="fa fa-search-plus" />
+        <i @click="clearSound" class="icon-close" />
+        <span @click="updateValue" class="change-media">{{ $t('Change Media') }}</span>
       </div>
     </div>
   </div>
@@ -29,6 +27,7 @@
 
   position: relative;
   width: 100%;
+  max-width: 300px;
   height: 30px;
   background-color: var(--section);
 }

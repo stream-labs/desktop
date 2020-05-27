@@ -48,7 +48,7 @@ const DEFAULT_CUSTOM_FIELDS: Dictionary<ICustomField> = {
   customField2: {
     label: 'Slider Example',
     type: 'slider',
-    value: 3,
+    value: 100,
     max: 200,
     min: 100,
     steps: 4,
@@ -77,18 +77,17 @@ const DEFAULT_CUSTOM_FIELDS: Dictionary<ICustomField> = {
     value: 'optionB',
   },
 
-  // TODO:
-  // customField6: {
-  //   label: 'Image Input Example',
-  //   type: 'image-input',
-  //   value: null
-  // },
-  //
-  // customField7: {
-  //   label: 'Sound Input Example',
-  //   type: 'sound-input',
-  //   value: null
-  // }
+  customField6: {
+    label: 'Image Input Example',
+    type: 'image-input',
+    value: null,
+  },
+
+  customField7: {
+    label: 'Sound Input Example',
+    type: 'sound-input',
+    value: null,
+  },
 };
 
 @Component({
@@ -168,7 +167,16 @@ export default class CustomFieldsEditor extends Vue {
           });
           break;
 
-        // TODO: add image-input and sound-input
+        case 'sound-input':
+          inputMetadata = metadata.sound({
+            title: field.label,
+          });
+          break;
+        case 'image-input':
+          inputMetadata = metadata.mediaGallery({
+            title: field.label,
+          });
+          break;
         default:
           inputMetadata = null;
           break;

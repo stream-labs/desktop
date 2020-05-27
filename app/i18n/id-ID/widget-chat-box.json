@@ -1,0 +1,19 @@
+{
+  "Visual Settings": "Pengaturan Visual",
+  "Font Settings": "Pengaturan Font",
+  "Chatter": "Chatter",
+  "Always Show Messages": "Selalu Tampilkan Pesan",
+  "Show Moderator Badges": "Tampilkan Lencana Moderator",
+  "Show Subscriber Badges": "Tampilkan Lencana Pelanggan",
+  "Show Turbo Badges": "Tampilkan Lencana Turbo",
+  "Show Twitch Prime Badges": "Tampilkan Lencana Utama Twitch",
+  "Show Bits Badges": "Tampilkan Lencana Bit",
+  "Show Top Coin Holder Badges": "Tampilkan Lencana Wadah Koin Utama",
+  "Enable BetterTTV Emotes": "Aktifkan Emote BetterTTV",
+  "Enable FrankerFaceZ Emotes": "Aktifkan Emote FrankerFaceZ",
+  "Text Color": "Warna Teks",
+  "Font Size": "Ukuran Font",
+  "Muted Chatters": "Mute Chatter",
+  "Hide Commands": "Sembunyikan Perintah",
+  "Background Color": "Warna Latar Belakang"
+}

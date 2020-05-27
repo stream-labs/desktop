@@ -1,0 +1,20 @@
+{
+  "You don't have any notifications": "Anda tidak mendapatkan notifikasi apa pun",
+  "Enable notifications": "Aktifkan notifikasi",
+  "Enable sound": "Aktifkan suara",
+  "Skipped frames detected:": "Frame terlewatkan yang terdeteksi:",
+  "Detect skipped frames": "Deteksi frame yang terlewatkan",
+  "Skipped frames threshold": "Ambang batas frame yang terlewatkan:",
+  "Detect lagged frames": "Deteksi frame yang tertunda",
+  "Lagged frames threshold": "Ambang batas frame yang tertunda:",
+  "Detect dropped frames": "Deteksi frame yang jatuh",
+  "Dropped frames threshold": "Ambang batas frame yang jatuh:",
+  "Show Notifications": "Tampilkan Notifkasi",
+  "Restore Defaults": "Pulihkan Default",
+  "Troubleshooter Notifications": "Notifikasi Penyelesaian Masalah",
+  "Click to open your Notifications window": "Klik untuk membuka jendela Notifikasi Anda",
+  "Click to read your unread Notifications": "Klik untuk membaca Notifikasi yang belum dibaca",
+  "New Notifications": "Notifikasi Baru",
+  "Log": "Log",
+  "Streamlabs OBS has updated! Click here to see what changed.": "Streamlabs OBS telah diperbarui! Klik di sini untuk melihat perubahan."
+}

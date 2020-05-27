@@ -40,7 +40,7 @@ export default class PerformanceMetrics extends TsxComponent<{
   }
 
   get bandwidth() {
-    return this.performanceService.state.bandwidth.toFixed(0);
+    return this.performanceService.state.streamingBandwidth.toFixed(0);
   }
 
   get showCPU() {
@@ -59,8 +59,10 @@ export default class PerformanceMetrics extends TsxComponent<{
     return this.mode === 'full' || this.customizationService.state.pinnedStatistics.bandwidth;
   }
 
-  get pinTooltip() {
-    return this.mode === 'full' ? $t('Click to add this info to your footer') : '';
+  pinTooltip(stat: string) {
+    return this.mode === 'full'
+      ? $t('Click to add %{stat} info to your footer', { stat: $t(`${stat}`) })
+      : '';
   }
 
   updatePinnedStats(key: string, value: boolean) {

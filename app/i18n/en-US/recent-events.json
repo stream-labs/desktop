@@ -22,7 +22,7 @@
   "has shared": "has shared",
   "has superchatted": "has superchatted",
   "has pledged on Patreon": "has pledged on Patreon",
-  "has donated to ExtraLife": "has donated to ExtraLife",
+  "has donated to Extra Life": "has donated to Extra Life",
   "has donated to Tiltify": "has donated to Tiltify",
   "has donated to Donor Drive": "has donated to Donor Drive",
   "has donated to Just Giving": "has donated to Just Giving",
@@ -48,5 +48,5 @@
   "Effects": "Effects",
   "has purchased %{product} from the store": "has purchased %{product} from the store",
   "Event Filters": "Event Filters",
-  "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, just click here.": "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, just click here."
+  "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, check out the Layout Editor in the sidebar.": "We have combined the Editor & Live tabs, and given your events feed a new look. If you want to switch back to the old events feed, check out the Layout Editor in the sidebar."
 }

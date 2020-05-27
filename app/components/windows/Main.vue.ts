@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import SideNav from '../SideNav';
 import NewsBanner from '../NewsBanner';
 import { ScenesService } from 'services/scenes';
@@ -11,12 +11,13 @@ import fs from 'fs';
 Vue.use(VueResize);
 
 // Pages
-import Studio from '../pages/Studio.vue';
+import Studio from '../pages/Studio';
 import Chatbot from '../pages/Chatbot.vue';
 import PlatformAppStore from '../pages/PlatformAppStore.vue';
 import BrowseOverlays from 'components/pages/BrowseOverlays.vue';
 import Onboarding from '../pages/Onboarding';
-import TitleBar from '../TitleBar.vue';
+import LayoutEditor from '../pages/LayoutEditor';
+import TitleBar from '../TitleBar';
 import { Inject } from '../../services/core/injector';
 import { CustomizationService } from 'services/customization';
 import { NavigationService } from 'services/navigation';
@@ -28,11 +29,17 @@ import StudioFooter from '../StudioFooter.vue';
 import CustomLoader from '../CustomLoader';
 import PatchNotes from '../pages/PatchNotes.vue';
 import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
-import Help from '../pages/Help.vue';
 import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import FacebookMerge from 'components/pages/FacebookMerge';
 import { getPlatformService } from 'services/platforms';
+
+const loadedTheme = () => {
+  const customizationState = localStorage.getItem('PersistentStatefulService-CustomizationService');
+  if (customizationState) {
+    return JSON.parse(customizationState)?.theme;
+  }
+};
 
 @Component({
   components: {
@@ -49,9 +56,9 @@ import { getPlatformService } from 'services/platforms';
     Chatbot,
     PlatformAppMainPage,
     PlatformAppStore,
-    Help,
     ResizeBar,
     FacebookMerge,
+    LayoutEditor,
   },
 })
 export default class Main extends Vue {
@@ -64,16 +71,31 @@ export default class Main extends Vue {
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() editorCommandsService: EditorCommandsService;
 
-  mounted() {
-    const dockWidth = this.customizationService.state.livedockSize;
-    if (dockWidth < 1) {
-      // migrate from old percentage value to the pixel value
-      this.resetWidth();
-    }
-
-    electron.remote.getCurrentWindow().show();
-    this.handleResize();
+  created() {
+    window.addEventListener('resize', this.windowSizeHandler);
   }
+
+  get bulkLoadFinished() {
+    return this.$store.state.bulkLoadFinished;
+  }
+
+  @Watch('bulkLoadFinished')
+  initializeResize() {
+    this.$nextTick(() => {
+      const dockWidth = this.customizationService.state.livedockSize;
+      if (dockWidth < 1) {
+        // migrate from old percentage value to the pixel value
+        this.resetWidth();
+      }
+      this.handleResize();
+    });
+  }
+
+  destroyed() {
+    window.removeEventListener('resize', this.windowSizeHandler);
+  }
+
+  minEditorWidth = 500;
 
   get title() {
     return this.windowsService.state.main.title;
@@ -88,7 +110,11 @@ export default class Main extends Vue {
   }
 
   get theme() {
-    return this.customizationService.currentTheme;
+    if (this.$store.state.bulkLoadFinished) {
+      return this.customizationService.currentTheme;
+    }
+
+    return loadedTheme() || 'night-theme';
   }
 
   get applicationLoading() {
@@ -102,7 +128,7 @@ export default class Main extends Vue {
   }
 
   get isLoggedIn() {
-    return this.userService.isLoggedIn();
+    return this.userService.isLoggedIn;
   }
 
   get renderDock() {
@@ -147,7 +173,12 @@ export default class Main extends Vue {
   }
 
   async onDropHandler(event: DragEvent) {
+    if (this.page !== 'Studio') return;
+
     const fileList = event.dataTransfer.files;
+
+    if (fileList.length < 1) return;
+
     const files: string[] = [];
     let fi = fileList.length;
     while (fi--) files.push(fileList.item(fi).path);
@@ -176,7 +207,7 @@ export default class Main extends Vue {
   executeFileDrop(files: string[]) {
     this.editorCommandsService.executeCommand(
       'AddFilesCommand',
-      this.scenesService.activeSceneId,
+      this.scenesService.views.activeSceneId,
       files,
     );
   }
@@ -197,14 +228,6 @@ export default class Main extends Vue {
     return classes.join(' ');
   }
 
-  created() {
-    window.addEventListener('resize', this.windowSizeHandler);
-  }
-
-  destroyed() {
-    window.removeEventListener('resize', this.windowSizeHandler);
-  }
-
   windowWidth: number;
 
   hasLiveDock = true;
@@ -220,8 +243,11 @@ export default class Main extends Vue {
     clearTimeout(this.windowResizeTimeout);
 
     this.hasLiveDock = this.windowWidth >= 1070;
+    if (this.page === 'Studio') {
+      this.hasLiveDock = this.windowWidth >= this.minEditorWidth + 100;
+    }
     this.windowResizeTimeout = window.setTimeout(
-      () => this.windowsService.updateStyleBlockers('main', false),
+      () => this.windowsService.actions.updateStyleBlockers('main', false),
       200,
     );
   }
@@ -230,27 +256,30 @@ export default class Main extends Vue {
     this.compactView = this.$refs.mainMiddle.clientWidth < 1200;
   }
 
+  handleEditorWidth(width: number) {
+    this.minEditorWidth = width;
+  }
+
   onResizeStartHandler() {
-    this.windowsService.updateStyleBlockers('main', true);
+    this.windowsService.actions.updateStyleBlockers('main', true);
   }
 
   onResizeStopHandler(offset: number) {
     const adjustedOffset = this.leftDock ? offset : -offset;
     this.setWidth(this.customizationService.state.livedockSize + adjustedOffset);
-    this.windowsService.updateStyleBlockers('main', false);
+    this.windowsService.actions.updateStyleBlockers('main', false);
   }
 
   setWidth(width: number) {
-    this.customizationService.setSettings({
+    this.customizationService.actions.setSettings({
       livedockSize: this.validateWidth(width),
     });
   }
 
   validateWidth(width: number): number {
     const appRect = this.$root.$el.getBoundingClientRect();
-    const minEditorWidth = 500;
     const minWidth = 290;
-    const maxWidth = Math.min(appRect.width - minEditorWidth, appRect.width / 2);
+    const maxWidth = Math.min(appRect.width - this.minEditorWidth, appRect.width / 2);
     let constrainedWidth = Math.max(minWidth, width);
     constrainedWidth = Math.min(maxWidth, width);
     return constrainedWidth;

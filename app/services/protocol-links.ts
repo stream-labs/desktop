@@ -7,6 +7,7 @@ import { PlatformAppsService } from 'services/platform-apps';
 import { PlatformAppStoreService } from 'services/platform-app-store';
 import { FacemasksService } from 'services/facemasks';
 import { UserService } from 'services/user';
+import { SettingsService } from './settings';
 
 function protocolHandler(base: string) {
   return (target: any, methodName: string, descriptor: PropertyDescriptor) => {
@@ -31,6 +32,7 @@ export class ProtocolLinksService extends Service {
   @Inject() platformAppStoreService: PlatformAppStoreService;
   @Inject() facemasksService: FacemasksService;
   @Inject() userService: UserService;
+  @Inject() settingsService: SettingsService;
 
   // Maps base URL components to handler function names
   private handlers: Dictionary<string>;
@@ -62,7 +64,7 @@ export class ProtocolLinksService extends Service {
 
   @protocolHandler('library')
   private navigateLibrary(info: IProtocolLinkInfo) {
-    if (!this.userService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn) return;
 
     const parts = info.path.match(/^\/(.+)\/(.+)$/);
     if (parts) {
@@ -75,18 +77,18 @@ export class ProtocolLinksService extends Service {
 
   @protocolHandler('paypalauth')
   private updateUserBillingInfo(info: IProtocolLinkInfo) {
-    if (!this.userService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn) return;
 
     this.platformAppStoreService.paypalAuthSuccess();
   }
 
   @protocolHandler('app')
   private navigateApp(info: IProtocolLinkInfo) {
-    if (!this.userService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn) return;
 
     const appId = info.path.replace('/', '');
 
-    if (this.platformAppsService.getApp(appId)) {
+    if (this.platformAppsService.views.getApp(appId)) {
       this.navigationService.navigate('PlatformAppMainPage', { appId });
     } else {
       this.navigationService.navigate('PlatformAppStore', { appId });
@@ -95,8 +97,15 @@ export class ProtocolLinksService extends Service {
 
   @protocolHandler('facemasks')
   private openFacemaskSettings() {
-    if (!this.userService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn) return;
 
     this.facemasksService.showSettings();
+  }
+
+  @protocolHandler('settings')
+  private openSettings(info: IProtocolLinkInfo) {
+    const category = info.path.replace('/', '');
+
+    this.settingsService.showSettings(category);
   }
 }

@@ -1,12 +1,13 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Subscription } from 'rxjs';
-import { AudioSource } from 'services/audio';
+import { AudioSource, AudioService, IVolmeter } from 'services/audio';
 import { Inject } from 'services/core/injector';
 import { CustomizationService } from 'services/customization';
 import { compileShader, createProgram } from 'util/webgl/utils';
 import vShaderSrc from 'util/webgl/shaders/volmeter.vert';
 import fShaderSrc from 'util/webgl/shaders/volmeter.frag';
+import electron from 'electron';
 import TsxComponent, { createProps } from './tsx-component';
 
 // Configuration
@@ -29,6 +30,7 @@ class MixerVolmeterProps {
 @Component({ props: createProps(MixerVolmeterProps) })
 export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
   @Inject() customizationService: CustomizationService;
+  @Inject() audioService: AudioService;
 
   volmeterSubscription: Subscription;
 
@@ -79,9 +81,6 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
 
   beforeDestroy() {
     this.$refs.canvas.removeEventListener('webglcontextlost', this.handleLostWebglContext);
-  }
-
-  destroyed() {
     if (this.gl) window['activeWebglContexts'] -= 1;
     clearInterval(this.canvasWidthInterval);
     this.unsubscribeVolmeter();
@@ -165,7 +164,7 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, positionBuffer);
 
     // Vertex geometry for a unit square
-    // tslint:disable-next-line
+    // eslint-disable-next-line
     const positions = [
       0, 0,
       0, 1,
@@ -204,13 +203,20 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
 
   private setColorUniform(uniform: string, color: number[]) {
     const location = this.gl.getUniformLocation(this.program, uniform);
+    // eslint-disable-next-line
     this.gl.uniform3fv(location, color.map(c => c / 255));
   }
 
   private setChannelCount(channels: number) {
     if (channels !== this.channelCount) {
       this.channelCount = channels;
-      this.canvasHeight = channels * (CHANNEL_HEIGHT + PADDING_HEIGHT) - PADDING_HEIGHT;
+      this.canvasHeight = Math.max(
+        channels * (CHANNEL_HEIGHT + PADDING_HEIGHT) - PADDING_HEIGHT,
+        0,
+      );
+
+      if (!this.$refs.canvas) return;
+
       this.$refs.canvas.height = this.canvasHeight;
       this.$refs.canvas.style.height = `${this.canvasHeight}px`;
       this.$refs.spacer.style.height = `${this.canvasHeight}px`;
@@ -233,7 +239,7 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
   }
 
   private drawVolmeterWebgl(peaks: number[]) {
-    const bg = this.customizationService.themeBackground;
+    const bg = this.customizationService.sectionBackground;
 
     this.gl.clearColor(bg.r / 255, bg.g / 255, bg.b / 255, 1);
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
@@ -357,11 +363,22 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
     this.peakHoldCounters[channel] -= 1;
   }
 
+  workerId: number;
+
+  listener: (e: Electron.Event, volmeter: IVolmeter) => void;
+
   subscribeVolmeter() {
-    this.volmeterSubscription = this.props.audioSource.subscribeVolmeter(volmeter => {
-      if (volmeter.peak.length) {
+    this.listener = (e: Electron.Event, volmeter: IVolmeter) => {
+      if (this.$refs.canvas) {
+        // don't init context for inactive sources
+        if (!volmeter.peak.length && !this.renderingInitialized) return;
+
         this.initRenderingContext();
         this.setChannelCount(volmeter.peak.length);
+
+        // don't render sources then channelsCount is 0
+        // happens when the browser source stops playing audio
+        if (!volmeter.peak.length) return;
 
         if (this.gl) {
           this.drawVolmeterWebgl(volmeter.peak);
@@ -369,10 +386,29 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
           this.drawVolmeterC2d(volmeter.peak);
         }
       }
-    });
+    };
+
+    electron.ipcRenderer.on(`volmeter-${this.props.audioSource.sourceId}`, this.listener);
+
+    // TODO: Remove sync
+    this.workerId = electron.ipcRenderer.sendSync('getWorkerWindowId');
+
+    electron.ipcRenderer.sendTo(
+      this.workerId,
+      'volmeterSubscribe',
+      this.props.audioSource.sourceId,
+    );
   }
 
   unsubscribeVolmeter() {
-    this.volmeterSubscription && this.volmeterSubscription.unsubscribe();
+    electron.ipcRenderer.removeListener(
+      `volmeter-${this.props.audioSource.sourceId}`,
+      this.listener,
+    );
+    electron.ipcRenderer.sendTo(
+      this.workerId,
+      'volmeterUnsubscribe',
+      this.props.audioSource.sourceId,
+    );
   }
 }

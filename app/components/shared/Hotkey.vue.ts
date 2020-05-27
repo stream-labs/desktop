@@ -45,6 +45,7 @@ export default class HotkeyComponent extends TsxComponent<HotkeyProps> {
     const binding = this.bindings[index];
 
     const key =
+      /*eslint-disable*/
       event instanceof MouseEvent
         ? {
             1: 'MiddleMouseButton',
@@ -52,7 +53,6 @@ export default class HotkeyComponent extends TsxComponent<HotkeyProps> {
             4: 'X2MouseButton',
           }[event.button]
         : event.code;
-
     binding.binding = {
       key,
       modifiers: this.getModifiers(event),

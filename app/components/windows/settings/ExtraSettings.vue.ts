@@ -82,7 +82,7 @@ export default class ExtraSettings extends Vue {
     this.streamlabelsService.restartSession().then(result => {
       if (result) {
         electron.remote.dialog.showMessageBox({
-          message: $t('Streamlabels session has been succesfully restarted!'),
+          message: $t('Stream Labels session has been succesfully restarted!'),
         });
       }
     });
@@ -103,7 +103,7 @@ export default class ExtraSettings extends Vue {
   }
 
   get isLoggedIn() {
-    return this.userService.isLoggedIn();
+    return this.userService.isLoggedIn;
   }
 
   get isTwitch() {

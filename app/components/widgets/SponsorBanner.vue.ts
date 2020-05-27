@@ -62,5 +62,6 @@ export default class SponsorBanner extends WidgetSettings<
     this.wData.settings[`placement_${placement}_images`] = this.wData.settings[
       `placement_${placement}_images`
     ].filter((image: { href: string }) => image.href !== href);
+    this.save();
   }
 }

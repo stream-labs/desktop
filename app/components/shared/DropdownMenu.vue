@@ -36,7 +36,6 @@
 
   display: flex;
   align-items: center;
-  text-transform: capitalize;
   font-size: 14px;
   color: var(--title);
 
@@ -80,6 +79,13 @@
   &:hover,
   &.active {
     color: var(--title);
+  }
+
+  &.dropdown-menu__disabled {
+    &:hover,
+    &.active {
+      color: var(--midtone);
+    }
   }
 }
 

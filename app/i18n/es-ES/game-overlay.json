@@ -1,8 +1,9 @@
 {
-  "Enable in-game overlay": "Habilitar vista previa en la superposición",
-  "Enable stream preview in overlay": "Habilitar vista previa en la superposición",
+  "Enable in-game overlay": "Activar superposición dentro del juego",
+  "Enable stream preview in overlay": "Activar vista previa de stream en superposición",
   "Toggle in-game overlay": "Alternar superposición dentro del juego",
-  "Toggle positioning mode": "Alternar modo de posicionamiento",
-  "Set a hotkey in Hotkey Settings to toggle the in-game overlay": "Asignar un bottom en Hotkey Settings para alternar la superposición dentro del juego",
-  "The in-game overlay is a new experimental feature that allows you to view chat and events overlayed on top of your game.  This overlay may not work with certain games running in exclusive fullscreen mode.  For best results, we recommend running your game in windowed-fullscreen mode.": "La superposición dentro del juego es un nueva herramienta experimental que te permite ver el chat y eventos superpuestos encima de tu juego. Esta superposición a lo mejor no funciona con algunos juegos que fucionan unicamente en modo pantalla completa. Para obetener los mejores resultados, recommendamos abrir el juego en modo ventana-pantalla completa."
+  "Toggle positioning mode": "Alternar modo de colocación",
+  "Set a hotkey in Hotkey Settings to toggle the in-game overlay": "Establecer una tecla de acceso rápido en Ajustes de teclas de acceso rápido para alternar la superposición dentro del juego",
+  "The in-game overlay is a new experimental feature that allows you to view chat and events overlayed on top of your game.  This overlay may not work with certain games running in exclusive fullscreen mode.  For best results, we recommend running your game in windowed-fullscreen mode.": "La superposición dentro del juego es un nueva función experimental que permite ver el chat y eventos superpuestos encima del juego. Es posible que esta superposición no funcione con algunos juegos ejecutados exclusivamente en modo a pantalla completa. Para obtener los mejores resultados, recomendamos ejecutar el juego en modo a pantalla completa en ventana.",
+  "Please log in to use the in-game overlay.": "Inicie sesión para usar la superposición dentro del juego."
 }

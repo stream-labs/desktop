@@ -33,7 +33,7 @@
 }
 
 .text-area:focus {
-  background-color: var(--hover);
+  background-color: var(--border);
 }
 </style>
 

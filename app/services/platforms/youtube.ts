@@ -137,7 +137,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   @Inject() private windowsService: WindowsService;
 
   channelInfoChanged = new Subject<IYoutubeChannelInfo>();
-  private activeChannel: IYoutubeChannelInfo = null;
+  private activeChannel: IYoutubeChannelInfo | null = null;
 
   capabilities = new Set<TPlatformCapability>(['chat', 'stream-schedule']);
 
@@ -168,7 +168,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   }
 
   get oauthToken() {
-    return this.userService.platform.token;
+    return this.userService.platform?.token;
   }
 
   @mutation()
@@ -202,6 +202,9 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   }
 
   async afterGoLive() {
+    // we don't have activeChannel if user start stream with the 'just go live' button
+    if (!this.activeChannel) return;
+
     const { streamId, broadcastId } = this.activeChannel;
 
     try {
@@ -249,6 +252,9 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   }
 
   async afterStopStream() {
+    // we don't have activeChannel if user start stream with the 'just go live' button
+    if (!this.activeChannel) return;
+
     const { broadcastId, lifecycleStep } = this.activeChannel;
     this.updateActiveChannel({
       lifecycleStep: 'idle',
@@ -317,6 +323,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   async fetchViewerCount(): Promise<number> {
     if (!this.activeChannel) return 0; // activeChannel is not available when streaming to custom ingest
     const endpoint = 'videos?part=snippet,liveStreamingDetails';
+    // eslint-disable-next-line prettier/prettier
     const url = `${this.apiBase}/${endpoint}&id=${this.activeChannel.broadcastId}&access_token=${
       this.oauthToken
     }`;
@@ -333,7 +340,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   async prepopulateInfo(): Promise<IYoutubeStartStreamOptions> {
     // if streaming then return activeBroadcast description and title if exists
     if (this.streamingService.isStreaming) {
-      return this.activeChannel;
+      return this.activeChannel as IYoutubeStartStreamOptions;
     }
 
     // otherwise return the last saved description and title for new the streaming session
@@ -354,7 +361,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   async fetchNewToken(): Promise<void> {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/youtube/token`;
-    const headers = authorizedHeaders(this.userService.apiToken);
+    const headers = authorizedHeaders(this.userService.apiToken!);
     const request = new Request(url, { headers });
 
     return fetch(request)
@@ -369,7 +376,8 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     { title, description }: IYoutubeStartStreamOptions,
     scheduledStartTime?: string,
   ): Promise<boolean> {
-    const broadcast = await this.updateBroadcast(this.activeChannel.broadcastId, {
+    const activeBroadcast = this.activeChannel as IYoutubeChannelInfo;
+    const broadcast = await this.updateBroadcast(activeBroadcast.broadcastId, {
       title,
       description,
     });
@@ -425,7 +433,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
    */
   private async createBroadcast(params: {
     title: string;
-    description: string;
+    description?: string;
     scheduledStartTime?: string;
   }): Promise<IYoutubeLiveBroadcast> {
     const fields = ['snippet', 'contentDetails', 'status'];
@@ -487,9 +495,8 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     const endpoint = `/liveBroadcasts/bind?part=${fields.join(',')}`;
     return platformAuthorizedRequest<IYoutubeLiveBroadcast>('youtube', {
       method: 'POST',
-      url: `${this.apiBase}${endpoint}&id=${broadcastId}&streamId=${streamId}&access_token=${
-        this.oauthToken
-      }`,
+      // es-lint-disable-next-line prettier/prettier
+      url: `${this.apiBase}${endpoint}&id=${broadcastId}&streamId=${streamId}&access_token=${this.oauthToken}`,
     });
   }
 
@@ -498,7 +505,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
    * this LiveStream must be bounded to the Youtube LiveBroadcast before going live
    */
   private async createLiveStream(title: string): Promise<IYoutubeLiveStream> {
-    const endpoint = `liveStreams?part=cdn,snippet,contentDetails`;
+    const endpoint = 'liveStreams?part=cdn,snippet,contentDetails';
     return platformAuthorizedRequest<IYoutubeLiveStream>('youtube', {
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
       method: 'POST',
@@ -573,7 +580,8 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     try {
       await this.pollAPI(async () => {
         // user clicked stop streaming, cancel polling
-        if (this.activeChannel.lifecycleStep === 'idle') throw new Error('stream stopped');
+        const activeChannel = this.activeChannel as IYoutubeChannelInfo;
+        if (activeChannel.lifecycleStep === 'idle') throw new Error('stream stopped');
 
         const stream = await this.fetchLiveStream(streamId, ['status']);
         return stream.status.streamStatus === status;
@@ -600,7 +608,8 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
       // wait for Youtube to change the broadcast status
       await this.pollAPI(async () => {
         // if user clicked stop streaming, cancel polling
-        if (this.activeChannel.lifecycleStep === 'idle') throw new Error('stream stopped');
+        const activeChannel = this.activeChannel as IYoutubeChannelInfo;
+        if (activeChannel.lifecycleStep === 'idle') throw new Error('stream stopped');
 
         const broadcast = await this.fetchBroadcast(broadcastId, ['status']);
         return broadcast.status.lifeCycleStatus === status;
@@ -635,13 +644,13 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     } catch (e) {
       message = `Can not connect to platform: ${error.message}`;
     }
-    return `Youtube: ${message}`;
+    return `YouTube: ${message}`;
   }
 
   showStreamStatusWindow() {
     this.windowsService.showWindow({
       componentName: 'YoutubeStreamStatus',
-      title: $t('Youtube stream status'),
+      title: $t('YouTube stream status'),
       size: {
         width: 550,
         height: 600,
@@ -658,7 +667,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     maxResults = 50,
     fields = ['snippet', 'contentDetails', 'status'],
   ): Promise<IYoutubeLiveBroadcast[]> {
-    const filter = ids ? `&id=${ids.join(',')}` : `&broadcastStatus=upcoming`;
+    const filter = ids ? `&id=${ids.join(',')}` : '&broadcastStatus=upcoming';
     const query = `part=${fields.join(',')}${filter}&maxResults=${maxResults}&access_token=${
       this.oauthToken
     }`;

@@ -1,11 +1,11 @@
 import { Service } from 'services/core/service';
 import {
-  IPlatformService,
+  EPlatformCallResult,
   IGame,
+  IPlatformRequest,
+  IPlatformService,
   TPlatformCapability,
   TPlatformCapabilityMap,
-  EPlatformCallResult,
-  IPlatformRequest,
 } from '.';
 import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
@@ -18,6 +18,7 @@ import { IPlatformResponse, platformAuthorizedRequest, platformRequest } from '.
 import { StreamSettingsService } from 'services/settings/streaming';
 import { Subject } from 'rxjs';
 import { CustomizationService } from 'services/customization';
+import { assertIsDefined } from '../../util/properties-type-guards';
 
 export interface ITwitchStartStreamOptions {
   title: string;
@@ -40,7 +41,7 @@ interface ITWitchChannel {
 /**
  * Request headers that need to be sent to Twitch
  */
-export interface ITwitchRequestHeaders extends Dictionary<string> {
+export interface ITwitchRequestHeaders extends Dictionary<string | undefined> {
   Accept: 'application/vnd.twitchtv.v5+json';
   Authorization?: string;
   'Client-Id': string;
@@ -85,12 +86,12 @@ export class TwitchService extends Service implements IPlatformService {
 
   private availableTags: TTwitchTag[];
   private hasUpdateTagsPermission: boolean;
-  private activeChannel: ITwitchChannelInfo;
+  private activeChannel: ITwitchChannelInfo | null;
 
   init() {
     // prepopulate data to make chat available after app start
     this.userService.userLogin.subscribe(_ => {
-      if (this.userService.platform.type === 'twitch') this.prepopulateInfo();
+      if (this.userService.platform?.type === 'twitch') this.prepopulateInfo();
     });
 
     // trigger `channelInfoChanged` event with new "chatUrl" based on the changed theme
@@ -111,10 +112,10 @@ export class TwitchService extends Service implements IPlatformService {
   }
 
   // TODO: Refactor so this is reusable
-  get userAuth(): { token: string; id: string } {
+  get userAuth(): { token?: string; id?: string } {
     return {
-      token: this.userService.state.auth.platforms.twitch.token,
-      id: this.userService.state.auth.platforms.twitch.id,
+      token: this.userService.state.auth?.platforms?.twitch?.token,
+      id: this.userService.state.auth?.platforms?.twitch?.id,
     };
   }
 
@@ -145,38 +146,40 @@ export class TwitchService extends Service implements IPlatformService {
   }
 
   async validatePlatform() {
-    try {
-      const result = await this.hasScope('channel_read');
+    const hasScopeCheck = this.hasScope('channel_read')
+      .then(result => {
+        if (!result) return EPlatformCallResult.TwitchScopeMissing;
+        return EPlatformCallResult.Success;
+      })
+      .catch(e => {
+        console.error('Error checking Twitch OAuth scopes', e);
+        return EPlatformCallResult.Error;
+      });
 
-      if (!result) return EPlatformCallResult.TwitchScopeMissing;
-    } catch (e) {
-      console.error('Error checking Twitch OAuth scopes', e);
-
-      return EPlatformCallResult.Error;
-    }
-
-    try {
-      // Catch 2FA errors
-      await this.fetchStreamKey();
-    } catch (e) {
-      if (e instanceof Response) {
-        if (e.status === 403) {
-          return EPlatformCallResult.TwitchTwoFactor;
+    const twitchTwoFactorCheck = this.fetchStreamKey()
+      .then(key => {
+        return EPlatformCallResult.Success;
+      })
+      .catch(e => {
+        if (e && e.status) {
+          if (e.status === 403) {
+            return EPlatformCallResult.TwitchTwoFactor;
+          }
         }
-      }
+        console.error('Error fetching Twitch stream key', e);
+        return EPlatformCallResult.Error;
+      });
 
-      console.error('Error fetching Twitch stream key', e);
-
-      return EPlatformCallResult.Error;
-    }
-
+    const results = await Promise.all([hasScopeCheck, twitchTwoFactorCheck]);
+    const failedResults = results.filter(result => result !== EPlatformCallResult.Success);
+    if (failedResults.length) return failedResults[0];
     return EPlatformCallResult.Success;
   }
 
   fetchNewToken(): Promise<void> {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/twitch/refresh`;
-    const headers = authorizedHeaders(this.userService.apiToken);
+    const headers = authorizedHeaders(this.userService.apiToken!);
     const request = new Request(url, { headers });
 
     return fetch(request)
@@ -207,8 +210,8 @@ export class TwitchService extends Service implements IPlatformService {
       this.getHasUpdateTagsPermission(),
     ]);
 
-    let tags: TTwitchTag[];
-    let availableTags: TTwitchTag[];
+    let tags: TTwitchTag[] = [];
+    let availableTags: TTwitchTag[] = [];
     if (hasUpdateTagsPermission) {
       [tags, availableTags] = await Promise.all([this.getStreamTags(), this.getAllTags()]);
     }
@@ -220,6 +223,7 @@ export class TwitchService extends Service implements IPlatformService {
       availableTags,
     };
     this.updateActiveChannel(activeChannel);
+    assertIsDefined(this.activeChannel);
     return this.activeChannel;
   }
 
@@ -227,12 +231,13 @@ export class TwitchService extends Service implements IPlatformService {
    * update the local info for current channel and emit the "channelInfoChanged" event
    */
   private updateActiveChannel(patch: Partial<ITwitchChannelInfo>) {
-    if (!this.activeChannel) this.activeChannel = {} as ITwitchChannelInfo;
+    const activeChannel = this.activeChannel || {};
     this.activeChannel = {
-      ...this.activeChannel,
+      ...activeChannel,
       chatUrl: this.getChatUrl(),
       ...patch,
-    };
+    } as ITwitchChannelInfo;
+    assertIsDefined(this.activeChannel);
     this.channelInfoChanged.next(this.activeChannel);
   }
 
@@ -240,7 +245,7 @@ export class TwitchService extends Service implements IPlatformService {
     return platformAuthorizedRequest<{ login: string }[]>(
       'twitch',
       `https://api.twitch.tv/helix/users?id=${this.twitchId}`,
-    ).then(json => (json[0] && json[0].login ? { username: json[0].login as string } : {}));
+    ).then(json => (json[0] && json[0].login ? { username: json[0].login! } : {}));
   }
 
   fetchViewerCount(): Promise<number> {
@@ -273,7 +278,9 @@ export class TwitchService extends Service implements IPlatformService {
   private getChatUrl(): string {
     const mode = this.customizationService.isDarkTheme ? 'night' : 'day';
     const nightMode = mode === 'day' ? 'popout' : 'darkpopout';
-    return `https://twitch.tv/popout/${this.userService.platform.username}/chat?${nightMode}`;
+    const username = this.userService.platform?.username;
+    assertIsDefined(username);
+    return `https://twitch.tv/popout/${username}/chat?${nightMode}`;
   }
 
   async getAllTags(): Promise<TTwitchTag[]> {
@@ -284,6 +291,7 @@ export class TwitchService extends Service implements IPlatformService {
   }
 
   getStreamTags(): Promise<TTwitchTag[]> {
+    assertIsDefined(this.twitchId);
     return getStreamTags(this.twitchId);
   }
 
@@ -293,11 +301,12 @@ export class TwitchService extends Service implements IPlatformService {
     if (!hasPermission) {
       return false;
     }
-
+    assertIsDefined(this.twitchId);
     return updateTags()(tags)(this.twitchId);
   }
 
   hasScope(scope: TTwitchOAuthScope): Promise<boolean> {
+    // eslint-disable-next-line prettier/prettier
     return platformAuthorizedRequest('twitch', 'https://id.twitch.tv/oauth2/validate').then(
       (response: ITwitchOAuthValidateResponse) => response.scopes.includes(scope),
     );

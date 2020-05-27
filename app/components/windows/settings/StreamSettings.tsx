@@ -14,8 +14,9 @@ import { metadata } from 'components/shared/inputs';
 import { NavigationService } from 'services/navigation';
 import { WindowsService } from 'services/windows';
 import { EStreamingState, StreamingService } from 'services/streaming';
+import BrowserView from 'components/shared/BrowserView';
 
-@Component({ components: { GenericFormGroups, PlatformLogo } })
+@Component({ components: { GenericFormGroups, PlatformLogo, BrowserView } })
 export default class StreamSettings extends TsxComponent {
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private userService: UserService;
@@ -60,7 +61,7 @@ export default class StreamSettings extends TsxComponent {
   }
 
   get needToShowWarning() {
-    return this.userService.isLoggedIn() && !this.protectedModeEnabled;
+    return this.userService.isLoggedIn && !this.protectedModeEnabled;
   }
 
   get canEditSettings() {

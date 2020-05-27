@@ -5,13 +5,14 @@
   "Background Color": "Hintergrundfarbe",
   "Font": "Schriftart",
   "Font Size": "Schriftgröße",
-  "Font Weight": "Schriftdicke",
+  "Font Weight": "Schriftstärke",
   "Text Color": "Textfarbe",
-  "Name Text Color": "Name-Textfarbe",
-  "Amount Text Color": "Textfarbe der Anzahl",
-  "The name of the donator,": "Der Name des Spenders,",
-  "The amount that was donated": "Der gespendete Betrag",
+  "Name Text Color": "Textfarbe für Namen",
+  "Amount Text Color": "Textfarbe für Betrag",
+  "The name of the donator,": "Name des Spenders,",
+  "The amount that was donated": "Gespendeter Betrag",
   "Manage List": "Liste verwalten",
   "Font Settings": "Schriftart-Einstellungen",
-  "A hex color for the text of the": "Eine Hex-Farbe für den Text der"
+  "A hex color for the text of the": "Hex-Farbe für den Text des",
+  "token": "Tokens"
 }

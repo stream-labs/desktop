@@ -1,6 +1,7 @@
 import { Inject } from 'services/core/injector';
 import {
   Scene as InternalScene,
+  ISceneItemNode as IInternalNodeModel,
   SceneItemNode as InternalSceneNode,
   ScenesService as InternalScenesService,
 } from 'services/scenes';
@@ -9,6 +10,7 @@ import { ScenesService } from './scenes';
 import { Scene } from './scene';
 import { SceneItemFolder } from './scene-item-folder';
 import { SceneItem } from './scene-item';
+import { ServiceHelper } from 'services';
 
 export declare type TSceneNodeType = 'folder' | 'item';
 
@@ -23,27 +25,31 @@ export interface ISceneNodeModel {
 /**
  * A base API for Items and Folders
  */
+@ServiceHelper()
 export abstract class SceneNode {
   @Inject('ScenesService') protected internalScenesService: InternalScenesService;
   @InjectFromExternalApi() protected scenesService: ScenesService;
   @Fallback() protected sceneNode: InternalSceneNode;
   protected scene: InternalScene;
 
+  id: string;
+  sceneNodeType: TSceneNodeType;
+  parentId: string;
+
   constructor(public sceneId: string, public nodeId: string) {
-    this.scene = this.internalScenesService.getScene(sceneId);
+    this.scene = this.internalScenesService.views.getScene(sceneId);
     this.sceneNode = this.scene.getNode(this.nodeId);
+  }
+
+  private isDestroyed(): boolean {
+    return this.sceneNode.isDestroyed();
   }
 
   /**
    * returns serialized representation on scene-node
    */
   getModel(): ISceneNodeModel {
-    return {
-      id: this.sceneNode.id,
-      sceneId: this.sceneNode.sceneId,
-      sceneNodeType: this.sceneNode.sceneNodeType,
-      parentId: this.sceneNode.parentId,
-    };
+    return getExternalNodeModel(this.sceneNode);
   }
 
   getScene(): Scene {
@@ -97,14 +103,14 @@ export abstract class SceneNode {
   /**
    * Check the node is scene item
    */
-  isItem(): boolean {
+  isItem(): this is SceneItem {
     return this.sceneNode.isItem();
   }
 
   /**
    * Check the node is scene folder
    */
-  isFolder(): boolean {
+  isFolder(): this is SceneItemFolder {
     return this.sceneNode.isFolder();
   }
 
@@ -215,4 +221,13 @@ export abstract class SceneNode {
   getPath(): string[] {
     return this.sceneNode.getPath();
   }
+}
+
+export function getExternalNodeModel(internalModel: IInternalNodeModel): ISceneNodeModel {
+  return {
+    id: internalModel.id,
+    sceneId: internalModel.sceneId,
+    sceneNodeType: internalModel.sceneNodeType,
+    parentId: internalModel.parentId,
+  };
 }

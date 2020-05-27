@@ -1,0 +1,38 @@
+@import "../../styles/index";
+
+.banlist {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.banlist-cell {
+  .radius();
+
+  background: var(--section);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 8px;
+  overflow: hidden;
+  margin-bottom: 4px;
+
+  button {
+    padding: 2px;
+    margin-left: auto;
+    line-height: 10px;
+  }
+
+  span {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+
+.whisper {
+  width: 100%;
+  display: block;
+  font-style: italic;
+  opacity: 0.7;
+  text-align: center;
+}

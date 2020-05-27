@@ -1,199 +1,147 @@
+import cx from 'classnames';
+import electron from 'electron';
 import { Component } from 'vue-property-decorator';
-import { Onboarding } from 'streamlabs-beaker';
 import TsxComponent from 'components/tsx-component';
 import { OnboardingService } from 'services/onboarding';
 import { Inject } from 'services/core/injector';
-import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
-import {
-  Connect,
-  ObsImport,
-  StreamlabsFeatures,
-  HardwareSetup,
-  ThemeSelector,
-  Optimize,
-  FacebookPageCreation,
-  Multistream,
-} from './onboarding-steps';
-import { UserService } from 'services/user';
 import { $t } from 'services/i18n';
 import styles from './Onboarding.m.less';
-import { RestreamService } from 'services/restream';
+import commonStyles from './onboarding-steps/Common.m.less';
+import { MagicLinkService } from 'services/magic-link';
+
+export class OnboardingStepProps {
+  continue: () => void = () => {};
+  setProcessing: (bool: boolean) => void = () => {};
+}
 
 @Component({})
 export default class OnboardingPage extends TsxComponent<{}> {
   @Inject() onboardingService: OnboardingService;
-  @Inject() incrementalRolloutService: IncrementalRolloutService;
-  @Inject() userService: UserService;
-  @Inject() restreamService: RestreamService;
+  @Inject() magicLinkService: MagicLinkService;
 
-  currentStep = 1;
-  importedFromObs = false;
+  currentStepIndex = 0;
   processing = false;
-  fbSetupEnabled: boolean = null;
 
-  stepsState = [{ complete: false }, { complete: false }, { complete: false }];
-
-  checkFbPageEnabled() {
-    if (this.fbSetupEnabled !== null || !this.userService.isLoggedIn()) return;
-    // This will do a second unnecessary fetch, but it's the only
-    // way to be sure we have fetched features
-    this.incrementalRolloutService.fetchAvailableFeatures().then(() => {
-      if (this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.facebookOnboarding)) {
-        this.fbSetupEnabled = true;
-      } else {
-        this.fbSetupEnabled = false;
-      }
-    });
-  }
-
-  continue(importedObs?: boolean) {
-    this.checkFbPageEnabled();
-    this.adjustStepsState(importedObs);
-
-    this.proceed();
-  }
-
-  proceed() {
+  continue(skipped?: boolean) {
     if (this.processing) return;
-    if (this.currentStep === this.stepsState.length) return this.complete();
-
-    this.stepsState[this.currentStep - 1].complete = true;
-    this.currentStep = this.currentStep + 1;
-
-    if (this.currentStep === this.stepsState.length) {
-      this.stepsState[this.currentStep - 1].complete = true;
+    if (this.currentStepIndex >= this.steps.length - 1 || this.singletonStep) {
+      return this.complete(skipped);
     }
+
+    this.currentStepIndex = this.currentStepIndex + 1;
   }
 
-  complete() {
+  complete(skipped?: boolean) {
+    if (!skipped) this.linkToPrime();
     this.onboardingService.finish();
+  }
+
+  async linkToPrime() {
+    const isPrimeStep = this.currentStep.label === $t('Prime');
+
+    if (isPrimeStep) {
+      try {
+        const link = await this.magicLinkService.getDashboardMagicLink('prime', 'slobs-onboarding');
+        electron.remote.shell.openExternal(link);
+      } catch (e) {
+        console.error('Error generating dashboard magic link', e);
+      }
+    }
   }
 
   setProcessing(bool: boolean) {
     this.processing = bool;
   }
 
-  adjustStepsState(importedObs?: boolean) {
-    if (importedObs === true) {
-      this.importedFromObs = true;
-    } else if (importedObs === false) {
-      this.importedFromObs = false;
-      this.stepsState.push({ complete: false });
-      if (
-        this.onboardingService.isTwitchAuthed ||
-        (this.onboardingService.isFacebookAuthed && this.fbSetupEnabled)
-      ) {
-        this.stepsState.push({ complete: false });
-      }
-      if (this.restreamService.canEnableRestream) {
-        this.stepsState.push({ complete: false });
-      }
-    }
+  get preboardingOffset() {
+    return this.steps.filter(step => step.isPreboarding).length;
   }
 
   get steps() {
-    const steps = [
-      <Connect slot="1" continue={this.continue.bind(this)} />,
-      <ObsImport
-        slot="2"
-        continue={this.continue.bind(this)}
-        setProcessing={this.setProcessing.bind(this)}
-      />,
-    ];
+    return this.onboardingService.views.steps;
+  }
 
-    if (this.importedFromObs) {
-      steps.push(<StreamlabsFeatures slot="3" />);
-      return steps;
+  get singletonStep() {
+    return this.onboardingService.views.singletonStep;
+  }
+
+  get currentStep() {
+    if (this.singletonStep) return this.singletonStep;
+    return this.steps[this.currentStepIndex];
+  }
+
+  get topBar() {
+    if (this.currentStepIndex < this.preboardingOffset || this.singletonStep) {
+      return <div class={styles.topBarContainer} />;
     }
-    steps.push(<HardwareSetup slot="3" />);
-    steps.push(
-      <ThemeSelector
-        slot="4"
-        continue={this.continue.bind(this)}
-        setProcessing={this.setProcessing.bind(this)}
-      />,
-    );
-    if (this.onboardingService.isTwitchAuthed) {
-      steps.push(
-        <Optimize
-          slot="5"
-          continue={this.continue.bind(this)}
-          setProcessing={this.setProcessing.bind(this)}
-        />,
-      );
-      steps.push(<Multistream slot="6" continue={() => this.continue()} />);
-    } else if (this.onboardingService.isFacebookAuthed && this.fbSetupEnabled) {
-      steps.push(<FacebookPageCreation slot="5" continue={this.continue.bind(this)} />);
-    }
-    return steps;
-  }
-
-  get loginPage() {
+    const offset = this.preboardingOffset;
+    const stepIdx = this.currentStepIndex - offset;
+    const filteredSteps = this.steps.filter(step => !step.isPreboarding);
     return (
-      <div>
-        <div class={styles.container}>
-          <Connect continue={this.complete.bind(this)} />
-        </div>
+      <div class={styles.topBarContainer}>
+        {filteredSteps.map((_step, i) => {
+          let stepClass;
+          if (i === stepIdx) stepClass = styles.current;
+          if (i < stepIdx) stepClass = styles.completed;
+          if (i > stepIdx) stepClass = styles.incomplete;
+          return (
+            <div class={styles.topBarSegment}>
+              <div class={cx(styles.topBarStep, stepClass)}>
+                {i < stepIdx && <i class="icon-check-mark" />}
+              </div>
+              {i < filteredSteps.length - 1 && (
+                <div class={cx(styles.topBarSeperator, stepClass)} />
+              )}
+            </div>
+          );
+        })}
       </div>
     );
   }
 
-  get optimizePage() {
+  get button() {
+    if (this.currentStep.hideButton) return null;
+    const isPrimeStep = this.currentStep.label === $t('Prime');
     return (
-      <div>
-        <div class={styles.container}>
-          <Optimize
-            continue={this.complete.bind(this)}
-            setProcessing={this.setProcessing.bind(this)}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  get hardwarePage() {
-    return (
-      <div>
-        <div class={styles.container}>
-          <HardwareSetup />
-          <button class="button button--action" onClick={this.complete}>
-            {$t('Complete')}
-          </button>
-        </div>
-      </div>
+      <button
+        class={cx('button button--action', commonStyles.onboardingButton, {
+          ['button--prime']: isPrimeStep,
+        })}
+        onClick={() => this.continue()}
+        disabled={this.processing}
+      >
+        {isPrimeStep ? $t('Go Prime') : $t('Continue')}
+      </button>
     );
   }
 
   render() {
-    if (this.onboardingService.options.isLogin) return this.loginPage;
-    if (this.onboardingService.options.isOptimize) return this.optimizePage;
-    if (this.onboardingService.options.isHardware) return this.hardwarePage;
+    const Component = this.currentStep.element;
 
     return (
-      <div>
-        <div class={styles.container}>
-          <Onboarding
-            steps={this.stepsState}
-            stepLocation="top"
-            skippable={true}
-            currentStep={this.currentStep}
-            disableControls={this.processing || this.currentStep === 2}
-            continueHandler={this.continue.bind(this)}
-            completeHandler={this.complete.bind(this)}
-            skipHandler={this.proceed.bind(this)}
-            prevHandler={() => {}}
-            hideBack={true}
-            hideSkip={
-              [1, 2].includes(this.currentStep) || (this.currentStep === 3 && this.importedFromObs)
-            }
-            hideButton={
-              [1, 2, 5, 6].includes(this.currentStep) ||
-              (this.currentStep === 4 && !this.importedFromObs)
-            }
-          >
-            {this.steps}
-          </Onboarding>
+      <div class={styles.onboardingContainer}>
+        {this.topBar}
+        <div class={styles.onboardingContent}>
+          <Component
+            class={styles.scroll}
+            continue={() => this.continue()}
+            setProcessing={(processing: boolean) => this.setProcessing(processing)}
+          />
         </div>
+        {(!this.currentStep.hideSkip || !this.currentStep.hideButton) && (
+          <div class={styles.footer}>
+            {!this.currentStep.hideSkip && (
+              <button
+                class={cx('button button--trans', commonStyles.onboardingButton)}
+                onClick={() => this.continue(true)}
+                disabled={this.processing}
+              >
+                {$t('Skip')}
+              </button>
+            )}
+            {this.button}
+          </div>
+        )}
       </div>
     );
   }
