@@ -14,7 +14,7 @@ export class SubscriberGoalService extends GenericGoalService {
       previewUrl: `https://${this.getHost()}/widgets/follower-goal?token=${this.getWidgetToken()}`,
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/followergoal/settings`,
       settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/followergoal/settings`,
-      goalUrl: `https://${this.getHost()}/api/v5/slobs/widget/follwergoal`,
+      goalUrl: `https://${this.getHost()}/api/v5/slobs/widget/followergoal`,
       settingsUpdateEvent: 'followerGoalSettingsUpdate',
       goalCreateEvent: 'followerGoalStart',
       goalResetEvent: 'followerGoalEnd',
