@@ -1,14 +1,16 @@
-import { Component, Prop } from 'vue-property-decorator';
-import { OnboardingStep } from 'streamlabs-beaker';
+import electron from 'electron';
+import { Component } from 'vue-property-decorator';
 import Multiselect from 'vue-multiselect';
 import TsxComponent, { createProps } from 'components/tsx-component';
+import KevinSvg from 'components/shared/KevinSvg';
+import SmoothProgressBar from 'components/shared/SmoothProgressBar';
 import { Inject } from 'services/core/injector';
 import { ObsImporterService } from 'services/obs-importer';
+import { ScenesService } from 'services/scenes';
 import defer from 'lodash/defer';
 import { $t } from 'services/i18n';
+import commonStyles from './Common.m.less';
 import styles from './ObsImport.m.less';
-import KevinSvg from 'components/shared/KevinSvg';
-import ObsSvg from './ObsSvg';
 
 class ObsImportProps {
   continue: (bool: boolean) => void = () => {};
@@ -18,14 +20,14 @@ class ObsImportProps {
 @Component({ props: createProps(ObsImportProps) })
 export default class ObsImport extends TsxComponent<ObsImportProps> {
   @Inject() obsImporterService: ObsImporterService;
+  @Inject() scenesService: ScenesService;
 
+  progress = 0;
   importing = false;
   pathChosen = false;
 
   sceneCollections = this.obsImporterService.getSceneCollections();
-
   profiles = this.obsImporterService.getProfiles();
-
   selectedProfile = this.profiles[0] || null;
 
   startImport(forceStart?: boolean) {
@@ -39,6 +41,7 @@ export default class ObsImport extends TsxComponent<ObsImportProps> {
       try {
         await this.obsImporterService.load(this.selectedProfile);
         this.importing = false;
+        this.progress = 1;
         this.props.setProcessing(false);
         this.props.continue(true);
       } catch (e) {
@@ -53,78 +56,104 @@ export default class ObsImport extends TsxComponent<ObsImportProps> {
     });
   }
 
-  get optionsMetadata() {
-    return [
-      {
-        title: $t('Import from OBS'),
-        time: `< 1 ${$t('min')}`,
-        timeColor: '--blue',
+  get recommendedFeatures() {
+    return ['appStore', 'gameOverlay'];
+  }
+
+  get featuresMetadata() {
+    return {
+      appStore: {
+        title: $t('App Store'),
         description: $t(
-          'We import all of your settings, including scenes, output, configurations, and much more',
+          'Check out 50+ amazing apps from independent developers, ranging from DMCA-compliant music ' +
+            'to stunning overlays to more tools to engage with your community. Head over to the app store in the left ' +
+            'navigation to browse our selection of free and paid apps.',
         ),
-        image: <ObsSvg />,
-        onClick: () => this.startImport(),
+        image: 'app-store',
       },
-      {
-        title: $t('Start Fresh'),
-        time: `~2 ${$t('min')}`,
-        timeColor: '--teal',
+      gameOverlay: {
+        title: $t('In-game Overlay'),
         description: $t(
-          'Start with a clean copy of Streamlabs OBS and configure your settings from scratch',
+          'Only have one screen? Perfect! Enable our in-game overlay to make sure you catch every chat message and ' +
+            'stream event that happens while you get your game on. You can enable this feature in the ‘Game Overlay’ ' +
+            'tab of the settings menu.',
         ),
-        image: <KevinSvg />,
-        onClick: () => this.props.continue(false),
+        image: 'game-overlay',
       },
-    ];
+    };
+  }
+
+  get featureCards() {
+    return (
+      <div class={styles.container}>
+        {this.recommendedFeatures.map(feature => {
+          const data = this.featuresMetadata[feature];
+          return (
+            <div class={styles.card}>
+              <div>
+                <h3>{data.title}</h3>
+                <div>{data.description}</div>
+              </div>
+              <img src={require(`../../../../media/images/onboarding/${data.image}.png`)} />
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  get preImport() {
+    if (this.importing) return null;
+    return (
+      <div>
+        {this.profiles.length > 1 && (
+          <div>
+            <span class={styles.profileSelectTitle}>{$t('Select an OBS profile to import')}</span>
+            <Multiselect
+              class={styles.profileSelect}
+              value={this.selectedProfile}
+              onInput={(val: string) => (this.selectedProfile = val)}
+              options={this.profiles}
+              allowEmpty={false}
+              showLabels={false}
+            />
+          </div>
+        )}
+        <button
+          class={commonStyles.optionCard}
+          style="margin: auto; margin-top: 24px;"
+          onClick={() => this.startImport(true)}
+        >
+          <h2>{$t('Start')}</h2>
+        </button>
+      </div>
+    );
   }
 
   render() {
     return (
-      <OnboardingStep slot="2">
-        <template slot="title">{$t('Welcome to Streamlabs OBS')}</template>
-        <template slot="desc">
-          {$t('Import your existing settings from OBS in less than a minute and go live')}
-        </template>
-        {!this.pathChosen ? (
-          <div style="display: flex; justify-content: space-between;">
-            {this.optionsMetadata.map(data => (
-              <div class={styles.optionCard} onClick={data.onClick}>
-                <span
-                  class={`${styles.badge} ${styles.timeBadge}`}
-                  style={{ background: `var(${data.timeColor})`, color: 'white' }}
-                >
-                  {data.time}
-                </span>
-                <h2>{data.title}</h2>
-                <span>{data.description}</span>
-                {data.image}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div>
-            {this.profiles.length > 1 && !this.importing && (
-              <div>
-                <span class={styles.profileSelectTitle}>
-                  {$t('Select an OBS profile to import')}
-                </span>
-                <Multiselect
-                  class={styles.profileSelect}
-                  value={this.selectedProfile}
-                  onInput={(val: string) => (this.selectedProfile = val)}
-                  options={this.profiles}
-                  allowEmpty={false}
-                  showLabels={false}
-                />
-                <button class="button button--action" onClick={() => this.startImport(true)}>
-                  {$t('Start')}
-                </button>
-              </div>
-            )}
-            {this.importing && <i class="fa fa-spinner fa-pulse" />}
-          </div>
+      <div style="width: 100%;">
+        <h1 class={commonStyles.titleContainer}>
+          {$t('Importing Your Existing Settings From OBS')}
+        </h1>
+        {this.preImport}
+        {this.importing && (
+          <SmoothProgressBar
+            value={this.progress}
+            timeLimit={1000 * 10}
+            class={styles.progressBar}
+          />
         )}
-      </OnboardingStep>
+        <div class={styles.textContainer}>
+          <KevinSvg />
+          <div>
+            {$t(
+              'While we import your settings and scenes from OBS Studio, check out these great features unique to Streamlabs OBS',
+            )}
+          </div>
+        </div>
+        {this.featureCards}
+      </div>
     );
   }
 }

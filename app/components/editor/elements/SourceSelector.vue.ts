@@ -36,6 +36,7 @@ const widgetIconMap = {
   [WidgetType.SubGoal]: 'fas fa-calendar',
   [WidgetType.StarsGoal]: 'fas fa-calendar',
   [WidgetType.SupporterGoal]: 'fas fa-calendar',
+  [WidgetType.SubscriberGoal]: 'fas fa-calendar',
   [WidgetType.MediaShare]: 'icon-share',
 };
 

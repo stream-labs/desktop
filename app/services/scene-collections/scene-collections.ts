@@ -219,7 +219,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
     this.collectionLoaded = true;
     await this.save();
-    return this.getCollection(id);
+    return this.getCollection(id)!;
   }
 
   /**
@@ -228,13 +228,15 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * @param id the id of the collection to delete
    */
   async delete(id?: string): Promise<void> {
-    // tslint:disable-next-line:no-parameter-reassignment TODO
-    id = id || this.activeCollection.id;
-    const removingActiveCollection = id === this.activeCollection.id;
+    const collId = id ?? this.activeCollection?.id;
+
+    if (collId == null) return;
+
+    const removingActiveCollection = collId === this.activeCollection?.id;
 
     if (removingActiveCollection) {
       await this.appService.runInLoadingMode(async () => {
-        await this.removeCollection(id);
+        await this.removeCollection(collId);
 
         if (this.loadableCollections.length > 0) {
           await this.load(this.loadableCollections[0].id);
@@ -243,7 +245,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         }
       });
     } else {
-      await this.removeCollection(id);
+      await this.removeCollection(collId);
     }
   }
 
@@ -253,13 +255,14 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * @param id if not present, will operate on the current collection
    */
   async rename(name: string, id?: string) {
-    this.stateService.RENAME_COLLECTION(
-      id || this.activeCollection.id,
-      name,
-      new Date().toISOString(),
-    );
+    const collId = id ?? this.activeCollection?.id;
+
+    if (!collId) return;
+
+    this.stateService.RENAME_COLLECTION(collId, name, new Date().toISOString());
     await this.safeSync();
-    this.collectionUpdated.next(this.getCollection(id));
+    const coll = this.getCollection(collId);
+    if (coll) this.collectionUpdated.next(coll);
   }
 
   /**
@@ -294,12 +297,16 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * @param id An optional ID, if omitted the active collection ID is used
    */
   async duplicate(name: string, id?: string) {
+    const oldId = id ?? this.activeCollection?.id;
+    if (oldId == null) return;
+
+    const oldColl = this.getCollection(oldId);
+    if (!oldColl) return;
+
     await this.disableAutoSave();
 
-    // tslint:disable-next-line:no-parameter-reassignment TODO
-    id = id || this.activeCollection.id;
     const newId = uuid();
-    await this.insertCollection(newId, name, this.getCollection(id).operatingSystem, false, id);
+    await this.insertCollection(newId, name, oldColl.operatingSystem, false, oldId);
     this.stateService.SET_NEEDS_RENAME(newId);
     this.enableAutoSave();
   }
@@ -388,8 +395,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * Returns the collection with the specified id
    * @param id the id of the collection
    */
-  getCollection(id: string): ISceneCollectionsManifestEntry {
-    return this.collections.find(coll => coll.id === id);
+  getCollection(id: string): ISceneCollectionsManifestEntry | null {
+    return this.collections.find(coll => coll.id === id) ?? null;
   }
 
   /**
@@ -526,6 +533,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   private async attemptRecovery(id: string) {
     // Check if the server has a copy
     const collection = this.collections.find(coll => coll.id === id);
+    if (collection == null) return;
 
     if (collection.serverId && this.userService.isLoggedIn) {
       const coll = await this.serverApi.fetchSceneCollection(collection.serverId);
@@ -647,7 +655,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     // the system, we can start actually deleting files from disk.
   }
 
-  private autoSaveInterval: number;
+  private autoSaveInterval: number | null;
   private autoSavePromise: Promise<void>;
 
   enableAutoSave() {
@@ -719,7 +727,9 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       if (inManifest) {
         if (inManifest.deleted) {
           const success = await this.performSyncStep('Delete on server', async () => {
-            await this.serverApi.deleteSceneCollection(inManifest.serverId);
+            if (inManifest.serverId) {
+              await this.serverApi.deleteSceneCollection(inManifest.serverId);
+            }
             this.stateService.HARD_DELETE_COLLECTION(inManifest.id);
           });
 
@@ -731,7 +741,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
             if (exists) {
               const data = this.stateService.readCollectionFile(inManifest.id);
 
-              if (data) {
+              if (data && inManifest.serverId) {
                 await this.serverApi.updateSceneCollection({
                   data,
                   id: inManifest.serverId,
@@ -746,10 +756,15 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         } else if (new Date(inManifest.modified) < new Date(onServer.last_updated_at)) {
           const success = await this.performSyncStep('Update from server', async () => {
             const response = await this.serverApi.fetchSceneCollection(onServer.id);
-            this.stateService.writeDataToCollectionFile(
-              inManifest.id,
-              response.scene_collection.data,
-            );
+
+            if (response.scene_collection.data) {
+              this.stateService.writeDataToCollectionFile(
+                inManifest.id,
+                response.scene_collection.data,
+              );
+            } else {
+              console.error(`Server returned empty data for collection ${inManifest.id}`);
+            }
 
             this.stateService.RENAME_COLLECTION(
               inManifest.id,

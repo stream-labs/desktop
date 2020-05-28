@@ -151,7 +151,7 @@ test('Go live error', async t => {
   await focusChild(t);
 
   // check that the error text is shown
-  await app.client.waitForVisible('a=just go live.');
+  await app.client.waitForVisible('a=just go live');
   await makeScreenshots(t, 'network error');
 
   await resetFetchMock(t);

@@ -32,6 +32,10 @@ const afterStartCallbacks: ((t: TExecutionContext) => any)[] = [];
 export function afterAppStart(cb: (t: TExecutionContext) => any) {
   afterStartCallbacks.push(cb);
 }
+const afterStopCallbacks: ((t: TExecutionContext) => any)[] = [];
+export function afterAppStop(cb: (t: TExecutionContext) => any) {
+  afterStopCallbacks.push(cb);
+}
 
 export async function focusWindow(t: any, regex: RegExp): Promise<boolean> {
   const handles = await t.context.app.client.windowHandles();
@@ -76,7 +80,7 @@ export async function closeWindow(t: any) {
 }
 
 export async function waitForLoader(t: any) {
-  await t.context.app.client.waitForExist('.main-loading', 10000, true);
+  await t.context.app.client.waitForExist('.main-loading', 20000, true);
 }
 
 interface ITestRunnerOptions {
@@ -136,6 +140,7 @@ export async function restartApp(t: TExecutionContext): Promise<Application> {
 }
 
 let skipCheckingErrorsInLogFlag = false;
+let cacheDir: string;
 
 /**
  * Disable checking errors in the log file for a single test
@@ -154,7 +159,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   let failMsg = '';
   let testName = '';
   let logFileLastReadingPos = 0;
-  const cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
+  cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
 
   startAppFn = async function startApp(t: TExecutionContext): Promise<Application> {
     t.context.cacheDir = cacheDir;
@@ -185,7 +190,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     });
 
     if (options.beforeAppStartCb) await options.beforeAppStartCb(t);
-
     await t.context.app.start();
 
     // Disable CSS transitions while running tests to allow for eager test clicks
@@ -216,9 +220,10 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       if (options.skipOnboarding) {
         await t.context.app.client.click('span=Skip');
         await t.context.app.client.click('h2=Start Fresh');
-        await t.context.app.client.click('p=Skip');
-        if (await t.context.app.client.isVisible('p=Skip')) {
-          await t.context.app.client.click('p=Skip');
+        await t.context.app.client.click('button=Skip');
+        await t.context.app.client.click('button=Skip');
+        if (await t.context.app.client.isVisible('button=Skip')) {
+          await t.context.app.client.click('button=Skip');
         }
       } else {
         // Wait for the connect screen before moving on
@@ -261,6 +266,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     await new Promise(resolve => {
       rimraf(cacheDir, resolve);
     });
+    for (const callback of afterStopCallbacks) {
+      await callback(t);
+    }
   };
 
   /**
@@ -315,12 +323,14 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     // wrap in try/catch for the situation when we have a crash
     // so we still can read the logs after the crash
     try {
-      const client = await getClient();
-      await client.unsubscribeAll();
       await releaseUserInPool();
       if (options.restartAppAfterEachTest) {
-        client.disconnect();
-        await stopAppFn(t);
+        if (appIsRunning) {
+          const client = await getClient();
+          await client.unsubscribeAll();
+          client.disconnect();
+          await stopAppFn(t);
+        }
       }
     } catch (e) {
       fail('Test finalization failed');
@@ -381,4 +391,8 @@ export async function click(t: TExecutionContext, selector: string) {
     const message = `click to "${selector}" failed in window ${windowId}: ${e.message} ${e.type}`;
     throw new Error(message);
   }
+}
+
+export function getCacheDir() {
+  return cacheDir;
 }

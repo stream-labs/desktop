@@ -41,7 +41,7 @@
         <div class="actions">
           <div class="input-container">
             <button class="button button--default" @click="restartStreamlabelsSession">
-              {{ $t('Restart Streamlabels') }}
+              {{ $t('Restart Stream Labels') }}
             </button>
           </div>
         </div>

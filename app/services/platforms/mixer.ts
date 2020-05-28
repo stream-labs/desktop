@@ -1,4 +1,4 @@
-import { StatefulService, mutation } from '../core/stateful-service';
+import { StatefulService, mutation } from 'services/core/stateful-service';
 import {
   IPlatformService,
   IGame,
@@ -71,15 +71,15 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
   }
 
   get oauthToken() {
-    return this.userService.platform.token;
+    return this.userService.platform?.token;
   }
 
   get mixerUsername() {
-    return this.userService.platform.username;
+    return this.userService.platform?.username;
   }
 
   get mixerId() {
-    return this.userService.platform.id;
+    return this.userService.platform?.id;
   }
 
   get channelId() {
@@ -89,7 +89,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
   init() {
     // prepopulate data to make chat available after app start
     this.userService.userLogin.subscribe(_ => {
-      if (this.userService.platform.type === 'mixer') this.prepopulateInfo();
+      if (this.userService.platform?.type === 'mixer') this.prepopulateInfo();
     });
 
     // trigger `channelInfoChanged` event with new "chatUrl" based on the changed theme

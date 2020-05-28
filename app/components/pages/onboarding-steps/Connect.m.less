@@ -12,8 +12,7 @@
   }
 
   :global(.list-input),
-  :global(.section)
-  { width: 400px }
+  :global(.section) { width: 400px; }
 }
 
 .select-another {
@@ -32,15 +31,8 @@
 
 .signup-buttons {
   display: flex;
-  flex-direction: column;
-  width: 400px;
   align-items: center;
-
-  button {
-    margin: 8px 0;
-    width: 100%;
-    &:last-child { margin-bottom: 0}
-  }
+  justify-content: center;
 }
 
 .link-button {
@@ -48,5 +40,21 @@
 
   &:hover {
     cursor: pointer;
+  }
+}
+
+.loginButton {
+  height: 80px;
+  width: 80px;
+  border-radius: 40px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 16px !important;
+  flex-shrink: 0;
+
+  i {
+    font-size: 40px;
+    margin: 0 !important;
   }
 }

@@ -22,7 +22,6 @@
 
 .nav-item {
   .margin-bottom();
-  .text-transform();
 
   cursor: pointer;
   list-style: none;
