@@ -2,6 +2,7 @@ import { focusMain, TExecutionContext, focusWorker } from './index';
 import { IUserAuth, IPlatformAuth, TPlatform } from '../../../app/services/platforms';
 import { sleep } from '../sleep';
 import { dialogDismiss } from './dialog';
+import { ExecutionContext } from 'ava';
 const request = require('request');
 
 const USER_POOL_URL = `https://slobs-users-pool.herokuapp.com`;
@@ -20,6 +21,7 @@ interface ITestUser {
   widgetToken: string; // needs for widgets showing
   channelId?: string; // for the Mixer and Facebook only
   features?: ITestUserFeatures; // user-specific features
+  streamKey?: string; // A valid streaming key for Twitch
 }
 
 interface ITestUserFeatures {
@@ -48,19 +50,15 @@ export async function logIn(
   features?: ITestUserFeatures, // if not set, pick a random user's account from user-pool
   waitForUI = true,
   isOnboardingTest = false,
-): Promise<IUserAuth> {
-  let authInfo: IUserAuth;
+): Promise<ITestUser> {
+  let authInfo: ITestUser;
 
   if (user) throw 'User already logged in';
 
   if (USER_POOL_TOKEN) {
-    authInfo = await reserveUserFromPool(USER_POOL_TOKEN, platform, features);
+    authInfo = await reserveUserFromPool(t, platform, features);
   } else {
-    authInfo = getAuthInfoFromEnv();
-    if (!authInfo) {
-      t.pass();
-      return null;
-    }
+    throw new Error('Setup env variable USER_POOL_TOKEN to run this test');
   }
 
   await loginWithAuthInfo(t, authInfo, waitForUI, isOnboardingTest);
@@ -69,10 +67,24 @@ export async function logIn(
 
 export async function loginWithAuthInfo(
   t: TExecutionContext,
-  authInfo: IUserAuth,
+  userInfo: ITestUser,
   waitForUI = true,
   isOnboardingTest = false,
 ) {
+  const authInfo = {
+    widgetToken: user.widgetToken,
+    apiToken: user.apiToken,
+    primaryPlatform: user.type,
+    platforms: {
+      [user.type]: {
+        username: user.username,
+        type: user.type,
+        id: user.id,
+        token: user.token,
+        channelId: user.channelId,
+      },
+    },
+  };
   await focusWorker(t);
   t.context.app.webContents.send('testing-fakeAuth', authInfo, isOnboardingTest);
   await focusMain(t);
@@ -97,56 +109,13 @@ export async function releaseUserInPool() {
 }
 
 /**
- * fetch credentials from ENV variables
- */
-function getAuthInfoFromEnv(): IUserAuth {
-  const env = process.env;
-
-  const authInfo = {
-    SLOBS_TEST_API_TOKEN: '',
-    SLOBS_TEST_WIDGET_TOKEN: '',
-    SLOBS_TEST_PLATFORM_TYPE: '',
-    SLOBS_TEST_PLATFORM_TOKEN: '',
-    SLOBS_TEST_PLATFORM_USER_ID: '',
-    SLOBS_TEST_USERNAME: '',
-  };
-
-  let canAuth = true;
-  Object.keys(authInfo).forEach(key => {
-    authInfo[key] = env[key];
-    if (!authInfo[key]) {
-      console.warn(`Setup env.${key} to run this test`);
-      canAuth = false;
-    }
-  });
-
-  if (!canAuth) {
-    return null;
-  }
-
-  return {
-    widgetToken: authInfo.SLOBS_TEST_WIDGET_TOKEN,
-    apiToken: authInfo.SLOBS_TEST_API_TOKEN,
-    primaryPlatform: authInfo.SLOBS_TEST_PLATFORM_TYPE as TPlatform,
-    platforms: {
-      [authInfo.SLOBS_TEST_PLATFORM_TYPE as TPlatform]: {
-        type: authInfo.SLOBS_TEST_PLATFORM_TYPE as TPlatform,
-        id: authInfo.SLOBS_TEST_PLATFORM_USER_ID,
-        token: authInfo.SLOBS_TEST_PLATFORM_TOKEN,
-        username: authInfo.SLOBS_TEST_USERNAME,
-      },
-    },
-  };
-}
-
-/**
  * Fetch credentials from slobs-users-pool service, and reserve these credentials
  */
-async function reserveUserFromPool(
-  token: string,
+export async function reserveUserFromPool(
+  t: ExecutionContext,
   platformType: TPlatform,
   features: ITestUserFeatures = null,
-): Promise<IUserAuth> {
+): Promise<ITestUser> {
   // try to get a user account from users-pool service
   // give it several attempts
   let attempts = 3;
@@ -160,30 +129,15 @@ async function reserveUserFromPool(
       user = await requestUserPool(urlPath);
       break;
     } catch (e) {
-      console.log(e);
+      t.log(e);
       if (attempts) {
-        console.log('retrying in 20 sec...');
+        t.log('retrying in 20 sec...');
         await sleep(20000);
       }
     }
   }
   if (!user) throw 'Unable to reserve a user after 3 attempts';
-
-  // the account has been received, get tokens from it
-  return {
-    widgetToken: user.widgetToken,
-    apiToken: user.apiToken,
-    primaryPlatform: user.type,
-    platforms: {
-      [user.type]: {
-        username: user.username,
-        type: user.type,
-        id: user.id,
-        token: user.token,
-        channelId: user.channelId,
-      },
-    },
-  };
+  return user;
 }
 
 /**

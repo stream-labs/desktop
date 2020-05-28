@@ -38,7 +38,9 @@ export default class OnePaneR extends BaseLayout {
           class={styles.rows}
           style={{ width: `calc(100% - ${this.bar1}px)`, paddingTop: '16px' }}
         >
-          <div style={{ height: '100%' }}>{this.$slots['1']}</div>
+          <div class={styles.cell} style={{ height: '100%' }}>
+            {this.$slots['1']}
+          </div>
           <div class={styles.segmented}>
             <div class={styles.cell}>{this.$slots['3']}</div>
             <div class={styles.cell}>{this.$slots['4']}</div>

@@ -4,6 +4,9 @@
     <i class="UpdaterWindow-icon fas fa-sync-alt fa-spin"/>
     {{ message }}
   </div>
+  <div class="UpdaterWindow-subMessage">
+    {{ subMessage }}
+  </div>
 </div>
 </template>
 
@@ -13,9 +16,10 @@ const { remote, ipcRenderer } = window.require('electron');
 export default {
   data() {
     return {
-      message: 'Checking for updates',
+      message: 'Downloading Updates',
+      subMessage: 'Streamlabs OBS is downloading updates. This can take several minutes.',
     };
-  }
+  },
 };
 </script>
 
@@ -28,6 +32,12 @@ export default {
   font-size: 18px;
   text-align: center;
   -webkit-app-region: drag;
+}
+
+.UpdaterWindow-subMessage {
+  font-size: 13px;
+  margin-top: 16px;
+  color: #bdc2c4;
 }
 
 .updater-window__img {

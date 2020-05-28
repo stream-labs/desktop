@@ -1,5 +1,5 @@
 {
-  "Youtube stream status": "Stav streamování na YouTube",
+  "YouTube stream status": "YouTube stream status",
   "Waiting for YouTube to receive the video signal...": "Čeká se, než YouTube obdrží váš videosignál...",
   "Testing your broadcast...": "Testování rychlosti připojení...",
   "Finalizing broadcast testing...": "Probíhá dokončení testu vysílání...",
@@ -11,7 +11,7 @@
   "Your stream will start shortly. You can close this window.": "Vaše streamování se brzy spustí. Toto okno můžete zavřít.",
   "stream control page": "ovládací stránka pro stream",
   " to publish it manually": " a proveďte publikování ručně",
-  "Go to Youtube Live Dashboard": "Přejděte na řídicí panel YouTube pro živé vysílání",
+  "Go to YouTube Live Dashboard": "Go to YouTube Live Dashboard",
   "Create New Event": "Vytvořit novou událost",
   "YouTube Chat": "Chat na YouTube",
   "This action cannot be performed inside Streamlabs OBS. To interact with chat, you can open this chat in a web browser.": "Tuto akci nelze provést v rámci softwaru Streamlabs OBS. Pokud chcete komunikovat s lidmi z chatu, můžete chat otevřít ve webovém prohlížeči.",

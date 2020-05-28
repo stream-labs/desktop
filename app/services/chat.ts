@@ -17,9 +17,9 @@ export class ChatService extends Service {
   @Inject() windowsService: WindowsService;
   @Inject() streamInfoService: StreamInfoService;
 
-  private chatView: Electron.BrowserView;
+  private chatView: Electron.BrowserView | null;
   private chatUrl = '';
-  private electronWindowId: number;
+  private electronWindowId: number | null;
 
   init() {
     // listen `streamInfoChanged` to init or deinit the chat
@@ -59,7 +59,7 @@ export class ChatService extends Service {
 
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
 
-    win.addBrowserView(this.chatView);
+    if (this.chatView) win.addBrowserView(this.chatView);
   }
 
   setChatBounds(position: IVec2, size: IVec2) {
@@ -84,8 +84,9 @@ export class ChatService extends Service {
 
   private async initChat() {
     if (this.chatView) return;
+    if (!this.userService.isLoggedIn) return;
 
-    const partition = this.userService.state.auth.partition;
+    const partition = this.userService.state.auth?.partition;
 
     this.chatView = new electron.remote.BrowserView({
       webPreferences: {
@@ -94,10 +95,15 @@ export class ChatService extends Service {
       },
     });
 
-    const win = this.windowsService.getWindowIdFromElectronId(this.electronWindowId);
-    if (win) this.windowsService.updateHideChat(win, true);
-    await this.navigateToChat();
-    if (win) this.windowsService.updateHideChat(win, false);
+    if (this.electronWindowId) {
+      const win = this.windowsService.getWindowIdFromElectronId(this.electronWindowId);
+      if (win) this.windowsService.updateHideChat(win, true);
+      await this.navigateToChat();
+      if (win) this.windowsService.updateHideChat(win, false);
+    } else {
+      await this.navigateToChat();
+    }
+
     this.bindWindowListener();
     this.bindDomReadyListener();
 
@@ -114,6 +120,8 @@ export class ChatService extends Service {
 
   private async navigateToChat() {
     if (!this.chatUrl) return; // user has logged out
+    if (!this.chatView) return; // chat was already deinitialized
+
     await this.chatView.webContents.loadURL(this.chatUrl).catch(this.handleRedirectError);
 
     // mount chat if electronWindowId is set and it has not been mounted yet
@@ -128,6 +136,8 @@ export class ChatService extends Service {
   }
 
   private bindWindowListener() {
+    if (!this.chatView) return; // chat was already deinitialized
+
     electron.ipcRenderer.send('webContents-preventPopup', this.chatView.webContents.id);
 
     if (this.userService.platformType === 'youtube') {
@@ -186,12 +196,16 @@ export class ChatService extends Service {
   }
 
   private bindDomReadyListener() {
+    if (!this.chatView) return; // chat was already deinitialized
+
     const settings = this.customizationService.getSettings();
 
     this.chatView.webContents.on('dom-ready', () => {
+      if (!this.chatView) return; // chat was already deinitialized
+
       this.chatView.webContents.setZoomFactor(settings.chatZoomFactor);
 
-      if (settings.enableBTTVEmotes && this.userService.platform.type === 'twitch') {
+      if (settings.enableBTTVEmotes && this.userService.platform?.type === 'twitch') {
         this.chatView.webContents.executeJavaScript(
           /*eslint-disable */
           `
@@ -221,7 +235,7 @@ export class ChatService extends Service {
         );
       }
 
-      if (settings.enableFFZEmotes && this.userService.platform.type === 'twitch') {
+      if (settings.enableFFZEmotes && this.userService.platform?.type === 'twitch') {
         this.chatView.webContents.executeJavaScript(
           `
           var ffzscript1 = document.createElement('script');

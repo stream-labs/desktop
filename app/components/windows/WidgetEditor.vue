@@ -323,7 +323,6 @@
   .subsection__title {
     .padding-h-sides(2);
     .padding-v-sides();
-    .text-transform();
     .margin-bottom(@0);
 
     width: 100%;

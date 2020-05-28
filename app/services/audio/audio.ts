@@ -180,7 +180,6 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
       forceMono: !!(obsSource.flags & obs.ESourceFlags.ForceMono),
       syncOffset: AudioService.timeSpecToMs(obsSource.syncOffset),
       muted: obsSource.muted,
-      resourceId: `AudioSource${JSON.stringify([sourceId])}`,
       mixerHidden: false,
     };
   }
@@ -353,6 +352,10 @@ export class AudioSource implements IAudioSourceApi {
       this.sourcesService.state.temporarySources[sourceId];
     Utils.applyProxy(this, this.audioSourceState);
     Utils.applyProxy(this, sourceState);
+  }
+
+  isDestroyed(): boolean {
+    return !this.audioService.state.audioSources[this.sourceId];
   }
 
   getModel(): IAudioSource & ISource {
