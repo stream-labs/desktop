@@ -90,12 +90,26 @@ export default class SideNav extends Vue {
     electron.remote.shell.openExternal('https://howto.streamlabs.com/');
   }
 
+  async upgradeToPrime() {
+    const link = await this.magicLinkService.getDashboardMagicLink('prime', 'slobs-side-nav');
+    electron.remote.shell.openExternal(link);
+  }
+
   render() {
     return (
       <div class={styles.bottomTools}>
         {this.isDevMode && (
           <div class={styles.cell} onClick={() => this.openDevTools()} title={'Dev Tools'}>
             <i class="icon-developer" />
+          </div>
+        )}
+        {this.userService.views.isLoggedIn && !this.userService.views.isPrime && (
+          <div
+            class={cx(styles.cell, styles.primeCell)}
+            onClick={() => this.upgradeToPrime()}
+            title={$t('Get Prime')}
+          >
+            <i class="icon-prime" />
           </div>
         )}
         {this.userService.isLoggedIn && (
@@ -109,7 +123,6 @@ export default class SideNav extends Vue {
           title={$t('Layout Editor')}
         >
           <i class="fas fa-th-large" />
-          <div class={cx(styles.badge, styles.newBadge)}>{$t('New')}</div>
         </div>
         <div
           class={cx(styles.cell, { [styles.toggleOn]: this.studioModeEnabled })}
