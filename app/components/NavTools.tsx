@@ -91,7 +91,10 @@ export default class SideNav extends Vue {
   }
 
   async upgradeToPrime() {
-    const link = await this.magicLinkService.getDashboardMagicLink('prime', 'slobs-side-nav');
+    const link = await this.magicLinkService.getDashboardMagicLink(
+      'prime-marketing',
+      'slobs-side-nav',
+    );
     electron.remote.shell.openExternal(link);
   }
 
