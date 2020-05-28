@@ -24,7 +24,7 @@ interface IPerformanceState {
   percentageLaggedFrames: number;
   numberEncodedFrames: number;
   numberRenderedFrames: number;
-  bandwidth: number;
+  streamingBandwidth: number;
   frameRate: number;
 }
 
@@ -76,7 +76,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     percentageLaggedFrames: 0,
     numberEncodedFrames: 0,
     numberRenderedFrames: 0,
-    bandwidth: 0,
+    streamingBandwidth: 0,
     frameRate: 0,
   };
 

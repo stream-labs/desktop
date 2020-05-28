@@ -10,6 +10,7 @@ import { UserService } from 'services/user';
 import { CustomizationService } from 'services/customization';
 import { TObsValue } from 'components/obs/inputs/ObsInput';
 import electron from 'electron';
+import { $t } from 'services/i18n';
 import { getSharedResource } from 'util/get-shared-resource';
 
 export interface IDefaultManagerSettings {
@@ -163,11 +164,12 @@ export class DefaultManager extends PropertiesManager {
     if (this.obsSource.id !== 'game_capture') return;
 
     this.obsSource.update({
-      auto_capture_list_path: path.join(
+      auto_capture_rules_path: path.join(
         electron.remote.app.getPath('userData'),
-        'game_capture_list.lst',
+        'game_capture_list.json',
       ),
       auto_placeholder_image: getSharedResource('capture-placeholder.png'),
+      auto_placeholder_message: $t('Looking for a game to capture'),
     });
   }
 }

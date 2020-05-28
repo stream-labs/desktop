@@ -41,8 +41,8 @@ export function camelize(response: Response): Promise<any> {
  * @param token the OAuth access token
  * @param headers headers to append to
  */
-export function authorizedHeaders(token: string, headers = new Headers()): Headers {
-  headers.append('Authorization', `Bearer ${token}`);
+export function authorizedHeaders(token: string | undefined, headers = new Headers()): Headers {
+  if (token) headers.append('Authorization', `Bearer ${token}`);
   return headers;
 }
 

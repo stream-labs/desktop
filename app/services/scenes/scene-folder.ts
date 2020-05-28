@@ -8,6 +8,8 @@ import { SceneItemNode } from './scene-node';
 import { ISceneItemFolder } from '.';
 import { TSceneNodeType } from './scenes';
 import { ServiceHelper } from 'services/core';
+import compact from 'lodash/compact';
+import { assertIsDefined } from '../../util/properties-type-guards';
 
 @ServiceHelper()
 export class SceneItemFolder extends SceneItemNode {
@@ -27,15 +29,19 @@ export class SceneItemFolder extends SceneItemNode {
     const state = this.scenesService.state.scenes[sceneId].nodes.find(item => {
       return item.id === id;
     });
-
+    assertIsDefined(state);
     Utils.applyProxy(this, state);
     this.state = state as ISceneItemFolder;
   }
 
   add(sceneNodeId: string) {
-    this.getScene()
-      .getNode(sceneNodeId)
-      .setParent(this.id);
+    const node = this.getScene().getNode(sceneNodeId);
+    if (!node) {
+      throw new Error(
+        `Can not add a non-existing ${sceneNodeId} item to the folder ${this.name}:{${this.id}`,
+      );
+    }
+    node.setParent(this.id);
   }
 
   ungroup() {
@@ -55,7 +61,7 @@ export class SceneItemFolder extends SceneItemNode {
    */
   getNodes(): TSceneNode[] {
     const scene = this.getScene();
-    return this.childrenIds.map(nodeId => scene.getNode(nodeId));
+    return compact(this.childrenIds.map(nodeId => scene.getNode(nodeId)));
   }
 
   getItems(): SceneItem[] {
@@ -67,7 +73,9 @@ export class SceneItemFolder extends SceneItemNode {
   }
 
   getScene(): Scene {
-    return this.scenesService.views.getScene(this.sceneId);
+    const scene = this.scenesService.views.getScene(this.sceneId);
+    assertIsDefined(scene);
+    return scene;
   }
 
   /**
@@ -102,7 +110,7 @@ export class SceneItemFolder extends SceneItemNode {
 
   getNestedNodes(traversedNodesIds: string[] = []): TSceneNode[] {
     // tslint:disable-next-line:no-parameter-reassignment TODO
-    traversedNodesIds = [].concat(traversedNodesIds);
+    traversedNodesIds = Object.assign([], traversedNodesIds);
     const nodes: TSceneNode[] = [];
     this.getNodes().forEach(node => {
       if (traversedNodesIds.includes(node.id)) {
@@ -112,14 +120,14 @@ export class SceneItemFolder extends SceneItemNode {
       }
       nodes.push(node);
       traversedNodesIds.push(node.id);
-      if (node.sceneNodeType !== 'folder') return;
-      nodes.push(...(node as SceneItemFolder).getNestedNodes(traversedNodesIds));
+      if (!node.isFolder()) return;
+      nodes.push(...node.getNestedNodes(traversedNodesIds));
     });
     return nodes;
   }
 
   getNestedItems(): SceneItem[] {
-    return this.getNestedNodes().filter(node => node.sceneNodeType === 'item') as SceneItem[];
+    return this.getNestedNodes().filter(isItem);
   }
 
   getNestedFolders(): SceneItemFolder[] {

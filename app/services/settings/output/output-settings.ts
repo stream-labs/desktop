@@ -81,6 +81,7 @@ export const QUALITY_ORDER = [
 export interface IOutputSettings {
   mode: TOutputSettingsMode;
   inputResolution: string;
+  framerate: IFramerateSettings;
   streaming: IStreamingEncoderSettings;
   recording: IRecordingEncoderSettings;
   replayBuffer: IReplayBufferSettings;
@@ -114,6 +115,14 @@ export interface IStreamingEncoderSettings extends IEncoderSettings {
   rescaleOutput: boolean;
   hasCustomResolution: boolean;
   encoderOptions: string;
+}
+
+export interface IFramerateSettings {
+  type: string;
+  common: string;
+  integer: number;
+  fracNum: number;
+  fracDen: number;
 }
 
 type TOutputSettingsMode = 'Simple' | 'Advanced';
@@ -193,9 +202,18 @@ export class OutputSettingsService extends Service {
       time: this.settingsService.findSettingValue(output, 'Replay Buffer', 'RecRBTime'),
     };
 
+    const framerate = {
+      type: this.settingsService.findSettingValue(video, 'Untitled', 'FPSType'),
+      common: this.settingsService.findSettingValue(video, 'Untitled', 'FPSCommon'),
+      integer: this.settingsService.findSettingValue(video, 'Untitled', 'FPSInt'),
+      fracNum: this.settingsService.findSettingValue(video, 'Untitled', 'FPSNum'),
+      fracDen: this.settingsService.findSettingValue(video, 'Untitled', 'FPSDen'),
+    };
+
     return {
       mode,
       inputResolution,
+      framerate,
       streaming,
       recording,
       replayBuffer,

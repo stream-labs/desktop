@@ -22,6 +22,7 @@ import { ISettingsServiceApi, ISettingsSubCategory } from './settings-api';
 import { PlatformAppsService } from 'services/platform-apps';
 import { EDeviceType } from 'services/hardware';
 import { StreamingService } from 'services/streaming';
+import { FacemasksService } from 'services/facemasks';
 
 export interface ISettingsState {
   General: {
@@ -84,6 +85,7 @@ export class SettingsService extends StatefulService<ISettingsState>
   @Inject() private platformAppsService: PlatformAppsService;
   @Inject() private outputSettingsService: OutputSettingsService;
   @Inject() private streamingService: StreamingService;
+  @Inject() private facemasksService: FacemasksService;
 
   @Inject()
   private videoEncodingOptimizationService: VideoEncodingOptimizationService;
@@ -124,9 +126,12 @@ export class SettingsService extends StatefulService<ISettingsState>
       'Scene Collections',
       'Notifications',
       'Appearance',
-      'Face Masks',
       'Remote Control',
     ]);
+
+    if (this.facemasksService.state.active) {
+      categories = categories.concat(['Face Masks']);
+    }
 
     if (this.advancedSettingEnabled() || this.platformAppsService.state.devMode) {
       categories = categories.concat('Developer');

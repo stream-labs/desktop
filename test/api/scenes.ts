@@ -34,6 +34,15 @@ test('Creating, fetching and removing scenes', async t => {
   scenesNames = scenes.map(scene => scene.name);
 
   t.deepEqual(scenesNames, ['Scene']);
+
+  // check the correct error message on removed item
+  let gotError = false;
+  try {
+    scene2.remove();
+  } catch (e) {
+    gotError = true;
+  }
+  t.true(gotError);
 });
 
 test('Switching between scenes', async t => {
@@ -136,7 +145,13 @@ test('Creating nested scenes', async t => {
   t.deepEqual(itemsCNames, ['SceneA']);
 
   // Unable to add a source when the scene you are trying to add already contains your current scene
-  sceneA.addSource(sceneC.id);
+  let errorIsThrew = false;
+  try {
+    sceneA.addSource(sceneC.id);
+  } catch (e) {
+    errorIsThrew = true;
+  }
+  t.true(errorIsThrew);
   sceneAItems = sceneA.getItems();
   itemsANames = sceneAItems.map(item => item['name']);
 
@@ -226,4 +241,11 @@ test('SceneItem.addFile()', async t => {
         hello.txt: text_gdiplus
   `),
   );
+});
+
+test('Try to make a not existing scene active', async t => {
+  const client = await getClient();
+  const scenesService = client.getResource<ScenesService>('ScenesService');
+  const sceneHasBeenSwitched = scenesService.makeSceneActive('This id does not exist');
+  t.false(sceneHasBeenSwitched);
 });

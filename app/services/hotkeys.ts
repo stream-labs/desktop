@@ -691,6 +691,10 @@ export class Hotkey implements IHotkey {
     this.shouldApply = this.action.shouldApply(entityId);
   }
 
+  isDestroyed() {
+    return false;
+  }
+
   equals(other: IHotkey) {
     return (
       this.actionName === other.actionName &&

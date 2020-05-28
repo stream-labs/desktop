@@ -11,6 +11,5 @@
 <style lang="less" scoped>
 .button--go-live {
   min-width: 130px;
-  text-transform: none;
 }
 </style>
