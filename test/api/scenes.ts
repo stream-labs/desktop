@@ -118,6 +118,7 @@ test('Scenes events', async t => {
   image.setVisibility(false);
   event = await client.fetchNextEvent();
   t.is(event.data.visible, false);
+  t.is(event.data.name, 'image');
 
   image.remove();
   event = await client.fetchNextEvent();
