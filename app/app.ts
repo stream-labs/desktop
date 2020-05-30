@@ -103,6 +103,13 @@ window.addEventListener('unhandledrejection', e => {
   sendLogMsg('error', e.reason);
 });
 
+// Remove the startup event listener that catches bundle parse errors and other
+// critical issues starting up the renderer.
+if (window['_startupErrorHandler']) {
+  window.removeEventListener('error', window['_startupErrorHandler']);
+  delete window['_startupErrorHandler'];
+}
+
 if (
   (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) &&
   !electron.remote.process.env.SLOBS_IPC
