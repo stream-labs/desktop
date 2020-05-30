@@ -2,6 +2,7 @@ import fetch from 'node-fetch';
 import * as electron from 'electron';
 import * as path from 'path';
 import * as fs from 'fs-extra';
+import * as stream from 'stream';
 
 module.exports = async (basePath: string) => {
   const cdnBase = `https://slobs-cdn.streamlabs.com/${process.env.SLOBS_VERSION}/bundles/`;
@@ -56,23 +57,22 @@ module.exports = async (basePath: string) => {
         })
         .then(({ body }) => {
           const fileStream = fs.createWriteStream(tmpPath);
-          body.pipe(fileStream);
 
-          fileStream.on('finish', () => {
-            fs.rename(tmpPath, dstPath, e => {
-              if (e) {
-                reject(e);
-                return;
-              }
+          stream.pipeline(body, fileStream, e => {
+            if (e) {
+              console.log(`Error downloading ${srcUrl}`, e);
+              reject(e);
+            } else {
+              fs.rename(tmpPath, dstPath, e => {
+                if (e) {
+                  reject(e);
+                  return;
+                }
 
-              console.log(`Successfully downloaded ${srcUrl}`);
-              resolve();
-            });
-          });
-
-          fileStream.on('error', e => {
-            console.log(`Error downloading ${srcUrl}`, e);
-            reject(e);
+                console.log(`Successfully downloaded ${srcUrl}`);
+                resolve();
+              });
+            }
           });
         })
         .catch(e => reject(e));
@@ -193,7 +193,10 @@ module.exports = async (basePath: string) => {
       const bundleName = request.url.split('/')[4];
 
       if (!useLocalBundles && bundlePathsMap[bundleName]) {
-        cb({ redirectURL: `file://${bundlePathsMap[bundleName]}` });
+        // Work around an extreme edge case where people have # in home directory path
+        const sanitizedBundleUrl = `file://${bundlePathsMap[bundleName]}`.replace('#', '%23');
+
+        cb({ redirectURL: sanitizedBundleUrl });
         return;
       }
 
@@ -201,4 +204,25 @@ module.exports = async (basePath: string) => {
       cb({ redirectURL: `${localBase}${localManifest[bundleName]}` });
     },
   );
+
+  electron.ipcMain.on('startupError', (e, msg) => {
+    console.log('Received startup error from worker window', msg);
+
+    try {
+      // Try clearing the bundles directory in case it got corrupted
+      if (fs.existsSync(bundlesBaseDirectory)) {
+        fs.emptyDirSync(bundlesBaseDirectory);
+      }
+    } catch (e) {
+      console.log('Error clearing bundle directory', e);
+    }
+
+    electron.dialog.showErrorBox(
+      'Streamlabs OBS',
+      'Streamlabs OBS failed to start. Please try launching Streamlabs OBS again. If this issue persists, please visit support.streamlabs.com for help.',
+    );
+
+    console.log('The app will now shut down');
+    electron.app.quit();
+  });
 };

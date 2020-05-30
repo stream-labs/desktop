@@ -1,3 +1,5 @@
+/*global SLOBS_BUNDLE_ID*/
+
 import { Inject } from './core/injector';
 import { UserService } from './user';
 import { HostsService } from './hosts';
@@ -24,7 +26,8 @@ type TAnalyticsEvent =
   | 'PlatformLogin'
   | 'SocialShare'
   | 'Recording'
-  | 'ReplayBuffer'; // add more types if you need
+  | 'ReplayBuffer'
+  | 'Heartbeat';
 
 interface IAnalyticsEvent {
   product: string;
@@ -60,7 +63,11 @@ export class UsageStatisticsService extends Service {
 
   init() {
     this.loadInstallerId();
-    this.sendAnalytics = throttle(this.sendAnalytics, 2 * 60 * 1000);
+    this.sendAnalytics = throttle(this.sendAnalytics, 30 * 1000);
+
+    setInterval(() => {
+      this.recordAnalyticsEvent('Heartbeat', { bundle: SLOBS_BUNDLE_ID });
+    }, 10 * 60 * 1000);
   }
 
   loadInstallerId() {
