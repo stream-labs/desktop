@@ -3,55 +3,20 @@
     <validated-form slot="manage-list-properties" @input="save()" v-if="loaded">
       <v-form-group :title="$t('Enable Events')">
         <bool-input
-          v-if="isMixer"
-          :title="$t('Follows')"
-          v-model="wData.settings.mixer_account.show_follows"
-        />
-        <bool-input
-          v-if="isMixer"
-          :title="$t('Hosts')"
-          v-model="wData.settings.mixer_account.show_hosts"
-        />
-        <bool-input
-          v-if="isMixer"
-          :title="$t('Subscriptions')"
-          v-model="wData.settings.mixer_account.show_subscriptions"
-        />
-        <bool-input
-          v-if="isMixer"
-          :title="$t('Stickers')"
-          v-model="wData.settings.mixer_account.show_stickers"
-        />
-        <bool-input
-          v-if="isMixer"
-          :title="$t('Effects')"
-          v-model="wData.settings.mixer_account.show_effects"
-        />
-        <bool-input
           v-for="event in eventsForPlatform"
           :key="event.key"
           :title="event.title"
-          v-model="wData.settings[event.key]"
+          :value="valueForEvent(event)"
+          @input="val => setEvent(event, val)"
         />
       </v-form-group>
       <v-form-group
-        v-if="isMixer"
-        :title="$t('Min. Sparks')"
+        v-for="event in minsForPlatform"
+        :key="event.key"
         type="number"
-        v-model="wData.settings.mixer_account.sparks_min"
-      />
-      <v-form-group
-        v-if="isMixer"
-        :title="$t('Min. Embers')"
-        type="number"
-        v-model="wData.settings.mixer_account.embers_min"
-      />
-      <v-form-group
-        v-if="isTwitch"
-        :title="$t('Min. Bits')"
-        type="number"
-        v-model="wData.settings.bits_minimum"
-        :metadata="{ tooltip: minBitsTooltip }"
+        :value="valueForEvent(event)"
+        @input="val => setEvent(event, val)"
+        :metadata="event"
       />
       <v-form-group
         :title="$t('Max Events')"
