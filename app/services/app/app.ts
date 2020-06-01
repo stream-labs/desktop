@@ -163,6 +163,7 @@ export class AppService extends StatefulService<IAppState> {
   @track('app_close')
   private shutdownHandler() {
     this.START_LOADING();
+    this.tcpServerService.stopListening();
     obs.NodeObs.StopCrashHandler();
     this.crashReporterService.beginShutdown();
 
@@ -172,7 +173,6 @@ export class AppService extends StatefulService<IAppState> {
       this.windowsService.closeChildWindow();
       await this.windowsService.closeAllOneOffs();
       this.ipcServerService.stopListening();
-      this.tcpServerService.stopListening();
       await this.userService.flushUserSession();
       await this.sceneCollectionsService.deinitialize();
       this.performanceService.stop();

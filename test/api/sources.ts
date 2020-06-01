@@ -2,6 +2,7 @@ import { useSpectron, test } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { ScenesService } from 'services/api/external-api/scenes/scenes';
 import { SourcesService } from 'services/api/external-api/sources/sources';
+import { sleep } from '../helpers/sleep';
 
 useSpectron({ restartAppAfterEachTest: false });
 
