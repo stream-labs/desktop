@@ -85,6 +85,7 @@
     "semver": "^5.5.1",
     "socket.io-client": "2.1.1",
     "tasklist": "^3.1.1",
+    "typedoc": "^0.16.11",
     "uuid": "^3.0.1",
     "vuejs-datepicker": "^1.6.2"
   },
