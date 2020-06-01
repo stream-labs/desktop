@@ -14,7 +14,6 @@ import { v2 } from '../util/vec2';
 import { EditorCommandsService } from 'services/editor-commands';
 import { mutation } from './core';
 import { TcpServerService } from './api/tcp-server';
-import { Subject } from 'rxjs';
 
 interface IResizeRegion {
   name: string;
@@ -35,7 +34,6 @@ interface IResizeOptions {
 
 interface IEditorServiceState {
   cursor: string;
-  changingPositionInProgress: boolean;
 }
 
 export interface IMouseEvent {
@@ -60,14 +58,8 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() private tcpServerService: TcpServerService;
 
-  /**
-   * emit this event when drag or resize have been finished
-   */
-  positionUpdateFinished = new Subject<void>();
-
   static initialState: IEditorServiceState = {
     cursor: 'default',
-    changingPositionInProgress: false,
   };
 
   renderedWidth = 0;
@@ -137,8 +129,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
         y: this.renderedOffsetY,
       },
     });
-    this.SET_CHANGING_POSITION_IN_PROGRESS(true);
-    this.tcpServerService.stopRequestsHandling(false);
+    this.tcpServerService.stopRequestsHandling();
   }
 
   startResizing(event: IMouseEvent, region: IResizeRegion) {
@@ -147,8 +138,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     this.currentY = event.pageY;
 
     if (event.altKey) this.isCropping = true;
-    this.SET_CHANGING_POSITION_IN_PROGRESS(true);
-    this.tcpServerService.stopRequestsHandling(false);
+    this.tcpServerService.stopRequestsHandling();
   }
 
   handleMouseUp(event: IMouseEvent) {
@@ -218,8 +208,6 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     this.dragHandler = null;
     this.resizeRegion = null;
     this.isCropping = false;
-    this.SET_CHANGING_POSITION_IN_PROGRESS(false);
-    this.positionUpdateFinished.next();
     this.tcpServerService.startRequestsHandling();
 
     this.updateCursor(event);
@@ -642,10 +630,5 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   @mutation()
   SET_CURSOR(cursor: string) {
     this.state.cursor = cursor;
-  }
-
-  @mutation()
-  SET_CHANGING_POSITION_IN_PROGRESS(enabled: boolean) {
-    this.state.changingPositionInProgress = enabled;
   }
 }

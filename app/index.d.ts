@@ -38,6 +38,10 @@ interface ICrop {
   right: number;
 }
 
+interface IResource {
+  resourceId: string;
+}
+
 interface IRGBColor {
   r: number;
   g: number;
