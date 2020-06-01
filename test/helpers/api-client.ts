@@ -1,4 +1,4 @@
-import { IJsonRpcEvent, IJsonRpcRequest, IJsonRpcResponse } from '../../app/services/api/jsonrpc';
+import { IJsonRpcEvent, IJsonRpcRequest } from '../../app/services/api/jsonrpc';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { first } from 'rxjs/operators';
 import { isEqual } from 'lodash';
@@ -17,7 +17,6 @@ export type TConnectionStatus = 'disconnected' | 'pending' | 'connected';
 
 export class ApiClient {
   eventReceived = new Subject<IJsonRpcEvent>();
-  messageReceived = new Subject<IJsonRpcResponse<any>>();
 
   private nextRequestId = 1;
   private socket: any;
@@ -122,11 +121,12 @@ export class ApiClient {
 
     const response = this.sendMessageSync(requestBody);
     const parsedResponse = JSON.parse(response.toString());
-    this.log(`Response Sync:`, parsedResponse);
 
     if (parsedResponse.error) {
       throw parsedResponse.error;
     }
+
+    if (this.logsEnabled) this.log(`Response Sync:`, parsedResponse);
 
     return parsedResponse.result;
   }
@@ -182,11 +182,6 @@ export class ApiClient {
     return Buffer.concat(response);
   }
 
-  sendJson(json: string) {
-    this.log('Send json:', json);
-    this.socket.write(json);
-  }
-
   onMessageHandler(data: ArrayBuffer) {
     data
       .toString()
@@ -194,11 +189,8 @@ export class ApiClient {
       .forEach(rawMessage => {
         if (!rawMessage) return;
         const message = JSON.parse(rawMessage);
-        this.messageReceived.next(message);
-
-        // if message is response for an API call
-        // than we should have a pending request object
         const request = this.requests[message.id];
+
         if (request) {
           if (message.error) {
             request.reject(message.error);

@@ -180,6 +180,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
       forceMono: !!(obsSource.flags & obs.ESourceFlags.ForceMono),
       syncOffset: AudioService.timeSpecToMs(obsSource.syncOffset),
       muted: obsSource.muted,
+      resourceId: `AudioSource${JSON.stringify([sourceId])}`,
       mixerHidden: false,
     };
   }

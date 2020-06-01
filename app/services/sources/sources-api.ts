@@ -4,7 +4,7 @@ import { WidgetType } from 'services/widgets';
 import { Observable } from 'rxjs';
 import { IAudioSource } from 'services/audio';
 
-export interface ISource {
+export interface ISource extends IResource {
   sourceId: string;
   name: string;
   type: TSourceType;
