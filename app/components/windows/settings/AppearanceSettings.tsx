@@ -86,7 +86,7 @@ export default class AppearanceSettings extends Vue {
               <div style={{ marginBottom: '16px' }}>
                 <a style={{ color: 'var(--prime)' }} onClick={() => this.upgradeToPrime()}>
                   <i style={{ color: 'var(--prime)' }} class="icon-prime" />
-                  {$t('Change the look of Stremlabs OBS with Prime')}
+                  {$t('Change the look of Streamlabs OBS with Prime')}
                 </a>
               </div>
             )}
