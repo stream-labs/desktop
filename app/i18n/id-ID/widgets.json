@@ -95,7 +95,14 @@
   "Facebook Shares": "Bagi Facebook",
   "Facebook Stars": "Bintang Facebook",
   "Facebook Supports": "Dukungan Facebook",
+  "Likes": "Suka",
+  "Shares": "Bagi",
+  "Stars": "Bintang",
+  "Supporters": "Supporters",
   "Note: This background color is for preview purposes only.It will not be shown in your stream.": "Catatan: Warna latar belakang ini adalah hanya untuk keperluan pratinjau saja. Ini tidak akan ditampilkan di streaming Anda.",
   "This background color is for preview purposes only. It will not be shown in your stream.": "Warna latar belakang ini adalah hanya untuk keperluan pratinjau saja. Ini tidak akan ditampilkan di streaming Anda.",
-  "Invalid JSON": "JSON Tidak Valid"
+  "Invalid JSON": "JSON Tidak Valid",
+  "Min. Sparks": "Min. Sparks",
+  "Min. Embers": "Min. Embers",
+  "The smallest amount of bits a cheer must have for an event to be shown. Setting this to 0 will make every cheer trigger an event.": "The smallest amount of bits a cheer must have for an event to be shown. Setting this to 0 will make every cheer trigger an event."
 }
