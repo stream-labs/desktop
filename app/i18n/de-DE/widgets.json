@@ -95,7 +95,14 @@
   "Facebook Shares": "Geteilt auf Facebook",
   "Facebook Stars": "Facebook-Sterne",
   "Facebook Supports": "Facebook-Unterstützer",
+  "Likes": "Gefällt mir",
+  "Shares": "Geteilt",
+  "Stars": "Stars",
+  "Supporters": "Supporters",
   "Note: This background color is for preview purposes only.It will not be shown in your stream.": "Hinweis: Diese Hintergrundfarbe dient nur der Vorschau. Sie wird nicht in Ihrem Stream gezeigt.",
   "This background color is for preview purposes only. It will not be shown in your stream.": "Diese Hintergrundfarbe dient nur der Vorschau. Sie wird nicht in Ihrem Stream gezeigt.",
-  "Invalid JSON": "Ungültige JSON-Datei"
+  "Invalid JSON": "Ungültige JSON-Datei",
+  "Min. Sparks": "Min. Sparks",
+  "Min. Embers": "Min. Embers",
+  "The smallest amount of bits a cheer must have for an event to be shown. Setting this to 0 will make every cheer trigger an event.": "Die geringste Anzahl an Bits haben muss, damit eine Benachrichtigung angezeigt wird. Wenn Sie dies auf 0 setzen, wird jeder Cheer eine Benachrichtigung auslösen."
 }
