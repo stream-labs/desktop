@@ -241,7 +241,7 @@
           :metadata="metadata.messageEmojis"
         />
       </div>
-      <div v-if="selectedVariation.settings.tts">
+      <div v-if="selectedVariation.settings.tts && selectedAlert !== 'merch'">
         <span>{{ $t('Text to Speech') }}</span>
         <v-form-group
           v-model="selectedVariation.settings.tts.enabled"
