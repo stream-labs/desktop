@@ -1,5 +1,6 @@
 import {
   SceneItem as InternalSceneItem,
+  ScenesService as InternalScenesService,
   ISceneItem as IInternalSceneItemModel,
   ISceneItem,
 } from 'services/scenes';
@@ -13,6 +14,7 @@ export interface ISceneItemModel extends ISceneItemSettings, ISceneNodeModel {
   sceneItemId: string;
   sourceId: string;
   name: string;
+  resourceId: string;
 }
 
 export interface ISceneItemSettings {
@@ -79,6 +81,7 @@ export class SceneItem extends SceneNode implements ISceneItemActions, ISceneIte
   locked: boolean;
   streamVisible: boolean;
   recordingVisible: boolean;
+  resourceId: string;
 
   constructor(public sceneId: string, public nodeId: string, sourceId: string) {
     super(sceneId, nodeId);
@@ -164,11 +167,13 @@ export function getExternalSceneItemModel(
   internalModel: IInternalSceneItemModel,
   name: string,
 ): ISceneItemModel {
+  const resourceId = `SceneItem["${internalModel.sceneId}","${internalModel.sourceId}", "${internalModel.sceneItemId}"]`;
   return {
     ...getExternalNodeModel(internalModel),
     sourceId: internalModel.sourceId,
     sceneItemId: internalModel.sceneItemId,
     name,
+    resourceId,
     transform: internalModel.transform,
     visible: internalModel.visible,
     locked: internalModel.locked,

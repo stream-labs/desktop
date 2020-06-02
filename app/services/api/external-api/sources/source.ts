@@ -8,6 +8,7 @@ import { ISerializable } from '../../rpc-api';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { Fallback, InjectFromExternalApi } from '../../external-api';
 import { SourcesService } from './sources';
+import Utils from '../../../utils';
 
 export interface ISourceModel {
   sourceId: string;
@@ -44,6 +45,7 @@ export class Source implements ISourceModel, ISerializable {
 
   constructor(public readonly sourceId: string) {
     this.source = this.internalSourcesService.views.getSource(sourceId);
+    Utils.applyProxy(this, () => this.getModel());
   }
 
   private isDestroyed(): boolean {
