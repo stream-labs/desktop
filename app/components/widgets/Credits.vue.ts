@@ -1,6 +1,5 @@
 import { Component } from 'vue-property-decorator';
 import { CreditsService, ICreditsData } from 'services/widgets/settings/credits';
-
 import { inputComponents } from 'components/widgets/inputs';
 import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
@@ -22,6 +21,38 @@ export default class Credits extends WidgetSettings<ICreditsData, CreditsService
       title: this.wData.themes[theme].label,
       value: theme,
     }));
+  }
+
+  optionIterable(map: Dictionary<string>) {
+    return Object.keys(map).filter(option => this.wData.settings[option]);
+  }
+
+  get shownCreditOptions() {
+    return {
+      // Twitch
+      followers: $t('Show Followers'),
+      subscribers: $t('Show Subscribers'),
+      bits: $t('Show Cheers'),
+      moderators: $t('Show Moderators'),
+      // Youtube
+      subscriptions: $t('Show Subscriptions'),
+      sponsors: $t('Show Members'),
+      superchats: $t('Show Super Chats'),
+    };
+  }
+
+  get creditNameOptions() {
+    return {
+      // Twitch
+      followers_change: $t('Followers'),
+      subscribers_change: $t('Subscribers & Resubs'),
+      bits_change: $t('Cheers'),
+      mods_change: $t('Moderators'),
+      // Youtube
+      subscriptions_change: $t('Subscriptions'),
+      sponsors_change: $t('Members'),
+      superchats_change: $t('Super Chats'),
+    };
   }
 
   rollCredits() {
