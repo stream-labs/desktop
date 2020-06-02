@@ -32,6 +32,7 @@ import { PlatformAppsService } from 'services/platform-apps';
 import { HardwareService, DefaultHardwareService } from 'services/hardware';
 import { AudioService } from '../audio';
 import { ReplayManager } from './properties-managers/replay-manager';
+import { assertIsDefined } from 'util/properties-type-guards';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -448,6 +449,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
   showSourceProperties(sourceId: string) {
     const source = this.views.getSource(sourceId);
     if (!source) return;
+    const platform = this.userService.views.platform;
+    assertIsDefined(platform);
     const propertiesManagerType = source.getPropertiesManagerType();
     const isWidget = propertiesManagerType === 'widget';
 
@@ -458,7 +461,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
         this.windowsService.showWindow({
           componentName,
           title: $t('Settings for %{sourceName}', {
-            sourceName: WidgetDisplayData(this.userService.views.platform.type)[widgetType].name,
+            sourceName: WidgetDisplayData(platform.type)[widgetType].name,
           }),
           queryParams: { sourceId },
           size: {
