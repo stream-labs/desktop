@@ -56,10 +56,8 @@ export default class SceneTransitions extends Vue {
 
   @debounce(500)
   set durationModel(value: number) {
-    const clamped = Math.min(value, TRANSITION_DURATION_MAX);
-
     this.editorCommandsService.executeCommand('EditTransitionCommand', this.transitionId, {
-      duration: clamped,
+      duration: Math.min(value, TRANSITION_DURATION_MAX),
     });
   }
 
