@@ -1,144 +1,334 @@
 <template>
-<widget-editor
-  :navItems="navItems"
-  :isAlertBox="true"
-  :slots="[{ value: 'layout', label: $t('Layout') }]"
-  :selectedVariation="selectedVariation"
-  :selectedAlert="selectedAlert"
-  :selectedId="selectedId"
->
-  <!-- Left Toolbar -->
-  <div slot="leftbar" v-if="wData">
-    <div class="left-accordion__button alert-button">
-      <span class="button button--default add-alert-button" @click="toggleAddAlertMenu()">
-        <i class="icon-add-circle" />{{ $t('Alert') }}
-      </span>
-      <div v-if="addAlertMenuOpen" class="add-alert-dropdown">
-        <button
-          v-for="type in alertTypes.filter(t => t !== 'facemasks')"
-          class="button button--action"
-          :key="type"
-          @click="addAlert(type)"
-        >
-          {{ alertName(type) }}
-        </button>
+  <widget-editor
+    :navItems="navItems"
+    :isAlertBox="true"
+    :slots="[{ value: 'layout', label: $t('Layout') }]"
+    :selectedVariation="selectedVariation"
+    :selectedAlert="selectedAlert"
+    :selectedId="selectedId"
+  >
+    <!-- Left Toolbar -->
+    <div slot="leftbar" v-if="wData">
+      <div class="left-accordion__button alert-button">
+        <span class="button button--default add-alert-button" @click="toggleAddAlertMenu()">
+          <i class="icon-add-circle" />{{ $t('Alert') }}
+        </span>
+        <div v-if="addAlertMenuOpen" class="add-alert-dropdown">
+          <button
+            v-for="type in alertTypes.filter(t => t !== 'facemasks')"
+            class="button button--action"
+            :key="type"
+            @click="addAlert(type)"
+          >
+            {{ alertName(type) }}
+          </button>
+        </div>
       </div>
-    </div>
-    <div class="left-accordion__button" :class="{ active: selectedAlert === 'general' }" @click="selectAlertType('general')">
-      {{ $t('Global Settings') }}
-    </div>
-    <div v-for="alert in alertTypes" :key="alert" style="position: relative;" >
-      <div class="left-accordion__button" :class="{ active: selectedAlert === alert }" @click="selectAlertType(alert)">
-        <i :class="{ 'icon-add': selectedAlert !== alert, 'icon-subtract': selectedAlert === alert }" />
-        <span class="left-accordion__title">{{ alertName(alert) }}</span>
+      <div
+        class="left-accordion__button"
+        :class="{ active: selectedAlert === 'general' }"
+        @click="selectAlertType('general')"
+      >
+        {{ $t('Global Settings') }}
       </div>
-      <div class="left-accordion__input" v-if="wData.settings[alert]">
-        <validated-form @input="save()"><toggle-input v-model="wData.settings[alert].enabled" /></validated-form>
-      </div>
-      <div v-if="wData && selectedAlert === alert">
+      <div v-for="alert in alertTypes" :key="alert" style="position: relative;">
         <div
-          v-for="variation in wData.settings[alert].variations"
-          :key="variation.id"
-          @click="selectVariation(variation.id)"
-          class="variation-tile"
-          :class="{ active: selectedId === variation.id }"
+          class="left-accordion__button"
+          :class="{ active: selectedAlert === alert }"
+          @click="selectAlertType(alert)"
         >
-          <div class="variation-tile__image-box">
-            <img v-if="variation.settings.image.href && !/\.webm/.test(variation.settings.image.href)" :src="variation.settings.image.href" />
-            <video v-if="variation.settings.image.href && /\.webm/.test(variation.settings.image.href)" :key="variation.settings.image.href" loop muted autoplay>
-              <source :src="variation.settings.image.href" type="video/webm" />
-            </video>
-            <div class="variation-tile__name">
-              <input
-                type="text"
-                :value="variation.name"
-                :disabled="editingName !== variation.id"
-                :ref="`${variation.id}-name-input`"
-                @input="nameInputHandler($event.target.value)"
-                @blur="nameBlurHandler(variation.id)"
+          <i
+            :class="{
+              'icon-add': selectedAlert !== alert,
+              'icon-subtract': selectedAlert === alert,
+            }"
+          />
+          <span class="left-accordion__title">{{ alertName(alert) }}</span>
+        </div>
+        <div class="left-accordion__input" v-if="wData.settings[alert]">
+          <validated-form @input="save()"
+            ><toggle-input v-model="wData.settings[alert].enabled"
+          /></validated-form>
+        </div>
+        <div v-if="wData && selectedAlert === alert">
+          <div
+            v-for="variation in wData.settings[alert].variations"
+            :key="variation.id"
+            @click="selectVariation(variation.id)"
+            class="variation-tile"
+            :class="{ active: selectedId === variation.id }"
+          >
+            <div class="variation-tile__image-box">
+              <img
+                v-if="
+                  variation.settings.image.href && !/\.webm/.test(variation.settings.image.href)
+                "
+                :src="variation.settings.image.href"
+              />
+              <video
+                v-if="variation.settings.image.href && /\.webm/.test(variation.settings.image.href)"
+                :key="variation.settings.image.href"
+                loop
+                muted
+                autoplay
+              >
+                <source :src="variation.settings.image.href" type="video/webm" />
+              </video>
+              <div class="variation-tile__name">
+                <input
+                  type="text"
+                  :value="variation.name"
+                  :disabled="editingName !== variation.id"
+                  :ref="`${variation.id}-name-input`"
+                  @input="nameInputHandler($event.target.value)"
+                  @blur="nameBlurHandler(variation.id)"
+                />
+              </div>
+            </div>
+            <div class="variation-tile__toolbar">
+              <i
+                v-if="variation.id !== 'default'"
+                class="icon-trash"
+                @click.stop="removeVariation(variation.id)"
+              />
+              <i
+                v-if="variation.id !== 'default'"
+                class="icon-edit"
+                @click.stop="editName(variation.id)"
               />
             </div>
-          </div>
-          <div class="variation-tile__toolbar">
-            <i v-if="variation.id !== 'default'" class="icon-trash" @click.stop="removeVariation(variation.id)" />
-            <i v-if="variation.id !== 'default'" class="icon-edit" @click.stop="editName(variation.id)" />
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <validated-form slot="layout" @input="save()" :key="`layout-${selectedAlert}-${selectedId}`" v-if="selectedVariation">
-    <alert-layout-input v-model="selectedVariation.settings.layout" />
-  </validated-form>
+    <validated-form
+      slot="layout"
+      @input="save()"
+      :key="`layout-${selectedAlert}-${selectedId}`"
+      v-if="selectedVariation"
+    >
+      <alert-layout-input v-model="selectedVariation.settings.layout" />
+    </validated-form>
 
-  <!-- Global Settings -->
-  <validated-form slot="general-properties" :key="`general-properties-${selectedAlert}-${selectedId}`" @input="save()" v-if="selectedVariation">
-    <v-form-group v-model="wData.settings.background_color" :metadata="metadata.bgColor" />
-    <v-form-group v-model="wData.settings.alert_delay" :metadata="metadata.alertDelay" />
-  </validated-form>
-  <validated-form slot="moderation-properties" :key="`moderation-properties-${selectedAlert}-${selectedId}`" @input="save()" v-if="selectedVariation">
-    <v-form-group :value="wData.settings.moderation_delay === -1" @input="handleUnlimitedModerationDelay" :metadata="metadata.unlimitedAlertMod" />
-    <v-form-group v-if="wData.settings.moderation_delay > -1" v-model="wData.settings.moderation_delay" :metadata="metadata.moderationDelay" />
-    <v-form-group v-model="wData.settings.unlimited_media_moderation_delay" :metadata="metadata.unlimitedMediaMod" />
-  </validated-form>
+    <!-- Global Settings -->
+    <validated-form
+      slot="general-properties"
+      :key="`general-properties-${selectedAlert}-${selectedId}`"
+      @input="save()"
+      v-if="selectedVariation"
+    >
+      <v-form-group v-model="wData.settings.background_color" :metadata="metadata.bgColor" />
+      <v-form-group v-model="wData.settings.alert_delay" :metadata="metadata.alertDelay" />
+    </validated-form>
+    <validated-form
+      slot="moderation-properties"
+      :key="`moderation-properties-${selectedAlert}-${selectedId}`"
+      @input="save()"
+      v-if="selectedVariation"
+    >
+      <v-form-group
+        :value="wData.settings.moderation_delay === -1"
+        @input="handleUnlimitedModerationDelay"
+        :metadata="metadata.unlimitedAlertMod"
+      />
+      <v-form-group
+        v-if="wData.settings.moderation_delay > -1"
+        v-model="wData.settings.moderation_delay"
+        :metadata="metadata.moderationDelay"
+      />
+      <v-form-group
+        v-model="wData.settings.unlimited_media_moderation_delay"
+        :metadata="metadata.unlimitedMediaMod"
+      />
+    </validated-form>
 
-  <!-- Alert-Specific Settings -->
-  <validated-form slot="title-properties" :key="`title-properties-${selectedAlert}-${selectedId}`" @input="save()" v-if="selectedVariation">
-    <div v-if="selectedVariation.settings.text">
-      <v-form-group v-model="selectedVariation.settings.text.format" :metadata="metadata.template" />
-      <v-form-group v-model="selectedVariation.settings.text.font" :metadata="metadata.fontFamily" />
-      <v-form-group v-model="selectedVariation.settings.text.size" :metadata="metadata.fontSize" />
-      <v-form-group v-model="selectedVariation.settings.text.thickness" :metadata="metadata.textThickness" />
-      <v-form-group v-model="selectedVariation.settings.text.color" :metadata="metadata.primaryColor" />
-      <v-form-group v-model="selectedVariation.settings.text.color2" :metadata="metadata.secondaryColor" />
-    </div>
-  </validated-form>
-  <validated-form slot="media-properties" :key="`media-properties--${selectedAlert}-${selectedId}`" @input="save()" v-if="selectedVariation">
-    <v-form-group v-model="selectedVariation.settings.useSkillImage" :metadata="metadata.skillImage" v-if="selectedVariation.settings.useSkillImage !== undefined" />
-    <v-form-group v-model="selectedVariation.settings.image.href" :metadata="metadata.imageFile" v-if="selectedVariation.settings.image" />
-    <v-form-group :metadata="metadata.soundFile" v-model="selectedVariation.settings.sound.href" v-if="selectedVariation.settings.sound" />
-    <v-form-group v-model="selectedVariation.settings.sound.volume" :metadata="metadata.soundVolume" v-if="selectedVariation.settings.sound" />
-  </validated-form>
-  <validated-form slot="message-properties" :key="`message-properties-${selectedAlert}-${selectedId}`" @input="save()" v-if="selectedVariation">
-    <v-form-group v-if="wData.settings[selectedAlert]" v-model="wData.settings[selectedAlert].showMessage" :metadata="metadata.showMessage" />
-    <div v-if="selectedVariation.settings.message">
-      <v-form-group v-model="selectedVariation.settings.message.minAmount" :metadata="metadata.minAmount" />
-      <v-form-group v-model="selectedVariation.settings.message.font" :metadata="metadata.fontFamily" />
-      <v-form-group v-model="selectedVariation.settings.message.size" :metadata="metadata.fontSize" />
-      <v-form-group v-model="selectedVariation.settings.message.weight" :metadata="metadata.messageWeight" />
-      <v-form-group v-model="selectedVariation.settings.message.color" :metadata="metadata.textColor" />
-      <v-form-group v-model="selectedVariation.settings.message.allowEmojis" :metadata="metadata.messageEmojis" />
-    </div>
-    <div v-if="selectedVariation.settings.tts">
-      <span>{{ $t('Text to Speech') }}</span>
-      <v-form-group v-model="selectedVariation.settings.tts.enabled" :metadata="metadata.ttsEnabled" />
-      <v-form-group v-model="selectedVariation.settings.tts.minAmount" :metadata="metadata.ttsMinAmount" />
-      <v-form-group v-model="selectedVariation.settings.tts.volume" :metadata="metadata.ttsVolume" />
-      <v-form-group v-model="selectedVariation.settings.tts.language" :metadata="metadata.ttsLanguage" />
-      <v-form-group v-model="selectedVariation.settings.tts.security" :metadata="metadata.ttsSecurity" />
-    </div>
-  </validated-form>
-  <validated-form slot="animation-properties" :key="`animation-properties-${selectedAlert}-${selectedId}`" @input="save()" v-if="selectedVariation">
-    <v-form-group v-model="selectedVariation.settings.showAnimation" :metadata="metadata.showAnimation" />
-    <v-form-group v-model="selectedVariation.settings.hideAnimation" :metadata="metadata.hideAnimation" />
-    <v-form-group v-model="selectedVariation.settings.duration" :metadata="metadata.duration" />
-    <v-form-group v-model="selectedVariation.settings.text.animation"  :metadata="metadata.textAnimation" v-if="selectedVariation.settings.text" />
-    <v-form-group v-model="selectedVariation.settings.textDelay" :metadata="metadata.textDelay" />
-  </validated-form>
-  <validated-form slot="alert-properties" :key="`alert-properties-${selectedAlert}-${selectedId}`" @input="save()" v-if="selectedVariation">
-    <v-form-group v-model="selectedVariation.settings.sparksEnabled" :metadata="metadata.sparksEnabled" v-if="selectedVariation.settings.sparksEnabled !== undefined" />
-    <v-form-group v-model="selectedVariation.settings.minSparksTrigger" :metadata="metadata.minSparksTrigger" v-if="selectedVariation.settings.minSparksTrigger !== undefined" />
-    <v-form-group v-model="selectedVariation.settings.embersEnabled" :metadata="metadata.embersEnabled" v-if="selectedVariation.settings.embersEnabled !== undefined" />
-    <v-form-group v-model="selectedVariation.settings.minEmbersTrigger" :metadata="metadata.minEmbersTrigger" v-if="selectedVariation.settings.minEmbersTrigger !== undefined" />
-    <v-form-group v-model="minTriggerAmount" :metadata="metadata.minTriggerAmount" v-if="['donations', 'bits', 'hosts', 'raids'].includes(selectedAlert)" />
-    <v-form-group v-model="minRecentEvents" :metadata="metadata.minRecentEvents" v-if="['donations', 'hosts'].includes(selectedAlert)" />
-    <div v-if="selectedId !== 'default'">
-      <v-form-group v-model="selectedVariation.condition" :metadata="metadata.conditions" />
-      <v-form-group v-model="selectedVariation.conditionData" :metadata="metadata.variations" />
-    </div>
-  </validated-form>
-</widget-editor>
+    <!-- Alert-Specific Settings -->
+    <validated-form
+      slot="title-properties"
+      :key="`title-properties-${selectedAlert}-${selectedId}`"
+      @input="save()"
+      v-if="selectedVariation"
+    >
+      <div v-if="selectedVariation.settings.text">
+        <v-form-group
+          v-model="selectedVariation.settings.text.format"
+          :metadata="metadata.template"
+        />
+        <v-form-group
+          v-model="selectedVariation.settings.text.font"
+          :metadata="metadata.fontFamily"
+        />
+        <v-form-group
+          v-model="selectedVariation.settings.text.size"
+          :metadata="metadata.fontSize"
+        />
+        <v-form-group
+          v-model="selectedVariation.settings.text.thickness"
+          :metadata="metadata.textThickness"
+        />
+        <v-form-group
+          v-model="selectedVariation.settings.text.color"
+          :metadata="metadata.primaryColor"
+        />
+        <v-form-group
+          v-model="selectedVariation.settings.text.color2"
+          :metadata="metadata.secondaryColor"
+        />
+      </div>
+    </validated-form>
+    <validated-form
+      slot="media-properties"
+      :key="`media-properties--${selectedAlert}-${selectedId}`"
+      @input="save()"
+      v-if="selectedVariation"
+    >
+      <v-form-group
+        v-model="selectedVariation.settings.useSkillImage"
+        :metadata="metadata.skillImage"
+        v-if="selectedVariation.settings.useSkillImage !== undefined"
+      />
+      <v-form-group
+        v-model="selectedVariation.settings.image.href"
+        :metadata="metadata.imageFile"
+        v-if="selectedVariation.settings.image"
+      />
+      <v-form-group
+        :metadata="metadata.soundFile"
+        v-model="selectedVariation.settings.sound.href"
+        v-if="selectedVariation.settings.sound"
+      />
+      <v-form-group
+        v-model="selectedVariation.settings.sound.volume"
+        :metadata="metadata.soundVolume"
+        v-if="selectedVariation.settings.sound"
+      />
+    </validated-form>
+    <validated-form
+      slot="message-properties"
+      :key="`message-properties-${selectedAlert}-${selectedId}`"
+      @input="save()"
+      v-if="selectedVariation"
+    >
+      <v-form-group
+        v-if="wData.settings[selectedAlert]"
+        v-model="wData.settings[selectedAlert].showMessage"
+        :metadata="metadata.showMessage"
+      />
+      <div v-if="selectedVariation.settings.message">
+        <v-form-group
+          v-model="selectedVariation.settings.message.minAmount"
+          :metadata="metadata.minAmount"
+        />
+        <v-form-group
+          v-model="selectedVariation.settings.message.font"
+          :metadata="metadata.fontFamily"
+        />
+        <v-form-group
+          v-model="selectedVariation.settings.message.size"
+          :metadata="metadata.fontSize"
+        />
+        <v-form-group
+          v-model="selectedVariation.settings.message.weight"
+          :metadata="metadata.messageWeight"
+        />
+        <v-form-group
+          v-model="selectedVariation.settings.message.color"
+          :metadata="metadata.textColor"
+        />
+        <v-form-group
+          v-model="selectedVariation.settings.message.allowEmojis"
+          :metadata="metadata.messageEmojis"
+        />
+      </div>
+      <div v-if="selectedVariation.settings.tts">
+        <span>{{ $t('Text to Speech') }}</span>
+        <v-form-group
+          v-model="selectedVariation.settings.tts.enabled"
+          :metadata="metadata.ttsEnabled"
+        />
+        <v-form-group
+          v-model="selectedVariation.settings.tts.minAmount"
+          :metadata="metadata.ttsMinAmount"
+        />
+        <v-form-group
+          v-model="selectedVariation.settings.tts.volume"
+          :metadata="metadata.ttsVolume"
+        />
+        <v-form-group
+          v-model="selectedVariation.settings.tts.language"
+          :metadata="metadata.ttsLanguage"
+        />
+        <v-form-group
+          v-model="selectedVariation.settings.tts.security"
+          :metadata="metadata.ttsSecurity"
+        />
+      </div>
+    </validated-form>
+    <validated-form
+      slot="animation-properties"
+      :key="`animation-properties-${selectedAlert}-${selectedId}`"
+      @input="save()"
+      v-if="selectedVariation"
+    >
+      <v-form-group
+        v-model="selectedVariation.settings.showAnimation"
+        :metadata="metadata.showAnimation"
+      />
+      <v-form-group
+        v-model="selectedVariation.settings.hideAnimation"
+        :metadata="metadata.hideAnimation"
+      />
+      <v-form-group v-model="selectedVariation.settings.duration" :metadata="metadata.duration" />
+      <v-form-group
+        v-model="selectedVariation.settings.text.animation"
+        :metadata="metadata.textAnimation"
+        v-if="selectedVariation.settings.text"
+      />
+      <v-form-group v-model="selectedVariation.settings.textDelay" :metadata="metadata.textDelay" />
+    </validated-form>
+    <validated-form
+      slot="alert-properties"
+      :key="`alert-properties-${selectedAlert}-${selectedId}`"
+      @input="save()"
+      v-if="selectedVariation"
+    >
+      <v-form-group
+        v-model="selectedVariation.settings.sparksEnabled"
+        :metadata="metadata.sparksEnabled"
+        v-if="selectedVariation.settings.sparksEnabled !== undefined"
+      />
+      <v-form-group
+        v-model="selectedVariation.settings.minSparksTrigger"
+        :metadata="metadata.minSparksTrigger"
+        v-if="selectedVariation.settings.minSparksTrigger !== undefined"
+      />
+      <v-form-group
+        v-model="selectedVariation.settings.embersEnabled"
+        :metadata="metadata.embersEnabled"
+        v-if="selectedVariation.settings.embersEnabled !== undefined"
+      />
+      <v-form-group
+        v-model="selectedVariation.settings.minEmbersTrigger"
+        :metadata="metadata.minEmbersTrigger"
+        v-if="selectedVariation.settings.minEmbersTrigger !== undefined"
+      />
+      <v-form-group
+        v-model="minTriggerAmount"
+        :metadata="metadata.minTriggerAmount"
+        v-if="['donations', 'bits', 'hosts', 'raids'].includes(selectedAlert)"
+      />
+      <v-form-group
+        v-model="minRecentEvents"
+        :metadata="metadata.minRecentEvents"
+        v-if="['donations', 'hosts'].includes(selectedAlert)"
+      />
+      <div v-if="selectedId !== 'default'">
+        <v-form-group v-model="selectedVariation.condition" :metadata="metadata.conditions" />
+        <v-form-group v-model="selectedVariation.conditionData" :metadata="metadata.variations" />
+      </div>
+    </validated-form>
+  </widget-editor>
 </template>
 
 <script lang="ts" src="./AlertBox.vue.ts"></script>

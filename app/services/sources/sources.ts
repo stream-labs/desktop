@@ -457,7 +457,9 @@ export class SourcesService extends StatefulService<ISourcesState> {
       if (componentName) {
         this.windowsService.showWindow({
           componentName,
-          title: $t('Settings for ') + WidgetDisplayData()[widgetType].name,
+          title: $t('Settings for %{sourceName}', {
+            sourceName: WidgetDisplayData(this.userService.views.platform.type)[widgetType].name,
+          }),
           queryParams: { sourceId },
           size: {
             width: 920,
