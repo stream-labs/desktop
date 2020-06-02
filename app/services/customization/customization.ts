@@ -178,16 +178,6 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     const settings = this.getSettings();
 
     const formData: TObsFormData = [
-      // <IObsListInput<string>>{
-      //   value: settings.theme,
-      //   name: 'theme',
-      //   description: $t('Theme'),
-      //   type: 'OBS_PROPERTY_LIST',
-      //   options: this.themeOptions,
-      //   visible: true,
-      //   enabled: true,
-      // },
-
       <IObsListInput<boolean>>{
         value: settings.folderSelection,
         name: 'folderSelection',
