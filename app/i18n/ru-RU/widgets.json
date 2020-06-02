@@ -95,7 +95,14 @@
   "Facebook Shares": "Общий доступ в Facebook",
   "Facebook Stars": "Звезды в Facebook",
   "Facebook Supports": "Поддержка в Facebook",
+  "Likes": "Лайки",
+  "Shares": "Поделились",
+  "Stars": "Звезды",
+  "Supporters": "Supporters",
   "Note: This background color is for preview purposes only.It will not be shown in your stream.": "Примечание. Этот цвет фона виден только в режиме предварительного просмотра и не будет отображаться в вашей трансляции.",
   "This background color is for preview purposes only. It will not be shown in your stream.": "Этот цвет фона виден только в режиме предварительного просмотра и не будет отображаться в вашей трансляции.",
-  "Invalid JSON": "Недопустимый текст JSON"
+  "Invalid JSON": "Недопустимый текст JSON",
+  "Min. Sparks": "Min. Sparks",
+  "Min. Embers": "Min. Embers",
+  "The smallest amount of bits a cheer must have for an event to be shown. Setting this to 0 will make every cheer trigger an event.": "Минимальное количество bits, которое cheer должен получить для показа события. Установив 0 каждый cheer будет активировать событие."
 }
