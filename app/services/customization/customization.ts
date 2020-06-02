@@ -161,14 +161,14 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
 
   get themeOptions() {
     const options = [
-      { value: 'night-theme', description: $t('Night') },
-      { value: 'day-theme', description: $t('Day') },
+      { value: 'night-theme', title: $t('Night') },
+      { value: 'day-theme', title: $t('Day') },
     ];
 
     if (this.userService.isPrime) {
       options.push(
-        { value: 'prime-dark', description: $t('Obsidian Prime') },
-        { value: 'prime-light', description: $t('Alabaster Prime') },
+        { value: 'prime-dark', title: $t('Obsidian Prime') },
+        { value: 'prime-light', title: $t('Alabaster Prime') },
       );
     }
     return options;
@@ -178,15 +178,15 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     const settings = this.getSettings();
 
     const formData: TObsFormData = [
-      <IObsListInput<string>>{
-        value: settings.theme,
-        name: 'theme',
-        description: $t('Theme'),
-        type: 'OBS_PROPERTY_LIST',
-        options: this.themeOptions,
-        visible: true,
-        enabled: true,
-      },
+      // <IObsListInput<string>>{
+      //   value: settings.theme,
+      //   name: 'theme',
+      //   description: $t('Theme'),
+      //   type: 'OBS_PROPERTY_LIST',
+      //   options: this.themeOptions,
+      //   visible: true,
+      //   enabled: true,
+      // },
 
       <IObsListInput<boolean>>{
         value: settings.folderSelection,
