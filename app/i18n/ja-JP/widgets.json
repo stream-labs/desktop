@@ -95,7 +95,14 @@
   "Facebook Shares": "Facebook 共有",
   "Facebook Stars": "Facebook スター",
   "Facebook Supports": "Facebook サポート",
+  "Likes": "いいね",
+  "Shares": "共有",
+  "Stars": "スター",
+  "Supporters": "Supporters",
   "Note: This background color is for preview purposes only.It will not be shown in your stream.": "注：この背景色はプレビューのみを目的としており、ストリーム内には表示されません。",
   "This background color is for preview purposes only. It will not be shown in your stream.": "この背景色はプレビューのみを目的としており、ストリーム内には表示されません。",
-  "Invalid JSON": "無効な JSON"
+  "Invalid JSON": "無効な JSON",
+  "Min. Sparks": "Min. Sparks",
+  "Min. Embers": "Min. Embers",
+  "The smallest amount of bits a cheer must have for an event to be shown. Setting this to 0 will make every cheer trigger an event.": "イベントを表示するために必要な最小ビット数。 これを0に設定すると、すべてのチアーがイベントを引き起こします。"
 }
