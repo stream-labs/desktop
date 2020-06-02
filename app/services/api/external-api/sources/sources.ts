@@ -93,7 +93,26 @@ export class SourcesService {
     observable: Observable<IInternalSourceModel>,
   ): Observable<ISourceModel> {
     return observable.pipe(
-      map(internalSourceModel => this.getSource(internalSourceModel.sourceId).getModel()),
+      map(internalSourceModel => this.convertInternalModelToExternal(internalSourceModel)),
     );
+  }
+
+  convertInternalModelToExternal(internalModel: IInternalSourceModel): ISourceModel {
+    return {
+      sourceId: internalModel.sourceId,
+      id: internalModel.sourceId,
+      name: internalModel.name,
+      type: internalModel.type,
+      audio: internalModel.audio,
+      video: internalModel.video,
+      async: internalModel.async,
+      muted: internalModel.muted,
+      width: internalModel.width,
+      height: internalModel.height,
+      doNotDuplicate: internalModel.doNotDuplicate,
+      channel: internalModel.channel,
+      configurable: internalModel.configurable,
+      resourceId: `Source["${internalModel.sourceId}"]`,
+    };
   }
 }

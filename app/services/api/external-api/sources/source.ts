@@ -56,22 +56,7 @@ export class Source implements ISourceModel, ISerializable {
   }
 
   getModel(): ISourceModel {
-    return {
-      sourceId: this.sourceId,
-      id: this.sourceId,
-      name: this.source.name,
-      type: this.source.type,
-      audio: this.source.audio,
-      video: this.source.video,
-      async: this.source.async,
-      muted: this.source.muted,
-      width: this.source.width,
-      height: this.source.height,
-      doNotDuplicate: this.source.doNotDuplicate,
-      channel: this.source.channel,
-      configurable: this.source.configurable,
-      resourceId: `Source["${this.sourceId}"]`,
-    };
+    return this.sourcesService.convertInternalModelToExternal(this.source.getModel());
   }
 
   updateSettings(settings: Dictionary<any>): void {
