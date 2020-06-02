@@ -95,7 +95,14 @@
   "Facebook Shares": "Facebook-delinger",
   "Facebook Stars": "Facebook-stjerner",
   "Facebook Supports": "Facebook-supportere",
+  "Likes": "Synes godt om",
+  "Shares": "Delinger",
+  "Stars": "Stjerner",
+  "Supporters": "Supporters",
   "Note: This background color is for preview purposes only.It will not be shown in your stream.": "Bemærk: Denne baggrundsfarve er kun til forhåndsvisning. Den vises ikke i din stream.",
   "This background color is for preview purposes only. It will not be shown in your stream.": "Denne baggrundsfarve er kun til forhåndsvisning. Den vises ikke i din stream.",
-  "Invalid JSON": "Ugyldig JSON"
+  "Invalid JSON": "Ugyldig JSON",
+  "Min. Sparks": "Min. Sparks",
+  "Min. Embers": "Min. Embers",
+  "The smallest amount of bits a cheer must have for an event to be shown. Setting this to 0 will make every cheer trigger an event.": "The smallest amount of bits a cheer must have for an event to be shown. Setting this to 0 will make every cheer trigger an event."
 }
