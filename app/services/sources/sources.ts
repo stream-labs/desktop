@@ -449,12 +449,12 @@ export class SourcesService extends StatefulService<ISourcesState> {
   showSourceProperties(sourceId: string) {
     const source = this.views.getSource(sourceId);
     if (!source) return;
-    const platform = this.userService.views.platform;
-    assertIsDefined(platform);
     const propertiesManagerType = source.getPropertiesManagerType();
     const isWidget = propertiesManagerType === 'widget';
 
     if (isWidget && this.userService.isLoggedIn) {
+      const platform = this.userService.views.platform;
+      assertIsDefined(platform);
       const widgetType = source.getPropertiesManagerSettings().widgetType;
       const componentName = this.widgetsService.getWidgetComponent(widgetType);
       if (componentName) {
