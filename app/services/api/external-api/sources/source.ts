@@ -23,6 +23,8 @@ export interface ISourceModel {
   height: number;
   doNotDuplicate: boolean;
   channel?: number;
+  resourceId: string;
+  configurable: boolean;
 }
 
 @ServiceHelper()
@@ -42,6 +44,7 @@ export class Source implements ISourceModel, ISerializable {
   readonly doNotDuplicate: boolean;
   readonly channel?: number;
   readonly resourceId: string;
+  readonly configurable: boolean;
 
   constructor(public readonly sourceId: string) {
     this.source = this.internalSourcesService.views.getSource(sourceId);
@@ -66,6 +69,8 @@ export class Source implements ISourceModel, ISerializable {
       height: this.source.height,
       doNotDuplicate: this.source.doNotDuplicate,
       channel: this.source.channel,
+      configurable: this.source.configurable,
+      resourceId: `Source["${this.sourceId}"]`,
     };
   }
 

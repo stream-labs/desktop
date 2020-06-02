@@ -119,6 +119,7 @@ test('Scenes events', async t => {
   event = await client.fetchNextEvent();
   t.is(event.data.visible, false);
   t.is(event.data.name, 'image');
+  t.truthy(event.data.resourceId); // the remote control app requires `resourceId` to be in the event
 
   image.remove();
   event = await client.fetchNextEvent();

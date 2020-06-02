@@ -61,5 +61,9 @@ test('Source events', async t => {
   // check `sourceUpdated` event when renaming a source
   source1.setName('audio3');
   event = await client.fetchNextEvent();
+
+  // the remote control app requires these fields to be in the event
   t.is(event.data.name, 'audio3');
+  t.is(event.data.configurable, true);
+  t.truthy(event.data.resourceId);
 });

@@ -167,7 +167,7 @@ export function getExternalSceneItemModel(
   internalModel: IInternalSceneItemModel,
   name: string,
 ): ISceneItemModel {
-  const resourceId = `SceneItem["${internalModel.sceneId}","${internalModel.sourceId}", "${internalModel.sceneItemId}"]`;
+  const resourceId = `SceneItem["${internalModel.sceneId}", "${internalModel.sceneItemId}", "${internalModel.sourceId}"]`;
   return {
     ...getExternalNodeModel(internalModel),
     sourceId: internalModel.sourceId,
