@@ -101,6 +101,9 @@
   "Note: This background color is for preview purposes only.It will not be shown in your stream.": "注意：此背景颜色仅用于预览目的。不会显示在您的直播中。",
   "This background color is for preview purposes only. It will not be shown in your stream.": "此背景颜色仅用于预览目的。不会显示在您的直播中。",
   "Invalid JSON": "无效 JSON",
+  "Increment Amount": "递增数量",
+  "Overkill Multiplier": "超杀乘数",
+  "Overkill Min Health": "超杀最低血量",
   "Min. Sparks": "Min. Sparks",
   "Min. Embers": "Min. Embers",
   "The smallest amount of bits a cheer must have for an event to be shown. Setting this to 0 will make every cheer trigger an event.": "触发事件纪录最小奇点数量。 将其设置为0将使任何数量的小奇点都被触发。"
