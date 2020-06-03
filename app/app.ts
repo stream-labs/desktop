@@ -23,7 +23,7 @@ import Toasted from 'vue-toasted';
 import VueI18n from 'vue-i18n';
 import VModal from 'vue-js-modal';
 import VeeValidate from 'vee-validate';
-import ChildWindow from 'components/windows/ChildWindow.vue';
+import ChildWindow from 'components/windows/ChildWindow';
 import OneOffWindow from 'components/windows/OneOffWindow.vue';
 import { UserService, setSentryContext } from 'services/user';
 import { getResource } from 'services';
