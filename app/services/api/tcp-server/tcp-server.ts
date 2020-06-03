@@ -17,7 +17,6 @@ import { SceneCollectionsService } from 'services/scene-collections';
 // eslint-disable-next-line no-undef
 import WritableStream = NodeJS.WritableStream;
 import { $t } from 'services/i18n';
-import set = Reflect.set;
 
 const net = require('net');
 
@@ -72,7 +71,6 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   private nextClientId = 1;
   private servers: IServer[] = [];
   private isRequestsHandlingStopped = false;
-  private isEventsSendingStopped = true;
 
   // if true then execute API request even if "isRequestsHandlingStopped" flag is set
   private forceRequests = false;
@@ -94,15 +92,14 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   /**
    * stop handle any requests
    * each API request will be responded with "API is busy" error
+   * this method doesn't stop event emitting
    */
-  stopRequestsHandling(stopEventsToo = true) {
+  stopRequestsHandling() {
     this.isRequestsHandlingStopped = true;
-    this.isEventsSendingStopped = stopEventsToo;
   }
 
   startRequestsHandling() {
     this.isRequestsHandlingStopped = false;
-    this.isEventsSendingStopped = false;
   }
 
   stopListening() {
@@ -287,7 +284,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   }
 
   private onConnectionHandler(socket: WritableStream, server: IServer) {
-    this.log('new connection');
+    this.log('new connection', socket);
 
     const id = this.nextClientId++;
     const client: IClient = {
@@ -298,9 +295,10 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       isAuthorized: false,
     };
     this.clients[id] = client;
-    this.log(`Id assigned ${id}`);
 
-    if (server.type === 'namedPipe' || this.isLocalClient(client)) {
+    // manual authorization for local clients is not required except for websokets
+    // disabling authorization for local websoket clients introduces a breach where any website can establish connection to the localhost
+    if (server.type === 'namedPipe' || (server.type === 'tcp' && this.isLocalClient(client))) {
       this.authorizeClient(client);
     }
 
@@ -325,8 +323,6 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
         throw e;
       }
     });
-
-    this.log(`Client ${id} ready`);
   }
 
   private authorizeClient(client: IClient) {
@@ -341,7 +337,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   }
 
   private onRequestHandler(client: IClient, data: string) {
-    this.log(`tcp request from ${client.id}`, data);
+    this.log('tcp request', data);
 
     if (this.isRequestsHandlingStopped && !this.forceRequests) {
       this.sendResponse(
@@ -510,12 +506,12 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   }
 
   private onDisconnectHandler(client: IClient) {
-    this.log(`client disconnected ${client.id}`);
+    this.log('client disconnected');
     delete this.clients[client.id];
   }
 
   private sendResponse(client: IClient, response: IJsonRpcResponse<any>, force = false) {
-    if (this.isEventsSendingStopped) {
+    if (this.isRequestsHandlingStopped) {
       if (!force && !this.forceRequests) return;
     }
 
