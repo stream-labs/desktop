@@ -101,6 +101,9 @@
   "Note: This background color is for preview purposes only.It will not be shown in your stream.": "Not: Bu arka plan rengi yalnızca ön izleme amaçlıdır.Yayınızda görünmeyecektir.",
   "This background color is for preview purposes only. It will not be shown in your stream.": "Bu arka plan rengi yalnızca ön izleme amaçlıdır.Yayınızda görünmeyecektir.",
   "Invalid JSON": "Geçersiz JSON",
+  "Increment Amount": "Artış Miktarı",
+  "Overkill Multiplier": "Aşırı Yükleme Çarpanı",
+  "Overkill Min Health": "Aşırı Yükleme Min. Can",
   "Min. Sparks": "Min. Sparks",
   "Min. Embers": "Min. Embers",
   "The smallest amount of bits a cheer must have for an event to be shown. Setting this to 0 will make every cheer trigger an event.": "Etkinliğin gösterilmesi için tebriğin sahip olması gereken en küçük bit sayısı. Bunu 0'a ayarlamak, her tebriğin etkinlik olarak gösterilmesini mümkün kılar."
