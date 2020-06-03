@@ -61,14 +61,11 @@
       </v-form-group>
       <v-form-group v-model="wData.settings.skin" :metadata="metadata.skin" />
       <v-form-group
-        v-model="wData.settings.follow_multiplier"
-        :metadata="metadata.follow_multiplier"
-      />
-      <v-form-group v-model="wData.settings.bit_multiplier" :metadata="metadata.bit_multiplier" />
-      <v-form-group v-model="wData.settings.sub_multiplier" :metadata="metadata.sub_multiplier" />
-      <v-form-group
-        v-model="wData.settings.donation_multiplier"
-        :metadata="metadata.donation_multiplier"
+        v-for="multiplier in multipliersForPlatform"
+        :key="multiplier.key"
+        v-model="wData.settings[multiplier.key]"
+        type="number"
+        :metadata="multiplier"
       />
     </validated-form>
 
