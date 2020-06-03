@@ -106,6 +106,9 @@ export abstract class StreamBossService extends BaseGoalService<
           },
         ],
       }),
+      incr_amount: metadata.number({ title: $t('Increment Amount'), isInteger: true }),
+      overkill_multiplier: metadata.number({ title: $t('Overkill Multiplier'), isInteger: true }),
+      overkill_min: metadata.number({ title: $t('Overkill Min Health'), isInteger: true }),
 
       // SETTINGS
 
