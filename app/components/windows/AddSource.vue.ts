@@ -7,12 +7,13 @@ import { TSourceType, ISourceApi, ISourceAddOptions, SourcesService } from 'serv
 import ModalLayout from 'components/ModalLayout.vue';
 import Selector from 'components/Selector.vue';
 import Display from 'components/shared/Display.vue';
-import { WidgetsService, WidgetDefinitions } from 'services/widgets';
+import { WidgetsService, WidgetDisplayData } from 'services/widgets';
 import { $t } from 'services/i18n';
 import { PlatformAppsService } from 'services/platform-apps';
 import { EditorCommandsService } from 'services/editor-commands';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import electron from 'electron';
+import { UserService } from 'services/user';
 
 @Component({
   components: { ModalLayout, Selector, Display, HFormGroup },
@@ -24,6 +25,7 @@ export default class AddSource extends Vue {
   @Inject() widgetsService: WidgetsService;
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() private editorCommandsService: EditorCommandsService;
+  @Inject() userService: UserService;
 
   name = '';
   error = '';
@@ -68,7 +70,9 @@ export default class AddSource extends Vue {
     } else if (this.sourceAddOptions.propertiesManager === 'streamlabels') {
       this.name = $t('Stream Label');
     } else if (this.sourceAddOptions.propertiesManager === 'widget') {
-      this.name = this.sourcesService.suggestName(WidgetDefinitions[this.widgetType].name);
+      this.name = this.sourcesService.suggestName(
+        WidgetDisplayData(this.platform)[this.widgetType].name,
+      );
     } else if (this.sourceAddOptions.propertiesManager === 'platformApp') {
       const app = this.platformAppsService.views.getApp(
         this.sourceAddOptions.propertiesManagerSettings.appId,
@@ -87,6 +91,10 @@ export default class AddSource extends Vue {
 
       this.name = this.sourcesService.suggestName(this.sourceType && sourceType.description);
     }
+  }
+
+  get platform() {
+    return this.userService.views.platform.type;
   }
 
   get isNewSource() {
