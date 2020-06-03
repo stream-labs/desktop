@@ -101,6 +101,9 @@
   "Note: This background color is for preview purposes only.It will not be shown in your stream.": "Nota: Esta cor de fundo é apenas para pré-visualização. Não será mostrada na sua transmissão.",
   "This background color is for preview purposes only. It will not be shown in your stream.": "Esta cor de fundo é apenas para pré-visualização. Não será mostrada na sua transmissão.",
   "Invalid JSON": "JSON inválido",
+  "Increment Amount": "Valor de incremento",
+  "Overkill Multiplier": "Multiplicador de overkill",
+  "Overkill Min Health": "Saúde mín. de overkill",
   "Min. Sparks": "Min. Sparks",
   "Min. Embers": "Min. Embers",
   "The smallest amount of bits a cheer must have for an event to be shown. Setting this to 0 will make every cheer trigger an event.": "O valor mínimo de bits que um cumprimento deve ter para que seja mostrado um evento. Definir este valor em 0 fará com que um evento seja despoletado por cada cumprimento."
