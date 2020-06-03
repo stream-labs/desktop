@@ -101,6 +101,9 @@
   "Note: This background color is for preview purposes only.It will not be shown in your stream.": "Uwaga: ten kolor tła służy wyłącznie do podglądu. Nie będzie wyświetlany podczas transmisji.",
   "This background color is for preview purposes only. It will not be shown in your stream.": "Ten kolor tła służy wyłącznie do podglądu. Nie będzie wyświetlany podczas transmisji.",
   "Invalid JSON": "Niepoprawny parametr JSON",
+  "Increment Amount": "Przyrost kwoty",
+  "Overkill Multiplier": "Mnożnik overkill",
+  "Overkill Min Health": "Overkill Min. Zdrowie",
   "Min. Sparks": "Min. Sparks",
   "Min. Embers": "Min. Embers",
   "The smallest amount of bits a cheer must have for an event to be shown. Setting this to 0 will make every cheer trigger an event.": "Najmniejsza ilość bitów, jaką musi mieć nastrój, aby pokazało się wydarzenie. Ustawienie tego na 0 sprawi, że każda troska wywoła zdarzenie."
