@@ -101,6 +101,9 @@
   "Note: This background color is for preview purposes only.It will not be shown in your stream.": "참고: 미리 보기 목적으로만 사용할 수 있는 배경색입니다. 스트리밍에 표시되지 않습니다.",
   "This background color is for preview purposes only. It will not be shown in your stream.": "미리 보기 목적으로만 사용할 수 있는 배경색입니다. 스트리밍에 표시되지 않습니다.",
   "Invalid JSON": "잘못된 JSON",
+  "Increment Amount": "Increment Amount",
+  "Overkill Multiplier": "Overkill Multiplier",
+  "Overkill Min Health": "Overkill Min Health",
   "Min. Sparks": "Min. Sparks",
   "Min. Embers": "Min. Embers",
   "The smallest amount of bits a cheer must have for an event to be shown. Setting this to 0 will make every cheer trigger an event.": "The smallest amount of bits a cheer must have for an event to be shown. Setting this to 0 will make every cheer trigger an event."
