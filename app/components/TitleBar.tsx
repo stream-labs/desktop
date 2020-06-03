@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import electron from 'electron';
+import electron, { ipcRenderer } from 'electron';
 import cx from 'classnames';
 import { CustomizationService } from 'services/customization';
 import { Inject } from 'services/core/injector';
@@ -16,6 +16,14 @@ export default class TitleBar extends Vue {
   @Inject() streamingService: StreamingService;
 
   @Prop() title: string;
+
+  created() {
+    if (Utils.isDevMode()) {
+      ipcRenderer.on('unhandledErrorState', () => {
+        this.errorState = true;
+      });
+    }
+  }
 
   minimize() {
     electron.remote.getCurrentWindow().minimize();
@@ -51,9 +59,14 @@ export default class TitleBar extends Vue {
     return /prime/.test(this.theme);
   }
 
+  errorState = false;
+
   render() {
     return (
-      <div class={cx(styles.titlebar, this.theme)}>
+      <div
+        class={cx(styles.titlebar, this.theme)}
+        style={{ backgroundColor: this.errorState ? 'var(--red)' : undefined }}
+      >
         {!this.primeTheme && (
           <img class={styles.titlebarIcon} src={require('../../media/images/icon.ico')} />
         )}
