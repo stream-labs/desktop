@@ -11,7 +11,10 @@ function getPresetBasePath() {
   return isPackaged ? EXE_DIR_PATH : APP_PATH;
 }
 
-/** export for testing */
+/**
+ * export for testing
+ * JSONから読みだしたパスのうちプリセットと判定できるものを、実際にOBSに渡すパスに変換する
+ */
 export function convertPresetPath(pathMaybePreset: string, presetBasePath = getPresetBasePath()): string {
   if (isAbsolute(pathMaybePreset)) {
     return pathMaybePreset;
@@ -27,7 +30,10 @@ export function convertPresetPath(pathMaybePreset: string, presetBasePath = getP
   return absolutePath;
 }
 
-/** export for testing */
+/**
+ * export for testing
+ * プリセットのファイルを参照するパスを、JSONに書き出す用の相対パスに変換する
+ */
 export function revertPresetPath(pathMaybePreset: string, presetBasePath = getPresetBasePath()): string {
   if (!isAbsolute(pathMaybePreset)) {
     return pathMaybePreset;
