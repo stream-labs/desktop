@@ -101,6 +101,9 @@
   "Note: This background color is for preview purposes only.It will not be shown in your stream.": "Poznámka: Táto farba pozadia slúži iba na účely náhľadu. Nebude sa zobrazovať vo vašom streame.",
   "This background color is for preview purposes only. It will not be shown in your stream.": "Táto farba pozadia slúži iba na účely náhľadu. Nebude sa zobrazovať vo vašom streame.",
   "Invalid JSON": "Neplatný JSON",
+  "Increment Amount": "Increment Amount",
+  "Overkill Multiplier": "Overkill Multiplier",
+  "Overkill Min Health": "Overkill Min Health",
   "Min. Sparks": "Min. Sparks",
   "Min. Embers": "Min. Embers",
   "The smallest amount of bits a cheer must have for an event to be shown. Setting this to 0 will make every cheer trigger an event.": "The smallest amount of bits a cheer must have for an event to be shown. Setting this to 0 will make every cheer trigger an event."
