@@ -17,6 +17,7 @@ export function convertPresetPath(pathMaybePreset: string, presetBasePath = getP
     return pathMaybePreset;
   }
 
+  // This is enough to detect that it's not a preset file
   const isOuterPath = pathMaybePreset.startsWith('..');
   if (isOuterPath) {
     return pathMaybePreset;
@@ -38,6 +39,7 @@ export function revertPresetPath(pathMaybePreset: string, presetBasePath = getPr
     return pathMaybePreset;
   }
 
+  // This is enough to detect that it's not a preset file
   const isOuterPath = relativePath.startsWith('..');
   if (isOuterPath) {
     return pathMaybePreset;
