@@ -1,5 +1,9 @@
 import { Component } from 'vue-property-decorator';
-import { SpinWheelService, ISpinWheelData } from 'services/widgets/settings/spin-wheel';
+import {
+  SpinWheelService,
+  ISpinWheelData,
+  ISpinWheelSettings,
+} from 'services/widgets/settings/spin-wheel';
 import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
 import { inputComponents } from './inputs';
@@ -7,6 +11,7 @@ import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import uuid from 'uuid/v4';
+import { KinesisAnalytics } from 'aws-sdk';
 
 @Component({
   components: {
@@ -42,13 +47,36 @@ export default class SpinWheel extends WidgetSettings<ISpinWheelData, SpinWheelS
     this.save();
   }
 
+  editCategory(key: string, patch: Partial<ISpinWheelSettings['categories']>) {
+    this.wData.settings.categories = this.wData.settings.categories.map(cat => {
+      if (cat.key === key) return { ...cat, ...patch };
+      return cat;
+    });
+    this.save();
+  }
+
   removeCategory(key: string) {
+    const catIdx = this.wData.settings.categories.findIndex(cat => cat.key === key);
     this.wData.settings.categories = this.wData.settings.categories.filter(cat => cat.key !== key);
+    this.wData.settings.sections = this.wData.settings.sections.filter(
+      sect => sect.category !== catIdx,
+    );
+    this.wData.settings.sections.forEach(sect => {
+      if (sect.category > catIdx) sect.category--;
+    });
     this.save();
   }
 
   get sectionOptions() {
-    return this.wData.settings.categories.map((cat, i) => ({ title: cat.prize, value: i + 1 }));
+    return this.wData.settings.categories.map((cat, i) => ({ title: cat.prize, value: i }));
+  }
+
+  editSection(key: string, patch: Partial<ISpinWheelSettings['sections']>) {
+    this.wData.settings.sections = this.wData.settings.sections.map(sect => {
+      if (sect.key === key) return { ...sect, ...patch };
+      return sect;
+    });
+    this.save();
   }
 
   removeSection(key: string) {
