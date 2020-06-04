@@ -5,7 +5,7 @@ import { TransitionsService, ETransitionType, TRANSITION_DURATION_MAX } from 'se
 import * as inputComponents from 'components/obs/inputs';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import GenericForm from 'components/obs/inputs/GenericForm';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import InputWrapper from 'components/shared/inputs/InputWrapper';
 import { EditorCommandsService } from 'services/editor-commands';
 import { debounce } from 'lodash-decorators';
 import { Subscription } from 'rxjs';
@@ -14,7 +14,7 @@ import isEqual from 'lodash/isEqual';
 @Component({
   components: {
     GenericForm,
-    HFormGroup,
+    InputWrapper,
     ...inputComponents,
   },
 })

@@ -1,7 +1,7 @@
 import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import InputWrapper from 'components/shared/inputs/InputWrapper';
 import { cloneDeep } from 'lodash';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { formMetadata, metadata } from '../../shared/inputs';
@@ -80,16 +80,16 @@ export default class YoutubeEditStreamInfo extends TsxComponent<YoutubeEditStrea
       this.channelInfo && (
         <ValidatedForm onInput={this.emitInput}>
           {this.props.canChangeBroadcast && (
-            <HFormGroup title={$t('Event')}>
+            <InputWrapper title={$t('Event')}>
               <BroadcastInput
                 onInput={this.onSelectBroadcastHandler}
                 vModel={this.channelInfo.broadcastId}
                 metadata={this.formMetadata.event}
               />
-            </HFormGroup>
+            </InputWrapper>
           )}
-          <HFormGroup vModel={this.channelInfo.title} metadata={this.formMetadata.title} />
-          <HFormGroup
+          <InputWrapper vModel={this.channelInfo.title} metadata={this.formMetadata.title} />
+          <InputWrapper
             vModel={this.channelInfo.description}
             metadata={this.formMetadata.description}
           />

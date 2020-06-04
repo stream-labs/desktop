@@ -1,7 +1,7 @@
 <template>
-<h-form-group>
+<input-wrapper>
   <bool-input :value="value.value" :metadata="metadata" @input="handleClick" />
-</h-form-group>
+</input-wrapper>
 </template>
 
 <script lang="ts" src="./ObsBoolInput.vue.ts"></script>

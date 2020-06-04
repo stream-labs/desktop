@@ -1,9 +1,9 @@
 import { ObsInput } from './ObsInput';
 import { Component, Prop } from 'vue-property-decorator';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import InputWrapper from 'components/shared/inputs/InputWrapper';
 import { $t } from 'services/i18n';
 
-@Component({ components: { HFormGroup } })
+@Component({ components: { InputWrapper } })
 export default class ObsFontSizeSelector extends ObsInput<number> {
   @Prop()
   value: number;

@@ -3,7 +3,7 @@ import moment from 'moment';
 import { Component } from 'vue-property-decorator';
 import ModalLayout from '../ModalLayout.vue';
 import { BoolInput, ListInput } from 'components/shared/inputs/inputs';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import InputWrapper from 'components/shared/inputs/InputWrapper';
 import { StreamInfoService, TCombinedChannelInfo } from 'services/stream-info';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { UserService } from 'services/user';
@@ -37,7 +37,7 @@ import Translate from 'components/shared/translate';
 @Component({
   components: {
     ModalLayout,
-    HFormGroup,
+    InputWrapper,
     BoolInput,
     ListInput,
     TwitchTagsInput,

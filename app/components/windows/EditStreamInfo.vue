@@ -24,27 +24,27 @@
           />
         </div>
         <div v-else>
-          <h-form-group
+          <input-wrapper
             v-if="isFacebook && hasPages && !midStreamMode"
             v-model="channelInfo.facebookPageId"
             :metadata="formMetadata.page"
           />
-          <h-form-group v-model="channelInfo.title" :metadata="formMetadata.title" />
-          <h-form-group
+          <input-wrapper v-model="channelInfo.title" :metadata="formMetadata.title" />
+          <input-wrapper
             v-if="isFacebook"
             v-model="channelInfo.description"
             :metadata="formMetadata.description"
           />
         </div>
 
-        <h-form-group v-if="isTwitch || isMixer || isFacebook" :metadata="formMetadata.game">
+        <input-wrapper v-if="isTwitch || isMixer || isFacebook" :metadata="formMetadata.game">
           <list-input
             @search-change="value => onGameSearchHandler(value)"
             @input="onGameInput"
             v-model="channelInfo.game"
             :metadata="formMetadata.game"
           />
-        </h-form-group>
+        </input-wrapper>
         <TwitchTagsInput
           v-if="isTwitch"
           v-model="channelInfo.tags"
@@ -52,18 +52,18 @@
           name="tags"
           :has-permission="hasUpdateTagsPermission"
         />
-        <h-form-group v-if="searchProfilesPending">
+        <input-wrapper v-if="searchProfilesPending">
           {{ $t('Checking optimized setting for') }} {{ channelInfo.game }}...
-        </h-form-group>
+        </input-wrapper>
         <div v-if="isSchedule">
-          <h-form-group v-model="startTimeModel.date" :metadata="formMetadata.date" />
-          <h-form-group v-model="startTimeModel.time" :metadata="formMetadata.time" />
+          <input-wrapper v-model="startTimeModel.date" :metadata="formMetadata.date" />
+          <input-wrapper v-model="startTimeModel.time" :metadata="formMetadata.time" />
         </div>
         <div
           v-if="selectedProfile"
           :class="{ profile: true, 'profile-default': selectedProfile.game === 'DEFAULT' }"
         >
-          <h-form-group
+          <input-wrapper
             v-if="isTwitch || isYoutube"
             :metadata="{
               tooltip: $t(
@@ -72,15 +72,15 @@
             }"
           >
             <bool-input v-model="useOptimizedProfile" :metadata="optimizedProfileMetadata" />
-          </h-form-group>
+          </input-wrapper>
         </div>
-        <h-form-group v-if="!midStreamMode && !isFacebook">
+        <input-wrapper v-if="!midStreamMode && !isFacebook">
           <bool-input
             v-model="doNotShowAgainModel"
             name="do_not_show_again"
             :metadata="{ title: $t('Do not show this message when going live') }"
           />
-        </h-form-group>
+        </input-wrapper>
         <Twitter
           :streamTitle="channelInfo.title"
           :midStreamMode="midStreamMode"

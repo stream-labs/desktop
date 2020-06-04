@@ -1,8 +1,8 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { TObsType, ObsInput, IObsNumberInputValue } from './ObsInput';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import InputWrapper from 'components/shared/inputs/InputWrapper';
 
-@Component({ components: { HFormGroup } })
+@Component({ components: { InputWrapper } })
 class ObsIntInput extends ObsInput<IObsNumberInputValue> {
   static obsType: TObsType[];
 

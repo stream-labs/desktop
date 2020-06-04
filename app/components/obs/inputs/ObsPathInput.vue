@@ -1,12 +1,12 @@
 <template>
-<h-form-group :title="value.description">
+<input-wrapper :title="value.description">
   <div class="path-input__row">
     <text-input :value="value.value" @input="handleChange" :metadata="{ disabled: value.enabled === false }" />
     <button @click="showFileDialog" class="button button--default" :disabled="value.enabled === false">
       {{ $t('Browse') }}
     </button>
   </div>
-</h-form-group>
+</input-wrapper>
 </template>
 
 <script lang="ts" src="./ObsPathInput.vue.ts"></script>

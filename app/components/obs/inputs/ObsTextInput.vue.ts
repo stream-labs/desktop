@@ -1,11 +1,11 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { IObsInput, TObsType, ObsInput } from './ObsInput';
 import { TextInput, TextAreaInput } from 'components/shared/inputs/inputs';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import InputWrapper from 'components/shared/inputs/InputWrapper';
 import { ITextMetadata, ITextAreaMetadata } from 'components/shared/inputs';
 
 @Component({
-  components: { TextInput, TextAreaInput, HFormGroup },
+  components: { TextInput, TextAreaInput, InputWrapper },
 })
 class ObsTextInput extends ObsInput<IObsInput<string>> {
   static obsType: TObsType[];

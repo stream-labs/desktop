@@ -1,74 +1,74 @@
 <template>
   <div slot="content">
     <div class="row">
-      <h-form-group :title="$t('Face Masks Enabled')">
+      <input-wrapper :title="$t('Face Masks Enabled')">
         <toggle-input
           v-model="enabledModel"
           name="enabled"
           @input="handleSubmit"
           :metadata="{ title: $t('Enable Face Masks') }"
         />
-      </h-form-group>
+      </input-wrapper>
     </div>
     <div class="row">
-      <h-form-group :title="$t('Video Device')">
+      <input-wrapper :title="$t('Video Device')">
         <list-input
           v-model="videoInputModel"
           :metadata="videoInputMetadata"
           @input="handleSubmit"
         />
-      </h-form-group>
+      </input-wrapper>
     </div>
     <div class="row">
-      <h-form-group :title="$t('Mask Duration')">
+      <input-wrapper :title="$t('Mask Duration')">
         <slider-input v-model="durationModel" @input="throttledSubmit" :metadata="{min: 8, max: 60}"/>
-      </h-form-group>
+      </input-wrapper>
     </div>
     <div class="row">
-      <h-form-group :title="$t('Donation Masks')">
+      <input-wrapper :title="$t('Donation Masks')">
         <toggle-input
           v-model="donationsEnabledModel"
           name="donationsEnabled"
           @input="handleSubmit"
           :metadata="{ title: $t('Enable Face Mask Donations') }"
         />
-      </h-form-group>
+      </input-wrapper>
     </div>
     <div class="row" v-if="showTwitchFeatures">
-      <h-form-group :title="$t('Subscriber Masks')">
+      <input-wrapper :title="$t('Subscriber Masks')">
         <toggle-input
           v-model="subsEnabledModel"
           name="subsEnabled"
           @input="handleSubmit"
           :metadata="{ title: $t('Enable Sub Masks') }"
         />
-      </h-form-group>
+      </input-wrapper>
     </div>
     <div class="row" v-if="showTwitchFeatures">
-      <h-form-group :title="$t('Bits Masks')">
+      <input-wrapper :title="$t('Bits Masks')">
         <toggle-input
           v-model="bitsEnabledModel"
           name="bitsEnabled"
           @input="handleSubmit"
           :metadata="{ title: $t('Enable Bits Masks') }"
         />
-      </h-form-group>
+      </input-wrapper>
     </div>
     <div class="row last-item" v-if="showTwitchFeatures">
-      <h-form-group :title="$t('Minimum Bits to Activate')">
+      <input-wrapper :title="$t('Minimum Bits to Activate')">
         <number-input
           v-model="bitsPriceModel"
           @input="handleSubmit"
         />
-      </h-form-group>
+      </input-wrapper>
     </div>
       <div class="row">
-      <h-form-group :title="$t('Download Progress')">
+      <input-wrapper :title="$t('Download Progress')">
         <progress-bar :progressComplete="downloadProgress"></progress-bar>
-      </h-form-group>
+      </input-wrapper>
     </div>
     <div class="row">
-      <h-form-group :title="$t('Test Face Masks')">
+      <input-wrapper :title="$t('Test Face Masks')">
         <Accordion :opened-title="$t('Collapse')" :closed-title="$t('Expand')">
           <div slot="content">
             <item-grid>
@@ -82,7 +82,7 @@
             </item-grid>
         </div>
         </Accordion>
-      </h-form-group>
+      </input-wrapper>
     </div>
   </div>
 </template>

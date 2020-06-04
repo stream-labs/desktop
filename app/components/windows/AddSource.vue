@@ -58,7 +58,7 @@
 
   <div slot="controls">
     <div class="new-source-toggle">
-      <h-form-group
+      <input-wrapper
         v-if="existingSources.length && sourceType !== 'scene'"
         v-model="overrideExistingSource"
         :metadata="{ title: $t('Add a new source instead'), type: 'toggle' }"

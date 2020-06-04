@@ -4,7 +4,7 @@ import { Inject } from 'services/core/injector';
 import ModalLayout from 'components/ModalLayout.vue';
 import { ListInput, ToggleInput, SliderInput, NumberInput } from 'components/shared/inputs/inputs';
 import { ProgressBar, ItemGrid, VirtualItem, Accordion } from 'streamlabs-beaker';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import InputWrapper from 'components/shared/inputs/InputWrapper';
 import { FacemasksService } from 'services/facemasks/index';
 import throttle from 'lodash/throttle';
 
@@ -37,7 +37,7 @@ interface IFormSettings {
 @Component({
   components: {
     ModalLayout,
-    HFormGroup,
+    InputWrapper,
     NumberInput,
     ListInput,
     ProgressBar,

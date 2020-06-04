@@ -3,10 +3,10 @@ import { IObsPathInputValue, TObsType, ObsInput } from './ObsInput';
 import electron from 'electron';
 // eslint-disable-next-line
 import OpenDialogOptions = Electron.OpenDialogOptions;
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import InputWrapper from 'components/shared/inputs/InputWrapper';
 import { TextInput } from 'components/shared/inputs/inputs';
 
-@Component({ components: { HFormGroup, TextInput } })
+@Component({ components: { InputWrapper, TextInput } })
 class ObsPathInput extends ObsInput<IObsPathInputValue> {
   static obsType: TObsType[];
 

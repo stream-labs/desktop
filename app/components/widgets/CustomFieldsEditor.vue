@@ -11,7 +11,7 @@
       <code-input :metadata="{ type: 'js' }" v-model="editorInputValue"/>
     </div>
     <div class="custom-fields-container" v-else-if="customFields && !isEditMode">
-      <h-form-group
+      <input-wrapper
         v-for="inputData in inputsData"
         v-if="inputData.metadata"
         :key="inputData.fieldName"

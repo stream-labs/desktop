@@ -1,10 +1,10 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { TObsType, IObsListInput, ObsInput, TObsValue } from './ObsInput';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import InputWrapper from 'components/shared/inputs/InputWrapper';
 import { ListInput } from 'components/shared/inputs/inputs';
 
 @Component({
-  components: { HFormGroup, ListInput },
+  components: { InputWrapper, ListInput },
 })
 class ObsResolutionInput extends ObsInput<IObsListInput<TObsValue>> {
   static obsType: TObsType;

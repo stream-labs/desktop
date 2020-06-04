@@ -1,5 +1,5 @@
 <template>
-<h-form-group :title="value.showDescription !== false ? value.description : null">
+<input-wrapper :title="value.showDescription !== false ? value.description : null">
   <div class="row bitmask-input">
     <bool-input
       v-for="(flag, index) in flags"
@@ -10,7 +10,7 @@
       :metadata="{ disabled: value.enabled === false, name: `flag${index}` }"
     />
   </div>
-</h-form-group>
+</input-wrapper>
 </template>
 
 <script lang="ts" src="./ObsBitMaskInput.vue.ts"></script>

@@ -2,7 +2,7 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import ModalLayout from 'components/ModalLayout.vue';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import InputWrapper from 'components/shared/inputs/InputWrapper';
 import TsxComponent from 'components/tsx-component';
 import { SelectionService } from 'services/selection';
 import { $t } from 'services/i18n';
@@ -98,7 +98,7 @@ export default class EditTransform extends TsxComponent<{}> {
 
   get cropForm() {
     return this.selection.isSceneItem() ? (
-      <HFormGroup metadata={{ title: $t('Crop') }}>
+      <InputWrapper metadata={{ title: $t('Crop') }}>
         {['left', 'right', 'top', 'bottom'].map((dir: keyof ICrop) => (
           <div style="display: flex; align-items: center; margin-bottom: 8px;">
             <NumberInput
@@ -109,7 +109,7 @@ export default class EditTransform extends TsxComponent<{}> {
             <span style="margin-left: 8px;">{dirMap(dir)}</span>
           </div>
         ))}
-      </HFormGroup>
+      </InputWrapper>
     ) : null;
   }
 
@@ -119,7 +119,7 @@ export default class EditTransform extends TsxComponent<{}> {
     const inputHandler = type === 'pos' ? this.setPos : this.setScale;
     if (dataArray.some(dir => isNaN(Math.round(this.rect[dir])))) return null;
     return (
-      <HFormGroup metadata={{ title }}>
+      <InputWrapper metadata={{ title }}>
         <div style="display: flex;">
           {dataArray.map(dir => (
             <div style="margin-right: 8px;">
@@ -131,7 +131,7 @@ export default class EditTransform extends TsxComponent<{}> {
             </div>
           ))}
         </div>
-      </HFormGroup>
+      </InputWrapper>
     );
   }
 
@@ -141,7 +141,7 @@ export default class EditTransform extends TsxComponent<{}> {
         <ValidatedForm slot="content" name="transform" ref="validForm">
           {this.coordinateForm('pos')}
           {this.coordinateForm('scale')}
-          <HFormGroup metadata={{ title: $t('Rotation') }}>
+          <InputWrapper metadata={{ title: $t('Rotation') }}>
             <button class="button button--default" style="width: 172px;" onClick={this.rotate(90)}>
               {$t('Rotate 90 Degrees CW')}
             </button>
@@ -149,7 +149,7 @@ export default class EditTransform extends TsxComponent<{}> {
             <button class="button button--default" style="width: 172px;" onClick={this.rotate(-90)}>
               {$t('Rotate 90 Degrees CCW')}
             </button>
-          </HFormGroup>
+          </InputWrapper>
           {this.cropForm}
         </ValidatedForm>
 

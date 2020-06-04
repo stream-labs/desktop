@@ -3,7 +3,7 @@ import TsxComponent, { createProps } from 'components/tsx-component';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { TwitterService } from 'services/integrations/twitter';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import InputWrapper from 'components/shared/inputs/InputWrapper';
 import { $t } from 'services/i18n';
 import { shell } from 'electron';
 import { TextArea } from 'streamlabs-beaker';
@@ -181,7 +181,7 @@ export class Twitter extends TsxComponent<TwitterProps> {
 
   render() {
     if (!this.props.midStreamMode) {
-      return <HFormGroup metadata={{}}>{this.twitter}</HFormGroup>;
+      return <InputWrapper metadata={{}}>{this.twitter}</InputWrapper>;
     }
   }
 }

@@ -1,11 +1,11 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { ObsInput, IObsInput, TObsType } from './ObsInput';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import InputWrapper from 'components/shared/inputs/InputWrapper';
 import { metadata } from 'components/shared/inputs';
 import { BoolInput } from 'components/shared/inputs/inputs';
 
 @Component({
-  components: { HFormGroup, BoolInput },
+  components: { InputWrapper, BoolInput },
 })
 class ObsBoolInput extends ObsInput<IObsInput<boolean>> {
   static obsType: TObsType;

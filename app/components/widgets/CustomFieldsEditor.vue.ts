@@ -6,7 +6,7 @@ import { IWidgetData, WidgetSettingsService, WidgetsService } from 'services/wid
 import { Inject } from '../../services/core/injector';
 import { $t } from 'services/i18n/index';
 import { IInputMetadata, inputComponents, metadata } from 'components/shared/inputs';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import InputWrapper from 'components/shared/inputs/InputWrapper';
 import { debounce } from 'lodash-decorators';
 import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
 import electron from 'electron';
@@ -94,7 +94,7 @@ const DEFAULT_CUSTOM_FIELDS: Dictionary<ICustomField> = {
   components: {
     CodeInput,
     ToggleInput,
-    HFormGroup,
+    InputWrapper,
   },
 })
 export default class CustomFieldsEditor extends Vue {

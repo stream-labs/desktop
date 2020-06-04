@@ -11,12 +11,12 @@ import { WidgetsService, WidgetDisplayData } from 'services/widgets';
 import { $t } from 'services/i18n';
 import { PlatformAppsService } from 'services/platform-apps';
 import { EditorCommandsService } from 'services/editor-commands';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import InputWrapper from 'components/shared/inputs/InputWrapper';
 import electron from 'electron';
 import { UserService } from 'services/user';
 
 @Component({
-  components: { ModalLayout, Selector, Display, HFormGroup },
+  components: { ModalLayout, Selector, Display, InputWrapper },
 })
 export default class AddSource extends Vue {
   @Inject() sourcesService: SourcesService;
