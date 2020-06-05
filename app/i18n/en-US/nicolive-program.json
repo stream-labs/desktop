@@ -8,7 +8,7 @@
         },
         "401": {
           "title": "You are not logged in",
-          "message": "Program information can not be fetched because you are not logged in to niconico on N Air.\nLog in to niconico from the login button on the upper right of the N Air main screen."
+          "message": "The program information can not be fetched because you are not logged in to niconico on N Air.\nLog in to niconico from the login button on the upper right of the N Air main screen."
         },
         "500": {
           "title": "An error occurred on the server",
@@ -16,7 +16,7 @@
         },
         "503": {
           "title": "Under maintenance",
-          "message": "Program information can not be fetched because niconico live streaming service is under maintenance.\nCheck niconico information about maintenance from the \"Notification\" button to know the maintenance time."
+          "message": "The program information can not be fetched because niconico live streaming service is under maintenance.\nCheck niconico information about maintenance from the \"Notification\" button to know the maintenance time."
         }
       },
       "fetchProgram": {
@@ -26,7 +26,7 @@
         },
         "401": {
           "title": "You are not logged in",
-          "message": "Program information can not be fetched because you are not logged in to niconico on N Air.\nLog in to niconico from the login button on the upper right of the N Air main screen."
+          "message": "The program information can not be fetched because you are not logged in to niconico on N Air.\nLog in to niconico from the login button on the upper right of the N Air main screen."
         },
         "404": {
           "title": "There is no program",
@@ -38,7 +38,7 @@
         },
         "503": {
           "title": "Under maintenance",
-          "message": "Program information can not be fetched because niconico live streaming service is under maintenance.\nCheck niconico information about maintenance from the \"Notification\" button to know the maintenance time."
+          "message": "The program information can not be fetched because niconico live streaming service is under maintenance.\nCheck niconico information about maintenance from the \"Notification\" button to know the maintenance time."
         }
       },
       "startProgram": {
@@ -128,79 +128,79 @@
       "fetchFilters": {
         "network_error": {
           "title": "A network error has occurred",
-          "message": "The Block settings could not be fetched because of a network error.\nCheck the health of your Internet connection."
+          "message": "The block settings could not be fetched because of a network error.\nCheck the health of your Internet connection."
         },
         "400": {
           "title": "The Block settings could not be fetched",
-          "message": "The Block settings could not be fetched\n%{additionalMessage}"
+          "message": "The block settings could not be fetched\n%{additionalMessage}"
         },
         "401": {
           "title": "You are not logged in",
-          "message": "Block settings can not be fetched because you are not logged in to niconico on N Air.\nLog in to niconico from the login button on the upper right of the N Air main screen."
+          "message": "The block settings can not be fetched because you are not logged in to niconico on N Air.\nLog in to niconico from the login button on the upper right of the N Air main screen."
         },
         "403": {
           "title": "You do not have the authority to load the Block settings",
-          "message": "You can not load the Block settings because the account you are logged into does not have authority to load the Block settings. \nMake sure you are logged in with the correct account."
+          "message": "You can not load the block settings because the account you are logged into does not have authority to load the Block settings. \nMake sure you are logged in with the correct account."
         },
         "404": {
           "title": "There is no program",
-          "message": "You can not load the Block settings because there is no program.\n If you want to create a new program, update the program information and then press the Create New Program button."
+          "message": "You can not load the block settings because there is no program.\n If you want to create a new program, update the program information and then press the Create New Program button."
         },
         "500": {
-          "title": "The Block settings could not be fetched",
-          "message": "The Block settings could not be fetched\n%{additionalMessage}"
+          "title": "The block settings could not be fetched",
+          "message": "The block settings could not be fetched\n%{additionalMessage}"
         }
       },
       "addFilters": {
         "network_error": {
           "title": "A network error has occurred",
-          "message": "The Block settings could not be fetched because of a network error.\nCheck the health of your Internet connection."
+          "message": "The block settings could not be fetched because of a network error.\nCheck the health of your Internet connection."
         },
         "400": {
           "title": "The Block settings could not be added",
-          "message": "The Block settings could not be added.\n%{additionalMessage}"
+          "message": "The block settings could not be added.\n%{additionalMessage}"
         },
         "401": {
           "title": "You are not logged in",
-          "message": "Block settings can not be added because you are not logged in to niconico on N Air.\nLog in to niconico from the login button on the upper right of the N Air main screen."
+          "message": "The block settings can not be added because you are not logged in to niconico on N Air.\nLog in to niconico from the login button on the upper right of the N Air main screen."
         },
         "403": {
-          "title": "The Block settings could not be added",
-          "message": "The Block settings could not be added\n%{additionalMessage}"
+          "title": "The block settings could not be added",
+          "message": "The block settings could not be added\n%{additionalMessage}"
         },
         "404": {
           "title": "There is no program",
-          "message": "You can not add the Block settings because there is no program. \nIf you want to create a new program, update the program information and then press the Create New Program button."
+          "message": "You can not add the block settings because there is no program. \nIf you want to create a new program, update the program information and then press the Create New Program button."
         },
         "500": {
-          "title": "The Block settings could not be added",
+          "title": "The block settings could not be added",
           "message": "The Block settings could not be added\n%{additionalMessage}"
         }
       },
       "deleteFilters": {
         "network_error": {
           "title": "A network error has occurred",
-          "message": "The Block settings could not be deleted because of a network error.\nCheck the health of your Internet connection."
+          "message": "The block settings could not be deleted because of a network error.\nCheck the health of your Internet connection."
         },
         "400": {
-          "title": "The Block settings could not be deleted",
-          "message": "The Block settings could not be deleted\n%{additionalMessage}"
+          "title": "The block settings could not be deleted",
+          "message": "The block settings could not be deleted\n%{additionalMessage}"
         },
         "401": {
           "title": "You are not logged in",
-          "message": "Block settings can not be deleted because you are not logged in to niconico on N Air.\nLog in to niconico from the login button on the upper right of the N Air main screen."
+          "message": "The block settings can not be deleted because you are not logged in to niconico on N Air.\nLog in to niconico from the login button on the upper right of the N Air main screen."
         },
         "403": {
           "title": "You do not have the authority to delete the Block settings",
-          "message": "You can not load the Block settings because the account you are logged into does not have authority to load the Block settings.\nMake sure you are logged in with the correct account."
+          "message": "You can not load the block settings because the account you are logged into does not have authority to load the Block settings.\nMake sure you are logged in with the correct account."
         },
         "404": {
           "title": "There is no program",
-          "message": "You can not delete the Block settings because there is no program. \nIf you want to create a new program, update the program information and then press the Create New Program button."
+          "message": "You can not delete the block settings because there is no program. \nIf you want to create a new program, update the program information and then press the Create New Program button."
         },
         "500": {
-          "title": "The Block settings could not be deleted",
-          "message": "The Block settings could not be deleted\n%{additionalMessage}"
+          "title": "The block settings could not be deleted",
+          "message": "The block settings could not be deleted\n%{additionalMessage}"
         }
       }
     },
