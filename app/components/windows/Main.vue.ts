@@ -17,7 +17,6 @@ import { WindowsService } from 'services/windows';
 import StudioFooter from '../StudioFooter.vue';
 import CustomLoader from '../CustomLoader.vue';
 import PatchNotes from '../pages/PatchNotes.vue';
-import Questionaire from '../pages/Questionaire.vue';
 import NicoliveArea from '../nicolive-area/NicoliveArea.vue';
 
 @Component({
@@ -30,7 +29,6 @@ import NicoliveArea from '../nicolive-area/NicoliveArea.vue';
     StudioFooter,
     CustomLoader,
     PatchNotes,
-    Questionaire,
     NicoliveArea,
   }
 })
