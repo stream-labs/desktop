@@ -95,6 +95,8 @@ export class ChatService extends Service {
       },
     });
 
+    this.bindDomReadyListener();
+
     if (this.electronWindowId) {
       const win = this.windowsService.getWindowIdFromElectronId(this.electronWindowId);
       if (win) this.windowsService.updateHideChat(win, true);
@@ -105,7 +107,6 @@ export class ChatService extends Service {
     }
 
     this.bindWindowListener();
-    this.bindDomReadyListener();
 
     this.customizationService.settingsChanged.subscribe(changed => {
       this.handleSettingsChanged(changed);
