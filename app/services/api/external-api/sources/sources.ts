@@ -15,14 +15,6 @@ export interface ISourceAddOptions {
   isTemporary?: boolean;
 }
 
-/**
- * converts an InternalApi event to ExternalApi event
- */
-function exposeSourceEvent(observable: Observable<IInternalSourceModel>): Observable<ISourceModel> {
-  // add `id` field to each sourceModel
-  return observable.pipe(map(source => ({ ...source, id: source.sourceId })));
-}
-
 @Singleton()
 export class SourcesService {
   @Fallback()
@@ -83,14 +75,44 @@ export class SourcesService {
   }
 
   get sourceAdded(): Observable<ISourceModel> {
-    return exposeSourceEvent(this.sourcesService.sourceAdded);
+    return this.exposeSourceEvent(this.sourcesService.sourceAdded);
   }
 
   get sourceUpdated(): Observable<ISourceModel> {
-    return exposeSourceEvent(this.sourcesService.sourceUpdated);
+    return this.exposeSourceEvent(this.sourcesService.sourceUpdated);
   }
 
   get sourceRemoved(): Observable<ISourceModel> {
-    return exposeSourceEvent(this.sourcesService.sourceRemoved);
+    return this.exposeSourceEvent(this.sourcesService.sourceRemoved);
+  }
+
+  /**
+   * converts an InternalApi event to ExternalApi event
+   */
+  private exposeSourceEvent(
+    observable: Observable<IInternalSourceModel>,
+  ): Observable<ISourceModel> {
+    return observable.pipe(
+      map(internalSourceModel => this.convertInternalModelToExternal(internalSourceModel)),
+    );
+  }
+
+  convertInternalModelToExternal(internalModel: IInternalSourceModel): ISourceModel {
+    return {
+      sourceId: internalModel.sourceId,
+      id: internalModel.sourceId,
+      name: internalModel.name,
+      type: internalModel.type,
+      audio: internalModel.audio,
+      video: internalModel.video,
+      async: internalModel.async,
+      muted: internalModel.muted,
+      width: internalModel.width,
+      height: internalModel.height,
+      doNotDuplicate: internalModel.doNotDuplicate,
+      channel: internalModel.channel,
+      configurable: internalModel.configurable,
+      resourceId: `Source["${internalModel.sourceId}"]`,
+    };
   }
 }

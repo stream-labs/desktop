@@ -27,7 +27,8 @@ type TAnalyticsEvent =
   | 'SocialShare'
   | 'Recording'
   | 'ReplayBuffer'
-  | 'Heartbeat';
+  | 'Heartbeat'
+  | 'StreamPerformance';
 
 interface IAnalyticsEvent {
   product: string;

@@ -17,7 +17,7 @@ import { lazyModule } from 'util/lazy-module';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
-export interface IScene extends IResource {
+export interface IScene {
   id: string;
   name: string;
   nodes: (ISceneItem | ISceneItemFolder)[];
@@ -119,7 +119,7 @@ export interface ISceneItemActions {
 
 export type TSceneNodeType = 'item' | 'folder';
 
-export interface ISceneItemNode extends IResource {
+export interface ISceneItemNode {
   id: string;
   sceneId: string;
   sceneNodeType: TSceneNodeType;
@@ -205,7 +205,6 @@ export class ScenesService extends StatefulService<IScenesState> {
     Vue.set<IScene>(this.state.scenes, id, {
       id,
       name,
-      resourceId: `Scene${JSON.stringify([id])}`,
       nodes: [],
     });
     this.state.displayOrder.push(id);

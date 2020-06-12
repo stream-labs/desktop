@@ -2,8 +2,9 @@ import { useSpectron, test } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { ScenesService } from 'services/api/external-api/scenes/scenes';
 import { SourcesService } from 'services/api/external-api/sources/sources';
+import { sleep } from '../helpers/sleep';
 
-useSpectron({ restartAppAfterEachTest: false });
+useSpectron({ restartAppAfterEachTest: false, pauseIfFailed: true });
 
 test('Creating, fetching and removing sources', async t => {
   const client = await getClient();
@@ -60,5 +61,9 @@ test('Source events', async t => {
   // check `sourceUpdated` event when renaming a source
   source1.setName('audio3');
   event = await client.fetchNextEvent();
+
+  // the remote control app requires these fields to be in the event
   t.is(event.data.name, 'audio3');
+  t.is(event.data.configurable, true);
+  t.truthy(event.data.resourceId);
 });
