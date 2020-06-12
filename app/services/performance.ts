@@ -157,11 +157,13 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
 
   stopStreamQualityMonitoring() {
     const streamLagged =
-      (obs.Global.laggedFrames - this.streamStartLaggedFrames) /
-      (obs.Global.totalFrames - this.streamStartRenderedFrames);
+      ((obs.Global.laggedFrames - this.streamStartLaggedFrames) /
+        (obs.Global.totalFrames - this.streamStartRenderedFrames)) *
+      100;
     const streamSkipped =
-      (obs.Video.skippedFrames - this.streamStartSkippedFrames) /
-      (obs.Video.encodedFrames - this.streamStartEncodedFrames);
+      ((obs.Video.skippedFrames - this.streamStartSkippedFrames) /
+        (obs.Video.encodedFrames - this.streamStartEncodedFrames)) *
+      100;
     const streamDropped = this.state.percentageDroppedFrames;
     const streamDuration = new Date().getTime() - this.streamStartTime.getTime();
 
