@@ -56,6 +56,42 @@ class LayoutViews extends ViewHandler<ILayoutServiceState> {
   className(layout: ELayout) {
     return LAYOUT_DATA[layout].className;
   }
+
+  calculateColumnTotal(slots: IVec2Array) {
+    let totalWidth = 0;
+    slots.forEach(slot => {
+      if (Array.isArray(slot)) {
+        totalWidth += this.calculateMinimum('x', slot);
+      } else if (slot) {
+        totalWidth += slot.x;
+      }
+    });
+
+    return totalWidth;
+  }
+
+  calculateMinimum(orientation: 'x' | 'y', slots: IVec2Array) {
+    const aggregateMins: number[] = [];
+    const minimums = [];
+    slots.forEach(slot => {
+      if (Array.isArray(slot)) {
+        aggregateMins.push(this.aggregateMinimum(orientation, slot));
+      } else {
+        minimums.push(slot[orientation]);
+      }
+    });
+    if (!minimums.length) minimums.push(10);
+    return Math.max(...minimums, ...aggregateMins);
+  }
+
+  aggregateMinimum(orientation: 'x' | 'y', slots: IVec2Array) {
+    const minimums = slots.map(mins => {
+      if (mins) return mins[orientation];
+      return 10;
+    });
+    if (!minimums.length) minimums.push(10);
+    return minimums.reduce((a: number, b: number) => a + b);
+  }
 }
 
 export class LayoutService extends PersistentStatefulService<ILayoutServiceState> {
@@ -151,42 +187,6 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   removeCurrentTab() {
     this.REMOVE_TAB(this.state.currentTab);
-  }
-
-  calculateColumnTotal(slots: IVec2Array) {
-    let totalWidth = 0;
-    slots.forEach(slot => {
-      if (Array.isArray(slot)) {
-        totalWidth += this.calculateMinimum('x', slot);
-      } else if (slot) {
-        totalWidth += slot.x;
-      }
-    });
-
-    return totalWidth;
-  }
-
-  calculateMinimum(orientation: 'x' | 'y', slots: IVec2Array) {
-    const aggregateMins: number[] = [];
-    const minimums = [];
-    slots.forEach(slot => {
-      if (Array.isArray(slot)) {
-        aggregateMins.push(this.aggregateMinimum(orientation, slot));
-      } else {
-        minimums.push(slot[orientation]);
-      }
-    });
-    if (!minimums.length) minimums.push(10);
-    return Math.max(...minimums, ...aggregateMins);
-  }
-
-  aggregateMinimum(orientation: 'x' | 'y', slots: IVec2Array) {
-    const minimums = slots.map(mins => {
-      if (mins) return mins[orientation];
-      return 10;
-    });
-    if (!minimums.length) minimums.push(10);
-    return minimums.reduce((a: number, b: number) => a + b);
   }
 
   @mutation()
