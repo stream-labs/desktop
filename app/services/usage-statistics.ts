@@ -146,7 +146,7 @@ export class UsageStatisticsService extends Service {
    * Record event for the analytics DB
    */
   recordAnalyticsEvent(event: TAnalyticsEvent, value: any) {
-    // if (!this.isProduction) return;
+    if (!this.isProduction) return;
 
     this.anaiticsEvents.push({
       event,
