@@ -154,7 +154,6 @@ export class SourcesService extends StatefulService<ISourcesState> {
       height: 0,
 
       muted: false,
-      resourceId: `Source${JSON.stringify([id])}`,
       channel: addOptions.channel,
     };
 
