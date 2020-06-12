@@ -351,7 +351,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
   }
 
   stop() {
-    this.shutdown = false;
+    this.shutdown = true;
     this.SET_PERFORMANCE_STATS(PerformanceService.initialState);
   }
 }
