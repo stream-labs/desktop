@@ -8,7 +8,6 @@ import { formMetadata, metadata } from '../../shared/inputs';
 import { $t } from '../../../services/i18n';
 import BroadcastInput from './BroadcastInput';
 import {
-  IYoutubeChannelInfo,
   IYoutubeLiveBroadcast,
   IYoutubeStartStreamOptions,
   YoutubeService,
@@ -17,7 +16,7 @@ import StreamTitleAndDescription from '../StreamTitleAndDescription';
 
 class YoutubeEditStreamInfoProps {
   showOnlyRequiredFields? = false;
-  value: IYoutubeStartStreamOptions = {
+  value?: IYoutubeStartStreamOptions = {
     description: '',
     title: '',
     broadcastId: '',
@@ -28,30 +27,30 @@ class YoutubeEditStreamInfoProps {
 @Component({ components: { ValidatedForm }, props: createProps(YoutubeEditStreamInfoProps) })
 export default class YoutubeEditStreamInfo extends TsxComponent<YoutubeEditStreamInfoProps> {
   @Inject() private youtubeService: YoutubeService;
-  channelInfo: IYoutubeStartStreamOptions = null;
+  settings: IYoutubeStartStreamOptions = null;
   broadcasts: IYoutubeLiveBroadcast[] = [];
   broadcastsLoaded = false;
 
   async created() {
-    this.channelInfo = cloneDeep(this.props.value);
+    this.settings = cloneDeep(this.props.value);
     this.broadcasts = await this.youtubeService.fetchBroadcasts();
     this.broadcastsLoaded = true;
   }
 
   @Watch('value')
-  syncValue(val: IYoutubeChannelInfo) {
-    this.channelInfo = cloneDeep(val);
+  syncValue(val: IYoutubeStartStreamOptions) {
+    this.settings = cloneDeep(val);
   }
 
   onSelectBroadcastHandler() {
     // set title and description fields from selected broadcast
     const selectedBroadcast = this.broadcasts.find(
-      broadcast => broadcast.id === this.channelInfo.broadcastId,
+      broadcast => broadcast.id === this.settings.broadcastId,
     );
     if (!selectedBroadcast) return;
     const { title, description } = selectedBroadcast.snippet;
-    this.channelInfo.title = title;
-    this.channelInfo.description = description;
+    this.settings.title = title;
+    this.settings.description = description;
   }
 
   get formMetadata() {
@@ -74,7 +73,7 @@ export default class YoutubeEditStreamInfo extends TsxComponent<YoutubeEditStrea
   }
 
   emitInput() {
-    this.$emit('input', this.channelInfo);
+    this.$emit('input', this.settings);
   }
 
   render() {
@@ -85,12 +84,12 @@ export default class YoutubeEditStreamInfo extends TsxComponent<YoutubeEditStrea
             <HFormGroup title={$t('Event')}>
               <BroadcastInput
                 onInput={this.onSelectBroadcastHandler}
-                vModel={this.channelInfo.broadcastId}
+                vModel={this.settings.broadcastId}
                 metadata={this.formMetadata.event}
               />
             </HFormGroup>
           )}
-          <StreamTitleAndDescription vModel={this.channelInfo} allowCustom={true} />
+          <StreamTitleAndDescription vModel={this.settings} allowCustom={true} />
         </ValidatedForm>
       )
     );

@@ -1,4 +1,10 @@
 import { Observable } from 'rxjs';
+import { TPlatform } from '../platforms';
+import { IEncoderProfile } from '../video-encoding-optimizations';
+import { ITwitchStartStreamOptions } from '../platforms/twitch';
+import { IYoutubeStartStreamOptions } from '../platforms/youtube';
+import { IFacebookStartStreamOptions } from '../platforms/facebook';
+import { IMixerStartStreamOptions } from '../platforms/mixer';
 
 export enum EStreamingState {
   Offline = 'offline',
@@ -22,6 +28,60 @@ export enum EReplayBufferState {
   Saving = 'saving',
 }
 
+export interface IStreamInfo {
+  lifecycle: 'idle' | 'channelPrefetch' | 'channelSetup' | 'runChecklist' | 'afterGoLive' | 'live';
+  error: IStreamError | null;
+  goLiveSettings: IGoLiveSettings | null;
+  checklist: {
+    applyOptimizedSettings: TGoLiveChecklistItemState;
+    twitch: TGoLiveChecklistItemState;
+    youtube: TGoLiveChecklistItemState;
+    facebook: TGoLiveChecklistItemState;
+    mixer: TGoLiveChecklistItemState;
+    setupRestream: TGoLiveChecklistItemState;
+    startVideoTransmission: TGoLiveChecklistItemState;
+    publishYoutubeBroadcast: TGoLiveChecklistItemState;
+    tweetWhenGoLive: TGoLiveChecklistItemState;
+  };
+}
+
+export type TGoLiveChecklistItemState = 'not-started' | 'pending' | 'done' | 'failed';
+
+export interface IStreamError {
+  message: string;
+  details?: string;
+}
+
+export interface IPlatformStatus {
+  error?: { message: string };
+  viewersCount: number;
+  chatUrl: string;
+  streamUrl: string;
+  dashboardUrl: string;
+  settings: IPlatformStreamSettings;
+}
+
+export interface IGoLiveSettings {
+  commonFields: {
+    title: string;
+    description: string;
+  };
+  destinations: {
+    twitch: IPlatformStreamSettings & ITwitchStartStreamOptions;
+    youtube: IPlatformStreamSettings & IYoutubeStartStreamOptions;
+    facebook: IPlatformStreamSettings & IFacebookStartStreamOptions;
+    mixer: IPlatformStreamSettings & IMixerStartStreamOptions;
+  };
+  useOptimizedProfile: boolean;
+  selectedProfile: IEncoderProfile;
+  advancedMode: boolean;
+}
+
+export interface IPlatformStreamSettings {
+  enabled: boolean;
+  useCustomTitleAndDescription: boolean;
+}
+
 export interface IStreamingServiceState {
   streamingStatus: EStreamingState;
   streamingStatusTime: string;
@@ -30,6 +90,7 @@ export interface IStreamingServiceState {
   replayBufferStatus: EReplayBufferState;
   replayBufferStatusTime: string;
   selectiveRecording: boolean;
+  info: IStreamInfo;
 }
 
 export interface IStreamingServiceApi {

@@ -17,9 +17,14 @@ import { StreamSettingsService } from 'services/settings/streaming';
 import { Subject } from 'rxjs';
 import { CustomizationService } from 'services/customization';
 import { IInputMetadata } from '../../components/shared/inputs';
+import { IFacebookStartStreamOptions } from './facebook';
+import { IGoLiveSettings } from '../streaming';
 
 interface IMixerServiceState {
   typeIdMap: object;
+  streamKey: string;
+  streamPageUrl: string;
+  settings: IMixerStartStreamOptions;
 }
 
 interface IMixerRawChannel {
@@ -58,7 +63,15 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
 
   static initialState: IMixerServiceState = {
     typeIdMap: {},
+    streamKey: '',
+    streamPageUrl: '',
+    settings: {
+      title: '',
+      game: '',
+    },
   };
+
+  readonly displayName = 'Mixer';
 
   @mutation()
   private ADD_GAME_MAPPING(game: string, id: integer) {
@@ -72,19 +85,19 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
   }
 
   get oauthToken() {
-    return this.userService.platform?.token;
+    return this.userService.state.auth.platforms.mixer?.token;
   }
 
   get mixerUsername() {
-    return this.userService.platform?.username;
+    return this.userService.state.auth.platforms.mixer?.username;
   }
 
   get mixerId() {
-    return this.userService.platform?.id;
+    return this.userService.state.auth.platforms.mixer?.id;
   }
 
   get channelId() {
-    return this.userService.channelId;
+    return this.userService.state.auth.platforms.mixer?.channelId;
   }
 
   init() {
@@ -177,7 +190,16 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
       chatUrl: this.getChatUrl(channelId),
       ...patch,
     };
+    this.SET_STREAM_PAGE_URL(`https://mixer.com/${this.mixerUsername}`);
     this.channelInfoChanged.next(this.activeChannel);
+  }
+
+  async fetchGoLiveSettings(): Promise<IMixerStartStreamOptions> {
+    await this.prepopulateInfo();
+    return {
+      title: this.activeChannel.title,
+      game: this.activeChannel.game,
+    };
   }
 
   fetchViewerCount(): Promise<number> {
@@ -219,16 +241,15 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     return `https://mixer.com/embed/chat/${channelId}`;
   }
 
-  async beforeGoLive(startStreamOptions?: IMixerStartStreamOptions) {
+  async beforeGoLive(settings?: IGoLiveSettings) {
     const key = await this.fetchStreamKey();
 
     if (this.streamSettingsService.isSafeToModifyStreamKey()) {
       this.streamSettingsService.setSettings({ key, platform: 'mixer', streamType: 'rtmp_common' });
     }
 
-    if (startStreamOptions) await this.putChannelInfo(startStreamOptions);
-
-    return key;
+    if (settings) await this.putChannelInfo(settings.destinations.mixer);
+    this.SET_STREAM_KEY(key);
   }
 
   // TODO: dedup
@@ -247,5 +268,15 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
    */
   getErrorDescription(error: IPlatformResponse<unknown>): string {
     return 'Can not connect to Mixer';
+  }
+
+  @mutation()
+  private SET_STREAM_KEY(key: string) {
+    this.state.streamKey = key;
+  }
+
+  @mutation()
+  private SET_STREAM_PAGE_URL(url: string) {
+    this.state.streamPageUrl = url;
   }
 }

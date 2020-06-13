@@ -6,7 +6,7 @@ import electron, { ipcRenderer } from 'electron';
 import url from 'url';
 import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
-import { StreamInfoService } from './stream-info';
+import { StreamInfoDeprecatedService } from './stream-info-deprecated';
 import { InitAfter } from './core';
 import Utils from './utils';
 
@@ -15,7 +15,7 @@ export class ChatService extends Service {
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() windowsService: WindowsService;
-  @Inject() streamInfoService: StreamInfoService;
+  @Inject() streamInfoService: StreamInfoDeprecatedService;
 
   private chatView: Electron.BrowserView | null;
   private chatUrl = '';

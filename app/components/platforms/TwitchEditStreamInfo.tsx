@@ -14,52 +14,51 @@ import { IListOption, metadata } from '../shared/inputs';
 import { $t } from '../../services/i18n';
 import { getPlatformService } from '../../services/platforms';
 import { Debounce } from 'lodash-decorators/debounce';
+import { IGoLiveSettings } from '../../services/streaming';
 
 class TwitchEditStreamProps {
   showOnlyRequiredFields? = false;
-  value: ITwitchStartStreamOptions = {
+  value?: IGoLiveSettings['destinations']['twitch'] = {
     title: '',
     game: '',
     tags: [],
+    enabled: true,
+    useCustomTitleAndDescription: false,
   };
 }
 
 @Component({ components: { TwitchTagsInput }, props: createProps(TwitchEditStreamProps) })
 export default class TwitchEditStreamInfo extends TsxComponent<TwitchEditStreamProps> {
   @Inject() private twitchService: TwitchService;
-  channelInfo: ITwitchStartStreamOptions = null;
+  settings: IGoLiveSettings['destinations']['twitch'] = null;
 
   created() {
-    this.channelInfo = {
-      title: '',
-      game: '',
-      tags: [],
-    };
+    this.syncValue(this.value);
   }
 
   @Watch('value')
-  syncValue(val: TwitchEditStreamProps) {
-    this.channelInfo = cloneDeep(val.value);
+  syncValue(val: IGoLiveSettings['destinations']['twitch']) {
+    this.settings = cloneDeep(val);
   }
 
   emitInput() {
-    this.$emit('input', this.channelInfo);
+    this.$emit('input', this.settings);
   }
-
-  private onGameInputHandler() {}
 
   searchingGames = false;
   private gameOptions: IListOption<string>[] = [];
-  private gameMetadata = metadata.list({
-    title: $t('Game'),
-    placeholder: $t('Start typing to search'),
-    options: this.gameOptions,
-    loading: this.searchingGames,
-    internalSearch: false,
-    allowEmpty: true,
-    noResult: $t('No matching game(s) found.'),
-    required: true,
-  });
+  private get gameMetadata() {
+    return metadata.list({
+      title: $t('Game'),
+      placeholder: $t('Start typing to search'),
+      options: this.gameOptions,
+      loading: this.searchingGames,
+      internalSearch: false,
+      allowEmpty: true,
+      noResult: $t('No matching game(s) found.'),
+      required: true,
+    });
+  }
 
   @Debounce(500)
   async onGameSearchHandler(searchString: string) {
@@ -83,28 +82,25 @@ export default class TwitchEditStreamInfo extends TsxComponent<TwitchEditStreamP
     }
   }
 
-  render(createElement: Function) {
+  private render() {
     return (
       <ValidatedForm onInput={this.emitInput}>
-        {!this.props.showOnlyRequiredFields &&
-          createElement(TwitchTagsInput, {
-            props: {
-              value: this.channelInfo.tags,
-              tags: this.channelInfo,
-              availableTags: [],
-              hasPermission: true,
-            },
-          })}
+        {!this.props.showOnlyRequiredFields && (
+          <TwitchTagsInput
+            tags={this.twitchService.state.availableTags}
+            hasPermission={this.twitchService.state.hasUpdateTagsPermission}
+            vModel={this.settings.tags}
+          />
+        )}
         <HFormGroup title={this.gameMetadata.title}>
           <ListInput
-            onSearchChange={val => console.log('search change', val)}
-            // onInput={this.onGameInput}
-            vModel={this.channelInfo.game}
+            handleSearchChange={val => this.onGameSearchHandler(val)}
+            vModel={this.settings.game}
             metadata={this.gameMetadata}
           />
         </HFormGroup>
         {!this.props.showOnlyRequiredFields && (
-          <StreamTitleAndDescription vModel={this.channelInfo} allowCustom={true} />
+          <StreamTitleAndDescription vModel={this.settings} allowCustom={true} />
         )}
       </ValidatedForm>
     );

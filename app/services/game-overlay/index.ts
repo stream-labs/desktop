@@ -8,7 +8,7 @@ import { WindowsService } from '../windows';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
 import { $t } from 'services/i18n';
-import { StreamInfoService } from 'services/stream-info';
+import { StreamInfoDeprecatedService } from 'services/stream-info-deprecated';
 
 const { BrowserWindow } = electron.remote;
 
@@ -52,7 +52,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() windowsService: WindowsService;
-  @Inject() streamInfoService: StreamInfoService;
+  @Inject() streamInfoService: StreamInfoDeprecatedService;
 
   static defaultState: GameOverlayState = {
     isEnabled: false,

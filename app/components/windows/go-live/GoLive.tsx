@@ -1,7 +1,7 @@
 import TsxComponent from 'components/tsx-component';
 import ModalLayout from 'components/ModalLayout.vue';
 import { $t } from 'services/i18n';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import PlatformLogo from 'components/shared/PlatformLogo';
 import styles from './GoLive.m.less';
 import { Inject } from 'services/core';
@@ -20,32 +20,43 @@ import HFormGroup from '../../shared/inputs/HFormGroup.vue';
 import { Twitter } from '../../Twitter';
 import { IEncoderProfile } from 'services/video-encoding-optimizations';
 import { WindowsService } from 'services/windows';
-import { StreamInfoService } from 'services/stream-info';
+import { StreamInfoDeprecatedService } from 'services/stream-info-deprecated';
+import { YoutubeService } from '../../../services/platforms/youtube';
+import {
+  IGoLiveSettings,
+  IPlatformStreamSettings,
+  IStreamInfo,
+  StreamingService,
+} from 'services/streaming';
 
-interface IPlatformStreamSettings {
-  enabled: boolean;
-  useCustomTitleAndDescription: boolean;
-  values: Dictionary<unknown>;
-}
+import { Spinner, ProgressBar } from 'streamlabs-beaker';
+import cloneDeep from 'lodash/cloneDeep';
+import { StreamSettingsService } from '../../../services/settings/streaming';
+import ValidatedForm from '../../shared/inputs/ValidatedForm';
+import GoLiveChecklist from './GoLiveChecklist';
 
 @Component({})
 export default class GoLiveWindow extends TsxComponent<{}> {
   @Inject() private userService: UserService;
   @Inject() private settingsService: SettingsService;
-  @Inject() private streamInfoService: StreamInfoService;
+  @Inject() private streamingService: StreamingService;
+  @Inject() private streamSettingsService: StreamSettingsService;
+  @Inject() private windowsService: WindowsService;
+  @Inject('StreamInfoDeprecatedService') private streamInfoService: StreamInfoDeprecatedService;
+
+  $refs: {
+    settingsForm: ValidatedForm;
+  };
 
   private get userName() {
     return this.userService.username;
   }
 
-  private useOptimizedProfile = true;
+  private settings: IGoLiveSettings = null;
 
-  private platforms: { [key in TPlatform]: IPlatformStreamSettings } = null;
-
-  private streamInfo = {
-    title: '',
-    description: '',
-  };
+  private get platforms() {
+    return this.settings.destinations;
+  }
 
   private components = {
     youtube: YoutubeEditStreamInfo,
@@ -54,8 +65,27 @@ export default class GoLiveWindow extends TsxComponent<{}> {
     mixer: MixerEditStreamInfo,
   };
 
+  private get state() {
+    return this.streamingService.views;
+  }
+
   private get isAdvancedMode() {
-    return this.streamInfoService.state.advancedMode;
+    return this.state.goLiveSettings.advancedMode;
+  }
+
+  private get lifecycleStep() {
+    return this.state.info.lifecycle;
+  }
+
+  @Watch('lifecycleStep')
+  private onLifecycleStepChangeHandler(step: IStreamInfo['lifecycle']) {
+    // close the window when we're live
+    // if (this.lifecycleStep === 'live') this.windowsService.actions.closeChildWindow();
+  }
+
+  @Watch('settings', { deep: true, immediate: true })
+  private onSettingsChange() {
+    console.log('settings changed', this.settings);
   }
 
   private get formMetadata() {
@@ -72,24 +102,9 @@ export default class GoLiveWindow extends TsxComponent<{}> {
     });
   }
 
-  created() {
-    const platformTypes: TPlatform[] = ['facebook', 'mixer', 'twitch', 'youtube'];
-    const platformSettings: Dictionary<IPlatformStreamSettings> = {};
-    platformTypes.forEach(platformType => {
-      const service = getPlatformService(platformType);
-      const fields = service.getStreamFields();
-      const values = {};
-      Object.keys(fields).forEach(fieldName => {
-        values[fieldName] = '';
-      });
-
-      platformSettings[platformType] = {
-        enabled: true,
-        useCustomTitleAndDescription: false,
-        values,
-      };
-    });
-    this.platforms = platformSettings as { [key in TPlatform]: IPlatformStreamSettings };
+  async created() {
+    // fetch platforms' data
+    this.streamingService.actions.prepopulateInfo();
   }
 
   private get enabledPlatforms(): TPlatform[] {
@@ -97,8 +112,6 @@ export default class GoLiveWindow extends TsxComponent<{}> {
       platform => this.platforms[platform].enabled,
     ) as TPlatform[];
   }
-
-  selectedProfile: IEncoderProfile = null;
 
   get optimizedProfileMetadata() {
     const gamName = 'Unknown';
@@ -112,8 +125,8 @@ export default class GoLiveWindow extends TsxComponent<{}> {
     };
   }
 
-  private capitalize(str: string): string {
-    return str.charAt(0).toUpperCase() + str.slice(1);
+  private getPlatformName(platform: TPlatform): string {
+    return getPlatformService(platform).displayName;
   }
 
   private showManagePlatforms() {
@@ -121,85 +134,168 @@ export default class GoLiveWindow extends TsxComponent<{}> {
   }
 
   private switchAdvancedMode(enabled: boolean) {
-    this.streamInfoService.updateInfo({ advancedMode: enabled });
+    this.streamSettingsService.setGoLiveSettings({ advancedMode: enabled });
     this.streamInfoService.showEditStreamInfo();
   }
 
+  private async goLive(force = false) {
+    const errors = await this.$refs.settingsForm.validateAndGetErrorsCount();
+    if (errors) return;
+    this.streamingService.actions.goLive(this.settings);
+
+    // try {
+    //   this.updatingInfo = true;
+    //   await this.streamingService.toggleStreaming(this.channelInfo, force);
+    //   this.streamInfoService.createGameAssociation(this.channelInfo.game);
+    //   this.windowsService.closeChildWindow();
+    //   // youtube needs additional actions after the stream has been started
+    //   if (
+    //     (this.windowQuery.platforms && this.windowQuery.platforms.includes('youtube')) ||
+    //     this.isYoutube
+    //   ) {
+    //     (getPlatformService('youtube') as YoutubeService).showStreamStatusWindow();
+    //   }
+    // } catch (e) {
+    //   const message = this.platformService.getErrorDescription(e);
+    //   this.$toasted.show(message, {
+    //     position: 'bottom-center',
+    //     className: 'toast-alert',
+    //     duration: 1000,
+    //     singleton: true,
+    //   });
+    //   this.infoError = true;
+    //   this.updatingInfo = false;
+    // }
+  }
+
+  private close() {
+    this.windowsService.closeChildWindow();
+  }
+
+  /**
+   * Renders the main component template
+   **/
   render() {
-    const hasPlatforms = this.enabledPlatforms.length > 0;
+    const isIdleMode = this.state.info.lifecycle === 'idle';
+    const isLoadingMode = this.state.info.lifecycle === 'channelPrefetch';
+    const isChecklistMode = !isIdleMode && !isLoadingMode;
     return (
       <ModalLayout customControls={true} showControls={false}>
-        <div slot="content" class="flex">
-          <div style={{ width: '400px', marginRight: '42px' }}>
-            {Object.keys(this.platforms).map((platform: TPlatform) =>
-              this.renderPlatformSwitcher(platform),
-            )}
-            {/*<div class={styles.rightText}>*/}
-            {/*  <a href="#" class={styles.managePlatformsLink} onclick={this.showManagePlatforms}>*/}
-            {/*    {$t('Manage Platforms')}*/}
-            {/*  </a>*/}
-            {/*</div>*/}
-          </div>
-          {!hasPlatforms && (
-            <div style={{ width: '100%' }}> Enable at least one destination to start streaming</div>
-          )}
-
-          {hasPlatforms && (
-            <div style={{ width: '100%' }}>
-              {this.renderGeneralForm()}
-              {/*{!this.isAdvancedMode && (*/}
-              {/*  <div class={styles.rightText}>*/}
-              {/*    {$t('Looking for more options?')}*/}
-              {/*    &nbsp;*/}
-              {/*    <a class={styles.managePlatformsLink} onClick={() => this.switchAdvancedMode(true)}>*/}
-              {/*      {$t('Switch Advanced Mode ON')}*/}
-              {/*    </a>*/}
-              {/*  </div>*/}
-              {/*)}*/}
-              {this.isAdvancedMode && (
-                <div>
-                  {this.enabledPlatforms.map((platform: TPlatform) =>
-                    this.renderSection(
-                      this.renderPlatformSettings(platform),
-                      this.capitalize(platform) + ' Settings',
-                    ),
-                  )}
-                  {this.renderSection(
-                    <div>
-                      <Twitter streamTitle="" midStreamMode={false} value="" updatingInfo={false} />
-
-                      <div>
-                        <HFormGroup
-                          metadata={{
-                            tooltip: $t(
-                              'Optimized encoding provides better quality and/or lower cpu/gpu usage. Depending on the game, resolution may be changed for a better quality of experience',
-                            ),
-                          }}
-                        >
-                          <BoolInput
-                            vModel={this.useOptimizedProfile}
-                            metadata={this.optimizedProfileMetadata}
-                          />
-                        </HFormGroup>
-                      </div>
-                    </div>,
-                    $t('Extras'),
-                  )}
-                </div>
-              )}
-            </div>
-          )}
+        <div slot="content">
+          {isLoadingMode && this.renderLoading()}
+          {isIdleMode && this.renderSettings()}
+          {isChecklistMode && <GoLiveChecklist />}
         </div>
+        <div slot="controls">{this.renderControls()}</div>
+      </ModalLayout>
+    );
+  }
 
-        <div
-          slot="controls"
-          class="controls"
-          style={{ display: 'flex', 'flex-direction': 'row-reverse' }}
-        >
-          <button class={cx('button button--action', styles.goLiveButton)}>
+  private renderLoading() {
+    return <Spinner />;
+  }
+
+  private renderErrors() {
+    return <div>Errors are found</div>;
+  }
+
+  /**
+   * Renders the form with stream settings
+   **/
+  private renderSettings() {
+    // create a copy of a settings model if not exist
+    if (!this.settings) this.settings = cloneDeep(this.streamingService.views.goLiveSettings);
+
+    const hasPlatforms = this.enabledPlatforms.length > 0;
+    return (
+      <ValidatedForm class="flex" ref="settingsForm">
+        <div style={{ width: '400px', marginRight: '42px' }}>
+          {Object.keys(this.platforms).map((platform: TPlatform) =>
+            this.renderPlatformSwitcher(platform),
+          )}
+          {/*<div class={styles.rightText}>*/}
+          {/*  <a href="#" class={styles.managePlatformsLink} onclick={this.showManagePlatforms}>*/}
+          {/*    {$t('Manage Platforms')}*/}
+          {/*  </a>*/}
+          {/*</div>*/}
+        </div>
+        {!hasPlatforms && (
+          <div style={{ width: '100%' }}> Enable at least one destination to start streaming</div>
+        )}
+        {hasPlatforms && (
+          <div style={{ width: '100%' }}>
+            {this.renderGeneralForm()}
+            {/*{!this.isAdvancedMode && (*/}
+            {/*  <div class={styles.rightText}>*/}
+            {/*    {$t('Looking for more options?')}*/}
+            {/*    &nbsp;*/}
+            {/*    <a class={styles.managePlatformsLink} onClick={() => this.switchAdvancedMode(true)}>*/}
+            {/*      {$t('Switch Advanced Mode ON')}*/}
+            {/*    </a>*/}
+            {/*  </div>*/}
+            {/*)}*/}
+            {this.isAdvancedMode && (
+              <div>
+                {this.enabledPlatforms.map((platform: TPlatform) =>
+                  this.renderSection(
+                    this.renderPlatformSettings(platform),
+                    this.getPlatformName(platform) + ' Settings',
+                  ),
+                )}
+                {this.renderSection(
+                  <div>
+                    <Twitter streamTitle="" midStreamMode={false} value="" updatingInfo={false} />
+
+                    <div>
+                      <HFormGroup
+                        metadata={{
+                          tooltip: $t(
+                            'Optimized encoding provides better quality and/or lower cpu/gpu usage. Depending on the game, resolution may be changed for a better quality of experience',
+                          ),
+                        }}
+                      >
+                        <BoolInput
+                          vModel={this.settings.useOptimizedProfile}
+                          metadata={this.optimizedProfileMetadata}
+                        />
+                      </HFormGroup>
+                    </div>
+                  </div>,
+                  $t('Extras'),
+                )}
+              </div>
+            )}
+          </div>
+        )}
+        )
+      </ValidatedForm>
+    );
+  }
+
+  private renderControls() {
+    const isIdle = this.state.info.lifecycle === 'idle';
+    return (
+      <div class="controls" style={{ display: 'flex', 'flex-direction': 'row-reverse' }}>
+        {/* GO LIVE BUTTON */}
+        {isIdle && (
+          <button
+            class={cx('button button--action', styles.goLiveButton)}
+            onClick={() => this.goLive()}
+          >
             {$t('Confirm and Go Live')}
           </button>
-          <button class="button button--default">{$t('Cancel')}</button>
+        )}
+
+        {/* CLOSE BUTTON */}
+        <button
+          onClick={() => this.close()}
+          class={cx('button button--default', styles.cancelButton)}
+        >
+          {$t('Close')}
+        </button>
+
+        {/* ADVANCED MODE SWITCHER */}
+        {isIdle && (
           <div class={styles.modeToggle}>
             <HFormGroup
               onInput={(val: boolean) => this.switchAdvancedMode(val)}
@@ -207,9 +303,13 @@ export default class GoLiveWindow extends TsxComponent<{}> {
               metadata={metadata.toggle({ title: $t('Advanced Mode') })}
             />
           </div>
-        </div>
-      </ModalLayout>
+        )}
+      </div>
     );
+  }
+
+  private renderPrepopulateInfo() {
+    return <div></div>;
   }
 
   private renderPlatformSwitcher(platform: TPlatform) {
@@ -226,7 +326,7 @@ export default class GoLiveWindow extends TsxComponent<{}> {
           <PlatformLogo platform={platform} class={styles[`platform-logo-${platform}`]} />
         </div>
         <div class="account">
-          <span class={styles.platformName}>Stream to {this.capitalize(platform)}</span> <br />
+          <span class={styles.platformName}>Stream to {this.getPlatformName(platform)}</span> <br />
           {this.userName} <br />
         </div>
       </div>
@@ -236,7 +336,7 @@ export default class GoLiveWindow extends TsxComponent<{}> {
   private renderGeneralForm() {
     return this.renderSection(
       <div>
-        <StreamTitleAndDescription vModel={this.streamInfo} />
+        <StreamTitleAndDescription vModel={this.settings.commonFields} />
         {!this.isAdvancedMode &&
           this.enabledPlatforms.map((platform: TPlatform) =>
             this.renderPlatformSettings(platform, true),
@@ -255,16 +355,41 @@ export default class GoLiveWindow extends TsxComponent<{}> {
   }
 
   private renderPlatformSettings(platform: TPlatform, showOnlyRequiredFields = false) {
-    const SettingsComponent = this.components[platform];
-
-    return (
-      <div>
-        <SettingsComponent
-          value={{ description: '', title: '', broadcastId: '' }}
-          canChangeBroadcast={true}
+    if (platform === 'twitch') {
+      return (
+        <TwitchEditStreamInfo
+          vModel={this.settings.destinations.twitch}
           showOnlyRequiredFields={showOnlyRequiredFields}
         />
-      </div>
-    );
+      );
+    }
+
+    if (platform === 'facebook') {
+      return (
+        <FacebookEditStreamInfo
+          vModel={this.settings.destinations.facebook}
+          showOnlyRequiredFields={showOnlyRequiredFields}
+        />
+      );
+    }
+
+    if (platform === 'youtube') {
+      return (
+        <YoutubeEditStreamInfo
+          vModel={this.settings.destinations.youtube}
+          showOnlyRequiredFields={showOnlyRequiredFields}
+          canChangeBroadcast={true}
+        />
+      );
+    }
+
+    if (platform === 'mixer') {
+      return (
+        <MixerEditStreamInfo
+          vModel={this.settings.destinations.mixer}
+          showOnlyRequiredFields={showOnlyRequiredFields}
+        />
+      );
+    }
   }
 }

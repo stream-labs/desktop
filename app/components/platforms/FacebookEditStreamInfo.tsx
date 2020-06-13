@@ -10,57 +10,64 @@ import { ListInput } from '../shared/inputs/inputs';
 import { formMetadata, IListOption, metadata } from '../shared/inputs';
 import { $t } from '../../services/i18n';
 import { FacebookService, IFacebookStartStreamOptions } from '../../services/platforms/facebook';
+import { IGoLiveSettings } from '../../services/streaming';
 
 class Props {
   showOnlyRequiredFields? = false;
+  value?: IGoLiveSettings['destinations']['facebook'] = {
+    facebookPageId: '',
+    title: '',
+    game: '',
+    enabled: true,
+    useCustomTitleAndDescription: false,
+  };
 }
 
 @Component({ props: createProps(Props) })
 export default class FacebookEditStreamInfo extends TsxComponent<Props> {
   @Inject() private facebookService: FacebookService;
-  channelInfo: IFacebookStartStreamOptions = null;
+  settings: IFacebookStartStreamOptions = null;
 
-  async created() {
-    this.channelInfo = {
-      facebookPageId: '',
-      title: '',
-      game: '',
-      description: '',
-    };
+  created() {
+    this.syncValue(this.value);
   }
 
-  private formMetadata = formMetadata({
-    page: metadata.list({
-      title: $t('Facebook Page'),
-      fullWidth: true,
-      options: [], /// this.facebookService.state.facebookPages.options,
-      required: true,
-    }),
-    game: metadata.text({
-      title: $t('Game'),
-      fullWidth: true,
-    }),
-  });
+  @Watch('value')
+  syncValue(val: IGoLiveSettings['destinations']['facebook']) {
+    this.settings = cloneDeep(val);
+  }
+
+  emitInput() {
+    this.$emit('input', this.settings);
+  }
+  private get formMetadata() {
+    return formMetadata({
+      page: metadata.list({
+        title: $t('Facebook Page'),
+        fullWidth: true,
+        options: this.facebookService.state.facebookPages.options,
+        required: true,
+      }),
+      game: metadata.text({
+        title: $t('Game'),
+        fullWidth: true,
+        required: true,
+      }),
+    });
+  }
 
   render() {
     const showOnlyRequiredFields = this.props.showOnlyRequiredFields;
     return (
-      <ValidatedForm>
+      <ValidatedForm onInput={this.emitInput}>
         <HFormGroup title={this.formMetadata.page.title}>
-          <ListInput
-            onSearchChange={val => console.log('search change', val)}
-            // onInput={this.onGameInput}
-            vModel={this.channelInfo.facebookPageId}
-            metadata={this.formMetadata.page}
-          />
+          <ListInput vModel={this.settings.facebookPageId} metadata={this.formMetadata.page} />
         </HFormGroup>
 
-        {!showOnlyRequiredFields && (
-          <HFormGroup metadata={this.formMetadata.game} vModel={this.channelInfo.game} />
-        )}
+        <HFormGroup metadata={this.formMetadata.game} vModel={this.settings.game} />
 
         {!showOnlyRequiredFields && (
-          <StreamTitleAndDescription vModel={this.channelInfo} allowCustom={true} />
+          <StreamTitleAndDescription vModel={this.settings} allowCustom={true} />
         )}
       </ValidatedForm>
     );

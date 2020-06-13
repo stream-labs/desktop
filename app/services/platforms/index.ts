@@ -1,5 +1,5 @@
 import { ITwitchChannelInfo, ITwitchStartStreamOptions, TwitchService } from './twitch';
-import { IYoutubeChannelInfo, IYoutubeStartStreamOptions, YoutubeService } from './youtube';
+import { IYoutubeStartStreamOptions, YoutubeService } from './youtube';
 import { IMixerChannelInfo, IMixerStartStreamOptions, MixerService } from './mixer';
 import { FacebookService, IFacebookChannelInfo, IFacebookStartStreamOptions } from './facebook';
 import { TTwitchTag } from './twitch/tags';
@@ -7,6 +7,7 @@ import { TTwitchOAuthScope } from './twitch/scopes';
 import { Observable } from 'rxjs';
 import { IPlatformResponse } from './utils';
 import { IInputMetadata } from '../../components/shared/inputs';
+import { IGoLiveSettings } from '../streaming';
 
 export type Tag = TTwitchTag;
 export interface IGame {
@@ -103,11 +104,7 @@ export type TStartStreamOptions =
   | Partial<IFacebookStartStreamOptions>
   | IMixerStartStreamOptions;
 
-export type TChannelInfo =
-  | IYoutubeChannelInfo
-  | ITwitchChannelInfo
-  | Partial<IFacebookChannelInfo>
-  | IMixerChannelInfo;
+export type TChannelInfo = ITwitchChannelInfo | Partial<IFacebookChannelInfo> | IMixerChannelInfo;
 
 // All platform services should implement this interface.
 export interface IPlatformService {
@@ -117,7 +114,7 @@ export interface IPlatformService {
     capability: T,
   ): this is TPlatformCapabilityMap[T] & IPlatformService;
 
-  channelInfoChanged: Observable<TChannelInfo>;
+  // channelInfoChanged: Observable<TChannelInfo>;
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions;
 
@@ -140,7 +137,10 @@ export interface IPlatformService {
    * Sets up the stream key and live broadcast info required to go live.
    * Returns the stream key.
    */
-  beforeGoLive: (options?: TStartStreamOptions) => Promise<string | null>;
+  // TODO get rid of any
+  beforeGoLive: (options: IGoLiveSettings) => void;
+
+  // fetchGoLiveSettings: () => Promise<TStartStreamOptions>;
 
   afterGoLive?: () => Promise<void>;
 
@@ -159,12 +159,15 @@ export interface IPlatformService {
 
   liveDockEnabled: () => boolean;
 
-  /**
-   * Get user-friendly error message
-   */
-  getErrorDescription: (error: IPlatformResponse<unknown>) => string;
+  readonly displayName: string;
 
-  getStreamFields(): Dictionary<IInputMetadata>;
+  // getStreamFields(): Dictionary<IInputMetadata>;
+
+  state: {
+    streamKey: string;
+    settings: TStartStreamOptions;
+    streamPageUrl: string;
+  };
 }
 
 export interface IUserAuth {

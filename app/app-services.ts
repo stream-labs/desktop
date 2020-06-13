@@ -71,7 +71,7 @@ export { IncrementalRolloutService } from 'services/incremental-rollout';
 export { CrashReporterService } from 'services/crash-reporter';
 export { PatchNotesService } from 'services/patch-notes';
 export { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
-export { StreamInfoService } from './services/stream-info';
+export { StreamInfoDeprecatedService } from './services/stream-info-deprecated';
 export { StreamingService } from 'services/streaming';
 export { StreamlabelsService } from 'services/streamlabels';
 export { AutoConfigService } from 'services/auto-config';

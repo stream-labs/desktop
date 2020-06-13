@@ -17,6 +17,8 @@ import { $t } from 'services/i18n';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { Subject } from 'rxjs';
 import { assertIsDefined } from '../../util/properties-type-guards';
+import { IYoutubeStartStreamOptions } from './youtube';
+import { IGoLiveSettings } from '../streaming';
 
 interface IFacebookPage {
   access_token: string;
@@ -48,16 +50,19 @@ export interface IStreamlabsFacebookPages {
 }
 
 interface IFacebookServiceState {
+  enabled: boolean;
   activePage: IFacebookPage | null;
   liveVideoId: number | null;
+  streamPageUrl: string;
   streamUrl: string | null;
-  streamProperties: { title?: string; description?: string; game?: string };
+  streamKey: string;
+  settings: IFacebookStartStreamOptions;
   facebookPages: IStreamlabsFacebookPages | null;
 }
 
 export interface IFacebookStartStreamOptions {
-  facebookPageId?: string;
-  title?: string;
+  facebookPageId: string;
+  title: string;
   game?: string;
   description?: string;
 }
@@ -73,6 +78,8 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   @Inject() streamSettingsService: StreamSettingsService;
   @Inject() userService: UserService;
 
+  readonly displayName = 'Facebook';
+
   capabilities = new Set<TPlatformCapability>([
     'chat',
     'user-info',
@@ -86,11 +93,14 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   authWindowOptions: Electron.BrowserWindowConstructorOptions = { width: 800, height: 800 };
 
   static initialState: IFacebookServiceState = {
+    enabled: true,
     activePage: null,
     liveVideoId: null,
     streamUrl: null,
-    streamProperties: { title: undefined, description: undefined, game: undefined },
+    streamPageUrl: '',
+    settings: null,
     facebookPages: null,
+    streamKey: '',
   };
 
   @mutation()
@@ -101,6 +111,11 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   @mutation()
   private SET_LIVE_VIDEO_ID(id: number | null) {
     this.state.liveVideoId = id;
+    const pathToPage = `${this.state.activePage.name}-${this.state.activePage.id}`.replace(
+      ' ',
+      '-',
+    );
+    this.state.streamPageUrl = `https://www.facebook.com/${pathToPage}/live_videos`;
   }
 
   @mutation()
@@ -109,8 +124,18 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   }
 
   @mutation()
-  private SET_STREAM_PROPERTIES(title?: string, description?: string, game?: string) {
-    this.state.streamProperties = { title, description, game };
+  private SET_STREAM_KEY(streamKey: string) {
+    this.state.streamKey = streamKey;
+  }
+
+  @mutation()
+  private SET_STREAM_PROPERTIES(
+    title: string,
+    description: string,
+    game: string,
+    facebookPageId: string,
+  ) {
+    this.state.settings = { title, description, game, facebookPageId };
   }
 
   @mutation()
@@ -171,6 +196,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
       const activePage = json.data.filter(page => pageId === page.id)[0] || json.data[0];
       this.userService.updatePlatformChannelId('facebook', pageId);
       this.SET_ACTIVE_PAGE(activePage);
+      this.SET_STREAM_PROPERTIES('', '', '', activePage.id);
     });
   }
 
@@ -179,7 +205,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   }
 
   private createLiveVideo(): Promise<string> {
-    const { title, description, game } = this.state.streamProperties;
+    const { title, description, game } = this.state.settings;
     const data = {
       method: 'POST',
       body: JSON.stringify({ title, description, game_specs: { name: game } }),
@@ -198,6 +224,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
       .then(json => {
         const streamKey = json.stream_url.substr(json.stream_url.lastIndexOf('/') + 1);
         this.SET_LIVE_VIDEO_ID(json.id);
+        this.SET_STREAM_KEY(streamKey);
         this.streamSettingsService.setSettings({ key: streamKey });
         return streamKey;
       })
@@ -236,9 +263,19 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
     );
   }
 
+  // async fetchGoLiveSettings(): Promise<IFacebookStartStreamOptions> {
+  //   await this.prepopulateInfo();
+  //   return {
+  //     facebookPageId: this.state.activePage!.id,
+  //     title: this.state.settings.title,
+  //     game: this.state.settings.game,
+  //     description: this.state.settings.description,
+  //   };
+  // }
+
   emitChannelInfo() {
     this.channelInfoChanged.next({
-      ...(this.state.streamProperties as IFacebookChannelInfo),
+      ...(this.state.settings as IFacebookChannelInfo),
       facebookPageId: this.state.activePage!.id,
       streamUrl: this.state.streamUrl!,
       chatUrl: this.getChatUrl(),
@@ -280,9 +317,9 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
       .catch(() => 0);
   }
 
-  async beforeGoLive(options: IFacebookStartStreamOptions) {
+  async beforeGoLive(options: IGoLiveSettings) {
     await this.prepopulateInfo();
-    await this.putChannelInfo(options);
+    await this.putChannelInfo(options.destinations.facebook);
     this.streamSettingsService.setSettings({ platform: 'facebook', streamType: 'rtmp_common' });
 
     // This generally happens when a stream was scheduled, or when we
@@ -309,7 +346,7 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
 
   async putChannelInfo(info: IFacebookStartStreamOptions): Promise<boolean> {
     const { title, description, game, facebookPageId } = info;
-    this.SET_STREAM_PROPERTIES(title, description, game);
+    this.SET_STREAM_PROPERTIES(title, description, game, facebookPageId);
     assertIsDefined(facebookPageId);
     await this.postPage(facebookPageId);
     if (this.state.liveVideoId && game) {

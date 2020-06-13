@@ -6,6 +6,8 @@ import { TPlatform, getPlatformService } from 'services/platforms';
 import { invert } from 'lodash';
 import { MixerService, TwitchService } from '../../../app-services';
 import { PlatformAppsService } from 'services/platform-apps';
+import { IGoLiveSettings } from '../../streaming';
+import { IEncoderProfile } from '../../video-encoding-optimizations';
 
 /**
  * settings that we keep in the localStorage
@@ -35,6 +37,8 @@ interface IStreamSettingsState {
    * show warning if no sources exists before going live
    */
   warnNoVideoSources: boolean;
+
+  goLiveSettings: IGoLiveSettings | null;
 }
 
 /**
@@ -78,6 +82,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     title: '',
     description: '',
     warnNoVideoSources: true,
+    goLiveSettings: null,
   };
 
   init() {
@@ -140,6 +145,10 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     this.settingsService.setSettings('Stream', streamFormData);
   }
 
+  setGoLiveSettings(settingsPatch: Partial<IGoLiveSettings>) {
+    this.setSettings({ goLiveSettings: { ...this.state.goLiveSettings, ...settingsPatch } });
+  }
+
   /**
    * obtain stream settings in a single object
    */
@@ -154,6 +163,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       description: this.state.description,
       warnNoVideoSources: this.state.warnNoVideoSources,
       protectedModeMigrationRequired: this.state.protectedModeMigrationRequired,
+      goLiveSettings: this.state.goLiveSettings,
       platform: invert(platformToServiceNameMap)[obsStreamSettings.service] as TPlatform,
       key: obsStreamSettings.key,
       server: obsStreamSettings.server,
@@ -263,6 +273,10 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     }
 
     return false;
+  }
+
+  get allPlatforms(): TPlatform[] {
+    return ['facebook', 'mixer', 'twitch', 'youtube'];
   }
 
   @mutation()

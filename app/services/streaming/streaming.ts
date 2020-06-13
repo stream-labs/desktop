@@ -1,4 +1,4 @@
-import { StatefulService, mutation } from 'services/core/stateful-service';
+import { StatefulService, mutation, ViewHandler } from 'services/core/stateful-service';
 import * as obs from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import moment from 'moment';
@@ -13,10 +13,14 @@ import {
   EStreamingState,
   ERecordingState,
   EReplayBufferState,
+  IGoLiveSettings,
+  IStreamInfo,
+  TGoLiveChecklistItemState,
+  IStreamError,
 } from './streaming-api';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { $t } from 'services/i18n';
-import { StreamInfoService } from 'services/stream-info';
+import { StreamInfoDeprecatedService } from 'services/stream-info-deprecated';
 import { getPlatformService, TStartStreamOptions, TPlatform } from 'services/platforms';
 import { UserService } from 'services/user';
 import {
@@ -34,6 +38,10 @@ import { RestreamService } from 'services/restream';
 import { ITwitchStartStreamOptions } from 'services/platforms/twitch';
 import { IFacebookStartStreamOptions } from 'services/platforms/facebook';
 import Utils from 'services/utils';
+import Vue from 'vue';
+import { ISourcesState, Source } from '../sources';
+import { cloneDeep } from 'lodash';
+import watch from 'vuex';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -65,7 +73,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @Inject() outputSettingsService: OutputSettingsService;
   @Inject() windowsService: WindowsService;
   @Inject() usageStatisticsService: UsageStatisticsService;
-  @Inject() streamInfoService: StreamInfoService;
+  @Inject('StreamInfoDeprecatedService') streamInfoService: StreamInfoDeprecatedService;
   @Inject() notificationsService: NotificationsService;
   @Inject() userService: UserService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
@@ -84,7 +92,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   powerSaveId: number;
 
-  static initialState = {
+  private resolveStartStreaming: Function = () => {};
+  private rejectStartStreaming: Function = () => {};
+
+  static initialState: IStreamingServiceState = {
     streamingStatus: EStreamingState.Offline,
     streamingStatusTime: new Date().toISOString(),
     recordingStatus: ERecordingState.Offline,
@@ -92,12 +103,176 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     replayBufferStatus: EReplayBufferState.Offline,
     replayBufferStatusTime: new Date().toISOString(),
     selectiveRecording: false,
+    info: {
+      lifecycle: 'channelPrefetch',
+      error: null,
+      goLiveSettings: null,
+      checklist: {
+        applyOptimizedSettings: 'not-started',
+        twitch: 'not-started',
+        youtube: 'not-started',
+        mixer: 'not-started',
+        facebook: 'not-started',
+        setupRestream: 'not-started',
+        startVideoTransmission: 'not-started',
+        publishYoutubeBroadcast: 'not-started',
+        tweetWhenGoLive: 'not-started',
+      },
+    },
   };
 
   init() {
     obs.NodeObs.OBS_service_connectOutputSignals((info: IOBSOutputSignalInfo) => {
       this.handleOBSOutputSignal(info);
     });
+    this.store.watch(
+      () => {
+        return this.state.info;
+      },
+      val => {
+        console.log('InfoChanged', val);
+      },
+      {
+        deep: true,
+      },
+    );
+  }
+
+  get views() {
+    return new StreamInfoView(this.state);
+  }
+
+  async prepopulateInfo() {
+    // TODO catch errors
+    this.UPDATE_STREAM_INFO({ lifecycle: 'channelPrefetch' });
+    for (const platform of this.views.enabledPlatforms) {
+      const service = getPlatformService(platform);
+      try {
+        await service.prepopulateInfo();
+      } catch (e) {
+        // this.UPDATE_PLATFORM_STATUS(platform, { error: e });
+        console.error(e);
+        return;
+      }
+    }
+    this.UPDATE_STREAM_INFO({ lifecycle: 'idle' });
+  }
+
+  async goLive(settings?: IGoLiveSettings) {
+    this.RESET_STREAM_INFO();
+
+    // use default settings if no new settings provided
+    if (!settings) settings = cloneDeep(this.views.goLiveSettings);
+    this.streamSettingsService.setSettings({ goLiveSettings: settings });
+    this.UPDATE_STREAM_INFO({ lifecycle: 'channelSetup', goLiveSettings: settings });
+
+    // copy common title and description for all platforms
+    const destinations = settings.destinations;
+    Object.keys(destinations).forEach((destName: TPlatform) => {
+      const dest = destinations[destName];
+      if (dest.useCustomTitleAndDescription) return;
+      if (dest.title !== void 0) dest.title = settings.commonFields.title;
+      if (dest['description'] !== void 0) dest['description'] = settings.commonFields.description;
+    });
+
+    // call beforeGoLive for each platform
+    // that will update the channel settings for each platform
+    const platforms = this.views.enabledPlatforms;
+    for (const platform of platforms) {
+      const service = getPlatformService(platform);
+      this.SET_CHECKLIST_ITEM(platform, 'pending');
+      try {
+        await service.beforeGoLive(settings);
+      } catch (e) {
+        this.SET_CHECKLIST_ITEM(platform, 'failed', { message: e.message });
+        // something is wrong, stop streaming
+        // this.UPDATE_PLATFORM_STATUS(platform, { error: e });
+        console.error(e);
+        return;
+      }
+      this.SET_CHECKLIST_ITEM(platform, 'done');
+    }
+
+    // setup restream
+    if (this.views.shouldGoLiveWithRestream) {
+      this.SET_CHECKLIST_ITEM('setupRestream', 'pending');
+      let ready = false;
+      try {
+        ready = await this.restreamService.checkStatus();
+        if (!ready) {
+          this.SET_CHECKLIST_ITEM('setupRestream', 'failed', {
+            message: $t('Restream Service is disabled'),
+          });
+        }
+      } catch (e) {
+        // Assume restream is down
+        console.error('Error fetching restreaming service', e);
+        this.SET_CHECKLIST_ITEM('setupRestream', 'failed', {
+          message: $t('Restream Service is disabled'),
+        });
+      }
+      if (!ready) return;
+      try {
+        await this.restreamService.beforeGoLive();
+      } catch (e) {
+        console.error('Failed to setup restream', e);
+        this.SET_CHECKLIST_ITEM('setupRestream', 'failed', {
+          message: $t('Failed to setup restream'),
+        });
+      }
+      this.SET_CHECKLIST_ITEM('setupRestream', 'done');
+    }
+
+    // we are ready to start streaming
+    this.SET_CHECKLIST_ITEM('startVideoTransmission', 'pending');
+    try {
+      await this.finishStartStreaming();
+    } catch (e) {
+      this.SET_CHECKLIST_ITEM('startVideoTransmission', 'failed');
+      return;
+    }
+    this.SET_CHECKLIST_ITEM('startVideoTransmission', 'done');
+
+    // publish the Youtube broadcast
+    if (this.streamSettingsService.protectedModeEnabled && destinations.youtube?.enabled) {
+      this.SET_CHECKLIST_ITEM('publishYoutubeBroadcast', 'pending');
+      try {
+        await getPlatformService('youtube').afterGoLive();
+      } catch (e) {
+        this.SET_CHECKLIST_ITEM('publishYoutubeBroadcast', 'failed', e);
+        return;
+      }
+      this.SET_CHECKLIST_ITEM('publishYoutubeBroadcast', 'done');
+    }
+
+    // tweet we're live
+    // TODO:
+
+    this.UPDATE_STREAM_INFO({ lifecycle: 'live' });
+  }
+
+  @mutation()
+  private UPDATE_STREAM_INFO(statusPatch: Partial<IStreamInfo>) {
+    this.state.info = { ...this.state.info, ...statusPatch };
+  }
+
+  @mutation()
+  private SET_CHECKLIST_ITEM(
+    itemName: keyof IStreamInfo['checklist'],
+    state: TGoLiveChecklistItemState,
+    error?: IStreamError,
+  ) {
+    this.state.info.checklist[itemName] = state;
+    if (error) this.state.info.error = error;
+  }
+
+  @mutation()
+  private RESET_STREAM_INFO() {
+    this.state.info = cloneDeep(StreamingService.initialState.info);
+  }
+
+  get allPlatforms(): TPlatform[] {
+    return this.streamSettingsService.allPlatforms;
   }
 
   getModel() {
@@ -143,7 +318,14 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   private async finishStartStreaming() {
-    const shouldConfirm = this.streamSettingsService.settings.warnBeforeStartingStream;
+    // register a promise that we should reject or resolve in the `handleObsOutputSignal`
+    const startStreamingPromise = new Promise((resolve, reject) => {
+      this.resolveStartStreaming = resolve;
+      this.rejectStartStreaming = reject;
+    });
+
+    const shouldConfirm =
+      !this.userService.isLoggedIn && this.streamSettingsService.settings.warnBeforeStartingStream;
 
     if (shouldConfirm) {
       const goLive = await electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
@@ -171,6 +353,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     if (replayWhenStreaming && this.state.replayBufferStatus === EReplayBufferState.Offline) {
       this.startReplayBuffer();
     }
+    return startStreamingPromise;
   }
 
   async toggleStreaming(options?: TStartStreamOptions, force = false) {
@@ -181,58 +364,58 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         return Promise.resolve();
       }
       try {
-        if (this.userService.isLoggedIn && this.userService.platform) {
-          const service = getPlatformService(this.userService.platform.type);
-
-          // Twitch is special cased because we can safely call beforeGoLive and it will
-          // not touch the stream settings if protected mode is off. This is to retain
-          // compatibility with some legacy use cases.
-          if (
-            this.streamSettingsService.protectedModeEnabled ||
-            this.userService.platformType === 'twitch'
-          ) {
-            if (this.restreamService.shouldGoLiveWithRestream) {
-              if (!this.restreamService.allPlatformsStaged) {
-                // We don't have enough information to go live with multistream.
-                // We should gather the information in the edit stream info window.
-                this.showEditStreamInfo(this.restreamService.platforms, 0);
-                return;
-              }
-
-              let ready: boolean;
-
-              try {
-                ready = await this.restreamService.checkStatus();
-              } catch (e) {
-                // Assume restream is down
-                console.error('Error fetching restreaming service', e);
-                ready = false;
-              }
-
-              if (ready) {
-                // Restream service is up and accepting connections
-                await this.restreamService.beforeGoLive();
-              } else {
-                // Restream service is down, just go live to Twitch for now
-
-                electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
-                  type: 'error',
-                  message: $t(
-                    'Multistream is temporarily unavailable. Your stream is being sent to Twitch only.',
-                  ),
-                  buttons: [$t('OK')],
-                });
-
-                const platform = this.userService.platformType;
-                await service.beforeGoLive(this.restreamService.state.platforms[platform].options);
-              }
-            } else {
-              await service.beforeGoLive(options);
-            }
-          }
-        }
-        await this.finishStartStreaming();
-        return Promise.resolve();
+        // if (this.userService.isLoggedIn && this.userService.platform) {
+        //   const service = getPlatformService(this.userService.platform.type);
+        //
+        //   // Twitch is special cased because we can safely call beforeGoLive and it will
+        //   // not touch the stream settings if protected mode is off. This is to retain
+        //   // compatibility with some legacy use cases.
+        //   if (
+        //     this.streamSettingsService.protectedModeEnabled ||
+        //     this.userService.platformType === 'twitch'
+        //   ) {
+        //     if (this.restreamService.shouldGoLiveWithRestream) {
+        //       if (!this.restreamService.allPlatformsStaged) {
+        //         // We don't have enough information to go live with multistream.
+        //         // We should gather the information in the edit stream info window.
+        //         this.showEditStreamInfo(this.restreamService.platforms, 0);
+        //         return;
+        //       }
+        //
+        //       let ready: boolean;
+        //
+        //       try {
+        //         ready = await this.restreamService.checkStatus();
+        //       } catch (e) {
+        //         // Assume restream is down
+        //         console.error('Error fetching restreaming service', e);
+        //         ready = false;
+        //       }
+        //
+        //       if (ready) {
+        //         // Restream service is up and accepting connections
+        //         await this.restreamService.beforeGoLive();
+        //       } else {
+        //         // Restream service is down, just go live to Twitch for now
+        //
+        //         electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
+        //           type: 'error',
+        //           message: $t(
+        //             'Multistream is temporarily unavailable. Your stream is being sent to Twitch only.',
+        //           ),
+        //           buttons: [$t('OK')],
+        //         });
+        //
+        //         const platform = this.userService.platformType;
+        //         await service.beforeGoLive(this.restreamService.state.platforms[platform].options);
+        //       }
+        //     } else {
+        //       await service.beforeGoLive(options);
+        //     }
+        //   }
+        // }
+        // await this.finishStartStreaming();
+        // return Promise.resolve();
       } catch (e) {
         return Promise.reject(e);
       }
@@ -452,8 +635,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     if (info.type === EOBSOutputType.Streaming) {
       if (info.signal === EOBSOutputSignal.Start) {
         this.SET_STREAMING_STATUS(EStreamingState.Live, time);
+        this.resolveStartStreaming();
         this.streamingStatusChange.next(EStreamingState.Live);
-        if (this.streamSettingsService.protectedModeEnabled) this.runPlatformAfterGoLiveHook();
 
         let streamEncoderInfo: Partial<IOutputSettings> = {};
         let game: string = '';
@@ -486,6 +669,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         this.streamingStatusChange.next(EStreamingState.Starting);
       } else if (info.signal === EOBSOutputSignal.Stop) {
         this.SET_STREAMING_STATUS(EStreamingState.Offline, time);
+        this.RESET_STREAM_INFO();
+        this.rejectStartStreaming();
         this.streamingStatusChange.next(EStreamingState.Offline);
         if (this.streamSettingsService.protectedModeEnabled) this.runPlaformAfterStopStreamHook();
       } else if (info.signal === EOBSOutputSignal.Stopping) {
@@ -660,20 +845,62 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.state.selectiveRecording = enabled;
   }
 
-  private async runPlatformAfterGoLiveHook() {
-    if (this.userService.isLoggedIn && this.userService.platform) {
-      const service = getPlatformService(this.userService.platform.type);
-      if (typeof service.afterGoLive === 'function') {
-        await service.afterGoLive();
-      }
-    }
-  }
-
   private async runPlaformAfterStopStreamHook() {
     if (!this.userService.isLoggedIn) return;
     const service = getPlatformService(this.userService!.platform!.type);
     if (typeof service.afterStopStream === 'function') {
       await service.afterStopStream();
     }
+  }
+}
+
+class StreamInfoView extends ViewHandler<IStreamingServiceState> {
+  @Inject() streamSettingsService: StreamSettingsService;
+
+  get info() {
+    return this.state.info;
+  }
+
+  get enabledPlatforms(): TPlatform[] {
+    const goLiveSettings = this.goLiveSettings;
+    return Object.keys(goLiveSettings.destinations).filter(
+      dest => goLiveSettings.destinations[dest].enabled,
+    ) as TPlatform[];
+  }
+
+  get shouldGoLiveWithRestream() {
+    return this.enabledPlatforms.length > 1;
+  }
+
+  get goLiveSettings(): IGoLiveSettings {
+    // return already saved settings if exist
+    if (this.streamSettingsService.state.goLiveSettings) {
+      return this.streamSettingsService.state.goLiveSettings;
+    }
+
+    // otherwise generate new settings
+    const { title, description } = this.streamSettingsService.state;
+    const enabledPlatforms = ['facebook', 'twitch', 'youtube'];
+    const destinations = {};
+    this.streamSettingsService.allPlatforms.forEach(platform => {
+      const service = getPlatformService(platform);
+      const enabled = enabledPlatforms.includes(platform);
+      destinations[platform] = {
+        ...service.state.settings,
+        useCustomTitleAndDescription: false,
+        enabled,
+      };
+    });
+
+    return {
+      commonFields: {
+        title,
+        description,
+      },
+      useOptimizedProfile: false,
+      selectedProfile: null,
+      destinations: destinations as IGoLiveSettings['destinations'],
+      advancedMode: false,
+    };
   }
 }

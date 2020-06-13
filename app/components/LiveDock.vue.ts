@@ -3,7 +3,7 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
 import Chat from './Chat.vue';
 import { StreamingService, EStreamingState } from '../services/streaming';
 import { Inject } from '../services/core/injector';
-import { StreamInfoService } from '../services/stream-info';
+import { StreamInfoDeprecatedService } from '../services/stream-info-deprecated';
 import { UserService } from '../services/user';
 import { CustomizationService } from 'services/customization';
 import electron from 'electron';
@@ -15,7 +15,7 @@ import { AppService } from 'services/app';
 import Tabs, { ITab } from 'components/Tabs.vue';
 import { ChatService } from 'services/chat';
 import { WindowsService } from 'services/windows';
-import { RestreamService } from 'app-services';
+import { RestreamService, YoutubeService } from 'app-services';
 
 @Component({
   components: {
@@ -27,7 +27,8 @@ import { RestreamService } from 'app-services';
 })
 export default class LiveDock extends Vue {
   @Inject() streamingService: StreamingService;
-  @Inject() streamInfoService: StreamInfoService;
+  @Inject() youtubeService: YoutubeService;
+  @Inject() streamInfoService: StreamInfoDeprecatedService;
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() platformAppsService: PlatformAppsService;
@@ -154,7 +155,7 @@ export default class LiveDock extends Vue {
   }
 
   openYoutubeControlRoom() {
-    electron.remote.shell.openExternal(this.streamInfoService.state.dashboardUrl);
+    electron.remote.shell.openExternal(this.youtubeService.state.dashboardUrl);
   }
 
   get isTwitch() {

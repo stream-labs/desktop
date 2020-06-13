@@ -9,16 +9,13 @@ import { Subject, Subscription } from 'rxjs';
 import { ITwitchChannelInfo, TwitchService } from './platforms/twitch';
 import { FacebookService, IFacebookChannelInfo } from './platforms/facebook';
 import { InitAfter } from './core';
-import { IYoutubeChannelInfo, TYoutubeLifecycleStep } from './platforms/youtube';
+import { TYoutubeLifecycleStep } from './platforms/youtube';
 import { IMixerChannelInfo } from './platforms/mixer';
 import { isEqual, pick, reduce } from 'lodash';
 import { $t } from './i18n';
 import { WindowsService } from './windows';
 
-export type TCombinedChannelInfo = IFacebookChannelInfo &
-  ITwitchChannelInfo &
-  IYoutubeChannelInfo &
-  IMixerChannelInfo;
+export type TCombinedChannelInfo = IFacebookChannelInfo & ITwitchChannelInfo & IMixerChannelInfo;
 
 type TStreamInfoServiceState = {
   advancedMode: boolean;
@@ -37,7 +34,7 @@ const VIEWER_COUNT_UPDATE_INTERVAL = 60 * 1000;
  * components to make use of.
  */
 @InitAfter('UserService')
-export class StreamInfoService extends StatefulService<TStreamInfoServiceState> {
+export class StreamInfoDeprecatedService extends StatefulService<TStreamInfoServiceState> {
   @Inject() userService: UserService;
   @Inject() streamingService: StreamingService;
   @Inject() hostsService: HostsService;
@@ -95,9 +92,9 @@ export class StreamInfoService extends StatefulService<TStreamInfoServiceState> 
 
   private onLoginHandler() {
     const platform = getPlatformService(this.userService.platform.type);
-    this.channelInfoSubsc = platform.channelInfoChanged.subscribe(channelInfo =>
-      this.updateInfo(channelInfo),
-    );
+    // this.channelInfoSubsc = platform.channelInfoChanged.subscribe(channelInfo =>
+    //   this.updateInfo(channelInfo),
+    // );
   }
 
   private onLogoutHandler() {
@@ -168,12 +165,9 @@ export class StreamInfoService extends StatefulService<TStreamInfoServiceState> 
       availableTags: [],
       hasUpdateTagsPermission: false,
       facebookPageId: '',
-      broadcastId: '',
-      streamId: '',
       channelId: '',
       chatUrl: '',
       streamUrl: '',
-      dashboardUrl: '',
       lifecycleStep: 'idle',
     };
   }

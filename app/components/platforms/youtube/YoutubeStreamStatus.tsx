@@ -3,12 +3,12 @@ import { Inject } from 'services/core/injector';
 import { WindowsService } from 'services/windows';
 import ModalLayout from 'components/ModalLayout.vue';
 import { $t } from 'services/i18n';
-import { StreamInfoService } from 'services/stream-info';
+import { StreamInfoDeprecatedService } from 'services/stream-info-deprecated';
 import SmoothProgressBar from 'components/shared/SmoothProgressBar';
 import PlatformLogo from 'components/shared/PlatformLogo';
 import TsxComponent from 'components/tsx-component';
 import styles from './YoutubeStreamStatus.m.less';
-import { TYoutubeLifecycleStep } from 'services/platforms/youtube';
+import { YoutubeService } from 'services/platforms/youtube';
 import { StreamingService } from 'services/streaming';
 import electron from 'electron';
 
@@ -19,8 +19,9 @@ import electron from 'electron';
 @Component({})
 export default class YoutubeStreamStatus extends TsxComponent {
   @Inject() private windowsService: WindowsService;
-  @Inject() private streamInfoService: StreamInfoService;
+  @Inject() private streamInfoService: StreamInfoDeprecatedService;
   @Inject() private streamingService: StreamingService;
+  @Inject() private youtubeService: YoutubeService;
 
   private errorDetailsVisible = false;
 
@@ -29,37 +30,7 @@ export default class YoutubeStreamStatus extends TsxComponent {
   }
 
   get progressInfo(): { msg: string; progress: number } {
-    const dictionary: { [key in TYoutubeLifecycleStep]: { msg: string; progress: number } } = {
-      idle: {
-        msg: '',
-        progress: 0,
-      },
-      waitForStreamToBeActive: {
-        msg: $t('Waiting for YouTube to receive the video signal...'),
-        progress: 0.1,
-      },
-      transitionBroadcastToTesting: {
-        msg: $t('Testing your broadcast...'),
-        progress: 0.3,
-      },
-      waitForTesting: {
-        msg: $t('Finalizing broadcast testing...'),
-        progress: 0.4,
-      },
-      transitionBroadcastToActive: {
-        msg: $t('Publishing to your YouTube channel...'),
-        progress: 0.5,
-      },
-      waitForBroadcastToBeLive: {
-        msg: $t('Waiting for broadcast to be published...'),
-        progress: 0.6,
-      },
-      live: {
-        msg: $t("You're live!"),
-        progress: 1,
-      },
-    };
-    return dictionary[this.streamInfo.lifecycleStep];
+    return this.youtubeService.progressInfo;
   }
 
   get error(): string {
@@ -90,7 +61,7 @@ export default class YoutubeStreamStatus extends TsxComponent {
   }
 
   goToDashboard() {
-    electron.remote.shell.openExternal(this.streamInfo.dashboardUrl);
+    electron.remote.shell.openExternal(this.youtubeService.state.dashboardUrl);
     this.windowsService.closeChildWindow();
   }
 

@@ -7,6 +7,7 @@ import { createProps } from '../tsx-component';
 import { BoolInput } from '../shared/inputs/inputs';
 import cloneDeep from 'lodash/cloneDeep';
 import styles from './StreamTitleAndDescription.m.less';
+import ValidatedForm from '../shared/inputs/ValidatedForm';
 
 class ComponentProps {
   allowCustom?: boolean = false;
@@ -41,7 +42,7 @@ export default class StreamTitleAndDescription extends TsxComponent<ComponentPro
       !this.props.allowCustom || (this.props.allowCustom && this.props.value.customEnabled);
 
     return (
-      <div>
+      <ValidatedForm>
         {this.props.allowCustom && (
           <HFormGroup>
             <BoolInput
@@ -56,7 +57,7 @@ export default class StreamTitleAndDescription extends TsxComponent<ComponentPro
             <div>
               <HFormGroup
                 vModel={this.localValue.title}
-                metadata={metadata.text({ title: $t('Title'), fullWidth: true })}
+                metadata={metadata.text({ title: $t('Title'), required: true, fullWidth: true })}
               />
               <HFormGroup
                 vModel={this.localValue.description}
@@ -68,7 +69,7 @@ export default class StreamTitleAndDescription extends TsxComponent<ComponentPro
             </div>
           )}
         </transition>
-      </div>
+      </ValidatedForm>
     );
   }
 }

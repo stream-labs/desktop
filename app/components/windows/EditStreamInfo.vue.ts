@@ -4,7 +4,7 @@ import { Component } from 'vue-property-decorator';
 import ModalLayout from '../ModalLayout.vue';
 import { BoolInput, ListInput } from 'components/shared/inputs/inputs';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
-import { StreamInfoService, TCombinedChannelInfo } from 'services/stream-info';
+import { StreamInfoDeprecatedService, TCombinedChannelInfo } from 'services/stream-info-deprecated';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { UserService } from 'services/user';
 import { Inject } from 'services/core/injector';
@@ -49,7 +49,7 @@ import Translate from 'components/shared/translate';
   },
 })
 export default class EditStreamInfo extends Vue {
-  @Inject() streamInfoService: StreamInfoService;
+  @Inject() streamInfoService: StreamInfoDeprecatedService;
   @Inject() userService: UserService;
   @Inject() streamingService: StreamingService;
   @Inject() windowsService: WindowsService;
@@ -315,7 +315,7 @@ export default class EditStreamInfo extends Vue {
 
     if (this.restreamService.shouldGoLiveWithRestream) {
       this.updatingInfo = true;
-      await this.restreamService.stagePlatform(this.platform, this.channelInfo);
+      // await this.restreamService.stagePlatform(this.platform, this.channelInfo);
 
       if (!this.isFinalStep) {
         this.streamingService.showEditStreamInfo(
@@ -373,15 +373,15 @@ export default class EditStreamInfo extends Vue {
         (getPlatformService('youtube') as YoutubeService).showStreamStatusWindow();
       }
     } catch (e) {
-      const message = this.platformService.getErrorDescription(e);
-      this.$toasted.show(message, {
-        position: 'bottom-center',
-        className: 'toast-alert',
-        duration: 1000,
-        singleton: true,
-      });
-      this.infoError = true;
-      this.updatingInfo = false;
+      // const message = this.platformService.getErrorDescription(e);
+      // this.$toasted.show(message, {
+      //   position: 'bottom-center',
+      //   className: 'toast-alert',
+      //   duration: 1000,
+      //   singleton: true,
+      // });
+      // this.infoError = true;
+      // this.updatingInfo = false;
     }
   }
 

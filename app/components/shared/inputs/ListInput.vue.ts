@@ -10,12 +10,12 @@ import { Spinner } from 'streamlabs-beaker';
 export default class ListInput extends BaseInput<
   string,
   IListMetadata<string>,
-  { onSearchChange?: (val: string) => unknown }
+  { handleSearchChange?: (val: string) => unknown }
 > {
   @Prop() readonly value: string;
   @Prop() readonly metadata: IListMetadata<string>;
   @Prop() readonly title: string;
-  @Prop() readonly onSearchChange?: (val: string) => unknown;
+  @Prop() readonly handleSearchChange?: (val: string) => unknown;
 
   get placeholder() {
     return this.options.placeholder || 'Select Option';
@@ -57,6 +57,6 @@ export default class ListInput extends BaseInput<
 
   private onSearchChangeHandler(value: string) {
     this.$emit('search-change', value);
-    this.$props.onSearchChange && this.$props.onSearchChange(value);
+    this.$props.handleSearchChange && this.$props.handleSearchChange(value);
   }
 }

@@ -2,7 +2,7 @@ import { Module, EApiPermissions, apiMethod, apiEvent } from './module';
 import { StreamingService, EStreamingState, ERecordingState } from 'services/streaming';
 import { Inject } from 'services/core/injector';
 import { Subject } from 'rxjs';
-import { StreamInfoService } from 'services/stream-info';
+import { StreamInfoDeprecatedService } from 'services/stream-info-deprecated';
 
 interface IOutputState {
   streamingStatus: EStreamingState;
@@ -22,7 +22,7 @@ export class StreamingRecordingModule extends Module {
   permissions = [EApiPermissions.Streaming];
 
   @Inject() streamingService: StreamingService;
-  @Inject() streamInfoService: StreamInfoService;
+  @Inject() streamInfoService: StreamInfoDeprecatedService;
 
   constructor() {
     super();

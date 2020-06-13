@@ -11,7 +11,7 @@ import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
 import { authorizedHeaders, handleResponse } from 'util/requests';
 import { UserService } from 'services/user';
-import { StreamInfoService } from 'services/stream-info';
+import { StreamInfoDeprecatedService } from 'services/stream-info-deprecated';
 import { getAllTags, getStreamTags, TTwitchTag, updateTags } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
 import { IPlatformResponse, platformAuthorizedRequest, platformRequest } from './utils';
@@ -21,6 +21,8 @@ import { CustomizationService } from 'services/customization';
 import { assertIsDefined } from '../../util/properties-type-guards';
 import { metadata, formMetadata } from 'components/shared/inputs';
 import { $t } from '../i18n';
+import { IGoLiveSettings } from '../streaming';
+import { mutation, StatefulService } from '../core';
 
 export interface ITwitchStartStreamOptions {
   title: string;
@@ -61,12 +63,35 @@ interface ITwitchOAuthValidateResponse {
   user_id: string;
 }
 
-export class TwitchService extends Service implements IPlatformService {
+interface ITwitchServiceState {
+  hasUpdateTagsPermission: boolean;
+  availableTags: TTwitchTag[];
+  streamKey: string;
+  streamPageUrl: string;
+  settings: ITwitchStartStreamOptions;
+}
+
+export class TwitchService extends StatefulService<ITwitchServiceState>
+  implements IPlatformService {
   @Inject() hostsService: HostsService;
   @Inject() streamSettingsService: StreamSettingsService;
   @Inject() userService: UserService;
-  @Inject() streamInfoService: StreamInfoService;
+  @Inject() streamInfoService: StreamInfoDeprecatedService;
   @Inject() customizationService: CustomizationService;
+
+  static initialState: ITwitchServiceState = {
+    hasUpdateTagsPermission: false,
+    availableTags: [],
+    streamKey: '',
+    streamPageUrl: '',
+    settings: {
+      title: '',
+      game: '',
+      tags: [],
+    },
+  };
+
+  readonly displayName = 'Twitch';
 
   channelInfoChanged = new Subject<ITwitchChannelInfo>();
 
@@ -86,8 +111,6 @@ export class TwitchService extends Service implements IPlatformService {
   // Streamlabs Production Twitch OAuth Client ID
   clientId = '8bmp6j83z5w4mepq0dn0q1a7g186azi';
 
-  private availableTags: TTwitchTag[];
-  private hasUpdateTagsPermission: boolean;
   private activeChannel: ITwitchChannelInfo | null;
 
   init() {
@@ -129,8 +152,14 @@ export class TwitchService extends Service implements IPlatformService {
     return this.userAuth.id;
   }
 
-  async beforeGoLive(channelInfo?: ITwitchStartStreamOptions) {
+  get username(): string {
+    return this.userService.state.auth.platforms?.twitch.username;
+  }
+
+  async beforeGoLive(goLiveSettings?: IGoLiveSettings) {
     const key = await this.fetchStreamKey();
+    this.SET_STREAM_KEY(key);
+    this.SET_STREAM_PAGE_URL(`https://twitch.tv/${this.username}`);
 
     if (
       this.streamSettingsService.protectedModeEnabled &&
@@ -143,8 +172,8 @@ export class TwitchService extends Service implements IPlatformService {
       });
     }
 
+    const channelInfo = goLiveSettings?.destinations.twitch;
     if (channelInfo) await this.putChannelInfo(channelInfo);
-    return key;
   }
 
   async validatePlatform() {
@@ -213,20 +242,27 @@ export class TwitchService extends Service implements IPlatformService {
     ]);
 
     let tags: TTwitchTag[] = [];
-    let availableTags: TTwitchTag[] = [];
     if (hasUpdateTagsPermission) {
-      [tags, availableTags] = await Promise.all([this.getStreamTags(), this.getAllTags()]);
+      [tags] = await Promise.all([this.getStreamTags(), this.getAllTags()]);
     }
 
     const activeChannel = {
       ...channelInfo,
       hasUpdateTagsPermission,
       tags,
-      availableTags,
     };
     this.updateActiveChannel(activeChannel);
     assertIsDefined(this.activeChannel);
     return this.activeChannel;
+  }
+
+  async fetchGoLiveSettings(): Promise<ITwitchStartStreamOptions> {
+    await this.prepopulateInfo();
+    return {
+      title: this.activeChannel.title,
+      game: this.activeChannel.game,
+      tags: this.activeChannel.tags,
+    };
   }
 
   /**
@@ -241,6 +277,12 @@ export class TwitchService extends Service implements IPlatformService {
     } as ITwitchChannelInfo;
     assertIsDefined(this.activeChannel);
     this.channelInfoChanged.next(this.activeChannel);
+  }
+
+  @mutation()
+  private SET_AVAILABLE_TAGS(tags: TTwitchTag[]) {
+    this.state.availableTags = tags;
+    this.state.hasUpdateTagsPermission = true;
   }
 
   fetchUserInfo() {
@@ -280,16 +322,13 @@ export class TwitchService extends Service implements IPlatformService {
   private getChatUrl(): string {
     const mode = this.customizationService.isDarkTheme ? 'night' : 'day';
     const nightMode = mode === 'day' ? 'popout' : 'darkpopout';
-    const username = this.userService.platform?.username;
-    assertIsDefined(username);
-    return `https://twitch.tv/popout/${username}/chat?${nightMode}`;
+    return `https://twitch.tv/popout/${this.username}/chat?${nightMode}`;
   }
 
   async getAllTags(): Promise<TTwitchTag[]> {
     // Fetch stream tags once per session as they're unlikely to change that often
-    if (this.availableTags) return this.availableTags;
-    this.availableTags = await getAllTags();
-    return this.availableTags;
+    if (this.state.availableTags.length) return this.state.availableTags;
+    this.SET_AVAILABLE_TAGS(await getAllTags());
   }
 
   getStreamTags(): Promise<TTwitchTag[]> {
@@ -315,11 +354,10 @@ export class TwitchService extends Service implements IPlatformService {
   }
 
   async getHasUpdateTagsPermission() {
-    // need to be fetched only once per session
-    if (this.hasUpdateTagsPermission === void 0) {
-      this.hasUpdateTagsPermission = await this.hasScope('user:edit:broadcast');
-    }
-    return this.hasUpdateTagsPermission;
+    // if available tags are loaded then the user has permissions
+    if (this.state.availableTags.length) return true;
+    // otherwise make a request to Twitch
+    return await this.hasScope('user:edit:broadcast');
   }
 
   getHeaders(req: IPlatformRequest, authorized = false): ITwitchRequestHeaders {
@@ -373,5 +411,15 @@ export class TwitchService extends Service implements IPlatformService {
         required: true,
       }),
     });
+  }
+
+  @mutation()
+  private SET_STREAM_KEY(key: string) {
+    this.state.streamKey = key;
+  }
+
+  @mutation()
+  private SET_STREAM_PAGE_URL(url: string) {
+    this.state.streamPageUrl = url;
   }
 }
