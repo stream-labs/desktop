@@ -7,10 +7,11 @@ import { mutation } from 'services/core/stateful-service';
 import { Service } from 'services/core';
 import electron from 'electron';
 import { HostsService } from 'services/hosts';
-import Util from 'services/utils';
 import { UserService } from 'services/user';
 import { $t, I18nService } from 'services/i18n';
 import uuid from 'uuid/v4';
+import { EAvailableFeatures, IncrementalRolloutService } from '../incremental-rollout';
+import Utils from 'services/utils';
 
 interface ITwitterServiceState {
   linked: boolean;
@@ -32,6 +33,7 @@ interface ITwitterStatusResponse {
 export class TwitterService extends PersistentStatefulService<ITwitterServiceState> {
   @Inject() private hostsService: HostsService;
   @Inject() private userService: UserService;
+  @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() i18nService: I18nService;
 
   authWindowOpen = false;
@@ -48,6 +50,13 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
   init() {
     super.init();
     this.userService.userLogout.subscribe(() => this.RESET_TWITTER_STATUS());
+  }
+
+  get isEnabled(): boolean {
+    return (
+      Utils.isPreview() ||
+      this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.twitter)
+    );
   }
 
   @mutation()

@@ -80,19 +80,21 @@ export default class StartStreamingButton extends Vue {
       }
 
       if (this.shouldShowGoLiveWindow()) {
-        if (this.hasPages) {
-          return this.streamingService.openShareStream();
-        }
-        if (this.restreamService.shouldGoLiveWithRestream) {
-          this.streamingService.showEditStreamInfo(this.restreamService.platforms, 0);
-        } else {
-          this.streamingService.showEditStreamInfo();
-        }
-      } else {
-        if (this.videoEncodingOptimizationService.canApplyProfileFromCache()) {
-          await this.videoEncodingOptimizationService.applyProfileFromCache();
-        }
-        this.streamingService.toggleStreaming();
+        // TODO
+        // if (this.hasPages) {
+        //   return this.streamingService.openShareStream();
+        // }
+        //   if (this.restreamService.shouldGoLiveWithRestream) {
+        //     this.streamingService.showEditStreamInfo(this.restreamService.platforms, 0);
+        //   } else {
+        //     this.streamingService.showEditStreamInfo();
+        //   }
+        // } else {
+        //   if (this.videoEncodingOptimizationService.canApplyProfileFromCache()) {
+        //     await this.videoEncodingOptimizationService.applyProfileFromCache();
+        //   }
+        //   this.streamingService.toggleStreaming();
+        this.streamingService.showEditStreamInfo();
       }
     }
   }

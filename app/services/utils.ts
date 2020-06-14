@@ -223,4 +223,8 @@ export default class Utils {
     document.execCommand('copy');
     document.body.removeChild(el);
   }
+
+  static sleep(ms: number): Promise<void> {
+    return new Promise(r => setTimeout(r, ms));
+  }
 }

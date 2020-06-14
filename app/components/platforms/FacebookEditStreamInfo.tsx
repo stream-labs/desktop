@@ -10,10 +10,11 @@ import { ListInput } from '../shared/inputs/inputs';
 import { formMetadata, IListOption, metadata } from '../shared/inputs';
 import { $t } from '../../services/i18n';
 import { FacebookService, IFacebookStartStreamOptions } from '../../services/platforms/facebook';
-import { IGoLiveSettings } from '../../services/streaming';
+import { IGoLiveSettings, StreamingService } from '../../services/streaming';
 
 class Props {
   showOnlyRequiredFields? = false;
+  goLiveSettings: IGoLiveSettings = null;
   value?: IGoLiveSettings['destinations']['facebook'] = {
     facebookPageId: '',
     title: '',
@@ -26,7 +27,19 @@ class Props {
 @Component({ props: createProps(Props) })
 export default class FacebookEditStreamInfo extends TsxComponent<Props> {
   @Inject() private facebookService: FacebookService;
+  @Inject() private streamingService: StreamingService;
   settings: IFacebookStartStreamOptions = null;
+
+  get twitchGame() {
+    return this.props.goLiveSettings.destinations.twitch?.game;
+  }
+
+  @Watch('twitchGame')
+  private onTwitchGameChanged(game: string) {
+    console.log('TW game changed to ', game);
+    this.settings.game = game;
+    this.emitInput();
+  }
 
   created() {
     this.syncValue(this.value);

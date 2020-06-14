@@ -69,25 +69,6 @@ export class StreamInfoDeprecatedService extends StatefulService<TStreamInfoServ
     }, VIEWER_COUNT_UPDATE_INTERVAL);
   }
 
-  showEditStreamInfo() {
-    const mainWinBounds = this.windowsService.getBounds('main');
-    const height = this.state.advancedMode ? 1080 : 550;
-    const width = 900;
-
-    this.windowsService.showWindow({
-      componentName: 'GoLiveWindow',
-      title: $t('Update Stream Info'),
-      size: {
-        height,
-        width,
-      },
-      position: {
-        x: mainWinBounds.x + mainWinBounds.width - width,
-        y: mainWinBounds.y + mainWinBounds.height - height,
-      },
-    });
-  }
-
   private channelInfoSubsc: Subscription = null;
 
   private onLoginHandler() {

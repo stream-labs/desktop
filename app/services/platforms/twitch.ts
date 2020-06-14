@@ -23,6 +23,7 @@ import { metadata, formMetadata } from 'components/shared/inputs';
 import { $t } from '../i18n';
 import { IGoLiveSettings } from '../streaming';
 import { mutation, StatefulService } from '../core';
+import { throwStreamError } from '../streaming/stream-error';
 
 export interface ITwitchStartStreamOptions {
   title: string;
@@ -218,11 +219,22 @@ export class TwitchService extends StatefulService<ITwitchServiceState>
       .then(response => this.userService.updatePlatformToken('twitch', response.access_token));
   }
 
+  /**
+   * Request Twitch API and wrap failed response to a unified error model
+   */
+  private async requestTwitch<T = unknown>(reqInfo: IPlatformRequest | string): Promise<T> {
+    try {
+      return await platformAuthorizedRequest<T>('twitch', reqInfo);
+    } catch (e) {
+      const details = e.result
+        ? `${e.result.status} ${e.result.error} ${e.result.message}`
+        : 'Connection failed';
+      throwStreamError('TWITCH_REQUEST_FAILED', details);
+    }
+  }
+
   private fetchRawChannelInfo(): Promise<ITWitchChannel> {
-    return platformAuthorizedRequest<ITWitchChannel>(
-      'twitch',
-      'https://api.twitch.tv/kraken/channel',
-    );
+    return this.requestTwitch<ITWitchChannel>('https://api.twitch.tv/kraken/channel');
   }
 
   fetchStreamKey(): Promise<string> {

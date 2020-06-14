@@ -5,6 +5,7 @@ import { ITwitchStartStreamOptions } from '../platforms/twitch';
 import { IYoutubeStartStreamOptions } from '../platforms/youtube';
 import { IFacebookStartStreamOptions } from '../platforms/facebook';
 import { IMixerStartStreamOptions } from '../platforms/mixer';
+import { IStreamError } from './stream-error';
 
 export enum EStreamingState {
   Offline = 'offline',
@@ -29,7 +30,12 @@ export enum EReplayBufferState {
 }
 
 export interface IStreamInfo {
-  lifecycle: 'idle' | 'channelPrefetch' | 'channelSetup' | 'runChecklist' | 'afterGoLive' | 'live';
+  lifecycle:
+    | 'empty' // platform settings are not synchronized
+    | 'prepopulate' // stetting synchronization in progress
+    | 'waitForNewSettings' // platform settings has been synchronized
+    | 'runChecklist' // applying new settings and start the stream
+    | 'live'; // stream has been successfully started
   error: IStreamError | null;
   goLiveSettings: IGoLiveSettings | null;
   checklist: {
@@ -41,16 +47,10 @@ export interface IStreamInfo {
     setupRestream: TGoLiveChecklistItemState;
     startVideoTransmission: TGoLiveChecklistItemState;
     publishYoutubeBroadcast: TGoLiveChecklistItemState;
-    tweetWhenGoLive: TGoLiveChecklistItemState;
   };
 }
 
 export type TGoLiveChecklistItemState = 'not-started' | 'pending' | 'done' | 'failed';
-
-export interface IStreamError {
-  message: string;
-  details?: string;
-}
 
 export interface IPlatformStatus {
   error?: { message: string };

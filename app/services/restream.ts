@@ -256,10 +256,9 @@ export class RestreamService extends StatefulService<IRestreamState> {
       }),
     );
     const request = new Request(url, { headers, body, method: 'POST' });
-    return fetch(request).then(res => res.json());
-    // const res = await fetch(request);
-    // if (!res.ok) throw await res.json();
-    // return res.json();
+    const res = await fetch(request);
+    if (!res.ok) throw await res.json();
+    return res.json();
   }
 
   deleteTarget(id: number) {

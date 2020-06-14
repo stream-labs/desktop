@@ -19,6 +19,7 @@ import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
 import { pickBy } from 'lodash';
 import { ITwitchStartStreamOptions } from './twitch';
+import { throwStreamError } from '../streaming/stream-error';
 
 interface IYoutubeServiceState {
   liveStreamingEnabled: boolean;
@@ -181,16 +182,16 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   }
 
   /**
-   * Request Youtube API and wrap error response in a readable message
+   * Request Youtube API and handle error response
    */
   private async requestYoutube<T = unknown>(reqInfo: IPlatformRequest | string): Promise<T> {
     try {
       return await platformAuthorizedRequest<T>('youtube', reqInfo);
     } catch (e) {
-      let message = e.result?.error?.message;
-      if (!message) message = 'connection failed';
+      let details = e.result?.error?.message;
+      if (!details) details = 'connection failed';
       console.error(e);
-      throw new Error(`Youtube: ${message}`);
+      throw throwStreamError('YOUTUBE_REQUEST_FAILED', details);
     }
   }
 
@@ -248,7 +249,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
       // we can't make it available for other user until we
       // didn't switch it to the 'testing' state
       this.setLifecycleStep('transitionBroadcastToTesting');
-      await this.transitionBroadcastStatus(broadcastId, 'testing');
+      await this.transitionBroadcastStatus(broadcastId, 'testing1' as TBroadcastLifecycleStatus);
 
       // now we ready to publish the broadcast
       this.setLifecycleStep('waitForBroadcastToBeLive');
@@ -606,13 +607,18 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     try {
       await this.pollAPI(async () => {
         // user clicked stop streaming, cancel polling
-        if (this.state.lifecycleStep === 'idle') throw new Error('stream stopped');
+        if (this.state.lifecycleStep === 'idle') {
+          throwStreamError('YOUTUBE_PUBLISH_FAILED', 'Stream stopped');
+        }
 
         const stream = await this.fetchLiveStream(streamId, ['status']);
         return stream.status.streamStatus === status;
       });
     } catch (e) {
-      throw new Error(`LiveStream has not changed the status to ${status}: ${e.message}`);
+      throwStreamError(
+        'YOUTUBE_PUBLISH_FAILED',
+        `LiveBroadcast has not changed the status to ${status}: ${e.details}`,
+      );
     }
   }
 
@@ -625,7 +631,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     try {
       // ask Youtube to change the broadcast status
       const endpoint = `liveBroadcasts/transition?broadcastStatus=${status}&id=${broadcastId}&part=status`;
-      await platformAuthorizedRequest<IYoutubeLiveBroadcast>('youtube', {
+      await this.requestYoutube<IYoutubeLiveBroadcast>({
         method: 'POST',
         url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
       });
@@ -633,13 +639,18 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
       // wait for Youtube to change the broadcast status
       await this.pollAPI(async () => {
         // if user clicked stop streaming, cancel polling
-        if (this.state.lifecycleStep === 'idle') throw new Error('stream stopped');
+        if (this.state.lifecycleStep === 'idle') {
+          throwStreamError('YOUTUBE_PUBLISH_FAILED', 'Stream stopped');
+        }
 
         const broadcast = await this.fetchBroadcast(broadcastId, ['status']);
         return broadcast.status.lifeCycleStatus === status;
       });
     } catch (e) {
-      throw new Error(`LiveBroadcast has not changed the status to ${status}: ${e.message}`);
+      throwStreamError(
+        'YOUTUBE_PUBLISH_FAILED',
+        `LiveBroadcast has not changed the status to ${status}: ${e.details}`,
+      );
     }
   }
 

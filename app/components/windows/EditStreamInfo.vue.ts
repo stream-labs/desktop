@@ -317,13 +317,13 @@ export default class EditStreamInfo extends Vue {
       this.updatingInfo = true;
       // await this.restreamService.stagePlatform(this.platform, this.channelInfo);
 
-      if (!this.isFinalStep) {
-        this.streamingService.showEditStreamInfo(
-          this.windowQuery.platforms,
-          this.windowQuery.platformStep + 1,
-        );
-        return;
-      }
+      // if (!this.isFinalStep) {
+      //   this.streamingService.showEditStreamInfo(
+      //     this.windowQuery.platforms,
+      //     this.windowQuery.platformStep + 1,
+      //   );
+      //   return;
+      // }
     }
 
     this.updateAndGoLive();
