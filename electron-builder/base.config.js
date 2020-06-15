@@ -48,6 +48,9 @@ const base = {
         subject: 'Streamlabs (General Workings, Inc.)',
         rfcTimestamp: 'http://timestamp.digicert.com',
         algorithm: config.hash,
+        append: config.isNest,
+        description: config.name,
+        url: config.site,
       });
     },
   },
