@@ -137,7 +137,7 @@ export default class LayoutEditor extends TsxComponent {
       <div class={styles.topBar}>
         <img class={styles.arrow} src={require('../../../media/images/chalk-arrow.png')} />
         <button
-          class="button button--prime"
+          class="button button--action"
           style="margin: 0 16px;"
           onClick={() => this.openModal()}
         >
