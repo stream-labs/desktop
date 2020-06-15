@@ -43,7 +43,7 @@ const base = {
         return;
       }
 
-      console.log(`Signing ${config.path}`);
+      console.log(`Signing ${config.hash} ${config.path}`);
       await signtool.sign(config.path, {
         subject: 'Streamlabs (General Workings, Inc.)',
         rfcTimestamp: 'http://timestamp.digicert.com',
