@@ -10377,6 +10377,11 @@ signal-exit@^3.0.0, signal-exit@^3.0.2:
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.2.tgz#b5fdc08f1287ea1178628e415e25132b73646c6d"
   integrity sha1-tf3AjxKH6hF4Yo5BXiUTK3NkbG0=
 
+signtool@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/signtool/-/signtool-1.0.0.tgz#a807636db3dc1e1a12dc76d5fbf03d1a49ae2453"
+  integrity sha1-qAdjbbPcHhoS3HbV+/A9GkmuJFM=
+
 single-line-log@^1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/single-line-log/-/single-line-log-1.1.2.tgz#c2f83f273a3e1a16edb0995661da0ed5ef033364"
