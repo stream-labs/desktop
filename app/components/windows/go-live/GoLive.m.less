@@ -68,3 +68,50 @@
 .cancel-button, .go-live-button {
   z-index: 1;
 }
+
+.copy-links-buttons {
+  text-align: right;
+  a {
+    margin-left: 16px;
+  }
+}
+
+.success-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.links-container {
+  width: 750px;
+  background-color: var(--section-alt) !important;
+  span {
+    display: inline-block;
+  }
+  button {
+    margin-left: 16px;
+  }
+  input {
+    width: 380px;
+  }
+}
+
+.stream-links {
+  td {
+    text-align: left !important;
+  }
+  td:first-child {
+    width: 150px;
+  }
+
+  // show/hide the copy button
+  tr a:nth-child(2) {
+    margin-left: 16px;
+    display: none;
+  }
+  tr:hover a:nth-child(2) {
+    display: inline-block;
+  }
+}

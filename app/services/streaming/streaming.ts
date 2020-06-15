@@ -35,7 +35,7 @@ import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremen
 import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService } from 'services/restream';
 import { ITwitchStartStreamOptions } from 'services/platforms/twitch';
-import { IFacebookStartStreamOptions } from 'services/platforms/facebook';
+import { FacebookService, IFacebookStartStreamOptions } from 'services/platforms/facebook';
 import Utils from 'services/utils';
 import Vue from 'vue';
 import { ISourcesState, Source } from '../sources';
@@ -84,6 +84,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @Inject() private customizationService: CustomizationService;
   @Inject() private restreamService: RestreamService;
   @Inject() private hostsService: HostsService;
+  @Inject() private facebookService: FacebookService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -155,17 +156,26 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.UPDATE_STREAM_INFO({ lifecycle: 'prepopulate', error: null });
     for (const platform of this.views.enabledPlatforms) {
       const service = getPlatformService(platform);
+      // facebook should have pages
+      if (platform === 'facebook' && !this.facebookService.state.facebookPages?.pages?.length) {
+        this.SET_ERROR('FACEBOOK_HAS_NO_PAGES');
+        this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
+        return;
+      }
       try {
         await service.prepopulateInfo();
       } catch (e) {
-        this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
         this.SET_ERROR('PREPOPULATE_FAILED', e.details, platform);
+        this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
         return;
       }
     }
     this.UPDATE_STREAM_INFO({ lifecycle: 'waitForNewSettings' });
   }
 
+  /**
+   * Make a transition to Live
+   */
   async goLive(settings?: IGoLiveSettings) {
     this.RESET_STREAM_INFO();
 
@@ -192,9 +202,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       try {
         await service.beforeGoLive(settings);
       } catch (e) {
-        this.setChecklistItem(platform, 'failed', 'CHANNEL_UPDATE_FAILED');
-        // something is wrong, stop streaming
-        // this.UPDATE_PLATFORM_STATUS(platform, { error: e });
+        this.setChecklistItem(platform, 'failed', 'SETTINGS_UPDATE_FAILED', e.details, platform);
         console.error(e);
         return;
       }
@@ -255,6 +263,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.createGameAssociation(this.views.game);
   }
 
+  /**
+   * update the status of a checklist item
+   */
   private setChecklistItem(
     itemName: keyof IStreamInfo['checklist'],
     state: TGoLiveChecklistItemState,
@@ -263,9 +274,14 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     platform?: TPlatform,
   ) {
     this.SET_CHECKLIST_ITEM(itemName, state);
-    this.state.info.checklist[itemName] = state;
-    if (!errorTypeOrError) return;
 
+    // always ask for error description for failed checkbox state
+    if (state === 'failed' && !errorTypeOrError) {
+      console.error('The error description is required for "failed" state');
+    }
+
+    // save the error info to the state if the error exists
+    if (!errorTypeOrError) return;
     if (typeof errorTypeOrError === 'object') {
       const error = (errorTypeOrError as StreamError).getModel();
       this.SET_ERROR(error.type, error.details, error.platform);
@@ -345,7 +361,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.toggleStreaming();
   }
 
-  private async finishStartStreaming() {
+  async finishStartStreaming() {
     // register a promise that we should reject or resolve in the `handleObsOutputSignal`
     const startStreamingPromise = new Promise((resolve, reject) => {
       this.resolveStartStreaming = resolve;
@@ -542,7 +558,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   showEditStreamInfo() {
     const advancedMode = this.streamSettingsService.state.goLiveSettings.advancedMode;
-    const height = advancedMode ? 1080 : 550;
+    const height = advancedMode ? 1080 : 750;
     const width = 900;
     const mainWinBounds = this.windowsService.getBounds('main');
 
@@ -569,10 +585,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         width: 520,
       },
     });
-  }
-
-  get twitterIsEnabled() {
-    return this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.twitter);
   }
 
   get delayEnabled() {

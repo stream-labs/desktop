@@ -15,8 +15,6 @@
   "You can re-enable this from the settings.": "You can re-enable this from the settings.",
   "Confirm & Go Live": "Confirm & Go Live",
   "Update Stream Info": "Update Stream Info",
-  "goLiveError": "There was an error fetching your channel information. You can try <fetch-again-link>fetching the information again</fetch-again-link> or you can <just-go-live-link>just go live</just-go-live-link>. If this error persists, you can try logging out and back in.",
-  "If this error persists, you can try logging out and back in.": "If this error persists, you can try logging out and back in.",
   "Use optimized encoder settings": "Use optimized encoder settings",
   "Optimized encoder gives equivalent quality while reducing usage. Game specific encoders for Fortnite, PUBG, Destiny 2, and League Of Legends": "Optimized encoder gives equivalent quality while reducing usage. Game specific encoders for Fortnite, PUBG, Destiny 2, and League Of Legends",
   "Something went wrong while updating your stream info.  Please try again.": "Something went wrong while updating your stream info.  Please try again.",
@@ -99,5 +97,7 @@
   "Refresh Login": "Refresh Login",
   "Update settings for %{platform}": "Update settings for %{platform}",
   "Link to the %{platform} page has been copied to your clipboard": "Link to the %{platform} page has been copied to your clipboard",
-  "Can not fetch settings from %{platformName}": "Can not fetch settings from %{platformName}"
+  "Can not fetch settings from %{platformName}": "Can not fetch settings from %{platformName}",
+  "prepopulateStreamSettingsError": "There was an error fetching your channel information. You can try <fetch-again-link>fetching the information again</fetch-again-link> or you can <just-go-live-link>just go live</just-go-live-link>. If this error persists, you can try logging out and back in.",
+  "updateStreamSettingsError": "Something went wrong while updating your stream info. You can <try-again-link>try again</try-again-link>, or you can <just-go-live-link>just go live</just-go-live-link>. If this error persists, you can try logging out and back in."
 }

@@ -119,7 +119,11 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
       .catch(() => null);
   }
 
-  async postTweet(tweet: string) {
+  /**
+   * Post a tweet and return a tweet url
+   * @param tweet
+   */
+  async postTweet(tweet: string): Promise<string> {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/twitter/tweet`;
     const headers = authorizedHeaders(this.userService.apiToken);

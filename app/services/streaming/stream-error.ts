@@ -2,20 +2,17 @@ import { ServiceHelper } from 'services/core';
 import { TPlatform } from '../platforms';
 
 const errorTypes = {
-  TWITCH_REQUEST_FAILED: {
+  PLATFORM_REQUEST_FAILED: {
     message: 'The request to Twitch API has been failed',
   },
-  YOUTUBE_REQUEST_FAILED: {
-    message: 'The request to Youtube API has been failed',
+  FACEBOOK_HAS_NO_PAGES: {
+    message: 'Facebook pages have not been found',
   },
   PREPOPULATE_FAILED: {
-    message: 'Failed to fetch channel info',
+    message: 'Failed to fetch platform settings',
   },
-  CHANNEL_UPDATE_FAILED: {
-    message: 'Failed to update channel info',
-  },
-  FACEBOOK_HAS_NO_PAGES: {
-    message: 'You must create a Facebook gaming page to go live with Facebook',
+  SETTINGS_UPDATE_FAILED: {
+    message: 'Failed to update platform settings',
   },
   RESTREAM_DISABLED: {
     message:

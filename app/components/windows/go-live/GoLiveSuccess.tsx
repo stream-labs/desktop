@@ -5,7 +5,7 @@ import { WindowsService } from '../../../services/windows';
 import { StreamInfoDeprecatedService } from '../../../services/stream-info-deprecated';
 import { $t } from 'services/i18n';
 import { Component } from 'vue-property-decorator';
-import styles from './GoLiveChecklist.m.less';
+import styles from './GoLive.m.less';
 import cx from 'classnames';
 import { YoutubeService } from '../../../services/platforms/youtube';
 import { getPlatformService, TPlatform } from '../../../services/platforms';
@@ -25,67 +25,83 @@ export default class GoLiveSuccess extends TsxComponent<{}> {
   @Inject() private windowsService: WindowsService;
   @Inject() private twitterService: TwitterService;
 
-  private confirmationCopyMessage = '';
-  private tweetModel = '';
-
-  private copyToClipboard(url: string, confirmMessage: string) {
+  private copyToClipboard(url: string) {
     Utils.copyToClipboard(url);
-    this.confirmationCopyMessage = confirmMessage;
+    this.$toasted.show($t('Copied to your clipboard'), {
+      position: 'bottom-center',
+      duration: 1000,
+      singleton: true,
+    });
   }
 
   private get view() {
     return this.streamingService.views;
   }
 
+  private get title() {
+    return this.view.goLiveSettings.commonFields.title;
+  }
+
   private openLink(url: string) {
     electron.remote.shell.openExternal(url);
   }
 
+  private get links() {
+    return this.view.enabledPlatforms.map(
+      platform => getPlatformService(platform).state.streamPageUrl,
+    );
+  }
+
+  private get streamInfoText(): string {
+    return `${this.title}\n${this.links.join('\n')}`;
+  }
+
+  private copyLinks() {
+    this.copyToClipboard(this.streamInfoText);
+  }
+
+  private openLinks() {
+    this.links.forEach(url => this.openLink(url));
+  }
+
   private render() {
     return (
-      <div>
-        {/* LINKS LIST */}
-        <div class={styles.linksContainer}>
-          {this.view.enabledPlatforms.map(platform => {
-            const service = getPlatformService(platform);
-            const name = service.displayName;
-            const url = service.state.streamPageUrl;
-            return (
-              <div class={styles.streamLink}>
-                <HFormGroup title={name}>
-                  <TextInput value={url} metadata={{ disabled: true }} />
-                  <button
-                    onclick={() =>
-                      this.copyToClipboard(
-                        url,
-                        $t('Link to the %{platform} page has been copied to your clipboard', {
-                          platform: name,
-                        }),
-                      )
-                    }
-                    class="button button--action"
-                  >
-                    {$t('Copy')}
-                  </button>
-                  <button onclick={() => this.openLink(url)} class="button button--default">
-                    {$t('Open')}
-                  </button>
-                </HFormGroup>
-              </div>
-            );
-          })}
-        </div>
+      <div class={styles.successContainer}>
+        <h1>{$t("You're live!")}</h1>
 
-        {/* CONFIRMATION MESSAGE FOR CLIPBOARD */}
-        {this.confirmationCopyMessage && (
-          <p style={{ textAlign: 'center' }}>{this.confirmationCopyMessage}</p>
-        )}
+        {/* LINKS LIST */}
+        <div class={cx('section', styles.linksContainer)}>
+          <p style={{ fontSize: '16px' }}> {$t('Your links')}</p>
+          <table class={styles.streamLinks}>
+            {this.view.enabledPlatforms.map(platform => {
+              const service = getPlatformService(platform);
+              const name = service.displayName;
+              const url = service.state.streamPageUrl;
+              return (
+                <tr>
+                  <td>
+                    <strong>{name}</strong>
+                  </td>
+                  <td>
+                    <a onclick={() => this.openLink(url)}>{url}</a>
+                    <a onclick={() => this.copyToClipboard(url)}>{$t('Copy')}</a>
+                  </td>
+                </tr>
+              );
+            })}
+          </table>
+          <div class={styles.copyLinksButtons}>
+            <a onclick={() => this.copyLinks()}>{$t('Copy Links')}</a>
+            <a onclick={() => this.openLinks()}>{$t('Open Links')}</a>
+          </div>
+        </div>
 
         {/* TWITTER */}
         {this.twitterService.isEnabled && (
           <Twitter
+            style={{ width: '750px' }}
             streamTitle={this.view.info.goLiveSettings.commonFields.title}
-            vModel={this.tweetModel}
+            value={this.streamInfoText}
           />
         )}
       </div>

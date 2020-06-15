@@ -12,13 +12,13 @@ import { Inject } from 'services/core/injector';
 import { authorizedHeaders, handleResponse } from '../../util/requests';
 import { UserService } from '../user';
 import { integer } from 'aws-sdk/clients/cloudfront';
-import { IPlatformResponse, platformAuthorizedRequest, platformRequest } from './utils';
+import { platformAuthorizedRequest, platformRequest } from './utils';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { Subject } from 'rxjs';
 import { CustomizationService } from 'services/customization';
 import { IInputMetadata } from '../../components/shared/inputs';
-import { IFacebookStartStreamOptions } from './facebook';
 import { IGoLiveSettings } from '../streaming';
+import { throwStreamError } from '../streaming/stream-error';
 
 interface IMixerServiceState {
   typeIdMap: object;
@@ -141,14 +141,27 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
       });
   }
 
-  fetchRawChannelInfo() {
-    return platformAuthorizedRequest<IMixerRawChannel>(
-      'mixer',
+  private fetchRawChannelInfo() {
+    return this.requestMixer<IMixerRawChannel>(
       `${this.apiBase}channels/${this.mixerUsername}/details`,
     ).then(json => {
       this.userService.updatePlatformChannelId('mixer', json.id);
       return json;
     });
+  }
+
+  /**
+   * Request Mixer API and wrap failed response to a unified error model
+   */
+  private async requestMixer<T = unknown>(reqInfo: IPlatformRequest | string): Promise<T> {
+    try {
+      return await platformAuthorizedRequest<T>('mixer', reqInfo);
+    } catch (e) {
+      const details = e.result
+        ? `${e.result.statusCode} ${e.result.error} ${e.result.message}`
+        : 'Connection failed';
+      throwStreamError('PLATFORM_REQUEST_FAILED', details, 'mixer');
+    }
   }
 
   fetchStreamKey(): Promise<string> {
@@ -194,14 +207,6 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     this.channelInfoChanged.next(this.activeChannel);
   }
 
-  async fetchGoLiveSettings(): Promise<IMixerStartStreamOptions> {
-    await this.prepopulateInfo();
-    return {
-      title: this.activeChannel.title,
-      game: this.activeChannel.game,
-    };
-  }
-
   fetchViewerCount(): Promise<number> {
     return platformRequest<{ viewersCurrent: number }>(
       'mixer',
@@ -216,7 +221,7 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
       data['typeId'] = this.state.typeIdMap[game];
     }
 
-    await platformAuthorizedRequest('mixer', {
+    await this.requestMixer({
       url: `${this.apiBase}channels/${this.channelId}`,
       method: 'PATCH',
       body: JSON.stringify(data),
@@ -261,13 +266,6 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
 
   liveDockEnabled(): boolean {
     return true;
-  }
-
-  /**
-   * Get user-friendly error message
-   */
-  getErrorDescription(error: IPlatformResponse<unknown>): string {
-    return 'Can not connect to Mixer';
   }
 
   @mutation()

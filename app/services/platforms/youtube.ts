@@ -191,7 +191,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
       let details = e.result?.error?.message;
       if (!details) details = 'connection failed';
       console.error(e);
-      throw throwStreamError('YOUTUBE_REQUEST_FAILED', details);
+      throw throwStreamError('PLATFORM_REQUEST_FAILED', details, 'youtube');
     }
   }
 

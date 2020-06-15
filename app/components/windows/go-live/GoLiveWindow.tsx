@@ -17,7 +17,6 @@ import TwitchEditStreamInfo from '../../platforms/TwitchEditStreamInfo';
 import FacebookEditStreamInfo from '../../platforms/FacebookEditStreamInfo';
 import MixerEditStreamInfo from '../../platforms/MixerEditStreamInfo';
 import HFormGroup from '../../shared/inputs/HFormGroup.vue';
-import { Twitter } from '../../Twitter';
 import { IEncoderProfile } from 'services/video-encoding-optimizations';
 import { WindowsService } from 'services/windows';
 import { StreamInfoDeprecatedService } from 'services/stream-info-deprecated';

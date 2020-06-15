@@ -62,7 +62,7 @@ export default class FacebookEditStreamInfo extends TsxComponent<Props> {
         required: true,
       }),
       game: metadata.text({
-        title: $t('Game'),
+        title: $t('Facebook Game'),
         fullWidth: true,
         required: true,
       }),

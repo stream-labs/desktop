@@ -11,7 +11,7 @@ import { getPlatformService, TPlatform } from '../../../services/platforms';
 import { TwitterService } from '../../../services/integrations/twitter';
 import { IStreamError } from '../../../services/streaming/stream-error';
 import Translate from '../../shared/translate';
-import electron from 'electron';
+import electron, { shell } from 'electron';
 
 /**
  * Shows error and troubleshooting suggestions
@@ -27,16 +27,24 @@ export default class GoLiveError extends TsxComponent<{}> {
     return this.streamingService.views;
   }
 
-  private get error() {
-    return this.view.info.error;
-  }
-
-  private getPlatformDisplayName(platform: TPlatform): string {
-    return getPlatformService(platform).displayName;
-  }
-
   private goToYoutubeDashboard() {
     electron.remote.shell.openExternal(this.youtubeService.state.dashboardUrl);
+  }
+
+  private createFBPage() {
+    electron.remote.shell.openExternal(
+      'https://www.facebook.com/gaming/pages/create?ref=streamlabs',
+    );
+    this.windowsService.actions.closeChildWindow();
+  }
+
+  private skipPrepopulateAndGoLive() {
+    this.streamingService.actions.goLive();
+  }
+
+  private skipSettingsUpdateAndGoLive() {
+    this.streamingService.actions.finishStartStreaming();
+    this.windowsService.actions.closeChildWindow();
   }
 
   private render() {
@@ -45,11 +53,17 @@ export default class GoLiveError extends TsxComponent<{}> {
     switch (error.type) {
       case 'PREPOPULATE_FAILED':
         return this.renderPrepopulateError(error);
+      case 'FACEBOOK_HAS_NO_PAGES':
+        return this.renderFacebookNoPagesError(error);
+      case 'SETTINGS_UPDATE_FAILED':
+        return this.renderSettingsUpdateError(error);
       case 'RESTREAM_DISABLED':
       case 'RESTREAM_SETUP_FAILED':
         return this.renderRestreamError(error);
       case 'YOUTUBE_PUBLISH_FAILED':
         return this.renderYoutubePublishError(error);
+      default:
+        return <ErrorLayout error={error} />;
     }
   }
 
@@ -61,7 +75,7 @@ export default class GoLiveError extends TsxComponent<{}> {
         message={$t('Can not fetch settings from %{platformName}', { platformName })}
       >
         <Translate
-          message={$t('goLiveError')}
+          message={$t('prepopulateStreamSettingsError')}
           scopedSlots={{
             fetchAgainLink: (text: string) => (
               <a
@@ -72,7 +86,33 @@ export default class GoLiveError extends TsxComponent<{}> {
               </a>
             ),
             justGoLiveLink: (text: string) => (
-              <a class={styles.link} onclick={() => this.streamingService.actions.goLive()}>
+              <a class={styles.link} onclick={() => this.skipPrepopulateAndGoLive()}>
+                {{ text }}
+              </a>
+            ),
+          }}
+        />
+      </ErrorLayout>
+    );
+  }
+
+  private renderSettingsUpdateError(error: IStreamError) {
+    const platformName = getPlatformService(error.platform).displayName;
+    return (
+      <ErrorLayout
+        error={error}
+        message={$t('Can not fetch settings from %{platformName}', { platformName })}
+      >
+        <Translate
+          message={$t('updateStreamSettingsError')}
+          scopedSlots={{
+            tryAgainLink: (text: string) => (
+              <a class={styles.link} onClick={() => this.streamingService.actions.goLive()}>
+                {{ text }}
+              </a>
+            ),
+            justGoLiveLink: (text: string) => (
+              <a class={styles.link} onclick={() => this.skipSettingsUpdateAndGoLive()}>
                 {{ text }}
               </a>
             ),
@@ -98,6 +138,23 @@ export default class GoLiveError extends TsxComponent<{}> {
           scopedSlots={{
             dashboardLink: (text: string) => (
               <a class={styles.link} onClick={() => this.goToYoutubeDashboard()}>
+                {{ text }}
+              </a>
+            ),
+          }}
+        />
+      </ErrorLayout>
+    );
+  }
+
+  private renderFacebookNoPagesError(error: IStreamError) {
+    return (
+      <ErrorLayout error={error}>
+        <Translate
+          message={$t('facebookNoPagesError')}
+          scopedSlots={{
+            createLink: (text: string) => (
+              <a class={styles.link} onClick={() => this.createFBPage()}>
                 {{ text }}
               </a>
             ),
@@ -141,7 +198,7 @@ class ErrorLayout extends TsxComponent<ErrorLayoutProps> {
             </a>
           </p>
         )}
-        {details && this.isErrorDetailsShown && <p class={styles.error}>{details}</p>}
+        {details && this.isErrorDetailsShown && <p class={styles.details}>{details}</p>}
       </div>
     );
   }

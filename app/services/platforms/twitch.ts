@@ -229,7 +229,7 @@ export class TwitchService extends StatefulService<ITwitchServiceState>
       const details = e.result
         ? `${e.result.status} ${e.result.error} ${e.result.message}`
         : 'Connection failed';
-      throwStreamError('TWITCH_REQUEST_FAILED', details);
+      throwStreamError('PLATFORM_REQUEST_FAILED', details, 'twitch');
     }
   }
 

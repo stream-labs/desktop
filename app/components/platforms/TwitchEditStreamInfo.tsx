@@ -49,7 +49,7 @@ export default class TwitchEditStreamInfo extends TsxComponent<TwitchEditStreamP
   private gameOptions: IListOption<string>[] = [];
   private get gameMetadata() {
     return metadata.list({
-      title: $t('Game'),
+      title: $t('Twitch Game'),
       placeholder: $t('Start typing to search'),
       options: this.gameOptions,
       loading: this.searchingGames,
