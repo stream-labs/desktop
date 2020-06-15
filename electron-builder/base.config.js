@@ -55,6 +55,4 @@ const base = {
   },
 };
 
-// if (!process.env.SLOBS_NO_SIGN) base.win.certificateSubjectName = 'Streamlabs (General Workings, Inc.)';
-
 module.exports = base;
