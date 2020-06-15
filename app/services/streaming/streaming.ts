@@ -497,6 +497,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         this.SET_STREAMING_STATUS(EStreamingState.Offline, time);
         this.streamingStatusChange.next(EStreamingState.Offline);
         if (this.streamSettingsService.protectedModeEnabled) this.runPlaformAfterStopStreamHook();
+        this.usageStatisticsService.recordAnalyticsEvent('StreamStop', { code: info.code });
       } else if (info.signal === EOBSOutputSignal.Stopping) {
         this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
         this.streamingStatusChange.next(EStreamingState.Ending);
