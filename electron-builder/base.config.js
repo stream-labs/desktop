@@ -36,6 +36,13 @@ const base = {
     async sign(config) {
       if (process.env.SLOBS_NO_SIGN) return;
 
+      if (
+        config.path.indexOf('node_modules\\obs-studio-node\\data\\obs-plugins\\win-capture') !== -1
+      ) {
+        console.log(`Skipping ${config.path}`);
+        return;
+      }
+
       console.log(`Signing ${config.path}`);
       await signtool.sign(config.path, {
         subject: 'Streamlabs (General Workings, Inc.)',
