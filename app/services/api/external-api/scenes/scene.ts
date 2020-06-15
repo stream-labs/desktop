@@ -6,7 +6,7 @@ import { TSourceType } from 'services/sources';
 import { Selection } from './selection';
 import { ISceneNodeAddOptions, ScenesService } from './scenes';
 import { ISceneNodeModel, SceneNode } from './scene-node';
-import { SceneItem } from './scene-item';
+import { getExternalSceneItemModel, SceneItem } from './scene-item';
 import { SceneItemFolder } from './scene-item-folder';
 import Utils from '../../../utils';
 

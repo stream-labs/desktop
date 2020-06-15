@@ -86,20 +86,20 @@ export default class Studio extends TsxComponent {
    * max, then the primary view will be reduced in size until a reasonable
    * minimum, at which point the secondary will start being reduced in size.
    */
-  reconcileSizeWithinContraints(mins: IResizeMins) {
+  async reconcileSizeWithinContraints(mins: IResizeMins) {
     const functionalMax = this.calculateMax(mins.rest);
     if (this.underMaxSize(functionalMax)) return;
 
     if (this.resizes.bar1 > mins.bar1) {
       const remainingSpace = mins.bar2 ? functionalMax - this.resizes.bar2 : functionalMax;
-      this.setBarResize('bar1', Math.max(remainingSpace, mins.bar1));
+      await this.setBarResize('bar1', Math.max(remainingSpace, mins.bar1));
       if (this.underMaxSize(functionalMax)) return;
     }
     if (!mins.bar2) return;
     if (this.resizes.bar2 > mins.bar2) {
       const oldBar2 = this.resizes.bar2;
-      this.setBarResize('bar2', Math.max(functionalMax - mins.bar1, mins.bar2));
-      this.setBarResize('bar1', this.resizes.bar1 - (this.resizes.bar2 - oldBar2));
+      await this.setBarResize('bar2', Math.max(functionalMax - mins.bar1, mins.bar2));
+      await this.setBarResize('bar1', this.resizes.bar1 - (this.resizes.bar2 - oldBar2));
       if (this.underMaxSize(functionalMax)) return;
     }
     // The final strategy is to just split the remaining space
@@ -108,14 +108,14 @@ export default class Studio extends TsxComponent {
   }
 
   calculateMin(slots: IVec2Array) {
-    return this.layoutService.calculateMinimum(this.isColumns ? 'x' : 'y', slots);
+    return this.layoutService.views.calculateMinimum(this.isColumns ? 'x' : 'y', slots);
   }
 
   totalWidthHandler(slots: IVec2Array) {
     if (this.isColumns) {
-      this.$emit('totalWidth', this.layoutService.calculateColumnTotal(slots));
+      this.$emit('totalWidth', this.layoutService.views.calculateColumnTotal(slots));
     } else {
-      this.$emit('totalWidth', this.layoutService.calculateMinimum('x', slots));
+      this.$emit('totalWidth', this.layoutService.views.calculateMinimum('x', slots));
     }
   }
 
@@ -130,8 +130,8 @@ export default class Studio extends TsxComponent {
     return this.resizes.bar1 + this.resizes.bar2 <= max;
   }
 
-  setBarResize(bar: 'bar1' | 'bar2', size: number, mins?: IResizeMins) {
-    this.layoutService.setBarResize(bar, size);
+  async setBarResize(bar: 'bar1' | 'bar2', size: number, mins?: IResizeMins) {
+    await this.layoutService.actions.setBarResize(bar, size);
     if (mins) this.reconcileSizeWithinContraints(mins);
   }
 

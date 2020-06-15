@@ -142,22 +142,6 @@ export abstract class StreamBossService extends BaseGoalService<
         title: $t('Transparent Background'),
       }),
 
-      follow_multiplier: metadata.number({
-        title: $t('Damage Per Follower'),
-      }),
-
-      bit_multiplier: metadata.number({
-        title: $t('Damage Per Bit'),
-      }),
-
-      sub_multiplier: metadata.number({
-        title: $t('Damage Per Subscriber'),
-      }),
-
-      donation_multiplier: metadata.number({
-        title: $t('Damage Per Dollar Donation'),
-      }),
-
       background_color: metadata.color({
         title: $t('Background Color'),
       }),
@@ -182,5 +166,29 @@ export abstract class StreamBossService extends BaseGoalService<
         title: $t('Font'),
       }),
     });
+  }
+
+  multipliersByPlatform(): { key: string; title: string; isInteger: boolean }[] {
+    const platform = this.userService.platform.type;
+    return {
+      twitch: [
+        { key: 'bit_multiplier', title: $t('Damage Per Bit'), isInteger: true },
+        { key: 'sub_multiplier', title: $t('Damage Per Subscriber'), isInteger: true },
+        { key: 'follow_multiplier', title: $t('Damage Per Follower'), isInteger: true },
+      ],
+      facebook: [
+        { key: 'follow_multiplier', title: $t('Damage Per Follower'), isInteger: true },
+        { key: 'sub_multiplier', title: $t('Damage Per Subscriber'), isInteger: true },
+      ],
+      youtube: [
+        { key: 'sub_multiplier', title: $t('Damage Per Membership'), isInteger: true },
+        { key: 'superchat_multiplier', title: $t('Damage Per Superchat Dollar'), isInteger: true },
+        { key: 'follow_multiplier', title: $t('Damage Per Subscriber'), isInteger: true },
+      ],
+      mixer: [
+        { key: 'follow_multiplier', title: $t('Damage Per Follower'), isInteger: true },
+        { key: 'sub_multiplier', title: $t('Damage Per Subscriber'), isInteger: true },
+      ],
+    }[platform];
   }
 }

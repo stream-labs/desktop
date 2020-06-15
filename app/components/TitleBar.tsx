@@ -9,13 +9,16 @@ import KevinSvg from 'components/shared/KevinSvg';
 import Utils from 'services/utils';
 import { $t } from 'services/i18n';
 import styles from './TitleBar.m.less';
+import TsxComponent, { createProps } from './tsx-component';
 
-@Component({})
-export default class TitleBar extends Vue {
+class TitleBarProps {
+  title: string = '';
+}
+
+@Component({ props: createProps(TitleBarProps) })
+export default class TitleBar extends TsxComponent<TitleBarProps> {
   @Inject() customizationService: CustomizationService;
   @Inject() streamingService: StreamingService;
-
-  @Prop() title: string;
 
   minimize() {
     electron.remote.getCurrentWindow().minimize();
@@ -58,7 +61,7 @@ export default class TitleBar extends Vue {
           <img class={styles.titlebarIcon} src={require('../../media/images/icon.ico')} />
         )}
         {this.primeTheme && <KevinSvg class={styles.titlebarIcon} />}
-        <div class={styles.titlebarTitle}>{this.title}</div>
+        <div class={styles.titlebarTitle}>{this.props.title}</div>
         <div class={styles.titlebarActions}>
           <i class={cx('icon-subtract', styles.titlebarAction)} onClick={() => this.minimize()} />
           {this.isMaximizable && (
