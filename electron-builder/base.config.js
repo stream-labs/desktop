@@ -47,6 +47,7 @@ const base = {
       await signtool.sign(config.path, {
         subject: 'Streamlabs (General Workings, Inc.)',
         rfcTimestamp: 'http://timestamp.digicert.com',
+        algorithm: config.hash,
       });
     },
   },
