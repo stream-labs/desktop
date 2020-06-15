@@ -1,3 +1,4 @@
+import colorPicker from 'color-picker';
 import { Component, Prop } from 'vue-property-decorator';
 import { Sketch } from 'vue-color';
 import { BaseInput } from './BaseInput';
@@ -21,6 +22,14 @@ export default class ColorInput extends BaseInput<string, IInputMetadata> {
     };
   }
 
+  eyedrop() {
+    colorPicker.startColorPicker((data: { event: string; hex: string }) => {
+      if (data.event === 'mouseClick') {
+        this.emitInput(data.hex);
+      }
+    });
+  }
+
   render() {
     return (
       <div data-role="input" data-type="color" data-name={this.options.name}>
@@ -38,6 +47,7 @@ export default class ColorInput extends BaseInput<string, IInputMetadata> {
                     onInput={(value: { hex: string }) => this.emitInput(value.hex)}
                     class="colorpicker-menu"
                   />
+                  <i class="fas fa-eye-dropper" />
                 </div>
               )}
             </transition>

@@ -3768,6 +3768,10 @@ color-name@^1.1.1:
   resolved "https://registry.yarnpkg.com/color-name/-/color-name-1.1.1.tgz#4b1415304cf50028ea81643643bd82ea05803689"
   integrity sha1-SxQVMEz1ACjqgWQ2Q72C6gWANok=
 
+"color-picker@https://obs-studio-deployment.s3-us-west-2.amazonaws.com/iojs-v6.0.3-color-picker-win.tar.gz":
+  version "1.0.0"
+  resolved "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/iojs-v6.0.3-color-picker-win.tar.gz#009a544bbc7d62388e1d0bb8c1eaaa63addb10fb"
+
 colors@1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/colors/-/colors-1.0.3.tgz#0433f44d809680fdeb60ed260f1b0c262e82a40b"
