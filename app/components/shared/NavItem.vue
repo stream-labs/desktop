@@ -4,7 +4,7 @@
   :class="{ active: to === value, disabled: enabled === false, 'nav-item--child': isSubItem }"
   @click="onClickHandler"
 >
-  <i v-if="ico" :class="ico" @click="onIconClickHandler"></i>
+  <i v-if="ico" :class="ico" @click="onIconClickHandler" :style="icoStyles"></i>
   <div class="nav-item__content">
     <slot></slot>
     <div v-if="expanded" class="nav-item__children">
