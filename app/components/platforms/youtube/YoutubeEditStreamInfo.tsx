@@ -13,20 +13,20 @@ import {
   YoutubeService,
 } from 'services/platforms/youtube';
 import StreamTitleAndDescription from '../StreamTitleAndDescription';
+import { StreamingService } from '../../../app-services';
 
 class YoutubeEditStreamInfoProps {
-  showOnlyRequiredFields? = false;
   value?: IYoutubeStartStreamOptions = {
     description: '',
     title: '',
     broadcastId: '',
   };
-  canChangeBroadcast = true;
 }
 
 @Component({ components: { ValidatedForm }, props: createProps(YoutubeEditStreamInfoProps) })
 export default class YoutubeEditStreamInfo extends TsxComponent<YoutubeEditStreamInfoProps> {
   @Inject() private youtubeService: YoutubeService;
+  @Inject() private streamingService: StreamingService;
   settings: IYoutubeStartStreamOptions = null;
   broadcasts: IYoutubeLiveBroadcast[] = [];
   broadcastsLoaded = false;
@@ -35,6 +35,10 @@ export default class YoutubeEditStreamInfo extends TsxComponent<YoutubeEditStrea
     this.settings = cloneDeep(this.props.value);
     this.broadcasts = await this.youtubeService.fetchBroadcasts();
     this.broadcastsLoaded = true;
+  }
+
+  get canChangeBroadcast() {
+    return this.streamingService.isStreaming;
   }
 
   @Watch('value')
@@ -67,7 +71,7 @@ export default class YoutubeEditStreamInfo extends TsxComponent<YoutubeEditStrea
       event: {
         broadcasts: this.broadcasts,
         loading: !this.broadcastsLoaded,
-        disabled: !this.props.canChangeBroadcast,
+        disabled: !this.canChangeBroadcast,
       },
     });
   }
@@ -77,10 +81,11 @@ export default class YoutubeEditStreamInfo extends TsxComponent<YoutubeEditStrea
   }
 
   render() {
+    const canShowOnlyRequiredFields = this.streamingService.views.canShowOnlyRequiredFields;
     return (
-      !this.props.showOnlyRequiredFields && (
+      !canShowOnlyRequiredFields && (
         <ValidatedForm onInput={this.emitInput}>
-          {this.props.canChangeBroadcast && (
+          {this.canChangeBroadcast && (
             <HFormGroup title={$t('Event')}>
               <BroadcastInput
                 onInput={this.onSelectBroadcastHandler}

@@ -33,6 +33,10 @@ export default class StartStreamingButton extends Vue {
     }
   }
 
+  get isMidStream() {
+    return this.streamingService.views.isMidStreamMode;
+  }
+
   async toggleStreaming() {
     if (this.streamingService.isStreaming) {
       this.streamingService.toggleStreaming();
@@ -94,9 +98,13 @@ export default class StartStreamingButton extends Vue {
         //     await this.videoEncodingOptimizationService.applyProfileFromCache();
         //   }
         //   this.streamingService.toggleStreaming();
-        this.streamingService.showEditStreamInfo();
+        this.streamingService.actions.showGoLiveWindow();
       }
     }
+  }
+
+  edit() {
+    this.streamingService.actions.showEditStream();
   }
 
   get hasPages() {

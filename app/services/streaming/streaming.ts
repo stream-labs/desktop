@@ -136,7 +136,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         console.log('InfoChanged', val);
         // show the error if child window is closed
         if (val.error && !this.windowsService.state.child.isShown) {
-          this.showEditStreamInfo();
+          this.showGoLiveWindow();
         }
       },
       {
@@ -181,17 +181,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
     // use default settings if no new settings provided
     if (!settings) settings = cloneDeep(this.views.goLiveSettings);
+    settings = this.sanitizeGoLiveSettings(settings);
     this.streamSettingsService.setSettings({ goLiveSettings: settings });
     this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist', goLiveSettings: settings });
-
-    // copy common title and description for all platforms
-    const destinations = settings.destinations;
-    Object.keys(destinations).forEach((destName: TPlatform) => {
-      const dest = destinations[destName];
-      if (dest.useCustomTitleAndDescription) return;
-      if (dest.title !== void 0) dest.title = settings.commonFields.title;
-      if (dest['description'] !== void 0) dest['description'] = settings.commonFields.description;
-    });
 
     // call beforeGoLive for each platform
     // that will update the channel settings for each platform
@@ -210,7 +202,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
 
     // setup restream
-    if (this.views.shouldGoLiveWithRestream) {
+    if (this.views.isMutliplatformMode) {
       this.setChecklistItem('setupRestream', 'pending');
       // check the Restream service is available
       let ready = false;
@@ -247,7 +239,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.setChecklistItem('startVideoTransmission', 'done');
 
     // publish the Youtube broadcast
-    if (this.streamSettingsService.protectedModeEnabled && destinations.youtube?.enabled) {
+    if (this.streamSettingsService.protectedModeEnabled && settings.destinations.youtube?.enabled) {
       this.setChecklistItem('publishYoutubeBroadcast', 'pending');
       try {
         await getPlatformService('youtube').afterGoLive();
@@ -261,6 +253,50 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.UPDATE_STREAM_INFO({ lifecycle: 'live' });
 
     this.createGameAssociation(this.views.game);
+  }
+
+  /**
+   * Update stream stetting while being live
+   */
+  async updateStreamSettings(settings: IGoLiveSettings) {
+    settings = this.sanitizeGoLiveSettings(settings);
+
+    // run checklist
+    this.RESET_STREAM_INFO();
+    this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist', goLiveSettings: settings });
+
+    // call putChannelInfo for each platform
+    const platforms = this.views.enabledPlatforms;
+    for (const platform of platforms) {
+      const service = getPlatformService(platform);
+      this.setChecklistItem(platform, 'pending');
+      const updatedSettings = settings.destinations[platform];
+      try {
+        await service.putChannelInfo(updatedSettings);
+      } catch (e) {
+        this.setChecklistItem(platform, 'failed', 'SETTINGS_UPDATE_FAILED', e.details, platform);
+        console.error(e);
+        return;
+      }
+      this.setChecklistItem(platform, 'done');
+    }
+
+    // save updated settings locally
+    this.streamSettingsService.setSettings({ goLiveSettings: settings });
+    // return back to the 'live' state
+    this.UPDATE_STREAM_INFO({ lifecycle: 'live' });
+  }
+
+  private sanitizeGoLiveSettings(settings: IGoLiveSettings): IGoLiveSettings {
+    // copy common title and description for all platforms
+    const destinations = settings.destinations;
+    Object.keys(destinations).forEach((destName: TPlatform) => {
+      const dest = destinations[destName];
+      if (dest.useCustomTitleAndDescription) return;
+      if (dest.title !== void 0) dest.title = settings.commonFields.title;
+      if (dest['description'] !== void 0) dest['description'] = settings.commonFields.description;
+    });
+    return settings;
   }
 
   /**
@@ -556,9 +592,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
   }
 
-  showEditStreamInfo() {
+  showGoLiveWindow() {
     const advancedMode = this.streamSettingsService.state.goLiveSettings.advancedMode;
-    const height = advancedMode ? 1080 : 750;
+    const height = 750; // advancedMode ? 1080 : 750;
     const width = 900;
     const mainWinBounds = this.windowsService.getBounds('main');
 
@@ -572,6 +608,20 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       position: {
         x: mainWinBounds.x + mainWinBounds.width - width,
         y: mainWinBounds.y + mainWinBounds.height - height,
+      },
+    });
+  }
+
+  showEditStream() {
+    const height = 750;
+    const width = 900;
+
+    this.windowsService.showWindow({
+      componentName: 'EditStreamInfoWindow',
+      title: $t('Update Stream Info'),
+      size: {
+        height,
+        width,
       },
     });
   }
@@ -949,8 +999,16 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     ) as TPlatform[];
   }
 
-  get shouldGoLiveWithRestream() {
+  get canShowOnlyRequiredFields(): boolean {
+    return this.enabledPlatforms.length > 1 && !this.goLiveSettings.advancedMode;
+  }
+
+  get isMutliplatformMode() {
     return this.enabledPlatforms.length > 1;
+  }
+
+  get isMidStreamMode(): boolean {
+    return this.state.streamingStatus !== 'offline';
   }
 
   get goLiveSettings(): IGoLiveSettings {

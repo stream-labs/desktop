@@ -249,7 +249,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
       // we can't make it available for other user until we
       // didn't switch it to the 'testing' state
       this.setLifecycleStep('transitionBroadcastToTesting');
-      await this.transitionBroadcastStatus(broadcastId, 'testing1' as TBroadcastLifecycleStatus);
+      await this.transitionBroadcastStatus(broadcastId, 'testing' as TBroadcastLifecycleStatus);
 
       // now we ready to publish the broadcast
       this.setLifecycleStep('waitForBroadcastToBeLive');
@@ -557,8 +557,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     fields = ['cdn', 'snippet', 'contentDetails', 'status'],
   ): Promise<IYoutubeLiveStream> {
     const endpoint = `liveStreams?part=${fields.join(',')}&id=${id}`;
-    const collection = await platformAuthorizedRequest<IYoutubeCollection<IYoutubeLiveStream>>(
-      'youtube',
+    const collection = await this.requestYoutube<IYoutubeCollection<IYoutubeLiveStream>>(
       `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
     );
     return collection.items[0];

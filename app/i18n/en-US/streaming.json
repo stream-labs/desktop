@@ -95,6 +95,7 @@
   "Multistream": "Multistream",
   "Your Twitch login is expired. Please log in again to continue using Streamlabs OBS": "Your Twitch login is expired. Please log in again to continue using Streamlabs OBS",
   "Refresh Login": "Refresh Login",
+  "%{platform} Settings": "%{platform} Settings",
   "Update settings for %{platform}": "Update settings for %{platform}",
   "Link to the %{platform} page has been copied to your clipboard": "Link to the %{platform} page has been copied to your clipboard",
   "Can not fetch settings from %{platformName}": "Can not fetch settings from %{platformName}",

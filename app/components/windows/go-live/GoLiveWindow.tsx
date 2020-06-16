@@ -2,31 +2,18 @@ import TsxComponent from 'components/tsx-component';
 import ModalLayout from 'components/ModalLayout.vue';
 import { $t } from 'services/i18n';
 import { Component, Watch } from 'vue-property-decorator';
-import PlatformLogo from 'components/shared/PlatformLogo';
 import styles from './GoLive.m.less';
 import { Inject } from 'services/core';
 import { UserService } from 'services/user';
-import { getPlatformService, TPlatform } from 'services/platforms';
 import { BoolInput, ToggleInput } from 'components/shared/inputs/inputs';
 import cx from 'classnames';
 import { formMetadata, IListOption, metadata } from 'components/shared/inputs';
 import { SettingsService } from 'services/settings';
-import YoutubeEditStreamInfo from 'components/platforms/youtube/YoutubeEditStreamInfo';
-import StreamTitleAndDescription from 'components/platforms/StreamTitleAndDescription';
-import TwitchEditStreamInfo from '../../platforms/TwitchEditStreamInfo';
-import FacebookEditStreamInfo from '../../platforms/FacebookEditStreamInfo';
-import MixerEditStreamInfo from '../../platforms/MixerEditStreamInfo';
 import HFormGroup from '../../shared/inputs/HFormGroup.vue';
 import { IEncoderProfile } from 'services/video-encoding-optimizations';
 import { WindowsService } from 'services/windows';
 import { StreamInfoDeprecatedService } from 'services/stream-info-deprecated';
-import { YoutubeService } from '../../../services/platforms/youtube';
-import {
-  IGoLiveSettings,
-  IPlatformStreamSettings,
-  IStreamInfo,
-  StreamingService,
-} from 'services/streaming';
+import { IGoLiveSettings, StreamingService } from 'services/streaming';
 
 import { Spinner, ProgressBar } from 'streamlabs-beaker';
 import cloneDeep from 'lodash/cloneDeep';
@@ -38,6 +25,9 @@ import GoLiveSettings from './GoLiveSettings';
 import GoLiveChecklist from './GoLiveChecklist';
 import GoLiveSuccess from './GoLiveSuccess';
 
+/***
+ * Windows that manages steps for streaming start
+ */
 @Component({})
 export default class GoLiveWindow extends TsxComponent<{}> {
   @Inject() private userService: UserService;
@@ -48,12 +38,10 @@ export default class GoLiveWindow extends TsxComponent<{}> {
   @Inject('StreamInfoDeprecatedService') private streamInfoService: StreamInfoDeprecatedService;
 
   $refs: {
-    goLiveSettings: GoLiveSettings;
+    form: ValidatedForm;
   };
 
-  private get userName() {
-    return this.userService.username;
-  }
+  private settings: IGoLiveSettings = null;
 
   private get view() {
     return this.streamingService.views;
@@ -88,24 +76,17 @@ export default class GoLiveWindow extends TsxComponent<{}> {
     }
   }
 
-  private showManagePlatforms() {
-    this.settingsService.showSettings('Stream');
-  }
-
   private async switchAdvancedMode(enabled: boolean) {
     this.streamSettingsService.setGoLiveSettings({ advancedMode: enabled });
-    await Utils.sleep(500); // wait to reduce the window flickering effect
-    this.streamingService.showEditStreamInfo();
   }
 
   /**
    * validate settings and try to go live
    */
   private async goLive() {
-    const settingComponent = this.$refs.goLiveSettings;
-    const errors = await settingComponent.$refs.settingsForm.validateAndGetErrorsCount();
+    const errors = await this.$refs.form.validateAndGetErrorsCount();
     if (errors) return;
-    this.streamingService.actions.goLive(settingComponent.settings);
+    this.streamingService.actions.goLive(this.settings);
   }
 
   private close() {
@@ -120,6 +101,8 @@ export default class GoLiveWindow extends TsxComponent<{}> {
    * Renders the child component depending on lifecycle step
    **/
   render() {
+    // create a copy of a settings model if not exist
+    if (!this.settings) this.settings = cloneDeep(this.streamingService.views.goLiveSettings);
     const shouldShowSettings = ['empty', 'prepopulate', 'waitForNewSettings'].includes(
       this.lifecycle,
     );
@@ -128,11 +111,12 @@ export default class GoLiveWindow extends TsxComponent<{}> {
 
     return (
       <ModalLayout customControls={true} showControls={false}>
-        <div slot="content">
-          {shouldShowSettings && <GoLiveSettings ref="goLiveSettings" />}
+        <ValidatedForm ref="form" slot="content">
+          {shouldShowSettings && <GoLiveSettings vModel={this.settings} />}
+          <BoolInput vModel={this.settings.useOptimizedProfile} />
           {shouldShowChecklist && <GoLiveChecklist />}
           {shouldShowSuccess && <GoLiveSuccess />}
-        </div>
+        </ValidatedForm>
         <div slot="controls">{this.renderControls()}</div>
       </ModalLayout>
     );

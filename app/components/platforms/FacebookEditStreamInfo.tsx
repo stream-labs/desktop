@@ -13,7 +13,6 @@ import { FacebookService, IFacebookStartStreamOptions } from '../../services/pla
 import { IGoLiveSettings, StreamingService } from '../../services/streaming';
 
 class Props {
-  showOnlyRequiredFields? = false;
   goLiveSettings: IGoLiveSettings = null;
   value?: IGoLiveSettings['destinations']['facebook'] = {
     facebookPageId: '',
@@ -70,7 +69,7 @@ export default class FacebookEditStreamInfo extends TsxComponent<Props> {
   }
 
   render() {
-    const showOnlyRequiredFields = this.props.showOnlyRequiredFields;
+    const showOnlyRequiredFields = this.streamingService.views.canShowOnlyRequiredFields;
     return (
       <ValidatedForm onInput={this.emitInput}>
         <HFormGroup title={this.formMetadata.page.title}>

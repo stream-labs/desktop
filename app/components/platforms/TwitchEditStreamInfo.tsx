@@ -14,10 +14,10 @@ import { IListOption, metadata } from '../shared/inputs';
 import { $t } from '../../services/i18n';
 import { getPlatformService } from '../../services/platforms';
 import { Debounce } from 'lodash-decorators/debounce';
-import { IGoLiveSettings } from '../../services/streaming';
+import { IGoLiveSettings, StreamingService } from '../../services/streaming';
+import { SyncWithValue } from '../../util/decorators';
 
 class TwitchEditStreamProps {
-  showOnlyRequiredFields? = false;
   value?: IGoLiveSettings['destinations']['twitch'] = {
     title: '',
     game: '',
@@ -29,24 +29,20 @@ class TwitchEditStreamProps {
 
 @Component({ components: { TwitchTagsInput }, props: createProps(TwitchEditStreamProps) })
 export default class TwitchEditStreamInfo extends TsxComponent<TwitchEditStreamProps> {
+  @Inject() private streamingService: StreamingService;
   @Inject() private twitchService: TwitchService;
+  @SyncWithValue()
   settings: IGoLiveSettings['destinations']['twitch'] = null;
 
-  created() {
-    this.syncValue(this.value);
-  }
-
-  @Watch('value')
-  syncValue(val: IGoLiveSettings['destinations']['twitch']) {
-    this.settings = cloneDeep(val);
-  }
-
-  emitInput() {
-    this.$emit('input', this.settings);
-  }
-
   searchingGames = false;
-  private gameOptions: IListOption<string>[] = [];
+  private gameOptions: IListOption<string>[] = null;
+
+  created() {
+    this.gameOptions = this.settings.game
+      ? [{ value: this.settings.game, title: this.settings.game }]
+      : [];
+  }
+
   private get gameMetadata() {
     return metadata.list({
       title: $t('Twitch Game'),
@@ -83,9 +79,15 @@ export default class TwitchEditStreamInfo extends TsxComponent<TwitchEditStreamP
   }
 
   private render() {
+    const view = this.streamingService.views;
+    const canShowOnlyRequiredFields = view.canShowOnlyRequiredFields;
+    const isMutliplatformMode = view.isMutliplatformMode;
     return (
-      <ValidatedForm onInput={this.emitInput}>
-        {!this.props.showOnlyRequiredFields && (
+      <ValidatedForm>
+        {!canShowOnlyRequiredFields && (
+          <StreamTitleAndDescription vModel={this.settings} allowCustom={isMutliplatformMode} />
+        )}
+        {!canShowOnlyRequiredFields && (
           <TwitchTagsInput
             tags={this.twitchService.state.availableTags}
             hasPermission={this.twitchService.state.hasUpdateTagsPermission}
@@ -99,9 +101,6 @@ export default class TwitchEditStreamInfo extends TsxComponent<TwitchEditStreamP
             metadata={this.gameMetadata}
           />
         </HFormGroup>
-        {!this.props.showOnlyRequiredFields && (
-          <StreamTitleAndDescription vModel={this.settings} allowCustom={true} />
-        )}
       </ValidatedForm>
     );
   }

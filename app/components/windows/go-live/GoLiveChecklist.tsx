@@ -47,16 +47,20 @@ export default class GoLiveChecklist extends TsxComponent<{}> {
 
   private render() {
     const checklist = this.view.info.checklist;
-    const settings = this.view.goLiveSettings;
+    const { isMidStreamMode, isMutliplatformMode, goLiveSettings } = this.view;
+    const shouldPublishYT = !isMidStreamMode && goLiveSettings.destinations.youtube?.enabled;
 
     return (
       <div class={styles.container}>
         <h1>{this.getHeaderText()}</h1>
 
-        {/* CHECKLIST */}
         <ul class={styles.checklist}>
-          {settings.useOptimizedProfile &&
+          {/* OPTIMIZED PROFILE */}
+          {!isMidStreamMode &&
+            goLiveSettings.useOptimizedProfile &&
             this.renderCheck($t('Apply optimized settings'), checklist.applyOptimizedSettings)}
+
+          {/* PLATFORMS UPDATE */}
           {this.view.enabledPlatforms.map(platform =>
             this.renderCheck(
               $t('Update settings for %{platform}', {
@@ -65,10 +69,18 @@ export default class GoLiveChecklist extends TsxComponent<{}> {
               checklist[platform],
             ),
           )}
-          {this.view.shouldGoLiveWithRestream &&
+
+          {/* RESTREAM */}
+          {!isMidStreamMode &&
+            isMutliplatformMode &&
             this.renderCheck($t('Configure the Restream service'), checklist.setupRestream)}
-          {this.renderCheck($t('Start video transmission'), checklist.startVideoTransmission)}
-          {settings.destinations.youtube?.enabled &&
+
+          {/* START TRANSMISSION */}
+          {!isMidStreamMode &&
+            this.renderCheck($t('Start video transmission'), checklist.startVideoTransmission)}
+
+          {/* PUBLISH  YT BROADCAST */}
+          {shouldPublishYT &&
             this.renderCheck(
               $t('Publish Youtube broadcast') + ' ' + this.renderYoutubePercentage(),
               checklist.publishYoutubeBroadcast,

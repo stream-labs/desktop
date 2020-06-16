@@ -1,4 +1,4 @@
-import TsxComponent from 'components/tsx-component';
+import TsxComponent, { createProps } from 'components/tsx-component';
 import ModalLayout from 'components/ModalLayout.vue';
 import { $t } from 'services/i18n';
 import { Component, Watch } from 'vue-property-decorator';
@@ -23,22 +23,55 @@ import { Spinner, ProgressBar } from 'streamlabs-beaker';
 import cloneDeep from 'lodash/cloneDeep';
 import { StreamSettingsService } from '../../../services/settings/streaming';
 import ValidatedForm from '../../shared/inputs/ValidatedForm';
+import PlatformSettings from './PlatformSettings';
 import { IStreamError } from '../../../services/streaming/stream-error';
 import GoLiveError from './GoLiveError';
+import { GoLiveProps } from './goLiveProps';
+import { SyncWithValue } from '../../../util/decorators';
+
+class SectionProps {
+  title?: string = '';
+  isSimpleMode?: boolean = false;
+}
 
 /**
- * Renders the form with stream settings
- **/
-@Component({})
-export default class GoLiveWindow extends TsxComponent<{}> {
-  settings: IGoLiveSettings = null;
-  $refs: {
-    settingsForm: ValidatedForm;
-  };
+ * renders a section wrapper
+ */
+@Component({ props: createProps(SectionProps) })
+class Section extends TsxComponent<SectionProps> {
+  private render() {
+    const slot = this.$slots.default;
+    const title = this.props.title;
 
+    // render heading and section wrapper in advanced mode
+    if (!this.props.isSimpleMode) {
+      return (
+        <div class={styles.section}>
+          {title && <h2>{title}</h2>}
+          <div>{slot}</div>
+        </div>
+      );
+    }
+
+    // render content only in simple mode
+    return <div>{slot}</div>;
+  }
+}
+
+/**
+ * Renders settings for starting the stream
+ * - Platform switchers
+ * - Settings for each platform
+ * - Extras settings
+ **/
+@Component({ props: createProps(GoLiveProps) })
+export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
   @Inject() private streamingService: StreamingService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private userService: UserService;
+
+  @SyncWithValue()
+  private settings: IGoLiveSettings = null;
 
   private get view() {
     return this.streamingService.views;
@@ -74,9 +107,6 @@ export default class GoLiveWindow extends TsxComponent<{}> {
   }
 
   private render() {
-    // create a copy of a settings model if not exist
-    if (!this.settings) this.settings = cloneDeep(this.streamingService.views.goLiveSettings);
-
     const platforms = this.view.availablePlatforms;
     const enabledPlatforms = this.view.enabledPlatforms;
     const hasPlatforms = enabledPlatforms.length > 0;
@@ -85,8 +115,10 @@ export default class GoLiveWindow extends TsxComponent<{}> {
       !isErrorMode && ['empty', 'prepopulate'].includes(this.view.info.lifecycle);
     const shouldShowSettings = !isErrorMode && !isLoadingMode && hasPlatforms;
     const isAdvancedMode = this.view.goLiveSettings.advancedMode;
+    const isMultiplePlatformMode = enabledPlatforms.length > 1;
     return (
-      <ValidatedForm class="flex" ref="settingsForm">
+      <ValidatedForm class="flex">
+        {/*PLATFORMS SWITCHER*/}
         <div style={{ width: '400px', marginRight: '42px' }}>
           {platforms.map((platform: TPlatform) => this.renderPlatformSwitcher(platform))}
           {/*<div class={styles.rightText}>*/}
@@ -103,44 +135,24 @@ export default class GoLiveWindow extends TsxComponent<{}> {
 
           {shouldShowSettings && (
             <div style={{ width: '100%' }}>
-              {this.renderGeneralForm()}
-              {/*{!this.isAdvancedMode && (*/}
-              {/*  <div class={styles.rightText}>*/}
-              {/*    {$t('Looking for more options?')}*/}
-              {/*    &nbsp;*/}
-              {/*    <a class={styles.managePlatformsLink} onClick={() => this.switchAdvancedMode(true)}>*/}
-              {/*      {$t('Switch Advanced Mode ON')}*/}
-              {/*    </a>*/}
-              {/*  </div>*/}
-              {/*)}*/}
+              <PlatformSettings vModel={this.settings} />
+
+              {/*EXTRAS*/}
               {isAdvancedMode && (
-                <div>
-                  {enabledPlatforms.map((platform: TPlatform) =>
-                    this.renderSection(
-                      this.renderPlatformSettings(platform),
-                      this.getPlatformName(platform) + ' Settings',
-                    ),
-                  )}
-                  {this.renderSection(
-                    <div>
-                      <div>
-                        <HFormGroup
-                          metadata={{
-                            tooltip: $t(
-                              'Optimized encoding provides better quality and/or lower cpu/gpu usage. Depending on the game, resolution may be changed for a better quality of experience',
-                            ),
-                          }}
-                        >
-                          <BoolInput
-                            vModel={this.settings.useOptimizedProfile}
-                            metadata={this.optimizedProfileMetadata}
-                          />
-                        </HFormGroup>
-                      </div>
-                    </div>,
-                    $t('Extras'),
-                  )}
-                </div>
+                <Section title={$t('Extras')}>
+                  <HFormGroup
+                    metadata={{
+                      tooltip: $t(
+                        'Optimized encoding provides better quality and/or lower cpu/gpu usage. Depending on the game, resolution may be changed for a better quality of experience',
+                      ),
+                    }}
+                  >
+                    <BoolInput
+                      vModel={this.settings.useOptimizedProfile}
+                      metadata={this.optimizedProfileMetadata}
+                    />
+                  </HFormGroup>
+                </Section>
               )}
             </div>
           )}
@@ -169,69 +181,6 @@ export default class GoLiveWindow extends TsxComponent<{}> {
         </div>
       </div>
     );
-  }
-
-  private renderSection(el: JSX.Element, title?: string) {
-    return (
-      <div class={styles.section}>
-        {title && <h2>{title}</h2>}
-        <div>{el}</div>
-      </div>
-    );
-  }
-
-  private renderGeneralForm() {
-    const isAdvancedMode = this.view.goLiveSettings.advancedMode;
-    const enabledPlatforms = this.view.enabledPlatforms;
-    return this.renderSection(
-      <div>
-        <StreamTitleAndDescription vModel={this.settings.commonFields} />
-        {!isAdvancedMode &&
-          enabledPlatforms.map((platform: TPlatform) =>
-            this.renderPlatformSettings(platform, true),
-          )}
-      </div>,
-    );
-  }
-
-  private renderPlatformSettings(platform: TPlatform, showOnlyRequiredFields = false) {
-    if (platform === 'twitch') {
-      return (
-        <TwitchEditStreamInfo
-          vModel={this.settings.destinations.twitch}
-          showOnlyRequiredFields={showOnlyRequiredFields}
-        />
-      );
-    }
-
-    if (platform === 'facebook') {
-      return (
-        <FacebookEditStreamInfo
-          vModel={this.settings.destinations.facebook}
-          showOnlyRequiredFields={showOnlyRequiredFields}
-          goLiveSettings={this.settings}
-        />
-      );
-    }
-
-    if (platform === 'youtube') {
-      return (
-        <YoutubeEditStreamInfo
-          vModel={this.settings.destinations.youtube}
-          showOnlyRequiredFields={showOnlyRequiredFields}
-          canChangeBroadcast={true}
-        />
-      );
-    }
-
-    if (platform === 'mixer') {
-      return (
-        <MixerEditStreamInfo
-          vModel={this.settings.destinations.mixer}
-          showOnlyRequiredFields={showOnlyRequiredFields}
-        />
-      );
-    }
   }
 
   private renderLoading() {

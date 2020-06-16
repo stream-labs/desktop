@@ -85,7 +85,7 @@ export default class ShareStream extends TsxComponent<{ sharePageUrl: string }> 
   }
 
   goLive() {
-    this.streamingService.showEditStreamInfo();
+    this.streamingService.showGoLiveWindow();
   }
 
   updateQrcodeData() {

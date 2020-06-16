@@ -62,6 +62,7 @@ import AlertBox from 'components/widgets/AlertBox.vue';
 import SpinWheel from 'components/widgets/SpinWheel.vue';
 
 import PerformanceMetrics from 'components/PerformanceMetrics.vue';
+import EditStreamWindow from '../components/windows/go-live/EditStreamWindow';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -122,6 +123,7 @@ export function getComponents() {
     ShareStream,
     WelcomeToPrime,
     GoLiveWindow,
+    EditStreamInfoWindow: EditStreamWindow,
   };
 }
 
