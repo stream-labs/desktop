@@ -104,9 +104,6 @@ export default class LayoutEditor extends TsxComponent {
   }
 
   get tabOptions() {
-    if (!this.userService.isPrime) {
-      return [{ value: 'default', title: this.layoutService.state.tabs.default.name }];
-    }
     return Object.keys(this.layoutService.state.tabs).map(tab => ({
       value: tab,
       title: this.layoutService.state.tabs[tab].name,
