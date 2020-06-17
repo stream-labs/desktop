@@ -38,7 +38,6 @@ import AdvancedStatistics from 'components/windows/AdvancedStatistics';
 import OverlayWindow from 'components/windows/OverlayWindow.vue';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
-import YoutubeStreamStatus from 'components/platforms/youtube/YoutubeStreamStatus';
 import ShareStream from 'components/windows/ShareStream';
 import WelcomeToPrime from 'components/windows/WelcomeToPrime';
 import GoLiveWindow from 'components/windows/go-live/GoLiveWindow';
@@ -119,16 +118,17 @@ export function getComponents() {
     MediaShare,
     AlertBox,
     SpinWheel,
-    YoutubeStreamStatus,
     ShareStream,
     WelcomeToPrime,
     GoLiveWindow,
-    EditStreamInfoWindow: EditStreamWindow,
+    EditStreamWindow,
   };
 }
 
+export type TWindowComponentName = keyof ReturnType<typeof getComponents> | '';
+
 export interface IWindowOptions extends Electron.BrowserWindowConstructorOptions {
-  componentName: string;
+  componentName: TWindowComponentName;
   queryParams?: Dictionary<any>;
   size?: {
     width: number;

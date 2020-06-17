@@ -12,7 +12,6 @@ import { SettingsService } from 'services/settings';
 import HFormGroup from '../../shared/inputs/HFormGroup.vue';
 import { IEncoderProfile } from 'services/video-encoding-optimizations';
 import { WindowsService } from 'services/windows';
-import { StreamInfoDeprecatedService } from 'services/stream-info-deprecated';
 import { IGoLiveSettings, StreamingService } from 'services/streaming';
 
 import { Spinner, ProgressBar } from 'streamlabs-beaker';
@@ -35,7 +34,6 @@ export default class GoLiveWindow extends TsxComponent<{}> {
   @Inject() private streamingService: StreamingService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private windowsService: WindowsService;
-  @Inject('StreamInfoDeprecatedService') private streamInfoService: StreamInfoDeprecatedService;
 
   $refs: {
     form: ValidatedForm;
@@ -113,7 +111,6 @@ export default class GoLiveWindow extends TsxComponent<{}> {
       <ModalLayout customControls={true} showControls={false}>
         <ValidatedForm ref="form" slot="content">
           {shouldShowSettings && <GoLiveSettings vModel={this.settings} />}
-          <BoolInput vModel={this.settings.useOptimizedProfile} />
           {shouldShowChecklist && <GoLiveChecklist />}
           {shouldShowSuccess && <GoLiveSuccess />}
         </ValidatedForm>
@@ -128,6 +125,7 @@ export default class GoLiveWindow extends TsxComponent<{}> {
       this.lifecycle === 'runChecklist' &&
       this.view.info.error &&
       this.view.info.checklist.startVideoTransmission !== 'done';
+    const shouldShowAdvancedSwitch = shouldShowConfirm && this.view.isMutliplatformMode;
 
     return (
       <div class="controls" style={{ display: 'flex', 'flex-direction': 'row-reverse' }}>
@@ -160,7 +158,7 @@ export default class GoLiveWindow extends TsxComponent<{}> {
         </button>
 
         {/* ADVANCED MODE SWITCHER */}
-        {shouldShowConfirm && (
+        {shouldShowAdvancedSwitch && (
           <div class={styles.modeToggle}>
             <HFormGroup
               onInput={(val: boolean) => this.switchAdvancedMode(val)}

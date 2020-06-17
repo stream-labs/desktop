@@ -25,8 +25,6 @@ export type TPlatformCapabilityMap = {
   tags: IPlatformCapabilityTags;
   /** Fetch and set user information **/
   'user-info': IPlatformCapabilityUserInfo;
-  /** Fetch viewer count **/
-  'viewer-count': IPlatformCapabilityViewerCount;
   /** Schedule streams for a latter date **/
   'stream-schedule': IPlatformCapabilityScheduleStream;
   /** Ability to check whether we're authorized to perform actions under a given scope **/
@@ -45,10 +43,6 @@ interface IPlatformCapabilityTags {
   getAllTags: () => Promise<Tag[]>;
   getStreamTags: () => Promise<Tag[]>;
   setStreamTags: () => Promise<any>;
-}
-
-interface IPlatformCapabilityViewerCount {
-  fetchViewerCount: () => Promise<number>;
 }
 
 interface IPlatformCapabilityUserInfo {
@@ -106,6 +100,15 @@ export type TStartStreamOptions =
 
 export type TChannelInfo = ITwitchChannelInfo | Partial<IFacebookChannelInfo> | IMixerChannelInfo;
 
+// state applicable for all platforms
+export interface IPlatformState {
+  viewersCount: number;
+  streamKey: string;
+  settings: TStartStreamOptions;
+  streamPageUrl: string;
+  chatUrl: string;
+}
+
 // All platform services should implement this interface.
 export interface IPlatformService {
   capabilities: Set<TPlatformCapability>;
@@ -125,8 +128,6 @@ export interface IPlatformService {
    */
   validatePlatform: () => Promise<EPlatformCallResult>;
 
-  fetchViewerCount: () => Promise<number>;
-
   fetchUserInfo: () => Promise<IUserInfo>;
 
   putChannelInfo: (channelInfo: TStartStreamOptions) => Promise<boolean>;
@@ -135,12 +136,8 @@ export interface IPlatformService {
 
   /**
    * Sets up the stream key and live broadcast info required to go live.
-   * Returns the stream key.
    */
-  // TODO get rid of any
-  beforeGoLive: (options: IGoLiveSettings) => void;
-
-  // fetchGoLiveSettings: () => Promise<TStartStreamOptions>;
+  beforeGoLive: (options: IGoLiveSettings) => Promise<void>;
 
   afterGoLive?: () => Promise<void>;
 
@@ -161,13 +158,7 @@ export interface IPlatformService {
 
   readonly displayName: string;
 
-  // getStreamFields(): Dictionary<IInputMetadata>;
-
-  state: {
-    streamKey: string;
-    settings: TStartStreamOptions;
-    streamPageUrl: string;
-  };
+  state: IPlatformState;
 }
 
 export interface IUserAuth {

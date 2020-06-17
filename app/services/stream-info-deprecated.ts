@@ -62,9 +62,9 @@ export class StreamInfoDeprecatedService extends StatefulService<TStreamInfoServ
       if (this.streamingService.isStreaming) {
         const platform = getPlatformService(this.userService.platform.type);
 
-        platform.fetchViewerCount().then(viewers => {
-          this.updateInfo({ viewerCount: viewers });
-        });
+        // platform.fetchViewerCount().then(viewers => {
+        //   this.updateInfo({ viewerCount: viewers });
+        // });
       }
     }, VIEWER_COUNT_UPDATE_INTERVAL);
   }

@@ -6,16 +6,16 @@ import electron, { ipcRenderer } from 'electron';
 import url from 'url';
 import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
-import { StreamInfoDeprecatedService } from './stream-info-deprecated';
 import { InitAfter } from './core';
 import Utils from './utils';
+import { StreamingService } from './streaming';
 
-@InitAfter('StreamInfoService')
+@InitAfter('StreamingService')
 export class ChatService extends Service {
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() windowsService: WindowsService;
-  @Inject() streamInfoService: StreamInfoDeprecatedService;
+  @Inject() streamingService: StreamingService;
 
   private chatView: Electron.BrowserView | null;
   private chatUrl = '';
@@ -23,8 +23,8 @@ export class ChatService extends Service {
 
   init() {
     // listen `streamInfoChanged` to init or deinit the chat
-    this.chatUrl = this.streamInfoService.state.chatUrl;
-    this.streamInfoService.streamInfoChanged.subscribe(streamInfo => {
+    this.chatUrl = this.streamingService.views.chatUrl;
+    this.streamingService.streamInfoChanged.subscribe(streamInfo => {
       if (streamInfo.chatUrl === void 0) return; // chatUrl has not been changed
 
       // chat url has been changed, set the new chat url
@@ -114,7 +114,7 @@ export class ChatService extends Service {
 
   private deinitChat() {
     // @ts-ignore: typings are incorrect
-    this.chatView.destroy();
+    if (this.chatView) this.chatView.destroy();
     this.chatView = null;
   }
 

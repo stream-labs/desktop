@@ -19,7 +19,6 @@ import {
 } from './streaming-api';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { $t } from 'services/i18n';
-import { StreamInfoDeprecatedService } from 'services/stream-info-deprecated';
 import { getPlatformService, TStartStreamOptions, TPlatform } from 'services/platforms';
 import { UserService } from 'services/user';
 import {
@@ -34,7 +33,7 @@ import { CustomizationService } from 'services/customization';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService } from 'services/restream';
-import { ITwitchStartStreamOptions } from 'services/platforms/twitch';
+import { ITwitchStartStreamOptions, TwitchService } from 'services/platforms/twitch';
 import { FacebookService, IFacebookStartStreamOptions } from 'services/platforms/facebook';
 import Utils from 'services/utils';
 import Vue from 'vue';
@@ -44,6 +43,7 @@ import watch from 'vuex';
 import { createStreamError, IStreamError, StreamError, TStreamErrorType } from './stream-error';
 import { authorizedHeaders } from '../../util/requests';
 import { HostsService } from '../hosts';
+import { IEncoderProfile } from '../video-encoding-optimizations/definitions';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -75,7 +75,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @Inject() outputSettingsService: OutputSettingsService;
   @Inject() windowsService: WindowsService;
   @Inject() usageStatisticsService: UsageStatisticsService;
-  @Inject('StreamInfoDeprecatedService') streamInfoService: StreamInfoDeprecatedService;
   @Inject() notificationsService: NotificationsService;
   @Inject() userService: UserService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
@@ -90,6 +89,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   recordingStatusChange = new Subject<ERecordingState>();
   replayBufferStatusChange = new Subject<EReplayBufferState>();
   replayBufferFileWrite = new Subject<string>();
+  streamInfoChanged = new Subject<StreamInfoView>();
 
   // Dummy subscription for stream deck
   streamingStateChange = new Subject<void>();
@@ -128,16 +128,19 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     obs.NodeObs.OBS_service_connectOutputSignals((info: IOBSOutputSignalInfo) => {
       this.handleOBSOutputSignal(info);
     });
+
+    // watch for StreamInfoView at emit `streamInfoChanged` event if something has been hanged there
     this.store.watch(
       () => {
-        return this.state.info;
+        return this.views;
       },
       val => {
-        console.log('InfoChanged', val);
+        console.log('InfoChanged', val, val.viewerCount);
         // show the error if child window is closed
-        if (val.error && !this.windowsService.state.child.isShown) {
+        if (val.info.error && !this.windowsService.state.child.isShown) {
           this.showGoLiveWindow();
         }
+        this.streamInfoChanged.next(val);
       },
       {
         deep: true,
@@ -176,7 +179,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   /**
    * Make a transition to Live
    */
-  async goLive(settings?: IGoLiveSettings) {
+  async goLive(settings?: IGoLiveSettings, unattendedMode = false) {
     this.RESET_STREAM_INFO();
 
     // use default settings if no new settings provided
@@ -190,68 +193,74 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const platforms = this.views.enabledPlatforms;
     for (const platform of platforms) {
       const service = getPlatformService(platform);
-      this.setChecklistItem(platform, 'pending');
+
       try {
-        await service.beforeGoLive(settings);
+        await this.runCheck(platform, () => service.beforeGoLive(settings));
       } catch (e) {
-        this.setChecklistItem(platform, 'failed', 'SETTINGS_UPDATE_FAILED', e.details, platform);
         console.error(e);
-        return;
+        this.setError('SETTINGS_UPDATE_FAILED', e.details, platform);
       }
-      this.setChecklistItem(platform, 'done');
     }
 
     // setup restream
     if (this.views.isMutliplatformMode) {
-      this.setChecklistItem('setupRestream', 'pending');
       // check the Restream service is available
       let ready = false;
       try {
-        ready = await this.restreamService.checkStatus();
+        await this.runCheck(
+          'setupRestream',
+          async () => (ready = await this.restreamService.checkStatus()),
+        );
       } catch (e) {
         console.error('Error fetching restreaming service', e);
       }
       // Assume restream is down
       if (!ready) {
-        this.setChecklistItem('setupRestream', 'failed', 'RESTREAM_DISABLED');
+        this.setError('RESTREAM_DISABLED');
         return;
       }
 
-      // setup restream
+      // update restream settings
       try {
-        await this.restreamService.beforeGoLive();
+        await this.runCheck('setupRestream', () => this.restreamService.beforeGoLive());
       } catch (e) {
         console.error('Failed to setup restream', e);
-        this.setChecklistItem('setupRestream', 'failed', 'RESTREAM_SETUP_FAILED');
+        this.setError('RESTREAM_SETUP_FAILED');
         return;
       }
-      this.setChecklistItem('setupRestream', 'done');
+    }
+
+    // apply optimized settings
+    const optimizer = this.videoEncodingOptimizationService;
+    if (optimizer.state.useOptimizedProfile) {
+      if (unattendedMode && optimizer.canApplyProfileFromCache()) {
+        optimizer.applyProfileFromCache();
+      } else {
+        optimizer.applyProfile(settings.optimizedProfile);
+      }
+      await this.runCheck('applyOptimizedSettings');
     }
 
     // we are ready to start streaming
-    this.setChecklistItem('startVideoTransmission', 'pending');
     try {
-      await this.finishStartStreaming();
+      await this.runCheck('startVideoTransmission', () => this.finishStartStreaming());
     } catch (e) {
-      this.setChecklistItem('startVideoTransmission', 'failed');
       return;
     }
-    this.setChecklistItem('startVideoTransmission', 'done');
 
     // publish the Youtube broadcast
     if (this.streamSettingsService.protectedModeEnabled && settings.destinations.youtube?.enabled) {
-      this.setChecklistItem('publishYoutubeBroadcast', 'pending');
       try {
-        await getPlatformService('youtube').afterGoLive();
+        await this.runCheck('publishYoutubeBroadcast', () =>
+          getPlatformService('youtube').afterGoLive(),
+        );
       } catch (e) {
-        this.setChecklistItem('publishYoutubeBroadcast', 'failed', e);
+        this.setError(e);
         return;
       }
-      this.setChecklistItem('publishYoutubeBroadcast', 'done');
     }
 
     this.UPDATE_STREAM_INFO({ lifecycle: 'live' });
-
     this.createGameAssociation(this.views.game);
   }
 
@@ -269,22 +278,37 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const platforms = this.views.enabledPlatforms;
     for (const platform of platforms) {
       const service = getPlatformService(platform);
-      this.setChecklistItem(platform, 'pending');
-      const updatedSettings = settings.destinations[platform];
+      const newSettings = settings.destinations[platform];
       try {
-        await service.putChannelInfo(updatedSettings);
+        await this.runCheck(platform, () => service.putChannelInfo(newSettings));
       } catch (e) {
-        this.setChecklistItem(platform, 'failed', 'SETTINGS_UPDATE_FAILED', e.details, platform);
         console.error(e);
+        this.setError('SETTINGS_UPDATE_FAILED', e.details, platform);
         return;
       }
-      this.setChecklistItem(platform, 'done');
     }
 
     // save updated settings locally
     this.streamSettingsService.setSettings({ goLiveSettings: settings });
     // return back to the 'live' state
     this.UPDATE_STREAM_INFO({ lifecycle: 'live' });
+  }
+
+  /**
+   * update checklist item status based callback result
+   */
+  private async runCheck(
+    checkName: keyof IStreamInfo['checklist'],
+    cb?: (...args: unknown[]) => Promise<unknown>,
+  ) {
+    this.SET_CHECKLIST_ITEM(checkName, 'pending');
+    try {
+      if (cb) await cb();
+      this.SET_CHECKLIST_ITEM(checkName, 'done');
+    } catch (e) {
+      this.SET_CHECKLIST_ITEM(checkName, 'failed');
+      throw e;
+    }
   }
 
   private sanitizeGoLiveSettings(settings: IGoLiveSettings): IGoLiveSettings {
@@ -299,37 +323,25 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     return settings;
   }
 
-  /**
-   * update the status of a checklist item
-   */
-  private setChecklistItem(
-    itemName: keyof IStreamInfo['checklist'],
-    state: TGoLiveChecklistItemState,
+  @mutation()
+  private UPDATE_STREAM_INFO(statusPatch: Partial<IStreamInfo>) {
+    this.state.info = { ...this.state.info, ...statusPatch };
+  }
+
+  private setError(
     errorTypeOrError?: TStreamErrorType | StreamError,
     errorDetails?: string,
     platform?: TPlatform,
   ) {
-    this.SET_CHECKLIST_ITEM(itemName, state);
-
-    // always ask for error description for failed checkbox state
-    if (state === 'failed' && !errorTypeOrError) {
-      console.error('The error description is required for "failed" state');
-    }
-
-    // save the error info to the state if the error exists
-    if (!errorTypeOrError) return;
     if (typeof errorTypeOrError === 'object') {
+      // an error object has been passed as a first arg
       const error = (errorTypeOrError as StreamError).getModel();
       this.SET_ERROR(error.type, error.details, error.platform);
     } else {
+      // an error type has been passed as a first arg
       const errorType = errorTypeOrError as TStreamErrorType;
       this.SET_ERROR(errorType, errorDetails, platform);
     }
-  }
-
-  @mutation()
-  private UPDATE_STREAM_INFO(statusPatch: Partial<IStreamInfo>) {
-    this.state.info = { ...this.state.info, ...statusPatch };
   }
 
   @mutation()
@@ -600,7 +612,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
     this.windowsService.showWindow({
       componentName: 'GoLiveWindow',
-      title: $t('Update Stream Info'),
+      title: $t('Go Live'),
       size: {
         height,
         width,
@@ -617,7 +629,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const width = 900;
 
     this.windowsService.showWindow({
-      componentName: 'EditStreamInfoWindow',
+      componentName: 'EditStreamWindow',
       title: $t('Update Stream Info'),
       size: {
         height,
@@ -743,7 +755,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
         try {
           streamEncoderInfo = this.outputSettingsService.getSettings();
-          game = this.streamInfoService.state.game;
+          game = this.views.game;
         } catch (e) {
           console.error('Error fetching stream encoder info: ', e);
         }
@@ -966,10 +978,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   private async runPlaformAfterStopStreamHook() {
     if (!this.userService.isLoggedIn) return;
-    const service = getPlatformService(this.userService!.platform!.type);
-    if (typeof service.afterStopStream === 'function') {
-      await service.afterStopStream();
-    }
+    this.views.enabledPlatforms.forEach(platform => {
+      const service = getPlatformService(platform);
+      if (typeof service.afterStopStream === 'function') {
+        service.afterStopStream();
+      }
+    });
   }
 }
 
@@ -982,6 +996,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private userService: UserService;
+  @Inject() private restreamService: RestreamService;
+  @Inject() private twitchService: TwitchService;
 
   get info() {
     return this.state.info;
@@ -1003,12 +1019,28 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     return this.enabledPlatforms.length > 1 && !this.goLiveSettings.advancedMode;
   }
 
+  get canShowAdvancedMode(): boolean {
+    return this.availablePlatforms.length > 1;
+  }
+
   get isMutliplatformMode() {
     return this.enabledPlatforms.length > 1;
   }
 
   get isMidStreamMode(): boolean {
     return this.state.streamingStatus !== 'offline';
+  }
+
+  get viewerCount(): number {
+    return this.enabledPlatforms
+      .map(platform => getPlatformService(platform).state.viewersCount)
+      .reduce((c1, c2) => c1 + c2);
+  }
+
+  get chatUrl(): string {
+    return this.isMutliplatformMode
+      ? this.restreamService.chatUrl
+      : getPlatformService(this.enabledPlatforms[0]).state.chatUrl;
   }
 
   get goLiveSettings(): IGoLiveSettings {
@@ -1018,8 +1050,8 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     }
 
     // otherwise generate new settings
-    const { title, description } = this.streamSettingsService.state;
-    const enabledPlatforms = ['facebook', 'twitch', 'youtube'];
+    const { title, description } = this.streamSettingsService.state; // migrate title and description
+    const enabledPlatforms = this.availablePlatforms;
     const destinations = {};
     this.streamSettingsService.allPlatforms.forEach(platform => {
       const service = getPlatformService(platform);
@@ -1035,18 +1067,17 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
       commonFields: {
         title,
         description,
+        game: '',
       },
-      useOptimizedProfile: false,
-      selectedProfile: null,
       destinations: destinations as IGoLiveSettings['destinations'],
+      optimizedProfile: null,
       advancedMode: false,
     };
   }
 
   get game(): string {
-    return (
-      this.goLiveSettings.destinations.twitch?.game ||
-      this.goLiveSettings.destinations.facebook?.game
-    );
+    // TODO: figure out a better way to detect the game
+    const destinations = this.goLiveSettings.destinations;
+    return destinations.twitch?.game || destinations.facebook?.game || destinations.mixer?.game;
   }
 }

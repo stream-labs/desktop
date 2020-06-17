@@ -65,6 +65,7 @@ export interface IGoLiveSettings {
   commonFields: {
     title: string;
     description: string;
+    game: string;
   };
   destinations: {
     twitch: IPlatformStreamSettings & ITwitchStartStreamOptions;
@@ -72,8 +73,7 @@ export interface IGoLiveSettings {
     facebook: IPlatformStreamSettings & IFacebookStartStreamOptions;
     mixer: IPlatformStreamSettings & IMixerStartStreamOptions;
   };
-  useOptimizedProfile: boolean;
-  selectedProfile: IEncoderProfile;
+  optimizedProfile: IEncoderProfile;
   advancedMode: boolean;
 }
 

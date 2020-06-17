@@ -12,7 +12,7 @@ import {
   IYoutubeStartStreamOptions,
   YoutubeService,
 } from 'services/platforms/youtube';
-import StreamTitleAndDescription from '../StreamTitleAndDescription';
+import CommonPlatformFields from '../CommonPlatformFields';
 import { StreamingService } from '../../../app-services';
 
 class YoutubeEditStreamInfoProps {
@@ -39,6 +39,10 @@ export default class YoutubeEditStreamInfo extends TsxComponent<YoutubeEditStrea
 
   get canChangeBroadcast() {
     return this.streamingService.isStreaming;
+  }
+
+  get view() {
+    return this.streamingService.views;
   }
 
   @Watch('value')
@@ -94,7 +98,11 @@ export default class YoutubeEditStreamInfo extends TsxComponent<YoutubeEditStrea
               />
             </HFormGroup>
           )}
-          <StreamTitleAndDescription vModel={this.settings} allowCustom={true} />
+          <CommonPlatformFields
+            vModel={this.settings}
+            hasCustomCheckbox={this.view.isMutliplatformMode}
+            platforms={['youtube']}
+          />
         </ValidatedForm>
       )
     );

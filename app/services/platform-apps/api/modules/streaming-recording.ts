@@ -2,7 +2,6 @@ import { Module, EApiPermissions, apiMethod, apiEvent } from './module';
 import { StreamingService, EStreamingState, ERecordingState } from 'services/streaming';
 import { Inject } from 'services/core/injector';
 import { Subject } from 'rxjs';
-import { StreamInfoDeprecatedService } from 'services/stream-info-deprecated';
 
 interface IOutputState {
   streamingStatus: EStreamingState;
@@ -21,8 +20,7 @@ export class StreamingRecordingModule extends Module {
   moduleName = 'StreamingRecording';
   permissions = [EApiPermissions.Streaming];
 
-  @Inject() streamingService: StreamingService;
-  @Inject() streamInfoService: StreamInfoDeprecatedService;
+  @Inject() private streamingService: StreamingService;
 
   constructor() {
     super();
@@ -32,7 +30,7 @@ export class StreamingRecordingModule extends Module {
     this.streamingService.recordingStatusChange.subscribe(() => {
       this.outputStateChanged.next(this.streamingService.state);
     });
-    this.streamInfoService.streamInfoChanged.subscribe(() => {
+    this.streamingService.streamInfoChanged.subscribe(() => {
       this.streamInfoChanged.next(this.serializeStreamInfo());
     });
   }
@@ -54,10 +52,11 @@ export class StreamingRecordingModule extends Module {
   }
 
   private serializeStreamInfo(): IStreamInfo {
+    const info = this.streamingService.views;
     return {
-      title: this.streamInfoService.state.title,
-      game: this.streamInfoService.state.game,
-      viewerCount: this.streamInfoService.state.viewerCount,
+      title: info.goLiveSettings.commonFields.title,
+      game: info.game,
+      viewerCount: info.viewerCount,
     };
   }
 }

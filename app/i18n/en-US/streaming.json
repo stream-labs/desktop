@@ -63,6 +63,7 @@
   "Schedule": "Schedule",
   "No matching game(s) found.": "No matching game(s) found.",
   "Use optimized encoder settings ": "Use optimized encoder settings ",
+  "Use optimized encoder settings for %{game}": "Use optimized encoder settings for %{game}",
   "Scheduled Date": "Scheduled Date",
   "Scheduled Time": "Scheduled Time",
   "You are 10 minutes away from the 8 hour stream limit": "You are 10 minutes away from the 8 hour stream limit",

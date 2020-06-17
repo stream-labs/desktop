@@ -1,4 +1,4 @@
-import { StatefulService, mutation } from '../core/stateful-service';
+import { StatefulService, mutation, InheritMutations } from '../core/stateful-service';
 import {
   IPlatformService,
   IGame,
@@ -6,6 +6,7 @@ import {
   TPlatformCapabilityMap,
   EPlatformCallResult,
   IPlatformRequest,
+  IPlatformState,
 } from '.';
 import { HostsService } from '../hosts';
 import { Inject } from '../core/injector';
@@ -20,6 +21,7 @@ import { assertIsDefined } from '../../util/properties-type-guards';
 import { IYoutubeStartStreamOptions } from './youtube';
 import { IGoLiveSettings } from '../streaming';
 import { throwStreamError } from '../streaming/stream-error';
+import { BasePlatformService } from './base-platform';
 
 interface IFacebookPage {
   access_token: string;
@@ -50,14 +52,11 @@ export interface IStreamlabsFacebookPages {
   options: IListOption<string>[];
 }
 
-interface IFacebookServiceState {
-  enabled: boolean;
+interface IFacebookServiceState extends IPlatformState {
   activePage: IFacebookPage | null;
   liveVideoId: number | null;
-  streamPageUrl: string;
   streamUrl: string | null;
-  streamKey: string;
-  settings: IFacebookStartStreamOptions;
+  settings: IFacebookStartStreamOptions | null;
   facebookPages: IStreamlabsFacebookPages | null;
 }
 
@@ -73,7 +72,8 @@ export interface IFacebookChannelInfo extends IFacebookStartStreamOptions {
   streamUrl: string;
 }
 
-export class FacebookService extends StatefulService<IFacebookServiceState>
+@InheritMutations()
+export class FacebookService extends BasePlatformService<IFacebookServiceState>
   implements IPlatformService {
   @Inject() hostsService: HostsService;
   @Inject() streamSettingsService: StreamSettingsService;
@@ -84,7 +84,6 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   capabilities = new Set<TPlatformCapability>([
     'chat',
     'user-info',
-    'viewer-count',
     'stream-schedule',
     'account-merging',
   ]);
@@ -94,14 +93,12 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   authWindowOptions: Electron.BrowserWindowConstructorOptions = { width: 800, height: 800 };
 
   static initialState: IFacebookServiceState = {
-    enabled: true,
+    ...BasePlatformService.initialState,
     activePage: null,
     liveVideoId: null,
     streamUrl: null,
-    streamPageUrl: '',
-    settings: null,
     facebookPages: null,
-    streamKey: '',
+    settings: null,
   };
 
   @mutation()
@@ -122,11 +119,6 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
   @mutation()
   private SET_STREAM_URL(url: string | null) {
     this.state.streamUrl = url;
-  }
-
-  @mutation()
-  private SET_STREAM_KEY(streamKey: string) {
-    this.state.streamKey = streamKey;
   }
 
   @mutation()
@@ -340,16 +332,16 @@ export class FacebookService extends StatefulService<IFacebookServiceState>
         streamType: 'rtmp_common',
       });
       this.SET_STREAM_URL(null);
-      return streamKey;
+      this.SET_STREAM_KEY(streamKey);
+      return;
     }
 
     if (this.state.activePage) {
-      return await this.createLiveVideo();
+      await this.createLiveVideo();
+      return;
     }
 
     this.emitChannelInfo();
-
-    return null;
   }
 
   async putChannelInfo(info: IFacebookStartStreamOptions): Promise<boolean> {

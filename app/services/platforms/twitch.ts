@@ -4,6 +4,7 @@ import {
   IGame,
   IPlatformRequest,
   IPlatformService,
+  IPlatformState,
   TPlatformCapability,
   TPlatformCapabilityMap,
 } from '.';
@@ -11,7 +12,6 @@ import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
 import { authorizedHeaders, handleResponse } from 'util/requests';
 import { UserService } from 'services/user';
-import { StreamInfoDeprecatedService } from 'services/stream-info-deprecated';
 import { getAllTags, getStreamTags, TTwitchTag, updateTags } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
 import { IPlatformResponse, platformAuthorizedRequest, platformRequest } from './utils';
@@ -22,8 +22,9 @@ import { assertIsDefined } from '../../util/properties-type-guards';
 import { metadata, formMetadata } from 'components/shared/inputs';
 import { $t } from '../i18n';
 import { IGoLiveSettings } from '../streaming';
-import { mutation, StatefulService } from '../core';
+import { InheritMutations, mutation, StatefulService } from '../core';
 import { throwStreamError } from '../streaming/stream-error';
+import { BasePlatformService } from './base-platform';
 
 export interface ITwitchStartStreamOptions {
   title: string;
@@ -64,27 +65,24 @@ interface ITwitchOAuthValidateResponse {
   user_id: string;
 }
 
-interface ITwitchServiceState {
+interface ITwitchServiceState extends IPlatformState {
   hasUpdateTagsPermission: boolean;
   availableTags: TTwitchTag[];
-  streamKey: string;
-  streamPageUrl: string;
   settings: ITwitchStartStreamOptions;
 }
 
-export class TwitchService extends StatefulService<ITwitchServiceState>
+@InheritMutations()
+export class TwitchService extends BasePlatformService<ITwitchServiceState>
   implements IPlatformService {
   @Inject() hostsService: HostsService;
   @Inject() streamSettingsService: StreamSettingsService;
   @Inject() userService: UserService;
-  @Inject() streamInfoService: StreamInfoDeprecatedService;
   @Inject() customizationService: CustomizationService;
 
   static initialState: ITwitchServiceState = {
+    ...BasePlatformService.initialState,
     hasUpdateTagsPermission: false,
     availableTags: [],
-    streamKey: '',
-    streamPageUrl: '',
     settings: {
       title: '',
       game: '',
@@ -96,13 +94,7 @@ export class TwitchService extends StatefulService<ITwitchServiceState>
 
   channelInfoChanged = new Subject<ITwitchChannelInfo>();
 
-  capabilities = new Set<TPlatformCapability>([
-    'chat',
-    'scope-validation',
-    'tags',
-    'user-info',
-    'viewer-count',
-  ]);
+  capabilities = new Set<TPlatformCapability>(['chat', 'scope-validation', 'tags', 'user-info']);
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 600,
@@ -423,15 +415,5 @@ export class TwitchService extends StatefulService<ITwitchServiceState>
         required: true,
       }),
     });
-  }
-
-  @mutation()
-  private SET_STREAM_KEY(key: string) {
-    this.state.streamKey = key;
-  }
-
-  @mutation()
-  private SET_STREAM_PAGE_URL(url: string) {
-    this.state.streamPageUrl = url;
   }
 }

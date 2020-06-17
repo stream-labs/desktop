@@ -72,8 +72,8 @@ export default class EditStreamWindow extends TsxComponent<{}> {
       <ModalLayout customControls={true} showControls={false}>
         <ValidatedForm ref="form" slot="content">
           {shouldShowSettings && <PlatformSettings vModel={this.settings} />}
-          <BoolInput vModel={this.settings.useOptimizedProfile} />
-          {shouldShowChecklist && <GoLiveChecklist />}
+          <BoolInput vModel={this.settings.optimizedProfile} />
+          {shouldShowChecklist && <GoLiveChecklist isUpdateMode={true} />}
         </ValidatedForm>
         <div slot="controls">{this.renderControls()}</div>
       </ModalLayout>
@@ -87,19 +87,22 @@ export default class EditStreamWindow extends TsxComponent<{}> {
 
   private renderControls() {
     const lifecycle = this.view.info.lifecycle;
-    const loading = lifecycle !== 'live';
-    const shouldShowGoBackButton = loading && this.view.info.error;
+    const shouldShowUpdateButton = lifecycle !== 'live';
+    const shouldShowGoBackButton = !shouldShowUpdateButton && this.view.info.error;
     const advancedMode = this.view.goLiveSettings.advancedMode;
+    const shouldShowAdvancedSwitch = shouldShowUpdateButton && this.view.isMutliplatformMode;
 
     return (
       <div class="controls" style={{ display: 'flex', 'flex-direction': 'row-reverse' }}>
         {/* UPDATE BUTTON */}
-        <button
-          class={cx('button button--action', styles.goLiveButton)}
-          onClick={() => this.submit()}
-        >
-          {$t('Update')}
-        </button>
+        {shouldShowUpdateButton && (
+          <button
+            class={cx('button button--action', styles.goLiveButton)}
+            onClick={() => this.submit()}
+          >
+            {$t('Update')}
+          </button>
+        )}
 
         {/* GO BACK BUTTON */}
         {shouldShowGoBackButton && (
@@ -120,7 +123,7 @@ export default class EditStreamWindow extends TsxComponent<{}> {
         </button>
 
         {/* ADVANCED MODE SWITCHER */}
-        {!loading && (
+        {!shouldShowAdvancedSwitch && (
           <div class={styles.modeToggle}>
             <HFormGroup
               onInput={(val: boolean) => this.switchAdvancedMode(val)}

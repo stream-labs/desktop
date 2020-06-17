@@ -6,7 +6,7 @@ import { Inject } from 'services/core';
 import { UserService } from 'services/user';
 import { getPlatformService, TPlatform } from 'services/platforms';
 import YoutubeEditStreamInfo from 'components/platforms/youtube/YoutubeEditStreamInfo';
-import StreamTitleAndDescription from 'components/platforms/StreamTitleAndDescription';
+import CommonPlatformFields from 'components/platforms/CommonPlatformFields';
 import TwitchEditStreamInfo from '../../platforms/TwitchEditStreamInfo';
 import FacebookEditStreamInfo from '../../platforms/FacebookEditStreamInfo';
 import MixerEditStreamInfo from '../../platforms/MixerEditStreamInfo';
@@ -16,7 +16,7 @@ import { Spinner } from 'streamlabs-beaker';
 import { StreamSettingsService } from '../../../services/settings/streaming';
 import ValidatedForm from '../../shared/inputs/ValidatedForm';
 import GoLiveError from './GoLiveError';
-import { SyncWithValue } from 'util/decorators';
+import { SyncWithValue } from '../../../services/app/app-decorators';
 
 // TODO: dedup
 class SectionProps {
@@ -88,7 +88,10 @@ export default class PlatformSettings extends TsxComponent {
             <div style={{ width: '100%' }}>
               {/*COMMON FIELDS*/}
               {isMultiplePlatformMode && (
-                <StreamTitleAndDescription vModel={this.settings.commonFields} />
+                <CommonPlatformFields
+                  vModel={this.settings.commonFields}
+                  platforms={enabledPlatforms}
+                />
               )}
 
               {/*SETTINGS FOR EACH ENABLED PLATFORM*/}

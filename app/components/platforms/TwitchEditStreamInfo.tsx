@@ -5,7 +5,7 @@ import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { cloneDeep } from 'lodash';
 import TsxComponent, { createProps } from 'components/tsx-component';
 
-import StreamTitleAndDescription from './StreamTitleAndDescription';
+import CommonPlatformFields from './CommonPlatformFields';
 import { ITwitchStartStreamOptions, TwitchService } from '../../services/platforms/twitch';
 import { TTwitchTag } from '../../services/platforms/twitch/tags';
 import TwitchTagsInput from '../shared/inputs/TwitchTagsInput.vue';
@@ -15,7 +15,7 @@ import { $t } from '../../services/i18n';
 import { getPlatformService } from '../../services/platforms';
 import { Debounce } from 'lodash-decorators/debounce';
 import { IGoLiveSettings, StreamingService } from '../../services/streaming';
-import { SyncWithValue } from '../../util/decorators';
+import { SyncWithValue } from '../../services/app/app-decorators';
 
 class TwitchEditStreamProps {
   value?: IGoLiveSettings['destinations']['twitch'] = {
@@ -34,50 +34,6 @@ export default class TwitchEditStreamInfo extends TsxComponent<TwitchEditStreamP
   @SyncWithValue()
   settings: IGoLiveSettings['destinations']['twitch'] = null;
 
-  searchingGames = false;
-  private gameOptions: IListOption<string>[] = null;
-
-  created() {
-    this.gameOptions = this.settings.game
-      ? [{ value: this.settings.game, title: this.settings.game }]
-      : [];
-  }
-
-  private get gameMetadata() {
-    return metadata.list({
-      title: $t('Twitch Game'),
-      placeholder: $t('Start typing to search'),
-      options: this.gameOptions,
-      loading: this.searchingGames,
-      internalSearch: false,
-      allowEmpty: true,
-      noResult: $t('No matching game(s) found.'),
-      required: true,
-    });
-  }
-
-  @Debounce(500)
-  async onGameSearchHandler(searchString: string) {
-    if (searchString !== '') {
-      this.searchingGames = true;
-      const service = getPlatformService('twitch');
-
-      this.gameOptions = [];
-
-      return service.searchGames(searchString).then(games => {
-        this.searchingGames = false;
-        if (games && games.length) {
-          games.forEach(game => {
-            this.gameOptions.push({
-              title: game.name,
-              value: game.name,
-            });
-          });
-        }
-      });
-    }
-  }
-
   private render() {
     const view = this.streamingService.views;
     const canShowOnlyRequiredFields = view.canShowOnlyRequiredFields;
@@ -85,7 +41,11 @@ export default class TwitchEditStreamInfo extends TsxComponent<TwitchEditStreamP
     return (
       <ValidatedForm>
         {!canShowOnlyRequiredFields && (
-          <StreamTitleAndDescription vModel={this.settings} allowCustom={isMutliplatformMode} />
+          <CommonPlatformFields
+            vModel={this.settings}
+            hasCustomCheckbox={isMutliplatformMode}
+            platforms={['twitch']}
+          />
         )}
         {!canShowOnlyRequiredFields && (
           <TwitchTagsInput
@@ -94,13 +54,6 @@ export default class TwitchEditStreamInfo extends TsxComponent<TwitchEditStreamP
             vModel={this.settings.tags}
           />
         )}
-        <HFormGroup title={this.gameMetadata.title}>
-          <ListInput
-            handleSearchChange={val => this.onGameSearchHandler(val)}
-            vModel={this.settings.game}
-            metadata={this.gameMetadata}
-          />
-        </HFormGroup>
       </ValidatedForm>
     );
   }

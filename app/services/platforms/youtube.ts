@@ -1,10 +1,11 @@
-import { StatefulService, mutation } from '../core/stateful-service';
+import { StatefulService, mutation, InheritMutations } from '../core/stateful-service';
 import {
   IPlatformService,
   TPlatformCapability,
   TPlatformCapabilityMap,
   EPlatformCallResult,
   IPlatformRequest,
+  IPlatformState,
 } from '.';
 import { HostsService } from '../hosts';
 import { Inject } from 'services/core/injector';
@@ -20,15 +21,14 @@ import { $t } from 'services/i18n';
 import { pickBy } from 'lodash';
 import { ITwitchStartStreamOptions } from './twitch';
 import { throwStreamError } from '../streaming/stream-error';
+import { BasePlatformService } from './base-platform';
 
-interface IYoutubeServiceState {
+interface IYoutubeServiceState extends IPlatformState {
   liveStreamingEnabled: boolean;
   streamId: string;
-  chatUrl: string;
   streamPageUrl: string;
   dashboardUrl: string;
   channelId: string;
-  streamKey: string;
   lifecycleStep: TYoutubeLifecycleStep;
   settings: IYoutubeStartStreamOptions;
 }
@@ -126,26 +126,24 @@ type TBroadcastLifecycleStatus =
   | 'testStarting'
   | 'testing';
 
-export class YoutubeService extends StatefulService<IYoutubeServiceState>
+@InheritMutations()
+export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   implements IPlatformService {
   @Inject() private hostsService: HostsService;
-  @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private userService: UserService;
   @Inject() private customizationService: CustomizationService;
-  @Inject() private streamingService: StreamingService;
+  @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private windowsService: WindowsService;
 
   capabilities = new Set<TPlatformCapability>(['chat', 'stream-schedule']);
 
   static initialState: IYoutubeServiceState = {
+    ...BasePlatformService.initialState,
     liveStreamingEnabled: true,
     streamId: '',
-    chatUrl: '',
-    streamPageUrl: '',
     dashboardUrl: '',
     channelId: '',
     lifecycleStep: 'idle',
-    streamKey: '',
     settings: {
       broadcastId: '',
       title: '',
@@ -230,6 +228,8 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
   }
 
   async afterGoLive() {
+    super.afterGoLive();
+
     // we don't have activeChannel if user start stream with the 'just go live' button
     if (!this.state.settings.broadcastId) return;
 
@@ -345,7 +345,7 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     return Promise.resolve({});
   }
 
-  async fetchViewerCount(): Promise<number> {
+  protected async fetchViewerCount(): Promise<number> {
     if (!this.state.settings.broadcastId) return 0; // activeChannel is not available when streaming to custom ingest
     const endpoint = 'videos?part=snippet,liveStreamingDetails';
     // eslint-disable-next-line prettier/prettier
@@ -666,17 +666,6 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState>
     capability: T,
   ): this is TPlatformCapabilityMap[T] & IPlatformService {
     return this.capabilities.has(capability);
-  }
-
-  showStreamStatusWindow() {
-    this.windowsService.showWindow({
-      componentName: 'YoutubeStreamStatus',
-      title: $t('YouTube stream status'),
-      size: {
-        width: 550,
-        height: 600,
-      },
-    });
   }
 
   get progressInfo(): { msg: string; progress: number } {

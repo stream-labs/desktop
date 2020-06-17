@@ -5,12 +5,13 @@ import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { cloneDeep } from 'lodash';
 import TsxComponent, { createProps } from 'components/tsx-component';
 
-import StreamTitleAndDescription from './StreamTitleAndDescription';
+import CommonPlatformFields from './CommonPlatformFields';
 import { ListInput } from '../shared/inputs/inputs';
 import { formMetadata, IListOption, metadata } from '../shared/inputs';
 import { $t } from '../../services/i18n';
 import { FacebookService, IFacebookStartStreamOptions } from '../../services/platforms/facebook';
 import { IGoLiveSettings, StreamingService } from '../../services/streaming';
+import { SyncWithValue } from '../../services/app/app-decorators';
 
 class Props {
   goLiveSettings: IGoLiveSettings = null;
@@ -27,26 +28,10 @@ class Props {
 export default class FacebookEditStreamInfo extends TsxComponent<Props> {
   @Inject() private facebookService: FacebookService;
   @Inject() private streamingService: StreamingService;
-  settings: IFacebookStartStreamOptions = null;
+  @SyncWithValue() settings: IFacebookStartStreamOptions = null;
 
-  get twitchGame() {
-    return this.props.goLiveSettings.destinations.twitch?.game;
-  }
-
-  @Watch('twitchGame')
-  private onTwitchGameChanged(game: string) {
-    console.log('TW game changed to ', game);
-    this.settings.game = game;
-    this.emitInput();
-  }
-
-  created() {
-    this.syncValue(this.value);
-  }
-
-  @Watch('value')
-  syncValue(val: IGoLiveSettings['destinations']['facebook']) {
-    this.settings = cloneDeep(val);
+  get view() {
+    return this.streamingService.views;
   }
 
   emitInput() {
@@ -60,11 +45,6 @@ export default class FacebookEditStreamInfo extends TsxComponent<Props> {
         options: this.facebookService.state.facebookPages.options,
         required: true,
       }),
-      game: metadata.text({
-        title: $t('Facebook Game'),
-        fullWidth: true,
-        required: true,
-      }),
     });
   }
 
@@ -76,10 +56,12 @@ export default class FacebookEditStreamInfo extends TsxComponent<Props> {
           <ListInput vModel={this.settings.facebookPageId} metadata={this.formMetadata.page} />
         </HFormGroup>
 
-        <HFormGroup metadata={this.formMetadata.game} vModel={this.settings.game} />
-
         {!showOnlyRequiredFields && (
-          <StreamTitleAndDescription vModel={this.settings} allowCustom={true} />
+          <CommonPlatformFields
+            vModel={this.settings}
+            hasCustomCheckbox={this.view.isMutliplatformMode}
+            platforms={['facebook']}
+          />
         )}
       </ValidatedForm>
     );

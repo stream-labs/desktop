@@ -1,4 +1,4 @@
-import TsxComponent from '../../tsx-component';
+import TsxComponent, { createProps } from '../../tsx-component';
 import { Inject } from '../../../services/core';
 import { StreamingService, TGoLiveChecklistItemState } from '../../../services/streaming';
 import { WindowsService } from '../../../services/windows';
@@ -10,18 +10,22 @@ import { YoutubeService } from '../../../services/platforms/youtube';
 import { getPlatformService, TPlatform } from '../../../services/platforms';
 import { TwitterService } from '../../../services/integrations/twitter';
 import GoLiveError from './GoLiveError';
+import { VideoEncodingOptimizationService } from '../../../app-services';
+
+class Props {
+  isUpdateMode? = false;
+}
 
 /**
  * Shows transition to live and helps troubleshoot related problems
  */
-@Component({})
-export default class GoLiveChecklist extends TsxComponent<{}> {
+@Component({ props: createProps(Props) })
+export default class GoLiveChecklist extends TsxComponent<Props> {
   @Inject() private streamingService: StreamingService;
   @Inject() private windowsService: WindowsService;
   @Inject() private youtubeService: YoutubeService;
   @Inject() private twitterService: TwitterService;
-
-  private isErrorDetailsShown = false;
+  @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
 
   private get view() {
     return this.streamingService.views;
@@ -47,19 +51,17 @@ export default class GoLiveChecklist extends TsxComponent<{}> {
 
   private render() {
     const checklist = this.view.info.checklist;
-    const { isMidStreamMode, isMutliplatformMode, goLiveSettings } = this.view;
-    const shouldPublishYT = !isMidStreamMode && goLiveSettings.destinations.youtube?.enabled;
+    const { isMutliplatformMode, goLiveSettings } = this.view;
+    const isUpdateMode = this.props.isUpdateMode;
+    const shouldPublishYT = !isUpdateMode && goLiveSettings.destinations.youtube?.enabled;
+    const shouldShowOptimizedProfile =
+      this.videoEncodingOptimizationService.state.useOptimizedProfile && !isUpdateMode;
 
     return (
       <div class={styles.container}>
         <h1>{this.getHeaderText()}</h1>
 
         <ul class={styles.checklist}>
-          {/* OPTIMIZED PROFILE */}
-          {!isMidStreamMode &&
-            goLiveSettings.useOptimizedProfile &&
-            this.renderCheck($t('Apply optimized settings'), checklist.applyOptimizedSettings)}
-
           {/* PLATFORMS UPDATE */}
           {this.view.enabledPlatforms.map(platform =>
             this.renderCheck(
@@ -71,12 +73,16 @@ export default class GoLiveChecklist extends TsxComponent<{}> {
           )}
 
           {/* RESTREAM */}
-          {!isMidStreamMode &&
+          {!isUpdateMode &&
             isMutliplatformMode &&
             this.renderCheck($t('Configure the Restream service'), checklist.setupRestream)}
 
+          {/* OPTIMIZED PROFILE */}
+          {!shouldShowOptimizedProfile &&
+            this.renderCheck($t('Apply optimized settings'), checklist.applyOptimizedSettings)}
+
           {/* START TRANSMISSION */}
-          {!isMidStreamMode &&
+          {!isUpdateMode &&
             this.renderCheck($t('Start video transmission'), checklist.startVideoTransmission)}
 
           {/* PUBLISH  YT BROADCAST */}

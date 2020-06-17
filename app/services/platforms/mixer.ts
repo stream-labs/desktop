@@ -1,4 +1,4 @@
-import { StatefulService, mutation } from 'services/core/stateful-service';
+import { StatefulService, mutation, InheritMutations } from 'services/core/stateful-service';
 import {
   IPlatformService,
   IGame,
@@ -6,6 +6,7 @@ import {
   TPlatformCapabilityMap,
   EPlatformCallResult,
   IPlatformRequest,
+  IPlatformState,
 } from '.';
 import { HostsService } from '../hosts';
 import { Inject } from 'services/core/injector';
@@ -19,11 +20,10 @@ import { CustomizationService } from 'services/customization';
 import { IInputMetadata } from '../../components/shared/inputs';
 import { IGoLiveSettings } from '../streaming';
 import { throwStreamError } from '../streaming/stream-error';
+import { BasePlatformService } from './base-platform';
 
-interface IMixerServiceState {
+interface IMixerServiceState extends IPlatformState {
   typeIdMap: object;
-  streamKey: string;
-  streamPageUrl: string;
   settings: IMixerStartStreamOptions;
 }
 
@@ -44,13 +44,15 @@ export interface IMixerChannelInfo extends IMixerStartStreamOptions {
   chatUrl: string;
 }
 
-export class MixerService extends StatefulService<IMixerServiceState> implements IPlatformService {
+@InheritMutations()
+export class MixerService extends BasePlatformService<IMixerServiceState>
+  implements IPlatformService {
   @Inject() private hostsService: HostsService;
   @Inject() private userService: UserService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private customizationService: CustomizationService;
 
-  capabilities = new Set<TPlatformCapability>(['chat', 'viewer-count']);
+  capabilities = new Set<TPlatformCapability>(['chat']);
   channelInfoChanged = new Subject<IMixerChannelInfo>();
   private activeChannel: IMixerChannelInfo;
 
@@ -62,9 +64,8 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
   apiBase = 'https://mixer.com/api/v1/';
 
   static initialState: IMixerServiceState = {
+    ...BasePlatformService.initialState,
     typeIdMap: {},
-    streamKey: '',
-    streamPageUrl: '',
     settings: {
       title: '',
       game: '',
@@ -266,15 +267,5 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
 
   liveDockEnabled(): boolean {
     return true;
-  }
-
-  @mutation()
-  private SET_STREAM_KEY(key: string) {
-    this.state.streamKey = key;
-  }
-
-  @mutation()
-  private SET_STREAM_PAGE_URL(url: string) {
-    this.state.streamPageUrl = url;
   }
 }

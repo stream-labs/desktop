@@ -4,7 +4,6 @@ import { Component } from 'vue-property-decorator';
 import ModalLayout from '../ModalLayout.vue';
 import { BoolInput, ListInput } from 'components/shared/inputs/inputs';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
-import { StreamInfoDeprecatedService, TCombinedChannelInfo } from 'services/stream-info-deprecated';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { UserService } from 'services/user';
 import { Inject } from 'services/core/injector';
@@ -13,7 +12,7 @@ import { StreamingService } from 'services/streaming';
 import { WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
 import { $t, I18nService } from 'services/i18n';
-import { FacebookService } from 'services/platforms/facebook';
+import { FacebookService, IFacebookStartStreamOptions } from 'services/platforms/facebook';
 import {
   VideoEncodingOptimizationService,
   IEncoderProfile,
@@ -49,7 +48,6 @@ import Translate from 'components/shared/translate';
   },
 })
 export default class EditStreamInfo extends Vue {
-  @Inject() streamInfoService: StreamInfoDeprecatedService;
   @Inject() userService: UserService;
   @Inject() streamingService: StreamingService;
   @Inject() windowsService: WindowsService;
@@ -80,15 +78,15 @@ export default class EditStreamInfo extends Vue {
   tweetModel: string = '';
 
   searchProfilesPending = false;
-  channelInfo: TCombinedChannelInfo = null;
   infoError = false;
+  channelInfo = cloneDeep(getPlatformService(this.platform).state.settings);
 
   $refs: {
     form: ValidatedForm;
   };
 
   get hasUpdateTagsPermission() {
-    return this.channelInfo.hasUpdateTagsPermission;
+    return this.twitchService.state.hasUpdateTagsPermission;
   }
 
   get hasPages() {
@@ -165,10 +163,6 @@ export default class EditStreamInfo extends Vue {
     this.videoEncodingOptimizationService.useOptimizedProfile(enabled);
   }
 
-  async created() {
-    await this.populateInfo();
-  }
-
   @Debounce(500)
   async onGameSearchHandler(searchString: string) {
     if (searchString !== '') {
@@ -189,67 +183,6 @@ export default class EditStreamInfo extends Vue {
         }
       });
     }
-  }
-
-  async loadAvailableProfiles() {
-    if (this.midStreamMode) return;
-    this.searchProfilesPending = true;
-    this.selectedProfile = await this.videoEncodingOptimizationService.fetchOptimizedProfile(
-      this.channelInfo.game,
-    );
-    this.searchProfilesPending = false;
-  }
-
-  // For some reason, v-model doesn't work with ListInput
-  onGameInput(gameModel: string) {
-    this.channelInfo.game = gameModel;
-    this.loadAvailableProfiles();
-  }
-
-  updateAndGoLive() {
-    this.updatingInfo = true;
-
-    if (this.doNotShowAgainModel) {
-      electron.remote.dialog.showMessageBox({
-        message:
-          $t('You will not be asked again to update your stream info when going live. ') +
-          $t('You can re-enable this from the settings.'),
-      });
-
-      this.customizationService.setUpdateStreamInfoOnLive(false);
-    }
-
-    this.videoEncodingOptimizationService.useOptimizedProfile(this.useOptimizedProfile);
-
-    if (this.midStreamMode) {
-      const platform = getPlatformService(this.userService.platform.type);
-      platform
-        .putChannelInfo(this.channelInfo)
-        .then(success => {
-          if (success) {
-            this.windowsService.closeChildWindow();
-          } else {
-            this.updateError = true;
-            this.updatingInfo = false;
-          }
-        })
-        .catch(e => {
-          this.$toasted.show(e.message, {
-            position: 'bottom-center',
-            className: 'toast-alert',
-            duration: 5000,
-            singleton: true,
-          });
-          this.updatingInfo = false;
-        });
-      return;
-    }
-
-    if (this.selectedProfile && this.useOptimizedProfile) {
-      this.videoEncodingOptimizationService.applyProfile(this.selectedProfile);
-    }
-
-    this.goLive();
   }
 
   async scheduleStream() {
@@ -297,36 +230,12 @@ export default class EditStreamInfo extends Vue {
   }
 
   async handleSubmit() {
-    if (this.infoError || this.updateError) {
-      await this.goLive(true);
-      return;
-    }
-
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
-    if (this.isFacebook && !this.channelInfo.game) {
+    if (this.isFacebook && !(this.channelInfo as IFacebookStartStreamOptions).game) {
       this.showGameError();
       return;
     }
     if (this.isSchedule) return this.scheduleStream();
-    if (this.twitterIsEnabled && this.shouldPostTweet) {
-      const tweetedSuccessfully = await this.handlePostTweet();
-      if (!tweetedSuccessfully) return;
-    }
-
-    if (this.restreamService.shouldGoLiveWithRestream) {
-      this.updatingInfo = true;
-      // await this.restreamService.stagePlatform(this.platform, this.channelInfo);
-
-      // if (!this.isFinalStep) {
-      //   this.streamingService.showEditStreamInfo(
-      //     this.windowQuery.platforms,
-      //     this.windowQuery.platformStep + 1,
-      //   );
-      //   return;
-      // }
-    }
-
-    this.updateAndGoLive();
   }
 
   showGameError() {
@@ -359,57 +268,8 @@ export default class EditStreamInfo extends Vue {
     return success;
   }
 
-  async goLive(force = false) {
-    try {
-      this.updatingInfo = true;
-      await this.streamingService.toggleStreaming(this.channelInfo, force);
-      this.streamInfoService.createGameAssociation(this.channelInfo.game);
-      this.windowsService.closeChildWindow();
-      // youtube needs additional actions after the stream has been started
-      if (
-        (this.windowQuery.platforms && this.windowQuery.platforms.includes('youtube')) ||
-        this.isYoutube
-      ) {
-        (getPlatformService('youtube') as YoutubeService).showStreamStatusWindow();
-      }
-    } catch (e) {
-      // const message = this.platformService.getErrorDescription(e);
-      // this.$toasted.show(message, {
-      //   position: 'bottom-center',
-      //   className: 'toast-alert',
-      //   duration: 1000,
-      //   singleton: true,
-      // });
-      // this.infoError = true;
-      // this.updatingInfo = false;
-    }
-  }
-
   cancel() {
     this.windowsService.closeChildWindow();
-  }
-
-  async populateInfo() {
-    // set the local state of the channelInfo
-    this.channelInfo = null;
-    this.infoError = false;
-    try {
-      this.channelInfo = cloneDeep(
-        await this.platformService.prepopulateInfo(),
-      ) as TCombinedChannelInfo;
-      this.infoError = false;
-    } catch (e) {
-      this.infoError = true;
-      return;
-    }
-
-    // the ListInput component requires the selected game to be in the options list
-    if (this.channelInfo.game) {
-      this.gameOptions = [{ value: this.channelInfo.game, title: this.channelInfo.game }];
-    }
-
-    // check available profiles for the selected game
-    await this.loadAvailableProfiles();
   }
 
   get platformService() {
@@ -494,16 +354,5 @@ export default class EditStreamInfo extends Vue {
   openFBPageCreateLink() {
     shell.openExternal('https://www.facebook.com/gaming/pages/create?ref=streamlabs');
     this.windowsService.closeChildWindow();
-  }
-
-  get optimizedProfileMetadata() {
-    const game = this.selectedProfile.game !== 'DEFAULT' ? `for ${this.channelInfo.game}` : '';
-    return {
-      title: $t('Use optimized encoder settings ') + game,
-      tooltip: $t(
-        'Optimized encoding provides better quality and/or lower cpu/gpu usage. Depending on the game, ' +
-          'resolution may be changed for a better quality of experience',
-      ),
-    };
   }
 }

@@ -21,6 +21,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Subscription } from 'rxjs';
 import { Throttle } from 'lodash-decorators';
 import { EditorCommandsService } from 'services/editor-commands';
+import { TWindowComponentName } from '../windows';
 
 export interface IWidgetSourcesState {
   widgetSources: Dictionary<IWidgetSource>;
@@ -130,8 +131,8 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
     return WidgetDefinitions[type].url(this.hostsService.streamlabs, this.userService.widgetToken);
   }
 
-  getWidgetComponent(type: WidgetType): string {
-    return WidgetType[type];
+  getWidgetComponent(type: WidgetType): TWindowComponentName {
+    return WidgetType[type] as TWindowComponentName;
   }
 
   getWidgetSettingsService(type: WidgetType): WidgetSettingsService<any> {

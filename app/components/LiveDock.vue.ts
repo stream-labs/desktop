@@ -3,7 +3,6 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
 import Chat from './Chat.vue';
 import { StreamingService, EStreamingState } from '../services/streaming';
 import { Inject } from '../services/core/injector';
-import { StreamInfoDeprecatedService } from '../services/stream-info-deprecated';
 import { UserService } from '../services/user';
 import { CustomizationService } from 'services/customization';
 import electron from 'electron';
@@ -28,7 +27,6 @@ import { RestreamService, YoutubeService } from 'app-services';
 export default class LiveDock extends Vue {
   @Inject() streamingService: StreamingService;
   @Inject() youtubeService: YoutubeService;
-  @Inject() streamInfoService: StreamInfoDeprecatedService;
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() platformAppsService: PlatformAppsService;
@@ -134,7 +132,7 @@ export default class LiveDock extends Vue {
       return 'viewers hidden';
     }
 
-    return this.streamInfoService.state.viewerCount.toString();
+    return this.streamingService.views.viewerCount.toString();
   }
 
   get offlineImageSrc() {
@@ -147,7 +145,7 @@ export default class LiveDock extends Vue {
   }
 
   openYoutubeStreamUrl() {
-    electron.remote.shell.openExternal(this.streamInfoService.state.streamUrl);
+    electron.remote.shell.openExternal(this.youtubeService.state.streamPageUrl);
   }
 
   openYoutubeControlRoom() {

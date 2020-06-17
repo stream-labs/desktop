@@ -3,9 +3,13 @@ import { Inject } from 'services/core/injector';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import TsxComponent, { createProps } from 'components/tsx-component';
 
-import StreamTitleAndDescription from './StreamTitleAndDescription';
+import CommonPlatformFields from './CommonPlatformFields';
 import { IMixerStartStreamOptions, MixerService } from '../../services/platforms/mixer';
 import { StreamingService } from '../../app-services';
+import { SyncWithValue } from '../../services/app/app-decorators';
+import HFormGroup from '../shared/inputs/HFormGroup.vue';
+import { formMetadata, metadata } from '../shared/inputs';
+import { $t } from '../../services/i18n';
 
 class Props {}
 
@@ -13,23 +17,34 @@ class Props {}
 export default class MixerEditStreamInfo extends TsxComponent<Props> {
   @Inject() private mixerService: MixerService;
   @Inject() private streamingService: StreamingService;
-  channelInfo: IMixerStartStreamOptions = null;
+  @SyncWithValue()
+  settings: IMixerStartStreamOptions = null;
 
-  async created() {
-    this.channelInfo = {
-      title: '',
-      game: '',
-    };
+  private get view() {
+    return this.streamingService.views;
+  }
+
+  private get metadata() {
+    return formMetadata({
+      game: metadata.text({ title: $t('Game'), required: true, fullWidth: true }),
+    });
   }
 
   render(createElement: Function) {
-    const canShowOnlyRequiredFields = this.streamingService.views.canShowOnlyRequiredFields;
+    const canShowOnlyRequiredFields = this.view.canShowOnlyRequiredFields;
     return (
-      !canShowOnlyRequiredFields && (
-        <ValidatedForm>
-          <StreamTitleAndDescription vModel={this.channelInfo} allowCustom={true} />
-        </ValidatedForm>
-      )
+      <div>
+        {!canShowOnlyRequiredFields && (
+          <ValidatedForm>
+            <CommonPlatformFields
+              vModel={this.settings}
+              hasCustomCheckbox={this.view.isMutliplatformMode}
+              platforms={['mixer']}
+            />
+          </ValidatedForm>
+        )}
+        {/*<HFormGroup metadata={this.metadata.game} vModel={this.settings.game} />*/}
+      </div>
     );
   }
 }

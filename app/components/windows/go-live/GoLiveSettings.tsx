@@ -12,7 +12,7 @@ import cx from 'classnames';
 import { formMetadata, IListOption, metadata } from 'components/shared/inputs';
 import { SettingsService } from 'services/settings';
 import YoutubeEditStreamInfo from 'components/platforms/youtube/YoutubeEditStreamInfo';
-import StreamTitleAndDescription from 'components/platforms/StreamTitleAndDescription';
+import CommonPlatformFields from 'components/platforms/CommonPlatformFields';
 import TwitchEditStreamInfo from '../../platforms/TwitchEditStreamInfo';
 import FacebookEditStreamInfo from '../../platforms/FacebookEditStreamInfo';
 import MixerEditStreamInfo from '../../platforms/MixerEditStreamInfo';
@@ -27,7 +27,8 @@ import PlatformSettings from './PlatformSettings';
 import { IStreamError } from '../../../services/streaming/stream-error';
 import GoLiveError from './GoLiveError';
 import { GoLiveProps } from './goLiveProps';
-import { SyncWithValue } from '../../../util/decorators';
+import { SyncWithValue } from '../../../services/app/app-decorators';
+import { OptimizedProfileSwitcher } from './OptimizedProfileSwitcher';
 
 class SectionProps {
   title?: string = '';
@@ -48,6 +49,7 @@ class Section extends TsxComponent<SectionProps> {
       return (
         <div class={styles.section}>
           {title && <h2>{title}</h2>}
+          {!title && <div class={styles.spacer} />}
           <div>{slot}</div>
         </div>
       );
@@ -77,18 +79,6 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
     return this.streamingService.views;
   }
 
-  get optimizedProfileMetadata() {
-    const gamName = 'Unknown';
-    const game = 'gameName'; // this.selectedProfile.game !== 'DEFAULT' ? `for ${gamName}` : '';
-    return {
-      title: $t('Use optimized encoder settings ') + game,
-      tooltip: $t(
-        'Optimized encoding provides better quality and/or lower cpu/gpu usage. Depending on the game, ' +
-          'resolution may be changed for a better quality of experience',
-      ),
-    };
-  }
-
   private getPlatformName(platform: TPlatform): string {
     return getPlatformService(platform).displayName;
   }
@@ -114,8 +104,7 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
     const isLoadingMode =
       !isErrorMode && ['empty', 'prepopulate'].includes(this.view.info.lifecycle);
     const shouldShowSettings = !isErrorMode && !isLoadingMode && hasPlatforms;
-    const isAdvancedMode = this.view.goLiveSettings.advancedMode;
-    const isMultiplePlatformMode = enabledPlatforms.length > 1;
+    const isAdvancedMode = this.view.goLiveSettings.advancedMode && this.view.isMutliplatformMode;
     return (
       <ValidatedForm class="flex">
         {/*PLATFORMS SWITCHER*/}
@@ -135,25 +124,19 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
 
           {shouldShowSettings && (
             <div style={{ width: '100%' }}>
+              {/*PLATFORM SETTINGS*/}
               <PlatformSettings vModel={this.settings} />
 
+              {/*ADD SOME SPACE*/}
+              {!isAdvancedMode && <div class={styles.spacer} />}
+
               {/*EXTRAS*/}
-              {isAdvancedMode && (
-                <Section title={$t('Extras')}>
-                  <HFormGroup
-                    metadata={{
-                      tooltip: $t(
-                        'Optimized encoding provides better quality and/or lower cpu/gpu usage. Depending on the game, resolution may be changed for a better quality of experience',
-                      ),
-                    }}
-                  >
-                    <BoolInput
-                      vModel={this.settings.useOptimizedProfile}
-                      metadata={this.optimizedProfileMetadata}
-                    />
-                  </HFormGroup>
-                </Section>
-              )}
+              <Section title={isAdvancedMode ? $t('Extras') : ''}>
+                <OptimizedProfileSwitcher
+                  vModel={this.settings.optimizedProfile}
+                  settings={this.settings}
+                />
+              </Section>
             </div>
           )}
         </div>

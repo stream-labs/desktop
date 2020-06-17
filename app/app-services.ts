@@ -53,6 +53,7 @@ export { MacPermissionsService } from 'services/mac-permissions';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';
+export { BasePlatformService } from 'services/platforms/base-platform';
 export { YoutubeService } from 'services/platforms/youtube';
 export { TwitchService } from 'services/platforms/twitch';
 export { MixerService } from 'services/platforms/mixer';
