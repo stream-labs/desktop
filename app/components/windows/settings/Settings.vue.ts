@@ -24,6 +24,7 @@ import FormInput from 'components/shared/inputs/FormInput.vue';
 import StreamSettings from './StreamSettings';
 import { MagicLinkService } from 'services/magic-link';
 import electron from 'electron';
+import { UserService } from 'services/user';
 
 @Component({
   components: {
@@ -52,6 +53,7 @@ export default class Settings extends Vue {
   @Inject() settingsService: ISettingsServiceApi;
   @Inject() windowsService: WindowsService;
   @Inject() magicLinkService: MagicLinkService;
+  @Inject() userService: UserService;
 
   $refs: { settingsContainer: HTMLElement & SearchablePages };
 
@@ -93,6 +95,10 @@ export default class Settings extends Vue {
     } else {
       this.internalCategoryName = val;
     }
+  }
+
+  get isPrime() {
+    return this.userService.views.isPrime;
   }
 
   mounted() {

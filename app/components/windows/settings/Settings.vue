@@ -28,6 +28,7 @@
           {{ $t(category) }}
         </NavItem>
         <NavItem
+          v-if="!isPrime"
           key="Prime"
           to="Prime"
           ico="icon-prime"
