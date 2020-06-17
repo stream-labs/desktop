@@ -19,7 +19,7 @@
     "clear-plugins": "rimraf plugins",
     "package": "yarn generate-agreement && rimraf dist && electron-builder build -w --x64 --config electron-builder/base.config.js",
     "package:preview": "yarn generate-agreement && rimraf dist && electron-builder build -w --x64 --config electron-builder/preview.config.js",
-    "eslint": "eslint {app,guest-api,obs-api,updater}/**/*.ts app/**/*.tsx",
+    "eslint": "eslint {app,guest-api,obs-api,updater}/**/*.ts app/**/*.tsx main.js",
     "test": "tsc -p test && ava -v",
     "test:stress": "yarn test test-dist/test/stress/index.js",
     "test:screen": "yarn test ./test-dist/test/screentest/tests/**/*.js",
