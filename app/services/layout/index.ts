@@ -182,7 +182,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   addTab(name: string, icon: string) {
     const id = uuid();
-    this.ADD_TAB(name, icon, id, this.userService.isPrime);
+    this.ADD_TAB(name, icon, id);
   }
 
   removeCurrentTab() {
@@ -234,7 +234,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
   }
 
   @mutation()
-  ADD_TAB(name: string, icon: string, id: string, switchTab = false) {
+  ADD_TAB(name: string, icon: string, id: string) {
     Vue.set(this.state.tabs, id, {
       name,
       icon,
@@ -252,6 +252,6 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
         bar2: 240,
       },
     });
-    if (switchTab) this.state.currentTab = id;
+    this.state.currentTab = id;
   }
 }

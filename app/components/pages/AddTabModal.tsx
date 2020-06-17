@@ -50,12 +50,6 @@ export default class AddTabModal extends TsxComponent<AddTabModalProps> {
     return !!this.icon && !!this.name;
   }
 
-  get buttonInfo() {
-    return this.userService.isPrime
-      ? { text: $t('Save New Tab'), class: 'button button--action' }
-      : { text: $t('Add New Tab With Prime'), class: 'button button--prime' };
-  }
-
   render() {
     return (
       <ModalLayout
@@ -75,11 +69,11 @@ export default class AddTabModal extends TsxComponent<AddTabModalProps> {
             {$t('Cancel')}
           </button>
           <button
-            class={this.buttonInfo.class}
+            class="button button--action"
             onClick={() => this.createTab()}
             disabled={!this.canSave}
           >
-            {this.buttonInfo.text}
+            {$t('Save New Tab')}
           </button>
         </div>
       </ModalLayout>
