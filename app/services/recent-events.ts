@@ -630,6 +630,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   applyConfig(config: IRecentEventsConfig) {
+    if (!config) return;
     this.SET_MUTED(config.eventsPanelMuted);
     this.SET_FILTER_CONFIG(config.settings);
   }
