@@ -1,9 +1,9 @@
 {
   "You have been logged out": "Você foi desconectado",
-  "This element is too small to be displayed": "This element is too small to be displayed",
-  "This element requires Selective Recording to be enabled": "This element requires Selective Recording to be enabled",
-  "Grant Permissions": "Grant Permissions",
-  "Streamlabs OBS needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs OBS needs additional permissions. Grant permissions in the pop-up dialogs to continue.",
-  "Microphone": "Microphone",
+  "This element is too small to be displayed": "Este elemento é muito pequeno para ser mostrado",
+  "This element requires Selective Recording to be enabled": "Este elemento requer Gravação Seletiva para ser ativado",
+  "Grant Permissions": "Forneça as permissões",
+  "Streamlabs OBS needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs OBS precisa de permissões adicionais. Forneça as permissões necessárias na janela que se abriu para continuar.",
+  "Microphone": "Microfone",
   "Webcam": "Webcam"
 }
