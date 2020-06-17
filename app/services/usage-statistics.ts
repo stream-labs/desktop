@@ -28,7 +28,8 @@ type TAnalyticsEvent =
   | 'Recording'
   | 'ReplayBuffer'
   | 'Heartbeat'
-  | 'StreamPerformance';
+  | 'StreamPerformance'
+  | 'StreamingStatus';
 
 interface IAnalyticsEvent {
   product: string;
