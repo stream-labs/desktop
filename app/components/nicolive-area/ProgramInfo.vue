@@ -47,7 +47,7 @@
 .program-title-link {
   display: block;
   color: @white;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: bold;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -89,12 +89,12 @@
 }
 
 .community-icon {
-  margin-right: 10px;
+  margin-right: 16px;
   flex-shrink: 0;
 
   .community-thumbnail {
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
   }
 }

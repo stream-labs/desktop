@@ -1,32 +1,50 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
-import { NicoliveProgramService, NicoliveProgramServiceFailure } from 'services/nicolive-program/nicolive-program';
-import { remote } from 'electron';
-import { $t } from 'services/i18n';
+import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
 
-import CommentForm from './CommentForm.vue';
 import ProgramDescription from './ProgramDescription.vue';
+import CommentViewer from './CommentViewer.vue';
+import CommentFilter from './CommentFilter.vue';
 import ProgramInfo from './ProgramInfo.vue';
 import ProgramStatistics from './ProgramStatistics.vue';
 import ToolBar from './ToolBar.vue';
 import TopNav from './TopNav.vue';
 import ControlsArrow from '../../../media/images/controls-arrow-vertical.svg';
+import AreaSwitcher from './AreaSwitcher.vue';
+import { NicoliveFailure, openErrorDialogFromFailure } from 'services/nicolive-program/NicoliveFailure';
 
 @Component({
   components: {
+    AreaSwitcher,
     TopNav,
     ProgramInfo,
     ProgramDescription,
+    CommentViewer,
+    CommentFilter,
     ProgramStatistics,
     ToolBar,
-    CommentForm,
     ControlsArrow,
   },
 })
 export default class NicolivePanelRoot extends Vue {
   @Inject()
   nicoliveProgramService: NicoliveProgramService;
+
+  get contents() {
+    return [
+      {
+        name: 'コメント',
+        text: '番組に投稿されたコメントを閲覧します',
+        slotName: 'commentViewer'
+      },
+      {
+        name: '番組説明文',
+        text: '番組作成時に設定した説明文の表示を確認します',
+        slotName: 'description'
+      },
+    ]
+  }
 
   get opened(): boolean {
     return this.nicoliveProgramService.state.panelOpened;
@@ -56,8 +74,8 @@ export default class NicolivePanelRoot extends Vue {
       this.isFetching = true;
       await this.nicoliveProgramService.fetchProgram();
     } catch (caught) {
-      if (caught instanceof NicoliveProgramServiceFailure) {
-        await NicoliveProgramService.openErrorDialogFromFailure(caught);
+      if (caught instanceof NicoliveFailure) {
+        await openErrorDialogFromFailure(caught);
       } else {
         throw caught;
       }

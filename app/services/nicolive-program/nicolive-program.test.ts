@@ -4,24 +4,62 @@ import { Subject, BehaviorSubject } from 'rxjs';
 type NicoliveProgramService = import('./nicolive-program').NicoliveProgramService;
 type PanelState = import('./nicolive-program').PanelState;
 
+const rooms = [{ id: 0, name: 'arena', webSocketUri: 'https://example.com/lv1', threadId: 'hoge' }];
+
 const schedules = {
-  ch: { nicoliveProgramId: 'lv1', socialGroupId: 'ch1', status: 'onAir', onAirBeginAt: 100, onAirEndAt: 150 },
-  onAir: { nicoliveProgramId: 'lv1', socialGroupId: 'co1', status: 'onAir', onAirBeginAt: 100, onAirEndAt: 150 },
-  test: { nicoliveProgramId: 'lv1', socialGroupId: 'co1', status: 'test', onAirBeginAt: 100, onAirEndAt: 150 },
-  end: { nicoliveProgramId: 'lv1', socialGroupId: 'co1', status: 'end', onAirBeginAt: 100, onAirEndAt: 150 },
+  ch: {
+    nicoliveProgramId: 'lv1',
+    socialGroupId: 'ch1',
+    status: 'onAir',
+    vposBaseAt: 50,
+    onAirBeginAt: 100,
+    onAirEndAt: 150,
+    rooms,
+  },
+  onAir: {
+    nicoliveProgramId: 'lv1',
+    socialGroupId: 'co1',
+    status: 'onAir',
+    vposBaseAt: 50,
+    onAirBeginAt: 100,
+    onAirEndAt: 150,
+    rooms,
+  },
+  test: {
+    nicoliveProgramId: 'lv1',
+    socialGroupId: 'co1',
+    status: 'test',
+    vposBaseAt: 50,
+    onAirBeginAt: 100,
+    onAirEndAt: 150,
+    rooms,
+  },
+  end: {
+    nicoliveProgramId: 'lv1',
+    socialGroupId: 'co1',
+    status: 'end',
+    vposBaseAt: 50,
+    onAirBeginAt: 100,
+    onAirEndAt: 150,
+    rooms,
+  },
   reserved1: {
     nicoliveProgramId: 'lv1',
     socialGroupId: 'co1',
     status: 'reserved',
+    vposBaseAt: 50,
     onAirBeginAt: 150,
     onAirEndAt: 200,
+    rooms,
   },
   reserved2: {
     nicoliveProgramId: 'lv1',
     socialGroupId: 'co1',
     status: 'reserved',
+    vposBaseAt: 50,
     onAirBeginAt: 250,
     onAirEndAt: 300,
+    rooms,
   },
 };
 
@@ -32,7 +70,9 @@ const programs = {
     description: '番組詳細情報',
     beginAt: schedules.onAir.onAirBeginAt,
     endAt: schedules.onAir.onAirEndAt,
+    vposBaseAt: schedules.onAir.vposBaseAt,
     isMemberOnly: true,
+    rooms,
   },
 };
 
@@ -74,6 +114,7 @@ jest.mock('services/nicolive-program/state', () => ({ NicoliveProgramStateServic
 jest.mock('services/i18n', () => ({
   $t: (x: any) => x,
 }));
+jest.mock('util/menus/Menu', () => ({}));
 
 beforeEach(() => {
   jest.doMock('services/stateful-service');
@@ -163,22 +204,22 @@ test('fetchProgramで結果が空ならエラー', async () => {
   (instance as any).setState = jest.fn();
 
   await expect(instance.fetchProgram()).rejects.toMatchInlineSnapshot(`
-NicoliveProgramServiceFailure {
-  "additionalMessage": "",
-  "method": "fetchProgram",
-  "reason": "no_suitable_program",
-  "type": "logic",
-}
-`);
+                              NicoliveFailure {
+                                "additionalMessage": "",
+                                "method": "fetchProgram",
+                                "reason": "no_suitable_program",
+                                "type": "logic",
+                              }
+                        `);
   expect(instance.client.fetchProgramSchedules).toHaveBeenCalledTimes(1);
   expect((instance as any).setState).toHaveBeenCalledTimes(1);
   expect((instance as any).setState.mock.calls[0]).toMatchInlineSnapshot(`
-Array [
-  Object {
-    "status": "end",
-  },
-]
-`);
+            Array [
+              Object {
+                "status": "end",
+              },
+            ]
+      `);
 });
 
 test('fetchProgram:成功', async () => {
@@ -200,21 +241,24 @@ test('fetchProgram:成功', async () => {
   expect(instance.client.fetchProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchCommunity).toHaveBeenCalledTimes(1);
   expect((instance as any).setState.mock.calls[0]).toMatchInlineSnapshot(`
-Array [
-  Object {
-    "communityID": "co1",
-    "communityName": "comunity.name",
-    "communitySymbol": "symbol url",
-    "description": "番組詳細情報",
-    "endTime": 150,
-    "isMemberOnly": true,
-    "programID": "lv1",
-    "startTime": 100,
-    "status": "onAir",
-    "title": "番組タイトル",
-  },
-]
-`);
+    Array [
+      Object {
+        "communityID": "co1",
+        "communityName": "comunity.name",
+        "communitySymbol": "symbol url",
+        "description": "番組詳細情報",
+        "endTime": 150,
+        "isMemberOnly": true,
+        "programID": "lv1",
+        "roomThreadID": "hoge",
+        "roomURL": "https://example.com/lv1",
+        "startTime": 100,
+        "status": "onAir",
+        "title": "番組タイトル",
+        "vposBaseTime": 50,
+      },
+    ]
+  `);
 });
 
 test('fetchProgramで番組があったが取りに行ったらエラー', async () => {
@@ -235,13 +279,13 @@ test('fetchProgramで番組があったが取りに行ったらエラー', async
   (instance as any).setState = jest.fn();
 
   await expect(instance.fetchProgram()).rejects.toMatchInlineSnapshot(`
-NicoliveProgramServiceFailure {
-  "additionalMessage": "",
-  "method": "fetchProgram",
-  "reason": "404",
-  "type": "http_error",
-}
-`);
+                              NicoliveFailure {
+                                "additionalMessage": "",
+                                "method": "fetchProgram",
+                                "reason": "404",
+                                "type": "http_error",
+                              }
+                        `);
   expect(instance.client.fetchProgramSchedules).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchCommunity).toHaveBeenCalledTimes(1);
@@ -257,13 +301,7 @@ test('fetchProgramでコミュ情報がエラーでも番組があったら先�
   instance.client.fetchProgramSchedules = jest.fn().mockResolvedValue({ ok: true, value: [schedules.onAir] });
   instance.client.fetchProgram = jest.fn().mockResolvedValue({
     ok: true,
-    value: {
-      status: schedules.onAir.status,
-      title: '番組タイトル',
-      description: '番組詳細情報',
-      beginAt: 100,
-      endAt: 150,
-    },
+    value: programs.onAir,
   });
   instance.client.fetchCommunity = jest.fn().mockResolvedValue({ ok: false, value });
 
@@ -274,21 +312,24 @@ test('fetchProgramでコミュ情報がエラーでも番組があったら先�
   expect(instance.client.fetchProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchCommunity).toHaveBeenCalledTimes(1);
   expect((instance as any).setState.mock.calls[0]).toMatchInlineSnapshot(`
-Array [
-  Object {
-    "communityID": "co1",
-    "communityName": "(コミュニティの取得に失敗しました)",
-    "communitySymbol": "",
-    "description": "番組詳細情報",
-    "endTime": 150,
-    "isMemberOnly": undefined,
-    "programID": "lv1",
-    "startTime": 100,
-    "status": "onAir",
-    "title": "番組タイトル",
-  },
-]
-`);
+    Array [
+      Object {
+        "communityID": "co1",
+        "communityName": "(コミュニティの取得に失敗しました)",
+        "communitySymbol": "",
+        "description": "番組詳細情報",
+        "endTime": 150,
+        "isMemberOnly": true,
+        "programID": "lv1",
+        "roomThreadID": "hoge",
+        "roomURL": "https://example.com/lv1",
+        "startTime": 100,
+        "status": "onAir",
+        "title": "番組タイトル",
+        "vposBaseTime": 50,
+      },
+    ]
+  `);
 });
 
 test('refreshProgram:成功', async () => {
@@ -305,17 +346,19 @@ test('refreshProgram:成功', async () => {
   expect(instance.client.fetchProgram).toHaveBeenCalledWith('lv1');
   expect((instance as any).setState).toHaveBeenCalledTimes(1);
   expect((instance as any).setState.mock.calls[0]).toMatchInlineSnapshot(`
-Array [
-  Object {
-    "description": "番組詳細情報",
-    "endTime": 150,
-    "isMemberOnly": true,
-    "startTime": 100,
-    "status": "onAir",
-    "title": "番組タイトル",
-  },
-]
-`);
+            Array [
+              Object {
+                "description": "番組詳細情報",
+                "endTime": 150,
+                "isMemberOnly": true,
+                "roomThreadID": "hoge",
+                "roomURL": "https://example.com/lv1",
+                "startTime": 100,
+                "status": "onAir",
+                "title": "番組タイトル",
+              },
+            ]
+      `);
 });
 
 test('refreshProgram:失敗', async () => {
@@ -329,13 +372,13 @@ test('refreshProgram:失敗', async () => {
   (instance as any).setState = jest.fn();
 
   await expect(instance.refreshProgram()).rejects.toMatchInlineSnapshot(`
-NicoliveProgramServiceFailure {
-  "additionalMessage": "",
-  "method": "fetchProgram",
-  "reason": "500",
-  "type": "http_error",
-}
-`);
+                              NicoliveFailure {
+                                "additionalMessage": "",
+                                "method": "fetchProgram",
+                                "reason": "500",
+                                "type": "http_error",
+                              }
+                        `);
   expect(instance.client.fetchProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.fetchProgram).toHaveBeenCalledWith('lv1');
   expect((instance as any).setState).not.toHaveBeenCalled();
@@ -354,13 +397,13 @@ test('endProgram:成功', async () => {
   expect(instance.client.endProgram).toHaveBeenCalledWith('lv1');
   expect((instance as any).setState).toHaveBeenCalledTimes(1);
   expect((instance as any).setState.mock.calls[0]).toMatchInlineSnapshot(`
-Array [
-  Object {
-    "endTime": 125,
-    "status": "end",
-  },
-]
-`);
+            Array [
+              Object {
+                "endTime": 125,
+                "status": "end",
+              },
+            ]
+      `);
 });
 
 test('endProgram:失敗', async () => {
@@ -373,13 +416,13 @@ test('endProgram:失敗', async () => {
   (instance as any).setState = jest.fn();
 
   await expect(instance.endProgram()).rejects.toMatchInlineSnapshot(`
-NicoliveProgramServiceFailure {
-  "additionalMessage": "",
-  "method": "endProgram",
-  "reason": "500",
-  "type": "http_error",
-}
-`);
+                              NicoliveFailure {
+                                "additionalMessage": "",
+                                "method": "endProgram",
+                                "reason": "500",
+                                "type": "http_error",
+                              }
+                        `);
   expect(instance.client.endProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.endProgram).toHaveBeenCalledWith('lv1');
   expect((instance as any).setState).not.toHaveBeenCalled();
@@ -398,12 +441,12 @@ test('extendProgram:成功', async () => {
   expect(instance.client.extendProgram).toHaveBeenCalledWith('lv1');
   expect((instance as any).setState).toHaveBeenCalledTimes(1);
   expect((instance as any).setState.mock.calls[0]).toMatchInlineSnapshot(`
-Array [
-  Object {
-    "endTime": 125,
-  },
-]
-`);
+            Array [
+              Object {
+                "endTime": 125,
+              },
+            ]
+      `);
 });
 
 test('extendProgram:失敗', async () => {
@@ -416,13 +459,13 @@ test('extendProgram:失敗', async () => {
   (instance as any).setState = jest.fn();
 
   await expect(instance.extendProgram()).rejects.toMatchInlineSnapshot(`
-NicoliveProgramServiceFailure {
-  "additionalMessage": "",
-  "method": "extendProgram",
-  "reason": "500",
-  "type": "http_error",
-}
-`);
+                              NicoliveFailure {
+                                "additionalMessage": "",
+                                "method": "extendProgram",
+                                "reason": "500",
+                                "type": "http_error",
+                              }
+                        `);
   expect(instance.client.extendProgram).toHaveBeenCalledTimes(1);
   expect(instance.client.extendProgram).toHaveBeenCalledWith('lv1');
   expect((instance as any).setState).not.toHaveBeenCalled();
@@ -560,21 +603,21 @@ test('updateStatistics', async () => {
   expect(instance.client.fetchNicoadStatistics).toHaveBeenCalledWith('lv1');
   expect((instance as any).setState).toHaveBeenCalledTimes(2);
   expect((instance as any).setState.mock.calls).toMatchInlineSnapshot(`
-Array [
-  Array [
-    Object {
-      "comments": 456,
-      "viewers": 123,
-    },
-  ],
-  Array [
-    Object {
-      "adPoint": 175,
-      "giftPoint": 345,
-    },
-  ],
-]
-`);
+            Array [
+              Array [
+                Object {
+                  "comments": 456,
+                  "viewers": 123,
+                },
+              ],
+              Array [
+                Object {
+                  "adPoint": 175,
+                  "giftPoint": 345,
+                },
+              ],
+            ]
+      `);
 });
 
 test('updateStatistics:APIがエラーでも無視', async () => {
@@ -861,7 +904,6 @@ describe('refreshAutoExtensionTimer', () => {
         case 'CLEAR':
           expect(window.clearTimeout).toHaveBeenCalledTimes(1);
           expect(window.clearTimeout).toHaveBeenCalledWith(0);
-
       }
     });
   }

@@ -18,11 +18,10 @@ import { FileManagerService } from 'services/file-manager';
 import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { WindowsService } from 'services/windows';
-import * as obs from '../../../obs-api';
-import { OutageNotificationsService } from 'services/outage-notifications';
 import { QuestionaireService } from 'services/questionaire';
 import { InformationsService } from 'services/informations';
 import { CrashReporterService } from 'services/crash-reporter';
+import * as obs from '../../../obs-api';
 
 interface IAppState {
   loading: boolean;
@@ -41,7 +40,6 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() shortcutsService: ShortcutsService;
   @Inject() patchNotesService: PatchNotesService;
   @Inject() windowsService: WindowsService;
-  @Inject() outageNotificationsService: OutageNotificationsService;
 
   static initialState: IAppState = {
     loading: true,
@@ -98,7 +96,6 @@ export class AppService extends StatefulService<IAppState> {
     this.tcpServerService.listen();
 
     this.patchNotesService.showPatchNotesIfRequired(onboarded);
-    this.outageNotificationsService;
 
     this.informationsService;
 

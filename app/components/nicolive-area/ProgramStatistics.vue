@@ -3,7 +3,7 @@
         <ul class="program-statistics-list">
             <li class="program-statistics-item" v-tooltip.bottom="visitorTooltip"><i class="program-statistics-icon icon-visitor"></i><span class="program-statistics-value">{{ viewers }}</span></li>
             <li class="program-statistics-item" v-tooltip.bottom="commentTooltip"><i class="program-statistics-icon icon-comment"></i><span class="program-statistics-value">{{ comments }}</span></li>
-            <li class="program-statistics-item" v-tooltip.bottom="adPointTooltip"><i class="program-statistics-icon icon-uad"></i><span class="program-statistics-value">{{ adPoint }}</span></li>
+            <li class="program-statistics-item" v-tooltip.bottom="adPointTooltip"><i class="program-statistics-icon icon-nicoad"></i><span class="program-statistics-value">{{ adPoint }}</span></li>
             <li class="program-statistics-item" v-tooltip.bottom="giftPointTooltip"><i class="program-statistics-icon icon-gift"></i><span class="program-statistics-value">{{ giftPoint }}</span></li>
         </ul>
         <div class="program-menu">
@@ -40,7 +40,7 @@
 
 .program-statistics {
     display: flex;
-    height: 40px;
+    height: 48px;
     padding: 0 16px;
     justify-content: space-between;
 }
@@ -63,6 +63,11 @@
 
 .program-statistics-icon {
     margin-right: 8px;
+    color: @grey;
+}
+
+.program-statistics-value {
+    color: @light-grey;
 }
 
 .program-menu {
@@ -92,35 +97,40 @@
 
  .popper {
     //TODO: 重なり順を変数で管理したい
-    z-index: 2;
+    z-index: 3;
  }
 
  .popup-menu-list {
-    min-width: 200px;
+    min-width: 220px;
     list-style: none;
     position: absolute;
     top: 6px;
     right: 0;
-    box-shadow: 0 0 4px rgba(0,0,0,.1);
+    
+    border-radius: 4px;
+    padding: 8px 1px;
+    background-color: @bg-primary;
+    box-shadow: 0 0 4px rgba(@black, 0.5), inset 0 0 0 1px rgba(@white, 0.1);
  }
 
 .popup-menu-item {
-    background-color: @bg-quaternary;
-
-    &:not(:last-child) {
-        border-bottom: 1px solid @bg-primary;
-    }
-
     i {
+        color: @white;
         font-size: 14px;
-        margin-right: 8px;
+        margin-right: 16px;
+        color: @light-grey;
     }
 
     a {
+        color: @white;
         display: flex;
         font-size: 12px;
-        padding: 12px;
+        padding: 8px 16px;
         text-decoration: none;
+
+        &:hover {
+            .bg-hover();
+        }
     }
 }
 

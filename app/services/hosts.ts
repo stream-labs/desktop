@@ -10,7 +10,7 @@ export class HostsService extends Service {
     return 'https://account.nicovideo.jp';
   }
   get niconicoOAuth() {
-    return 'https://oauth.nicovideo.jp/oauth2';
+    return 'https://oauth.nicovideo.jp';
   }
   get niconicoFlapi() {
     return 'http://flapi.nicovideo.jp/api';
@@ -22,7 +22,16 @@ export class HostsService extends Service {
     if (process.env.NAIR_LOGIN_URL) {
       return process.env.NAIR_LOGIN_URL;
     }
-    return 'https://n-air-app.nicovideo.jp/authorize';
+
+    const scopes = [
+      'openid',
+      'profile',
+      'user.premium',
+    ];
+
+    const url = new URL('https://n-air-app.nicovideo.jp/authorize');
+    url.searchParams.set('scope', scopes.join(' '));
+    return url.toString();
   }
   get niconicoNAirInformationsFeed() {
     return 'https://blog.nicovideo.jp/niconews/category/se_n-air/feed/index.xml';

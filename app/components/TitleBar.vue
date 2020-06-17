@@ -6,7 +6,7 @@
   <div class="titlebar-actions">
     <i v-if="isMinimizable" class="link icon-minimize titlebar-action" @click="minimize" />
     <i class="link icon-maximize titlebar-action" @click="maximize" />
-    <i class="link icon-close titlebar-action" @click="close" />
+    <i class="link icon-close-square titlebar-action" @click="close" />
   </div>
 </div>
 </template>

@@ -23,6 +23,7 @@ export interface IPlatformService {
   logout?: () => Promise<void>;
 
   getUserPageURL?: () => string;
+  isPremium?: (token: string) => Promise<boolean>;
 }
 
 export interface IPlatformAuth {
@@ -34,6 +35,7 @@ export interface IPlatformAuth {
     id: string;
     channelId?: string;
     userIcon?: string;
+    isPremium?: boolean;
   };
 }
 

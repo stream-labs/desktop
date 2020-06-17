@@ -1,7 +1,8 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
-import { NicoliveProgramService, NicoliveProgramServiceFailure } from 'services/nicolive-program/nicolive-program';
+import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
+import { NicoliveFailure, openErrorDialogFromFailure } from 'services/nicolive-program/NicoliveFailure';
 
 @Component({})
 export default class CommentForm extends Vue {
@@ -14,6 +15,7 @@ export default class CommentForm extends Vue {
   async sendOperatorComment(event: KeyboardEvent) {
     const text = this.operatorCommentValue;
     if (text.length === 0) return;
+
     const isPermanent = event.ctrlKey;
     if (this.isCommentSending) throw new Error('sendOperatorComment is running');
 
@@ -22,18 +24,21 @@ export default class CommentForm extends Vue {
       await this.nicoliveProgramService.sendOperatorComment(text, isPermanent);
       this.operatorCommentValue = '';
     } catch (caught) {
-      
-      if (caught instanceof NicoliveProgramServiceFailure) {
-        await NicoliveProgramService.openErrorDialogFromFailure(caught);
+      if (caught instanceof NicoliveFailure) {
+        await openErrorDialogFromFailure(caught);
       } else {
         throw caught;
       }
     } finally {
       this.isCommentSending = false;
+
+      this.$nextTick(() => {
+        (this.$refs.input as HTMLElement)?.focus();
+      });
     }
   }
 
-  get programStatus(): string {
-    return this.nicoliveProgramService.state.status;
+  get programEnded(): boolean {
+    return this.nicoliveProgramService.state.status === 'end';
   }
 }

@@ -2,16 +2,17 @@
   <div class="comment-form">
     <input
       type="text"
+      ref="input"
       :readonly="isCommentSending"
       :disabled="isCommentSending"
-      placeholder="Ctrl+Enterで固定表示"
+      placeholder="コメントを入力"
       v-model="operatorCommentValue"
-      @keydown.enter="sendOperatorComment($event)"
       class="comment-input"
       maxlength="80"
+      @keydown.enter="sendOperatorComment($event)"
     />
-    <button type="submit" :disabled="isCommentSending || operatorCommentValue.length === 0" @click="sendOperatorComment($event)" class="button comment-button">コメント</button>
-    <div class="comment-disabled-message" v-if="programStatus === 'end'">
+    <button @click="sendOperatorComment($event)" :disabled="isCommentSending || operatorCommentValue.length === 0" class="comment-button"><i class="icon-comment-send"></i></button>
+    <div class="comment-disabled-message" v-if="programEnded">
       番組が終了したため、放送者コメントを投稿できません
     </div>
   </div>
@@ -25,29 +26,52 @@
   display: flex;
   justify-content: center;
   padding: 8px;
-  background-color: @bg-primary;
+  border-top: 1px solid @bg-primary;
+  background-color: @bg-secondary;
   position: relative;
 }
 
 .comment-input {
+  font-size: 12px;
   flex-grow: 1;
   width: auto;
-  margin-right: 8px;
-  background-color: @bg-secondary;
-  border-radius: 4px;
+  background-color: @bg-quaternary;
+  box-sizing: border-box;
+
+  &:focus {
+    background-color: @bg-tertiary;
+
+    &::placeholder {
+      opacity: .5;
+    }
+  }
 
   &::placeholder {
-    color: @grey;
+    color: @white;
+    opacity: .5;
   }
 }
 
 .comment-button {
-  padding: 0 8px;
-  background-color: @nicolive-button;
-  border-radius: 4px;
+  height: 36px;
+  padding: 0 8px 0 16px;
+
+  > i {
+    font-size: 14px;
+    color: @text-secondary;
+  }
 
   &:hover {
-    background-color: @nicolive-button-hover;
+    > i {
+      color: @text-primary;
+    }
+  }
+
+  &:disabled {
+    > i {
+      color: @white;
+      opacity: .26;
+    }
   }
 }
 

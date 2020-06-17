@@ -53,8 +53,8 @@
 
       <template slot="toggle" slot-scope="{ node }">
         <span v-if="!node.isLeaf && node.children.length">
-          <i v-if="node.isExpanded" class="icon-down-arrow"/>
-          <i v-if="!node.isExpanded" class="icon-down-arrow icon-right"/>
+          <i v-if="node.isExpanded" class="icon-drop-down-arrow"/>
+          <i v-if="!node.isExpanded" class="icon-drop-down-arrow icon-right"/>
         </span>
       </template>
 

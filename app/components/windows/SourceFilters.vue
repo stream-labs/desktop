@@ -73,12 +73,21 @@
   height: 100%;
 }
 
-.side-menu > .sl-vue-tree-toggle {
-  display: none;
-}
+.side-menu {
+  background-color: transparent;
+
+  & > .sl-vue-tree-toggle {
+    display: none;
+  }
+
+  & /deep/ .sl-vue-tree-node-item {
+    padding: 0 16px;
+    background-color: transparent;
+  }
+} 
 
 .controls {
-  margin-left: 8px;
-  margin-bottom: 16px;
+  height: 48px;
+  padding: 16px;
 }
 </style>

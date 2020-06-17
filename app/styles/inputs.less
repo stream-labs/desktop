@@ -117,14 +117,14 @@ textarea {
 }
 
 .toggle-label {
-  color: @text-secondary;
-  font-size: 11px;
-  margin-right: 12px;
+  color: @light-grey;
+  font-size: 12px;
+  margin-right: 16px;
 }
 
 .toggle-button {
-  width: 30px;
-  height: 16px;
+  width: 32px;
+  height: 20px;
   margin: 0;
   cursor: pointer;
   outline: none;
@@ -143,16 +143,16 @@ textarea {
   }
 
   &:before {
-    width: 30px;
-    height: 8px;;
+    width: 32px;
+    height: 16px;;
     margin: auto;
     background-color: @bg-quaternary;
-    border-radius: 20px;
+    border-radius: 8px;
   }
 
   &:after {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     background-color: @grey;
     border-radius: 100%;
   }
@@ -163,7 +163,7 @@ textarea {
     }
 
     &:after {
-      left: 14px;
+      left: 12px;
       background-color: @text-active;
     }
   }
@@ -185,7 +185,7 @@ textarea {
 
   &:before {
     font-family: n-air;
-    content: @n-air--codepoint--down-arrow;
+    content: @n-air--codepoint--drop-down-arrow;
     border: none;
     font-size: 9px;
     position: absolute;

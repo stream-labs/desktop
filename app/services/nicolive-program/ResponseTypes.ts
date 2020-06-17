@@ -76,7 +76,7 @@ export interface ProgramInfo {
     /** メンバー限定放送であるか */
     isMemberOnly: boolean;
     /** vpos基準時刻 */
-    vposBaseTime: number;
+    vposBaseAt: number;
     /** 開演時間 */
     beginAt: number;
     /** 終了時間 */
@@ -182,4 +182,19 @@ export interface Communities {
       };
     }[];
   };
+}
+
+export type FilterRecord = {
+  id: number;
+  type: 'word' | 'user' | 'command';
+  body: string;
+};
+
+export type FilterType = FilterRecord['type'];
+
+export interface Filters {
+  meta: {
+    status: 200;
+  };
+  data: FilterRecord[];
 }
