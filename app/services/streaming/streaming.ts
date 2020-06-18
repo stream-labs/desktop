@@ -490,6 +490,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         eventMetadata.server = streamSettings.server;
 
         this.usageStatisticsService.recordEvent('stream_start', eventMetadata);
+        this.usageStatisticsService.recordAnalyticsEvent('StreamingStatus', {
+          code: info.code,
+          status: EStreamingState.Live,
+        });
       } else if (info.signal === EOBSOutputSignal.Starting) {
         this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
         this.streamingStatusChange.next(EStreamingState.Starting);
@@ -523,7 +527,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       }[info.signal];
 
       if (info.signal === EOBSOutputSignal.Start) {
-        this.usageStatisticsService.recordAnalyticsEvent('Recording', { action: 'start' });
+        this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
+          status: nextState,
+          code: info.code,
+        });
       }
 
       this.SET_RECORDING_STATUS(nextState, time);
@@ -543,7 +550,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       }
 
       if (info.signal === EOBSOutputSignal.Wrote) {
-        this.usageStatisticsService.recordAnalyticsEvent('ReplayBuffer', { action: 'captured' });
+        this.usageStatisticsService.recordAnalyticsEvent('ReplayBufferStatus', {
+          status: 'wrote',
+          code: info.code,
+        });
         this.replayBufferFileWrite.next(obs.NodeObs.OBS_service_getLastReplay());
       }
     }
