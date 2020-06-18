@@ -123,7 +123,7 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
           <GoLiveError />
 
           {shouldShowSettings && (
-            <div style={{ width: '100%' }}>
+            <div class={styles.settingsContainer}>
               {/*PLATFORM SETTINGS*/}
               <PlatformSettings vModel={this.settings} />
 

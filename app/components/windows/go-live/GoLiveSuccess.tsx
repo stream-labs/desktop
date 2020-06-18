@@ -97,7 +97,7 @@ export default class GoLiveSuccess extends TsxComponent<{}> {
         {this.twitterService.isEnabled && (
           <Twitter
             style={{ width: '750px' }}
-            streamTitle={this.view.info.goLiveSettings.commonFields.title}
+            streamTitle={this.view.goLiveSettings.commonFields.title}
             value={this.streamInfoText}
           />
         )}

@@ -258,13 +258,6 @@ export class MixerService extends BasePlatformService<IMixerServiceState>
     this.SET_STREAM_KEY(key);
   }
 
-  // TODO: dedup
-  supports<T extends TPlatformCapability>(
-    capability: T,
-  ): this is TPlatformCapabilityMap[T] & IPlatformService {
-    return this.capabilities.has(capability);
-  }
-
   liveDockEnabled(): boolean {
     return true;
   }

@@ -23,8 +23,10 @@ class TwitchEditStreamProps {
     game: '',
     tags: [],
     enabled: true,
-    useCustomTitleAndDescription: false,
+    useCustomFields: false,
   };
+  // TODO: remove
+  onInput?: any;
 }
 
 @Component({ components: { TwitchTagsInput }, props: createProps(TwitchEditStreamProps) })
@@ -43,6 +45,7 @@ export default class TwitchEditStreamInfo extends TsxComponent<TwitchEditStreamP
         {!canShowOnlyRequiredFields && (
           <CommonPlatformFields
             vModel={this.settings}
+            onInput={(val: boolean) => console.log('twitch change', val)}
             hasCustomCheckbox={isMutliplatformMode}
             platforms={['twitch']}
           />

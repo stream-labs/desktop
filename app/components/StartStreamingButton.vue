@@ -8,7 +8,12 @@
     >
       {{ getStreamButtonLabel() }}
     </button>
-    <button v-if="isMidStream" class="button button--default" :disabled="isDisabled" @click="edit">
+    <button
+      v-if="shouldShowEditButton"
+      class="button button--default"
+      :disabled="isDisabled"
+      @click="edit"
+    >
       <i class="fa fa-pen" />
     </button>
   </div>

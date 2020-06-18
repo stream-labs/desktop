@@ -81,8 +81,10 @@ export default class ChildWindow extends Vue {
     }
 
     // don't update component if the name has not been changed
+    // we should only focus it
     const currentComponent = this.components[this.components.length - 1];
     if (currentComponent && currentComponent.name === options.componentName) {
+      Utils.makeChildWindowVisible();
       return;
     }
 

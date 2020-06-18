@@ -14,6 +14,7 @@ import {
 } from 'services/platforms/youtube';
 import CommonPlatformFields from '../CommonPlatformFields';
 import { StreamingService } from '../../../app-services';
+import { SyncWithValue } from '../../../services/app/app-decorators';
 
 class YoutubeEditStreamInfoProps {
   value?: IYoutubeStartStreamOptions = {
@@ -27,27 +28,21 @@ class YoutubeEditStreamInfoProps {
 export default class YoutubeEditStreamInfo extends TsxComponent<YoutubeEditStreamInfoProps> {
   @Inject() private youtubeService: YoutubeService;
   @Inject() private streamingService: StreamingService;
-  settings: IYoutubeStartStreamOptions = null;
+  @SyncWithValue() settings: IYoutubeStartStreamOptions = null;
   broadcasts: IYoutubeLiveBroadcast[] = [];
   broadcastsLoaded = false;
 
   async created() {
-    this.settings = cloneDeep(this.props.value);
     this.broadcasts = await this.youtubeService.fetchBroadcasts();
     this.broadcastsLoaded = true;
   }
 
   get canChangeBroadcast() {
-    return this.streamingService.isStreaming;
+    return !this.view.isMidStreamMode;
   }
 
   get view() {
     return this.streamingService.views;
-  }
-
-  @Watch('value')
-  syncValue(val: IYoutubeStartStreamOptions) {
-    this.settings = cloneDeep(val);
   }
 
   onSelectBroadcastHandler() {
@@ -89,15 +84,13 @@ export default class YoutubeEditStreamInfo extends TsxComponent<YoutubeEditStrea
     return (
       !canShowOnlyRequiredFields && (
         <ValidatedForm onInput={this.emitInput}>
-          {this.canChangeBroadcast && (
-            <HFormGroup title={$t('Event')}>
-              <BroadcastInput
-                onInput={this.onSelectBroadcastHandler}
-                vModel={this.settings.broadcastId}
-                metadata={this.formMetadata.event}
-              />
-            </HFormGroup>
-          )}
+          <HFormGroup title={$t('Event')}>
+            <BroadcastInput
+              onInput={this.onSelectBroadcastHandler}
+              vModel={this.settings.broadcastId}
+              metadata={this.formMetadata.event}
+            />
+          </HFormGroup>
           <CommonPlatformFields
             vModel={this.settings}
             hasCustomCheckbox={this.view.isMutliplatformMode}

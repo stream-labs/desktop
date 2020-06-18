@@ -37,7 +37,6 @@ export interface IStreamInfo {
     | 'runChecklist' // applying new settings and start the stream
     | 'live'; // stream has been successfully started
   error: IStreamError | null;
-  goLiveSettings: IGoLiveSettings | null;
   checklist: {
     applyOptimizedSettings: TGoLiveChecklistItemState;
     twitch: TGoLiveChecklistItemState;
@@ -52,15 +51,6 @@ export interface IStreamInfo {
 
 export type TGoLiveChecklistItemState = 'not-started' | 'pending' | 'done' | 'failed';
 
-export interface IPlatformStatus {
-  error?: { message: string };
-  viewersCount: number;
-  chatUrl: string;
-  streamUrl: string;
-  dashboardUrl: string;
-  settings: IPlatformStreamSettings;
-}
-
 export interface IGoLiveSettings {
   commonFields: {
     title: string;
@@ -68,18 +58,24 @@ export interface IGoLiveSettings {
     game: string;
   };
   destinations: {
-    twitch: IPlatformStreamSettings & ITwitchStartStreamOptions;
-    youtube: IPlatformStreamSettings & IYoutubeStartStreamOptions;
-    facebook: IPlatformStreamSettings & IFacebookStartStreamOptions;
-    mixer: IPlatformStreamSettings & IMixerStartStreamOptions;
+    twitch: IPlatformFlags & ITwitchStartStreamOptions;
+    youtube: IPlatformFlags & IYoutubeStartStreamOptions;
+    facebook: IPlatformFlags & IFacebookStartStreamOptions;
+    mixer: IPlatformFlags & IMixerStartStreamOptions;
   };
   optimizedProfile: IEncoderProfile;
   advancedMode: boolean;
 }
 
-export interface IPlatformStreamSettings {
+export interface IPlatformCommonFields {
+  title: string;
+  description?: string;
+  game?: string;
+}
+
+export interface IPlatformFlags {
   enabled: boolean;
-  useCustomTitleAndDescription: boolean;
+  useCustomFields: boolean;
 }
 
 export interface IStreamingServiceState {

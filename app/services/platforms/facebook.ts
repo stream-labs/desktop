@@ -63,7 +63,7 @@ interface IFacebookServiceState extends IPlatformState {
 export interface IFacebookStartStreamOptions {
   facebookPageId: string;
   title: string;
-  game?: string;
+  game: string;
   description?: string;
 }
 
@@ -83,6 +83,8 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
 
   capabilities = new Set<TPlatformCapability>([
     'chat',
+    'description',
+    'game',
     'user-info',
     'stream-schedule',
     'account-merging',
@@ -230,17 +232,13 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
         ...data,
       },
       this.activeToken,
-    )
-      .then(json => {
-        const streamKey = json.stream_url.substr(json.stream_url.lastIndexOf('/') + 1);
-        this.SET_LIVE_VIDEO_ID(json.id);
-        this.SET_STREAM_KEY(streamKey);
-        this.streamSettingsService.setSettings({ key: streamKey });
-        return streamKey;
-      })
-      .catch(resp =>
-        Promise.reject($t('Something went wrong while going live, please try again.')),
-      );
+    ).then(json => {
+      const streamKey = json.stream_url.substr(json.stream_url.lastIndexOf('/') + 1);
+      this.SET_LIVE_VIDEO_ID(json.id);
+      this.SET_STREAM_KEY(streamKey);
+      this.streamSettingsService.setSettings({ key: streamKey });
+      return streamKey;
+    });
   }
 
   /**
@@ -372,13 +370,6 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
 
   private getChatUrl(): string {
     return 'https://www.facebook.com/gaming/streamer/chat/';
-  }
-
-  // TODO: dedup
-  supports<T extends TPlatformCapability>(
-    capability: T,
-  ): this is TPlatformCapabilityMap[T] & IPlatformService {
-    return this.capabilities.has(capability);
   }
 
   fetchRawPageResponse() {

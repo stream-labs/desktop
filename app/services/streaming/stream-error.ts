@@ -3,7 +3,7 @@ import { TPlatform } from '../platforms';
 
 const errorTypes = {
   PLATFORM_REQUEST_FAILED: {
-    message: 'The request to Twitch API has been failed',
+    message: 'The request to Platform API has been failed',
   },
   FACEBOOK_HAS_NO_PAGES: {
     message: 'Facebook pages have not been found',

@@ -20,6 +20,7 @@ import { StreamSettingsService } from '../../../services/settings/streaming';
 import ValidatedForm from '../../shared/inputs/ValidatedForm';
 import GoLiveChecklist from './GoLiveChecklist';
 import PlatformSettings from './PlatformSettings';
+import CommonPlatformFields from '../../platforms/CommonPlatformFields';
 
 /**
  * Allows to update stream setting while being live
@@ -36,15 +37,14 @@ export default class EditStreamWindow extends TsxComponent<{}> {
     form: ValidatedForm;
   };
 
-  private settings: IGoLiveSettings = null;
+  private settings: IGoLiveSettings = cloneDeep(this.streamingService.views.goLiveSettings);
 
   private get view() {
     return this.streamingService.views;
   }
 
   private async submit() {
-    const errors = await this.$refs.form.validateAndGetErrorsCount();
-    if (errors) return;
+    if (!(await this.$refs.form.validate())) return;
     await this.streamingService.actions.return.updateStreamSettings(this.settings);
     this.$toasted.success($t('Successfully updated'), {
       position: 'bottom-center',
@@ -61,18 +61,24 @@ export default class EditStreamWindow extends TsxComponent<{}> {
     this.windowsService.actions.closeChildWindow();
   }
 
-  private render() {
-    // create a copy of current settings model if not exist
-    if (!this.settings) this.settings = cloneDeep(this.streamingService.views.goLiveSettings);
+  private switchAdvancedMode(advancedMode: boolean) {
+    this.settings.advancedMode = advancedMode;
+    this.streamSettingsService.actions.setGoLiveSettings({ advancedMode });
+  }
 
+  private render() {
     const lifecycle = this.view.info.lifecycle;
     const shouldShowSettings = lifecycle === 'live';
     const shouldShowChecklist = lifecycle === 'runChecklist';
     return (
       <ModalLayout customControls={true} showControls={false}>
         <ValidatedForm ref="form" slot="content">
-          {shouldShowSettings && <PlatformSettings vModel={this.settings} />}
-          <BoolInput vModel={this.settings.optimizedProfile} />
+          {shouldShowSettings && (
+            <PlatformSettings
+              vModel={this.settings}
+              onInput={(val: boolean) => console.log('EditStream change', val)}
+            />
+          )}
           {shouldShowChecklist && <GoLiveChecklist isUpdateMode={true} />}
         </ValidatedForm>
         <div slot="controls">{this.renderControls()}</div>
@@ -80,14 +86,9 @@ export default class EditStreamWindow extends TsxComponent<{}> {
     );
   }
 
-  private switchAdvancedMode(advancedMode: boolean) {
-    this.settings.advancedMode = advancedMode;
-    this.streamSettingsService.actions.setGoLiveSettings({ advancedMode });
-  }
-
   private renderControls() {
     const lifecycle = this.view.info.lifecycle;
-    const shouldShowUpdateButton = lifecycle !== 'live';
+    const shouldShowUpdateButton = lifecycle === 'live';
     const shouldShowGoBackButton = !shouldShowUpdateButton && this.view.info.error;
     const advancedMode = this.view.goLiveSettings.advancedMode;
     const shouldShowAdvancedSwitch = shouldShowUpdateButton && this.view.isMutliplatformMode;
@@ -123,7 +124,7 @@ export default class EditStreamWindow extends TsxComponent<{}> {
         </button>
 
         {/* ADVANCED MODE SWITCHER */}
-        {!shouldShowAdvancedSwitch && (
+        {shouldShowAdvancedSwitch && (
           <div class={styles.modeToggle}>
             <HFormGroup
               onInput={(val: boolean) => this.switchAdvancedMode(val)}

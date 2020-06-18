@@ -1,6 +1,6 @@
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { $t } from 'services/i18n';
-import { Component, Watch } from 'vue-property-decorator';
+import { Component, Watch, Prop } from 'vue-property-decorator';
 import styles from './GoLive.m.less';
 import { Inject } from 'services/core';
 import { UserService } from 'services/user';
@@ -17,6 +17,7 @@ import { StreamSettingsService } from '../../../services/settings/streaming';
 import ValidatedForm from '../../shared/inputs/ValidatedForm';
 import GoLiveError from './GoLiveError';
 import { SyncWithValue } from '../../../services/app/app-decorators';
+import { BoolInput } from '../../shared/inputs/inputs';
 
 // TODO: dedup
 class SectionProps {
@@ -52,7 +53,8 @@ class Section extends TsxComponent<SectionProps> {
  * Renders the form with stream settings for each enabled platform
  **/
 @Component({})
-export default class PlatformSettings extends TsxComponent {
+// TODO: remove
+export default class PlatformSettings extends TsxComponent<{ onInput?: any }> {
   @Inject() private streamingService: StreamingService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private userService: UserService;
@@ -112,7 +114,10 @@ export default class PlatformSettings extends TsxComponent {
     return (
       <Section title={title} isSimpleMode={!isAdvancedMode}>
         {platform === 'twitch' && (
-          <TwitchEditStreamInfo vModel={this.settings.destinations.twitch} />
+          <TwitchEditStreamInfo
+            vModel={this.settings.destinations.twitch}
+            onInput={(val: boolean) => console.log('Platform change', val)}
+          />
         )}
 
         {platform === 'facebook' && (

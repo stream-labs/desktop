@@ -20,7 +20,7 @@ class Props {
     title: '',
     game: '',
     enabled: true,
-    useCustomTitleAndDescription: false,
+    useCustomFields: false,
   };
 }
 

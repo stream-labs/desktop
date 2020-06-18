@@ -446,11 +446,25 @@ select {
   max-height: 100px;
   overflow: hidden;
 }
-.slidedown-enter, .slidedown-leave-to /* .fade-leave-active below version 2.1.8 */ {
+.slidedown-enter, .slidedown-leave-to {
   opacity: 0;
   max-height: 0;
   overflow: hidden;
 }
+
+.zoom-enter-active, .zoom-leave-active {
+  transition: transform .3s, opacity .5s;
+}
+.zoom-enter {
+  opacity: 1;
+  transform: translateX(100%);
+}
+
+.zoom-leave-to {
+  opacity: 0;
+  transform: translateX(-100%);
+}
+
 .v--modal-overlay {
   background: var(--modal-overlay);
 }

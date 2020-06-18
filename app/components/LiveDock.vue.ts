@@ -141,7 +141,7 @@ export default class LiveDock extends Vue {
   }
 
   showEditStreamInfo() {
-    this.streamingService.showGoLiveWindow();
+    this.streamingService.actions.showEditStream();
   }
 
   openYoutubeStreamUrl() {

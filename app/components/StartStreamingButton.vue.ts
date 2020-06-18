@@ -84,21 +84,9 @@ export default class StartStreamingButton extends Vue {
       }
 
       if (this.shouldShowGoLiveWindow()) {
-        // TODO
-        // if (this.hasPages) {
-        //   return this.streamingService.openShareStream();
-        // }
-        //   if (this.restreamService.shouldGoLiveWithRestream) {
-        //     this.streamingService.showEditStreamInfo(this.restreamService.platforms, 0);
-        //   } else {
-        //     this.streamingService.showEditStreamInfo();
-        //   }
-        // } else {
-        //   if (this.videoEncodingOptimizationService.canApplyProfileFromCache()) {
-        //     await this.videoEncodingOptimizationService.applyProfileFromCache();
-        //   }
-        //   this.streamingService.toggleStreaming();
         this.streamingService.actions.showGoLiveWindow();
+      } else {
+        this.streamingService.actions.goLive(null, true);
       }
     }
   }
@@ -107,16 +95,12 @@ export default class StartStreamingButton extends Vue {
     this.streamingService.actions.showEditStream();
   }
 
-  get hasPages() {
-    return (
-      (this.isFacebook || this.restreamService.shouldGoLiveWithRestream) &&
-      this.facebookService.state.facebookPages &&
-      this.facebookService.state.facebookPages.pages.length
-    );
-  }
-
   get streamingStatus() {
     return this.streamingService.state.streamingStatus;
+  }
+
+  get shouldShowEditButton() {
+    return this.isMidStream && this.streamingService.views.enabledPlatforms.length > 0;
   }
 
   shouldShowGoLiveWindow() {

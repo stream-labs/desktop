@@ -39,7 +39,7 @@ export default class GoLiveWindow extends TsxComponent<{}> {
     form: ValidatedForm;
   };
 
-  private settings: IGoLiveSettings = null;
+  private settings: IGoLiveSettings = cloneDeep(this.streamingService.views.goLiveSettings);
 
   private get view() {
     return this.streamingService.views;
@@ -53,20 +53,6 @@ export default class GoLiveWindow extends TsxComponent<{}> {
     return this.view.info.lifecycle;
   }
 
-  private get formMetadata() {
-    return formMetadata({
-      title: metadata.text({
-        title: $t('Title'),
-        fullWidth: true,
-        required: true,
-      }),
-      description: metadata.textArea({
-        title: $t('Description'),
-        fullWidth: true,
-      }),
-    });
-  }
-
   async created() {
     // fetch platforms' data
     if (this.lifecycle === 'empty') {
@@ -75,15 +61,15 @@ export default class GoLiveWindow extends TsxComponent<{}> {
   }
 
   private async switchAdvancedMode(enabled: boolean) {
+    this.settings.advancedMode = enabled;
     this.streamSettingsService.setGoLiveSettings({ advancedMode: enabled });
   }
 
   /**
-   * validate settings and try to go live
+   * validate settings and go live
    */
   private async goLive() {
-    const errors = await this.$refs.form.validateAndGetErrorsCount();
-    if (errors) return;
+    if (!(await this.$refs.form.validate())) return;
     this.streamingService.actions.goLive(this.settings);
   }
 
@@ -96,11 +82,24 @@ export default class GoLiveWindow extends TsxComponent<{}> {
   }
 
   /**
+   * Perform extra validations
+   */
+  private postValidate(): boolean {
+    const errorMsg = this.view.validateSettings(this.settings);
+    if (!errorMsg) return true;
+
+    this.$toasted.error(errorMsg, {
+      position: 'bottom-center',
+      duration: 2000,
+      singleton: true,
+    });
+    return false;
+  }
+
+  /**
    * Renders the child component depending on lifecycle step
    **/
   render() {
-    // create a copy of a settings model if not exist
-    if (!this.settings) this.settings = cloneDeep(this.streamingService.views.goLiveSettings);
     const shouldShowSettings = ['empty', 'prepopulate', 'waitForNewSettings'].includes(
       this.lifecycle,
     );
@@ -109,10 +108,27 @@ export default class GoLiveWindow extends TsxComponent<{}> {
 
     return (
       <ModalLayout customControls={true} showControls={false}>
-        <ValidatedForm ref="form" slot="content">
-          {shouldShowSettings && <GoLiveSettings vModel={this.settings} />}
-          {shouldShowChecklist && <GoLiveChecklist />}
-          {shouldShowSuccess && <GoLiveSuccess />}
+        <ValidatedForm
+          ref="form"
+          slot="content"
+          handleExtraValidation={this.postValidate}
+          style={{ position: 'relative' }}
+        >
+          {shouldShowSettings && (
+            <transition name="zoom">
+              <GoLiveSettings class={styles.page} vModel={this.settings} />
+            </transition>
+          )}
+          {shouldShowChecklist && (
+            <transition name="zoom">
+              <GoLiveChecklist class={styles.page} />
+            </transition>
+          )}
+          {shouldShowSuccess && (
+            <transition name="zoom">
+              <GoLiveSuccess class={styles.page} />
+            </transition>
+          )}
         </ValidatedForm>
         <div slot="controls">{this.renderControls()}</div>
       </ModalLayout>
@@ -120,7 +136,8 @@ export default class GoLiveWindow extends TsxComponent<{}> {
   }
 
   private renderControls() {
-    const shouldShowConfirm = this.lifecycle === 'waitForNewSettings';
+    const shouldShowConfirm =
+      this.lifecycle === 'waitForNewSettings' && this.view.availablePlatforms.length > 0;
     const shouldShowGoBackButton =
       this.lifecycle === 'runChecklist' &&
       this.view.info.error &&

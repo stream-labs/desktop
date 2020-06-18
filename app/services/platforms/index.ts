@@ -21,6 +21,10 @@ type TOAuthScope = TTwitchOAuthScope;
 export type TPlatformCapabilityMap = {
   /** Display and interact with chat **/
   chat: IPlatformCapabilityChat;
+  /** Ability to set the stream description **/
+  description: IPlatformCapabilityDescription;
+  /** Ability to set the stream game **/
+  game: IPlatformCapabilityGame;
   /** Fetch and set stream tags **/
   tags: IPlatformCapabilityTags;
   /** Fetch and set user information **/
@@ -37,6 +41,14 @@ export type TPlatformCapability = keyof TPlatformCapabilityMap;
 
 interface IPlatformCapabilityChat {
   getChatUrl: (mode: string) => Promise<string>;
+}
+
+interface IPlatformCapabilityGame {
+  state: { settings: { game: string } };
+}
+
+interface IPlatformCapabilityDescription {
+  state: { settings: { description: string } };
 }
 
 interface IPlatformCapabilityTags {

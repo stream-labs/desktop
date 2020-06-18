@@ -46,7 +46,7 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
     if (this.view.info.lifecycle === 'live') {
       return $t("You're live!");
     }
-    return $t('Working on your livestream');
+    return $t('Working on your live stream');
   }
 
   private render() {
@@ -78,14 +78,14 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
             this.renderCheck($t('Configure the Restream service'), checklist.setupRestream)}
 
           {/* OPTIMIZED PROFILE */}
-          {!shouldShowOptimizedProfile &&
+          {shouldShowOptimizedProfile &&
             this.renderCheck($t('Apply optimized settings'), checklist.applyOptimizedSettings)}
 
           {/* START TRANSMISSION */}
           {!isUpdateMode &&
             this.renderCheck($t('Start video transmission'), checklist.startVideoTransmission)}
 
-          {/* PUBLISH  YT BROADCAST */}
+          {/* PUBLISH YT BROADCAST */}
           {shouldPublishYT &&
             this.renderCheck(
               $t('Publish Youtube broadcast') + ' ' + this.renderYoutubePercentage(),

@@ -135,7 +135,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private windowsService: WindowsService;
 
-  capabilities = new Set<TPlatformCapability>(['chat', 'stream-schedule']);
+  capabilities = new Set<TPlatformCapability>(['chat', 'description', 'stream-schedule']);
 
   static initialState: IYoutubeServiceState = {
     ...BasePlatformService.initialState,
@@ -659,13 +659,6 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
 
   liveDockEnabled(): boolean {
     return this.streamSettingsService.settings.protectedModeEnabled;
-  }
-
-  // TODO: dedup
-  supports<T extends TPlatformCapability>(
-    capability: T,
-  ): this is TPlatformCapabilityMap[T] & IPlatformService {
-    return this.capabilities.has(capability);
   }
 
   get progressInfo(): { msg: string; progress: number } {

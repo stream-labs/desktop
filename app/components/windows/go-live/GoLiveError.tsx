@@ -101,7 +101,7 @@ export default class GoLiveError extends TsxComponent<{}> {
     return (
       <ErrorLayout
         error={error}
-        message={$t('Can not fetch settings from %{platformName}', { platformName })}
+        message={$t('Can not update settings for %{platformName}', { platformName })}
       >
         <Translate
           message={$t('updateStreamSettingsError')}

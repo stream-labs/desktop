@@ -1,4 +1,4 @@
-import { Component, Watch } from 'vue-property-decorator';
+import { Component, Watch, Prop } from 'vue-property-decorator';
 import { $t } from 'services/i18n';
 import TsxComponent from 'components/tsx-component';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
@@ -12,27 +12,28 @@ import { getPlatformService, TPlatform } from '../../services/platforms';
 import { IGoLiveSettings } from '../../services/streaming';
 import { SyncWithValue } from '../../services/app/app-decorators';
 import { Debounce } from 'lodash-decorators';
+import { IPlatformCommonFields, IPlatformFlags } from '../../services/streaming/streaming-api';
 
 class ComponentProps {
   hasCustomCheckbox?: boolean = false;
   platforms: TPlatform[] = [];
-  value?: IComponentValue = {
+  value?: TComponentValue = {
+    enabled: false,
     title: '',
     description: '',
-    customEnabled: false,
+    game: '',
+    useCustomFields: false,
   };
+  //TODO: remove
+  onInput?: any;
 }
 
-interface IComponentValue {
-  title: string;
-  description: string;
-  customEnabled?: boolean;
-}
+type TComponentValue = IPlatformCommonFields & IPlatformFlags;
 
 @Component({ props: createProps(ComponentProps) })
 export default class CommonPlatformFields extends TsxComponent<ComponentProps> {
   @SyncWithValue()
-  private settings: IGoLiveSettings['commonFields'];
+  private settings: TComponentValue = null;
 
   searchingGames = false;
   private gameOptions: IListOption<string>[] = null;
@@ -81,14 +82,16 @@ export default class CommonPlatformFields extends TsxComponent<ComponentProps> {
   render() {
     const fieldsAreVisible =
       !this.props.hasCustomCheckbox ||
-      (this.props.hasCustomCheckbox && this.props.value.customEnabled);
-    const platforms = this.props.platforms;
-    const hasDescription = platforms.includes('facebook') || platforms.includes('youtube');
-    const hasGame = platforms.includes('twitch') || platforms.includes('facebook');
+      (this.props.hasCustomCheckbox && this.settings.useCustomFields);
+    const platformServices = this.props.platforms.map(getPlatformService);
+    const hasDescription = platformServices.find(platform => platform.supports('description'));
+    const hasGame = platformServices.find(platform => platform.supports('game'));
 
-    // find out the best checkbox title
+    // find out the best title for common fields
     let title = '';
-    if (hasDescription) {
+    if (hasDescription && hasGame) {
+      title = $t('Use custom title, game and description');
+    } else if (hasDescription) {
       title = $t('Use custom title and description');
     } else if (hasGame) {
       title = $t('Use custom title and game');
@@ -101,7 +104,11 @@ export default class CommonPlatformFields extends TsxComponent<ComponentProps> {
         {/*USE CUSTOM CHECKBOX*/}
         {this.props.hasCustomCheckbox && (
           <HFormGroup>
-            <BoolInput vModel={this.value.customEnabled} title={title} />
+            <BoolInput
+              vModel={this.settings.useCustomFields}
+              title={title}
+              onInput={(val: boolean) => console.log('commonFields change', val)}
+            />
           </HFormGroup>
         )}
 

@@ -22,9 +22,13 @@ export default class ListInput extends BaseInput<
   }
 
   onInputHandler(option: IListOption<string>) {
-    // Fixes a render issue when reselecting the same option as currently selected
-    const val = option ? option.value : this.value;
-    this.emitInput(val);
+    if (option) {
+      this.emitInput(option.value);
+    } else if (this.options.allowEmpty) {
+      this.emitInput(null);
+    } else {
+      this.emitInput(this.value);
+    }
   }
 
   getOptions(): IListMetadata<string> {

@@ -32,17 +32,20 @@ export function SyncWithValue() {
     (options.props || (options.props = {}))['value'] = null;
     if (!options.watch) options.watch = {};
 
-    let shouldSkipNextWatcher = true;
-
     // watch for the props.value
     options.watch['value'] = {
+      deep: true,
       immediate: true, // immediate call will setup the initial local value
       handler(newVal) {
         // update the local value
         this[key] = cloneDeep(newVal);
         // changing the prop should not trigger the `input` event
         // only changes of local value inside component should trigger this event
-        shouldSkipNextWatcher = true;
+        if (!this['_isNotInitialCall']) {
+          this['_isNotInitialCall'] = true;
+        } else {
+          this['_shouldSkipNextWatcher'] = true;
+        }
       },
     };
 
@@ -50,10 +53,10 @@ export function SyncWithValue() {
     options.watch[key] = {
       deep: true,
       handler(newVal) {
-        if (!shouldSkipNextWatcher) {
+        if (!this['_shouldSkipNextWatcher']) {
           this['$emit']('input', cloneDeep(newVal));
         }
-        shouldSkipNextWatcher = false;
+        this['_shouldSkipNextWatcher'] = false;
       },
     };
   });

@@ -94,7 +94,13 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
 
   channelInfoChanged = new Subject<ITwitchChannelInfo>();
 
-  capabilities = new Set<TPlatformCapability>(['chat', 'scope-validation', 'tags', 'user-info']);
+  capabilities = new Set<TPlatformCapability>([
+    'chat',
+    'scope-validation',
+    'tags',
+    'game',
+    'user-info',
+  ]);
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 600,
@@ -374,12 +380,6 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
         ? { Authorization: `${isNewApi ? 'Bearer' : 'OAuth'} ${this.oauthToken}` }
         : {}),
     };
-  }
-
-  supports<T extends TPlatformCapability>(
-    capability: T,
-  ): this is TPlatformCapabilityMap[T] & IPlatformService {
-    return this.capabilities.has(capability);
   }
 
   liveDockEnabled(): boolean {

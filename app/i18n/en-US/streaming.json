@@ -100,6 +100,8 @@
   "Update settings for %{platform}": "Update settings for %{platform}",
   "Link to the %{platform} page has been copied to your clipboard": "Link to the %{platform} page has been copied to your clipboard",
   "Can not fetch settings from %{platformName}": "Can not fetch settings from %{platformName}",
+  "Can not update settings for %{platformName}": "Can not update settings for %{platformName}",
   "prepopulateStreamSettingsError": "There was an error fetching your channel information. You can try <fetch-again-link>fetching the information again</fetch-again-link> or you can <just-go-live-link>just go live</just-go-live-link>. If this error persists, you can try logging out and back in.",
-  "updateStreamSettingsError": "Something went wrong while updating your stream info. You can <try-again-link>try again</try-again-link>, or you can <just-go-live-link>just go live</just-go-live-link>. If this error persists, you can try logging out and back in."
+  "updateStreamSettingsError": "Something went wrong while updating your stream info. You can <try-again-link>try again</try-again-link>, or you can <just-go-live-link>just go live</just-go-live-link>. If this error persists, you can try logging out and back in.",
+  "You must select a game for %{platformName}": "You must select a game for %{platformName}"
 }

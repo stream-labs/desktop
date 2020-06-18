@@ -1,5 +1,10 @@
 import { Inject, mutation, StatefulService } from '../core';
-import { IPlatformState } from './index';
+import {
+  IPlatformService,
+  IPlatformState,
+  TPlatformCapability,
+  TPlatformCapabilityMap,
+} from './index';
 import { StreamingService } from '../streaming';
 
 const VIEWER_COUNT_UPDATE_INTERVAL = 60 * 1000;
@@ -19,8 +24,16 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
 
   @Inject() protected streamingService: StreamingService;
 
+  abstract capabilities: Set<TPlatformCapability>;
+
   protected fetchViewerCount(): Promise<number> {
     return Promise.reject('not implemented');
+  }
+
+  supports<T extends TPlatformCapability>(
+    capability: T,
+  ): this is TPlatformCapabilityMap[T] & IPlatformService {
+    return this.capabilities.has(capability);
   }
 
   async afterGoLive(): Promise<void> {

@@ -16,6 +16,8 @@ import {
   IGoLiveSettings,
   IStreamInfo,
   TGoLiveChecklistItemState,
+  IPlatformFlags,
+  IPlatformCommonFields,
 } from './streaming-api';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { $t } from 'services/i18n';
@@ -110,7 +112,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     info: {
       lifecycle: 'empty',
       error: null,
-      goLiveSettings: null,
       checklist: {
         applyOptimizedSettings: 'not-started',
         twitch: 'not-started',
@@ -180,25 +181,28 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
    * Make a transition to Live
    */
   async goLive(settings?: IGoLiveSettings, unattendedMode = false) {
+    if (!this.userService.isLoggedIn) {
+      this.finishStartStreaming();
+      return;
+    }
     this.RESET_STREAM_INFO();
 
     // use default settings if no new settings provided
     if (!settings) settings = cloneDeep(this.views.goLiveSettings);
     settings = this.sanitizeGoLiveSettings(settings);
     this.streamSettingsService.setSettings({ goLiveSettings: settings });
-    this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist', goLiveSettings: settings });
+    this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist' });
 
-    // call beforeGoLive for each platform
-    // that will update the channel settings for each platform
+    // update channel settings for each platform
     const platforms = this.views.enabledPlatforms;
     for (const platform of platforms) {
       const service = getPlatformService(platform);
-
       try {
         await this.runCheck(platform, () => service.beforeGoLive(settings));
       } catch (e) {
         console.error(e);
         this.setError('SETTINGS_UPDATE_FAILED', e.details, platform);
+        return;
       }
     }
 
@@ -272,7 +276,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
     // run checklist
     this.RESET_STREAM_INFO();
-    this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist', goLiveSettings: settings });
+    this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist' });
 
     // call putChannelInfo for each platform
     const platforms = this.views.enabledPlatforms;
@@ -312,13 +316,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   private sanitizeGoLiveSettings(settings: IGoLiveSettings): IGoLiveSettings {
-    // copy common title and description for all platforms
+    // set common fields for each platform
     const destinations = settings.destinations;
     Object.keys(destinations).forEach((destName: TPlatform) => {
-      const dest = destinations[destName];
-      if (dest.useCustomTitleAndDescription) return;
-      if (dest.title !== void 0) dest.title = settings.commonFields.title;
-      if (dest['description'] !== void 0) dest['description'] = settings.commonFields.description;
+      // @ts-ignore
+      destinations[destName] = this.views.getPlatformSettings(destName, settings);
     });
     return settings;
   }
@@ -456,6 +458,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         return Promise.resolve();
       }
       try {
+        await this.goLive();
         // if (this.userService.isLoggedIn && this.userService.platform) {
         //   const service = getPlatformService(this.userService.platform.type);
         //
@@ -546,6 +549,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       if (!keepReplaying && this.state.replayBufferStatus === EReplayBufferState.Running) {
         this.stopReplayBuffer();
       }
+
+      this.windowsService.actions.closeChildWindow();
 
       return Promise.resolve();
     }
@@ -1004,6 +1009,7 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   }
 
   get availablePlatforms(): TPlatform[] {
+    if (!this.userService.isLoggedIn) return [];
     return Object.keys(this.userService.state.auth.platforms).sort() as TPlatform[];
   }
 
@@ -1013,10 +1019,6 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
       (platform: TPlatform) =>
         this.availablePlatforms.includes(platform) && goLiveSettings.destinations[platform].enabled,
     ) as TPlatform[];
-  }
-
-  get canShowOnlyRequiredFields(): boolean {
-    return this.enabledPlatforms.length > 1 && !this.goLiveSettings.advancedMode;
   }
 
   get canShowAdvancedMode(): boolean {
@@ -1032,12 +1034,14 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   }
 
   get viewerCount(): number {
+    if (!this.enabledPlatforms.length) return 0;
     return this.enabledPlatforms
       .map(platform => getPlatformService(platform).state.viewersCount)
       .reduce((c1, c2) => c1 + c2);
   }
 
   get chatUrl(): string {
+    if (!this.userService.isLoggedIn) return '';
     return this.isMutliplatformMode
       ? this.restreamService.chatUrl
       : getPlatformService(this.enabledPlatforms[0]).state.chatUrl;
@@ -1076,8 +1080,57 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   }
 
   get game(): string {
-    // TODO: figure out a better way to detect the game
-    const destinations = this.goLiveSettings.destinations;
-    return destinations.twitch?.game || destinations.facebook?.game || destinations.mixer?.game;
+    return this.goLiveSettings.commonFields.game;
+  }
+
+  get canShowOnlyRequiredFields(): boolean {
+    return this.enabledPlatforms.length > 1 && !this.goLiveSettings.advancedMode;
+  }
+
+  /**
+   * Returns merged common settings + required platform settings
+   */
+  getPlatformSettings(
+    platform: TPlatform,
+    settings: IGoLiveSettings,
+  ): IPlatformFlags & IPlatformCommonFields {
+    const platformSettings = settings.destinations[platform];
+    const service = getPlatformService(platform);
+
+    // if platform use custom settings, than return without merging
+    if (platformSettings.useCustomFields) return platformSettings;
+
+    // otherwise merge common settings
+    const commonFields = {
+      title: settings.commonFields.title,
+    };
+    if (service.supports('description')) {
+      commonFields['description'] = settings.commonFields.description;
+    }
+
+    if (service.supports('game')) {
+      commonFields['game'] = settings.commonFields.game;
+    }
+    return {
+      ...platformSettings,
+      ...commonFields,
+    };
+  }
+
+  /**
+   * Validates settings and returns an error string
+   */
+  validateSettings(settings: IGoLiveSettings): string {
+    const platforms = Object.keys(settings.destinations) as TPlatform[];
+    for (const platform of platforms) {
+      const platformSettings = this.getPlatformSettings(platform, settings);
+      const platformName = getPlatformService(platform).displayName;
+      if (platform === 'twitch' || platform === 'facebook') {
+        if (!platformSettings.game) {
+          return $t('You must select a game for %{platformName}', { platformName });
+        }
+      }
+    }
+    return '';
   }
 }
