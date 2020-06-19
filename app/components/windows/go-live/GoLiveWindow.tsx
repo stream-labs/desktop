@@ -114,21 +114,11 @@ export default class GoLiveWindow extends TsxComponent<{}> {
           handleExtraValidation={this.postValidate}
           style={{ position: 'relative' }}
         >
-          {shouldShowSettings && (
-            <transition name="zoom">
-              <GoLiveSettings class={styles.page} vModel={this.settings} />
-            </transition>
-          )}
-          {shouldShowChecklist && (
-            <transition name="zoom">
-              <GoLiveChecklist class={styles.page} />
-            </transition>
-          )}
-          {shouldShowSuccess && (
-            <transition name="zoom">
-              <GoLiveSuccess class={styles.page} />
-            </transition>
-          )}
+          <transition name="zoom">
+            {shouldShowSettings && <GoLiveSettings class={styles.page} vModel={this.settings} />}
+            {shouldShowChecklist && <GoLiveChecklist class={styles.page} />}
+            {shouldShowSuccess && <GoLiveSuccess class={styles.page} />}
+          </transition>
         </ValidatedForm>
         <div slot="controls">{this.renderControls()}</div>
       </ModalLayout>
@@ -137,7 +127,7 @@ export default class GoLiveWindow extends TsxComponent<{}> {
 
   private renderControls() {
     const shouldShowConfirm =
-      this.lifecycle === 'waitForNewSettings' && this.view.availablePlatforms.length > 0;
+      this.lifecycle === 'waitForNewSettings' && this.view.enabledPlatforms.length > 0;
     const shouldShowGoBackButton =
       this.lifecycle === 'runChecklist' &&
       this.view.info.error &&

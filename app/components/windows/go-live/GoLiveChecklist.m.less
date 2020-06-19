@@ -16,8 +16,7 @@ ul.checklist {
 
 .item-not-started { opacity: 0.5; }
 .check {
-  .margin-right(2);
-}
+  .margin-right(2);}
 
 .not-started{
   color: grey;
@@ -29,7 +28,18 @@ ul.checklist {
   }
 }
 .pending {color: orange};
-.done {color: green }
+.done {
+  color: green;
+  width: 17px;
+  overflow: hidden;
+  display: inline-block;
+  height: 20px;
+  position: relative;
+  bottom: -1px;
+  i {
+    overflow: hidden;
+  }
+}
 .failed {
   color: var(--red);;
   i {

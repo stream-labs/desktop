@@ -6,6 +6,8 @@ import {
   TPlatformCapabilityMap,
 } from './index';
 import { StreamingService } from '../streaming';
+import { authorizedHeaders, handleResponse } from '../../util/requests';
+import { UserService } from '../user';
 
 const VIEWER_COUNT_UPDATE_INTERVAL = 60 * 1000;
 
@@ -23,8 +25,10 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
   };
 
   @Inject() protected streamingService: StreamingService;
+  @Inject() protected userService: UserService;
 
-  abstract capabilities: Set<TPlatformCapability>;
+  protected abstract readonly capabilities: Set<TPlatformCapability>;
+  protected abstract readonly unlinkUrl: string;
 
   protected fetchViewerCount(): Promise<number> {
     return Promise.reject('not implemented');
@@ -46,6 +50,17 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
       }
     };
     await runInterval();
+  }
+
+  /**
+   * unlink platform and reload auth state
+   */
+  unlink() {
+    const headers = authorizedHeaders(this.userService.apiToken!);
+    const request = new Request(this.unlinkUrl, { headers });
+    return fetch(request)
+      .then(handleResponse)
+      .then(_ => this.userService.updateLinkedPlatforms());
   }
 
   @mutation()

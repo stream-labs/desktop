@@ -456,7 +456,7 @@ select {
   transition: transform .3s, opacity .5s;
 }
 .zoom-enter {
-  opacity: 1;
+  opacity: 0;
   transform: translateX(100%);
 }
 
@@ -464,6 +464,10 @@ select {
   opacity: 0;
   transform: translateX(-100%);
 }
+
+.checkboxdone-enter-active {transition: width 0.3s;}
+.checkboxdone-enter {width: 0;}
+.checkboxdone-enter-to {width: 16px;}
 
 .v--modal-overlay {
   background: var(--modal-overlay);

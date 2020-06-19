@@ -89,40 +89,15 @@ export class RestreamService extends StatefulService<IRestreamState> {
    * - Rolled out to
    */
   get canEnableRestream() {
-    return !!(this.userService.state.auth && this.restreamPlatformEligible);
+    return !!this.userService.state.auth;
   }
 
   get chatUrl() {
     return `https://streamlabs.com/embed/chat?oauth_token=${this.userService.apiToken}`;
   }
 
-  /**
-   * Go live requirements for now:
-   * - Restream is enabled
-   * - Protected mode is enabled
-   * - Logged in via twitch
-   * - Facebook is linked
-   * For now, restream will only work if you are logged into Twitch and
-   * restreaming to Facebook. We are starting with a simple case with broad
-   * appeal, but will be expanding to all platforms very soon.
-   */
   get shouldGoLiveWithRestream() {
-    return (
-      this.userService.state.auth &&
-      this.restreamPlatformEligible &&
-      this.userService.state.auth.platforms.facebook &&
-      this.state.enabled &&
-      this.streamSettingsService.protectedModeEnabled
-    );
-  }
-
-  /**
-   * Only users logged into these platforms as primary can multistream
-   * for the time being. Eventually all combinations of platforms will
-   * be supported.
-   */
-  get restreamPlatformEligible() {
-    return ['twitch', 'youtube'].includes(this.userService.state.auth.primaryPlatform);
+    return this.streamInfo.isMutliplatformMode;
   }
 
   fetchUserSettings() {

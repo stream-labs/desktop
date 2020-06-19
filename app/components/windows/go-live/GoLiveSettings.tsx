@@ -70,6 +70,7 @@ class Section extends TsxComponent<SectionProps> {
 export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
   @Inject() private streamingService: StreamingService;
   @Inject() private streamSettingsService: StreamSettingsService;
+  @Inject() private settingsService: SettingsService;
   @Inject() private userService: UserService;
 
   @SyncWithValue()
@@ -96,25 +97,33 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
     this.streamingService.actions.prepopulateInfo();
   }
 
+  private addDestination() {
+    this.settingsService.actions.showSettings('Stream');
+  }
+
   private render() {
-    const platforms = this.view.availablePlatforms;
-    const enabledPlatforms = this.view.enabledPlatforms;
+    const view = this.view;
+    const platforms = view.availablePlatforms;
+    const enabledPlatforms = view.enabledPlatforms;
     const hasPlatforms = enabledPlatforms.length > 0;
-    const isErrorMode = this.view.info.error;
-    const isLoadingMode =
-      !isErrorMode && ['empty', 'prepopulate'].includes(this.view.info.lifecycle);
+    const isErrorMode = view.info.error;
+    const isLoadingMode = !isErrorMode && ['empty', 'prepopulate'].includes(view.info.lifecycle);
     const shouldShowSettings = !isErrorMode && !isLoadingMode && hasPlatforms;
-    const isAdvancedMode = this.view.goLiveSettings.advancedMode && this.view.isMutliplatformMode;
+    const isAdvancedMode = view.goLiveSettings.advancedMode && view.isMutliplatformMode;
+    const shouldShowAddDestination = view.allPlatforms.length !== view.availablePlatforms.length;
     return (
       <ValidatedForm class="flex">
-        {/*PLATFORMS SWITCHER*/}
+        {/*PLATFORMS SWITCHERS*/}
         <div style={{ width: '400px', marginRight: '42px' }}>
           {platforms.map((platform: TPlatform) => this.renderPlatformSwitcher(platform))}
-          {/*<div class={styles.rightText}>*/}
-          {/*  <a href="#" class={styles.managePlatformsLink} onclick={this.showManagePlatforms}>*/}
-          {/*    {$t('Manage Platforms')}*/}
-          {/*  </a>*/}
-          {/*</div>*/}
+
+          {/*ADD DESTINATION BUTTON*/}
+          {shouldShowAddDestination && (
+            <a class={styles.addDestinationBtn} onclick={this.addDestination}>
+              <i class="fa fa-plus" />
+              {$t('Add Destination')}
+            </a>
+          )}
         </div>
         <div style={{ width: '100%' }}>
           {!hasPlatforms && $t('Enable at least one destination to start streaming')}

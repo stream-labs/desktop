@@ -88,8 +88,9 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
           {/* PUBLISH YT BROADCAST */}
           {shouldPublishYT &&
             this.renderCheck(
-              $t('Publish Youtube broadcast') + ' ' + this.renderYoutubePercentage(),
+              $t('Publish Youtube broadcast'),
               checklist.publishYoutubeBroadcast,
+              true,
             )}
         </ul>
 
@@ -99,52 +100,47 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
     );
   }
 
-  private renderCheck(title: string, state: TGoLiveChecklistItemState) {
+  private renderCheck(title: string, state: TGoLiveChecklistItemState, renderYTPercentage = false) {
     return (
       <li
+        key={title}
         class={{
           [styles.notStarted]: state === 'not-started',
           [styles.itemError]: state === 'failed',
         }}
       >
-        {this.renderCheckMark(state)}
+        <CheckMark state={state} />
         {title}
+        {renderYTPercentage && this.renderYoutubePercentage()}
       </li>
     );
-  }
-
-  private renderCheckMark(state: TGoLiveChecklistItemState) {
-    switch (state) {
-      case 'not-started':
-        return (
-          <span class={cx(styles.check, styles.notStarted)}>
-            <i class="fa fa-circle" />
-          </span>
-        );
-      case 'pending':
-        return (
-          <span class={cx(styles.check, styles.pending)}>
-            <i class="fa fa-spinner fa-pulse" />
-          </span>
-        );
-      case 'done':
-        return (
-          <span class={cx(styles.check, styles.done)}>
-            <i class="fa fa-check" />
-          </span>
-        );
-      case 'failed':
-        return (
-          <span class={cx(styles.check, styles.failed)}>
-            <i class="fa fa-times" />
-          </span>
-        );
-    }
   }
 
   private renderYoutubePercentage() {
     if (this.view.info.checklist.publishYoutubeBroadcast === 'not-started') return '';
     const progressInfo = this.youtubeService.progressInfo;
-    return ` ${progressInfo.progress * 100}%`;
+    return <span class={styles.pending}> {progressInfo.progress * 100}%</span>;
+  }
+}
+
+class CheckMarkProps {
+  state: TGoLiveChecklistItemState = 'not-started';
+}
+
+@Component({ props: createProps(CheckMarkProps) })
+class CheckMark extends TsxComponent<CheckMarkProps> {
+  render() {
+    const state = this.props.state;
+    const cssClass = cx(styles.check, styles[state]);
+    return (
+      <span class={cssClass}>
+        {state === 'not-started' && <i class="fa fa-circle" />}
+        {state === 'pending' && <i class="fa fa-spinner fa-pulse" />}
+        <transition name="checkboxdone">
+          {state === 'done' && <i key="done" class="fa fa-check" />}
+        </transition>
+        {state === 'failed' && <i class="fa fa-times" />}
+      </span>
+    );
   }
 }

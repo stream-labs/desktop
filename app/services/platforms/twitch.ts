@@ -92,6 +92,10 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
 
   readonly displayName = 'Twitch';
 
+  get unlinkUrl() {
+    return `https://${this.hostsService.streamlabs}/api/v5/user/accounts/unlink/twitch_account`;
+  }
+
   channelInfoChanged = new Subject<ITwitchChannelInfo>();
 
   capabilities = new Set<TPlatformCapability>([

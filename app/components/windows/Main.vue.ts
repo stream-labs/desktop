@@ -31,7 +31,7 @@ import PatchNotes from '../pages/PatchNotes.vue';
 import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
 import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
-import FacebookMerge from 'components/pages/FacebookMerge';
+import PlatformMerge from 'components/pages/PlatformMerge';
 import { getPlatformService } from 'services/platforms';
 
 const loadedTheme = () => {
@@ -57,7 +57,7 @@ const loadedTheme = () => {
     PlatformAppMainPage,
     PlatformAppStore,
     ResizeBar,
-    FacebookMerge,
+    PlatformMerge,
     LayoutEditor,
   },
 })

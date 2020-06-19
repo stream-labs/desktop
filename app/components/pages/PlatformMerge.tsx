@@ -8,16 +8,19 @@ import { $t } from 'services/i18n';
 import { RestreamService } from 'services/restream';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { SceneCollectionsService } from 'services/scene-collections';
+import { getPlatformService, TPlatform } from '../../services/platforms';
+import PlatformLogo from '../shared/PlatformLogo';
 
-class FacebookMergeProps {
+class PlatformMergeProps {
   params: {
+    platform?: TPlatform;
     overlayUrl?: string;
     overlayName?: string;
   } = {};
 }
 
-@Component({ props: createProps(FacebookMergeProps) })
-export default class FacebookMerge extends TsxComponent<FacebookMergeProps> {
+@Component({ props: createProps(PlatformMergeProps) })
+export default class PlatformMerge extends TsxComponent<PlatformMergeProps> {
   @Inject() userService: UserService;
   @Inject() navigationService: NavigationService;
   @Inject() restreamService: RestreamService;
@@ -27,21 +30,32 @@ export default class FacebookMerge extends TsxComponent<FacebookMergeProps> {
   showOverlay = false;
   showLogin = false;
 
+  get platform() {
+    return this.props.params.platform;
+  }
+
+  created() {
+    if (!this.platform) throw new Error('Platform should be provided for PlatformMerge');
+    if (this.platform !== 'facebook') this.showLogin = true;
+  }
+
   get loading() {
     return this.userService.state.authProcessState === EAuthProcessState.Busy;
   }
 
-  openPageCreation() {
+  get platformName() {
+    return getPlatformService(this.platform).displayName;
+  }
+
+  private openFBPageCreation() {
     electron.remote.shell.openExternal(
       'https://www.facebook.com/gaming/pages/create?ref=streamlabs',
     );
     this.showLogin = true;
   }
 
-  async mergeFacebook() {
-    await this.userService.startAuth('facebook', 'internal', true);
-
-    this.restreamService.setEnabled(true);
+  private async mergePlatform(platform: TPlatform) {
+    await this.userService.startAuth(platform, 'internal', true);
     this.streamSettingsService.setSettings({ protectedModeEnabled: true });
 
     if (this.props.params.overlayUrl) {
@@ -65,13 +79,11 @@ export default class FacebookMerge extends TsxComponent<FacebookMergeProps> {
   get createPageStep() {
     return (
       <div>
-        <div>
-          <b>{$t('Step')} 1:</b> {$t('Create a Facebook Gaming page to get started.')}
-        </div>
+        <div>{$t('Create a Facebook Gaming page to get started.')}</div>
         <button
           style={{ marginTop: '24px' }}
           class="button button--action"
-          onClick={() => this.openPageCreation()}
+          onClick={() => this.openFBPageCreation()}
         >
           {$t('Create a Gaming Page')}
         </button>
@@ -80,21 +92,22 @@ export default class FacebookMerge extends TsxComponent<FacebookMergeProps> {
   }
 
   get loginStep() {
+    const platformName = this.platformName;
     return (
       <div>
         <div>
-          <b>{$t('Step')} 2:</b> {$t('Connect Facebook to Streamlabs OBS.')}
+          {$t('Connect %{platformName} to Streamlabs OBS.', { platformName })}
           <br />
           {$t('All of your scenes, sources, and settings will be preserved.')}
         </div>
         <button
           style={{ marginTop: '24px' }}
-          class="button button--facebook"
+          class={`button button--${this.platform}`}
           disabled={this.loading}
-          onClick={() => this.mergeFacebook()}
+          onClick={() => this.mergePlatform(this.platform)}
         >
-          <i class={this.loading ? 'fas fa-spinner fa-spin' : 'fab fa-facebook'} />
-          {$t('Connect Facebook')}
+          {this.loading && <i class="fas fa-spinner fa-spin" />}
+          {$t('Connect')}
         </button>
       </div>
     );
@@ -127,10 +140,11 @@ export default class FacebookMerge extends TsxComponent<FacebookMergeProps> {
   }
 
   render() {
+    const platformName = this.platformName;
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ width: '400px' }}>
-          <h1>{$t('Multistream To Facebook')}</h1>
+          <h1>{$t('Connect %{platformName}', { platformName })}</h1>
           {this.currentStep}
         </div>
       </div>

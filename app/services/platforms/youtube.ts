@@ -130,7 +130,6 @@ type TBroadcastLifecycleStatus =
 export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   implements IPlatformService {
   @Inject() private hostsService: HostsService;
-  @Inject() private userService: UserService;
   @Inject() private customizationService: CustomizationService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private windowsService: WindowsService;
@@ -177,6 +176,10 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
 
   get oauthToken() {
     return this.userService.state.auth?.platforms?.youtube?.token;
+  }
+
+  get unlinkUrl() {
+    return `https://${this.hostsService.streamlabs}/api/v5/user/accounts/unlink/youtube_account`;
   }
 
   /**
@@ -616,7 +619,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     } catch (e) {
       throwStreamError(
         'YOUTUBE_PUBLISH_FAILED',
-        `LiveBroadcast has not changed the status to ${status}: ${e.details}`,
+        `LiveBroadcast has not changed the status to ${status}: ${e.details || e.message}`,
       );
     }
   }
@@ -648,7 +651,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     } catch (e) {
       throwStreamError(
         'YOUTUBE_PUBLISH_FAILED',
-        `LiveBroadcast has not changed the status to ${status}: ${e.details}`,
+        `LiveBroadcast has not changed the status to ${status}: ${e.details || e.message}`,
       );
     }
   }

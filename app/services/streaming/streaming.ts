@@ -1008,6 +1008,10 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     return this.state.info;
   }
 
+  get allPlatforms(): TPlatform[] {
+    return ['twitch', 'mixer', 'facebook', 'youtube'].sort() as TPlatform[];
+  }
+
   get availablePlatforms(): TPlatform[] {
     if (!this.userService.isLoggedIn) return [];
     return Object.keys(this.userService.state.auth.platforms).sort() as TPlatform[];
@@ -1021,12 +1025,10 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     ) as TPlatform[];
   }
 
-  get canShowAdvancedMode(): boolean {
-    return this.availablePlatforms.length > 1;
-  }
-
   get isMutliplatformMode() {
-    return this.enabledPlatforms.length > 1;
+    return (
+      this.streamSettingsService.state.protectedModeEnabled && this.enabledPlatforms.length > 1
+    );
   }
 
   get isMidStreamMode(): boolean {

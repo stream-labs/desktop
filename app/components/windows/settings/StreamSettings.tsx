@@ -15,6 +15,8 @@ import { NavigationService } from 'services/navigation';
 import { WindowsService } from 'services/windows';
 import { EStreamingState, StreamingService } from 'services/streaming';
 import BrowserView from 'components/shared/BrowserView';
+import { getPlatformService, TPlatform } from '../../../services/platforms';
+import cx from 'classnames';
 
 @Component({ components: { GenericFormGroups, PlatformLogo, BrowserView } })
 export default class StreamSettings extends TsxComponent {
@@ -44,20 +46,8 @@ export default class StreamSettings extends TsxComponent {
     return this.streamSettingsService.protectedModeEnabled;
   }
 
-  get userName() {
-    return this.userService.platform.username;
-  }
-
-  get platform() {
-    return this.userService.platform.type;
-  }
-
-  get platformName() {
-    return this.formattedPlatformName(this.platform);
-  }
-
-  formattedPlatformName(platform: string) {
-    return platform.charAt(0).toUpperCase() + this.platform.slice(1);
+  get streamingView() {
+    return this.streamingService.views;
   }
 
   get needToShowWarning() {
@@ -68,69 +58,32 @@ export default class StreamSettings extends TsxComponent {
     return this.streamingService.state.streamingStatus === EStreamingState.Offline;
   }
 
-  get restreamEnabled() {
-    return this.restreamService.state.enabled;
+  private platformMerge(platform: TPlatform) {
+    this.navigationService.navigate('PlatformMerge', { platform });
+    this.windowsService.actions.closeChildWindow();
   }
 
-  set restreamEnabled(enabled: boolean) {
-    this.restreamService.setEnabled(enabled);
+  private platformUnlink(platform: TPlatform) {
+    getPlatformService(platform).unlink();
   }
 
-  facebookMerge() {
-    this.navigationService.navigate('FacebookMerge');
-    this.windowsService.closeChildWindow();
+  private isPlatformMerged(platform: TPlatform) {
+    return !!this.userService.state.auth.platforms[platform];
   }
 
   render() {
+    const unsortedPlatforms = this.streamingView.allPlatforms;
+    const platforms = [
+      ...unsortedPlatforms.filter(p => this.isPlatformMerged(p)),
+      ...unsortedPlatforms.filter(p => !this.isPlatformMerged(p)),
+    ];
     return (
       <div>
         {/* account info */}
         {this.protectedModeEnabled && (
           <div>
-            {this.restreamService.canEnableRestream && (
-              <div class="section">
-                <VFormGroup
-                  vModel={this.restreamEnabled}
-                  metadata={metadata.toggle({
-                    title: $t('Enable Multistream'),
-                    disabled: !this.canEditSettings,
-                    description: $t(
-                      'Multistream allows you to stream to multiple platforms simultaneously.',
-                    ),
-                  })}
-                />
-              </div>
-            )}
-            <div class="section flex">
-              <div class="margin-right--20">
-                <PlatformLogo platform={this.platform} class={styles.platformLogo} />
-              </div>
-              <div>
-                {$t('Streaming to %{platformName}', { platformName: this.platformName })} <br />
-                {this.userName} <br />
-              </div>
-            </div>
-            {this.restreamEnabled && (
-              <div class="section flex">
-                <div class="margin-right--20">
-                  <PlatformLogo platform={'facebook'} class={styles.platformLogo} />
-                </div>
-                {this.userService.state.auth.platforms.facebook ? (
-                  <div>
-                    {$t('Streaming to %{platformName}', { platformName: 'facebook' })} <br />
-                    {this.userService.state.auth.platforms.facebook.username} <br />
-                  </div>
-                ) : (
-                  <div style={{ lineHeight: '42px' }}>
-                    {this.canEditSettings && (
-                      <button onClick={this.facebookMerge} class="button button--facebook">
-                        {$t('Connect')}
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
+            {platforms.map(platform => this.renderPlatform(platform))}
+
             {this.canEditSettings && (
               <div>
                 <a onClick={this.disableProtectedMode}>{$t('Stream to custom ingest')}</a>
@@ -166,6 +119,58 @@ export default class StreamSettings extends TsxComponent {
         {!this.protectedModeEnabled && this.canEditSettings && (
           <GenericFormGroups value={this.obsSettings} onInput={this.saveObsSettings} />
         )}
+      </div>
+    );
+  }
+
+  renderPlatform(platform: TPlatform) {
+    const isMerged = this.isPlatformMerged(platform);
+    const username = this.userService.state.auth.platforms[platform]?.username;
+    const platformName = getPlatformService(platform).displayName;
+    const buttonClass = {
+      facebook: 'button--facebook',
+      mixer: 'button--mixer',
+      youtube: 'button--youtube',
+      twitch: 'button--twitch',
+    }[platform];
+    const isPrimary = platform === this.userService.state.auth.primaryPlatform;
+    const shouldShowPrimaryBtn = isPrimary;
+    const shouldShowConnectBtn = !isMerged;
+    const shouldShowUnlinkBtn = !isPrimary && isMerged;
+
+    return (
+      <div class="section flex">
+        <div class="margin-right--20" style={{ width: '50px' }}>
+          <PlatformLogo platform={platform} class={styles.platformLogo} />
+        </div>
+        <div>
+          {platformName} <br />
+          {isMerged ? username : <span style={{ opacity: '0.5' }}>{$t('unlinked')}</span>} <br />
+        </div>
+
+        <div style={{ marginLeft: 'auto' }}>
+          {shouldShowConnectBtn && (
+            <button
+              onclick={() => this.platformMerge(platform)}
+              class={cx(`button ${buttonClass}`, styles.platformButton)}
+            >
+              {$t('Connect')}
+            </button>
+          )}
+          {shouldShowUnlinkBtn && (
+            <button
+              onclick={() => this.platformUnlink(platform)}
+              class={cx('button button--soft-warning', styles.platformButton)}
+            >
+              {$t('Unlink')}
+            </button>
+          )}
+          {shouldShowPrimaryBtn && (
+            <button disabled={true} class={cx('button button--action', styles.platformButton)}>
+              {$t('Primary')}
+            </button>
+          )}
+        </div>
       </div>
     );
   }

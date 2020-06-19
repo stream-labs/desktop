@@ -169,6 +169,7 @@ export interface IPlatformService {
   liveDockEnabled: () => boolean;
 
   readonly displayName: string;
+  unlink: () => void;
 
   state: IPlatformState;
 }

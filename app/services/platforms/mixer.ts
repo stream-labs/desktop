@@ -48,7 +48,6 @@ export interface IMixerChannelInfo extends IMixerStartStreamOptions {
 export class MixerService extends BasePlatformService<IMixerServiceState>
   implements IPlatformService {
   @Inject() private hostsService: HostsService;
-  @Inject() private userService: UserService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private customizationService: CustomizationService;
 
@@ -73,6 +72,10 @@ export class MixerService extends BasePlatformService<IMixerServiceState>
   };
 
   readonly displayName = 'Mixer';
+
+  get unlinkUrl() {
+    return `https://${this.hostsService.streamlabs}/api/v5/user/accounts/unlink/mixer_account`;
+  }
 
   @mutation()
   private ADD_GAME_MAPPING(game: string, id: integer) {

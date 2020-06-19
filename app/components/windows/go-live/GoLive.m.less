@@ -69,6 +69,27 @@
   background: rgba(#2b383f, 0.3);
 }
 
+.add-destination-btn {
+  width: 100%;
+  border: 1px dashed var(--border);
+  border-radius: 4px;
+  line-height: 58px;
+  display: block;
+  text-align: center;
+  position: relative;
+  &:hover {
+    border-color: (var(--paragraph));
+    box-shadow: 0 0 50px rgba(255, 255, 255, 0.2) inset;
+  }
+  i {
+    position: absolute;
+    left: 19px;
+    top: 17px;
+    font-size: 24px !important;
+    opacity: 0.6;
+  }
+}
+
 .right-text {
   .margin-top(4);
   text-align: right;

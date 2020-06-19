@@ -152,6 +152,10 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     return `https://${host}/slobs/merge/${token}/facebook_account`;
   }
 
+  get unlinkUrl() {
+    return `https://${this.hostsService.streamlabs}/api/v5/user/accounts/unlink/facebook_account`;
+  }
+
   get oauthToken() {
     return this.userService.state.auth?.platforms?.facebook?.token;
   }

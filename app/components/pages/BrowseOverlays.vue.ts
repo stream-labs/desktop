@@ -68,7 +68,7 @@ export default class BrowseOverlays extends Vue {
     url: string,
     name: string,
     progressCallback?: (progress: IDownloadProgress) => void,
-    mergeFacebook = false,
+    mergePlatform = false,
   ) {
     const host = new urlLib.URL(url).hostname;
     const trustedHosts = ['cdn.streamlabs.com'];
@@ -82,11 +82,16 @@ export default class BrowseOverlays extends Vue {
     // User should be eligible to enable restream for this behavior to work.
     // If restream is already set up, then just install as normal.
     if (
-      mergeFacebook &&
+      mergePlatform &&
+      this.userService.state.auth?.platforms.facebook &&
       this.restreamService.canEnableRestream &&
       !this.restreamService.shouldGoLiveWithRestream
     ) {
-      this.navigationService.navigate('FacebookMerge', { overlayUrl: url, overlayName: name });
+      this.navigationService.navigate('PlatformMerge', {
+        platform: 'facebook',
+        overlayUrl: url,
+        overlayName: name,
+      });
     } else {
       const sub = this.sceneCollectionsService.downloadProgress.subscribe(progressCallback);
       await this.sceneCollectionsService.installOverlay(url, name);
