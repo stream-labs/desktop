@@ -4,7 +4,7 @@
       <slot :name="activeContent.slotName" />
     </div>
     <div class="header">
-      <popper trigger="hover" :options="{ placement: 'bottom-end' }">
+      <popper trigger="hover" :options="{ placement: 'bottom-start' }">
         <div class="popper">
           <ul class="selector">
             <li
@@ -79,7 +79,7 @@
 
 .selector {
   border-radius: 4px;
-  margin: 0 0 0 8px;
+  margin: 0;
   padding: 8px 1px;
   width: 330px;
   background-color: @bg-primary;
@@ -140,5 +140,17 @@
 
   display: flex;
   flex-direction: column;
+}
+
+.popper {
+  background-color: transparent;
+  padding: 0;
+  margin-left: 8px;
+  border: none;
+  text-align: unset;
+
+  & /deep/ .popper__arrow {
+    border-color: transparent !important;
+  }
 }
 </style>
