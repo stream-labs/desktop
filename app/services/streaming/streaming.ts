@@ -619,8 +619,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   showGoLiveWindow() {
-    const advancedMode = this.streamSettingsService.state.goLiveSettings.advancedMode;
-    const height = 750; // advancedMode ? 1080 : 750;
+    const height = 750;
     const width = 900;
     const mainWinBounds = this.windowsService.getBounds('main');
 
@@ -1142,9 +1141,12 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     settings: T,
   ): IPlatformFlags & IPlatformCommonFields {
     const platformSettings = settings.destinations[platform];
+    const enabledPlatforms = Object.keys(settings.destinations).filter(
+      dest => settings.destinations[dest].enabled,
+    );
 
     // if platform use custom settings, than return without merging
-    if (platformSettings.useCustomFields) return platformSettings;
+    if (platformSettings.useCustomFields || enabledPlatforms.length === 1) return platformSettings;
 
     // otherwise merge common settings
     const commonFields = {
@@ -1196,6 +1198,7 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     const platforms = Object.keys(settings.destinations) as TPlatform[];
     for (const platform of platforms) {
       const platformSettings = this.getPlatformSettings(platform, settings);
+      if (!platformSettings.enabled) continue;
       const platformName = getPlatformService(platform).displayName;
       if (platform === 'twitch' || platform === 'facebook') {
         if (!platformSettings.game) {

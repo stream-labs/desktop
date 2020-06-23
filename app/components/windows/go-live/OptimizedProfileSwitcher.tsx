@@ -48,7 +48,7 @@ export class OptimizedProfileSwitcher extends TsxComponent<Props> {
   get optimizedProfileMetadata() {
     const game = this.game;
     const title =
-      this.selectedProfile.game !== 'DEFAULT'
+      this.selectedProfile && this.selectedProfile.game !== 'DEFAULT'
         ? $t('Use optimized encoder settings for %{game}', { game })
         : $t('Use optimized encoder settings');
     return {

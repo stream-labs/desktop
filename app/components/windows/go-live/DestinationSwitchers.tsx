@@ -57,7 +57,14 @@ export class DestinationSwitchers extends TsxComponent<Props> {
         onClick={() => this.onSwitchHandler(platform, !enabled)}
       >
         <div class={cx(styles.colInput, isPrimary && styles.colPrimary)}>
-          {isPrimary && <span>{$t('primary')}</span>}
+          {isPrimary && (
+            <i
+              class="fa fa-info-circle"
+              vTooltip={$t(
+                'You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destination.',
+              )}
+            />
+          )}
           {!isPrimary && <ToggleInput value={enabled} />}
         </div>
         <div class="logo margin-right--20">

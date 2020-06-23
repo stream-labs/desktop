@@ -349,8 +349,11 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   }
 
   async putChannelInfo(info: IFacebookStartStreamOptions): Promise<boolean> {
-    const { title, description, game, facebookPageId } = info;
+    const { title, description, game } = info;
+    let facebookPageId = info.facebookPageId;
     this.SET_STREAM_PROPERTIES(title, description, game, facebookPageId);
+    // take fist page if no pages provided
+    if (!facebookPageId) facebookPageId = this.state.facebookPages.pages[0].id;
     assertIsDefined(facebookPageId);
     await this.postPage(facebookPageId);
     if (this.state.liveVideoId && game) {
