@@ -192,7 +192,7 @@
         },
         "403": {
           "title": "You do not have the authority to delete the Block settings",
-          "message": "You can not load the block settings because the account you are logged into does not have authority to load the Block settings.\nMake sure you are logged in with the correct account."
+          "message": "You can not delete the block settings because the account you are logged into does not have authority to load the Block settings.\nMake sure you are logged in with the correct account."
         },
         "404": {
           "title": "There is no program",
