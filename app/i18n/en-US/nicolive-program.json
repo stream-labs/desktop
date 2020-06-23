@@ -174,7 +174,7 @@
         },
         "500": {
           "title": "The block settings could not be added",
-          "message": "The Block settings could not be added\n%{additionalMessage}"
+          "message": "The block settings could not be added\n%{additionalMessage}"
         }
       },
       "deleteFilters": {
