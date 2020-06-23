@@ -105,5 +105,7 @@
   "updateStreamSettingsError": "Something went wrong while updating your stream info. You can <try-again-link>try again</try-again-link>, or you can <just-go-live-link>just go live</just-go-live-link>. If this error persists, you can try logging out and back in.",
   "You must select a game for %{platformName}": "You must select a game for %{platformName}",
   "Connect %{platformName} to Streamlabs OBS.": "Connect %{platformName} to Streamlabs OBS.",
-  "Connect %{platformName}": "Connect %{platformName}"
+  "Connect %{platformName}": "Connect %{platformName}",
+  "Stream to %{platformName}": "Stream to %{platformName}",
+  "Schedule to %{platformName}": "Schedule to %{platformName}"
 }

@@ -79,9 +79,10 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   @Inject() streamSettingsService: StreamSettingsService;
   @Inject() userService: UserService;
 
+  readonly platform = 'facebook';
   readonly displayName = 'Facebook';
 
-  capabilities = new Set<TPlatformCapability>([
+  readonly capabilities = new Set<TPlatformCapability>([
     'chat',
     'description',
     'game',
@@ -267,6 +268,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
           this.SET_LIVE_VIDEO_ID(null);
         }
         this.emitChannelInfo();
+        this.SET_PREPOPULATED(true);
         return {
           ...info,
           facebookPageId: this.state.activePage!.id,

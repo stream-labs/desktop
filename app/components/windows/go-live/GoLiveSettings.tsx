@@ -11,12 +11,6 @@ import { BoolInput, ToggleInput } from 'components/shared/inputs/inputs';
 import cx from 'classnames';
 import { formMetadata, IListOption, metadata } from 'components/shared/inputs';
 import { SettingsService } from 'services/settings';
-import YoutubeEditStreamInfo from 'components/platforms/youtube/YoutubeEditStreamInfo';
-import CommonPlatformFields from 'components/platforms/CommonPlatformFields';
-import TwitchEditStreamInfo from '../../platforms/TwitchEditStreamInfo';
-import FacebookEditStreamInfo from '../../platforms/FacebookEditStreamInfo';
-import MixerEditStreamInfo from '../../platforms/MixerEditStreamInfo';
-import HFormGroup from '../../shared/inputs/HFormGroup.vue';
 import { IGoLiveSettings, StreamingService } from 'services/streaming';
 
 import { Spinner, ProgressBar } from 'streamlabs-beaker';
@@ -26,9 +20,9 @@ import ValidatedForm from '../../shared/inputs/ValidatedForm';
 import PlatformSettings from './PlatformSettings';
 import { IStreamError } from '../../../services/streaming/stream-error';
 import GoLiveError from './GoLiveError';
-import { GoLiveProps } from './goLiveProps';
 import { SyncWithValue } from '../../../services/app/app-decorators';
 import { OptimizedProfileSwitcher } from './OptimizedProfileSwitcher';
+import { DestinationSwitchers } from './DestinationSwitchers';
 
 class SectionProps {
   title?: string = '';
@@ -60,6 +54,10 @@ class Section extends TsxComponent<SectionProps> {
   }
 }
 
+class GoLiveProps {
+  value?: IGoLiveSettings = null;
+}
+
 /**
  * Renders settings for starting the stream
  * - Platform switchers
@@ -80,15 +78,8 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
     return this.streamingService.views;
   }
 
-  private getPlatformName(platform: TPlatform): string {
-    return getPlatformService(platform).displayName;
-  }
-
-  private getPlatformUsername(platform: TPlatform): string {
-    return this.userService.state.auth.platforms[platform].username;
-  }
-
   private switchPlatform(platform: TPlatform, enabled: boolean) {
+    console.log('handle on switch');
     // save settings
     this.settings.destinations[platform].enabled = enabled;
     this.streamSettingsService.setGoLiveSettings(this.settings);
@@ -103,20 +94,23 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
 
   private render() {
     const view = this.view;
-    const platforms = view.availablePlatforms;
     const enabledPlatforms = view.enabledPlatforms;
     const hasPlatforms = enabledPlatforms.length > 0;
     const isErrorMode = view.info.error;
     const isLoadingMode = !isErrorMode && ['empty', 'prepopulate'].includes(view.info.lifecycle);
     const shouldShowSettings = !isErrorMode && !isLoadingMode && hasPlatforms;
     const isAdvancedMode = view.goLiveSettings.advancedMode && view.isMutliplatformMode;
-    const shouldShowAddDestination = view.allPlatforms.length !== view.availablePlatforms.length;
+    const shouldShowAddDestination = view.allPlatforms.length !== view.linkedPlatforms.length;
     return (
       <ValidatedForm class="flex">
-        {/*PLATFORMS SWITCHERS*/}
+        {/*LEFT COLUMN*/}
         <div style={{ width: '400px', marginRight: '42px' }}>
-          {platforms.map((platform: TPlatform) => this.renderPlatformSwitcher(platform))}
-
+          {/*DESTINATION SWITCHERS*/}
+          <DestinationSwitchers
+            value={this.settings.destinations}
+            title="Stream to %{platformName}"
+            handleOnSwitch={(...args) => this.switchPlatform(...args)}
+          />
           {/*ADD DESTINATION BUTTON*/}
           {shouldShowAddDestination && (
             <a class={styles.addDestinationBtn} onclick={this.addDestination}>
@@ -125,6 +119,8 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
             </a>
           )}
         </div>
+
+        {/*RIGHT COLUMN*/}
         <div style={{ width: '100%' }}>
           {!hasPlatforms && $t('Enable at least one destination to start streaming')}
 
@@ -150,28 +146,6 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
           )}
         </div>
       </ValidatedForm>
-    );
-  }
-
-  private renderPlatformSwitcher(platform: TPlatform) {
-    const platformSettings = this.settings.destinations[platform];
-    const disabled = !platformSettings.enabled;
-    return (
-      <div
-        class={cx(styles.platformSwitcher, { [styles.platformDisabled]: disabled })}
-        onClick={() => this.switchPlatform(platform, !platformSettings.enabled)}
-      >
-        <div class={styles.colInput}>
-          <ToggleInput value={platformSettings.enabled} />
-        </div>
-        <div class="logo margin-right--20">
-          <PlatformLogo platform={platform} class={styles[`platform-logo-${platform}`]} />
-        </div>
-        <div class="account">
-          <span class={styles.platformName}>Stream to {this.getPlatformName(platform)}</span> <br />
-          {this.getPlatformUsername(platform)} <br />
-        </div>
-      </div>
     );
   }
 

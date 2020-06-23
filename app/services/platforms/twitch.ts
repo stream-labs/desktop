@@ -90,6 +90,7 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
     },
   };
 
+  readonly platform = 'twitch';
   readonly displayName = 'Twitch';
 
   get unlinkUrl() {
@@ -98,7 +99,7 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
 
   channelInfoChanged = new Subject<ITwitchChannelInfo>();
 
-  capabilities = new Set<TPlatformCapability>([
+  readonly capabilities = new Set<TPlatformCapability>([
     'chat',
     'scope-validation',
     'tags',
@@ -267,6 +268,7 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
     };
     this.updateActiveChannel(activeChannel);
     assertIsDefined(this.activeChannel);
+    this.SET_PREPOPULATED(true);
     return this.activeChannel;
   }
 

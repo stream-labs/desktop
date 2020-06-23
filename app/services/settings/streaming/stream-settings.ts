@@ -275,10 +275,6 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     return false;
   }
 
-  get allPlatforms(): TPlatform[] {
-    return ['facebook', 'mixer', 'twitch', 'youtube'];
-  }
-
   @mutation()
   private SET_LOCAL_STORAGE_SETTINGS(settings: Partial<IStreamSettingsState>) {
     Object.keys(settings).forEach(prop => {

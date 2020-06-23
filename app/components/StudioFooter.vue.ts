@@ -92,9 +92,7 @@ export default class StudioFooterComponent extends Vue {
   }
 
   get canSchedule() {
-    return (
-      this.userService.platform && ['facebook', 'youtube'].includes(this.userService.platform.type)
-    );
+    return this.streamingService.views.supports('stream-schedule');
   }
 
   get youtubeEnabled() {
@@ -114,10 +112,9 @@ export default class StudioFooterComponent extends Vue {
 
   openScheduleStream() {
     this.windowsService.showWindow({
-      componentName: 'EditStreamInfo',
+      componentName: 'ScheduleStreamWindow',
       title: $t('Schedule Stream'),
-      queryParams: { isSchedule: true },
-      size: { width: 500, height: 670 },
+      size: { width: 800, height: 670 },
     });
   }
 

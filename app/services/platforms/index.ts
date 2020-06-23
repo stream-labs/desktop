@@ -119,17 +119,12 @@ export interface IPlatformState {
   settings: TStartStreamOptions;
   streamPageUrl: string;
   chatUrl: string;
+  isPrepopulated: boolean;
 }
 
 // All platform services should implement this interface.
 export interface IPlatformService {
   capabilities: Set<TPlatformCapability>;
-
-  supports<T extends TPlatformCapability>(
-    capability: T,
-  ): this is TPlatformCapabilityMap[T] & IPlatformService;
-
-  // channelInfoChanged: Observable<TChannelInfo>;
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions;
 
@@ -168,7 +163,9 @@ export interface IPlatformService {
 
   liveDockEnabled: () => boolean;
 
+  readonly platform: TPlatform;
   readonly displayName: string;
+  readonly mergeUrl: string;
   unlink: () => void;
 
   state: IPlatformState;

@@ -67,16 +67,8 @@ export default class StreamSettings extends TsxComponent {
     getPlatformService(platform).unlink();
   }
 
-  private isPlatformMerged(platform: TPlatform) {
-    return !!this.userService.state.auth.platforms[platform];
-  }
-
   render() {
-    const unsortedPlatforms = this.streamingView.allPlatforms;
-    const platforms = [
-      ...unsortedPlatforms.filter(p => this.isPlatformMerged(p)),
-      ...unsortedPlatforms.filter(p => !this.isPlatformMerged(p)),
-    ];
+    const platforms = this.streamingView.allPlatforms;
     return (
       <div>
         {/* account info */}
@@ -124,7 +116,7 @@ export default class StreamSettings extends TsxComponent {
   }
 
   renderPlatform(platform: TPlatform) {
-    const isMerged = this.isPlatformMerged(platform);
+    const isMerged = this.streamingView.isPlatformLinked(platform);
     const username = this.userService.state.auth.platforms[platform]?.username;
     const platformName = getPlatformService(platform).displayName;
     const buttonClass = {
@@ -133,7 +125,7 @@ export default class StreamSettings extends TsxComponent {
       youtube: 'button--youtube',
       twitch: 'button--twitch',
     }[platform];
-    const isPrimary = platform === this.userService.state.auth.primaryPlatform;
+    const isPrimary = this.streamingView.isPrimaryPlatform(platform);
     const shouldShowPrimaryBtn = isPrimary;
     const shouldShowConnectBtn = !isMerged;
     const shouldShowUnlinkBtn = !isPrimary && isMerged;

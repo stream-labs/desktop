@@ -51,7 +51,7 @@ export interface IStreamInfo {
 
 export type TGoLiveChecklistItemState = 'not-started' | 'pending' | 'done' | 'failed';
 
-export interface IGoLiveSettings {
+export interface IStreamSettings {
   commonFields: {
     title: string;
     description: string;
@@ -63,6 +63,9 @@ export interface IGoLiveSettings {
     facebook: IPlatformFlags & IFacebookStartStreamOptions;
     mixer: IPlatformFlags & IMixerStartStreamOptions;
   };
+}
+
+export interface IGoLiveSettings extends IStreamSettings {
   optimizedProfile: IEncoderProfile;
   advancedMode: boolean;
 }

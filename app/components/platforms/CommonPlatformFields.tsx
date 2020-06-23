@@ -9,10 +9,11 @@ import cloneDeep from 'lodash/cloneDeep';
 import styles from './StreamTitleAndDescription.m.less';
 import ValidatedForm from '../shared/inputs/ValidatedForm';
 import { getPlatformService, TPlatform } from '../../services/platforms';
-import { IGoLiveSettings } from '../../services/streaming';
+import { IGoLiveSettings, StreamingService } from '../../services/streaming';
 import { SyncWithValue } from '../../services/app/app-decorators';
 import { Debounce } from 'lodash-decorators';
 import { IPlatformCommonFields, IPlatformFlags } from '../../services/streaming/streaming-api';
+import { Inject } from '../../services/core';
 
 class ComponentProps {
   hasCustomCheckbox?: boolean = false;
@@ -32,6 +33,7 @@ type TComponentValue = IPlatformCommonFields & IPlatformFlags;
 
 @Component({ props: createProps(ComponentProps) })
 export default class CommonPlatformFields extends TsxComponent<ComponentProps> {
+  @Inject() private streamingService: StreamingService;
   @SyncWithValue()
   private settings: TComponentValue = null;
 
@@ -83,9 +85,9 @@ export default class CommonPlatformFields extends TsxComponent<ComponentProps> {
     const fieldsAreVisible =
       !this.props.hasCustomCheckbox ||
       (this.props.hasCustomCheckbox && this.settings.useCustomFields);
-    const platformServices = this.props.platforms.map(getPlatformService);
-    const hasDescription = platformServices.find(platform => platform.supports('description'));
-    const hasGame = platformServices.find(platform => platform.supports('game'));
+    const view = this.streamingService.views;
+    const hasDescription = view.supports('description');
+    const hasGame = view.supports('game');
 
     // find out the best title for common fields
     let title = '';

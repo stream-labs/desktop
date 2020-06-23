@@ -71,7 +71,14 @@ export default class PlatformSettings extends TsxComponent<{ onInput?: any }> {
   }
 
   private render() {
-    const enabledPlatforms = this.view.enabledPlatforms;
+    const enabledPlatforms = Object.keys(this.settings.destinations).filter(
+      dest => this.settings.destinations[dest].enabled,
+    ) as TPlatform[];
+
+    // don't render platform settings if platform has not prepopulated the channel data
+    if (!this.view.isPrepopulated(enabledPlatforms)) {
+      return '';
+    }
     const hasPlatforms = enabledPlatforms.length > 0;
     const isErrorMode = this.view.info.error;
     const isLoadingMode =

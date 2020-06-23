@@ -18,10 +18,16 @@ import {
   TGoLiveChecklistItemState,
   IPlatformFlags,
   IPlatformCommonFields,
+  IStreamSettings,
 } from './streaming-api';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { $t } from 'services/i18n';
-import { getPlatformService, TStartStreamOptions, TPlatform } from 'services/platforms';
+import {
+  getPlatformService,
+  TStartStreamOptions,
+  TPlatform,
+  TPlatformCapability,
+} from 'services/platforms';
 import { UserService } from 'services/user';
 import {
   NotificationsService,
@@ -40,7 +46,7 @@ import { FacebookService, IFacebookStartStreamOptions } from 'services/platforms
 import Utils from 'services/utils';
 import Vue from 'vue';
 import { ISourcesState, Source } from '../sources';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, difference } from 'lodash';
 import watch from 'vuex';
 import { createStreamError, IStreamError, StreamError, TStreamErrorType } from './stream-error';
 import { authorizedHeaders } from '../../util/requests';
@@ -160,16 +166,16 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.UPDATE_STREAM_INFO({ lifecycle: 'prepopulate', error: null });
     for (const platform of this.views.enabledPlatforms) {
       const service = getPlatformService(platform);
-      // facebook should have pages
-      if (platform === 'facebook' && !this.facebookService.state.facebookPages?.pages?.length) {
-        this.SET_ERROR('FACEBOOK_HAS_NO_PAGES');
-        this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
-        return;
-      }
       try {
         await service.prepopulateInfo();
       } catch (e) {
         this.SET_ERROR('PREPOPULATE_FAILED', e.details, platform);
+        this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
+        return;
+      }
+      // facebook should have pages
+      if (platform === 'facebook' && !this.facebookService.state.facebookPages?.pages?.length) {
+        this.SET_ERROR('FACEBOOK_HAS_NO_PAGES');
         this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
         return;
       }
@@ -189,7 +195,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
     // use default settings if no new settings provided
     if (!settings) settings = cloneDeep(this.views.goLiveSettings);
-    settings = this.sanitizeGoLiveSettings(settings);
+    settings = this.views.sanitizeSettings(settings);
     this.streamSettingsService.setSettings({ goLiveSettings: settings });
     this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist' });
 
@@ -272,7 +278,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
    * Update stream stetting while being live
    */
   async updateStreamSettings(settings: IGoLiveSettings) {
-    settings = this.sanitizeGoLiveSettings(settings);
+    settings = this.views.sanitizeSettings(settings);
 
     // run checklist
     this.RESET_STREAM_INFO();
@@ -299,6 +305,21 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   /**
+   * Update stream stetting while being live
+   */
+  async scheduleStream(settings: IStreamSettings, time: string) {
+    settings = this.views.sanitizeSettings(settings);
+    const destinations = settings.destinations;
+    const platforms = (Object.keys(destinations) as TPlatform[]).filter(
+      dest => destinations[dest].enabled && this.views.supports('stream-schedule', dest),
+    );
+    for (const platform of platforms) {
+      const service = getPlatformService(platform);
+      await service.scheduleStream(time, destinations[platform]);
+    }
+  }
+
+  /**
    * update checklist item status based callback result
    */
   private async runCheck(
@@ -313,16 +334,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       this.SET_CHECKLIST_ITEM(checkName, 'failed');
       throw e;
     }
-  }
-
-  private sanitizeGoLiveSettings(settings: IGoLiveSettings): IGoLiveSettings {
-    // set common fields for each platform
-    const destinations = settings.destinations;
-    Object.keys(destinations).forEach((destName: TPlatform) => {
-      // @ts-ignore
-      destinations[destName] = this.views.getPlatformSettings(destName, settings);
-    });
-    return settings;
   }
 
   @mutation()
@@ -1008,20 +1019,23 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     return this.state.info;
   }
 
+  /**
+   * returns sorted list of all platforms
+   */
   get allPlatforms(): TPlatform[] {
-    return ['twitch', 'mixer', 'facebook', 'youtube'].sort() as TPlatform[];
+    return this.sortPlatforms(['twitch', 'mixer', 'facebook', 'youtube']);
   }
 
-  get availablePlatforms(): TPlatform[] {
+  get linkedPlatforms(): TPlatform[] {
     if (!this.userService.isLoggedIn) return [];
-    return Object.keys(this.userService.state.auth.platforms).sort() as TPlatform[];
+    return this.allPlatforms.filter(p => this.isPlatformLinked(p));
   }
 
   get enabledPlatforms(): TPlatform[] {
     const goLiveSettings = this.goLiveSettings;
     return Object.keys(goLiveSettings.destinations).filter(
       (platform: TPlatform) =>
-        this.availablePlatforms.includes(platform) && goLiveSettings.destinations[platform].enabled,
+        this.linkedPlatforms.includes(platform) && goLiveSettings.destinations[platform].enabled,
     ) as TPlatform[];
   }
 
@@ -1052,21 +1066,14 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   get goLiveSettings(): IGoLiveSettings {
     // return already saved settings if exist
     if (this.streamSettingsService.state.goLiveSettings) {
-      return this.streamSettingsService.state.goLiveSettings;
+      return this.sanitizeSettings(this.streamSettingsService.state.goLiveSettings);
     }
 
     // otherwise generate new settings
     const { title, description } = this.streamSettingsService.state; // migrate title and description
-    const enabledPlatforms = this.availablePlatforms;
     const destinations = {};
-    this.streamSettingsService.allPlatforms.forEach(platform => {
-      const service = getPlatformService(platform);
-      const enabled = enabledPlatforms.includes(platform);
-      destinations[platform] = {
-        ...service.state.settings,
-        useCustomTitleAndDescription: false,
-        enabled,
-      };
+    this.linkedPlatforms.forEach(platform => {
+      destinations[platform] = this.getDefaultPlatformSettings(platform);
     });
 
     return {
@@ -1090,14 +1097,53 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   }
 
   /**
+   * Sort the platform list
+   * - the primary platform is always first
+   * - linked platforms are always on the top of the list
+   * - the rest has an alphabetic sort
+   */
+  sortPlatforms(platforms: TPlatform[]): TPlatform[] {
+    platforms = platforms.sort();
+    return [
+      ...platforms.filter(p => this.isPrimaryPlatform(p)),
+      ...platforms.filter(p => !this.isPrimaryPlatform(p) && this.isPlatformLinked(p)),
+      ...platforms.filter(p => !this.isPlatformLinked(p)),
+    ];
+  }
+
+  /**
+   * returns `true` if all enabled platforms have prepopulated their settings
+   */
+  isPrepopulated(platforms: TPlatform[]): boolean {
+    for (const platform of platforms) {
+      if (!getPlatformService(platform).state.isPrepopulated) return false;
+    }
+    return true;
+  }
+
+  supports(capability: TPlatformCapability, platform?: TPlatform) {
+    const platforms = platform ? [platform] : this.linkedPlatforms;
+    for (platform of platforms) {
+      if (getPlatformService(platform).capabilities.has(capability)) return true;
+    }
+  }
+
+  isPlatformLinked(platform: TPlatform): boolean {
+    return !!this.userService.state.auth.platforms[platform];
+  }
+
+  isPrimaryPlatform(platform: TPlatform) {
+    return platform === this.userService.state.auth.primaryPlatform;
+  }
+
+  /**
    * Returns merged common settings + required platform settings
    */
-  getPlatformSettings(
+  getPlatformSettings<T extends IStreamSettings>(
     platform: TPlatform,
-    settings: IGoLiveSettings,
+    settings: T,
   ): IPlatformFlags & IPlatformCommonFields {
     const platformSettings = settings.destinations[platform];
-    const service = getPlatformService(platform);
 
     // if platform use custom settings, than return without merging
     if (platformSettings.useCustomFields) return platformSettings;
@@ -1106,11 +1152,11 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     const commonFields = {
       title: settings.commonFields.title,
     };
-    if (service.supports('description')) {
+    if (this.supports('description', platform)) {
       commonFields['description'] = settings.commonFields.description;
     }
 
-    if (service.supports('game')) {
+    if (this.supports('game', platform)) {
       commonFields['game'] = settings.commonFields.game;
     }
     return {
@@ -1119,10 +1165,36 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     };
   }
 
+  sanitizeSettings<T extends IStreamSettings>(settings: T): T {
+    settings = cloneDeep(settings);
+    const destinations = settings.destinations;
+    const linkedPlatforms = this.linkedPlatforms;
+
+    // delete unlinked platforms if provided
+    Object.keys(destinations).forEach((destName: TPlatform) => {
+      if (!linkedPlatforms.includes(destName)) delete destinations[destName];
+    });
+
+    // add linked platforms if not exist
+    difference(linkedPlatforms, Object.keys(destinations) as TPlatform[]).forEach(destName => {
+      // TODO: fix types
+      // @ts-ignore
+      destinations[destName] = this.getDefaultPlatformSettings(destName);
+    });
+
+    // set common fields for each platform
+    Object.keys(destinations).forEach((destName: TPlatform) => {
+      // TODO: fix types
+      // @ts-ignore
+      destinations[destName] = this.getPlatformSettings(destName, settings);
+    });
+    return settings;
+  }
+
   /**
    * Validates settings and returns an error string
    */
-  validateSettings(settings: IGoLiveSettings): string {
+  validateSettings<T extends IStreamSettings>(settings: T): string {
     const platforms = Object.keys(settings.destinations) as TPlatform[];
     for (const platform of platforms) {
       const platformSettings = this.getPlatformSettings(platform, settings);
@@ -1134,5 +1206,15 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
       }
     }
     return '';
+  }
+
+  private getDefaultPlatformSettings(platform: TPlatform) {
+    const enabled = this.isPrimaryPlatform(platform);
+    const service = getPlatformService(platform);
+    return {
+      ...service.state.settings,
+      enabled,
+      useCustomFields: false,
+    };
   }
 }

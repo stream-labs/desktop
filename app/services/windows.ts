@@ -21,7 +21,6 @@ import NameFolder from 'components/windows/NameFolder.vue';
 import SourceProperties from 'components/windows/SourceProperties.vue';
 import SourceFilters from 'components/windows/SourceFilters.vue';
 import AddSourceFilter from 'components/windows/AddSourceFilter';
-import EditStreamInfo from 'components/windows/EditStreamInfo.vue';
 import AdvancedAudio from 'components/windows/AdvancedAudio.vue';
 import Notifications from 'components/windows/Notifications.vue';
 import Troubleshooter from 'components/windows/Troubleshooter.vue';
@@ -41,6 +40,8 @@ import BrowserSourceInteraction from 'components/windows/BrowserSourceInteractio
 import ShareStream from 'components/windows/ShareStream';
 import WelcomeToPrime from 'components/windows/WelcomeToPrime';
 import GoLiveWindow from 'components/windows/go-live/GoLiveWindow';
+import EditStreamWindow from 'components/windows/go-live/EditStreamWindow';
+import ScheduleStreamWindow from 'components/windows/go-live/ScheduleStreamWindow';
 
 import BitGoal from 'components/widgets/goal/BitGoal.vue';
 import DonationGoal from 'components/widgets/goal/DonationGoal.vue';
@@ -61,7 +62,6 @@ import AlertBox from 'components/widgets/AlertBox.vue';
 import SpinWheel from 'components/widgets/SpinWheel.vue';
 
 import PerformanceMetrics from 'components/PerformanceMetrics.vue';
-import EditStreamWindow from '../components/windows/go-live/EditStreamWindow';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -84,7 +84,6 @@ export function getComponents() {
     SourceFilters,
     AddSourceFilter,
     Blank,
-    EditStreamInfo,
     AdvancedAudio,
     Notifications,
     Troubleshooter,
@@ -122,6 +121,7 @@ export function getComponents() {
     WelcomeToPrime,
     GoLiveWindow,
     EditStreamWindow,
+    ScheduleStreamWindow,
   };
 }
 

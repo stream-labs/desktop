@@ -47,11 +47,10 @@ export interface IMixerChannelInfo extends IMixerStartStreamOptions {
 @InheritMutations()
 export class MixerService extends BasePlatformService<IMixerServiceState>
   implements IPlatformService {
-  @Inject() private hostsService: HostsService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private customizationService: CustomizationService;
 
-  capabilities = new Set<TPlatformCapability>(['chat']);
+  readonly capabilities = new Set<TPlatformCapability>(['chat']);
   channelInfoChanged = new Subject<IMixerChannelInfo>();
   private activeChannel: IMixerChannelInfo;
 
@@ -71,6 +70,7 @@ export class MixerService extends BasePlatformService<IMixerServiceState>
     },
   };
 
+  readonly platform = 'mixer';
   readonly displayName = 'Mixer';
 
   get unlinkUrl() {
@@ -193,6 +193,7 @@ export class MixerService extends BasePlatformService<IMixerServiceState>
       game: gameTitle,
     });
 
+    this.SET_PREPOPULATED(true);
     return this.activeChannel;
   }
 

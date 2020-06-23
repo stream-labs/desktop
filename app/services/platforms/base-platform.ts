@@ -1,13 +1,9 @@
 import { Inject, mutation, StatefulService } from '../core';
-import {
-  IPlatformService,
-  IPlatformState,
-  TPlatformCapability,
-  TPlatformCapabilityMap,
-} from './index';
+import { IPlatformState, TPlatform } from './index';
 import { StreamingService } from '../streaming';
 import { authorizedHeaders, handleResponse } from '../../util/requests';
 import { UserService } from '../user';
+import { HostsService } from '../hosts';
 
 const VIEWER_COUNT_UPDATE_INTERVAL = 60 * 1000;
 
@@ -22,22 +18,23 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
     viewersCount: 0,
     chatUrl: '',
     settings: null,
+    isPrepopulated: false,
   };
 
   @Inject() protected streamingService: StreamingService;
   @Inject() protected userService: UserService;
-
-  protected abstract readonly capabilities: Set<TPlatformCapability>;
+  @Inject() protected hostsService: HostsService;
+  abstract readonly platform: TPlatform;
   protected abstract readonly unlinkUrl: string;
 
   protected fetchViewerCount(): Promise<number> {
     return Promise.reject('not implemented');
   }
 
-  supports<T extends TPlatformCapability>(
-    capability: T,
-  ): this is TPlatformCapabilityMap[T] & IPlatformService {
-    return this.capabilities.has(capability);
+  get mergeUrl() {
+    const host = this.hostsService.streamlabs;
+    const token = this.userService.apiToken;
+    return `https://${host}/slobs/merge/${token}/${this.platform}_account`;
   }
 
   async afterGoLive(): Promise<void> {
@@ -81,5 +78,10 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
   @mutation()
   protected SET_CHAT_URL(url: string) {
     this.state.chatUrl = url;
+  }
+
+  @mutation()
+  protected SET_PREPOPULATED(isPrepopulated: boolean) {
+    this.state.isPrepopulated = isPrepopulated;
   }
 }

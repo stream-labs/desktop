@@ -129,12 +129,11 @@ type TBroadcastLifecycleStatus =
 @InheritMutations()
 export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   implements IPlatformService {
-  @Inject() private hostsService: HostsService;
   @Inject() private customizationService: CustomizationService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private windowsService: WindowsService;
 
-  capabilities = new Set<TPlatformCapability>(['chat', 'description', 'stream-schedule']);
+  readonly capabilities = new Set<TPlatformCapability>(['chat', 'description', 'stream-schedule']);
 
   static initialState: IYoutubeServiceState = {
     ...BasePlatformService.initialState,
@@ -150,6 +149,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     },
   };
 
+  readonly platform = 'youtube';
   readonly displayName = 'Youtube';
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
@@ -373,10 +373,12 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
 
     // otherwise return the last saved description and title for new the streaming session
     const settings = this.streamSettingsService.settings;
-    return {
+    const result = {
       title: settings.title,
       description: settings.description || (await this.fetchDefaultDescription()),
     };
+    this.SET_PREPOPULATED(true);
+    return result;
   }
 
   scheduleStream(
