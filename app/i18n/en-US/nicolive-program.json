@@ -157,7 +157,7 @@
           "message": "The block settings could not be fetched because of a network error.\nCheck the health of your Internet connection."
         },
         "400": {
-          "title": "The Block settings could not be added",
+          "title": "The block settings could not be added",
           "message": "The block settings could not be added.\n%{additionalMessage}"
         },
         "401": {
