@@ -291,8 +291,6 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
                   item.bounds_align === 0 &&
                   [1, 2].includes(item.bounds_type)
                 ) {
-                  console.log(sourceToAdd.width, sourceToAdd.height);
-
                   // Stretch
                   scale.x = item.bounds.x / sourceToAdd.width;
                   scale.y = item.bounds.y / sourceToAdd.height;
