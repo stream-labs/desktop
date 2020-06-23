@@ -59,13 +59,13 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
   }
 
   created() {
-    this.streamingService.actions.prepopulateInfo();
     this.settings = cloneDeep(this.view.goLiveSettings);
     const destinations = this.settings.destinations;
     Object.keys(destinations).forEach((dest: TPlatform) => {
       destinations[dest].enabled = true;
       if (!this.eligiblePlatforms.includes(dest)) delete destinations[dest];
     });
+    this.streamingService.actions.prepopulateInfo(this.selectedDestinations);
   }
 
   /**
