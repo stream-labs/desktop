@@ -78,7 +78,7 @@ export default class BaseLayout extends TsxComponent<LayoutProps> {
   }
 
   async getBarPixels(bar: 'bar1' | 'bar2') {
-    // Before we can access the componentInstance at least one render cycle needs to run
+    // Before we can access the clientRect at least one render cycle needs to run
     if (!this.firstRender) await this.$nextTick();
     this.firstRender = true;
     const { height, width } = this.$el.getBoundingClientRect();
@@ -129,7 +129,7 @@ export default class BaseLayout extends TsxComponent<LayoutProps> {
   }
 
   calculateMax(restMin: number) {
-    if (!this.$el) return 1000;
+    if (!this.$el) return;
     const { height, width } = this.$el.getBoundingClientRect();
     const max = this.isColumns ? width : height;
     return max - restMin;

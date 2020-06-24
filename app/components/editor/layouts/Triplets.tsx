@@ -7,6 +7,8 @@ import styles from './Layouts.m.less';
 
 @Component({ props: createProps(LayoutProps) })
 export default class Triplets extends BaseLayout {
+  isColumns = true;
+
   async mounted() {
     this.mountResize();
     this.setMins(['1', '4'], ['2', '5'], ['3', '6']);

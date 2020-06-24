@@ -7,6 +7,8 @@ import styles from './Layouts.m.less';
 
 @Component({ props: createProps(LayoutProps) })
 export default class TwoPane extends BaseLayout {
+  isColumns = true;
+
   async mounted() {
     this.mountResize();
     this.$emit('totalWidth', await this.mapVectors(['2', '5', ['1', ['3', '4']]]));
