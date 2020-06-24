@@ -1,17 +1,13 @@
 import TsxComponent from 'components/tsx-component';
 import { Watch } from 'vue-property-decorator';
-import { LayoutSlot, IVec2Array } from 'services/layout';
+import { LayoutSlot, LayoutService, IVec2Array } from 'services/layout';
 import BaseElement from 'components/editor/elements/BaseElement';
+import { Inject } from 'services/core';
+import { CustomizationService } from 'services/customization';
+import { WindowsService } from 'services/windows';
 
 export class LayoutProps {
-  resizeStartHandler: () => void = () => {};
-  resizeStopHandler: () => void = () => {};
-  calculateMin: (slots: IVec2Array) => number = () => 0;
-  calculateMax: (mins: number) => number = () => 0;
-  setBarResize: (bar: 'bar1' | 'bar2', size: number, mins?: IResizeMins) => void = () => {};
-  windowResizeHandler: (mins: IResizeMins, isChat?: boolean) => void = () => {};
-  resizes: { bar1: number; bar2: number } = null;
-  elWidth: number = 0;
+  onTotalWidth: (slots: IVec2Array, isColumns: boolean) => void = () => {};
 }
 
 export interface IResizeMins {
@@ -20,22 +16,50 @@ export interface IResizeMins {
   bar2?: number;
 }
 
-interface ILayoutSlotArray extends Array<ILayoutSlotArray | LayoutSlot> {}
+export interface ILayoutSlotArray extends Array<ILayoutSlotArray | LayoutSlot> {}
 
 export default class BaseLayout extends TsxComponent<LayoutProps> {
-  mins: IResizeMins = { rest: null, bar1: null };
-  firstRender: boolean;
+  @Inject() private layoutService: LayoutService;
+  @Inject() private customizationService: CustomizationService;
+  @Inject() private windowsService: WindowsService;
 
-  mountResize() {
-    window.addEventListener('resize', () => this.props.windowResizeHandler(this.mins));
-    if (this.bar1 < this.mins.bar1) this.props.setBarResize('bar1', this.mins.bar1);
-    if (this.mins.bar2 && this.bar2 < this.mins.bar2) {
-      this.props.setBarResize('bar2', this.mins.bar2);
+  mins: IResizeMins = { rest: null, bar1: null };
+  isColumns: boolean;
+  firstRender: boolean;
+  bar1: number = 0;
+  bar2: number = 0;
+
+  async mountResize() {
+    this.$emit('totalWidth', await this.mapVectors(this.vectors));
+    window.addEventListener('resize', () => this.updateSize());
+    this.migrateToProportions();
+    this.bar1 = await this.getBarPixels('bar1');
+    this.bar2 = await this.getBarPixels('bar2');
+    if (this.bar1 < this.mins.bar1) this.setBar('bar1', this.mins.bar1);
+    if (this.bar2 < this.mins.bar2) {
+      this.setBar('bar2', this.mins.bar2);
     }
-    this.props.windowResizeHandler(this.mins);
+    this.updateSize();
   }
   destroyResize() {
-    window.removeEventListener('resize', () => this.props.windowResizeHandler(this.mins));
+    window.removeEventListener('resize', () => this.updateSize());
+  }
+
+  migrateToProportions() {
+    if (this.resizes.bar1 >= 1) {
+      this.setBar('bar1', this.resizes.bar1);
+    }
+    if (this.resizes.bar2 >= 1) {
+      this.setBar('bar2', this.resizes.bar2);
+    }
+  }
+
+  get vectors(): ILayoutSlotArray {
+    return null;
+  }
+
+  get chatExpanded() {
+    return this.customizationService.state.livedockCollapsed;
   }
 
   async setMins(
@@ -49,6 +73,27 @@ export default class BaseLayout extends TsxComponent<LayoutProps> {
     this.mins = { rest, bar1, bar2 };
   }
 
+  get resizes() {
+    return this.layoutService.views.currentTab.resizes;
+  }
+
+  async getBarPixels(bar: 'bar1' | 'bar2') {
+    // Before we can access the componentInstance at least one render cycle needs to run
+    if (!this.firstRender) await this.$nextTick();
+    this.firstRender = true;
+    const { height, width } = this.$el.getBoundingClientRect();
+    return this.isColumns ? width * this.resizes[bar] : height * this.resizes[bar];
+  }
+
+  setBar(bar: 'bar1' | 'bar2', val: number) {
+    if (val === 0) return;
+    this[bar] = val;
+    const { height, width } = this.$el.getBoundingClientRect();
+    const totalSize = this.isColumns ? width : height;
+    const proportion = parseFloat((val / totalSize).toFixed(2));
+    this.layoutService.actions.setBarResize(bar, proportion);
+  }
+
   async minsFromSlot(slot: LayoutSlot) {
     // Before we can access the componentInstance at least one render cycle needs to run
     if (!this.firstRender) await this.$nextTick();
@@ -59,7 +104,7 @@ export default class BaseLayout extends TsxComponent<LayoutProps> {
   async calculateMinimum(slots: ILayoutSlotArray) {
     if (!slots) return;
     const mins = await this.mapVectors(slots);
-    return this.props.calculateMin(mins);
+    return this.calculateMin(mins);
   }
 
   async mapVectors(slots: ILayoutSlotArray): Promise<IVec2Array> {
@@ -71,19 +116,28 @@ export default class BaseLayout extends TsxComponent<LayoutProps> {
     );
   }
 
-  get totalWidth() {
-    return this.props.elWidth;
+  calculateMin(slots: IVec2Array) {
+    return this.layoutService.views.calculateMinimum(this.isColumns ? 'x' : 'y', slots);
   }
 
-  @Watch('totalWidth')
-  updateSize() {
-    this.props.windowResizeHandler(this.mins, true);
+  resizeStartHandler() {
+    this.windowsService.actions.updateStyleBlockers('main', true);
   }
 
-  get bar1(): number {
-    return null;
+  resizeStopHandler() {
+    this.windowsService.actions.updateStyleBlockers('main', false);
   }
-  get bar2(): number {
-    return null;
+
+  calculateMax(restMin: number) {
+    if (!this.$el) return 1000;
+    const { height, width } = this.$el.getBoundingClientRect();
+    const max = this.isColumns ? width : height;
+    return max - restMin;
+  }
+
+  @Watch('chatExpanded')
+  async updateSize() {
+    this.bar1 = await this.getBarPixels('bar1');
+    this.bar2 = await this.getBarPixels('bar2');
   }
 }

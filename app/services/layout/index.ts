@@ -39,10 +39,6 @@ class LayoutViews extends ViewHandler<ILayoutServiceState> {
     return LAYOUT_DATA[this.currentTab.currentLayout].component;
   }
 
-  get isColumnLayout() {
-    return LAYOUT_DATA[this.currentTab.currentLayout].isColumns;
-  }
-
   elementTitle(element: ELayoutElement) {
     if (!element) return;
     return ELEMENT_DATA()[element].title;

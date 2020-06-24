@@ -1,5 +1,5 @@
 import cx from 'classnames';
-import BaseLayout, { LayoutProps, IResizeMins } from './BaseLayout';
+import BaseLayout, { LayoutProps, ILayoutSlotArray } from './BaseLayout';
 import { Component } from 'vue-property-decorator';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import styles from './Layouts.m.less';
@@ -9,25 +9,14 @@ import { createProps } from 'components/tsx-component';
 export default class Default extends BaseLayout {
   async mounted() {
     this.mountResize();
-    this.$emit('totalWidth', await this.mapVectors(['1', '2', ['3', '4', '5']]));
     this.setMins(['1'], ['2'], ['3', '4', '5']);
   }
   destroyed() {
     this.destroyResize();
   }
 
-  get bar1() {
-    return this.props.resizes.bar1;
-  }
-  set bar1(size: number) {
-    this.props.setBarResize('bar1', size, this.mins);
-  }
-
-  get bar2() {
-    return this.props.resizes.bar2;
-  }
-  set bar2(size: number) {
-    this.props.setBarResize('bar2', size, this.mins);
+  get vectors() {
+    return ['1', '2', ['3', '4', '5']] as ILayoutSlotArray;
   }
 
   get bottomSection() {
@@ -48,10 +37,11 @@ export default class Default extends BaseLayout {
         </div>
         <ResizeBar
           position="top"
-          vModel={this.bar1}
-          onResizestart={() => this.props.resizeStartHandler()}
-          onResizestop={() => this.props.resizeStopHandler()}
-          max={this.props.calculateMax(this.mins.rest + this.bar2)}
+          value={this.bar1}
+          onInput={(value: number) => this.setBar('bar1', value)}
+          onResizestart={() => this.resizeStartHandler()}
+          onResizestop={() => this.resizeStopHandler()}
+          max={this.calculateMax(this.mins.rest + this.bar2)}
           min={this.mins.bar1}
           reverse={true}
         />
@@ -60,10 +50,11 @@ export default class Default extends BaseLayout {
         </div>
         <ResizeBar
           position="top"
-          vModel={this.bar2}
-          onResizestart={() => this.props.resizeStartHandler()}
-          onResizestop={() => this.props.resizeStopHandler()}
-          max={this.props.calculateMax(this.mins.rest + this.mins.bar1)}
+          value={this.bar2}
+          onInput={(value: number) => this.setBar('bar2', value)}
+          onResizestart={() => this.resizeStartHandler()}
+          onResizestop={() => this.resizeStopHandler()}
+          max={this.calculateMax(this.mins.rest + this.mins.bar1)}
           min={this.mins.bar2}
           reverse={true}
         />
