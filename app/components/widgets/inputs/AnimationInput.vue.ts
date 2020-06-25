@@ -131,3 +131,22 @@ export default class AnimationInput extends BaseInput<string, IAnimationMetadata
     };
   }
 }
+
+
+// get listInputMetadata() {
+//   const animations = [].concat(COMMON_ANIMATIONS);
+//   if (this.options.filter === 'in') {
+//     animations.push(...IN_ANIMATIONS);
+//   } else if (this.options.filter === 'out') {
+//     animations.push(...OUT_ANIMATIONS);
+//   } else {
+//     animations.push(...IN_ANIMATIONS, ...OUT_ANIMATIONS);
+//   }
+//   if (this.options.filter === 'text') {
+//     return { ...this.options, options: textAnimations() };
+//   }
+//   return {
+//     ...this.options,
+//     options: animations.map(animationName => ({ title: animationName, value: animationName })),
+//   };
+// }
