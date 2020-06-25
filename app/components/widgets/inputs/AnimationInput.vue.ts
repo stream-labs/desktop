@@ -5,6 +5,22 @@ import { BaseInput } from 'components/shared/inputs/BaseInput';
 import { IAnimationMetadata } from './index';
 import { $t } from 'services/i18n';
 
+// const COMMON_ANIMATIONS = [
+//   'bounce',
+//   'flash',
+//   'pulse',
+//   'rubberBand',
+//   'shake',
+//   'headShake',
+//   'swing',
+//   'tada',
+//   'wobble',
+//   'jello',
+//   'flip',
+//   'hinge',
+//   'jackInTheBox',
+// ];
+
 const inAnimations = () => [
   { title: $t('Bounce In'), value: 'bounceIn' },
   { title: $t('Bounce In Down'), value: 'bounceInDown' },
