@@ -164,7 +164,6 @@ export default class AnimationInput extends BaseInput<string, IAnimationMetadata
   readonly title: string;
 
   get listInputMetadata() {
-
     switch (this.options.filter) {
       case 'in':
         return { ...this.options, options: inAnimations() };
