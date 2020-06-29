@@ -36,7 +36,7 @@ export default class GoLiveSuccess extends TsxComponent<{}> {
   }
 
   private get title() {
-    return this.view.goLiveSettings.commonFields.title;
+    return this.view.commonFields.title;
   }
 
   private openLink(url: string) {
@@ -97,7 +97,7 @@ export default class GoLiveSuccess extends TsxComponent<{}> {
         {this.twitterService.isEnabled && (
           <Twitter
             style={{ width: '750px' }}
-            streamTitle={this.view.goLiveSettings.commonFields.title}
+            streamTitle={this.view.commonFields.title}
             value={this.streamInfoText}
           />
         )}

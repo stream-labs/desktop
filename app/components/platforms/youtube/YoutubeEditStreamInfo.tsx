@@ -15,17 +15,14 @@ import {
 import CommonPlatformFields from '../CommonPlatformFields';
 import { StreamingService } from '../../../app-services';
 import { SyncWithValue } from '../../../services/app/app-decorators';
+import { IStreamSettings } from '../../../services/streaming';
 
-class YoutubeEditStreamInfoProps {
-  value?: IYoutubeStartStreamOptions = {
-    description: '',
-    title: '',
-    broadcastId: '',
-  };
+class Props {
+  value?: IStreamSettings;
 }
 
-@Component({ components: { ValidatedForm }, props: createProps(YoutubeEditStreamInfoProps) })
-export default class YoutubeEditStreamInfo extends TsxComponent<YoutubeEditStreamInfoProps> {
+@Component({ components: { ValidatedForm }, props: createProps(Props) })
+export default class YoutubeEditStreamInfo extends TsxComponent<Props> {
   @Inject() private youtubeService: YoutubeService;
   @Inject() private streamingService: StreamingService;
   @SyncWithValue() settings: IYoutubeStartStreamOptions = null;
@@ -91,11 +88,7 @@ export default class YoutubeEditStreamInfo extends TsxComponent<YoutubeEditStrea
               metadata={this.formMetadata.event}
             />
           </HFormGroup>
-          <CommonPlatformFields
-            vModel={this.settings}
-            hasCustomCheckbox={this.view.isMutliplatformMode}
-            platforms={['youtube']}
-          />
+          <CommonPlatformFields vModel={this.settings} platform={'youtube'} />
         </ValidatedForm>
       )
     );

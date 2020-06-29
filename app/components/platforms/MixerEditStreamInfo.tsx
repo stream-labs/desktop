@@ -36,11 +36,7 @@ export default class MixerEditStreamInfo extends TsxComponent<Props> {
       <div>
         {!canShowOnlyRequiredFields && (
           <ValidatedForm>
-            <CommonPlatformFields
-              vModel={this.settings}
-              hasCustomCheckbox={this.view.isMutliplatformMode}
-              platforms={['mixer']}
-            />
+            <CommonPlatformFields vModel={this.settings} platform="mixer" />
           </ValidatedForm>
         )}
         {/*<HFormGroup metadata={this.metadata.game} vModel={this.settings.game} />*/}

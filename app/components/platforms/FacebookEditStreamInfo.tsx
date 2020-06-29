@@ -10,25 +10,18 @@ import { ListInput } from '../shared/inputs/inputs';
 import { formMetadata, IListOption, metadata } from '../shared/inputs';
 import { $t } from '../../services/i18n';
 import { FacebookService, IFacebookStartStreamOptions } from '../../services/platforms/facebook';
-import { IGoLiveSettings, StreamingService } from '../../services/streaming';
+import { IGoLiveSettings, IStreamSettings, StreamingService } from '../../services/streaming';
 import { SyncWithValue } from '../../services/app/app-decorators';
 
 class Props {
-  goLiveSettings: IGoLiveSettings = null;
-  value?: IGoLiveSettings['destinations']['facebook'] = {
-    facebookPageId: '',
-    title: '',
-    game: '',
-    enabled: true,
-    useCustomFields: false,
-  };
+  value?: IStreamSettings = null;
 }
 
 @Component({ props: createProps(Props) })
 export default class FacebookEditStreamInfo extends TsxComponent<Props> {
   @Inject() private facebookService: FacebookService;
   @Inject() private streamingService: StreamingService;
-  @SyncWithValue() settings: IFacebookStartStreamOptions = null;
+  @SyncWithValue() settings: IStreamSettings = null;
 
   get view() {
     return this.streamingService.views;
@@ -53,15 +46,14 @@ export default class FacebookEditStreamInfo extends TsxComponent<Props> {
     return (
       <ValidatedForm onInput={this.emitInput}>
         <HFormGroup title={this.formMetadata.page.title}>
-          <ListInput vModel={this.settings.facebookPageId} metadata={this.formMetadata.page} />
+          <ListInput
+            vModel={this.settings.destinations.facebook.facebookPageId}
+            metadata={this.formMetadata.page}
+          />
         </HFormGroup>
 
         {!showOnlyRequiredFields && (
-          <CommonPlatformFields
-            vModel={this.settings}
-            hasCustomCheckbox={this.view.isMutliplatformMode}
-            platforms={['facebook']}
-          />
+          <CommonPlatformFields vModel={this.settings} platform={'facebook'} key="facebook" />
         )}
       </ValidatedForm>
     );

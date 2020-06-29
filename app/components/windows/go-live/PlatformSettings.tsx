@@ -96,12 +96,7 @@ export default class PlatformSettings extends TsxComponent<{ onInput?: any }> {
           {shouldShowSettings && (
             <div style={{ width: '100%' }}>
               {/*COMMON FIELDS*/}
-              {isMultiplePlatformMode && (
-                <CommonPlatformFields
-                  vModel={this.settings.commonFields}
-                  platforms={enabledPlatforms}
-                />
-              )}
+              {isMultiplePlatformMode && <CommonPlatformFields vModel={this.settings} />}
 
               {/*SETTINGS FOR EACH ENABLED PLATFORM*/}
               {enabledPlatforms.map((platform: TPlatform) => this.renderPlatformSettings(platform))}
@@ -120,25 +115,10 @@ export default class PlatformSettings extends TsxComponent<{ onInput?: any }> {
     const title = $t('%{platform} Settings', { platform: this.getPlatformName(platform) });
     return (
       <Section title={title} isSimpleMode={!isAdvancedMode}>
-        {platform === 'twitch' && (
-          <TwitchEditStreamInfo
-            vModel={this.settings.destinations.twitch}
-            onInput={(val: boolean) => console.log('Platform change', val)}
-          />
-        )}
-
-        {platform === 'facebook' && (
-          <FacebookEditStreamInfo
-            vModel={this.settings.destinations.facebook}
-            goLiveSettings={this.settings}
-          />
-        )}
-
-        {platform === 'youtube' && (
-          <YoutubeEditStreamInfo vModel={this.settings.destinations.youtube} />
-        )}
-
-        {platform === 'mixer' && <MixerEditStreamInfo vModel={this.settings.destinations.mixer} />}
+        {platform === 'twitch' && <TwitchEditStreamInfo vModel={this.settings} />}
+        {platform === 'facebook' && <FacebookEditStreamInfo vModel={this.settings} />}
+        {platform === 'youtube' && <YoutubeEditStreamInfo vModel={this.settings} />}
+        {platform === 'mixer' && <MixerEditStreamInfo vModel={this.settings} />}
       </Section>
     );
   }

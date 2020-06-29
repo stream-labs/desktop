@@ -52,22 +52,17 @@ export interface IStreamInfo {
 export type TGoLiveChecklistItemState = 'not-started' | 'pending' | 'done' | 'failed';
 
 export interface IStreamSettings {
-  commonFields: {
-    title: string;
-    description: string;
-    game: string;
-  };
   destinations: {
     twitch: IPlatformFlags & ITwitchStartStreamOptions;
     youtube: IPlatformFlags & IYoutubeStartStreamOptions;
     facebook: IPlatformFlags & IFacebookStartStreamOptions;
     mixer: IPlatformFlags & IMixerStartStreamOptions;
   };
+  advancedMode: boolean;
 }
 
 export interface IGoLiveSettings extends IStreamSettings {
   optimizedProfile: IEncoderProfile;
-  advancedMode: boolean;
 }
 
 export interface IPlatformCommonFields {

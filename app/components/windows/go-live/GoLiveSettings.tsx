@@ -109,6 +109,7 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
           <DestinationSwitchers
             value={this.settings.destinations}
             title="Stream to %{platformName}"
+            canDisablePrimary={false}
             handleOnSwitch={(...args) => this.switchPlatform(...args)}
           />
           {/*ADD DESTINATION BUTTON*/}

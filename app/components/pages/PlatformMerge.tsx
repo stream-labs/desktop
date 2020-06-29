@@ -55,7 +55,8 @@ export default class PlatformMerge extends TsxComponent<PlatformMergeProps> {
   }
 
   private async mergePlatform(platform: TPlatform) {
-    await this.userService.startAuth(platform, 'internal', true);
+    const mode = platform === 'youtube' ? 'external' : 'internal';
+    await this.userService.startAuth(platform, mode, true);
     this.streamSettingsService.setSettings({ protectedModeEnabled: true });
 
     if (this.props.params.overlayUrl) {

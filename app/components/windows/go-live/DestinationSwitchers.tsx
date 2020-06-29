@@ -16,6 +16,7 @@ type TDestinations = Partial<Record<TPlatform, { enabled: boolean }>>;
 class Props {
   title?: string = '';
   value?: TDestinations = {};
+  canDisablePrimary: boolean = false;
   handleOnSwitch?: (platform: TPlatform, enabled: boolean) => unknown = () => null;
 }
 
@@ -51,22 +52,27 @@ export class DestinationSwitchers extends TsxComponent<Props> {
     const platformName = platformService.displayName;
     const username = this.userService.state.auth.platforms[platform].username;
     const title = this.props.title ? $t(this.props.title, { platformName }) : platformName;
+    const shouldShowToggle = !isPrimary || this.props.canDisablePrimary;
+    const shouldShowNotificator = !shouldShowToggle;
+    const shouldShowLeftColumn = Object.keys(this.destinations).length > 1;
     return (
       <div
         class={cx(styles.platformSwitcher, { [styles.platformDisabled]: !enabled })}
         onClick={() => this.onSwitchHandler(platform, !enabled)}
       >
-        <div class={cx(styles.colInput, isPrimary && styles.colPrimary)}>
-          {isPrimary && (
-            <i
-              class="fa fa-info-circle"
-              vTooltip={$t(
-                'You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destination.',
-              )}
-            />
-          )}
-          {!isPrimary && <ToggleInput value={enabled} />}
-        </div>
+        {shouldShowLeftColumn && (
+          <div class={cx(styles.colInput, isPrimary && styles.colPrimary)}>
+            {shouldShowNotificator && (
+              <i
+                class="fa fa-info-circle"
+                vTooltip={$t(
+                  'You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destination.',
+                )}
+              />
+            )}
+            {shouldShowToggle && <ToggleInput value={enabled} />}
+          </div>
+        )}
         <div class="logo margin-right--20">
           <PlatformLogo platform={platform} class={styles[`platform-logo-${platform}`]} />
         </div>

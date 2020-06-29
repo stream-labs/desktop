@@ -21,6 +21,7 @@
     :loading="options.loading"
     :disabled="options.disabled"
     :allow-custom="options.hasCustomCheckbox"
+    :taggable="options.taggable"
     @input="onInputHandler"
     @search-change="onSearchChangeHandler"
   >

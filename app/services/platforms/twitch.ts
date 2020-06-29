@@ -225,7 +225,7 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
   /**
    * Request Twitch API and wrap failed response to a unified error model
    */
-  private async requestTwitch<T = unknown>(reqInfo: IPlatformRequest | string): Promise<T> {
+  async requestTwitch<T = unknown>(reqInfo: IPlatformRequest | string): Promise<T> {
     try {
       return await platformAuthorizedRequest<T>('twitch', reqInfo);
     } catch (e) {

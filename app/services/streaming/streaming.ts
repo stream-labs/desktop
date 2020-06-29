@@ -272,7 +272,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
 
     this.UPDATE_STREAM_INFO({ lifecycle: 'live' });
-    this.createGameAssociation(this.views.game);
+    this.createGameAssociation(this.views.commonFields.game);
   }
 
   /**
@@ -768,7 +768,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
         try {
           streamEncoderInfo = this.outputSettingsService.getSettings();
-          game = this.views.game;
+          game = this.views.commonFields.game;
         } catch (e) {
           console.error('Error fetching stream encoder info: ', e);
         }
@@ -1074,23 +1074,60 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     });
 
     return {
-      commonFields: {
-        title,
-        description,
-        game: '',
-      },
       destinations: destinations as IGoLiveSettings['destinations'],
       optimizedProfile: null,
       advancedMode: false,
     };
   }
 
-  get game(): string {
-    return this.goLiveSettings.commonFields.game;
-  }
-
   get canShowOnlyRequiredFields(): boolean {
     return this.enabledPlatforms.length > 1 && !this.goLiveSettings.advancedMode;
+  }
+
+  /**
+   * return common fields for the stream such title, description, game
+   */
+  getCommonFields(settings: IStreamSettings) {
+    const commonFields = {
+      title: '',
+      description: '',
+      game: '',
+    };
+    const destinations = Object.keys(settings.destinations) as TPlatform[];
+    const enabledDestinations = destinations.filter(dest => settings.destinations[dest].enabled);
+    const destinationsWithCommonSettings = enabledDestinations.filter(
+      dest => !settings.destinations[dest].useCustomFields,
+    );
+    const destinationWithCustomSettings = difference(
+      enabledDestinations,
+      destinationsWithCommonSettings,
+    );
+
+    // search fields in platforms that don't use custom settings first
+    destinationsWithCommonSettings.forEach(platform => {
+      const destSettings = settings.destinations[platform];
+      Object.keys(commonFields).forEach(fieldName => {
+        if (commonFields[fieldName] || !destSettings[fieldName]) return;
+        commonFields[fieldName] = destSettings[fieldName];
+      });
+    });
+
+    destinationWithCustomSettings.forEach(platform => {
+      const destSettings = settings.destinations[platform];
+      Object.keys(commonFields).forEach(fieldName => {
+        if (commonFields[fieldName] || !destSettings[fieldName]) return;
+        commonFields[fieldName] = destSettings[fieldName];
+      });
+    });
+
+    return commonFields;
+  }
+
+  /**
+   * return common fields for the stream such title, description, game
+   */
+  get commonFields(): { title: string; description: string; game: string } {
+    return this.getCommonFields(this.goLiveSettings);
   }
 
   /**
@@ -1126,44 +1163,44 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   }
 
   isPlatformLinked(platform: TPlatform): boolean {
-    return !!this.userService.state.auth.platforms[platform];
+    return !!this.userService.state.auth?.platforms[platform];
   }
 
   isPrimaryPlatform(platform: TPlatform) {
-    return platform === this.userService.state.auth.primaryPlatform;
+    return platform === this.userService.state.auth?.primaryPlatform;
   }
 
-  /**
-   * Returns merged common settings + required platform settings
-   */
-  getPlatformSettings<T extends IStreamSettings>(
-    platform: TPlatform,
-    settings: T,
-  ): IPlatformFlags & IPlatformCommonFields {
-    const platformSettings = settings.destinations[platform];
-    const enabledPlatforms = Object.keys(settings.destinations).filter(
-      dest => settings.destinations[dest].enabled,
-    );
-
-    // if platform use custom settings, than return without merging
-    if (platformSettings.useCustomFields || enabledPlatforms.length === 1) return platformSettings;
-
-    // otherwise merge common settings
-    const commonFields = {
-      title: settings.commonFields.title,
-    };
-    if (this.supports('description', platform)) {
-      commonFields['description'] = settings.commonFields.description;
-    }
-
-    if (this.supports('game', platform)) {
-      commonFields['game'] = settings.commonFields.game;
-    }
-    return {
-      ...platformSettings,
-      ...commonFields,
-    };
-  }
+  // /**
+  //  * Returns merged common settings + required platform settings
+  //  */
+  // getPlatformSettings<T extends IStreamSettings>(
+  //   platform: TPlatform,
+  //   settings: T,
+  // ): IPlatformFlags & IPlatformCommonFields {
+  //   const platformSettings = settings.destinations[platform];
+  //   const enabledPlatforms = Object.keys(settings.destinations).filter(
+  //     dest => settings.destinations[dest].enabled,
+  //   );
+  //
+  //   // if platform use custom settings, than return without merging
+  //   if (platformSettings.useCustomFields || enabledPlatforms.length === 1) return platformSettings;
+  //
+  //   // otherwise merge common settings
+  //   const commonFields = {
+  //     title: settings.commonFields.title,
+  //   };
+  //   if (this.supports('description', platform)) {
+  //     commonFields['description'] = settings.commonFields.description;
+  //   }
+  //
+  //   if (this.supports('game', platform)) {
+  //     commonFields['game'] = settings.commonFields.game;
+  //   }
+  //   return {
+  //     ...platformSettings,
+  //     ...commonFields,
+  //   };
+  // }
 
   sanitizeSettings<T extends IStreamSettings>(settings: T): T {
     settings = cloneDeep(settings);
@@ -1175,18 +1212,11 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
       if (!linkedPlatforms.includes(destName)) delete destinations[destName];
     });
 
-    // add linked platforms if not exist
+    // add default settings for just linked platforms
     difference(linkedPlatforms, Object.keys(destinations) as TPlatform[]).forEach(destName => {
       // TODO: fix types
       // @ts-ignore
       destinations[destName] = this.getDefaultPlatformSettings(destName);
-    });
-
-    // set common fields for each platform
-    Object.keys(destinations).forEach((destName: TPlatform) => {
-      // TODO: fix types
-      // @ts-ignore
-      destinations[destName] = this.getPlatformSettings(destName, settings);
     });
     return settings;
   }
@@ -1197,11 +1227,11 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   validateSettings<T extends IStreamSettings>(settings: T): string {
     const platforms = Object.keys(settings.destinations) as TPlatform[];
     for (const platform of platforms) {
-      const platformSettings = this.getPlatformSettings(platform, settings);
+      const platformSettings = settings.destinations[platform];
       if (!platformSettings.enabled) continue;
       const platformName = getPlatformService(platform).displayName;
       if (platform === 'twitch' || platform === 'facebook') {
-        if (!platformSettings.game) {
+        if (!platformSettings['game']) {
           return $t('You must select a game for %{platformName}', { platformName });
         }
       }

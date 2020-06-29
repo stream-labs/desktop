@@ -53,9 +53,10 @@ export class StreamingRecordingModule extends Module {
 
   private serializeStreamInfo(): IStreamInfo {
     const info = this.streamingService.views;
+    const commonFields = info.commonFields;
     return {
-      title: info.goLiveSettings.commonFields.title,
-      game: info.game,
+      title: commonFields.title,
+      game: commonFields.game,
       viewerCount: info.viewerCount,
     };
   }

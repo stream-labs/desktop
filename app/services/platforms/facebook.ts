@@ -372,9 +372,8 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   async searchGames(searchString: string): Promise<IGame[]> {
     if (searchString.length < 2) return [];
     return this.requestFacebook<{ data: IGame[] }>(
-      'facebook',
       `${this.apiBase}/v3.2/search?type=game&q=${searchString}`,
-    ).then(json => json.data);
+    ).then(json => json.data.slice(0, 15));
   }
 
   private getChatUrl(): string {

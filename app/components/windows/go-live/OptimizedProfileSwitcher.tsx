@@ -21,7 +21,7 @@ export class OptimizedProfileSwitcher extends TsxComponent<Props> {
   @SyncWithValue() private selectedProfile: IEncoderProfile;
 
   get game() {
-    return this.props.settings.commonFields.game;
+    return this.props.settings.destinations.twitch.game;
   }
 
   @Watch('game')

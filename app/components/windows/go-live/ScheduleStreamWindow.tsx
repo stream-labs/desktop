@@ -1,16 +1,13 @@
 import TsxComponent from 'components/tsx-component';
 import ModalLayout from 'components/ModalLayout.vue';
 import { $t } from 'services/i18n';
-import { Component, Watch } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import styles from './GoLive.m.less';
 import { Inject } from 'services/core';
 import { UserService } from 'services/user';
-import { BoolInput, ToggleInput } from 'components/shared/inputs/inputs';
-import cx from 'classnames';
 import { formMetadata, IListOption, metadata } from 'components/shared/inputs';
 import { SettingsService } from 'services/settings';
 import HFormGroup from '../../shared/inputs/HFormGroup.vue';
-import { IEncoderProfile } from 'services/video-encoding-optimizations';
 import { WindowsService } from 'services/windows';
 import { IGoLiveSettings, IStreamSettings, StreamingService } from 'services/streaming';
 
@@ -167,7 +164,7 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
           class="flex"
         >
           <div style={{ width: '400px', marginRight: '42px' }}>
-            <DestinationSwitchers vModel={this.settings.destinations} />
+            <DestinationSwitchers vModel={this.settings.destinations} canDisablePrimary={true} />
           </div>
           <div style={{ width: '100%' }}>
             {shouldShowSettings && (
