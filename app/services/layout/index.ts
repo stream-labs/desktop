@@ -208,7 +208,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   @mutation()
   SET_RESIZE(bar: 'bar1' | 'bar2', size: number) {
-    this.state.tabs[this.state.currentTab].resizes[bar] = size;
+    Vue.set(this.state.tabs[this.state.currentTab].resizes, bar, size);
   }
 
   @mutation()
