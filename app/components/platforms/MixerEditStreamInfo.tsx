@@ -10,36 +10,26 @@ import { SyncWithValue } from '../../services/app/app-decorators';
 import HFormGroup from '../shared/inputs/HFormGroup.vue';
 import { formMetadata, metadata } from '../shared/inputs';
 import { $t } from '../../services/i18n';
+import BaseEditSteamInfo from './BaseEditSteamInfo';
+import { IStreamSettings } from '../../services/streaming';
 
 class Props {}
 
 @Component({ props: createProps(Props) })
-export default class MixerEditStreamInfo extends TsxComponent<Props> {
+export default class MixerEditStreamInfo extends BaseEditSteamInfo<Props> {
   @Inject() private mixerService: MixerService;
   @Inject() private streamingService: StreamingService;
   @SyncWithValue()
-  settings: IMixerStartStreamOptions = null;
-
-  private get view() {
-    return this.streamingService.views;
-  }
-
-  private get metadata() {
-    return formMetadata({
-      game: metadata.text({ title: $t('Game'), required: true, fullWidth: true }),
-    });
-  }
+  protected settings: IStreamSettings = null;
 
   render(createElement: Function) {
-    const canShowOnlyRequiredFields = this.view.canShowOnlyRequiredFields;
     return (
       <div>
-        {!canShowOnlyRequiredFields && (
+        {!this.canShowOnlyRequiredFields && (
           <ValidatedForm>
             <CommonPlatformFields vModel={this.settings} platform="mixer" />
           </ValidatedForm>
         )}
-        {/*<HFormGroup metadata={this.metadata.game} vModel={this.settings.game} />*/}
       </div>
     );
   }

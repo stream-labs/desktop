@@ -94,7 +94,7 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
   private render() {
     const isSinglePlatformMode = !!this.props.platform;
     const disabled = this.targetPlatforms.length === 0;
-    const hasCustomCheckbox = isSinglePlatformMode && this.enabledPlatforms.length > 1;
+    const hasCustomCheckbox = isSinglePlatformMode && this.settings.advancedMode;
     const fieldsAreVisible = !hasCustomCheckbox || this.platformSettings.useCustomFields;
     const view = this.streamingService.views;
     const hasDescription = isSinglePlatformMode
@@ -108,13 +108,13 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
     // find out the best title for common fields
     let title = '';
     if (hasDescription && hasGame) {
-      title = $t('Use custom title, game and description');
+      title = $t('Use different title, game and description');
     } else if (hasDescription) {
-      title = $t('Use custom title and description');
+      title = $t('Use different title and description');
     } else if (hasGame) {
-      title = $t('Use custom title and game');
+      title = $t('Use different title and game');
     } else {
-      title = $t('Use custom title');
+      title = $t('Use different title');
     }
 
     return (

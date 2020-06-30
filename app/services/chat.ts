@@ -24,6 +24,7 @@ export class ChatService extends Service {
   init() {
     // listen `streamInfoChanged` to init or deinit the chat
     this.chatUrl = this.streamingService.views.chatUrl;
+    if (this.chatUrl) this.initChat();
     this.streamingService.streamInfoChanged.subscribe(streamInfo => {
       if (streamInfo.chatUrl === void 0) return; // chatUrl has not been changed
 

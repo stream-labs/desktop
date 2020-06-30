@@ -93,10 +93,6 @@ export default class StartStreamingButton extends Vue {
     return this.streamingService.state.streamingStatus;
   }
 
-  get shouldShowEditButton() {
-    return this.isMidStream && this.streamingService.views.enabledPlatforms.length > 0;
-  }
-
   shouldShowGoLiveWindow() {
     if (!this.userService.isLoggedIn) return false;
 

@@ -150,7 +150,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   };
 
   readonly platform = 'youtube';
-  readonly displayName = 'Youtube';
+  readonly displayName = 'YouTube';
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 1000,
@@ -442,7 +442,6 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
 
     this.PATCH_STATE({
       ...info,
-      chatUrl: this.getChatUrl(broadCastId),
       streamPageUrl: this.getSteamUrl(broadCastId),
       dashboardUrl: this.getDashboardUrl(channelId),
       settings,
@@ -738,7 +737,9 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     return (await this.fetchBroadcasts([id], 1, fields))[0];
   }
 
-  private getChatUrl(broadcastId: string) {
+  get chatUrl() {
+    const broadcastId = this.state.settings.broadcastId;
+    if (!broadcastId) return '';
     const mode = this.customizationService.isDarkTheme ? 'night' : 'day';
     const youtubeDomain = mode === 'day' ? 'https://youtube.com' : 'https://gaming.youtube.com';
     return `${youtubeDomain}/live_chat?v=${broadcastId}&is_popout=1`;

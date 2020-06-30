@@ -2,7 +2,6 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
 import cx from 'classnames';
 import { BaseInput } from 'components/shared/inputs/BaseInput';
 import { IListMetadata, IListOption } from 'components/shared/inputs';
-import VSelectPageWrapper from 'components/shared/VSelectPage.vue';
 import { ListInput } from './inputs';
 import styles from './TagsInput.m.less';
 import { modifiers as m } from 'vue-tsx-support';
@@ -18,9 +17,8 @@ interface IOptionData {
 }
 
 class Props {
-  max?: number = null;
-  handleOnSearch: (str: string) => unknown = () => null;
-  handleOnSelect: (option: IListOption) => unknown = () => null;
+  handleOnSearch?: (str: string) => unknown = () => null;
+  handleOnSelect?: (option: IListOption) => unknown = () => null;
 }
 
 @Component({ props: createProps(Props) })

@@ -45,10 +45,6 @@ export default class GoLiveWindow extends TsxComponent<{}> {
     return this.streamingService.views;
   }
 
-  private get isAdvancedMode() {
-    return this.view.goLiveSettings.advancedMode;
-  }
-
   private get lifecycle() {
     return this.view.info.lifecycle;
   }
@@ -58,6 +54,13 @@ export default class GoLiveWindow extends TsxComponent<{}> {
     if (this.lifecycle === 'empty') {
       this.streamingService.actions.prepopulateInfo();
     }
+  }
+
+  @Watch('view.goLiveSettings')
+  onGoLiveSettingUpdateHandler() {
+    // update local settings after settings for platforms have been prepopulated
+    console.log('goLiveSettingsUpdated');
+    this.settings = cloneDeep(this.streamingService.views.goLiveSettings);
   }
 
   private async switchAdvancedMode(enabled: boolean) {
@@ -167,10 +170,10 @@ export default class GoLiveWindow extends TsxComponent<{}> {
         {/* ADVANCED MODE SWITCHER */}
         {shouldShowAdvancedSwitch && (
           <div class={styles.modeToggle}>
-            <HFormGroup
+            <div>{$t('Show Advanced Settings')}</div>
+            <ToggleInput
               onInput={(val: boolean) => this.switchAdvancedMode(val)}
-              value={this.isAdvancedMode}
-              metadata={metadata.toggle({ title: $t('Advanced Mode') })}
+              value={this.settings.advancedMode}
             />
           </div>
         )}

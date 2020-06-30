@@ -11,7 +11,6 @@ import { SyncWithValue } from '../../../services/app/app-decorators';
 import { IStreamSettings, StreamingService } from 'services/streaming';
 import { Inject } from '../../../services/core';
 import { flatten, sortBy } from 'lodash';
-import styles from './GameSelector.m.less';
 import PlatformLogo from '../../shared/PlatformLogo';
 
 interface IGameOptionData {
@@ -187,17 +186,22 @@ export default class GameSelector extends TsxComponent<Props> {
   }
 
   render() {
-    return (
+    return this.targetPlatforms.length > 1 ? (
       <TagsInput
         ref="tagsInput"
-        max={this.targetPlatforms.length}
         handleOnSearch={val => this.onGameSearchHandler(val)}
-        handleOnSelect={val => this.onSelectHandler(val)}
-        class={styles.gameSelector}
+        handleOnSelect={(val: TGameOption) => this.onSelectHandler(val)}
         value={this.gameSelectorValue}
         onInput={(values: string[]) => this.onInputHandler(values)}
         metadata={this.gameMetadata}
         scopedSlots={{ item: (props: IItemSlotScope) => this.renderItem(props) }}
+      />
+    ) : (
+      <ListInput
+        handleSearchChange={val => this.onGameSearchHandler(val)}
+        value={this.gameSelectorValue[0]}
+        onInput={(val: string) => this.onInputHandler([val])}
+        metadata={this.gameMetadata}
       />
     );
   }

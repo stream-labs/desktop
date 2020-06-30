@@ -196,7 +196,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
     // use default settings if no new settings provided
     if (!settings) settings = cloneDeep(this.views.goLiveSettings);
-    settings = this.views.sanitizeSettings(settings);
+    // settings = this.views.sanitizeSettings(settings);
     this.streamSettingsService.setSettings({ goLiveSettings: settings });
     this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist' });
 
@@ -279,7 +279,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
    * Update stream stetting while being live
    */
   async updateStreamSettings(settings: IGoLiveSettings) {
-    settings = this.views.sanitizeSettings(settings);
+    // settings = this.views.sanitizeSettings(settings);
 
     // run checklist
     this.RESET_STREAM_INFO();
@@ -306,7 +306,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   async scheduleStream(settings: IStreamSettings, time: string) {
-    settings = this.views.sanitizeSettings(settings);
+    // settings = this.views.sanitizeSettings(settings);
     const destinations = settings.destinations;
     const platforms = (Object.keys(destinations) as TPlatform[]).filter(
       dest => destinations[dest].enabled && this.views.supports('stream-schedule', dest),
@@ -621,7 +621,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   showGoLiveWindow() {
     const height = 750;
     const width = 900;
-    const mainWinBounds = this.windowsService.getBounds('main');
 
     this.windowsService.showWindow({
       componentName: 'GoLiveWindow',
@@ -629,10 +628,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       size: {
         height,
         width,
-      },
-      position: {
-        x: mainWinBounds.x + mainWinBounds.width - width,
-        y: mainWinBounds.y + mainWinBounds.height - height,
       },
     });
   }
@@ -1011,6 +1006,7 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   @Inject() private userService: UserService;
   @Inject() private restreamService: RestreamService;
   @Inject() private twitchService: TwitchService;
+  @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
 
   get info() {
     return this.state.info;
@@ -1024,7 +1020,7 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   }
 
   get linkedPlatforms(): TPlatform[] {
-    if (!this.userService.isLoggedIn) return [];
+    if (!this.userService.state.auth) return [];
     return this.allPlatforms.filter(p => this.isPlatformLinked(p));
   }
 
@@ -1054,34 +1050,23 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   }
 
   get chatUrl(): string {
-    if (!this.userService.isLoggedIn) return '';
+    if (!this.userService.state.auth) return '';
     return this.isMutliplatformMode
       ? this.restreamService.chatUrl
-      : getPlatformService(this.enabledPlatforms[0]).state.chatUrl;
+      : getPlatformService(this.enabledPlatforms[0]).chatUrl;
   }
 
   get goLiveSettings(): IGoLiveSettings {
-    // return already saved settings if exist
-    if (this.streamSettingsService.state.goLiveSettings) {
-      return this.sanitizeSettings(this.streamSettingsService.state.goLiveSettings);
-    }
-
-    // otherwise generate new settings
-    const { title, description } = this.streamSettingsService.state; // migrate title and description
     const destinations = {};
     this.linkedPlatforms.forEach(platform => {
-      destinations[platform] = this.getDefaultPlatformSettings(platform);
+      destinations[platform] = this.getPlatformSettings(platform);
     });
 
     return {
       destinations: destinations as IGoLiveSettings['destinations'],
       optimizedProfile: null,
-      advancedMode: false,
+      advancedMode: this.streamSettingsService.state.goLiveSettings.advancedMode,
     };
-  }
-
-  get canShowOnlyRequiredFields(): boolean {
-    return this.enabledPlatforms.length > 1 && !this.goLiveSettings.advancedMode;
   }
 
   /**
@@ -1202,24 +1187,24 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   //   };
   // }
 
-  sanitizeSettings<T extends IStreamSettings>(settings: T): T {
-    settings = cloneDeep(settings);
-    const destinations = settings.destinations;
-    const linkedPlatforms = this.linkedPlatforms;
-
-    // delete unlinked platforms if provided
-    Object.keys(destinations).forEach((destName: TPlatform) => {
-      if (!linkedPlatforms.includes(destName)) delete destinations[destName];
-    });
-
-    // add default settings for just linked platforms
-    difference(linkedPlatforms, Object.keys(destinations) as TPlatform[]).forEach(destName => {
-      // TODO: fix types
-      // @ts-ignore
-      destinations[destName] = this.getDefaultPlatformSettings(destName);
-    });
-    return settings;
-  }
+  // sanitizeSettings<T extends IStreamSettings>(settings: T): T {
+  //   settings = cloneDeep(settings);
+  //   const destinations = settings.destinations;
+  //   const linkedPlatforms = this.linkedPlatforms;
+  //
+  //   // delete unlinked platforms if provided
+  //   Object.keys(destinations).forEach((destName: TPlatform) => {
+  //     if (!linkedPlatforms.includes(destName)) delete destinations[destName];
+  //   });
+  //
+  //   // add default settings for just linked platforms
+  //   difference(linkedPlatforms, Object.keys(destinations) as TPlatform[]).forEach(destName => {
+  //     // TODO: fix types
+  //     // @ts-ignore
+  //     destinations[destName] = this.getPlatformSettings(destName);
+  //   });
+  //   return settings;
+  // }
 
   /**
    * Validates settings and returns an error string
@@ -1239,13 +1224,17 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     return '';
   }
 
-  private getDefaultPlatformSettings(platform: TPlatform) {
-    const enabled = this.isPrimaryPlatform(platform);
+  private getPlatformSettings(platform: TPlatform) {
     const service = getPlatformService(platform);
+    const savedDestinations = this.streamSettingsService.state.goLiveSettings?.destinations;
+    const { enabled, useCustomFields } = (savedDestinations && savedDestinations[platform]) || {
+      enabled: false,
+      useCustomFields: false,
+    };
     return {
       ...service.state.settings,
-      enabled,
-      useCustomFields: false,
+      useCustomFields,
+      enabled: enabled || this.isPrimaryPlatform(platform),
     };
   }
 }

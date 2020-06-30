@@ -97,8 +97,6 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
     return `https://${this.hostsService.streamlabs}/api/v5/user/accounts/unlink/twitch_account`;
   }
 
-  channelInfoChanged = new Subject<ITwitchChannelInfo>();
-
   readonly capabilities = new Set<TPlatformCapability>([
     'chat',
     'scope-validation',
@@ -115,17 +113,10 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
   // Streamlabs Production Twitch OAuth Client ID
   clientId = '8bmp6j83z5w4mepq0dn0q1a7g186azi';
 
-  private activeChannel: ITwitchChannelInfo | null;
-
   init() {
     // prepopulate data to make chat available after app start
     this.userService.userLogin.subscribe(_ => {
       if (this.userService.platform?.type === 'twitch') this.prepopulateInfo();
-    });
-
-    // trigger `channelInfoChanged` event with new "chatUrl" based on the changed theme
-    this.customizationService.settingsChanged.subscribe(updatedSettings => {
-      if (updatedSettings.theme) this.updateActiveChannel({});
     });
   }
 
@@ -245,9 +236,9 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
   }
 
   /**
-   * returns perilled data for the EditStreamInfo window
+   * prepopulate channel info and save it to the store
    */
-  async prepopulateInfo(): Promise<ITwitchChannelInfo> {
+  async prepopulateInfo(): Promise<void> {
     const [channelInfo, hasUpdateTagsPermission] = await Promise.all([
       this.fetchRawChannelInfo().then(json => ({
         title: json.status,
@@ -260,39 +251,8 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
     if (hasUpdateTagsPermission) {
       [tags] = await Promise.all([this.getStreamTags(), this.getAllTags()]);
     }
-
-    const activeChannel = {
-      ...channelInfo,
-      hasUpdateTagsPermission,
-      tags,
-    };
-    this.updateActiveChannel(activeChannel);
-    assertIsDefined(this.activeChannel);
     this.SET_PREPOPULATED(true);
-    return this.activeChannel;
-  }
-
-  async fetchGoLiveSettings(): Promise<ITwitchStartStreamOptions> {
-    await this.prepopulateInfo();
-    return {
-      title: this.activeChannel.title,
-      game: this.activeChannel.game,
-      tags: this.activeChannel.tags,
-    };
-  }
-
-  /**
-   * update the local info for current channel and emit the "channelInfoChanged" event
-   */
-  private updateActiveChannel(patch: Partial<ITwitchChannelInfo>) {
-    const activeChannel = this.activeChannel || {};
-    this.activeChannel = {
-      ...activeChannel,
-      chatUrl: this.getChatUrl(),
-      ...patch,
-    } as ITwitchChannelInfo;
-    assertIsDefined(this.activeChannel);
-    this.channelInfoChanged.next(this.activeChannel);
+    this.SET_STREAM_SETTINGS({ tags, title: channelInfo.title, game: channelInfo.game });
   }
 
   @mutation()
@@ -324,7 +284,7 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
       }),
       this.setStreamTags(tags),
     ]);
-    this.updateActiveChannel({ title, game, tags });
+    this.SET_STREAM_SETTINGS({ title, game, tags });
     return true;
   }
 
@@ -335,7 +295,7 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
     ).then(json => json.games);
   }
 
-  private getChatUrl(): string {
+  get chatUrl(): string {
     const mode = this.customizationService.isDarkTheme ? 'night' : 'day';
     const nightMode = mode === 'day' ? 'popout' : 'darkpopout';
     return `https://twitch.tv/popout/${this.username}/chat?${nightMode}`;
@@ -390,36 +350,5 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
 
   liveDockEnabled(): boolean {
     return true;
-  }
-
-  /**
-   * Get user-friendly error message
-   */
-  getErrorDescription(error: IPlatformResponse<unknown>): string {
-    return `Can not connect to Twitch: ${error.message}`;
-  }
-
-  getStreamFields() {
-    return formMetadata({
-      title: metadata.text({
-        title: $t('Title'),
-        fullWidth: true,
-        required: true,
-      }),
-      description: metadata.textArea({
-        title: $t('Description'),
-        fullWidth: true,
-      }),
-
-      twitchGame: metadata.list({
-        title: $t('Game on Twitch'),
-        placeholder: $t('Start typing to search'),
-        options: [],
-        internalSearch: false,
-        allowEmpty: true,
-        noResult: $t('No matching game(s) found.'),
-        required: true,
-      }),
-    });
   }
 }

@@ -205,7 +205,6 @@ export class MixerService extends BasePlatformService<IMixerServiceState>
     const channelId = patch.channelId || this.activeChannel.channelId;
     this.activeChannel = {
       ...this.activeChannel,
-      chatUrl: this.getChatUrl(channelId),
       ...patch,
     };
     this.SET_STREAM_PAGE_URL(`https://mixer.com/${this.mixerUsername}`);
@@ -247,8 +246,8 @@ export class MixerService extends BasePlatformService<IMixerServiceState>
     });
   }
 
-  private getChatUrl(channelId: string): string {
-    return `https://mixer.com/embed/chat/${channelId}`;
+  get chatUrl(): string {
+    return `https://mixer.com/embed/chat/${this.channelId}`;
   }
 
   async beforeGoLive(settings?: IGoLiveSettings) {

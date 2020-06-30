@@ -57,6 +57,7 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
 
   created() {
     this.settings = cloneDeep(this.view.goLiveSettings);
+    this.settings.advancedMode = false;
     const destinations = this.settings.destinations;
     Object.keys(destinations).forEach((dest: TPlatform) => {
       destinations[dest].enabled = true;

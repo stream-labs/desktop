@@ -12,13 +12,14 @@ import { $t } from '../../services/i18n';
 import { FacebookService, IFacebookStartStreamOptions } from '../../services/platforms/facebook';
 import { IGoLiveSettings, IStreamSettings, StreamingService } from '../../services/streaming';
 import { SyncWithValue } from '../../services/app/app-decorators';
+import BaseEditSteamInfo from './BaseEditSteamInfo';
 
 class Props {
   value?: IStreamSettings = null;
 }
 
 @Component({ props: createProps(Props) })
-export default class FacebookEditStreamInfo extends TsxComponent<Props> {
+export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
   @Inject() private facebookService: FacebookService;
   @Inject() private streamingService: StreamingService;
   @SyncWithValue() settings: IStreamSettings = null;
@@ -42,7 +43,7 @@ export default class FacebookEditStreamInfo extends TsxComponent<Props> {
   }
 
   render() {
-    const showOnlyRequiredFields = this.streamingService.views.canShowOnlyRequiredFields;
+    const showOnlyRequiredFields = this.canShowOnlyRequiredFields;
     return (
       <ValidatedForm onInput={this.emitInput}>
         <HFormGroup title={this.formMetadata.page.title}>
@@ -53,7 +54,7 @@ export default class FacebookEditStreamInfo extends TsxComponent<Props> {
         </HFormGroup>
 
         {!showOnlyRequiredFields && (
-          <CommonPlatformFields vModel={this.settings} platform={'facebook'} key="facebook" />
+          <CommonPlatformFields vModel={this.settings} platform={'facebook'} />
         )}
       </ValidatedForm>
     );

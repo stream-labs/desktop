@@ -1,5 +1,5 @@
 import { Inject, mutation, StatefulService } from '../core';
-import { IPlatformState, TPlatform } from './index';
+import { IPlatformState, TPlatform, TStartStreamOptions } from './index';
 import { StreamingService } from '../streaming';
 import { authorizedHeaders, handleResponse } from '../../util/requests';
 import { UserService } from '../user';
@@ -83,5 +83,10 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
   @mutation()
   protected SET_PREPOPULATED(isPrepopulated: boolean) {
     this.state.isPrepopulated = isPrepopulated;
+  }
+
+  @mutation()
+  protected SET_STREAM_SETTINGS(settings: TStartStreamOptions) {
+    this.state.settings = settings;
   }
 }

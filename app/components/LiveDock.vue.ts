@@ -15,6 +15,7 @@ import Tabs, { ITab } from 'components/Tabs.vue';
 import { ChatService } from 'services/chat';
 import { WindowsService } from 'services/windows';
 import { RestreamService, YoutubeService } from 'app-services';
+import { getPlatformService } from '../services/platforms';
 
 @Component({
   components: {
@@ -227,7 +228,7 @@ export default class LiveDock extends Vue {
   get chatTabs(): ITab[] {
     const tabs: ITab[] = [
       {
-        name: this.userService.platform.type.toString(),
+        name: getPlatformService(this.userService.state.auth.primaryPlatform).displayName,
         value: 'default',
       },
     ].concat(

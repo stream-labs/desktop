@@ -11,21 +11,21 @@ import { TTwitchTag } from '../../services/platforms/twitch/tags';
 import TwitchTagsInput from '../shared/inputs/TwitchTagsInput.vue';
 import { IGoLiveSettings, IStreamSettings, StreamingService } from '../../services/streaming';
 import { SyncWithValue } from '../../services/app/app-decorators';
+import BaseEditSteamInfo from './BaseEditSteamInfo';
 
 class TwitchEditStreamProps {
   value?: IStreamSettings;
 }
 
 @Component({ components: { TwitchTagsInput }, props: createProps(TwitchEditStreamProps) })
-export default class TwitchEditStreamInfo extends TsxComponent<TwitchEditStreamProps> {
+export default class TwitchEditStreamInfo extends BaseEditSteamInfo<TwitchEditStreamProps> {
   @Inject() private streamingService: StreamingService;
   @Inject() private twitchService: TwitchService;
   @SyncWithValue()
   settings: IStreamSettings = null;
 
   private render() {
-    const view = this.streamingService.views;
-    const canShowOnlyRequiredFields = view.canShowOnlyRequiredFields;
+    const canShowOnlyRequiredFields = this.canShowOnlyRequiredFields;
     return (
       <ValidatedForm>
         {!canShowOnlyRequiredFields && (

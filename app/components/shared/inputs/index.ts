@@ -49,7 +49,7 @@ export interface ITimerMetadata extends INumberMetadata {
   format?: 'hms' | 'hm' | 'ms';
 }
 
-export interface IListMetadata<TValueType, TOptionData = undefined> extends IInputMetadata {
+export interface IListMetadata<TValueType, TOptionData = unknown> extends IInputMetadata {
   options: IListOption<TValueType, TOptionData>[];
   allowEmpty?: boolean;
   loading?: boolean;
@@ -94,7 +94,7 @@ export interface ISliderMetadata extends IInputMetadata {
   data?: string[];
 }
 
-export interface IListOption<TValue = string, TOptionData = undefined> {
+export interface IListOption<TValue = string, TOptionData = unknown> {
   value: TValue;
   title: string;
   description?: string;

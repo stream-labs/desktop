@@ -6,7 +6,7 @@ import { TPlatform, getPlatformService } from 'services/platforms';
 import { invert } from 'lodash';
 import { MixerService, TwitchService } from '../../../app-services';
 import { PlatformAppsService } from 'services/platform-apps';
-import { IGoLiveSettings } from '../../streaming';
+import { IGoLiveSettings, IPlatformFlags } from '../../streaming';
 import { IEncoderProfile } from '../../video-encoding-optimizations';
 
 /**
@@ -38,7 +38,15 @@ interface IStreamSettingsState {
    */
   warnNoVideoSources: boolean;
 
-  goLiveSettings: IGoLiveSettings | null;
+  goLiveSettings: {
+    destinations: {
+      twitch: IPlatformFlags;
+      facebook: IPlatformFlags;
+      youtube: IPlatformFlags;
+      mixer: IPlatformFlags;
+    };
+    advancedMode: boolean;
+  };
 }
 
 /**

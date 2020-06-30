@@ -126,10 +126,10 @@ export default class EditStreamWindow extends TsxComponent<{}> {
         {/* ADVANCED MODE SWITCHER */}
         {shouldShowAdvancedSwitch && (
           <div class={styles.modeToggle}>
-            <HFormGroup
+            <div>{$t('Show Advanced Settings')}</div>
+            <ToggleInput
               onInput={(val: boolean) => this.switchAdvancedMode(val)}
-              value={advancedMode}
-              metadata={metadata.toggle({ title: $t('Advanced Mode') })}
+              value={this.settings.advancedMode}
             />
           </div>
         )}

@@ -8,14 +8,6 @@
     >
       {{ getStreamButtonLabel() }}
     </button>
-    <button
-      v-if="shouldShowEditButton"
-      class="button button--default"
-      :disabled="isDisabled"
-      @click="edit"
-    >
-      <i class="fa fa-pen" />
-    </button>
   </div>
 </template>
 

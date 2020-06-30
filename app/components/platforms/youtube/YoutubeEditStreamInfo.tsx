@@ -16,16 +16,17 @@ import CommonPlatformFields from '../CommonPlatformFields';
 import { StreamingService } from '../../../app-services';
 import { SyncWithValue } from '../../../services/app/app-decorators';
 import { IStreamSettings } from '../../../services/streaming';
+import BaseEditStreamInfo from '../BaseEditSteamInfo';
 
 class Props {
   value?: IStreamSettings;
 }
 
 @Component({ components: { ValidatedForm }, props: createProps(Props) })
-export default class YoutubeEditStreamInfo extends TsxComponent<Props> {
+export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
   @Inject() private youtubeService: YoutubeService;
   @Inject() private streamingService: StreamingService;
-  @SyncWithValue() settings: IYoutubeStartStreamOptions = null;
+  @SyncWithValue() protected settings: IStreamSettings = null;
   broadcasts: IYoutubeLiveBroadcast[] = [];
   broadcastsLoaded = false;
 
@@ -44,13 +45,14 @@ export default class YoutubeEditStreamInfo extends TsxComponent<Props> {
 
   onSelectBroadcastHandler() {
     // set title and description fields from selected broadcast
+    const ytSettings = this.settings.destinations.youtube;
     const selectedBroadcast = this.broadcasts.find(
-      broadcast => broadcast.id === this.settings.broadcastId,
+      broadcast => broadcast.id === ytSettings.broadcastId,
     );
     if (!selectedBroadcast) return;
     const { title, description } = selectedBroadcast.snippet;
-    this.settings.title = title;
-    this.settings.description = description;
+    ytSettings.title = title;
+    ytSettings.description = description;
   }
 
   get formMetadata() {
@@ -77,14 +79,14 @@ export default class YoutubeEditStreamInfo extends TsxComponent<Props> {
   }
 
   render() {
-    const canShowOnlyRequiredFields = this.streamingService.views.canShowOnlyRequiredFields;
+    const canShowOnlyRequiredFields = this.canShowOnlyRequiredFields;
     return (
       !canShowOnlyRequiredFields && (
         <ValidatedForm onInput={this.emitInput}>
           <HFormGroup title={$t('Event')}>
             <BroadcastInput
               onInput={this.onSelectBroadcastHandler}
-              vModel={this.settings.broadcastId}
+              vModel={this.settings.destinations.youtube.broadcastId}
               metadata={this.formMetadata.event}
             />
           </HFormGroup>

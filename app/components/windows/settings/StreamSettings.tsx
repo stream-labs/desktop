@@ -130,6 +130,9 @@ export default class StreamSettings extends TsxComponent {
     const shouldShowConnectBtn = !isMerged;
     const shouldShowUnlinkBtn = !isPrimary && isMerged;
 
+    // RIP Mixer
+    if (platform === 'mixer' && !isPrimary) return;
+
     return (
       <div class="section flex">
         <div class="margin-right--20" style={{ width: '50px' }}>
@@ -158,9 +161,15 @@ export default class StreamSettings extends TsxComponent {
             </button>
           )}
           {shouldShowPrimaryBtn && (
-            <button disabled={true} class={cx('button button--action', styles.platformButton)}>
-              {$t('Primary')}
-            </button>
+            <span
+              vTooltip={$t(
+                'You cannot unlink the platform you used to sign in to Streamlabs OBS. If you want to unlink this platform, please sign in with a different platform.',
+              )}
+            >
+              <button disabled={true} class={cx('button button--action', styles.platformButton)}>
+                {$t('Logged in')}
+              </button>
+            </span>
           )}
         </div>
       </div>

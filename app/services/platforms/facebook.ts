@@ -267,7 +267,6 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
         } else {
           this.SET_LIVE_VIDEO_ID(null);
         }
-        this.emitChannelInfo();
         this.SET_PREPOPULATED(true);
         return {
           ...info,
@@ -275,15 +274,6 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
         };
       },
     );
-  }
-
-  emitChannelInfo() {
-    this.channelInfoChanged.next({
-      ...(this.state.settings as IFacebookChannelInfo),
-      facebookPageId: this.state.activePage!.id,
-      streamUrl: this.state.streamUrl!,
-      chatUrl: this.getChatUrl(),
-    });
   }
 
   async scheduleStream(
@@ -344,8 +334,6 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
       await this.createLiveVideo();
       return;
     }
-
-    this.emitChannelInfo();
   }
 
   async putChannelInfo(info: IFacebookStartStreamOptions): Promise<boolean> {
@@ -376,7 +364,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     ).then(json => json.data.slice(0, 15));
   }
 
-  private getChatUrl(): string {
+  get chatUrl(): string {
     return 'https://www.facebook.com/gaming/streamer/chat/';
   }
 

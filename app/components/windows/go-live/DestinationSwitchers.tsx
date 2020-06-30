@@ -52,8 +52,6 @@ export class DestinationSwitchers extends TsxComponent<Props> {
     const platformName = platformService.displayName;
     const username = this.userService.state.auth.platforms[platform].username;
     const title = this.props.title ? $t(this.props.title, { platformName }) : platformName;
-    const shouldShowToggle = !isPrimary || this.props.canDisablePrimary;
-    const shouldShowNotificator = !shouldShowToggle;
     const shouldShowLeftColumn = Object.keys(this.destinations).length > 1;
     return (
       <div
@@ -61,22 +59,24 @@ export class DestinationSwitchers extends TsxComponent<Props> {
         onClick={() => this.onSwitchHandler(platform, !enabled)}
       >
         {shouldShowLeftColumn && (
-          <div class={cx(styles.colInput, isPrimary && styles.colPrimary)}>
-            {shouldShowNotificator && (
-              <i
-                class="fa fa-info-circle"
+          <div class={cx(styles.colInput)}>
+            {isPrimary ? (
+              <span
                 vTooltip={$t(
                   'You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destination.',
                 )}
-              />
+              >
+                <ToggleInput value={enabled} metadata={{ disabled: true }} />
+              </span>
+            ) : (
+              <ToggleInput value={enabled} />
             )}
-            {shouldShowToggle && <ToggleInput value={enabled} />}
           </div>
         )}
         <div class="logo margin-right--20">
           <PlatformLogo platform={platform} class={styles[`platform-logo-${platform}`]} />
         </div>
-        <div class="account">
+        <div class={styles.colAccount}>
           <span class={styles.platformName}>{title}</span> <br />
           {username} <br />
         </div>

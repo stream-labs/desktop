@@ -150,7 +150,7 @@ export interface IPlatformService {
 
   afterStopStream?: () => Promise<void>;
 
-  prepopulateInfo: () => Promise<TStartStreamOptions>;
+  prepopulateInfo: () => Promise<unknown>;
 
   scheduleStream?: (startTime: string, info: TChannelInfo) => Promise<any>;
 
@@ -166,6 +166,7 @@ export interface IPlatformService {
   readonly platform: TPlatform;
   readonly displayName: string;
   readonly mergeUrl: string;
+  readonly chatUrl: string;
   unlink: () => void;
 
   state: IPlatformState;
