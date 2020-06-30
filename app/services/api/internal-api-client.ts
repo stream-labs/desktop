@@ -113,7 +113,11 @@ export class InternalApiClient {
         const request = this.jsonrpc.createRequestWithOptions(
           isHelper ? target['_resourceId'] : serviceName,
           methodName as string,
-          { compactMode: true, fetchMutations: false, noReturn: !options.shouldReturn },
+          {
+            compactMode: true,
+            fetchMutations: options.shouldReturn,
+            noReturn: !options.shouldReturn,
+          },
           ...args,
         );
 
@@ -155,14 +159,18 @@ export class InternalApiClient {
       const result = response.result;
       const mutations = response.mutations;
 
-      // commit all mutations caused by the api-request now
-      mutations.forEach(mutation => commitMutation(mutation));
-      // we'll still receive already committed mutations from async IPC event
-      // mark them as ignored
-      this.skippedMutations.push(...mutations.map(m => m.id));
+      this.handleMutations(mutations);
 
       return this.handleResult(result);
     };
+  }
+
+  handleMutations(mutations: IMutation[] = []) {
+    // commit all mutations caused by the api-request now
+    mutations.forEach(mutation => commitMutation(mutation));
+    // we'll still receive already committed mutations from async IPC event
+    // mark them as ignored
+    this.skippedMutations.push(...mutations.map(m => m.id));
   }
 
   /**
@@ -237,6 +245,7 @@ export class InternalApiClient {
         return;
       }
 
+      this.handleMutations(response.mutations);
       const result = this.handleResult(response.result);
 
       if (result instanceof Promise) {
