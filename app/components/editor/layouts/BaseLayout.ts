@@ -32,26 +32,17 @@ export default class BaseLayout extends TsxComponent<LayoutProps> {
   async mountResize() {
     this.$emit('totalWidth', await this.mapVectors(this.vectors));
     window.addEventListener('resize', () => this.updateSize());
-    this.migrateToProportions();
-    this.bar1 = await this.getBarPixels('bar1');
-    this.bar2 = await this.getBarPixels('bar2');
-    if (this.bar1 < this.mins.bar1) this.setBar('bar1', this.mins.bar1);
-    if (this.bar2 < this.mins.bar2) {
-      this.setBar('bar2', this.mins.bar2);
-    }
-    this.updateSize();
+    await this.migrateToProportions();
+    await this.updateSize();
   }
+
   destroyResize() {
     window.removeEventListener('resize', () => this.updateSize());
   }
 
-  migrateToProportions() {
-    if (this.resizes.bar1 >= 1) {
-      this.setBar('bar1', this.resizes.bar1);
-    }
-    if (this.resizes.bar2 >= 1) {
-      this.setBar('bar2', this.resizes.bar2);
-    }
+  async migrateToProportions() {
+    if (this.resizes.bar1 >= 1) await this.setBar('bar1', this.resizes.bar1);
+    if (this.resizes.bar2 >= 1) await this.setBar('bar2', this.resizes.bar2);
   }
 
   get vectors(): ILayoutSlotArray {
@@ -78,20 +69,23 @@ export default class BaseLayout extends TsxComponent<LayoutProps> {
   }
 
   async getBarPixels(bar: 'bar1' | 'bar2') {
+    if (this.resizes[bar] >= 1) return this.resizes[bar];
     // Before we can access the clientRect at least one render cycle needs to run
     if (!this.firstRender) await this.$nextTick();
     this.firstRender = true;
     const { height, width } = this.$el.getBoundingClientRect();
-    return this.isColumns ? width * this.resizes[bar] : height * this.resizes[bar];
+    return Math.round((this.isColumns ? width : height) * this.resizes[bar]);
   }
 
-  setBar(bar: 'bar1' | 'bar2', val: number) {
+  async setBar(bar: 'bar1' | 'bar2', val: number) {
     if (val === 0) return;
+    if (!this.firstRender) await this.$nextTick();
+    this.firstRender = true;
     this[bar] = val;
     const { height, width } = this.$el.getBoundingClientRect();
     const totalSize = this.isColumns ? width : height;
     const proportion = parseFloat((val / totalSize).toFixed(2));
-    this.layoutService.actions.setBarResize(bar, proportion);
+    await this.layoutService.actions.return.setBarResize(bar, proportion);
   }
 
   async minsFromSlot(slot: LayoutSlot) {
