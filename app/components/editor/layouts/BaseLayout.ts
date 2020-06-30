@@ -32,17 +32,11 @@ export default class BaseLayout extends TsxComponent<LayoutProps> {
   async mountResize() {
     this.$emit('totalWidth', await this.mapVectors(this.vectors));
     window.addEventListener('resize', () => this.updateSize());
-    await this.migrateToProportions();
     await this.updateSize();
   }
 
   destroyResize() {
     window.removeEventListener('resize', () => this.updateSize());
-  }
-
-  async migrateToProportions() {
-    if (this.resizes.bar1 >= 1) await this.setBar('bar1', this.resizes.bar1);
-    if (this.resizes.bar2 >= 1) await this.setBar('bar2', this.resizes.bar2);
   }
 
   get vectors(): ILayoutSlotArray {
@@ -69,10 +63,11 @@ export default class BaseLayout extends TsxComponent<LayoutProps> {
   }
 
   async getBarPixels(bar: 'bar1' | 'bar2') {
-    if (this.resizes[bar] >= 1) return this.resizes[bar];
     // Before we can access the clientRect at least one render cycle needs to run
     if (!this.firstRender) await this.$nextTick();
     this.firstRender = true;
+    // Migrate from pixels to proportions
+    if (this.resizes[bar] >= 1) await this.setBar(bar, this.resizes[bar]);
     const { height, width } = this.$el.getBoundingClientRect();
     return Math.round((this.isColumns ? width : height) * this.resizes[bar]);
   }
@@ -85,7 +80,7 @@ export default class BaseLayout extends TsxComponent<LayoutProps> {
     const { height, width } = this.$el.getBoundingClientRect();
     const totalSize = this.isColumns ? width : height;
     const proportion = parseFloat((val / totalSize).toFixed(2));
-    await this.layoutService.actions.return.setBarResize(bar, proportion);
+    this.layoutService.setBarResize(bar, proportion);
   }
 
   async minsFromSlot(slot: LayoutSlot) {
