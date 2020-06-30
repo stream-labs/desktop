@@ -34,8 +34,6 @@ export class InternalApiClient {
    */
   private subscriptions: Dictionary<Subject<any>> = {};
 
-  private skippedMutations: number[] = [];
-
   private windowId = Utils.getWindowId();
 
   constructor() {
@@ -159,18 +157,10 @@ export class InternalApiClient {
       const result = response.result;
       const mutations = response.mutations;
 
-      this.handleMutations(mutations);
+      mutations.forEach(commitMutation);
 
       return this.handleResult(result);
     };
-  }
-
-  handleMutations(mutations: IMutation[] = []) {
-    // commit all mutations caused by the api-request now
-    mutations.forEach(mutation => commitMutation(mutation));
-    // we'll still receive already committed mutations from async IPC event
-    // mark them as ignored
-    this.skippedMutations.push(...mutations.map(m => m.id));
   }
 
   /**
@@ -214,16 +204,6 @@ export class InternalApiClient {
     return this.servicesManager.getResource(resourceId);
   }
 
-  handleMutation(mutation: IMutation) {
-    const ind = this.skippedMutations.indexOf(mutation.id);
-    if (ind !== -1) {
-      // this mutation is already committed
-      this.skippedMutations.splice(ind, 1);
-      return;
-    }
-    commitMutation(mutation);
-  }
-
   /**
    * just a shortcut for static functions in JsonrpcService
    */
@@ -245,7 +225,7 @@ export class InternalApiClient {
         return;
       }
 
-      this.handleMutations(response.mutations);
+      response.mutations.forEach(commitMutation);
       const result = this.handleResult(response.result);
 
       if (result instanceof Promise) {

@@ -74,15 +74,7 @@ plugins.push((store: Store<any>) => {
 
     const mutations = JSON.parse(mutationString);
     for (const mutation of mutations) {
-      // for worker window commit mutation directly
-      if (isWorkerWindow) {
-        commitMutation(mutation);
-        return;
-      }
-
-      // for renderer windows commit mutations via api-client
-      const servicesManager: ServicesManager = ServicesManager.instance;
-      servicesManager.internalApiClient.handleMutation(mutation);
+      commitMutation(mutation);
     }
   });
 
