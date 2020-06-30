@@ -33,6 +33,8 @@ let mutationId = 1;
 const isWorkerWindow = Util.isWorkerWindow();
 let storeCanReceiveMutations = isWorkerWindow;
 
+const appliedForeignMutations: { [id: number]: boolean } = {};
+
 // This plugin will keep all vuex stores in sync via IPC
 plugins.push((store: Store<any>) => {
   store.subscribe((mutation: Dictionary<any>) => {
@@ -120,6 +122,9 @@ export function createStore(): Store<any> {
 }
 
 export function commitMutation(mutation: IMutation) {
+  if (appliedForeignMutations[mutation.id]) return;
+  appliedForeignMutations[mutation.id] = true;
+
   store.commit(
     mutation.type,
     Object.assign({}, mutation.payload, {
