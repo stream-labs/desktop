@@ -48,8 +48,8 @@
   text-align: center;
   position: relative;
   &:hover {
-    border-color: (var(--paragraph));
-    box-shadow: 0 0 50px rgba(255, 255, 255, 0.2) inset;
+    border-color: (var(--button));
+    box-shadow: 0 0 50px rgba(255, 255, 255, 0.1) inset;
   }
   i {
     position: absolute;
@@ -124,4 +124,15 @@
 .spacer {
   width: 1px;
   height: 32px;
+}
+
+[data-type="bool"] {
+  width: 100% !important;
+}
+
+.prime {
+  position: absolute;
+  right: 16px;
+  font-style: italic;
+  color: var(--prime-hover);
 }

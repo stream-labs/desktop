@@ -117,7 +117,7 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
           {shouldShowAddDestination && (
             <a class={styles.addDestinationBtn} onclick={this.addDestination}>
               <i class="fa fa-plus" />
-              {$t('Add Destination')}
+              {$t('Add Destination')} <b class={styles.prime}>prime</b>
             </a>
           )}
         </div>

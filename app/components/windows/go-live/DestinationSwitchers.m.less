@@ -12,9 +12,9 @@
 
   display: flex;
   height: 60px;
-  // background-color: var(--section);
   background: var(--dropdown-bg);
   transition: transform 0.05s;
+  cursor: pointer;
 
   & > div:first-child {
     padding-left: 8px;
@@ -36,10 +36,14 @@
     text-overflow: ellipsis;
     overflow: hidden;
   }
-}
 
-.platform-name {
-  color: var(--title);
+  .platform-name {
+    color: var(--title);
+  }
+
+  &:hover .col-account {
+    color: var(--title);
+  }
 }
 
 .platform-disabled {
