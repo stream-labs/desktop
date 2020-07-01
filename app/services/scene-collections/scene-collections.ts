@@ -513,7 +513,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     // TODO: This is an edge case now that scene collections are segmented by OS
     // Ideally we don't ever hit this.
     if (!root.data.sources.isAllSupported()) {
-      const backupName = `${this.activeCollection.name} - Backup`;
+      const backupName = `${this.activeCollection?.name} - Backup`;
 
       await this.duplicate(backupName);
       await electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
