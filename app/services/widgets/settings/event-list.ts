@@ -50,6 +50,17 @@ export interface IEventListSettings extends IWidgetSettings {
   text_size: number;
   theme: string;
   theme_color: string;
+  mixer_account?: {
+    embers_minimum: number;
+    host_show_auto_hosts: boolean;
+    host_viewer_minimum: number;
+    show_effects: boolean;
+    show_follows: boolean;
+    show_hosts: boolean;
+    show_stickers: boolean;
+    show_subscriptions: boolean;
+    sparks_minimum: number;
+  };
 }
 
 export interface IEventListData extends IWidgetData {
@@ -93,7 +104,7 @@ export class EventListService extends WidgetSettingsService<IEventListData> {
     };
   }
 
-  eventsByPlatform(): { key: string; title: string }[] {
+  eventsByPlatform(): { key: string; title: string; isMixer?: boolean }[] {
     const platform = this.userService.platform.type;
     return {
       twitch: [
@@ -105,13 +116,51 @@ export class EventListService extends WidgetSettingsService<IEventListData> {
         { key: 'show_bits', title: $t('Bits') },
         { key: 'show_raids', title: $t('Raids') },
       ],
-      facebook: [],
+      facebook: [
+        { key: 'show_follows', title: $t('Follows') },
+        { key: 'show_stars', title: $t('Stars') },
+        { key: 'show_supports', title: $t('Supporters') },
+        { key: 'show_likes', title: $t('Likes') },
+        { key: 'show_shares', title: $t('Shares') },
+      ],
       youtube: [
         { key: 'show_subscriptions', title: $t('Subscriptions') },
         { key: 'show_sponsors', title: $t('Members') },
         { key: 'show_fanfundings', title: $t('Super Chats') },
       ],
-      mixer: [{ key: 'show_resubs', title: $t('Show Resubs') }],
+      mixer: [
+        { key: 'show_follows', title: $t('Follows'), isMixer: true },
+        { key: 'show_hosts', title: $t('Hosts'), isMixer: true },
+        { key: 'show_subscriptions', title: $t('Subscriptions'), isMixer: true },
+        { key: 'show_stickers', title: $t('Stickers'), isMixer: true },
+        { key: 'show_effects', title: $t('Effects'), isMixer: true },
+        { key: 'show_resubs', title: $t('Show Resubs') },
+      ],
     }[platform];
+  }
+
+  minsByPlatform(): { key: string; title: string; isMixer?: boolean; tooltip?: string }[] {
+    const platform = this.userService.platform.type;
+    return {
+      twitch: [
+        {
+          key: 'bits_minimum',
+          title: $t('Min. Bits'),
+
+          tooltip: $t(
+            'The smallest amount of bits a cheer must have for an event to be shown.' +
+              ' Setting this to 0 will make every cheer trigger an event.',
+          ),
+        },
+      ],
+      mixer: [
+        { key: 'sparks_minimum', title: $t('Min. Sparks'), isMixer: true },
+        { key: 'embers_minimum', title: $t('Min. Embers'), isMixer: true },
+      ],
+    }[platform];
+  }
+
+  protected patchBeforeSend(data: IEventListSettings): any {
+    return { ...data, ...data.mixer_account };
   }
 }

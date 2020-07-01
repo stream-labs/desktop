@@ -113,7 +113,6 @@
 .recommended-label {
   color: var(--teal);
   margin-left: 10px;
-  text-transform: none;
 }
 
 .studio-controls-selector {

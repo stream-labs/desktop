@@ -23,7 +23,7 @@ import Toasted from 'vue-toasted';
 import VueI18n from 'vue-i18n';
 import VModal from 'vue-js-modal';
 import VeeValidate from 'vee-validate';
-import ChildWindow from 'components/windows/ChildWindow.vue';
+import ChildWindow from 'components/windows/ChildWindow';
 import OneOffWindow from 'components/windows/OneOffWindow.vue';
 import { UserService, setSentryContext } from 'services/user';
 import { getResource } from 'services';
@@ -36,6 +36,7 @@ import Main from 'components/windows/Main.vue';
 import CustomLoader from 'components/CustomLoader';
 import { getOS, OS } from 'util/operating-systems';
 import process from 'process';
+import { MetricsService } from 'services/metrics';
 
 const crashHandler = window['require']('crash-handler');
 
@@ -65,7 +66,7 @@ if (isProduction) {
       'https://sentry.io/api/1283430/minidump/?sentry_key=01fc20f909124c8499b4972e9a5253f2',
     extra: {
       'sentry[release]': slobsVersion,
-      processType: 'renderer',
+      windowId: Utils.getWindowId(),
     },
   });
 }
@@ -109,6 +110,13 @@ window.addEventListener('error', e => {
 window.addEventListener('unhandledrejection', e => {
   sendLogMsg('error', e.reason);
 });
+
+// Remove the startup event listener that catches bundle parse errors and other
+// critical issues starting up the renderer.
+if (window['_startupErrorHandler']) {
+  window.removeEventListener('error', window['_startupErrorHandler']);
+  delete window['_startupErrorHandler'];
+}
 
 if (
   (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) &&
@@ -292,8 +300,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     },
   });
 
+  let mainWindowShowTime = 0;
   if (Utils.isMainWindow()) {
     electron.remote.getCurrentWindow().show();
+    mainWindowShowTime = Date.now();
   }
 
   // Perform some final initialization now that services are ready
@@ -301,6 +311,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // setup translations for the current window
     if (!Utils.isWorkerWindow()) {
       I18nService.uploadTranslationsToVueI18n();
+    }
+
+    if (Utils.isMainWindow()) {
+      const metricsService: MetricsService = MetricsService.instance;
+      metricsService.actions.recordMetric('mainWindowShowTime', mainWindowShowTime);
     }
 
     if (usingSentry) {

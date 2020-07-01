@@ -4,11 +4,14 @@ import { HostsService } from 'services/hosts';
 import { handleResponse, authorizedHeaders } from 'util/requests';
 import { UserService } from 'services/user';
 
-export interface IServerSceneCollection {
-  id?: number;
+export interface IServerSceneCollectionCreation {
   name: string;
   data?: string;
   last_updated_at: string;
+}
+
+export interface IServerSceneCollection extends IServerSceneCollectionCreation {
+  id: number;
 }
 
 export interface ISceneCollectionsResponse {
@@ -57,7 +60,9 @@ export class SceneCollectionsServerApiService extends Service {
     return fetch(request).then(handleResponse);
   }
 
-  createSceneCollection(collection: IServerSceneCollection): Promise<IServerSceneCollection> {
+  createSceneCollection(
+    collection: IServerSceneCollectionCreation,
+  ): Promise<IServerSceneCollection> {
     const url = `${this.baseUrl}/scene-collection`;
     const headers = this.headers;
     headers.append('Content-Type', 'application/x-www-form-urlencoded');
@@ -86,10 +91,10 @@ export class SceneCollectionsServerApiService extends Service {
     return fetch(request).then(handleResponse);
   }
 
-  private formSerializeCollection(collection: IServerSceneCollection) {
+  private formSerializeCollection(collection: IServerSceneCollectionCreation) {
     const bodyVars: string[] = [];
     bodyVars.push(`name=${encodeURIComponent(collection.name)}`);
-    bodyVars.push(`data=${encodeURIComponent(collection.data)}`);
+    bodyVars.push(`data=${encodeURIComponent(collection.data ?? '')}`);
     bodyVars.push(`last_updated_at=${encodeURIComponent(collection.last_updated_at)}`);
     return bodyVars.join('&');
   }

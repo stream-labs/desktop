@@ -35,7 +35,7 @@ export interface ISceneCollectionsServiceApi {
   /**
    * Contains the active collection
    */
-  activeCollection: ISceneCollectionsManifestEntry;
+  activeCollection: ISceneCollectionsManifestEntry | undefined;
 
   /**
    * Subscribe to receive notifications when a new collection is added

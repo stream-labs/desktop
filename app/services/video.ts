@@ -84,7 +84,7 @@ export class Display {
 
     // grid lines are enabled by default
     // switch them off multiple items are selected
-    if (this.selectionService.getSize() > 1) {
+    if (this.selectionService.views.size > 1) {
       this.switchGridlines(false);
     }
 

@@ -1,30 +1,34 @@
 @import "../../../styles/index";
 @import '../../../styles/badges';
 
-.option-card {
-  .radius();
-
-  position: relative;
-  background: var(--button);
-  padding: 16px;
-  width: 45%;
-  overflow: hidden;
-
-  &:hover {
-    cursor: pointer;
-  }
-
-  svg {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-  }
+.container {
+  display: flex;
+  justify-content: space-between;
+  padding: 40px;
+  width: 100%;
 }
 
-.time-badge {
-  position: absolute;
-  top: 16px;
-  right: 16px;
+.card {
+  .radius(2);
+
+  background: var(--section);
+  width: 48%;
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  img {
+    margin-left: 16px;
+    height: auto;
+    width: 50%;
+    flex-shrink: 0;
+  }
+
+  h3 {
+    margin-bottom: 16px;
+    font-size: 20px;
+  }
 }
 
 .profile-select--title,
@@ -35,4 +39,32 @@
 
 .profile-select {
   width: 30%;
+}
+
+.text-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 40px;
+}
+
+.text-container svg {
+  width: auto;
+  height: 40px;
+  padding: 10px;
+  margin-right: 32px;
+  margin-bottom: 24px;
+  overflow: visible;
+
+  path {
+    opacity: 1;
+    fill: var(--paragraph);
+  }
+}
+
+.progress-bar {
+  position: relative;
+  display: block !important;
+  width: 80% !important;
+  margin: 0 auto;
 }

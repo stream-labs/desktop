@@ -11,14 +11,17 @@ import { $t } from 'services/i18n';
 import { WindowsService } from 'services/windows';
 import { byOS, OS } from 'util/operating-systems';
 import styles from './TitleBar.m.less';
+import TsxComponent, { createProps } from './tsx-component';
 
-@Component({})
-export default class TitleBar extends Vue {
+class TitleBarProps {
+  title: string = '';
+}
+
+@Component({ props: createProps(TitleBarProps) })
+export default class TitleBar extends TsxComponent<TitleBarProps> {
   @Inject() customizationService: CustomizationService;
   @Inject() streamingService: StreamingService;
   @Inject() windowsService: WindowsService;
-
-  @Prop() title: string;
 
   minimize() {
     electron.remote.getCurrentWindow().minimize();
@@ -65,7 +68,7 @@ export default class TitleBar extends Vue {
           <img class={styles.titlebarIcon} src={require('../../media/images/icon.ico')} />
         )}
         {this.primeTheme && !this.isMac && <KevinSvg class={styles.titlebarIcon} />}
-        <div class={styles.titlebarTitle}>{this.title}</div>
+        <div class={styles.titlebarTitle}>{this.props.title}</div>
         {!this.isMac && (
           <div class={styles.titlebarActions}>
             <i class={cx('icon-subtract', styles.titlebarAction)} onClick={() => this.minimize()} />

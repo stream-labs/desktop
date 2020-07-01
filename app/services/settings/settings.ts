@@ -23,6 +23,7 @@ import { PlatformAppsService } from 'services/platform-apps';
 import { EDeviceType } from 'services/hardware';
 import { StreamingService } from 'services/streaming';
 import { byOS, OS } from 'util/operating-systems';
+import { FacemasksService } from 'services/facemasks';
 
 export interface ISettingsState {
   General: {
@@ -85,6 +86,7 @@ export class SettingsService extends StatefulService<ISettingsState>
   @Inject() private platformAppsService: PlatformAppsService;
   @Inject() private outputSettingsService: OutputSettingsService;
   @Inject() private streamingService: StreamingService;
+  @Inject() private facemasksService: FacemasksService;
 
   @Inject()
   private videoEncodingOptimizationService: VideoEncodingOptimizationService;
@@ -121,17 +123,24 @@ export class SettingsService extends StatefulService<ISettingsState>
   getCategories(): string[] {
     let categories: string[] = obs.NodeObs.OBS_settings_getListCategories();
     categories = categories.concat([
-      'Game Overlay',
-      'Virtual Webcam',
       'Scene Collections',
       'Notifications',
       'Appearance',
-      'Face Masks',
       'Remote Control',
     ]);
 
-    categories = categories.filter(cat => {
-      return !(['Game Overlay', 'Face Masks'].includes(cat) && process.platform === OS.Mac);
+    // Platform-specific categories
+    byOS({
+      [OS.Mac]: () => {
+        categories = categories.concat(['Virtual Webcam']);
+      },
+      [OS.Windows]: () => {
+        categories = categories.concat(['Game Overlay']);
+
+        if (this.facemasksService.state.active) {
+          categories = categories.concat(['Face Masks']);
+        }
+      },
     });
 
     if (this.advancedSettingEnabled() || this.platformAppsService.state.devMode) {

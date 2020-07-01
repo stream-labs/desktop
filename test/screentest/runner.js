@@ -1,17 +1,16 @@
 require('dotenv').config();
 const rimraf = require('rimraf');
-const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const AWS = require('aws-sdk');
 const uuid = require('uuid');
 const recursiveReadDir = require('recursive-readdir');
 const { GithubClient } = require('../../scripts/github-client');
+const { exec, checkoutBranch, getCommitSHA } = require('../helpers/repo');
 const {
   AWS_ACCESS_KEY,
   AWS_SECRET_KEY,
   AWS_BUCKET,
-  CI,
   STREAMLABS_BOT_ID,
   STREAMLABS_BOT_KEY,
   BUILD_REPOSITORY_NAME,
@@ -27,17 +26,19 @@ const args = process.argv.slice(2);
   rimraf.sync(CONFIG.dist);
   fs.mkdirSync(CONFIG.dist, { recursive: true });
 
+  const baseBranch = await detectBaseBranchName();
+
   // make screenshots for each branch
   const branches = [
     'current',
-    CONFIG.baseBranch
+    baseBranch,
   ];
   for (const branchName of branches) {
-    checkoutBranch(branchName);
-    exec(`yarn test-flaky ${CONFIG.compiledTestsDist}/screentest/tests/**/*.js ${args.join(' ')}`);
+    checkoutBranch(branchName, baseBranch, CONFIG);
+    exec(`yarn ci:tests ${CONFIG.compiledTestsDist}/screentest/tests/**/*.js ${args.join(' ')}`);
   }
   // return to the current branch
-  checkoutBranch('current');
+  checkoutBranch('current', baseBranch, CONFIG);
 
   // compile the test folder
   exec(`tsc -p test`);
@@ -49,25 +50,21 @@ const args = process.argv.slice(2);
   await updateCheck();
 })();
 
-
-function checkoutBranch(branchName) {
-  const branchPath = `${CONFIG.dist}/${branchName}`;
-  if (!fs.existsSync(branchPath)) fs.mkdirSync(branchPath);
-  const checkoutTarget = branchName === 'current' ? commitSHA : branchName;
-  rimraf.sync(CONFIG.compiledTestsDist);
-  exec(`git reset --hard`);
-  exec(`git checkout ${checkoutTarget}`);
-  if (branchName !== CONFIG.baseBranch) {
-    // the base branch may have changes, so merge it
-    exec(`git pull origin ${CONFIG.baseBranch}`);
+async function detectBaseBranchName() {
+  const commit = getCommitSHA();
+  let prs = [];
+  try {
+    const github = await getGithubClient();
+    const res = await github.getPullRequestsForCommit(commit);
+    prs = res.data;
+  } catch (e) {
+    console.error(e);
   }
-  exec('yarn install --frozen-lockfile --check-files');
-  exec('yarn compile:ci');
-  // save current branch name to the file
-  // screenshoter.js will use this value
-  fs.writeFileSync(`${CONFIG.dist}/current-branch.txt`, branchName);
+  if (!prs.length) {
+    throw new Error(`No pull requests found for ${commit}`);
+  }
+  return prs[0].base.ref;
 }
-
 
 async function updateCheck() {
 
@@ -107,14 +104,8 @@ async function updateCheck() {
 
   console.info('Updating the GithubCheck', conclusion, title);
 
-  // AzurePipelines doesn't support multiline variables.
-  // All new-line characters are replaced with `;`
-  const botKey = STREAMLABS_BOT_KEY.replace(/;/g, '\n');
-
-  const [owner, repo] = BUILD_REPOSITORY_NAME.split('/');
-  const github = new GithubClient(STREAMLABS_BOT_ID, botKey, owner, repo);
-
   try {
+    const github = await getGithubClient();
     await github.login();
     await github.postCheck({
       name: 'Screenshots',
@@ -134,30 +125,6 @@ async function updateCheck() {
 
 }
 
-/**
- * exec sync or die
- */
-function exec(cmd) {
-  try {
-    console.log('RUN', cmd);
-    return execSync(cmd, { stdio: [0, 1, 2] });
-  } catch (e) {
-    console.error(e);
-    process.exit(1);
-  }
-}
-
-function getCommitSHA() {
-  // fetching the commit SHA
-  const lastCommits = execSync('git log -n 2 --pretty=oneline')
-    .toString()
-    .split('\n')
-    .map(log => log.split(' ')[0]);
-
-  // the repo is in the detached state for CI
-  // we need to take a one commit before to take a commit that has been associated to the PR
-  return CI ? lastCommits[1] : lastCommits[0];
-}
 
 async function uploadScreenshots() {
   if (!AWS_ACCESS_KEY || !AWS_SECRET_KEY || !AWS_BUCKET) {
@@ -195,4 +162,18 @@ async function uploadScreenshots() {
     console.error(e);
   }
 
+}
+
+/**
+ * returns github client in the logged-in state
+ */
+async function getGithubClient() {
+  // AzurePipelines doesn't support multiline variables.
+  // All new-line characters are replaced with `;`
+  const botKey = STREAMLABS_BOT_KEY.replace(/;/g, '\n');
+
+  const [owner, repo] = BUILD_REPOSITORY_NAME.split('/');
+  const github = new GithubClient(STREAMLABS_BOT_ID, botKey, owner, repo);
+  await github.login();
+  return github;
 }

@@ -258,7 +258,7 @@ export class TouchBarService extends Service {
       this.cpuLabel.label = `CPU: ${this.performanceService.state.CPU.toFixed(1)}%`;
       this.fpsLabel.label = `FPS: ${this.performanceService.state.frameRate.toFixed(2)}`;
       this.dfLabel.label = `Dropped Frames: ${this.performanceService.state.numberDroppedFrames}`;
-      this.brLabel.label = `Bitrate: ${this.performanceService.state.bandwidth} kbps`;
+      this.brLabel.label = `Bitrate: ${this.performanceService.state.streamingBandwidth} kbps`;
     }, 2000);
   }
 

@@ -22,7 +22,7 @@ export class PerformanceService {
   getModel(): IPerformanceState {
     return {
       CPU: this.performanceService.state.CPU,
-      bandwidth: this.performanceService.state.bandwidth,
+      bandwidth: this.performanceService.state.streamingBandwidth,
       frameRate: this.performanceService.state.frameRate,
       numberDroppedFrames: this.performanceService.state.numberDroppedFrames,
       percentageDroppedFrames: this.performanceService.state.percentageDroppedFrames,

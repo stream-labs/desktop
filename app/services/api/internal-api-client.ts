@@ -36,6 +36,8 @@ export class InternalApiClient {
 
   private skippedMutations: number[] = [];
 
+  private windowId = Utils.getWindowId();
+
   constructor() {
     this.listenWorkerWindowMessages();
   }
@@ -141,7 +143,7 @@ export class InternalApiClient {
         this.jsonrpc.createRequestWithOptions(
           isHelper ? target['_resourceId'] : serviceName,
           methodName,
-          { compactMode: true, fetchMutations: true },
+          { compactMode: true, fetchMutations: true, windowId: this.windowId },
           ...args,
         ),
       );

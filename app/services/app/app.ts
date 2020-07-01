@@ -39,6 +39,7 @@ import { downloadFile } from '../../util/requests';
 import { TouchBarService } from 'services/touch-bar';
 import { ApplicationMenuService } from 'services/application-menu';
 import { KeyListenerService } from 'services/key-listener';
+import { MetricsService } from '../metrics';
 import { SettingsService } from '../settings';
 
 interface IAppState {
@@ -100,6 +101,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private restreamService: RestreamService;
   @Inject() private applicationMenuService: ApplicationMenuService;
   @Inject() private keyListenerService: KeyListenerService;
+  @Inject() private metricsService: MetricsService;
   @Inject() private settingsService: SettingsService;
 
   private loadingPromises: Dictionary<Promise<any>> = {};
@@ -180,6 +182,7 @@ export class AppService extends StatefulService<IAppState> {
     this.applicationMenuService;
 
     ipcRenderer.send('AppInitFinished');
+    this.metricsService.recordMetric('sceneCollectionLoadingTime');
   }
 
   shutdownStarted = new Subject();
@@ -188,6 +191,7 @@ export class AppService extends StatefulService<IAppState> {
   private shutdownHandler() {
     this.START_LOADING();
     this.loadingChanged.next(true);
+    this.tcpServerService.stopListening();
     obs.NodeObs.StopCrashHandler();
     this.crashReporterService.beginShutdown();
 
@@ -198,7 +202,6 @@ export class AppService extends StatefulService<IAppState> {
       this.windowsService.closeChildWindow();
       await this.windowsService.closeAllOneOffs();
       this.ipcServerService.stopListening();
-      this.tcpServerService.stopListening();
       await this.userService.flushUserSession();
       await this.sceneCollectionsService.deinitialize();
       this.performanceService.stop();
@@ -286,8 +289,8 @@ export class AppService extends StatefulService<IAppState> {
   private async downloadAutoGameCaptureConfig() {
     // download game-list for auto game capture
     await downloadFile(
-      'https://slobs-cdn.streamlabs.com/configs/game_capture_list.lst',
-      `${this.appDataDirectory}/game_capture_list.lst`,
+      'https://slobs-cdn.streamlabs.com/configs/game_capture_list.json',
+      `${this.appDataDirectory}/game_capture_list.json`,
     );
   }
 

@@ -192,7 +192,7 @@ const DEFAULT_ALERT_FORMATS = {
   donations: '{name} has just donated {amount}!',
   donordrive: '{name} has just donated {amount} via Charity Streaming!',
   patreon: '{name} has just pledged {amount} via Patreon!',
-  extraLife: '{name} has just donated {amount} via ExtraLife!',
+  extraLife: '{name} has just donated {amount} via Extra Life!',
   justGiving: '{name} has just donated {amount} via JustGiving!',
   merch: '{name} bought {product}!',
   resubs: '{name} just resubbed for {months} months!',

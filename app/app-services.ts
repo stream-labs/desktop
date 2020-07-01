@@ -6,6 +6,7 @@
 export { AppService } from 'services/app';
 export { InternalApiService } from 'services/api/internal-api';
 export { ExternalApiService } from 'services/api/external-api';
+export { ExternalApiLimitsService } from 'services/api/external-api-limits';
 export { SourcesService, Source } from 'services/sources';
 export { Scene, SceneItem, SceneItemFolder, SceneItemNode, ScenesService } from 'services/scenes';
 export { ObsImporterService } from 'services/obs-importer';
@@ -51,6 +52,7 @@ export { TouchBarService } from 'services/touch-bar';
 export { ApplicationMenuService } from 'services/application-menu';
 export { MacPermissionsService } from 'services/mac-permissions';
 export { VirtualWebcamService } from 'services/virtual-webcam';
+export { MetricsService } from 'services/metrics';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';
@@ -92,6 +94,7 @@ export { DonationGoalService } from 'services/widgets/settings/donation-goal';
 export { FollowerGoalService } from 'services/widgets/settings/follower-goal';
 export { StarsGoalService } from 'services/widgets/settings/stars-goal';
 export { SupporterGoalService } from 'services/widgets/settings/supporter-goal';
+export { SubscriberGoalService } from 'services/widgets/settings/subscriber-goal';
 export { ViewerCountService } from 'services/widgets/settings/viewer-count';
 export { StreamBossService } from 'services/widgets/settings/stream-boss';
 export { DonationTickerService } from 'services/widgets/settings/donation-ticker';

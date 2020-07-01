@@ -9,7 +9,7 @@ import * as util from 'util';
 import * as path from 'path';
 import * as tasklist from 'tasklist';
 import * as fs from 'fs';
-import * as request from 'request';
+import fetch from 'node-fetch';
 import * as cp from 'child_process';
 import * as semver from 'semver';
 import * as crypto from 'crypto';
@@ -17,21 +17,6 @@ import * as crypto from 'crypto';
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
 const mkdir = util.promisify(fs.mkdir);
-
-/**
- * Use our own promisify for request, has better typings
- */
-const prequest = (info: request.UriOptions & request.CoreOptions) => {
-  return new Promise<request.Response>((resolve, reject) => {
-    request(info, (err, response) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(response);
-      }
-    });
-  });
-};
 
 /**
  * The main process provides this to the bootstrap module. It describes
@@ -182,10 +167,6 @@ async function fetchUpdater(info: IUpdateInfo): Promise<string | null> {
     updaterName = 'preview-updater.exe';
   }
 
-  const reqInfo = {
-    baseUrl: info.baseUrl,
-    uri: `/${updaterName}`,
-  };
   const updaterPath = path.resolve(info.tempDir, updaterName);
   if (await isUpdaterRunning(updaterPath, updaterName)) {
     console.log('Updater is already running, aborting fetch.');
@@ -193,42 +174,36 @@ async function fetchUpdater(info: IUpdateInfo): Promise<string | null> {
   }
 
   const outStream = fs.createWriteStream(updaterPath);
-
   return new Promise((resolve, reject) => {
-    const outPipe = request(reqInfo)
-      .on('response', response => {
-        if (response.statusCode !== 200) {
-          reject(`Failed to fetch updater: status ${response.statusCode}`);
+    fetch(`${info.baseUrl}/${updaterName}`)
+      .then(response => {
+        if (response.status !== 200) {
+          reject(`Failed to fetch updater: status ${response.status}`);
         }
+        const outPipe = response.body.pipe(outStream);
+        outPipe.on('close', () => {
+          resolve(updaterPath);
+        });
+
+        outPipe.on('error', error => {
+          reject(error);
+        });
       })
-      .pipe(outStream);
-
-    outPipe.on('close', () => {
-      resolve(updaterPath);
-    });
-
-    outPipe.on('error', error => {
-      reject(error);
-    });
+      .catch(e => {
+        reject(e);
+      });
   });
 }
 
 async function getLatestVersionInfo(info: IUpdateInfo): Promise<ILatestVersionInfo | null> {
-  const reqInfo = {
-    baseUrl: info.baseUrl,
-    uri: `/${info.versionFileName}`,
-    json: true,
-  };
+  const response = await fetch(`${info.baseUrl}/${info.versionFileName}`);
 
-  const response = await prequest(reqInfo);
-
-  if (response.statusCode !== 200) {
-    console.log(`Failed to fetch version information - ${response.statusCode}`);
-
+  if (response.status !== 200) {
+    console.log(`Failed to fetch version information - ${response.status}`);
     return null;
   }
 
-  return response.body;
+  return response.json();
 }
 
 async function shouldUpdate(latestVersion: ILatestVersionInfo, info: IUpdateInfo) {
