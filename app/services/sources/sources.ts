@@ -118,7 +118,7 @@ class SourcesViews extends ViewHandler<ISourcesState> {
       return s.channel === channel;
     })?.sourceId;
 
-    return this.getSource(id);
+    return id != null ? this.getSource(id) : null;
   }
 
   getSources() {
