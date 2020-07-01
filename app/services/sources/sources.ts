@@ -113,7 +113,7 @@ class SourcesViews extends ViewHandler<ISourcesState> {
     return this.state.sources[id] || this.state.temporarySources[id] ? new Source(id) : null;
   }
 
-  getSourceByChannel(channel: E_AUDIO_CHANNELS): Source {
+  getSourceByChannel(channel: E_AUDIO_CHANNELS): Source | null {
     const id = Object.values(this.state.sources).find(s => {
       return s.channel === channel;
     })?.sourceId;
