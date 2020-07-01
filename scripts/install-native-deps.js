@@ -78,6 +78,7 @@ async function runScript() {
       .map(async dependency => {
         const { bucket } = AmazonS3URI(dependency['url']);
 
+        executeCmd('rm -rf ' + path.join(node_modules, dependency['name']), { silent: false });
         sh.rm(path.join(process.cwd(), dependency['name']));
 
         let fileName = dependency['archive'];
