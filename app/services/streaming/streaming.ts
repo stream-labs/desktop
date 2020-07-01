@@ -145,7 +145,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         return this.views;
       },
       val => {
-        console.log('InfoChanged', val, val.viewerCount);
+        console.log('InfoChanged', val, val.chatUrl);
         // show the error if child window is closed
         if (val.info.error && !this.windowsService.state.child.isShown) {
           this.showGoLiveWindow();
