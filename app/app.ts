@@ -34,7 +34,6 @@ import uuid from 'uuid/v4';
 import Blank from 'components/windows/Blank.vue';
 import Main from 'components/windows/Main.vue';
 import CustomLoader from 'components/CustomLoader';
-import { getOS, OS } from 'util/operating-systems';
 import process from 'process';
 import { MetricsService } from 'services/metrics';
 
@@ -45,7 +44,7 @@ const slobsVersion = Utils.env.SLOBS_VERSION;
 const isProduction = Utils.env.NODE_ENV === 'production';
 const isPreview = !!Utils.env.SLOBS_PREVIEW;
 
-// TODO: Used by Eddy for debugging. Remove later.
+// Used by Eddy for debugging on mac.
 if (!isProduction) {
   const windowId = Utils.getWindowId();
   process.title = `SLOBS Renderer ${windowId}`;
@@ -127,7 +126,7 @@ if (
   Sentry.init({
     dsn: sentryDsn,
     release: `${slobsVersion}-${SLOBS_BUNDLE_ID}`,
-    sampleRate: isPreview || getOS() === OS.Mac ? 1.0 : 0.1,
+    sampleRate: isPreview ? 1.0 : 0.1,
     beforeSend: event => {
       // Because our URLs are local files and not publicly
       // accessible URLs, we simply truncate and send only

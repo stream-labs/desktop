@@ -5,7 +5,6 @@ import { Inject } from '../../../services/core/injector';
 import { SourcesService } from '../../../services/sources';
 import { ObsInput, IGoogleFont } from './ObsInput';
 import ObsFontSizeSelector from './ObsFontSizeSelector.vue';
-// MAC-TODO
 import * as fi from 'node-fontinfo';
 import { EFontStyle } from 'obs-studio-node';
 

@@ -41,6 +41,7 @@ import { ApplicationMenuService } from 'services/application-menu';
 import { KeyListenerService } from 'services/key-listener';
 import { MetricsService } from '../metrics';
 import { SettingsService } from '../settings';
+import { OS, getOS } from 'util/operating-systems';
 
 interface IAppState {
   loading: boolean;
@@ -111,15 +112,12 @@ export class AppService extends StatefulService<IAppState> {
   @track('app_start')
   @RunInLoadingMode()
   async load() {
-    // MAC-TODO: Remove debug logging
-
     if (Utils.isDevMode()) {
       electron.ipcRenderer.on('showErrorAlert', () => {
         this.SET_ERROR_ALERT(true);
       });
     }
 
-    console.log('Init: Validate login and download game capture');
     // perform several concurrent http requests
     await Promise.all([
       // We want to start this as early as possible so that any
@@ -137,49 +135,39 @@ export class AppService extends StatefulService<IAppState> {
     // Second, we want to start the crash reporter service.  We do this
     // after the user service because we want crashes to be associated
     // with a particular user if possible.
-    console.log('Init: Crash reporter begin startup');
     this.crashReporterService.beginStartup();
 
     if (!this.userService.isLoggedIn) {
       // If this user is logged in, this would have already happened as part of login
       // TODO: We should come up with a better way to handle this.
-      console.log('Init: scene collections');
       await this.sceneCollectionsService.initialize();
     }
 
-    console.log('Init: Dismissibles initialize');
     this.SET_ONBOARDED(this.onboardingService.startOnboardingIfRequired());
     this.dismissablesService.initialize();
 
-    console.log('Init: Bind shutdown');
     electron.ipcRenderer.on('shutdown', () => {
       electron.ipcRenderer.send('acknowledgeShutdown');
       this.shutdownHandler();
     });
 
-    console.log('Init: Monitor performance');
     this.performanceService.startMonitoringPerformance();
 
-    console.log('Init: Ipc server listen');
     this.ipcServerService.listen();
     this.tcpServerService.listen();
 
-    console.log('Init: Patch notes');
     this.patchNotesService.showPatchNotesIfRequired(this.state.onboarded);
-    console.log('Init: Update banner');
     this.announcementsService.updateBanner();
 
-    console.log('Init: Crash reporter end startup');
     this.crashReporterService.endStartup();
 
-    console.log('Init: Protocol links start');
     this.protocolLinksService.start(this.state.argv);
 
-    // MAC-TODO
-    console.log('Init: Touch bar service');
-    this.touchBarService;
-    console.log('Init: Application menu service');
-    this.applicationMenuService;
+    // Initialize some mac-only services
+    if (getOS() === OS.Mac) {
+      this.touchBarService;
+      this.applicationMenuService;
+    }
 
     ipcRenderer.send('AppInitFinished');
     this.metricsService.recordMetric('sceneCollectionLoadingTime');

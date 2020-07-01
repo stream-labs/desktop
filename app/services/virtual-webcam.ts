@@ -15,7 +15,7 @@ const INTERNAL_PLIST_PATH =
 export enum EVirtualWebcamPluginInstallStatus {
   Installed = 'installed',
   NotPresent = 'notPresent',
-  Outdated = 'outdated', // TODO
+  Outdated = 'outdated',
 }
 
 interface IVirtualWebcamServiceState {

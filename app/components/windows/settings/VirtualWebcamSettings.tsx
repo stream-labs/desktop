@@ -16,7 +16,7 @@ export default class AppearanceSettings extends Vue {
   }
 
   install() {
-    // Inttionally synchronous. Call is blocking until user action in the worker
+    // Intentionally synchronous. Call is blocking until user action in the worker
     // process, so we don't want the user doing anything else.
     this.virtualWebcamService.install();
     this.checkInstalled();

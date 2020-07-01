@@ -77,7 +77,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
   },
   dshow_input: {
     name: $t('Video Capture Device'),
-    description: $t('Select from your build in USB webcam or an external.'),
+    description: $t('Select from your built in USB webcam or an external.'),
     demoFilename: 'video-capture.png',
     supportList: [
       $t('Built in webcam'),
@@ -161,7 +161,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
   },
   av_capture_input: {
     name: $t('Video Capture Device'),
-    description: $t('Select from your build in USB webcam or an external.'),
+    description: $t('Select from your built in USB webcam or an external.'),
     demoFilename: 'video-capture.png',
     supportList: [
       $t('Built in webcam'),

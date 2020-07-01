@@ -19,7 +19,7 @@
     "start": "electron .",
     "clear-plugins": "rimraf plugins",
     "package": "yarn generate-agreement && rimraf dist && electron-builder build -w --x64 --config electron-builder/base.config.js",
-    "package:mac": "yarn generate-agreement && rimraf dist && electron-builder build -m --x64 --config electron-builder/base.config.js",
+    "package:mac": "yarn generate-agreement:mac && rimraf dist && electron-builder build -m --x64 --config electron-builder/base.config.js",
     "package:preview": "yarn generate-agreement && rimraf dist && electron-builder build -w --x64 --config electron-builder/preview.config.js",
     "eslint": "eslint {app,guest-api,obs-api,updater}/**/*.ts app/**/*.tsx main.js",
     "test": "tsc -p test && ava -v",
@@ -36,7 +36,8 @@
     "ci:performance": "node test/performance/performance-test-runner.js",
     "commit": "commit",
     "tail-obs-logs": "yarn install --cwd bin && node bin/tail-obs-logs.js",
-    "generate-agreement": "cat BASEAGREEMENT > license_en.txt && yarn licenses generate-disclaimer --ignore-platform >> license_en.txt"
+    "generate-agreement": "cat BASEAGREEMENT > AGREEMENT && yarn licenses generate-disclaimer --ignore-platform >> AGREEMENT",
+    "generate-agreement:mac": "cat BASEAGREEMENT > license_en.txt && yarn licenses generate-disclaimer --ignore-platform >> license_en.txt"
   },
   "prettier": {
     "singleQuote": true,
@@ -66,6 +67,7 @@
   },
   "dependencies": {
     "electron-updater": "^4.2.0",
+    "@streamlabs/game-overlay": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.41.tar.gz",
     "@types/node-fetch": "^2.5.5",
     "archiver": "2.1.1",
     "aws-sdk": "^2.344.0",
@@ -203,5 +205,8 @@
     "webpack-cli": "3.1.2",
     "webpack-manifest-plugin": "2.2.0",
     "webpack-merge": "4.2.1"
+  },
+  "optionalDependencies": {
+    "node-win32-np": "1.0.6"
   }
 }

@@ -9,7 +9,7 @@ import { WindowsService } from './windows';
 import { NavigationService } from './navigation';
 
 /**
- * Manages the application menuy and shortcuts on Mac OS
+ * Manages the application menu and shortcuts on Mac OS
  */
 export class ApplicationMenuService extends Service {
   @Inject() editorCommandsService: EditorCommandsService;

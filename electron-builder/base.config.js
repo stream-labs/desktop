@@ -20,14 +20,9 @@ const base = {
     'updater/mac/index.html',
     'updater/mac/Updater.js',
   ],
-  extraFiles: [
-    // 'LICENSE',
-    // 'AGREEMENT',
-    'shared-resources/**/*',
-    '!shared-resources/README',
-  ],
+  extraFiles: ['LICENSE', 'AGREEMENT', 'shared-resources/**/*', '!shared-resources/README'],
   directories: {
-    buildResources: '.'
+    buildResources: '.',
   },
   nsis: {
     license: 'AGREEMENT',

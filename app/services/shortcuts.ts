@@ -3,7 +3,7 @@ import Utils from './utils';
 import { AppService } from './app';
 import { Inject } from './core/injector';
 import { InitAfter } from './core';
-import { OS } from 'util/operating-systems';
+import { OS, getOS } from 'util/operating-systems';
 
 type TShortcutHandler = (event: KeyboardEvent) => void;
 
@@ -25,7 +25,7 @@ export class ShortcutsService extends Service {
   init() {
     // Shortcuts are handled via the application menu on Mac OS
     // TODO: Merge the windows and mac systems
-    if (process.platform === OS.Mac) return;
+    if (getOS() === OS.Mac) return;
 
     document.addEventListener('keydown', e => {
       // ignore key events from webview

@@ -8,9 +8,15 @@ import { WindowsService } from './windows';
 import { ScalableRectangle } from '../util/ScalableRectangle';
 import { Subscription } from 'rxjs';
 import { SelectionService } from 'services/selection';
-import { byOS, OS } from 'util/operating-systems';
+import { byOS, OS, getOS } from 'util/operating-systems';
 
-const nwr = electron.remote.require('node-window-rendering');
+// TODO: There are no typings for nwr
+let nwr: any;
+
+// NWR is used to handle display rendering via IOSurface on mac
+if (getOS() === OS.Mac) {
+  nwr = electron.remote.require('node-window-rendering');
+}
 
 const { remote } = electron;
 
@@ -195,23 +201,22 @@ export class Display {
     this.videoService.actions.resizeOBSDisplay(this.name, width, height);
     if (this.outputRegionCallbacks.length) this.refreshOutputRegion();
 
-    byOS({
-      [OS.Windows]: () => {},
-      [OS.Mac]: () => {
-        if (this.existingWindow) {
-          nwr.destroyWindow(this.name);
-          nwr.destroyIOSurface(this.name);
-        }
+    // On mac, resizing the display is not enough, we also have to
+    // recreate the window and IOSurface for the new size
+    if (getOS() === OS.Mac) {
+      if (this.existingWindow) {
+        nwr.destroyWindow(this.name);
+        nwr.destroyIOSurface(this.name);
+      }
 
-        const surface = this.videoService.createOBSIOSurface(this.name);
-        nwr.createWindow(
-          this.name,
-          remote.BrowserWindow.fromId(this.electronWindowId).getNativeWindowHandle(),
-        );
-        nwr.connectIOSurface(this.name, surface);
-        this.existingWindow = true;
-      },
-    });
+      const surface = this.videoService.createOBSIOSurface(this.name);
+      nwr.createWindow(
+        this.name,
+        remote.BrowserWindow.fromId(this.electronWindowId).getNativeWindowHandle(),
+      );
+      nwr.connectIOSurface(this.name, surface);
+      this.existingWindow = true;
+    }
   }
 
   remoteClose() {
@@ -221,13 +226,12 @@ export class Display {
     if (!this.displayDestroyed) {
       this.videoService.actions.destroyOBSDisplay(this.name);
 
-      byOS({
-        [OS.Windows]: () => {},
-        [OS.Mac]: () => {
-          nwr.destroyWindow(this.name);
-          nwr.destroyIOSurface(this.name);
-        },
-      });
+      // On mac, we also deinit NWR
+      if (getOS() === OS.Mac) {
+        nwr.destroyWindow(this.name);
+        nwr.destroyIOSurface(this.name);
+      }
+
       this.displayDestroyed = true;
     }
   }

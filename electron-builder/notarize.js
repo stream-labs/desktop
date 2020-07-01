@@ -3,6 +3,7 @@ const fs = require('fs');
 
 exports.default = async function notarizing(context) {
   if (process.env.SLOBS_NO_NOTARIZE) return;
+  if (process.platform !== 'darwin') return;
 
   const appName = context.packager.appInfo.productFilename;
   const appPath = `${context.appOutDir}/${appName}.app`;

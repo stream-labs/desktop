@@ -33,8 +33,11 @@ const {
 const path = require('path');
 const rimraf = require('rimraf');
 
-// MAC-TODO
-// const overlay = require('@streamlabs/game-overlay');
+// Game overlay is Windows only
+let overlay;
+if (process.platform === 'win32') {
+  overlay = require('@streamlabs/game-overlay');
+}
 
 // We use a special cache directory for running tests
 if (process.env.SLOBS_CACHE_DIR) {
@@ -699,25 +702,24 @@ ipcMain.on('showErrorAlert', () => {
   }
 });
 
-// MAC-TODO
-// ipcMain.on('gameOverlayPaintCallback', (e, { contentsId, overlayId }) => {
-//   const contents = webContents.fromId(contentsId);
+ipcMain.on('gameOverlayPaintCallback', (e, { contentsId, overlayId }) => {
+  const contents = webContents.fromId(contentsId);
 
-//   if (contents.isDestroyed()) return;
+  if (contents.isDestroyed()) return;
 
-//   contents.on('paint', (event, dirty, image) => {
-//     if (
-//       overlay.paintOverlay(
-//         overlayId,
-//         image.getSize().width,
-//         image.getSize().height,
-//         image.getBitmap(),
-//       ) === 0
-//     ) {
-//       contents.invalidate();
-//     }
-//   });
-// });
+  contents.on('paint', (event, dirty, image) => {
+    if (
+      overlay.paintOverlay(
+        overlayId,
+        image.getSize().width,
+        image.getSize().height,
+        image.getBitmap(),
+      ) === 0
+    ) {
+      contents.invalidate();
+    }
+  });
+});
 
 ipcMain.on('getWindowIds', e => {
   e.returnValue = {
