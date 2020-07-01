@@ -15,7 +15,7 @@ const { BrowserWindow } = electron.remote;
 // We remote.require because this module needs to live in the main
 // process so we can paint to it from there. We are doing this to
 // work around an electron bug: https://github.com/electron/electron/issues/20559
-const overlay = electron.remote.require('@streamlabs/game-overlay');
+const overlay = electron.remote.require('game-overlay');
 
 interface IWindowProperties {
   chat: { position: IVec2; id: number; enabled: boolean };

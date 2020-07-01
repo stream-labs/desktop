@@ -30,7 +30,7 @@ const {
 } = require('electron');
 const path = require('path');
 const rimraf = require('rimraf');
-const overlay = require('@streamlabs/game-overlay');
+const overlay = require('game-overlay');
 
 // We use a special cache directory for running tests
 if (process.env.SLOBS_CACHE_DIR) {
