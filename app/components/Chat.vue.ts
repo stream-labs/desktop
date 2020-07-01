@@ -4,7 +4,7 @@ import { Inject } from 'services/core/injector';
 import { ChatService } from 'services/chat';
 import electron from 'electron';
 import { RestreamService } from 'services/restream';
-import { byOS, OS } from 'util/operating-systems';
+import { OS, getOS } from 'util/operating-systems';
 
 @Component({})
 export default class Chat extends Vue {
@@ -32,32 +32,26 @@ export default class Chat extends Vue {
 
     // Work around an electron bug on mac where chat is not interactable
     // after leaving fullscreen until chat is remounted.
-    byOS({
-      [OS.Windows]: () => {},
-      [OS.Mac]: () => {
-        this.leaveFullScreenTrigger = () => {
-          setTimeout(() => {
-            this.changeChat();
-          }, 1000);
-        };
+    if (getOS() === OS.Mac) {
+      this.leaveFullScreenTrigger = () => {
+        setTimeout(() => {
+          this.changeChat();
+        }, 1000);
+      };
 
-        electron.remote.getCurrentWindow().on('leave-full-screen', this.leaveFullScreenTrigger);
-      },
-    });
+      electron.remote.getCurrentWindow().on('leave-full-screen', this.leaveFullScreenTrigger);
+    }
   }
 
   destroyed() {
     this.getChatService().actions.unmountChat(electron.remote.getCurrentWindow().id);
     clearInterval(this.resizeInterval);
 
-    byOS({
-      [OS.Windows]: () => {},
-      [OS.Mac]: () => {
-        electron.remote
-          .getCurrentWindow()
-          .removeListener('leave-full-screen', this.leaveFullScreenTrigger);
-      },
-    });
+    if (getOS() === OS.Mac) {
+      electron.remote
+        .getCurrentWindow()
+        .removeListener('leave-full-screen', this.leaveFullScreenTrigger);
+    }
   }
 
   @Watch('restream')

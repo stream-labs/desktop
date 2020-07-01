@@ -25,7 +25,7 @@ import { AppService } from 'services/app';
 import { propsToSettings } from 'util/obs';
 import { InitAfter } from '../core';
 import Utils from 'services/utils';
-import { byOS, OS } from 'util/operating-systems';
+import { OS, getOS } from 'util/operating-systems';
 
 @InitAfter('UserService')
 export class FacemasksService extends PersistentStatefulService<Interfaces.IFacemasksServiceState> {
@@ -72,18 +72,15 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
 
   init() {
     // Facemasks are only supported on Windows
-    byOS({
-      [OS.Windows]: () => {
-        super.init();
-        this.subscribeToSourceAdded();
-        this.userService.userLogin.subscribe(() => {
-          this.startup();
-        });
-        this.streamingService.streamingStatusChange.subscribe(status => {
-          if (status === 'starting' && this.userService.isLoggedIn) this.startup();
-        });
-      },
-      [OS.Mac]: () => {},
+    if (getOS() !== OS.Windows) return;
+
+    super.init();
+    this.subscribeToSourceAdded();
+    this.userService.userLogin.subscribe(() => {
+      this.startup();
+    });
+    this.streamingService.streamingStatusChange.subscribe(status => {
+      if (status === 'starting' && this.userService.isLoggedIn) this.startup();
     });
   }
 
