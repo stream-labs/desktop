@@ -22,6 +22,11 @@ class Props {
 
 type TCustomFieldName = 'title' | 'description';
 
+/**
+ * Component for modifying common platform fields
+ * if props.platform is provided it changes props for a single platform
+ * otherwise it changes fields for all enabled platforms
+ */
 @Component({ props: createProps(Props) })
 export default class CommonPlatformFields extends TsxComponent<Props> {
   @Inject() private streamingService: StreamingService;
@@ -94,7 +99,8 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
   private render() {
     const isSinglePlatformMode = !!this.props.platform;
     const disabled = this.targetPlatforms.length === 0;
-    const hasCustomCheckbox = isSinglePlatformMode && this.settings.advancedMode;
+    const hasCustomCheckbox =
+      isSinglePlatformMode && this.settings.advancedMode && this.enabledPlatforms.length > 1;
     const fieldsAreVisible = !hasCustomCheckbox || this.platformSettings.useCustomFields;
     const view = this.streamingService.views;
     const hasDescription = isSinglePlatformMode
