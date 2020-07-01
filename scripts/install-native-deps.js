@@ -74,20 +74,27 @@ async function runScript() {
 
     sh.cd(node_modules);
 
-    const promises = dependecies.filter(dependancy => dependancy[os])
-      .map(async dependancy => {
-        const { bucket } = AmazonS3URI(dependancy['url']);
+    const promises = dependecies.filter(dependency => dependency[os])
+      .map(async dependency => {
+        const { bucket } = AmazonS3URI(dependency['url']);
 
-        let fileName = dependancy['archive'];
-        fileName = fileName.replace('[VERSION]', dependancy['version']);
+        sh.rm(path.join(process.cwd(), 'node_modules', dependency['name']));
+
+        let fileName = dependency['archive'];
+        fileName = fileName.replace('[VERSION]', dependency['version']);
         fileName = fileName.replace('[OS]', os);
         
         await downloadBinaries(bucket, fileName).catch((error) => {
           log_error(error);
-          throw 'Installation failed for ' + dependancy['name'];
+          throw 'Installation failed for ' + dependency['name'];
         });
       });
       await Promise.all(promises);
+
+      if (process.platform === 'win32') {
+        sh.cd('../scripts');
+        executeCmd('facemask-plugin-move.bat', { silent: false });
+      }
   } catch (error) {
     log_error('An error occured preventing the script from installing successfully all required native dependencies.')
     log_error(error);
