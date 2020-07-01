@@ -4100,9 +4100,9 @@ cosmiconfig@^5.2.0:
     js-yaml "^3.13.1"
     parse-json "^4.0.0"
 
-"crash-handler@https://slobs-crash-handler.s3-us-west-2.amazonaws.com/crash-handler-1.0.4-osx.tar.gz":
+"crash-handler@https://slobs-crash-handler.s3-us-west-2.amazonaws.com/crash-handler-1.0.4-win64.tar.gz":
   version "0.0.1"
-  resolved "https://slobs-crash-handler.s3-us-west-2.amazonaws.com/crash-handler-1.0.4-osx.tar.gz#e9f2c47ba8ff9c558dbeab28db5a6a04ebd09717"
+  resolved "https://slobs-crash-handler.s3-us-west-2.amazonaws.com/crash-handler-1.0.4-win64.tar.gz#f2eaea84c244634a8a8871264121c860945b7043"
 
 crc32-stream@^2.0.0:
   version "2.0.0"
@@ -5663,9 +5663,9 @@ flush-write-stream@^1.0.0:
     inherits "^2.0.1"
     readable-stream "^2.0.4"
 
-"font-manager@https://slobs-font-manager.s3-us-west-2.amazonaws.com/font-manager-1.1.2-osx.tar.gz":
+"font-manager@https://slobs-font-manager.s3-us-west-2.amazonaws.com/font-manager-1.1.2-win64.tar.gz":
   version "1.0.8"
-  resolved "https://slobs-font-manager.s3-us-west-2.amazonaws.com/font-manager-1.1.2-osx.tar.gz#0610cc9cd66f3c4f1c407d19669568faf1fd38fd"
+  resolved "https://slobs-font-manager.s3-us-west-2.amazonaws.com/font-manager-1.1.2-win64.tar.gz#2dfe95f6a3953ef69a7a6b5f95cb45356fc46cd4"
 
 for-in@^1.0.2:
   version "1.0.2"
@@ -8317,9 +8317,9 @@ node-fetch@^2.3.0, node-fetch@^2.6.0:
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.0.tgz#e633456386d4aa55863f676a7ab0daa8fdecb0fd"
   integrity sha512-8dG4H5ujfvFiqDmVu9fQ5bOHUC15JMjMY/Zumv26oOvvVJjM67KF8koCWIabKQ1GJIa9r2mMZscBq/TbdOcmNA==
 
-"node-fontinfo@https://slobs-node-fontinfo.s3-us-west-2.amazonaws.com/node-fontinfo-1.0.8-osx.tar.gz":
+"node-fontinfo@https://slobs-node-fontinfo.s3-us-west-2.amazonaws.com/node-fontinfo-1.0.8-win64.tar.gz":
   version "0.0.12"
-  resolved "https://slobs-node-fontinfo.s3-us-west-2.amazonaws.com/node-fontinfo-1.0.8-osx.tar.gz#aa6481c89bccbfc122b3d4253cab8f5495ea4267"
+  resolved "https://slobs-node-fontinfo.s3-us-west-2.amazonaws.com/node-fontinfo-1.0.8-win64.tar.gz#d7d81f210f01d8ab97c79c5fb137719bf67c3a91"
 
 node-libs-browser@^2.0.0:
   version "2.0.0"
@@ -8350,9 +8350,9 @@ node-libs-browser@^2.0.0:
     util "^0.10.3"
     vm-browserify "0.0.4"
 
-"node-libuiohook@https://slobs-node-libuiohook.s3-us-west-2.amazonaws.com/node-libuiohook-1.0.8-osx.tar.gz":
+"node-libuiohook@https://slobs-node-libuiohook.s3-us-west-2.amazonaws.com/node-libuiohook-1.0.8-win64.tar.gz":
   version "0.0.9"
-  resolved "https://slobs-node-libuiohook.s3-us-west-2.amazonaws.com/node-libuiohook-1.0.8-osx.tar.gz#a9ebec94b5811952ec1d11013ccc12dda7034d62"
+  resolved "https://slobs-node-libuiohook.s3-us-west-2.amazonaws.com/node-libuiohook-1.0.8-win64.tar.gz#e305572f084d93611d52fc8c875091b28c223300"
 
 node-object-hash@^1.2.0:
   version "1.4.2"
@@ -8620,9 +8620,9 @@ object.values@^1.1.0:
     function-bind "^1.1.1"
     has "^1.0.3"
 
-"obs-studio-node@https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/osn-0.7.4-release-osx.tar.gz":
+"obs-studio-node@https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/osn-0.7.4-release-win64.tar.gz":
   version "0.3.99"
-  resolved "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/osn-0.7.4-release-osx.tar.gz#f2cfb7de9132ba6ef3c2eb147b24c95cdfa1316a"
+  resolved "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/osn-0.7.4-release-win64.tar.gz#b60d40541df833912f1388df22a6f131f2ea4eb7"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
