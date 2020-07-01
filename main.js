@@ -185,6 +185,22 @@ console.log(`Free: ${humanFileSize(os.freemem(), false)}`);
 console.log('=================================');
 
 app.on('ready', () => {
+  // Detect when running from an unwritable location like a DMG image (will break updater)
+  if (process.platform === 'darwin') {
+    try {
+      fs.accessSync(app.getPath('exe'), fs.constants.W_OK);
+    } catch (e) {
+      // This error code indicates a read only file system
+      if (e.code === 'EROFS') {
+        dialog.showErrorBox(
+          'Streamlabs OBS',
+          'Please run Streamlabs OBS from your Applications folder. Streamlabs OBS cannot run directly from this disk image.',
+        );
+        app.exit();
+      }
+    }
+  }
+
   // network logging is disabled by default
   if (!process.argv.includes('--network-logging')) return;
 
@@ -310,6 +326,7 @@ async function startApp() {
     y: mainWindowState.y,
     show: false,
     frame: false,
+    titleBarStyle: 'hidden',
     title: 'Streamlabs OBS',
     backgroundColor: '#17242D',
     webPreferences: { nodeIntegration: true, webviewTag: true },
@@ -350,6 +367,14 @@ async function startApp() {
     }
   });
 
+  // This needs to be explicitly handled on Mac
+  app.on('before-quit', e => {
+    if (!shutdownStarted) {
+      e.preventDefault();
+      mainWindow.close();
+    }
+  });
+
   ipcMain.on('acknowledgeShutdown', () => {
     if (appShutdownTimeout) clearTimeout(appShutdownTimeout);
   });
@@ -360,11 +385,7 @@ async function startApp() {
     workerWindow.close();
   });
 
-  // Initialize the keylistener
-  require('node-libuiohook').startHook();
-
   workerWindow.on('closed', () => {
-    require('node-libuiohook').stopHook();
     session.defaultSession.flushStorageData();
     session.defaultSession.cookies.flushStore(() => app.quit());
   });
@@ -373,6 +394,8 @@ async function startApp() {
   childWindow = new BrowserWindow({
     show: false,
     frame: false,
+    fullscreenable: false,
+    titleBarStyle: 'hidden',
     backgroundColor: '#17242D',
     webPreferences: { nodeIntegration: true },
   });
@@ -499,24 +522,46 @@ app.on('second-instance', (event, argv, cwd) => {
   }
 });
 
+let protocolLinkReady = false;
+let pendingLink;
+
+// For mac os, this event will fire when a protocol link is triggered
+app.on('open-url', (e, url) => {
+  if (protocolLinkReady) {
+    workerWindow.send('protocolLink', url);
+  } else {
+    pendingLink = url;
+  }
+});
+
+ipcMain.on('protocolLinkReady', () => {
+  protocolLinkReady = true;
+  if (pendingLink) workerWindow.send('protocolLink', pendingLink);
+});
+
 app.on('ready', () => {
   if (
     !process.argv.includes('--skip-update') &&
     (process.env.NODE_ENV === 'production' || process.env.SLOBS_FORCE_AUTO_UPDATE)
   ) {
-    const updateInfo = {
-      baseUrl: 'https://slobs-cdn.streamlabs.com',
-      version: pjson.version,
-      exec: process.argv,
-      cwd: process.cwd(),
-      waitPids: [process.pid],
-      appDir: path.dirname(app.getPath('exe')),
-      tempDir: path.join(app.getPath('temp'), 'slobs-updater'),
-      cacheDir: app.getPath('userData'),
-      versionFileName: `${releaseChannel}.json`,
-    };
+    // Windows uses our custom update, Mac uses electron-updater
+    if (process.platform === 'win32') {
+      const updateInfo = {
+        baseUrl: 'https://slobs-cdn.streamlabs.com',
+        version: pjson.version,
+        exec: process.argv,
+        cwd: process.cwd(),
+        waitPids: [process.pid],
+        appDir: path.dirname(app.getPath('exe')),
+        tempDir: path.join(app.getPath('temp'), 'slobs-updater'),
+        cacheDir: app.getPath('userData'),
+        versionFileName: `${releaseChannel}.json`,
+      };
 
-    bootstrap(updateInfo, startApp, app.exit);
+      bootstrap(updateInfo, startApp, app.exit);
+    } else {
+      new Updater(startApp).run();
+    }
   } else {
     startApp();
   }

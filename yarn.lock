@@ -8609,9 +8609,9 @@ object.values@^1.1.0:
     function-bind "^1.1.1"
     has "^1.0.3"
 
-"obs-studio-node@https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/osn-0.7.2-release-osx.tar.gz":
+"obs-studio-node@https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/osn-0.7.4-release-osx.tar.gz":
   version "0.3.99"
-  resolved "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/osn-0.7.2-release-osx.tar.gz#a94ac8229e9671a1e9f3d47c53fffb7cb52f0130"
+  resolved "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/osn-0.7.4-release-osx.tar.gz#f2cfb7de9132ba6ef3c2eb147b24c95cdfa1316a"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
