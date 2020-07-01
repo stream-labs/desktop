@@ -17,7 +17,7 @@ import { SceneCollectionsService } from 'services/scene-collections';
 // eslint-disable-next-line no-undef
 import WritableStream = NodeJS.WritableStream;
 import { $t } from 'services/i18n';
-import set = Reflect.set;
+import { OS, getOS } from 'util/operating-systems';
 
 const net = require('net');
 
@@ -87,7 +87,12 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
 
   listen() {
     this.listenConnections(this.createTcpServer());
-    if (this.state.namedPipe.enabled) this.listenConnections(this.createNamedPipeServer());
+
+    // Named pipe is windows only
+    if (this.state.namedPipe.enabled && getOS() === OS.Windows) {
+      this.listenConnections(this.createNamedPipeServer());
+    }
+
     if (this.state.websockets.enabled) this.listenConnections(this.createWebsoketsServer());
   }
 

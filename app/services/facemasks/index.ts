@@ -25,6 +25,7 @@ import { AppService } from 'services/app';
 import { propsToSettings } from 'util/obs';
 import { InitAfter } from '../core';
 import Utils from 'services/utils';
+import { OS, getOS } from 'util/operating-systems';
 
 @InitAfter('UserService')
 export class FacemasksService extends PersistentStatefulService<Interfaces.IFacemasksServiceState> {
@@ -70,6 +71,9 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   };
 
   init() {
+    // Facemasks are only supported on Windows
+    if (getOS() !== OS.Windows) return;
+
     super.init();
     this.subscribeToSourceAdded();
     this.userService.userLogin.subscribe(() => {

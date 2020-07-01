@@ -4,6 +4,7 @@ import SmoothProgressBar from 'components/shared/SmoothProgressBar';
 import { Inject } from 'services/core/injector';
 import { AutoConfigService, IConfigProgress } from 'services/auto-config';
 import { $t } from 'services/i18n';
+import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import commonStyles from './Common.m.less';
 
 interface IConfigStepPresentation {
@@ -20,6 +21,7 @@ class OptimizeProps {
 @Component({ props: createProps(OptimizeProps) })
 export default class Optimize extends TsxComponent<OptimizeProps> {
   @Inject() autoConfigService: AutoConfigService;
+  @Inject() videoEncodingOptimizationService: VideoEncodingOptimizationService;
 
   stepInfo: IConfigStepPresentation = null;
   optimizing = false;
@@ -44,6 +46,9 @@ export default class Optimize extends TsxComponent<OptimizeProps> {
           };
         }
       } else if (progress.event === 'done') {
+        // We also default on video encoding optimizations
+        this.videoEncodingOptimizationService.actions.useOptimizedProfile(true);
+
         this.props.setProcessing(false);
         sub.unsubscribe();
         this.props.continue();

@@ -119,6 +119,7 @@ export default class StudioEditor extends TsxComponent {
       altKey: event.altKey,
       ctrlKey: event.ctrlKey,
       shiftKey: event.shiftKey,
+      metaKey: event.metaKey,
       button: event.button,
       buttons: event.buttons,
     };

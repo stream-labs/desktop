@@ -177,7 +177,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       isShown: true,
       hideStyleBlockers: true,
       hideChat: false,
-      title: `Streamlabs OBS - Version: ${Utils.env.SLOBS_VERSION}`,
+      title: `Streamlabs OBS - ${Utils.env.SLOBS_VERSION}`,
     },
     child: {
       componentName: '',
@@ -194,13 +194,14 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
   windowUpdated = new Subject<{ windowId: string; options: IWindowOptions }>();
   windowDestroyed = new Subject<string>();
-  private windows: Dictionary<Electron.BrowserWindow> = {};
+  windows: Dictionary<Electron.BrowserWindow> = {};
 
   init() {
-    const windows = BrowserWindow.getAllWindows();
-    this.windows.worker = windows[0];
-    this.windows.main = windows[1];
-    this.windows.child = windows[2];
+    const windowIds = ipcRenderer.sendSync('getWindowIds');
+
+    this.windows.worker = BrowserWindow.fromId(windowIds.worker);
+    this.windows.main = BrowserWindow.fromId(windowIds.main);
+    this.windows.child = BrowserWindow.fromId(windowIds.child);
 
     this.updateScaleFactor('main');
     this.updateScaleFactor('child');
@@ -342,6 +343,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
     const newWindow = (this.windows[windowId] = new BrowserWindow({
       frame: false,
+      titleBarStyle: 'hidden',
+      fullscreenable: false,
       width: 400,
       height: 400,
       title: 'New Window',

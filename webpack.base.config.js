@@ -150,7 +150,7 @@ module.exports = {
         ],
       },
       {
-        test: /\.(png|jpe?g|gif|svg|mp4|ico|wav|webm)(\?.*)?$/,
+        test: /\.(png|jpe?g|gif|svg|mp4|ico|wav|webm|icns)(\?.*)?$/,
         loader: 'file-loader',
         options: {
           name: '[name]-[hash].[ext]',

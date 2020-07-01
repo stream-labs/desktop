@@ -1,9 +1,10 @@
 {
   "name": "slobs-client",
+  "productName": "Streamlabs OBS",
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "0.23.0-preview.3",
+  "version": "0.23.0-preview.4",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && yarn compile:updater && yarn webpack-cli --progress --config webpack.dev.config.js",
@@ -18,6 +19,7 @@
     "start": "electron .",
     "clear-plugins": "rimraf plugins",
     "package": "yarn generate-agreement && rimraf dist && electron-builder build -w --x64 --config electron-builder/base.config.js",
+    "package:mac": "yarn generate-agreement:mac && rimraf dist && electron-builder build -m --x64 --config electron-builder/base.config.js",
     "package:preview": "yarn generate-agreement && rimraf dist && electron-builder build -w --x64 --config electron-builder/preview.config.js",
     "eslint": "eslint {app,guest-api,obs-api,updater}/**/*.ts app/**/*.tsx main.js",
     "test": "tsc -p test && ava -v",
@@ -35,7 +37,8 @@
     "commit": "commit",
     "postinstall": "node ./scripts/install-native-deps.js && scripts/facemask-plugin-move.bat",
     "tail-obs-logs": "yarn install --cwd bin && node bin/tail-obs-logs.js",
-    "generate-agreement": "cat BASEAGREEMENT > AGREEMENT && yarn licenses generate-disclaimer --ignore-platform >> AGREEMENT"
+    "generate-agreement": "cat BASEAGREEMENT > AGREEMENT && yarn licenses generate-disclaimer --ignore-platform >> AGREEMENT",
+    "generate-agreement:mac": "cat BASEAGREEMENT > license_en.txt && yarn licenses generate-disclaimer --ignore-platform >> license_en.txt"
   },
   "prettier": {
     "singleQuote": true,
@@ -64,6 +67,7 @@
     "serial": true
   },
   "dependencies": {
+    "electron-updater": "^4.2.0",
     "@types/node-fetch": "^2.5.5",
     "archiver": "2.1.1",
     "aws-sdk": "^2.344.0",
@@ -147,7 +151,6 @@
     "mark.js": "8.11.1",
     "mime": "2.4.3",
     "moment": "2.22.2",
-    "node-win32-np": "1.0.6",
     "pixelmatch": "4.0.2",
     "pngjs": "3.3.3",
     "prettier": "1.19.1",
@@ -198,5 +201,8 @@
     "webpack-cli": "3.1.2",
     "webpack-manifest-plugin": "2.2.0",
     "webpack-merge": "4.2.1"
+  },
+  "optionalDependencies": {
+    "node-win32-np": "1.0.6"
   }
 }
