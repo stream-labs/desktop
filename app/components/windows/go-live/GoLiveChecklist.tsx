@@ -1,6 +1,10 @@
 import TsxComponent, { createProps } from '../../tsx-component';
 import { Inject } from '../../../services/core';
-import { StreamingService, TGoLiveChecklistItemState } from '../../../services/streaming';
+import {
+  IGoLiveSettings,
+  StreamingService,
+  TGoLiveChecklistItemState,
+} from '../../../services/streaming';
 import { WindowsService } from '../../../services/windows';
 import { $t } from 'services/i18n';
 import { Component } from 'vue-property-decorator';
@@ -56,6 +60,7 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
     const shouldPublishYT = !isUpdateMode && goLiveSettings.destinations.youtube?.enabled;
     const shouldShowOptimizedProfile =
       this.videoEncodingOptimizationService.state.useOptimizedProfile && !isUpdateMode;
+    const shouldPostTweet = this.twitterService.state.tweetWhenGoingLive;
 
     return (
       <div class={styles.container}>
@@ -92,6 +97,9 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
               checklist.publishYoutubeBroadcast,
               true,
             )}
+
+          {/* PUBLISH YT BROADCAST */}
+          {shouldPostTweet && this.renderCheck($t('Post a tweet'), checklist.postTweet)}
         </ul>
 
         {/* ERROR MESSAGE */}

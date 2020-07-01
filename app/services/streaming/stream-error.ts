@@ -24,6 +24,9 @@ const errorTypes = {
   YOUTUBE_PUBLISH_FAILED: {
     message: 'Failed to publish the Youtube broadcast',
   },
+  TWEET_FAILED: {
+    message: 'Failed to post a tweet',
+  },
 };
 export type TStreamErrorType = keyof typeof errorTypes;
 const newCallProtector = Symbol('singleton');

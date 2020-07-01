@@ -157,6 +157,7 @@ export default class GameSelector extends TsxComponent<Props> {
   private onInputHandler(values: string[]) {
     const options = values.map(value => this.gameOptions.find(opt => opt.value === value));
     const targetPlatforms = this.targetPlatforms;
+    const isMultiplatformMode = targetPlatforms.length > 1;
 
     // don't allow to select more than one game for each platform
     if (this.lastSelectedOption) {
@@ -180,7 +181,7 @@ export default class GameSelector extends TsxComponent<Props> {
     });
 
     // close the game selector if max items has been selected
-    if (options.length === targetPlatforms.length) {
+    if (isMultiplatformMode && options.length === targetPlatforms.length) {
       this.$refs.tagsInput.toggle();
     }
   }

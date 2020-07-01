@@ -23,6 +23,7 @@ import GoLiveError from './GoLiveError';
 import { SyncWithValue } from '../../../services/app/app-decorators';
 import { OptimizedProfileSwitcher } from './OptimizedProfileSwitcher';
 import { DestinationSwitchers } from './DestinationSwitchers';
+import { Twitter } from '../../Twitter';
 
 class SectionProps {
   title?: string = '';
@@ -138,6 +139,10 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
 
               {/*EXTRAS*/}
               <Section title={isAdvancedMode ? $t('Extras') : ''}>
+                <Twitter
+                  vModel={this.settings.tweetText}
+                  streamTitle={this.view.getCommonFields(this.settings).title}
+                />
                 <OptimizedProfileSwitcher
                   vModel={this.settings.optimizedProfile}
                   settings={this.settings}

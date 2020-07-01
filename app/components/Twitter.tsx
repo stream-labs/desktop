@@ -5,14 +5,13 @@ import { Inject } from 'services/core/injector';
 import { TwitterService } from 'services/integrations/twitter';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { $t } from 'services/i18n';
+import { shell } from 'electron';
 import { TextArea } from 'streamlabs-beaker';
 import { ToggleInput } from 'components/shared/inputs/inputs';
 import { UserService } from 'services/user';
-import electron from 'electron';
 
 import cx from 'classnames';
 import styles from './Twitter.m.less';
-import { WindowsService } from 'services/windows';
 
 class TwitterProps {
   streamTitle: string = '';
@@ -23,12 +22,8 @@ class TwitterProps {
 export class Twitter extends TsxComponent<TwitterProps> {
   @Inject() twitterService: TwitterService;
   @Inject() userService: UserService;
-  @Inject() windowsService: WindowsService;
 
   priorTitle: string = '';
-  private loading = false;
-  private tweetText: string;
-  private posted = false;
 
   get isTwitch() {
     return this.userService.platform.type === 'twitch';
@@ -58,6 +53,10 @@ export class Twitter extends TsxComponent<TwitterProps> {
     return this.twitterService.state.creatorSiteUrl;
   }
 
+  get composeTweetText() {
+    return $t('Compose Tweet');
+  }
+
   linkTwitter() {
     this.twitterService.openLinkTwitterDialog();
   }
@@ -66,20 +65,12 @@ export class Twitter extends TsxComponent<TwitterProps> {
     this.twitterService.unlinkTwitter().then(() => this.getTwitterStatus());
   }
 
-  private async share() {
-    this.loading = true;
-    try {
-      await this.twitterService.postTweet(this.props.value);
-      this.posted = true;
-    } catch (e) {
-      this.$toasted.show(e.error, {
-        position: 'bottom-center',
-        className: 'toast-alert',
-        duration: 1000,
-        singleton: true,
-      });
+  setInitialTweetBody() {
+    let url = `${this.siteUrl}/home`;
+    if (!this.csOnboardingComplete && this.isTwitch) {
+      url = `https://twitch.tv/${this.userService.platform.username}`;
     }
-    this.loading = false;
+    this.onTweetChange(`${this.props.streamTitle} ${url}`);
   }
 
   async getTwitterStatus() {
@@ -87,19 +78,45 @@ export class Twitter extends TsxComponent<TwitterProps> {
   }
 
   async created() {
-    this.tweetText = this.props.value;
-    this.priorTitle = this.props.streamTitle;
     await this.getTwitterStatus();
+    this.priorTitle = this.props.streamTitle;
+    this.setInitialTweetBody();
+  }
+
+  updateTweetModel(tweet: string) {
+    this.onTweetChange(tweet);
+  }
+
+  updateShouldTweet(shouldTweet: boolean) {
+    this.twitterService.setTweetPreference(shouldTweet);
+  }
+
+  onTweetChange(tweet: string) {
+    this.$emit('input', tweet);
+  }
+
+  @Watch('siteUrl')
+  onSiteUrlChange() {
+    this.setInitialTweetBody();
+  }
+
+  @Watch('streamTitle')
+  onTitleUpdate(title: string) {
+    const newTweet = this.props.value.replace(this.priorTitle, title);
+    if (this.props.value.indexOf(this.priorTitle) !== -1 && newTweet.length <= 280) {
+      this.onTweetChange(newTweet);
+    }
+    this.priorTitle = title;
   }
 
   get tweetInput() {
     return (
       <TextArea
         name="tweetInput"
-        disabled={this.loading}
-        value={this.tweetText}
+        onInput={this.updateTweetModel.bind(this)}
+        value={this.props.value}
         autoResize="true"
-        label={$t('Compose Tweet')}
+        label={this.composeTweetText}
         class={styles.twitterTweetInput}
         placeholder="Come check out my stream"
         maxLength={280}
@@ -126,6 +143,15 @@ export class Twitter extends TsxComponent<TwitterProps> {
       <div class={cx('section', styles.section)}>
         <p class={styles.twitterShareText}>{$t('Share Your Stream')}</p>
         <div class={styles.twitterRow}>
+          <div class={styles.twitterToggleBlock}>
+            <span>{$t('Enable Tweet Sharing')}</span>
+            <ToggleInput
+              onInput={(shouldTweet: boolean) => this.updateShouldTweet(shouldTweet)}
+              value={this.shouldTweet}
+              class={styles.twitterTweetToggle}
+              metadata={{ title: $t('Tweet when going live') }}
+            />
+          </div>
           <p>@{this.twitterScreenName}</p>
         </div>
         {this.tweetInput}
@@ -136,25 +162,17 @@ export class Twitter extends TsxComponent<TwitterProps> {
           >
             {$t('Unlink Twitter')}
           </button>
-          <button
-            disabled={this.loading}
-            class={cx('button', 'button--action', styles.adjustButton)}
-            onclick={() => this.share()}
-          >
-            {$t('Share')}
-          </button>
         </div>
       </div>
     );
   }
 
-  get postedView() {
-    return <div class={cx('section', styles.section)}>{$t('Your tween has been posted')}</div>;
+  get twitter() {
+    if (!this.hasTwitter) return this.unlinkedView;
+    if (this.hasTwitter) return this.linkedView;
   }
 
   render() {
-    if (this.posted) return this.postedView;
-    if (!this.hasTwitter) return this.unlinkedView;
-    if (this.hasTwitter) return this.linkedView;
+    return <HFormGroup metadata={{}}>{this.twitter}</HFormGroup>;
   }
 }

@@ -52,6 +52,7 @@ import { createStreamError, IStreamError, StreamError, TStreamErrorType } from '
 import { authorizedHeaders } from '../../util/requests';
 import { HostsService } from '../hosts';
 import { IEncoderProfile } from '../video-encoding-optimizations/definitions';
+import { TwitterService } from '../integrations/twitter';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -79,19 +80,20 @@ interface IOBSOutputSignalInfo {
 
 export class StreamingService extends StatefulService<IStreamingServiceState>
   implements IStreamingServiceApi {
-  @Inject() streamSettingsService: StreamSettingsService;
-  @Inject() outputSettingsService: OutputSettingsService;
-  @Inject() windowsService: WindowsService;
-  @Inject() usageStatisticsService: UsageStatisticsService;
-  @Inject() notificationsService: NotificationsService;
-  @Inject() userService: UserService;
-  @Inject() incrementalRolloutService: IncrementalRolloutService;
+  @Inject() private streamSettingsService: StreamSettingsService;
+  @Inject() private outputSettingsService: OutputSettingsService;
+  @Inject() private windowsService: WindowsService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
+  @Inject() private notificationsService: NotificationsService;
+  @Inject() private userService: UserService;
+  @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
   @Inject() private navigationService: NavigationService;
   @Inject() private customizationService: CustomizationService;
   @Inject() private restreamService: RestreamService;
   @Inject() private hostsService: HostsService;
   @Inject() private facebookService: FacebookService;
+  @Inject() private twitterService: TwitterService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -127,6 +129,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         setupRestream: 'not-started',
         startVideoTransmission: 'not-started',
         publishYoutubeBroadcast: 'not-started',
+        postTweet: 'not-started',
       },
     },
   };
@@ -243,7 +246,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
     // apply optimized settings
     const optimizer = this.videoEncodingOptimizationService;
-    if (optimizer.state.useOptimizedProfile) {
+    if (optimizer.state.useOptimizedProfile && settings.optimizedProfile) {
       if (unattendedMode && optimizer.canApplyProfileFromCache()) {
         optimizer.applyProfileFromCache();
       } else {
@@ -271,8 +274,21 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       }
     }
 
+    // tweet
+    if (settings.tweetText && this.twitterService.state.tweetWhenGoingLive) {
+      try {
+        await this.runCheck('postTweet', () => this.twitterService.postTweet(settings.tweetText));
+      } catch (e) {
+        this.setError(e);
+        return;
+      }
+    }
+
     this.UPDATE_STREAM_INFO({ lifecycle: 'live' });
     this.createGameAssociation(this.views.commonFields.game);
+
+    // TODO replace to actions.closeChildWindow
+    this.windowsService.closeChildWindow();
   }
 
   /**
@@ -559,8 +575,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         this.stopReplayBuffer();
       }
 
-      this.windowsService.actions.closeChildWindow();
-
+      // TODO: use actions
+      this.windowsService.closeChildWindow();
+      this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
       return Promise.resolve();
     }
 
@@ -1064,8 +1081,9 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
 
     return {
       destinations: destinations as IGoLiveSettings['destinations'],
-      optimizedProfile: null,
       advancedMode: this.streamSettingsService.state.goLiveSettings.advancedMode,
+      optimizedProfile: null,
+      tweetText: '',
     };
   }
 

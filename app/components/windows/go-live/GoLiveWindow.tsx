@@ -22,7 +22,6 @@ import Utils from '../../../services/utils';
 import Translate from '../../shared/translate';
 import GoLiveSettings from './GoLiveSettings';
 import GoLiveChecklist from './GoLiveChecklist';
-import GoLiveSuccess from './GoLiveSuccess';
 
 /***
  * Windows that manages steps for streaming start
@@ -60,7 +59,11 @@ export default class GoLiveWindow extends TsxComponent<{}> {
   onGoLiveSettingUpdateHandler() {
     // update local settings after settings for platforms have been prepopulated
     console.log('goLiveSettingsUpdated');
-    this.settings = cloneDeep(this.streamingService.views.goLiveSettings);
+    this.settings.destinations = cloneDeep(this.streamingService.views.goLiveSettings.destinations);
+  }
+
+  @Watch('settings') watchSettings() {
+    console.log('settings updated', this.settings.optimizedProfile);
   }
 
   private async switchAdvancedMode(enabled: boolean) {
@@ -106,8 +109,7 @@ export default class GoLiveWindow extends TsxComponent<{}> {
     const shouldShowSettings = ['empty', 'prepopulate', 'waitForNewSettings'].includes(
       this.lifecycle,
     );
-    const shouldShowChecklist = this.lifecycle === 'runChecklist';
-    const shouldShowSuccess = this.lifecycle === 'live';
+    const shouldShowChecklist = ['runChecklist', 'live'].includes(this.lifecycle);
 
     return (
       <ModalLayout customControls={true} showControls={false}>
@@ -120,7 +122,6 @@ export default class GoLiveWindow extends TsxComponent<{}> {
           <transition name="zoom">
             {shouldShowSettings && <GoLiveSettings class={styles.page} vModel={this.settings} />}
             {shouldShowChecklist && <GoLiveChecklist class={styles.page} />}
-            {shouldShowSuccess && <GoLiveSuccess class={styles.page} />}
           </transition>
         </ValidatedForm>
         <div slot="controls">{this.renderControls()}</div>

@@ -18,18 +18,19 @@ class Props {
 export class OptimizedProfileSwitcher extends TsxComponent<Props> {
   @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
   private loading: boolean = false;
-  @SyncWithValue() private selectedProfile: IEncoderProfile;
+  @SyncWithValue() private selectedProfile: IEncoderProfile = null;
 
   get game() {
     return this.props.settings.destinations.twitch.game;
   }
 
-  @Watch('game')
+  @Watch('game', { immediate: true })
   private async loadAvailableProfiles() {
     this.loading = true;
     this.selectedProfile = await this.videoEncodingOptimizationService.fetchOptimizedProfile(
       this.game,
     );
+    console.log('selected profile', this.selectedProfile);
     this.loading = false;
   }
 

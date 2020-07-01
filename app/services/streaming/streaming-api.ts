@@ -46,6 +46,7 @@ export interface IStreamInfo {
     setupRestream: TGoLiveChecklistItemState;
     startVideoTransmission: TGoLiveChecklistItemState;
     publishYoutubeBroadcast: TGoLiveChecklistItemState;
+    postTweet: TGoLiveChecklistItemState;
   };
 }
 
@@ -63,6 +64,7 @@ export interface IStreamSettings {
 
 export interface IGoLiveSettings extends IStreamSettings {
   optimizedProfile: IEncoderProfile;
+  tweetText: string;
 }
 
 export interface IPlatformCommonFields {
