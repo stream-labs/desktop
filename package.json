@@ -78,7 +78,7 @@
     "node-fetch": "^2.6.0",
     "node-fontinfo": "https://slobs-node-fontinfo.s3-us-west-2.amazonaws.com/node-fontinfo-1.0.8-win64.tar.gz",
     "node-libuiohook": "https://slobs-node-libuiohook.s3-us-west-2.amazonaws.com/node-libuiohook-1.0.8-win64.tar.gz",
-    "obs-studio-node": "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/osn-0.7.3-release-win64.tar.gz",
+    "obs-studio-node": "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/osn-0.7.4-release-win64.tar.gz",
     "raven": "^2.6.4",
     "request": "^2.88.0",
     "rimraf": "^2.6.1",
