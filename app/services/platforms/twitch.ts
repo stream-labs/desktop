@@ -33,7 +33,6 @@ export interface ITwitchStartStreamOptions {
 }
 
 export interface ITwitchChannelInfo extends ITwitchStartStreamOptions {
-  chatUrl: string;
   hasUpdateTagsPermission: boolean;
   availableTags: TTwitchTag[];
 }

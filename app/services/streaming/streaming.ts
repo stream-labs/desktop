@@ -142,6 +142,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     // watch for StreamInfoView at emit `streamInfoChanged` event if something has been hanged there
     this.store.watch(
       () => {
+        this.views.chatUrl; // read `chatUrl` to tell vuex that this computed property is reactive
         return this.views;
       },
       val => {
@@ -1068,9 +1069,7 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
 
   get chatUrl(): string {
     if (!this.userService.state.auth) return '';
-    return this.isMutliplatformMode
-      ? this.restreamService.chatUrl
-      : getPlatformService(this.enabledPlatforms[0]).chatUrl;
+    getPlatformService(this.userService.state.auth.primaryPlatform).state.chatUrl;
   }
 
   get goLiveSettings(): IGoLiveSettings {

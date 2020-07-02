@@ -150,9 +150,6 @@ export interface IWindowOptions extends Electron.BrowserWindowConstructorOptions
   // the display of elements we cannot draw over. During this time such elements, for example
   // BrowserViews and the OBS Display, will be hidden until the operation is complete.
   hideStyleBlockers: boolean;
-  // Necessary to hide chat when switching the chat URL to prevent a crash caused by rendering BrowsweWindows
-  // when the loaded url changes
-  hideChat: boolean;
 }
 
 interface IWindowsState {
@@ -164,7 +161,6 @@ const DEFAULT_WINDOW_OPTIONS: IWindowOptions = {
   scaleFactor: 1,
   isShown: true,
   hideStyleBlockers: false,
-  hideChat: false,
 };
 
 export class WindowsService extends StatefulService<IWindowsState> {
@@ -179,14 +175,12 @@ export class WindowsService extends StatefulService<IWindowsState> {
       scaleFactor: 1,
       isShown: true,
       hideStyleBlockers: true,
-      hideChat: false,
       title: `Streamlabs OBS - Version: ${Utils.env.SLOBS_VERSION}`,
     },
     child: {
       componentName: '',
       scaleFactor: 1,
       hideStyleBlockers: false,
-      hideChat: false,
       isShown: false,
     },
   };
@@ -442,10 +436,6 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.UPDATE_HIDE_STYLE_BLOCKERS(windowId, hideStyleBlockers);
   }
 
-  updateHideChat(windowId: string, hideChat: boolean) {
-    this.UPDATE_HIDE_CHAT(windowId, hideChat);
-  }
-
   updateChildWindowOptions(optionsPatch: Partial<IWindowOptions>) {
     const currentOptions = cloneDeep(this.state.child);
     const newOptions: IWindowOptions = {
@@ -494,11 +484,6 @@ export class WindowsService extends StatefulService<IWindowsState> {
   @mutation()
   private UPDATE_HIDE_STYLE_BLOCKERS(windowId: string, hideStyleBlockers: boolean) {
     this.state[windowId].hideStyleBlockers = hideStyleBlockers;
-  }
-
-  @mutation()
-  private UPDATE_HIDE_CHAT(windowId: string, hideChat: boolean) {
-    this.state[windowId].hideChat = hideChat;
   }
 
   @mutation()

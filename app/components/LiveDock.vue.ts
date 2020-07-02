@@ -202,7 +202,7 @@ export default class LiveDock extends Vue {
   }
 
   get chatHidden() {
-    return this.windowsService.state.main.hideChat;
+    return this.chatService.state.isReadyToShow;
   }
 
   get hasChatTabs() {

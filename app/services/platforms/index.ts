@@ -166,7 +166,7 @@ export interface IPlatformService {
   readonly platform: TPlatform;
   readonly displayName: string;
   readonly mergeUrl: string;
-  readonly chatUrl: string;
+  chatUrl: string;
   unlink: () => void;
 
   state: IPlatformState;

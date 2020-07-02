@@ -6,12 +6,19 @@ import electron, { ipcRenderer } from 'electron';
 import url from 'url';
 import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
-import { InitAfter } from './core';
+import { InitAfter, mutation, StatefulService } from './core';
 import Utils from './utils';
 import { StreamingService } from './streaming';
 
+interface IState {
+  isReadyToShow: boolean;
+}
+
 @InitAfter('StreamingService')
-export class ChatService extends Service {
+export class ChatService extends StatefulService<IState> {
+  static initialState: IState = {
+    isReadyToShow: false,
+  };
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() windowsService: WindowsService;
@@ -20,11 +27,12 @@ export class ChatService extends Service {
   private chatView: Electron.BrowserView | null;
   private chatUrl = '';
   private electronWindowId: number | null;
+  private mountChatTask: { resolve: Function } | null = null;
 
   init() {
-    // listen `streamInfoChanged` to init or deinit the chat
     this.chatUrl = this.streamingService.views.chatUrl;
-    if (this.chatUrl) this.initChat();
+
+    // listen `streamInfoChanged` to init or deinit the chat
     this.streamingService.streamInfoChanged.subscribe(streamInfo => {
       if (streamInfo.chatUrl === void 0) return; // chatUrl has not been changed
 
@@ -32,21 +40,14 @@ export class ChatService extends Service {
       const oldChatUrl = this.chatUrl;
       this.chatUrl = streamInfo.chatUrl;
 
-      // chat url has been changed to an empty string, deinit chat
+      // chat url has been changed to an empty string, unmount chat
       if (oldChatUrl && !this.chatUrl) {
-        this.deinitChat();
+        this.unmountChat();
         return;
       }
 
-      if (!this.chatUrl) return;
-
-      // chat url changed to a new valid url, init or reload chat
-      if (oldChatUrl) {
-        this.deinitChat();
-        this.initChat();
-      } else {
-        this.initChat();
-      }
+      // chat url changed to a new valid url, reload chat
+      this.navigateToChat();
     });
   }
 
@@ -58,6 +59,7 @@ export class ChatService extends Service {
     this.electronWindowId = electronWindowId;
     if (!this.chatView) this.initChat();
 
+    this.navigateToChat();
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
 
     if (this.chatView) win.addBrowserView(this.chatView);
@@ -76,18 +78,15 @@ export class ChatService extends Service {
     });
   }
 
-  unmountChat(electronWindowId: number) {
-    this.electronWindowId = null;
-    if (!this.chatView) return;
-
-    const win = electron.remote.BrowserWindow.fromId(electronWindowId);
-
+  unmountChat() {
+    if (!this.electronWindowId) return; // already unmounted
+    const win = electron.remote.BrowserWindow.fromId(this.electronWindowId);
     win.removeBrowserView(this.chatView);
-
+    this.electronWindowId = null;
     console.log('unmount simple chat');
   }
 
-  private async initChat() {
+  private initChat() {
     if (this.chatView) return;
     if (!this.userService.isLoggedIn) return;
 
@@ -100,15 +99,6 @@ export class ChatService extends Service {
       },
     });
 
-    if (this.electronWindowId) {
-      const win = this.windowsService.getWindowIdFromElectronId(this.electronWindowId);
-      if (win) this.windowsService.updateHideChat(win, true);
-      await this.navigateToChat();
-      if (win) this.windowsService.updateHideChat(win, false);
-    } else {
-      await this.navigateToChat();
-    }
-
     this.bindWindowListener();
     this.bindDomReadyListener();
 
@@ -118,19 +108,17 @@ export class ChatService extends Service {
   }
 
   private deinitChat() {
+    // this.SET_READY(false);
     // @ts-ignore: typings are incorrect
-    if (this.chatView) this.chatView.destroy();
+    this.unmountChat();
     this.chatView = null;
   }
 
   private async navigateToChat() {
     if (!this.chatUrl) return; // user has logged out
     if (!this.chatView) return; // chat was already deinitialized
-
-    await this.chatView.webContents.loadURL(this.chatUrl).catch(this.handleRedirectError);
-
-    // mount chat if electronWindowId is set and it has not been mounted yet
-    if (this.electronWindowId) this.mountChat(this.electronWindowId);
+    // this.navigateTask =
+    this.chatView.webContents.loadURL(this.chatUrl).catch(this.handleRedirectError);
   }
 
   handleRedirectError(e: Error) {
@@ -250,6 +238,7 @@ export class ChatService extends Service {
           true,
         );
       }
+      // this.SET_READY(true);
     });
   }
 
@@ -262,5 +251,9 @@ export class ChatService extends Service {
     if (changed.enableBTTVEmotes != null || changed.enableFFZEmotes != null) {
       this.refreshChat();
     }
+  }
+
+  @mutation() private SET_READY(ready: boolean) {
+    this.state.isReadyToShow = ready;
   }
 }
