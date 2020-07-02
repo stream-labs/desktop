@@ -90,7 +90,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     if (getOS() !== OS.Windows) return;
 
     super.init();
-    this.overlay = electron.remote.require('@streamlabs/game-overlay');
+    this.overlay = electron.remote.require('game-overlay');
 
     this.lifecycle = await this.userService.withLifecycle({
       init: this.initializeOverlay,

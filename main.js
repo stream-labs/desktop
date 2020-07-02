@@ -36,7 +36,7 @@ const rimraf = require('rimraf');
 // Game overlay is Windows only
 let overlay;
 if (process.platform === 'win32') {
-  overlay = require('@streamlabs/game-overlay');
+  overlay = require('game-overlay');
 }
 
 // We use a special cache directory for running tests
