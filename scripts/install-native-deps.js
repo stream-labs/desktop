@@ -86,6 +86,14 @@ async function runScript() {
 
     const promises = dependecies.filter(dependency => dependency[os])
       .map(async dependency => {
+        const file = path.join(process.cwd(), dependency['name'], 'package.json');
+        const jsonData = fs.readFileSync(file);
+        const root = JSON.parse(jsonData.toString());
+        const currentVersion = root['version'];
+
+        if (currentVersion == dependency['version'])
+          return;
+
         sh.rm('-rf', path.join(node_modules, dependency['name']));
 
         let fileName = dependency['archive'];
