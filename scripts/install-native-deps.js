@@ -1,14 +1,13 @@
 const sh = require('shelljs');
 const colors = require('colors/safe');
-const AWS = require('aws-sdk');
 const fs = require('fs');
 const os = require('os');
-const AmazonS3URI = require('amazon-s3-uri');
 const path = require('path');
+const stream = require('stream');
 
 const node_modules = path.join(process.cwd(), 'node_modules');
 
-const s3Client = new AWS.S3();
+const fetch = require('node-fetch');
 
 function log_info(msg) {
     sh.echo(colors.magenta(msg));
@@ -36,24 +35,35 @@ function executeCmd(cmd, options) {
   return result.stdout;
 }
 
-async function downloadBinaries(bucket, fileName, attempt = 60, waitMs = 60000) {
-  try {
-    const data = await s3Client.getObject({ Bucket: bucket, Key: fileName }).promise().catch( (error) => { throw error });
-    if (data) {
-      fs.writeFileSync(path.join(node_modules, fileName), data.Body);
-      log_info ('Installing ' + fileName);
-      executeCmd('tar -xzvf ' + fileName, { silent: true });
-      sh.rm(fileName);
-    }
-  } catch (e) {
-    if (attempt > 0) {
-      await new Promise(r => setTimeout(r, waitMs));
-      await downloadBinaries(bucket, fileName, --attempt).catch(() => console.log('failed'));
-    } else {
-      log_error('Error while downloading');
-      throw e;
-    }
-  }
+function downloadFile(srcUrl, dstPath) {
+  const tmpPath = `${dstPath}.tmp`;
+  return new Promise((resolve, reject) => {
+    fetch(srcUrl)
+      .then(response => {
+        if (response.ok) return response;
+        log_error(`Got ${response.status} response from ${srcUrl}`);
+        return Promise.reject(response);
+      })
+      .then(({ body }) => {
+        const fileStream = fs.createWriteStream(tmpPath);
+        stream.pipeline(body, fileStream, e => {
+          if (e) {
+            log_error(`Error downloading ${srcUrl}`, e);
+            reject(e);
+          } else {
+            fs.rename(tmpPath, dstPath, e => {
+              if (e) {
+                reject(e);
+                return;
+              }
+              log_info(`Successfully downloaded ${srcUrl}`);
+              resolve();
+            });
+          }
+        });
+      })
+      .catch(e => reject(e));
+  });
 }
 
 async function runScript() {
@@ -76,19 +86,20 @@ async function runScript() {
 
     const promises = dependecies.filter(dependency => dependency[os])
       .map(async dependency => {
-        const { bucket } = AmazonS3URI(dependency['url']);
-
         executeCmd('rm -rf ' + path.join(node_modules, dependency['name']), { silent: false });
-        sh.rm(path.join(process.cwd(), dependency['name']));
 
         let fileName = dependency['archive'];
         fileName = fileName.replace('[VERSION]', dependency['version']);
         fileName = fileName.replace('[OS]', os);
         
-        await downloadBinaries(bucket, fileName).catch((error) => {
-          log_error(error);
-          throw 'Installation failed for ' + dependency['name'];
-        });
+        const url = dependency['url'] + fileName;
+        const filePath = path.join(process.cwd(), fileName);
+
+        log_info ('Downloading ' + fileName);
+        await downloadFile(url, filePath);
+        log_info ('Installing ' + fileName);
+        executeCmd('tar -xzvf ' + fileName, { silent: true });
+        sh.rm(fileName);
       });
       await Promise.all(promises);
 
