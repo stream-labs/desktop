@@ -96,7 +96,8 @@ export class QuestionaireService extends StatefulService<
       console.log('uuid = ', uuid);
       console.log('hash = ', hash);
 
-      // まずアンケートを出す必要があるかどうか判定する
+      // 以前はアンケートを出す判断をする目的で呼び出していたAPIだが、アンケートはなくなったため、
+      // 現在はインストール数を集計する目的で利用している
       return this.callLicenseApi({ uuid, hash }).then((result: LicenseApiResponse) => {
         console.log('getlicenseair response: ', result);
         if (result.meta.status != 200) {
