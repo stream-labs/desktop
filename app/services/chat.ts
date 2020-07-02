@@ -100,7 +100,6 @@ export class ChatService extends StatefulService<IState> {
     });
 
     this.bindWindowListener();
-    this.bindDomReadyListener();
 
     this.customizationService.settingsChanged.subscribe(changed => {
       this.handleSettingsChanged(changed);

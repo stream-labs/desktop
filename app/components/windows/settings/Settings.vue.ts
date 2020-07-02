@@ -22,6 +22,9 @@ import FacemaskSettings from './FacemaskSettings.vue';
 import SearchablePages from 'components/shared/SearchablePages';
 import FormInput from 'components/shared/inputs/FormInput.vue';
 import StreamSettings from './StreamSettings';
+import { MagicLinkService } from 'services/magic-link';
+import electron from 'electron';
+import { UserService } from 'services/user';
 
 @Component({
   components: {
@@ -49,12 +52,13 @@ import StreamSettings from './StreamSettings';
 export default class Settings extends Vue {
   @Inject() settingsService: ISettingsServiceApi;
   @Inject() windowsService: WindowsService;
+  @Inject() magicLinkService: MagicLinkService;
+  @Inject() userService: UserService;
 
   $refs: { settingsContainer: HTMLElement & SearchablePages };
 
   searchStr = '';
   searchResultPages: string[] = [];
-  categoryName: string = 'General';
   settingsData: ISettingsSubCategory[] = [];
   icons: Dictionary<string> = {
     General: 'icon-overview',
@@ -74,6 +78,28 @@ export default class Settings extends Vue {
     Experimental: 'fas fa-flask',
     'Installed Apps': 'icon-store',
   };
+
+  internalCategoryName = 'General';
+
+  get categoryName() {
+    return this.internalCategoryName;
+  }
+
+  set categoryName(val: string) {
+    if (val === 'Prime') {
+      this.magicLinkService
+        .getDashboardMagicLink('prime-marketing', 'slobs-settings')
+        .then(link => {
+          electron.remote.shell.openExternal(link);
+        });
+    } else {
+      this.internalCategoryName = val;
+    }
+  }
+
+  get isPrime() {
+    return this.userService.views.isPrime;
+  }
 
   mounted() {
     this.categoryName = this.getInitialCategoryName();

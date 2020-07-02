@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // import { Component } from 'vue-property-decorator';
 // import { Inject } from 'services/core/injector';
 // import { WindowsService } from 'services/windows';

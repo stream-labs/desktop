@@ -54,6 +54,10 @@
         color: var(--button);
       }
     }
+
+    .vue-slider-tooltip {
+      color: var(--paragraph);
+    }
   }
 }
 

@@ -1,10 +1,10 @@
 import { Component } from 'vue-property-decorator';
-import { OnboardingStep } from 'streamlabs-beaker';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { $t } from 'services/i18n';
 import { Inject } from 'services';
 import { MacPermissionsService, IPermissionsStatus } from 'services/mac-permissions';
 import { Subscription } from 'rxjs';
+import commonStyles from './Common.m.less';
 
 class MacPermissionsProps {
   continue: () => void = () => {};
@@ -32,13 +32,13 @@ export default class MacPermissions extends TsxComponent<MacPermissionsProps> {
 
   render() {
     return (
-      <OnboardingStep style={{ width: '600px' }}>
-        <template slot="title">{$t('Grant Permissions')}</template>
-        <template slot="desc">
+      <div>
+        <h1 class={commonStyles.titleContainer}>{$t('Grant Permissions')}</h1>
+        <div>
           {$t(
             'Streamlabs OBS needs additional permissions. Grant permissions in the pop-up dialogs to continue.',
           )}
-        </template>
+        </div>
         <div style={{ fontSize: '16px' }}>
           <div>
             {$t('Microphone')}
@@ -59,9 +59,9 @@ export default class MacPermissions extends TsxComponent<MacPermissionsProps> {
           onClick={() => this.props.continue()}
           disabled={!this.permissions.webcamPermission || !this.permissions.micPermission}
         >
-          Continue
+          {$t('Continue')}
         </button>
-      </OnboardingStep>
+      </div>
     );
   }
 }

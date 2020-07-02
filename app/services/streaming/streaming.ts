@@ -802,6 +802,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         eventMetadata.server = streamSettings.server;
 
         this.usageStatisticsService.recordEvent('stream_start', eventMetadata);
+        this.usageStatisticsService.recordAnalyticsEvent('StreamingStatus', {
+          code: info.code,
+          status: EStreamingState.Live,
+        });
       } else if (info.signal === EOBSOutputSignal.Starting) {
         this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
         this.streamingStatusChange.next(EStreamingState.Starting);
@@ -811,6 +815,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         this.rejectStartStreaming();
         this.streamingStatusChange.next(EStreamingState.Offline);
         if (this.streamSettingsService.protectedModeEnabled) this.runPlaformAfterStopStreamHook();
+        this.usageStatisticsService.recordAnalyticsEvent('StreamingStatus', {
+          code: info.code,
+          status: EStreamingState.Offline,
+        });
       } else if (info.signal === EOBSOutputSignal.Stopping) {
         this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
         this.streamingStatusChange.next(EStreamingState.Ending);
@@ -832,6 +840,13 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         [EOBSOutputSignal.Stopping]: ERecordingState.Stopping,
       }[info.signal];
 
+      if (info.signal === EOBSOutputSignal.Start) {
+        this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
+          status: nextState,
+          code: info.code,
+        });
+      }
+
       this.SET_RECORDING_STATUS(nextState, time);
       this.recordingStatusChange.next(nextState);
     } else if (info.type === EOBSOutputType.ReplayBuffer) {
@@ -849,6 +864,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       }
 
       if (info.signal === EOBSOutputSignal.Wrote) {
+        this.usageStatisticsService.recordAnalyticsEvent('ReplayBufferStatus', {
+          status: 'wrote',
+          code: info.code,
+        });
         this.replayBufferFileWrite.next(obs.NodeObs.OBS_service_getLastReplay());
       }
     }
