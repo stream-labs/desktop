@@ -86,7 +86,7 @@ async function runScript() {
 
     const promises = dependecies.filter(dependency => dependency[os])
       .map(async dependency => {
-        executeCmd('rm -rf ' + path.join(node_modules, dependency['name']), { silent: false });
+        sh.rm('-rf', path.join(node_modules, dependency['name']));
 
         let fileName = dependency['archive'];
         fileName = fileName.replace('[VERSION]', dependency['version']);
