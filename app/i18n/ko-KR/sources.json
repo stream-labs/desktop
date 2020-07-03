@@ -5,7 +5,7 @@
   "Add videos or sound clips to your scene.": "장면에 비디오 또는 사운드 클립을 추가합니다.",
   "Capture a specific window that's open on your computer.": "컴퓨터에 열려있는 특정한 창을 캡처합니다.",
   "Compatible with most modern browsers and programs": "최신 브라우저 및 프로그램 대부분과 호환됩니다",
-  "Select from your build in USB webcam or an external.": "USB 웹캠 또는 외부에 있는 빌드에서 선택합니다.",
+  "Select from your built in USB webcam or an external.": "Select from your built in USB webcam or an external.",
   "Built in webcam": "내장 웹캠",
   "Logitech webcam": "Logitech 웹캠",
   "Capture cards (Elgato, Avermedia, BlackMagic)": "캡처 카드(Elgato, Avermedia, BlackMagic)",
@@ -179,5 +179,6 @@
   "Remove source": "소스 제거",
   "Toggle Selective Recording": "선택 녹화 토글",
   "Size": "사이즈",
-  "Position": "포지션"
+  "Position": "포지션",
+  "JACK Input Client": "JACK Input Client"
 }
