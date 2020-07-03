@@ -5,7 +5,7 @@
   "Add videos or sound clips to your scene.": "Tilføj videoer eller lydklip til scenen.",
   "Capture a specific window that's open on your computer.": "Optag fra et bestemt åbent vindue på computeren.",
   "Compatible with most modern browsers and programs": "Kompatibel med de fleste moderne browsere og programmer",
-  "Select from your build in USB webcam or an external.": "Vælg et indbygget webcam eller et eksternt kamera.",
+  "Select from your built in USB webcam or an external.": "Select from your built in USB webcam or an external.",
   "Built in webcam": "Indbygget webcam",
   "Logitech webcam": "Logitech-webcam",
   "Capture cards (Elgato, Avermedia, BlackMagic)": "Optagelseskort (Elgato, Avermedia, BlackMagic)",
@@ -179,5 +179,6 @@
   "Remove source": "Fjern kilde",
   "Toggle Selective Recording": "Aktivér selektiv optagelse",
   "Size": "Størrelse",
-  "Position": "Position"
+  "Position": "Position",
+  "JACK Input Client": "JACK Input Client"
 }
