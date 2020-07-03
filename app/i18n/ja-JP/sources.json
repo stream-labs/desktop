@@ -5,7 +5,7 @@
   "Add videos or sound clips to your scene.": "ビデオクリップまたはサウンドクリップをシーンに追加します。",
   "Capture a specific window that's open on your computer.": "コンピュータ上で開いている特定のウィンドウをキャプチャーします。",
   "Compatible with most modern browsers and programs": "最新のブラウザとプログラムに対応",
-  "Select from your build in USB webcam or an external.": "内蔵 USB ウェブカメラまたは外付けウェブカメラから選択します。",
+  "Select from your built in USB webcam or an external.": "Select from your built in USB webcam or an external.",
   "Built in webcam": "内蔵ウェブカメラ",
   "Logitech webcam": "Logicool ウェブカメラ",
   "Capture cards (Elgato, Avermedia, BlackMagic)": "キャプチャー カード (Elgato, Avermedia, BlackMagic)",
@@ -179,5 +179,6 @@
   "Remove source": "ソースを削除",
   "Toggle Selective Recording": "セレクティブレコーディングを切り替え",
   "Size": "サイズ",
-  "Position": "位置"
+  "Position": "位置",
+  "JACK Input Client": "JACK Input Client"
 }
