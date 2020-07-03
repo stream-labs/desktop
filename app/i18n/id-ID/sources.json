@@ -5,7 +5,7 @@
   "Add videos or sound clips to your scene.": "Tambahkan video atau klip suara ke scene Anda.",
   "Capture a specific window that's open on your computer.": "Tangkap jendela tertentu yang terbuka di komputer Anda.",
   "Compatible with most modern browsers and programs": "Kompatibel dengan sebagian besar browser dan program modern",
-  "Select from your build in USB webcam or an external.": "Pilih dari USB webcam internal Anda atau USB webcam eksternal.",
+  "Select from your built in USB webcam or an external.": "Select from your built in USB webcam or an external.",
   "Built in webcam": "Webcam bawaan",
   "Logitech webcam": "Webcam Logitech",
   "Capture cards (Elgato, Avermedia, BlackMagic)": "Tangkap kartu (Elgato, Avermedia, BlackMagic)",
@@ -179,5 +179,6 @@
   "Remove source": "Hapus sumber",
   "Toggle Selective Recording": "Berganti Rekaman Selektif",
   "Size": "Ukuran",
-  "Position": "Posisi"
+  "Position": "Posisi",
+  "JACK Input Client": "JACK Input Client"
 }
