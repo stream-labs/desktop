@@ -5,7 +5,7 @@
   "Add videos or sound clips to your scene.": "将视频或声音片段添加到场景。",
   "Capture a specific window that's open on your computer.": "捕捉在计算机上打开的特定窗口。",
   "Compatible with most modern browsers and programs": "兼容多数现代浏览器和程序",
-  "Select from your build in USB webcam or an external.": "从内置 USB 网络摄像头或外部选择。",
+  "Select from your built in USB webcam or an external.": "Select from your built in USB webcam or an external.",
   "Built in webcam": "内置网络摄像头",
   "Logitech webcam": "罗技网络摄像头",
   "Capture cards (Elgato, Avermedia, BlackMagic)": "采集卡（Elgato，Avermedia，BlackMagic）",
@@ -179,5 +179,6 @@
   "Remove source": "移除源",
   "Toggle Selective Recording": "切换选择性录制",
   "Size": "尺寸",
-  "Position": "位置"
+  "Position": "位置",
+  "JACK Input Client": "JACK Input Client"
 }
