@@ -5,7 +5,7 @@
   "Add videos or sound clips to your scene.": "Přidání videa nebo zvukových klipů do scény.",
   "Capture a specific window that's open on your computer.": "Zachycení konkrétního okna otevřeného v počítači.",
   "Compatible with most modern browsers and programs": "Kompatibilní s většinou moderních prohlížečů a programů.",
-  "Select from your build in USB webcam or an external.": "Vyberte integrovanou USB webkameru nebo externí kameru.",
+  "Select from your built in USB webcam or an external.": "Select from your built in USB webcam or an external.",
   "Built in webcam": "Integrovaná webkamera",
   "Logitech webcam": "Webkamera Logitech",
   "Capture cards (Elgato, Avermedia, BlackMagic)": "Karty pro zachycení videa (Elgato, Avermedia, BlackMagic)",
@@ -179,5 +179,6 @@
   "Remove source": "Odebrat zdroj",
   "Toggle Selective Recording": "Přepnout selektivní nahrávání",
   "Size": "Velikost",
-  "Position": "Pozice"
+  "Position": "Pozice",
+  "JACK Input Client": "JACK Input Client"
 }
