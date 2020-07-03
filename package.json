@@ -67,11 +67,11 @@
     "serial": true
   },
   "dependencies": {
-    "electron-updater": "^4.2.0",
     "@types/node-fetch": "^2.5.5",
     "archiver": "2.1.1",
     "aws-sdk": "^2.344.0",
     "crash-handler": "https://slobs-crash-handler.s3-us-west-2.amazonaws.com/crash-handler-0.0.0.tar.gz",
+    "electron-updater": "^4.2.0",
     "electron-window-state": "5.0.3",
     "eslint-loader": "^3.0.3",
     "extract-zip": "^1.6.7",
@@ -140,6 +140,7 @@
     "electron": "6.1.11",
     "electron-builder": "22.7.0",
     "electron-devtools-installer": "2.2.4",
+    "electron-notarize": "^1.0.0",
     "eslint": "6.8.0",
     "eslint-config-airbnb-base": "14.1.0",
     "eslint-plugin-import": "2.20.2",
