@@ -96,5 +96,7 @@
   "Multistream allows you to stream to multiple platforms simultaneously.": "多流传输允许您同时直播到多个平台。",
   "Multistream": "多流传输",
   "Your Twitch login is expired. Please log in again to continue using Streamlabs OBS": "您的 Twitch 登录已过期。请再次登录以继续使用 Streamlabs OBS",
-  "Refresh Login": "刷新登录"
+  "Refresh Login": "刷新登录",
+  "There was an error starting the output. Check your settings and try again. If this issue persists, please contact Streamlabs support.": "There was an error starting the output. Check your settings and try again. If this issue persists, please contact Streamlabs support.",
+  "Contact Support": "Contact Support"
 }
