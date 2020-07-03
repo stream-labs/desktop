@@ -96,5 +96,7 @@
   "Multistream allows you to stream to multiple platforms simultaneously.": "Multistream allows you to stream to multiple platforms simultaneously.",
   "Multistream": "Multistream",
   "Your Twitch login is expired. Please log in again to continue using Streamlabs OBS": "Your Twitch login is expired. Please log in again to continue using Streamlabs OBS",
-  "Refresh Login": "Refresh Login"
+  "Refresh Login": "Refresh Login",
+  "There was an error starting the output. Check your settings and try again. If this issue persists, please contact Streamlabs support.": "There was an error starting the output. Check your settings and try again. If this issue persists, please contact Streamlabs support.",
+  "Contact Support": "Contact Support"
 }
