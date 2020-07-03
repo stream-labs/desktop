@@ -5,7 +5,7 @@
   "Add videos or sound clips to your scene.": "Sahnenize video veya ses klipleri ekleyin.",
   "Capture a specific window that's open on your computer.": "Bilgisayarınızda açık olan belirli bir pencereyi yakalayın.",
   "Compatible with most modern browsers and programs": "Çoğu modern tarayıcı ve programla uyumludur",
-  "Select from your build in USB webcam or an external.": "Eklenmiş bir USB kamera ya da harici bir görüntü cihazı seçin.",
+  "Select from your built in USB webcam or an external.": "Select from your built in USB webcam or an external.",
   "Built in webcam": "Eklenmiş kamera",
   "Logitech webcam": "Logitech kamera",
   "Capture cards (Elgato, Avermedia, BlackMagic)": "Yakalama kartları (Elgato, Avermedia, BlackMagic)",
@@ -179,5 +179,6 @@
   "Remove source": "Kaynağı kaldır",
   "Toggle Selective Recording": "Seçilebilir Kaydı Değiştir",
   "Size": "Boyut",
-  "Position": "Konum"
+  "Position": "Konum",
+  "JACK Input Client": "JACK Input Client"
 }
