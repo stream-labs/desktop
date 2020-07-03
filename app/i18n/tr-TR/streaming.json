@@ -96,5 +96,7 @@
   "Multistream allows you to stream to multiple platforms simultaneously.": "Çoklu Yayın, aynı anda birden fazla platformda yayın yapmanıza olanak tanır.",
   "Multistream": "Çoklu Yayın",
   "Your Twitch login is expired. Please log in again to continue using Streamlabs OBS": "Twitch oturumunuzun süresi doldu. Streamlabs OBS kullanmaya devam etmek için lütfen yeniden oturum açın",
-  "Refresh Login": "Oturum Açmayı Yenile"
+  "Refresh Login": "Oturum Açmayı Yenile",
+  "There was an error starting the output. Check your settings and try again. If this issue persists, please contact Streamlabs support.": "There was an error starting the output. Check your settings and try again. If this issue persists, please contact Streamlabs support.",
+  "Contact Support": "Contact Support"
 }
