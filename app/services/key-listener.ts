@@ -28,6 +28,8 @@ interface INodeLibuiohook {
   registerCallback(binding: IKeyBinding): boolean;
   unregisterCallback(binding: IKeyBinding): void;
   unregisterAllCallbacks(): void;
+  startHook(): void;
+  stopHook(): void;
 }
 
 export class KeyListenerService extends Service {
@@ -35,6 +37,8 @@ export class KeyListenerService extends Service {
 
   // key -> namepsace -> function
   bindings: Dictionary<Dictionary<IKeyBinding>> = {};
+
+  hookStarted = false;
 
   init() {
     this.libuiohook = electron.remote.require('node-libuiohook');
@@ -49,6 +53,11 @@ export class KeyListenerService extends Service {
   }
 
   register(binding: IKeyBinding, namespace = 'global') {
+    if (!this.hookStarted) {
+      this.libuiohook.startHook();
+      this.hookStarted = true;
+    }
+
     // An empty string is not valid
     if (!binding.key) return;
     const keystr = this.getKeyString(binding);
@@ -86,6 +95,10 @@ export class KeyListenerService extends Service {
     //   delete this.bindings[keystr];
     //   this.libuiohook.unregisterCallback(binding);
     // }
+  }
+
+  shutdown() {
+    if (this.hookStarted) this.libuiohook.stopHook();
   }
 
   // Returns a string used for fast lookup of this keybinding

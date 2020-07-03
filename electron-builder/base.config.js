@@ -17,8 +17,13 @@ const base = {
     'index.html',
     'main.js',
     'obs-api',
+    'updater/mac/index.html',
+    'updater/mac/Updater.js',
   ],
-  extraFiles: ['LICENSE', 'AGREEMENT', 'shared-resources/*', '!shared-resources/README'],
+  extraFiles: ['LICENSE', 'AGREEMENT', 'shared-resources/**/*', '!shared-resources/README'],
+  directories: {
+    buildResources: '.',
+  },
   nsis: {
     license: 'AGREEMENT',
     oneClick: false,
@@ -54,9 +59,41 @@ const base = {
       });
     },
   },
+  mac: {
+    icon: 'media/images/icon-mac.icns',
+    hardenedRuntime: true,
+    entitlements: 'electron-builder/entitlements.plist',
+    entitlementsInherit: 'electron-builder/entitlements.plist',
+    extendInfo: {
+      CFBundleURLTypes: [
+        {
+          CFBundleURLName: 'Streamlabs OBS Link',
+          CFBundleURLSchemes: ['slobs'],
+        },
+      ],
+    },
+  },
+  dmg: {
+    background: 'media/images/dmg-bg.png',
+    iconSize: 100,
+    contents: [
+      {
+        x: 112,
+        y: 165,
+      },
+      {
+        type: 'link',
+        path: '/Applications',
+        x: 396,
+        y: 165,
+      },
+    ],
+  },
   extraMetadata: {
     env: 'production',
   },
+  afterPack: './electron-builder/afterPack.js',
+  afterSign: './electron-builder/notarize.js',
 };
 
 module.exports = base;

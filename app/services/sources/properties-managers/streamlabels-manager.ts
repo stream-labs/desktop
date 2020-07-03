@@ -2,6 +2,7 @@ import { DefaultManager, IDefaultManagerSettings } from './default-manager';
 import { Inject } from 'services/core/injector';
 import { StreamlabelsService, IStreamlabelSubscription } from 'services/streamlabels';
 import { UserService } from 'services/user';
+import { byOS, OS } from 'util/operating-systems';
 
 export interface IStreamlabelsManagerSettings extends IDefaultManagerSettings {
   statname: string;
@@ -13,8 +14,14 @@ export class StreamlabelsManager extends DefaultManager {
 
   settings: IStreamlabelsManagerSettings;
   private subscription: IStreamlabelSubscription;
-  blacklist = ['read_from_file', 'file'];
   customUIComponent = 'StreamlabelProperties';
+
+  get blacklist() {
+    return byOS({
+      [OS.Windows]: ['read_from_file', 'file'],
+      [OS.Mac]: ['from_file', 'text', 'text_file', 'log_mode', 'log_lines'],
+    });
+  }
 
   destroy() {
     this.unsubscribe();
@@ -83,10 +90,11 @@ export class StreamlabelsManager extends DefaultManager {
 
     this.subscription = this.streamlabelsService.subscribe(this.settings.statname);
 
-    this.obsSource.update({
-      ...this.obsSource.settings,
-      read_from_file: true,
-      file: this.subscription.path,
+    const sourceSettings = byOS({
+      [OS.Windows]: { read_from_file: true, file: this.subscription.path },
+      [OS.Mac]: { from_file: true, text_file: this.subscription.path },
     });
+
+    this.obsSource.update(sourceSettings);
   }
 }

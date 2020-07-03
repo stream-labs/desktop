@@ -5,6 +5,7 @@ import { CustomizationService } from 'services/customization';
 import { Inject } from 'services/core/injector';
 import { AppService } from 'services/app';
 import TsxComponent from 'components/tsx-component';
+import { OS, getOS } from 'util/operating-systems';
 
 @Component({})
 export default class ModalLayout extends TsxComponent<{
@@ -87,11 +88,11 @@ export default class ModalLayout extends TsxComponent<{
   }
 
   get wrapperClassNames() {
-    if (this.hasTitleBar) {
-      return [this.customizationService.currentTheme, 'has-titlebar'].join(' ');
-    }
-
-    return this.customizationService.currentTheme;
+    return {
+      [this.customizationService.currentTheme]: true,
+      'has-titlebar': this.hasTitleBar,
+      'modal-layout-mac': getOS() === OS.Mac,
+    };
   }
 
   cancel() {
