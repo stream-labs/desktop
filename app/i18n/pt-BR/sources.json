@@ -5,7 +5,7 @@
   "Add videos or sound clips to your scene.": "Adicione vídeos ou trechos de áudio à sua cena.",
   "Capture a specific window that's open on your computer.": "Capture uma janela específica que está aberta em seu computador.",
   "Compatible with most modern browsers and programs": "Compatível com a maioria dos navegadores e programas",
-  "Select from your build in USB webcam or an external.": "Selecione de sua câmera USB ou externa.",
+  "Select from your built in USB webcam or an external.": "Select from your built in USB webcam or an external.",
   "Built in webcam": "Webcam integrada",
   "Logitech webcam": "Webcam Logitech",
   "Capture cards (Elgato, Avermedia, BlackMagic)": "Placas de Captura (Elgato, Avermedia, BlackMagic)",
@@ -179,5 +179,6 @@
   "Remove source": "Remover fonte",
   "Toggle Selective Recording": "Alternar gravação seletiva",
   "Size": "Tamanho",
-  "Position": "Posição"
+  "Position": "Posição",
+  "JACK Input Client": "JACK Input Client"
 }
