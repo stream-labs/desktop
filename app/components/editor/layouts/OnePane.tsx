@@ -24,7 +24,7 @@ export default class OnePane extends BaseLayout {
   render() {
     return (
       <div class={cx(styles.columns, styles.sidePadded)}>
-        <div style={{ width: `calc(100% - ${this.bar1}px)` }} class={styles.cell}>
+        <div style={{ width: `${100 - this.resizes.bar1 * 100}%` }} class={styles.cell}>
           {this.$slots['2']}
         </div>
         <ResizeBar
@@ -37,7 +37,10 @@ export default class OnePane extends BaseLayout {
           min={this.mins.bar1}
           reverse={true}
         />
-        <div class={styles.rows} style={{ width: `${this.bar1}px`, paddingTop: '16px' }}>
+        <div
+          class={styles.rows}
+          style={{ width: `${this.resizes.bar1 * 100}%`, paddingTop: '16px' }}
+        >
           <div class={styles.cell} style={{ height: '100%' }}>
             {this.$slots['1']}
           </div>

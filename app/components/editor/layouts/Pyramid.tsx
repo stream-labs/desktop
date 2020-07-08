@@ -22,7 +22,7 @@ export default class Pyramid extends BaseLayout {
   render() {
     return (
       <div class={styles.rows}>
-        <div class={styles.cell} style={{ height: `calc(100% - ${this.bar1}px)` }}>
+        <div class={styles.cell} style={{ height: `${100 - this.resizes.bar1 * 100}%` }}>
           {this.$slots['1']}
         </div>
         <ResizeBar
@@ -35,7 +35,10 @@ export default class Pyramid extends BaseLayout {
           min={this.mins.bar1}
           reverse={true}
         />
-        <div class={styles.segmented} style={{ height: `${this.bar1}px`, padding: '0 8px' }}>
+        <div
+          class={styles.segmented}
+          style={{ height: `${this.resizes.bar1 * 100}%`, padding: '0 8px' }}
+        >
           {['2', '3'].map(slot => (
             <div class={cx(styles.cell, styles.noTopPadding)}>{this.$slots[slot]}</div>
           ))}

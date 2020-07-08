@@ -38,7 +38,7 @@ export default class Triplets extends BaseLayout {
   render() {
     return (
       <div class={cx(styles.columns, styles.sidePadded)}>
-        {this.stackedSection(['1', '4'], `calc(100% - ${this.bar1 + this.bar2}px)`)}
+        {this.stackedSection(['1', '4'], `${100 - (this.resizes.bar1 + this.resizes.bar2) * 100}%`)}
         <ResizeBar
           position="right"
           value={this.bar1}
@@ -49,7 +49,7 @@ export default class Triplets extends BaseLayout {
           min={this.mins.bar1}
           reverse={true}
         />
-        {this.stackedSection(['2', '5'], `${this.bar1}px`)}
+        {this.stackedSection(['2', '5'], `${100 - this.resizes.bar1 * 100}%`)}
         <ResizeBar
           position="left"
           value={this.bar2}
@@ -60,7 +60,7 @@ export default class Triplets extends BaseLayout {
           min={this.mins.bar2}
           reverse={true}
         />
-        {this.stackedSection(['3', '6'], `${this.bar2}px`)}
+        {this.stackedSection(['3', '6'], `${100 - this.resizes.bar2 * 100}%`)}
       </div>
     );
   }
