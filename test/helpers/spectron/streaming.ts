@@ -46,8 +46,10 @@ export async function tryToGoLive(t: TExecutionContext, prefillData?: Dictionary
   if (await t.context.app.client.isExisting('button=Go Live')) await click(t, 'button=Go Live');
   if (prefillData) {
     await fillForm(t, 'form[name=editStreamForm]', prefillData);
+    console.log('prefiled;');
   }
   await submit(t);
+  console.log('submited;');
 }
 
 /**
