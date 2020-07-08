@@ -224,7 +224,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       key: streamKey,
       streamType: 'rtmp_common',
     });
-    this.updateState({ streamKey });
+    this.SET_STREAM_KEY(streamKey);
 
     // update the local chanel info based on the selected broadcast and emit the "channelInfoChanged" event
     this.setActiveBroadcast(broadcast);
