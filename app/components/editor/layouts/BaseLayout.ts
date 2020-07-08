@@ -43,7 +43,7 @@ export default class BaseLayout extends TsxComponent<LayoutProps> {
     return null;
   }
 
-  get chatExpanded() {
+  get chatCollapsed() {
     return this.customizationService.state.livedockCollapsed;
   }
 
@@ -62,14 +62,15 @@ export default class BaseLayout extends TsxComponent<LayoutProps> {
     return this.layoutService.views.currentTab.resizes;
   }
 
-  async getBarPixels(bar: 'bar1' | 'bar2') {
+  async getBarPixels(bar: 'bar1' | 'bar2', offset: number) {
     // Before we can access the clientRect at least one render cycle needs to run
     if (!this.firstRender) await this.$nextTick();
     this.firstRender = true;
     // Migrate from pixels to proportions
     if (this.resizes[bar] >= 1) await this.setBar(bar, this.resizes[bar]);
     const { height, width } = this.$el.getBoundingClientRect();
-    return Math.round((this.isColumns ? width : height) * this.resizes[bar]);
+    const offsetSize = this.isColumns ? width - offset : height;
+    return Math.round(offsetSize * this.resizes[bar]);
   }
 
   async setBar(bar: 'bar1' | 'bar2', val: number) {
@@ -124,9 +125,14 @@ export default class BaseLayout extends TsxComponent<LayoutProps> {
     return max - restMin;
   }
 
-  @Watch('chatExpanded')
-  async updateSize() {
-    this.bar1 = await this.getBarPixels('bar1');
-    this.bar2 = await this.getBarPixels('bar2');
+  @Watch('chatCollapsed')
+  async updateSize(chatCollapsed = true, oldChatCollapsed?: boolean) {
+    let offset = chatCollapsed ? 0 : this.customizationService.state.livedockSize;
+    // Reverse offset if chat is collapsed from an uncollapsed state
+    if (chatCollapsed && oldChatCollapsed === false) {
+      offset = this.customizationService.state.livedockSize * -1;
+    }
+    this.bar1 = await this.getBarPixels('bar1', offset);
+    this.bar2 = await this.getBarPixels('bar2', offset);
   }
 }
