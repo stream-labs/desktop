@@ -27,7 +27,7 @@ enum EAppState {
 
 interface ICrashReporterState {
   code: EAppState;
-  detected: string; // what was detected before close happens: ipc freez, backend crash, electron window unresponcive 
+  detected: string; // what was detected before close happens: ipc freez, backend crash, electron window unresponcive
   version: string; // SLOBS version
 }
 
@@ -113,7 +113,7 @@ export class CrashReporterService extends Service {
   }
 
   private readStateFile(): ICrashReporterState {
-    const clearState = { code: EAppState.CleanExit, version: this.version };
+    const clearState = { code: EAppState.CleanExit, version: this.version, detected: '' };
     try {
       if (!fs.existsSync(this.appStateFile)) return clearState;
       const stateString = fs.readFileSync(this.appStateFile).toString() as EAppState;
