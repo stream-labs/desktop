@@ -30,7 +30,7 @@ export default class BaseLayout extends TsxComponent<LayoutProps> {
   bar2: number = 0;
 
   async mountResize() {
-    this.$emit('totalWidth', await this.mapVectors(this.vectors));
+    this.$emit('totalWidth', await this.mapVectors(this.vectors), this.isColumns);
     window.addEventListener('resize', () => this.updateSize());
     await this.updateSize();
   }
