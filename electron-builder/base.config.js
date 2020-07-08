@@ -20,7 +20,6 @@ const base = {
     'updater/mac/index.html',
     'updater/mac/Updater.js',
   ],
-  extraFiles: ['LICENSE', 'AGREEMENT', 'shared-resources/**/*', '!shared-resources/README'],
   directories: {
     buildResources: '.',
   },
@@ -36,6 +35,7 @@ const base = {
     url: 'https://slobs-cdn.streamlabs.com',
   },
   win: {
+    extraFiles: ['LICENSE', 'AGREEMENT', 'shared-resources/**/*', '!shared-resources/README'],
     rfc3161TimeStampServer: 'http://timestamp.digicert.com',
     timeStampServer: 'http://timestamp.digicert.com',
     async sign(config) {
@@ -60,6 +60,7 @@ const base = {
     },
   },
   mac: {
+    extraFiles: ['shared-resources/**/*', '!shared-resources/README'],
     icon: 'media/images/icon-mac.icns',
     hardenedRuntime: true,
     entitlements: 'electron-builder/entitlements.plist',
