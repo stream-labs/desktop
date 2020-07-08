@@ -22,7 +22,10 @@ export default class FourByFour extends BaseLayout {
   render() {
     return (
       <div class={styles.rows}>
-        <div class={styles.cell} style={{ height: `calc(100% - ${this.bar1 + this.bar2}px)` }}>
+        <div
+          class={styles.cell}
+          style={{ height: `${100 - (this.resizes.bar1 + this.resizes.bar2) * 100}%` }}
+        >
           {this.$slots['1']}
         </div>
         <ResizeBar
@@ -35,7 +38,7 @@ export default class FourByFour extends BaseLayout {
           min={this.mins.bar1}
           reverse={true}
         />
-        <div class={styles.segmented} style={{ height: `${this.bar1}px` }}>
+        <div class={styles.segmented} style={{ height: `${this.resizes.bar1 * 100}%` }}>
           <div class={cx(styles.cell, styles.noTopPadding)}>{this.$slots['2']}</div>
           <div class={cx(styles.cell, styles.noTopPadding)}>{this.$slots['3']}</div>
         </div>
@@ -49,7 +52,10 @@ export default class FourByFour extends BaseLayout {
           min={this.mins.bar2}
           reverse={true}
         />
-        <div class={styles.segmented} style={{ height: `${this.bar2}px`, padding: '0 8px' }}>
+        <div
+          class={styles.segmented}
+          style={{ height: `${this.resizes.bar2 * 100}`, padding: '0 8px' }}
+        >
           <div class={cx(styles.cell, styles.noTopPadding)}>{this.$slots['4']}</div>
           <div class={cx(styles.cell, styles.noTopPadding)}>{this.$slots['5']}</div>
         </div>

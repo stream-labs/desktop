@@ -27,7 +27,7 @@ export default class OnePaneR extends BaseLayout {
       <div class={cx(styles.columns, styles.sidePadded)}>
         <div
           class={styles.rows}
-          style={{ width: `calc(100% - ${this.bar1}px)`, paddingTop: '16px' }}
+          style={{ width: `${100 - this.resizes.bar1 * 100}%`, paddingTop: '16px' }}
         >
           <div class={styles.cell} style={{ height: '100%' }}>
             {this.$slots['1']}
@@ -48,7 +48,7 @@ export default class OnePaneR extends BaseLayout {
           min={this.mins.bar1}
           reverse={true}
         />
-        <div style={{ width: `${this.bar1}px` }} class={styles.cell}>
+        <div style={{ width: `${this.resizes.bar1 * 100}%` }} class={styles.cell}>
           {this.$slots['2']}
         </div>
       </div>
