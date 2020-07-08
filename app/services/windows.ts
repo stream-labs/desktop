@@ -136,7 +136,6 @@ export interface IWindowOptions extends Electron.BrowserWindowConstructorOptions
     minWidth?: number;
     minHeight?: number;
   };
-  position?: { x: number; y: number };
   scaleFactor: number;
   isShown: boolean;
   title?: string;
@@ -219,10 +218,6 @@ export class WindowsService extends StatefulService<IWindowsState> {
     return Object.keys(this.windows).find(win => this.windows[win].id === electronWindowId);
   }
 
-  getBounds(windowId: string): Electron.Rectangle {
-    return this.windows[windowId].getBounds();
-  }
-
   showWindow(options: Partial<IWindowOptions>) {
     // Don't center the window if it's the same component
     // This prevents "snapping" behavior when navigating settings
@@ -272,7 +267,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
       this.updateChildWindowOptions({ ...options, isShown: true });
       childWindow.setMinimumSize(options.size.width, options.size.height);
-      if (options.center || options.position) {
+      if (options.center) {
         childWindow.setBounds({
           x: Math.floor(childX),
           y: Math.floor(childY),
@@ -437,14 +432,14 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
   updateChildWindowOptions(optionsPatch: Partial<IWindowOptions>) {
-    const currentOptions = cloneDeep(this.state.child);
     const newOptions: IWindowOptions = {
       ...DEFAULT_WINDOW_OPTIONS,
-      ...currentOptions,
       ...optionsPatch,
       scaleFactor: this.state.child.scaleFactor,
     };
     if (newOptions.preservePrevWindow) {
+      const currentOptions = cloneDeep(this.state.child);
+
       if (currentOptions.preservePrevWindow) {
         throw new Error(
           "You can't use preservePrevWindow option for more that 1 window in the row",

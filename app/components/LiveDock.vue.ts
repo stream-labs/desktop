@@ -17,12 +17,20 @@ import { WindowsService } from 'services/windows';
 import { RestreamService, YoutubeService } from 'app-services';
 import { getPlatformService } from '../services/platforms';
 
+@Component({})
+class TestComp extends Vue {
+  mounted() {
+    console.log('test comp is mounted');
+  }
+}
+
 @Component({
   components: {
     Chat,
     ListInput,
     PlatformAppPageView,
     Tabs,
+    TestComp,
   },
 })
 export default class LiveDock extends Vue {
@@ -108,11 +116,11 @@ export default class LiveDock extends Vue {
 
   setCollapsed(livedockCollapsed: boolean) {
     this.canAnimate = true;
-    this.windowsService.actions.updateStyleBlockers('main', true);
+    this.windowsService.updateStyleBlockers('main', true);
     this.customizationService.setSettings({ livedockCollapsed });
     setTimeout(() => {
       this.canAnimate = false;
-      this.windowsService.actions.updateStyleBlockers('main', false);
+      this.windowsService.updateStyleBlockers('main', false);
     }, 300);
   }
 
@@ -202,7 +210,8 @@ export default class LiveDock extends Vue {
   }
 
   get chatHidden() {
-    return this.chatService.state.isReadyToShow;
+    return false;
+    // return this.chatService.state.isReadyToShow;
   }
 
   get hasChatTabs() {

@@ -27,7 +27,7 @@ export class ChatService extends StatefulService<IState> {
   private chatView: Electron.BrowserView | null;
   private chatUrl = '';
   private electronWindowId: number | null;
-  private mountChatTask: { resolve: Function } | null = null;
+  private loadUrlTask: { resolve: (success: boolean) => unknown } | null = null;
 
   init() {
     this.chatUrl = this.streamingService.views.chatUrl;
@@ -47,24 +47,23 @@ export class ChatService extends StatefulService<IState> {
       }
 
       // chat url changed to a new valid url, reload chat
-      this.navigateToChat();
+      this.loadUrl();
     });
   }
 
   refreshChat() {
-    this.navigateToChat();
+    this.loadUrl();
   }
 
-  mountChat(electronWindowId: number) {
+  async mountChat(electronWindowId: number) {
+    console.log('start mount');
+    this.deinitChat();
+    this.initChat();
+    this.loadUrl();
     this.electronWindowId = electronWindowId;
-    if (!this.chatView) this.initChat();
-
-    this.navigateToChat();
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
-
     if (this.chatView) win.addBrowserView(this.chatView);
-
-    console.log('mount simple chat');
+    console.log('finish mount');
   }
 
   setChatBounds(position: IVec2, size: IVec2) {
@@ -108,16 +107,14 @@ export class ChatService extends StatefulService<IState> {
   }
 
   private deinitChat() {
-    // this.SET_READY(false);
     // @ts-ignore: typings are incorrect
     this.unmountChat();
     this.chatView = null;
   }
 
-  private async navigateToChat() {
+  private async loadUrl(): Promise<boolean> {
     if (!this.chatUrl) return; // user has logged out
     if (!this.chatView) return; // chat was already deinitialized
-    // this.navigateTask =
     this.chatView.webContents.loadURL(this.chatUrl).catch(this.handleRedirectError);
   }
 
@@ -238,7 +235,13 @@ export class ChatService extends StatefulService<IState> {
           true,
         );
       }
-      // this.SET_READY(true);
+
+      // chat is fully loaded now
+      if (this.loadUrlTask) {
+        this.loadUrlTask.resolve(true);
+        this.loadUrlTask = null;
+        console.log('loaded');
+      }
     });
   }
 
@@ -253,7 +256,7 @@ export class ChatService extends StatefulService<IState> {
     }
   }
 
-  @mutation() private SET_READY(ready: boolean) {
+  @mutation() private SET_READY_TOSHOW(ready: boolean) {
     this.state.isReadyToShow = ready;
   }
 }
