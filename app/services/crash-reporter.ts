@@ -99,6 +99,9 @@ export class CrashReporterService extends Service {
     this.appState = this.readStateFile();
     this.appState.code = code;
     this.appState.version = this.version;
+    if (this.appState.code !== EAppState.Starting) {
+      this.appState.detected = '';
+    }
 
     if (process.env.NODE_ENV !== 'production') return;
     try {
