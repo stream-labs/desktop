@@ -44,6 +44,9 @@ interface IOBSConfigSceneItem {
   pos: IVec2;
   scale: IVec2;
   visible: boolean;
+  bounds: IVec2;
+  bounds_align: number;
+  bounds_type: number;
 }
 
 interface IOBSConfigSource {
@@ -280,6 +283,35 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
                 };
                 const pos = item.pos;
                 const scale = item.scale;
+
+                if (
+                  item.bounds &&
+                  item.bounds.x &&
+                  item.bounds.y &&
+                  item.bounds_align === 0 &&
+                  [1, 2].includes(item.bounds_type)
+                ) {
+                  // Stretch
+                  scale.x = item.bounds.x / sourceToAdd.width;
+                  scale.y = item.bounds.y / sourceToAdd.height;
+
+                  // Fit
+                  if (item.bounds_type === 2) {
+                    if (scale.x > scale.y) {
+                      scale.x = scale.y;
+
+                      // Account for centering in the bounding box
+                      const actualWidth = sourceToAdd.width * scale.x;
+                      pos.x += (item.bounds.x - actualWidth) / 2;
+                    } else {
+                      scale.y = scale.x;
+
+                      // Account for centering in the bounding box
+                      const actualHeight = sourceToAdd.height * scale.y;
+                      pos.y += (item.bounds.y - actualHeight) / 2;
+                    }
+                  }
+                }
 
                 sceneItem.setSettings({
                   visible: item.visible,

@@ -129,6 +129,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
     name: string;
     type: TSourceType;
     configurable: boolean;
+    width: number;
+    height: number;
     channel?: number;
     isTemporary?: boolean;
     propertiesManagerType?: TPropertiesManager;
@@ -150,8 +152,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
       configurable: addOptions.configurable,
 
       // Unscaled width and height
-      width: 0,
-      height: 0,
+      width: addOptions.width,
+      height: addOptions.height,
 
       muted: false,
       channel: addOptions.channel,
@@ -207,6 +209,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
       id,
       name,
       type,
+      width: obsInput.width,
+      height: obsInput.height,
       configurable: obsInput.configurable,
       channel: options.channel,
       isTemporary: options.isTemporary,
