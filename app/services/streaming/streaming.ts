@@ -1088,7 +1088,7 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
 
   get chatUrl(): string {
     if (!this.userService.state.auth) return '';
-    getPlatformService(this.userService.state.auth.primaryPlatform).state.chatUrl;
+    return getPlatformService(this.userService.state.auth.primaryPlatform).chatUrl;
   }
 
   get goLiveSettings(): IGoLiveSettings {

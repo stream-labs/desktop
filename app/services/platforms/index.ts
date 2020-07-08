@@ -118,7 +118,6 @@ export interface IPlatformState {
   streamKey: string;
   settings: TStartStreamOptions;
   streamPageUrl: string;
-  chatUrl: string;
   isPrepopulated: boolean;
 }
 

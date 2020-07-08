@@ -46,6 +46,13 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
     ) as { title: string; description: string };
   }
 
+  mounted() {
+    // set common fields fore each target platform
+    Object.keys(this.commonFields).forEach((fieldName: 'title' | 'description') =>
+      this.updateCommonField(fieldName, this.commonFields[fieldName]),
+    );
+  }
+
   private get enabledPlatforms(): TPlatform[] {
     const platforms = Object.keys(this.settings.destinations) as TPlatform[];
     return platforms.filter(platform => this.settings.destinations[platform].enabled);

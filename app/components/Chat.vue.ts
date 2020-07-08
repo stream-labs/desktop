@@ -21,6 +21,7 @@ export default class Chat extends Vue {
   @Inject() restreamService: RestreamService;
 
   mounted() {
+    console.log('chat component is mounted');
     this.getChatService().actions.mountChat(electron.remote.getCurrentWindow().id);
 
     this.resizeInterval = window.setInterval(() => {

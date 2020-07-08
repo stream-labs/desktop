@@ -16,7 +16,6 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
     streamKey: '',
     streamPageUrl: '',
     viewersCount: 0,
-    chatUrl: '',
     settings: null,
     isPrepopulated: false,
   };
@@ -73,11 +72,6 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
   @mutation()
   protected SET_STREAM_PAGE_URL(url: string) {
     this.state.streamPageUrl = url;
-  }
-
-  @mutation()
-  protected SET_CHAT_URL(url: string) {
-    this.state.chatUrl = url;
   }
 
   @mutation()
