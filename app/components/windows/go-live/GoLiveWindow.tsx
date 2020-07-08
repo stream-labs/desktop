@@ -118,6 +118,7 @@ export default class GoLiveWindow extends TsxComponent<{}> {
           slot="content"
           handleExtraValidation={this.postValidate}
           style={{ position: 'relative' }}
+          name="editStreamForm"
         >
           <transition name="zoom">
             {shouldShowSettings && <GoLiveSettings class={styles.page} vModel={this.settings} />}

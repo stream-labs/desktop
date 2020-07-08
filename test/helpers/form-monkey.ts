@@ -34,7 +34,7 @@ export class FormMonkey {
   constructor(
     private t: TExecutionContext,
     private formSelector?: string,
-    private showLogs = false,
+    private showLogs = true,
   ) {
     if (!formSelector) this.formSelector = DEFAULT_SELECTOR;
   }
@@ -77,6 +77,7 @@ export class FormMonkey {
    * fill the form with values
    */
   async fill(formData: Dictionary<any>) {
+    this.log('fill form with data', formData);
     await this.waitForLoading();
     const inputs = await this.getInputs();
 
@@ -130,6 +131,7 @@ export class FormMonkey {
     if (notFoundFields.length) {
       throw new Error(`Fields not found: ${JSON.stringify(notFoundFields)}`);
     }
+    this.log('filled');
   }
 
   /**

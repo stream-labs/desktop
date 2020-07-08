@@ -1099,7 +1099,7 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
 
     return {
       destinations: destinations as IGoLiveSettings['destinations'],
-      advancedMode: this.streamSettingsService.state.goLiveSettings.advancedMode,
+      advancedMode: this.streamSettingsService.state.goLiveSettings?.advancedMode,
       optimizedProfile: null,
       tweetText: '',
     };

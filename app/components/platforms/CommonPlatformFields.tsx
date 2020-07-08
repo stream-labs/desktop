@@ -152,6 +152,7 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
                 onInput={(val: string) => this.updateCommonField('title', val)}
                 metadata={metadata.text({
                   title: $t('Title'),
+                  name: 'title',
                   required: true,
                   fullWidth: true,
                   disabled,
@@ -165,6 +166,7 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
                   onInput={(val: string) => this.updateCommonField('description', val)}
                   metadata={metadata.textArea({
                     title: $t('Description'),
+                    name: 'description',
                     fullWidth: true,
                     disabled,
                   })}
