@@ -46,7 +46,7 @@ import { FacebookService, IFacebookStartStreamOptions } from 'services/platforms
 import Utils from 'services/utils';
 import Vue from 'vue';
 import { ISourcesState, Source } from '../sources';
-import { cloneDeep, difference } from 'lodash';
+import { cloneDeep, difference, pick } from 'lodash';
 import watch from 'vuex';
 import { createStreamError, IStreamError, StreamError, TStreamErrorType } from './stream-error';
 import { authorizedHeaders } from '../../util/requests';
@@ -1267,8 +1267,16 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
       enabled: false,
       useCustomFields: false,
     };
+    const settings = pick(service.state.settings, ['title', 'description', 'game']);
+
+    // use previously used title and description if not provided
+    if (!settings.title) settings.title = this.streamSettingsService.state.title;
+
+    if (this.supports('description', platform) && !settings['description']) {
+      settings['description'] = this.streamSettingsService.state.description;
+    }
     return {
-      ...service.state.settings,
+      ...settings,
       useCustomFields,
       enabled: enabled || this.isPrimaryPlatform(platform),
     };
