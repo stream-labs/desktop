@@ -13,6 +13,7 @@ class ResizeBarProps {
   reverse: boolean = false;
   onResizestart: () => void = null;
   onResizestop: () => void = null;
+  onInput?: (val: number) => void = null;
 }
 
 /**

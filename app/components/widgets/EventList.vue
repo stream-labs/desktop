@@ -62,10 +62,10 @@
         :metadata="{ tooltip: backgroundColorTooltip }"
       />
       <v-form-group :title="$t('Show Animation')">
-        <animation-input v-model="wData.settings.show_animation" :metadata="{ filter: 'in' }" />
+        <animation-input v-model="wData.settings.show_animation" :metadata="{ filter: 'eventIn' }" />
       </v-form-group>
       <v-form-group :title="$t('Hide Animation')">
-        <animation-input v-model="wData.settings.hide_animation" :metadata="{ filter: 'out' }" />
+        <animation-input v-model="wData.settings.hide_animation" :metadata="{ filter: 'eventOut' }" />
       </v-form-group>
       <v-form-group
         :title="$t('Animation Speed')"
