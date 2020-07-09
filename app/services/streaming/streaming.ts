@@ -1,4 +1,4 @@
-import { StatefulService, mutation, ViewHandler } from 'services/core/stateful-service';
+import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-service';
 import * as obs from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import moment from 'moment';
@@ -8,50 +8,44 @@ import { WindowsService } from 'services/windows';
 import { Subject } from 'rxjs';
 import electron from 'electron';
 import {
-  IStreamingServiceApi,
-  IStreamingServiceState,
-  EStreamingState,
   ERecordingState,
   EReplayBufferState,
+  EStreamingState,
   IGoLiveSettings,
   IStreamInfo,
-  TGoLiveChecklistItemState,
-  IPlatformFlags,
-  IPlatformCommonFields,
+  IStreamingServiceApi,
+  IStreamingServiceState,
   IStreamSettings,
+  TGoLiveChecklistItemState,
 } from './streaming-api';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { $t } from 'services/i18n';
 import {
   getPlatformService,
-  TStartStreamOptions,
   TPlatform,
   TPlatformCapability,
+  TStartStreamOptions,
 } from 'services/platforms';
 import { UserService } from 'services/user';
 import {
-  NotificationsService,
+  ENotificationSubType,
   ENotificationType,
   INotification,
-  ENotificationSubType,
+  NotificationsService,
 } from 'services/notifications';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
-import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
+import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService } from 'services/restream';
-import { ITwitchStartStreamOptions, TwitchService } from 'services/platforms/twitch';
-import { FacebookService, IFacebookStartStreamOptions } from 'services/platforms/facebook';
+import { TwitchService } from 'services/platforms/twitch';
+import { FacebookService } from 'services/platforms/facebook';
 import Utils from 'services/utils';
-import Vue from 'vue';
-import { ISourcesState, Source } from '../sources';
 import { cloneDeep, difference, pick } from 'lodash';
-import watch from 'vuex';
-import { createStreamError, IStreamError, StreamError, TStreamErrorType } from './stream-error';
+import { createStreamError, StreamError, TStreamErrorType } from './stream-error';
 import { authorizedHeaders } from '../../util/requests';
 import { HostsService } from '../hosts';
-import { IEncoderProfile } from '../video-encoding-optimizations/definitions';
 import { TwitterService } from '../integrations/twitter';
 
 enum EOBSOutputType {
@@ -276,7 +270,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
 
     // tweet
-    if (settings.tweetText && this.twitterService.state.tweetWhenGoingLive) {
+    if (
+      settings.tweetText &&
+      this.twitterService.state.linked &&
+      this.twitterService.state.tweetWhenGoingLive
+    ) {
       try {
         await this.runCheck('postTweet', () => this.twitterService.postTweet(settings.tweetText));
       } catch (e) {
@@ -285,11 +283,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       }
     }
 
-    this.UPDATE_STREAM_INFO({ lifecycle: 'live' });
-    this.createGameAssociation(this.views.commonFields.game);
-
-    // TODO replace to actions.closeChildWindow
-    this.windowsService.closeChildWindow();
+    if (this.state.streamingStatus === EStreamingState.Live) {
+      this.UPDATE_STREAM_INFO({ lifecycle: 'live' });
+      this.createGameAssociation(this.views.commonFields.game);
+    }
   }
 
   /**
@@ -352,8 +349,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   @mutation()
-  private UPDATE_STREAM_INFO(statusPatch: Partial<IStreamInfo>) {
-    this.state.info = { ...this.state.info, ...statusPatch };
+  private UPDATE_STREAM_INFO(infoPatch: Partial<IStreamInfo>) {
+    this.state.info = { ...this.state.info, ...infoPatch };
   }
 
   private setError(
@@ -1158,7 +1155,7 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   }
 
   supports(capability: TPlatformCapability, platform?: TPlatform) {
-    const platforms = platform ? [platform] : this.linkedPlatforms;
+    const platforms = platform ? [platform] : this.enabledPlatforms;
     for (platform of platforms) {
       if (getPlatformService(platform).capabilities.has(capability)) return true;
     }

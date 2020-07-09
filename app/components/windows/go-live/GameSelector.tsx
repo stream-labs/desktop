@@ -92,10 +92,14 @@ export default class GameSelector extends TsxComponent<Props> {
   private get targetPlatforms(): TPlatform[] {
     if (this.props.platform) return [this.props.platform];
     const destinations = Object.keys(this.settings.destinations) as TPlatform[];
-    return destinations.filter(
-      (dest: TPlatform) =>
-        !this.settings.destinations[dest].useCustomFields && this.view.supports('game', dest),
-    );
+    return destinations.filter((dest: TPlatform) => {
+      const platformSettings = this.settings.destinations[dest];
+      return (
+        platformSettings.enabled &&
+        !platformSettings.useCustomFields &&
+        this.view.supports('game', dest)
+      );
+    });
   }
 
   onGameSearchHandler(searchString: string) {
@@ -173,7 +177,7 @@ export default class GameSelector extends TsxComponent<Props> {
 
     // update game for platforms
     targetPlatforms.forEach(platform => {
-      const option = options.find(opt => opt.data.platform === platform);
+      const option = options.find(opt => opt?.data.platform === platform);
       if (option) {
         this.$set(this.settings.destinations[platform], 'game', option.data.game);
         return;

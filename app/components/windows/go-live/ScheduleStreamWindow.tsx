@@ -162,6 +162,7 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
           ref="form"
           slot="content"
           handleExtraValidation={this.postValidate}
+          name="editStreamForm"
           class="flex"
         >
           <div style={{ width: '400px', marginRight: '42px' }}>

@@ -1,6 +1,6 @@
 import { click, focusChild, focusMain, TExecutionContext } from './index';
 import { setOutputResolution } from './output';
-import { fillForm } from '../form-monkey';
+import { fillForm, TFormMonkeyData } from '../form-monkey';
 import { getClient } from '../api-client';
 import moment = require('moment');
 import { StreamSettingsService } from '../../../app/services/settings/streaming';
@@ -8,7 +8,7 @@ import { sleep } from '../sleep';
 /**
  * Go live and wait for stream start
  */
-export async function goLive(t: TExecutionContext, prefillData?: Dictionary<string>) {
+export async function goLive(t: TExecutionContext, prefillData?: TFormMonkeyData) {
   await tryToGoLive(t, prefillData);
   await waitForStreamStart(t);
 }
@@ -39,17 +39,15 @@ export async function clickGoLive(t: TExecutionContext) {
 /**
  * Fill the form in the EditStreamInfo window and click Go Live
  */
-export async function tryToGoLive(t: TExecutionContext, prefillData?: Dictionary<string>) {
+export async function tryToGoLive(t: TExecutionContext, prefillData?: TFormMonkeyData) {
   await prepareToGoLive(t);
   await clickGoLive(t);
   await focusChild(t);
   if (await t.context.app.client.isExisting('button=Go Live')) await click(t, 'button=Go Live');
   if (prefillData) {
     await fillForm(t, 'form[name=editStreamForm]', prefillData);
-    console.log('prefiled;');
   }
   await submit(t);
-  console.log('submited;');
 }
 
 /**
