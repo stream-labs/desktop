@@ -176,11 +176,6 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
               {/*GAME*/}
               {hasGame && (
                 <HFormGroup title={$t('Game')}>
-                  {/*<ListInput*/}
-                  {/*  handleSearchChange={val => this.onGameSearchHandler(val)}*/}
-                  {/*  vModel={this.settings.game}*/}
-                  {/*  metadata={this.gameMetadata}*/}
-                  {/*/>*/}
                   <GameSelector vModel={this.settings} platform={this.props.platform} />
                 </HFormGroup>
               )}

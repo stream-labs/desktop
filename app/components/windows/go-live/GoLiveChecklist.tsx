@@ -7,7 +7,7 @@ import {
 } from '../../../services/streaming';
 import { WindowsService } from '../../../services/windows';
 import { $t } from 'services/i18n';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import styles from './GoLiveChecklist.m.less';
 import cx from 'classnames';
 import { YoutubeService } from '../../../services/platforms/youtube';
@@ -15,6 +15,7 @@ import { getPlatformService, TPlatform } from '../../../services/platforms';
 import { TwitterService } from '../../../services/integrations/twitter';
 import GoLiveError from './GoLiveError';
 import { VideoEncodingOptimizationService } from '../../../app-services';
+import Utils from '../../../services/utils';
 
 class Props {
   isUpdateMode? = false;
@@ -35,12 +36,25 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
     return this.streamingService.views;
   }
 
+  private get lifecycle() {
+    return this.streamingService.state.info.lifecycle;
+  }
+
   private get error() {
     return this.view.info.error;
   }
 
   private getPlatformDisplayName(platform: TPlatform): string {
     return getPlatformService(platform).displayName;
+  }
+
+  @Watch('lifecycle')
+  private async watchLifecycle() {
+    // close window in 1s when live
+    if (this.lifecycle === 'live') {
+      await Utils.sleep(1000);
+      this.windowsService.closeChildWindow();
+    }
   }
 
   private getHeaderText() {
@@ -60,7 +74,8 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
     const shouldPublishYT = !isUpdateMode && goLiveSettings.destinations.youtube?.enabled;
     const shouldShowOptimizedProfile =
       this.videoEncodingOptimizationService.state.useOptimizedProfile && !isUpdateMode;
-    const shouldPostTweet = this.twitterService.state.tweetWhenGoingLive;
+    const shouldPostTweet =
+      this.twitterService.state.linked && this.twitterService.state.tweetWhenGoingLive;
 
     return (
       <div class={styles.container}>

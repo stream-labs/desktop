@@ -21,7 +21,7 @@ export class OptimizedProfileSwitcher extends TsxComponent<Props> {
   @SyncWithValue() private selectedProfile: IEncoderProfile = null;
 
   get game() {
-    return this.props.settings.destinations.twitch.game;
+    return this.props.settings.destinations.twitch?.game || '';
   }
 
   @Watch('game', { immediate: true })
@@ -30,7 +30,6 @@ export class OptimizedProfileSwitcher extends TsxComponent<Props> {
     this.selectedProfile = await this.videoEncodingOptimizationService.fetchOptimizedProfile(
       this.game,
     );
-    console.log('selected profile', this.selectedProfile);
     this.loading = false;
   }
 

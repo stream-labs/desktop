@@ -72,7 +72,7 @@ export default class EditStreamWindow extends TsxComponent<{}> {
     const shouldShowChecklist = lifecycle === 'runChecklist';
     return (
       <ModalLayout customControls={true} showControls={false}>
-        <ValidatedForm ref="form" slot="content">
+        <ValidatedForm ref="form" slot="content" name="editStreamForm">
           {shouldShowSettings && (
             <PlatformSettings
               vModel={this.settings}

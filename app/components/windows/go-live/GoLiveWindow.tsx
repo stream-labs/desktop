@@ -147,7 +147,7 @@ export default class GoLiveWindow extends TsxComponent<{}> {
             class={cx('button button--action', styles.goLiveButton)}
             onClick={() => this.goLive()}
           >
-            {$t('Confirm and Go Live')}
+            {$t('Confirm & Go Live')}
           </button>
         )}
 

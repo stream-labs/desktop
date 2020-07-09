@@ -9,7 +9,7 @@ import {
   click,
 } from './helpers/spectron/index';
 import { setFormInput } from './helpers/spectron/forms';
-import { fillForm, formIncludes, FormMonkey } from './helpers/form-monkey';
+import { fillForm, formIncludes, FormMonkey, optionByTitle } from './helpers/form-monkey';
 import { logIn, logOut, reserveUserFromPool } from './helpers/spectron/user';
 import { setTemporaryRecordingPath } from './helpers/spectron/output';
 const moment = require('moment');
@@ -56,7 +56,7 @@ test('Streaming to Twitch', async t => {
   await logIn(t, 'twitch');
   await goLive(t, {
     title: 'SLOBS Test Stream',
-    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+    game: optionByTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
   });
   t.true(await chatIsVisible(t), 'Chat should be visible');
 
@@ -72,7 +72,7 @@ test('Streaming to Facebook', async t => {
   await logIn(t, 'facebook');
   await goLive(t, {
     title: 'SLOBS Test Stream',
-    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+    game: optionByTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
     description: 'SLOBS Test Stream Description',
   });
   t.true(await chatIsVisible(t), 'Chat should be visible');
@@ -84,7 +84,7 @@ test.skip('Streaming to Mixer', async t => {
   await logIn(t, 'mixer');
   await goLive(t, {
     title: 'SLOBS Test Stream',
-    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+    game: optionByTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
   });
   t.true(await chatIsVisible(t), 'Chat should be visible');
   t.pass();
@@ -104,7 +104,7 @@ test('Streaming to Youtube', async t => {
 
   // give youtube 2 min to publish stream
   await focusChild(t);
-  await t.context.app.client.waitForVisible("p=You're live!", 2 * 60 * 1000);
+  await t.context.app.client.waitForVisible("h1=You're live!", 2 * 60 * 1000);
 
   t.pass();
 });
@@ -167,7 +167,7 @@ test('Stream after switching accounts', async t => {
   await logIn(t, 'twitch');
   await goLive(t, {
     title: 'SLOBS Test Stream',
-    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+    game: optionByTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
   });
 
   t.pass();
@@ -215,7 +215,7 @@ test('Migrate the twitch account to the protected mode', async t => {
   // go live
   await tryToGoLive(t, {
     title: 'SLOBS Test Stream',
-    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+    game: optionByTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
   });
   await waitForStreamStop(t); // can't go live with a fake key
 
@@ -237,7 +237,7 @@ test('Migrate the twitch account to the protected mode', async t => {
   await restartApp(t); // restarting the app should call migration again
   await tryToGoLive(t, {
     title: 'SLOBS Test Stream',
-    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+    game: optionByTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
   });
   await waitForStreamStop(t);
 
@@ -281,10 +281,10 @@ schedulingPlatforms.forEach(platform => {
         break;
     }
 
-    await app.client.click('button=Schedule');
+    await app.client.click('button=Done');
 
     // need to provide a date
-    t.true(await app.client.isExisting('div=The field is required'));
+    t.true(await app.client.isExisting('div=The field is required'), 'need to provide a date');
 
     // set the date to tomorrow
     const today = new Date();
@@ -301,7 +301,7 @@ schedulingPlatforms.forEach(platform => {
       t.true(await app.client.waitForVisible('.toast-alert', 2000));
 
       await formMonkey.fill({
-        game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+        game: optionByTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
       });
 
       await app.client.click('button=Schedule');
@@ -391,7 +391,7 @@ test('Recording when streaming', async t => {
 
   await goLive(t, {
     title: 'SLOBS Test Stream',
-    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+    game: optionByTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
   });
 
   // Stop recording
