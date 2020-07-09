@@ -93,7 +93,7 @@ export default class AppearanceSettings extends Vue {
   }
 
   getSection(status: EVirtualWebcamPluginInstallStatus) {
-    byOS({
+    return byOS({
       [OS.Mac]: () => {
         if (status === EVirtualWebcamPluginInstallStatus.NotPresent) {
           return this.needsInstallSection(false);
