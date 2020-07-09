@@ -54,7 +54,7 @@ export default class FourByFour extends BaseLayout {
         />
         <div
           class={styles.segmented}
-          style={{ height: `${this.resizes.bar2 * 100}`, padding: '0 8px' }}
+          style={{ height: `${this.resizes.bar2 * 100}%`, padding: '0 8px' }}
         >
           <div class={cx(styles.cell, styles.noTopPadding)}>{this.$slots['4']}</div>
           <div class={cx(styles.cell, styles.noTopPadding)}>{this.$slots['5']}</div>
