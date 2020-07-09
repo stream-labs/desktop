@@ -4,6 +4,7 @@ import { Inject } from 'services';
 import { VirtualWebcamService, EVirtualWebcamPluginInstallStatus } from 'services/virtual-webcam';
 import styles from './VirtualWebcamSettings.m.less';
 import cx from 'classnames';
+import { byOS, OS } from 'util/operating-systems';
 
 @Component({})
 export default class AppearanceSettings extends Vue {
@@ -12,7 +13,14 @@ export default class AppearanceSettings extends Vue {
   installStatus: EVirtualWebcamPluginInstallStatus = null;
 
   created() {
-    this.checkInstalled();
+    byOS({
+      [OS.Mac]: () => {
+        this.checkInstalled();
+      },
+      [OS.Windows]: () => {
+        this.installStatus = EVirtualWebcamPluginInstallStatus.Installed;
+      },
+    });
   }
 
   install() {
@@ -85,15 +93,24 @@ export default class AppearanceSettings extends Vue {
   }
 
   getSection(status: EVirtualWebcamPluginInstallStatus) {
-    if (status === EVirtualWebcamPluginInstallStatus.NotPresent) {
-      return this.needsInstallSection(false);
-    }
-    if (status === EVirtualWebcamPluginInstallStatus.Outdated) {
-      return this.needsInstallSection(true);
-    }
-    if (status === EVirtualWebcamPluginInstallStatus.Installed) {
-      return this.isInstalledSection();
-    }
+    byOS({
+      [OS.Mac]: () => {
+        if (status === EVirtualWebcamPluginInstallStatus.NotPresent) {
+          return this.needsInstallSection(false);
+        }
+        if (status === EVirtualWebcamPluginInstallStatus.Outdated) {
+          return this.needsInstallSection(true);
+        }
+        if (status === EVirtualWebcamPluginInstallStatus.Installed) {
+          return this.isInstalledSection();
+        }
+      },
+      [OS.Windows]: () => {
+        if (status === EVirtualWebcamPluginInstallStatus.Installed) {
+          return this.isInstalledSection();
+        }
+      },
+    });
   }
 
   render() {

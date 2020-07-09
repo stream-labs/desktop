@@ -127,13 +127,12 @@ export class SettingsService extends StatefulService<ISettingsState>
       'Notifications',
       'Appearance',
       'Remote Control',
+      'Virtual Webcam',
     ]);
 
     // Platform-specific categories
     byOS({
-      [OS.Mac]: () => {
-        categories = categories.concat(['Virtual Webcam']);
-      },
+      [OS.Mac]: () => {},
       [OS.Windows]: () => {
         categories = categories.concat(['Game Overlay']);
 
