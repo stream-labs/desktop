@@ -1182,7 +1182,8 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   }
 
   isPlatformLinked(platform: TPlatform): boolean {
-    return !!this.userService.state.auth?.platforms![platform];
+    if (!this.userService.state.auth) return false;
+    return !!this.userService.state.auth?.platforms[platform];
   }
 
   isPrimaryPlatform(platform: TPlatform) {
@@ -1265,14 +1266,11 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
       enabled: false,
       useCustomFields: false,
     };
-    const settings = pick(service.state.settings, ['title', 'description', 'game']);
+    const settings = cloneDeep(service.state.settings);
 
-    // use previously used title and description if not provided
-    if (!settings.title) settings.title = this.streamSettingsService.state.title;
+    // don't reuse broadcastId for Youtube
+    if (settings && settings['broadcastId']) settings['broadcastId'] = '';
 
-    if (this.supports('description', platform) && !settings['description']) {
-      settings['description'] = this.streamSettingsService.state.description;
-    }
     return {
       ...settings,
       useCustomFields,
