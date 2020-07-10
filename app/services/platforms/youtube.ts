@@ -22,6 +22,7 @@ import { pickBy } from 'lodash';
 import { ITwitchStartStreamOptions } from './twitch';
 import { throwStreamError } from '../streaming/stream-error';
 import { BasePlatformService } from './base-platform';
+import { assertIsDefined } from '../../util/properties-type-guards';
 
 interface IYoutubeServiceState extends IPlatformState {
   liveStreamingEnabled: boolean;
@@ -407,6 +408,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     scheduledStartTime?: string,
   ): Promise<boolean> {
     const broadcastId = this.state.settings.broadcastId;
+    assertIsDefined(broadcastId);
     const broadcast = await this.updateBroadcast(broadcastId, {
       title,
       description,
@@ -439,6 +441,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     const channelId = info.channelId || this.state.channelId;
     const settings = info.settings || this.state.settings;
     const broadCastId = settings.broadcastId;
+    assertIsDefined(broadCastId);
 
     this.PATCH_STATE({
       ...info,

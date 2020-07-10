@@ -80,9 +80,8 @@ export class ChatService extends StatefulService<IState> {
   unmountChat() {
     if (!this.electronWindowId) return; // already unmounted
     const win = electron.remote.BrowserWindow.fromId(this.electronWindowId);
-    win.removeBrowserView(this.chatView);
+    if (this.chatView) win.removeBrowserView(this.chatView);
     this.electronWindowId = null;
-    console.log('unmount simple chat');
   }
 
   private initChat() {
@@ -112,7 +111,7 @@ export class ChatService extends StatefulService<IState> {
     this.chatView = null;
   }
 
-  private async loadUrl(): Promise<boolean> {
+  private async loadUrl() {
     if (!this.chatUrl) return; // user has logged out
     if (!this.chatView) return; // chat was already deinitialized
     this.chatView.webContents.loadURL(this.chatUrl).catch(this.handleRedirectError);

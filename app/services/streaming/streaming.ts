@@ -47,6 +47,8 @@ import { createStreamError, StreamError, TStreamErrorType } from './stream-error
 import { authorizedHeaders } from '../../util/requests';
 import { HostsService } from '../hosts';
 import { TwitterService } from '../integrations/twitter';
+import { assertIsDefined } from '../../util/properties-type-guards';
+import { YoutubeService } from '../platforms/youtube';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -87,6 +89,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @Inject() private restreamService: RestreamService;
   @Inject() private hostsService: HostsService;
   @Inject() private facebookService: FacebookService;
+  @Inject() private youtubeService: YoutubeService;
   @Inject() private twitterService: TwitterService;
 
   streamingStatusChange = new Subject<EStreamingState>();
@@ -185,7 +188,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   /**
    * Make a transition to Live
    */
-  async goLive(settings?: IGoLiveSettings, unattendedMode = false) {
+  async goLive(newSettings?: IGoLiveSettings, unattendedMode = false) {
     if (!this.userService.isLoggedIn) {
       this.finishStartStreaming();
       return;
@@ -193,8 +196,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.RESET_STREAM_INFO();
 
     // use default settings if no new settings provided
-    if (!settings) settings = cloneDeep(this.views.goLiveSettings);
-    // settings = this.views.sanitizeSettings(settings);
+    const settings = newSettings || cloneDeep(this.views.goLiveSettings);
     this.streamSettingsService.setSettings({ goLiveSettings: settings });
     this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist' });
 
@@ -260,9 +262,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     // publish the Youtube broadcast
     if (this.streamSettingsService.protectedModeEnabled && settings.destinations.youtube?.enabled) {
       try {
-        await this.runCheck('publishYoutubeBroadcast', () =>
-          getPlatformService('youtube').afterGoLive(),
-        );
+        await this.runCheck('publishYoutubeBroadcast', () => this.youtubeService.afterGoLive());
       } catch (e) {
         this.setError(e);
         return;
@@ -327,6 +327,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     );
     for (const platform of platforms) {
       const service = getPlatformService(platform);
+      assertIsDefined(service.scheduleStream);
       await service.scheduleStream(time, destinations[platform]);
     }
   }
@@ -370,7 +371,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   @mutation()
-  private SET_ERROR(type?: TStreamErrorType, details?: string, platform?: TPlatform) {
+  private SET_ERROR(type: TStreamErrorType, details?: string, platform?: TPlatform) {
     this.state.info.error = createStreamError(type, details, platform).getModel();
   }
 
@@ -1097,7 +1098,7 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     return {
       destinations: destinations as IGoLiveSettings['destinations'],
       advancedMode: this.streamSettingsService.state.goLiveSettings?.advancedMode,
-      optimizedProfile: null,
+      optimizedProfile: undefined,
       tweetText: '',
     };
   }
@@ -1181,7 +1182,7 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   }
 
   isPlatformLinked(platform: TPlatform): boolean {
-    return !!this.userService.state.auth?.platforms[platform];
+    return !!this.userService.state.auth?.platforms![platform];
   }
 
   isPrimaryPlatform(platform: TPlatform) {

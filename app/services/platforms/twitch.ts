@@ -147,7 +147,7 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
   }
 
   get username(): string {
-    return this.userService.state.auth.platforms?.twitch.username;
+    return this.userService.state.auth?.platforms?.twitch?.username || '';
   }
 
   async beforeGoLive(goLiveSettings?: IGoLiveSettings) {
@@ -300,9 +300,9 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
     return `https://twitch.tv/popout/${this.username}/chat?${nightMode}`;
   }
 
-  async getAllTags(): Promise<TTwitchTag[]> {
+  async getAllTags(): Promise<void> {
     // Fetch stream tags once per session as they're unlikely to change that often
-    if (this.state.availableTags.length) return this.state.availableTags;
+    if (this.state.availableTags.length) return;
     this.SET_AVAILABLE_TAGS(await getAllTags());
   }
 

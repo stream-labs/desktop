@@ -39,7 +39,7 @@ export interface IStreamError {
 }
 
 export class StreamError extends Error {
-  public platform: TPlatform;
+  public platform?: TPlatform;
   public type: TStreamErrorType;
   public details: string;
   /**
@@ -57,14 +57,14 @@ export class StreamError extends Error {
   constructor(
     message: string,
     type: TStreamErrorType,
-    details: string,
-    platform: TPlatform,
-    protector: typeof newCallProtector,
+    details?: string,
+    platform?: TPlatform,
+    protector?: typeof newCallProtector,
   ) {
     super(message);
     this.message = message;
     this.type = type;
-    this.details = details;
+    this.details = details || '';
     this.platform = platform;
     // don't allow to call 'new' outside this file
     if (protector !== newCallProtector) {

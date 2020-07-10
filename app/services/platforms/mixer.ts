@@ -89,19 +89,15 @@ export class MixerService extends BasePlatformService<IMixerServiceState>
   }
 
   get oauthToken() {
-    return this.userService.state.auth.platforms.mixer?.token;
+    return this.userService.state.auth?.platforms?.mixer?.token;
   }
 
   get mixerUsername() {
-    return this.userService.state.auth.platforms.mixer?.username;
-  }
-
-  get mixerId() {
-    return this.userService.state.auth.platforms.mixer?.id;
+    return this.userService.state.auth?.platforms?.mixer?.username;
   }
 
   get channelId() {
-    return this.userService.state.auth.platforms.mixer?.channelId;
+    return this.userService.state.auth?.platforms?.mixer?.channelId;
   }
 
   init() {

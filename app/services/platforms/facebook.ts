@@ -112,6 +112,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   @mutation()
   private SET_LIVE_VIDEO_ID(id: number | null) {
     this.state.liveVideoId = id;
+    if (!this.state.activePage) return;
     const pathToPage = `${this.state.activePage.name}-${this.state.activePage.id}`.replace(
       ' ',
       '-',
@@ -127,7 +128,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   @mutation()
   private SET_STREAM_PROPERTIES(
     title: string,
-    description: string,
+    description: string | undefined,
     game: string,
     facebookPageId: string,
   ) {
@@ -223,6 +224,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   }
 
   private createLiveVideo(): Promise<string> {
+    assertIsDefined(this.state.settings);
     const { title, description, game } = this.state.settings;
     const data = {
       method: 'POST',
@@ -341,6 +343,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     let facebookPageId = info.facebookPageId;
     this.SET_STREAM_PROPERTIES(title, description, game, facebookPageId);
     // take fist page if no pages provided
+    assertIsDefined(this.state.facebookPages);
     if (!facebookPageId) facebookPageId = this.state.facebookPages.pages[0].id;
     assertIsDefined(facebookPageId);
     await this.postPage(facebookPageId);
