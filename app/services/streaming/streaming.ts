@@ -574,8 +574,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         this.stopReplayBuffer();
       }
 
-      // TODO: use actions
       this.windowsService.closeChildWindow();
+      this.views.enabledPlatforms.forEach(platform => {
+        const service = getPlatformService(platform);
+        if (service.afterStopStream) service.afterStopStream();
+      });
       this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
       return Promise.resolve();
     }
