@@ -6,7 +6,7 @@ import {
   useSpectron,
 } from '../../helpers/spectron';
 import { logIn } from '../../helpers/spectron/user';
-import { fillForm } from '../../helpers/form-monkey';
+import { fillForm, selectTitle } from '../../helpers/form-monkey';
 import { makeScreenshots, useScreentest } from '../screenshoter';
 import { TPlatform } from '../../../app/services/platforms';
 import { setOutputResolution } from '../../helpers/spectron/output';
@@ -52,7 +52,7 @@ platforms.forEach(platform => {
       case 'twitch':
         await fillForm(t, 'form[name=editStreamForm]', {
           title: 'SLOBS Test Stream',
-          game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+          game: selectTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
           tags: ['100%', 'AMA'],
         });
         break;
@@ -60,7 +60,7 @@ platforms.forEach(platform => {
       case 'facebook':
         await fillForm(t, 'form[name=editStreamForm]', {
           title: 'SLOBS Test Stream',
-          game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+          game: selectTitle('Fortnite'),
           description: 'SLOBS Test Stream Description',
         });
         break;
@@ -68,7 +68,6 @@ platforms.forEach(platform => {
       case 'mixer':
         await fillForm(t, 'form[name=editStreamForm]', {
           title: 'SLOBS Test Stream',
-          game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
         });
         break;
 
@@ -115,7 +114,7 @@ schedulingPlatforms.forEach(platform => {
       case 'facebook':
         await fillForm(t, 'form[name=editStreamForm]', {
           title: 'SLOBS Test Stream',
-          game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+          game: selectTitle('Fortnite'),
           description: 'SLOBS Test Stream Description',
         });
         break;
