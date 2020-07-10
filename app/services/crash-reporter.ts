@@ -27,7 +27,7 @@ enum EAppState {
 
 interface ICrashReporterState {
   code: EAppState;
-  detected: string; // what was detected before close happens: ipc freez, backend crash, electron window unresponcive
+  detected: string; // The Backend event that was detected: IPC freeze or backend crash or electron window unresponsive.
   version: string; // SLOBS version
 }
 
