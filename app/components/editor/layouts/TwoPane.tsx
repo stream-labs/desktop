@@ -11,7 +11,7 @@ export default class TwoPane extends BaseLayout {
 
   async mounted() {
     this.mountResize();
-    this.$emit('totalWidth', await this.mapVectors(['2', '5', ['1', ['3', '4']]]));
+    this.$emit('totalWidth', await this.mapVectors(['2', '5', ['1', ['3', '4']]]), this.isColumns);
     this.setMins(['2'], ['1', ['3', '4']], ['5']);
   }
   destroyed() {
