@@ -16,6 +16,7 @@ import { WidgetsService, WidgetType, WidgetDisplayData } from 'services/widgets'
 import { PlatformAppsService, IAppSource } from 'services/platform-apps';
 import omit from 'lodash/omit';
 import { CustomizationService } from 'services/customization';
+import { byOS, OS } from 'util/operating-systems';
 
 type TInspectableSource = TSourceType | WidgetType | 'streamlabel' | 'app_source' | string;
 
@@ -123,7 +124,7 @@ export default class SourcesShowcase extends Vue {
     ) {
       this.selectSource(this.inspectedSource as TSourceType);
     } else if (this.inspectedSource === 'streamlabel') {
-      this.selectSource('text_gdiplus', { propertiesManager: 'streamlabels' });
+      this.selectStreamlabel();
     } else if (this.inspectedSource === 'replay') {
       this.selectSource('ffmpeg_source', { propertiesManager: 'replay' });
     } else if (this.inspectedSource === 'app_source') {
@@ -131,6 +132,12 @@ export default class SourcesShowcase extends Vue {
     } else {
       this.selectWidget(this.inspectedSourceType as WidgetType);
     }
+  }
+
+  selectStreamlabel() {
+    this.selectSource(byOS({ [OS.Windows]: 'text_gdiplus', [OS.Mac]: 'text_ft2_source' }), {
+      propertiesManager: 'streamlabels',
+    });
   }
 
   get demoMode() {
@@ -141,7 +148,10 @@ export default class SourcesShowcase extends Vue {
     const sourcesList: ISourceDefinition[] = this.sourcesService
       .getAvailableSourcesTypesList()
       .filter(type => {
-        if (type.value === 'text_ft2_source') return false;
+        // Freetype on windows is hidden
+        if (type.value === 'text_ft2_source' && byOS({ [OS.Windows]: true, [OS.Mac]: false })) {
+          return;
+        }
         return !(type.value === 'scene' && this.scenesService.views.scenes.length <= 1);
       })
       .map(listItem => {

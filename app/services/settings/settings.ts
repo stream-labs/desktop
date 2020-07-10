@@ -22,6 +22,7 @@ import { ISettingsServiceApi, ISettingsSubCategory } from './settings-api';
 import { PlatformAppsService } from 'services/platform-apps';
 import { EDeviceType } from 'services/hardware';
 import { StreamingService } from 'services/streaming';
+import { byOS, OS } from 'util/operating-systems';
 import { FacemasksService } from 'services/facemasks';
 
 export interface ISettingsState {
@@ -120,18 +121,27 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   getCategories(): string[] {
-    let categories = obs.NodeObs.OBS_settings_getListCategories();
+    let categories: string[] = obs.NodeObs.OBS_settings_getListCategories();
     categories = categories.concat([
-      'Game Overlay',
       'Scene Collections',
       'Notifications',
       'Appearance',
       'Remote Control',
     ]);
 
-    if (this.facemasksService.state.active) {
-      categories = categories.concat(['Face Masks']);
-    }
+    // Platform-specific categories
+    byOS({
+      [OS.Mac]: () => {
+        categories = categories.concat(['Virtual Webcam']);
+      },
+      [OS.Windows]: () => {
+        categories = categories.concat(['Game Overlay']);
+
+        if (this.facemasksService.state.active) {
+          categories = categories.concat(['Face Masks']);
+        }
+      },
+    });
 
     if (this.advancedSettingEnabled() || this.platformAppsService.state.devMode) {
       categories = categories.concat('Developer');
@@ -360,7 +370,7 @@ export class SettingsService extends StatefulService<ISettingsState>
     settingsData[0].parameters.forEach((deviceForm, ind) => {
       const channel = ind + 1;
       const isOutput = [E_AUDIO_CHANNELS.OUTPUT_1, E_AUDIO_CHANNELS.OUTPUT_2].includes(channel);
-      const source = this.sourcesService.views
+      let source = this.sourcesService.views
         .getSources()
         .find(source => source.channel === channel);
 
@@ -374,16 +384,20 @@ export class SettingsService extends StatefulService<ISettingsState>
         const displayName = device.id === 'default' ? deviceForm.name : device.description;
 
         if (!source) {
-          this.sourcesService.createSource(
+          source = this.sourcesService.createSource(
             displayName,
-            isOutput ? 'wasapi_output_capture' : 'wasapi_input_capture',
-            {},
+            byOS({
+              [OS.Windows]: isOutput ? 'wasapi_output_capture' : 'wasapi_input_capture',
+              [OS.Mac]: isOutput ? 'coreaudio_output_capture' : 'coreaudio_input_capture',
+            }),
+            { device_id: deviceForm.value },
             { channel },
           );
         } else {
-          source.setName(displayName);
           source.updateSettings({ device_id: deviceForm.value });
         }
+
+        source.setName(displayName);
       }
     });
   }

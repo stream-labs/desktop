@@ -27,7 +27,7 @@ export interface ISpamSecurityMetadata extends ISliderMetadata {
 }
 
 export interface IAnimationMetadata extends IInputMetadata {
-  filter?: 'in' | 'out' | 'text';
+  filter?: 'in' | 'out' | 'text' | 'eventIn' | 'eventOut';
 }
 
 class WidgetInputMetadata extends InputMetadata {

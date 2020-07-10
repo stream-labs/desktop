@@ -39,10 +39,6 @@ class LayoutViews extends ViewHandler<ILayoutServiceState> {
     return LAYOUT_DATA[this.currentTab.currentLayout].component;
   }
 
-  get isColumnLayout() {
-    return LAYOUT_DATA[this.currentTab.currentLayout].isColumns;
-  }
-
   elementTitle(element: ELayoutElement) {
     if (!element) return;
     return ELEMENT_DATA()[element].title;
@@ -212,7 +208,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   @mutation()
   SET_RESIZE(bar: 'bar1' | 'bar2', size: number) {
-    this.state.tabs[this.state.currentTab].resizes[bar] = size;
+    Vue.set(this.state.tabs[this.state.currentTab].resizes, bar, size);
   }
 
   @mutation()

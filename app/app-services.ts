@@ -48,8 +48,11 @@ export { HardwareService, DefaultHardwareService } from 'services/hardware';
 export { EditorCommandsService } from 'services/editor-commands';
 export { EditorService } from 'services/editor';
 export { StreamSettingsService } from 'services/settings/streaming';
-export { MetricsService } from 'services/metrics';
+export { TouchBarService } from 'services/touch-bar';
+export { ApplicationMenuService } from 'services/application-menu';
 export { MacPermissionsService } from 'services/mac-permissions';
+export { VirtualWebcamService } from 'services/virtual-webcam';
+export { MetricsService } from 'services/metrics';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';
