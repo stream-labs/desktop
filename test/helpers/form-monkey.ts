@@ -449,7 +449,7 @@ export class FormMonkey {
   }
 }
 
-export function optionByTitle(optionTitle: string | RegExp): FNValueSetter {
+export function selectTitle(optionTitle: string | RegExp): FNValueSetter {
   return async (form: FormMonkey, input: IUIInput) => {
     const hasInternalSearch: boolean = JSON.parse(
       await form.getAttribute(input.selector, 'data-internal-search'),

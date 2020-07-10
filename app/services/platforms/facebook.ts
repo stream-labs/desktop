@@ -194,7 +194,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
         const activePage = json.data.filter(page => pageId === page.id)[0] || json.data[0];
         this.userService.updatePlatformChannelId('facebook', pageId);
         this.SET_ACTIVE_PAGE(activePage);
-        this.SET_STREAM_PROPERTIES('', '', '', activePage.id);
+        this.SET_STREAM_PROPERTIES('', '', '', activePage?.id);
       },
     );
   }

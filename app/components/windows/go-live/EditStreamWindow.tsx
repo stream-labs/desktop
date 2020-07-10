@@ -73,12 +73,7 @@ export default class EditStreamWindow extends TsxComponent<{}> {
     return (
       <ModalLayout customControls={true} showControls={false}>
         <ValidatedForm ref="form" slot="content" name="editStreamForm">
-          {shouldShowSettings && (
-            <PlatformSettings
-              vModel={this.settings}
-              onInput={(val: boolean) => console.log('EditStream change', val)}
-            />
-          )}
+          {shouldShowSettings && <PlatformSettings vModel={this.settings} />}
           {shouldShowChecklist && <GoLiveChecklist isUpdateMode={true} />}
         </ValidatedForm>
         <div slot="controls">{this.renderControls()}</div>

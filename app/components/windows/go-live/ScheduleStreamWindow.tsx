@@ -171,7 +171,7 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
           <div style={{ width: '100%' }}>
             {shouldShowSettings && (
               <div>
-                <PlatformSettings vModel={this.settings} />
+                <PlatformSettings vModel={this.settings} isScheduleMode={true} />
                 <HFormGroup metadata={this.formMetadata.date} vModel={this.startTimeModel.date} />
                 <HFormGroup metadata={this.formMetadata.time} vModel={this.startTimeModel.time} />
               </div>

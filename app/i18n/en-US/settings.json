@@ -121,5 +121,6 @@
   "Change the look of Streamlabs OBS with Prime": "Change the look of Streamlabs OBS with Prime",
   "unlinked": "unlinked",
   "Unlink": "Unlink",
-  "Logged in": "Logged in"
+  "Logged in": "Logged in",
+  "You cannot unlink the platform you used to sign in to Streamlabs OBS. If you want to unlink this platform, please sign in with a different platform.": "You cannot unlink the platform you used to sign in to Streamlabs OBS. If you want to unlink this platform, please sign in with a different platform."
 }

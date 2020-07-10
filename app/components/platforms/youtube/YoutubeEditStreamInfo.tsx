@@ -20,6 +20,7 @@ import BaseEditStreamInfo from '../BaseEditSteamInfo';
 
 class Props {
   value?: IStreamSettings;
+  showEvents?: boolean = true;
 }
 
 @Component({ components: { ValidatedForm }, props: createProps(Props) })
@@ -83,13 +84,15 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
     return (
       !canShowOnlyRequiredFields && (
         <ValidatedForm onInput={this.emitInput}>
-          <HFormGroup title={$t('Event')}>
-            <BroadcastInput
-              onInput={this.onSelectBroadcastHandler}
-              vModel={this.settings.destinations.youtube.broadcastId}
-              metadata={this.formMetadata.event}
-            />
-          </HFormGroup>
+          {this.props.showEvents && (
+            <HFormGroup title={$t('Event')}>
+              <BroadcastInput
+                onInput={this.onSelectBroadcastHandler}
+                vModel={this.settings.destinations.youtube.broadcastId}
+                metadata={this.formMetadata.event}
+              />
+            </HFormGroup>
+          )}
           <CommonPlatformFields vModel={this.settings} platform={'youtube'} />
         </ValidatedForm>
       )

@@ -49,12 +49,15 @@ class Section extends TsxComponent<SectionProps> {
   }
 }
 
+class Props {
+  isScheduleMode?: boolean = false;
+}
+
 /**
  * Renders the form with stream settings for each enabled platform
  **/
-@Component({})
-// TODO: remove
-export default class PlatformSettings extends TsxComponent<{ onInput?: any }> {
+@Component({ props: createProps(Props) })
+export default class PlatformSettings extends TsxComponent<Props> {
   @Inject() private streamingService: StreamingService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private userService: UserService;
@@ -117,7 +120,9 @@ export default class PlatformSettings extends TsxComponent<{ onInput?: any }> {
       <Section title={title} isSimpleMode={!isAdvancedMode}>
         {platform === 'twitch' && <TwitchEditStreamInfo vModel={this.settings} />}
         {platform === 'facebook' && <FacebookEditStreamInfo vModel={this.settings} />}
-        {platform === 'youtube' && <YoutubeEditStreamInfo vModel={this.settings} />}
+        {platform === 'youtube' && (
+          <YoutubeEditStreamInfo vModel={this.settings} showEvents={!this.props.isScheduleMode} />
+        )}
         {platform === 'mixer' && <MixerEditStreamInfo vModel={this.settings} />}
       </Section>
     );
