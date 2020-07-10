@@ -1185,7 +1185,7 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   }
 
   isPlatformLinked(platform: TPlatform): boolean {
-    if (!this.userService.state.auth) return false;
+    if (!this.userService.state.auth?.platforms) return false;
     return !!this.userService.state.auth?.platforms[platform];
   }
 
