@@ -11,7 +11,7 @@ export default class OnePaneR extends BaseLayout {
 
   async mounted() {
     this.mountResize();
-    this.$emit('totalWidth', await this.mapVectors([['1', ['3', '4', '5']], '2']));
+    this.$emit('totalWidth', await this.mapVectors([['1', ['3', '4', '5']], '2']), this.isColumns);
     this.setMins(['1', ['3', '4', '5']], ['2']);
   }
   destroyed() {
