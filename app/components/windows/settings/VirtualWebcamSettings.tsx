@@ -13,14 +13,7 @@ export default class AppearanceSettings extends Vue {
   installStatus: EVirtualWebcamPluginInstallStatus = null;
 
   created() {
-    byOS({
-      [OS.Mac]: () => {
-        this.checkInstalled();
-      },
-      [OS.Windows]: () => {
-        this.installStatus = EVirtualWebcamPluginInstallStatus.Installed;
-      },
-    });
+    this.checkInstalled();
   }
 
   install() {
@@ -106,9 +99,15 @@ export default class AppearanceSettings extends Vue {
         }
       },
       [OS.Windows]: () => {
-        if (status === EVirtualWebcamPluginInstallStatus.Installed) {
-          return this.isInstalledSection();
-        }
+        let sections = [];
+        sections.push(this.needsInstallSection(false));
+        sections.push(this.isInstalledSection());
+
+        return (
+          <div>
+              {sections}
+          </div>
+        );
       },
     });
   }

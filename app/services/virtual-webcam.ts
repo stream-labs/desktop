@@ -5,6 +5,9 @@ import util from 'util';
 import electron from 'electron';
 import path from 'path';
 import { getChecksum } from 'util/requests';
+import { byOS, OS } from 'util/operating-systems';
+import { Inject } from 'services/core/injector';
+import { HardwareService } from 'services/hardware';
 
 const PLUGIN_PLIST_PATH =
   '/Library/CoreMediaIO/Plug-Ins/DAL/vcam-plugin.plugin/Contents/Info.plist';
@@ -24,34 +27,45 @@ interface IVirtualWebcamServiceState {
 
 export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceState> {
   static initialState: IVirtualWebcamServiceState = { running: false };
+  @Inject() private hardwareService: HardwareService;
 
   getInstallStatus(): Promise<EVirtualWebcamPluginInstallStatus> {
-    return util
-      .promisify(fs.exists)(PLUGIN_PLIST_PATH)
-      .then(async exists => {
-        if (exists) {
-          try {
-            const latest = await this.getCurrentChecksum();
-            const installed = await getChecksum(PLUGIN_PLIST_PATH);
+    return byOS({
+      [OS.Mac]: async () => {
+        return util
+        .promisify(fs.exists)(PLUGIN_PLIST_PATH)
+        .then(async exists => {
+          if (exists) {
+            try {
+              const latest = await this.getCurrentChecksum();
+              const installed = await getChecksum(PLUGIN_PLIST_PATH);
 
-            if (latest === installed) {
-              return EVirtualWebcamPluginInstallStatus.Installed;
+              if (latest === installed) {
+                return EVirtualWebcamPluginInstallStatus.Installed;
+              }
+
+              return EVirtualWebcamPluginInstallStatus.Outdated;
+            } catch (e) {
+              console.error('Error comparing checksums on virtual webcam', e);
+              // Assume outdated
+              return EVirtualWebcamPluginInstallStatus.Outdated;
             }
-
-            return EVirtualWebcamPluginInstallStatus.Outdated;
-          } catch (e) {
-            console.error('Error comparing checksums on virtual webcam', e);
-            // Assume outdated
-            return EVirtualWebcamPluginInstallStatus.Outdated;
           }
-        }
 
-        return EVirtualWebcamPluginInstallStatus.NotPresent;
-      })
-      .catch(e => {
-        console.error('Error checking for presence of virtual webcam', e);
-        return EVirtualWebcamPluginInstallStatus.NotPresent;
-      });
+          return EVirtualWebcamPluginInstallStatus.NotPresent;
+        })
+        .catch(e => {
+          console.error('Error checking for presence of virtual webcam', e);
+          return EVirtualWebcamPluginInstallStatus.NotPresent;
+        });
+      },
+      [OS.Windows]: async () => {
+        if (this.hardwareService.getDshowDeviceByName('Streamlabs OBS Virtual Webcam'))
+          return EVirtualWebcamPluginInstallStatus.Installed;
+        else
+          return EVirtualWebcamPluginInstallStatus.NotPresent;
+      },
+    });
   }
 
   install() {
