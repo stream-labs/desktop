@@ -59,6 +59,29 @@ interface ITrains {
   follow: ITrainInfo;
 }
 
+export interface IStreamlabelSet {
+  [categoryName: string]: IStreamlabelCategory;
+}
+
+export interface IStreamlabelCategory {
+  label: string;
+  files: IStreamlabelDefinition[];
+}
+
+export interface IStreamlabelDefinition {
+  name: string;
+  label: string;
+  settings: IStreamlabelSettingsDefinition;
+}
+
+export interface IStreamlabelSettingsDefinition {
+  format?: { tokens: string[] };
+  item_format?: { tokens: string[] };
+  item_separator?: { tokens: string[] };
+  settingsStat?: string;
+  settingsWhitelist?: string[];
+}
+
 type TTrainType = 'donation' | 'follow' | 'subscription';
 
 function isDonationTrain(train: ITrainInfo | IDonationTrainInfo): train is IDonationTrainInfo {
@@ -91,6 +114,8 @@ export class StreamlabelsService extends Service {
   trainInterval: number;
 
   socket: SocketIOClient.Socket;
+
+  definitions: IStreamlabelSet;
 
   /**
    * Holds data about the currently running trains.
@@ -134,6 +159,7 @@ export class StreamlabelsService extends Service {
   onUserLogin() {
     this.fetchInitialData();
     this.fetchSettings();
+    this.fetchDefinitions();
   }
 
   /**
@@ -259,6 +285,21 @@ export class StreamlabelsService extends Service {
     fetch(request)
       .then(handleResponse)
       .then(settings => this.updateSettings(settings));
+  }
+
+  private fetchDefinitions(): void {
+    if (!this.userService.isLoggedIn) return;
+
+    console.log('firing');
+
+    const platform = this.userService.platform.type;
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/app-settings/${platform}`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers });
+
+    fetch(request)
+      .then(handleResponse)
+      .then(settings => (this.definitions = settings));
   }
 
   private initSocketConnection(): void {
