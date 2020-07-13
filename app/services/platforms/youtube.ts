@@ -192,7 +192,6 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     } catch (e) {
       let details = e.result?.error?.message;
       if (!details) details = 'connection failed';
-      console.error(e);
       throw throwStreamError('PLATFORM_REQUEST_FAILED', details, 'youtube');
     }
   }
@@ -587,12 +586,16 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
 
       // poll each 2s
       while (canPoll) {
-        let shouldStop = false;
-        try {
-          shouldStop = await cb();
-        } catch (e) {
-          reject(e);
-          return;
+        let shouldStop = this.state.lifecycleStep === 'idle'; // if user clicked stop streaming, cancel polling
+        if (shouldStop) {
+          reject(new Error('Stream stopped'));
+        } else {
+          try {
+            shouldStop = await cb();
+          } catch (e) {
+            reject(e);
+            return;
+          }
         }
 
         if (shouldStop) {
@@ -612,11 +615,6 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   private async waitForStreamStatus(streamId: string, status: TStreamStatus) {
     try {
       await this.pollAPI(async () => {
-        // user clicked stop streaming, cancel polling
-        if (this.state.lifecycleStep === 'idle') {
-          throwStreamError('YOUTUBE_PUBLISH_FAILED', 'Stream stopped');
-        }
-
         const stream = await this.fetchLiveStream(streamId, ['status']);
         return stream.status.streamStatus === status;
       });
@@ -644,11 +642,6 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
 
       // wait for Youtube to change the broadcast status
       await this.pollAPI(async () => {
-        // if user clicked stop streaming, cancel polling
-        if (this.state.lifecycleStep === 'idle') {
-          throwStreamError('YOUTUBE_PUBLISH_FAILED', 'Stream stopped');
-        }
-
         const broadcast = await this.fetchBroadcast(broadcastId, ['status']);
         return broadcast.status.lifeCycleStatus === status;
       });

@@ -101,7 +101,12 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     liveVideoId: null,
     streamUrl: null,
     facebookPages: null,
-    settings: null,
+    settings: {
+      facebookPageId: '',
+      title: '',
+      description: '',
+      game: '',
+    },
   };
 
   @mutation()

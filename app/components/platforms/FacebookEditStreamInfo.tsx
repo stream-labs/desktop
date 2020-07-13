@@ -28,9 +28,6 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
     return this.streamingService.views;
   }
 
-  emitInput() {
-    this.$emit('input', this.settings);
-  }
   private get formMetadata() {
     return formMetadata({
       page: metadata.list({
@@ -45,7 +42,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
   render() {
     const showOnlyRequiredFields = this.canShowOnlyRequiredFields;
     return (
-      <ValidatedForm onInput={this.emitInput}>
+      <ValidatedForm>
         <HFormGroup title={this.formMetadata.page.title}>
           <ListInput
             vModel={this.settings.destinations.facebook.facebookPageId}

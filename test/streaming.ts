@@ -290,7 +290,6 @@ schedulingPlatforms.forEach(platform => {
     await formMonkey.fill({
       date: moment(tomorrow).format('MM/DD/YYYY'),
     });
-
     await app.client.click('button=Done');
 
     // facebook requires a game

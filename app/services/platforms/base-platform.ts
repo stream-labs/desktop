@@ -24,7 +24,6 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
   @Inject() protected userService: UserService;
   @Inject() protected hostsService: HostsService;
   abstract readonly platform: TPlatform;
-  protected abstract readonly unlinkUrl: string;
 
   protected fetchViewerCount(): Promise<number> {
     return Promise.reject('not implemented');
@@ -52,8 +51,9 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
    * unlink platform and reload auth state
    */
   unlink() {
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/unlink/${this.platform}_account`;
     const headers = authorizedHeaders(this.userService.apiToken!);
-    const request = new Request(this.unlinkUrl, { headers });
+    const request = new Request(url, { headers });
     return fetch(request)
       .then(handleResponse)
       .then(_ => this.userService.updateLinkedPlatforms());
