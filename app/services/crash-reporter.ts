@@ -27,6 +27,7 @@ enum EAppState {
 
 interface ICrashReporterState {
   code: EAppState;
+  detected: string; // The Backend event that was detected: IPC freeze or backend crash or electron window unresponsive.
   version: string; // SLOBS version
 }
 
@@ -94,7 +95,13 @@ export class CrashReporterService extends Service {
   }
 
   private writeStateFile(code: EAppState) {
-    this.appState = { code, version: this.version };
+    this.appState = this.readStateFile();
+    this.appState.code = code;
+    if (this.appState.code !== EAppState.Starting) {
+      this.appState.detected = '';
+      this.appState.version = this.version;
+    }
+
     if (process.env.NODE_ENV !== 'production') return;
     try {
       fs.writeFileSync(this.appStateFile, JSON.stringify(this.appState));
@@ -108,7 +115,7 @@ export class CrashReporterService extends Service {
   }
 
   private readStateFile(): ICrashReporterState {
-    const clearState = { code: EAppState.CleanExit, version: this.version };
+    const clearState = { code: EAppState.CleanExit, version: this.version, detected: '' };
     try {
       if (!fs.existsSync(this.appStateFile)) return clearState;
       const stateString = fs.readFileSync(this.appStateFile).toString() as EAppState;
@@ -116,7 +123,7 @@ export class CrashReporterService extends Service {
         return JSON.parse(stateString);
       } catch (e) {
         // the old version of crash-reporter file contained only a code string
-        return { code: stateString, version: this.version };
+        return { code: stateString, version: this.version, detected: '' };
       }
     } catch (e) {
       console.error('Error loading app state file', e);
