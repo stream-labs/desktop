@@ -97,7 +97,7 @@ export class CrashReporterService extends Service {
   private writeStateFile(code: EAppState) {
     this.appState = this.readStateFile();
     this.appState.code = code;
-    if (this.appState.code !== EAppState.Starting) {
+    if (this.appState.code === EAppState.Starting) {
       this.appState.detected = '';
       this.appState.version = this.version;
     }
