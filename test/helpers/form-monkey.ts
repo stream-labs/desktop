@@ -38,7 +38,7 @@ export class FormMonkey {
   constructor(
     public t: TExecutionContext,
     private formSelector?: string,
-    private showLogs = true,
+    private showLogs = false,
   ) {
     if (!formSelector) this.formSelector = DEFAULT_SELECTOR;
   }
