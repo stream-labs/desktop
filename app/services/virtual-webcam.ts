@@ -31,37 +31,40 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
     return byOS({
       [OS.Mac]: async () => {
         return util
-        .promisify(fs.exists)(PLUGIN_PLIST_PATH)
-        .then(async exists => {
-          if (exists) {
-            try {
-              const latest = await this.getCurrentChecksum();
-              const installed = await getChecksum(PLUGIN_PLIST_PATH);
+          .promisify(fs.exists)(PLUGIN_PLIST_PATH)
+          .then(async exists => {
+            if (exists) {
+              try {
+                const latest = await this.getCurrentChecksum();
+                const installed = await getChecksum(PLUGIN_PLIST_PATH);
 
-              if (latest === installed) {
-                return EVirtualWebcamPluginInstallStatus.Installed;
+                if (latest === installed) {
+                  return EVirtualWebcamPluginInstallStatus.Installed;
+                }
+
+                return EVirtualWebcamPluginInstallStatus.Outdated;
+              } catch (e) {
+                console.error('Error comparing checksums on virtual webcam', e);
+                // Assume outdated
+                return EVirtualWebcamPluginInstallStatus.Outdated;
               }
-
-              return EVirtualWebcamPluginInstallStatus.Outdated;
-            } catch (e) {
-              console.error('Error comparing checksums on virtual webcam', e);
-              // Assume outdated
-              return EVirtualWebcamPluginInstallStatus.Outdated;
             }
-          }
 
-          return EVirtualWebcamPluginInstallStatus.NotPresent;
-        })
-        .catch(e => {
-          console.error('Error checking for presence of virtual webcam', e);
-          return EVirtualWebcamPluginInstallStatus.NotPresent;
-        });
+            return EVirtualWebcamPluginInstallStatus.NotPresent;
+          })
+          .catch(e => {
+            console.error('Error checking for presence of virtual webcam', e);
+            return EVirtualWebcamPluginInstallStatus.NotPresent;
+          });
       },
       [OS.Windows]: async () => {
-        if (obs.NodeObs.OBS_service_isVirtualCamPluginInstalled())
+        const isInstalled = obs.NodeObs.OBS_service_isVirtualCamPluginInstalled();
+        console.log(isInstalled);
+        if (isInstalled) {
           return EVirtualWebcamPluginInstallStatus.Installed;
-        else
+        } else {
           return EVirtualWebcamPluginInstallStatus.NotPresent;
+        }
       },
     });
   }
