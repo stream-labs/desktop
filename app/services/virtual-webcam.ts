@@ -7,7 +7,6 @@ import path from 'path';
 import { getChecksum } from 'util/requests';
 import { byOS, OS } from 'util/operating-systems';
 import { Inject } from 'services/core/injector';
-import { HardwareService } from 'services/hardware';
 
 const PLUGIN_PLIST_PATH =
   '/Library/CoreMediaIO/Plug-Ins/DAL/vcam-plugin.plugin/Contents/Info.plist';
@@ -27,7 +26,6 @@ interface IVirtualWebcamServiceState {
 
 export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceState> {
   static initialState: IVirtualWebcamServiceState = { running: false };
-  @Inject() private hardwareService: HardwareService;
 
   getInstallStatus(): Promise<EVirtualWebcamPluginInstallStatus> {
     return byOS({
@@ -60,7 +58,7 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
         });
       },
       [OS.Windows]: async () => {
-        if (this.hardwareService.getDshowDeviceByName('Streamlabs OBS Virtual Webcam'))
+        if (obs.NodeObs.OBS_service_isVirtualCamPluginInstalled())
           return EVirtualWebcamPluginInstallStatus.Installed;
         else
           return EVirtualWebcamPluginInstallStatus.NotPresent;
