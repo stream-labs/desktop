@@ -12,12 +12,25 @@ export class StreamlabelsManager extends DefaultManager {
   @Inject() userService: UserService;
 
   settings: IStreamlabelsManagerSettings;
-  private subscription: IStreamlabelSubscription;
-  blacklist = ['read_from_file', 'file'];
+  blacklist = ['text', 'read_from_file'];
+  oldOutput: string = null;
   customUIComponent = 'StreamlabelProperties';
 
+  init() {
+    this.streamlabelsService.output.subscribe(output => {
+      if (output[this.settings.statname] !== this.oldOutput) {
+        this.oldOutput = output[this.settings.statname];
+        this.obsSource.update({
+          ...this.obsSource.settings,
+          read_from_file: false,
+          text: output[this.settings.statname],
+        });
+      }
+    });
+  }
+
   destroy() {
-    this.unsubscribe();
+    this.streamlabelsService.output.unsubscribe();
   }
 
   normalizeSettings() {
@@ -60,6 +73,12 @@ export class StreamlabelsManager extends DefaultManager {
   }
 
   applySettings(settings: Dictionary<any>) {
+    if (settings.statname !== this.settings.statname) {
+      this.obsSource.update({
+        text: this.streamlabelsService.output.getValue()[settings.statname],
+      });
+    }
+
     this.settings = {
       // Default to All-Time Top Donator
       statname: 'all_time_top_donator',
@@ -68,25 +87,5 @@ export class StreamlabelsManager extends DefaultManager {
     };
 
     this.normalizeSettings();
-
-    this.refreshSubscription();
-  }
-
-  private unsubscribe() {
-    if (this.subscription) {
-      this.streamlabelsService.unsubscribe(this.subscription);
-    }
-  }
-
-  private refreshSubscription() {
-    this.unsubscribe();
-
-    this.subscription = this.streamlabelsService.subscribe(this.settings.statname);
-
-    this.obsSource.update({
-      ...this.obsSource.settings,
-      read_from_file: true,
-      file: this.subscription.path,
-    });
   }
 }
