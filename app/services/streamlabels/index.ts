@@ -4,11 +4,6 @@ import { Inject } from 'services/core/injector';
 import { HostsService } from 'services/hosts';
 import { authorizedHeaders, handleResponse } from 'util/requests';
 import { TSocketEvent, WebsocketService } from 'services/websocket';
-import uuid from 'uuid/v4';
-import fs from 'fs-extra';
-import path from 'path';
-import electron from 'electron';
-import without from 'lodash/without';
 import { AppService } from 'services/app';
 import { InitAfter } from '../core';
 import { BehaviorSubject } from 'rxjs';
@@ -16,17 +11,6 @@ import { BehaviorSubject } from 'rxjs';
 interface IStreamlabelActiveSubscriptions {
   filename: string;
   subscribers: string[];
-}
-
-/**
- * Returned to streamlabels subscribers.  Contains
- * information about the subscription, and must be
- * passed back when unsubscribing.
- */
-export interface IStreamlabelSubscription {
-  id: string;
-  statname: string;
-  text: string;
 }
 
 export interface IStreamlabelSettings {

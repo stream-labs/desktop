@@ -1,6 +1,6 @@
 import { DefaultManager, IDefaultManagerSettings } from './default-manager';
 import { Inject } from 'services/core/injector';
-import { StreamlabelsService, IStreamlabelSubscription } from 'services/streamlabels';
+import { StreamlabelsService } from 'services/streamlabels';
 import { UserService } from 'services/user';
 
 export interface IStreamlabelsManagerSettings extends IDefaultManagerSettings {

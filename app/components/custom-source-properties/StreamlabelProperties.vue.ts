@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import { ISourceApi } from 'services/sources';
 import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
