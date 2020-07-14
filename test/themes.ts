@@ -28,6 +28,7 @@ test('Installing a theme', async (t: any) => {
 
   // install overlay
   await app.client.waitForVisible('button=Install Overlay');
+  await sleep(2000); // wait for the scroll animation
   await app.client.click('button=Install Overlay');
 
   // wait for installation complete
