@@ -290,8 +290,6 @@ export class StreamlabelsService extends Service {
   private fetchDefinitions(): void {
     if (!this.userService.isLoggedIn) return;
 
-    console.log('firing');
-
     const platform = this.userService.platform.type;
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/app-settings/${platform}`;
     const headers = authorizedHeaders(this.userService.apiToken);

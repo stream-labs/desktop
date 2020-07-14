@@ -22,6 +22,7 @@ export default class StreamlabelProperties extends Vue {
   @Inject() streamlabelsService: StreamlabelsService;
 
   get statOptions() {
+    if (!this.streamlabelsService.definitions) return [];
     return Object.values(this.streamlabelsService.definitions);
   }
 
