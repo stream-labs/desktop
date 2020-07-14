@@ -109,6 +109,22 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     },
   };
 
+  protected init() {
+    // save settings to the local storage
+    const savedSettings: IFacebookStartStreamOptions = JSON.parse(
+      localStorage.getItem(this.serviceName),
+    );
+    if (savedSettings) this.SET_STREAM_SETTINGS(savedSettings);
+    this.store.watch(
+      () => this.state.settings,
+      () => {
+        const { title, description, game } = this.state.settings;
+        localStorage.setItem(this.serviceName, JSON.stringify({ title, description, game }));
+      },
+      { deep: true },
+    );
+  }
+
   @mutation()
   private SET_ACTIVE_PAGE(page: IFacebookPage) {
     this.state.activePage = page;
@@ -200,7 +216,6 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
         const activePage = json.data.filter(page => pageId === page.id)[0] || json.data[0];
         this.userService.updatePlatformChannelId('facebook', pageId);
         this.SET_ACTIVE_PAGE(activePage);
-        this.SET_STREAM_PROPERTIES('', '', '', activePage?.id);
       },
     );
   }

@@ -34,7 +34,7 @@ export class ChatService extends StatefulService<IState> {
 
     // listen `streamInfoChanged` to init or deinit the chat
     this.streamingService.streamInfoChanged.subscribe(streamInfo => {
-      if (streamInfo.chatUrl === void 0) return; // chatUrl has not been changed
+      if (streamInfo.chatUrl === this.chatUrl) return; // chatUrl has not been changed
 
       // chat url has been changed, set the new chat url
       const oldChatUrl = this.chatUrl;
@@ -56,14 +56,10 @@ export class ChatService extends StatefulService<IState> {
   }
 
   async mountChat(electronWindowId: number) {
-    console.log('start mount');
-    this.deinitChat();
-    this.initChat();
-    this.loadUrl();
+    if (!this.chatView) this.initChat();
     this.electronWindowId = electronWindowId;
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
     if (this.chatView) win.addBrowserView(this.chatView);
-    console.log('finish mount');
   }
 
   setChatBounds(position: IVec2, size: IVec2) {
@@ -103,6 +99,8 @@ export class ChatService extends StatefulService<IState> {
     this.customizationService.settingsChanged.subscribe(changed => {
       this.handleSettingsChanged(changed);
     });
+
+    if (this.chatUrl) this.loadUrl();
   }
 
   private deinitChat() {
