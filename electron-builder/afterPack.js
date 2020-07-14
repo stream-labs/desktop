@@ -2,9 +2,17 @@ const cp = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-function sign(filePath) {
+function signAndCheck(filePath) {
   console.log(`Signing: ${filePath}`);
   cp.execSync(`codesign -fs "Developer ID Application: Streamlabs LLC (UT675MBB9Q)" "${filePath}"`);
+
+  // All files need to be writable for update to succeed on mac
+  console.log(`Checking Writable: ${filePath}`);
+  try {
+    fs.accessSync(filePath, fs.constants.W_OK);
+  } catch {
+    throw new Error(`File ${filePath} is not writable!`);
+  }
 }
 
 function signBinaries(directory) {
@@ -24,7 +32,7 @@ function signBinaries(directory) {
 
       // Sign dynamic libraries
       if (ext === '.so' || ext === '.dylib') {
-        sign(absolutePath);
+        signAndCheck(absolutePath);
         continue;
       }
 
@@ -32,8 +40,11 @@ function signBinaries(directory) {
       // aren't marked by a specific extension.
       try {
         fs.accessSync(absolutePath, fs.constants.X_OK);
-        sign(absolutePath);
-      } catch {}
+      } catch {
+        continue;
+      }
+
+      signAndCheck(absolutePath);
     }
   }
 }
