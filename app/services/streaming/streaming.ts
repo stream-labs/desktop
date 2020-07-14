@@ -233,7 +233,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
       // update restream settings
       try {
-        await this.runCheck('setupRestream', () => this.restreamService.beforeGoLive());
+        await this.runCheck('setupRestream', async () => {
+          if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
+          await this.restreamService.beforeGoLive();
+        });
       } catch (e) {
         console.error('Failed to setup restream', e);
         this.setError('RESTREAM_SETUP_FAILED');
