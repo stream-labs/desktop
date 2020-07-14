@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="labelSettings">
     <div class="input-container select">
       <div class="input-label">
         <label>{{ $t('Label Type') }}</label>

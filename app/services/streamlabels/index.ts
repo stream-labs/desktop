@@ -115,8 +115,6 @@ export class StreamlabelsService extends Service {
 
   socket: SocketIOClient.Socket;
 
-  definitions: IStreamlabelSet;
-
   /**
    * Holds data about the currently running trains.
    * Will be updated by socket events and be used to
@@ -287,7 +285,7 @@ export class StreamlabelsService extends Service {
       .then(settings => this.updateSettings(settings));
   }
 
-  private fetchDefinitions(): void {
+  async fetchDefinitions(): Promise<IStreamlabelSet> {
     if (!this.userService.isLoggedIn) return;
 
     const platform = this.userService.platform.type;
@@ -295,9 +293,7 @@ export class StreamlabelsService extends Service {
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 
-    fetch(request)
-      .then(handleResponse)
-      .then(settings => (this.definitions = settings));
+    return await fetch(request).then(handleResponse);
   }
 
   private initSocketConnection(): void {
