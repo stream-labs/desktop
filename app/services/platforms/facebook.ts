@@ -56,7 +56,7 @@ interface IFacebookServiceState extends IPlatformState {
   activePage: IFacebookPage | null;
   liveVideoId: number | null;
   streamUrl: string | null;
-  settings: IFacebookStartStreamOptions | null;
+  settings: IFacebookStartStreamOptions;
   facebookPages: IStreamlabsFacebookPages | null;
 }
 
@@ -91,8 +91,6 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     'account-merging',
   ]);
 
-  channelInfoChanged = new Subject<Partial<IFacebookChannelInfo>>();
-
   authWindowOptions: Electron.BrowserWindowConstructorOptions = { width: 800, height: 800 };
 
   static initialState: IFacebookServiceState = {
@@ -112,7 +110,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   protected init() {
     // save settings to the local storage
     const savedSettings: IFacebookStartStreamOptions = JSON.parse(
-      localStorage.getItem(this.serviceName),
+      localStorage.getItem(this.serviceName) as string,
     );
     if (savedSettings) this.SET_STREAM_SETTINGS(savedSettings);
     this.store.watch(

@@ -24,6 +24,7 @@ import { SyncWithValue } from '../../../services/app/app-decorators';
 import { OptimizedProfileSwitcher } from './OptimizedProfileSwitcher';
 import { DestinationSwitchers } from './DestinationSwitchers';
 import { Twitter } from '../../Twitter';
+import { RestreamService } from '../../../services/restream';
 
 class SectionProps {
   title?: string = '';
@@ -71,6 +72,7 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private settingsService: SettingsService;
   @Inject() private userService: UserService;
+  @Inject() private restreamService: RestreamService;
 
   @SyncWithValue()
   private settings: IGoLiveSettings = null;
@@ -90,7 +92,11 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
   }
 
   private addDestination() {
-    this.settingsService.actions.showSettings('Stream');
+    if (this.restreamService.canEnableRestream) {
+      this.settingsService.actions.showSettings('Stream');
+    } else {
+      this.userService.openPrimeUrl('slobsmultistream');
+    }
   }
 
   private render() {

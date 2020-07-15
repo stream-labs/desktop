@@ -59,8 +59,12 @@ export default class StreamSettings extends TsxComponent {
   }
 
   private platformMerge(platform: TPlatform) {
-    this.navigationService.navigate('PlatformMerge', { platform });
-    this.windowsService.actions.closeChildWindow();
+    if (this.restreamService.canEnableRestream) {
+      this.navigationService.navigate('PlatformMerge', { platform });
+      this.windowsService.actions.closeChildWindow();
+    } else {
+      this.userService.openPrimeUrl('slobsmultistream');
+    }
   }
 
   private platformUnlink(platform: TPlatform) {

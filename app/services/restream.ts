@@ -20,15 +20,18 @@ interface IRestreamTarget {
 }
 
 interface IRestreamState {
-  enabled: boolean;
-}
-
-interface IUserSettingsResponse {
   /**
    * Whether this user has restream enabled
    */
   enabled: boolean;
 
+  /**
+   * if true than user obtained the restream feature before it became a prime-only feature
+   */
+  grandfathered: boolean;
+}
+
+interface IUserSettingsResponse extends IRestreamState {
   streamKey: string;
 }
 
@@ -44,6 +47,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
   static initialState: IRestreamState = {
     enabled: true,
+    grandfathered: false,
   };
 
   get streamInfo() {
@@ -53,6 +57,11 @@ export class RestreamService extends StatefulService<IRestreamState> {
   @mutation()
   private SET_ENABLED(enabled: boolean) {
     this.state.enabled = enabled;
+  }
+
+  @mutation()
+  private SET_GRANDFATHERED(enabled: boolean) {
+    this.state.grandfathered = enabled;
   }
 
   // @mutation()
@@ -75,6 +84,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
   async loadUserSettings() {
     this.settings = await this.fetchUserSettings();
+    this.SET_GRANDFATHERED(this.settings.grandfathered);
     this.SET_ENABLED(this.settings.enabled && this.canEnableRestream);
   }
 
@@ -83,13 +93,13 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   /**
-   * This determines whether the user sees the restream toggle in settings
+   * This determines whether the user can enable restream
    * Requirements:
-   * - Logged in with Twitch
-   * - Rolled out to
+   * - Has prime, or
+   * - Has a grandfathered status enabled
    */
   get canEnableRestream() {
-    return !!this.userService.state.auth;
+    return this.userService.isPrime || (this.userService.state.auth && this.state.grandfathered);
   }
 
   get chatUrl() {

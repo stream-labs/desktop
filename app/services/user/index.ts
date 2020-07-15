@@ -460,6 +460,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.showPrimeWindow();
   }
 
+  /**
+   * open the prime onboarding in the browser
+   * @param refl a referral tag for analytics
+   */
+  openPrimeUrl(refl: 'slobsmultistream') {
+    electron.remote.shell.openExternal(
+      `https://${this.hostsService.streamlabs}/goprime?refl=${refl}`,
+    );
+  }
+
   recentEventsUrl() {
     if (this.isLoggedIn) {
       const host = this.hostsService.streamlabs;

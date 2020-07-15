@@ -4,6 +4,7 @@ import { StreamingService } from '../streaming';
 import { authorizedHeaders, handleResponse } from '../../util/requests';
 import { UserService } from '../user';
 import { HostsService } from '../hosts';
+import electron from 'electron';
 
 const VIEWER_COUNT_UPDATE_INTERVAL = 60 * 1000;
 
@@ -47,16 +48,20 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
     await runInterval();
   }
 
-  /**
-   * unlink platform and reload auth state
-   */
   unlink() {
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/unlink/${this.platform}_account`;
-    const headers = authorizedHeaders(this.userService.apiToken!);
-    const request = new Request(url, { headers });
-    return fetch(request)
-      .then(handleResponse)
-      .then(_ => this.userService.updateLinkedPlatforms());
+    // /**
+    //  * unlink platform and reload auth state
+    //  */
+    // const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/unlink/${this.platform}_account`;
+    // const headers = authorizedHeaders(this.userService.apiToken!);
+    // const request = new Request(url, { headers });
+    // return fetch(request)
+    //   .then(handleResponse)
+    //   .then(_ => this.userService.updateLinkedPlatforms());
+
+    electron.remote.shell.openExternal(
+      `https://${this.hostsService.streamlabs}/dashboard#/settings/account-settings`,
+    );
   }
 
   @mutation()
