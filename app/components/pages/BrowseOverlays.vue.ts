@@ -45,7 +45,7 @@ export default class BrowseOverlays extends Vue {
             // We raise an exception which will result in a rejected promise.
             // This allows the themes library to catch out of date versions
             // in the same code path as ineligable users.
-            throw new Error('User is not elgigible to restream');
+            Promise.reject('User is not elgigible to restream');
           }
 
           return Promise.resolve(true);

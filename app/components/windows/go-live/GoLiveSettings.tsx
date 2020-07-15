@@ -95,7 +95,7 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
     if (this.restreamService.canEnableRestream) {
       this.settingsService.actions.showSettings('Stream');
     } else {
-      this.userService.openPrimeUrl('slobsmultistream');
+      this.userService.openPrimeUrl('slobs-multistream');
     }
   }
 
@@ -108,6 +108,7 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
     const shouldShowSettings = !isErrorMode && !isLoadingMode && hasPlatforms;
     const isAdvancedMode = view.goLiveSettings.advancedMode && view.isMutliplatformMode;
     const shouldShowAddDestination = view.allPlatforms.length !== view.linkedPlatforms.length;
+    const shouldShowPrimeLabel = !this.restreamService.state.grandfathered;
     return (
       <ValidatedForm class="flex">
         {/*LEFT COLUMN*/}
@@ -123,7 +124,7 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
           {shouldShowAddDestination && (
             <a class={styles.addDestinationBtn} onclick={this.addDestination}>
               <i class="fa fa-plus" />
-              {$t('Add Destination')} <b class={styles.prime}>prime</b>
+              {$t('Add Destination')} {shouldShowPrimeLabel && <b class={styles.prime}>prime</b>}
             </a>
           )}
         </div>

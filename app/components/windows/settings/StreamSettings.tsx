@@ -63,7 +63,7 @@ export default class StreamSettings extends TsxComponent {
       this.navigationService.navigate('PlatformMerge', { platform });
       this.windowsService.actions.closeChildWindow();
     } else {
-      this.userService.openPrimeUrl('slobsmultistream');
+      this.userService.openPrimeUrl('slobs-multistream');
     }
   }
 
@@ -133,6 +133,8 @@ export default class StreamSettings extends TsxComponent {
     const shouldShowPrimaryBtn = isPrimary;
     const shouldShowConnectBtn = !isMerged;
     const shouldShowUnlinkBtn = !isPrimary && isMerged;
+    const shouldShowPrimeLabel =
+      !this.userService.state.isPrime && !this.restreamService.state.grandfathered;
 
     // RIP Mixer
     if (platform === 'mixer' && !isPrimary) return;
@@ -149,12 +151,15 @@ export default class StreamSettings extends TsxComponent {
 
         <div style={{ marginLeft: 'auto' }}>
           {shouldShowConnectBtn && (
-            <button
-              onclick={() => this.platformMerge(platform)}
-              class={cx(`button ${buttonClass}`, styles.platformButton)}
-            >
-              {$t('Connect')}
-            </button>
+            <span>
+              {shouldShowPrimeLabel && <b class={styles.prime}>prime</b>}
+              <button
+                onclick={() => this.platformMerge(platform)}
+                class={cx(`button ${buttonClass}`, styles.platformButton)}
+              >
+                {$t('Connect')}
+              </button>
+            </span>
           )}
           {shouldShowUnlinkBtn && (
             <button

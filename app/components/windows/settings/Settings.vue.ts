@@ -90,11 +90,7 @@ export default class Settings extends Vue {
 
   set categoryName(val: string) {
     if (val === 'Prime') {
-      this.magicLinkService
-        .getDashboardMagicLink('prime-marketing', 'slobs-settings')
-        .then(link => {
-          electron.remote.shell.openExternal(link);
-        });
+      this.userService.openPrimeUrl('slobs-settings');
     } else {
       this.internalCategoryName = val;
     }

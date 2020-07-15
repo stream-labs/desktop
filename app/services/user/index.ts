@@ -30,6 +30,7 @@ import { StreamSettingsService } from 'services/settings/streaming';
 import { lazyModule } from 'util/lazy-module';
 import { AuthModule } from './auth-module';
 import { WebsocketService, TSocketEvent } from 'services/websocket';
+import { MagicLinkService } from '../magic-link';
 
 export enum EAuthProcessState {
   Idle = 'idle',
@@ -117,6 +118,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private settingsService: SettingsService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private websocketService: WebsocketService;
+  @Inject() private magicLinkService: MagicLinkService;
 
   @mutation()
   LOGIN(auth: IUserAuth) {
@@ -464,10 +466,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    * open the prime onboarding in the browser
    * @param refl a referral tag for analytics
    */
-  openPrimeUrl(refl: 'slobsmultistream') {
-    electron.remote.shell.openExternal(
-      `https://${this.hostsService.streamlabs}/goprime?refl=${refl}`,
-    );
+  openPrimeUrl(refl: 'slobs-multistream' | 'slobs-settings') {
+    this.magicLinkService.getDashboardMagicLink('prime-marketing', refl).then(link => {
+      electron.remote.shell.openExternal(link);
+    });
   }
 
   recentEventsUrl() {

@@ -87,6 +87,9 @@ platforms.forEach(platform => {
     await focusMain(t);
     await app.client.waitForExist('button=End Stream', 20 * 1000);
 
+    // give the GoLive window a couple of seconds to become closed
+    await sleep(2000);
+
     // open the editStreamInfo dialog
     await app.client.click('.live-dock-info .icon-edit');
     await focusChild(t);
