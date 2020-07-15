@@ -42,7 +42,7 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
 
   private settings: IStreamSettings = null;
   private eligiblePlatforms = this.view.linkedPlatforms.filter(p =>
-    this.view.supports('stream-schedule', p),
+    this.view.supports('stream-schedule', [p]),
   );
   private startTimeModel = {
     date: Date.now(),

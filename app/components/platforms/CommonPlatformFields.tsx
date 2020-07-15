@@ -69,7 +69,15 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
    * Returns platforms that don't have `useCustomFields = true` flag
    **/
   private get targetPlatforms(): TPlatform[] {
+    // component in the single platform mode
     if (this.props.platform) return [this.props.platform];
+
+    // component in the simple multiplatform mode
+    if (!this.settings.advancedMode) {
+      return this.enabledPlatforms;
+    }
+
+    // component in the advanced multiplatform mode
     return this.enabledPlatforms.filter(
       platform => !this.settings.destinations[platform].useCustomFields,
     );
@@ -95,7 +103,7 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
         useCustomFields,
         title: commonFields.title,
       };
-      if (this.view.supports('description', platform)) {
+      if (this.view.supports('description', [platform])) {
         this.settings.destinations[platform]['description'] = commonFields.description;
       }
       return;
@@ -111,9 +119,9 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
     const fieldsAreVisible = !hasCustomCheckbox || this.platformSettings.useCustomFields;
     const view = this.streamingService.views;
     const hasDescription = isSinglePlatformMode
-      ? view.supports('description', this.props.platform)
+      ? view.supports('description', [this.props.platform])
       : view.supports('description');
-    const hasGame = view.supports('game');
+    const hasGame = view.supports('game', this.targetPlatforms);
     const fields = isSinglePlatformMode
       ? this.settings.destinations[this.props.platform]
       : this.commonFields;

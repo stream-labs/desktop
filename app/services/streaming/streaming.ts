@@ -326,7 +326,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     // settings = this.views.sanitizeSettings(settings);
     const destinations = settings.destinations;
     const platforms = (Object.keys(destinations) as TPlatform[]).filter(
-      dest => destinations[dest].enabled && this.views.supports('stream-schedule', dest),
+      dest => destinations[dest].enabled && this.views.supports('stream-schedule', [dest]),
     );
     for (const platform of platforms) {
       const service = getPlatformService(platform);
@@ -1180,9 +1180,9 @@ class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     return true;
   }
 
-  supports(capability: TPlatformCapability, platform?: TPlatform) {
-    const platforms = platform ? [platform] : this.enabledPlatforms;
-    for (platform of platforms) {
+  supports(capability: TPlatformCapability, targetPlatforms?: TPlatform[]) {
+    const platforms = targetPlatforms || this.enabledPlatforms;
+    for (const platform of platforms) {
       if (getPlatformService(platform).capabilities.has(capability)) return true;
     }
   }

@@ -272,6 +272,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   async prepopulateInfo(): Promise<Partial<IFacebookStartStreamOptions>> {
     await this.fetchActivePage();
     if (!this.state.activePage || !this.state.activePage.id) {
+      this.SET_PREPOPULATED(true);
       return { facebookPageId: undefined };
     }
     const url =

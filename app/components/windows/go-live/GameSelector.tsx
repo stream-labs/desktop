@@ -96,8 +96,8 @@ export default class GameSelector extends TsxComponent<Props> {
       const platformSettings = this.settings.destinations[dest];
       return (
         platformSettings.enabled &&
-        !platformSettings.useCustomFields &&
-        this.view.supports('game', dest)
+        (!this.settings.advancedMode || !platformSettings.useCustomFields) &&
+        this.view.supports('game', [dest])
       );
     });
   }
