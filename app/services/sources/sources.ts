@@ -454,7 +454,6 @@ export class SourcesService extends StatefulService<ISourcesState> {
       { description: 'Audio Output Capture', value: 'coreaudio_output_capture' },
       { description: 'Video Capture Device', value: 'av_capture_input' },
       { description: 'Display Capture', value: 'display_capture' },
-      { description: 'JACK Input Client', value: 'audio_line' },
     ];
 
     const availableWhitelistedType = whitelistedTypes.filter(type =>
