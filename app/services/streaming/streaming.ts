@@ -171,7 +171,14 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       try {
         await service.prepopulateInfo();
       } catch (e) {
-        this.SET_ERROR('PREPOPULATE_FAILED', e.details, platform);
+        if (
+          platform === 'twitch' &&
+          e?.details === '401 Unauthorized missing required oauth scope'
+        ) {
+          this.SET_ERROR('TWITCH_MISSED_OAUTH_SCOPE', e.details, platform);
+        } else {
+          this.SET_ERROR('PREPOPULATE_FAILED', e.details, platform);
+        }
         this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
         return;
       }

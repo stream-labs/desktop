@@ -8,6 +8,9 @@ const errorTypes = {
   FACEBOOK_HAS_NO_PAGES: {
     message: 'Facebook pages have not been found',
   },
+  TWITCH_MISSED_OAUTH_SCOPE: {
+    message: 'Missing required oauth scope',
+  },
   PREPOPULATE_FAILED: {
     message: 'Failed to fetch platform settings',
   },

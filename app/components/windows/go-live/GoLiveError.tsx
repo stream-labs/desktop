@@ -12,6 +12,8 @@ import { TwitterService } from '../../../services/integrations/twitter';
 import { IStreamError } from '../../../services/streaming/stream-error';
 import Translate from '../../shared/translate';
 import electron, { shell } from 'electron';
+import { UserService } from '../../../services/user';
+import { NavigationService } from '../../../services/navigation';
 
 /**
  * Shows error and troubleshooting suggestions
@@ -22,6 +24,8 @@ export default class GoLiveError extends TsxComponent<{}> {
   @Inject() private windowsService: WindowsService;
   @Inject() private youtubeService: YoutubeService;
   @Inject() private twitterService: TwitterService;
+  @Inject() private userService: UserService;
+  @Inject() private navigationService: NavigationService;
 
   private get view() {
     return this.streamingService.views;
@@ -47,6 +51,11 @@ export default class GoLiveError extends TsxComponent<{}> {
     this.windowsService.actions.closeChildWindow();
   }
 
+  private navigatePlatformMerge(platform: TPlatform) {
+    this.navigationService.navigate('PlatformMerge', { platform });
+    this.windowsService.actions.closeChildWindow();
+  }
+
   private render() {
     const error = this.view.info.error;
     if (!error) return;
@@ -55,6 +64,8 @@ export default class GoLiveError extends TsxComponent<{}> {
         return this.renderPrepopulateError(error);
       case 'FACEBOOK_HAS_NO_PAGES':
         return this.renderFacebookNoPagesError(error);
+      case 'TWITCH_MISSED_OAUTH_SCOPE':
+        return this.renderTwitchMissedScopeError(error);
       case 'SETTINGS_UPDATE_FAILED':
         return this.renderSettingsUpdateError(error);
       case 'RESTREAM_DISABLED':
@@ -89,6 +100,33 @@ export default class GoLiveError extends TsxComponent<{}> {
               <a class={styles.link} onclick={() => this.skipPrepopulateAndGoLive()}>
                 {{ text }}
               </a>
+            ),
+          }}
+        />
+      </ErrorLayout>
+    );
+  }
+
+  private renderTwitchMissedScopeError(error: IStreamError) {
+    // If primary platform, then ask to re-login
+    if (this.userService.state.auth.primaryPlatform === 'twitch') {
+      return this.renderPrepopulateError(error);
+    }
+
+    // If not primary platform than ask to connect platform again from SLOBS
+    const platformName = getPlatformService(error.platform).displayName;
+    return (
+      <ErrorLayout message={$t('Can not fetch settings from %{platformName}', { platformName })}>
+        <Translate
+          message={$t('twitchMissedScopeError')}
+          scopedSlots={{
+            connectButton: (text: string) => (
+              <button
+                class="button button--twitch"
+                onClick={() => this.navigatePlatformMerge('twitch')}
+              >
+                {{ text }}
+              </button>
             ),
           }}
         />
@@ -166,7 +204,7 @@ export default class GoLiveError extends TsxComponent<{}> {
 }
 
 class ErrorLayoutProps {
-  error: IStreamError = null;
+  error?: IStreamError = null;
   /**
    * overrides the error message if provided
    */
@@ -183,7 +221,7 @@ class ErrorLayout extends TsxComponent<ErrorLayoutProps> {
   private render() {
     const error = this.props.error;
     const message = this.props.message || error.message;
-    const details = error.details;
+    const details = error?.details;
     return (
       <div class={cx('section selectable', styles.container)}>
         <p class={styles.title}>
