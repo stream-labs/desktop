@@ -54,6 +54,10 @@ export default class PlatformMerge extends TsxComponent<PlatformMergeProps> {
     this.showLogin = true;
   }
 
+  private skipPageCreation() {
+    this.showLogin = true;
+  }
+
   private async mergePlatform(platform: TPlatform) {
     const mode = platform === 'youtube' ? 'external' : 'internal';
     await this.userService.startAuth(platform, mode, true);
@@ -81,6 +85,13 @@ export default class PlatformMerge extends TsxComponent<PlatformMergeProps> {
     return (
       <div>
         <div>{$t('Create a Facebook Gaming page to get started.')}</div>
+        <button
+          style={{ marginTop: '24px', marginRight: '24px' }}
+          class="button button--action"
+          onclick={() => this.skipPageCreation()}
+        >
+          {$t('I already have a Gaming Page')}
+        </button>
         <button
           style={{ marginTop: '24px' }}
           class="button button--action"

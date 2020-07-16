@@ -215,7 +215,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         await this.runCheck(platform, () => service.beforeGoLive(settings));
       } catch (e) {
         console.error(e);
-        this.setError('SETTINGS_UPDATE_FAILED', e.details, platform);
+        // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
+        const errorType =
+          (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
+            ? 'SETTINGS_UPDATE_FAILED'
+            : e.type;
+        this.setError(errorType, e.details, platform);
         return;
       }
     }

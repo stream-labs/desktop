@@ -24,6 +24,9 @@ const errorTypes = {
   RESTREAM_SETUP_FAILED: {
     message: 'Failed to setup the Restream',
   },
+  YOUTUBE_STREAMING_DISABLED: {
+    message: 'YouTube account not enabled for live streaming',
+  },
   YOUTUBE_PUBLISH_FAILED: {
     message: 'Failed to publish the Youtube broadcast',
   },

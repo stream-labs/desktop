@@ -56,6 +56,10 @@ export default class GoLiveError extends TsxComponent<{}> {
     this.windowsService.actions.closeChildWindow();
   }
 
+  private enableYT() {
+    this.youtubeService.actions.openYoutubeEnable();
+  }
+
   private render() {
     const error = this.view.info.error;
     if (!error) return;
@@ -71,6 +75,8 @@ export default class GoLiveError extends TsxComponent<{}> {
       case 'RESTREAM_DISABLED':
       case 'RESTREAM_SETUP_FAILED':
         return this.renderRestreamError(error);
+      case 'YOUTUBE_STREAMING_DISABLED':
+        return this.renderYoutubeStreamingDisabled(error);
       case 'YOUTUBE_PUBLISH_FAILED':
         return this.renderYoutubePublishError(error);
       default:
@@ -156,6 +162,16 @@ export default class GoLiveError extends TsxComponent<{}> {
             ),
           }}
         />
+      </ErrorLayout>
+    );
+  }
+
+  private renderYoutubeStreamingDisabled(error: IStreamError) {
+    return (
+      <ErrorLayout message={error.message}>
+        <button class="button button--warn" onClick={() => this.enableYT()}>
+          {$t('Fix')}
+        </button>
       </ErrorLayout>
     );
   }

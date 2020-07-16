@@ -23,6 +23,7 @@ import { ITwitchStartStreamOptions } from './twitch';
 import { throwStreamError } from '../streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import { assertIsDefined } from '../../util/properties-type-guards';
+import electron from 'electron';
 
 interface IYoutubeServiceState extends IPlatformState {
   liveStreamingEnabled: boolean;
@@ -192,7 +193,13 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     } catch (e) {
       let details = e.result?.error?.message;
       if (!details) details = 'connection failed';
-      throw throwStreamError('PLATFORM_REQUEST_FAILED', details, 'youtube');
+      const errorType =
+        details === 'The user is not enabled for live streaming.'
+          ? 'YOUTUBE_STREAMING_DISABLED'
+          : 'PLATFORM_REQUEST_FAILED';
+      if (e.result) {
+        throw throwStreamError(errorType, details, 'youtube');
+      }
     }
   }
 
@@ -739,6 +746,10 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     const mode = this.customizationService.isDarkTheme ? 'night' : 'day';
     const youtubeDomain = mode === 'day' ? 'https://youtube.com' : 'https://gaming.youtube.com';
     return `${youtubeDomain}/live_chat?v=${broadcastId}&is_popout=1`;
+  }
+
+  openYoutubeEnable() {
+    electron.remote.shell.openExternal('https://youtube.com/live_dashboard_splash');
   }
 
   private getDashboardUrl(channelId: string): string {
