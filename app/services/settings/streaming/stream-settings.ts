@@ -108,7 +108,15 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
    */
   setSettings(patch: Partial<IStreamSettings>) {
     // save settings to localStorage
-    Object.keys(this.state).forEach(prop => {
+    const localStorageSettings: (keyof IStreamSettingsState)[] = [
+      'protectedModeEnabled',
+      'protectedModeMigrationRequired',
+      'title',
+      'description',
+      'warnNoVideoSources',
+      'goLiveSettings',
+    ];
+    localStorageSettings.forEach(prop => {
       if (prop in patch) {
         this.SET_LOCAL_STORAGE_SETTINGS({ [prop]: patch[prop] } as Partial<IStreamSettingsState>);
       }

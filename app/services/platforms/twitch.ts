@@ -142,13 +142,12 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
   }
 
   async beforeGoLive(goLiveSettings?: IGoLiveSettings) {
-    const key = await this.fetchStreamKey();
-    this.SET_STREAM_KEY(key);
-
     if (
       this.streamSettingsService.protectedModeEnabled &&
       this.streamSettingsService.isSafeToModifyStreamKey()
     ) {
+      const key = await this.fetchStreamKey();
+      this.SET_STREAM_KEY(key);
       this.streamSettingsService.setSettings({
         key,
         platform: 'twitch',

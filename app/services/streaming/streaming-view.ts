@@ -34,10 +34,16 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   }
 
   /**
-   * Returns a list of linked platforms
+   * Returns a list of linked platforms available for restream
    */
   get linkedPlatforms(): TPlatform[] {
     if (!this.userService.state.auth) return [];
+    if (
+      !this.restreamService.canEnableRestream ||
+      !this.streamSettingsService.state.protectedModeEnabled
+    ) {
+      return [this.userService.state.auth.primaryPlatform];
+    }
     return this.allPlatforms.filter(p => this.isPlatformLinked(p));
   }
 

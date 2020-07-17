@@ -462,8 +462,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       this.rejectStartStreaming = reject;
     });
 
-    const shouldConfirm =
-      !this.userService.isLoggedIn && this.streamSettingsService.settings.warnBeforeStartingStream;
+    const shouldConfirm = this.streamSettingsService.settings.warnBeforeStartingStream;
 
     if (shouldConfirm) {
       const goLive = await electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
@@ -473,7 +472,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         buttons: [$t('Cancel'), $t('Go Live')],
       });
 
-      if (!goLive.response) return;
+      if (!goLive.response) {
+        this.rejectStartStreaming();
+        return;
+      }
     }
 
     this.powerSaveId = electron.remote.powerSaveBlocker.start('prevent-display-sleep');

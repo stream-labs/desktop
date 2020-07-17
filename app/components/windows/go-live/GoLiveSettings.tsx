@@ -70,26 +70,29 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
     const isAdvancedMode = view.goLiveSettings.advancedMode && view.isMutliplatformMode;
     const shouldShowAddDestination = view.allPlatforms.length !== view.linkedPlatforms.length;
     const shouldShowPrimeLabel = !this.restreamService.state.grandfathered;
+    const shouldShowLeftCol = this.streamSettingsService.state.protectedModeEnabled;
     return (
       <ValidatedForm class="flex">
         {/*LEFT COLUMN*/}
-        <div style={{ width: '400px', marginRight: '42px' }}>
-          {/*DESTINATION SWITCHERS*/}
-          <DestinationSwitchers
-            value={this.settings.destinations}
-            title="Stream to %{platformName}"
-            canDisablePrimary={false}
-            handleOnSwitch={(...args) => this.switchPlatform(...args)}
-          />
+        {shouldShowLeftCol && (
+          <div style={{ width: '400px', marginRight: '42px' }}>
+            {/*DESTINATION SWITCHERS*/}
+            <DestinationSwitchers
+              value={this.settings.destinations}
+              title="Stream to %{platformName}"
+              canDisablePrimary={false}
+              handleOnSwitch={(...args) => this.switchPlatform(...args)}
+            />
 
-          {/*ADD DESTINATION BUTTON*/}
-          {shouldShowAddDestination && (
-            <a class={styles.addDestinationBtn} onclick={this.addDestination}>
-              <i class="fa fa-plus" />
-              {$t('Add Destination')} {shouldShowPrimeLabel && <b class={styles.prime}>prime</b>}
-            </a>
-          )}
-        </div>
+            {/*ADD DESTINATION BUTTON*/}
+            {shouldShowAddDestination && (
+              <a class={styles.addDestinationBtn} onclick={this.addDestination}>
+                <i class="fa fa-plus" />
+                {$t('Add Destination')} {shouldShowPrimeLabel && <b class={styles.prime}>prime</b>}
+              </a>
+            )}
+          </div>
+        )}
 
         {/*RIGHT COLUMN*/}
         <div style={{ width: '100%' }}>
