@@ -1,22 +1,19 @@
-import { Component, Prop, Watch } from 'vue-property-decorator';
-import cx from 'classnames';
-import { IListMetadata, IListOption, metadata } from 'components/shared/inputs';
+import { Component, Watch } from 'vue-property-decorator';
+import { IListOption, metadata } from 'components/shared/inputs';
 import { ListInput, TagsInput } from 'components/shared/inputs/inputs';
 import {
   getPlatformService,
-  IGame,
   IPlatformCapabilityGame,
   TPlatform,
-} from '../../../services/platforms';
+} from 'services/platforms';
 import { $t } from 'services/i18n';
 import { Debounce } from 'lodash-decorators';
-import HFormGroup from '../../shared/inputs/HFormGroup.vue';
 import TsxComponent, { createProps } from '../../tsx-component';
-import { SyncWithValue } from '../../../services/app/app-decorators';
+import { SyncWithValue } from 'services/app/app-decorators';
 import { IStreamSettings, StreamingService } from 'services/streaming';
-import { Inject } from '../../../services/core';
+import { Inject } from 'services/core';
 import { flatten, sortBy } from 'lodash';
-import PlatformLogo from '../../shared/PlatformLogo';
+import PlatformLogo from 'components/shared/PlatformLogo';
 
 interface IGameOptionData {
   platform: TPlatform;
@@ -35,6 +32,9 @@ class Props {
   platform?: TPlatform | null = null;
 }
 
+/**
+ * Selects a game for streaming
+ */
 @Component({ props: createProps(Props) })
 export default class GameSelector extends TsxComponent<Props> {
   @Inject() private streamingService: StreamingService;
@@ -51,14 +51,6 @@ export default class GameSelector extends TsxComponent<Props> {
   get view() {
     return this.streamingService.views;
   }
-
-  // created() {
-  //   this.gameOptions = [...this.selectedOptions];
-  //
-  //   // this.gameOptions = this.settings.game
-  //   //   ? [{ value: this.settings.game, title: this.settings.game }]
-  //   //   : [];
-  // }
 
   private createGameOption(
     platform: TPlatform,

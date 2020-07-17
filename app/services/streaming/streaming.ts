@@ -1,4 +1,4 @@
-import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-service';
+import { mutation, StatefulService } from 'services/core/stateful-service';
 import * as obs from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import moment from 'moment';
@@ -23,7 +23,6 @@ import { $t } from 'services/i18n';
 import {
   getPlatformService,
   TPlatform,
-  TPlatformCapability,
   TStartStreamOptions,
 } from 'services/platforms';
 import { UserService } from 'services/user';
@@ -39,15 +38,14 @@ import { CustomizationService } from 'services/customization';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService } from 'services/restream';
-import { TwitchService } from 'services/platforms/twitch';
 import { FacebookService } from 'services/platforms/facebook';
 import Utils from 'services/utils';
-import { cloneDeep, difference, pick } from 'lodash';
+import { cloneDeep } from 'lodash';
 import { createStreamError, StreamError, TStreamErrorType } from './stream-error';
-import { authorizedHeaders } from '../../util/requests';
+import { authorizedHeaders } from 'util/requests';
 import { HostsService } from '../hosts';
 import { TwitterService } from '../integrations/twitter';
-import { assertIsDefined } from '../../util/properties-type-guards';
+import { assertIsDefined } from 'util/properties-type-guards';
 import { YoutubeService } from '../platforms/youtube';
 import { StreamInfoView } from './streaming-view';
 
@@ -144,7 +142,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         return this.views;
       },
       val => {
-        console.log('InfoChanged', val, val.chatUrl);
         // show the error if child window is closed
         if (val.info.error && !this.windowsService.state.child.isShown) {
           this.showGoLiveWindow();

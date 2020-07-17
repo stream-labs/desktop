@@ -166,7 +166,7 @@ export interface IPlatformService {
   readonly displayName: string;
   readonly mergeUrl: string;
   readonly streamPageUrl: string;
-  chatUrl: string;
+  readonly chatUrl: string;
   unlink: () => void;
 
   state: IPlatformState;

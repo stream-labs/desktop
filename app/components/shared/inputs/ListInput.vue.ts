@@ -55,7 +55,7 @@ export default class ListInput extends BaseInput<
     return options[0];
   }
 
-  get selectedOption(): IListOption<string, unknown> {
+  get selectedOption(): IListOption<string> {
     return this.options.options.find(option => option.value === this.value);
   }
 

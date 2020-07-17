@@ -298,7 +298,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       return h(OneOffWindow);
     },
   });
-  window['vm'] = vm;
 
   let mainWindowShowTime = 0;
   if (Utils.isMainWindow()) {

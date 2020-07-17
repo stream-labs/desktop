@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import Chat from './Chat.vue';
 import { StreamingService, EStreamingState } from '../services/streaming';
-import { Inject } from '../services/core/injector';
+import { Inject } from 'services/core/injector';
 import { UserService } from '../services/user';
 import { CustomizationService } from 'services/customization';
 import electron from 'electron';
@@ -15,7 +15,7 @@ import Tabs, { ITab } from 'components/Tabs.vue';
 import { ChatService } from 'services/chat';
 import { WindowsService } from 'services/windows';
 import { RestreamService, YoutubeService } from 'app-services';
-import { getPlatformService } from '../services/platforms';
+import { getPlatformService } from 'services/platforms';
 
 @Component({})
 class TestComp extends Vue {
@@ -207,11 +207,6 @@ export default class LiveDock extends Vue {
 
   get hideStyleBlockers() {
     return this.windowsService.state.main.hideStyleBlockers;
-  }
-
-  get chatHidden() {
-    return false;
-    // return this.chatService.state.isReadyToShow;
   }
 
   get hasChatTabs() {

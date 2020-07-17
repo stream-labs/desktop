@@ -4,7 +4,7 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { cloneDeep } from 'lodash';
 import TsxComponent, { createProps } from 'components/tsx-component';
-import { formMetadata, metadata } from '../../../../shared/inputs';
+import { formMetadata, metadata } from 'components/shared/inputs';
 import { $t } from 'services/i18n';
 import BroadcastInput from './BroadcastInput';
 import {
@@ -13,9 +13,8 @@ import {
   YoutubeService,
 } from 'services/platforms/youtube';
 import CommonPlatformFields from '../../CommonPlatformFields';
-import { StreamingService } from '../../../../../app-services';
-import { SyncWithValue } from '../../../../../services/app/app-decorators';
-import { IStreamSettings } from '../../../../../services/streaming';
+import { StreamingService, IStreamSettings } from 'services/streaming';
+import { SyncWithValue } from 'services/app/app-decorators';
 import BaseEditStreamInfo from '../BaseEditSteamInfo';
 
 class Props {

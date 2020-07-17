@@ -449,6 +449,10 @@ export class FormMonkey {
   }
 }
 
+/**
+ * select ListInput option by given title
+ * able to work with a dynamic options list
+ */
 export function selectTitle(optionTitle: string | RegExp): FNValueSetter {
   return async (form: FormMonkey, input: IUIInput) => {
     const hasInternalSearch: boolean = JSON.parse(

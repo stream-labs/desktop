@@ -30,7 +30,7 @@ import { StreamSettingsService } from 'services/settings/streaming';
 import { lazyModule } from 'util/lazy-module';
 import { AuthModule } from './auth-module';
 import { WebsocketService, TSocketEvent } from 'services/websocket';
-import { MagicLinkService } from '../magic-link';
+import { MagicLinkService } from 'services/magic-link';
 
 export enum EAuthProcessState {
   Idle = 'idle',

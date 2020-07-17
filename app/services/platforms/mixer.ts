@@ -163,7 +163,7 @@ export class MixerService extends BasePlatformService<IMixerServiceState>
   }
 
   /**
-   * obtain the channel info for the GoLive window
+   * obtain channel info for the GoLive window
    */
   async prepopulateInfo() {
     const json = await this.fetchRawChannelInfo();

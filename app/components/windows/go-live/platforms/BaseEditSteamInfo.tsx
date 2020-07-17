@@ -3,7 +3,7 @@ import { TPlatform } from 'services/platforms';
 import { IStreamSettings } from 'services/streaming';
 
 /**
- * A base component for editing the stream settings
+ * A base component for editing the stream settings for a specific platform
  */
 export default abstract class BaseEditStreamInfo<Props> extends TsxComponent<Props> {
   protected abstract settings: IStreamSettings;

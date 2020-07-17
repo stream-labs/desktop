@@ -1,15 +1,11 @@
 import { StatefulService } from 'services';
 import { Inject, mutation, InitAfter } from 'services/core';
 import { HostsService } from 'services/hosts';
-import { getPlatformService, TPlatform, TStartStreamOptions } from 'services/platforms';
-import { ITwitchStartStreamOptions } from 'services/platforms/twitch';
+import { getPlatformService, TPlatform } from 'services/platforms';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { UserService } from 'services/user';
 import { authorizedHeaders } from 'util/requests';
-import Vue from 'vue';
-import { IFacebookStartStreamOptions } from './platforms/facebook';
-import { IncrementalRolloutService, EAvailableFeatures } from './incremental-rollout';
-import Utils from './utils';
+import { IncrementalRolloutService } from './incremental-rollout';
 import electron from 'electron';
 import { StreamingService } from './streaming';
 
@@ -26,7 +22,8 @@ interface IRestreamState {
   enabled: boolean;
 
   /**
-   * if true than user obtained the restream feature before it became a prime-only feature
+   * if true then user obtained the restream feature before it became a prime-only feature
+   * Restream should be available without Prime for such users
    */
   grandfathered: boolean;
 }
@@ -63,16 +60,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
   private SET_GRANDFATHERED(enabled: boolean) {
     this.state.grandfathered = enabled;
   }
-
-  // @mutation()
-  // private UNSTAGE_PLATFORMS() {
-  //   this.state.platforms = {};
-  // }
-  //
-  // @mutation()
-  // private STAGE_PLATFORM(platform: TPlatform, options: TStartStreamOptions, streamKey: string) {
-  //   Vue.set(this.state.platforms, platform, { options, streamKey });
-  // }
 
   init() {
     this.userService.userLogin.subscribe(() => this.loadUserSettings());
@@ -155,23 +142,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
   get platforms(): TPlatform[] {
     return [this.userService.state.auth.primaryPlatform, 'facebook'];
   }
-
-  // /**
-  //  * Stages a platform for restreaming, which means it will have a target
-  //  * created when `setupRestreamTargets` is called.
-  //  * @param platform The platform to stage
-  //  * @param options The go-live info/options
-  //  */
-  // async stagePlatform(platform: TPlatform, options: TStartStreamOptions) {
-  //   const service = getPlatformService(platform);
-  //   const streamKey = await service.beforeGoLive(options);
-  //
-  //   this.STAGE_PLATFORM(platform, options, streamKey);
-  // }
-
-  // unstageAllPlatforms() {
-  //   this.UNSTAGE_PLATFORMS();
-  // }
 
   async beforeGoLive() {
     await Promise.all([this.setupIngest(), this.setupTargets()]);

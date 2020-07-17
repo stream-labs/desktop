@@ -50,13 +50,20 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
   }
 
   created() {
+    // use goLive settings for schedule
     this.settings = cloneDeep(this.view.goLiveSettings);
+
+    // always show a simple mode only
     this.settings.advancedMode = false;
+
+    // always have all platforms enabled when show window
     const destinations = this.settings.destinations;
     Object.keys(destinations).forEach((dest: TPlatform) => {
       destinations[dest].enabled = true;
       if (!this.eligiblePlatforms.includes(dest)) delete destinations[dest];
     });
+
+    // prepopulate info for target platforms
     this.streamingService.actions.prepopulateInfo(this.selectedDestinations);
   }
 
@@ -64,11 +71,15 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
    * validate settings and schedule stream
    */
   private async submit() {
+    // validate
     if (!(await this.$refs.form.validate())) return;
+
+    // convert date to ISO string format
     const scheduledStartTime = new Date(
       this.startTimeModel.date + this.startTimeModel.time * 1000,
     ).toISOString();
 
+    // schedule
     try {
       this.isLoading = true;
       await this.streamingService.actions.return.scheduleStream(this.settings, scheduledStartTime);
