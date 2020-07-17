@@ -177,6 +177,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     for (const platform of platforms) {
       if (getPlatformService(platform).capabilities.has(capability)) return true;
     }
+    return false;
   }
 
   isPlatformLinked(platform: TPlatform): boolean {
