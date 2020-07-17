@@ -5,26 +5,19 @@ import { Component, Watch } from 'vue-property-decorator';
 import styles from './GoLive.m.less';
 import { Inject } from 'services/core';
 import { UserService } from 'services/user';
-import { BoolInput, ToggleInput } from 'components/shared/inputs/inputs';
+import { ToggleInput } from 'components/shared/inputs/inputs';
 import cx from 'classnames';
-import { formMetadata, IListOption, metadata } from 'components/shared/inputs';
 import { SettingsService } from 'services/settings';
-import HFormGroup from '../../shared/inputs/HFormGroup.vue';
-import { IEncoderProfile } from 'services/video-encoding-optimizations';
 import { WindowsService } from 'services/windows';
 import { IGoLiveSettings, StreamingService } from 'services/streaming';
-
-import { Spinner, ProgressBar } from 'streamlabs-beaker';
 import cloneDeep from 'lodash/cloneDeep';
-import { StreamSettingsService } from '../../../services/settings/streaming';
-import ValidatedForm from '../../shared/inputs/ValidatedForm';
-import Utils from '../../../services/utils';
-import Translate from '../../shared/translate';
+import { StreamSettingsService } from 'services/settings/streaming';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import GoLiveSettings from './GoLiveSettings';
 import GoLiveChecklist from './GoLiveChecklist';
 
 /***
- * Windows that manages steps for streaming start
+ * A window for stream starting
  */
 @Component({})
 export default class GoLiveWindow extends TsxComponent<{}> {
@@ -56,14 +49,9 @@ export default class GoLiveWindow extends TsxComponent<{}> {
   }
 
   @Watch('view.goLiveSettings')
-  onGoLiveSettingUpdateHandler() {
+  private onGoLiveSettingUpdateHandler() {
     // update local settings after settings for platforms have been prepopulated
-    console.log('goLiveSettingsUpdated');
     this.settings.destinations = cloneDeep(this.streamingService.views.goLiveSettings.destinations);
-  }
-
-  @Watch('settings') watchSettings() {
-    console.log('settings updated', this.settings.optimizedProfile);
   }
 
   private async switchAdvancedMode(enabled: boolean) {
@@ -83,6 +71,9 @@ export default class GoLiveWindow extends TsxComponent<{}> {
     this.windowsService.actions.closeChildWindow();
   }
 
+  /**
+   * Return to the settings form from the error screen
+   */
   private goBackToSettings() {
     this.streamingService.actions.prepopulateInfo();
   }
@@ -103,7 +94,7 @@ export default class GoLiveWindow extends TsxComponent<{}> {
   }
 
   /**
-   * Renders the child component depending on lifecycle step
+   * Renders GoLiveSettings or GoLiveChecklist component depending on the lifecycle step
    **/
   render() {
     const shouldShowSettings = ['empty', 'prepopulate', 'waitForNewSettings'].includes(

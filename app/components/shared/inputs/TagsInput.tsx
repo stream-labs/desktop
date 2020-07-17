@@ -18,7 +18,7 @@ interface IOptionData {
 
 class Props {
   handleOnSearch?: (str: string) => unknown = () => null;
-  handleOnSelect?: (option: IListOption) => unknown = () => null;
+  handleOnSelect?: (option: IListOption<string, unknown>) => unknown = () => null;
 }
 
 @Component({ props: createProps(Props) })

@@ -1,4 +1,3 @@
-import { Service } from 'services/core/service';
 import {
   EPlatformCallResult,
   IGame,
@@ -6,7 +5,6 @@ import {
   IPlatformService,
   IPlatformState,
   TPlatformCapability,
-  TPlatformCapabilityMap,
 } from '.';
 import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
@@ -14,16 +12,13 @@ import { authorizedHeaders, handleResponse } from 'util/requests';
 import { UserService } from 'services/user';
 import { getAllTags, getStreamTags, TTwitchTag, updateTags } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
-import { IPlatformResponse, platformAuthorizedRequest, platformRequest } from './utils';
+import { platformAuthorizedRequest, platformRequest } from './utils';
 import { StreamSettingsService } from 'services/settings/streaming';
-import { Subject } from 'rxjs';
 import { CustomizationService } from 'services/customization';
-import { assertIsDefined } from '../../util/properties-type-guards';
-import { metadata, formMetadata } from 'components/shared/inputs';
-import { $t } from '../i18n';
-import { IGoLiveSettings } from '../streaming';
-import { InheritMutations, mutation, StatefulService } from '../core';
-import { throwStreamError } from '../streaming/stream-error';
+import { assertIsDefined } from 'util/properties-type-guards';
+import { IGoLiveSettings } from 'services/streaming';
+import { InheritMutations, mutation } from 'services/core';
+import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 
 export interface ITwitchStartStreamOptions {
@@ -37,7 +32,7 @@ export interface ITwitchChannelInfo extends ITwitchStartStreamOptions {
   availableTags: TTwitchTag[];
 }
 
-interface ITWitchChannel {
+interface ITWitchChannelResponse {
   status: string;
   game: string;
   stream_key: string;
@@ -91,10 +86,6 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
 
   readonly platform = 'twitch';
   readonly displayName = 'Twitch';
-
-  get unlinkUrl() {
-    return `https://${this.hostsService.streamlabs}/api/v5/user/accounts/unlink/twitch_account`;
-  }
 
   readonly capabilities = new Set<TPlatformCapability>([
     'chat',
@@ -153,7 +144,6 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
   async beforeGoLive(goLiveSettings?: IGoLiveSettings) {
     const key = await this.fetchStreamKey();
     this.SET_STREAM_KEY(key);
-    this.SET_STREAM_PAGE_URL(`https://twitch.tv/${this.username}`);
 
     if (
       this.streamSettingsService.protectedModeEnabled &&
@@ -222,12 +212,16 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
       const details = e.result
         ? `${e.result.status} ${e.result.error} ${e.result.message}`
         : 'Connection failed';
-      throwStreamError('PLATFORM_REQUEST_FAILED', details, 'twitch');
+      const errorType =
+        e.result.message === 'missing required oauth scope'
+          ? 'TWITCH_MISSED_OAUTH_SCOPE'
+          : 'PLATFORM_REQUEST_FAILED';
+      throwStreamError(errorType, details, 'twitch');
     }
   }
 
-  private fetchRawChannelInfo(): Promise<ITWitchChannel> {
-    return this.requestTwitch<ITWitchChannel>('https://api.twitch.tv/kraken/channel');
+  private fetchRawChannelInfo(): Promise<ITWitchChannelResponse> {
+    return this.requestTwitch<ITWitchChannelResponse>('https://api.twitch.tv/kraken/channel');
   }
 
   fetchStreamKey(): Promise<string> {
@@ -298,6 +292,10 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
     const mode = this.customizationService.isDarkTheme ? 'night' : 'day';
     const nightMode = mode === 'day' ? 'popout' : 'darkpopout';
     return `https://twitch.tv/popout/${this.username}/chat?${nightMode}`;
+  }
+
+  get streamPageUrl() {
+    return `https://twitch.tv/${this.username}`;
   }
 
   async getAllTags(): Promise<void> {

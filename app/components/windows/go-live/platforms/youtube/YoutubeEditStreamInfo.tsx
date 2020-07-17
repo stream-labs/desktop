@@ -4,30 +4,37 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { cloneDeep } from 'lodash';
 import TsxComponent, { createProps } from 'components/tsx-component';
-import { formMetadata, metadata } from '../../shared/inputs';
-import { $t } from '../../../services/i18n';
+import { formMetadata, metadata } from '../../../../shared/inputs';
+import { $t } from 'services/i18n';
 import BroadcastInput from './BroadcastInput';
 import {
   IYoutubeLiveBroadcast,
   IYoutubeStartStreamOptions,
   YoutubeService,
 } from 'services/platforms/youtube';
-import CommonPlatformFields from '../CommonPlatformFields';
-import { StreamingService } from '../../../app-services';
-import { SyncWithValue } from '../../../services/app/app-decorators';
-import { IStreamSettings } from '../../../services/streaming';
+import CommonPlatformFields from '../../CommonPlatformFields';
+import { StreamingService } from '../../../../../app-services';
+import { SyncWithValue } from '../../../../../services/app/app-decorators';
+import { IStreamSettings } from '../../../../../services/streaming';
 import BaseEditStreamInfo from '../BaseEditSteamInfo';
 
 class Props {
   value?: IStreamSettings;
+
+  /**
+   * show the event selector?
+   */
   showEvents?: boolean = true;
 }
 
+/**
+ * Edit Youtube stream settings
+ */
 @Component({ components: { ValidatedForm }, props: createProps(Props) })
 export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
   @Inject() private youtubeService: YoutubeService;
   @Inject() private streamingService: StreamingService;
-  @SyncWithValue() protected settings: IStreamSettings = null;
+  @SyncWithValue() protected settings: IStreamSettings;
   broadcasts: IYoutubeLiveBroadcast[] = [];
   broadcastsLoaded = false;
 
@@ -58,15 +65,6 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
 
   get formMetadata() {
     return formMetadata({
-      title: metadata.text({
-        title: $t('Title'),
-        fullWidth: true,
-        required: true,
-      }),
-      description: metadata.textArea({
-        title: $t('Description'),
-        fullWidth: true,
-      }),
       event: {
         broadcasts: this.broadcasts,
         loading: !this.broadcastsLoaded,
@@ -75,15 +73,11 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
     });
   }
 
-  emitInput() {
-    this.$emit('input', this.settings);
-  }
-
   render() {
     const canShowOnlyRequiredFields = this.canShowOnlyRequiredFields;
     return (
       !canShowOnlyRequiredFields && (
-        <ValidatedForm onInput={this.emitInput}>
+        <ValidatedForm>
           {this.props.showEvents && (
             <HFormGroup title={$t('Event')}>
               <BroadcastInput

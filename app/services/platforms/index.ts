@@ -43,7 +43,8 @@ interface IPlatformCapabilityChat {
   getChatUrl: (mode: string) => Promise<string>;
 }
 
-interface IPlatformCapabilityGame {
+export interface IPlatformCapabilityGame {
+  searchGames: (searchString: string) => Promise<IGame[]>;
   state: { settings: { game: string } };
 }
 
@@ -117,7 +118,6 @@ export interface IPlatformState {
   viewersCount: number;
   streamKey: string;
   settings: TStartStreamOptions | null;
-  streamPageUrl: string;
   isPrepopulated: boolean;
 }
 
@@ -138,7 +138,7 @@ export interface IPlatformService {
 
   putChannelInfo: (channelInfo: TStartStreamOptions) => Promise<boolean>;
 
-  searchGames: (searchString: string) => Promise<IGame[]>;
+  searchGames?: (searchString: string) => Promise<IGame[]>;
 
   /**
    * Sets up the stream key and live broadcast info required to go live.
@@ -165,6 +165,7 @@ export interface IPlatformService {
   readonly platform: TPlatform;
   readonly displayName: string;
   readonly mergeUrl: string;
+  readonly streamPageUrl: string;
   chatUrl: string;
   unlink: () => void;
 
@@ -189,7 +190,7 @@ export interface IUserAuth {
   /**
    * New key that supports multiple logged in platforms
    */
-  platforms?: { [platform in TPlatform]?: IPlatformAuth };
+  platforms: { [platform in TPlatform]?: IPlatformAuth };
 
   /**
    * Session partition used to separate cookies associated

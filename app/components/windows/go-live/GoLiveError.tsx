@@ -1,19 +1,20 @@
-import TsxComponent, { createProps } from '../../tsx-component';
-import { Inject } from '../../../services/core';
-import { StreamingService, TGoLiveChecklistItemState } from '../../../services/streaming';
-import { WindowsService } from '../../../services/windows';
+import TsxComponent, { createProps } from 'components/tsx-component';
+import { Inject } from 'services/core';
+import { StreamingService } from 'services/streaming';
+import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
 import { Component } from 'vue-property-decorator';
 import styles from './GoLiveError.m.less';
 import cx from 'classnames';
-import { YoutubeService } from '../../../services/platforms/youtube';
-import { getPlatformService, TPlatform } from '../../../services/platforms';
-import { TwitterService } from '../../../services/integrations/twitter';
-import { IStreamError } from '../../../services/streaming/stream-error';
-import Translate from '../../shared/translate';
-import electron, { shell } from 'electron';
-import { UserService } from '../../../services/user';
-import { NavigationService } from '../../../services/navigation';
+import { YoutubeService } from 'services/platforms/youtube';
+import { getPlatformService, TPlatform } from 'services/platforms';
+import { TwitterService } from 'services/integrations/twitter';
+import { IStreamError } from 'services/streaming/stream-error';
+import Translate from 'components/shared/translate';
+import electron from 'electron';
+import { UserService } from 'services/user';
+import { NavigationService } from 'services/navigation';
+import { assertIsDefined } from 'util/properties-type-guards';
 
 /**
  * Shows error and troubleshooting suggestions
@@ -32,7 +33,7 @@ export default class GoLiveError extends TsxComponent<{}> {
   }
 
   private goToYoutubeDashboard() {
-    electron.remote.shell.openExternal(this.youtubeService.state.dashboardUrl);
+    electron.remote.shell.openExternal(this.youtubeService.dashboardUrl);
   }
 
   private createFBPage() {
@@ -85,6 +86,7 @@ export default class GoLiveError extends TsxComponent<{}> {
   }
 
   private renderPrepopulateError(error: IStreamError) {
+    assertIsDefined(error.platform);
     const platformName = getPlatformService(error.platform).displayName;
     return (
       <ErrorLayout
@@ -115,11 +117,12 @@ export default class GoLiveError extends TsxComponent<{}> {
 
   private renderTwitchMissedScopeError(error: IStreamError) {
     // If primary platform, then ask to re-login
-    if (this.userService.state.auth.primaryPlatform === 'twitch') {
+    if (this.userService.state.auth?.primaryPlatform === 'twitch') {
       return this.renderPrepopulateError(error);
     }
 
     // If not primary platform than ask to connect platform again from SLOBS
+    assertIsDefined(error.platform);
     const platformName = getPlatformService(error.platform).displayName;
     return (
       <ErrorLayout message={$t('Can not fetch settings from %{platformName}', { platformName })}>
@@ -141,6 +144,7 @@ export default class GoLiveError extends TsxComponent<{}> {
   }
 
   private renderSettingsUpdateError(error: IStreamError) {
+    assertIsDefined(error.platform);
     const platformName = getPlatformService(error.platform).displayName;
     return (
       <ErrorLayout
@@ -220,7 +224,7 @@ export default class GoLiveError extends TsxComponent<{}> {
 }
 
 class ErrorLayoutProps {
-  error?: IStreamError = null;
+  error?: IStreamError = undefined;
   /**
    * overrides the error message if provided
    */
@@ -236,7 +240,7 @@ class ErrorLayout extends TsxComponent<ErrorLayoutProps> {
 
   private render() {
     const error = this.props.error;
-    const message = this.props.message || error.message;
+    const message = this.props.message || error?.message;
     const details = error?.details;
     return (
       <div class={cx('section selectable', styles.container)}>

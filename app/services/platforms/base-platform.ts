@@ -1,9 +1,8 @@
-import { Inject, mutation, StatefulService } from '../core';
+import { Inject, mutation, StatefulService } from 'services/core';
 import { IPlatformState, TPlatform, TStartStreamOptions } from './index';
-import { StreamingService } from '../streaming';
-import { authorizedHeaders, handleResponse } from '../../util/requests';
-import { UserService } from '../user';
-import { HostsService } from '../hosts';
+import { StreamingService } from 'services/streaming';
+import { UserService } from 'services/user';
+import { HostsService } from 'services/hosts';
 import electron from 'electron';
 
 const VIEWER_COUNT_UPDATE_INTERVAL = 60 * 1000;
@@ -15,7 +14,6 @@ const VIEWER_COUNT_UPDATE_INTERVAL = 60 * 1000;
 export abstract class BasePlatformService<T extends IPlatformState> extends StatefulService<T> {
   static initialState: IPlatformState = {
     streamKey: '',
-    streamPageUrl: '',
     viewersCount: 0,
     settings: null,
     isPrepopulated: false,
@@ -49,9 +47,7 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
   }
 
   unlink() {
-    // /**
-    //  * unlink platform and reload auth state
-    //  */
+    // unlink platform and reload auth state
     // const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/unlink/${this.platform}_account`;
     // const headers = authorizedHeaders(this.userService.apiToken!);
     // const request = new Request(url, { headers });
@@ -72,11 +68,6 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
   @mutation()
   protected SET_STREAM_KEY(key: string) {
     this.state.streamKey = key;
-  }
-
-  @mutation()
-  protected SET_STREAM_PAGE_URL(url: string) {
-    this.state.streamPageUrl = url;
   }
 
   @mutation()

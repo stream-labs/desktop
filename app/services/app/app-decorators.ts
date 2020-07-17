@@ -2,6 +2,7 @@ import { getResource } from 'services/core/injector';
 import { AppService, IRunInLoadingModeOptions } from './app';
 import { createDecorator } from 'vue-class-component';
 import cloneDeep from 'lodash/cloneDeep';
+import Vue from 'vue';
 
 /**
  * Method decorator
@@ -31,6 +32,9 @@ export function SyncWithValue() {
     // create watchers and props.value if don't exist
     (options.props || (options.props = {}))['value'] = null;
     if (!options.watch) options.watch = {};
+
+    // make property reactive
+    options.data = () => ({ [key]: null });
 
     // watch for the props.value
     options.watch['value'] = {

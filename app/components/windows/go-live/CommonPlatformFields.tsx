@@ -1,41 +1,42 @@
-import { Component, Watch, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import { $t } from 'services/i18n';
-import TsxComponent from 'components/tsx-component';
+import TsxComponent, { createProps, required } from 'components/tsx-component';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
-import { IListOption, metadata } from 'components/shared/inputs';
-import { createProps } from '../tsx-component';
-import { BoolInput, ListInput } from '../shared/inputs/inputs';
-import ValidatedForm from '../shared/inputs/ValidatedForm';
-import { getPlatformService, TPlatform } from '../../services/platforms';
-import { IGoLiveSettings, IStreamSettings, StreamingService } from '../../services/streaming';
-import { SyncWithValue } from '../../services/app/app-decorators';
-import { Debounce } from 'lodash-decorators';
-import { IPlatformCommonFields, IPlatformFlags } from '../../services/streaming/streaming-api';
-import { Inject } from '../../services/core';
-import GameSelector from '../windows/go-live/GameSelector';
+import { metadata } from 'components/shared/inputs';
+import { BoolInput } from 'components/shared/inputs/inputs';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm';
+import { TPlatform } from 'services/platforms';
+import { IStreamSettings, StreamingService } from 'services/streaming';
+import { SyncWithValue } from 'services/app/app-decorators';
+import { Inject } from 'services/core';
+import GameSelector from './GameSelector';
 import { pick } from 'lodash';
+import { assertIsDefined } from 'util/properties-type-guards';
 
 class Props {
-  platform?: TPlatform | null = null;
-  value?: IStreamSettings = null;
+  /**
+   * if provided then change props only for the provided platform
+   */
+  platform?: TPlatform = undefined;
+  value?: IStreamSettings = undefined;
 }
 
 type TCustomFieldName = 'title' | 'description';
 
 /**
- * Component for modifying common platform fields
- * if props.platform is provided it changes props for a single platform
- * otherwise it changes fields for all enabled platforms
+ * Component for modifying common platform fields such as "Title", "Description" and "Game"
+ * if "props.platform" is provided it changes props for a single platform
+ * otherwise it changes props for all enabled platforms
  */
 @Component({ props: createProps(Props) })
 export default class CommonPlatformFields extends TsxComponent<Props> {
   @Inject() private streamingService: StreamingService;
   @SyncWithValue()
-  private settings: IStreamSettings = null;
+  private settings: IStreamSettings;
   private get view() {
     return this.streamingService.views;
   }
-  private commonFields: { title: string; description: string } = null;
+  private commonFields: { title: string; description: string } = required();
 
   created() {
     this.commonFields = pick(
@@ -59,30 +60,37 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
   }
 
   /**
-   * Returns platform settings in a single-platform mode
+   * Returns platform settings for a single-platform mode
    **/
   private get platformSettings() {
+    if (!this.props.platform) return null;
     return this.settings.destinations[this.props.platform];
   }
 
   /**
-   * Returns platforms that don't have `useCustomFields = true` flag
+   * Returns platforms that we should apply settings to
    **/
   private get targetPlatforms(): TPlatform[] {
     // component in the single platform mode
+    // just return "props.platform"
     if (this.props.platform) return [this.props.platform];
 
     // component in the simple multiplatform mode
+    // return all enabled platforms
     if (!this.settings.advancedMode) {
       return this.enabledPlatforms;
     }
 
     // component in the advanced multiplatform mode
+    // return platforms with "useCustomFields=false"
     return this.enabledPlatforms.filter(
       platform => !this.settings.destinations[platform].useCustomFields,
     );
   }
 
+  /**
+   * Update a selected field for all target platforms
+   **/
   private updateCommonField(fieldName: TCustomFieldName, value: string) {
     this.commonFields[fieldName] = value;
     this.targetPlatforms.forEach(platform => {
@@ -90,10 +98,16 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
     });
   }
 
+  /**
+   * Toggle the "Use different title... " checkbox
+   **/
   private toggleUseCustom(useCustomFields: boolean) {
+    // this method is applicable only for a single platform component's mode
     const platform = this.props.platform;
+    assertIsDefined(platform);
 
-    // if we disabled customFileds we should return common fields values for this platform
+    // if we disabled customFields for a platform
+    // than we should return common fields values for this platform
     if (!useCustomFields) {
       const commonFields = this.view.getCommonFields(this.settings);
       // TODO: figure out how to resolve types
@@ -116,14 +130,14 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
     const disabled = this.targetPlatforms.length === 0;
     const hasCustomCheckbox =
       isSinglePlatformMode && this.settings.advancedMode && this.enabledPlatforms.length > 1;
-    const fieldsAreVisible = !hasCustomCheckbox || this.platformSettings.useCustomFields;
+    const fieldsAreVisible = !hasCustomCheckbox || this.platformSettings?.useCustomFields;
     const view = this.streamingService.views;
     const hasDescription = isSinglePlatformMode
-      ? view.supports('description', [this.props.platform])
+      ? view.supports('description', [this.props.platform as TPlatform])
       : view.supports('description');
     const hasGame = view.supports('game', this.targetPlatforms);
     const fields = isSinglePlatformMode
-      ? this.settings.destinations[this.props.platform]
+      ? this.settings.destinations[this.props.platform as TPlatform]
       : this.commonFields;
 
     // find out the best title for common fields
@@ -144,7 +158,7 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
         {hasCustomCheckbox && (
           <HFormGroup>
             <BoolInput
-              value={this.platformSettings.useCustomFields}
+              value={this.platformSettings?.useCustomFields}
               onInput={(enabled: boolean) => this.toggleUseCustom(enabled)}
               title={title}
             />

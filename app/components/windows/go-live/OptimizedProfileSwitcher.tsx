@@ -1,29 +1,35 @@
-import TsxComponent, { createProps } from '../../tsx-component';
+import TsxComponent, { createProps, required } from '../../tsx-component';
 import Component from 'vue-class-component';
-import HFormGroup from '../../shared/inputs/HFormGroup.vue';
-import { $t } from '../../../services/i18n';
-import { BoolInput } from '../../shared/inputs/inputs';
-import { SyncWithValue } from '../../../services/app/app-decorators';
-import { IGoLiveSettings } from '../../../services/streaming';
-import { Inject } from '../../../services/core';
-import { VideoEncodingOptimizationService } from '../../../app-services';
-import { IEncoderProfile } from 'services/video-encoding-optimizations';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import { $t } from 'services/i18n';
+import { BoolInput } from 'components/shared/inputs/inputs';
+import { SyncWithValue } from 'services/app/app-decorators';
+import { IGoLiveSettings } from 'services/streaming';
+import { Inject } from 'services/core';
+import {
+  VideoEncodingOptimizationService,
+  IEncoderProfile,
+} from 'services/video-encoding-optimizations';
 import { Watch } from 'vue-property-decorator';
 
 class Props {
-  settings: IGoLiveSettings = null;
+  settings: IGoLiveSettings = required<IGoLiveSettings>();
 }
 
+/**
+ * Renders a checkbox for switching optimized profile in the GoLive window
+ */
 @Component({ props: createProps(Props) })
 export class OptimizedProfileSwitcher extends TsxComponent<Props> {
   @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
   private loading: boolean = false;
-  @SyncWithValue() private selectedProfile: IEncoderProfile = null;
+  @SyncWithValue() private selectedProfile: IEncoderProfile;
 
   get game() {
     return this.props.settings.destinations.twitch?.game || '';
   }
 
+  // if game is changed we should load a new profile
   @Watch('game', { immediate: true })
   private async loadAvailableProfiles() {
     this.loading = true;
@@ -33,6 +39,8 @@ export class OptimizedProfileSwitcher extends TsxComponent<Props> {
     this.loading = false;
   }
 
+  // define getter and setter for "useOptimizedProfile" flag
+  // we save these settings immediately to the local-storage
   get useOptimizedProfile() {
     return this.videoEncodingOptimizationService.state.useOptimizedProfile;
   }
