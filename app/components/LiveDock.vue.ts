@@ -17,20 +17,12 @@ import { WindowsService } from 'services/windows';
 import { RestreamService, YoutubeService } from 'app-services';
 import { getPlatformService } from 'services/platforms';
 
-@Component({})
-class TestComp extends Vue {
-  mounted() {
-    console.log('test comp is mounted');
-  }
-}
-
 @Component({
   components: {
     Chat,
     ListInput,
     PlatformAppPageView,
     Tabs,
-    TestComp,
   },
 })
 export default class LiveDock extends Vue {

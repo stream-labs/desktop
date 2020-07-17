@@ -24,7 +24,6 @@ export default class Chat extends Vue {
   leaveFullScreenTrigger: Function;
 
   mounted() {
-    console.log('chat component is mounted');
     this.getChatService().actions.mountChat(electron.remote.getCurrentWindow().id);
 
     this.resizeInterval = window.setInterval(() => {
