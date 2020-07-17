@@ -6,19 +6,12 @@ import electron, { ipcRenderer } from 'electron';
 import url from 'url';
 import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
-import { InitAfter, mutation, StatefulService } from './core';
+import { InitAfter } from './core';
 import Utils from './utils';
 import { StreamingService } from './streaming';
 
-interface IState {
-  isReadyToShow: boolean;
-}
-
 @InitAfter('StreamingService')
-export class ChatService extends StatefulService<IState> {
-  static initialState: IState = {
-    isReadyToShow: false,
-  };
+export class ChatService extends Service {
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() windowsService: WindowsService;
@@ -251,9 +244,5 @@ export class ChatService extends StatefulService<IState> {
     if (changed.enableBTTVEmotes != null || changed.enableFFZEmotes != null) {
       this.refreshChat();
     }
-  }
-
-  @mutation() private SET_READY_TOSHOW(ready: boolean) {
-    this.state.isReadyToShow = ready;
   }
 }

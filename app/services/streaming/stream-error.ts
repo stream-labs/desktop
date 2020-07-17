@@ -77,10 +77,6 @@ export class StreamError extends Error {
       throw new Error('Use createStreamError() instead "new StreamError()"');
     }
   }
-
-  isDestroyed() {
-    return false;
-  }
 }
 
 /**

@@ -26,7 +26,7 @@ class Props {
 }
 
 /**
- * Allows enable/disable platforms for the stream
+ * Allows enabling/disabling platforms for the stream
  */
 @Component({ props: createProps(Props) })
 export class DestinationSwitchers extends TsxComponent<Props> {

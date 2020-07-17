@@ -112,7 +112,7 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
               true,
             )}
 
-          {/* PUBLISH YT BROADCAST */}
+          {/* POST A TWEET */}
           {shouldPostTweet && this.renderCheck($t('Post a tweet'), checklist.postTweet)}
         </ul>
 
