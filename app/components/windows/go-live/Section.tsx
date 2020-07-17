@@ -1,6 +1,7 @@
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { Component } from 'vue-property-decorator';
 import styles from './GoLive.m.less';
+import cx from 'classnames';
 
 class SectionProps {
   title?: string = '';
@@ -19,7 +20,7 @@ export default class Section extends TsxComponent<SectionProps> {
     // render header and section wrapper in advanced mode
     if (!this.props.isSimpleMode) {
       return (
-        <div class={styles.section}>
+        <div class={{ [styles.section]: true, [styles.sectionWithoutTitle]: !title }}>
           {title && <h2>{title}</h2>}
           <div>{slot}</div>
         </div>

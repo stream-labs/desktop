@@ -1,11 +1,7 @@
 import { Component, Watch } from 'vue-property-decorator';
 import { IListOption, metadata } from 'components/shared/inputs';
 import { ListInput, TagsInput } from 'components/shared/inputs/inputs';
-import {
-  getPlatformService,
-  IPlatformCapabilityGame,
-  TPlatform,
-} from 'services/platforms';
+import { getPlatformService, IPlatformCapabilityGame, TPlatform } from 'services/platforms';
 import { $t } from 'services/i18n';
 import { Debounce } from 'lodash-decorators';
 import TsxComponent, { createProps } from '../../tsx-component';

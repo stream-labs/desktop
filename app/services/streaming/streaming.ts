@@ -20,11 +20,7 @@ import {
 } from './streaming-api';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { $t } from 'services/i18n';
-import {
-  getPlatformService,
-  TPlatform,
-  TStartStreamOptions,
-} from 'services/platforms';
+import { getPlatformService, TPlatform, TStartStreamOptions } from 'services/platforms';
 import { UserService } from 'services/user';
 import {
   ENotificationSubType,
