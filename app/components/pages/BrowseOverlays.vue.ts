@@ -41,13 +41,7 @@ export default class BrowseOverlays extends Vue {
         installOverlay: this.installOverlay,
         installWidgets: this.installWidgets,
         eligibleToRestream: () => {
-          if (!this.restreamService.canEnableRestream) {
-            // We raise an exception which will result in a rejected promise.
-            // This allows the themes library to catch out of date versions
-            // in the same code path as ineligable users.
-            throw new Error('User is not elgigible to restream');
-          }
-
+          // assume all users are eligible
           return Promise.resolve(true);
         },
       });

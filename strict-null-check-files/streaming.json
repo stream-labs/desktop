@@ -1,8 +1,9 @@
 {
   "ts": [
-    "app/services/streaming/*.ts"
+    "app/services/streaming/*.ts",
+    "app/services/settings/streaming/*.ts"
   ],
   "tsx": [
-    "app/components/windows/GoLive.tsx"
+    "app/components/windows/go-live/*.ts"
   ]
 }

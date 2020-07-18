@@ -227,20 +227,4 @@ export default class Utils {
   static sleep(ms: number): Promise<void> {
     return new Promise(r => setTimeout(r, ms));
   }
-
-  // /**
-  //  * Converts an array to the map
-  //  * @example
-  //  * <pre>
-  //  *  arrayToMap(['foo', 'bar'], (key) => true) // { foo: true, bar: true}
-  //  * </pre>
-  //  */
-  // static arrayToMap<TSource extends string | number, TResult>(
-  //   array: TSource[],
-  //   cb: (val: TSource) => TResult,
-  // ): Record<TSource, TResult> {
-  //   const result: Partial<Record<TSource, TResult>> = {};
-  //   array.forEach(item => (result[item] = cb(item)));
-  //   return result as Record<TSource, TResult>;
-  // }
 }

@@ -74,9 +74,7 @@
         <div
           class="live-dock-chat"
           v-if="
-            !hideStyleBlockers &&
-              !chatHidden &&
-              (isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook)
+            !hideStyleBlockers && (isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook)
           "
         >
           <div v-if="hasChatTabs" class="flex">

@@ -1,16 +1,14 @@
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import cx from 'classnames';
 import { BaseInput } from 'components/shared/inputs/BaseInput';
 import { IListMetadata, IListOption } from 'components/shared/inputs';
-import { ListInput } from './inputs';
 import styles from './TagsInput.m.less';
 import { modifiers as m } from 'vue-tsx-support';
-
 import { Multiselect } from 'vue-multiselect';
-import { $t } from '../../../services/i18n';
-import { createProps } from '../../tsx-component';
+import { $t } from 'services/i18n';
+import { createProps } from 'components/tsx-component';
 import { Spinner } from 'streamlabs-beaker';
-import Utils from '../../../services/utils';
+import Utils from 'services/utils';
 
 interface IOptionData {
   bgColor?: string;
@@ -18,9 +16,12 @@ interface IOptionData {
 
 class Props {
   handleOnSearch?: (str: string) => unknown = () => null;
-  handleOnSelect?: (option: IListOption) => unknown = () => null;
+  handleOnSelect?: (option: IListOption<string, unknown>) => unknown = () => null;
 }
 
+/**
+ * TagsInput based on vue-multiselect
+ */
 @Component({ props: createProps(Props) })
 export default class TagsInput extends BaseInput<
   string[],

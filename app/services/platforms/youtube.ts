@@ -1,33 +1,28 @@
-import { StatefulService, mutation, InheritMutations } from '../core/stateful-service';
+import { mutation, InheritMutations } from '../core/stateful-service';
 import {
   IPlatformService,
   TPlatformCapability,
-  TPlatformCapabilityMap,
   EPlatformCallResult,
   IPlatformRequest,
   IPlatformState,
 } from '.';
-import { HostsService } from '../hosts';
 import { Inject } from 'services/core/injector';
-import { authorizedHeaders, handleResponse } from '../../util/requests';
-import { UserService } from '../user';
-import { IPlatformResponse, platformAuthorizedRequest } from './utils';
+import { authorizedHeaders, handleResponse } from 'util/requests';
+import { platformAuthorizedRequest } from './utils';
 import { StreamSettingsService } from 'services/settings/streaming';
-import { Subject } from 'rxjs';
 import { CustomizationService } from 'services/customization';
-import { IGoLiveSettings, StreamingService } from 'services/streaming';
+import { IGoLiveSettings } from 'services/streaming';
 import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
-import { pickBy } from 'lodash';
-import { ITwitchStartStreamOptions } from './twitch';
-import { throwStreamError } from '../streaming/stream-error';
+import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
+import { assertIsDefined } from 'util/properties-type-guards';
+import electron from 'electron';
+import { pickBy } from 'lodash';
 
 interface IYoutubeServiceState extends IPlatformState {
   liveStreamingEnabled: boolean;
   streamId: string;
-  streamPageUrl: string;
-  dashboardUrl: string;
   channelId: string;
   lifecycleStep: TYoutubeLifecycleStep;
   settings: IYoutubeStartStreamOptions;
@@ -139,7 +134,6 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     ...BasePlatformService.initialState,
     liveStreamingEnabled: true,
     streamId: '',
-    dashboardUrl: '',
     channelId: '',
     lifecycleStep: 'idle',
     settings: {
@@ -157,14 +151,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     height: 600,
   };
 
-  apiBase = 'https://www.googleapis.com/youtube/v3';
-
-  init() {
-    this.customizationService.settingsChanged.subscribe(updatedSettings => {
-      // trigger `channelInfoChanged` event with a new chat url based on the changed theme
-      if (updatedSettings.theme) this.updateState({});
-    });
-  }
+  private apiBase = 'https://www.googleapis.com/youtube/v3';
 
   get authUrl() {
     const host = this.hostsService.streamlabs;
@@ -178,10 +165,6 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     return this.userService.state.auth?.platforms?.youtube?.token;
   }
 
-  get unlinkUrl() {
-    return `https://${this.hostsService.streamlabs}/api/v5/user/accounts/unlink/youtube_account`;
-  }
-
   /**
    * Request Youtube API and handle error response
    */
@@ -191,14 +174,22 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     } catch (e) {
       let details = e.result?.error?.message;
       if (!details) details = 'connection failed';
-      console.error(e);
-      throw throwStreamError('PLATFORM_REQUEST_FAILED', details, 'youtube');
+      const errorType =
+        details === 'The user is not enabled for live streaming.'
+          ? 'YOUTUBE_STREAMING_DISABLED'
+          : 'PLATFORM_REQUEST_FAILED';
+      throw throwStreamError(errorType, details, 'youtube');
     }
   }
 
   @mutation()
   private SET_ENABLED_STATUS(enabled: boolean) {
     this.state.liveStreamingEnabled = enabled;
+  }
+
+  @mutation()
+  private SET_LIFECYCLE_STEP(step: TYoutubeLifecycleStep) {
+    this.state.lifecycleStep = step;
   }
 
   async beforeGoLive(settings: IGoLiveSettings) {
@@ -282,24 +273,20 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     // we don't have activeChannel if user start stream with the 'just go live' button
     if (!this.state.settings.broadcastId) return;
 
-    const broadcastId = this.state.settings.broadcastId;
-    const lifecycleStep = this.state.lifecycleStep;
-
-    this.updateState({
-      lifecycleStep: 'idle',
-    });
-    if (lifecycleStep !== 'idle') {
+    // notify YT API that we've stopped the stream
+    if (this.state.lifecycleStep !== 'idle') {
       try {
-        await this.transitionBroadcastStatus(broadcastId, 'complete');
+        await this.transitionBroadcastStatus(this.state.settings.broadcastId, 'complete');
       } catch (e) {
         // most likely we tried to switch status to complete when the broadcast is in ready or testing state
         // this happens when we stop stream before it becomes active
       }
     }
+    this.SET_LIFECYCLE_STEP('idle');
   }
 
   private setLifecycleStep(step: TYoutubeLifecycleStep) {
-    this.updateState({ lifecycleStep: step });
+    this.SET_LIFECYCLE_STEP(step);
   }
 
   /**
@@ -363,7 +350,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   }
 
   /**
-   * returns perilled data for the EditStreamInfo window
+   * returns perilled data for the GoLive window
    */
   async prepopulateInfo(): Promise<IYoutubeStartStreamOptions> {
     // if streaming then return activeBroadcast description and title if exists
@@ -381,6 +368,9 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     return result;
   }
 
+  /**
+   * Create a YT broadcast (event) for the future stream
+   */
   scheduleStream(
     scheduledStartTime: string,
     { title, description }: { title: string; description: string },
@@ -407,6 +397,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     scheduledStartTime?: string,
   ): Promise<boolean> {
     const broadcastId = this.state.settings.broadcastId;
+    assertIsDefined(broadcastId);
     const broadcast = await this.updateBroadcast(broadcastId, {
       title,
       description,
@@ -418,40 +409,17 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   /**
    * update the chanel info based on the selected broadcast
    */
-  private setActiveBroadcast(broadcast: Partial<IYoutubeLiveBroadcast>) {
+  private setActiveBroadcast(broadcast: IYoutubeLiveBroadcast) {
     const patch = {
       streamId: broadcast.contentDetails?.boundStreamId,
       settings: {
         broadcastId: broadcast.id,
-        title: broadcast.snippet?.title,
-        description: broadcast.snippet?.description,
+        title: broadcast.snippet.title,
+        description: broadcast.snippet.description,
       },
     };
-
     // update non-empty fields
-    this.updateState(pickBy(patch, val => val));
-  }
-
-  /**
-   * update the local info for the current channel
-   */
-  private updateState(info: Partial<IYoutubeServiceState>) {
-    const channelId = info.channelId || this.state.channelId;
-    const settings = info.settings || this.state.settings;
-    const broadCastId = settings.broadcastId;
-
-    this.PATCH_STATE({
-      ...info,
-      streamPageUrl: this.getSteamUrl(broadCastId),
-      dashboardUrl: this.getDashboardUrl(channelId),
-      settings,
-    });
-
-    // save title and description to use them as pre-filled data for the next stream
-    this.streamSettingsService.setSettings({
-      title: this.state.settings.title,
-      description: this.state.settings.description,
-    });
+    this.PATCH_STATE(pickBy(patch, val => val));
   }
 
   @mutation()
@@ -568,7 +536,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   }
 
   /**
-   * Poll youtube API for limited period of time
+   * Poll youtube API for a limited period of time
    * Stop polling when cb returns 'true'
    * @param cb
    */
@@ -584,12 +552,16 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
 
       // poll each 2s
       while (canPoll) {
-        let shouldStop = false;
-        try {
-          shouldStop = await cb();
-        } catch (e) {
-          reject(e);
-          return;
+        let shouldStop = this.state.lifecycleStep === 'idle'; // if user has clicked stop streaming than cancel polling
+        if (shouldStop) {
+          reject(new Error('Stream stopped'));
+        } else {
+          try {
+            shouldStop = await cb();
+          } catch (e) {
+            reject(e);
+            return;
+          }
         }
 
         if (shouldStop) {
@@ -609,11 +581,6 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   private async waitForStreamStatus(streamId: string, status: TStreamStatus) {
     try {
       await this.pollAPI(async () => {
-        // user clicked stop streaming, cancel polling
-        if (this.state.lifecycleStep === 'idle') {
-          throwStreamError('YOUTUBE_PUBLISH_FAILED', 'Stream stopped');
-        }
-
         const stream = await this.fetchLiveStream(streamId, ['status']);
         return stream.status.streamStatus === status;
       });
@@ -641,11 +608,6 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
 
       // wait for Youtube to change the broadcast status
       await this.pollAPI(async () => {
-        // if user clicked stop streaming, cancel polling
-        if (this.state.lifecycleStep === 'idle') {
-          throwStreamError('YOUTUBE_PUBLISH_FAILED', 'Stream stopped');
-        }
-
         const broadcast = await this.fetchBroadcast(broadcastId, ['status']);
         return broadcast.status.lifeCycleStatus === status;
       });
@@ -657,14 +619,13 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     }
   }
 
-  searchGames(searchString: string) {
-    return Promise.resolve(JSON.parse(''));
-  }
-
   liveDockEnabled(): boolean {
     return this.streamSettingsService.settings.protectedModeEnabled;
   }
 
+  /**
+   * Returns a description for a current lifecycle step
+   */
   get progressInfo(): { msg: string; progress: number } {
     const dictionary: { [key in TYoutubeLifecycleStep]: { msg: string; progress: number } } = {
       idle: {
@@ -745,15 +706,18 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     return `${youtubeDomain}/live_chat?v=${broadcastId}&is_popout=1`;
   }
 
-  private getDashboardUrl(channelId: string): string {
-    return `https://studio.youtube.com/channel/${channelId}/livestreaming/dashboard`;
+  openYoutubeEnable() {
+    electron.remote.shell.openExternal('https://youtube.com/live_dashboard_splash');
   }
 
-  private getSteamUrl(broadcastId: string) {
+  get dashboardUrl(): string {
+    return `https://studio.youtube.com/channel/${this.state.channelId}/livestreaming/dashboard`;
+  }
+
+  get streamPageUrl() {
     const nightMode = this.customizationService.isDarkTheme ? 'night' : 'day';
     const youtubeDomain =
       nightMode === 'day' ? 'https://youtube.com' : 'https://gaming.youtube.com';
-
-    return `${youtubeDomain}/watch?v=${broadcastId}`;
+    return `${youtubeDomain}/watch?v=${this.state.settings.broadcastId}`;
   }
 }

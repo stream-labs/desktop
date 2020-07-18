@@ -1,4 +1,4 @@
-import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-service';
+import { mutation, StatefulService } from 'services/core/stateful-service';
 import * as obs from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import moment from 'moment';
@@ -20,12 +20,7 @@ import {
 } from './streaming-api';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { $t } from 'services/i18n';
-import {
-  getPlatformService,
-  TPlatform,
-  TPlatformCapability,
-  TStartStreamOptions,
-} from 'services/platforms';
+import { getPlatformService, TPlatform, TStartStreamOptions } from 'services/platforms';
 import { UserService } from 'services/user';
 import {
   ENotificationSubType,
@@ -39,14 +34,16 @@ import { CustomizationService } from 'services/customization';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService } from 'services/restream';
-import { TwitchService } from 'services/platforms/twitch';
 import { FacebookService } from 'services/platforms/facebook';
 import Utils from 'services/utils';
-import { cloneDeep, difference, pick } from 'lodash';
+import { cloneDeep } from 'lodash';
 import { createStreamError, StreamError, TStreamErrorType } from './stream-error';
-import { authorizedHeaders } from '../../util/requests';
+import { authorizedHeaders } from 'util/requests';
 import { HostsService } from '../hosts';
 import { TwitterService } from '../integrations/twitter';
+import { assertIsDefined } from 'util/properties-type-guards';
+import { YoutubeService } from '../platforms/youtube';
+import { StreamInfoView } from './streaming-view';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -87,6 +84,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @Inject() private restreamService: RestreamService;
   @Inject() private hostsService: HostsService;
   @Inject() private facebookService: FacebookService;
+  @Inject() private youtubeService: YoutubeService;
   @Inject() private twitterService: TwitterService;
 
   streamingStatusChange = new Subject<EStreamingState>();
@@ -140,7 +138,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         return this.views;
       },
       val => {
-        console.log('InfoChanged', val, val.chatUrl);
         // show the error if child window is closed
         if (val.info.error && !this.windowsService.state.child.isShown) {
           this.showGoLiveWindow();
@@ -158,7 +155,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   /**
-   * sync the settings from platforms with local state
+   * sync the settings from platforms with the local state
    */
   async prepopulateInfo(platforms?: TPlatform[]) {
     platforms = platforms || this.views.enabledPlatforms;
@@ -168,7 +165,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       try {
         await service.prepopulateInfo();
       } catch (e) {
-        this.SET_ERROR('PREPOPULATE_FAILED', e.details, platform);
+        // cast all PLATFORM_REQUEST_FAILED errors to PREPOPULATE_FAILED
+        const errorType =
+          (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
+            ? 'PREPOPULATE_FAILED'
+            : e.type;
+        this.SET_ERROR(errorType, e.details, platform);
         this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
         return;
       }
@@ -179,23 +181,30 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         return;
       }
     }
+    // successfully prepopulated
     this.UPDATE_STREAM_INFO({ lifecycle: 'waitForNewSettings' });
   }
 
   /**
    * Make a transition to Live
    */
-  async goLive(settings?: IGoLiveSettings, unattendedMode = false) {
+  async goLive(newSettings?: IGoLiveSettings, unattendedMode = false) {
+    // just go live in loggedout mode
     if (!this.userService.isLoggedIn) {
       this.finishStartStreaming();
       return;
     }
+
+    // clear the current stream info
     this.RESET_STREAM_INFO();
 
     // use default settings if no new settings provided
-    if (!settings) settings = cloneDeep(this.views.goLiveSettings);
-    // settings = this.views.sanitizeSettings(settings);
+    const settings = newSettings || cloneDeep(this.views.goLiveSettings);
+
+    // save enabled platforms to reuse setting with the next app start
     this.streamSettingsService.setSettings({ goLiveSettings: settings });
+
+    // show the GoLive checklist
     this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist' });
 
     // update channel settings for each platform
@@ -206,7 +215,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         await this.runCheck(platform, () => service.beforeGoLive(settings));
       } catch (e) {
         console.error(e);
-        this.setError('SETTINGS_UPDATE_FAILED', e.details, platform);
+        // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
+        const errorType =
+          (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
+            ? 'SETTINGS_UPDATE_FAILED'
+            : e.type;
+        this.setError(errorType, e.details, platform);
         return;
       }
     }
@@ -231,7 +245,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
       // update restream settings
       try {
-        await this.runCheck('setupRestream', () => this.restreamService.beforeGoLive());
+        await this.runCheck('setupRestream', async () => {
+          // enable restream on the backend side
+          if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
+          await this.restreamService.beforeGoLive();
+        });
       } catch (e) {
         console.error('Failed to setup restream', e);
         this.setError('RESTREAM_SETUP_FAILED');
@@ -250,7 +268,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       await this.runCheck('applyOptimizedSettings');
     }
 
-    // we are ready to start streaming
+    // start video transmission
     try {
       await this.runCheck('startVideoTransmission', () => this.finishStartStreaming());
     } catch (e) {
@@ -260,9 +278,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     // publish the Youtube broadcast
     if (this.streamSettingsService.protectedModeEnabled && settings.destinations.youtube?.enabled) {
       try {
-        await this.runCheck('publishYoutubeBroadcast', () =>
-          getPlatformService('youtube').afterGoLive(),
-        );
+        await this.runCheck('publishYoutubeBroadcast', () => this.youtubeService.afterGoLive());
       } catch (e) {
         this.setError(e);
         return;
@@ -283,6 +299,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       }
     }
 
+    // all done
     if (this.state.streamingStatus === EStreamingState.Live) {
       this.UPDATE_STREAM_INFO({ lifecycle: 'live' });
       this.createGameAssociation(this.views.commonFields.game);
@@ -293,8 +310,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
    * Update stream stetting while being live
    */
   async updateStreamSettings(settings: IGoLiveSettings) {
-    // settings = this.views.sanitizeSettings(settings);
-
     // run checklist
     this.RESET_STREAM_INFO();
     this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist' });
@@ -319,20 +334,23 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.UPDATE_STREAM_INFO({ lifecycle: 'live' });
   }
 
+  /**
+   * Schedule stream for eligible platforms
+   */
   async scheduleStream(settings: IStreamSettings, time: string) {
-    // settings = this.views.sanitizeSettings(settings);
     const destinations = settings.destinations;
     const platforms = (Object.keys(destinations) as TPlatform[]).filter(
-      dest => destinations[dest].enabled && this.views.supports('stream-schedule', dest),
+      dest => destinations[dest].enabled && this.views.supports('stream-schedule', [dest]),
     );
     for (const platform of platforms) {
       const service = getPlatformService(platform);
+      assertIsDefined(service.scheduleStream);
       await service.scheduleStream(time, destinations[platform]);
     }
   }
 
   /**
-   * update checklist item status based callback result
+   * Run task and update the checklist item status based on task result
    */
   private async runCheck(
     checkName: keyof IStreamInfo['checklist'],
@@ -353,6 +371,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.state.info = { ...this.state.info, ...infoPatch };
   }
 
+  /**
+   * Set the error state for the GoLive window
+   */
   private setError(
     errorTypeOrError?: TStreamErrorType | StreamError,
     errorDetails?: string,
@@ -370,7 +391,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   @mutation()
-  private SET_ERROR(type?: TStreamErrorType, details?: string, platform?: TPlatform) {
+  private SET_ERROR(type: TStreamErrorType, details?: string, platform?: TPlatform) {
     this.state.info.error = createStreamError(type, details, platform).getModel();
   }
 
@@ -441,8 +462,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       this.rejectStartStreaming = reject;
     });
 
-    const shouldConfirm =
-      !this.userService.isLoggedIn && this.streamSettingsService.settings.warnBeforeStartingStream;
+    const shouldConfirm = this.streamSettingsService.settings.warnBeforeStartingStream;
 
     if (shouldConfirm) {
       const goLive = await electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
@@ -452,7 +472,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         buttons: [$t('Cancel'), $t('Go Live')],
       });
 
-      if (!goLive.response) return;
+      if (!goLive.response) {
+        this.rejectStartStreaming();
+        return;
+      }
     }
 
     this.powerSaveId = electron.remote.powerSaveBlocker.start('prevent-display-sleep');
@@ -482,58 +505,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       }
       try {
         await this.goLive();
-        // if (this.userService.isLoggedIn && this.userService.platform) {
-        //   const service = getPlatformService(this.userService.platform.type);
-        //
-        //   // Twitch is special cased because we can safely call beforeGoLive and it will
-        //   // not touch the stream settings if protected mode is off. This is to retain
-        //   // compatibility with some legacy use cases.
-        //   if (
-        //     this.streamSettingsService.protectedModeEnabled ||
-        //     this.userService.platformType === 'twitch'
-        //   ) {
-        //     if (this.restreamService.shouldGoLiveWithRestream) {
-        //       if (!this.restreamService.allPlatformsStaged) {
-        //         // We don't have enough information to go live with multistream.
-        //         // We should gather the information in the edit stream info window.
-        //         this.showEditStreamInfo(this.restreamService.platforms, 0);
-        //         return;
-        //       }
-        //
-        //       let ready: boolean;
-        //
-        //       try {
-        //         ready = await this.restreamService.checkStatus();
-        //       } catch (e) {
-        //         // Assume restream is down
-        //         console.error('Error fetching restreaming service', e);
-        //         ready = false;
-        //       }
-        //
-        //       if (ready) {
-        //         // Restream service is up and accepting connections
-        //         await this.restreamService.beforeGoLive();
-        //       } else {
-        //         // Restream service is down, just go live to Twitch for now
-        //
-        //         electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
-        //           type: 'error',
-        //           message: $t(
-        //             'Multistream is temporarily unavailable. Your stream is being sent to Twitch only.',
-        //           ),
-        //           buttons: [$t('OK')],
-        //         });
-        //
-        //         const platform = this.userService.platformType;
-        //         await service.beforeGoLive(this.restreamService.state.platforms[platform].options);
-        //       }
-        //     } else {
-        //       await service.beforeGoLive(options);
-        //     }
-        //   }
-        // }
-        // await this.finishStartStreaming();
-        // return Promise.resolve();
       } catch (e) {
         return Promise.reject(e);
       }
@@ -573,8 +544,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         this.stopReplayBuffer();
       }
 
-      // TODO: use actions
       this.windowsService.closeChildWindow();
+      this.views.enabledPlatforms.forEach(platform => {
+        const service = getPlatformService(platform);
+        if (service.afterStopStream) service.afterStopStream();
+      });
       this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
       return Promise.resolve();
     }
@@ -1007,256 +981,5 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         service.afterStopStream();
       }
     });
-  }
-}
-
-/**
- * The stream info view is responsible for keeping
- * reliable, up-to-date information about the user's
- * channel and current stream in the Vuex store for
- * components to make use of.
- */
-class StreamInfoView extends ViewHandler<IStreamingServiceState> {
-  @Inject() private streamSettingsService: StreamSettingsService;
-  @Inject() private userService: UserService;
-  @Inject() private restreamService: RestreamService;
-  @Inject() private twitchService: TwitchService;
-  @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
-
-  get info() {
-    return this.state.info;
-  }
-
-  /**
-   * returns sorted list of all platforms
-   */
-  get allPlatforms(): TPlatform[] {
-    return this.sortPlatforms(['twitch', 'mixer', 'facebook', 'youtube']);
-  }
-
-  get linkedPlatforms(): TPlatform[] {
-    if (!this.userService.state.auth) return [];
-    return this.allPlatforms.filter(p => this.isPlatformLinked(p));
-  }
-
-  get enabledPlatforms(): TPlatform[] {
-    const goLiveSettings = this.goLiveSettings;
-    return Object.keys(goLiveSettings.destinations).filter(
-      (platform: TPlatform) =>
-        this.linkedPlatforms.includes(platform) && goLiveSettings.destinations[platform].enabled,
-    ) as TPlatform[];
-  }
-
-  get isMutliplatformMode() {
-    return (
-      this.streamSettingsService.state.protectedModeEnabled && this.enabledPlatforms.length > 1
-    );
-  }
-
-  get isMidStreamMode(): boolean {
-    return this.state.streamingStatus !== 'offline';
-  }
-
-  get viewerCount(): number {
-    if (!this.enabledPlatforms.length) return 0;
-    return this.enabledPlatforms
-      .map(platform => getPlatformService(platform).state.viewersCount)
-      .reduce((c1, c2) => c1 + c2);
-  }
-
-  get chatUrl(): string {
-    if (!this.userService.state.auth) return '';
-    return getPlatformService(this.userService.state.auth.primaryPlatform).chatUrl;
-  }
-
-  get goLiveSettings(): IGoLiveSettings {
-    const destinations = {};
-    this.linkedPlatforms.forEach(platform => {
-      destinations[platform] = this.getPlatformSettings(platform);
-    });
-
-    return {
-      destinations: destinations as IGoLiveSettings['destinations'],
-      advancedMode: this.streamSettingsService.state.goLiveSettings?.advancedMode,
-      optimizedProfile: null,
-      tweetText: '',
-    };
-  }
-
-  /**
-   * return common fields for the stream such title, description, game
-   */
-  getCommonFields(settings: IStreamSettings) {
-    const commonFields = {
-      title: '',
-      description: '',
-      game: '',
-    };
-    const destinations = Object.keys(settings.destinations) as TPlatform[];
-    const enabledDestinations = destinations.filter(dest => settings.destinations[dest].enabled);
-    const destinationsWithCommonSettings = enabledDestinations.filter(
-      dest => !settings.destinations[dest].useCustomFields,
-    );
-    const destinationWithCustomSettings = difference(
-      enabledDestinations,
-      destinationsWithCommonSettings,
-    );
-
-    // search fields in platforms that don't use custom settings first
-    destinationsWithCommonSettings.forEach(platform => {
-      const destSettings = settings.destinations[platform];
-      Object.keys(commonFields).forEach(fieldName => {
-        if (commonFields[fieldName] || !destSettings[fieldName]) return;
-        commonFields[fieldName] = destSettings[fieldName];
-      });
-    });
-
-    destinationWithCustomSettings.forEach(platform => {
-      const destSettings = settings.destinations[platform];
-      Object.keys(commonFields).forEach(fieldName => {
-        if (commonFields[fieldName] || !destSettings[fieldName]) return;
-        commonFields[fieldName] = destSettings[fieldName];
-      });
-    });
-
-    return commonFields;
-  }
-
-  /**
-   * return common fields for the stream such title, description, game
-   */
-  get commonFields(): { title: string; description: string; game: string } {
-    return this.getCommonFields(this.goLiveSettings);
-  }
-
-  /**
-   * Sort the platform list
-   * - the primary platform is always first
-   * - linked platforms are always on the top of the list
-   * - the rest has an alphabetic sort
-   */
-  sortPlatforms(platforms: TPlatform[]): TPlatform[] {
-    platforms = platforms.sort();
-    return [
-      ...platforms.filter(p => this.isPrimaryPlatform(p)),
-      ...platforms.filter(p => !this.isPrimaryPlatform(p) && this.isPlatformLinked(p)),
-      ...platforms.filter(p => !this.isPlatformLinked(p)),
-    ];
-  }
-
-  /**
-   * returns `true` if all enabled platforms have prepopulated their settings
-   */
-  isPrepopulated(platforms: TPlatform[]): boolean {
-    for (const platform of platforms) {
-      if (!getPlatformService(platform).state.isPrepopulated) return false;
-    }
-    return true;
-  }
-
-  supports(capability: TPlatformCapability, platform?: TPlatform) {
-    const platforms = platform ? [platform] : this.enabledPlatforms;
-    for (platform of platforms) {
-      if (getPlatformService(platform).capabilities.has(capability)) return true;
-    }
-  }
-
-  isPlatformLinked(platform: TPlatform): boolean {
-    return !!this.userService.state.auth?.platforms[platform];
-  }
-
-  isPrimaryPlatform(platform: TPlatform) {
-    return platform === this.userService.state.auth?.primaryPlatform;
-  }
-
-  // /**
-  //  * Returns merged common settings + required platform settings
-  //  */
-  // getPlatformSettings<T extends IStreamSettings>(
-  //   platform: TPlatform,
-  //   settings: T,
-  // ): IPlatformFlags & IPlatformCommonFields {
-  //   const platformSettings = settings.destinations[platform];
-  //   const enabledPlatforms = Object.keys(settings.destinations).filter(
-  //     dest => settings.destinations[dest].enabled,
-  //   );
-  //
-  //   // if platform use custom settings, than return without merging
-  //   if (platformSettings.useCustomFields || enabledPlatforms.length === 1) return platformSettings;
-  //
-  //   // otherwise merge common settings
-  //   const commonFields = {
-  //     title: settings.commonFields.title,
-  //   };
-  //   if (this.supports('description', platform)) {
-  //     commonFields['description'] = settings.commonFields.description;
-  //   }
-  //
-  //   if (this.supports('game', platform)) {
-  //     commonFields['game'] = settings.commonFields.game;
-  //   }
-  //   return {
-  //     ...platformSettings,
-  //     ...commonFields,
-  //   };
-  // }
-
-  // sanitizeSettings<T extends IStreamSettings>(settings: T): T {
-  //   settings = cloneDeep(settings);
-  //   const destinations = settings.destinations;
-  //   const linkedPlatforms = this.linkedPlatforms;
-  //
-  //   // delete unlinked platforms if provided
-  //   Object.keys(destinations).forEach((destName: TPlatform) => {
-  //     if (!linkedPlatforms.includes(destName)) delete destinations[destName];
-  //   });
-  //
-  //   // add default settings for just linked platforms
-  //   difference(linkedPlatforms, Object.keys(destinations) as TPlatform[]).forEach(destName => {
-  //     // TODO: fix types
-  //     // @ts-ignore
-  //     destinations[destName] = this.getPlatformSettings(destName);
-  //   });
-  //   return settings;
-  // }
-
-  /**
-   * Validates settings and returns an error string
-   */
-  validateSettings<T extends IStreamSettings>(settings: T): string {
-    const platforms = Object.keys(settings.destinations) as TPlatform[];
-    for (const platform of platforms) {
-      const platformSettings = settings.destinations[platform];
-      if (!platformSettings.enabled) continue;
-      const platformName = getPlatformService(platform).displayName;
-      if (platform === 'twitch' || platform === 'facebook') {
-        if (!platformSettings['game']) {
-          return $t('You must select a game for %{platformName}', { platformName });
-        }
-      }
-    }
-    return '';
-  }
-
-  private getPlatformSettings(platform: TPlatform) {
-    const service = getPlatformService(platform);
-    const savedDestinations = this.streamSettingsService.state.goLiveSettings?.destinations;
-    const { enabled, useCustomFields } = (savedDestinations && savedDestinations[platform]) || {
-      enabled: false,
-      useCustomFields: false,
-    };
-    const settings = pick(service.state.settings, ['title', 'description', 'game']);
-
-    // use previously used title and description if not provided
-    if (!settings.title) settings.title = this.streamSettingsService.state.title;
-
-    if (this.supports('description', platform) && !settings['description']) {
-      settings['description'] = this.streamSettingsService.state.description;
-    }
-    return {
-      ...settings,
-      useCustomFields,
-      enabled: enabled || this.isPrimaryPlatform(platform),
-    };
   }
 }

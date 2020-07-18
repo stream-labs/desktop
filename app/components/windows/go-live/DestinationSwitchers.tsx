@@ -11,23 +11,28 @@ import { $t } from 'services/i18n';
 import styles from './DestinationSwitchers.m.less';
 import { StreamingService } from 'services/streaming';
 
-type TDestinations = Partial<Record<TPlatform, { enabled: boolean }>>;
+type TDestinations = Record<TPlatform, { enabled: boolean }>;
 
 class Props {
   title?: string = '';
-  value?: TDestinations = {};
+  value?: TDestinations = undefined;
+
+  /**
+   * allow to disable the primary platform
+   * we can disable primary platform in the ScheduleStream window
+   */
   canDisablePrimary: boolean = false;
   handleOnSwitch?: (platform: TPlatform, enabled: boolean) => unknown = () => null;
 }
 
 /**
- * Renders a list of switchers for the stream destinations
+ * Allows enabling/disabling platforms for the stream
  */
 @Component({ props: createProps(Props) })
 export class DestinationSwitchers extends TsxComponent<Props> {
   @Inject() private streamingService: StreamingService;
   @Inject() private userService: UserService;
-  @SyncWithValue() private destinations: TDestinations = {};
+  @SyncWithValue() private destinations: TDestinations;
 
   private get view() {
     return this.streamingService.views;
@@ -39,26 +44,35 @@ export class DestinationSwitchers extends TsxComponent<Props> {
     this.props.handleOnSwitch && this.props.handleOnSwitch(platform, enabled);
   }
 
+  /**
+   * Renders a list of switchers
+   */
   private render() {
-    const destinations = this.view.sortPlatforms(Object.keys(this.props.value) as TPlatform[]);
+    const destinations = this.view.sortPlatforms(Object.keys(this.destinations) as TPlatform[]);
     return <div>{destinations.map((platform: TPlatform) => this.renderDestination(platform))}</div>;
   }
 
+  /**
+   * Renders a single switcher
+   */
   private renderDestination(platform: TPlatform) {
     const destination = this.destinations[platform];
     const enabled = destination.enabled;
     const isPrimary = this.view.isPrimaryPlatform(platform);
     const platformService = getPlatformService(platform);
     const platformName = platformService.displayName;
-    const username = this.userService.state.auth.platforms[platform].username;
+    const username = this.userService.state.auth?.platforms[platform]!.username;
     const title = this.props.title ? $t(this.props.title, { platformName }) : platformName;
-    const shouldShowLeftColumn = Object.keys(this.destinations).length > 1;
+
+    // don't show toggle inputs if we have only one platform to stream
+    const shouldShowToggles = Object.keys(this.destinations).length > 1;
     return (
       <div
         class={cx(styles.platformSwitcher, { [styles.platformDisabled]: !enabled })}
         onClick={() => this.onSwitchHandler(platform, !enabled)}
       >
-        {shouldShowLeftColumn && (
+        {/* TOGGLE INPUT */}
+        {shouldShowToggles && (
           <div class={cx(styles.colInput)}>
             {isPrimary ? (
               <span
@@ -73,9 +87,13 @@ export class DestinationSwitchers extends TsxComponent<Props> {
             )}
           </div>
         )}
+
+        {/* PLATFORM LOGO */}
         <div class="logo margin-right--20">
           <PlatformLogo platform={platform} class={styles[`platform-logo-${platform}`]} />
         </div>
+
+        {/* PLATFORM TITLE AND ACCOUNT */}
         <div class={styles.colAccount}>
           <span class={styles.platformName}>{title}</span> <br />
           {username} <br />

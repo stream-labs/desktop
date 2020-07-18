@@ -15,7 +15,7 @@ import { ISerializableWidget, IWidgetSource, IWidgetsServiceApi } from './widget
 import { WidgetType, WidgetDefinitions, WidgetTesters } from './widgets-data';
 import { mutation, StatefulService } from '../core/stateful-service';
 import { WidgetSource } from './widget-source';
-import { InitAfter } from '../core/service-initialization-observer';
+import { InitAfter } from 'services/core/service-initialization-observer';
 import Vue from 'vue';
 import cloneDeep from 'lodash/cloneDeep';
 import { Subscription } from 'rxjs';

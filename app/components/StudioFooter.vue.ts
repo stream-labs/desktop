@@ -31,6 +31,7 @@ export default class StudioFooterComponent extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() settingsService: SettingsService;
   @Inject() performanceService: PerformanceService;
+  @Inject() youtubeService: YoutubeService;
 
   @Prop() locked: boolean;
 
@@ -107,7 +108,7 @@ export default class StudioFooterComponent extends Vue {
   }
 
   openYoutubeEnable() {
-    electron.remote.shell.openExternal('https://youtube.com/live_dashboard_splash');
+    this.youtubeService.actions.openYoutubeEnable();
   }
 
   openScheduleStream() {

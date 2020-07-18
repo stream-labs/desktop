@@ -38,7 +38,7 @@ export class FormMonkey {
   constructor(
     public t: TExecutionContext,
     private formSelector?: string,
-    private showLogs = true,
+    private showLogs = false,
   ) {
     if (!formSelector) this.formSelector = DEFAULT_SELECTOR;
   }
@@ -449,7 +449,11 @@ export class FormMonkey {
   }
 }
 
-export function optionByTitle(optionTitle: string | RegExp): FNValueSetter {
+/**
+ * select ListInput option by given title
+ * able to work with a dynamic options list
+ */
+export function selectTitle(optionTitle: string | RegExp): FNValueSetter {
   return async (form: FormMonkey, input: IUIInput) => {
     const hasInternalSearch: boolean = JSON.parse(
       await form.getAttribute(input.selector, 'data-internal-search'),

@@ -38,7 +38,7 @@ interface IStreamSettingsState {
    */
   warnNoVideoSources: boolean;
 
-  goLiveSettings: {
+  goLiveSettings?: {
     destinations: {
       twitch: IPlatformFlags;
       facebook: IPlatformFlags;
@@ -90,7 +90,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     title: '',
     description: '',
     warnNoVideoSources: true,
-    goLiveSettings: null,
+    goLiveSettings: undefined,
   };
 
   init() {
@@ -108,7 +108,15 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
    */
   setSettings(patch: Partial<IStreamSettings>) {
     // save settings to localStorage
-    Object.keys(this.state).forEach(prop => {
+    const localStorageSettings: (keyof IStreamSettingsState)[] = [
+      'protectedModeEnabled',
+      'protectedModeMigrationRequired',
+      'title',
+      'description',
+      'warnNoVideoSources',
+      'goLiveSettings',
+    ];
+    localStorageSettings.forEach(prop => {
       if (prop in patch) {
         this.SET_LOCAL_STORAGE_SETTINGS({ [prop]: patch[prop] } as Partial<IStreamSettingsState>);
       }
@@ -154,7 +162,9 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
   }
 
   setGoLiveSettings(settingsPatch: Partial<IGoLiveSettings>) {
-    this.setSettings({ goLiveSettings: { ...this.state.goLiveSettings, ...settingsPatch } });
+    this.setSettings({
+      goLiveSettings: { ...this.state.goLiveSettings, ...settingsPatch } as IGoLiveSettings,
+    });
   }
 
   /**

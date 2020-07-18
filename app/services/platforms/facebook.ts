@@ -1,26 +1,23 @@
-import { StatefulService, mutation, InheritMutations } from '../core/stateful-service';
+import { mutation, InheritMutations } from '../core/stateful-service';
 import {
   IPlatformService,
   IGame,
   TPlatformCapability,
-  TPlatformCapabilityMap,
   EPlatformCallResult,
   IPlatformRequest,
   IPlatformState,
 } from '.';
-import { HostsService } from '../hosts';
-import { Inject } from '../core/injector';
-import { authorizedHeaders, handleResponse } from '../../util/requests';
-import { UserService } from '../user';
+import { HostsService } from 'services/hosts';
+import { Inject } from 'services/core/injector';
+import { authorizedHeaders, handleResponse } from 'util/requests';
+import { UserService } from 'services/user';
 import { IPlatformResponse, platformAuthorizedRequest, platformRequest } from './utils';
-import { IListOption } from '../../components/shared/inputs';
+import { IListOption } from 'components/shared/inputs';
 import { $t } from 'services/i18n';
 import { StreamSettingsService } from 'services/settings/streaming';
-import { Subject } from 'rxjs';
-import { assertIsDefined } from '../../util/properties-type-guards';
-import { IYoutubeStartStreamOptions } from './youtube';
-import { IGoLiveSettings } from '../streaming';
-import { throwStreamError } from '../streaming/stream-error';
+import { assertIsDefined } from 'util/properties-type-guards';
+import { IGoLiveSettings } from 'services/streaming';
+import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 
 interface IFacebookPage {
@@ -56,7 +53,7 @@ interface IFacebookServiceState extends IPlatformState {
   activePage: IFacebookPage | null;
   liveVideoId: number | null;
   streamUrl: string | null;
-  settings: IFacebookStartStreamOptions | null;
+  settings: IFacebookStartStreamOptions;
   facebookPages: IStreamlabsFacebookPages | null;
 }
 
@@ -91,8 +88,6 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     'account-merging',
   ]);
 
-  channelInfoChanged = new Subject<Partial<IFacebookChannelInfo>>();
-
   authWindowOptions: Electron.BrowserWindowConstructorOptions = { width: 800, height: 800 };
 
   static initialState: IFacebookServiceState = {
@@ -101,8 +96,29 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     liveVideoId: null,
     streamUrl: null,
     facebookPages: null,
-    settings: null,
+    settings: {
+      facebookPageId: '',
+      title: '',
+      description: '',
+      game: '',
+    },
   };
+
+  protected init() {
+    // save settings to the local storage
+    const savedSettings: IFacebookStartStreamOptions = JSON.parse(
+      localStorage.getItem(this.serviceName) as string,
+    );
+    if (savedSettings) this.SET_STREAM_SETTINGS(savedSettings);
+    this.store.watch(
+      () => this.state.settings,
+      () => {
+        const { title, description, game } = this.state.settings;
+        localStorage.setItem(this.serviceName, JSON.stringify({ title, description, game }));
+      },
+      { deep: true },
+    );
+  }
 
   @mutation()
   private SET_ACTIVE_PAGE(page: IFacebookPage) {
@@ -112,11 +128,6 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   @mutation()
   private SET_LIVE_VIDEO_ID(id: number | null) {
     this.state.liveVideoId = id;
-    const pathToPage = `${this.state.activePage.name}-${this.state.activePage.id}`.replace(
-      ' ',
-      '-',
-    );
-    this.state.streamPageUrl = `https://www.facebook.com/${pathToPage}/live_videos`;
   }
 
   @mutation()
@@ -127,7 +138,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   @mutation()
   private SET_STREAM_PROPERTIES(
     title: string,
-    description: string,
+    description: string | undefined,
     game: string,
     facebookPageId: string,
   ) {
@@ -153,10 +164,6 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     return `https://${host}/slobs/merge/${token}/facebook_account`;
   }
 
-  get unlinkUrl() {
-    return `https://${this.hostsService.streamlabs}/api/v5/user/accounts/unlink/facebook_account`;
-  }
-
   get oauthToken() {
     return this.userService.state.auth?.platforms?.facebook?.token;
   }
@@ -165,8 +172,13 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     return this.state.activePage?.access_token;
   }
 
-  getStreamFields() {
-    return {};
+  get streamPageUrl(): string {
+    if (!this.state.activePage) return '';
+    const pathToPage = `${this.state.activePage.name}-${this.state.activePage.id}`.replace(
+      ' ',
+      '-',
+    );
+    return `https://www.facebook.com/${pathToPage}/live_videos`;
   }
 
   validatePlatform() {
@@ -194,7 +206,6 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
         const activePage = json.data.filter(page => pageId === page.id)[0] || json.data[0];
         this.userService.updatePlatformChannelId('facebook', pageId);
         this.SET_ACTIVE_PAGE(activePage);
-        this.SET_STREAM_PROPERTIES('', '', '', activePage.id);
       },
     );
   }
@@ -223,6 +234,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   }
 
   private createLiveVideo(): Promise<string> {
+    assertIsDefined(this.state.settings);
     const { title, description, game } = this.state.settings;
     const data = {
       method: 'POST',
@@ -252,6 +264,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   async prepopulateInfo(): Promise<Partial<IFacebookStartStreamOptions>> {
     await this.fetchActivePage();
     if (!this.state.activePage || !this.state.activePage.id) {
+      this.SET_PREPOPULATED(true);
       return { facebookPageId: undefined };
     }
     const url =
@@ -341,6 +354,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     let facebookPageId = info.facebookPageId;
     this.SET_STREAM_PROPERTIES(title, description, game, facebookPageId);
     // take fist page if no pages provided
+    assertIsDefined(this.state.facebookPages);
     if (!facebookPageId) facebookPageId = this.state.facebookPages.pages[0].id;
     assertIsDefined(facebookPageId);
     await this.postPage(facebookPageId);
@@ -409,13 +423,6 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     } catch {
       console.error(new Error('Could not set Facebook page'));
     }
-  }
-
-  /**
-   * Get user-friendly error message
-   */
-  getErrorDescription(error: IPlatformResponse<unknown>): string {
-    return `Can not connect to Facebook: ${error.message}`;
   }
 
   sendPushNotif() {

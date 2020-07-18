@@ -103,6 +103,7 @@
   "Can not update settings for %{platformName}": "Can not update settings for %{platformName}",
   "prepopulateStreamSettingsError": "There was an error fetching your channel information. You can try <fetch-again-link>fetching the information again</fetch-again-link> or you can <just-go-live-link>just go live</just-go-live-link>. If this error persists, you can try logging out and back in.",
   "updateStreamSettingsError": "Something went wrong while updating your stream info. You can <try-again-link>try again</try-again-link>, or you can <just-go-live-link>just go live</just-go-live-link>. If this error persists, you can try logging out and back in.",
+  "twitchMissedScopeError": "<p>It looks like you connected your Twitch account on the streamlabs.com website. To start streaming you should connect it again via Streamlabs OBS</p><connect-button>Connect Twitch</connect-button>",
   "You must select a game for %{platformName}": "You must select a game for %{platformName}",
   "Connect %{platformName} to Streamlabs OBS.": "Connect %{platformName} to Streamlabs OBS.",
   "Connect %{platformName}": "Connect %{platformName}",
@@ -127,6 +128,8 @@
   "Extras": "Extras",
   "Go back to settings": "Go back to settings",
   "Select at least one destination": "Select at least one destination",
-  "You cannot unlink the platform you used to sign in to Streamlabs OBS. If you want to unlink this platform, please sign in with a different platform.": "You cannot unlink the platform you used to sign in to Streamlabs OBS. If you want to unlink this platform, please sign in with a different platform.",
-  "Checking optimized setting for %{game}": "Checking optimized setting for %{game}"
+  "You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destination.": "You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destination.",
+  "Checking optimized setting for %{game}": "Checking optimized setting for %{game}",
+  "There was an error starting the output. Check your settings and try again. If this issue persists, please contact Streamlabs support.": "There was an error starting the output. Check your settings and try again. If this issue persists, please contact Streamlabs support.",
+  "Contact Support": "Contact Support"
 }

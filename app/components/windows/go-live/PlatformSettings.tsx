@@ -1,56 +1,24 @@
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { $t } from 'services/i18n';
-import { Component, Watch, Prop } from 'vue-property-decorator';
-import styles from './GoLive.m.less';
+import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core';
 import { UserService } from 'services/user';
 import { getPlatformService, TPlatform } from 'services/platforms';
-import YoutubeEditStreamInfo from 'components/platforms/youtube/YoutubeEditStreamInfo';
-import CommonPlatformFields from 'components/platforms/CommonPlatformFields';
-import TwitchEditStreamInfo from '../../platforms/TwitchEditStreamInfo';
-import FacebookEditStreamInfo from '../../platforms/FacebookEditStreamInfo';
-import MixerEditStreamInfo from '../../platforms/MixerEditStreamInfo';
+import YoutubeEditStreamInfo from 'components/windows/go-live/platforms/youtube/YoutubeEditStreamInfo';
+import CommonPlatformFields from 'components/windows/go-live/CommonPlatformFields';
+import TwitchEditStreamInfo from './platforms/TwitchEditStreamInfo';
+import FacebookEditStreamInfo from './platforms/FacebookEditStreamInfo';
+import MixerEditStreamInfo from './platforms/MixerEditStreamInfo';
 import { IGoLiveSettings, StreamingService } from 'services/streaming';
-
 import { Spinner } from 'streamlabs-beaker';
-import { StreamSettingsService } from '../../../services/settings/streaming';
-import ValidatedForm from '../../shared/inputs/ValidatedForm';
+import { StreamSettingsService } from 'services/settings/streaming';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import GoLiveError from './GoLiveError';
-import { SyncWithValue } from '../../../services/app/app-decorators';
-import { BoolInput } from '../../shared/inputs/inputs';
-
-// TODO: dedup
-class SectionProps {
-  title?: string = '';
-  isSimpleMode?: boolean = false;
-}
+import { SyncWithValue } from 'services/app/app-decorators';
+import Section from './Section';
 
 /**
- * renders a section wrapper
- */
-@Component({ props: createProps(SectionProps) })
-class Section extends TsxComponent<SectionProps> {
-  private render() {
-    const slot = this.$slots.default;
-    const title = this.props.title;
-
-    // render heading and section wrapper in advanced mode
-    if (!this.props.isSimpleMode) {
-      return (
-        <div class={styles.section}>
-          {title && <h2>{title}</h2>}
-          <div>{slot}</div>
-        </div>
-      );
-    }
-
-    // render content only in simple mode
-    return <div>{slot}</div>;
-  }
-}
-
-/**
- * Renders the form with stream settings for each enabled platform
+ * Renders a form with stream settings for each enabled platform
  **/
 @Component({})
 // TODO: remove
@@ -58,9 +26,7 @@ export default class PlatformSettings extends TsxComponent<{ onInput?: any }> {
   @Inject() private streamingService: StreamingService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private userService: UserService;
-
-  @SyncWithValue()
-  private settings: IGoLiveSettings = null;
+  @SyncWithValue() private settings: IGoLiveSettings;
 
   private get view() {
     return this.streamingService.views;

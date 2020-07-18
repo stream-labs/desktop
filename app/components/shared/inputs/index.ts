@@ -94,7 +94,7 @@ export interface ISliderMetadata extends IInputMetadata {
   data?: string[];
 }
 
-export interface IListOption<TValue = string, TOptionData = unknown> {
+export interface IListOption<TValue = string, TOptionData = undefined> {
   value: TValue;
   title: string;
   description?: string;

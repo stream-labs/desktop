@@ -1,28 +1,27 @@
-import TsxComponent, { createProps } from '../../tsx-component';
-import { Inject } from '../../../services/core';
-import {
-  IGoLiveSettings,
-  StreamingService,
-  TGoLiveChecklistItemState,
-} from '../../../services/streaming';
-import { WindowsService } from '../../../services/windows';
+import TsxComponent, { createProps } from 'components/tsx-component';
+import { Inject } from 'services/core';
+import { StreamingService, TGoLiveChecklistItemState } from '../../../services/streaming';
+import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
 import { Component, Watch } from 'vue-property-decorator';
 import styles from './GoLiveChecklist.m.less';
 import cx from 'classnames';
-import { YoutubeService } from '../../../services/platforms/youtube';
-import { getPlatformService, TPlatform } from '../../../services/platforms';
-import { TwitterService } from '../../../services/integrations/twitter';
+import { YoutubeService } from 'services/platforms/youtube';
+import { getPlatformService, TPlatform } from 'services/platforms';
+import { TwitterService } from 'services/integrations/twitter';
 import GoLiveError from './GoLiveError';
-import { VideoEncodingOptimizationService } from '../../../app-services';
-import Utils from '../../../services/utils';
+import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
+import Utils from 'services/utils';
 
 class Props {
+  /**
+   * True if we're updating a stream instead of creating a new one
+   */
   isUpdateMode? = false;
 }
 
 /**
- * Shows transition to live and helps troubleshoot related problems
+ * Shows transition to live progress and helps troubleshoot related problems
  */
 @Component({ props: createProps(Props) })
 export default class GoLiveChecklist extends TsxComponent<Props> {
@@ -50,7 +49,7 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
 
   @Watch('lifecycle')
   private async watchLifecycle() {
-    // close window in 1s when live
+    // close window in 1s after start streaming
     if (this.lifecycle === 'live') {
       await Utils.sleep(1000);
       this.windowsService.closeChildWindow();
@@ -113,7 +112,7 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
               true,
             )}
 
-          {/* PUBLISH YT BROADCAST */}
+          {/* POST A TWEET */}
           {shouldPostTweet && this.renderCheck($t('Post a tweet'), checklist.postTweet)}
         </ul>
 
@@ -150,6 +149,9 @@ class CheckMarkProps {
   state: TGoLiveChecklistItemState = 'not-started';
 }
 
+/**
+ * Renders a check mark in one of 4 states - 'not-started', 'pending', 'done', 'error'
+ */
 @Component({ props: createProps(CheckMarkProps) })
 class CheckMark extends TsxComponent<CheckMarkProps> {
   render() {

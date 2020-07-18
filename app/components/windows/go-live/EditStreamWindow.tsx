@@ -1,26 +1,20 @@
 import TsxComponent from 'components/tsx-component';
 import ModalLayout from 'components/ModalLayout.vue';
 import { $t } from 'services/i18n';
-import { Component, Watch } from 'vue-property-decorator';
-import PlatformLogo from 'components/shared/PlatformLogo';
+import { Component } from 'vue-property-decorator';
 import styles from './GoLive.m.less';
 import { Inject } from 'services/core';
 import { UserService } from 'services/user';
-import { getPlatformService, TPlatform } from 'services/platforms';
-import { BoolInput, ToggleInput } from 'components/shared/inputs/inputs';
+import { ToggleInput } from 'components/shared/inputs/inputs';
 import cx from 'classnames';
-import { formMetadata, IListOption, metadata } from 'components/shared/inputs';
 import { SettingsService } from 'services/settings';
-import HFormGroup from '../../shared/inputs/HFormGroup.vue';
 import { WindowsService } from 'services/windows';
 import { IGoLiveSettings, StreamingService } from 'services/streaming';
-
 import cloneDeep from 'lodash/cloneDeep';
 import { StreamSettingsService } from '../../../services/settings/streaming';
 import ValidatedForm from '../../shared/inputs/ValidatedForm';
 import GoLiveChecklist from './GoLiveChecklist';
 import PlatformSettings from './PlatformSettings';
-import CommonPlatformFields from '../../platforms/CommonPlatformFields';
 
 /**
  * Allows to update stream setting while being live
@@ -73,12 +67,7 @@ export default class EditStreamWindow extends TsxComponent<{}> {
     return (
       <ModalLayout customControls={true} showControls={false}>
         <ValidatedForm ref="form" slot="content" name="editStreamForm">
-          {shouldShowSettings && (
-            <PlatformSettings
-              vModel={this.settings}
-              onInput={(val: boolean) => console.log('EditStream change', val)}
-            />
-          )}
+          {shouldShowSettings && <PlatformSettings vModel={this.settings} />}
           {shouldShowChecklist && <GoLiveChecklist isUpdateMode={true} />}
         </ValidatedForm>
         <div slot="controls">{this.renderControls()}</div>
@@ -90,7 +79,6 @@ export default class EditStreamWindow extends TsxComponent<{}> {
     const lifecycle = this.view.info.lifecycle;
     const shouldShowUpdateButton = lifecycle === 'live';
     const shouldShowGoBackButton = !shouldShowUpdateButton && this.view.info.error;
-    const advancedMode = this.view.goLiveSettings.advancedMode;
     const shouldShowAdvancedSwitch = shouldShowUpdateButton && this.view.isMutliplatformMode;
 
     return (

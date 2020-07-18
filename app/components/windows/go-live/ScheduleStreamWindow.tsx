@@ -1,29 +1,23 @@
-import TsxComponent from 'components/tsx-component';
+import TsxComponent, { required } from 'components/tsx-component';
 import ModalLayout from 'components/ModalLayout.vue';
 import { $t } from 'services/i18n';
 import { Component } from 'vue-property-decorator';
-import styles from './GoLive.m.less';
 import { Inject } from 'services/core';
 import { UserService } from 'services/user';
-import { formMetadata, IListOption, metadata } from 'components/shared/inputs';
+import { formMetadata, metadata } from 'components/shared/inputs';
 import { SettingsService } from 'services/settings';
-import HFormGroup from '../../shared/inputs/HFormGroup.vue';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { WindowsService } from 'services/windows';
-import { IGoLiveSettings, IStreamSettings, StreamingService } from 'services/streaming';
-
-import { Spinner, ProgressBar } from 'streamlabs-beaker';
+import { IStreamSettings, StreamingService } from 'services/streaming';
+import { Spinner } from 'streamlabs-beaker';
 import cloneDeep from 'lodash/cloneDeep';
-import { StreamSettingsService } from '../../../services/settings/streaming';
-import ValidatedForm from '../../shared/inputs/ValidatedForm';
-import Utils from '../../../services/utils';
+import { StreamSettingsService } from 'services/settings/streaming';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import PlatformSettings from './PlatformSettings';
-import { getPlatformService, TPlatform } from '../../../services/platforms';
+import { TPlatform } from 'services/platforms';
 import { DestinationSwitchers } from './DestinationSwitchers';
 import moment from 'moment';
 
-/***
- * Windows that manages steps for streaming start
- */
 @Component({})
 export default class ScheduleStreamWindow extends TsxComponent<{}> {
   @Inject() private userService: UserService;
@@ -40,9 +34,9 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
     return this.streamingService.views;
   }
 
-  private settings: IStreamSettings = null;
+  private settings: IStreamSettings = required();
   private eligiblePlatforms = this.view.linkedPlatforms.filter(p =>
-    this.view.supports('stream-schedule', p),
+    this.view.supports('stream-schedule', [p]),
   );
   private startTimeModel = {
     date: Date.now(),
@@ -56,13 +50,20 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
   }
 
   created() {
+    // use goLive settings for schedule
     this.settings = cloneDeep(this.view.goLiveSettings);
+
+    // always show a simple mode only
     this.settings.advancedMode = false;
+
+    // always have all platforms enabled when show window
     const destinations = this.settings.destinations;
     Object.keys(destinations).forEach((dest: TPlatform) => {
       destinations[dest].enabled = true;
       if (!this.eligiblePlatforms.includes(dest)) delete destinations[dest];
     });
+
+    // prepopulate info for target platforms
     this.streamingService.actions.prepopulateInfo(this.selectedDestinations);
   }
 
@@ -70,15 +71,19 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
    * validate settings and schedule stream
    */
   private async submit() {
+    // validate
     if (!(await this.$refs.form.validate())) return;
+
+    // convert date to ISO string format
     const scheduledStartTime = new Date(
       this.startTimeModel.date + this.startTimeModel.time * 1000,
     ).toISOString();
 
+    // schedule
     try {
       this.isLoading = true;
       await this.streamingService.actions.return.scheduleStream(this.settings, scheduledStartTime);
-      this.startTimeModel = { time: null, date: null };
+      this.startTimeModel = { time: 0, date: 0 };
       this.$toasted.show(
         $t(
           'Your stream has been scheduled for %{time} from now.' +

@@ -6,19 +6,12 @@ import electron, { ipcRenderer } from 'electron';
 import url from 'url';
 import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
-import { InitAfter, mutation, StatefulService } from './core';
+import { InitAfter } from './core';
 import Utils from './utils';
 import { StreamingService } from './streaming';
 
-interface IState {
-  isReadyToShow: boolean;
-}
-
 @InitAfter('StreamingService')
-export class ChatService extends StatefulService<IState> {
-  static initialState: IState = {
-    isReadyToShow: false,
-  };
+export class ChatService extends Service {
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() windowsService: WindowsService;
@@ -34,7 +27,7 @@ export class ChatService extends StatefulService<IState> {
 
     // listen `streamInfoChanged` to init or deinit the chat
     this.streamingService.streamInfoChanged.subscribe(streamInfo => {
-      if (streamInfo.chatUrl === void 0) return; // chatUrl has not been changed
+      if (streamInfo.chatUrl === this.chatUrl) return; // chatUrl has not been changed
 
       // chat url has been changed, set the new chat url
       const oldChatUrl = this.chatUrl;
@@ -56,14 +49,10 @@ export class ChatService extends StatefulService<IState> {
   }
 
   async mountChat(electronWindowId: number) {
-    console.log('start mount');
-    this.deinitChat();
-    this.initChat();
-    this.loadUrl();
+    if (!this.chatView) this.initChat();
     this.electronWindowId = electronWindowId;
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
     if (this.chatView) win.addBrowserView(this.chatView);
-    console.log('finish mount');
   }
 
   setChatBounds(position: IVec2, size: IVec2) {
@@ -80,9 +69,8 @@ export class ChatService extends StatefulService<IState> {
   unmountChat() {
     if (!this.electronWindowId) return; // already unmounted
     const win = electron.remote.BrowserWindow.fromId(this.electronWindowId);
-    win.removeBrowserView(this.chatView);
+    if (this.chatView) win.removeBrowserView(this.chatView);
     this.electronWindowId = null;
-    console.log('unmount simple chat');
   }
 
   private initChat() {
@@ -104,6 +92,8 @@ export class ChatService extends StatefulService<IState> {
     this.customizationService.settingsChanged.subscribe(changed => {
       this.handleSettingsChanged(changed);
     });
+
+    if (this.chatUrl) this.loadUrl();
   }
 
   private deinitChat() {
@@ -112,7 +102,7 @@ export class ChatService extends StatefulService<IState> {
     this.chatView = null;
   }
 
-  private async loadUrl(): Promise<boolean> {
+  private async loadUrl() {
     if (!this.chatUrl) return; // user has logged out
     if (!this.chatView) return; // chat was already deinitialized
     this.chatView.webContents.loadURL(this.chatUrl).catch(this.handleRedirectError);
@@ -254,9 +244,5 @@ export class ChatService extends StatefulService<IState> {
     if (changed.enableBTTVEmotes != null || changed.enableFFZEmotes != null) {
       this.refreshChat();
     }
-  }
-
-  @mutation() private SET_READY_TOSHOW(ready: boolean) {
-    this.state.isReadyToShow = ready;
   }
 }

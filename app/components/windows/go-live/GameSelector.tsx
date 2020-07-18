@@ -1,17 +1,15 @@
-import { Component, Prop, Watch } from 'vue-property-decorator';
-import cx from 'classnames';
-import { IListMetadata, IListOption, metadata } from 'components/shared/inputs';
+import { Component, Watch } from 'vue-property-decorator';
+import { IListOption, metadata } from 'components/shared/inputs';
 import { ListInput, TagsInput } from 'components/shared/inputs/inputs';
-import { getPlatformService, IGame, TPlatform } from '../../../services/platforms';
+import { getPlatformService, IPlatformCapabilityGame, TPlatform } from 'services/platforms';
 import { $t } from 'services/i18n';
 import { Debounce } from 'lodash-decorators';
-import HFormGroup from '../../shared/inputs/HFormGroup.vue';
 import TsxComponent, { createProps } from '../../tsx-component';
-import { SyncWithValue } from '../../../services/app/app-decorators';
+import { SyncWithValue } from 'services/app/app-decorators';
 import { IStreamSettings, StreamingService } from 'services/streaming';
-import { Inject } from '../../../services/core';
+import { Inject } from 'services/core';
 import { flatten, sortBy } from 'lodash';
-import PlatformLogo from '../../shared/PlatformLogo';
+import PlatformLogo from 'components/shared/PlatformLogo';
 
 interface IGameOptionData {
   platform: TPlatform;
@@ -30,14 +28,17 @@ class Props {
   platform?: TPlatform | null = null;
 }
 
+/**
+ * Selects a game for streaming
+ */
 @Component({ props: createProps(Props) })
 export default class GameSelector extends TsxComponent<Props> {
   @Inject() private streamingService: StreamingService;
-  @SyncWithValue() private settings: IStreamSettings = null;
+  @SyncWithValue() private settings: IStreamSettings;
 
   private searchingGames = false;
   private gameOptions: TGameOption[] = [];
-  private lastSelectedOption: TGameOption = null;
+  private lastSelectedOption?: TGameOption = undefined;
 
   $refs: {
     tagsInput: TagsInput;
@@ -46,14 +47,6 @@ export default class GameSelector extends TsxComponent<Props> {
   get view() {
     return this.streamingService.views;
   }
-
-  // created() {
-  //   this.gameOptions = [...this.selectedOptions];
-  //
-  //   // this.gameOptions = this.settings.game
-  //   //   ? [{ value: this.settings.game, title: this.settings.game }]
-  //   //   : [];
-  // }
 
   private createGameOption(
     platform: TPlatform,
@@ -96,8 +89,8 @@ export default class GameSelector extends TsxComponent<Props> {
       const platformSettings = this.settings.destinations[dest];
       return (
         platformSettings.enabled &&
-        !platformSettings.useCustomFields &&
-        this.view.supports('game', dest)
+        (!this.settings.advancedMode || !platformSettings.useCustomFields) &&
+        this.view.supports('game', [dest])
       );
     });
   }
@@ -111,24 +104,27 @@ export default class GameSelector extends TsxComponent<Props> {
 
   @Debounce(500)
   private async searchGames(searchStr: string) {
+    // search games for target platforms
     const gameList = flatten(
       await Promise.all(
-        this.targetPlatforms.map(platform => getPlatformService(platform).searchGames(searchStr)),
+        this.targetPlatforms.map(platform =>
+          (getPlatformService(platform) as IPlatformCapabilityGame).searchGames(searchStr),
+        ),
       ),
     );
 
+    // create options for the selector
     this.gameOptions = gameList
       .filter(game => game)
       .map(game => {
         const platform = game['_id'] ? 'twitch' : 'facebook';
         return this.createGameOption(platform, game.name);
       });
-
     this.gameOptions = sortBy(this.gameOptions, 'title');
+
+    // selected options should always be in the list
     this.addSelectedOptionsToList();
     this.searchingGames = false;
-
-    console.log('loaded', this.gameOptions);
   }
 
   private get gameMetadata() {
@@ -137,7 +133,7 @@ export default class GameSelector extends TsxComponent<Props> {
       name: 'game',
       placeholder: $t('Start typing to search'),
       // we should filter game list for the case when we disabled one of platform but still store search results for it
-      options: this.gameOptions.filter(game => this.targetPlatforms.includes(game.data.platform)),
+      options: this.gameOptions.filter(game => this.targetPlatforms.includes(game.data!.platform)),
       loading: this.searchingGames,
       internalSearch: false,
       allowEmpty: true,
@@ -160,7 +156,9 @@ export default class GameSelector extends TsxComponent<Props> {
    * sync game selector with the stream settings
    */
   private onInputHandler(values: string[]) {
-    const options = values.map(value => this.gameOptions.find(opt => opt.value === value));
+    const options = values.map(value =>
+      this.gameOptions.find(opt => opt.value === value),
+    ) as TGameOption[];
     const targetPlatforms = this.targetPlatforms;
     const isMultiplatformMode = targetPlatforms.length > 1;
 
@@ -168,18 +166,18 @@ export default class GameSelector extends TsxComponent<Props> {
     if (this.lastSelectedOption) {
       const itemToRemoveInd = options.findIndex(
         opt =>
-          this.lastSelectedOption.value !== opt.value &&
-          opt.data.platform === this.lastSelectedOption.data.platform,
+          this.lastSelectedOption!.value !== opt.value &&
+          opt.data!.platform === this.lastSelectedOption!.data!.platform,
       );
       if (itemToRemoveInd !== -1) options.splice(itemToRemoveInd, 1);
-      this.lastSelectedOption = null;
+      this.lastSelectedOption = undefined;
     }
 
     // update game for platforms
     targetPlatforms.forEach(platform => {
-      const option = options.find(opt => opt?.data.platform === platform);
+      const option = options.find(opt => opt.data!.platform === platform);
       if (option) {
-        this.$set(this.settings.destinations[platform], 'game', option.data.game);
+        this.$set(this.settings.destinations[platform], 'game', option.data!.game);
         return;
       }
       this.$set(this.settings.destinations[platform], 'game', '');
@@ -192,6 +190,7 @@ export default class GameSelector extends TsxComponent<Props> {
   }
 
   render() {
+    // use TagsInput for a multiplatform mode and ListInput for a single platform mode
     return this.targetPlatforms.length > 1 ? (
       <TagsInput
         ref="tagsInput"

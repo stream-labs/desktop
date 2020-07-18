@@ -1,15 +1,11 @@
 import { StatefulService } from 'services';
 import { Inject, mutation, InitAfter } from 'services/core';
 import { HostsService } from 'services/hosts';
-import { getPlatformService, TPlatform, TStartStreamOptions } from 'services/platforms';
-import { ITwitchStartStreamOptions } from 'services/platforms/twitch';
+import { getPlatformService, TPlatform } from 'services/platforms';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { UserService } from 'services/user';
 import { authorizedHeaders } from 'util/requests';
-import Vue from 'vue';
-import { IFacebookStartStreamOptions } from './platforms/facebook';
-import { IncrementalRolloutService, EAvailableFeatures } from './incremental-rollout';
-import Utils from './utils';
+import { IncrementalRolloutService } from './incremental-rollout';
 import electron from 'electron';
 import { StreamingService } from './streaming';
 
@@ -20,15 +16,19 @@ interface IRestreamTarget {
 }
 
 interface IRestreamState {
-  enabled: boolean;
-}
-
-interface IUserSettingsResponse {
   /**
    * Whether this user has restream enabled
    */
   enabled: boolean;
 
+  /**
+   * if true then user obtained the restream feature before it became a prime-only feature
+   * Restream should be available without Prime for such users
+   */
+  grandfathered: boolean;
+}
+
+interface IUserSettingsResponse extends IRestreamState {
   streamKey: string;
 }
 
@@ -44,6 +44,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
   static initialState: IRestreamState = {
     enabled: true,
+    grandfathered: false,
   };
 
   get streamInfo() {
@@ -55,15 +56,10 @@ export class RestreamService extends StatefulService<IRestreamState> {
     this.state.enabled = enabled;
   }
 
-  // @mutation()
-  // private UNSTAGE_PLATFORMS() {
-  //   this.state.platforms = {};
-  // }
-  //
-  // @mutation()
-  // private STAGE_PLATFORM(platform: TPlatform, options: TStartStreamOptions, streamKey: string) {
-  //   Vue.set(this.state.platforms, platform, { options, streamKey });
-  // }
+  @mutation()
+  private SET_GRANDFATHERED(enabled: boolean) {
+    this.state.grandfathered = enabled;
+  }
 
   init() {
     this.userService.userLogin.subscribe(() => this.loadUserSettings());
@@ -75,6 +71,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
   async loadUserSettings() {
     this.settings = await this.fetchUserSettings();
+    this.SET_GRANDFATHERED(this.settings.grandfathered);
     this.SET_ENABLED(this.settings.enabled && this.canEnableRestream);
   }
 
@@ -83,13 +80,13 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   /**
-   * This determines whether the user sees the restream toggle in settings
+   * This determines whether the user can enable restream
    * Requirements:
-   * - Logged in with Twitch
-   * - Rolled out to
+   * - Has prime, or
+   * - Has a grandfathered status enabled
    */
   get canEnableRestream() {
-    return !!this.userService.state.auth;
+    return this.userService.isPrime || (this.userService.state.auth && this.state.grandfathered);
   }
 
   get chatUrl() {
@@ -147,23 +144,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
   get platforms(): TPlatform[] {
     return [this.userService.state.auth.primaryPlatform, 'facebook'];
   }
-
-  // /**
-  //  * Stages a platform for restreaming, which means it will have a target
-  //  * created when `setupRestreamTargets` is called.
-  //  * @param platform The platform to stage
-  //  * @param options The go-live info/options
-  //  */
-  // async stagePlatform(platform: TPlatform, options: TStartStreamOptions) {
-  //   const service = getPlatformService(platform);
-  //   const streamKey = await service.beforeGoLive(options);
-  //
-  //   this.STAGE_PLATFORM(platform, options, streamKey);
-  // }
-
-  // unstageAllPlatforms() {
-  //   this.UNSTAGE_PLATFORMS();
-  // }
 
   async beforeGoLive() {
     await Promise.all([this.setupIngest(), this.setupTargets()]);

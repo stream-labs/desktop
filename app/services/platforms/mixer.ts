@@ -51,7 +51,6 @@ export class MixerService extends BasePlatformService<IMixerServiceState>
   @Inject() private customizationService: CustomizationService;
 
   readonly capabilities = new Set<TPlatformCapability>(['chat']);
-  channelInfoChanged = new Subject<IMixerChannelInfo>();
   private activeChannel: IMixerChannelInfo;
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
@@ -89,30 +88,21 @@ export class MixerService extends BasePlatformService<IMixerServiceState>
   }
 
   get oauthToken() {
-    return this.userService.state.auth.platforms.mixer?.token;
+    return this.userService.state.auth?.platforms?.mixer?.token;
   }
 
   get mixerUsername() {
-    return this.userService.state.auth.platforms.mixer?.username;
-  }
-
-  get mixerId() {
-    return this.userService.state.auth.platforms.mixer?.id;
+    return this.userService.state.auth?.platforms?.mixer?.username;
   }
 
   get channelId() {
-    return this.userService.state.auth.platforms.mixer?.channelId;
+    return this.userService.state.auth?.platforms?.mixer?.channelId;
   }
 
   init() {
     // prepopulate data to make chat available after app start
     this.userService.userLogin.subscribe(_ => {
       if (this.userService.platform?.type === 'mixer') this.prepopulateInfo();
-    });
-
-    // trigger `channelInfoChanged` event with new "chatUrl" based on the changed theme
-    this.customizationService.settingsChanged.subscribe(updatedSettings => {
-      if (updatedSettings.theme) this.updateActiveChannel({});
     });
   }
 
@@ -172,10 +162,6 @@ export class MixerService extends BasePlatformService<IMixerServiceState>
     return this.fetchRawChannelInfo().then(json => `${json.id}-${json.streamKey}`);
   }
 
-  getStreamFields(): Dictionary<IInputMetadata> {
-    return {};
-  }
-
   /**
    * obtain channel info for the GoLive window
    */
@@ -187,28 +173,12 @@ export class MixerService extends BasePlatformService<IMixerServiceState>
       gameTitle = json.type.name;
     }
 
-    this.updateActiveChannel({
-      channelId: json.id,
+    this.SET_STREAM_SETTINGS({
       title: json.name,
       game: gameTitle,
     });
-
     this.SET_PREPOPULATED(true);
-    return this.activeChannel;
-  }
-
-  /**
-   * update the local info for current channel and emit the "channelInfoChanged" event
-   */
-  private updateActiveChannel(patch: Partial<IMixerChannelInfo>) {
-    if (!this.activeChannel) this.activeChannel = {} as IMixerChannelInfo;
-    const channelId = patch.channelId || this.activeChannel.channelId;
-    this.activeChannel = {
-      ...this.activeChannel,
-      ...patch,
-    };
-    this.SET_STREAM_PAGE_URL(`https://mixer.com/${this.mixerUsername}`);
-    this.channelInfoChanged.next(this.activeChannel);
+    return this.state.settings;
   }
 
   fetchViewerCount(): Promise<number> {
@@ -230,7 +200,6 @@ export class MixerService extends BasePlatformService<IMixerServiceState>
       method: 'PATCH',
       body: JSON.stringify(data),
     });
-    this.updateActiveChannel({ title, game });
     return true;
   }
 
@@ -248,6 +217,10 @@ export class MixerService extends BasePlatformService<IMixerServiceState>
 
   get chatUrl(): string {
     return `https://mixer.com/embed/chat/${this.channelId}`;
+  }
+
+  get streamPageUrl(): string {
+    return `https://mixer.com/${this.mixerUsername}`;
   }
 
   async beforeGoLive(settings?: IGoLiveSettings) {

@@ -8,6 +8,9 @@ const errorTypes = {
   FACEBOOK_HAS_NO_PAGES: {
     message: 'Facebook pages have not been found',
   },
+  TWITCH_MISSED_OAUTH_SCOPE: {
+    message: 'Missing required oauth scope',
+  },
   PREPOPULATE_FAILED: {
     message: 'Failed to fetch platform settings',
   },
@@ -20,6 +23,9 @@ const errorTypes = {
   },
   RESTREAM_SETUP_FAILED: {
     message: 'Failed to setup the Restream',
+  },
+  YOUTUBE_STREAMING_DISABLED: {
+    message: 'YouTube account not enabled for live streaming',
   },
   YOUTUBE_PUBLISH_FAILED: {
     message: 'Failed to publish the Youtube broadcast',
@@ -39,7 +45,7 @@ export interface IStreamError {
 }
 
 export class StreamError extends Error {
-  public platform: TPlatform;
+  public platform?: TPlatform;
   public type: TStreamErrorType;
   public details: string;
   /**
@@ -57,23 +63,19 @@ export class StreamError extends Error {
   constructor(
     message: string,
     type: TStreamErrorType,
-    details: string,
-    platform: TPlatform,
-    protector: typeof newCallProtector,
+    details?: string,
+    platform?: TPlatform,
+    protector?: typeof newCallProtector,
   ) {
     super(message);
     this.message = message;
     this.type = type;
-    this.details = details;
+    this.details = details || '';
     this.platform = platform;
     // don't allow to call 'new' outside this file
     if (protector !== newCallProtector) {
       throw new Error('Use createStreamError() instead "new StreamError()"');
     }
-  }
-
-  isDestroyed() {
-    return false;
   }
 }
 
