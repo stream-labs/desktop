@@ -300,7 +300,9 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     this.clients[id] = client;
     this.log(`Id assigned ${id}`);
 
-    if (server.type === 'namedPipe' || this.isLocalClient(client)) {
+    // manual authorization for local clients is not required except for websokets
+    // disabling authorization for local websoket clients introduces a breach where any website can establish connection to the localhost
+    if (server.type === 'namedPipe' || (server.type === 'tcp' && this.isLocalClient(client))) {
       this.authorizeClient(client);
     }
 

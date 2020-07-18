@@ -12,6 +12,8 @@ import { DefaultManager } from 'services/sources/properties-managers/default-man
 import { Subject } from 'rxjs';
 import { isUrl } from '../util/requests';
 
+export const TRANSITION_DURATION_MAX = 2_000_000_000;
+
 export enum ETransitionType {
   Cut = 'cut_transition',
   Fade = 'fade_transition',
@@ -158,11 +160,17 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
 
     obsTransition.set(this.getCurrentTransition().getActiveSource());
     obs.Global.setOutputSource(0, obsTransition);
-    obsTransition.start(transition.duration, this.sceneDuplicate);
+    obsTransition.start(
+      Math.min(transition.duration, TRANSITION_DURATION_MAX),
+      this.sceneDuplicate,
+    );
 
     oldDuplicate.release();
 
-    setTimeout(() => (this.studioModeLocked = false), transition.duration);
+    setTimeout(
+      () => (this.studioModeLocked = false),
+      Math.min(transition.duration, TRANSITION_DURATION_MAX),
+    );
   }
 
   /**
@@ -219,12 +227,12 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     if (sceneAId) {
       obsTransition.set(this.scenesService.views.getScene(sceneAId).getObsScene());
       obs.Global.setOutputSource(0, obsTransition);
-      obsTransition.start(transition.duration, obsScene);
+      obsTransition.start(Math.min(transition.duration, TRANSITION_DURATION_MAX), obsScene);
     } else {
       const defaultTransition = obs.TransitionFactory.create(ETransitionType.Cut, uuid());
       defaultTransition.set(obsScene);
       obs.Global.setOutputSource(0, defaultTransition);
-      obsTransition.start(transition.duration, obsScene);
+      obsTransition.start(Math.min(transition.duration, TRANSITION_DURATION_MAX), obsScene);
       defaultTransition.release();
     }
   }

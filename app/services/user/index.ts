@@ -1,9 +1,8 @@
 import Vue from 'vue';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
-import { Inject } from 'services/core/injector';
 import { handleResponse, authorizedHeaders } from 'util/requests';
 import { mutation } from 'services/core/stateful-service';
-import { Service } from 'services/core';
+import { Service, Inject, ViewHandler } from 'services/core';
 import electron from 'electron';
 import { HostsService } from 'services/hosts';
 import {
@@ -82,6 +81,30 @@ export function setSentryContext(ctx: ISentryContext) {
 
   if (Utils.isWorkerWindow()) {
     obs.NodeObs.SetUsername(ctx.username);
+  }
+}
+
+class UserViews extends ViewHandler<IUserServiceState> {
+  get isLoggedIn() {
+    return !!(this.state.auth && this.state.auth.widgetToken && this.state.loginValidated);
+  }
+
+  get isPrime() {
+    return this.state.isPrime;
+  }
+
+  get platform() {
+    if (this.isLoggedIn) {
+      return this.state.auth.platforms[this.state.auth.primaryPlatform];
+    }
+  }
+
+  get isTwitchAuthed() {
+    return this.isLoggedIn && this.platform.type === 'twitch';
+  }
+
+  get isFacebookAuthed() {
+    return this.isLoggedIn && this.platform.type === 'facebook';
   }
 }
 
@@ -185,6 +208,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.MIGRATE_AUTH();
     this.VALIDATE_LOGIN(false);
     this.SET_AUTH_STATE(EAuthProcessState.Idle);
+  }
+
+  get views() {
+    return new UserViews(this.state);
   }
 
   mounted() {

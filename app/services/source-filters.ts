@@ -128,6 +128,8 @@ export class SourceFiltersService extends Service {
   getTypesForSource(sourceId: string): ISourceFilterType[] {
     const source = this.sourcesService.views.getSource(sourceId);
     return this.getTypes().filter(filterType => {
+      if (filterType.type === 'face_mask_filter') return false;
+
       /* Audio filters can be applied to audio sources. */
       if (source.audio && filterType.audio) {
         return true;

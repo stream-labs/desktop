@@ -32,6 +32,7 @@ import { PlatformAppsService } from 'services/platform-apps';
 import { HardwareService, DefaultHardwareService } from 'services/hardware';
 import { AudioService } from '../audio';
 import { ReplayManager } from './properties-managers/replay-manager';
+import { assertIsDefined } from 'util/properties-type-guards';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -128,6 +129,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
     name: string;
     type: TSourceType;
     configurable: boolean;
+    width: number;
+    height: number;
     channel?: number;
     isTemporary?: boolean;
     propertiesManagerType?: TPropertiesManager;
@@ -149,8 +152,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
       configurable: addOptions.configurable,
 
       // Unscaled width and height
-      width: 0,
-      height: 0,
+      width: addOptions.width,
+      height: addOptions.height,
 
       muted: false,
       channel: addOptions.channel,
@@ -206,6 +209,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
       id,
       name,
       type,
+      width: obsInput.width,
+      height: obsInput.height,
       configurable: obsInput.configurable,
       channel: options.channel,
       isTemporary: options.isTemporary,
@@ -450,35 +455,17 @@ export class SourcesService extends StatefulService<ISourcesState> {
     const propertiesManagerType = source.getPropertiesManagerType();
     const isWidget = propertiesManagerType === 'widget';
 
-    // show a custom component for widgets below
-    const widgetsWhitelist = [
-      WidgetType.BitGoal,
-      WidgetType.DonationGoal,
-      WidgetType.FollowerGoal,
-      WidgetType.StarsGoal,
-      WidgetType.SupporterGoal,
-      WidgetType.ChatBox,
-      WidgetType.ViewerCount,
-      WidgetType.DonationTicker,
-      WidgetType.Credits,
-      WidgetType.EventList,
-      WidgetType.StreamBoss,
-      WidgetType.TipJar,
-      WidgetType.SubGoal,
-      WidgetType.MediaShare,
-      WidgetType.SponsorBanner,
-      WidgetType.AlertBox,
-      WidgetType.SpinWheel,
-    ];
-
     if (isWidget && this.userService.isLoggedIn) {
+      const platform = this.userService.views.platform;
+      assertIsDefined(platform);
       const widgetType = source.getPropertiesManagerSettings().widgetType;
-      if (widgetsWhitelist.includes(widgetType)) {
-        const componentName = this.widgetsService.getWidgetComponent(widgetType);
-
+      const componentName = this.widgetsService.getWidgetComponent(widgetType);
+      if (componentName) {
         this.windowsService.showWindow({
           componentName,
-          title: $t('Settings for ') + WidgetDisplayData()[widgetType].name,
+          title: $t('Settings for %{sourceName}', {
+            sourceName: WidgetDisplayData(platform.type)[widgetType].name,
+          }),
           queryParams: { sourceId },
           size: {
             width: 920,

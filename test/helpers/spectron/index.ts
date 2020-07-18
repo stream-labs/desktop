@@ -220,9 +220,10 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       if (options.skipOnboarding) {
         await t.context.app.client.click('span=Skip');
         await t.context.app.client.click('h2=Start Fresh');
-        await t.context.app.client.click('p=Skip');
-        if (await t.context.app.client.isVisible('p=Skip')) {
-          await t.context.app.client.click('p=Skip');
+        await t.context.app.client.click('button=Skip');
+        await t.context.app.client.click('button=Skip');
+        if (await t.context.app.client.isVisible('button=Skip')) {
+          await t.context.app.client.click('button=Skip');
         }
       } else {
         // Wait for the connect screen before moving on

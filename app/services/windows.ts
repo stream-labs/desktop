@@ -48,6 +48,7 @@ import DonationGoal from 'components/widgets/goal/DonationGoal.vue';
 import SubGoal from 'components/widgets/goal/SubGoal.vue';
 import StarsGoal from 'components/widgets/goal/StarsGoal.vue';
 import SupporterGoal from 'components/widgets/goal/SupporterGoal.vue';
+import SubscriberGoal from 'components/widgets/goal/SubscriberGoal';
 import ChatBox from 'components/widgets/ChatBox.vue';
 import FollowerGoal from 'components/widgets/goal/FollowerGoal.vue';
 import ViewerCount from 'components/widgets/ViewerCount.vue';
@@ -105,6 +106,7 @@ export function getComponents() {
     FollowerGoal,
     StarsGoal,
     SupporterGoal,
+    SubscriberGoal,
     ChatBox,
     ViewerCount,
     DonationTicker,
@@ -246,11 +248,13 @@ export class WindowsService extends StatefulService<IWindowsState> {
       }
     }
 
+    this.centerChildWindow(options);
+  }
+
+  centerChildWindow(options: Partial<IWindowOptions>) {
     const mainWindow = this.windows.main;
     const childWindow = this.windows.child;
-
-    // Set position of the child window on the main window
-
+    this.updateChildWindowOptions(options);
     // For some unknown reason, electron sometimes gets into a
     // weird state where this will always fail.  Instead, we
     // should recover by simply setting the size and forgetting
@@ -261,7 +265,6 @@ export class WindowsService extends StatefulService<IWindowsState> {
       const childX = bounds.width / 2 - options.size.width / 2;
       const childY = bounds.y + bounds.height / 2 - options.size.height / 2;
 
-      this.updateChildWindowOptions({ ...options, isShown: true });
       childWindow.setMinimumSize(options.size.width, options.size.height);
       if (options.center) {
         childWindow.setBounds({
@@ -298,7 +301,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       };
 
       ipcRenderer.send('window-showChildWindow', options);
-      this.updateChildWindowOptions(options);
+      this.centerChildWindow(options);
       return;
     }
 
@@ -447,7 +450,6 @@ export class WindowsService extends StatefulService<IWindowsState> {
       // restrict saving history only for 1 window before
       delete newOptions.prevWindowOptions.prevWindowOptions;
     }
-
     this.SET_CHILD_WINDOW_OPTIONS(newOptions);
     this.windowUpdated.next({ windowId: 'child', options: newOptions });
   }
