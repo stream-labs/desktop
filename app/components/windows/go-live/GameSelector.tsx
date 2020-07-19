@@ -156,9 +156,9 @@ export default class GameSelector extends TsxComponent<Props> {
    * sync game selector with the stream settings
    */
   private onInputHandler(values: string[]) {
-    const options = values.map(value =>
-      this.gameOptions.find(opt => opt.value === value),
-    ) as TGameOption[];
+    const options = values
+      .filter(val => val)
+      .map(value => this.gameOptions.find(opt => opt.value === value)) as TGameOption[];
     const targetPlatforms = this.targetPlatforms;
     const isMultiplatformMode = targetPlatforms.length > 1;
 
