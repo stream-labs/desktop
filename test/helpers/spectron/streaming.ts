@@ -97,11 +97,15 @@ export async function scheduleStream(
   await focusMain(t);
   await click(t, 'button .icon-date');
   await focusChild(t);
+
+  // wait fields to be shown
+  await app.client.waitForVisible('[data-name=title]');
+
   await fillForm(t, null, {
     ...channelInfo,
     date: moment(date).format('MM/DD/YYYY'),
   });
-  await click(t, 'button=Schedule');
+  await click(t, 'button=Done');
 
   // the success message should be shown
   await app.client.waitForVisible('.toast-success', 20000);

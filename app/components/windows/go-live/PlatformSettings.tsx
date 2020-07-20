@@ -4,29 +4,33 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core';
 import { UserService } from 'services/user';
 import { getPlatformService, TPlatform } from 'services/platforms';
-import YoutubeEditStreamInfo from 'components/windows/go-live/platforms/youtube/YoutubeEditStreamInfo';
-import CommonPlatformFields from 'components/windows/go-live/CommonPlatformFields';
-import TwitchEditStreamInfo from './platforms/TwitchEditStreamInfo';
-import FacebookEditStreamInfo from './platforms/FacebookEditStreamInfo';
-import MixerEditStreamInfo from './platforms/MixerEditStreamInfo';
 import { IGoLiveSettings, StreamingService } from 'services/streaming';
 import { Spinner } from 'streamlabs-beaker';
-import { StreamSettingsService } from 'services/settings/streaming';
+import { StreamSettingsService } from '../../../services/settings/streaming';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import GoLiveError from './GoLiveError';
-import { SyncWithValue } from 'services/app/app-decorators';
+import { SyncWithValue } from '../../../services/app/app-decorators';
+import CommonPlatformFields from './CommonPlatformFields';
+import TwitchEditStreamInfo from './platforms/TwitchEditStreamInfo';
+import FacebookEditStreamInfo from './platforms/FacebookEditStreamInfo';
+import YoutubeEditStreamInfo from './platforms/youtube/YoutubeEditStreamInfo';
+import MixerEditStreamInfo from './platforms/MixerEditStreamInfo';
 import Section from './Section';
 
+class Props {
+  isScheduleMode?: boolean = false;
+}
 /**
- * Renders a form with stream settings for each enabled platform
+ * Renders the form with stream settings for each enabled platform
  **/
-@Component({})
-// TODO: remove
-export default class PlatformSettings extends TsxComponent<{ onInput?: any }> {
+@Component({ props: createProps(Props) })
+export default class PlatformSettings extends TsxComponent<Props> {
   @Inject() private streamingService: StreamingService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private userService: UserService;
-  @SyncWithValue() private settings: IGoLiveSettings;
+
+  @SyncWithValue()
+  private settings: IGoLiveSettings = null;
 
   private get view() {
     return this.streamingService.views;
@@ -83,7 +87,9 @@ export default class PlatformSettings extends TsxComponent<{ onInput?: any }> {
       <Section title={title} isSimpleMode={!isAdvancedMode}>
         {platform === 'twitch' && <TwitchEditStreamInfo vModel={this.settings} />}
         {platform === 'facebook' && <FacebookEditStreamInfo vModel={this.settings} />}
-        {platform === 'youtube' && <YoutubeEditStreamInfo vModel={this.settings} />}
+        {platform === 'youtube' && (
+          <YoutubeEditStreamInfo vModel={this.settings} showEvents={!this.props.isScheduleMode} />
+        )}
         {platform === 'mixer' && <MixerEditStreamInfo vModel={this.settings} />}
       </Section>
     );
