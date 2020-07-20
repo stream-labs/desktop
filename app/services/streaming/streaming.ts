@@ -182,7 +182,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           primeRequired = true;
         }
         if (primeRequired) {
-          this.SET_ERROR('PRIME_REQUIRED', null, platform);
+          this.SET_ERROR('PRIME_REQUIRED', undefined, platform);
           this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
           return;
         }

@@ -170,7 +170,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       const pickedFields: (keyof IPlatformFlags)[] = ['enabled', 'useCustomFields'];
       const platforms: Dictionary<IPlatformFlags> = {};
       Object.keys(settingsPatch.platforms).map(
-        platform => (platforms[platform] = pick(settingsPatch.platforms[platform], pickedFields)),
+        platform => (platforms[platform] = pick(settingsPatch.platforms![platform], pickedFields)),
       );
       patch.platforms = platforms as ISavedGoLiveSettings['platforms'];
     }
