@@ -261,8 +261,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     // about the bounds.
     try {
       const bounds = mainWindow.getBounds();
-      // place the child window on the center of the main window if "position" is not provided
-      const childX = bounds.width / 2 - options.size.width / 2;
+      const childX = bounds.x + bounds.width / 2 - options.size.width / 2;
       const childY = bounds.y + bounds.height / 2 - options.size.height / 2;
 
       childWindow.setMinimumSize(options.size.width, options.size.height);
