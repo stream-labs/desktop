@@ -180,5 +180,6 @@
   "Toggle Selective Recording": "Включить/выключить выборочную запись",
   "Size": "Размер",
   "Position": "Положение",
-  "JACK Input Client": "JACK Input Client"
+  "JACK Input Client": "JACK Input Client",
+  "Motion": "Motion"
 }
