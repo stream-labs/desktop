@@ -180,10 +180,10 @@ export class AppService extends StatefulService<IAppState> {
     this.START_LOADING();
     this.loadingChanged.next(true);
     this.tcpServerService.stopListening();
-    obs.NodeObs.StopCrashHandler();
-    this.crashReporterService.beginShutdown();
 
     window.setTimeout(async () => {
+      obs.NodeObs.StopCrashHandler();
+      this.crashReporterService.beginShutdown();
       this.shutdownStarted.next();
       this.keyListenerService.shutdown();
       this.platformAppsService.unloadAllApps();
