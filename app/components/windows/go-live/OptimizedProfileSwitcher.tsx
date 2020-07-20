@@ -26,7 +26,7 @@ export class OptimizedProfileSwitcher extends TsxComponent<Props> {
   @SyncWithValue() private selectedProfile: IEncoderProfile;
 
   get game() {
-    return this.props.settings.destinations.twitch?.game || '';
+    return this.props.settings.platforms.twitch?.game || '';
   }
 
   // if game is changed we should load a new profile

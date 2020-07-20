@@ -9,8 +9,8 @@ export default abstract class BaseEditStreamInfo<Props> extends TsxComponent<Pro
   protected abstract settings: IStreamSettings;
 
   get enabledPlatforms(): TPlatform[] {
-    const platforms = Object.keys(this.settings.destinations) as TPlatform[];
-    return platforms.filter(platform => this.settings.destinations[platform].enabled);
+    const platforms = Object.keys(this.settings.platforms) as TPlatform[];
+    return platforms.filter(platform => this.settings.platforms[platform].enabled);
   }
 
   /**

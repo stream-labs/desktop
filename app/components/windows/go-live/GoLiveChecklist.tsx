@@ -70,7 +70,7 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
     const checklist = this.view.info.checklist;
     const { isMutliplatformMode, goLiveSettings } = this.view;
     const isUpdateMode = this.props.isUpdateMode;
-    const shouldPublishYT = !isUpdateMode && goLiveSettings.destinations.youtube?.enabled;
+    const shouldPublishYT = !isUpdateMode && goLiveSettings.platforms.youtube?.enabled;
     const shouldShowOptimizedProfile =
       this.videoEncodingOptimizationService.state.useOptimizedProfile && !isUpdateMode;
     const shouldPostTweet =

@@ -230,7 +230,7 @@ export class MixerService extends BasePlatformService<IMixerServiceState>
       this.streamSettingsService.setSettings({ key, platform: 'mixer', streamType: 'rtmp_common' });
     }
 
-    if (settings) await this.putChannelInfo(settings.destinations.mixer);
+    if (settings) await this.putChannelInfo(settings.platforms.mixer);
     this.SET_STREAM_KEY(key);
   }
 

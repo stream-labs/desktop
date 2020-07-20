@@ -52,9 +52,9 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
    */
   get enabledPlatforms(): TPlatform[] {
     const goLiveSettings = this.goLiveSettings;
-    return Object.keys(goLiveSettings.destinations).filter(
+    return Object.keys(goLiveSettings.platforms).filter(
       (platform: TPlatform) =>
-        this.linkedPlatforms.includes(platform) && goLiveSettings.destinations[platform].enabled,
+        this.linkedPlatforms.includes(platform) && goLiveSettings.platforms[platform].enabled,
     ) as TPlatform[];
   }
 
@@ -96,7 +96,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     });
 
     return {
-      destinations: destinations as IGoLiveSettings['destinations'],
+      platforms: destinations as IGoLiveSettings['platforms'],
       advancedMode: !!this.streamSettingsService.state.goLiveSettings?.advancedMode,
       optimizedProfile: undefined,
       tweetText: '',
@@ -112,10 +112,10 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
       description: '',
       game: '',
     };
-    const destinations = Object.keys(settings.destinations) as TPlatform[];
-    const enabledDestinations = destinations.filter(dest => settings.destinations[dest].enabled);
+    const destinations = Object.keys(settings.platforms) as TPlatform[];
+    const enabledDestinations = destinations.filter(dest => settings.platforms[dest].enabled);
     const destinationsWithCommonSettings = enabledDestinations.filter(
-      dest => !settings.destinations[dest].useCustomFields,
+      dest => !settings.platforms[dest].useCustomFields,
     );
     const destinationWithCustomSettings = difference(
       enabledDestinations,
@@ -124,7 +124,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
 
     // search fields in platforms that don't use custom settings first
     destinationsWithCommonSettings.forEach(platform => {
-      const destSettings = settings.destinations[platform];
+      const destSettings = settings.platforms[platform];
       Object.keys(commonFields).forEach(fieldName => {
         if (commonFields[fieldName] || !destSettings[fieldName]) return;
         commonFields[fieldName] = destSettings[fieldName];
@@ -133,7 +133,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
 
     // search fields in platforms that have custom fields
     destinationWithCustomSettings.forEach(platform => {
-      const destSettings = settings.destinations[platform];
+      const destSettings = settings.platforms[platform];
       Object.keys(commonFields).forEach(fieldName => {
         if (commonFields[fieldName] || !destSettings[fieldName]) return;
         commonFields[fieldName] = destSettings[fieldName];
@@ -199,9 +199,9 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
    * Validates settings and returns an error string
    */
   validateSettings<T extends IStreamSettings>(settings: T): string {
-    const platforms = Object.keys(settings.destinations) as TPlatform[];
+    const platforms = Object.keys(settings.platforms) as TPlatform[];
     for (const platform of platforms) {
-      const platformSettings = settings.destinations[platform];
+      const platformSettings = settings.platforms[platform];
       if (!platformSettings.enabled) continue;
       const platformName = getPlatformService(platform).displayName;
       if (platform === 'twitch' || platform === 'facebook') {
@@ -218,7 +218,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
    */
   private getPlatformSettings(platform: TPlatform) {
     const service = getPlatformService(platform);
-    const savedDestinations = this.streamSettingsService.state.goLiveSettings?.destinations;
+    const savedDestinations = this.streamSettingsService.state.goLiveSettings?.platforms;
     const { enabled, useCustomFields } = (savedDestinations && savedDestinations[platform]) || {
       enabled: false,
       useCustomFields: false,

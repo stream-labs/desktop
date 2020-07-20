@@ -52,7 +52,7 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
 
   onSelectBroadcastHandler() {
     // set title and description fields from selected broadcast
-    const ytSettings = this.settings.destinations.youtube;
+    const ytSettings = this.settings.platforms.youtube;
     const selectedBroadcast = this.broadcasts.find(
       broadcast => broadcast.id === ytSettings.broadcastId,
     );
@@ -81,7 +81,7 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
             <HFormGroup title={$t('Event')}>
               <BroadcastInput
                 onInput={this.onSelectBroadcastHandler}
-                vModel={this.settings.destinations.youtube.broadcastId}
+                vModel={this.settings.platforms.youtube.broadcastId}
                 metadata={this.formMetadata.event}
               />
             </HFormGroup>

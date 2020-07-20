@@ -45,7 +45,7 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
   private isLoading = false;
 
   get selectedDestinations(): TPlatform[] {
-    const destinations = this.settings.destinations;
+    const destinations = this.settings.platforms;
     return Object.keys(destinations).filter(dest => destinations[dest].enabled) as TPlatform[];
   }
 
@@ -57,7 +57,7 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
     this.settings.advancedMode = false;
 
     // always have all platforms enabled when show window
-    const destinations = this.settings.destinations;
+    const destinations = this.settings.platforms;
     Object.keys(destinations).forEach((dest: TPlatform) => {
       destinations[dest].enabled = true;
       if (!this.eligiblePlatforms.includes(dest)) delete destinations[dest];
@@ -130,7 +130,7 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
   }
 
   private get isFacebook() {
-    return this.settings.destinations.facebook?.enabled;
+    return this.settings.platforms.facebook?.enabled;
   }
 
   get formMetadata() {
@@ -171,7 +171,7 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
           class="flex"
         >
           <div style={{ width: '400px', marginRight: '42px' }}>
-            <DestinationSwitchers vModel={this.settings.destinations} canDisablePrimary={true} />
+            <DestinationSwitchers vModel={this.settings.platforms} canDisablePrimary={true} />
           </div>
           <div style={{ width: '100%' }}>
             {shouldShowSettings && (

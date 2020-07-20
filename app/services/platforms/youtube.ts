@@ -197,7 +197,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       title,
       description,
       broadcastId,
-    }: IYoutubeStartStreamOptions = settings.destinations.youtube;
+    }: IYoutubeStartStreamOptions = settings.platforms.youtube;
     // update selected LiveBroadcast with new title and description
     // or create a new LiveBroadcast if there are no broadcasts selected
     let broadcast = broadcastId

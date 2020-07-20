@@ -155,7 +155,7 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
       });
     }
 
-    const channelInfo = goLiveSettings?.destinations.twitch;
+    const channelInfo = goLiveSettings?.platforms.twitch;
     if (channelInfo) await this.putChannelInfo(channelInfo);
   }
 

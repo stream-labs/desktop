@@ -53,7 +53,7 @@ export interface IStreamInfo {
 export type TGoLiveChecklistItemState = 'not-started' | 'pending' | 'done' | 'failed';
 
 export interface IStreamSettings {
-  destinations: {
+  platforms: {
     twitch: IPlatformFlags & ITwitchStartStreamOptions;
     youtube: IPlatformFlags & IYoutubeStartStreamOptions;
     facebook: IPlatformFlags & IFacebookStartStreamOptions;

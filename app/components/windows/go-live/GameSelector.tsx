@@ -63,7 +63,7 @@ export default class GameSelector extends TsxComponent<Props> {
   private get selectedOptions(): TGameOption[] {
     const options: TGameOption[] = [];
     this.targetPlatforms.forEach(platform => {
-      const gameName = this.settings.destinations[platform]['game'];
+      const gameName = this.settings.platforms[platform]['game'];
       if (gameName) options.push(this.createGameOption(platform, gameName));
     });
     return options;
@@ -84,9 +84,9 @@ export default class GameSelector extends TsxComponent<Props> {
    */
   private get targetPlatforms(): TPlatform[] {
     if (this.props.platform) return [this.props.platform];
-    const destinations = Object.keys(this.settings.destinations) as TPlatform[];
+    const destinations = Object.keys(this.settings.platforms) as TPlatform[];
     return destinations.filter((dest: TPlatform) => {
-      const platformSettings = this.settings.destinations[dest];
+      const platformSettings = this.settings.platforms[dest];
       return (
         platformSettings.enabled &&
         (!this.settings.advancedMode || !platformSettings.useCustomFields) &&
@@ -177,10 +177,10 @@ export default class GameSelector extends TsxComponent<Props> {
     targetPlatforms.forEach(platform => {
       const option = options.find(opt => opt.data!.platform === platform);
       if (option) {
-        this.$set(this.settings.destinations[platform], 'game', option.data!.game);
+        this.$set(this.settings.platforms[platform], 'game', option.data!.game);
         return;
       }
-      this.$set(this.settings.destinations[platform], 'game', '');
+      this.$set(this.settings.platforms[platform], 'game', '');
     });
 
     // close the game selector if max items has been selected

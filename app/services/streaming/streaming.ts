@@ -276,7 +276,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
 
     // publish the Youtube broadcast
-    if (this.streamSettingsService.protectedModeEnabled && settings.destinations.youtube?.enabled) {
+    if (this.streamSettingsService.protectedModeEnabled && settings.platforms.youtube?.enabled) {
       try {
         await this.runCheck('publishYoutubeBroadcast', () => this.youtubeService.afterGoLive());
       } catch (e) {
@@ -318,7 +318,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const platforms = this.views.enabledPlatforms;
     for (const platform of platforms) {
       const service = getPlatformService(platform);
-      const newSettings = settings.destinations[platform];
+      const newSettings = settings.platforms[platform];
       try {
         await this.runCheck(platform, () => service.putChannelInfo(newSettings));
       } catch (e) {
@@ -338,7 +338,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
    * Schedule stream for eligible platforms
    */
   async scheduleStream(settings: IStreamSettings, time: string) {
-    const destinations = settings.destinations;
+    const destinations = settings.platforms;
     const platforms = (Object.keys(destinations) as TPlatform[]).filter(
       dest => destinations[dest].enabled && this.views.supports('stream-schedule', [dest]),
     );

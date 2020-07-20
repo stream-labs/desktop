@@ -44,7 +44,7 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
 
   private switchPlatform(platform: TPlatform, enabled: boolean) {
     // save settings
-    this.settings.destinations[platform].enabled = enabled;
+    this.settings.platforms[platform].enabled = enabled;
     this.streamSettingsService.setGoLiveSettings(this.settings);
 
     // preload channel data
@@ -78,7 +78,7 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
           <div style={{ width: '400px', marginRight: '42px' }}>
             {/*DESTINATION SWITCHERS*/}
             <DestinationSwitchers
-              value={this.settings.destinations}
+              value={this.settings.platforms}
               title="Stream to %{platformName}"
               canDisablePrimary={false}
               handleOnSwitch={(...args) => this.switchPlatform(...args)}

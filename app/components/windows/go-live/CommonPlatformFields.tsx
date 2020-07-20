@@ -41,7 +41,7 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
   created() {
     this.commonFields = pick(
       this.props.platform
-        ? this.settings.destinations[this.props.platform]
+        ? this.settings.platforms[this.props.platform]
         : this.view.getCommonFields(this.settings),
       ['title', 'description'],
     ) as { title: string; description: string };
@@ -55,8 +55,8 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
   }
 
   private get enabledPlatforms(): TPlatform[] {
-    const platforms = Object.keys(this.settings.destinations) as TPlatform[];
-    return platforms.filter(platform => this.settings.destinations[platform].enabled);
+    const platforms = Object.keys(this.settings.platforms) as TPlatform[];
+    return platforms.filter(platform => this.settings.platforms[platform].enabled);
   }
 
   /**
@@ -64,7 +64,7 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
    **/
   private get platformSettings() {
     if (!this.props.platform) return null;
-    return this.settings.destinations[this.props.platform];
+    return this.settings.platforms[this.props.platform];
   }
 
   /**
@@ -84,7 +84,7 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
     // component in the advanced multiplatform mode
     // return platforms with "useCustomFields=false"
     return this.enabledPlatforms.filter(
-      platform => !this.settings.destinations[platform].useCustomFields,
+      platform => !this.settings.platforms[platform].useCustomFields,
     );
   }
 
@@ -94,7 +94,7 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
   private updateCommonField(fieldName: TCustomFieldName, value: string) {
     this.commonFields[fieldName] = value;
     this.targetPlatforms.forEach(platform => {
-      this.settings.destinations[platform][fieldName] = value;
+      this.settings.platforms[platform][fieldName] = value;
     });
   }
 
@@ -112,17 +112,17 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
       const commonFields = this.view.getCommonFields(this.settings);
       // TODO: figure out how to resolve types
       // @ts-ignore
-      this.settings.destinations[platform] = {
-        ...this.settings.destinations[platform],
+      this.settings.platforms[platform] = {
+        ...this.settings.platforms[platform],
         useCustomFields,
         title: commonFields.title,
       };
       if (this.view.supports('description', [platform])) {
-        this.settings.destinations[platform]['description'] = commonFields.description;
+        this.settings.platforms[platform]['description'] = commonFields.description;
       }
       return;
     }
-    this.settings.destinations[platform].useCustomFields = useCustomFields;
+    this.settings.platforms[platform].useCustomFields = useCustomFields;
   }
 
   private render() {
@@ -137,7 +137,7 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
       : view.supports('description');
     const hasGame = view.supports('game', this.targetPlatforms);
     const fields = isSinglePlatformMode
-      ? this.settings.destinations[this.props.platform as TPlatform]
+      ? this.settings.platforms[this.props.platform as TPlatform]
       : this.commonFields;
 
     // find out the best title for common fields

@@ -41,8 +41,8 @@ export default class PlatformSettings extends TsxComponent<Props> {
   }
 
   private render() {
-    const enabledPlatforms = Object.keys(this.settings.destinations).filter(
-      dest => this.settings.destinations[dest].enabled,
+    const enabledPlatforms = Object.keys(this.settings.platforms).filter(
+      dest => this.settings.platforms[dest].enabled,
     ) as TPlatform[];
 
     // don't render platform settings if platform has not prepopulated the channel data

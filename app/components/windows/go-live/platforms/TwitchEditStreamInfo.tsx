@@ -31,7 +31,7 @@ export default class TwitchEditStreamInfo extends BaseEditSteamInfo<TwitchEditSt
           <TwitchTagsInput
             tags={this.twitchService.state.availableTags}
             hasPermission={this.twitchService.state.hasUpdateTagsPermission}
-            vModel={this.settings.destinations.twitch.tags}
+            vModel={this.settings.platforms.twitch.tags}
             name={'tags'}
           />
         )}

@@ -51,7 +51,7 @@ export default class GoLiveWindow extends TsxComponent<{}> {
   @Watch('view.goLiveSettings')
   private onGoLiveSettingUpdateHandler() {
     // update local settings after settings for platforms have been prepopulated
-    this.settings.destinations = cloneDeep(this.streamingService.views.goLiveSettings.destinations);
+    this.settings.platforms = cloneDeep(this.streamingService.views.goLiveSettings.platforms);
   }
 
   private async switchAdvancedMode(enabled: boolean) {

@@ -326,7 +326,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
 
   async beforeGoLive(options: IGoLiveSettings) {
     await this.prepopulateInfo();
-    await this.putChannelInfo(options.destinations.facebook);
+    await this.putChannelInfo(options.platforms.facebook);
     this.streamSettingsService.setSettings({ platform: 'facebook', streamType: 'rtmp_common' });
 
     // This generally happens when a stream was scheduled, or when we
