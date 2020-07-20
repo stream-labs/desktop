@@ -296,7 +296,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     try {
       const endpoint = 'liveStreams?part=id,snippet&mine=true';
       const url = `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`;
-      await this.requestYoutube(url);
+      await platformAuthorizedRequest('youtube', url);
       this.SET_ENABLED_STATUS(true);
       return EPlatformCallResult.Success;
     } catch (resp) {
