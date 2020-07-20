@@ -180,5 +180,6 @@
   "Toggle Selective Recording": "セレクティブレコーディングを切り替え",
   "Size": "サイズ",
   "Position": "位置",
-  "JACK Input Client": "JACK Input Client"
+  "JACK Input Client": "JACK Input Client",
+  "Motion": "Motion"
 }
