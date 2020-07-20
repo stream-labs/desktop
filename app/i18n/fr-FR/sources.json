@@ -180,5 +180,6 @@
   "Toggle Selective Recording": "Basculer sur Enregistrement sélectif",
   "Size": "Taille",
   "Position": "Position",
-  "JACK Input Client": "JACK Input Client"
+  "JACK Input Client": "JACK Input Client",
+  "Motion": "Motion"
 }
