@@ -258,7 +258,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
     // This method was added in our fork
     (win as any).addBrowserView(this.chatView);
-    console.log('mount restream chat');
   }
 
   setChatBounds(position: IVec2, size: IVec2) {
@@ -279,8 +278,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
     // @ts-ignore: this method was added in our fork
     win.removeBrowserView(this.chatView);
-
-    console.log('unmount restream chat');
   }
 
   private initChat() {

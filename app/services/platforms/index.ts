@@ -145,7 +145,7 @@ export interface IPlatformService {
    */
   beforeGoLive: (options: IGoLiveSettings) => Promise<void>;
 
-  afterGoLive?: () => Promise<void>;
+  afterGoLive: () => Promise<void>;
 
   afterStopStream?: () => Promise<void>;
 

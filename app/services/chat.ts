@@ -20,7 +20,6 @@ export class ChatService extends Service {
   private chatView: Electron.BrowserView | null;
   private chatUrl = '';
   private electronWindowId: number | null;
-  private loadUrlTask: { resolve: (success: boolean) => unknown } | null = null;
 
   init() {
     this.chatUrl = this.streamingService.views.chatUrl;
@@ -223,13 +222,6 @@ export class ChatService extends Service {
         `,
           true,
         );
-      }
-
-      // chat is fully loaded now
-      if (this.loadUrlTask) {
-        this.loadUrlTask.resolve(true);
-        this.loadUrlTask = null;
-        console.log('loaded');
       }
     });
   }
