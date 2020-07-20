@@ -169,7 +169,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         const errorType =
           (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
             ? 'PREPOPULATE_FAILED'
-            : e.type;
+            : e.type || 'UNKNOWN_ERROR';
         this.SET_ERROR(errorType, e.details, platform);
         this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
         return;
@@ -219,7 +219,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         const errorType =
           (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
             ? 'SETTINGS_UPDATE_FAILED'
-            : e.type;
+            : e.type || 'UNKNOWN_ERROR';
         this.setError(errorType, e.details, platform);
         return;
       }

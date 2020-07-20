@@ -212,7 +212,7 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
         ? `${e.result.status} ${e.result.error} ${e.result.message}`
         : 'Connection failed';
       const errorType =
-        e.result.message === 'missing required oauth scope'
+        e.result?.message === 'missing required oauth scope'
           ? 'TWITCH_MISSED_OAUTH_SCOPE'
           : 'PLATFORM_REQUEST_FAILED';
       throwStreamError(errorType, details, 'twitch');

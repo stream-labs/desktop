@@ -33,6 +33,11 @@ const errorTypes = {
   TWEET_FAILED: {
     message: 'Failed to post a tweet',
   },
+  UNKNOWN_ERROR: {
+    // show this error if we caught a runtime error
+    // we should threat this error as a bug in the codebase
+    message: 'Unknown error',
+  },
 };
 export type TStreamErrorType = keyof typeof errorTypes;
 const newCallProtector = Symbol('singleton');
