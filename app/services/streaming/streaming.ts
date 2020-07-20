@@ -890,7 +890,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         );
         if (info.error) {
           showNativeErrorMessage = true;
-          extendedErrorText = errorText + '\n\n' + $t('System error message:"') + info.error + '"';
+          extendedErrorText = errorText + '\n\n' + $t('System error message:') + info.error + '"';
         }
       }
       const buttons = [$t('OK')];
