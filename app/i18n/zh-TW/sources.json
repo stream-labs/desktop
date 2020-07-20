@@ -180,5 +180,6 @@
   "Toggle Selective Recording": "切換可選擇的錄影",
   "Size": "大小",
   "Position": "位置",
-  "JACK Input Client": "JACK Input Client"
+  "JACK Input Client": "JACK Input Client",
+  "Motion": "Motion"
 }
