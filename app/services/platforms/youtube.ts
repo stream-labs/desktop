@@ -221,10 +221,8 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     this.setActiveBroadcast(broadcast);
   }
 
-  async afterGoLive() {
-    super.afterGoLive();
-
-    // we don't have activeChannel if user start stream with the 'just go live' button
+  async publishBroadcast() {
+    // we don't have broadcastId if user start stream with the 'just go live' button
     if (!this.state.settings.broadcastId) return;
 
     const streamId = this.state.streamId;

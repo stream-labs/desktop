@@ -304,11 +304,22 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     // publish the Youtube broadcast
     if (this.streamSettingsService.protectedModeEnabled && settings.platforms.youtube?.enabled) {
       try {
-        await this.runCheck('publishYoutubeBroadcast', () => this.youtubeService.afterGoLive());
+        await this.runCheck('publishYoutubeBroadcast', () =>
+          this.youtubeService.publishBroadcast(),
+        );
       } catch (e) {
         this.setError(e);
         return;
       }
+    }
+
+    // run afterGoLive hooks
+    try {
+      this.views.enabledPlatforms.forEach(platform => {
+        getPlatformService(platform).afterGoLive();
+      });
+    } catch (e) {
+      console.error(e);
     }
 
     // tweet
@@ -634,7 +645,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   showGoLiveWindow() {
-    const height = 750;
+    const height = this.views.linkedPlatforms.length > 1 ? 750 : 600;
     const width = 900;
 
     this.windowsService.showWindow({
