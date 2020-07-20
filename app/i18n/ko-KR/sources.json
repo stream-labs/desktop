@@ -180,5 +180,6 @@
   "Toggle Selective Recording": "선택 녹화 토글",
   "Size": "사이즈",
   "Position": "포지션",
-  "JACK Input Client": "JACK Input Client"
+  "JACK Input Client": "JACK Input Client",
+  "Motion": "Motion"
 }
