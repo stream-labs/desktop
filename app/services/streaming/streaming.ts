@@ -36,7 +36,7 @@ import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService } from 'services/restream';
 import { FacebookService } from 'services/platforms/facebook';
 import Utils from 'services/utils';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isEqual } from 'lodash';
 import { createStreamError, StreamError, TStreamErrorType } from './stream-error';
 import { authorizedHeaders } from 'util/requests';
 import { HostsService } from '../hosts';
@@ -162,6 +162,32 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.UPDATE_STREAM_INFO({ lifecycle: 'prepopulate', error: null });
     for (const platform of platforms) {
       const service = getPlatformService(platform);
+
+      // check eligibility for restream
+      // primary platform is always available to stream into
+      // prime users are eligeble for streaming to any platform
+      let primeRequired = false;
+      if (!this.views.isPrimaryPlatform(platform) && !this.userService.isPrime) {
+        const primaryPlatform = this.userService.state.auth?.primaryPlatform;
+
+        // grandfathared users allowed to stream TW + FB and FB + TW
+        if (!this.restreamService.state.grandfathered) {
+          primeRequired = true;
+        } else if (
+          isEqual([primaryPlatform, platform], ['twitch', 'facebook']) ||
+          isEqual([primaryPlatform, platform], ['facebook', 'twitch'])
+        ) {
+          primeRequired = false;
+        } else {
+          primeRequired = true;
+        }
+        if (primeRequired) {
+          this.SET_ERROR('PRIME_REQUIRED', null, platform);
+          this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
+          return;
+        }
+      }
+
       try {
         await service.prepopulateInfo();
       } catch (e) {

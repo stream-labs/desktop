@@ -61,12 +61,18 @@ export default class GoLiveError extends TsxComponent<{}> {
     this.youtubeService.actions.openYoutubeEnable();
   }
 
+  private enablePrime() {
+    this.userService.actions.openPrimeUrl('slobs-multistream');
+  }
+
   private render() {
     const error = this.view.info.error;
     if (!error) return;
     switch (error.type) {
       case 'PREPOPULATE_FAILED':
         return this.renderPrepopulateError(error);
+      case 'PRIME_REQUIRED':
+        return this.renderPrimeRequiredError(error);
       case 'FACEBOOK_HAS_NO_PAGES':
         return this.renderFacebookNoPagesError(error);
       case 'TWITCH_MISSED_OAUTH_SCOPE':
@@ -111,6 +117,18 @@ export default class GoLiveError extends TsxComponent<{}> {
             ),
           }}
         />
+      </ErrorLayout>
+    );
+  }
+
+  private renderPrimeRequiredError(error: IStreamError) {
+    assertIsDefined(error.platform);
+    const platformName = getPlatformService(error.platform).displayName;
+    return (
+      <ErrorLayout message={$t('Multistream to YouTube is a Prime feature', { platformName })}>
+        <button class="button button--prime" onClick={() => this.enablePrime()}>
+          {$t('Become a Prime member')}
+        </button>
       </ErrorLayout>
     );
   }

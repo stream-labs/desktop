@@ -33,6 +33,9 @@ const errorTypes = {
   TWEET_FAILED: {
     message: 'Failed to post a tweet',
   },
+  PRIME_REQUIRED: {
+    message: 'This feature is for Prime members only',
+  },
   UNKNOWN_ERROR: {
     // show this error if we caught a runtime error
     // we should threat this error as a bug in the codebase
