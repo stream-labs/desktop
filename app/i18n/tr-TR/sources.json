@@ -180,5 +180,6 @@
   "Toggle Selective Recording": "Seçilebilir Kaydı Değiştir",
   "Size": "Boyut",
   "Position": "Konum",
-  "JACK Input Client": "JACK Input Client"
+  "JACK Input Client": "JACK Input Client",
+  "Motion": "Motion"
 }
