@@ -68,7 +68,8 @@ export default class GoLiveError extends TsxComponent<{}> {
   private render() {
     const error = this.view.info.error;
     if (!error) return;
-    switch (error.type) {
+    const type = error.type || 'UNKNOWN_ERROR';
+    switch (type) {
       case 'PREPOPULATE_FAILED':
         return this.renderPrepopulateError(error);
       case 'PRIME_REQUIRED':

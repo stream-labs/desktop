@@ -33,6 +33,12 @@ export default class EditStreamWindow extends TsxComponent<{}> {
 
   private settings: IGoLiveSettings = cloneDeep(this.streamingService.views.goLiveSettings);
 
+  created() {
+    // the streamingService still may keep a error from GoLive flow like a "Post a Tweet" error
+    // reset error for allowing update channel info
+    this.streamingService.actions.resetError();
+  }
+
   private get view() {
     return this.streamingService.views;
   }
