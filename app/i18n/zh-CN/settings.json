@@ -119,5 +119,8 @@
   "You can not change these settings when you're live": "直播时无法更改这些设置",
   "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.": "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.",
   "Change the look of Streamlabs OBS with Prime": "Change the look of Streamlabs OBS with Prime",
-  "Virtual Webcam": "Virtual Webcam"
+  "Virtual Webcam": "Virtual Webcam",
+  "unlinked": "unlinked",
+  "Unlink": "取消链接",
+  "Logged in": "Logged in"
 }
