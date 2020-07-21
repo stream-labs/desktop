@@ -170,12 +170,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       if (!this.views.isPrimaryPlatform(platform) && !this.userService.isPrime) {
         const primaryPlatform = this.userService.state.auth?.primaryPlatform;
 
-        // grandfathared users allowed to stream TW + FB and FB + TW
+        // grandfathared users allowed to stream primary + FB
         if (!this.restreamService.state.grandfathered) {
           primeRequired = true;
         } else if (
           isEqual([primaryPlatform, platform], ['twitch', 'facebook']) ||
-          isEqual([primaryPlatform, platform], ['facebook', 'twitch'])
+          isEqual([primaryPlatform, platform], ['youtube', 'facebook'])
         ) {
           primeRequired = false;
         } else {
