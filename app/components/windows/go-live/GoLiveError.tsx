@@ -122,12 +122,8 @@ export default class GoLiveError extends TsxComponent<{}> {
   }
 
   private renderPrimeRequiredError(error: IStreamError) {
-    assertIsDefined(error.platform);
-    const platformName = getPlatformService(error.platform).displayName;
     return (
-      <ErrorLayout
-        message={$t('Multistreaming to these platforms requires Prime', { platformName })}
-      >
+      <ErrorLayout message={$t('Multistreaming to these platforms requires Prime')}>
         <button class="button button--prime" onClick={() => this.enablePrime()}>
           {$t('Become a Prime member')}
         </button>
