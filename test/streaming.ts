@@ -126,7 +126,9 @@ test('Youtube should show error window if afterStreamStart hook fails', async t 
   // the error window should be shown right after request to YT API fails
   await sleep(2000); // TODO: wait for the child window to be shown instead sleep
   await focusChild(t);
-  await t.context.app.client.waitForVisible('h1=Something went wrong');
+  await t.context.app.client.waitForVisible(
+    'h1=Your stream has started, but there were issues with other actions taken',
+  );
 
   t.pass();
 });

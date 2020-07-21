@@ -68,7 +68,8 @@ export default class GoLiveError extends TsxComponent<{}> {
   private render() {
     const error = this.view.info.error;
     if (!error) return;
-    switch (error.type) {
+    const type = error.type || 'UNKNOWN_ERROR';
+    switch (type) {
       case 'PREPOPULATE_FAILED':
         return this.renderPrepopulateError(error);
       case 'PRIME_REQUIRED':
@@ -122,10 +123,8 @@ export default class GoLiveError extends TsxComponent<{}> {
   }
 
   private renderPrimeRequiredError(error: IStreamError) {
-    assertIsDefined(error.platform);
-    const platformName = getPlatformService(error.platform).displayName;
     return (
-      <ErrorLayout message={$t('Multistream to YouTube is a Prime feature', { platformName })}>
+      <ErrorLayout message={$t('Multistreaming to these platforms requires Prime')}>
         <button class="button button--prime" onClick={() => this.enablePrime()}>
           {$t('Become a Prime member')}
         </button>

@@ -170,12 +170,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       if (!this.views.isPrimaryPlatform(platform) && !this.userService.isPrime) {
         const primaryPlatform = this.userService.state.auth?.primaryPlatform;
 
-        // grandfathared users allowed to stream TW + FB and FB + TW
+        // grandfathared users allowed to stream primary + FB
         if (!this.restreamService.state.grandfathered) {
           primeRequired = true;
         } else if (
           isEqual([primaryPlatform, platform], ['twitch', 'facebook']) ||
-          isEqual([primaryPlatform, platform], ['facebook', 'twitch'])
+          isEqual([primaryPlatform, platform], ['youtube', 'facebook'])
         ) {
           primeRequired = false;
         } else {
@@ -215,8 +215,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
    * Make a transition to Live
    */
   async goLive(newSettings?: IGoLiveSettings, unattendedMode = false) {
-    // just go live in loggedout mode
-    if (!this.userService.isLoggedIn) {
+    // don't interact with API in loged out mode and when protected mode is disabled
+    if (
+      !this.userService.isLoggedIn ||
+      (!this.streamSettingsService.state.protectedModeEnabled &&
+        this.userService.state.auth?.primaryPlatform !== 'twitch') // twitch is a special case
+    ) {
       this.finishStartStreaming();
       return;
     }
@@ -331,6 +335,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       try {
         await this.runCheck('postTweet', () => this.twitterService.postTweet(settings.tweetText));
       } catch (e) {
+        console.error('unable to post a tweet', e);
         this.setError(e);
         return;
       }
@@ -418,7 +423,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   ) {
     if (typeof errorTypeOrError === 'object') {
       // an error object has been passed as a first arg
-      const error = (errorTypeOrError as StreamError).getModel();
+      const error = errorTypeOrError.getModel
+        ? (errorTypeOrError as StreamError).getModel()
+        : errorTypeOrError;
       this.SET_ERROR(error.type, error.details, error.platform);
     } else {
       // an error type has been passed as a first arg
@@ -427,8 +434,16 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
   }
 
+  resetError() {
+    this.RESET_ERROR();
+    if (this.state.info.checklist.startVideoTransmission === 'done') {
+      this.UPDATE_STREAM_INFO({ lifecycle: 'live' });
+    }
+  }
+
   @mutation()
   private SET_ERROR(type: TStreamErrorType, details?: string, platform?: TPlatform) {
+    if (!type) type = 'UNKNOWN_ERROR';
     this.state.info.error = createStreamError(type, details, platform).getModel();
   }
 
