@@ -253,6 +253,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
   mountChat(electronWindowId: number) {
     if (!this.chatView) this.initChat();
+
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
 
     // This method was added in our fork
