@@ -1,6 +1,6 @@
 {
   "Add %{filterName}": "Dodaj %{filterName}",
-  "Center %{sourceName}": "Center %{sourceName}",
+  "Center %{sourceName}": "Wyśrodkuj %{sourceName}",
   "Paste %{nodeName}": "Wklej %{nodeName}",
   "Create a new connection": "Stwórz nowe połączenie",
   "Create %{sourceName}": "Stwórz %{sourceName}",
