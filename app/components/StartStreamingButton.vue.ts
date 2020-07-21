@@ -77,7 +77,7 @@ export default class StartStreamingButton extends Vue {
         if (!goLive) return;
       }
 
-      if (this.shouldShowGoLiveWindow()) {
+      if (this.streamingService.views.shouldShowGoLiveWindow()) {
         this.streamingService.actions.showGoLiveWindow();
       } else {
         this.streamingService.actions.goLive(null, true);
@@ -91,41 +91,6 @@ export default class StartStreamingButton extends Vue {
 
   get streamingStatus() {
     return this.streamingService.state.streamingStatus;
-  }
-
-  shouldShowGoLiveWindow() {
-    if (!this.userService.isLoggedIn) return false;
-
-    if (this.isTwitch) {
-      // For Twitch, we can show the Go Live window even with protected mode off
-      // This is mainly for legacy reasons.
-      return (
-        this.restreamService.shouldGoLiveWithRestream ||
-        this.customizationService.state.updateStreamInfoOnLive
-      );
-    }
-
-    if (this.isMixer) {
-      return (
-        this.streamSettingsService.protectedModeEnabled &&
-        this.customizationService.state.updateStreamInfoOnLive &&
-        this.streamSettingsService.isSafeToModifyStreamKey()
-      );
-    }
-
-    if (this.isFacebook) {
-      return (
-        this.streamSettingsService.protectedModeEnabled &&
-        this.streamSettingsService.isSafeToModifyStreamKey()
-      );
-    }
-
-    if (this.isYoutube) {
-      return (
-        this.streamSettingsService.protectedModeEnabled &&
-        this.streamSettingsService.isSafeToModifyStreamKey()
-      );
-    }
   }
 
   getStreamButtonLabel() {
@@ -158,26 +123,6 @@ export default class StartStreamingButton extends Vue {
 
   getIsRedButton() {
     return this.streamingStatus !== EStreamingState.Offline;
-  }
-
-  get isStreaming() {
-    return this.streamingService.isStreaming;
-  }
-
-  get isFacebook() {
-    return this.userService.isLoggedIn && this.userService.platformType === 'facebook';
-  }
-
-  get isYoutube() {
-    return this.userService.isLoggedIn && this.userService.platformType === 'youtube';
-  }
-
-  get isTwitch() {
-    return this.userService.isLoggedIn && this.userService.platformType === 'twitch';
-  }
-
-  get isMixer() {
-    return this.userService.isLoggedIn && this.userService.platformType === 'mixer';
   }
 
   get isDisabled() {

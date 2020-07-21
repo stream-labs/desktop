@@ -8,6 +8,7 @@ import { VideoEncodingOptimizationService } from '../video-encoding-optimization
 import { getPlatformService, TPlatform, TPlatformCapability } from '../platforms';
 import { $t } from '../i18n';
 import { cloneDeep, difference } from 'lodash';
+import { CustomizationService } from 'services/customization';
 
 /**
  * The stream info view is responsible for keeping
@@ -21,6 +22,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   @Inject() private restreamService: RestreamService;
   @Inject() private twitchService: TwitchService;
   @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
+  @Inject() private customizationService: CustomizationService;
 
   get info() {
     return this.state.info;
@@ -233,5 +235,41 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
       useCustomFields,
       enabled: enabled || this.isPrimaryPlatform(platform),
     };
+  }
+
+  shouldShowGoLiveWindow() {
+    if (!this.userService.isLoggedIn) return false;
+    const primaryPlatform = this.userService.state.auth?.primaryPlatform;
+
+    if (primaryPlatform === 'twitch') {
+      // For Twitch, we can show the Go Live window even with protected mode off
+      // This is mainly for legacy reasons.
+      return (
+        this.restreamService.shouldGoLiveWithRestream ||
+        this.customizationService.state.updateStreamInfoOnLive
+      );
+    }
+
+    if (primaryPlatform === 'mixer') {
+      return (
+        this.streamSettingsService.protectedModeEnabled &&
+        this.customizationService.state.updateStreamInfoOnLive &&
+        this.streamSettingsService.isSafeToModifyStreamKey()
+      );
+    }
+
+    if (primaryPlatform === 'facebook') {
+      return (
+        this.streamSettingsService.protectedModeEnabled &&
+        this.streamSettingsService.isSafeToModifyStreamKey()
+      );
+    }
+
+    if (primaryPlatform === 'youtube') {
+      return (
+        this.streamSettingsService.protectedModeEnabled &&
+        this.streamSettingsService.isSafeToModifyStreamKey()
+      );
+    }
   }
 }

@@ -215,8 +215,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
    * Make a transition to Live
    */
   async goLive(newSettings?: IGoLiveSettings, unattendedMode = false) {
-    // just go live in loggedout mode
-    if (!this.userService.isLoggedIn) {
+    // We should only ever do anything with platform APIs if the user used the go live window
+    if (!this.views.shouldShowGoLiveWindow()) {
       this.finishStartStreaming();
       return;
     }
