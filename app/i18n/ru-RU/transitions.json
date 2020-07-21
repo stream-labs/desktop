@@ -24,7 +24,7 @@
   "This connection is redundant because another connection already connects these scenes.": "Уже есть соединение между этими сценами.",
   "You need at least 2 scenes to edit transitions.": "Для редактирования перехода необходимо хотя бы две сцены.",
   "This scene transition is managed by an App and cannot be edited.": "Этот переход нельзя отредактировать, поскольку он управляется приложением.",
-  "Global Transition": "Global Transition",
-  "Edit": "Edit",
-  "Live": "Live"
+  "Global Transition": "Глобальный переход",
+  "Edit": "Изменить",
+  "Live": "Трансляция"
 }
