@@ -3,7 +3,6 @@ import { Inject } from 'services/core/injector';
 import { Fallback, Singleton } from 'services/api/external-api';
 import { Observable } from 'rxjs';
 import { ISerializable } from 'services/api/rpc-api';
-import * as obs from '../../../../../obs-api';
 
 enum EStreamingState {
   Offline = 'offline',

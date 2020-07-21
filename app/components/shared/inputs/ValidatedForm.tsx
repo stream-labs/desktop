@@ -8,8 +8,19 @@ import { Subject } from 'rxjs';
 import TsxComponent, { createProps } from 'components/tsx-component';
 
 class ValidatedFormProps {
+  /**
+   * name attr for the <form> tag
+   */
   name?: string = '';
+  /**
+   * 'input' event is triggering every time when nested field or nested form is changed
+   */
   onInput?: () => unknown;
+  /**
+   * A custom validation function that will be called after regular validation
+   * Should return `true` for successful validation
+   */
+  handleExtraValidation?: (form: ValidatedForm, errors: ErrorField[]) => boolean = null;
 }
 
 /**
@@ -50,9 +61,10 @@ export default class ValidatedForm extends TsxComponent<ValidatedFormProps> {
   }
 
   /**
-   * validate and show validation messages
+   * Validate form and show validation messages
+   * Returns true if the form is valid
    */
-  async validate() {
+  async validate(): Promise<boolean> {
     // validate the root-level form
     const inputs = this.getInputs();
     for (let i = 0; i < inputs.length; i++) {
@@ -67,6 +79,14 @@ export default class ValidatedForm extends TsxComponent<ValidatedFormProps> {
     this.validated.next(
       this.$validator.errors.items.concat(...nestedForms.map(form => form.$validator.errors.items)),
     );
+
+    const errors = this.$validator.errors.items;
+
+    // execute extra validations if provided
+    if (this.props.handleExtraValidation) {
+      return this.props.handleExtraValidation(this, errors) && !errors.length;
+    }
+    return !errors.length;
   }
 
   async validateAndGetErrors(): Promise<ErrorField[]> {

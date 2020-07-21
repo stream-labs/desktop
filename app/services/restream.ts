@@ -1,16 +1,13 @@
 import { StatefulService } from 'services';
 import { Inject, mutation, InitAfter } from 'services/core';
 import { HostsService } from 'services/hosts';
-import { getPlatformService, TPlatform, TStartStreamOptions } from 'services/platforms';
-import { ITwitchStartStreamOptions } from 'services/platforms/twitch';
+import { getPlatformService, TPlatform } from 'services/platforms';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { UserService } from 'services/user';
 import { authorizedHeaders } from 'util/requests';
-import Vue from 'vue';
-import { IFacebookStartStreamOptions } from './platforms/facebook';
-import { IncrementalRolloutService, EAvailableFeatures } from './incremental-rollout';
-import Utils from './utils';
+import { IncrementalRolloutService } from './incremental-rollout';
 import electron from 'electron';
+import { StreamingService } from './streaming';
 
 interface IRestreamTarget {
   id: number;
@@ -19,29 +16,19 @@ interface IRestreamTarget {
 }
 
 interface IRestreamState {
-  enabled: boolean;
-
-  /**
-   * Only twitch and facebook are currently supported
-   */
-  platforms: {
-    twitch?: {
-      options: ITwitchStartStreamOptions;
-      streamKey: string;
-    };
-    facebook?: {
-      options: IFacebookStartStreamOptions;
-      streamKey: string;
-    };
-  };
-}
-
-interface IUserSettingsResponse {
   /**
    * Whether this user has restream enabled
    */
   enabled: boolean;
 
+  /**
+   * if true then user obtained the restream feature before it became a prime-only feature
+   * Restream should be available without Prime for such users
+   */
+  grandfathered: boolean;
+}
+
+interface IUserSettingsResponse extends IRestreamState {
   streamKey: string;
 }
 
@@ -50,14 +37,19 @@ export class RestreamService extends StatefulService<IRestreamState> {
   @Inject() hostsService: HostsService;
   @Inject() userService: UserService;
   @Inject() streamSettingsService: StreamSettingsService;
+  @Inject() streamingService: StreamingService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
 
   settings: IUserSettingsResponse;
 
   static initialState: IRestreamState = {
     enabled: true,
-    platforms: {},
+    grandfathered: false,
   };
+
+  get streamInfo() {
+    return this.streamingService.views;
+  }
 
   @mutation()
   private SET_ENABLED(enabled: boolean) {
@@ -65,13 +57,8 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   @mutation()
-  private UNSTAGE_PLATFORMS() {
-    this.state.platforms = {};
-  }
-
-  @mutation()
-  private STAGE_PLATFORM(platform: TPlatform, options: TStartStreamOptions, streamKey: string) {
-    Vue.set(this.state.platforms, platform, { options, streamKey });
+  private SET_GRANDFATHERED(enabled: boolean) {
+    this.state.grandfathered = enabled;
   }
 
   init() {
@@ -84,6 +71,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
   async loadUserSettings() {
     this.settings = await this.fetchUserSettings();
+    this.SET_GRANDFATHERED(this.settings.grandfathered);
     this.SET_ENABLED(this.settings.enabled && this.canEnableRestream);
   }
 
@@ -92,55 +80,21 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   /**
-   * This determines whether the user sees the restream toggle in settings
+   * This determines whether the user can enable restream
    * Requirements:
-   * - Logged in with Twitch
-   * - Rolled out to
+   * - Has prime, or
+   * - Has a grandfathered status enabled
    */
   get canEnableRestream() {
-    return !!(this.userService.state.auth && this.restreamPlatformEligible);
+    return this.userService.isPrime || (this.userService.state.auth && this.state.grandfathered);
   }
 
   get chatUrl() {
     return `https://streamlabs.com/embed/chat?oauth_token=${this.userService.apiToken}`;
   }
 
-  /**
-   * Go live requirements for now:
-   * - Restream is enabled
-   * - Protected mode is enabled
-   * - Logged in via twitch
-   * - Facebook is linked
-   * For now, restream will only work if you are logged into Twitch and
-   * restreaming to Facebook. We are starting with a simple case with broad
-   * appeal, but will be expanding to all platforms very soon.
-   */
   get shouldGoLiveWithRestream() {
-    return (
-      this.userService.state.auth &&
-      this.restreamPlatformEligible &&
-      this.userService.state.auth.platforms.facebook &&
-      this.state.enabled &&
-      this.streamSettingsService.protectedModeEnabled
-    );
-  }
-
-  /**
-   * Only users logged into these platforms as primary can multistream
-   * for the time being. Eventually all combinations of platforms will
-   * be supported.
-   */
-  get restreamPlatformEligible() {
-    return ['twitch', 'youtube'].includes(this.userService.state.auth.primaryPlatform);
-  }
-
-  /**
-   * This checks to see if all platforms are staged and ready to go live.
-   * If this is false and we are about to go live, we should short circuit
-   * and do something else.
-   */
-  get allPlatformsStaged() {
-    return Object.keys(this.state.platforms).length === this.platforms.length;
+    return this.streamInfo.isMutliplatformMode;
   }
 
   fetchUserSettings() {
@@ -189,26 +143,8 @@ export class RestreamService extends StatefulService<IRestreamState> {
     return [this.userService.state.auth.primaryPlatform, 'facebook'];
   }
 
-  /**
-   * Stages a platform for restreaming, which means it will have a target
-   * created when `setupRestreamTargets` is called.
-   * @param platform The platform to stage
-   * @param options The go-live info/options
-   */
-  async stagePlatform(platform: TPlatform, options: TStartStreamOptions) {
-    const service = getPlatformService(platform);
-    const streamKey = await service.beforeGoLive(options);
-
-    this.STAGE_PLATFORM(platform, options, streamKey);
-  }
-
-  unstageAllPlatforms() {
-    this.UNSTAGE_PLATFORMS();
-  }
-
   async beforeGoLive() {
     await Promise.all([this.setupIngest(), this.setupTargets()]);
-    this.unstageAllPlatforms();
   }
 
   async setupIngest() {
@@ -232,10 +168,10 @@ export class RestreamService extends StatefulService<IRestreamState> {
     await Promise.all(promises);
 
     await this.createTargets(
-      Object.keys(this.state.platforms).map(platform => {
+      this.streamInfo.enabledPlatforms.map(platform => {
         return {
           platform: platform as TPlatform,
-          streamKey: this.state.platforms[platform].streamKey,
+          streamKey: getPlatformService(platform).state.streamKey,
         };
       }),
     );
@@ -254,7 +190,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
       );
   }
 
-  createTargets(targets: { platform: TPlatform; streamKey: string }[]) {
+  async createTargets(targets: { platform: TPlatform; streamKey: string }[]) {
     const headers = authorizedHeaders(
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
@@ -273,8 +209,9 @@ export class RestreamService extends StatefulService<IRestreamState> {
       }),
     );
     const request = new Request(url, { headers, body, method: 'POST' });
-
-    return fetch(request).then(res => res.json());
+    const res = await fetch(request);
+    if (!res.ok) throw await res.json();
+    return res.json();
   }
 
   deleteTarget(id: number) {

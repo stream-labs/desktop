@@ -188,7 +188,7 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
     return !!(this.state.useOptimizedProfile && this.state.lastSelectedProfile);
   }
 
-  async applyProfileFromCache() {
+  applyProfileFromCache() {
     if (!this.canApplyProfileFromCache()) {
       return;
     }

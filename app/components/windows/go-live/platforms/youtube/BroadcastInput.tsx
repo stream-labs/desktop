@@ -1,9 +1,9 @@
 import { Component, Prop } from 'vue-property-decorator';
-import { IInputMetadata, IListOption } from '../../shared/inputs';
+import { IInputMetadata, IListOption } from '../../../../shared/inputs';
 import { ListInput } from 'components/shared/inputs/inputs';
 import { BaseInput } from 'components/shared/inputs/BaseInput';
-import { IYoutubeLiveBroadcast } from '../../../services/platforms/youtube';
-import { $t } from '../../../services/i18n';
+import { IYoutubeLiveBroadcast } from 'services/platforms/youtube';
+import { $t } from 'services/i18n';
 import * as moment from 'moment';
 import styles from './BroadcastInput.m.less';
 import cx from 'classnames';

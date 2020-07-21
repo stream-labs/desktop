@@ -1,24 +1,25 @@
-import { Service } from 'services/core/service';
 import {
   EPlatformCallResult,
   IGame,
   IPlatformRequest,
   IPlatformService,
+  IPlatformState,
   TPlatformCapability,
-  TPlatformCapabilityMap,
 } from '.';
 import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
 import { authorizedHeaders, handleResponse } from 'util/requests';
 import { UserService } from 'services/user';
-import { StreamInfoService } from 'services/stream-info';
 import { getAllTags, getStreamTags, TTwitchTag, updateTags } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
-import { IPlatformResponse, platformAuthorizedRequest, platformRequest } from './utils';
+import { platformAuthorizedRequest, platformRequest } from './utils';
 import { StreamSettingsService } from 'services/settings/streaming';
-import { Subject } from 'rxjs';
 import { CustomizationService } from 'services/customization';
-import { assertIsDefined } from '../../util/properties-type-guards';
+import { assertIsDefined } from 'util/properties-type-guards';
+import { IGoLiveSettings } from 'services/streaming';
+import { InheritMutations, mutation } from 'services/core';
+import { throwStreamError } from 'services/streaming/stream-error';
+import { BasePlatformService } from './base-platform';
 
 export interface ITwitchStartStreamOptions {
   title: string;
@@ -27,12 +28,11 @@ export interface ITwitchStartStreamOptions {
 }
 
 export interface ITwitchChannelInfo extends ITwitchStartStreamOptions {
-  chatUrl: string;
   hasUpdateTagsPermission: boolean;
   availableTags: TTwitchTag[];
 }
 
-interface ITWitchChannel {
+interface ITWitchChannelResponse {
   status: string;
   game: string;
   stream_key: string;
@@ -59,21 +59,40 @@ interface ITwitchOAuthValidateResponse {
   user_id: string;
 }
 
-export class TwitchService extends Service implements IPlatformService {
+interface ITwitchServiceState extends IPlatformState {
+  hasUpdateTagsPermission: boolean;
+  availableTags: TTwitchTag[];
+  settings: ITwitchStartStreamOptions;
+}
+
+@InheritMutations()
+export class TwitchService extends BasePlatformService<ITwitchServiceState>
+  implements IPlatformService {
   @Inject() hostsService: HostsService;
   @Inject() streamSettingsService: StreamSettingsService;
   @Inject() userService: UserService;
-  @Inject() streamInfoService: StreamInfoService;
   @Inject() customizationService: CustomizationService;
 
-  channelInfoChanged = new Subject<ITwitchChannelInfo>();
+  static initialState: ITwitchServiceState = {
+    ...BasePlatformService.initialState,
+    hasUpdateTagsPermission: false,
+    availableTags: [],
+    settings: {
+      title: '',
+      game: '',
+      tags: [],
+    },
+  };
 
-  capabilities = new Set<TPlatformCapability>([
+  readonly platform = 'twitch';
+  readonly displayName = 'Twitch';
+
+  readonly capabilities = new Set<TPlatformCapability>([
     'chat',
     'scope-validation',
     'tags',
+    'game',
     'user-info',
-    'viewer-count',
   ]);
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
@@ -84,19 +103,10 @@ export class TwitchService extends Service implements IPlatformService {
   // Streamlabs Production Twitch OAuth Client ID
   clientId = '8bmp6j83z5w4mepq0dn0q1a7g186azi';
 
-  private availableTags: TTwitchTag[];
-  private hasUpdateTagsPermission: boolean;
-  private activeChannel: ITwitchChannelInfo | null;
-
   init() {
     // prepopulate data to make chat available after app start
     this.userService.userLogin.subscribe(_ => {
       if (this.userService.platform?.type === 'twitch') this.prepopulateInfo();
-    });
-
-    // trigger `channelInfoChanged` event with new "chatUrl" based on the changed theme
-    this.customizationService.settingsChanged.subscribe(updatedSettings => {
-      if (updatedSettings.theme) this.updateActiveChannel({});
     });
   }
 
@@ -127,13 +137,17 @@ export class TwitchService extends Service implements IPlatformService {
     return this.userAuth.id;
   }
 
-  async beforeGoLive(channelInfo?: ITwitchStartStreamOptions) {
-    const key = await this.fetchStreamKey();
+  get username(): string {
+    return this.userService.state.auth?.platforms?.twitch?.username || '';
+  }
 
+  async beforeGoLive(goLiveSettings?: IGoLiveSettings) {
     if (
       this.streamSettingsService.protectedModeEnabled &&
       this.streamSettingsService.isSafeToModifyStreamKey()
     ) {
+      const key = await this.fetchStreamKey();
+      this.SET_STREAM_KEY(key);
       this.streamSettingsService.setSettings({
         key,
         platform: 'twitch',
@@ -141,8 +155,8 @@ export class TwitchService extends Service implements IPlatformService {
       });
     }
 
+    const channelInfo = goLiveSettings?.platforms.twitch;
     if (channelInfo) await this.putChannelInfo(channelInfo);
-    return key;
   }
 
   async validatePlatform() {
@@ -187,11 +201,26 @@ export class TwitchService extends Service implements IPlatformService {
       .then(response => this.userService.updatePlatformToken('twitch', response.access_token));
   }
 
-  private fetchRawChannelInfo(): Promise<ITWitchChannel> {
-    return platformAuthorizedRequest<ITWitchChannel>(
-      'twitch',
-      'https://api.twitch.tv/kraken/channel',
-    );
+  /**
+   * Request Twitch API and wrap failed response to a unified error model
+   */
+  async requestTwitch<T = unknown>(reqInfo: IPlatformRequest | string): Promise<T> {
+    try {
+      return await platformAuthorizedRequest<T>('twitch', reqInfo);
+    } catch (e) {
+      const details = e.result
+        ? `${e.result.status} ${e.result.error} ${e.result.message}`
+        : 'Connection failed';
+      const errorType =
+        e.result?.message === 'missing required oauth scope'
+          ? 'TWITCH_MISSED_OAUTH_SCOPE'
+          : 'PLATFORM_REQUEST_FAILED';
+      throwStreamError(errorType, details, 'twitch');
+    }
+  }
+
+  private fetchRawChannelInfo(): Promise<ITWitchChannelResponse> {
+    return this.requestTwitch<ITWitchChannelResponse>('https://api.twitch.tv/kraken/channel');
   }
 
   fetchStreamKey(): Promise<string> {
@@ -199,9 +228,9 @@ export class TwitchService extends Service implements IPlatformService {
   }
 
   /**
-   * returns perilled data for the EditStreamInfo window
+   * prepopulate channel info and save it to the store
    */
-  async prepopulateInfo(): Promise<ITwitchChannelInfo> {
+  async prepopulateInfo(): Promise<void> {
     const [channelInfo, hasUpdateTagsPermission] = await Promise.all([
       this.fetchRawChannelInfo().then(json => ({
         title: json.status,
@@ -211,34 +240,17 @@ export class TwitchService extends Service implements IPlatformService {
     ]);
 
     let tags: TTwitchTag[] = [];
-    let availableTags: TTwitchTag[] = [];
     if (hasUpdateTagsPermission) {
-      [tags, availableTags] = await Promise.all([this.getStreamTags(), this.getAllTags()]);
+      [tags] = await Promise.all([this.getStreamTags(), this.getAllTags()]);
     }
-
-    const activeChannel = {
-      ...channelInfo,
-      hasUpdateTagsPermission,
-      tags,
-      availableTags,
-    };
-    this.updateActiveChannel(activeChannel);
-    assertIsDefined(this.activeChannel);
-    return this.activeChannel;
+    this.SET_PREPOPULATED(true);
+    this.SET_STREAM_SETTINGS({ tags, title: channelInfo.title, game: channelInfo.game });
   }
 
-  /**
-   * update the local info for current channel and emit the "channelInfoChanged" event
-   */
-  private updateActiveChannel(patch: Partial<ITwitchChannelInfo>) {
-    const activeChannel = this.activeChannel || {};
-    this.activeChannel = {
-      ...activeChannel,
-      chatUrl: this.getChatUrl(),
-      ...patch,
-    } as ITwitchChannelInfo;
-    assertIsDefined(this.activeChannel);
-    this.channelInfoChanged.next(this.activeChannel);
+  @mutation()
+  private SET_AVAILABLE_TAGS(tags: TTwitchTag[]) {
+    this.state.availableTags = tags;
+    this.state.hasUpdateTagsPermission = true;
   }
 
   fetchUserInfo() {
@@ -264,7 +276,7 @@ export class TwitchService extends Service implements IPlatformService {
       }),
       this.setStreamTags(tags),
     ]);
-    this.updateActiveChannel({ title, game, tags });
+    this.SET_STREAM_SETTINGS({ title, game, tags });
     return true;
   }
 
@@ -275,19 +287,20 @@ export class TwitchService extends Service implements IPlatformService {
     ).then(json => json.games);
   }
 
-  private getChatUrl(): string {
+  get chatUrl(): string {
     const mode = this.customizationService.isDarkTheme ? 'night' : 'day';
     const nightMode = mode === 'day' ? 'popout' : 'darkpopout';
-    const username = this.userService.platform?.username;
-    assertIsDefined(username);
-    return `https://twitch.tv/popout/${username}/chat?${nightMode}`;
+    return `https://twitch.tv/popout/${this.username}/chat?${nightMode}`;
   }
 
-  async getAllTags(): Promise<TTwitchTag[]> {
+  get streamPageUrl() {
+    return `https://twitch.tv/${this.username}`;
+  }
+
+  async getAllTags(): Promise<void> {
     // Fetch stream tags once per session as they're unlikely to change that often
-    if (this.availableTags) return this.availableTags;
-    this.availableTags = await getAllTags();
-    return this.availableTags;
+    if (this.state.availableTags.length) return;
+    this.SET_AVAILABLE_TAGS(await getAllTags());
   }
 
   getStreamTags(): Promise<TTwitchTag[]> {
@@ -313,11 +326,10 @@ export class TwitchService extends Service implements IPlatformService {
   }
 
   async getHasUpdateTagsPermission() {
-    // need to be fetched only once per session
-    if (this.hasUpdateTagsPermission === void 0) {
-      this.hasUpdateTagsPermission = await this.hasScope('user:edit:broadcast');
-    }
-    return this.hasUpdateTagsPermission;
+    // if available tags are loaded then the user has permissions
+    if (this.state.availableTags.length) return true;
+    // otherwise make a request to Twitch
+    return await this.hasScope('user:edit:broadcast');
   }
 
   getHeaders(req: IPlatformRequest, authorized = false): ITwitchRequestHeaders {
@@ -332,20 +344,7 @@ export class TwitchService extends Service implements IPlatformService {
     };
   }
 
-  supports<T extends TPlatformCapability>(
-    capability: T,
-  ): this is TPlatformCapabilityMap[T] & IPlatformService {
-    return this.capabilities.has(capability);
-  }
-
   liveDockEnabled(): boolean {
     return true;
-  }
-
-  /**
-   * Get user-friendly error message
-   */
-  getErrorDescription(error: IPlatformResponse<unknown>): string {
-    return `Can not connect to Twitch: ${error.message}`;
   }
 }

@@ -58,7 +58,7 @@ export default class Chat extends Vue {
   changeChat() {
     const windowId = electron.remote.getCurrentWindow().id;
 
-    this.chatService.unmountChat(windowId);
+    this.chatService.unmountChat();
     this.restreamService.unmountChat(windowId);
 
     this.getChatService().mountChat(windowId);

@@ -8,8 +8,8 @@ import { WindowsService } from '../windows';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
 import { $t } from 'services/i18n';
-import { StreamInfoService } from 'services/stream-info';
 import { getOS, OS } from 'util/operating-systems';
+import { StreamingService } from '../streaming';
 
 const { BrowserWindow } = electron.remote;
 
@@ -48,7 +48,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() windowsService: WindowsService;
-  @Inject() streamInfoService: StreamInfoService;
+  @Inject() streamingService: StreamingService;
 
   static defaultState: GameOverlayState = {
     isEnabled: false,
@@ -197,14 +197,13 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       this.previewWindows[key].setBounds({ ...position, ...size });
     });
 
-    if (this.streamInfoService.state.chatUrl) {
-      this.windows.chat
-        .loadURL(this.streamInfoService.state.chatUrl)
-        .catch(this.handleRedirectError);
+    const chatUrl = this.streamingService.views.chatUrl;
+    if (chatUrl) {
+      this.windows.chat.loadURL(chatUrl).catch(this.handleRedirectError);
     }
 
     // sync chat url if it has been changed
-    this.onChatUrlChangedSubscription = this.streamInfoService.streamInfoChanged.subscribe(
+    this.onChatUrlChangedSubscription = this.streamingService.streamInfoChanged.subscribe(
       streamInfo => {
         if (!this.state.isEnabled) return;
         const chatWindow = this.windows.chat;
