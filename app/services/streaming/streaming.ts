@@ -331,6 +331,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       try {
         await this.runCheck('postTweet', () => this.twitterService.postTweet(settings.tweetText));
       } catch (e) {
+        console.error('unable to post a tweet', e);
         this.setError(e);
         return;
       }
@@ -418,7 +419,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   ) {
     if (typeof errorTypeOrError === 'object') {
       // an error object has been passed as a first arg
-      const error = (errorTypeOrError as StreamError).getModel();
+      const error = errorTypeOrError.getModel
+        ? (errorTypeOrError as StreamError).getModel()
+        : errorTypeOrError;
       this.SET_ERROR(error.type, error.details, error.platform);
     } else {
       // an error type has been passed as a first arg
@@ -427,8 +430,16 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
   }
 
+  resetError() {
+    this.RESET_ERROR();
+    if (this.state.info.checklist.startVideoTransmission === 'done') {
+      this.UPDATE_STREAM_INFO({ lifecycle: 'live' });
+    }
+  }
+
   @mutation()
   private SET_ERROR(type: TStreamErrorType, details?: string, platform?: TPlatform) {
+    if (!type) type = 'UNKNOWN_ERROR';
     this.state.info.error = createStreamError(type, details, platform).getModel();
   }
 

@@ -58,7 +58,11 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
 
   private getHeaderText() {
     if (this.error) {
-      return $t('Something went wrong');
+      if (this.view.info.checklist.startVideoTransmission === 'done') {
+        return $t('Your stream has started, but there were issues with other actions taken');
+      } else {
+        return $t('Something went wrong');
+      }
     }
     if (this.view.info.lifecycle === 'live') {
       return $t("You're live!");
