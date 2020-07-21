@@ -24,7 +24,7 @@
   "This connection is redundant because another connection already connects these scenes.": "Başka bir bağlantı zaten bu sahneleri bağladığı için bu bağlantı fazla.",
   "You need at least 2 scenes to edit transitions.": "Geçişleri düzenlemek için en az 2 sahne gerekir.",
   "This scene transition is managed by an App and cannot be edited.": "Bu sahne geçişi bir Uygulama tarafından yönetiliyor, bu nedenle düzenlenemez.",
-  "Global Transition": "Global Transition",
-  "Edit": "Edit",
-  "Live": "Live"
+  "Global Transition": "Global Geçiş",
+  "Edit": "Düzenle",
+  "Live": "Canlı"
 }
