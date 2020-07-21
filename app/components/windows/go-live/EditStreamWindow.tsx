@@ -79,7 +79,7 @@ export default class EditStreamWindow extends TsxComponent<{}> {
     const lifecycle = this.view.info.lifecycle;
     const shouldShowUpdateButton = lifecycle === 'live';
     const shouldShowGoBackButton = !shouldShowUpdateButton && this.view.info.error;
-    const shouldShowAdvancedSwitch = shouldShowUpdateButton && this.view.isMutliplatformMode;
+    const shouldShowAdvancedSwitch = shouldShowUpdateButton && this.view.isMultiplatformMode;
 
     return (
       <div class="controls" style={{ display: 'flex', 'flex-direction': 'row-reverse' }}>

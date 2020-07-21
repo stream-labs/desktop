@@ -68,7 +68,7 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
 
   private render() {
     const checklist = this.view.info.checklist;
-    const { isMutliplatformMode, goLiveSettings } = this.view;
+    const { isMultiplatformMode, goLiveSettings } = this.view;
     const isUpdateMode = this.props.isUpdateMode;
     const shouldPublishYT = !isUpdateMode && goLiveSettings.platforms.youtube?.enabled;
     const shouldShowOptimizedProfile =
@@ -93,7 +93,7 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
 
           {/* RESTREAM */}
           {!isUpdateMode &&
-            isMutliplatformMode &&
+            isMultiplatformMode &&
             this.renderCheck($t('Configure the Restream service'), checklist.setupRestream)}
 
           {/* OPTIMIZED PROFILE */}

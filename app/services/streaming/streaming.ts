@@ -252,7 +252,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
 
     // setup restream
-    if (this.views.isMutliplatformMode) {
+    if (this.views.isMultiplatformMode) {
       // check the Restream service is available
       let ready = false;
       try {

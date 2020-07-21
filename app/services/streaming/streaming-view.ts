@@ -58,7 +58,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     ) as TPlatform[];
   }
 
-  get isMutliplatformMode(): boolean {
+  get isMultiplatformMode(): boolean {
     return (
       this.streamSettingsService.state.protectedModeEnabled && this.enabledPlatforms.length > 1
     );

@@ -67,8 +67,8 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
     const isErrorMode = view.info.error;
     const isLoadingMode = !isErrorMode && ['empty', 'prepopulate'].includes(view.info.lifecycle);
     const shouldShowSettings = !isErrorMode && !isLoadingMode && hasPlatforms;
-    const isAdvancedMode = view.goLiveSettings.advancedMode && view.isMutliplatformMode;
-    const shouldShowAddDestination = view.allPlatforms.length !== view.linkedPlatforms.length;
+    const isAdvancedMode = view.goLiveSettings.advancedMode && view.isMultiplatformMode;
+    const shouldShowAddDestination = view.linkedPlatforms.length < 3;
     const shouldShowPrimeLabel = !this.restreamService.state.grandfathered;
     const shouldShowLeftCol = this.streamSettingsService.state.protectedModeEnabled;
     return (
