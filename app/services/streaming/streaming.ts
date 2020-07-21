@@ -219,7 +219,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     if (
       !this.userService.isLoggedIn ||
       (!this.streamSettingsService.state.protectedModeEnabled &&
-        this.userService.state.auth.primaryPlatform !== 'twitch') // twitch is a special case
+        this.userService.state.auth?.primaryPlatform !== 'twitch') // twitch is a special case
     ) {
       this.finishStartStreaming();
       return;
