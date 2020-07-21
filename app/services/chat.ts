@@ -86,6 +86,7 @@ export class ChatService extends Service {
     });
 
     this.bindWindowListener();
+    this.bindDomReadyListener();
 
     this.customizationService.settingsChanged.subscribe(changed => {
       this.handleSettingsChanged(changed);
