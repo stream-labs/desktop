@@ -125,7 +125,9 @@ export default class GoLiveError extends TsxComponent<{}> {
     assertIsDefined(error.platform);
     const platformName = getPlatformService(error.platform).displayName;
     return (
-      <ErrorLayout message={$t('Multistream to YouTube is a Prime feature', { platformName })}>
+      <ErrorLayout
+        message={$t('Multistreaming to these platforms requires Prime', { platformName })}
+      >
         <button class="button button--prime" onClick={() => this.enablePrime()}>
           {$t('Become a Prime member')}
         </button>
