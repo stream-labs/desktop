@@ -215,8 +215,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
    * Make a transition to Live
    */
   async goLive(newSettings?: IGoLiveSettings, unattendedMode = false) {
-    // We should only ever do anything with platform APIs if the user used the go live window
-    if (!this.views.shouldShowGoLiveWindow()) {
+    // don't interact with API in loged out mode and when protected mode is disabled
+    if (
+      !this.userService.isLoggedIn ||
+      (!this.streamSettingsService.state.protectedModeEnabled &&
+        this.userService.state.auth.primaryPlatform !== 'twitch') // twitch is a special case
+    ) {
       this.finishStartStreaming();
       return;
     }
