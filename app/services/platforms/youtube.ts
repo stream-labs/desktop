@@ -341,9 +341,10 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       this.oauthToken
     }`;
     return this.requestYoutube<{
-      items: { liveStreamingDetails: { concurrentViewers: number } }[];
+      items: { liveStreamingDetails: { concurrentViewers: string } }[];
     }>(url).then(
-      json => (json.items[0] && json.items[0].liveStreamingDetails.concurrentViewers) || 0,
+      json =>
+        (json.items[0] && parseInt(json.items[0].liveStreamingDetails.concurrentViewers, 10)) || 0,
     );
   }
 
