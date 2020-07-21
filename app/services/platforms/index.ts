@@ -4,10 +4,7 @@ import { IMixerChannelInfo, IMixerStartStreamOptions, MixerService } from './mix
 import { FacebookService, IFacebookChannelInfo, IFacebookStartStreamOptions } from './facebook';
 import { TTwitchTag } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
-import { Observable } from 'rxjs';
-import { IPlatformResponse } from './utils';
-import { IInputMetadata } from '../../components/shared/inputs';
-import { IGoLiveSettings } from '../streaming';
+import { IGoLiveSettings } from 'services/streaming';
 
 export type Tag = TTwitchTag;
 export interface IGame {
