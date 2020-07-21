@@ -1,10 +1,10 @@
 import * as widgetInputComponents from './inputs';
 import {
   inputComponents as sharedInputComponents,
-  metadata as sharedMetadata,
   IInputMetadata,
   IListMetadata,
   ISliderMetadata,
+  InputMetadata,
 } from 'components/shared/inputs';
 
 export * from './inputs';
@@ -30,21 +30,21 @@ export interface IAnimationMetadata extends IInputMetadata {
   filter?: 'in' | 'out' | 'text' | 'eventIn' | 'eventOut';
 }
 
-export const metadata = {
-  ...sharedMetadata,
-  animation: (options: IAnimationMetadata) =>
-    ({ type: EWInput.animation, ...options } as IAnimationMetadata),
-  frequency: (options: IInputMetadata) =>
-    ({ type: EWInput.frequency, ...options } as IInputMetadata),
-  sectionedMultiselect: (
+class WidgetInputMetadata extends InputMetadata {
+  animation = (options: IAnimationMetadata) =>
+    ({ type: EWInput.animation, ...options } as IAnimationMetadata);
+  frequency = (options: IInputMetadata) =>
+    ({ type: EWInput.frequency, ...options } as IInputMetadata);
+  sectionedMultiselect = (
     options: IListMetadata<{ label: string; options: { value: string; label: string }[] }>,
   ) =>
     ({
       type: EWInput.sectionedMultiselect,
       ...options,
-    } as IListMetadata<{ label: string; options: { value: string; label: string }[] }>),
-  numberList: (options: IListMetadata<number>) =>
-    ({ type: EWInput.numberList, ...options } as IListMetadata<number>),
-  spamSecurity: (options: ISpamSecurityMetadata) =>
-    ({ type: EWInput.spamSecurity, ...options } as ISpamSecurityMetadata),
-};
+    } as IListMetadata<{ label: string; options: { value: string; label: string }[] }>);
+  numberList = (options: IListMetadata<number>) =>
+    ({ type: EWInput.numberList, ...options } as IListMetadata<number>);
+  spamSecurity = (options: ISpamSecurityMetadata) =>
+    ({ type: EWInput.spamSecurity, ...options } as ISpamSecurityMetadata);
+}
+export const metadata = new WidgetInputMetadata();

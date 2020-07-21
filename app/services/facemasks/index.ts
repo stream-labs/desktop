@@ -25,6 +25,7 @@ import { AppService } from 'services/app';
 import { propsToSettings } from 'util/obs';
 import { InitAfter } from '../core';
 import Utils from 'services/utils';
+import { SettingsService } from '../settings';
 
 @InitAfter('UserService')
 export class FacemasksService extends PersistentStatefulService<Interfaces.IFacemasksServiceState> {
@@ -35,6 +36,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   @Inject() sourceFiltersService: SourceFiltersService;
   @Inject() streamingService: StreamingService;
   @Inject() private windowsService: WindowsService;
+  @Inject() private settingsService: SettingsService;
   @Inject() appService: AppService;
 
   cdn = `https://${this.hostsService.facemaskCDN}`;
@@ -557,16 +559,8 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
     });
   }
 
-  showSettings(categoryName?: string) {
-    this.windowsService.showWindow({
-      componentName: 'FacemaskSettings',
-      title: $t('Face Mask Settings'),
-      queryParams: { categoryName },
-      size: {
-        width: 850,
-        height: 800,
-      },
-    });
+  showSettings() {
+    this.settingsService.showSettings('Facemasks');
   }
 
   closeSettings() {

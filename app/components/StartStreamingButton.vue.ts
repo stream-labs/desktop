@@ -27,10 +27,8 @@ export default class StartStreamingButton extends Vue {
 
   @Prop() disabled: boolean;
 
-  mounted() {
-    if (this.isFacebook || this.restreamService.shouldGoLiveWithRestream) {
-      this.facebookService.fetchActivePage();
-    }
+  get isMidStream() {
+    return this.streamingService.views.isMidStreamMode;
   }
 
   async toggleStreaming() {
@@ -80,29 +78,15 @@ export default class StartStreamingButton extends Vue {
       }
 
       if (this.shouldShowGoLiveWindow()) {
-        if (this.hasPages) {
-          return this.streamingService.openShareStream();
-        }
-        if (this.restreamService.shouldGoLiveWithRestream) {
-          this.streamingService.showEditStreamInfo(this.restreamService.platforms, 0);
-        } else {
-          this.streamingService.showEditStreamInfo();
-        }
+        this.streamingService.actions.showGoLiveWindow();
       } else {
-        if (this.videoEncodingOptimizationService.canApplyProfileFromCache()) {
-          await this.videoEncodingOptimizationService.applyProfileFromCache();
-        }
-        this.streamingService.toggleStreaming();
+        this.streamingService.actions.goLive(null, true);
       }
     }
   }
 
-  get hasPages() {
-    return (
-      (this.isFacebook || this.restreamService.shouldGoLiveWithRestream) &&
-      this.facebookService.state.facebookPages &&
-      this.facebookService.state.facebookPages.pages.length
-    );
+  edit() {
+    this.streamingService.actions.showEditStream();
   }
 
   get streamingStatus() {

@@ -10,6 +10,10 @@ interface IUIInput {
   loading: boolean;
 }
 
+type FNValueSetter = (form: FormMonkey, input: IUIInput) => Promise<unknown>;
+
+export type TFormMonkeyData = Dictionary<string | FNValueSetter>;
+
 const DEFAULT_SELECTOR = 'body';
 
 const months = [
@@ -32,7 +36,7 @@ const months = [
  */
 export class FormMonkey {
   constructor(
-    private t: TExecutionContext,
+    public t: TExecutionContext,
     private formSelector?: string,
     private showLogs = false,
   ) {
@@ -77,6 +81,7 @@ export class FormMonkey {
    * fill the form with values
    */
   async fill(formData: Dictionary<any>) {
+    this.log('fill form with data', formData);
     await this.waitForLoading();
     const inputs = await this.getInputs();
 
@@ -130,6 +135,7 @@ export class FormMonkey {
     if (notFoundFields.length) {
       throw new Error(`Fields not found: ${JSON.stringify(notFoundFields)}`);
     }
+    this.log('filled');
   }
 
   /**
@@ -200,7 +206,18 @@ export class FormMonkey {
     return Number(await this.getTextValue(selector));
   }
 
-  async setListValue(selector: string, value: string) {
+  async setListValue(selector: string, valueSetter: string | FNValueSetter) {
+    if (typeof valueSetter === 'function') {
+      const inputName = await this.getAttribute(selector, 'data-name');
+      const input = inputName && (await this.getInput(inputName));
+      await (valueSetter as FNValueSetter)(this, input);
+      // the vue-multiselect's popup-div needs time to be closed
+      // otherwise it can overlap the elements under it
+      await sleep(100);
+      return;
+    }
+
+    const value = valueSetter as string;
     const hasInternalSearch: boolean = JSON.parse(
       await this.getAttribute(selector, 'data-internal-search'),
     );
@@ -378,8 +395,9 @@ export class FormMonkey {
   async setInputValue(selector: string, value: string) {
     await this.client.waitForVisible(selector);
     await this.client.click(selector);
-    await ((this.client.keys(['Control', 'a']) as any) as Promise<any>); // clear
+    await ((this.client.keys(['Control', 'a']) as any) as Promise<any>); // select all
     await ((this.client.keys('Control') as any) as Promise<any>); // release ctrl key
+    await ((this.client.keys('Backspace') as any) as Promise<any>); // clear
     await ((this.client.keys(value) as any) as Promise<any>); // type text
   }
 
@@ -394,7 +412,7 @@ export class FormMonkey {
     await this.client.click(selector);
 
     // select values
-    const inputSelector = `.v-dropdown-container .sp-search-input`;
+    const inputSelector = '.v-dropdown-container .sp-search-input';
     for (const value of values) {
       await this.setInputValue(inputSelector, value);
       await ((this.client.keys('ArrowDown') as any) as Promise<any>);
@@ -420,7 +438,7 @@ export class FormMonkey {
     return Promise.all(watchers);
   }
 
-  private async getAttribute(selector: string, attrName: string) {
+  public async getAttribute(selector: string, attrName: string) {
     const id = (await this.client.$(selector)).value.ELEMENT;
     return (await this.client.elementIdAttribute(id, attrName)).value;
   }
@@ -429,6 +447,31 @@ export class FormMonkey {
     if (!this.showLogs) return;
     console.log(...args);
   }
+}
+
+/**
+ * select ListInput option by given title
+ * able to work with a dynamic options list
+ */
+export function selectTitle(optionTitle: string | RegExp): FNValueSetter {
+  return async (form: FormMonkey, input: IUIInput) => {
+    const hasInternalSearch: boolean = JSON.parse(
+      await form.getAttribute(input.selector, 'data-internal-search'),
+    );
+
+    if (!hasInternalSearch) {
+      // the component has dynamic list of items, we should start typing to load list options
+      const title = optionTitle as string;
+      await form.setInputValue(input.selector, title);
+
+      // wait the options list loading
+      await form.client.waitForExist(`${input.selector} .multiselect__element`);
+
+      // click to the option
+      await click(form.t, `${input.selector} .multiselect__element [data-option-title="${title}"]`);
+      return;
+    }
+  };
 }
 
 /**

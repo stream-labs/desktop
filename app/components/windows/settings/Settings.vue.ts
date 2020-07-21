@@ -68,6 +68,7 @@ export default class Settings extends Vue {
     Audio: 'icon-audio',
     Hotkeys: 'icon-settings',
     'Game Overlay': 'icon-full-screen',
+    'Virtual Webcam': 'fas fa-camera',
     Advanced: 'fas fa-cogs',
     Developer: 'far fa-file-code',
     'Scene Collections': 'icon-themes',
@@ -87,11 +88,7 @@ export default class Settings extends Vue {
 
   set categoryName(val: string) {
     if (val === 'Prime') {
-      this.magicLinkService
-        .getDashboardMagicLink('prime-marketing', 'slobs-settings')
-        .then(link => {
-          electron.remote.shell.openExternal(link);
-        });
+      this.userService.openPrimeUrl('slobs-settings');
     } else {
       this.internalCategoryName = val;
     }

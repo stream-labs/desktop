@@ -1,6 +1,6 @@
 import { click, focusChild, focusMain, TExecutionContext } from './index';
 import { setOutputResolution } from './output';
-import { fillForm } from '../form-monkey';
+import { fillForm, TFormMonkeyData } from '../form-monkey';
 import { getClient } from '../api-client';
 import moment = require('moment');
 import { StreamSettingsService } from '../../../app/services/settings/streaming';
@@ -8,7 +8,7 @@ import { sleep } from '../sleep';
 /**
  * Go live and wait for stream start
  */
-export async function goLive(t: TExecutionContext, prefillData?: Dictionary<string>) {
+export async function goLive(t: TExecutionContext, prefillData?: TFormMonkeyData) {
   await tryToGoLive(t, prefillData);
   await waitForStreamStart(t);
 }
@@ -39,7 +39,7 @@ export async function clickGoLive(t: TExecutionContext) {
 /**
  * Fill the form in the EditStreamInfo window and click Go Live
  */
-export async function tryToGoLive(t: TExecutionContext, prefillData?: Dictionary<string>) {
+export async function tryToGoLive(t: TExecutionContext, prefillData?: TFormMonkeyData) {
   await prepareToGoLive(t);
   await clickGoLive(t);
   await focusChild(t);
@@ -97,11 +97,15 @@ export async function scheduleStream(
   await focusMain(t);
   await click(t, 'button .icon-date');
   await focusChild(t);
+
+  // wait fields to be shown
+  await app.client.waitForVisible('[data-name=title]');
+
   await fillForm(t, null, {
     ...channelInfo,
     date: moment(date).format('MM/DD/YYYY'),
   });
-  await click(t, 'button=Schedule');
+  await click(t, 'button=Done');
 
   // the success message should be shown
   await app.client.waitForVisible('.toast-success', 20000);
