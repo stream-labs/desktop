@@ -645,7 +645,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   showGoLiveWindow() {
-    const height = this.views.linkedPlatforms.length > 1 ? 750 : 600;
+    const height = this.views.linkedPlatforms.length > 1 ? 750 : 650;
     const width = 900;
 
     this.windowsService.showWindow({

@@ -71,6 +71,7 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
     const shouldShowAddDestination = view.linkedPlatforms.length < 3;
     const shouldShowPrimeLabel = !this.restreamService.state.grandfathered;
     const shouldShowLeftCol = this.streamSettingsService.state.protectedModeEnabled;
+    const onlyOnePlatformIsLinked = view.linkedPlatforms.length === 1;
     return (
       <ValidatedForm class="flex">
         {/*LEFT COLUMN*/}
@@ -100,7 +101,12 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
           <GoLiveError />
 
           {shouldShowSettings && (
-            <div class={styles.settingsContainer}>
+            <div
+              class={{
+                [styles.settingsContainer]: true,
+                [styles.settingsContainerOnePlatform]: onlyOnePlatformIsLinked,
+              }}
+            >
               {/*PLATFORM SETTINGS*/}
               <PlatformSettings vModel={this.settings} />
 
