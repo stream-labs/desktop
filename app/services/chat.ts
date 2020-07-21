@@ -52,6 +52,7 @@ export class ChatService extends Service {
     this.electronWindowId = electronWindowId;
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
     if (this.chatView) win.addBrowserView(this.chatView);
+    this.chatView.webContents.openDevTools({ mode: 'detach' });
   }
 
   setChatBounds(position: IVec2, size: IVec2) {
@@ -86,6 +87,7 @@ export class ChatService extends Service {
     });
 
     this.bindWindowListener();
+    this.bindDomReadyListener();
 
     this.customizationService.settingsChanged.subscribe(changed => {
       this.handleSettingsChanged(changed);
