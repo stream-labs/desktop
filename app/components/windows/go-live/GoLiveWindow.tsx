@@ -128,7 +128,7 @@ export default class GoLiveWindow extends TsxComponent<{}> {
       this.lifecycle === 'runChecklist' &&
       this.view.info.error &&
       this.view.info.checklist.startVideoTransmission !== 'done';
-    const shouldShowAdvancedSwitch = shouldShowConfirm && this.view.isMutliplatformMode;
+    const shouldShowAdvancedSwitch = shouldShowConfirm && this.view.isMultiplatformMode;
 
     return (
       <div class="controls" style={{ display: 'flex', 'flex-direction': 'row-reverse' }}>
