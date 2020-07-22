@@ -557,6 +557,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       }
       try {
         await this.goLive();
+        return Promise.resolve();
       } catch (e) {
         return Promise.reject(e);
       }
