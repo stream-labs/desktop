@@ -131,8 +131,8 @@ export default class StreamSettings extends TsxComponent {
     }[platform];
     const isPrimary = this.streamingView.isPrimaryPlatform(platform);
     const shouldShowPrimaryBtn = isPrimary;
-    const shouldShowConnectBtn = !isMerged;
-    const shouldShowUnlinkBtn = !isPrimary && isMerged;
+    const shouldShowConnectBtn = !isMerged && this.canEditSettings;
+    const shouldShowUnlinkBtn = !isPrimary && isMerged && this.canEditSettings;
     const shouldShowPrimeLabel =
       !this.userService.state.isPrime && !this.restreamService.state.grandfathered;
 

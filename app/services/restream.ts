@@ -94,7 +94,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   get shouldGoLiveWithRestream() {
-    return this.streamInfo.isMutliplatformMode;
+    return this.streamInfo.isMultiplatformMode;
   }
 
   fetchUserSettings() {
