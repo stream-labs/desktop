@@ -63,6 +63,7 @@ import AlertBox from 'components/widgets/AlertBox.vue';
 import SpinWheel from 'components/widgets/SpinWheel.vue';
 
 import PerformanceMetrics from 'components/PerformanceMetrics.vue';
+import { byOS, OS } from 'util/operating-systems';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -342,7 +343,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     const newWindow = (this.windows[windowId] = new BrowserWindow({
       frame: false,
       titleBarStyle: 'hidden',
-      fullscreenable: false,
+      fullscreenable: byOS({ [OS.Windows]: true, [OS.Mac]: false }),
       width: 400,
       height: 400,
       title: 'New Window',
