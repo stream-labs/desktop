@@ -120,6 +120,15 @@ export default class LiveDock extends Vue {
     return this.streamingService.isStreaming;
   }
 
+  get isLive() {
+    // TODO: We shouldn't be checking Twitter here.  Need concept of an "optional" step
+    return (
+      this.streamingService.views.info.lifecycle === 'live' ||
+      (this.streamingService.views.info.lifecycle === 'runChecklist' &&
+        this.streamingService.views.info.checklist.postTweet === 'failed')
+    );
+  }
+
   get liveText() {
     if (this.streamingStatus === EStreamingState.Live) return 'Live';
     if (this.streamingStatus === EStreamingState.Starting) return 'Starting';
