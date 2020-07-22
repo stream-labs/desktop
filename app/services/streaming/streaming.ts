@@ -256,7 +256,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
 
     // setup restream
-    if (this.views.isMutliplatformMode) {
+    if (this.views.isMultiplatformMode) {
       // check the Restream service is available
       let ready = false;
       try {
@@ -660,7 +660,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   showGoLiveWindow() {
-    const height = this.views.linkedPlatforms.length > 1 ? 750 : 600;
+    const height = this.views.linkedPlatforms.length > 1 ? 750 : 650;
     const width = 900;
 
     this.windowsService.showWindow({

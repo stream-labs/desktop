@@ -20,7 +20,7 @@
     :internal-search="options.internalSearch"
     :loading="options.loading"
     :disabled="options.disabled"
-    :allow-custom="options.hasCustomCheckbox"
+    :allow-custom="options.allowCustom"
     :taggable="options.taggable"
     @input="onInputHandler"
     @search-change="onSearchChangeHandler"
