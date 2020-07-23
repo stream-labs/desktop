@@ -2,13 +2,28 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' https://streamlabs-obs-dev.s3-us-west-2.amazonaws.com https://slobs-cdn.streamlabs.com">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' https://streamlabs-obs-dev.s3-us-west-2.amazonaws.com https://slobs-cdn.streamlabs.com 'sha256-jCWxWF7KA5z24xNr1KGyitCPyVJJ9efr/Zkdyu27fdQ='">
     <link rel="stylesheet" type="text/css" href="vendor/foundation.min.css" />
     <link href="vendor/roboto.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="vendor/fontawesome-free-5.13.0-web/css/all.css" />
     <link rel="stylesheet" href="vendor/flexboxgrid.min.css" type="text/css" >
-    <script defer src="https://slobs-cdn.streamlabs.com/bundles/vendors~renderer.js"></script>
-    <script defer src="https://slobs-cdn.streamlabs.com/bundles/renderer.js"></script>
+    <script>
+      if (window.location.search.match('worker')) {
+        let handlerHasRun = false;
+
+        window['_startupErrorHandler'] = event => {
+          if (handlerHasRun) return;
+          handlerHasRun = true;
+
+          const electron = require('electron');
+          electron.ipcRenderer.send('startupError', event && event.message || 'Script load error');
+        }
+
+        window.addEventListener('error', window['_startupErrorHandler']);
+      }
+    </script>
+    <script defer src="https://slobs-cdn.streamlabs.com/bundles/vendors~renderer.js" onerror="window['_startupErrorHandler'] && window['_startupErrorHandler']()"></script>
+    <script defer src="https://slobs-cdn.streamlabs.com/bundles/renderer.js"  onerror="window['_startupErrorHandler'] && window['_startupErrorHandler']()"></script>
   </head>
   <body style="background-color: transparent;">
     <div id="app"></div>

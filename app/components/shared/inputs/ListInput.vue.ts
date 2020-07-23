@@ -7,19 +7,28 @@ import { Spinner } from 'streamlabs-beaker';
 @Component({
   components: { Multiselect, Spinner },
 })
-export default class ListInput extends BaseInput<string, IListMetadata<string>> {
+export default class ListInput extends BaseInput<
+  string,
+  IListMetadata<string>,
+  { handleSearchChange?: (val: string) => unknown }
+> {
   @Prop() readonly value: string;
   @Prop() readonly metadata: IListMetadata<string>;
   @Prop() readonly title: string;
+  @Prop() readonly handleSearchChange?: (val: string) => unknown;
 
   get placeholder() {
     return this.options.placeholder || 'Select Option';
   }
 
   onInputHandler(option: IListOption<string>) {
-    // Fixes a render issue when reselecting the same option as currently selected
-    const val = option ? option.value : this.value;
-    this.emitInput(val);
+    if (option) {
+      this.emitInput(option.value);
+    } else if (this.options.allowEmpty) {
+      this.emitInput(null);
+    } else {
+      this.emitInput(this.value);
+    }
   }
 
   getOptions(): IListMetadata<string> {
@@ -46,11 +55,12 @@ export default class ListInput extends BaseInput<string, IListMetadata<string>> 
     return options[0];
   }
 
-  get selectedOption(): IListOption<string> {
+  get selectedOption(): IListOption<string, unknown> {
     return this.options.options.find(option => option.value === this.value);
   }
 
-  onSearchChange(value: string) {
+  private onSearchChangeHandler(value: string) {
     this.$emit('search-change', value);
+    this.$props.handleSearchChange && this.$props.handleSearchChange(value);
   }
 }

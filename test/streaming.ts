@@ -9,7 +9,7 @@ import {
   click,
 } from './helpers/spectron/index';
 import { setFormInput } from './helpers/spectron/forms';
-import { fillForm, formIncludes, FormMonkey } from './helpers/form-monkey';
+import { fillForm, formIncludes, FormMonkey, selectTitle } from './helpers/form-monkey';
 import { logIn, logOut, reserveUserFromPool } from './helpers/spectron/user';
 import { setTemporaryRecordingPath } from './helpers/spectron/output';
 const moment = require('moment');
@@ -25,6 +25,7 @@ import {
   tryToGoLive,
   chatIsVisible,
   waitForStreamStop,
+  updateChannelSettings,
 } from './helpers/spectron/streaming';
 import { TPlatform } from '../app/services/platforms';
 import { readdir } from 'fs-extra';
@@ -56,7 +57,7 @@ test('Streaming to Twitch', async t => {
   await logIn(t, 'twitch');
   await goLive(t, {
     title: 'SLOBS Test Stream',
-    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+    game: selectTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
   });
   t.true(await chatIsVisible(t), 'Chat should be visible');
 
@@ -72,7 +73,7 @@ test('Streaming to Facebook', async t => {
   await logIn(t, 'facebook');
   await goLive(t, {
     title: 'SLOBS Test Stream',
-    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+    game: selectTitle('Fortnite'),
     description: 'SLOBS Test Stream Description',
   });
   t.true(await chatIsVisible(t), 'Chat should be visible');
@@ -84,7 +85,7 @@ test.skip('Streaming to Mixer', async t => {
   await logIn(t, 'mixer');
   await goLive(t, {
     title: 'SLOBS Test Stream',
-    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+    game: selectTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
   });
   t.true(await chatIsVisible(t), 'Chat should be visible');
   t.pass();
@@ -104,7 +105,7 @@ test('Streaming to Youtube', async t => {
 
   // give youtube 2 min to publish stream
   await focusChild(t);
-  await t.context.app.client.waitForVisible("p=You're live!", 2 * 60 * 1000);
+  await t.context.app.client.waitForVisible("h1=You're live!", 2 * 60 * 1000);
 
   t.pass();
 });
@@ -126,7 +127,9 @@ test('Youtube should show error window if afterStreamStart hook fails', async t 
   // the error window should be shown right after request to YT API fails
   await sleep(2000); // TODO: wait for the child window to be shown instead sleep
   await focusChild(t);
-  await t.context.app.client.waitForVisible('h1=Something went wrong');
+  await t.context.app.client.waitForVisible(
+    'h1=Your stream has started, but there were issues with other actions taken',
+  );
 
   t.pass();
 });
@@ -167,7 +170,7 @@ test('Stream after switching accounts', async t => {
   await logIn(t, 'twitch');
   await goLive(t, {
     title: 'SLOBS Test Stream',
-    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+    game: selectTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
   });
 
   t.pass();
@@ -215,7 +218,7 @@ test('Migrate the twitch account to the protected mode', async t => {
   // go live
   await tryToGoLive(t, {
     title: 'SLOBS Test Stream',
-    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+    game: selectTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
   });
   await waitForStreamStop(t); // can't go live with a fake key
 
@@ -237,7 +240,7 @@ test('Migrate the twitch account to the protected mode', async t => {
   await restartApp(t); // restarting the app should call migration again
   await tryToGoLive(t, {
     title: 'SLOBS Test Stream',
-    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+    game: selectTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
   });
   await waitForStreamStop(t);
 
@@ -261,8 +264,10 @@ schedulingPlatforms.forEach(platform => {
     await focusMain(t);
     await app.client.click('button .icon-date');
     await focusChild(t);
+    const formMonkey = new FormMonkey(t);
 
-    const formMonkey = new FormMonkey(t, 'form[name=editStreamForm]');
+    // wait fields to be shown
+    await app.client.waitForVisible('[data-name=title]');
 
     // fill streaming data
     switch (platform) {
@@ -281,11 +286,6 @@ schedulingPlatforms.forEach(platform => {
         break;
     }
 
-    await app.client.click('button=Schedule');
-
-    // need to provide a date
-    t.true(await app.client.isExisting('div=The field is required'));
-
     // set the date to tomorrow
     const today = new Date();
     const tomorrow = new Date();
@@ -293,21 +293,21 @@ schedulingPlatforms.forEach(platform => {
     await formMonkey.fill({
       date: moment(tomorrow).format('MM/DD/YYYY'),
     });
-
-    await app.client.click('button=Schedule');
+    await app.client.click('button=Done');
 
     // facebook requires a game
     if (platform === 'facebook') {
-      t.true(await app.client.waitForVisible('.toast-alert', 2000));
+      await app.client.waitForVisible('.toasted.error', 2000);
 
       await formMonkey.fill({
-        game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+        game: selectTitle('Fortnite'),
       });
 
-      await app.client.click('button=Schedule');
+      await app.client.click('button=Done');
     }
 
     await app.client.waitForVisible('.toast-success', 20000);
+    t.pass();
   });
 });
 
@@ -362,7 +362,7 @@ test('User does not have Facebook pages', async t => {
   if (await t.context.app.client.isExisting('button=Go Live')) await t.context.app.client.click('button=Go Live');
   await focusChild(t);
   t.true(
-    await t.context.app.client.isExisting('a=Create Page'),
+    await t.context.app.client.isExisting('a=create one now'),
     'The link for adding new facebook changes should exist',
   );
 });
@@ -391,7 +391,7 @@ test('Recording when streaming', async t => {
 
   await goLive(t, {
     title: 'SLOBS Test Stream',
-    game: "PLAYERUNKNOWN'S BATTLEGROUNDS",
+    game: selectTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
   });
 
   // Stop recording
@@ -423,4 +423,10 @@ test('Streaming to Dlive', async t => {
   );
 
   // TODO: we probably want to start streaming with a real streamkey
+});
+
+test('Update channel settings before streaming', async t => {
+  await logIn(t, 'twitch');
+  await updateChannelSettings(t, { title: 'updated title' });
+  t.pass();
 });

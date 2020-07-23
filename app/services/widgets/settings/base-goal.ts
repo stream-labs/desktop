@@ -17,8 +17,8 @@ export abstract class BaseGoalService<
   TGoalData extends IBaseGoalData,
   TGoalCreateOptions
 > extends WidgetSettingsService<TGoalData> {
-  init() {
-    super.init();
+  subToWebsocket() {
+    super.subToWebsocket();
 
     this.websocketService.socketEvent.subscribe(event => {
       const apiSettings = this.getApiSettings();

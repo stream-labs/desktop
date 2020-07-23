@@ -7,19 +7,15 @@ import { CustomizationService } from 'services/customization';
 import TitleBar from '../TitleBar';
 import { AppService } from 'services/app';
 import Utils from 'services/utils';
+import styles from './ChildWindow.m.less';
 
-@Component({
-  components: {
-    TitleBar,
-    ...getComponents(),
-  },
-})
+@Component({})
 export default class ChildWindow extends Vue {
   @Inject() private windowsService: WindowsService;
   @Inject() private customizationService: CustomizationService;
   @Inject() private appService: AppService;
 
-  components: { name: string; isShown: boolean; title: string; hideStyleBlockers: boolean }[] = [];
+  components: IWindowOptions[] = [];
   private refreshingTimeout: number;
 
   mounted() {
@@ -43,7 +39,7 @@ export default class ChildWindow extends Vue {
   }
 
   get componentsToRender() {
-    return this.components.filter(c => c.name && !this.appLoading);
+    return this.components.filter(c => c.componentName && !this.appLoading);
   }
 
   get appLoading() {
@@ -96,13 +92,11 @@ export default class ChildWindow extends Vue {
     // at having a successful paint cycle before loading a component
     // that will do a bunch of synchronous IO.
     clearTimeout(this.refreshingTimeout);
-    Utils.makeChildWindowVisible();
     this.refreshingTimeout = window.setTimeout(async () => {
+      Utils.makeChildWindowVisible();
       this.components.push({
-        name: options.componentName,
+        ...options,
         isShown: true,
-        title: options.title,
-        hideStyleBlockers: options.hideStyleBlockers,
       });
       this.setWindowTitle();
       window.addEventListener('resize', this.windowSizeHandler);
@@ -112,10 +106,8 @@ export default class ChildWindow extends Vue {
   private handlePreservePrevWindow(options: IWindowOptions) {
     this.currentComponent.isShown = false;
     this.components.push({
-      name: options.componentName,
+      ...options,
       isShown: true,
-      title: options.title,
-      hideStyleBlockers: options.hideStyleBlockers,
     });
     this.setWindowTitle();
     window.addEventListener('resize', this.windowSizeHandler);
@@ -126,5 +118,24 @@ export default class ChildWindow extends Vue {
     this.currentComponent.isShown = true;
     this.setWindowTitle();
     window.addEventListener('resize', this.windowSizeHandler);
+  }
+
+  render() {
+    return (
+      <div style="height: 100%;" class={this.theme}>
+        <TitleBar title={this.options.title} class={styles.childWindowTitlebar} />
+        <div class={styles.blankSlate}>
+          <div class={styles.spinnerSpacer} />
+          <i class="fa fa-spinner fa-pulse" />
+          <div class={styles.spinnerSpacer} />
+        </div>
+        {this.componentsToRender.map((comp, index) => {
+          const ChildWindowComponent = getComponents()[comp.componentName];
+          return (
+            <ChildWindowComponent key={`${comp.componentName}-${index}`} vShow={comp.isShown} />
+          );
+        })}
+      </div>
+    );
   }
 }

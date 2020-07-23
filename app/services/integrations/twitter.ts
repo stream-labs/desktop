@@ -11,6 +11,7 @@ import Util from 'services/utils';
 import { UserService } from 'services/user';
 import { $t, I18nService } from 'services/i18n';
 import uuid from 'uuid/v4';
+import { createStreamError, throwStreamError } from '../streaming/stream-error';
 
 interface ITwitterServiceState {
   linked: boolean;
@@ -120,7 +121,9 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
       method: 'POST',
       body: JSON.stringify({ tweet }),
     });
-    return fetch(request).then(handleResponse);
+    return fetch(request)
+      .then(handleResponse)
+      .catch(e => throwStreamError('TWEET_FAILED', e.error || $t('Could not connect to Twitter')));
   }
 
   openLinkTwitterDialog() {

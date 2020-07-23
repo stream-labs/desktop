@@ -106,7 +106,7 @@ export default class SideNav extends Vue {
   get additionalStudioTabs() {
     return (
       <transition name="sidenav-slide">
-        {this.userService.isPrime && this.showTabDropdown && (
+        {this.showTabDropdown && (
           <div class={styles.studioTabs}>
             {this.studioTabs.slice(1).map(page => this.studioTab(page))}
           </div>

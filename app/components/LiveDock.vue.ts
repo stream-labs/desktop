@@ -2,8 +2,7 @@ import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import Chat from './Chat.vue';
 import { StreamingService, EStreamingState } from '../services/streaming';
-import { Inject } from '../services/core/injector';
-import { StreamInfoService } from '../services/stream-info';
+import { Inject } from 'services/core/injector';
 import { UserService } from '../services/user';
 import { CustomizationService } from 'services/customization';
 import electron from 'electron';
@@ -15,7 +14,8 @@ import { AppService } from 'services/app';
 import Tabs, { ITab } from 'components/Tabs.vue';
 import { ChatService } from 'services/chat';
 import { WindowsService } from 'services/windows';
-import { RestreamService } from 'app-services';
+import { RestreamService, YoutubeService } from 'app-services';
+import { getPlatformService } from 'services/platforms';
 
 @Component({
   components: {
@@ -27,7 +27,7 @@ import { RestreamService } from 'app-services';
 })
 export default class LiveDock extends Vue {
   @Inject() streamingService: StreamingService;
-  @Inject() streamInfoService: StreamInfoService;
+  @Inject() youtubeService: YoutubeService;
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() platformAppsService: PlatformAppsService;
@@ -108,11 +108,11 @@ export default class LiveDock extends Vue {
 
   setCollapsed(livedockCollapsed: boolean) {
     this.canAnimate = true;
-    this.windowsService.actions.updateStyleBlockers('main', true);
+    this.windowsService.updateStyleBlockers('main', true);
     this.customizationService.setSettings({ livedockCollapsed });
     setTimeout(() => {
       this.canAnimate = false;
-      this.windowsService.actions.updateStyleBlockers('main', false);
+      this.windowsService.updateStyleBlockers('main', false);
     }, 300);
   }
 
@@ -133,7 +133,7 @@ export default class LiveDock extends Vue {
       return 'viewers hidden';
     }
 
-    return this.streamInfoService.state.viewerCount.toString();
+    return this.streamingService.views.viewerCount.toString();
   }
 
   get offlineImageSrc() {
@@ -142,19 +142,15 @@ export default class LiveDock extends Vue {
   }
 
   showEditStreamInfo() {
-    if (!this.isStreaming && this.restreamService.shouldGoLiveWithRestream) {
-      this.streamingService.showEditStreamInfo(this.restreamService.platforms, 0);
-    } else {
-      this.streamingService.showEditStreamInfo();
-    }
+    this.streamingService.actions.showEditStream();
   }
 
   openYoutubeStreamUrl() {
-    electron.remote.shell.openExternal(this.streamInfoService.state.streamUrl);
+    electron.remote.shell.openExternal(this.youtubeService.streamPageUrl);
   }
 
   openYoutubeControlRoom() {
-    electron.remote.shell.openExternal(this.streamInfoService.state.dashboardUrl);
+    electron.remote.shell.openExternal(this.youtubeService.dashboardUrl);
   }
 
   get isTwitch() {
@@ -205,10 +201,6 @@ export default class LiveDock extends Vue {
     return this.windowsService.state.main.hideStyleBlockers;
   }
 
-  get chatHidden() {
-    return this.windowsService.state.main.hideChat;
-  }
-
   get hasChatTabs() {
     return this.chatTabs.length > 1;
   }
@@ -232,7 +224,7 @@ export default class LiveDock extends Vue {
   get chatTabs(): ITab[] {
     const tabs: ITab[] = [
       {
-        name: this.userService.platform.type.toString(),
+        name: getPlatformService(this.userService.state.auth.primaryPlatform).displayName,
         value: 'default',
       },
     ].concat(
@@ -272,5 +264,12 @@ export default class LiveDock extends Vue {
   popOut() {
     this.platformAppsService.popOutAppPage(this.selectedChat, this.slot);
     this.selectedChat = 'default';
+  }
+
+  canEditChannelInfo(): boolean {
+    return (
+      this.streamingService.state.info.checklist.startVideoTransmission === 'done' ||
+      this.userService.state.auth?.primaryPlatform === 'twitch'
+    );
   }
 }

@@ -1,5 +1,5 @@
 import TsxComponent from 'components/tsx-component';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import Display from 'components/shared/Display.vue';
 import StudioModeControls from 'components/StudioModeControls.vue';
@@ -31,19 +31,22 @@ export default class StudioEditor extends TsxComponent {
   showDisplay = true;
 
   mounted() {
-    this.sizeCheckInterval = window.setInterval(() => {
-      if (this.$refs.studioModeContainer) {
-        const { clientWidth, clientHeight } = this.$refs.studioModeContainer;
-        this.showDisplay = clientHeight > 50;
-        if (this.studioMode) {
-          this.stacked = clientWidth / clientHeight <= 16 / 9;
-        }
+    this.sizeCheckInterval = window.setInterval(() => this.checkVerticalOrientation(), 1000);
+  }
+
+  @Watch('studioMode')
+  checkVerticalOrientation() {
+    if (this.$refs.studioModeContainer) {
+      const { clientWidth, clientHeight } = this.$refs.studioModeContainer;
+      this.showDisplay = clientHeight > 50;
+      if (this.studioMode) {
+        this.stacked = clientWidth / clientHeight <= 16 / 9;
       }
-      if (!this.displayEnabled && !this.performanceMode && this.$refs.placeholder) {
-        const { clientWidth, clientHeight } = this.$refs.placeholder;
-        this.verticalPlaceholder = clientWidth / clientHeight < 16 / 9;
-      }
-    }, 1000);
+    }
+    if (!this.displayEnabled && !this.performanceMode && this.$refs.placeholder) {
+      const { clientWidth, clientHeight } = this.$refs.placeholder;
+      this.verticalPlaceholder = clientWidth / clientHeight < 16 / 9;
+    }
   }
 
   destroyed() {
@@ -119,6 +122,7 @@ export default class StudioEditor extends TsxComponent {
       altKey: event.altKey,
       ctrlKey: event.ctrlKey,
       shiftKey: event.shiftKey,
+      metaKey: event.metaKey,
       button: event.button,
       buttons: event.buttons,
     };

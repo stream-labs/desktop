@@ -1,5 +1,5 @@
 import cx from 'classnames';
-import BaseLayout, { LayoutProps } from './BaseLayout';
+import BaseLayout, { LayoutProps, ILayoutSlotArray } from './BaseLayout';
 import { createProps } from 'components/tsx-component';
 import { Component } from 'vue-property-decorator';
 import ResizeBar from 'components/shared/ResizeBar.vue';
@@ -7,35 +7,22 @@ import styles from './Layouts.m.less';
 
 @Component({ props: createProps(LayoutProps) })
 export default class Triplets extends BaseLayout {
+  isColumns = true;
+
   async mounted() {
     this.mountResize();
-    this.$emit(
-      'totalWidth',
-      await this.mapVectors([
-        ['1', '4'],
-        ['2', '5'],
-        ['3', '6'],
-      ]),
-    );
     this.setMins(['1', '4'], ['2', '5'], ['3', '6']);
   }
   destroyed() {
     this.destroyResize();
   }
 
-  get bar1() {
-    return this.props.resizes.bar1;
-  }
-  set bar1(size: number) {
-    if (size === 0) return;
-    this.props.setBarResize('bar1', size, this.mins);
-  }
-
-  get bar2() {
-    return this.props.resizes.bar2;
-  }
-  set bar2(size: number) {
-    this.props.setBarResize('bar2', size, this.mins);
+  get vectors() {
+    return [
+      ['1', '4'],
+      ['2', '5'],
+      ['3', '6'],
+    ] as ILayoutSlotArray;
   }
 
   stackedSection(slots: string[], width: string) {
@@ -51,27 +38,29 @@ export default class Triplets extends BaseLayout {
   render() {
     return (
       <div class={cx(styles.columns, styles.sidePadded)}>
-        {this.stackedSection(['1', '4'], `calc(100% - ${this.bar1 + this.bar2}px)`)}
+        {this.stackedSection(['1', '4'], `${100 - (this.resizes.bar1 + this.resizes.bar2) * 100}%`)}
         <ResizeBar
           position="right"
-          vModel={this.bar1}
-          onResizestart={() => this.props.resizeStartHandler()}
-          onResizestop={() => this.props.resizeStopHandler()}
-          max={this.props.calculateMax(this.mins.rest + this.bar2)}
+          value={this.bar1}
+          onInput={(value: number) => this.setBar('bar1', value)}
+          onResizestart={() => this.resizeStartHandler()}
+          onResizestop={() => this.resizeStopHandler()}
+          max={this.calculateMax(this.mins.rest + this.bar2)}
           min={this.mins.bar1}
           reverse={true}
         />
-        {this.stackedSection(['2', '5'], `${this.bar1}px`)}
+        {this.stackedSection(['2', '5'], `${this.resizes.bar1 * 100}%`)}
         <ResizeBar
           position="left"
-          vModel={this.bar2}
-          onResizestart={() => this.props.resizeStartHandler()}
-          onResizestop={() => this.props.resizeStopHandler()}
-          max={this.props.calculateMax(this.mins.rest + this.mins.bar1)}
+          value={this.bar2}
+          onInput={(value: number) => this.setBar('bar2', value)}
+          onResizestart={() => this.resizeStartHandler()}
+          onResizestop={() => this.resizeStopHandler()}
+          max={this.calculateMax(this.mins.rest + this.mins.bar1)}
           min={this.mins.bar2}
           reverse={true}
         />
-        {this.stackedSection(['3', '6'], `${this.bar2}px`)}
+        {this.stackedSection(['3', '6'], `${this.resizes.bar2 * 100}%`)}
       </div>
     );
   }

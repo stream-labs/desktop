@@ -17,7 +17,7 @@ import { SceneCollectionsService } from 'services/scene-collections';
 // eslint-disable-next-line no-undef
 import WritableStream = NodeJS.WritableStream;
 import { $t } from 'services/i18n';
-import set = Reflect.set;
+import { OS, getOS } from 'util/operating-systems';
 
 const net = require('net');
 
@@ -87,7 +87,12 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
 
   listen() {
     this.listenConnections(this.createTcpServer());
-    if (this.state.namedPipe.enabled) this.listenConnections(this.createNamedPipeServer());
+
+    // Named pipe is windows only
+    if (this.state.namedPipe.enabled && getOS() === OS.Windows) {
+      this.listenConnections(this.createNamedPipeServer());
+    }
+
     if (this.state.websockets.enabled) this.listenConnections(this.createWebsoketsServer());
   }
 
@@ -300,7 +305,9 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     this.clients[id] = client;
     this.log(`Id assigned ${id}`);
 
-    if (server.type === 'namedPipe' || this.isLocalClient(client)) {
+    // manual authorization for local clients is not required except for websokets
+    // disabling authorization for local websoket clients introduces a breach where any website can establish connection to the localhost
+    if (server.type === 'namedPipe' || (server.type === 'tcp' && this.isLocalClient(client))) {
       this.authorizeClient(client);
     }
 
