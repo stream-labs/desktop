@@ -60,7 +60,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
   }
 
   iconForPlatform(platform: TPlatform) {
-    if (this.loading) return 'fas fa-spinner fa-spin';
+    if (this.loading && platform !== 'mixer') return 'fas fa-spinner fa-spin';
 
     return {
       twitch: 'fab fa-twitch',
