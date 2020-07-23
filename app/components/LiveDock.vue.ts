@@ -120,10 +120,6 @@ export default class LiveDock extends Vue {
     return this.streamingService.isStreaming;
   }
 
-  get isLive() {
-    return this.streamingService.views.info.checklist.startVideoTransmission === 'done';
-  }
-
   get liveText() {
     if (this.streamingStatus === EStreamingState.Live) return 'Live';
     if (this.streamingStatus === EStreamingState.Starting) return 'Starting';
@@ -268,5 +264,12 @@ export default class LiveDock extends Vue {
   popOut() {
     this.platformAppsService.popOutAppPage(this.selectedChat, this.slot);
     this.selectedChat = 'default';
+  }
+
+  canEditChannelInfo(): boolean {
+    return (
+      this.streamingService.state.info.checklist.startVideoTransmission === 'done' ||
+      this.userService.state.auth?.primaryPlatform === 'twitch'
+    );
   }
 }

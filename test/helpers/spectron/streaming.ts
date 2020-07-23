@@ -127,3 +127,15 @@ export async function stopRecording(t: TExecutionContext) {
   await client.click('.record-button');
   await client.waitForVisible('.record-button:not(.active)', 15000);
 }
+
+/**
+ * Open liveDock and edit stream settings
+ */
+export async function updateChannelSettings(t: TExecutionContext, prefillData?: TFormMonkeyData) {
+  await click(t, '.live-dock'); // open LiveDock
+  await click(t, '.icon-edit'); // click Edit
+  await focusChild(t);
+  await fillForm(t, null, prefillData);
+  await click(t, 'button=Update');
+  await t.context.app.client.waitForVisible('div=Successfully updated');
+}
