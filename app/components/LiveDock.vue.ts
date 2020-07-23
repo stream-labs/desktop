@@ -120,10 +120,6 @@ export default class LiveDock extends Vue {
     return this.streamingService.isStreaming;
   }
 
-  get isLive() {
-    return this.streamingService.views.info.checklist.startVideoTransmission === 'done';
-  }
-
   get liveText() {
     if (this.streamingStatus === EStreamingState.Live) return 'Live';
     if (this.streamingStatus === EStreamingState.Starting) return 'Starting';

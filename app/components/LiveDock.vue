@@ -40,7 +40,7 @@
 
         <div class="live-dock-info">
           <div class="live-dock-platform-tools">
-            <a @click="showEditStreamInfo" v-if="isLive" v-tooltip.right="editStreamInfoTooltip">
+            <a @click="showEditStreamInfo" v-tooltip.right="editStreamInfoTooltip">
               <i class="icon-edit" />
             </a>
             <a
