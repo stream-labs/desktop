@@ -827,7 +827,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       queryParams: {},
       size: {
         width: 450,
-        height: 600,
+        height: 480,
       },
     });
   }
