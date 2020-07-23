@@ -265,4 +265,11 @@ export default class LiveDock extends Vue {
     this.platformAppsService.popOutAppPage(this.selectedChat, this.slot);
     this.selectedChat = 'default';
   }
+
+  canEditChannelInfo(): boolean {
+    return (
+      this.streamingService.state.info.checklist.startVideoTransmission === 'done' ||
+      this.userService.state.auth?.primaryPlatform === 'twitch'
+    );
+  }
 }
