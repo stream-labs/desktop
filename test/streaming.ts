@@ -25,6 +25,7 @@ import {
   tryToGoLive,
   chatIsVisible,
   waitForStreamStop,
+  updateChannelSettings,
 } from './helpers/spectron/streaming';
 import { TPlatform } from '../app/services/platforms';
 import { readdir } from 'fs-extra';
@@ -422,4 +423,10 @@ test('Streaming to Dlive', async t => {
   );
 
   // TODO: we probably want to start streaming with a real streamkey
+});
+
+test('Update channel settings before streaming', async t => {
+  await logIn(t, 'twitch');
+  await updateChannelSettings(t, { title: 'updated title' });
+  t.pass();
 });
