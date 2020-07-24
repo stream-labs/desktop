@@ -53,10 +53,16 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
    * Returns a list of enabled for streaming platforms
    */
   get enabledPlatforms(): TPlatform[] {
-    const goLiveSettings = this.goLiveSettings;
-    return Object.keys(goLiveSettings.platforms).filter(
+    return this.getEnabledPlatforms(this.goLiveSettings);
+  }
+
+  /**
+   * Returns a list of enabled for streaming platforms from the given settings object
+   */
+  getEnabledPlatforms(settings: IStreamSettings): TPlatform[] {
+    return Object.keys(settings.platforms).filter(
       (platform: TPlatform) =>
-        this.linkedPlatforms.includes(platform) && goLiveSettings.platforms[platform].enabled,
+        this.linkedPlatforms.includes(platform) && settings.platforms[platform].enabled,
     ) as TPlatform[];
   }
 

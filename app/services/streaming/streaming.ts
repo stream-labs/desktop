@@ -352,6 +352,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
    * Update stream stetting while being live
    */
   async updateStreamSettings(settings: IGoLiveSettings) {
+    const lifecycle = this.state.info.lifecycle;
+
     // run checklist
     this.RESET_STREAM_INFO();
     this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist' });
@@ -359,6 +361,14 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     // call putChannelInfo for each platform
     const platforms = this.views.enabledPlatforms;
     for (const platform of platforms) {
+      // don't update settings for a non-primary platform if we're not live
+      if (
+        this.state.info.checklist.startVideoTransmission !== 'done' &&
+        !this.views.isPrimaryPlatform(platform)
+      ) {
+        continue;
+      }
+
       const service = getPlatformService(platform);
       const newSettings = settings.platforms[platform];
       try {
@@ -372,8 +382,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
     // save updated settings locally
     this.streamSettingsService.setSettings({ goLiveSettings: settings });
-    // return back to the 'live' state
-    this.UPDATE_STREAM_INFO({ lifecycle: 'live' });
+    // finish the 'runChecklist' step
+    this.UPDATE_STREAM_INFO({ lifecycle });
   }
 
   /**
