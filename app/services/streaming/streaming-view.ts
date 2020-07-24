@@ -46,7 +46,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
       !this.restreamView.canEnableRestream ||
       !this.streamSettingsView.state.protectedModeEnabled
     ) {
-      return [this.userView.auth?.primaryPlatform];
+      return [this.userView.auth!.primaryPlatform];
     }
     return this.allPlatforms.filter(p => this.isPlatformLinked(p));
   }
