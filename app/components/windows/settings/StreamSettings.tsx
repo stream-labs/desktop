@@ -59,7 +59,7 @@ export default class StreamSettings extends TsxComponent {
   }
 
   private platformMerge(platform: TPlatform) {
-    if (this.restreamService.canEnableRestream) {
+    if (this.restreamService.views.canEnableRestream) {
       this.navigationService.navigate('PlatformMerge', { platform });
       this.windowsService.actions.closeChildWindow();
     } else {
