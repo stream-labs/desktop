@@ -266,7 +266,7 @@ export default class LiveDock extends Vue {
     this.selectedChat = 'default';
   }
 
-  canEditChannelInfo(): boolean {
+  get canEditChannelInfo(): boolean {
     return (
       this.streamingService.state.info.checklist.startVideoTransmission === 'done' ||
       this.userService.state.auth?.primaryPlatform === 'twitch'
