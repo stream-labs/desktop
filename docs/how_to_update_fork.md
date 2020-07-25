@@ -30,7 +30,7 @@ node script\prepare_fork_build.js
 
 First 3 command from official build instruction `https://github.com/electron/electron/blob/2-0-x/docs/development/build-instructions-windows.md`
 
-Last command print in log paths to tar.gz zip and sha256 files what need to be uploaded to github as relase 
+Last command print in log paths to tar.gz zip and sha256 files what need to be uploaded to github as release 
 
 Do not commit changes in electron.gyp and package.json if you do not want manualy merge next time. 
 
@@ -38,7 +38,7 @@ Do not commit changes in electron.gyp and package.json if you do not want manual
 * Go to `https://github.com/stream-labs/electron/releases`
 * Create new release with save version as set in `package.json` - `2.0.16-streamlabs`
 * upload tgz package file 
-* upload relese zip file 
+* upload release zip file 
 * upload SHASUMS256 file 
 * publish release 
 * get url of uploaded package file 
