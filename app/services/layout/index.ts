@@ -1,10 +1,9 @@
 import Vue from 'vue';
 import isEqual from 'lodash/isEqual';
-import { Inject, ViewHandler } from 'services/core';
+import { Inject, ViewHandler, InitAfter } from 'services/core';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
 import { CustomizationService } from 'services/customization';
-import { UserService } from 'services/user';
 import { $t } from 'services/i18n';
 import uuid from 'uuid/v4';
 import { LAYOUT_DATA, ELEMENT_DATA, ELayout, ELayoutElement } from './layout-data';
@@ -37,6 +36,12 @@ class LayoutViews extends ViewHandler<ILayoutServiceState> {
 
   get component() {
     return LAYOUT_DATA[this.currentTab.currentLayout].component;
+  }
+
+  get elementsToRender() {
+    return Object.keys(this.currentTab.slottedElements).filter(
+      key => this.currentTab.slottedElements[key].slot,
+    );
   }
 
   elementTitle(element: ELayoutElement) {
@@ -90,6 +95,7 @@ class LayoutViews extends ViewHandler<ILayoutServiceState> {
   }
 }
 
+@InitAfter('UserService')
 export class LayoutService extends PersistentStatefulService<ILayoutServiceState> {
   static defaultState: ILayoutServiceState = {
     currentTab: 'default',
@@ -114,7 +120,6 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
   };
 
   @Inject() private customizationService: CustomizationService;
-  @Inject() private userService: UserService;
 
   init() {
     super.init();
@@ -187,14 +192,14 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   @mutation()
   CHANGE_LAYOUT(layout: ELayout) {
-    this.state.tabs[this.state.currentTab].currentLayout = layout;
-    this.state.tabs[this.state.currentTab].slottedElements = {};
-    this.state.tabs[this.state.currentTab].resizes = LAYOUT_DATA[layout].resizeDefaults;
+    Vue.set(this.state.tabs[this.state.currentTab], 'currentLayout', layout);
+    Vue.set(this.state.tabs[this.state.currentTab], 'slottedElements', {});
+    Vue.set(this.state.tabs[this.state.currentTab], 'resizes', LAYOUT_DATA[layout].resizeDefaults);
   }
 
   @mutation()
   SET_SLOTS(slottedElements: { [key in ELayoutElement]?: { slot: LayoutSlot } }) {
-    this.state.tabs[this.state.currentTab].slottedElements = slottedElements;
+    Vue.set(this.state.tabs[this.state.currentTab], 'slottedElements', slottedElements);
   }
 
   @mutation()
@@ -213,7 +218,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   @mutation()
   SET_TAB_NAME(id: string, name: string) {
-    this.state.tabs[id].name = name;
+    Vue.set(this.state.tabs[id], 'name', name);
   }
 
   @mutation()
