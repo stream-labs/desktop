@@ -4,28 +4,13 @@ import { Inject } from 'services/core/injector';
 import { HostsService } from 'services/hosts';
 import { authorizedHeaders, handleResponse } from 'util/requests';
 import { TSocketEvent, WebsocketService } from 'services/websocket';
-import uuid from 'uuid/v4';
-import fs from 'fs-extra';
-import path from 'path';
-import electron from 'electron';
-import without from 'lodash/without';
 import { AppService } from 'services/app';
 import { InitAfter } from '../core';
+import { BehaviorSubject } from 'rxjs';
 
 interface IStreamlabelActiveSubscriptions {
   filename: string;
   subscribers: string[];
-}
-
-/**
- * Returned to streamlabels subscribers.  Contains
- * information about the subscription, and must be
- * passed back when unsubscribing.
- */
-export interface IStreamlabelSubscription {
-  id: string;
-  statname: string;
-  path: string;
 }
 
 export interface IStreamlabelSettings {
@@ -59,6 +44,29 @@ interface ITrains {
   follow: ITrainInfo;
 }
 
+export interface IStreamlabelSet {
+  [categoryName: string]: IStreamlabelCategory;
+}
+
+export interface IStreamlabelCategory {
+  label: string;
+  files: IStreamlabelDefinition[];
+}
+
+export interface IStreamlabelDefinition {
+  name: string;
+  label: string;
+  settings: IStreamlabelSettingsDefinition;
+}
+
+export interface IStreamlabelSettingsDefinition {
+  format?: { tokens: string[] };
+  item_format?: { tokens: string[] };
+  item_separator?: { tokens: string[] };
+  settingsStat?: string;
+  settingsWhitelist?: string[];
+}
+
 type TTrainType = 'donation' | 'follow' | 'subscription';
 
 function isDonationTrain(train: ITrainInfo | IDonationTrainInfo): train is IDonationTrainInfo {
@@ -73,10 +81,9 @@ export class StreamlabelsService extends Service {
   @Inject() appService: AppService;
 
   /**
-   * Represents the raw strings that should be
-   * written to the files.
+   * Represents the raw string value of the sources
    */
-  output: Dictionary<string> = {};
+  output = new BehaviorSubject({});
 
   /**
    * Represents settings which are stored on the server
@@ -122,7 +129,6 @@ export class StreamlabelsService extends Service {
   };
 
   async init() {
-    this.ensureDirectory();
     this.initSocketConnection();
     this.initTrainClockInterval();
 
@@ -134,47 +140,7 @@ export class StreamlabelsService extends Service {
   onUserLogin() {
     this.fetchInitialData();
     this.fetchSettings();
-  }
-
-  /**
-   * Subscribe to a particular streamlabels stat
-   * @param statname the stat to subscribe to
-   */
-  subscribe(statname: string): IStreamlabelSubscription {
-    const subscriptionId = uuid();
-
-    if (this.subscriptions[statname]) {
-      this.subscriptions[statname].subscribers.push(subscriptionId);
-    } else {
-      this.subscriptions[statname] = {
-        filename: uuid(),
-        subscribers: [subscriptionId],
-      };
-
-      this.writeFileForStat(statname);
-    }
-
-    return {
-      statname,
-      id: subscriptionId,
-      path: this.getStreamlabelsPath(this.subscriptions[statname].filename),
-    };
-  }
-
-  /**
-   * End a streamlabel subscription
-   * @param subscription the subscription object
-   */
-  unsubscribe(subscription: IStreamlabelSubscription) {
-    const subInfo = this.subscriptions[subscription.statname];
-
-    if (!subInfo) return;
-
-    subInfo.subscribers = without(subInfo.subscribers, subscription.id);
-
-    if (subInfo.subscribers.length === 0) {
-      delete this.subscriptions[subscription.statname];
-    }
+    this.fetchDefinitions();
   }
 
   getSettingsForStat(statname: string) {
@@ -259,6 +225,17 @@ export class StreamlabelsService extends Service {
     fetch(request)
       .then(handleResponse)
       .then(settings => this.updateSettings(settings));
+  }
+
+  async fetchDefinitions(): Promise<IStreamlabelSet> {
+    if (!this.userService.isLoggedIn) return;
+
+    const platform = this.userService.platform.type;
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/app-settings/${platform}`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers });
+
+    return await fetch(request).then(handleResponse);
   }
 
   private initSocketConnection(): void {
@@ -376,23 +353,6 @@ export class StreamlabelsService extends Service {
     }
   }
 
-  private ensureDirectory() {
-    try {
-      fs.removeSync(this.streamlabelsDirectory);
-      fs.mkdirSync(this.streamlabelsDirectory);
-    } catch (e) {
-      console.error('Error ensuring streamlabels directory!');
-    }
-  }
-
-  private get streamlabelsDirectory() {
-    return path.join(this.appService.appDataDirectory, 'Streamlabels');
-  }
-
-  private getStreamlabelsPath(filename: string) {
-    return path.join(this.streamlabelsDirectory, `${filename}.txt`);
-  }
-
   /**
    * Applies a patch to the settings object
    * @param settingsPatch the new settings to be applied
@@ -406,31 +366,14 @@ export class StreamlabelsService extends Service {
   }
 
   /**
-   * Applies a patch to the output object and writes files for
-   * the newly updated outputs.
+   * Applies a patch to the output object and fires an update event
    * @param outputPatch the new output strings
    */
   private updateOutput(outputPatch: Dictionary<string>) {
-    this.output = {
-      ...this.output,
+    const oldOutput = this.output.getValue();
+    this.output.next({
+      ...oldOutput,
       ...outputPatch,
-    };
-
-    Object.keys(outputPatch).forEach(stat => this.writeFileForStat(stat));
-  }
-
-  /**
-   * Writes data for a particular stat.  Will not do anything
-   * if there is no data available for that stat, or if there
-   * are no subscribers for that particular stat.
-   */
-  private writeFileForStat(statname: string) {
-    if (this.output[statname] == null) return;
-    if (this.subscriptions[statname] == null) return;
-
-    electron.ipcRenderer.send('streamlabels-writeFile', {
-      path: this.getStreamlabelsPath(this.subscriptions[statname].filename),
-      data: this.output[statname],
     });
   }
 }

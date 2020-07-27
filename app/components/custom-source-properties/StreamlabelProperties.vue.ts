@@ -1,11 +1,15 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { ISourceApi } from 'services/sources';
-import { getDefinitions, IStreamlabelDefinition } from 'services/streamlabels/definitions';
 import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
 import { Multiselect } from 'vue-multiselect';
-import { StreamlabelsService, IStreamlabelSettings } from 'services/streamlabels';
+import {
+  StreamlabelsService,
+  IStreamlabelSettings,
+  IStreamlabelDefinition,
+  IStreamlabelSet,
+} from 'services/streamlabels';
 import debounce from 'lodash/debounce';
 import pick from 'lodash/pick';
 
@@ -19,20 +23,23 @@ export default class StreamlabelProperties extends Vue {
   @Inject() streamlabelsService: StreamlabelsService;
 
   get statOptions() {
-    const definitions = getDefinitions(this.userService.platform.type);
-
-    return Object.values(definitions);
+    if (!this.definitions) return;
+    return Object.values(this.definitions);
   }
 
+  definitions: IStreamlabelSet = null;
   currentlySelected: IStreamlabelDefinition = null;
   labelSettings: IStreamlabelSettings = null;
 
-  created() {
+  async created() {
+    this.definitions = await this.streamlabelsService.fetchDefinitions();
     this.refreshPropertyValues();
     this.debouncedSetSettings = debounce(() => this.setSettings(), 1000);
   }
 
   refreshPropertyValues() {
+    if (!this.statOptions) return;
+
     const settings = this.source.getPropertiesManagerSettings();
 
     this.statOptions.forEach(category => {
