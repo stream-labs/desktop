@@ -2,6 +2,7 @@ import { DefaultManager, IDefaultManagerSettings } from './default-manager';
 import { Inject } from 'services/core/injector';
 import { StreamlabelsService } from 'services/streamlabels';
 import { UserService } from 'services/user';
+import { byOS, OS } from 'util/operating-systems';
 
 export interface IStreamlabelsManagerSettings extends IDefaultManagerSettings {
   statname: string;
@@ -12,7 +13,6 @@ export class StreamlabelsManager extends DefaultManager {
   @Inject() userService: UserService;
 
   settings: IStreamlabelsManagerSettings;
-  blacklist = ['text', 'read_from_file'];
   oldOutput: string = null;
   customUIComponent = 'StreamlabelProperties';
 
@@ -26,6 +26,13 @@ export class StreamlabelsManager extends DefaultManager {
           text: output[this.settings.statname],
         });
       }
+    });
+  }
+
+  get blacklist() {
+    return byOS({
+      [OS.Windows]: ['read_from_file', 'text'],
+      [OS.Mac]: ['from_file', 'text', 'text_file', 'log_mode', 'log_lines'],
     });
   }
 

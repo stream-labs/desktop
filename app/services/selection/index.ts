@@ -13,7 +13,7 @@ import {
 } from 'services/scenes';
 import { $t } from 'services/i18n';
 import { shortcut } from 'services/shortcuts';
-import { Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import Utils from 'services/utils';
 import { Source } from 'services/sources';
 import { Rect } from 'util/rect';
@@ -49,7 +49,10 @@ export class SelectionService extends StatefulService<ISelectionState> {
     lastSelectedId: '',
   };
 
-  updated = new Subject<ISelectionState>();
+  updated = new BehaviorSubject<ISelectionState>({
+    selectedIds: [],
+    lastSelectedId: '',
+  });
 
   get sceneId() {
     return this.scenesService.views.activeSceneId;

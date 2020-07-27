@@ -1,3 +1,5 @@
+@import 'mixins';
+
 .input-container {
   .margin-bottom(2);
 
@@ -159,14 +161,7 @@ textarea[type=text] {
 
   .multiselect__input,
   .multiselect__single {
-    background: var(--dropdown-bg);
-    border-color: var(--button);
-
-    &:hover,
-    &:focus {
-      background: var(--dropdown-bg);
-      border-color: var(--button);
-    }
+    .dropdown-input-mixin();
   }
 }
 

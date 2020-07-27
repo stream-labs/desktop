@@ -81,13 +81,15 @@ export default class BaseLayout extends TsxComponent<LayoutProps> {
     const { height, width } = this.$el.getBoundingClientRect();
     const totalSize = this.isColumns ? width : height;
     const proportion = parseFloat((val / totalSize).toFixed(2));
-    this.layoutService.setBarResize(bar, proportion);
+    await this.layoutService.actions.return.setBarResize(bar, proportion);
   }
 
   async minsFromSlot(slot: LayoutSlot) {
     // Before we can access the componentInstance at least one render cycle needs to run
     if (!this.firstRender) await this.$nextTick();
     this.firstRender = true;
+    // If there is no component slotted we return no minimum
+    if (!this.$slots[slot]) return { x: 0, y: 0 };
     return (this.$slots[slot][0].componentInstance as BaseElement).mins;
   }
 

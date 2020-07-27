@@ -60,7 +60,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
   }
 
   iconForPlatform(platform: TPlatform) {
-    if (this.loading) return 'fas fa-spinner fa-spin';
+    if (this.loading && platform !== 'mixer') return 'fas fa-spinner fa-spin';
 
     return {
       twitch: 'fab fa-twitch',
@@ -99,6 +99,12 @@ export default class Connect extends TsxComponent<ConnectProps> {
     this.selectedExtraPlatform = platform;
   }
 
+  showMixerMigration() {
+    electron.remote.shell.openExternal(
+      'https://blog.streamlabs.com/how-to-migrate-your-mixer-account-settings-on-streamlabs-7c77e0d9a47b',
+    );
+  }
+
   render() {
     if (this.selectedExtraPlatform) {
       return (
@@ -122,7 +128,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
               : $t('Sign in with your streaming account to get started with Streamlabs OBS')}
           </p>
           <div class={styles.signupButtons}>
-            {['twitch', 'youtube', 'mixer', 'facebook'].map((platform: TPlatform) => (
+            {['twitch', 'youtube', 'facebook'].map((platform: TPlatform) => (
               <button
                 class={cx(`button button--${platform}`, styles.loginButton)}
                 disabled={this.loading}
@@ -153,6 +159,21 @@ export default class Connect extends TsxComponent<ConnectProps> {
               ] as IListOption<TExtraPlatform>[],
             }}
           />
+          <div style={{ marginTop: '24px' }}>
+            <i
+              class={this.iconForPlatform('mixer')}
+              style={{
+                color: '#0078d7',
+                fontSize: '24px',
+                verticalAlign: 'middle',
+                marginRight: '8px',
+              }}
+            />
+            <span onClick={() => this.showMixerMigration()} style={{ cursor: 'pointer' }}>
+              Mixer was shut down on July 22nd. To migrate your Streamlabs account to another
+              platform, please click here.
+            </span>
+          </div>
           <p>
             <br />
             <span class={styles['link-button']} onClick={this.onSkip}>

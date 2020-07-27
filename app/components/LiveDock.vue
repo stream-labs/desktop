@@ -42,7 +42,7 @@
           <div class="live-dock-platform-tools">
             <a
               @click="showEditStreamInfo"
-              v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook"
+              v-if="canEditChannelInfo"
               v-tooltip.right="editStreamInfoTooltip"
             >
               <i class="icon-edit" />
@@ -71,13 +71,10 @@
             </a>
           </div>
         </div>
-
         <div
           class="live-dock-chat"
           v-if="
-            !hideStyleBlockers &&
-              !chatHidden &&
-              (isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook)
+            !hideStyleBlockers && (isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook)
           "
         >
           <div v-if="hasChatTabs" class="flex">
@@ -90,8 +87,7 @@
             />
           </div>
           <!-- v-if is required because left-side chat will not properly load on application startup -->
-          <chat v-if="!applicationLoading && selectedChat === 'default'" />
-          <chat v-if="selectedChat === 'restream'" :restream="true" />
+          <chat v-if="!applicationLoading && !collapsed" :restream="selectedChat === 'restream'" />
           <PlatformAppPageView
             v-if="selectedChat !== 'default' && selectedChat !== 'restream'"
             class="live-dock-platform-app-webview"

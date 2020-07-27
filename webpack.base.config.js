@@ -68,7 +68,6 @@ module.exports = {
     'backtrace-js': 'require("backtrace-js")',
     request: 'require("request")',
     archiver: 'require("archiver")',
-    '@streamlabs/game-overlay': 'require("@streamlabs/game-overlay")',
     'extract-zip': 'require("extract-zip")',
     'fs-extra': 'require("fs-extra")',
   },
@@ -151,7 +150,7 @@ module.exports = {
         ],
       },
       {
-        test: /\.(png|jpe?g|gif|svg|mp4|ico|wav|webm)(\?.*)?$/,
+        test: /\.(png|jpe?g|gif|svg|mp4|ico|wav|webm|icns)(\?.*)?$/,
         loader: 'file-loader',
         options: {
           name: '[name]-[hash].[ext]',
