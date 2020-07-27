@@ -249,7 +249,7 @@ export class StreamlabelsService extends Service {
 
         if (train.mostRecentEventAt == null) return;
 
-        const statname = `${trainType}_train_clock`;
+        const statname = train.setting;
         const settings = this.getSettingsForStat(train.setting);
 
         // There is currently a bug where this will sometimes come back
@@ -311,7 +311,7 @@ export class StreamlabelsService extends Service {
     }
 
     if (train.mostRecentEventAt == null) {
-      output[`${trainType}_train_clock`] = settings.show_clock === 'always' ? '0:00' : '';
+      output[train.setting] = settings.show_clock === 'always' ? '0:00' : '';
     }
 
     this.updateOutput(output);
