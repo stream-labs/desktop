@@ -1,14 +1,20 @@
-import { SceneItem as InternalSceneItem } from 'services/scenes';
+import {
+  SceneItem as InternalSceneItem,
+  ScenesService as InternalScenesService,
+  ISceneItem as IInternalSceneItemModel,
+  ISceneItem,
+} from 'services/scenes';
 import { InjectFromExternalApi, Fallback } from 'services/api/external-api';
 import { Source, SourcesService } from 'services/api/external-api/sources';
-import { ISceneNodeModel, SceneNode } from './scene-node';
+import { getExternalNodeModel, ISceneNodeModel, SceneNode } from './scene-node';
 import Utils from '../../../utils';
-import { ServiceHelper } from '../../../core';
+import { Inject, ServiceHelper } from '../../../core';
 
 export interface ISceneItemModel extends ISceneItemSettings, ISceneNodeModel {
   sceneItemId: string;
   sourceId: string;
   name: string;
+  resourceId: string;
 }
 
 export interface ISceneItemSettings {
@@ -75,6 +81,7 @@ export class SceneItem extends SceneNode implements ISceneItemActions, ISceneIte
   locked: boolean;
   streamVisible: boolean;
   recordingVisible: boolean;
+  resourceId: string;
 
   constructor(public sceneId: string, public nodeId: string, sourceId: string) {
     super(sceneId, nodeId);
@@ -94,17 +101,7 @@ export class SceneItem extends SceneNode implements ISceneItemActions, ISceneIte
    */
   getModel(): ISceneItemModel {
     const sourceModel = this.getSource().getModel();
-    return {
-      ...super.getModel(),
-      sourceId: this.getSource().sourceId,
-      sceneItemId: this.sceneItem.sceneItemId,
-      name: sourceModel.name,
-      transform: this.sceneItem.transform,
-      visible: this.sceneItem.visible,
-      locked: this.sceneItem.locked,
-      streamVisible: this.sceneItem.streamVisible,
-      recordingVisible: this.sceneItem.recordingVisible,
-    };
+    return getExternalSceneItemModel(this.sceneItem as ISceneItem, sourceModel.name);
   }
 
   setSettings(settings: Partial<ISceneItemSettings>): void {
@@ -164,4 +161,23 @@ export class SceneItem extends SceneNode implements ISceneItemActions, ISceneIte
   setContentCrop(): void {
     return this.setContentCrop();
   }
+}
+
+export function getExternalSceneItemModel(
+  internalModel: IInternalSceneItemModel,
+  name: string,
+): ISceneItemModel {
+  const resourceId = `SceneItem["${internalModel.sceneId}", "${internalModel.sceneItemId}", "${internalModel.sourceId}"]`;
+  return {
+    ...getExternalNodeModel(internalModel),
+    sourceId: internalModel.sourceId,
+    sceneItemId: internalModel.sceneItemId,
+    name,
+    resourceId,
+    transform: internalModel.transform,
+    visible: internalModel.visible,
+    locked: internalModel.locked,
+    streamVisible: internalModel.streamVisible,
+    recordingVisible: internalModel.recordingVisible,
+  };
 }

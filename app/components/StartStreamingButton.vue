@@ -1,9 +1,12 @@
 <template>
-<button
-  class="button button--go-live button--action"
-  :class="{ 'button--soft-warning': getIsRedButton() }"
-  :disabled="isDisabled"
-  @click="toggleStreaming">{{getStreamButtonLabel()}}</button>
+  <button
+    class="button button--go-live button--action"
+    :class="{ 'button--soft-warning': getIsRedButton() }"
+    :disabled="isDisabled"
+    @click="toggleStreaming"
+  >
+    {{ getStreamButtonLabel() }}
+  </button>
 </template>
 
 <script lang="ts" src="./StartStreamingButton.vue.ts"></script>

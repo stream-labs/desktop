@@ -21,8 +21,9 @@
     :loading="options.loading"
     :disabled="options.disabled"
     :allow-custom="options.allowCustom"
+    :taggable="options.taggable"
     @input="onInputHandler"
-    @search-change="onSearchChange"
+    @search-change="onSearchChangeHandler"
   >
     <span
       slot="option"

@@ -7,16 +7,19 @@ import TsxComponent from 'components/tsx-component';
 
 export abstract class BaseInput<
   TValueType,
-  TMetadataType extends IInputMetadata
-> extends TsxComponent<{
-  metadata?: TMetadataType;
-  value?: TValueType;
-  title?: string;
-  type?: EInputType;
-  onInput?: Function;
-  onFocus?: () => void;
-  onBlur?: () => void;
-}> {
+  TMetadataType extends IInputMetadata,
+  TProps extends any = {}
+> extends TsxComponent<
+  {
+    metadata?: TMetadataType;
+    value?: TValueType;
+    title?: string;
+    type?: EInputType;
+    onInput?: Function;
+    onFocus?: () => void;
+    onBlur?: () => void;
+  } & TProps
+> {
   abstract readonly value: TValueType;
   abstract readonly title: string;
   abstract readonly metadata: TMetadataType;

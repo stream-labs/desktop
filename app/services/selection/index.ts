@@ -13,13 +13,14 @@ import {
 } from 'services/scenes';
 import { $t } from 'services/i18n';
 import { shortcut } from 'services/shortcuts';
-import { Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import Utils from 'services/utils';
 import { Source } from 'services/sources';
 import { Rect } from 'util/rect';
 import { WindowsService } from 'services/windows';
 import { EditorCommandsService } from 'services/editor-commands';
 import { Selection } from './selection';
+import { ViewHandler } from 'services/core';
 
 export { Selection };
 
@@ -33,6 +34,12 @@ export interface ISelectionState {
  */
 export type TNodesList = string | string[] | ISceneItemNode | ISceneItemNode[];
 
+class SelectionViews extends ViewHandler<ISelectionState> {
+  get size() {
+    return this.state.selectedIds.length;
+  }
+}
+
 /**
  * represents selection of active scene and provide shortcuts
  */
@@ -42,7 +49,10 @@ export class SelectionService extends StatefulService<ISelectionState> {
     lastSelectedId: '',
   };
 
-  updated = new Subject<ISelectionState>();
+  updated = new BehaviorSubject<ISelectionState>({
+    selectedIds: [],
+    lastSelectedId: '',
+  });
 
   get sceneId() {
     return this.scenesService.views.activeSceneId;
@@ -56,6 +66,10 @@ export class SelectionService extends StatefulService<ISelectionState> {
     this.scenesService.sceneSwitched.subscribe(() => {
       this.reset();
     });
+  }
+
+  get views() {
+    return new SelectionViews(this.state);
   }
 
   // SELECTION METHODS

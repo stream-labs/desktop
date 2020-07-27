@@ -12,7 +12,7 @@ if (!process.env.CI) plugins.push(new HardSourceWebpackPlugin());
 module.exports = merge.smart(baseConfig, {
   entry: {
     renderer: './app/app.ts',
-    updater: './updater/ui.js',
+    updater: './updater/mac/ui.js',
     'guest-api': './guest-api',
   },
 

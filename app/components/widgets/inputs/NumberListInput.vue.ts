@@ -39,7 +39,7 @@ export default class ListInput extends BaseInput<number, IListMetadata<number>> 
     return this.options.options[0];
   }
 
-  get selectedOption(): IListOption<number> {
+  get selectedOption(): IListOption<number, unknown> {
     return this.options.options.find(option => option.value === this.value);
   }
 }

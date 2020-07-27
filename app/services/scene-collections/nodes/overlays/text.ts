@@ -3,9 +3,19 @@ import { SceneItem } from 'services/scenes';
 import { FontLibraryService } from 'services/font-library';
 import { Inject } from 'services/core/injector';
 import path from 'path';
+import { byOS, OS } from 'util/operating-systems';
+import Utils from 'services/utils';
 
 interface ISchema {
-  settings: object;
+  settings: {
+    text: string;
+    color: number;
+    custom_font: string;
+    font: { size: number };
+    gradient: boolean;
+    gradient_color: number;
+    outline: true;
+  };
 }
 
 interface IContext {
@@ -19,7 +29,7 @@ export class TextNode extends Node<ISchema, IContext> {
   @Inject() fontLibraryService: FontLibraryService;
 
   async save(context: IContext) {
-    const settings = { ...context.sceneItem.getObsInput().settings };
+    const settings: any = { ...context.sceneItem.getObsInput().settings };
 
     // We only store the filename for the custom font, to prevent
     // storing a full path that could possibly leak information
@@ -34,8 +44,6 @@ export class TextNode extends Node<ISchema, IContext> {
   }
 
   async load(context: IContext) {
-    const settings = this.data.settings;
-
     this.updateInput(context);
 
     // This is a bit of a hack to force us to immediately download the
@@ -44,6 +52,37 @@ export class TextNode extends Node<ISchema, IContext> {
   }
 
   updateInput(context: IContext) {
-    context.sceneItem.getObsInput().update(this.data.settings);
+    const input = context.sceneItem.getObsInput();
+
+    byOS({
+      [OS.Windows]: () => {
+        input.update(this.data.settings);
+      },
+      [OS.Mac]: () => {
+        // Translate GDI+ settings to Freetype settings
+        const color1 = this.resetAlpha(this.data.settings.color);
+        const color2 = this.data.settings.gradient
+          ? this.resetAlpha(this.data.settings.gradient_color)
+          : this.resetAlpha(this.data.settings.color);
+
+        input.update({
+          color1,
+          color2,
+          custom_font: this.data.settings.custom_font,
+          font: this.data.settings.font,
+          text: this.data.settings.text,
+          outline: this.data.settings.outline,
+        });
+      },
+    });
+  }
+
+  /**
+   * Forces 100% alpha on a color (used by mac)
+   * @param color An integer color
+   */
+  private resetAlpha(color: number) {
+    const rgba = Utils.intToRgba(color);
+    return Utils.rgbaToInt(rgba.r, rgba.g, rgba.b, 255);
   }
 }
