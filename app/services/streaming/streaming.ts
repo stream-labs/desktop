@@ -242,22 +242,22 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist' });
 
     // update channel settings for each platform
-    if (!unattendedMode) {
-      const platforms = this.views.enabledPlatforms;
-      for (const platform of platforms) {
-        const service = getPlatformService(platform);
-        try {
-          await this.runCheck(platform, () => service.beforeGoLive(settings));
-        } catch (e) {
-          console.error(e);
-          // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
-          const errorType =
-            (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
-              ? 'SETTINGS_UPDATE_FAILED'
-              : e.type || 'UNKNOWN_ERROR';
-          this.setError(errorType, e.details, platform);
-          return;
-        }
+    const platforms = this.views.enabledPlatforms;
+    for (const platform of platforms) {
+      // don't update settigns for twitch in unattendedMode
+      if (platform === 'twitch' && unattendedMode) continue;
+      const service = getPlatformService(platform);
+      try {
+        await this.runCheck(platform, () => service.beforeGoLive(settings));
+      } catch (e) {
+        console.error(e);
+        // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
+        const errorType =
+          (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
+            ? 'SETTINGS_UPDATE_FAILED'
+            : e.type || 'UNKNOWN_ERROR';
+        this.setError(errorType, e.details, platform);
+        return;
       }
     }
 
