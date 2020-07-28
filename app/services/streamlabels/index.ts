@@ -416,7 +416,6 @@ export class StreamlabelsService extends Service {
    * @param settingsPatch the new settings to be applied
    */
   private updateSettings(settingsPatch: Dictionary<IStreamlabelSettings>) {
-    console.log(settingsPatch);
     this.settings = {
       ...this.settings,
       ...settingsPatch,
