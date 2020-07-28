@@ -106,7 +106,6 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
   }
 
   get views() {
-    class StreamSettingsView extends ViewHandler<IStreamSettingsState> {}
     return new StreamSettingsView(this.state);
   }
 
@@ -317,3 +316,5 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     });
   }
 }
+
+class StreamSettingsView extends ViewHandler<IStreamSettingsState> {}

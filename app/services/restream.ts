@@ -70,18 +70,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   get views() {
-    class RestreamView extends ViewHandler<IRestreamState> {
-      /**
-       * This determines whether the user can enable restream
-       * Requirements:
-       * - Has prime, or
-       * - Has a grandfathered status enabled
-       */
-      get canEnableRestream() {
-        const userView = this.getServiceViews(UserService);
-        return userView.isPrime || (userView.auth && this.state.grandfathered);
-      }
-    }
     return new RestreamView(this.state);
   }
 
@@ -310,5 +298,18 @@ export class RestreamService extends StatefulService<IRestreamState> {
     // @ts-ignore: typings are incorrect
     this.chatView.destroy();
     this.chatView = null;
+  }
+}
+
+class RestreamView extends ViewHandler<IRestreamState> {
+  /**
+   * This determines whether the user can enable restream
+   * Requirements:
+   * - Has prime, or
+   * - Has a grandfathered status enabled
+   */
+  get canEnableRestream() {
+    const userView = this.getServiceViews(UserService);
+    return userView.isPrime || (userView.auth && this.state.grandfathered);
   }
 }
