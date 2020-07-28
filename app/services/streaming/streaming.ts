@@ -247,7 +247,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       const service = getPlatformService(platform);
       try {
         // don't update settigns for twitch in unattendedMode
-        const settingsForPlatform = platform === 'twitch' && unattendedMode ? null : settings;
+        const settingsForPlatform = platform === 'twitch' && unattendedMode ? undefined : settings;
         await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform));
       } catch (e) {
         console.error(e);
