@@ -73,6 +73,12 @@ function isDonationTrain(train: ITrainInfo | IDonationTrainInfo): train is IDona
   return (train as IDonationTrainInfo).donationTrain;
 }
 
+const capitalize = (val: string) =>
+  val
+    .split('_')
+    .map(word => `${word[0].toLocaleUpperCase()}${word.slice(1)}`)
+    .join(' ');
+
 @InitAfter('UserService')
 export class StreamlabelsService extends Service {
   @Inject() userService: UserService;
@@ -235,7 +241,59 @@ export class StreamlabelsService extends Service {
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 
-    return await fetch(request).then(handleResponse);
+    return await fetch(request)
+      .then(handleResponse)
+      .then((data: IStreamlabelSet) => this.formatTrainDefinitions(data));
+  }
+
+  formatTrainDefinitions(data: IStreamlabelSet) {
+    const { trains_combos, ...rest } = data;
+    const trainData = {};
+    trains_combos.files.forEach(file => {
+      trainData[file.name] = { label: file.label, files: this.trainFiles(file.name) };
+    });
+    return {
+      ...rest,
+      ...trainData,
+    };
+  }
+
+  trainFiles(fileName: string) {
+    const type = Object.keys(this.trains).find(key => this.trains[key].setting === fileName);
+
+    const baseFiles = [
+      {
+        name: `${type}_train_counter`,
+        label: capitalize(`${type}_train_counter`),
+        settings: { settingsStat: fileName, settingsWhitelist: ['show_count'] },
+      },
+      {
+        name: `${type}_train_latest_name`,
+        label: capitalize(`${type}_train_latest_name`),
+        settings: { settingsStat: fileName, settingsWhitelist: ['show_latest'] },
+      },
+      {
+        name: `${type}_train_clock`,
+        label: capitalize(`${type}_train_clock`),
+        settings: { settingsStat: fileName, settingsWhitelist: ['duration', 'show_clock'] },
+      },
+    ];
+
+    const donationFiles = [
+      {
+        name: `${type}_train_latest_amount`,
+        label: capitalize(`${type}_train_latest_amount`),
+        settings: { settingsStat: fileName, settingsWhitelist: [] as Array<string> },
+      },
+      {
+        name: `${type}_train_total_amount`,
+        label: capitalize(`${type}_train_total_amount`),
+        settings: { settingsStat: fileName, settingsWhitelist: [] as Array<string> },
+      },
+    ];
+
+    if (fileName !== 'train_tips') return baseFiles;
+    return baseFiles.concat(donationFiles);
   }
 
   private initSocketConnection(): void {
