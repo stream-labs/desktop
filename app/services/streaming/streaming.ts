@@ -244,11 +244,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     // update channel settings for each platform
     const platforms = this.views.enabledPlatforms;
     for (const platform of platforms) {
-      // don't update settigns for twitch in unattendedMode
-      if (platform === 'twitch' && unattendedMode) continue;
       const service = getPlatformService(platform);
       try {
-        await this.runCheck(platform, () => service.beforeGoLive(settings));
+        // don't update settigns for twitch in unattendedMode
+        const settingsForPlatform = platform === 'twitch' && unattendedMode ? null : settings;
+        await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform));
       } catch (e) {
         console.error(e);
         // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
