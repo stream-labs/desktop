@@ -73,6 +73,12 @@ function isDonationTrain(train: ITrainInfo | IDonationTrainInfo): train is IDona
   return (train as IDonationTrainInfo).donationTrain;
 }
 
+const capitalize = (val: string) =>
+  val
+    .split('_')
+    .map(word => `${word[0].toLocaleUpperCase()}${word.slice(1)}`)
+    .join(' ');
+
 @InitAfter('UserService')
 export class StreamlabelsService extends Service {
   @Inject() userService: UserService;
@@ -235,7 +241,29 @@ export class StreamlabelsService extends Service {
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 
-    return await fetch(request).then(handleResponse);
+    return await fetch(request)
+      .then(handleResponse)
+      .then((data: IStreamlabelSet) => this.formatTrainDefinitions(data));
+  }
+
+  formatTrainDefinitions(data: IStreamlabelSet) {
+    const { trains_combos, ...rest } = data;
+    const trainData = {};
+    trains_combos.files.forEach(file => {
+      const type = Object.keys(this.trains).find(key => this.trains[key].setting === file.name);
+      const filetypes = ['train_counter', 'train_latest_name', 'train_clock'];
+      if (file.name === 'train_tips') filetypes.push('train_latest_amount', 'train_total_amount');
+      const files = filetypes.map(filetype => ({
+        name: `${type}_${filetype}`,
+        label: capitalize(`${type}_${filetype}`),
+        settings: { settingsStat: file.name },
+      }));
+      trainData[file.name] = { label: file.label, files };
+    });
+    return {
+      ...rest,
+      ...trainData,
+    };
   }
 
   private initSocketConnection(): void {
@@ -249,7 +277,7 @@ export class StreamlabelsService extends Service {
 
         if (train.mostRecentEventAt == null) return;
 
-        const statname = train.setting;
+        const statname = `${trainType}_train_clock`;
         const settings = this.getSettingsForStat(train.setting);
 
         // There is currently a bug where this will sometimes come back
@@ -311,7 +339,7 @@ export class StreamlabelsService extends Service {
     }
 
     if (train.mostRecentEventAt == null) {
-      output[train.setting] = settings.show_clock === 'always' ? '0:00' : '';
+      output[`${trainType}_train_clock`] = settings.show_clock === 'always' ? '0:00' : '';
     }
 
     this.updateOutput(output);
