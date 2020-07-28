@@ -80,7 +80,7 @@ export default class StartStreamingButton extends Vue {
       if (this.streamingService.views.shouldShowGoLiveWindow()) {
         this.streamingService.actions.showGoLiveWindow();
       } else {
-        this.streamingService.actions.goLive(null, true);
+        this.streamingService.actions.goLive();
       }
     }
   }
