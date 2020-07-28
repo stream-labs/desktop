@@ -250,20 +250,50 @@ export class StreamlabelsService extends Service {
     const { trains_combos, ...rest } = data;
     const trainData = {};
     trains_combos.files.forEach(file => {
-      const type = Object.keys(this.trains).find(key => this.trains[key].setting === file.name);
-      const filetypes = ['train_counter', 'train_latest_name', 'train_clock'];
-      if (file.name === 'train_tips') filetypes.push('train_latest_amount', 'train_total_amount');
-      const files = filetypes.map(filetype => ({
-        name: `${type}_${filetype}`,
-        label: capitalize(`${type}_${filetype}`),
-        settings: { settingsStat: file.name },
-      }));
-      trainData[file.name] = { label: file.label, files };
+      trainData[file.name] = { label: file.label, files: this.trainFiles(file.name) };
     });
     return {
       ...rest,
       ...trainData,
     };
+  }
+
+  trainFiles(fileName: string) {
+    const type = Object.keys(this.trains).find(key => this.trains[key].setting === fileName);
+
+    const baseFiles = [
+      {
+        name: `${type}_train_counter`,
+        label: capitalize(`${type}_train_counter`),
+        settings: { settingsStat: fileName, settingsWhitelist: ['show_count'] },
+      },
+      {
+        name: `${type}_train_latest_name`,
+        label: capitalize(`${type}_train_latest_name`),
+        settings: { settingsStat: fileName, settingsWhitelist: ['show_latest'] },
+      },
+      {
+        name: `${type}_train_clock`,
+        label: capitalize(`${type}_train_clock`),
+        settings: { settingsStat: fileName, settingsWhitelist: ['duration', 'show_clock'] },
+      },
+    ];
+
+    const donationFiles = [
+      {
+        name: `${type}_train_latest_amount`,
+        label: capitalize(`${type}_train_latest_amount`),
+        settings: { settingsStat: fileName, settingsWhitelist: [] as Array<string> },
+      },
+      {
+        name: `${type}_train_total_amount`,
+        label: capitalize(`${type}_train_total_amount`),
+        settings: { settingsStat: fileName, settingsWhitelist: [] as Array<string> },
+      },
+    ];
+
+    if (fileName !== 'train_tips') return baseFiles;
+    return baseFiles.concat(donationFiles);
   }
 
   private initSocketConnection(): void {
@@ -386,6 +416,7 @@ export class StreamlabelsService extends Service {
    * @param settingsPatch the new settings to be applied
    */
   private updateSettings(settingsPatch: Dictionary<IStreamlabelSettings>) {
+    console.log(settingsPatch);
     this.settings = {
       ...this.settings,
       ...settingsPatch,
