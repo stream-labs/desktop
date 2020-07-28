@@ -140,7 +140,7 @@ export interface IPlatformService {
   /**
    * Sets up the stream key and live broadcast info required to go live.
    */
-  beforeGoLive: (options: IGoLiveSettings) => Promise<void>;
+  beforeGoLive: (options?: IGoLiveSettings) => Promise<void>;
 
   afterGoLive: () => Promise<void>;
 
