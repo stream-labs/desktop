@@ -34,7 +34,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
   browser_source: {
     name: $t('Browser Source'),
     description: $t(
-      'Allows you to add web-based content as a source, such as web pages and Flash SWFs.',
+      'Allows you to add web-based content as a source, such as web pages, widgets and streaming video.',
     ),
     demoFilename: 'browser-source.png',
     supportList: [$t('Websites'), $t('Third party widgets'), 'HTML'],
@@ -127,7 +127,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
   },
   scene: {
     name: $t('Scene'),
-    description: $t('Allows you to add existing scene as a source'),
+    description: $t('Allows you to add an existing scene as a source'),
     demoFilename: 'scene.png',
   },
   // vvv Not sure if this is still supported, there is no showcase data for it vvv
