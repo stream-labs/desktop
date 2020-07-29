@@ -272,8 +272,19 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
       'fields=status,stream_url,title,description';
     return this.requestFacebook<{ data: IFacebookLiveVideo[] }>(url, this.activeToken).then(
       json => {
-        const info =
-          json.data.find((vid: any) => vid.status === 'SCHEDULED_UNPUBLISHED') || json.data[0];
+        // First check if there are any live videos
+        let info = json.data.find((vid: any) => vid.status.includes(['LIVE_STOPPED', 'LIVE']));
+
+        // Next check for future scheduled videos
+        if (!info) {
+          info = json.data.find((vid: any) => vid.status === 'SCHEDULED_UNPUBLISHED');
+        }
+
+        // Finally, just fallback to the first video, which will be their most recent VOD
+        if (!info) {
+          info = json.data[0];
+        }
+
         if (info && ['SCHEDULED_UNPUBLISHED', 'LIVE_STOPPED', 'LIVE'].includes(info.status)) {
           this.SET_LIVE_VIDEO_ID(info.id);
           this.SET_STREAM_URL(info.stream_url);
