@@ -3,6 +3,7 @@ import { Inject } from 'services/core/injector';
 import { StreamlabelsService } from 'services/streamlabels';
 import { UserService } from 'services/user';
 import { byOS, OS } from 'util/operating-systems';
+import { Subscription } from 'rxjs';
 
 export interface IStreamlabelsManagerSettings extends IDefaultManagerSettings {
   statname: string;
@@ -16,8 +17,10 @@ export class StreamlabelsManager extends DefaultManager {
   oldOutput: string = null;
   customUIComponent = 'StreamlabelProperties';
 
+  private subscription: Subscription;
+
   init() {
-    this.streamlabelsService.output.subscribe(output => {
+    this.subscription = this.streamlabelsService.output.subscribe(output => {
       if (output[this.settings.statname] !== this.oldOutput) {
         this.oldOutput = output[this.settings.statname];
         this.obsSource.update({
@@ -37,7 +40,7 @@ export class StreamlabelsManager extends DefaultManager {
   }
 
   destroy() {
-    this.streamlabelsService.output.unsubscribe();
+    if (this.subscription) this.subscription.unsubscribe();
   }
 
   normalizeSettings() {
