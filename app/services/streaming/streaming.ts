@@ -361,11 +361,17 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const lifecycle = this.state.info.lifecycle;
 
     // run checklist
-    this.RESET_STREAM_INFO();
     this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist' });
 
     // call putChannelInfo for each platform
     const platforms = this.views.enabledPlatforms;
+
+    platforms.forEach(platform => {
+      this.UPDATE_STREAM_INFO({
+        checklist: { ...this.state.info.checklist, [platform]: 'not-started' },
+      });
+    });
+
     for (const platform of platforms) {
       // don't update settings for a non-primary platform if we're not live
       if (
