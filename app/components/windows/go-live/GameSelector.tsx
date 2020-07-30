@@ -52,7 +52,7 @@ export default class GameSelector extends TsxComponent<Props> {
     platform: TPlatform,
     game: string,
   ): IListOption<string, IGameOptionData> {
-    const bgColor = { twitch: '#6441a4', facebook: '#3b5998' }[platform];
+    const bgColor = { twitch: 'var(--twitch)', facebook: 'var(--facebook)' }[platform];
     return {
       title: game,
       value: `${platform} ${game}`,
