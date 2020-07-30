@@ -27,7 +27,7 @@
   "Confirm stream title and game before going live": "Bekræft streamtitel og spil før du går live",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "ADVARSEL! Du vil miste alle scener, kilder og indstillinger. Dette kan ikke fortrydes!",
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Din cache-mappe er blevet uploadet. Filnavnet %{file} er blevet kopieret til udklipsholderen.",
-  "Stream Labels session has been succesfully restarted!": "Streamlabels-sessionen er blevet genstartet.",
+  "Stream Labels session has been successfully restarted!": "Stream Labels session has been successfully restarted!",
   "This action will restart the application. Continue?": "Dette vil genstarte programmet. Vil du fortsætte?",
   "Show confirmation dialog when starting streams": "Vis en dialogboks med bekræftelse når du streamen startes",
   "Show confirmation dialog when stopping streams": "Vis en dialogboks med bekræftelse når du streamen stoppes",
