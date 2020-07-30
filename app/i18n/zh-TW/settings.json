@@ -27,7 +27,7 @@
   "Confirm stream title and game before going live": "在開始直播前確認直播標題與遊戲",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "警告！您會失去所有場景、來源與設定。此動作無法復原！",
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "您的快取目錄已成功上傳。檔案名稱 %{file} 已複製到您的剪貼簿。",
-  "Stream Labels session has been succesfully restarted!": "直播標籤作業已成功重新啟動！",
+  "Stream Labels session has been successfully restarted!": "Stream Labels session has been successfully restarted!",
   "This action will restart the application. Continue?": "此動作會重新啟動應用程式。要繼續嗎？",
   "Show confirmation dialog when starting streams": "開始直播時顯示確認對話方塊",
   "Show confirmation dialog when stopping streams": "停止直播時顯示確認對話方塊",
