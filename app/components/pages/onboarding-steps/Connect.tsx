@@ -163,7 +163,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
             <i
               class={this.iconForPlatform('mixer')}
               style={{
-                color: '#0078d7',
+                color: 'var(--mixer)',
                 fontSize: '24px',
                 verticalAlign: 'middle',
                 marginRight: '8px',
