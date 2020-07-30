@@ -100,7 +100,7 @@ function getObs() {
 function startApp() {
   const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
 
-  const bt = require('backtrace-node');
+  const Raven = require('raven-js');
 
   function handleFinishedReport() {
     dialog.showErrorBox(`予期せぬエラー`,
@@ -112,30 +112,23 @@ function startApp() {
     }
   }
 
-  function handleUnhandledException(err) {
-    bt.report(err, {}, handleFinishedReport);
-  }
-
   if (pjson.env === 'production') {
-    bt.initialize({
-      disableGlobalHandler: true,
-      endpoint: 'https://n-air-app.sp.backtrace.io:8443',
-      token: '66abc2eda8a8ead580b825dd034d9b4f9da4d54eeb312bf8ce713571e1b1d35f',
-      attributes: {
-        version: pjson.version,
-        processType: 'main'
-      }
-    });
+    const params = !!process.env.NAIR_UNSTABLE
+      ? {project: '1546758', key: '7451aaa71b7640a69ee1d31d6fd9ef78'}
+      : {project: '1246812', key: '35a02d8ebec14fd3aadc9d95894fabcf'};
 
-    process.on('uncaughtException', handleUnhandledException);
+    Raven.config(`https://${params.key}@o170115.ingest.sentry.io/${params.project}`, {
+      release: process.env.NAIR_VERSION
+    }).install(function (err, initialErr, eventId) {
+      handleFinishedReport();
+    });
 
     crashReporter.start({
       productName: 'n-air-app',
       companyName: 'n-air-app',
       submitURL:
-        'https://n-air-app.sp.backtrace.io:8443/post?' +
-        'format=minidump&' +
-        'token=66abc2eda8a8ead580b825dd034d9b4f9da4d54eeb312bf8ce713571e1b1d35f',
+        `https://o170115.ingest.sentry.io/api/${params.project}/minidump/` +
+        `?sentry_key=${params.key}`,
       extra: {
         version: pjson.version,
         processType: 'main'
