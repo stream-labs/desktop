@@ -74,6 +74,7 @@ export default class SideNav extends Vue {
       target: tab,
       title: this.layoutService.state.tabs[tab].name || $t('Editor'),
       icon: this.layoutService.state.tabs[tab].icon,
+      trackingTarget: tab === 'default' ? 'editor' : 'custom',
     }));
   }
 
@@ -115,7 +116,7 @@ export default class SideNav extends Vue {
     );
   }
 
-  studioTab(page: { target: string; title: string; icon: string }) {
+  studioTab(page: { target: string; title: string; icon: string; trackingTarget: string }) {
     return (
       <div
         class={cx(styles.mainCell, {
@@ -123,6 +124,7 @@ export default class SideNav extends Vue {
             this.page === 'Studio' && this.layoutService.state.currentTab === page.target,
         })}
         onClick={() => this.navigateToStudioTab(page.target)}
+        vTrackClick={{ component: 'SideNav', target: page.trackingTarget }}
         title={page.title}
       >
         <i class={page.icon} />
@@ -131,13 +133,31 @@ export default class SideNav extends Vue {
   }
 
   render() {
-    const pageData = [{ target: 'BrowseOverlays', icon: 'icon-themes', title: $t('Themes') }];
+    const pageData = [
+      {
+        target: 'BrowseOverlays',
+        icon: 'icon-themes',
+        title: $t('Themes'),
+        trackingTarget: 'themes',
+      },
+    ];
 
     if (this.chatbotVisible) {
-      pageData.push({ target: 'Chatbot', icon: 'icon-cloudbot', title: $t('Cloudbot') });
+      pageData.push({
+        target: 'Chatbot',
+        icon: 'icon-cloudbot',
+        title: $t('Cloudbot'),
+        trackingTarget: 'cloudbot',
+      });
     }
+
     if (this.appStoreVisible) {
-      pageData.push({ target: 'PlatformAppStore', icon: 'icon-store', title: $t('App Store') });
+      pageData.push({
+        target: 'PlatformAppStore',
+        icon: 'icon-store',
+        title: $t('App Store'),
+        trackingTarget: 'app-store',
+      });
     }
 
     return (
@@ -150,6 +170,7 @@ export default class SideNav extends Vue {
               [styles.disabled]: !this.userService.isLoggedIn && page.target !== 'Studio',
             })}
             onClick={() => this.navigate(page.target as TAppPage)}
+            vTrackClick={{ component: 'SideNav', target: page.trackingTarget }}
             title={page.title}
           >
             <i class={page.icon} />
