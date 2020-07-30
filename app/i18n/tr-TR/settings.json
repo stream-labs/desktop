@@ -27,7 +27,7 @@
   "Confirm stream title and game before going live": "Yayın başlığını ve oyunu yayına başlamadan önce onaylayın",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "DİKKAT! Bütün sahneleri, kaynakları ve ayarları kaybedeceksiniz. Bu işlem geri alınamaz!",
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Önbellek dizini başarıyla yüklendi. %{file} isimli dosya panonuza kopyalandı.",
-  "Stream Labels session has been succesfully restarted!": "Yayın Etiketleri oturumu başarılı bir şekilde tekrar başlatıldı!",
+  "Stream Labels session has been successfully restarted!": "Stream Labels session has been successfully restarted!",
   "This action will restart the application. Continue?": "Bu işlem uygulamayı yeniden başlatacak. Devam edilsin mi?",
   "Show confirmation dialog when starting streams": "Yayın başlatma sırasında onay iletişim kutusunu göster",
   "Show confirmation dialog when stopping streams": "Yayın durdurma sırasında onay iletişim kutusunu göster",
