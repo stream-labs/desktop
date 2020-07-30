@@ -153,7 +153,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         buttons: [$t('Cancel'), $t('Go Live')],
       });
 
-      if (!goLive) return;
+      if (!goLive.response) return;
     }
 
     this.powerSaveId = electron.remote.powerSaveBlocker.start('prevent-display-sleep');
@@ -253,7 +253,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           buttons: [$t('Cancel'), $t('End Stream')],
         });
 
-        if (!endStream) return;
+        if (!endStream.response) return;
       }
 
       if (this.powerSaveId) {
@@ -490,6 +490,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         eventMetadata.server = streamSettings.server;
 
         this.usageStatisticsService.recordEvent('stream_start', eventMetadata);
+        this.usageStatisticsService.recordAnalyticsEvent('StreamingStatus', {
+          code: info.code,
+          status: EStreamingState.Live,
+        });
       } else if (info.signal === EOBSOutputSignal.Starting) {
         this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
         this.streamingStatusChange.next(EStreamingState.Starting);
@@ -497,6 +501,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         this.SET_STREAMING_STATUS(EStreamingState.Offline, time);
         this.streamingStatusChange.next(EStreamingState.Offline);
         if (this.streamSettingsService.protectedModeEnabled) this.runPlaformAfterStopStreamHook();
+        this.usageStatisticsService.recordAnalyticsEvent('StreamingStatus', {
+          code: info.code,
+          status: EStreamingState.Offline,
+        });
       } else if (info.signal === EOBSOutputSignal.Stopping) {
         this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
         this.streamingStatusChange.next(EStreamingState.Ending);
@@ -518,6 +526,13 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         [EOBSOutputSignal.Stopping]: ERecordingState.Stopping,
       }[info.signal];
 
+      if (info.signal === EOBSOutputSignal.Start) {
+        this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
+          status: nextState,
+          code: info.code,
+        });
+      }
+
       this.SET_RECORDING_STATUS(nextState, time);
       this.recordingStatusChange.next(nextState);
     } else if (info.type === EOBSOutputType.ReplayBuffer) {
@@ -535,6 +550,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       }
 
       if (info.signal === EOBSOutputSignal.Wrote) {
+        this.usageStatisticsService.recordAnalyticsEvent('ReplayBufferStatus', {
+          status: 'wrote',
+          code: info.code,
+        });
         this.replayBufferFileWrite.next(obs.NodeObs.OBS_service_getLastReplay());
       }
     }
@@ -546,7 +565,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       }
 
       let errorText = '';
+      let extendedErrorText = '';
       let linkToDriverInfo = false;
+      let showNativeErrorMessage = false;
 
       if (info.code === obs.EOutputCode.BadPath) {
         errorText = $t(
@@ -571,20 +592,24 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           $t(
             'The output format is either unsupported or does not support more than one audio track.  ',
           ) + $t('Please check your settings and try again.');
+      } else if (info.code === obs.EOutputCode.OutdatedDriver) {
+        linkToDriverInfo = true;
+        errorText = $t(
+          'An error occurred with the output. This is usually caused by out of date video drivers. Please ensure your Nvidia or AMD drivers are up to date and try again.',
+        );
       } else {
         // -4 is used for generic unknown messages in OBS. Both -4 and any other code
         // we don't recognize should fall into this branch and show a generic error.
+        errorText = $t(
+          'An error occurred with the output. Please check your streaming and recording settings.',
+        );
         if (info.error) {
-          errorText = info.error;
-        } else {
-          linkToDriverInfo = true;
-          errorText = $t(
-            'An error occurred with the output. This is usually caused by out of date video drivers. Please ensure your Nvidia or AMD drivers are up to date and try again.',
-          );
+          showNativeErrorMessage = true;
+          extendedErrorText = errorText + '\n\n' + $t('System error message:"') + info.error + '"';
         }
       }
-
       const buttons = [$t('OK')];
+
       const title = {
         [EOBSOutputType.Streaming]: $t('Streaming Error'),
         [EOBSOutputType.Recording]: $t('Recording Error'),
@@ -592,23 +617,46 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       }[info.type];
 
       if (linkToDriverInfo) buttons.push($t('Learn More'));
+      if (showNativeErrorMessage) buttons.push($t('More'));
 
       this.outputErrorOpen = true;
-
+      const errorType = 'error';
       electron.remote.dialog
         .showMessageBox(Utils.getMainWindow(), {
           buttons,
           title,
-          type: 'error',
+          type: errorType,
           message: errorText,
         })
         .then(({ response }) => {
-          this.outputErrorOpen = false;
-
           if (linkToDriverInfo && response === 1) {
+            this.outputErrorOpen = false;
             electron.remote.shell.openExternal(
               'https://howto.streamlabs.com/streamlabs-obs-19/nvidia-graphics-driver-clean-install-tutorial-7000',
             );
+          } else {
+            let expectedResponse = 1;
+            if (linkToDriverInfo) {
+              expectedResponse = 2;
+            }
+            if (showNativeErrorMessage && response === expectedResponse) {
+              const buttons = [$t('OK')];
+              electron.remote.dialog
+                .showMessageBox({
+                  buttons,
+                  title,
+                  type: errorType,
+                  message: extendedErrorText,
+                })
+                .then(({ response }) => {
+                  this.outputErrorOpen = false;
+                })
+                .catch(() => {
+                  this.outputErrorOpen = false;
+                });
+            } else {
+              this.outputErrorOpen = false;
+            }
           }
         })
         .catch(() => {

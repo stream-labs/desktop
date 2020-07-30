@@ -14,19 +14,13 @@ import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
 import { ViewHandler } from 'services/core';
 import { lazyModule } from 'util/lazy-module';
-import { assertIsDefined } from '../../util/properties-type-guards';
 
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 
 export interface IScene {
   id: string;
   name: string;
-
-  // array of nodes with preserved order
   nodes: (ISceneItem | ISceneItemFolder)[];
-
-  // dictionary of nodes where key is nodeId
-  nodesMap: Dictionary<ISceneItem | ISceneItemFolder>;
 }
 
 export interface ISceneNodeAddOptions {
@@ -191,16 +185,6 @@ export class ScenesService extends StatefulService<IScenesState> {
     scenes: {},
   };
 
-  // keeps instances of SceneItem and SceneFolder to speed-up API calls
-  private cachedNodes: Dictionary<TSceneNode> = {};
-
-  /**
-   * return TSceneNode from the cache
-   */
-  getNodeFromCache(id: string): TSceneNode {
-    return this.cachedNodes[id];
-  }
-
   get views() {
     return new ScenesViews(this.state);
   }
@@ -216,31 +200,12 @@ export class ScenesService extends StatefulService<IScenesState> {
   @Inject() private sourcesService: SourcesService;
   @Inject() private transitionsService: TransitionsService;
 
-  protected init() {
-    // subscribe to itemAdded and itemRemoved event to sync cachedNodes
-    this.itemAdded.subscribe(itemModel => {
-      this.addItemToCache(itemModel.sceneId, itemModel.id);
-    });
-    this.itemRemoved.subscribe(itemModel => {
-      delete this.cachedNodes[itemModel.id];
-    });
-  }
-
-  addItemToCache(sceneId: string, itemId: string) {
-    const scene = this.views.getScene(sceneId);
-    assertIsDefined(scene);
-    const node = scene.getNode(itemId);
-    assertIsDefined(node);
-    this.cachedNodes[itemId] = node;
-  }
-
   @mutation()
   private ADD_SCENE(id: string, name: string) {
     Vue.set<IScene>(this.state.scenes, id, {
       id,
       name,
       nodes: [],
-      nodesMap: {},
     });
     this.state.displayOrder.push(id);
   }
@@ -504,7 +469,7 @@ export class ScenesService extends StatefulService<IScenesState> {
 
   /**
    * Apply a callback for each sceneNode
-   * Stop travers if the callback returns false
+   * Stop traversing if the callback returns false
    */
   private traverseScene(
     sceneId: string,
@@ -513,6 +478,7 @@ export class ScenesService extends StatefulService<IScenesState> {
   ): boolean {
     let canContinue = true;
     const scene = this.views.getScene(sceneId);
+    if (!scene) return false;
 
     // traverse root-level
     if (!nodeId) {
@@ -526,6 +492,8 @@ export class ScenesService extends StatefulService<IScenesState> {
 
     // traverse a scene-node
     const node = scene.getNode(nodeId);
+    if (!node) return false;
+
     if (node.isItem()) {
       canContinue = cb(node);
       if (!canContinue) return false;

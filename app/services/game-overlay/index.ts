@@ -9,13 +9,9 @@ import { PersistentStatefulService } from 'services/core/persistent-stateful-ser
 import { mutation } from 'services/core/stateful-service';
 import { $t } from 'services/i18n';
 import { StreamInfoService } from 'services/stream-info';
+import { getOS, OS } from 'util/operating-systems';
 
 const { BrowserWindow } = electron.remote;
-
-// We remote.require because this module needs to live in the main
-// process so we can paint to it from there. We are doing this to
-// work around an electron bug: https://github.com/electron/electron/issues/20559
-const overlay = electron.remote.require('@streamlabs/game-overlay');
 
 interface IWindowProperties {
   chat: { position: IVec2; id: number; enabled: boolean };
@@ -69,13 +65,11 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   windows: {
     chat: Electron.BrowserWindow;
     recentEvents: Electron.BrowserWindow;
-    // overlayControls: Electron.BrowserWindow;
   } = {} as any;
 
   previewWindows: {
     chat: Electron.BrowserWindow;
     recentEvents: Electron.BrowserWindow;
-    // overlayControls: Electron.BrowserWindow;
   } = {} as any;
 
   private onWindowsReady: Subject<Electron.BrowserWindow> = new Subject<Electron.BrowserWindow>();
@@ -85,8 +79,19 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
   private commonWindowOptions = {} as Electron.BrowserWindowConstructorOptions;
 
+  // We remote.require because this module needs to live in the main
+  // process so we can paint to it from there. We are doing this to
+  // work around an electron bug: https://github.com/electron/electron/issues/20559
+  // TODO: This module has types but we can't use them in their current state
+  private overlay: any;
+
   async init() {
+    // Game overlay is windows only
+    if (getOS() !== OS.Windows) return;
+
     super.init();
+    this.overlay = electron.remote.require('game-overlay');
+
     this.lifecycle = await this.userService.withLifecycle({
       init: this.initializeOverlay,
       destroy: () => this.setEnabled(false),
@@ -108,7 +113,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       crashHandlerLogPath = electron.remote.app.getPath('userData') + overlayLogFile;
     }
 
-    overlay.start(crashHandlerLogPath);
+    this.overlay.start(crashHandlerLogPath);
 
     this.onWindowsReadySubscription = this.onWindowsReady
       .pipe(
@@ -246,7 +251,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
       this.windows[key].setBounds({ ...pos, ...size });
       this.previewWindows[key].setBounds({ ...pos, ...size });
-      overlay.setPosition(overlayId, pos.x, pos.y, size.width, size.height);
+      this.overlay.setPosition(overlayId, pos.x, pos.y, size.width, size.height);
     });
   }
 
@@ -258,7 +263,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   showOverlay() {
-    overlay.show();
+    this.overlay.show();
     this.TOGGLE_OVERLAY(true);
 
     // Force a refresh to trigger a paint event
@@ -266,13 +271,13 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   hideOverlay() {
-    overlay.hide();
+    this.overlay.hide();
     this.TOGGLE_OVERLAY(false);
   }
 
   toggleOverlay() {
     // This is a typo in the module: "runing"
-    if (overlay.getStatus() !== 'runing' || !this.state.isEnabled) {
+    if (this.overlay.getStatus() !== 'runing' || !this.state.isEnabled) {
       return;
     }
 
@@ -305,7 +310,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
     const id = this.state.windowProperties[window].id;
 
-    overlay.setVisibility(id, this.state.windowProperties[window].enabled);
+    this.overlay.setVisibility(id, this.state.windowProperties[window].enabled);
 
     if (!this.state.windowProperties[window].enabled) {
       this.previewWindows[window].hide();
@@ -329,7 +334,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
         this.SET_WINDOW_POSITION(key, { x, y });
         const { width, height } = win.getBounds();
 
-        await overlay.setPosition(overlayId, x, y, width, height);
+        await this.overlay.setPosition(overlayId, x, y, width, height);
         win.hide();
       });
     }
@@ -341,7 +346,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     Object.keys(this.windows).forEach(key => {
       const overlayId = this.state.windowProperties[key].id;
 
-      overlay.setTransparency(overlayId, percentage * 2.55);
+      this.overlay.setTransparency(overlayId, percentage * 2.55);
     });
   }
 
@@ -354,7 +359,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     if (!this.overlayRunning) return;
     this.overlayRunning = false;
 
-    await overlay.stop();
+    await this.overlay.stop();
     if (this.onWindowsReadySubscription) await this.onWindowsReadySubscription.unsubscribe();
     if (this.windows) await Object.values(this.windows).forEach(win => win.destroy());
     if (this.previewWindows) {
@@ -371,7 +376,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       // Fix race condition in screen tests
       if (win.isDestroyed()) return;
 
-      const overlayId = overlay.addHWND(win.getNativeWindowHandle());
+      const overlayId = this.overlay.addHWND(win.getNativeWindowHandle());
 
       if (overlayId === -1 || overlayId == null) {
         win.hide();
@@ -383,9 +388,9 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       const position = this.getPosition(key, win);
       const { width, height } = win.getBounds();
 
-      overlay.setPosition(overlayId, position.x, position.y, width, height);
-      overlay.setTransparency(overlayId, this.state.opacity * 2.55);
-      overlay.setVisibility(overlayId, this.state.windowProperties[key].enabled);
+      this.overlay.setPosition(overlayId, position.x, position.y, width, height);
+      this.overlay.setTransparency(overlayId, this.state.opacity * 2.55);
+      this.overlay.setVisibility(overlayId, this.state.windowProperties[key].enabled);
 
       win.webContents.executeJavaScript(hideInteraction);
 

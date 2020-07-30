@@ -6,6 +6,7 @@ import { WindowsService } from 'services/windows';
 import { Inject } from 'services';
 import Utils from 'services/utils';
 import { SourcesService } from 'services/sources';
+import { byOS, OS } from 'util/operating-systems';
 
 @Component({})
 export default class BrowserSourceInteraction extends TsxComponent<{}> {
@@ -32,7 +33,7 @@ export default class BrowserSourceInteraction extends TsxComponent<{}> {
   }
 
   eventLocationInSourceSpace(e: MouseEvent): IVec2 {
-    const factor = this.windowsService.state.child.scaleFactor;
+    const factor = byOS({ [OS.Windows]: this.windowsService.state.child.scaleFactor, [OS.Mac]: 1 });
 
     return {
       x:

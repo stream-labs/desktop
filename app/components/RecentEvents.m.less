@@ -47,6 +47,8 @@
   display: flex;
   align-items: center;
   padding: 8px 16px;
+  flex-wrap: wrap;
+  position: relative;
 
   span {
     margin-right: 8px;
@@ -54,7 +56,9 @@
   }
 
   i {
-    margin-left: auto;
+    position: absolute;
+    top: 10px;
+    right: 16px;
   }
 }
 
@@ -101,6 +105,7 @@
   opacity: 0.7;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: normal !important;
 }
 
 :global(.action-icon).red {

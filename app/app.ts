@@ -23,7 +23,7 @@ import Toasted from 'vue-toasted';
 import VueI18n from 'vue-i18n';
 import VModal from 'vue-js-modal';
 import VeeValidate from 'vee-validate';
-import ChildWindow from 'components/windows/ChildWindow.vue';
+import ChildWindow from 'components/windows/ChildWindow';
 import OneOffWindow from 'components/windows/OneOffWindow.vue';
 import { UserService, setSentryContext } from 'services/user';
 import { getResource } from 'services';
@@ -34,6 +34,7 @@ import uuid from 'uuid/v4';
 import Blank from 'components/windows/Blank.vue';
 import Main from 'components/windows/Main.vue';
 import CustomLoader from 'components/CustomLoader';
+import process from 'process';
 import { MetricsService } from 'services/metrics';
 
 const crashHandler = window['require']('crash-handler');
@@ -42,6 +43,12 @@ const { ipcRenderer, remote, app, contentTracing } = electron;
 const slobsVersion = Utils.env.SLOBS_VERSION;
 const isProduction = Utils.env.NODE_ENV === 'production';
 const isPreview = !!Utils.env.SLOBS_PREVIEW;
+
+// Used by Eddy for debugging on mac.
+if (!isProduction) {
+  const windowId = Utils.getWindowId();
+  process.title = `SLOBS Renderer ${windowId}`;
+}
 
 // This is the development DSN
 let sentryDsn = 'https://8f444a81edd446b69ce75421d5e91d4d@sentry.io/252950';
@@ -58,7 +65,7 @@ if (isProduction) {
       'https://sentry.io/api/1283430/minidump/?sentry_key=01fc20f909124c8499b4972e9a5253f2',
     extra: {
       'sentry[release]': slobsVersion,
-      processType: 'renderer',
+      windowId: Utils.getWindowId(),
     },
   });
 }
@@ -102,6 +109,13 @@ window.addEventListener('error', e => {
 window.addEventListener('unhandledrejection', e => {
   sendLogMsg('error', e.reason);
 });
+
+// Remove the startup event listener that catches bundle parse errors and other
+// critical issues starting up the renderer.
+if (window['_startupErrorHandler']) {
+  window.removeEventListener('error', window['_startupErrorHandler']);
+  delete window['_startupErrorHandler'];
+}
 
 if (
   (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) &&
@@ -244,7 +258,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const message = apiInitErrorResultToMessage(apiResult);
       showDialog(message);
 
-      crashHandler.unregisterProcess(appService.pid);
+      crashHandler.unregisterProcess(process.pid);
 
       obs.NodeObs.StopCrashHandler();
       obs.IPC.disconnect();

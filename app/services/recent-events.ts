@@ -264,7 +264,7 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
       superchat: $t('has superchatted'),
       // Integrations
       pledge: $t('has pledged on Patreon'),
-      eldonation: $t('has donated to ExtraLife'),
+      eldonation: $t('has donated to Extra Life'),
       tiltifydonation: $t('has donated to Tiltify'),
       donordrivedonation: $t('has donated to Donor Drive'),
       justgivingdonation: $t('has donated to Just Giving'),
@@ -295,6 +295,12 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
       });
     }
     return $t('has subscribed (%{tier})', { tier: subscriptionMap(event.sub_plan) });
+  }
+
+  getEvent(uuid: string) {
+    return this.state.recentEvents.find(event => {
+      return event.uuid === uuid;
+    });
   }
 }
 
@@ -492,14 +498,15 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
 
   async readAlert(event: IRecentEvent) {
     this.TOGGLE_RECENT_EVENT_READ(event.uuid);
+    const newEvent = this.views.getEvent(event.uuid);
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/readalert`;
     const headers = authorizedHeaders(
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
     );
     const body = JSON.stringify({
-      eventHash: event.hash,
-      read: event.read,
+      eventHash: newEvent.hash,
+      read: newEvent.read,
     });
     const request = new Request(url, { headers, body, method: 'POST' });
     return await fetch(request).then(handleResponse);
@@ -630,6 +637,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   applyConfig(config: IRecentEventsConfig) {
+    if (!config) return;
     this.SET_MUTED(config.eventsPanelMuted);
     this.SET_FILTER_CONFIG(config.settings);
   }

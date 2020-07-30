@@ -36,7 +36,6 @@
 
   display: flex;
   align-items: center;
-  text-transform: capitalize;
   font-size: 14px;
   color: var(--title);
 

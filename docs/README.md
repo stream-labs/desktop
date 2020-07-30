@@ -259,11 +259,13 @@ To disable that behavior, use the `compactMode` parameter in JSON-RPC request:
 ```
 
 # Remote connections
-Streamlabs OBS allows remote connection via websokets protocol powered by [Sockjs](https://github.com/sockjs).
-To enable remote connections run Streamlabs OBS with `--adv-settings` parameter, go to `Settings->API`,
-enable Websokets and check `Allow Remote Connections`.
-Use API token from this window to authorize you connection:
+Streamlabs OBS allows remote connection via websockets protocol powered by [Sockjs](https://github.com/sockjs).
+To enable remote connections go to `Settings->Remote Control` click on QR Code and click `show details`.
+Copy the token and close the settings window.
+SLOBS will start listening for new collections.
 
+You should provide your token in your first request to the API.
+This step is required for each new connection to websockets.
 
 ### Request
 ```
@@ -278,9 +280,8 @@ Use API token from this window to authorize you connection:
 }
 ```
 
-Local connections to '127.0.0.1' don't require authorization.
 
-
+You can find more settings if you start SLOBS with `--adv-settings` parameter and go to `Settings->Developer`.
 
 # FAQ
 

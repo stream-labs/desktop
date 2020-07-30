@@ -20,6 +20,7 @@ export interface IJsonRpcRequest {
     fetchMutations?: boolean;
     compactMode?: boolean;
     noReturn?: boolean;
+    windowId?: string;
   };
 }
 

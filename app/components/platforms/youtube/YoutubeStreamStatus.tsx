@@ -10,6 +10,7 @@ import TsxComponent from 'components/tsx-component';
 import styles from './YoutubeStreamStatus.m.less';
 import { TYoutubeLifecycleStep } from 'services/platforms/youtube';
 import { StreamingService } from 'services/streaming';
+import Translate from 'components/shared/translate';
 import electron from 'electron';
 
 /**
@@ -94,6 +95,16 @@ export default class YoutubeStreamStatus extends TsxComponent {
     this.windowsService.closeChildWindow();
   }
 
+  get scopedSlots() {
+    return {
+      dashboardLink: (text: string) => (
+        <a href="javascript:void(0)" onClick={() => this.goToDashboard()}>
+          {text}
+        </a>
+      ),
+    };
+  }
+
   render() {
     return (
       <ModalLayout showControls={false}>
@@ -116,13 +127,7 @@ export default class YoutubeStreamStatus extends TsxComponent {
             <div class={styles.content}>
               <h1>{$t('Something went wrong')}</h1>
               <p class={styles.error}>
-                {$t(
-                  "Your stream has been created but we can't publish it in your channel. Check your internet connection or go to the ",
-                )}
-                <a href="javascript:void(0)" onClick={this.goToDashboard}>
-                  {$t('stream control page')}
-                </a>
-                {$t(' to publish it manually')}
+                <Translate message={$t('youtubeStatusError')} scopedSlots={this.scopedSlots} />
               </p>
 
               {!this.errorDetailsVisible && (

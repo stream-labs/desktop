@@ -328,7 +328,7 @@ test('Go live error', async t => {
   await focusChild(t);
 
   // check that the error text is shown
-  await app.client.waitForVisible('a=just go live.');
+  await app.client.waitForVisible('a=just go live');
 
   // stop simulating network issues and retry fetching the channelInfo
   await resetFetchMock(t);
@@ -340,7 +340,7 @@ test('Go live error', async t => {
   await fetchMock(t, /api\.twitch\.tv/, 404);
   await focusChild(t);
   await click(t, 'button=Confirm & Go Live');
-  await app.client.waitForVisible('a=just go live.');
+  await app.client.waitForVisible('a=just go live');
 
   t.pass();
 });

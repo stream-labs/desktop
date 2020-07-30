@@ -1,13 +1,15 @@
 import { IPatchNotes } from '.';
 
 export const notes: IPatchNotes = {
-  version: '0.20.0',
-  title: 'Introducing the Layout Editor',
+  version: '0.22.0',
+  title: 'Updated Internals',
   showChest: false,
   notes: [
-    'Our new Layout Editor feature lets you completely customize the editor tab. Choose what panels you want to see, and where the should go. Complete control is finally here. Click the Layout Editor icon in the bottom left to get started.',
-    "The game capture now has an 'auto' mode that takes the guesswork out of capturing games. It will automatically capture most popular games without need any additional settings.",
-    'Multistream is now available to users logged in via YouTube',
+    'Window capture now works on hardware accelerated windows such as Chrome and Discord',
+    'Game capture now supports capturing games that use the Vulkan API',
+    'Auto mode for game capture is now better than ever at automatically detecting games to capture',
+    'The dynamic bitrate mode is smarter and less aggressive in lowering the bitrate',
+    'We added a brand new flow for first-time Streamlabs OBS users',
     'Lots of bug and crash fixes',
   ],
 };

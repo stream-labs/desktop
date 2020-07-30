@@ -39,10 +39,6 @@ class LayoutViews extends ViewHandler<ILayoutServiceState> {
     return LAYOUT_DATA[this.currentTab.currentLayout].component;
   }
 
-  get isColumnLayout() {
-    return LAYOUT_DATA[this.currentTab.currentLayout].isColumns;
-  }
-
   elementTitle(element: ELayoutElement) {
     if (!element) return;
     return ELEMENT_DATA()[element].title;
@@ -55,6 +51,42 @@ class LayoutViews extends ViewHandler<ILayoutServiceState> {
 
   className(layout: ELayout) {
     return LAYOUT_DATA[layout].className;
+  }
+
+  calculateColumnTotal(slots: IVec2Array) {
+    let totalWidth = 0;
+    slots.forEach(slot => {
+      if (Array.isArray(slot)) {
+        totalWidth += this.calculateMinimum('x', slot);
+      } else if (slot) {
+        totalWidth += slot.x;
+      }
+    });
+
+    return totalWidth;
+  }
+
+  calculateMinimum(orientation: 'x' | 'y', slots: IVec2Array) {
+    const aggregateMins: number[] = [];
+    const minimums = [];
+    slots.forEach(slot => {
+      if (Array.isArray(slot)) {
+        aggregateMins.push(this.aggregateMinimum(orientation, slot));
+      } else {
+        minimums.push(slot[orientation]);
+      }
+    });
+    if (!minimums.length) minimums.push(10);
+    return Math.max(...minimums, ...aggregateMins);
+  }
+
+  aggregateMinimum(orientation: 'x' | 'y', slots: IVec2Array) {
+    const minimums = slots.map(mins => {
+      if (mins) return mins[orientation];
+      return 10;
+    });
+    if (!minimums.length) minimums.push(10);
+    return minimums.reduce((a: number, b: number) => a + b);
   }
 }
 
@@ -146,47 +178,11 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   addTab(name: string, icon: string) {
     const id = uuid();
-    this.ADD_TAB(name, icon, id, this.userService.isPrime);
+    this.ADD_TAB(name, icon, id);
   }
 
   removeCurrentTab() {
     this.REMOVE_TAB(this.state.currentTab);
-  }
-
-  calculateColumnTotal(slots: IVec2Array) {
-    let totalWidth = 0;
-    slots.forEach(slot => {
-      if (Array.isArray(slot)) {
-        totalWidth += this.calculateMinimum('x', slot);
-      } else if (slot) {
-        totalWidth += slot.x;
-      }
-    });
-
-    return totalWidth;
-  }
-
-  calculateMinimum(orientation: 'x' | 'y', slots: IVec2Array) {
-    const aggregateMins: number[] = [];
-    const minimums = [];
-    slots.forEach(slot => {
-      if (Array.isArray(slot)) {
-        aggregateMins.push(this.aggregateMinimum(orientation, slot));
-      } else {
-        minimums.push(slot[orientation]);
-      }
-    });
-    if (!minimums.length) minimums.push(10);
-    return Math.max(...minimums, ...aggregateMins);
-  }
-
-  aggregateMinimum(orientation: 'x' | 'y', slots: IVec2Array) {
-    const minimums = slots.map(mins => {
-      if (mins) return mins[orientation];
-      return 10;
-    });
-    if (!minimums.length) minimums.push(10);
-    return minimums.reduce((a: number, b: number) => a + b);
   }
 
   @mutation()
@@ -212,7 +208,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   @mutation()
   SET_RESIZE(bar: 'bar1' | 'bar2', size: number) {
-    this.state.tabs[this.state.currentTab].resizes[bar] = size;
+    Vue.set(this.state.tabs[this.state.currentTab].resizes, bar, size);
   }
 
   @mutation()
@@ -234,7 +230,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
   }
 
   @mutation()
-  ADD_TAB(name: string, icon: string, id: string, switchTab = false) {
+  ADD_TAB(name: string, icon: string, id: string) {
     Vue.set(this.state.tabs, id, {
       name,
       icon,
@@ -252,6 +248,6 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
         bar2: 240,
       },
     });
-    if (switchTab) this.state.currentTab = id;
+    this.state.currentTab = id;
   }
 }

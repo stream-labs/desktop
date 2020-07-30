@@ -48,8 +48,11 @@ export { HardwareService, DefaultHardwareService } from 'services/hardware';
 export { EditorCommandsService } from 'services/editor-commands';
 export { EditorService } from 'services/editor';
 export { StreamSettingsService } from 'services/settings/streaming';
-export { MetricsService } from 'services/metrics';
+export { TouchBarService } from 'services/touch-bar';
+export { ApplicationMenuService } from 'services/application-menu';
 export { MacPermissionsService } from 'services/mac-permissions';
+export { VirtualWebcamService } from 'services/virtual-webcam';
+export { MetricsService } from 'services/metrics';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';
@@ -91,6 +94,7 @@ export { DonationGoalService } from 'services/widgets/settings/donation-goal';
 export { FollowerGoalService } from 'services/widgets/settings/follower-goal';
 export { StarsGoalService } from 'services/widgets/settings/stars-goal';
 export { SupporterGoalService } from 'services/widgets/settings/supporter-goal';
+export { SubscriberGoalService } from 'services/widgets/settings/subscriber-goal';
 export { ViewerCountService } from 'services/widgets/settings/viewer-count';
 export { StreamBossService } from 'services/widgets/settings/stream-boss';
 export { DonationTickerService } from 'services/widgets/settings/donation-ticker';

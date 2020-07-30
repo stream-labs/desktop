@@ -38,23 +38,28 @@ export default class EventList extends WidgetSettings<IEventListData, EventListS
     return this.service.eventsByPlatform().concat(baseEvents);
   }
 
-  get isTwitch() {
-    return this.userService.platform.type === 'twitch';
+  get minsForPlatform() {
+    return this.service.minsByPlatform();
   }
 
-  get isMixer() {
-    return this.userService.platform.type === 'mixer';
+  valueForEvent(event: { key: string; title: string; isMixer?: boolean }) {
+    return event.isMixer
+      ? this.wData.settings.mixer_account[event.key]
+      : this.wData.settings[event.key];
+  }
+
+  setEvent(event: { key: string; title: string; isMixer?: boolean }, value: boolean) {
+    if (event.isMixer) {
+      this.wData.settings.mixer_account[event.key] = value;
+    } else {
+      this.wData.settings[event.key] = value;
+    }
   }
 
   textColorTooltip = $t('A hex code for the base text color.');
 
   backgroundColorTooltip = $t(
     'A hex code for the widget background. This is for preview purposes only. It will not be shown in your stream.',
-  );
-
-  minBitsTooltip = $t(
-    'The smallest amount of bits a cheer must have for an event to be shown.' +
-      ' Setting this to 0 will make every cheer trigger an event.',
   );
 
   fontSizeTooltip = $t(

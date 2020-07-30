@@ -104,9 +104,6 @@ export default class LayoutEditor extends TsxComponent {
   }
 
   get tabOptions() {
-    if (!this.userService.isPrime) {
-      return [{ value: 'default', title: this.layoutService.state.tabs.default.name }];
-    }
     return Object.keys(this.layoutService.state.tabs).map(tab => ({
       value: tab,
       title: this.layoutService.state.tabs[tab].name,
@@ -137,7 +134,7 @@ export default class LayoutEditor extends TsxComponent {
       <div class={styles.topBar}>
         <img class={styles.arrow} src={require('../../../media/images/chalk-arrow.png')} />
         <button
-          class="button button--prime"
+          class="button button--action"
           style="margin: 0 16px;"
           onClick={() => this.openModal()}
         >

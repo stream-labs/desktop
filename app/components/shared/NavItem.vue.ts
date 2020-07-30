@@ -10,14 +10,15 @@ interface INavMenu {
 
 @Component({})
 export default class NavItem extends Vue {
-  @Prop()
-  to: string;
-
-  @Prop()
-  ico: string;
-
-  @Prop({ default: true })
-  enabled: boolean;
+  @Prop() to: string;
+  @Prop() ico: string;
+  @Prop({
+    default: () => {
+      return {};
+    },
+  })
+  icoStyles: Dictionary<string>;
+  @Prop({ default: true }) enabled: boolean;
 
   expanded = false;
 
