@@ -27,7 +27,7 @@
   "Confirm stream title and game before going live": "Confirmer le titre du stream et le jeu avant de lancer la diffusion en direct",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "ATTENTION! Vous allez perdre toutes vos scènes, sources et paramètres. Cette action est irréversible.",
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Votre répertoire cache a été transféré. Le nom du fichier %{file} a été copié dans votre presse-papiers.",
-  "Stream Labels session has been succesfully restarted!": "La session Stream Labels a été démarrée avec succès!",
+  "Stream Labels session has been successfully restarted!": "Stream Labels session has been successfully restarted!",
   "This action will restart the application. Continue?": "Cette action redémarrera l'application. Voulez-vous continuer?",
   "Show confirmation dialog when starting streams": "Afficher une boîte de dialogue de confirmation au démarrage des streams",
   "Show confirmation dialog when stopping streams": "Afficher une boîte de dialogue de confirmation à l'arrêt des streams",
