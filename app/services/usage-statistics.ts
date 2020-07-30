@@ -41,6 +41,7 @@ interface IAnalyticsEvent {
   count?: number;
   uuid?: string;
   saveUser?: boolean;
+  userId?: number;
 }
 
 export function track(event: TUsageEvent) {
@@ -62,11 +63,11 @@ export class UsageStatisticsService extends Service {
   installerId: string;
   version = Utils.env.SLOBS_VERSION;
 
-  private anaiticsEvents: IAnalyticsEvent[] = [];
+  private analyticsEvents: IAnalyticsEvent[] = [];
 
   init() {
     this.loadInstallerId();
-    this.sendAnalytics = throttle(this.sendAnalytics, 30 * 1000);
+    this.throttledSendAnalytics = throttle(this.sendAnalytics, 30 * 1000);
 
     setInterval(() => {
       this.recordAnalyticsEvent('Heartbeat', { bundle: SLOBS_BUNDLE_ID });
@@ -152,15 +153,19 @@ export class UsageStatisticsService extends Service {
   recordAnalyticsEvent(event: TAnalyticsEvent, value: any) {
     if (!this.isProduction) return;
 
-    this.anaiticsEvents.push({
+    const analyticsEvent: IAnalyticsEvent = {
       event,
       value,
       product: 'SLOBS',
       version: this.version,
       count: 1,
       uuid: this.userService.getLocalUserId(),
-    });
-    this.sendAnalytics();
+    };
+
+    if (this.userService.state.userId) analyticsEvent.userId = this.userService.state.userId;
+
+    this.analyticsEvents.push(analyticsEvent);
+    this.throttledSendAnalytics();
   }
 
   /**
@@ -175,18 +180,35 @@ export class UsageStatisticsService extends Service {
     this.recordAnalyticsEvent('Click', { component, target });
   }
 
-  private sendAnalytics() {
-    const data = { analyticsTokens: [...this.anaiticsEvents] };
+  /**
+   * Should be called on shutdown to flush all events in the pipeline
+   */
+  async flushEvents() {
+    // Unthrottled version
+    await this.sendAnalytics();
+  }
+
+  /**
+   * Should not be called directly except during shutdown.
+   */
+  private async sendAnalytics() {
+    const data = { analyticsTokens: [...this.analyticsEvents] };
     const headers = authorizedHeaders(this.userService.apiToken);
     headers.append('Content-Type', 'application/json');
 
-    this.anaiticsEvents.length = 0;
+    this.analyticsEvents.length = 0;
 
     const request = new Request(`https://${this.hostsService.analitycs}/slobs/data/ping`, {
       headers,
       method: 'post',
       body: JSON.stringify(data || {}),
     });
-    fetch(request).then(handleResponse);
+    await fetch(request)
+      .then(handleResponse)
+      .catch(e => {
+        console.error('Error sending analytics events', e);
+      });
   }
+
+  private throttledSendAnalytics: () => void;
 }
