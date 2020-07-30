@@ -110,13 +110,19 @@ export default class SideNav extends Vue {
           <div
             class={cx(styles.cell, styles.primeCell)}
             onClick={() => this.upgradeToPrime()}
+            vTrackClick={{ component: 'NavTools', target: 'prime' }}
             title={$t('Get Prime')}
           >
             <i class="icon-prime" />
           </div>
         )}
         {this.userService.isLoggedIn && (
-          <div class={cx(styles.cell)} onClick={() => this.openDashboard()} title={$t('Dashboard')}>
+          <div
+            class={cx(styles.cell)}
+            onClick={() => this.openDashboard()}
+            title={$t('Dashboard')}
+            vTrackClick={{ component: 'NavTools', target: 'dashboard' }}
+          >
             <i class="icon-dashboard" />
           </div>
         )}
@@ -124,6 +130,7 @@ export default class SideNav extends Vue {
           class={styles.cell}
           onClick={() => this.navigate('LayoutEditor')}
           title={$t('Layout Editor')}
+          vTrackClick={{ component: 'NavTools', target: 'layout-editor' }}
         >
           <i class="fas fa-th-large" />
         </div>
@@ -131,10 +138,16 @@ export default class SideNav extends Vue {
           class={cx(styles.cell, { [styles.toggleOn]: this.studioModeEnabled })}
           onClick={this.studioMode.bind(this)}
           title={$t('Studio Mode')}
+          vTrackClick={{ component: 'NavTools', target: 'studio-mode' }}
         >
           <i class="icon-studio-mode-3" />
         </div>
-        <div class={styles.cell} onClick={() => this.openHelp()} title={$t('Get Help')}>
+        <div
+          class={styles.cell}
+          onClick={() => this.openHelp()}
+          title={$t('Get Help')}
+          vTrackClick={{ component: 'NavTools', target: 'help' }}
+        >
           <i class="icon-question" />
         </div>
         <div
@@ -145,10 +158,19 @@ export default class SideNav extends Vue {
               ? $t('Logout %{username}', { username: this.userService.username })
               : $t('Login')
           }
+          vTrackClick={{
+            component: 'NavTools',
+            target: this.userService.isLoggedIn ? 'logout' : 'login',
+          }}
         >
           <i class={this.userService.isLoggedIn ? 'fas fa-sign-out-alt' : 'fas fa-sign-in-alt'} />
         </div>
-        <div class={styles.cell} onClick={() => this.openSettingsWindow()} title={$t('Settings')}>
+        <div
+          class={styles.cell}
+          onClick={() => this.openSettingsWindow()}
+          title={$t('Settings')}
+          vTrackClick={{ component: 'NavTools', target: 'settings' }}
+        >
           <i class="icon-settings" />
         </div>
       </div>

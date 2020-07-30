@@ -29,7 +29,8 @@ type TAnalyticsEvent =
   | 'StreamPerformance'
   | 'StreamingStatus'
   | 'RecordingStatus'
-  | 'ReplayBufferStatus';
+  | 'ReplayBufferStatus'
+  | 'Click';
 
 interface IAnalyticsEvent {
   product: string;
@@ -160,6 +161,18 @@ export class UsageStatisticsService extends Service {
       uuid: this.userService.getLocalUserId(),
     });
     this.sendAnalytics();
+  }
+
+  /**
+   * All clicks should use this function to ensure consistent naming
+   * of click events.
+   * @param component A logical grouping to namespace this click. Can
+   * be the name of the component, or some other grouping.
+   * @param target A unique and descriptive name for the element that
+   * was clicked.
+   */
+  recordClick(component: string, target: string) {
+    this.recordAnalyticsEvent('Click', { component, target });
   }
 
   private sendAnalytics() {
