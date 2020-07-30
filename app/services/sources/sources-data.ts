@@ -101,6 +101,16 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     demoFilename: 'vr-capture.png',
     supportList: ['OpenVR', 'SteamVR'],
   },
+  streamfx_source_mirror: {
+    name: $t('Source Mirror'),
+    description: $t(
+      'Create a mirror of any source without any overhead, and filter both video and audio again.',
+    ),
+  },
+  streamfx_source_shader: {
+    name: $t('Shader'),
+    description: $t('Use your own HLSL effect files as a source'),
+  },
   liv_capture: {
     name: $t('LIV Client Capture'),
     description: $t(

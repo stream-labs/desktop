@@ -103,6 +103,8 @@ export type TSourceType =
   | 'scene'
   | 'ndi_source'
   | 'openvr_capture'
+  | 'streamfx_source_shader'
+  | 'streamfx_source_mirror'
   | 'liv_capture'
   | 'ovrstream_dc_source'
   | 'vlc_source'

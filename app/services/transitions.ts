@@ -23,6 +23,7 @@ export enum ETransitionType {
   LumaWipe = 'wipe_transition',
   Stinger = 'obs_stinger_transition',
   Motion = 'motion_transition',
+  StreamFXShader = 'streamfx_transition_shader',
 }
 
 interface ITransitionsState {
@@ -113,6 +114,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
       { title: $t('Luma Wipe'), value: ETransitionType.LumaWipe },
       { title: $t('Stinger'), value: ETransitionType.Stinger },
       { title: $t('Motion'), value: ETransitionType.Motion },
+      { title: $t('Shader'), value: ETransitionType.StreamFXShader },
     ];
   }
 

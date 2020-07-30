@@ -74,6 +74,8 @@ export const windowsSources: TSourceType[] = [
   'scene',
   'ndi_source',
   'openvr_capture',
+  'streamfx_source_mirror',
+  'streamfx_source_shader',
   'liv_capture',
   'ovrstream_dc_source',
   'vlc_source',
@@ -454,6 +456,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
       { description: 'Audio Output Capture', value: 'coreaudio_output_capture' },
       { description: 'Video Capture Device', value: 'av_capture_input' },
       { description: 'Display Capture', value: 'display_capture' },
+      { description: 'Source Mirror', value: 'streamfx_source_mirror' },
+      { description: 'Source Shader', value: 'streamfx_source_shader' },
     ];
 
     const availableWhitelistedType = whitelistedTypes.filter(type =>

@@ -33,6 +33,14 @@ export type TSourceFilterType =
   | 'noise_suppress_filter'
   | 'noise_gate_filter'
   | 'compressor_filter'
+  | 'streamfx_filter_transform'
+  | 'streamfx_filter_shader'
+  | 'streamfx_filter_sdf_effects'
+  | 'streamfx_filter_nvidia_face_tracking'
+  | 'streamfx_filter_dynamic_mask'
+  | 'streamfx_filter_displacement'
+  | 'streamfx_filter_color_grade'
+  | 'streamfx_filter_blur'
   | 'vst_filter'
   | 'face_mask_filter'
   | 'invert_polarity_filter'
@@ -96,6 +104,14 @@ export class SourceFiltersService extends Service {
       { description: $t('Limiter'), value: 'limiter_filter' },
       { description: $t('Expander'), value: 'expander_filter' },
       { description: $t('Shader'), value: 'shader_filter' },
+      { description: $t('Transform'), value: 'streamfx_filter_transform' },
+      { description: $t('Shader'), value: 'streamfx_filter_shader' },
+      { description: $t('SDF Effects'), value: 'streamfx_filter_sdf_effects' },
+      { description: $t('Nvidia Face Tracking'), value: 'streamfx_filter_nvidia_face_tracking' },
+      { description: $t('Dynamic Mask'), value: 'streamfx_filter_dynamic_mask' },
+      { description: $t('Displacement'), value: 'streamfx_filter_displacement' },
+      { description: $t('Color Grade'), value: 'streamfx_filter_color_grade' },
+      { description: $t('Blur'), value: 'streamfx_filter_blur' },
     ];
 
     return whitelistedTypes.filter(type => obsAvailableTypes.includes(type.value));
