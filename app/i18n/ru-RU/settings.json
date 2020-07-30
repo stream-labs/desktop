@@ -27,7 +27,7 @@
   "Confirm stream title and game before going live": "Подтвердите название трансляции и игры, прежде чем выходить в прямой эфир",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "ВНИМАНИЕ! Вы потеряете все сцены, источники и настройки. Это действие нельзя отменить!",
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Каталог кэша успешно загружен. В буфер обмена скопировано имя файла %{file}.",
-  "Stream Labels session has been succesfully restarted!": "Сессия Stream Labels успешно перезапущена!",
+  "Stream Labels session has been successfully restarted!": "Stream Labels session has been successfully restarted!",
   "This action will restart the application. Continue?": "Это действие приведет к перезапуску приложения. Продолжить?",
   "Show confirmation dialog when starting streams": "Показывать диалоговое окно с подтверждением при запуске трансляции",
   "Show confirmation dialog when stopping streams": "Показывать диалоговое окно с подтверждением при завершении трансляции",

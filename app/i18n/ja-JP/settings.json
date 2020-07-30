@@ -27,7 +27,7 @@
   "Confirm stream title and game before going live": "ライブ配信を開始する前に、ストリーム タイトルとゲームを確認",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "警告！すべてのシーン、ソース、および設定が失われます。これは取り消すことはできません！",
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "キャッシュディレクトリが正常にアップロードされました。ファイル名 %{file} がクリップボードにコピーされました。",
-  "Stream Labels session has been succesfully restarted!": "Stream Labels セッションが正常に再起動しました！",
+  "Stream Labels session has been successfully restarted!": "Stream Labels session has been successfully restarted!",
   "This action will restart the application. Continue?": "この操作によってアプリケーションが再起動します。続行しますか?",
   "Show confirmation dialog when starting streams": "ストリームの開始時に確認ダイアログを表示",
   "Show confirmation dialog when stopping streams": "ストリームの停止時に確認ダイアログを表示",
