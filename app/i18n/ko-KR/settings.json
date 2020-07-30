@@ -27,7 +27,7 @@
   "Confirm stream title and game before going live": "라이브 하기 전에 스트리밍 제목 및 게임 확인하기",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "경고! 모든 장면, 소스, 설정을 잃게 됩니다. 이 작업은 취소할 수 없습니다!",
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "캐시 디렉터리가 성공적으로 업로드되었습니다. 파일 이름(%{file})이 클립보드에 복사되었습니다.",
-  "Stream Labels session has been succesfully restarted!": "Stream Labels 세션이 성공적으로 다시 시작되었습니다!",
+  "Stream Labels session has been successfully restarted!": "Stream Labels session has been successfully restarted!",
   "This action will restart the application. Continue?": "이 작업은 애플리케이션을 다시 시작합니다. 계속할까요?",
   "Show confirmation dialog when starting streams": "스트리밍을 시작할 때 확인 대화 상자 표시",
   "Show confirmation dialog when stopping streams": "스트리밍을 중지할 때 확인 대화 상자 표시",
