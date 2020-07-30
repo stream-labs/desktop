@@ -16,7 +16,14 @@ interface ISavedGoLiveSettings {
     youtube: IPlatformFlags;
     mixer: IPlatformFlags;
   };
+  customDestinations?: ICustomStreamDestination[];
   advancedMode: boolean;
+}
+
+export interface ICustomStreamDestination {
+  name: string;
+  url: string;
+  streamKey?: string;
 }
 
 /**

@@ -79,6 +79,7 @@ export default class StreamSettings extends TsxComponent {
         {this.protectedModeEnabled && (
           <div>
             {platforms.map(platform => this.renderPlatform(platform))}
+            {this.renderCustomDestinations()}
 
             {this.canEditSettings && (
               <div>
@@ -181,6 +182,37 @@ export default class StreamSettings extends TsxComponent {
             </span>
           )}
         </div>
+      </div>
+    );
+  }
+
+  renderCustomDestinations() {
+    // const destinations = this.streamingService.views.goLiveSettings.customDestinations;
+
+    const destinations = [
+      { name: 'Fooo1', url: 'rtmp://test1.com' },
+      { name: 'Fooo2', url: 'rtmp://test2.com' },
+    ];
+
+    return (
+      <div>
+        {destinations.map(dest => (
+          <div class="section flex">
+            <div class="margin-right--20" style={{ width: '50px' }}>
+              <PlatformLogo platform="youtube" class={styles.platformLogo} />
+            </div>
+            <div>
+              {dest.name} <br />
+              {dest.url}}<br />
+            </div>
+
+            <div style={{ marginLeft: 'auto' }}>
+              <button onclick={() => 1} class={cx('button button--default')}>
+                {$t('Edit')}
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
     );
   }

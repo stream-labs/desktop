@@ -103,10 +103,13 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
       destinations[platform] = this.getPlatformSettings(platform);
     });
 
+    const savedGoLiveSettings = this.streamSettingsService.state.goLiveSettings;
+
     return {
       platforms: destinations as IGoLiveSettings['platforms'],
-      advancedMode: !!this.streamSettingsService.state.goLiveSettings?.advancedMode,
+      advancedMode: !!savedGoLiveSettings?.advancedMode,
       optimizedProfile: undefined,
+      customDestinations: savedGoLiveSettings?.customDestinations || [],
       tweetText: '',
     };
   }
