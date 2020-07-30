@@ -98,7 +98,7 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
           {/* RESTREAM */}
           {!isUpdateMode &&
             isMultiplatformMode &&
-            this.renderCheck($t('Configure the Restream service'), checklist.setupRestream)}
+            this.renderCheck($t('Configure the Multistream service'), checklist.setupRestream)}
 
           {/* OPTIMIZED PROFILE */}
           {shouldShowOptimizedProfile &&
