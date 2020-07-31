@@ -17,7 +17,7 @@ type TPlatforms = Record<TPlatform, { enabled: boolean }>;
 class Props {
   title?: string = '';
   platforms: TPlatforms = undefined;
-  customDestinations?: ICustomStreamDestination[] = [];
+  customDestinations?: ICustomStreamDestination[] = undefined;
 
   /**
    * allow to disable the primary platform
