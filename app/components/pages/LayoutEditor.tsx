@@ -11,14 +11,12 @@ import { LayoutService, ELayoutElement, ELayout, LayoutSlot } from 'services/lay
 import { $t } from 'services/i18n';
 import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
-import { UserService } from 'services/user';
 
 @Component({})
 export default class LayoutEditor extends TsxComponent {
   @Inject() private layoutService: LayoutService;
   @Inject() private navigationService: NavigationService;
   @Inject() private customizationService: CustomizationService;
-  @Inject() private userService: UserService;
 
   currentLayout = this.layoutService.views.currentTab.currentLayout || ELayout.Default;
   slottedElements = cloneDeep(this.layoutService.views.currentTab.slottedElements) || {};
@@ -84,15 +82,15 @@ export default class LayoutEditor extends TsxComponent {
     this.currentLayout = layout;
   }
 
-  save() {
+  async save() {
     if (this.currentLayout !== this.layoutService.views.currentTab.currentLayout) {
-      this.layoutService.changeLayout(this.currentLayout);
+      await this.layoutService.actions.return.changeLayout(this.currentLayout);
     }
-    this.layoutService.setSlots(this.slottedElements);
+    await this.layoutService.actions.return.setSlots(this.slottedElements);
     if (this.browserUrl && this.slottedElements[ELayoutElement.Browser]) {
-      this.layoutService.setUrl(this.browserUrl);
+      await this.layoutService.actions.return.setUrl(this.browserUrl);
     }
-    this.navigationService.navigate('Studio');
+    this.navigationService.actions.navigate('Studio');
   }
 
   closeModal() {
@@ -104,9 +102,6 @@ export default class LayoutEditor extends TsxComponent {
   }
 
   get tabOptions() {
-    if (!this.userService.isPrime) {
-      return [{ value: 'default', title: this.layoutService.state.tabs.default.name }];
-    }
     return Object.keys(this.layoutService.state.tabs).map(tab => ({
       value: tab,
       title: this.layoutService.state.tabs[tab].name,
@@ -137,7 +132,7 @@ export default class LayoutEditor extends TsxComponent {
       <div class={styles.topBar}>
         <img class={styles.arrow} src={require('../../../media/images/chalk-arrow.png')} />
         <button
-          class="button button--prime"
+          class="button button--action"
           style="margin: 0 16px;"
           onClick={() => this.openModal()}
         >

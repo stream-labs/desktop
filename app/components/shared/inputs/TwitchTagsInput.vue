@@ -159,7 +159,6 @@ table.sp-table {
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
-  text-transform: none;
   line-height: 1;
 
   /* Better Font Rendering =========== */

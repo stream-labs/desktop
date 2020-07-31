@@ -13,6 +13,7 @@ import { CustomizationService } from 'services/customization';
 import { v2 } from '../util/vec2';
 import { EditorCommandsService } from 'services/editor-commands';
 import { mutation } from './core';
+import { byOS, OS } from 'util/operating-systems';
 import { TcpServerService } from './api/tcp-server';
 import { Subject } from 'rxjs';
 
@@ -46,6 +47,7 @@ export interface IMouseEvent {
   altKey: boolean;
   ctrlKey: boolean;
   shiftKey: boolean;
+  metaKey: boolean;
   button: number;
   buttons: number;
 }
@@ -171,8 +173,8 @@ export class EditorService extends StatefulService<IEditorServiceState> {
             overNode = overSources[0].hasParent() ? overSources[0].getParent() : overSources[0];
           }
 
-          // Ctrl adds or removes from a multiselection
-          if (event.ctrlKey) {
+          // Ctrl/Cmd adds or removes from a multiselection
+          if (byOS({ [OS.Windows]: event.ctrlKey, [OS.Mac]: event.metaKey })) {
             if (overNode.isSelected()) {
               overNode.deselect();
             } else {
@@ -233,7 +235,8 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   }
 
   handleMouseMove(event: IMouseEvent) {
-    const factor = this.windowsService.state.main.scaleFactor;
+    // We don't need to adjust mac coordinates for scale factor
+    const factor = byOS({ [OS.Windows]: this.windowsService.state.main.scaleFactor, [OS.Mac]: 1 });
     const mousePosX = event.offsetX * factor - this.renderedOffsetX;
     const mousePosY = event.offsetY * factor - this.renderedOffsetY;
 
@@ -435,7 +438,8 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   // Takes the given mouse event, and determines if it is
   // over the given box in base resolution space.
   isOverBox(event: IMouseEvent, x: number, y: number, width: number, height: number) {
-    const factor = this.windowsService.state.main.scaleFactor;
+    // We don't need to adjust mac coordinates for scale factor
+    const factor = byOS({ [OS.Windows]: this.windowsService.state.main.scaleFactor, [OS.Mac]: 1 });
 
     const mouse = this.convertVectorToBaseSpace(event.offsetX * factor, event.offsetY * factor);
 
@@ -555,7 +559,8 @@ export class EditorService extends StatefulService<IEditorServiceState> {
 
   generateResizeRegionsForItem(item: SceneItem): IResizeRegion[] {
     const renderedRegionRadius = 5;
-    const factor = this.windowsService.state.main.scaleFactor;
+    // We don't need to adjust mac coordinates for scale factor
+    const factor = byOS({ [OS.Windows]: this.windowsService.state.main.scaleFactor, [OS.Mac]: 1 });
     const regionRadius = (renderedRegionRadius * factor * this.baseWidth) / this.renderedWidth;
     const width = regionRadius * 2;
     const height = regionRadius * 2;

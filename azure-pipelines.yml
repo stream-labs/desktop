@@ -111,3 +111,27 @@ jobs:
         env:
           BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
           SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
+
+  - job: macOS
+
+    pool:
+      vmImage: macOS-latest
+
+    workspace:
+      clean: resources
+
+    steps:
+      - script: yarn install --frozen-lockfile --check-files 2>&1
+        displayName: 'Install Dependencies'
+
+      - script: node node_modules/electron/install.js
+        displayName: 'Install Electron'
+
+      - script: 'yarn eslint'
+        displayName: 'ESLint'
+
+      - script: 'yarn compile:strictnulls'
+        displayName: 'Check regressions in files with strictNullChecks'
+
+      - script: 'yarn ci:compile'
+        displayName: 'Compile Assets'

@@ -1,0 +1,36 @@
+.prime-title {
+  color: var(--prime);
+  background: var(--prime-semi);
+  border-radius: 4px;
+  padding: 4px;
+  line-height: 32px;
+  font-weight: 700;
+}
+
+.prime-card-container {
+  display: grid;
+  gap: 24px 24px;
+  grid-template-columns: auto 33% auto;
+  grid-template-rows: auto auto;
+  grid-auto-flow: row;
+  padding: 40px;
+  width: 100%;
+}
+
+.prime-card {
+  grid-column: auto / auto;
+  grid-row: auto / auto;
+  height: 175px;
+  background: var(--section-alt);
+  padding: 16px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  img {
+    height: 95px;
+    width: auto;
+  }
+}

@@ -1,3 +1,5 @@
+/*global SLOBS_BUNDLE_ID*/
+
 import { Inject } from './core/injector';
 import { UserService } from './user';
 import { HostsService } from './hosts';
@@ -19,7 +21,16 @@ interface IUsageApiData {
   data: string;
 }
 
-type TAnalyticsEvent = 'FacebookLogin' | 'PlatformLogin' | 'SocialShare'; // add more types if you need
+type TAnalyticsEvent =
+  | 'FacebookLogin'
+  | 'PlatformLogin'
+  | 'SocialShare'
+  | 'Heartbeat'
+  | 'StreamPerformance'
+  | 'StreamingStatus'
+  | 'RecordingStatus'
+  | 'ReplayBufferStatus'
+  | 'Click';
 
 interface IAnalyticsEvent {
   product: string;
@@ -55,7 +66,11 @@ export class UsageStatisticsService extends Service {
 
   init() {
     this.loadInstallerId();
-    this.sendAnalytics = throttle(this.sendAnalytics, 2 * 60 * 1000);
+    this.sendAnalytics = throttle(this.sendAnalytics, 30 * 1000);
+
+    setInterval(() => {
+      this.recordAnalyticsEvent('Heartbeat', { bundle: SLOBS_BUNDLE_ID });
+    }, 10 * 60 * 1000);
   }
 
   loadInstallerId() {
@@ -105,6 +120,8 @@ export class UsageStatisticsService extends Service {
       metadata['platform'] = this.userService.state.auth.primaryPlatform;
     }
 
+    metadata['os'] = process.platform;
+
     const bodyData: IUsageApiData = {
       event,
       slobs_user_id: this.userService.getLocalUserId(),
@@ -144,6 +161,18 @@ export class UsageStatisticsService extends Service {
       uuid: this.userService.getLocalUserId(),
     });
     this.sendAnalytics();
+  }
+
+  /**
+   * All clicks should use this function to ensure consistent naming
+   * of click events.
+   * @param component A logical grouping to namespace this click. Can
+   * be the name of the component, or some other grouping.
+   * @param target A unique and descriptive name for the element that
+   * was clicked.
+   */
+  recordClick(component: string, target: string) {
+    this.recordAnalyticsEvent('Click', { component, target });
   }
 
   private sendAnalytics() {

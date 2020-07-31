@@ -22,6 +22,8 @@
   "Damage Per Bit": "1 ビット当たりのダメージ",
   "Damage Per Subscriber": "1 サブスクライバー当たりのダメージ",
   "Damage Per Dollar Donation": "1 ドル寄付当たりのダメージ",
+  "Damage Per Membership": "1 メンバーシップ当たりのダメージ",
+  "Damage Per Superchat Dollar": "スーパーチャットドルごとのダメージ",
   "Background Color": "背景色",
   "Text Color": "テキスト色",
   "Health Text Color": "ヘルステキスト色",

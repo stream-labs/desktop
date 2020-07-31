@@ -1,6 +1,7 @@
 import { mutation, StatefulService } from '../core/stateful-service';
 import * as obs from '../../../obs-api';
 import uuid from 'uuid/v4';
+import { byOS, OS } from 'util/operating-systems';
 
 export enum EDeviceType {
   audioInput = 'audioInput',
@@ -54,15 +55,29 @@ export class HardwareService extends StatefulService<IHardwareServiceState> {
     const dshowDevices: IDevice[] = [];
 
     // Avoid initializing any devices by passing a device id that doesn't exist
-    const obsAudioInput = obs.InputFactory.create('wasapi_input_capture', uuid(), {
-      device_id: 'does_not_exist',
-    });
-    const obsAudioOutput = obs.InputFactory.create('wasapi_output_capture', uuid(), {
-      device_id: 'does_not_exist',
-    });
-    const obsVideoInput = obs.InputFactory.create('dshow_input', uuid(), {
-      audio_device_id: 'does_not_exist',
-      video_device_id: 'does_not_exist',
+    const obsAudioInput = obs.InputFactory.create(
+      byOS({ [OS.Windows]: 'wasapi_input_capture', [OS.Mac]: 'coreaudio_input_capture' }),
+      uuid(),
+      {
+        device_id: 'does_not_exist',
+      },
+    );
+    const obsAudioOutput = obs.InputFactory.create(
+      byOS({ [OS.Windows]: 'wasapi_output_capture', [OS.Mac]: 'coreaudio_output_capture' }),
+      uuid(),
+      {
+        device_id: 'does_not_exist',
+      },
+    );
+
+    const obsVideoInput = byOS({
+      [OS.Windows]: () =>
+        obs.InputFactory.create('dshow_input', uuid(), {
+          audio_device_id: 'does_not_exist',
+          video_device_id: 'does_not_exist',
+        }),
+      [OS.Mac]: () =>
+        obs.InputFactory.create('av_capture_input', uuid(), { device: 'does_not_exist' }),
     });
 
     (obsAudioInput.properties.get('device_id') as obs.IListProperty).details.items.forEach(
@@ -85,18 +100,20 @@ export class HardwareService extends StatefulService<IHardwareServiceState> {
       },
     );
 
-    (obsVideoInput.properties.get('video_device_id') as obs.IListProperty).details.items.forEach(
-      (item: { name: string; value: string }) => {
+    (obsVideoInput.properties.get(
+      byOS({ [OS.Windows]: 'video_device_id', [OS.Mac]: 'device' }),
+    ) as obs.IListProperty).details.items.forEach((item: { name: string; value: string }) => {
+      if (item.value) {
         dshowDevices.push({
           id: item.value,
           description: item.name,
           type: EDeviceType.videoInput,
         });
-      },
-    );
+      }
+    });
 
     const audioDeviceIdProp = obsVideoInput.properties.get('audio_device_id') as obs.IListProperty;
-    // audioDeviceIdProp can be null if no devices exist
+    // audioDeviceIdProp can be null if no devices exist or if on Mac
     if (audioDeviceIdProp) {
       audioDeviceIdProp.details.items.forEach((item: { name: string; value: string }) => {
         dshowDevices.push({

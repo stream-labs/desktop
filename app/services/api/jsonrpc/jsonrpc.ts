@@ -46,7 +46,12 @@ export class JsonrpcService extends Service implements IJsonrpcServiceApi {
   static createRequestWithOptions(
     resourceId: string,
     method: string,
-    options: { compactMode: boolean; fetchMutations: boolean; noReturn?: boolean },
+    options: {
+      compactMode: boolean;
+      fetchMutations: boolean;
+      noReturn?: boolean;
+      windowId?: string;
+    },
     ...args: any[]
   ): IJsonRpcRequest {
     const request = this.createRequest(resourceId, method, ...args);

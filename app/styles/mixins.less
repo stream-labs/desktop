@@ -194,10 +194,6 @@
   text-align: @left;
 }
 
-.text-transform(@capitalize: @capitalize) {
-  text-transform: @capitalize;
-}
-
 .teal() {
   color: var(--teal);
 }
@@ -212,4 +208,16 @@
 
 .cursor--pointer() {
   cursor: pointer;
+}
+
+// inputs
+.dropdown-input-mixin {
+  background: var(--dropdown-bg);
+  border-color: var(--button);
+
+  &:hover,
+  &:focus {
+    background: var(--dropdown-bg);
+    border-color: var(--button);
+  }
 }

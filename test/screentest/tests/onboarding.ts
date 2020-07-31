@@ -14,7 +14,7 @@ test('Onboarding steps', async t => {
   await focusMain(t);
 
   // Wait for the auth screen to appear
-  await app.client.waitForVisible('button=Twitch');
+  await app.client.waitForVisible('h1=Connect');
 
   await logIn(t, 'twitch', null, false, true);
   await sleep(1000);
@@ -24,13 +24,13 @@ test('Onboarding steps', async t => {
   await makeScreenshots(t, 'Start fresh or import from OBS');
   await app.client.click('h2=Start Fresh');
 
-  await app.client.waitForVisible('h1=Setup Mic and Webcam');
+  await app.client.waitForVisible('h1=Set Up Mic and Webcam');
   await makeScreenshots(t, 'Setup Mic and Webcam');
-  await app.client.click('p=Skip');
+  await app.client.click('button=Skip');
 
   await app.client.waitForVisible('h1=Add a Theme');
   await makeScreenshots(t, 'Add a Theme');
-  await app.client.click('p=Skip');
+  await app.client.click('button=Skip');
 
   await app.client.waitForVisible('h1=Optimize');
   await makeScreenshots(t, 'Before optimize');
@@ -38,8 +38,12 @@ test('Onboarding steps', async t => {
   await app.client.waitForVisible('h1=Optimizing... 33%');
   await makeScreenshots(t, 'Optimization progress');
 
+  await app.client.waitForVisible('h2=Overlay, Widget & Site Themes', 60000);
+  await makeScreenshots(t, 'Prime');
+  await app.client.click('button=Skip');
+
   // success?
-  await app.client.waitForVisible('h2=Sources', 60000);
+  await app.client.waitForVisible('h2=Sources');
   await makeScreenshots(t, 'Onboarding completed');
   t.pass();
 });
@@ -59,18 +63,16 @@ test('OBS Importer', async t => {
   }
 
   // skip auth
-  await client.waitForVisible('button=Twitch');
+  await client.waitForVisible('h1=Connect');
   await t.context.app.client.click('span=Skip');
 
   // import from OBS
   await client.waitForVisible('h2=Import from OBS');
-  await makeScreenshots(t, 'Import button');
   await client.click('h2=Import from OBS');
 
-  // benefits page
-  await client.waitForVisible('h1=A few benefits of using Streamlabs OBS');
-  await makeScreenshots(t, 'Benefits');
-  await client.click('button=Complete');
+  await client.waitForVisible('h1=Importing Your Existing Settings From OBS');
+  await makeScreenshots(t, 'Import button');
+  await client.click('h2=Start');
 
   // success?
   await client.waitForVisible('h2=Sources', 60000);

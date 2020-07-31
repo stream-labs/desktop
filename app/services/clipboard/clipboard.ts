@@ -21,6 +21,7 @@ import { IClipboardServiceApi } from './clipboard-api';
 import { EditorCommandsService } from 'services/editor-commands';
 import { IFilterData } from 'services/editor-commands/commands/paste-filters';
 import { NavigationService } from 'services/navigation';
+import { byOS, OS } from 'util/operating-systems';
 const { clipboard } = electron;
 
 interface ISceneNodeInfo {
@@ -440,16 +441,22 @@ export class ClipboardService extends StatefulService<IClipboardState>
   }
 
   private getFiles() {
-    // electron clipboard doesn't support file system
-    // use .NET API instead
-    return execSync(
-      'Powershell -command Add-Type -AssemblyName System.Windows.Forms;' +
-        '[System.Windows.Forms.Clipboard]::GetFileDropList()',
-    )
-      .toString()
-      .split('\n')
-      .filter(fineName => fineName)
-      .map(fileName => fileName.trim());
+    return byOS({
+      [OS.Windows]: () => {
+        // electron clipboard doesn't support file system
+        // use .NET API instead
+        return execSync(
+          'Powershell -command Add-Type -AssemblyName System.Windows.Forms;' +
+            '[System.Windows.Forms.Clipboard]::GetFileDropList()',
+        )
+          .toString()
+          .split('\n')
+          .filter(fineName => fineName)
+          .map(fileName => fileName.trim());
+      },
+      // We don't support this on mac for now
+      [OS.Mac]: [],
+    });
   }
 
   @mutation()

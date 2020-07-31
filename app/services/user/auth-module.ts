@@ -106,7 +106,8 @@ export class AuthModule {
         const address = this.authServer.address();
 
         if (address && typeof address !== 'string') {
-          const url = `${authUrl}&port=${address.port}`;
+          const paramSeparator = merge ? '?' : '&';
+          const url = `${authUrl}${paramSeparator}port=${address.port}`;
 
           electron.shell.openExternal(url);
           onWindowShow();

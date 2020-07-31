@@ -6,28 +6,16 @@ import { $t } from 'services/i18n';
 import { Menu } from 'util/menus/Menu';
 import { EditorCommandsService } from 'services/editor-commands';
 import BaseElement from './BaseElement';
-import GLVolmeters from '../../GLVolmeters';
-import { CustomizationService } from 'services/customization';
 
 @Component({})
 export default class Mixer extends BaseElement {
   @Inject() audioService: AudioService;
   @Inject() editorCommandsService: EditorCommandsService;
-  @Inject() customizationService: CustomizationService;
 
   mins = { x: 150, y: 120 };
 
   advancedSettingsTooltip = $t('Open advanced audio settings');
   mixerTooltip = $t('Monitor audio levels. If the bars are moving you are outputting audio.');
-  needToRenderVolmetes: boolean = (() => {
-    // render volmeters without hardware acceleration only if we don't have the webgl context
-    const canvas = document.createElement('canvas');
-    return !canvas.getContext('webgl');
-  })();
-
-  get performanceMode() {
-    return this.customizationService.state.performanceMode;
-  }
 
   showAdvancedSettings() {
     this.audioService.showAdvancedSettings();
@@ -67,18 +55,9 @@ export default class Mixer extends BaseElement {
           </div>
         </div>
         <div class="studio-controls-selector mixer-panel">
-          <div style={{ position: 'relative' }}>
-            {this.audioSources.length && !this.performanceMode && (
-              <GLVolmeters style={{ left: '17px', right: '17px', height: '100%' }} />
-            )}
-            {this.audioSources.map(audioSource => (
-              <MixerItem
-                audioSource={audioSource}
-                key={audioSource.sourceId}
-                volmetersEnabled={this.needToRenderVolmetes}
-              />
-            ))}
-          </div>
+          {this.audioSources.map(audioSource => (
+            <MixerItem audioSource={audioSource} key={audioSource.sourceId} />
+          ))}
         </div>
       </div>
     );

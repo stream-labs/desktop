@@ -18,6 +18,7 @@ import { SelectionService, Selection, TNodesList } from 'services/selection';
 import uniqBy from 'lodash/uniqBy';
 import { TSceneNodeInfo } from 'services/scene-collections/nodes/scene-items';
 import * as fs from 'fs';
+import * as path from 'path';
 import uuid from 'uuid/v4';
 import { SceneNode } from '../api/external-api/scenes';
 import compact from 'lodash/compact';
@@ -69,14 +70,6 @@ export class Scene {
   }
 
   getNode(sceneNodeId: string): TSceneNode | null {
-    // try to get a node instance from cache
-    const cachedNode = this.scenesService.getNodeFromCache(sceneNodeId);
-    if (cachedNode) {
-      if (cachedNode.sceneId !== this.id) return null;
-      return cachedNode;
-    }
-
-    // otherwise create a new instance
     const nodeModel = this.state.nodes.find(
       sceneItemModel => sceneItemModel.id === sceneNodeId,
     ) as ISceneItem;
@@ -183,20 +176,20 @@ export class Scene {
     return sceneItem;
   }
 
-  addFile(path: string, folderId?: string): TSceneNode | null {
-    const fstat = fs.lstatSync(path);
+  addFile(addPath: string, folderId?: string): TSceneNode | null {
+    const fstat = fs.lstatSync(addPath);
     if (!fstat) return null;
-    const fname = path.split('\\').slice(-1)[0];
+    const fname = path.parse(addPath).name;
 
     if (fstat.isDirectory()) {
       const folder = this.createFolder(fname);
       if (folderId) folder.setParent(folderId);
-      const files = fs.readdirSync(path).reverse();
-      files.forEach(filePath => this.addFile(`${path}\\${filePath}`, folder.id));
+      const files = fs.readdirSync(addPath).reverse();
+      files.forEach(filePath => this.addFile(path.join(addPath, filePath), folder.id));
       return folder;
     }
 
-    const source = this.sourcesService.addFile(path);
+    const source = this.sourcesService.addFile(addPath);
     if (!source) return null;
     const item = this.addSource(source.sourceId);
     if (folderId) item.setParent(folderId);
@@ -368,15 +361,11 @@ export class Scene {
       if (nodeModel.sceneNodeType === 'folder') {
         this.createFolder(nodeModel.name, { id: nodeModel.id });
       } else {
-        this.ADD_SOURCE_TO_SCENE(
-          nodeModel.id,
-          nodeModel.sourceId,
-          obsSceneItems[itemIndex].id,
-          nodeModel,
-        );
+        this.ADD_SOURCE_TO_SCENE(nodeModel.id, nodeModel.sourceId, obsSceneItems[itemIndex].id);
+        const item = this.getItem(nodeModel.id)!;
+        item.loadItemAttributes(nodeModel);
         itemIndex++;
       }
-      this.scenesService.addItemToCache(this.id, nodeModel.id);
     });
 
     // add items to folders
@@ -477,42 +466,13 @@ export class Scene {
   }
 
   @mutation()
-  private ADD_SOURCE_TO_SCENE(
-    sceneItemId: string,
-    sourceId: string,
-    obsSceneItemId: number,
-    customSceneItem?: ISceneItemInfo,
-  ) {
-    // define default attributes
-    let visible = true;
-    // Position in video space
-    let position = { x: 0, y: 0 };
-    let crop = {
-      top: 0,
-      bottom: 0,
-      left: 0,
-      right: 0,
-    };
-    let locked = false;
-    // Scale between 0 and 1
-    let scale = { x: 1.0, y: 1.0 };
-    let rotation = 0;
-    let streamVisible = true;
-    let recordingVisible = true;
+  private SET_NAME(newName: string) {
+    this.state.name = newName;
+  }
 
-    // set custom attributes if provided
-    if (customSceneItem) {
-      visible = customSceneItem.visible;
-      position = { x: customSceneItem.x, y: customSceneItem.y };
-      crop = customSceneItem.crop;
-      scale = { x: customSceneItem.scaleX, y: customSceneItem.scaleY };
-      rotation = customSceneItem.rotation || 0;
-      locked = !!customSceneItem.locked;
-      streamVisible = !!customSceneItem.streamVisible;
-      recordingVisible = !!customSceneItem.recordingVisible;
-    }
-
-    const sceneItem: ISceneItem = {
+  @mutation()
+  private ADD_SOURCE_TO_SCENE(sceneItemId: string, sourceId: string, obsSceneItemId: number) {
+    this.state.nodes.unshift({
       sceneItemId,
       sourceId,
       obsSceneItemId,
@@ -523,31 +483,31 @@ export class Scene {
 
       transform: {
         // Position in video space
-        position,
+        position: { x: 0, y: 0 },
+
         // Scale between 0 and 1
-        scale,
-        crop,
-        rotation,
+        scale: { x: 1.0, y: 1.0 },
+
+        crop: {
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+        },
+
+        rotation: 0,
       },
-      visible,
-      locked,
-      streamVisible,
-      recordingVisible,
-    };
 
-    this.state.nodes.unshift(sceneItem);
-    this.state.nodesMap[sceneItemId] = sceneItem;
-  }
-
-  @mutation()
-  private SET_NAME(newName: string) {
-    this.state.name = newName;
+      visible: true,
+      locked: false,
+      streamVisible: true,
+      recordingVisible: true,
+    });
   }
 
   @mutation()
   private ADD_FOLDER_TO_SCENE(folderModel: ISceneItemFolder) {
     this.state.nodes.unshift(folderModel);
-    this.state.nodesMap[folderModel.id] = folderModel;
   }
 
   @mutation()
@@ -557,11 +517,15 @@ export class Scene {
     this.state.nodes = this.state.nodes.filter(item => {
       return item.id !== nodeId;
     });
-    delete this.state.nodesMap[nodeId];
   }
 
   @mutation()
   private SET_NODES_ORDER(order: string[]) {
-    this.state.nodes = order.map(id => this.state.nodesMap[id]);
+    // TODO: This is O(n^2)
+    this.state.nodes = order.map(id => {
+      return this.state.nodes.find(item => {
+        return item.id === id;
+      })!;
+    });
   }
 }

@@ -132,8 +132,7 @@ const filterName = (key: string): string => {
     filter_subscription_6_months: $t('6 Months'),
     filter_subscription_9_months: $t('9 Months'),
     filter_subscription_12_months: $t('12 Months'),
-    filter_subscription_minimum_enabled: $t('Minimum'),
-    filter_subscription_minimum_months: $t('months'),
+    filter_subscription_minimum_enabled: $t('Min. Months'),
     primesub: $t('Prime'),
     resub: $t('Resubs'),
     resub_tier_1: $t('Tier 1'),
@@ -295,6 +294,12 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
       });
     }
     return $t('has subscribed (%{tier})', { tier: subscriptionMap(event.sub_plan) });
+  }
+
+  getEvent(uuid: string) {
+    return this.state.recentEvents.find(event => {
+      return event.uuid === uuid;
+    });
   }
 }
 
@@ -492,14 +497,15 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
 
   async readAlert(event: IRecentEvent) {
     this.TOGGLE_RECENT_EVENT_READ(event.uuid);
+    const newEvent = this.views.getEvent(event.uuid);
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/widget/readalert`;
     const headers = authorizedHeaders(
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
     );
     const body = JSON.stringify({
-      eventHash: event.hash,
-      read: event.read,
+      eventHash: newEvent.hash,
+      read: newEvent.read,
     });
     const request = new Request(url, { headers, body, method: 'POST' });
     return await fetch(request).then(handleResponse);
@@ -630,6 +636,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   applyConfig(config: IRecentEventsConfig) {
+    if (!config) return;
     this.SET_MUTED(config.eventsPanelMuted);
     this.SET_FILTER_CONFIG(config.settings);
   }
@@ -820,7 +827,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       queryParams: {},
       size: {
         width: 450,
-        height: 600,
+        height: 480,
       },
     });
   }

@@ -1,6 +1,6 @@
 {
   "You can access your Facebook Streamer Dashboard here.": "Hier gelangen Sie zu Ihrem Facebook Streamer Dashboard.",
-  "You need a Facebook page to stream to Facebook. You can create one now.": "Sie brauchen eine Facebook-Seite, um auf Facebook zu streamen. Sie können sie jetzt erstellen.",
+  "facebookNoPagesError": "You need a Facebook page to stream to Facebook. You can <create-link>create one now</create-link>.",
   "Create a Page": "Seite erstellen",
   "Facebook Setup": "Facebook-Einrichtung",
   "Streamer Dashboard": "Streamer Dashboard",
@@ -10,11 +10,11 @@
   "Step": "Schritt",
   "Create a Facebook Gaming page to get started.": "Erstellen Sie eine Facebook Gaming-Seite, um zu beginnen.",
   "Create a Gaming Page": "Gaming-Seite erstellen",
-  "Connect Facebook to Streamlabs OBS.": "Verbinden Sie Facebook mit Streamlabs OBS.",
   "All of your scenes, sources, and settings will be preserved.": "Alle Ihre Szenen, Quellen und Einstellungen bleiben erhalten.",
   "Connect Facebook": "Mit Facebook verbinden",
   "Multistream To Facebook": "Multistream auf Facebook",
-  "Connect": "Connect",
+  "Connect": "Verbinden",
   "Install Your Theme": "Installieren Sie Ihr Thema",
-  "Install": "Installieren"
+  "Install": "Installieren",
+  "I already have a Gaming Page": "I already have a Gaming Page"
 }

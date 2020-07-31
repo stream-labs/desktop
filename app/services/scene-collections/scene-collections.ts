@@ -35,7 +35,7 @@ import { TransitionsService } from 'services/transitions';
 import { $t } from '../i18n';
 import { StreamingService, EStreamingState } from 'services/streaming';
 import { DefaultHardwareService } from 'services/hardware';
-import { OS, getOS } from 'util/operating-systems';
+import { byOS, OS, getOS } from 'util/operating-systems';
 import Utils from 'services/utils';
 
 const uuid = window['require']('uuid/v4');
@@ -508,7 +508,21 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * @param data Scene collection JSON data
    */
   private async loadDataIntoApplicationState(data: string) {
-    const root = parse(data, NODE_TYPES);
+    const root: RootNode = parse(data, NODE_TYPES);
+
+    // TODO: This is an edge case now that scene collections are segmented by OS
+    // Ideally we don't ever hit this.
+    if (!root.data.sources.isAllSupported()) {
+      const backupName = `${this.activeCollection?.name} - Backup`;
+
+      await this.duplicate(backupName);
+      await electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
+        title: 'Unsupported Sources',
+        type: 'warning',
+        message: `The scene collection you are loading has sources that are not supported by your current operating system. These sources will be removed before loading the scene collection. A backup of this collection with the original sources preserved has been created with the name: ${backupName}`,
+      });
+    }
+
     await root.load();
     this.hotkeysService.bindHotkeys();
   }
@@ -611,7 +625,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   private setupDefaultAudio() {
     this.sourcesService.createSource(
       'Desktop Audio',
-      'wasapi_output_capture',
+      byOS({ [OS.Windows]: 'wasapi_output_capture', [OS.Mac]: 'coreaudio_output_capture' }),
       {},
       { channel: E_AUDIO_CHANNELS.OUTPUT_1 },
     );
@@ -620,7 +634,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       : undefined;
     this.sourcesService.createSource(
       'Mic/Aux',
-      'wasapi_input_capture',
+      byOS({ [OS.Windows]: 'wasapi_input_capture', [OS.Mac]: 'coreaudio_input_capture' }),
       { device_id: defaultId },
       { channel: E_AUDIO_CHANNELS.INPUT_1 },
     );

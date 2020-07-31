@@ -13,6 +13,8 @@ import { ServicesManager } from '../services-manager';
 import { JsonrpcService } from './api/jsonrpc';
 import { TroubleshooterService, TIssueCode } from 'services/troubleshooter';
 import { $t } from 'services/i18n';
+import { StreamingService, EStreamingState } from 'services/streaming';
+import { UsageStatisticsService } from './usage-statistics';
 
 interface IPerformanceState {
   CPU: number;
@@ -24,7 +26,7 @@ interface IPerformanceState {
   percentageLaggedFrames: number;
   numberEncodedFrames: number;
   numberRenderedFrames: number;
-  bandwidth: number;
+  streamingBandwidth: number;
   frameRate: number;
 }
 
@@ -65,6 +67,8 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
   @Inject() private notificationsService: NotificationsService;
   @Inject() private jsonrpcService: JsonrpcService;
   @Inject() private troubleshooterService: TroubleshooterService;
+  @Inject() private streamingService: StreamingService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
 
   static initialState: IPerformanceState = {
     CPU: 0,
@@ -76,14 +80,22 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     percentageLaggedFrames: 0,
     numberEncodedFrames: 0,
     numberRenderedFrames: 0,
-    bandwidth: 0,
+    streamingBandwidth: 0,
     frameRate: 0,
   };
 
   private historicalDroppedFrames: number[] = [];
   private historicalSkippedFrames: number[] = [];
   private historicalLaggedFrames: number[] = [];
-  private intervalId: number = null;
+  private shutdown = false;
+  private statsRequestInProgress = false;
+
+  // Used to report on the overall quality of a complete stream
+  private streamStartSkippedFrames = 0;
+  private streamStartLaggedFrames = 0;
+  private streamStartRenderedFrames = 0;
+  private streamStartEncodedFrames = 0;
+  private streamStartTime: Date;
 
   @mutation()
   private SET_PERFORMANCE_STATS(stats: Partial<IPerformanceState>) {
@@ -92,11 +104,27 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     });
   }
 
+  init() {
+    this.streamingService.streamingStatusChange.subscribe(state => {
+      if (state === EStreamingState.Live) this.startStreamQualityMonitoring();
+      if (state === EStreamingState.Ending) this.stopStreamQualityMonitoring();
+    });
+  }
+
   // Starts interval to poll updates from OBS
   startMonitoringPerformance() {
-    this.intervalId = window.setInterval(() => {
-      electron.ipcRenderer.send('requestPerformanceStats');
-    }, STATS_UPDATE_INTERVAL);
+    const statsInterval = () => {
+      if (this.shutdown) return;
+
+      // Don't request more stats if we haven't finished processing the last bunch
+      if (!this.statsRequestInProgress) {
+        this.statsRequestInProgress = true;
+        electron.ipcRenderer.send('requestPerformanceStats');
+      }
+
+      setTimeout(statsInterval, STATS_UPDATE_INTERVAL);
+    };
+    statsInterval();
 
     electron.ipcRenderer.on(
       'performanceStatsResponse',
@@ -111,8 +139,40 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
 
         this.SET_PERFORMANCE_STATS(stats);
         this.monitorAndUpdateStats();
+        this.statsRequestInProgress = false;
       },
     );
+  }
+
+  /**
+   * Capture some analytics for the entire duration of a stream
+   */
+  startStreamQualityMonitoring() {
+    this.streamStartSkippedFrames = obs.Video.skippedFrames;
+    this.streamStartLaggedFrames = obs.Global.laggedFrames;
+    this.streamStartRenderedFrames = obs.Global.totalFrames;
+    this.streamStartEncodedFrames = obs.Video.encodedFrames;
+    this.streamStartTime = new Date();
+  }
+
+  stopStreamQualityMonitoring() {
+    const streamLagged =
+      ((obs.Global.laggedFrames - this.streamStartLaggedFrames) /
+        (obs.Global.totalFrames - this.streamStartRenderedFrames)) *
+      100;
+    const streamSkipped =
+      ((obs.Video.skippedFrames - this.streamStartSkippedFrames) /
+        (obs.Video.encodedFrames - this.streamStartEncodedFrames)) *
+      100;
+    const streamDropped = this.state.percentageDroppedFrames;
+    const streamDuration = new Date().getTime() - this.streamStartTime.getTime();
+
+    this.usageStatisticsService.recordAnalyticsEvent('StreamPerformance', {
+      streamLagged,
+      streamSkipped,
+      streamDropped,
+      streamDuration,
+    });
   }
 
   /* Monitor frame rate statistics
@@ -223,7 +283,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
       code,
       type: ENotificationType.WARNING,
       data: factor,
-      lifeTime: -1,
+      lifeTime: 2 * 60 * 1000,
       showTime: true,
       subType: ENotificationSubType.SKIPPED,
       // tslint:disable-next-line:prefer-template
@@ -243,7 +303,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
       code,
       type: ENotificationType.WARNING,
       data: factor,
-      lifeTime: -1,
+      lifeTime: 2 * 60 * 1000,
       showTime: true,
       subType: ENotificationSubType.LAGGED,
       message: `Lagged frames detected: ${Math.round(factor * 100)}%  over last 2 minutes`,
@@ -262,7 +322,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
       code,
       type: ENotificationType.WARNING,
       data: factor,
-      lifeTime: -1,
+      lifeTime: 2 * 60 * 1000,
       showTime: true,
       subType: ENotificationSubType.DROPPED,
       message: `Dropped frames detected: ${Math.round(factor * 100)}%  over last 2 minutes`,
@@ -293,8 +353,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
   }
 
   stop() {
-    clearInterval(this.intervalId);
-    this.intervalId = null;
+    this.shutdown = true;
     this.SET_PERFORMANCE_STATS(PerformanceService.initialState);
   }
 }

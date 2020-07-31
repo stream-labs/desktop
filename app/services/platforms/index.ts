@@ -1,11 +1,10 @@
 import { ITwitchChannelInfo, ITwitchStartStreamOptions, TwitchService } from './twitch';
-import { IYoutubeChannelInfo, IYoutubeStartStreamOptions, YoutubeService } from './youtube';
+import { IYoutubeStartStreamOptions, YoutubeService } from './youtube';
 import { IMixerChannelInfo, IMixerStartStreamOptions, MixerService } from './mixer';
 import { FacebookService, IFacebookChannelInfo, IFacebookStartStreamOptions } from './facebook';
 import { TTwitchTag } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
-import { Observable } from 'rxjs';
-import { IPlatformResponse } from './utils';
+import { IGoLiveSettings } from 'services/streaming';
 
 export type Tag = TTwitchTag;
 export interface IGame {
@@ -19,12 +18,14 @@ type TOAuthScope = TTwitchOAuthScope;
 export type TPlatformCapabilityMap = {
   /** Display and interact with chat **/
   chat: IPlatformCapabilityChat;
+  /** Ability to set the stream description **/
+  description: IPlatformCapabilityDescription;
+  /** Ability to set the stream game **/
+  game: IPlatformCapabilityGame;
   /** Fetch and set stream tags **/
   tags: IPlatformCapabilityTags;
   /** Fetch and set user information **/
   'user-info': IPlatformCapabilityUserInfo;
-  /** Fetch viewer count **/
-  'viewer-count': IPlatformCapabilityViewerCount;
   /** Schedule streams for a latter date **/
   'stream-schedule': IPlatformCapabilityScheduleStream;
   /** Ability to check whether we're authorized to perform actions under a given scope **/
@@ -39,14 +40,19 @@ interface IPlatformCapabilityChat {
   getChatUrl: (mode: string) => Promise<string>;
 }
 
+export interface IPlatformCapabilityGame {
+  searchGames: (searchString: string) => Promise<IGame[]>;
+  state: { settings: { game: string } };
+}
+
+interface IPlatformCapabilityDescription {
+  state: { settings: { description: string } };
+}
+
 interface IPlatformCapabilityTags {
   getAllTags: () => Promise<Tag[]>;
   getStreamTags: () => Promise<Tag[]>;
   setStreamTags: () => Promise<any>;
-}
-
-interface IPlatformCapabilityViewerCount {
-  fetchViewerCount: () => Promise<number>;
 }
 
 interface IPlatformCapabilityUserInfo {
@@ -102,21 +108,19 @@ export type TStartStreamOptions =
   | Partial<IFacebookStartStreamOptions>
   | IMixerStartStreamOptions;
 
-export type TChannelInfo =
-  | IYoutubeChannelInfo
-  | ITwitchChannelInfo
-  | Partial<IFacebookChannelInfo>
-  | IMixerChannelInfo;
+export type TChannelInfo = ITwitchChannelInfo | Partial<IFacebookChannelInfo> | IMixerChannelInfo;
+
+// state applicable for all platforms
+export interface IPlatformState {
+  viewersCount: number;
+  streamKey: string;
+  settings: TStartStreamOptions | null;
+  isPrepopulated: boolean;
+}
 
 // All platform services should implement this interface.
 export interface IPlatformService {
   capabilities: Set<TPlatformCapability>;
-
-  supports<T extends TPlatformCapability>(
-    capability: T,
-  ): this is TPlatformCapabilityMap[T] & IPlatformService;
-
-  channelInfoChanged: Observable<TChannelInfo>;
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions;
 
@@ -127,25 +131,22 @@ export interface IPlatformService {
    */
   validatePlatform: () => Promise<EPlatformCallResult>;
 
-  fetchViewerCount: () => Promise<number>;
-
   fetchUserInfo: () => Promise<IUserInfo>;
 
   putChannelInfo: (channelInfo: TStartStreamOptions) => Promise<boolean>;
 
-  searchGames: (searchString: string) => Promise<IGame[]>;
+  searchGames?: (searchString: string) => Promise<IGame[]>;
 
   /**
    * Sets up the stream key and live broadcast info required to go live.
-   * Returns the stream key.
    */
-  beforeGoLive: (options?: TStartStreamOptions) => Promise<string | null>;
+  beforeGoLive: (options?: IGoLiveSettings) => Promise<void>;
 
-  afterGoLive?: () => Promise<void>;
+  afterGoLive: () => Promise<void>;
 
   afterStopStream?: () => Promise<void>;
 
-  prepopulateInfo: () => Promise<TStartStreamOptions>;
+  prepopulateInfo: () => Promise<unknown>;
 
   scheduleStream?: (startTime: string, info: TChannelInfo) => Promise<any>;
 
@@ -158,10 +159,14 @@ export interface IPlatformService {
 
   liveDockEnabled: () => boolean;
 
-  /**
-   * Get user-friendly error message
-   */
-  getErrorDescription: (error: IPlatformResponse<unknown>) => string;
+  readonly platform: TPlatform;
+  readonly displayName: string;
+  readonly mergeUrl: string;
+  readonly streamPageUrl: string;
+  readonly chatUrl: string;
+  unlink: () => void;
+
+  state: IPlatformState;
 }
 
 export interface IUserAuth {
@@ -182,7 +187,7 @@ export interface IUserAuth {
   /**
    * New key that supports multiple logged in platforms
    */
-  platforms?: { [platform in TPlatform]?: IPlatformAuth };
+  platforms: { [platform in TPlatform]?: IPlatformAuth };
 
   /**
    * Session partition used to separate cookies associated

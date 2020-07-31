@@ -456,6 +456,10 @@ export function setPropertiesFormData(
   updatedFormData.forEach(prop => {
     if (prop.type !== 'OBS_PROPERTY_LIST') return;
     const listProp = prop as IObsListInput<TObsValue>;
+
+    // Special case a misbehaving plugin on mac
+    if (obsSource.id === 'av_capture_input' && listProp.value === -1) return;
+
     if (!listProp.options.length) return;
     const optionExists = !!listProp.options.find(option => option.value === listProp.value);
     if (optionExists) return;

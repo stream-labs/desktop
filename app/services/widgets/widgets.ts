@@ -15,12 +15,13 @@ import { ISerializableWidget, IWidgetSource, IWidgetsServiceApi } from './widget
 import { WidgetType, WidgetDefinitions, WidgetTesters } from './widgets-data';
 import { mutation, StatefulService } from '../core/stateful-service';
 import { WidgetSource } from './widget-source';
-import { InitAfter } from '../core/service-initialization-observer';
+import { InitAfter } from 'services/core/service-initialization-observer';
 import Vue from 'vue';
 import cloneDeep from 'lodash/cloneDeep';
 import { Subscription } from 'rxjs';
 import { Throttle } from 'lodash-decorators';
 import { EditorCommandsService } from 'services/editor-commands';
+import { TWindowComponentName } from '../windows';
 
 export interface IWidgetSourcesState {
   widgetSources: Dictionary<IWidgetSource>;
@@ -130,8 +131,8 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
     return WidgetDefinitions[type].url(this.hostsService.streamlabs, this.userService.widgetToken);
   }
 
-  getWidgetComponent(type: WidgetType): string {
-    return WidgetType[type];
+  getWidgetComponent(type: WidgetType): TWindowComponentName {
+    return WidgetType[type] as TWindowComponentName;
   }
 
   getWidgetSettingsService(type: WidgetType): WidgetSettingsService<any> {

@@ -62,8 +62,7 @@ export default class EventFilterMenu extends TsxComponent<{}> {
 
   get renderGeneralFilters() {
     return (
-      <div class={styles.halfWidth}>
-        <h2>{$t('General')}</h2>
+      <div class={styles.generalFilters}>
         {Object.keys(this.mainFilters).map(filter => (
           <div>{this.renderBooleanInput(filter, this.mainFilters[filter])}</div>
         ))}
@@ -74,42 +73,31 @@ export default class EventFilterMenu extends TsxComponent<{}> {
   get renderSubFilters() {
     return (
       <div class={styles.halfWidth}>
-        {Object.keys(this.subFilters).map(
-          filter =>
-            filter === 'subscription' && (
-              <div>{this.renderBooleanInput(filter, this.subFilters[filter], true)}</div>
-            ),
-        )}
-        {Object.keys(this.subFilters).map(
-          filter =>
-            filter !== 'subscription' &&
-            this.subsEnabled && (
-              <div>{this.renderBooleanInput(filter, this.subFilters[filter])}</div>
-            ),
-        )}
+        <div>{this.renderBooleanInput('subscription', this.subFilters['subscription'], true)}</div>
+        {this.subsEnabled &&
+          Object.keys(this.subFilters)
+            .filter(filter => filter !== 'subscription')
+            .map(filter => <div>{this.renderBooleanInput(filter, this.subFilters[filter])}</div>)}
       </div>
     );
   }
 
   get renderResubFilters() {
     return (
-      <div class={styles.fullWidth}>
-        {Object.keys(this.resubFilters).map(
-          filter =>
-            filter === 'resub' && (
-              <div>{this.renderBooleanInput(filter, this.resubFilters[filter], true)}</div>
-            ),
-        )}
+      <div class={styles.halfWidth}>
+        <div>{this.renderBooleanInput('resub', this.resubFilters['resub'], true)}</div>
         <div class={styles.resubOptions}>
-          {Object.keys(this.resubFilters).map(
-            filter =>
-              filter !== 'resub' &&
-              this.resubsEnabled &&
-              filter !== 'filter_subscription_minimum_months' &&
-              filter !== 'filter_subscription_minimum_enabled' && (
+          {this.resubsEnabled &&
+            Object.keys(this.resubFilters)
+              .filter(
+                key =>
+                  !/months/.test(key) &&
+                  key !== 'resub' &&
+                  key !== 'filter_subscription_minimum_enabled',
+              )
+              .map(filter => (
                 <div>{this.renderBooleanInput(filter, this.resubFilters[filter])}</div>
-              ),
-          )}
+              ))}
         </div>
         {this.renderResubMonthsFilter}
       </div>
@@ -117,29 +105,23 @@ export default class EventFilterMenu extends TsxComponent<{}> {
   }
 
   get renderResubMonthsFilter() {
+    const minEnabledFilter = this.resubFilters['filter_subscription_minimum_enabled'];
+    const minMonthsFilter = this.minMonthsFilter['filter_subscription_minimum_months'];
     return (
       <div class={styles.minimum}>
-        {Object.keys(this.resubFilters).map(
-          filter =>
-            filter === 'filter_subscription_minimum_enabled' &&
-            this.resubsEnabled && (
-              <div>{this.renderBooleanInput(filter, this.resubFilters[filter])}</div>
-            ),
-        )}
-        {Object.keys(this.minMonthsFilter).map(
-          filter =>
-            filter === 'filter_subscription_minimum_months' &&
-            this.resubsEnabled && (
-              <div class={styles.monthsInputContainer}>
-                <NumberInput
-                  value={this.minMonthsFilter[filter].value}
-                  metadata={{ min: 1, max: 120, isInteger: true }}
-                  onInput={(value: number) => this.updateFilter(filter, value)}
-                  class={styles.monthsInput}
-                />
-                <p class={styles.monthsLabel}>{this.minMonthsFilter[filter].name}</p>
-              </div>
-            ),
+        {this.resubsEnabled &&
+          this.renderBooleanInput('filter_subscription_minimum_enabled', minEnabledFilter)}
+        {this.resubsEnabled && minEnabledFilter?.value && (
+          <div class={styles.monthsInputContainer}>
+            <NumberInput
+              value={minMonthsFilter.value}
+              metadata={{ min: 1, max: 120, isInteger: true }}
+              onInput={(value: number) =>
+                this.updateFilter('filter_subscription_minimum_months', value)
+              }
+              class={styles.monthsInput}
+            />
+          </div>
         )}
       </div>
     );
@@ -149,11 +131,11 @@ export default class EventFilterMenu extends TsxComponent<{}> {
     return (
       <ModalLayout customControls showControls={false}>
         <div slot="content" class={styles.flexColumn}>
-          <div class={styles.flexRow}>
-            {this.renderGeneralFilters}
+          {this.renderGeneralFilters}
+          <div class={styles.subFilters}>
             {this.renderSubFilters}
+            {this.renderResubFilters}
           </div>
-          <div class={styles.flexRow}>{this.renderResubFilters}</div>
         </div>
         <div slot="controls">
           <button class="button button--action" onClick={this.cancel}>

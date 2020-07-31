@@ -1,9 +1,8 @@
 import Vue from 'vue';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
-import { Inject } from 'services/core/injector';
 import { handleResponse, authorizedHeaders } from 'util/requests';
 import { mutation } from 'services/core/stateful-service';
-import { Service } from 'services/core';
+import { Service, Inject, ViewHandler } from 'services/core';
 import electron from 'electron';
 import { HostsService } from 'services/hosts';
 import {
@@ -31,6 +30,7 @@ import { StreamSettingsService } from 'services/settings/streaming';
 import { lazyModule } from 'util/lazy-module';
 import { AuthModule } from './auth-module';
 import { WebsocketService, TSocketEvent } from 'services/websocket';
+import { MagicLinkService } from 'services/magic-link';
 
 export enum EAuthProcessState {
   Idle = 'idle',
@@ -84,6 +84,30 @@ export function setSentryContext(ctx: ISentryContext) {
   }
 }
 
+class UserViews extends ViewHandler<IUserServiceState> {
+  get isLoggedIn() {
+    return !!(this.state.auth && this.state.auth.widgetToken && this.state.loginValidated);
+  }
+
+  get isPrime() {
+    return this.state.isPrime;
+  }
+
+  get platform() {
+    if (this.isLoggedIn) {
+      return this.state.auth.platforms[this.state.auth.primaryPlatform];
+    }
+  }
+
+  get isTwitchAuthed() {
+    return this.isLoggedIn && this.platform.type === 'twitch';
+  }
+
+  get isFacebookAuthed() {
+    return this.isLoggedIn && this.platform.type === 'facebook';
+  }
+}
+
 export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private hostsService: HostsService;
   @Inject() private customizationService: CustomizationService;
@@ -94,6 +118,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private settingsService: SettingsService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private websocketService: WebsocketService;
+  @Inject() private magicLinkService: MagicLinkService;
 
   @mutation()
   LOGIN(auth: IUserAuth) {
@@ -183,6 +208,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.MIGRATE_AUTH();
     this.VALIDATE_LOGIN(false);
     this.SET_AUTH_STATE(EAuthProcessState.Idle);
+  }
+
+  get views() {
+    return new UserViews(this.state);
   }
 
   mounted() {
@@ -433,6 +462,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.showPrimeWindow();
   }
 
+  /**
+   * open the prime onboarding in the browser
+   * @param refl a referral tag for analytics
+   */
+  openPrimeUrl(refl: 'slobs-multistream' | 'slobs-settings') {
+    this.magicLinkService.getDashboardMagicLink('prime-marketing', refl).then(link => {
+      electron.remote.shell.openExternal(link);
+    });
+  }
+
   recentEventsUrl() {
     if (this.isLoggedIn) {
       const host = this.hostsService.streamlabs;
@@ -581,8 +620,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     merge = false,
   ): Promise<EPlatformCallResult> {
     const service = getPlatformService(platform);
-    const authUrl =
-      merge && service.supports('account-merging') ? service.mergeUrl : service.authUrl;
+    const authUrl = merge ? service.mergeUrl : service.authUrl;
 
     if (merge && !this.isLoggedIn) {
       throw new Error('Account merging can only be performed while logged in');

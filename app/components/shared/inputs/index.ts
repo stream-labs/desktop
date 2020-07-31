@@ -49,8 +49,8 @@ export interface ITimerMetadata extends INumberMetadata {
   format?: 'hms' | 'hm' | 'ms';
 }
 
-export interface IListMetadata<TValueType> extends IInputMetadata {
-  options: IListOption<TValueType>[];
+export interface IListMetadata<TValueType, TOptionData = unknown> extends IInputMetadata {
+  options: IListOption<TValueType, TOptionData>[];
   allowEmpty?: boolean;
   loading?: boolean;
   internalSearch?: boolean;
@@ -94,12 +94,13 @@ export interface ISliderMetadata extends IInputMetadata {
   data?: string[];
 }
 
-export interface IListOption<TValue> {
+export interface IListOption<TValue = string, TOptionData = undefined> {
   value: TValue;
   title: string;
   description?: string;
   icon?: string;
   options?: { label: string; value: string }[];
+  data?: TOptionData;
 }
 
 export interface IMediaGalleryMetadata extends IInputMetadata {
@@ -121,32 +122,34 @@ export interface ITextAreaMetadata extends IInputMetadata {
 }
 
 // a helper for creating metadata for inputs
-export const metadata = {
-  timer: (options: ITimerMetadata) => ({ type: EInputType.timer, ...options } as ITimerMetadata),
-  bool: (options: IInputMetadata) => ({ type: EInputType.bool, ...options } as IInputMetadata),
-  number: (options: INumberMetadata) =>
-    ({ type: EInputType.number, ...options } as INumberMetadata),
-  text: (options: ITextMetadata) => ({ type: EInputType.text, ...options } as ITextMetadata),
-  date: (options: IDateMetadata) => ({ type: EInputType.date, ...options } as IDateMetadata),
-  list: (options: IListMetadata<string>) =>
-    ({ type: EInputType.list, ...options } as IListMetadata<string>),
-  color: (options: IInputMetadata) => ({ type: EInputType.color, ...options } as IInputMetadata),
-  slider: (options: ISliderMetadata) =>
-    ({ type: EInputType.slider, ...options } as ISliderMetadata),
-  textArea: (options: ITextMetadata) =>
-    ({ type: EInputType.textArea, ...options } as ITextMetadata),
-  fontSize: (options: INumberMetadata) =>
-    ({ type: EInputType.fontSize, ...options } as INumberMetadata),
-  fontFamily: (options: IInputMetadata) =>
-    ({ type: EInputType.fontFamily, ...options } as IInputMetadata),
-  code: (options: IInputMetadata) => ({ type: EInputType.code, ...options } as IInputMetadata),
-  file: (options: IFileMetadata) => ({ type: EInputType.file, ...options } as IFileMetadata),
-  toggle: (options: IInputMetadata) => ({ type: EInputType.toggle, ...options } as IInputMetadata),
-  mediaGallery: (options: IMediaGalleryMetadata) =>
-    ({ type: EInputType.mediaGallery, ...options } as IMediaGalleryMetadata),
-  sound: (options: IMediaGalleryMetadata) =>
-    ({ type: EInputType.sound, ...options } as IMediaGalleryMetadata),
-};
+export class InputMetadata {
+  timer = (options: ITimerMetadata) => ({ type: EInputType.timer, ...options } as ITimerMetadata);
+  bool = (options: IInputMetadata) => ({ type: EInputType.bool, ...options } as IInputMetadata);
+  number = (options: INumberMetadata) =>
+    ({ type: EInputType.number, ...options } as INumberMetadata);
+  text = (options: ITextMetadata) => ({ type: EInputType.text, ...options } as ITextMetadata);
+  date = (options: IDateMetadata) => ({ type: EInputType.date, ...options } as IDateMetadata);
+  list<TOptionData = undefined>(options: IListMetadata<string, TOptionData>) {
+    return { type: EInputType.list, ...options } as IListMetadata<string, TOptionData>;
+  }
+  color = (options: IInputMetadata) => ({ type: EInputType.color, ...options } as IInputMetadata);
+  slider = (options: ISliderMetadata) =>
+    ({ type: EInputType.slider, ...options } as ISliderMetadata);
+  textArea = (options: ITextMetadata) =>
+    ({ type: EInputType.textArea, ...options } as ITextMetadata);
+  fontSize = (options: INumberMetadata) =>
+    ({ type: EInputType.fontSize, ...options } as INumberMetadata);
+  fontFamily = (options: IInputMetadata) =>
+    ({ type: EInputType.fontFamily, ...options } as IInputMetadata);
+  code = (options: IInputMetadata) => ({ type: EInputType.code, ...options } as IInputMetadata);
+  file = (options: IFileMetadata) => ({ type: EInputType.file, ...options } as IFileMetadata);
+  toggle = (options: IInputMetadata) => ({ type: EInputType.toggle, ...options } as IInputMetadata);
+  mediaGallery = (options: IMediaGalleryMetadata) =>
+    ({ type: EInputType.mediaGallery, ...options } as IMediaGalleryMetadata);
+  sound = (options: IMediaGalleryMetadata) =>
+    ({ type: EInputType.sound, ...options } as IMediaGalleryMetadata);
+}
+export const metadata = new InputMetadata();
 
 // a helper for creating metadata for forms
 export function formMetadata<TMetadataType extends Dictionary<IInputMetadata>>(

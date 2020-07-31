@@ -89,9 +89,9 @@ test('Invalid selection', async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const selection = client.getResource<SelectionService>('SelectionService');
-  const colorSource = scenesService.activeScene.createAndAddSource('MyColor1', 'color_source');
   const anotherScene = scenesService.createScene('Another scene');
-  const colorFromAnotherScene = anotherScene.createAndAddSource('MyColor2', 'color_source');
+  const colorFromAnotherScene = anotherScene.createAndAddSource('MyColor', 'color_source');
+  const [colorSource] = scenesService.activeScene.getItems();
 
   // invalid ids must be ignored
   selection.select([colorSource.sceneItemId, 'this_is_an_invalid_id']);

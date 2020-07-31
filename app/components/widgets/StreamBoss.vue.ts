@@ -36,6 +36,13 @@ export default class StreamBoss extends WidgetSettings<IStreamBossData, StreamBo
     return this.loaded && this.wData.goal;
   }
 
+  get multipliersForPlatform() {
+    const baseEvents = [
+      { key: 'donation_multiplier', title: $t('Damage Per Dollar Donation'), isInteger: true },
+    ];
+    return this.service.multipliersByPlatform().concat(baseEvents);
+  }
+
   async saveGoal() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
     await this.service.saveGoal(this.bossCreateOptions);

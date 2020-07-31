@@ -7,6 +7,7 @@ import { ScalableRectangle } from 'util/ScalableRectangle';
 import { SelectionService } from 'services/selection';
 import { EditorCommandsService } from 'services/editor-commands';
 import { IMouseEvent } from 'services/editor';
+import { byOS, OS } from './operating-systems';
 
 /*
  * An edge looks like:
@@ -102,7 +103,13 @@ export class DragHandler {
     this.baseHeight = this.videoService.baseHeight;
     this.displaySize = options.displaySize;
     this.displayOffset = options.displayOffset;
-    this.scaleFactor = this.windowsService.state.main.scaleFactor;
+
+    // We don't need to adjust mac coordinates for scale factor
+    this.scaleFactor = byOS({
+      [OS.Windows]: this.windowsService.state.main.scaleFactor,
+      [OS.Mac]: 1,
+    });
+
     this.snapDistance =
       (this.renderedSnapDistance * this.scaleFactor * this.baseWidth) / this.displaySize.x;
 
