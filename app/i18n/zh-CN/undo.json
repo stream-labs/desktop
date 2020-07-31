@@ -1,6 +1,6 @@
 {
   "Add %{filterName}": "添加 %{filterName}",
-  "Center %{sourceName}": "Center %{sourceName}",
+  "Center %{sourceName}": "居中 %{sourceName}",
   "Paste %{nodeName}": "粘贴 %{nodeName}",
   "Create a new connection": "创建新连接",
   "Create %{sourceName}": "创建 %{sourceName}",

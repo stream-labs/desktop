@@ -1,6 +1,6 @@
 {
   "You can access your Facebook Streamer Dashboard here.": "Anda bisa mengakses Facebook Streamer Dashboard di sini.",
-  "You need a Facebook page to stream to Facebook. You can create one now.": "Anda memerlukan halaman Facebook untuk streaming ke Facebook. Anda bisa membuat satu sekarang.",
+  "facebookNoPagesError": "You need a Facebook page to stream to Facebook. You can <create-link>create one now</create-link>.",
   "Create a Page": "Buat sebuah Halaman",
   "Facebook Setup": "Pengaturan Facebook",
   "Streamer Dashboard": "Streamer Dashboard",
@@ -10,11 +10,11 @@
   "Step": "Langkah",
   "Create a Facebook Gaming page to get started.": "Buat halaman Facebook Gaming untuk memulainya.",
   "Create a Gaming Page": "Buat Halaman Gaming",
-  "Connect Facebook to Streamlabs OBS.": "Hubungkan Facebook ke Streamlabs OBS.",
   "All of your scenes, sources, and settings will be preserved.": "Semua scene, sumber, dan pengaturan akan disimpan.",
   "Connect Facebook": "Hubungkan Facebook",
   "Multistream To Facebook": "Multistreaming ke Facebook",
   "Connect": "Hubungkan",
   "Install Your Theme": "Instal Tema Anda",
-  "Install": "Instal"
+  "Install": "Instal",
+  "I already have a Gaming Page": "I already have a Gaming Page"
 }

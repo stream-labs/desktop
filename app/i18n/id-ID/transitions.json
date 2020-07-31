@@ -24,7 +24,7 @@
   "This connection is redundant because another connection already connects these scenes.": "Koneksi ini mubazir karena koneksi lain sudah terhubung ke scene ini.",
   "You need at least 2 scenes to edit transitions.": "Anda memerlukan setidaknya 2 scene untuk mengedit transisi.",
   "This scene transition is managed by an App and cannot be edited.": "Transisi scene ini dikelola oleh sebuah Aplikasi dan tidak bisa diedit.",
-  "Global Transition": "Global Transition",
+  "Global Transition": "Transisi Global",
   "Edit": "Edit",
   "Live": "Live"
 }

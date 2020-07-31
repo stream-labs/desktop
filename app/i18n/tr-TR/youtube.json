@@ -1,5 +1,5 @@
 {
-  "YouTube stream status": "YouTube stream status",
+  "YouTube stream status": "YouTube yayın durumu",
   "Waiting for YouTube to receive the video signal...": "Video sinyalinin YouTube tarafından alınması bekleniyor...",
   "Testing your broadcast...": "Yayınınız test ediliyor...",
   "Finalizing broadcast testing...": "Yayın testiniz sonlandırılıyor...",
@@ -9,9 +9,8 @@
   "Waiting for broadcast to be published...": "Yayınlanması bekleniyor...",
   "Working on your live stream": "Canlı yayınınız üzerinde çalışılıyor",
   "Your stream will start shortly. You can close this window.": "Yayınınız kısa süre içinde başlayacak. Bu pencereyi kapatabilirsiniz.",
-  "stream control page": "yayın kontrol sayfası",
-  " to publish it manually": " ile manuel olarak yayınlayın",
-  "Go to YouTube Live Dashboard": "Go to YouTube Live Dashboard",
+  "youtubeStatusError": "Yayınınız oluşturuldu ancak şu anda kanalınızda yayınlanamıyor. İnternet bağlantınızı kontrol edin veya <dashboard-link>yayın kontrol sayfasına</dashboard-link> giderek manuel olarak yayınlayın",
+  "Go to YouTube Live Dashboard": "YouTube Canlı Panosu’na git",
   "Create New Event": "Yeni Olay Oluştur",
   "YouTube Chat": "YouTube Sohbeti",
   "This action cannot be performed inside Streamlabs OBS. To interact with chat, you can open this chat in a web browser.": "Bu eylem, Streamlabs OBS içinde gerçekleştirilemez. Sohbetle etkileşim kurmak için bu sohbeti bir web tarayıcısında açabilirsiniz.",

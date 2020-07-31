@@ -1,6 +1,6 @@
 {
   "You can access your Facebook Streamer Dashboard here.": "Du kan få adgang til dit Facebook Streamer Dashboard her.",
-  "You need a Facebook page to stream to Facebook. You can create one now.": "Du har brug for en Facebook-side for at streame til Facebook. Du kan oprette en nu.",
+  "facebookNoPagesError": "You need a Facebook page to stream to Facebook. You can <create-link>create one now</create-link>.",
   "Create a Page": "Opret en side",
   "Facebook Setup": "Facebook-indstilling",
   "Streamer Dashboard": "Streamer skrivebord",
@@ -10,11 +10,11 @@
   "Step": "Trin",
   "Create a Facebook Gaming page to get started.": "Opret en Facebook-gamingside for at komme i gang.",
   "Create a Gaming Page": "Opret en gamingside",
-  "Connect Facebook to Streamlabs OBS.": "Tilslut Facebook til Streamlabs OBS.",
   "All of your scenes, sources, and settings will be preserved.": "Alle dine scener, kilder og indstillinger bevares.",
   "Connect Facebook": "Opret forbindelse Facebook",
   "Multistream To Facebook": "Multistream til Facebook",
   "Connect": "Tilslut",
   "Install Your Theme": "Installer dit tema",
-  "Install": "Installer"
+  "Install": "Installer",
+  "I already have a Gaming Page": "I already have a Gaming Page"
 }
