@@ -24,6 +24,7 @@ export interface ICustomStreamDestination {
   name: string;
   url: string;
   streamKey?: string;
+  enabled: boolean;
 }
 
 /**

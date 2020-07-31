@@ -10,3 +10,25 @@
   font-style: italic;
   color: var(--prime-hover);
 }
+
+.action-icon {
+  cursor: pointer;
+  color: var(--icon);
+  transition: all 275ms;
+  margin-right: 16px;
+  margin-top: 14px;
+  &:hover {
+    color: var(--title);
+  }
+}
+
+.destination-name {
+  max-width: 340px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.destination-logo {
+  font-size: 40px;
+}

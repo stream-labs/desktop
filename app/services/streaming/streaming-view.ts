@@ -68,7 +68,9 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
 
   get isMultiplatformMode(): boolean {
     return (
-      this.streamSettingsService.state.protectedModeEnabled && this.enabledPlatforms.length > 1
+      this.streamSettingsService.state.protectedModeEnabled &&
+      (this.enabledPlatforms.length > 1 ||
+        this.goLiveSettings.customDestinations.filter(dest => dest.enabled).length > 0)
     );
   }
 

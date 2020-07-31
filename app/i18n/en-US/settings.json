@@ -122,5 +122,9 @@
   "Virtual Webcam": "Virtual Webcam",
   "unlinked": "unlinked",
   "Unlink": "Unlink",
-  "Logged in": "Logged in"
+  "Logged in": "Logged in",
+  "Add additional destination": "Add additional destination",
+  "Maximum custom destinations has been added": "Maximum custom destinations has been added",
+  "Linked Platforms": "Linked Platforms",
+  "Additional Multistream Destinations": "Additional Multistream Destinations"
 }
