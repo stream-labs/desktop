@@ -114,8 +114,8 @@ function startApp() {
 
   if (pjson.env === 'production') {
     const params = !!process.env.NAIR_UNSTABLE
-      ? {project: '1546758', key: '7451aaa71b7640a69ee1d31d6fd9ef78'}
-      : {project: '1246812', key: '35a02d8ebec14fd3aadc9d95894fabcf'};
+      ? {project: '5372801', key: '819e76e51864453aafd28c6d0473881f'} // crash-reporter-unstable
+      : {project: '1520076', key: 'd965eea4b2254c2b9f38d2346fb8a472'}; // crash-reporter
 
     Raven.config(`https://${params.key}@o170115.ingest.sentry.io/${params.project}`, {
       release: process.env.NAIR_VERSION
