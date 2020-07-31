@@ -6,5 +6,6 @@
   "Enable Tweet Sharing": "Tweet 共有を有効化",
   "Tweet when going live": "ライブ配信の開始時にツイート",
   "Unlink Twitter": "Twitter のリンクを解除",
-  "Tweet & Go Live": "Tweet & ライブ配信を開始"
+  "Tweet & Go Live": "Tweet & ライブ配信を開始",
+  "Could not connect to Twitter": "Could not connect to Twitter"
 }

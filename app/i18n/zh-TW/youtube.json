@@ -1,5 +1,5 @@
 {
-  "YouTube stream status": "YouTube stream status",
+  "YouTube stream status": "YouTube 直播狀態",
   "Waiting for YouTube to receive the video signal...": "等待 YouTube 接收視訊訊號...",
   "Testing your broadcast...": "測試您的直播...",
   "Finalizing broadcast testing...": "正在結束直播測試...",
@@ -9,9 +9,8 @@
   "Waiting for broadcast to be published...": "正在等待直播發佈...",
   "Working on your live stream": "正在處理您的即時直播",
   "Your stream will start shortly. You can close this window.": "您的直播很快就會開始。您可以關閉此視窗。",
-  "stream control page": "直播控制頁面",
-  " to publish it manually": "手動發佈",
-  "Go to YouTube Live Dashboard": "Go to YouTube Live Dashboard",
+  "youtubeStatusError": "您的直播已建立，但無法發佈到您的頻道。請檢查您的網際網路連線，或前往<dashboard-link>直播控制頁面</dashboard-link>手動發佈",
+  "Go to YouTube Live Dashboard": "前往 YouTube 直播儀表板",
   "Create New Event": "建立新事件",
   "YouTube Chat": "YouTube 留言",
   "This action cannot be performed inside Streamlabs OBS. To interact with chat, you can open this chat in a web browser.": "此動作無法在 Streamlabs OBS 內執行。若要與聊天室互動，可以在網頁瀏覽器中開啟此聊天室。",

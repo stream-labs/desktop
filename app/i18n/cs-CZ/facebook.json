@@ -1,6 +1,6 @@
 {
   "You can access your Facebook Streamer Dashboard here.": "Přístup ke svému řídicímu panelu Facebook pro streamery naleznete zde.",
-  "You need a Facebook page to stream to Facebook. You can create one now.": "Streamování na Facebooku vyžaduje založení stránku na Facebooku. Vytvořit si ji můžete ještě dnes.",
+  "facebookNoPagesError": "You need a Facebook page to stream to Facebook. You can <create-link>create one now</create-link>.",
   "Create a Page": "Vytvořit stránku",
   "Facebook Setup": "Nastavení Facebooku",
   "Streamer Dashboard": "Řídicí panel pro streamery",
@@ -10,11 +10,11 @@
   "Step": "Krok",
   "Create a Facebook Gaming page to get started.": "Začněte vytvořením herní stránky na Facebooku.",
   "Create a Gaming Page": "Vytvořit stránku",
-  "Connect Facebook to Streamlabs OBS.": "Propojte Facebook se softwarem Streamlabs OBS.",
   "All of your scenes, sources, and settings will be preserved.": "Všechny vaše scény, zdroje a nastavení budou zachovány.",
   "Connect Facebook": "Připojit Facebook",
   "Multistream To Facebook": "Multistream na Facebooku",
   "Connect": "Connect",
   "Install Your Theme": "Nainstalujte svůj motiv",
-  "Install": "Instalovat"
+  "Install": "Instalovat",
+  "I already have a Gaming Page": "I already have a Gaming Page"
 }
