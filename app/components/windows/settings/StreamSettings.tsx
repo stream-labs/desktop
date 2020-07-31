@@ -322,7 +322,7 @@ export default class StreamSettings extends TsxComponent {
 
   private renderCustomDestForm() {
     return (
-      <ValidatedForm ref="customDestForm" style={{ height: '540px' }}>
+      <ValidatedForm ref="customDestForm">
         <VFormGroup vModel={this.customDestModel.name} metadata={this.customDestMetadata.name} />
         <VFormGroup vModel={this.customDestModel.url} metadata={this.customDestMetadata.url} />
         <VFormGroup
