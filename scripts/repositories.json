@@ -55,6 +55,14 @@
             "version": "v0.0.41",
             "win64": true,
             "osx": false
+        },
+        {
+            "name": "color-picker",
+            "url": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/",
+            "archive": "color-picker-[VERSION]-[OS].tar.gz",
+            "version": "1.0.6",
+            "win64": true,
+            "osx": false
         }
     ]
 }
