@@ -48,11 +48,15 @@ export { HardwareService, DefaultHardwareService } from 'services/hardware';
 export { EditorCommandsService } from 'services/editor-commands';
 export { EditorService } from 'services/editor';
 export { StreamSettingsService } from 'services/settings/streaming';
-export { MetricsService } from 'services/metrics';
+export { TouchBarService } from 'services/touch-bar';
+export { ApplicationMenuService } from 'services/application-menu';
 export { MacPermissionsService } from 'services/mac-permissions';
+export { VirtualWebcamService } from 'services/virtual-webcam';
+export { MetricsService } from 'services/metrics';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';
+export { BasePlatformService } from 'services/platforms/base-platform';
 export { YoutubeService } from 'services/platforms/youtube';
 export { TwitchService } from 'services/platforms/twitch';
 export { MixerService } from 'services/platforms/mixer';
@@ -71,7 +75,6 @@ export { IncrementalRolloutService } from 'services/incremental-rollout';
 export { CrashReporterService } from 'services/crash-reporter';
 export { PatchNotesService } from 'services/patch-notes';
 export { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
-export { StreamInfoService } from './services/stream-info';
 export { StreamingService } from 'services/streaming';
 export { StreamlabelsService } from 'services/streamlabels';
 export { AutoConfigService } from 'services/auto-config';

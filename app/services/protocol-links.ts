@@ -8,6 +8,7 @@ import { PlatformAppStoreService } from 'services/platform-app-store';
 import { FacemasksService } from 'services/facemasks';
 import { UserService } from 'services/user';
 import { SettingsService } from './settings';
+import { byOS, OS } from 'util/operating-systems';
 
 function protocolHandler(base: string) {
   return (target: any, methodName: string, descriptor: PropertyDescriptor) => {
@@ -38,15 +39,22 @@ export class ProtocolLinksService extends Service {
   private handlers: Dictionary<string>;
 
   start(argv: string[]) {
-    // Check if this instance was started with a protocol link
-    argv.forEach(arg => {
-      if (arg.match(/^slobs:\/\//)) this.handleLink(arg);
+    // Other instances started with a protocol link will receive this message
+    electron.ipcRenderer.on('protocolLink', (event: Electron.Event, link: string) => {
+      this.handleLink(link);
     });
 
-    // Other instances started with a protocol link will receive this message
-    electron.ipcRenderer.on('protocolLink', (event: Electron.Event, link: string) =>
-      this.handleLink(link),
-    );
+    // Check if this instance was started with a protocol link
+    byOS({
+      [OS.Windows]: () => {
+        argv.forEach(arg => {
+          if (arg.match(/^slobs:\/\//)) this.handleLink(arg);
+        });
+      },
+      [OS.Mac]: () => {
+        electron.ipcRenderer.send('protocolLinkReady');
+      },
+    });
   }
 
   private handleLink(link: string) {

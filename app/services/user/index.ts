@@ -30,6 +30,7 @@ import { StreamSettingsService } from 'services/settings/streaming';
 import { lazyModule } from 'util/lazy-module';
 import { AuthModule } from './auth-module';
 import { WebsocketService, TSocketEvent } from 'services/websocket';
+import { MagicLinkService } from 'services/magic-link';
 
 export enum EAuthProcessState {
   Idle = 'idle',
@@ -117,6 +118,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private settingsService: SettingsService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private websocketService: WebsocketService;
+  @Inject() private magicLinkService: MagicLinkService;
 
   @mutation()
   LOGIN(auth: IUserAuth) {
@@ -460,6 +462,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.showPrimeWindow();
   }
 
+  /**
+   * open the prime onboarding in the browser
+   * @param refl a referral tag for analytics
+   */
+  openPrimeUrl(refl: 'slobs-multistream' | 'slobs-settings') {
+    this.magicLinkService.getDashboardMagicLink('prime-marketing', refl).then(link => {
+      electron.remote.shell.openExternal(link);
+    });
+  }
+
   recentEventsUrl() {
     if (this.isLoggedIn) {
       const host = this.hostsService.streamlabs;
@@ -608,8 +620,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     merge = false,
   ): Promise<EPlatformCallResult> {
     const service = getPlatformService(platform);
-    const authUrl =
-      merge && service.supports('account-merging') ? service.mergeUrl : service.authUrl;
+    const authUrl = merge ? service.mergeUrl : service.authUrl;
 
     if (merge && !this.isLoggedIn) {
       throw new Error('Account merging can only be performed while logged in');

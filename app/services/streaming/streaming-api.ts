@@ -1,4 +1,11 @@
 import { Observable } from 'rxjs';
+import { TPlatform } from '../platforms';
+import { IEncoderProfile } from '../video-encoding-optimizations';
+import { ITwitchStartStreamOptions } from '../platforms/twitch';
+import { IYoutubeStartStreamOptions } from '../platforms/youtube';
+import { IFacebookStartStreamOptions } from '../platforms/facebook';
+import { IMixerStartStreamOptions } from '../platforms/mixer';
+import { IStreamError } from './stream-error';
 
 export enum EStreamingState {
   Offline = 'offline',
@@ -22,6 +29,55 @@ export enum EReplayBufferState {
   Saving = 'saving',
 }
 
+export interface IStreamInfo {
+  lifecycle:
+    | 'empty' // platform settings are not synchronized
+    | 'prepopulate' // stetting synchronization in progress
+    | 'waitForNewSettings' // platform settings has been synchronized
+    | 'runChecklist' // applying new settings and start the stream
+    | 'live'; // stream has been successfully started
+  error: IStreamError | null;
+  checklist: {
+    applyOptimizedSettings: TGoLiveChecklistItemState;
+    twitch: TGoLiveChecklistItemState;
+    youtube: TGoLiveChecklistItemState;
+    facebook: TGoLiveChecklistItemState;
+    mixer: TGoLiveChecklistItemState;
+    setupRestream: TGoLiveChecklistItemState;
+    startVideoTransmission: TGoLiveChecklistItemState;
+    publishYoutubeBroadcast: TGoLiveChecklistItemState;
+    postTweet: TGoLiveChecklistItemState;
+  };
+}
+
+export type TGoLiveChecklistItemState = 'not-started' | 'pending' | 'done' | 'failed';
+
+export interface IStreamSettings {
+  platforms: {
+    twitch: IPlatformFlags & ITwitchStartStreamOptions;
+    youtube: IPlatformFlags & IYoutubeStartStreamOptions;
+    facebook: IPlatformFlags & IFacebookStartStreamOptions;
+    mixer: IPlatformFlags & IMixerStartStreamOptions;
+  };
+  advancedMode: boolean;
+}
+
+export interface IGoLiveSettings extends IStreamSettings {
+  optimizedProfile?: IEncoderProfile;
+  tweetText: string;
+}
+
+export interface IPlatformCommonFields {
+  title: string;
+  description?: string;
+  game?: string;
+}
+
+export interface IPlatformFlags {
+  enabled: boolean;
+  useCustomFields: boolean;
+}
+
 export interface IStreamingServiceState {
   streamingStatus: EStreamingState;
   streamingStatusTime: string;
@@ -30,6 +86,7 @@ export interface IStreamingServiceState {
   replayBufferStatus: EReplayBufferState;
   replayBufferStatusTime: string;
   selectiveRecording: boolean;
+  info: IStreamInfo;
 }
 
 export interface IStreamingServiceApi {

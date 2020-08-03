@@ -34,6 +34,7 @@ import uuid from 'uuid/v4';
 import Blank from 'components/windows/Blank.vue';
 import Main from 'components/windows/Main.vue';
 import CustomLoader from 'components/CustomLoader';
+import process from 'process';
 import { MetricsService } from 'services/metrics';
 
 const crashHandler = window['require']('crash-handler');
@@ -42,6 +43,12 @@ const { ipcRenderer, remote, app, contentTracing } = electron;
 const slobsVersion = Utils.env.SLOBS_VERSION;
 const isProduction = Utils.env.NODE_ENV === 'production';
 const isPreview = !!Utils.env.SLOBS_PREVIEW;
+
+// Used by Eddy for debugging on mac.
+if (!isProduction) {
+  const windowId = Utils.getWindowId();
+  process.title = `SLOBS Renderer ${windowId}`;
+}
 
 // This is the development DSN
 let sentryDsn = 'https://8f444a81edd446b69ce75421d5e91d4d@sentry.io/252950';
@@ -251,7 +258,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const message = apiInitErrorResultToMessage(apiResult);
       showDialog(message);
 
-      crashHandler.unregisterProcess(appService.pid);
+      crashHandler.unregisterProcess(process.pid);
 
       obs.NodeObs.StopCrashHandler();
       obs.IPC.disconnect();

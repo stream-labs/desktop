@@ -25,10 +25,11 @@ type TAnalyticsEvent =
   | 'FacebookLogin'
   | 'PlatformLogin'
   | 'SocialShare'
-  | 'Recording'
-  | 'ReplayBuffer'
   | 'Heartbeat'
-  | 'StreamPerformance';
+  | 'StreamPerformance'
+  | 'StreamingStatus'
+  | 'RecordingStatus'
+  | 'ReplayBufferStatus';
 
 interface IAnalyticsEvent {
   product: string;
@@ -117,6 +118,8 @@ export class UsageStatisticsService extends Service {
     if (this.userService.state.auth && this.userService.state.auth.primaryPlatform) {
       metadata['platform'] = this.userService.state.auth.primaryPlatform;
     }
+
+    metadata['os'] = process.platform;
 
     const bodyData: IUsageApiData = {
       event,

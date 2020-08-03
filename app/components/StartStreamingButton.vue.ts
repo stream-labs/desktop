@@ -27,10 +27,8 @@ export default class StartStreamingButton extends Vue {
 
   @Prop() disabled: boolean;
 
-  mounted() {
-    if (this.isFacebook || this.restreamService.shouldGoLiveWithRestream) {
-      this.facebookService.fetchActivePage();
-    }
+  get isMidStream() {
+    return this.streamingService.views.isMidStreamMode;
   }
 
   async toggleStreaming() {
@@ -79,69 +77,20 @@ export default class StartStreamingButton extends Vue {
         if (!goLive) return;
       }
 
-      if (this.shouldShowGoLiveWindow()) {
-        if (this.hasPages) {
-          return this.streamingService.openShareStream();
-        }
-        if (this.restreamService.shouldGoLiveWithRestream) {
-          this.streamingService.showEditStreamInfo(this.restreamService.platforms, 0);
-        } else {
-          this.streamingService.showEditStreamInfo();
-        }
+      if (this.streamingService.views.shouldShowGoLiveWindow()) {
+        this.streamingService.actions.showGoLiveWindow();
       } else {
-        if (this.videoEncodingOptimizationService.canApplyProfileFromCache()) {
-          await this.videoEncodingOptimizationService.applyProfileFromCache();
-        }
-        this.streamingService.toggleStreaming();
+        this.streamingService.actions.goLive(null, true);
       }
     }
   }
 
-  get hasPages() {
-    return (
-      (this.isFacebook || this.restreamService.shouldGoLiveWithRestream) &&
-      this.facebookService.state.facebookPages &&
-      this.facebookService.state.facebookPages.pages.length
-    );
+  edit() {
+    this.streamingService.actions.showEditStream();
   }
 
   get streamingStatus() {
     return this.streamingService.state.streamingStatus;
-  }
-
-  shouldShowGoLiveWindow() {
-    if (!this.userService.isLoggedIn) return false;
-
-    if (this.isTwitch) {
-      // For Twitch, we can show the Go Live window even with protected mode off
-      // This is mainly for legacy reasons.
-      return (
-        this.restreamService.shouldGoLiveWithRestream ||
-        this.customizationService.state.updateStreamInfoOnLive
-      );
-    }
-
-    if (this.isMixer) {
-      return (
-        this.streamSettingsService.protectedModeEnabled &&
-        this.customizationService.state.updateStreamInfoOnLive &&
-        this.streamSettingsService.isSafeToModifyStreamKey()
-      );
-    }
-
-    if (this.isFacebook) {
-      return (
-        this.streamSettingsService.protectedModeEnabled &&
-        this.streamSettingsService.isSafeToModifyStreamKey()
-      );
-    }
-
-    if (this.isYoutube) {
-      return (
-        this.streamSettingsService.protectedModeEnabled &&
-        this.streamSettingsService.isSafeToModifyStreamKey()
-      );
-    }
   }
 
   getStreamButtonLabel() {
@@ -174,26 +123,6 @@ export default class StartStreamingButton extends Vue {
 
   getIsRedButton() {
     return this.streamingStatus !== EStreamingState.Offline;
-  }
-
-  get isStreaming() {
-    return this.streamingService.isStreaming;
-  }
-
-  get isFacebook() {
-    return this.userService.isLoggedIn && this.userService.platformType === 'facebook';
-  }
-
-  get isYoutube() {
-    return this.userService.isLoggedIn && this.userService.platformType === 'youtube';
-  }
-
-  get isTwitch() {
-    return this.userService.isLoggedIn && this.userService.platformType === 'twitch';
-  }
-
-  get isMixer() {
-    return this.userService.isLoggedIn && this.userService.platformType === 'mixer';
   }
 
   get isDisabled() {

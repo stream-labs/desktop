@@ -39,10 +39,6 @@ class LayoutViews extends ViewHandler<ILayoutServiceState> {
     return LAYOUT_DATA[this.currentTab.currentLayout].component;
   }
 
-  get isColumnLayout() {
-    return LAYOUT_DATA[this.currentTab.currentLayout].isColumns;
-  }
-
   elementTitle(element: ELayoutElement) {
     if (!element) return;
     return ELEMENT_DATA()[element].title;
@@ -182,7 +178,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   addTab(name: string, icon: string) {
     const id = uuid();
-    this.ADD_TAB(name, icon, id, this.userService.isPrime);
+    this.ADD_TAB(name, icon, id);
   }
 
   removeCurrentTab() {
@@ -212,7 +208,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   @mutation()
   SET_RESIZE(bar: 'bar1' | 'bar2', size: number) {
-    this.state.tabs[this.state.currentTab].resizes[bar] = size;
+    Vue.set(this.state.tabs[this.state.currentTab].resizes, bar, size);
   }
 
   @mutation()
@@ -234,7 +230,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
   }
 
   @mutation()
-  ADD_TAB(name: string, icon: string, id: string, switchTab = false) {
+  ADD_TAB(name: string, icon: string, id: string) {
     Vue.set(this.state.tabs, id, {
       name,
       icon,
@@ -252,6 +248,6 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
         bar2: 240,
       },
     });
-    if (switchTab) this.state.currentTab = id;
+    this.state.currentTab = id;
   }
 }

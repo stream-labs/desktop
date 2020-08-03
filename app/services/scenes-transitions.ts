@@ -51,6 +51,7 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
       { description: $t('Fade to Color'), value: 'fade_to_color_transition' },
       { description: $t('Luma Wipe'), value: 'wipe_transition' },
       { description: $t('Stinger'), value: 'obs_stinger_transition' },
+      { description: $t('Motion'), value: 'motion_transition' },
     ];
   }
 

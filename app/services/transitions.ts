@@ -22,6 +22,7 @@ export enum ETransitionType {
   FadeToColor = 'fade_to_color_transition',
   LumaWipe = 'wipe_transition',
   Stinger = 'obs_stinger_transition',
+  Motion = 'motion_transition',
 }
 
 interface ITransitionsState {
@@ -111,6 +112,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
       { title: $t('Fade to Color'), value: ETransitionType.FadeToColor },
       { title: $t('Luma Wipe'), value: ETransitionType.LumaWipe },
       { title: $t('Stinger'), value: ETransitionType.Stinger },
+      { title: $t('Motion'), value: ETransitionType.Motion },
     ];
   }
 
