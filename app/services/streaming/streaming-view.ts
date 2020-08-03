@@ -212,7 +212,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
       const platformSettings = settings.platforms[platform];
       if (!platformSettings.enabled) continue;
       const platformName = getPlatformService(platform).displayName;
-      if (platform === 'twitch' || platform === 'facebook') {
+      if (platform === 'facebook') {
         if (!platformSettings['game']) {
           return $t('You must select a game for %{platformName}', { platformName });
         }

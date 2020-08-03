@@ -1,8 +1,9 @@
 import { DefaultManager, IDefaultManagerSettings } from './default-manager';
 import { Inject } from 'services/core/injector';
-import { StreamlabelsService, IStreamlabelSubscription } from 'services/streamlabels';
+import { StreamlabelsService } from 'services/streamlabels';
 import { UserService } from 'services/user';
 import { byOS, OS } from 'util/operating-systems';
+import { Subscription } from 'rxjs';
 
 export interface IStreamlabelsManagerSettings extends IDefaultManagerSettings {
   statname: string;
@@ -13,18 +14,33 @@ export class StreamlabelsManager extends DefaultManager {
   @Inject() userService: UserService;
 
   settings: IStreamlabelsManagerSettings;
-  private subscription: IStreamlabelSubscription;
+  oldOutput: string = null;
   customUIComponent = 'StreamlabelProperties';
+
+  private subscription: Subscription;
+
+  init() {
+    this.subscription = this.streamlabelsService.output.subscribe(output => {
+      if (output[this.settings.statname] !== this.oldOutput) {
+        this.oldOutput = output[this.settings.statname];
+        this.obsSource.update({
+          ...this.obsSource.settings,
+          read_from_file: false,
+          text: output[this.settings.statname],
+        });
+      }
+    });
+  }
 
   get blacklist() {
     return byOS({
-      [OS.Windows]: ['read_from_file', 'file'],
+      [OS.Windows]: ['read_from_file', 'text'],
       [OS.Mac]: ['from_file', 'text', 'text_file', 'log_mode', 'log_lines'],
     });
   }
 
   destroy() {
-    this.unsubscribe();
+    if (this.subscription) this.subscription.unsubscribe();
   }
 
   normalizeSettings() {
@@ -67,6 +83,12 @@ export class StreamlabelsManager extends DefaultManager {
   }
 
   applySettings(settings: Dictionary<any>) {
+    if (settings.statname !== this.settings.statname) {
+      this.obsSource.update({
+        text: this.streamlabelsService.output.getValue()[settings.statname],
+      });
+    }
+
     this.settings = {
       // Default to All-Time Top Donator
       statname: 'all_time_top_donator',
@@ -75,26 +97,5 @@ export class StreamlabelsManager extends DefaultManager {
     };
 
     this.normalizeSettings();
-
-    this.refreshSubscription();
-  }
-
-  private unsubscribe() {
-    if (this.subscription) {
-      this.streamlabelsService.unsubscribe(this.subscription);
-    }
-  }
-
-  private refreshSubscription() {
-    this.unsubscribe();
-
-    this.subscription = this.streamlabelsService.subscribe(this.settings.statname);
-
-    const sourceSettings = byOS({
-      [OS.Windows]: { read_from_file: true, file: this.subscription.path },
-      [OS.Mac]: { from_file: true, text_file: this.subscription.path },
-    });
-
-    this.obsSource.update(sourceSettings);
   }
 }

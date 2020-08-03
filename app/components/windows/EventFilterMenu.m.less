@@ -13,11 +13,6 @@
   flex-direction: column;
 }
 
-.flex-row {
-  display: flex;
-  flex-direction: row;
-}
-
 .category-header {
   :global(.checkbox label) {
     font-weight: 500;
@@ -41,6 +36,7 @@
 .minimum {
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
 .months-input-container {
@@ -49,19 +45,45 @@
 }
 
 .months-input {
-  width: 100px;
+  width: 60px;
+  margin-left: 10px;
+
+  input {
+    height: 27px !important;
+    position: relative;
+    top: -3px;
+  }
+
+  :global(.arrows) {
+    top: -4px !important;
+  }
 }
 
 .months-label {
   margin-left: 10px;
 }
 
-.half-width {
-  width: 50%;
-  .padding(2);
+.filter-section() {
+  width: 100%;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  background-color: var(--section-alt);
+  border-radius: 4px;
 }
 
-.full-width {
-  width: 100%;
-  .padding(2);
+.general-filters {
+  height: 140px;
+  .filter-section();
+}
+
+.sub-filters {
+  margin-top: 16px;
+  height: 220px;
+  .filter-section();
+}
+
+.half-width {
+  width: 50%;
 }
