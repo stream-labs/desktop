@@ -4,7 +4,7 @@
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "0.23.2",
+  "version": "0.23.3-preview.0",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && yarn compile:updater && yarn webpack-cli --progress --config webpack.dev.config.js",
@@ -155,7 +155,7 @@
     "js-yaml": "3.13.1",
     "less": "3.11.1",
     "less-loader": "4.1.0",
-    "lodash": "4.17.15",
+    "lodash": "4.17.19",
     "lodash-decorators": "4.5.0",
     "mark.js": "8.11.1",
     "mime": "2.4.3",

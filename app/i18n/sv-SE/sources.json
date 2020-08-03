@@ -5,14 +5,14 @@
   "Add videos or sound clips to your scene.": "Lägg till video eller ljud-clip till din scen.",
   "Capture a specific window that's open on your computer.": "Fånga ett specifikt fönster som är öppet på din dator.",
   "Compatible with most modern browsers and programs": "Kompatibel med de flesta moderna webläsare och program",
-  "Select from your build in USB webcam or an external.": "Välj mellan den inbyggda eller en extern webbkamera.",
+  "Display video from webcams, capture cards, and other devices.": "Display video from webcams, capture cards, and other devices.",
   "Built in webcam": "Inbyggd webbkamera",
   "Logitech webcam": "Logitech webbkamera",
   "Capture cards (Elgato, Avermedia, BlackMagic)": "Inspelningskort (Elgato, Avermedia, BlackMagic)",
   "Captures your desktop audio for the purpose of playing sound, such as music or speech.": "Fångar ljudet från ditt skrivbord i syfte att spela ljud, till exempel musik eller tal.",
   "Desktop audio": "Skrivbordsljud",
   "Add a color to the background of your whole scene or just a part.": "Lägga till en färg i bakgrunden av hela din scen eller bara en del.",
-  "Allows you to add web-based content as a source, such as web pages and Flash SWFs.": "Gör det möjligt att lägga till webbaserat innehåll som en källa, såsom webbsidor och Flash SWF-filer.",
+  "Allows you to add web-based content as a source, such as web pages, widgets, and streaming video.": "Allows you to add web-based content as a source, such as web pages, widgets, and streaming video.",
   "Websites": "Webbplatser",
   "Third party widget": "Tredje part widget",
   "Add text to your scene and adjust its style.": "Lägga till text till din scen och justera textens stil.",
@@ -179,5 +179,7 @@
   "Remove source": "Remove source",
   "Toggle Selective Recording": "Toggle Selective Recording",
   "Size": "Storlek",
-  "Position": "Position"
+  "Position": "Position",
+  "JACK Input Client": "JACK Input Client",
+  "Motion": "Motion"
 }

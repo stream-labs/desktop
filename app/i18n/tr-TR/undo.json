@@ -1,6 +1,6 @@
 {
   "Add %{filterName}": "%{filterName} ekle",
-  "Center %{sourceName}": "Center %{sourceName}",
+  "Center %{sourceName}": "%{sourceName} kaynağını ortala",
   "Paste %{nodeName}": "%{nodeName} ögesini yapıştır",
   "Create a new connection": "Yeni bağlantı oluştur",
   "Create %{sourceName}": "%{sourceName} oluştur",
