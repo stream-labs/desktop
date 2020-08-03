@@ -9,6 +9,7 @@ import {
   isTextProperty,
 } from '../../../util/properties-type-guards';
 import { $translateIfExist } from 'services/i18n';
+import TsxComponent from 'components/tsx-component';
 
 /**
  * all possible OBS properties types
@@ -96,7 +97,7 @@ export interface IGoogleFont {
   face: string;
   flags: number;
   path?: string;
-  size?: string;
+  size?: number;
 }
 
 export type TObsStringList = { value: string }[];
@@ -471,7 +472,10 @@ export function setPropertiesFormData(
   return settings;
 }
 
-export abstract class ObsInput<TValueType> extends Vue {
+export abstract class ObsInput<TValueType> extends TsxComponent<{
+  value: TValueType;
+  onInput: (value: TValueType) => void;
+}> {
   abstract value: TValueType;
 
   emitInput(eventData: TValueType) {

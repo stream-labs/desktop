@@ -1,11 +1,12 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { ObsInput, IObsInput, TObsType, IObsFont, IGoogleFont } from './ObsInput';
-import GoogleFontSelector from './ObsGoogleFontSelector.vue';
+import GoogleFontSelector from './ObsGoogleFontSelector';
 import ObsSystemFontSelector from './ObsSystemFontSelector.vue';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import { metadata } from 'components/shared/inputs';
+import { $t } from 'services/i18n';
 
-@Component({
-  components: { GoogleFontSelector, SystemFontSelector: ObsSystemFontSelector },
-})
+@Component({})
 class ObsFontInput extends ObsInput<IObsInput<IObsFont>> {
   static obsType: TObsType;
 
@@ -30,6 +31,10 @@ class ObsFontInput extends ObsInput<IObsInput<IObsFont>> {
     });
   }
 
+  get checkboxMetadata() {
+    return metadata.bool({ title: $t('Use Google Font') });
+  }
+
   get googleFont() {
     return {
       path: this.value.value.path,
@@ -39,8 +44,26 @@ class ObsFontInput extends ObsInput<IObsInput<IObsFont>> {
     };
   }
 
-  setFontType(e: Event) {
-    this.isGoogleFont = e.target['checked'];
+  setFontType(val: boolean) {
+    this.isGoogleFont = val;
+  }
+
+  render() {
+    return (
+      <div>
+        <HFormGroup
+          value={this.isGoogleFont}
+          onInput={(val: boolean) => this.setFontType(val)}
+          metadata={this.checkboxMetadata}
+        />
+        {this.isGoogleFont && (
+          <GoogleFontSelector value={this.googleFont} onInput={font => this.setGoogleFont(font)} />
+        )}
+        {!this.isGoogleFont && (
+          <ObsSystemFontSelector value={this.value} onInput={font => this.setFont(font)} />
+        )}
+      </div>
+    );
   }
 }
 
