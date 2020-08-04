@@ -31,12 +31,17 @@ interface ITestUserFeatures {
   '2FADisabled'?: boolean;
 }
 
-export async function logOut(t: TExecutionContext) {
-  await focusMain(t);
-  await t.context.app.client.click('.fa-sign-out-alt');
-  await dialogDismiss(t, 'Yes');
-  await t.context.app.client.waitForVisible('.fa-sign-in-alt'); // wait for the log-in button
-  await releaseUserInPool();
+export async function logOut(t: TExecutionContext, skipUI = false) {
+  // logout from the SLOBS app
+  if (!skipUI) {
+    await focusMain(t);
+    await t.context.app.client.click('.fa-sign-out-alt');
+    await dialogDismiss(t, 'Yes');
+    await t.context.app.client.waitForVisible('.fa-sign-in-alt'); // wait for the log-in button
+  }
+  // release the testing user
+  await releaseUserInPool(user);
+  user = null;
 }
 
 /**
@@ -56,7 +61,7 @@ export async function logIn(
   if (user) throw 'User already logged in';
 
   if (USER_POOL_TOKEN) {
-    authInfo = await reserveUserFromPool(t, platform, features);
+    user = await reserveUserFromPool(t, platform, features);
   } else {
     throw new Error('Setup env variable USER_POOL_TOKEN to run this test');
   }
@@ -102,10 +107,9 @@ export async function isLoggedIn(t: TExecutionContext) {
  * We must let slobs-users-pool service know that we are not going to do any actions with reserved
  * account.
  */
-export async function releaseUserInPool() {
+export async function releaseUserInPool(user: ITestUser) {
   if (!user || !USER_POOL_TOKEN) return;
   await requestUserPool(`release/${user.type}/${user.email}`);
-  user = null;
 }
 
 /**
@@ -119,6 +123,7 @@ export async function reserveUserFromPool(
   // try to get a user account from users-pool service
   // give it several attempts
   let attempts = 3;
+  let reservedUser = null;
   while (attempts--) {
     try {
       let urlPath = 'reserve';
@@ -126,7 +131,7 @@ export async function reserveUserFromPool(
       if (platformType) urlPath += `/${platformType}`;
       // request a user with a specific feature
       if (features) urlPath += `?features=${JSON.stringify(features)}`;
-      user = await requestUserPool(urlPath);
+      reservedUser = await requestUserPool(urlPath);
       break;
     } catch (e) {
       t.log(e);
@@ -136,8 +141,8 @@ export async function reserveUserFromPool(
       }
     }
   }
-  if (!user) throw 'Unable to reserve a user after 3 attempts';
-  return user;
+  if (!reservedUser) throw new Error('Unable to reserve a user after 3 attempts');
+  return reservedUser;
 }
 
 /**

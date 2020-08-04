@@ -295,7 +295,7 @@ export default class StreamSettings extends TsxComponent {
             <i class={cx(styles.destinationLogo, 'fa fa-globe')} />
           </div>
           <div class={styles.destinationName}>
-            {dest.name} <br />
+            <span>{dest.name}</span> <br />
             {dest.url}
             <br />
           </div>
