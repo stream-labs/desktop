@@ -57,7 +57,7 @@ export class DestinationSwitchers extends TsxComponent<Props> {
     return (
       <div>
         {platforms.map((platform: TPlatform) => this.renderPlatform(platform))}
-        {this.props.customDestinations.map((dest, ind) => this.renderCustomDestination(dest, ind))}
+        {this.props.customDestinations?.map((dest, ind) => this.renderCustomDestination(dest, ind))}
       </div>
     );
   }
