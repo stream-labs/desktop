@@ -31,10 +31,6 @@ class ObsFontInput extends ObsInput<IObsInput<IObsFont>> {
     });
   }
 
-  get checkboxMetadata() {
-    return metadata.bool({ title: $t('Use Google Font') });
-  }
-
   get googleFont() {
     return {
       path: this.value.value.path,
@@ -54,7 +50,7 @@ class ObsFontInput extends ObsInput<IObsInput<IObsFont>> {
         <HFormGroup
           value={this.isGoogleFont}
           onInput={(val: boolean) => this.setFontType(val)}
-          metadata={this.checkboxMetadata}
+          metadata={metadata.bool({ title: $t('Use Google Font') })}
         />
         {this.isGoogleFont && (
           <GoogleFontSelector value={this.googleFont} onInput={font => this.setGoogleFont(font)} />
