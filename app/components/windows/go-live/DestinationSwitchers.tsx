@@ -76,7 +76,7 @@ export class DestinationSwitchers extends TsxComponent<Props> {
 
     // don't show toggle inputs if we have only one platform to stream
     const shouldShowToggles =
-      Object.keys(this.props.platforms).length > 1 || this.props.customDestinations.length;
+      Object.keys(this.props.platforms).length > 1 || this.props.customDestinations?.length;
     return (
       <div
         class={cx(styles.platformSwitcher, { [styles.platformDisabled]: !enabled })}
