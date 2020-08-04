@@ -56,7 +56,6 @@ export async function logIn(
   waitForUI = true,
   isOnboardingTest = false,
 ): Promise<ITestUser> {
-  let authInfo: ITestUser;
 
   if (user) throw 'User already logged in';
 
@@ -66,8 +65,8 @@ export async function logIn(
     throw new Error('Setup env variable USER_POOL_TOKEN to run this test');
   }
 
-  await loginWithAuthInfo(t, authInfo, waitForUI, isOnboardingTest);
-  return authInfo;
+  await loginWithAuthInfo(t, user, waitForUI, isOnboardingTest);
+  return user;
 }
 
 export async function loginWithAuthInfo(
