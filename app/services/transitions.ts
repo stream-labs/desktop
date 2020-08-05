@@ -12,6 +12,7 @@ import { DefaultManager } from 'services/sources/properties-managers/default-man
 import { Subject } from 'rxjs';
 import { isUrl } from '../util/requests';
 import { UsageStatisticsService } from './usage-statistics';
+import { getOS, OS } from 'util/operating-systems';
 
 export const TRANSITION_DURATION_MAX = 2_000_000_000;
 
@@ -106,7 +107,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   }
 
   getTypes(): IListOption<ETransitionType>[] {
-    return [
+    const types = [
       { title: $t('Cut'), value: ETransitionType.Cut },
       { title: $t('Fade'), value: ETransitionType.Fade },
       { title: $t('Swipe'), value: ETransitionType.Swipe },
@@ -114,8 +115,11 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
       { title: $t('Fade to Color'), value: ETransitionType.FadeToColor },
       { title: $t('Luma Wipe'), value: ETransitionType.LumaWipe },
       { title: $t('Stinger'), value: ETransitionType.Stinger },
-      { title: $t('Motion'), value: ETransitionType.Motion },
     ];
+
+    if (getOS() === OS.Windows) types.push({ title: $t('Motion'), value: ETransitionType.Motion });
+
+    return types;
   }
 
   enableStudioMode() {
