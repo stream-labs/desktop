@@ -31,7 +31,7 @@ type TAnalyticsEvent =
   | 'RecordingStatus'
   | 'ReplayBufferStatus'
   | 'Click'
-  | 'SessionTest';
+  | 'Session';
 
 interface IAnalyticsEvent {
   product: string;
@@ -200,7 +200,7 @@ export class UsageStatisticsService extends Service {
       features: Object.keys(this.session.features),
     };
 
-    this.recordAnalyticsEvent('SessionTest', session);
+    this.recordAnalyticsEvent('Session', session);
 
     // Unthrottled version
     await this.sendAnalytics();
