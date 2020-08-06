@@ -2,14 +2,13 @@ import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
-import { cloneDeep } from 'lodash';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { formMetadata, metadata } from 'components/shared/inputs';
 import { $t } from 'services/i18n';
 import BroadcastInput from './BroadcastInput';
 import {
+  IYoutubeCategory,
   IYoutubeLiveBroadcast,
-  IYoutubeStartStreamOptions,
   YoutubeService,
 } from 'services/platforms/youtube';
 import CommonPlatformFields from '../../CommonPlatformFields';
@@ -34,12 +33,19 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
   @Inject() private youtubeService: YoutubeService;
   @Inject() private streamingService: StreamingService;
   @SyncWithValue() protected settings: IStreamSettings;
-  broadcasts: IYoutubeLiveBroadcast[] = [];
-  broadcastsLoaded = false;
+  private broadcasts: IYoutubeLiveBroadcast[] = [];
+  private loaded = false;
+  private categories: IYoutubeCategory[] = [];
 
   async created() {
-    this.broadcasts = await this.youtubeService.fetchBroadcasts();
-    this.broadcastsLoaded = true;
+    // load list of broadcasts and categories
+    const [broadcasts, categories] = (await Promise.all([
+      this.youtubeService.fetchBroadcasts(),
+      this.youtubeService.fetchCategories(),
+    ])) as [IYoutubeLiveBroadcast[], IYoutubeCategory[]];
+    this.broadcasts = broadcasts;
+    this.categories = categories;
+    this.loaded = true;
   }
 
   get canChangeBroadcast() {
@@ -66,9 +72,19 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
     return formMetadata({
       event: {
         broadcasts: this.broadcasts,
-        loading: !this.broadcastsLoaded,
+        loading: !this.loaded,
         disabled: !this.canChangeBroadcast,
       },
+      category: metadata.list({
+        title: $t('Category'),
+        allowEmpty: true,
+        options: this.categories.map(category => ({
+          value: category.id,
+          title: category.snippet.title,
+        })),
+        loading: !this.loaded,
+        fullWidth: true,
+      }),
     });
   }
 
@@ -87,6 +103,10 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
             </HFormGroup>
           )}
           <CommonPlatformFields vModel={this.settings} platform={'youtube'} />
+          <HFormGroup
+            metadata={this.formMetadata.category}
+            vModel={this.settings.platforms.youtube.category}
+          />
         </ValidatedForm>
       )
     );

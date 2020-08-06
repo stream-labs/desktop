@@ -13,7 +13,7 @@ import { StreamSettingsService } from 'services/settings/streaming';
 import { CustomizationService } from 'services/customization';
 import { IGoLiveSettings } from 'services/streaming';
 import { WindowsService } from 'services/windows';
-import { $t } from 'services/i18n';
+import { $t, I18nService } from 'services/i18n';
 import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import { assertIsDefined } from 'util/properties-type-guards';
@@ -32,6 +32,7 @@ export interface IYoutubeStartStreamOptions {
   title: string;
   broadcastId?: string;
   description?: string;
+  category?: string;
 }
 
 export type TYoutubeLifecycleStep =
@@ -110,6 +111,13 @@ interface IYoutubeLiveStream {
   };
 }
 
+export interface IYoutubeCategory {
+  id: string;
+  snippet: {
+    title: string;
+  };
+}
+
 type TStreamStatus = 'active' | 'created' | 'error' | 'inactive' | 'ready';
 type TBroadcastLifecycleStatus =
   | 'complete'
@@ -127,6 +135,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   @Inject() private customizationService: CustomizationService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private windowsService: WindowsService;
+  @Inject() private i18nService: I18nService;
 
   readonly capabilities = new Set<TPlatformCapability>(['chat', 'description', 'stream-schedule']);
 
@@ -197,12 +206,13 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       title,
       description,
       broadcastId,
+      category,
     }: IYoutubeStartStreamOptions = settings.platforms.youtube;
     // update selected LiveBroadcast with new title and description
     // or create a new LiveBroadcast if there are no broadcasts selected
     let broadcast = broadcastId
       ? await this.updateBroadcast(broadcastId, { title, description })
-      : await this.createBroadcast({ title, description });
+      : await this.createBroadcast({ title, description, category });
 
     // create a LiveStream object and bind it with current LiveBroadcast
     const stream = await this.createLiveStream(title);
@@ -348,6 +358,14 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     );
   }
 
+  async fetchCategories(): Promise<IYoutubeCategory[]> {
+    // region should be in "ISO 3166 alpha 2" format
+    const region = this.i18nService.state.locale.split('-')[1];
+    const endpoint = `${this.apiBase}/videoCategories?part=snippet&regionCode=${region}`;
+    const collection = await this.requestYoutube<IYoutubeCollection<IYoutubeCategory>>(endpoint);
+    return collection.items;
+  }
+
   /**
    * returns perilled data for the GoLive window
    */
@@ -432,6 +450,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   private async createBroadcast(params: {
     title: string;
     description?: string;
+    category?: string;
     scheduledStartTime?: string;
   }): Promise<IYoutubeLiveBroadcast> {
     const fields = ['snippet', 'contentDetails', 'status'];
@@ -445,9 +464,30 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       status: { privacyStatus: 'public' },
     };
 
-    return await this.requestYoutube<IYoutubeLiveBroadcast>({
+    const broadcast = await this.requestYoutube<IYoutubeLiveBroadcast>({
       body: JSON.stringify(data),
       method: 'POST',
+      url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
+    });
+
+    if (params.category) await this.updateBroadcastCategory(broadcast.id, params.category);
+
+    return broadcast;
+  }
+
+  private async updateBroadcastCategory(broadcastId: string, categoryId: string) {
+    const fields = ['id', 'snippet'];
+    const endpoint = `videos?part=${fields.join(',')}`;
+    const data: Dictionary<any> = {
+      snippet: {
+        categoryId,
+        id: broadcastId,
+      },
+    };
+
+    await this.requestYoutube({
+      body: JSON.stringify(data),
+      method: 'PUT',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
     });
   }
