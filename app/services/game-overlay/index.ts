@@ -10,6 +10,7 @@ import { mutation } from 'services/core/stateful-service';
 import { $t } from 'services/i18n';
 import { getOS, OS } from 'util/operating-systems';
 import { StreamingService } from '../streaming';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 const { BrowserWindow } = electron.remote;
 
@@ -49,6 +50,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   @Inject() customizationService: CustomizationService;
   @Inject() windowsService: WindowsService;
   @Inject() streamingService: StreamingService;
+  @Inject() usageStatisticsService: UsageStatisticsService;
 
   static defaultState: GameOverlayState = {
     isEnabled: false,
@@ -106,6 +108,8 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
     if (this.overlayRunning) return;
     this.overlayRunning = true;
+
+    this.usageStatisticsService.recordFeatureUsage('GameOverlay');
 
     let crashHandlerLogPath = '';
     if (process.env.NODE_ENV !== 'production' || !!process.env.SLOBS_PREVIEW) {

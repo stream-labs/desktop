@@ -43,6 +43,7 @@ interface IUserServiceState {
   auth?: IUserAuth;
   authProcessState: EAuthProcessState;
   isPrime: boolean;
+  userId?: number;
 }
 
 interface ILinkedPlatform {
@@ -56,6 +57,7 @@ interface ILinkedPlatformsResponse {
   facebook_account?: ILinkedPlatform;
   youtube_account?: ILinkedPlatform;
   mixer_account?: ILinkedPlatform;
+  user_id: number;
 }
 
 export type LoginLifecycleOptions = {
@@ -147,6 +149,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @mutation()
   SET_PRIME(isPrime: boolean) {
     this.state.isPrime = isPrime;
+  }
+
+  @mutation()
+  SET_USER_ID(userId: number) {
+    this.state.userId = userId;
   }
 
   @mutation()
@@ -289,6 +296,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   async updateLinkedPlatforms() {
     const linkedPlatforms = await this.fetchLinkedPlatforms();
+
+    if (linkedPlatforms.user_id) this.SET_USER_ID(linkedPlatforms.user_id);
 
     // TODO: Could metaprogram this a bit more
     if (linkedPlatforms.facebook_account) {
