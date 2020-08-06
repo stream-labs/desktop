@@ -98,41 +98,44 @@ export class FormMonkey {
       const value = formData[input.name];
       this.log(`set the value for the ${input.type} field: ${input.name} = ${value}`);
 
-      switch (input.type) {
-        case 'text':
-        case 'number':
-        case 'textArea':
-          await this.setTextValue(input.selector, value);
-          break;
-        case 'bool':
-          await this.setBoolValue(input.selector, value);
-          break;
-        case 'toggle':
-          await this.setToggleValue(input.selector, value);
-          break;
-        case 'list':
-        case 'fontFamily':
-          await this.setListValue(input.selector, value);
-          break;
-        case 'tags':
-          await this.setTagsInput(input.selector, value);
-          break;
-        case 'color':
-          await this.setColorValue(input.selector, value);
-          break;
-        case 'slider':
-        case 'fontSize':
-        case 'fontWeight':
-          await this.setSliderValue(input.selector, value);
-          break;
-        case 'date':
-          await this.setDateValue(input.selector, value);
-          break;
-        case 'twitchTags':
-          await this.setTwitchTagsValue(input.selector, value);
-          break;
-        default:
-          throw new Error(`No setter found for input type = ${input.type}`);
+      if (typeof value === 'function') {
+        // apply custom setter
+        await (value as FNValueSetter)(this, input);
+      } else {
+        // apply default setter
+        switch (input.type) {
+          case 'text':
+          case 'number':
+          case 'textArea':
+            await this.setTextValue(input.selector, value);
+            break;
+          case 'bool':
+            await this.setBoolValue(input.selector, value);
+            break;
+          case 'toggle':
+            await this.setToggleValue(input.selector, value);
+            break;
+          case 'list':
+          case 'fontFamily':
+            await this.setListValue(input.selector, value);
+            break;
+          case 'color':
+            await this.setColorValue(input.selector, value);
+            break;
+          case 'slider':
+          case 'fontSize':
+          case 'fontWeight':
+            await this.setSliderValue(input.selector, value);
+            break;
+          case 'date':
+            await this.setDateValue(input.selector, value);
+            break;
+          case 'twitchTags':
+            await this.setTwitchTagsValue(input.selector, value);
+            break;
+          default:
+            throw new Error(`No setter found for input type = ${input.type}`);
+        }
       }
 
       delete formData[input.name];
@@ -503,6 +506,29 @@ export function selectTitle(optionTitle: string | RegExp): FNValueSetter {
       // click to the option
       await click(form.t, `${input.selector} .multiselect__element [data-option-title="${title}"]`);
       return;
+    }
+  };
+}
+
+/**
+ * select games
+ */
+export function selectGamesByTitles(
+  games: {
+    title: string;
+    platform: 'facebook' | 'twitch';
+  }[],
+): FNValueSetter {
+  return async (form: FormMonkey, input: IUIInput) => {
+    await form.setInputValue(input.selector, games[0].title);
+    // wait the options list loading
+    await form.client.waitForExist(`${input.selector} .multiselect__element`);
+    for (const game of games) {
+      // click to the option
+      await click(
+        form.t,
+        `${input.selector} .multiselect__element [data-option-value="${game.platform} ${game.title}"]`,
+      );
     }
   };
 }
