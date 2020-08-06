@@ -37,13 +37,15 @@ export function getBestSettingsForNiconico(
         encoderPreset: 'ultrafast',
     };
     if (!('useHardwareEncoder' in options) || options.useHardwareEncoder) {
-        if (settings.hasSpecificValue(OptimizationKey.encoder, EncoderType.nvenc)) {
+        if (settings.hasSpecificValue(OptimizationKey.encoder, EncoderType.nvenc) ||
+            settings.hasSpecificValue(OptimizationKey.encoder, EncoderType.advancedNvenc)) {
             encoderSettings = {
                 encoder: EncoderType.nvenc,
                 simpleUseAdvanced: true,
                 NVENCPreset: 'llhq',
             };
-        } else if (settings.hasSpecificValue(OptimizationKey.encoder, EncoderType.qsv)) {
+        } else if (settings.hasSpecificValue(OptimizationKey.encoder, EncoderType.qsv) ||
+            settings.hasSpecificValue(OptimizationKey.encoder, EncoderType.advancedQsv)) {
             encoderSettings = {
                 encoder: EncoderType.qsv,
                 simpleUseAdvanced: true,

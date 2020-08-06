@@ -110,6 +110,9 @@
       },
       "StreamEncoder": {
         "name": "@:settings.Output.Streaming.Encoder.name",
+        "obs_x264": "@:settings.Output.Streaming.Encoder.obs_x264",
+        "obs_qsv11": "@:settings.Output.Streaming.Encoder.obs_qsv11",
+        "ffmpeg_nvenc": "@:settings.Output.Streaming.Encoder.ffmpeg_nvenc",
         "x264": "@:settings.Output.Streaming.Encoder.obs_x264",
         "qsv": "@:settings.Output.Streaming.Encoder.obs_qsv11",
         "nvenc": "@:settings.Output.Streaming.Encoder.ffmpeg_nvenc"
