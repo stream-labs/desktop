@@ -30,18 +30,25 @@ type TAnalyticsEvent =
   | 'StreamingStatus'
   | 'RecordingStatus'
   | 'ReplayBufferStatus'
-  | 'Click';
+  | 'Click'
+  | 'SessionTest';
 
 interface IAnalyticsEvent {
   product: string;
   version: string;
   event: string;
   value?: any;
-  time?: string;
+  time?: Date;
   count?: number;
   uuid?: string;
   saveUser?: boolean;
   userId?: number;
+}
+
+interface ISessionInfo {
+  startTime: Date;
+  endTime?: Date;
+  features: Dictionary<boolean>;
 }
 
 export function track(event: TUsageEvent) {
@@ -160,6 +167,7 @@ export class UsageStatisticsService extends Service {
       version: this.version,
       count: 1,
       uuid: this.userService.getLocalUserId(),
+      time: new Date(),
     };
 
     if (this.userService.state.userId) analyticsEvent.userId = this.userService.state.userId;
@@ -184,14 +192,35 @@ export class UsageStatisticsService extends Service {
    * Should be called on shutdown to flush all events in the pipeline
    */
   async flushEvents() {
+    this.session.endTime = new Date();
+
+    const session = {
+      ...this.session,
+      // Convert features to an array for persistence for better querying
+      features: Object.keys(this.session.features),
+    };
+
+    this.recordAnalyticsEvent('SessionTest', session);
+
     // Unthrottled version
     await this.sendAnalytics();
+  }
+
+  private session: ISessionInfo = {
+    startTime: new Date(),
+    features: {},
+  };
+
+  recordFeatureUsage(feature: string) {
+    this.session.features[feature] = true;
   }
 
   /**
    * Should not be called directly except during shutdown.
    */
   private async sendAnalytics() {
+    if (!this.analyticsEvents.length) return;
+
     const data = { analyticsTokens: [...this.analyticsEvents] };
     const headers = authorizedHeaders(this.userService.apiToken);
     headers.append('Content-Type', 'application/json');
