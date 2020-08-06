@@ -29,6 +29,7 @@ interface ITestUserFeatures {
   noFacebookPages?: boolean;
   hasLinkedTwitter?: boolean;
   '2FADisabled'?: boolean;
+  multistream?: boolean;
 }
 
 export async function logOut(t: TExecutionContext) {

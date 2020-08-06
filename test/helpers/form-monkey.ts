@@ -107,9 +107,15 @@ export class FormMonkey {
         case 'bool':
           await this.setBoolValue(input.selector, value);
           break;
+        case 'toggle':
+          await this.setToggleValue(input.selector, value);
+          break;
         case 'list':
         case 'fontFamily':
           await this.setListValue(input.selector, value);
+          break;
+        case 'tags':
+          await this.setTagsInput(input.selector, value);
           break;
         case 'color':
           await this.setColorValue(input.selector, value);
@@ -161,6 +167,9 @@ export class FormMonkey {
           break;
         case 'bool':
           value = await this.getBoolValue(input.selector);
+          break;
+        case 'toggle':
+          value = await this.getToggleValue(input.selector);
           break;
         case 'list':
         case 'fontFamily':
@@ -306,6 +315,22 @@ export class FormMonkey {
   async getBoolValue(selector: string): Promise<boolean> {
     const checkboxSelector = `${selector} input`;
     return await this.client.isSelected(checkboxSelector);
+  }
+
+  async setToggleValue(selector: string, value: boolean) {
+    // click to change the ToggleInput state
+    await this.client.click(selector);
+
+    // if the current value is not what we need than click one more time
+    const selected = (await this.getAttribute(selector, 'data-value')) === 'true';
+    if (value !== selected) {
+      await this.client.click(selector);
+    }
+  }
+
+  async getToggleValue(selector: string): Promise<boolean> {
+    const val = await this.getAttribute(selector, 'data-value');
+    return val === 'true';
   }
 
   async setSliderValue(sliderInputSelector: string, goalValue: number) {
