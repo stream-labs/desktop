@@ -9,7 +9,7 @@ import { fillForm, selectTitle, selectGamesByTitles } from '../helpers/form-monk
 
 useSpectron();
 
-test.skip('Multistream default mode', async t => {
+test('Multistream default mode', async t => {
   const client = t.context.app.client;
   await logIn(t, null, { multistream: true });
   await prepareToGoLive(t);
