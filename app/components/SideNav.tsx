@@ -133,7 +133,7 @@ export default class SideNav extends Vue {
 
     if (this.userService.isLoggedIn) {
       pageData.push({
-        target: 'AlertLibrary',
+        target: 'AlertboxLibrary',
         icon: 'icon-alert-box',
         title: $t('Alertbox Library'),
         trackingTarget: 'alertbox-library',
