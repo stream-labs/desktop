@@ -5,7 +5,9 @@ export enum EncoderType {
   x264 = 'obs_x264',
   nvenc = 'nvenc',
   amd = 'amd_amf_h264',
-  qsv = 'qsv'
+  qsv = 'qsv',
+  advancedQsv = 'obs_qsv11',
+  advancedNvenc = 'ffmpeg_nvenc',
 }
 
 export enum OptimizationKey {
