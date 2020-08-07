@@ -511,6 +511,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     // Selective recording cannot be toggled while live
     if (this.state.streamingStatus !== EStreamingState.Offline) return;
 
+    if (enabled) this.usageStatisticsService.recordFeatureUsage('SelectiveRecording');
+
     this.SET_SELECTIVE_RECORDING(enabled);
     obs.Global.multipleRendering = enabled;
   }
@@ -662,7 +664,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   startReplayBuffer() {
     if (this.state.replayBufferStatus !== EReplayBufferState.Offline) return;
-
+    this.usageStatisticsService.recordFeatureUsage('ReplayBuffer');
     obs.NodeObs.OBS_service_startReplayBuffer();
   }
 
@@ -852,6 +854,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           code: info.code,
           status: EStreamingState.Live,
         });
+        this.usageStatisticsService.recordFeatureUsage('Streaming');
       } else if (info.signal === EOBSOutputSignal.Starting) {
         this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
         this.streamingStatusChange.next(EStreamingState.Starting);
@@ -887,6 +890,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       }[info.signal];
 
       if (info.signal === EOBSOutputSignal.Start) {
+        this.usageStatisticsService.recordFeatureUsage('Recording');
         this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
           status: nextState,
           code: info.code,

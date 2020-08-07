@@ -10,7 +10,7 @@ import { TransitionsService } from 'services/transitions';
 import { SourcesService } from 'services/sources';
 import { ScenesService } from 'services/scenes';
 import { VideoService } from 'services/video';
-import { track } from 'services/usage-statistics';
+import { track, UsageStatisticsService } from 'services/usage-statistics';
 import { IpcServerService } from 'services/api/ipc-server';
 import { TcpServerService } from 'services/api/tcp-server';
 import { StreamlabelsService } from 'services/streamlabels';
@@ -102,6 +102,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private keyListenerService: KeyListenerService;
   @Inject() private metricsService: MetricsService;
   @Inject() private settingsService: SettingsService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
 
   private loadingPromises: Dictionary<Promise<any>> = {};
 
@@ -185,6 +186,7 @@ export class AppService extends StatefulService<IAppState> {
       this.shutdownStarted.next();
       this.keyListenerService.shutdown();
       this.platformAppsService.unloadAllApps();
+      await this.usageStatisticsService.flushEvents();
       this.windowsService.closeChildWindow();
       await this.windowsService.closeAllOneOffs();
       this.ipcServerService.stopListening();

@@ -12,6 +12,7 @@ import { DefaultManager } from 'services/sources/properties-managers/default-man
 import { Subject } from 'rxjs';
 import { isUrl } from '../util/requests';
 import { getOS, OS } from 'util/operating-systems';
+import { UsageStatisticsService } from './usage-statistics';
 
 export const TRANSITION_DURATION_MAX = 2_000_000_000;
 
@@ -65,6 +66,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   @Inject() windowsService: WindowsService;
   @Inject() scenesService: ScenesService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
+  @Inject() usageStatisticsService: UsageStatisticsService;
 
   studioModeChanged = new Subject<boolean>();
 
@@ -123,6 +125,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   enableStudioMode() {
     if (this.state.studioMode) return;
 
+    this.usageStatisticsService.recordFeatureUsage('StudioMode');
     this.SET_STUDIO_MODE(true);
     this.studioModeChanged.next(true);
 
