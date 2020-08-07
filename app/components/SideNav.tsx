@@ -26,7 +26,6 @@ export default class SideNav extends Vue {
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
 
-  availableChatbotPlatforms = ['twitch', 'mixer', 'youtube'];
   showTabDropdown = false;
 
   get availableFeatures() {
@@ -62,13 +61,6 @@ export default class SideNav extends Vue {
     return this.userService.isLoggedIn && this.platformAppsService.state.storeVisible;
   }
 
-  get chatbotVisible() {
-    return (
-      this.userService.isLoggedIn &&
-      this.availableChatbotPlatforms.indexOf(this.userService.platform.type) !== -1
-    );
-  }
-
   get studioTabs() {
     return Object.keys(this.layoutService.state.tabs).map(tab => ({
       target: tab,
@@ -96,7 +88,11 @@ export default class SideNav extends Vue {
         >
           {this.studioTab(this.studioTabs[0])}
           {this.studioTabs.length > 1 && this.userService.isPrime && (
-            <i class={cx('icon-down', styles.studioDropdown)} />
+            <i
+              class={cx('icon-down', styles.studioDropdown, {
+                [styles.studioDropdownActive]: this.layoutService.state.currentTab !== 'default',
+              })}
+            />
           )}
         </div>
         {this.additionalStudioTabs}
@@ -133,21 +129,23 @@ export default class SideNav extends Vue {
   }
 
   render() {
-    const pageData = [
-      {
+    const pageData = [];
+
+    if (this.userService.isLoggedIn) {
+      pageData.push({
+        target: 'AlertLibrary',
+        icon: 'icon-alert-box',
+        title: $t('Alertbox Library'),
+        trackingTarget: 'alertbox-library',
+      });
+    }
+
+    if (this.userService.isLoggedIn) {
+      pageData.push({
         target: 'BrowseOverlays',
         icon: 'icon-themes',
         title: $t('Themes'),
         trackingTarget: 'themes',
-      },
-    ];
-
-    if (this.chatbotVisible) {
-      pageData.push({
-        target: 'Chatbot',
-        icon: 'icon-cloudbot',
-        title: $t('Cloudbot'),
-        trackingTarget: 'cloudbot',
       });
     }
 
