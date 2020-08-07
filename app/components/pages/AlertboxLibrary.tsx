@@ -68,7 +68,9 @@ export default class AlertboxLibrary extends Vue {
       type: ENotificationType.SUCCESS,
       lifeTime: 8000,
       showTime: false,
-      message: $t('Widget Theme installed & activated. Click here to manage your Widget Profiles.'),
+      message: $t(
+        'Alertbox Theme installed & activated. Click here to manage your Widget Profiles.',
+      ),
       action: this.jsonrpcService.createRequest(
         Service.getResourceId(this.magicLinkService),
         'openWidgetThemesMagicLink',
