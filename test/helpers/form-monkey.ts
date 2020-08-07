@@ -69,6 +69,11 @@ export class FormMonkey {
 
   async getInput(name: string): Promise<IUIInput> {
     const selector = `${this.formSelector} [data-name="${name}"]`;
+    try {
+      this.client.waitForVisible(selector);
+    } catch (e) {
+      throw new Error(`Input is not visible: ${selector}`);
+    }
     const $el = await this.client.$(selector);
     const id = ($el as any).value.ELEMENT;
     const type = await this.getAttribute(selector, 'data-type');
@@ -82,14 +87,15 @@ export class FormMonkey {
    */
   async fill(formData: Dictionary<any>) {
     this.log('fill form with data', formData);
-    await this.waitFieldsForVisible(Object.keys(formData));
     await this.waitForLoading();
     const inputs = await this.getInputs();
 
     // tslint:disable-next-line:no-parameter-reassignment TODO
     formData = cloneDeep(formData);
+    const inputNames = Object.keys(formData);
 
-    for (const input of inputs) {
+    for (const inputName of inputNames) {
+      const input = await this.getInput(inputName);
       if (!(input.name in formData)) {
         // skip no-name fields
         continue;
@@ -451,13 +457,6 @@ export class FormMonkey {
     // click away and wait for the control to dismiss
     await this.client.click('.tags-container .input-label');
     await this.client.waitForExist('.sp-input-container.sp-open', 500, true);
-  }
-
-  async waitFieldsForVisible(fieldNames: string[]) {
-    const watchers = fieldNames.map(inputName => {
-      return this.client.waitForVisible(`[data-role="input"][data-name=${inputName}]`);
-    });
-    return Promise.all(watchers);
   }
 
   /**

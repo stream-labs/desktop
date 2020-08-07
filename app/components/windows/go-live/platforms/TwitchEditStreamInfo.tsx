@@ -23,7 +23,7 @@ export default class TwitchEditStreamInfo extends BaseEditSteamInfo<TwitchEditSt
   private render() {
     const canShowOnlyRequiredFields = this.canShowOnlyRequiredFields;
     return (
-      <ValidatedForm>
+      <ValidatedForm name="twitch-settings">
         {!canShowOnlyRequiredFields && (
           <CommonPlatformFields vModel={this.settings} platform="twitch" />
         )}

@@ -90,7 +90,7 @@ export async function loginWithAuthInfo(
   t.context.app.webContents.send('testing-fakeAuth', authInfo, isOnboardingTest);
   await focusMain(t);
   if (!waitForUI) return true;
-  await t.context.app.client.waitForVisible('.fa-sign-out-alt', 20000); // wait for the log-out button
+  await t.context.app.client.waitForVisible('.fa-sign-out-alt', 30000); // wait for the log-out button
   return true;
 }
 

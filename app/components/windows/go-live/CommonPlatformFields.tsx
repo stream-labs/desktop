@@ -160,6 +160,7 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
             <BoolInput
               value={this.platformSettings?.useCustomFields}
               onInput={(enabled: boolean) => this.toggleUseCustom(enabled)}
+              metadata={{ title, name: 'customEnabled' }}
               title={title}
             />
           </HFormGroup>
