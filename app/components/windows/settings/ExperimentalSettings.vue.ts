@@ -3,9 +3,8 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import GenericForm from 'components/obs/inputs/GenericForm';
 import { TObsFormData, TObsValue } from 'components/obs/inputs/ObsInput';
-import { ICustomizationServiceApi } from 'services/customization';
+import { ICustomizationServiceApi, ICustomizationServiceState } from 'services/customization';
 import { ScenesService } from 'services/scenes';
-import { $t } from '../../../services/i18n';
 import electron from 'electron';
 
 @Component({
@@ -26,7 +25,9 @@ export default class ExperimentalSettings extends Vue {
     formData.forEach(formInput => {
       settings[formInput.name] = formInput.value;
     });
-    this.customizationService.setSettings({ experimental: settings });
+    this.customizationService.setSettings({
+      experimental: settings as ICustomizationServiceState['experimental'],
+    });
     this.settingsFormData = this.customizationService.getExperimentalSettingsFormData();
   }
 

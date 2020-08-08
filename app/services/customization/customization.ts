@@ -88,6 +88,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     },
     experimental: {
       // put experimental features here
+      volmetersFPSLimit: 60,
     },
   };
 
@@ -252,7 +253,20 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
   }
 
   getExperimentalSettingsFormData(): TObsFormData {
-    return [];
+    const settings = this.getSettings();
+    return [
+      <IObsNumberInputValue>{
+        value: settings.experimental.volmetersFPSLimit,
+        name: 'volmetersFPSLimit',
+        description: 'Volmeters FPS limit',
+        type: 'OBS_PROPERTY_SLIDER',
+        minVal: 1,
+        maxVal: 160,
+        stepVal: 1,
+        visible: true,
+        enabled: true,
+      },
+    ];
   }
 
   restoreDefaults() {

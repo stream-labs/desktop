@@ -9,6 +9,7 @@ import electron from 'electron';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { v2 } from 'util/vec2';
 import { difference } from 'lodash';
+import { Subscription } from 'rxjs';
 
 // Configuration
 const CHANNEL_HEIGHT = 3;
@@ -24,7 +25,6 @@ const DANGER_LEVEL = -9;
 const GREEN = [49, 195, 162];
 const YELLOW = [255, 205, 71];
 const RED = [252, 62, 63];
-const FPS_LIMIT = 60;
 
 interface IVolmeterSubscription {
   sourceId: string;
@@ -102,18 +102,28 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
   // Used to render extra interpolated frames
   interpolationTime = 35;
   private bg: { r: number; g: number; b: number };
+  private fpsLimit: number;
   private firstFrameTime: number;
   private frameNumber: number;
   private sourcesOrder: string[];
   private workerId: number;
   private requestedFrameId: number;
   private bgMultiplier = this.customizationService.isDarkTheme ? 0.2 : 0.5;
+  private customizationServiceSubscription: Subscription = null;
 
   mounted() {
     this.workerId = electron.ipcRenderer.sendSync('getWorkerWindowId');
     this.subscribeVolmeters();
     this.bg = this.customizationService.sectionBackground;
+    this.fpsLimit = this.customizationService.state.experimental.volmetersFPSLimit;
     this.setupNewCanvas();
+
+    // update FPS limit if settings have changed
+    this.customizationServiceSubscription = this.customizationService.settingsChanged.subscribe(
+      settings => {
+        this.fpsLimit = settings.experimental.volmetersFPSLimit;
+      },
+    );
   }
 
   get audioSources() {
@@ -195,6 +205,7 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
 
     // cancel next frame rendering
     cancelAnimationFrame(this.requestedFrameId);
+    this.customizationServiceSubscription.unsubscribe();
   }
 
   private setupNewCanvas() {
@@ -229,13 +240,13 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
     if (isDestroyed) return;
 
     // init first rendering frame
-    if (!this.frameNumber) {
+    if (!this.firstFrameTime) {
       this.frameNumber = -1;
       this.firstFrameTime = now;
     }
 
     const timeElapsed = now - this.firstFrameTime;
-    const timeBetweenFrames = 1000 / FPS_LIMIT;
+    const timeBetweenFrames = 1000 / this.fpsLimit;
     const currentFrameNumber = Math.ceil(timeElapsed / timeBetweenFrames);
 
     if (currentFrameNumber !== this.frameNumber) {

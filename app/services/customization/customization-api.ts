@@ -28,7 +28,9 @@ export interface ICustomizationServiceState {
   enableFFZEmotes: boolean;
   mediaBackupOptOut: boolean;
   navigateToLiveOnStreamStart: boolean;
-  experimental: any;
+  experimental: {
+    volmetersFPSLimit: number;
+  };
   legacyEvents: boolean;
   pinnedStatistics: IPinnedStatistics;
 }
