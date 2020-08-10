@@ -1720,6 +1720,11 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.14.9.tgz#2e8d678039d27943ce53a1913386133227fd9066"
   integrity sha512-NelG/dSahlXYtSoVPErrp06tYFrvzj8XLWmKA+X8x0W//4MqbUyZu++giUG/v0bjAT6/Qxa8IjodrfdACyb0Fg==
 
+"@types/overlayscrollbars@^1.12.0":
+  version "1.12.0"
+  resolved "https://registry.yarnpkg.com/@types/overlayscrollbars/-/overlayscrollbars-1.12.0.tgz#98456caceca8ad73bd5bb572632a585074e70764"
+  integrity sha512-h/pScHNKi4mb+TrJGDon8Yb06ujFG0mSg12wIO0sWMUF3dQIe2ExRRdNRviaNt9IjxIiOfnRr7FsQAdHwK4sMg==
+
 "@types/request@2.48.4":
   version "2.48.4"
   resolved "https://registry.yarnpkg.com/@types/request/-/request-2.48.4.tgz#df3d43d7b9ed3550feaa1286c6eabf0738e6cf7e"
@@ -8728,6 +8733,16 @@ osenv@^0.1.4:
   dependencies:
     os-homedir "^1.0.0"
     os-tmpdir "^1.0.0"
+
+overlayscrollbars-vue@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/overlayscrollbars-vue/-/overlayscrollbars-vue-0.2.2.tgz#4a3d4eaf09dbbaae8c52ff0e9219909075eb920e"
+  integrity sha512-JpDkM+fkNp7YbZxZNf9cbSWCa1tylaSUkmdhux+qtVFekH4zpZpM8+GRtOgs7YDDWyVNPkUBQ8FnMRMoBNfoJw==
+
+overlayscrollbars@^1.13.0:
+  version "1.13.0"
+  resolved "https://registry.yarnpkg.com/overlayscrollbars/-/overlayscrollbars-1.13.0.tgz#1edb436328133b94877b558f77966d5497ca36a7"
+  integrity sha512-p8oHrMeRAKxXDMPI/EBNITj/zTVHKNnAnM59Im+xnoZUlV07FyTg46wom2286jJlXGGfcPFG/ba5NUiCwWNd4w==
 
 p-cancelable@^1.0.0:
   version "1.1.0"
