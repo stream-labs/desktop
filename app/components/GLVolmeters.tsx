@@ -121,7 +121,9 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
     // update FPS limit if settings have changed
     this.customizationServiceSubscription = this.customizationService.settingsChanged.subscribe(
       settings => {
-        this.fpsLimit = settings.experimental.volmetersFPSLimit;
+        if (settings.experimental?.volmetersFPSLimit) {
+          this.fpsLimit = settings.experimental.volmetersFPSLimit;
+        }
       },
     );
   }
