@@ -6,6 +6,7 @@ import { IRecentEvent, RecentEventsService } from 'services/recent-events';
 import { Component } from 'vue-property-decorator';
 import styles from './RecentEvents.m.less';
 import TsxComponent, { createProps } from './tsx-component';
+import Scrollable from 'components/shared/Scrollable';
 import { UserService } from 'services/user';
 import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
@@ -93,7 +94,7 @@ export default class RecentEvents extends TsxComponent<RecentEventsProps> {
 
   get renderNativeEvents() {
     return (
-      <div class={cx(styles.eventContainer, this.props.isOverlay ? styles.overlay : '')}>
+      <Scrollable class={cx(styles.eventContainer, this.props.isOverlay ? styles.overlay : '')}>
         {!!this.recentEvents.length &&
           this.recentEvents.map(event => (
             <EventCell
@@ -107,7 +108,7 @@ export default class RecentEvents extends TsxComponent<RecentEventsProps> {
         {this.recentEvents.length === 0 && (
           <div class={styles.empty}>{$t('There are no events to display')}</div>
         )}
-      </div>
+      </Scrollable>
     );
   }
 
