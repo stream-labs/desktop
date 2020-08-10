@@ -97,7 +97,7 @@
   "Multistream": "Multistream",
   "Your Twitch login is expired. Please log in again to continue using Streamlabs OBS": "A Twitch bejelentkezés lejárt. Kérjük, jelentkezzen be újra, hogy folytassa a Streamlabs OBS használatát",
   "Refresh Login": "Bejelentkezés frissítése",
-  "%{platform} Settings": "%{platform} Settings",
+  "%{platform} Settings": "%{platform} Beállítások",
   "Update settings for %{platform}": "Update settings for %{platform}",
   "Link to the %{platform} page has been copied to your clipboard": "Link to the %{platform} page has been copied to your clipboard",
   "Can not fetch settings from %{platformName}": "Can not fetch settings from %{platformName}",
