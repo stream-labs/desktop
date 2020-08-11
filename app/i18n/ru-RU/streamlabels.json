@@ -15,5 +15,6 @@
   "Include Resubs": "Включить переподписки",
   "Preview": "Предварительный просмотр",
   "Note:": "Примечание:",
+  "Tokens: %{tokenList}": "Tokens: %{tokenList}",
   "Actual label text may take up to 60 seconds to update": "Фактический текст метки может обновляться до 60 секунд"
 }
