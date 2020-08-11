@@ -15,5 +15,6 @@
   "Include Resubs": "Includi reiscritti",
   "Preview": "Anteprima",
   "Note:": "Nota:",
+  "Tokens: %{tokenList}": "Tokens: %{tokenList}",
   "Actual label text may take up to 60 seconds to update": "L'aggiornamento del testo dell'etichetta può richiedere fino a 60 secondi"
 }
