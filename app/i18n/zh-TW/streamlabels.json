@@ -15,5 +15,6 @@
   "Include Resubs": "包括重新訂閱",
   "Preview": "預覽",
   "Note:": "注意：",
+  "Tokens: %{tokenList}": "Tokens: %{tokenList}",
   "Actual label text may take up to 60 seconds to update": "實際的標籤文字可能要花 60 秒才會更新"
 }
