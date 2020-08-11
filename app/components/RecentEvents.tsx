@@ -94,7 +94,7 @@ export default class RecentEvents extends TsxComponent<RecentEventsProps> {
 
   get renderNativeEvents() {
     return (
-      <Scrollable class={cx(styles.eventContainer, this.props.isOverlay ? styles.overlay : '')}>
+      <Scrollable className={cx(styles.eventContainer, this.props.isOverlay ? styles.overlay : '')}>
         {!!this.recentEvents.length &&
           this.recentEvents.map(event => (
             <EventCell
