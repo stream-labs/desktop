@@ -149,7 +149,7 @@ export default class StreamSettings extends TsxComponent {
         {/* account info */}
         {this.protectedModeEnabled && (
           <div>
-            <h2>{$t('Linked Platforms')}</h2>
+            <h2>{$t('Stream Destinations')}</h2>
             {platforms.map(platform => this.renderPlatform(platform))}
 
             {isPrime && <div>{this.renderCustomDestinations()}</div>}
@@ -270,7 +270,7 @@ export default class StreamSettings extends TsxComponent {
         {!isEditMode && canAddMoreDestinations && (
           <a class={styles.addDestinationBtn} onclick={() => this.addCustomDest()}>
             <i class="fa fa-plus" />
-            {$t('Add additional destination')}
+            {$t('Add destination')}
           </a>
         )}
         {!canAddMoreDestinations && <p>{$t('Maximum custom destinations has been added')}</p>}
