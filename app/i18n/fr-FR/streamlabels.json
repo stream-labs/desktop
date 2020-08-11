@@ -14,7 +14,6 @@
   "Always, show last person when inactive": "Toujours afficher la dernière personne en cas d'inactivité",
   "Include Resubs": "Inclure les réabonnements",
   "Preview": "Aperçu",
-  "Note:": "Remarque:",
   "Tokens: %{tokenList}": "Tokens: %{tokenList}",
-  "Actual label text may take up to 60 seconds to update": "La mise à jour du texte de l'étiquette peut prendre jusqu'à 60 secondes"
+  "Note: Actual label text may take up to 60 seconds to update": "Note: Actual label text may take up to 60 seconds to update"
 }
