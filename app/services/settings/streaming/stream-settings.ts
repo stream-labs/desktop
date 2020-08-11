@@ -259,6 +259,11 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       protectedModeMigrationRequired: false,
       key: '',
       streamType: 'rtmp_common',
+      goLiveSettings: {
+        platforms: null,
+        advancedMode: false,
+        customDestinations: [],
+      },
     });
   }
 

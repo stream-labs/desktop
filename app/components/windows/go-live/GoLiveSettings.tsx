@@ -80,6 +80,8 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
     const shouldShowPrimeLabel = !this.restreamService.state.grandfathered;
     const shouldShowLeftCol = this.streamSettingsService.state.protectedModeEnabled;
     const onlyOnePlatformIsLinked = view.linkedPlatforms.length === 1;
+    const shouldShowAddDestButton =
+      view.linkedPlatforms.length + view.goLiveSettings.customDestinations.length < 5;
     return (
       <ValidatedForm class="flex">
         {/*LEFT COLUMN*/}
@@ -96,10 +98,12 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
             />
 
             {/*ADD DESTINATION BUTTON*/}
-            <a class={styles.addDestinationBtn} onclick={this.addDestination}>
-              <i class="fa fa-plus" />
-              {$t('Add Destination')} {shouldShowPrimeLabel && <b class={styles.prime}>prime</b>}
-            </a>
+            {shouldShowAddDestButton && (
+              <a class={styles.addDestinationBtn} onclick={this.addDestination}>
+                <i class="fa fa-plus" />
+                {$t('Add Destination')} {shouldShowPrimeLabel && <b class={styles.prime}>prime</b>}
+              </a>
+            )}
           </div>
         )}
 

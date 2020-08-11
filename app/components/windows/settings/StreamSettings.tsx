@@ -152,16 +152,10 @@ export default class StreamSettings extends TsxComponent {
             <h2>{$t('Linked Platforms')}</h2>
             {platforms.map(platform => this.renderPlatform(platform))}
 
-            {isPrime && (
-              <div>
-                <h2>{$t('Additional Multistream Destinations')}</h2>
-                {this.renderCustomDestinations()}
-              </div>
-            )}
+            {isPrime && <div>{this.renderCustomDestinations()}</div>}
 
             {this.canEditSettings && (
               <div>
-                <h2>{$t('Advanced Settings')}</h2>
                 <a onClick={this.disableProtectedMode}>{$t('Stream to custom ingest')}</a>
               </div>
             )}
@@ -271,18 +265,17 @@ export default class StreamSettings extends TsxComponent {
     const shouldShowAddForm = this.editCustomDestMode === true;
     const canAddMoreDestinations = destinations.length < 2;
     return (
-      <div>
+      <p>
         {destinations.map((dest, ind) => this.renderCustomDestination(dest, ind))}
         {!isEditMode && canAddMoreDestinations && (
-          <p style={{ textAlign: 'right' }}>
-            <button class="button button--action" onclick={() => this.addCustomDest()}>
-              {$t('Add additional destination')}
-            </button>
-          </p>
+          <a class={styles.addDestinationBtn} onclick={() => this.addCustomDest()}>
+            <i class="fa fa-plus" />
+            {$t('Add additional destination')}
+          </a>
         )}
         {!canAddMoreDestinations && <p>{$t('Maximum custom destinations has been added')}</p>}
         {shouldShowAddForm && <div class="section">{this.renderCustomDestForm()}</div>}
-      </div>
+      </p>
     );
   }
 
