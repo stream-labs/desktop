@@ -15,5 +15,6 @@
   "Include Resubs": "Zahrnúť predĺženie odberu",
   "Preview": "Náhľad",
   "Note:": "Poznámka:",
+  "Tokens: %{tokenList}": "Tokens: %{tokenList}",
   "Actual label text may take up to 60 seconds to update": "Aktualizácia aktuálneho textu štítku môže trvať až 60 sekúnd"
 }
