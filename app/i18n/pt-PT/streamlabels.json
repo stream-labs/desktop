@@ -15,5 +15,6 @@
   "Include Resubs": "Incluir Resubs",
   "Preview": "Visualizar",
   "Note:": "Nota:",
+  "Tokens: %{tokenList}": "Tokens: %{tokenList}",
   "Actual label text may take up to 60 seconds to update": "A atualização do texto atual da etiqueta pode demorar até 60 segundos"
 }
