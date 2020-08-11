@@ -129,7 +129,6 @@ export default class LiveDock extends Vue {
   }
 
   get viewerCount() {
-    console.log("Fuck Off");
     if (this.hideViewerCount) {
       return 'viewers hidden';
     }
