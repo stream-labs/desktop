@@ -23,6 +23,13 @@ export default class Translate extends TsxComponent<TranslateProps> {
   private xmlNodes: Node[] = [];
 
   created() {
+    this.setup();
+  }
+
+  @Watch('props.message')
+  setup() {
+    this.xmlNodes = [];
+
     // use built-in xml parser to extract xml-nodes
     const xmlDoc = new DOMParser().parseFromString(
       `<root> ${this.props.message} </root>`,

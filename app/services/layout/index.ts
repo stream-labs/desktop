@@ -7,6 +7,7 @@ import { CustomizationService } from 'services/customization';
 import { $t } from 'services/i18n';
 import uuid from 'uuid/v4';
 import { LAYOUT_DATA, ELEMENT_DATA, ELayout, ELayoutElement } from './layout-data';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 export { ELayout, ELayoutElement };
 
@@ -120,6 +121,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
   };
 
   @Inject() private customizationService: CustomizationService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
 
   init() {
     super.init();
@@ -141,6 +143,17 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
         [ELayoutElement.Mixer]: { slot: '5' },
       });
       this.customizationService.setSettings({ legacyEvents: false });
+    }
+
+    this.checkUsage();
+  }
+
+  private checkUsage() {
+    if (Object.keys(this.state.tabs).length > 1) {
+      this.usageStatisticsService.recordFeatureUsage('LayoutEditorTabs');
+      this.usageStatisticsService.recordFeatureUsage('LayoutEditor');
+    } else if (this.state.tabs.default.currentLayout !== ELayout.Default) {
+      this.usageStatisticsService.recordFeatureUsage('LayoutEditor');
     }
   }
 
@@ -171,6 +184,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   changeLayout(layout: ELayout) {
     this.CHANGE_LAYOUT(layout);
+    this.checkUsage();
   }
 
   setSlots(slottedElements: { [key in ELayoutElement]?: { slot: LayoutSlot } }) {
@@ -184,6 +198,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
   addTab(name: string, icon: string) {
     const id = uuid();
     this.ADD_TAB(name, icon, id);
+    this.checkUsage();
   }
 
   removeCurrentTab() {
