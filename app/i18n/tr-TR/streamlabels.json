@@ -15,5 +15,6 @@
   "Include Resubs": "Yeniden Abone Olanları Ekle",
   "Preview": "Ön İzleme",
   "Note:": "Not:",
+  "Tokens: %{tokenList}": "Tokens: %{tokenList}",
   "Actual label text may take up to 60 seconds to update": "Etiket yazısının güncellenmesi 60 saniye kadar sürebilir"
 }
