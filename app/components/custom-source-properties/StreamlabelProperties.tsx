@@ -3,7 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { ISourceApi } from 'services/sources';
 import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
-import { Multiselect } from 'vue-multiselect';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import {
   StreamlabelsService,
   IStreamlabelSettings,
@@ -12,9 +12,12 @@ import {
 } from 'services/streamlabels';
 import debounce from 'lodash/debounce';
 import pick from 'lodash/pick';
+import { metadata } from 'components/widgets/inputs';
+import { formMetadata } from 'components/shared/inputs';
+import { $t } from 'services/i18n';
 
 @Component({
-  components: { Multiselect },
+  components: { HFormGroup },
 })
 export default class StreamlabelProperties extends Vue {
   @Prop() source: ISourceApi;
@@ -63,8 +66,8 @@ export default class StreamlabelProperties extends Vue {
     });
   }
 
-  handleInput(value: IStreamlabelDefinition) {
-    this.source.setPropertiesManagerSettings({ statname: value.name });
+  handleInput(value: string) {
+    this.source.setPropertiesManagerSettings({ statname: value });
     this.refreshPropertyValues();
   }
 
@@ -164,4 +167,100 @@ export default class StreamlabelProperties extends Vue {
       bits_amount: '1337 Bits',
     },
   ];
+
+  get metadata() {
+    return formMetadata({
+      labelType: metadata.sectionedMultiselect({
+        title: $t('Label Type'),
+        options: this.statOptions?.map(option => ({
+          label: option.label,
+          options: option.files.map(def => ({ label: def.label, value: def.name })),
+        })) as any[],
+        allowEmpty: false,
+      }),
+      format: metadata.text({
+        title: $t('Label Template'),
+        description: $t('Tokens: %{tokenList}', {
+          tokenList: this.currentlySelected?.settings?.format?.tokens.join(' '),
+        }),
+      }),
+      item_format: metadata.text({
+        title: $t('Item Template'),
+        description: $t('Tokens: %{tokenList}', {
+          tokenList: this.currentlySelected?.settings?.item_format?.tokens.join(' '),
+        }),
+      }),
+      item_separator: metadata.text({
+        title: $t('Item Separator'),
+        description: $t('Tokens: %{tokenList}', {
+          tokenList: this.currentlySelected?.settings?.item_separator?.tokens.join(' '),
+        }),
+      }),
+      limit: metadata.text({ title: $t('Item Limit') }),
+      duration: metadata.number({
+        title: $t('Duration'),
+        isInteger: true,
+      }),
+      show_clock: metadata.list({
+        title: $t('Show Clock'),
+        options: [
+          { title: $t('Always, show 0:00 when inactive'), value: 'always' },
+          { title: $t('Hide when inactive'), value: 'active' },
+        ],
+        allowEmpty: false,
+      }),
+      show_count: metadata.list({
+        title: $t('Show Count'),
+        options: [
+          { title: $t('Always, show 0 when inactive'), value: 'always' },
+          { title: $t('Hide when inactive'), value: 'active' },
+        ],
+        allowEmpty: false,
+      }),
+      show_latest: metadata.list({
+        title: $t('Show Latest'),
+        options: [
+          { title: $t('Always, show last person when inactive'), value: 'always' },
+          { title: $t('Hide when inactive'), value: 'active' },
+        ],
+        allowEmpty: false,
+      }),
+      include_resubs: metadata.bool({ title: $t('Include Resubs') }),
+    });
+  }
+
+  render() {
+    return (
+      this.labelSettings && (
+        <div>
+          <HFormGroup
+            value={this.currentlySelected.name}
+            onInput={(val: string) => this.handleInput(val)}
+            metadata={this.metadata.labelType}
+          />
+          {Object.keys(this.labelSettings).map(key => (
+            <HFormGroup
+              key={key}
+              vModel={this.labelSettings[key]}
+              onInput={() => this.debouncedSetSettings()}
+              metadata={this.metadata[key]}
+            />
+          ))}
+          {this.labelSettings.format != null && (
+            <HFormGroup title={$t('Preview')}>
+              <div style="color: var(--title);">
+                {this.splitPreview.map(line => (
+                  <div key={line}>{line}</div>
+                ))}
+              </div>
+              <div>
+                <b>{$t('Note:')}</b>
+                {$t('Actual label text may take up to 60 seconds to update')}
+              </div>
+            </HFormGroup>
+          )}
+        </div>
+      )
+    );
+  }
 }
