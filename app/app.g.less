@@ -1,3 +1,4 @@
+@import "../node_modules/overlayscrollbars/css/OverlayScrollbars.css";
 @import "./styles/index";
 @import "./styles/checkboxes";
 @import "./styles/tables";
@@ -360,7 +361,6 @@ a,
 
   background: var(--section);
   flex-grow: 1;
-  overflow-y: auto;
 }
 
 // Make select boxes look similar to input boxes
@@ -371,21 +371,39 @@ select {
 }
 
 // Scrolls
-::-webkit-scrollbar {
-  width: 6px;
+.os-scrollbar {
+  width: 8px;
   height: 8px;
 }
 
-::-webkit-scrollbar-track {
+.os-scrollbar.os-scrollbar-vertical {
+  height: 100%;
+  transition: all 0.2s linear;
+
+  &:hover,
+  &:active {
+    width: 16px;
+  }
+}
+
+.os-scrollbar.os-scrollbar-horizontal {
+  width: 100%;
+}
+
+.os-scrollbar-track {
   background: var(--section);
   border-radius: 0 3px 3px 0;
 }
 
-::-webkit-scrollbar-thumb {
+.os-scrollbar-handle {
   background-color: var(--solid-input);
   border: 2px solid var(--border);
   border-right: 1px solid var(--border);
   border-radius: 10px;
+
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 // Loader TODO: move off of Beaker
