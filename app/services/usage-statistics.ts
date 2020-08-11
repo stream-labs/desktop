@@ -198,6 +198,7 @@ export class UsageStatisticsService extends Service {
       ...this.session,
       // Convert features to an array for persistence for better querying
       features: Object.keys(this.session.features),
+      isPrime: this.userService.state.isPrime,
     };
 
     this.recordAnalyticsEvent('Session', session);
