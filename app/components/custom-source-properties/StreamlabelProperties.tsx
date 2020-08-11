@@ -253,9 +253,8 @@ export default class StreamlabelProperties extends Vue {
                   <div key={line}>{line}</div>
                 ))}
               </div>
-              <div>
-                <b>{$t('Note:')}</b>
-                {$t('Actual label text may take up to 60 seconds to update')}
+              <div style="font-style: italic; opacity: 0.7;">
+                {$t('Note: Actual label text may take up to 60 seconds to update')}
               </div>
             </HFormGroup>
           )}
