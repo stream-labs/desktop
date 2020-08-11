@@ -1,30 +1,34 @@
 <template>
-<ul class="selector-list" @contextmenu="handleContextMenu()">
-  <draggable
-    :list="normalizedItems"
-    :options="{draggable: draggableSelector}"
-    @change="handleChange">
-    <li
-      v-for="(item, index) in normalizedItems"
-      :key="item.value"
-      class="selector-item"
-      :class="{ 'selector-item--active': activeItems.includes(item.value) }"
-      @contextmenu.stop="(ev) => handleContextMenu(ev, index)"
-      @click="(ev) => handleSelect(ev, index)"
-      @dblclick="(ev) => handleDoubleClick(ev, index)">
-      <div class="selector-item-text">{{item.name}}</div>
-      <div class="selector-actions">
-        <slot name="actions" :item="item"/>
-      </div>
-    </li>
-  </draggable>
-</ul>
+  <scrollable>
+    <ul class="selector-list" @contextmenu="handleContextMenu()">
+      <draggable
+        :list="normalizedItems"
+        :options="{ draggable: draggableSelector }"
+        @change="handleChange"
+      >
+        <li
+          v-for="(item, index) in normalizedItems"
+          :key="item.value"
+          class="selector-item"
+          :class="{ 'selector-item--active': activeItems.includes(item.value) }"
+          @contextmenu.stop="ev => handleContextMenu(ev, index)"
+          @click="ev => handleSelect(ev, index)"
+          @dblclick="ev => handleDoubleClick(ev, index)"
+        >
+          <div class="selector-item-text">{{ item.name }}</div>
+          <div class="selector-actions">
+            <slot name="actions" :item="item" />
+          </div>
+        </li>
+      </draggable>
+    </ul>
+  </scrollable>
 </template>
 
 <script lang="ts" src="./Selector.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import '../styles/index';
 
 .sortable-ghost {
   opacity: 0.7;
