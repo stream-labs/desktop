@@ -263,10 +263,55 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
   }
 
   fetchViewerCount(): Promise<number> {
-    return platformRequest<{ stream?: { viewers: number } }>(
+    const response = platformRequest<{ stream?: { viewers: number } }>(
       'twitch',
       `https://api.twitch.tv/kraken/streams/${this.twitchId}`,
     ).then(json => (json.stream ? json.stream.viewers : 0));
+    return response;
+  }
+
+  fetchSubpointCount(cursor?: string) {
+    let response = null;
+    if (cursor === undefined) {
+      response = platformAuthorizedRequest(
+        'twitch',
+        `https://api.twitch.tv/helix/subscriptions?broadcaster_id=${this.twitchId}`,
+      );
+      response.then(this.countSubs);
+    } else {
+      response = platformAuthorizedRequest(
+        'twitch',
+        `https://api.twitch.tv/helix/subscriptions?broadcaster_id=${this.twitchId}&after=${cursor}`,
+      );
+      response.then(this.countSubs);
+    }
+    const subcount = response;
+    console.log(subcount);
+    return subcount;
+  }
+
+  async countSubs(result: object) {
+    let subcount = 0;
+    const data = result['data'];
+    const cursor = result['pagination']['cursor'];
+    for (const item of data) {
+      if (item['tier'] === '3000') {
+        subcount = subcount + 3;
+      }
+      if (item['tier'] === '2000') {
+        subcount = subcount + 2;
+      }
+      if (item['tier'] === '1000') {
+        subcount = subcount + 1;
+      }
+    }
+    if (cursor !== '') {
+      subcount = subcount + this.fetchSubpointCount(cursor);
+    } else {
+      console.log(subcount);
+      console.log(cursor);
+      return subcount;
+    }
   }
 
   async putChannelInfo({ title, game, tags = [] }: ITwitchStartStreamOptions): Promise<boolean> {

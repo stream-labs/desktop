@@ -15,6 +15,7 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
   static initialState: IPlatformState = {
     streamKey: '',
     viewersCount: 0,
+    subCount: 0,
     settings: null,
     isPrepopulated: false,
   };
@@ -28,6 +29,10 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
     return Promise.reject('not implemented');
   }
 
+  protected fetchSubpointCount(): Promise<number> {
+    return Promise.reject('not implemented');
+  }
+
   get mergeUrl() {
     const host = this.hostsService.streamlabs;
     const token = this.userService.apiToken;
@@ -38,6 +43,7 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
     // update viewers count
     const runInterval = async () => {
       this.SET_VIEWERS_COUNT(await this.fetchViewerCount());
+      this.SET_SUB_COUNT(await this.fetchSubpointCount());
       // stop updating if streaming has stopped
       if (this.streamingService.views.isMidStreamMode) {
         setTimeout(runInterval, VIEWER_COUNT_UPDATE_INTERVAL);
@@ -63,6 +69,11 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
   @mutation()
   protected SET_VIEWERS_COUNT(viewers: number) {
     this.state.viewersCount = viewers;
+  }
+
+  protected SET_SUB_COUNT(subpoints: number) {
+    this.state.subCount = subpoints;
+    console.log(subpoints);
   }
 
   @mutation()

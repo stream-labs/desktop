@@ -129,12 +129,17 @@ export default class LiveDock extends Vue {
   }
 
   get viewerCount() {
+    console.log("Fuck Off");
     if (this.hideViewerCount) {
       return 'viewers hidden';
     }
 
     return this.streamingService.views.viewerCount.toString();
   }
+
+//  get subPoints() {
+//    return this.streamingService.subPoints.subPointsCount.toString();
+//  }
 
   get offlineImageSrc() {
     const mode = this.customizationService.isDarkTheme ? 'night' : 'day';

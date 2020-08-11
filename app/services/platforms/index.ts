@@ -113,6 +113,7 @@ export type TChannelInfo = ITwitchChannelInfo | Partial<IFacebookChannelInfo> | 
 // state applicable for all platforms
 export interface IPlatformState {
   viewersCount: number;
+  subCount: number;
   streamKey: string;
   settings: TStartStreamOptions | null;
   isPrepopulated: boolean;
