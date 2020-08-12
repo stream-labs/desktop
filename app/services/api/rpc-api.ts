@@ -301,7 +301,7 @@ export abstract class RpcApi extends Service {
   private sendPromiseMessage(info: { isRejected: boolean; promiseId: string; data: any }) {
     // serialize errors
     const serializedData = info.isRejected
-      ? { message: info.data.message, ...info.data }
+      ? { message: info.data?.message, ...info.data }
       : info.data;
 
     this.serviceEvent.next(

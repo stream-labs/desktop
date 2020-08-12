@@ -623,12 +623,17 @@ export class SceneCollectionsService extends Service implements ISceneCollection
    * Creates the default audio sources
    */
   private setupDefaultAudio() {
-    this.sourcesService.createSource(
-      'Desktop Audio',
-      byOS({ [OS.Windows]: 'wasapi_output_capture', [OS.Mac]: 'coreaudio_output_capture' }),
-      {},
-      { channel: E_AUDIO_CHANNELS.OUTPUT_1 },
-    );
+    // On macOS, most users will not have an audio capture device, so
+    // we do not create it automatically.
+    if (getOS() === OS.Windows) {
+      this.sourcesService.createSource(
+        'Desktop Audio',
+        byOS({ [OS.Windows]: 'wasapi_output_capture', [OS.Mac]: 'coreaudio_output_capture' }),
+        {},
+        { channel: E_AUDIO_CHANNELS.OUTPUT_1 },
+      );
+    }
+
     const defaultId = this.defaultHardwareService.state.defaultAudioDevice
       ? this.defaultHardwareService.state.defaultAudioDevice
       : undefined;

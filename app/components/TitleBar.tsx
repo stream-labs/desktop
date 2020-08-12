@@ -83,7 +83,9 @@ export default class TitleBar extends TsxComponent<TitleBarProps> {
           <img class={styles.titlebarIcon} src={require('../../media/images/icon.ico')} />
         )}
         {this.primeTheme && !this.isMac && <KevinSvg class={styles.titlebarIcon} />}
-        <div class={styles.titlebarTitle}>{this.props.title}</div>
+        <div class={styles.titlebarTitle} onDblclick={() => this.maximize()}>
+          {this.props.title}
+        </div>
         {!this.isMac && (
           <div class={styles.titlebarActions}>
             <i class={cx('icon-subtract', styles.titlebarAction)} onClick={() => this.minimize()} />

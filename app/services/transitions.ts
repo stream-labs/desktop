@@ -11,6 +11,8 @@ import { $t } from 'services/i18n';
 import { DefaultManager } from 'services/sources/properties-managers/default-manager';
 import { Subject } from 'rxjs';
 import { isUrl } from '../util/requests';
+import { getOS, OS } from 'util/operating-systems';
+import { UsageStatisticsService } from './usage-statistics';
 
 export const TRANSITION_DURATION_MAX = 2_000_000_000;
 
@@ -64,6 +66,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   @Inject() windowsService: WindowsService;
   @Inject() scenesService: ScenesService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
+  @Inject() usageStatisticsService: UsageStatisticsService;
 
   studioModeChanged = new Subject<boolean>();
 
@@ -104,7 +107,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   }
 
   getTypes(): IListOption<ETransitionType>[] {
-    return [
+    const types = [
       { title: $t('Cut'), value: ETransitionType.Cut },
       { title: $t('Fade'), value: ETransitionType.Fade },
       { title: $t('Swipe'), value: ETransitionType.Swipe },
@@ -112,13 +115,17 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
       { title: $t('Fade to Color'), value: ETransitionType.FadeToColor },
       { title: $t('Luma Wipe'), value: ETransitionType.LumaWipe },
       { title: $t('Stinger'), value: ETransitionType.Stinger },
-      { title: $t('Motion'), value: ETransitionType.Motion },
     ];
+
+    if (getOS() === OS.Windows) types.push({ title: $t('Motion'), value: ETransitionType.Motion });
+
+    return types;
   }
 
   enableStudioMode() {
     if (this.state.studioMode) return;
 
+    this.usageStatisticsService.recordFeatureUsage('StudioMode');
     this.SET_STUDIO_MODE(true);
     this.studioModeChanged.next(true);
 
@@ -225,6 +232,10 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     const obsScene = this.scenesService.views.getScene(sceneBId).getObsScene();
     const transition = this.getConnectedTransition(sceneAId, sceneBId);
     const obsTransition = this.obsTransitions[transition.id];
+
+    if (transition.type === ETransitionType.Motion) {
+      this.usageStatisticsService.recordFeatureUsage('MotionTransition');
+    }
 
     if (sceneAId) {
       obsTransition.set(this.scenesService.views.getScene(sceneAId).getObsScene());
