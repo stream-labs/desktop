@@ -1,3 +1,4 @@
+import cx from 'classnames';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { $t } from 'services/i18n';
 import { Component } from 'vue-property-decorator';
@@ -18,6 +19,7 @@ import { DestinationSwitchers } from './DestinationSwitchers';
 import { Twitter } from 'components/Twitter';
 import { RestreamService } from 'services/restream';
 import Section from './Section';
+import Scrollable from 'components/shared/Scrollable';
 
 class GoLiveProps {
   value?: IGoLiveSettings = undefined;
@@ -113,11 +115,11 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
           <GoLiveError />
 
           {shouldShowSettings && (
-            <div
-              class={{
+            <Scrollable
+              className={cx({
                 [styles.settingsContainer]: true,
                 [styles.settingsContainerOnePlatform]: onlyOnePlatformIsLinked,
-              }}
+              })}
             >
               {/*PLATFORM SETTINGS*/}
               <PlatformSettings vModel={this.settings} />
@@ -136,7 +138,7 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
                   settings={this.settings}
                 />
               </Section>
-            </div>
+            </Scrollable>
           )}
         </div>
       </ValidatedForm>
