@@ -1,8 +1,9 @@
 import { Component, Prop } from 'vue-property-decorator';
-import { debounce } from 'lodash-decorators';
+import { debounce, throttleSetter } from 'lodash-decorators';
 import { TObsType, IObsInput, ObsInput } from './ObsInput';
 import Utils from '../../../services/utils';
-import VueColor from 'vue-color';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import { metadata } from 'components/shared/inputs';
 
 interface IColor {
   r: number;
@@ -11,20 +12,12 @@ interface IColor {
   a: number;
 }
 
-@Component({
-  components: { ColorPicker: VueColor.Sketch },
-})
+@Component({})
 class ObsColorInput extends ObsInput<IObsInput<number>> {
   static obsType: TObsType;
 
   @Prop()
   value: IObsInput<number>;
-
-  pickerVisible = false;
-
-  togglePicker() {
-    this.pickerVisible = !this.pickerVisible;
-  }
 
   @debounce(500)
   setValue(rgba: IColor) {
@@ -53,13 +46,6 @@ class ObsColorInput extends ObsInput<IObsInput<number>> {
     return `#${this.hexAlpha}${this.hexColor}`.toLowerCase();
   }
 
-  get swatchStyle() {
-    return {
-      backgroundColor: `#${this.hexColor}`,
-      opacity: this.obsColor.a || 1,
-    };
-  }
-
   get obsColor(): IColor {
     const rgba = Utils.intToRgba(this.value.value);
     return {
@@ -74,6 +60,20 @@ class ObsColorInput extends ObsInput<IObsInput<number>> {
     let result = int.toString(16);
     if (result.length === 1) result = `0${result}`;
     return result;
+  }
+
+  get metadata() {
+    return metadata.color({ title: this.value.description, mode: 'rgba', fullWidth: true });
+  }
+
+  render() {
+    return (
+      <HFormGroup
+        value={this.hexColor}
+        onInput={(rgba: IColor) => this.setValue(rgba)}
+        metadata={this.metadata}
+      />
+    );
   }
 }
 
