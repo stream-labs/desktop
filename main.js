@@ -304,7 +304,7 @@ async function startApp() {
 
   workerWindow = new BrowserWindow({
     show: false,
-    webPreferences: { nodeIntegration: true },
+    webPreferences: { nodeIntegration: true, enableRemoteModule: true },
   });
 
   // setTimeout(() => {
@@ -336,7 +336,7 @@ async function startApp() {
     titleBarStyle: 'hidden',
     title: 'Streamlabs OBS',
     backgroundColor: '#17242D',
-    webPreferences: { nodeIntegration: true, webviewTag: true },
+    webPreferences: { nodeIntegration: true, webviewTag: true, enableRemoteModule: true },
   });
 
   // setTimeout(() => {
@@ -404,7 +404,7 @@ async function startApp() {
     fullscreenable: false,
     titleBarStyle: 'hidden',
     backgroundColor: '#17242D',
-    webPreferences: { nodeIntegration: true },
+    webPreferences: { nodeIntegration: true, enableRemoteModule: true },
   });
 
   childWindow.removeMenu();
