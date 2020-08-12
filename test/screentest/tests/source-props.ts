@@ -4,6 +4,7 @@ import { ISourcesServiceApi, TSourceType } from '../../../app/services/sources/s
 import { useScreentest } from '../screenshoter';
 import { sleep } from '../../helpers/sleep';
 import { ScenesService } from '../../../app/services/api/external-api/scenes';
+import { CustomizationService } from '../../../app/services/customization';
 
 let showSourceProps: (name: string) => void;
 
@@ -30,10 +31,15 @@ afterAppStart(async t => {
   const client = await getClient();
   const scenesService = client.getResource<ScenesService>('ScenesService');
   const sourcesService = client.getResource<ISourcesServiceApi>('SourcesService');
+  const customizationService = client.getResource<CustomizationService>('CustomizationService');
 
   types.forEach(type => {
     scenesService.activeScene.createAndAddSource(type, type);
   });
+
+  // set performance mode to avoid hiding/showing the display
+  // that improves test performance and prevents crashes
+  customizationService.setSettings({ performanceMode: true });
 
   showSourceProps = async (name: string) => {
     const sourceId = sourcesService.getSourcesByName(name)[0].sourceId;
