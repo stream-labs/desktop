@@ -229,6 +229,10 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     const transition = this.getConnectedTransition(sceneAId, sceneBId);
     const obsTransition = this.obsTransitions[transition.id];
 
+    if (transition.type === ETransitionType.Motion) {
+      this.usageStatisticsService.recordFeatureUsage('MotionTransition');
+    }
+
     if (sceneAId) {
       obsTransition.set(this.scenesService.views.getScene(sceneAId).getObsScene());
       obs.Global.setOutputSource(0, obsTransition);
