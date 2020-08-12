@@ -48,7 +48,7 @@ export default class StreamSettings extends TsxComponent {
   private customDestMetadata = formMetadata({
     name: metadata.text({ title: $t('Name'), required: true }),
     url: metadata.text({ title: 'URL', required: true }),
-    streamKey: metadata.text({ title: $t('Stream Key') }),
+    streamKey: metadata.text({ title: $t('Stream Key'), masked: true }),
   });
 
   private editCustomDestMode: boolean | number = false;
