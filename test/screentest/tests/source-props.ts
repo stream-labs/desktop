@@ -46,6 +46,7 @@ afterAppStart(async t => {
     sourcesService.showSourceProperties(sourceId);
     await focusChild(t);
   };
+
 });
 
 test('image_source', async t => {
