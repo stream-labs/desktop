@@ -116,10 +116,4 @@
   align-items: stretch;
   height: 100%;
 }
-
-.modal-container--side-nav {
-  flex-grow: 1;
-  margin: -16px -16px -16px 0;
-  overflow: auto;
-}
 </style>

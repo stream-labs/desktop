@@ -1,6 +1,6 @@
 <template>
-  <scrollable>
-    <ul class="selector-list" @contextmenu="handleContextMenu()">
+  <div>
+    <scrollable className="selector-list" @contextmenu="handleContextMenu()">
       <draggable
         :list="normalizedItems"
         :options="{ draggable: draggableSelector }"
@@ -21,8 +21,8 @@
           </div>
         </li>
       </draggable>
-    </ul>
-  </scrollable>
+    </scrollable>
+  </div>
 </template>
 
 <script lang="ts" src="./Selector.vue.ts"></script>
@@ -49,7 +49,6 @@
 
   list-style-type: none;
   margin: 0;
-  overflow: auto;
 }
 
 .selector-item {
