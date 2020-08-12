@@ -270,7 +270,7 @@ export default class StreamSettings extends TsxComponent {
         {!isEditMode && canAddMoreDestinations && (
           <a class={styles.addDestinationBtn} onclick={() => this.addCustomDest()}>
             <i class="fa fa-plus" />
-            {$t('Add destination')}
+            {$t('Add Destination')}
           </a>
         )}
         {!canAddMoreDestinations && <p>{$t('Maximum custom destinations has been added')}</p>}
