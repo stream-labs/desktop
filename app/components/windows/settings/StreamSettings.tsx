@@ -116,6 +116,15 @@ export default class StreamSettings extends TsxComponent {
 
   private async saveCustomDest() {
     if (!(await this.$refs.customDestForm.validate())) return;
+
+    // add "/" to the end of url string
+    if (
+      this.customDestModel.streamKey &&
+      this.customDestModel.url.charAt(this.customDestModel.url.length - 1) !== '/'
+    ) {
+      this.customDestModel.url += '/';
+    }
+
     const destinations = cloneDeep(this.customDestinations);
     const isUpdateMode = typeof this.editCustomDestMode === 'number';
     if (isUpdateMode) {
