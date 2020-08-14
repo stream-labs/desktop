@@ -9,14 +9,6 @@
         <div class="name">匿名(184)のコメントを表示</div>
         <div class="value"><input type="checkbox" v-model="showAnonymous" class="toggle-button" /></div>
       </div>
-      <div class="row">
-        <div class="name">NG共有設定</div>
-        <div class="value">
-          <select v-model="level" class="nl-select">
-            <option v-for="lv in NG_SHARING_LEVELS" :key="lv" :value="lv" :label="NG_SHARING_LEVEL_LABELS[lv]" :selected="lv === level"></option>
-          </select>
-        </div>
-      </div>
     </div>
   </div>
 </template>
