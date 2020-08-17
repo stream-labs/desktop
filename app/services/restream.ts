@@ -167,14 +167,17 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
     await Promise.all(promises);
 
-    await this.createTargets(
-      this.streamInfo.enabledPlatforms.map(platform => {
+    await this.createTargets([
+      ...this.streamInfo.enabledPlatforms.map(platform => {
         return {
           platform: platform as TPlatform,
           streamKey: getPlatformService(platform).state.streamKey,
         };
       }),
-    );
+      ...this.streamInfo.goLiveSettings.customDestinations
+        .filter(dest => dest.enabled)
+        .map(dest => ({ platform: 'relay' as 'relay', streamKey: `${dest.url}${dest.streamKey}` })),
+    ]);
   }
 
   checkStatus(): Promise<boolean> {
@@ -190,7 +193,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
       );
   }
 
-  async createTargets(targets: { platform: TPlatform; streamKey: string }[]) {
+  async createTargets(targets: { platform: TPlatform | 'relay'; streamKey: string }[]) {
     const headers = authorizedHeaders(
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),

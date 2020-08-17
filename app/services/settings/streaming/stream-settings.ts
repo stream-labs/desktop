@@ -16,7 +16,15 @@ interface ISavedGoLiveSettings {
     youtube: IPlatformFlags;
     mixer: IPlatformFlags;
   };
+  customDestinations?: ICustomStreamDestination[];
   advancedMode: boolean;
+}
+
+export interface ICustomStreamDestination {
+  name: string;
+  url: string;
+  streamKey?: string;
+  enabled: boolean;
 }
 
 /**
@@ -251,6 +259,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       protectedModeMigrationRequired: false,
       key: '',
       streamType: 'rtmp_common',
+      goLiveSettings: undefined,
     });
   }
 
