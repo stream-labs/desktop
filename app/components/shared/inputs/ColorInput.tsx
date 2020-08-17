@@ -32,7 +32,6 @@ export default class ColorInput extends BaseInput<string, IColorMetadata> {
   }
 
   render() {
-    console.log(this.value);
     return (
       <div
         data-role="input"
