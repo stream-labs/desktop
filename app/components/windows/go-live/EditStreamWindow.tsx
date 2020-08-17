@@ -15,6 +15,7 @@ import { StreamSettingsService } from '../../../services/settings/streaming';
 import ValidatedForm from '../../shared/inputs/ValidatedForm';
 import GoLiveChecklist from './GoLiveChecklist';
 import PlatformSettings from './PlatformSettings';
+import { TPlatform } from 'services/platforms';
 
 /**
  * Allows to update stream setting while being live
@@ -31,12 +32,23 @@ export default class EditStreamWindow extends TsxComponent<{}> {
     form: ValidatedForm;
   };
 
-  private settings: IGoLiveSettings = cloneDeep(this.streamingService.views.goLiveSettings);
+  private settings: IGoLiveSettings = (() => {
+    const settings = cloneDeep(this.streamingService.views.goLiveSettings);
+    // if stream has not been started than we allow to change settings only for a primary platform
+    // so delete other platforms from the settings object
+    if (this.streamingService.state.info.checklist.startVideoTransmission !== 'done') {
+      Object.keys(settings.platforms).forEach((platform: TPlatform) => {
+        if (!this.view.isPrimaryPlatform(platform)) delete settings.platforms[platform];
+      });
+    }
+    return settings;
+  })();
 
   created() {
     // the streamingService still may keep a error from GoLive flow like a "Post a Tweet" error
     // reset error for allowing update channel info
     this.streamingService.actions.resetError();
+    this.streamingService.actions.prepopulateInfo();
   }
 
   private get view() {
@@ -68,8 +80,8 @@ export default class EditStreamWindow extends TsxComponent<{}> {
 
   private render() {
     const lifecycle = this.view.info.lifecycle;
-    const shouldShowSettings = lifecycle === 'live';
     const shouldShowChecklist = lifecycle === 'runChecklist';
+    const shouldShowSettings = !shouldShowChecklist;
     return (
       <ModalLayout customControls={true} showControls={false}>
         <ValidatedForm ref="form" slot="content" name="editStreamForm">
@@ -83,9 +95,10 @@ export default class EditStreamWindow extends TsxComponent<{}> {
 
   private renderControls() {
     const lifecycle = this.view.info.lifecycle;
-    const shouldShowUpdateButton = lifecycle === 'live';
+    const shouldShowUpdateButton = lifecycle !== 'runChecklist';
     const shouldShowGoBackButton = !shouldShowUpdateButton && this.view.info.error;
-    const shouldShowAdvancedSwitch = shouldShowUpdateButton && this.view.isMultiplatformMode;
+    const shouldShowAdvancedSwitch =
+      shouldShowUpdateButton && this.view.getEnabledPlatforms(this.settings).length > 1;
 
     return (
       <div class="controls" style={{ display: 'flex', 'flex-direction': 'row-reverse' }}>

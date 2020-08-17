@@ -55,15 +55,25 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
    * Returns a list of enabled for streaming platforms
    */
   get enabledPlatforms(): TPlatform[] {
-    const goLiveSettings = this.goLiveSettings;
-    return Object.keys(goLiveSettings.platforms).filter(
+    return this.getEnabledPlatforms(this.goLiveSettings);
+  }
+
+  /**
+   * Returns a list of enabled for streaming platforms from the given settings object
+   */
+  getEnabledPlatforms(settings: IStreamSettings): TPlatform[] {
+    return Object.keys(settings.platforms).filter(
       (platform: TPlatform) =>
-        this.linkedPlatforms.includes(platform) && goLiveSettings.platforms[platform].enabled,
+        this.linkedPlatforms.includes(platform) && settings.platforms[platform].enabled,
     ) as TPlatform[];
   }
 
   get isMultiplatformMode(): boolean {
-    return this.streamSettingsView.state.protectedModeEnabled && this.enabledPlatforms.length > 1;
+    return (
+      this.streamSettingsView.state.protectedModeEnabled &&
+      (this.enabledPlatforms.length > 1 ||
+        this.goLiveSettings.customDestinations.filter(dest => dest.enabled).length > 0)
+    );
   }
 
   get isMidStreamMode(): boolean {
@@ -97,10 +107,13 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
       destinations[platform] = this.getPlatformSettings(platform);
     });
 
+    const savedGoLiveSettings = this.streamSettingsView.state.goLiveSettings;
+
     return {
       platforms: destinations as IGoLiveSettings['platforms'],
       advancedMode: !!this.streamSettingsView.state.goLiveSettings?.advancedMode,
       optimizedProfile: undefined,
+      customDestinations: savedGoLiveSettings?.customDestinations || [],
       tweetText: '',
     };
   }
@@ -206,7 +219,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
       const platformSettings = settings.platforms[platform];
       if (!platformSettings.enabled) continue;
       const platformName = getPlatformService(platform).displayName;
-      if (platform === 'twitch' || platform === 'facebook') {
+      if (platform === 'facebook') {
         if (!platformSettings['game']) {
           return $t('You must select a game for %{platformName}', { platformName });
         }

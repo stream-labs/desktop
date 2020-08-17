@@ -82,6 +82,7 @@ export class FormMonkey {
    */
   async fill(formData: Dictionary<any>) {
     this.log('fill form with data', formData);
+    await this.waitFieldsForVisible(Object.keys(formData));
     await this.waitForLoading();
     const inputs = await this.getInputs();
 
@@ -422,6 +423,13 @@ export class FormMonkey {
     // click away and wait for the control to dismiss
     await this.client.click('.tags-container .input-label');
     await this.client.waitForExist('.sp-input-container.sp-open', 500, true);
+  }
+
+  async waitFieldsForVisible(fieldNames: string[]) {
+    const watchers = fieldNames.map(inputName => {
+      return this.client.waitForVisible(`[data-role="input"][data-name=${inputName}]`);
+    });
+    return Promise.all(watchers);
   }
 
   /**

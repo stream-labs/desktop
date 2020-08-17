@@ -214,7 +214,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   /**
    * Make a transition to Live
    */
-  async goLive(newSettings?: IGoLiveSettings, unattendedMode = false) {
+  async goLive(newSettings?: IGoLiveSettings) {
     // don't interact with API in loged out mode and when protected mode is disabled
     if (
       !this.userService.isLoggedIn ||
@@ -227,6 +227,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
     // clear the current stream info
     this.RESET_STREAM_INFO();
+
+    // if settings are not provided then GoLive window has been not shown
+    // consider this as unattendedMode
+    const unattendedMode = !newSettings;
 
     // use default settings if no new settings provided
     const settings = newSettings || cloneDeep(this.views.goLiveSettings);
@@ -242,7 +246,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     for (const platform of platforms) {
       const service = getPlatformService(platform);
       try {
-        await this.runCheck(platform, () => service.beforeGoLive(settings));
+        // don't update settigns for twitch in unattendedMode
+        const settingsForPlatform = platform === 'twitch' && unattendedMode ? undefined : settings;
+        await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform));
       } catch (e) {
         console.error(e);
         // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
@@ -352,13 +358,29 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
    * Update stream stetting while being live
    */
   async updateStreamSettings(settings: IGoLiveSettings) {
+    const lifecycle = this.state.info.lifecycle;
+
     // run checklist
-    this.RESET_STREAM_INFO();
     this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist' });
 
     // call putChannelInfo for each platform
     const platforms = this.views.enabledPlatforms;
+
+    platforms.forEach(platform => {
+      this.UPDATE_STREAM_INFO({
+        checklist: { ...this.state.info.checklist, [platform]: 'not-started' },
+      });
+    });
+
     for (const platform of platforms) {
+      // don't update settings for a non-primary platform if we're not live
+      if (
+        this.state.info.checklist.startVideoTransmission !== 'done' &&
+        !this.views.isPrimaryPlatform(platform)
+      ) {
+        continue;
+      }
+
       const service = getPlatformService(platform);
       const newSettings = settings.platforms[platform];
       try {
@@ -372,8 +394,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
     // save updated settings locally
     this.streamSettingsService.setSettings({ goLiveSettings: settings });
-    // return back to the 'live' state
-    this.UPDATE_STREAM_INFO({ lifecycle: 'live' });
+    // finish the 'runChecklist' step
+    this.UPDATE_STREAM_INFO({ lifecycle });
   }
 
   /**
@@ -488,6 +510,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   setSelectiveRecording(enabled: boolean) {
     // Selective recording cannot be toggled while live
     if (this.state.streamingStatus !== EStreamingState.Offline) return;
+
+    if (enabled) this.usageStatisticsService.recordFeatureUsage('SelectiveRecording');
 
     this.SET_SELECTIVE_RECORDING(enabled);
     obs.Global.multipleRendering = enabled;
@@ -640,7 +664,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   startReplayBuffer() {
     if (this.state.replayBufferStatus !== EReplayBufferState.Offline) return;
-
+    this.usageStatisticsService.recordFeatureUsage('ReplayBuffer');
     obs.NodeObs.OBS_service_startReplayBuffer();
   }
 
@@ -830,6 +854,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           code: info.code,
           status: EStreamingState.Live,
         });
+        this.usageStatisticsService.recordFeatureUsage('Streaming');
+        if (this.views.goLiveSettings.customDestinations.filter(dest => dest.enabled).length) {
+          this.usageStatisticsService.recordFeatureUsage('CustomStreamDestination');
+        }
       } else if (info.signal === EOBSOutputSignal.Starting) {
         this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
         this.streamingStatusChange.next(EStreamingState.Starting);
@@ -865,6 +893,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       }[info.signal];
 
       if (info.signal === EOBSOutputSignal.Start) {
+        this.usageStatisticsService.recordFeatureUsage('Recording');
         this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
           status: nextState,
           code: info.code,

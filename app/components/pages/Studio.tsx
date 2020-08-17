@@ -1,23 +1,13 @@
 import TsxComponent from 'components/tsx-component';
-import { Component, Watch } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { LayoutService, ELayoutElement, IVec2Array } from 'services/layout';
-import { WindowsService } from 'services/windows';
-import { IResizeMins } from 'components/editor/layouts/BaseLayout';
 
 @Component({})
 export default class Studio extends TsxComponent {
   @Inject() private layoutService: LayoutService;
 
-  get slottedElements() {
-    return this.layoutService.views.currentTab.slottedElements;
-  }
-
-  get currentTab() {
-    return this.layoutService.views.currentTab;
-  }
-
-  async totalWidthHandler(slots: IVec2Array, isColumns: boolean) {
+  totalWidthHandler(slots: IVec2Array, isColumns: boolean) {
     if (isColumns) {
       this.$emit('totalWidth', this.layoutService.views.calculateColumnTotal(slots));
     } else {
@@ -34,14 +24,12 @@ export default class Studio extends TsxComponent {
           this.totalWidthHandler(slots, isColumns)
         }
       >
-        {Object.keys(this.layoutService.views.currentTab.slottedElements).map(
-          (widget: ELayoutElement) => {
-            const Element = this.layoutService.views.elementComponent(widget);
-            return (
-              <Element slot={this.layoutService.views.currentTab.slottedElements[widget].slot} />
-            );
-          },
-        )}
+        {this.layoutService.views.elementsToRender.map((widget: ELayoutElement) => {
+          const Element = this.layoutService.views.elementComponent(widget);
+          return (
+            <Element slot={this.layoutService.views.currentTab.slottedElements[widget].slot} />
+          );
+        })}
       </Layout>
     );
   }

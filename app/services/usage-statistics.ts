@@ -29,17 +29,26 @@ type TAnalyticsEvent =
   | 'StreamPerformance'
   | 'StreamingStatus'
   | 'RecordingStatus'
-  | 'ReplayBufferStatus';
+  | 'ReplayBufferStatus'
+  | 'Click'
+  | 'Session';
 
 interface IAnalyticsEvent {
   product: string;
   version: string;
   event: string;
   value?: any;
-  time?: string;
+  time?: Date;
   count?: number;
   uuid?: string;
   saveUser?: boolean;
+  userId?: number;
+}
+
+interface ISessionInfo {
+  startTime: Date;
+  endTime?: Date;
+  features: Dictionary<boolean>;
 }
 
 export function track(event: TUsageEvent) {
@@ -61,11 +70,11 @@ export class UsageStatisticsService extends Service {
   installerId: string;
   version = Utils.env.SLOBS_VERSION;
 
-  private anaiticsEvents: IAnalyticsEvent[] = [];
+  private analyticsEvents: IAnalyticsEvent[] = [];
 
   init() {
     this.loadInstallerId();
-    this.sendAnalytics = throttle(this.sendAnalytics, 30 * 1000);
+    this.throttledSendAnalytics = throttle(this.sendAnalytics, 30 * 1000);
 
     setInterval(() => {
       this.recordAnalyticsEvent('Heartbeat', { bundle: SLOBS_BUNDLE_ID });
@@ -151,29 +160,85 @@ export class UsageStatisticsService extends Service {
   recordAnalyticsEvent(event: TAnalyticsEvent, value: any) {
     if (!this.isProduction) return;
 
-    this.anaiticsEvents.push({
+    const analyticsEvent: IAnalyticsEvent = {
       event,
       value,
       product: 'SLOBS',
       version: this.version,
       count: 1,
       uuid: this.userService.getLocalUserId(),
-    });
-    this.sendAnalytics();
+      time: new Date(),
+    };
+
+    if (this.userService.state.userId) analyticsEvent.userId = this.userService.state.userId;
+
+    this.analyticsEvents.push(analyticsEvent);
+    this.throttledSendAnalytics();
   }
 
-  private sendAnalytics() {
-    const data = { analyticsTokens: [...this.anaiticsEvents] };
+  /**
+   * All clicks should use this function to ensure consistent naming
+   * of click events.
+   * @param component A logical grouping to namespace this click. Can
+   * be the name of the component, or some other grouping.
+   * @param target A unique and descriptive name for the element that
+   * was clicked.
+   */
+  recordClick(component: string, target: string) {
+    this.recordAnalyticsEvent('Click', { component, target });
+  }
+
+  /**
+   * Should be called on shutdown to flush all events in the pipeline
+   */
+  async flushEvents() {
+    this.session.endTime = new Date();
+
+    const session = {
+      ...this.session,
+      // Convert features to an array for persistence for better querying
+      features: Object.keys(this.session.features),
+      isPrime: this.userService.state.isPrime,
+    };
+
+    this.recordAnalyticsEvent('Session', session);
+
+    // Unthrottled version
+    await this.sendAnalytics();
+  }
+
+  private session: ISessionInfo = {
+    startTime: new Date(),
+    features: {},
+  };
+
+  recordFeatureUsage(feature: string) {
+    this.session.features[feature] = true;
+  }
+
+  /**
+   * Should not be called directly except during shutdown.
+   */
+  private async sendAnalytics() {
+    if (!this.analyticsEvents.length) return;
+
+    const data = { analyticsTokens: [...this.analyticsEvents] };
     const headers = authorizedHeaders(this.userService.apiToken);
     headers.append('Content-Type', 'application/json');
 
-    this.anaiticsEvents.length = 0;
+    this.analyticsEvents.length = 0;
 
     const request = new Request(`https://${this.hostsService.analitycs}/slobs/data/ping`, {
       headers,
       method: 'post',
       body: JSON.stringify(data || {}),
     });
-    fetch(request).then(handleResponse);
+    await fetch(request)
+      .then(handleResponse)
+      .catch(e => {
+        console.error('Error sending analytics events', e);
+      });
   }
+
+  private throttledSendAnalytics: () => void;
 }
