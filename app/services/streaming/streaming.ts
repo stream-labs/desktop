@@ -855,6 +855,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           status: EStreamingState.Live,
         });
         this.usageStatisticsService.recordFeatureUsage('Streaming');
+        if (this.views.goLiveSettings.customDestinations.filter(dest => dest.enabled).length) {
+          this.usageStatisticsService.recordFeatureUsage('CustomStreamDestination');
+        }
       } else if (info.signal === EOBSOutputSignal.Starting) {
         this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
         this.streamingStatusChange.next(EStreamingState.Starting);

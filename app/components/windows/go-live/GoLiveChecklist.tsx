@@ -136,7 +136,7 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
         }}
       >
         <CheckMark state={state} />
-        {title}
+        <span>{title}</span>
         {renderYTPercentage && this.renderYoutubePercentage()}
       </li>
     );
