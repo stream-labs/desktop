@@ -79,7 +79,7 @@ export default class AlertboxLibrary extends Vue {
   }
 
   get libraryUrl() {
-    return this.userService.alertboxLibraryUrl();
+    return this.userService.alertboxLibraryUrl;
   }
 
   render() {
