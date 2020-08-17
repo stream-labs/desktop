@@ -51,6 +51,15 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
     this.streamingService.actions.prepopulateInfo();
   }
 
+  private switchCustomDest(destInd: number, enabled: boolean) {
+    // save settings
+    this.$set(this.settings.customDestinations, destInd, {
+      ...this.settings.customDestinations[destInd],
+      enabled,
+    });
+    this.streamSettingsService.actions.setGoLiveSettings(this.settings);
+  }
+
   private addDestination() {
     // open the stream settings or prime page
     if (this.restreamService.canEnableRestream) {
@@ -68,10 +77,11 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
     const isLoadingMode = !isErrorMode && ['empty', 'prepopulate'].includes(view.info.lifecycle);
     const shouldShowSettings = !isErrorMode && !isLoadingMode && hasPlatforms;
     const isAdvancedMode = view.goLiveSettings.advancedMode && view.isMultiplatformMode;
-    const shouldShowAddDestination = view.linkedPlatforms.length < 3;
     const shouldShowPrimeLabel = !this.restreamService.state.grandfathered;
     const shouldShowLeftCol = this.streamSettingsService.state.protectedModeEnabled;
     const onlyOnePlatformIsLinked = view.linkedPlatforms.length === 1;
+    const shouldShowAddDestButton =
+      view.linkedPlatforms.length + view.goLiveSettings.customDestinations.length < 5;
     return (
       <ValidatedForm class="flex">
         {/*LEFT COLUMN*/}
@@ -79,14 +89,16 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
           <div style={{ width: '400px', marginRight: '42px' }}>
             {/*DESTINATION SWITCHERS*/}
             <DestinationSwitchers
-              value={this.settings.platforms}
+              platforms={this.settings.platforms}
+              customDestinations={this.settings.customDestinations}
               title="Stream to %{platformName}"
               canDisablePrimary={false}
-              handleOnSwitch={(...args) => this.switchPlatform(...args)}
+              handleOnPlatformSwitch={(...args) => this.switchPlatform(...args)}
+              handleOnCustomDestSwitch={(...args) => this.switchCustomDest(...args)}
             />
 
             {/*ADD DESTINATION BUTTON*/}
-            {shouldShowAddDestination && (
+            {shouldShowAddDestButton && (
               <a class={styles.addDestinationBtn} onclick={this.addDestination}>
                 <i class="fa fa-plus" />
                 {$t('Add Destination')} {shouldShowPrimeLabel && <b class={styles.prime}>prime</b>}

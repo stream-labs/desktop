@@ -155,6 +155,10 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
     });
   }
 
+  private switchPlatform(platform: TPlatform, enabled: boolean) {
+    this.settings.platforms[platform].enabled = enabled;
+  }
+
   render() {
     const shouldShowLoading =
       this.isLoading || !this.view.isPrepopulated(this.selectedDestinations);
@@ -171,7 +175,11 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
           class="flex"
         >
           <div style={{ width: '400px', marginRight: '42px' }}>
-            <DestinationSwitchers vModel={this.settings.platforms} canDisablePrimary={true} />
+            <DestinationSwitchers
+              platforms={this.settings.platforms}
+              handleOnPlatformSwitch={(...args) => this.switchPlatform(...args)}
+              canDisablePrimary={true}
+            />
           </div>
           <div style={{ width: '100%' }}>
             {shouldShowSettings && (
