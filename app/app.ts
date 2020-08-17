@@ -193,7 +193,7 @@ Vue.directive('trackClick', {
     }
 
     el.addEventListener('click', () => {
-      getResource<UsageStatisticsService>('UsageStatisticsService').recordClick(
+      getResource<UsageStatisticsService>('UsageStatisticsService').actions.recordClick(
         binding.value.component,
         binding.value.target,
       );
