@@ -20,30 +20,24 @@ class ObsColorInput extends ObsInput<IObsInput<number>> {
   value: IObsInput<number>;
 
   @debounce(500)
-  setValue(rgba: IColor) {
+  setValue(hex: string) {
+    const rgba = this.hexToRGB(hex);
     if (!Object.keys(rgba).every(key => rgba[key] === this.obsColor[key])) {
-      const intColor = Utils.rgbaToInt(rgba.r, rgba.g, rgba.b, Math.round(255 * rgba.a));
+      const intColor = Utils.rgbaToInt(rgba.r, rgba.g, rgba.b, rgba.a);
       this.emitInput({ ...this.value, value: intColor });
     }
   }
 
   mounted() {
-    this.setValue(this.obsColor);
-  }
-
-  get hexAlpha() {
-    const alpha = this.obsColor.a;
-    return `00${Math.floor(alpha * 255).toString(16)}`;
+    this.setValue(this.hexColor);
   }
 
   get hexColor() {
     const rgba = Utils.intToRgba(this.value.value);
-    return this.intTo2hexDigit(rgba.r) + this.intTo2hexDigit(rgba.g) + this.intTo2hexDigit(rgba.b);
-  }
-
-  // This is displayed to the user
-  get hexARGB() {
-    return `#${this.hexAlpha}${this.hexColor}`.toLowerCase();
+    return `#${this.intTo2hexDigit(rgba.r) +
+      this.intTo2hexDigit(rgba.g) +
+      this.intTo2hexDigit(rgba.b) +
+      this.intTo2hexDigit(rgba.a)}`;
   }
 
   get obsColor(): IColor {
@@ -52,7 +46,7 @@ class ObsColorInput extends ObsInput<IObsInput<number>> {
       r: rgba.r,
       g: rgba.g,
       b: rgba.b,
-      a: Number((rgba.a / 255).toFixed(2)),
+      a: rgba.a,
     };
   }
 
@@ -62,15 +56,29 @@ class ObsColorInput extends ObsInput<IObsInput<number>> {
     return result;
   }
 
+  hexToRGB(hex: string) {
+    console.log(hex);
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    let a = 255;
+
+    if (hex[8]) {
+      a = parseInt(hex.slice(7, 9), 16);
+    }
+
+    return { r, g, b, a };
+  }
+
   get metadata() {
-    return metadata.color({ title: this.value.description, mode: 'rgba', fullWidth: true });
+    return metadata.color({ title: this.value.description, fullWidth: true, includeAlpha: true });
   }
 
   render() {
     return (
       <HFormGroup
         value={this.hexColor}
-        onInput={(rgba: IColor) => this.setValue(rgba)}
+        onInput={(hex: string) => this.setValue(hex)}
         metadata={this.metadata}
       />
     );

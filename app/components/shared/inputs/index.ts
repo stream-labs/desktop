@@ -86,7 +86,7 @@ export interface IDateMetadata extends IInputMetadata {
 }
 
 export interface IColorMetadata extends IInputMetadata {
-  mode?: 'rgba' | 'hex';
+  includeAlpha?: boolean;
   fullWidth?: boolean;
 }
 
