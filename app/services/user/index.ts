@@ -536,6 +536,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return url;
   }
 
+  get alertboxLibraryUrl() {
+    const uiTheme = this.customizationService.isDarkTheme ? 'night' : 'day';
+    let url = `https://${this.hostsService.streamlabs}/alertbox-library?mode=${uiTheme}&slobs`;
+
+    if (this.isLoggedIn) {
+      url += `&oauth_token=${this.apiToken}`;
+    }
+
+    return url;
+  }
+
   getDonationSettings() {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/donation/settings`;
