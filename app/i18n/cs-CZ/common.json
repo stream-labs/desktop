@@ -55,6 +55,7 @@
   "Cloudbot": "Cloudbot",
   "Merch": "Zboží",
   "App Store": "Obchod s aplikacemi",
+  "Alertbox Library": "Alertbox Library",
   "New": "Nová",
   "Face Masks": "Masky",
   "Help": "Nápověda",
@@ -118,5 +119,5 @@
   "Apps": "Aplikace",
   "Finish": "Dokončit",
   "Get Prime": "Získat Prime",
-  "System error message:": "System error message:"
+  "System error message:": "Zpráva systémové chyby:"
 }
