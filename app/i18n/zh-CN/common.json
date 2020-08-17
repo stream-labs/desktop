@@ -55,6 +55,7 @@
   "Cloudbot": "云机器人",
   "Merch": "Merch",
   "App Store": "App Store",
+  "Alertbox Library": "Alertbox Library",
   "New": "新",
   "Face Masks": "面部蒙版",
   "Help": "帮助",
@@ -118,5 +119,5 @@
   "Apps": "应用程序",
   "Finish": "完成",
   "Get Prime": "获取 Prime",
-  "System error message:": "System error message:"
+  "System error message:": "系统错误信息："
 }
