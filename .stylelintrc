@@ -1,6 +1,6 @@
 {
-  "extends": ["stylelint-config-standard", "stylelint-config-css-modules"],
+  "extends": ["stylelint-config-standard", "stylelint-config-css-modules", "stylelint-config-prettier"],
   "rules": {
-    "no-descending-specificity": null
+    "no-descending-specificity": null,
   }
 }
