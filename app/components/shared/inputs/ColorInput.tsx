@@ -31,6 +31,28 @@ export default class ColorInput extends BaseInput<string, IColorMetadata> {
     );
   }
 
+  get pickerBody() {
+    return (
+      <transition name="colorpicker-slide">
+        {this.pickerVisible && (
+          <div
+            class={cx(styles.colorpickerContainer, {
+              [styles.hiddenAlpha]: !this.metadata.includeAlpha,
+            })}
+          >
+            <Sketch
+              value={{ hex: this.value }}
+              onInput={(value: { hex: string; hex8: string }) =>
+                this.emitInput(this.metadata.includeAlpha ? value.hex8 : value.hex)
+              }
+              class={styles.colorpickerMenu}
+            />
+          </div>
+        )}
+      </transition>
+    );
+  }
+
   render() {
     return (
       <div
@@ -50,23 +72,7 @@ export default class ColorInput extends BaseInput<string, IColorMetadata> {
             />
             <div class={styles.colorpickerSwatch} style={`background-color: ${this.value}`} />
           </div>
-          <transition name="colorpicker-slide">
-            {this.pickerVisible && (
-              <div
-                class={cx(styles.colorpickerContainer, {
-                  [styles.hiddenAlpha]: !this.metadata.includeAlpha,
-                })}
-              >
-                <Sketch
-                  value={{ hex: this.value }}
-                  onInput={(value: { hex: string; hex8: string }) =>
-                    this.emitInput(this.metadata.includeAlpha ? value.hex8 : value.hex)
-                  }
-                  class={styles.colorpickerMenu}
-                />
-              </div>
-            )}
-          </transition>
+          {this.pickerBody}
         </div>
       </div>
     );
