@@ -168,7 +168,7 @@ export function InheritMutations(): ClassDecorator {
  * the state of other services.
  */
 export abstract class ViewHandler<TState extends object> {
-  constructor(protected readonly state: TState) {}
+  constructor(public readonly state: TState) {}
 
   protected getServiceViews<TService extends new (...args: any[]) => StatefulService<any>>(
     service: TService,

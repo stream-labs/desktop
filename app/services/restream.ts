@@ -1,4 +1,4 @@
-import { StatefulService } from 'services';
+import { StatefulService, ViewHandler } from 'services';
 import { Inject, mutation, InitAfter } from 'services/core';
 import { HostsService } from 'services/hosts';
 import { getPlatformService, TPlatform } from 'services/platforms';
@@ -69,24 +69,18 @@ export class RestreamService extends StatefulService<IRestreamState> {
     });
   }
 
+  get views() {
+    return new RestreamView(this.state);
+  }
+
   async loadUserSettings() {
     this.settings = await this.fetchUserSettings();
     this.SET_GRANDFATHERED(this.settings.grandfathered);
-    this.SET_ENABLED(this.settings.enabled && this.canEnableRestream);
+    this.SET_ENABLED(this.settings.enabled && this.views.canEnableRestream);
   }
 
   get host() {
     return this.hostsService.streamlabs;
-  }
-
-  /**
-   * This determines whether the user can enable restream
-   * Requirements:
-   * - Has prime, or
-   * - Has a grandfathered status enabled
-   */
-  get canEnableRestream() {
-    return this.userService.isPrime || (this.userService.state.auth && this.state.grandfathered);
   }
 
   get chatUrl() {
@@ -307,5 +301,18 @@ export class RestreamService extends StatefulService<IRestreamState> {
     // @ts-ignore: typings are incorrect
     this.chatView.destroy();
     this.chatView = null;
+  }
+}
+
+class RestreamView extends ViewHandler<IRestreamState> {
+  /**
+   * This determines whether the user can enable restream
+   * Requirements:
+   * - Has prime, or
+   * - Has a grandfathered status enabled
+   */
+  get canEnableRestream() {
+    const userView = this.getServiceViews(UserService);
+    return userView.isPrime || (userView.auth && this.state.grandfathered);
   }
 }
