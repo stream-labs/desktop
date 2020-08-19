@@ -125,6 +125,7 @@ export default class OnboardingPage extends TsxComponent<{}> {
         <div class={styles.onboardingContent}>
           <Scrollable className={styles.scroll}>
             <Component
+              style="height: 100%;"
               continue={() => this.continue()}
               setProcessing={(processing: boolean) => this.setProcessing(processing)}
             />
