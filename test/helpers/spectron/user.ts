@@ -5,7 +5,7 @@ import { dialogDismiss } from './dialog';
 import { ExecutionContext } from 'ava';
 const request = require('request');
 
-const USER_POOL_URL = `https://slobs-users-pool.herokuapp.com`;
+const USER_POOL_URL = 'https://slobs-users-pool.herokuapp.com';
 const USER_POOL_TOKEN = process.env.SLOBS_TEST_USER_POOL_TOKEN;
 let user: ITestUser; // keep user's name if SLOBS is logged-in
 
@@ -25,11 +25,34 @@ interface ITestUser {
 }
 
 interface ITestUserFeatures {
+  /**
+   * Streaming is disabled for YT account
+   */
   streamingIsDisabled?: boolean;
+  /**
+   * This account doesn't have facebook pages
+   */
   noFacebookPages?: boolean;
+  /**
+   * This account has a linked twitter
+   */
   hasLinkedTwitter?: boolean;
+  /**
+   * 2 factor auth is disabled on twitch
+   */
   '2FADisabled'?: boolean;
+  /**
+   * Account has multiple platforms enabled
+   */
   multistream?: boolean;
+  /**
+   * This is a Prime account
+   */
+  prime?: boolean;
+  /**
+   * Streaming is not available for this account
+   */
+  notStreamable?: boolean;
 }
 
 export async function logOut(t: TExecutionContext, skipUI = false) {
@@ -57,7 +80,6 @@ export async function logIn(
   waitForUI = true,
   isOnboardingTest = false,
 ): Promise<ITestUser> {
-
   if (user) throw 'User already logged in';
 
   if (USER_POOL_TOKEN) {
@@ -130,7 +152,16 @@ export async function reserveUserFromPool(
       // request a specific platform
       if (platformType) urlPath += `/${platformType}`;
       // request a user with a specific feature
-      if (features) urlPath += `?features=${JSON.stringify(features)}`;
+      if (features) {
+        // create a filter using mongoDB syntax
+        const filter = {};
+        Object.keys(features).forEach(feature => {
+          const enabled = features[feature];
+          const filterValue = enabled ? true : null; // convert false to null, since DB doesn't have `false` as a value for features
+          filter[feature] = filterValue;
+        });
+        urlPath += `?filter=${JSON.stringify(filter)}`;
+      }
       reservedUser = await requestUserPool(urlPath);
       break;
     } catch (e) {
