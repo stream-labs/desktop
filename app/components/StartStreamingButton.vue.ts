@@ -77,7 +77,7 @@ export default class StartStreamingButton extends Vue {
         if (!goLive) return;
       }
 
-      if (this.streamingService.views.shouldShowGoLiveWindow()) {
+      if (this.shouldShowGoLiveWindow()) {
         this.streamingService.actions.showGoLiveWindow();
       } else {
         this.streamingService.actions.goLive();
@@ -141,6 +141,40 @@ export default class StartStreamingButton extends Vue {
 
     if (this.streamingService.delaySecondsRemaining) {
       setTimeout(() => this.setDelayUpdate(), 100);
+    }
+  }
+
+  shouldShowGoLiveWindow() {
+    if (!this.userService.isLoggedIn) return false;
+    const primaryPlatform = this.userService.state.auth?.primaryPlatform;
+    const updateStreamInfoOnLive = this.customizationService.state.updateStreamInfoOnLive;
+
+    if (primaryPlatform === 'twitch') {
+      // For Twitch, we can show the Go Live window even with protected mode off
+      // This is mainly for legacy reasons.
+      return this.streamingService.views.isMultiplatformMode || updateStreamInfoOnLive;
+    }
+
+    if (primaryPlatform === 'mixer') {
+      return (
+        this.streamSettingsService.state.protectedModeEnabled &&
+        updateStreamInfoOnLive &&
+        this.streamSettingsService.isSafeToModifyStreamKey()
+      );
+    }
+
+    if (primaryPlatform === 'facebook') {
+      return (
+        this.streamSettingsService.state.protectedModeEnabled &&
+        this.streamSettingsService.isSafeToModifyStreamKey()
+      );
+    }
+
+    if (primaryPlatform === 'youtube') {
+      return (
+        this.streamSettingsService.state.protectedModeEnabled &&
+        this.streamSettingsService.isSafeToModifyStreamKey()
+      );
     }
   }
 }
