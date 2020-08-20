@@ -16,6 +16,7 @@ import isEqual from 'lodash/isEqual';
 import omitBy from 'lodash/omitBy';
 import { cloneDeep } from 'lodash';
 import { assertIsDefined } from '../../util/properties-type-guards';
+import { SourceFiltersService } from '../source-filters';
 
 @ServiceHelper()
 export class Source implements ISourceApi {
@@ -36,8 +37,8 @@ export class Source implements ISourceApi {
 
   state: ISource;
 
-  @Inject()
-  scenesService: ScenesService;
+  @Inject() private scenesService: ScenesService;
+  @Inject() private sourceFiltersService: SourceFiltersService;
 
   /**
    * Should only be called by functions with the ExecuteInWorkerProcess() decorator
@@ -162,11 +163,19 @@ export class Source implements ISourceApi {
   duplicate(newSourceId?: string): Source | null {
     if (this.doNotDuplicate) return null;
 
-    return this.sourcesService.createSource(this.name, this.type, this.getSettings(), {
+    // create a new source
+    const newSource = this.sourcesService.createSource(this.name, this.type, this.getSettings(), {
       sourceId: newSourceId,
       propertiesManager: this.getPropertiesManagerType(),
       propertiesManagerSettings: this.getPropertiesManagerSettings(),
     });
+
+    // copy filters
+    this.sourceFiltersService.getFilters(this.sourceId).forEach(filter => {
+      this.sourceFiltersService.add(newSource.sourceId, filter.type, filter.name, filter.settings);
+    });
+
+    return newSource;
   }
 
   remove() {

@@ -64,7 +64,7 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
 
   private addDestination() {
     // open the stream settings or prime page
-    if (this.restreamService.canEnableRestream) {
+    if (this.restreamService.views.canEnableRestream) {
       this.settingsService.actions.showSettings('Stream');
     } else {
       this.userService.openPrimeUrl('slobs-multistream');
