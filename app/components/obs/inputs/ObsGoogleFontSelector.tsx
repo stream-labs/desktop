@@ -1,16 +1,16 @@
+import * as fi from 'node-fontinfo';
+import { EFontStyle } from 'obs-studio-node';
 import { Component, Prop } from 'vue-property-decorator';
-import { Multiselect } from 'vue-multiselect';
 import { FontLibraryService } from '../../../services/font-library';
 import { Inject } from '../../../services/core/injector';
 import { SourcesService } from '../../../services/sources';
 import { ObsInput, IGoogleFont } from './ObsInput';
 import ObsFontSizeSelector from './ObsFontSizeSelector.vue';
-import * as fi from 'node-fontinfo';
-import { EFontStyle } from 'obs-studio-node';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import { $t } from 'services/i18n';
+import { formMetadata, metadata, IListOption } from 'components/shared/inputs';
 
-@Component({
-  components: { Multiselect, FontSizeSelector: ObsFontSizeSelector },
-})
+@Component({})
 export default class GoogleFontSelector extends ObsInput<IGoogleFont> {
   @Inject()
   fontLibraryService: FontLibraryService;
@@ -21,9 +21,9 @@ export default class GoogleFontSelector extends ObsInput<IGoogleFont> {
   @Prop()
   value: IGoogleFont;
 
-  fontFamilies: string[] = [];
+  fontFamilies: IListOption<string>[] = [];
 
-  fontStyles: string[] = [];
+  fontStyles: IListOption<string>[] = [];
 
   selectedFamily = '';
 
@@ -57,7 +57,10 @@ export default class GoogleFontSelector extends ObsInput<IGoogleFont> {
     this.isLoading = true;
     this.fontLibraryService.getManifest().then(manifest => {
       this.isLoading = false;
-      this.fontFamilies = manifest.families.map(family => family.name);
+      this.fontFamilies = manifest.families.map(family => ({
+        title: family.name,
+        value: family.name,
+      }));
 
       if (this.value.path) this.updateSelectionFromPath();
     });
@@ -75,7 +78,7 @@ export default class GoogleFontSelector extends ObsInput<IGoogleFont> {
   updateStyles() {
     if (this.selectedFamily) {
       this.fontLibraryService.findFamily(this.selectedFamily).then(fam => {
-        this.fontStyles = fam.styles.map(sty => sty.name);
+        this.fontStyles = fam.styles.map(sty => ({ title: sty.name, value: sty.name }));
       });
     }
   }
@@ -119,7 +122,48 @@ export default class GoogleFontSelector extends ObsInput<IGoogleFont> {
     });
   }
 
-  setSize(size: string) {
+  setSize(size: number) {
     this.emitInput({ ...this.value, size });
+  }
+
+  get metadata() {
+    return formMetadata({
+      fontFamily: metadata.list({
+        title: $t('Font Family'),
+        disabled: this.isLoading,
+        options: this.fontFamilies,
+        fullWidth: true,
+      }),
+      fontStyle: metadata.list({
+        title: $t('Font Style'),
+        disabled: this.isLoading,
+        options: this.fontStyles,
+        allowEmpty: false,
+        fullWidth: true,
+      }),
+    });
+  }
+
+  render() {
+    return (
+      <div class="google-font-selector">
+        <div>
+          <HFormGroup
+            value={this.selectedFamily}
+            onInput={(family: string) => this.setFamily(family)}
+            metadata={this.metadata.fontFamily}
+          />
+          <HFormGroup
+            value={this.selectedStyle}
+            onInput={(style: string) => this.setStyle(style)}
+            metadata={this.metadata.fontStyle}
+          />
+          <ObsFontSizeSelector
+            value={this.value.size}
+            onInput={(size: number) => this.setSize(size)}
+          />
+        </div>
+      </div>
+    );
   }
 }

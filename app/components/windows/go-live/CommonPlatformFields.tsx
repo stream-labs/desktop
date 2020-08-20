@@ -178,6 +178,7 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
                   name: 'title',
                   required: true,
                   fullWidth: true,
+                  max: 120,
                   disabled,
                 })}
               />

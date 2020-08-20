@@ -8,7 +8,7 @@ import ModalLayout from 'components/ModalLayout.vue';
 import Display from 'components/shared/Display.vue';
 import GenericForm from 'components/obs/inputs/GenericForm';
 import WidgetProperties from 'components/custom-source-properties/WidgetProperties.vue';
-import StreamlabelProperties from 'components/custom-source-properties/StreamlabelProperties.vue';
+import StreamlabelProperties from 'components/custom-source-properties/StreamlabelProperties';
 import PlatformAppProperties from 'components/custom-source-properties/PlatformAppProperties.vue';
 import { $t } from 'services/i18n';
 import { Subscription } from 'rxjs';

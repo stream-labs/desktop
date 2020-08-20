@@ -1,29 +1,19 @@
 <template>
   <div>
-    <div class="input-container">
-      <div class="input-label">
-        <label>{{$t('Font Family')}}</label>
-      </div>
-      <div class="input-wrapper">
-        <list-input :value="value.value.face" :metadata="familyMetadata" @input="setFamily">
-          <template slot="item" slot-scope="{ option }">
-            <span :style="familyOptionStyle(option.value)">{{ option.title }}</span>
-          </template>
-        </list-input>
-      </div>
-    </div>
-    <div class="input-container">
-      <div class="input-label">
-        <label>{{$t('Font Style')}}</label>
-      </div>
-      <div class="input-wrapper">
-        <list-input :value="value.value.style" :metadata="styleMetadata" @input="setStyle">
-          <template slot="item" slot-scope="{ option }">
-            <span :style="styleOptionStyle(option.value)">{{ option.title }}</span>
-          </template>
-        </list-input>
-      </div>
-    </div>
+    <h-form-group :title="$t('Font Family')">
+      <list-input :value="value.value.face" :metadata="familyMetadata" @input="setFamily">
+        <template slot="item" slot-scope="{ option }">
+          <span :style="familyOptionStyle(option.value)">{{ option.title }}</span>
+        </template>
+      </list-input>
+    </h-form-group>
+    <h-form-group :title="$t('Font Style')">
+      <list-input :value="value.value.style" :metadata="styleMetadata" @input="setStyle">
+        <template slot="item" slot-scope="{ option }">
+          <span :style="styleOptionStyle(option.value)">{{ option.title }}</span>
+        </template>
+      </list-input>
+    </h-form-group>
     <font-size-selector :value="value.value.size" @input="setSize" />
   </div>
 </template>
@@ -31,7 +21,7 @@
 <script lang="ts" src="./ObsSystemFontSelector.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../../styles/index";
+@import '../../../styles/index';
 
 .multiselect--font {
   margin-bottom: 0;
