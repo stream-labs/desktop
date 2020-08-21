@@ -284,7 +284,11 @@ export default class StreamSettings extends TsxComponent {
           <a class={styles.addDestinationBtn} onclick={() => this.addCustomDest()}>
             <i class="fa fa-plus" />
             {$t('Add Destination')}
-            {shouldShowPrimeLabel && <b class={styles.prime}>prime</b>}
+            {shouldShowPrimeLabel ? (
+              <b class={styles.prime}>prime</b>
+            ) : (
+              <div class={styles.prime} />
+            )}
           </a>
         )}
         {!canAddMoreDestinations && <p>{$t('Maximum custom destinations has been added')}</p>}
