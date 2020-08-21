@@ -2,7 +2,7 @@ import electron from 'electron';
 import VueI18n from 'vue-i18n';
 import { PersistentStatefulService } from '../core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
-import { Inject } from '../core/injector';
+import { Inject, getResource } from '../core/injector';
 import { FileManagerService } from 'services/file-manager';
 import { IObsListInput, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { I18nServiceApi } from './i18n-api';
@@ -93,8 +93,8 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
     if (!view) return;
 
     // use a static method here because it allows to accept unserializable arguments like browserview from other windows
-    const i18nService = I18nService.instance as I18nService; // TODO: replace with getResource('I18nService')
-    const locale = i18nService.state.locale;
+    const i18nService = getResource<I18nService>('I18nService');
+    const locale = i18nService.getLocale();
     view.webContents.on('dom-ready', () => {
       view.webContents.executeJavaScript(`
         var langCode = $.cookie('langCode');
@@ -150,9 +150,6 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
       locale = langDescription ? langDescription.locale : 'en-US';
     }
 
-    // Force en-US locale on CI machines
-    if (process.env.CI) locale = 'en-US';
-
     // if electron has unsupported locale, don't allow to use it
     const fallbackLocale = this.getFallbackLocale();
     if (!this.localeIsSupported(locale)) locale = fallbackLocale;
@@ -174,6 +171,14 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
 
     I18nService.uploadTranslationsToVueI18n();
     this.isLoaded = true;
+  }
+
+  /**
+   * Used to fetch the locale synchronously from the worker process
+   * to avoid store initialization race conditions.
+   */
+  getLocale() {
+    return this.state.locale;
   }
 
   getFallbackLocale() {
