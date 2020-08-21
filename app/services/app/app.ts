@@ -10,8 +10,7 @@ import { TransitionsService } from 'services/transitions';
 import { SourcesService } from 'services/sources';
 import { ScenesService } from 'services/scenes';
 import { VideoService } from 'services/video';
-import { StreamInfoService } from 'services/stream-info';
-import { track } from 'services/usage-statistics';
+import { track, UsageStatisticsService } from 'services/usage-statistics';
 import { IpcServerService } from 'services/api/ipc-server';
 import { TcpServerService } from 'services/api/tcp-server';
 import { StreamlabelsService } from 'services/streamlabels';
@@ -36,8 +35,12 @@ import { Subject } from 'rxjs';
 import { DismissablesService } from 'services/dismissables';
 import { RestreamService } from 'services/restream';
 import { downloadFile } from '../../util/requests';
+import { TouchBarService } from 'services/touch-bar';
+import { ApplicationMenuService } from 'services/application-menu';
+import { KeyListenerService } from 'services/key-listener';
 import { MetricsService } from '../metrics';
 import { SettingsService } from '../settings';
+import { OS, getOS } from 'util/operating-systems';
 
 interface IAppState {
   loading: boolean;
@@ -60,13 +63,13 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() hotkeysService: HotkeysService;
   @Inject() userService: UserService;
   @Inject() shortcutsService: ShortcutsService;
-  @Inject() streamInfoService: StreamInfoService;
   @Inject() patchNotesService: PatchNotesService;
   @Inject() windowsService: WindowsService;
   @Inject() facemasksService: FacemasksService;
   @Inject() outageNotificationsService: OutageNotificationsService;
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() gameOverlayService: GameOverlayService;
+  @Inject() touchBarService: TouchBarService;
 
   static initialState: IAppState = {
     loading: true,
@@ -76,6 +79,8 @@ export class AppService extends StatefulService<IAppState> {
   };
 
   readonly appDataDirectory = electron.remote.app.getPath('userData');
+
+  loadingChanged = new Subject<boolean>();
 
   @Inject() transitionsService: TransitionsService;
   @Inject() sourcesService: SourcesService;
@@ -93,8 +98,11 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private recentEventsService: RecentEventsService;
   @Inject() private dismissablesService: DismissablesService;
   @Inject() private restreamService: RestreamService;
+  @Inject() private applicationMenuService: ApplicationMenuService;
+  @Inject() private keyListenerService: KeyListenerService;
   @Inject() private metricsService: MetricsService;
   @Inject() private settingsService: SettingsService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
 
   private loadingPromises: Dictionary<Promise<any>> = {};
 
@@ -154,6 +162,12 @@ export class AppService extends StatefulService<IAppState> {
 
     this.protocolLinksService.start(this.state.argv);
 
+    // Initialize some mac-only services
+    if (getOS() === OS.Mac) {
+      this.touchBarService;
+      this.applicationMenuService;
+    }
+
     ipcRenderer.send('AppInitFinished');
     this.metricsService.recordMetric('sceneCollectionLoadingTime');
   }
@@ -163,16 +177,19 @@ export class AppService extends StatefulService<IAppState> {
   @track('app_close')
   private shutdownHandler() {
     this.START_LOADING();
-    obs.NodeObs.StopCrashHandler();
-    this.crashReporterService.beginShutdown();
+    this.loadingChanged.next(true);
+    this.tcpServerService.stopListening();
 
     window.setTimeout(async () => {
+      obs.NodeObs.StopCrashHandler();
+      this.crashReporterService.beginShutdown();
       this.shutdownStarted.next();
+      this.keyListenerService.shutdown();
       this.platformAppsService.unloadAllApps();
+      await this.usageStatisticsService.flushEvents();
       this.windowsService.closeChildWindow();
       await this.windowsService.closeAllOneOffs();
       this.ipcServerService.stopListening();
-      this.tcpServerService.stopListening();
       await this.userService.flushUserSession();
       await this.sceneCollectionsService.deinitialize();
       this.performanceService.stop();
@@ -199,6 +216,7 @@ export class AppService extends StatefulService<IAppState> {
     if (!this.state.loading) {
       if (opts.hideStyleBlockers) this.windowsService.updateStyleBlockers('main', true);
       this.START_LOADING();
+      this.loadingChanged.next(true);
 
       // The scene collections window is the only one we don't close when
       // switching scene collections, because it results in poor UX.
@@ -247,6 +265,7 @@ export class AppService extends StatefulService<IAppState> {
     this.tcpServerService.startRequestsHandling();
     this.sceneCollectionsService.enableAutoSave();
     this.FINISH_LOADING();
+    this.loadingChanged.next(false);
     // Set timeout to allow transition animation to play
     if (opts.hideStyleBlockers) {
       setTimeout(() => this.windowsService.updateStyleBlockers('main', false), 500);

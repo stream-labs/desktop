@@ -30,6 +30,7 @@ import { StreamSettingsService } from 'services/settings/streaming';
 import { lazyModule } from 'util/lazy-module';
 import { AuthModule } from './auth-module';
 import { WebsocketService, TSocketEvent } from 'services/websocket';
+import { MagicLinkService } from 'services/magic-link';
 
 export enum EAuthProcessState {
   Idle = 'idle',
@@ -42,6 +43,7 @@ interface IUserServiceState {
   auth?: IUserAuth;
   authProcessState: EAuthProcessState;
   isPrime: boolean;
+  userId?: number;
 }
 
 interface ILinkedPlatform {
@@ -55,6 +57,7 @@ interface ILinkedPlatformsResponse {
   facebook_account?: ILinkedPlatform;
   youtube_account?: ILinkedPlatform;
   mixer_account?: ILinkedPlatform;
+  user_id: number;
 }
 
 export type LoginLifecycleOptions = {
@@ -105,6 +108,10 @@ class UserViews extends ViewHandler<IUserServiceState> {
   get isFacebookAuthed() {
     return this.isLoggedIn && this.platform.type === 'facebook';
   }
+
+  get auth() {
+    return this.state.auth;
+  }
 }
 
 export class UserService extends PersistentStatefulService<IUserServiceState> {
@@ -117,6 +124,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private settingsService: SettingsService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private websocketService: WebsocketService;
+  @Inject() private magicLinkService: MagicLinkService;
 
   @mutation()
   LOGIN(auth: IUserAuth) {
@@ -145,6 +153,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @mutation()
   SET_PRIME(isPrime: boolean) {
     this.state.isPrime = isPrime;
+  }
+
+  @mutation()
+  SET_USER_ID(userId: number) {
+    this.state.userId = userId;
   }
 
   @mutation()
@@ -287,6 +300,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   async updateLinkedPlatforms() {
     const linkedPlatforms = await this.fetchLinkedPlatforms();
+
+    if (linkedPlatforms.user_id) this.SET_USER_ID(linkedPlatforms.user_id);
 
     // TODO: Could metaprogram this a bit more
     if (linkedPlatforms.facebook_account) {
@@ -460,6 +475,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.showPrimeWindow();
   }
 
+  /**
+   * open the prime onboarding in the browser
+   * @param refl a referral tag for analytics
+   */
+  openPrimeUrl(refl: 'slobs-multistream' | 'slobs-settings') {
+    this.magicLinkService.getDashboardMagicLink('prime-marketing', refl).then(link => {
+      electron.remote.shell.openExternal(link);
+    });
+  }
+
   recentEventsUrl() {
     if (this.isLoggedIn) {
       const host = this.hostsService.streamlabs;
@@ -510,6 +535,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     if (type && id) {
       url += `#/?type=${type}&id=${id}`;
+    }
+
+    return url;
+  }
+
+  get alertboxLibraryUrl() {
+    const uiTheme = this.customizationService.isDarkTheme ? 'night' : 'day';
+    let url = `https://${this.hostsService.streamlabs}/alertbox-library?mode=${uiTheme}&slobs`;
+
+    if (this.isLoggedIn) {
+      url += `&oauth_token=${this.apiToken}`;
     }
 
     return url;
@@ -608,8 +644,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     merge = false,
   ): Promise<EPlatformCallResult> {
     const service = getPlatformService(platform);
-    const authUrl =
-      merge && service.supports('account-merging') ? service.mergeUrl : service.authUrl;
+    const authUrl = merge ? service.mergeUrl : service.authUrl;
 
     if (merge && !this.isLoggedIn) {
       throw new Error('Account merging can only be performed while logged in');

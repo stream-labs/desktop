@@ -12,7 +12,6 @@ import {
   JsonrpcService,
 } from 'services/api/jsonrpc';
 import { ServicesManager } from '../../services-manager';
-import { ServiceHelper } from 'services/core';
 
 export interface ISerializable {
   // really wish to have something like
@@ -88,7 +87,7 @@ export abstract class RpcApi extends Service {
     });
   }
 
-  private get jsonrpc(): typeof JsonrpcService {
+  protected get jsonrpc(): typeof JsonrpcService {
     return JsonrpcService;
   }
 
@@ -96,7 +95,7 @@ export abstract class RpcApi extends Service {
    *  Handles requests to services, but doesn't handle exceptions
    *  Returns serializable response with mutations
    */
-  private handleServiceRequest(request: IJsonRpcRequest): IJsonRpcResponse<any> {
+  protected handleServiceRequest(request: IJsonRpcRequest): IJsonRpcResponse<any> {
     const methodName = request.method;
     const { resource: resourceId, args, fetchMutations } = request.params;
 
@@ -302,7 +301,7 @@ export abstract class RpcApi extends Service {
   private sendPromiseMessage(info: { isRejected: boolean; promiseId: string; data: any }) {
     // serialize errors
     const serializedData = info.isRejected
-      ? { message: info.data.message, ...info.data }
+      ? { message: info.data?.message, ...info.data }
       : info.data;
 
     this.serviceEvent.next(

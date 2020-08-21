@@ -11,6 +11,22 @@ export function createProps<TProps extends new () => any>(
   return propsObj;
 }
 
+/**
+ * Sets an inital value for the required prop
+ * Helps to avoid typescript errors in strict-nulls mode when declare a shape of the props object
+ * @example
+ * <pre>
+ *
+ * class MyComponentProps() {
+ *   myProp: string = required<string>()
+ * }
+ *
+ * </pre>
+ */
+export function required<TPropType>() {
+  return (null as unknown) as TPropType;
+}
+
 export default abstract class TsxComponent<
   TProps extends { value: unknown } | any = {}
 > extends Vue {

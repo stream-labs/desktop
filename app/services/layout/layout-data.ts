@@ -29,7 +29,6 @@ export enum ELayoutElement {
 type ILayoutData = {
   [Layout in ELayout]: {
     resizeDefaults: { bar1: number; bar2?: number };
-    isColumns: boolean;
     className: string;
     component: typeof TsxComponent;
   };
@@ -37,50 +36,42 @@ type ILayoutData = {
 
 export const LAYOUT_DATA: ILayoutData = {
   [ELayout.Default]: {
-    resizeDefaults: { bar1: 156, bar2: 240 },
-    isColumns: false,
+    resizeDefaults: { bar1: 0.2, bar2: 0.3 },
     className: 'default',
     component: Layouts.Default,
   },
   [ELayout.TwoPane]: {
-    resizeDefaults: { bar1: 700, bar2: 350 },
-    isColumns: true,
+    resizeDefaults: { bar1: 0.5, bar2: 0.3 },
     className: 'twoPane',
     component: Layouts.TwoPane,
   },
   [ELayout.Classic]: {
-    resizeDefaults: { bar1: 450 },
-    isColumns: false,
+    resizeDefaults: { bar1: 0.4 },
     className: 'classic',
     component: Layouts.Classic,
   },
   [ELayout.FourByFour]: {
-    resizeDefaults: { bar1: 170, bar2: 170 },
-    isColumns: false,
+    resizeDefaults: { bar1: 0.25, bar2: 0.25 },
     className: 'fourByFour',
     component: Layouts.FourByFour,
   },
   [ELayout.Triplets]: {
-    resizeDefaults: { bar1: 700, bar2: 350 },
-    isColumns: true,
+    resizeDefaults: { bar1: 0.6, bar2: 0.3 },
     className: 'triplets',
     component: Layouts.Triplets,
   },
   [ELayout.OnePane]: {
-    resizeDefaults: { bar1: 800 },
-    isColumns: true,
+    resizeDefaults: { bar1: 0.7 },
     className: 'onePane',
     component: Layouts.OnePane,
   },
   [ELayout.OnePaneR]: {
-    resizeDefaults: { bar1: 350 },
-    isColumns: true,
+    resizeDefaults: { bar1: 0.3 },
     className: 'onePaneR',
     component: Layouts.OnePaneR,
   },
   [ELayout.Pyramid]: {
-    resizeDefaults: { bar1: 450 },
-    isColumns: false,
+    resizeDefaults: { bar1: 0.4 },
     className: 'pyramid',
     component: Layouts.Pyramid,
   },

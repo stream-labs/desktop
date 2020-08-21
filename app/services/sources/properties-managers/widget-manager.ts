@@ -15,12 +15,15 @@ export interface IWidgetManagerSettings {
 export class WidgetManager extends PropertiesManager {
   @Inject() widgetsService: WidgetsService;
 
-  blacklist = ['url', 'is_local_file'];
   displayOrder = ['widgetType'];
 
   customUIComponent = 'WidgetProperties';
 
   settings: IWidgetManagerSettings;
+
+  get blacklist() {
+    return ['url', 'is_local_file'];
+  }
 
   applySettings(settings: Dictionary<any>) {
     this.settings.widgetType = parseInt(settings.widgetType, 10);

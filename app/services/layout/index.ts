@@ -1,13 +1,13 @@
 import Vue from 'vue';
 import isEqual from 'lodash/isEqual';
-import { Inject, ViewHandler } from 'services/core';
+import { Inject, ViewHandler, InitAfter } from 'services/core';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
 import { CustomizationService } from 'services/customization';
-import { UserService } from 'services/user';
 import { $t } from 'services/i18n';
 import uuid from 'uuid/v4';
 import { LAYOUT_DATA, ELEMENT_DATA, ELayout, ELayoutElement } from './layout-data';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 export { ELayout, ELayoutElement };
 
@@ -39,8 +39,10 @@ class LayoutViews extends ViewHandler<ILayoutServiceState> {
     return LAYOUT_DATA[this.currentTab.currentLayout].component;
   }
 
-  get isColumnLayout() {
-    return LAYOUT_DATA[this.currentTab.currentLayout].isColumns;
+  get elementsToRender() {
+    return Object.keys(this.currentTab.slottedElements).filter(
+      key => this.currentTab.slottedElements[key].slot,
+    );
   }
 
   elementTitle(element: ELayoutElement) {
@@ -94,6 +96,7 @@ class LayoutViews extends ViewHandler<ILayoutServiceState> {
   }
 }
 
+@InitAfter('UserService')
 export class LayoutService extends PersistentStatefulService<ILayoutServiceState> {
   static defaultState: ILayoutServiceState = {
     currentTab: 'default',
@@ -118,7 +121,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
   };
 
   @Inject() private customizationService: CustomizationService;
-  @Inject() private userService: UserService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
 
   init() {
     super.init();
@@ -140,6 +143,17 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
         [ELayoutElement.Mixer]: { slot: '5' },
       });
       this.customizationService.setSettings({ legacyEvents: false });
+    }
+
+    this.checkUsage();
+  }
+
+  private checkUsage() {
+    if (Object.keys(this.state.tabs).length > 1) {
+      this.usageStatisticsService.recordFeatureUsage('LayoutEditorTabs');
+      this.usageStatisticsService.recordFeatureUsage('LayoutEditor');
+    } else if (this.state.tabs.default.currentLayout !== ELayout.Default) {
+      this.usageStatisticsService.recordFeatureUsage('LayoutEditor');
     }
   }
 
@@ -170,6 +184,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   changeLayout(layout: ELayout) {
     this.CHANGE_LAYOUT(layout);
+    this.checkUsage();
   }
 
   setSlots(slottedElements: { [key in ELayoutElement]?: { slot: LayoutSlot } }) {
@@ -182,7 +197,8 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   addTab(name: string, icon: string) {
     const id = uuid();
-    this.ADD_TAB(name, icon, id, this.userService.isPrime);
+    this.ADD_TAB(name, icon, id);
+    this.checkUsage();
   }
 
   removeCurrentTab() {
@@ -191,14 +207,14 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   @mutation()
   CHANGE_LAYOUT(layout: ELayout) {
-    this.state.tabs[this.state.currentTab].currentLayout = layout;
-    this.state.tabs[this.state.currentTab].slottedElements = {};
-    this.state.tabs[this.state.currentTab].resizes = LAYOUT_DATA[layout].resizeDefaults;
+    Vue.set(this.state.tabs[this.state.currentTab], 'currentLayout', layout);
+    Vue.set(this.state.tabs[this.state.currentTab], 'slottedElements', {});
+    Vue.set(this.state.tabs[this.state.currentTab], 'resizes', LAYOUT_DATA[layout].resizeDefaults);
   }
 
   @mutation()
   SET_SLOTS(slottedElements: { [key in ELayoutElement]?: { slot: LayoutSlot } }) {
-    this.state.tabs[this.state.currentTab].slottedElements = slottedElements;
+    Vue.set(this.state.tabs[this.state.currentTab], 'slottedElements', slottedElements);
   }
 
   @mutation()
@@ -212,12 +228,12 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   @mutation()
   SET_RESIZE(bar: 'bar1' | 'bar2', size: number) {
-    this.state.tabs[this.state.currentTab].resizes[bar] = size;
+    Vue.set(this.state.tabs[this.state.currentTab].resizes, bar, size);
   }
 
   @mutation()
   SET_TAB_NAME(id: string, name: string) {
-    this.state.tabs[id].name = name;
+    Vue.set(this.state.tabs[id], 'name', name);
   }
 
   @mutation()
@@ -234,7 +250,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
   }
 
   @mutation()
-  ADD_TAB(name: string, icon: string, id: string, switchTab = false) {
+  ADD_TAB(name: string, icon: string, id: string) {
     Vue.set(this.state.tabs, id, {
       name,
       icon,
@@ -252,6 +268,6 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
         bar2: 240,
       },
     });
-    if (switchTab) this.state.currentTab = id;
+    this.state.currentTab = id;
   }
 }

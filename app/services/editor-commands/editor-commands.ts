@@ -9,6 +9,8 @@ import { ENudgeDirection } from './commands/nudge-items';
 import { SceneCollectionsService } from 'services/scene-collections';
 import electron from 'electron';
 import Utils from 'services/utils';
+import { BehaviorSubject } from 'rxjs';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 const COMMANDS = { ...commands };
 
@@ -30,6 +32,7 @@ interface IEditorCommandsServiceState {
 export class EditorCommandsService extends StatefulService<IEditorCommandsServiceState> {
   @Inject() private selectionService: SelectionService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
 
   static initialState: IEditorCommandsServiceState = {
     undoMetadata: [],
@@ -41,6 +44,11 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
   // this service's vuex state.
   undoHistory: Command[] = [];
   redoHistory: Command[] = [];
+
+  undoHistorySize = new BehaviorSubject<{ undoLength: number; redoLength: number }>({
+    undoLength: 0,
+    redoLength: 0,
+  });
 
   combineActive = false;
 
@@ -70,6 +78,7 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
     // Executing any command clears out the redo history, since we are
     // creating a new branch in the timeline.
     this.redoHistory = [];
+    this.updateUndoHistoryLength();
     this.CLEAR_REDO_METADATA();
 
     const instance: Command = new (COMMANDS[commandType] as any)(...commandArgs);
@@ -98,10 +107,12 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
     }
 
     this.undoHistory.push(instance);
+    this.updateUndoHistoryLength();
     this.PUSH_UNDO_METADATA({ description: instance.description });
 
     if (this.undoHistory.length > MAX_HISTORY_SIZE) {
       this.undoHistory.shift();
+      this.updateUndoHistoryLength();
       this.SHIFT_UNDO_METADATA();
     }
 
@@ -112,7 +123,10 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
   undo() {
     if (this.state.operationInProgress) return;
 
+    this.usageStatisticsService.recordFeatureUsage('Undo');
+
     const command = this.undoHistory.pop();
+    this.updateUndoHistoryLength();
     this.POP_UNDO_METADATA();
 
     if (command) {
@@ -136,6 +150,7 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
       }
 
       this.redoHistory.push(command);
+      this.updateUndoHistoryLength();
       this.PUSH_REDO_METADATA({ description: command.description });
     }
   }
@@ -145,6 +160,7 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
     if (this.state.operationInProgress) return;
 
     const command = this.redoHistory.pop();
+    this.updateUndoHistoryLength();
     this.POP_REDO_METADATA();
 
     if (command) {
@@ -168,6 +184,7 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
       }
 
       this.undoHistory.push(command);
+      this.updateUndoHistoryLength();
       this.PUSH_UNDO_METADATA({ description: command.description });
     }
   }
@@ -188,6 +205,7 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
   private clear() {
     this.undoHistory = [];
     this.redoHistory = [];
+    this.updateUndoHistoryLength();
     this.CLEAR_UNDO_METADATA();
     this.CLEAR_REDO_METADATA();
   }
@@ -215,7 +233,7 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
   }
 
   @shortcut('ArrowRight')
-  nudgeActiveItemRight() {
+  nudgeActiveItemsRight() {
     this.nudgeActiveItems(ENudgeDirection.Right);
   }
 
@@ -236,6 +254,13 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
     if (selection.isAnyLocked()) return;
 
     this.executeCommand('NudgeItemsCommand', selection, direction);
+  }
+
+  private updateUndoHistoryLength() {
+    this.undoHistorySize.next({
+      undoLength: this.undoHistory.length,
+      redoLength: this.redoHistory.length,
+    });
   }
 
   @mutation()

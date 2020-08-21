@@ -34,7 +34,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
   browser_source: {
     name: $t('Browser Source'),
     description: $t(
-      'Allows you to add web-based content as a source, such as web pages and Flash SWFs.',
+      'Allows you to add web-based content as a source, such as web pages, widgets, and streaming video.',
     ),
     demoFilename: 'browser-source.png',
     supportList: [$t('Websites'), $t('Third party widgets'), 'HTML'],
@@ -77,7 +77,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
   },
   dshow_input: {
     name: $t('Video Capture Device'),
-    description: $t('Select from your build in USB webcam or an external.'),
+    description: $t('Display video from webcams, capture cards, and other devices.'),
     demoFilename: 'video-capture.png',
     supportList: [
       $t('Built in webcam'),
@@ -142,5 +142,47 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
   vlc_source: {
     name: $t('VLC Source'),
     description: $t('Add playlists of videos to your scene.'),
+  },
+  coreaudio_input_capture: {
+    name: $t('Audio Input Capture'),
+    description: $t(
+      'Any device that attaches to a computer for the purpose of capturing sound, such as music or speech.',
+    ),
+    demoFilename: 'audio-input.png',
+    supportList: [$t('Built in microphones'), $t('USB microphones'), $t('Other USB devices')],
+  },
+  coreaudio_output_capture: {
+    name: $t('Audio Output Capture'),
+    description: $t(
+      'Captures your desktop audio for the purpose of playing sound, such as music or speech.',
+    ),
+    demoFilename: 'audio-output.png',
+    supportList: [$t('Desktop audio')],
+  },
+  av_capture_input: {
+    name: $t('Video Capture Device'),
+    description: $t('Display video from webcams, capture cards, and other devices.'),
+    demoFilename: 'video-capture.png',
+    supportList: [
+      $t('Built in webcam'),
+      $t('Logitech webcam'),
+      $t('Capture cards (Elgato, Avermedia, BlackMagic)'),
+    ],
+  },
+  display_capture: {
+    name: $t('Display Capture'),
+    description: $t('Capture your entire computer monitor.'),
+    demoFilename: 'display-capture.png',
+    supportList: [$t('Primary monitor'), $t('Secondary monitor')],
+  },
+  'syphon-input': {
+    name: $t('Game Capture'),
+    description: $t("Capture a game you're playing on your computer."),
+    demoFilename: 'game-capture.png',
+    supportList: [$t('Built in works with most modern computer games')],
+  },
+  audio_line: {
+    name: $t('JACK Input Client'),
+    description: $t(''),
   },
 });

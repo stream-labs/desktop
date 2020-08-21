@@ -27,6 +27,13 @@ export default class SideNav extends Vue {
     return Utils.isDevMode();
   }
 
+  get chatbotVisible() {
+    return (
+      this.userService.isLoggedIn &&
+      ['twitch', 'mixer', 'youtube'].includes(this.userService.platform.type)
+    );
+  }
+
   openSettingsWindow(categoryName?: string) {
     this.settingsService.showSettings(categoryName);
   }
@@ -72,12 +79,12 @@ export default class SideNav extends Vue {
   dashboardOpening = false;
 
   @throttle(2000, { trailing: false })
-  async openDashboard() {
+  async openDashboard(page?: string) {
     if (this.dashboardOpening) return;
     this.dashboardOpening = true;
 
     try {
-      const link = await this.magicLinkService.getDashboardMagicLink();
+      const link = await this.magicLinkService.getDashboardMagicLink(page);
       electron.remote.shell.openExternal(link);
     } catch (e) {
       console.error('Error generating dashboard magic link', e);
@@ -110,20 +117,37 @@ export default class SideNav extends Vue {
           <div
             class={cx(styles.cell, styles.primeCell)}
             onClick={() => this.upgradeToPrime()}
+            vTrackClick={{ component: 'NavTools', target: 'prime' }}
             title={$t('Get Prime')}
           >
             <i class="icon-prime" />
           </div>
         )}
         {this.userService.isLoggedIn && (
-          <div class={cx(styles.cell)} onClick={() => this.openDashboard()} title={$t('Dashboard')}>
+          <div
+            class={cx(styles.cell)}
+            onClick={() => this.openDashboard()}
+            title={$t('Dashboard')}
+            vTrackClick={{ component: 'NavTools', target: 'dashboard' }}
+          >
             <i class="icon-dashboard" />
+          </div>
+        )}
+        {this.userService.isLoggedIn && (
+          <div
+            class={cx(styles.cell)}
+            onClick={() => this.openDashboard('cloudbot')}
+            title={$t('Cloudbot')}
+            vTrackClick={{ component: 'NavTools', target: 'cloudbot' }}
+          >
+            <i class="icon-cloudbot" />
           </div>
         )}
         <div
           class={styles.cell}
           onClick={() => this.navigate('LayoutEditor')}
           title={$t('Layout Editor')}
+          vTrackClick={{ component: 'NavTools', target: 'layout-editor' }}
         >
           <i class="fas fa-th-large" />
         </div>
@@ -131,10 +155,16 @@ export default class SideNav extends Vue {
           class={cx(styles.cell, { [styles.toggleOn]: this.studioModeEnabled })}
           onClick={this.studioMode.bind(this)}
           title={$t('Studio Mode')}
+          vTrackClick={{ component: 'NavTools', target: 'studio-mode' }}
         >
           <i class="icon-studio-mode-3" />
         </div>
-        <div class={styles.cell} onClick={() => this.openHelp()} title={$t('Get Help')}>
+        <div
+          class={styles.cell}
+          onClick={() => this.openHelp()}
+          title={$t('Get Help')}
+          vTrackClick={{ component: 'NavTools', target: 'help' }}
+        >
           <i class="icon-question" />
         </div>
         <div
@@ -145,10 +175,19 @@ export default class SideNav extends Vue {
               ? $t('Logout %{username}', { username: this.userService.username })
               : $t('Login')
           }
+          vTrackClick={{
+            component: 'NavTools',
+            target: this.userService.isLoggedIn ? 'logout' : 'login',
+          }}
         >
           <i class={this.userService.isLoggedIn ? 'fas fa-sign-out-alt' : 'fas fa-sign-in-alt'} />
         </div>
-        <div class={styles.cell} onClick={() => this.openSettingsWindow()} title={$t('Settings')}>
+        <div
+          class={styles.cell}
+          onClick={() => this.openSettingsWindow()}
+          title={$t('Settings')}
+          vTrackClick={{ component: 'NavTools', target: 'settings' }}
+        >
           <i class="icon-settings" />
         </div>
       </div>

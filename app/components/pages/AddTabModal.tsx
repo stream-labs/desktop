@@ -9,7 +9,6 @@ import { Inject } from 'services/core/injector';
 import { LayoutService } from 'services/layout';
 import { $t } from 'services/i18n';
 import { UserService } from 'services/user';
-import { MagicLinkService } from 'services/magic-link';
 
 const ICONS = [
   { title: '', value: 'icon-studio', description: 'icon-studio' },
@@ -34,7 +33,6 @@ class AddTabModalProps {
 export default class AddTabModal extends TsxComponent<AddTabModalProps> {
   @Inject() private layoutService: LayoutService;
   @Inject() private userService: UserService;
-  @Inject() private magicLinkService: MagicLinkService;
 
   name = '';
   icon = '';
@@ -42,17 +40,6 @@ export default class AddTabModal extends TsxComponent<AddTabModalProps> {
   async createTab() {
     this.layoutService.addTab(this.name, this.icon);
     this.$emit('close');
-    if (!this.userService.isPrime) {
-      try {
-        const link = await this.magicLinkService.getDashboardMagicLink(
-          'prime',
-          'slobs-layout-editor',
-        );
-        electron.remote.shell.openExternal(link);
-      } catch (e) {
-        console.error('Error generating dashboard magic link', e);
-      }
-    }
   }
 
   cancel() {
@@ -61,12 +48,6 @@ export default class AddTabModal extends TsxComponent<AddTabModalProps> {
 
   get canSave() {
     return !!this.icon && !!this.name;
-  }
-
-  get buttonInfo() {
-    return this.userService.isPrime
-      ? { text: $t('Save New Tab'), class: 'button button--action' }
-      : { text: $t('Add New Tab With Prime'), class: 'button button--prime' };
   }
 
   render() {
@@ -88,11 +69,11 @@ export default class AddTabModal extends TsxComponent<AddTabModalProps> {
             {$t('Cancel')}
           </button>
           <button
-            class={this.buttonInfo.class}
+            class="button button--action"
             onClick={() => this.createTab()}
             disabled={!this.canSave}
           >
-            {this.buttonInfo.text}
+            {$t('Save New Tab')}
           </button>
         </div>
       </ModalLayout>

@@ -1,11 +1,31 @@
 import { ISettingsSubCategory, SettingsService } from 'services/settings';
 import { Inject } from 'services/core/injector';
-import { InitAfter, mutation, PersistentStatefulService } from '../../core';
+import { InitAfter, mutation, PersistentStatefulService, ViewHandler } from '../../core';
 import { UserService } from 'services/user';
 import { TPlatform, getPlatformService } from 'services/platforms';
-import { invert } from 'lodash';
+import { invert, pick } from 'lodash';
 import { MixerService, TwitchService } from '../../../app-services';
 import { PlatformAppsService } from 'services/platform-apps';
+import { IGoLiveSettings, IPlatformFlags } from '../../streaming';
+import Vue from 'vue';
+
+interface ISavedGoLiveSettings {
+  platforms: {
+    twitch: IPlatformFlags;
+    facebook: IPlatformFlags;
+    youtube: IPlatformFlags;
+    mixer: IPlatformFlags;
+  };
+  customDestinations?: ICustomStreamDestination[];
+  advancedMode: boolean;
+}
+
+export interface ICustomStreamDestination {
+  name: string;
+  url: string;
+  streamKey?: string;
+  enabled: boolean;
+}
 
 /**
  * settings that we keep in the localStorage
@@ -35,6 +55,8 @@ interface IStreamSettingsState {
    * show warning if no sources exists before going live
    */
   warnNoVideoSources: boolean;
+
+  goLiveSettings?: ISavedGoLiveSettings;
 }
 
 /**
@@ -78,6 +100,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     title: '',
     description: '',
     warnNoVideoSources: true,
+    goLiveSettings: undefined,
   };
 
   init() {
@@ -90,12 +113,24 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     });
   }
 
+  get views() {
+    return new StreamSettingsView(this.state);
+  }
+
   /**
    * setup all stream-settings via single object
    */
   setSettings(patch: Partial<IStreamSettings>) {
     // save settings to localStorage
-    Object.keys(this.state).forEach(prop => {
+    const localStorageSettings: (keyof IStreamSettingsState)[] = [
+      'protectedModeEnabled',
+      'protectedModeMigrationRequired',
+      'title',
+      'description',
+      'warnNoVideoSources',
+      'goLiveSettings',
+    ];
+    localStorageSettings.forEach(prop => {
       if (prop in patch) {
         this.SET_LOCAL_STORAGE_SETTINGS({ [prop]: patch[prop] } as Partial<IStreamSettingsState>);
       }
@@ -140,6 +175,22 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     this.settingsService.setSettings('Stream', streamFormData);
   }
 
+  setGoLiveSettings(settingsPatch: Partial<IGoLiveSettings>) {
+    // transform IGoLiveSettings to ISavedGoLiveSettings
+    const patch: Partial<ISavedGoLiveSettings> = settingsPatch;
+    if (settingsPatch.platforms) {
+      const pickedFields: (keyof IPlatformFlags)[] = ['enabled', 'useCustomFields'];
+      const platforms: Dictionary<IPlatformFlags> = {};
+      Object.keys(settingsPatch.platforms).map(
+        platform => (platforms[platform] = pick(settingsPatch.platforms![platform], pickedFields)),
+      );
+      patch.platforms = platforms as ISavedGoLiveSettings['platforms'];
+    }
+    this.setSettings({
+      goLiveSettings: { ...this.state.goLiveSettings, ...settingsPatch } as IGoLiveSettings,
+    });
+  }
+
   /**
    * obtain stream settings in a single object
    */
@@ -154,6 +205,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       description: this.state.description,
       warnNoVideoSources: this.state.warnNoVideoSources,
       protectedModeMigrationRequired: this.state.protectedModeMigrationRequired,
+      goLiveSettings: this.state.goLiveSettings,
       platform: invert(platformToServiceNameMap)[obsStreamSettings.service] as TPlatform,
       key: obsStreamSettings.key,
       server: obsStreamSettings.server,
@@ -211,6 +263,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       protectedModeMigrationRequired: false,
       key: '',
       streamType: 'rtmp_common',
+      goLiveSettings: undefined,
     });
   }
 
@@ -268,7 +321,9 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
   @mutation()
   private SET_LOCAL_STORAGE_SETTINGS(settings: Partial<IStreamSettingsState>) {
     Object.keys(settings).forEach(prop => {
-      this.state[prop] = settings[prop];
+      Vue.set(this.state, prop, settings[prop]);
     });
   }
 }
+
+class StreamSettingsView extends ViewHandler<IStreamSettingsState> {}

@@ -11,6 +11,7 @@ import { $t } from 'services/i18n';
 import { DefaultManager } from 'services/sources/properties-managers/default-manager';
 import { Subject } from 'rxjs';
 import { isUrl } from '../util/requests';
+import { UsageStatisticsService } from './usage-statistics';
 
 export const TRANSITION_DURATION_MAX = 2_000_000_000;
 
@@ -22,6 +23,7 @@ export enum ETransitionType {
   FadeToColor = 'fade_to_color_transition',
   LumaWipe = 'wipe_transition',
   Stinger = 'obs_stinger_transition',
+  Motion = 'motion_transition',
 }
 
 interface ITransitionsState {
@@ -63,6 +65,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   @Inject() windowsService: WindowsService;
   @Inject() scenesService: ScenesService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
+  @Inject() usageStatisticsService: UsageStatisticsService;
 
   studioModeChanged = new Subject<boolean>();
 
@@ -111,12 +114,14 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
       { title: $t('Fade to Color'), value: ETransitionType.FadeToColor },
       { title: $t('Luma Wipe'), value: ETransitionType.LumaWipe },
       { title: $t('Stinger'), value: ETransitionType.Stinger },
+      { title: $t('Motion'), value: ETransitionType.Motion },
     ];
   }
 
   enableStudioMode() {
     if (this.state.studioMode) return;
 
+    this.usageStatisticsService.recordFeatureUsage('StudioMode');
     this.SET_STUDIO_MODE(true);
     this.studioModeChanged.next(true);
 
@@ -223,6 +228,10 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     const obsScene = this.scenesService.views.getScene(sceneBId).getObsScene();
     const transition = this.getConnectedTransition(sceneAId, sceneBId);
     const obsTransition = this.obsTransitions[transition.id];
+
+    if (transition.type === ETransitionType.Motion) {
+      this.usageStatisticsService.recordFeatureUsage('MotionTransition');
+    }
 
     if (sceneAId) {
       obsTransition.set(this.scenesService.views.getScene(sceneAId).getObsScene());

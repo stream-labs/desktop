@@ -3,7 +3,7 @@ import avaTest, { ExecutionContext, TestInterface } from 'ava';
 import { Application } from 'spectron';
 import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
-import { getUser, releaseUserInPool } from './user';
+import { getUser, logOut, releaseUserInPool } from './user';
 import { sleep } from '../sleep';
 import { uniq } from 'lodash';
 import { installFetchMock } from './network';
@@ -323,7 +323,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     // wrap in try/catch for the situation when we have a crash
     // so we still can read the logs after the crash
     try {
-      await releaseUserInPool();
+      await logOut(t, true);
       if (options.restartAppAfterEachTest) {
         if (appIsRunning) {
           const client = await getClient();

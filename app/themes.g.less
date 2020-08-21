@@ -37,6 +37,12 @@
 @primelight-4: #C3C4C6;
 @primelight-5: #767676;
 
+@twitch: #9146FF;
+@facebook: #1778F2;
+@youtube: #D22222;
+@mixer: #0078D7;
+@twitter: #1DA1F2;
+
 // Variables for use
 :root {
   --white: #fff;
@@ -59,6 +65,7 @@
   --red: @red;
   --red-semi: @red-semi;
   --icon: @light-5;
+  --icon-active: @teal;
   --icon-semi: fade(@light-5, 15%);
   --prime: @goldenrod;
   --prime-semi: fade(@goldenrod, 15%);
@@ -91,6 +98,19 @@
   --new-badge-text: @purple;
   --modal-overlay: rgba(0, 0, 0, 0.3);
   --prime-hover: darken(@goldenrod, 8%);
+  --studio-tabs: @light-2;
+
+  // 3rd Party Colors
+  --twitch: @twitch;
+  --twitch-hover: lighten(@twitch, 4%);
+  --facebook: @facebook;
+  --facebook-hover: lighten(@facebook, 4%);
+  --youtube: @youtube;
+  --youtube-hover: lighten(@youtube, 4%);
+  --mixer: @mixer;
+  --mixer-hover: lighten(@mixer, 4%);
+  --twitter: @twitter;
+  --twitter-hover: lighten(@twitter, 4%);
 }
 
 .night-theme {
@@ -120,6 +140,7 @@
   --new-badge-text: @light-1;
   --modal-overlay: rgba(0, 0, 0, 0.5);
   --prime-hover: lighten(@goldenrod, 8%);
+  --studio-tabs: @dark-2;
 }
 
 .prime-dark {
@@ -155,6 +176,8 @@
   --accent: @goldenrod;
   --new: @goldenrod;
   --icon: @goldenrod;
+  --icon-active: @primelight-1;
+  --studio-tabs: @primedark-2;
 }
 
 .prime-light {
@@ -192,4 +215,6 @@
   --accent: @goldenrod-dark;
   --new: @goldenrod-dark;
   --icon: @goldenrod-dark;
+  --icon-active: @primedark-2;
+  --studio-tabs: @primelight-2;
 }

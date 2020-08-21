@@ -30,9 +30,10 @@ import { SourceDisplayData } from './sources-data';
 import { NavigationService } from 'services/navigation';
 import { PlatformAppsService } from 'services/platform-apps';
 import { HardwareService, DefaultHardwareService } from 'services/hardware';
-import { AudioService } from '../audio';
+import { AudioService, E_AUDIO_CHANNELS } from '../audio';
 import { ReplayManager } from './properties-managers/replay-manager';
 import { assertIsDefined } from 'util/properties-type-guards';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -54,6 +55,54 @@ interface IObsSourceCallbackInfo {
   flags: number;
 }
 
+/**
+ * These sources are valid on windows
+ */
+export const windowsSources: TSourceType[] = [
+  'image_source',
+  'color_source',
+  'browser_source',
+  'slideshow',
+  'ffmpeg_source',
+  'text_gdiplus',
+  'monitor_capture',
+  'window_capture',
+  'game_capture',
+  'dshow_input',
+  'wasapi_input_capture',
+  'wasapi_output_capture',
+  'decklink-input',
+  'scene',
+  'ndi_source',
+  'openvr_capture',
+  'liv_capture',
+  'ovrstream_dc_source',
+  'vlc_source',
+];
+
+/**
+ * These sources are valid on mac
+ */
+export const macSources: TSourceType[] = [
+  'image_source',
+  'color_source',
+  'browser_source',
+  'slideshow',
+  'ffmpeg_source',
+  'text_ft2_source',
+  'scene',
+  'coreaudio_input_capture',
+  'coreaudio_output_capture',
+  'av_capture_input',
+  'display_capture',
+  'audio_line',
+  'ndi_source',
+  'vlc_source',
+  'window_capture',
+  'syphon-input',
+  'decklink-input',
+];
+
 class SourcesViews extends ViewHandler<ISourcesState> {
   get sources(): Source[] {
     return Object.values(this.state.sources).map(
@@ -63,6 +112,14 @@ class SourcesViews extends ViewHandler<ISourcesState> {
 
   getSource(id: string): Source | null {
     return this.state.sources[id] || this.state.temporarySources[id] ? new Source(id) : null;
+  }
+
+  getSourceByChannel(channel: E_AUDIO_CHANNELS): Source | null {
+    const id = Object.values(this.state.sources).find(s => {
+      return s.channel === channel;
+    })?.sourceId;
+
+    return id != null ? this.getSource(id) : null;
   }
 
   getSources() {
@@ -96,6 +153,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
   @Inject() private hardwareService: HardwareService;
   @Inject() private audioService: AudioService;
   @Inject() private defaultHardwareService: DefaultHardwareService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
 
   get views() {
     return new SourcesViews(this.state);
@@ -129,6 +187,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
     name: string;
     type: TSourceType;
     configurable: boolean;
+    width: number;
+    height: number;
     channel?: number;
     isTemporary?: boolean;
     propertiesManagerType?: TPropertiesManager;
@@ -150,11 +210,10 @@ export class SourcesService extends StatefulService<ISourcesState> {
       configurable: addOptions.configurable,
 
       // Unscaled width and height
-      width: 0,
-      height: 0,
+      width: addOptions.width,
+      height: addOptions.height,
 
       muted: false,
-      resourceId: `Source${JSON.stringify([id])}`,
       channel: addOptions.channel,
     };
 
@@ -208,6 +267,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
       id,
       name,
       type,
+      width: obsInput.width,
+      height: obsInput.height,
       configurable: obsInput.configurable,
       channel: options.channel,
       isTemporary: options.isTemporary,
@@ -217,6 +278,14 @@ export class SourcesService extends StatefulService<ISourcesState> {
     const muted = obsInput.muted;
     this.UPDATE_SOURCE({ id, muted });
     this.updateSourceFlags(source.state, obsInput.outputFlags, true);
+
+    if (type === 'ndi_source') {
+      this.usageStatisticsService.recordFeatureUsage('NDI');
+    } else if (type === 'openvr_capture') {
+      this.usageStatisticsService.recordFeatureUsage('OpenVR');
+    } else if (type === 'vlc_source') {
+      this.usageStatisticsService.recordFeatureUsage('VLC');
+    }
 
     const managerKlass = PROPERTIES_MANAGER_TYPES[managerType];
     this.propertiesManagers[id] = {
@@ -391,6 +460,10 @@ export class SourcesService extends StatefulService<ISourcesState> {
       { description: 'LIV Client Capture', value: 'liv_capture' },
       { description: 'OvrStream', value: 'ovrstream_dc_source' },
       { description: 'VLC Source', value: 'vlc_source' },
+      { description: 'Audio Input Capture', value: 'coreaudio_input_capture' },
+      { description: 'Audio Output Capture', value: 'coreaudio_output_capture' },
+      { description: 'Video Capture Device', value: 'av_capture_input' },
+      { description: 'Display Capture', value: 'display_capture' },
     ];
 
     const availableWhitelistedType = whitelistedTypes.filter(type =>

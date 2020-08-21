@@ -67,7 +67,9 @@ export abstract class PropertiesManager implements IPropertyManager {
    * The blacklist is a list of OBS property names that
    * should not be displayed to the user.
    */
-  blacklist: string[] = [];
+  get blacklist(): string[] {
+    return [];
+  }
 
   /**
    * displayOrder will be used as a list of property

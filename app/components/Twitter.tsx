@@ -15,9 +15,7 @@ import styles from './Twitter.m.less';
 
 class TwitterProps {
   streamTitle: string = '';
-  midStreamMode: boolean = false;
-  updatingInfo: boolean = false;
-  value: string = '';
+  value?: string = '';
 }
 
 @Component({ props: createProps(TwitterProps) })
@@ -133,11 +131,7 @@ export class Twitter extends TsxComponent<TwitterProps> {
       <div class={styles.section}>
         <p class={styles.twitterShareText}>{$t('Share Your Stream')}</p>
         <p>{$t("Tweet to let your followers know you're going live")}</p>
-        <button
-          class="button button--default"
-          disabled={this.props.updatingInfo}
-          onClick={this.linkTwitter}
-        >
+        <button class="button button--default" onClick={this.linkTwitter}>
           {$t('Connect to Twitter')} <i class="fab fa-twitter" />
         </button>
       </div>
@@ -164,7 +158,6 @@ export class Twitter extends TsxComponent<TwitterProps> {
         <div class={styles.twitterButtons}>
           <button
             class={cx('button', 'button--default', styles.adjustButton)}
-            disabled={this.props.updatingInfo}
             onClick={this.unlinkTwitter}
           >
             {$t('Unlink Twitter')}
@@ -175,13 +168,11 @@ export class Twitter extends TsxComponent<TwitterProps> {
   }
 
   get twitter() {
-    if (!this.props.updatingInfo && !this.hasTwitter) return this.unlinkedView;
+    if (!this.hasTwitter) return this.unlinkedView;
     if (this.hasTwitter) return this.linkedView;
   }
 
   render() {
-    if (!this.props.midStreamMode) {
-      return <InputWrapper metadata={{}}>{this.twitter}</InputWrapper>;
-    }
+    return <InputWrapper metadata={{}}>{this.twitter}</InputWrapper>;
   }
 }

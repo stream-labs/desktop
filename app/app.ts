@@ -34,7 +34,9 @@ import uuid from 'uuid/v4';
 import Blank from 'components/windows/Blank.vue';
 import Main from 'components/windows/Main.vue';
 import CustomLoader from 'components/CustomLoader';
+import process from 'process';
 import { MetricsService } from 'services/metrics';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 const crashHandler = window['require']('crash-handler');
 
@@ -42,6 +44,12 @@ const { ipcRenderer, remote, app, contentTracing } = electron;
 const slobsVersion = Utils.env.SLOBS_VERSION;
 const isProduction = Utils.env.NODE_ENV === 'production';
 const isPreview = !!Utils.env.SLOBS_PREVIEW;
+
+// Used by Eddy for debugging on mac.
+if (!isProduction) {
+  const windowId = Utils.getWindowId();
+  process.title = `SLOBS Renderer ${windowId}`;
+}
 
 // This is the development DSN
 let sentryDsn = 'https://8f444a81edd446b69ce75421d5e91d4d@sentry.io/252950';
@@ -172,6 +180,27 @@ Vue.use(Toasted);
 Vue.use(VeeValidate); // form validations
 Vue.use(VModal);
 
+Vue.directive('trackClick', {
+  bind(el: HTMLElement, binding: { value?: { component: string; target: string } }) {
+    if (typeof binding.value.component !== 'string') {
+      throw new Error(
+        `vTrackClick requires "component" to be passed. Got: ${binding.value.component}`,
+      );
+    }
+
+    if (typeof binding.value.target !== 'string') {
+      throw new Error(`vTrackClick requires "target" to be passed. Got: ${binding.value.target}`);
+    }
+
+    el.addEventListener('click', () => {
+      getResource<UsageStatisticsService>('UsageStatisticsService').actions.recordClick(
+        binding.value.component,
+        binding.value.target,
+      );
+    });
+  },
+});
+
 // Disable chrome default drag/drop behavior
 document.addEventListener('dragover', event => event.preventDefault());
 document.addEventListener('dragenter', event => event.preventDefault());
@@ -251,7 +280,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const message = apiInitErrorResultToMessage(apiResult);
       showDialog(message);
 
-      crashHandler.unregisterProcess(appService.pid);
+      crashHandler.unregisterProcess(process.pid);
 
       obs.NodeObs.StopCrashHandler();
       obs.IPC.disconnect();

@@ -15,6 +15,7 @@ import Studio from '../pages/Studio';
 import Chatbot from '../pages/Chatbot.vue';
 import PlatformAppStore from '../pages/PlatformAppStore.vue';
 import BrowseOverlays from 'components/pages/BrowseOverlays.vue';
+import AlertboxLibrary from 'components/pages/AlertboxLibrary';
 import Onboarding from '../pages/Onboarding';
 import LayoutEditor from '../pages/LayoutEditor';
 import TitleBar from '../TitleBar';
@@ -31,7 +32,7 @@ import PatchNotes from '../pages/PatchNotes.vue';
 import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
 import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
-import FacebookMerge from 'components/pages/FacebookMerge';
+import PlatformMerge from 'components/pages/PlatformMerge';
 import { getPlatformService } from 'services/platforms';
 
 const loadedTheme = () => {
@@ -57,8 +58,9 @@ const loadedTheme = () => {
     PlatformAppMainPage,
     PlatformAppStore,
     ResizeBar,
-    FacebookMerge,
+    PlatformMerge,
     LayoutEditor,
+    AlertboxLibrary,
   },
 })
 export default class Main extends Vue {

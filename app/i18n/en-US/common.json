@@ -55,6 +55,7 @@
   "Cloudbot": "Cloudbot",
   "Merch": "Merch",
   "App Store": "App Store",
+  "Alertbox Library": "Alertbox Library",
   "New": "New",
   "Face Masks": "Face Masks",
   "Help": "Help",
@@ -117,5 +118,6 @@
   "Very High": "Very High",
   "Apps": "Apps",
   "Finish": "Finish",
-  "Get Prime": "Get Prime"
+  "Get Prime": "Get Prime",
+  "System error message:": "System error message:"
 }

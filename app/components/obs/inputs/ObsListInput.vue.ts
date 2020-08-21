@@ -37,7 +37,7 @@ class ObsListInput extends ObsInput<IObsListInput<TObsValue>> {
       loading: this.loading,
       disabled: this.value.enabled === false,
       placeholder: this.placeholder,
-      allowEmpty: this.allowEmpty,
+      allowEmpty: false,
       internalSearch: this.internalSearch,
       name: this.value.name,
       options: this.value.options.map(opt => ({ title: opt.description, value: opt.value })),

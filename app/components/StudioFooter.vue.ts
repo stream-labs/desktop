@@ -15,6 +15,7 @@ import { CustomizationService } from 'services/customization';
 import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
 import { SettingsService } from 'services/settings';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 @Component({
   components: {
@@ -31,6 +32,8 @@ export default class StudioFooterComponent extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() settingsService: SettingsService;
   @Inject() performanceService: PerformanceService;
+  @Inject() youtubeService: YoutubeService;
+  @Inject() usageStatisticsService: UsageStatisticsService;
 
   @Prop() locked: boolean;
 
@@ -92,9 +95,7 @@ export default class StudioFooterComponent extends Vue {
   }
 
   get canSchedule() {
-    return (
-      this.userService.platform && ['facebook', 'youtube'].includes(this.userService.platform.type)
-    );
+    return this.streamingService.views.supports('stream-schedule');
   }
 
   get youtubeEnabled() {
@@ -109,15 +110,14 @@ export default class StudioFooterComponent extends Vue {
   }
 
   openYoutubeEnable() {
-    electron.remote.shell.openExternal('https://youtube.com/live_dashboard_splash');
+    this.youtubeService.actions.openYoutubeEnable();
   }
 
   openScheduleStream() {
     this.windowsService.showWindow({
-      componentName: 'EditStreamInfo',
+      componentName: 'ScheduleStreamWindow',
       title: $t('Schedule Stream'),
-      queryParams: { isSchedule: true },
-      size: { width: 500, height: 670 },
+      size: { width: 800, height: 670 },
     });
   }
 
@@ -141,6 +141,7 @@ export default class StudioFooterComponent extends Vue {
       minWidth: 500,
       minHeight: 400,
     });
+    this.usageStatisticsService.recordFeatureUsage('PerformanceStatistics');
   }
 
   get replayBufferEnabled() {
