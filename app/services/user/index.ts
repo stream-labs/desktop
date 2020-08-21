@@ -108,6 +108,10 @@ class UserViews extends ViewHandler<IUserServiceState> {
   get isFacebookAuthed() {
     return this.isLoggedIn && this.platform.type === 'facebook';
   }
+
+  get auth() {
+    return this.state.auth;
+  }
 }
 
 export class UserService extends PersistentStatefulService<IUserServiceState> {
