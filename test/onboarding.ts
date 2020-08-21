@@ -21,7 +21,7 @@ test('Go through the onboarding and autoconfig', async t => {
   // Wait for the auth screen to appear
   await app.client.isExisting('button=Twitch');
 
-  await logIn(t, 'twitch', { prime: false }, false, true);
+  await logIn(t, 'twitch', null, false, true);
   await sleep(1000);
 
   if (await t.context.app.client.isExisting('span=Skip')) {
