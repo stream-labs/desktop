@@ -19,7 +19,6 @@ import BrowserView from 'components/shared/BrowserView';
 import { getPlatformService, TPlatform } from '../../../services/platforms';
 import cx from 'classnames';
 import ValidatedForm from '../../shared/inputs/ValidatedForm';
-import HFormGroup from '../../shared/inputs/HFormGroup.vue';
 import { formMetadata, metadata } from 'components/shared/inputs';
 import VFormGroup from '../../shared/inputs/VFormGroup.vue';
 import cloneDeep from 'lodash/cloneDeep';

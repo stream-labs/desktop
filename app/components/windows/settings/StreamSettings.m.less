@@ -1,12 +1,12 @@
 @import '../../../styles/index.less';
 
 .platform-logo { font-size: 40px; }
-.platform-button {
-  width: 100px;
-}
+
+.platform-button { width: 100px; }
 
 .prime {
   margin-right: 16px;
+  margin-left: 16px;
   font-style: italic;
   color: var(--prime-hover);
 }
@@ -17,6 +17,7 @@
   transition: all 275ms;
   margin-right: 16px;
   margin-top: 14px;
+
   &:hover {
     color: var(--title);
   }
@@ -41,10 +42,12 @@
   display: block;
   text-align: center;
   position: relative;
+
   &:hover {
     border-color: (var(--button));
     box-shadow: 0 0 50px rgba(255, 255, 255, 0.1) inset;
   }
+
   i {
     position: absolute;
     left: 19px;
