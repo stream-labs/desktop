@@ -52,7 +52,7 @@
     </div>
     <div v-else class="row">
       <div class="small-12 columns">
-        {{ $t('There are no existing sources of this type.') }}
+        {{ $t('sources.noSameTypeSources') }}
       </div>
     </div>
 
