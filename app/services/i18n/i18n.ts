@@ -150,6 +150,9 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
       locale = langDescription ? langDescription.locale : 'en-US';
     }
 
+    // Force en-US locale on CI machines
+    if (process.env.CI) locale = 'en-US';
+
     // if electron has unsupported locale, don't allow to use it
     const fallbackLocale = this.getFallbackLocale();
     if (!this.localeIsSupported(locale)) locale = fallbackLocale;
