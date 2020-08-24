@@ -176,6 +176,7 @@ export class AppService extends StatefulService<IAppState> {
 
   @track('app_close')
   private shutdownHandler() {
+    obs.NodeObs.StopCallbackWorkers();
     this.START_LOADING();
     this.loadingChanged.next(true);
     this.tcpServerService.stopListening();
