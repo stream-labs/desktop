@@ -5,7 +5,9 @@ import * as fs from 'fs-extra';
 import * as stream from 'stream';
 
 module.exports = async (basePath: string) => {
-  const cdnBase = `https://slobs-cdn.streamlabs.com/${process.env.SLOBS_VERSION}/bundles/`;
+  const cdnBase = `https://slobs-cdn.streamlabs.com/${process.env.SLOBS_VERSION}${
+    process.platform === 'darwin' ? '-mac' : ''
+  }/bundles/`;
   const localBase = `file://${basePath}/bundles/`;
   const bundlesBaseDirectory = path.join(electron.app.getPath('userData'), 'bundles');
   const bundleDirectory = path.join(bundlesBaseDirectory, process.env.SLOBS_VERSION!);
