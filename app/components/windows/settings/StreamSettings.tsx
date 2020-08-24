@@ -19,6 +19,7 @@ import BrowserView from 'components/shared/BrowserView';
 import { getPlatformService, TPlatform } from '../../../services/platforms';
 import cx from 'classnames';
 import ValidatedForm from '../../shared/inputs/ValidatedForm';
+import HFormGroup from '../../shared/inputs/HFormGroup.vue';
 import { formMetadata, metadata } from 'components/shared/inputs';
 import VFormGroup from '../../shared/inputs/VFormGroup.vue';
 import cloneDeep from 'lodash/cloneDeep';
@@ -284,11 +285,7 @@ export default class StreamSettings extends TsxComponent {
           <a class={styles.addDestinationBtn} onclick={() => this.addCustomDest()}>
             <i class="fa fa-plus" />
             {$t('Add Destination')}
-            {shouldShowPrimeLabel ? (
-              <b class={styles.prime}>prime</b>
-            ) : (
-              <div class={styles.prime} />
-            )}
+            {shouldShowPrimeLabel && <b class={styles.prime}>prime</b>}
           </a>
         )}
         {!canAddMoreDestinations && <p>{$t('Maximum custom destinations has been added')}</p>}
