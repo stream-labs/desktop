@@ -19,7 +19,6 @@ import BrowserView from 'components/shared/BrowserView';
 import { getPlatformService, TPlatform } from '../../../services/platforms';
 import cx from 'classnames';
 import ValidatedForm from '../../shared/inputs/ValidatedForm';
-import HFormGroup from '../../shared/inputs/HFormGroup.vue';
 import { formMetadata, metadata } from 'components/shared/inputs';
 import VFormGroup from '../../shared/inputs/VFormGroup.vue';
 import cloneDeep from 'lodash/cloneDeep';
@@ -105,6 +104,10 @@ export default class StreamSettings extends TsxComponent {
   }
 
   private addCustomDest() {
+    if (!this.userService.isPrime) {
+      this.userService.openPrimeUrl('slobs-multistream');
+      return;
+    }
     this.customDestModel = {
       name: this.suggestCustomDestName(),
       streamKey: '',
@@ -152,7 +155,6 @@ export default class StreamSettings extends TsxComponent {
 
   render() {
     const platforms = this.streamingView.allPlatforms;
-    const isPrime = this.userService.isPrime;
     return (
       <div>
         {/* account info */}
@@ -161,7 +163,7 @@ export default class StreamSettings extends TsxComponent {
             <h2>{$t('Stream Destinations')}</h2>
             {platforms.map(platform => this.renderPlatform(platform))}
 
-            {isPrime && <div>{this.renderCustomDestinations()}</div>}
+            {<div>{this.renderCustomDestinations()}</div>}
 
             {this.canEditSettings && (
               <div>
@@ -269,6 +271,8 @@ export default class StreamSettings extends TsxComponent {
   }
 
   private renderCustomDestinations() {
+    const isPrime = this.userService.isPrime;
+    const shouldShowPrimeLabel = !isPrime;
     const destinations = this.customDestinations;
     const isEditMode = this.editCustomDestMode !== false;
     const shouldShowAddForm = this.editCustomDestMode === true;
@@ -280,6 +284,11 @@ export default class StreamSettings extends TsxComponent {
           <a class={styles.addDestinationBtn} onclick={() => this.addCustomDest()}>
             <i class="fa fa-plus" />
             {$t('Add Destination')}
+            {shouldShowPrimeLabel ? (
+              <b class={styles.prime}>prime</b>
+            ) : (
+              <div class={styles.prime} />
+            )}
           </a>
         )}
         {!canAddMoreDestinations && <p>{$t('Maximum custom destinations has been added')}</p>}
