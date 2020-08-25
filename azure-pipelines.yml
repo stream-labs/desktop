@@ -1,5 +1,6 @@
 trigger:
 - staging
+- master
 
 variables:
   CI: true
