@@ -108,11 +108,11 @@ export default class LiveDock extends Vue {
 
   setCollapsed(livedockCollapsed: boolean) {
     this.canAnimate = true;
-    this.windowsService.updateStyleBlockers('main', true);
-    this.customizationService.setSettings({ livedockCollapsed });
+    this.windowsService.actions.updateStyleBlockers('main', true);
+    this.customizationService.actions.setSettings({ livedockCollapsed });
     setTimeout(() => {
       this.canAnimate = false;
-      this.windowsService.updateStyleBlockers('main', false);
+      this.windowsService.actions.updateStyleBlockers('main', false);
     }, 300);
   }
 

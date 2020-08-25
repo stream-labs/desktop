@@ -43,6 +43,7 @@ interface IUserServiceState {
   auth?: IUserAuth;
   authProcessState: EAuthProcessState;
   isPrime: boolean;
+  userId?: number;
 }
 
 interface ILinkedPlatform {
@@ -56,6 +57,7 @@ interface ILinkedPlatformsResponse {
   facebook_account?: ILinkedPlatform;
   youtube_account?: ILinkedPlatform;
   mixer_account?: ILinkedPlatform;
+  user_id: number;
 }
 
 export type LoginLifecycleOptions = {
@@ -106,6 +108,10 @@ class UserViews extends ViewHandler<IUserServiceState> {
   get isFacebookAuthed() {
     return this.isLoggedIn && this.platform.type === 'facebook';
   }
+
+  get auth() {
+    return this.state.auth;
+  }
 }
 
 export class UserService extends PersistentStatefulService<IUserServiceState> {
@@ -147,6 +153,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @mutation()
   SET_PRIME(isPrime: boolean) {
     this.state.isPrime = isPrime;
+  }
+
+  @mutation()
+  SET_USER_ID(userId: number) {
+    this.state.userId = userId;
   }
 
   @mutation()
@@ -289,6 +300,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   async updateLinkedPlatforms() {
     const linkedPlatforms = await this.fetchLinkedPlatforms();
+
+    if (linkedPlatforms.user_id) this.SET_USER_ID(linkedPlatforms.user_id);
 
     // TODO: Could metaprogram this a bit more
     if (linkedPlatforms.facebook_account) {
@@ -522,6 +535,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     if (type && id) {
       url += `#/?type=${type}&id=${id}`;
+    }
+
+    return url;
+  }
+
+  get alertboxLibraryUrl() {
+    const uiTheme = this.customizationService.isDarkTheme ? 'night' : 'day';
+    let url = `https://${this.hostsService.streamlabs}/alertbox-library?mode=${uiTheme}&slobs`;
+
+    if (this.isLoggedIn) {
+      url += `&oauth_token=${this.apiToken}`;
     }
 
     return url;

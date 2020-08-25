@@ -18,7 +18,7 @@ import { RestreamService } from 'services/restream';
 import { GuestApiHandler } from 'util/guest-api-handler';
 
 @Component({ components: { BrowserView } })
-export default class BrowseOverlays extends Vue {
+export default class AlertboxLibrary extends Vue {
   @Inject() userService: UserService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() navigationService: NavigationService;
@@ -30,20 +30,10 @@ export default class BrowseOverlays extends Vue {
   @Inject() private jsonrpcService: JsonrpcService;
   @Inject() private restreamService: RestreamService;
 
-  @Prop() params: {
-    type?: 'overlay' | 'widget-theme';
-    id?: string;
-  };
-
   onBrowserViewReady(view: Electron.BrowserView) {
     view.webContents.on('did-finish-load', () => {
       new GuestApiHandler().exposeApi(view.webContents.id, {
-        installOverlay: this.installOverlay,
         installWidgets: this.installWidgets,
-        eligibleToRestream: () => {
-          // assume all users are eligible
-          return Promise.resolve(true);
-        },
       });
     });
 
@@ -56,42 +46,6 @@ export default class BrowseOverlays extends Vue {
         electron.remote.shell.openExternal(url);
       }
     });
-  }
-
-  async installOverlay(
-    url: string,
-    name: string,
-    progressCallback?: (progress: IDownloadProgress) => void,
-    mergePlatform = false,
-  ) {
-    const host = new urlLib.URL(url).hostname;
-    const trustedHosts = ['cdn.streamlabs.com'];
-
-    if (!trustedHosts.includes(host)) {
-      console.error(`Ignoring overlay install from untrusted host: ${host}`);
-      return;
-    }
-
-    // Handle exclusive theme that requires enabling multistream first
-    // User should be eligible to enable restream for this behavior to work.
-    // If restream is already set up, then just install as normal.
-    if (
-      mergePlatform &&
-      this.userService.state.auth?.platforms.facebook &&
-      this.restreamService.views.canEnableRestream &&
-      !this.restreamService.shouldGoLiveWithRestream
-    ) {
-      this.navigationService.navigate('PlatformMerge', {
-        platform: 'facebook',
-        overlayUrl: url,
-        overlayName: name,
-      });
-    } else {
-      const sub = this.sceneCollectionsService.downloadProgress.subscribe(progressCallback);
-      await this.sceneCollectionsService.installOverlay(url, name);
-      sub.unsubscribe();
-      this.navigationService.navigate('Studio');
-    }
   }
 
   async installWidgets(urls: string[], progressCallback?: (progress: IDownloadProgress) => void) {
@@ -114,7 +68,9 @@ export default class BrowseOverlays extends Vue {
       type: ENotificationType.SUCCESS,
       lifeTime: 8000,
       showTime: false,
-      message: $t('Widget Theme installed & activated. Click here to manage your Widget Profiles.'),
+      message: $t(
+        'Alertbox Theme installed & activated. Click here to manage your Widget Profiles.',
+      ),
       action: this.jsonrpcService.createRequest(
         Service.getResourceId(this.magicLinkService),
         'openWidgetThemesMagicLink',
@@ -122,7 +78,21 @@ export default class BrowseOverlays extends Vue {
     });
   }
 
-  get overlaysUrl() {
-    return this.userService.overlaysUrl(this.params.type, this.params.id);
+  get libraryUrl() {
+    return this.userService.alertboxLibraryUrl;
+  }
+
+  render() {
+    return (
+      <div>
+        <browser-view
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+          src={this.libraryUrl}
+          enableGuestApi={true}
+          setLocale={true}
+          onReady={this.onBrowserViewReady.bind(this)}
+        />
+      </div>
+    );
   }
 }

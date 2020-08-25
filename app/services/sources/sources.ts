@@ -33,6 +33,7 @@ import { HardwareService, DefaultHardwareService } from 'services/hardware';
 import { AudioService, E_AUDIO_CHANNELS } from '../audio';
 import { ReplayManager } from './properties-managers/replay-manager';
 import { assertIsDefined } from 'util/properties-type-guards';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -152,6 +153,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
   @Inject() private hardwareService: HardwareService;
   @Inject() private audioService: AudioService;
   @Inject() private defaultHardwareService: DefaultHardwareService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
 
   get views() {
     return new SourcesViews(this.state);
@@ -276,6 +278,14 @@ export class SourcesService extends StatefulService<ISourcesState> {
     const muted = obsInput.muted;
     this.UPDATE_SOURCE({ id, muted });
     this.updateSourceFlags(source.state, obsInput.outputFlags, true);
+
+    if (type === 'ndi_source') {
+      this.usageStatisticsService.recordFeatureUsage('NDI');
+    } else if (type === 'openvr_capture') {
+      this.usageStatisticsService.recordFeatureUsage('OpenVR');
+    } else if (type === 'vlc_source') {
+      this.usageStatisticsService.recordFeatureUsage('VLC');
+    }
 
     const managerKlass = PROPERTIES_MANAGER_TYPES[managerType];
     this.propertiesManagers[id] = {
