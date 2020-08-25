@@ -108,6 +108,10 @@ class UserViews extends ViewHandler<IUserServiceState> {
   get isFacebookAuthed() {
     return this.isLoggedIn && this.platform.type === 'facebook';
   }
+
+  get auth() {
+    return this.state.auth;
+  }
 }
 
 export class UserService extends PersistentStatefulService<IUserServiceState> {
@@ -531,6 +535,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     if (type && id) {
       url += `#/?type=${type}&id=${id}`;
+    }
+
+    return url;
+  }
+
+  get alertboxLibraryUrl() {
+    const uiTheme = this.customizationService.isDarkTheme ? 'night' : 'day';
+    let url = `https://${this.hostsService.streamlabs}/alertbox-library?mode=${uiTheme}&slobs`;
+
+    if (this.isLoggedIn) {
+      url += `&oauth_token=${this.apiToken}`;
     }
 
     return url;

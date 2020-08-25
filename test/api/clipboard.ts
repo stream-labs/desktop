@@ -220,6 +220,13 @@ test('Copy/paste duplicate sources', async t => {
       Item2: image_source
   `);
 
+  // add filter
+  sourceFiltersService.add(
+    (getNode('Item2') as SceneItem).sourceId,
+    'chroma_key_filter',
+    'MyFilter',
+  );
+
   selectionService.selectAll();
   clipboardService.copy();
   const sourcesCount = selectionService.getSources().length;
@@ -240,4 +247,8 @@ test('Copy/paste duplicate sources', async t => {
   // check that sources also have been duplicated
   selectionService.selectAll();
   t.is(selectionService.getSources().length, sourcesCount * 2);
+
+  // check duplicated filters
+  const lastItem = selectionService.getItems()[3].sourceId;
+  t.true(sourceFiltersService.getFilters(lastItem).length > 0, 'Filters should be pasted');
 });

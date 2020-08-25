@@ -15,6 +15,7 @@ import Studio from '../pages/Studio';
 import Chatbot from '../pages/Chatbot.vue';
 import PlatformAppStore from '../pages/PlatformAppStore.vue';
 import BrowseOverlays from 'components/pages/BrowseOverlays.vue';
+import AlertboxLibrary from 'components/pages/AlertboxLibrary';
 import Onboarding from '../pages/Onboarding';
 import LayoutEditor from '../pages/LayoutEditor';
 import TitleBar from '../TitleBar';
@@ -59,6 +60,7 @@ const loadedTheme = () => {
     ResizeBar,
     PlatformMerge,
     LayoutEditor,
+    AlertboxLibrary,
   },
 })
 export default class Main extends Vue {
