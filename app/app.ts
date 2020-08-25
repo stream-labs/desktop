@@ -118,17 +118,16 @@ if (window['_startupErrorHandler']) {
   delete window['_startupErrorHandler'];
 }
 
-if (
-  (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) &&
-  !electron.remote.process.env.SLOBS_IPC
-) {
+if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
+  const sampleRate = isPreview ? 1.0 : 0.1;
+  const isSampled = Math.random() < sampleRate;
+
   usingSentry = true;
 
   Sentry.init({
     dsn: sentryDsn,
     release: `${slobsVersion}-${SLOBS_BUNDLE_ID}`,
-    sampleRate: isPreview ? 1.0 : 0.1,
-    beforeSend: event => {
+    beforeSend: (event, hint) => {
       // Because our URLs are local files and not publicly
       // accessible URLs, we simply truncate and send only
       // the filename.  Unfortunately sentry's electron support
@@ -138,6 +137,10 @@ if (
         const splitArray = filename.split('/');
         return splitArray[splitArray.length - 1];
       };
+
+      if (hint.originalException) {
+        sendLogMsg('error', hint.originalException);
+      }
 
       if (event.exception && event.exception.values[0].stacktrace) {
         event.exception.values[0].stacktrace.frames.forEach(frame => {
@@ -149,7 +152,7 @@ if (
         event.request.url = normalize(event.request.url);
       }
 
-      return event;
+      return isSampled ? event : null;
     },
     integrations: [new Integrations.Vue({ Vue })],
   });
