@@ -41,6 +41,7 @@ export class ApplicationMenuService extends Service {
             label: 'Preferences…',
             accelerator: 'Command+,',
             click: () => {
+              if (this.appService.state.loading) return;
               this.settingsService.showSettings();
             },
           },
