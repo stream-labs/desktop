@@ -119,7 +119,7 @@ if (window['_startupErrorHandler']) {
 }
 
 if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
-  const sampleRate = isPreview ? 1.0 : 0.1;
+  const sampleRate = isPreview || process.env.SLOBS_REPORT_TO_SENTRY ? 1.0 : 0.1;
   const isSampled = Math.random() < sampleRate;
 
   usingSentry = true;
@@ -159,7 +159,7 @@ if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
 
   const oldConsoleError = console.error;
 
-  console.error = (msg: string, ...params: any[]) => {
+  console.error = (msg: unknown, ...params: any[]) => {
     oldConsoleError(msg, ...params);
 
     Sentry.withScope(scope => {
@@ -168,7 +168,17 @@ if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
       }
 
       scope.setExtra('console-args', JSON.stringify(params, null, 2));
-      Sentry.captureMessage(msg, Sentry.Severity.Error);
+
+      if (typeof msg === 'string') {
+        Sentry.captureMessage(msg, Sentry.Severity.Error);
+      } else if (msg instanceof Error) {
+        Sentry.captureException(msg);
+      } else {
+        Sentry.captureMessage(
+          'console.error was called with other type than string or Error',
+          Sentry.Severity.Error,
+        );
+      }
     });
   };
 }
