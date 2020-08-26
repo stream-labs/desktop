@@ -611,6 +611,10 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
         return broadcast.status.lifeCycleStatus === status;
       });
     } catch (e) {
+      if (e.message === 'Redundant transition') {
+        // handle Redundant transition as a success
+        return;
+      }
       throwStreamError(
         'YOUTUBE_PUBLISH_FAILED',
         `LiveBroadcast has not changed the status to ${status}: ${e.details || e.message}`,
