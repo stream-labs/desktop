@@ -7,6 +7,9 @@
             "name": "Launch",
             "protocol": "inspector",
             "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd",
+            "osx": {
+                "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+            },
             "runtimeArgs": [
                 "."
             ],
