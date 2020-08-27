@@ -18,14 +18,18 @@
   "Credit Subtitle": "Credit Subtitle",
   "When the credits roll, this will be the format of the subtitle. Available tokens: ": "When the credits roll, this will be the format of the subtitle. Available tokens: ",
   "Theme": "Thema",
-  "Background Color": "Background Color",
-  "Font": "Font",
-  "Font Size": "Font Size",
-  "Text Color": "Text Color",
+  "Background Color": "Achtergrondkleur",
+  "Font": "Lettertype",
+  "Font Size": "Lettertype Grootte",
+  "Text Color": "Tekstkleur",
   "Delay Time": "Delay Time",
   "Wait time before rerunning the credit reel.": "Wait time before rerunning the credit reel.",
   "Roll Speed": "Roll Speed",
   "Speed of the rolling credits.": "Speed of the rolling credits.",
   "Roll Time": "Roll Time",
-  "Duration of the rolling credits.": "Duration of the rolling credits."
+  "Duration of the rolling credits.": "Duration of the rolling credits.",
+  "Show Donations": "Show Donations",
+  "Show Subscriptions": "Show Subscriptions",
+  "Show Members": "Show Members",
+  "Show Super Chats": "Show Super Chats"
 }

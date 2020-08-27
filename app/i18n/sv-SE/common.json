@@ -107,7 +107,7 @@
   "Bottom": "Bottom",
   "Crop": "Crop",
   "Rotation": "Rotation",
-  "Reset": "Reset",
+  "Reset": "Återställ",
   "Retry": "Retry",
   "Warning": "Warning",
   "Off": "Off",
@@ -116,5 +116,7 @@
   "High": "High",
   "Very High": "Very High",
   "Apps": "Apps",
-  "Finish": "Finish"
+  "Finish": "Slutför",
+  "Get Prime": "Get Prime",
+  "System error message:": "System error message:"
 }

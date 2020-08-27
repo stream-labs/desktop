@@ -1,6 +1,6 @@
 {
   "You can access your Facebook Streamer Dashboard here.": "여기서 Facebook 스트리머 대시보드에 접속할 수 있습니다.",
-  "You need a Facebook page to stream to Facebook. You can create one now.": "Facebook에서 스트리밍하려면 Facebook 페이지가 필요합니다. 지금 만들 수 있습니다.",
+  "facebookNoPagesError": "You need a Facebook page to stream to Facebook. You can <create-link>create one now</create-link>.",
   "Create a Page": "페이지 만들기",
   "Facebook Setup": "Facebook 설정",
   "Streamer Dashboard": "스트리머 대시보드",
@@ -10,11 +10,11 @@
   "Step": "단계",
   "Create a Facebook Gaming page to get started.": "시작하려면 Facebook Gaming 페이지를 생성하세요.",
   "Create a Gaming Page": "게이밍 페이지 만들기",
-  "Connect Facebook to Streamlabs OBS.": "Facebook을 Streamlabs OBS에 연결합니다.",
   "All of your scenes, sources, and settings will be preserved.": "모든 장면, 소스, 설정이 유지됩니다.",
   "Connect Facebook": "Facebook 연결",
   "Multistream To Facebook": "Facebook에 멀티 스트리밍",
   "Connect": "연결",
   "Install Your Theme": "테마 설치",
-  "Install": "설치"
+  "Install": "설치",
+  "I already have a Gaming Page": "I already have a Gaming Page"
 }

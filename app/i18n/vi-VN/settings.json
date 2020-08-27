@@ -27,7 +27,7 @@
   "Confirm stream title and game before going live": "Confirm stream title and game before going live",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!",
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.",
-  "Stream Labels session has been succesfully restarted!": "Stream Labels session has been succesfully restarted!",
+  "Stream Labels session has been successfully restarted!": "Stream Labels session has been successfully restarted!",
   "This action will restart the application. Continue?": "This action will restart the application. Continue?",
   "Show confirmation dialog when starting streams": "Show confirmation dialog when starting streams",
   "Show confirmation dialog when stopping streams": "Show confirmation dialog when stopping streams",
@@ -117,5 +117,10 @@
   "Audio - Track 6": "Audio - Track 6",
   "Stream Key": "Stream Key",
   "You can not change these settings when you're live": "You can not change these settings when you're live",
-  "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.": "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk."
+  "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.": "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.",
+  "Change the look of Streamlabs OBS with Prime": "Change the look of Streamlabs OBS with Prime",
+  "Virtual Webcam": "Virtual Webcam",
+  "unlinked": "unlinked",
+  "Unlink": "Unlink",
+  "Logged in": "Logged in"
 }

@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import electron from 'electron';
+import electron, { ipcRenderer } from 'electron';
 import cx from 'classnames';
 import { CustomizationService } from 'services/customization';
 import { Inject } from 'services/core/injector';
@@ -22,6 +22,14 @@ export default class TitleBar extends TsxComponent<TitleBarProps> {
   @Inject() customizationService: CustomizationService;
   @Inject() streamingService: StreamingService;
   @Inject() windowsService: WindowsService;
+
+  created() {
+    if (Utils.isDevMode()) {
+      ipcRenderer.on('unhandledErrorState', () => {
+        this.errorState = true;
+      });
+    }
+  }
 
   minimize() {
     electron.remote.getCurrentWindow().minimize();
@@ -61,9 +69,16 @@ export default class TitleBar extends TsxComponent<TitleBarProps> {
     return /prime/.test(this.theme);
   }
 
+  errorState = false;
+
   render() {
     return (
-      <div class={cx(styles.titlebar, this.theme, { [styles['titlebar-mac']]: this.isMac })}>
+      <div
+        class={cx(styles.titlebar, this.theme, {
+          [styles['titlebar-mac']]: this.isMac,
+          [styles.titlebarError]: this.errorState,
+        })}
+      >
         {!this.primeTheme && !this.isMac && (
           <img class={styles.titlebarIcon} src={require('../../media/images/icon.ico')} />
         )}

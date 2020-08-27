@@ -1,5 +1,5 @@
 {
-  "YouTube stream status": "YouTube stream status",
+  "YouTube stream status": "État du stream YouTube",
   "Waiting for YouTube to receive the video signal...": "Attendre que YouTube reçoive le signal vidéo…",
   "Testing your broadcast...": "Test de votre diffusion…",
   "Finalizing broadcast testing...": "Finalisation du test de diffusion…",
@@ -9,9 +9,8 @@
   "Waiting for broadcast to be published...": "Attendre la publication de la diffusion…",
   "Working on your live stream": "Traitement de votre stream en direct",
   "Your stream will start shortly. You can close this window.": "Votre stream va commencer sous peu. Vous pouvez fermer cette fenêtre.",
-  "stream control page": "page de commande du stream",
-  " to publish it manually": " pour le publier manuellement",
-  "Go to YouTube Live Dashboard": "Go to YouTube Live Dashboard",
+  "youtubeStatusError": "Votre stream a été créé, mais nous ne pouvons pas le publier sur votre chaîne. Vérifiez votre connexion Internet ou rendez-vous sur la <dashboard-link>page de commande du stream</dashboard-link> pour le publier manuellement",
+  "Go to YouTube Live Dashboard": "Accédez au tableau de bord YouTube Live",
   "Create New Event": "Créer un nouvel événement",
   "YouTube Chat": "Chat YouTube",
   "This action cannot be performed inside Streamlabs OBS. To interact with chat, you can open this chat in a web browser.": "Cette action ne peut pas être effectuée dans Streamlabs OBS. Pour interagir avec le chat, vous pouvez l'ouvrir dans un navigateur Web.",
