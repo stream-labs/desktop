@@ -127,10 +127,10 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
         this.$refs.canvas.addEventListener('webglcontextlost', this.handleLostWebglContext);
       } catch (e) {
         console.error('Failed to initialize WebGL rendering, falling back to Canvas 2d', e);
+        this.gl = null;
         this.initCanvas2dRendering();
       }
     } else {
-      this.gl = null;
       this.initCanvas2dRendering();
     }
 
