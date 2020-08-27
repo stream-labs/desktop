@@ -130,6 +130,7 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
         this.initCanvas2dRendering();
       }
     } else {
+      this.gl = null;
       this.initCanvas2dRendering();
     }
 
