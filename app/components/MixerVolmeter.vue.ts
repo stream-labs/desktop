@@ -118,19 +118,29 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
     this.gl = this.$refs.canvas.getContext('webgl', { alpha: false });
 
     if (this.gl) {
-      this.initWebglRendering();
+      try {
+        this.initWebglRendering();
 
-      // Get ready to lose this conext if too many are created
-      if (window['activeWebglContexts'] == null) window['activeWebglContexts'] = 0;
-      window['activeWebglContexts'] += 1;
-      this.$refs.canvas.addEventListener('webglcontextlost', this.handleLostWebglContext);
+        // Get ready to lose this conext if too many are created
+        if (window['activeWebglContexts'] == null) window['activeWebglContexts'] = 0;
+        window['activeWebglContexts'] += 1;
+        this.$refs.canvas.addEventListener('webglcontextlost', this.handleLostWebglContext);
+      } catch (e) {
+        console.error('Failed to initialize WebGL rendering, falling back to Canvas 2d', e);
+        this.gl = null;
+        this.initCanvas2dRendering();
+      }
     } else {
-      // This machine does not support hardware acceleration, or it has been disabled
-      // Fall back to canvas 2d rendering instead.
-      this.ctx = this.$refs.canvas.getContext('2d', { alpha: false });
+      this.initCanvas2dRendering();
     }
 
     this.renderingInitialized = true;
+  }
+
+  initCanvas2dRendering() {
+    // This machine does not support hardware acceleration, or it has been disabled
+    // Fall back to canvas 2d rendering instead.
+    this.ctx = this.$refs.canvas.getContext('2d', { alpha: false });
   }
 
   private handleLostWebglContext() {

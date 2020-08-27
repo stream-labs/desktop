@@ -299,7 +299,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       return EPlatformCallResult.Success;
     } catch (resp) {
       if (resp.status !== 403) {
-        console.error(resp);
+        console.error('Got 403 checking if YT is enabled for live streaming', resp);
         return EPlatformCallResult.Error;
       }
       const json = resp.result;
