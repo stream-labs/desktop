@@ -347,7 +347,7 @@ test('Go live error', async t => {
 
 test('Youtube streaming is disabled', async t => {
   skipCheckingErrorsInLog();
-  await logIn(t, 'youtube', { streamingIsDisabled: true });
+  await logIn(t, 'youtube', { streamingIsDisabled: true, notStreamable: true });
   t.true(
     await t.context.app.client.isExisting('span=YouTube account not enabled for live streaming'),
     'The streaming-disabled message should be visible',
@@ -356,7 +356,7 @@ test('Youtube streaming is disabled', async t => {
 
 test('User does not have Facebook pages', async t => {
   skipCheckingErrorsInLog();
-  await logIn(t, 'facebook', { noFacebookPages: true });
+  await logIn(t, 'facebook', { noFacebookPages: true, notStreamable: true });
   await prepareToGoLive(t);
   await clickGoLive(t);
   if (await t.context.app.client.isExisting('button=Go Live')) await t.context.app.client.click('button=Go Live');
