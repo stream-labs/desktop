@@ -22,7 +22,6 @@ interface IUsageApiData {
 }
 
 type TAnalyticsEvent =
-  | 'FacebookLogin'
   | 'PlatformLogin'
   | 'SocialShare'
   | 'Heartbeat'
@@ -31,7 +30,8 @@ type TAnalyticsEvent =
   | 'RecordingStatus'
   | 'ReplayBufferStatus'
   | 'Click'
-  | 'Session';
+  | 'Session'
+  | 'Shown';
 
 interface IAnalyticsEvent {
   product: string;
@@ -186,6 +186,10 @@ export class UsageStatisticsService extends Service {
    */
   recordClick(component: string, target: string) {
     this.recordAnalyticsEvent('Click', { component, target });
+  }
+
+  recordShown(component: string) {
+    this.recordAnalyticsEvent('Shown', { component });
   }
 
   /**
