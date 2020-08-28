@@ -367,7 +367,7 @@ test('User does not have Facebook pages', async t => {
   );
 });
 
-test.skip('User has linked twitter', async t => {
+test('User has linked twitter', async t => {
   await logIn(t, 'twitch', { hasLinkedTwitter: true });
   await prepareToGoLive(t);
   await clickGoLive(t);
