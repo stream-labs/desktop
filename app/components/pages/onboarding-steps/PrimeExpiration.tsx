@@ -21,6 +21,7 @@ export default class PrimeExpiration extends TsxComponent<OnboardingStepProps> {
     try {
       const link = await this.magicLinkService.getDashboardMagicLink('prime', 'slobs_themes_resub');
       remote.shell.openExternal(link);
+      this.navigationService.navigate('Studio');
     } catch (e) {
       console.error('Error generating dashboard magic link', e);
     }
