@@ -188,6 +188,10 @@ export class UsageStatisticsService extends Service {
     this.recordAnalyticsEvent('Click', { component, target });
   }
 
+  recordShown(component: string) {
+    this.recordAnalyticsEvent('Shown', { component });
+  }
+
   /**
    * Should be called on shutdown to flush all events in the pipeline
    */

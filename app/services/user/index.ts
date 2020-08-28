@@ -394,7 +394,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       return;
     } else if (!this.state.expires) {
       this.SET_EXPIRES(response.expires_at);
-      this.usageStatisticsService.recordAnalyticsEvent('Shown', 'prime-resubscribe-modal');
+      this.usageStatisticsService.recordShown('prime-resubscribe-modal');
       this.onboardingService.start({ isPrimeExpiration: true });
     }
   }
