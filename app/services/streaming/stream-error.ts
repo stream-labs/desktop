@@ -36,6 +36,9 @@ const errorTypes = {
   PRIME_REQUIRED: {
     message: 'This feature is for Prime members only',
   },
+  MACHINE_LOCKED: {
+    message: 'Your computer is locked',
+  },
   UNKNOWN_ERROR: {
     // show this error if we caught a runtime error
     // we should threat this error as a bug in the codebase
