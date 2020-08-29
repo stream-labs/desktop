@@ -226,7 +226,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
 	
     if (
-    electron.remote.powerMonitor.getSystemIdleState(1000) == 'locked'
+    electron.remote.powerMonitor.getSystemIdleState(3) === 'locked'
     ) {
       console.log('Machine locked, did not start stream.');
       this.setError('MACHINE_LOCKED');
