@@ -8,6 +8,7 @@ import { $t } from 'services/i18n';
 import styles from './Onboarding.m.less';
 import commonStyles from './onboarding-steps/Common.m.less';
 import { MagicLinkService } from 'services/magic-link';
+import Scrollable from 'components/shared/Scrollable';
 
 export class OnboardingStepProps {
   continue: () => void = () => {};
@@ -122,11 +123,13 @@ export default class OnboardingPage extends TsxComponent<{}> {
       <div class={styles.onboardingContainer}>
         {this.topBar}
         <div class={styles.onboardingContent}>
-          <Component
-            class={styles.scroll}
-            continue={() => this.continue()}
-            setProcessing={(processing: boolean) => this.setProcessing(processing)}
-          />
+          <Scrollable className={styles.scroll}>
+            <Component
+              style="height: 100%;"
+              continue={() => this.continue()}
+              setProcessing={(processing: boolean) => this.setProcessing(processing)}
+            />
+          </Scrollable>
         </div>
         {(!this.currentStep.hideSkip || !this.currentStep.hideButton) && (
           <div class={styles.footer}>

@@ -24,8 +24,8 @@ import FormInput from 'components/shared/inputs/FormInput.vue';
 import StreamSettings from './StreamSettings';
 import VirtualWebcamSettings from './VirtualWebcamSettings';
 import { MagicLinkService } from 'services/magic-link';
-import electron from 'electron';
 import { UserService } from 'services/user';
+import Scrollable from 'components/shared/Scrollable';
 
 @Component({
   components: {
@@ -49,6 +49,7 @@ import { UserService } from 'services/user';
     FormInput,
     StreamSettings,
     VirtualWebcamSettings,
+    Scrollable,
   },
 })
 export default class Settings extends Vue {
