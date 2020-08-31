@@ -173,7 +173,7 @@ async function isInRolloutGroup(info: IUpdateInfo, latestVersion: ILatestVersion
     console.log('Update is restricted. Checking eligibility.');
 
     if (!(await isRestrictedRolloutEligible(info))) {
-      console.log('User is not eligible for restricted rollout. Update will not be applied.');
+      console.log('User is not eligible for restricted rollout.');
       return false;
     }
   }

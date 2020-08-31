@@ -152,6 +152,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   LOGOUT() {
     Vue.delete(this.state, 'auth');
     this.state.isPrime = false;
+    Vue.delete(this.state, 'userId');
   }
 
   @mutation()
@@ -308,9 +309,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    * fail. This is used by the updater.
    * @param userId The user id to write
    */
-  writeUserIdFile(userId: number) {
+  writeUserIdFile(userId?: number) {
     const filePath = path.join(this.appService.appDataDirectory, 'userId');
-    fs.writeFile(filePath, userId, err => {
+    fs.writeFile(filePath, userId ?? '', err => {
       if (err) {
         console.error('Error writing user id file', err);
       }
@@ -651,6 +652,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     session.clearStorageData({ storages: ['cookies'] });
     this.settingsService.setSettingValue('Stream', 'key', '');
 
+    this.writeUserIdFile();
     this.unsubscribeFromSocketConnection();
     this.LOGOUT();
     this.userLogout.next();
