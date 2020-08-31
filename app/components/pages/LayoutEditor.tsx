@@ -167,7 +167,7 @@ export default class LayoutEditor extends TsxComponent {
       <div class={styles.elementList}>
         <div class={styles.title}>{$t('Elements')}</div>
         <div class={styles.subtitle}>{$t('Drag and drop to edit.')}</div>
-        <Scrollable className={styles.elementContainer}>
+        <Scrollable className={styles.elementContainer} isFlexbox={true}>
           {Object.keys(ELayoutElement).map((element: ELayoutElement) => (
             <div
               draggable

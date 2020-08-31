@@ -4,6 +4,7 @@ import { Component } from 'vue-property-decorator';
 
 class ScrollableProps {
   className?: string = '';
+  isFlexbox?: boolean = false;
 }
 
 @Component({ props: createProps(ScrollableProps) })
@@ -14,6 +15,7 @@ export default class Scrollable extends TsxComponent<ScrollableProps> {
         options={{
           className: this.props.className,
           resize: 'both',
+          sizeAutoCapable: !this.props.isFlexbox,
           scrollbars: { clickScrolling: true },
         }}
       >
