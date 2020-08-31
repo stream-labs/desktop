@@ -31,6 +31,9 @@ import { lazyModule } from 'util/lazy-module';
 import { AuthModule } from './auth-module';
 import { WebsocketService, TSocketEvent } from 'services/websocket';
 import { MagicLinkService } from 'services/magic-link';
+import fs from 'fs';
+import path from 'path';
+import { AppService } from 'services/app';
 
 export enum EAuthProcessState {
   Idle = 'idle',
@@ -125,6 +128,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private websocketService: WebsocketService;
   @Inject() private magicLinkService: MagicLinkService;
+  @Inject() private appService: AppService;
 
   @mutation()
   LOGIN(auth: IUserAuth) {
@@ -298,10 +302,28 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
   }
 
+  /**
+   * Makes a best attempt to write a user id to disk. Does not
+   * guarantee it will succeed. Calling this function will never
+   * fail. This is used by the updater.
+   * @param userId The user id to write
+   */
+  writeUserIdFile(userId: number) {
+    const filePath = path.join(this.appService.appDataDirectory, 'userId');
+    fs.writeFile(filePath, userId, err => {
+      if (err) {
+        console.error('Error writing user id file', err);
+      }
+    });
+  }
+
   async updateLinkedPlatforms() {
     const linkedPlatforms = await this.fetchLinkedPlatforms();
 
-    if (linkedPlatforms.user_id) this.SET_USER_ID(linkedPlatforms.user_id);
+    if (linkedPlatforms.user_id) {
+      this.writeUserIdFile(linkedPlatforms.user_id);
+      this.SET_USER_ID(linkedPlatforms.user_id);
+    }
 
     // TODO: Could metaprogram this a bit more
     if (linkedPlatforms.facebook_account) {
