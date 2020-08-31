@@ -1,12 +1,13 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
+import Scrollable from './shared/Scrollable';
 
 export interface ITab {
   name: string;
   value: string;
 }
 
-@Component({})
+@Component({ components: { Scrollable } })
 export default class Tabs extends Vue {
   @Prop() tabs: ITab[];
   @Prop() value: string;
