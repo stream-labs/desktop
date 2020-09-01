@@ -41,20 +41,18 @@
             />
           </div>
           <div class="sidebar">
-            <scrollable
-              className="subsection"
+            <div
+              class="subsection"
               v-if="props.slots"
               v-for="slot in props.slots"
               :key="slot.value"
             >
               <h2 class="subsection__title">{{ slot.label }}</h2>
-              <scrollable className="subsection__content custom"
-                ><slot :name="slot.value"
-              /></scrollable>
-            </scrollable>
-            <scrollable className="subsection">
+              <div class="subsection__content custom"><slot :name="slot.value" /></div>
+            </div>
+            <div class="subsection">
               <h2 class="subsection__title">{{ $t('Sources and Settings') }}</h2>
-              <ul style="margin: 0;">
+              <scrollable style="margin: 0;" :isResizable="false">
                 <li
                   class="settings-title"
                   v-for="setting in navItems"
@@ -64,9 +62,9 @@
                 >
                   {{ setting.label }}
                 </li>
-              </ul>
-            </scrollable>
-            <scrollable className="subsection">
+              </scrollable>
+            </div>
+            <div class="subsection">
               <h2 class="subsection__title">{{ $t('Selected Properties') }}</h2>
               <scrollable className="subsection__content" v-if="currentSetting !== 'source'">
                 <slot :name="`${currentSetting}-properties`" v-if="!loadingFailed" />
@@ -77,10 +75,10 @@
                   </button>
                 </div>
               </scrollable>
-              <div class="subsection__content" v-if="currentSetting === 'source'">
+              <scrollable className="subsection__content" v-if="currentSetting === 'source'">
                 <generic-form :value="sourceProperties" @input="onPropsInputHandler" />
-              </div>
-            </scrollable>
+              </scrollable>
+            </div>
           </div>
 
           <div class="code-editor" v-if="loaded && customCodeIsEnabled && !loadingFailed">
@@ -357,9 +355,9 @@
 .subsection__content {
   .padding(2);
 
-  overflow: hidden;
   width: 100%;
   min-width: 260px;
+  height: 100%;
 
   @media (max-width: 1024px) {
     min-width: 0;
@@ -367,8 +365,8 @@
 }
 
 .subsection__content.custom {
-  overflow: visible;
   padding: 8px;
+  flex-grow: 1;
 }
 
 .source-property {

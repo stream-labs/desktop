@@ -371,7 +371,8 @@ select {
 }
 
 // Scrolls
-.os-scrollbar {
+.os-scrollbar,
+::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
@@ -388,14 +389,21 @@ select {
 
 .os-scrollbar.os-scrollbar-horizontal {
   width: 100%;
+
+  &:hover,
+  &:active {
+    height: 16px;
+  }
 }
 
-.os-scrollbar-track {
+.os-scrollbar-track,
+::-webkit-scrollbar-track {
   background: var(--section);
   border-radius: 0 3px 3px 0;
 }
 
-.os-scrollbar-handle {
+.os-scrollbar-handle,
+::-webkit-scrollbar-thumb {
   background-color: var(--solid-input);
   border: 2px solid var(--border);
   border-right: 1px solid var(--border);

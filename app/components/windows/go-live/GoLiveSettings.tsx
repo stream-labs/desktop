@@ -120,6 +120,7 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
                 [styles.settingsContainer]: true,
                 [styles.settingsContainerOnePlatform]: onlyOnePlatformIsLinked,
               })}
+              isFlexbox={true}
             >
               {/*PLATFORM SETTINGS*/}
               <PlatformSettings vModel={this.settings} />
