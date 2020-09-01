@@ -7,7 +7,7 @@ import { OnboardingStepProps } from '../Onboarding';
 import Translate from 'components/shared/translate';
 
 @Component({ props: createProps(OnboardingStepProps) })
-export default class ChooseYourAdventure extends TsxComponent<OnboardingStepProps> {
+export default class Prime extends TsxComponent<OnboardingStepProps> {
   get primeMetadata() {
     return [
       {

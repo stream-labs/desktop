@@ -47,6 +47,7 @@ interface ITestUserFeatures {
   prime?: boolean;
   /**
    * Streaming is not available for this account
+   * User pool does not return accounts with this flag unless you explicitly set this flag to true in the request
    */
   notStreamable?: boolean;
 }

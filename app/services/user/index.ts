@@ -34,6 +34,7 @@ import { MagicLinkService } from 'services/magic-link';
 import fs from 'fs';
 import path from 'path';
 import { AppService } from 'services/app';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 export enum EAuthProcessState {
   Idle = 'idle',
@@ -46,6 +47,7 @@ interface IUserServiceState {
   auth?: IUserAuth;
   authProcessState: EAuthProcessState;
   isPrime: boolean;
+  expires?: string;
   userId?: number;
 }
 
@@ -129,6 +131,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private websocketService: WebsocketService;
   @Inject() private magicLinkService: MagicLinkService;
   @Inject() private appService: AppService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
 
   @mutation()
   LOGIN(auth: IUserAuth) {
@@ -158,6 +161,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @mutation()
   SET_PRIME(isPrime: boolean) {
     this.state.isPrime = isPrime;
+  }
+
+  @mutation()
+  SET_EXPIRES(expires: string) {
+    this.state.expires = expires;
   }
 
   @mutation()
@@ -398,8 +406,20 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const request = new Request(url, { headers });
     return fetch(request)
       .then(handleResponse)
-      .then(response => this.SET_PRIME(response.is_prime))
+      .then(response => this.validatePrimeStatus(response))
       .catch(() => null);
+  }
+
+  validatePrimeStatus(response: { expires_soon: boolean; expires_at: string; is_prime: boolean }) {
+    this.SET_PRIME(response.is_prime);
+    if (!response.expires_soon) {
+      this.SET_EXPIRES(null);
+      return;
+    } else if (!this.state.expires) {
+      this.SET_EXPIRES(response.expires_at);
+      this.usageStatisticsService.recordShown('prime-resubscribe-modal');
+      this.onboardingService.start({ isPrimeExpiration: true });
+    }
   }
 
   /**

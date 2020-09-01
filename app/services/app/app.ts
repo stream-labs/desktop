@@ -181,7 +181,7 @@ export class AppService extends StatefulService<IAppState> {
     this.tcpServerService.stopListening();
 
     window.setTimeout(async () => {
-      obs.NodeObs.StopCrashHandler();
+      obs.NodeObs.InitShutdownSequence();
       this.crashReporterService.beginShutdown();
       this.shutdownStarted.next();
       this.keyListenerService.shutdown();

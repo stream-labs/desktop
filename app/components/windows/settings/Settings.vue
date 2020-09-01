@@ -39,55 +39,56 @@
         </NavItem>
       </NavMenu>
 
-      <searchable-pages
-        class="settings-container"
-        ref="settingsContainer"
-        :page="categoryName"
-        :pages="categoryNames"
-        :searchStr="searchStr"
-        :onBeforePageScan="onBeforePageScanHandler"
-        :onPageRender="onPageRenderHandler"
-        @searchCompleted="onSearchCompletedHandler"
-        @scanCompleted="settingsData = getSettingsData(categoryName)"
-        v-slot:default="{ page, scanning }"
-      >
-        <extra-settings v-if="page === 'General'" />
-        <language-settings v-if="page === 'General'" />
-        <hotkeys
-          v-if="page === 'Hotkeys'"
-          :globalSearchStr="scanning ? '' : searchStr"
-          :highlightSearch="highlightSearch"
-        />
-        <stream-settings v-if="page === 'Stream'" />
-        <developer-settings v-if="page === 'Developer'" />
-        <installed-apps v-if="page === 'Installed Apps'" />
-        <overlay-settings v-if="page === 'Scene Collections'" />
-        <notifications-settings v-if="page === 'Notifications'" />
-        <appearance-settings v-if="page === 'Appearance'" />
-        <experimental-settings v-if="page === 'Experimental'" />
-        <remote-control-settings v-if="page === 'Remote Control'" />
-        <game-overlay-settings v-if="page === 'Game Overlay'" />
-        <virtual-webcam-settings v-if="page === 'Virtual Webcam'" />
-        <facemask-settings v-if="page === 'Face Masks'" />
-        <GenericFormGroups
-          v-if="
-            ![
-              'Hotkeys',
-              'Stream',
-              'API',
-              'Overlays',
-              'Notifications',
-              'Appearance',
-              'Experimental',
-              'Remote Control',
-            ].includes(page)
-          "
-          :key="page"
-          :categoryName="page"
-          v-model="settingsData"
-          @input="save"
-        />
-      </searchable-pages>
+      <scrollable className="settings-container">
+        <searchable-pages
+          ref="settingsContainer"
+          :page="categoryName"
+          :pages="categoryNames"
+          :searchStr="searchStr"
+          :onBeforePageScan="onBeforePageScanHandler"
+          :onPageRender="onPageRenderHandler"
+          @searchCompleted="onSearchCompletedHandler"
+          @scanCompleted="settingsData = getSettingsData(categoryName)"
+          v-slot:default="{ page, scanning }"
+        >
+          <extra-settings v-if="page === 'General'" />
+          <language-settings v-if="page === 'General'" />
+          <hotkeys
+            v-if="page === 'Hotkeys'"
+            :globalSearchStr="scanning ? '' : searchStr"
+            :highlightSearch="highlightSearch"
+          />
+          <stream-settings v-if="page === 'Stream'" />
+          <developer-settings v-if="page === 'Developer'" />
+          <installed-apps v-if="page === 'Installed Apps'" />
+          <overlay-settings v-if="page === 'Scene Collections'" />
+          <notifications-settings v-if="page === 'Notifications'" />
+          <appearance-settings v-if="page === 'Appearance'" />
+          <experimental-settings v-if="page === 'Experimental'" />
+          <remote-control-settings v-if="page === 'Remote Control'" />
+          <game-overlay-settings v-if="page === 'Game Overlay'" />
+          <virtual-webcam-settings v-if="page === 'Virtual Webcam'" />
+          <facemask-settings v-if="page === 'Face Masks'" />
+          <GenericFormGroups
+            v-if="
+              ![
+                'Hotkeys',
+                'Stream',
+                'API',
+                'Overlays',
+                'Notifications',
+                'Appearance',
+                'Experimental',
+                'Remote Control',
+              ].includes(page)
+            "
+            :key="page"
+            :categoryName="page"
+            v-model="settingsData"
+            @input="save"
+          />
+        </searchable-pages>
+      </scrollable>
     </div>
   </modal-layout>
 </template>
@@ -137,7 +138,6 @@
   .padding-top(2);
 
   flex-grow: 1;
-  overflow: auto;
 }
 </style>
 
