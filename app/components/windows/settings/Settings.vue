@@ -111,6 +111,7 @@
   align-items: stretch;
   flex: 1;
   margin: -16px;
+  height: 100%;
 
   .search {
     .margin-left(2);
