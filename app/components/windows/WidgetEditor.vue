@@ -188,6 +188,8 @@
 
 .container {
   position: relative;
+  height: 100%;
+  width: 100%;
 }
 
 .window-container {
