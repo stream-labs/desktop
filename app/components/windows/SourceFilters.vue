@@ -68,6 +68,13 @@
   margin: -16px -16px -16px 0;
 }
 
+.modal--side-nav {
+  display: flex;
+  align-content: stretch;
+  align-items: stretch;
+  height: 100%;
+}
+
 .modal--side-nav > .sl-vue-tree-toggle {
   display: none;
 }
