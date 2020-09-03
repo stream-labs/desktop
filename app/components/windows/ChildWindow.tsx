@@ -93,7 +93,6 @@ export default class ChildWindow extends Vue {
     // that will do a bunch of synchronous IO.
     clearTimeout(this.refreshingTimeout);
     this.refreshingTimeout = window.setTimeout(async () => {
-      Utils.makeChildWindowVisible();
       this.components.push({
         ...options,
         isShown: true,
