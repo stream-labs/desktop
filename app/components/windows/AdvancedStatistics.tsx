@@ -140,7 +140,7 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
     return (
       <div class={styles.section}>
         <h2>Performance Notifications</h2>
-        <Scrollable class={styles.notificationContainer}>
+        <Scrollable className={styles.notificationContainer} isResizable={false}>
           {this.notifications.map(notification => (
             <div
               class={cx(styles.notification, styles.hasAction)}
