@@ -60,5 +60,6 @@
   "selectCroppingArea": "Drag the area to capture",
   "pressEscapeToCancel": "Press Esc to cancel",
   "desktopAudio": "Desktop Audio",
-  "micAux": "Mic/Aux"
+  "micAux": "Mic/Aux",
+  "noSameTypeSources": "There are no existing sources of this type."
 }
