@@ -224,17 +224,15 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       this.finishStartStreaming();
       return;
     }
-	
-    if (
-    electron.remote.powerMonitor.getSystemIdleState(3) === 'locked'
-    ) {
+
+    if (electron.remote.powerMonitor.getSystemIdleState(3) === 'locked') {
       console.log('Machine locked, did not start stream.');
       this.setError('MACHINE_LOCKED');
-	  this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
-	  return;
+      this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
+      return;
     }
-	
-	// clear the current stream info
+
+    // clear the current stream info
     this.RESET_STREAM_INFO();
 
     // if settings are not provided then GoLive window has been not shown

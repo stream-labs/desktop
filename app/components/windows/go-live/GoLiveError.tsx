@@ -240,7 +240,7 @@ export default class GoLiveError extends TsxComponent<{}> {
       </ErrorLayout>
     );
   }
-  
+
   private renderMachineLockedError(error: IStreamError) {
     return (
       <ErrorLayout error={error}>
