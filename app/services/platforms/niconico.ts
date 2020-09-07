@@ -59,6 +59,7 @@ class UserInfo {
   }
 }
 
+// TODO: LiveProgramInfo2 に移行して消す
 export type LiveProgramInfo = Dictionary<{
   title: string,
   description: string,
@@ -66,6 +67,18 @@ export type LiveProgramInfo = Dictionary<{
   url: string,
   key: string
 }>
+
+// TODO: 旧 LiveProgramInfo が消えたら 名前を LiveProgramInfo にする
+export type LiveProgramInfo2 = {
+  user: {
+    broadcastableProgramId: string;
+  },
+  channels: Dictionary<{
+    thumbnailUrl: string;
+    name: string;
+    broadcastableProgramIds: string[];
+  }>;
+};
 
 class GetPublishStatusResult {
   attrib: object;
@@ -100,7 +113,7 @@ class GetPublishStatusResult {
       this.user = new UserInfo(getpublishstatus['user'][0]);
 
       // convert items[].stream[].description to XML string
-      const xml = new Builder({rootName: 'root', headless: true});
+      const xml = new Builder({ rootName: 'root', headless: true });
       const removeRoot = (s: string): string => s.replace(/^<root>([\s\S]*)<\/root>$/, '$1');
       for (const p of this.items) {
         for (const s of p.stream) {
@@ -251,23 +264,43 @@ export class NiconicoService extends Service implements IPlatformService {
     const info = await this.fetchLiveProgramInfo(programId);
     console.log('fetchLiveProgramInfo: ' + JSON.stringify(info));
 
-    const num = Object.keys(info).length;
-    if (num > 1) {
+    // TODO: 自身のチャンネルを持ってる場合にのみ表示するように条件を変更する. 現状はチャンネルがない場合でも出てしまう.
+    if (programId === '') {
       // show dialog and select
       this.windowsService.showWindow({
         componentName: 'NicoliveProgramSelector',
-        queryParams: info,
+        // TODO: APIから取得した放送可能な番組を埋めて queryParams に渡す.
+        queryParams: {
+          user: {
+            broadcastableProgramId: 'lv10'
+          },
+          channels: {
+            'co1': {
+              thumbnailUrl: 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg',
+              name: 'テスト用コミュニティ1',
+              broadcastableProgramIds: ['lv1111111111', 'lv2222222222']
+            },
+            'co2': {
+              thumbnailUrl: 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg',
+              name: 'テスト用コミュニティ2',
+              broadcastableProgramIds: ['lv4444444444', 'lv5555555555']
+            }
+          }
+        },
+        // 仮のコードここまで ↑
         size: {
-          width: 700,
-          height: 400
+          width: 800,
+          height: 800
         }
       });
       return NiconicoService.emptyStreamingSetting(true); // ダイアログでたから無視してね
     }
+    /*
     if (num < 1) {
-      // 番組がない
+      // TODO: 配信可能番組がない場合について要検討
       throw new Error('no program');
     }
+    */
     const id = Object.keys(info)[0];
     const selected = info[id];
     const url = selected.url;
