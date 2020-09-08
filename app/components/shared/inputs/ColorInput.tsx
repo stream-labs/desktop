@@ -27,7 +27,7 @@ export default class ColorInput extends BaseInput<string, IColorMetadata> {
           this.emitInput(`#${data.hex}`);
         }
       },
-      () => {}, true, true
+      () => {}, true, true, false, 35
     );
   }
 
