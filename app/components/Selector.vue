@@ -1,28 +1,26 @@
 <template>
-  <div>
-    <scrollable className="selector-list" @contextmenu="handleContextMenu()" :isFlexbox="true">
-      <draggable
-        :list="normalizedItems"
-        :options="{ draggable: draggableSelector }"
-        @change="handleChange"
+  <scrollable className="selector-list" @contextmenu="handleContextMenu()" :isFlexbox="true">
+    <draggable
+      :list="normalizedItems"
+      :options="{ draggable: draggableSelector }"
+      @change="handleChange"
+    >
+      <li
+        v-for="(item, index) in normalizedItems"
+        :key="item.value"
+        class="selector-item"
+        :class="{ 'selector-item--active': activeItems.includes(item.value) }"
+        @contextmenu.stop="ev => handleContextMenu(ev, index)"
+        @click="ev => handleSelect(ev, index)"
+        @dblclick="ev => handleDoubleClick(ev, index)"
       >
-        <li
-          v-for="(item, index) in normalizedItems"
-          :key="item.value"
-          class="selector-item"
-          :class="{ 'selector-item--active': activeItems.includes(item.value) }"
-          @contextmenu.stop="ev => handleContextMenu(ev, index)"
-          @click="ev => handleSelect(ev, index)"
-          @dblclick="ev => handleDoubleClick(ev, index)"
-        >
-          <div class="selector-item-text">{{ item.name }}</div>
-          <div class="selector-actions">
-            <slot name="actions" :item="item" />
-          </div>
-        </li>
-      </draggable>
-    </scrollable>
-  </div>
+        <div class="selector-item-text">{{ item.name }}</div>
+        <div class="selector-actions">
+          <slot name="actions" :item="item" />
+        </div>
+      </li>
+    </draggable>
+  </scrollable>
 </template>
 
 <script lang="ts" src="./Selector.vue.ts"></script>

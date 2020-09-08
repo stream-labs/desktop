@@ -251,6 +251,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
     }
 
     this.centerChildWindow(options);
+    this.windows.child.show();
+    this.windows.child.restore();
   }
 
   centerChildWindow(options: Partial<IWindowOptions>) {
