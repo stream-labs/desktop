@@ -96,6 +96,7 @@ export class InternalApiClient {
     const isHelper = target['_isHelper'];
     const resourceId = isHelper ? target['_resourceId'] : serviceName;
     const isObservable = target[methodName] instanceof Observable;
+    const isDevMode = Utils.isDevMode();
 
     return (...args: any[]) => {
       // args may contain ServiceHelper objects
@@ -141,10 +142,13 @@ export class InternalApiClient {
         return;
       }
 
-      if (Utils.isDevMode()) {
+      let startMark: number;
+
+      if (isDevMode) {
         console.warn(
           `Calling synchronous service method from renderer process: ${resourceId}.${methodName} - Consider calling as an action instead`,
         );
+        startMark = performance.now();
       }
 
       const response: IJsonRpcResponse<any> = electron.ipcRenderer.sendSync(
@@ -156,6 +160,18 @@ export class InternalApiClient {
           ...args,
         ),
       );
+
+      if (isDevMode) {
+        const measure = performance.now() - startMark;
+
+        if (measure > 50) {
+          console.warn(
+            `Synchronous method ${resourceId}.${methodName} took ${measure.toFixed(
+              2,
+            )}ms to execute`,
+          );
+        }
+      }
 
       if (response.error) {
         throw new Error('IPC request failed: check the errors in the worker window');
