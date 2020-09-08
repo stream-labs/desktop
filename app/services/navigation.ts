@@ -4,7 +4,6 @@ import { Subject } from 'rxjs';
 type TAppPage =
   | 'Studio'
   | 'Onboarding'
-  | 'Questionaire'
   | 'PatchNotes';
 
 interface INavigationState {

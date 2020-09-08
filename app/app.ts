@@ -42,22 +42,37 @@ window['obs'] = window['require']('obs-studio-node');
   });
 }
 
+type SentryParams = {
+  organization: string
+  key: string
+  project: string
+}
+const sentryOrg = 'o170115';
+
+function getSentryDsn(p: SentryParams): string {
+  return `https://${p.key}@${p.organization}.ingest.sentry.io/${p.project}`;
+}
+
+function getSentryCrashReportUrl(p: SentryParams): string {
+  return `https://${p.organization}.ingest.sentry.io/api/${p.project}/minidump/?sentry_key=${p.key}`;
+}
+
 // This is the development DSN
-let sentryDsn = 'https://1cb5cdf6a93c466dad570861b8c82b61@sentry.io/1262580';
+let sentryParam: SentryParams = {
+  organization: sentryOrg, project: '1262580', key: '1cb5cdf6a93c466dad570861b8c82b61'
+};
 
 if (isProduction) {
   // This is the production DSN
-  sentryDsn = Utils.isUnstable()
-    ? 'https://7451aaa71b7640a69ee1d31d6fd9ef78@sentry.io/1546758'
-    : 'https://35a02d8ebec14fd3aadc9d95894fabcf@sentry.io/1246812';
+  sentryParam = Utils.isUnstable()
+    ? {organization: sentryOrg, project: '1546758', key: '7451aaa71b7640a69ee1d31d6fd9ef78'}
+    : {organization: sentryOrg, project: '1246812', key: '35a02d8ebec14fd3aadc9d95894fabcf'};
 
   electron.crashReporter.start({
     productName: 'n-air-app',
     companyName: 'n-air-app',
     submitURL:
-      'https://n-air-app.sp.backtrace.io:8443/post?' +
-      'format=minidump&' +
-      'token=66abc2eda8a8ead580b825dd034d9b4f9da4d54eeb312bf8ce713571e1b1d35f',
+      getSentryCrashReportUrl(sentryParam),
     extra: {
       version: nAirVersion,
       processType: 'renderer'
@@ -66,7 +81,7 @@ if (isProduction) {
 }
 
 if ((isProduction || process.env.NAIR_REPORT_TO_SENTRY) && !electron.remote.process.env.NAIR_IPC) {
-  Raven.config(sentryDsn, {
+  Raven.config(getSentryDsn(sentryParam), {
     release: nAirVersion,
     dataCallback: data => {
       // Because our URLs are local files and not publicly
