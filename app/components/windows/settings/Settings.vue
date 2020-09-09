@@ -1,5 +1,10 @@
 <template>
-  <modal-layout :show-cancel="false" :done-handler="done" class="modal-layout--w-side-menu">
+  <modal-layout
+    :show-cancel="false"
+    :done-handler="done"
+    class="modal-layout--w-side-menu"
+    :contentStyles="{ padding: '0' }"
+  >
     <div slot="content" class="settings">
       <NavMenu v-model="categoryName">
         <form-input
@@ -110,7 +115,6 @@
   align-content: stretch;
   align-items: stretch;
   flex: 1;
-  margin: -16px;
   height: 100%;
 
   .search {
