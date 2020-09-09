@@ -137,7 +137,7 @@
       <div class="sources" :class="{ 'sources--has-platform-apps': showAppSources }">
         <div class="source-group">
           <h3>{{ $t('Standard') }}</h3>
-          <scrollable className="source-list">
+          <scrollable className="source-list" :isFlexbox="true">
             <li
               v-for="source in availableSources"
               :key="source.id"
@@ -153,7 +153,7 @@
 
         <div class="source-group" v-if="loggedIn">
           <h3>{{ $t('Widgets') }}</h3>
-          <scrollable className="source-list">
+          <scrollable className="source-list" :isFlexbox="true">
             <div
               v-for="type in iterableWidgetTypes"
               :key="type"
@@ -190,7 +190,7 @@
 
         <div class="source-group" v-if="showAppSources">
           <h3>{{ $t('Apps') }}</h3>
-          <scrollable className="source-list">
+          <scrollable className="source-list" :isFlexbox="true">
             <li
               v-for="appSource in availableAppSources"
               :key="`${appSource.appId}-${appSource.source.id}`"

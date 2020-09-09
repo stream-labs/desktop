@@ -4,6 +4,7 @@
     <scrollable
       :className="containsTabs ? 'modal-layout-tab-content' : 'modal-layout-content'"
       :style="contentStyle"
+      :isFlexbox="true"
     >
       <slot name="content" v-if="!loading" />
       <div class="spinner-container" v-else>

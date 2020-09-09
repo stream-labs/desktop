@@ -1,5 +1,5 @@
 <template>
-  <scrollable className="selector-list" @contextmenu="handleContextMenu()">
+  <scrollable className="selector-list" @contextmenu="handleContextMenu()" :isFlexbox="true">
     <draggable
       :list="normalizedItems"
       :options="{ draggable: draggableSelector }"
