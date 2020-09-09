@@ -6,7 +6,6 @@ import { $t } from 'services/i18n';
 import { Menu } from 'util/menus/Menu';
 import { EditorCommandsService } from 'services/editor-commands';
 import BaseElement from './BaseElement';
-import Scrollable from 'components/shared/Scrollable';
 
 @Component({})
 export default class Mixer extends BaseElement {
@@ -55,11 +54,11 @@ export default class Mixer extends BaseElement {
             />
           </div>
         </div>
-        <Scrollable className="studio-controls-selector mixer-panel">
+        <div class="studio-controls-selector mixer-panel">
           {this.audioSources.map(audioSource => (
             <MixerItem audioSource={audioSource} key={audioSource.sourceId} />
           ))}
-        </Scrollable>
+        </div>
       </div>
     );
   }

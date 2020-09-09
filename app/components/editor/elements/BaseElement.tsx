@@ -2,7 +2,6 @@ import { Component, Watch } from 'vue-property-decorator';
 import TsxComponent from 'components/tsx-component';
 import { $t } from 'services/i18n';
 import styles from './BaseElement.m.less';
-import Scrollable from 'components/shared/Scrollable';
 
 @Component({})
 export default class BaseElement extends TsxComponent {
@@ -27,9 +26,9 @@ export default class BaseElement extends TsxComponent {
 
   get belowMinWarning() {
     return (
-      <Scrollable className={styles.container}>
+      <div class={styles.container}>
         <span class={styles.empty}>{$t('This element is too small to be displayed')}</span>
-      </Scrollable>
+      </div>
     );
   }
 

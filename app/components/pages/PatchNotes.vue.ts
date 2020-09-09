@@ -3,9 +3,8 @@ import { Component } from 'vue-property-decorator';
 import { PatchNotesService } from 'services/patch-notes';
 import { Inject } from 'services/core/injector';
 import { NavigationService } from 'services/navigation';
-import Scrollable from 'components/shared/Scrollable';
 
-@Component({ components: { Scrollable } })
+@Component({})
 export default class Dashboard extends Vue {
   @Inject() patchNotesService: PatchNotesService;
   @Inject() navigationService: NavigationService;

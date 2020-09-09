@@ -6,7 +6,6 @@ import { WindowsService } from '../../services/windows';
 import { MediaGalleryService, IMediaGalleryFile, IMediaGalleryInfo } from 'services/media-gallery';
 import { $t } from 'services/i18n';
 import ModalLayout from '../ModalLayout.vue';
-import Scrollable from 'components/shared/Scrollable';
 
 const getTypeMap = () => ({
   title: {
@@ -30,7 +29,7 @@ interface IToast {
 }
 
 @Component({
-  components: { ModalLayout, Scrollable },
+  components: { ModalLayout },
 })
 export default class MediaGallery extends Vue {
   @Inject() windowsService: WindowsService;

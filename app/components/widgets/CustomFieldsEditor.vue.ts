@@ -9,7 +9,6 @@ import { IInputMetadata, inputComponents, metadata } from 'components/shared/inp
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { debounce } from 'lodash-decorators';
 import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
-import Scrollable from 'components/shared/Scrollable';
 import electron from 'electron';
 
 const { ToggleInput } = inputComponents;
@@ -96,7 +95,6 @@ const DEFAULT_CUSTOM_FIELDS: Dictionary<ICustomField> = {
     CodeInput,
     ToggleInput,
     HFormGroup,
-    Scrollable,
   },
 })
 export default class CustomFieldsEditor extends Vue {

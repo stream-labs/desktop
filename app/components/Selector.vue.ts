@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import draggable from 'vuedraggable';
-import Scrollable from 'components/shared/Scrollable';
 
 interface ISelectorItem {
   name: string;
@@ -9,7 +8,7 @@ interface ISelectorItem {
 }
 
 @Component({
-  components: { draggable, Scrollable },
+  components: { draggable },
 })
 export default class Selector extends Vue {
   @Prop()

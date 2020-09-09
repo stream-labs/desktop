@@ -1,7 +1,13 @@
 import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { SourcesService } from 'services/sources';
-import { ScenesService, TSceneNode, ISceneItemFolder, ISceneItem } from 'services/scenes';
+import {
+  ScenesService,
+  ISceneItemNode,
+  TSceneNode,
+  ISceneItemFolder,
+  ISceneItem,
+} from 'services/scenes';
 import { SelectionService } from 'services/selection';
 import { EditMenu } from 'util/menus/EditMenu';
 import SlVueTree, { ISlTreeNode, ISlTreeNodeModel, ICursorPosition } from 'sl-vue-tree';
@@ -12,7 +18,6 @@ import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 import { CustomizationService } from 'services/customization';
 import { StreamingService } from 'services/streaming';
 import TsxComponent from 'components/tsx-component';
-import Scrollable from 'components/shared/Scrollable';
 
 const widgetIconMap = {
   [WidgetType.AlertBox]: 'fas fa-bell',
@@ -59,13 +64,14 @@ interface ISceneNodeData {
 }
 
 @Component({
-  components: { SlVueTree, Scrollable },
+  components: { SlVueTree },
 })
 export default class SourceSelector extends TsxComponent {
   @Inject() private scenesService: ScenesService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private selectionService: SelectionService;
   @Inject() private editorCommandsService: EditorCommandsService;
+  @Inject() private customizationService: CustomizationService;
   @Inject() private streamingService: StreamingService;
 
   sourcesTooltip = $t('The building blocks of your scene. Also contains widgets.');

@@ -74,7 +74,6 @@ declare module '*.frag';
 declare module 'mark.js';
 declare module 'vuejs-datepicker';
 declare module 'vuejs-datepicker/dist/locale';
-declare module 'overlayscrollbars-vue';
 
 // uncomment to allow TS to import components without type definitions
 // webpack still checks the module existence

@@ -56,20 +56,19 @@
         />
       </div>
     </div>
-    <scrollable className="vue-tree-container">
-      <sl-vue-tree
-        data-name="scene-selector"
-        :value="scenes"
-        ref="slVueTree"
-        @select="makeActive"
-        @input="handleSort"
-        @contextmenu.native="showContextMenu()"
-      >
-        <template slot="title" slot-scope="{ node }">
-          <div>{{ node.title }}</div>
-        </template>
-      </sl-vue-tree>
-    </scrollable>
+
+    <sl-vue-tree
+      data-name="scene-selector"
+      :value="scenes"
+      ref="slVueTree"
+      @select="makeActive"
+      @input="handleSort"
+      @contextmenu.native="showContextMenu()"
+    >
+      <template slot="title" slot-scope="{ node }">
+        <div>{{ node.title }}</div>
+      </template>
+    </sl-vue-tree>
 
     <help-tip :dismissable-key="helpTipDismissable" :position="{ top: '-8px', left: '102px' }">
       <div slot="title">

@@ -1,10 +1,9 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import Popper from 'vue-popperjs';
-import Scrollable from 'components/shared/Scrollable';
 
 @Component({
-  components: { Popper, Scrollable },
+  components: { Popper },
 })
 export default class DropdownMenu extends Vue {
   @Prop() title: string;

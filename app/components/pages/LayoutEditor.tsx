@@ -11,7 +11,6 @@ import { LayoutService, ELayoutElement, ELayout, LayoutSlot } from 'services/lay
 import { $t } from 'services/i18n';
 import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
-import Scrollable from 'components/shared/Scrollable';
 
 @Component({})
 export default class LayoutEditor extends TsxComponent {
@@ -167,7 +166,7 @@ export default class LayoutEditor extends TsxComponent {
       <div class={styles.elementList}>
         <div class={styles.title}>{$t('Elements')}</div>
         <div class={styles.subtitle}>{$t('Drag and drop to edit.')}</div>
-        <Scrollable className={styles.elementContainer}>
+        <div class={styles.elementContainer}>
           {Object.keys(ELayoutElement).map((element: ELayoutElement) => (
             <div
               draggable
@@ -178,7 +177,7 @@ export default class LayoutEditor extends TsxComponent {
               {this.layoutService.views.elementTitle(element)}
             </div>
           ))}
-        </Scrollable>
+        </div>
       </div>
     );
   }
@@ -189,7 +188,7 @@ export default class LayoutEditor extends TsxComponent {
         <div>
           <div class={styles.title}>{$t('Layouts')}</div>
           <div class={styles.subtitle} />
-          <Scrollable className={styles.layouts}>
+          <div class={styles.layouts}>
             {Object.keys(ELayout).map(layout => (
               <img
                 class={this.currentLayout === layout ? styles.active : ''}
@@ -197,7 +196,7 @@ export default class LayoutEditor extends TsxComponent {
                 src={this.layoutImage(ELayout[layout])}
               />
             ))}
-          </Scrollable>
+          </div>
         </div>
         {this.elementList}
       </div>

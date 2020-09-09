@@ -17,7 +17,6 @@ import {
   NotificationsService,
   INotification,
 } from 'services/notifications';
-import Scrollable from 'components/shared/Scrollable';
 
 @Component({})
 export default class AdvancedStatistics extends TsxComponent<{}> {
@@ -140,7 +139,7 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
     return (
       <div class={styles.section}>
         <h2>Performance Notifications</h2>
-        <Scrollable class={styles.notificationContainer}>
+        <div class={styles.notificationContainer}>
           {this.notifications.map(notification => (
             <div
               class={cx(styles.notification, styles.hasAction)}
@@ -158,7 +157,7 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
               <div class="message">{$t('You do not have any notifications')}</div>
             </div>
           )}
-        </Scrollable>
+        </div>
         <p class={styles.description}>
           {$t(
             'When Streamlabs OBS detects performance issues with your stream, such as dropped frames, lagged frames, or a stream disconnection, troubleshooting notifications will be sent to you here.',
