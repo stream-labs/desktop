@@ -10,7 +10,7 @@ import {
 } from './helpers/spectron/index';
 import { setFormInput } from './helpers/spectron/forms';
 import { fillForm, formIncludes, FormMonkey, selectTitle } from './helpers/form-monkey';
-import { logIn, logOut, reserveUserFromPool } from './helpers/spectron/user';
+import { logIn, logOut, releaseUserInPool, reserveUserFromPool } from './helpers/spectron/user';
 import { setTemporaryRecordingPath } from './helpers/spectron/output';
 const moment = require('moment');
 import { fetchMock, resetFetchMock } from './helpers/spectron/network';
@@ -347,7 +347,7 @@ test('Go live error', async t => {
 
 test('Youtube streaming is disabled', async t => {
   skipCheckingErrorsInLog();
-  await logIn(t, 'youtube', { streamingIsDisabled: true });
+  await logIn(t, 'youtube', { streamingIsDisabled: true, notStreamable: true });
   t.true(
     await t.context.app.client.isExisting('span=YouTube account not enabled for live streaming'),
     'The streaming-disabled message should be visible',
@@ -356,7 +356,7 @@ test('Youtube streaming is disabled', async t => {
 
 test('User does not have Facebook pages', async t => {
   skipCheckingErrorsInLog();
-  await logIn(t, 'facebook', { noFacebookPages: true });
+  await logIn(t, 'facebook', { noFacebookPages: true, notStreamable: true });
   await prepareToGoLive(t);
   await clickGoLive(t);
   if (await t.context.app.client.isExisting('button=Go Live')) await t.context.app.client.click('button=Go Live');
@@ -367,8 +367,8 @@ test('User does not have Facebook pages', async t => {
   );
 });
 
-test('User has linked twitter', async t => {
-  await logIn(t, 'twitch', { hasLinkedTwitter: true });
+test.skip('User has linked twitter', async t => {
+  await logIn(t, 'twitch', { hasLinkedTwitter: true, notStreamable: true });
   await prepareToGoLive(t);
   await clickGoLive(t);
 
@@ -428,5 +428,61 @@ test('Streaming to Dlive', async t => {
 test('Update channel settings before streaming', async t => {
   await logIn(t, 'twitch');
   await updateChannelSettings(t, { title: 'updated title' });
+  t.pass();
+});
+
+// TODO: enable Prime for testing accounts
+test.skip('Custom stream destinations', async t => {
+  const client = t.context.app.client;
+  await logIn(t, 'twitch');
+
+  // fetch a new stream key
+  const user = await reserveUserFromPool(t, 'twitch');
+
+  // add new destination
+  await showSettings(t, 'Stream');
+  await click(t, 'button=Add additional destination');
+  await fillForm(t, null, {
+    name: 'MyCustomDest',
+    url: 'rtmp://live.twitch.tv/app/',
+    streamKey: user.streamKey,
+  });
+  await click(t, 'Save');
+  await t.true(await client.isExisting('span=MyCustomDest'), 'New destination is created');
+
+  // update destinations
+  await click(t, 'fa-pen');
+  await fillForm(t, null, {
+    name: 'MyCustomDestUpdated',
+  });
+  await click(t, 'Save');
+  await t.true(await client.isExisting('span=MyCustomDestUpdated'), 'Destination is updated');
+
+  // add one more destination
+  await click(t, 'button=Add additional destination');
+  await fillForm(t, null, {
+    name: 'MyCustomDest',
+    url: 'rtmp://live.twitch.tv/app/',
+    streamKey: user.streamKey,
+  });
+  await click(t, 'Save');
+  await t.false(
+    await client.isExisting('button=Add additional destinationt'),
+    'Do not allow more than 2 custom dest',
+  );
+
+  // open the GoLiveWindow and check destinations
+  await clickGoLive(t);
+  await t.true(await client.isExisting('span=MyCustomDest'), 'Destination is available');
+  await click(t, 'span=MyCustomDest'); // switch the destination on
+  await client.waitForExist('span=Configure the Multistream service'); // the multistream should be started
+  await stopStream(t);
+  await releaseUserInPool(user);
+
+  // delete existing destinations
+  await showSettings(t, 'Stream');
+  await click(t, 'fa-trash');
+  await click(t, 'fa-trash');
+
   t.pass();
 });

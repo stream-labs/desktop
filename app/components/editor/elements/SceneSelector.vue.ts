@@ -18,9 +18,10 @@ import SlVueTree, { ISlTreeNode } from 'sl-vue-tree';
 import { ERenderingMode } from '../../../../obs-api';
 import TsxComponent from 'components/tsx-component';
 import { getOS } from 'util/operating-systems';
+import Scrollable from 'components/shared/Scrollable';
 
 @Component({
-  components: { DropdownMenu, HelpTip, SlVueTree },
+  components: { DropdownMenu, HelpTip, SlVueTree, Scrollable },
 })
 export default class SceneSelector extends TsxComponent {
   @Inject() scenesService: ScenesService;

@@ -8,11 +8,13 @@ import { SourcesService } from 'services/sources';
 import electron from 'electron';
 import Util from 'services/utils';
 import { Subscription } from 'rxjs';
+import Scrollable from 'components/shared/Scrollable';
 
 @Component({
   components: {
     ModalLayout,
     Display,
+    Scrollable,
   },
 })
 export default class Projector extends Vue {

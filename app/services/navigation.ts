@@ -10,7 +10,9 @@ export type TAppPage =
   | 'PlatformAppMainPage'
   | 'PlatformAppStore'
   | 'PlatformMerge'
-  | 'LayoutEditor';
+  | 'LayoutEditor'
+  | 'PrimeExpiration'
+  | 'AlertboxLibrary';
 
 interface INavigationState {
   currentPage: TAppPage;

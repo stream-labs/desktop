@@ -11,6 +11,7 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 
 import { $t } from 'services/i18n';
 import styles from './MedaShare.m.less';
+import Scrollable from 'components/shared/Scrollable';
 
 @Component({})
 export default class MediaShare extends WidgetSettings<IMediaShareData, MediaShareService> {
@@ -78,9 +79,9 @@ export default class MediaShare extends WidgetSettings<IMediaShareData, MediaSha
           slots={[{ value: 'banlist', label: $t('Banned Media') }]}
           navItems={this.navItems}
         >
-          <div slot="banlist" class={styles.banlist}>
+          <Scrollable slot="banlist" className={styles.banlist}>
             {this.banList}
-          </div>
+          </Scrollable>
           {this.form}
         </WidgetEditor>
       )

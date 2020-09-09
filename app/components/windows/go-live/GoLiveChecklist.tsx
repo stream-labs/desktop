@@ -30,6 +30,19 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
   @Inject() private youtubeService: YoutubeService;
   @Inject() private twitterService: TwitterService;
   @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
+  private delayEnabled = this.streamingService.delayEnabled;
+  private delaySecondsRemaining = 0;
+
+  created() {
+    if (!this.delayEnabled) return;
+    const updateDelaySecondsRemaining = () => {
+      this.delaySecondsRemaining = this.streamingService.delaySecondsRemaining;
+      setTimeout(() => {
+        updateDelaySecondsRemaining();
+      }, 1000);
+    };
+    updateDelaySecondsRemaining();
+  }
 
   private get view() {
     return this.streamingService.views;
@@ -106,15 +119,15 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
 
           {/* START TRANSMISSION */}
           {!isUpdateMode &&
-            this.renderCheck($t('Start video transmission'), checklist.startVideoTransmission)}
+            this.renderCheck($t('Start video transmission'), checklist.startVideoTransmission, {
+              renderStreamDelay: this.delayEnabled,
+            })}
 
           {/* PUBLISH YT BROADCAST */}
           {shouldPublishYT &&
-            this.renderCheck(
-              $t('Publish Youtube broadcast'),
-              checklist.publishYoutubeBroadcast,
-              true,
-            )}
+            this.renderCheck($t('Publish Youtube broadcast'), checklist.publishYoutubeBroadcast, {
+              renderYTPercentage: true,
+            })}
 
           {/* POST A TWEET */}
           {shouldPostTweet && this.renderCheck($t('Post a tweet'), checklist.postTweet)}
@@ -126,7 +139,15 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
     );
   }
 
-  private renderCheck(title: string, state: TGoLiveChecklistItemState, renderYTPercentage = false) {
+  private renderCheck(
+    title: string,
+    state: TGoLiveChecklistItemState,
+    modificators?: { renderYTPercentage?: boolean; renderStreamDelay?: boolean },
+  ) {
+    const renderYTPercentage = modificators?.renderYTPercentage;
+    const renderStreamDelay =
+      modificators?.renderStreamDelay &&
+      this.view.info.checklist.startVideoTransmission === 'pending';
     return (
       <li
         key={title}
@@ -136,8 +157,9 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
         }}
       >
         <CheckMark state={state} />
-        {title}
+        <span>{title}</span>
         {renderYTPercentage && this.renderYoutubePercentage()}
+        {renderStreamDelay && <span class={styles.pending}> {this.delaySecondsRemaining}s</span>}
       </li>
     );
   }

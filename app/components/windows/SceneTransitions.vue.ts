@@ -12,6 +12,7 @@ import ConnectionSettings from 'components/ConnectionSettings';
 import VModal from 'vue-js-modal';
 import { EditorCommandsService } from 'services/editor-commands';
 import electron from 'electron';
+import Scrollable from 'components/shared/Scrollable';
 
 Vue.use(VModal);
 
@@ -21,6 +22,7 @@ Vue.use(VModal);
     TransitionSettings,
     Tabs,
     ConnectionSettings,
+    Scrollable,
   },
 })
 export default class SceneTransitions extends Vue {
