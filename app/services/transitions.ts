@@ -1,4 +1,4 @@
-import { mutation, StatefulService } from 'services/core/stateful-service';
+import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-service';
 import * as obs from '../../obs-api';
 import { Inject } from 'services/core/injector';
 import { TObsValue, TObsFormData } from 'components/obs/inputs/ObsInput';
@@ -54,6 +54,40 @@ export interface ITransitionCreateOptions {
   duration?: number;
 }
 
+class TransitionsViews extends ViewHandler<ITransitionsState> {
+  getTypes(): IListOption<ETransitionType>[] {
+    return [
+      { title: $t('Cut'), value: ETransitionType.Cut },
+      { title: $t('Fade'), value: ETransitionType.Fade },
+      { title: $t('Swipe'), value: ETransitionType.Swipe },
+      { title: $t('Slide'), value: ETransitionType.Slide },
+      { title: $t('Fade to Color'), value: ETransitionType.FadeToColor },
+      { title: $t('Luma Wipe'), value: ETransitionType.LumaWipe },
+      { title: $t('Stinger'), value: ETransitionType.Stinger },
+      { title: $t('Motion'), value: ETransitionType.Motion },
+    ];
+  }
+
+  /**
+   * Returns true if this connection is redundant.  A redundant
+   * connection has the same from/to scene ids as a connection
+   * earlier in the order.
+   */
+  isConnectionRedundant(id: string) {
+    const connection = this.getConnection(id);
+
+    const match = this.state.connections.find(conn => {
+      return conn.fromSceneId === connection.fromSceneId && conn.toSceneId === connection.toSceneId;
+    });
+
+    return match.id !== connection.id;
+  }
+
+  getConnection(id: string) {
+    return this.state.connections.find(conn => conn.id === id);
+  }
+}
+
 export class TransitionsService extends StatefulService<ITransitionsState> {
   static initialState = {
     transitions: [],
@@ -66,6 +100,10 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   @Inject() scenesService: ScenesService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() usageStatisticsService: UsageStatisticsService;
+
+  get views() {
+    return new TransitionsViews(this.state);
+  }
 
   studioModeChanged = new Subject<boolean>();
 
@@ -103,19 +141,6 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     this.sceneCollectionsService.collectionWillSwitch.subscribe(() => {
       this.disableStudioMode();
     });
-  }
-
-  getTypes(): IListOption<ETransitionType>[] {
-    return [
-      { title: $t('Cut'), value: ETransitionType.Cut },
-      { title: $t('Fade'), value: ETransitionType.Fade },
-      { title: $t('Swipe'), value: ETransitionType.Swipe },
-      { title: $t('Slide'), value: ETransitionType.Slide },
-      { title: $t('Fade to Color'), value: ETransitionType.FadeToColor },
-      { title: $t('Luma Wipe'), value: ETransitionType.LumaWipe },
-      { title: $t('Stinger'), value: ETransitionType.Stinger },
-      { title: $t('Motion'), value: ETransitionType.Motion },
-    ];
   }
 
   enableStudioMode() {
@@ -397,7 +422,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
       fromSceneId: fromId,
       toSceneId: toId,
     });
-    return this.getConnection(id);
+    return this.views.getConnection(id);
   }
 
   updateConnection(id: string, patch: Partial<ITransitionConnection>) {
@@ -406,25 +431,6 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
 
   deleteConnection(id: string) {
     this.DELETE_CONNECTION(id);
-  }
-
-  /**
-   * Returns true if this connection is redundant.  A redundant
-   * connection has the same from/to scene ids as a connection
-   * earlier in the order.
-   */
-  isConnectionRedundant(id: string) {
-    const connection = this.getConnection(id);
-
-    const match = this.state.connections.find(conn => {
-      return conn.fromSceneId === connection.fromSceneId && conn.toSceneId === connection.toSceneId;
-    });
-
-    return match.id !== connection.id;
-  }
-
-  getConnection(id: string) {
-    return this.state.connections.find(conn => conn.id === id);
   }
 
   setDuration(id: string, duration: number) {
@@ -462,6 +468,19 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
           }),
         );
       });
+  }
+
+  /**
+   * Gets locked states for all transitions
+   */
+  getLockedStates() {
+    const states: Dictionary<boolean> = {};
+
+    this.state.transitions.forEach(transition => {
+      states[transition.id] = this.getPropertiesManagerSettings(transition.id).locked;
+    });
+
+    return states;
   }
 
   @mutation()

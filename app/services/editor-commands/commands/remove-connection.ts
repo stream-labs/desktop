@@ -17,7 +17,7 @@ export class RemoveConnectionCommand extends Command {
   }
 
   execute() {
-    const connection = this.transitionsService.getConnection(this.connectionId);
+    const connection = this.transitionsService.views.getConnection(this.connectionId);
 
     this.fromId = connection.fromSceneId;
     this.toId = connection.toSceneId;
