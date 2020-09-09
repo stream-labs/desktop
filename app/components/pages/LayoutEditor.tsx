@@ -186,7 +186,7 @@ export default class LayoutEditor extends TsxComponent {
   get sideBar() {
     return (
       <div class={styles.sideBar}>
-        <div>
+        <div class={styles.layoutList}>
           <div class={styles.title}>{$t('Layouts')}</div>
           <div class={styles.subtitle} />
           <Scrollable className={styles.layouts}>
