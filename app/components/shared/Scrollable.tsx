@@ -4,7 +4,6 @@ import { Component } from 'vue-property-decorator';
 
 class ScrollableProps {
   className?: string = '';
-  isFlexbox?: boolean = false;
   isResizable?: boolean = true;
   horizontal?: boolean = false;
 }
