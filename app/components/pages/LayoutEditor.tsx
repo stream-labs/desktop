@@ -189,7 +189,7 @@ export default class LayoutEditor extends TsxComponent {
         <div class={styles.layoutList}>
           <div class={styles.title}>{$t('Layouts')}</div>
           <div class={styles.subtitle} />
-          <Scrollable className={styles.layouts}>
+          <Scrollable className={styles.layouts} autoSizeCapable={true}>
             {Object.keys(ELayout).map(layout => (
               <img
                 class={this.currentLayout === layout ? styles.active : ''}
