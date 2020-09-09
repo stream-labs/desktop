@@ -16,7 +16,7 @@ export default class Scrollable extends TsxComponent<ScrollableProps> {
       <OverlayScrollbarsComponent
         options={{
           autoUpdate: true,
-          autoUpdateInterval: 1000,
+          autoUpdateInterval: 200,
           className: this.props.className,
           resize: this.props.isResizable ? 'both' : 'none',
           sizeAutoCapable: false,
