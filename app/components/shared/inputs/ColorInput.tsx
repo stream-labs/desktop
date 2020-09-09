@@ -28,10 +28,7 @@ export default class ColorInput extends BaseInput<string, IColorMetadata> {
         }
       },
       () => {},
-      true,
-      true,
-      false,
-      35
+      { onMouseMoveEnabled: true, showPreview: true, showText: false, previewSize: 35 },
     );
   }
 
