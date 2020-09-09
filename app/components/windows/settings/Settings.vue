@@ -39,7 +39,7 @@
         </NavItem>
       </NavMenu>
 
-      <scrollable className="settings-container" :isFlexbox="true">
+      <scrollable className="settings-container">
         <searchable-pages
           ref="settingsContainer"
           :page="categoryName"

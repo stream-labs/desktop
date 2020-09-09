@@ -41,18 +41,20 @@
             />
           </div>
           <div class="sidebar">
-            <div
-              class="subsection"
+            <scrollable
+              className="subsection"
               v-if="props.slots"
               v-for="slot in props.slots"
               :key="slot.value"
             >
               <h2 class="subsection__title">{{ slot.label }}</h2>
-              <div class="subsection__content custom"><slot :name="slot.value" /></div>
-            </div>
-            <div class="subsection">
+              <scrollable className="subsection__content custom"
+                ><slot :name="slot.value"
+              /></scrollable>
+            </scrollable>
+            <scrollable className="subsection">
               <h2 class="subsection__title">{{ $t('Sources and Settings') }}</h2>
-              <scrollable style="margin: 0;" :isResizable="false">
+              <ul style="margin: 0;">
                 <li
                   class="settings-title"
                   v-for="setting in navItems"
@@ -62,9 +64,9 @@
                 >
                   {{ setting.label }}
                 </li>
-              </scrollable>
-            </div>
-            <div class="subsection">
+              </ul>
+            </scrollable>
+            <scrollable className="subsection">
               <h2 class="subsection__title">{{ $t('Selected Properties') }}</h2>
               <scrollable className="subsection__content" v-if="currentSetting !== 'source'">
                 <slot :name="`${currentSetting}-properties`" v-if="!loadingFailed" />
@@ -75,10 +77,10 @@
                   </button>
                 </div>
               </scrollable>
-              <scrollable className="subsection__content" v-if="currentSetting === 'source'">
+              <div class="subsection__content" v-if="currentSetting === 'source'">
                 <generic-form :value="sourceProperties" @input="onPropsInputHandler" />
-              </scrollable>
-            </div>
+              </div>
+            </scrollable>
           </div>
 
           <div class="code-editor" v-if="loaded && customCodeIsEnabled && !loadingFailed">
@@ -355,9 +357,9 @@
 .subsection__content {
   .padding(2);
 
+  overflow: hidden;
   width: 100%;
   min-width: 260px;
-  height: 100%;
 
   @media (max-width: 1024px) {
     min-width: 0;
@@ -365,8 +367,8 @@
 }
 
 .subsection__content.custom {
+  overflow: visible;
   padding: 8px;
-  flex-grow: 1;
 }
 
 .source-property {

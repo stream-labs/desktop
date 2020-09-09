@@ -137,7 +137,7 @@
       <div class="sources" :class="{ 'sources--has-platform-apps': showAppSources }">
         <div class="source-group">
           <h3>{{ $t('Standard') }}</h3>
-          <scrollable className="source-list" :isFlexbox="true">
+          <ul class="source-list">
             <li
               v-for="source in availableSources"
               :key="source.id"
@@ -148,12 +148,12 @@
             >
               {{ $t(source.name) }}
             </li>
-          </scrollable>
+          </ul>
         </div>
 
         <div class="source-group" v-if="loggedIn">
           <h3>{{ $t('Widgets') }}</h3>
-          <scrollable className="source-list" :isFlexbox="true">
+          <div class="source-list">
             <div
               v-for="type in iterableWidgetTypes"
               :key="type"
@@ -185,12 +185,12 @@
             >
               <div>{{ $t('Instant Replay') }}</div>
             </div>
-          </scrollable>
+          </div>
         </div>
 
         <div class="source-group" v-if="showAppSources">
           <h3>{{ $t('Apps') }}</h3>
-          <scrollable className="source-list" :isFlexbox="true">
+          <scrollable className="source-list">
             <li
               v-for="appSource in availableAppSources"
               :key="`${appSource.appId}-${appSource.source.id}`"
@@ -298,9 +298,9 @@ h2 {
 
   cursor: pointer;
   padding: 4px 8px;
+  margin-top: 8px;
   background-color: var(--section);
-  width: 48%;
-  margin-right: 4px;
+  width: 49%;
   white-space: nowrap;
   text-overflow: ellipsis;
   max-width: 100%;
@@ -329,13 +329,8 @@ h2 {
 }
 
 .source--widget {
-  position: relative;
-  display: inline-block;
-
-  .label--essential {
-    position: absolute;
-    top: 6px;
-  }
+  display: flex;
+  align-items: center;
 }
 
 .source-info__media {

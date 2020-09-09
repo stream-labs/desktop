@@ -1,6 +1,6 @@
 <template>
   <div>
-    <scrollable className="selector-list" @contextmenu="handleContextMenu()" :isFlexbox="true">
+    <scrollable className="selector-list" @contextmenu="handleContextMenu()">
       <draggable
         :list="normalizedItems"
         :options="{ draggable: draggableSelector }"
@@ -47,7 +47,6 @@
 .selector-list {
   .radius();
 
-  height: 100%;
   list-style-type: none;
   margin: 0;
 }
