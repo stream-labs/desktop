@@ -52,7 +52,7 @@
             </div>
             <div class="subsection">
               <h2 class="subsection__title">{{ $t('Sources and Settings') }}</h2>
-              <scrollable style="margin: 0;" :isResizable="false">
+              <scrollable style="margin: 0;" :isResizable="false" :autoSizeCapable="true">
                 <li
                   class="settings-title"
                   v-for="setting in navItems"

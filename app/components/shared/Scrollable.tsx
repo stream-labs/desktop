@@ -4,9 +4,13 @@ import { Component } from 'vue-property-decorator';
 
 class ScrollableProps {
   className?: string = '';
-  isFlexbox?: boolean = false;
   isResizable?: boolean = true;
   horizontal?: boolean = false;
+  /**
+   * Has performance implications. Should only be used where
+   * absolutely necessary.
+   */
+  autoSizeCapable?: boolean = false;
 }
 
 @Component({ props: createProps(ScrollableProps) })
@@ -15,9 +19,11 @@ export default class Scrollable extends TsxComponent<ScrollableProps> {
     return (
       <OverlayScrollbarsComponent
         options={{
+          autoUpdate: true,
+          autoUpdateInterval: 200,
           className: this.props.className,
           resize: this.props.isResizable ? 'both' : 'none',
-          sizeAutoCapable: !this.props.isFlexbox,
+          sizeAutoCapable: this.props.autoSizeCapable,
           scrollbars: { clickScrolling: true },
           overflowBehavior: { x: this.props.horizontal ? 'scroll' : 'hidden' },
         }}
