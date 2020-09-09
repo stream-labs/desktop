@@ -8,7 +8,6 @@ import { Inject } from '../../services/core/injector';
 import { $t } from 'services/i18n/index';
 import { IInputMetadata } from 'components/shared/inputs';
 import { debounce } from 'lodash-decorators';
-import Scrollable from 'components/shared/Scrollable';
 
 interface ICodeEditorMetadata extends IInputMetadata {
   selectedId?: string;
@@ -19,7 +18,6 @@ interface ICodeEditorMetadata extends IInputMetadata {
   components: {
     CodeInput,
     BoolInput,
-    Scrollable,
   },
 })
 export default class CodeEditor extends Vue {

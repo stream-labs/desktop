@@ -5,17 +5,15 @@
     </div>
     <modal-layout v-else :content-styles="{ padding: 0 }" :showControls="false">
       <div slot="content" class="projector-windowed">
-        <scrollable className="button-container">
-          <div class="projector-buttons">
-            <button
-              class="button button--trans"
-              v-for="(display, index) in allDisplays"
-              :key="display.id"
-              @click="enterFullscreen(display)"
-            >
-              Fullscreen Display {{ index + 1 }}: {{ display.size.width }}x{{ display.size.height }}
-            </button>
-          </div>
+        <scrollable className="projector-buttons">
+          <button
+            class="button button--trans"
+            v-for="(display, index) in allDisplays"
+            :key="display.id"
+            @click="enterFullscreen(display)"
+          >
+            Fullscreen Display {{ index + 1 }}: {{ display.size.width }}x{{ display.size.height }}
+          </button>
         </scrollable>
         <display v-if="!hideStyleBlockers" :source-id="sourceId" :rendering-mode="renderingMode" />
       </div>

@@ -79,7 +79,7 @@ export default class MediaShare extends WidgetSettings<IMediaShareData, MediaSha
           slots={[{ value: 'banlist', label: $t('Banned Media') }]}
           navItems={this.navItems}
         >
-          <Scrollable slot="banlist" className={styles.banlist}>
+          <Scrollable slot="banlist" class={styles.banlist}>
             {this.banList}
           </Scrollable>
           {this.form}
