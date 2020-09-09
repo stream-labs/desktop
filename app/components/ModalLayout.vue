@@ -1,16 +1,15 @@
 <template>
   <div id="mainWrapper" class="modal-layout" :class="wrapperClassNames">
     <div class="ModalLayout-fixed" :style="fixedStyle"><slot name="fixed" /></div>
-    <scrollable
-      :className="containsTabs ? 'modal-layout-tab-content' : 'modal-layout-content'"
+    <div
+      :class="containsTabs ? 'modal-layout-tab-content' : 'modal-layout-content'"
       :style="contentStyle"
-      :isFlexbox="true"
     >
       <slot name="content" v-if="!loading" />
       <div class="spinner-container" v-else>
         <i class="fa fa-spinner fa-pulse modal-layout-spinner" />
       </div>
-    </scrollable>
+    </div>
     <div v-if="showControls" class="modal-layout-controls">
       <button v-if="showCancel" class="button button--default" @click="cancel">
         {{ $t('Cancel') }}

@@ -108,7 +108,7 @@ export default class GoLiveWindow extends TsxComponent<{}> {
           ref="form"
           slot="content"
           handleExtraValidation={this.postValidate}
-          style={{ position: 'relative', height: '100%' }}
+          style={{ position: 'relative' }}
           name="editStreamForm"
         >
           <transition name="zoom">
