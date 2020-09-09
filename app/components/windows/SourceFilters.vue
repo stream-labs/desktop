@@ -37,7 +37,7 @@
         </sl-vue-tree>
       </NavMenu>
 
-      <scrollable className="modal-container--side-nav" :isFlexbox="true" :isResizable="false">
+      <scrollable class="modal-container--side-nav">
         <div v-if="selectedFilterName">
           <GenericForm
             v-if="properties.length"
