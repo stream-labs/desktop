@@ -16,7 +16,7 @@ test('Onboarding steps', async t => {
   // Wait for the auth screen to appear
   await app.client.waitForVisible('h1=Connect');
 
-  await logIn(t, 'twitch', null, false, true);
+  await logIn(t, 'twitch', { prime: false }, false, true);
   await sleep(1000);
   await t.context.app.client.click('span=Skip');
 

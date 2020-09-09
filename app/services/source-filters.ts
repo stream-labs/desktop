@@ -273,7 +273,7 @@ export class SourceFiltersService extends Service {
       queryParams: { sourceId },
       size: {
         width: 600,
-        height: 400,
+        height: 500,
       },
     });
   }

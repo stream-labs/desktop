@@ -1,6 +1,6 @@
 <template>
   <popper trigger="click" :options="{ placement: placement || 'bottom-start' }">
-    <scrollable className="popper dropdown-menu" :isResizable="false">
+    <scrollable className="popper dropdown-menu" :isResizable="false" :autoSizeCapable="true">
       <slot></slot>
     </scrollable>
 
