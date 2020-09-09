@@ -60,7 +60,6 @@ platforms.forEach(platform => {
           game: selectTitle('Fortnite'),
           description: 'SLOBS Test Stream Description',
         });
-        await sleep(99999, true);
         break;
 
       case 'mixer':
