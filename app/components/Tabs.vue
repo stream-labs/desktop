@@ -11,7 +11,7 @@
         {{ tab.name }}
       </button>
     </div>
-    <scrollable className="tab-content" v-if="!hideContent">
+    <scrollable className="tab-content" v-if="!hideContent" :autoSizeCapable="true">
       <slot v-for="tab in tabs.filter(t => t.value === value)" :name="tab.value" />
     </scrollable>
   </div>

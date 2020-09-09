@@ -278,7 +278,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     await sleep(1000); // electron-log needs some time to write down logs
     const filePath = path.join(cacheDir, 'slobs-client', 'app.log');
     if (!fs.existsSync(filePath)) return;
-    const logs = fs.readFileSync(filePath).toString();
+    const logs: string = fs.readFileSync(filePath).toString();
     const errors = logs
       .substr(logFileLastReadingPos)
       .split('\n')
@@ -287,10 +287,16 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     // save the last reading position, to skip already read records next time
     logFileLastReadingPos = logs.length - 1;
 
+    // remove [vue-i18n] warnings
+    const displayLogs = logs
+      .split('\n')
+      .filter(str => !str.match('Fall back to translate'))
+      .join('\n');
+
     if (errors.length && !skipCheckingErrorsInLogFlag) {
-      fail(`The log-file has errors \n ${logs}`);
+      fail(`The log-file has errors \n ${displayLogs}`);
     } else if (options.networkLogging && !testPassed) {
-      fail(`log-file: \n ${logs}`);
+      fail(`log-file: \n ${displayLogs}`);
     }
   }
 
