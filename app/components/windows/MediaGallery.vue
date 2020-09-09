@@ -80,7 +80,7 @@
             class="drag-overlay radius"
           ></div>
           <div v-if="busy" class="busy-overlay"></div>
-          <scrollable v-if="files.length" className="uploads-manager__list" :isFlexbox="true">
+          <scrollable v-if="files.length" className="uploads-manager__list">
             <li
               v-for="file in files"
               :key="file.href"

@@ -167,7 +167,7 @@ export default class LayoutEditor extends TsxComponent {
       <div class={styles.elementList}>
         <div class={styles.title}>{$t('Elements')}</div>
         <div class={styles.subtitle}>{$t('Drag and drop to edit.')}</div>
-        <Scrollable className={styles.elementContainer} isFlexbox={true}>
+        <Scrollable className={styles.elementContainer}>
           {Object.keys(ELayoutElement).map((element: ELayoutElement) => (
             <div
               draggable
@@ -189,7 +189,7 @@ export default class LayoutEditor extends TsxComponent {
         <div>
           <div class={styles.title}>{$t('Layouts')}</div>
           <div class={styles.subtitle} />
-          <Scrollable className={styles.layouts}>
+          <Scrollable className={styles.layouts} autoSizeCapable={true}>
             {Object.keys(ELayout).map(layout => (
               <img
                 class={this.currentLayout === layout ? styles.active : ''}
