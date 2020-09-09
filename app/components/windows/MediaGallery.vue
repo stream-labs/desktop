@@ -110,12 +110,20 @@
                     style="line-height: 132px; font-size: 28px; text-align: center; display: block;"
                   ></i>
                 </div>
-                <button class="copy-button button button--action" @click="handleCopy(file.href)">
+                <button
+                  v-if="!file.prime"
+                  class="copy-button button button--action"
+                  @click="handleCopy(file.href)"
+                >
                   <i class="icon-copy"></i> {{ $t('Copy URL') }}
                 </button>
                 <div class="upload__footer" :class="[file.type === 'image' ? 'image' : '']">
                   <div class="upload__size">{{ file.size ? formatBytes(file.size) : ' ' }}</div>
-                  <div class="upload__title">{{ file.fileName }}</div>
+                  <div class="upload__title">{{ file.filename }}</div>
+                  <div v-if="file.prime" class="upload__prime">
+                    {{ $t('Prime') }}
+                    <i class="icon-prime" />
+                  </div>
                 </div>
               </div>
             </li>
@@ -366,6 +374,10 @@
   color: var(--white);
   text-transform: uppercase;
   font-size: 12px;
+}
+
+.upload__prime {
+  color: var(--prime);
 }
 
 .upload__footer {
