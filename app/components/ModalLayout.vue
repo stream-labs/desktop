@@ -110,4 +110,11 @@
     .margin-left();
   }
 }
+
+.modal--side-nav {
+  display: flex;
+  align-content: stretch;
+  align-items: stretch;
+  height: 100%;
+}
 </style>
