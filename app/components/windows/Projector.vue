@@ -5,7 +5,7 @@
     </div>
     <modal-layout v-else :content-styles="{ padding: 0 }" :showControls="false">
       <div slot="content" class="projector-windowed">
-        <scrollable className="button-container">
+        <scrollable className="button-container" :autoSizeCapable="true">
           <div class="projector-buttons">
             <button
               class="button button--trans"
