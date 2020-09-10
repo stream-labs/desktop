@@ -7,6 +7,7 @@ import { Component } from 'vue-property-decorator';
 import styles from './RecentEvents.m.less';
 import TsxComponent, { createProps } from './tsx-component';
 import Scrollable from 'components/shared/Scrollable';
+import PlatformLogo from 'components/shared/PlatformLogo';
 import { UserService } from 'services/user';
 import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
@@ -34,6 +35,7 @@ export default class RecentEvents extends TsxComponent<RecentEventsProps> {
   eventsCollapsed = false;
 
   get recentEvents() {
+    console.log(this.recentEventsService.state.recentEvents);
     return this.recentEventsService.state.recentEvents;
   }
 
@@ -247,6 +249,14 @@ class EventCell extends TsxComponent<EventCellProps> {
     if (this.timestampInterval) clearInterval(this.timestampInterval);
   }
 
+  platformIcon(platform: string) {
+    return {
+      twitch_account: <PlatformLogo platform="twitch" />,
+      youtube_account: <PlatformLogo platform="youtube" />,
+      facebook_account: <PlatformLogo platform="facebook" />,
+    }[platform];
+  }
+
   updateTimestamp() {
     this.timestamp = moment.utc(this.createdAt).fromNow(true);
   }
@@ -266,6 +276,7 @@ class EventCell extends TsxComponent<EventCellProps> {
         onClick={() => this.props.readAlert(this.props.event)}
       >
         <span class={styles.timestamp}>{this.timestamp}</span>
+        {this.platformIcon(this.props.event.platform)}
         <span class={styles.name}>{getName(this.props.event)}</span>
         <span class={styles.message}>{this.props.eventString(this.props.event)}</span>
         {this.props.event.gifter && (
