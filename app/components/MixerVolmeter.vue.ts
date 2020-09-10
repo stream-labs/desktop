@@ -117,7 +117,7 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
 
     // Style blockers are always hidden whenever something happens that causes main
     // window elements to change width. We can improve performance by just listening
-    // th
+    // the style blocker change event.
     this.styleBlockersSubscription = this.windowsService.styleBlockersUpdated.subscribe(
       blockers => {
         if (blockers.windowId === 'main' && !blockers.hideStyleBlockers) {
