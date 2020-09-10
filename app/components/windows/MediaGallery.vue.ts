@@ -172,6 +172,11 @@ export default class MediaGallery extends Vue {
   async upgradeToPrime() {
     const link = await this.magicLinkService.getDashboardMagicLink('prime', 'slobs-media-gallery');
     electron.remote.shell.openExternal(link);
+    this.$toasted.show($t('You must have Streamlabs Prime to use this media'), {
+      duration: 5000,
+      position: 'top-right',
+      className: 'toast-prime',
+    });
   }
 
   handleSelect() {
