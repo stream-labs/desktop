@@ -8,6 +8,7 @@ import { $t } from 'services/i18n';
 import { Inject } from 'services';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { loadColorPicker } from 'util/slow-imports';
+import { OS, getOS } from 'util/operating-systems';
 
 @Component({})
 export default class ColorInput extends BaseInput<string, IColorMetadata> {
@@ -71,11 +72,13 @@ export default class ColorInput extends BaseInput<string, IColorMetadata> {
         <div class={styles.colorpicker}>
           <div class={styles.colorpickerText} onClick={() => this.togglePicker()}>
             <input class={styles.colorpickerInput} type="text" readonly value={this.value} />
-            <i
-              class="fas fa-eye-dropper"
-              onClick={(e: MouseEvent) => this.eyedrop(e)}
-              vTooltip={{ content: $t('Pick Screen Color'), placement: 'bottom' }}
-            />
+            {getOS() === OS.Windows && (
+              <i
+                class="fas fa-eye-dropper"
+                onClick={(e: MouseEvent) => this.eyedrop(e)}
+                vTooltip={{ content: $t('Pick Screen Color'), placement: 'bottom' }}
+              />
+            )}
             <div class={styles.colorpickerSwatch} style={`background-color: ${this.value}`} />
           </div>
           {this.pickerBody}
