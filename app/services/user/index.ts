@@ -560,13 +560,15 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return url;
   }
 
-  get alertboxLibraryUrl() {
+  alertboxLibraryUrl(id?: string) {
     const uiTheme = this.customizationService.isDarkTheme ? 'night' : 'day';
     let url = `https://${this.hostsService.streamlabs}/alertbox-library?mode=${uiTheme}&slobs`;
 
     if (this.isLoggedIn) {
       url += `&oauth_token=${this.apiToken}`;
     }
+
+    if (id) url += `&id=${id}`;
 
     return url;
   }
