@@ -282,7 +282,11 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     const errors = logs
       .substr(logFileLastReadingPos)
       .split('\n')
-      .filter((record: string) => record.match(/\[error\]/));
+      .filter((record: string) => {
+        // This error is outside our control and can be ignored.
+        // See: https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded
+        return record.match(/\[error\]/) && !record.match(/ResizeObserver loop limit exceeded/);
+      });
 
     // save the last reading position, to skip already read records next time
     logFileLastReadingPos = logs.length - 1;
