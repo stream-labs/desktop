@@ -1,17 +1,20 @@
 import cx from 'classnames';
-import colorPicker from 'color-picker';
 import { Component, Prop } from 'vue-property-decorator';
 import { Sketch } from 'vue-color';
 import { BaseInput } from './BaseInput';
 import { IColorMetadata } from './index';
 import styles from './ColorInput.m.less';
 import { $t } from 'services/i18n';
+import { Inject } from 'services';
+import { UsageStatisticsService } from 'services/usage-statistics';
+import { loadColorPicker } from 'util/slow-imports';
 
 @Component({})
 export default class ColorInput extends BaseInput<string, IColorMetadata> {
   @Prop() readonly value: string;
   @Prop() readonly metadata: IColorMetadata;
   @Prop() readonly title: string;
+  @Inject() readonly usageStatisticsService: UsageStatisticsService;
 
   pickerVisible = false;
 
@@ -19,8 +22,10 @@ export default class ColorInput extends BaseInput<string, IColorMetadata> {
     this.pickerVisible = !this.pickerVisible;
   }
 
-  eyedrop(e: MouseEvent) {
+  async eyedrop(e: MouseEvent) {
     e.stopPropagation();
+    const colorPicker = (await loadColorPicker()).default;
+    this.usageStatisticsService.recordFeatureUsage('screen-color-picker');
     colorPicker.startColorPicker(
       (data: { event: string; hex: string }) => {
         if (data.event === 'mouseClick') {
