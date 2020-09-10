@@ -254,6 +254,7 @@ class EventCell extends TsxComponent<EventCellProps> {
       twitch_account: <PlatformLogo platform="twitch" />,
       youtube_account: <PlatformLogo platform="youtube" />,
       facebook_account: <PlatformLogo platform="facebook" />,
+      streamlabs: <PlatformLogo platform="streamlabs" />,
     }[platform];
   }
 
