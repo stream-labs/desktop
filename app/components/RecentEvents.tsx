@@ -35,7 +35,6 @@ export default class RecentEvents extends TsxComponent<RecentEventsProps> {
   eventsCollapsed = false;
 
   get recentEvents() {
-    console.log(this.recentEventsService.state.recentEvents);
     return this.recentEventsService.state.recentEvents;
   }
 
