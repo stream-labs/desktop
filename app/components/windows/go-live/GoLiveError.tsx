@@ -193,8 +193,13 @@ export default class GoLiveError extends TsxComponent<{}> {
         {$t(
           'Please enable your account for live streaming, and wait 24 hours before attempting to stream.',
         )}
-        <button class="button button--warn" onClick={() => this.enableYT()}>
-          {$t('Fix')}
+        <br />
+        <button
+          class="button button--warn"
+          style={{ marginTop: '8px' }}
+          onClick={() => this.enableYT()}
+        >
+          {$t('Enable Live Streaming')}
         </button>
       </ErrorLayout>
     );
