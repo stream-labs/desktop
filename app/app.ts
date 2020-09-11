@@ -104,7 +104,7 @@ if (windowId === 'worker') {
 }
 
 window.addEventListener('error', e => {
-  sendLogMsg('error', e.error);
+  sendLogMsg('error', e.message, e.error);
 });
 
 window.addEventListener('unhandledrejection', e => {
