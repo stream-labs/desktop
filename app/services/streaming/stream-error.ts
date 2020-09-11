@@ -25,7 +25,7 @@ const errorTypes = {
     message: $t('Failed to configure the Multistream server'),
   },
   YOUTUBE_STREAMING_DISABLED: {
-    message: $t('Your YouTube account not enabled for live streaming'),
+    message: $t('Your YouTube account is not enabled for live streaming'),
   },
   YOUTUBE_PUBLISH_FAILED: {
     message: $t('Failed to publish the YouTube broadcast'),

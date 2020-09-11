@@ -190,10 +190,11 @@ export default class GoLiveError extends TsxComponent<{}> {
   private renderYoutubeStreamingDisabled(error: IStreamError) {
     return (
       <ErrorLayout message={error.message}>
+        {$t(
+          'Please enable your account for live streaming, and wait 24 hours before attempting to stream.',
+        )}
         <button class="button button--warn" onClick={() => this.enableYT()}>
-          {$t(
-            'Please enable your account for live streaming, and wait 24 hours before attempting to stream.',
-          )}
+          {$t('Fix')}
         </button>
       </ErrorLayout>
     );
