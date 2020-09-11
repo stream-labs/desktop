@@ -83,6 +83,17 @@ export class ProtocolLinksService extends Service {
     }
   }
 
+  @protocolHandler('alertbox-library')
+  private navigateAlertboxLibrary(info: IProtocolLinkInfo) {
+    if (!this.userService.isLoggedIn) return;
+
+    const match = info.path.match(/^\/?([0-9]+)?\/?$/);
+
+    if (match) {
+      this.navigationService.navigate('AlertboxLibrary', { id: match[1] });
+    }
+  }
+
   @protocolHandler('paypalauth')
   private updateUserBillingInfo(info: IProtocolLinkInfo) {
     if (!this.userService.isLoggedIn) return;
