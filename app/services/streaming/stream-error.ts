@@ -4,42 +4,66 @@ import { $t } from 'services/i18n';
 
 const errorTypes = {
   PLATFORM_REQUEST_FAILED: {
-    message: $t('The request to the platform failed'),
+    get message() {
+      return $t('The request to the platform failed');
+    },
   },
   FACEBOOK_HAS_NO_PAGES: {
-    message: $t('No Facebook pages were found'),
+    get message() {
+      return $t('No Facebook pages were found');
+    },
   },
   TWITCH_MISSED_OAUTH_SCOPE: {
-    message: $t('Missing required oauth scope'),
+    get message() {
+      return $t('Missing required oauth scope');
+    },
   },
   PREPOPULATE_FAILED: {
-    message: $t('Failed to fetch platform settings'),
+    get message() {
+      return $t('Failed to fetch platform settings');
+    },
   },
   SETTINGS_UPDATE_FAILED: {
-    message: $t('Failed to update platform settings'),
+    get message() {
+      return $t('Failed to update platform settings');
+    },
   },
   RESTREAM_DISABLED: {
-    message: $t('The Multistream server is temporarily unavailable'),
+    get message() {
+      return $t('The Multistream server is temporarily unavailable');
+    },
   },
   RESTREAM_SETUP_FAILED: {
-    message: $t('Failed to configure the Multistream server'),
+    get message() {
+      return $t('Failed to configure the Multistream server');
+    },
   },
   YOUTUBE_STREAMING_DISABLED: {
-    message: $t('Your YouTube account is not enabled for live streaming'),
+    get message() {
+      return $t('Your YouTube account is not enabled for live streaming');
+    },
   },
   YOUTUBE_PUBLISH_FAILED: {
-    message: $t('Failed to publish the YouTube broadcast'),
+    get message() {
+      return $t('Failed to publish the YouTube broadcast');
+    },
   },
   TWEET_FAILED: {
-    message: $t('Failed to post the Tweet'),
+    get message() {
+      return $t('Failed to post the Tweet');
+    },
   },
   PRIME_REQUIRED: {
-    message: $t('This feature is for Prime members only'),
+    get message() {
+      return $t('This feature is for Prime members only');
+    },
   },
   UNKNOWN_ERROR: {
     // show this error if we caught a runtime error
     // we should treat this error as a bug in the codebase
-    message: $t('An unkown error occurred'),
+    get message() {
+      return $t('An unkown error occurred');
+    },
   },
 };
 export type TStreamErrorType = keyof typeof errorTypes;
