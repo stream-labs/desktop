@@ -71,7 +71,13 @@ export default class ColorInput extends BaseInput<string, IColorMetadata> {
       >
         <div class={styles.colorpicker}>
           <div class={styles.colorpickerText} onClick={() => this.togglePicker()}>
-            <input class={styles.colorpickerInput} type="text" readonly value={this.value} />
+            <input
+              class={styles.colorpickerInput}
+              name="colorpicker-input"
+              type="text"
+              readonly
+              value={this.value}
+            />
             {getOS() === OS.Windows && (
               <i
                 class="fas fa-eye-dropper"
