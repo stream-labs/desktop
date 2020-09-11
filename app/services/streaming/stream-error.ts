@@ -1,45 +1,45 @@
 import { ServiceHelper } from 'services/core';
 import { TPlatform } from '../platforms';
+import { $t } from 'services/i18n';
 
 const errorTypes = {
   PLATFORM_REQUEST_FAILED: {
-    message: 'The request to Platform API has been failed',
+    message: $t('The request to the platform failed'),
   },
   FACEBOOK_HAS_NO_PAGES: {
-    message: 'Facebook pages have not been found',
+    message: $t('No Facebook pages were found'),
   },
   TWITCH_MISSED_OAUTH_SCOPE: {
-    message: 'Missing required oauth scope',
+    message: $t('Missing required oauth scope'),
   },
   PREPOPULATE_FAILED: {
-    message: 'Failed to fetch platform settings',
+    message: $t('Failed to fetch platform settings'),
   },
   SETTINGS_UPDATE_FAILED: {
-    message: 'Failed to update platform settings',
+    message: $t('Failed to update platform settings'),
   },
   RESTREAM_DISABLED: {
-    message:
-      'The Restream server is temporarily down and streaming to multiple platforms is unavailable',
+    message: $t('The Multistream server is temporarily unavailable'),
   },
   RESTREAM_SETUP_FAILED: {
-    message: 'Failed to setup the Restream',
+    message: $t('Failed to configure the Multistream server'),
   },
   YOUTUBE_STREAMING_DISABLED: {
-    message: 'YouTube account not enabled for live streaming',
+    message: $t('Your YouTube account not enabled for live streaming'),
   },
   YOUTUBE_PUBLISH_FAILED: {
-    message: 'Failed to publish the Youtube broadcast',
+    message: $t('Failed to publish the YouTube broadcast'),
   },
   TWEET_FAILED: {
-    message: 'Failed to post a tweet',
+    message: $t('Failed to post the Tweet'),
   },
   PRIME_REQUIRED: {
-    message: 'This feature is for Prime members only',
+    message: $t('This feature is for Prime members only'),
   },
   UNKNOWN_ERROR: {
     // show this error if we caught a runtime error
-    // we should threat this error as a bug in the codebase
-    message: 'Unknown error',
+    // we should treat this error as a bug in the codebase
+    message: $t('An unkown error occurred'),
   },
 };
 export type TStreamErrorType = keyof typeof errorTypes;
