@@ -190,7 +190,7 @@ export class FileManagerService extends Service {
 
       fs.writeFile(tmpPath, data, err => {
         if (err) {
-          console.log('Error on Write', err);
+          console.error('Error on Write', err);
           reject(err);
           return;
         }
