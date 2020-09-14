@@ -202,6 +202,7 @@ export class FileManagerService extends Service {
             return;
           }
 
+          console.log('Successful write', filePath);
           resolve();
         });
       });
