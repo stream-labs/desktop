@@ -190,12 +190,14 @@ export class FileManagerService extends Service {
 
       fs.writeFile(tmpPath, data, err => {
         if (err) {
+          console.log('Error on Write', err);
           reject(err);
           return;
         }
 
         fs.rename(tmpPath, filePath, err => {
           if (err) {
+            console.error('Error on Rename', err);
             reject(err);
             return;
           }
