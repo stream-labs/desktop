@@ -265,7 +265,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     if (!clearCache) return;
     await new Promise(resolve => {
+      console.log('RIMRAF STARTED');
       rimraf(cacheDir, resolve);
+      console.log('RIMRAF ENDED');
     });
     for (const callback of afterStopCallbacks) {
       await callback(t);
@@ -277,6 +279,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
    */
   async function checkErrorsInLogFile() {
     await sleep(1000); // electron-log needs some time to write down logs
+    console.log('CHECKING ERRORS IN LOG FILE');
     const filePath = path.join(cacheDir, 'slobs-client', 'app.log');
     if (!fs.existsSync(filePath)) return;
     const logs: string = fs.readFileSync(filePath).toString();
@@ -299,6 +302,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       .join('\n');
 
     if (errors.length && !skipCheckingErrorsInLogFlag) {
+      console.log('FOUND ERRORS IN LOG FILE');
       fail(`The log-file has errors \n ${displayLogs}`);
     } else if (options.networkLogging && !testPassed) {
       fail(`log-file: \n ${displayLogs}`);
