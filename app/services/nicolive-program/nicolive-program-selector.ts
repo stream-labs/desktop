@@ -146,14 +146,18 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
   /**
    * 指定ステップに戻る.
    * 指定ステップ以降で設定された値は初期値にリセットする.
+   * 完了していないステップが与えられた場合は何もしない.
    * @param step 
    */
   backTo(step: TStep) {
+    if (!this.isCompletedStep(step)) {
+      return;
+    }
     this.SET_STATE({
       currentStep: step,
       candidatePrograms: stepsMap[step] <= stepsMap['broadcastChannelSelect'] ? [] : this.state.candidatePrograms,
-      selectedProviderType:  stepsMap[step] <= stepsMap['providerTypeSelect'] ? null :this.state.selectedProviderType,
-      selectedChannel:   stepsMap[step] <= stepsMap['broadcastChannelSelect'] ? null : this.state.selectedChannel,
+      selectedProviderType: stepsMap[step] <= stepsMap['providerTypeSelect'] ? null : this.state.selectedProviderType,
+      selectedChannel: stepsMap[step] <= stepsMap['broadcastChannelSelect'] ? null : this.state.selectedChannel,
       selectedProgram: stepsMap[step] <= stepsMap['programSelect']  ? null : this.state.selectedProgram,
     });
   }
@@ -176,6 +180,5 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
   @mutation()
   private SET_STATE(nextState: Partial<INicoliveProgramSelectorState>) {
     this.state = { ...this.state, ...nextState };
-    console.log(this.state);
   }
 }
