@@ -164,6 +164,7 @@ export class FileManagerService extends Service {
       } else {
         if (file.flushFinished) file.flushFinished();
         console.error(`Ran out of retries writing ${filePath}`);
+        console.error('Most recent error', e);
       }
     }
   }
