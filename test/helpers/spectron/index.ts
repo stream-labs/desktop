@@ -264,7 +264,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     if (!clearCache) return;
     await new Promise(resolve => {
-      rimraf(cacheDir, resolve);
+      setTimeout(() => {
+        rimraf(cacheDir, resolve);
+      }, 10 * 1000);
     });
     for (const callback of afterStopCallbacks) {
       await callback(t);
