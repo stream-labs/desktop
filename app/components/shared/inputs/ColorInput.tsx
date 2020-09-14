@@ -26,7 +26,7 @@ export default class ColorInput extends BaseInput<string, IColorMetadata> {
   async eyedrop(e: MouseEvent) {
     e.stopPropagation();
     const colorPicker = (await loadColorPicker()).default;
-    this.usageStatisticsService.recordFeatureUsage('screen-color-picker');
+    this.usageStatisticsService.recordFeatureUsage('screenColorPicker');
     colorPicker.startColorPicker(
       (data: { event: string; hex: string }) => {
         if (data.event === 'mouseClick') {
