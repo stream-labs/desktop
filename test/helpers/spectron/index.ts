@@ -187,6 +187,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         // disable deprecation warning and waiting for better docs now
         deprecationWarnings: false,
       },
+      quitTimeout: 30 * 1000,
     });
 
     if (options.beforeAppStartCb) await options.beforeAppStartCb(t);
@@ -264,9 +265,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     if (!clearCache) return;
     await new Promise(resolve => {
-      setTimeout(() => {
-        rimraf(cacheDir, resolve);
-      }, 10 * 1000);
+      rimraf(cacheDir, resolve);
     });
     for (const callback of afterStopCallbacks) {
       await callback(t);
