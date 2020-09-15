@@ -1,5 +1,5 @@
 import { MetricsService } from '../../../app/services/metrics';
-import { test, stopApp, startApp, TExecutionContext, getCacheDir } from '../../helpers/spectron';
+import { test, stopApp, startApp, TExecutionContext } from '../../helpers/spectron';
 import { ApiClient, getClient } from '../../helpers/api-client';
 import { TSourceType } from '../../../app/services/sources/sources-api';
 import { ScenesService } from '../../../app/services/api/external-api/scenes';
@@ -27,7 +27,7 @@ const MAX_SOURCES_COUNT = 40;
  * unzip a sample of a large scene collection to the SceneCollection folder
  */
 function unzipLargeSceneCollection(t: TExecutionContext) {
-  const cacheDir = path.resolve(getCacheDir(), 'slobs-client');
+  const cacheDir = path.resolve(t.context.cacheDir, 'slobs-client');
   const sceneCollectionPath = path.resolve(cacheDir, 'SceneCollections');
   fs.removeSync(sceneCollectionPath);
 

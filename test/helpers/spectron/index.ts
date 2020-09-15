@@ -140,7 +140,6 @@ export async function restartApp(t: TExecutionContext): Promise<Application> {
 }
 
 let skipCheckingErrorsInLogFlag = false;
-let cacheDir: string;
 
 /**
  * Disable checking errors in the log file for a single test
@@ -159,10 +158,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   let failMsg = '';
   let testName = '';
   let logFileLastReadingPos = 0;
-  cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
 
   startAppFn = async function startApp(t: TExecutionContext): Promise<Application> {
-    t.context.cacheDir = cacheDir;
+    t.context.cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
     const appArgs = options.appArgs ? options.appArgs.split(' ') : [];
     if (options.networkLogging) appArgs.push('--network-logging');
     if (options.noSync) appArgs.push('--nosync');
@@ -187,7 +185,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         // disable deprecation warning and waiting for better docs now
         deprecationWarnings: false,
       },
-      quitTimeout: 30 * 1000,
     });
 
     if (options.beforeAppStartCb) await options.beforeAppStartCb(t);
@@ -260,14 +257,12 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       console.error(e);
     }
     appIsRunning = false;
-    await checkErrorsInLogFile();
+    await checkErrorsInLogFile(t);
     logFileLastReadingPos = 0;
 
     if (!clearCache) return;
     await new Promise(resolve => {
-      console.log('RIMRAF STARTED');
-      rimraf(cacheDir, resolve);
-      console.log('RIMRAF ENDED');
+      rimraf(t.context.cacheDir, resolve);
     });
     for (const callback of afterStopCallbacks) {
       await callback(t);
@@ -277,10 +272,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   /**
    * test should be considered as failed if it writes exceptions in to the log file
    */
-  async function checkErrorsInLogFile() {
+  async function checkErrorsInLogFile(t: TExecutionContext) {
     await sleep(1000); // electron-log needs some time to write down logs
-    console.log('CHECKING ERRORS IN LOG FILE');
-    const filePath = path.join(cacheDir, 'slobs-client', 'app.log');
+    const filePath = path.join(t.context.cacheDir, 'slobs-client', 'app.log');
     if (!fs.existsSync(filePath)) return;
     const logs: string = fs.readFileSync(filePath).toString();
     const errors = logs
@@ -302,7 +296,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       .join('\n');
 
     if (errors.length && !skipCheckingErrorsInLogFlag) {
-      console.log('FOUND ERRORS IN LOG FILE');
       fail(`The log-file has errors \n ${displayLogs}`);
     } else if (options.networkLogging && !testPassed) {
       fail(`log-file: \n ${displayLogs}`);
@@ -329,7 +322,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   });
 
   test.afterEach.always(async t => {
-    await checkErrorsInLogFile();
+    await checkErrorsInLogFile(t);
     if (!testPassed && options.pauseIfFailed) {
       console.log('Test execution has been paused due `pauseIfFailed` enabled');
       await sleep(ALMOST_INFINITY);
@@ -406,8 +399,4 @@ export async function click(t: TExecutionContext, selector: string) {
     const message = `click to "${selector}" failed in window ${windowId}: ${e.message} ${e.type}`;
     throw new Error(message);
   }
-}
-
-export function getCacheDir() {
-  return cacheDir;
 }
