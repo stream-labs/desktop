@@ -177,7 +177,7 @@
     "sl-vue-tree": "https://github.com/stream-labs/sl-vue-tree.git",
     "sockjs": "0.3.19",
     "sockjs-client": "1.1.5",
-    "spectron": "5.0.0",
+    "spectron": "8.0.0",
     "streamlabs-beaker": "0.9.4",
     "style-loader": "0.21.0",
     "stylelint": "10.0.1",
