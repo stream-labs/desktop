@@ -47,7 +47,7 @@
         "title": "配信種別を選択",
         "description": "配信する番組種別を選択してください。"
       },
-      "broadcastChannelSelect": {
+      "channelSelect": {
         "menuTitle": "配信チャンネル",
         "title": "配信チャンネルを選択",
         "description": "リストから配信したいチャンネルを選択してください。"

@@ -42,7 +42,7 @@ test('チャンネル番組を選んで配信開始のための番組情報を�
 
   // チャンネル選択へ
   instance.onSelectProviderTypeChannel();
-  expect(instance.state.currentStep).toBe('broadcastChannelSelect');
+  expect(instance.state.currentStep).toBe('channelSelect');
   expect(instance.state.selectedProviderType).toBe('channel');
 
   // 番組選択へ
@@ -92,22 +92,22 @@ test('チャンネル選択ステップで, 配信種別や番組の選択をし
 
   // チャンネル選択へ
   instance.onSelectProviderTypeChannel();
-  expect(instance.state.currentStep).toBe('broadcastChannelSelect');
+  expect(instance.state.currentStep).toBe('channelSelect');
   expect(instance.state.selectedProviderType).toBe('channel');
 
   // 配信種別をチャンネルに変更しようとしても何も起きない
   instance.onSelectProviderTypeChannel();
-  expect(instance.state.currentStep).toBe('broadcastChannelSelect');
+  expect(instance.state.currentStep).toBe('channelSelect');
   expect(instance.state.selectedProviderType).toBe('channel');
 
   // 配信種別をユーザー番組に変更できない
   instance.onSelectProviderTypeUser('lv1');
-  expect(instance.state.currentStep).toBe('broadcastChannelSelect');
+  expect(instance.state.currentStep).toBe('channelSelect');
   expect(instance.state.selectedProviderType).toBe('channel');
 
   // 番組を選択できない
   instance.onSelectBroadcastingProgram('lv1', 'title')
-  expect(instance.state.currentStep).toBe('broadcastChannelSelect');
+  expect(instance.state.currentStep).toBe('channelSelect');
   expect(instance.state.selectedProgram).toBeNull();
 });
 
@@ -235,7 +235,7 @@ describe('ステップ比較系メソッド', () => {
       switch (step) {
         case 'providerTypeSelect':
           return instance;
-        case 'broadcastChannelSelect':
+        case 'channelSelect':
           instance.onSelectProviderTypeChannel();
           return instance;
         case 'programSelect':
@@ -255,35 +255,35 @@ describe('ステップ比較系メソッド', () => {
       // 初期状態なので, 'user' でも同様.
       const instance = createServiceInstanceByStep('providerTypeSelect', 'channel');
       expect(instance.isCompletedOrCurrentStep('providerTypeSelect')).toBe(true);
-      expect(instance.isCompletedOrCurrentStep('broadcastChannelSelect')).toBe(false);
+      expect(instance.isCompletedOrCurrentStep('channelSelect')).toBe(false);
       expect(instance.isCompletedOrCurrentStep('programSelect')).toBe(false);
       expect(instance.isCompletedOrCurrentStep('confirm')).toBe(false);
     });
-    test('broadcastChannelSelect ステップのインスタンスに対して正しい値を返す', () => {
-      const instance = createServiceInstanceByStep('broadcastChannelSelect', 'channel');
+    test('channelSelect ステップのインスタンスに対して正しい値を返す', () => {
+      const instance = createServiceInstanceByStep('channelSelect', 'channel');
       expect(instance.isCompletedOrCurrentStep('providerTypeSelect')).toBe(true);
-      expect(instance.isCompletedOrCurrentStep('broadcastChannelSelect')).toBe(true);
+      expect(instance.isCompletedOrCurrentStep('channelSelect')).toBe(true);
       expect(instance.isCompletedOrCurrentStep('programSelect')).toBe(false);
       expect(instance.isCompletedOrCurrentStep('confirm')).toBe(false);
     });
     test('programSelect ステップのインスタンスに対して正しい値を返す', () => {
       const instance = createServiceInstanceByStep('programSelect', 'channel');
       expect(instance.isCompletedOrCurrentStep('providerTypeSelect')).toBe(true);
-      expect(instance.isCompletedOrCurrentStep('broadcastChannelSelect')).toBe(true);
+      expect(instance.isCompletedOrCurrentStep('channelSelect')).toBe(true);
       expect(instance.isCompletedOrCurrentStep('programSelect')).toBe(true);
       expect(instance.isCompletedOrCurrentStep('confirm')).toBe(false);
     });
     test('confirm ステップ (チャンネル番組) のインスタンスに対して正しい値を返す', () => {
       const instance = createServiceInstanceByStep('confirm', 'channel');
       expect(instance.isCompletedOrCurrentStep('providerTypeSelect')).toBe(true);
-      expect(instance.isCompletedOrCurrentStep('broadcastChannelSelect')).toBe(true);
+      expect(instance.isCompletedOrCurrentStep('channelSelect')).toBe(true);
       expect(instance.isCompletedOrCurrentStep('programSelect')).toBe(true);
       expect(instance.isCompletedOrCurrentStep('confirm')).toBe(true);
     });
     test('confirm ステップ (ユーザー番組) のインスタンスに対して正しい値を返す', () => {
       const instance = createServiceInstanceByStep('confirm', 'user');
       expect(instance.isCompletedOrCurrentStep('providerTypeSelect')).toBe(true);
-      expect(instance.isCompletedOrCurrentStep('broadcastChannelSelect')).toBe(false); // ユーザー番組は経由しない
+      expect(instance.isCompletedOrCurrentStep('channelSelect')).toBe(false); // ユーザー番組は経由しない
       expect(instance.isCompletedOrCurrentStep('programSelect')).toBe(false); // ユーザー番組は経由しない
     });
   });
@@ -292,35 +292,35 @@ describe('ステップ比較系メソッド', () => {
       // 初期状態なので, 'user' でも同様.
       const instance = createServiceInstanceByStep('providerTypeSelect', 'channel');
       expect(instance.isCompletedStep('providerTypeSelect')).toBe(false);
-      expect(instance.isCompletedStep('broadcastChannelSelect')).toBe(false);
+      expect(instance.isCompletedStep('channelSelect')).toBe(false);
       expect(instance.isCompletedStep('programSelect')).toBe(false);
       expect(instance.isCompletedStep('confirm')).toBe(false);
     });
-    test('broadcastChannelSelect ステップのインスタンスに対して正しい値を返す', () => {
-      const instance = createServiceInstanceByStep('broadcastChannelSelect', 'channel');
+    test('channelSelect ステップのインスタンスに対して正しい値を返す', () => {
+      const instance = createServiceInstanceByStep('channelSelect', 'channel');
       expect(instance.isCompletedStep('providerTypeSelect')).toBe(true);
-      expect(instance.isCompletedStep('broadcastChannelSelect')).toBe(false);
+      expect(instance.isCompletedStep('channelSelect')).toBe(false);
       expect(instance.isCompletedStep('programSelect')).toBe(false);
       expect(instance.isCompletedStep('confirm')).toBe(false);
     });
     test('programSelect ステップのインスタンスに対して正しい値を返す', () => {
       const instance = createServiceInstanceByStep('programSelect', 'channel');
       expect(instance.isCompletedStep('providerTypeSelect')).toBe(true);
-      expect(instance.isCompletedStep('broadcastChannelSelect')).toBe(true);
+      expect(instance.isCompletedStep('channelSelect')).toBe(true);
       expect(instance.isCompletedStep('programSelect')).toBe(false);
       expect(instance.isCompletedStep('confirm')).toBe(false);
     });
     test('confirm ステップ (チャンネル番組) のインスタンスに対して正しい値を返す', () => {
       const instance = createServiceInstanceByStep('confirm', 'channel');
       expect(instance.isCompletedStep('providerTypeSelect')).toBe(true);
-      expect(instance.isCompletedStep('broadcastChannelSelect')).toBe(true);
+      expect(instance.isCompletedStep('channelSelect')).toBe(true);
       expect(instance.isCompletedStep('programSelect')).toBe(true);
       expect(instance.isCompletedStep('confirm')).toBe(false);
     });
     test('confirm ステップ (ユーザー番組) のインスタンスに対して正しい値を返す', () => {
       const instance = createServiceInstanceByStep('confirm', 'user');
       expect(instance.isCompletedStep('providerTypeSelect')).toBe(true);
-      expect(instance.isCompletedStep('broadcastChannelSelect')).toBe(false); // ユーザー番組は経由しない
+      expect(instance.isCompletedStep('channelSelect')).toBe(false); // ユーザー番組は経由しない
       expect(instance.isCompletedStep('programSelect')).toBe(false); // ユーザー番組は経由しない
       expect(instance.isCompletedStep('confirm')).toBe(false);
     });
@@ -331,7 +331,7 @@ describe('ステップ比較系メソッド', () => {
         const instance = createServiceInstanceByStep('providerTypeSelect', 'channel');
         (instance as any).SET_STATE = jest.fn();
         instance.backTo('providerTypeSelect');
-        instance.backTo('broadcastChannelSelect');
+        instance.backTo('channelSelect');
         instance.backTo('programSelect');
         instance.backTo('confirm');
         expect((instance as any).SET_STATE).not.toBeCalled();
@@ -339,7 +339,7 @@ describe('ステップ比較系メソッド', () => {
     });
     describe('broadcastChanelSelect ステップのインスタンスに対して状態をクリアできる', () => {
       test('providerTypeSelect ステップに戻るときに適切な状態に初期化できる', () => {
-        const instance = createServiceInstanceByStep('broadcastChannelSelect', 'channel');
+        const instance = createServiceInstanceByStep('channelSelect', 'channel');
         instance.backTo('providerTypeSelect');
         expect(instance.state).toMatchObject({
           currentStep: 'providerTypeSelect',
@@ -350,9 +350,9 @@ describe('ステップ比較系メソッド', () => {
         });
       });
       test('その他のステップに戻ろうとしても何も起こらない', () => {
-        const instance = createServiceInstanceByStep('broadcastChannelSelect', 'channel');
+        const instance = createServiceInstanceByStep('channelSelect', 'channel');
         (instance as any).SET_STATE = jest.fn();
-        instance.backTo('broadcastChannelSelect');
+        instance.backTo('channelSelect');
         instance.backTo('programSelect');
         instance.backTo('confirm');
         expect((instance as any).SET_STATE).not.toBeCalled();
@@ -370,11 +370,11 @@ describe('ステップ比較系メソッド', () => {
           selectedProgram: null
         });
       });
-      test('broadcastChannelSelect ステップに戻るときに適切な状態に初期化できる', () => {
+      test('channelSelect ステップに戻るときに適切な状態に初期化できる', () => {
         const instance = createServiceInstanceByStep('programSelect', 'channel');
-        instance.backTo('broadcastChannelSelect');
+        instance.backTo('channelSelect');
         expect(instance.state).toMatchObject({
-          currentStep: 'broadcastChannelSelect',
+          currentStep: 'channelSelect',
           candidatePrograms: [],
           selectedProviderType: 'channel',
           selectedChannel: null,
@@ -401,11 +401,11 @@ describe('ステップ比較系メソッド', () => {
           selectedProgram: null
         });
       });
-      test('broadcastChannelSelect ステップに戻るときに適切な状態に初期化できる', () => {
+      test('channelSelect ステップに戻るときに適切な状態に初期化できる', () => {
         const instance = createServiceInstanceByStep('confirm', 'channel');
-        instance.backTo('broadcastChannelSelect');
+        instance.backTo('channelSelect');
         expect(instance.state).toMatchObject({
-          currentStep: 'broadcastChannelSelect',
+          currentStep: 'channelSelect',
           candidatePrograms: [],
           selectedProviderType: 'channel',
           selectedChannel: null,
@@ -450,7 +450,7 @@ describe('ステップ比較系メソッド', () => {
       test('他のステップに戻ろうとしても何も起こらない', () => {
         const instance = createServiceInstanceByStep('confirm', 'user');
         (instance as any).SET_STATE = jest.fn();
-        instance.backTo('broadcastChannelSelect'); // ユーザー番組ではスキップされるため無効
+        instance.backTo('channelSelect'); // ユーザー番組ではスキップされるため無効
         instance.backTo('programSelect');  // ユーザー番組ではスキップされるため無効
         instance.backTo('confirm');
         expect((instance as any).SET_STATE).not.toBeCalled();

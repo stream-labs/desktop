@@ -103,7 +103,7 @@ export default class NicoliveProgramSelector extends Vue {
     switch (navItemStep) {
       case 'providerTypeSelect':
         return this.getProviderTypeProgramText(selectedProviderType) || this.BLANK;
-      case 'broadcastChannelSelect':
+      case 'channelSelect':
         return selectedChannel?.name || this.BLANK;
       case 'programSelect':
         return selectedProgram?.title || this.BLANK;

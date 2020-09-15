@@ -11,7 +11,7 @@ export type TProviderType = typeof providerTypes[number];
  * 選択肢からなるステップ.
  * 配列の並び順はステップの順序.
  */
-export const selectionSteps = ['providerTypeSelect', 'broadcastChannelSelect', 'programSelect'] as const;
+export const selectionSteps = ['providerTypeSelect', 'channelSelect', 'programSelect'] as const;
 export type TSelectionStep = typeof selectionSteps[number];
 
 /**
@@ -27,7 +27,7 @@ export type TStep = typeof steps[number];
  * ```
  * {
  *   'providerTypeSelect': 0
- *   'broadcastChannelSelect': 1, 
+ *   'channelSelect': 1, 
  *   // ...
  * }
  * ```
@@ -66,7 +66,7 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
     }
     this.SET_STATE({
       selectedProviderType: 'channel',
-      currentStep: 'broadcastChannelSelect'
+      currentStep: 'channelSelect'
     });
   }
 
@@ -90,7 +90,7 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
    * @param broadcastableProgramIds 配信可能な番組ID (lvXXXX) の一覧
    */
   onSelectChannel(id: string, name: string, broadcastableProgramIds: string[]) {
-    if(this.state.currentStep !== 'broadcastChannelSelect') {
+    if(this.state.currentStep !== 'channelSelect') {
       return;
     }
     this.SET_STATE({
@@ -155,9 +155,9 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
     }
     this.SET_STATE({
       currentStep: step,
-      candidatePrograms: stepsMap[step] <= stepsMap['broadcastChannelSelect'] ? [] : this.state.candidatePrograms,
+      candidatePrograms: stepsMap[step] <= stepsMap['channelSelect'] ? [] : this.state.candidatePrograms,
       selectedProviderType: stepsMap[step] <= stepsMap['providerTypeSelect'] ? null : this.state.selectedProviderType,
-      selectedChannel: stepsMap[step] <= stepsMap['broadcastChannelSelect'] ? null : this.state.selectedChannel,
+      selectedChannel: stepsMap[step] <= stepsMap['channelSelect'] ? null : this.state.selectedChannel,
       selectedProgram: stepsMap[step] <= stepsMap['programSelect']  ? null : this.state.selectedProgram,
     });
   }
@@ -172,7 +172,7 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
   private isStepToSkip(step: TStep, providerType: TProviderType): boolean {
     return (
       providerType === 'user' && (
-        step === 'programSelect' || step === 'broadcastChannelSelect'
+        step === 'programSelect' || step === 'channelSelect'
       )
     );
   }

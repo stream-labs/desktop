@@ -32,7 +32,7 @@
         </li>
       </Step>
       <Step
-        v-if="currentStep === 'broadcastChannelSelect'"
+        v-if="currentStep === 'channelSelect'"
         :class="'broadcast-channel-select-step'"
         :title="getStepTitle(currentStep)"
         :desciption="getStepDescription(currentStep)">
