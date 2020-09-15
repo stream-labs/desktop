@@ -83,11 +83,11 @@ export default class SceneSelector extends TsxComponent {
   }
 
   makeActive(selectedNodes: ISlTreeNode<{ id: string }>[]) {
-    this.scenesService.makeSceneActive(selectedNodes[0].data.id);
+    this.scenesService.actions.makeSceneActive(selectedNodes[0].data.id);
   }
 
   handleSort(nodes: ISlTreeNode<{ id: string }>[]) {
-    this.scenesService.setSceneOrder(nodes.map(node => node.data.id));
+    this.scenesService.actions.setSceneOrder(nodes.map(node => node.data.id));
   }
 
   addScene() {
