@@ -37,7 +37,10 @@ export class CacheUploaderService extends Service {
         const AWS = await importAwsSdk();
         AWS.config.region = 'us-west-2';
 
-        // This is a restricted cache upload account
+        /*************** ATTENTION *********************
+         * These credentials are intentionally public. *
+         * Please do not report this to us.            *
+         **********************************************/
         AWS.config.credentials = new AWS.Credentials({
           accessKeyId: 'AKIAIAINC32O7I3KUJGQ',
           secretAccessKey: '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',
