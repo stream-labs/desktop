@@ -67,7 +67,7 @@ test('Media backup', async t => {
     // restart app and delete local images
     await stopApp(t, false);
     fse.removeSync(tmpDir);
-    await startApp(t);
+    await startApp(t, true);
 
     // images should be downloaded from the media-backup server
     const image1DownloadedPath = item1.getSource().getSettings().file;
