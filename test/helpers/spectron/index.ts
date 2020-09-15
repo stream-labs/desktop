@@ -193,6 +193,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         // disable deprecation warning and waiting for better docs now
         deprecationWarnings: false,
       },
+      chromeDriverArgs: [`user-data-dir=${path.join(t.context.cacheDir, 'slobs-client')}`],
     });
 
     if (options.beforeAppStartCb) await options.beforeAppStartCb(t);
