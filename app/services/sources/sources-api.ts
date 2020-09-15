@@ -17,6 +17,7 @@ export interface ISource {
   doNotDuplicate: boolean;
   configurable: boolean;
   propertiesManagerType: TPropertiesManager;
+  propertiesManagerSettings?: Dictionary<any>;
   channel?: number;
 }
 
