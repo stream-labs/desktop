@@ -158,9 +158,11 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   let failMsg = '';
   let testName = '';
   let logFileLastReadingPos = 0;
+  let lastCacheDir: string;
 
   startAppFn = async function startApp(t: TExecutionContext): Promise<Application> {
     t.context.cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
+    lastCacheDir = t.context.cacheDir;
     const appArgs = options.appArgs ? options.appArgs.split(' ') : [];
     if (options.networkLogging) appArgs.push('--network-logging');
     if (options.noSync) appArgs.push('--nosync');
@@ -273,6 +275,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
    * test should be considered as failed if it writes exceptions in to the log file
    */
   async function checkErrorsInLogFile(t: TExecutionContext) {
+    console.log('CHECK ERRORS');
     await sleep(1000); // electron-log needs some time to write down logs
     const filePath = path.join(t.context.cacheDir, 'slobs-client', 'app.log');
     if (!fs.existsSync(filePath)) return;
@@ -314,7 +317,12 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     skipCheckingErrorsInLogFlag = false;
 
     t.context.app = app;
-    if (options.restartAppAfterEachTest || !appIsRunning) await startAppFn(t);
+    if (options.restartAppAfterEachTest || !appIsRunning) {
+      await startAppFn(t);
+    } else {
+      // Set the cache dir to what it previously was, since we are re-using it
+      t.context.cacheDir = lastCacheDir;
+    }
   });
 
   test.afterEach(async t => {
