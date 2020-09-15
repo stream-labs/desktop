@@ -60,7 +60,7 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
     super.init();
   }
 
-  onSelectChannelProgram() {
+  onSelectProviderTypeChannel() {
     if (this.state.currentStep !== 'providerTypeSelect') {
       return;
     }
@@ -70,7 +70,7 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
     });
   }
 
-  onSelectUserProgram(userProgramId: string) {
+  onSelectProviderTypeUser(userProgramId: string) {
     if (this.state.currentStep !== 'providerTypeSelect') {
       return;
     }

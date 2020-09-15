@@ -60,9 +60,9 @@ export default class NicoliveProgramSelector extends Vue {
       return;
     }
     if (providerType === 'channel') {
-      this.nicoliveProgramSelectorService.onSelectChannelProgram();
+      this.nicoliveProgramSelectorService.onSelectProviderTypeChannel();
     } else {
-      this.nicoliveProgramSelectorService.onSelectUserProgram(
+      this.nicoliveProgramSelectorService.onSelectProviderTypeUser(
         this.queryParams.user.broadcastableProgramId
       );
     }
