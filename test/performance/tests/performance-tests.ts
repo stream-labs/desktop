@@ -80,14 +80,14 @@ test('Empty collection', async t => {
   // measure startup time
   let attempts = RELOAD_ATTEMPTS;
   while (attempts--) {
-    await startApp(t);
+    await startApp(t, true);
     const api = await getClient();
     measureStartupTime(api);
     await stopApp(t, false);
   }
 
   // measure memory and CPU
-  await startApp(t);
+  await startApp(t, true);
   await measureMemoryAndCPU(t);
 
   t.pass();
@@ -101,14 +101,14 @@ test('Large collection', async t => {
   // measure startup time
   let i = RELOAD_ATTEMPTS;
   while (i--) {
-    await startApp(t);
+    await startApp(t, true);
     const api = await getClient();
     measureStartupTime(api);
     await stopApp(t, false);
   }
 
   // measure memory and CPU
-  await startApp(t);
+  await startApp(t, true);
   await measureMemoryAndCPU(t);
   t.pass();
 });
@@ -122,7 +122,7 @@ test('Empty collection (logged-in twitch)', async t => {
   // measure startup time
   let attempts = RELOAD_ATTEMPTS;
   while (attempts--) {
-    await startApp(t);
+    await startApp(t, true);
     const api = await getClient();
     measureStartupTime(api);
     await stopApp(t, false);

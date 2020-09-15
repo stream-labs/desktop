@@ -123,11 +123,11 @@ export interface ITestContext {
 
 export type TExecutionContext = ExecutionContext<ITestContext>;
 
-let startAppFn: (t: TExecutionContext) => Promise<any>;
+let startAppFn: (t: TExecutionContext, reuseCache?: boolean) => Promise<any>;
 let stopAppFn: (t: TExecutionContext, clearCache?: boolean) => Promise<any>;
 
-export async function startApp(t: TExecutionContext) {
-  return startAppFn(t);
+export async function startApp(t: TExecutionContext, reuseCache = false) {
+  return startAppFn(t, reuseCache);
 }
 
 export async function stopApp(t: TExecutionContext, clearCache?: boolean) {
@@ -136,7 +136,7 @@ export async function stopApp(t: TExecutionContext, clearCache?: boolean) {
 
 export async function restartApp(t: TExecutionContext): Promise<Application> {
   await stopAppFn(t, false);
-  return await startAppFn(t);
+  return await startAppFn(t, true);
 }
 
 let skipCheckingErrorsInLogFlag = false;
@@ -160,9 +160,15 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   let logFileLastReadingPos = 0;
   let lastCacheDir: string;
 
-  startAppFn = async function startApp(t: TExecutionContext): Promise<Application> {
-    t.context.cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
-    lastCacheDir = t.context.cacheDir;
+  startAppFn = async function startApp(
+    t: TExecutionContext,
+    reuseCache = false,
+  ): Promise<Application> {
+    if (!reuseCache) {
+      lastCacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
+    }
+
+    t.context.cacheDir = lastCacheDir;
     const appArgs = options.appArgs ? options.appArgs.split(' ') : [];
     if (options.networkLogging) appArgs.push('--network-logging');
     if (options.noSync) appArgs.push('--nosync');
@@ -275,7 +281,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
    * test should be considered as failed if it writes exceptions in to the log file
    */
   async function checkErrorsInLogFile(t: TExecutionContext) {
-    console.log('CHECK ERRORS');
     await sleep(1000); // electron-log needs some time to write down logs
     const filePath = path.join(t.context.cacheDir, 'slobs-client', 'app.log');
     if (!fs.existsSync(filePath)) return;
