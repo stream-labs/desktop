@@ -164,7 +164,6 @@ export class FileManagerService extends Service {
       } else {
         if (file.flushFinished) file.flushFinished();
         console.error(`Ran out of retries writing ${filePath}`);
-        console.error('Most recent error', e);
       }
     }
   }
@@ -190,19 +189,16 @@ export class FileManagerService extends Service {
 
       fs.writeFile(tmpPath, data, err => {
         if (err) {
-          console.error('Error on Write', err);
           reject(err);
           return;
         }
 
         fs.rename(tmpPath, filePath, err => {
           if (err) {
-            console.error('Error on Rename', err);
             reject(err);
             return;
           }
 
-          console.log('Successful write', filePath);
           resolve();
         });
       });

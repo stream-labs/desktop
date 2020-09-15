@@ -149,7 +149,6 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
    * Creates the scene collections directory if it doesn't exist
    */
   async ensureDirectory() {
-    console.log('Ensuring cache directory', this.collectionsDirectory);
     const exists = await new Promise(resolve => {
       fs.exists(this.collectionsDirectory, exists => resolve(exists));
     });
@@ -158,12 +157,10 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
       await new Promise((resolve, reject) => {
         fs.mkdir(this.collectionsDirectory, err => {
           if (err) {
-            console.error('Error creating collections directory', err);
             reject(err);
             return;
           }
 
-          console.log('Successfully wrote collections directory', this.collectionsDirectory);
           resolve();
         });
       });
