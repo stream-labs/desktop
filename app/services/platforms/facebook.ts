@@ -26,13 +26,14 @@ interface IFacebookPage {
   id: string;
 }
 
-interface IFacebookLiveVideo {
-  status: string;
-  id: number;
+export interface IFacebookLiveVideo {
+  status: 'SCHEDULED_UNPUBLISHED' | 'LIVE_STOPPED' | 'LIVE';
+  id: string;
   stream_url: string;
   title: string;
   game: string;
   description: string;
+  planned_start_time: number;
 }
 
 export interface IStreamlabsFacebookPage {
@@ -62,6 +63,7 @@ export interface IFacebookStartStreamOptions {
   title: string;
   game: string;
   description?: string;
+  scheduledVideoId?: string;
 }
 
 export interface IFacebookChannelInfo extends IFacebookStartStreamOptions {
@@ -261,43 +263,9 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   /**
    * fetch prefill data
    */
-  async prepopulateInfo(): Promise<Partial<IFacebookStartStreamOptions>> {
+  async prepopulateInfo() {
     await this.fetchActivePage();
-    if (!this.state.activePage || !this.state.activePage.id) {
-      this.SET_PREPOPULATED(true);
-      return { facebookPageId: undefined };
-    }
-    const url =
-      `${this.apiBase}/${this.state.activePage.id}/live_videos?` +
-      'fields=status,stream_url,title,description';
-    return this.requestFacebook<{ data: IFacebookLiveVideo[] }>(url, this.activeToken).then(
-      json => {
-        // First check if there are any live videos
-        let info = json.data.find((vid: any) => vid.status.includes(['LIVE_STOPPED', 'LIVE']));
-
-        // Next check for future scheduled videos
-        if (!info) {
-          info = json.data.find((vid: any) => vid.status === 'SCHEDULED_UNPUBLISHED');
-        }
-
-        // Finally, just fallback to the first video, which will be their most recent VOD
-        if (!info) {
-          info = json.data[0];
-        }
-
-        if (info && ['SCHEDULED_UNPUBLISHED', 'LIVE_STOPPED', 'LIVE'].includes(info.status)) {
-          this.SET_LIVE_VIDEO_ID(info.id);
-          this.SET_STREAM_URL(info.stream_url);
-        } else {
-          this.SET_LIVE_VIDEO_ID(null);
-        }
-        this.SET_PREPOPULATED(true);
-        return {
-          ...info,
-          facebookPageId: this.state.activePage!.id,
-        };
-      },
-    );
+    this.SET_PREPOPULATED(true);
   }
 
   async scheduleStream(
