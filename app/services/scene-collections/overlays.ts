@@ -7,6 +7,7 @@ import { TextNode } from './nodes/overlays/text';
 import { WebcamNode } from './nodes/overlays/webcam';
 import { VideoNode } from './nodes/overlays/video';
 import { TransitionNode } from './nodes/overlays/transition';
+import { GameCaptureNode } from './nodes/overlays/game-capture';
 import { parse } from './parse';
 import { StreamlabelNode } from './nodes/overlays/streamlabel';
 import { WidgetNode } from './nodes/overlays/widget';
@@ -33,6 +34,7 @@ const NODE_TYPES = {
   WidgetNode,
   TransitionNode,
   SceneSourceNode,
+  GameCaptureNode,
 };
 
 export interface IDownloadProgress {
