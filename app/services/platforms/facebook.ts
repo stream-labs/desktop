@@ -26,7 +26,7 @@ interface IFacebookPage {
   id: string;
 }
 
-export interface IFacebookLiveVideo {
+interface IFacebookLiveVideo {
   status: 'SCHEDULED_UNPUBLISHED' | 'LIVE_STOPPED' | 'LIVE';
   id: string;
   stream_url: string;
@@ -63,7 +63,6 @@ export interface IFacebookStartStreamOptions {
   title: string;
   game: string;
   description?: string;
-  scheduledVideoId?: string;
 }
 
 export interface IFacebookChannelInfo extends IFacebookStartStreamOptions {
