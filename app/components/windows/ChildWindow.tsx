@@ -93,7 +93,6 @@ export default class ChildWindow extends Vue {
     // that will do a bunch of synchronous IO.
     clearTimeout(this.refreshingTimeout);
     this.refreshingTimeout = window.setTimeout(async () => {
-      Utils.makeChildWindowVisible();
       this.components.push({
         ...options,
         isShown: true,
@@ -122,7 +121,7 @@ export default class ChildWindow extends Vue {
 
   render() {
     return (
-      <div style="height: 100%;" class={this.theme}>
+      <div style="height: 100%;" class={this.theme} id="mainWrapper">
         <TitleBar title={this.options.title} class={styles.childWindowTitlebar} />
         <div class={styles.blankSlate}>
           <div class={styles.spinnerSpacer} />

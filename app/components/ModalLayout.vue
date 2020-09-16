@@ -1,15 +1,15 @@
 <template>
-  <div id="mainWrapper" class="modal-layout" :class="wrapperClassNames">
+  <div class="modal-layout" :class="wrapperClassNames">
     <div class="ModalLayout-fixed" :style="fixedStyle"><slot name="fixed" /></div>
-    <div
-      :class="containsTabs ? 'modal-layout-tab-content' : 'modal-layout-content'"
+    <scrollable
+      :className="containsTabs ? 'modal-layout-tab-content' : 'modal-layout-content'"
       :style="contentStyle"
     >
       <slot name="content" v-if="!loading" />
       <div class="spinner-container" v-else>
         <i class="fa fa-spinner fa-pulse modal-layout-spinner" />
       </div>
-    </div>
+    </scrollable>
     <div v-if="showControls" class="modal-layout-controls">
       <button v-if="showCancel" class="button button--default" @click="cancel">
         {{ $t('Cancel') }}
@@ -108,18 +108,5 @@
   .button {
     .margin-left();
   }
-}
-
-.modal--side-nav {
-  display: flex;
-  align-content: stretch;
-  align-items: stretch;
-  height: 100%;
-}
-
-.modal-container--side-nav {
-  flex-grow: 1;
-  margin: -16px -16px -16px 0;
-  overflow: auto;
 }
 </style>

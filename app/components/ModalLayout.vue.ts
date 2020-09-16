@@ -6,8 +6,9 @@ import { Inject } from 'services/core/injector';
 import { AppService } from 'services/app';
 import TsxComponent from 'components/tsx-component';
 import { OS, getOS } from 'util/operating-systems';
+import Scrollable from 'components/shared/Scrollable';
 
-@Component({})
+@Component({ components: { Scrollable } })
 export default class ModalLayout extends TsxComponent<{
   showControls?: boolean;
   showCancel?: boolean;
@@ -74,7 +75,6 @@ export default class ModalLayout extends TsxComponent<{
   created() {
     const contentStyle = {
       padding: '16px',
-      overflowY: 'auto',
     };
 
     Object.assign(contentStyle, this.contentStyles);

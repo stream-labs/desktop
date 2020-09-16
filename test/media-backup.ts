@@ -44,8 +44,10 @@ test('Media backup', async t => {
 
   try {
     const scene = api.getResource<ScenesService>('ScenesService').activeScene;
-    const image1Path = path.resolve(tmpDir, 'moon.png');
-    const image2Path = path.resolve(tmpDir, 'sun.png');
+    const image1Filename = 'moon.png';
+    const image2Filename = 'sun.png';
+    const image1Path = path.resolve(tmpDir, image1Filename);
+    const image2Path = path.resolve(tmpDir, image2Filename);
 
     // simply create the first image
     const item1 = scene.createAndAddSource('image', 'image_source', {
@@ -67,15 +69,23 @@ test('Media backup', async t => {
     // restart app and delete local images
     await stopApp(t, false);
     fse.removeSync(tmpDir);
-    await startApp(t);
+    await startApp(t, true);
 
     // images should be downloaded from the media-backup server
-    const image1DownloadedPath = item1.getSource().getSettings().file;
-    const image2DownloadedPath = item2.getSource().getSettings().file;
+    const image1DownloadedPath: string = item1.getSource().getSettings().file;
+    const image2DownloadedPath: string = item2.getSource().getSettings().file;
+
+    // Make sure the paths exist
     t.truthy(image1DownloadedPath);
     t.truthy(image2DownloadedPath);
+
+    // Make sure they are still not pointing at the original path
     t.not(image1Path, image1DownloadedPath);
     t.not(image2Path, image2DownloadedPath);
+
+    // Make sure the filenames contain the original filename
+    t.not(image1DownloadedPath.indexOf(image1Filename), -1);
+    t.not(image2DownloadedPath.indexOf(image2Filename), -1);
   } catch (e) {
     await collectionsService.delete(collection.id);
     throw e;

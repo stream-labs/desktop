@@ -12,6 +12,7 @@ import ConnectionSettings from 'components/ConnectionSettings';
 import VModal from 'vue-js-modal';
 import { EditorCommandsService } from 'services/editor-commands';
 import electron from 'electron';
+import Scrollable from 'components/shared/Scrollable';
 
 Vue.use(VModal);
 
@@ -21,6 +22,7 @@ Vue.use(VModal);
     TransitionSettings,
     Tabs,
     ConnectionSettings,
+    Scrollable,
   },
 })
 export default class SceneTransitions extends Vue {
@@ -53,6 +55,8 @@ export default class SceneTransitions extends Vue {
     return this.scenesService.views.scenes.length > 1;
   }
 
+  lockStates: Dictionary<boolean>;
+
   /**
    * Scene transitions created from apps should not be editable
    * if the app developer specified `shouldLock` as part of their
@@ -61,7 +65,11 @@ export default class SceneTransitions extends Vue {
    * @param id ID of the scene transition
    */
   isEditable(id: string) {
-    return this.transitionsService.getPropertiesManagerSettings(id).locked !== true;
+    if (!this.lockStates) {
+      this.lockStates = this.transitionsService.getLockedStates();
+    }
+
+    return !this.lockStates[id];
   }
 
   getEditableMessage(id: string) {
@@ -162,11 +170,11 @@ export default class SceneTransitions extends Vue {
   }
 
   isConnectionRedundant(id: string) {
-    return this.transitionsService.isConnectionRedundant(id);
+    return this.transitionsService.views.isConnectionRedundant(id);
   }
 
   nameForType(type: ETransitionType) {
-    return this.transitionsService.getTypes().find(t => t.value === type).title;
+    return this.transitionsService.views.getTypes().find(t => t.value === type).title;
   }
 
   done() {

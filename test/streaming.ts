@@ -69,7 +69,8 @@ test('Streaming to Twitch', async t => {
   t.pass();
 });
 
-test('Streaming to Facebook', async t => {
+// TODO: Flaky
+test.skip('Streaming to Facebook', async t => {
   await logIn(t, 'facebook');
   await goLive(t, {
     title: 'SLOBS Test Stream',
@@ -367,13 +368,12 @@ test('User does not have Facebook pages', async t => {
   );
 });
 
-test.skip('User has linked twitter', async t => {
-  await logIn(t, 'twitch', { hasLinkedTwitter: true });
+test('User has linked twitter', async t => {
+  await logIn(t, 'twitch', { hasLinkedTwitter: true, notStreamable: true });
   await prepareToGoLive(t);
   await clickGoLive(t);
 
-  // check the "Unlink" button
-  await t.context.app.client.waitForVisible('button=Unlink Twitter');
+  await t.context.app.client.waitForVisible('button=Unlink Twitter', 10000);
   t.true(
     await t.context.app.client.isExisting('button=Unlink Twitter'),
     'The button for unlinking Twitter should exist',

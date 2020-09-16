@@ -9,6 +9,7 @@ import vShaderSrc from 'util/webgl/shaders/volmeter.vert';
 import fShaderSrc from 'util/webgl/shaders/volmeter.frag';
 import electron from 'electron';
 import TsxComponent, { createProps } from './tsx-component';
+import { WindowsService } from 'services/windows';
 
 // Configuration
 const CHANNEL_HEIGHT = 3;
@@ -31,6 +32,7 @@ class MixerVolmeterProps {
 export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
   @Inject() customizationService: CustomizationService;
   @Inject() audioService: AudioService;
+  @Inject() windowsService: WindowsService;
 
   volmeterSubscription: Subscription;
 
@@ -71,6 +73,8 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
   // Used for lazy initialization of the canvas rendering
   renderingInitialized = false;
 
+  styleBlockersSubscription: Subscription;
+
   mounted() {
     this.subscribeVolmeter();
     this.peakHoldCounters = [];
@@ -84,6 +88,7 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
     if (this.gl) window['activeWebglContexts'] -= 1;
     clearInterval(this.canvasWidthInterval);
     this.unsubscribeVolmeter();
+    if (this.styleBlockersSubscription) this.styleBlockersSubscription.unsubscribe();
   }
 
   private setupNewCanvas() {
@@ -109,7 +114,17 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
     this.setChannelCount(2);
 
     this.setCanvasWidth();
-    this.canvasWidthInterval = window.setInterval(() => this.setCanvasWidth(), 500);
+
+    // Style blockers are always hidden whenever something happens that causes main
+    // window elements to change width. We can improve performance by just listening
+    // the style blocker change event.
+    this.styleBlockersSubscription = this.windowsService.styleBlockersUpdated.subscribe(
+      blockers => {
+        if (blockers.windowId === 'main' && !blockers.hideStyleBlockers) {
+          this.setCanvasWidth();
+        }
+      },
+    );
   }
 
   private initRenderingContext() {

@@ -123,11 +123,11 @@ export interface ITestContext {
 
 export type TExecutionContext = ExecutionContext<ITestContext>;
 
-let startAppFn: (t: TExecutionContext) => Promise<any>;
+let startAppFn: (t: TExecutionContext, reuseCache?: boolean) => Promise<any>;
 let stopAppFn: (t: TExecutionContext, clearCache?: boolean) => Promise<any>;
 
-export async function startApp(t: TExecutionContext) {
-  return startAppFn(t);
+export async function startApp(t: TExecutionContext, reuseCache = false) {
+  return startAppFn(t, reuseCache);
 }
 
 export async function stopApp(t: TExecutionContext, clearCache?: boolean) {
@@ -136,11 +136,10 @@ export async function stopApp(t: TExecutionContext, clearCache?: boolean) {
 
 export async function restartApp(t: TExecutionContext): Promise<Application> {
   await stopAppFn(t, false);
-  return await startAppFn(t);
+  return await startAppFn(t, true);
 }
 
 let skipCheckingErrorsInLogFlag = false;
-let cacheDir: string;
 
 /**
  * Disable checking errors in the log file for a single test
@@ -159,10 +158,17 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   let failMsg = '';
   let testName = '';
   let logFileLastReadingPos = 0;
-  cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
+  let lastCacheDir: string;
 
-  startAppFn = async function startApp(t: TExecutionContext): Promise<Application> {
-    t.context.cacheDir = cacheDir;
+  startAppFn = async function startApp(
+    t: TExecutionContext,
+    reuseCache = false,
+  ): Promise<Application> {
+    if (!reuseCache) {
+      lastCacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
+    }
+
+    t.context.cacheDir = lastCacheDir;
     const appArgs = options.appArgs ? options.appArgs.split(' ') : [];
     if (options.networkLogging) appArgs.push('--network-logging');
     if (options.noSync) appArgs.push('--nosync');
@@ -187,6 +193,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         // disable deprecation warning and waiting for better docs now
         deprecationWarnings: false,
       },
+      chromeDriverArgs: [`user-data-dir=${path.join(t.context.cacheDir, 'slobs-client')}`],
     });
 
     if (options.beforeAppStartCb) await options.beforeAppStartCb(t);
@@ -259,12 +266,12 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       console.error(e);
     }
     appIsRunning = false;
-    await checkErrorsInLogFile();
+    await checkErrorsInLogFile(t);
     logFileLastReadingPos = 0;
 
     if (!clearCache) return;
     await new Promise(resolve => {
-      rimraf(cacheDir, resolve);
+      rimraf(t.context.cacheDir, resolve);
     });
     for (const callback of afterStopCallbacks) {
       await callback(t);
@@ -274,23 +281,33 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   /**
    * test should be considered as failed if it writes exceptions in to the log file
    */
-  async function checkErrorsInLogFile() {
+  async function checkErrorsInLogFile(t: TExecutionContext) {
     await sleep(1000); // electron-log needs some time to write down logs
-    const filePath = path.join(cacheDir, 'slobs-client', 'app.log');
+    const filePath = path.join(t.context.cacheDir, 'slobs-client', 'app.log');
     if (!fs.existsSync(filePath)) return;
-    const logs = fs.readFileSync(filePath).toString();
+    const logs: string = fs.readFileSync(filePath).toString();
     const errors = logs
       .substr(logFileLastReadingPos)
       .split('\n')
-      .filter((record: string) => record.match(/\[error\]/));
+      .filter((record: string) => {
+        // This error is outside our control and can be ignored.
+        // See: https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded
+        return record.match(/\[error\]/) && !record.match(/ResizeObserver loop limit exceeded/);
+      });
 
     // save the last reading position, to skip already read records next time
     logFileLastReadingPos = logs.length - 1;
 
+    // remove [vue-i18n] warnings
+    const displayLogs = logs
+      .split('\n')
+      .filter(str => !str.match('Fall back to translate'))
+      .join('\n');
+
     if (errors.length && !skipCheckingErrorsInLogFlag) {
-      fail(`The log-file has errors \n ${logs}`);
+      fail(`The log-file has errors \n ${displayLogs}`);
     } else if (options.networkLogging && !testPassed) {
-      fail(`log-file: \n ${logs}`);
+      fail(`log-file: \n ${displayLogs}`);
     }
   }
 
@@ -306,7 +323,12 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     skipCheckingErrorsInLogFlag = false;
 
     t.context.app = app;
-    if (options.restartAppAfterEachTest || !appIsRunning) await startAppFn(t);
+    if (options.restartAppAfterEachTest || !appIsRunning) {
+      await startAppFn(t);
+    } else {
+      // Set the cache dir to what it previously was, since we are re-using it
+      t.context.cacheDir = lastCacheDir;
+    }
   });
 
   test.afterEach(async t => {
@@ -314,7 +336,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   });
 
   test.afterEach.always(async t => {
-    await checkErrorsInLogFile();
+    await checkErrorsInLogFile(t);
     if (!testPassed && options.pauseIfFailed) {
       console.log('Test execution has been paused due `pauseIfFailed` enabled');
       await sleep(ALMOST_INFINITY);
@@ -391,8 +413,4 @@ export async function click(t: TExecutionContext, selector: string) {
     const message = `click to "${selector}" failed in window ${windowId}: ${e.message} ${e.type}`;
     throw new Error(message);
   }
-}
-
-export function getCacheDir() {
-  return cacheDir;
 }
