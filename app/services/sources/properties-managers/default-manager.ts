@@ -64,6 +64,8 @@ export class DefaultManager extends PropertiesManager {
       this.mediaBackupFileSetting = 'file';
     } else if (this.obsSource.id === 'obs_stinger_transition') {
       this.mediaBackupFileSetting = 'path';
+    } else if (this.obsSource.id === 'game_capture') {
+      this.mediaBackupFileSetting = 'user_placeholder_image';
     } else {
       return;
     }
