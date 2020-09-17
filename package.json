@@ -62,7 +62,8 @@
       "test-dist/test/api/*.js",
       "test-dist/test/widgets/*.js",
       "test-dist/test/settings/**/*.js",
-      "test-dist/test/streaming/**/*.js"
+      "test-dist/test/streaming/**/*.js",
+      "test-dist/test/performance/tests/**/*.js"
     ],
     "serial": true
   },
