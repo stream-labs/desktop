@@ -30,20 +30,31 @@ Array [
   Object {
     "componentName": "NicoliveProgramSelector",
     "queryParams": Object {
-      "channelId1": Object {
-        "bitrate": "bitrate1",
-        "key": "key1",
-        "url": "url1",
+      "channels": Object {
+        "co1": Object {
+          "broadcastableProgramIds": Array [
+            "lv1111111111",
+            "lv2222222222",
+          ],
+          "name": "テスト用コミュニティ1",
+          "thumbnailUrl": "https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg",
+        },
+        "co2": Object {
+          "broadcastableProgramIds": Array [
+            "lv4444444444",
+            "lv5555555555",
+          ],
+          "name": "テスト用コミュニティ2",
+          "thumbnailUrl": "https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg",
+        },
       },
-      "channelId2": Object {
-        "bitrate": "bitrate2",
-        "key": "key2",
-        "url": "url2",
+      "user": Object {
+        "broadcastableProgramId": "lv10",
       },
     },
     "size": Object {
-      "height": 400,
-      "width": 700,
+      "height": 800,
+      "width": 800,
     },
   },
 ]
