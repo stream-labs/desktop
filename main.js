@@ -546,6 +546,8 @@ ipcMain.on('protocolLinkReady', () => {
   if (pendingLink) workerWindow.send('protocolLink', pendingLink);
 });
 
+app.allowRendererProcessReuse = false;
+
 app.on('ready', () => {
   if (
     !process.argv.includes('--skip-update') &&
