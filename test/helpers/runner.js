@@ -115,6 +115,9 @@ async function createTestTimingsFile() {
           reject('Unable to request the utility server', res);
         } else {
           res.json().then(data => {
+            if (!fs.existsSync('test-dist')) {
+              fs.mkdirSync('test-dist');
+            }
             fs.writeFileSync(testTimingsFile, JSON.stringify(data));
             resolve();
           });
