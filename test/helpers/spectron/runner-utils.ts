@@ -106,7 +106,6 @@ function isTestEligibleToRun(testName: string) {
 }
 
 export function saveTestExecutionTimeToDB(timings: Record<string, number>) {
-  console.log('send timings', timings);
   try {
     return requestUtilsServer('testTimings', 'post', timings);
   } catch (e) {
