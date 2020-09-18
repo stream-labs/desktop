@@ -95,10 +95,15 @@ function isTestEligibleToRun(testName: string) {
   let testAvgTotalTime = 0;
   Object.keys(testTimings).forEach(name => {
     testAvgTotalTime += testTimings[name];
+    console.log('testAvgTotalTime', testAvgTotalTime);
     if (name === testName) testAvgStartTime = testAvgTotalTime;
   });
   const timePerChunk = testAvgTotalTime / totalChunks;
+
+  console.log('timePerChunk', timePerChunk);
+  console.log('testAvgStartTime', testAvgStartTime);
   const testChunkNum = Math.round(testAvgStartTime / timePerChunk);
+  console.log('testChunkNum', testChunkNum);
 
   console.log('current chunk', currentChunkNum, 'testChunk', testChunkNum);
 
