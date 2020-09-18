@@ -37,7 +37,9 @@ function retryTests() {
   const retryingArgs = failedTests.map(testName => `--match="${testName}"`);
   let retryingFailed = false;
   try {
-    execSync(`yarn test --timeout=${TIMEOUT}m ` + args.concat(retryingArgs).join(' '), { stdio: [0, 1, 2] });
+    execSync(`yarn test --timeout=${TIMEOUT}m ` + args.concat(retryingArgs).join(' '), {
+      stdio: [0, 1, 2],
+    });
     log('retrying succeed');
   } catch (e) {
     retryingFailed = true;
@@ -100,19 +102,24 @@ async function createTestTimingsFile() {
   const testTimingsFile = 'test-dist/test-timings.json';
   rimraf.sync(failedTestsFile);
 
-  await fetch(`${utilsServerUrl}/testStats`, {
-    method: 'get',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-  })
-    .then(res => {
-      if (res.status !== 200) {
-        console.error('Unable to request the utility server', res);
-      } else {
-        res.json().then(data => fs.writeFileSync(testTimingsFile, JSON.stringify(data)));
-      }
+  return new Promise((resolve, reject) => {
+    fetch(`${utilsServerUrl}/testStats`, {
+      method: 'get',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
     })
-    .catch(e => console.error(`Utility server is not available ${e}`));
+      .then(res => {
+        if (res.status !== 200) {
+          reject('Unable to request the utility server', res);
+        } else {
+          res.json().then(data => {
+            fs.writeFileSync(testTimingsFile, JSON.stringify(data));
+            resolve();
+          });
+        }
+      })
+      .catch(e => reject(`Utility server is not available ${e}`));
+  });
 }

@@ -79,7 +79,7 @@ function isTestEligibleToRun(testName: string) {
   const testAvgTime = testTimings[testName];
 
   // if we don't have a timing data for test then it's always eligible to run
-  if (testAvgTime) return true;
+  if (!testAvgTime) return true;
 
   // determine which chunk of the test suite is running now
   const chunk = process.env.SLOBS_TEST_RUN_CHUNK;
@@ -95,13 +95,13 @@ function isTestEligibleToRun(testName: string) {
   let testAvgTotalTime = 0;
   Object.keys(testTimings).forEach(name => {
     testAvgTotalTime += testTimings[name];
-    console.log('testAvgTotalTime', testAvgTotalTime);
     if (name === testName) testAvgStartTime = testAvgTotalTime;
   });
   const timePerChunk = testAvgTotalTime / totalChunks;
 
   console.log('timePerChunk', timePerChunk);
   console.log('testAvgStartTime', testAvgStartTime);
+  console.log('testAvgTotalTime', testAvgTotalTime);
   const testChunkNum = Math.round(testAvgStartTime / timePerChunk);
   console.log('testChunkNum', testChunkNum);
 
