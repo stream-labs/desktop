@@ -1,5 +1,6 @@
 /**
  * Tests runner script:
+ * - fetch average test timings from the DB
  * - run tests
  * - if some tests failed retry only these tests
  */
@@ -8,20 +9,22 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const rimraf = require('rimraf');
 const request = require('request');
+const fetch = require('node-fetch');
 
 const failedTestsFile = 'test-dist/failed-tests.json';
 const args = process.argv.slice(2);
 const TIMEOUT = 3; // timeout in minutes
 
-(function main() {
+(async function main() {
   try {
     rimraf.sync(failedTestsFile);
-    execSync(`yarn test --timeout=${TIMEOUT}m ` + args.join(' '), { stdio: [0, 1, 2] });
+    await createTestTimingsFile();
+    execSync(`yarn test:file test-dist/test/regular/api/*.js ` + args.join(' '), { stdio: [0, 1, 2] });
   } catch (e) {
+    console.log(e);
     retryTests();
   }
 })();
-
 
 function retryTests() {
   log('retrying failed tests');
@@ -44,7 +47,6 @@ function retryTests() {
   sendFailedTestsToAnalytics(failedTests).then(() => {
     if (retryingFailed) failAndExit();
   });
-
 }
 
 function log(...args) {
@@ -58,7 +60,6 @@ function failAndExit() {
 function sendFailedTestsToAnalytics(failedTests) {
   log('Sending analytics..');
   return new Promise((resolve, reject) => {
-
     const options = {
       url: 'https://r2d2.streamlabs.com/slobs/data/ping',
       json: {
@@ -69,13 +70,13 @@ function sendFailedTestsToAnalytics(failedTests) {
             product: 'SLOBS',
             version: this.version,
             count: 1,
-            uuid: 'test environment'
-          }
-        ]
-      }
+            uuid: 'test environment',
+          },
+        ],
+      },
     };
 
-    const callback = (error) => {
+    const callback = error => {
       if (error) {
         console.error('Analytics has not been sent');
         resolve();
@@ -87,4 +88,31 @@ function sendFailedTestsToAnalytics(failedTests) {
 
     request(options, callback);
   });
+}
+
+/**
+ * Fetch average execution timings for tests from DB
+ * and save results to a file
+ */
+async function createTestTimingsFile() {
+  const utilsServerUrl = 'https://slobs-users-pool.herokuapp.com';
+  const token = process.env.SLOBS_TEST_USER_POOL_TOKEN;
+  const testTimingsFile = 'test-dist/test-timings.json';
+  rimraf.sync(failedTestsFile);
+
+  await fetch(`${utilsServerUrl}/testStats`, {
+    method: 'get',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  })
+    .then(res => {
+      if (res.status !== 200) {
+        console.error('Unable to request the utility server', res);
+      } else {
+        res.json().then(data => fs.writeFileSync(testTimingsFile, JSON.stringify(data)));
+      }
+    })
+    .catch(e => console.error(`Utility server is not available ${e}`));
 }
