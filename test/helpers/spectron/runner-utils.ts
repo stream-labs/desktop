@@ -76,6 +76,7 @@ export function removeFailedTestFromFile(testName: string) {
  * check if test is eligible to run on the current CI agent
  */
 function isTestEligibleToRun(testName: string) {
+  console.log('test', testName);
   const testAvgTime = testTimings[testName];
 
   // if we don't have a timing data for test then it's always eligible to run
@@ -102,7 +103,7 @@ function isTestEligibleToRun(testName: string) {
   console.log('timePerChunk', timePerChunk);
   console.log('testAvgStartTime', testAvgStartTime);
   console.log('testAvgTotalTime', testAvgTotalTime);
-  const testChunkNum = Math.round(testAvgStartTime / timePerChunk);
+  const testChunkNum = Math.round(testAvgStartTime / timePerChunk) + 1;
   console.log('testChunkNum', testChunkNum);
 
   console.log('current chunk', currentChunkNum, 'testChunk', testChunkNum);
@@ -112,6 +113,7 @@ function isTestEligibleToRun(testName: string) {
 
 export function saveTestExecutionTimeToDB(timings: Record<string, number>) {
   try {
+    console.log('save timings', timings);
     return requestUtilsServer('testTimings', 'post', timings);
   } catch (e) {
     console.error('Failed to send timings');
