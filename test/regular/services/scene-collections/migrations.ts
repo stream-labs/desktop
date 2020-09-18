@@ -19,7 +19,7 @@ function copyFile(src: string, dest: string) {
 
 useSpectron({
   beforeAppStartCb: async t => {
-    const dataDir = path.resolve(__dirname, '..', '..', 'test', 'data');
+    const dataDir = path.resolve(__dirname, '..', '..', '..', 'test', 'data');
 
     fs.mkdirSync(path.join(t.context.cacheDir, 'slobs-client'));
     const sceneCollectionsPath = path.join(t.context.cacheDir, 'slobs-client', 'SceneCollections');

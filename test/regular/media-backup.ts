@@ -4,7 +4,7 @@ import {
   test,
   useSpectron,
   focusChild,
-  skipCheckingErrorsInLog
+  skipCheckingErrorsInLog,
 } from '../helpers/spectron';
 
 import { getClient } from '../helpers/api-client';
@@ -19,7 +19,6 @@ import { ScenesService } from '../../app/services/api/external-api/scenes';
 useSpectron({ noSync: false });
 
 test('Media backup', async t => {
-
   // sometimes this test causes a console error from Electron's code that is difficult to catch
   //
   // [error] Error: Object has been destroyed
@@ -29,7 +28,16 @@ test('Media backup', async t => {
   skipCheckingErrorsInLog();
 
   // copy images to the temporary folder
-  const imagesDir = path.resolve(__dirname, '..', '..', 'test', 'data', 'sources-files', 'images');
+  const imagesDir = path.resolve(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    'test',
+    'data',
+    'sources-files',
+    'images',
+  );
   const tmpDir = fs.mkdtempSync(os.tmpdir());
   fse.copySync(imagesDir, tmpDir);
 
