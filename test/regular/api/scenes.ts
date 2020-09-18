@@ -218,7 +218,7 @@ test('SceneItem.resetTransform()', async t => {
 });
 
 test('SceneItem.addFile()', async t => {
-  const dataDir = path.resolve(__dirname, '..', '..', '..', 'test', 'data', 'sources-files');
+  const dataDir = path.resolve(__dirname, '..', '..', '..', '..', 'test', 'data', 'sources-files');
 
   const client = await getClient();
   const sceneBuilder = new SceneBuilder(client);
