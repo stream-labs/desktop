@@ -16,6 +16,7 @@ import * as obs from '../../../../../obs-api';
 import { WidgetType } from '../../../widgets';
 import { byOS, OS, getOS } from 'util/operating-systems';
 import { GameCaptureNode } from './game-capture';
+import { Node } from '../node';
 
 type TContent =
   | ImageNode
@@ -179,6 +180,9 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       context.scene.createFolder(obj.name, { id });
       return;
     }
+
+    // This was something we don't recognize
+    if (!(obj.content instanceof Node)) return;
 
     const webcamSourceType = byOS<TSourceType>({
       [OS.Windows]: 'dshow_input',
