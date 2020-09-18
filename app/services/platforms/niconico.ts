@@ -275,14 +275,14 @@ export class NiconicoService extends Service implements IPlatformService {
             broadcastableProgramId: 'lv10'
           },
           channels: {
-            'co1': {
+            'ch1': {
               thumbnailUrl: 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg',
-              name: 'テスト用コミュニティ1',
+              name: 'テスト用チャンネル1',
               broadcastableProgramIds: ['lv1111111111', 'lv2222222222']
             },
-            'co2': {
+            'ch2': {
               thumbnailUrl: 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg',
-              name: 'テスト用コミュニティ2',
+              name: 'テスト用チャンネル2',
               broadcastableProgramIds: ['lv4444444444', 'lv5555555555']
             }
           }
