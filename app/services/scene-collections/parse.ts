@@ -12,7 +12,7 @@ export function parse(config: string, nodeTypes: Dictionary<any>) {
       const nodeClass = nodeTypes[value.nodeType];
 
       if (nodeClass) {
-        const instance = new nodeTypes[value.nodeType]();
+        const instance = new nodeClass();
 
         instance.fromJSON(value);
         return instance;
