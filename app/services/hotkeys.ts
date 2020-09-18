@@ -239,6 +239,13 @@ const SOURCE_ACTIONS: HotkeyGroup = {
     up: processObsHotkey(false),
     shouldApply: isSourceType('slideshow'),
   },
+  FFMPEG_SOURCE_RESTART: {
+    name: 'FFMPEG_SOURCE_RESTART',
+    description: () => $t('Restart'),
+    down: processObsHotkey(true),
+    up: processObsHotkey(false),
+    shouldApply: isSourceType('ffmpeg_source'),
+  },
 };
 
 const SCENE_ACTIONS: HotkeyGroup = {

@@ -1,5 +1,5 @@
 <template>
-  <modal-layout :title="$t('Media Gallery')" :doneHandler="handleSelect">
+  <modal-layout :doneHandler="handleSelect">
     <div
       slot="content"
       class="container"
@@ -89,41 +89,38 @@
               @click.prevent="selectFile(file)"
               @dblclick.prevent="selectFile(file, true)"
             >
-              <div>
-                <div v-if="file.type === 'image' && /\.webm$/.test(file.href)">
-                  <video
-                    autoplay
-                    muted
-                    loop
-                    :src="file.href"
-                    style="height: 100%; width: 100%;"
-                  ></video>
-                </div>
-                <div
-                  v-if="file.type == 'image' && !/\.webm$/.test(file.href)"
-                  class="image-preview"
-                  :style="'background-image: url(' + file.href + ')'"
-                ></div>
-                <div v-if="file.type == 'audio'" style="height: 132px;">
-                  <i
-                    class="icon-music"
-                    style="line-height: 132px; font-size: 28px; text-align: center; display: block;"
-                  ></i>
-                </div>
-                <button
-                  v-if="!file.prime"
-                  class="copy-button button button--action"
-                  @click="handleCopy(file.href)"
-                >
-                  <i class="icon-copy"></i> {{ $t('Copy URL') }}
-                </button>
-                <div class="upload__footer" :class="[file.type === 'image' ? 'image' : '']">
-                  <div class="upload__size">{{ file.size ? formatBytes(file.size) : ' ' }}</div>
-                  <div class="upload__title">{{ file.filename }}</div>
-                  <div v-if="file.prime" class="upload__prime">
-                    {{ $t('Prime') }}
-                    <i class="icon-prime" />
-                  </div>
+              <div v-if="file.type === 'image' && /\.webm$/.test(file.href)">
+                <video
+                  autoplay
+                  muted
+                  loop
+                  :src="file.href"
+                  style="height: 100%; width: 100%;"
+                ></video>
+              </div>
+              <div
+                v-if="file.type == 'image' && !/\.webm$/.test(file.href)"
+                class="image-preview"
+                :style="'background-image: url(' + file.href + ')'"
+              ></div>
+              <div v-if="file.type == 'audio'" style="height: 132px;">
+                <i
+                  class="icon-music"
+                  style="line-height: 132px; font-size: 28px; text-align: center; display: block;"
+                />
+              </div>
+              <i
+                v-if="!file.prime"
+                class="icon-copy"
+                v-tooltip.left="$t('Copy URL')"
+                @click="handleCopy(file.href)"
+              />
+              <div class="upload__footer" :class="[file.type === 'image' ? 'image' : '']">
+                <div class="upload__size">{{ file.size ? formatBytes(file.size) : ' ' }}</div>
+                <div class="upload__title">{{ file.filename }}</div>
+                <div v-if="file.prime" class="upload__prime">
+                  {{ $t('Prime') }}
+                  <i class="icon-prime" />
                 </div>
               </div>
             </li>
@@ -331,14 +328,6 @@
   padding-bottom: 30px;
 }
 
-.copy-button {
-  display: none;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
 .uploads-manager__item {
   border: 1px solid var(--border);
   width: 23%;
@@ -351,15 +340,23 @@
   &:hover {
     border-color: var(--teal);
     background-color: var(--teal-semi);
-
-    .copy-button {
-      display: inline-block;
-    }
+    cursor: pointer;
   }
 
   &.selected {
     border-color: var(--teal);
     background-color: var(--teal-semi);
+  }
+
+  .icon-copy {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: block;
+
+    &:hover {
+      color: var(--title);
+    }
   }
 }
 
