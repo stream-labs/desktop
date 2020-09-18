@@ -6,7 +6,7 @@ variables:
   CI: true
 
 jobs:
-  - job: Tests 1
+  - job: Tests_1
 
     pool:
       name: 'Default'
@@ -45,7 +45,7 @@ jobs:
         SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
         SLOBS_TEST_RUN_CHUNK: '1/2'
 
-  - job: Tests 2
+  - job: Tests_2
 
     pool:
       name: 'Default'
