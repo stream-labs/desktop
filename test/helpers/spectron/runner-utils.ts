@@ -125,6 +125,7 @@ export function saveTestExecutionTimeToDB(timings: Record<string, number>) {
 }
 
 export function requestUtilsServer(path: string, method = 'get', body?: unknown) {
+  console.log('request pool', `${USER_POOL_URL}/${path}`);
   return new Promise((resolve, reject) => {
     fetch(`${USER_POOL_URL}/${path}`, {
       method,
