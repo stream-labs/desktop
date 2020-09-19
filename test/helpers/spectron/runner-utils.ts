@@ -136,10 +136,12 @@ export function requestUtilsServer(path: string, method = 'get', body?: unknown)
     })
       .then((res: any) => {
         if (res.status !== 200) {
-          console.error('Unable to request the utility server', res);
-          reject();
+          res.json().then((data: any) => {
+            console.error('Unable to request the utility server', data);
+            reject();
+          });
         } else {
-          resolve(res);
+          res.json().then((data: any) => resolve(data));
         }
       })
       .catch((e: any) => reject(`Utility server is not available ${e}`));
