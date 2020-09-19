@@ -108,6 +108,10 @@ function isTestEligibleToRun(testName: string) {
 
   console.log('current chunk', currentChunkNum, 'testChunk', testChunkNum);
 
+  if (testChunkNum === currentChunkNum) {
+    console.log('test is eligible');
+  }
+
   return testChunkNum === currentChunkNum;
 }
 
