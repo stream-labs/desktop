@@ -392,7 +392,6 @@ function saveFailedTestsToFile(failedTests: string[]) {
     failedTests = JSON.parse(fs.readFileSync(FAILED_TESTS_PATH)).concat(failedTests);
   }
   fs.writeFileSync(FAILED_TESTS_PATH, JSON.stringify(uniq(failedTests)));
-  console.log('save filed tests to file', failedTests);
 }
 
 function removeFailedTestFromFile(testName: string) {
@@ -400,7 +399,6 @@ function removeFailedTestFromFile(testName: string) {
     const failedTests = JSON.parse(fs.readFileSync(FAILED_TESTS_PATH));
     failedTests.splice(failedTests.indexOf(testName), 1);
     fs.writeFileSync(FAILED_TESTS_PATH, JSON.stringify(failedTests));
-    console.log('remove failed tests to file', testName);
   }
 }
 
