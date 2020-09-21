@@ -42,7 +42,7 @@ export const testFn: TestInterface<ITestContext> = new Proxy(avaTest, {
   apply: (target, thisArg, args) => {
     const testName = args[0];
     if (!isTestEligibleToRun(testName)) {
-      avaTest.skip(`Test is not eligible to run on this agent: ${testName}`, t => {});
+      avaTest.skip(`SKIP: ${testName}`, t => {});
       return;
     }
     pendingTests.push(testName);
@@ -62,6 +62,7 @@ export function saveFailedTestsToFile(failedTests: string[]) {
     failedTests = JSON.parse(fs.readFileSync(FAILED_TESTS_PATH)).concat(failedTests);
   }
   fs.writeFileSync(FAILED_TESTS_PATH, JSON.stringify(uniq(failedTests)));
+  console.log('write test to file', failedTests);
 }
 
 export function removeFailedTestFromFile(testName: string) {
@@ -69,6 +70,7 @@ export function removeFailedTestFromFile(testName: string) {
     const failedTests = JSON.parse(fs.readFileSync(FAILED_TESTS_PATH));
     failedTests.splice(failedTests.indexOf(testName), 1);
     fs.writeFileSync(FAILED_TESTS_PATH, JSON.stringify(failedTests));
+    console.log('remove test from file', testName);
   }
 }
 
