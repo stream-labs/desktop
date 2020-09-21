@@ -16,7 +16,7 @@ const TIMEOUT = 3; // timeout in minutes
 (function main() {
   try {
     rimraf.sync(failedTestsFile);
-    execSync(`yarn test --timeout=${TIMEOUT}m ` + args.join(' '), { stdio: [0, 1, 2] });
+    execSync(`yarn test:file test-dist/test/regular/api/*s.js --timeout=${TIMEOUT}m ` + args.join(' '), { stdio: [0, 1, 2] });
   } catch (e) {
     retryTests();
   }

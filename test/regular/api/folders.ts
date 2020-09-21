@@ -63,6 +63,7 @@ test('Place item after non-empty folder', async t => {
     Folder2
   `),
   );
+  t.fail();
 });
 
 test('Move a folder with deep nesting', async t => {
