@@ -6,15 +6,25 @@ variables:
   CI: true
 
 jobs:
-  - template: scripts/ci/test-job.tpl.yml  # Template reference
+  - template: scripts/ci/test-job.tpl.yml
     parameters:
       name: Test_1
-      chunk: '1/2'
+      chunk: '1/4'
 
-  - template: scripts/ci/test-job.tpl.yml  # Template reference
+  - template: scripts/ci/test-job.tpl.yml
     parameters:
       name: Test_2
-      chunk: '2/2'
+      chunk: '2/4'
+
+  - template: scripts/ci/test-job.tpl.yml
+    parameters:
+      name: Test_3
+      chunk: '3/4'
+
+  - template: scripts/ci/test-job.tpl.yml
+    parameters:
+      name: Test_4
+      chunk: '4/4'
 
 #  - job: Tests_1
 #
