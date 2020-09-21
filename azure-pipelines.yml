@@ -11,9 +11,6 @@ jobs:
    pool:
      name: 'Default'
 
-   strategy:
-     parallel: 4
-
    workspace:
      clean: resources
 
