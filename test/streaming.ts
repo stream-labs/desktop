@@ -156,7 +156,8 @@ test('Streaming to the scheduled event on Youtube', async t => {
   t.pass();
 });
 
-test('Stream after switching accounts', async t => {
+// TODO: flaky
+test.skip('Stream after switching accounts', async t => {
   // stream to youtube
   await logIn(t, 'youtube');
   await goLive(t, {

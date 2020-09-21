@@ -104,8 +104,6 @@
 @import '../../../styles/index';
 
 .settings {
-  .transition();
-
   & /deep/ h2 {
     // reset 'capitalize' transform that works weird when text has a highlight caused by the search
     text-transform: none;

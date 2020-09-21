@@ -109,17 +109,21 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
   /**
    * Upload translations from the state to the vueI18nInstance
    */
-  static uploadTranslationsToVueI18n() {
+  static async uploadTranslationsToVueI18n(async = false) {
     const vueI18nInstance = I18nService.vueI18nInstance;
     const i18nService: I18nService = I18nService.instance;
-    const dictionaries = i18nService.getLoadedDictionaries();
+    const dictionaries = async
+      ? await i18nService.actions.return.getLoadedDictionaries()
+      : i18nService.getLoadedDictionaries();
 
     Object.keys(dictionaries).forEach(locale => {
       I18nService.vueI18nInstance.setLocaleMessage(locale, dictionaries[locale]);
     });
 
     vueI18nInstance.locale = i18nService.state.locale;
-    vueI18nInstance.fallbackLocale = i18nService.getFallbackLocale();
+    vueI18nInstance.fallbackLocale = async
+      ? await i18nService.actions.return.getFallbackLocale()
+      : i18nService.getFallbackLocale();
   }
 
   private availableLocales: Dictionary<string> = {};

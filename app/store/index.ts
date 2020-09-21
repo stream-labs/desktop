@@ -19,9 +19,13 @@ const mutations = {
   // tslint:disable-next-line:function-name
   BULK_LOAD_STATE(state: any, data: any) {
     each(data.state, (value, key) => {
+      if (key === 'i18nReady') return;
       state[key] = value;
-      state.bulkLoadFinished = true;
     });
+  },
+
+  I18N_READY(state: any) {
+    state.i18nReady = true;
   },
 };
 
@@ -105,6 +109,7 @@ export function createStore(): Store<any> {
     strict: false,
     state: {
       bulkLoadFinished: !!Util.isWorkerWindow(),
+      i18nReady: false,
     },
   });
 
