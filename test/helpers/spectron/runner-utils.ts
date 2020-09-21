@@ -15,14 +15,6 @@ const USER_POOL_URL = 'https://slobs-users-pool.herokuapp.com';
 const FAILED_TESTS_PATH = 'test-dist/failed-tests.json'; // failed will be written down to this file
 const TESTS_TIMINGS_PATH = 'test-dist/test-timings.json'; // a known timings for tests should be provided in this file
 
-
-if (fs.existsSync(FAILED_TESTS_PATH)) {
-  console.log('File content: ', fs.readFileSync(FAILED_TESTS_PATH, 'utf8'))
-  JSON.parse(fs.readFileSync(FAILED_TESTS_PATH));
-} else {
-  console.log('failed test file does not exist');
-}
-
 // save names of all running tests in this array to use them in the retrying mechanism
 const pendingTests: string[] = [];
 
@@ -70,7 +62,6 @@ export function saveFailedTestsToFile(failedTests: string[]) {
     failedTests = JSON.parse(fs.readFileSync(FAILED_TESTS_PATH, 'utf8')).concat(failedTests);
   }
   fs.writeFileSync(FAILED_TESTS_PATH, JSON.stringify(uniq(failedTests)));
-  console.log('write test to file', failedTests);
 }
 
 export function removeFailedTestFromFile(testName: string) {
@@ -78,7 +69,6 @@ export function removeFailedTestFromFile(testName: string) {
     const failedTests = JSON.parse(fs.readFileSync(FAILED_TESTS_PATH, 'utf8'));
     failedTests.splice(failedTests.indexOf(testName), 1);
     fs.writeFileSync(FAILED_TESTS_PATH, JSON.stringify(failedTests));
-    console.log('remove test from file', testName);
   }
 }
 

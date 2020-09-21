@@ -33,10 +33,7 @@ function retryTests() {
     throw 'no tests to retry';
   }
 
-  console.log('content for retrying', fs.readFileSync(failedTestsFile, 'utf8'));
-
   const failedTests = JSON.parse(fs.readFileSync(failedTestsFile, 'utf8'));
-  console.log('failed tests list', failedTests);
   const retryingArgs = failedTests.map(testName => `--match="${testName}"`);
   let retryingFailed = false;
   try {
