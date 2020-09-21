@@ -10,8 +10,9 @@ jobs:
  - job: Test
    pool:
      name: 'Default'
-  strategy:
-    parallel: 4
+
+   strategy:
+     parallel: 4
 
    workspace:
      clean: resources
