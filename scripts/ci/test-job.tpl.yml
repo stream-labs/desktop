@@ -26,12 +26,6 @@ jobs:
       - script: node node_modules/electron/install.js
         displayName: 'Install Electron'
 
-      - script: 'yarn eslint'
-        displayName: 'ESLint'
-
-      - script: 'yarn compile:strictnulls'
-        displayName: 'Check regressions in files with strictNullChecks'
-
       - script: 'yarn ci:compile'
         displayName: 'Compile Assets'
 

@@ -307,7 +307,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   }
 
   test.beforeEach(async t => {
-    testStartTime = Date.now();
     testName = t.title.replace('beforeEach hook for ', '');
     testPassed = false;
     skipCheckingErrorsInLogFlag = false;
@@ -319,6 +318,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       // Set the cache dir to what it previously was, since we are re-using it
       t.context.cacheDir = lastCacheDir;
     }
+    testStartTime = Date.now();
   });
 
   test.afterEach(async t => {
