@@ -15,7 +15,7 @@ test('Scene-collections cloud-backup', async t => {
   const sketch = `
     Folder1
       Item1: color_source
-      Item2: image
+      Item2: image_source
   `;
   sceneBuilder.build(sketch);
 
