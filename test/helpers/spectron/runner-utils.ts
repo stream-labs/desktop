@@ -83,6 +83,7 @@ function isTestEligibleToRun(testName: string) {
 
   // determine which chunk of the test suite is running now
   const chunk = process.env.SLOBS_TEST_RUN_CHUNK;
+  console.log('chunk', chunk);
 
   // always allow test to run if no chunk data provided
   if (!chunk) return true;
