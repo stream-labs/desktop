@@ -6,83 +6,93 @@ variables:
   CI: true
 
 jobs:
-  - job: Tests_1
+  - template: scripts/ci/test-job.tpl.yml  # Template reference
+    parameters:
+      name: Test_1
+      chunk: '1/2'
 
-    pool:
-      name: 'Default'
+  - template: scripts/ci/test-job.tpl.yml  # Template reference
+    parameters:
+      name: Test_1
+      chunk: '2/2'
 
-    workspace:
-      clean: resources
-
-    steps:
-
-    - powershell: echo "IP for RDP connections:" $(Invoke-RestMethod ipinfo.io/ip)
-      displayName: 'Get RDP address'
-
-    - powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
-      displayName: 'Setup Screen Resolution'
-
-    - script: yarn install --frozen-lockfile --check-files 2>&1
-      displayName: 'Install Dependencies'
-
-    - script: node node_modules/electron/install.js
-      displayName: 'Install Electron'
-
-    - script: 'yarn eslint'
-      displayName: 'ESLint'
-
-    - script: 'yarn compile:strictnulls'
-      displayName: 'Check regressions in files with strictNullChecks'
-
-    - script: 'yarn ci:compile'
-      displayName: 'Compile Assets'
-
-    - script: 'yarn ci:tests'
-      displayName: 'Run Tests'
-      env:
-        SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
-        BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
-        SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
-        SLOBS_TEST_RUN_CHUNK: '1/2'
-
-  - job: Tests_2
-
-    pool:
-      name: 'Default'
-
-    workspace:
-      clean: resources
-
-    steps:
-
-      - powershell: echo "IP for RDP connections:" $(Invoke-RestMethod ipinfo.io/ip)
-        displayName: 'Get RDP address'
-
-      - powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
-        displayName: 'Setup Screen Resolution'
-
-      - script: yarn install --frozen-lockfile --check-files 2>&1
-        displayName: 'Install Dependencies'
-
-      - script: node node_modules/electron/install.js
-        displayName: 'Install Electron'
-
-      - script: 'yarn eslint'
-        displayName: 'ESLint'
-
-      - script: 'yarn compile:strictnulls'
-        displayName: 'Check regressions in files with strictNullChecks'
-
-      - script: 'yarn ci:compile'
-        displayName: 'Compile Assets'
-
-      - script: 'yarn ci:tests'
-        displayName: 'Run Tests'
-        env:
-          SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
-          BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
-          SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
-          SLOBS_TEST_RUN_CHUNK: '2/2'
+#  - job: Tests_1
+#
+#    pool:
+#      name: 'Default'
+#
+#    workspace:
+#      clean: resources
+#
+#    steps:
+#
+#    - powershell: echo "IP for RDP connections:" $(Invoke-RestMethod ipinfo.io/ip)
+#      displayName: 'Get RDP address'
+#
+#    - powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
+#      displayName: 'Setup Screen Resolution'
+#
+#    - script: yarn install --frozen-lockfile --check-files 2>&1
+#      displayName: 'Install Dependencies'
+#
+#    - script: node node_modules/electron/install.js
+#      displayName: 'Install Electron'
+#
+#    - script: 'yarn eslint'
+#      displayName: 'ESLint'
+#
+#    - script: 'yarn compile:strictnulls'
+#      displayName: 'Check regressions in files with strictNullChecks'
+#
+#    - script: 'yarn ci:compile'
+#      displayName: 'Compile Assets'
+#
+#    - script: 'yarn ci:tests'
+#      displayName: 'Run Tests'
+#      env:
+#        SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
+#        BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
+#        SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
+#        SLOBS_TEST_RUN_CHUNK: '1/2'
+#
+#  - job: Tests_2
+#
+#    pool:
+#      name: 'Default'
+#
+#    workspace:
+#      clean: resources
+#
+#    steps:
+#
+#      - powershell: echo "IP for RDP connections:" $(Invoke-RestMethod ipinfo.io/ip)
+#        displayName: 'Get RDP address'
+#
+#      - powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
+#        displayName: 'Setup Screen Resolution'
+#
+#      - script: yarn install --frozen-lockfile --check-files 2>&1
+#        displayName: 'Install Dependencies'
+#
+#      - script: node node_modules/electron/install.js
+#        displayName: 'Install Electron'
+#
+#      - script: 'yarn eslint'
+#        displayName: 'ESLint'
+#
+#      - script: 'yarn compile:strictnulls'
+#        displayName: 'Check regressions in files with strictNullChecks'
+#
+#      - script: 'yarn ci:compile'
+#        displayName: 'Compile Assets'
+#
+#      - script: 'yarn ci:tests'
+#        displayName: 'Run Tests'
+#        env:
+#          SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
+#          BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
+#          SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
+#          SLOBS_TEST_RUN_CHUNK: '2/2'
 
 #  - job: Screenshots
 #
