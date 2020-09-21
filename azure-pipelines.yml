@@ -13,7 +13,7 @@ jobs:
 
   - template: scripts/ci/test-job.tpl.yml  # Template reference
     parameters:
-      name: Test_1
+      name: Test_2
       chunk: '2/2'
 
 #  - job: Tests_1
