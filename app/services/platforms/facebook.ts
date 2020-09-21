@@ -364,7 +364,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     return this.requestFacebook<{ data: IFacebookPage[] }>(`${this.apiBase}/me/accounts`);
   }
 
-  liveDockEnabled(): boolean {
+  get liveDockEnabled(): boolean {
     return true;
   }
 
