@@ -69,8 +69,7 @@ test('Streaming to Twitch', async t => {
   t.pass();
 });
 
-// TODO: Flaky
-test.skip('Streaming to Facebook', async t => {
+test('Streaming to Facebook', async t => {
   await logIn(t, 'facebook');
   await goLive(t, {
     title: 'SLOBS Test Stream',

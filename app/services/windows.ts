@@ -324,6 +324,13 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
   /**
+   * Should only ever be called on shutdown
+   */
+  hideMainWindow() {
+    this.windows.main.hide();
+  }
+
+  /**
    * Creates a one-off window that will not impact or close
    * any existing windows, and will cease to exist when closed.
    * @param options window options
