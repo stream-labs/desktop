@@ -33,7 +33,9 @@ function retryTests() {
     throw 'no tests to retry';
   }
 
-  const failedTests = JSON.parse(fs.readFileSync(failedTestsFile));
+  console.log('content for retrying', fs.readFileSync(failedTestsFile, 'utf8'));
+
+  const failedTests = JSON.parse(fs.readFileSync(failedTestsFile, 'utf8'));
   console.log('failed tests list', failedTests);
   const retryingArgs = failedTests.map(testName => `--match="${testName}"`);
   let retryingFailed = false;
@@ -101,7 +103,7 @@ async function createTestTimingsFile() {
   const utilsServerUrl = 'https://slobs-users-pool.herokuapp.com';
   const token = process.env.SLOBS_TEST_USER_POOL_TOKEN;
   const testTimingsFile = 'test-dist/test-timings.json';
-  rimraf.sync(failedTestsFile);
+  rimraf.sync(testTimingsFile);
 
   return new Promise((resolve, reject) => {
     fetch(`${utilsServerUrl}/testStats`, {
