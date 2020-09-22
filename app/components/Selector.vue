@@ -52,7 +52,6 @@
 
 .selector-item {
   .padding-h-sides(2);
-  .transition();
 
   display: flex;
   flex-direction: row;

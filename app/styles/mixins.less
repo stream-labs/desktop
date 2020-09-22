@@ -102,7 +102,7 @@
 // Hovers
 .icon-hover() {
   color: var(--icon);
-  .transition();
+  transition: color @transition-time;
 
   &:hover {
     color: var(--title);
@@ -178,11 +178,6 @@
 // Shadows
 .shadow() {
   box-shadow: 0 8px 16px var(--shadow);
-}
-
-// Transitiions
-.transition() {
-  transition: all @transition-time;
 }
 
 // Typography

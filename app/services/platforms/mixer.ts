@@ -234,7 +234,7 @@ export class MixerService extends BasePlatformService<IMixerServiceState>
     this.SET_STREAM_KEY(key);
   }
 
-  liveDockEnabled(): boolean {
+  get liveDockEnabled(): boolean {
     return true;
   }
 }

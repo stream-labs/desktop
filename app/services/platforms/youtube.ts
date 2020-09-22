@@ -622,7 +622,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     }
   }
 
-  liveDockEnabled(): boolean {
+  get liveDockEnabled(): boolean {
     return this.streamSettingsService.settings.protectedModeEnabled;
   }
 

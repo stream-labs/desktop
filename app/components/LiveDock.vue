@@ -119,7 +119,7 @@
   border-left: 1px solid var(--border);
 
   &.can-animate {
-    .transition();
+    transition: width 300ms;
   }
 
   &.live-dock--left {

@@ -28,7 +28,6 @@
 }
 
 .widget-layout-picker__option {
-  .transition();
   .radius();
 
   width: 56px;

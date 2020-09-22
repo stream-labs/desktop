@@ -293,7 +293,6 @@ h2 {
 }
 
 .source {
-  .transition();
   .radius();
 
   cursor: pointer;
