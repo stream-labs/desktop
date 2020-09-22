@@ -25,9 +25,9 @@ const TESTS_SERVICE_URL = CI ? 'https://slobs-users-pool.herokuapp.com' : 'http:
   fs.removeSync(CONFIG.compiledTestsDist);
 
   // run tests
-  const runTestsCmd = `yarn test ${CONFIG.compiledTestsDist}/performance/tests/**/*.js ${args.join(
-    ' ',
-  )}`;
+  const runTestsCmd = `yarn test:file ${
+    CONFIG.compiledTestsDist
+  }/performance/tests/**/*.js ${args.join(' ')}`;
   exec(runTestsCmd);
 
   // get tests results and compare with DB data
