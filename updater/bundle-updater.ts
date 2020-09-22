@@ -3,6 +3,8 @@ import * as electron from 'electron';
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as stream from 'stream';
+import * as http from 'http';
+import * as handler from 'serve-handler';
 
 module.exports = async (basePath: string) => {
   const cdnBase = `https://slobs-cdn.streamlabs.com/${process.env.SLOBS_VERSION}${
@@ -206,6 +208,30 @@ module.exports = async (basePath: string) => {
       cb({ redirectURL: `${localBase}${localManifest[bundleName]}` });
     },
   );
+
+  // Use a local web server to serve source maps in development.
+  // This is needed because chromium no longer uses the redirect
+  // URL when looking for source maps.
+  if (process.env.NODE_ENV !== 'production') {
+    const server = http.createServer((request, response) => {
+      handler(request, response, {
+        public: path.resolve(__dirname, '..', '..', 'bundles'),
+        headers: [
+          {
+            source: '**',
+            headers: [
+              {
+                key: 'Cache-Control',
+                value: 'no-cache, no-store, must-revalidate',
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    server.listen(9000);
+  }
 
   electron.ipcMain.on('startupError', (e, msg) => {
     console.log('Received startup error from worker window', msg);

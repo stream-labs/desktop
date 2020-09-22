@@ -137,7 +137,6 @@
     "cli-table": "0.3.1",
     "css-element-queries": "1.2.3",
     "css-loader": "2.1.1",
-    "devtron": "1.4.0",
     "dotenv": "8.2.0",
     "electron": "10.1.2",
     "electron-builder": "22.7.0",

@@ -429,7 +429,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
    */
   shutdown() {
     this.closeAllOneOffs();
-    this.windows['child']?.close();
+    this.windows.child.close();
   }
 
   // @ExecuteInCurrentWindow()

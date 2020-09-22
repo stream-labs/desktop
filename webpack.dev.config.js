@@ -1,3 +1,4 @@
+const webpack = require('webpack');
 const merge = require('webpack-merge');
 const baseConfig = require('./webpack.base.config.js');
 const path = require('path');
@@ -9,6 +10,15 @@ const plugins = [];
 if (process.env.SLOBS_FORKED_TYPECHECKING) plugins.push(new CheckerPlugin());
 if (!process.env.CI) plugins.push(new HardSourceWebpackPlugin());
 
+// Use the source map plugin so we can override source map location
+// The bundle updater serves the maps in development.
+plugins.push(
+  new webpack.SourceMapDevToolPlugin({
+    filename: '[file].map',
+    publicPath: 'http://localhost:9000/',
+  }),
+);
+
 module.exports = merge.smart(baseConfig, {
   entry: {
     renderer: './app/app.ts',
@@ -17,7 +27,7 @@ module.exports = merge.smart(baseConfig, {
   },
 
   mode: 'development',
-  devtool: 'source-map',
+  devtool: false,
   watchOptions: { ignored: /node_modules/ },
 
   module: {
@@ -26,7 +36,7 @@ module.exports = merge.smart(baseConfig, {
         test: /\.ts$/,
         loader: 'awesome-typescript-loader',
         options: { useCache: true, forceIsolatedModules: true, reportFiles: ['app/**/*.ts'] },
-        exclude: /node_modules|vue\/src/
+        exclude: /node_modules|vue\/src/,
       },
       {
         test: /\.tsx$/,
@@ -35,8 +45,13 @@ module.exports = merge.smart(baseConfig, {
           'babel-loader',
           {
             loader: 'awesome-typescript-loader',
-            options: { forceIsolatedModules: true, reportFiles: ['app/components/**/*.tsx'], configFileName: 'tsxconfig.json', instance: 'tsx-loader' }
-          }
+            options: {
+              forceIsolatedModules: true,
+              reportFiles: ['app/components/**/*.tsx'],
+              configFileName: 'tsxconfig.json',
+              instance: 'tsx-loader',
+            },
+          },
         ],
         exclude: /node_modules/,
       },
@@ -45,7 +60,7 @@ module.exports = merge.smart(baseConfig, {
         enforce: 'pre',
         loader: 'eslint-loader',
       },
-    ]
+    ],
   },
 
   plugins,
