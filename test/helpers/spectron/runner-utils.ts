@@ -100,16 +100,14 @@ function isTestEligibleToRun(testName: string) {
   const timePerChunk = testAvgTotalTime / totalChunks;
   const testChunkNum = Math.round(testAvgStartTime / timePerChunk) + 1;
 
-  console.log('test', testName);
-  console.log('test avg start time', testAvgStartTime);
-  console.log('time per chunk', timePerChunk);
-  console.log('testAvgTotalTime', testAvgTotalTime);
-  console.log('testChunkNum', testChunkNum);
-
   return testChunkNum === currentChunkNum;
 }
 
 export function saveTestExecutionTimeToDB(timings: Record<string, number>) {
+  if (!process.env.SLOBS_TEST_RUN_CHUNK) {
+    // don't save timings for tests that are not sliced
+    return;
+  }
   try {
     return requestUtilsServer('testTimings', 'post', timings);
   } catch (e) {
