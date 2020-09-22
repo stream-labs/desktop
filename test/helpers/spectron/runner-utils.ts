@@ -83,7 +83,6 @@ function isTestEligibleToRun(testName: string) {
 
   // determine which chunk of the test suite is running now
   const chunk = process.env.SLOBS_TEST_RUN_CHUNK;
-  console.log('chunk', chunk);
 
   // always allow test to run if no chunk data provided
   if (!chunk) return true;
@@ -100,6 +99,13 @@ function isTestEligibleToRun(testName: string) {
   });
   const timePerChunk = testAvgTotalTime / totalChunks;
   const testChunkNum = Math.round(testAvgStartTime / timePerChunk) + 1;
+
+  console.log('test', testName);
+  console.log('test avg start time', testAvgStartTime);
+  console.log('time per chunk', timePerChunk);
+  console.log('testAvgTotalTime', testAvgTotalTime);
+  console.log('testChunkNum', testChunkNum);
+
   return testChunkNum === currentChunkNum;
 }
 
