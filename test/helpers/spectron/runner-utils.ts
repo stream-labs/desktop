@@ -42,6 +42,7 @@ export const testFn: TestInterface<ITestContext> = new Proxy(avaTest, {
   apply: (target, thisArg, args) => {
     const testName = args[0];
     if (!isTestEligibleToRun(testName)) {
+      // skip tests that don't belong current slice
       avaTest.skip(`SKIP: ${testName}`, t => {});
       return;
     }
