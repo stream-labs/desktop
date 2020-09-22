@@ -107,7 +107,7 @@ export default class ObsImport extends TsxComponent<ObsImportProps> {
     return (
       <div>
         {this.profiles.length > 1 && (
-          <div>
+          <div style="width: 400px; margin: auto;">
             <span class={styles.profileSelectTitle}>{$t('Select an OBS profile to import')}</span>
             <Multiselect
               class={styles.profileSelect}

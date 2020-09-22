@@ -99,7 +99,8 @@ export default class ExtraSettings extends Vue {
   }
 
   importFromObs() {
-    this.obsImporterService.import();
+    this.onboardingService.start({ isImport: true });
+    this.windowsService.closeChildWindow();
   }
 
   get isLoggedIn() {

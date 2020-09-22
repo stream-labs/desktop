@@ -112,6 +112,7 @@ interface IOnboardingOptions {
   // about our security upgrade.
   isHardware: boolean; // When configuring capture defaults
   isPrimeExpiration: boolean; // Only shown as a singleton step if prime is expiring soon
+  isImport: boolean; // When users are importing from OBS
 }
 
 interface IOnboardingServiceState {
@@ -125,6 +126,7 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
     if (this.state.options.isLogin) return ONBOARDING_STEPS()[EOnboardingSteps.Connect];
     if (this.state.options.isOptimize) return ONBOARDING_STEPS()[EOnboardingSteps.Optimize];
     if (this.state.options.isHardware) return ONBOARDING_STEPS()[EOnboardingSteps.HardwareSetup];
+    if (this.state.options.isImport) return ONBOARDING_STEPS()[EOnboardingSteps.ObsImport];
     if (this.state.options.isPrimeExpiration) {
       return ONBOARDING_STEPS()[EOnboardingSteps.PrimeExpiration];
     }
@@ -171,6 +173,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
       isSecurityUpgrade: false,
       isHardware: false,
       isPrimeExpiration: false,
+      isImport: false,
     },
     importedFromObs: false,
     existingSceneCollections: false,
@@ -242,6 +245,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
       isSecurityUpgrade: false,
       isHardware: false,
       isPrimeExpiration: false,
+      isImport: false,
       ...options,
     };
 
