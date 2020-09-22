@@ -323,7 +323,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     render: h => {
       if (windowId === 'worker') return h(Blank);
       if (windowId === 'child') {
-        if (store.state.bulkLoadFinished) {
+        if (store.state.bulkLoadFinished && store.state.i18nReady) {
           return h(ChildWindow);
         }
 
@@ -344,7 +344,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   ipcRenderer.on('initFinished', () => {
     // setup translations for the current window
     if (!Utils.isWorkerWindow()) {
-      I18nService.uploadTranslationsToVueI18n();
+      I18nService.uploadTranslationsToVueI18n(true).then(() => {
+        store.commit('I18N_READY');
+      });
     }
 
     if (Utils.isMainWindow()) {

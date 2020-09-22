@@ -77,11 +77,11 @@ export default class Main extends Vue {
     window.addEventListener('resize', this.windowSizeHandler);
   }
 
-  get bulkLoadFinished() {
-    return this.$store.state.bulkLoadFinished;
+  get uiReady() {
+    return this.$store.state.bulkLoadFinished && this.$store.state.i18nReady;
   }
 
-  @Watch('bulkLoadFinished')
+  @Watch('uiReady')
   initializeResize() {
     this.$nextTick(() => {
       const dockWidth = this.customizationService.state.livedockSize;
@@ -138,7 +138,7 @@ export default class Main extends Vue {
       this.isLoggedIn &&
       !this.isOnboarding &&
       this.hasLiveDock &&
-      getPlatformService(this.userService.platform.type).liveDockEnabled() &&
+      getPlatformService(this.userService.platform.type).liveDockEnabled &&
       !this.showLoadingSpinner
     );
   }

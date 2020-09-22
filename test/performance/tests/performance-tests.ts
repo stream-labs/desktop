@@ -31,7 +31,7 @@ function unzipLargeSceneCollection(t: TExecutionContext) {
   const sceneCollectionPath = path.resolve(cacheDir, 'SceneCollections');
   fs.removeSync(sceneCollectionPath);
 
-  const dataDir = path.resolve(__dirname, '..', '..', '..', '..', 'test', 'data');
+  const dataDir = path.resolve(__dirname, '..', '..', '..', '..', '..', 'test', 'data');
   const sceneCollectionZip = path.resolve(
     dataDir,
     'scene-collections',

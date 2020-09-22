@@ -126,11 +126,7 @@ i.disabled {
 
   &:hover,
   &.sl-vue-tree-selected {
-    .transition();
-
     .source-selector-action {
-      .transition();
-
       opacity: 1;
       color: var(--icon);
     }

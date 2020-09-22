@@ -133,7 +133,6 @@
 }
 
 .record-button {
-  .transition();
   .weight(@bold);
 
   position: relative;

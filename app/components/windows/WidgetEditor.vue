@@ -314,8 +314,6 @@
 }
 
 .sidebar {
-  .transition();
-
   width: 30%;
   height: 100%;
   position: absolute;
@@ -376,7 +374,6 @@
 }
 
 .settings-title {
-  .transition();
   .padding-h-sides(2);
 
   margin: 0;
@@ -403,7 +400,6 @@
   bottom: 0;
   border-top: 1px solid var(--border);
   background-color: var(--background);
-  .transition();
 }
 
 .code-tab {
@@ -413,7 +409,6 @@
 .custom-code {
   .margin-left();
   .padding-left();
-  .transition();
 
   position: absolute;
   display: flex;

@@ -9,6 +9,8 @@ import ModalLayout from '../ModalLayout.vue';
 import Scrollable from 'components/shared/Scrollable';
 import { UserService } from 'services/user';
 import { MagicLinkService } from 'services/magic-link';
+import { WebsocketService, TSocketEvent } from 'services/websocket';
+import { Subscription } from 'rxjs';
 
 const getTypeMap = () => ({
   title: {
@@ -39,6 +41,7 @@ export default class MediaGallery extends Vue {
   @Inject() mediaGalleryService: MediaGalleryService;
   @Inject() userService: UserService;
   @Inject() magicLinkService: MagicLinkService;
+  @Inject() websocketService: WebsocketService;
 
   dragOver = false;
   selectedFile: IMediaGalleryFile = null;
@@ -48,10 +51,24 @@ export default class MediaGallery extends Vue {
   busy: IToast = null;
 
   private typeMap = getTypeMap();
+  private socketConnection: Subscription = null;
+  private audio: HTMLAudioElement = null;
 
   async mounted() {
     this.galleryInfo = await this.mediaGalleryService.fetchGalleryInfo();
     if (this.filter) this.type = this.filter;
+
+    this.socketConnection = this.websocketService.socketEvent.subscribe(ev =>
+      this.onSocketEvent(ev),
+    );
+  }
+
+  destroyed() {
+    if (this.socketConnection) this.socketConnection.unsubscribe();
+    if (this.audio) {
+      this.audio.pause();
+      this.audio = null;
+    }
   }
 
   get promiseId() {
@@ -102,6 +119,11 @@ export default class MediaGallery extends Vue {
 
   get maxUsageLabel() {
     return this.formatBytes(this.maxUsage, 2);
+  }
+
+  async onSocketEvent(e: TSocketEvent) {
+    if (e.type !== 'streamlabs_prime_subscribe') return;
+    this.galleryInfo = await this.mediaGalleryService.fetchGalleryInfo();
   }
 
   formatBytes(bytes: number, argPlaces: number = 1) {
@@ -164,9 +186,10 @@ export default class MediaGallery extends Vue {
     }
     this.selectedFile = file;
 
-    if (file.type === 'audio') {
-      const audio = new Audio(file.href);
-      audio.play();
+    if (file.type === 'audio' && !shouldSelect) {
+      if (this.audio) this.audio.pause();
+      this.audio = new Audio(file.href);
+      this.audio.play();
     }
 
     if (shouldSelect) this.handleSelect();

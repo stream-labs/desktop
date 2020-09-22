@@ -22,10 +22,11 @@
     "package:mac": "yarn generate-agreement:mac && rimraf dist && electron-builder build -m --x64 --config electron-builder/base.config.js",
     "package:preview": "yarn generate-agreement && rimraf dist && electron-builder build -w --x64 --config electron-builder/preview.config.js",
     "eslint": "eslint {app,guest-api,obs-api,updater}/**/*.ts app/**/*.tsx main.js",
-    "test": "tsc -p test && ava -v",
+    "test": "tsc -p test && ava -v --timeout=3m ./test-dist/test/regular/**/*.js",
+    "test:file": "tsc -p test && ava -v --timeout=10m",
     "test:stress": "yarn test test-dist/test/stress/index.js",
-    "test:screen": "yarn test ./test-dist/test/screentest/tests/**/*.js",
-    "test:performance": "yarn test ./test-dist/test/performance/tests/**/*.js",
+    "test:screen": "yarn test:file ./test-dist/test/screentest/tests/**/*.js",
+    "test:performance": "yarn test:file ./test-dist/test/performance/tests/**/*.js",
     "test:debug": "tsc -p test && node --inspect ./node_modules/ava/profile.js",
     "test:debug-brk": "tsc -p test && node --inspect --inspect-brk ./node_modules/ava/profile.js",
     "clear": "rimraf bundles/media",
@@ -57,13 +58,6 @@
     ]
   },
   "ava": {
-    "files": [
-      "test-dist/test/*.js",
-      "test-dist/test/api/*.js",
-      "test-dist/test/widgets/*.js",
-      "test-dist/test/settings/**/*.js",
-      "test-dist/test/streaming/**/*.js"
-    ],
     "serial": true
   },
   "dependencies": {
@@ -80,7 +74,7 @@
     "fs-extra": "^9.0.0",
     "game-overlay": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.0.tar.gz",
     "color-picker": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/color-picker-0.0.0.tar.gz",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "node-fontinfo": "https://slobs-node-fontinfo.s3-us-west-2.amazonaws.com/node-fontinfo-0.0.0.tar.gz",
     "node-libuiohook": "https://slobs-node-libuiohook.s3-us-west-2.amazonaws.com/node-libuiohook-0.0.0.tar.gz",
     "node-window-rendering": "https://slobs-node-window-rendering.s3-us-west-2.amazonaws.com/node-window-rendering-0.0.0.tar.gz",
@@ -125,7 +119,7 @@
     "@vue/babel-preset-jsx": "1.1.2",
     "@xkeshi/vue-qrcode": "0.3.0",
     "amazon-s3-uri": "^0.0.3",
-    "ava": "1.4.1",
+    "ava": "3.12.1",
     "awesome-typescript-loader": "5.2.1",
     "babel-helper-vue-jsx-merge-props": "2.0.3",
     "babel-loader": "8.1.0",
