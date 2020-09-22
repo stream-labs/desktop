@@ -42,8 +42,8 @@ export const testFn: TestInterface<ITestContext> = new Proxy(avaTest, {
   apply: (target, thisArg, args) => {
     const testName = args[0];
     if (!isTestEligibleToRun(testName)) {
-      // skip this test
-      return () => null as unknown;
+      avaTest.skip(`SKIP: ${testName}`, t => {});
+      return;
     }
     pendingTests.push(testName);
     return target.apply(thisArg, args);
