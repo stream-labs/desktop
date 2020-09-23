@@ -133,4 +133,9 @@ export default class NicoliveProgramSelector extends Vue {
 
     this.windowsService.closeChildWindow();
   }
+
+  beforeDestroy(): void {
+    // 状態初期化
+    this.nicoliveProgramSelectorService.backTo('providerTypeSelect');
+  }
 }
