@@ -36,8 +36,8 @@
         :class="'broadcast-channel-select-step'"
         :title="getStepTitle(currentStep)"
         :desciption="getStepDescription(currentStep)">
-          <li v-for="(channel, channelId) in queryParams.channels" :key="channelId" >
-            <a @click="onSelectChannel(channelId, channel.name)">
+          <li v-for="channel in queryParams.channels" :key="channel.id" >
+            <a @click="onSelectChannel(channel.id, channel.name)">
               <img :src="channel.thumbnailUrl" :alt="channel.name" class="channel-thumbnail" />
               <p class="anchor-text">{{ channel.name }}</p>
             </a>

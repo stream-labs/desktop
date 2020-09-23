@@ -74,14 +74,15 @@ type Program = {
 
 type SocialGroup = {
   type: 'community' | 'channel';
+  id: string;
   name: string;
   thumbnailUrl: string;
   broadcastablePrograms: Program[];
 }
 
 export type LiveProgramInfo2 = {
-  communities: Dictionary<SocialGroup>;
-  channels: Dictionary<SocialGroup>;
+  community: SocialGroup;
+  channels: SocialGroup[];
 }
 
 class GetPublishStatusResult {
@@ -275,28 +276,29 @@ export class NiconicoService extends Service implements IPlatformService {
         componentName: 'NicoliveProgramSelector',
         // TODO: APIから取得した放送可能な番組を埋めて queryParams に渡す.
         queryParams: {
-          communities: {
-            'co1': {
+          community: {
+              id: 'co1',
               type: 'community',
               name: 'テスト用コミュニティ',
               thumbnailUrl: 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg',
               broadcastablePrograms: [{ id: 'lv1' }, { id: 'lv2' }]
-            },
           },
-          channels: {
-            'ch1': {
+          channels: [
+             {
+              id: 'ch1',
               type: 'channel',
               thumbnailUrl: 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg',
               name: 'テスト用チャンネル1',
               broadcastablePrograms: [{ id: 'lv1111111111' }, { id: 'lv2222222222' }]
             },
-            'ch2': {
+            {
+              id: 'ch2',
               type: 'channel',
               thumbnailUrl: 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg',
               name: 'テスト用チャンネル2',
               broadcastablePrograms: [{ id: 'lv4444444444' }, { id: 'lv5555555555' }]
             }
-          }
+          ]
         } as LiveProgramInfo2,
         // 仮のコードここまで ↑
         size: {

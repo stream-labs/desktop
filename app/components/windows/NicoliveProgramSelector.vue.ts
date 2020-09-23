@@ -62,11 +62,8 @@ export default class NicoliveProgramSelector extends Vue {
     if (providerType === 'channel') {
       this.nicoliveProgramSelectorService.onSelectProviderTypeChannel();
     } else {
-      // 1つのコミュニティしかない前提
-      const communityId = Object.keys(this.queryParams.communities)[0];
       this.nicoliveProgramSelectorService.onSelectProviderTypeUser(
-        // 1つの番組しかない前提
-        this.queryParams.communities[communityId].broadcastablePrograms[0].id
+        this.queryParams.community.id
       );
     }
   }
@@ -75,8 +72,8 @@ export default class NicoliveProgramSelector extends Vue {
     if (this.nicoliveProgramSelectorService.state.isLoading) {
       return;
     }
-    this.nicoliveProgramSelectorService.onSelectChannel(
-      id, name, this.queryParams.channels[id].broadcastablePrograms);
+    const channel = this.queryParams.channels.find(channel => channel.id === id);
+    this.nicoliveProgramSelectorService.onSelectChannel(id, name, channel.broadcastablePrograms);
   }
 
   onSelectBroadcastingProgram(id: string, title: string): void {
