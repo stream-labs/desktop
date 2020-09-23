@@ -32,24 +32,46 @@ Array [
     "queryParams": Object {
       "channels": Object {
         "ch1": Object {
-          "broadcastableProgramIds": Array [
-            "lv1111111111",
-            "lv2222222222",
+          "broadcastablePrograms": Array [
+            Object {
+              "id": "lv1111111111",
+            },
+            Object {
+              "id": "lv2222222222",
+            },
           ],
           "name": "テスト用チャンネル1",
           "thumbnailUrl": "https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg",
+          "type": "channel",
         },
         "ch2": Object {
-          "broadcastableProgramIds": Array [
-            "lv4444444444",
-            "lv5555555555",
+          "broadcastablePrograms": Array [
+            Object {
+              "id": "lv4444444444",
+            },
+            Object {
+              "id": "lv5555555555",
+            },
           ],
           "name": "テスト用チャンネル2",
           "thumbnailUrl": "https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg",
+          "type": "channel",
         },
       },
-      "user": Object {
-        "broadcastableProgramId": "lv10",
+      "communities": Object {
+        "co1": Object {
+          "broadcastablePrograms": Array [
+            Object {
+              "id": "lv1",
+            },
+            Object {
+              "id": "lv2",
+            },
+          ],
+          "name": "テスト用コミュニティ",
+          "thumbnailUrl": "https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg",
+          "type": "community",
+        },
       },
     },
     "size": Object {

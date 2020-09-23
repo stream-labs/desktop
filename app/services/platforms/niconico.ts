@@ -68,17 +68,21 @@ export type LiveProgramInfo = Dictionary<{
   key: string
 }>
 
-// TODO: 旧 LiveProgramInfo が消えたら 名前を LiveProgramInfo にする
-export type LiveProgramInfo2 = {
-  user: {
-    broadcastableProgramId: string;
-  },
-  channels: Dictionary<{
-    thumbnailUrl: string;
-    name: string;
-    broadcastableProgramIds: string[];
-  }>;
+type Program = {
+  id: string;
 };
+
+type SocialGroup = {
+  type: 'community' | 'channel';
+  name: string;
+  thumbnailUrl: string;
+  broadcastablePrograms: Program[];
+}
+
+export type LiveProgramInfo2 = {
+  communities: Dictionary<SocialGroup>;
+  channels: Dictionary<SocialGroup>;
+}
 
 class GetPublishStatusResult {
   attrib: object;
@@ -271,22 +275,29 @@ export class NiconicoService extends Service implements IPlatformService {
         componentName: 'NicoliveProgramSelector',
         // TODO: APIから取得した放送可能な番組を埋めて queryParams に渡す.
         queryParams: {
-          user: {
-            broadcastableProgramId: 'lv10'
+          communities: {
+            'co1': {
+              type: 'community',
+              name: 'テスト用コミュニティ',
+              thumbnailUrl: 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg',
+              broadcastablePrograms: [{ id: 'lv1' }, { id: 'lv2' }]
+            },
           },
           channels: {
             'ch1': {
+              type: 'channel',
               thumbnailUrl: 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg',
               name: 'テスト用チャンネル1',
-              broadcastableProgramIds: ['lv1111111111', 'lv2222222222']
+              broadcastablePrograms: [{ id: 'lv1111111111' }, { id: 'lv2222222222' }]
             },
             'ch2': {
+              type: 'channel',
               thumbnailUrl: 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg',
               name: 'テスト用チャンネル2',
-              broadcastableProgramIds: ['lv4444444444', 'lv5555555555']
+              broadcastablePrograms: [{ id: 'lv4444444444' }, { id: 'lv5555555555' }]
             }
           }
-        },
+        } as LiveProgramInfo2,
         // 仮のコードここまで ↑
         size: {
           width: 800,

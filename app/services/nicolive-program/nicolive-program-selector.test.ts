@@ -48,14 +48,14 @@ test('チャンネル番組を選んで配信開始のための番組情報を�
   // 番組選択へ
   const selectedChannelId = 'ch9999';
   const selectedChannelName = 'チャンネルああああ'
-  const programIds = ['lv1111', 'lv2222'];
-  instance.onSelectChannel(selectedChannelId, selectedChannelName, programIds);
+  const programs = [{ id: 'lv1111' }, { id: 'lv2222' }];
+  instance.onSelectChannel(selectedChannelId, selectedChannelName, programs);
   expect(instance.state.currentStep).toBe('programSelect');
   // TODO: APIを叩くようになったら、モック化されたAPIを絡めたテストを書く
   // その際タイトルも検査するようにする
   expect(instance.state.selectedChannel).toMatchObject({ id: selectedChannelId, name: selectedChannelName })
-  expect(instance.state.candidatePrograms[0].id).toBe(programIds[0]);
-  expect(instance.state.candidatePrograms[1].id).toBe(programIds[1]);
+  expect(instance.state.candidatePrograms[0].id).toBe(programs[0].id);
+  expect(instance.state.candidatePrograms[1].id).toBe(programs[1].id);
 
   // 確認へ
   const selectedProgramId = 'lv1111';
@@ -122,7 +122,7 @@ test('番組選択ステップで, 配信種別やチャンネルの選択をし
 
   // 番組選択へ
   const selectedChannelId = 'ch9999';
-  instance.onSelectChannel(selectedChannelId, 'チャンネルああああ', ['lv1111', 'lv2222']);
+  instance.onSelectChannel(selectedChannelId, 'チャンネルああああ', [{ id: 'lv1111' }, { id: 'lv2222' }]);
   expect(instance.state.currentStep).toBe('programSelect');
 
   // 配信種別をチャンネルに変更しようとしても何も起きない
@@ -184,7 +184,7 @@ test('チャンネル番組の確認ステップでは, あらゆる設定済の
 
   // 番組選択へ
   const selectedChannelId = 'ch9999';
-  instance.onSelectChannel(selectedChannelId, 'チャンネルああああ', ['lv1111', 'lv2222']);
+  instance.onSelectChannel(selectedChannelId, 'チャンネルああああ', [{ id: 'lv1111' }, { id: 'lv2222' }]);
 
   // 確認へ
   const selectedProgram = 'lv1111';
@@ -240,11 +240,11 @@ describe('ステップ比較系メソッド', () => {
           return instance;
         case 'programSelect':
           instance.onSelectProviderTypeChannel();
-          instance.onSelectChannel('ch9999', 'name', ['lv1', 'lv2', 'lv3']);
+          instance.onSelectChannel('ch9999', 'name', [{ id: 'lv1' }, { id: 'lv2' }, { id: 'lv3' }]);
           return instance;
         case 'confirm':
           instance.onSelectProviderTypeChannel();
-          instance.onSelectChannel('ch9999', 'name', ['lv1', 'lv2', 'lv3']);
+          instance.onSelectChannel('ch9999', 'name', [{ id: 'lv1' }, { id: 'lv2' }, { id: 'lv3' }]);
           instance.onSelectBroadcastingProgram('id', 'title');
           return instance;
       }
@@ -419,12 +419,12 @@ describe('ステップ比較系メソッド', () => {
           currentStep: 'programSelect',
           candidatePrograms: [
             // TODO: 番組情報取得APIを叩くようになったらそのAPIのモックの値に変更する必要がある
-            {id: 'lv1', title: 'これは lv1 のタイトルです'},
-            {id: 'lv2', title: 'これは lv2 のタイトルです'},
-            {id: 'lv3', title: 'これは lv3 のタイトルです'}
+            { id: 'lv1', title: 'これは lv1 のタイトルです' },
+            { id: 'lv2', title: 'これは lv2 のタイトルです' },
+            { id: 'lv3', title: 'これは lv3 のタイトルです' }
           ],
           selectedProviderType: 'channel',
-          selectedChannel: { id: 'ch9999', name: 'name'},
+          selectedChannel: { id: 'ch9999', name: 'name' },
           selectedProgram: null
         });
       });

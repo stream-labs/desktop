@@ -87,9 +87,9 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
    * 番組選択ステップへ移動後, APIを叩いて番組IDからタイトルを解決し, candidatePrograms に番組IDとタイトルを保存する.
    * @param id 配信するチャンネルID (chXXXX)
    * @param name 配信するチャンネル名
-   * @param broadcastableProgramIds 配信可能な番組ID (lvXXXX) の一覧
+   * @param broadcastablePrograms 配信可能な番組 の一覧
    */
-  onSelectChannel(id: string, name: string, broadcastableProgramIds: string[]) {
+  onSelectChannel(id: string, name: string, broadcastablePrograms: { id: string }[]) {
     if(this.state.currentStep !== 'channelSelect') {
       return;
     }
@@ -100,9 +100,9 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
       isLoading: true
     });
     // TODO: API から番組タイトルを取得するようにする. 現在は仮のタイトルを指定.
-    const candidatePrograms = broadcastableProgramIds.map(programId => ({
-      id: programId,
-      title: `これは ${programId} のタイトルです`
+    const candidatePrograms = broadcastablePrograms.map(program => ({
+      id: program.id,
+      title: `これは ${program.id} のタイトルです`
     }));
     // ↑ ここまで仮の処理
     this.SET_STATE({
