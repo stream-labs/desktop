@@ -257,7 +257,6 @@ test('Migrate the twitch account to the protected mode', async t => {
 const schedulingPlatforms = ['facebook', 'youtube'];
 schedulingPlatforms.forEach(platform => {
   test(`Schedule stream to ${platform}`, async t => {
-
     if (platform === 'facebook') {
       // TODO test.skip
       console.log('Schedule facebook test is flaky');
