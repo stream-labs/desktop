@@ -3,10 +3,9 @@ import { IUserAuth, IPlatformAuth, TPlatform } from '../../../app/services/platf
 import { sleep } from '../sleep';
 import { dialogDismiss } from './dialog';
 import { ExecutionContext } from 'ava';
+import { requestUtilsServer, USER_POOL_TOKEN } from './runner-utils';
 const request = require('request');
 
-const USER_POOL_URL = 'https://slobs-users-pool.herokuapp.com';
-const USER_POOL_TOKEN = process.env.SLOBS_TEST_USER_POOL_TOKEN;
 let user: ITestUser; // keep user's name if SLOBS is logged-in
 
 interface ITestUser {
@@ -177,21 +176,7 @@ export async function reserveUserFromPool(
  * Make a GET request to slobs-users-pool service
  */
 async function requestUserPool(path: string): Promise<any> {
-  return new Promise((resolve, reject) => {
-    request(
-      {
-        url: `${USER_POOL_URL}/${path}`,
-        headers: { Authorization: `Bearer ${USER_POOL_TOKEN}` },
-      },
-      (err: any, res: any, body: any) => {
-        if (err || res.statusCode !== 200) {
-          reject(`Unable to request users pool ${err || body}`);
-          return;
-        }
-        resolve(JSON.parse(body));
-      },
-    );
-  });
+  return requestUtilsServer(path);
 }
 
 export function getUser(): ITestUser {
