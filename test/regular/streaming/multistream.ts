@@ -1,11 +1,7 @@
-import { test, useSpectron } from '../helpers/spectron';
-import { logIn } from '../helpers/spectron/user';
-import {
-  clickGoLive,
-  prepareToGoLive,
-  submit,
-} from '../helpers/spectron/streaming';
-import { fillForm, selectTitle, selectGamesByTitles } from '../helpers/form-monkey';
+import { test, useSpectron } from '../../helpers/spectron';
+import { logIn } from '../../helpers/spectron/user';
+import { clickGoLive, prepareToGoLive, submit } from '../../helpers/spectron/streaming';
+import { fillForm, selectTitle, selectGamesByTitles } from '../../helpers/form-monkey';
 
 useSpectron();
 
@@ -41,7 +37,6 @@ test('Multistream default mode', async t => {
   );
   await client.waitForVisible("h1=You're live!", 60000);
 });
-
 
 test('Multistream advanced mode', async t => {
   const client = t.context.app.client;
