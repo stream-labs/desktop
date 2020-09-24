@@ -299,7 +299,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       return EPlatformCallResult.Success;
     } catch (resp) {
       if (resp.status !== 403) {
-        console.error(resp);
+        console.error('Got 403 checking if YT is enabled for live streaming', resp);
         return EPlatformCallResult.Error;
       }
       const json = resp.result;
@@ -611,6 +611,10 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
         return broadcast.status.lifeCycleStatus === status;
       });
     } catch (e) {
+      if (e.message === 'Redundant transition') {
+        // handle Redundant transition as a success
+        return;
+      }
       throwStreamError(
         'YOUTUBE_PUBLISH_FAILED',
         `LiveBroadcast has not changed the status to ${status}: ${e.details || e.message}`,
@@ -618,7 +622,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     }
   }
 
-  liveDockEnabled(): boolean {
+  get liveDockEnabled(): boolean {
     return this.streamSettingsService.settings.protectedModeEnabled;
   }
 

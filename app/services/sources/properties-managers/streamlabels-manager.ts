@@ -43,7 +43,7 @@ export class StreamlabelsManager extends DefaultManager {
     if (this.subscription) this.subscription.unsubscribe();
   }
 
-  normalizeSettings() {
+  normalizeSettings(settings: IStreamlabelsManagerSettings) {
     const youtubeKeys = {
       most_recent_follower: 'most_recent_youtube_subscriber',
       session_followers: 'session_youtube_subscribers',
@@ -69,14 +69,14 @@ export class StreamlabelsManager extends DefaultManager {
 
     if (this.userService.platform) {
       if (this.userService.platform.type === 'youtube') {
-        if (youtubeKeys[this.settings.statname]) {
-          this.settings.statname = youtubeKeys[this.settings.statname];
+        if (youtubeKeys[settings.statname]) {
+          settings.statname = youtubeKeys[settings.statname];
         }
       }
 
       if (this.userService.platform.type === 'mixer') {
-        if (mixerKeys[this.settings.statname]) {
-          this.settings.statname = mixerKeys[this.settings.statname];
+        if (mixerKeys[settings.statname]) {
+          settings.statname = mixerKeys[settings.statname];
         }
       }
     }
@@ -89,13 +89,15 @@ export class StreamlabelsManager extends DefaultManager {
       });
     }
 
-    this.settings = {
+    const newSettings = {
       // Default to All-Time Top Donator
       statname: 'all_time_top_donator',
       ...this.settings,
       ...settings,
     };
 
-    this.normalizeSettings();
+    // Modifies the object in-place
+    this.normalizeSettings(newSettings);
+    super.applySettings(newSettings);
   }
 }

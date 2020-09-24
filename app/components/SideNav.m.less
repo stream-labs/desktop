@@ -18,6 +18,7 @@
 }
 
 .cell {
+  display: flex;
   height: 46px;
   width: 52px;
   position: relative;
@@ -25,19 +26,16 @@
   font-size: 16px;
 
   i {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    margin: auto;
   }
 
   &:hover {
-    transition: all 0.2s;
     cursor: pointer;
-    transform: scale(1.2, 1.2);
 
     i {
+      transition: all 0.2s;
       color: var(--title);
+      transform: scale(1.2, 1.2);
     }
   }
 
@@ -81,9 +79,8 @@
   .cell;
 
   &.active {
-    transform: scale(1.2, 1.2);
-
     i {
+      transform: scale(1.2, 1.2);
       color: var(--teal);
     }
   }
@@ -103,8 +100,8 @@
 }
 
 .new-badge {
-  background: var(--teal);
-  color: var(--action-button-text);
+  background: var(--new-badge);
+  color: var(--new-badge-text);
   font-size: 9px;
   position: absolute;
   right: 2px;

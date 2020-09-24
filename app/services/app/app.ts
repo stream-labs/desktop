@@ -70,18 +70,6 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() gameOverlayService: GameOverlayService;
   @Inject() touchBarService: TouchBarService;
-
-  static initialState: IAppState = {
-    loading: true,
-    argv: electron.remote.process.argv,
-    errorAlert: false,
-    onboarded: false,
-  };
-
-  readonly appDataDirectory = electron.remote.app.getPath('userData');
-
-  loadingChanged = new Subject<boolean>();
-
   @Inject() transitionsService: TransitionsService;
   @Inject() sourcesService: SourcesService;
   @Inject() scenesService: ScenesService;
@@ -103,6 +91,17 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private metricsService: MetricsService;
   @Inject() private settingsService: SettingsService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
+
+  static initialState: IAppState = {
+    loading: true,
+    argv: electron.remote.process.argv,
+    errorAlert: false,
+    onboarded: false,
+  };
+
+  readonly appDataDirectory = electron.remote.app.getPath('userData');
+
+  loadingChanged = new Subject<boolean>();
 
   private loadingPromises: Dictionary<Promise<any>> = {};
 
@@ -146,6 +145,7 @@ export class AppService extends StatefulService<IAppState> {
     this.dismissablesService.initialize();
 
     electron.ipcRenderer.on('shutdown', () => {
+      this.windowsService.hideMainWindow();
       electron.ipcRenderer.send('acknowledgeShutdown');
       this.shutdownHandler();
     });

@@ -10,6 +10,7 @@ import { authorizedHeaders, handleResponse } from 'util/requests';
 import throttle from 'lodash/throttle';
 import { Service } from './core/service';
 import Utils from './utils';
+import os from 'os';
 
 export type TUsageEvent = 'stream_start' | 'stream_end' | 'app_start' | 'app_close' | 'crash';
 
@@ -22,7 +23,6 @@ interface IUsageApiData {
 }
 
 type TAnalyticsEvent =
-  | 'FacebookLogin'
   | 'PlatformLogin'
   | 'SocialShare'
   | 'Heartbeat'
@@ -31,7 +31,8 @@ type TAnalyticsEvent =
   | 'RecordingStatus'
   | 'ReplayBufferStatus'
   | 'Click'
-  | 'Session';
+  | 'Session'
+  | 'Shown';
 
 interface IAnalyticsEvent {
   product: string;
@@ -45,10 +46,22 @@ interface IAnalyticsEvent {
   userId?: number;
 }
 
+interface ISystemInfo {
+  os: {
+    platform: string;
+    release: string;
+  };
+  arch: string;
+  cpu: string;
+  cores: number;
+  mem: number;
+}
+
 interface ISessionInfo {
   startTime: Date;
   endTime?: Date;
   features: Dictionary<boolean>;
+  sysInfo: ISystemInfo;
 }
 
 export function track(event: TUsageEvent) {
@@ -188,6 +201,10 @@ export class UsageStatisticsService extends Service {
     this.recordAnalyticsEvent('Click', { component, target });
   }
 
+  recordShown(component: string) {
+    this.recordAnalyticsEvent('Shown', { component });
+  }
+
   /**
    * Should be called on shutdown to flush all events in the pipeline
    */
@@ -210,6 +227,16 @@ export class UsageStatisticsService extends Service {
   private session: ISessionInfo = {
     startTime: new Date(),
     features: {},
+    sysInfo: {
+      os: {
+        platform: os.platform(),
+        release: os.release(),
+      },
+      arch: process.arch,
+      cpu: os.cpus()[0].model,
+      cores: os.cpus().length,
+      mem: os.totalmem(),
+    },
   };
 
   recordFeatureUsage(feature: string) {

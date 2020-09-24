@@ -34,6 +34,7 @@ export class Source implements ISourceApi {
   channel?: number;
   resourceId: string;
   propertiesManagerType: TPropertiesManager;
+  propertiesManagerSettings: Dictionary<any>;
 
   state: ISource;
 
@@ -106,10 +107,8 @@ export class Source implements ISourceApi {
     return this.propertiesManagerType;
   }
 
-  // TODO: propertiesMangers should be private
-  @ExecuteInWorkerProcess()
   getPropertiesManagerSettings(): Dictionary<any> {
-    return cloneDeep(this.sourcesService.propertiesManagers[this.sourceId].manager.settings);
+    return this.propertiesManagerSettings;
   }
 
   // TODO: propertiesMangers should be private
@@ -133,6 +132,7 @@ export class Source implements ISourceApi {
     this.sourcesService.propertiesManagers[this.sourceId].manager = new managerKlass(
       this.getObsInput(),
       settings,
+      this.sourceId,
     );
     this.sourcesService.propertiesManagers[this.sourceId].type = type;
     this.SET_PROPERTIES_MANAGER_TYPE(type);

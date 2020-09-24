@@ -128,7 +128,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     let data: { id: number };
 
     try {
-      data = await this.withRetry(() => this.uploadFile(filePath));
+      data = await this.withRetry(() => this.uploadFile(file));
     } catch (e) {
       console.error('[Media Backup] Error uploading file:', e);
 
@@ -246,14 +246,16 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     }
   }
 
-  private async uploadFile(filePath: string) {
-    const checksum = await getChecksum(filePath);
-    const file = await new Promise<Blob>(r => {
-      fs.readFile(filePath, (err, data) => r(new Blob([data])));
+  private async uploadFile(file: IMediaFile) {
+    const checksum = await getChecksum(file.filePath);
+    const fileBlob = await new Promise<Blob>(r => {
+      fs.readFile(file.filePath, (err, data) => r(new Blob([data])));
     });
+    const fileObj = new File([fileBlob], file.name);
+
     const formData = new FormData();
     formData.append('checksum', checksum);
-    formData.append('file', file);
+    formData.append('file', fileObj);
     formData.append('modified', new Date().toISOString());
 
     return await new Promise<{ id: number }>((resolve, reject) => {

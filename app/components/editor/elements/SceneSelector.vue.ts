@@ -18,9 +18,10 @@ import SlVueTree, { ISlTreeNode } from 'sl-vue-tree';
 import { ERenderingMode } from '../../../../obs-api';
 import TsxComponent from 'components/tsx-component';
 import { getOS } from 'util/operating-systems';
+import Scrollable from 'components/shared/Scrollable';
 
 @Component({
-  components: { DropdownMenu, HelpTip, SlVueTree },
+  components: { DropdownMenu, HelpTip, SlVueTree, Scrollable },
 })
 export default class SceneSelector extends TsxComponent {
   @Inject() scenesService: ScenesService;
@@ -82,11 +83,11 @@ export default class SceneSelector extends TsxComponent {
   }
 
   makeActive(selectedNodes: ISlTreeNode<{ id: string }>[]) {
-    this.scenesService.makeSceneActive(selectedNodes[0].data.id);
+    this.scenesService.actions.makeSceneActive(selectedNodes[0].data.id);
   }
 
   handleSort(nodes: ISlTreeNode<{ id: string }>[]) {
-    this.scenesService.setSceneOrder(nodes.map(node => node.data.id));
+    this.scenesService.actions.setSceneOrder(nodes.map(node => node.data.id));
   }
 
   addScene() {

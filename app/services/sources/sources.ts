@@ -289,7 +289,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
     const managerKlass = PROPERTIES_MANAGER_TYPES[managerType];
     this.propertiesManagers[id] = {
-      manager: new managerKlass(obsInput, options.propertiesManagerSettings || {}),
+      manager: new managerKlass(obsInput, options.propertiesManagerSettings || {}, id),
       type: managerType,
     };
 
@@ -517,6 +517,16 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
   reset() {
     this.RESET_SOURCES();
+  }
+
+  /**
+   * DO NOT CALL THIS FUNCTION
+   * This is a plumbing function that allows properties managers to sync their
+   * settings into the Vuex store. It should not be called from anywhere outside
+   * the base PropertiesManager class.
+   */
+  updatePropertiesManagerSettingsInStore(sourceId: string, settings: Dictionary<any>) {
+    this.UPDATE_SOURCE({ id: sourceId, propertiesManagerSettings: settings });
   }
 
   showSourceProperties(sourceId: string) {
