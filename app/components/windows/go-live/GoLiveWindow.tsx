@@ -167,6 +167,7 @@ export default class GoLiveWindow extends TsxComponent<{}> {
             <ToggleInput
               onInput={(val: boolean) => this.switchAdvancedMode(val)}
               value={this.settings.advancedMode}
+              metadata={{ name: 'advancedMode' }}
             />
           </div>
         )}

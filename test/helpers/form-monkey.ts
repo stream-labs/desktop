@@ -69,6 +69,11 @@ export class FormMonkey {
 
   async getInput(name: string): Promise<IUIInput> {
     const selector = `${this.formSelector} [data-name="${name}"]`;
+    try {
+      this.client.waitForVisible(selector);
+    } catch (e) {
+      throw new Error(`Input is not visible: ${selector}`);
+    }
     const $el = await this.client.$(selector);
     const id = ($el as any).value.ELEMENT;
     const type = await this.getAttribute(selector, 'data-type');
@@ -82,14 +87,15 @@ export class FormMonkey {
    */
   async fill(formData: Dictionary<any>) {
     this.log('fill form with data', formData);
-    await this.waitFieldsForVisible(Object.keys(formData));
     await this.waitForLoading();
     const inputs = await this.getInputs();
 
     // tslint:disable-next-line:no-parameter-reassignment TODO
     formData = cloneDeep(formData);
+    const inputNames = Object.keys(formData);
 
-    for (const input of inputs) {
+    for (const inputName of inputNames) {
+      const input = await this.getInput(inputName);
       if (!(input.name in formData)) {
         // skip no-name fields
         continue;
@@ -98,35 +104,44 @@ export class FormMonkey {
       const value = formData[input.name];
       this.log(`set the value for the ${input.type} field: ${input.name} = ${value}`);
 
-      switch (input.type) {
-        case 'text':
-        case 'number':
-        case 'textArea':
-          await this.setTextValue(input.selector, value);
-          break;
-        case 'bool':
-          await this.setBoolValue(input.selector, value);
-          break;
-        case 'list':
-        case 'fontFamily':
-          await this.setListValue(input.selector, value);
-          break;
-        case 'color':
-          await this.setColorValue(input.selector, value);
-          break;
-        case 'slider':
-        case 'fontSize':
-        case 'fontWeight':
-          await this.setSliderValue(input.selector, value);
-          break;
-        case 'date':
-          await this.setDateValue(input.selector, value);
-          break;
-        case 'twitchTags':
-          await this.setTwitchTagsValue(input.selector, value);
-          break;
-        default:
-          throw new Error(`No setter found for input type = ${input.type}`);
+      if (typeof value === 'function') {
+        // apply custom setter
+        await (value as FNValueSetter)(this, input);
+      } else {
+        // apply default setter
+        switch (input.type) {
+          case 'text':
+          case 'number':
+          case 'textArea':
+            await this.setTextValue(input.selector, value);
+            break;
+          case 'bool':
+            await this.setBoolValue(input.selector, value);
+            break;
+          case 'toggle':
+            await this.setToggleValue(input.selector, value);
+            break;
+          case 'list':
+          case 'fontFamily':
+            await this.setListValue(input.selector, value);
+            break;
+          case 'color':
+            await this.setColorValue(input.selector, value);
+            break;
+          case 'slider':
+          case 'fontSize':
+          case 'fontWeight':
+            await this.setSliderValue(input.selector, value);
+            break;
+          case 'date':
+            await this.setDateValue(input.selector, value);
+            break;
+          case 'twitchTags':
+            await this.setTwitchTagsValue(input.selector, value);
+            break;
+          default:
+            throw new Error(`No setter found for input type = ${input.type}`);
+        }
       }
 
       delete formData[input.name];
@@ -161,6 +176,9 @@ export class FormMonkey {
           break;
         case 'bool':
           value = await this.getBoolValue(input.selector);
+          break;
+        case 'toggle':
+          value = await this.getToggleValue(input.selector);
           break;
         case 'list':
         case 'fontFamily':
@@ -308,6 +326,22 @@ export class FormMonkey {
     return await this.client.isSelected(checkboxSelector);
   }
 
+  async setToggleValue(selector: string, value: boolean) {
+    // click to change the ToggleInput state
+    await this.client.click(selector);
+
+    // if the current value is not what we need than click one more time
+    const selected = (await this.getAttribute(selector, 'data-value')) === 'true';
+    if (value !== selected) {
+      await this.client.click(selector);
+    }
+  }
+
+  async getToggleValue(selector: string): Promise<boolean> {
+    const val = await this.getAttribute(selector, 'data-value');
+    return val === 'true';
+  }
+
   async setSliderValue(sliderInputSelector: string, goalValue: number) {
     await sleep(500); // slider has an initialization delay
 
@@ -425,13 +459,6 @@ export class FormMonkey {
     await this.client.waitForExist('.sp-input-container.sp-open', 500, true);
   }
 
-  async waitFieldsForVisible(fieldNames: string[]) {
-    const watchers = fieldNames.map(inputName => {
-      return this.client.waitForVisible(`[data-role="input"][data-name=${inputName}]`);
-    });
-    return Promise.all(watchers);
-  }
-
   /**
    * wait for input to be loaded
    * if no field name provided then wait for all inputs
@@ -478,6 +505,29 @@ export function selectTitle(optionTitle: string | RegExp): FNValueSetter {
       // click to the option
       await click(form.t, `${input.selector} .multiselect__element [data-option-title="${title}"]`);
       return;
+    }
+  };
+}
+
+/**
+ * select games
+ */
+export function selectGamesByTitles(
+  games: {
+    title: string;
+    platform: 'facebook' | 'twitch';
+  }[],
+): FNValueSetter {
+  return async (form: FormMonkey, input: IUIInput) => {
+    await form.setInputValue(input.selector, games[0].title);
+    // wait the options list loading
+    await form.client.waitForExist(`${input.selector} .multiselect__element`);
+    for (const game of games) {
+      // click to the option
+      await click(
+        form.t,
+        `${input.selector} .multiselect__element [data-option-value="${game.platform} ${game.title}"]`,
+      );
     }
   };
 }

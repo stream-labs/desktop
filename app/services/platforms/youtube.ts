@@ -441,6 +441,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
         title: params.title,
         scheduledStartTime: params.scheduledStartTime || new Date().toISOString(),
         description: params.description,
+        categoryId: 10,
       },
       status: { privacyStatus: 'public' },
     };
@@ -520,8 +521,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   }
 
   /**
-   * create new LiveStream via API
-   * this LiveStream must be bounded to the Youtube LiveBroadcast before going live
+   * returns liveStream
    */
   private async fetchLiveStream(
     id: string,
