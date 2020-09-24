@@ -5,18 +5,15 @@ import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
 import { getUser, logOut, releaseUserInPool } from './user';
 import { sleep } from '../sleep';
-import { uniq } from 'lodash';
 import { installFetchMock } from './network';
 
-// save names of all running tests to use them in the retrying mechanism
-const pendingTests: string[] = [];
-export const test: TestInterface<ITestContext> = new Proxy(avaTest, {
-  apply: (target, thisArg, args) => {
-    const testName = args[0];
-    pendingTests.push(testName);
-    return target.apply(thisArg, args);
-  },
-});
+import {
+  removeFailedTestFromFile,
+  saveFailedTestsToFile,
+  saveTestExecutionTimeToDB,
+  testFn,
+} from './runner-utils';
+export const test = testFn; // the overridden "test" function
 
 const path = require('path');
 const fs = require('fs');
@@ -24,8 +21,9 @@ const os = require('os');
 const rimraf = require('rimraf');
 
 const ALMOST_INFINITY = Math.pow(2, 31) - 1; // max 32bit int
-const FAILED_TESTS_PATH = 'test-dist/failed-tests.json';
 
+const testTimings: Record<string, number> = {};
+let testStartTime = 0;
 let activeWindow: string | RegExp;
 
 const afterStartCallbacks: ((t: TExecutionContext) => any)[] = [];
@@ -152,7 +150,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   // tslint:disable-next-line:no-parameter-reassignment TODO
   options = Object.assign({}, DEFAULT_OPTIONS, options);
   let appIsRunning = false;
-  let context: any = null;
   let app: any;
   let testPassed = false;
   let failMsg = '';
@@ -247,8 +244,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     await focusChild(t);
     await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
     await focusMain(t);
-
-    context = t.context;
     appIsRunning = true;
 
     for (const callback of afterStartCallbacks) {
@@ -271,7 +266,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     if (!clearCache) return;
     await new Promise(resolve => {
-      rimraf(t.context.cacheDir, resolve);
+      rimraf(lastCacheDir, resolve);
     });
     for (const callback of afterStopCallbacks) {
       await callback(t);
@@ -283,7 +278,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
    */
   async function checkErrorsInLogFile(t: TExecutionContext) {
     await sleep(1000); // electron-log needs some time to write down logs
-    const filePath = path.join(t.context.cacheDir, 'slobs-client', 'app.log');
+    const filePath = path.join(lastCacheDir, 'slobs-client', 'app.log');
     if (!fs.existsSync(filePath)) return;
     const logs: string = fs.readFileSync(filePath).toString();
     const errors = logs
@@ -311,12 +306,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     }
   }
 
-  test.before(async t => {
-    // consider all tests as failed until it's not successfully finished
-    // so we can catch failures for tests with timeouts
-    saveFailedTestsToFile(pendingTests);
-  });
-
   test.beforeEach(async t => {
     testName = t.title.replace('beforeEach hook for ', '');
     testPassed = false;
@@ -329,6 +318,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       // Set the cache dir to what it previously was, since we are re-using it
       t.context.cacheDir = lastCacheDir;
     }
+    testStartTime = Date.now();
   });
 
   test.afterEach(async t => {
@@ -362,6 +352,8 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     if (testPassed) {
       // consider this test succeed and remove from the `failedTests` list
       removeFailedTestFromFile(testName);
+      // save the test execution time
+      testTimings[testName] = Date.now() - testStartTime;
     } else {
       fail();
       const user = getUser();
@@ -371,10 +363,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   });
 
   test.after.always(async t => {
-    if (!appIsRunning) return;
-    t.context = context;
-    await stopAppFn(t);
+    if (appIsRunning) await stopAppFn(t);
     if (!testPassed) saveFailedTestsToFile([testName]);
+    await saveTestExecutionTimeToDB(testTimings);
   });
 
   /**
@@ -383,22 +374,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   function fail(msg?: string) {
     testPassed = false;
     if (msg) failMsg = msg;
-  }
-}
-
-function saveFailedTestsToFile(failedTests: string[]) {
-  if (fs.existsSync(FAILED_TESTS_PATH)) {
-    // tslint:disable-next-line:no-parameter-reassignment TODO
-    failedTests = JSON.parse(fs.readFileSync(FAILED_TESTS_PATH)).concat(failedTests);
-  }
-  fs.writeFileSync(FAILED_TESTS_PATH, JSON.stringify(uniq(failedTests)));
-}
-
-function removeFailedTestFromFile(testName: string) {
-  if (fs.existsSync(FAILED_TESTS_PATH)) {
-    const failedTests = JSON.parse(fs.readFileSync(FAILED_TESTS_PATH));
-    failedTests.splice(failedTests.indexOf(testName), 1);
-    fs.writeFileSync(FAILED_TESTS_PATH, JSON.stringify(failedTests));
   }
 }
 
