@@ -149,6 +149,7 @@ export async function reserveUserFromPool(
   while (attempts--) {
     try {
       let urlPath = 'reserve';
+      const getParams: string[] = [];
       // request a specific platform
       if (platformType) urlPath += `/${platformType}`;
       // request a user with a specific feature
@@ -160,8 +161,15 @@ export async function reserveUserFromPool(
           const filterValue = enabled ? true : null; // convert false to null, since DB doesn't have `false` as a value for features
           filter[feature] = filterValue;
         });
-        urlPath += `?filter=${JSON.stringify(filter)}`;
+        getParams.push(`filter=${JSON.stringify(filter)}`);
       }
+
+      if (attempts === 0) {
+        // notify the user-pool that it's the last attempt before failure
+        getParams.push('isLastCall=true');
+      }
+
+      if (getParams.length) urlPath = `${urlPath}?${getParams.join('&')}`;
       reservedUser = await requestUserPool(urlPath);
       break;
     } catch (e) {
