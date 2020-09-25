@@ -41,10 +41,16 @@ export default class GoLiveWindow extends TsxComponent<{}> {
     return this.view.info.lifecycle;
   }
 
-  async created() {
-    // fetch platforms' data
-    if (this.lifecycle === 'empty') {
+  created() {
+    if (['empty', 'waitingForNewSettings'].includes(this.lifecycle)) {
       this.streamingService.actions.prepopulateInfo();
+    }
+  }
+
+  destroyed() {
+    // clear failed checks on window close
+    if (this.view.hasFailedChecks() && this.view.info.checklist.startVideoTransmission !== 'done') {
+      this.streamingService.actions.resetInfo();
     }
   }
 
