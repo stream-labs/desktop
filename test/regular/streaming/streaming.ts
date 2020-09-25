@@ -145,7 +145,6 @@ test('Streaming to the scheduled event on Youtube', async t => {
   t.pass();
 });
 
-// TODO: flaky
 test('Stream after switching accounts', async t => {
   // stream to youtube
   await logIn(t, 'youtube');
