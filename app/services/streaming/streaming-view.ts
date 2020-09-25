@@ -229,6 +229,15 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   }
 
   /**
+   * Return true if one of the checks has been failed
+   */
+  hasFailedChecks(): boolean {
+    return !!Object.keys(this.state.info.checklist).find(
+      check => this.state.info.checklist[check] === 'failed',
+    );
+  }
+
+  /**
    * Returns Go-Live settings for a given platform
    */
   private getPlatformSettings(platform: TPlatform) {

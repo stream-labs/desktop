@@ -463,6 +463,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
   }
 
+  resetInfo() {
+    this.RESET_STREAM_INFO();
+  }
+
   resetError() {
     this.RESET_ERROR();
     if (this.state.info.checklist.startVideoTransmission === 'done') {
@@ -538,7 +542,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.toggleStreaming();
   }
 
-  async finishStartStreaming() {
+  async finishStartStreaming(): Promise<unknown> {
     // register a promise that we should reject or resolve in the `handleObsOutputSignal`
     const startStreamingPromise = new Promise((resolve, reject) => {
       this.resolveStartStreaming = resolve;
@@ -556,8 +560,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       });
 
       if (!goLive.response) {
-        this.rejectStartStreaming();
-        return;
+        return Promise.reject();
       }
     }
 
