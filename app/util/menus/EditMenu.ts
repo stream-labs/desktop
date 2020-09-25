@@ -1,8 +1,8 @@
 import { Inject } from '../../services/core/injector';
 import { Menu } from './Menu';
 import { Source, SourcesService } from '../../services/sources';
-import { ScenesService } from '../../services/scenes';
-import { ClipboardService } from '../../services/clipboard';
+import { ScenesService, isItem } from '../../services/scenes';
+import { ClipboardService } from 'services/clipboard';
 import { SourceTransformMenu } from './SourceTransformMenu';
 import { GroupMenu } from './GroupMenu';
 import { SourceFiltersService } from '../../services/source-filters';
@@ -44,8 +44,11 @@ export class EditMenu extends Menu {
 
     if (this.options.selectedSourceId) {
       this.source = this.sourcesService.views.getSource(this.options.selectedSourceId);
-    } else if (this.options.showSceneItemMenu && this.selectionService.isSceneItem()) {
-      this.source = this.selectionService.getItems()[0].getSource();
+    } else if (
+      this.options.showSceneItemMenu &&
+      this.selectionService.views.globalSelection.isSceneItem()
+    ) {
+      this.source = this.selectionService.views.globalSelection.getItems()[0].getSource();
     }
 
     this.appendEditMenuItems();
@@ -55,22 +58,22 @@ export class EditMenu extends Menu {
     if (this.scene) {
       this.append({
         label: $t('Paste (Reference)'),
-        enabled: this.clipboardService.hasData(),
+        enabled: this.clipboardService.views.hasData(),
         accelerator: 'CommandOrControl+V',
         click: () => this.clipboardService.paste(),
       });
 
       this.append({
         label: $t('Paste (Duplicate)'),
-        enabled: this.clipboardService.canDuplicate(),
+        enabled: this.clipboardService.views.canDuplicate(),
         click: () => this.clipboardService.paste(true),
       });
     }
 
-    const isMultipleSelection = this.selectionService.getSize() > 1;
+    const isMultipleSelection = this.selectionService.views.globalSelection.getSize() > 1;
 
     if (this.options.showSceneItemMenu) {
-      const selectedItem = this.selectionService.getLastSelected();
+      const selectedItem = this.selectionService.views.globalSelection.getLastSelected();
 
       this.append({
         label: $t('Copy'),
@@ -100,7 +103,7 @@ export class EditMenu extends Menu {
         submenu: this.groupSubmenu().menu,
       });
 
-      if (selectedItem) {
+      if (selectedItem && isItem(selectedItem)) {
         const visibilityLabel = selectedItem.visible ? $t('Hide') : $t('Show');
         const streamVisLabel = selectedItem.streamVisible
           ? $t('Hide on Stream')
@@ -151,33 +154,33 @@ export class EditMenu extends Menu {
             },
           });
         }
-      }
 
-      if (this.source && this.source.getPropertiesManagerType() === 'widget') {
-        this.append({
-          label: $t('Export Widget'),
-          click: () => {
-            electron.remote.dialog
-              .showSaveDialog({
-                filters: [{ name: 'Widget File', extensions: ['widget'] }],
-              })
-              .then(({ filePath }) => {
-                if (!filePath) return;
+        if (this.source && this.source.getPropertiesManagerType() === 'widget') {
+          this.append({
+            label: $t('Export Widget'),
+            click: () => {
+              electron.remote.dialog
+                .showSaveDialog({
+                  filters: [{ name: 'Widget File', extensions: ['widget'] }],
+                })
+                .then(({ filePath }) => {
+                  if (!filePath) return;
 
-                this.widgetsService.saveWidgetFile(filePath, selectedItem.sceneItemId);
-              });
-          },
-        });
+                  this.widgetsService.saveWidgetFile(filePath, selectedItem.sceneItemId);
+                });
+            },
+          });
+        }
       }
     }
 
-    if (this.selectionService.isSceneFolder()) {
+    if (this.selectionService.views.globalSelection.isSceneFolder()) {
       this.append({
         label: $t('Rename'),
         click: () =>
           this.scenesService.showNameFolder({
             sceneId: this.scenesService.views.activeSceneId,
-            renameId: this.selectionService.getFolders()[0].id,
+            renameId: this.selectionService.views.globalSelection.getFolders()[0].id,
           }),
       });
     }
@@ -189,7 +192,7 @@ export class EditMenu extends Menu {
         click: () => {
           // if scene items are selected than remove the selection
           if (this.options.showSceneItemMenu) {
-            this.selectionService.remove();
+            this.selectionService.actions.removeSelected();
           } else {
             // if no items are selected we are in the MixerSources context menu
             // if a simple source is selected than remove all sources from the current scene
@@ -269,7 +272,7 @@ export class EditMenu extends Menu {
       this.append({
         label: $t('Paste Filters'),
         click: () => this.clipboardService.pasteFilters(this.source.sourceId),
-        enabled: this.clipboardService.hasFilters(),
+        enabled: this.clipboardService.views.hasFilters(),
       });
 
       this.append({ type: 'separator' });

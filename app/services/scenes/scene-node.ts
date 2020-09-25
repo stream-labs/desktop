@@ -146,7 +146,7 @@ export abstract class SceneItemNode implements ISceneItemNode {
   }
 
   isSelected() {
-    return this.selectionService.isSelected(this.id);
+    return this.selectionService.views.globalSelection.isSelected(this.id);
   }
 
   select() {

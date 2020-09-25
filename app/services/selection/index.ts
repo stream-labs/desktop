@@ -21,6 +21,7 @@ import { WindowsService } from 'services/windows';
 import { EditorCommandsService } from 'services/editor-commands';
 import { Selection } from './selection';
 import { ViewHandler } from 'services/core';
+import { GlobalSelection } from './global-selection';
 
 export { Selection };
 
@@ -35,6 +36,10 @@ export interface ISelectionState {
 export type TNodesList = string | string[] | ISceneItemNode | ISceneItemNode[];
 
 class SelectionViews extends ViewHandler<ISelectionState> {
+  get globalSelection() {
+    return new GlobalSelection(null);
+  }
+
   get size() {
     return this.state.selectedIds.length;
   }
@@ -128,28 +133,8 @@ export class SelectionService extends StatefulService<ISelectionState> {
   setParent: (folderId: string) => void;
 
   @shortcut('Delete')
-  remove() {
-    const lastSelected = this.getLastSelected();
-
-    if (!lastSelected) return;
-
-    const name = lastSelected.name;
-    const selectionLength = this.getSelection().getIds.call(this).length;
-    const message =
-      selectionLength > 1
-        ? $t('Are you sure you want to remove these %{count} items?', { count: selectionLength })
-        : $t('Are you sure you want to remove %{sceneName}?', { sceneName: name });
-
-    electron.remote.dialog
-      .showMessageBox(Utils.getMainWindow(), {
-        message,
-        type: 'warning',
-        buttons: [$t('Cancel'), $t('OK')],
-      })
-      .then(({ response }) => {
-        if (!response) return;
-        this.editorCommandsService.executeCommand('RemoveNodesCommand', this.getActiveSelection());
-      });
+  removeSelected() {
+    this.views.globalSelection.remove();
   }
 
   openEditTransform() {
@@ -195,10 +180,7 @@ export class SelectionService extends StatefulService<ISelectionState> {
     return Selection.prototype;
   }
 
-  /**
-   * @override Selection.setState
-   */
-  private setState(state: Partial<ISelectionState>) {
+  setState(state: Partial<ISelectionState>) {
     this.SET_STATE(state);
   }
 

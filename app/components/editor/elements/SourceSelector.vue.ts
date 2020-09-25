@@ -159,9 +159,9 @@ export default class SourceSelector extends TsxComponent {
     if (this.scenesService.views.activeScene) {
       let itemsToGroup: string[] = [];
       let parentId: string;
-      if (this.selectionService.canGroupIntoFolder()) {
-        itemsToGroup = this.selectionService.getIds();
-        const parent = this.selectionService.getClosestParent();
+      if (this.selectionService.views.globalSelection.canGroupIntoFolder()) {
+        itemsToGroup = this.selectionService.views.globalSelection.getIds();
+        const parent = this.selectionService.views.globalSelection.getClosestParent();
         if (parent) parentId = parent.id;
       }
       this.scenesService.showNameFolder({
@@ -185,12 +185,12 @@ export default class SourceSelector extends TsxComponent {
   }
 
   removeItems() {
-    this.selectionService.remove();
+    this.selectionService.views.globalSelection.remove();
   }
 
   sourceProperties(nodeId: string) {
     const node =
-      this.scenesService.views.getSceneNode(nodeId) || this.selectionService.getNodes()[0];
+      this.scenesService.views.getSceneNode(nodeId) || this.selectionService.views.globalSelection.getNodes()[0];
 
     if (!node) return;
 
@@ -292,7 +292,7 @@ export default class SourceSelector extends TsxComponent {
   }
 
   get activeItems() {
-    return this.selectionService.getItems();
+    return this.selectionService.views.globalSelection.getItems();
   }
 
   toggleVisibility(sceneNodeId: string) {

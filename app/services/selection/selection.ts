@@ -22,11 +22,11 @@ import { ISelectionState, TNodesList } from './index';
  */
 @ServiceHelper()
 export class Selection {
-  @Inject() private scenesService: ScenesService;
+  @Inject() scenesService: ScenesService;
 
   _resourceId: string;
 
-  private state: ISelectionState = {
+  protected state: ISelectionState = {
     selectedIds: [],
     lastSelectedId: '',
   };
@@ -532,7 +532,7 @@ export class Selection {
     return [itemsList.id];
   }
 
-  private setState(state: Partial<ISelectionState>) {
+  protected setState(state: Partial<ISelectionState>) {
     Object.assign(this.state, state);
   }
 }
