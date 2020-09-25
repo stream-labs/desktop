@@ -69,23 +69,12 @@ test('Streaming to Twitch', async t => {
   t.pass();
 });
 
-test.skip('Streaming to Facebook', async t => {
+test('Streaming to Facebook', async t => {
   await logIn(t, 'facebook');
   await goLive(t, {
     title: 'SLOBS Test Stream',
     game: selectTitle('Fortnite'),
     description: 'SLOBS Test Stream Description',
-  });
-  t.true(await chatIsVisible(t), 'Chat should be visible');
-  t.pass();
-});
-
-// TODO: Mixer stopped returning a stream key for testing accounts
-test.skip('Streaming to Mixer', async t => {
-  await logIn(t, 'mixer');
-  await goLive(t, {
-    title: 'SLOBS Test Stream',
-    game: selectTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
   });
   t.true(await chatIsVisible(t), 'Chat should be visible');
   t.pass();
@@ -157,7 +146,7 @@ test('Streaming to the scheduled event on Youtube', async t => {
 });
 
 // TODO: flaky
-test.skip('Stream after switching accounts', async t => {
+test('Stream after switching accounts', async t => {
   // stream to youtube
   await logIn(t, 'youtube');
   await goLive(t, {
@@ -257,13 +246,7 @@ test('Migrate the twitch account to the protected mode', async t => {
 const schedulingPlatforms = ['facebook', 'youtube'];
 schedulingPlatforms.forEach(platform => {
   test(`Schedule stream to ${platform}`, async t => {
-    if (platform === 'facebook') {
-      // TODO test.skip
-      console.log('Schedule facebook test is flaky');
-      t.pass();
-      return;
-    }
-    // login into the account
+    // login into the account:
     await logIn(t, platform as TPlatform);
     const app = t.context.app;
 
@@ -374,7 +357,7 @@ test('User does not have Facebook pages', async t => {
   );
 });
 
-test.skip('User has linked twitter', async t => {
+test('User has linked twitter', async t => {
   await logIn(t, 'twitch', { hasLinkedTwitter: true, notStreamable: true });
   await prepareToGoLive(t);
   await clickGoLive(t);
@@ -438,58 +421,60 @@ test('Update channel settings before streaming', async t => {
   t.pass();
 });
 
-// TODO: enable Prime for testing accounts
-test.skip('Custom stream destinations', async t => {
+test('Custom stream destinations', async t => {
   const client = t.context.app.client;
-  await logIn(t, 'twitch');
+  await logIn(t, 'twitch', { prime: true });
 
   // fetch a new stream key
   const user = await reserveUserFromPool(t, 'twitch');
 
   // add new destination
   await showSettings(t, 'Stream');
-  await click(t, 'button=Add additional destination');
+  await click(t, 'span=Add Destination');
   await fillForm(t, null, {
     name: 'MyCustomDest',
     url: 'rtmp://live.twitch.tv/app/',
     streamKey: user.streamKey,
   });
-  await click(t, 'Save');
+  await click(t, 'button=Save');
   await t.true(await client.isExisting('span=MyCustomDest'), 'New destination is created');
 
   // update destinations
-  await click(t, 'fa-pen');
+  await click(t, 'i.fa-pen');
   await fillForm(t, null, {
     name: 'MyCustomDestUpdated',
   });
-  await click(t, 'Save');
+  await click(t, 'button=Save');
   await t.true(await client.isExisting('span=MyCustomDestUpdated'), 'Destination is updated');
 
   // add one more destination
-  await click(t, 'button=Add additional destination');
+  await click(t, 'span=Add Destination');
   await fillForm(t, null, {
     name: 'MyCustomDest',
     url: 'rtmp://live.twitch.tv/app/',
     streamKey: user.streamKey,
   });
-  await click(t, 'Save');
+  await click(t, 'button=Save');
   await t.false(
-    await client.isExisting('button=Add additional destinationt'),
+    await client.isExisting('span=Add Destination'),
     'Do not allow more than 2 custom dest',
   );
 
   // open the GoLiveWindow and check destinations
+  await prepareToGoLive(t);
   await clickGoLive(t);
   await t.true(await client.isExisting('span=MyCustomDest'), 'Destination is available');
   await click(t, 'span=MyCustomDest'); // switch the destination on
+  await tryToGoLive(t);
   await client.waitForExist('span=Configure the Multistream service'); // the multistream should be started
   await stopStream(t);
   await releaseUserInPool(user);
 
   // delete existing destinations
   await showSettings(t, 'Stream');
-  await click(t, 'fa-trash');
-  await click(t, 'fa-trash');
+  await click(t, 'i.fa-trash');
+  await click(t, 'i.fa-trash');
+  t.false(await client.isExisting('i.fa-trash'), 'Destinations should be removed');
 
   t.pass();
 });
