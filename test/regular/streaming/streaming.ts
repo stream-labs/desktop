@@ -7,13 +7,13 @@ import {
   restartApp,
   closeWindow,
   click,
-} from '../helpers/spectron';
-import { setFormInput } from '../helpers/spectron/forms';
-import { fillForm, formIncludes, FormMonkey, selectTitle } from '../helpers/form-monkey';
-import { logIn, logOut, releaseUserInPool, reserveUserFromPool } from '../helpers/spectron/user';
-import { setTemporaryRecordingPath } from '../helpers/spectron/output';
+} from '../../helpers/spectron';
+import { setFormInput } from '../../helpers/spectron/forms';
+import { fillForm, formIncludes, FormMonkey, selectTitle } from '../../helpers/form-monkey';
+import { logIn, logOut, releaseUserInPool, reserveUserFromPool } from '../../helpers/spectron/user';
+import { setTemporaryRecordingPath } from '../../helpers/spectron/output';
 const moment = require('moment');
-import { fetchMock, resetFetchMock } from '../helpers/spectron/network';
+import { fetchMock, resetFetchMock } from '../../helpers/spectron/network';
 import {
   goLive,
   clickGoLive,
@@ -26,13 +26,13 @@ import {
   chatIsVisible,
   waitForStreamStop,
   updateChannelSettings,
-} from '../helpers/spectron/streaming';
-import { TPlatform } from '../../app/services/platforms';
+} from '../../helpers/spectron/streaming';
+import { TPlatform } from '../../../app/services/platforms';
 import { readdir } from 'fs-extra';
-import { showSettings } from '../helpers/spectron/settings';
-import { sleep } from '../helpers/sleep';
-import { getClient } from '../helpers/api-client';
-import { StreamSettingsService } from '../../app/services/settings/streaming';
+import { showSettings } from '../../helpers/spectron/settings';
+import { sleep } from '../../helpers/sleep';
+import { getClient } from '../../helpers/api-client';
+import { StreamSettingsService } from '../../../app/services/settings/streaming';
 
 useSpectron();
 

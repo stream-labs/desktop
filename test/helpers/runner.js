@@ -30,7 +30,8 @@ function retryTests() {
   log('retrying failed tests');
 
   if (!fs.existsSync(failedTestsFile)) {
-    throw 'no tests to retry';
+    console.error('no tests to retry');
+    failAndExit();
   }
 
   const failedTests = JSON.parse(fs.readFileSync(failedTestsFile, 'utf8'));

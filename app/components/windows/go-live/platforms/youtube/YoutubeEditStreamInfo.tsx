@@ -76,7 +76,7 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
     const canShowOnlyRequiredFields = this.canShowOnlyRequiredFields;
     return (
       !canShowOnlyRequiredFields && (
-        <ValidatedForm>
+        <ValidatedForm name="youtube-settings">
           {this.props.showEvents && (
             <HFormGroup title={$t('Event')}>
               <BroadcastInput

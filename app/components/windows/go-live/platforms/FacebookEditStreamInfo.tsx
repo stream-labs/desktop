@@ -42,7 +42,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
 
   render() {
     return (
-      <ValidatedForm>
+      <ValidatedForm name="facebook-settings">
         <HFormGroup title={this.formMetadata.page.title}>
           <ListInput
             vModel={this.settings.platforms.facebook.facebookPageId}
