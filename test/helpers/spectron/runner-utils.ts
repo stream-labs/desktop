@@ -77,9 +77,7 @@ export function removeFailedTestFromFile(testName: string) {
  * check if test is eligible to run on the current CI agent
  */
 function isTestEligibleToRun(testName: string) {
-  console.log('check elig', testName);
   const testAvgTime = testTimings[testName];
-  console.log('test avg time', testAvgTime);
 
   // if we don't have a timing data for test then it's always eligible to run
   if (!testAvgTime) return true;
@@ -102,15 +100,6 @@ function isTestEligibleToRun(testName: string) {
   });
   const timePerChunk = testAvgTotalTime / totalChunks;
   const testChunkNum = Math.floor(testAvgStartTime / timePerChunk) + 1;
-
-  console.log('test name', testName);
-  console.log('testAvgStartTime', testAvgStartTime);
-  console.log('testAvgTotalTime', testAvgTotalTime);
-  console.log('testChunkNum', testChunkNum);
-  console.log('currentChunkNum', currentChunkNum);
-  console.log('totalChunks', totalChunks);
-
-
   return testChunkNum === currentChunkNum;
 }
 
