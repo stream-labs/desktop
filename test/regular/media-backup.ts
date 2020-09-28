@@ -92,6 +92,8 @@ test('Media backup', async t => {
     t.not(image2Path, image2DownloadedPath);
 
     // Make sure the filenames contain the original filename
+    console.log(image1DownloadedPath);
+    console.log(image2DownloadedPath);
     t.not(image1DownloadedPath.indexOf(image1Filename), -1);
     t.not(image2DownloadedPath.indexOf(image2Filename), -1);
   } catch (e) {
