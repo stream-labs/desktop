@@ -295,7 +295,7 @@ schedulingPlatforms.forEach(platform => {
       await app.client.click('button=Done');
     }
 
-    await app.client.waitForVisible('.toast-success', 20000);
+    await app.client.waitForVisible('.toast-success', 30000);
     t.pass();
   });
 });
