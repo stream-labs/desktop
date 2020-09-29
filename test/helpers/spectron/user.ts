@@ -144,7 +144,7 @@ export async function reserveUserFromPool(
 ): Promise<ITestUser> {
   // try to get a user account from users-pool service
   // give it several attempts
-  let attempts = 3;
+  let attempts = 5;
   let reservedUser = null;
   while (attempts--) {
     try {
