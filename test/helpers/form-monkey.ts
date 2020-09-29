@@ -501,6 +501,7 @@ export function selectTitle(optionTitle: string | RegExp): FNValueSetter {
 
       // wait the options list loading
       await form.client.waitForExist(`${input.selector} .multiselect__element`);
+      await form.waitForLoading(input.name);
 
       // click to the option
       await click(form.t, `${input.selector} .multiselect__element [data-option-title="${title}"]`);
