@@ -84,11 +84,11 @@ export class EditMenu extends Menu {
       this.append({
         label: $t('Select All'),
         accelerator: 'CommandOrControl+A',
-        click: () => this.selectionService.selectAll(),
+        click: () => this.selectionService.views.globalSelection.selectAll(),
       });
       this.append({
         label: $t('Invert Selection'),
-        click: () => this.selectionService.invert(),
+        click: () => this.selectionService.views.globalSelection.invert(),
       });
 
       this.append({ type: 'separator' });
@@ -116,7 +116,11 @@ export class EditMenu extends Menu {
           this.append({
             label: visibilityLabel,
             click: () => {
-              selectedItem.setVisibility(!selectedItem.visible);
+              this.editorCommandsService.executeCommand(
+                'HideItemsCommand',
+                selectedItem.getSelection(),
+                !selectedItem.visible,
+              );
             },
           });
           this.append({
@@ -144,13 +148,21 @@ export class EditMenu extends Menu {
           this.append({
             label: $t('Show'),
             click: () => {
-              this.selectionService.setVisibility(true);
+              this.editorCommandsService.executeCommand(
+                'HideItemsCommand',
+                this.selectionService.views.globalSelection,
+                false,
+              );
             },
           });
           this.append({
             label: $t('Hide'),
             click: () => {
-              this.selectionService.setVisibility(false);
+              this.editorCommandsService.executeCommand(
+                'HideItemsCommand',
+                this.selectionService.views.globalSelection,
+                true,
+              );
             },
           });
         }

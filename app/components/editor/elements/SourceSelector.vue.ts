@@ -190,7 +190,8 @@ export default class SourceSelector extends TsxComponent {
 
   sourceProperties(nodeId: string) {
     const node =
-      this.scenesService.views.getSceneNode(nodeId) || this.selectionService.views.globalSelection.getNodes()[0];
+      this.scenesService.views.getSceneNode(nodeId) ||
+      this.selectionService.views.globalSelection.getNodes()[0];
 
     if (!node) return;
 
@@ -246,13 +247,13 @@ export default class SourceSelector extends TsxComponent {
         EPlaceType.Inside,
       );
     }
-    this.selectionService.select(nodesToMove.getIds());
+    this.selectionService.views.globalSelection.select(nodesToMove.getIds());
   }
 
   makeActive(treeNodes: ISlTreeNode<ISceneNodeData>[], ev: MouseEvent) {
     const ids = treeNodes.map(treeNode => treeNode.data.id);
     this.callCameFromInsideTheHouse = true;
-    this.selectionService.actions.select(ids);
+    this.selectionService.views.globalSelection.select(ids);
   }
 
   toggleFolder(treeNode: ISlTreeNode<ISceneNodeData>) {

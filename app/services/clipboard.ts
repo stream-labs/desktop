@@ -154,7 +154,7 @@ export class ClipboardService extends StatefulService<IClipboardState> {
 
   @shortcut('Ctrl+C')
   copy() {
-    this.SET_SCENE_ITEMS_IDS(this.selectionService.getIds());
+    this.SET_SCENE_ITEMS_IDS(this.selectionService.views.globalSelection.getIds());
     this.SET_SCENE_ITEMS_SCENE(this.scenesService.views.activeScene.id);
   }
 
@@ -184,7 +184,7 @@ export class ClipboardService extends StatefulService<IClipboardState> {
         duplicateSources,
       );
 
-      if (insertedItems.length) this.selectionService.select(insertedItems);
+      if (insertedItems.length) this.selectionService.views.globalSelection.select(insertedItems);
     } else if (this.views.hasSystemClipboard()) {
       this.pasteFromSystemClipboard();
     }
@@ -193,9 +193,11 @@ export class ClipboardService extends StatefulService<IClipboardState> {
   copyFilters(sourceId?: string) {
     const source = sourceId
       ? this.sourcesService.views.getSource(sourceId)
-      : this.selectionService.getLastSelected();
+      : this.selectionService.views.globalSelection.getLastSelected();
 
     if (!source) return;
+    if (source instanceof SceneItemFolder) return;
+
     this.SET_FILTERS_IDS([source.sourceId]);
     this.SET_UNLOADED_CLIPBOARD_FILTERS([]);
   }
@@ -203,8 +205,9 @@ export class ClipboardService extends StatefulService<IClipboardState> {
   pasteFilters(sourceId?: string) {
     const source = sourceId
       ? this.sourcesService.views.getSource(sourceId)
-      : this.selectionService.getLastSelected();
+      : this.selectionService.views.globalSelection.getLastSelected();
     if (!source) return;
+    if (source instanceof SceneItemFolder) return;
 
     const filterData: IFilterData[] = [];
 

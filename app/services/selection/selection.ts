@@ -26,6 +26,13 @@ export class Selection {
 
   _resourceId: string;
 
+  /**
+   * Once a selection has been frozen, the selected items
+   * cannot be changed. This is mostly used for keeping
+   * undo/redo history when working with the GlobalSelection.
+   */
+  isFrozen = false;
+
   protected state: ISelectionState = {
     selectedIds: [],
     lastSelectedId: '',
@@ -51,7 +58,15 @@ export class Selection {
     return this;
   }
 
+  freeze() {
+    this.isFrozen = true;
+  }
+
   select(itemsList: TNodesList): Selection {
+    if (this.isFrozen) {
+      throw new Error('Attempted to modify frozen selection');
+    }
+
     let ids = this.resolveItemsList(itemsList);
     ids = uniq(ids);
     const scene = this.getScene();

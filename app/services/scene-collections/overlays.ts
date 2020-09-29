@@ -104,7 +104,7 @@ export class OverlaysPersistenceService extends Service {
     await root.load({ assetsPath });
 
     this.scenesService.makeSceneActive(this.scenesService.views.scenes[0].id);
-    this.selectionService.reset();
+    this.selectionService.views.globalSelection.reset();
   }
 
   async saveOverlay(overlayFilePath: string) {

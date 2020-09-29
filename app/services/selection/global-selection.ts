@@ -5,6 +5,7 @@ import { $t } from 'services/i18n';
 import electron from 'electron';
 import Utils from 'services/utils';
 import { EditorCommandsService } from 'services/editor-commands';
+import { cloneDeep } from 'lodash';
 
 /**
  * A specific case of a selection that represents what
@@ -17,8 +18,14 @@ export class GlobalSelection extends Selection {
   @Inject() selectionService: SelectionService;
   @Inject() editorCommandsService: EditorCommandsService;
 
+  /**
+   * Used to remember the state when this selection
+   * was frozen.
+   */
+  frozenState: ISelectionState;
+
   protected get state() {
-    return this.selectionService.state;
+    return this.isFrozen ? this.frozenState : this.selectionService.state;
   }
 
   get sceneId() {
@@ -28,6 +35,11 @@ export class GlobalSelection extends Selection {
   // Ensures compatibiltiy with parent class
   set sceneId(val: string) {}
   protected set state(val: ISelectionState) {}
+
+  freeze() {
+    this.frozenState = cloneDeep(this.state);
+    super.freeze();
+  }
 
   remove() {
     const lastSelected = this.getLastSelected();
@@ -54,29 +66,24 @@ export class GlobalSelection extends Selection {
   }
 
   select(items: TNodesList) {
-    // this.getSelection().select.call(this, items);
-    super.select(items);
+    if (this.isFrozen) {
+      throw new Error('Attempted to modify frozen selection');
+    }
 
-    const scene = this.getScene();
-    const activeObsIds = this.getItems().map(sceneItem => sceneItem.obsSceneItemId);
-
-    // tell OBS which sceneItems are selected
-    scene
-      .getObsScene()
-      .getItems()
-      .forEach(obsSceneItem => {
-        obsSceneItem.selected = activeObsIds.includes(obsSceneItem.id);
-      });
-    this.selectionService.updated.next(this.state);
+    // TODO: Allow calling of actions from the worker window
+    if (Utils.isWorkerWindow()) {
+      this.selectionService.select(items);
+    } else {
+      this.selectionService.actions.select(items);
+    }
 
     return this;
   }
 
   /**
-   * Sets the state on the Vuex store. Is done synchronously
-   * to avoid race conditions.
+   * Should not be called on the GlobalSelection
    */
   protected setState(state: Partial<ISelectionState>) {
-    this.selectionService.setState(state);
+    throw new Error('setState cannot be called on the GlobalSelection');
   }
 }

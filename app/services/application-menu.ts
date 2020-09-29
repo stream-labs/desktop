@@ -106,7 +106,7 @@ export class ApplicationMenuService extends Service {
             click: () => {
               if (this.isEditorFocused()) {
                 if (this.appService.state.loading) return;
-                this.selectionService.selectAll();
+                this.selectionService.views.globalSelection.selectAll();
               } else {
                 electron.remote.Menu.sendActionToFirstResponder('selectAll:');
               }
