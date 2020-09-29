@@ -39,10 +39,7 @@ export default class HotkeyGroup extends TsxComponent<HotkeyGroupProps> {
         {this.header}
         <transition name="expand">
           {(!this.isCollapsible || !this.collapsed) && (
-            <div
-              // style={this.collapsed ? { display: 'none' } : null}
-              class={cx({ 'section-content--opened': !!this.props.title }, 'section-content')}
-            >
+            <div class={cx({ 'section-content--opened': !!this.props.title }, 'section-content')}>
               {this.props.hotkeys.map(hotkey => (
                 <div
                   key={hotkey.actionName + hotkey.sceneId + hotkey.sceneItemId + hotkey.sourceId}
