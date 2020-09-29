@@ -14,10 +14,6 @@ class HotkeyGroupProps {
 export default class HotkeyGroup extends TsxComponent<HotkeyGroupProps> {
   collapsed = true;
 
-  mounted() {
-    console.log(this.props);
-  }
-
   get header() {
     return this.props.title ? (
       <h2
