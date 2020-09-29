@@ -23,13 +23,14 @@ export class GlobalSelection extends Selection {
    * was frozen.
    */
   frozenState: ISelectionState;
+  frozenSceneId: string;
 
   protected get state() {
     return this.isFrozen ? this.frozenState : this.selectionService.state;
   }
 
   get sceneId() {
-    return this.scenesService.views.activeSceneId;
+    return this.isFrozen ? this.frozenSceneId : this.scenesService.views.activeSceneId;
   }
 
   // Ensures compatibiltiy with parent class
@@ -38,6 +39,7 @@ export class GlobalSelection extends Selection {
 
   freeze() {
     this.frozenState = cloneDeep(this.state);
+    this.frozenSceneId = this.sceneId;
     super.freeze();
   }
 
