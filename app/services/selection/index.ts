@@ -11,7 +11,7 @@ import { Selection } from './selection';
 import { ViewHandler } from 'services/core';
 import { GlobalSelection } from './global-selection';
 
-export { Selection };
+export { Selection, GlobalSelection };
 
 export interface ISelectionState {
   selectedIds: string[];
@@ -25,7 +25,7 @@ export type TNodesList = string | string[] | ISceneItemNode | ISceneItemNode[];
 
 class SelectionViews extends ViewHandler<ISelectionState> {
   get globalSelection() {
-    return new GlobalSelection(null);
+    return new GlobalSelection();
   }
 }
 

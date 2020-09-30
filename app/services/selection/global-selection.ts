@@ -1,5 +1,5 @@
 import { Selection } from './selection';
-import { Inject } from 'services/core';
+import { Inject, ServiceHelper } from 'services/core';
 import { SelectionService, ISelectionState, TNodesList } from 'services/selection';
 import { $t } from 'services/i18n';
 import electron from 'electron';
@@ -14,6 +14,7 @@ import { cloneDeep } from 'lodash';
  * store in the SelectionService, and selecting items
  * actually selects them in OBS.
  */
+@ServiceHelper()
 export class GlobalSelection extends Selection {
   @Inject() selectionService: SelectionService;
   @Inject() editorCommandsService: EditorCommandsService;
@@ -36,6 +37,10 @@ export class GlobalSelection extends Selection {
   // Ensures compatibiltiy with parent class
   set sceneId(val: string) {}
   protected set state(val: ISelectionState) {}
+
+  constructor() {
+    super(null);
+  }
 
   freeze() {
     this.frozenState = cloneDeep(this.state);

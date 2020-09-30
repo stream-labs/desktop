@@ -119,7 +119,7 @@ export class EditMenu extends Menu {
               this.editorCommandsService.executeCommand(
                 'HideItemsCommand',
                 selectedItem.getSelection(),
-                !selectedItem.visible,
+                selectedItem.visible,
               );
             },
           });
