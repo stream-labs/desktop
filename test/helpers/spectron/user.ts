@@ -70,7 +70,7 @@ export async function logOut(t: TExecutionContext, skipUI = false) {
 
 /**
  * Login SLOBS into user's account
- * If env.USER_POOL_TOKEN is set than request credentials from slobs-users-pool service
+ * If env.SLOBS_TEST_USER_POOL_TOKEN is set than request credentials from slobs-users-pool service
  * otherwise fetch credentials from ENV variables
  */
 export async function logIn(
@@ -85,7 +85,7 @@ export async function logIn(
   if (USER_POOL_TOKEN) {
     user = await reserveUserFromPool(t, platform, features);
   } else {
-    throw new Error('Setup env variable USER_POOL_TOKEN to run this test');
+    throw new Error('Setup env variable SLOBS_TEST_USER_POOL_TOKEN to run this test');
   }
 
   await loginWithAuthInfo(t, user, waitForUI, isOnboardingTest);
