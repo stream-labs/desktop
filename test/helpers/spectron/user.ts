@@ -144,7 +144,8 @@ export async function reserveUserFromPool(
 ): Promise<ITestUser> {
   // try to get a user account from users-pool service
   // give it several attempts
-  let attempts = 5;
+  const maxAttempts = 5;
+  let attempts = maxAttempts;
   let reservedUser = null;
   while (attempts--) {
     try {
@@ -180,7 +181,7 @@ export async function reserveUserFromPool(
       }
     }
   }
-  if (!reservedUser) throw new Error('Unable to reserve a user after 3 attempts');
+  if (!reservedUser) throw new Error(`Unable to reserve a user after ${maxAttempts} attempts`);
   return reservedUser;
 }
 
