@@ -313,6 +313,16 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     }
   }
 
+  async fetchScheduledVideos() {
+    const videos = await this.requestFacebook(
+      `${this.apiBase}/${
+        this.state.activePage!.id
+      }/live_videos?broadcast_status=["SCHEDULED_UNPUBLISHED"]&source=owner`,
+    );
+    console.log('VIDEOS', videos);
+    return videos;
+  }
+
   fetchViewerCount(): Promise<number> {
     if (this.state.liveVideoId == null) return Promise.resolve(0);
 
