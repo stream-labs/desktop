@@ -62,6 +62,7 @@ export interface IYoutubeLiveBroadcast {
   contentDetails: {
     boundStreamId: string;
     enableAutoStart: boolean;
+    enableEmbed: boolean;
   };
   snippet: {
     title: string;
@@ -198,17 +199,21 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     const {
       title,
       description,
-      broadcastId,
+      broadcastId: scheduledBroadcastId,
     }: IYoutubeStartStreamOptions = settings.platforms.youtube;
     // update selected LiveBroadcast with new title and description
     // or create a new LiveBroadcast if there are no broadcasts selected
-    let broadcast = broadcastId
-      ? await this.updateBroadcast(broadcastId, { title, description })
-      : await this.createBroadcast({ title, description });
+    let broadcastId = scheduledBroadcastId;
+    if (!broadcastId) {
+      broadcastId = await this.createBroadcast({ title, description });
+    } else {
+      await this.updateBroadcast(broadcastId, { title, description });
+    }
 
     // create a LiveStream object and bind it with current LiveBroadcast
     const stream = await this.createLiveStream(title);
-    broadcast = await this.bindStreamToBroadcast(broadcast.id, stream.id);
+    await this.bindStreamToBroadcast(broadcastId, stream.id);
+    const broadcast = await this.fetchBroadcast(broadcastId);
 
     // setup key and platform type in the OBS settings
     const streamKey = stream.cdn.ingestionInfo.streamName;
@@ -230,15 +235,15 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     const streamId = this.state.streamId;
     const broadcastId = this.state.settings.broadcastId;
 
-
-    // if enableAutoStart=true then broadcast should start after YT receives the transmission
+    // if enableAutoStart=true then the broadcast should be published right after YT receives the transmission
     if (this.state.settings.enableAutoStart) {
       this.setLifecycleStep('waitForBroadcastToBeLive');
-      await this.transitionBroadcastStatus(broadcastId, 'live');
+      await this.waitForBroadcastStatus(broadcastId, 'live');
       this.setLifecycleStep('live');
       return;
     }
 
+    // otherwise manually publish broadcast
     try {
       // SLOBS started sending the video data to Youtube
       // wait YT for establish connection with SLOBS
@@ -381,11 +386,11 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   /**
    * Create a YT broadcast (event) for the future stream
    */
-  scheduleStream(
+  async scheduleStream(
     scheduledStartTime: string,
     { title, description }: { title: string; description: string },
-  ): Promise<IYoutubeLiveBroadcast> {
-    return this.createBroadcast({ title, description, scheduledStartTime });
+  ): Promise<void> {
+    await this.createBroadcast({ title, description, scheduledStartTime });
   }
 
   async fetchNewToken(): Promise<void> {
@@ -408,10 +413,11 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   ): Promise<boolean> {
     const broadcastId = this.state.settings.broadcastId;
     assertIsDefined(broadcastId);
-    const broadcast = await this.updateBroadcast(broadcastId, {
+    await this.updateBroadcast(broadcastId, {
       title,
       description,
     });
+    const broadcast = await this.fetchBroadcast(broadcastId);
     this.setActiveBroadcast(broadcast);
     return true;
   }
@@ -445,7 +451,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     title: string;
     description?: string;
     scheduledStartTime?: string;
-  }): Promise<IYoutubeLiveBroadcast> {
+  }): Promise<string> {
     const fields = ['snippet', 'contentDetails', 'status'];
     const endpoint = `liveBroadcasts?part=${fields.join(',')}`;
     const data: Dictionary<any> = {
@@ -458,11 +464,12 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       status: { privacyStatus: 'public' },
     };
 
-    return await this.requestYoutube<IYoutubeLiveBroadcast>({
+    const broadcastInfo = await this.requestYoutube<{ id: string }>({
       body: JSON.stringify(data),
       method: 'POST',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
     });
+    return broadcastInfo.id;
   }
 
   /**
@@ -475,8 +482,8 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       description?: string;
       boundStreamId?: string;
     },
-  ): Promise<IYoutubeLiveBroadcast> {
-    const fields = ['snippet', 'contentDetails'];
+  ): Promise<void> {
+    const fields = ['snippet'];
     const endpoint = `liveBroadcasts?part=${fields.join(',')}&id=${id}`;
     const snippet: Partial<IYoutubeLiveBroadcast['snippet']> = {};
     if (params.title !== void 0) {
@@ -488,7 +495,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
 
     snippet.scheduledStartTime = new Date().toISOString();
 
-    return await this.requestYoutube<IYoutubeLiveBroadcast>({
+    await this.requestYoutube<IYoutubeLiveBroadcast>({
       body: JSON.stringify({ id, snippet }),
       method: 'PUT',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
@@ -604,6 +611,16 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   }
 
   /**
+   * Poll the Youtube API until broadcast has not changed the required status
+   */
+  private async waitForBroadcastStatus(broadcastId: string, status: TBroadcastLifecycleStatus) {
+    await this.pollAPI(async () => {
+      const broadcast = await this.fetchBroadcast(broadcastId, ['status']);
+      return broadcast.status.lifeCycleStatus === status;
+    });
+  }
+
+  /**
    * Change the broadcast status
    * The broadcast may switch between several statuses before get the required status
    * So we should poll the API until we get the required status
@@ -618,10 +635,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       });
 
       // wait for Youtube to change the broadcast status
-      await this.pollAPI(async () => {
-        const broadcast = await this.fetchBroadcast(broadcastId, ['status']);
-        return broadcast.status.lifeCycleStatus === status;
-      });
+      await this.waitForBroadcastStatus(broadcastId, status);
     } catch (e) {
       if (e.message === 'Redundant transition') {
         // handle Redundant transition as a success
