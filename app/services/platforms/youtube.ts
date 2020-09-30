@@ -32,6 +32,7 @@ export interface IYoutubeStartStreamOptions {
   title: string;
   broadcastId?: string;
   description?: string;
+  enableAutoStart?: boolean;
 }
 
 export type TYoutubeLifecycleStep =
@@ -140,6 +141,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       broadcastId: '',
       title: '',
       description: '',
+      enableAutoStart: false,
     },
   };
 
@@ -227,6 +229,15 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
 
     const streamId = this.state.streamId;
     const broadcastId = this.state.settings.broadcastId;
+
+
+    // if enableAutoStart=true then broadcast should start after YT receives the transmission
+    if (this.state.settings.enableAutoStart) {
+      this.setLifecycleStep('waitForBroadcastToBeLive');
+      await this.transitionBroadcastStatus(broadcastId, 'live');
+      this.setLifecycleStep('live');
+      return;
+    }
 
     try {
       // SLOBS started sending the video data to Youtube
@@ -415,6 +426,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
         broadcastId: broadcast.id,
         title: broadcast.snippet.title,
         description: broadcast.snippet.description,
+        enableAutoStart: broadcast.contentDetails.enableAutoStart,
       },
     };
     // update non-empty fields
@@ -464,7 +476,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       boundStreamId?: string;
     },
   ): Promise<IYoutubeLiveBroadcast> {
-    const fields = ['snippet'];
+    const fields = ['snippet', 'contentDetails'];
     const endpoint = `liveBroadcasts?part=${fields.join(',')}&id=${id}`;
     const snippet: Partial<IYoutubeLiveBroadcast['snippet']> = {};
     if (params.title !== void 0) {
