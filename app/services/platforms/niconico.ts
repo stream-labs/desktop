@@ -9,6 +9,7 @@ import { UserService } from 'services/user';
 import { Builder, parseString } from 'xml2js';
 import { StreamingService, EStreamingState } from 'services/streaming';
 import { WindowsService } from 'services/windows';
+import { NicoliveClient, isOk } from 'services/nicolive-program/NicoliveClient';
 
 export type INiconicoProgramSelection = {
   info: LiveProgramInfo
@@ -29,45 +30,6 @@ function parseXml(xml: String): Promise<object> {
   });
 }
 
-type StreamInfo = {
-  id?: string[];
-  exclude?: string[];
-  title?: string[];
-  description?: string[];
-};
-type RtmpInfo = {
-  url?: string[];
-  stream?: string[];
-  ticket?: string[];
-  bitrate?: string[];
-};
-type ProgramInfo = {
-  stream: StreamInfo[];
-  rtmp: RtmpInfo[];
-};
-class UserInfo {
-  nickname: string | undefined;
-  isPremium: number;
-  userId: string | undefined;
-  NLE: number;
-
-  constructor(obj: object) {
-    this.nickname = obj['nickname'][0];
-    this.isPremium = parseInt(obj['is_premium'][0], 10);
-    this.userId = obj['user_id'][0];
-    this.NLE = parseInt(obj['NLE'][0], 10);
-  }
-}
-
-// TODO: LiveProgramInfo2 に移行して消す
-export type LiveProgramInfo = Dictionary<{
-  title: string,
-  description: string,
-  bitrate: number | undefined,
-  url: string,
-  key: string
-}>
-
 type Program = {
   id: string;
 };
@@ -80,60 +42,33 @@ type SocialGroup = {
   broadcastablePrograms: Program[];
 }
 
-export type LiveProgramInfo2 = {
-  community: SocialGroup;
-  channels: SocialGroup[];
+export type LiveProgramInfo = {
+  community?: SocialGroup;
+  channels?: SocialGroup[];
 }
 
-class GetPublishStatusResult {
-  attrib: object;
-  items?: ProgramInfo[];
-  user?: UserInfo;
+type OnairUserProgramData = {
+  programId: string;
+  nextProgramId: string;
+}
 
-  get status(): string {
-    return this.attrib['status'];
-  }
-  get ok(): boolean {
-    return this.status === 'ok';
-  }
-  get multi(): boolean {
-    return this.attrib['multi'] === 'true';
-  }
+type OnairChannelProgramData = {
+  testProgramId: string;
+  programId: string;
+  nextProgramId: string;
+}
 
-  constructor(obj: object) {
-    console.log('getpublishstatus => ', JSON.stringify(obj)); // DEBUG
-    console.log('getpublishstatus => ', obj); // DEBUG
+type OnairChannelsData = {
+  id: string;
+  name: string;
+  ownerName: string;
+  thumbnailUrl: string;
+  smallThumbnailUrl: string;
+}[];
 
-    if (!('getpublishstatus' in obj)) {
-      throw 'invalid response from getpublishstatus';
-    }
-    const getpublishstatus = obj['getpublishstatus'];
-    this.attrib = getpublishstatus['$'];
-    if (this.ok) {
-      if (this.multi) {
-        this.items = getpublishstatus['list'][0]['item'] as ProgramInfo[];
-      } else {
-        this.items = [getpublishstatus as ProgramInfo];
-      }
-      this.user = new UserInfo(getpublishstatus['user'][0]);
-
-      // convert items[].stream[].description to XML string
-      const xml = new Builder({ rootName: 'root', headless: true });
-      const removeRoot = (s: string): string => s.replace(/^<root>([\s\S]*)<\/root>$/, '$1');
-      for (const p of this.items) {
-        for (const s of p.stream) {
-          if ('description' in s) {
-            s.description = s.description.map(d => removeRoot(xml.buildObject(d)));
-          }
-        }
-      }
-    }
-    console.log(this);
-  }
-
-  static fromXml(xmlString: string): Promise<GetPublishStatusResult> {
-    return parseXml(xmlString).then(obj => new GetPublishStatusResult(obj));
-  }
+type BroadcastStreamData = {
+  url: string;
+  name: string;
 }
 
 export class NiconicoService extends Service implements IPlatformService {
@@ -148,6 +83,8 @@ export class NiconicoService extends Service implements IPlatformService {
     width: 800,
     height: 800,
   };
+
+  client: NicoliveClient = new NicoliveClient();
 
   getUserKey(): Promise<string> {
     const url = `${this.hostsService.niconicoFlapi}/getuserkey`;
@@ -265,42 +202,38 @@ export class NiconicoService extends Service implements IPlatformService {
     }
   }
 
+  private countBroadcastableChannelProgram(channels?: SocialGroup[]) {
+    if (!channels) {
+      return 0;
+    }
+    if (channels.length === 1) {
+      return channels[0].broadcastablePrograms.length;
+    }
+
+    return channels.reduce((total, channel) => total + channel.broadcastablePrograms.length, 0);
+  }
+
   private async _setupStreamSettings(programId: string = ''): Promise<IStreamingSetting> {
     const info = await this.fetchLiveProgramInfo(programId);
     console.log('fetchLiveProgramInfo: ' + JSON.stringify(info));
 
-    // TODO: 自身のチャンネルを持ってる場合にのみ表示するように条件を変更する. 現状はチャンネルがない場合でも出てしまう.
-    if (programId === '') {
+    const broadcastableComunityProgramNumber = info.community ? info.community.broadcastablePrograms.length : 0;
+    const broadcastableChannnelProgramNumber = this.countBroadcastableChannelProgram(info.channels);
+    const broadcastableProgramNumber = broadcastableComunityProgramNumber + broadcastableChannnelProgramNumber;
+    // const broadcastableprogramnumber = 2;
+
+    // 配信可能番組がない場合
+    if (broadcastableProgramNumber === 0) {
+      // TODO: 配信可能番組がない場合について要検討
+      throw new Error('no program');
+    }
+
+    // 放送可能な番組が複数ある場合は選択ダイアログを出す
+    if (broadcastableProgramNumber > 1) {
       // show dialog and select
       this.windowsService.showWindow({
         componentName: 'NicoliveProgramSelector',
-        // TODO: APIから取得した放送可能な番組を埋めて queryParams に渡す.
-        queryParams: {
-          community: {
-              id: 'co1',
-              type: 'community',
-              name: 'テスト用コミュニティ',
-              thumbnailUrl: 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg',
-              broadcastablePrograms: [{ id: 'lv1' }, { id: 'lv2' }]
-          },
-          channels: [
-             {
-              id: 'ch1',
-              type: 'channel',
-              thumbnailUrl: 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg',
-              name: 'テスト用チャンネル1',
-              broadcastablePrograms: [{ id: 'lv1111111111' }, { id: 'lv2222222222' }]
-            },
-            {
-              id: 'ch2',
-              type: 'channel',
-              thumbnailUrl: 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg',
-              name: 'テスト用チャンネル2',
-              broadcastablePrograms: [{ id: 'lv4444444444' }, { id: 'lv5555555555' }]
-            }
-          ]
-        } as LiveProgramInfo2,
-        // 仮のコードここまで ↑
+        queryParams: info,
         size: {
           width: 800,
           height: 800
@@ -308,18 +241,16 @@ export class NiconicoService extends Service implements IPlatformService {
       });
       return NiconicoService.emptyStreamingSetting(true); // ダイアログでたから無視してね
     }
-    /*
-    if (num < 1) {
-      // TODO: 配信可能番組がない場合について要検討
-      throw new Error('no program');
-    }
-    */
-    const id = Object.keys(info)[0];
-    const selected = info[id];
-    const url = selected.url;
-    const key = selected.key;
-    const bitrate = selected.bitrate;
-    this.userService.updatePlatformChannelId(id);
+
+    // 以下、放送可能番組が1つの場合
+    const broadcastableProgramInfo = broadcastableComunityProgramNumber === 1 ? info.community : info.channels[0];
+    const socialGroupId = broadcastableProgramInfo.id;
+    const broadcastableProgramId = broadcastableProgramInfo.broadcastablePrograms[0].id;
+    const stream = await this.fetchBroadcastStream(broadcastableProgramId);
+    const url = stream.url;
+    const key = stream.name;
+    const bitrate = await this.fetchMaxBitrate(broadcastableProgramId);
+    this.userService.updatePlatformChannelId(socialGroupId);
 
     const settings = this.settingsService.getSettingsFormData('Stream');
     settings.forEach(subCategory => {
@@ -367,22 +298,134 @@ export class NiconicoService extends Service implements IPlatformService {
       );
   }
 
-  private fetchGetPublishStatus(): Promise<string> {
-    const headers = this.getHeaders(true);
-    const request = new Request(
-      `${this.hostsService.niconicolive}/api/getpublishstatus?accept-multi=1`,
-      { headers, credentials: 'include' }
-    );
-
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.text());
+  /**
+   * 放送可能なユーザー番組IDを取得する 
+   */
+  private fetchOnairUserProgram(): Promise<OnairUserProgramData> {
+    const url = `${this.hostsService.niconicoRelive}/unama/tool/v2/onairs/user`
+    const headers = this.getHeaders();
+    headers.append('X-niconico-session', this.userService.apiToken);
+    const request = new Request(url, { headers });
+    return fetch(request).then(handleErrors).then(response => response.json()).then(json => json.data);
   }
 
-  @requiresToken()
-  fetchRawChannelInfo(): Promise<GetPublishStatusResult> {
-    return this.fetchGetPublishStatus()
-      .then(xml => GetPublishStatusResult.fromXml(xml));
+  /**
+   * 放送可能なチャンネル番組IDを取得する 
+   * @param channelId チャンネルID(例： ch12345)
+   */
+  private fetchOnairChannelProgram(channelId: string): Promise<OnairChannelProgramData> {
+    const url = `${this.hostsService.niconicoRelive}/unama/tool/v2/onairs/channels${channelId}`
+    const headers = this.getHeaders();
+    headers.append('X-niconico-session', this.userService.apiToken);
+    const request = new Request(url, { headers });
+    return fetch(request).then(handleErrors).then(response => response.json().then(json => json.data));
+  }
+
+  /**
+   * 放送可能なチャンネル一覧を取得する 
+   */
+  private fetchOnairChannnels(): Promise<OnairChannelsData> {
+    const url = `${this.hostsService.niconicoRelive}/unama/tool/v2/onairs/channels`
+    const headers = this.getHeaders();
+    headers.append('X-niconico-session', this.userService.apiToken);
+    const request = new Request(url, { headers });
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json())
+      .then(json => { return json.data as OnairChannelsData });
+  }
+
+  /**
+   * 指定番組IDのストリーム情報を取得する 
+   * @param programId 番組ID(例： lv12345)
+   */
+  private fetchBroadcastStream(programId: string): Promise<BroadcastStreamData> {
+    const url = `${this.hostsService.niconicoRelive}/unama/api/v2/programs/${programId}/broadcast_stream`;
+    const headers = this.getHeaders();
+    headers.append('X-niconico-session', this.userService.apiToken);
+    const request = new Request(url, { headers });
+    return fetch(request).then(handleErrors).then(response => response.json()).then(json => json.data);
+  }
+
+  /**
+   *  放送可能な番組があるコミュニティを取得する
+   */
+  private async fetchBroadcastableCommunity(): Promise<SocialGroup | undefined> {
+    try {
+      const onairUserProgram = await this.fetchOnairUserProgram();
+      const programInformation = await this.client.fetchProgram(onairUserProgram.programId);
+      if (!isOk(programInformation)) {
+        console.log('program not found');
+        return undefined;
+      }
+      return {
+        type: 'community',
+        id: programInformation.value.socialGroup.id,
+        name: programInformation.value.socialGroup.name,
+        thumbnailUrl: programInformation.value.socialGroup.thumbnailUrl,
+        broadcastablePrograms: [{ id: onairUserProgram.programId }]
+      };
+    } catch (e) {
+      return undefined;
+    }
+
+  }
+
+  /**
+   *  放送可能な番組があるチャンネル一覧を取得する
+   */
+  private async fetchBroadcastableChannels(): Promise<SocialGroup[] | undefined> {
+    const onairChannelsData = await this.fetchOnairChannnels();
+    if (onairChannelsData.length === 0) {
+      return undefined;
+    }
+    const channels = await Promise.all(onairChannelsData.map(async (channel) => {
+      try {
+        const programData = await this.fetchOnairChannelProgram(channel.id);
+        return {
+          type: 'channel',
+          id: channel.id,
+          name: channel.name,
+          thumbnailUrl: channel.thumbnailUrl,
+          broadcastablePrograms: Object.keys(programData).map(key => { return { id: programData[key] } })
+        } as SocialGroup
+      } catch (e) {
+        return;
+      }
+    }));
+    const filterdChannels = channels.filter(x => x); // undefinedを除く
+    if (filterdChannels.length === 0) {
+      return undefined;
+    }
+    return filterdChannels;
+  }
+
+  private async fetchMaxBitrate(programId: string): Promise<number> {
+    const programInformation = await this.client.fetchProgram(programId);
+    if (!isOk(programInformation)) {
+      return 192;
+    }
+    switch (programInformation.value.streamSetting.maxQuality) {
+      case '6Mbps720p':
+        return 6000;
+      case '2Mbps450p':
+        return 2000;
+      case '1Mbps450p':
+        return 1000;
+      case '384kbps288p':
+        return 384;
+      case '192kbps288p':
+        return 192;
+    }
+  }
+
+  /**
+   * 指定したsocialGroupに指定したprogramIdが含まれているかどうか
+   * @param socialGroup 検索対象のソーシャルグループ
+   * @param programId 検索するprogramId
+   */
+  private hasProgram(socialGroup: SocialGroup, programId: string): boolean {
+    return socialGroup.broadcastablePrograms.filter(program => program.id === programId).length > 1;
   }
 
   /**
@@ -390,30 +433,31 @@ export class NiconicoService extends Service implements IPlatformService {
    * @param programId 与えた場合、一致する番組があればその情報だけを返す。
    *   無い場合と与えない場合、配信可能な全番組を返す。
    */
-  fetchLiveProgramInfo(programId: string = ''): Promise<LiveProgramInfo> {
-    return this.fetchRawChannelInfo().then(result => {
-      const status = result.status;
-      console.log('getpublishstatus status=' + status);
-      let r: LiveProgramInfo = {};
-      if (status === 'ok') {
-        for (const item of result.items) {
-          const rtmp = item.rtmp[0];
-          const stream = item.stream[0];
-          const id = stream.id[0];
-          r[id] = {
-            title: stream.title[0],
-            description: stream.description[0],
-            bitrate: rtmp.bitrate.length > 0 ? parseInt(rtmp.bitrate[0], 10) : undefined,
-            url: rtmp.url[0].trim(),
-            key: rtmp.stream[0].trim()
-          };
+  async fetchLiveProgramInfo(programId: string = ''): Promise<LiveProgramInfo> {
+    const broadcastableCommunity = await this.fetchBroadcastableCommunity();
+    const broadcastableChannels = await this.fetchBroadcastableChannels();
+    if (programId !== '') {
+      if (broadcastableCommunity && this.hasProgram(broadcastableCommunity, programId)) {
+        return {
+          community: broadcastableCommunity,
         };
-        if (programId && programId in r) {
-          r = { [programId]: r[programId] };
-        }
       }
-      return r;
-    });
+      const matchedChannel = broadcastableChannels && broadcastableChannels.reduce((_result, channel) => {
+        if (this.hasProgram(channel, programId)) {
+          return channel;
+        }
+      }, undefined);
+      if (matchedChannel) {
+        return {
+          channels: [matchedChannel]
+        };
+      }
+    }
+
+    return {
+      community: broadcastableCommunity,
+      channels: broadcastableChannels
+    };
   }
 
   /**
@@ -456,15 +500,6 @@ export class NiconicoService extends Service implements IPlatformService {
       .then(o => {
         return o['stream'][0]['comment_count'][0];
       });
-  }
-
-  getChatUrl(mode: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-      this.fetchRawChannelInfo()
-        .then(json => {
-          reject('not yet supported for chat');
-        });
-    });
   }
 }
 

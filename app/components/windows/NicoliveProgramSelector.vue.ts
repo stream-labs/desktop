@@ -16,7 +16,7 @@ import {
   selectionSteps as _selectionSteps,
   TSelectionStep
 } from 'services/nicolive-program/nicolive-program-selector';
-import { LiveProgramInfo2 } from 'services/platforms/niconico';
+import { LiveProgramInfo } from 'services/platforms/niconico';
 import { StreamingService } from 'services/streaming';
 import { $t } from 'services/i18n';
 
@@ -34,7 +34,7 @@ export default class NicoliveProgramSelector extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() streamingService: StreamingService;
 
-  queryParams = this.windowsService.getChildWindowOptions().queryParams as LiveProgramInfo2;
+  queryParams = this.windowsService.getChildWindowOptions().queryParams as LiveProgramInfo;
 
   readonly providerTypes = _providerTypes;
   readonly steps = _steps;
