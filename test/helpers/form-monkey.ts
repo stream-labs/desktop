@@ -69,11 +69,7 @@ export class FormMonkey {
 
   async getInput(name: string): Promise<IUIInput> {
     const selector = `${this.formSelector} [data-name="${name}"]`;
-    try {
-      this.client.waitForVisible(selector);
-    } catch (e) {
-      throw new Error(`Input is not visible: ${selector}`);
-    }
+    await this.client.waitForVisible(selector);
     const $el = await this.client.$(selector);
     const id = ($el as any).value.ELEMENT;
     const type = await this.getAttribute(selector, 'data-type');

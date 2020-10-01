@@ -15,9 +15,7 @@ test('Multistream default mode', async t => {
   await fillForm(t, null, {
     twitch: true,
     facebook: true,
-
-    // TODO enable youtube after 24h disabled period
-    youtube: false,
+    youtube: true,
   });
 
   // add settings
@@ -40,7 +38,7 @@ test('Multistream default mode', async t => {
 
 test('Multistream advanced mode', async t => {
   const client = t.context.app.client;
-  await logIn(t, null, { multistream: true });
+  await logIn(t, 'youtube', { multistream: true });
   await prepareToGoLive(t);
   await clickGoLive(t);
 
@@ -48,9 +46,7 @@ test('Multistream advanced mode', async t => {
   await fillForm(t, null, {
     twitch: true,
     facebook: true,
-
-    // TODO enable youtube after 24h disabled period
-    youtube: false,
+    youtube: true,
   });
 
   // switch advanced mode on
@@ -65,12 +61,11 @@ test('Multistream advanced mode', async t => {
     tags: ['100%'],
   });
 
-  // TODO: enable YT
-  // await fillForm(t, 'youtube-settings', {
-  //   customEnabled: true,
-  //   title: 'youtube title',
-  //   description: 'youtube description',
-  // });
+  await fillForm(t, 'form[name="youtube-settings"]', {
+    customEnabled: true,
+    title: 'youtube title',
+    description: 'youtube description',
+  });
 
   await fillForm(t, 'form[name="facebook-settings"]', {
     customEnabled: true,
