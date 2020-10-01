@@ -447,6 +447,7 @@ export class NiconicoService extends Service implements IPlatformService {
         }
       }, undefined);
       if (matchedChannel) {
+        matchedChannel.broadcastablePrograms = [{ id: programId }]
         return {
           channels: [matchedChannel]
         };
