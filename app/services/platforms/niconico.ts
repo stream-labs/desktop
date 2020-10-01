@@ -220,7 +220,6 @@ export class NiconicoService extends Service implements IPlatformService {
     const broadcastableComunityProgramNumber = info.community ? info.community.broadcastablePrograms.length : 0;
     const broadcastableChannnelProgramNumber = this.countBroadcastableChannelProgram(info.channels);
     const broadcastableProgramNumber = broadcastableComunityProgramNumber + broadcastableChannnelProgramNumber;
-    // const broadcastableprogramnumber = 2;
 
     // 配信可能番組がない場合
     if (broadcastableProgramNumber === 0) {
