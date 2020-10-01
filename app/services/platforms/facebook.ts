@@ -26,7 +26,7 @@ interface IFacebookPage {
   id: string;
 }
 
-interface IFacebookLiveVideo {
+export interface IFacebookLiveVideo {
   status: 'SCHEDULED_UNPUBLISHED' | 'LIVE_STOPPED' | 'LIVE';
   id: string;
   stream_url: string;
@@ -63,6 +63,7 @@ export interface IFacebookStartStreamOptions {
   title: string;
   game: string;
   description?: string;
+  scheduledVideoId?: string;
 }
 
 export interface IFacebookChannelInfo extends IFacebookStartStreamOptions {
@@ -292,14 +293,14 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     }
   }
 
-  async fetchScheduledVideos() {
-    const videos = await this.requestFacebook(
-      `${this.apiBase}/${
-        this.state.activePage!.id
-      }/live_videos?broadcast_status=["SCHEDULED_UNPUBLISHED"]&source=owner`,
-    );
-    console.log('VIDEOS', videos);
-    return videos;
+  async fetchScheduledVideos(): Promise<IFacebookLiveVideo[]> {
+    return (
+      await this.requestFacebook<{ data: IFacebookLiveVideo[] }>(
+        `${this.apiBase}/${
+          this.state.activePage!.id
+        }/live_videos?broadcast_status=["SCHEDULED_UNPUBLISHED"]&fields=title,description,planned_start_time&source=owner`,
+      )
+    ).data;
   }
 
   fetchViewerCount(): Promise<number> {
