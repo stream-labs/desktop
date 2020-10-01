@@ -39,8 +39,6 @@ jobs:
           BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
           SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
           SLOBS_TEST_RUN_CHUNK: "$(System.JobPositionInPhase)/$(System.TotalJobsInPhase)"
-          BUILD_ID: "${Build.BuildId}"
-          JOB_ID: "${System.JobId}"
 
   - job: Check_eslint_and_strict_nulls_regression
 

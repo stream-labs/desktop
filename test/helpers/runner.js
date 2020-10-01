@@ -14,9 +14,7 @@ const fetch = require('node-fetch');
 const failedTestsFile = 'test-dist/failed-tests.json';
 const args = process.argv.slice(2);
 const TIMEOUT = 3; // timeout in minutes
-const { BUILD_ID, JOB_ID, BUILD_REASON } = process.env;
-
-console.log(process.env);
+const { BUILD_BUILDID, SYSTEM_JOBID, BUILD_REASON } = process.env;
 
 (async function main() {
   try {
@@ -78,8 +76,8 @@ async function sendFailedTestsToAnalytics(failedTests) {
   log('Sending analytics..');
   const body = {
     tests: testsToSend,
-    buildId: BUILD_ID,
-    jobId: JOB_ID,
+    buildId: BUILD_BUILDID,
+    jobId: SYSTEM_JOBID,
     buildReason: BUILD_REASON,
   };
   log(body);
@@ -102,7 +100,6 @@ async function createTestTimingsFile() {
   if (!fs.existsSync('test-dist')) {
     fs.mkdirSync('test-dist');
   }
-  console.log('tests stats', data);
   fs.writeFileSync(testTimingsFile, JSON.stringify(data));
 }
 
