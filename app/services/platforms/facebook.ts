@@ -27,8 +27,8 @@ interface IFacebookPage {
 }
 
 interface IFacebookLiveVideo {
-  status: string;
-  id: number;
+  status: 'SCHEDULED_UNPUBLISHED' | 'LIVE_STOPPED' | 'LIVE';
+  id: string;
   stream_url: string;
   title: string;
   game: string;
@@ -51,7 +51,7 @@ export interface IStreamlabsFacebookPages {
 
 interface IFacebookServiceState extends IPlatformState {
   activePage: IFacebookPage | null;
-  liveVideoId: number | null;
+  liveVideoId: string | null;
   streamUrl: string | null;
   settings: IFacebookStartStreamOptions;
   facebookPages: IStreamlabsFacebookPages | null;
@@ -62,6 +62,7 @@ export interface IFacebookStartStreamOptions {
   title: string;
   game: string;
   description?: string;
+  scheduledVideoId?: string;
 }
 
 export interface IFacebookChannelInfo extends IFacebookStartStreamOptions {
@@ -114,7 +115,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   }
 
   @mutation()
-  private SET_LIVE_VIDEO_ID(id: number | null) {
+  private SET_LIVE_VIDEO_ID(id: string | null) {
     this.state.liveVideoId = id;
   }
 
@@ -231,7 +232,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     const pageId = this.state.activePage?.id;
     assertIsDefined(pageId);
 
-    return this.requestFacebook<{ stream_url: string; id: number }>(
+    return this.requestFacebook<{ stream_url: string; id: string }>(
       {
         url: `${this.apiBase}/${pageId}/live_videos`,
         ...data,
@@ -313,14 +314,14 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     }
   }
 
-  async fetchScheduledVideos() {
-    const videos = await this.requestFacebook(
-      `${this.apiBase}/${
-        this.state.activePage!.id
-      }/live_videos?broadcast_status=["SCHEDULED_UNPUBLISHED"]&source=owner`,
-    );
-    console.log('VIDEOS', videos);
-    return videos;
+  async fetchScheduledVideos(): Promise<IFacebookLiveVideo[]> {
+    return (
+      await this.requestFacebook<{ data: IFacebookLiveVideo[] }>(
+        `${this.apiBase}/${
+          this.state.activePage!.id
+        }/live_videos?broadcast_status=["SCHEDULED_UNPUBLISHED"]&fields=title,description,planned_start_time&source=owner`,
+      )
+    ).data;
   }
 
   fetchViewerCount(): Promise<number> {
