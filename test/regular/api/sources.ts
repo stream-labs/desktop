@@ -24,7 +24,7 @@ test('Creating, fetching and removing sources', async t => {
   const colorItem1 = scene.addSource(colorSource1.sourceId);
   let sceneItemNames = scene.getItems().map(item => item['name']);
 
-  t.deepEqual(sceneItemNames, ['MyColorSource1', 'MyColorSource22']);
+  t.deepEqual(sceneItemNames, ['MyColorSource1', 'MyColorSource2']);
 
   scene.removeItem(colorItem1.id);
   colorItem2.remove();
