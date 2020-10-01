@@ -38,7 +38,7 @@ test('Multistream default mode', async t => {
 
 test('Multistream advanced mode', async t => {
   const client = t.context.app.client;
-  await logIn(t, 'youtube', { multistream: true });
+  await logIn(t, null, { multistream: true });
   await prepareToGoLive(t);
   await clickGoLive(t);
 
