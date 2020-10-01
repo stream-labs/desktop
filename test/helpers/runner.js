@@ -100,6 +100,7 @@ async function createTestTimingsFile() {
   if (!fs.existsSync('test-dist')) {
     fs.mkdirSync('test-dist');
   }
+  console.log('tests stats', data);
   fs.writeFileSync(testTimingsFile, JSON.stringify(data));
 }
 
