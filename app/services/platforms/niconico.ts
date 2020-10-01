@@ -313,7 +313,7 @@ export class NiconicoService extends Service implements IPlatformService {
    * @param channelId チャンネルID(例： ch12345)
    */
   private fetchOnairChannelProgram(channelId: string): Promise<OnairChannelProgramData> {
-    const url = `${this.hostsService.niconicoRelive}/unama/tool/v2/onairs/channels${channelId}`
+    const url = `${this.hostsService.niconicoRelive}/unama/tool/v2/onairs/channels/${channelId}`
     const headers = this.getHeaders();
     headers.append('X-niconico-session', this.userService.apiToken);
     const request = new Request(url, { headers });
