@@ -14,7 +14,8 @@ import { SceneSourceNode } from './scene';
 import { AudioService } from 'services/audio';
 import * as obs from '../../../../../obs-api';
 import { WidgetType } from '../../../widgets';
-import { byOS, OS } from 'util/operating-systems';
+import { byOS, OS, getOS } from 'util/operating-systems';
+import { GameCaptureNode } from './game-capture';
 import { Node } from '../node';
 
 type TContent =
@@ -24,7 +25,8 @@ type TContent =
   | VideoNode
   | StreamlabelNode
   | WidgetNode
-  | SceneSourceNode;
+  | SceneSourceNode
+  | GameCaptureNode;
 
 interface IFilterInfo {
   name: string;
@@ -156,6 +158,12 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       return { ...details, content } as IItemSchema;
     }
 
+    if (sceneNode.type === 'game_capture') {
+      const content = new GameCaptureNode();
+      await content.save({ sceneItem: sceneNode, assetsPath: context.assetsPath });
+      return { ...details, content } as IItemSchema;
+    }
+
     if (sceneNode.type === 'scene') {
       const content = new SceneSourceNode();
       await content.save({ sceneItem: sceneNode, assetsPath: context.assetsPath });
@@ -220,6 +228,18 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
         {},
         { id, select: false },
       );
+    } else if (obj.content instanceof GameCaptureNode) {
+      if (getOS() === OS.Windows) {
+        sceneItem = context.scene.createAndAddSource(
+          obj.name,
+          'game_capture',
+          {},
+          { id, select: false },
+        );
+      } else {
+        // We will not load this source at all on mac
+        return;
+      }
     } else if (obj.content instanceof TextNode) {
       sceneItem = context.scene.createAndAddSource(
         obj.name,

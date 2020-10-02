@@ -1,9 +1,9 @@
 {
   "You have been logged out": "Вы вышли из системы",
-  "This element is too small to be displayed": "This element is too small to be displayed",
-  "This element requires Selective Recording to be enabled": "This element requires Selective Recording to be enabled",
-  "Grant Permissions": "Grant Permissions",
-  "Streamlabs OBS needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs OBS needs additional permissions. Grant permissions in the pop-up dialogs to continue.",
-  "Microphone": "Microphone",
-  "Webcam": "Webcam"
+  "This element is too small to be displayed": "Этот элемент слишком мал для отображения",
+  "This element requires Selective Recording to be enabled": "Для этого элемента должна быть включена выборочная запись",
+  "Grant Permissions": "Предоставить разрешения",
+  "Streamlabs OBS needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Для Streamlabs OBS требуются дополнительные разрешения. Чтобы продолжить, предоставьте разрешения во всплывающих диалоговых окнах.",
+  "Microphone": "Микрофон",
+  "Webcam": "Веб-камера"
 }
