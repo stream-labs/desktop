@@ -124,7 +124,7 @@ test('Youtube should show error window if afterStreamStart hook fails', async t 
 });
 
 test('Streaming to the scheduled event on Youtube', async t => {
-  await logIn(t, 'youtube');
+  await logIn(t, 'youtube', { multistream: false });
 
   // create event via scheduling form
   const tomorrow = Date.now() + 1000 * 60 * 60 * 24;
@@ -242,62 +242,46 @@ test('Migrate the twitch account to the protected mode', async t => {
 });
 
 // test scheduling for each platform
-const schedulingPlatforms = ['facebook', 'youtube'];
-schedulingPlatforms.forEach(platform => {
-  test(`Schedule stream to ${platform}`, async t => {
-    // login into the account:
-    await logIn(t, platform as TPlatform);
-    const app = t.context.app;
+test('Schedule stream to facebook', async t => {
+  // login into the account:
+  await logIn(t, 'facebook', { multistream: false });
+  const app = t.context.app;
 
-    // open EditStreamInfo window
-    await focusMain(t);
-    await app.client.click('button .icon-date');
-    await focusChild(t);
-    const formMonkey = new FormMonkey(t);
+  // open EditStreamInfo window
+  await focusMain(t);
+  await app.client.click('button .icon-date');
+  await focusChild(t);
+  const formMonkey = new FormMonkey(t);
 
-    // wait fields to be shown
-    await app.client.waitForVisible('[data-name=title]');
+  // wait fields to be shown
+  await app.client.waitForVisible('[data-name=title]');
 
-    // fill streaming data
-    switch (platform) {
-      case 'facebook':
-        await formMonkey.fill({
-          title: 'SLOBS Test Stream',
-          description: 'SLOBS Test Stream Description',
-        });
-        break;
-
-      case 'youtube':
-        await formMonkey.fill({
-          title: 'SLOBS Test Stream',
-          description: 'SLOBS Test Stream Description',
-        });
-        break;
-    }
-
-    // set the date to tomorrow
-    const today = new Date();
-    const tomorrow = new Date();
-    tomorrow.setDate(today.getDate() + 1);
-    await formMonkey.fill({
-      date: moment(tomorrow).format('MM/DD/YYYY'),
-    });
-    await app.client.click('button=Done');
-
-    // facebook requires a game
-    if (platform === 'facebook') {
-      await app.client.waitForVisible('.toasted.error', 2000);
-
-      await formMonkey.fill({
-        game: selectTitle('Fortnite'),
-      });
-
-      await app.client.click('button=Done');
-    }
-
-    await app.client.waitForVisible('.toast-success', 30000);
-    t.pass();
+  // fill streaming data
+  await formMonkey.fill({
+    title: 'SLOBS Test Stream',
+    description: 'SLOBS Test Stream Description',
   });
+
+  // set the date to tomorrow
+  const today = new Date();
+  const tomorrow = new Date();
+  tomorrow.setDate(today.getDate() + 1);
+  await formMonkey.fill({
+    date: moment(tomorrow).format('MM/DD/YYYY'),
+  });
+  await app.client.click('button=Done');
+
+  // facebook requires a game
+  await app.client.waitForVisible('.toasted.error', 2000);
+
+  await formMonkey.fill({
+    game: selectTitle('Fortnite'),
+  });
+
+  await app.client.click('button=Done');
+
+  await app.client.waitForVisible('.toast-success', 30000);
+  t.pass();
 });
 
 test('Go live error', async t => {
