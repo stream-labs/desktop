@@ -3,10 +3,9 @@ import { IUserAuth, IPlatformAuth, TPlatform } from '../../../app/services/platf
 import { sleep } from '../sleep';
 import { dialogDismiss } from './dialog';
 import { ExecutionContext } from 'ava';
+import { requestUtilsServer, USER_POOL_TOKEN } from './runner-utils';
 const request = require('request');
 
-const USER_POOL_URL = 'https://slobs-users-pool.herokuapp.com';
-const USER_POOL_TOKEN = process.env.SLOBS_TEST_USER_POOL_TOKEN;
 let user: ITestUser; // keep user's name if SLOBS is logged-in
 
 interface ITestUser {
@@ -42,11 +41,16 @@ interface ITestUserFeatures {
    */
   '2FADisabled'?: boolean;
   /**
+   * Account has multiple platforms enabled
+   */
+  multistream?: boolean;
+  /**
    * This is a Prime account
    */
   prime?: boolean;
   /**
    * Streaming is not available for this account
+   * User pool does not return accounts with this flag unless you explicitly set this flag to true in the request
    */
   notStreamable?: boolean;
 }
@@ -112,7 +116,7 @@ export async function loginWithAuthInfo(
   t.context.app.webContents.send('testing-fakeAuth', authInfo, isOnboardingTest);
   await focusMain(t);
   if (!waitForUI) return true;
-  await t.context.app.client.waitForVisible('.fa-sign-out-alt', 20000); // wait for the log-out button
+  await t.context.app.client.waitForVisible('.fa-sign-out-alt', 30000); // wait for the log-out button
   return true;
 }
 
@@ -145,6 +149,7 @@ export async function reserveUserFromPool(
   while (attempts--) {
     try {
       let urlPath = 'reserve';
+      const getParams: string[] = [];
       // request a specific platform
       if (platformType) urlPath += `/${platformType}`;
       // request a user with a specific feature
@@ -156,8 +161,15 @@ export async function reserveUserFromPool(
           const filterValue = enabled ? true : null; // convert false to null, since DB doesn't have `false` as a value for features
           filter[feature] = filterValue;
         });
-        urlPath += `?filter=${JSON.stringify(filter)}`;
+        getParams.push(`filter=${JSON.stringify(filter)}`);
       }
+
+      if (attempts === 0) {
+        // notify the user-pool that it's the last attempt before failure
+        getParams.push('isLastCall=true');
+      }
+
+      if (getParams.length) urlPath = `${urlPath}?${getParams.join('&')}`;
       reservedUser = await requestUserPool(urlPath);
       break;
     } catch (e) {
@@ -176,21 +188,7 @@ export async function reserveUserFromPool(
  * Make a GET request to slobs-users-pool service
  */
 async function requestUserPool(path: string): Promise<any> {
-  return new Promise((resolve, reject) => {
-    request(
-      {
-        url: `${USER_POOL_URL}/${path}`,
-        headers: { Authorization: `Bearer ${USER_POOL_TOKEN}` },
-      },
-      (err: any, res: any, body: any) => {
-        if (err || res.statusCode !== 200) {
-          reject(`Unable to request users pool ${err || body}`);
-          return;
-        }
-        resolve(JSON.parse(body));
-      },
-    );
-  });
+  return requestUtilsServer(path);
 }
 
 export function getUser(): ITestUser {

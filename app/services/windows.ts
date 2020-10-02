@@ -193,6 +193,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
   windowUpdated = new Subject<{ windowId: string; options: IWindowOptions }>();
   windowDestroyed = new Subject<string>();
+  styleBlockersUpdated = new Subject<{ windowId: string; hideStyleBlockers: boolean }>();
   windows: Dictionary<Electron.BrowserWindow> = {};
 
   init() {
@@ -251,6 +252,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
     }
 
     this.centerChildWindow(options);
+    this.windows.child.show();
+    this.windows.child.restore();
   }
 
   centerChildWindow(options: Partial<IWindowOptions>) {
@@ -318,6 +321,13 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
   closeMainWindow() {
     remote.getCurrentWindow().close();
+  }
+
+  /**
+   * Should only ever be called on shutdown
+   */
+  hideMainWindow() {
+    this.windows.main.hide();
   }
 
   /**
@@ -431,6 +441,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
   updateStyleBlockers(windowId: string, hideStyleBlockers: boolean) {
     this.UPDATE_HIDE_STYLE_BLOCKERS(windowId, hideStyleBlockers);
+    this.styleBlockersUpdated.next({ windowId, hideStyleBlockers });
   }
 
   updateChildWindowOptions(optionsPatch: Partial<IWindowOptions>) {

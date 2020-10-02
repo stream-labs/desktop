@@ -114,7 +114,7 @@ export default class BrowserSourceInteraction extends TsxComponent<{}> {
           onKeydown={this.onKeydown}
           onKeyup={this.onKeyup}
           tabindex="0"
-          style={{ outline: 'none' }}
+          style={{ outline: 'none', height: '100%' }}
           ref="eventDiv"
         >
           <Display sourceId={this.sourceId} onOutputResize={this.onOutputResize} />

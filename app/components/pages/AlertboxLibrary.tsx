@@ -16,9 +16,14 @@ import { $t, I18nService } from 'services/i18n';
 import BrowserView from 'components/shared/BrowserView';
 import { RestreamService } from 'services/restream';
 import { GuestApiHandler } from 'util/guest-api-handler';
+import TsxComponent, { createProps } from 'components/tsx-component';
 
-@Component({ components: { BrowserView } })
-export default class AlertboxLibrary extends Vue {
+class AlertboxLibraryProps {
+  params: { id?: string } = {};
+}
+
+@Component({ components: { BrowserView }, props: createProps(AlertboxLibraryProps) })
+export default class AlertboxLibrary extends TsxComponent<AlertboxLibraryProps> {
   @Inject() userService: UserService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() navigationService: NavigationService;
@@ -79,7 +84,7 @@ export default class AlertboxLibrary extends Vue {
   }
 
   get libraryUrl() {
-    return this.userService.alertboxLibraryUrl;
+    return this.userService.alertboxLibraryUrl(this.props.params.id);
   }
 
   render() {

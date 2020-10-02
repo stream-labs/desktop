@@ -208,13 +208,6 @@ export default class Utils {
     electron.ipcRenderer.send('measure-time', msg, timestamp || Date.now());
   }
 
-  static makeChildWindowVisible() {
-    const childWindowId: number = electron.ipcRenderer.sendSync('getWindowIds').child;
-    const childWindow = electron.remote.BrowserWindow.fromId(childWindowId);
-    childWindow.show();
-    childWindow.restore();
-  }
-
   static copyToClipboard(str: string) {
     const el = document.createElement('textarea');
     el.value = str;

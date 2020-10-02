@@ -1,5 +1,5 @@
 import { MetricsService } from '../../../app/services/metrics';
-import { test, stopApp, startApp, TExecutionContext, getCacheDir } from '../../helpers/spectron';
+import { test, stopApp, startApp, TExecutionContext } from '../../helpers/spectron';
 import { ApiClient, getClient } from '../../helpers/api-client';
 import { TSourceType } from '../../../app/services/sources/sources-api';
 import { ScenesService } from '../../../app/services/api/external-api/scenes';
@@ -27,11 +27,11 @@ const MAX_SOURCES_COUNT = 40;
  * unzip a sample of a large scene collection to the SceneCollection folder
  */
 function unzipLargeSceneCollection(t: TExecutionContext) {
-  const cacheDir = path.resolve(getCacheDir(), 'slobs-client');
+  const cacheDir = path.resolve(t.context.cacheDir, 'slobs-client');
   const sceneCollectionPath = path.resolve(cacheDir, 'SceneCollections');
   fs.removeSync(sceneCollectionPath);
 
-  const dataDir = path.resolve(__dirname, '..', '..', '..', '..', 'test', 'data');
+  const dataDir = path.resolve(__dirname, '..', '..', '..', '..', '..', 'test', 'data');
   const sceneCollectionZip = path.resolve(
     dataDir,
     'scene-collections',
@@ -80,14 +80,14 @@ test('Empty collection', async t => {
   // measure startup time
   let attempts = RELOAD_ATTEMPTS;
   while (attempts--) {
-    await startApp(t);
+    await startApp(t, true);
     const api = await getClient();
     measureStartupTime(api);
     await stopApp(t, false);
   }
 
   // measure memory and CPU
-  await startApp(t);
+  await startApp(t, true);
   await measureMemoryAndCPU(t);
 
   t.pass();
@@ -101,14 +101,14 @@ test('Large collection', async t => {
   // measure startup time
   let i = RELOAD_ATTEMPTS;
   while (i--) {
-    await startApp(t);
+    await startApp(t, true);
     const api = await getClient();
     measureStartupTime(api);
     await stopApp(t, false);
   }
 
   // measure memory and CPU
-  await startApp(t);
+  await startApp(t, true);
   await measureMemoryAndCPU(t);
   t.pass();
 });
@@ -122,7 +122,7 @@ test('Empty collection (logged-in twitch)', async t => {
   // measure startup time
   let attempts = RELOAD_ATTEMPTS;
   while (attempts--) {
-    await startApp(t);
+    await startApp(t, true);
     const api = await getClient();
     measureStartupTime(api);
     await stopApp(t, false);

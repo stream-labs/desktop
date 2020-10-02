@@ -196,8 +196,6 @@ textarea[type=text] {
 }
 
 .multiselect__option {
-  .transition();
-
   padding: 4px @spacing;
   height: auto;
   min-height: 0;
@@ -269,98 +267,6 @@ textarea[type=text] {
       background: var(--background);
     }
   }
-}
-
-.colorpicker {
-  position: relative;
-  width: 220px;
-
-  @media (max-width: 1024px) {
-    width: auto;
-  }
-
-  .colorpicker__input {
-    cursor: pointer !important;
-    background: var(--dropdown-bg);
-    border-color: var(--button);
-
-    &:focus,
-    &:visited,
-    &:active {
-      background: var(--dropdown-bg);
-      border-color: var(--button);
-    }
-  }
-
-  .colorpicker__text {
-    position: relative;
-    cursor: pointer;
-  }
-
-  .colorpicker__swatch {
-    .radius();
-
-    position: absolute;
-    top: 6px;
-    right: @spacing;
-    border: 1px solid #ccc;
-    width: 20px;
-    height: 20px;
-  }
-
-  .colorpicker-container {
-    position: relative;
-    top: -4px;
-    z-index: 10;
-    border-radius: 0 0 4px 4px;
-    background: var(--dropdown-bg);
-    border: 1px solid var(--button);
-    border-top: none;
-    box-shadow: 0 8px 16px var(--shadow) !important;
-    width: auto;
-  }
-
-  .colorpicker-menu {
-    width: auto;
-    max-width: 200px;
-    margin: 0 auto;
-    background: var(--dropdown-bg);
-    box-shadow: none;
-  }
-
-  // hide alpha input
-  .vc-alpha { display: none; }
-  .vc-sketch-field > div:last-child { display: none; }
-
-  .vc-sketch-presets {
-    margin-right: -8px;
-    margin-left: -8px;
-    padding-left: 8px;
-    padding-top: 8px;
-    border-top: 1px solid var(--border);
-  }
-
-  .vc-sketch-field .vc-input__label {
-    color: var(--icon);
-  }
-
-  .vc-checkerboard {
-    display: none;
-  }
-}
-
-.colorpicker-slide-enter,
-.colorpicker-slide-leave-to {
-  transform: translateY(-50%) scaleY(0);
-}
-
-.colorpicker-slide-enter-to {
-  transform: translateY(0) scaleY(100%);
-}
-
-.colorpicker-slide-enter-active,
-.colorpicker-slide-leave-active {
-  transition: all 0.2s linear;
 }
 
 // Path inputs

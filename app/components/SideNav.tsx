@@ -15,6 +15,14 @@ import NavTools from './NavTools';
 import styles from './SideNav.m.less';
 import { LayoutService } from 'services/layout';
 
+interface IPageData {
+  target: TAppPage;
+  icon: string;
+  title: string;
+  trackingTarget: string;
+  newBadge?: boolean;
+}
+
 @Component({})
 export default class SideNav extends Vue {
   @Inject() appService: AppService;
@@ -129,7 +137,7 @@ export default class SideNav extends Vue {
   }
 
   render() {
-    const pageData = [];
+    const pageData: IPageData[] = [];
 
     if (this.userService.isLoggedIn) {
       pageData.push({
@@ -137,6 +145,7 @@ export default class SideNav extends Vue {
         icon: 'icon-alert-box',
         title: $t('Alertbox Library'),
         trackingTarget: 'alertbox-library',
+        newBadge: true,
       });
     }
 
@@ -172,6 +181,7 @@ export default class SideNav extends Vue {
             title={page.title}
           >
             <i class={page.icon} />
+            {page.newBadge && <div class={cx(styles.badge, styles.newBadge)}>{$t('New')}</div>}
           </div>
         ))}
         {this.platformAppsService.enabledApps.length > 0 && <AppsNav />}

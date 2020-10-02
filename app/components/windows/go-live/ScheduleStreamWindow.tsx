@@ -74,10 +74,11 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
     // validate
     if (!(await this.$refs.form.validate())) return;
 
+    // take the date without hours and minutes
+    const startDate = new Date(this.startTimeModel.date).setHours(0, 0, 0, 0);
+
     // convert date to ISO string format
-    const scheduledStartTime = new Date(
-      this.startTimeModel.date + this.startTimeModel.time * 1000,
-    ).toISOString();
+    const scheduledStartTime = new Date(startDate + this.startTimeModel.time * 1000).toISOString();
 
     // schedule
     try {

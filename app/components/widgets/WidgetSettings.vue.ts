@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs';
 import { $t } from 'services/i18n/index';
 import { Component } from 'vue-property-decorator';
 import { Debounce } from 'lodash-decorators';
+import { SourcesService } from 'services/sources';
 
 export interface IWidgetNavItem {
   value: string;
@@ -20,6 +21,7 @@ export default class WidgetSettings<
 > extends Vue {
   @Inject() private windowsService: WindowsService;
   @Inject() private widgetsService: IWidgetsServiceApi;
+  @Inject() private sourcesService: SourcesService;
 
   service: TService;
   sourceId = this.windowsService.getChildWindowOptions().queryParams.sourceId;
@@ -38,6 +40,7 @@ export default class WidgetSettings<
   private lastSuccessfullySavedWData: TData = null;
   private dataUpdatedSubscr: Subscription;
   private pendingRequests = 0;
+  private sourceRemovedSub: Subscription;
 
   get metadata() {
     return this.service.getMetadata();
@@ -58,6 +61,12 @@ export default class WidgetSettings<
   mounted() {
     this.dataUpdatedSubscr = this.service.dataUpdated.subscribe(newData => {
       this.dataUpdatedHandler(newData);
+    });
+    // close the window if source has been deleted
+    this.sourceRemovedSub = this.sourcesService.sourceRemoved.subscribe(source => {
+      if (source.sourceId === this.sourceId) {
+        this.windowsService.actions.closeChildWindow();
+      }
     });
   }
 

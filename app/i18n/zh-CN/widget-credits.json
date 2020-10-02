@@ -27,5 +27,9 @@
   "Roll Speed": "滚动速度",
   "Speed of the rolling credits.": "积分滚动速度。",
   "Roll Time": "滚动时间",
-  "Duration of the rolling credits.": "积分滚动持续时间。"
+  "Duration of the rolling credits.": "积分滚动持续时间。",
+  "Show Donations": "Show Donations",
+  "Show Subscriptions": "显示订阅者",
+  "Show Members": "Show Members",
+  "Show Super Chats": "显示超级聊天者"
 }

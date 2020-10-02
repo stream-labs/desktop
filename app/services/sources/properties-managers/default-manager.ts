@@ -37,7 +37,7 @@ export class DefaultManager extends PropertiesManager {
   currentMediaPath: string;
 
   init() {
-    if (!this.settings.mediaBackup) this.settings.mediaBackup = {};
+    if (!this.settings.mediaBackup) this.applySettings({ mediaBackup: {} });
     this.initializeMediaBackup();
     this.downloadGoogleFont();
     this.setupAutomaticGameCapture();
@@ -52,7 +52,7 @@ export class DefaultManager extends PropertiesManager {
 
   private initializeMediaBackup() {
     if (this.customizationService.state.mediaBackupOptOut) {
-      this.settings.mediaBackup = {};
+      this.applySettings({ mediaBackup: {} });
       return;
     }
 
@@ -64,6 +64,8 @@ export class DefaultManager extends PropertiesManager {
       this.mediaBackupFileSetting = 'file';
     } else if (this.obsSource.id === 'obs_stinger_transition') {
       this.mediaBackupFileSetting = 'path';
+    } else if (this.obsSource.id === 'game_capture') {
+      this.mediaBackupFileSetting = 'user_placeholder_image';
     } else {
       return;
     }
@@ -93,28 +95,36 @@ export class DefaultManager extends PropertiesManager {
     if (!this.mediaBackupFileSetting) return;
     if (!this.obsSource.settings[this.mediaBackupFileSetting]) return;
 
-    this.settings.mediaBackup.serverId = null;
-    this.settings.mediaBackup.originalPath = null;
+    this.applySettings({
+      mediaBackup: { ...this.settings.mediaBackup, serverId: null, originalPath: null },
+    });
 
     this.mediaBackupService
       .createNewFile(
-        this.mediaBackupService.getLocalFileId(),
+        this.settings.mediaBackup.localId,
         this.obsSource.settings[this.mediaBackupFileSetting],
       )
       .then(file => {
         if (file) {
-          this.settings.mediaBackup.localId = file.id;
-          this.settings.mediaBackup.serverId = file.serverId;
-          this.settings.mediaBackup.originalPath = this.obsSource.settings[
-            this.mediaBackupFileSetting
-          ];
+          this.applySettings({
+            mediaBackup: {
+              localId: file.id,
+              serverId: file.serverId,
+              originalPath: this.obsSource.settings[this.mediaBackupFileSetting],
+            },
+          });
         }
       });
   }
 
   private ensureMediaBackupId() {
     if (this.settings.mediaBackup.localId) return;
-    this.settings.mediaBackup.localId = this.mediaBackupService.getLocalFileId();
+    this.applySettings({
+      mediaBackup: {
+        ...this.settings.mediaBackup,
+        localId: this.mediaBackupService.getLocalFileId(),
+      },
+    });
   }
 
   isMediaBackupSource() {

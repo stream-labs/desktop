@@ -16,7 +16,9 @@ export class EditConnectionCommand extends Command {
   }
 
   execute() {
-    this.beforeConnection = cloneDeep(this.transitionsService.getConnection(this.connectionId));
+    this.beforeConnection = cloneDeep(
+      this.transitionsService.views.getConnection(this.connectionId),
+    );
 
     this.transitionsService.updateConnection(this.connectionId, this.changes);
   }

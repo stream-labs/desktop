@@ -17,6 +17,7 @@ import { PlatformAppsService, IAppSource } from 'services/platform-apps';
 import omit from 'lodash/omit';
 import { CustomizationService } from 'services/customization';
 import { byOS, OS } from 'util/operating-systems';
+import Scrollable from 'components/shared/Scrollable';
 
 type TInspectableSource = TSourceType | WidgetType | 'streamlabel' | 'app_source' | string;
 
@@ -38,6 +39,7 @@ interface ISourceDefinition {
   components: {
     ModalLayout,
     AddSourceInfo,
+    Scrollable,
   },
 })
 export default class SourcesShowcase extends Vue {

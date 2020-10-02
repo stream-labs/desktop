@@ -91,10 +91,10 @@ export class DestinationSwitchers extends TsxComponent<Props> {
                   'You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destination.',
                 )}
               >
-                <ToggleInput value={enabled} metadata={{ disabled: true }} />
+                <ToggleInput value={enabled} metadata={{ disabled: true, name: platform }} />
               </span>
             ) : (
-              <ToggleInput value={enabled} />
+              <ToggleInput value={enabled} metadata={{ disabled: true, name: platform }} />
             )}
           </div>
         )}

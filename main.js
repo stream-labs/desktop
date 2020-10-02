@@ -88,6 +88,11 @@ const releaseChannel = (() => {
 // Main Program
 ////////////////////////////////////////////////////////////////////////////////
 
+// Windows
+let workerWindow;
+let mainWindow;
+let childWindow;
+
 const util = require('util');
 const logFile = path.join(app.getPath('userData'), 'app.log');
 const maxLogBytes = 131072;
@@ -100,6 +105,10 @@ if (fs.existsSync(logFile) && fs.statSync(logFile).size > maxLogBytes) {
 }
 
 ipcMain.on('logmsg', (e, msg) => {
+  if (msg.level === 'error' && mainWindow && process.env.NODE_ENV !== 'production') {
+    mainWindow.send('unhandledErrorState');
+  }
+
   logFromRemote(msg.level, msg.sender, msg.message);
 });
 
@@ -223,11 +232,6 @@ app.on('ready', () => {
     console.log('HTTP REQUEST COMPLETED', details.method, details.url, details.statusCode);
   });
 });
-
-// Windows
-let workerWindow;
-let mainWindow;
-let childWindow;
 
 // Somewhat annoyingly, this is needed so that the main window
 // can differentiate between a user closing it vs the app
