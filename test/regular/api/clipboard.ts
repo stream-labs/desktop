@@ -1,8 +1,8 @@
 import { useSpectron, test, afterAppStart } from '../../helpers/spectron';
 import { getClient } from '../../helpers/api-client';
 import { SceneBuilder } from '../../helpers/scene-builder';
-import { SelectionService } from 'services/selection';
-import { IClipboardServiceApi } from 'services/clipboard';
+import { SelectionService } from 'services/api/external-api/selection';
+import { ClipboardService } from 'services/clipboard';
 import { ISceneCollectionsServiceApi } from 'services/scene-collections';
 import { ISourcesServiceApi } from 'services/sources';
 import { SourceFiltersService } from 'services/source-filters';
@@ -14,7 +14,7 @@ let sceneBuilder: SceneBuilder;
 let getNode: (name: string) => SceneNode;
 let getNodeId: (name: string) => string;
 let selectionService: SelectionService;
-let clipboardService: IClipboardServiceApi;
+let clipboardService: ClipboardService;
 let sourceFiltersService: SourceFiltersService;
 let sceneCollectionsService: ISceneCollectionsServiceApi;
 let sourcesService: ISourcesServiceApi;
@@ -64,7 +64,7 @@ test('Copy/paste folder with items', async t => {
         Item2:
   `);
 
-  selectionService.select(getNodeId('Folder2'));
+  selectionService.select([getNodeId('Folder2')]);
   clipboardService.copy();
   clipboardService.paste();
 
