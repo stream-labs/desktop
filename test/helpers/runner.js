@@ -13,7 +13,7 @@ const fetch = require('node-fetch');
 
 const failedTestsFile = 'test-dist/failed-tests.json';
 const args = process.argv.slice(2);
-const TIMEOUT = 3; // timeout in minutes
+const TIMEOUT = 60; // timeout in minutes
 const { BUILD_BUILDID, SYSTEM_JOBID, BUILD_REASON, BUILD_SOURCEBRANCH } = process.env;
 
 (async function main() {
@@ -68,25 +68,25 @@ function getFailedTests() {
 }
 
 async function sendFailedTestsToAnalytics(failedTests) {
-  const failedAfterRetryTests = getFailedTests();
-  const testsToSend = failedTests.map(testName => ({
-    name: testName,
-    retrySucceeded: !failedAfterRetryTests.includes(testName),
-  }));
-  log('Sending analytics..');
-  const body = {
-    tests: testsToSend,
-    buildId: BUILD_BUILDID,
-    jobId: SYSTEM_JOBID,
-    buildReason: BUILD_REASON,
-    branch: BUILD_SOURCEBRANCH,
-  };
-  log(body);
-  try {
-    await requestUtilityServer('flakyTests', 'post', body);
-  } catch (e) {
-    console.error('failed to send failed tests', e);
-  }
+  // const failedAfterRetryTests = getFailedTests();
+  // const testsToSend = failedTests.map(testName => ({
+  //   name: testName,
+  //   retrySucceeded: !failedAfterRetryTests.includes(testName),
+  // }));
+  // log('Sending analytics..');
+  // const body = {
+  //   tests: testsToSend,
+  //   buildId: BUILD_BUILDID,
+  //   jobId: SYSTEM_JOBID,
+  //   buildReason: BUILD_REASON,
+  //   branch: BUILD_SOURCEBRANCH,
+  // };
+  // log(body);
+  // try {
+  //   await requestUtilityServer('flakyTests', 'post', body);
+  // } catch (e) {
+  //   console.error('failed to send failed tests', e);
+  // }
 }
 
 /**

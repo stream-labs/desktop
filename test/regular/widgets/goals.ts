@@ -5,14 +5,16 @@ import { FormMonkey } from '../../helpers/form-monkey';
 import { waitForWidgetSettingsSync } from '../../helpers/widget-helpers';
 import { sleep } from '../../helpers/sleep';
 
-useSpectron();
+useSpectron({ pauseIfFailed: true });
 
-testGoal('Donation Goal');
-testGoal('Follower Goal');
-testGoal('Bit Goal');
+for (let i = 0; i < 10; i++) {
+  testGoal('Donation Goal', i);
+  testGoal('Follower Goal', i);
+  testGoal('Bit Goal', i);
+}
 
-function testGoal(goalType: string) {
-  test(`${goalType} create and delete`, async t => {
+function testGoal(goalType: string, ind: number) {
+  test(`${goalType} create and delete ${ind}`, async t => {
     const client = t.context.app.client;
     if (!(await logIn(t))) return;
     await addSource(t, goalType, goalType, false);
@@ -22,6 +24,7 @@ function testGoal(goalType: string) {
       await client.click('button=End Goal');
     }
 
+    console.log('wait for visible 1 button=Start Goal');
     await client.waitForVisible('button=Start Goal', 20000);
 
     const formMonkey = new FormMonkey(t, 'form[name=new-goal-form]');
@@ -35,45 +38,47 @@ function testGoal(goalType: string) {
     await client.waitForVisible('button=End Goal');
     t.true(await client.isExisting('span=My Goal'));
     await client.click('button=End Goal');
+
+    console.log('wait for visible 2 button=Start Goal');
     await client.waitForVisible('button=Start Goal', 20000);
   });
 
-  test(`${goalType} change settings`, async t => {
-    const client = t.context.app.client;
-    if (!(await logIn(t))) return;
-
-    await addSource(t, goalType, goalType, false);
-
-    await client.waitForExist('li=Visual Settings');
-    await client.click('li=Visual Settings');
-    const formMonkey = new FormMonkey(t, 'form[name=visual-properties-form]');
-
-    const testSet1 = {
-      layout: 'standard',
-      background_color: '#FF0000',
-      bar_color: '#FF0000',
-      bar_bg_color: '#FF0000',
-      text_color: '#FF0000',
-      bar_text_color: '#FF0000',
-      font: 'Roboto',
-    };
-
-    await formMonkey.fill(testSet1);
-    await waitForWidgetSettingsSync(t);
-    t.true(await formMonkey.includes(testSet1));
-
-    const testSet2 = {
-      layout: 'condensed',
-      background_color: '#7ED321',
-      bar_color: '#AB14CE',
-      bar_bg_color: '#DDDDDD',
-      text_color: '#FFFFFF',
-      bar_text_color: '#F8E71C',
-      font: 'Open Sans',
-    };
-
-    await formMonkey.fill(testSet2);
-    await waitForWidgetSettingsSync(t);
-    t.true(await formMonkey.includes(testSet2));
-  });
+  // test(`${goalType} change settings`, async t => {
+  //   const client = t.context.app.client;
+  //   if (!(await logIn(t))) return;
+  //
+  //   await addSource(t, goalType, goalType, false);
+  //
+  //   await client.waitForExist('li=Visual Settings');
+  //   await client.click('li=Visual Settings');
+  //   const formMonkey = new FormMonkey(t, 'form[name=visual-properties-form]');
+  //
+  //   const testSet1 = {
+  //     layout: 'standard',
+  //     background_color: '#FF0000',
+  //     bar_color: '#FF0000',
+  //     bar_bg_color: '#FF0000',
+  //     text_color: '#FF0000',
+  //     bar_text_color: '#FF0000',
+  //     font: 'Roboto',
+  //   };
+  //
+  //   await formMonkey.fill(testSet1);
+  //   await waitForWidgetSettingsSync(t);
+  //   t.true(await formMonkey.includes(testSet1));
+  //
+  //   const testSet2 = {
+  //     layout: 'condensed',
+  //     background_color: '#7ED321',
+  //     bar_color: '#AB14CE',
+  //     bar_bg_color: '#DDDDDD',
+  //     text_color: '#FFFFFF',
+  //     bar_text_color: '#F8E71C',
+  //     font: 'Open Sans',
+  //   };
+  //
+  //   await formMonkey.fill(testSet2);
+  //   await waitForWidgetSettingsSync(t);
+  //   t.true(await formMonkey.includes(testSet2));
+  // });
 }
