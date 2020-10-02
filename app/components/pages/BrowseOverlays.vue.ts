@@ -78,7 +78,7 @@ export default class BrowseOverlays extends Vue {
     if (
       mergePlatform &&
       this.userService.state.auth?.platforms.facebook &&
-      this.restreamService.canEnableRestream &&
+      this.restreamService.views.canEnableRestream &&
       !this.restreamService.shouldGoLiveWithRestream
     ) {
       this.navigationService.navigate('PlatformMerge', {

@@ -2,6 +2,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { IObsFont, IObsInput, ObsInput } from './ObsInput';
 import { ListInput } from 'components/shared/inputs/inputs';
 import ObsFontSizeSelector from './ObsFontSizeSelector.vue';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import fontManager from 'font-manager';
 import { EFontStyle } from 'obs-studio-node';
 
@@ -21,7 +22,7 @@ interface IFontDescriptor {
 }
 
 @Component({
-  components: { ListInput, FontSizeSelector: ObsFontSizeSelector },
+  components: { ListInput, FontSizeSelector: ObsFontSizeSelector, HFormGroup },
 })
 export default class ObsSystemFontSelector extends ObsInput<IObsInput<IObsFont>> {
   @Prop()

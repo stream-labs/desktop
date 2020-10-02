@@ -92,16 +92,24 @@ export default class TagsInput extends BaseInput<
     // so bind a native listener for the search input
     this.$el.querySelector('input[type=text]').addEventListener('keyup', (e: InputEvent) => {
       this.onSearchChangeHandler(e.currentTarget['value']);
-
-      // vue multiselect don't can't forbid adding tags outside the options list
-      // just hide this option
-      const tagEl = this.$el.querySelector('[data-select="Add this as new tag"]');
-      if (tagEl) tagEl.parentElement.style.display = 'none';
     });
   }
 
   private render() {
     const isEmpty = this.isEmpty;
+    const el = this.$el;
+
+    // a hack that prevents adding tags outside the options list
+    this.$nextTick().then(() => {
+      if (!el) return;
+      const tagEl = el.querySelector('[data-select="Add this as new tag"]');
+      if (tagEl) {
+        el.querySelector('li').style.display = 'none';
+      } else {
+        el.querySelector('li').style.display = 'inline-block';
+      }
+    });
+
     return (
       <div
         class={cx('input-wrapper', styles.container, {

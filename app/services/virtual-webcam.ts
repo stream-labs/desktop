@@ -7,6 +7,7 @@ import path from 'path';
 import { getChecksum } from 'util/requests';
 import { byOS, OS } from 'util/operating-systems';
 import { Inject } from 'services/core/injector';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 const PLUGIN_PLIST_PATH =
   '/Library/CoreMediaIO/Plug-Ins/DAL/vcam-plugin.plugin/Contents/Info.plist';
@@ -25,6 +26,8 @@ interface IVirtualWebcamServiceState {
 }
 
 export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceState> {
+  @Inject() usageStatisticsService: UsageStatisticsService;
+
   static initialState: IVirtualWebcamServiceState = { running: false };
 
   getInstallStatus(): Promise<EVirtualWebcamPluginInstallStatus> {
@@ -78,6 +81,8 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
     obs.NodeObs.OBS_service_startVirtualWebcam();
 
     this.SET_RUNNING(true);
+
+    this.usageStatisticsService.recordFeatureUsage('VirtualWebcam');
   }
 
   stop() {

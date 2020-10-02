@@ -87,6 +87,8 @@ export default class GoLiveError extends TsxComponent<{}> {
         return this.renderYoutubeStreamingDisabled(error);
       case 'YOUTUBE_PUBLISH_FAILED':
         return this.renderYoutubePublishError(error);
+      case 'MACHINE_LOCKED':
+        return this.renderMachineLockedError(error);
       default:
         return <ErrorLayout error={error} />;
     }
@@ -98,7 +100,7 @@ export default class GoLiveError extends TsxComponent<{}> {
     return (
       <ErrorLayout
         error={error}
-        message={$t('Can not fetch settings from %{platformName}', { platformName })}
+        message={$t('Failed to fetch settings from %{platformName}', { platformName })}
       >
         <Translate
           message={$t('prepopulateStreamSettingsError')}
@@ -142,7 +144,7 @@ export default class GoLiveError extends TsxComponent<{}> {
     assertIsDefined(error.platform);
     const platformName = getPlatformService(error.platform).displayName;
     return (
-      <ErrorLayout message={$t('Can not fetch settings from %{platformName}', { platformName })}>
+      <ErrorLayout message={$t('Failed to fetch settings from %{platformName}', { platformName })}>
         <Translate
           message={$t('twitchMissedScopeError')}
           scopedSlots={{
@@ -166,7 +168,7 @@ export default class GoLiveError extends TsxComponent<{}> {
     return (
       <ErrorLayout
         error={error}
-        message={$t('Can not update settings for %{platformName}', { platformName })}
+        message={$t('Failed to update settings for %{platformName}', { platformName })}
       >
         <Translate
           message={$t('updateStreamSettingsError')}
@@ -190,8 +192,16 @@ export default class GoLiveError extends TsxComponent<{}> {
   private renderYoutubeStreamingDisabled(error: IStreamError) {
     return (
       <ErrorLayout message={error.message}>
-        <button class="button button--warn" onClick={() => this.enableYT()}>
-          {$t('Fix')}
+        {$t(
+          'Please enable your account for live streaming, and wait 24 hours before attempting to stream.',
+        )}
+        <br />
+        <button
+          class="button button--warn"
+          style={{ marginTop: '8px' }}
+          onClick={() => this.enableYT()}
+        >
+          {$t('Enable Live Streaming')}
         </button>
       </ErrorLayout>
     );
@@ -200,7 +210,9 @@ export default class GoLiveError extends TsxComponent<{}> {
   private renderRestreamError(error: IStreamError) {
     return (
       <ErrorLayout error={error}>
-        {$t('You could try reducing the number of your destinations to one for direct streaming.')}
+        {$t(
+          'Please try again. If the issue persists, you can stream directly to a single platform instead.',
+        )}
       </ErrorLayout>
     );
   }
@@ -235,6 +247,14 @@ export default class GoLiveError extends TsxComponent<{}> {
             ),
           }}
         />
+      </ErrorLayout>
+    );
+  }
+
+  private renderMachineLockedError(error: IStreamError) {
+    return (
+      <ErrorLayout error={error}>
+        {$t('You could try locking and unlocking your computer to fix this error.')}
       </ErrorLayout>
     );
   }

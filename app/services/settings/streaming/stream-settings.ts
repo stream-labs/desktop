@@ -1,6 +1,6 @@
 import { ISettingsSubCategory, SettingsService } from 'services/settings';
 import { Inject } from 'services/core/injector';
-import { InitAfter, mutation, PersistentStatefulService } from '../../core';
+import { InitAfter, mutation, PersistentStatefulService, ViewHandler } from '../../core';
 import { UserService } from 'services/user';
 import { TPlatform, getPlatformService } from 'services/platforms';
 import { invert, pick } from 'lodash';
@@ -16,7 +16,15 @@ interface ISavedGoLiveSettings {
     youtube: IPlatformFlags;
     mixer: IPlatformFlags;
   };
+  customDestinations?: ICustomStreamDestination[];
   advancedMode: boolean;
+}
+
+export interface ICustomStreamDestination {
+  name: string;
+  url: string;
+  streamKey?: string;
+  enabled: boolean;
 }
 
 /**
@@ -103,6 +111,10 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     this.userService.userLogout.subscribe(async _ => {
       this.resetStreamSettings();
     });
+  }
+
+  get views() {
+    return new StreamSettingsView(this.state);
   }
 
   /**
@@ -251,6 +263,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       protectedModeMigrationRequired: false,
       key: '',
       streamType: 'rtmp_common',
+      goLiveSettings: undefined,
     });
   }
 
@@ -312,3 +325,5 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     });
   }
 }
+
+class StreamSettingsView extends ViewHandler<IStreamSettingsState> {}

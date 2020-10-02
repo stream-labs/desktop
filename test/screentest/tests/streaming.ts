@@ -14,6 +14,7 @@ import { fetchMock, resetFetchMock } from '../../helpers/spectron/network';
 import { getClient } from '../../helpers/api-client';
 import { ScenesService } from 'services/api/external-api/scenes';
 import { sleep } from '../../helpers/sleep';
+import { prepareToGoLive } from '../../helpers/spectron/streaming';
 
 useSpectron();
 useScreentest();
@@ -35,11 +36,7 @@ platforms.forEach(platform => {
     if (!(await logIn(t, platform))) return;
     const app = t.context.app;
 
-    // decrease resolution to reduce CPU usage
-    await setOutputResolution(t, '100x100');
-
-    // add a single source to prevent showing the No-Sources dialog
-    await addColorSource();
+    await prepareToGoLive(t);
 
     // open EditStreamInfo window
     await focusMain(t);

@@ -56,6 +56,7 @@ module.exports = {
   // We want to dynamically require native addons
   externals: {
     'font-manager': 'require("font-manager")',
+    'color-picker': 'require("color-picker")',
 
     // Not actually a native addons, but for one reason or another
     // we don't want them compiled in our webpack bundle.

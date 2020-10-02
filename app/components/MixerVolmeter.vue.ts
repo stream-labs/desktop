@@ -5,6 +5,7 @@ import { Inject } from 'services/core/injector';
 import { CustomizationService } from 'services/customization';
 import electron from 'electron';
 import TsxComponent, { createProps } from './tsx-component';
+import { WindowsService } from 'services/windows';
 
 // Configuration
 const CHANNEL_HEIGHT = 3;
@@ -33,6 +34,7 @@ class MixerVolmeterProps {
 export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
   @Inject() customizationService: CustomizationService;
   @Inject() audioService: AudioService;
+  @Inject() windowsService: WindowsService;
 
   volmeterSubscription: Subscription;
 
@@ -72,6 +74,7 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
 
   firstFrameTime: number;
   frameNumber: number;
+  styleBlockersSubscription: Subscription;
 
   mounted() {
     this.subscribeVolmeter();
@@ -84,6 +87,7 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
   beforeDestroy() {
     clearInterval(this.canvasWidthInterval);
     this.unsubscribeVolmeter();
+    if (this.styleBlockersSubscription) this.styleBlockersSubscription.unsubscribe();
   }
 
   private setupNewCanvas() {
@@ -100,10 +104,22 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
     this.setChannelCount(2);
 
     this.setCanvasWidth();
+
     this.canvasWidthInterval = window.setInterval(() => this.setCanvasWidth(), 500);
     if (this.props.volmetersEnabled) {
       requestAnimationFrame(t => this.onRequestAnimationFrameHandler(t));
     }
+
+    // Style blockers are always hidden whenever something happens that causes main
+    // window elements to change width. We can improve performance by just listening
+    // the style blocker change event.
+    this.styleBlockersSubscription = this.windowsService.styleBlockersUpdated.subscribe(
+      blockers => {
+        if (blockers.windowId === 'main' && !blockers.hideStyleBlockers) {
+          this.setCanvasWidth();
+        }
+      },
+    );
   }
 
   /**

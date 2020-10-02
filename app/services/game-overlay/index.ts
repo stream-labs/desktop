@@ -109,8 +109,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     if (this.overlayRunning) return;
     this.overlayRunning = true;
 
-    this.usageStatisticsService.recordFeatureUsage('GameOverlay');
-
     let crashHandlerLogPath = '';
     if (process.env.NODE_ENV !== 'production' || !!process.env.SLOBS_PREVIEW) {
       const overlayLogFile = '\\game-overlays.log';
@@ -268,6 +266,8 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   showOverlay() {
     this.overlay.show();
     this.TOGGLE_OVERLAY(true);
+
+    this.usageStatisticsService.recordFeatureUsage('GameOverlay');
 
     // Force a refresh to trigger a paint event
     Object.values(this.windows).forEach(win => win.webContents.invalidate());

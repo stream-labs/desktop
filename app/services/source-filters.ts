@@ -16,6 +16,7 @@ import namingHelpers from '../util/NamingHelpers';
 import { $t } from 'services/i18n';
 import { EOrderMovement } from 'obs-studio-node';
 import { Subject } from 'rxjs';
+import { UsageStatisticsService } from './usage-statistics';
 
 export type TSourceFilterType =
   | 'mask_filter'
@@ -61,11 +62,9 @@ export interface ISourceFilterIdentifier {
 }
 
 export class SourceFiltersService extends Service {
-  @Inject()
-  sourcesService: SourcesService;
-
-  @Inject()
-  windowsService: WindowsService;
+  @Inject() private sourcesService: SourcesService;
+  @Inject() private windowsService: WindowsService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
 
   filterAdded = new Subject<ISourceFilterIdentifier>();
   filterRemoved = new Subject<ISourceFilterIdentifier>();
@@ -168,6 +167,11 @@ export class SourceFiltersService extends Service {
     // We need to release one
     obsFilter.release();
     this.filterAdded.next({ sourceId, name: filterName });
+
+    if (filterType === 'vst_filter') {
+      this.usageStatisticsService.recordFeatureUsage('VST');
+    }
+
     return filterReference;
   }
 
@@ -269,7 +273,7 @@ export class SourceFiltersService extends Service {
       queryParams: { sourceId },
       size: {
         width: 600,
-        height: 400,
+        height: 500,
       },
     });
   }

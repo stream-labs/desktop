@@ -157,7 +157,7 @@ export interface IPlatformService {
     useToken?: boolean | string,
   ) => Dictionary<string | undefined>;
 
-  liveDockEnabled: () => boolean;
+  liveDockEnabled: boolean;
 
   readonly platform: TPlatform;
   readonly displayName: string;

@@ -346,7 +346,7 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
     };
   }
 
-  liveDockEnabled(): boolean {
+  get liveDockEnabled(): boolean {
     return true;
   }
 }

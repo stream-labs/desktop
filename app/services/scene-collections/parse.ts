@@ -9,10 +9,16 @@ export function parse(config: string, nodeTypes: Dictionary<any>) {
       value.nodeType &&
       !deprecatedNodes.includes(value.nodeType)
     ) {
-      const instance = new nodeTypes[value.nodeType]();
+      const nodeClass = nodeTypes[value.nodeType];
 
-      instance.fromJSON(value);
-      return instance;
+      if (nodeClass) {
+        const instance = new nodeClass();
+
+        instance.fromJSON(value);
+        return instance;
+      } else {
+        console.warn(`Found unrecognized node in JSON: ${value.nodeType}`);
+      }
     }
 
     return value;

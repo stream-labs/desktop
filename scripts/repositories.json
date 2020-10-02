@@ -4,7 +4,7 @@
             "name": "obs-studio-node",
             "url": "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/",
             "archive": "osn-[VERSION]-release-[OS].tar.gz",
-            "version": "0.8.70",
+            "version": "0.10.6",
             "win64": true,
             "osx": true
         },
@@ -36,7 +36,7 @@
             "name": "crash-handler",
             "url": "https://slobs-crash-handler.s3-us-west-2.amazonaws.com/",
             "archive": "crash-handler-[VERSION]-[OS].tar.gz",
-            "version": "1.0.9",
+            "version": "1.0.15",
             "win64": true,
             "osx": true
         },
@@ -52,7 +52,15 @@
             "name": "game-overlay",
             "url": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/",
             "archive": "game-overlay-[VERSION].tar.gz",
-            "version": "v0.0.41",
+            "version": "0.0.42",
+            "win64": true,
+            "osx": false
+        },
+        {
+            "name": "color-picker",
+            "url": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/",
+            "archive": "color-picker-[VERSION]-[OS].tar.gz",
+            "version": "1.2.12",
             "win64": true,
             "osx": false
         }

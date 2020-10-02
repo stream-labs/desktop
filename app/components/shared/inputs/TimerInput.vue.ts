@@ -1,8 +1,9 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { BaseInput } from './BaseInput';
 import { ITimerMetadata } from './index';
+import Scrollable from 'components/shared/Scrollable';
 
-@Component({})
+@Component({ components: { Scrollable } })
 export default class TimerInput extends BaseInput<number, ITimerMetadata> {
   @Prop() value: number;
   @Prop() title: string;

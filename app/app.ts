@@ -104,7 +104,7 @@ if (windowId === 'worker') {
 }
 
 window.addEventListener('error', e => {
-  sendLogMsg('error', e.error);
+  sendLogMsg('error', e.message, e.error);
 });
 
 window.addEventListener('unhandledrejection', e => {
@@ -118,17 +118,16 @@ if (window['_startupErrorHandler']) {
   delete window['_startupErrorHandler'];
 }
 
-if (
-  (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) &&
-  !electron.remote.process.env.SLOBS_IPC
-) {
+if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
+  const sampleRate = isPreview || process.env.SLOBS_REPORT_TO_SENTRY ? 1.0 : 0.1;
+  const isSampled = Math.random() < sampleRate;
+
   usingSentry = true;
 
   Sentry.init({
     dsn: sentryDsn,
     release: `${slobsVersion}-${SLOBS_BUNDLE_ID}`,
-    sampleRate: isPreview ? 1.0 : 0.1,
-    beforeSend: event => {
+    beforeSend: (event, hint) => {
       // Because our URLs are local files and not publicly
       // accessible URLs, we simply truncate and send only
       // the filename.  Unfortunately sentry's electron support
@@ -138,6 +137,10 @@ if (
         const splitArray = filename.split('/');
         return splitArray[splitArray.length - 1];
       };
+
+      if (hint.originalException) {
+        sendLogMsg('error', hint.originalException);
+      }
 
       if (event.exception && event.exception.values[0].stacktrace) {
         event.exception.values[0].stacktrace.frames.forEach(frame => {
@@ -149,14 +152,14 @@ if (
         event.request.url = normalize(event.request.url);
       }
 
-      return event;
+      return isSampled ? event : null;
     },
     integrations: [new Integrations.Vue({ Vue })],
   });
 
   const oldConsoleError = console.error;
 
-  console.error = (msg: string, ...params: any[]) => {
+  console.error = (msg: unknown, ...params: any[]) => {
     oldConsoleError(msg, ...params);
 
     Sentry.withScope(scope => {
@@ -165,7 +168,17 @@ if (
       }
 
       scope.setExtra('console-args', JSON.stringify(params, null, 2));
-      Sentry.captureMessage(msg, Sentry.Severity.Error);
+
+      if (typeof msg === 'string') {
+        Sentry.captureMessage(msg, Sentry.Severity.Error);
+      } else if (msg instanceof Error) {
+        Sentry.captureException(msg);
+      } else {
+        Sentry.captureMessage(
+          'console.error was called with other type than string or Error',
+          Sentry.Severity.Error,
+        );
+      }
     });
   };
 }
@@ -193,7 +206,7 @@ Vue.directive('trackClick', {
     }
 
     el.addEventListener('click', () => {
-      getResource<UsageStatisticsService>('UsageStatisticsService').recordClick(
+      getResource<UsageStatisticsService>('UsageStatisticsService').actions.recordClick(
         binding.value.component,
         binding.value.target,
       );
@@ -310,7 +323,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     render: h => {
       if (windowId === 'worker') return h(Blank);
       if (windowId === 'child') {
-        if (store.state.bulkLoadFinished) {
+        if (store.state.bulkLoadFinished && store.state.i18nReady) {
           return h(ChildWindow);
         }
 
@@ -331,7 +344,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   ipcRenderer.on('initFinished', () => {
     // setup translations for the current window
     if (!Utils.isWorkerWindow()) {
-      I18nService.uploadTranslationsToVueI18n();
+      I18nService.uploadTranslationsToVueI18n(true).then(() => {
+        store.commit('I18N_READY');
+      });
     }
 
     if (Utils.isMainWindow()) {

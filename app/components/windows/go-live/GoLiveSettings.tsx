@@ -1,3 +1,4 @@
+import cx from 'classnames';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { $t } from 'services/i18n';
 import { Component } from 'vue-property-decorator';
@@ -18,6 +19,7 @@ import { DestinationSwitchers } from './DestinationSwitchers';
 import { Twitter } from 'components/Twitter';
 import { RestreamService } from 'services/restream';
 import Section from './Section';
+import Scrollable from 'components/shared/Scrollable';
 
 class GoLiveProps {
   value?: IGoLiveSettings = undefined;
@@ -51,9 +53,18 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
     this.streamingService.actions.prepopulateInfo();
   }
 
+  private switchCustomDest(destInd: number, enabled: boolean) {
+    // save settings
+    this.$set(this.settings.customDestinations, destInd, {
+      ...this.settings.customDestinations[destInd],
+      enabled,
+    });
+    this.streamSettingsService.actions.setGoLiveSettings(this.settings);
+  }
+
   private addDestination() {
     // open the stream settings or prime page
-    if (this.restreamService.canEnableRestream) {
+    if (this.restreamService.views.canEnableRestream) {
       this.settingsService.actions.showSettings('Stream');
     } else {
       this.userService.openPrimeUrl('slobs-multistream');
@@ -68,10 +79,11 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
     const isLoadingMode = !isErrorMode && ['empty', 'prepopulate'].includes(view.info.lifecycle);
     const shouldShowSettings = !isErrorMode && !isLoadingMode && hasPlatforms;
     const isAdvancedMode = view.goLiveSettings.advancedMode && view.isMultiplatformMode;
-    const shouldShowAddDestination = view.linkedPlatforms.length < 3;
     const shouldShowPrimeLabel = !this.restreamService.state.grandfathered;
     const shouldShowLeftCol = this.streamSettingsService.state.protectedModeEnabled;
     const onlyOnePlatformIsLinked = view.linkedPlatforms.length === 1;
+    const shouldShowAddDestButton =
+      view.linkedPlatforms.length + view.goLiveSettings.customDestinations.length < 5;
     return (
       <ValidatedForm class="flex">
         {/*LEFT COLUMN*/}
@@ -79,14 +91,16 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
           <div style={{ width: '400px', marginRight: '42px' }}>
             {/*DESTINATION SWITCHERS*/}
             <DestinationSwitchers
-              value={this.settings.platforms}
+              platforms={this.settings.platforms}
+              customDestinations={this.settings.customDestinations}
               title="Stream to %{platformName}"
               canDisablePrimary={false}
-              handleOnSwitch={(...args) => this.switchPlatform(...args)}
+              handleOnPlatformSwitch={(...args) => this.switchPlatform(...args)}
+              handleOnCustomDestSwitch={(...args) => this.switchCustomDest(...args)}
             />
 
             {/*ADD DESTINATION BUTTON*/}
-            {shouldShowAddDestination && (
+            {shouldShowAddDestButton && (
               <a class={styles.addDestinationBtn} onclick={this.addDestination}>
                 <i class="fa fa-plus" />
                 {$t('Add Destination')} {shouldShowPrimeLabel && <b class={styles.prime}>prime</b>}
@@ -101,11 +115,11 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
           <GoLiveError />
 
           {shouldShowSettings && (
-            <div
-              class={{
+            <Scrollable
+              className={cx({
                 [styles.settingsContainer]: true,
                 [styles.settingsContainerOnePlatform]: onlyOnePlatformIsLinked,
-              }}
+              })}
             >
               {/*PLATFORM SETTINGS*/}
               <PlatformSettings vModel={this.settings} />
@@ -124,7 +138,7 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
                   settings={this.settings}
                 />
               </Section>
-            </div>
+            </Scrollable>
           )}
         </div>
       </ValidatedForm>

@@ -31,6 +31,10 @@ import { lazyModule } from 'util/lazy-module';
 import { AuthModule } from './auth-module';
 import { WebsocketService, TSocketEvent } from 'services/websocket';
 import { MagicLinkService } from 'services/magic-link';
+import fs from 'fs';
+import path from 'path';
+import { AppService } from 'services/app';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 export enum EAuthProcessState {
   Idle = 'idle',
@@ -43,6 +47,7 @@ interface IUserServiceState {
   auth?: IUserAuth;
   authProcessState: EAuthProcessState;
   isPrime: boolean;
+  expires?: string;
   userId?: number;
 }
 
@@ -108,6 +113,10 @@ class UserViews extends ViewHandler<IUserServiceState> {
   get isFacebookAuthed() {
     return this.isLoggedIn && this.platform.type === 'facebook';
   }
+
+  get auth() {
+    return this.state.auth;
+  }
 }
 
 export class UserService extends PersistentStatefulService<IUserServiceState> {
@@ -121,6 +130,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private websocketService: WebsocketService;
   @Inject() private magicLinkService: MagicLinkService;
+  @Inject() private appService: AppService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
 
   @mutation()
   LOGIN(auth: IUserAuth) {
@@ -144,11 +155,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   LOGOUT() {
     Vue.delete(this.state, 'auth');
     this.state.isPrime = false;
+    Vue.delete(this.state, 'userId');
   }
 
   @mutation()
   SET_PRIME(isPrime: boolean) {
     this.state.isPrime = isPrime;
+  }
+
+  @mutation()
+  SET_EXPIRES(expires: string) {
+    this.state.expires = expires;
   }
 
   @mutation()
@@ -294,10 +311,28 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
   }
 
+  /**
+   * Makes a best attempt to write a user id to disk. Does not
+   * guarantee it will succeed. Calling this function will never
+   * fail. This is used by the updater.
+   * @param userId The user id to write
+   */
+  writeUserIdFile(userId?: number) {
+    const filePath = path.join(this.appService.appDataDirectory, 'userId');
+    fs.writeFile(filePath, userId ?? '', err => {
+      if (err) {
+        console.error('Error writing user id file', err);
+      }
+    });
+  }
+
   async updateLinkedPlatforms() {
     const linkedPlatforms = await this.fetchLinkedPlatforms();
 
-    if (linkedPlatforms.user_id) this.SET_USER_ID(linkedPlatforms.user_id);
+    if (linkedPlatforms.user_id) {
+      this.writeUserIdFile(linkedPlatforms.user_id);
+      this.SET_USER_ID(linkedPlatforms.user_id);
+    }
 
     // TODO: Could metaprogram this a bit more
     if (linkedPlatforms.facebook_account) {
@@ -371,8 +406,20 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const request = new Request(url, { headers });
     return fetch(request)
       .then(handleResponse)
-      .then(response => this.SET_PRIME(response.is_prime))
+      .then(response => this.validatePrimeStatus(response))
       .catch(() => null);
+  }
+
+  validatePrimeStatus(response: { expires_soon: boolean; expires_at: string; is_prime: boolean }) {
+    this.SET_PRIME(response.is_prime);
+    if (!response.expires_soon) {
+      this.SET_EXPIRES(null);
+      return;
+    } else if (!this.state.expires) {
+      this.SET_EXPIRES(response.expires_at);
+      this.usageStatisticsService.recordShown('prime-resubscribe-modal');
+      this.onboardingService.start({ isPrimeExpiration: true });
+    }
   }
 
   /**
@@ -536,6 +583,19 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return url;
   }
 
+  alertboxLibraryUrl(id?: string) {
+    const uiTheme = this.customizationService.isDarkTheme ? 'night' : 'day';
+    let url = `https://${this.hostsService.streamlabs}/alertbox-library?mode=${uiTheme}&slobs`;
+
+    if (this.isLoggedIn) {
+      url += `&oauth_token=${this.apiToken}`;
+    }
+
+    if (id) url += `&id=${id}`;
+
+    return url;
+  }
+
   getDonationSettings() {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/donation/settings`;
@@ -614,6 +674,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     session.clearStorageData({ storages: ['cookies'] });
     this.settingsService.setSettingValue('Stream', 'key', '');
 
+    this.writeUserIdFile();
     this.unsubscribeFromSocketConnection();
     this.LOGOUT();
     this.userLogout.next();

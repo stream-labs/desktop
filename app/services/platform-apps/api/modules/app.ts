@@ -1,6 +1,7 @@
 import { Module, EApiPermissions, apiMethod, IApiContext } from './module';
 import { Inject } from 'services/core/injector';
 import { NavigationService } from 'services/navigation';
+import { PlatformAppsService } from 'services/platform-apps';
 
 interface INavigation {
   sourceId?: string;
@@ -20,6 +21,7 @@ export class AppModule extends Module {
   readonly permissions: EApiPermissions[] = [];
 
   @Inject() navigationService: NavigationService;
+  @Inject() platformAppsService: PlatformAppsService;
 
   callbacks: Dictionary<TNavigationCallback> = {};
 
@@ -52,5 +54,10 @@ export class AppModule extends Module {
     } else if (page === EPage.AppDetailsPage) {
       this.navigationService.navigate('PlatformAppStore', { appId: ctx.app.id });
     }
+  }
+
+  @apiMethod()
+  reload(ctx: IApiContext) {
+    this.platformAppsService.refreshApp(ctx.app.id);
   }
 }

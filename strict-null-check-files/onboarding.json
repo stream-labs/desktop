@@ -1,0 +1,4 @@
+{
+  "ts": [],
+  "tsx": ["app/components/pages/onboarding-steps/PrimeExpiration.tsx"]
+}

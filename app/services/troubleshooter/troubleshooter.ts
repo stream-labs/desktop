@@ -19,11 +19,11 @@ export class TroubleshooterService extends PersistentStatefulService<ITroublesho
   static defaultState: ITroubleshooterState = {
     settings: {
       skippedEnabled: true,
-      skippedThreshold: 0.15,
+      skippedThreshold: 0.25,
       laggedEnabled: false,
-      laggedThreshold: 0.15,
+      laggedThreshold: 0.25,
       droppedEnabled: true,
-      droppedThreshold: 0.1,
+      droppedThreshold: 0.25,
     },
   };
 

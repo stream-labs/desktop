@@ -1,69 +1,64 @@
 <template>
-<div class="patch-notes-page">
-  <div
-    v-if="notes.showChest"
-    class="patch-notes-container patch-notes-container--closed"
-    :class="{ 'patch-notes-container--closing': patchNotesClosing }">
-    <div class="patch-notes-content">
-      <div class="patch-notes-header">
-        <video
-          src="../../../media/chest.webm"
-          ref="patchNotesVideo"
-          class="patch-notes-chest">
-        </video>
-        <video
-          src="../../../media/chest-deco.webm"
-          class="patch-notes-chest-deco"
-          autoplay
-          loop>
-        </video>
-      </div>
-
-      <button
-        @click="show"
-        class="patch-notes-button button button--action">
-        Open Update {{ notes.version }}
-      </button>
-    </div>
-  </div>
-
-  <div
-    class="patch-notes-container"
-    :class="{
-      'patch-notes-container--opened': notes.showChest,
-      'patch-notes-container--opening': patchNotesOpening
-    }">
-    <div class="patch-notes-content">
-      <div class="patch-notes-header">
-        <div class="patch-notes-title">
-          {{ notes.title }}
+  <div class="patch-notes-page">
+    <div
+      v-if="notes.showChest"
+      class="patch-notes-container patch-notes-container--closed"
+      :class="{ 'patch-notes-container--closing': patchNotesClosing }"
+    >
+      <div class="patch-notes-content">
+        <div class="patch-notes-header">
+          <video
+            src="../../../media/chest.webm"
+            ref="patchNotesVideo"
+            class="patch-notes-chest"
+          ></video>
+          <video
+            src="../../../media/chest-deco.webm"
+            class="patch-notes-chest-deco"
+            autoplay
+            loop
+          ></video>
         </div>
-        <div class="patch-notes-version">
-          {{ notes.version }}
-        </div>
+
+        <button @click="show" class="patch-notes-button button button--action">
+          Open Update {{ notes.version }}
+        </button>
       </div>
-      <ul class="patch-notes-list">
-        <li
-          class="patch-notes-item"
-          v-for="item in notes.notes"
-          :key="item">
-          {{ item }}
-        </li>
-      </ul>
-      <button
-        @click="done"
-        class="patch-notes-button button button--action">
-        Done
-      </button>
     </div>
+
+    <scrollable
+      class="patch-notes-container"
+      :class="{
+        'patch-notes-container--opened': notes.showChest,
+        'patch-notes-container--opening': patchNotesOpening,
+      }"
+    >
+      <div class="patch-notes-content">
+        <div class="patch-notes-header">
+          <div class="patch-notes-title">
+            {{ notes.title }}
+          </div>
+          <div class="patch-notes-version">
+            {{ notes.version }}
+          </div>
+        </div>
+        <ul class="patch-notes-list">
+          <li class="patch-notes-item" v-for="item in notes.notes" :key="item">
+            {{ item }}
+          </li>
+        </ul>
+        <button @click="done" class="patch-notes-button button button--action">
+          Done
+        </button>
+      </div>
+    </scrollable>
   </div>
-</div>
 </template>
 
 <script lang="ts" src="./PatchNotes.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/index";
+@import '../../styles/index';
 
 .patch-notes-chest,
 .patch-notes-chest-deco {
@@ -184,7 +179,6 @@
 
 .patch-notes-container {
   width: 400px;
-  overflow: auto;
   position: absolute;
 }
 

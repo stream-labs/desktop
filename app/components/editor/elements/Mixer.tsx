@@ -8,6 +8,7 @@ import { EditorCommandsService } from 'services/editor-commands';
 import BaseElement from './BaseElement';
 import GLVolmeters from '../../GLVolmeters';
 import { CustomizationService } from 'services/customization';
+import Scrollable from 'components/shared/Scrollable';
 
 @Component({})
 export default class Mixer extends BaseElement {
@@ -66,7 +67,7 @@ export default class Mixer extends BaseElement {
             />
           </div>
         </div>
-        <div class="studio-controls-selector mixer-panel">
+        <Scrollable class="studio-controls-selector mixer-panel">
           <div style={{ position: 'relative' }}>
             {this.audioSources.length && !this.performanceMode && (
               <GLVolmeters style={{ left: '17px', right: '17px', height: '100%' }} />
@@ -79,7 +80,7 @@ export default class Mixer extends BaseElement {
               />
             ))}
           </div>
-        </div>
+        </Scrollable>
       </div>
     );
   }

@@ -13,6 +13,8 @@ import * as obs from '../../../../obs-api';
 import { ScenesService } from 'services/scenes';
 import defaultTo from 'lodash/defaultTo';
 import { byOS, OS } from 'util/operating-systems';
+import { UsageStatisticsService } from 'services/usage-statistics';
+import { TSourceFilterType } from 'services/source-filters';
 
 interface ISchema {
   items: ISourceInfo[];
@@ -20,7 +22,7 @@ interface ISchema {
 
 interface IFilterInfo {
   name: string;
-  type: string;
+  type: TSourceFilterType;
   settings: obs.ISettings;
   enabled?: boolean;
 }
@@ -55,6 +57,7 @@ export class SourcesNode extends Node<ISchema, {}> {
   @Inject() private sourcesService: SourcesService;
   @Inject() private audioService: AudioService;
   @Inject() private scenesService: ScenesService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
 
   getItems() {
     const linkedSourcesIds = this.scenesService.views
@@ -105,7 +108,7 @@ export class SourcesNode extends Node<ISchema, {}> {
 
                 return {
                   name: filter.name,
-                  type: filter.id,
+                  type: filter.id as TSourceFilterType,
                   settings: filter.settings,
                   enabled: filter.enabled,
                 };
@@ -195,6 +198,10 @@ export class SourcesNode extends Node<ISchema, {}> {
         volume: source.volume,
         syncOffset: source.syncOffset,
         filters: source.filters.items.map(filter => {
+          if (filter.type === 'vst_filter') {
+            this.usageStatisticsService.recordFeatureUsage('VST');
+          }
+
           return {
             name: filter.name,
             type: filter.type,

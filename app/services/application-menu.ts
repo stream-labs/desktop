@@ -7,6 +7,7 @@ import { SelectionService } from './selection';
 import { AppService } from './app';
 import { WindowsService } from './windows';
 import { NavigationService } from './navigation';
+import { SettingsService } from './settings';
 
 /**
  * Manages the application menu and shortcuts on Mac OS
@@ -18,6 +19,7 @@ export class ApplicationMenuService extends Service {
   @Inject() appService: AppService;
   @Inject() windowsService: WindowsService;
   @Inject() navigationService: NavigationService;
+  @Inject() settingsService: SettingsService;
 
   init() {
     if (process.platform !== OS.Mac) return;
@@ -31,7 +33,28 @@ export class ApplicationMenuService extends Service {
   private buildMenu(): electron.Menu {
     // TODO: i18n
     return electron.remote.Menu.buildFromTemplate([
-      { role: 'appMenu' },
+      {
+        label: 'Streamlabs OBS',
+        submenu: [
+          { role: 'about' },
+          {
+            label: 'Preferences…',
+            accelerator: 'Command+,',
+            click: () => {
+              if (this.appService.state.loading) return;
+              this.settingsService.showSettings();
+            },
+          },
+          { type: 'separator' },
+          { role: 'services' },
+          { type: 'separator' },
+          { role: 'hide' },
+          { role: 'hideOthers' },
+          { role: 'unhide' },
+          { type: 'separator' },
+          { role: 'quit' },
+        ],
+      },
       { role: 'fileMenu' },
       {
         id: 'edit',

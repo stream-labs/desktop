@@ -27,6 +27,13 @@ export default class SideNav extends Vue {
     return Utils.isDevMode();
   }
 
+  get chatbotVisible() {
+    return (
+      this.userService.isLoggedIn &&
+      ['twitch', 'mixer', 'youtube'].includes(this.userService.platform.type)
+    );
+  }
+
   openSettingsWindow(categoryName?: string) {
     this.settingsService.showSettings(categoryName);
   }
@@ -72,12 +79,12 @@ export default class SideNav extends Vue {
   dashboardOpening = false;
 
   @throttle(2000, { trailing: false })
-  async openDashboard() {
+  async openDashboard(page?: string) {
     if (this.dashboardOpening) return;
     this.dashboardOpening = true;
 
     try {
-      const link = await this.magicLinkService.getDashboardMagicLink();
+      const link = await this.magicLinkService.getDashboardMagicLink(page);
       electron.remote.shell.openExternal(link);
     } catch (e) {
       console.error('Error generating dashboard magic link', e);
@@ -124,6 +131,16 @@ export default class SideNav extends Vue {
             vTrackClick={{ component: 'NavTools', target: 'dashboard' }}
           >
             <i class="icon-dashboard" />
+          </div>
+        )}
+        {this.userService.isLoggedIn && (
+          <div
+            class={cx(styles.cell)}
+            onClick={() => this.openDashboard('cloudbot')}
+            title={$t('Cloudbot')}
+            vTrackClick={{ component: 'NavTools', target: 'cloudbot' }}
+          >
+            <i class="icon-cloudbot" />
           </div>
         )}
         <div

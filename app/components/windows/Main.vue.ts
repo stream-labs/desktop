@@ -15,6 +15,7 @@ import Studio from '../pages/Studio';
 import Chatbot from '../pages/Chatbot.vue';
 import PlatformAppStore from '../pages/PlatformAppStore.vue';
 import BrowseOverlays from 'components/pages/BrowseOverlays.vue';
+import AlertboxLibrary from 'components/pages/AlertboxLibrary';
 import Onboarding from '../pages/Onboarding';
 import LayoutEditor from '../pages/LayoutEditor';
 import TitleBar from '../TitleBar';
@@ -59,6 +60,7 @@ const loadedTheme = () => {
     ResizeBar,
     PlatformMerge,
     LayoutEditor,
+    AlertboxLibrary,
   },
 })
 export default class Main extends Vue {
@@ -75,11 +77,11 @@ export default class Main extends Vue {
     window.addEventListener('resize', this.windowSizeHandler);
   }
 
-  get bulkLoadFinished() {
-    return this.$store.state.bulkLoadFinished;
+  get uiReady() {
+    return this.$store.state.bulkLoadFinished && this.$store.state.i18nReady;
   }
 
-  @Watch('bulkLoadFinished')
+  @Watch('uiReady')
   initializeResize() {
     this.$nextTick(() => {
       const dockWidth = this.customizationService.state.livedockSize;
@@ -136,7 +138,7 @@ export default class Main extends Vue {
       this.isLoggedIn &&
       !this.isOnboarding &&
       this.hasLiveDock &&
-      getPlatformService(this.userService.platform.type).liveDockEnabled() &&
+      getPlatformService(this.userService.platform.type).liveDockEnabled &&
       !this.showLoadingSpinner
     );
   }

@@ -18,6 +18,7 @@ enum EOnboardingSteps {
   ThemeSelector = 'ThemeSelector',
   Optimize = 'Optimize',
   Prime = 'Prime',
+  PrimeExpiration = 'PrimeExpiration',
 }
 
 const ONBOARDING_STEPS = () => ({
@@ -77,6 +78,13 @@ const ONBOARDING_STEPS = () => ({
     hideButton: false,
     label: $t('Prime'),
   },
+  [EOnboardingSteps.PrimeExpiration]: {
+    element: onboardingSteps.PrimeExpiration,
+    disableControls: true,
+    hideSkip: true,
+    hideButton: true,
+    label: '',
+  },
 });
 
 const THEME_METADATA = {
@@ -103,6 +111,8 @@ interface IOnboardingOptions {
   isSecurityUpgrade: boolean; // When logging in, display a special message
   // about our security upgrade.
   isHardware: boolean; // When configuring capture defaults
+  isPrimeExpiration: boolean; // Only shown as a singleton step if prime is expiring soon
+  isImport: boolean; // When users are importing from OBS
 }
 
 interface IOnboardingServiceState {
@@ -116,6 +126,10 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
     if (this.state.options.isLogin) return ONBOARDING_STEPS()[EOnboardingSteps.Connect];
     if (this.state.options.isOptimize) return ONBOARDING_STEPS()[EOnboardingSteps.Optimize];
     if (this.state.options.isHardware) return ONBOARDING_STEPS()[EOnboardingSteps.HardwareSetup];
+    if (this.state.options.isImport) return ONBOARDING_STEPS()[EOnboardingSteps.ObsImport];
+    if (this.state.options.isPrimeExpiration) {
+      return ONBOARDING_STEPS()[EOnboardingSteps.PrimeExpiration];
+    }
   }
 
   get steps() {
@@ -158,6 +172,8 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
       isOptimize: false,
       isSecurityUpgrade: false,
       isHardware: false,
+      isPrimeExpiration: false,
+      isImport: false,
     },
     importedFromObs: false,
     existingSceneCollections: false,
@@ -228,6 +244,8 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
       isOptimize: false,
       isSecurityUpgrade: false,
       isHardware: false,
+      isPrimeExpiration: false,
+      isImport: false,
       ...options,
     };
 

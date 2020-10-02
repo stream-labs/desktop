@@ -46,7 +46,7 @@ export default class SceneTransitions extends Vue {
   }
 
   get typeOptions() {
-    return this.transitionsService.getTypes();
+    return this.transitionsService.views.getTypes();
   }
 
   get durationModel(): number {
