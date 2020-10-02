@@ -29,6 +29,12 @@ test('Go through the onboarding and autoconfig', async t => {
     await sleep(1000);
   }
 
+  // Skip purchasing prime
+  if (await t.context.app.client.isExisting('div=Choose Starter')) {
+    await t.context.app.client.click('div=Choose Starter');
+    await sleep(1000);
+  }
+
   // Don't Import from OBS
   if (await t.context.app.client.isExisting('h2=Start Fresh')) {
     await t.context.app.client.click('h2=Start Fresh');
@@ -52,12 +58,6 @@ test('Go through the onboarding and autoconfig', async t => {
   await app.client.click('button=Start');
   await app.client.waitForVisible('h2=Overlay, Widget & Site Themes', 60000);
 
-  // Skip purchasing prime
-  if (await t.context.app.client.isExisting('button=Skip')) {
-    await t.context.app.client.click('button=Skip');
-    await sleep(1000);
-  }
-
   // success?
   t.true(await app.client.isVisible('h2=Sources'), 'Sources selector is visible');
 });
@@ -77,17 +77,17 @@ test('OBS Importer', async t => {
     await sleep(1000);
   }
 
+  // Skip purchasing prime
+  if (await t.context.app.client.isExisting('div=Choose Starter')) {
+    await t.context.app.client.click('div=Choose Starter');
+    await sleep(1000);
+  }
+
   // import from OBS
   if (await t.context.app.client.isExisting('h2=Import from OBS')) {
     await t.context.app.client.click('h2=Import from OBS');
     await t.context.app.client.click('h2=Start');
     await sleep(10000);
-  }
-
-  // Skip purchasing prime
-  if (await t.context.app.client.isExisting('button=Skip')) {
-    await t.context.app.client.click('button=Skip');
-    await sleep(1000);
   }
 
   // check collection 1 and sources
