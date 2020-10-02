@@ -1,6 +1,6 @@
 {
   "You can access your Facebook Streamer Dashboard here.": "您可以在這裡存取您的 Facebook 直播主儀表板。",
-  "You need a Facebook page to stream to Facebook. You can create one now.": "您需要有 Facebook 專頁才能在 Facebook 直播。您可以現在建立一個專頁。",
+  "facebookNoPagesError": "You need a Facebook page to stream to Facebook. You can <create-link>create one now</create-link>.",
   "Create a Page": "建立專頁",
   "Facebook Setup": "Facebook 設定",
   "Streamer Dashboard": "直播主儀表板",
@@ -10,11 +10,11 @@
   "Step": "步驟",
   "Create a Facebook Gaming page to get started.": "建立 Facebook 遊戲專頁以開始使用。",
   "Create a Gaming Page": "建立遊戲專頁",
-  "Connect Facebook to Streamlabs OBS.": "將 Facebook 連線到 Streamlabs OBS。",
   "All of your scenes, sources, and settings will be preserved.": "您的所有場景、來源和設定都會保留。",
   "Connect Facebook": "連線 Facebook",
   "Multistream To Facebook": "多點直播到 Facebook",
   "Connect": "連線",
   "Install Your Theme": "安裝您的主題",
-  "Install": "安裝"
+  "Install": "安裝",
+  "I already have a Gaming Page": "I already have a Gaming Page"
 }

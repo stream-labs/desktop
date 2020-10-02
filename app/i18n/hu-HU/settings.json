@@ -27,7 +27,7 @@
   "Confirm stream title and game before going live": "A stream címének és a játék megerősítése élő adás kezdése előtt",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "FIGYELEM! Az összes jelenet, forrás és beállítás elveszik. Nem visszavonható!",
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "A gyorsítótár könyvtár sikeresen feltöltődött. A %{file} fájlnevet másolták a vágólapra.",
-  "Stream Labels session has been succesfully restarted!": "A Stream Labels munkamenet sikeresen újraindult!",
+  "Stream Labels session has been successfully restarted!": "Stream Labels session has been successfully restarted!",
   "This action will restart the application. Continue?": "Ez a művelet újraindítja az alkalmazást. Folytatod?",
   "Show confirmation dialog when starting streams": "Megerősítő párbeszédpanel megjelenítése stream indításakor",
   "Show confirmation dialog when stopping streams": "Megerősítő párbeszédpanel megjelenítése stream leállításakor",
@@ -117,5 +117,10 @@
   "Audio - Track 6": "Audio - 6. szám",
   "Stream Key": "Stream kulcs",
   "You can not change these settings when you're live": "Ezeket a beállításokat élőben nem módosíthatja",
-  "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.": "Ez a szolgáltatás az overlay tervezők számára készült, hogy munkájukat a Theme Store-ba exportálhassák. Nem minden forrás kerül exportálásra, használja a saját felelősségére."
+  "This feature is intended for overlay designers to export their work for our Theme Store. Not all sources will be exported, use at your own risk.": "Ez a szolgáltatás az overlay tervezők számára készült, hogy munkájukat a Theme Store-ba exportálhassák. Nem minden forrás kerül exportálásra, használja a saját felelősségére.",
+  "Change the look of Streamlabs OBS with Prime": "Változtassa meg a Streamlabs OBS megjelenését Prime-mal",
+  "Virtual Webcam": "Virtual Webcam",
+  "unlinked": "unlinked",
+  "Unlink": "Leválasztás",
+  "Logged in": "Logged in"
 }

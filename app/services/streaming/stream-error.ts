@@ -58,6 +58,9 @@ const errorTypes = {
       return $t('This feature is for Prime members only');
     },
   },
+  MACHINE_LOCKED: {
+    message: 'Your computer is locked',
+  },
   UNKNOWN_ERROR: {
     // show this error if we caught a runtime error
     // we should treat this error as a bug in the codebase

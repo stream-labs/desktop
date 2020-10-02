@@ -11,6 +11,7 @@ import { $t } from 'services/i18n';
 import { DefaultManager } from 'services/sources/properties-managers/default-manager';
 import { Subject } from 'rxjs';
 import { isUrl } from '../util/requests';
+import { getOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from './usage-statistics';
 
 export const TRANSITION_DURATION_MAX = 2_000_000_000;
@@ -56,7 +57,7 @@ export interface ITransitionCreateOptions {
 
 class TransitionsViews extends ViewHandler<ITransitionsState> {
   getTypes(): IListOption<ETransitionType>[] {
-    return [
+    const types = [
       { title: $t('Cut'), value: ETransitionType.Cut },
       { title: $t('Fade'), value: ETransitionType.Fade },
       { title: $t('Swipe'), value: ETransitionType.Swipe },
@@ -64,8 +65,11 @@ class TransitionsViews extends ViewHandler<ITransitionsState> {
       { title: $t('Fade to Color'), value: ETransitionType.FadeToColor },
       { title: $t('Luma Wipe'), value: ETransitionType.LumaWipe },
       { title: $t('Stinger'), value: ETransitionType.Stinger },
-      { title: $t('Motion'), value: ETransitionType.Motion },
     ];
+
+    if (getOS() === OS.Windows) types.push({ title: $t('Motion'), value: ETransitionType.Motion });
+
+    return types;
   }
 
   /**

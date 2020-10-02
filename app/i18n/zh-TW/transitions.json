@@ -24,7 +24,7 @@
   "This connection is redundant because another connection already connects these scenes.": "此連線是多餘的，因為有其他連線已經連接到這些場景。",
   "You need at least 2 scenes to edit transitions.": "您至少需要有 2 個場景才能編輯轉場效果。",
   "This scene transition is managed by an App and cannot be edited.": "此場景轉場效果是由應用程式管理，無法編輯。",
-  "Global Transition": "Global Transition",
-  "Edit": "Edit",
-  "Live": "Live"
+  "Global Transition": "全域轉場效果",
+  "Edit": "編輯",
+  "Live": "直播"
 }

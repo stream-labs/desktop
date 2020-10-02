@@ -345,8 +345,7 @@ test('User has linked twitter', async t => {
   await prepareToGoLive(t);
   await clickGoLive(t);
 
-  // check the "Unlink" button
-  await t.context.app.client.waitForVisible('button=Unlink Twitter');
+  await t.context.app.client.waitForVisible('button=Unlink Twitter', 10000);
   t.true(
     await t.context.app.client.isExisting('button=Unlink Twitter'),
     'The button for unlinking Twitter should exist',
