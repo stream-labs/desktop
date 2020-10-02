@@ -241,7 +241,6 @@ test('Migrate the twitch account to the protected mode', async t => {
   );
 });
 
-// test scheduling for each platform
 test('Schedule stream to facebook', async t => {
   // login into the account:
   await logIn(t, 'facebook', { multistream: false });
