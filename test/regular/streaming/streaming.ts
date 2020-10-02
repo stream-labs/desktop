@@ -280,7 +280,6 @@ test('Schedule stream to facebook', async t => {
   });
 
   await app.client.click('button=Done');
-
   await app.client.waitForVisible('.toast-success', 30000);
   t.pass();
 });
