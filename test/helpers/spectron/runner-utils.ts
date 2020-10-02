@@ -99,8 +99,7 @@ function isTestEligibleToRun(testName: string) {
     if (name === testName) testAvgStartTime = testAvgTotalTime;
   });
   const timePerChunk = testAvgTotalTime / totalChunks;
-  const testChunkNum = Math.round(testAvgStartTime / timePerChunk) + 1;
-
+  const testChunkNum = Math.floor(testAvgStartTime / timePerChunk) + 1;
   return testChunkNum === currentChunkNum;
 }
 

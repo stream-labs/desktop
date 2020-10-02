@@ -12,8 +12,7 @@ testGoal('Follower Goal');
 testGoal('Bit Goal');
 
 function testGoal(goalType: string) {
-  // TODO: fix API
-  test.skip(`${goalType} create and delete`, async t => {
+  test(`${goalType} create and delete`, async t => {
     const client = t.context.app.client;
     if (!(await logIn(t))) return;
     await addSource(t, goalType, goalType, false);
@@ -36,11 +35,10 @@ function testGoal(goalType: string) {
     await client.waitForVisible('button=End Goal');
     t.true(await client.isExisting('span=My Goal'));
     await client.click('button=End Goal');
-    await client.waitForVisible('button=Start Goal');
+    await client.waitForVisible('button=Start Goal', 20000);
   });
 
-  // TODO: fix API
-  test.skip(`${goalType} change settings`, async t => {
+  test(`${goalType} change settings`, async t => {
     const client = t.context.app.client;
     if (!(await logIn(t))) return;
 
