@@ -266,12 +266,12 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   toggleOverlay() {
+    if (!this.state.isEnabled) return;
+
     this.initializeOverlay();
 
     // This is a typo in the module: "runing"
-    if (this.overlay.getStatus() !== 'runing' || !this.state.isEnabled) {
-      return;
-    }
+    if (this.overlay.getStatus() !== 'runing') return;
 
     if (this.state.previewMode) this.setPreviewMode(false);
 
