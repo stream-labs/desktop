@@ -71,6 +71,7 @@ test('Streaming to Twitch', async t => {
 
 test('Streaming to Facebook', async t => {
   await logIn(t, 'facebook');
+  await sleep(2000); // there are some issues with setting the game field without delay here
   await goLive(t, {
     title: 'SLOBS Test Stream',
     game: selectTitle('Fortnite'),
@@ -273,6 +274,7 @@ test('Schedule stream to facebook', async t => {
   // facebook requires a game
   await app.client.waitForVisible('.toasted.error', 2000);
 
+  await sleep(2000); // there are some issues with setting the game field without delay here
   await formMonkey.fill({
     game: selectTitle('Fortnite'),
   });
