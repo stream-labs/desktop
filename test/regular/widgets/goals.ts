@@ -35,7 +35,7 @@ function testGoal(goalType: string) {
     await client.waitForVisible('button=End Goal');
     t.true(await client.isExisting('span=My Goal'));
     await client.click('button=End Goal');
-    await client.waitForVisible('button=Start Goal');
+    await client.waitForVisible('button=Start Goal', 20000);
   });
 
   test(`${goalType} change settings`, async t => {
