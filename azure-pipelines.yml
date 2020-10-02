@@ -12,9 +12,9 @@ jobs:
 
     workspace:
       clean: resources
-
-    strategy:
-      parallel: 4
+#
+#    strategy:
+#      parallel: 4
 
     steps:
       - powershell: echo "IP for RDP connections:" $(Invoke-RestMethod ipinfo.io/ip)
