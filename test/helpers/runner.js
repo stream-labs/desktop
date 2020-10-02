@@ -19,7 +19,7 @@ const { BUILD_BUILDID, SYSTEM_JOBID, BUILD_REASON, BUILD_SOURCEBRANCH } = proces
 (async function main() {
   try {
     rimraf.sync(failedTestsFile);
-    await createTestTimingsFile();
+    // await createTestTimingsFile();
     execSync(`yarn test --timeout=${TIMEOUT}m ` + args.join(' '), { stdio: [0, 1, 2] });
   } catch (e) {
     console.log(e);
@@ -39,7 +39,7 @@ function retryTests() {
   const retryingArgs = failedTests.map(testName => `--match="${testName}"`);
   let retryingFailed = false;
   try {
-    execSync(`yarn test --timeout=${TIMEOUT}m ` + args.concat(retryingArgs).join(' '), {
+    execSync(`yarn test:file test-dist/test/regular/widgets/goals.js --timeout=${TIMEOUT}m ` + args.concat(retryingArgs).join(' '), {
       stdio: [0, 1, 2],
     });
     log('retrying succeed');
