@@ -36,7 +36,7 @@ export { DismissablesService } from 'services/dismissables';
 export { SceneCollectionsServerApiService } from 'services/scene-collections/server-api';
 export { SceneCollectionsService } from 'services/scene-collections';
 export { TroubleshooterService } from 'services/troubleshooter';
-export { Selection, SelectionService } from 'services/selection';
+export { GlobalSelection, Selection, SelectionService } from 'services/selection';
 export { OverlaysPersistenceService } from 'services/scene-collections/overlays';
 export { SceneCollectionsStateService } from 'services/scene-collections/state';
 export { FileManagerService } from 'services/file-manager';

@@ -69,11 +69,7 @@ export class FormMonkey {
 
   async getInput(name: string): Promise<IUIInput> {
     const selector = `${this.formSelector} [data-name="${name}"]`;
-    try {
-      this.client.waitForVisible(selector);
-    } catch (e) {
-      throw new Error(`Input is not visible: ${selector}`);
-    }
+    await this.client.waitForVisible(selector);
     const $el = await this.client.$(selector);
     const id = ($el as any).value.ELEMENT;
     const type = await this.getAttribute(selector, 'data-type');
@@ -501,6 +497,7 @@ export function selectTitle(optionTitle: string | RegExp): FNValueSetter {
 
       // wait the options list loading
       await form.client.waitForExist(`${input.selector} .multiselect__element`);
+      await form.waitForLoading(input.name);
 
       // click to the option
       await click(form.t, `${input.selector} .multiselect__element [data-option-title="${title}"]`);

@@ -7,6 +7,7 @@ import { getClient } from './api-client';
 export async function waitForWidgetSettingsSync(t: TExecutionContext) {
   await sleep(2000);
   await t.context.app.client.waitForVisible('.saving-indicator', 15000, true);
+  await sleep(2000);
 }
 
 export enum EWidgetType {
