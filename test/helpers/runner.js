@@ -20,7 +20,7 @@ const { BUILD_BUILDID, SYSTEM_JOBID, BUILD_REASON, BUILD_SOURCEBRANCH } = proces
   try {
     rimraf.sync(failedTestsFile);
     // await createTestTimingsFile();
-    execSync(`yarn test :file test-dist/test/regular/widgets/goals.js  --timeout=${TIMEOUT}m ` + args.join(' '), { stdio: [0, 1, 2] });
+    execSync(`yarn test:file test-dist/test/regular/widgets/goals.js  --timeout=${TIMEOUT}m ` + args.join(' '), { stdio: [0, 1, 2] });
   } catch (e) {
     console.log(e);
     retryTests();

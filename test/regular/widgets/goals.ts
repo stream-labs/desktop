@@ -41,6 +41,7 @@ function testGoal(goalType: string, ind: number) {
 
     console.log('wait for visible 2 button=Start Goal');
     await client.waitForVisible('button=Start Goal', 20000);
+    console.log('finish');
   });
 
   // test(`${goalType} change settings`, async t => {
