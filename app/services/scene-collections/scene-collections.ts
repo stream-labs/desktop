@@ -497,9 +497,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         throw new Error('Scene collection was loaded but there were no scenes.');
       }
 
-      // fix issues if exist
-      this.scenesService.repair();
-
       // Everything was successful, write a backup
       this.stateService.writeDataToCollectionFile(id, data, true);
       this.collectionLoaded = true;
