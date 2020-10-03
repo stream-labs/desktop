@@ -7,7 +7,7 @@ import { sleep } from '../../helpers/sleep';
 
 useSpectron({ pauseIfFailed: true });
 
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 50; i++) {
   testGoal('Donation Goal', i);
   testGoal('Follower Goal', i);
   testGoal('Bit Goal', i);
