@@ -5,7 +5,7 @@ import { FormMonkey } from '../../helpers/form-monkey';
 import { waitForWidgetSettingsSync } from '../../helpers/widget-helpers';
 import { sleep } from '../../helpers/sleep';
 
-useSpectron({ pauseIfFailed: true });
+useSpectron({ pauseIfFailed: false });
 
 for (let i = 0; i < 50; i++) {
   testGoal('Donation Goal', i);
@@ -14,8 +14,8 @@ for (let i = 0; i < 50; i++) {
 }
 
 async function toggleGoal(t: TExecutionContext, enabled: boolean) {
-  const currentButtonSelector = enabled ? 'button=End Goal' : 'button=Start Goal';
-  const waitingButtonSelector = enabled ? 'button=Start Goal' : 'button=End Goal';
+  const currentButtonSelector = enabled ? 'button=Start Goal' : 'button=End Goal';
+  const waitingButtonSelector = enabled ? 'button=End Goal' : 'button=Start Goal';
   await t.context.app.client.click(currentButtonSelector);
   await sleep(1000);
   try {
@@ -25,7 +25,7 @@ async function toggleGoal(t: TExecutionContext, enabled: boolean) {
     console.error(`The goal widget has not switched the state to ${enabled}, retrying`);
     await t.context.app.client.click(currentButtonSelector);
     await sleep(1000);
-    t.context.app.client.waitForVisible(waitingButtonSelector);
+    await t.context.app.client.waitForVisible(waitingButtonSelector);
   }
 }
 
