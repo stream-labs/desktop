@@ -17,6 +17,7 @@
   "Rather do this manually?": "想要手動執行此動作？",
   "Setup later": "稍後設定",
   "Widget Theme installed & activated. Click here to manage your Widget Profiles.": "小程式主題已安裝並啟用。按一下這裡可管理您的小程式設定檔。",
+  "Alertbox Theme installed & activated. Click here to manage your Widget Profiles.": "Alertbox Theme installed & activated. Click here to manage your Widget Profiles.",
   "Follow": "關注",
   "Subscription": "訂閱",
   "Donation": "捐贈",
@@ -180,5 +181,6 @@
   "Slide Out Down": "向下滑出",
   "Slide Out Left": "向左滑出",
   "Slide Out Right": "向右滑出",
-  "Slide Out Up": "向上滑出"
+  "Slide Out Up": "向上滑出",
+  "Pick Screen Color": "Pick Screen Color"
 }
