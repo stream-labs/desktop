@@ -13,6 +13,22 @@ for (let i = 0; i < 50; i++) {
   testGoal('Bit Goal', i);
 }
 
+async function toggleGoal(t: TExecutionContext, enabled: boolean) {
+  const currentButtonSelector = enabled ? 'button=End Goal' : 'button=Start Goal';
+  const waitingButtonSelector = enabled ? 'button=Start Goal' : 'button=End Goal';
+  await t.context.app.client.click(currentButtonSelector);
+  await sleep(1000);
+  try {
+    t.context.app.client.waitForVisible(waitingButtonSelector);
+    return;
+  } catch (e) {
+    console.error(`The goal widget has not switched the state to ${enabled}, retrying`);
+    await t.context.app.client.click(currentButtonSelector);
+    await sleep(1000);
+    t.context.app.client.waitForVisible(waitingButtonSelector);
+  }
+}
+
 function testGoal(goalType: string, ind: number) {
   test(`${goalType} create and delete ${ind}`, async t => {
     const client = t.context.app.client;
@@ -21,13 +37,12 @@ function testGoal(goalType: string, ind: number) {
 
     // end goal if it's already exist
     if (await client.isVisible('button=End Goal')) {
-      await client.click('button=End Goal');
-      await waitForWidgetSettingsSync(t);
+      await toggleGoal(t, false);
     }
 
-    console.log('wait for visible 1 button=Start Goal');
-    await waitForWidgetSettingsSync(t);
-    await client.waitForVisible('button=Start Goal', 20000);
+    // console.log('wait for visible 1 button=Start Goal');
+    // await waitForWidgetSettingsSync(t);
+    // await client.waitForVisible('button=Start Goal', 20000);
 
     const formMonkey = new FormMonkey(t, 'form[name=new-goal-form]');
     await formMonkey.fill({
@@ -36,15 +51,19 @@ function testGoal(goalType: string, ind: number) {
       manual_goal_amount: 0,
       ends_at: '12/12/2030',
     });
-    await client.click('button=Start Goal');
-    await waitForWidgetSettingsSync(t);
-    await client.waitForVisible('button=End Goal');
-    t.true(await client.isExisting('span=My Goal'));
-    await client.click('button=End Goal');
 
-    console.log('wait for visible 2 button=Start Goal');
-    await waitForWidgetSettingsSync(t);
-    await client.waitForVisible('button=Start Goal', 20000);
+    await toggleGoal(t, true);
+    // await client.click('button=Start Goal');
+    // await waitForWidgetSettingsSync(t);
+    // await client.waitForVisible('button=End Goal');
+
+    t.true(await client.isExisting('span=My Goal'));
+    await toggleGoal(t, false);
+    // await client.click('button=End Goal');
+    //
+    // console.log('wait for visible 2 button=Start Goal');
+    // await waitForWidgetSettingsSync(t);
+    // await client.waitForVisible('button=Start Goal', 20000);
     console.log('finish');
   });
 
