@@ -166,7 +166,7 @@ export class Scene {
 
     // Default is to select
     if (options.select == null) options.select = true;
-    if (options.select) this.selectionService.select(sceneItemId);
+    if (options.select) this.selectionService.views.globalSelection.select(sceneItemId);
 
     if (options.initialTransform) {
       sceneItem.setTransform(options.initialTransform);

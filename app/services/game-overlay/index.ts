@@ -1,6 +1,5 @@
 import electron, { ipcRenderer } from 'electron';
-import { Subject, Subscription } from 'rxjs';
-import { delay, take } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import { Inject, InitAfter } from 'services/core';
 import { LoginLifecycle, UserService } from 'services/user';
 import { CustomizationService } from 'services/customization';
@@ -74,8 +73,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     recentEvents: Electron.BrowserWindow;
   } = {} as any;
 
-  private onWindowsReady: Subject<Electron.BrowserWindow> = new Subject<Electron.BrowserWindow>();
-  private onWindowsReadySubscription: Subscription;
   private onChatUrlChangedSubscription: Subscription;
   private lifecycle: LoginLifecycle;
 
@@ -92,19 +89,15 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     if (getOS() !== OS.Windows) return;
 
     super.init();
-    this.overlay = electron.remote.require('game-overlay');
 
-    this.lifecycle = await this.userService.withLifecycle({
-      init: this.initializeOverlay,
-      destroy: () => this.setEnabled(false),
-      context: this,
-    });
+    this.userService.userLogout.subscribe(() => this.setEnabled(false));
   }
 
   private overlayRunning = false;
 
-  async initializeOverlay() {
+  initializeOverlay() {
     if (!this.state.isEnabled) return;
+    this.overlay = electron.remote.require('game-overlay');
 
     if (this.overlayRunning) return;
     this.overlayRunning = true;
@@ -116,13 +109,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     }
 
     this.overlay.start(crashHandlerLogPath);
-
-    this.onWindowsReadySubscription = this.onWindowsReady
-      .pipe(
-        take(Object.keys(this.windows).length),
-        delay(5000), // so recent events has time to load
-      )
-      .subscribe({ complete: () => this.createWindowOverlays() });
 
     this.assignCommonWindowOptions();
     const partition = this.userService.state.auth.partition;
@@ -144,7 +130,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     this.windows.chat.webContents.setAudioMuted(true);
 
     this.createPreviewWindows();
-    await this.configureWindows();
+    this.configureWindows();
   }
 
   assignCommonWindowOptions() {
@@ -188,16 +174,17 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     });
   }
 
-  async configureWindows() {
+  configureWindows() {
     Object.keys(this.windows).forEach((key: string) => {
       const win = this.windows[key];
-      win.webContents.once('did-finish-load', () => this.onWindowsReady.next(win));
 
       const position = this.determineStartPosition(key);
       const size = key === 'chat' ? { width: 300, height: 600 } : { width: 600, height: 300 };
       win.setBounds({ ...position, ...size });
       this.previewWindows[key].setBounds({ ...position, ...size });
     });
+
+    this.createWindowOverlays();
 
     const chatUrl = this.streamingService.views.chatUrl;
     if (chatUrl) {
@@ -279,10 +266,12 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   toggleOverlay() {
+    if (!this.state.isEnabled) return;
+
+    this.initializeOverlay();
+
     // This is a typo in the module: "runing"
-    if (this.overlay.getStatus() !== 'runing' || !this.state.isEnabled) {
-      return;
-    }
+    if (this.overlay.getStatus() !== 'runing') return;
 
     if (this.state.previewMode) this.setPreviewMode(false);
 
@@ -300,11 +289,9 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
       return Promise.reject($t('Please log in to use the in-game overlay.'));
     }
 
-    const shouldStart = shouldEnable && !this.state.isEnabled;
     const shouldStop = !shouldEnable && this.state.isEnabled;
 
     this.SET_ENABLED(shouldEnable);
-    if (shouldStart) await this.initializeOverlay();
     if (shouldStop) await this.destroyOverlay();
   }
 
@@ -323,6 +310,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   async setPreviewMode(previewMode: boolean) {
+    if (previewMode) this.initializeOverlay();
     if (this.state.isShowing) this.hideOverlay();
     if (!this.state.isEnabled) return;
     this.SET_PREVIEW_MODE(previewMode);
@@ -363,7 +351,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     this.overlayRunning = false;
 
     await this.overlay.stop();
-    if (this.onWindowsReadySubscription) await this.onWindowsReadySubscription.unsubscribe();
     if (this.windows) await Object.values(this.windows).forEach(win => win.destroy());
     if (this.previewWindows) {
       await Object.values(this.previewWindows).forEach(win => win.destroy());

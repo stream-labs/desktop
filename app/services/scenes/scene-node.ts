@@ -146,19 +146,19 @@ export abstract class SceneItemNode implements ISceneItemNode {
   }
 
   isSelected() {
-    return this.selectionService.isSelected(this.id);
+    return this.selectionService.views.globalSelection.isSelected(this.id);
   }
 
   select() {
-    this.selectionService.select(this.id);
+    this.selectionService.views.globalSelection.select(this.id);
   }
 
   addToSelection() {
-    this.selectionService.add(this.id);
+    this.selectionService.views.globalSelection.add(this.id);
   }
 
   deselect() {
-    this.selectionService.deselect(this.id);
+    this.selectionService.views.globalSelection.deselect(this.id);
   }
 
   isFolder(): this is SceneItemFolder {

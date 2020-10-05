@@ -4,7 +4,7 @@ import { ScenesService } from 'services/api/external-api/scenes/scenes';
 import { SourcesService } from 'services/api/external-api/sources/sources';
 import { sleep } from '../../helpers/sleep';
 
-useSpectron({ restartAppAfterEachTest: false, pauseIfFailed: true });
+useSpectron({ restartAppAfterEachTest: false });
 
 test('Creating, fetching and removing sources', async t => {
   const client = await getClient();
