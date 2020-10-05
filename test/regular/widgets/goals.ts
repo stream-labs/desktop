@@ -22,9 +22,11 @@ function testGoal(goalType: string, ind: number) {
     // end goal if it's already exist
     if (await client.isVisible('button=End Goal')) {
       await client.click('button=End Goal');
+      await waitForWidgetSettingsSync(t);
     }
 
     console.log('wait for visible 1 button=Start Goal');
+    await waitForWidgetSettingsSync(t);
     await client.waitForVisible('button=Start Goal', 20000);
 
     const formMonkey = new FormMonkey(t, 'form[name=new-goal-form]');
@@ -35,11 +37,13 @@ function testGoal(goalType: string, ind: number) {
       ends_at: '12/12/2030',
     });
     await client.click('button=Start Goal');
+    await waitForWidgetSettingsSync(t);
     await client.waitForVisible('button=End Goal');
     t.true(await client.isExisting('span=My Goal'));
     await client.click('button=End Goal');
 
     console.log('wait for visible 2 button=Start Goal');
+    await waitForWidgetSettingsSync(t);
     await client.waitForVisible('button=Start Goal', 20000);
     console.log('finish');
   });
