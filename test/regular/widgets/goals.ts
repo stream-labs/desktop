@@ -11,7 +11,6 @@ for (let i = 0; i < 50; i++) {
   testGoal('Donation Goal', i);
   testGoal('Follower Goal', i);
   testGoal('Bit Goal', i);
-
 }
 
 function testGoal(goalType: string, ind: number) {
