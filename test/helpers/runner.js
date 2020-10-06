@@ -33,6 +33,7 @@ const RUN_TESTS_CMD = `yarn test --timeout=${TIMEOUT}m `;
     await createTestTimingsFile();
     execSync(RUN_TESTS_CMD + args.join(' '), { stdio: [0, 1, 2] });
   } catch (e) {
+    console.log(e);
     failedTests = getFailedTests();
     retryTests(failedTests);
   }
