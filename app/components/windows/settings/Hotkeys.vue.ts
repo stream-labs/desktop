@@ -100,14 +100,6 @@ export default class Hotkeys extends Vue {
     return this.augmentedHotkeySet;
   }
 
-  hasHotkeys(hotkeyDict: Dictionary<IAugmentedHotkey[]>) {
-    for (const key in hotkeyDict) {
-      if (hotkeyDict[key].length) return true;
-    }
-
-    return false;
-  }
-
   private filterHotkeys(hotkeys: IHotkey[]): IHotkey[] {
     return new Fuse(hotkeys, {
       keys: ['description', 'categoryName'],
