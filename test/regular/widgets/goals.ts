@@ -19,13 +19,18 @@ async function toggleGoal(t: TExecutionContext, enabled: boolean) {
   await t.context.app.client.click(currentButtonSelector);
   await sleep(1000);
   try {
-    t.context.app.client.waitForVisible(waitingButtonSelector);
+    t.context.app.client.waitForVisible(waitingButtonSelector, 10000);
     return;
   } catch (e) {
     console.error(`The goal widget has not switched the state to ${enabled}, retrying`);
     await t.context.app.client.click(currentButtonSelector);
     await sleep(1000);
-    await t.context.app.client.waitForVisible(waitingButtonSelector);
+    try {
+      await t.context.app.client.waitForVisible(waitingButtonSelector, 10000);
+    } catch (e) {
+      console.error(`The goal widget has not switched the state to ${enabled}, after 2 attempts`);
+      throw e;
+    }
   }
 }
 
