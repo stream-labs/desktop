@@ -5,14 +5,14 @@
   "Add videos or sound clips to your scene.": "Add videos or sound clips to your scene.",
   "Capture a specific window that's open on your computer.": "Capture a specific window that's open on your computer.",
   "Compatible with most modern browsers and programs": "Compatible with most modern browsers and programs",
-  "Select from your build in USB webcam or an external.": "Select from your build in USB webcam or an external.",
+  "Display video from webcams, capture cards, and other devices.": "Display video from webcams, capture cards, and other devices.",
   "Built in webcam": "Built in webcam",
   "Logitech webcam": "Logitech webcam",
   "Capture cards (Elgato, Avermedia, BlackMagic)": "Capture cards (Elgato, Avermedia, BlackMagic)",
   "Captures your desktop audio for the purpose of playing sound, such as music or speech.": "Captures your desktop audio for the purpose of playing sound, such as music or speech.",
   "Desktop audio": "Desktop audio",
   "Add a color to the background of your whole scene or just a part.": "Add a color to the background of your whole scene or just a part.",
-  "Allows you to add web-based content as a source, such as web pages and Flash SWFs.": "Allows you to add web-based content as a source, such as web pages and Flash SWFs.",
+  "Allows you to add web-based content as a source, such as web pages, widgets, and streaming video.": "Allows you to add web-based content as a source, such as web pages, widgets, and streaming video.",
   "Websites": "Websites",
   "Third party widget": "Third party widget",
   "Add text to your scene and adjust its style.": "Add text to your scene and adjust its style.",
@@ -179,5 +179,7 @@
   "Remove source": "Remove source",
   "Toggle Selective Recording": "Toggle Selective Recording",
   "Size": "Grootte",
-  "Position": "Position"
+  "Position": "Position",
+  "JACK Input Client": "JACK Input Client",
+  "Motion": "Motion"
 }

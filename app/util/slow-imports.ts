@@ -20,3 +20,8 @@ export function importSocketIOClient() {
 export function importBeaker() {
   return import('streamlabs-beaker');
 }
+
+// Not slow but we import it in the component layer
+export function loadColorPicker() {
+  return import('color-picker');
+}

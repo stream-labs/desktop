@@ -26,8 +26,7 @@ test('Set stream-boss health', async t => {
   t.pass();
 });
 
-// TODO: fix api
-test.skip('Stream Boss Manage Battle settings', async t => {
+test('Stream Boss Manage Battle settings', async t => {
   const client = t.context.app.client;
   if (!(await logIn(t))) return;
   await addSource(t, 'Stream Boss', '__Stream Boss', false);
@@ -40,10 +39,6 @@ test.skip('Stream Boss Manage Battle settings', async t => {
     boss_heal: false,
     fade_time: 5,
     skin: 'noimg',
-    follow_multiplier: 1,
-    bit_multiplier: 2,
-    sub_multiplier: 3,
-    donation_multiplier: 4,
   };
   await formMonkey.fill(testSet1);
   await waitForWidgetSettingsSync(t);
@@ -53,10 +48,6 @@ test.skip('Stream Boss Manage Battle settings', async t => {
     boss_heal: true,
     fade_time: 10,
     skin: 'default',
-    follow_multiplier: 5,
-    bit_multiplier: 1,
-    sub_multiplier: 300,
-    donation_multiplier: 200,
   };
   await formMonkey.fill(testSet2);
   await waitForWidgetSettingsSync(t);

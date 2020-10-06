@@ -69,11 +69,7 @@ export class FormMonkey {
 
   async getInput(name: string): Promise<IUIInput> {
     const selector = `${this.formSelector} [data-name="${name}"]`;
-    try {
-      this.client.waitForVisible(selector);
-    } catch (e) {
-      throw new Error(`Input is not visible: ${selector}`);
-    }
+    await this.client.waitForVisible(selector);
     const $el = await this.client.$(selector);
     const id = ($el as any).value.ELEMENT;
     const type = await this.getAttribute(selector, 'data-type');
@@ -261,18 +257,18 @@ export class FormMonkey {
   }
 
   async setColorValue(selector: string, value: string) {
-    await this.client.click(`${selector} .colorpicker__input`); // open colorpicker
+    await this.client.click(`${selector} [name="colorpicker-input"]`); // open colorpicker
     // tslint:disable-next-line:no-parameter-reassignment TODO
     value = value.substr(1); // get rid of # character in value
     const inputSelector = `${selector} .vc-input__input`;
     await sleep(100); // give colorpicker some time to be opened
     await this.setInputValue(inputSelector, value);
-    await this.client.click(`${selector} .colorpicker__input`); // close colorpicker
+    await this.client.click(`${selector} [name="colorpicker-input"]`); // close colorpicker
     await sleep(100); // give colorpicker some time to be closed
   }
 
   async getColorValue(selector: string) {
-    return await this.client.getValue(`${selector} .colorpicker__input`);
+    return await this.client.getValue(`${selector} [name="colorpicker-input"]`);
   }
 
   async getListValue(selector: string): Promise<string> {
@@ -501,6 +497,7 @@ export function selectTitle(optionTitle: string | RegExp): FNValueSetter {
 
       // wait the options list loading
       await form.client.waitForExist(`${input.selector} .multiselect__element`);
+      await form.waitForLoading(input.name);
 
       // click to the option
       await click(form.t, `${input.selector} .multiselect__element [data-option-title="${title}"]`);
