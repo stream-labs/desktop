@@ -209,3 +209,27 @@ export interface Filters {
   };
   data: FilterRecord[];
 }
+
+export type OnairUserProgramData = {
+  programId?: string;
+  nextProgramId?: string;
+}
+
+export type OnairChannelProgramData = {
+  testProgramId?: string;
+  programId?: string;
+  nextProgramId?: string;
+}
+
+export type OnairChannelsData = {
+  id: string;
+  name: string;
+  ownerName: string;
+  thumbnailUrl: string;
+  smallThumbnailUrl: string;
+}[];
+
+export type BroadcastStreamData = {
+  url: string;
+  name: string;
+}

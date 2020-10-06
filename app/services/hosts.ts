@@ -18,9 +18,6 @@ export class HostsService extends Service {
   get niconicolive() {
     return 'http://live.nicovideo.jp';
   }
-  get niconicoRelive() {
-    return 'http://live2.nicovideo.jp';
-  }
   get nAirLogin() {
     if (process.env.NAIR_LOGIN_URL) {
       return process.env.NAIR_LOGIN_URL;

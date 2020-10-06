@@ -368,7 +368,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }, 'RecentEvents');
   }
 
-  async updateStreamSettings(programId: string = ''): Promise<IStreamingSetting> {
+  async updateStreamSettings(programId: string): Promise<IStreamingSetting> {
     return await getPlatformService(this.platform.type).setupStreamSettings(programId);
   }
 

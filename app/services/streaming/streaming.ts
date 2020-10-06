@@ -18,6 +18,7 @@ import { CustomizationService } from 'services/customization';
 import { UserService } from 'services/user';
 import { IStreamingSetting } from '../platforms';
 import { OptimizedSettings } from 'services/settings/optimizer';
+import { NicoliveClient, isOk } from 'services/nicolive-program/NicoliveClient';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -51,6 +52,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
+
+  client: NicoliveClient = new NicoliveClient();
 
   // Dummy subscription for stream deck
   streamingStateChange = new Subject<void>();
@@ -101,6 +104,22 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.toggleStreaming();
   }
 
+  private async showNotBroadcastingMessageBox() {
+    return new Promise(resolve => {
+      electron.remote.dialog.showMessageBox(
+        electron.remote.getCurrentWindow(),
+        {
+          title: $t('streaming.notBroadcasting'),
+          type: 'warning',
+          message: $t('streaming.notBroadcastingMessage'),
+          buttons: [$t('common.close')],
+          noLink: true,
+        },
+        done => resolve(done)
+      );
+    });
+  }
+
   // 配信開始ボタンまたはショートカットキーによる配信開始(対話可能)
   async toggleStreamingAsync(
     options: {
@@ -122,25 +141,31 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     if (this.userService.isNiconicoLoggedIn()) {
       try {
         this.SET_PROGRAM_FETCHING(true);
-        const setting = await this.userService.updateStreamSettings(opts.programId);
+        const broadcastableUserProgram = await this.client.fetchOnairUserProgram();
+        if (opts.programId === '') {
+          const broadcastableChannels = await this.client.fetchOnairChannnels();
+          if (broadcastableChannels.length > 0) {
+            this.windowsService.showWindow({
+              componentName: 'NicoliveProgramSelector',
+              size: {
+                width: 800,
+                height: 800
+              }
+            });
+            return;
+          }
+          if (!broadcastableUserProgram.programId) {
+            return this.showNotBroadcastingMessageBox();
+          }
+        }
+        const programId = opts.programId !== '' ? opts.programId : broadcastableUserProgram.programId;
+        const setting = await this.userService.updateStreamSettings(programId);
         if (setting.asking) {
           return;
         }
         const streamkey = setting.key;
         if (streamkey === '') {
-          return new Promise(resolve => {
-            electron.remote.dialog.showMessageBox(
-              electron.remote.getCurrentWindow(),
-              {
-                title: $t('streaming.notBroadcasting'),
-                type: 'warning',
-                message: $t('streaming.notBroadcastingMessage'),
-                buttons: [$t('common.close')],
-                noLink: true,
-              },
-              done => resolve(done)
-            );
-          });
+          return this.showNotBroadcastingMessageBox();
         }
         if (this.customizationService.optimizeForNiconico) {
           return this.optimizeForNiconicoAndStartStreaming(setting, opts.mustShowOptimizationDialog);

@@ -47,29 +47,6 @@ export type LiveProgramInfo = {
   channels?: SocialGroup[];
 }
 
-type OnairUserProgramData = {
-  programId: string;
-  nextProgramId: string;
-}
-
-type OnairChannelProgramData = {
-  testProgramId: string;
-  programId: string;
-  nextProgramId: string;
-}
-
-type OnairChannelsData = {
-  id: string;
-  name: string;
-  ownerName: string;
-  thumbnailUrl: string;
-  smallThumbnailUrl: string;
-}[];
-
-type BroadcastStreamData = {
-  url: string;
-  name: string;
-}
 
 export class NiconicoService extends Service implements IPlatformService {
 
@@ -164,15 +141,9 @@ export class NiconicoService extends Service implements IPlatformService {
       console.log('streamingService.streamingStatusChange! ', this.streamingStatus);
       if (this.streamingStatus === EStreamingState.Reconnecting) {
         console.log('reconnecting - checking stream key');
-        this.fetchLiveProgramInfo(this.channelId).then(info => {
-          let key = '';
-          if (this.channelId && this.channelId in info) {
-            key = info[this.channelId].key;
-          }
-          if (key === '') {
-            console.log('niconico programas has ended! stopping streaming.');
-            this.streamingService.stopStreaming();
-          }
+        this.client.fetchBroadcastStream(this.channelId).catch(() => {
+          console.log('niconico programas has ended! stopping streaming.');
+          this.streamingService.stopStreaming();
         });
       }
     });
@@ -183,7 +154,7 @@ export class NiconicoService extends Service implements IPlatformService {
    * そうでなければ、ダイアログを出して選択を促すか、配信していない旨返す。
    * @param programId ユーザーが選択した番組ID(省略は未選択)
    */
-  async setupStreamSettings(programId: string = ''): Promise<IStreamingSetting> {
+  async setupStreamSettings(programId: string): Promise<IStreamingSetting> {
     try {
       // 直接returnしてしまうとcatchできないので一度awaitで受ける
       const result = await this._setupStreamSettings(programId);
@@ -202,54 +173,11 @@ export class NiconicoService extends Service implements IPlatformService {
     }
   }
 
-  private countBroadcastableChannelProgram(channels?: SocialGroup[]) {
-    if (!channels) {
-      return 0;
-    }
-    if (channels.length === 1) {
-      return channels[0].broadcastablePrograms.length;
-    }
-
-    return channels.reduce((total, channel) => total + channel.broadcastablePrograms.length, 0);
-  }
-
-  private async _setupStreamSettings(programId: string = ''): Promise<IStreamingSetting> {
-    const info = await this.fetchLiveProgramInfo(programId);
-    console.log('fetchLiveProgramInfo: ' + JSON.stringify(info));
-
-    const broadcastableComunityProgramNumber = info.community ? info.community.broadcastablePrograms.length : 0;
-    const broadcastableChannnelProgramNumber = this.countBroadcastableChannelProgram(info.channels);
-    const broadcastableProgramNumber = broadcastableComunityProgramNumber + broadcastableChannnelProgramNumber;
-
-    // 配信可能番組がない場合
-    if (broadcastableProgramNumber === 0) {
-      // TODO: 配信可能番組がない場合について要検討
-      throw new Error('no program');
-    }
-
-    // 放送可能な番組が複数ある場合は選択ダイアログを出す
-    if (broadcastableProgramNumber > 1) {
-      // show dialog and select
-      this.windowsService.showWindow({
-        componentName: 'NicoliveProgramSelector',
-        queryParams: info,
-        size: {
-          width: 800,
-          height: 800
-        }
-      });
-      return NiconicoService.emptyStreamingSetting(true); // ダイアログでたから無視してね
-    }
-
-    // 以下、放送可能番組が1つの場合
-    const broadcastableProgramInfo = broadcastableComunityProgramNumber === 1 ? info.community : info.channels[0];
-    const socialGroupId = broadcastableProgramInfo.id;
-    const broadcastableProgramId = broadcastableProgramInfo.broadcastablePrograms[0].id;
-    const stream = await this.fetchBroadcastStream(broadcastableProgramId);
+  private async _setupStreamSettings(programId: string): Promise<IStreamingSetting> {
+    const stream = await this.client.fetchBroadcastStream(programId);
     const url = stream.url;
     const key = stream.name;
-    const bitrate = await this.fetchMaxBitrate(broadcastableProgramId);
-    this.userService.updatePlatformChannelId(socialGroupId);
+    const bitrate = await this.client.fetchMaxBitrate(programId);
 
     const settings = this.settingsService.getSettingsFormData('Stream');
     settings.forEach(subCategory => {
@@ -298,166 +226,39 @@ export class NiconicoService extends Service implements IPlatformService {
   }
 
   /**
-   * 放送可能なユーザー番組IDを取得する 
-   */
-  private fetchOnairUserProgram(): Promise<OnairUserProgramData> {
-    const url = `${this.hostsService.niconicoRelive}/unama/tool/v2/onairs/user`
-    const headers = this.getHeaders();
-    headers.append('X-niconico-session', this.userService.apiToken);
-    const request = new Request(url, { headers });
-    return fetch(request).then(handleErrors).then(response => response.json()).then(json => json.data);
-  }
 
-  /**
-   * 放送可能なチャンネル番組IDを取得する 
-   * @param channelId チャンネルID(例： ch12345)
-   */
-  private fetchOnairChannelProgram(channelId: string): Promise<OnairChannelProgramData> {
-    const url = `${this.hostsService.niconicoRelive}/unama/tool/v2/onairs/channels/${channelId}`
-    const headers = this.getHeaders();
-    headers.append('X-niconico-session', this.userService.apiToken);
-    const request = new Request(url, { headers });
-    return fetch(request).then(handleErrors).then(response => response.json().then(json => json.data));
-  }
+  async fetchBroadcastableProgramId(): Promise<string | undefined> {
+    const broadcastableUserProgramId = await this.fetchOnairUserProgram();
+    const broadcastableChannelId = await this.fetchOnairChannnels();
+    console.log('=================userprogram', broadcastableUserProgramId);
+    console.log('=================channel', broadcastableChannelId);
+    // 配信可能な番組がない場合
+    if (!broadcastableUserProgramId.programId && broadcastableChannelId.length === 0) {
+      return Promise.reject("no program");
+    }
 
-  /**
-   * 放送可能なチャンネル一覧を取得する 
-   */
-  private fetchOnairChannnels(): Promise<OnairChannelsData> {
-    const url = `${this.hostsService.niconicoRelive}/unama/tool/v2/onairs/channels`
-    const headers = this.getHeaders();
-    headers.append('X-niconico-session', this.userService.apiToken);
-    const request = new Request(url, { headers });
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
-      .then(json => { return json.data as OnairChannelsData });
-  }
+    // ユーザ番組のみ配信可能
+    if (broadcastableUserProgramId.programId && broadcastableChannelId.length === 0) {
+      console.log('=========================user only')
+      return broadcastableUserProgramId.programId;
+    }
 
-  /**
-   * 指定番組IDのストリーム情報を取得する 
-   * @param programId 番組ID(例： lv12345)
-   */
-  private fetchBroadcastStream(programId: string): Promise<BroadcastStreamData> {
-    const url = `${this.hostsService.niconicoRelive}/unama/api/v2/programs/${programId}/broadcast_stream`;
-    const headers = this.getHeaders();
-    headers.append('X-niconico-session', this.userService.apiToken);
-    const request = new Request(url, { headers });
-    return fetch(request).then(handleErrors).then(response => response.json()).then(json => json.data);
-  }
-
-  /**
-   *  放送可能な番組があるコミュニティを取得する
-   */
-  private async fetchBroadcastableCommunity(): Promise<SocialGroup | undefined> {
-    try {
-      const onairUserProgram = await this.fetchOnairUserProgram();
-      const programInformation = await this.client.fetchProgram(onairUserProgram.programId);
-      if (!isOk(programInformation)) {
-        console.log('program not found');
+    // 配信可能なユーザ番組がないが配信可能なチャンネルがある場合
+    if (!broadcastableUserProgramId.programId && broadcastableChannelId.length > 0) {
+      const broadcastableChannelProgramId = await this.fetchOnairChannelProgram(broadcastableChannelId[0].id);
+      const programIds = Object.keys(broadcastableChannelProgramId).map((key) => {
+        return broadcastableChannelProgramId[key];
+      });
+      // 配信可能なチャンネル番組が一つだけの場合
+      if (programIds.length === 1) {
+        return programIds[0];
+      } else {
         return undefined;
       }
-      return {
-        type: 'community',
-        id: programInformation.value.socialGroup.id,
-        name: programInformation.value.socialGroup.name,
-        thumbnailUrl: programInformation.value.socialGroup.thumbnailUrl,
-        broadcastablePrograms: [{ id: onairUserProgram.programId }]
-      };
-    } catch (e) {
-      return undefined;
     }
 
-  }
-
-  /**
-   *  放送可能な番組があるチャンネル一覧を取得する
-   */
-  private async fetchBroadcastableChannels(): Promise<SocialGroup[] | undefined> {
-    const onairChannelsData = await this.fetchOnairChannnels();
-    if (onairChannelsData.length === 0) {
-      return undefined;
-    }
-    const channels = await Promise.all(onairChannelsData.map(async (channel) => {
-      try {
-        const programData = await this.fetchOnairChannelProgram(channel.id);
-        return {
-          type: 'channel',
-          id: channel.id,
-          name: channel.name,
-          thumbnailUrl: channel.thumbnailUrl,
-          broadcastablePrograms: Object.keys(programData).map(key => { return { id: programData[key] } })
-        } as SocialGroup
-      } catch (e) {
-        return;
-      }
-    }));
-    const filterdChannels = channels.filter(x => x); // undefinedを除く
-    if (filterdChannels.length === 0) {
-      return undefined;
-    }
-    return filterdChannels;
-  }
-
-  private async fetchMaxBitrate(programId: string): Promise<number> {
-    const programInformation = await this.client.fetchProgram(programId);
-    if (!isOk(programInformation)) {
-      return 192;
-    }
-    switch (programInformation.value.streamSetting.maxQuality) {
-      case '6Mbps720p':
-        return 6000;
-      case '2Mbps450p':
-        return 2000;
-      case '1Mbps450p':
-        return 1000;
-      case '384kbps288p':
-        return 384;
-      case '192kbps288p':
-        return 192;
-    }
-  }
-
-  /**
-   * 指定したsocialGroupに指定したprogramIdが含まれているかどうか
-   * @param socialGroup 検索対象のソーシャルグループ
-   * @param programId 検索するprogramId
-   */
-  private hasProgram(socialGroup: SocialGroup, programId: string): boolean {
-    return socialGroup.broadcastablePrograms.filter(program => program.id === programId).length > 1;
-  }
-
-  /**
-   * 配信可能番組情報を取得する。
-   * @param programId 与えた場合、一致する番組があればその情報だけを返す。
-   *   無い場合と与えない場合、配信可能な全番組を返す。
-   */
-  async fetchLiveProgramInfo(programId: string = ''): Promise<LiveProgramInfo> {
-    const broadcastableCommunity = await this.fetchBroadcastableCommunity();
-    const broadcastableChannels = await this.fetchBroadcastableChannels();
-    if (programId !== '') {
-      if (broadcastableCommunity && this.hasProgram(broadcastableCommunity, programId)) {
-        return {
-          community: broadcastableCommunity,
-        };
-      }
-      const matchedChannel = broadcastableChannels && broadcastableChannels.reduce((_result, channel) => {
-        if (this.hasProgram(channel, programId)) {
-          return channel;
-        }
-      }, undefined);
-      if (matchedChannel) {
-        matchedChannel.broadcastablePrograms = [{ id: programId }]
-        return {
-          channels: [matchedChannel]
-        };
-      }
-    }
-
-    return {
-      community: broadcastableCommunity,
-      channels: broadcastableChannels
-    };
+    // 配信可能なユーザ番組があり、配信可能なチャンネルがある場合
+    return undefined;
   }
 
   /**
