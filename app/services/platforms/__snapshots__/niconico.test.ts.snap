@@ -25,31 +25,6 @@ Array [
 ]
 `;
 
-exports[`setupStreamSettingsで番組がひとつある場合 1`] = `
-Array [
-  "Stream",
-  Array [
-    Object {
-      "nameSubCategory": "Untitled",
-      "parameters": Array [
-        Object {
-          "name": "service",
-          "value": "niconico ニコニコ生放送",
-        },
-        Object {
-          "name": "server",
-          "value": "url1",
-        },
-        Object {
-          "name": "key",
-          "value": "key1",
-        },
-      ],
-    },
-  ],
-]
-`;
-
 exports[`setupStreamSettingsで番組取得にリトライで成功する場合 1`] = `
 Array [
   "Stream",
