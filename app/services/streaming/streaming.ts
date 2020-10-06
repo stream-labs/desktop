@@ -215,7 +215,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
    * Make a transition to Live
    */
   async goLive(newSettings?: IGoLiveSettings) {
-    console.log('new settings are', newSettings);
     // don't interact with API in loged out mode and when protected mode is disabled
     if (
       !this.userService.isLoggedIn ||
