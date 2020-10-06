@@ -8,8 +8,8 @@ import { sleep } from '../../helpers/sleep';
 useSpectron();
 
 testGoal('Donation Goal');
-testGoal('Follower Goal');
-testGoal('Bit Goal');
+// testGoal('Follower Goal');
+// testGoal('Bit Goal');
 
 function testGoal(goalType: string) {
   test(`${goalType} create and delete`, async t => {
@@ -34,7 +34,7 @@ function testGoal(goalType: string) {
     await client.click('button=Start Goal');
     await client.waitForVisible('button=End Goal');
     t.true(await client.isExisting('span=My Goal'));
-    await client.click('button=End Goal');
+    await client.click('button=End Goal1');
     await client.waitForVisible('button=Start Goal', 20000);
   });
 

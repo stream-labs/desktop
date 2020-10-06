@@ -5,7 +5,7 @@
  * - if some tests failed retry only these tests
  * - save failed tests to DB
  */
-
+const jobStartTime = Date.now();
 const { execSync } = require('child_process');
 const fs = require('fs');
 const rimraf = require('rimraf');
@@ -14,32 +14,44 @@ const fetch = require('node-fetch');
 const failedTestsFile = 'test-dist/failed-tests.json';
 const args = process.argv.slice(2);
 const TIMEOUT = 3; // timeout in minutes
-const { BUILD_BUILDID, SYSTEM_JOBID, BUILD_REASON, BUILD_SOURCEBRANCH } = process.env;
+const {
+  BUILD_BUILDID,
+  SYSTEM_JOBID,
+  BUILD_REASON,
+  BUILD_SOURCEBRANCH,
+  SYSTEM_JOBNAME,
+  SLOBS_TEST_RUN_CHUNK,
+} = process.env;
+let retryingFailed = false;
+
+const RUN_TESTS_CMD = `yarn test --timeout=${TIMEOUT}m `;
 
 (async function main() {
+  let failedTests = [];
   try {
     rimraf.sync(failedTestsFile);
     await createTestTimingsFile();
-    execSync(`yarn test --timeout=${TIMEOUT}m ` + args.join(' '), { stdio: [0, 1, 2] });
+    execSync(RUN_TESTS_CMD + args.join(' '), { stdio: [0, 1, 2] });
   } catch (e) {
-    console.log(e);
-    retryTests();
+    failedTests = getFailedTests();
+    retryTests(failedTests);
   }
+  sendJobToAnalytics(failedTests).then(() => {
+    if (retryingFailed) failAndExit();
+  });
 })();
 
-function retryTests() {
+function retryTests(failedTests) {
   log('retrying failed tests');
 
-  if (!fs.existsSync(failedTestsFile)) {
+  if (!failedTests.length) {
     console.error('no tests to retry');
     failAndExit();
   }
 
-  const failedTests = getFailedTests();
   const retryingArgs = failedTests.map(testName => `--match="${testName}"`);
-  let retryingFailed = false;
   try {
-    execSync(`yarn test --timeout=${TIMEOUT}m ` + args.concat(retryingArgs).join(' '), {
+    execSync(RUN_TESTS_CMD + args.concat(retryingArgs).join(' '), {
       stdio: [0, 1, 2],
     });
     log('retrying succeed');
@@ -47,10 +59,6 @@ function retryTests() {
     retryingFailed = true;
     log('failed to retry tests');
   }
-
-  sendFailedTestsToAnalytics(failedTests).then(() => {
-    if (retryingFailed) failAndExit();
-  });
 }
 
 function log(...args) {
@@ -62,12 +70,17 @@ function failAndExit() {
 }
 
 function getFailedTests() {
-  const failedTests = JSON.parse(fs.readFileSync(failedTestsFile, 'utf8'));
-  rimraf.sync(failedTestsFile);
+  let failedTests = [];
+  try {
+    failedTests = JSON.parse(fs.readFileSync(failedTestsFile, 'utf8'));
+    rimraf.sync(failedTestsFile);
+  } catch (e) {
+    console.error(e);
+  }
   return failedTests;
 }
 
-async function sendFailedTestsToAnalytics(failedTests) {
+async function sendJobToAnalytics(failedTests) {
   const failedAfterRetryTests = getFailedTests();
   const testsToSend = failedTests.map(testName => ({
     name: testName,
@@ -75,17 +88,20 @@ async function sendFailedTestsToAnalytics(failedTests) {
   }));
   log('Sending analytics..');
   const body = {
-    tests: testsToSend,
+    name: SYSTEM_JOBNAME,
+    duration: Date.now() - jobStartTime,
+    failedTests: testsToSend,
     buildId: BUILD_BUILDID,
     jobId: SYSTEM_JOBID,
     buildReason: BUILD_REASON,
     branch: BUILD_SOURCEBRANCH,
+    slice: SLOBS_TEST_RUN_CHUNK,
   };
   log(body);
   try {
-    await requestUtilityServer('flakyTests', 'post', body);
+    await requestUtilityServer('job', 'post', body);
   } catch (e) {
-    console.error('failed to send failed tests', e);
+    console.error('failed to send analytics', e);
   }
 }
 
