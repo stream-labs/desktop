@@ -169,7 +169,7 @@ export class NiconicoService extends Service implements IPlatformService {
       return result;
     } catch (e) {
       // リトライは1回だけ
-      return NiconicoService.emptyStreamingSetting(false);
+      return NiconicoService.emptyStreamingSetting();
     }
   }
 
@@ -199,16 +199,16 @@ export class NiconicoService extends Service implements IPlatformService {
     this.settingsService.setSettings('Stream', settings);
 
     // 有効な番組が選択されているので stream keyを返す
-    return NiconicoService.createStreamingSetting(false, url, key, bitrate);
+    return NiconicoService.createStreamingSetting(url, key, bitrate);
   }
 
-  private static emptyStreamingSetting(asking: boolean): IStreamingSetting {
-    return NiconicoService.createStreamingSetting(asking, '', '');
+  private static emptyStreamingSetting(): IStreamingSetting {
+    return NiconicoService.createStreamingSetting('', '');
   }
 
-  private static createStreamingSetting(asking: boolean, url: string, key: string, bitrate?: number)
+  private static createStreamingSetting(url: string, key: string, bitrate?: number)
     : IStreamingSetting {
-    return { asking, url, key, bitrate };
+    return { url, key, bitrate };
   }
 
   // TODO ニコニコOAuthのtoken更新に使う

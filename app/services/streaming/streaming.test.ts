@@ -14,8 +14,10 @@ jest.mock('services/i18n', () => ({
 }));
 jest.mock('services/customization', () => ({}));
 jest.mock('services/user', () => ({}));
+jest.mock('util/menus/Menu', () => ({}));
 
-function noop() {}
+function noop() { }
+const showWindow = jest.fn();
 
 const createInjectee = ({
   OBS_service_startStreaming = noop,
@@ -58,6 +60,9 @@ const createInjectee = ({
   },
   CustomizationService: {
     optimizeForNiconico,
+  },
+  WindowsService: {
+    showWindow: showWindow,
   },
 });
 
@@ -376,6 +381,9 @@ test('toggleStreamingAsyncでstreamingStatusがoffline以外の場合', async ()
   const { StreamingService } = require('./streaming');
   const { instance } = StreamingService;
 
+  instance.client.fetchOnairUserProgram = jest.fn(() => Promise.resolve('lv12345'));
+  instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve([]));
+
   instance.toggleStreaming = jest.fn();
 
   await instance.toggleStreamingAsync();
@@ -406,8 +414,8 @@ test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログ�
   setup({
     injectee: createInjectee({
       isNiconicoLoggedIn: true,
-      updateStreamSettings() {
-        return { asking: true };
+      updateStreamSettings: () => {
+        return { url: '', name: '' };
       },
     }),
     state: {
@@ -419,6 +427,16 @@ test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログ�
 
   const { StreamingService } = require('./streaming');
   const { instance } = StreamingService;
+  const channels = [{
+    id: 'id',
+    name: 'name',
+    ownerName: 'ownerName',
+    thumbnailUrl: 'thumbnailUrl',
+    smallThumbnailUrl: 'smallThumbnailUrl',
+  }];
+
+  instance.client.fetchOnairUserProgram = jest.fn(() => Promise.resolve({ programId: 'lv12345' }));
+  instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve(channels));
 
   instance.toggleStreaming = jest.fn();
 
@@ -431,7 +449,7 @@ test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログ�
   setup({
     injectee: createInjectee({
       isNiconicoLoggedIn: true,
-      updateStreamSettings() {
+      updateStreamSettings: () => {
         return { key: '' };
       },
     }),
@@ -444,6 +462,9 @@ test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログ�
 
   const { StreamingService } = require('./streaming');
   const { instance } = StreamingService;
+
+  instance.client.fetchOnairUserProgram = jest.fn(() => Promise.resolve(undefined));
+  instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve([]));
 
   instance.toggleStreaming = jest.fn();
   instance.optimizeForNiconicoAndStartStreaming = jest.fn();
@@ -464,7 +485,7 @@ test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログ�
   setup({
     injectee: createInjectee({
       isNiconicoLoggedIn: true,
-      updateStreamSettings() {
+      updateStreamSettings: () => {
         return { key: 'hoge' };
       },
       optimizeForNiconico: true,
@@ -481,6 +502,9 @@ test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログ�
   instance.optimizeForNiconicoAndStartStreaming = jest.fn();
   instance.toggleStreaming = jest.fn();
 
+  instance.client.fetchOnairUserProgram = jest.fn(() => Promise.resolve({ programId: 'lv12345' }));
+  instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve([]));
+
   await instance.toggleStreamingAsync();
 
   expect(instance.optimizeForNiconicoAndStartStreaming).toHaveBeenCalledTimes(1);
@@ -491,7 +515,7 @@ test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログ�
   setup({
     injectee: createInjectee({
       isNiconicoLoggedIn: true,
-      updateStreamSettings() {
+      updateStreamSettings: () => {
         return { key: 'hoge' };
       },
     }),
@@ -507,6 +531,9 @@ test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログ�
   instance.toggleStreaming = jest.fn();
   instance.optimizeForNiconicoAndStartStreaming = jest.fn();
 
+  instance.client.fetchOnairUserProgram = jest.fn(() => Promise.resolve({ programId: 'lv12345' }));
+  instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve([]));
+
   await instance.toggleStreamingAsync();
 
   expect(instance.optimizeForNiconicoAndStartStreaming).not.toHaveBeenCalled();
@@ -517,7 +544,7 @@ test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログ�
   setup({
     injectee: createInjectee({
       isNiconicoLoggedIn: true,
-      updateStreamSettings() {
+      updateStreamSettings: () => {
         throw new Error('NetworkError');
       },
     }),
@@ -539,6 +566,9 @@ test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログ�
   instance.toggleStreaming = jest.fn();
   instance.optimizeForNiconicoAndStartStreaming = jest.fn();
 
+  instance.client.fetchOnairUserProgram = jest.fn(() => Promise.resolve({ programId: 'lv12345' }));
+  instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve([]));
+
   await instance.toggleStreamingAsync();
 
   expect(instance.optimizeForNiconicoAndStartStreaming).not.toHaveBeenCalled();
@@ -549,7 +579,7 @@ test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログ�
   setup({
     injectee: createInjectee({
       isNiconicoLoggedIn: true,
-      updateStreamSettings() {
+      updateStreamSettings: () => {
         throw new Response('HTTPError', {
           statusText: 'Internal Server Error(stub)',
           status: 500,
@@ -573,6 +603,9 @@ test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログ�
   const { instance } = StreamingService;
   instance.toggleStreaming = jest.fn();
   instance.optimizeForNiconicoAndStartStreaming = jest.fn();
+
+  instance.client.fetchOnairUserProgram = jest.fn(() => Promise.resolve({ programId: 'lv12345' }));
+  instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve([]));
 
   await instance.toggleStreamingAsync();
 

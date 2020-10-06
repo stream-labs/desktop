@@ -143,7 +143,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         this.SET_PROGRAM_FETCHING(true);
         const broadcastableUserProgram = await this.client.fetchOnairUserProgram();
         if (opts.programId === '') {
-          const broadcastableChannels = await this.client.fetchOnairChannnels();
+          const broadcastableChannels = await this.client.fetchOnairChannels();
           if (broadcastableChannels.length > 0) {
             this.windowsService.showWindow({
               componentName: 'NicoliveProgramSelector',
@@ -160,9 +160,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         }
         const programId = opts.programId !== '' ? opts.programId : broadcastableUserProgram.programId;
         const setting = await this.userService.updateStreamSettings(programId);
-        if (setting.asking) {
-          return;
-        }
         const streamkey = setting.key;
         if (streamkey === '') {
           return this.showNotBroadcastingMessageBox();

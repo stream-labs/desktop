@@ -1,7 +1,6 @@
 import { NiconicoService } from './niconico';
 
 export type IStreamingSetting = {
-  asking: boolean,
   url: string,
   key: string,
   bitrate: number | undefined
