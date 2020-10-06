@@ -18,6 +18,9 @@ export function classify(chat: ChatMessage) {
       case 'gift':
         return 'gift' as const;
 
+      case 'emotion':
+        return 'emotion' as const;
+
       case 'info': {
         const parsed = parseContent(chat);
         // コミュニティ参加通知は非表示
