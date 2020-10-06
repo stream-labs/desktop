@@ -66,7 +66,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
       <ValidatedForm name="facebook-settings">
         <HFormGroup title={this.formMetadata.page.title}>
           <ListInput
-            vModel={this.settings.platforms.facebook.facebookPageId}
+            vModel={this.settings.platforms.facebook.destinationId}
             metadata={this.formMetadata.page}
           />
         </HFormGroup>
@@ -75,7 +75,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
           <div>
             <HFormGroup title={this.formMetadata.event.title}>
               <ListInput
-                vModel={this.settings.platforms.facebook.scheduledVideoId}
+                vModel={this.settings.platforms.facebook.liveVideoId}
                 metadata={this.formMetadata.event}
               />
             </HFormGroup>
