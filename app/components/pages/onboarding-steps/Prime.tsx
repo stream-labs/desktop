@@ -32,8 +32,7 @@ export default class Prime extends TsxComponent<OnboardingStepProps> {
       ],
       prime: [
         { text: $t('Unlimited Themes & Overlays'), icon: 'icon-themes' },
-        { text: $t('Go Live with multistream'), icon: 'icon-multistream' },
-        { text: $t('Go Live to a single platform'), icon: 'icon-desktop' },
+        { text: $t('Go Live to one or more platforms'), icon: 'icon-multistream' },
         { text: $t('Custom Tip Page'), icon: 'icon-creator-site' },
         { text: $t('Custom Alerts & Tipping'), icon: 'icon-alert-box' },
         { text: $t('App Store Apps are FREE'), icon: 'icon-store' },
