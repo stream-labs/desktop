@@ -10,15 +10,19 @@ import { $t } from 'services/i18n';
 import {
   FacebookService,
   IFacebookLiveVideo,
-  IStreamlabsFacebookPages,
+  IFacebookStartStreamOptions,
 } from 'services/platforms/facebook';
-import { IStreamSettings, StreamingService } from '../../../../services/streaming';
-import { SyncWithValue } from '../../../../services/app/app-decorators';
+import { IStreamSettings, StreamingService } from 'services/streaming';
+import { SyncWithValue } from 'services/app/app-decorators';
 import BaseEditSteamInfo from './BaseEditSteamInfo';
 import moment from 'moment';
 
 class Props {
   value?: IStreamSettings = undefined;
+  /**
+   * show the event selector?
+   */
+  showEvents?: boolean = true;
 }
 
 /**
@@ -29,8 +33,6 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
   @Inject() private facebookService: FacebookService;
   @Inject() private streamingService: StreamingService;
   @SyncWithValue() settings: IStreamSettings;
-  private pages: IStreamlabsFacebookPages | null = null;
-  private pagesLoaded = false;
 
   private scheduledVideos: IFacebookLiveVideo[] = [];
   private scheduledVideosLoaded = false;
@@ -39,40 +41,44 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
     return this.streamingService.views;
   }
 
-  async created() {
-    // LOAD PAGES
-    this.pages = await this.facebookService.fetchPages();
-    if (!this.pages.pages.length) {
-      // TODO
-      throw new Error('No pages');
-    }
-    if (!this.settings.platforms.facebook.pageId) {
-      this.settings.platforms.facebook.pageId = this.pages.pages[0].id;
-    }
-    this.pagesLoaded = true;
+  get fbSettings(): IFacebookStartStreamOptions {
+    return this.settings.platforms.facebook;
+  }
 
-    // this.scheduledVideos = await this.facebookService.fetchScheduledVideos();
-    // this.scheduledVideosLoaded = true;
+  async created() {
+    this.scheduledVideos = await this.facebookService.fetchScheduledVideos(
+      this.fbSettings.destinationId,
+    );
+    this.scheduledVideosLoaded = true;
   }
 
   private get formMetadata() {
     return formMetadata({
+      destinationType: metadata.list({
+        title: $t('Facebook Destination'),
+        fullWidth: true,
+        options: [
+          { value: 'page', title: $t('Share to a Page You Manage') },
+          { value: 'me', title: $t('Share to Your Timeline') },
+        ],
+        required: true,
+      }),
+
       page: metadata.list({
         title: $t('Facebook Page'),
         fullWidth: true,
         options:
-          this.pages?.pages.map(page => ({
+          this.facebookService.state.facebookPages.map(page => ({
             value: page.id,
             title: `${page.name} | ${page.category}`,
           })) || [],
         required: true,
-        loading: !this.pagesLoaded,
       }),
       event: metadata.list({
-        title: $t('Event'),
+        title: $t('Scheduled Video'),
         fullWidth: true,
         options: [
-          { value: null, title: $t('Create New Event') },
+          { value: null, title: $t('Not selected') },
           ...this.scheduledVideos.map(vid => ({
             value: vid.id,
             title: `${vid.title} ${moment(new Date(vid.planned_start_time)).calendar()}`,
@@ -84,15 +90,36 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
     });
   }
 
+  onSelectScheduledVideoHandler() {
+    // set title and description fields from selected video
+    const fbSettings = this.settings.platforms.facebook;
+    const selectedLiveVideo = this.scheduledVideos.find(
+      video => video.id === fbSettings.liveVideoId,
+    );
+    if (!selectedLiveVideo) return;
+    const { title, description } = selectedLiveVideo;
+    fbSettings.title = title;
+    fbSettings.description = description;
+  }
+
   render() {
     return (
       <ValidatedForm name="facebook-settings">
-        <HFormGroup title={this.formMetadata.page.title}>
+        <HFormGroup title={this.formMetadata.destinationType.title}>
           <ListInput
-            vModel={this.settings.platforms.facebook.pageId}
-            metadata={this.formMetadata.page}
+            vModel={this.settings.platforms.facebook.destinationType}
+            metadata={this.formMetadata.destinationType}
           />
         </HFormGroup>
+
+        {this.settings.platforms.facebook.destinationType === 'page' && this.props.showEvents && (
+          <HFormGroup title={this.formMetadata.page.title}>
+            <ListInput
+              vModel={this.settings.platforms.facebook.destinationId}
+              metadata={this.formMetadata.page}
+            />
+          </HFormGroup>
+        )}
 
         {!this.canShowOnlyRequiredFields && (
           <div>
@@ -100,6 +127,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
               <ListInput
                 vModel={this.settings.platforms.facebook.liveVideoId}
                 metadata={this.formMetadata.event}
+                onInput={() => this.onSelectScheduledVideoHandler()}
               />
             </HFormGroup>
             <CommonPlatformFields vModel={this.settings} platform={'facebook'} />

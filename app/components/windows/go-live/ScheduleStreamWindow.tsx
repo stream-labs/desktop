@@ -190,7 +190,7 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
                 <HFormGroup metadata={this.formMetadata.time} vModel={this.startTimeModel.time} />
               </div>
             )}
-            {shouldShowWarn && <div>{$t('Select at least one destination')}</div>}
+            {shouldShowWarn && <div>{$t('Select at least one destinationType')}</div>}
             {shouldShowLoading && <Spinner />}
           </div>
         </ValidatedForm>

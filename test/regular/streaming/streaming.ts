@@ -410,7 +410,7 @@ test('Custom stream destinations', async t => {
   // fetch a new stream key
   const user = await reserveUserFromPool(t, 'twitch');
 
-  // add new destination
+  // add new destinationType
   await showSettings(t, 'Stream');
   await click(t, 'span=Add Destination');
   await fillForm(t, null, {
@@ -419,7 +419,7 @@ test('Custom stream destinations', async t => {
     streamKey: user.streamKey,
   });
   await click(t, 'button=Save');
-  await t.true(await client.isExisting('span=MyCustomDest'), 'New destination is created');
+  await t.true(await client.isExisting('span=MyCustomDest'), 'New destinationType is created');
 
   // update destinations
   await click(t, 'i.fa-pen');
@@ -429,7 +429,7 @@ test('Custom stream destinations', async t => {
   await click(t, 'button=Save');
   await t.true(await client.isExisting('span=MyCustomDestUpdated'), 'Destination is updated');
 
-  // add one more destination
+  // add one more destinationType
   await click(t, 'span=Add Destination');
   await fillForm(t, null, {
     name: 'MyCustomDest',
@@ -446,7 +446,7 @@ test('Custom stream destinations', async t => {
   await prepareToGoLive(t);
   await clickGoLive(t);
   await t.true(await client.isExisting('span=MyCustomDest'), 'Destination is available');
-  await click(t, 'span=MyCustomDest'); // switch the destination on
+  await click(t, 'span=MyCustomDest'); // switch the destinationType on
   await tryToGoLive(t);
   await client.waitForExist('span=Configure the Multistream service'); // the multistream should be started
   await stopStream(t);

@@ -11976,7 +11976,7 @@ map:
     terms:
       - address
       - coordinates
-      - destination
+      - destinationType
       - gps
       - localize
       - location
@@ -12002,7 +12002,7 @@ map-marked:
     terms:
       - address
       - coordinates
-      - destination
+      - destinationType
       - gps
       - localize
       - location
@@ -12027,7 +12027,7 @@ map-marked-alt:
     terms:
       - address
       - coordinates
-      - destination
+      - destinationType
       - gps
       - localize
       - location
@@ -12053,7 +12053,7 @@ map-marker:
     terms:
       - address
       - coordinates
-      - destination
+      - destinationType
       - gps
       - localize
       - location
@@ -12078,7 +12078,7 @@ map-marker-alt:
     terms:
       - address
       - coordinates
-      - destination
+      - destinationType
       - gps
       - localize
       - location
@@ -12106,7 +12106,7 @@ map-pin:
       - address
       - agree
       - coordinates
-      - destination
+      - destinationType
       - gps
       - localize
       - location
@@ -14299,7 +14299,7 @@ plane:
   search:
     terms:
       - airplane
-      - destination
+      - destinationType
       - fly
       - location
       - mode
@@ -14317,7 +14317,7 @@ plane-arrival:
     terms:
       - airplane
       - arriving
-      - destination
+      - destinationType
       - fly
       - land
       - landing
@@ -14338,7 +14338,7 @@ plane-departure:
     terms:
       - airplane
       - departing
-      - destination
+      - destinationType
       - fly
       - location
       - mode
