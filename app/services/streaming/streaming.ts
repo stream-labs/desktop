@@ -200,12 +200,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
         return;
       }
-      // facebook should have pages
-      if (platform === 'facebook' && !this.facebookService.state.facebookPages?.pages?.length) {
-        this.SET_ERROR('FACEBOOK_HAS_NO_PAGES');
-        this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
-        return;
-      }
     }
     // successfully prepopulated
     this.UPDATE_STREAM_INFO({ lifecycle: 'waitForNewSettings' });
