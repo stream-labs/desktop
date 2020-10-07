@@ -223,12 +223,12 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     if (await t.context.app.client.isExisting('span=Skip')) {
       if (options.skipOnboarding) {
         await t.context.app.client.click('span=Skip');
+        if (await t.context.app.client.isVisible('div=Choose Starter')) {
+          await t.context.app.client.click('div=Choose Starter');
+        }
         await t.context.app.client.click('h2=Start Fresh');
         await t.context.app.client.click('button=Skip');
         await t.context.app.client.click('button=Skip');
-        if (await t.context.app.client.isVisible('button=Skip')) {
-          await t.context.app.client.click('button=Skip');
-        }
       } else {
         // Wait for the connect screen before moving on
         await t.context.app.client.isExisting('button=Twitch');

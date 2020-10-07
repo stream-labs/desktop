@@ -73,9 +73,9 @@ const ONBOARDING_STEPS = () => ({
   },
   [EOnboardingSteps.Prime]: {
     element: onboardingSteps.Prime,
-    disableControls: false,
-    hideSkip: false,
-    hideButton: false,
+    disableControls: true,
+    hideSkip: true,
+    hideButton: true,
     label: $t('Prime'),
   },
   [EOnboardingSteps.PrimeExpiration]: {
@@ -141,6 +141,11 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
     }
 
     steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Connect]);
+
+    if (userViews.isLoggedIn && !userViews.isPrime) {
+      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Prime]);
+    }
+
     steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ChooseYourAdventure]);
 
     if (this.state.importedFromObs) {
@@ -155,10 +160,6 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
 
     if (userViews.isTwitchAuthed) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Optimize]);
-    }
-
-    if (userViews.isLoggedIn && !userViews.isPrime) {
-      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Prime]);
     }
 
     return steps;

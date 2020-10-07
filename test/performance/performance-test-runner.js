@@ -15,8 +15,38 @@ const { execSync } = require('child_process');
 const TESTS_SERVICE_URL = CI ? 'https://slobs-users-pool.herokuapp.com' : 'http://localhost:5000';
 
 (async function main() {
-  console.log('Start performance test on', getCommitSHA(), 'build reason is ', BUILD_REASON);
+  console.log('Start performance test on', getCommitSHA());
 
+  // run tests
+  const testResults = runTests();
+
+  // get base branch timings
+  const baseBranchTestResults = await getBaseBranchResults();
+  if (baseBranchTestResults) {
+    printResults(baseBranchTestResults, testResults);
+  }
+
+  // save results to DB if needed
+  const needToSaveResults = BUILD_REASON === 'IndividualCI';
+  if (needToSaveResults) await sendResults(testResults);
+})();
+
+async function getBaseBranchResults() {
+  // on CI get results from DB instead running tests on base branch
+  // this saves a lot of time
+  if (CI) {
+    console.log('Compare testing results with last branch results from DB');
+    const baseBranchTestResults = await fetchLastResultsForBaseBranch();
+    console.log('commit', baseBranchTestResults.commit);
+    return baseBranchTestResults.tests;
+  }
+
+  // otherwise run tests locally
+  exec(`git checkout ${CONFIG.baseBranch}`);
+  return runTests(true);
+}
+
+function runTests(installNodeModules = false) {
   // prepare dirs
   const resultsPath = path.resolve(CONFIG.dist, 'performance-results.json');
   fs.removeSync(CONFIG.dist);
@@ -24,25 +54,19 @@ const TESTS_SERVICE_URL = CI ? 'https://slobs-users-pool.herokuapp.com' : 'http:
   fs.removeSync(resultsPath);
   fs.removeSync(CONFIG.compiledTestsDist);
 
-  // run tests
+  // install deps
+  if (installNodeModules) {
+    exec('yarn install');
+    exec('yarn compile');
+  }
+
   const runTestsCmd = `yarn test:file ${
     CONFIG.compiledTestsDist
   }/performance/tests/**/*.js ${args.join(' ')}`;
   exec(runTestsCmd);
-
-  // get tests results and compare with DB data
   const testResults = fs.readJsonSync(resultsPath);
-  const baseBranchTestResults = await fetchLastResultsForBaseBranch();
-  if (baseBranchTestResults) {
-    console.log('Comparing testing results with last base branch results');
-    console.log(baseBranchTestResults.commit);
-    printResults(baseBranchTestResults.tests, testResults);
-  }
-
-  // save results to DB if needed
-  const needToSaveResults = BUILD_REASON === 'IndividualCI';
-  if (needToSaveResults) await sendResults(testResults);
-})();
+  return testResults;
+}
 
 /**
  * Compare results from 2 branches and show them as a table

@@ -1,61 +1,91 @@
-import { Component } from 'vue-property-decorator';
+import cx from 'classnames';
+import electron from 'electron';
+import { Component, Watch } from 'vue-property-decorator';
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { $t } from 'services/i18n';
 import commonStyles from './Common.m.less';
 import styles from './Prime.m.less';
 import { OnboardingStepProps } from '../Onboarding';
-import Translate from 'components/shared/translate';
+import { Inject } from 'services/core/injector';
+import { MagicLinkService } from 'services/magic-link';
+import { UserService } from 'services/user';
 
 @Component({ props: createProps(OnboardingStepProps) })
 export default class Prime extends TsxComponent<OnboardingStepProps> {
-  get primeMetadata() {
-    return [
-      {
-        title: $t('Overlay, Widget & Site Themes'),
-        img: require('../../../../media/images/onboarding/prime/themes.png'),
-      },
-      {
-        title: $t('Custom Domain + Website'),
-        img: require('../../../../media/images/onboarding/prime/website.png'),
-      },
-      {
-        title: $t('More Than 40 FREE Apps'),
-        img: require('../../../../media/images/onboarding/prime/appstore.png'),
-      },
-      {
-        title: $t('Custom Merch Store'),
-        img: require('../../../../media/images/onboarding/prime/merch.png'),
-      },
-      {
-        title: $t('Stream on Mobile'),
-        img: require('../../../../media/images/onboarding/prime/mobile.png'),
-      },
-      {
-        title: $t('Gold Status + FREE T-shirt'),
-        img: require('../../../../media/images/onboarding/prime/loyalty.png'),
-      },
-    ];
+  @Inject() magicLinkService: MagicLinkService;
+  @Inject() userService: UserService;
+
+  get isPrime() {
+    return this.userService.views.isPrime;
   }
 
-  get scopedSlots() {
+  @Watch('isPrime')
+  navigate() {
+    this.props.continue();
+  }
+
+  get primeMetadata() {
     return {
-      primeTitle: (text: string) => <h1 class={styles.primeTitle}>{text}</h1>,
+      standard: [
+        { text: $t('Go Live to a single platform'), icon: 'icon-desktop' },
+        { text: $t('Alerts & Tipping'), icon: 'icon-alert-box' },
+      ],
+      prime: [
+        { text: $t('Unlimited Themes & Overlays'), icon: 'icon-themes' },
+        { text: $t('Go Live to one or more platforms'), icon: 'icon-multistream' },
+        { text: $t('Custom Tip Page'), icon: 'icon-creator-site' },
+        { text: $t('Custom Alerts & Tipping'), icon: 'icon-alert-box' },
+        { text: $t('App Store Apps are FREE'), icon: 'icon-store' },
+        { text: $t('Custom Merch Store'), icon: 'icon-upperwear' },
+      ],
     };
+  }
+
+  async linkToPrime() {
+    try {
+      const link = await this.magicLinkService.getDashboardMagicLink('prime', 'slobs-onboarding');
+      electron.remote.shell.openExternal(link);
+    } catch (e) {
+      console.error('Error generating dashboard magic link', e);
+    }
   }
 
   render() {
     return (
       <div style="width: 100%;">
-        <h1 class={commonStyles.titleContainer}>
-          <Translate message={$t('primeTitle')} scopedSlots={this.scopedSlots} />
-        </h1>
-        <div class={styles.primeCardContainer}>
-          {this.primeMetadata.map(data => (
-            <div class={styles.primeCard}>
-              <h2>{data.title}</h2>
-              <img src={data.img} />
-            </div>
-          ))}
+        <h1 class={commonStyles.titleContainer}>{$t('Choose your Streamlabs plan')}</h1>
+        <p style="text-align: center; width: 100%;">
+          {$t('Choose Prime to enjoy everything from Starter plus themes and much more.')}
+        </p>
+        <div style="display: flex; align-items: center; justify-content: center;">
+          <div class={styles.cardContainer} onClick={() => this.props.continue()}>
+            <h1>{$t('Starter')}</h1>
+            <strong>{$t('Free')}</strong>
+            {this.primeMetadata.standard.map(data => (
+              <div class={styles.primeRow}>
+                <i class={data.icon} />
+                <span>{data.text}</span>
+              </div>
+            ))}
+            <div class={styles.primeButton}>{$t('Choose Starter')}</div>
+          </div>
+          <div
+            class={cx(styles.cardContainer, styles.primeCardContainer)}
+            onClick={() => this.linkToPrime()}
+          >
+            <h1>
+              <i class="icon-prime" />
+              {$t('Prime')}
+            </h1>
+            <strong>{$t('From $12/mo, billed annually')}</strong>
+            {this.primeMetadata.prime.map(data => (
+              <div class={styles.primeRow}>
+                <i class={data.icon} />
+                <span>{data.text}</span>
+              </div>
+            ))}
+            <div class={styles.primeButton}>{$t('Choose Prime')}</div>
+          </div>
         </div>
       </div>
     );
