@@ -11,7 +11,7 @@ import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
 import { authorizedHeaders, handleResponse } from 'util/requests';
 import { UserService } from 'services/user';
-import { platformAuthorizedRequest, platformRequest } from './utils';
+import { IPlatformResponse, platformAuthorizedRequest, platformRequest } from './utils';
 import { IListOption } from 'components/shared/inputs';
 import { $t } from 'services/i18n';
 import { StreamSettingsService } from 'services/settings/streaming';
