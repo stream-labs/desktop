@@ -226,42 +226,6 @@ export class NiconicoService extends Service implements IPlatformService {
   }
 
   /**
-
-  async fetchBroadcastableProgramId(): Promise<string | undefined> {
-    const broadcastableUserProgramId = await this.fetchOnairUserProgram();
-    const broadcastableChannelId = await this.fetchOnairChannnels();
-    console.log('=================userprogram', broadcastableUserProgramId);
-    console.log('=================channel', broadcastableChannelId);
-    // 配信可能な番組がない場合
-    if (!broadcastableUserProgramId.programId && broadcastableChannelId.length === 0) {
-      return Promise.reject("no program");
-    }
-
-    // ユーザ番組のみ配信可能
-    if (broadcastableUserProgramId.programId && broadcastableChannelId.length === 0) {
-      console.log('=========================user only')
-      return broadcastableUserProgramId.programId;
-    }
-
-    // 配信可能なユーザ番組がないが配信可能なチャンネルがある場合
-    if (!broadcastableUserProgramId.programId && broadcastableChannelId.length > 0) {
-      const broadcastableChannelProgramId = await this.fetchOnairChannelProgram(broadcastableChannelId[0].id);
-      const programIds = Object.keys(broadcastableChannelProgramId).map((key) => {
-        return broadcastableChannelProgramId[key];
-      });
-      // 配信可能なチャンネル番組が一つだけの場合
-      if (programIds.length === 1) {
-        return programIds[0];
-      } else {
-        return undefined;
-      }
-    }
-
-    // 配信可能なユーザ番組があり、配信可能なチャンネルがある場合
-    return undefined;
-  }
-
-  /**
    * getplayerstatusを叩く
    * 将来的にAPIはN Air向けのものに移行する予定で、暫定的な実装
    */
