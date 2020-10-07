@@ -22,7 +22,8 @@ class Props {
   /**
    * show the event selector?
    */
-  showEvents?: boolean = true;
+  isScheduleMode?: boolean = false;
+  isUpdateMode?: boolean = false;
 }
 
 /**
@@ -105,14 +106,16 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
   render() {
     return (
       <ValidatedForm name="facebook-settings">
-        <HFormGroup title={this.formMetadata.destinationType.title}>
-          <ListInput
-            vModel={this.settings.platforms.facebook.destinationType}
-            metadata={this.formMetadata.destinationType}
-          />
-        </HFormGroup>
+        {!this.props.isUpdateMode && (
+          <HFormGroup title={this.formMetadata.destinationType.title}>
+            <ListInput
+              vModel={this.settings.platforms.facebook.destinationType}
+              metadata={this.formMetadata.destinationType}
+            />
+          </HFormGroup>
+        )}
 
-        {this.settings.platforms.facebook.destinationType === 'page' && this.props.showEvents && (
+        {this.settings.platforms.facebook.destinationType === 'page' && !this.props.isUpdateMode && (
           <HFormGroup title={this.formMetadata.page.title}>
             <ListInput
               vModel={this.settings.platforms.facebook.destinationId}
@@ -123,13 +126,16 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
 
         {!this.canShowOnlyRequiredFields && (
           <div>
-            <HFormGroup title={this.formMetadata.event.title}>
-              <ListInput
-                vModel={this.settings.platforms.facebook.liveVideoId}
-                metadata={this.formMetadata.event}
-                onInput={() => this.onSelectScheduledVideoHandler()}
-              />
-            </HFormGroup>
+            {!this.props.isUpdateMode && !this.props.isScheduleMode && (
+              <HFormGroup title={this.formMetadata.event.title}>
+                <ListInput
+                  vModel={this.settings.platforms.facebook.liveVideoId}
+                  metadata={this.formMetadata.event}
+                  onInput={() => this.onSelectScheduledVideoHandler()}
+                />
+              </HFormGroup>
+            )}
+
             <CommonPlatformFields vModel={this.settings} platform={'facebook'} />
           </div>
         )}

@@ -83,11 +83,16 @@ export default class PlatformSettings extends TsxComponent<Props> {
   private renderPlatformSettings(platform: TPlatform) {
     const isAdvancedMode = this.view.goLiveSettings.advancedMode && this.view.isMultiplatformMode;
     const title = $t('%{platform} Settings', { platform: this.getPlatformName(platform) });
+    const isLive = this.view.isMidStreamMode;
     return (
       <Section title={title} isSimpleMode={!isAdvancedMode}>
         {platform === 'twitch' && <TwitchEditStreamInfo vModel={this.settings} />}
         {platform === 'facebook' && (
-          <FacebookEditStreamInfo vModel={this.settings} showEvents={!this.props.isScheduleMode} />
+          <FacebookEditStreamInfo
+            vModel={this.settings}
+            isScheduleMode={this.props.isScheduleMode}
+            isUpdateMode={isLive}
+          />
         )}
         {platform === 'youtube' && (
           <YoutubeEditStreamInfo
