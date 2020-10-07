@@ -88,7 +88,7 @@ export class DestinationSwitchers extends TsxComponent<Props> {
             {isPrimary ? (
               <span
                 vTooltip={$t(
-                  'You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destination.',
+                  'You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destinationType.',
                 )}
               >
                 <ToggleInput value={enabled} metadata={{ disabled: true, name: platform }} />
@@ -114,7 +114,7 @@ export class DestinationSwitchers extends TsxComponent<Props> {
   }
 
   /**
-   * Renders a switcher for a custom destination
+   * Renders a switcher for a custom destinationType
    */
   private renderCustomDestination(dest: ICustomStreamDestination, ind: number) {
     const enabled = dest.enabled;

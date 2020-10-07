@@ -58,7 +58,7 @@ export default class PlatformSettings extends TsxComponent<Props> {
     return (
       <ValidatedForm class="flex" ref="settingsForm">
         <div style={{ width: '100%' }}>
-          {!hasPlatforms && $t('Enable at least one destination to start streaming')}
+          {!hasPlatforms && $t('Enable at least one destinationType to start streaming')}
 
           {isLoadingMode && this.renderLoading()}
           <GoLiveError />
@@ -86,7 +86,9 @@ export default class PlatformSettings extends TsxComponent<Props> {
     return (
       <Section title={title} isSimpleMode={!isAdvancedMode}>
         {platform === 'twitch' && <TwitchEditStreamInfo vModel={this.settings} />}
-        {platform === 'facebook' && <FacebookEditStreamInfo vModel={this.settings} />}
+        {platform === 'facebook' && (
+          <FacebookEditStreamInfo vModel={this.settings} showEvents={!this.props.isScheduleMode} />
+        )}
         {platform === 'youtube' && (
           <YoutubeEditStreamInfo
             vModel={this.settings}

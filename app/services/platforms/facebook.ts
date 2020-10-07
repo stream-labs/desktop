@@ -24,6 +24,9 @@ interface IFacebookPage {
   access_token: string;
   name: string;
   id: string;
+  category: string;
+  category_list: { id: string; name: string }[];
+  tasks: 'ANALYZE' | 'ADVERTISE' | 'MODERATE' | 'CREATE_CONTENT' | 'MANAGE';
 }
 
 interface IFacebookLiveVideo {
@@ -35,31 +38,22 @@ interface IFacebookLiveVideo {
   description: string;
 }
 
-export interface IStreamlabsFacebookPage {
-  id: string;
-  category: string;
-  name: string;
-}
-
-export interface IStreamlabsFacebookPages {
-  pages: IStreamlabsFacebookPage[];
-  page_id: string;
-  page_type: string;
-  name: string;
-  options: IListOption<string>[];
-}
-
 interface IFacebookServiceState extends IPlatformState {
-  streamUrl: string | null;
+  facebookPages: IFacebookPage[];
   settings: IFacebookStartStreamOptions;
 }
 
 export interface IFacebookStartStreamOptions {
-  pageId: string;
   title: string;
-  game: string;
+  game?: string;
+  destinationType: 'me' | 'page' | 'group';
+  destinationId: string;
   description?: string;
   liveVideoId?: string;
+}
+
+export interface IFacebookUpdateVideoOptions extends IFacebookStartStreamOptions {
+  liveVideoId: string;
 }
 
 export interface IFacebookChannelInfo extends IFacebookStartStreamOptions {
@@ -69,9 +63,10 @@ export interface IFacebookChannelInfo extends IFacebookStartStreamOptions {
 
 const initialState: IFacebookServiceState = {
   ...BasePlatformService.initialState,
-  streamUrl: null,
+  facebookPages: [],
   settings: {
-    pageId: '',
+    destinationType: 'page',
+    destinationId: '',
     liveVideoId: '',
     title: '',
     description: '',
@@ -107,18 +102,25 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   }
 
   @mutation()
-  private SET_STREAM_URL(url: string | null) {
-    this.state.streamUrl = url;
-  }
-
-  @mutation()
   private SET_STREAM_PROPERTIES(
     title: string,
     description: string | undefined,
     game: string,
-    facebookPageId: string,
+    destinationType: IFacebookStartStreamOptions['destinationType'],
+    destinationId: string,
   ) {
-    this.state.settings = { title, description, game, pageId: facebookPageId };
+    this.state.settings = {
+      title,
+      description,
+      game,
+      destinationType,
+      destinationId,
+    };
+  }
+
+  @mutation()
+  private SET_FACEBOOK_PAGES(pages: IFacebookPage[]) {
+    this.state.facebookPages = pages;
   }
 
   apiBase = 'https://graph.facebook.com';
@@ -137,12 +139,6 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
 
   get oauthToken() {
     return this.userService.state.auth?.platforms?.facebook?.token;
-  }
-
-  get activeToken() {
-    // TODO:
-    return '';
-    // return this.state.activePage?.access_token;
   }
 
   get streamPageUrl(): string {
@@ -174,18 +170,6 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     return Promise.resolve();
   }
 
-  async fetchActivePage() {
-    // await this.fetchPages();
-    // return this.requestFacebook<{ data: IFacebookPage[] }>(`${this.apiBase}/me/accounts`).then(
-    //   async json => {
-    //     const pageId = this.userService.platform?.channelId || this.state.facebookPages?.page_id!;
-    //     const activePage = json.data.filter(page => pageId === page.id)[0] || json.data[0];
-    //     this.userService.updatePlatformChannelId('facebook', pageId);
-    //     this.SET_ACTIVE_PAGE(activePage);
-    //   },
-    // );
-  }
-
   fetchUserInfo() {
     return Promise.resolve({});
   }
@@ -210,17 +194,22 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   }
 
   private createLiveVideo(options: IFacebookStartStreamOptions): Promise<IFacebookLiveVideo> {
-    const { title, description, game, pageId } = options;
+    const { title, description, game, destinationType } = options;
     const data = {
       method: 'POST',
       body: JSON.stringify({ title, description, game_specs: { name: game } }),
     };
+
+    const destinationId = destinationType === 'me' ? 'me' : options.destinationId;
+    const token =
+      destinationType === 'me' ? this.oauthToken : this.getPage(destinationId).access_token;
+
     return this.requestFacebook<IFacebookLiveVideo>(
       {
-        url: `${this.apiBase}/${pageId}/live_videos`,
+        url: `${this.apiBase}/${destinationId}/live_videos`,
         ...data,
       },
-      this.activeToken,
+      token,
     );
   }
 
@@ -228,73 +217,80 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
    * fetch prefill data
    */
   async prepopulateInfo() {
-    // no prefill data needed for FB
-    // we already have taken all data from local storage
-
-    // /me/accounts
-
-    this.fetchPages();
+    this.SET_FACEBOOK_PAGES(await this.fetchPages());
+    const pageId = this.state.settings.destinationId;
+    const page = this.getPage(pageId);
+    if (!page) this.UPDATE_STREAM_SETTINGS({ destinationId: this.state.facebookPages[0].id });
     this.SET_PREPOPULATED(true);
+  }
+
+  private getPage(id: string): IFacebookPage {
+    return this.state.facebookPages.find(p => p.id === id);
   }
 
   async scheduleStream(
     scheduledStartTime: string,
-    { title, description, game }: IFacebookChannelInfo,
+    { title, description, game, destinationId }: IFacebookChannelInfo,
   ): Promise<any> {
-    // const url = `${this.apiBase}/${this.state.activePage!.id}/live_videos`;
-    // const body = JSON.stringify({
-    //   title,
-    //   description,
-    //   planned_start_time: new Date(scheduledStartTime).getTime() / 1000,
-    //   game_specs: { name: game },
-    //   status: 'SCHEDULED_UNPUBLISHED',
-    // });
-    // try {
-    //   return await platformRequest('facebook', { url, body, method: 'POST' }, this.activeToken);
-    // } catch (e) {
-    //   if (e?.result?.error?.code === 100) {
-    //     throw new Error(
-    //       $t(
-    //         'Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.',
-    //       ),
-    //     );
-    //   }
-    // }
+    const url = `${this.apiBase}/${destinationId}/live_videos`;
+    const data: Dictionary<any> = {
+      title,
+      description,
+      planned_start_time: new Date(scheduledStartTime).getTime() / 1000,
+      status: 'SCHEDULED_UNPUBLISHED',
+    };
+    if (game) data.game_specs = { name: game };
+    const body = JSON.stringify(data);
+    const token = this.getPage(destinationId).access_token;
+    try {
+      return await platformRequest('facebook', { url, body, method: 'POST' }, token);
+    } catch (e) {
+      if (e?.result?.error?.code === 100) {
+        throw new Error(
+          $t(
+            'Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.',
+          ),
+        );
+      }
+    }
   }
 
   async fetchScheduledVideos(pageId: string): Promise<IFacebookLiveVideo[]> {
+    const timeRange = 1000 * 60 * 60 * 24;
+    const maxDate = Date.now() + timeRange;
+    const minDate = Date.now() - timeRange;
     return (
       await this.requestFacebook<{ data: IFacebookLiveVideo[] }>(
-        `${this.apiBase}/${pageId}/live_videos?broadcast_status=["SCHEDULED_UNPUBLISHED"]&fields=title,description,planned_start_time&source=owner`,
+        `${this.apiBase}/${pageId}/live_videos?broadcast_status=["SCHEDULED_UNPUBLISHED"]&fields=title,description,planned_start_time&source=owner&since=${minDate}&until=${maxDate}`,
       )
     ).data;
   }
 
-  async fetchGroups(): Promise<[]> {
-    return [];
+  async fetchGroups(): Promise<unknown> {
+    return (await this.requestFacebook<{ data: IFacebookPage[] }>(`${this.apiBase}/me/groups`))
+      .data;
   }
 
   fetchViewerCount(): Promise<number> {
-    if (this.state.settings.liveVideoId == null) return Promise.resolve(0);
+    const { liveVideoId, destinationId } = this.state.settings;
+    if (liveVideoId == null) return Promise.resolve(0);
 
     const url = `${this.apiBase}/${this.state.settings.liveVideoId}?fields=live_views`;
+    const pageToken = this.getPage(destinationId).access_token;
 
-    return this.requestFacebook<{ live_views: number }>(url, this.activeToken)
+    return this.requestFacebook<{ live_views: number }>(url, pageToken)
       .then(json => json.live_views)
       .catch(() => 0);
   }
 
   async beforeGoLive(options: IGoLiveSettings) {
     const fbOptions = options.platforms.facebook;
+    const liveVideo = fbOptions.liveVideoId
+      ? await this.updateLiveVideo(fbOptions as IFacebookUpdateVideoOptions)
+      : await this.createLiveVideo(fbOptions);
 
-    if (fbOptions.liveVideoId) {
-      // TODO:
-      throw new Error('not implemented');
-    }
-
-    const liveVideo = await this.createLiveVideo(fbOptions);
     const streamUrl = liveVideo.stream_url;
-    const streamKey = streamUrl.substr(this.state.streamUrl.lastIndexOf('/') + 1);
+    const streamKey = streamUrl.substr(streamUrl.lastIndexOf('/') + 1);
 
     this.streamSettingsService.setSettings({ platform: 'facebook', streamType: 'rtmp_common' });
     this.streamSettingsService.setSettings({
@@ -307,29 +303,40 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   }
 
   /**
-   * update data for the current active broadcast
+   * update data for the current active video
    */
-  async putChannelInfo(info: IFacebookStartStreamOptions): Promise<void> {
-    return Promise.resolve();
-    // const { title, description, game } = info;
-    // let facebookPageId = info.destinationId;
-    // this.SET_STREAM_PROPERTIES(title, description, game, facebookPageId);
-    // // take fist page if no pages provided
-    // assertIsDefined(this.state.facebookPages);
-    // if (!facebookPageId) facebookPageId = this.state.facebookPages.pages[0].id;
-    // assertIsDefined(facebookPageId);
-    // await this.postPage(facebookPageId);
-    // if (this.state.liveVideoId && game) {
-    //   return this.requestFacebook(
-    //     {
-    //       url: `${this.apiBase}/${this.state.liveVideoId}`,
-    //       method: 'POST',
-    //       body: JSON.stringify({ title, description, game_specs: { name: game } }),
-    //     },
-    //     this.state.activePage!.access_token,
-    //   ).then(() => true);
-    // }
-    // return Promise.resolve(true);
+  async putChannelInfo(info: IFacebookUpdateVideoOptions): Promise<void> {
+    const liveVideo = await this.updateLiveVideo(info);
+    const { game, destinationType, destinationId } = info;
+    this.SET_STREAM_PROPERTIES(
+      liveVideo.title,
+      liveVideo.description,
+      game,
+      destinationType,
+      destinationId,
+    );
+  }
+
+  /**
+   * update live video
+   */
+  private async updateLiveVideo(options: IFacebookUpdateVideoOptions): Promise<IFacebookLiveVideo> {
+    const { title, description, game, liveVideoId, destinationId } = options;
+    const data: Dictionary<any> = { title, description };
+    const token = this.getPage(destinationId).access_token;
+    if (game) data.game_specs = { name: game };
+
+    console.log('options', options);
+    console.log('update url', `${this.apiBase}/${liveVideoId}?fields=title,description,stream_url`);
+
+    return await this.requestFacebook(
+      {
+        url: `${this.apiBase}/${liveVideoId}?fields=title,description,stream_url`,
+        method: 'POST',
+        body: JSON.stringify(data),
+      },
+      token,
+    );
   }
 
   async searchGames(searchString: string): Promise<IGame[]> {
@@ -343,23 +350,27 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     return 'https://www.facebook.com/gaming/streamer/chat/';
   }
 
-  fetchRawPageResponse() {
-    return this.requestFacebook<{ data: IFacebookPage[] }>(`${this.apiBase}/me/accounts`);
-  }
-
   get liveDockEnabled(): boolean {
     return true;
   }
 
-  fetchPages(): Promise<IStreamlabsFacebookPages> {
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
-    const headers = authorizedHeaders(this.userService.apiToken!);
-    const request = new Request(url, { headers });
-    return fetch(request).then(handleResponse);
+  private async fetchPages(): Promise<IFacebookPage[]> {
+    return (
+      await this.requestFacebook<{ data: IFacebookPage[] }>(
+        `${this.apiBase}/679834535996414/accounts`,
+      )
+    ).data;
   }
 
-  // private postPage(pageId: string) {
+  // fetchPages(): Promise<IStreamlabsFacebookPages> {
+  //   const host = this.hostsService.streamlabs;
+  //   const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
+  //   const headers = authorizedHeaders(this.userService.apiToken!);
+  //   const request = new Request(url, { headers });
+  //   return fetch(request).then(handleResponse);
+  // }
+
+  // private postPage(destinationId: string) {
   //   const host = this.hostsService.streamlabs;
   //   const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
   //   const headers = authorizedHeaders(this.userService.apiToken!);
@@ -367,10 +378,10 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   //   const request = new Request(url, {
   //     headers,
   //     method: 'POST',
-  //     body: JSON.stringify({ page_id: pageId, page_type: 'page' }),
+  //     body: JSON.stringify({ page_id: destinationId, page_type: 'page' }),
   //   });
   //   try {
-  //     fetch(request).then(() => this.userService.updatePlatformChannelId('facebook', pageId));
+  //     fetch(request).then(() => this.userService.updatePlatformChannelId('facebook', destinationId));
   //   } catch {
   //     console.error(new Error('Could not set Facebook page'));
   //   }
