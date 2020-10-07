@@ -118,23 +118,6 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   }
 
   @mutation()
-  private SET_STREAM_PROPERTIES(
-    title: string,
-    description: string | undefined,
-    game: string,
-    destinationType: IFacebookStartStreamOptions['destinationType'],
-    destinationId: string,
-  ) {
-    this.state.settings = {
-      title,
-      description,
-      game,
-      destinationType,
-      destinationId,
-    };
-  }
-
-  @mutation()
   private SET_FACEBOOK_PAGES(pages: IFacebookPage[]) {
     this.state.facebookPages = pages;
   }
@@ -167,6 +150,52 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     //   '-',
     // );
     // return `https://www.facebook.com/${pathToPage}/live_videos`;
+  }
+
+  async beforeGoLive(options: IGoLiveSettings) {
+    const fbOptions = options.platforms.facebook;
+    const liveVideo = fbOptions.liveVideoId
+      ? await this.updateLiveVideo(fbOptions as IFacebookUpdateVideoOptions)
+      : await this.createLiveVideo(fbOptions);
+
+    const streamUrl = liveVideo.stream_url;
+    const streamKey = streamUrl.substr(streamUrl.lastIndexOf('/') + 1);
+
+    this.streamSettingsService.setSettings({
+      key: streamKey,
+      platform: 'facebook',
+      streamType: 'rtmp_common',
+    });
+
+    this.SET_STREAM_KEY(streamKey);
+    this.UPDATE_STREAM_SETTINGS({ ...fbOptions, liveVideoId: liveVideo.id });
+  }
+
+  /**
+   * update data for the current active video
+   */
+  async putChannelInfo(info: IFacebookUpdateVideoOptions): Promise<void> {
+    await this.updateLiveVideo(info);
+    this.UPDATE_STREAM_SETTINGS(info);
+  }
+
+  /**
+   * update live video
+   */
+  private async updateLiveVideo(options: IFacebookUpdateVideoOptions): Promise<IFacebookLiveVideo> {
+    const { title, description, game, liveVideoId, destinationId } = options;
+    const data: Dictionary<any> = { title, description };
+    const token = this.getPage(destinationId).access_token;
+    if (game) data.game_specs = { name: game };
+
+    return await this.requestFacebook(
+      {
+        url: `${this.apiBase}/${liveVideoId}?fields=title,description,stream_url`,
+        method: 'POST',
+        body: JSON.stringify(data),
+      },
+      token,
+    );
   }
 
   validatePlatform() {
@@ -297,62 +326,6 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     return this.requestFacebook<{ live_views: number }>(url, pageToken)
       .then(json => json.live_views)
       .catch(() => 0);
-  }
-
-  async beforeGoLive(options: IGoLiveSettings) {
-    const fbOptions = options.platforms.facebook;
-    const liveVideo = fbOptions.liveVideoId
-      ? await this.updateLiveVideo(fbOptions as IFacebookUpdateVideoOptions)
-      : await this.createLiveVideo(fbOptions);
-
-    const streamUrl = liveVideo.stream_url;
-    const streamKey = streamUrl.substr(streamUrl.lastIndexOf('/') + 1);
-
-    this.streamSettingsService.setSettings({ platform: 'facebook', streamType: 'rtmp_common' });
-    this.streamSettingsService.setSettings({
-      key: streamKey,
-      platform: 'facebook',
-      streamType: 'rtmp_common',
-    });
-
-    this.SET_STREAM_KEY(streamKey);
-  }
-
-  /**
-   * update data for the current active video
-   */
-  async putChannelInfo(info: IFacebookUpdateVideoOptions): Promise<void> {
-    const liveVideo = await this.updateLiveVideo(info);
-    const { game, destinationType, destinationId } = info;
-    this.SET_STREAM_PROPERTIES(
-      liveVideo.title,
-      liveVideo.description,
-      game,
-      destinationType,
-      destinationId,
-    );
-  }
-
-  /**
-   * update live video
-   */
-  private async updateLiveVideo(options: IFacebookUpdateVideoOptions): Promise<IFacebookLiveVideo> {
-    const { title, description, game, liveVideoId, destinationId } = options;
-    const data: Dictionary<any> = { title, description };
-    const token = this.getPage(destinationId).access_token;
-    if (game) data.game_specs = { name: game };
-
-    console.log('options', options);
-    console.log('update url', `${this.apiBase}/${liveVideoId}?fields=title,description,stream_url`);
-
-    return await this.requestFacebook(
-      {
-        url: `${this.apiBase}/${liveVideoId}?fields=title,description,stream_url`,
-        method: 'POST',
-        body: JSON.stringify(data),
-      },
-      token,
-    );
   }
 
   async searchGames(searchString: string): Promise<IGame[]> {
