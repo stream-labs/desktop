@@ -36,12 +36,12 @@ export default class GoLiveError extends TsxComponent<{}> {
     electron.remote.shell.openExternal(this.youtubeService.dashboardUrl);
   }
 
-  private createFBPage() {
-    electron.remote.shell.openExternal(
-      'https://www.facebook.com/gaming/pages/create?ref=streamlabs',
-    );
-    this.windowsService.actions.closeChildWindow();
-  }
+  // private createFBPage() {
+  //   electron.remote.shell.openExternal(
+  //     'https://www.facebook.com/gaming/pages/create?ref=streamlabs',
+  //   );
+  //   this.windowsService.actions.closeChildWindow();
+  // }
 
   private skipPrepopulateAndGoLive() {
     this.streamingService.actions.goLive();
@@ -74,8 +74,6 @@ export default class GoLiveError extends TsxComponent<{}> {
         return this.renderPrepopulateError(error);
       case 'PRIME_REQUIRED':
         return this.renderPrimeRequiredError(error);
-      case 'FACEBOOK_HAS_NO_PAGES':
-        return this.renderFacebookNoPagesError(error);
       case 'TWITCH_MISSED_OAUTH_SCOPE':
         return this.renderTwitchMissedScopeError(error);
       case 'SETTINGS_UPDATE_FAILED':
@@ -225,23 +223,6 @@ export default class GoLiveError extends TsxComponent<{}> {
           scopedSlots={{
             dashboardLink: (text: string) => (
               <a class={styles.link} onClick={() => this.goToYoutubeDashboard()}>
-                {{ text }}
-              </a>
-            ),
-          }}
-        />
-      </ErrorLayout>
-    );
-  }
-
-  private renderFacebookNoPagesError(error: IStreamError) {
-    return (
-      <ErrorLayout error={error}>
-        <Translate
-          message={$t('facebookNoPagesError')}
-          scopedSlots={{
-            createLink: (text: string) => (
-              <a class={styles.link} onClick={() => this.createFBPage()}>
                 {{ text }}
               </a>
             ),

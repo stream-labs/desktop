@@ -269,7 +269,7 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
     ).then(json => (json.stream ? json.stream.viewers : 0));
   }
 
-  async putChannelInfo({ title, game, tags = [] }: ITwitchStartStreamOptions): Promise<boolean> {
+  async putChannelInfo({ title, game, tags = [] }: ITwitchStartStreamOptions): Promise<void> {
     await Promise.all([
       platformAuthorizedRequest('twitch', {
         url: `https://api.twitch.tv/kraken/channels/${this.twitchId}`,
@@ -279,7 +279,6 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
       this.setStreamTags(tags),
     ]);
     this.SET_STREAM_SETTINGS({ title, game, tags });
-    return true;
   }
 
   searchGames(searchString: string): Promise<IGame[]> {

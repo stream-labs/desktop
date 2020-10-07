@@ -394,7 +394,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   async putChannelInfo(
     { title, description }: IYoutubeStartStreamOptions,
     scheduledStartTime?: string,
-  ): Promise<boolean> {
+  ): Promise<void> {
     const broadcastId = this.state.settings.broadcastId;
     assertIsDefined(broadcastId);
     const broadcast = await this.updateBroadcast(broadcastId, {
@@ -402,7 +402,6 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       description,
     });
     this.setActiveBroadcast(broadcast);
-    return true;
   }
 
   /**

@@ -7,7 +7,11 @@ import CommonPlatformFields from '../CommonPlatformFields';
 import { ListInput } from 'components/shared/inputs/inputs';
 import { formMetadata, metadata } from 'components/shared/inputs';
 import { $t } from 'services/i18n';
-import { FacebookService, IFacebookLiveVideo } from 'services/platforms/facebook';
+import {
+  FacebookService,
+  IFacebookLiveVideo,
+  IStreamlabsFacebookPages,
+} from 'services/platforms/facebook';
 import { IStreamSettings, StreamingService } from '../../../../services/streaming';
 import { SyncWithValue } from '../../../../services/app/app-decorators';
 import BaseEditSteamInfo from './BaseEditSteamInfo';
@@ -25,6 +29,9 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
   @Inject() private facebookService: FacebookService;
   @Inject() private streamingService: StreamingService;
   @SyncWithValue() settings: IStreamSettings;
+  private pages: IStreamlabsFacebookPages | null = null;
+  private pagesLoaded = false;
+
   private scheduledVideos: IFacebookLiveVideo[] = [];
   private scheduledVideosLoaded = false;
 
@@ -33,8 +40,19 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
   }
 
   async created() {
-    this.scheduledVideos = await this.facebookService.fetchScheduledVideos();
-    this.scheduledVideosLoaded = true;
+    // LOAD PAGES
+    this.pages = await this.facebookService.fetchPages();
+    if (!this.pages.pages.length) {
+      // TODO
+      throw new Error('No pages');
+    }
+    if (!this.settings.platforms.facebook.pageId) {
+      this.settings.platforms.facebook.pageId = this.pages.pages[0].id;
+    }
+    this.pagesLoaded = true;
+
+    // this.scheduledVideos = await this.facebookService.fetchScheduledVideos();
+    // this.scheduledVideosLoaded = true;
   }
 
   private get formMetadata() {
@@ -42,8 +60,13 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
       page: metadata.list({
         title: $t('Facebook Page'),
         fullWidth: true,
-        options: this.facebookService.state.facebookPages?.options || [],
+        options:
+          this.pages?.pages.map(page => ({
+            value: page.id,
+            title: `${page.name} | ${page.category}`,
+          })) || [],
         required: true,
+        loading: !this.pagesLoaded,
       }),
       event: metadata.list({
         title: $t('Event'),
@@ -66,7 +89,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
       <ValidatedForm name="facebook-settings">
         <HFormGroup title={this.formMetadata.page.title}>
           <ListInput
-            vModel={this.settings.platforms.facebook.destinationId}
+            vModel={this.settings.platforms.facebook.pageId}
             metadata={this.formMetadata.page}
           />
         </HFormGroup>
