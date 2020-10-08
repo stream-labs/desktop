@@ -35,7 +35,8 @@ const args = process.argv.slice(2);
   ];
   for (const branchName of branches) {
     checkoutBranch(branchName, baseBranch, CONFIG);
-    exec(`yarn ci:tests ${CONFIG.compiledTestsDist}/screentest/tests/**/*.js ${args.join(' ')}`);
+    // exec(`yarn ci:tests ${CONFIG.compiledTestsDist}/screentest/tests/**/*.js ${args.join(' ')}`);
+    exec(`yarn ci:tests ${CONFIG.compiledTestsDist}/screentest/tests/editor.js ${args.join(' ')}`);
   }
   // return to the current branch
   checkoutBranch('current', baseBranch, CONFIG);
