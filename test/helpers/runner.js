@@ -24,7 +24,6 @@ const {
 } = process.env;
 let retryingFailed = false;
 
-console.log('args', args);
 const RUN_TESTS_CMD = !args.length ? `yarn test --timeout=${TIMEOUT}m ` : args.join(' ');
 
 (async function main() {
@@ -32,7 +31,6 @@ const RUN_TESTS_CMD = !args.length ? `yarn test --timeout=${TIMEOUT}m ` : args.j
   try {
     rimraf.sync(failedTestsFile);
     await createTestTimingsFile();
-    console.log('exec cmd', args);
     execSync(RUN_TESTS_CMD, { stdio: [0, 1, 2] });
   } catch (e) {
     console.log(e);

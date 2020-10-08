@@ -29,13 +29,6 @@ console.log('start main');
 
   const baseBranch = await detectBaseBranchName();
 
-
-  console.log('run screen tests', baseBranch);
-
-  exec(`yarn ci:tests yarn test:file ${CONFIG.compiledTestsDist}/screentest/tests/editor.js ${args.join(' ')}`);
-
-  return;
-
   // make screenshots for each branch
   const branches = [
     'current',
@@ -56,7 +49,7 @@ console.log('start main');
   exec(`node ${CONFIG.compiledTestsDist}/screentest/comparator.js ${branches[0]} ${branches[1]}`);
 
   // send the status to the GitHub check and upload screenshots
-  await updateCheck();
+  await updateCheckAndUploadScreenshots();
 })().catch(e => {
   console.error(e);
   process.exit(-1);
@@ -78,7 +71,7 @@ async function detectBaseBranchName() {
   return prs[0].base.ref;
 }
 
-async function updateCheck() {
+async function updateCheckAndUploadScreenshots() {
 
   if (!STREAMLABS_BOT_ID || !STREAMLABS_BOT_KEY) {
     console.info('STREAMLABS_BOT_ID or STREAMLABS_BOT_KEY is not set. Skipping GitCheck status update');
