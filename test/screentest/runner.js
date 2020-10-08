@@ -168,7 +168,6 @@ async function uploadScreenshots() {
     console.error('Failed to upload screenshots');
     console.error(e);
   }
-
 }
 
 /**
