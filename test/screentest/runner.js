@@ -21,6 +21,8 @@ const CONFIG = require('./config.json');
 const commitSHA = getCommitSHA();
 const args = process.argv.slice(2);
 
+let runSucceeded = false;
+
 console.log(process.env);
 
 (async function main() {
@@ -34,11 +36,10 @@ console.log(process.env);
   const branches = ['current', baseBranch];
   for (const branchName of branches) {
     checkoutBranch(branchName, baseBranch, CONFIG);
-    // exec(`yarn ci:tests ${CONFIG.compiledTestsDist}/screentest/tests/**/*.js ${args.join(' ')}`);
     exec(
       `yarn ci:tests yarn test:file ${
         CONFIG.compiledTestsDist
-      }/screentest/tests/editor.js ${args.join(' ')}`,
+      }/screentest/tests/**/*.js ${args.join(' ')}`,
     );
   }
   // return to the current branch
@@ -49,12 +50,18 @@ console.log(process.env);
 
   // compare screenshots
   exec(`node ${CONFIG.compiledTestsDist}/screentest/comparator.js ${branches[0]} ${branches[1]}`);
+  runSucceeded = true;
 
   // send the status to the GitHub check and upload screenshots
   await updateCheckAndUploadScreenshots();
-})().catch(e => {
+})().catch(async e => {
   console.error(e);
-  process.exit(-1);
+  try {
+    // report a failed status to the GitHub check
+    await updateCheckAndUploadScreenshots();
+  } finally {
+    process.exit(-1);
+  }
 });
 
 async function detectBaseBranchName() {
@@ -114,7 +121,7 @@ async function updateCheckAndUploadScreenshots() {
 
   console.info('Updating the GithubCheck', conclusion, title);
 
-  const summary = `Build Url: https://dev.azure.com/streamlabs/Streamlabs%20OBS/_build/results?buildId=${BUILD_BUILDID}&view=logs&j=${SYSTEM_JOBID}`;
+  const summary = `[Build Url](https://dev.azure.com/streamlabs/Streamlabs%20OBS/_build/results?buildId=${BUILD_BUILDID}&view=logs&j=${SYSTEM_JOBID})`;
 
   try {
     const github = await getGithubClient();
@@ -127,7 +134,7 @@ async function updateCheckAndUploadScreenshots() {
       details_url: screenshotsUrl || 'https://github.com/stream-labs/streamlabs-obs',
       output: {
         title,
-        summary: '',
+        summary,
       },
     });
   } catch (e) {
