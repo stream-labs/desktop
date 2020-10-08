@@ -14,7 +14,8 @@ const {
   STREAMLABS_BOT_ID,
   STREAMLABS_BOT_KEY,
   BUILD_REPOSITORY_NAME,
-  BUILD_BUILD_ID,
+  BUILD_BUILDID,
+  SYSTEM_JOBID,
 } = process.env;
 const CONFIG = require('./config.json');
 const commitSHA = getCommitSHA();
@@ -22,9 +23,7 @@ const args = process.argv.slice(2);
 
 console.log(process.env);
 
-
 (async function main() {
-
   // prepare the dist dir
   rimraf.sync(CONFIG.dist);
   fs.mkdirSync(CONFIG.dist, { recursive: true });
@@ -32,20 +31,21 @@ console.log(process.env);
   const baseBranch = await detectBaseBranchName();
 
   // make screenshots for each branch
-  const branches = [
-    'current',
-    baseBranch,
-  ];
+  const branches = ['current', baseBranch];
   for (const branchName of branches) {
     checkoutBranch(branchName, baseBranch, CONFIG);
     // exec(`yarn ci:tests ${CONFIG.compiledTestsDist}/screentest/tests/**/*.js ${args.join(' ')}`);
-    exec(`yarn ci:tests yarn test:file ${CONFIG.compiledTestsDist}/screentest/tests/editor.js ${args.join(' ')}`);
+    exec(
+      `yarn ci:tests yarn test:file ${
+        CONFIG.compiledTestsDist
+      }/screentest/tests/editor.js ${args.join(' ')}`,
+    );
   }
   // return to the current branch
   checkoutBranch('current', baseBranch, CONFIG);
 
   // compile the test folder
-  exec(`tsc -p test`);
+  exec('tsc -p test');
 
   // compare screenshots
   exec(`node ${CONFIG.compiledTestsDist}/screentest/comparator.js ${branches[0]} ${branches[1]}`);
@@ -74,9 +74,10 @@ async function detectBaseBranchName() {
 }
 
 async function updateCheckAndUploadScreenshots() {
-
   if (!STREAMLABS_BOT_ID || !STREAMLABS_BOT_KEY) {
-    console.info('STREAMLABS_BOT_ID or STREAMLABS_BOT_KEY is not set. Skipping GitCheck status update');
+    console.info(
+      'STREAMLABS_BOT_ID or STREAMLABS_BOT_KEY is not set. Skipping GitCheck status update',
+    );
     return;
   }
 
@@ -99,8 +100,10 @@ async function updateCheckAndUploadScreenshots() {
     title = `Changes are detected in ${testResults.changedScreens} screenshots`;
   } else {
     conclusion = 'success';
-    title = `${testResults.totalScreens} screenshots have been checked.` + `\n` +
-            `${testResults.newScreens} new screenshots have been found`;
+    title =
+      `${testResults.totalScreens} screenshots have been checked.` +
+      '\n' +
+      `${testResults.newScreens} new screenshots have been found`;
   }
 
   // upload screenshots if any changes present
@@ -110,6 +113,8 @@ async function updateCheckAndUploadScreenshots() {
   }
 
   console.info('Updating the GithubCheck', conclusion, title);
+
+  const summary = `Build Url: https://dev.azure.com/streamlabs/Streamlabs%20OBS/_build/results?buildId=${BUILD_BUILDID}&view=logs&j=${SYSTEM_JOBID}`;
 
   try {
     const github = await getGithubClient();
@@ -121,17 +126,15 @@ async function updateCheckAndUploadScreenshots() {
       completed_at: new Date().toISOString(),
       details_url: screenshotsUrl || 'https://github.com/stream-labs/streamlabs-obs',
       output: {
-        title: title,
-        summary: ''
-      }
+        title,
+        summary: '',
+      },
     });
   } catch (e) {
     console.error('Unable to update GithubCheck status');
     console.error(e);
   }
-
 }
-
 
 async function uploadScreenshots() {
   if (!AWS_ACCESS_KEY || !AWS_SECRET_KEY || !AWS_BUCKET) {
@@ -139,12 +142,12 @@ async function uploadScreenshots() {
     return;
   }
 
-  console.info(`Uploading screenshots to the s3 bucket`);
+  console.info('Uploading screenshots to the s3 bucket');
   const Bucket = AWS_BUCKET;
   const awsCredentials = new AWS.Credentials(AWS_ACCESS_KEY, AWS_SECRET_KEY);
-  const s3Options = {credentials : awsCredentials};
+  const s3Options = { credentials: awsCredentials };
   const s3Client = new AWS.S3(s3Options);
-  const bucketDir = BUILD_BUILD_ID || uuid();
+  const bucketDir = BUILD_BUILDID || uuid();
 
   try {
     const files = await recursiveReadDir(CONFIG.dist);
@@ -154,10 +157,10 @@ async function uploadScreenshots() {
       const stream = fs.createReadStream(filePath);
       const params = {
         Bucket,
-        Key : `${bucketDir}/${relativePath}`,
+        Key: `${bucketDir}/${relativePath}`,
         ContentType: 'text/html',
-        ACL : 'public-read',
-        Body : stream
+        ACL: 'public-read',
+        Body: stream,
       };
       await s3Client.upload(params).promise();
     }
@@ -168,7 +171,6 @@ async function uploadScreenshots() {
     console.error('Failed to upload screenshots');
     console.error(e);
   }
-
 }
 
 /**
