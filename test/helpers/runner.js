@@ -24,9 +24,10 @@ const {
 } = process.env;
 let retryingFailed = false;
 
-const RUN_TESTS_CMD = !args.length ? `yarn test --timeout=${TIMEOUT}m ` : args.join(' ');
+const RUN_TESTS_CMD = !args.length ? `yarn test --timeout=${TIMEOUT}m ` : args.join(' ') + ' ';
 
 (async function main() {
+  process.exit(-1);
   let failedTests = [];
   try {
     rimraf.sync(failedTestsFile);
