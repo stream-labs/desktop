@@ -21,8 +21,6 @@ const CONFIG = require('./config.json');
 const commitSHA = getCommitSHA();
 const args = process.argv.slice(2);
 
-let runSucceeded = false;
-
 console.log(process.env);
 
 (async function main() {
@@ -50,7 +48,6 @@ console.log(process.env);
 
   // compare screenshots
   exec(`node ${CONFIG.compiledTestsDist}/screentest/comparator.js ${branches[0]} ${branches[1]}`);
-  runSucceeded = true;
 
   // send the status to the GitHub check and upload screenshots
   await updateCheckAndUploadScreenshots();
