@@ -80,7 +80,7 @@ async function detectBaseBranchName() {
 async function updateCheckAndUploadScreenshots() {
   console.log('try  updateCheckAndUploadScreenshots');
   if (!STREAMLABS_BOT_ID || !STREAMLABS_BOT_KEY) {
-    console.info(
+    console.log(
       'STREAMLABS_BOT_ID or STREAMLABS_BOT_KEY is not set. Skipping GitCheck status update',
     );
     return;
@@ -93,6 +93,7 @@ async function updateCheckAndUploadScreenshots() {
   } catch (e) {
     console.error('No results found for screentest');
   }
+
 
   // create a conclusion
   let conclusion = '';
@@ -112,12 +113,13 @@ async function updateCheckAndUploadScreenshots() {
   }
 
   // upload screenshots if any changes present
+  console.log('conclusion is', conclusion);
   let screenshotsUrl = '';
-  if (conclusion === 'action_required' || testResults.newScreens > 1) {
+  if (conclusion === 'action_required' || (testResults && testResults.newScreens > 1)) {
     screenshotsUrl = await uploadScreenshots();
   }
 
-  console.info('Updating the GithubCheck', conclusion, title);
+  console.log('Updating the GithubCheck', conclusion, title);
 
   const summary = `[Build Url](https://dev.azure.com/streamlabs/Streamlabs%20OBS/_build/results?buildId=${BUILD_BUILDID}&view=logs&j=${SYSTEM_JOBID})`;
 
@@ -127,7 +129,7 @@ async function updateCheckAndUploadScreenshots() {
     await github.postCheck({
       name: 'Screenshots',
       head_sha: commitSHA,
-      conclusion: 'success',
+      conclusion,
       completed_at: new Date().toISOString(),
       details_url: screenshotsUrl || 'https://github.com/stream-labs/streamlabs-obs',
       output: {
@@ -136,7 +138,7 @@ async function updateCheckAndUploadScreenshots() {
       },
     });
   } catch (e) {
-    console.error('Unable to update GithubCheck status');
+    console.log('Unable to update GithubCheck status');
     console.error(e);
   }
 }

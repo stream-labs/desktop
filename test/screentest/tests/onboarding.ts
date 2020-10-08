@@ -20,7 +20,7 @@ test('Onboarding steps', async t => {
   await sleep(1000);
   await t.context.app.client.click('span=Skip');
 
-  await app.client.waitForVisible('h1=Choose your Streamlabs Plan', 15000);
+  await app.client.waitForVisible('h1=Choose your Streamlabs plan', 15000);
   await makeScreenshots(t, 'Prime');
   await app.client.click('div=Choose Starter');
 
@@ -67,7 +67,7 @@ test('OBS Importer', async t => {
   await client.click('span=Skip');
 
   // skip prime
-  await client.waitForVisible('h1=Choose your Streamlabs Plan');
+  await client.waitForVisible('h1=Choose your Streamlabs plan');
   await client.click('div=Choose Starter');
 
   // import from OBS
