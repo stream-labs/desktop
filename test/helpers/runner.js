@@ -24,14 +24,14 @@ const {
 } = process.env;
 let retryingFailed = false;
 
-const RUN_TESTS_CMD = `yarn test --timeout=${TIMEOUT}m `;
+const RUN_TESTS_CMD = !args.length ? `yarn test --timeout=${TIMEOUT}m ` : args.join('');
 
 (async function main() {
   let failedTests = [];
   try {
     rimraf.sync(failedTestsFile);
     await createTestTimingsFile();
-    execSync(RUN_TESTS_CMD + args.join(' '), { stdio: [0, 1, 2] });
+    execSync(RUN_TESTS_CMD, { stdio: [0, 1, 2] });
   } catch (e) {
     console.log(e);
     failedTests = getFailedTests();
@@ -52,7 +52,7 @@ function retryTests(failedTests) {
 
   const retryingArgs = failedTests.map(testName => `--match="${testName}"`);
   try {
-    execSync(RUN_TESTS_CMD + args.concat(retryingArgs).join(' '), {
+    execSync(RUN_TESTS_CMD + retryingArgs.join(' '), {
       stdio: [0, 1, 2],
     });
     log('retrying succeed');

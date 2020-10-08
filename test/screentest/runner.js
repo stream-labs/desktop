@@ -36,7 +36,7 @@ const args = process.argv.slice(2);
   for (const branchName of branches) {
     checkoutBranch(branchName, baseBranch, CONFIG);
     // exec(`yarn ci:tests ${CONFIG.compiledTestsDist}/screentest/tests/**/*.js ${args.join(' ')}`);
-    exec(`yarn ci:tests ${CONFIG.compiledTestsDist}/screentest/tests/editor.js ${args.join(' ')}`);
+    exec(`yarn ci:tests yarn test:file ${CONFIG.compiledTestsDist}/screentest/tests/editor.js ${args.join(' ')}`);
   }
   // return to the current branch
   checkoutBranch('current', baseBranch, CONFIG);
@@ -49,7 +49,10 @@ const args = process.argv.slice(2);
 
   // send the status to the GitHub check and upload screenshots
   await updateCheck();
-})();
+})().catch(e => {
+  console.error(e);
+  process.exit(-1);
+});
 
 async function detectBaseBranchName() {
   const commit = getCommitSHA();
