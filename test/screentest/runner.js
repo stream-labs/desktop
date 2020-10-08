@@ -20,6 +20,7 @@ const CONFIG = require('./config.json');
 const commitSHA = getCommitSHA();
 const args = process.argv.slice(2);
 
+console.log('start main');
 (async function main() {
 
   // prepare the dist dir
@@ -27,6 +28,11 @@ const args = process.argv.slice(2);
   fs.mkdirSync(CONFIG.dist, { recursive: true });
 
   const baseBranch = await detectBaseBranchName();
+
+
+  console.log('run screen tests');
+  exec(`yarn ci:tests yarn test:file ${CONFIG.compiledTestsDist}/screentest/tests/editor.js ${args.join(' ')}`);
+  return;
 
   // make screenshots for each branch
   const branches = [
