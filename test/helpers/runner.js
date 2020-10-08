@@ -84,6 +84,8 @@ function getFailedTests() {
 }
 
 async function sendJobToAnalytics(failedTests) {
+  if (!BUILD_BUILDID) return; // do not send analytics for local builds
+
   const failedAfterRetryTests = getFailedTests();
   const testsToSend = failedTests.map(testName => ({
     name: testName,

@@ -30,8 +30,10 @@ console.log('start main');
   const baseBranch = await detectBaseBranchName();
 
 
-  console.log('run screen tests');
+  console.log('run screen tests', baseBranch);
+
   exec(`yarn ci:tests yarn test:file ${CONFIG.compiledTestsDist}/screentest/tests/editor.js ${args.join(' ')}`);
+
   return;
 
   // make screenshots for each branch
