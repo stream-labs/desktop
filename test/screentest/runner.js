@@ -20,7 +20,8 @@ const CONFIG = require('./config.json');
 const commitSHA = getCommitSHA();
 const args = process.argv.slice(2);
 
-console.log('start main');
+console.log(process.env);
+
 (async function main() {
 
   // prepare the dist dir

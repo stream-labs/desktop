@@ -28,9 +28,6 @@ jobs:
       - script: node node_modules/electron/install.js
         displayName: 'Install Electron'
 
-      - script: node --eval "console.log(process.env)"
-        displayName: 'Show env'
-
       - script: 'yarn ci:screentests'
         displayName: 'Snapshot testing'
         env:
