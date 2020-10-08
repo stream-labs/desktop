@@ -181,5 +181,6 @@
   "Size": "Size",
   "Position": "Position",
   "JACK Input Client": "JACK Input Client",
-  "Motion": "Motion"
+  "Motion": "Motion",
+  "Soundtrack source": "Soundtrack source"
 }

@@ -185,4 +185,8 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     name: $t('JACK Input Client'),
     description: $t(''),
   },
+  soundtrack_source: {
+    name: $t('Soundtrack source'),
+    description: $t(''),
+  },
 });

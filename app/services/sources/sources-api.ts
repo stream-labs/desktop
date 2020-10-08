@@ -112,7 +112,8 @@ export type TSourceType =
   | 'av_capture_input'
   | 'display_capture'
   | 'audio_line'
-  | 'syphon-input';
+  | 'syphon-input'
+  | 'soundtrack_source';
 
 // Register new properties managers here
 export type TPropertiesManager = 'default' | 'widget' | 'streamlabels' | 'platformApp' | 'replay';
