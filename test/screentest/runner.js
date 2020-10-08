@@ -52,6 +52,7 @@ console.log(process.env);
   // send the status to the GitHub check and upload screenshots
   await updateCheckAndUploadScreenshots();
 })().catch(async e => {
+  console.log('failed main');
   try {
     // report a failed status to the GitHub check
     await updateCheckAndUploadScreenshots();
@@ -77,6 +78,7 @@ async function detectBaseBranchName() {
 }
 
 async function updateCheckAndUploadScreenshots() {
+  console.log('try  updateCheckAndUploadScreenshots');
   if (!STREAMLABS_BOT_ID || !STREAMLABS_BOT_KEY) {
     console.info(
       'STREAMLABS_BOT_ID or STREAMLABS_BOT_KEY is not set. Skipping GitCheck status update',
