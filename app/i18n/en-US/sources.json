@@ -182,5 +182,6 @@
   "Position": "Position",
   "JACK Input Client": "JACK Input Client",
   "Motion": "Motion",
-  "Soundtrack source": "Soundtrack source"
+  "Twitch Soundtrack": "Twitch Soundtrack",
+  "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.": "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs."
 }
