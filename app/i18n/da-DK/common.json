@@ -55,6 +55,7 @@
   "Cloudbot": "Cloudbot",
   "Merch": "Merch",
   "App Store": "App Store",
+  "Alertbox Library": "Alertbox Library",
   "New": "Ny",
   "Face Masks": "Ansigtsmasker",
   "Help": "Hjælp",
@@ -118,5 +119,5 @@
   "Apps": "Apps",
   "Finish": "Afslut",
   "Get Prime": "Få Prime",
-  "System error message:": "System error message:"
+  "System error message:": "Systemfejlmeddelelse:"
 }

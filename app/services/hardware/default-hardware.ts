@@ -68,8 +68,8 @@ export class DefaultHardwareService extends PersistentStatefulService<
     return this.sourcesService.views.sources
       .filter(
         source =>
-          this.videoDevices.find(device => device.id === source.getSettings()[deviceProperty]) &&
-          source.type === byOS({ [OS.Windows]: 'dshow_input', [OS.Mac]: 'av_capture_input' }),
+          source.type === byOS({ [OS.Windows]: 'dshow_input', [OS.Mac]: 'av_capture_input' }) &&
+          this.videoDevices.find(device => device.id === source.getSettings()[deviceProperty]),
       )
       .map(source => ({
         source,

@@ -27,7 +27,7 @@ export class SourceTransformMenu extends Menu {
       click: () =>
         this.editorCommandsService.executeCommand(
           'ResetTransformCommand',
-          this.selectionService.getActiveSelection(),
+          this.selectionService.views.globalSelection,
         ),
     });
 
@@ -38,7 +38,7 @@ export class SourceTransformMenu extends Menu {
       click: () =>
         this.editorCommandsService.executeCommand(
           'StretchToScreenCommand',
-          this.selectionService.getActiveSelection(),
+          this.selectionService.views.globalSelection,
         ),
     });
 
@@ -47,7 +47,7 @@ export class SourceTransformMenu extends Menu {
       click: () =>
         this.editorCommandsService.executeCommand(
           'FitToScreenCommand',
-          this.selectionService.getActiveSelection(),
+          this.selectionService.views.globalSelection,
         ),
     });
 
@@ -58,7 +58,7 @@ export class SourceTransformMenu extends Menu {
       click: () =>
         this.editorCommandsService.executeCommand(
           'CenterItemsCommand',
-          this.selectionService.getActiveSelection(),
+          this.selectionService.views.globalSelection,
           ECenteringType.Screen,
         ),
     });
@@ -68,7 +68,7 @@ export class SourceTransformMenu extends Menu {
       click: () =>
         this.editorCommandsService.executeCommand(
           'CenterItemsCommand',
-          this.selectionService.getActiveSelection(),
+          this.selectionService.views.globalSelection,
           ECenteringType.Horizontal,
         ),
     });
@@ -78,7 +78,7 @@ export class SourceTransformMenu extends Menu {
       click: () =>
         this.editorCommandsService.executeCommand(
           'CenterItemsCommand',
-          this.selectionService.getActiveSelection(),
+          this.selectionService.views.globalSelection,
           ECenteringType.Vertical,
         ),
     });
@@ -90,7 +90,7 @@ export class SourceTransformMenu extends Menu {
       click: () =>
         this.editorCommandsService.executeCommand(
           'FlipItemsCommand',
-          this.selectionService.getActiveSelection(),
+          this.selectionService.views.globalSelection,
           EFlipAxis.Vertical,
         ),
     });
@@ -100,7 +100,7 @@ export class SourceTransformMenu extends Menu {
       click: () =>
         this.editorCommandsService.executeCommand(
           'FlipItemsCommand',
-          this.selectionService.getActiveSelection(),
+          this.selectionService.views.globalSelection,
           EFlipAxis.Horizontal,
         ),
     });
@@ -112,7 +112,7 @@ export class SourceTransformMenu extends Menu {
       click: () =>
         this.editorCommandsService.executeCommand(
           'RotateItemsCommand',
-          this.selectionService.getActiveSelection(),
+          this.selectionService.views.globalSelection,
           90,
         ),
     });
@@ -122,7 +122,7 @@ export class SourceTransformMenu extends Menu {
       click: () =>
         this.editorCommandsService.executeCommand(
           'RotateItemsCommand',
-          this.selectionService.getActiveSelection(),
+          this.selectionService.views.globalSelection,
           -90,
         ),
     });
@@ -132,7 +132,7 @@ export class SourceTransformMenu extends Menu {
       click: () =>
         this.editorCommandsService.executeCommand(
           'RotateItemsCommand',
-          this.selectionService.getActiveSelection(),
+          this.selectionService.views.globalSelection,
           180,
         ),
     });

@@ -20,6 +20,7 @@ export class StreamlabelsManager extends DefaultManager {
   private subscription: Subscription;
 
   init() {
+    super.init();
     this.subscription = this.streamlabelsService.output.subscribe(output => {
       if (output[this.settings.statname] !== this.oldOutput) {
         this.oldOutput = output[this.settings.statname];

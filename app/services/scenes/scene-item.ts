@@ -174,8 +174,11 @@ export class SceneItem extends SceneItemNode {
     }
 
     if (changed.locked !== void 0) {
-      if (changed.locked && this.selectionService.isSelected(this.sceneItemId)) {
-        this.selectionService.deselect(this.sceneItemId);
+      if (
+        changed.locked &&
+        this.selectionService.views.globalSelection.isSelected(this.sceneItemId)
+      ) {
+        this.selectionService.views.globalSelection.deselect(this.sceneItemId);
       }
     }
 
