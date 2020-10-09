@@ -42,6 +42,21 @@
         >
           Prime
         </NavItem>
+        <button
+          class="settings-auth"
+          @click="handleAuth()"
+          v-track-click="{
+            component: 'Settings',
+            target: this.userService.isLoggedIn ? 'logout' : 'login',
+          }"
+        >
+          <i :class="userService.isLoggedIn ? 'fas fa-sign-out-alt' : 'fas fa-sign-in-alt'" />
+          {{
+            userService.isLoggedIn
+              ? $t('Logout %{username}', { username: this.userService.username })
+              : $t('Login')
+          }}
+        </button>
       </NavMenu>
 
       <scrollable className="settings-container">
@@ -141,6 +156,26 @@
   .padding-top(2);
 
   flex-grow: 1;
+}
+
+.settings-auth {
+  cursor: pointer;
+  border-left: 1px solid transparent;
+  padding-left: 24px;
+  font-size: 14px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  position: absolute;
+  bottom: 0;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  width: 100%;
+  border-top: 1px solid var(--border);
+
+  i {
+    margin-right: 8px;
+  }
 }
 </style>
 
