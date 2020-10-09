@@ -13,6 +13,7 @@ export class RemoveNodesCommand extends Command {
 
   constructor(private selection: Selection) {
     super();
+    this.selection.freeze();
     this.selectionName = this.selection.getNodes()[0].name;
   }
 

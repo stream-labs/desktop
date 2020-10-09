@@ -17,6 +17,7 @@
   "Rather do this manually?": "Vous préférez définir les paramètres manuellement?",
   "Setup later": "Configurer plus tard",
   "Widget Theme installed & activated. Click here to manage your Widget Profiles.": "Thème de widget installé et activé. Cliquez ici pour gérer vos profils de widget.",
+  "Alertbox Theme installed & activated. Click here to manage your Widget Profiles.": "Alertbox Theme installed & activated. Click here to manage your Widget Profiles.",
   "Follow": "Suivre",
   "Subscription": "Abonnement",
   "Donation": "Don",
@@ -180,5 +181,6 @@
   "Slide Out Down": "Glisser vers l’extérieur en bas",
   "Slide Out Left": "Glisser vers l’extérieur a gauche",
   "Slide Out Right": "Glisser vers l’extérieur a droite",
-  "Slide Out Up": "Glisser vers l’extérieur en haut"
+  "Slide Out Up": "Glisser vers l’extérieur en haut",
+  "Pick Screen Color": "Pick Screen Color"
 }

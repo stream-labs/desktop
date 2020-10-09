@@ -14,7 +14,7 @@ import Utils from 'services/utils';
 import * as obs from '../../../obs-api';
 import isEqual from 'lodash/isEqual';
 import omitBy from 'lodash/omitBy';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, omit } from 'lodash';
 import { assertIsDefined } from '../../util/properties-type-guards';
 import { SourceFiltersService } from '../source-filters';
 
@@ -167,7 +167,9 @@ export class Source implements ISourceApi {
     const newSource = this.sourcesService.createSource(this.name, this.type, this.getSettings(), {
       sourceId: newSourceId,
       propertiesManager: this.getPropertiesManagerType(),
-      propertiesManagerSettings: this.getPropertiesManagerSettings(),
+      // Media backup settings are considered per-source and should not be
+      // copied to new sources.
+      propertiesManagerSettings: omit(this.getPropertiesManagerSettings(), 'mediaBackup'),
     });
 
     // copy filters

@@ -7,32 +7,56 @@
   font-weight: 700;
 }
 
-.prime-card-container {
-  display: grid;
-  gap: 24px 24px;
-  grid-template-columns: auto 33% auto;
-  grid-template-rows: auto auto;
-  grid-auto-flow: row;
-  padding: 40px;
-  width: 100%;
+.card-container {
+  height: 400px;
+  width: 350px;
+  margin: 10px;
+  padding: 32px;
+  border-radius: 8px;
+  background: var(--section);
+  color: var(--paragraph);
+  position: relative;
+
+  h1 {
+    margin-bottom: 8px;
+    color: var(--title);
+  }
+
+  strong {
+    font-size: 16px;
+    margin-bottom: 24px;
+    display: block;
+    color: var(--title);
+  }
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  i {
+    margin-right: 8px;
+  }
 }
 
-.prime-card {
-  grid-column: auto / auto;
-  grid-row: auto / auto;
-  height: 175px;
-  background: var(--section-alt);
-  padding: 16px;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+.prime-card-container {
+  background: var(--prime);
+  color: var(--section);
+}
 
-  img {
-    height: 95px;
-    width: auto;
-  }
+.prime-row {
+  margin-bottom: 12px;
+}
+
+.prime-button {
+  width: 80%;
+  border-radius: 4px;
+  margin-top: auto;
+  text-align: center;
+  background: var(--background);
+  color: var(--title);
+  padding: 8px;
+  position: absolute;
+  bottom: 16px;
 }
 
 .expiration-container {

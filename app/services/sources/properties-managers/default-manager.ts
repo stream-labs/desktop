@@ -101,7 +101,7 @@ export class DefaultManager extends PropertiesManager {
 
     this.mediaBackupService
       .createNewFile(
-        this.mediaBackupService.getLocalFileId(),
+        this.settings.mediaBackup.localId,
         this.obsSource.settings[this.mediaBackupFileSetting],
       )
       .then(file => {

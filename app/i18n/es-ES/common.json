@@ -55,6 +55,7 @@
   "Cloudbot": "Cloudbot",
   "Merch": "Mercancía",
   "App Store": "Tienda de aplicaciones",
+  "Alertbox Library": "Alertbox Library",
   "New": "Novedad",
   "Face Masks": "Máscaras de cara",
   "Help": "Ayuda",
@@ -118,5 +119,5 @@
   "Apps": "Aplicaciones",
   "Finish": "Finalizar",
   "Get Prime": "Obtener Prime",
-  "System error message:": "System error message:"
+  "System error message:": "Mensaje de error del sistema:"
 }
