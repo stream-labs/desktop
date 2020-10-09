@@ -186,7 +186,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     description: $t(''),
   },
   soundtrack_source: {
-    name: $t('Soundtrack source'),
-    description: $t('Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from the your Twitch VODs.'),
+    name: $t('Twitch Soundtrack'),
+    description: $t('Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.'),
   },
 });
