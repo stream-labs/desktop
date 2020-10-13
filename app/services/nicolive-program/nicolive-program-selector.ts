@@ -1,4 +1,6 @@
 import { StatefulService, mutation } from 'services/stateful-service';
+import { NicoliveClient } from './NicoliveClient';
+import { OnairChannelsData } from './ResponseTypes';
 
 /**
  * 配信する番組種別
@@ -40,6 +42,7 @@ export interface INicoliveProgramSelectorState {
   selectedProviderType: TProviderType | null;
   selectedChannel: { id: string; name: string } | null;
   selectedProgram: { id: string; title?: string } | null; // ユーザー番組の場合はタイトルは取得せず undefined のまま
+  candidateChannels: OnairChannelsData;
   candidatePrograms: { id: string; title: string }[];
   isLoading: boolean;
   currentStep: TStep;
@@ -51,33 +54,42 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
     selectedProviderType: null,
     selectedChannel: null,
     selectedProgram:  null,
+    candidateChannels: [],
     candidatePrograms: [],
     isLoading: false,
     currentStep: 'providerTypeSelect'
   };
 
+  client = new NicoliveClient();
+
   init() {
     super.init();
   }
 
-  onSelectProviderTypeChannel() {
+  async onSelectProviderTypeChannel() {
     if (this.state.currentStep !== 'providerTypeSelect') {
       return;
     }
     this.SET_STATE({
+      currentStep: 'channelSelect',
       selectedProviderType: 'channel',
-      currentStep: 'channelSelect'
+      isLoading: true
+    });
+    const candidateChannels = await this.client.fetchOnairChannnels();
+    this.SET_STATE({
+      isLoading: false,
+      candidateChannels
     });
   }
 
-  onSelectProviderTypeUser(userProgramId: string) {
+  onSelectProviderTypeUser() {
     if (this.state.currentStep !== 'providerTypeSelect') {
       return;
     }
     this.SET_STATE({
       selectedProviderType: 'user',
       selectedChannel: null,
-      selectedProgram: { id: userProgramId },
+      selectedProgram: { id: 'hoge' }, // TODO
       currentStep: 'confirm'
     });
   }
@@ -87,9 +99,8 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
    * 番組選択ステップへ移動後, APIを叩いて番組IDからタイトルを解決し, candidatePrograms に番組IDとタイトルを保存する.
    * @param id 配信するチャンネルID (chXXXX)
    * @param name 配信するチャンネル名
-   * @param broadcastablePrograms 配信可能な番組 の一覧
    */
-  onSelectChannel(id: string, name: string, broadcastablePrograms: { id: string }[]) {
+  async onSelectChannel(id: string, name: string) {
     if(this.state.currentStep !== 'channelSelect') {
       return;
     }
@@ -99,12 +110,16 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
       candidatePrograms: [],
       isLoading: true
     });
-    // TODO: API から番組タイトルを取得するようにする. 現在は仮のタイトルを指定.
-    const candidatePrograms = broadcastablePrograms.map(program => ({
-      id: program.id,
-      title: `これは ${program.id} のタイトルです`
-    }));
-    // ↑ ここまで仮の処理
+    const { testProgramId, programId, nextProgramId } = await this.client.fetchOnairChannelProgram(id);
+    const candidateProgramIds = [testProgramId, programId, nextProgramId].filter(Boolean);
+    const candidatePrograms = (await Promise.all(candidateProgramIds.map(async (programId) => {
+      try {
+        const program = await this.client.fetchProgram(programId);
+        return program.ok ? { id: programId, title: program.value.title } : undefined;
+      } catch(error) {
+        return undefined;
+      }
+    }))).filter(Boolean);
     this.SET_STATE({
       candidatePrograms,
       isLoading: false
@@ -155,6 +170,7 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
     }
     this.SET_STATE({
       currentStep: step,
+      candidateChannels: stepsMap[step] <= stepsMap['providerTypeSelect'] ? [] : this.state.candidateChannels,
       candidatePrograms: stepsMap[step] <= stepsMap['channelSelect'] ? [] : this.state.candidatePrograms,
       selectedProviderType: stepsMap[step] <= stepsMap['providerTypeSelect'] ? null : this.state.selectedProviderType,
       selectedChannel: stepsMap[step] <= stepsMap['channelSelect'] ? null : this.state.selectedChannel,

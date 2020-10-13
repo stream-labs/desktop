@@ -39,8 +39,6 @@
   },
   "nicoliveProgramSelector": {
     "title": "配信番組の選択",
-    "description": "配信可能な番組が複数あります。<br/>配信する番組を選択してください。",
-    "cancel": "キャンセル",
     "steps": {
       "providerTypeSelect": {
         "menuTitle": "配信種別",
@@ -67,6 +65,7 @@
       "channel": "チャンネル番組",
       "user": "ユーザー番組"
     },
+    "noChannelPrograms": "指定されたチャンネルに配信可能な番組がありません。<br />番組を作成するか、正しいチャンネルが選択されているかを確認してください。",
     "done": "番組を決定して配信する"
   },
   "FPS": "フレームレート",

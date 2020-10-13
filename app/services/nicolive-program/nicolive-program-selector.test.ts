@@ -27,7 +27,7 @@ test('ユーザー番組を選んで配信開始のための番組情報を準�
 
   // 確認へ
   const programId = 'lv1111';
-  instance.onSelectProviderTypeUser(programId);
+  instance.onSelectProviderTypeUser();
   expect(instance.state.currentStep).toBe('confirm');
   expect(instance.state.selectedProviderType).toBe('user');
   expect(instance.state.selectedChannel).toBeNull();
@@ -49,7 +49,7 @@ test('チャンネル番組を選んで配信開始のための番組情報を�
   const selectedChannelId = 'ch9999';
   const selectedChannelName = 'チャンネルああああ'
   const programs = [{ id: 'lv1111' }, { id: 'lv2222' }];
-  instance.onSelectChannel(selectedChannelId, selectedChannelName, programs);
+  instance.onSelectChannel(selectedChannelId, selectedChannelName);
   expect(instance.state.currentStep).toBe('programSelect');
   // TODO: APIを叩くようになったら、モック化されたAPIを絡めたテストを書く
   // その際タイトルも検査するようにする
@@ -74,7 +74,7 @@ test('番組選択ステップで, チャンネルや番組の選択をしよう
   expect(instance.state.currentStep).toBe('providerTypeSelect');
 
   // チャンネル選択ができない
-  instance.onSelectChannel('ch1', 'name', []);
+  instance.onSelectChannel('ch1', 'name');
   expect(instance.state.currentStep).toBe('providerTypeSelect');
   expect(instance.state.selectedChannel).toBeNull();
 
@@ -101,7 +101,7 @@ test('チャンネル選択ステップで, 配信種別や番組の選択をし
   expect(instance.state.selectedProviderType).toBe('channel');
 
   // 配信種別をユーザー番組に変更できない
-  instance.onSelectProviderTypeUser('lv1');
+  instance.onSelectProviderTypeUser();
   expect(instance.state.currentStep).toBe('channelSelect');
   expect(instance.state.selectedProviderType).toBe('channel');
 
@@ -122,7 +122,7 @@ test('番組選択ステップで, 配信種別やチャンネルの選択をし
 
   // 番組選択へ
   const selectedChannelId = 'ch9999';
-  instance.onSelectChannel(selectedChannelId, 'チャンネルああああ', [{ id: 'lv1111' }, { id: 'lv2222' }]);
+  instance.onSelectChannel(selectedChannelId, 'チャンネルああああ');
   expect(instance.state.currentStep).toBe('programSelect');
 
   // 配信種別をチャンネルに変更しようとしても何も起きない
@@ -131,12 +131,12 @@ test('番組選択ステップで, 配信種別やチャンネルの選択をし
   expect(instance.state.selectedProviderType).toBe('channel');
 
   // 配信種別をユーザー番組に変更できない
-  instance.onSelectProviderTypeUser('lv1');
+  instance.onSelectProviderTypeUser();
   expect(instance.state.currentStep).toBe('programSelect');
   expect(instance.state.selectedProviderType).toBe('channel');
 
   // チャンネルを選択しようとしても何も起きない
-  instance.onSelectChannel('ch100000000', 'name', [])
+  instance.onSelectChannel('ch100000000', 'name')
   expect(instance.state.currentStep).toBe('programSelect');
   expect(instance.state.selectedChannel.id).toBe(selectedChannelId)
 });
@@ -148,7 +148,7 @@ test('ユーザー番組の確認ステップでは, あらゆる設定済の項
   expect(instance.state.currentStep).toBe('providerTypeSelect');
 
   // 確認へ
-  instance.onSelectProviderTypeUser('lv9800');
+  instance.onSelectProviderTypeUser();
   expect(instance.state.currentStep).toBe('confirm');
 
   // 配信種別をチャンネルに変更できない
@@ -162,7 +162,7 @@ test('ユーザー番組の確認ステップでは, あらゆる設定済の項
   expect(instance.state.selectedProviderType).toBe('user');
 
   // チャンネルを選択しようとしても何も起きない
-  instance.onSelectChannel('ch1111', 'name', [])
+  instance.onSelectChannel('ch1111', 'name')
   expect(instance.state.currentStep).toBe('confirm');
   expect(instance.state.selectedProviderType).toBe('user');
   expect(instance.state.selectedChannel).toBeNull();
@@ -184,7 +184,7 @@ test('チャンネル番組の確認ステップでは, あらゆる設定済の
 
   // 番組選択へ
   const selectedChannelId = 'ch9999';
-  instance.onSelectChannel(selectedChannelId, 'チャンネルああああ', [{ id: 'lv1111' }, { id: 'lv2222' }]);
+  instance.onSelectChannel(selectedChannelId, 'チャンネルああああ');
 
   // 確認へ
   const selectedProgram = 'lv1111';
@@ -202,7 +202,7 @@ test('チャンネル番組の確認ステップでは, あらゆる設定済の
   expect(instance.state.selectedProviderType).toBe('channel');
 
   // チャンネルを選択しようとしても変更できない
-  instance.onSelectChannel('ch1111', 'name', [])
+  instance.onSelectChannel('ch1111', 'name')
   expect(instance.state.currentStep).toBe('confirm');
   expect(instance.state.selectedProviderType).toBe('channel');
   expect(instance.state.selectedChannel.id).toBe(selectedChannelId);
@@ -226,7 +226,7 @@ describe('ステップ比較系メソッド', () => {
         case 'providerTypeSelect':
           return instance;
         case 'confirm':
-          instance.onSelectProviderTypeUser('id');
+          instance.onSelectProviderTypeUser();
           return instance;
         default:
           throw new Error('作れません')
@@ -240,11 +240,11 @@ describe('ステップ比較系メソッド', () => {
           return instance;
         case 'programSelect':
           instance.onSelectProviderTypeChannel();
-          instance.onSelectChannel('ch9999', 'name', [{ id: 'lv1' }, { id: 'lv2' }, { id: 'lv3' }]);
+          instance.onSelectChannel('ch9999', 'name');
           return instance;
         case 'confirm':
           instance.onSelectProviderTypeChannel();
-          instance.onSelectChannel('ch9999', 'name', [{ id: 'lv1' }, { id: 'lv2' }, { id: 'lv3' }]);
+          instance.onSelectChannel('ch9999', 'name');
           instance.onSelectBroadcastingProgram('id', 'title');
           return instance;
       }

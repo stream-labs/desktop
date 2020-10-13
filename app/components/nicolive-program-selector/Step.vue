@@ -5,9 +5,7 @@
      <p>{{ description }} </p>
    </div>
    <div class="section">
-     <ul class="list">
-       <slot />
-     </ul>
+     <slot />
    </div>
   </div>
 </template>

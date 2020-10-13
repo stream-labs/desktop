@@ -24,48 +24,61 @@
         v-if="currentStep === 'providerTypeSelect'"
         :class="'provider-type-select-step'"
         :title="getStepTitle(currentStep)"
-        :desciption="getStepDescription(currentStep)">
-        <li v-for="providerType in providerTypes" :key="providerType">
-          <a @click="onSelectProviderType(providerType)">
-            <p class="anchor-text">{{ getProviderTypeProgramText(providerType) }}</p>
-          </a>
-        </li>
+        :description="getStepDescription(currentStep)">
+        <ul class="list">
+          <li v-for="providerType in providerTypes" :key="providerType">
+            <a @click="onSelectProviderType(providerType)">
+              <p class="anchor-text">{{ getProviderTypeProgramText(providerType) }}</p>
+            </a>
+          </li>
+        </ul>
       </Step>
       <Step
         v-if="currentStep === 'channelSelect'"
-        :class="'broadcast-channel-select-step'"
+        :class="'channel-select-step'"
         :title="getStepTitle(currentStep)"
-        :desciption="getStepDescription(currentStep)">
-          <li v-for="channel in queryParams.channels" :key="channel.id" >
+        :description="getStepDescription(currentStep)">
+        <ul class="list">
+          <li v-for="channel in candidateChannels" :key="channel.id" >
             <a @click="onSelectChannel(channel.id, channel.name)">
               <img :src="channel.thumbnailUrl" :alt="channel.name" class="channel-thumbnail" />
               <p class="anchor-text">{{ channel.name }}</p>
             </a>
           </li>
+        </ul>
       </Step>
       <Step
           v-if="currentStep === 'programSelect'"
           :class="'program-select-step'"
           :title="getStepTitle(currentStep)"
-          :desciption="getStepDescription(currentStep)">
-          <li v-for="program in candidatePrograms" :key="program.id">
-            <a @click="onSelectBroadcastingProgram(program.id, program.title)" >
-              <p class="anchor-text">{{ program.title }}</p>
-              <p class="annotation">
-                <span class="lv">{{ program.id }}</span>
-              </p>
-            </a>
-          </li>
+          :description="getStepDescription(currentStep)">
+          <!-- 文言に改行タグ <br /> を含むため、 v-html で HTML を注入しています。-->
+          <div class="section"
+             v-if="canShowNoProgramsSection()"
+             v-html="$t('streaming.nicoliveProgramSelector.noChannelPrograms')"
+          />
+          <ul class="list" v-else>
+            <li v-for="program in candidatePrograms" :key="program.id">
+              <a @click="onSelectBroadcastingProgram(program.id, program.title)" >
+                <p class="anchor-text">{{ program.title }}</p>
+                <p class="annotation">
+                  <span class="lv">{{ program.id }}</span>
+                </p>
+              </a>
+            </li>
+          </ul>
       </Step>
       <Step
         v-if="currentStep === 'confirm'"
         :class="'confirm-step'"
         :title="getStepTitle(currentStep)"
-        :desciption="getStepDescription(currentStep)">
-          <li v-for="step in selectionSteps" :key="step">
-            <div class="caption">{{ getStepTitle(step) }}</div>
-            <div class="value">{{ getSelectedValueForDisplay(step) || '-' }}</div>
-          </li>
+        :description="getStepDescription(currentStep)">
+          <ul class="list">
+            <li v-for="step in selectionSteps" :key="step">
+              <div class="caption">{{ getStepTitle(step) }}</div>
+              <div class="value">{{ getSelectedValueForDisplay(step) || '-' }}</div>
+            </li>
+          </ul>
       </Step>
     </div>
   </div>
