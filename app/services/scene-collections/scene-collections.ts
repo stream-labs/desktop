@@ -329,6 +329,9 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     );
     const collectionName = this.suggestName(name);
     await this.loadOverlay(pathName, collectionName);
+
+    // repair scene collection in the case if it has any issues
+    this.scenesService.repair();
   }
 
   /**
