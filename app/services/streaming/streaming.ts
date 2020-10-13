@@ -454,6 +454,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       const errorType = errorTypeOrError as TStreamErrorType;
       this.SET_ERROR(errorType, errorDetails, platform);
     }
+    console.error(this.state.info.error);
   }
 
   resetInfo() {

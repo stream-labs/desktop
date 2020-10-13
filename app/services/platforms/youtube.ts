@@ -25,14 +25,15 @@ interface IYoutubeServiceState extends IPlatformState {
   streamId: string;
   channelId: string;
   lifecycleStep: TYoutubeLifecycleStep;
+  broadcastStatus: TBroadcastLifecycleStatus | '';
   settings: IYoutubeStartStreamOptions;
 }
 
-export interface IYoutubeStartStreamOptions {
+export interface IYoutubeStartStreamOptions extends IExtraBroadcastSettings {
   title: string;
   broadcastId?: string;
   description?: string;
-  enableAutoStart?: boolean;
+  privacyStatus?: 'private' | 'public' | 'unlisted';
 }
 
 export type TYoutubeLifecycleStep =
@@ -59,11 +60,7 @@ interface IYoutubeCollection<T> {
  */
 export interface IYoutubeLiveBroadcast {
   id: string;
-  contentDetails: {
-    boundStreamId: string;
-    enableAutoStart: boolean;
-    enableEmbed: boolean;
-  };
+  contentDetails: { boundStreamId: string } & IExtraBroadcastSettings;
   snippet: {
     title: string;
     description: string;
@@ -112,6 +109,15 @@ interface IYoutubeLiveStream {
   };
 }
 
+interface IExtraBroadcastSettings {
+  enableAutoStart?: boolean;
+  enableAutoStop?: boolean;
+  enableEmbed?: boolean;
+  enableDvr?: boolean;
+  projection?: 'rectangular' | '360';
+  latencyPreference?: 'normal' | 'low' | 'ultraLow';
+}
+
 type TStreamStatus = 'active' | 'created' | 'error' | 'inactive' | 'ready';
 type TBroadcastLifecycleStatus =
   | 'complete'
@@ -138,11 +144,17 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     streamId: '',
     channelId: '',
     lifecycleStep: 'idle',
+    broadcastStatus: '',
     settings: {
       broadcastId: '',
       title: '',
       description: '',
-      enableAutoStart: false,
+      enableAutoStart: true,
+      enableAutoStop: true,
+      enableEmbed: true,
+      enableDvr: true,
+      projection: 'rectangular',
+      latencyPreference: 'normal',
     },
   };
 
@@ -196,16 +208,18 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   }
 
   async beforeGoLive(settings: IGoLiveSettings) {
+    const ytSettings = settings.platforms.youtube;
     const {
       title,
       description,
+      enableAutoStart,
       broadcastId: scheduledBroadcastId,
     }: IYoutubeStartStreamOptions = settings.platforms.youtube;
     // update selected LiveBroadcast with new title and description
     // or create a new LiveBroadcast if there are no broadcasts selected
     let broadcastId = scheduledBroadcastId;
     if (!broadcastId) {
-      broadcastId = await this.createBroadcast({ title, description });
+      broadcastId = await this.createBroadcast({ title, description, enableAutoStart });
     } else {
       await this.updateBroadcast(broadcastId, { title, description });
     }
@@ -224,63 +238,63 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     });
     this.SET_STREAM_KEY(streamKey);
 
-    // update the local chanel info based on the selected broadcast and emit the "channelInfoChanged" event
-    this.setActiveBroadcast(broadcast);
+    // update the local chanel info based on the selected broadcast
+    this.updateLocalBroadcastState(broadcast);
   }
 
   async publishBroadcast() {
-    // we don't have broadcastId if user start stream with the 'just go live' button
-    if (!this.state.settings.broadcastId) return;
-
-    const streamId = this.state.streamId;
-    const broadcastId = this.state.settings.broadcastId;
-
-    // if enableAutoStart=true then the broadcast should be published right after YT receives the transmission
-    if (this.state.settings.enableAutoStart) {
-      this.setLifecycleStep('waitForBroadcastToBeLive');
-      await this.waitForBroadcastStatus(broadcastId, 'live');
-      this.setLifecycleStep('live');
-      return;
-    }
-
-    // otherwise manually publish broadcast
-    try {
-      // SLOBS started sending the video data to Youtube
-      // wait YT for establish connection with SLOBS
-      this.setLifecycleStep('waitForStreamToBeActive');
-      await this.waitForStreamStatus(streamId, 'active');
-
-      // the connection has been established
-      // at this step you can see preview of the stream in the Youtube dashboard
-      // but the stream still is not available for other viewers
-
-      // we can't make it available for other user until we
-      // didn't switch it to the 'testing' state
-      this.setLifecycleStep('transitionBroadcastToTesting');
-      await this.transitionBroadcastStatus(broadcastId, 'testing' as TBroadcastLifecycleStatus);
-
-      // now we ready to publish the broadcast
-      this.setLifecycleStep('waitForBroadcastToBeLive');
-      await this.transitionBroadcastStatus(broadcastId, 'live');
-
-      // we all set
-      this.setLifecycleStep('live');
-    } catch (e) {
-      if (!this.userService.isLoggedIn || !this.userService.state.auth?.platforms?.youtube) {
-        // user has logged out before the stream started
-        // don't treat this as an error
-        return;
-      }
-
-      if (this.state.lifecycleStep === 'idle') {
-        // user stopped streaming before it started, so transitions for broadcast may not work
-        // don't treat this as an error
-        return;
-      }
-
-      // something is wrong in afterGoLive hook
-      throw e;
-    }
+    // // we don't have broadcastId if user start stream with the 'just go live' button
+    // if (!this.state.settings.broadcastId) return;
+    //
+    // const streamId = this.state.streamId;
+    // const broadcastId = this.state.settings.broadcastId;
+    //
+    // // if enableAutoStart=true then the broadcast should be published right after YT receives the transmission
+    // if (this.state.settings.enableAutoStart) {
+    //   this.setLifecycleStep('waitForBroadcastToBeLive');
+    //   await this.waitForBroadcastStatus(broadcastId, 'live');
+    //   this.setLifecycleStep('live');
+    //   return;
+    // }
+    //
+    // // otherwise manually publish broadcast
+    // try {
+    //   // SLOBS started sending the video data to Youtube
+    //   // wait YT for establish connection with SLOBS
+    //   this.setLifecycleStep('waitForStreamToBeActive');
+    //   await this.waitForStreamStatus(streamId, 'active');
+    //
+    //   // the connection has been established
+    //   // at this step you can see preview of the stream in the Youtube dashboard
+    //   // but the stream still is not available for other viewers
+    //
+    //   // we can't make it available for other user until we
+    //   // didn't switch it to the 'testing' state
+    //   this.setLifecycleStep('transitionBroadcastToTesting');
+    //   await this.transitionBroadcastStatus(broadcastId, 'testing' as TBroadcastLifecycleStatus);
+    //
+    //   // now we ready to publish the broadcast
+    //   this.setLifecycleStep('waitForBroadcastToBeLive');
+    //   await this.transitionBroadcastStatus(broadcastId, 'live');
+    //
+    //   // we all set
+    //   this.setLifecycleStep('live');
+    // } catch (e) {
+    //   if (!this.userService.isLoggedIn || !this.userService.state.auth?.platforms?.youtube) {
+    //     // user has logged out before the stream started
+    //     // don't treat this as an error
+    //     return;
+    //   }
+    //
+    //   if (this.state.lifecycleStep === 'idle') {
+    //     // user stopped streaming before it started, so transitions for broadcast may not work
+    //     // don't treat this as an error
+    //     return;
+    //   }
+    //
+    //   // something is wrong in afterGoLive hook
+    //   throw e;
+    // }
   }
 
   async afterStopStream() {
@@ -418,17 +432,18 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       description,
     });
     const broadcast = await this.fetchBroadcast(broadcastId);
-    this.setActiveBroadcast(broadcast);
+    this.updateLocalBroadcastState(broadcast);
     return true;
   }
 
   /**
    * update the chanel info based on the selected broadcast
    */
-  private setActiveBroadcast(broadcast: IYoutubeLiveBroadcast) {
+  private updateLocalBroadcastState(broadcast: IYoutubeLiveBroadcast) {
     const patch = {
       streamId: broadcast.contentDetails?.boundStreamId,
-      settings: {
+      broadcastStatus: broadcast.status?.lifeCycleStatus,
+      settings: broadcast.snippet && {
         broadcastId: broadcast.id,
         title: broadcast.snippet.title,
         description: broadcast.snippet.description,
@@ -447,11 +462,9 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   /**
    * create a new broadcast via API
    */
-  private async createBroadcast(params: {
-    title: string;
-    description?: string;
-    scheduledStartTime?: string;
-  }): Promise<string> {
+  private async createBroadcast(
+    params: IYoutubeStartStreamOptions & { scheduledStartTime?: string },
+  ): Promise<IYoutubeLiveBroadcast> {
     const fields = ['snippet', 'contentDetails', 'status'];
     const endpoint = `liveBroadcasts?part=${fields.join(',')}`;
     const data: Dictionary<any> = {
@@ -461,15 +474,22 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
         description: params.description,
         categoryId: 10,
       },
+      contentDetails: {
+        enableAutoStart: params.enableAutoStart,
+        enableAutoStop: params.enableAutoStop,
+        enableEmbed: params.enableEmbed,
+        enableDvr: params.enableDvr,
+        projection: params.projection,
+        latencyPreference: params.latencyPreference,
+      },
       status: { privacyStatus: 'public' },
     };
 
-    const broadcastInfo = await this.requestYoutube<{ id: string }>({
+    return await this.requestYoutube<IYoutubeLiveBroadcast>({
       body: JSON.stringify(data),
       method: 'POST',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
     });
-    return broadcastInfo.id;
   }
 
   /**
@@ -616,6 +636,8 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   private async waitForBroadcastStatus(broadcastId: string, status: TBroadcastLifecycleStatus) {
     await this.pollAPI(async () => {
       const broadcast = await this.fetchBroadcast(broadcastId, ['status']);
+      this.updateLocalBroadcastState(broadcast);
+      console.log(`current broadcast status is ${broadcast.status.lifeCycleStatus}`);
       return broadcast.status.lifeCycleStatus === status;
     });
   }
@@ -626,6 +648,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
    * So we should poll the API until we get the required status
    */
   private async transitionBroadcastStatus(broadcastId: string, status: TBroadcastLifecycleStatus) {
+    const startingStatus = this.state.broadcastStatus;
     try {
       // ask Youtube to change the broadcast status
       const endpoint = `liveBroadcasts/transition?broadcastStatus=${status}&id=${broadcastId}&part=status`;
@@ -637,13 +660,15 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       // wait for Youtube to change the broadcast status
       await this.waitForBroadcastStatus(broadcastId, status);
     } catch (e) {
-      if (e.message === 'Redundant transition') {
+      if (e.details === 'Redundant transition') {
         // handle Redundant transition as a success
+        console.log('redundant transition', status);
         return;
       }
+      const errorMessage = e.details || e.message;
       throwStreamError(
         'YOUTUBE_PUBLISH_FAILED',
-        `LiveBroadcast has not changed the status to ${status}: ${e.details || e.message}`,
+        `LiveBroadcast has not changed the status from ${startingStatus} to ${status}: ${errorMessage}. Current status is ${this.state.broadcastStatus}`,
       );
     }
   }
