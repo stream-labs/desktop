@@ -14,6 +14,7 @@ export interface IEnv {
   SLOBS_IPC: boolean;
   SLOBS_USE_LOCAL_HOST: boolean;
   SLOBS_VERSION: string;
+  SLOBS_TRACE_SYNC_IPC: boolean;
   CI: boolean;
 }
 

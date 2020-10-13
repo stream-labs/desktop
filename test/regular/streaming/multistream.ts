@@ -2,6 +2,7 @@ import { test, useSpectron } from '../../helpers/spectron';
 import { logIn } from '../../helpers/spectron/user';
 import { clickGoLive, prepareToGoLive, submit } from '../../helpers/spectron/streaming';
 import { fillForm, selectTitle, selectGamesByTitles } from '../../helpers/form-monkey';
+import { sleep } from '../../helpers/sleep';
 
 useSpectron();
 
@@ -15,10 +16,11 @@ test('Multistream default mode', async t => {
   await fillForm(t, null, {
     twitch: true,
     facebook: true,
-
-    // TODO enable youtube after 24h disabled period
-    youtube: false,
+    youtube: true,
   });
+
+  // wait until all platforms prepopulate data
+  await sleep(2000);
 
   // add settings
   await fillForm(t, null, {
@@ -48,10 +50,11 @@ test('Multistream advanced mode', async t => {
   await fillForm(t, null, {
     twitch: true,
     facebook: true,
-
-    // TODO enable youtube after 24h disabled period
-    youtube: false,
+    youtube: true,
   });
+
+  // wait until all platforms prepopulate data
+  await sleep(2000);
 
   // switch advanced mode on
   await fillForm(t, null, {
@@ -65,12 +68,11 @@ test('Multistream advanced mode', async t => {
     tags: ['100%'],
   });
 
-  // TODO: enable YT
-  // await fillForm(t, 'youtube-settings', {
-  //   customEnabled: true,
-  //   title: 'youtube title',
-  //   description: 'youtube description',
-  // });
+  await fillForm(t, 'form[name="youtube-settings"]', {
+    customEnabled: true,
+    title: 'youtube title',
+    description: 'youtube description',
+  });
 
   await fillForm(t, 'form[name="facebook-settings"]', {
     customEnabled: true,

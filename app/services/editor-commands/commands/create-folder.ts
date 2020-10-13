@@ -13,6 +13,7 @@ export class CreateFolderCommand extends Command {
 
   constructor(private sceneId: string, private name: string, private items?: Selection) {
     super();
+    if (this.items) this.items.freeze();
   }
 
   get description() {

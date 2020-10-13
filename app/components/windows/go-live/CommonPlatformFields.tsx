@@ -153,7 +153,7 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
     }
 
     return (
-      <ValidatedForm>
+      <ValidatedForm name="common-settings">
         {/*USE CUSTOM CHECKBOX*/}
         {hasCustomCheckbox && (
           <HFormGroup>

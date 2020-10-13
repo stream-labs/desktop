@@ -145,9 +145,11 @@ export class InternalApiClient {
       let startMark: number;
 
       if (isDevMode) {
-        console.warn(
-          `Calling synchronous service method from renderer process: ${resourceId}.${methodName} - Consider calling as an action instead`,
-        );
+        const msg = `Calling synchronous service method from renderer process: ${resourceId}.${methodName} - Consider calling as an action instead`;
+        const func = Utils.env.SLOBS_TRACE_SYNC_IPC ? console.trace : console.warn;
+
+        func(msg);
+
         startMark = performance.now();
       }
 
