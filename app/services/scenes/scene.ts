@@ -267,12 +267,8 @@ export class Scene {
     }
 
     if (sourceNode.parentId !== destFolderId) {
-      sourceNode.setParent(destFolderId);
+      this.SET_PARENT(sourceNode.id, destFolderId);
     }
-
-    const itemsToMove: SceneItem[] = sourceNode.isFolder()
-      ? sourceNode.getNestedItems()
-      : [sourceNode];
 
     // move nodes
 
@@ -334,7 +330,8 @@ export class Scene {
     } else if (destNode.parentId) {
       const sourceNode = this.getNode(sourceNodeId);
       assertIsDefined(sourceNode);
-      sourceNode.setParent(destNode.parentId); // place to the top of folder
+
+      this.SET_PARENT(sourceNode.id, destNode.parentId);
     } else {
       this.placeAfter(sourceNodeId); // place to the top of scene
     }
@@ -540,5 +537,11 @@ export class Scene {
         return item.id === id;
       })!;
     });
+  }
+
+  @mutation()
+  private SET_PARENT(childNodeId: string, parentFolderId: string) {
+    const childNodeState = this.state.nodes.find(node => node.id === childNodeId);
+    childNodeState.parentId = parentFolderId;
   }
 }
