@@ -2,6 +2,7 @@ import { test, useSpectron } from '../../helpers/spectron';
 import { logIn } from '../../helpers/spectron/user';
 import { clickGoLive, prepareToGoLive, submit } from '../../helpers/spectron/streaming';
 import { fillForm, selectTitle, selectGamesByTitles } from '../../helpers/form-monkey';
+import { sleep } from '../../helpers/sleep';
 
 useSpectron();
 
@@ -17,6 +18,9 @@ test('Multistream default mode', async t => {
     facebook: true,
     youtube: true,
   });
+
+  // wait until all platforms prepopulate data
+  await sleep(2000);
 
   // add settings
   await fillForm(t, null, {
@@ -48,6 +52,9 @@ test('Multistream advanced mode', async t => {
     facebook: true,
     youtube: true,
   });
+
+  // wait until all platforms prepopulate data
+  await sleep(2000);
 
   // switch advanced mode on
   await fillForm(t, null, {
