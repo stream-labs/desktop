@@ -61,6 +61,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
         options: [
           { value: 'page', title: $t('Share to a Page You Manage') },
           { value: 'me', title: $t('Share to Your Timeline') },
+          { value: 'group', title: $t('Share in a Group') },
         ],
         required: true,
       }),
@@ -73,6 +74,15 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
             value: page.id,
             title: `${page.name} | ${page.category}`,
           })) || [],
+        required: true,
+      }),
+      group: metadata.list({
+        title: $t('Facebook Group'),
+        fullWidth: true,
+        options: [
+          { title: 'My Group 1', value: 'My Group 1' },
+          { title: 'My Group 2', value: 'My Group 2' },
+        ],
         required: true,
       }),
       event: metadata.list({
@@ -122,6 +132,14 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
               metadata={this.formMetadata.page}
             />
           </HFormGroup>
+        )}
+
+        {this.settings.platforms.facebook.destinationType === 'group' &&
+          !this.props.isUpdateMode && (
+            <HFormGroup
+              value={this.settings.platforms.facebook.destinationId}
+              metadata={this.formMetadata.group}
+            />
         )}
 
         {!this.canShowOnlyRequiredFields && (

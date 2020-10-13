@@ -344,11 +344,8 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   }
 
   private async fetchPages(): Promise<IFacebookPage[]> {
-    return (
-      await this.requestFacebook<{ data: IFacebookPage[] }>(
-        `${this.apiBase}/679834535996414/accounts`,
-      )
-    ).data;
+    return (await this.requestFacebook<{ data: IFacebookPage[] }>(`${this.apiBase}/me/accounts`))
+      .data;
   }
 
   // fetchPages(): Promise<IStreamlabsFacebookPages> {
