@@ -77,12 +77,7 @@ export class GlobalSelection extends Selection {
       throw new Error('Attempted to modify frozen selection');
     }
 
-    // TODO: Allow calling of actions from the worker window
-    if (Utils.isWorkerWindow()) {
-      this.selectionService.select(items);
-    } else {
-      this.selectionService.actions.select(items);
-    }
+    this.selectionService.actions.select(items);
 
     return this;
   }
