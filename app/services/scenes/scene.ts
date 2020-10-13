@@ -541,6 +541,9 @@ export class Scene {
 
   @mutation()
   private SET_PARENT(childNodeId: string, parentFolderId: string) {
+    if (childNodeId === parentFolderId) {
+      throw new Error('The parent id should not be equal the child id');
+    }
     const childNodeState = this.state.nodes.find(node => node.id === childNodeId);
     childNodeState.parentId = parentFolderId;
   }

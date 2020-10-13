@@ -178,6 +178,9 @@ export abstract class SceneItemNode implements ISceneItemNode {
 
   @mutation()
   protected SET_PARENT(parentId?: string) {
+    if (parentId && this.state.id === parentId) {
+      throw new Error('The parent id should not be equal the child id');
+    }
     this.state.parentId = parentId;
   }
 
