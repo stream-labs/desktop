@@ -41,7 +41,7 @@ const stepsMap = steps.reduce<{ [key in TStep]?: number }>((prev, current, index
 export interface INicoliveProgramSelectorState {
   selectedProviderType: TProviderType | null;
   selectedChannel: { id: string; name: string } | null;
-  selectedProgram: { id: string; title?: string } | null; // ユーザー番組の場合はタイトルは取得せず undefined のまま
+  selectedChannelProgram: { id: string; title: string } | null; // ユーザー生放送時 null
   candidateChannels: OnairChannelsData[];
   candidatePrograms: { id: string; title: string }[];
   isLoading: boolean;
@@ -53,7 +53,7 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
   static initialState: INicoliveProgramSelectorState = {
     selectedProviderType: null,
     selectedChannel: null,
-    selectedProgram:  null,
+    selectedChannelProgram:  null,
     candidateChannels: [],
     candidatePrograms: [],
     isLoading: false,
@@ -89,7 +89,6 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
     this.SET_STATE({
       selectedProviderType: 'user',
       selectedChannel: null,
-      selectedProgram: { id: 'hoge' }, // TODO
       currentStep: 'confirm'
     });
   }
@@ -131,7 +130,7 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
       return;
     }
     this.SET_STATE({
-      selectedProgram: { id, title },
+      selectedChannelProgram: { id, title },
       currentStep: 'confirm'
     });
   }
@@ -174,7 +173,7 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
       candidatePrograms: stepsMap[step] <= stepsMap['channelSelect'] ? [] : this.state.candidatePrograms,
       selectedProviderType: stepsMap[step] <= stepsMap['providerTypeSelect'] ? null : this.state.selectedProviderType,
       selectedChannel: stepsMap[step] <= stepsMap['channelSelect'] ? null : this.state.selectedChannel,
-      selectedProgram: stepsMap[step] <= stepsMap['programSelect']  ? null : this.state.selectedProgram,
+      selectedChannelProgram: stepsMap[step] <= stepsMap['programSelect']  ? null : this.state.selectedChannelProgram,
     });
   }
 

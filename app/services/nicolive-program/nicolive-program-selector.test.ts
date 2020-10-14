@@ -31,7 +31,7 @@ test('ユーザー番組を選んで配信開始のための番組情報を準�
   expect(instance.state.currentStep).toBe('confirm');
   expect(instance.state.selectedProviderType).toBe('user');
   expect(instance.state.selectedChannel).toBeNull();
-  expect(instance.state.selectedProgram).toMatchObject({ id: programId });
+  expect(instance.state.selectedChannelProgram).toMatchObject({ id: programId });
 });
 
 test('チャンネル番組を選んで配信開始のための番組情報を準備できる', () => {
@@ -64,7 +64,7 @@ test('チャンネル番組を選んで配信開始のための番組情報を�
   expect(instance.state.currentStep).toBe('confirm');
   expect(instance.state.selectedProviderType).toBe('channel');
   expect(instance.state.selectedChannel).toMatchObject({ id: selectedChannelId, name: selectedChannelName });
-  expect(instance.state.selectedProgram).toMatchObject({ id: selectedProgramId, title: selectedProgramTitle });
+  expect(instance.state.selectedChannelProgram).toMatchObject({ id: selectedProgramId, title: selectedProgramTitle });
 });
 
 test('番組選択ステップで, チャンネルや番組の選択をしようとしても何も起きない.', () => {
@@ -81,7 +81,7 @@ test('番組選択ステップで, チャンネルや番組の選択をしよう
   // 番組選択ができない
   instance.onSelectBroadcastingProgram('lv1', 'title')
   expect(instance.state.currentStep).toBe('providerTypeSelect');
-  expect(instance.state.selectedProgram).toBeNull();
+  expect(instance.state.selectedChannelProgram).toBeNull();
 });
 
 test('チャンネル選択ステップで, 配信種別や番組の選択をしようとしても何も起きない. ', () => {
@@ -108,7 +108,7 @@ test('チャンネル選択ステップで, 配信種別や番組の選択をし
   // 番組を選択できない
   instance.onSelectBroadcastingProgram('lv1', 'title')
   expect(instance.state.currentStep).toBe('channelSelect');
-  expect(instance.state.selectedProgram).toBeNull();
+  expect(instance.state.selectedChannelProgram).toBeNull();
 });
 
 test('番組選択ステップで, 配信種別やチャンネルの選択をしようとしても何も起きない.', () => {
@@ -171,7 +171,7 @@ test('ユーザー番組の確認ステップでは, あらゆる設定済の項
   instance.onSelectBroadcastingProgram('lv1111', 'title')
   expect(instance.state.currentStep).toBe('confirm');
   expect(instance.state.selectedProviderType).toBe('user');
-  expect(instance.state.selectedProgram.id).toBe('lv9800');
+  expect(instance.state.selectedChannelProgram.id).toBe('lv9800');
 });
 
 test('チャンネル番組の確認ステップでは, あらゆる設定済の項目を変更することはできない', () => {
@@ -212,7 +212,7 @@ test('チャンネル番組の確認ステップでは, あらゆる設定済の
   expect(instance.state.currentStep).toBe('confirm');
   console.log(instance.state.currentStep);
   expect(instance.state.selectedProviderType).toBe('channel');
-  expect(instance.state.selectedProgram.id).toBe(selectedProgram);
+  expect(instance.state.selectedChannelProgram.id).toBe(selectedProgram);
 });
 
 describe('ステップ比較系メソッド', () => {

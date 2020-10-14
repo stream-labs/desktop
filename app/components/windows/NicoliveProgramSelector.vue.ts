@@ -96,7 +96,7 @@ export default class NicoliveProgramSelector extends Vue {
     const {
        selectedProviderType,
        selectedChannel,
-       selectedProgram
+       selectedChannelProgram
     } = this.nicoliveProgramSelectorService.state;
     switch (navItemStep) {
       case 'providerTypeSelect':
@@ -104,7 +104,7 @@ export default class NicoliveProgramSelector extends Vue {
       case 'channelSelect':
         return selectedChannel?.name || this.BLANK;
       case 'programSelect':
-        return selectedProgram?.title || this.BLANK;
+        return selectedChannelProgram?.title || this.BLANK;
     }
   }
 
@@ -135,7 +135,7 @@ export default class NicoliveProgramSelector extends Vue {
     this.streamingService.toggleStreamingAsync({
       nicoliveProgramSelectorResult: {
         providerType: this.nicoliveProgramSelectorService.state.selectedProviderType,
-        channelProgramId: this.nicoliveProgramSelectorService.state.selectedProgram.id ?? undefined
+        channelProgramId: this.nicoliveProgramSelectorService.state.selectedChannelProgram.id ?? undefined
       }
     });
 
