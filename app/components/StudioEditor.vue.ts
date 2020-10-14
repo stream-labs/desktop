@@ -5,7 +5,6 @@ import Display from 'components/shared/Display.vue';
 import StudioModeControls from 'components/StudioModeControls.vue';
 import { TransitionsService } from 'services/transitions';
 import { EditorService, IMouseEvent } from 'services/editor';
-import { throttle } from 'lodash-decorators';
 import { CustomizationService } from 'services/customization';
 import { WindowsService } from 'services/windows';
 import { ERenderingMode } from '../../obs-api';
@@ -104,16 +103,32 @@ export default class StudioEditor extends TsxComponent {
     this.editorService.actions.handleMouseEnter(this.getMouseEvent(event));
   }
 
-  handleMouseMove(event: MouseEvent) {
-    this.throttledHandleMouseMove(event);
+  lastMoveEvent: IMouseEvent;
+  moveInFlight = false;
+
+  handleMouseMove(event: IMouseEvent) {
+    if (this.moveInFlight) {
+      this.lastMoveEvent = event;
+      return;
+    }
+
+    this.moveInFlight = true;
+    this.editorService.actions.return.handleMouseMove(this.getMouseEvent(event)).then(() => {
+      this.moveInFlight = false;
+
+      if (this.lastMoveEvent) {
+        this.handleMouseMove(this.lastMoveEvent);
+        this.lastMoveEvent = null;
+      }
+    });
   }
 
-  @throttle(20)
-  throttledHandleMouseMove(event: MouseEvent) {
-    this.editorService.actions.handleMouseMove(this.getMouseEvent(event));
-  }
-
-  getMouseEvent(event: MouseEvent): IMouseEvent {
+  /**
+   * Takes something that looks like a mouse event and cleans it
+   * down to the bare minimum for sending over IPC.
+   * @param event The mouse event
+   */
+  getMouseEvent(event: IMouseEvent): IMouseEvent {
     return {
       offsetX: event.offsetX,
       offsetY: event.offsetY,
