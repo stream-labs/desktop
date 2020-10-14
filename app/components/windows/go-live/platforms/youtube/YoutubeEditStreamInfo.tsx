@@ -61,14 +61,12 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
     const { title, description } = selectedBroadcast.snippet;
     const { privacyStatus } = selectedBroadcast.status;
     const {
-      enableAutoStop,
       enableDvr,
       projection,
       latencyPreference,
     } = selectedBroadcast.contentDetails;
     ytSettings.title = title;
     ytSettings.description = description;
-    ytSettings.enableAutoStop = enableAutoStop;
     ytSettings.enableDvr = enableDvr;
     ytSettings.latencyPreference = latencyPreference;
     ytSettings.projection = projection;
