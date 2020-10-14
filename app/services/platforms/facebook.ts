@@ -378,7 +378,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
       .then(response => {
         // create an options list for using in the ListInput
         response.options = response.pages.map((page: any) => {
-          return { value: page.id, title: `${page.name} | ${page.category}` };
+          return { value: page.id, title: `${page.name} | ${page.categoryId}` };
         });
         this.SET_FACEBOOK_PAGES(response);
         return response;

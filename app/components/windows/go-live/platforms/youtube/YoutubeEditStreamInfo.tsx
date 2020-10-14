@@ -1,13 +1,13 @@
-import { Component, Watch } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
-import { cloneDeep } from 'lodash';
-import TsxComponent, { createProps } from 'components/tsx-component';
+import { createProps } from 'components/tsx-component';
 import { formMetadata, metadata } from 'components/shared/inputs';
 import { $t } from 'services/i18n';
 import BroadcastInput from './BroadcastInput';
 import {
+  IYoutubeCategory,
   IYoutubeLiveBroadcast,
   IYoutubeStartStreamOptions,
   YoutubeService,
@@ -52,16 +52,29 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
   }
 
   private onSelectBroadcastHandler() {
-    // set title and description fields from selected broadcast
+    // set title and description fields from the selected broadcast
     const ytSettings = this.settings.platforms.youtube;
     const selectedBroadcast = this.broadcasts.find(
       broadcast => broadcast.id === ytSettings.broadcastId,
     );
     if (!selectedBroadcast) return;
     const { title, description } = selectedBroadcast.snippet;
+    const { privacyStatus } = selectedBroadcast.status;
+    const {
+      enableAutoStart,
+      enableAutoStop,
+      enableDvr,
+      projection,
+      latencyPreference,
+    } = selectedBroadcast.contentDetails;
     ytSettings.title = title;
     ytSettings.description = description;
-    ytSettings.enableAutoStart = selectedBroadcast.contentDetails.enableAutoStart;
+    ytSettings.enableAutoStart = enableAutoStart;
+    ytSettings.enableAutoStop = enableAutoStop;
+    ytSettings.enableDvr = enableDvr;
+    ytSettings.latencyPreference = latencyPreference;
+    ytSettings.projection = projection;
+    ytSettings.privacyStatus = privacyStatus;
   }
 
   private onProjectionChangeHandler(enable360: boolean) {
@@ -75,6 +88,33 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
         loading: !this.broadcastsLoaded,
         disabled: !this.canChangeBroadcast,
       },
+      privacyStatus: metadata.list({
+        title: $t('Privacy'),
+        allowEmpty: false,
+        options: [
+          {
+            value: 'public',
+            title: $t('Public'),
+            description: $t('Anyone can search for and view'),
+          },
+          {
+            value: 'unlisted',
+            title: $t('Unlisted'),
+            description: $t('Anyone with the link can view'),
+          },
+          { value: 'private', title: $t('Private'), description: $t('Only you can view') },
+        ],
+        fullWidth: true,
+      }),
+      category: metadata.list({
+        title: $t('Category'),
+        allowEmpty: false,
+        options: this.youtubeService.state.categories.map(category => ({
+          value: category.id,
+          title: category.snippet.title,
+        })),
+        fullWidth: true,
+      }),
       latencyPreference: metadata.list<IYoutubeStartStreamOptions['latencyPreference']>({
         title: $t('Stream Latency'),
         options: [
@@ -88,9 +128,7 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
         ],
         allowEmpty: false,
         tooltip: $t(
-          'A low-latency stream can reduce the amount of time it takes for video to be visible to users watching a broadcast, though it can also affect the smoothness of playback.\n' +
-            '\n' +
-            'An ultra-low-latency stream further reduces the time it takes for video to be visible to viewers, making interaction with viewers easier, but ultra-low latency does not support closed captions, or resolutions higher than 1080p.',
+          'A low-latency stream can reduce the amount of time it takes for video to be visible to users watching a broadcast, though it can also affect the smoothness of playback. An ultra-low-latency stream further reduces the time it takes for video to be visible to viewers, making interaction with viewers easier, but ultra-low latency does not support closed captions, or resolutions higher than 1080p.',
         ),
       }),
       enableAutoStart: metadata.bool({
@@ -135,8 +173,16 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
             </HFormGroup>
           )}
           <CommonPlatformFields vModel={this.settings} platform={'youtube'} />
+          <HFormGroup
+            metadata={this.formMetadata.privacyStatus}
+            vModel={this.settings.platforms.youtube.privacyStatus}
+          />
           {!isUpdate && (
             <div>
+              <HFormGroup
+                metadata={this.formMetadata.category}
+                vModel={this.settings.platforms.youtube.categoryId}
+              />
               <HFormGroup
                 metadata={this.formMetadata.latencyPreference}
                 vModel={this.settings.platforms.youtube.latencyPreference}

@@ -48,8 +48,8 @@ export default class GoLiveWindow extends TsxComponent<{}> {
   }
 
   destroyed() {
-    // clear failed checks on window close
-    if (this.view.hasFailedChecks() && this.view.info.checklist.startVideoTransmission !== 'done') {
+    // clear failed checks and warnings on window close
+    if (this.view.info.checklist.startVideoTransmission !== 'done') {
       this.streamingService.actions.resetInfo();
     }
   }

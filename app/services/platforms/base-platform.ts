@@ -79,4 +79,9 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
   protected SET_STREAM_SETTINGS(settings: TStartStreamOptions) {
     this.state.settings = settings;
   }
+
+  @mutation()
+  protected UPDATE_STREAM_SETTINGS(patch: Partial<TStartStreamOptions>) {
+    this.state.settings = { ...this.state.settings, ...patch };
+  }
 }

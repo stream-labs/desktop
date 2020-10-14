@@ -13,37 +13,28 @@ import { StreamSettingsService } from 'services/settings/streaming';
 import { CustomizationService } from 'services/customization';
 import { IGoLiveSettings } from 'services/streaming';
 import { WindowsService } from 'services/windows';
-import { $t } from 'services/i18n';
+import { $t, I18nService } from 'services/i18n';
 import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import { assertIsDefined } from 'util/properties-type-guards';
 import electron from 'electron';
-import { pickBy } from 'lodash';
 
 interface IYoutubeServiceState extends IPlatformState {
   liveStreamingEnabled: boolean;
   streamId: string;
   channelId: string;
-  lifecycleStep: TYoutubeLifecycleStep;
   broadcastStatus: TBroadcastLifecycleStatus | '';
   settings: IYoutubeStartStreamOptions;
+  categories: IYoutubeCategory[];
 }
 
 export interface IYoutubeStartStreamOptions extends IExtraBroadcastSettings {
   title: string;
+  categoryId?: string;
   broadcastId?: string;
   description?: string;
   privacyStatus?: 'private' | 'public' | 'unlisted';
 }
-
-export type TYoutubeLifecycleStep =
-  | 'idle'
-  | 'waitForStreamToBeActive'
-  | 'transitionBroadcastToTesting'
-  | 'waitForTesting'
-  | 'transitionBroadcastToActive'
-  | 'waitForBroadcastToBeLive'
-  | 'live';
 
 /**
  * Represents an API response with a paginated collection
@@ -62,6 +53,7 @@ export interface IYoutubeLiveBroadcast {
   id: string;
   contentDetails: { boundStreamId: string } & IExtraBroadcastSettings;
   snippet: {
+    channelId: string;
     title: string;
     description: string;
     scheduledStartTime: string;
@@ -109,6 +101,13 @@ interface IYoutubeLiveStream {
   };
 }
 
+export interface IYoutubeCategory {
+  id: string;
+  snippet: {
+    title: string;
+  };
+}
+
 interface IExtraBroadcastSettings {
   enableAutoStart?: boolean;
   enableAutoStop?: boolean;
@@ -135,6 +134,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   @Inject() private customizationService: CustomizationService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private windowsService: WindowsService;
+  @Inject() private i18nService: I18nService;
 
   readonly capabilities = new Set<TPlatformCapability>(['chat', 'description', 'stream-schedule']);
 
@@ -143,18 +143,20 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     liveStreamingEnabled: true,
     streamId: '',
     channelId: '',
-    lifecycleStep: 'idle',
     broadcastStatus: '',
+    categories: [],
     settings: {
       broadcastId: '',
       title: '',
       description: '',
+      categoryId: '20', // Set Gaming as a default category
       enableAutoStart: true,
       enableAutoStop: true,
       enableEmbed: true,
       enableDvr: true,
       projection: 'rectangular',
       latencyPreference: 'normal',
+      privacyStatus: 'public',
     },
   };
 
@@ -202,32 +204,24 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     this.state.liveStreamingEnabled = enabled;
   }
 
-  @mutation()
-  private SET_LIFECYCLE_STEP(step: TYoutubeLifecycleStep) {
-    this.state.lifecycleStep = step;
-  }
-
   async beforeGoLive(settings: IGoLiveSettings) {
     const ytSettings = settings.platforms.youtube;
-    const {
-      title,
-      description,
-      enableAutoStart,
-      broadcastId: scheduledBroadcastId,
-    }: IYoutubeStartStreamOptions = settings.platforms.youtube;
     // update selected LiveBroadcast with new title and description
     // or create a new LiveBroadcast if there are no broadcasts selected
-    let broadcastId = scheduledBroadcastId;
-    if (!broadcastId) {
-      broadcastId = await this.createBroadcast({ title, description, enableAutoStart });
+    let broadcast: IYoutubeLiveBroadcast;
+    if (!ytSettings.broadcastId) {
+      broadcast = await this.createBroadcast(ytSettings);
     } else {
-      await this.updateBroadcast(broadcastId, { title, description });
+      await this.updateBroadcast(ytSettings.broadcastId, ytSettings);
+      broadcast = await this.fetchBroadcast(ytSettings.broadcastId);
     }
 
     // create a LiveStream object and bind it with current LiveBroadcast
-    const stream = await this.createLiveStream(title);
-    await this.bindStreamToBroadcast(broadcastId, stream.id);
-    const broadcast = await this.fetchBroadcast(broadcastId);
+    const stream = await this.createLiveStream(broadcast.snippet.title);
+    await this.bindStreamToBroadcast(broadcast.id, stream.id);
+
+    // set the category
+    await this.updateCategory(broadcast.id, broadcast.snippet.title, ytSettings.categoryId);
 
     // setup key and platform type in the OBS settings
     const streamKey = stream.cdn.ingestionInfo.streamName;
@@ -236,85 +230,12 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       key: streamKey,
       streamType: 'rtmp_common',
     });
+
+    // update the local state
+    this.UPDATE_STREAM_SETTINGS({ ...ytSettings, broadcastId: broadcast.id });
+    this.SET_STREAM_ID(stream.id);
+    this.SET_CHANNEL_ID(broadcast.snippet.channelId);
     this.SET_STREAM_KEY(streamKey);
-
-    // update the local chanel info based on the selected broadcast
-    this.updateLocalBroadcastState(broadcast);
-  }
-
-  async publishBroadcast() {
-    // // we don't have broadcastId if user start stream with the 'just go live' button
-    // if (!this.state.settings.broadcastId) return;
-    //
-    // const streamId = this.state.streamId;
-    // const broadcastId = this.state.settings.broadcastId;
-    //
-    // // if enableAutoStart=true then the broadcast should be published right after YT receives the transmission
-    // if (this.state.settings.enableAutoStart) {
-    //   this.setLifecycleStep('waitForBroadcastToBeLive');
-    //   await this.waitForBroadcastStatus(broadcastId, 'live');
-    //   this.setLifecycleStep('live');
-    //   return;
-    // }
-    //
-    // // otherwise manually publish broadcast
-    // try {
-    //   // SLOBS started sending the video data to Youtube
-    //   // wait YT for establish connection with SLOBS
-    //   this.setLifecycleStep('waitForStreamToBeActive');
-    //   await this.waitForStreamStatus(streamId, 'active');
-    //
-    //   // the connection has been established
-    //   // at this step you can see preview of the stream in the Youtube dashboard
-    //   // but the stream still is not available for other viewers
-    //
-    //   // we can't make it available for other user until we
-    //   // didn't switch it to the 'testing' state
-    //   this.setLifecycleStep('transitionBroadcastToTesting');
-    //   await this.transitionBroadcastStatus(broadcastId, 'testing' as TBroadcastLifecycleStatus);
-    //
-    //   // now we ready to publish the broadcast
-    //   this.setLifecycleStep('waitForBroadcastToBeLive');
-    //   await this.transitionBroadcastStatus(broadcastId, 'live');
-    //
-    //   // we all set
-    //   this.setLifecycleStep('live');
-    // } catch (e) {
-    //   if (!this.userService.isLoggedIn || !this.userService.state.auth?.platforms?.youtube) {
-    //     // user has logged out before the stream started
-    //     // don't treat this as an error
-    //     return;
-    //   }
-    //
-    //   if (this.state.lifecycleStep === 'idle') {
-    //     // user stopped streaming before it started, so transitions for broadcast may not work
-    //     // don't treat this as an error
-    //     return;
-    //   }
-    //
-    //   // something is wrong in afterGoLive hook
-    //   throw e;
-    // }
-  }
-
-  async afterStopStream() {
-    // we don't have activeChannel if user start stream with the 'just go live' button
-    if (!this.state.settings.broadcastId) return;
-
-    // notify YT API that we've stopped the stream
-    if (this.state.lifecycleStep !== 'idle') {
-      try {
-        await this.transitionBroadcastStatus(this.state.settings.broadcastId, 'complete');
-      } catch (e) {
-        // most likely we tried to switch status to complete when the broadcast is in ready or testing state
-        // this happens when we stop stream before it becomes active
-      }
-    }
-    this.SET_LIFECYCLE_STEP('idle');
-  }
-
-  private setLifecycleStep(step: TYoutubeLifecycleStep) {
-    this.SET_LIFECYCLE_STEP(step);
   }
 
   /**
@@ -378,23 +299,35 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     );
   }
 
+  private async fetchCategories(): Promise<IYoutubeCategory[]> {
+    // region should be in "ISO 3166 alpha 2" format
+    const region = this.i18nService.state.locale.split('-')[1];
+    const endpoint = `${this.apiBase}/videoCategories?part=snippet&regionCode=${region}`;
+    const collection = await this.requestYoutube<IYoutubeCollection<IYoutubeCategory>>(endpoint);
+    return collection.items;
+  }
+
+  private async updateCategory(broadcastId: string, title: string, categoryId: string) {
+    const endpoint = 'videos?part=snippet';
+    await this.requestYoutube<IYoutubeLiveBroadcast>({
+      body: JSON.stringify({ id: broadcastId, snippet: { categoryId, title } }),
+      method: 'PUT',
+      url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
+    });
+  }
+
   /**
    * returns perilled data for the GoLive window
    */
-  async prepopulateInfo(): Promise<IYoutubeStartStreamOptions> {
-    // if streaming then return activeBroadcast description and title if exists
-    if (this.streamingService.isStreaming) {
-      return this.state.settings;
-    }
-
-    // otherwise return the last saved description and title for new the streaming session
+  async prepopulateInfo(): Promise<void> {
     const settings = this.streamSettingsService.settings;
-    const result = {
-      title: settings.title,
+    this.UPDATE_STREAM_SETTINGS({
       description: settings.description || (await this.fetchDefaultDescription()),
-    };
+    });
+    if (!this.state.categories.length) {
+      this.SET_CATEGORIES(await this.fetchCategories());
+    }
     this.SET_PREPOPULATED(true);
-    return result;
   }
 
   /**
@@ -402,9 +335,9 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
    */
   async scheduleStream(
     scheduledStartTime: string,
-    { title, description }: { title: string; description: string },
+    options: IYoutubeStartStreamOptions,
   ): Promise<void> {
-    await this.createBroadcast({ title, description, scheduledStartTime });
+    await this.createBroadcast(options);
   }
 
   async fetchNewToken(): Promise<void> {
@@ -421,42 +354,20 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   /**
    * update data for the current active broadcast
    */
-  async putChannelInfo(
-    { title, description }: IYoutubeStartStreamOptions,
-    scheduledStartTime?: string,
-  ): Promise<boolean> {
+  async putChannelInfo({
+    title,
+    description,
+    privacyStatus,
+  }: IYoutubeStartStreamOptions): Promise<boolean> {
     const broadcastId = this.state.settings.broadcastId;
     assertIsDefined(broadcastId);
     await this.updateBroadcast(broadcastId, {
       title,
       description,
+      privacyStatus,
     });
-    const broadcast = await this.fetchBroadcast(broadcastId);
-    this.updateLocalBroadcastState(broadcast);
+    this.UPDATE_STREAM_SETTINGS({ title, description });
     return true;
-  }
-
-  /**
-   * update the chanel info based on the selected broadcast
-   */
-  private updateLocalBroadcastState(broadcast: IYoutubeLiveBroadcast) {
-    const patch = {
-      streamId: broadcast.contentDetails?.boundStreamId,
-      broadcastStatus: broadcast.status?.lifeCycleStatus,
-      settings: broadcast.snippet && {
-        broadcastId: broadcast.id,
-        title: broadcast.snippet.title,
-        description: broadcast.snippet.description,
-        enableAutoStart: broadcast.contentDetails.enableAutoStart,
-      },
-    };
-    // update non-empty fields
-    this.PATCH_STATE(pickBy(patch, val => val));
-  }
-
-  @mutation()
-  private PATCH_STATE(newState: Partial<IYoutubeServiceState>) {
-    Object.assign(this.state, newState);
   }
 
   /**
@@ -472,7 +383,6 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
         title: params.title,
         scheduledStartTime: params.scheduledStartTime || new Date().toISOString(),
         description: params.description,
-        categoryId: 10,
       },
       contentDetails: {
         enableAutoStart: params.enableAutoStart,
@@ -482,7 +392,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
         projection: params.projection,
         latencyPreference: params.latencyPreference,
       },
-      status: { privacyStatus: 'public' },
+      status: { privacyStatus: params.privacyStatus },
     };
 
     return await this.requestYoutube<IYoutubeLiveBroadcast>({
@@ -501,9 +411,10 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       title?: string;
       description?: string;
       boundStreamId?: string;
+      privacyStatus?: string;
     },
   ): Promise<void> {
-    const fields = ['snippet'];
+    const fields = ['snippet', 'status'];
     const endpoint = `liveBroadcasts?part=${fields.join(',')}&id=${id}`;
     const snippet: Partial<IYoutubeLiveBroadcast['snippet']> = {};
     if (params.title !== void 0) {
@@ -514,9 +425,11 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     }
 
     snippet.scheduledStartTime = new Date().toISOString();
+    const body: Dictionary<any> = { id, snippet };
+    if (params.privacyStatus) body.status = { privacyStatus: params.privacyStatus };
 
     await this.requestYoutube<IYoutubeLiveBroadcast>({
-      body: JSON.stringify({ id, snippet }),
+      body: JSON.stringify(body),
       method: 'PUT',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
     });
@@ -559,159 +472,8 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     });
   }
 
-  /**
-   * returns liveStream
-   */
-  private async fetchLiveStream(
-    id: string,
-    fields = ['cdn', 'snippet', 'contentDetails', 'status'],
-  ): Promise<IYoutubeLiveStream> {
-    const endpoint = `liveStreams?part=${fields.join(',')}&id=${id}`;
-    const collection = await this.requestYoutube<IYoutubeCollection<IYoutubeLiveStream>>(
-      `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
-    );
-    return collection.items[0];
-  }
-
-  /**
-   * Poll youtube API for a limited period of time
-   * Stop polling when cb returns 'true'
-   * @param cb
-   */
-  private async pollAPI(cb: () => Promise<boolean>): Promise<void> {
-    return new Promise(async (resolve, reject) => {
-      // make sure we should not poll more than a minute
-      const maxWaitTime = 60 * 1000;
-      let canPoll = true;
-      setTimeout(() => {
-        canPoll = false;
-        reject(new Error('timeout'));
-      }, maxWaitTime);
-
-      // poll each 2s
-      while (canPoll) {
-        let shouldStop = this.state.lifecycleStep === 'idle'; // if user has clicked stop streaming than cancel polling
-        if (shouldStop) {
-          reject(new Error('Stream stopped'));
-        } else {
-          try {
-            shouldStop = await cb();
-          } catch (e) {
-            reject(e);
-            return;
-          }
-        }
-
-        if (shouldStop) {
-          canPoll = false;
-          resolve();
-          return;
-        }
-        await new Promise(r => setTimeout(r, 2000));
-      }
-    });
-  }
-
-  /**
-   * Poll Youtube API until liveStream has not changed the required status
-   * This typically takes 5-10 seconds, but may take up to a minute
-   */
-  private async waitForStreamStatus(streamId: string, status: TStreamStatus) {
-    try {
-      await this.pollAPI(async () => {
-        const stream = await this.fetchLiveStream(streamId, ['status']);
-        return stream.status.streamStatus === status;
-      });
-    } catch (e) {
-      throwStreamError(
-        'YOUTUBE_PUBLISH_FAILED',
-        `LiveBroadcast has not changed the status to ${status}: ${e.details || e.message}`,
-      );
-    }
-  }
-
-  /**
-   * Poll the Youtube API until broadcast has not changed the required status
-   */
-  private async waitForBroadcastStatus(broadcastId: string, status: TBroadcastLifecycleStatus) {
-    await this.pollAPI(async () => {
-      const broadcast = await this.fetchBroadcast(broadcastId, ['status']);
-      this.updateLocalBroadcastState(broadcast);
-      console.log(`current broadcast status is ${broadcast.status.lifeCycleStatus}`);
-      return broadcast.status.lifeCycleStatus === status;
-    });
-  }
-
-  /**
-   * Change the broadcast status
-   * The broadcast may switch between several statuses before get the required status
-   * So we should poll the API until we get the required status
-   */
-  private async transitionBroadcastStatus(broadcastId: string, status: TBroadcastLifecycleStatus) {
-    const startingStatus = this.state.broadcastStatus;
-    try {
-      // ask Youtube to change the broadcast status
-      const endpoint = `liveBroadcasts/transition?broadcastStatus=${status}&id=${broadcastId}&part=status`;
-      await this.requestYoutube<IYoutubeLiveBroadcast>({
-        method: 'POST',
-        url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
-      });
-
-      // wait for Youtube to change the broadcast status
-      await this.waitForBroadcastStatus(broadcastId, status);
-    } catch (e) {
-      if (e.details === 'Redundant transition') {
-        // handle Redundant transition as a success
-        console.log('redundant transition', status);
-        return;
-      }
-      const errorMessage = e.details || e.message;
-      throwStreamError(
-        'YOUTUBE_PUBLISH_FAILED',
-        `LiveBroadcast has not changed the status from ${startingStatus} to ${status}: ${errorMessage}. Current status is ${this.state.broadcastStatus}`,
-      );
-    }
-  }
-
   get liveDockEnabled(): boolean {
     return this.streamSettingsService.settings.protectedModeEnabled;
-  }
-
-  /**
-   * Returns a description for a current lifecycle step
-   */
-  get progressInfo(): { msg: string; progress: number } {
-    const dictionary: { [key in TYoutubeLifecycleStep]: { msg: string; progress: number } } = {
-      idle: {
-        msg: '',
-        progress: 0,
-      },
-      waitForStreamToBeActive: {
-        msg: $t('Waiting for YouTube to receive the video signal...'),
-        progress: 0.1,
-      },
-      transitionBroadcastToTesting: {
-        msg: $t('Testing your broadcast...'),
-        progress: 0.3,
-      },
-      waitForTesting: {
-        msg: $t('Finalizing broadcast testing...'),
-        progress: 0.4,
-      },
-      transitionBroadcastToActive: {
-        msg: $t('Publishing to your YouTube channel...'),
-        progress: 0.5,
-      },
-      waitForBroadcastToBeLive: {
-        msg: $t('Waiting for broadcast to be published...'),
-        progress: 0.6,
-      },
-      live: {
-        msg: $t("You're live!"),
-        progress: 1,
-      },
-    };
-    return dictionary[this.state.lifecycleStep];
   }
 
   /**
@@ -764,6 +526,10 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     electron.remote.shell.openExternal('https://youtube.com/live_dashboard_splash');
   }
 
+  openDashboard() {
+    electron.remote.shell.openExternal(this.dashboardUrl);
+  }
+
   get dashboardUrl(): string {
     return `https://studio.youtube.com/channel/${this.state.channelId}/livestreaming/dashboard`;
   }
@@ -773,5 +539,20 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     const youtubeDomain =
       nightMode === 'day' ? 'https://youtube.com' : 'https://gaming.youtube.com';
     return `${youtubeDomain}/watch?v=${this.state.settings.broadcastId}`;
+  }
+
+  @mutation()
+  private SET_STREAM_ID(streamId: string) {
+    this.state.streamId = streamId;
+  }
+
+  @mutation()
+  private SET_CHANNEL_ID(channelId: string) {
+    this.state.channelId = channelId;
+  }
+
+  @mutation()
+  private SET_CATEGORIES(categories: IYoutubeCategory[]) {
+    this.state.categories = categories;
   }
 }

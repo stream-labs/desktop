@@ -33,7 +33,7 @@ export default class GoLiveError extends TsxComponent<{}> {
   }
 
   private goToYoutubeDashboard() {
-    electron.remote.shell.openExternal(this.youtubeService.dashboardUrl);
+    this.youtubeService.openDashboard();
   }
 
   private createFBPage() {
