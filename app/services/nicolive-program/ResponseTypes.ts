@@ -227,7 +227,7 @@ export type OnairChannelsData = {
   ownerName: string;
   thumbnailUrl: string;
   smallThumbnailUrl: string;
-}[];
+};
 
 export type BroadcastStreamData = {
   url: string;

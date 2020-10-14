@@ -433,7 +433,7 @@ export class NicoliveClient {
   /**
    * 放送可能なチャンネル一覧を取得する 
    */
-  async fetchOnairChannels(): Promise<OnairChannelsData> {
+  async fetchOnairChannels(): Promise<OnairChannelsData[]> {
     const url = `${NicoliveClient.live2BaseURL}/unama/tool/v2/onairs/channels`
     const headers = new Headers();
     const userSession = await this.fetchSession();
@@ -444,7 +444,7 @@ export class NicoliveClient {
       return fetch(request)
         .then(handleErrors)
         .then(response => response.json())
-        .then(json => { return json.data as OnairChannelsData });
+        .then(json => { return json.data as OnairChannelsData[] });
     } catch {
       return Promise.resolve([]);
     }
