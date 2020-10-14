@@ -14,7 +14,7 @@ import {
   providerTypes as _providerTypes,
   steps as _steps,
   selectionSteps as _selectionSteps,
-  TSelectionStep
+  TSelectionStep,
 } from 'services/nicolive-program/nicolive-program-selector';
 import { StreamingService } from 'services/streaming';
 import { $t } from 'services/i18n';
@@ -60,11 +60,7 @@ export default class NicoliveProgramSelector extends Vue {
     if (this.nicoliveProgramSelectorService.state.isLoading) {
       return;
     }
-    if (providerType === 'channel') {
-      this.nicoliveProgramSelectorService.onSelectProviderTypeChannel();
-    } else {
-      this.nicoliveProgramSelectorService.onSelectProviderTypeUser();
-    }
+    this.nicoliveProgramSelectorService.onSelectProviderType(providerType);
   }
 
   onSelectChannel(id: string, name: string): void {

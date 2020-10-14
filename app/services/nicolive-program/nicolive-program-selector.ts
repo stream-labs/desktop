@@ -53,7 +53,7 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
   static initialState: INicoliveProgramSelectorState = {
     selectedProviderType: null,
     selectedChannel: null,
-    selectedChannelProgram:  null,
+    selectedChannelProgram: null,
     candidateChannels: [],
     candidatePrograms: [],
     isLoading: false,
@@ -66,31 +66,28 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
     super.init();
   }
 
-  async onSelectProviderTypeChannel() {
+  async onSelectProviderType(providerType: TProviderType) {
     if (this.state.currentStep !== 'providerTypeSelect') {
       return;
     }
-    this.SET_STATE({
-      currentStep: 'channelSelect',
-      selectedProviderType: 'channel',
-      isLoading: true
-    });
-    const candidateChannels = await this.client.fetchOnairChannels();
-    this.SET_STATE({
-      isLoading: false,
-      candidateChannels
-    });
-  }
-
-  onSelectProviderTypeUser() {
-    if (this.state.currentStep !== 'providerTypeSelect') {
-      return;
+    if (providerType === 'channel') {
+      this.SET_STATE({
+        currentStep: 'channelSelect',
+        selectedProviderType: 'channel',
+        isLoading: true
+      });
+      const candidateChannels = await this.client.fetchOnairChannels();
+      this.SET_STATE({
+        isLoading: false,
+        candidateChannels
+      });
+    } else { // providerType === 'user'
+      this.SET_STATE({
+        selectedProviderType: 'user',
+        selectedChannel: null,
+        currentStep: 'confirm'
+      });
     }
-    this.SET_STATE({
-      selectedProviderType: 'user',
-      selectedChannel: null,
-      currentStep: 'confirm'
-    });
   }
 
   /**
@@ -100,7 +97,7 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
    * @param name 配信するチャンネル名
    */
   async onSelectChannel(id: string, name: string) {
-    if(this.state.currentStep !== 'channelSelect') {
+    if (this.state.currentStep !== 'channelSelect') {
       return;
     }
     this.SET_STATE({
@@ -115,7 +112,7 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
       try {
         const program = await this.client.fetchProgram(programId);
         return program.ok ? { id: programId, title: program.value.title } : undefined;
-      } catch(error) {
+      } catch (error) {
         return undefined;
       }
     }))).filter(Boolean);
@@ -126,7 +123,7 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
   }
 
   onSelectBroadcastingProgram(id: string, title: string) {
-    if(this.state.currentStep !== 'programSelect') {
+    if (this.state.currentStep !== 'programSelect') {
       return;
     }
     this.SET_STATE({
@@ -173,7 +170,7 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
       candidatePrograms: stepsMap[step] <= stepsMap['channelSelect'] ? [] : this.state.candidatePrograms,
       selectedProviderType: stepsMap[step] <= stepsMap['providerTypeSelect'] ? null : this.state.selectedProviderType,
       selectedChannel: stepsMap[step] <= stepsMap['channelSelect'] ? null : this.state.selectedChannel,
-      selectedChannelProgram: stepsMap[step] <= stepsMap['programSelect']  ? null : this.state.selectedChannelProgram,
+      selectedChannelProgram: stepsMap[step] <= stepsMap['programSelect'] ? null : this.state.selectedChannelProgram,
     });
   }
 
