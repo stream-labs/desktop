@@ -111,7 +111,6 @@ export interface IYoutubeCategory {
 interface IExtraBroadcastSettings {
   enableAutoStart?: boolean;
   enableAutoStop?: boolean;
-  enableEmbed?: boolean;
   enableDvr?: boolean;
   projection?: 'rectangular' | '360';
   latencyPreference?: 'normal' | 'low' | 'ultraLow';
@@ -152,7 +151,6 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       categoryId: '20', // Set Gaming as a default category
       enableAutoStart: true,
       enableAutoStop: true,
-      enableEmbed: true,
       enableDvr: true,
       projection: 'rectangular',
       latencyPreference: 'normal',
@@ -387,10 +385,10 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       contentDetails: {
         enableAutoStart: params.enableAutoStart,
         enableAutoStop: params.enableAutoStop,
-        enableEmbed: params.enableEmbed,
         enableDvr: params.enableDvr,
         projection: params.projection,
         latencyPreference: params.latencyPreference,
+        enableEmbed: true,
       },
       status: { privacyStatus: params.privacyStatus },
     };

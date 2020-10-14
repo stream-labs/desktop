@@ -127,9 +127,7 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
           },
         ],
         allowEmpty: false,
-        tooltip: $t(
-          'A low-latency stream can reduce the amount of time it takes for video to be visible to users watching a broadcast, though it can also affect the smoothness of playback. An ultra-low-latency stream further reduces the time it takes for video to be visible to viewers, making interaction with viewers easier, but ultra-low latency does not support closed captions, or resolutions higher than 1080p.',
-        ),
+        tooltip: $t('latencyTooltip'),
       }),
       enableAutoStart: metadata.bool({
         title: 'Enable Auto-start',
