@@ -388,7 +388,6 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
         enableDvr: params.enableDvr,
         projection: params.projection,
         latencyPreference: params.latencyPreference,
-        enableEmbed: true,
       },
       status: { privacyStatus: params.privacyStatus },
     };
