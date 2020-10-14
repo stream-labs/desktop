@@ -221,7 +221,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     await this.bindStreamToBroadcast(broadcast.id, stream.id);
 
     // set the category
-    await this.updateCategory(broadcast.id, broadcast.snippet.title, ytSettings.categoryId);
+    await this.updateCategory(broadcast.id, broadcast.snippet.title, ytSettings.categoryId!);
 
     // setup key and platform type in the OBS settings
     const streamKey = stream.cdn.ingestionInfo.streamName;
@@ -366,7 +366,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       description,
       privacyStatus,
     });
-    this.UPDATE_STREAM_SETTINGS({ title, description });
+    this.UPDATE_STREAM_SETTINGS({ title, description, privacyStatus });
     return true;
   }
 

@@ -40,7 +40,7 @@
       <v-form-group v-for="(section, i) in wData.settings.sections" :key="section.key">
         <div class="section-weight-box">
           <list-input
-            :value="section.categoryId"
+            :value="section.category"
             @input="val => editSection(section.key, { category: val })"
             :metadata="metadata.sectionWeightList"
           />
