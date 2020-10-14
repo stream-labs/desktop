@@ -1,6 +1,6 @@
 {
   "You can access your Facebook Streamer Dashboard here.": "Здесь вы можете получить доступ к своей панели управления Facebook для стримеров.",
-  "You need a Facebook page to stream to Facebook. You can create one now.": "Вам нужна страница на Facebook для трансляции на Facebook. Вы можете создать ее сейчас.",
+  "facebookNoPagesError": "You need a Facebook page to stream to Facebook. You can <create-link>create one now</create-link>.",
   "Create a Page": "Создать страницу",
   "Facebook Setup": "Настроить страницу Facebook",
   "Streamer Dashboard": "Панель управления стримера",
@@ -10,11 +10,11 @@
   "Step": "Шаг",
   "Create a Facebook Gaming page to get started.": "Создайте игровую страницу в Facebook, чтобы начать.",
   "Create a Gaming Page": "Создать игровую страницу",
-  "Connect Facebook to Streamlabs OBS.": "Подключите Facebook к Streamlabs OBS.",
   "All of your scenes, sources, and settings will be preserved.": "Все ваши сцены, источники и настройки будут сохранены.",
   "Connect Facebook": "Подключите Facebook",
   "Multistream To Facebook": "Многопоточная трансляция в Facebook",
   "Connect": "Подключиться",
   "Install Your Theme": "Установите свою тему",
-  "Install": "Установить"
+  "Install": "Установить",
+  "I already have a Gaming Page": "I already have a Gaming Page"
 }

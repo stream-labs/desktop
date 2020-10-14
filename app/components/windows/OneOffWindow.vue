@@ -3,7 +3,7 @@
     <title-bar
       :title="options.title"
       class="child-window-titlebar"
-      v-if="$store.state.bulkLoadFinished && !options.isFullScreen"
+      v-if="$store.state.bulkLoadFinished && $store.state.i18nReady && !options.isFullScreen"
     />
     <div class="blank-slate">
       <div class="spinner-spacer" />
@@ -11,7 +11,7 @@
       <div class="spinner-spacer" />
     </div>
     <component
-      v-if="$store.state.bulkLoadFinished"
+      v-if="$store.state.bulkLoadFinished && $store.state.i18nReady"
       :is="options.componentName"
       :title="options.title"
       id="mainWrapper"

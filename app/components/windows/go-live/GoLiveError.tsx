@@ -87,6 +87,8 @@ export default class GoLiveError extends TsxComponent<{}> {
         return this.renderYoutubeStreamingDisabled(error);
       case 'YOUTUBE_PUBLISH_FAILED':
         return this.renderYoutubePublishError(error);
+      case 'MACHINE_LOCKED':
+        return this.renderMachineLockedError(error);
       default:
         return <ErrorLayout error={error} />;
     }
@@ -245,6 +247,14 @@ export default class GoLiveError extends TsxComponent<{}> {
             ),
           }}
         />
+      </ErrorLayout>
+    );
+  }
+
+  private renderMachineLockedError(error: IStreamError) {
+    return (
+      <ErrorLayout error={error}>
+        {$t('You could try locking and unlocking your computer to fix this error.')}
       </ErrorLayout>
     );
   }

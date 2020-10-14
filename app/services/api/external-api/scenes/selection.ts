@@ -42,7 +42,7 @@ export class Selection implements ISceneItemActions {
     return this.internalSelection.sceneId;
   }
 
-  protected get selection(): InternalSelection | InternalSelectionService {
+  protected get selection(): InternalSelection {
     return this.internalSelection;
   }
 

@@ -14,10 +14,10 @@ export class SelectionService extends Selection {
   private internalSelectionService: InternalSelectionService;
 
   get sceneId() {
-    return this.internalSelectionService.sceneId;
+    return this.selection.sceneId;
   }
 
   protected get selection() {
-    return this.internalSelectionService;
+    return this.internalSelectionService.views.globalSelection;
   }
 }

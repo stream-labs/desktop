@@ -5,14 +5,14 @@
   "Add videos or sound clips to your scene.": "Pridajte do svojej scény videá alebo zvukové klipy.",
   "Capture a specific window that's open on your computer.": "Zachyťte konkrétne okno, ktoré je otvorené v počítači.",
   "Compatible with most modern browsers and programs": "Kompatibilný s väčšinou moderných prehliadačov a programov",
-  "Select from your build in USB webcam or an external.": "Vyberte si zo svojej zabudovanej webovej kamery USB alebo externej.",
+  "Display video from webcams, capture cards, and other devices.": "Display video from webcams, capture cards, and other devices.",
   "Built in webcam": "Vstavaná webová kamera",
   "Logitech webcam": "Webová kamera Logitech",
   "Capture cards (Elgato, Avermedia, BlackMagic)": "Zachytávacie karty (Elgato, Avermedia, BlackMagic)",
   "Captures your desktop audio for the purpose of playing sound, such as music or speech.": "Zachytáva zvuk vášho počítača za účelom prehrávania zvuku, napríklad hudby alebo reči.",
   "Desktop audio": "Stolový zvuk",
   "Add a color to the background of your whole scene or just a part.": "Pridajte farbu na pozadie celej scény alebo len jej časti.",
-  "Allows you to add web-based content as a source, such as web pages and Flash SWFs.": "Umožňuje vám pridať webový obsah ako zdroj, napríklad webové stránky a Flash SWF.",
+  "Allows you to add web-based content as a source, such as web pages, widgets, and streaming video.": "Allows you to add web-based content as a source, such as web pages, widgets, and streaming video.",
   "Websites": "Webové stránky",
   "Third party widget": "Miniaplikácia tretej strany",
   "Add text to your scene and adjust its style.": "Pridajte text do svojej scény a upravte jeho štýl.",
@@ -179,5 +179,7 @@
   "Remove source": "Odstráňte zdroj",
   "Toggle Selective Recording": "Prepnúť selektívne nahrávanie",
   "Size": "Veľkosť",
-  "Position": "Pozície"
+  "Position": "Pozície",
+  "JACK Input Client": "JACK Input Client",
+  "Motion": "Motion"
 }

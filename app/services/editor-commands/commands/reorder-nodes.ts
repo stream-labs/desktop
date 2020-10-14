@@ -18,6 +18,7 @@ export class ReorderNodesCommand extends Command {
     private placeType: EPlaceType,
   ) {
     super();
+    this.selection.freeze();
     this.initialNodeOrder = this.selection.getScene().getNodesIds();
     this.selection.getNodes().forEach(node => {
       this.initialParentMap[node.id] = node.parentId;

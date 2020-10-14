@@ -1,6 +1,6 @@
 {
   "Add %{filterName}": "%{filterName} を追加",
-  "Center %{sourceName}": "Center %{sourceName}",
+  "Center %{sourceName}": "%{sourceName} を中央揃え",
   "Paste %{nodeName}": "%{nodeName} を貼り付け",
   "Create a new connection": "新規接続を作成",
   "Create %{sourceName}": "%{sourceName} を作成",

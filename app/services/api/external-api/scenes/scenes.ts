@@ -74,7 +74,7 @@ export class ScenesService {
 
     // if user has stopped dragging or resizing then send ItemUpdated event
     this.editorService.positionUpdateFinished.subscribe(() => {
-      const updatedItems = this.selectionService.getItems();
+      const updatedItems = this.selectionService.views.globalSelection.getItems();
       updatedItems.forEach(item =>
         itemUpdated.next(this.convertToExternalSceneItemModel(item as ISceneItem)),
       );
