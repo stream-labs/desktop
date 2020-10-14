@@ -123,12 +123,14 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   // 配信開始ボタンまたはショートカットキーによる配信開始(対話可能)
   async toggleStreamingAsync(
     options: {
-      programId?: string,
+      nicoliveProgramSelectorResult?: {
+        providerType: 'channel' | 'user',
+        channelProgramId?: string;
+      },
       mustShowOptimizationDialog?: boolean
     } = {}
   ) {
     const opts = Object.assign({
-      programId: '',
       mustShowOptimizationDialog: false
     }, options);
 
@@ -142,8 +144,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       try {
         this.SET_PROGRAM_FETCHING(true);
         const broadcastableUserProgram = await this.client.fetchOnairUserProgram();
-        if (opts.programId === '') {
+
+        // 配信番組選択ウィンドウ以外からの呼び出し時
+        if (!opts.nicoliveProgramSelectorResult) {
           const broadcastableChannels = await this.client.fetchOnairChannels();
+
+          // 配信可能チャンネルがある時
           if (broadcastableChannels.length > 0) {
             this.windowsService.showWindow({
               componentName: 'NicoliveProgramSelector',
@@ -154,11 +160,25 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
             });
             return;
           }
+
+          // 配信可能チャンネルがなく、配信できるユーザー生放送もない場合
           if (!broadcastableUserProgram.programId) {
             return this.showNotBroadcastingMessageBox();
           }
         }
-        const programId = opts.programId !== '' ? opts.programId : broadcastableUserProgram.programId;
+
+        // 配信番組選択ウィンドウでチャンネル番組が選ばれた時はそのチャンネル番組を, それ以外の場合は放送中のユーザー番組を代入
+        const programId = 
+            opts.nicoliveProgramSelectorResult &&
+            opts.nicoliveProgramSelectorResult.providerType === 'channel' &&
+            opts.nicoliveProgramSelectorResult.channelProgramId ?
+            opts.nicoliveProgramSelectorResult.channelProgramId : broadcastableUserProgram.programId;
+
+        // 配信番組選択ウィンドウでユーザー番組を選んだが、配信可能なユーザー番組がない場合
+        if (!programId) {
+            return this.showNotBroadcastingMessageBox();
+        }
+
         const setting = await this.userService.updateStreamSettings(programId);
         const streamkey = setting.key;
         if (streamkey === '') {

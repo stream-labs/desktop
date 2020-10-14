@@ -42,7 +42,7 @@ export interface INicoliveProgramSelectorState {
   selectedProviderType: TProviderType | null;
   selectedChannel: { id: string; name: string } | null;
   selectedProgram: { id: string; title?: string } | null; // ユーザー番組の場合はタイトルは取得せず undefined のまま
-  candidateChannels: OnairChannelsData;
+  candidateChannels: OnairChannelsData[];
   candidatePrograms: { id: string; title: string }[];
   isLoading: boolean;
   currentStep: TStep;
@@ -75,7 +75,7 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
       selectedProviderType: 'channel',
       isLoading: true
     });
-    const candidateChannels = await this.client.fetchOnairChannnels();
+    const candidateChannels = await this.client.fetchOnairChannels();
     this.SET_STATE({
       isLoading: false,
       candidateChannels

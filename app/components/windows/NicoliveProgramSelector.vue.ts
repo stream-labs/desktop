@@ -133,7 +133,10 @@ export default class NicoliveProgramSelector extends Vue {
 
   ok(): void {
     this.streamingService.toggleStreamingAsync({
-      programId: this.nicoliveProgramSelectorService.state.selectedProgram.id
+      nicoliveProgramSelectorResult: {
+        providerType: this.nicoliveProgramSelectorService.state.selectedProviderType,
+        channelProgramId: this.nicoliveProgramSelectorService.state.selectedProgram.id ?? undefined
+      }
     });
 
     this.windowsService.closeChildWindow();
