@@ -66,10 +66,6 @@ test('OBS Importer', async t => {
   await client.waitForVisible('h1=Connect');
   await client.click('span=Skip');
 
-  // // skip prime
-  // await client.waitForVisible('h1=Choose your Streamlabs plan');
-  // await client.click('div=Choose Starter');
-
   // import from OBS
   await client.waitForVisible('h2=Import from OBS');
   await client.click('h2=Import from OBS');

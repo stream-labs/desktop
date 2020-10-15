@@ -53,7 +53,6 @@ console.log(process.env);
   // send the status to the GitHub check and upload screenshots
   await updateCheckAndUploadScreenshots();
 })().catch(async e => {
-  console.log('failed main');
   try {
     // report a failed status to the GitHub check
     await updateCheckAndUploadScreenshots();
