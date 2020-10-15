@@ -17,7 +17,9 @@ export class MagicLinkService extends Service {
   async getDashboardMagicLink(subPage = '', source?: string) {
     const token = (await this.fetchNewToken()).login_token;
     const sourceString = source ? `&refl=${source}` : '';
-    return `https://${this.hostsService.streamlabs}/slobs/magic/dashboard?login_token=${token}&r=${subPage}${sourceString}`;
+    return `https://${
+      this.hostsService.streamlabs
+    }/slobs/magic/dashboard?login_token=${token}&r=${subPage ?? ''}${sourceString}`;
   }
 
   private fetchNewToken(): Promise<ILoginTokenResponse> {
