@@ -286,6 +286,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
       this.usageStatisticsService.recordFeatureUsage('OpenVR');
     } else if (type === 'vlc_source') {
       this.usageStatisticsService.recordFeatureUsage('VLC');
+    } else if (type === 'soundtrack_source') {
+      this.usageStatisticsService.recordFeatureUsage('soundtrackSource');
     }
 
     const managerKlass = PROPERTIES_MANAGER_TYPES[managerType];

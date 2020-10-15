@@ -14,7 +14,6 @@ import { EditorCommandsService } from 'services/editor-commands';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import electron from 'electron';
 import { UserService } from 'services/user';
-import { UsageStatisticsService } from 'services/usage-statistics';
 
 @Component({
   components: { ModalLayout, Selector, Display, HFormGroup },
@@ -27,7 +26,6 @@ export default class AddSource extends Vue {
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() userService: UserService;
-  @Inject() usageStatisticsService: UsageStatisticsService;
 
   name = '';
   error = '';
@@ -136,9 +134,6 @@ export default class AddSource extends Vue {
       this.error = 'The source name is required';
     } else {
       let source: ISourceApi;
-      if (this.sourceType === 'soundtrack_source') {
-        this.usageStatisticsService.recordFeatureUsage('soundtrackSource');
-      }
 
       if (this.sourceAddOptions.propertiesManager === 'widget') {
         const widget = this.widgetsService.createWidget(this.widgetType, this.name);
