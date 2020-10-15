@@ -23,6 +23,7 @@ const args = process.argv.slice(2);
 
 console.log(process.env);
 
+
 (async function main() {
   // prepare the dist dir
   rimraf.sync(CONFIG.dist);
