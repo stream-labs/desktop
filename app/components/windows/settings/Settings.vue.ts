@@ -101,6 +101,10 @@ export default class Settings extends Vue {
     return this.userService.views.isPrime;
   }
 
+  get isLoggedIn() {
+    return this.userService.views.isLoggedIn;
+  }
+
   mounted() {
     this.categoryName = this.getInitialCategoryName();
     this.settingsData = this.settingsService.getSettingsFormData(this.categoryName);
