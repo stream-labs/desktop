@@ -14,7 +14,6 @@ import { WidgetNode } from './nodes/overlays/widget';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import https from 'https';
 import { ScenesService } from 'services/scenes';
 import { SelectionService } from 'services/selection';
 import uuid from 'uuid/v4';
