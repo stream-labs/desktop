@@ -1,8 +1,8 @@
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const baseConfig = require('./webpack.base.config.js');
 const TerserPlugin = require('terser-webpack-plugin');
 
-module.exports = merge.smart(baseConfig, {
+module.exports = merge(baseConfig, {
   entry: {
     renderer: './app/app.ts',
     updater: './updater/mac/ui.js',

@@ -1,4 +1,4 @@
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const baseConfig = require('./webpack.base.config.js');
 const path = require('path');
 const fs = require('fs');
@@ -14,12 +14,11 @@ files.forEach(file => {
   if (json.tsx) tsxFiles.push(...json.tsx);
 });
 
-
-module.exports = merge.smart(baseConfig, {
+module.exports = merge(baseConfig, {
   entry: {
     renderer: './app/app.ts',
     updater: './updater/ui.js',
-    'guest-api': './guest-api'
+    'guest-api': './guest-api',
   },
 
   mode: 'development',
@@ -36,12 +35,10 @@ module.exports = merge.smart(baseConfig, {
         loader: 'awesome-typescript-loader',
         options: {
           useCache: true,
-          reportFiles: [
-            ...tsFiles
-          ],
-          strictNullChecks: true
+          reportFiles: [...tsFiles],
+          strictNullChecks: true,
         },
-        exclude: /node_modules|vue\/src/
+        exclude: /node_modules|vue\/src/,
       },
       {
         test: /\.tsx$/,
@@ -52,16 +49,14 @@ module.exports = merge.smart(baseConfig, {
             loader: 'awesome-typescript-loader',
             options: {
               forceIsolatedModules: true,
-              reportFiles: [
-                ...tsxFiles
-              ],
+              reportFiles: [...tsxFiles],
               configFileName: 'tsxconfig.json',
-              instance: 'tsx-loader'
-            }
-          }
+              instance: 'tsx-loader',
+            },
+          },
         ],
         exclude: /node_modules/,
       },
     ],
-  }
+  },
 });

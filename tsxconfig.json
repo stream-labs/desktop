@@ -7,7 +7,7 @@
       "es7",
       "es2017"
     ],
-    "module": "es2015",
+    "module": "esnext",
     "moduleResolution": "node",
     "isolatedModules": false,
     "experimentalDecorators": true,

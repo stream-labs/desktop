@@ -85,31 +85,65 @@ module.exports = {
             video: 'src',
             source: 'src',
           },
-          loaders: { ts: 'awesome-typescript-loader' },
+          loaders: { ts: 'ts-loader' },
         },
       },
+      // {
+      //   test: /\.ts$/,
+      //   loader: 'awesome-typescript-loader',
+      //   options: { useCache: true, reportFiles: ['app/**/*.ts'] },
+      //   exclude: /node_modules|vue\/src/,
+      // },
+      // {
+      //   test: /\.tsx$/,
+      //   include: path.resolve(__dirname, 'app/components'),
+      //   use: [
+      //     'babel-loader',
+      //     {
+      //       loader: 'awesome-typescript-loader',
+      //       options: {
+      //         useCache: true,
+      //         reportFiles: ['app/components/**/*.tsx'],
+      //         configFileName: 'tsxconfig.json',
+      //         instance: 'tsx-loader',
+      //       },
+      //     },
+      //   ],
+      //   exclude: /node_modules/,
+      // },
+      // {
+      //   test: /\.ts$/,
+      //   loader: 'ts-loader',
+      //   exclude: /node_modules/,
+      // },
       {
         test: /\.ts$/,
-        loader: 'awesome-typescript-loader',
-        options: { useCache: true, reportFiles: ['app/**/*.ts'] },
-        exclude: /node_modules|vue\/src/,
+        exclude: /node_modules/,
+        use: [
+          'cache-loader',
+          {
+            loader: 'ts-loader',
+            options: {
+              experimentalFileCaching: true,
+            },
+          },
+        ],
       },
       {
         test: /\.tsx$/,
         include: path.resolve(__dirname, 'app/components'),
-        loader: [
+        use: [
+          'cache-loader',
           'babel-loader',
           {
-            loader: 'awesome-typescript-loader',
+            loader: 'ts-loader',
             options: {
-              useCache: true,
-              reportFiles: ['app/components/**/*.tsx'],
-              configFileName: 'tsxconfig.json',
+              configFile: 'tsxconfig.json',
               instance: 'tsx-loader',
+              experimentalFileCaching: true,
             },
           },
         ],
-        exclude: /node_modules/,
       },
       {
         test: /\.js$/,
