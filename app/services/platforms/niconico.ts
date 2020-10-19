@@ -174,10 +174,12 @@ export class NiconicoService extends Service implements IPlatformService {
   }
 
   private async _setupStreamSettings(programId: string): Promise<IStreamingSetting> {
-    const stream = await this.client.fetchBroadcastStream(programId);
+    const [stream, bitrate] = await Promise.all([
+      this.client.fetchBroadcastStream(programId),
+      this.client.fetchMaxBitrate(programId)
+    ]);
     const url = stream.url;
     const key = stream.name;
-    const bitrate = await this.client.fetchMaxBitrate(programId);
 
     const settings = this.settingsService.getSettingsFormData('Stream');
     settings.forEach(subCategory => {
