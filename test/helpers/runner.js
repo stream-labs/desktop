@@ -20,6 +20,7 @@ const {
   BUILD_REASON,
   BUILD_SOURCEBRANCH,
   SYSTEM_JOBNAME,
+  BUILD_DEFINITIONNAME,
   SLOBS_TEST_RUN_CHUNK,
 } = process.env;
 let retryingFailed = false;
@@ -82,6 +83,8 @@ function getFailedTests() {
 }
 
 async function sendJobToAnalytics(failedTests) {
+  if (!BUILD_BUILDID) return; // do not send analytics for local builds
+
   const failedAfterRetryTests = getFailedTests();
   const testsToSend = failedTests.map(testName => ({
     name: testName,
@@ -90,6 +93,7 @@ async function sendJobToAnalytics(failedTests) {
   log('Sending analytics..');
   const body = {
     name: SYSTEM_JOBNAME,
+    pipelineName: BUILD_DEFINITIONNAME,
     duration: Date.now() - jobStartTime,
     failedTests: testsToSend,
     buildId: BUILD_BUILDID,
