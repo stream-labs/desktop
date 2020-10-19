@@ -411,7 +411,7 @@ export class NicoliveClient {
     headers.append('X-niconico-session', userSession);
     const request = new Request(url, { headers });
     try {
-      return fetch(request).then(handleErrors).then(response => response.json()).then(json => json.data);
+      return await fetch(request).then(handleErrors).then(response => response.json()).then(json => json.data);
     } catch {
       return Promise.resolve(undefined);
     }
@@ -441,7 +441,7 @@ export class NicoliveClient {
     const request = new Request(url, { headers });
     // 取得できなかった場合も空配列を返す
     try {
-      return fetch(request)
+      return await fetch(request)
         .then(handleErrors)
         .then(response => response.json())
         .then(json => { return json.data as OnairChannelsData[] });
