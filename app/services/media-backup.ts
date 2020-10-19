@@ -265,7 +265,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
         body: formData,
       })
         .then(res => {
-          if (Math.floor(res.status / 100) === 2) {
+          if (res.ok) {
             res.json().then(json => resolve(json));
           } else {
             reject(res);
