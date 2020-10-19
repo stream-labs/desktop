@@ -7,7 +7,7 @@ import {
   IPlatformState,
 } from '.';
 import { Inject } from 'services/core/injector';
-import { authorizedHeaders, handleResponse } from 'util/requests';
+import { authorizedHeaders, handleResponse, jfetch } from 'util/requests';
 import { platformAuthorizedRequest } from './utils';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { CustomizationService } from 'services/customization';
@@ -383,9 +383,9 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     const headers = authorizedHeaders(this.userService.apiToken!);
     const request = new Request(url, { headers });
 
-    return fetch(request)
-      .then(handleResponse)
-      .then(response => this.userService.updatePlatformToken('youtube', response.access_token));
+    return jfetch<{ access_token: string }>(request).then(response =>
+      this.userService.updatePlatformToken('youtube', response.access_token),
+    );
   }
 
   /**
