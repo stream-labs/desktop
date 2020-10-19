@@ -77,16 +77,21 @@ module.exports = {
     rules: [
       {
         test: /\.vue$/,
-        loader: 'vue-loader',
-        include: [path.resolve(__dirname, 'app/components'), path.resolve(__dirname, 'updater')],
-        options: {
-          esModule: true,
-          transformToRequire: {
-            video: 'src',
-            source: 'src',
+        use: [
+          'cache-loader',
+          {
+            loader: 'vue-loader',
+            options: {
+              esModule: true,
+              transformToRequire: {
+                video: 'src',
+                source: 'src',
+              },
+              loaders: { ts: 'ts-loader' },
+            },
           },
-          loaders: { ts: 'ts-loader' },
-        },
+        ],
+        include: [path.resolve(__dirname, 'app/components'), path.resolve(__dirname, 'updater')],
       },
       // {
       //   test: /\.ts$/,

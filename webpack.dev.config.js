@@ -4,12 +4,16 @@ const path = require('path');
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 const { CheckerPlugin } = require('awesome-typescript-loader');
 
+const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
+
+const smp = new SpeedMeasurePlugin();
+
 const plugins = [];
 
 if (process.env.SLOBS_FORKED_TYPECHECKING) plugins.push(new CheckerPlugin());
 // if (!process.env.CI) plugins.push(new HardSourceWebpackPlugin());
 
-module.exports = merge(baseConfig, {
+module.exports = smp.wrap(merge(baseConfig, {
   entry: {
     renderer: './app/app.ts',
     updater: './updater/mac/ui.js',
@@ -56,6 +60,6 @@ module.exports = merge(baseConfig, {
   // },
 
   plugins,
-});
+}));
 
 console.log(JSON.stringify(module.exports, null, 2));
