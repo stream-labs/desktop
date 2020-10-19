@@ -263,13 +263,17 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
         method: 'POST',
         headers: this.authedHeaders,
         body: formData,
-      }).then(res => {
-        if (Math.floor(res.status / 100) === 2) {
-          res.json().then(json => resolve(json));
-        } else {
-          reject(res);
-        }
-      });
+      })
+        .then(res => {
+          if (Math.floor(res.status / 100) === 2) {
+            res.json().then(json => resolve(json));
+          } else {
+            reject(res);
+          }
+        })
+        .catch(e => {
+          reject(e);
+        });
     });
   }
 
