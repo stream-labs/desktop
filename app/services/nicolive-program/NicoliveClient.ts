@@ -13,7 +13,7 @@ import {
   FilterRecord,
   OnairUserProgramData,
   OnairChannelProgramData,
-  OnairChannelsData,
+  OnairChannelData,
   BroadcastStreamData
 } from './ResponseTypes';
 import { addClipboardMenu } from 'util/addClipboardMenu';
@@ -433,7 +433,7 @@ export class NicoliveClient {
   /**
    * 放送可能なチャンネル一覧を取得する 
    */
-  async fetchOnairChannels(): Promise<OnairChannelsData[]> {
+  async fetchOnairChannels(): Promise<OnairChannelData[]> {
     const url = `${NicoliveClient.live2BaseURL}/unama/tool/v2/onairs/channels`
     const headers = new Headers();
     const userSession = await this.fetchSession();
@@ -444,7 +444,7 @@ export class NicoliveClient {
       return await fetch(request)
         .then(handleErrors)
         .then(response => response.json())
-        .then(json => { return json.data as OnairChannelsData[] });
+        .then(json => { return json.data as OnairChannelData[] });
     } catch {
       return Promise.resolve([]);
     }

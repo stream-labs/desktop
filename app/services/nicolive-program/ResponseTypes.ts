@@ -221,7 +221,7 @@ export type OnairChannelProgramData = {
   nextProgramId?: string;
 }
 
-export type OnairChannelsData = {
+export type OnairChannelData = {
   id: string;
   name: string;
   ownerName: string;
