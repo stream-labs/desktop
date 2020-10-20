@@ -296,8 +296,11 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   }
 
   async fetchGroups(): Promise<unknown> {
-    return (await this.requestFacebook<{ data: IFacebookPage[] }>(`${this.apiBase}/me/groups`))
-      .data;
+    return (
+      await this.requestFacebook<{ data: IFacebookPage[] }>(
+        `${this.apiBase}/me/groups?admin_only=true&limit=100`,
+      )
+    ).data;
   }
 
   fetchViewerCount(): Promise<number> {
