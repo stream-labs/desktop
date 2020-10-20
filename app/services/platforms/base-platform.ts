@@ -4,6 +4,7 @@ import { StreamingService } from 'services/streaming';
 import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
 import electron from 'electron';
+import { IFacebookStartStreamOptions } from './facebook';
 
 const VIEWER_COUNT_UPDATE_INTERVAL = 60 * 1000;
 
@@ -57,6 +58,21 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
 
     electron.remote.shell.openExternal(
       `https://${this.hostsService.streamlabs}/dashboard#/settings/account-settings`,
+    );
+  }
+
+  protected syncSettingsWithLocalStorage() {
+    // save settings to the local storage
+    const savedSettings: IFacebookStartStreamOptions = JSON.parse(
+      localStorage.getItem(this.serviceName) as string,
+    );
+    if (savedSettings) this.SET_STREAM_SETTINGS(savedSettings);
+    this.store.watch(
+      () => this.state.settings,
+      () => {
+        localStorage.setItem(this.serviceName, JSON.stringify(this.state.settings));
+      },
+      { deep: true },
     );
   }
 

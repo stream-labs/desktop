@@ -24,7 +24,7 @@ class Props {
   /**
    * show the event selector?
    */
-  showEvents?: boolean = true;
+  isScheduleMode?: boolean = false;
 }
 
 /**
@@ -51,12 +51,22 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
     return this.streamingService.views;
   }
 
+  private get selectedBroadcast() {
+    return this.broadcasts.find(
+      broadcast => broadcast.id === this.settings.platforms.youtube.broadcastId,
+    );
+  }
+
+  private fieldIsDisabled(fieldName: keyof IYoutubeStartStreamOptions): boolean {
+    const selectedBroadcast = this.selectedBroadcast;
+    if (!selectedBroadcast || selectedBroadcast.status.lifeCycleStatus !== 'live') return false;
+    return !this.youtubeService.updatableSettings.includes(fieldName);
+  }
+
   private onSelectBroadcastHandler() {
     // set title and description fields from the selected broadcast
     const ytSettings = this.settings.platforms.youtube;
-    const selectedBroadcast = this.broadcasts.find(
-      broadcast => broadcast.id === ytSettings.broadcastId,
-    );
+    const selectedBroadcast = this.selectedBroadcast;
     if (!selectedBroadcast) return;
     const { title, description } = selectedBroadcast.snippet;
     const { privacyStatus } = selectedBroadcast.status;
@@ -120,12 +130,14 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
         ],
         allowEmpty: false,
         tooltip: $t('latencyTooltip'),
+        disabled: this.fieldIsDisabled('latencyPreference'),
       }),
       enableAutoStart: metadata.bool({
         title: 'Enable Auto-start',
         tooltip: $t(
           'Enabling auto-start will automatically start the stream when you start sending data from your streaming software',
         ),
+        disabled: this.fieldIsDisabled('enableAutoStart'),
       }),
       enableAutoStop: metadata.bool({
         title: 'Enable Auto-stop',
@@ -141,6 +153,7 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
       }),
       projection: metadata.bool({
         title: $t('360° video'),
+        disabled: this.fieldIsDisabled('projection'),
       }),
     });
   }
@@ -153,7 +166,7 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
     return (
       shouldShowOptionalFields && (
         <ValidatedForm name="youtube-settings">
-          {this.props.showEvents && (
+          {!this.props.isScheduleMode && (
             <HFormGroup title={$t('Event')}>
               <BroadcastInput
                 onInput={this.onSelectBroadcastHandler}
@@ -178,14 +191,18 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
                 vModel={this.settings.platforms.youtube.latencyPreference}
               />
               <HFormGroup title={$t('Additional Settings')}>
-                <FormInput
-                  metadata={this.formMetadata.enableAutoStart}
-                  vModel={this.settings.platforms.youtube.enableAutoStart}
-                />
-                <FormInput
-                  metadata={this.formMetadata.enableAutoStop}
-                  vModel={this.settings.platforms.youtube.enableAutoStop}
-                />
+                {!this.props.isScheduleMode && (
+                  <FormInput
+                    metadata={this.formMetadata.enableAutoStart}
+                    vModel={this.settings.platforms.youtube.enableAutoStart}
+                  />
+                )}
+                {!this.props.isScheduleMode && (
+                  <FormInput
+                    metadata={this.formMetadata.enableAutoStop}
+                    vModel={this.settings.platforms.youtube.enableAutoStop}
+                  />
+                )}
                 <FormInput
                   metadata={this.formMetadata.enableDvr}
                   vModel={this.settings.platforms.youtube.enableDvr}
