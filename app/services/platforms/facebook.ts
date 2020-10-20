@@ -262,6 +262,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
    * fetch prefill data
    */
   async prepopulateInfo() {
+    this.fetchGroups();
     this.SET_FACEBOOK_PAGES(await this.fetchPages());
     const pageId = this.state.settings.destinationId;
     const page = this.getPage(pageId);
@@ -347,8 +348,12 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   }
 
   private async fetchPages(): Promise<IFacebookPage[]> {
-    return (await this.requestFacebook<{ data: IFacebookPage[] }>(`${this.apiBase}/me/accounts`))
-      .data;
+    return (
+      await this.requestFacebook<{ data: IFacebookPage[] }>(
+        `${this.apiBase}/me/accounts`,
+        this.oauthToken,
+      )
+    ).data;
   }
 
   // fetchPages(): Promise<IStreamlabsFacebookPages> {

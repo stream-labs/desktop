@@ -134,13 +134,12 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
           </HFormGroup>
         )}
 
-        {this.settings.platforms.facebook.destinationType === 'group' &&
-          !this.props.isUpdateMode && (
-            <HFormGroup
-              value={this.settings.platforms.facebook.destinationId}
-              metadata={this.formMetadata.group}
-            />
-        )}
+        {this.settings.platforms.facebook.destinationType === 'group' && !this.props.isUpdateMode && <HFormGroup
+            value={this.settings.platforms.facebook.destinationId}
+            metadata={this.formMetadata.group}
+          />
+        // prettier-ignore
+        }
 
         {!this.canShowOnlyRequiredFields && (
           <div>
