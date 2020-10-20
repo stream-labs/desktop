@@ -401,7 +401,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     return true;
   }
 
-  private fetchPages(): Promise<IStreamlabsFacebookPages> {
+  private fetchPages(): Promise<IStreamlabsFacebookPages | null> {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
     const headers = authorizedHeaders(this.userService.apiToken!);
