@@ -36,7 +36,7 @@ export default class Prime extends TsxComponent<OnboardingStepProps> {
         { text: $t('Custom Tip Page'), icon: 'icon-creator-site' },
         { text: $t('Custom Alerts & Tipping'), icon: 'icon-alert-box' },
         { text: $t('App Store Apps are FREE'), icon: 'icon-store' },
-        { text: $t('Custom Merch Store'), icon: 'icon-upperwear' },
+        { text: $t('Premium Merch'), icon: 'icon-upperwear' },
       ],
     };
   }
