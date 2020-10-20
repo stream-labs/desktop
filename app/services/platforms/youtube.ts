@@ -51,7 +51,13 @@ interface IYoutubeCollection<T> {
  */
 export interface IYoutubeLiveBroadcast {
   id: string;
-  contentDetails: { boundStreamId: string } & IExtraBroadcastSettings;
+  contentDetails: { boundStreamId: string } & IExtraBroadcastSettings & {
+      recordFromStart: boolean;
+      enableContentEncryption: boolean;
+      startWithSlate: boolean;
+      monitorStream: { enableMonitorStream: boolean; broadcastStreamDelayMs: boolean };
+      enableEmbed: boolean;
+    };
   snippet: {
     channelId: string;
     title: string;
@@ -422,24 +428,32 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     id: string,
     params: Partial<IYoutubeStartStreamOptions>,
   ): Promise<void> {
+    const broadcast = await this.fetchBroadcast(id);
+
     const snippet: Partial<IYoutubeLiveBroadcast['snippet']> = {
       title: params.title,
       description: params.description,
       scheduledStartTime: new Date().toISOString(),
     };
 
-    const contentDetails = {
+    const contentDetails: Dictionary<any> = {
       enableAutoStop: params.enableAutoStop,
       enableDvr: params.enableDvr,
 
       // YT requires to setup these options on broadcast update if contentDetails provided
-      // use default values
-      enableEmbed: true,
-      recordFromStart: true,
-      enableContentEncryption: false,
-      startWithSlate: false,
-      monitorStream: { enableMonitorStream: true, broadcastStreamDelayMs: 0 },
+      recordFromStart: broadcast.contentDetails.recordFromStart,
+      enableContentEncryption: broadcast.contentDetails.enableContentEncryption,
+      startWithSlate: broadcast.contentDetails.startWithSlate,
+      monitorStream: {
+        enableMonitorStream: broadcast.contentDetails.monitorStream.enableMonitorStream,
+        broadcastStreamDelayMs: broadcast.contentDetails.monitorStream.broadcastStreamDelayMs,
+      },
     };
+
+    // we must provide value for `contentDetails.enableEmbed` unless the broadcast in the testing or live state.
+    if (!['testing', 'live'].includes(broadcast.status.lifeCycleStatus)) {
+      contentDetails.enableEmbed = broadcast.contentDetails.enableEmbed;
+    }
 
     const status: Partial<IYoutubeLiveBroadcast['status']> = {
       privacyStatus: params.privacyStatus,

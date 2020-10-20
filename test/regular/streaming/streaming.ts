@@ -123,6 +123,40 @@ test('Streaming to the scheduled event on Youtube', async t => {
   t.pass();
 });
 
+test('Start stream twice to the same YT event', async t => {
+  await logIn(t, 'youtube', { multistream: false });
+
+  // create event via scheduling form
+  const now = Date.now();
+  await goLive(t, {
+    title: `Youtube Test Stream ${now}`,
+    description: 'SLOBS Test Stream Description',
+    enableAutoStop: false,
+  });
+  await stopStream(t);
+
+  // await prepareToGoLive(t);
+  // await clickGoLive(t);
+  // const form = new FormMonkey(t);
+  // await form.fill({
+  //   event: selectTitle(`Youtube Test Stream ${now}`),
+  // });
+  //
+  // await sleep(9999999, true);
+
+  try {
+    await goLive(t, {
+      event: selectTitle(`Youtube Test Stream ${now}`),
+      enableAutoStop: true,
+    });
+  } catch (e) {
+    await sleep(9999999, true);
+  }
+
+
+  t.pass();
+});
+
 test('Stream after switching accounts', async t => {
   // stream to youtube
   await logIn(t, 'youtube');
