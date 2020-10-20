@@ -135,25 +135,10 @@ test('Start stream twice to the same YT event', async t => {
   });
   await stopStream(t);
 
-  // await prepareToGoLive(t);
-  // await clickGoLive(t);
-  // const form = new FormMonkey(t);
-  // await form.fill({
-  //   event: selectTitle(`Youtube Test Stream ${now}`),
-  // });
-  //
-  // await sleep(9999999, true);
-
-  try {
-    await goLive(t, {
-      event: selectTitle(`Youtube Test Stream ${now}`),
-      enableAutoStop: true,
-    });
-  } catch (e) {
-    await sleep(9999999, true);
-  }
-
-
+  await goLive(t, {
+    event: selectTitle(`Youtube Test Stream ${now}`),
+    enableAutoStop: true,
+  });
   t.pass();
 });
 
