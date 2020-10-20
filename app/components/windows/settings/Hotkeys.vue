@@ -4,7 +4,7 @@
       <hotkey-group
         v-if="filteredHotkeySet.general.length > 0"
         :hotkeys="filteredHotkeySet.general"
-        :isSearch="!!searchString"
+        :isSearch="!!searchString || scanning"
       />
       <h2 v-if="hasHotkeys(filteredHotkeySet.scenes)">Scenes</h2>
       <hotkey-group
@@ -13,7 +13,7 @@
         :key="sceneId"
         :title="scenesService.views.getScene(sceneId).name"
         :hotkeys="scenesHotkeys"
-        :isSearch="!!searchString"
+        :isSearch="!!searchString || scanning"
       />
       <h2 v-if="hasHotkeys(filteredHotkeySet.sources)">Sources</h2>
       <hotkey-group
@@ -22,7 +22,7 @@
         :key="sourceId"
         :title="sourcesService.views.getSource(sourceId).name"
         :hotkeys="sourceHotkeys"
-        :isSearch="!!searchString"
+        :isSearch="!!searchString || scanning"
       />
     </div>
   </div>

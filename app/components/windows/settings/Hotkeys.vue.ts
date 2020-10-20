@@ -46,6 +46,9 @@ export default class Hotkeys extends Vue {
     this.highlightSearch(val);
   }
 
+  @Prop({ default: false })
+  scanning: boolean;
+
   async mounted() {
     // We don't want hotkeys registering while trying to bind.
     // We may change our minds on this in the future.
