@@ -44,6 +44,10 @@ export interface ProgramInfo {
           name: string;
           /** コミュニティID */
           id: string;
+          /** コミュレベル */
+          communityLevel: number;
+          /** サムネイルのURL */
+          thumbnailUrl: string;
         }
       | {
           providerType: 'channel';
@@ -53,8 +57,8 @@ export interface ProgramInfo {
           id: string;
           /** 配信会社名 */
           ownerName: string;
-          /** コミュレベル */
-          communityLevel: number;
+          /** サムネイルのURL */
+          thumbnailUrl: string;
         };
     /** コメントのルーム */
     rooms: {
@@ -92,6 +96,13 @@ export interface ProgramInfo {
       /** 配信者/配信会社名 */
       name: string;
     }[];
+    /** ストリーム設定 */
+    streamSetting: {
+      /** 配信最高画質 */
+      maxQuality: '6Mbps720p' | '2Mbps450p' | '1Mbps450p' | '384kbps288p' | '192kbps288p';
+      /** 配信の向き */
+      orientation: 'Landscape' | 'Portrait';
+    }
   };
 }
 
@@ -197,4 +208,28 @@ export interface Filters {
     status: 200;
   };
   data: FilterRecord[];
+}
+
+export type OnairUserProgramData = {
+  programId?: string;
+  nextProgramId?: string;
+}
+
+export type OnairChannelProgramData = {
+  testProgramId?: string;
+  programId?: string;
+  nextProgramId?: string;
+}
+
+export type OnairChannelData = {
+  id: string;
+  name: string;
+  ownerName: string;
+  thumbnailUrl: string;
+  smallThumbnailUrl: string;
+};
+
+export type BroadcastStreamData = {
+  url: string;
+  name: string;
 }

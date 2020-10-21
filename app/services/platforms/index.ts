@@ -1,7 +1,6 @@
 import { NiconicoService } from './niconico';
 
 export type IStreamingSetting = {
-  asking: boolean,
   url: string,
   key: string,
   bitrate: number | undefined
@@ -18,8 +17,6 @@ export interface IPlatformService {
   setupStreamSettings: (programId: string) => Promise<IStreamingSetting>;
 
   fetchViewerCount: () => Promise<number>;
-
-  getChatUrl: (mode: string) => Promise<string>;
 
   isLoggedIn?: () => Promise<boolean>;
   logout?: () => Promise<void>;

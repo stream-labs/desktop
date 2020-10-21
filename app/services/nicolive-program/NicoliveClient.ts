@@ -10,9 +10,14 @@ import {
   CommonErrorResponse,
   Community,
   Filters,
-  FilterRecord
+  FilterRecord,
+  OnairUserProgramData,
+  OnairChannelProgramData,
+  OnairChannelData,
+  BroadcastStreamData
 } from './ResponseTypes';
 import { addClipboardMenu } from 'util/addClipboardMenu';
+import { handleErrors } from 'util/requests';
 const { BrowserWindow } = remote;
 
 export enum CreateResult {
@@ -94,7 +99,7 @@ export class NicoliveClient {
     let obj: any = null;
     try {
       obj = JSON.parse(body);
-    } catch(e) {
+    } catch (e) {
       // bodyがJSONになってない異常失敗
 
       // breadcrumbsに載るようにログ
@@ -394,6 +399,87 @@ export class NicoliveClient {
       ok: false,
       value: obj as CommonErrorResponse,
     };
+  }
+  /*
+   * 放送可能なユーザー番組IDを取得する 
+   * 放送可能な番組がない場合はundefinedを返す
+   */
+  async fetchOnairUserProgram(): Promise<OnairUserProgramData | undefined> {
+    const url = `${NicoliveClient.live2BaseURL}/unama/tool/v2/onairs/user`
+    const headers = new Headers();
+    const userSession = await this.fetchSession();
+    headers.append('X-niconico-session', userSession);
+    const request = new Request(url, { headers });
+    try {
+      return await fetch(request).then(handleErrors).then(response => response.json()).then(json => json.data);
+    } catch {
+      return Promise.resolve(undefined);
+    }
+  }
+
+  /**
+   * 放送可能なチャンネル番組IDを取得する 
+   * @param channelId チャンネルID(例： ch12345)
+   */
+  async fetchOnairChannelProgram(channelId: string): Promise<OnairChannelProgramData> {
+    const url = `${NicoliveClient.live2BaseURL}/unama/tool/v2/onairs/channels/${channelId}`
+    const headers = new Headers();
+    const userSession = await this.fetchSession();
+    headers.append('X-niconico-session', userSession);
+    const request = new Request(url, { headers });
+    return fetch(request).then(handleErrors).then(response => response.json().then(json => json.data));
+  }
+
+  /**
+   * 放送可能なチャンネル一覧を取得する 
+   */
+  async fetchOnairChannels(): Promise<OnairChannelData[]> {
+    const url = `${NicoliveClient.live2BaseURL}/unama/tool/v2/onairs/channels`
+    const headers = new Headers();
+    const userSession = await this.fetchSession();
+    headers.append('X-niconico-session', userSession);
+    const request = new Request(url, { headers });
+    // 取得できなかった場合も空配列を返す
+    try {
+      return await fetch(request)
+        .then(handleErrors)
+        .then(response => response.json())
+        .then(json => { return json.data as OnairChannelData[] });
+    } catch {
+      return Promise.resolve([]);
+    }
+  }
+
+  /**
+   * 指定番組IDのストリーム情報を取得する 
+   * @param programId 番組ID(例： lv12345)
+   */
+  async fetchBroadcastStream(programId: string): Promise<BroadcastStreamData> {
+    const url = `${NicoliveClient.live2BaseURL}/unama/api/v2/programs/${programId}/broadcast_stream`;
+    const headers = new Headers();
+    const userSession = await this.fetchSession();
+    headers.append('X-niconico-session', userSession);
+    const request = new Request(url, { headers });
+    return fetch(request).then(handleErrors).then(response => response.json()).then(json => json.data);
+  }
+
+  async fetchMaxBitrate(programId: string): Promise<number> {
+    const programInformation = await this.fetchProgram(programId);
+    if (!isOk(programInformation)) {
+      return 192;
+    }
+    switch (programInformation.value.streamSetting.maxQuality) {
+      case '6Mbps720p':
+        return 6000;
+      case '2Mbps450p':
+        return 2000;
+      case '1Mbps450p':
+        return 1000;
+      case '384kbps288p':
+        return 384;
+      case '192kbps288p':
+        return 192;
+    }
   }
 
   /** 番組作成画面を開いて結果を返す */

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`setupStreamSettingsで番組がひとつある場合 1`] = `
+exports[`setupStreamSettingsでストリーム情報がとれた場合 1`] = `
 Array [
   "Stream",
   Array [
@@ -22,64 +22,6 @@ Array [
       ],
     },
   ],
-]
-`;
-
-exports[`setupStreamSettingsで番組が複数ある場合 2`] = `
-Array [
-  Object {
-    "componentName": "NicoliveProgramSelector",
-    "queryParams": Object {
-      "channels": Array [
-        Object {
-          "broadcastablePrograms": Array [
-            Object {
-              "id": "lv1111111111",
-            },
-            Object {
-              "id": "lv2222222222",
-            },
-          ],
-          "id": "ch1",
-          "name": "テスト用チャンネル1",
-          "thumbnailUrl": "https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg",
-          "type": "channel",
-        },
-        Object {
-          "broadcastablePrograms": Array [
-            Object {
-              "id": "lv4444444444",
-            },
-            Object {
-              "id": "lv5555555555",
-            },
-          ],
-          "id": "ch2",
-          "name": "テスト用チャンネル2",
-          "thumbnailUrl": "https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg",
-          "type": "channel",
-        },
-      ],
-      "community": Object {
-        "broadcastablePrograms": Array [
-          Object {
-            "id": "lv1",
-          },
-          Object {
-            "id": "lv2",
-          },
-        ],
-        "id": "co1",
-        "name": "テスト用コミュニティ",
-        "thumbnailUrl": "https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg",
-        "type": "community",
-      },
-    },
-    "size": Object {
-      "height": 800,
-      "width": 800,
-    },
-  },
 ]
 `;
 
