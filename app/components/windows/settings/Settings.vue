@@ -33,7 +33,7 @@
           {{ $t(category) }}
         </NavItem>
         <NavItem
-          v-if="!isPrime"
+          v-if="!isPrime && isLoggedIn"
           key="Prime"
           to="Prime"
           ico="icon-prime"
