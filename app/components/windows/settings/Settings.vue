@@ -62,6 +62,7 @@
             v-if="page === 'Hotkeys'"
             :globalSearchStr="scanning ? '' : searchStr"
             :highlightSearch="highlightSearch"
+            :scanning="scanning"
           />
           <stream-settings v-if="page === 'Stream'" />
           <developer-settings v-if="page === 'Developer'" />
