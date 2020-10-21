@@ -34,5 +34,6 @@
   "latencyTooltip": "A low-latency stream can reduce the amount of time it takes for video to be visible to users watching a broadcast, though it can also affect the smoothness of playback.",
   "Enabling auto-start will automatically start the stream when you start sending data from your streaming software": "Enabling auto-start will automatically start the stream when you start sending data from your streaming software",
   "Enabling auto-stop will automatically stop the stream when you stop sending data from your streaming software": "Enabling auto-stop will automatically stop the stream when you stop sending data from your streaming software",
-  "DVR controls enable the viewer to control the video playback experience by pausing, rewinding, or fast forwarding content": "DVR controls enable the viewer to control the video playback experience by pausing, rewinding, or fast forwarding content"
+  "DVR controls enable the viewer to control the video playback experience by pausing, rewinding, or fast forwarding content": "DVR controls enable the viewer to control the video playback experience by pausing, rewinding, or fast forwarding content",
+  "Auto-start is disabled for your broadcast. You should manually publish your stream from Youtube Studio": "Auto-start is disabled for your broadcast. You should manually publish your stream from Youtube Studio"
 }

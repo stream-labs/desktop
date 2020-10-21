@@ -164,7 +164,7 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
       <div class="section selectable">
         <p>
           {$t(
-            'Auto-start is disabled for you broadcast. You should manually publish you stream in the Youtube Studio',
+            'Auto-start is disabled for your broadcast. You should manually publish your stream from Youtube Studio',
           )}
         </p>
         <button class="button button--default" onclick={() => this.youtubeService.openDashboard()}>
