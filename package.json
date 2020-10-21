@@ -185,7 +185,7 @@
     "typescript": "3.7.2",
     "urijs": "1.19.1",
     "v-selectpage": "2.0.2",
-    "v-tooltip": "v2.0.3",
+    "v-tooltip": "2.0.0-rc.33",
     "vee-validate": "2.2.0",
     "vue": "2.6.9",
     "vue-codemirror": "4.0.5",
