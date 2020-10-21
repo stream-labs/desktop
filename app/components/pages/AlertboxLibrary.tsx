@@ -4,7 +4,7 @@ import { UserService } from '../../services/user';
 import { Inject, Service } from 'services';
 import { NavigationService } from 'services/navigation';
 import { SceneCollectionsService } from 'services/scene-collections';
-import { IDownloadProgress, OverlaysPersistenceService } from 'services/scene-collections/overlays';
+import { OverlaysPersistenceService } from 'services/scene-collections/overlays';
 import { ScenesService } from 'services/scenes';
 import { WidgetsService } from 'services/widgets';
 import { NotificationsService, ENotificationType } from 'services/notifications';
@@ -17,6 +17,7 @@ import BrowserView from 'components/shared/BrowserView';
 import { RestreamService } from 'services/restream';
 import { GuestApiHandler } from 'util/guest-api-handler';
 import TsxComponent, { createProps } from 'components/tsx-component';
+import { IDownloadProgress } from 'util/requests';
 
 class AlertboxLibraryProps {
   params: { id?: string } = {};
