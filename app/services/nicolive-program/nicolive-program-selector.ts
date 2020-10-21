@@ -76,11 +76,19 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
         selectedProviderType: 'channel',
         isLoading: true
       });
-      const candidateChannels = await this.client.fetchOnairChannels();
-      this.SET_STATE({
-        isLoading: false,
-        candidateChannels
-      });
+      try {
+        const candidateChannels = await this.client.fetchOnairChannels();
+        this.SET_STATE({
+          isLoading: false,
+          candidateChannels
+        });
+      } catch (error) {
+        // 番組選択ウィンドウを出した後、メインウィンドウでログアウトした場合にここに到達することがある
+        // TODO: 何らかのエラー表示を出すか、エラー時の挙動を決める
+        this.SET_STATE({
+          isLoading: false
+        })
+      }
     } else { // providerType === 'user'
       this.SET_STATE({
         selectedProviderType: 'user',
