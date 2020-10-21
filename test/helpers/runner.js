@@ -20,6 +20,7 @@ const {
   BUILD_REASON,
   BUILD_SOURCEBRANCH,
   SYSTEM_JOBNAME,
+  BUILD_DEFINITIONNAME,
   SLOBS_TEST_RUN_CHUNK,
 } = process.env;
 let retryingFailed = false;
@@ -92,6 +93,7 @@ async function sendJobToAnalytics(failedTests) {
   log('Sending analytics..');
   const body = {
     name: SYSTEM_JOBNAME,
+    pipelineName: BUILD_DEFINITIONNAME,
     duration: Date.now() - jobStartTime,
     failedTests: testsToSend,
     buildId: BUILD_BUILDID,

@@ -19,6 +19,7 @@ test('Populates essential hotkeys for them to be bound', async t => {
   await focusChild(t);
 
   await app.client.click('li=Hotkeys');
+  await app.client.click('h2=Mic/Aux');
 
   for (const hotkey of [
     'Start Streaming',

@@ -41,6 +41,10 @@ export class ChatService extends Service {
       // chat url changed to a new valid url, reload chat
       this.loadUrl();
     });
+
+    this.userService.userLogout.subscribe(() => {
+      this.deinitChat();
+    });
   }
 
   refreshChat() {
