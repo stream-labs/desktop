@@ -450,8 +450,8 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       },
     };
 
-    // we must provide value for `contentDetails.enableEmbed` unless the broadcast in the testing or live state.
-    if (!['testing', 'live'].includes(broadcast.status.lifeCycleStatus)) {
+    // we must provide value for `contentDetails.enableEmbed` unless the broadcast in the testing state.
+    if (!['testing'].includes(broadcast.status.lifeCycleStatus)) {
       contentDetails.enableEmbed = broadcast.contentDetails.enableEmbed;
     }
 
