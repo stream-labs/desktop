@@ -33,7 +33,7 @@
           {{ $t(category) }}
         </NavItem>
         <NavItem
-          v-if="!isPrime"
+          v-if="!isPrime && isLoggedIn"
           key="Prime"
           to="Prime"
           ico="icon-prime"
@@ -62,6 +62,7 @@
             v-if="page === 'Hotkeys'"
             :globalSearchStr="scanning ? '' : searchStr"
             :highlightSearch="highlightSearch"
+            :scanning="scanning"
           />
           <stream-settings v-if="page === 'Stream'" />
           <developer-settings v-if="page === 'Developer'" />
