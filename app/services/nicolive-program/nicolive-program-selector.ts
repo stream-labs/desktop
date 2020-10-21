@@ -1,6 +1,6 @@
 import { StatefulService, mutation } from 'services/stateful-service';
 import { NicoliveClient } from './NicoliveClient';
-import { OnairChannelsData } from './ResponseTypes';
+import { OnairChannelData } from './ResponseTypes';
 
 /**
  * 配信する番組種別
@@ -42,7 +42,7 @@ export interface INicoliveProgramSelectorState {
   selectedProviderType: TProviderType | null;
   selectedChannel: { id: string; name: string } | null;
   selectedChannelProgram: { id: string; title: string } | null; // ユーザー生放送時 null
-  candidateChannels: OnairChannelsData[];
+  candidateChannels: OnairChannelData[];
   candidatePrograms: { id: string; title: string }[];
   isLoading: boolean;
   currentStep: TStep;

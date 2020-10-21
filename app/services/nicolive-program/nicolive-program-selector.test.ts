@@ -1,7 +1,7 @@
 import { createSetupFunction } from 'util/test-setup';
 import { Subject } from 'rxjs';
 import { NicoliveProgramSelectorService, TStep, TProviderType } from './nicolive-program-selector';
-import { OnairChannelsData, OnairChannelProgramData } from './ResponseTypes';
+import { OnairChannelData, OnairChannelProgramData } from './ResponseTypes';
 
 const setup = createSetupFunction({
   injectee: {
@@ -25,7 +25,7 @@ function createInstance() {
       thumbnailUrl: 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg',
       name: 'テスト用チャンネル2',
     }
-  ] as OnairChannelsData[]);
+  ] as OnairChannelData[]);
   instance.client.fetchOnairChannelProgram = jest.fn().mockResolvedValue({
     testProgramId: 'lv1111111111',
     programId: 'lv2222222222'
