@@ -12,7 +12,7 @@ testGoal('Follower Goal');
 testGoal('Bit Goal');
 
 function testGoal(goalType: string) {
-  test(`${goalType} create and delete`, async t => {
+  test.skip(`${goalType} create and delete`, async t => {
     const client = t.context.app.client;
     if (!(await logIn(t))) return;
     await addSource(t, goalType, goalType, false);

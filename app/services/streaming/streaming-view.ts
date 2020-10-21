@@ -6,6 +6,9 @@ import { RestreamService } from '../restream';
 import { getPlatformService, TPlatform, TPlatformCapability } from '../platforms';
 import { $t } from '../i18n';
 import { cloneDeep, difference } from 'lodash';
+import { YoutubeService } from '../platforms/youtube';
+import { FacebookService } from '../platforms/facebook';
+import { TwitchService } from '../platforms/twitch';
 
 /**
  * The stream info view is responsible for keeping

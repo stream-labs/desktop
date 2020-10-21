@@ -34,12 +34,12 @@ interface IFacebookGroup {
 
 export interface IFacebookLiveVideo {
   status: 'SCHEDULED_UNPUBLISHED' | 'LIVE_STOPPED' | 'LIVE';
+  planned_start_time: string;
   id: string;
   stream_url: string;
   title: string;
   game: string;
   description: string;
-  planned_start_time: number;
 }
 
 interface IFacebookServiceState extends IPlatformState {
@@ -106,22 +106,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   static initialState = initialState;
 
   protected init() {
-    // save settings to the local storage
-    const savedSettings: IFacebookStartStreamOptions = JSON.parse(
-      localStorage.getItem(this.serviceName) as string,
-    );
-    if (savedSettings) this.UPDATE_STREAM_SETTINGS(savedSettings);
-    this.store.watch(
-      () => this.state.settings,
-      () => {
-        const { title, description, game, destinationType, pageId } = this.state.settings;
-        localStorage.setItem(
-          this.serviceName,
-          JSON.stringify({ title, description, game, destinationType, pageId }),
-        );
-      },
-      { deep: true },
-    );
+    this.syncSettingsWithLocalStorage();
   }
 
   @mutation()

@@ -95,7 +95,10 @@ export default class PlatformSettings extends TsxComponent<Props> {
           />
         )}
         {platform === 'youtube' && (
-          <YoutubeEditStreamInfo vModel={this.settings} showEvents={!this.props.isScheduleMode} />
+          <YoutubeEditStreamInfo
+            vModel={this.settings}
+            isScheduleMode={this.props.isScheduleMode}
+          />
         )}
         {platform === 'mixer' && <MixerEditStreamInfo vModel={this.settings} />}
       </Section>
