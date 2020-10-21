@@ -47,9 +47,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
   }
 
   async created() {
-    this.scheduledVideos = await this.facebookService.fetchScheduledVideos(
-      this.fbSettings.destinationId,
-    );
+    this.scheduledVideos = await this.facebookService.fetchScheduledVideos(this.fbSettings.pageId);
     this.scheduledVideosLoaded = true;
   }
 
@@ -59,8 +57,8 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
         title: $t('Facebook Destination'),
         fullWidth: true,
         options: [
-          { value: 'page', title: $t('Share to a Page You Manage') },
           { value: 'me', title: $t('Share to Your Timeline') },
+          { value: 'page', title: $t('Share to a Page You Manage') },
           { value: 'group', title: $t('Share in a Group') },
         ],
         required: true,
@@ -79,10 +77,11 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
       group: metadata.list({
         title: $t('Facebook Group'),
         fullWidth: true,
-        options: [
-          { title: 'My Group 1', value: 'My Group 1' },
-          { title: 'My Group 2', value: 'My Group 2' },
-        ],
+        options:
+          this.facebookService.state.facebookGroups.map(group => ({
+            value: group.id,
+            title: group.name,
+          })) || [],
         required: true,
       }),
       event: metadata.list({
@@ -114,6 +113,10 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
   }
 
   render() {
+    const fbSettings = this.settings.platforms.facebook;
+    const shouldShowGroups = fbSettings.destinationType === 'group' && !this.props.isUpdateMode;
+    const shouldShowPages = fbSettings.destinationType === 'page' && !this.props.isUpdateMode;
+
     return (
       <ValidatedForm name="facebook-settings">
         {!this.props.isUpdateMode && (
@@ -125,17 +128,17 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
           </HFormGroup>
         )}
 
-        {this.settings.platforms.facebook.destinationType === 'page' && !this.props.isUpdateMode && (
+        {shouldShowPages && (
           <HFormGroup title={this.formMetadata.page.title}>
             <ListInput
-              vModel={this.settings.platforms.facebook.destinationId}
+              vModel={this.settings.platforms.facebook.pageId}
               metadata={this.formMetadata.page}
             />
           </HFormGroup>
         )}
 
-        {this.settings.platforms.facebook.destinationType === 'group' && !this.props.isUpdateMode && <HFormGroup
-            value={this.settings.platforms.facebook.destinationId}
+        {shouldShowGroups && <HFormGroup
+            value={this.settings.platforms.facebook.groupId}
             metadata={this.formMetadata.group}
           />
         // prettier-ignore
