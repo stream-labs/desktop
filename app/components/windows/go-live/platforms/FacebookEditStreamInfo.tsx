@@ -38,17 +38,38 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
   private scheduledVideos: IFacebookLiveVideo[] = [];
   private scheduledVideosLoaded = false;
 
-  get view() {
+  /**
+   * cached pictures for groups and pages
+   */
+  private pictures: Dictionary<string> = {};
+
+  private get view() {
     return this.streamingService.views;
   }
 
-  get fbSettings(): IFacebookStartStreamOptions {
+  private get fbSettings(): IFacebookStartStreamOptions {
     return this.settings.platforms.facebook;
   }
 
   async created() {
     this.scheduledVideos = await this.facebookService.fetchScheduledVideos(this.fbSettings.pageId);
     this.scheduledVideosLoaded = true;
+  }
+
+  private async loadPicture(objectId: string): Promise<string> {
+    if (this.pictures[objectId]) return this.pictures[objectId];
+    this.$set(this.pictures, objectId, await this.facebookService.fetchPicture(objectId));
+  }
+
+  private async loadPictures(groupOrPage: IFacebookStartStreamOptions['destinationType']) {
+    // setTimeout(() => {
+    //   debugger;
+    // }, 3000);
+    const ids =
+      groupOrPage === 'group'
+        ? this.facebookService.state.facebookGroups.map(item => item.id)
+        : this.facebookService.state.facebookPages.map(item => item.id);
+    ids.forEach(id => this.loadPicture(id));
   }
 
   private get formMetadata() {
@@ -71,6 +92,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
           this.facebookService.state.facebookPages.map(page => ({
             value: page.id,
             title: `${page.name} | ${page.category}`,
+            icon: this.pictures[page.id],
           })) || [],
         required: true,
       }),
@@ -81,6 +103,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
           this.facebookService.state.facebookGroups.map(group => ({
             value: group.id,
             title: group.name,
+            icon: this.pictures[group.id],
           })) || [],
         required: true,
       }),
@@ -100,7 +123,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
     });
   }
 
-  onSelectScheduledVideoHandler() {
+  private onSelectScheduledVideoHandler() {
     // set title and description fields from selected video
     const fbSettings = this.settings.platforms.facebook;
     const selectedLiveVideo = this.scheduledVideos.find(
@@ -131,18 +154,22 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
         {shouldShowPages && (
           <HFormGroup title={this.formMetadata.page.title}>
             <ListInput
-              vModel={this.settings.platforms.facebook.pageId}
+              vModel={fbSettings.pageId}
               metadata={this.formMetadata.page}
+              handleOpen={() => this.loadPictures('page')}
             />
           </HFormGroup>
         )}
 
-        {shouldShowGroups && <HFormGroup
-            value={this.settings.platforms.facebook.groupId}
-            metadata={this.formMetadata.group}
-          />
-        // prettier-ignore
-        }
+        {shouldShowGroups && (
+          <HFormGroup title={this.formMetadata.group.title}>
+            <ListInput
+              vModel={fbSettings.groupId}
+              metadata={this.formMetadata.group}
+              handleOpen={() => this.loadPictures('group')}
+            />
+          </HFormGroup>
+        )}
 
         {!this.canShowOnlyRequiredFields && (
           <div>

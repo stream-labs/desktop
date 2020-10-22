@@ -255,6 +255,9 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     // don't reuse broadcastId for Youtube
     if (settings && settings['broadcastId']) settings['broadcastId'] = '';
 
+    // don't reuse liveVideoId for Facebook
+    if (platform === 'facebook' && settings['liveVideoId']) settings['liveVideoId'] = '';
+
     return {
       ...settings,
       useCustomFields,
