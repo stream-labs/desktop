@@ -27,6 +27,7 @@ import VirtualWebcamSettings from './VirtualWebcamSettings';
 import { MagicLinkService } from 'services/magic-link';
 import { UserService } from 'services/user';
 import Scrollable from 'components/shared/Scrollable';
+import PlatformLogo from 'components/shared/PlatformLogo';
 import { $t } from 'services/i18n';
 
 @Component({
@@ -52,6 +53,7 @@ import { $t } from 'services/i18n';
     StreamSettings,
     VirtualWebcamSettings,
     Scrollable,
+    PlatformLogo,
   },
 })
 export default class Settings extends Vue {

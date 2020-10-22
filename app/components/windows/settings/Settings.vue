@@ -47,15 +47,13 @@
           @click="handleAuth()"
           v-track-click="{
             component: 'Settings',
-            target: this.userService.isLoggedIn ? 'logout' : 'login',
+            target: userService.isLoggedIn ? 'logout' : 'login',
           }"
         >
           <i :class="userService.isLoggedIn ? 'fas fa-sign-out-alt' : 'fas fa-sign-in-alt'" />
-          {{
-            userService.isLoggedIn
-              ? $t('Log Out %{username}', { username: this.userService.username })
-              : $t('Log In')
-          }}
+          <strong>{{ userService.isLoggedIn ? $t('Log Out') : $t('Log In') }}</strong>
+          <platform-logo v-if="userService.isLoggedIn" :platform="userService.platform.type" />
+          {{ userService.isLoggedIn && userService.username }}
         </button>
       </NavMenu>
 
@@ -171,11 +169,16 @@
   bottom: 0;
   padding-top: 16px;
   padding-bottom: 16px;
-  width: 100%;
+  width: 240px;
   border-top: 1px solid var(--border);
+  white-space: nowrap;
+  text-overflow: ellipsis;
 
   i {
     margin-right: 8px;
+  }
+  strong {
+    margin-right: 16px;
   }
 }
 </style>
