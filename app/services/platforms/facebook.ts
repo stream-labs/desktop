@@ -105,19 +105,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   };
 
   protected init() {
-    // save settings to the local storage
-    const savedSettings: IFacebookStartStreamOptions = JSON.parse(
-      localStorage.getItem(this.serviceName) as string,
-    );
-    if (savedSettings) this.SET_STREAM_SETTINGS(savedSettings);
-    this.store.watch(
-      () => this.state.settings,
-      () => {
-        const { title, description, game } = this.state.settings;
-        localStorage.setItem(this.serviceName, JSON.stringify({ title, description, game }));
-      },
-      { deep: true },
-    );
+    this.syncSettingsWithLocalStorage();
   }
 
   @mutation()

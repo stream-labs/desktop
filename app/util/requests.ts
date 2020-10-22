@@ -45,21 +45,60 @@ export function authorizedHeaders(token: string | undefined, headers = new Heade
   return headers;
 }
 
-export async function downloadFile(srcUrl: string, dstPath: string): Promise<void> {
+export interface IDownloadProgress {
+  totalBytes: number;
+  downloadedBytes: number;
+  percent: number;
+}
+
+export async function downloadFile(
+  srcUrl: string,
+  dstPath: string,
+  progressCallback?: (progress: IDownloadProgress) => void,
+): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     return fetch(srcUrl)
       .then(resp => (resp.ok ? Promise.resolve(resp) : Promise.reject(resp)))
-      .then(({ body }: { body: ReadableStream }) => {
-        const reader = body.getReader();
+      .then(response => {
+        const contentLength = response.headers.get('content-length');
+        const totalSize = parseInt(contentLength, 10);
+        const reader = response.body.getReader();
         const fileStream = fs.createWriteStream(dstPath);
+        let bytesWritten = 0;
 
         const readStream = ({ done, value }: { done: boolean; value: Uint8Array }) => {
           if (done) {
-            fileStream.end();
-            resolve();
+            fileStream.end((err: Error) => {
+              if (err) {
+                reject(err);
+                return;
+              }
+
+              // Final progress callback is emitted regardless of whether
+              // we got a content-length header.
+              if (progressCallback) {
+                progressCallback({
+                  totalBytes: totalSize || 0,
+                  downloadedBytes: totalSize || 0,
+                  percent: 1,
+                });
+              }
+              resolve();
+            });
           } else {
+            bytesWritten += value.byteLength;
             fileStream.write(value);
             reader.read().then(readStream);
+
+            // Only do intermediate progress callbacks if we received the
+            // content-length header in the response
+            if (progressCallback && totalSize) {
+              progressCallback({
+                totalBytes: totalSize,
+                downloadedBytes: bytesWritten,
+                percent: bytesWritten / totalSize,
+              });
+            }
           }
         };
 
