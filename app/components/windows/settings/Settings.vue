@@ -53,8 +53,8 @@
           <i :class="userService.isLoggedIn ? 'fas fa-sign-out-alt' : 'fas fa-sign-in-alt'" />
           {{
             userService.isLoggedIn
-              ? $t('Logout %{username}', { username: this.userService.username })
-              : $t('Login')
+              ? $t('Log Out %{username}', { username: this.userService.username })
+              : $t('Log In')
           }}
         </button>
       </NavMenu>
