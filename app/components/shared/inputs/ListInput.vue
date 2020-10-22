@@ -24,6 +24,9 @@
     :taggable="options.taggable"
     @input="onInputHandler"
     @search-change="onSearchChangeHandler"
+    @open="handleOpen && handleOpen()"
+    selectLabel=""
+    deselectLabel=""
   >
     <span
       slot="option"
@@ -33,6 +36,9 @@
       <slot name="item" :option="props.option"><img v-if="props.option.icon" :src="props.option.icon" alt="" class="icon"/>{{ props.option.title }}</slot>
     </span>
 
+    <template slot="singleLabel" slot-scope="props">
+      <img v-if="props.option.icon" :src="props.option.icon" alt="" class="icon"/>{{ props.option.title }}
+    </template>
     <template v-if="options.noResult" slot="noResult">{{ options.noResult }}</template>
     <template v-if="options.loading" slot="afterList"><spinner/></template>
 

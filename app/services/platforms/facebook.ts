@@ -215,7 +215,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   /**
    * Request Facebook API and wrap failed response to a unified error model
    */
-  private async requestFacebook<T = unknown>(
+  async requestFacebook<T = unknown>(
     reqInfo: IPlatformRequest | string,
     token?: string,
   ): Promise<T> {
@@ -231,21 +231,55 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     }
   }
 
+  /**
+   * Download the picture of a group or page and return it's base64 url string
+   */
+  async fetchPicture(objectId: string): Promise<string> {
+    let url = '';
+    try {
+      await fetch(`${this.apiBase}/${objectId}/picture`, {
+        method: 'GET',
+        headers: new Headers({
+          Authorization: 'Bearer ' + this.oauthToken,
+        }),
+      })
+        .then(response => response.blob())
+        .then(blob => {
+          url = window.URL.createObjectURL(blob);
+        });
+    } catch (e) {
+      // just don't care is something is wrong here
+    }
+    return url;
+  }
+
   private createLiveVideo(options: IFacebookStartStreamOptions): Promise<IFacebookLiveVideo> {
     const { title, description, game, destinationType } = options;
-    const data = {
-      method: 'POST',
-      body: JSON.stringify({ title, description, game_specs: { name: game } }),
-    };
+    const body: Dictionary<any> = { title, description };
+    if (game) body.game_specs = { name: game };
 
-    const destinationId = destinationType === 'me' ? 'me' : options.pageId;
-    const token =
-      destinationType === 'me' ? this.oauthToken : this.getPage(destinationId).access_token;
+    let destinationId: string;
+    let token: string;
+    switch (destinationType) {
+      case 'me':
+        destinationId = 'me';
+        token = this.oauthToken;
+        break;
+      case 'page':
+        destinationId = options.pageId;
+        token = this.getPage(destinationId).access_token;
+        break;
+      case 'group':
+        destinationId = options.groupId;
+        token = this.oauthToken;
+        break;
+    }
 
     return this.requestFacebook<IFacebookLiveVideo>(
       {
         url: `${this.apiBase}/${destinationId}/live_videos`,
-        ...data,
+        method: 'POST',
+        body: JSON.stringify(body),
       },
       token,
     );
@@ -314,7 +348,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   async fetchGroups(): Promise<IFacebookPage[]> {
     return (
       await this.requestFacebook<{ data: IFacebookPage[] }>(
-        `${this.apiBase}/me/groups?admin_only=true&limit=100`,
+        `${this.apiBase}/me/groups?admin_only=true&fields=id,name,icon,privacy&limit=100`,
       )
     ).data;
   }

@@ -10,12 +10,13 @@ import { Spinner } from 'streamlabs-beaker';
 export default class ListInput extends BaseInput<
   string,
   IListMetadata<string>,
-  { handleSearchChange?: (val: string) => unknown }
+  { handleSearchChange?: (val: string) => unknown; handleOpen?: () => unknown }
 > {
   @Prop() readonly value: string;
   @Prop() readonly metadata: IListMetadata<string>;
   @Prop() readonly title: string;
   @Prop() readonly handleSearchChange?: (val: string) => unknown;
+  @Prop() readonly handleOpen?: () => unknown;
 
   get placeholder() {
     return this.options.placeholder || 'Select Option';
