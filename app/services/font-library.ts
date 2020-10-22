@@ -38,7 +38,7 @@ export class FontLibraryService extends Service {
     if (!this.manifest) {
       const req = new Request(this.libraryUrl('manifest.json'));
 
-      return jfetch<IFontManifest>(req)
+      return jfetch<IFontManifest>(req, null, { forceJson: true })
         .then(json => {
           this.manifest = json;
           return json;

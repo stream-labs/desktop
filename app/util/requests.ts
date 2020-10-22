@@ -121,12 +121,26 @@ export function getChecksum(filePath: string) {
   });
 }
 
-export function jfetch<TResponse>(request: RequestInfo, init?: RequestInit): Promise<TResponse> {
+interface IJfetchOptions {
+  /**
+   * If true, will force parsing of JSON even when the server
+   * does not respond with the appropriate content-type header.
+   * This is useful when requesting files from a CDN rather than
+   * calling an API.
+   */
+  forceJson?: boolean;
+}
+
+export function jfetch<TResponse>(
+  request: RequestInfo,
+  init?: RequestInit,
+  options: IJfetchOptions = {},
+): Promise<TResponse> {
   return fetch(request, init).then(response => {
     if (response.ok) {
       const contentType = response.headers.get('content-type');
       const isJson = contentType && contentType.includes('application/json');
-      if (isJson) {
+      if (isJson || options.forceJson) {
         return response.json() as Promise<TResponse>;
       } else {
         console.warn('jfetch: Got non-JSON response');
