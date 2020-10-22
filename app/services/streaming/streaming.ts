@@ -120,7 +120,18 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     });
   }
 
-  // 配信開始ボタンまたはショートカットキーによる配信開始(対話可能)
+  /**
+   * 配信開始ボタンまたはショートカットキーによる配信開始(対話可能)
+   * 
+   * 現在ログインされているユーザーで、配信可能なチャンネルが存在する場合には、配信番組選択ウィンドウを開きます。
+   * 
+   * 配信番組選択ウィンドウで「配信開始」ボタンを押した時にもこのメソッドが呼ばれ、
+   * options.nicoliveProgramSelectorResult に、ウィンドウで選ばれた配信種別と
+   * チャンネル番組の場合は番組IDが与えられます。
+   * 
+   * 配信番組選択ウィンドウからの呼び出しの場合、および現在ログインされているユーザーで
+   * 配信可能なチャンネルが存在しない場合には、配信開始を試みます。
+   */
   async toggleStreamingAsync(
     options: {
       nicoliveProgramSelectorResult?: {
