@@ -66,7 +66,7 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
     const savedSettings: IFacebookStartStreamOptions = JSON.parse(
       localStorage.getItem(this.serviceName) as string,
     );
-    if (savedSettings) this.SET_STREAM_SETTINGS(savedSettings);
+    if (savedSettings) this.UPDATE_STREAM_SETTINGS(savedSettings);
     this.store.watch(
       () => this.state.settings,
       () => {
