@@ -375,7 +375,7 @@ test('Recording when streaming', async t => {
 
 test('Streaming to Dlive', async t => {
   // click Log-in
-  await click(t, 'icon-settings');
+  await click(t, '.icon-settings');
   await focusChild(t);
   await click(t, '.fa-sign-in-alt');
 
