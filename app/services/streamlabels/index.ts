@@ -371,7 +371,8 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
     const train = this.trains[trainType] as ITrainInfo | IDonationTrainInfo;
     const settings = this.getSettingsForStat(train.setting);
     const output = {
-      [`${trainType}_train_counter`]: settings.show_count ? train.counter.toString() : '',
+      [`${trainType}_train_counter`]:
+        train.counter || settings.show_count === 'always' ? train.counter.toString() : '',
       [`${trainType}_train_latest_name`]: settings.show_latest ? train.mostRecentName || '' : '',
     };
 
