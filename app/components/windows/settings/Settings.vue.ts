@@ -179,8 +179,8 @@ export default class Settings extends Vue {
           }
         });
     } else {
-      this.userService.showLogin();
       this.windowsService.closeChildWindow();
+      this.userService.showLogin();
     }
   }
 }

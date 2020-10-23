@@ -378,6 +378,7 @@ test('Streaming to Dlive', async t => {
   await click(t, '.icon-settings');
   await focusChild(t);
   await click(t, '.fa-sign-in-alt');
+  await focusMain(t);
 
   // select DLive from the "use another platform list"
   await fillForm(t, null, { otherPlatform: 'dlive' });
