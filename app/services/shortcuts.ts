@@ -37,7 +37,10 @@ export class ShortcutsService extends Service {
       const shortcutName = ShortcutsService.getShortcutName(e);
       const handler = this.shortcuts.get(shortcutName);
 
-      if (handler) handler(e);
+      if (handler) {
+        e.preventDefault();
+        handler(e);
+      }
     });
   }
 
