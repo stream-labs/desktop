@@ -131,7 +131,7 @@ interface IJfetchOptions {
   forceJson?: boolean;
 }
 
-export function jfetch<TResponse>(
+export function jfetch<TResponse = unknown>(
   request: RequestInfo,
   init?: RequestInit,
   options: IJfetchOptions = {},
