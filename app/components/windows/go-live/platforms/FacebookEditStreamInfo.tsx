@@ -1,4 +1,4 @@
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
@@ -52,7 +52,18 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
   }
 
   async created() {
-    this.scheduledVideos = await this.facebookService.fetchScheduledVideos(this.fbSettings.pageId);
+    this.loadScheduledBroadcasts();
+    if (this.fbSettings.pageId) this.loadPicture(this.fbSettings.pageId);
+    if (this.fbSettings.groupId) this.loadPicture(this.fbSettings.groupId);
+  }
+
+  @Watch('settings.platforms.facebook.destinationType')
+  private async loadScheduledBroadcasts() {
+    const destinationId = this.facebookService.getDestinationId(this.fbSettings);
+    this.scheduledVideos = await this.facebookService.fetchScheduledVideos(
+      this.fbSettings.destinationType,
+      destinationId,
+    );
     this.scheduledVideosLoaded = true;
   }
 
@@ -62,9 +73,6 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
   }
 
   private async loadPictures(groupOrPage: IFacebookStartStreamOptions['destinationType']) {
-    // setTimeout(() => {
-    //   debugger;
-    // }, 3000);
     const ids =
       groupOrPage === 'group'
         ? this.facebookService.state.facebookGroups.map(item => item.id)
@@ -111,13 +119,13 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
         title: $t('Scheduled Video'),
         fullWidth: true,
         options: [
-          { value: null, title: $t('Not selected') },
           ...this.scheduledVideos.map(vid => ({
             value: vid.id,
             title: `${vid.title} ${moment(new Date(vid.planned_start_time)).calendar()}`,
           })),
         ],
         required: false,
+        allowEmpty: true,
         loading: !this.scheduledVideosLoaded,
       }),
     });
@@ -157,6 +165,8 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
               vModel={fbSettings.pageId}
               metadata={this.formMetadata.page}
               handleOpen={() => this.loadPictures('page')}
+              showIconPlaceholder={true}
+              iconSize={{ width: 44, height: 44 }}
             />
           </HFormGroup>
         )}
@@ -167,6 +177,8 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
               vModel={fbSettings.groupId}
               metadata={this.formMetadata.group}
               handleOpen={() => this.loadPictures('group')}
+              showIconPlaceholder={true}
+              iconSize={{ width: 44, height: 44 }}
             />
           </HFormGroup>
         )}
