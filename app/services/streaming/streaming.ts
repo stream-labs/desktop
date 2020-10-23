@@ -312,7 +312,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
 
     // check if we should show the waring about the disabled Auto-start
-    if (settings.platforms.youtube.enabled && !settings.platforms.youtube.enableAutoStart) {
+    if (settings.platforms.youtube?.enabled && !settings.platforms.youtube.enableAutoStart) {
       this.SET_WARNING('YT_AUTO_START_IS_DISABLED');
     }
 

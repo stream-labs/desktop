@@ -1,4 +1,4 @@
-import { Service } from 'services/core/service';
+import { mutation, StatefulService } from 'services/core/stateful-service';
 import { UserService } from 'services/user';
 import { Inject } from 'services/core/injector';
 import { HostsService } from 'services/hosts';
@@ -69,6 +69,10 @@ export interface IStreamlabelSettingsDefinition {
 
 type TTrainType = 'donation' | 'follow' | 'subscription';
 
+interface IStreamlabelsServiceState {
+  definitions: IStreamlabelSet;
+}
+
 function isDonationTrain(train: ITrainInfo | IDonationTrainInfo): train is IDonationTrainInfo {
   return (train as IDonationTrainInfo).donationTrain;
 }
@@ -80,11 +84,15 @@ const capitalize = (val: string) =>
     .join(' ');
 
 @InitAfter('UserService')
-export class StreamlabelsService extends Service {
+export class StreamlabelsService extends StatefulService<IStreamlabelsServiceState> {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
   @Inject() websocketService: WebsocketService;
   @Inject() appService: AppService;
+
+  static initialState: IStreamlabelsServiceState = {
+    definitions: null,
+  };
 
   /**
    * Represents the raw string value of the sources
@@ -133,6 +141,11 @@ export class StreamlabelsService extends Service {
       setting: 'train_twitch_follows',
     },
   };
+
+  @mutation()
+  SET_DEFINITIONS(definitions: IStreamlabelSet) {
+    this.state.definitions = definitions;
+  }
 
   async init() {
     this.initSocketConnection();
@@ -233,7 +246,7 @@ export class StreamlabelsService extends Service {
       .then(settings => this.updateSettings(settings));
   }
 
-  async fetchDefinitions(): Promise<IStreamlabelSet> {
+  fetchDefinitions(): void {
     if (!this.userService.isLoggedIn) return;
 
     const platform = this.userService.platform.type;
@@ -241,9 +254,11 @@ export class StreamlabelsService extends Service {
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 
-    return await fetch(request)
+    fetch(request)
       .then(handleResponse)
-      .then((data: IStreamlabelSet) => this.formatTrainDefinitions(data));
+      .then((data: IStreamlabelSet) => {
+        this.SET_DEFINITIONS(this.formatTrainDefinitions(data));
+      });
   }
 
   formatTrainDefinitions(data: IStreamlabelSet) {
@@ -356,7 +371,8 @@ export class StreamlabelsService extends Service {
     const train = this.trains[trainType] as ITrainInfo | IDonationTrainInfo;
     const settings = this.getSettingsForStat(train.setting);
     const output = {
-      [`${trainType}_train_counter`]: settings.show_count ? train.counter.toString() : '',
+      [`${trainType}_train_counter`]:
+        train.counter || settings.show_count === 'always' ? train.counter.toString() : '',
       [`${trainType}_train_latest_name`]: settings.show_latest ? train.mostRecentName || '' : '',
     };
 
