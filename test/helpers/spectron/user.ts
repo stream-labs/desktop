@@ -119,14 +119,11 @@ export async function loginWithAuthInfo(
   t.context.app.webContents.send('testing-fakeAuth', authInfo, isOnboardingTest);
   await focusMain(t);
   if (!waitForUI) return true;
-  await t.context.app.client.click('.icon-settings');
-  await focusChild(t);
-  await t.context.app.client.waitForVisible('.fa-sign-out-alt', 30000); // wait for the log-out button
-  await closeWindow(t);
-  return true;
+  return await isLoggedIn(t);
 }
 
 export async function isLoggedIn(t: TExecutionContext) {
+  await t.context.app.client.waitForVisible('.icon-settings');
   await t.context.app.client.click('.icon-settings');
   await focusChild(t);
   const isLoggedIn = await t.context.app.client.isVisible('.fa-sign-out-alt');
