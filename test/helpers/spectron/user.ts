@@ -63,8 +63,10 @@ export async function logOut(t: TExecutionContext, skipUI = false) {
     await focusChild(t);
     await t.context.app.client.click('.fa-sign-out-alt');
     await dialogDismiss(t, 'Yes');
+    await focusChild(t);
     await t.context.app.client.waitForVisible('.fa-sign-in-alt'); // wait for the log-in button
     await closeWindow(t);
+    await focusMain(t);
   }
   // release the testing user
   await releaseUserInPool(user);
