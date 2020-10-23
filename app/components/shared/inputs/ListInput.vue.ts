@@ -10,13 +10,20 @@ import { Spinner } from 'streamlabs-beaker';
 export default class ListInput extends BaseInput<
   string,
   IListMetadata<string>,
-  { handleSearchChange?: (val: string) => unknown; handleOpen?: () => unknown }
+  {
+    handleSearchChange?: (val: string) => unknown;
+    handleOpen?: () => unknown;
+    showIconPlaceholder?: boolean;
+    iconSize?: { width: number; height: number };
+  }
 > {
   @Prop() readonly value: string;
   @Prop() readonly metadata: IListMetadata<string>;
   @Prop() readonly title: string;
   @Prop() readonly handleSearchChange?: (val: string) => unknown;
   @Prop() readonly handleOpen?: () => unknown;
+  @Prop() readonly showIconPlaceholder: boolean;
+  @Prop() readonly iconSize: { width: number; height: number };
 
   get placeholder() {
     return this.options.placeholder || 'Select Option';
@@ -39,6 +46,14 @@ export default class ListInput extends BaseInput<
       // internalSearch is `true` by default in vue-multiselect
       internalSearch: options.internalSearch == null ? true : options.internalSearch,
       allowEmpty: !!options.allowEmpty, // undefined value is not working for vue-multiselect
+    };
+  }
+
+  get iconSizeStyle() {
+    const { width, height } = this.props.iconSize ? this.props.iconSize : { width: 15, height: 15 };
+    return {
+      width: `${width}px`,
+      height: `${height}px`,
     };
   }
 
