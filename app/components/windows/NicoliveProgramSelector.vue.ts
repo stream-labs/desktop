@@ -14,9 +14,8 @@ import {
   providerTypes as _providerTypes,
   steps as _steps,
   selectionSteps as _selectionSteps,
-  TSelectionStep
+  TSelectionStep,
 } from 'services/nicolive-program/nicolive-program-selector';
-import { LiveProgramInfo } from 'services/platforms/niconico';
 import { StreamingService } from 'services/streaming';
 import { $t } from 'services/i18n';
 
@@ -34,8 +33,6 @@ export default class NicoliveProgramSelector extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() streamingService: StreamingService;
 
-  queryParams = this.windowsService.getChildWindowOptions().queryParams as LiveProgramInfo;
-
   readonly providerTypes = _providerTypes;
   readonly steps = _steps;
   readonly selectionSteps = _selectionSteps;
@@ -51,6 +48,10 @@ export default class NicoliveProgramSelector extends Vue {
     this.nicoliveProgramSelectorService.backTo(step);
   }
 
+  get candidateChannels() {
+    return this.nicoliveProgramSelectorService.state.candidateChannels;
+  }
+
   get candidatePrograms() {
     return this.nicoliveProgramSelectorService.state.candidatePrograms;
   }
@@ -59,21 +60,14 @@ export default class NicoliveProgramSelector extends Vue {
     if (this.nicoliveProgramSelectorService.state.isLoading) {
       return;
     }
-    if (providerType === 'channel') {
-      this.nicoliveProgramSelectorService.onSelectProviderTypeChannel();
-    } else {
-      this.nicoliveProgramSelectorService.onSelectProviderTypeUser(
-        this.queryParams.community.id
-      );
-    }
+    this.nicoliveProgramSelectorService.onSelectProviderType(providerType);
   }
 
   onSelectChannel(id: string, name: string): void {
     if (this.nicoliveProgramSelectorService.state.isLoading) {
       return;
     }
-    const channel = this.queryParams.channels.find(channel => channel.id === id);
-    this.nicoliveProgramSelectorService.onSelectChannel(id, name, channel.broadcastablePrograms);
+    this.nicoliveProgramSelectorService.onSelectChannel(id, name);
   }
 
   onSelectBroadcastingProgram(id: string, title: string): void {
@@ -98,7 +92,7 @@ export default class NicoliveProgramSelector extends Vue {
     const {
        selectedProviderType,
        selectedChannel,
-       selectedProgram
+       selectedChannelProgram
     } = this.nicoliveProgramSelectorService.state;
     switch (navItemStep) {
       case 'providerTypeSelect':
@@ -106,8 +100,15 @@ export default class NicoliveProgramSelector extends Vue {
       case 'channelSelect':
         return selectedChannel?.name || this.BLANK;
       case 'programSelect':
-        return selectedProgram?.title || this.BLANK;
+        return selectedChannelProgram?.title || this.BLANK;
     }
+  }
+
+  canShowNoProgramsSection(): boolean {
+    return (
+      !this.nicoliveProgramSelectorService.state.isLoading &&
+      this.nicoliveProgramSelectorService.state.candidatePrograms.length <= 0
+    );
   }
 
   getProviderTypeProgramText(providerType: TProviderType): string {
@@ -123,12 +124,15 @@ export default class NicoliveProgramSelector extends Vue {
   }
 
   getStepDescription(step: TStep): string {
-    return $t(`streaming.nicoliveProgramSelector.steps.${step}.desciption`);
+    return $t(`streaming.nicoliveProgramSelector.steps.${step}.description`);
   }
 
   ok(): void {
     this.streamingService.toggleStreamingAsync({
-      programId: this.nicoliveProgramSelectorService.state.selectedProgram.id
+      nicoliveProgramSelectorResult: {
+        providerType: this.nicoliveProgramSelectorService.state.selectedProviderType,
+        channelProgramId: this.nicoliveProgramSelectorService.state.selectedChannelProgram?.id ?? undefined
+      }
     });
 
     this.windowsService.closeChildWindow();

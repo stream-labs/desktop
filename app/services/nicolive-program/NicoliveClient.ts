@@ -141,6 +141,7 @@ export class NicoliveClient {
     return new Promise((resolve, reject) =>
       session.cookies.get({ url: 'https://.nicovideo.jp', name: 'user_session' }, (err, cookies) => {
         if (err) return reject(err);
+        if (cookies.length < 1) return reject(new Error('cookie not found'));
         resolve(cookies[0].value);
       })
     );
