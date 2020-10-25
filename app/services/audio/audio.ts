@@ -192,7 +192,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
       componentName: 'AdvancedAudio',
       title: $t('Advanced Audio Settings'),
       size: {
-        width: 1370,
+        width: 1450,
         height: 600,
       },
     });
@@ -371,6 +371,26 @@ export class AudioSource implements IAudioSourceApi {
         minVal: 0,
         maxVal: 100,
         type: 'OBS_PROPERTY_INT',
+      },
+
+      <IObsInput<boolean>>{
+        value: this.muted,
+        name: 'muted',
+        description: $t('Muted'),
+        showDescription: false,
+        type: 'OBS_PROPERTY_BOOL',
+        visible: true,
+        enabled: true,
+      },
+
+      <IObsInput<boolean>>{
+        value: this.mixerHidden,
+        name: 'mixerHidden',
+        description: $t('Hide in Mixer'),
+        showDescription: false,
+        type: 'OBS_PROPERTY_BOOL',
+        visible: true,
+        enabled: true,
       },
 
       <IObsInput<boolean>>{

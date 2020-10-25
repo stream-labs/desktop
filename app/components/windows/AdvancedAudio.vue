@@ -11,6 +11,8 @@
         <tr>
           <th>{{ $t('Name') }}</th>
           <th>{{ $t('Volume ( % )') }}</th>
+          <th>{{ $t('Muted') }}</th>
+          <th>{{ $t('Hide in Mixer') }}</th>
           <th>{{ $t('Downmix to Mono') }}</th>
           <th>{{ $t('Sync Offset ( ms )') }}</th>
           <th>{{ $t('Audio Monitoring') }}</th>
