@@ -115,6 +115,20 @@ export interface IYoutubeCategory {
   };
 }
 
+/**
+ * A liveBroadcast resource represents an event that will be streamed, via live video, on YouTube.
+ * For the full set of available fields:
+ * @see https://google-developers.appspot.com/youtube/v3/live/docs/liveBroadcasts
+ */
+export interface IYoutubeVideo {
+  id: string;
+  snippet: {
+    title: string;
+    description: string;
+    categoryId: string;
+  };
+}
+
 interface IExtraBroadcastSettings {
   enableAutoStart?: boolean;
   enableAutoStop?: boolean;
@@ -339,11 +353,19 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     categoryId: string,
   ) {
     const endpoint = 'videos?part=snippet';
-    await this.requestYoutube<IYoutubeLiveBroadcast>({
+    await this.requestYoutube({
       body: JSON.stringify({ id: broadcastId, snippet: { categoryId, title, description } }),
       method: 'PUT',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
     });
+  }
+
+  async fetchVideo(id: string): Promise<IYoutubeVideo> {
+    const endpoint = `videos?id=${id}&part=snippet`;
+    const videoCollection = await this.requestYoutube<IYoutubeCollection<IYoutubeVideo>>(
+      `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
+    );
+    return videoCollection.items[0];
   }
 
   /**

@@ -1,4 +1,4 @@
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import { Multiselect } from 'vue-multiselect';
 import { IListMetadata, IListOption } from './index';
 import { BaseInput } from './BaseInput';
@@ -19,6 +19,11 @@ export default class ListInput extends BaseInput<
 
   get placeholder() {
     return this.options.placeholder || 'Select Option';
+  }
+
+  @Watch('value')
+  onValueChange(val: string) {
+    console.log('List input changed', this.title, val);
   }
 
   onInputHandler(option: IListOption<string>) {
