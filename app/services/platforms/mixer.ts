@@ -10,7 +10,7 @@ import {
 } from '.';
 import { HostsService } from '../hosts';
 import { Inject } from 'services/core/injector';
-import { authorizedHeaders, handleResponse } from '../../util/requests';
+import { authorizedHeaders, handleResponse, jfetch } from '../../util/requests';
 import { UserService } from '../user';
 import { integer } from 'aws-sdk/clients/cloudfront';
 import { platformAuthorizedRequest, platformRequest } from './utils';
@@ -128,11 +128,9 @@ export class MixerService extends BasePlatformService<IMixerServiceState>
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 
-    return fetch(request)
-      .then(handleResponse)
-      .then(response => {
-        this.userService.updatePlatformToken('mixer', response.access_token);
-      });
+    return jfetch<{ access_token: string }>(request).then(response => {
+      this.userService.updatePlatformToken('mixer', response.access_token);
+    });
   }
 
   private fetchRawChannelInfo() {
