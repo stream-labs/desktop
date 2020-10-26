@@ -10,7 +10,7 @@ import humps from 'humps';
  * this is NOT the default behavior of the fetch API, so we have to
  * handle it explicitly.
  */
-export const handleResponse = (response: Response): Promise<any> => {
+export const handleResponse = (response: Response) => {
   const contentType = response.headers.get('content-type');
   const isJson = contentType && contentType.includes('application/json');
   const result = isJson ? response.json() : response.text();
@@ -28,7 +28,7 @@ export const handleErrors = (response: Response): Promise<any> => {
  */
 export function camelize(response: Response): Promise<any> {
   return new Promise(resolve => {
-    return response.json().then(json => {
+    return response.json().then((json: object) => {
       resolve(humps.camelizeKeys(json));
     });
   });
@@ -118,5 +118,36 @@ export function getChecksum(filePath: string) {
     file.on('data', data => hash.update(data));
     file.on('end', () => resolve(hash.digest('hex')));
     file.on('error', e => reject(e));
+  });
+}
+
+interface IJfetchOptions {
+  /**
+   * If true, will force parsing of JSON even when the server
+   * does not respond with the appropriate content-type header.
+   * This is useful when requesting files from a CDN rather than
+   * calling an API.
+   */
+  forceJson?: boolean;
+}
+
+export function jfetch<TResponse = unknown>(
+  request: RequestInfo,
+  init?: RequestInit,
+  options: IJfetchOptions = {},
+): Promise<TResponse> {
+  return fetch(request, init).then(response => {
+    if (response.ok) {
+      const contentType = response.headers.get('content-type');
+      const isJson = contentType && contentType.includes('application/json');
+      if (isJson || options.forceJson) {
+        return response.json() as Promise<TResponse>;
+      } else {
+        console.warn('jfetch: Got non-JSON response');
+        throw response;
+      }
+    } else {
+      throw response;
+    }
   });
 }

@@ -10,7 +10,7 @@ import { EApiPermissions } from './api/modules/module';
 import { VideoService } from 'services/video';
 import { DevServer } from './dev-server';
 import { HostsService } from 'services/hosts';
-import { authorizedHeaders, handleResponse } from 'util/requests';
+import { authorizedHeaders, handleResponse, jfetch } from 'util/requests';
 import { UserService } from 'services/user';
 import trim from 'lodash/trim';
 import without from 'lodash/without';
@@ -211,9 +211,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
       headers,
     });
 
-    return fetch(request)
-      .then(handleResponse)
-      .catch(() => []);
+    return jfetch<IProductionAppResponse[]>(request).catch(() => []);
   }
 
   getDisabledAppsFromStorage(): string[] {
@@ -256,8 +254,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
       { headers },
     );
 
-    return fetch(request)
-      .then(handleResponse)
+    return jfetch<{ is_app_store_visible: boolean }>(request)
       .then(json => json.is_app_store_visible)
       .catch(() => false);
   }
@@ -488,10 +485,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
       { headers },
     );
 
-    return fetch(request)
-      .then(handleResponse)
-      .then(json => json.id_hash)
-      .catch(() => null);
+    return jfetch<{ id_hash: string }>(request).then(json => json.id_hash);
   }
 
   private getIsDevMode(): Promise<boolean> {
@@ -500,8 +494,7 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
       headers,
     });
 
-    return fetch(request)
-      .then(handleResponse)
+    return jfetch<{ dev_mode: boolean }>(request)
       .then(json => json.dev_mode)
       .catch(() => false);
   }

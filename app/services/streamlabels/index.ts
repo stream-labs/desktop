@@ -2,7 +2,7 @@ import { mutation, StatefulService } from 'services/core/stateful-service';
 import { UserService } from 'services/user';
 import { Inject } from 'services/core/injector';
 import { HostsService } from 'services/hosts';
-import { authorizedHeaders, handleResponse } from 'util/requests';
+import { authorizedHeaders, handleResponse, jfetch } from 'util/requests';
 import { TSocketEvent, WebsocketService } from 'services/websocket';
 import { AppService } from 'services/app';
 import { InitAfter } from '../core';
@@ -229,9 +229,7 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 
-    fetch(request)
-      .then(handleResponse)
-      .then(json => this.updateOutput(json.data));
+    jfetch<{ data: Dictionary<string> }>(request).then(json => this.updateOutput(json.data));
   }
 
   private fetchSettings(): void {
@@ -241,9 +239,9 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 
-    fetch(request)
-      .then(handleResponse)
-      .then(settings => this.updateSettings(settings));
+    jfetch<Dictionary<IStreamlabelSettings>>(request).then(settings =>
+      this.updateSettings(settings),
+    );
   }
 
   fetchDefinitions(): void {

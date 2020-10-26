@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
-import { handleResponse, authorizedHeaders } from 'util/requests';
+import { handleResponse, authorizedHeaders, jfetch } from 'util/requests';
 import { mutation } from 'services/core/stateful-service';
 import { Service, Inject, ViewHandler } from 'services/core';
 import electron from 'electron';
@@ -329,6 +329,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   async updateLinkedPlatforms() {
     const linkedPlatforms = await this.fetchLinkedPlatforms();
 
+    if (!linkedPlatforms) return;
+
     if (linkedPlatforms.user_id) {
       this.writeUserIdFile(linkedPlatforms.user_id);
       this.SET_USER_ID(linkedPlatforms.user_id);
@@ -380,7 +382,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
   }
 
-  fetchLinkedPlatforms(): Promise<ILinkedPlatformsResponse> {
+  fetchLinkedPlatforms() {
     if (!this.isLoggedIn) return;
 
     const host = this.hostsService.streamlabs;
@@ -388,11 +390,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const url = `https://${host}/api/v5/restream/user/info`;
     const request = new Request(url, { headers });
 
-    return fetch(request)
-      .then(res => {
-        return res.json();
-      })
-      .catch(() => {});
+    return jfetch<ILinkedPlatformsResponse>(request).catch(() => {
+      console.warn('Error fetching linked platforms');
+    });
   }
 
   get isPrime() {
@@ -404,8 +404,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const url = `https://${host}/api/v5/slobs/prime`;
     const headers = authorizedHeaders(this.apiToken);
     const request = new Request(url, { headers });
-    return fetch(request)
-      .then(handleResponse)
+    return jfetch<{ expires_soon: boolean; expires_at: string; is_prime: boolean }>(request)
       .then(response => this.validatePrimeStatus(response))
       .catch(() => null);
   }
@@ -603,7 +602,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const headers = authorizedHeaders(this.apiToken);
     const request = new Request(url, { headers });
 
-    return fetch(request).then(handleResponse);
+    return jfetch<{ donation_url: string; settings: { autopublish: boolean } }>(request);
   }
 
   async showLogin() {
