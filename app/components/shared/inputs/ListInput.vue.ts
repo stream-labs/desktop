@@ -1,4 +1,4 @@
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import { Multiselect } from 'vue-multiselect';
 import { IListMetadata, IListOption } from './index';
 import { BaseInput } from './BaseInput';
