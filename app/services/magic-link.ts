@@ -1,7 +1,7 @@
 import { Service } from 'services';
 import { Inject } from 'services/core';
 import { UserService } from 'services/user';
-import { authorizedHeaders, handleResponse } from 'util/requests';
+import { authorizedHeaders, jfetch } from 'util/requests';
 import { HostsService } from './hosts';
 import electron from 'electron';
 
@@ -29,7 +29,7 @@ export class MagicLinkService extends Service {
       { headers },
     );
 
-    return fetch(request).then(handleResponse);
+    return jfetch(request);
   }
 
   async openWidgetThemesMagicLink() {

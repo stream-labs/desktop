@@ -2,7 +2,7 @@ import Vue from 'vue';
 import URI from 'urijs';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { Inject } from 'services/core/injector';
-import { handleResponse, authorizedHeaders } from 'util/requests';
+import { handleResponse, authorizedHeaders, jfetch } from 'util/requests';
 import { mutation } from 'services/core/stateful-service';
 import { Service } from 'services/core';
 import electron from 'electron';
@@ -88,7 +88,7 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
 
   async getTwitterStatus() {
     const response = await this.fetchTwitterStatus();
-    this.SET_TWITTER_STATUS(response);
+    if (response) this.SET_TWITTER_STATUS(response);
   }
 
   async unlinkTwitter() {
@@ -96,9 +96,9 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
     const url = `https://${host}/api/v5/slobs/twitter/unlink`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
-    return fetch(request)
-      .then(handleResponse)
-      .catch(() => null);
+    return jfetch(request).catch(() => {
+      console.warn('Error unlinking Twitter');
+    });
   }
 
   async fetchTwitterStatus() {
@@ -106,9 +106,9 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
     const url = `https://${host}/api/v5/slobs/twitter/status`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
-    return fetch(request)
-      .then(handleResponse)
-      .catch(() => null);
+    return jfetch<ITwitterStatusResponse>(request).catch(() => {
+      console.warn('Error fetching Twitter status');
+    });
   }
 
   async postTweet(tweet: string) {
@@ -121,9 +121,9 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
       method: 'POST',
       body: JSON.stringify({ tweet }),
     });
-    return fetch(request)
-      .then(handleResponse)
-      .catch(e => throwStreamError('TWEET_FAILED', e.error || $t('Could not connect to Twitter')));
+    return jfetch(request).catch(e =>
+      throwStreamError('TWEET_FAILED', e.error || $t('Could not connect to Twitter')),
+    );
   }
 
   openLinkTwitterDialog() {

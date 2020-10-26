@@ -1,7 +1,7 @@
 import { Service } from 'services/core/service';
 import { Inject } from 'services/core/injector';
 import { HostsService } from 'services/hosts';
-import { handleResponse, authorizedHeaders } from 'util/requests';
+import { authorizedHeaders, jfetch } from 'util/requests';
 import { UserService } from 'services/user';
 
 export interface IServerSceneCollectionCreation {
@@ -33,7 +33,7 @@ export class SceneCollectionsServerApiService extends Service {
     const url = `${this.baseUrl}/scene-collection`;
     const request = new Request(url, { headers: this.headers });
 
-    return fetch(request).then(handleResponse);
+    return jfetch(request);
   }
 
   /**
@@ -43,21 +43,14 @@ export class SceneCollectionsServerApiService extends Service {
     const url = `${this.baseUrl}/scene-collection/${id}`;
     const request = new Request(url, { headers: this.headers });
 
-    return fetch(request).then(handleResponse);
-  }
-
-  fetchActiveCollection() {
-    const url = `${this.baseUrl}/active/scene-collection`;
-    const request = new Request(url, { headers: this.headers });
-
-    return fetch(request).then(handleResponse);
+    return jfetch(request);
   }
 
   makeSceneCollectionActive(id: number) {
     const url = `${this.baseUrl}/active/scene-collection/${id}`;
     const request = new Request(url, { headers: this.headers, method: 'POST' });
 
-    return fetch(request).then(handleResponse);
+    return jfetch(request);
   }
 
   createSceneCollection(
@@ -70,7 +63,7 @@ export class SceneCollectionsServerApiService extends Service {
     const body = this.formSerializeCollection(collection);
     const request = new Request(url, { headers, body, method: 'POST' });
 
-    return fetch(request).then(handleResponse);
+    return jfetch(request);
   }
 
   updateSceneCollection(collection: IServerSceneCollection) {
@@ -81,14 +74,14 @@ export class SceneCollectionsServerApiService extends Service {
     const body = this.formSerializeCollection(collection);
     const request = new Request(url, { headers, body, method: 'PUT' });
 
-    return fetch(request).then(handleResponse);
+    return jfetch(request);
   }
 
   deleteSceneCollection(id: number) {
     const url = `${this.baseUrl}/scene-collection/${id}`;
     const request = new Request(url, { headers: this.headers, method: 'DELETE' });
 
-    return fetch(request).then(handleResponse);
+    return jfetch(request);
   }
 
   private formSerializeCollection(collection: IServerSceneCollectionCreation) {

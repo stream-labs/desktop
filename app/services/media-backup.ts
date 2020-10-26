@@ -4,7 +4,7 @@ import fs from 'fs';
 import { Inject } from 'services/core/injector';
 import { HostsService } from 'services/hosts';
 import { UserService } from 'services/user';
-import { getChecksum, isUrl, downloadFile } from 'util/requests';
+import { getChecksum, isUrl, downloadFile, jfetch } from 'util/requests';
 import { AppService } from 'services/app';
 
 const uuid = window['require']('uuid/v4');
@@ -258,30 +258,16 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     formData.append('file', fileObj);
     formData.append('modified', new Date().toISOString());
 
-    return await new Promise<{ id: number }>((resolve, reject) => {
-      fetch(`${this.apiBase}/upload`, {
-        method: 'POST',
-        headers: this.authedHeaders,
-        body: formData,
-      })
-        .then(res => {
-          if (res.ok) {
-            res.json().then(json => resolve(json));
-          } else {
-            reject(res);
-          }
-        })
-        .catch(e => {
-          reject(e);
-        });
+    return jfetch<{ id: number }>(`${this.apiBase}/upload`, {
+      method: 'POST',
+      headers: this.authedHeaders,
+      body: formData,
     });
   }
 
   private getFileData(id: number): Promise<IMediaFileDataResponse> {
     const req = new Request(`${this.apiBase}/${id}`, { headers: new Headers(this.authedHeaders) });
-    return fetch(req)
-      .then(r => (r.ok ? Promise.resolve(r) : Promise.reject(r)))
-      .then(r => r.json());
+    return jfetch(req);
   }
 
   private async downloadFile(url: string, serverId: number, filename: string) {
