@@ -202,18 +202,6 @@ export class MixerService extends BasePlatformService<IMixerServiceState>
     });
   }
 
-  searchGames(searchString: string): Promise<IGame[]> {
-    return platformRequest<{ id: number; name: string }[]>(
-      'mixer',
-      `${this.apiBase}types?limit=10&noCount=1&scope=all&query=${searchString}`,
-    ).then(response => {
-      response.forEach(game => {
-        this.ADD_GAME_MAPPING(game.name, game.id);
-      });
-      return response;
-    });
-  }
-
   get chatUrl(): string {
     return `https://mixer.com/embed/chat/${this.channelId}`;
   }

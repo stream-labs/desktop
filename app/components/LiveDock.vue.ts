@@ -14,7 +14,7 @@ import { AppService } from 'services/app';
 import Tabs, { ITab } from 'components/Tabs.vue';
 import { ChatService } from 'services/chat';
 import { WindowsService } from 'services/windows';
-import { RestreamService, YoutubeService } from 'app-services';
+import { FacebookService, RestreamService, YoutubeService } from 'app-services';
 import { getPlatformService } from 'services/platforms';
 
 @Component({
@@ -28,6 +28,7 @@ import { getPlatformService } from 'services/platforms';
 export default class LiveDock extends Vue {
   @Inject() streamingService: StreamingService;
   @Inject() youtubeService: YoutubeService;
+  @Inject() facebookService: FacebookService;
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() platformAppsService: PlatformAppsService;
@@ -151,6 +152,10 @@ export default class LiveDock extends Vue {
 
   openYoutubeControlRoom() {
     electron.remote.shell.openExternal(this.youtubeService.dashboardUrl);
+  }
+
+  openFBStreamUrl() {
+    electron.remote.shell.openExternal(this.facebookService.streamPageUrl);
   }
 
   get isTwitch() {

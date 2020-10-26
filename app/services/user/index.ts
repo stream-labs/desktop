@@ -681,6 +681,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.userLogout.next();
   }
 
+  async reLogin() {
+    const platform = this.state.auth.primaryPlatform;
+    await this.logOut();
+    await this.startAuth(platform, 'internal');
+  }
+
   /**
    * Starts the authentication process.  Multiple callbacks
    * can be passed for various events.
