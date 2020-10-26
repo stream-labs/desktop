@@ -115,11 +115,6 @@ export interface IYoutubeCategory {
   };
 }
 
-/**
- * A liveBroadcast resource represents an event that will be streamed, via live video, on YouTube.
- * For the full set of available fields:
- * @see https://google-developers.appspot.com/youtube/v3/live/docs/liveBroadcasts
- */
 export interface IYoutubeVideo {
   id: string;
   snippet: {

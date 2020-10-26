@@ -21,11 +21,6 @@ export default class ListInput extends BaseInput<
     return this.options.placeholder || 'Select Option';
   }
 
-  @Watch('value')
-  onValueChange(val: string) {
-    console.log('List input changed', this.title, val);
-  }
-
   onInputHandler(option: IListOption<string>) {
     if (option) {
       this.emitInput(option.value);
