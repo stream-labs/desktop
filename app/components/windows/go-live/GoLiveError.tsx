@@ -15,6 +15,7 @@ import electron from 'electron';
 import { UserService } from 'services/user';
 import { NavigationService } from 'services/navigation';
 import { assertIsDefined } from 'util/properties-type-guards';
+import ErrorLayout from './ErrorLayout';
 
 /**
  * Shows error and troubleshooting suggestions
@@ -237,45 +238,6 @@ export default class GoLiveError extends TsxComponent<{}> {
       <ErrorLayout error={error}>
         {$t('You could try locking and unlocking your computer to fix this error.')}
       </ErrorLayout>
-    );
-  }
-}
-
-class ErrorLayoutProps {
-  error?: IStreamError = undefined;
-  /**
-   * overrides the error message if provided
-   */
-  message?: string = '';
-}
-
-/**
- * Layout for displaying an single error
- */
-@Component({ props: createProps(ErrorLayoutProps) })
-class ErrorLayout extends TsxComponent<ErrorLayoutProps> {
-  private isErrorDetailsShown = false;
-
-  private render() {
-    const error = this.props.error;
-    const message = this.props.message || error?.message;
-    const details = error?.details;
-    return (
-      <div class={cx('section selectable', styles.container)}>
-        <p class={styles.title}>
-          <i class="fa fa-warning" /> {message}
-        </p>
-        <p>{this.$slots.default}</p>
-
-        {details && !this.isErrorDetailsShown && (
-          <p style={{ textAlign: 'right' }}>
-            <a class={styles.link} onclick={() => (this.isErrorDetailsShown = true)}>
-              {$t('Show details')}
-            </a>
-          </p>
-        )}
-        {details && this.isErrorDetailsShown && <p class={styles.details}>{details}</p>}
-      </div>
     );
   }
 }

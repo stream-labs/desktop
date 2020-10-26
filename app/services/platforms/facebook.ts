@@ -47,6 +47,7 @@ interface IFacebookServiceState extends IPlatformState {
   facebookPages: IFacebookPage[];
   facebookGroups: IFacebookGroup[];
   settings: IFacebookStartStreamOptions;
+  grantedPermissions: TFacebookPermissionName[];
 }
 
 export interface IFacebookStartStreamOptions {
@@ -59,23 +60,19 @@ export interface IFacebookStartStreamOptions {
   liveVideoId?: string;
 }
 
-export type TDestinationType = 'me' | 'page' | 'group';
+export type TDestinationType = 'me' | 'page' | 'group' | '';
 
 export interface IFacebookUpdateVideoOptions extends IFacebookStartStreamOptions {
   liveVideoId: string;
-}
-
-export interface IFacebookChannelInfo extends IFacebookStartStreamOptions {
-  chatUrl: string;
-  streamUrl: string;
 }
 
 const initialState: IFacebookServiceState = {
   ...BasePlatformService.initialState,
   facebookPages: [],
   facebookGroups: [],
+  grantedPermissions: [],
   settings: {
-    destinationType: 'me',
+    destinationType: '',
     pageId: '',
     groupId: '',
     liveVideoId: '',
@@ -84,6 +81,9 @@ const initialState: IFacebookServiceState = {
     game: '',
   },
 };
+
+type TFacebookPermissionName = 'publish_video' | 'publish_to_groups';
+type TFacebookPermission = { permission: TFacebookPermissionName; status: 'granted' | string };
 
 @InheritMutations()
 export class FacebookService extends BasePlatformService<IFacebookServiceState>
@@ -109,13 +109,29 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   static initialState = initialState;
 
   protected init() {
+    // pick up settings from the local storage and start syncing them
     this.syncSettingsWithLocalStorage();
+
+    // migrate user from SLOBS version that could stream only on a FB page
+    const shouldMigrate = !this.state.settings.destinationType && this.state.settings.pageId;
+    if (shouldMigrate) {
+      // stream to a FB page by default for migrated users
+      this.UPDATE_STREAM_SETTINGS({ destinationType: 'page' });
+    } else {
+      // stream to a user personal page by default for new users
+      this.UPDATE_STREAM_SETTINGS({ destinationType: 'me' });
+    }
   }
 
   @mutation()
   private SET_FACEBOOK_PAGES_AND_GROUPS(pages: IFacebookPage[], groups: IFacebookGroup[]) {
     this.state.facebookPages = pages;
     this.state.facebookGroups = groups;
+  }
+
+  @mutation()
+  private SET_PERMISSIONS(permissions: TFacebookPermissionName[]) {
+    this.state.grantedPermissions = permissions;
   }
 
   apiBase = 'https://graph.facebook.com';
@@ -137,15 +153,21 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   }
 
   get streamPageUrl(): string {
-    // TODO:
-    return '';
-
-    // if (!this.state.activePage) return '';
-    // const pathToPage = `${this.state.activePage.name}-${this.state.activePage.id}`.replace(
-    //   ' ',
-    //   '-',
-    // );
-    // return `https://www.facebook.com/${pathToPage}/live_videos`;
+    const settings = this.state.settings;
+    if (settings.destinationType === 'page') {
+      const page = this.getPage(settings.pageId);
+      if (!page) return '';
+      const pathToPage = `${page.name}-${page.id}`.replace(' ', '-');
+      return `https://www.facebook.com/${pathToPage}/live_videos`;
+    } else if (settings.destinationType === 'me') {
+      const user = this.userService.state.auth?.platforms?.facebook;
+      if (!user) return '';
+      return `https://www.facebook.com/${user.username}`;
+    } else if (settings.destinationType === 'group') {
+      const group = this.getGroup(settings.groupId);
+      if (!group) return '';
+      return `https://www.facebook.com/groups/${group.name}`;
+    }
   }
 
   async beforeGoLive(options: IGoLiveSettings) {
@@ -209,8 +231,14 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     );
   }
 
-  validatePlatform() {
-    return Promise.resolve(EPlatformCallResult.Success);
+  async validatePlatform() {
+    const permissions = await this.fetchPermissions();
+    const grantedPermissions = permissions
+      .filter(p => ['publish_video', 'publish_to_groups'].includes(p.permission))
+      .filter(p => p.status === 'granted')
+      .map(p => p.permission);
+    this.SET_PERMISSIONS(grantedPermissions);
+    return EPlatformCallResult.Success;
   }
 
   getHeaders(req: IPlatformRequest, useToken: boolean | string) {
@@ -228,6 +256,14 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
 
   fetchUserInfo() {
     return Promise.resolve({});
+  }
+
+  private async fetchPermissions(): Promise<TFacebookPermission[]> {
+    const permissionsResponse = await this.requestFacebook<{ data: TFacebookPermission[] }>(
+      `${this.apiBase}/me/permissions`,
+      this.oauthToken,
+    );
+    return permissionsResponse.data;
   }
 
   /**
@@ -434,9 +470,10 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
 
   async searchGames(searchString: string): Promise<IGame[]> {
     if (searchString.length < 2) return [];
-    return this.requestFacebook<{ data: IGame[] }>(
+    const gamesResponse = await this.requestFacebook<{ data: { name: string; id: string }[] }>(
       `${this.apiBase}/v3.2/search?type=game&q=${searchString}`,
-    ).then(json => json.data.slice(0, 15));
+    );
+    return gamesResponse.data.slice(0, 15).map(g => ({ id: g.id, name: g.name }));
   }
 
   get chatUrl(): string {

@@ -5,7 +5,7 @@ import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { createProps } from 'components/tsx-component';
 import CommonPlatformFields from '../CommonPlatformFields';
 import { ListInput } from 'components/shared/inputs/inputs';
-import { formMetadata, metadata } from 'components/shared/inputs';
+import { formMetadata, IListOption, metadata } from 'components/shared/inputs';
 import { $t } from 'services/i18n';
 import {
   FacebookService,
@@ -16,6 +16,13 @@ import { IStreamSettings, StreamingService } from 'services/streaming';
 import { SyncWithValue } from 'services/app/app-decorators';
 import BaseEditSteamInfo from './BaseEditSteamInfo';
 import moment from 'moment';
+import GameSelector from '../GameSelector';
+import ErrorLayout from '../ErrorLayout';
+import { assertIsDefined } from 'util/properties-type-guards';
+import { getPlatformService } from 'services/platforms';
+import { UserService } from 'services/user';
+import { NavigationService } from 'services/navigation';
+import { WindowsService } from 'services/windows';
 
 class Props {
   value?: IStreamSettings = undefined;
@@ -31,8 +38,11 @@ class Props {
  */
 @Component({ props: createProps(Props) })
 export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
+  @Inject() private userService: UserService;
   @Inject() private facebookService: FacebookService;
   @Inject() private streamingService: StreamingService;
+  @Inject() private navigationService: NavigationService;
+  @Inject() private windowsService: WindowsService;
   @SyncWithValue() settings: IStreamSettings;
 
   private scheduledVideos: IFacebookLiveVideo[] = [];
@@ -59,9 +69,17 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
 
   @Watch('settings.platforms.facebook.destinationType')
   private async loadScheduledBroadcasts() {
-    const destinationId = this.facebookService.getDestinationId(this.fbSettings);
+    const fbSettings = this.fbSettings;
+    let destinationId = this.facebookService.getDestinationId(this.fbSettings);
+
+    // by some unknown reason FB returns scheduled events for groups
+    // only if you request these events from the user's personal page
+    const destinationType =
+      fbSettings.destinationType === 'group' ? 'me' : fbSettings.destinationType;
+    if (destinationType === 'me') destinationId = 'me';
+
     this.scheduledVideos = await this.facebookService.fetchScheduledVideos(
-      this.fbSettings.destinationType,
+      destinationType,
       destinationId,
     );
     this.scheduledVideosLoaded = true;
@@ -89,7 +107,11 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
           { value: 'me', title: $t('Share to Your Timeline') },
           { value: 'page', title: $t('Share to a Page You Manage') },
           { value: 'group', title: $t('Share in a Group') },
-        ],
+        ].filter(opt => {
+          if (opt.value === 'me' && !this.canStreamToTimeline) return false;
+          if (opt.value === 'group' && !this.canStreamToGroup) return false;
+          return true;
+        }),
         required: true,
       }),
 
@@ -100,7 +122,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
           this.facebookService.state.facebookPages.map(page => ({
             value: page.id,
             title: `${page.name} | ${page.category}`,
-            icon: this.pictures[page.id],
+            data: { image: this.pictures[page.id] },
           })) || [],
         required: true,
       }),
@@ -111,7 +133,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
           this.facebookService.state.facebookGroups.map(group => ({
             value: group.id,
             title: group.name,
-            icon: this.pictures[group.id],
+            data: { image: this.pictures[group.id] },
           })) || [],
         required: true,
       }),
@@ -121,7 +143,8 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
         options: [
           ...this.scheduledVideos.map(vid => ({
             value: vid.id,
-            title: `${vid.title} ${moment(new Date(vid.planned_start_time)).calendar()}`,
+            title: vid.title,
+            data: { startTime: moment(new Date(vid.planned_start_time)).calendar() },
           })),
         ],
         required: false,
@@ -143,20 +166,56 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
     fbSettings.description = description;
   }
 
+  private get eventInputSlots() {
+    return {
+      item: (props: { option: IListOption<string, { startTime: string }> }) => {
+        return (
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div>{props.option.title}</div>
+            <div>{props.option.data.startTime}</div>
+          </div>
+        );
+      },
+    };
+  }
+
+  private get canStreamToTimeline() {
+    return this.facebookService.state.grantedPermissions.includes('publish_video');
+  }
+
+  private get canStreamToGroup() {
+    return this.facebookService.state.grantedPermissions.includes('publish_to_groups');
+  }
+
+  private async reLogin() {
+    await this.userService.actions.return.reLogin();
+    await this.streamingService.actions.showGoLiveWindow();
+  }
+
+  private reconnectFB() {
+    const platform = 'facebook';
+    this.navigationService.actions.navigate('PlatformMerge', { platform });
+    this.windowsService.actions.closeChildWindow();
+  }
+
   render() {
     const fbSettings = this.settings.platforms.facebook;
     const shouldShowGroups = fbSettings.destinationType === 'group' && !this.props.isUpdateMode;
     const shouldShowPages = fbSettings.destinationType === 'page' && !this.props.isUpdateMode;
+    const shouldShowPermissionWarn = !this.canStreamToTimeline || !this.canStreamToGroup;
 
     return (
       <ValidatedForm name="facebook-settings">
         {!this.props.isUpdateMode && (
-          <HFormGroup title={this.formMetadata.destinationType.title}>
-            <ListInput
-              vModel={this.settings.platforms.facebook.destinationType}
-              metadata={this.formMetadata.destinationType}
-            />
-          </HFormGroup>
+          <div>
+            {shouldShowPermissionWarn && this.renderMissedPermissionsWarning()}
+            <HFormGroup title={this.formMetadata.destinationType.title}>
+              <ListInput
+                vModel={this.settings.platforms.facebook.destinationType}
+                metadata={this.formMetadata.destinationType}
+              />
+            </HFormGroup>
+          </div>
         )}
 
         {shouldShowPages && (
@@ -165,8 +224,8 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
               vModel={fbSettings.pageId}
               metadata={this.formMetadata.page}
               handleOpen={() => this.loadPictures('page')}
-              showIconPlaceholder={true}
-              iconSize={{ width: 44, height: 44 }}
+              showImagePlaceholder={true}
+              imageSize={{ width: 44, height: 44 }}
             />
           </HFormGroup>
         )}
@@ -177,8 +236,8 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
               vModel={fbSettings.groupId}
               metadata={this.formMetadata.group}
               handleOpen={() => this.loadPictures('group')}
-              showIconPlaceholder={true}
-              iconSize={{ width: 44, height: 44 }}
+              showImagePlaceholder={true}
+              imageSize={{ width: 44, height: 44 }}
             />
           </HFormGroup>
         )}
@@ -188,9 +247,10 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
             {!this.props.isUpdateMode && !this.props.isScheduleMode && (
               <HFormGroup title={this.formMetadata.event.title}>
                 <ListInput
-                  vModel={this.settings.platforms.facebook.liveVideoId}
+                  vModel={fbSettings.liveVideoId}
                   metadata={this.formMetadata.event}
                   onInput={() => this.onSelectScheduledVideoHandler()}
+                  scopedSlots={this.eventInputSlots}
                 />
               </HFormGroup>
             )}
@@ -198,7 +258,35 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
             <CommonPlatformFields vModel={this.settings} platform={'facebook'} />
           </div>
         )}
+
+        <HFormGroup title={$t('Facebook Game')}>
+          <GameSelector vModel={this.settings} platform="facebook" />
+        </HFormGroup>
       </ValidatedForm>
+    );
+  }
+
+  private renderMissedPermissionsWarning() {
+    const isPrimary = this.view.isPrimaryPlatform('facebook');
+    return (
+      <ErrorLayout message={$t('You can stream to your timeline and groups now')} type={'success'}>
+        {isPrimary && (
+          <div>
+            <p>{$t('Please log-out and log-in again to get these new features')}</p>
+            <button class="button button--facebook" onClick={() => this.reLogin()}>
+              {$t('Re-login now')}
+            </button>
+          </div>
+        )}
+        {!isPrimary && (
+          <div>
+            <p>{$t('Please reconnect Facebook to get these new features')}</p>
+            <button class="button button--facebook" onClick={() => this.reconnectFB()}>
+              {$t('Reconnect now')}
+            </button>
+          </div>
+        )}
+      </ErrorLayout>
     );
   }
 }

@@ -34,17 +34,17 @@
         :data-option-value="itemProps.option.value"
         :data-option-title="itemProps.option.title"
       >
-        <slot name="item" :option="props.option">
+        <slot name="item" :option="itemProps.option">
           <img
-            v-if="itemProps.option.icon"
-            :src="itemProps.option.icon"
+            v-if="getImage(itemProps.option)"
+            :src="getImage(itemProps.option)"
             alt=""
-            class="icon"
+            class="image"
             :style="iconSizeStyle"
           />
           <div
-            v-if="itemProps.showIconPlaceholder && !itemProps.option.icon"
-            class="icon-placeholder"
+            v-if="itemProps.showImagePlaceholder && !itemProps.option.image"
+            class="image-placeholder"
             :style="iconSizeStyle"
           />
           {{ itemProps.option.title }}</slot
@@ -52,8 +52,16 @@
       </span>
 
       <template slot="singleLabel" slot-scope="itemProps">
-        <img v-if="itemProps.option.icon" :src="itemProps.option.icon" alt="" class="icon" />
-        <div v-if="props.showIconPlaceholder && !itemProps.option.icon" class="icon-placeholder" />
+        <img
+          v-if="getImage(itemProps.option)"
+          :src="getImage(itemProps.option)"
+          alt=""
+          class="image"
+        />
+        <div
+          v-if="props.showImagePlaceholder && !getImage(itemProps.option)"
+          class="image-placeholder"
+        />
         {{ itemProps.option.title }}
       </template>
       <template v-if="options.noResult" slot="noResult">{{ options.noResult }}</template>
@@ -84,8 +92,8 @@
   font-style: italic;
 }
 
-.icon,
-.icon-placeholder {
+.image,
+.image-placeholder {
   display: inline-block;
   width: 16px;
   height: 16px;
