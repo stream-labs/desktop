@@ -53,7 +53,7 @@
           <i :class="userService.isLoggedIn ? 'fas fa-sign-out-alt' : 'fas fa-sign-in-alt'" />
           <strong>{{ userService.isLoggedIn ? $t('Log Out') : $t('Log In') }}</strong>
           <platform-logo v-if="userService.isLoggedIn" :platform="userService.platform.type" />
-          {{ userService.isLoggedIn && userService.username }}
+          <span>{{ userService.isLoggedIn && userService.username }}</span>
         </button>
       </NavMenu>
 
@@ -171,15 +171,19 @@
   padding-bottom: 16px;
   width: 240px;
   border-top: 1px solid var(--border);
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
+
+  span {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
 
   i {
     margin-right: 8px;
   }
   strong {
     margin-right: 16px;
+    white-space: nowrap;
   }
 }
 </style>
