@@ -173,6 +173,7 @@
   border-top: 1px solid var(--border);
   white-space: nowrap;
   text-overflow: ellipsis;
+  overflow: hidden;
 
   i {
     margin-right: 8px;
