@@ -243,7 +243,10 @@ export class ScenesService extends StatefulService<IScenesState> {
 
   @mutation()
   private SET_SCENE_ORDER(order: string[]) {
-    this.state.displayOrder = order;
+    // Exclude scenes that don't exist from the display order
+    // This enforces the correctness of the displayOrder.
+    const sanitizedOrder = order.filter(id => this.state.scenes[id]);
+    this.state.displayOrder = sanitizedOrder;
   }
 
   createScene(name: string, options: ISceneCreateOptions = {}) {
