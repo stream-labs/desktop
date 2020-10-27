@@ -63,7 +63,7 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
     return !this.youtubeService.updatableSettings.includes(fieldName);
   }
 
-  private onSelectBroadcastHandler() {
+  private async onSelectBroadcastHandler() {
     // set title and description fields from the selected broadcast
     const ytSettings = this.settings.platforms.youtube;
     const selectedBroadcast = this.selectedBroadcast;
@@ -77,6 +77,14 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
     ytSettings.latencyPreference = latencyPreference;
     ytSettings.projection = projection;
     ytSettings.privacyStatus = privacyStatus;
+
+    // category id is a property of YoutubeVideo
+    const video = await this.youtubeService.fetchVideo(selectedBroadcast.id);
+    this.setCategory(video.snippet.categoryId);
+  }
+
+  private setCategory(categoryId: string) {
+    this.settings.platforms.youtube.categoryId = categoryId;
   }
 
   private onProjectionChangeHandler(enable360: boolean) {
@@ -123,7 +131,7 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
           { value: 'normal', title: $t('Normal Latency') },
           { value: 'low', title: $t('Low-latency') },
           {
-            value: 'ultra-low',
+            value: 'ultraLow',
             title: $t('Ultra low-latency'),
             description: $t('Does not support: Closed captions, 1440p, and 4k resolutions'),
           },

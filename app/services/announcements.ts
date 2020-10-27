@@ -3,7 +3,7 @@ import { UserService } from './user';
 import { HostsService } from './hosts';
 import { AppService } from 'services/app';
 import { Inject } from './core/injector';
-import { authorizedHeaders } from '../util/requests';
+import { authorizedHeaders, jfetch } from '../util/requests';
 import path from 'path';
 import fs from 'fs';
 import { PatchNotesService } from 'services/patch-notes';
@@ -116,7 +116,7 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     }`;
     const req = this.formRequest(endpoint);
     try {
-      const newState = await fetch(req).then(rawResp => rawResp.json());
+      const newState = await jfetch<IAnnouncementsInfo>(req);
 
       // splits out params for local links eg PlatformAppStore?appId=<app-id>
       const queryString = newState.link.split('?')[1];

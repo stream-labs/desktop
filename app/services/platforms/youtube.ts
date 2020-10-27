@@ -7,7 +7,7 @@ import {
   IPlatformState,
 } from '.';
 import { Inject } from 'services/core/injector';
-import { authorizedHeaders, handleResponse } from 'util/requests';
+import { authorizedHeaders, handleResponse, jfetch } from 'util/requests';
 import { platformAuthorizedRequest } from './utils';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { CustomizationService } from 'services/customization';
@@ -112,6 +112,15 @@ export interface IYoutubeCategory {
   snippet: {
     title: string;
     assignable: boolean;
+  };
+}
+
+export interface IYoutubeVideo {
+  id: string;
+  snippet: {
+    title: string;
+    description: string;
+    categoryId: string;
   };
 }
 
@@ -339,11 +348,19 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     categoryId: string,
   ) {
     const endpoint = 'videos?part=snippet';
-    await this.requestYoutube<IYoutubeLiveBroadcast>({
+    await this.requestYoutube({
       body: JSON.stringify({ id: broadcastId, snippet: { categoryId, title, description } }),
       method: 'PUT',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
     });
+  }
+
+  async fetchVideo(id: string): Promise<IYoutubeVideo> {
+    const endpoint = `videos?id=${id}&part=snippet`;
+    const videoCollection = await this.requestYoutube<IYoutubeCollection<IYoutubeVideo>>(
+      `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
+    );
+    return videoCollection.items[0];
   }
 
   /**
@@ -374,9 +391,9 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     const headers = authorizedHeaders(this.userService.apiToken!);
     const request = new Request(url, { headers });
 
-    return fetch(request)
-      .then(handleResponse)
-      .then(response => this.userService.updatePlatformToken('youtube', response.access_token));
+    return jfetch<{ access_token: string }>(request).then(response =>
+      this.userService.updatePlatformToken('youtube', response.access_token),
+    );
   }
 
   /**

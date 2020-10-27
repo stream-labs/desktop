@@ -14,9 +14,6 @@ export class HostsService extends Service {
   }
 
   get overlays() {
-    if (Util.isPreview()) {
-      return 'beta-overlays.streamlabs.com';
-    }
     return 'overlays.streamlabs.com';
   }
 

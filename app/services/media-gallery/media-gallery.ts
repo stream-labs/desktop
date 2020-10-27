@@ -7,6 +7,7 @@ import { HostsService } from 'services/hosts';
 import { WindowsService } from 'services/windows';
 import uuid from 'uuid';
 import { $t } from '../i18n';
+import { jfetch } from 'util/requests';
 
 export interface IMediaGalleryFile {
   href: string;
@@ -146,13 +147,12 @@ export class MediaGalleryService extends Service {
     images: Array<IMediaGalleryFile>;
   }> {
     const req = this.formRequest('api/v5/slobs/widget/alertbox/stock-media');
-    const stockMedia = await fetch(req).then(resp => resp.json());
-    return stockMedia;
+    return jfetch(req);
   }
 
   private async fetchFiles(): Promise<IMediaGalleryFile[]> {
     const req = this.formRequest('api/v5/slobs/uploads');
-    const files: { href: string; size?: number }[] = await fetch(req).then(resp => resp.json());
+    const files: { href: string; size?: number }[] = await jfetch(req);
 
     const uploads = files.map(item => {
       const filename = decodeURIComponent(item.href.split(/[\\/]/).pop());
