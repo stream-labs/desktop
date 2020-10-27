@@ -7,13 +7,13 @@ import {
   restartApp,
   closeWindow,
   click,
-} from '../helpers/spectron';
-import { setFormInput } from '../helpers/spectron/forms';
-import { fillForm, formIncludes, FormMonkey, selectTitle } from '../helpers/form-monkey';
-import { logIn, logOut, releaseUserInPool, reserveUserFromPool } from '../helpers/spectron/user';
-import { setTemporaryRecordingPath } from '../helpers/spectron/output';
+} from '../../helpers/spectron';
+import { setFormInput } from '../../helpers/spectron/forms';
+import { fillForm, formIncludes, FormMonkey, selectTitle } from '../../helpers/form-monkey';
+import { logIn, logOut, releaseUserInPool, reserveUserFromPool } from '../../helpers/spectron/user';
+import { setTemporaryRecordingPath } from '../../helpers/spectron/output';
 const moment = require('moment');
-import { fetchMock, resetFetchMock } from '../helpers/spectron/network';
+import { fetchMock, resetFetchMock } from '../../helpers/spectron/network';
 import {
   goLive,
   clickGoLive,
@@ -26,13 +26,13 @@ import {
   chatIsVisible,
   waitForStreamStop,
   updateChannelSettings,
-} from '../helpers/spectron/streaming';
-import { TPlatform } from '../../app/services/platforms';
+} from '../../helpers/spectron/streaming';
+import { TPlatform } from '../../../app/services/platforms';
 import { readdir } from 'fs-extra';
-import { showSettings } from '../helpers/spectron/settings';
-import { sleep } from '../helpers/sleep';
-import { getClient } from '../helpers/api-client';
-import { StreamSettingsService } from '../../app/services/settings/streaming';
+import { showSettings } from '../../helpers/spectron/settings';
+import { sleep } from '../../helpers/sleep';
+import { getClient } from '../../helpers/api-client';
+import { StreamSettingsService } from '../../../app/services/settings/streaming';
 
 useSpectron();
 
@@ -69,23 +69,14 @@ test('Streaming to Twitch', async t => {
   t.pass();
 });
 
-test('Streaming to Facebook', async t => {
+// TODO: Flaky
+test.skip('Streaming to Facebook', async t => {
   await logIn(t, 'facebook');
+  await sleep(3000); // there are some issues with setting the game field without delay here
   await goLive(t, {
     title: 'SLOBS Test Stream',
     game: selectTitle('Fortnite'),
     description: 'SLOBS Test Stream Description',
-  });
-  t.true(await chatIsVisible(t), 'Chat should be visible');
-  t.pass();
-});
-
-// TODO: Mixer stopped returning a stream key for testing accounts
-test.skip('Streaming to Mixer', async t => {
-  await logIn(t, 'mixer');
-  await goLive(t, {
-    title: 'SLOBS Test Stream',
-    game: selectTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
   });
   t.true(await chatIsVisible(t), 'Chat should be visible');
   t.pass();
@@ -110,32 +101,8 @@ test('Streaming to Youtube', async t => {
   t.pass();
 });
 
-test('Youtube should show error window if afterStreamStart hook fails', async t => {
-  await logIn(t, 'youtube');
-
-  await goLive(t, {
-    title: 'SLOBS Test Stream',
-    description: 'SLOBS Test Stream Description',
-  });
-  await focusChild(t);
-  await closeWindow(t);
-
-  // emulate API errors
-  skipCheckingErrorsInLog();
-  await fetchMock(t, /www\.googleapis\.com\/youtube/, 404);
-
-  // the error window should be shown right after request to YT API fails
-  await sleep(2000); // TODO: wait for the child window to be shown instead sleep
-  await focusChild(t);
-  await t.context.app.client.waitForVisible(
-    'h1=Your stream has started, but there were issues with other actions taken',
-  );
-
-  t.pass();
-});
-
 test('Streaming to the scheduled event on Youtube', async t => {
-  await logIn(t, 'youtube');
+  await logIn(t, 'youtube', { multistream: false });
 
   // create event via scheduling form
   const tomorrow = Date.now() + 1000 * 60 * 60 * 24;
@@ -156,8 +123,26 @@ test('Streaming to the scheduled event on Youtube', async t => {
   t.pass();
 });
 
-// TODO: flaky
-test.skip('Stream after switching accounts', async t => {
+test('Start stream twice to the same YT event', async t => {
+  await logIn(t, 'youtube', { multistream: false });
+
+  // create event via scheduling form
+  const now = Date.now();
+  await goLive(t, {
+    title: `Youtube Test Stream ${now}`,
+    description: 'SLOBS Test Stream Description',
+    enableAutoStop: false,
+  });
+  await stopStream(t);
+
+  await goLive(t, {
+    event: selectTitle(`Youtube Test Stream ${now}`),
+    enableAutoStop: true,
+  });
+  t.pass();
+});
+
+test('Stream after switching accounts', async t => {
   // stream to youtube
   await logIn(t, 'youtube');
   await goLive(t, {
@@ -253,63 +238,46 @@ test('Migrate the twitch account to the protected mode', async t => {
   );
 });
 
-// test scheduling for each platform
-const schedulingPlatforms = ['facebook', 'youtube'];
-schedulingPlatforms.forEach(platform => {
-  test(`Schedule stream to ${platform}`, async t => {
-    // login into the account
-    await logIn(t, platform as TPlatform);
-    const app = t.context.app;
+test('Schedule stream to facebook', async t => {
+  // login into the account:
+  await logIn(t, 'facebook', { multistream: false });
+  const app = t.context.app;
 
-    // open EditStreamInfo window
-    await focusMain(t);
-    await app.client.click('button .icon-date');
-    await focusChild(t);
-    const formMonkey = new FormMonkey(t);
+  // open EditStreamInfo window
+  await focusMain(t);
+  await app.client.click('button .icon-date');
+  await focusChild(t);
+  const formMonkey = new FormMonkey(t);
 
-    // wait fields to be shown
-    await app.client.waitForVisible('[data-name=title]');
+  // wait fields to be shown
+  await app.client.waitForVisible('[data-name=title]');
 
-    // fill streaming data
-    switch (platform) {
-      case 'facebook':
-        await formMonkey.fill({
-          title: 'SLOBS Test Stream',
-          description: 'SLOBS Test Stream Description',
-        });
-        break;
-
-      case 'youtube':
-        await formMonkey.fill({
-          title: 'SLOBS Test Stream',
-          description: 'SLOBS Test Stream Description',
-        });
-        break;
-    }
-
-    // set the date to tomorrow
-    const today = new Date();
-    const tomorrow = new Date();
-    tomorrow.setDate(today.getDate() + 1);
-    await formMonkey.fill({
-      date: moment(tomorrow).format('MM/DD/YYYY'),
-    });
-    await app.client.click('button=Done');
-
-    // facebook requires a game
-    if (platform === 'facebook') {
-      await app.client.waitForVisible('.toasted.error', 2000);
-
-      await formMonkey.fill({
-        game: selectTitle('Fortnite'),
-      });
-
-      await app.client.click('button=Done');
-    }
-
-    await app.client.waitForVisible('.toast-success', 20000);
-    t.pass();
+  // fill streaming data
+  await formMonkey.fill({
+    title: 'SLOBS Test Stream',
+    description: 'SLOBS Test Stream Description',
   });
+
+  // set the date to tomorrow
+  const today = new Date();
+  const tomorrow = new Date();
+  tomorrow.setDate(today.getDate() + 1);
+  await formMonkey.fill({
+    date: moment(tomorrow).format('MM/DD/YYYY'),
+  });
+  await app.client.click('button=Done');
+
+  // facebook requires a game
+  await app.client.waitForVisible('.toasted.error', 2000);
+
+  await sleep(3000); // there are some issues with setting the game field without delay here
+  await formMonkey.fill({
+    game: selectTitle('Fortnite'),
+  });
+
+  await app.client.click('button=Done');
+  await app.client.waitForVisible('.toast-success', 30000);
+  t.pass();
 });
 
 test('Go live error', async t => {
@@ -431,58 +399,60 @@ test('Update channel settings before streaming', async t => {
   t.pass();
 });
 
-// TODO: enable Prime for testing accounts
-test.skip('Custom stream destinations', async t => {
+test('Custom stream destinations', async t => {
   const client = t.context.app.client;
-  await logIn(t, 'twitch');
+  await logIn(t, 'twitch', { prime: true });
 
   // fetch a new stream key
   const user = await reserveUserFromPool(t, 'twitch');
 
   // add new destination
   await showSettings(t, 'Stream');
-  await click(t, 'button=Add additional destination');
+  await click(t, 'span=Add Destination');
   await fillForm(t, null, {
     name: 'MyCustomDest',
     url: 'rtmp://live.twitch.tv/app/',
     streamKey: user.streamKey,
   });
-  await click(t, 'Save');
+  await click(t, 'button=Save');
   await t.true(await client.isExisting('span=MyCustomDest'), 'New destination is created');
 
   // update destinations
-  await click(t, 'fa-pen');
+  await click(t, 'i.fa-pen');
   await fillForm(t, null, {
     name: 'MyCustomDestUpdated',
   });
-  await click(t, 'Save');
+  await click(t, 'button=Save');
   await t.true(await client.isExisting('span=MyCustomDestUpdated'), 'Destination is updated');
 
   // add one more destination
-  await click(t, 'button=Add additional destination');
+  await click(t, 'span=Add Destination');
   await fillForm(t, null, {
     name: 'MyCustomDest',
     url: 'rtmp://live.twitch.tv/app/',
     streamKey: user.streamKey,
   });
-  await click(t, 'Save');
+  await click(t, 'button=Save');
   await t.false(
-    await client.isExisting('button=Add additional destinationt'),
+    await client.isExisting('span=Add Destination'),
     'Do not allow more than 2 custom dest',
   );
 
   // open the GoLiveWindow and check destinations
+  await prepareToGoLive(t);
   await clickGoLive(t);
   await t.true(await client.isExisting('span=MyCustomDest'), 'Destination is available');
   await click(t, 'span=MyCustomDest'); // switch the destination on
+  await tryToGoLive(t);
   await client.waitForExist('span=Configure the Multistream service'); // the multistream should be started
   await stopStream(t);
   await releaseUserInPool(user);
 
   // delete existing destinations
   await showSettings(t, 'Stream');
-  await click(t, 'fa-trash');
-  await click(t, 'fa-trash');
+  await click(t, 'i.fa-trash');
+  await click(t, 'i.fa-trash');
+  t.false(await client.isExisting('i.fa-trash'), 'Destinations should be removed');
 
   t.pass();
 });

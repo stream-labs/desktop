@@ -73,9 +73,9 @@ const ONBOARDING_STEPS = () => ({
   },
   [EOnboardingSteps.Prime]: {
     element: onboardingSteps.Prime,
-    disableControls: false,
-    hideSkip: false,
-    hideButton: false,
+    disableControls: true,
+    hideSkip: true,
+    hideButton: true,
     label: $t('Prime'),
   },
   [EOnboardingSteps.PrimeExpiration]: {
@@ -112,6 +112,7 @@ interface IOnboardingOptions {
   // about our security upgrade.
   isHardware: boolean; // When configuring capture defaults
   isPrimeExpiration: boolean; // Only shown as a singleton step if prime is expiring soon
+  isImport: boolean; // When users are importing from OBS
 }
 
 interface IOnboardingServiceState {
@@ -125,6 +126,7 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
     if (this.state.options.isLogin) return ONBOARDING_STEPS()[EOnboardingSteps.Connect];
     if (this.state.options.isOptimize) return ONBOARDING_STEPS()[EOnboardingSteps.Optimize];
     if (this.state.options.isHardware) return ONBOARDING_STEPS()[EOnboardingSteps.HardwareSetup];
+    if (this.state.options.isImport) return ONBOARDING_STEPS()[EOnboardingSteps.ObsImport];
     if (this.state.options.isPrimeExpiration) {
       return ONBOARDING_STEPS()[EOnboardingSteps.PrimeExpiration];
     }
@@ -139,6 +141,11 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
     }
 
     steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Connect]);
+
+    if (userViews.isLoggedIn && !userViews.isPrime) {
+      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Prime]);
+    }
+
     steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ChooseYourAdventure]);
 
     if (this.state.importedFromObs) {
@@ -155,10 +162,6 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Optimize]);
     }
 
-    if (userViews.isLoggedIn && !userViews.isPrime) {
-      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Prime]);
-    }
-
     return steps;
   }
 }
@@ -171,6 +174,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
       isSecurityUpgrade: false,
       isHardware: false,
       isPrimeExpiration: false,
+      isImport: false,
     },
     importedFromObs: false,
     existingSceneCollections: false,
@@ -242,6 +246,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
       isSecurityUpgrade: false,
       isHardware: false,
       isPrimeExpiration: false,
+      isImport: false,
       ...options,
     };
 

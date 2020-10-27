@@ -6,6 +6,9 @@ import { RestreamService } from '../restream';
 import { getPlatformService, TPlatform, TPlatformCapability } from '../platforms';
 import { $t } from '../i18n';
 import { cloneDeep, difference } from 'lodash';
+import { YoutubeService } from '../platforms/youtube';
+import { FacebookService } from '../platforms/facebook';
+import { TwitchService } from '../platforms/twitch';
 
 /**
  * The stream info view is responsible for keeping
@@ -226,6 +229,15 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
       }
     }
     return '';
+  }
+
+  /**
+   * Return true if one of the checks has been failed
+   */
+  hasFailedChecks(): boolean {
+    return !!Object.keys(this.state.info.checklist).find(
+      check => this.state.info.checklist[check] === 'failed',
+    );
   }
 
   /**

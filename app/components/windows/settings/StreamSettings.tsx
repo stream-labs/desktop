@@ -61,8 +61,12 @@ export default class StreamSettings extends TsxComponent {
     this.streamSettingsService.setSettings({ protectedModeEnabled: false });
   }
 
-  restoreDefaults() {
-    this.streamSettingsService.resetStreamSettings();
+  private enableProtectedMode() {
+    this.streamSettingsService.actions.setSettings({
+      protectedModeEnabled: true,
+      key: '',
+      streamType: 'rtmp_common',
+    });
   }
 
   get protectedModeEnabled(): boolean {
@@ -189,7 +193,7 @@ export default class StreamSettings extends TsxComponent {
             <br />
 
             {this.canEditSettings && (
-              <button class="button button--warn" onClick={this.restoreDefaults}>
+              <button class="button button--warn" onClick={() => this.enableProtectedMode()}>
                 {$t('Use recommended settings')}
               </button>
             )}
@@ -283,7 +287,7 @@ export default class StreamSettings extends TsxComponent {
         {!isEditMode && canAddMoreDestinations && (
           <a class={styles.addDestinationBtn} onclick={() => this.addCustomDest()}>
             <i class="fa fa-plus" />
-            {$t('Add Destination')}
+            <span>{$t('Add Destination')}</span>
             {shouldShowPrimeLabel ? (
               <b class={styles.prime}>prime</b>
             ) : (

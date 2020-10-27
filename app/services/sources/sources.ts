@@ -78,6 +78,7 @@ export const windowsSources: TSourceType[] = [
   'liv_capture',
   'ovrstream_dc_source',
   'vlc_source',
+  'soundtrack_source',
 ];
 
 /**
@@ -285,6 +286,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
       this.usageStatisticsService.recordFeatureUsage('OpenVR');
     } else if (type === 'vlc_source') {
       this.usageStatisticsService.recordFeatureUsage('VLC');
+    } else if (type === 'soundtrack_source') {
+      this.usageStatisticsService.recordFeatureUsage('soundtrackSource');
     }
 
     const managerKlass = PROPERTIES_MANAGER_TYPES[managerType];
@@ -464,6 +467,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       { description: 'Audio Output Capture', value: 'coreaudio_output_capture' },
       { description: 'Video Capture Device', value: 'av_capture_input' },
       { description: 'Display Capture', value: 'display_capture' },
+      { description: 'Soundtrack source', value: 'soundtrack_source' },
     ];
 
     const availableWhitelistedType = whitelistedTypes.filter(type =>

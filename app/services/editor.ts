@@ -122,9 +122,9 @@ export class EditorService extends StatefulService<IEditorServiceState> {
       this.customizationService.getSettings().folderSelection &&
       (!parent || (parent && parent.isSelected()))
     ) {
-      this.selectionService.select(overSources[0].id);
+      this.selectionService.views.globalSelection.select(overSources[0].id);
     } else if (parent) {
-      this.selectionService.select(parent.id);
+      this.selectionService.views.globalSelection.select(parent.id);
     }
   }
 
@@ -162,7 +162,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
       const overSources = this.getOverSources(event);
 
       // Find out if we are over any currently selected sources
-      const overSelected = this.selectionService
+      const overSelected = this.selectionService.views.globalSelection
         .getItems()
         .find(item => overSources.some(source => source.id === item.id));
 
@@ -191,7 +191,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
           }
         } else {
           // Click was not over any sources so empty the selection
-          this.selectionService.reset();
+          this.selectionService.views.globalSelection.reset();
         }
       } else if (event.button === 2) {
         let menu: EditMenu;
@@ -203,7 +203,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
             selectedSourceId: overSelected.sourceId,
           });
         } else if (overSources.length) {
-          this.selectionService.select(overSources[0].sceneItemId);
+          this.selectionService.views.globalSelection.select(overSources[0].sceneItemId);
           menu = new EditMenu({
             selectedSceneId: this.scene.id,
             showSceneItemMenu: true,
@@ -240,7 +240,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     const mousePosX = event.offsetX * factor - this.renderedOffsetX;
     const mousePosY = event.offsetY * factor - this.renderedOffsetY;
 
-    const converted = this.convertScalarToBaseSpace(mousePosX * factor, mousePosY * factor);
+    const converted = this.convertScalarToBaseSpace(mousePosX, mousePosY);
 
     if (this.resizeRegion) {
       const name = this.resizeRegion.name;
@@ -361,7 +361,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
 
     let scaleXDelta = 1;
     let scaleYDelta = 1;
-    const rect = this.selectionService.getBoundingRect();
+    const rect = this.selectionService.views.globalSelection.getBoundingRect();
     const anchorPosition = rect.getOffsetFromOrigin(AnchorPositions[opts.anchor]);
 
     // resizeRegion is opposite the anchor point
@@ -407,7 +407,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
 
     this.editorCommandsService.executeCommand(
       'ResizeItemsCommand',
-      this.selectionService.getActiveSelection(),
+      this.selectionService.views.globalSelection,
       { x: scaleXDelta, y: scaleYDelta },
       AnchorPositions[opts.anchor],
     );
@@ -518,7 +518,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   // getters
 
   get activeSources(): SceneItem[] {
-    return this.selectionService.getItems().filter(item => {
+    return this.selectionService.views.globalSelection.getItems().filter(item => {
       return item.isVisualSource;
     });
   }
@@ -550,7 +550,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   get resizeRegions(): IResizeRegion[] {
     let regions: IResizeRegion[] = [];
 
-    this.selectionService.getItems().forEach(item => {
+    this.selectionService.views.globalSelection.getItems().forEach(item => {
       regions = regions.concat(this.generateResizeRegionsForItem(item));
     });
 

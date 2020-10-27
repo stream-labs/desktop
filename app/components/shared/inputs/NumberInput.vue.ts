@@ -54,6 +54,7 @@ export default class NumberInput extends BaseInput<number | string, INumberMetad
 
   handleInput(value: string) {
     this.displayValue = value;
+    if (value === '-' || value === '') return;
     if (this.options.isInteger) {
       this.updateValue(value);
     } else {

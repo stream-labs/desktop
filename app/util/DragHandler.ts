@@ -114,8 +114,11 @@ export class DragHandler {
       (this.renderedSnapDistance * this.scaleFactor * this.baseWidth) / this.displaySize.x;
 
     // Load some attributes about sources
-    this.draggedSource = this.selectionService.getLastSelected();
-    this.otherSources = this.selectionService
+    const lastDragged = this.selectionService.views.globalSelection.getLastSelected();
+
+    if (lastDragged.isItem()) this.draggedSource = lastDragged;
+
+    this.otherSources = this.selectionService.views.globalSelection
       .clone()
       .invert()
       .getItems()
@@ -185,7 +188,7 @@ export class DragHandler {
 
     this.editorCommandsService.executeCommand(
       'MoveItemsCommand',
-      this.selectionService.getActiveSelection(),
+      this.selectionService.views.globalSelection,
       { x: deltaX, y: deltaY },
     );
   }

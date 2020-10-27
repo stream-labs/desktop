@@ -9,7 +9,7 @@ import {
 } from '.';
 import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
-import { authorizedHeaders, handleResponse } from 'util/requests';
+import { authorizedHeaders, handleResponse, jfetch } from 'util/requests';
 import { UserService } from 'services/user';
 import { IPlatformResponse, platformAuthorizedRequest, platformRequest } from './utils';
 import { IListOption } from 'components/shared/inputs';
@@ -27,13 +27,12 @@ interface IFacebookPage {
 }
 
 interface IFacebookLiveVideo {
-  status: 'SCHEDULED_UNPUBLISHED' | 'LIVE_STOPPED' | 'LIVE';
-  id: string;
+  status: string;
+  id: number;
   stream_url: string;
   title: string;
   game: string;
   description: string;
-  planned_start_time: number;
 }
 
 export interface IStreamlabsFacebookPage {
@@ -106,19 +105,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   };
 
   protected init() {
-    // save settings to the local storage
-    const savedSettings: IFacebookStartStreamOptions = JSON.parse(
-      localStorage.getItem(this.serviceName) as string,
-    );
-    if (savedSettings) this.SET_STREAM_SETTINGS(savedSettings);
-    this.store.watch(
-      () => this.state.settings,
-      () => {
-        const { title, description, game } = this.state.settings;
-        localStorage.setItem(this.serviceName, JSON.stringify({ title, description, game }));
-      },
-      { deep: true },
-    );
+    this.syncSettingsWithLocalStorage();
   }
 
   @mutation()
@@ -262,9 +249,43 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   /**
    * fetch prefill data
    */
-  async prepopulateInfo() {
+  async prepopulateInfo(): Promise<Partial<IFacebookStartStreamOptions>> {
     await this.fetchActivePage();
-    this.SET_PREPOPULATED(true);
+    if (!this.state.activePage || !this.state.activePage.id) {
+      this.SET_PREPOPULATED(true);
+      return { facebookPageId: undefined };
+    }
+    const url =
+      `${this.apiBase}/${this.state.activePage.id}/live_videos?` +
+      'fields=status,stream_url,title,description';
+    return this.requestFacebook<{ data: IFacebookLiveVideo[] }>(url, this.activeToken).then(
+      json => {
+        // First check if there are any live videos
+        let info = json.data.find((vid: any) => vid.status.includes(['LIVE_STOPPED', 'LIVE']));
+
+        // Next check for future scheduled videos
+        if (!info) {
+          info = json.data.find((vid: any) => vid.status === 'SCHEDULED_UNPUBLISHED');
+        }
+
+        // Finally, just fallback to the first video, which will be their most recent VOD
+        if (!info) {
+          info = json.data[0];
+        }
+
+        if (info && ['SCHEDULED_UNPUBLISHED', 'LIVE_STOPPED', 'LIVE'].includes(info.status)) {
+          this.SET_LIVE_VIDEO_ID(info.id);
+          this.SET_STREAM_URL(info.stream_url);
+        } else {
+          this.SET_LIVE_VIDEO_ID(null);
+        }
+        this.SET_PREPOPULATED(true);
+        return {
+          ...info,
+          facebookPageId: this.state.activePage!.id,
+        };
+      },
+    );
   }
 
   async scheduleStream(
@@ -368,16 +389,15 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     return true;
   }
 
-  private fetchPages(): Promise<IStreamlabsFacebookPages> {
+  private fetchPages(): Promise<IStreamlabsFacebookPages | null> {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
     const headers = authorizedHeaders(this.userService.apiToken!);
     const request = new Request(url, { headers });
-    return fetch(request)
-      .then(handleResponse)
+    return jfetch<IStreamlabsFacebookPages>(request)
       .then(response => {
         // create an options list for using in the ListInput
-        response.options = response.pages.map((page: any) => {
+        response.options = response.pages.map(page => {
           return { value: page.id, title: `${page.name} | ${page.category}` };
         });
         this.SET_FACEBOOK_PAGES(response);

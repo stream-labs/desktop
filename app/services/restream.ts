@@ -4,7 +4,7 @@ import { HostsService } from 'services/hosts';
 import { getPlatformService, TPlatform } from 'services/platforms';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { UserService } from 'services/user';
-import { authorizedHeaders } from 'util/requests';
+import { authorizedHeaders, jfetch } from 'util/requests';
 import { IncrementalRolloutService } from './incremental-rollout';
 import electron from 'electron';
 import { StreamingService } from './streaming';
@@ -91,12 +91,12 @@ export class RestreamService extends StatefulService<IRestreamState> {
     return this.streamInfo.isMultiplatformMode;
   }
 
-  fetchUserSettings() {
+  fetchUserSettings(): Promise<IUserSettingsResponse> {
     const headers = authorizedHeaders(this.userService.apiToken);
     const url = `https://${this.host}/api/v1/rst/user/settings`;
     const request = new Request(url, { headers });
 
-    return fetch(request).then(res => res.json());
+    return jfetch(request);
   }
 
   fetchTargets(): Promise<IRestreamTarget[]> {
@@ -104,7 +104,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
     const url = `https://${this.host}/api/v1/rst/targets`;
     const request = new Request(url, { headers });
 
-    return fetch(request).then(res => res.json());
+    return jfetch(request);
   }
 
   fetchIngest(): Promise<{ server: string }> {
@@ -112,7 +112,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
     const url = `https://${this.host}/api/v1/rst/ingest`;
     const request = new Request(url, { headers });
 
-    return fetch(request).then(res => res.json());
+    return jfetch(request);
   }
 
   setEnabled(enabled: boolean) {
@@ -130,7 +130,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
     });
     const request = new Request(url, { headers, body, method: 'PUT' });
 
-    return fetch(request).then(res => res.json());
+    return jfetch(request);
   }
 
   get platforms(): TPlatform[] {
@@ -178,13 +178,9 @@ export class RestreamService extends StatefulService<IRestreamState> {
     const url = `https://${this.host}/api/v1/rst/util/status`;
     const request = new Request(url);
 
-    return fetch(request)
-      .then(res => res.json())
-      .then(
-        j =>
-          j.find((service: { name: string; enabled: boolean }) => service.name === 'restream')
-            .status,
-      );
+    return jfetch<{ name: string; status: boolean }[]>(request).then(
+      j => j.find(service => service.name === 'restream').status,
+    );
   }
 
   async createTargets(targets: { platform: TPlatform | 'relay'; streamKey: string }[]) {

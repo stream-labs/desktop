@@ -8,6 +8,8 @@ export class HideItemsCommand extends Command {
 
   constructor(private selection: Selection, private hidden: boolean) {
     super();
+    this.selection.freeze();
+
     const action = hidden ? 'Hide %{sourceName}' : 'Show %{sourceName}';
     this.description = $t(action, { sourceName: this.selection.getNodes()[0].name });
 
