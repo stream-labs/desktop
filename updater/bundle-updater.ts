@@ -211,7 +211,7 @@ module.exports = async (basePath: string) => {
   // Use a local web server to serve source maps in development.
   // This is needed because chromium no longer uses the redirect
   // URL when looking for source maps.
-  if (process.env.NODE_ENV !== 'production') {
+  if (!['production', 'test'].includes(process.env.NODE_ENV ?? '')) {
     const handler = require('serve-handler');
 
     const server = http.createServer((request, response) => {
