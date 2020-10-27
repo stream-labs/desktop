@@ -46,24 +46,6 @@ export default class SideNav extends Vue {
     electron.ipcRenderer.send('openDevTools');
   }
 
-  handleAuth() {
-    if (this.userService.isLoggedIn) {
-      electron.remote.dialog
-        .showMessageBox({
-          title: $t('Confirm'),
-          message: $t('Are you sure you want to log out?'),
-          buttons: [$t('Yes'), $t('No')],
-        })
-        .then(({ response }) => {
-          if (response === 0) {
-            this.userService.logOut();
-          }
-        });
-    } else {
-      this.userService.showLogin();
-    }
-  }
-
   studioMode() {
     if (this.transitionsService.state.studioMode) {
       this.transitionsService.disableStudioMode();
@@ -166,21 +148,6 @@ export default class SideNav extends Vue {
           vTrackClick={{ component: 'NavTools', target: 'help' }}
         >
           <i class="icon-question" />
-        </div>
-        <div
-          class={styles.cell}
-          onClick={() => this.handleAuth()}
-          title={
-            this.userService.isLoggedIn
-              ? $t('Logout %{username}', { username: this.userService.username })
-              : $t('Login')
-          }
-          vTrackClick={{
-            component: 'NavTools',
-            target: this.userService.isLoggedIn ? 'logout' : 'login',
-          }}
-        >
-          <i class={this.userService.isLoggedIn ? 'fas fa-sign-out-alt' : 'fas fa-sign-in-alt'} />
         </div>
         <div
           class={styles.cell}
