@@ -25,7 +25,7 @@ export default class GameSelector extends TsxComponent<Props> {
   @SyncWithValue() private settings: IStreamSettings;
 
   private searchingGames = false;
-  private gameOptions: IListOption<string, { image: string }>[] = [];
+  private games: IListOption<string, { image: string }>[] = [];
 
   $refs: {
     tagsInput: TagsInput;
@@ -43,6 +43,12 @@ export default class GameSelector extends TsxComponent<Props> {
     return this.supportImages && this.twitchService.gameImageSize;
   }
 
+  get gameOptions() {
+    const selectedGame = this.selectedGameName;
+    if (selectedGame) return [{ value: selectedGame, title: selectedGame }, ...this.games];
+    return this.games;
+  }
+
   private get supportImages() {
     return this.props.platform === 'twitch';
   }
@@ -55,8 +61,8 @@ export default class GameSelector extends TsxComponent<Props> {
     const selectedGameName = this.selectedGameName;
     const game = await this.twitchService.fetchGame(this.selectedGameName);
     if (!game || selectedGameName !== this.selectedGameName) return;
-    const optionInd = this.gameOptions.findIndex(opt => opt.value === selectedGameName);
-    this.gameOptions.splice(optionInd, 1, {
+    const optionInd = this.games.findIndex(opt => opt.value === selectedGameName);
+    this.games.splice(optionInd, 1, {
       value: selectedGameName,
       title: selectedGameName,
       data: { image: game.image },
@@ -75,10 +81,7 @@ export default class GameSelector extends TsxComponent<Props> {
     // search games for the target platform
     const selectedGame = this.selectedGameName;
     const games = await getPlatformService(this.props.platform).searchGames(searchStr);
-    this.gameOptions = games.map(g => ({ value: g.name, title: g.name, data: { image: g.image } }));
-    if (selectedGame) {
-      this.gameOptions.unshift({ value: selectedGame, title: selectedGame });
-    }
+    this.games = games.map(g => ({ value: g.name, title: g.name, data: { image: g.image } }));
     this.searchingGames = false;
   }
 

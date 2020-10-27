@@ -17,12 +17,12 @@ import { SyncWithValue } from 'services/app/app-decorators';
 import BaseEditSteamInfo from './BaseEditSteamInfo';
 import moment from 'moment';
 import GameSelector from '../GameSelector';
-import ErrorLayout from '../ErrorLayout';
-import { assertIsDefined } from 'util/properties-type-guards';
-import { getPlatformService } from 'services/platforms';
+import MessageLayout from '../MessageLayout';
 import { UserService } from 'services/user';
 import { NavigationService } from 'services/navigation';
 import { WindowsService } from 'services/windows';
+import Translate from 'components/shared/translate';
+import electron from 'electron';
 
 class Props {
   value?: IStreamSettings = undefined;
@@ -70,7 +70,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
   @Watch('settings.platforms.facebook.destinationType')
   private async loadScheduledBroadcasts() {
     const fbSettings = this.fbSettings;
-    let destinationId = this.facebookService.getDestinationId(this.fbSettings);
+    let destinationId = this.facebookService.views.getDestinationId(this.fbSettings);
 
     // by some unknown reason FB returns scheduled events for groups
     // only if you request these events from the user's personal page
@@ -104,9 +104,27 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
         title: $t('Facebook Destination'),
         fullWidth: true,
         options: [
-          { value: 'me', title: $t('Share to Your Timeline') },
-          { value: 'page', title: $t('Share to a Page You Manage') },
-          { value: 'group', title: $t('Share in a Group') },
+          {
+            value: 'me',
+            title: $t('Share to Your Timeline'),
+            data: {
+              image: this.facebookService.state.userAvatar,
+            },
+          },
+          {
+            value: 'page',
+            title: $t('Share to a Page You Manage'),
+            data: {
+              image: require('../../../../../media/images/platforms/fb-page.png'),
+            },
+          },
+          {
+            value: 'group',
+            title: $t('Share in a Group'),
+            data: {
+              image: require('../../../../../media/images/platforms/fb-group.png'),
+            },
+          },
         ].filter(opt => {
           if (opt.value === 'me' && !this.canStreamToTimeline) return false;
           if (opt.value === 'group' && !this.canStreamToGroup) return false;
@@ -198,11 +216,21 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
     this.windowsService.actions.closeChildWindow();
   }
 
+  private openCreateGamingPage() {
+    this.facebookService.actions.createFBPage();
+  }
+
+  private verifyGroup() {
+    const groupId = this.fbSettings.groupId;
+    electron.remote.shell.openExternal(`https://www.facebook.com/gropus/${groupId}/edit`);
+  }
+
   render() {
     const fbSettings = this.settings.platforms.facebook;
     const shouldShowGroups = fbSettings.destinationType === 'group' && !this.props.isUpdateMode;
     const shouldShowPages = fbSettings.destinationType === 'page' && !this.props.isUpdateMode;
     const shouldShowPermissionWarn = !this.canStreamToTimeline || !this.canStreamToGroup;
+    const shouldShowGamingWarning = fbSettings.destinationType !== 'page' && fbSettings.game;
 
     return (
       <ValidatedForm name="facebook-settings">
@@ -213,6 +241,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
               <ListInput
                 vModel={this.settings.platforms.facebook.destinationType}
                 metadata={this.formMetadata.destinationType}
+                imageSize={{ width: 35, height: 35 }}
               />
             </HFormGroup>
           </div>
@@ -239,6 +268,10 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
               showImagePlaceholder={true}
               imageSize={{ width: 44, height: 44 }}
             />
+            <p>
+              {$t('Make sure Streamlabs app is added to your Group.')}
+              <a onClick={() => this.verifyGroup()}> {$t('Click here to verify.')}</a>
+            </p>
           </HFormGroup>
         )}
 
@@ -255,13 +288,25 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
               </HFormGroup>
             )}
 
+            <HFormGroup title={$t('Facebook Game')}>
+              <GameSelector vModel={this.settings} platform="facebook" />
+              {shouldShowGamingWarning && (
+                <p>
+                  <Translate
+                    message={$t('facebookGamingWarning')}
+                    scopedSlots={{
+                      createPageLink: (text: string) => (
+                        <a onClick={() => this.openCreateGamingPage()}>{{ text }}</a>
+                      ),
+                    }}
+                  />
+                </p>
+              )}
+            </HFormGroup>
+
             <CommonPlatformFields vModel={this.settings} platform={'facebook'} />
           </div>
         )}
-
-        <HFormGroup title={$t('Facebook Game')}>
-          <GameSelector vModel={this.settings} platform="facebook" />
-        </HFormGroup>
       </ValidatedForm>
     );
   }
@@ -269,7 +314,10 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
   private renderMissedPermissionsWarning() {
     const isPrimary = this.view.isPrimaryPlatform('facebook');
     return (
-      <ErrorLayout message={$t('You can stream to your timeline and groups now')} type={'success'}>
+      <MessageLayout
+        message={$t('You can stream to your timeline and groups now')}
+        type={'success'}
+      >
         {isPrimary && (
           <div>
             <p>{$t('Please log-out and log-in again to get these new features')}</p>
@@ -286,7 +334,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
             </button>
           </div>
         )}
-      </ErrorLayout>
+      </MessageLayout>
     );
   }
 }
