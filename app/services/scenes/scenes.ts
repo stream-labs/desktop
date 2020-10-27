@@ -169,6 +169,25 @@ class ScenesViews extends ViewHandler<IScenesState> {
     return null;
   }
 
+  /**
+   * Returns an array of all scene items across all scenes
+   * referencing the given source id.
+   * @param sourceId The source id
+   */
+  getSceneItemsBySourceId(sourceId: string): SceneItem[] {
+    const items: SceneItem[] = [];
+
+    this.scenes.forEach(scene => {
+      scene.getItems().forEach(item => {
+        if (item.sourceId === sourceId) {
+          items.push(item);
+        }
+      });
+    });
+
+    return items;
+  }
+
   getSceneNode(nodeId: string) {
     for (const scene of this.scenes) {
       const sceneNode = scene.getNode(nodeId);
