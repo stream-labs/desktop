@@ -323,19 +323,6 @@ test('Youtube streaming is disabled', async t => {
   );
 });
 
-test('User does not have Facebook pages', async t => {
-  skipCheckingErrorsInLog();
-  await logIn(t, 'facebook', { noFacebookPages: true, notStreamable: true });
-  await prepareToGoLive(t);
-  await clickGoLive(t);
-  if (await t.context.app.client.isExisting('button=Go Live')) await t.context.app.client.click('button=Go Live');
-  await focusChild(t);
-  t.true(
-    await t.context.app.client.isExisting('a=create one now'),
-    'The link for adding new facebook changes should exist',
-  );
-});
-
 test('User has linked twitter', async t => {
   await logIn(t, 'twitch', { hasLinkedTwitter: true, notStreamable: true });
   await prepareToGoLive(t);

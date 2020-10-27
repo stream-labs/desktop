@@ -15,7 +15,7 @@ import electron from 'electron';
 import { UserService } from 'services/user';
 import { NavigationService } from 'services/navigation';
 import { assertIsDefined } from 'util/properties-type-guards';
-import ErrorLayout from './ErrorLayout';
+import MessageLayout from './MessageLayout';
 
 /**
  * Shows error and troubleshooting suggestions
@@ -36,13 +36,6 @@ export default class GoLiveError extends TsxComponent<{}> {
   private goToYoutubeDashboard() {
     this.youtubeService.openDashboard();
   }
-
-  // private createFBPage() {
-  //   electron.remote.shell.openExternal(
-  //     'https://www.facebook.com/gaming/pages/create?ref=streamlabs',
-  //   );
-  //   this.windowsService.actions.closeChildWindow();
-  // }
 
   private skipPrepopulateAndGoLive() {
     this.streamingService.actions.goLive();
@@ -89,7 +82,7 @@ export default class GoLiveError extends TsxComponent<{}> {
       case 'MACHINE_LOCKED':
         return this.renderMachineLockedError(error);
       default:
-        return <ErrorLayout error={error} />;
+        return <MessageLayout error={error} />;
     }
   }
 
@@ -97,7 +90,7 @@ export default class GoLiveError extends TsxComponent<{}> {
     assertIsDefined(error.platform);
     const platformName = getPlatformService(error.platform).displayName;
     return (
-      <ErrorLayout
+      <MessageLayout
         error={error}
         message={$t('Failed to fetch settings from %{platformName}', { platformName })}
       >
@@ -119,17 +112,17 @@ export default class GoLiveError extends TsxComponent<{}> {
             ),
           }}
         />
-      </ErrorLayout>
+      </MessageLayout>
     );
   }
 
   private renderPrimeRequiredError(error: IStreamError) {
     return (
-      <ErrorLayout message={$t('Multistreaming to these platforms requires Prime')}>
+      <MessageLayout message={$t('Multistreaming to these platforms requires Prime')}>
         <button class="button button--prime" onClick={() => this.enablePrime()}>
           {$t('Become a Prime member')}
         </button>
-      </ErrorLayout>
+      </MessageLayout>
     );
   }
 
@@ -143,7 +136,9 @@ export default class GoLiveError extends TsxComponent<{}> {
     assertIsDefined(error.platform);
     const platformName = getPlatformService(error.platform).displayName;
     return (
-      <ErrorLayout message={$t('Failed to fetch settings from %{platformName}', { platformName })}>
+      <MessageLayout
+        message={$t('Failed to fetch settings from %{platformName}', { platformName })}
+      >
         <Translate
           message={$t('twitchMissedScopeError')}
           scopedSlots={{
@@ -157,7 +152,7 @@ export default class GoLiveError extends TsxComponent<{}> {
             ),
           }}
         />
-      </ErrorLayout>
+      </MessageLayout>
     );
   }
 
@@ -165,7 +160,7 @@ export default class GoLiveError extends TsxComponent<{}> {
     assertIsDefined(error.platform);
     const platformName = getPlatformService(error.platform).displayName;
     return (
-      <ErrorLayout
+      <MessageLayout
         error={error}
         message={$t('Failed to update settings for %{platformName}', { platformName })}
       >
@@ -184,13 +179,13 @@ export default class GoLiveError extends TsxComponent<{}> {
             ),
           }}
         />
-      </ErrorLayout>
+      </MessageLayout>
     );
   }
 
   private renderYoutubeStreamingDisabled(error: IStreamError) {
     return (
-      <ErrorLayout message={error.message}>
+      <MessageLayout message={error.message}>
         {$t(
           'Please enable your account for live streaming, and wait 24 hours before attempting to stream.',
         )}
@@ -202,23 +197,23 @@ export default class GoLiveError extends TsxComponent<{}> {
         >
           {$t('Enable Live Streaming')}
         </button>
-      </ErrorLayout>
+      </MessageLayout>
     );
   }
 
   private renderRestreamError(error: IStreamError) {
     return (
-      <ErrorLayout error={error}>
+      <MessageLayout error={error}>
         {$t(
           'Please try again. If the issue persists, you can stream directly to a single platform instead.',
         )}
-      </ErrorLayout>
+      </MessageLayout>
     );
   }
 
   private renderYoutubePublishError(error: IStreamError) {
     return (
-      <ErrorLayout error={error}>
+      <MessageLayout error={error}>
         <Translate
           message={$t('youtubeStatusError')}
           scopedSlots={{
@@ -229,15 +224,15 @@ export default class GoLiveError extends TsxComponent<{}> {
             ),
           }}
         />
-      </ErrorLayout>
+      </MessageLayout>
     );
   }
 
   private renderMachineLockedError(error: IStreamError) {
     return (
-      <ErrorLayout error={error}>
+      <MessageLayout error={error}>
         {$t('You could try locking and unlocking your computer to fix this error.')}
-      </ErrorLayout>
+      </MessageLayout>
     );
   }
 }

@@ -3,7 +3,6 @@
   "Create a Page": "Create a Page",
   "Facebook Setup": "Facebook Setup",
   "Streamer Dashboard": "Streamer Dashboard",
-  "It looks like you don't have any Pages. Head to ": "It looks like you don't have any Pages. Head to ",
   "Share": "Share",
   "Like": "Like",
   "Step": "Step",
@@ -15,5 +14,5 @@
   "Connect": "Connect",
   "Install Your Theme": "Install Your Theme",
   "Install": "Install",
-  "I already have a Gaming Page": "I already have a Gaming Page"
+  "facebookGamingWarning": "For the full Facebook Gaming experience <create-page-link>create a Gaming Video Creator Page </create-page-link>"
 }
