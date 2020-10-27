@@ -1,4 +1,4 @@
-import { focusMain, TExecutionContext, focusWorker, focusChild, closeWindow } from './index';
+import { focusMain, TExecutionContext, focusWorker } from './index';
 import { IUserAuth, IPlatformAuth, TPlatform } from '../../../app/services/platforms';
 import { sleep } from '../sleep';
 import { dialogDismiss } from './dialog';
@@ -59,16 +59,9 @@ export async function logOut(t: TExecutionContext, skipUI = false) {
   // logout from the SLOBS app
   if (!skipUI) {
     await focusMain(t);
-    await t.context.app.client.click('.icon-settings');
-    await focusChild(t);
     await t.context.app.client.click('.fa-sign-out-alt');
     await dialogDismiss(t, 'Yes');
-    await focusMain(t);
-    await t.context.app.client.click('.icon-settings');
-    await focusChild(t);
     await t.context.app.client.waitForVisible('.fa-sign-in-alt'); // wait for the log-in button
-    await closeWindow(t);
-    await focusMain(t);
   }
   // release the testing user
   await releaseUserInPool(user);
@@ -123,17 +116,12 @@ export async function loginWithAuthInfo(
   t.context.app.webContents.send('testing-fakeAuth', authInfo, isOnboardingTest);
   await focusMain(t);
   if (!waitForUI) return true;
-  return await isLoggedIn(t);
+  await t.context.app.client.waitForVisible('.fa-sign-out-alt', 30000); // wait for the log-out button
+  return true;
 }
 
 export async function isLoggedIn(t: TExecutionContext) {
-  await t.context.app.client.waitForVisible('.icon-settings');
-  await t.context.app.client.click('.icon-settings');
-  await focusChild(t);
-  const isLoggedIn = await t.context.app.client.isVisible('.fa-sign-out-alt');
-  await closeWindow(t);
-  await focusMain(t);
-  return isLoggedIn;
+  return t.context.app.client.isVisible('.fa-sign-out-alt');
 }
 
 /**

@@ -328,9 +328,7 @@ test('User does not have Facebook pages', async t => {
   await logIn(t, 'facebook', { noFacebookPages: true, notStreamable: true });
   await prepareToGoLive(t);
   await clickGoLive(t);
-  if (await t.context.app.client.isExisting('button=Go Live')) {
-    await t.context.app.client.click('button=Go Live');
-  }
+  if (await t.context.app.client.isExisting('button=Go Live')) await t.context.app.client.click('button=Go Live');
   await focusChild(t);
   t.true(
     await t.context.app.client.isExisting('a=create one now'),
@@ -375,10 +373,7 @@ test('Recording when streaming', async t => {
 
 test('Streaming to Dlive', async t => {
   // click Log-in
-  await click(t, '.icon-settings');
-  await focusChild(t);
   await click(t, '.fa-sign-in-alt');
-  await focusMain(t);
 
   // select DLive from the "use another platform list"
   await fillForm(t, null, { otherPlatform: 'dlive' });
