@@ -4,7 +4,7 @@ import ModalLayout from 'components/ModalLayout.vue';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import TsxComponent from 'components/tsx-component';
-import { SelectionService } from 'services/selection';
+import { GlobalSelection, SelectionService } from 'services/selection';
 import { $t } from 'services/i18n';
 import { NumberInput } from 'components/shared/inputs/inputs';
 import { WindowsService } from 'services/windows';
@@ -26,10 +26,15 @@ export default class EditTransform extends TsxComponent<{}> {
   @Inject() windowsService: WindowsService;
   @Inject() private editorCommandsService: EditorCommandsService;
 
-  selection = this.selectionService.views.globalSelection;
+  selection: GlobalSelection = null;
+  rect: IVec2 = null;
 
-  // We only care about the attributes of the rectangle not the functionality
-  rect = { ...this.selection.getBoundingRect() };
+  mounted() {
+    this.selection = this.selectionService.views.globalSelection;
+
+    // We only care about the attributes of the rectangle not the functionality
+    this.rect = { ...this.selection.getBoundingRect() };
+  }
 
   $refs: {
     validForm: ValidatedForm;
@@ -97,7 +102,8 @@ export default class EditTransform extends TsxComponent<{}> {
   }
 
   get cropForm() {
-    return this.selection.isSceneItem() ? (
+    if (!this.selection || !this.selection.isSceneItem()) return null;
+    return (
       <HFormGroup metadata={{ title: $t('Crop') }}>
         {['left', 'right', 'top', 'bottom'].map((dir: keyof ICrop) => (
           <div style="display: flex; align-items: center; margin-bottom: 8px;">
@@ -110,13 +116,14 @@ export default class EditTransform extends TsxComponent<{}> {
           </div>
         ))}
       </HFormGroup>
-    ) : null;
+    );
   }
 
   coordinateForm(type: string) {
     const title = type === 'pos' ? $t('Position') : $t('Size');
     const dataArray = type === 'pos' ? ['x', 'y'] : ['width', 'height'];
     const inputHandler = type === 'pos' ? this.setPos : this.setScale;
+    if (!this.rect) return null;
     if (dataArray.some(dir => isNaN(Math.round(this.rect[dir])))) return null;
     return (
       <HFormGroup metadata={{ title }}>
@@ -135,29 +142,43 @@ export default class EditTransform extends TsxComponent<{}> {
     );
   }
 
+  get rotationForm() {
+    return (
+      <HFormGroup metadata={{ title: $t('Rotation') }}>
+        <button
+          class="button button--default"
+          style="width: 172px;"
+          onClick={() => this.rotate(90)}
+        >
+          {$t('Rotate 90 Degrees CW')}
+        </button>
+        <div style="margin: 8px;" />
+        <button
+          class="button button--default"
+          style="width: 172px;"
+          onClick={() => this.rotate(-90)}
+        >
+          {$t('Rotate 90 Degrees CCW')}
+        </button>
+      </HFormGroup>
+    );
+  }
+
   render() {
     return (
       <ModalLayout customControls showControls={false}>
         <ValidatedForm slot="content" name="transform" ref="validForm">
           {this.coordinateForm('pos')}
           {this.coordinateForm('scale')}
-          <HFormGroup metadata={{ title: $t('Rotation') }}>
-            <button class="button button--default" style="width: 172px;" onClick={this.rotate(90)}>
-              {$t('Rotate 90 Degrees CW')}
-            </button>
-            <div style="margin: 8px;" />
-            <button class="button button--default" style="width: 172px;" onClick={this.rotate(-90)}>
-              {$t('Rotate 90 Degrees CCW')}
-            </button>
-          </HFormGroup>
+          {this.rotationForm}
           {this.cropForm}
         </ValidatedForm>
 
         <div slot="controls">
-          <button class="button button--default" onClick={this.reset}>
+          <button class="button button--default" onClick={() => this.reset()}>
             {$t('Reset')}
           </button>
-          <button class="button button--action" onClick={this.cancel}>
+          <button class="button button--action" onClick={() => this.cancel()}>
             {$t('Done')}
           </button>
         </div>
