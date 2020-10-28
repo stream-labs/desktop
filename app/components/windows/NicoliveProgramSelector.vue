@@ -157,7 +157,7 @@
   font-size: 12px;
   color: @grey;
   margin: 4px 0 0;
-  .text-ellipsis;
+  .text-ellipsis();
 }
 
 .nicolive-program-selector-container {
