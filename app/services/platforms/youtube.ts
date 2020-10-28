@@ -77,6 +77,7 @@ export interface IYoutubeLiveBroadcast {
     lifeCycleStatus: TBroadcastLifecycleStatus;
     privacyStatus: 'private' | 'public' | 'unlisted';
     recordingStatus: 'notRecording' | 'recorded' | 'recording';
+    selfDeclaredMadeForKids: boolean;
   };
 }
 
@@ -130,6 +131,7 @@ interface IExtraBroadcastSettings {
   enableDvr?: boolean;
   projection?: 'rectangular' | '360';
   latencyPreference?: 'normal' | 'low' | 'ultraLow';
+  selfDeclaredMadeForKids?: boolean;
 }
 
 type TStreamStatus = 'active' | 'created' | 'error' | 'inactive' | 'ready';
@@ -170,6 +172,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       projection: 'rectangular',
       latencyPreference: 'normal',
       privacyStatus: 'public',
+      selfDeclaredMadeForKids: false,
     },
   };
 
@@ -236,8 +239,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     if (!ytSettings.broadcastId) {
       broadcast = await this.createBroadcast(ytSettings);
     } else {
-      await this.updateBroadcast(ytSettings.broadcastId, ytSettings);
-      broadcast = await this.fetchBroadcast(ytSettings.broadcastId);
+      broadcast = await this.updateBroadcast(ytSettings.broadcastId, ytSettings);
     }
 
     // create a LiveStream object and bind it with current LiveBroadcast
@@ -248,14 +250,6 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     } else {
       stream = await this.fetchLiveStream(broadcast.contentDetails.boundStreamId);
     }
-
-    // set the category
-    await this.updateCategory(
-      broadcast.id,
-      broadcast.snippet.title,
-      broadcast.snippet.description,
-      ytSettings.categoryId!,
-    );
 
     // setup key and platform type in the OBS settings
     const streamKey = stream.cdn.ingestionInfo.streamName;
@@ -341,15 +335,10 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     return collection.items.filter(category => category.snippet.assignable);
   }
 
-  private async updateCategory(
-    broadcastId: string,
-    title: string,
-    description: string,
-    categoryId: string,
-  ) {
+  private async updateCategory(broadcastId: string, title: string, categoryId: string) {
     const endpoint = 'videos?part=snippet';
     await this.requestYoutube({
-      body: JSON.stringify({ id: broadcastId, snippet: { categoryId, title, description } }),
+      body: JSON.stringify({ id: broadcastId, snippet: { categoryId, title } }),
       method: 'PUT',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
     });
@@ -403,7 +392,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     const broadcastId = this.state.settings.broadcastId;
     assertIsDefined(broadcastId);
     await this.updateBroadcast(broadcastId, options);
-    this.UPDATE_STREAM_SETTINGS(options);
+    this.UPDATE_STREAM_SETTINGS({ ...options, broadcastId });
     return true;
   }
 
@@ -428,14 +417,21 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
         projection: params.projection,
         latencyPreference: params.latencyPreference,
       },
-      status: { privacyStatus: params.privacyStatus },
+      status: {
+        privacyStatus: params.privacyStatus,
+        selfDeclaredMadeForKids: params.selfDeclaredMadeForKids,
+      },
     };
 
-    return await this.requestYoutube<IYoutubeLiveBroadcast>({
+    const broadcast = await this.requestYoutube<IYoutubeLiveBroadcast>({
       body: JSON.stringify(data),
       method: 'POST',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
     });
+    return broadcast;
+
+    // update additional settings
+    // return await this.updateBroadcast(broadcast.id, params);
   }
 
   /**
@@ -444,7 +440,10 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   private async updateBroadcast(
     id: string,
     params: Partial<IYoutubeStartStreamOptions>,
-  ): Promise<void> {
+  ): Promise<IYoutubeLiveBroadcast> {
+    // set the category
+    // await this.updateCategory(id, params.title, params.categoryId!);
+
     const broadcast = await this.fetchBroadcast(id);
 
     const snippet: Partial<IYoutubeLiveBroadcast['snippet']> = {
@@ -454,8 +453,12 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     };
 
     const contentDetails: Dictionary<any> = {
+      enableAutoStart: params.enableAutoStart,
       enableAutoStop: params.enableAutoStop,
       enableDvr: params.enableDvr,
+      projection: params.projection,
+      // latencyPreference: params.latencyPreference,
+      enableEmbed: broadcast.contentDetails.enableEmbed,
 
       // YT requires to setup these options on broadcast update if contentDetails provided
       recordFromStart: broadcast.contentDetails.recordFromStart,
@@ -467,22 +470,16 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       },
     };
 
-    // we must provide value for `contentDetails.enableEmbed` unless the broadcast in the testing state.
-    if (!['testing'].includes(broadcast.status.lifeCycleStatus)) {
-      contentDetails.enableEmbed = broadcast.contentDetails.enableEmbed;
-    }
-
     const status: Partial<IYoutubeLiveBroadcast['status']> = {
       privacyStatus: params.privacyStatus,
+      selfDeclaredMadeForKids: params.selfDeclaredMadeForKids,
     };
 
     const fields = ['snippet', 'status', 'contentDetails'];
     const endpoint = `liveBroadcasts?part=${fields.join(',')}&id=${id}`;
-
     const body: Dictionary<any> = { id, snippet, contentDetails, status };
-    if (params.privacyStatus) body.status = { privacyStatus: params.privacyStatus };
 
-    await this.requestYoutube<IYoutubeLiveBroadcast>({
+    return await this.requestYoutube<IYoutubeLiveBroadcast>({
       body: JSON.stringify(body),
       method: 'PUT',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
