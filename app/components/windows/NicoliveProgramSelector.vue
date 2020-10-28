@@ -135,7 +135,7 @@
   &.active {
     color: @white;
     cursor: default;
-    .bg-active;
+    .bg-active();
   }
 
   &:not(.active):not(.disabled):hover {
