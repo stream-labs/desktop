@@ -28,7 +28,7 @@
             "name": "font-manager",
             "url": "https://slobs-font-manager.s3-us-west-2.amazonaws.com/",
             "archive": "font-manager-[VERSION]-[OS].tar.gz",
-            "version": "1.1.7",
+            "version": "1.1.8",
             "win64": true,
             "osx": true
         },
