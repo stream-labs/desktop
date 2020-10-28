@@ -14,9 +14,10 @@
         :to="step"
         :ico=" isCompletedStep(step) ? 'icon-check' : undefined"
         :data-test="step"
+        :class="'step-item'"
       >
-        <h3>{{ getStepTitleForMenu(step) }}</h3>
-        <p v-if="isCompletedStep(step)">{{ getSelectedValueForDisplay(step) }}</p>
+        <h3 class="step-item-title">{{ getStepTitleForMenu(step) }}</h3>
+        <p class="step-item-selected-item" v-if="isCompletedStep(step)">{{ getSelectedValueForDisplay(step) }}</p>
       </NavItem>
     </NavMenu>
     <div class="nicolive-program-selector-container">
@@ -53,17 +54,17 @@
           :title="getStepTitle(currentStep)"
           :description="getStepDescription(currentStep)">
           <!-- 文言に改行タグ <br /> を含むため、 v-html で HTML を注入しています。-->
-          <div class="section"
+          <div class="no-program-message"
              v-if="canShowNoProgramsSection()"
              v-html="$t('streaming.nicoliveProgramSelector.noChannelPrograms')"
           />
           <ul class="list" v-else>
             <li v-for="program in candidatePrograms" :key="program.id">
               <a @click="onSelectBroadcastingProgram(program.id, program.title)" >
-                <p class="anchor-text">{{ program.title }}</p>
                 <p class="annotation">
                   <span class="lv">{{ program.id }}</span>
                 </p>
+                <p class="anchor-text">{{ program.title }}</p>
               </a>
             </li>
           </ul>
@@ -75,7 +76,7 @@
         :description="getStepDescription(currentStep)">
           <ul class="list">
             <li v-for="step in selectionSteps" :key="step">
-              <div class="caption">{{ getStepTitle(step) }}</div>
+              <div class="caption">{{ getStepTitleForMenu(step) }}</div>
               <div class="value">{{ getSelectedValueForDisplay(step) || '-' }}</div>
             </li>
           </ul>
@@ -97,6 +98,7 @@
 
 <style lang="less" scoped>
 @import "../../styles/_colors";
+@import "../../styles/mixins";
 
 .nicolive-program-selector {
   display: flex;
@@ -105,6 +107,57 @@
 
 .side-menu {
   overflow-y: auto;
+  padding: 8px 0;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 40px 12px 16px;
+  position: relative;
+
+  & /deep/ .icon-check {
+    font-size: 12px;
+    color: @accent;
+    width: auto;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: inherit;
+    right: 16px;
+    transform: translateY(-50%);
+  }
+
+  & /deep/ .nav-item__name {
+    max-width: inherit;
+  }
+
+  &.active {
+    color: @white;
+    cursor: default;
+    .bg-active();
+  }
+
+  &:not(.active):not(.disabled):hover {
+    .bg-hover();
+  }
+}
+
+.step-item-title {
+  font-size: 14px;
+  color: @light-grey;
+  margin: 0;
+
+  .step-item.active & {
+    color: @text-active;
+  }
+}
+
+.step-item-selected-item {
+  font-size: 12px;
+  color: @grey;
+  margin: 4px 0 0;
+  .text-ellipsis();
 }
 
 .nicolive-program-selector-container {
@@ -115,68 +168,82 @@
 }
 
 .list {
-  margin-left: 0;
+  margin: 0;
   width: 100%;
+  padding: 8px 0;
+
   > li {
     list-style: none;
     position: relative;
-    padding: 0;
     margin: 0;
-    border-bottom: 2px solid @bg-secondary;
-    &:hover {
-      background-color: @bg-secondary;
+    padding: 0;
+
+    .confirm-step & {
+      display: flex;
+      flex-direction: column;
+      padding: 12px 24px;
     }
-    &:last-child {
-      border-bottom: none;
+
+    > .caption {
+      color: @grey;
+      font-size: 12px;
+      margin-bottom: 8px;
     }
+
+    > .value {
+      color: @white;
+      font-size: 14px;
+    }
+
     > a {
+      display: flex;
+      align-items: center;
       width: 100%;
-      display: block;
-      text-align: left;
-      padding: 8px 0;
-      margin-left: 0;
-      margin-right: 0;
+      min-height: 56px;
+      padding: 12px 16px;
       cursor: pointer;
-      position: relative;
-      z-index: 2;
-      transition: color 200ms ease-in;
-      overflow: hidden;
       text-decoration: none;
-      color: @text-secondary;
+
+      &:hover {
+        .bg-hover();
+      }
+
+      .program-select-step & {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
       .channel-thumbnail {
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
+        margin-right: 16px;
         background-color: @bg-secondary;
         overflow: hidden;
         border-radius: 50%;
+        flex-shrink: 0;
       }
+
       .anchor-text {
-        display: inline-block;
-        font-size: 16px;
-        text-indent: 1.3em;
-        margin-bottom: 0;
-        width: 80%;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        box-sizing: border-box;
-      }
-      .annotation {
-        display: inline-block;
+        color: @white;
         font-size: 14px;
-        margin-bottom: 0;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        box-sizing: border-box;
+        margin: 0;
+        .text-ellipsis();
+      }
+
+      .annotation {
+        margin-bottom: 8px;
+        
         .lv {
+          display: block;
           font-size: 12px;
-          background-color: @text-secondary;
-          color: @bg-primary;
+          line-height: 24px;
+          background-color: @bg-quinary;
+          color: @white;
           border-radius: 2px;
-          padding: 2px 4px;
+          padding: 0 8px;
         }
       }
+
       &:after {
         width: 6px;
         height: 6px;
@@ -193,19 +260,11 @@
     }
   }
 }
-.confirm-step {
-  ul {
-    > li {
-      font-size: 16px;
-      display: flex;
-      justify-content: space-around;
-      > .caption {
-        width: 30%;
-      }
-      > .value {
-        width: 60%;
-      }
-    }
-  }
+
+.no-program-message {
+  color: @grey;
+  text-align: center;
+  margin: auto;
+  padding-bottom: 80px;
 }
 </style>

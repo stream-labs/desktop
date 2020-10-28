@@ -51,7 +51,7 @@
         "description": "リストから配信したいチャンネルを選択してください。"
       },
       "programSelect": {
-        "menuTitle": "配信番組択",
+        "menuTitle": "配信番組",
         "title":"配信番組を選択",
         "description": "配信を開始する番組を選択してください。"
       },

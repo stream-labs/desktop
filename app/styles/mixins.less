@@ -124,5 +124,11 @@
 }
 
 .bg-active(@color: @black) {
-  background-color: rgba(@color, .2);
+  background-color: rgba(@color, .25);
+}
+
+.text-ellipsis() {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
