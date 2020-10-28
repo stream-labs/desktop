@@ -227,7 +227,7 @@
         color: @white;
         font-size: 14px;
         margin: 0;
-        .text-ellipsis;
+        .text-ellipsis();
       }
 
       .annotation {
