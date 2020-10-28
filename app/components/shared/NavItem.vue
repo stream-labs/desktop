@@ -28,7 +28,7 @@
   &.active {
     opacity: 1;
     color: @text-primary;
-    .bg-active;
+    .bg-active();
     .semibold;
 
     i {
