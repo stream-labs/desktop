@@ -448,6 +448,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       this.SET_ERROR(errorType, errorDetails, platform);
     }
     const error = this.state.info.error;
+    assertIsDefined(error);
     console.error(error.message, error);
   }
 
