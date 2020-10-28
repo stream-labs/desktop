@@ -205,7 +205,7 @@
       text-decoration: none;
 
       &:hover {
-        .bg-hover;
+        .bg-hover();
       }
 
       .program-select-step & {
