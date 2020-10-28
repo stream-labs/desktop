@@ -1,4 +1,4 @@
-import { FailedResult } from './NicoliveClient';
+import { FailedResult, NotLoggedInError } from './NicoliveClient';
 import { $t } from 'services/i18n';
 import { remote } from 'electron';
 
@@ -11,6 +11,10 @@ export class NicoliveFailure {
   ) {}
 
   static fromClientError(method: string, res: FailedResult) {
+    if (res.value instanceof NotLoggedInError) {
+      console.error(res.value);
+      return new this('logic', method, 'not_logged_in')
+    }
     if (res.value instanceof Error) {
       console.error(res.value);
       return new this('network_error', method, 'network_error');

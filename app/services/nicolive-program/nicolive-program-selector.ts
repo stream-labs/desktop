@@ -1,6 +1,7 @@
 import { StatefulService, mutation } from 'services/stateful-service';
-import { NicoliveClient } from './NicoliveClient';
+import { NicoliveClient, isOk } from './NicoliveClient';
 import { OnairChannelData } from './ResponseTypes';
+import { NicoliveFailure, openErrorDialogFromFailure } from './NicoliveFailure';
 
 /**
  * 配信する番組種別
@@ -77,17 +78,21 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
         isLoading: true
       });
       try {
-        const candidateChannels = await this.client.fetchOnairChannels();
+        const methodName = 'fetchOnairChannels';
+        const onairChannelsResult = await this.client.fetchOnairChannels();
+        if (!isOk(onairChannelsResult)) {
+          throw NicoliveFailure.fromClientError(methodName, onairChannelsResult);
+        }
+        if (onairChannelsResult.value.length < 1) {
+          throw NicoliveFailure.fromConditionalError(methodName, 'no_channels');
+        }
         this.SET_STATE({
           isLoading: false,
-          candidateChannels
+          candidateChannels: onairChannelsResult.value
         });
       } catch (error) {
-        // 番組選択ウィンドウを出した後、メインウィンドウでログアウトした場合にここに到達することがある
-        // TODO: 何らかのエラー表示を出すか、エラー時の挙動を決める
-        this.SET_STATE({
-          isLoading: false
-        })
+        await openErrorDialogFromFailure(error);
+        this.SET_STATE({ isLoading: false })
       }
     } else { // providerType === 'user'
       this.SET_STATE({
@@ -95,6 +100,20 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
         selectedChannel: null,
         currentStep: 'confirm'
       });
+    }
+  }
+
+  private async fetchOnairChannelPrograms(channelId: string) {
+    try {
+      const onairChannelProgramResult = await this.client.fetchOnairChannelProgram(channelId);
+      if ((isOk(onairChannelProgramResult))) {
+        const { testProgramId, programId, nextProgramId } = onairChannelProgramResult.value;
+        return [testProgramId, programId, nextProgramId];
+      } else {
+        throw onairChannelProgramResult;
+      }
+    } catch (error) {
+        throw NicoliveFailure.fromClientError('fetchOnairChannelProgram', error);
     }
   }
 
@@ -114,20 +133,24 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
       candidatePrograms: [],
       isLoading: true
     });
-    const { testProgramId, programId, nextProgramId } = await this.client.fetchOnairChannelProgram(id);
-    const candidateProgramIds = [testProgramId, programId, nextProgramId].filter(Boolean);
-    const candidatePrograms = (await Promise.all(candidateProgramIds.map(async (programId) => {
-      try {
-        const program = await this.client.fetchProgram(programId);
-        return program.ok ? { id: programId, title: program.value.title } : undefined;
-      } catch (error) {
-        return undefined;
-      }
-    }))).filter(Boolean);
-    this.SET_STATE({
-      candidatePrograms,
-      isLoading: false
-    });
+    try {
+      const programs = await this.fetchOnairChannelPrograms(id);
+      const candidateProgramIds = programs.filter(Boolean);
+      const candidatePrograms = (await Promise.all(candidateProgramIds.map(async (programId) => {
+        const programResult = await this.client.fetchProgram(programId);
+        if (isOk(programResult)) {
+          return { id: programId, title: programResult.value.title }
+        }
+        throw NicoliveFailure.fromClientError('fetchProgram', programResult);
+      }))).filter(Boolean);
+      this.SET_STATE({
+        candidatePrograms,
+        isLoading: false
+      });
+    } catch (error) {
+      await openErrorDialogFromFailure(error);
+      this.SET_STATE({ isLoading: false });
+    }
   }
 
   onSelectBroadcastingProgram(id: string, title: string) {
@@ -160,6 +183,14 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
       return false;
     }
     return stepsMap[this.state.currentStep] > stepsMap[step];
+  }
+
+  /**
+   * 状態を初期状態にリセットする.
+   */
+  reset() {
+    this.backTo('providerTypeSelect');
+    this.SET_STATE({ isLoading: false });
   }
 
   /**

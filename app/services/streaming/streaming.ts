@@ -158,10 +158,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
         // 配信番組選択ウィンドウ以外からの呼び出し時
         if (!opts.nicoliveProgramSelectorResult) {
-          const broadcastableChannels = await this.client.fetchOnairChannels();
+          const broadcastableChannelsResult = await this.client.fetchOnairChannels();
 
           // 配信可能チャンネルがある時
-          if (broadcastableChannels.length > 0) {
+          // エラー時は チャンネルがない時と同様の挙動とする
+          if (isOk(broadcastableChannelsResult) && broadcastableChannelsResult.value.length > 0) {
             this.windowsService.showWindow({
               componentName: 'NicoliveProgramSelector',
               size: {
