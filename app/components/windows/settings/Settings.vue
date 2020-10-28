@@ -53,7 +53,7 @@
           <i :class="userService.isLoggedIn ? 'fas fa-sign-out-alt' : 'fas fa-sign-in-alt'" />
           <strong>{{ userService.isLoggedIn ? $t('Log Out') : $t('Log In') }}</strong>
           <platform-logo v-if="userService.isLoggedIn" :platform="userService.platform.type" />
-          <span>{{ userService.isLoggedIn && userService.username }}</span>
+          <span v-if="userService.isLoggedIn">{{ userService.username }}</span>
         </button>
       </NavMenu>
 
