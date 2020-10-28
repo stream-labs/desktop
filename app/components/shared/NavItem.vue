@@ -37,7 +37,7 @@
   }
 
   &:not(.active):not(.disabled):hover {
-    .bg-hover;
+    .bg-hover();
   }
 
   &.disabled {
