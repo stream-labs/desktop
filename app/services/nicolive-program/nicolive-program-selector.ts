@@ -140,8 +140,12 @@ export class NicoliveProgramSelectorService extends StatefulService<INicolivePro
         const programResult = await this.client.fetchProgram(programId);
         if (isOk(programResult)) {
           return { id: programId, title: programResult.value.title }
+        } else if (programResult.value instanceof Error || programResult.value.meta.status !== 404) {
+          // ネットワークエラー, メンテナンスの場合など
+          throw NicoliveFailure.fromClientError('fetchProgram', programResult);
         }
-        throw NicoliveFailure.fromClientError('fetchProgram', programResult);
+        // 与えられた lv の番組が見つからない場合 (HTTP 404 時) はその番組は出さない
+        return undefined;
       }))).filter(Boolean);
       this.SET_STATE({
         candidatePrograms,
