@@ -88,6 +88,7 @@ export class DestinationSwitchers extends TsxComponent<Props> {
     const platformName = platformService.displayName;
     const username = this.userService.state.auth?.platforms[platform]!.username;
     const title = this.props.title ? $t(this.props.title, { platformName }) : platformName;
+    const canDisablePrimary = this.props.canDisablePrimary;
 
     return (
       <div
@@ -95,7 +96,7 @@ export class DestinationSwitchers extends TsxComponent<Props> {
         onClick={() => this.onSwitchPlatformHandler(platform, !enabled)}
       >
         <div class={cx(styles.colInput)}>
-          {isPrimary ? (
+          {isPrimary && !canDisablePrimary ? (
             <span
               vTooltip={$t(
                 'You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destination.',
