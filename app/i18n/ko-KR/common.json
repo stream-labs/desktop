@@ -55,6 +55,7 @@
   "Cloudbot": "클라우드봇",
   "Merch": "MD",
   "App Store": "앱스토어",
+  "Alertbox Library": "Alertbox Library",
   "New": "신규",
   "Face Masks": "얼굴 마스크",
   "Help": "도움말",
@@ -118,5 +119,5 @@
   "Apps": "앱",
   "Finish": "종료",
   "Get Prime": "Prime 이용하기",
-  "System error message:": "System error message:"
+  "System error message:": "시스템 오류 메시지:"
 }
