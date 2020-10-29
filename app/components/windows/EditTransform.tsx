@@ -88,8 +88,8 @@ export default class EditTransform extends TsxComponent<{}> {
   }
 
   rotate(deg: number) {
-    return () =>
-      this.editorCommandsService.executeCommand('RotateItemsCommand', this.selection, deg);
+    console.log('firing');
+    this.editorCommandsService.executeCommand('RotateItemsCommand', this.selection, deg);
   }
 
   reset() {
@@ -122,20 +122,19 @@ export default class EditTransform extends TsxComponent<{}> {
   coordinateForm(type: string) {
     const title = type === 'pos' ? $t('Position') : $t('Size');
     const dataArray = type === 'pos' ? ['x', 'y'] : ['width', 'height'];
-    const inputHandler = type === 'pos' ? this.setPos : this.setScale;
+    const inputHandler = (dir: string) => (type === 'pos' ? this.setPos(dir) : this.setScale(dir));
     if (!this.rect) return null;
     if (dataArray.some(dir => isNaN(Math.round(this.rect[dir])))) return null;
     return (
       <HFormGroup metadata={{ title }}>
         <div style="display: flex;">
           {dataArray.map(dir => (
-            <div style="margin-right: 8px;">
-              <NumberInput
-                value={Math.round(this.rect[dir])}
-                metadata={{ isInteger: true, min: type === 'pos' ? null : 1 }}
-                onInput={inputHandler(dir)}
-              />
-            </div>
+            <NumberInput
+              style="margin-right: 8px;"
+              value={Math.round(this.rect[dir])}
+              metadata={{ isInteger: true, min: type === 'pos' ? null : 1 }}
+              onInput={(dir: string) => inputHandler(dir)}
+            />
           ))}
         </div>
       </HFormGroup>
@@ -145,21 +144,13 @@ export default class EditTransform extends TsxComponent<{}> {
   get rotationForm() {
     return (
       <HFormGroup metadata={{ title: $t('Rotation') }}>
-        <button
-          class="button button--default"
-          style="width: 172px;"
-          onClick={() => this.rotate(90)}
-        >
+        <div class="button button--default" style="width: 172px;" onClick={() => this.rotate(90)}>
           {$t('Rotate 90 Degrees CW')}
-        </button>
+        </div>
         <div style="margin: 8px;" />
-        <button
-          class="button button--default"
-          style="width: 172px;"
-          onClick={() => this.rotate(-90)}
-        >
+        <div class="button button--default" style="width: 172px;" onClick={() => this.rotate(-90)}>
           {$t('Rotate 90 Degrees CCW')}
-        </button>
+        </div>
       </HFormGroup>
     );
   }
