@@ -178,6 +178,10 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
 
   readonly platform = 'youtube';
   readonly displayName = 'YouTube';
+
+  /**
+   * The list of fields we can update in the mid stream mode
+   */
   readonly updatableSettings: (keyof IYoutubeStartStreamOptions)[] = [
     'title',
     'description',
@@ -239,7 +243,8 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     if (!ytSettings.broadcastId) {
       broadcast = await this.createBroadcast(ytSettings);
     } else {
-      broadcast = await this.updateBroadcast(ytSettings.broadcastId, ytSettings);
+      await this.updateBroadcast(ytSettings.broadcastId, ytSettings);
+      broadcast = await this.fetchBroadcast(ytSettings.broadcastId);
     }
 
     // create a LiveStream object and bind it with current LiveBroadcast
@@ -250,6 +255,14 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     } else {
       stream = await this.fetchLiveStream(broadcast.contentDetails.boundStreamId);
     }
+
+    // set the category
+    await this.updateCategory(
+      broadcast.id,
+      broadcast.snippet.title,
+      broadcast.snippet.description,
+      ytSettings.categoryId!,
+    );
 
     // setup key and platform type in the OBS settings
     const streamKey = stream.cdn.ingestionInfo.streamName;
@@ -335,10 +348,15 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     return collection.items.filter(category => category.snippet.assignable);
   }
 
-  private async updateCategory(broadcastId: string, title: string, categoryId: string) {
+  private async updateCategory(
+    broadcastId: string,
+    title: string,
+    description: string,
+    categoryId: string,
+  ) {
     const endpoint = 'videos?part=snippet';
     await this.requestYoutube({
-      body: JSON.stringify({ id: broadcastId, snippet: { categoryId, title } }),
+      body: JSON.stringify({ id: broadcastId, snippet: { categoryId, title, description } }),
       method: 'PUT',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
     });
@@ -391,7 +409,17 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   async putChannelInfo(options: IYoutubeStartStreamOptions): Promise<boolean> {
     const broadcastId = this.state.settings.broadcastId;
     assertIsDefined(broadcastId);
-    await this.updateBroadcast(broadcastId, options);
+
+    if (this.state.settings.categoryId !== options.categoryId) {
+      await this.updateCategory(
+        broadcastId,
+        options.title,
+        options.description,
+        options.categoryId,
+      );
+    }
+
+    await this.updateBroadcast(broadcastId, options, true);
     this.UPDATE_STREAM_SETTINGS({ ...options, broadcastId });
     return true;
   }
@@ -440,10 +468,8 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   private async updateBroadcast(
     id: string,
     params: Partial<IYoutubeStartStreamOptions>,
-  ): Promise<IYoutubeLiveBroadcast> {
-    // set the category
-    // await this.updateCategory(id, params.title, params.categoryId!);
-
+    isMidStreamMode = false,
+  ): Promise<void> {
     const broadcast = await this.fetchBroadcast(id);
 
     const snippet: Partial<IYoutubeLiveBroadcast['snippet']> = {
@@ -453,12 +479,17 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     };
 
     const contentDetails: Dictionary<any> = {
-      enableAutoStart: params.enableAutoStart,
+      enableAutoStart: isMidStreamMode
+        ? broadcast.contentDetails.enableAutoStart
+        : params.enableAutoStop,
       enableAutoStop: params.enableAutoStop,
       enableDvr: params.enableDvr,
-      projection: params.projection,
-      // latencyPreference: params.latencyPreference,
       enableEmbed: broadcast.contentDetails.enableEmbed,
+      projection: isMidStreamMode ? broadcast.contentDetails.projection : params.projection,
+      enableLowLatency: false,
+      latencyPreference: isMidStreamMode
+        ? broadcast.contentDetails.latencyPreference
+        : params.latencyPreference,
 
       // YT requires to setup these options on broadcast update if contentDetails provided
       recordFromStart: broadcast.contentDetails.recordFromStart,
@@ -479,7 +510,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     const endpoint = `liveBroadcasts?part=${fields.join(',')}&id=${id}`;
     const body: Dictionary<any> = { id, snippet, contentDetails, status };
 
-    return await this.requestYoutube<IYoutubeLiveBroadcast>({
+    await this.requestYoutube<IYoutubeLiveBroadcast>({
       body: JSON.stringify(body),
       method: 'PUT',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
