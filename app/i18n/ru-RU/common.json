@@ -55,6 +55,7 @@
   "Cloudbot": "Облачный бот",
   "Merch": "Мерч",
   "App Store": "Магазин приложений",
+  "Alertbox Library": "Alertbox Library",
   "New": "Новинки",
   "Face Masks": "Лицевые маски",
   "Help": "Помощь",
@@ -118,5 +119,5 @@
   "Apps": "Приложения",
   "Finish": "Готово",
   "Get Prime": "Приобрести подписку Prime",
-  "System error message:": "System error message:"
+  "System error message:": "Сообщение о системной ошибке:"
 }
