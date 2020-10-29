@@ -32,7 +32,7 @@ export interface IYoutubeStartStreamOptions extends IExtraBroadcastSettings {
   title: string;
   categoryId?: string;
   broadcastId?: string;
-  description?: string;
+  description: string;
   privacyStatus?: 'private' | 'public' | 'unlisted';
 }
 
@@ -415,7 +415,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
         broadcastId,
         options.title,
         options.description,
-        options.categoryId,
+        options.categoryId!,
       );
     }
 

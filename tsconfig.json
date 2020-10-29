@@ -20,7 +20,7 @@
     "outDir": "bundles/ts",
     "sourceMap": true,
     "allowJs": false,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "emitDecoratorMetadata": true,
     "baseUrl": "./app",
     "jsx": "preserve"
