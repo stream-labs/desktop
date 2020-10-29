@@ -41,7 +41,7 @@ interface IMediaFileDataResponse {
   url: string;
 }
 
-const ONE_GIGABYTE = Math.pow(10, 9);
+const ONE_MEGABYTE = 1_048_576;
 
 export class MediaBackupService extends StatefulService<IMediaBackupState> {
   @Inject() hostsService: HostsService;
@@ -106,7 +106,8 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
       return null;
     }
 
-    if (stats.size > ONE_GIGABYTE) {
+    // Upload limit is 350MB
+    if (stats.size > ONE_MEGABYTE * 350) {
       // We don't upload files larger than 1 gigabyte
       return null;
     }
