@@ -382,7 +382,7 @@ test('toggleStreamingAsyncでstreamingStatusがoffline以外の場合', async ()
   const { instance } = StreamingService;
 
   instance.client.fetchOnairUserProgram = jest.fn(() => Promise.resolve('lv12345'));
-  instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve([]));
+  instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve({ ok: true, value: [] }));
 
   instance.toggleStreaming = jest.fn();
 
@@ -436,7 +436,7 @@ test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログ�
   }];
 
   instance.client.fetchOnairUserProgram = jest.fn(() => Promise.resolve({ programId: 'lv12345' }));
-  instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve(channels));
+  instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve({ ok: true, value: channels }));
 
   instance.toggleStreaming = jest.fn();
 
@@ -464,7 +464,7 @@ test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログ�
   const { instance } = StreamingService;
 
   instance.client.fetchOnairUserProgram = jest.fn(() => Promise.resolve(undefined));
-  instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve([]));
+  instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve({ ok: true, value: [] }));
 
   instance.toggleStreaming = jest.fn();
   instance.optimizeForNiconicoAndStartStreaming = jest.fn();
@@ -503,7 +503,7 @@ test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログ�
   instance.toggleStreaming = jest.fn();
 
   instance.client.fetchOnairUserProgram = jest.fn(() => Promise.resolve({ programId: 'lv12345' }));
-  instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve([]));
+  instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve({ ok: true, value: [] }));
 
   await instance.toggleStreamingAsync();
 
@@ -532,7 +532,7 @@ test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログ�
   instance.optimizeForNiconicoAndStartStreaming = jest.fn();
 
   instance.client.fetchOnairUserProgram = jest.fn(() => Promise.resolve({ programId: 'lv12345' }));
-  instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve([]));
+  instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve({ ok: true, value: [] }));
 
   await instance.toggleStreamingAsync();
 
@@ -567,7 +567,7 @@ test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログ�
   instance.optimizeForNiconicoAndStartStreaming = jest.fn();
 
   instance.client.fetchOnairUserProgram = jest.fn(() => Promise.resolve({ programId: 'lv12345' }));
-  instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve([]));
+  instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve({ ok: true, value: [] }));
 
   await instance.toggleStreamingAsync();
 
@@ -605,7 +605,7 @@ test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログ�
   instance.optimizeForNiconicoAndStartStreaming = jest.fn();
 
   instance.client.fetchOnairUserProgram = jest.fn(() => Promise.resolve({ programId: 'lv12345' }));
-  instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve([]));
+  instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve({ ok: true, value: [] }));
 
   await instance.toggleStreamingAsync();
 

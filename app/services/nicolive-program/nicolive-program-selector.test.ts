@@ -14,22 +14,28 @@ const setup = createSetupFunction({
 function createInstance() {
   const { NicoliveProgramSelectorService } = require('./nicolive-program-selector');
   const instance = NicoliveProgramSelectorService.instance as NicoliveProgramSelectorService;
-  instance.client.fetchOnairChannels = jest.fn().mockResolvedValue([
-    {
-      id: 'ch1',
-      thumbnailUrl: 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg',
-      name: 'テスト用チャンネル1',
-    },
-    {
-      id: 'ch2',
-      thumbnailUrl: 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg',
-      name: 'テスト用チャンネル2',
-    }
-  ] as OnairChannelData[]);
+  instance.client.fetchOnairChannels = jest.fn().mockResolvedValue({
+    ok: true,
+    value: [
+      {
+        id: 'ch1',
+        thumbnailUrl: 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg',
+        name: 'テスト用チャンネル1',
+      },
+      {
+        id: 'ch2',
+        thumbnailUrl: 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg',
+        name: 'テスト用チャンネル2',
+      }
+    ] as OnairChannelData[]
+  });
   instance.client.fetchOnairChannelProgram = jest.fn().mockResolvedValue({
-    testProgramId: 'lv1111111111',
-    programId: 'lv2222222222'
-  } as OnairChannelProgramData);
+    ok: true,
+    value: {
+      testProgramId: 'lv1111111111',
+      programId: 'lv2222222222'
+    } as OnairChannelProgramData
+  });
   instance.client.fetchProgram = jest.fn().mockImplementation(
     (programId: string) => Promise.resolve({
       ok: true,

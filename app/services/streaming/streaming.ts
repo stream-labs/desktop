@@ -163,6 +163,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           // 配信可能チャンネルがある時
           // エラー時は チャンネルがない時と同様の挙動とする
           if (isOk(broadcastableChannelsResult) && broadcastableChannelsResult.value.length > 0) {
+            console.log(1);
             this.windowsService.showWindow({
               componentName: 'NicoliveProgramSelector',
               size: {
@@ -172,6 +173,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
             });
             return;
           }
+          console.log(2);
 
           // 配信可能チャンネルがなく、配信できるユーザー生放送もない場合
           if (!broadcastableUserProgram.programId) {
