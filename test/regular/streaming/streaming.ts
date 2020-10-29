@@ -34,7 +34,7 @@ import { sleep } from '../../helpers/sleep';
 import { getClient } from '../../helpers/api-client';
 import { StreamSettingsService } from '../../../app/services/settings/streaming';
 
-useSpectron({pauseIfFailed: true});
+useSpectron();
 
 test('Streaming to Twitch without auth', async t => {
   const userInfo = await reserveUserFromPool(t, 'twitch');
