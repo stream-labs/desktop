@@ -112,15 +112,15 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     info: {
       lifecycle: 'empty',
       error: null,
+      warning: '',
       checklist: {
         applyOptimizedSettings: 'not-started',
         twitch: 'not-started',
         youtube: 'not-started',
         mixer: 'not-started',
         facebook: 'not-started',
-        setupRestream: 'not-started',
+        setupMultistream: 'not-started',
         startVideoTransmission: 'not-started',
-        publishYoutubeBroadcast: 'not-started',
         postTweet: 'not-started',
       },
     },
@@ -267,7 +267,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       let ready = false;
       try {
         await this.runCheck(
-          'setupRestream',
+          'setupMultistream',
           async () => (ready = await this.restreamService.checkStatus()),
         );
       } catch (e) {
@@ -281,7 +281,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
       // update restream settings
       try {
-        await this.runCheck('setupRestream', async () => {
+        await this.runCheck('setupMultistream', async () => {
           // enable restream on the backend side
           if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
           await this.restreamService.beforeGoLive();
@@ -311,16 +311,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       return;
     }
 
-    // publish the Youtube broadcast
-    if (this.streamSettingsService.protectedModeEnabled && settings.platforms.youtube?.enabled) {
-      try {
-        await this.runCheck('publishYoutubeBroadcast', () =>
-          this.youtubeService.publishBroadcast(),
-        );
-      } catch (e) {
-        this.setError(e);
-        return;
-      }
+    // check if we should show the waring about the disabled Auto-start
+    if (settings.platforms.youtube?.enabled && !settings.platforms.youtube.enableAutoStart) {
+      this.SET_WARNING('YT_AUTO_START_IS_DISABLED');
     }
 
     // run afterGoLive hooks
@@ -454,6 +447,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       const errorType = errorTypeOrError as TStreamErrorType;
       this.SET_ERROR(errorType, errorDetails, platform);
     }
+    const error = this.state.info.error;
+    assertIsDefined(error);
+    console.error(error.message, error);
   }
 
   resetInfo() {
@@ -869,7 +865,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         this.RESET_STREAM_INFO();
         this.rejectStartStreaming();
         this.streamingStatusChange.next(EStreamingState.Offline);
-        if (this.streamSettingsService.protectedModeEnabled) this.runPlaformAfterStopStreamHook();
         this.usageStatisticsService.recordAnalyticsEvent('StreamingStatus', {
           code: info.code,
           status: EStreamingState.Offline,
@@ -1077,13 +1072,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.state.selectiveRecording = enabled;
   }
 
-  private async runPlaformAfterStopStreamHook() {
-    if (!this.userService.isLoggedIn) return;
-    this.views.enabledPlatforms.forEach(platform => {
-      const service = getPlatformService(platform);
-      if (typeof service.afterStopStream === 'function') {
-        service.afterStopStream();
-      }
-    });
+  @mutation()
+  private SET_WARNING(warningType: 'YT_AUTO_START_IS_DISABLED') {
+    this.state.info.warning = warningType;
   }
 }
