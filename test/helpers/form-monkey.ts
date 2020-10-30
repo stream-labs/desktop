@@ -12,7 +12,7 @@ interface IUIInput {
 
 type FNValueSetter = (form: FormMonkey, input: IUIInput) => Promise<unknown>;
 
-export type TFormMonkeyData = Dictionary<string | FNValueSetter>;
+export type TFormMonkeyData = Dictionary<string | boolean | FNValueSetter>;
 
 const DEFAULT_SELECTOR = 'body';
 
@@ -323,12 +323,8 @@ export class FormMonkey {
   }
 
   async setToggleValue(selector: string, value: boolean) {
-    // click to change the ToggleInput state
-    await this.client.click(selector);
-
-    // if the current value is not what we need than click one more time
     const selected = (await this.getAttribute(selector, 'data-value')) === 'true';
-    if (value !== selected) {
+    if ((selected && !value) || (!selected && value)) {
       await this.client.click(selector);
     }
   }
@@ -484,25 +480,18 @@ export class FormMonkey {
  * select ListInput option by given title
  * able to work with a dynamic options list
  */
-export function selectTitle(optionTitle: string | RegExp): FNValueSetter {
+export function selectTitle(optionTitle: string): FNValueSetter {
   return async (form: FormMonkey, input: IUIInput) => {
-    const hasInternalSearch: boolean = JSON.parse(
-      await form.getAttribute(input.selector, 'data-internal-search'),
-    );
+    // we should start typing to load list options
+    const title = optionTitle as string;
+    await form.setTextValue(input.selector, title);
 
-    if (!hasInternalSearch) {
-      // the component has dynamic list of items, we should start typing to load list options
-      const title = optionTitle as string;
-      await form.setInputValue(input.selector, title);
+    // wait the options list loading
+    await form.client.waitForExist(`${input.selector} .multiselect__element`);
+    await form.waitForLoading(input.name);
 
-      // wait the options list loading
-      await form.client.waitForExist(`${input.selector} .multiselect__element`);
-      await form.waitForLoading(input.name);
-
-      // click to the option
-      await click(form.t, `${input.selector} .multiselect__element [data-option-title="${title}"]`);
-      return;
-    }
+    // click to the first option
+    await click(form.t, `${input.selector} .multiselect__element`);
   };
 }
 

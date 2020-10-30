@@ -8671,9 +8671,9 @@ pngjs@^3.0.0:
   integrity sha512-ggXCTsqHRIsGMkHlCEhbHhUmNTA2r1lpkE0NL4Q9S8spkXbm4vE9TVmPso2AGYn90Gltdz8W5CyzhcIGg2Gejg==
 
 popper.js@^1.12.9:
-  version "1.13.0"
-  resolved "https://registry.yarnpkg.com/popper.js/-/popper.js-1.13.0.tgz#e1e7ff65cc43f7cf9cf16f1510a75e81f84f4565"
-  integrity sha1-4ef/ZcxD98+c8W8VEKdegfhPRWU=
+  version "1.16.1"
+  resolved "https://registry.yarnpkg.com/popper.js/-/popper.js-1.16.1.tgz#2a223cb3dc7b6213d740e40372be40de43e65b1b"
+  integrity sha512-Wb4p1J4zyFTbM+u6WuO4XstYx4Ky9Cewe4DWrel7B0w6VVICvPwdOpotjzcf6eD8TsckVnIMNONQyPIUFOUbCQ==
 
 popper.js@^1.14.3:
   version "1.14.6"
@@ -11530,9 +11530,9 @@ vue-resize@0.4.4:
   integrity sha512-Lb/cnE2N9Y42ZJPw8wpjkpuX5a9ReerWNGcQRcbNCwfCnkHG6++FurNNmLIdU8dcCTH4c5rtTPdxBqFoRMK2cQ==
 
 vue-resize@^0.4.3:
-  version "0.4.3"
-  resolved "https://registry.yarnpkg.com/vue-resize/-/vue-resize-0.4.3.tgz#5bdfd1cd60eb2bf1ebc08dff1517754af69e4886"
-  integrity sha512-lFEhenRjvyzer6JylQOPltJhI48Fv2IukdGPpvb5fqK7FUGxiiGinSlAkPPdug5DQemFFysjp+8GqQU10oWouA==
+  version "0.4.5"
+  resolved "https://registry.yarnpkg.com/vue-resize/-/vue-resize-0.4.5.tgz#4777a23042e3c05620d9cbda01c0b3cc5e32dcea"
+  integrity sha512-bhP7MlgJQ8TIkZJXAfDf78uJO+mEI3CaLABLjv0WNzr4CcGRGPIAItyWYnP6LsPA4Oq0WE+suidNs6dgpO4RHg==
 
 vue-spinner@1.0.3:
   version "1.0.3"
@@ -11772,9 +11772,9 @@ websocket-driver@>=0.5.1:
     websocket-extensions ">=0.1.1"
 
 websocket-extensions@>=0.1.1:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/websocket-extensions/-/websocket-extensions-0.1.2.tgz#0e18781de629a18308ce1481650f67ffa2693a5d"
-  integrity sha1-Dhh4HeYpoYMIzhSBZQ9n/6JpOl0=
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/websocket-extensions/-/websocket-extensions-0.1.4.tgz#7f8473bc839dfd87608adb95d7eb075211578a42"
+  integrity sha512-OqedPIGOfsDlo31UNwYbCFMSaO9m9G/0faIHj5/dZFDMFqPTcx6UwqyOy3COEaEOg/9VsGIpdqn62W5KhoKSpg==
 
 well-known-symbols@^2.0.0:
   version "2.0.0"

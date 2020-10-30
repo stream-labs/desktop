@@ -8,7 +8,7 @@ import {
 } from '.';
 import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
-import { authorizedHeaders, handleResponse } from 'util/requests';
+import { authorizedHeaders, handleResponse, jfetch } from 'util/requests';
 import { UserService } from 'services/user';
 import { getAllTags, getStreamTags, TTwitchTag, updateTags } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
@@ -198,9 +198,9 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
     const headers = authorizedHeaders(this.userService.apiToken!);
     const request = new Request(url, { headers });
 
-    return fetch(request)
-      .then(handleResponse)
-      .then(response => this.userService.updatePlatformToken('twitch', response.access_token));
+    return jfetch<{ access_token: string }>(request).then(response =>
+      this.userService.updatePlatformToken('twitch', response.access_token),
+    );
   }
 
   /**

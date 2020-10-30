@@ -9,7 +9,7 @@ import {
 } from '.';
 import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
-import { authorizedHeaders, handleResponse } from 'util/requests';
+import { authorizedHeaders, handleResponse, jfetch } from 'util/requests';
 import { UserService } from 'services/user';
 import { IPlatformResponse, platformAuthorizedRequest, platformRequest } from './utils';
 import { IListOption } from 'components/shared/inputs';
@@ -105,19 +105,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   };
 
   protected init() {
-    // save settings to the local storage
-    const savedSettings: IFacebookStartStreamOptions = JSON.parse(
-      localStorage.getItem(this.serviceName) as string,
-    );
-    if (savedSettings) this.SET_STREAM_SETTINGS(savedSettings);
-    this.store.watch(
-      () => this.state.settings,
-      () => {
-        const { title, description, game } = this.state.settings;
-        localStorage.setItem(this.serviceName, JSON.stringify({ title, description, game }));
-      },
-      { deep: true },
-    );
+    this.syncSettingsWithLocalStorage();
   }
 
   @mutation()
@@ -401,16 +389,15 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     return true;
   }
 
-  private fetchPages(): Promise<IStreamlabsFacebookPages> {
+  private fetchPages(): Promise<IStreamlabsFacebookPages | null> {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
     const headers = authorizedHeaders(this.userService.apiToken!);
     const request = new Request(url, { headers });
-    return fetch(request)
-      .then(handleResponse)
+    return jfetch<IStreamlabsFacebookPages>(request)
       .then(response => {
         // create an options list for using in the ListInput
-        response.options = response.pages.map((page: any) => {
+        response.options = response.pages.map(page => {
           return { value: page.id, title: `${page.name} | ${page.category}` };
         });
         this.SET_FACEBOOK_PAGES(response);

@@ -5,7 +5,6 @@ import {
   test,
   skipCheckingErrorsInLog,
   restartApp,
-  closeWindow,
   click,
 } from '../../helpers/spectron';
 import { setFormInput } from '../../helpers/spectron/forms';
@@ -27,7 +26,6 @@ import {
   waitForStreamStop,
   updateChannelSettings,
 } from '../../helpers/spectron/streaming';
-import { TPlatform } from '../../../app/services/platforms';
 import { readdir } from 'fs-extra';
 import { showSettings } from '../../helpers/spectron/settings';
 import { sleep } from '../../helpers/sleep';
@@ -101,30 +99,6 @@ test('Streaming to Youtube', async t => {
   t.pass();
 });
 
-test('Youtube should show error window if afterStreamStart hook fails', async t => {
-  await logIn(t, 'youtube');
-
-  await goLive(t, {
-    title: 'SLOBS Test Stream',
-    description: 'SLOBS Test Stream Description',
-  });
-  await focusChild(t);
-  await closeWindow(t);
-
-  // emulate API errors
-  skipCheckingErrorsInLog();
-  await fetchMock(t, /www\.googleapis\.com\/youtube/, 404);
-
-  // the error window should be shown right after request to YT API fails
-  await sleep(2000); // TODO: wait for the child window to be shown instead sleep
-  await focusChild(t);
-  await t.context.app.client.waitForVisible(
-    'h1=Your stream has started, but there were issues with other actions taken',
-  );
-
-  t.pass();
-});
-
 test('Streaming to the scheduled event on Youtube', async t => {
   await logIn(t, 'youtube', { multistream: false });
 
@@ -144,6 +118,25 @@ test('Streaming to the scheduled event on Youtube', async t => {
   });
   await submit(t);
   await waitForStreamStart(t);
+  t.pass();
+});
+
+test('Start stream twice to the same YT event', async t => {
+  await logIn(t, 'youtube', { multistream: false });
+
+  // create event via scheduling form
+  const now = Date.now();
+  await goLive(t, {
+    title: `Youtube Test Stream ${now}`,
+    description: 'SLOBS Test Stream Description',
+    enableAutoStop: false,
+  });
+  await stopStream(t);
+
+  await goLive(t, {
+    event: selectTitle(`Youtube Test Stream ${now}`),
+    enableAutoStop: true,
+  });
   t.pass();
 });
 
