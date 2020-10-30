@@ -12,6 +12,8 @@ interface IAlertBoxGeneralSettings extends IWidgetSettings {
   automatically_reset_session: boolean;
   censor_streamer_recent_events: boolean;
   display_mtg_codes: boolean;
+  interrupt_mode: boolean;
+  interrupt_mode_delay: number;
 
   // SHOW MESSAGES
   show_bits_message: boolean;
