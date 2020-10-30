@@ -26,12 +26,9 @@ export default class EditTransform extends TsxComponent<{}> {
   @Inject() windowsService: WindowsService;
   @Inject() private editorCommandsService: EditorCommandsService;
 
-  selection: GlobalSelection = null;
   rect: IVec2 = null;
 
   mounted() {
-    this.selection = this.selectionService.views.globalSelection;
-
     // We only care about the attributes of the rectangle not the functionality
     this.rect = { ...this.selection.getBoundingRect() };
   }
@@ -40,60 +37,57 @@ export default class EditTransform extends TsxComponent<{}> {
     validForm: ValidatedForm;
   };
 
+  get selection() {
+    return this.selectionService.views.globalSelection;
+  }
+
   get transform() {
     return this.selection.getItems()[0].transform;
   }
 
-  setCrop(cropEdge: keyof ICrop) {
-    return async (value: string) => {
-      if (await this.$refs.validForm.validateAndGetErrorsCount()) return;
+  async setCrop(cropEdge: keyof ICrop, value: string) {
+    if (await this.$refs.validForm.validateAndGetErrorsCount()) return;
 
-      this.editorCommandsService.executeCommand('CropItemsCommand', this.selection, {
-        [cropEdge]: Number(value),
-      });
-    };
+    this.editorCommandsService.actions.executeCommand('CropItemsCommand', this.selection, {
+      [cropEdge]: Number(value),
+    });
   }
 
-  setPos(dir: string) {
-    return async (value: string) => {
-      if (await this.$refs.validForm.validateAndGetErrorsCount()) return;
-      const delta = Number(value) - Math.round(this.rect[dir]);
+  async setPos(dir: string, value: string) {
+    if (await this.$refs.validForm.validateAndGetErrorsCount()) return;
+    const delta = Number(value) - Math.round(this.rect[dir]);
 
-      this.editorCommandsService.executeCommand('MoveItemsCommand', this.selection, {
-        [dir]: delta,
-      });
+    this.editorCommandsService.actions.executeCommand('MoveItemsCommand', this.selection, {
+      [dir]: delta,
+    });
 
-      this.rect[dir] += delta;
-    };
+    this.rect[dir] += delta;
   }
 
-  setScale(dir: string) {
-    return async (value: string) => {
-      if (await this.$refs.validForm.validateAndGetErrorsCount()) return;
-      if (Number(value) === this.rect[dir]) return;
-      const scale = Number(value) / this.rect[dir];
-      const scaleX = dir === 'width' ? scale : 1;
-      const scaleY = dir === 'height' ? scale : 1;
-      const scaleDelta = v2(scaleX, scaleY);
+  async setScale(dir: string, value: string) {
+    if (await this.$refs.validForm.validateAndGetErrorsCount()) return;
+    if (Number(value) === this.rect[dir]) return;
+    const scale = Number(value) / this.rect[dir];
+    const scaleX = dir === 'width' ? scale : 1;
+    const scaleY = dir === 'height' ? scale : 1;
+    const scaleDelta = v2(scaleX, scaleY);
 
-      this.editorCommandsService.executeCommand(
-        'ResizeItemsCommand',
-        this.selection,
-        scaleDelta,
-        AnchorPositions[AnchorPoint.NorthWest],
-      );
+    this.editorCommandsService.actions.executeCommand(
+      'ResizeItemsCommand',
+      this.selection,
+      scaleDelta,
+      AnchorPositions[AnchorPoint.NorthWest],
+    );
 
-      this.rect[dir] = Number(value);
-    };
+    this.rect[dir] = Number(value);
   }
 
   rotate(deg: number) {
-    console.log('firing');
-    this.editorCommandsService.executeCommand('RotateItemsCommand', this.selection, deg);
+    this.editorCommandsService.actions.executeCommand('RotateItemsCommand', this.selection, deg);
   }
 
   reset() {
-    this.editorCommandsService.executeCommand('ResetTransformCommand', this.selection);
+    this.editorCommandsService.actions.executeCommand('ResetTransformCommand', this.selection);
     this.rect = this.selection.getBoundingRect();
   }
 
@@ -110,7 +104,7 @@ export default class EditTransform extends TsxComponent<{}> {
             <NumberInput
               value={this.transform.crop[dir]}
               metadata={{ isInteger: true, min: 0 }}
-              onInput={this.setCrop(dir)}
+              onInput={(value: string) => this.setCrop(dir, value)}
             />
             <span style="margin-left: 8px;">{dirMap(dir)}</span>
           </div>
@@ -119,10 +113,17 @@ export default class EditTransform extends TsxComponent<{}> {
     );
   }
 
+  coordinateInputHandler(type: string, dir: string, value: string) {
+    if (type === 'pos') {
+      this.setPos(dir, value);
+    } else {
+      this.setScale(dir, value);
+    }
+  }
+
   coordinateForm(type: string) {
     const title = type === 'pos' ? $t('Position') : $t('Size');
     const dataArray = type === 'pos' ? ['x', 'y'] : ['width', 'height'];
-    const inputHandler = (dir: string) => (type === 'pos' ? this.setPos(dir) : this.setScale(dir));
     if (!this.rect) return null;
     if (dataArray.some(dir => isNaN(Math.round(this.rect[dir])))) return null;
     return (
@@ -133,7 +134,7 @@ export default class EditTransform extends TsxComponent<{}> {
               style="margin-right: 8px;"
               value={Math.round(this.rect[dir])}
               metadata={{ isInteger: true, min: type === 'pos' ? null : 1 }}
-              onInput={(dir: string) => inputHandler(dir)}
+              onInput={(value: string) => this.coordinateInputHandler(type, dir, value)}
             />
           ))}
         </div>
