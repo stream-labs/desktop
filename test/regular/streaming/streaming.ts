@@ -26,6 +26,7 @@ import {
   waitForStreamStop,
   updateChannelSettings,
 } from '../../helpers/spectron/streaming';
+import { TPlatform } from '../../../app/services/platforms';
 import { readdir } from 'fs-extra';
 import { showSettings } from '../../helpers/spectron/settings';
 import { sleep } from '../../helpers/sleep';
