@@ -31,7 +31,7 @@ test('4xxで未定義文言だったら400にフォールバックする', async
   const NicoliveFailure = m.NicoliveFailure as NicoliveFailureType;
   const openErrorDialogFromFailure = m.openErrorDialogFromFailure;
   const failure = NicoliveFailure.fromClientError('method', { ok: false, value: { meta: { status: 403 } } });
-console.log(failure);
+
   await openErrorDialogFromFailure(failure);
   expect(showMessageBox.mock.calls[0][1].title).toBe('title');
   expect(showMessageBox.mock.calls[0][1].message).toBe('message');
