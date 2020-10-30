@@ -152,5 +152,5 @@
   "Please try again. If the issue persists, you can stream directly to a single platform instead.": "Please try again. If the issue persists, you can stream directly to a single platform instead.",
   "Enable Live Streaming": "Enable Live Streaming",
   "Destination": "Destination",
-  "canNotDisablePrimaryPlatform": "You cannot disable your primary platform.  Do you want to <switch-account-link>log in to another account</switch-account-link> instead?"
+  "canNotDisablePrimaryPlatform": "You cannot disable the platform you logged in with.<br/> Do you want to <switch-account-link>log in to another account</switch-account-link> instead?"
 }
