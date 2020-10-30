@@ -1,4 +1,5 @@
 import { StatefulService, mutation } from './stateful-service';
+import { Subject } from 'rxjs';
 
 type TAppPage =
   | 'Studio'
@@ -16,8 +17,11 @@ export class NavigationService extends StatefulService<INavigationState> {
     params: {}
   };
 
+  navigated = new Subject<INavigationState>();
+
   navigate(page: TAppPage, params: Dictionary<string> = {}) {
     this.NAVIGATE(page, params);
+    this.navigated.next(this.state);
   }
 
   @mutation()

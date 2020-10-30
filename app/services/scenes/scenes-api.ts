@@ -7,11 +7,13 @@ import { ISelection, TNodesList } from 'services/selection';
  */
 export interface IScenesServiceApi {
   createScene(name: string, options?: ISceneCreateOptions): ISceneApi;
+
   makeSceneActive(id: string): boolean;
   removeScene(id: string): IScene;
   scenes: ISceneApi[];
   activeScene: ISceneApi;
   activeSceneId: string;
+  getScene(id: string): ISceneApi;
   getSceneByName(name: string): ISceneApi;
   getScenes(): ISceneApi[];
   getModel(): IScenesState;

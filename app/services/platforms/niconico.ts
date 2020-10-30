@@ -6,10 +6,10 @@ import { Inject } from 'util/injector';
 import { sleep } from 'util/sleep';
 import { handleErrors, requiresToken, authorizedHeaders } from 'util/requests';
 import { UserService } from 'services/user';
-import { Builder, parseString } from 'xml2js';
+import { parseString } from 'xml2js';
 import { StreamingService, EStreamingState } from 'services/streaming';
 import { WindowsService } from 'services/windows';
-import { NicoliveClient, isOk } from 'services/nicolive-program/NicoliveClient';
+import { NicoliveClient } from 'services/nicolive-program/NicoliveClient';
 
 export type INiconicoProgramSelection = {
   info: LiveProgramInfo

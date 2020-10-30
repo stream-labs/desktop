@@ -3,9 +3,17 @@ import { EStreamingState, ERecordingState } from './streaming-api';
 
 import { createSetupFunction } from 'util/test-setup';
 
+function noop() {}
+
 jest.mock('services/stateful-service');
 jest.mock('util/injector');
-jest.mock('services/obs-api', () => ({}));
+jest.mock('../../../obs-api', () => ({
+  NodeObs: {
+    OBS_service_startStreaming: noop,
+    OBS_service_stopStreaming: noop,
+    OBS_service_connectOutputSignals: noop,
+  }
+}));
 jest.mock('services/settings', () => ({}));
 jest.mock('services/windows', () => ({}));
 jest.mock('services/usage-statistics', () => ({}));
@@ -15,14 +23,10 @@ jest.mock('services/i18n', () => ({
 jest.mock('services/customization', () => ({}));
 jest.mock('services/user', () => ({}));
 jest.mock('util/menus/Menu', () => ({}));
-
-function noop() { }
+jest.mock('services/notifications', () => ({}));
 const showWindow = jest.fn();
 
 const createInjectee = ({
-  OBS_service_startStreaming = noop,
-  OBS_service_stopStreaming = noop,
-  OBS_service_connectOutputSignals = noop,
   recordEvent = noop,
   WarnBeforeStartingStream = false,
   WarnBeforeStoppingStream = false,
@@ -32,13 +36,6 @@ const createInjectee = ({
   updateStreamSettings = noop,
   optimizeForNiconico = false,
 } = {}) => ({
-  ObsApiService: {
-    nodeObs: {
-      OBS_service_startStreaming,
-      OBS_service_stopStreaming,
-      OBS_service_connectOutputSignals,
-    },
-  },
   SettingsService: {
     state: {
       General: {
@@ -90,11 +87,16 @@ test('toggleStreamingでstreamingStatusがofflineの場合', () => {
   const OBS_service_startStreaming = jest.fn();
   const OBS_service_stopStreaming = jest.fn();
 
-  setup({
-    injectee: createInjectee({
+  jest.mock('../../../obs-api', () => ({
+    NodeObs: {
       OBS_service_startStreaming,
       OBS_service_stopStreaming,
-    }),
+      OBS_service_connectOutputSignals: noop,
+    }
+  }));
+
+  setup({
+    injectee: createInjectee(),
     state: {
       StreamingService: {
         streamingStatus: EStreamingState.Offline,
@@ -119,10 +121,16 @@ test('toggleStreamingでstreamingStatusがoffline、配信開始時に確認し�
   const OBS_service_startStreaming = jest.fn();
   const OBS_service_stopStreaming = jest.fn();
 
-  setup({
-    injectee: createInjectee({
+  jest.mock('../../../obs-api', () => ({
+    NodeObs: {
       OBS_service_startStreaming,
       OBS_service_stopStreaming,
+      OBS_service_connectOutputSignals: noop,
+    }
+  }));
+
+  setup({
+    injectee: createInjectee({
       WarnBeforeStartingStream: true,
     }),
     state: {
@@ -150,10 +158,16 @@ test('toggleStreamingでstreamingStatusがoffline、配信開始時に確認し�
   const OBS_service_startStreaming = jest.fn();
   const OBS_service_stopStreaming = jest.fn();
 
-  setup({
-    injectee: createInjectee({
+  jest.mock('../../../obs-api', () => ({
+    NodeObs: {
       OBS_service_startStreaming,
       OBS_service_stopStreaming,
+      OBS_service_connectOutputSignals: noop,
+    }
+  }));
+
+  setup({
+    injectee: createInjectee({
       WarnBeforeStartingStream: true,
     }),
     state: {
@@ -183,11 +197,16 @@ test('toggleStreamingでstreamingStatusがoffline、配信開始と同時に録�
   const OBS_service_stopStreaming = jest.fn();
   const OBS_service_connectOutputSignals = jest.fn();
 
-  setup({
-    injectee: createInjectee({
+  jest.mock('../../../obs-api', () => ({
+    NodeObs: {
       OBS_service_startStreaming,
       OBS_service_stopStreaming,
       OBS_service_connectOutputSignals,
+    }
+  }));
+
+  setup({
+    injectee: createInjectee({
       RecordWhenStreaming: true,
     }),
     state: {
@@ -219,10 +238,16 @@ test('toggleStreamingでstreamingStatusがoffline、配信開始と同時に録�
     const OBS_service_startStreaming = jest.fn();
     const OBS_service_stopStreaming = jest.fn();
 
-    setup({
-      injectee: createInjectee({
+    jest.mock('../../../obs-api', () => ({
+      NodeObs: {
         OBS_service_startStreaming,
         OBS_service_stopStreaming,
+        OBS_service_connectOutputSignals: noop,
+      }
+    }));
+
+    setup({
+      injectee: createInjectee({
       }),
       state: {
         StreamingService: {
@@ -248,10 +273,16 @@ test('toggleStreamingでstreamingStatusがoffline、配信開始と同時に録�
     const OBS_service_startStreaming = jest.fn();
     const OBS_service_stopStreaming = jest.fn();
 
-    setup({
-      injectee: createInjectee({
+    jest.mock('../../../obs-api', () => ({
+      NodeObs: {
         OBS_service_startStreaming,
         OBS_service_stopStreaming,
+        OBS_service_connectOutputSignals: noop,
+      }
+    }));
+
+    setup({
+      injectee: createInjectee({
         WarnBeforeStoppingStream: true,
       }),
       state: {
@@ -279,10 +310,16 @@ test('toggleStreamingでstreamingStatusがoffline、配信開始と同時に録�
     const OBS_service_startStreaming = jest.fn();
     const OBS_service_stopStreaming = jest.fn();
 
-    setup({
-      injectee: createInjectee({
+    jest.mock('../../../obs-api', () => ({
+      NodeObs: {
         OBS_service_startStreaming,
         OBS_service_stopStreaming,
+        OBS_service_connectOutputSignals: noop,
+      }
+    }));
+
+    setup({
+      injectee: createInjectee({
         WarnBeforeStoppingStream: true,
       }),
       state: {
@@ -311,10 +348,16 @@ test('toggleStreamingでstreamingStatusがoffline、配信開始と同時に録�
     const OBS_service_startStreaming = jest.fn();
     const OBS_service_stopStreaming = jest.fn();
 
-    setup({
-      injectee: createInjectee({
+    jest.mock('../../../obs-api', () => ({
+      NodeObs: {
         OBS_service_startStreaming,
         OBS_service_stopStreaming,
+        OBS_service_connectOutputSignals: noop,
+      }
+    }));
+
+    setup({
+      injectee: createInjectee({
         KeepRecordingWhenStreamStops: false,
       }),
       state: {
@@ -342,10 +385,16 @@ test('toggleStreamingでstreamingStatusがendingの場合', () => {
   const OBS_service_startStreaming = jest.fn();
   const OBS_service_stopStreaming = jest.fn();
 
-  setup({
-    injectee: createInjectee({
+  jest.mock('../../../obs-api', () => ({
+    NodeObs: {
       OBS_service_startStreaming,
       OBS_service_stopStreaming,
+      OBS_service_connectOutputSignals: noop,
+    }
+  }));
+
+  setup({
+    injectee: createInjectee({
       KeepRecordingWhenStreamStops: false,
     }),
     state: {

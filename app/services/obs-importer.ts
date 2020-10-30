@@ -10,7 +10,7 @@ import { TransitionsService, ETransitionType } from 'services/transitions';
 import { AudioService } from 'services/audio';
 import { Inject } from 'util/injector';
 import { SceneCollectionsService } from 'services/scene-collections';
-import { nodeObs } from 'services/obs-api';
+import * as obs from '../../obs-api';
 import { SettingsService } from 'services/settings';
 
 interface Source {
@@ -100,8 +100,8 @@ export class ObsImporterService extends Service {
       }
     }
 
-    nodeObs.OBS_service_resetVideoContext();
-    nodeObs.OBS_service_resetAudioContext();
+    obs.NodeObs.OBS_service_resetVideoContext();
+    obs.NodeObs.OBS_service_resetAudioContext();
 
     // Ensure we reload any updated settings
     this.settingsService.loadSettingsIntoStore();
@@ -230,6 +230,10 @@ export class ObsImporterService extends Service {
     const sourcesJSON = configJSON.sources;
     const currentScene = configJSON.current_scene;
 
+    // OBS uses unique scene names instead id
+    // so create a mapping variable
+    const nameToIdMap: Dictionary<string> = {};
+
     if (Array.isArray(sourcesJSON)) {
       // Create all the scenes
       sourcesJSON.forEach(sourceJSON => {
@@ -237,13 +241,14 @@ export class ObsImporterService extends Service {
           const scene = this.scenesService.createScene(sourceJSON.name, {
             makeActive: sourceJSON.name === currentScene
           });
+          nameToIdMap[scene.name] = scene.id;
         }
       });
 
       // Add all the sceneItems to every scene
       sourcesJSON.forEach(sourceJSON => {
         if (sourceJSON.id === 'scene') {
-          const scene = this.scenesService.getSceneByName(sourceJSON.name);
+          const scene = this.scenesService.getScene(nameToIdMap[sourceJSON.name]);
           if (!scene) return;
 
           const sceneItems = sourceJSON.settings.items;
@@ -328,12 +333,17 @@ export class ObsImporterService extends Service {
     });
   }
 
+  // TODO: Fix this function
   importTransitions(configJSON: IOBSConfigJSON) {
-    // Only import the first transition found in obs as N Air only
-    // uses one global transition
+    // Only import a single transition from OBS for now.
+    // Eventually we should import all transitions
     if (configJSON.transitions && configJSON.transitions.length > 0) {
-      this.transitionsService.setType(configJSON.transitions[0].id as ETransitionType);
-      this.transitionsService.setDuration(configJSON.transition_duration);
+      this.transitionsService.deleteAllTransitions();
+      this.transitionsService.createTransition(
+        configJSON.transitions[0].id as ETransitionType,
+        'Global Transition',
+        { duration: configJSON.transition_duration }
+      );
     }
   }
 

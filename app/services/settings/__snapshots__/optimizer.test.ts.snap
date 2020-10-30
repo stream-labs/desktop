@@ -96,7 +96,7 @@ Array [
                     "subCategory": "Streaming",
                   },
                 ],
-                "value": "obs_qsv11",
+                "value": "qsv",
               },
               Object {
                 "params": Array [
@@ -108,7 +108,7 @@ Array [
                     "subCategory": "Streaming",
                   },
                 ],
-                "value": "ffmpeg_nvenc",
+                "value": "nvenc",
               },
             ],
             "key": "encoder",

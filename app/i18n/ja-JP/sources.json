@@ -60,5 +60,6 @@
   "selectCroppingArea": "キャプチャする領域をドラッグして指定してください",
   "pressEscapeToCancel": "Escキーでキャンセルします",
   "desktopAudio": "デスクトップ音声",
-  "micAux": "マイク"
+  "micAux": "マイク",
+  "noSameTypeSources": "この種類のソースはまだ追加されていません。"
 }

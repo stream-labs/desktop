@@ -1,4 +1,4 @@
-import { TFormData } from 'components/shared/forms/Input';
+import { TObsFormData } from 'components/obs/inputs/ObsInput';
 
 
 interface II18nState {
@@ -10,5 +10,5 @@ export interface I18nServiceApi {
   state: II18nState;
 
   setLocale(locale: string): void;
-  getLocaleFormData(): TFormData;
+  getLocaleFormData(): TObsFormData;
 }

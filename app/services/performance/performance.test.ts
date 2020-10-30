@@ -1,44 +1,66 @@
 import { createSetupFunction } from 'util/test-setup';
-const setup = createSetupFunction();
+const setup = createSetupFunction({
+  injectee: {
+    CustomizationService: {
+      pollingPerformanceStatistics: true,
+    },
+  },
+});
 
 jest.mock('services/stateful-service');
 jest.mock('util/injector');
 jest.mock('services/settings', () => ({}));
 jest.mock('services/customization', () => ({}));
+jest.mock('../../../obs-api', () => ({
+  NodeObs: {}
+}));
 
 beforeEach(() => {
   jest.resetModules();
 });
 
 test('get instance', () => {
-  jest.doMock('services/obs-api', () => ({}));
-  setup();
   const { PerformanceService } = require('./performance');
   expect(PerformanceService.instance).toBeInstanceOf(PerformanceService);
 });
 
-test('getStatisticsでpollingPerformanceStatisticsがtrueの場合', () => {
-  jest.doMock('services/obs-api', () => ({
-    nodeObs: { OBS_API_getPerformanceStatistics: jest.fn().mockReturnValue('obs result') },
-  }));
-  setup({ injectee: { CustomizationService: { pollingPerformanceStatistics: true } } });
-
-  const { PerformanceService } = require('./performance');
-  const { instance } = PerformanceService;
-  expect(instance.getStatistics()).toBe('obs result');
-});
-
-test('getStatisticsでpollingPerformanceStatisticsがfalseの場合', () => {
-  const OBS_API_getPerformanceStatistics = jest.fn();
-  jest.doMock('services/obs-api', () => ({
-    nodeObs: {
-      OBS_API_getPerformanceStatistics,
+test('update', () => {
+  jest.doMock('electron', () => ({
+    default: {
+      remote: {
+        app: {
+          getAppMetrics() {
+            return [
+              {
+                cpu: {
+                  percentCPUUsage: 1,
+                }
+              },
+              {
+                cpu: {
+                  percentCPUUsage: 2,
+                }
+              }
+            ];
+          }
+        },
+      },
     },
   }));
-  setup({ injectee: { CustomizationService: { pollingPerformanceStatistics: false } } });
+  jest.doMock('../../../obs-api', () => ({
+    NodeObs: {
+      OBS_API_getPerformanceStatistics() {
+        return { dummy: 'obs result', CPU: 0 };
+      }
+    },
+  }));
+  setup();
 
   const { PerformanceService } = require('./performance');
   const { instance } = PerformanceService;
-  expect(instance.getStatistics()).toEqual({});
-  expect(OBS_API_getPerformanceStatistics).not.toHaveBeenCalled();
+  instance.SET_PERFORMANCE_STATS = jest.fn();
+  instance.update();
+  expect(instance.SET_PERFORMANCE_STATS).toHaveBeenNthCalledWith(1, {
+    dummy: 'obs result', CPU: 3
+  });
 });

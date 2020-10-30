@@ -1,7 +1,5 @@
 <template>
-<modal-layout
-  :title="options.rename ? $t('scenes.renameScene') : $t('scenes.nameScene')"
-  :done-handler="submit">
+<modal-layout :done-handler="submit">
   <form
     slot="content"
     @submit.prevent="submit">

@@ -6,9 +6,9 @@ import { Subject } from 'rxjs';
 
 const singleton = Symbol();
 const singletonEnforcer = Symbol();
+const instances: Service[] = [];
 
 export abstract class Service {
-  static hasInstance = false;
   static isSingleton = true;
 
   /**
@@ -32,6 +32,10 @@ export abstract class Service {
     return this.proxyFn ? this.proxyFn(instance) : instance;
   }
 
+  static get hasInstance(): boolean {
+    return !!instances[this.name];
+  }
+
   /**
    * proxy function will be applied for all services instances
    */
@@ -53,14 +57,15 @@ export abstract class Service {
     if (ServiceClass.hasInstance) {
       throw 'Unable to create more than one singleton service';
     }
-    ServiceClass.hasInstance = true;
     ServiceClass.isSingleton = true;
     const instance = new ServiceClass(singletonEnforcer);
     ServiceClass[singleton] = instance;
+    instances[ServiceClass.name] = instance;
 
     const mustInit = this.initFn ? !this.initFn(instance) : true;
 
     if (mustInit) instance.init();
+
     instance.mounted();
     Service.serviceAfterInit.next(instance);
     if (mustInit) instance.afterInit();

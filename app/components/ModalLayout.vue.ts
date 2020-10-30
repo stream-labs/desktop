@@ -3,13 +3,10 @@ import { Component, Prop } from 'vue-property-decorator';
 import { WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
 import { Inject } from 'util/injector';
-import TitleBar from './TitleBar.vue';
 import { AppService } from 'services/app';
 import electron from 'electron';
 
-@Component({
-  components: { TitleBar }
-})
+@Component({})
 export default class ModalLayout extends Vue {
 
   contentStyle: Object = {};
@@ -19,16 +16,13 @@ export default class ModalLayout extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() appService: AppService;
 
-  // The title shown at the top of the window
-  @Prop() title: string;
-
   // Whether the "cancel" and "done" controls should be
   // shown at the bottom of the modal.
-  @Prop({ default: true }) showControls: boolean;
+  @Prop({ default: true, type: Boolean }) showControls: boolean;
 
   // If controls are shown, whether or not to show the
   // cancel button.
-  @Prop({ default: true }) showCancel: boolean;
+  @Prop({ default: true, type: Boolean }) showCancel: boolean;
 
   // Will be called when "done" is clicked if controls
   // are enabled
@@ -45,11 +39,11 @@ export default class ModalLayout extends Vue {
    * Set to true when using custom controls.
    * Custom controls go in the "controls" slot.
    */
-  @Prop({ default: false })
+  @Prop({ default: false, type: Boolean })
   customControls: boolean;
 
   /** Contentにpaddingを持たせない場合 */
-  @Prop({ default: false })
+  @Prop({ default: false, type: Boolean })
   bareContent: boolean;
 
   created() {
@@ -58,13 +52,19 @@ export default class ModalLayout extends Vue {
     };
 
     this.fixedStyle = fixedStyle;
-
-    electron.remote.getCurrentWindow().setTitle(this.title);
   }
 
   cancel() {
     if (this.cancelHandler) {
       this.cancelHandler();
+    } else {
+      this.windowsService.closeChildWindow();
+    }
+  }
+
+  done() {
+    if (this.doneHandler) {
+      this.doneHandler();
     } else {
       this.windowsService.closeChildWindow();
     }

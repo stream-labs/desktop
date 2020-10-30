@@ -2,9 +2,9 @@ import Vue from 'vue';
 import electron from 'electron';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
-import BoolInput from 'components/shared/forms/BoolInput.vue';
+import ObsBoolInput from 'components/obs/inputs/ObsBoolInput.vue';
 import { CustomizationService } from 'services/customization';
-import { IFormInput } from 'components/shared/forms/Input';
+import { IObsInput } from 'components/obs/inputs/ObsInput';
 import { OnboardingService } from 'services/onboarding';
 import { WindowsService } from 'services/windows';
 import { UserService } from 'services/user';
@@ -16,7 +16,7 @@ import ClipBoardCopy from '../../media/images/clipboard-copy.svg';
 
 @Component({
   components: {
-    BoolInput,
+    ObsBoolInput,
     ClipBoardCopy
   }
 })
@@ -41,7 +41,7 @@ export default class ExtraSettings extends Vue {
     electron.clipboard.writeText(text);
   }
 
-  get optimizeForNiconicoModel(): IFormInput<boolean> {
+  get optimizeForNiconicoModel(): IObsInput<boolean> {
     return {
       name: 'optimize_for_niconico',
       description: $t('settings.optimizeForNiconico'),
@@ -50,11 +50,11 @@ export default class ExtraSettings extends Vue {
     };
   }
 
-  setOptimizeForNiconico(model: IFormInput<boolean>) {
+  setOptimizeForNiconico(model: IObsInput<boolean>) {
     this.customizationService.setOptimizeForNiconico(model.value);
   }
 
-  get showOptimizationDialogForNiconicoModel(): IFormInput<boolean> {
+  get showOptimizationDialogForNiconicoModel(): IObsInput<boolean> {
     return {
       name: 'show_optimization_dialog_for_niconico',
       description: $t('settings.showOptimizationDialogForNiconico'),
@@ -63,11 +63,11 @@ export default class ExtraSettings extends Vue {
     };
   }
 
-  setShowOptimizationDialogForNiconico(model: IFormInput<boolean>) {
+  setShowOptimizationDialogForNiconico(model: IObsInput<boolean>) {
     this.customizationService.setShowOptimizationDialogForNiconico(model.value);
   }
 
-  get optimizeWithHardwareEncoderModel(): IFormInput<boolean> {
+  get optimizeWithHardwareEncoderModel(): IObsInput<boolean> {
     return {
       name: 'optimize_with_hardware_encoder',
       description: $t('settings.optimizeWithHardwareEncoder'),
@@ -76,11 +76,11 @@ export default class ExtraSettings extends Vue {
     };
   }
 
-  setOptimizeWithHardwareEncoder(model: IFormInput<boolean>) {
+  setOptimizeWithHardwareEncoder(model: IObsInput<boolean>) {
     this.customizationService.setOptimizeWithHardwareEncoder(model.value);
   }
 
-  get pollingPerformanceStatisticsModel(): IFormInput<boolean> {
+  get pollingPerformanceStatisticsModel(): IObsInput<boolean> {
     return {
       name: 'polling_performance_statistics',
       description: $t('settings.pollingPerformanceStatistics'),
@@ -88,7 +88,7 @@ export default class ExtraSettings extends Vue {
     };
   }
 
-  setPollingPerformanceStatistics(model: IFormInput<boolean>) {
+  setPollingPerformanceStatistics(model: IObsInput<boolean>) {
     this.customizationService.setPollingPerformanceStatistics(model.value);
   }
 

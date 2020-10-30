@@ -1,6 +1,5 @@
 <template>
   <modal-layout
-    :title="$t('sources.layerFilters') + ' (' + sourceDisplayName + ')'"
     :show-cancel="false"
     :done-handler="done"
     :fixedSectionHeight="250"
@@ -46,7 +45,7 @@
 
       <div class="content">
         <div v-if="selectedFilterName">
-          <GenericForm v-model="properties" @input="save"></GenericForm>
+          <GenericForm v-model="properties" @input="save" :key="selectedFilterName"></GenericForm>
         </div>
         <div v-if="!selectedFilterName">
           {{ $t('filters.noFilterMessage') }}

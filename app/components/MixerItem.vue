@@ -53,7 +53,7 @@
 <script lang="ts" src="./MixerItem.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/_colors";
+@import "../styles/index";
 
 .mixer-item {
   position: relative;

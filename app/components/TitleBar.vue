@@ -14,7 +14,7 @@
 <script lang="ts" src="./TitleBar.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/_colors";
+@import "../styles/index";
 
 .titlebar {
   display: flex;
@@ -24,6 +24,7 @@
   box-shadow: 0 1px 0 rgba(0,0,0,0.1);
   vertical-align: top;
   z-index: 1;
+  background-color: @bg-primary;
 
   // 実験版用
   &.isUnstable {

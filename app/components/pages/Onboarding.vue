@@ -7,8 +7,7 @@
 <script lang="ts" src="./Onboarding.vue.ts"></script>
 
 <style lang="less">
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .onboarding {
   display: flex;
@@ -20,10 +19,7 @@
   .button--lg {
     width: 300px;
     padding: 0 0;
-    font-size: 12px;
-    letter-spacing: 1px;
-    font-weight: normal;
-    margin-top: 15px;
+    .margin-top(2);
   }
 }
 
@@ -58,8 +54,7 @@
 .onboarding-title {
   color: @text-primary;
   font-size: 22px;
-  margin-bottom: 20px;
-  letter-spacing: .5px;
+  .margin-bottom(3);
 }
 
 .onboarding-title--sm {
@@ -85,7 +80,8 @@
 
   a {
     text-decoration: underline;
-    transition: all 275ms;
+    .transition();
+
     &:hover {
       color: @white;
     }
@@ -100,7 +96,7 @@
   margin-bottom: 20px;
   height: 270px;
   position: relative;
-  .radius;
+  .radius();
 
   &.optimizing {
     .running-setup-row {
@@ -146,7 +142,7 @@
   top: 0;
   height: 240px;
   width: auto;
-  margin: 15px 0;
+  margin: 16px 0;
 
   img {
     height: 100%;

@@ -39,8 +39,7 @@
 <script lang="ts" src="./EditableSceneCollection.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/_colors";
-@import "../styles/mixins";
+@import "../styles/index";
 
 .editable-scene-collection {
   height: 35px;

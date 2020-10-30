@@ -5,7 +5,6 @@ import ModalLayout from '../ModalLayout.vue';
 import NavMenu from '../shared/NavMenu.vue';
 import NavItem from '../shared/NavItem.vue';
 import Step from '../nicolive-program-selector/Step.vue';
-import windowMixin from '../mixins/window';
 import { WindowsService } from '../../services/windows';
 import {
   NicoliveProgramSelectorService,
@@ -26,7 +25,6 @@ import { $t } from 'services/i18n';
     NavItem,
     Step
   },
-  mixins: [windowMixin]
 })
 export default class NicoliveProgramSelector extends Vue {
   @Inject() nicoliveProgramSelectorService: NicoliveProgramSelectorService;

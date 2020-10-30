@@ -51,7 +51,7 @@ const DEFAULT_OPTIONS: ITestRunnerOptions = {
   restartAppAfterEachTest: true
 };
 
-export function useSpectron(options: ITestRunnerOptions) {
+export function useSpectron(options: ITestRunnerOptions = {}) {
   options = Object.assign({}, DEFAULT_OPTIONS, options);
   let appIsRunning = false;
   let context: any = null;

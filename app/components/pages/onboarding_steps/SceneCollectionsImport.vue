@@ -20,14 +20,14 @@
 <script lang="ts" src="./SceneCollectionsImport.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../../styles/_colors";
+@import "../../../styles/index";
 
 .scene-collections-list {
-  margin: 0;
+  margin-left: 0;
   padding: 10px;
   width: 100%;
   height: 200px;
-  color: white;
+  color: @white;
   list-style: none;
   overflow: auto;
   border-radius: 3px;

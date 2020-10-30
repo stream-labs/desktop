@@ -20,6 +20,9 @@ jest.mock('services/streaming', () => ({}));
 jest.mock('services/user', () => ({}));
 jest.mock('services/settings', () => ({}));
 jest.mock('services/windows', () => ({}));
+jest.mock('services/i18n', () => ({
+  $t: (x: any) => x,
+}));
 jest.mock('util/sleep', () => ({
   sleep: () => jest.requireActual('util/sleep').sleep(0),
 }));

@@ -1,4 +1,6 @@
 import electron from 'electron';
+import uuid from 'uuid/v4';
+import 'reflect-metadata';
 import { Service } from './services/service';
 import { ObsImporterService } from './services/obs-importer';
 import { ScenesService, SceneItem, SceneItemFolder, Scene, SceneItemNode } from './services/scenes';
@@ -10,7 +12,6 @@ import { Hotkey, HotkeysService } from './services/hotkeys';
 import { KeyListenerService } from './services/key-listener';
 import { NavigationService } from './services/navigation';
 import { NotificationsService } from './services/notifications';
-import { ObsApiService } from './services/obs-api';
 import { OnboardingService } from './services/onboarding';
 import { PerformanceService } from './services/performance';
 import { PerformanceMonitorService } from './services/performance-monitor';
@@ -41,6 +42,7 @@ import { SceneCollectionsService } from 'services/scene-collections';
 import { TroubleshooterService } from 'services/troubleshooter';
 import { SelectionService, Selection } from 'services/selection';
 import { SceneCollectionsStateService } from 'services/scene-collections/state';
+import { IncrementalRolloutService } from 'services/incremental-rollout';
 import {
   IJsonRpcResponse,
   IJsonRpcEvent,
@@ -50,6 +52,7 @@ import {
   JsonrpcService
 } from 'services/jsonrpc';
 import { FileManagerService } from 'services/file-manager';
+import { CrashReporterService } from 'services/crash-reporter';
 import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { ProjectorService } from 'services/projector';
@@ -90,7 +93,6 @@ export class ServicesManager extends Service {
     KeyListenerService,
     NavigationService,
     NotificationsService,
-    ObsApiService,
     OnboardingService,
     PerformanceService,
     PerformanceMonitorService,
@@ -111,6 +113,7 @@ export class ServicesManager extends Service {
     IpcServerService,
     TcpServerService,
     VideoEncodingOptimizationService,
+    CrashReporterService,
     DismissablesService,
     SceneCollectionsService,
     SceneCollectionsStateService,
@@ -132,6 +135,7 @@ export class ServicesManager extends Service {
     NicoliveProgramService,
     NicoliveProgramStateService,
     NicoliveProgramSelectorService,
+    IncrementalRolloutService,
     NicoliveCommentViewerService,
     NicoliveCommentFilterService,
     NicoliveCommentLocalFilterService,
@@ -164,6 +168,12 @@ export class ServicesManager extends Service {
   subscriptions: Dictionary<Subscription> = {};
 
   init() {
+
+    // this helps to debug services from the console
+    if (Utils.isDevMode()) {
+      window['sm'] = this;
+    }
+
     if (!Utils.isMainWindow()) {
       Service.setupProxy(service => this.applyIpcProxy(service));
       Service.setupInitFunction(service => {
@@ -174,10 +184,6 @@ export class ServicesManager extends Service {
 
     Service.serviceAfterInit.subscribe(service => this.initObservers(service));
 
-    // this helps to debug services from console
-    if (Utils.isDevMode()) {
-      window['sm'] = this;
-    }
   }
 
   private initObservers(observableService: Service): Service[] {
@@ -343,7 +349,7 @@ export class ServicesManager extends Service {
     const isPromise = !!(responsePayload && responsePayload.then);
 
     if (isPromise) {
-      const promiseId = ipcRenderer.sendSync('getUniqueId');
+      const promiseId = uuid();
       const promise = responsePayload as PromiseLike<any>;
 
       promise.then(
@@ -400,7 +406,7 @@ export class ServicesManager extends Service {
    * @example
    * source = getResource('Source[12]')
    */
-  private getResource(resourceId: string) {
+  getResource(resourceId: string) {
     if (resourceId === 'ServicesManager') {
       return this;
     }
@@ -487,6 +493,10 @@ export class ServicesManager extends Service {
           return this.applyIpcProxy(target[property]);
         }
 
+        if (Reflect.getMetadata('executeInCurrentWindow', target, property as string)) {
+          return target[property];
+        }
+
         if (typeof target[property] !== 'function' && !(target[property] instanceof Observable)) {
           return target[property];
         }
@@ -529,7 +539,7 @@ export class ServicesManager extends Service {
             }
           }
 
-          if (result && result._type === 'HELPER') {
+          if (result && (result._type === 'HELPER' || result._type === 'SERVICE')) {
             const helper = this.getResource(result.resourceId);
             return this.applyIpcProxy(helper);
           }

@@ -1,23 +1,28 @@
 import { readFileSync } from 'fs';
-import { resolve } from 'path';
 import { createSetupFunction } from 'util/test-setup';
 
+jest.mock('electron', () => ({
+  remote: {
+    app: {
+      getAppPath() {
+        return '.';
+      }
+    }
+  }
+}));
 jest.mock('services/stateful-service');
 jest.mock('util/injector');
 jest.mock('../../../obs-api', () => ({
   Global: {},
 }));
 jest.mock('services/app', () => ({}));
-jest.mock('components/shared/forms/Input', () => ({}));
+jest.mock('components/obs/inputs/ObsInput', () => ({}));
 
 const setup = createSetupFunction({
   injectee: {
     FileManagerService: {
       read(filename: string) {
         return readFileSync(filename, 'utf-8');
-      },
-      resolve(filepath: string) {
-        return resolve(filepath);
       },
     },
   },

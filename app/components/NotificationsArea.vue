@@ -20,6 +20,7 @@
   <div class="notifications__container flex--grow" ref="notificationsContainer">
     <div
       v-for="notify in notifications"
+      :key="`${notify.message}${notify.date}`"
       class="notification"
       v-show="showExtendedNotifications"
       @click="onNotificationClickHandler(notify.id)"
@@ -41,7 +42,7 @@
 <script lang="ts" src="./NotificationsArea.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/_colors";
+@import "../styles/index";
 
 .notifications-area {
   overflow: hidden;
@@ -60,9 +61,9 @@
   height: 30px;
   max-width: 100%;
   line-height: 30px;
-  padding-left: 10px;
-  padding-right: 10px;
-  border-radius: 3px;
+  .padding-left();
+  .padding-right();
+  .radius();
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
