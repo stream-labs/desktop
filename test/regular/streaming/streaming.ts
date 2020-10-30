@@ -5,7 +5,6 @@ import {
   test,
   skipCheckingErrorsInLog,
   restartApp,
-  closeWindow,
   click,
 } from '../../helpers/spectron';
 import { setFormInput } from '../../helpers/spectron/forms';
