@@ -12,6 +12,26 @@ import SlVueTree, {
 } from 'sl-vue-tree';
 import { $t } from 'services/i18n';
 
+const sourceIconMap = {
+  ffmpeg_source: 'icon-media',
+  text_gdiplus: 'icon-text',
+  text_ft2_source: 'icon-text',
+  image_source: 'icon-image',
+  slideshow: 'icon-slideshow',
+  dshow_input: 'icon-video-capture',
+  wasapi_input_capture: 'icon-mic',
+  wasapi_output_capture: 'icon-speaker',
+  monitor_capture: 'icon-display',
+  game_capture: 'icon-game-capture',
+  browser_source: 'icon-browser',
+  scene: 'icon-studio-mode',
+  color_source: 'icon-color',
+  openvr_capture: 'icon-vr-google',
+  liv_capture: 'icon-vr-google',
+  ndi_source: 'icon-NDI',
+  'decklink-input': 'icon-blackmagic',
+}
+
 @Component({
   components: { SlVueTree }
 })
@@ -53,6 +73,12 @@ export default class SourceSelector extends Vue {
     };
 
     return getSlVueTreeNodes(this.scene.getRootNodes());
+  }
+
+  determineIcon(isLeaf: boolean, sourceId: string) {
+    if (!isLeaf) { return 'icon-folder'; }
+    const sourceDetails = this.sourcesService.getSource(sourceId).getComparisonDetails();
+    return sourceIconMap[sourceDetails.type] || 'icon-file';
   }
 
   addSource() {

@@ -3,11 +3,10 @@ import {
   obsValuesToInputValues,
   inputValuesToObsValues,
   TObsValue,
-  TFormData,
-  IListOption,
-  IListInput
-} from '../../components/shared/forms/Input';
-import { nodeObs } from '../obs-api';
+  TObsFormData,
+  IObsListInput
+} from 'components/obs/inputs/ObsInput';
+import * as obs from '../../../obs-api';
 import { SourcesService } from 'services/sources';
 import { Inject } from '../../util/injector';
 import { AudioService, E_AUDIO_CHANNELS } from 'services/audio';
@@ -124,11 +123,8 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   @Inject() private sourcesService: SourcesService;
-
   @Inject() private audioService: AudioService;
-
   @Inject() private windowsService: WindowsService;
-
   @Inject() private appService: AppService;
 
   @Inject() private userService: UserService;
@@ -166,6 +162,7 @@ export class SettingsService extends StatefulService<ISettingsState>
   showSettings(categoryName?: string) {
     this.windowsService.showWindow({
       componentName: 'Settings',
+      title: $t('common.settings'),
       queryParams: { categoryName },
       size: {
         width: 800,
@@ -181,7 +178,7 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   getCategories(): string[] {
-    let categories: string[] = nodeObs.OBS_settings_getListCategories();
+    const categories: string[] = obs.NodeObs.OBS_settings_getListCategories();
 
     // if (this.advancedSettingEnabled()) categories = categories.concat(['Experimental']);
 
@@ -190,7 +187,7 @@ export class SettingsService extends StatefulService<ISettingsState>
 
   getSettingsFormData(categoryName: string): ISettingsSubCategory[] {
     if (categoryName === 'Audio') return this.getAudioSettingsFormData();
-    const settings = nodeObs.OBS_settings_getSettings(categoryName) as ISettingsSubCategory[];
+    const settings = obs.NodeObs.OBS_settings_getSettings(categoryName) as ISettingsSubCategory[];
 
     // Names of settings that are disabled because we
     // have not implemented them yet.
@@ -562,7 +559,7 @@ export class SettingsService extends StatefulService<ISettingsState>
         return param.value;
       }
       if (typeof param.options !== 'undefined' && Array.isArray(param.options)) {
-        return (param as IListInput<string>).options[0].value;
+        return (param as IObsListInput<string>).options[0].value;
       }
     }
     return undefined;
@@ -574,7 +571,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       .getSources()
       .filter(source => source.channel !== void 0);
 
-    const parameters: TFormData = [];
+    const parameters: TObsFormData = [];
 
     // collect output channels info
     for (
@@ -660,7 +657,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       });
     }
 
-    nodeObs.OBS_settings_saveSettings(categoryName, dataToSave);
+    obs.NodeObs.OBS_settings_saveSettings(categoryName, dataToSave);
     this.SET_SETTINGS(
       SettingsService.convertFormDataToState({ [categoryName]: settingsData })
     );

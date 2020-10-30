@@ -5,7 +5,7 @@
   </div>
   <div class="Hotkey-bindings">
     <transition-group name="bindings" tag="div">
-      <div v-for="(binding, index) in bindings" :key="binding.key">
+      <div v-for="(binding, index) in bindings" :key="binding.key" class="hotkey-bindings__binding">
         <input
           type="text"
           class="Hotkey-input"
@@ -26,13 +26,11 @@
 <script lang="ts" src="./Hotkey.vue.ts"></script>
 
 <style lang="less" scoped>
+@import "../../styles/index";
+
 .hotkey {
   display: flex;
   flex-direction: row;
-
-  & + & {
-    margin-top: 20px;
-  }
 }
 
 .Hotkey-description {
@@ -55,8 +53,9 @@
   }
 }
 
-.bindings-enter-active, .bindings-leave-active {
-  transition: all 0.2s;
+.bindings-enter-active,
+.bindings-leave-active {
+  .transition();
 }
 
 .bindings-enter, .bindings-leave-to {

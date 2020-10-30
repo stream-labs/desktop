@@ -1,6 +1,6 @@
 import { Service } from './service';
 import { SettingsService } from './settings';
-import { nodeObs } from './obs-api';
+import * as obs from '../../obs-api';
 import electron from 'electron';
 import { Inject } from '../util/injector';
 import Utils from './utils';
@@ -26,6 +26,7 @@ export class Display {
 
   outputRegionCallbacks: Function[];
   outputRegion: IRectangle;
+  isDestroyed = false;
 
   trackingInterval: number;
   currentPosition: IRectangle = {
@@ -41,49 +42,52 @@ export class Display {
 
   sourceId: string;
 
+  boundDestroy: any;
+  boundClose: any;
+  displayDestroyed: boolean;
+
   constructor(public name: string, options: IDisplayOptions = {}) {
     this.windowId = Utils.isChildWindow() ? 'child' : 'main';
 
     this.sourceId = options.sourceId;
 
     if (this.sourceId) {
-      nodeObs.OBS_content_createSourcePreviewDisplay(
+      obs.NodeObs.OBS_content_createSourcePreviewDisplay(
         remote.getCurrentWindow().getNativeWindowHandle(),
         this.sourceId,
         name
       );
     } else {
-      nodeObs.OBS_content_createDisplay(
+      obs.NodeObs.OBS_content_createDisplay(
         remote.getCurrentWindow().getNativeWindowHandle(),
         name
       );
     }
+    this.displayDestroyed = false;
 
-    this.selectionSubscription = this.selectionService.updated.subscribe(() => {
-      this.switchGridlines(this.selectionService.getSize() <= 1);
+    this.selectionSubscription = this.selectionService.updated.subscribe(state => {
+      this.switchGridlines(state.selectedIds.length <= 1);
     });
 
     // 映像部分以外の色
-    nodeObs.OBS_content_setPaddingColor(name, 31, 34, 45);
+    obs.NodeObs.OBS_content_setPaddingColor(name, 31, 34, 45);
 
     // ソースの枠線の色
-    nodeObs.OBS_content_setOutlineColor(name, 255, 105, 82);
+    // obs.NodeObs.OBS_content_setOutlineColor(name, 255, 105, 82);
 
     // ソースから十字に伸びる線の色
-    nodeObs.OBS_content_setGuidelineColor(name, 255, 105, 82);
+    // obs.NodeObs.OBS_content_setGuidelineColor(name, 255, 105, 82);
 
     if (options.paddingSize != null) {
-      nodeObs.OBS_content_setPaddingSize(name, options.paddingSize);
+      obs.NodeObs.OBS_content_setPaddingSize(name, options.paddingSize);
     }
 
     this.outputRegionCallbacks = [];
 
-    this.boundDestroy = this.destroy.bind(this);
+    this.boundClose = this.remoteClose.bind(this);
 
-    remote.getCurrentWindow().on('close', this.boundDestroy);
+    remote.getCurrentWindow().on('close', this.boundClose);
   }
-
-  boundDestroy: any;
 
   /**
    * Will keep the display positioned on top of the passed HTML element
@@ -123,21 +127,28 @@ export class Display {
   move(x: number, y: number) {
     this.currentPosition.x = x;
     this.currentPosition.y = y;
-    nodeObs.OBS_content_moveDisplay(this.name, x, y);
+    obs.NodeObs.OBS_content_moveDisplay(this.name, x, y);
   }
 
   resize(width: number, height: number) {
     this.currentPosition.width = width;
     this.currentPosition.height = height;
-    nodeObs.OBS_content_resizeDisplay(this.name, width, height);
+    obs.NodeObs.OBS_content_resizeDisplay(this.name, width, height);
     if (this.outputRegionCallbacks.length) this.refreshOutputRegion();
   }
 
-  destroy() {
-    remote.getCurrentWindow().removeListener('close', this.boundDestroy);
-    nodeObs.OBS_content_destroyDisplay(this.name);
+  remoteClose() {
     if (this.trackingInterval) clearInterval(this.trackingInterval);
     if (this.selectionSubscription) this.selectionSubscription.unsubscribe();
+    if (!this.displayDestroyed) {
+      obs.NodeObs.OBS_content_destroyDisplay(this.name);
+      this.displayDestroyed = true;
+    }
+  }
+
+  destroy() {
+    remote.getCurrentWindow().removeListener('close', this.boundClose);
+    this.remoteClose();
   }
 
   onOutputResize(cb: (region: IRectangle) => void) {
@@ -145,8 +156,8 @@ export class Display {
   }
 
   refreshOutputRegion() {
-    const position = nodeObs.OBS_content_getDisplayPreviewOffset(this.name);
-    const size = nodeObs.OBS_content_getDisplayPreviewSize(this.name);
+    const position = obs.NodeObs.OBS_content_getDisplayPreviewOffset(this.name);
+    const size = obs.NodeObs.OBS_content_getDisplayPreviewSize(this.name);
 
     this.outputRegion = {
       ...position,
@@ -158,12 +169,17 @@ export class Display {
     });
   }
 
+  drawingUI = true;
+
   setShoulddrawUI(drawUI: boolean) {
-    nodeObs.OBS_content_setShouldDrawUI(this.name, drawUI);
+    this.drawingUI = drawUI;
+    obs.NodeObs.OBS_content_setShouldDrawUI(this.name, drawUI);
   }
 
   switchGridlines(enabled: boolean) {
-    nodeObs.OBS_content_setDrawGuideLines(this.name, enabled);
+    // This function does nothing if we aren't drawing the UI
+    if (!this.drawingUI) return;
+    obs.NodeObs.OBS_content_setDrawGuideLines(this.name, enabled);
   }
 }
 

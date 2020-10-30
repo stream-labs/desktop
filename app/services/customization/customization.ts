@@ -6,7 +6,7 @@ import {
   ICustomizationServiceState,
   ICustomizationSettings
 } from './customization-api';
-import { IListInput, TFormData } from '../../components/shared/forms/Input';
+import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import Utils from 'services/utils';
 import { $t } from 'services/i18n';
 
@@ -86,13 +86,13 @@ export class CustomizationService
     this.setSettings({ pollingPerformanceStatistics: activate });
   }
 
-  getSettingsFormData(): TFormData {
+  getSettingsFormData(): TObsFormData {
     const settings = this.getSettings();
 
     return [];
   }
 
-  getExperimentalSettingsFormData(): TFormData {
+  getExperimentalSettingsFormData(): TObsFormData {
     return [];
   }
 

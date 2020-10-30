@@ -1,5 +1,5 @@
 <template>
-<div class="display" ref="display"></div>
+<div class="display" ref="display" @click="onClickHandler"></div>
 </template>
 
 <script lang="ts" src="./Display.vue.ts"></script>

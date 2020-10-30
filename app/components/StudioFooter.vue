@@ -28,8 +28,7 @@
 <script lang="ts" src="./StudioFooter.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/_colors";
-@import "../styles/mixins";
+@import "../styles/index";
 
 .footer {
   display: flex;

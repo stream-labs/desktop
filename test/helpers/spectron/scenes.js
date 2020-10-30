@@ -66,3 +66,10 @@ export async function sceneIsExisting(t, sceneName) {
     .$('[data-test="SceneSelector"]')
     .isExisting(`[data-test="${sceneName}"]`);
 }
+
+export async function openDuplicateWindow(t, sourceName) {
+  await focusMain(t);
+  await rightClickScene(t, sourceName);
+  await contextMenuClick(t, 'Duplicate');
+  await focusChild(t);
+}

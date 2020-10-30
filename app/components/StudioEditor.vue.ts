@@ -70,6 +70,11 @@ export default class StudioEditor extends Vue {
     return this.transitionsService.state.studioMode;
   }
 
+  // Not reactive, don't cache
+  getStudioTransitionName() {
+    return this.transitionsService.studioTransitionName;
+  }
+
 
   /*****************
    * Mouse Handling *

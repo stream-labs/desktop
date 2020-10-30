@@ -25,7 +25,7 @@
 <script lang="ts" src="./Main.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/_colors";
+@import "../../styles/index";
 
 .main {
   display: flex;

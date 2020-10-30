@@ -1,6 +1,6 @@
 import { mutation } from '../stateful-service';
 import { PersistentStatefulService } from 'services/persistent-stateful-service';
-import { IFormInput, INumberInputValue, TFormData } from '../../components/shared/forms/Input';
+import { IObsInput, IObsNumberInputValue, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { ITroubleshooterServiceApi, ITroubleshooterSettings, TIssueCode } from './troubleshooter-api';
 import { WindowsService } from 'services/windows';
 import { Inject } from '../../util/injector';
@@ -34,12 +34,12 @@ export class TroubleshooterService
     return this.state.settings;
   }
 
-  getSettingsFormData(): TFormData {
+  getSettingsFormData(): TObsFormData {
 
     const settings = this.state.settings;
 
     return [
-      <IFormInput<boolean>> {
+      <IObsInput<boolean>> {
         value: settings.skippedEnabled,
         name: 'skippedEnabled',
         description: $t('notifications.detectSkippedFrames'),
@@ -48,7 +48,7 @@ export class TroubleshooterService
         enabled: true,
       },
 
-      <INumberInputValue> {
+      <IObsNumberInputValue> {
         value: settings.skippedThreshold,
         name: 'skippedThreshold',
         description: $t('notifications.skippedFramesThreshold'),
@@ -61,7 +61,7 @@ export class TroubleshooterService
         usePercentages: true,
       },
 
-      <IFormInput<boolean>> {
+      <IObsInput<boolean>> {
         value: settings.laggedEnabled,
         name: 'laggedEnabled',
         description: $t('notifications.detectLaggedFrames'),
@@ -70,7 +70,7 @@ export class TroubleshooterService
         enabled: true,
       },
 
-      <INumberInputValue> {
+      <IObsNumberInputValue> {
         value: settings.laggedThreshold,
         name: 'laggedThreshold',
         description: $t('notifications.laggedFramesThreshold'),
@@ -83,7 +83,7 @@ export class TroubleshooterService
         usePercentages: true,
       },
 
-      <IFormInput<boolean>> {
+      <IObsInput<boolean>> {
         value: settings.droppedEnabled,
         name: 'droppedEnabled',
         description: $t('notifications.detectDroppedFrames'),
@@ -92,7 +92,7 @@ export class TroubleshooterService
         enabled: true,
       },
 
-      <INumberInputValue> {
+      <IObsNumberInputValue> {
         value: settings.droppedThreshold,
         name: 'droppedThreshold',
         description: $t('notifications.droppedFramesThreshold'),
@@ -119,6 +119,7 @@ export class TroubleshooterService
   showTroubleshooter(issueCode: TIssueCode) {
     this.windowsService.showWindow({
       componentName: 'Troubleshooter',
+      title: $t('troubleshooter.pageTitle'),
       queryParams: { issueCode },
       size: {
         width: 500,

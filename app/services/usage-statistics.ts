@@ -11,7 +11,8 @@ export type TUsageEvent =
   'stream_start' |
   'stream_end' |
   'app_start' |
-  'app_close';
+  'app_close' |
+  'crash';
 
 export function track(event: TUsageEvent) {
   return (target: any, methodName: string, descriptor: PropertyDescriptor) => {

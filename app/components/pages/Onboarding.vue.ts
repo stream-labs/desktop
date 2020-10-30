@@ -11,8 +11,7 @@ import { Inject } from '../../util/injector';
   components: {
     Connect,
     ObsImport,
-    SuccessfullyImported,
-    SceneCollectionsImport
+    SuccessfullyImported
   }
 })
 export default class Onboarding extends Vue {

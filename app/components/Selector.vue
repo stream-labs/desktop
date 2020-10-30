@@ -5,10 +5,10 @@
     :options="{draggable: draggableSelector}"
     @change="handleChange">
     <li
+      v-for="(item, index) in normalizedItems"
+      :key="item.value"
       class="selector-item"
       :class="{ 'selector-item--active': activeItems.includes(item.value) }"
-      v-for="(item, index) in normalizedItems"
-      :key="item.name"
       @contextmenu.stop="(ev) => handleContextMenu(ev, index)"
       @click="(ev) => handleSelect(ev, index)"
       @dblclick="(ev) => handleDoubleClick(ev, index)">
@@ -26,8 +26,7 @@
 <script lang="ts" src="./Selector.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/_colors";
-@import "../styles/mixins";
+@import "../styles/index";
 
 .sortable-ghost {
   opacity: .7;
@@ -61,7 +60,6 @@
   justify-content: space-between;
   color: @text-secondary;
   .transition;
-  margin-top: -1px;
 
   &:hover {
     color: @text-primary;
@@ -107,7 +105,7 @@
 
 .selector-drag-handle {
   cursor: move;
-  .icon-hover;
+  .icon-hover();
 }
 
 </style>

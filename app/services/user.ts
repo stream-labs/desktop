@@ -1,11 +1,10 @@
 import Vue from 'vue';
 import URI from 'urijs';
-import { defer } from 'lodash';
-import { PersistentStatefulService } from './persistent-stateful-service';
-import { Inject } from '../util/injector';
-import { mutation } from './stateful-service';
+import { PersistentStatefulService } from 'services/persistent-stateful-service';
+import { Inject } from 'util/injector';
+import { mutation } from 'services/stateful-service';
 import electron from 'electron';
-import { Menu } from 'util/menus/Menu';
+import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { HostsService } from './hosts';
 import {
   getPlatformService,
@@ -14,13 +13,11 @@ import {
   IPlatformService,
   IStreamingSetting
 } from './platforms';
-import { CustomizationService } from './customization';
 import Raven from 'raven-js';
 import { AppService } from 'services/app';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { Subject, Observable, merge } from 'rxjs';
 import { WindowsService } from 'services/windows';
-import { SettingsService } from 'services/settings';
 import {
   cpu as systemInfoCpu,
   graphics as systemInfoGraphics,
@@ -34,6 +31,9 @@ import {
   release as nodeOsRelease,
 } from 'os';
 import { memoryUsage as nodeMemUsage } from 'process';
+import { $t } from 'services/i18n';
+import uuid from 'uuid/v4';
+import { OnboardingService } from './onboarding';
 import { QuestionaireService } from './questionaire';
 import { addClipboardMenu } from 'util/addClipboardMenu';
 
@@ -43,13 +43,13 @@ interface IUserServiceState {
 }
 
 export class UserService extends PersistentStatefulService<IUserServiceState> {
-  @Inject() hostsService: HostsService;
-  @Inject() customizationService: CustomizationService;
-  @Inject() appService: AppService;
-  @Inject() sceneCollectionsService: SceneCollectionsService;
-  @Inject() windowsService: WindowsService;
-  @Inject() settingsService: SettingsService;
-  @Inject() questionaireService: QuestionaireService;
+  @Inject() private appService: AppService;
+  @Inject() private sceneCollectionsService: SceneCollectionsService;
+  @Inject() private windowsService: WindowsService;
+  @Inject() private onboardingService: OnboardingService;
+  @Inject() private incrementalRolloutService: IncrementalRolloutService;
+  @Inject() private hostsService: HostsService;
+  @Inject() private questionaireService: QuestionaireService;
 
   @mutation()
   LOGIN(auth: IPlatformAuth) {
@@ -78,18 +78,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   init() {
     super.init();
     this.setRavenContext();
-    this.validateLogin().then(() => {
-      this.updatePlatformUserInfo();
-    });
+    this.validateLogin();
+    this.incrementalRolloutService.fetchAvailableFeatures();
   }
 
   mounted() {
     // This is used for faking authentication in tests
     electron.ipcRenderer.on(
       'testing-fakeAuth',
-      (e: Electron.Event, auth: any) => {
+      async (e: Electron.Event, auth: any) => {
         this.LOGIN(auth);
-        this.setRavenContext();
+        await this.sceneCollectionsService.setupNewUser();
       }
     );
   }
@@ -130,7 +129,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     let userId = localStorage.getItem(localStorageKey);
 
     if (!userId) {
-      userId = electron.ipcRenderer.sendSync('getUniqueId');
+      userId = uuid();
       localStorage.setItem(localStorageKey, userId);
     }
 
@@ -152,16 +151,19 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       return this.state.auth.platform.username;
     }
   }
+
   get userIcon() {
     if (this.isLoggedIn()) {
       return this.state.auth.platform.userIcon;
     }
   }
+
   get platformId() {
     if (this.isLoggedIn()) {
       return this.state.auth.platform.id;
     }
   }
+
   get platformUserPageURL() {
     if (this.isLoggedIn()) {
       const platform = getPlatformService(this.state.auth.platform.type);
@@ -184,6 +186,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
   }
 
+  async showLogin() {
+    if (this.isLoggedIn()) await this.logOut();
+    this.onboardingService.start({ isLogin: true });
+  }
+
+
   private async login(service: IPlatformService, rawAuth: IPlatformAuth) {
     const isPremium = await service.isPremium(rawAuth.platform.token);
     const auth = { ...rawAuth, platform: { ...rawAuth.platform, isPremium } };
@@ -205,7 +213,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     await this.sceneCollectionsService.safeSync();
     */
     this.userLogout.next();
+
     this.LOGOUT();
+    electron.remote.session.defaultSession.clearStorageData({ storages: ['cookies'] });
     this.appService.finishLoading();
   }
 
@@ -361,6 +371,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   popoutRecentEvents() {
     this.windowsService.createOneOffWindow({
       componentName: 'RecentEvents',
+      title: $t('Recent Events'),
       size: {
         width: 800,
         height: 600

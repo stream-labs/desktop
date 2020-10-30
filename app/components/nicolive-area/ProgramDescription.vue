@@ -10,8 +10,7 @@
 
 <script lang="ts" src="./ProgramDescription.vue.ts"></script>
 <style lang="less" scoped>
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .program-description {
   display: flex;
@@ -47,7 +46,7 @@
     background-color: @grey;
     border-color: @white;
   }
-  
+
 }
 
 .program-description-text {

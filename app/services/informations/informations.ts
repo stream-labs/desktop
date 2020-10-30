@@ -5,6 +5,7 @@ import { parseString } from 'xml2js';
 import { handleErrors } from 'util/requests';
 import { WindowsService } from 'services/windows';
 import { InformationsStateService } from './state';
+import { $t } from 'services/i18n';
 
 function parseXml(xml: String): Promise<object> {
   return new Promise((resolve, reject) => {
@@ -127,6 +128,7 @@ export class InformationsService extends StatefulService<IInformationsState> {
   showInformations() {
     this.windowsService.showWindow({
       componentName: 'Informations',
+      title: $t('informations.title'),
       queryParams: { },
       size: {
         width: 600,
