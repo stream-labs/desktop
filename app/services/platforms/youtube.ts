@@ -486,7 +486,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       enableDvr: params.enableDvr,
       enableEmbed: broadcast.contentDetails.enableEmbed,
       projection: isMidStreamMode ? broadcast.contentDetails.projection : params.projection,
-      enableLowLatency: false,
+      enableLowLatency: params.latencyPreference === 'low',
       latencyPreference: isMidStreamMode
         ? broadcast.contentDetails.latencyPreference
         : params.latencyPreference,
