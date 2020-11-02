@@ -142,13 +142,23 @@ export default class EditTransform extends TsxComponent<{}> {
           {this.coordinateForm('pos')}
           {this.coordinateForm('scale')}
           <HFormGroup metadata={{ title: $t('Rotation') }}>
-            <button class="button button--default" style="width: 172px;" onClick={this.rotate(90)}>
+            <input
+              type="button"
+              class="button button--default"
+              style="width: 172px;"
+              onClick={this.rotate(90)}
+            >
               {$t('Rotate 90 Degrees CW')}
-            </button>
+            </input>
             <div style="margin: 8px;" />
-            <button class="button button--default" style="width: 172px;" onClick={this.rotate(-90)}>
+            <input
+              type="button"
+              class="button button--default"
+              style="width: 172px;"
+              onClick={this.rotate(-90)}
+            >
               {$t('Rotate 90 Degrees CCW')}
-            </button>
+            </input>
           </HFormGroup>
           {this.cropForm}
         </ValidatedForm>
