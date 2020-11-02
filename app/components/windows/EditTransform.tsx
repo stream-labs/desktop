@@ -164,10 +164,10 @@ export default class EditTransform extends TsxComponent<{}> {
         </ValidatedForm>
 
         <div slot="controls">
-          <button class="button button--default" onClick={this.reset}>
+          <button class="button button--default" onClick={() => this.reset()}>
             {$t('Reset')}
           </button>
-          <button class="button button--action" onClick={this.cancel}>
+          <button class="button button--action" onClick={() => this.cancel()}>
             {$t('Done')}
           </button>
         </div>
