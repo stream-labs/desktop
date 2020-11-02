@@ -105,8 +105,9 @@ test('Streaming to the scheduled event on Youtube', async t => {
 
   // create event via scheduling form
   const tomorrow = Date.now() + 1000 * 60 * 60 * 24;
+  const formattedTomorrow = moment(tomorrow).format(moment.localeData().longDateFormat('ll'));
   await scheduleStream(t, tomorrow, {
-    title: `Youtube Test Stream ${tomorrow}`,
+    title: 'Youtube Test Stream',
     description: 'SLOBS Test Stream Description',
   });
 
@@ -115,7 +116,7 @@ test('Streaming to the scheduled event on Youtube', async t => {
   await clickGoLive(t);
   const form = new FormMonkey(t);
   await form.fill({
-    event: await form.getOptionByTitle('event', new RegExp(`Youtube Test Stream ${tomorrow}`)),
+    event: await form.getOptionByTitle('event', `Youtube Test Stream (${formattedTomorrow})`),
   });
   await submit(t);
   await waitForStreamStart(t);
@@ -327,7 +328,9 @@ test('User does not have Facebook pages', async t => {
   await logIn(t, 'facebook', { noFacebookPages: true, notStreamable: true });
   await prepareToGoLive(t);
   await clickGoLive(t);
-  if (await t.context.app.client.isExisting('button=Go Live')) await t.context.app.client.click('button=Go Live');
+  if (await t.context.app.client.isExisting('button=Go Live')) {
+    await t.context.app.client.click('button=Go Live');
+  }
   await focusChild(t);
   t.true(
     await t.context.app.client.isExisting('a=create one now'),
@@ -372,7 +375,10 @@ test('Recording when streaming', async t => {
 
 test('Streaming to Dlive', async t => {
   // click Log-in
+  await click(t, '.icon-settings');
+  await focusChild(t);
   await click(t, '.fa-sign-in-alt');
+  await focusMain(t);
 
   // select DLive from the "use another platform list"
   await fillForm(t, null, { otherPlatform: 'dlive' });
