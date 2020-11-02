@@ -75,6 +75,12 @@ class ClipboardViews extends ViewHandler<IClipboardState> {
   }
 
   hasItems(): boolean {
+    // If the items that were copied are in a scene that no longer exists,
+    // we should treat this as if there is nothing in the clipboard
+    if (this.state.sceneNodesIds.length) {
+      if (!this.getServiceViews(ScenesService).getScene(this.state.itemsSceneId)) return false;
+    }
+
     return !!(this.state.sceneNodesIds.length || this.hasItemsInUnloadedClipboard());
   }
 
