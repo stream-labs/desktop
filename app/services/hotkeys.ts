@@ -10,7 +10,8 @@ import mapValues from 'lodash/mapValues';
 import { $t } from 'services/i18n';
 import * as obs from '../../obs-api';
 import { GameOverlayService } from './game-overlay';
-import Utils from './utils';
+import { CustomizationService } from './customization';
+import { RecentEventsService } from './recent-events';
 
 function getScenesService(): ScenesService {
   return ScenesService.instance;
@@ -30,6 +31,14 @@ function getTransitionsService(): TransitionsService {
 
 function getGameOverlayService(): GameOverlayService {
   return GameOverlayService.instance;
+}
+
+function getCustomizationService(): CustomizationService {
+  return CustomizationService.instance;
+}
+
+function getRecentEventsService(): RecentEventsService {
+  return RecentEventsService.instance;
 }
 
 const isAudio = (sourceId: string) => {
@@ -158,6 +167,16 @@ const GENERAL_ACTIONS: HotkeyGroup = {
     name: 'TOGGLE_OVERLAY_POSITIONING',
     description: () => $t('Toggle overlay positioning mode'),
     down: () => getGameOverlayService().setPreviewMode(!getGameOverlayService().state.previewMode),
+  },
+  TOGGLE_PERFORMANCE_MODE: {
+    name: 'TOGGLE_PERFORMANCE_MODE',
+    description: () => $t('Toggle Performance Mode'),
+    down: () => getCustomizationService().togglePerformanceMode(),
+  },
+  SKIP_ALERT: {
+    name: 'SKIP_ALERT',
+    description: () => $t('Skip Alert'),
+    down: () => getRecentEventsService().skipAlert(),
   },
 };
 
