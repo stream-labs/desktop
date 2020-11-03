@@ -115,7 +115,7 @@ export class SceneItemFolder extends SceneItemNode {
     this.getNodes().forEach(node => {
       if (traversedNodesIds.includes(node.id)) {
         // TODO: find the use-case that causes loops in folders structure
-        console.error(`Loop in folders structure detected', ${this.name} -> ${node.name}`);
+        console.warn(`Loop in folders structure detected', ${this.name} -> ${node.name}`);
         return;
       }
       nodes.push(node);

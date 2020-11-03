@@ -6,7 +6,7 @@ Simple, powerful, and efficient live streaming software built on Electron and OB
 
 ![Streamlabs OBS](https://cdn.streamlabs.com/slobs/slobs-chatbox.png)
 
-This application currently only supports 64-bit Windows.
+This application currently only supports OSX 10.14+ and 64-bit Windows.
 
 ## Dependencies
 

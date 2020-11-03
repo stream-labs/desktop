@@ -71,7 +71,7 @@ export class OptimizedProfileSwitcher extends TsxComponent<Props> {
   private render() {
     const game = this.game;
     return (
-      <HFormGroup metadata={{ tooltip: this.optimizedProfileMetadata.tooltip }}>
+      <HFormGroup>
         {this.loading && $t('Checking optimized setting for %{game}', { game })}
         {!this.loading && (
           <BoolInput vModel={this.useOptimizedProfile} metadata={this.optimizedProfileMetadata} />

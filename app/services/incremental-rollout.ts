@@ -1,5 +1,5 @@
 import { Inject } from 'services/core/injector';
-import { handleResponse, authorizedHeaders } from 'util/requests';
+import { authorizedHeaders, jfetch } from 'util/requests';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import { UserService } from 'services/user';
 import { HostsService } from './hosts';
@@ -55,11 +55,9 @@ export class IncrementalRolloutService extends StatefulService<IIncrementalRollo
       const headers = authorizedHeaders(this.userService.apiToken);
       const request = new Request(url, { headers });
 
-      return fetch(request)
-        .then(handleResponse)
-        .then(response => {
-          this.SET_AVAILABLE_FEATURES(response.features);
-        });
+      return jfetch<{ features: string[] }>(request).then(response => {
+        this.SET_AVAILABLE_FEATURES(response.features);
+      });
     }
   }
 

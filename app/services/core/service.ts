@@ -40,6 +40,37 @@ export interface IActionsReturn<T> {
   return: TPromisifyFunctions<T>;
 }
 
+/**
+ * Creates a Proxy for handling action calls from the worker process.
+ * Although Promises are still returned, all execution happens
+ * synchronously.
+ * @param service The service to wrap
+ * @param isReturn Whether to return the result
+ */
+function getActionProxy<T extends Service>(
+  service: T,
+  isReturn = false,
+): TVoidFunctions<T> & IActionsReturn<T> {
+  return (new Proxy(service, {
+    get: (target, key) => {
+      if (key === 'return' && !isReturn) {
+        return getActionProxy(target, true);
+      }
+
+      return (...args: unknown[]) => {
+        return new Promise((resolve, reject) => {
+          try {
+            const result: unknown = (target[key] as Function).apply(target, args);
+            isReturn ? resolve(result) : resolve();
+          } catch (e) {
+            reject(e);
+          }
+        });
+      };
+    },
+  }) as unknown) as TVoidFunctions<T> & IActionsReturn<T>;
+}
+
 export abstract class Service {
   static isSingleton = true;
 
@@ -137,12 +168,9 @@ export abstract class Service {
    * return values by default.
    */
   get actions(): TVoidFunctions<this> & IActionsReturn<this> {
-    // The internal API client handles this via Proxies at runtime.
-    // This getter is here for the type system only.
-    // Attempting to call actions from the worker window will result
-    // in a poor experience.
-
-    // TODO: Make a dummy synchronous aciton handler here
-    return (null as unknown) as TVoidFunctions<this> & IActionsReturn<this>;
+    // The internal API client handles this via Proxies at runtime
+    // for renderer processes. For the worker process, we use a simple
+    // proxy that synchronously executes the calls.
+    return getActionProxy(this);
   }
 }

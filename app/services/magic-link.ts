@@ -1,7 +1,7 @@
 import { Service } from 'services';
 import { Inject } from 'services/core';
 import { UserService } from 'services/user';
-import { authorizedHeaders, handleResponse } from 'util/requests';
+import { authorizedHeaders, jfetch } from 'util/requests';
 import { HostsService } from './hosts';
 import electron from 'electron';
 
@@ -17,7 +17,9 @@ export class MagicLinkService extends Service {
   async getDashboardMagicLink(subPage = '', source?: string) {
     const token = (await this.fetchNewToken()).login_token;
     const sourceString = source ? `&refl=${source}` : '';
-    return `https://${this.hostsService.streamlabs}/slobs/magic/dashboard?login_token=${token}&r=${subPage}${sourceString}`;
+    return `https://${
+      this.hostsService.streamlabs
+    }/slobs/magic/dashboard?login_token=${token}&r=${subPage ?? ''}${sourceString}`;
   }
 
   private fetchNewToken(): Promise<ILoginTokenResponse> {
@@ -27,7 +29,7 @@ export class MagicLinkService extends Service {
       { headers },
     );
 
-    return fetch(request).then(handleResponse);
+    return jfetch(request);
   }
 
   async openWidgetThemesMagicLink() {
