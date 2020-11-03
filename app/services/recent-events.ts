@@ -16,6 +16,7 @@ export interface IRecentEvent {
   from?: string;
   type: string;
   platform: string;
+  for?: string;
   created_at: string;
   display_name?: string;
   from_display_name?: string;
