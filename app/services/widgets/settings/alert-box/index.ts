@@ -81,6 +81,16 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     return {
       moderationDelay: metadata.slider({ title: $t('Alert Moderation delay'), min: 0, max: 600 }),
       alertDelay: metadata.slider({ title: $t('Global Alert Delay'), min: 0, max: 30 }),
+      interruptMode: metadata.toggle({
+        title: $t('Alert Parries'),
+        tooltip: $t('New alerts will interrupt the on screen alert'),
+      }),
+      interruptDelay: metadata.slider({
+        title: $t('Parry Alert Delay'),
+        min: 0,
+        max: 20,
+        interval: 0.5,
+      }),
       textThickness: metadata.slider({
         title: $t('Font Weight'),
         min: 300,
@@ -204,6 +214,10 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
       });
       if (['alert_delay', 'moderation_delay'].includes(key)) {
         newSettings[key] = Math.floor(settings[key] / 1000);
+      } else if (key === 'interrupt_mode_delay') {
+        const constrainedInterruptDelay =
+          settings.interrupt_mode_delay / 1000 <= 20 ? settings.interrupt_mode_delay / 1000 : 20;
+        newSettings[key] = constrainedInterruptDelay;
       } else if (!testSuccess && !/smfredemption/.test(key)) {
         newSettings[key] = settings[key];
       }

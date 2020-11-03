@@ -123,10 +123,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
   }
 
   static msToTimeSpec(ms: number): obs.ITimeSpec {
-    return {
-      sec: Math.floor(ms / 1000),
-      nsec: Math.floor(ms % 1000) * 1000000,
-    };
+    return { sec: Math.trunc(ms / 1000), nsec: Math.trunc(ms % 1000) * 1000000 };
   }
 
   volmeterSubscriptions: Dictionary<number[]> = {};

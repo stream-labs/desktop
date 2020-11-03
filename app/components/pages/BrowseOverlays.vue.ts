@@ -4,7 +4,7 @@ import { UserService } from '../../services/user';
 import { Inject, Service } from 'services';
 import { NavigationService } from 'services/navigation';
 import { SceneCollectionsService } from 'services/scene-collections';
-import { IDownloadProgress, OverlaysPersistenceService } from 'services/scene-collections/overlays';
+import { OverlaysPersistenceService } from 'services/scene-collections/overlays';
 import { ScenesService } from 'services/scenes';
 import { WidgetsService } from 'services/widgets';
 import { NotificationsService, ENotificationType } from 'services/notifications';
@@ -16,6 +16,7 @@ import { $t, I18nService } from 'services/i18n';
 import BrowserView from 'components/shared/BrowserView';
 import { RestreamService } from 'services/restream';
 import { GuestApiHandler } from 'util/guest-api-handler';
+import { IDownloadProgress } from 'util/requests';
 
 @Component({ components: { BrowserView } })
 export default class BrowseOverlays extends Vue {

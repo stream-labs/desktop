@@ -240,7 +240,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     const mousePosX = event.offsetX * factor - this.renderedOffsetX;
     const mousePosY = event.offsetY * factor - this.renderedOffsetY;
 
-    const converted = this.convertScalarToBaseSpace(mousePosX * factor, mousePosY * factor);
+    const converted = this.convertScalarToBaseSpace(mousePosX, mousePosY);
 
     if (this.resizeRegion) {
       const name = this.resizeRegion.name;

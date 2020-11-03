@@ -17,6 +17,7 @@
   "Rather do this manually?": "Bunu el ile yapmak ister misiniz?",
   "Setup later": "Sonra kur",
   "Widget Theme installed & activated. Click here to manage your Widget Profiles.": "Pencere Ögesi Teması yüklendi ve etkinleştirildi. Pencere Ögesi Profillerinizi yönetmek için buraya tıklayın.",
+  "Alertbox Theme installed & activated. Click here to manage your Widget Profiles.": "Alertbox Theme installed & activated. Click here to manage your Widget Profiles.",
   "Follow": "Takip",
   "Subscription": "Abonelik",
   "Donation": "Bağış",
@@ -180,5 +181,6 @@
   "Slide Out Down": "Aşağı Dışarı Kaydır",
   "Slide Out Left": "Sola Dışarı Kaydır",
   "Slide Out Right": "Sağa Dışarı Kaydır",
-  "Slide Out Up": "Yukarı Dışarı Kaydır"
+  "Slide Out Up": "Yukarı Dışarı Kaydır",
+  "Pick Screen Color": "Pick Screen Color"
 }

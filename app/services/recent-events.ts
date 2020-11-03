@@ -1,7 +1,7 @@
 import { HostsService } from 'services/hosts';
 import { StatefulService, Inject, mutation, InitAfter, ViewHandler } from 'services/core';
 import { UserService, LoginLifecycle } from 'services/user';
-import { authorizedHeaders, handleResponse } from 'util/requests';
+import { authorizedHeaders, handleResponse, jfetch } from 'util/requests';
 import { $t } from 'services/i18n';
 import { WindowsService } from 'services/windows';
 import { WebsocketService, TSocketEvent, IEventSocketEvent } from 'services/websocket';
@@ -338,7 +338,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
 
   async syncEventsState() {
     const config = await this.fetchConfig();
-    this.applyConfig(config);
+    if (config) this.applyConfig(config);
     this.formEventsArray();
     this.fetchMediaShareState();
     this.subscribeToSocketConnection();
@@ -359,7 +359,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     this.unsubscribeFromSocketConnection();
   }
 
-  fetchRecentEvents(): Promise<{ data: Dictionary<IRecentEvent[]> }> {
+  fetchRecentEvents() {
     const typeString = this.getEventTypesString();
     // eslint-disable-next-line
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/recentevents/${
@@ -367,20 +367,20 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     }?types=${typeString}`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
-    return fetch(request)
-      .then(handleResponse)
-      .catch(() => null);
+    return jfetch<{ data: Dictionary<IRecentEvent[]> }>(request).catch(() => {
+      console.warn('Error fetching recent events');
+    });
   }
 
-  async fetchConfig(): Promise<IRecentEventsConfig> {
+  async fetchConfig() {
     // eslint-disable-next-line
     const url = `https://${
       this.hostsService.streamlabs
     }/api/v5/slobs/widget/config?widget=recent_events`;
     const headers = authorizedHeaders(this.userService.apiToken);
-    return fetch(new Request(url, { headers }))
-      .then(handleResponse)
-      .catch(() => null);
+    return jfetch<IRecentEventsConfig>(url, { headers }).catch(() => {
+      console.warn('Error fetching recent events config');
+    });
   }
 
   fetchMediaShareState() {
@@ -389,9 +389,9 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       this.hostsService.streamlabs
     }/api/v5/slobs/widget/config?widget=media-sharing`;
     const headers = authorizedHeaders(this.userService.apiToken);
-    return fetch(new Request(url, { headers }))
-      .then(handleResponse)
-      .then(resp => this.SET_MEDIA_SHARE(resp.settings.advanced_settings.enabled));
+    return jfetch<{ settings: { advanced_settings: { enabled: boolean } } }>(url, {
+      headers,
+    }).then(resp => this.SET_MEDIA_SHARE(resp.settings.advanced_settings.enabled));
   }
 
   refresh() {
@@ -401,7 +401,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   private async formEventsArray() {
     const events = await this.fetchRecentEvents();
     let eventArray: IRecentEvent[] = [];
-    if (!events.data) return;
+    if (!events || !events.data) return;
     Object.keys(events.data).forEach(key => {
       const fortifiedEvents = events.data[key].map(event => {
         event.hash = getHashForRecentEvent(event);
@@ -478,7 +478,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     const body = JSON.stringify({
       hashValues,
     });
-    return await fetch(new Request(url, { headers, body, method: 'POST' })).then(handleResponse);
+    return await jfetch(url, { headers, body, method: 'POST' });
   }
 
   async repeatAlert(event: IRecentEvent) {
