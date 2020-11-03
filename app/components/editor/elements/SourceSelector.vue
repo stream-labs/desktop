@@ -114,13 +114,6 @@ i.disabled {
   }
 }
 
-.vue-tree-container {
-  flex-grow: 1;
-  height: 100%;
-  border-color: var(--section);
-  background: var(--section);
-}
-
 .sl-vue-tree-node-item {
   align-items: center;
 
