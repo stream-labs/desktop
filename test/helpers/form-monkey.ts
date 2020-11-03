@@ -323,8 +323,12 @@ export class FormMonkey {
   }
 
   async setToggleValue(selector: string, value: boolean) {
+    // click to change the ToggleInput state
+    await this.client.click(selector);
+
+    // if the current value is not what we need than click one more time
     const selected = (await this.getAttribute(selector, 'data-value')) === 'true';
-    if ((selected && !value) || (!selected && value)) {
+    if (value !== selected) {
       await this.client.click(selector);
     }
   }
