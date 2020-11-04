@@ -164,6 +164,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           // 配信可能チャンネルがある時
           if (broadcastableChannels.length > 0) {
             this.windowsService.showWindow({
+              title: $t('streaming.nicoliveProgramSelector.title'),
               componentName: 'NicoliveProgramSelector',
               size: {
                 width: 800,
