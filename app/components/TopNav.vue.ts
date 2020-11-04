@@ -11,6 +11,7 @@ import { SettingsService } from 'services/settings';
 import Utils from 'services/utils';
 import { TransitionsService } from 'services/transitions';
 import { InformationsService } from 'services/informations';
+import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 
 @Component({
   components: {
@@ -25,8 +26,15 @@ export default class TopNav extends Vue {
   @Inject() userService: UserService;
   @Inject() transitionsService: TransitionsService;
   @Inject() informationsService: InformationsService;
+  @Inject() incrementalRolloutService: IncrementalRolloutService;
 
   slideOpen = false;
+
+  studioModeTooltip = 'Studio Mode';
+
+  get availableFeatures() {
+    return EAvailableFeatures;
+  }
 
   @Prop() locked: boolean;
 
@@ -36,6 +44,10 @@ export default class TopNav extends Vue {
 
   navigateOnboarding() {
     this.navigationService.navigate('Onboarding');
+  }
+
+  featureIsEnabled(feature: EAvailableFeatures) {
+    return this.incrementalRolloutService.featureIsEnabled(feature);
   }
 
   studioMode() {

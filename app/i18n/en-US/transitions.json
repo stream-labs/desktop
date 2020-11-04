@@ -7,6 +7,19 @@
   "fade_to_color_transition": "Fade to Color",
   "wipe_transition": "Luma Wipe",
   "obs_stinger_transition": "Stinger",
-  "transition": "Transition",
-  "duration": "Duration"
+  "transitionName": "名前",
+  "transitionType": "Transition",
+  "duration": "Duration",
+  "connectionFrom": "Beginning Scene",
+  "connectionTo": "Ending Scene",
+  "default": "Default",
+  "transitions": "Transitions",
+  "connections": "Connections",
+  "addTransition": "Add Transition",
+  "addConnection": "Add Connection",
+  "mustHaveLeastTwoScenes": "You need at least 2 scenes to edit transitions.",
+  "mustHaveLeastOneTransition": "You need at least 1 transition.",
+  "redundantConnectionTooltip": "This connection is redundant because another connection already connects these scenes.",
+  "newTransition": "New Transition",
+  "deleted": "Deleted"
 }

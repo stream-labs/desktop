@@ -4,7 +4,7 @@ import { RootNode } from './nodes/root';
 import { SourcesNode, ISourceInfo } from './nodes/sources';
 import { ScenesNode, ISceneSchema } from './nodes/scenes';
 import { SceneItemsNode, ISceneItemInfo } from './nodes/scene-items';
-import { TransitionNode } from './nodes/transition';
+import { TransitionsNode } from './nodes/transitions';
 import { HotkeysNode } from './nodes/hotkeys';
 import { SceneFiltersNode } from './nodes/scene-filters';
 import path from 'path';
@@ -30,6 +30,7 @@ import {
 import { SceneCollectionsStateService, ScenePresetId } from './state';
 import { Subject } from 'rxjs';
 import { $t } from 'services/i18n';
+import { TransitionsService, ETransitionType } from 'services/transitions';
 import { SettingsService } from 'services/settings';
 import { DismissablesService, EDismissable } from 'services/dismissables';
 
@@ -40,7 +41,8 @@ export const NODE_TYPES = {
   SourcesNode,
   ScenesNode,
   SceneItemsNode,
-  TransitionNode,
+  TransitionNode: TransitionsNode, // Alias old name to new node
+  TransitionsNode,
   HotkeysNode,
   SceneFiltersNode
 };
@@ -73,6 +75,7 @@ export class SceneCollectionsService extends Service
   @Inject() userService: UserService;
   @Inject() overlaysPersistenceService: OverlaysPersistenceService;
   @Inject() tcpServerService: TcpServerService;
+  @Inject() transitionsService: TransitionsService;
   @Inject() dismissablesService: DismissablesService;
   @Inject() settingsService: SettingsService;
 
@@ -103,7 +106,17 @@ export class SceneCollectionsService extends Service
     if (this.activeCollection) {
       await this.load(this.activeCollection.id);
     } else if (this.collections.length > 0) {
-      await this.load(this.collections[0].id);
+      let latestId = this.collections[0].id;
+      let latestModified = this.collections[0].modified;
+
+      this.collections.forEach(collection => {
+        if (collection.modified > latestModified) {
+          latestModified = collection.modified;
+          latestId = collection.id;
+        }
+      });
+
+      await this.load(latestId);
     } else {
       await this.create();
     }
@@ -265,13 +278,13 @@ export class SceneCollectionsService extends Service
 
     const removingActiveCollection = id === this.activeCollection.id;
 
-    this.removeCollection(id);
+    await this.removeCollection(id);
 
     if (removingActiveCollection) {
       if (this.collections.length > 0) {
-        this.load(this.collections[0].id);
+        await this.load(this.collections[0].id);
       } else {
-        this.create();
+        await this.create();
       }
     }
   }
@@ -281,7 +294,7 @@ export class SceneCollectionsService extends Service
    * @param name the name of the new scene collection
    * @param id if not present, will operate on the current collection
    */
-  rename(name: string, id?: string) {
+  async rename(name: string, id?: string) {
     this.stateService.RENAME_COLLECTION(
       id || this.activeCollection.id,
       name,
@@ -370,11 +383,33 @@ export class SceneCollectionsService extends Service
   }
 
   /**
+   * Show the window to name a new scene collection
+   * @param options options
+   */
+  showNameConfig(
+    options: { sceneCollectionToDuplicate?: string; rename?: boolean } = {}
+  ) {
+    this.windowsService.showWindow({
+      componentName: 'NameSceneCollection',
+      title: $t('scenes.nameSceneCollection'),
+      queryParams: {
+        sceneCollectionToDuplicate: options.sceneCollectionToDuplicate,
+        rename: options.rename ? 'true' : ''
+      },
+      size: {
+        width: 400,
+        height: 250
+      }
+    });
+  }
+
+  /**
    * Show the window to manage scene collections
    */
   showManageWindow() {
     this.windowsService.showWindow({
       componentName: 'ManageSceneCollections',
+      title: $t('scenes.manageSceneCollections'),
       size: {
         width: 700,
         height: 800
@@ -391,7 +426,8 @@ export class SceneCollectionsService extends Service
   }
 
   /**
-   * Used by StreamDeck
+   * Used by StreamDeck and platform API.
+   * This method is potentially *very* expensive
    */
   fetchSceneCollectionsSchema(): Promise<ISceneCollectionSchema[]> {
     const promises: Promise<ISceneCollectionSchema>[] = [];
@@ -538,6 +574,9 @@ export class SceneCollectionsService extends Service
       this.sourcesService.sources.forEach(source => {
         if (source.type !== 'scene') source.remove();
       });
+
+      this.transitionsService.deleteAllTransitions();
+      this.transitionsService.deleteAllConnections();
     } catch (e) {
       console.error('Error deloading application state');
     }
@@ -550,6 +589,8 @@ export class SceneCollectionsService extends Service
    * Should be called before any loading operations
    */
   private startLoadingOperation() {
+    this.windowsService.closeChildWindow();
+    this.windowsService.closeAllOneOffs();
     this.appService.startLoading();
     this.tcpServerService.stopRequestsHandling();
     this.disableAutoSave();
@@ -571,6 +612,7 @@ export class SceneCollectionsService extends Service
   private setupEmptyCollection() {
     this.scenesService.createScene('Scene', { makeActive: true });
     this.setupDefaultAudio();
+    this.transitionsService.ensureTransition();
   }
 
   /**
@@ -607,7 +649,7 @@ export class SceneCollectionsService extends Service
   /**
    * Deletes on the server and removes from the store
    */
-  private removeCollection(id: string) {
+  private async removeCollection(id: string) {
     this.collectionRemoved.next(this.collections.find(coll => coll.id === id));
     this.stateService.DELETE_COLLECTION(id);
 
@@ -642,21 +684,6 @@ export class SceneCollectionsService extends Service
 
   private get legacyDirectory() {
     return path.join(electron.remote.app.getPath('userData'), 'SceneConfigs');
-  }
-
-  /**
-   * Performs a sync step, catches any errors, and returns
-   * true/false depending on whether the step succeeded
-   */
-  private async performSyncStep(name: string, stepRunner: () => Promise<void>): Promise<boolean> {
-    try {
-      await stepRunner();
-      console.debug(`Sync step succeeded: ${name}`);
-      return true;
-    } catch (e) {
-      console.error(`Sync step failed: ${name}`, e);
-      return false;
-    }
   }
 
   /**

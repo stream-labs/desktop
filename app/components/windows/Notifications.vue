@@ -1,21 +1,19 @@
 <template>
-<modal-layout
-    :title="$t('common.notifications')"
-    :showControls="false"
->
+<modal-layout :showControls="false">
   <div slot="content">
 
     <h4 v-if="!notificationsCount">
       {{ $t('notifications.noNotification') }}
     </h4>
 
-    <div v-for="(notificationsService, groupName) in notificationGroups">
+    <div v-for="(notificationsService, groupName) in notificationGroups" :key="groupName">
       <h4 v-if="notificationsService.length">
         {{ groupName == 'unread' ? $t('notifications.newNotifications') : $t('notifications.log') }}
       </h4>
       <div
         class="notification"
         v-for="notify in notificationsService"
+        :key="notify.id"
         @click="onNotificationClickHandler(notify.id)"
         :class = "{
           'unread': notify.unread,
@@ -39,8 +37,7 @@
 <script lang="ts" src="./Notifications.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .notification {
   color: @text-primary;
@@ -50,7 +47,7 @@
   grid-template-columns: 30px 1fr 130px;
   background: @hover;
   border-color: @hover;
-  .border;
+  .border();
 
   &.has-action:hover {
     color: @white;

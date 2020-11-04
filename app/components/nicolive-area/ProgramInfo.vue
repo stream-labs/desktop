@@ -26,8 +26,7 @@
 
 <script lang="ts" src="./ProgramInfo.vue.ts"></script>
 <style lang="less" scoped>
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .program-info {
   width: 100%;

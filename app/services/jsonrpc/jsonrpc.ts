@@ -1,5 +1,5 @@
 import electron from 'electron';
-import { Service } from '../service';
+import { Service } from 'services/service';
 import {
   E_JSON_RPC_ERROR,
   IJsonRpcResponse,
@@ -7,6 +7,7 @@ import {
   IJsonRpcEvent,
   IJsonrpcServiceApi
 } from './jsonrpc-api';
+import uuid from 'uuid/v4';
 
 const { ipcRenderer } = electron;
 
@@ -38,7 +39,7 @@ export class JsonrpcService extends Service implements IJsonrpcServiceApi {
   ): IJsonRpcRequest {
     return {
       jsonrpc: '2.0',
-      id: ipcRenderer.sendSync('getUniqueId'),
+      id: uuid(),
       method,
       params: {
         resource: resourceId,
@@ -60,7 +61,7 @@ export class JsonrpcService extends Service implements IJsonrpcServiceApi {
 
   static createResponse<TResult>(
     requestOrRequestId: string | IJsonRpcRequest,
-    result: TResult
+    result: TResult = null
   ): IJsonRpcResponse<TResult> {
     const id =
       (arguments[0] && typeof arguments[0] === 'object')

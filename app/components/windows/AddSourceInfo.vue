@@ -19,8 +19,7 @@
 <script lang="ts" src="./AddSourceInfo.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .source-info--no-selection {
   ol {

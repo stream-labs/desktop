@@ -3,7 +3,7 @@ import { SceneItem } from '../../../scenes';
 import { VideoService } from '../../../video';
 import { SourcesService } from '../../../sources';
 import { sortBy } from 'lodash';
-import { IListProperty } from '../../../obs-api';
+import { IListProperty } from '../../../../../obs-api';
 import { ScalableRectangle } from '../../../../util/ScalableRectangle';
 
 interface ISchema {
@@ -52,6 +52,8 @@ export class WebcamNode extends Node<ISchema, IContext> {
     } else {
       resolution = this.performInitialSetup(context.sceneItem);
     }
+
+    if (!resolution) return;
 
     const currentAspect = resolution.width / resolution.height;
     const crop: ICrop = {

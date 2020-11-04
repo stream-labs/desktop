@@ -10,46 +10,13 @@ import {
     iterateKeyDescriptions,
     Optimizer
 } from './optimizer';
-import { createSetupFunction } from 'util/test-setup';
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
-import { ISettingsSubCategory } from './settings-api';
-jest.mock('services/stateful-service');
-jest.mock('util/injector');
-jest.mock('services/obs-api', () => ({}));
-jest.mock('components/shared/forms/Input', () => ({}));
-jest.mock('services/windows', () => ({}));
-jest.mock('services/hotkeys', () => ({}));
-jest.mock('services/audio', () => ({}));
-jest.mock('services/shortcuts', () => ({}));
-jest.mock('services/selection', () => ({}));
-jest.mock('services/video', () => ({}));
-jest.mock('services/scenes', () => ({}));
-jest.mock('services/sources', () => ({}));
-jest.mock('services-manager', () => ({}));
-jest.mock('services/ipc-server', () => ({}));
-jest.mock('services/jsonrpc/jsonrpc', () => ({}));
-jest.mock('services/jsonrpc', () => ({}));
-jest.mock('util/menus/Menu', () => ({}));
-
-const setup = createSetupFunction({
-    injectee: {
-        FileManagerService: {
-            read(filename: string) {
-                return readFileSync(filename, 'utf-8');
-            },
-            resolve(filepath: string) {
-                return resolve(filepath);
-            },
-        },
-    },
-    state: {
-        I18nService: {},
-    },
-});
+type ISettingsSubCategory = import('./settings-api').ISettingsSubCategory;
+jest.mock('./settings-api');
+jest.mock('services/i18n', () => ({
+  $t: (x: string) => x,
+}));
 
 test('filterKeyDescriptions', () => {
-    setup();
     const outputSimpleOnly: OptimizeSettings = {
         outputMode: 'Simple',
     }
@@ -71,7 +38,6 @@ test('filterKeyDescriptions', () => {
 });
 
 test('SettingsKeyAccessor#traverseKeyDescriptions', () => {
-    setup();
     // テスト用の最小のdescriptionを用意する
     //  分岐があること
     const simpleSettings: OptimizeSettings = {

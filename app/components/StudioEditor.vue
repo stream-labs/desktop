@@ -12,7 +12,7 @@
     class="studio-editor-display"
     :drawUI="true"
     :paddingSize="10"
-    :sourceId="studioMode ? 'Studio Transition' : void 0"
+    :sourceId="studioMode ? getStudioTransitionName() : void 0"
     @outputResize="onOutputResize"/>
 </div>
 </template>
@@ -20,7 +20,7 @@
 <script lang="ts" src="./StudioEditor.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/_colors";
+@import "../styles/index";
 
 .studio-editor-display-container {
   position: relative;

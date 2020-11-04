@@ -3,9 +3,9 @@ import { Subject } from 'rxjs';
 
 import { StatefulService, mutation } from 'services/stateful-service';
 import { CustomizationService } from 'services/customization';
-import { nodeObs } from 'services/obs-api';
-import electron from 'electron';
 import { Inject } from 'util/injector';
+import electron from 'electron';
+import * as obs from '../../../obs-api';
 
 interface IPerformanceState {
   CPU: number;
@@ -14,6 +14,8 @@ interface IPerformanceState {
   bandwidth: number;
   frameRate: number;
 }
+
+const STATS_UPDATE_INTERVAL = 2 * 1000;
 
 // TODO: merge this service with PerformanceMonitorService
 
@@ -41,35 +43,28 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
   }
 
   init() {
-    this.intervalId = setInterval(() => {
-      this.updateStatistics();
-    }, 2 * 1000) as any;
+    this.intervalId = window.setInterval(() => this.update(), STATS_UPDATE_INTERVAL);
   }
 
-  stop() {
-    clearInterval(this.intervalId);
-    this.SET_PERFORMANCE_STATS(PerformanceService.initialState);
-  }
-
-  private getStatistics(): Partial<IPerformanceState> {
-    if (this.customizationService.pollingPerformanceStatistics) {
-      return nodeObs.OBS_API_getPerformanceStatistics();
-    }
-
-    return {};
-  }
-
-  private updateStatistics(): void {
-    const stats = this.getStatistics();
+  private update() {
+    const stats: IPerformanceState = this.customizationService.pollingPerformanceStatistics
+      ? obs.NodeObs.OBS_API_getPerformanceStatistics()
+      : { CPU: 0 };
 
     if (stats.percentageDroppedFrames) {
       this.droppedFramesDetected.next(stats.percentageDroppedFrames / 100);
     }
 
-    stats.CPU = electron.remote.app.getAppMetrics().map(proc => {
+    const am = electron.remote.app.getAppMetrics();
+
+    stats.CPU += am.map(proc => {
       return proc.cpu.percentCPUUsage;
     }).reduce((sum, usage) => sum + usage);
 
     this.SET_PERFORMANCE_STATS(stats);
+  }
+
+  stop() {
+    window.clearInterval(this.intervalId);
   }
 }

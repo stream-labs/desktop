@@ -11,7 +11,7 @@ import {
 import { mutation, ServiceHelper } from 'services/stateful-service';
 import { Inject } from 'util/injector';
 import { ScenesService } from 'services/scenes';
-import { TFormData } from 'components/shared/forms/Input';
+import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import Utils from 'services/utils';
 import * as obs from '../../../obs-api';
 import { isEqual } from 'lodash';
@@ -49,6 +49,7 @@ export class Source implements ISourceApi {
 
   updateSettings(settings: Dictionary<any>) {
     this.getObsInput().update(settings);
+    this.sourcesService.sourceUpdated.next(this.sourceState);
   }
 
 
@@ -112,15 +113,16 @@ export class Source implements ISourceApi {
   }
 
 
-  getPropertiesFormData(): TFormData {
+  getPropertiesFormData(): TObsFormData {
     const manager = this.sourcesService.propertiesManagers[this.sourceId].manager;
     return manager.getPropertiesFormData();
   }
 
 
-  setPropertiesFormData(properties: TFormData) {
+  setPropertiesFormData(properties: TObsFormData) {
     const manager = this.sourcesService.propertiesManagers[this.sourceId].manager;
     manager.setPropertiesFormData(properties);
+    this.sourcesService.sourceUpdated.next(this.sourceState);
   }
 
 
@@ -163,6 +165,15 @@ export class Source implements ISourceApi {
     return this.getObsInput().configurable;
   }
 
+  /**
+   * works only for browser_source
+   */
+  refresh() {
+    const obsInput = this.getObsInput();
+    (obsInput.properties.get('refreshnocache') as obs.IButtonProperty)
+      .buttonClicked(obsInput);
+  }
+
 
   @Inject()
   protected sourcesService: SourcesService;
@@ -172,8 +183,14 @@ export class Source implements ISourceApi {
     // is always up-to-date, and essentially acts
     // as a view into the store.  It also enforces
     // the read-only nature of this data
-    this.sourceState = this.sourcesService.state.sources[sourceId];
-    Utils.applyProxy(this, this.sourcesService.state.sources[sourceId]);
+    const isTemporarySource = !!this.sourcesService.state.temporarySources[sourceId];
+    if (isTemporarySource) {
+      this.sourceState = this.sourcesService.state.temporarySources[sourceId];
+      Utils.applyProxy(this, this.sourcesService.state.temporarySources[sourceId]);
+    } else {
+      this.sourceState = this.sourcesService.state.sources[sourceId];
+      Utils.applyProxy(this, this.sourcesService.state.sources[sourceId]);
+    }
   }
 
   @mutation()

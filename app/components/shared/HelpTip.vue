@@ -14,8 +14,7 @@
 <script lang="ts" src="./HelpTip.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../styles/_colors";
-@import "../../styles/mixins";
+@import "../../styles/index";
 
 .help-tip {
   position: absolute;
@@ -46,7 +45,7 @@
   font-size: 20px;
   cursor: pointer;
   opacity: .6;
-  .transition;
+  .transition();
 
   &:hover {
     opacity: 1;

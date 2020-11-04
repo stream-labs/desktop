@@ -9,7 +9,9 @@
       </button>
     </div>
     <div class="section">
-      <GenericForm v-model="settingsFormData" @input="saveNotificationsSettings" />
+      <div class="section-content">
+        <GenericForm v-model="settingsFormData" @input="saveNotificationsSettings" />
+      </div>
     </div>
     <div class="section">
       <h4>

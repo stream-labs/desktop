@@ -20,6 +20,8 @@ import { ProtocolLinksService } from 'services/protocol-links';
 import { WindowsService } from 'services/windows';
 import { QuestionaireService } from 'services/questionaire';
 import { InformationsService } from 'services/informations';
+import { CrashReporterService } from 'services/crash-reporter';
+import * as obs from '../../../obs-api';
 
 interface IAppState {
   loading: boolean;
@@ -41,7 +43,7 @@ export class AppService extends StatefulService<IAppState> {
 
   static initialState: IAppState = {
     loading: true,
-    argv: []
+    argv: electron.remote.process.argv
   };
 
   private autosaveInterval: number;
@@ -57,55 +59,57 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private protocolLinksService: ProtocolLinksService;
   @Inject() private questionaireService: QuestionaireService;
   @Inject() private informationsService: InformationsService;
+  @Inject() private crashReporterService: CrashReporterService;
 
   @track('app_start')
-  load() {
+  async load() {
     this.START_LOADING();
+
+    // Initialize OBS
+    obs.NodeObs.OBS_API_initAPI('en-US', electron.remote.process.env.NAIR_IPC_USERDATA);
 
     // We want to start this as early as possible so that any
     // exceptions raised while loading the configuration are
     // associated with the user in sentry.
-    this.userService;
+    await this.userService;
 
-    this.sceneCollectionsService.initialize().then(
-      () => this.questionaireService.startIfRequired()
-    ).then(questionaireStarted => {
-      let onboarded = false;
-      if (!questionaireStarted) {
-        onboarded = this.onboardingService.startOnboardingIfRequired();
-      }
+    // Second, we want to start the crash reporter service.  We do this
+    // after the user service because we want crashes to be associated
+    // with a particular user if possible.
+    this.crashReporterService.beginStartup();
 
-      electron.ipcRenderer.on('shutdown', () => {
-        electron.ipcRenderer.send('acknowledgeShutdown');
-        this.shutdownHandler();
-      });
+    await this.sceneCollectionsService.initialize();
+    const questionaireStarted = await this.questionaireService.startIfRequired()
 
-      this.shortcutsService;
+    const onboarded = !questionaireStarted && this.onboardingService.startOnboardingIfRequired();
 
-      this.performanceMonitorService.start();
-
-      this.ipcServerService.listen();
-      this.tcpServerService.listen();
-
-      this.patchNotesService.showPatchNotesIfRequired(onboarded);
-
-      this.FINISH_LOADING();
-
-      this.informationsService;
+    electron.ipcRenderer.on('shutdown', () => {
+      electron.ipcRenderer.send('acknowledgeShutdown');
+      this.shutdownHandler();
     });
-  }
 
-  /**
-   * the main process sends argv string here
-   */
-  setArgv(argv: string[]) {
-    this.SET_ARGV(argv);
-    this.protocolLinksService.start(argv);
+    this.shortcutsService;
+
+    this.performanceMonitorService.start();
+
+    this.ipcServerService.listen();
+    this.tcpServerService.listen();
+
+    this.patchNotesService.showPatchNotesIfRequired(onboarded);
+
+    this.informationsService;
+
+    this.crashReporterService.endStartup();
+
+    this.FINISH_LOADING();
+    this.protocolLinksService.start(this.state.argv);
   }
 
   @track('app_close')
   private shutdownHandler() {
     this.START_LOADING();
+
+    this.crashReporterService.beginShutdown();
 
     this.ipcServerService.stopListening();
     this.tcpServerService.stopListening();
@@ -113,9 +117,12 @@ export class AppService extends StatefulService<IAppState> {
     window.setTimeout(async () => {
       await this.sceneCollectionsService.deinitialize();
       this.performanceMonitorService.stop();
-      this.transitionsService.reset();
+      this.transitionsService.shutdown();
       this.windowsService.closeAllOneOffs();
       await this.fileManagerService.flushAll();
+      this.crashReporterService.endShutdown();
+      obs.NodeObs.OBS_service_removeCallback();
+      obs.NodeObs.OBS_API_destroyOBS_API();
       electron.ipcRenderer.send('shutdownComplete');
     }, 300);
   }

@@ -3,15 +3,13 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
 import ModalLayout from '../ModalLayout.vue';
 import { WindowsService } from '../../services/windows';
-import windowMixin from '../mixins/window';
 import { IScenesServiceApi } from '../../services/scenes';
 import { ISourcesServiceApi } from '../../services/sources';
 import { ISelectionServiceApi } from '../../services/selection';
 import { $t } from 'services/i18n';
 
 @Component({
-  components: { ModalLayout },
-  mixins: [windowMixin]
+  components: { ModalLayout }
 })
 export default class NameScene extends Vue {
 
@@ -31,8 +29,8 @@ export default class NameScene extends Vue {
   selectionService: ISelectionServiceApi;
 
   options: {
-    sceneToDuplicate?: string,
-    rename?: string,
+    sceneToDuplicate?: string, // id of scene
+    rename?: string, // id of scene
     itemsToGroup?: string[]
   } = this.windowsService.getChildWindowQueryParams();
 
@@ -40,9 +38,9 @@ export default class NameScene extends Vue {
     let name = '';
 
     if (this.options.rename) {
-      name = this.options.rename;
+      name = this.scenesService.getScene(this.options.rename).name;
     } else if (this.options.sceneToDuplicate) {
-      name = this.options.sceneToDuplicate;
+      name = this.scenesService.getScene(this.options.sceneToDuplicate).name;
     } else if (this.options.itemsToGroup) {
       name = $t('scenes.newSceneGroupName', { activeSceneName: this.scenesService.activeScene.name });
     } else {
@@ -58,7 +56,7 @@ export default class NameScene extends Vue {
     if (!this.name) {
       this.error = $t('scenes.nameIsRequired');
     } else if (this.options.rename) {
-      this.scenesService.getSceneByName(this.options.rename).setName(this.name);
+      this.scenesService.getScene(this.options.rename).setName(this.name);
       this.windowsService.closeChildWindow();
     } else {
       const newScene = this.scenesService.createScene(

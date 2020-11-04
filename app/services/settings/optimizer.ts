@@ -3,9 +3,11 @@ import { ISettingsSubCategory } from './settings-api';
 
 export enum EncoderType {
   x264 = 'obs_x264',
-  nvenc = 'ffmpeg_nvenc',
+  nvenc = 'nvenc',
   amd = 'amd_amf_h264',
-  qsv = 'obs_qsv11'
+  qsv = 'qsv',
+  advancedQsv = 'obs_qsv11',
+  advancedNvenc = 'ffmpeg_nvenc',
 }
 
 export enum OptimizationKey {
@@ -139,7 +141,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
                                 ]
                             },
                             {
-                                value: 'obs_qsv11',
+                                value: 'qsv',
                                 params: [
                                     {
                                         key: OptimizationKey.targetUsage,
@@ -191,7 +193,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
                                 ]
                             },
                             {
-                                value: 'ffmpeg_nvenc',
+                                value: 'nvenc',
                                 params: [
                                     // 'Rescale' // bool
                                     //    'RescaleRes' // '1920x1200' ... '640x400' (10個)
@@ -316,7 +318,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
                                 ]
                             },
                             {
-                                value: 'obs_qsv11',
+                                value: 'qsv',
                                 params: [
                                     {
                                         key: OptimizationKey.simpleUseAdvanced,
@@ -341,7 +343,7 @@ export const AllKeyDescriptions: KeyDescription[] = [
                                 ]
                             },
                             {
-                                value: 'ffmpeg_nvenc',
+                                value: 'nvenc',
                                 params: [
                                     {
                                         key: OptimizationKey.simpleUseAdvanced,
@@ -498,8 +500,8 @@ type OptimizeItem = {
 };
 
 /** KeyDescription を OptimizeSettings にある分岐点に沿う物だけ列挙する
- * @param values 
- * @param desc 
+ * @param values
+ * @param desc
  */
 export function* iterateKeyDescriptions(
     values: OptimizeSettings,
@@ -553,8 +555,8 @@ function isDependOnItems(values: OptimizeSettings, items: KeyDescription[]): boo
 
 /**
  * source を keysNeededに存在するキーに必要なだけの内容に削減したものを返す。
- * @param source 
- * @param keysNeeded 
+ * @param source
+ * @param keysNeeded
  */
 export function filterKeyDescriptions(keysNeeded: OptimizeSettings, source: KeyDescription[]): KeyDescription[] {
     const result: KeyDescription[] = [];
@@ -714,8 +716,8 @@ export class SettingsKeyAccessor {
 
     /**
      * KeyDescriptions を再帰的に渡り歩いて f を呼び出す
-     * @param keyDescriptions 
-     * @param f 
+     * @param keyDescriptions
+     * @param f
      */
     *travarseKeyDescriptions<T>(keyDescriptions: KeyDescription[], f: (d: KeyDescription) => T): IterableIterator<T> {
         for (const item of keyDescriptions) {
@@ -789,9 +791,9 @@ export class SettingsKeyAccessor {
 
     /**
     // 指定した keyに指定した値が選択肢として現れるかを確認する
-     * @param key 
-     * @param value 
-     * @param keyDescriptions 
+     * @param key
+     * @param value
+     * @param keyDescriptions
      */
     hasSpecificValue(
         key: OptimizationKey,

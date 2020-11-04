@@ -72,7 +72,7 @@
 <script lang="ts" src="./SceneSelector.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/_colors";
+@import "../styles/index";
 
 .scene-collections-wrapper {
   position: relative;
@@ -91,6 +91,10 @@
       background-color: #3a585f!important;
       border:1px solid @text-primary;
     }
+  }
+
+  &::after {
+    color: @text-primary;
   }
 }
 

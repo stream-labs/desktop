@@ -55,6 +55,21 @@ function registerMutation(
   return Object.getOwnPropertyDescriptor(target, methodName);
 }
 
+
+function inheritMutations(target: any) {
+  const baseClassMutations = Object.getPrototypeOf(target.prototype)
+    .constructor
+    .prototype
+    .originalMethods;
+  if (baseClassMutations) {
+    Object.keys(baseClassMutations).forEach(methodName => {
+      if (Object.getOwnPropertyDescriptor(target.prototype, methodName)) return; // mutation is overridden
+      target.prototype[methodName] = baseClassMutations[methodName];
+      registerMutation(target.prototype, methodName, Object.getOwnPropertyDescriptor(target.prototype, methodName));
+    });
+  }
+}
+
 /**
  * helps to integrate services with Vuex store
  */
@@ -84,17 +99,26 @@ export abstract class StatefulService<TState extends object> extends Service {
     Vue.set(this.store.state, this.serviceName, newState);
   }
 
-
 }
 
 /**
  * Returns an injectable Vuex module
  */
 export function getModule(ModuleContainer: any): Module<any, any> {
+  const prototypeMutations = (<any>ModuleContainer.prototype).mutations;
+  const mutations = {};
+
+  // filter inherited mutations
+  for (const mutationName in prototypeMutations) {
+    const serviceName = mutationName.split('.')[0];
+    if (serviceName !== ModuleContainer.name) continue;
+    mutations[mutationName] = prototypeMutations[mutationName];
+  }
+
   return {
     state: ModuleContainer.initialState ?
       JSON.parse(JSON.stringify(ModuleContainer.initialState)) : {},
-    mutations: (<any>ModuleContainer.prototype).mutations
+    mutations: mutations
   };
 }
 
@@ -128,20 +152,17 @@ export function ServiceHelper(): ClassDecorator {
     // so we need to save the name
     Object.defineProperty(f, 'name', { value: target.name });
 
-    // inherit mutations
-    const baseClassMutations = Object.getPrototypeOf(target.prototype)
-      .constructor
-      .prototype
-      .originalMethods;
-    if (baseClassMutations) {
-      Object.keys(baseClassMutations).forEach(methodName => {
-        if (Object.getOwnPropertyDescriptor(f.prototype, methodName)) return; // mutation is overridden
-        f.prototype[methodName] = baseClassMutations[methodName];
-        registerMutation(f.prototype, methodName, Object.getOwnPropertyDescriptor(f.prototype, methodName));
-      });
-    }
+    inheritMutations(f);
 
     // return new constructor (will override original)
     return f;
   };
 }
+
+
+export function InheritMutations(): ClassDecorator {
+  return function (target: any) {
+    inheritMutations(target);
+  };
+}
+

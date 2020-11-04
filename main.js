@@ -30,7 +30,7 @@ if (!process.env.NAIR_LICENSE_API_KEY && pjson.getlicensenair_key) {
 ////////////////////////////////////////////////////////////////////////////////
 // Modules and other Requires
 ////////////////////////////////////////////////////////////////////////////////
-const { app, BrowserWindow, ipcMain, session, crashReporter, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, session, crashReporter, dialog, webContents, shell } = require('electron');
 const electron = require('electron');
 const fs = require('fs');
 const { Updater } = require('./updater/Updater.js');
@@ -39,6 +39,7 @@ const rimraf = require('rimraf');
 const path = require('path');
 const windowStateKeeper = require('electron-window-state');
 const { URL } = require('url');
+const obs = require('obs-studio-node');
 
 app.disableHardwareAcceleration();
 
@@ -68,7 +69,6 @@ if (process.argv.includes('--clearCacheDir')) {
 // Windows
 let mainWindow;
 let childWindow;
-let childWindowIsReadyToShow = false;
 
 // Somewhat annoyingly, this is needed so that the child window
 // can differentiate between a user closing it vs the app
@@ -79,26 +79,26 @@ let appShutdownTimeout;
 
 global.indexUrl = 'file://' + __dirname + '/index.html';
 
-
 function openDevTools() {
   childWindow.webContents.openDevTools({ mode: 'undocked' });
   mainWindow.webContents.openDevTools({ mode: 'undocked' });
 }
 
-// Lazy require OBS
-let _obs;
-
-function getObs() {
-  if (!_obs) {
-    _obs = require('obs-studio-node').NodeObs;
-  }
-
-  return _obs;
-}
-
-
 function startApp() {
   const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
+
+  { // Initialize obs-studio-server
+    // Set up environment variables for IPC.
+    process.env.NAIR_IPC_PATH = "nair-".concat(uuid());
+    process.env.NAIR_IPC_USERDATA = app.getPath('userData');
+    // Host a new IPC Server and connect to it.
+    obs.IPC.ConnectOrHost(process.env.NAIR_IPC_PATH);
+    obs.NodeObs.SetWorkingDirectory(path.join(
+      app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
+      'node_modules',
+      'obs-studio-node')
+    );
+  }
 
   const Raven = require('raven-js');
 
@@ -206,7 +206,6 @@ function startApp() {
   mainWindow.on('closed', () => {
     require('node-libuiohook').stopHook();
     session.defaultSession.flushStorageData();
-    getObs().OBS_API_destroyOBS_API();
     app.quit();
   });
 
@@ -256,12 +255,7 @@ function startApp() {
   }
 
   ipcMain.on('services-ready', () => {
-    callService('AppService', 'setArgv', process.argv);
     childWindow.loadURL(`${global.indexUrl}?windowId=child`);
-  });
-
-  ipcMain.on('window-childWindowIsReadyToShow', () => {
-    childWindowIsReadyToShow = true;
   });
 
   ipcMain.on('services-request', (event, payload) => {
@@ -296,15 +290,7 @@ function startApp() {
     // setTimeout(() => {
     //   openDevTools();
     // }, 10 * 1000);
-
   }
-
-  // Initialize various OBS services
-  getObs().SetWorkingDirectory(
-    path.join(app.getAppPath().replace('app.asar', 'app.asar.unpacked') +
-              '/node_modules/obs-studio-node'));
-
-  getObs().OBS_API_initAPI('en-US', app.getPath('userData'));
 }
 
 app.setAsDefaultProtocolClient('nair');
@@ -372,6 +358,10 @@ app.on('ready', () => {
   }
 });
 
+app.on('quit', (e, exitCode) => {
+  obs.IPC.disconnect();
+});
+
 ipcMain.on('openDevTools', () => {
   openDevTools();
 });
@@ -392,6 +382,7 @@ ipcMain.on('window-showChildWindow', (event, windowOptions) => {
       const width = Math.min(windowOptions.size.width, targetWorkArea.width);
       const height = Math.min(windowOptions.size.height, targetWorkArea.height);
 
+      childWindow.show();
       childWindow.restore();
       childWindow.setMinimumSize(width, height);
 
@@ -428,19 +419,6 @@ ipcMain.on('window-showChildWindow', (event, windowOptions) => {
 
     childWindow.focus();
   }
-
-
-  // show the child window when it will be ready
-  new Promise(resolve => {
-    if (childWindowIsReadyToShow) {
-      resolve();
-      return;
-    }
-    ipcMain.once('window-childWindowIsReadyToShow', () => resolve());
-  }).then(() => {
-    // The child window will show itself when rendered
-    childWindow.send('window-setContents', windowOptions);
-  });
 
 });
 
@@ -500,7 +478,7 @@ ipcMain.on('window-preventLogout', (event, id) => {
  **/
 function preventNewWindow(e, url) {
   e.preventDefault();
-  electron.shell.openExternal(url);
+  shell.openExternal(url);
 }
 
 ipcMain.on('window-preventNewWindow', (_event, id) => {
@@ -551,78 +529,6 @@ ipcMain.on('vuex-mutation', (event, mutation) => {
   }
 });
 
-
-// Virtual node OBS calls:
-//
-// These are methods that appear upstream to be OBS
-// API calls, but are actually Javascript functions.
-// These should be used sparingly, and are used to
-// ensure atomic operation of a handful of calls.
-const nodeObsVirtualMethods = {
-
-  OBS_test_callbackProxy(num, cb) {
-    setTimeout(() => {
-      cb(num + 1);
-    }, 5000);
-  }
-
-};
-
-// These are called constantly and dirty up the logs.
-// They can be commented out of this list on the rare
-// occasional that they are useful in the log output.
-const filteredObsApiMethods = [
-  'OBS_content_getSourceSize',
-  'OBS_content_getSourceFlags',
-  'OBS_API_getPerformanceStatistics'
-];
-
-// Proxy node OBS calls
-ipcMain.on('obs-apiCall', (event, data) => {
-  let retVal;
-  const shouldLog = !filteredObsApiMethods.includes(data.method);
-
-  if (shouldLog) log('OBS API CALL', data);
-
-  const mappedArgs = data.args.map(arg => {
-    const isCallbackPlaceholder = (typeof arg === 'object') && arg && arg.__obsCallback;
-
-    if (isCallbackPlaceholder) {
-      return (...args) => {
-        if (!event.sender.isDestroyed()) {
-          event.sender.send('obs-apiCallback', {
-            id: arg.id,
-            args
-          });
-        }
-      };
-    }
-
-    return arg;
-  });
-
-  if (nodeObsVirtualMethods[data.method]) {
-    retVal = nodeObsVirtualMethods[data.method].apply(null, mappedArgs);
-  } else {
-    retVal = getObs()[data.method](...mappedArgs);
-  }
-
-  if (shouldLog) log('OBS RETURN VALUE', retVal);
-
-  // electron ipc doesn't like returning undefined, so
-  // we return null instead.
-  if (retVal == null) {
-    retVal = null;
-  }
-
-  event.returnValue = retVal;
-});
-
-// Used for guaranteeing unique ids for objects in the vuex store
-ipcMain.on('getUniqueId', event => {
-  event.returnValue = uuid();
-});
-
 ipcMain.on('restartApp', () => {
   // prevent unexpected cache clear
   const args = process.argv.slice(1).filter(x => x !== '--clearCacheDir');
@@ -636,4 +542,20 @@ ipcMain.on('requestSourceAttributes', (e, names) => {
   const sizes = require('obs-studio-node').getSourcesSize(names);
 
   e.sender.send('notifySourceAttributes', sizes);
+});
+
+ipcMain.on('requestPerformanceStatistics', (e) => {
+  const stats = getObs().OBS_API_getPerformanceStatistics();
+
+  e.sender.send('notifyPerformanceStatistics', stats);
+});
+
+ipcMain.on('webContents-preventNavigation', (e, id) => {
+  webContents.fromId(id).on('will-navigate', e => {
+    e.preventDefault();
+  });
+});
+
+ipcMain.on('getMainWindowWebContentsId', e => {
+  e.returnValue = mainWindow.webContents.id;
 });

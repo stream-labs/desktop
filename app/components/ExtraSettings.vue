@@ -4,15 +4,15 @@
     <div class="input-label">
       <label>{{ $t('settings.optimizationForNiconicoLiveService')}}</label>
     </div>
-    <BoolInput
+    <ObsBoolInput
       :value="optimizeForNiconicoModel"
       @input="setOptimizeForNiconico" />
-    <BoolInput
+    <ObsBoolInput
       :value="showOptimizationDialogForNiconicoModel"
       v-show="optimizeForNiconicoModel.value"
       @input="setShowOptimizationDialogForNiconico"
       class="optional-item" />
-    <BoolInput
+    <ObsBoolInput
       :value="optimizeWithHardwareEncoderModel"
       v-show="optimizeForNiconicoModel.value"
       @input="setOptimizeWithHardwareEncoder"
@@ -51,7 +51,7 @@
   </div>
 
   <div class="section">
-    <BoolInput
+    <ObsBoolInput
       :value="pollingPerformanceStatisticsModel"
       @input="setPollingPerformanceStatistics" />
     <p>{{ $t('settings.pollingPerformanceStatisticsDescription') }}</p>
@@ -62,7 +62,7 @@
 <script lang="ts" src="./ExtraSettings.vue.ts"></script>
 
 <style lang="less">
-@import "../styles/_colors";
+@import "../styles/index";
 
 .optional-item {
   margin-left: 24px;

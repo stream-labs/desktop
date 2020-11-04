@@ -6,8 +6,6 @@ import { Inject } from 'util/injector';
 import { Selection, SelectionService } from 'services/selection';
 import {
   ISceneItemFolderApi,
-  ISceneItemNode,
-  TSceneNodeType,
   SceneItem,
   ISceneHierarchy,
   TSceneNode
@@ -108,12 +106,19 @@ export class SceneItemFolder extends SceneItemNode implements ISceneItemFolderAp
     });
   }
 
-  getNestedNodes(): TSceneNode[] {
+  getNestedNodes(traversedNodesIds: string[] = []): TSceneNode[] {
+    traversedNodesIds = [].concat(traversedNodesIds);
     const nodes: TSceneNode[] = [];
     this.getNodes().forEach(node => {
+      if (traversedNodesIds.includes(node.id)) {
+        // TODO: find the use-case that causes loops in folders structure
+        console.error(`Loop in folders structure detected', ${this.name} -> ${node.name}`);
+        return;
+      }
       nodes.push(node);
+      traversedNodesIds.push(node.id);
       if (node.sceneNodeType !== 'folder') return;
-      nodes.push(...((node as SceneItemFolder).getNestedNodes()));
+      nodes.push(...((node as SceneItemFolder).getNestedNodes(traversedNodesIds)));
     });
     return nodes;
   }

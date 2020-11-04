@@ -1,10 +1,9 @@
 <template>
 <modal-layout
   bare-content
-  :title="$t('streaming.nicoliveProgramSelector.title')"
   :show-controls="false"
   :custom-controls="true"
-  >
+>
   <div slot="content" class="nicolive-program-selector">
     <NavMenu v-model="currentStep" class="side-menu" data-test="SideMenu">
       <NavItem
