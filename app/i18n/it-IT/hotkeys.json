@@ -21,5 +21,7 @@
   "Play/Pause": "Avvio/Pausa",
   "Restart": "Riavvia",
   "Next Slide": "Prossima diapositiva",
-  "Previous Slide": "Diapositiva precedente"
+  "Previous Slide": "Diapositiva precedente",
+  "Toggle Performance Mode": "Toggle Performance Mode",
+  "Skip Alert": "Salta l'avviso"
 }

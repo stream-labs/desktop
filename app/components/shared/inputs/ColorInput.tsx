@@ -13,7 +13,7 @@ import { OS, getOS } from 'util/operating-systems';
 @Component({})
 export default class ColorInput extends BaseInput<string, IColorMetadata> {
   @Prop() readonly value: string;
-  @Prop() readonly metadata: IColorMetadata;
+  @Prop({ default: () => ({}) }) readonly metadata: IColorMetadata;
   @Prop() readonly title: string;
   @Inject() readonly usageStatisticsService: UsageStatisticsService;
 

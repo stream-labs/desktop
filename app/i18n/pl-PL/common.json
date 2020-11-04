@@ -32,7 +32,7 @@
   "Submit": "Wprowadź",
   "Save": "Zapisz",
   "Edit": "Edytuj",
-  "Login": "Zaloguj się",
+  "Log In": "Log In",
   "Yes": "Tak",
   "No": "Nie",
   "OK": "OK",
@@ -55,6 +55,7 @@
   "Cloudbot": "Cloudbot",
   "Merch": "Gadżety",
   "App Store": "Sklep z aplikacjami",
+  "Alertbox Library": "Alertbox Library",
   "New": "Nowość",
   "Face Masks": "Face Masks",
   "Help": "Pomoc",
@@ -91,7 +92,7 @@
   "OBSInit.UnknownError": "Wystąpił nieznany błąd podczas inicjalizacji OBS.",
   "OBSInit.ModuleNotFoundError": "Nie można odnaleźć DirectX w systemie. Zainstaluj najnowszą wersję DirectX dla swojej maszyny korzystając z odnośnika <https://www.microsoft.com/en-us/download/details.aspx?id=35?> i spróbuj ponownie.",
   "OBSInit.NotSupportedError": "Inicjalizacja OBS nie powiodła się. Twoje sterowniki karty graficznej mogą być nieaktualne lub Streamlabs OBS nie jest obsługiwany na Twoim systemie.",
-  "Logout %{username}": "Wyloguj %{username}",
+  "Log Out": "Log Out",
   "Layout Editor": "Edytor układu",
   "Are you sure you want to import multiple files?": "Czy na pewno chcesz importować wiele plików?",
   "Studio": "Studio",
@@ -118,5 +119,5 @@
   "Apps": "Aplikacje",
   "Finish": "Zakończ",
   "Get Prime": "Zyskaj Prime",
-  "System error message:": "System error message:"
+  "System error message:": "Komunikat błędu systemu:"
 }

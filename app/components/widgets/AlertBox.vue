@@ -120,6 +120,12 @@
     >
       <v-form-group v-model="wData.settings.background_color" :metadata="metadata.bgColor" />
       <v-form-group v-model="wData.settings.alert_delay" :metadata="metadata.alertDelay" />
+      <v-form-group v-model="wData.settings.interrupt_mode" :metadata="metadata.interruptMode" />
+      <v-form-group
+        v-if="wData.settings.interrupt_mode"
+        v-model="wData.settings.interrupt_mode_delay"
+        :metadata="metadata.interruptDelay"
+      />
     </validated-form>
     <validated-form
       slot="moderation-properties"

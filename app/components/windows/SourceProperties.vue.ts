@@ -45,6 +45,7 @@ export default class SourceProperties extends Vue {
     this.properties = this.source ? this.source.getPropertiesFormData() : [];
     this.sourceRemovedSub = this.sourcesService.sourceRemoved.subscribe(source => {
       if (source.sourceId === this.sourceId) {
+        this.source = null;
         electron.remote.getCurrentWindow().close();
       }
     });

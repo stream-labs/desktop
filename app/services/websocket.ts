@@ -2,7 +2,7 @@ import { Service } from './core/service';
 import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
-import { handleResponse, authorizedHeaders } from 'util/requests';
+import { authorizedHeaders, jfetch } from 'util/requests';
 import { Subject } from 'rxjs';
 import { AppService } from 'services/app';
 import { IRecentEvent } from 'services/recent-events';
@@ -140,8 +140,7 @@ export class WebsocketService extends Service {
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 
-    fetch(request)
-      .then(handleResponse)
+    jfetch<{ socket_token: string }>(request)
       .then(json => json.socket_token)
       .then(token => {
         const url = `${this.hostsService.io}?token=${token}`;

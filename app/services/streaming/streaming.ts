@@ -306,7 +306,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
 
     // check if we should show the waring about the disabled Auto-start
-    if (settings.platforms.youtube.enabled && !settings.platforms.youtube.enableAutoStart) {
+    if (settings.platforms.youtube?.enabled && !settings.platforms.youtube.enableAutoStart) {
       this.SET_WARNING('YT_AUTO_START_IS_DISABLED');
     }
 
@@ -441,7 +441,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       const errorType = errorTypeOrError as TStreamErrorType;
       this.SET_ERROR(errorType, errorDetails, platform);
     }
-    console.error(this.state.info.error);
+    const error = this.state.info.error;
+    assertIsDefined(error);
+    console.error(error.message, error);
   }
 
   resetInfo() {

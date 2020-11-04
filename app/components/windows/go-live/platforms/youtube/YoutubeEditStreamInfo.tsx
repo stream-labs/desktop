@@ -59,17 +59,23 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
 
   private fieldIsDisabled(fieldName: keyof IYoutubeStartStreamOptions): boolean {
     const selectedBroadcast = this.selectedBroadcast;
-    if (!selectedBroadcast || selectedBroadcast.status.lifeCycleStatus !== 'live') return false;
+
+    // selfDeclaredMadeForKids can be set only on the broadcast creating step
+    if (selectedBroadcast && fieldName === 'selfDeclaredMadeForKids') {
+      return true;
+    }
+
+    if (!this.view.isMidStreamMode) return false;
     return !this.youtubeService.updatableSettings.includes(fieldName);
   }
 
-  private onSelectBroadcastHandler() {
+  private async onSelectBroadcastHandler() {
     // set title and description fields from the selected broadcast
     const ytSettings = this.settings.platforms.youtube;
     const selectedBroadcast = this.selectedBroadcast;
     if (!selectedBroadcast) return;
     const { title, description } = selectedBroadcast.snippet;
-    const { privacyStatus } = selectedBroadcast.status;
+    const { privacyStatus, selfDeclaredMadeForKids } = selectedBroadcast.status;
     const { enableDvr, projection, latencyPreference } = selectedBroadcast.contentDetails;
     ytSettings.title = title;
     ytSettings.description = description;
@@ -77,6 +83,15 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
     ytSettings.latencyPreference = latencyPreference;
     ytSettings.projection = projection;
     ytSettings.privacyStatus = privacyStatus;
+    ytSettings.selfDeclaredMadeForKids = selfDeclaredMadeForKids;
+
+    // category id is a property of YoutubeVideo
+    const video = await this.youtubeService.fetchVideo(selectedBroadcast.id);
+    this.setCategory(video.snippet.categoryId);
+  }
+
+  private setCategory(categoryId: string) {
+    this.settings.platforms.youtube.categoryId = categoryId;
   }
 
   private onProjectionChangeHandler(enable360: boolean) {
@@ -123,7 +138,7 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
           { value: 'normal', title: $t('Normal Latency') },
           { value: 'low', title: $t('Low-latency') },
           {
-            value: 'ultra-low',
+            value: 'ultraLow',
             title: $t('Ultra low-latency'),
             description: $t('Does not support: Closed captions, 1440p, and 4k resolutions'),
           },
@@ -155,6 +170,10 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
         title: $t('360° video'),
         disabled: this.fieldIsDisabled('projection'),
       }),
+      selfDeclaredMadeForKids: metadata.bool({
+        title: $t('Made for kids'),
+        disabled: this.fieldIsDisabled('selfDeclaredMadeForKids'),
+      }),
     });
   }
 
@@ -163,6 +182,7 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
     const shouldShowOptionalFields = !this.canShowOnlyRequiredFields;
     const isUpdate = this.view.isMidStreamMode;
     const is360video = ytSettings.projection === '360';
+    const shouldShowSafeForKidsWarn = ytSettings.selfDeclaredMadeForKids;
     return (
       shouldShowOptionalFields && (
         <ValidatedForm name="youtube-settings">
@@ -180,41 +200,48 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
             metadata={this.formMetadata.privacyStatus}
             vModel={this.settings.platforms.youtube.privacyStatus}
           />
-          {!isUpdate && (
-            <div>
-              <HFormGroup
-                metadata={this.formMetadata.category}
-                vModel={this.settings.platforms.youtube.categoryId}
+          <HFormGroup
+            metadata={this.formMetadata.category}
+            vModel={this.settings.platforms.youtube.categoryId}
+          />
+          <HFormGroup
+            metadata={this.formMetadata.latencyPreference}
+            vModel={this.settings.platforms.youtube.latencyPreference}
+          />
+          <HFormGroup title={$t('Additional Settings')}>
+            {!this.props.isScheduleMode && (
+              <FormInput
+                metadata={this.formMetadata.enableAutoStart}
+                vModel={this.settings.platforms.youtube.enableAutoStart}
               />
-              <HFormGroup
-                metadata={this.formMetadata.latencyPreference}
-                vModel={this.settings.platforms.youtube.latencyPreference}
+            )}
+            {!this.props.isScheduleMode && (
+              <FormInput
+                metadata={this.formMetadata.enableAutoStop}
+                vModel={this.settings.platforms.youtube.enableAutoStop}
               />
-              <HFormGroup title={$t('Additional Settings')}>
-                {!this.props.isScheduleMode && (
-                  <FormInput
-                    metadata={this.formMetadata.enableAutoStart}
-                    vModel={this.settings.platforms.youtube.enableAutoStart}
-                  />
+            )}
+            <FormInput
+              metadata={this.formMetadata.enableDvr}
+              vModel={this.settings.platforms.youtube.enableDvr}
+            />
+            <FormInput
+              metadata={this.formMetadata.projection}
+              value={is360video}
+              onInput={(val: boolean) => this.onProjectionChangeHandler(val)}
+            />
+            <FormInput
+              metadata={this.formMetadata.selfDeclaredMadeForKids}
+              vModel={this.settings.platforms.youtube.selfDeclaredMadeForKids}
+            />
+            {shouldShowSafeForKidsWarn && (
+              <p>
+                {$t(
+                  "Features like personalized ads and live chat won't be available on live streams made for kids.",
                 )}
-                {!this.props.isScheduleMode && (
-                  <FormInput
-                    metadata={this.formMetadata.enableAutoStop}
-                    vModel={this.settings.platforms.youtube.enableAutoStop}
-                  />
-                )}
-                <FormInput
-                  metadata={this.formMetadata.enableDvr}
-                  vModel={this.settings.platforms.youtube.enableDvr}
-                />
-                <FormInput
-                  metadata={this.formMetadata.projection}
-                  value={is360video}
-                  onInput={(val: boolean) => this.onProjectionChangeHandler(val)}
-                />
-              </HFormGroup>
-            </div>
-          )}
+              </p>
+            )}
+          </HFormGroup>
         </ValidatedForm>
       )
     );
