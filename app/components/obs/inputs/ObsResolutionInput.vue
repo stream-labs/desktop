@@ -7,20 +7,6 @@
         @search-change="onSearchHandler"
         :metadata="metadata"
       />
-      <!--      <div v-if="isCustom">-->
-      <!--        <v-form-group-->
-      <!--          :title="$t('width')"-->
-      <!--          :value="width"-->
-      <!--          :metadata="customDimensionMetadata"-->
-      <!--          @input="onWidthInput"-->
-      <!--        />-->
-      <!--        <v-form-group-->
-      <!--          :title="$t('height')"-->
-      <!--          :value="height"-->
-      <!--          :metadata="customDimensionMetadata"-->
-      <!--          @input="onHeightInput"-->
-      <!--        />-->
-      <!--      </div>-->
     </h-form-group>
   </div>
 </template>

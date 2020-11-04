@@ -214,18 +214,6 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
    */
   validateSettings<T extends IStreamSettings>(settings: T): string {
     return '';
-    // const platforms = Object.keys(settings.platforms) as TPlatform[];
-    // for (const platform of platforms) {
-    //   const platformSettings = settings.platforms[platform];
-    //   if (!platformSettings.enabled) continue;
-    //   const platformName = getPlatformService(platform).displayName;
-    //   if (platform === 'facebook') {
-    //     if (!platformSettings['game']) {
-    //       return $t('You must select a game for %{platformName}', { platformName });
-    //     }
-    //   }
-    // }
-    // return '';
   }
 
   /**
