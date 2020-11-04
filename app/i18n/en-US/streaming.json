@@ -38,35 +38,35 @@
     "description": "Optimize simple settings to deliver Nicolive."
   },
   "nicoliveProgramSelector": {
-    "title": "Select a programs to start streaming on",
+    "title": "Select a program",
     "steps": {
       "providerTypeSelect": {
-        "menuTitle": "",
-        "title": "",
-        "description": ""
+        "menuTitle": "Program Type",
+        "title": "Select a program type",
+        "description": "Select a type of the program you will start streaming to."
       },
       "channelSelect": {
-        "menuTitle": "",
-        "title": "",
-        "description": ""
+        "menuTitle": "Channel",
+        "title": "Select a channel",
+        "description": "Select a channel you will start streaming on from the list."
       },
       "programSelect": {
-        "menuTitle": "",
-        "title":"",
-        "description": ""
+        "menuTitle": "Program",
+        "title":"Select a program",
+        "description": "Select a program you will start streaming to."
       },
       "confirm": {
-        "menuTitle": "",
-        "title": "",
-        "description": ""
+        "menuTitle": "Confirmation",
+        "title": "Confirmation",
+        "description": "You will start streaming to the following program."
       }
     },
     "providerTypeProgram": {
-      "channel": "",
-      "user": ""
+      "channel": "Channel program",
+      "user": "User program"
     },
-    "noChannelPrograms": "",
-    "done": "Select a program"
+    "noChannelPrograms": "There is no program on the selected channel.<br />Create a program on the channel or make sure you selected a correct channel.",
+    "done": "Start streaming"
   },
   "FPS": "FPS",
   "resolution": "resolution",
