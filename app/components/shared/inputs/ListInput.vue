@@ -26,6 +26,7 @@
       @search-change="onSearchChangeHandler"
       @open="handleOpen && handleOpen()"
       selectLabel=""
+      selectedLabel=""
       deselectLabel=""
     >
       <span
@@ -65,6 +66,7 @@
         {{ itemProps.option.title }}
       </template>
       <template v-if="options.noResult" slot="noResult">{{ options.noResult }}</template>
+      <template slot="noOptions">{{ $t('List is empty') }}</template>
       <template v-if="options.loading" slot="afterList"><spinner /></template>
     </multiselect>
     <div v-if="selectedOption && selectedOption.description" class="description">
