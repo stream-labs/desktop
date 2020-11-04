@@ -721,22 +721,6 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       return false;
     }
 
-    if (!this.state.filterConfig.filter_subscription_3_months && event.months < 3) {
-      return false;
-    }
-
-    if (!this.state.filterConfig.filter_subscription_6_months && event.months < 6) {
-      return false;
-    }
-
-    if (!this.state.filterConfig.filter_subscription_9_months && event.months < 9) {
-      return false;
-    }
-
-    if (!this.state.filterConfig.filter_subscription_12_months && event.months < 12) {
-      return false;
-    }
-
     if (
       this.state.filterConfig.filter_subscription_minimum_enabled &&
       event.months < this.state.filterConfig.filter_subscription_minimum_months
