@@ -18,7 +18,7 @@ import { CustomizationService } from 'services/customization';
 import { UserService } from 'services/user';
 import { IStreamingSetting } from '../platforms';
 import { OptimizedSettings } from 'services/settings/optimizer';
-import { NicoliveClient } from 'services/nicolive-program/NicoliveClient';
+import { NicoliveClient, isOk } from 'services/nicolive-program/NicoliveClient';
 import { NotificationsService, ENotificationType, INotification } from 'services/notifications';
 
 enum EOBSOutputType {
