@@ -51,6 +51,7 @@ export interface IEventSocketEvent {
     | 'donordrivedonation'
     | 'justgivingdonation'
     | 'treat';
+  for: string;
   message: IRecentEvent[];
 }
 
