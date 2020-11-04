@@ -16,7 +16,6 @@ export interface IRecentEvent {
   from?: string;
   type: string;
   platform: string;
-  for?: string;
   created_at: string;
   display_name?: string;
   from_display_name?: string;
@@ -772,6 +771,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     const messages = e.message
       .filter(msg => !msg.isTest && !msg.repeat)
       .map(msg => {
+        msg.platform = e.for;
         msg.type = e.type;
         msg.hash = getHashForRecentEvent(msg);
         msg.uuid = uuid();

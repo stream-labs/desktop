@@ -249,7 +249,7 @@ class EventCell extends TsxComponent<EventCellProps> {
   }
 
   get platformIcon() {
-    const platform = this.props.event.platform || this.props.event.for;
+    const platform = this.props.event.platform;
     return {
       twitch_account: <PlatformLogo platform="twitch" />,
       youtube_account: <PlatformLogo platform="youtube" />,
