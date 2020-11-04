@@ -138,6 +138,6 @@ export default class NicoliveProgramSelector extends Vue {
 
   beforeDestroy(): void {
     // 状態初期化
-    this.nicoliveProgramSelectorService.backTo('providerTypeSelect');
+    this.nicoliveProgramSelectorService.reset();
   }
 }

@@ -60,6 +60,8 @@ export function isOk<T>(result: WrappedResult<T>): result is SucceededResult<T> 
   return result.ok === true;
 }
 
+export class NotLoggedInError {}
+
 export class NicoliveClient {
   static live2BaseURL = 'https://live2.nicovideo.jp';
   static publicBaseURL = 'https://public.api.nicovideo.jp';
@@ -141,7 +143,7 @@ export class NicoliveClient {
     return new Promise((resolve, reject) =>
       session.cookies.get({ url: 'https://.nicovideo.jp', name: 'user_session' }, (err, cookies) => {
         if (err) return reject(err);
-        if (cookies.length < 1) return reject(new Error('cookie not found'));
+        if (cookies.length < 1) return reject(new NotLoggedInError());
         resolve(cookies[0].value);
       })
     );
@@ -422,32 +424,33 @@ export class NicoliveClient {
    * 放送可能なチャンネル番組IDを取得する 
    * @param channelId チャンネルID(例： ch12345)
    */
-  async fetchOnairChannelProgram(channelId: string): Promise<OnairChannelProgramData> {
+  async fetchOnairChannelProgram(channelId: string): Promise<WrappedResult<OnairChannelProgramData>> {
     const url = `${NicoliveClient.live2BaseURL}/unama/tool/v2/onairs/channels/${channelId}`
     const headers = new Headers();
-    const userSession = await this.fetchSession();
-    headers.append('X-niconico-session', userSession);
-    const request = new Request(url, { headers });
-    return fetch(request).then(handleErrors).then(response => response.json().then(json => json.data));
+   try {
+      const userSession = await this.fetchSession();
+      headers.append('X-niconico-session', userSession);
+      const request = new Request(url, { headers });
+      const response = await fetch(request);
+      return NicoliveClient.wrapResult<OnairChannelProgramData>(response);
+    } catch(error) {
+      return NicoliveClient.wrapFetchError(error);
+    }
   }
 
   /**
    * 放送可能なチャンネル一覧を取得する 
    */
-  async fetchOnairChannels(): Promise<OnairChannelData[]> {
+  async fetchOnairChannels(): Promise<WrappedResult<OnairChannelData[]>> {
     const url = `${NicoliveClient.live2BaseURL}/unama/tool/v2/onairs/channels`
     const headers = new Headers();
-    const userSession = await this.fetchSession();
-    headers.append('X-niconico-session', userSession);
-    const request = new Request(url, { headers });
-    // 取得できなかった場合も空配列を返す
     try {
-      return await fetch(request)
-        .then(handleErrors)
-        .then(response => response.json())
-        .then(json => { return json.data as OnairChannelData[] });
-    } catch {
-      return Promise.resolve([]);
+      const userSession = await this.fetchSession();
+      headers.append('X-niconico-session', userSession);
+      const response = await fetch(new Request(url, { headers }));
+      return NicoliveClient.wrapResult<OnairChannelData[]>(response);
+    } catch (error) {
+      return NicoliveClient.wrapFetchError(error)
     }
   }
 
