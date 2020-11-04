@@ -78,7 +78,7 @@ const initialState: IFacebookServiceState = {
   streamPageUrl: '',
   userAvatar: '',
   settings: {
-    destinationType: '',
+    destinationType: 'page',
     pageId: '',
     groupId: '',
     liveVideoId: '',
@@ -200,7 +200,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     });
 
     this.SET_STREAM_KEY(streamKey);
-    this.SET_STREAM_PAGE_URL(liveVideo.permalink_url);
+    this.SET_STREAM_PAGE_URL(`https://facebook.com/${liveVideo.permalink_url}`);
     this.UPDATE_STREAM_SETTINGS({ ...fbOptions, liveVideoId: liveVideo.id });
   }
 
@@ -208,8 +208,9 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
    * update data for the current active video
    */
   async putChannelInfo(info: IFacebookUpdateVideoOptions): Promise<void> {
-    await this.updateLiveVideo(this.state.settings.liveVideoId, info);
-    this.UPDATE_STREAM_SETTINGS(info);
+    const vidId = this.state.settings.liveVideoId;
+    await this.updateLiveVideo(vidId, info);
+    this.UPDATE_STREAM_SETTINGS({ ...info, liveVideoId: vidId });
   }
 
   /**
@@ -361,6 +362,11 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
       this.UPDATE_STREAM_SETTINGS({ groupId: '' });
     }
 
+    // if the user doesn't have groups and pages than set destinationType to the user's timeline
+    if (!this.state.settings.pageId && !this.state.settings.groupId) {
+      this.UPDATE_STREAM_SETTINGS({ destinationType: 'me' });
+    }
+
     if (!this.state.userAvatar) {
       this.SET_AVATAR(await this.fetchPicture('me'));
     }
@@ -385,7 +391,6 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     if (game) data.game_specs = { name: game };
     const body = JSON.stringify(data);
 
-    console.log('schedule stream for  ', options.destinationType);
     try {
       return await platformRequest('facebook', { url, body, method: 'POST' }, token);
     } catch (e) {
@@ -460,7 +465,15 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   }
 
   get chatUrl(): string {
-    return 'https://www.facebook.com/gaming/streamer/chat/';
+    if (this.state.settings.destinationType === 'page' && this.state.settings.game) {
+      return 'https://www.facebook.com/gaming/streamer/chat/';
+    } else {
+      const token = this.views.getDestinationToken(
+        this.state.settings.destinationType,
+        this.state.settings.pageId,
+      );
+      return `https://streamlabs.com/embed/chat?oauth_token=${this.userService.apiToken}&fbVideoId=${this.state.settings.liveVideoId}&fbToken=${token}`;
+    }
   }
 
   get liveDockEnabled(): boolean {
@@ -512,7 +525,9 @@ export class FacebookView extends ViewHandler<IFacebookServiceState> {
     }
   }
 
-  getDestinationToken(destinationType: TDestinationType, destinationId: string): string {
+  getDestinationToken(destinationType?: TDestinationType, destinationId?: string): string {
+    destinationType = destinationType || this.state.settings.destinationType;
+    destinationId = destinationId || this.getDestinationId(this.state.settings);
     switch (destinationType) {
       case 'me':
       case 'group':
