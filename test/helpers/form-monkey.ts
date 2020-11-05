@@ -469,9 +469,28 @@ export class FormMonkey {
     return Promise.all(watchers);
   }
 
-  public async getAttribute(selector: string, attrName: string) {
-    const id = (await this.client.$(selector)).value.ELEMENT;
+  public async getAttribute(selectorOrElement: string | any, attrName: string) {
+    let element;
+    if (typeof selectorOrElement === 'string') {
+      element = await this.client.$(selectorOrElement);
+    } else {
+      element = selectorOrElement;
+    }
+    const id = element.value.ELEMENT;
     return (await this.client.elementIdAttribute(id, attrName)).value;
+  }
+
+  /**
+   * returns selector for the input element by title
+   * @param inputTitle
+   */
+  async getInputSelectorByTitle(inputTitle: string): Promise<string> {
+    const el = await this.client
+      .$(`label=${inputTitle}`)
+      .$('../..')
+      .$('[data-role="input"]');
+    const name = await this.getAttribute(el, 'data-name');
+    return `[data-role="input"][data-name="${name}"]`;
   }
 
   private log(...args: any[]) {

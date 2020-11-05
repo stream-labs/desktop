@@ -40,6 +40,7 @@ class ObsResolutionInput extends ObsInput<IObsListInput<TObsValue>> {
       options,
       allowEmpty: this.allowEmpty,
       placeholder: this.placeholder,
+      name: this.value.name,
     };
   }
 
