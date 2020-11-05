@@ -1,9 +1,9 @@
 {
   "secutityUpgrade": "バックエンドのシステムを改善しています。データの移動のプロセスには、またログインをしなくてはならないことになりました。質問はあれば、",
   "contactSupport": "サポートにお問い合わせをしてください。",
-  "urgeToSignIn": "niconicoにログインすると、より簡単にニコ生配信が可能です。",
+  "urgeToSignIn": "ニコニコにログインすると、より簡単にニコ生配信が可能です。",
   "skipConnect": "後でセットアップをする",
-  "loginToNiconico": "niconicoにログイン",
+  "loginToNiconico": "ニコニコにログイン",
 
   "selectObsProfile": "インポートしたいOBSのプロファイルを選択してください。",
   "importFromObs": "OBSからインポート",
