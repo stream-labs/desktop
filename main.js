@@ -255,10 +255,7 @@ let workerInitFinished = false;
 
 async function startApp() {
   const isDevMode = process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test';
-  let crashHandlerLogPath = '';
-  if (process.env.NODE_ENV !== 'production' || !!process.env.SLOBS_PREVIEW) {
-    crashHandlerLogPath = app.getPath('userData');
-  }
+  const crashHandlerLogPath = app.getPath('userData');
 
   await bundleUpdater(__dirname);
 
