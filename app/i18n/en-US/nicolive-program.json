@@ -220,7 +220,7 @@
       "fetchOnairChannelProgram": {
         "network_error": {
           "title":  "A network error has occurred",
-          "message": "The program information could not be fetched because of a network error.\nheck the health of your Internet connection."
+          "message": "The program information could not be fetched because of a network error.\nCheck the health of your Internet connection."
         },
         "403": {
           "title": "You do not have the authority to start streaming",
