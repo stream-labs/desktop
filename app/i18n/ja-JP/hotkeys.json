@@ -21,5 +21,7 @@
   "Play/Pause": "再生/一時停止",
   "Restart": "再起動",
   "Next Slide": "次のスライダー",
-  "Previous Slide": "前のスライダー"
+  "Previous Slide": "前のスライダー",
+  "Toggle Performance Mode": "Toggle Performance Mode",
+  "Skip Alert": "警告をスキップする。"
 }
