@@ -25,6 +25,12 @@ export default class AppearanceSettings extends Vue {
     this.checkInstalled();
   }
 
+  uninstall() {
+    // Intentionally synchronous for the same reasons as above.
+    this.virtualWebcamService.uninstall();
+    this.checkInstalled();
+  }
+
   start() {
     this.virtualWebcamService.actions.start();
   }
@@ -114,6 +120,28 @@ export default class AppearanceSettings extends Vue {
     );
   }
 
+  uninstallSection() {
+    return (
+      <div class="section">
+        <div class="section-content">
+          <p>
+            {$t(
+              'Uninstalling Virtual Webcam will remove it as a device option in other applications.',
+            )}
+          </p>
+          <button
+            class="button button--default"
+            style={{ marginBottom: '16px' }}
+            disabled={this.running}
+            onClick={this.uninstall}
+          >
+            {$t('Uninstall Virtual Webcam')}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   getSection(status: EVirtualWebcamPluginInstallStatus) {
     if (status === EVirtualWebcamPluginInstallStatus.NotPresent) {
       return this.needsInstallSection(false);
@@ -140,6 +168,9 @@ export default class AppearanceSettings extends Vue {
           </div>
         </div>
         {this.installStatus && this.getSection(this.installStatus)}
+        {this.installStatus &&
+          this.installStatus !== EVirtualWebcamPluginInstallStatus.NotPresent &&
+          this.uninstallSection()}
       </div>
     );
   }
