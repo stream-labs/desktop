@@ -168,6 +168,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
         required: false,
         allowEmpty: true,
         loading: !this.scheduledVideosLoaded,
+        placeholder: $t('Not selected'),
       }),
     });
   }
