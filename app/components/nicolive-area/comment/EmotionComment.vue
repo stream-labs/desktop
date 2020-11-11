@@ -14,8 +14,6 @@
 .root {
   display: flex;
   flex-direction: row;
-
-  .comment-row-fade(@emotion-brand-color);
 }
 
 .comment-header {
