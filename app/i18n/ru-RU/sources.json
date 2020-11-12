@@ -181,5 +181,7 @@
   "Size": "Размер",
   "Position": "Положение",
   "JACK Input Client": "Клиент JACK",
-  "Motion": "Motion"
+  "Motion": "Motion",
+  "Twitch Soundtrack": "Twitch Soundtrack",
+  "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.": "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs."
 }

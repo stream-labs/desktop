@@ -21,5 +21,7 @@
   "Play/Pause": "播放/暂停",
   "Restart": "重新开始",
   "Next Slide": "下一张幻灯片",
-  "Previous Slide": "上一张幻灯片"
+  "Previous Slide": "上一张幻灯片",
+  "Toggle Performance Mode": "Toggle Performance Mode",
+  "Skip Alert": "跳过通知"
 }
