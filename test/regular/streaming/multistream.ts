@@ -26,10 +26,7 @@ test('Multistream default mode', async t => {
   await fillForm(t, null, {
     title: 'Test stream',
     description: 'Test stream description',
-    game: selectGamesByTitles([
-      { title: 'Fortnite', platform: 'facebook' },
-      { title: 'Fortnite', platform: 'twitch' },
-    ]),
+    twitchGame: selectTitle('Fortnite'),
   });
 
   await submit(t);
@@ -64,7 +61,7 @@ test('Multistream advanced mode', async t => {
   await fillForm(t, 'form[name="twitch-settings"]', {
     customEnabled: true,
     title: 'twitch title',
-    game: selectTitle('Fortnite'),
+    twitchGame: selectTitle('Fortnite'),
     tags: ['100%'],
   });
 
@@ -76,7 +73,7 @@ test('Multistream advanced mode', async t => {
 
   await fillForm(t, 'form[name="facebook-settings"]', {
     customEnabled: true,
-    title: 'facebook title',
+    facebookGame: 'facebook title',
     game: selectTitle('Fortnite'),
   });
 

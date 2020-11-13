@@ -241,7 +241,9 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     if (settings && settings['broadcastId']) settings['broadcastId'] = '';
 
     // don't reuse liveVideoId for Facebook
-    if (platform === 'facebook' && settings['liveVideoId']) settings['liveVideoId'] = '';
+    if (platform === 'facebook' && settings && settings['liveVideoId']) {
+      settings['liveVideoId'] = '';
+    }
 
     return {
       ...settings,

@@ -56,7 +56,7 @@ test('Streaming to Twitch', async t => {
   await logIn(t, 'twitch');
   await goLive(t, {
     title: 'SLOBS Test Stream',
-    game: selectTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
+    twitchGame: selectTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
   });
   t.true(await chatIsVisible(t), 'Chat should be visible');
 
@@ -64,20 +64,44 @@ test('Streaming to Twitch', async t => {
   await showSettings(t, 'Stream');
   await t.true(
     await t.context.app.client.isExisting("div=You can not change these settings when you're live"),
+    'Stream settings should be not visible',
   );
   t.pass();
 });
 
-// TODO: Flaky
-test.skip('Streaming to Facebook', async t => {
+// TODO update accounts in the user-pool
+test.skip('Streaming to a Facebook Page', async t => {
   await logIn(t, 'facebook');
-  await sleep(3000); // there are some issues with setting the game field without delay here
   await goLive(t, {
     title: 'SLOBS Test Stream',
-    game: selectTitle('Fortnite'),
+    facebookGame: selectTitle('Fortnite'),
     description: 'SLOBS Test Stream Description',
   });
   t.true(await chatIsVisible(t), 'Chat should be visible');
+  t.pass();
+});
+
+// TODO update accounts in the user-pool
+test.skip('Streaming to a Facebook User`s timeline', async t => {
+  await logIn(t, 'facebook');
+  await goLive(t, {
+    title: 'SLOBS Test Stream',
+    facebookGame: selectTitle('Fortnite'),
+    description: 'SLOBS Test Stream Description',
+    destinationType: 'me',
+  });
+  t.pass();
+});
+
+// TODO update accounts in the user-pool
+test.skip('Streaming to a Facebook User`s group', async t => {
+  await logIn(t, 'facebook');
+  await goLive(t, {
+    title: 'SLOBS Test Stream',
+    facebookGame: selectTitle('Fortnite'),
+    description: 'SLOBS Test Stream Description',
+    destinationType: 'group',
+  });
   t.pass();
 });
 
@@ -156,7 +180,7 @@ test('Stream after switching accounts', async t => {
   await logIn(t, 'twitch');
   await goLive(t, {
     title: 'SLOBS Test Stream',
-    game: selectTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
+    twitchGame: selectTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
   });
 
   t.pass();
@@ -204,7 +228,7 @@ test('Migrate the twitch account to the protected mode', async t => {
   // go live
   await tryToGoLive(t, {
     title: 'SLOBS Test Stream',
-    game: selectTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
+    twitchGame: selectTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
   });
   await waitForStreamStop(t); // can't go live with a fake key
 
@@ -226,7 +250,7 @@ test('Migrate the twitch account to the protected mode', async t => {
   await restartApp(t); // restarting the app should call migration again
   await tryToGoLive(t, {
     title: 'SLOBS Test Stream',
-    game: selectTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
+    twitchGame: selectTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
   });
   await waitForStreamStop(t);
 
@@ -346,7 +370,7 @@ test('Recording when streaming', async t => {
 
   await goLive(t, {
     title: 'SLOBS Test Stream',
-    game: selectTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
+    twitchGame: selectTitle("PLAYERUNKNOWN'S BATTLEGROUNDS"),
   });
 
   // Stop recording
