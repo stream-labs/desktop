@@ -69,8 +69,7 @@ test('Streaming to Twitch', async t => {
   t.pass();
 });
 
-// TODO update accounts in the user-pool
-test.skip('Streaming to a Facebook Page', async t => {
+test('Streaming to a Facebook Page', async t => {
   await logIn(t, 'facebook');
   await goLive(t, {
     title: 'SLOBS Test Stream',
@@ -81,7 +80,7 @@ test.skip('Streaming to a Facebook Page', async t => {
   t.pass();
 });
 
-// TODO update accounts in the user-pool
+// TODO: setup FB permissions in the user-pool to run this test
 test.skip('Streaming to a Facebook User`s timeline', async t => {
   await logIn(t, 'facebook');
   await goLive(t, {
@@ -93,7 +92,7 @@ test.skip('Streaming to a Facebook User`s timeline', async t => {
   t.pass();
 });
 
-// TODO update accounts in the user-pool
+// TODO: setup FB permissions in the user-pool to run this test
 test.skip('Streaming to a Facebook User`s group', async t => {
   await logIn(t, 'facebook');
   await goLive(t, {
@@ -103,6 +102,20 @@ test.skip('Streaming to a Facebook User`s group', async t => {
     destinationType: 'group',
   });
   t.pass();
+});
+
+test('User does not have Facebook pages', async t => {
+  await logIn(t, 'facebook', { noFacebookPages: true, notStreamable: true });
+  await prepareToGoLive(t);
+  await clickGoLive(t);
+  if (await t.context.app.client.isExisting('button=Go Live')) {
+    await t.context.app.client.click('button=Go Live');
+  }
+  await focusChild(t);
+  t.true(
+    await t.context.app.client.isExisting('a=create a Gaming Video Creator Page'),
+    'The link for adding new facebook changes should exist',
+  );
 });
 
 test('Streaming to Youtube', async t => {
