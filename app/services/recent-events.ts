@@ -16,7 +16,6 @@ export interface IRecentEvent {
   from?: string;
   type: string;
   platform: string;
-  for?: string;
   created_at: string;
   display_name?: string;
   from_display_name?: string;
@@ -721,22 +720,6 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
       return false;
     }
 
-    if (!this.state.filterConfig.filter_subscription_3_months && event.months < 3) {
-      return false;
-    }
-
-    if (!this.state.filterConfig.filter_subscription_6_months && event.months < 6) {
-      return false;
-    }
-
-    if (!this.state.filterConfig.filter_subscription_9_months && event.months < 9) {
-      return false;
-    }
-
-    if (!this.state.filterConfig.filter_subscription_12_months && event.months < 12) {
-      return false;
-    }
-
     if (
       this.state.filterConfig.filter_subscription_minimum_enabled &&
       event.months < this.state.filterConfig.filter_subscription_minimum_months
@@ -772,6 +755,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
     const messages = e.message
       .filter(msg => !msg.isTest && !msg.repeat)
       .map(msg => {
+        msg.platform = e.for;
         msg.type = e.type;
         msg.hash = getHashForRecentEvent(msg);
         msg.uuid = uuid();
