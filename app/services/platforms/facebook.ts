@@ -199,6 +199,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
 
     // send selected pageId to streamlabs.com
     if (fbOptions.destinationType === 'page') {
+      assertIsDefined(fbOptions.pageId);
       await this.postPage(fbOptions.pageId);
     }
   }
