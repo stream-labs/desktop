@@ -493,19 +493,6 @@ export class FormMonkey {
     return `[data-role="input"][data-name="${name}"]`;
   }
 
-
-  /**
-   * returns input name by a title
-   * @param inputTitle
-   */
-  async getInputNameByTitle(title: string): Promise<string> {
-    const selector = await this.getInputSelectorByTitle(title);
-    if (!selector) return '';
-    const el = await this.client.$(selector);
-    if (!el) return '';
-    return await this.getAttribute(el, 'data-name');
-  }
-
   /**
    * returns input selector
    * @param inputTitle
