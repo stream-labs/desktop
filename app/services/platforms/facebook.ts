@@ -19,6 +19,7 @@ import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import electron from 'electron';
 import { WindowsService } from '../windows';
+import { assertIsDefined } from '../../util/properties-type-guards';
 
 interface IFacebookPage {
   access_token: string;
@@ -210,6 +211,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
    */
   async putChannelInfo(info: IFacebookUpdateVideoOptions): Promise<void> {
     const vidId = this.state.settings.liveVideoId;
+    assertIsDefined(vidId);
     await this.updateLiveVideo(vidId, info);
     this.UPDATE_STREAM_SETTINGS({ ...info, liveVideoId: vidId });
   }
@@ -347,7 +349,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
 
     // if currently selected page is not in the pages list then select the first page
     if (pages.length) {
-      const pageId = this.state.settings.pageId;
+      const pageId = this.state.settings.pageId!;
       const page = this.views.getPage(pageId);
       if (!page) this.UPDATE_STREAM_SETTINGS({ pageId: this.state.facebookPages[0].id });
     } else {
@@ -356,7 +358,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
 
     // if currently selected group is not in the group list then select the first group
     if (groups.length) {
-      const groupId = this.state.settings.groupId;
+      const groupId = this.state.settings.groupId!;
       const group = this.views.getGroup(groupId);
       if (!group) this.UPDATE_STREAM_SETTINGS({ groupId: this.state.facebookGroups[0].id });
     } else {
@@ -446,13 +448,13 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   }
 
   fetchViewerCount(): Promise<number> {
-    const { liveVideoId, pageId } = this.state.settings;
+    const { liveVideoId } = this.state.settings;
     if (liveVideoId == null) return Promise.resolve(0);
 
     const url = `${this.apiBase}/${this.state.settings.liveVideoId}?fields=live_views`;
-    const pageToken = this.views.getPage(pageId).access_token;
+    const token = this.views.getDestinationToken();
 
-    return this.requestFacebook<{ live_views: number }>(url, pageToken)
+    return this.requestFacebook<{ live_views: number }>(url, token)
       .then(json => json.live_views)
       .catch(() => 0);
   }
@@ -507,12 +509,12 @@ export class FacebookView extends ViewHandler<IFacebookServiceState> {
     return this.userView.state.auth?.platforms?.facebook?.token;
   }
 
-  getPage(id: string): IFacebookPage {
-    return this.state.facebookPages.find(p => p.id === id);
+  getPage(id: string): IFacebookPage | null {
+    return this.state.facebookPages.find(p => p.id === id) || null;
   }
 
-  getGroup(id: string): IFacebookGroup {
-    return this.state.facebookGroups.find(g => g.id === id);
+  getGroup(id: string): IFacebookGroup | null {
+    return this.state.facebookGroups.find(g => g.id === id) || null;
   }
 
   getDestinationId(options: IFacebookStartStreamOptions) {
@@ -532,9 +534,10 @@ export class FacebookView extends ViewHandler<IFacebookServiceState> {
     switch (destinationType) {
       case 'me':
       case 'group':
-        return this.oauthToken;
+        return this.oauthToken || '';
       case 'page':
-        return this.getPage(destinationId).access_token;
+        return destinationId ? this.getPage(destinationId)!.access_token : '';
     }
+    return '';
   }
 }
