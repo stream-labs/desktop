@@ -40,6 +40,7 @@ const fallbackDictionary = {
   ...require('./en-US/transitions.json'),
   ...require('./en-US/troubleshooter.json'),
   ...require('./en-US/twitter.json'),
+  ...require('./en-US/twitch.json'),
   ...require('./en-US/undo.json'),
   ...require('./en-US/widget-alertbox.json'),
   ...require('./en-US/widget-chat-box.json'),
