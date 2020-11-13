@@ -236,6 +236,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
       useCustomFields: false,
     };
     const settings = cloneDeep(service.state.settings);
+    console.log('get platform settings', settings);
 
     // don't reuse broadcastId for Youtube
     if (settings && settings['broadcastId']) settings['broadcastId'] = '';

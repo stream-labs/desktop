@@ -124,16 +124,6 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   protected init() {
     // pick up settings from the local storage and start syncing them
     this.syncSettingsWithLocalStorage();
-
-    // migrate user from SLOBS version that could stream only on a FB page
-    const shouldMigrate = !this.state.settings.destinationType && this.state.settings.pageId;
-    if (shouldMigrate) {
-      // stream to a FB page by default for migrated users
-      this.UPDATE_STREAM_SETTINGS({ destinationType: 'page' });
-    } else {
-      // stream to a user personal page by default for new users
-      this.UPDATE_STREAM_SETTINGS({ destinationType: 'me' });
-    }
   }
 
   @mutation()
@@ -181,29 +171,36 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
 
   async beforeGoLive(options: IGoLiveSettings) {
     const fbOptions = options.platforms.facebook;
+
     let liveVideo: IFacebookLiveVideo;
     if (fbOptions.liveVideoId) {
+      // start streaming to a scheduled video
       liveVideo = await this.updateLiveVideo(
         fbOptions.liveVideoId,
         fbOptions as IFacebookUpdateVideoOptions,
         true,
       );
     } else {
+      // create new video and go live
       liveVideo = await this.createLiveVideo(fbOptions);
     }
 
+    // setup stream key and new settings
     const streamUrl = liveVideo.stream_url;
     const streamKey = streamUrl.substr(streamUrl.lastIndexOf('/') + 1);
-
     this.streamSettingsService.setSettings({
       key: streamKey,
       platform: 'facebook',
       streamType: 'rtmp_common',
     });
-
     this.SET_STREAM_KEY(streamKey);
     this.SET_STREAM_PAGE_URL(`https://facebook.com/${liveVideo.permalink_url}`);
     this.UPDATE_STREAM_SETTINGS({ ...fbOptions, liveVideoId: liveVideo.id });
+
+    // send selected pageId to streamlabs.com
+    if (fbOptions.destinationType === 'page') {
+      await this.postPage(fbOptions.pageId);
+    }
   }
 
   /**
@@ -365,8 +362,11 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
       this.UPDATE_STREAM_SETTINGS({ groupId: '' });
     }
 
-    // if the user doesn't have groups and pages than set destinationType to the user's timeline
-    if (!this.state.settings.pageId && !this.state.settings.groupId) {
+    // set destinationType to the user's timeline if other options dont work
+    if (
+      (this.state.settings.destinationType === 'page' && !this.state.settings.pageId) ||
+      (this.state.settings.destinationType === 'group' && !this.state.settings.groupId)
+    ) {
       this.UPDATE_STREAM_SETTINGS({ destinationType: 'me' });
     }
 
@@ -497,6 +497,26 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
         this.oauthToken,
       )
     ).data;
+  }
+
+  /**
+   * Change the active facebook page on the Streamlabs.com
+   */
+  private postPage(pageId: string) {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/user/facebook/pages`;
+    const headers = authorizedHeaders(this.userService.apiToken!);
+    headers.append('Content-Type', 'application/json');
+    const request = new Request(url, {
+      headers,
+      method: 'POST',
+      body: JSON.stringify({ page_id: pageId, page_type: 'page' }),
+    });
+    try {
+      fetch(request).then(() => this.userService.updatePlatformChannelId('facebook', pageId));
+    } catch {
+      console.error(new Error('Could not set Facebook page'));
+    }
   }
 }
 

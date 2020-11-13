@@ -155,7 +155,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
           })) || [],
         required: true,
       }),
-      event: metadata.list({
+      fbEvent: metadata.list({
         title: $t('Scheduled Video'),
         fullWidth: true,
         options: [
@@ -227,11 +227,13 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
   }
 
   render() {
+    const hasPages = this.facebookService.state.facebookPages.length;
     const fbSettings = this.settings.platforms.facebook;
     const shouldShowGroups = fbSettings.destinationType === 'group' && !this.props.isUpdateMode;
     const shouldShowPages = fbSettings.destinationType === 'page' && !this.props.isUpdateMode;
     const shouldShowPermissionWarn = !this.canStreamToTimeline || !this.canStreamToGroup;
-    const shouldShowGamingWarning = fbSettings.destinationType !== 'page' && fbSettings.game;
+    const shouldShowGamingWarning = !hasPages && fbSettings.game;
+    const shouldShowEvents = !this.props.isUpdateMode && !this.props.isScheduleMode;
 
     return (
       <ValidatedForm name="facebook-settings">
@@ -278,11 +280,11 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
 
         {!this.canShowOnlyRequiredFields && (
           <div>
-            {!this.props.isUpdateMode && !this.props.isScheduleMode && (
-              <HFormGroup title={this.formMetadata.event.title}>
+            {shouldShowEvents && (
+              <HFormGroup title={this.formMetadata.fbEvent.title}>
                 <ListInput
                   vModel={fbSettings.liveVideoId}
-                  metadata={this.formMetadata.event}
+                  metadata={this.formMetadata.fbEvent}
                   onInput={() => this.onSelectScheduledVideoHandler()}
                   scopedSlots={this.eventInputSlots}
                 />
