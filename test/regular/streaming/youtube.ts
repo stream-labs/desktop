@@ -11,6 +11,7 @@ import {
 } from '../../helpers/spectron/streaming';
 import { FormMonkey, selectTitle } from '../../helpers/form-monkey';
 import moment = require('moment');
+import { sleep } from '../../helpers/sleep';
 
 useSpectron();
 

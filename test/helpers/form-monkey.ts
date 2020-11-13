@@ -467,6 +467,7 @@ export class FormMonkey {
     await ((this.client.keys(['Control', 'a']) as any) as Promise<any>); // select all
     await ((this.client.keys('Control') as any) as Promise<any>); // release ctrl key
     await ((this.client.keys('Backspace') as any) as Promise<any>); // clear
+    await this.client.click(selector); // click again if it's a list input
     await ((this.client.keys(value) as any) as Promise<any>); // type text
   }
 
