@@ -1,56 +1,34 @@
 import { focusChild, focusMain, test, useSpectron } from '../../helpers/spectron';
 import { FormMonkey } from '../../helpers/form-monkey';
-import { addTrailingSpace, createOptionsAssertion } from '../../helpers/spectron/assertions';
+import { assertOptions } from '../../helpers/spectron/assertions';
 import { getFormCheckbox, getFormInput } from '../../helpers/spectron/forms';
+import { showSettings } from '../../helpers/spectron/settings';
 
 useSpectron();
 
 test('Populates advanced settings', async t => {
-  const { app } = t.context;
-  const form = new FormMonkey(t);
-  const assertOptions = createOptionsAssertion(t, form);
-
-  await focusMain(t);
-  await app.client.click('.side-nav .icon-settings');
-
-  await focusChild(t);
-  await app.client.click('li=Advanced');
+  await showSettings(t, 'Advanced');
 
   // Process Priority
-  await assertOptions(
-    '[data-name=ProcessPriority]',
+  await assertOptions(t, 'ProcessPriority', 'Normal', [
+    'High',
+    'Above Normal',
     'Normal',
-    ['High', 'Above Normal', 'Normal', 'Below Normal', 'Idle'].map(addTrailingSpace),
-  );
+    'Below Normal',
+    'Idle',
+  ]);
 
   // Color Profile
-  await assertOptions(
-    '[data-name=ColorFormat]',
-    'NV12',
-    ['NV12', 'I420', 'I444', 'RGB'].map(addTrailingSpace),
-  );
+  await assertOptions(t, 'ColorFormat', 'NV12', ['NV12', 'I420', 'I444', 'RGB']);
 
   // YUV Color Space
-  await assertOptions('[data-name=ColorSpace]', '601', ['601', '709'].map(addTrailingSpace));
+  await assertOptions(t, 'ColorSpace', '601', ['601', '709']);
 
   // YUV Color Range
-  await assertOptions(
-    '[data-name=ColorRange]',
-    'Partial',
-    ['Partial', 'Full'].map(addTrailingSpace),
-  );
+  await assertOptions(t, 'ColorRange', 'Partial', ['Partial', 'Full']);
 
   // Force GPU as render device should be checked by default
   t.true(await getFormCheckbox(t, 'Force GPU as render device'));
-
-  if (process.env.CI) {
-    // Audio Monitoring Device
-    await assertOptions(
-      '[data-name=MonitoringDeviceName]',
-      'Default',
-      ['Default'].map(addTrailingSpace),
-    );
-  }
 
   // Disable Windows audio ducking should be unchecked
   t.false(await getFormCheckbox(t, 'Disable Windows audio ducking'));
