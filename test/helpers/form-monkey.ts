@@ -37,7 +37,11 @@ const months = [
  * helper for simulating user input into SLOBS forms
  */
 export class FormMonkey {
-  constructor(public t: TExecutionContext, private formSelector?: string, private showLogs = true) {
+  constructor(
+    public t: TExecutionContext,
+    private formSelector?: string,
+    private showLogs = false,
+  ) {
     if (!formSelector) this.formSelector = DEFAULT_SELECTOR;
   }
 
@@ -117,8 +121,10 @@ export class FormMonkey {
             await this.setToggleValue(input.selector, value);
             break;
           case 'list':
-          case 'fontFamily':
             await this.setListValue(input.selector, value, useTitleAsValue);
+            break;
+          case 'fontFamily':
+            await this.setListValue(`${input.selector} [data-type="list"]`, value, useTitleAsValue);
             break;
           case 'color':
             await this.setColorValue(input.selector, value);
@@ -184,9 +190,12 @@ export class FormMonkey {
           break;
         case 'list':
         case 'fontFamily':
+          // eslint-disable-next-line no-case-declarations
+          const selector =
+            input.type === 'list' ? input.selector : `${input.selector} [data-type="list"]`;
           value = returnTitlesInsteadValues
-            ? await this.getListSelectedTitle(input.selector)
-            : await this.getListValue(input.selector);
+            ? await this.getListSelectedTitle(selector)
+            : await this.getListValue(selector);
           break;
         case 'color':
           value = await this.getColorValue(input.selector);
@@ -542,13 +551,13 @@ export function selectTitle(optionTitle: string): FNValueSetter {
   return async (form: FormMonkey, input: IUIInput) => {
     // we should start typing to load list options
     const title = optionTitle as string;
-    await form.setTextValue(input.selector, title);
+    await form.setInputValue(input.selector, title);
 
     // wait the options list loading
     await form.client.waitForExist(`${input.selector} .multiselect__element`);
     await form.waitForLoading(input.name);
 
-    // click to the first option
+    // click on the first option
     await click(form.t, `${input.selector} .multiselect__element`);
   };
 }

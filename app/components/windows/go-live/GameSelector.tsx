@@ -88,7 +88,7 @@ export default class GameSelector extends TsxComponent<Props> {
   private get gameMetadata() {
     return metadata.list({
       title: $t('Game'),
-      name: 'game',
+      name: `${this.props.platform}Game`,
       placeholder: $t('Start typing to search'),
       // we should filter game list for the case when we disabled one of platform but still store search results for it
       options: this.gameOptions,
