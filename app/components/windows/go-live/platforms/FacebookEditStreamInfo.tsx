@@ -223,7 +223,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
 
   private verifyGroup() {
     const groupId = this.fbSettings.groupId;
-    electron.remote.shell.openExternal(`https://www.facebook.com/gropus/${groupId}/edit`);
+    electron.remote.shell.openExternal(`https://www.facebook.com/groups/${groupId}/edit`);
   }
 
   render() {
