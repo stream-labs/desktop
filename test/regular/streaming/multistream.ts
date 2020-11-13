@@ -80,8 +80,9 @@ test('Multistream advanced mode', async t => {
 
   await fillForm(t, 'form[name="facebook-settings"]', {
     customEnabled: true,
-    facebookGame: 'facebook title',
-    game: selectTitle('Fortnite'),
+    facebookGame: selectTitle('Fortnite'),
+    title: 'facebook title',
+    description: 'facebook description',
   });
 
   await submit(t);
