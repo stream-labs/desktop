@@ -160,6 +160,29 @@ test('Streaming to the scheduled event on Youtube', async t => {
   t.pass();
 });
 
+test('Streaming to the scheduled event on Facebook', async t => {
+  await logIn(t, 'facebook', { multistream: false });
+
+  // create event via scheduling form
+  const tomorrow = Date.now() + 1000 * 60 * 60 * 24;
+  const title = `facebook scheduled stream ${tomorrow}`;
+  await scheduleStream(t, tomorrow, {
+    title,
+    description: 'Facebook Test Stream Description',
+  });
+
+  // select event and go live
+  await prepareToGoLive(t);
+  await clickGoLive(t);
+  const form = new FormMonkey(t);
+  await form.fill({
+    fbEvent: selectTitle(title),
+  });
+  await submit(t);
+  await waitForStreamStart(t);
+  t.pass();
+});
+
 test('Start stream twice to the same YT event', async t => {
   await logIn(t, 'youtube', { multistream: false });
 
