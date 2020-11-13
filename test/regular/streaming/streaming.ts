@@ -160,7 +160,8 @@ test('Streaming to the scheduled event on Youtube', async t => {
   t.pass();
 });
 
-test('Streaming to the scheduled event on Facebook', async t => {
+// TODO: delete all the scheduled on the user-pool and enable this test
+test.skip('Streaming to the scheduled event on Facebook', async t => {
   await logIn(t, 'facebook', { multistream: false });
 
   // create event via scheduling form
