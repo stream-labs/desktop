@@ -553,8 +553,6 @@ export function selectTitle(optionTitle: string): FNValueSetter {
     const title = optionTitle as string;
     await form.setInputValue(input.selector, title);
 
-    await sleep(60000, true);
-
     // wait the options list loading
     await form.client.waitForExist(`${input.selector} .multiselect__element`);
     await form.waitForLoading(input.name);
