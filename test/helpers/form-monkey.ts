@@ -6,11 +6,13 @@ interface IUIInput {
   id: string;
   type: string;
   name: string;
+  title: string;
   selector: string;
   loading: boolean;
 }
 
 type FNValueSetter = (form: FormMonkey, input: IUIInput) => Promise<unknown>;
+type TListOption = { value: string; title: string };
 
 export type TFormMonkeyData = Dictionary<string | boolean | FNValueSetter>;
 
@@ -35,11 +37,7 @@ const months = [
  * helper for simulating user input into SLOBS forms
  */
 export class FormMonkey {
-  constructor(
-    public t: TExecutionContext,
-    private formSelector?: string,
-    private showLogs = false,
-  ) {
+  constructor(public t: TExecutionContext, private formSelector?: string, private showLogs = true) {
     if (!formSelector) this.formSelector = DEFAULT_SELECTOR;
   }
 
@@ -73,32 +71,33 @@ export class FormMonkey {
     const $el = await this.client.$(selector);
     const id = ($el as any).value.ELEMENT;
     const type = await this.getAttribute(selector, 'data-type');
+    const title = await this.getAttribute(selector, 'data-title');
     const loadingAttr = await this.getAttribute(selector, 'data-loading');
     const loading = loadingAttr === 'true';
-    return { id, name, type, selector, loading };
+    return { id, name, type, selector, loading, title };
   }
 
   /**
    * fill the form with values
    */
-  async fill(formData: Dictionary<any>) {
+  async fill(formData: Dictionary<any>, useTitleAsValue = false) {
     this.log('fill form with data', formData);
     await this.waitForLoading();
-    const inputs = await this.getInputs();
 
     // tslint:disable-next-line:no-parameter-reassignment TODO
     formData = cloneDeep(formData);
-    const inputNames = Object.keys(formData);
+    const inputKeys = Object.keys(formData);
 
-    for (const inputName of inputNames) {
+    for (const inputKey of inputKeys) {
+      const inputName = useTitleAsValue ? await this.getInputNameByTitle(inputKey) : inputKey;
       const input = await this.getInput(inputName);
-      if (!(input.name in formData)) {
+      if (!input.name) {
         // skip no-name fields
         continue;
       }
 
-      const value = formData[input.name];
-      this.log(`set the value for the ${input.type} field: ${input.name} = ${value}`);
+      const value = formData[inputKey];
+      this.log(`set the value for the ${input.type} field: ${inputKey} = ${value}`);
 
       if (typeof value === 'function') {
         // apply custom setter
@@ -119,7 +118,7 @@ export class FormMonkey {
             break;
           case 'list':
           case 'fontFamily':
-            await this.setListValue(input.selector, value);
+            await this.setListValue(input.selector, value, useTitleAsValue);
             break;
           case 'color':
             await this.setColorValue(input.selector, value);
@@ -140,7 +139,7 @@ export class FormMonkey {
         }
       }
 
-      delete formData[input.name];
+      delete formData[inputKey];
     }
 
     const notFoundFields = Object.keys(formData);
@@ -151,9 +150,16 @@ export class FormMonkey {
   }
 
   /**
+   * a shortcut for .fill(data, useTitleAsValue = true)
+   */
+  async fillByTitles(formData: Dictionary<any>) {
+    return await this.fill(formData, true);
+  }
+
+  /**
    * returns all input values from the form
    */
-  async read(): Promise<Dictionary<any>> {
+  async read(returnTitlesInsteadValues = false): Promise<Dictionary<any>> {
     await this.waitForLoading();
     const inputs = await this.getInputs();
     const formData = {};
@@ -178,7 +184,9 @@ export class FormMonkey {
           break;
         case 'list':
         case 'fontFamily':
-          value = await this.getListValue(input.selector);
+          value = returnTitlesInsteadValues
+            ? await this.getListSelectedTitle(input.selector)
+            : await this.getListValue(input.selector);
           break;
         case 'color':
           value = await this.getColorValue(input.selector);
@@ -193,18 +201,23 @@ export class FormMonkey {
       }
 
       this.log(`got: ${value}`);
-      formData[input.name] = value;
+      const key = returnTitlesInsteadValues ? input.title : input.name;
+      formData[key] = value;
     }
 
     return formData;
   }
 
-  async includes(expectedData: Dictionary<any>): Promise<boolean> {
-    const formData = await this.read();
+  async includes(expectedData: Dictionary<any>, useTitleInsteadName = false): Promise<boolean> {
+    const formData = await this.read(useTitleInsteadName);
     this.log('check form includes expected data:');
     this.log(formData);
     this.log(expectedData);
     return isMatch(formData, expectedData);
+  }
+
+  async includesByTitles(expectedData: Dictionary<any>) {
+    return this.includes(expectedData, true);
   }
 
   async setTextValue(selector: string, value: string) {
@@ -221,7 +234,11 @@ export class FormMonkey {
     return Number(await this.getTextValue(selector));
   }
 
-  async setListValue(selector: string, valueSetter: string | FNValueSetter) {
+  async setListValue(
+    selector: string,
+    valueSetter: string | FNValueSetter,
+    useTitleAsValue = false,
+  ) {
     if (typeof valueSetter === 'function') {
       const inputName = await this.getAttribute(selector, 'data-name');
       const input = inputName && (await this.getInput(inputName));
@@ -237,10 +254,14 @@ export class FormMonkey {
       await this.getAttribute(selector, 'data-internal-search'),
     );
 
+    const optionSelector = useTitleAsValue
+      ? `${selector} .multiselect__element [data-option-title="${value}"]`
+      : `${selector} .multiselect__element [data-option-value="${value}"]`;
+
     if (hasInternalSearch) {
       // the list input has a static list of options
       await this.client.click(`${selector} .multiselect`);
-      await this.client.click(`${selector} [data-option-value="${value}"]`);
+      await this.client.click(optionSelector);
     } else {
       // the list input has a dynamic list of options
 
@@ -248,7 +269,7 @@ export class FormMonkey {
       await this.setTextValue(selector, value);
       // wait the options list load
       await this.client.waitForExist(`${selector} .multiselect__element`);
-      await this.client.click(`${selector} .multiselect__element [data-option-value="${value}"]`);
+      await this.client.click(optionSelector);
     }
 
     // the vue-multiselect's popup-div needs time to be closed
@@ -272,16 +293,24 @@ export class FormMonkey {
   }
 
   async getListValue(selector: string): Promise<string> {
-    return await this.getAttribute(
-      `${selector} .multiselect .multiselect__option--selected span`,
-      'data-option-value',
-    );
+    return (await this.getListSelectedOption(selector)).value;
+  }
+
+  async getListSelectedTitle(selector: string): Promise<string> {
+    return (await this.getListSelectedOption(selector)).title;
+  }
+
+  async getListSelectedOption(selector: string): Promise<TListOption> {
+    return {
+      value: await this.getAttribute(selector, 'data-value'),
+      title: await this.getAttribute(selector, 'data-option-title'),
+    };
   }
 
   /**
    * return ListInput options
    */
-  async getListOptions(fieldName: string): Promise<{ value: string; title: string }[]> {
+  async getListOptions(fieldName: string): Promise<TListOption[]> {
     await this.waitForLoading(fieldName);
     const input = await this.getInput(fieldName);
     const optionsEls = await this.client.$$(`${input.selector} [data-option-value]`);
@@ -482,15 +511,21 @@ export class FormMonkey {
 
   /**
    * returns selector for the input element by a title
-   * @param inputTitle
    */
   async getInputSelectorByTitle(inputTitle: string): Promise<string> {
+    const name = await this.getInputNameByTitle(inputTitle);
+    return `[data-role="input"][data-name="${name}"]`;
+  }
+
+  /**
+   * returns name for the input element by a title
+   */
+  async getInputNameByTitle(inputTitle: string): Promise<string> {
     const el = await this.client
       .$(`label=${inputTitle}`)
       .$('../..')
       .$('[data-role="input"]');
-    const name = await this.getAttribute(el, 'data-name');
-    return `[data-role="input"][data-name="${name}"]`;
+    return await this.getAttribute(el, 'data-name');
   }
 
   private log(...args: any[]) {
