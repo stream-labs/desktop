@@ -182,8 +182,13 @@ textarea[type=text] {
     background: var(--dropdown-bg);
   }
 
-  .multiselect--disabled {
+  &.multiselect--disabled {
     opacity: 0.5;
+    background: none;
+
+    .multiselect__select {
+      background: none;
+    }
 
     &:focus {
       outline: none;
