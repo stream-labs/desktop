@@ -237,6 +237,20 @@ export class ChatService extends Service {
           true,
         );
       }
+
+      // the facebook chat does not properly fit in our sidebar and shows ugly scrollbars
+      // inject a script that removing the scrollbars
+      if (this.userService.platform?.type === 'facebook') {
+        Utils.sleep(2000).then(() => {
+          this.chatView.webContents.executeJavaScript(
+            `
+                var chatIframe = document.querySelector('iframe');
+                if (chatIframe) chatIframe.setAttribute('scrolling','no');
+        `,
+            true,
+          );
+        });
+      }
     });
   }
 
