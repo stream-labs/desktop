@@ -108,7 +108,16 @@ export class ChatService extends Service {
   private async loadUrl() {
     if (!this.chatUrl) return; // user has logged out
     if (!this.chatView) return; // chat was already deinitialized
-    this.chatView.webContents.loadURL(this.chatUrl).catch(this.handleRedirectError);
+
+    // try to load chat url
+    await this.chatView.webContents.loadURL(this.chatUrl).catch(this.handleRedirectError);
+
+    // sometimes it fails to load chat
+    // try to load again if needed
+    await Utils.sleep(1000);
+    if (this.chatView.webContents.getURL() !== this.chatUrl) {
+      await this.chatView.webContents.loadURL(this.chatUrl).catch(this.handleRedirectError);
+    }
   }
 
   handleRedirectError(e: Error) {
