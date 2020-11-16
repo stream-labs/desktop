@@ -7,7 +7,7 @@ import NavMenu from 'components/shared/NavMenu.vue';
 import NavItem from 'components/shared/NavItem.vue';
 import GenericFormGroups from 'components/obs/inputs/GenericFormGroups.vue';
 import { WindowsService } from 'services/windows';
-import { ISettingsServiceApi, ISettingsSubCategory } from 'services/settings/index';
+import { ISettingsSubCategory, SettingsService } from 'services/settings/index';
 import ExtraSettings from './ExtraSettings.vue';
 import DeveloperSettings from './DeveloperSettings';
 import InstalledApps from 'components/InstalledApps.vue';
@@ -57,7 +57,7 @@ import { $t } from 'services/i18n';
   },
 })
 export default class Settings extends Vue {
-  @Inject() settingsService: ISettingsServiceApi;
+  @Inject() settingsService: SettingsService;
   @Inject() windowsService: WindowsService;
   @Inject() magicLinkService: MagicLinkService;
   @Inject() userService: UserService;
@@ -66,7 +66,6 @@ export default class Settings extends Vue {
 
   searchStr = '';
   searchResultPages: string[] = [];
-  settingsData: ISettingsSubCategory[] = [];
   icons: Dictionary<string> = {
     General: 'icon-overview',
     Stream: 'fas fa-globe',
@@ -87,10 +86,18 @@ export default class Settings extends Vue {
     'Installed Apps': 'icon-store',
   };
 
-  internalCategoryName = 'General';
+  internalCategoryName: string = null;
 
   get categoryName() {
+    if (this.internalCategoryName == null) {
+      this.internalCategoryName = this.getInitialCategoryName();
+    }
+
     return this.internalCategoryName;
+  }
+
+  get settingsData() {
+    return this.settingsService.state[this.categoryName].formData;
   }
 
   set categoryName(val: string) {
@@ -109,11 +116,6 @@ export default class Settings extends Vue {
     return this.userService.views.isLoggedIn;
   }
 
-  mounted() {
-    this.categoryName = this.getInitialCategoryName();
-    this.settingsData = this.settingsService.getSettingsFormData(this.categoryName);
-  }
-
   getInitialCategoryName() {
     if (this.windowsService.state.child.queryParams) {
       return this.windowsService.state.child.queryParams.categoryName || 'General';
@@ -127,7 +129,7 @@ export default class Settings extends Vue {
 
   save(settingsData: ISettingsSubCategory[]) {
     this.settingsService.setSettings(this.categoryName, settingsData);
-    this.settingsData = this.settingsService.getSettingsFormData(this.categoryName);
+    // this.settingsData = this.settingsService.getSettingsFormData(this.categoryName);
   }
 
   done() {
@@ -136,16 +138,29 @@ export default class Settings extends Vue {
 
   @Watch('categoryName')
   onCategoryNameChangedHandler(categoryName: string) {
-    this.settingsData = this.getSettingsData(categoryName);
+    // this.settingsData = this.getSettingsData(categoryName);
     this.$refs.settingsContainer.scrollTop = 0;
   }
 
   getSettingsData(categoryName: string) {
-    return this.settingsService.getSettingsFormData(categoryName);
+    // return this.settingsService.getSettingsFormData(categoryName);
+    return this.settingsService.state[categoryName].formData;
   }
 
+  originalCategory: string = null;
+
   onBeforePageScanHandler(page: string) {
-    this.settingsData = this.getSettingsData(page);
+    if (this.originalCategory == null) {
+      this.originalCategory = this.categoryName;
+    }
+
+    // this.settingsData = this.getSettingsData(page);
+    this.categoryName = page;
+  }
+
+  onScanCompletedHandler() {
+    this.categoryName = this.originalCategory;
+    this.originalCategory = null;
   }
 
   onPageRenderHandler(page: string) {

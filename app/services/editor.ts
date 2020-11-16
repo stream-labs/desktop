@@ -119,7 +119,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     const parent = overSources[0].getParent();
 
     if (
-      this.customizationService.getSettings().folderSelection &&
+      this.customizationService.state.folderSelection &&
       (!parent || (parent && parent.isSelected()))
     ) {
       this.selectionService.views.globalSelection.select(overSources[0].id);
@@ -169,7 +169,7 @@ export class EditorService extends StatefulService<IEditorServiceState> {
       if (event.button === 0) {
         if (overSources.length) {
           let overNode: TSceneNode = overSources[0];
-          if (this.customizationService.getSettings().folderSelection) {
+          if (this.customizationService.state.folderSelection) {
             overNode = overSources[0].hasParent() ? overSources[0].getParent() : overSources[0];
           }
 

@@ -1,5 +1,5 @@
 import cloneDeep from 'lodash/cloneDeep';
-import { StatefulService, mutation } from 'services/core/stateful-service';
+import { StatefulService, mutation, ViewHandler } from 'services/core/stateful-service';
 import {
   inputValuesToObsValues,
   obsValuesToInputValues,
@@ -16,16 +16,15 @@ import { WindowsService } from 'services/windows';
 import Utils from '../utils';
 import { AppService } from 'services/app';
 import { $t } from 'services/i18n';
-import { encoderFieldsMap, OutputSettingsService, obsEncoderToEncoderFamily } from './output';
+import { encoderFieldsMap, obsEncoderToEncoderFamily } from './output';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
-import { ISettingsServiceApi, ISettingsSubCategory } from './settings-api';
 import { PlatformAppsService } from 'services/platform-apps';
 import { EDeviceType } from 'services/hardware';
 import { StreamingService } from 'services/streaming';
 import { byOS, OS } from 'util/operating-systems';
 import { FacemasksService } from 'services/facemasks';
 
-export interface ISettingsState {
+export interface ISettingsValues {
   General: {
     KeepRecordingWhenStreamStops: boolean;
     RecordWhenStreaming: boolean;
@@ -59,49 +58,135 @@ export interface ISettingsState {
   };
 }
 
+export interface ISettingsSubCategory {
+  nameSubCategory: string;
+  codeSubCategory?: string;
+  parameters: TObsFormData;
+}
+
 declare type TSettingsFormData = Dictionary<ISettingsSubCategory[]>;
 
-export class SettingsService extends StatefulService<ISettingsState>
-  implements ISettingsServiceApi {
-  static initialState = {};
+export enum ESettingsCategoryType {
+  Untabbed = 0,
+  Tabbed = 1,
+}
 
-  static convertFormDataToState(settingsFormData: TSettingsFormData): ISettingsState {
-    const settingsState: Partial<ISettingsState> = {};
-    for (const groupName in settingsFormData) {
-      settingsFormData[groupName].forEach(subGroup => {
+interface ISettingsCategory {
+  type: ESettingsCategoryType;
+  formData: ISettingsSubCategory[];
+}
+
+interface ISettingsServiceState {
+  [categoryName: string]: ISettingsCategory;
+}
+
+class SettingsViews extends ViewHandler<ISettingsServiceState> {
+  get values() {
+    const settingsValues: Partial<ISettingsValues> = {};
+
+    for (const groupName in this.state) {
+      this.state[groupName].formData.forEach(subGroup => {
         subGroup.parameters.forEach(parameter => {
-          settingsState[groupName] = settingsState[groupName] || {};
-          settingsState[groupName][parameter.name] = parameter.value;
+          settingsValues[groupName] = settingsValues[groupName] || {};
+          settingsValues[groupName][parameter.name] = parameter.value;
         });
       });
     }
 
-    return settingsState as ISettingsState;
+    return settingsValues as ISettingsValues;
   }
+}
+
+export class SettingsService extends StatefulService<ISettingsServiceState> {
+  static initialState = {};
 
   @Inject() private sourcesService: SourcesService;
   @Inject() private audioService: AudioService;
   @Inject() private windowsService: WindowsService;
   @Inject() private appService: AppService;
   @Inject() private platformAppsService: PlatformAppsService;
-  @Inject() private outputSettingsService: OutputSettingsService;
   @Inject() private streamingService: StreamingService;
   @Inject() private facemasksService: FacemasksService;
 
   @Inject()
   private videoEncodingOptimizationService: VideoEncodingOptimizationService;
 
+  get views() {
+    return new SettingsViews(this.state);
+  }
+
   init() {
     this.loadSettingsIntoStore();
   }
 
+  private fetchSettingsFromObs(categoryName: string): ISettingsCategory {
+    const settingsMetadata = obs.NodeObs.OBS_settings_getSettings(categoryName);
+    let settings = settingsMetadata.data;
+    if (!settings) settings = [];
+
+    // Names of settings that are disabled because we
+    // have not implemented them yet.
+    const BLACK_LIST_NAMES = [
+      'SysTrayMinimizeToTray',
+      'SysTrayEnabled',
+      'CenterSnapping',
+      'HideProjectorCursor',
+      'ProjectorAlwaysOnTop',
+      'SaveProjectors',
+      'SysTrayWhenStarted',
+    ];
+
+    for (const group of settings) {
+      group.parameters = obsValuesToInputValues(group.parameters, {
+        disabledFields: BLACK_LIST_NAMES,
+        transformListOptions: true,
+      });
+    }
+
+    if (categoryName === 'Audio') {
+      return {
+        type: ESettingsCategoryType.Untabbed,
+        formData: this.getAudioSettingsFormData(settings[0]),
+      };
+    }
+
+    // We hide the encoder preset and settings if the optimized ones are in used
+    if (
+      categoryName === 'Output' &&
+      !this.streamingService.isIdle &&
+      this.videoEncodingOptimizationService.state.useOptimizedProfile
+    ) {
+      const encoder = obsEncoderToEncoderFamily(
+        this.findSettingValue(settings, 'Streaming', 'Encoder') ||
+          this.findSettingValue(settings, 'Streaming', 'StreamEncoder'),
+      );
+      // Setting preset visibility
+      settings = this.patchSetting(settings, encoderFieldsMap[encoder].preset, { visible: false });
+      // Setting encoder settings visibility
+      if (encoder === 'x264') {
+        settings = this.patchSetting(settings, encoderFieldsMap[encoder].encoderOptions, {
+          visible: false,
+        });
+      }
+    }
+
+    return {
+      type: settingsMetadata.type,
+      formData: settings,
+    };
+  }
+
+  /**
+   * Can be called externally to ensure that you have the absolute latest settings
+   * fetched from OBS directly.
+   */
   loadSettingsIntoStore() {
     // load configuration from nodeObs to state
     const settingsFormData = {};
     this.getCategories().forEach(categoryName => {
-      settingsFormData[categoryName] = this.getSettingsFormData(categoryName);
+      settingsFormData[categoryName] = this.fetchSettingsFromObs(categoryName);
     });
-    this.SET_SETTINGS(SettingsService.convertFormDataToState(settingsFormData));
+    this.SET_SETTINGS(settingsFormData);
   }
 
   showSettings(categoryName?: string) {
@@ -152,58 +237,6 @@ export class SettingsService extends StatefulService<ISettingsState>
     }
 
     return categories;
-  }
-
-  isTabbedForm(categoryName: string) {
-    if (!categoryName) return false;
-    return obs.NodeObs.OBS_settings_getSettings(categoryName).type === 1;
-  }
-
-  getSettingsFormData(categoryName: string): ISettingsSubCategory[] {
-    let settings = obs.NodeObs.OBS_settings_getSettings(categoryName).data;
-    if (!settings) settings = [];
-
-    // Names of settings that are disabled because we
-    // have not implemented them yet.
-    const BLACK_LIST_NAMES = [
-      'SysTrayMinimizeToTray',
-      'SysTrayEnabled',
-      'CenterSnapping',
-      'HideProjectorCursor',
-      'ProjectorAlwaysOnTop',
-      'SaveProjectors',
-      'SysTrayWhenStarted',
-    ];
-
-    for (const group of settings) {
-      group.parameters = obsValuesToInputValues(group.parameters, {
-        disabledFields: BLACK_LIST_NAMES,
-        transformListOptions: true,
-      });
-    }
-
-    if (categoryName === 'Audio') return this.getAudioSettingsFormData(settings[0]);
-    // We hide the encoder preset and settings if the optimized ones are in used
-    if (
-      categoryName === 'Output' &&
-      !this.streamingService.isIdle &&
-      this.videoEncodingOptimizationService.state.useOptimizedProfile
-    ) {
-      const encoder = obsEncoderToEncoderFamily(
-        this.findSettingValue(settings, 'Streaming', 'Encoder') ||
-          this.findSettingValue(settings, 'Streaming', 'StreamEncoder'),
-      );
-      // Setting preset visibility
-      settings = this.patchSetting(settings, encoderFieldsMap[encoder].preset, { visible: false });
-      // Setting encoder settings visibility
-      if (encoder === 'x264') {
-        settings = this.patchSetting(settings, encoderFieldsMap[encoder].encoderOptions, {
-          visible: false,
-        });
-      }
-    }
-
-    return settings;
   }
 
   findSetting(settings: ISettingsSubCategory[], category: string, setting: string) {
@@ -257,7 +290,9 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   setSettingValue(category: string, name: string, value: TObsValue) {
-    const newSettings = this.patchSetting(this.getSettingsFormData(category), name, { value });
+    const newSettings = this.patchSetting(this.fetchSettingsFromObs(category).formData, name, {
+      value,
+    });
     this.setSettings(category, newSettings);
   }
 
@@ -340,14 +375,14 @@ export class SettingsService extends StatefulService<ISettingsState>
     this.loadSettingsIntoStore();
   }
 
-  setSettingsPatch(patch: Partial<ISettingsState>) {
+  setSettingsPatch(patch: Partial<ISettingsValues>) {
     // Tech Debt: This is a product of the node-obs settings API.
     // This function represents a cleaner API we would like to have
     // in the future.
 
     Object.keys(patch).forEach(categoryName => {
       const category: Dictionary<any> = patch[categoryName];
-      const formSubCategories = this.getSettingsFormData(categoryName);
+      const formSubCategories = this.fetchSettingsFromObs(categoryName).formData;
 
       Object.keys(category).forEach(paramName => {
         formSubCategories.forEach(subCategory => {
@@ -400,7 +435,7 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   @mutation()
-  SET_SETTINGS(settingsData: ISettingsState) {
+  SET_SETTINGS(settingsData: ISettingsServiceState) {
     this.state = Object.assign({}, this.state, settingsData);
   }
 }

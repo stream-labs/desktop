@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { SceneCollectionsService } from 'services/scene-collections/index';
 import { OverlaysPersistenceService } from 'services/scene-collections/overlays';
-import { CustomizationService } from 'services/customization/index';
+import { CustomizationService } from 'services/customization';
 import electron from 'electron';
 import path from 'path';
 import { AppService } from 'services/app/index';

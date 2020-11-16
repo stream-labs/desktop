@@ -66,7 +66,7 @@
           :onBeforePageScan="onBeforePageScanHandler"
           :onPageRender="onPageRenderHandler"
           @searchCompleted="onSearchCompletedHandler"
-          @scanCompleted="settingsData = getSettingsData(categoryName)"
+          @scanCompleted="onScanCompletedHandler"
           v-slot:default="{ page, scanning }"
         >
           <extra-settings v-if="page === 'General'" />
@@ -103,7 +103,7 @@
             "
             :key="page"
             :categoryName="page"
-            v-model="settingsData"
+            :value="settingsData"
             @input="save"
           />
         </searchable-pages>
