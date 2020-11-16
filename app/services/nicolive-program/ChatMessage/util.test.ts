@@ -7,6 +7,7 @@ import {
   isAnonymous,
   getScore,
   parseCommandName,
+  parseCommandArgument,
   parseJsonContent,
   parseContent,
 } from './util';
@@ -86,6 +87,11 @@ test('getScore', () => {
 test('parseCommandName', () => {
   expect(parseCommandName(standard)).toBe('');
   expect(parseCommandName(operatorCommand)).toBe('vote');
+});
+
+test('parseCommandArgument', () => {
+  expect(parseCommandArgument(standard)).toBe('');
+  expect(parseCommandArgument(operatorCommand)).toBe('stop');
 });
 
 test('parseJsonContent', () => {

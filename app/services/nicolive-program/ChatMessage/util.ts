@@ -37,6 +37,11 @@ export function parseCommandName(chat: ChatMessage): string {
   return matched && matched[1] ? matched[1] : '';
 }
 
+export function parseCommandArgument(chat: ChatMessage): string {
+  const matched = (chat.content ?? '').match(/^\/\S+\s+(.+)/);
+  return matched && matched[1] ? matched[1] : '';
+}
+
 export function parseJsonContent(chat: ChatMessage): { commandName: string, value: any} | null {
   const content = chat.content ?? '';
   const matched = content.match(/(\S+)\s+(.+)/);

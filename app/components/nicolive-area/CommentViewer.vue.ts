@@ -16,12 +16,14 @@ import CommonComment from './comment/CommonComment.vue';
 import SystemMessage from './comment/SystemMessage.vue';
 import GiftComment from './comment/GiftComment.vue';
 import NicoadComment from './comment/NicoadComment.vue';
+import EmotionComment from './comment/EmotionComment.vue';
 
 const componentMap: { [type in ChatMessageType]: Vue.Component } = {
   normal: CommonComment,
   operator: CommonComment,
   nicoad: NicoadComment,
   gift: GiftComment,
+  emotion: EmotionComment,
   system: SystemMessage,
   info: SystemMessage,
   unknown: SystemMessage,

@@ -28,6 +28,10 @@ test('ギフト', () => {
   expect(classify(make('/gift ...args'))).toBe('gift');
 });
 
+test('エモーション', () => {
+  expect(classify(make('/emotion ...args'))).toBe('emotion');
+});
+
 test('info', () => {
   expect(classify(make('/info 1 ...args'))).toBe('info');
   expect(classify(make('/info 2 ...args'))).toBe('invisible');
