@@ -38,10 +38,35 @@
     "description": "ニコニコ生放送に最適化した設定で配信します。"
   },
   "nicoliveProgramSelector": {
-    "title": "配信する番組の選択",
-    "description": "配信可能な番組が複数あります。<br/>配信する番組を選択してください。",
-    "cancel": "キャンセル",
-    "done": "配信する番組を決定する"
+    "title": "配信番組の選択",
+    "steps": {
+      "providerTypeSelect": {
+        "menuTitle": "配信種別",
+        "title": "配信種別を選択",
+        "description": "配信する番組種別を選択してください。"
+      },
+      "channelSelect": {
+        "menuTitle": "配信チャンネル",
+        "title": "配信チャンネルを選択",
+        "description": "リストから配信したいチャンネルを選択してください。"
+      },
+      "programSelect": {
+        "menuTitle": "配信番組",
+        "title":"配信番組を選択",
+        "description": "配信を開始する番組を選択してください。"
+      },
+      "confirm": {
+        "menuTitle": "確認",
+        "title": "確認",
+        "description": "下記の内容で配信を開始します。"
+      }
+    },
+    "providerTypeProgram": {
+      "channel": "チャンネル番組",
+      "user": "ユーザー番組"
+    },
+    "noChannelPrograms": "指定されたチャンネルに配信可能な番組がありません。<br />番組を作成するか、正しいチャンネルが選択されているかを確認してください。",
+    "done": "番組を決定して配信する"
   },
   "FPS": "フレームレート",
   "resolution": "解像度",

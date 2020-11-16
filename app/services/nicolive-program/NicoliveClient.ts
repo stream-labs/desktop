@@ -10,9 +10,14 @@ import {
   CommonErrorResponse,
   Community,
   Filters,
-  FilterRecord
+  FilterRecord,
+  OnairUserProgramData,
+  OnairChannelProgramData,
+  OnairChannelData,
+  BroadcastStreamData
 } from './ResponseTypes';
 import { addClipboardMenu } from 'util/addClipboardMenu';
+import { handleErrors } from 'util/requests';
 const { BrowserWindow } = remote;
 
 export enum CreateResult {
@@ -55,6 +60,8 @@ export function isOk<T>(result: WrappedResult<T>): result is SucceededResult<T> 
   return result.ok === true;
 }
 
+export class NotLoggedInError {}
+
 export class NicoliveClient {
   static live2BaseURL = 'https://live2.nicovideo.jp';
   static publicBaseURL = 'https://public.api.nicovideo.jp';
@@ -94,7 +101,7 @@ export class NicoliveClient {
     let obj: any = null;
     try {
       obj = JSON.parse(body);
-    } catch(e) {
+    } catch (e) {
       // bodyがJSONになってない異常失敗
 
       // breadcrumbsに載るようにログ
@@ -136,6 +143,7 @@ export class NicoliveClient {
     return new Promise((resolve, reject) =>
       session.cookies.get({ url: 'https://.nicovideo.jp', name: 'user_session' }, (err, cookies) => {
         if (err) return reject(err);
+        if (cookies.length < 1) return reject(new NotLoggedInError());
         resolve(cookies[0].value);
       })
     );
@@ -394,6 +402,90 @@ export class NicoliveClient {
       ok: false,
       value: obj as CommonErrorResponse,
     };
+  }
+  /*
+   * 放送可能なユーザー番組IDを取得する 
+   * 放送可能な番組がない場合はundefinedを返す
+   */
+  async fetchOnairUserProgram(): Promise<OnairUserProgramData | undefined> {
+    const url = `${NicoliveClient.live2BaseURL}/unama/tool/v2/onairs/user`
+    const headers = new Headers();
+    const userSession = await this.fetchSession();
+    headers.append('X-niconico-session', userSession);
+    const request = new Request(url, { headers });
+    try {
+      return await fetch(request).then(handleErrors).then(response => response.json()).then(json => json.data);
+    } catch {
+      return Promise.resolve(undefined);
+    }
+  }
+
+  /**
+   * 放送可能なチャンネル番組IDを取得する 
+   * @param channelId チャンネルID(例： ch12345)
+   */
+  async fetchOnairChannelProgram(channelId: string): Promise<WrappedResult<OnairChannelProgramData>> {
+    const url = `${NicoliveClient.live2BaseURL}/unama/tool/v2/onairs/channels/${channelId}`
+    const headers = new Headers();
+   try {
+      const userSession = await this.fetchSession();
+      headers.append('X-niconico-session', userSession);
+      const request = new Request(url, { headers });
+      const response = await fetch(request);
+      return NicoliveClient.wrapResult<OnairChannelProgramData>(response);
+    } catch(error) {
+      return NicoliveClient.wrapFetchError(error);
+    }
+  }
+
+  /**
+   * 放送可能なチャンネル一覧を取得する 
+   */
+  async fetchOnairChannels(): Promise<WrappedResult<OnairChannelData[]>> {
+    const url = `${NicoliveClient.live2BaseURL}/unama/tool/v2/onairs/channels`
+    const headers = new Headers();
+    try {
+      const userSession = await this.fetchSession();
+      headers.append('X-niconico-session', userSession);
+      const response = await fetch(new Request(url, { headers }));
+      return NicoliveClient.wrapResult<OnairChannelData[]>(response);
+    } catch (error) {
+      return NicoliveClient.wrapFetchError(error)
+    }
+  }
+
+  /**
+   * 指定番組IDのストリーム情報を取得する 
+   * @param programId 番組ID(例： lv12345)
+   */
+  async fetchBroadcastStream(programId: string): Promise<BroadcastStreamData> {
+    const url = `${NicoliveClient.live2BaseURL}/unama/api/v2/programs/${programId}/broadcast_stream`;
+    const headers = new Headers();
+    const userSession = await this.fetchSession();
+    headers.append('X-niconico-session', userSession);
+    const request = new Request(url, { headers });
+    return fetch(request).then(handleErrors).then(response => response.json()).then(json => json.data);
+  }
+
+  async fetchMaxBitrate(programId: string): Promise<number> {
+    const programInformation = await this.fetchProgram(programId);
+    if (!isOk(programInformation)) {
+      return 192;
+    }
+    switch (programInformation.value.streamSetting.maxQuality) {
+      case '6Mbps720p':
+        return 6000;
+      case '2Mbps450p':
+        return 2000;
+      case '1Mbps450p':
+        return 1000;
+      case '384kbps288p':
+        return 384;
+      case '192kbps288p':
+        return 192;
+      default: // 来ないはず
+        return 192;
+    }
   }
 
   /** 番組作成画面を開いて結果を返す */

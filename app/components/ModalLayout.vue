@@ -81,10 +81,13 @@
 .modal-layout-controls {
   background-color: @bg-primary;
   box-shadow: 0 -1px 0 rgba(0,0,0,0.1);
-  padding: 8px 16px;
   text-align: right;
   flex-shrink: 0;
   z-index: 10;
+
+  &:not(:empty) {
+    padding: 8px 16px;
+  }
 
   .button {
     .margin-left();

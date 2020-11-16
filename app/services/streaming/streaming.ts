@@ -18,6 +18,7 @@ import { CustomizationService } from 'services/customization';
 import { UserService } from 'services/user';
 import { IStreamingSetting } from '../platforms';
 import { OptimizedSettings } from 'services/settings/optimizer';
+import { NicoliveClient, isOk } from 'services/nicolive-program/NicoliveClient';
 import { NotificationsService, ENotificationType, INotification } from 'services/notifications';
 
 enum EOBSOutputType {
@@ -52,6 +53,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
+
+  client: NicoliveClient = new NicoliveClient();
 
   // Dummy subscription for stream deck
   streamingStateChange = new Subject<void>();
@@ -102,15 +105,44 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.toggleStreaming();
   }
 
-  // 配信開始ボタンまたはショートカットキーによる配信開始(対話可能)
+  private async showNotBroadcastingMessageBox() {
+    return new Promise(resolve => {
+      electron.remote.dialog.showMessageBox(
+        electron.remote.getCurrentWindow(),
+        {
+          title: $t('streaming.notBroadcasting'),
+          type: 'warning',
+          message: $t('streaming.notBroadcastingMessage'),
+          buttons: [$t('common.close')],
+          noLink: true,
+        },
+        done => resolve(done)
+      );
+    });
+  }
+
+  /**
+   * 配信開始ボタンまたはショートカットキーによる配信開始(対話可能)
+   * 
+   * 現在ログインされているユーザーで、配信可能なチャンネルが存在する場合には、配信番組選択ウィンドウを開きます。
+   * 
+   * 配信番組選択ウィンドウで「配信開始」ボタンを押した時にもこのメソッドが呼ばれ、
+   * options.nicoliveProgramSelectorResult に、ウィンドウで選ばれた配信種別と
+   * チャンネル番組の場合は番組IDが与えられます。
+   * 
+   * 配信番組選択ウィンドウからの呼び出しの場合、および現在ログインされているユーザーで
+   * 配信可能なチャンネルが存在しない場合には、配信開始を試みます。
+   */
   async toggleStreamingAsync(
     options: {
-      programId?: string,
+      nicoliveProgramSelectorResult?: {
+        providerType: 'channel' | 'user',
+        channelProgramId?: string;
+      },
       mustShowOptimizationDialog?: boolean
     } = {}
   ) {
     const opts = Object.assign({
-      programId: '',
       mustShowOptimizationDialog: false
     }, options);
 
@@ -123,25 +155,48 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     if (this.userService.isNiconicoLoggedIn()) {
       try {
         this.SET_PROGRAM_FETCHING(true);
-        const setting = await this.userService.updateStreamSettings(opts.programId);
-        if (setting.asking) {
-          return;
+        const broadcastableUserProgram = await this.client.fetchOnairUserProgram();
+
+        // 配信番組選択ウィンドウ以外からの呼び出し時
+        if (!opts.nicoliveProgramSelectorResult) {
+          const broadcastableChannelsResult = await this.client.fetchOnairChannels();
+
+          // 配信可能チャンネルがある時
+          // エラー時は チャンネルがない時と同様の挙動とする
+          if (isOk(broadcastableChannelsResult) && broadcastableChannelsResult.value.length > 0) {
+            this.windowsService.showWindow({
+              title: $t('streaming.nicoliveProgramSelector.title'),
+              componentName: 'NicoliveProgramSelector',
+              size: {
+                width: 800,
+                height: 800
+              }
+            });
+            return;
+          }
+
+          // 配信可能チャンネルがなく、配信できるユーザー生放送もない場合
+          if (!broadcastableUserProgram.programId) {
+            return this.showNotBroadcastingMessageBox();
+          }
         }
+
+        // 配信番組選択ウィンドウでチャンネル番組が選ばれた時はそのチャンネル番組を, それ以外の場合は放送中のユーザー番組を代入
+        const programId = 
+            opts.nicoliveProgramSelectorResult &&
+            opts.nicoliveProgramSelectorResult.providerType === 'channel' &&
+            opts.nicoliveProgramSelectorResult.channelProgramId ?
+            opts.nicoliveProgramSelectorResult.channelProgramId : broadcastableUserProgram.programId;
+
+        // 配信番組選択ウィンドウでユーザー番組を選んだが、配信可能なユーザー番組がない場合
+        if (!programId) {
+            return this.showNotBroadcastingMessageBox();
+        }
+
+        const setting = await this.userService.updateStreamSettings(programId);
         const streamkey = setting.key;
         if (streamkey === '') {
-          return new Promise(resolve => {
-            electron.remote.dialog.showMessageBox(
-              electron.remote.getCurrentWindow(),
-              {
-                title: $t('streaming.notBroadcasting'),
-                type: 'warning',
-                message: $t('streaming.notBroadcastingMessage'),
-                buttons: [$t('common.close')],
-                noLink: true,
-              },
-              done => resolve(done)
-            );
-          });
+          return this.showNotBroadcastingMessageBox();
         }
         if (this.customizationService.optimizeForNiconico) {
           return this.optimizeForNiconicoAndStartStreaming(setting, opts.mustShowOptimizationDialog);

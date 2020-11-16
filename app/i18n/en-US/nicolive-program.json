@@ -202,6 +202,34 @@
           "title": "The block settings could not be deleted",
           "message": "The block settings could not be deleted\n%{additionalMessage}"
         }
+      },
+      "fetchOnairChannels": {
+        "network_error": {
+          "title": "A network error has occurred",
+          "message": "The channel information could not be fetched because of a network error.\nCheck the health of your Internet connection."
+        },
+        "404": {
+          "title": "There is no channel",
+          "message": "There is no channel available for the logged-in account.\nMake sure you are logged in with the correct account."
+        },
+        "500": {
+          "title": "An error occurred on the server",
+          "message": "The channel information could not be fetched because an error occurred on the server.\nThere may be temporary problems, so try again later. Check the trouble information from the \"Notification\" button, as well."
+        }
+      },
+      "fetchOnairChannelProgram": {
+        "network_error": {
+          "title":  "A network error has occurred",
+          "message": "The program information could not be fetched because of a network error.\nCheck the health of your Internet connection."
+        },
+        "403": {
+          "title": "You do not have the authority to start streaming",
+          "message": "The program information could not be fetched because the account you are logged into does not have authority to start streaming on the channel.\nMake sure you are logged in with the correct account."
+        },
+        "500": {
+          "title": "An error occurred on the server",
+          "message": "The program information could not be fetched because an error occurred on the server.\nhere may be temporary problems, so try again later. Check the trouble information from the \"Notification\" button, as well."
+        }
       }
     },
     "logic": {
@@ -209,6 +237,22 @@
         "no_suitable_program": {
           "title": "There is no program",
           "message": "Click \"Create a Program\" button.\nNote: You can not fetch the channel program information."
+        }
+      },
+      "fetchOnairChannels": {
+        "not_logged_in": {
+          "title": "You are not logged in",
+          "message": "The channel information can not be fetched because you are not logged in to niconico on N Air.\nLog in to niconico from the login button on the upper right of the N Air main screen."
+        },
+        "no_channels": {
+          "title": "There is no channel",
+          "message": "There is no channel available for the logged-in account.\nMake sure you are logged in with the correct account."
+        }
+      },
+      "fetchOnairChannelProgram": {
+        "not_logged_in": {
+          "title": "You are not logged in",
+          "message": "The program information can not be fetched because you are not logged in to niconico on N Air.\nLog in to niconico from the login button on the upper right of the N Air main screen."
         }
       }
     }

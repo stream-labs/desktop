@@ -16,6 +16,7 @@ test('4xxで未定義文言だったら400にフォールバックする', async
       getCurrentWindow: () => {},
     },
   }));
+  jest.doMock('./NicoliveClient', () => ({ NotLoggedInError: class {} }));
   jest.doMock('services/i18n', () => ({
     $t: jest.fn().mockImplementation((key, { fallback } = {}) => {
       const keys = key.split('.');
