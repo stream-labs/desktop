@@ -483,6 +483,8 @@ export class NicoliveClient {
         return 384;
       case '192kbps288p':
         return 192;
+      default: // 来ないはず
+        return 192;
     }
   }
 
