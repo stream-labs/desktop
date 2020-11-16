@@ -335,12 +335,14 @@ export class VideoService extends Service {
     const electronWindow = remote.BrowserWindow.fromId(electronWindowId);
 
     if (sourceId) {
+      console.log('OBS_content_createSourcePreviewDisplay', sourceId, name);
       obs.NodeObs.OBS_content_createSourcePreviewDisplay(
         electronWindow.getNativeWindowHandle(),
         sourceId,
         name,
       );
     } else {
+      console.log('OBS_content_createDisplay', name, remderingMode);
       obs.NodeObs.OBS_content_createDisplay(
         electronWindow.getNativeWindowHandle(),
         name,
@@ -350,31 +352,42 @@ export class VideoService extends Service {
   }
 
   setOBSDisplayPaddingColor(name: string, r: number, g: number, b: number) {
+    console.log('OBS_content_setPaddingColor', name, r, g, b);
     obs.NodeObs.OBS_content_setPaddingColor(name, r, g, b);
   }
 
   setOBSDisplayPaddingSize(name: string, size: number) {
+    console.log('OBS_content_setPaddingSize', name, size);
     obs.NodeObs.OBS_content_setPaddingSize(name, size);
   }
 
   moveOBSDisplay(name: string, x: number, y: number) {
+    console.log('OBS_content_moveDisplay', name, x, y);
     obs.NodeObs.OBS_content_moveDisplay(name, x, y);
   }
 
   resizeOBSDisplay(name: string, width: number, height: number) {
+    console.log('OBS_content_resizeDisplay', name, width, height);
     obs.NodeObs.OBS_content_resizeDisplay(name, width, height);
   }
 
   destroyOBSDisplay(name: string) {
+    console.log('OBS_content_destroyDisplay', name);
     obs.NodeObs.OBS_content_destroyDisplay(name);
   }
 
   getOBSDisplayPreviewOffset(name: string): IVec2 {
-    return obs.NodeObs.OBS_content_getDisplayPreviewOffset(name);
+    console.log('OBS_content_getDisplayPreviewOffset', name);
+    const result = obs.NodeObs.OBS_content_getDisplayPreviewOffset(name);
+    console.log('OBS_content_getDisplayPreviewOffset result', result);
+    return result;
   }
 
   getOBSDisplayPreviewSize(name: string): { width: number; height: number } {
-    return obs.NodeObs.OBS_content_getDisplayPreviewSize(name);
+    console.log('OBS_content_getDisplayPreviewSize', name);
+    const result = obs.NodeObs.OBS_content_getDisplayPreviewSize(name);
+    console.log('OBS_content_getDisplayPreviewSize result', result);
+    return result;
   }
 
   setOBSDisplayShouldDrawUI(name: string, drawUI: boolean) {
