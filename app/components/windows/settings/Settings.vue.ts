@@ -129,7 +129,6 @@ export default class Settings extends Vue {
 
   save(settingsData: ISettingsSubCategory[]) {
     this.settingsService.setSettings(this.categoryName, settingsData);
-    // this.settingsData = this.settingsService.getSettingsFormData(this.categoryName);
   }
 
   done() {
@@ -138,12 +137,10 @@ export default class Settings extends Vue {
 
   @Watch('categoryName')
   onCategoryNameChangedHandler(categoryName: string) {
-    // this.settingsData = this.getSettingsData(categoryName);
     this.$refs.settingsContainer.scrollTop = 0;
   }
 
   getSettingsData(categoryName: string) {
-    // return this.settingsService.getSettingsFormData(categoryName);
     return this.settingsService.state[categoryName].formData;
   }
 
@@ -154,7 +151,6 @@ export default class Settings extends Vue {
       this.originalCategory = this.categoryName;
     }
 
-    // this.settingsData = this.getSettingsData(page);
     this.categoryName = page;
   }
 
