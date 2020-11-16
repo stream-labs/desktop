@@ -28,6 +28,8 @@
   "Please log-out and log-in again to get these new features": "Please log-out and log-in again to get these new features",
   "Re-login now": "Re-login now",
   "Please reconnect Facebook to get these new features": "Please reconnect Facebook to get these new features",
-  "Reconnect now": "Reconnect now"
-
+  "Reconnect now": "Reconnect now",
+  "FBPrivacyWarning": "The granted privacy level may be limited for your Facebook account. Check the \"Who can see you use this business integration\" section for the Streamlabs integration <link>here</link>",
+  "Only Me": "Only Me",
+  "Do not change privacy settings": "Do not change privacy settings"
 }

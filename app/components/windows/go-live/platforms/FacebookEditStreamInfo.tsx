@@ -23,6 +23,7 @@ import { NavigationService } from 'services/navigation';
 import { WindowsService } from 'services/windows';
 import Translate from 'components/shared/translate';
 import electron from 'electron';
+import styles from './FacebookEditStreamInfo.m.less';
 
 class Props {
   value?: IStreamSettings = undefined;
@@ -98,6 +99,38 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
     ids.forEach(id => this.loadPicture(id));
   }
 
+  private get privacyOptions(): IListOption[] {
+    const options: any = [
+      {
+        value: 'EVERYONE',
+        title: $t('Public'),
+        data: {
+          image: require('../../../../../media/images/platforms/fb_privacy_public.png'),
+        },
+      },
+      {
+        value: 'ALL_FRIENDS',
+        title: $t('Friends'),
+        data: {
+          image: require('../../../../../media/images/platforms/fb_privacy_friends.png'),
+        },
+      },
+      {
+        value: 'SELF',
+        title: $t('Only Me'),
+        data: {
+          image: require('../../../../../media/images/platforms/fb_privacy_noone.png'),
+        },
+      },
+    ];
+
+    // we cant read the privacy property of already created video
+    if (this.fbSettings.liveVideoId || this.view.isMidStreamMode) {
+      options.unshift({ value: '', title: $t('Do not change privacy settings') });
+    }
+    return options;
+  }
+
   private get formMetadata() {
     return formMetadata({
       destinationType: metadata.list({
@@ -133,6 +166,13 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
         required: true,
       }),
 
+      privacy: metadata.list({
+        title: $t('Privacy'),
+        fullWidth: true,
+        options: this.privacyOptions,
+        required: true,
+      }),
+
       page: metadata.list({
         title: $t('Facebook Page'),
         fullWidth: true,
@@ -144,6 +184,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
           })) || [],
         required: true,
       }),
+
       group: metadata.list({
         title: $t('Facebook Group'),
         fullWidth: true,
@@ -155,6 +196,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
           })) || [],
         required: true,
       }),
+
       fbEvent: metadata.list({
         title: $t('Scheduled Video'),
         fullWidth: true,
@@ -183,6 +225,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
     const { title, description } = selectedLiveVideo;
     fbSettings.title = title;
     fbSettings.description = description;
+    fbSettings.privacy = { value: '' }; // we can't read privacy
   }
 
   private get eventInputSlots() {
@@ -221,6 +264,10 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
     this.facebookService.actions.createFBPage();
   }
 
+  private openIntegrationSettings() {
+    electron.remote.shell.openExternal('https://www.facebook.com/settings?tab=business_tools');
+  }
+
   private verifyGroup() {
     const groupId = this.fbSettings.groupId;
     electron.remote.shell.openExternal(`https://www.facebook.com/groups/${groupId}/edit`);
@@ -234,6 +281,10 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
     const shouldShowPermissionWarn = !this.canStreamToTimeline || !this.canStreamToGroup;
     const shouldShowGamingWarning = !hasPages && fbSettings.game;
     const shouldShowEvents = !this.props.isUpdateMode && !this.props.isScheduleMode;
+    const shouldShowPrivacy = fbSettings.destinationType === 'me';
+    const shouldShowPrivacyWarn =
+      (!fbSettings.liveVideoId && fbSettings.privacy.value !== 'SELF') ||
+      (fbSettings.liveVideoId && fbSettings.privacy.value);
 
     return (
       <ValidatedForm name="facebook-settings">
@@ -288,6 +339,29 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
                   onInput={() => this.onSelectScheduledVideoHandler()}
                   scopedSlots={this.eventInputSlots}
                 />
+              </HFormGroup>
+            )}
+
+            {shouldShowPrivacy && (
+              <HFormGroup title={this.formMetadata.privacy.title}>
+                <ListInput
+                  vModel={this.settings.platforms.facebook.privacy.value}
+                  metadata={this.formMetadata.privacy}
+                  imageSize={{ width: 24, height: 24 }}
+                  class={styles.privacySelector}
+                />
+                {shouldShowPrivacyWarn && (
+                  <div class="input-description">
+                    <Translate
+                      message={$t('FBPrivacyWarning')}
+                      scopedSlots={{
+                        link: (text: string) => (
+                          <a onClick={() => this.openIntegrationSettings()}>{{ text }}</a>
+                        ),
+                      }}
+                    />
+                  </div>
+                )}
               </HFormGroup>
             )}
 

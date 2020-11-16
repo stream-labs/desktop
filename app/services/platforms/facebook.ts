@@ -64,6 +64,7 @@ export interface IFacebookStartStreamOptions {
   groupId?: string;
   description?: string;
   liveVideoId?: string;
+  privacy?: { value: 'SELF' | 'ALL_FRIENDS' | 'EVERYONE' | '' };
 }
 
 export type TDestinationType = 'me' | 'page' | 'group' | '';
@@ -87,6 +88,7 @@ const initialState: IFacebookServiceState = {
     title: '',
     description: '',
     game: '',
+    privacy: { value: 'EVERYONE' },
   },
 };
 
@@ -222,7 +224,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     options: IFacebookUpdateVideoOptions,
     switchToLive = false,
   ): Promise<IFacebookLiveVideo> {
-    const { title, description, game } = options;
+    const { title, description, game, privacy } = options;
     const data: Dictionary<any> = { title, description };
     if (game) data.game_specs = { name: game };
     if (switchToLive) {
@@ -230,6 +232,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     }
     const destinationId = this.views.getDestinationId(options);
     const token = this.views.getDestinationToken(options.destinationType, destinationId);
+    if (privacy?.value) data.privacy = privacy;
 
     return await this.requestFacebook(
       {
@@ -318,11 +321,12 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   }
 
   private createLiveVideo(options: IFacebookStartStreamOptions): Promise<IFacebookLiveVideo> {
-    const { title, description, game } = options;
+    const { title, description, game, privacy } = options;
     const destinationId = this.views.getDestinationId(options);
     const token = this.views.getDestinationToken(options.destinationType, destinationId);
     const body: Dictionary<any> = { title, description };
     if (game) body.game_specs = { name: game };
+    if (privacy?.value) body.privacy = privacy;
 
     return this.requestFacebook<IFacebookLiveVideo>(
       {
