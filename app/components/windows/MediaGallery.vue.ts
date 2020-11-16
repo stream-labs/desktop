@@ -203,6 +203,7 @@ export default class MediaGallery extends Vue {
   }
 
   handleSelect() {
+    if (!this.selectedFile) return this.windowsService.closeChildWindow();
     if (this.selectedFile.prime && !this.userService.views.isPrime) {
       this.upgradeToPrime();
       return;
