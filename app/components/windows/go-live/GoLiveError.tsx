@@ -1,17 +1,15 @@
-import TsxComponent, { createProps } from 'components/tsx-component';
+import TsxComponent from 'components/tsx-component';
 import { Inject } from 'services/core';
 import { StreamingService } from 'services/streaming';
 import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
 import { Component } from 'vue-property-decorator';
 import styles from './GoLiveError.m.less';
-import cx from 'classnames';
 import { YoutubeService } from 'services/platforms/youtube';
 import { getPlatformService, TPlatform } from 'services/platforms';
 import { TwitterService } from 'services/integrations/twitter';
 import { IStreamError } from 'services/streaming/stream-error';
 import Translate from 'components/shared/translate';
-import electron from 'electron';
 import { UserService } from 'services/user';
 import { NavigationService } from 'services/navigation';
 import { assertIsDefined } from 'util/properties-type-guards';
