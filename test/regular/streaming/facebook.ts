@@ -50,20 +50,6 @@ test.skip('Streaming to a Facebook User`s group', async t => {
   t.pass();
 });
 
-test('User does not have Facebook pages', async t => {
-  await logIn(t, 'facebook', { noFacebookPages: true, notStreamable: true });
-  await prepareToGoLive(t);
-  await clickGoLive(t);
-  if (await t.context.app.client.isExisting('button=Go Live')) {
-    await t.context.app.client.click('button=Go Live');
-  }
-  await focusChild(t);
-  t.true(
-    await t.context.app.client.isExisting('a=create a Gaming Video Creator Page'),
-    'The link for adding new facebook changes should exist',
-  );
-});
-
 // TODO: delete all the scheduled on the user-pool and enable this test
 test.skip('Streaming to the scheduled event on Facebook', async t => {
   await logIn(t, 'facebook', { multistream: false });
