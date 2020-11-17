@@ -88,7 +88,8 @@ test.skip('Streaming to the scheduled event on Facebook', async t => {
   t.pass();
 });
 
-test('Schedule stream to facebook', async t => {
+// TODO: refresh tookens on user-pool side
+test.skip('Schedule stream to facebook', async t => {
   // login into the account:
   await logIn(t, 'facebook', { multistream: false });
   const app = t.context.app;
@@ -96,33 +97,23 @@ test('Schedule stream to facebook', async t => {
   // open EditStreamInfo window
   await focusMain(t);
   await app.client.click('button .icon-date');
+
   await focusChild(t);
   const formMonkey = new FormMonkey(t);
 
   // wait fields to be shown
   await app.client.waitForVisible('[data-name=title]');
 
-  // fill streaming data
-  await formMonkey.fill({
-    title: 'SLOBS Test Stream',
-    description: 'SLOBS Test Stream Description',
-  });
-
   // set the date to tomorrow
   const today = new Date();
   const tomorrow = new Date();
   tomorrow.setDate(today.getDate() + 1);
+
+  // fill streaming data
   await formMonkey.fill({
+    title: 'SLOBS Test Stream',
+    description: 'SLOBS Test Stream Description',
     date: moment(tomorrow).format('MM/DD/YYYY'),
-  });
-  await app.client.click('button=Done');
-
-  // facebook requires a game
-  await app.client.waitForVisible('.toasted.error', 2000);
-
-  await sleep(3000); // there are some issues with setting the game field without delay here
-  await formMonkey.fill({
-    game: selectTitle('Fortnite'),
   });
 
   await app.client.click('button=Done');
