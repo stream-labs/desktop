@@ -242,6 +242,7 @@ export class ChatService extends Service {
       // inject a script that removing the scrollbars
       if (this.userService.platform?.type === 'facebook') {
         Utils.sleep(2000).then(() => {
+          if (!this.chatView) return;
           this.chatView.webContents.executeJavaScript(
             `
                 var chatIframe = document.querySelector('iframe');
