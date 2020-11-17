@@ -1,46 +1,46 @@
-trigger:
-- staging
-- master
+# trigger:
+# - staging
+# - master
 
-variables:
-  CI: true
+# variables:
+#   CI: true
 
-jobs:
-  - job: Screenshots
+# jobs:
+#   - job: Screenshots
 
-    pool:
-      name: 'Default'
+#     pool:
+#       name: 'Default'
 
-    workspace:
-      clean: resources
+#     workspace:
+#       clean: resources
 
-    steps:
+#     steps:
 
-      - powershell: echo "IP for RDP connections:" $(Invoke-RestMethod ipinfo.io/ip)
-        displayName: 'Get RDP address'
+#       - powershell: echo "IP for RDP connections:" $(Invoke-RestMethod ipinfo.io/ip)
+#         displayName: 'Get RDP address'
 
-      - powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
-        displayName: 'Setup Screen Resolution'
+#       - powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
+#         displayName: 'Setup Screen Resolution'
 
-      - script: yarn install --frozen-lockfile --check-files 2>&1
-        displayName: 'Install Dependencies'
+#       - script: yarn install --frozen-lockfile --check-files 2>&1
+#         displayName: 'Install Dependencies'
 
-      - script: node node_modules/electron/install.js
-        displayName: 'Install Electron'
+#       - script: node node_modules/electron/install.js
+#         displayName: 'Install Electron'
 
-      - script: 'yarn ci:screentests'
-        displayName: 'Snapshot testing'
-        env:
-          BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
-          SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
-          STREAMLABS_BOT_ID: $(streamlabsBotId)
-          STREAMLABS_BOT_KEY: $(streamlabsBotKey)
-          AWS_BUCKET: $(awsBucket)
-          AWS_ACCESS_KEY: $(awsAccessKey)
-          AWS_SECRET_KEY: $(awsSecretKey)
+#       - script: 'yarn ci:screentests'
+#         displayName: 'Snapshot testing'
+#         env:
+#           BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
+#           SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
+#           STREAMLABS_BOT_ID: $(streamlabsBotId)
+#           STREAMLABS_BOT_KEY: $(streamlabsBotKey)
+#           AWS_BUCKET: $(awsBucket)
+#           AWS_ACCESS_KEY: $(awsAccessKey)
+#           AWS_SECRET_KEY: $(awsSecretKey)
 
-      - task: PublishPipelineArtifact@0
-        inputs:
-          artifactName: 'SnapshotsResults'
-          targetPath: $(Build.SourcesDirectory)/test-dist/screentest
+#       - task: PublishPipelineArtifact@0
+#         inputs:
+#           artifactName: 'SnapshotsResults'
+#           targetPath: $(Build.SourcesDirectory)/test-dist/screentest
 
