@@ -244,12 +244,6 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   }
 
   async validatePlatform() {
-    const permissions = await this.fetchPermissions();
-    const grantedPermissions = permissions
-      .filter(p => ['publish_video', 'publish_to_groups'].includes(p.permission))
-      .filter(p => p.status === 'granted')
-      .map(p => p.permission);
-    this.SET_PERMISSIONS(grantedPermissions);
     return EPlatformCallResult.Success;
   }
 
@@ -341,6 +335,14 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
    * fetch prefill data and set default values
    */
   async prepopulateInfo() {
+    // check permissions
+    const permissions = await this.fetchPermissions();
+    const grantedPermissions = permissions
+      .filter(p => ['publish_video', 'publish_to_groups'].includes(p.permission))
+      .filter(p => p.status === 'granted')
+      .map(p => p.permission);
+    this.SET_PERMISSIONS(grantedPermissions);
+
     // fetch pages and groups
     const [pages, groups] = ((await Promise.all([
       this.fetchPages(),
