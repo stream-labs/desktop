@@ -44,6 +44,7 @@ export interface IFacebookLiveVideo {
   game: string;
   description: string;
   permalink_url: string;
+  planned_start_time: string;
 }
 
 interface IFacebookServiceState extends IPlatformState {
