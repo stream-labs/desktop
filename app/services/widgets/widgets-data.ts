@@ -411,7 +411,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     description: $t('Set a goal for your viewers to help you reach.'),
     demoVideo: false,
     demoFilename: 'source-follower-goal.png',
-    platforms: new Set(['twitch', 'mixer']),
+    platforms: new Set(['twitch', 'facebook']),
     supportList: [$t('Twitch Follows'), $t('Mixer Follows')],
   },
   [WidgetType.SubscriberGoal]: {
