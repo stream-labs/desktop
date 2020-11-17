@@ -13,13 +13,14 @@ export default class BaseElement extends TsxComponent {
   width = 0;
 
   mounted() {
+    this.setDimensions();
+    window.setInterval(() => this.setDimensions(), 500);
+  }
+
+  setDimensions() {
+    if (!this.$el?.getBoundingClientRect) return;
     this.height = this.$el.getBoundingClientRect().height;
     this.width = this.$el.getBoundingClientRect().width;
-    window.setInterval(() => {
-      if (!this.$el?.getBoundingClientRect) return;
-      this.height = this.$el.getBoundingClientRect().height;
-      this.width = this.$el.getBoundingClientRect().width;
-    }, 500);
   }
 
   destroyed() {
