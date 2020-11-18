@@ -8,7 +8,8 @@
     <div slot="content" class="settings">
       <NavMenu v-model="categoryName">
         <form-input
-          v-model="searchStr"
+          :value="searchStr"
+          @input="str => onSearchInput(str)"
           :metadata="{
             type: 'text',
             placeholder: 'Search',

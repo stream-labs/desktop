@@ -52,18 +52,15 @@ export default class Hotkeys extends Vue {
   async mounted() {
     // We don't want hotkeys registering while trying to bind.
     // We may change our minds on this in the future.
-    this.hotkeysService.unregisterAll();
+    this.hotkeysService.actions.unregisterAll();
 
-    // Render a blank page before doing synchronous IPC
-    await new Promise(r => setTimeout(r, 100));
-
-    this.hotkeySet = this.hotkeysService.getHotkeysSet();
+    this.hotkeySet = await this.hotkeysService.actions.return.getHotkeysSet();
     await this.$nextTick();
     this.highlightSearch(this.globalSearchStr);
   }
 
   destroyed() {
-    if (this.hotkeySet) this.hotkeysService.applyHotkeySet(this.hotkeySet);
+    if (this.hotkeySet) this.hotkeysService.actions.applyHotkeySet(this.hotkeySet);
   }
 
   get sources() {

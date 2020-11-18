@@ -29,6 +29,7 @@ import { UserService } from 'services/user';
 import Scrollable from 'components/shared/Scrollable';
 import PlatformLogo from 'components/shared/PlatformLogo';
 import { $t } from 'services/i18n';
+import { debounce } from 'lodash-decorators';
 
 @Component({
   components: {
@@ -87,6 +88,13 @@ export default class Settings extends Vue {
   };
 
   internalCategoryName: string = null;
+
+  /**
+   * Whether we have built a cache of searchable pages already.
+   * If we havne't - we should debounce the user input.
+   * If we have - no need to debounce and we should preserve a snappy experience
+   */
+  scanningDone = false;
 
   get categoryName() {
     if (this.internalCategoryName == null) {
@@ -155,6 +163,7 @@ export default class Settings extends Vue {
   }
 
   onScanCompletedHandler() {
+    this.scanningDone = true;
     this.categoryName = this.originalCategory;
     this.originalCategory = null;
   }
@@ -170,6 +179,19 @@ export default class Settings extends Vue {
     if (foundPages.length && !foundPages.includes(this.categoryName)) {
       this.categoryName = foundPages[0];
     }
+  }
+
+  onSearchInput(str: string) {
+    if (this.scanningDone) {
+      this.searchStr = str;
+    } else {
+      this.debouncedSearchInput(str);
+    }
+  }
+
+  @debounce(300)
+  debouncedSearchInput(str: string) {
+    this.searchStr = str;
   }
 
   highlightSearch(searchStr: string) {
