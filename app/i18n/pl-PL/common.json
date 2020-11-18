@@ -86,8 +86,6 @@
   "Amount": "Suma",
   "here": "tutaj",
   "Link": "Link",
-  "Whitelist": "Biała lista",
-  "Blacklist": "Czarna lista",
   "Description": "Opis",
   "OBSInit.UnknownError": "Wystąpił nieznany błąd podczas inicjalizacji OBS.",
   "OBSInit.ModuleNotFoundError": "Nie można odnaleźć DirectX w systemie. Zainstaluj najnowszą wersję DirectX dla swojej maszyny korzystając z odnośnika <https://www.microsoft.com/en-us/download/details.aspx?id=35?> i spróbuj ponownie.",
