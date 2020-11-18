@@ -58,7 +58,7 @@ export default class PlatformSettings extends TsxComponent<Props> {
     return (
       <ValidatedForm class="flex" ref="settingsForm">
         <div style={{ width: '100%' }}>
-          {!hasPlatforms && $t('Enable at least one destinationType to start streaming')}
+          {!hasPlatforms && $t('Enable at least one destination to start streaming')}
 
           {isLoadingMode && this.renderLoading()}
           <GoLiveError />

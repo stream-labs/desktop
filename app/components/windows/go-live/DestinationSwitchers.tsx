@@ -3,7 +3,6 @@ import { getPlatformService, TPlatform } from '../../../services/platforms';
 import { Component } from 'vue-property-decorator';
 import { ToggleInput } from '../../shared/inputs/inputs';
 import PlatformLogo from '../../shared/PlatformLogo';
-import { SyncWithValue } from '../../../services/app/app-decorators';
 import { Inject } from '../../../services/core';
 import { UserService } from '../../../services/user';
 import cx from 'classnames';
@@ -88,7 +87,7 @@ export class DestinationSwitchers extends TsxComponent<Props> {
             {isPrimary ? (
               <span
                 vTooltip={$t(
-                  'You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destinationType.',
+                  'You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destination.',
                 )}
               >
                 <ToggleInput value={enabled} metadata={{ disabled: true, name: platform }} />
@@ -114,7 +113,7 @@ export class DestinationSwitchers extends TsxComponent<Props> {
   }
 
   /**
-   * Renders a switcher for a custom destinationType
+   * Renders a switcher for a custom destination
    */
   private renderCustomDestination(dest: ICustomStreamDestination, ind: number) {
     const enabled = dest.enabled;

@@ -66,7 +66,7 @@ export default class LiveDock extends Vue {
     this.underlyingSelectedChat = val;
   }
 
-  viewStreamTooltip = $t('Open browser to view your live stream');
+  viewStreamTooltip = $t('View your live stream in a web browser');
   editStreamInfoTooltip = $t('Edit your stream title and description');
   controlRoomTooltip = $t('Go to YouTube Live Dashboard');
 
