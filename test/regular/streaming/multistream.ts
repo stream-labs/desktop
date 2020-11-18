@@ -147,6 +147,4 @@ test('Custom stream destinations', async t => {
   await click(t, 'i.fa-trash');
   await click(t, 'i.fa-trash');
   t.false(await client.isExisting('i.fa-trash'), 'Destinations should be removed');
-
-  t.pass();
 });
