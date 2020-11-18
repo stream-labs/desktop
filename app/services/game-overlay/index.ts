@@ -74,7 +74,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   } = {} as any;
 
   private onChatUrlChangedSubscription: Subscription;
-  private lifecycle: LoginLifecycle;
 
   private commonWindowOptions = {} as Electron.BrowserWindowConstructorOptions;
 
@@ -342,14 +341,12 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
   }
 
   async destroy() {
-    if (!this.lifecycle) return;
     await this.destroyOverlay();
   }
 
   async destroyOverlay() {
     if (!this.overlayRunning) return;
     this.overlayRunning = false;
-
     await this.overlay.stop();
     if (this.windows) await Object.values(this.windows).forEach(win => win.destroy());
     if (this.previewWindows) {
