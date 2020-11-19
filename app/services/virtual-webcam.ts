@@ -74,10 +74,6 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
     obs.NodeObs.OBS_service_installVirtualCamPlugin();
   }
 
-  uninstall() {
-    obs.NodeObs.OBS_service_uninstallVirtualCamPlugin();
-  }
-
   start() {
     if (this.state.running) return;
 
