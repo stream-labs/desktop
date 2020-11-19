@@ -1,8 +1,15 @@
-import { test, useSpectron } from '../../helpers/spectron';
-import { logIn } from '../../helpers/spectron/user';
-import { clickGoLive, prepareToGoLive, submit } from '../../helpers/spectron/streaming';
-import { fillForm, selectTitle, selectGamesByTitles } from '../../helpers/form-monkey';
+import { click, test, useSpectron } from '../../helpers/spectron';
+import { logIn, releaseUserInPool, reserveUserFromPool } from '../../helpers/spectron/user';
+import {
+  clickGoLive,
+  prepareToGoLive,
+  stopStream,
+  submit,
+  tryToGoLive,
+} from '../../helpers/spectron/streaming';
+import { fillForm, selectTitle } from '../../helpers/form-monkey';
 import { sleep } from '../../helpers/sleep';
+import { showSettings } from '../../helpers/spectron/settings';
 
 useSpectron();
 
@@ -26,10 +33,7 @@ test('Multistream default mode', async t => {
   await fillForm(t, null, {
     title: 'Test stream',
     description: 'Test stream description',
-    game: selectGamesByTitles([
-      { title: 'Fortnite', platform: 'facebook' },
-      { title: 'Fortnite', platform: 'twitch' },
-    ]),
+    twitchGame: selectTitle('Fortnite'),
   });
 
   await submit(t);
@@ -64,7 +68,7 @@ test('Multistream advanced mode', async t => {
   await fillForm(t, 'form[name="twitch-settings"]', {
     customEnabled: true,
     title: 'twitch title',
-    game: selectTitle('Fortnite'),
+    twitchGame: selectTitle('Fortnite'),
     tags: ['100%'],
   });
 
@@ -76,8 +80,9 @@ test('Multistream advanced mode', async t => {
 
   await fillForm(t, 'form[name="facebook-settings"]', {
     customEnabled: true,
+    facebookGame: selectTitle('Fortnite'),
     title: 'facebook title',
-    game: selectTitle('Fortnite'),
+    description: 'facebook description',
   });
 
   await submit(t);
@@ -86,4 +91,60 @@ test('Multistream advanced mode', async t => {
     'Mutlistream should be enabled',
   );
   await client.waitForVisible("h1=You're live!", 60000);
+});
+
+test('Custom stream destinations', async t => {
+  const client = t.context.app.client;
+  await logIn(t, 'twitch', { prime: true });
+
+  // fetch a new stream key
+  const user = await reserveUserFromPool(t, 'twitch');
+
+  // add new destination
+  await showSettings(t, 'Stream');
+  await click(t, 'span=Add Destination');
+  await fillForm(t, null, {
+    name: 'MyCustomDest',
+    url: 'rtmp://live.twitch.tv/app/',
+    streamKey: user.streamKey,
+  });
+  await click(t, 'button=Save');
+  await t.true(await client.isExisting('span=MyCustomDest'), 'New destination is created');
+
+  // update destinations
+  await click(t, 'i.fa-pen');
+  await fillForm(t, null, {
+    name: 'MyCustomDestUpdated',
+  });
+  await click(t, 'button=Save');
+  await t.true(await client.isExisting('span=MyCustomDestUpdated'), 'Destination is updated');
+
+  // add one more destination
+  await click(t, 'span=Add Destination');
+  await fillForm(t, null, {
+    name: 'MyCustomDest',
+    url: 'rtmp://live.twitch.tv/app/',
+    streamKey: user.streamKey,
+  });
+  await click(t, 'button=Save');
+  await t.false(
+    await client.isExisting('span=Add Destination'),
+    'Do not allow more than 2 custom dest',
+  );
+
+  // open the GoLiveWindow and check destinations
+  await prepareToGoLive(t);
+  await clickGoLive(t);
+  await t.true(await client.isExisting('span=MyCustomDest'), 'Destination is available');
+  await click(t, 'span=MyCustomDest'); // switch the destination on
+  await tryToGoLive(t);
+  await client.waitForExist('span=Configure the Multistream service'); // the multistream should be started
+  await stopStream(t);
+  await releaseUserInPool(user);
+
+  // delete existing destinations
+  await showSettings(t, 'Stream');
+  await click(t, 'i.fa-trash');
+  await click(t, 'i.fa-trash');
+  t.false(await client.isExisting('i.fa-trash'), 'Destinations should be removed');
 });

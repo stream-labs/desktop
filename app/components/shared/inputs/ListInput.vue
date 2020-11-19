@@ -1,52 +1,87 @@
 <template>
-<div
-  class="list-input"
-  data-role="input"
-  data-type="list"
-  :data-name="options.name"
-  :data-loading="options.loading"
-  :class="{ 'full-width': options.fullWidth, disabled: options.disabled }"
-  :data-internal-search="options.internalSearch"
->
-  <label>{{ title }}</label>
-  <multiselect
-    :value="currentMultiselectValue"
-    :options="options.options"
-    track-by="value"
-    :close-on-select="true"
-    :placeholder="placeholder"
-    label="title"
-    :allow-empty="options.allowEmpty"
-    :internal-search="options.internalSearch"
-    :loading="options.loading"
-    :disabled="options.disabled"
-    :allow-custom="options.allowCustom"
-    :taggable="options.taggable"
-    @input="onInputHandler"
-    @search-change="onSearchChangeHandler"
+  <div
+    class="list-input"
+    data-role="input"
+    data-type="list"
+    :data-name="options.name"
+    :data-title="options.title"
+    :data-value="currentMultiselectValue ? currentMultiselectValue.value : ''"
+    :data-option-title="currentMultiselectValue ? currentMultiselectValue.title : ''"
+    :data-loading="options.loading"
+    :class="{ 'full-width': options.fullWidth, disabled: options.disabled }"
+    :data-internal-search="options.internalSearch"
   >
-    <span
-      slot="option"
-      slot-scope="props"
-      :data-option-value="props.option.value"
-      :data-option-title="props.option.title">
-      <slot name="item" :option="props.option"><img v-if="props.option.icon" :src="props.option.icon" alt="" class="icon"/>{{ props.option.title }}</slot>
-    </span>
+    <label>{{ title }}</label>
+    <multiselect
+      :value="currentMultiselectValue"
+      :options="options.options"
+      track-by="value"
+      :close-on-select="true"
+      :placeholder="placeholder"
+      label="title"
+      :allow-empty="options.allowEmpty"
+      :internal-search="options.internalSearch"
+      :loading="options.loading"
+      :disabled="options.disabled"
+      :allow-custom="options.allowCustom"
+      :taggable="options.taggable"
+      @input="onInputHandler"
+      @search-change="onSearchChangeHandler"
+      @open="handleOpen && handleOpen()"
+      selectLabel=""
+      selectedLabel=""
+      deselectLabel=""
+    >
+      <span
+        slot="option"
+        slot-scope="itemProps"
+        :data-option-value="itemProps.option.value"
+        :data-option-title="itemProps.option.title"
+      >
+        <slot name="item" :option="itemProps.option">
+          <img
+            v-if="getImage(itemProps.option)"
+            :src="getImage(itemProps.option)"
+            alt=""
+            class="image"
+            :style="iconSizeStyle"
+          />
+          <div
+            v-if="itemProps.showImagePlaceholder && !itemProps.option.image"
+            class="image-placeholder"
+            :style="iconSizeStyle"
+          />
+          {{ itemProps.option.title }}</slot
+        >
+      </span>
 
-    <template v-if="options.noResult" slot="noResult">{{ options.noResult }}</template>
-    <template v-if="options.loading" slot="afterList"><spinner/></template>
-
-  </multiselect>
-  <div v-if="selectedOption && selectedOption.description" class="description">
-    {{ selectedOption.description }}
+      <template slot="singleLabel" slot-scope="itemProps">
+        <img
+          v-if="getImage(itemProps.option)"
+          :src="getImage(itemProps.option)"
+          alt=""
+          class="image"
+        />
+        <div
+          v-if="props.showImagePlaceholder && !getImage(itemProps.option)"
+          class="image-placeholder"
+        />
+        {{ itemProps.option.title }}
+      </template>
+      <template v-if="options.noResult" slot="noResult">{{ options.noResult }}</template>
+      <template slot="noOptions">{{ $t('List is empty') }}</template>
+      <template v-if="options.loading" slot="afterList"><spinner /></template>
+    </multiselect>
+    <div v-if="selectedOption && selectedOption.description" class="description">
+      {{ selectedOption.description }}
+    </div>
   </div>
-</div>
 </template>
 
 <script lang="ts" src="./ListInput.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../../styles/index";
+@import '../../../styles/index';
 
 .list-input.full-width {
   width: 100%;
@@ -62,11 +97,11 @@
   font-style: italic;
 }
 
-.icon {
+.image,
+.image-placeholder {
   display: inline-block;
-  max-width: 16px;
-  max-height: 16px;
+  width: 16px;
+  height: 16px;
   .margin-right(1);
 }
-
 </style>

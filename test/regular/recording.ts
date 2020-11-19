@@ -4,6 +4,7 @@ import { setFormDropdown } from '../helpers/spectron/forms';
 import { sleep } from '../helpers/sleep';
 import { startRecording, stopRecording } from '../helpers/spectron/streaming';
 import { setOutputResolution, setTemporaryRecordingPath } from '../helpers/spectron/output';
+import { FormMonkey } from '../helpers/form-monkey';
 
 useSpectron();
 
@@ -23,7 +24,8 @@ test('Recording', async t => {
 
     await focusChild(t);
     await app.client.click('li=Output');
-    await setFormDropdown(t, 'Recording Format', format);
+    const form = new FormMonkey(t);
+    await form.setInputValue(await form.getInputSelectorByTitle('Recording Format'), format);
     await app.client.click('button=Done');
     await focusMain(t);
 

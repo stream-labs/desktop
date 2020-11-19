@@ -8,6 +8,7 @@ import { getFormInput } from '../helpers/spectron/forms';
 import { getClient } from '../helpers/api-client';
 import { WidgetsService } from '../../app/services/widgets';
 import { EWidgetType } from '../helpers/widget-helpers';
+import { FormMonkey } from '../helpers/form-monkey';
 
 const path = require('path');
 const _7z = require('7zip')['7z'];
@@ -105,8 +106,9 @@ test('OBS Importer', async t => {
   await client.click('.side-nav .icon-settings');
   await focusChild(t);
   await client.click('li=Output');
-  t.is(await getFormInput(t, 'Video Bitrate'), '5000');
-  t.is(await getFormInput(t, 'Encoder'), 'Software (x264)');
+  const form = new FormMonkey(t);
+  await form.setInputValue(await form.getInputSelectorByTitle('Video Bitrate'), '5000');
+  await form.setInputValue(await form.getInputSelectorByTitle('Encoder'), 'Software (x264)');
 
   // check that widgets have been migrated
   await focusMain(t);

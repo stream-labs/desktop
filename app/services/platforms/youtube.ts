@@ -406,7 +406,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   /**
    * update data for the current active broadcast
    */
-  async putChannelInfo(options: IYoutubeStartStreamOptions): Promise<boolean> {
+  async putChannelInfo(options: IYoutubeStartStreamOptions): Promise<void> {
     const broadcastId = this.state.settings.broadcastId;
     assertIsDefined(broadcastId);
 
@@ -421,7 +421,6 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
 
     await this.updateBroadcast(broadcastId, options, true);
     this.UPDATE_STREAM_SETTINGS({ ...options, broadcastId });
-    return true;
   }
 
   /**
