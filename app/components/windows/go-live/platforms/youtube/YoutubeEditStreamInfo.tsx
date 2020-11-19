@@ -84,6 +84,7 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
     ytSettings.projection = projection;
     ytSettings.privacyStatus = privacyStatus;
     ytSettings.selfDeclaredMadeForKids = selfDeclaredMadeForKids;
+    ytSettings.thumbnail = '';
 
     // category id is a property of YoutubeVideo
     const video = await this.youtubeService.fetchVideo(selectedBroadcast.id);
@@ -99,6 +100,7 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
   }
 
   private get formMetadata() {
+    const ytSettings = this.settings.platforms.youtube;
     return formMetadata({
       event: {
         broadcasts: this.broadcasts,
@@ -131,6 +133,15 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
           title: category.snippet.title,
         })),
         fullWidth: true,
+      }),
+      thumbnail: metadata.imageUploader({
+        title: $t('Thumbnail'),
+        maxFileSize: 2 * 1024 * 1024, // 2 mb
+        defaultUrl:
+          ytSettings.broadcastId &&
+          this.broadcastsLoaded &&
+          this.broadcasts.find(broadcast => broadcast.id === ytSettings.broadcastId)?.snippet
+            .thumbnails.high.url,
       }),
       latencyPreference: metadata.list<IYoutubeStartStreamOptions['latencyPreference']>({
         title: $t('Stream Latency'),
@@ -203,6 +214,10 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
           <HFormGroup
             metadata={this.formMetadata.category}
             vModel={this.settings.platforms.youtube.categoryId}
+          />
+          <HFormGroup
+            metadata={this.formMetadata.thumbnail}
+            vModel={this.settings.platforms.youtube.thumbnail}
           />
           <HFormGroup
             metadata={this.formMetadata.latencyPreference}
