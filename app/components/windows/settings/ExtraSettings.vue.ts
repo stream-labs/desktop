@@ -46,8 +46,8 @@ export default class ExtraSettings extends Vue {
     return this.streamSettingsService.state.protectedModeEnabled;
   }
 
-  async showCacheDir() {
-    await electron.remote.shell.openPath(this.appService.appDataDirectory);
+  showCacheDir() {
+    electron.remote.shell.openItem(this.appService.appDataDirectory);
   }
 
   deleteCacheDir() {
