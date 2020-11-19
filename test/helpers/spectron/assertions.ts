@@ -1,16 +1,16 @@
 import { TExecutionContext } from './index';
 import { FormMonkey } from '../form-monkey';
-import { getDropdownOptions } from './forms';
 
-export const createOptionsAssertion = (t: TExecutionContext, form: FormMonkey) => async (
-  selector: string,
+export async function assertOptions(
+  t: TExecutionContext,
+  inputName: string,
   expectedValue: string,
   expectedOptions: string[],
-  dropdownSelector = '.multiselect__element',
-) => {
-  t.is(expectedValue, await form.getTextValue(selector));
-  t.deepEqual(await getDropdownOptions(t, [selector, dropdownSelector].join(' ')), expectedOptions);
-};
-
-// The trailing space is apparently required for most OBS dropdown options
-export const addTrailingSpace = (x: string) => `${x} `;
+) {
+  const form = new FormMonkey(t);
+  const input = await form.getInput(inputName);
+  const options = (await form.getListOptions(inputName)).map(opt => opt.title);
+  const selectedOption = await form.getListSelectedOption(input.selector);
+  t.is(expectedValue, selectedOption.title);
+  t.true(expectedOptions.join(',') === options.join(','));
+}

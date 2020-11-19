@@ -3,6 +3,7 @@ import { logIn } from '../../helpers/spectron/user';
 import { getFormInput } from '../../helpers/spectron/forms';
 import { goLive, stopStream } from '../../helpers/spectron/streaming';
 import { showSettings } from '../../helpers/spectron/settings';
+import { FormMonkey } from '../../helpers/form-monkey';
 
 useSpectron();
 
@@ -14,10 +15,14 @@ test('Populates stream settings after go live', async t => {
   await stopStream(t);
   await showSettings(t, 'Stream');
   await app.client.click('a=Stream to custom ingest');
-
-  t.is('Streaming Services', await getFormInput(t, 'Stream Type'));
-  t.is('Twitch', await getFormInput(t, 'Service'));
-  t.is('Auto (Recommended)', await getFormInput(t, 'Server'));
+  const form = new FormMonkey(t);
+  t.true(
+    await form.includesByTitles({
+      'Stream Type': 'Streaming Services',
+      Service: 'Twitch',
+      Server: 'Auto (Recommended)',
+    }),
+  );
 });
 
 test('Populates stream key after go live', async t => {

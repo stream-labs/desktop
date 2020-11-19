@@ -3,7 +3,6 @@ import { getPlatformService, TPlatform } from '../../../services/platforms';
 import { Component } from 'vue-property-decorator';
 import { ToggleInput } from '../../shared/inputs/inputs';
 import PlatformLogo from '../../shared/PlatformLogo';
-import { SyncWithValue } from '../../../services/app/app-decorators';
 import { Inject } from '../../../services/core';
 import { UserService } from '../../../services/user';
 import cx from 'classnames';

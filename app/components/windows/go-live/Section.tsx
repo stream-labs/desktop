@@ -1,7 +1,6 @@
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { Component } from 'vue-property-decorator';
 import styles from './GoLive.m.less';
-import cx from 'classnames';
 
 class SectionProps {
   title?: string = '';

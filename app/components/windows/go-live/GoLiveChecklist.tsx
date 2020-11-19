@@ -65,7 +65,9 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
     // close this window in 1s after start streaming
     if (this.lifecycle === 'live' && !this.view.info.warning) {
       await Utils.sleep(1000);
-      this.windowsService.closeChildWindow();
+      if (this.windowsService.state.child.componentName === 'GoLiveWindow') {
+        this.windowsService.closeChildWindow();
+      }
     }
   }
 

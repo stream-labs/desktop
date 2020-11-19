@@ -1,6 +1,5 @@
 import { Component } from 'vue-property-decorator';
 import TsxComponent, { createProps } from 'components/tsx-component';
-import electron from 'electron';
 import { Inject } from 'services';
 import { UserService, EAuthProcessState } from 'services/user';
 import { NavigationService } from 'services/navigation';
@@ -9,7 +8,6 @@ import { RestreamService } from 'services/restream';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { getPlatformService, TPlatform } from '../../services/platforms';
-import PlatformLogo from '../shared/PlatformLogo';
 
 class PlatformMergeProps {
   params: {
@@ -28,7 +26,6 @@ export default class PlatformMerge extends TsxComponent<PlatformMergeProps> {
   @Inject() sceneCollectionsService: SceneCollectionsService;
 
   showOverlay = false;
-  showLogin = false;
 
   get platform() {
     return this.props.params.platform;
@@ -36,7 +33,6 @@ export default class PlatformMerge extends TsxComponent<PlatformMergeProps> {
 
   created() {
     if (!this.platform) throw new Error('Platform should be provided for PlatformMerge');
-    if (this.platform !== 'facebook') this.showLogin = true;
   }
 
   get loading() {
@@ -45,17 +41,6 @@ export default class PlatformMerge extends TsxComponent<PlatformMergeProps> {
 
   get platformName() {
     return getPlatformService(this.platform).displayName;
-  }
-
-  private openFBPageCreation() {
-    electron.remote.shell.openExternal(
-      'https://www.facebook.com/gaming/pages/create?ref=streamlabs',
-    );
-    this.showLogin = true;
-  }
-
-  private skipPageCreation() {
-    this.showLogin = true;
   }
 
   private async mergePlatform(platform: TPlatform) {
@@ -79,28 +64,6 @@ export default class PlatformMerge extends TsxComponent<PlatformMergeProps> {
     }
 
     this.navigationService.navigate('Studio');
-  }
-
-  get createPageStep() {
-    return (
-      <div>
-        <div>{$t('Create a Facebook Gaming page to get started.')}</div>
-        <button
-          style={{ marginTop: '24px', marginRight: '24px' }}
-          class="button button--action"
-          onclick={() => this.skipPageCreation()}
-        >
-          {$t('I already have a Gaming Page')}
-        </button>
-        <button
-          style={{ marginTop: '24px' }}
-          class="button button--action"
-          onClick={() => this.openFBPageCreation()}
-        >
-          {$t('Create a Gaming Page')}
-        </button>
-      </div>
-    );
   }
 
   get loginStep() {
@@ -147,8 +110,7 @@ export default class PlatformMerge extends TsxComponent<PlatformMergeProps> {
 
   get currentStep() {
     if (this.showOverlay) return this.overlayStep;
-    if (this.showLogin) return this.loginStep;
-    return this.createPageStep;
+    return this.loginStep;
   }
 
   render() {
