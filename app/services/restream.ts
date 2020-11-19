@@ -8,6 +8,7 @@ import { authorizedHeaders, jfetch } from 'util/requests';
 import { IncrementalRolloutService } from './incremental-rollout';
 import electron from 'electron';
 import { StreamingService } from './streaming';
+import { FacebookService } from './platforms/facebook';
 
 interface IRestreamTarget {
   id: number;
@@ -39,6 +40,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   @Inject() streamSettingsService: StreamSettingsService;
   @Inject() streamingService: StreamingService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
+  @Inject() facebookService: FacebookService;
 
   settings: IUserSettingsResponse;
 
@@ -84,7 +86,14 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   get chatUrl() {
-    return `https://streamlabs.com/embed/chat?oauth_token=${this.userService.apiToken}`;
+    const hasFBTarget = this.streamInfo.enabledPlatforms.includes('facebook');
+    let fbParams = '';
+    if (hasFBTarget) {
+      const videoId = this.facebookService.state.settings.liveVideoId;
+      const token = this.facebookService.views.getDestinationToken();
+      fbParams = `&fbVideoId=${videoId}&fbToken=${token}`;
+    }
+    return `https://streamlabs.com/embed/chat?oauth_token=${this.userService.apiToken}${fbParams}`;
   }
 
   get shouldGoLiveWithRestream() {
@@ -131,10 +140,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
     const request = new Request(url, { headers, body, method: 'PUT' });
 
     return jfetch(request);
-  }
-
-  get platforms(): TPlatform[] {
-    return [this.userService.state.auth.primaryPlatform, 'facebook'];
   }
 
   async beforeGoLive() {
