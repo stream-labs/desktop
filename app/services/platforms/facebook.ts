@@ -564,7 +564,7 @@ export class FacebookView extends ViewHandler<IFacebookServiceState> {
       case 'group':
         return this.oauthToken || '';
       case 'page':
-        return this.getPage(destinationId)?.access_token || '';
+        return destinationId ? this.getPage(destinationId)?.access_token || '' : '';
     }
     return '';
   }
