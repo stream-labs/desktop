@@ -69,7 +69,7 @@ export default class EditTransform extends TsxComponent<{}> {
       const scale = Number(value) / this.rect[dir];
       const scaleX = dir === 'width' ? scale : 1;
       const scaleY = dir === 'height' ? scale : 1;
-      const scaleDelta = { x: scaleX, y: scaleY };
+      const scaleDelta = v2(scaleX, scaleY);
 
       this.editorCommandsService.executeCommand(
         'ResizeItemsCommand',

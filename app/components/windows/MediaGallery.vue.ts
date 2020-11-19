@@ -149,15 +149,12 @@ export default class MediaGallery extends Vue {
     this.dragOver = false;
   }
 
-  async openFilePicker() {
-    const choices = await electron.remote.dialog.showOpenDialog(
+  openFilePicker() {
+    electron.remote.dialog.showOpenDialog(
       electron.remote.getCurrentWindow(),
       { properties: ['openFile', 'multiSelections'] },
+      this.upload,
     );
-
-    if (choices && choices.filePaths) {
-      this.upload(choices.filePaths);
-    }
   }
 
   handleFileDrop(e: DragEvent) {
