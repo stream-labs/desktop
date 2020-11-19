@@ -73,9 +73,6 @@ app.commandLine.appendSwitch(
   'streamlabs.com,youtube.com,twitch.tv,facebook.com,mixer.com',
 );
 
-// Remove this when all backend module are on NAPI
-app.allowRendererProcessReuse = false;
-
 /* Determine the current release channel we're
  * on based on name. The channel will always be
  * the premajor identifier, if it exists.
@@ -304,7 +301,7 @@ async function startApp() {
 
   workerWindow = new BrowserWindow({
     show: false,
-    webPreferences: { nodeIntegration: true, enableRemoteModule: true },
+    webPreferences: { nodeIntegration: true },
   });
 
   // setTimeout(() => {
@@ -336,11 +333,7 @@ async function startApp() {
     titleBarStyle: 'hidden',
     title: 'Streamlabs OBS',
     backgroundColor: '#17242D',
-    webPreferences: {
-      nodeIntegration: true,
-      webviewTag: true,
-      enableRemoteModule: true,
-    },
+    webPreferences: { nodeIntegration: true, webviewTag: true },
   });
 
   // setTimeout(() => {
@@ -408,10 +401,7 @@ async function startApp() {
     fullscreenable: false,
     titleBarStyle: 'hidden',
     backgroundColor: '#17242D',
-    webPreferences: {
-      nodeIntegration: true,
-      enableRemoteModule: true,
-    },
+    webPreferences: { nodeIntegration: true },
   });
 
   childWindow.removeMenu();
@@ -498,11 +488,15 @@ async function startApp() {
   });
 
   if (isDevMode) {
+    require('devtron').install();
+
     // Vue dev tools appears to cause strange non-deterministic
     // interference with certain NodeJS APIs, expecially asynchronous
     // IO from the renderer process.  Enable at your own risk.
+
     // const devtoolsInstaller = require('electron-devtools-installer');
     // devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
+
     // setTimeout(() => {
     //   openDevTools();
     // }, 10 * 1000);
