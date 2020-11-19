@@ -482,6 +482,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
         this.state.settings.destinationType,
         this.state.settings.pageId,
       );
+      if (!token) return '';
       return `https://streamlabs.com/embed/chat?oauth_token=${this.userService.apiToken}&fbVideoId=${this.state.settings.liveVideoId}&fbToken=${token}`;
     }
   }
@@ -563,7 +564,7 @@ export class FacebookView extends ViewHandler<IFacebookServiceState> {
       case 'group':
         return this.oauthToken || '';
       case 'page':
-        return destinationId ? this.getPage(destinationId)!.access_token : '';
+        return this.getPage(destinationId)?.access_token || '';
     }
     return '';
   }
