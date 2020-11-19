@@ -105,21 +105,21 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
         value: 'EVERYONE',
         title: $t('Public'),
         data: {
-          image: require('../../../../../media/images/platforms/fb_privacy_public.png'),
+          image: 'https://slobs-cdn.streamlabs.com/media/fb_privacy_public.png',
         },
       },
       {
         value: 'ALL_FRIENDS',
         title: $t('Friends'),
         data: {
-          image: require('../../../../../media/images/platforms/fb_privacy_friends.png'),
+          image: 'https://slobs-cdn.streamlabs.com/media/fb_privacy_friends.png',
         },
       },
       {
         value: 'SELF',
         title: $t('Only Me'),
         data: {
-          image: require('../../../../../media/images/platforms/fb_privacy_noone.png'),
+          image: 'https://slobs-cdn.streamlabs.com/media/fb_privacy_noone.png',
         },
       },
     ];
@@ -148,14 +148,14 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
             value: 'page',
             title: $t('Share to a Page You Manage'),
             data: {
-              image: require('../../../../../media/images/platforms/fb-page.png'),
+              image: 'https://slobs-cdn.streamlabs.com/media/fb-page.png',
             },
           },
           {
             value: 'group',
             title: $t('Share in a Group'),
             data: {
-              image: require('../../../../../media/images/platforms/fb-group.png'),
+              image: 'https://slobs-cdn.streamlabs.com/media/fb-group.png',
             },
           },
         ].filter(opt => {
