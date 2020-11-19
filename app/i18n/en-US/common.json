@@ -122,5 +122,9 @@
   "System error message:": "System error message:",
   "List is empty": "List is empty",
   "Not selected": "Not selected",
-  "Friends": "Friends"
+  "Friends": "Friends",
+  "Thumbnail": "Thumbnail",
+  "Maximum file size reached ": "Maximum file size reached ",
+  "Select image": "Select image",
+  "Clear": "Clear"
 }

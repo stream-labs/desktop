@@ -17,6 +17,7 @@ import { StreamingService, IStreamSettings } from 'services/streaming';
 import { SyncWithValue } from 'services/app/app-decorators';
 import BaseEditStreamInfo from '../BaseEditSteamInfo';
 import FormInput from 'components/shared/inputs/FormInput.vue';
+import electron from 'electron';
 
 class Props {
   value?: IStreamSettings;
@@ -89,6 +90,12 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
     // category id is a property of YoutubeVideo
     const video = await this.youtubeService.fetchVideo(selectedBroadcast.id);
     this.setCategory(video.snippet.categoryId);
+  }
+
+  private openThumbnailsEditor() {
+    electron.remote.shell.openExternal(
+      'https://streamlabs.com/dashboard#/prime/thumbnails?ref=slobs',
+    );
   }
 
   private setCategory(categoryId: string) {
@@ -215,10 +222,15 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
             metadata={this.formMetadata.category}
             vModel={this.settings.platforms.youtube.categoryId}
           />
-          <HFormGroup
-            metadata={this.formMetadata.thumbnail}
-            vModel={this.settings.platforms.youtube.thumbnail}
-          />
+          <HFormGroup title={this.formMetadata.thumbnail.title}>
+            <FormInput
+              metadata={this.formMetadata.thumbnail}
+              vModel={this.settings.platforms.youtube.thumbnail}
+            />
+            <div class="input-description">
+              <a onclick={() => this.openThumbnailsEditor()}>{$t('Try thumbnails editor')}</a>
+            </div>
+          </HFormGroup>
           <HFormGroup
             metadata={this.formMetadata.latencyPreference}
             vModel={this.settings.platforms.youtube.latencyPreference}
