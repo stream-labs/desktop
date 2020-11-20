@@ -22,13 +22,12 @@ export async function setTemporaryRecordingPath(t: TExecutionContext): Promise<s
 
 export async function setOutputResolution(t: TExecutionContext, resolution: string) {
   const { app } = t.context;
+  const [width, height] = resolution.split('x');
   await showSettings(t, 'Video');
+  await app.client.click('button=Use Custom');
   const form = new FormMonkey(t);
-  await form.setInputValue(
-    await form.getInputSelectorByTitle('Output (Scaled) Resolution'),
-    resolution,
-  );
-  await ((app.client.keys(['Enter']) as any) as Promise<any>);
+  await form.setInputValue(width, height);
+  await app.client.click('button=Apply');
   await app.client.click('button=Done');
   await focusMain(t);
 }
