@@ -86,8 +86,6 @@
   "Amount": "Кол-во",
   "here": "здесь",
   "Link": "Ссылка",
-  "Whitelist": "Белый список",
-  "Blacklist": "Черный список",
   "Description": "Описание",
   "OBSInit.UnknownError": "Обнаружена неизвестная ошибка при инициализации OBS.",
   "OBSInit.ModuleNotFoundError": "Не найден DirectX в вашей системе. Установите последнюю версию DirectX для вашего компьютера, загрузив ее по ссылке <https://www.microsoft.com/ru-ru/download/details.aspx?id=35?>, и попробуйте снова.",

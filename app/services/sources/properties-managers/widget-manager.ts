@@ -21,7 +21,7 @@ export class WidgetManager extends PropertiesManager {
 
   settings: IWidgetManagerSettings;
 
-  get blacklist() {
+  get denylist() {
     return ['url', 'is_local_file'];
   }
 
