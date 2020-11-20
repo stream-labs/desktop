@@ -5,7 +5,7 @@ import { StreamingService } from 'services/streaming';
 export class ReplayManager extends PropertiesManager {
   @Inject() streamingService: StreamingService;
 
-  get blacklist() {
+  get denylist() {
     return ['is_local_file', 'local_file'];
   }
 

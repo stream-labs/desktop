@@ -10,7 +10,7 @@ import {
 } from '.';
 import { HostsService } from '../hosts';
 import { Inject } from 'services/core/injector';
-import { authorizedHeaders, handleResponse } from '../../util/requests';
+import { authorizedHeaders, handleResponse, jfetch } from '../../util/requests';
 import { UserService } from '../user';
 import { integer } from 'aws-sdk/clients/cloudfront';
 import { platformAuthorizedRequest, platformRequest } from './utils';
@@ -128,11 +128,9 @@ export class MixerService extends BasePlatformService<IMixerServiceState>
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 
-    return fetch(request)
-      .then(handleResponse)
-      .then(response => {
-        this.userService.updatePlatformToken('mixer', response.access_token);
-      });
+    return jfetch<{ access_token: string }>(request).then(response => {
+      this.userService.updatePlatformToken('mixer', response.access_token);
+    });
   }
 
   private fetchRawChannelInfo() {
@@ -188,7 +186,7 @@ export class MixerService extends BasePlatformService<IMixerServiceState>
     ).then(json => json.viewersCurrent);
   }
 
-  async putChannelInfo({ title, game }: IMixerStartStreamOptions): Promise<boolean> {
+  async putChannelInfo({ title, game }: IMixerStartStreamOptions): Promise<void> {
     const data = { name: title };
 
     if (this.state.typeIdMap[game]) {
@@ -199,19 +197,6 @@ export class MixerService extends BasePlatformService<IMixerServiceState>
       url: `${this.apiBase}channels/${this.channelId}`,
       method: 'PATCH',
       body: JSON.stringify(data),
-    });
-    return true;
-  }
-
-  searchGames(searchString: string): Promise<IGame[]> {
-    return platformRequest<{ id: number; name: string }[]>(
-      'mixer',
-      `${this.apiBase}types?limit=10&noCount=1&scope=all&query=${searchString}`,
-    ).then(response => {
-      response.forEach(game => {
-        this.ADD_GAME_MAPPING(game.name, game.id);
-      });
-      return response;
     });
   }
 

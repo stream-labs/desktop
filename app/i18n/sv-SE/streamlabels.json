@@ -14,6 +14,6 @@
   "Always, show last person when inactive": "Visa alltid, sista personen vid inaktivitet",
   "Include Resubs": "Inkludera återkommande prenumeranter",
   "Preview": "Förhandsgranska",
-  "Note:": "Obs:",
-  "Actual label text may take up to 60 seconds to update": "Faktiska etikettexten kan ta upp till 60 sekunder att uppdatera"
+  "Tokens: %{tokenList}": "Tokens: %{tokenList}",
+  "Note: Actual label text may take up to 60 seconds to update": "Note: Actual label text may take up to 60 seconds to update"
 }

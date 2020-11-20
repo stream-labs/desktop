@@ -11,7 +11,7 @@ import { Inject } from 'services/core/injector';
 import { WebsocketService, TSocketEvent, IAlertPlayingSocketEvent } from 'services/websocket';
 import { StreamingService } from 'services/streaming';
 import { WindowsService } from 'services/windows';
-import { handleResponse, authorizedHeaders } from 'util/requests';
+import { handleResponse, authorizedHeaders, jfetch } from 'util/requests';
 import * as obs from '../../../obs-api';
 import path from 'path';
 import fs from 'fs';
@@ -365,7 +365,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   }
 
   fetchFacemaskSettings() {
-    return this.formRequest('slobs/facemasks/settings');
+    return this.formRequest<Interfaces.IFacemaskSettings>('slobs/facemasks/settings');
   }
 
   async updateFacemaskSettings(settings: Interfaces.IUserFacemaskSettings) {
@@ -613,12 +613,12 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
     return `${this.cdn}${uuid}.json`;
   }
 
-  private formRequest(endpoint: string, options: any = {}) {
+  private formRequest<TResponse>(endpoint: string, options: any = {}) {
     const host = this.hostsService.streamlabs;
     const headers = authorizedHeaders(this.apiToken, options.headers);
     const url = `https://${host}/api/v5/${endpoint}`;
     const request = new Request(url, { ...options, headers });
 
-    return fetch(request).then(handleResponse);
+    return jfetch<TResponse>(request);
   }
 }

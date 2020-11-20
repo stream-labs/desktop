@@ -55,6 +55,7 @@
   "Cloudbot": "Bulut robotu",
   "Merch": "Ürünler",
   "App Store": "Uygulama Mağazası",
+  "Alertbox Library": "Alertbox Library",
   "New": "Yeni",
   "Face Masks": "Yüz Maskeleri",
   "Help": "Yardım",
@@ -85,8 +86,6 @@
   "Amount": "Miktar",
   "here": "buraya",
   "Link": "Bağlantı",
-  "Whitelist": "Beyaz Liste",
-  "Blacklist": "Kara Liste",
   "Description": "Açıklama",
   "OBSInit.UnknownError": "OBS başlatılırken bilinmeyen bir hatayla karşılaşıldı.",
   "OBSInit.ModuleNotFoundError": "Sisteminizde DirectX bulunamadı. Lütfen <https://www.microsoft.com/en-us/download/details.aspx?id=35?> adresinden makineniz için en son DirectX sürümünü yükleyin ve tekrar deneyin.",
@@ -118,5 +117,5 @@
   "Apps": "Uygulamalar",
   "Finish": "Bitir",
   "Get Prime": "Prime Üyeliği Al",
-  "System error message:": "System error message:"
+  "System error message:": "Sistem hata mesajı:"
 }

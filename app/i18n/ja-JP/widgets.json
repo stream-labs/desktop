@@ -17,6 +17,7 @@
   "Rather do this manually?": "これを手動で行いますか?",
   "Setup later": "後でセットアップ",
   "Widget Theme installed & activated. Click here to manage your Widget Profiles.": "ウィジェットテーマがインストールされ、アクティブ化されています。ここをクリックして、ウィジェットプロファイルを管理します。",
+  "Alertbox Theme installed & activated. Click here to manage your Widget Profiles.": "Alertbox Theme installed & activated. Click here to manage your Widget Profiles.",
   "Follow": "フォロー",
   "Subscription": "サブスクリプション",
   "Donation": "ドネーション",
@@ -180,5 +181,6 @@
   "Slide Out Down": "スライドアウトダウン",
   "Slide Out Left": "スライドアウトレフト",
   "Slide Out Right": "スライドアウトライト",
-  "Slide Out Up": "スライドアウトアップ"
+  "Slide Out Up": "スライドアウトアップ",
+  "Pick Screen Color": "Pick Screen Color"
 }

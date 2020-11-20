@@ -55,6 +55,7 @@
   "Cloudbot": "Cloudbot",
   "Merch": "Produto",
   "App Store": "App Store",
+  "Alertbox Library": "Alertbox Library",
   "New": "Novo",
   "Face Masks": "Máscaras Faciais",
   "Help": "Ajuda",
@@ -85,8 +86,6 @@
   "Amount": "Valor",
   "here": "aqui",
   "Link": "Link",
-  "Whitelist": "Autorizados",
-  "Blacklist": "Lista Negra",
   "Description": "Descrição",
   "OBSInit.UnknownError": "Foi encontrado um erro desconhecido ao iniciar o OBS.",
   "OBSInit.ModuleNotFoundError": "Não encontramos o DirectX no seu sistema. Instale a última versão do DirectX disponível na sua máquina através desse link <https://www.microsoft.com/en-us/download/details.aspx?id=35?> e tente novamente.",
@@ -118,5 +117,5 @@
   "Apps": "Aplicativos",
   "Finish": "Finalizar",
   "Get Prime": "Obter Prime",
-  "System error message:": "System error message:"
+  "System error message:": "Mensagem de erro do sistema:"
 }

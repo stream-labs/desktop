@@ -8,11 +8,6 @@ const errorTypes = {
       return $t('The request to the platform failed');
     },
   },
-  FACEBOOK_HAS_NO_PAGES: {
-    get message() {
-      return $t('No Facebook pages were found');
-    },
-  },
   TWITCH_MISSED_OAUTH_SCOPE: {
     get message() {
       return $t('Missing required oauth scope');

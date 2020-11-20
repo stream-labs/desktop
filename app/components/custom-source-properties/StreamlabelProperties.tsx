@@ -26,16 +26,14 @@ export default class StreamlabelProperties extends Vue {
   @Inject() streamlabelsService: StreamlabelsService;
 
   get statOptions() {
-    if (!this.definitions) return;
-    return Object.values(this.definitions);
+    if (!this.streamlabelsService.state.definitions) return;
+    return Object.values(this.streamlabelsService.state.definitions);
   }
 
-  definitions: IStreamlabelSet = null;
   currentlySelected: IStreamlabelDefinition = null;
   labelSettings: IStreamlabelSettings = null;
 
   async created() {
-    this.definitions = await this.streamlabelsService.fetchDefinitions();
     this.refreshPropertyValues();
     this.debouncedSetSettings = debounce(() => this.setSettings(), 1000);
   }

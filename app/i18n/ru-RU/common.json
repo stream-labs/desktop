@@ -55,6 +55,7 @@
   "Cloudbot": "Облачный бот",
   "Merch": "Мерч",
   "App Store": "Магазин приложений",
+  "Alertbox Library": "Alertbox Library",
   "New": "Новинки",
   "Face Masks": "Лицевые маски",
   "Help": "Помощь",
@@ -85,8 +86,6 @@
   "Amount": "Кол-во",
   "here": "здесь",
   "Link": "Ссылка",
-  "Whitelist": "Белый список",
-  "Blacklist": "Черный список",
   "Description": "Описание",
   "OBSInit.UnknownError": "Обнаружена неизвестная ошибка при инициализации OBS.",
   "OBSInit.ModuleNotFoundError": "Не найден DirectX в вашей системе. Установите последнюю версию DirectX для вашего компьютера, загрузив ее по ссылке <https://www.microsoft.com/ru-ru/download/details.aspx?id=35?>, и попробуйте снова.",
@@ -118,5 +117,5 @@
   "Apps": "Приложения",
   "Finish": "Готово",
   "Get Prime": "Приобрести подписку Prime",
-  "System error message:": "System error message:"
+  "System error message:": "Сообщение о системной ошибке:"
 }

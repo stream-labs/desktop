@@ -109,9 +109,9 @@ export class SceneTransitionsModule extends Module {
       const parsed = url.parse(options.url);
 
       if (parsed.protocol) {
-        const whitelist = ctx.app.manifest.mediaDomains || [];
+        const allowlist = ctx.app.manifest.mediaDomains || [];
 
-        if (!whitelist.includes(parsed.hostname)) {
+        if (!allowlist.includes(parsed.hostname)) {
           throw new Error(`The host ${parsed.hostname} was not found in the mediaDomains list`);
         }
       }
