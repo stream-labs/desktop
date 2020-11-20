@@ -37,7 +37,6 @@ import AdvancedStatistics from 'components/windows/AdvancedStatistics';
 import OverlayWindow from 'components/windows/OverlayWindow.vue';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
-import ShareStream from 'components/windows/ShareStream';
 import WelcomeToPrime from 'components/windows/WelcomeToPrime';
 import GoLiveWindow from 'components/windows/go-live/GoLiveWindow';
 import EditStreamWindow from 'components/windows/go-live/EditStreamWindow';
@@ -120,7 +119,6 @@ export function getComponents() {
     MediaShare,
     AlertBox,
     SpinWheel,
-    ShareStream,
     WelcomeToPrime,
     GoLiveWindow,
     EditStreamWindow,

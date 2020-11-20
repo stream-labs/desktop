@@ -52,6 +52,10 @@
   width: 120px;
 }
 
+.column-monitoringType {
+  width: 210px;
+}
+
 tr {
   td {
     &:nth-child(1) {

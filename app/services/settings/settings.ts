@@ -126,7 +126,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
 
     // Names of settings that are disabled because we
     // have not implemented them yet.
-    const BLACK_LIST_NAMES = [
+    const DENY_LIST_NAMES = [
       'SysTrayMinimizeToTray',
       'SysTrayEnabled',
       'CenterSnapping',
@@ -138,7 +138,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
 
     for (const group of settings) {
       group.parameters = obsValuesToInputValues(group.parameters, {
-        disabledFields: BLACK_LIST_NAMES,
+        disabledFields: DENY_LIST_NAMES,
         transformListOptions: true,
       });
     }

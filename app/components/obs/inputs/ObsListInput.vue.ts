@@ -40,6 +40,7 @@ class ObsListInput extends ObsInput<IObsListInput<TObsValue>> {
       allowEmpty: false,
       internalSearch: this.internalSearch,
       name: this.value.name,
+      title: this.value.description,
       options: this.value.options.map(opt => ({ title: opt.description, value: opt.value })),
     };
   }

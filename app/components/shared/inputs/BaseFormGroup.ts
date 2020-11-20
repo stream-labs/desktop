@@ -31,11 +31,13 @@ export default abstract class BaseFormGroup extends BaseInput<any, IInputMetadat
     if (!options.type) return {};
     const inputMetadata = options;
 
-    // FormGroup handle the render of the FormInput title
-    // so remove the title from FormInput metadata
-    delete inputMetadata.title;
-    delete inputMetadata.tooltip;
-    delete inputMetadata.description;
+    if (options.type === 'bool') {
+      // FormGroup handle the render of the FormInput title
+      // so remove the title from FormInput metadata
+      delete inputMetadata.title;
+      delete inputMetadata.tooltip;
+      delete inputMetadata.description;
+    }
     return inputMetadata;
   }
 

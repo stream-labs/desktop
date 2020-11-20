@@ -200,12 +200,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
         return;
       }
-      // facebook should have pages
-      if (platform === 'facebook' && !this.facebookService.state.facebookPages?.pages?.length) {
-        this.SET_ERROR('FACEBOOK_HAS_NO_PAGES');
-        this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
-        return;
-      }
     }
     // successfully prepopulated
     this.UPDATE_STREAM_INFO({ lifecycle: 'waitForNewSettings' });
@@ -344,6 +338,32 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     if (this.state.streamingStatus === EStreamingState.Live) {
       this.UPDATE_STREAM_INFO({ lifecycle: 'live' });
       this.createGameAssociation(this.views.commonFields.game);
+      this.recordAfterStreamStartAnalytics(settings);
+    }
+  }
+
+  private recordAfterStreamStartAnalytics(settings: IGoLiveSettings) {
+    if (settings.customDestinations.filter(dest => dest.enabled).length) {
+      this.usageStatisticsService.recordFeatureUsage('CustomStreamDestination');
+    }
+
+    // send analytics for Facebook
+    if (settings.platforms.facebook?.enabled) {
+      const fbSettings = settings.platforms.facebook;
+      this.usageStatisticsService.recordFeatureUsage('StreamToFacebook');
+      if (fbSettings.game) {
+        this.usageStatisticsService.recordFeatureUsage('StreamToFacebookGaming');
+      }
+      if (fbSettings.liveVideoId) {
+        this.usageStatisticsService.recordFeatureUsage('StreamToFacebookScheduledVideo');
+      }
+      if (fbSettings.destinationType === 'me') {
+        this.usageStatisticsService.recordFeatureUsage('StreamToFacebookTimeline');
+      } else if (fbSettings.destinationType === 'group') {
+        this.usageStatisticsService.recordFeatureUsage('StreamToFacebookGroup');
+      } else {
+        this.usageStatisticsService.recordFeatureUsage('StreamToFacebookPage');
+      }
     }
   }
 
@@ -711,17 +731,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     });
   }
 
-  openShareStream() {
-    this.windowsService.showWindow({
-      componentName: 'ShareStream',
-      title: $t('Share Your Stream'),
-      size: {
-        height: 450,
-        width: 520,
-      },
-    });
-  }
-
   get delayEnabled() {
     return this.streamSettingsService.settings.delayEnable;
   }
@@ -854,9 +863,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           status: EStreamingState.Live,
         });
         this.usageStatisticsService.recordFeatureUsage('Streaming');
-        if (this.views.goLiveSettings.customDestinations.filter(dest => dest.enabled).length) {
-          this.usageStatisticsService.recordFeatureUsage('CustomStreamDestination');
-        }
       } else if (info.signal === EOBSOutputSignal.Starting) {
         this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
         this.streamingStatusChange.next(EStreamingState.Starting);
