@@ -409,8 +409,8 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
             <button class="button button--facebook" onClick={() => this.reLogin()}>
               {$t('Re-login now')}
             </button>
-            <button class="button button--default" onclick={() => this.dismissWarning()}>
-              {$t('Do not show this message')}
+            <button class="button button--trans" onclick={() => this.dismissWarning()}>
+              {$t('Do not show this message again')}
             </button>
           </div>
         )}
@@ -420,8 +420,8 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
             <button class="button button--facebook" onClick={() => this.reconnectFB()}>
               {$t('Reconnect now')}
             </button>
-            <button class="button button--default" onclick={() => this.dismissWarning()}>
-              {$t('Do not show this message')}
+            <button class="button button--trans" onclick={() => this.dismissWarning()}>
+              {$t('Do not show this message again')}
             </button>
           </div>
         )}
