@@ -86,8 +86,6 @@
   "Amount": "Betrag",
   "here": "hier",
   "Link": "Link",
-  "Whitelist": "Whitelist",
-  "Blacklist": "Blacklist",
   "Description": "Beschreibung",
   "OBSInit.UnknownError": "Bei der Initialisierung von OBS kam es zu einem unbekannten Fehler.",
   "OBSInit.ModuleNotFoundError": "DirectX wurde auf dem System nicht gefunden. Bitte installieren Sie neueste Version von DirectX für Ihren Computer: <https://www.microsoft.com/en-us/download/details.aspx?id=35?>. Versuchen Sie es anschließend erneut.",
@@ -122,5 +120,9 @@
   "System error message:": "Systemfehlermeldung:",
   "List is empty": "List is empty",
   "Not selected": "Not selected",
-  "Friends": "Friends"
+  "Friends": "Friends",
+  "Width": "Breite",
+  "Height": "Höhe",
+  "Use Custom": "Use Custom",
+  "Apply": "Apply"
 }
