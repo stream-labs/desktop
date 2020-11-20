@@ -292,7 +292,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
       (fbSettings.liveVideoId && fbSettings.privacy.value);
     const shouldShowPermissionWarn =
       (!this.canStreamToTimeline || !this.canStreamToGroup) &&
-      !this.dismissablesService.state[EDismissable.FacebookNeedPermissionsTip];
+      this.dismissablesService.views.shouldShow(EDismissable.FacebookNeedPermissionsTip);
 
     return (
       <ValidatedForm name="facebook-settings">
