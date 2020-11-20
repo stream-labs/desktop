@@ -3,8 +3,11 @@
   <div>
     <!-- title -->
     <div class="form-group__title form-group__title--vertical">
-      <label>
+      <label v-if="options.title">
         {{ options.title }}
+      </label>
+      <label v-else>
+        &nbsp;
       </label>
       <div v-if="options.tooltip" class="tooltip">
         <i class="icon-question icon-btn" v-tooltip="metadata.tooltip" />
