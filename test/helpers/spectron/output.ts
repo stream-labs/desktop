@@ -26,7 +26,7 @@ export async function setOutputResolution(t: TExecutionContext, resolution: stri
   await showSettings(t, 'Video');
   await app.client.click('button=Use Custom');
   const form = new FormMonkey(t);
-  await form.setInputValue(width, height);
+  await form.fill({ width, height });
   await app.client.click('button=Apply');
   await app.client.click('button=Done');
   await focusMain(t);
