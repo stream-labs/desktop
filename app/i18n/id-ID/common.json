@@ -86,8 +86,6 @@
   "Amount": "Jumlah",
   "here": "di sini",
   "Link": "Tautan",
-  "Whitelist": "Daftar putih",
-  "Blacklist": "Daftar hitam",
   "Description": "Deskripsi",
   "OBSInit.UnknownError": "Ditemui kesalahan yang tidak diketahui saat menginisialisasi OBS.",
   "OBSInit.ModuleNotFoundError": "DirectX tidak bisa ditemukan di sistem Anda. Instal versi DirectX terbaru di mesin Anda di sini <https://www.microsoft.com/en-us/download/details.aspx?id=35?> dan coba lagi.",

@@ -86,8 +86,6 @@
   "Amount": "Miktar",
   "here": "buraya",
   "Link": "Bağlantı",
-  "Whitelist": "Beyaz Liste",
-  "Blacklist": "Kara Liste",
   "Description": "Açıklama",
   "OBSInit.UnknownError": "OBS başlatılırken bilinmeyen bir hatayla karşılaşıldı.",
   "OBSInit.ModuleNotFoundError": "Sisteminizde DirectX bulunamadı. Lütfen <https://www.microsoft.com/en-us/download/details.aspx?id=35?> adresinden makineniz için en son DirectX sürümünü yükleyin ve tekrar deneyin.",

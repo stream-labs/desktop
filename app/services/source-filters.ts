@@ -73,7 +73,7 @@ export class SourceFiltersService extends Service {
 
   getTypesList(): IObsListOption<TSourceFilterType>[] {
     const obsAvailableTypes = obs.FilterFactory.types();
-    const whitelistedTypes: IObsListOption<TSourceFilterType>[] = [
+    const allowlistedTypes: IObsListOption<TSourceFilterType>[] = [
       { description: $t('Image Mask/Blend'), value: 'mask_filter' },
       { description: $t('Crop/Pad'), value: 'crop_filter' },
       { description: $t('Gain'), value: 'gain_filter' },
@@ -97,7 +97,7 @@ export class SourceFiltersService extends Service {
       { description: $t('Shader'), value: 'shader_filter' },
     ];
 
-    return whitelistedTypes.filter(type => obsAvailableTypes.includes(type.value));
+    return allowlistedTypes.filter(type => obsAvailableTypes.includes(type.value));
   }
 
   getTypes(): ISourceFilterType[] {

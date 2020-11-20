@@ -86,8 +86,6 @@
   "Amount": "量",
   "here": "ここ",
   "Link": "リンク",
-  "Whitelist": "ホワイトリスト",
-  "Blacklist": "ブラックリスト",
   "Description": "説明",
   "OBSInit.UnknownError": "OBS の初期化中に未知のエラーが発生しました。",
   "OBSInit.ModuleNotFoundError": "DirectX がお使いのシステム上に見つかりませんでした。最新バージョンの DirectX をここ <https://www.microsoft.com/en-us/download/details.aspx?id=35?> からマシンにインストールして、再試行してください。",

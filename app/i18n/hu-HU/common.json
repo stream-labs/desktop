@@ -86,8 +86,6 @@
   "Amount": "Összeg",
   "here": "itt",
   "Link": "Link",
-  "Whitelist": "Whitelist",
-  "Blacklist": "Feketelista",
   "Description": "Leírás",
   "OBSInit.UnknownError": "Az OBS inicializálása során ismeretlen hiba történt.",
   "OBSInit.ModuleNotFoundError": "A DirectX nem található a rendszerén. Telepítse a számítógépére a DirectX legújabb verzióját ide: <https://www.microsoft.com/en-us/download/details.aspx?id=35?> és próbálja újra.",

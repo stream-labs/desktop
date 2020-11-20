@@ -86,8 +86,6 @@
   "Amount": "Quantité",
   "here": "ici",
   "Link": "Lien",
-  "Whitelist": "Liste blanche",
-  "Blacklist": "Liste noire",
   "Description": "Description",
   "OBSInit.UnknownError": "Une erreur inconnue est survenue lors de l'initialisation d'OBS.",
   "OBSInit.ModuleNotFoundError": "DirectX n'a pas pu être trouvé sur votre système. Installez la dernière version de DirectX pour votre système, disponible ici <https://www.microsoft.com/en-us/download/details.aspx?id=35?>, et réessayez.",
