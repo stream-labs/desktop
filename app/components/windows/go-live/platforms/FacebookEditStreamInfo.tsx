@@ -24,7 +24,7 @@ import { WindowsService } from 'services/windows';
 import Translate from 'components/shared/translate';
 import electron from 'electron';
 import styles from './FacebookEditStreamInfo.m.less';
-import { DismissablesService, EDismissable } from '../../../../services/dismissables';
+import { DismissablesService, EDismissable } from 'services/dismissables';
 
 class Props {
   value?: IStreamSettings = undefined;
