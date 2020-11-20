@@ -86,8 +86,6 @@
   "Amount": "Čiastka",
   "here": "tu",
   "Link": "Odkaz",
-  "Whitelist": "Whitelist",
-  "Blacklist": "Čierna listina",
   "Description": "Popis",
   "OBSInit.UnknownError": "Pri inicializácii systému OBS sa vyskytla neznáma chyba.",
   "OBSInit.ModuleNotFoundError": "DirectX sa vo vašom systéme nenašiel. Nainštalujte si najnovšiu verziu rozhrania DirectX do svojho počítača tu <https://www.microsoft.com/en-us/download/details.aspx?id=35?> A skúste to znova.",
@@ -122,5 +120,9 @@
   "System error message:": "System error message:",
   "List is empty": "List is empty",
   "Not selected": "Not selected",
-  "Friends": "Friends"
+  "Friends": "Friends",
+  "Width": "Width",
+  "Height": "Height",
+  "Use Custom": "Use Custom",
+  "Apply": "Apply"
 }
