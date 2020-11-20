@@ -86,8 +86,6 @@
   "Amount": "Jumlah",
   "here": "di sini",
   "Link": "Tautan",
-  "Whitelist": "Daftar putih",
-  "Blacklist": "Daftar hitam",
   "Description": "Deskripsi",
   "OBSInit.UnknownError": "Ditemui kesalahan yang tidak diketahui saat menginisialisasi OBS.",
   "OBSInit.ModuleNotFoundError": "DirectX tidak bisa ditemukan di sistem Anda. Instal versi DirectX terbaru di mesin Anda di sini <https://www.microsoft.com/en-us/download/details.aspx?id=35?> dan coba lagi.",
@@ -122,5 +120,9 @@
   "System error message:": "Pesan kesalahan sistem:",
   "List is empty": "List is empty",
   "Not selected": "Not selected",
-  "Friends": "Friends"
+  "Friends": "Friends",
+  "Width": "Width",
+  "Height": "Height",
+  "Use Custom": "Use Custom",
+  "Apply": "Apply"
 }
