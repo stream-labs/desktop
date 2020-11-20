@@ -86,8 +86,6 @@
   "Amount": "Số tiền",
   "here": "here",
   "Link": "Liên kết",
-  "Whitelist": "Whitelist",
-  "Blacklist": "Blacklist",
   "Description": "Mô tả",
   "OBSInit.UnknownError": "An unknown error was encountered while initializing OBS.",
   "OBSInit.ModuleNotFoundError": "DirectX could not be found on your system. Please install the latest version of DirectX for your machine here <https://www.microsoft.com/en-us/download/details.aspx?id=35?> and try again.",
@@ -122,5 +120,9 @@
   "System error message:": "System error message:",
   "List is empty": "List is empty",
   "Not selected": "Not selected",
-  "Friends": "Friends"
+  "Friends": "Friends",
+  "Width": "Chiều rộng",
+  "Height": "Chiều cao",
+  "Use Custom": "Use Custom",
+  "Apply": "Apply"
 }
