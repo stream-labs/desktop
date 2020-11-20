@@ -86,8 +86,6 @@
   "Amount": "Beløb",
   "here": "her",
   "Link": "Link",
-  "Whitelist": "Whiteliste",
-  "Blacklist": "Sortliste",
   "Description": "Beskrivelse",
   "OBSInit.UnknownError": "Der opstod en ukendt fejl under start af OBS.",
   "OBSInit.ModuleNotFoundError": "DirectX er ikke installeret på computeren. Installer den seneste version af DirectX fra <https://www.microsoft.com/da-us/download/details.aspx?id=35?>, og prøv igen.",

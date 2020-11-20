@@ -443,7 +443,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
   getAvailableSourcesTypesList(): IObsListOption<TSourceType>[] {
     const obsAvailableTypes = obs.InputFactory.types();
-    const whitelistedTypes: IObsListOption<TSourceType>[] = [
+    const allowlistedTypes: IObsListOption<TSourceType>[] = [
       { description: 'Image', value: 'image_source' },
       { description: 'Color Source', value: 'color_source' },
       { description: 'Browser Source', value: 'browser_source' },
@@ -470,13 +470,13 @@ export class SourcesService extends StatefulService<ISourcesState> {
       { description: 'Soundtrack source', value: 'soundtrack_source' },
     ];
 
-    const availableWhitelistedType = whitelistedTypes.filter(type =>
+    const availableAllowlistedTypes = allowlistedTypes.filter(type =>
       obsAvailableTypes.includes(type.value),
     );
     // 'scene' is not an obs input type so we have to set it manually
-    availableWhitelistedType.push({ description: 'Scene', value: 'scene' });
+    availableAllowlistedTypes.push({ description: 'Scene', value: 'scene' });
 
-    return availableWhitelistedType;
+    return availableAllowlistedTypes;
   }
 
   getAvailableSourcesTypes(): TSourceType[] {
