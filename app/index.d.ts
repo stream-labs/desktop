@@ -84,6 +84,7 @@ declare module 'vuejs-datepicker';
 declare module 'vuejs-datepicker/dist/locale';
 declare module 'color-picker';
 declare module 'overlayscrollbars-vue';
+declare module 'v-calendar';
 
 // uncomment to allow TS to import components without type definitions
 // webpack still checks the module existence

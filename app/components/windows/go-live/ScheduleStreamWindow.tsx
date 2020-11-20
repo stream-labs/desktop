@@ -1,7 +1,7 @@
 import TsxComponent, { required } from 'components/tsx-component';
 import ModalLayout from 'components/ModalLayout.vue';
 import { $t } from 'services/i18n';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core';
 import { UserService } from 'services/user';
 import { formMetadata, metadata } from 'components/shared/inputs';
@@ -17,18 +17,40 @@ import PlatformSettings from './PlatformSettings';
 import { TPlatform } from 'services/platforms';
 import { DestinationSwitchers } from './DestinationSwitchers';
 import moment from 'moment';
+import styles from './GoLive.m.less';
+import { ToggleInput } from '../../shared/inputs/inputs';
+import cx from 'classnames';
+import { IYoutubeLiveBroadcast, YoutubeService } from '../../../services/platforms/youtube';
+import { FacebookService, IFacebookLiveVideo } from '../../../services/platforms/facebook';
 
 @Component({})
-export default class ScheduleStreamWindow extends TsxComponent<{}> {
+export default class ScheduleStreamWindowDeprecated extends TsxComponent<{}> {
   @Inject() private userService: UserService;
   @Inject() private settingsService: SettingsService;
   @Inject() private streamingService: StreamingService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private windowsService: WindowsService;
+  @Inject() private youtubeService: YoutubeService;
+  @Inject() private facebookService: FacebookService;
 
   $refs: {
     form: ValidatedForm;
   };
+
+  private dialogOptions: {
+    date?: string;
+    platform?: TPlatform;
+    id?: string;
+  } = this.windowsService.getChildWindowQueryParams();
+
+  private date = this.dialogOptions.date;
+  private platform = this.view.linkedPlatforms.filter(p => p !== 'twitch')[0];
+  private ytBroadcast: IYoutubeLiveBroadcast = null;
+  private fbVideo: IFacebookLiveVideo = null;
+
+  private get isUpdateMode(): boolean {
+    return !!this.dialogOptions.id;
+  }
 
   private get view() {
     return this.streamingService.views;
@@ -39,43 +61,54 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
     this.view.supports('stream-schedule', [p]),
   );
   private startTimeModel = {
-    date: Date.now(),
     time: 0,
   };
   private isLoading = false;
 
-  get selectedDestinations(): TPlatform[] {
-    const destinations = this.settings.platforms;
-    return Object.keys(destinations).filter(dest => destinations[dest].enabled) as TPlatform[];
+  created() {
+    this.updateSettings();
   }
 
-  created() {
+  @Watch('platform')
+  private async updateSettings() {
     // use goLive settings for schedule
     this.settings = cloneDeep(this.view.goLiveSettings);
 
-    // always show a simple mode only
-    this.settings.advancedMode = false;
-
-    // always have all platforms enabled when show window
-    const destinations = this.settings.platforms;
-    Object.keys(destinations).forEach((dest: TPlatform) => {
-      destinations[dest].enabled = true;
-      if (!this.eligiblePlatforms.includes(dest)) delete destinations[dest];
+    // delete not-selected platforms
+    this.view.linkedPlatforms.forEach(p => {
+      if (p !== this.platform) {
+        delete this.settings.platforms[p];
+      } else {
+        this.settings.platforms[p].enabled = true;
+      }
     });
 
     // prepopulate info for target platforms
-    this.streamingService.actions.prepopulateInfo(this.selectedDestinations);
+    this.streamingService.actions.prepopulateInfo([this.platform]);
+
+    if (this.isUpdateMode) {
+      if (this.platform === 'youtube') {
+        this.ytBroadcast = await this.youtubeService.fetchBroadcast(this.dialogOptions.id);
+        this.settings.platforms.youtube = {
+          ...this.settings.platforms.youtube,
+          title: this.ytBroadcast.snippet.title,
+          description: this.ytBroadcast.snippet.description,
+        };
+      } else {
+        // this.fbVideo = await this.facebookService.fetchV
+      }
+    }
   }
 
   /**
    * validate settings and schedule stream
    */
-  private async submit() {
+  private async scheduleNewStream() {
     // validate
     if (!(await this.$refs.form.validate())) return;
 
     // take the date without hours and minutes
-    const startDate = new Date(this.startTimeModel.date).setHours(0, 0, 0, 0);
+    const startDate = new Date(this.date).setHours(0, 0, 0, 0);
 
     // convert date to ISO string format
     const scheduledStartTime = new Date(startDate + this.startTimeModel.time * 1000).toISOString();
@@ -84,25 +117,7 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
     try {
       this.isLoading = true;
       await this.streamingService.actions.return.scheduleStream(this.settings, scheduledStartTime);
-      this.startTimeModel = { time: 0, date: 0 };
-      this.$toasted.show(
-        $t(
-          'Your stream has been scheduled for %{time} from now.' +
-            " If you'd like to make another schedule please enter a different time",
-          { time: moment().to(scheduledStartTime, true) },
-        ),
-        {
-          position: 'bottom-center',
-          fullWidth: true,
-          className: 'toast-success toast-success__schedule',
-          duration: 0,
-          action: {
-            text: $t('Close'),
-            class: 'toast-action',
-            onClick: (_e, toastedObject) => toastedObject.goAway(),
-          },
-        },
-      );
+      this.close();
     } catch (e) {
       this.$toasted.show(e.message, {
         position: 'bottom-center',
@@ -115,38 +130,28 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
     }
   }
 
-  /**
-   * Perform extra validations
-   */
-  private postValidate(): boolean {
-    const errorMsg = this.view.validateSettings(this.settings);
-    if (!errorMsg) return true;
-
-    this.$toasted.error(errorMsg, {
-      position: 'bottom-center',
-      duration: 2000,
-      singleton: true,
-    });
-    return false;
+  private close() {
+    this.windowsService.actions.closeChildWindow();
   }
 
-  private get isFacebook() {
-    return this.settings.platforms.facebook?.enabled;
+  private remove() {
+    const id = this.dialogOptions.id;
+    if (this.platform === 'youtube') {
+      this.youtubeService.actions.removeBroadcast(id);
+    } else {
+      this.facebookService.actions.removeLiveVideo(id);
+    }
+    this.close();
   }
 
   get formMetadata() {
     return formMetadata({
-      date: metadata.date({
-        title: $t('Scheduled Date'),
-        disablePastDates: true,
-        required: true,
-        description: this.isFacebook
-          /* eslint-disable */
-          ? $t(
-            'Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.',
-          )
-          : undefined,
-          /* eslint-enable */
+      platform: metadata.list({
+        title: $t('Platform'),
+        options: this.view.linkedPlatforms
+          .filter(p => p !== 'twitch')
+          .map(p => ({ title: p, value: p })),
+        disabled: this.isUpdateMode,
       }),
       time: metadata.timer({
         title: $t('Scheduled Time'),
@@ -156,45 +161,57 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
     });
   }
 
-  private switchPlatform(platform: TPlatform, enabled: boolean) {
-    this.settings.platforms[platform].enabled = enabled;
-  }
-
   render() {
-    const shouldShowLoading =
-      this.isLoading || !this.view.isPrepopulated(this.selectedDestinations);
-    const shouldShowWarn = !shouldShowLoading && this.selectedDestinations.length === 0;
-    const shouldShowSettings = !shouldShowWarn && !shouldShowLoading;
+    const shouldShowLoading = this.isLoading || !this.view.isPrepopulated([this.platform]);
+    const shouldShowSettings = !shouldShowLoading;
 
     return (
-      <ModalLayout doneHandler={() => this.submit()}>
-        <ValidatedForm
-          ref="form"
-          slot="content"
-          handleExtraValidation={this.postValidate}
-          name="editStreamForm"
-          class="flex"
-        >
-          <div style={{ width: '400px', marginRight: '42px' }}>
-            <DestinationSwitchers
-              platforms={this.settings.platforms}
-              handleOnPlatformSwitch={(...args) => this.switchPlatform(...args)}
-              canDisablePrimary={true}
-            />
-          </div>
+      <ModalLayout customControls={true} showControls={false}>
+        <ValidatedForm ref="form" slot="content" name="editStreamForm" class="flex">
           <div style={{ width: '100%' }}>
             {shouldShowSettings && (
               <div>
+                <HFormGroup metadata={this.formMetadata.platform} vModel={this.platform} />
                 <PlatformSettings vModel={this.settings} isScheduleMode={true} />
-                <HFormGroup metadata={this.formMetadata.date} vModel={this.startTimeModel.date} />
                 <HFormGroup metadata={this.formMetadata.time} vModel={this.startTimeModel.time} />
               </div>
             )}
-            {shouldShowWarn && <div>{$t('Select at least one destination')}</div>}
             {shouldShowLoading && <Spinner />}
           </div>
         </ValidatedForm>
+        <div slot="controls">{this.renderControls()}</div>
       </ModalLayout>
+    );
+  }
+
+  private renderControls() {
+    const shouldShowUpdateButton = this.isUpdateMode;
+    const shouldShowScheduleButton = !this.isUpdateMode;
+    const shouldShowDeleteButton = this.isUpdateMode;
+
+    return (
+      <div class="controls" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        {/* DELETE BUTTON */}
+        {shouldShowDeleteButton && (
+          <button class={cx('button button--warn')} onClick={() => this.remove()}>
+            {$t('Delete')}
+          </button>
+        )}
+
+        {/* SCHEDULE BUTTON */}
+        {shouldShowScheduleButton && (
+          <button class={cx('button button--action')} onClick={() => this.scheduleNewStream()}>
+            {$t('Schedule')}
+          </button>
+        )}
+
+        {/* UPDATE BUTTON */}
+        {shouldShowUpdateButton && (
+          <button class={cx('button button--action')} onClick={() => this.close()}>
+            {$t('Update')}
+          </button>
+        )}
+      </div>
     );
   }
 }

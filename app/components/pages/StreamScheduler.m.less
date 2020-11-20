@@ -1,0 +1,121 @@
+@import "../../styles/index.less";
+
+.stream-scheduler-page {
+  :global(.vc-container) {
+    background-color: var(--background);
+    color: var(--paragraph);
+    border: none;
+    height: 100%;
+  }
+
+  :global(.vc-pane-container) {
+    height: 100%;
+  }
+
+  :global(.vc-pane) {
+    height: 100%;
+  }
+
+  :global(.vc-grid-container) {
+    height: 100%;
+    transition: filter 0.3ms;
+  }
+
+  :global(.vc-title) {
+    color: var(--paragraph);
+  }
+
+  :global(.vc-weekday) {
+    height: 100%;
+    width: 100%;
+    border-bottom: 1px solid var(--solid-input);
+  }
+
+  :global(.vc-day) {
+    border-bottom: 1px solid var(--solid-input);
+    padding: 8px 0;
+    transition: border 0.3s, box-shadow 0.3s;
+
+    &:hover {
+      box-shadow: 0 0 3px rgba(255, 255, 255, 0.2) inset
+    }
+
+    &:not(:global(.on-bottom)) {
+      border-bottom:  1px solid var(--solid-input);
+      &:global(.weekday-1) {
+        border-bottom: 1px solid var(--solid-input);
+      }
+    }
+    &:not(:global(.on-right)) {
+      border-right: 1px solid var(--solid-input);
+    }
+  }
+
+  :global(.is-today) .day-label {
+    border-radius: 50%;
+    background: var(--teal);
+    color: white;
+  }
+
+}
+
+.day-slot {
+  height: 100%;
+}
+
+.day-label {
+  display: block;
+  margin: 0 auto 8px auto;
+  width: 25px;
+  cursor: pointer;
+  text-align: center;
+  height: 25px;
+  line-height: 25px;
+}
+
+.event {
+  .radius();
+  padding: 0 4px;
+  margin-bottom: 4px;
+  margin-right: 8px;
+  cursor: pointer;
+  color: var(--gray-400);
+}
+
+.event--facebook {
+  background-color: var(--facebook-transparent);
+  &:hover {
+    color: white;
+  }
+}
+
+.event--youtube {
+  background-color: var(--youtube-transparent);
+  &:hover {
+    color: white;
+  }
+}
+
+.event-time {
+  font-weight: bold;
+}
+
+.event-title {
+  font-style: italic;
+}
+
+.loading-fader {
+  .absolute(0,0,0,0);
+  .loading-shadow {
+    .absolute(0,0,0,0);
+    background: var(--background);
+    opacity: 0.7;
+    z-index: 10;
+  }
+  .spinner {
+    position: absolute;
+    z-index: 11;
+  }
+}
+
+

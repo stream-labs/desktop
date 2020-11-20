@@ -37,6 +37,7 @@ import CustomLoader from 'components/CustomLoader';
 import process from 'process';
 import { MetricsService } from 'services/metrics';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import { setupCalendar } from 'v-calendar';
 
 const crashHandler = window['require']('crash-handler');
 
@@ -192,6 +193,7 @@ VTooltip.options.defaultContainer = '#mainWrapper';
 Vue.use(Toasted);
 Vue.use(VeeValidate); // form validations
 Vue.use(VModal);
+setupCalendar({});
 
 Vue.directive('trackClick', {
   bind(el: HTMLElement, binding: { value?: { component: string; target: string } }) {

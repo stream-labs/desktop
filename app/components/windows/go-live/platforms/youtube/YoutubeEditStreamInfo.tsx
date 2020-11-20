@@ -39,7 +39,7 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
   private broadcastsLoaded = false;
 
   async created() {
-    this.broadcasts = await this.youtubeService.fetchBroadcasts();
+    this.broadcasts = await this.youtubeService.fetchEligibleBroadcasts();
     this.broadcastsLoaded = true;
   }
 

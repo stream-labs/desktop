@@ -92,6 +92,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   replayBufferStatusChange = new Subject<EReplayBufferState>();
   replayBufferFileWrite = new Subject<string>();
   streamInfoChanged = new Subject<StreamInfoView>();
+  streamScheduled = new Subject();
 
   // Dummy subscription for stream deck
   streamingStateChange = new Subject<void>();
@@ -148,9 +149,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         deep: true,
       },
     );
+    this.youtubeService.streamScheduled.subscribe(() => this.streamScheduled.next());
+    this.facebookService.streamScheduled.subscribe(() => this.streamScheduled.next());
   }
 
-  get views() {
+  get views(): StreamInfoView {
     return new StreamInfoView(this.state);
   }
 

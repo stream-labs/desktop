@@ -18,7 +18,7 @@ import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import { assertIsDefined } from 'util/properties-type-guards';
 import electron from 'electron';
-import { omitBy } from 'lodash';
+import { Subject } from 'rxjs';
 
 interface IYoutubeServiceState extends IPlatformState {
   liveStreamingEnabled: boolean;
@@ -63,6 +63,7 @@ export interface IYoutubeLiveBroadcast {
     title: string;
     description: string;
     scheduledStartTime: string;
+    actualStartTime: string;
     isDefaultBroadcast: boolean;
     liveChatId: string;
     thumbnails: {
@@ -196,6 +197,8 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   };
 
   private apiBase = 'https://www.googleapis.com/youtube/v3';
+
+  streamScheduled = new Subject();
 
   protected init() {
     this.syncSettingsWithLocalStorage();
@@ -390,6 +393,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     options: IYoutubeStartStreamOptions,
   ): Promise<void> {
     await this.createBroadcast({ ...options, scheduledStartTime });
+    this.streamScheduled.next();
   }
 
   async fetchNewToken(): Promise<void> {
@@ -516,6 +520,14 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     });
   }
 
+  async removeBroadcast(id: string) {
+    const endpoint = `liveBroadcasts?&id=${id}`;
+    await this.requestYoutube<IYoutubeLiveBroadcast>({
+      method: 'DELETE',
+      url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
+    });
+  }
+
   /**
    * The liveStream must be bounded to the Youtube LiveBroadcast before going live
    */
@@ -560,7 +572,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   /**
    * Fetch the list of upcoming and active broadcasts
    */
-  async fetchBroadcasts(): Promise<IYoutubeLiveBroadcast[]> {
+  async fetchEligibleBroadcasts(): Promise<IYoutubeLiveBroadcast[]> {
     const fields = ['snippet', 'contentDetails', 'status'];
     const query = `part=${fields.join(',')}&maxResults=50&access_token=${this.oauthToken}`;
 
@@ -599,13 +611,30 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     return [...activeBroadcasts, ...upcomingBroadcasts];
   }
 
+  /**
+   * Fetch the list of all broadcasts
+   */
+  async fetchBroadcasts(): Promise<IYoutubeLiveBroadcast[]> {
+    const fields = ['snippet', 'contentDetails', 'status'];
+    const query = `part=${fields.join(
+      ',',
+    )}&broadcastType=all&mine=true&maxResults=100&access_token=${this.oauthToken}`;
+    const broadcasts = (
+      await platformAuthorizedRequest<IYoutubeCollection<IYoutubeLiveBroadcast>>(
+        'youtube',
+        `${this.apiBase}/liveBroadcasts?${query}`,
+      )
+    ).items;
+    return broadcasts;
+  }
+
   private async fetchLiveStream(id: string): Promise<IYoutubeLiveStream> {
     const url = `${this.apiBase}/liveStreams?part=cdn,snippet,contentDetails&id=${id}`;
     return (await platformAuthorizedRequest<{ items: IYoutubeLiveStream[] }>('youtube', url))
       .items[0];
   }
 
-  private async fetchBroadcast(
+  async fetchBroadcast(
     id: string,
     fields = ['snippet', 'contentDetails', 'status'],
   ): Promise<IYoutubeLiveBroadcast> {

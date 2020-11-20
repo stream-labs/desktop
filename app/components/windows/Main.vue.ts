@@ -33,6 +33,7 @@ import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
 import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import PlatformMerge from 'components/pages/PlatformMerge';
+import StreamScheduler from 'components/pages/StreamScheduler';
 import { getPlatformService } from 'services/platforms';
 
 const loadedTheme = () => {
@@ -61,6 +62,7 @@ const loadedTheme = () => {
     PlatformMerge,
     LayoutEditor,
     AlertboxLibrary,
+    StreamScheduler,
   },
 })
 export default class Main extends Vue {

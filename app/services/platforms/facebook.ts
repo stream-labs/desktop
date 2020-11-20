@@ -20,6 +20,7 @@ import { BasePlatformService } from './base-platform';
 import electron from 'electron';
 import { WindowsService } from '../windows';
 import { assertIsDefined } from '../../util/properties-type-guards';
+import { Subject } from 'rxjs';
 
 interface IFacebookPage {
   access_token: string;
@@ -45,6 +46,7 @@ export interface IFacebookLiveVideo {
   description: string;
   permalink_url: string;
   planned_start_time: string;
+  broadcast_start_time: string;
 }
 
 interface IFacebookServiceState extends IPlatformState {
@@ -105,6 +107,8 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
 
   readonly platform = 'facebook';
   readonly displayName = 'Facebook';
+
+  streamScheduled = new Subject();
 
   readonly capabilities = new Set<TPlatformCapability>([
     'chat',
@@ -239,6 +243,18 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
         url: `${this.apiBase}/${liveVideoId}?fields=title,description,stream_url,planned_start_time,permalink_url`,
         method: 'POST',
         body: JSON.stringify(data),
+      },
+      token,
+    );
+  }
+
+  async removeLiveVideo(id: string): Promise<IFacebookLiveVideo> {
+    const token = this.views.getDestinationToken();
+
+    return await this.requestFacebook(
+      {
+        url: `${this.apiBase}/${id}`,
+        method: 'DELETE',
       },
       token,
     );
@@ -387,7 +403,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   async scheduleStream(
     scheduledStartTime: string,
     options: IFacebookStartStreamOptions,
-  ): Promise<any> {
+  ): Promise<void> {
     const { title, description, game } = options;
     const destinationId = this.views.getDestinationId(options);
     const token = this.views.getDestinationToken(options.destinationType, destinationId);
@@ -402,7 +418,8 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     const body = JSON.stringify(data);
 
     try {
-      return await platformRequest('facebook', { url, body, method: 'POST' }, token);
+      await platformRequest('facebook', { url, body, method: 'POST' }, token);
+      this.streamScheduled.next();
     } catch (e) {
       if (e?.result?.error?.code === 100) {
         throw new Error(
@@ -444,6 +461,26 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
       const videoDate = new Date(v.planned_start_time).valueOf();
       return videoDate >= minDate && videoDate <= maxDate;
     });
+  }
+
+  async fetchAllVideos(): Promise<IFacebookLiveVideo[]> {
+    const destinationType = this.state.settings.destinationType;
+    const destinationId = this.views.getDestinationId();
+    const token = this.views.getDestinationToken();
+    let sourceParam = '';
+    if (destinationType === 'page' || destinationType === 'me') {
+      sourceParam = '&source=owner';
+    } else {
+      sourceParam = '&source=target';
+    }
+
+    const videos = (
+      await this.requestFacebook<{ data: IFacebookLiveVideo[] }>(
+        `${this.apiBase}/${destinationId}/live_videos?&fields=title,description,planned_start_time,permalink_url,broadcast_start_time,from${sourceParam}`,
+        token,
+      )
+    ).data;
+    return videos;
   }
 
   async fetchGroups(): Promise<IFacebookPage[]> {
@@ -545,7 +582,8 @@ export class FacebookView extends ViewHandler<IFacebookServiceState> {
     return this.state.facebookGroups.find(g => g.id === id) || null;
   }
 
-  getDestinationId(options: IFacebookStartStreamOptions) {
+  getDestinationId(options?: IFacebookStartStreamOptions) {
+    if (!options) options = this.state.settings;
     switch (options.destinationType) {
       case 'me':
         return 'me';

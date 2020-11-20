@@ -40,6 +40,7 @@ import BrowserSourceInteraction from 'components/windows/BrowserSourceInteractio
 import WelcomeToPrime from 'components/windows/WelcomeToPrime';
 import GoLiveWindow from 'components/windows/go-live/GoLiveWindow';
 import EditStreamWindow from 'components/windows/go-live/EditStreamWindow';
+import ScheduleStreamWindowDeprecated from 'components/windows/go-live/ScheduleStreamWindowDeprecated';
 import ScheduleStreamWindow from 'components/windows/go-live/ScheduleStreamWindow';
 
 import BitGoal from 'components/widgets/goal/BitGoal.vue';
@@ -122,6 +123,7 @@ export function getComponents() {
     WelcomeToPrime,
     GoLiveWindow,
     EditStreamWindow,
+    ScheduleStreamWindowDeprecated,
     ScheduleStreamWindow,
   };
 }
