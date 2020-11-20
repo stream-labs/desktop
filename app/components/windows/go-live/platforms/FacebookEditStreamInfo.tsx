@@ -24,6 +24,7 @@ import { WindowsService } from 'services/windows';
 import Translate from 'components/shared/translate';
 import electron from 'electron';
 import styles from './FacebookEditStreamInfo.m.less';
+import { DismissablesService, EDismissable } from '../../../../services/dismissables';
 
 class Props {
   value?: IStreamSettings = undefined;
@@ -44,6 +45,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
   @Inject() private streamingService: StreamingService;
   @Inject() private navigationService: NavigationService;
   @Inject() private windowsService: WindowsService;
+  @Inject() private dismissablesService: DismissablesService;
   @SyncWithValue() settings: IStreamSettings;
 
   private scheduledVideos: IFacebookLiveVideo[] = [];
@@ -273,18 +275,24 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
     electron.remote.shell.openExternal(`https://www.facebook.com/groups/${groupId}/edit`);
   }
 
+  private dismissWarning() {
+    this.dismissablesService.actions.dismiss(EDismissable.FacebookNeedPermissionsTip);
+  }
+
   render() {
     const hasPages = this.facebookService.state.facebookPages.length;
     const fbSettings = this.settings.platforms.facebook;
     const shouldShowGroups = fbSettings.destinationType === 'group' && !this.props.isUpdateMode;
     const shouldShowPages = fbSettings.destinationType === 'page' && !this.props.isUpdateMode;
-    const shouldShowPermissionWarn = !this.canStreamToTimeline || !this.canStreamToGroup;
     const shouldShowGamingWarning = !hasPages && fbSettings.game;
     const shouldShowEvents = !this.props.isUpdateMode && !this.props.isScheduleMode;
     const shouldShowPrivacy = fbSettings.destinationType === 'me';
     const shouldShowPrivacyWarn =
       (!fbSettings.liveVideoId && fbSettings.privacy.value !== 'SELF') ||
       (fbSettings.liveVideoId && fbSettings.privacy.value);
+    const shouldShowPermissionWarn =
+      (!this.canStreamToTimeline || !this.canStreamToGroup) &&
+      !this.dismissablesService.state[EDismissable.FacebookNeedPermissionsTip];
 
     return (
       <ValidatedForm name="facebook-settings">
@@ -401,6 +409,9 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
             <button class="button button--facebook" onClick={() => this.reLogin()}>
               {$t('Re-login now')}
             </button>
+            <button class="button button--default" onclick={() => this.dismissWarning()}>
+              {$t('Do not show this message')}
+            </button>
           </div>
         )}
         {!isPrimary && (
@@ -408,6 +419,9 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
             <p>{$t('Please reconnect Facebook to get these new features')}</p>
             <button class="button button--facebook" onClick={() => this.reconnectFB()}>
               {$t('Reconnect now')}
+            </button>
+            <button class="button button--default" onclick={() => this.dismissWarning()}>
+              {$t('Do not show this message')}
             </button>
           </div>
         )}
