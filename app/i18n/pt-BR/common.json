@@ -86,8 +86,6 @@
   "Amount": "Valor",
   "here": "aqui",
   "Link": "Link",
-  "Whitelist": "Autorizados",
-  "Blacklist": "Lista Negra",
   "Description": "Descrição",
   "OBSInit.UnknownError": "Foi encontrado um erro desconhecido ao iniciar o OBS.",
   "OBSInit.ModuleNotFoundError": "Não encontramos o DirectX no seu sistema. Instale a última versão do DirectX disponível na sua máquina através desse link <https://www.microsoft.com/en-us/download/details.aspx?id=35?> e tente novamente.",
@@ -122,5 +120,9 @@
   "System error message:": "Mensagem de erro do sistema:",
   "List is empty": "List is empty",
   "Not selected": "Not selected",
-  "Friends": "Friends"
+  "Friends": "Friends",
+  "Width": "Largura",
+  "Height": "Altura",
+  "Use Custom": "Use Custom",
+  "Apply": "Apply"
 }
