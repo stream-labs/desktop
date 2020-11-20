@@ -417,14 +417,14 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
 
       // these events will be sent to the client even if isRequestsHandlingStopped = true
       // this allows to send this event even if the app is in the loading state
-      const whitelistedEvents: (keyof SceneCollectionsService)[] = [
+      const allowlistedEvents: (keyof SceneCollectionsService)[] = [
         'collectionWillSwitch',
         'collectionAdded',
         'collectionRemoved',
         'collectionSwitched',
         'collectionUpdated',
       ];
-      const force = (whitelistedEvents as string[]).includes(eventName);
+      const force = (allowlistedEvents as string[]).includes(eventName);
 
       const needToSendEvent =
         client.listenAllSubscriptions || client.subscriptions.includes(event.result.resourceId);

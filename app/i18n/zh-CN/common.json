@@ -86,8 +86,6 @@
   "Amount": "量",
   "here": "此处",
   "Link": "链接",
-  "Whitelist": "白名单",
-  "Blacklist": "黑名单",
   "Description": "描述",
   "OBSInit.UnknownError": "初始化 OBS 时遇到未知错误。",
   "OBSInit.ModuleNotFoundError": "在您的系统上找不到 DirectX。请在此处 <https://www.microsoft.com/en-us/download/details.aspx?id=35?> 为您的计算机安装最新版本的 DirectX 并重试。",

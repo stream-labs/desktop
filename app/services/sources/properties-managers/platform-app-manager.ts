@@ -15,7 +15,7 @@ export class PlatformAppManager extends PropertiesManager {
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() transitionsService: TransitionsService;
 
-  get blacklist() {
+  get denylist() {
     return ['url', 'is_local_file'];
   }
 

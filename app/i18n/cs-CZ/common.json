@@ -86,8 +86,6 @@
   "Amount": "Množství",
   "here": "zde",
   "Link": "Propojit",
-  "Whitelist": "Seznam povolených",
-  "Blacklist": "Seznam zakázaných",
   "Description": "Popis",
   "OBSInit.UnknownError": "Při inicializaci OBS došlo k neznámé chybě.",
   "OBSInit.ModuleNotFoundError": "Ve vašem počítači se nepodařilo najít rozhraní DirectX. Nejnovější verzi DirectX pro svůj počítač nainstalujte z adresy <https://www.microsoft.com/en-us/download/details.aspx?id=35?> a akci opakujte.",
