@@ -122,5 +122,9 @@
   "System error message:": "System error message:",
   "List is empty": "List is empty",
   "Not selected": "Not selected",
-  "Friends": "Friends"
+  "Friends": "Friends",
+  "Width": "Width",
+  "Height": "Height",
+  "Use Custom": "Use Custom",
+  "Apply": "Apply"
 }
