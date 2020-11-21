@@ -7,6 +7,7 @@ import { AppService } from 'services/app';
 export enum EDismissable {
   SceneCollectionsHelpTip = 'scene_collections_help_tip',
   RecentEventsHelpTip = 'recent_events_help_tip',
+  FacebookNeedPermissionsTip = 'facebook_need_permissions_tip',
 }
 
 interface IDismissablesServiceState {
