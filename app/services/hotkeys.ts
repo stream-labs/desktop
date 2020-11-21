@@ -12,6 +12,7 @@ import * as obs from '../../obs-api';
 import { GameOverlayService } from './game-overlay';
 import { CustomizationService } from './customization';
 import { RecentEventsService } from './recent-events';
+import { UsageStatisticsService } from './usage-statistics';
 
 function getScenesService(): ScenesService {
   return ScenesService.instance;
@@ -392,14 +393,10 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     hotkeys: [],
   };
 
-  @Inject()
-  private scenesService: ScenesService;
-
-  @Inject()
-  private sourcesService: SourcesService;
-
-  @Inject()
-  private keyListenerService: KeyListenerService;
+  @Inject() private scenesService: ScenesService;
+  @Inject() private sourcesService: SourcesService;
+  @Inject() private keyListenerService: KeyListenerService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
 
   /**
    * Memoizes the currently registered hotkeys
@@ -621,7 +618,10 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
       this.keyListenerService.register({
         ...binding,
         eventType: 'registerKeydown',
-        callback: () => hotkeys.forEach(hotkey => hotkey.action.downHandler()),
+        callback: () => {
+          this.usageStatisticsService.recordFeatureUsage('HotkeyPress');
+          hotkeys.forEach(hotkey => hotkey.action.downHandler());
+        },
       });
     });
 
