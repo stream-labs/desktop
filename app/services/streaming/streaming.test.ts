@@ -3,7 +3,7 @@ import { EStreamingState, ERecordingState } from './streaming-api';
 
 import { createSetupFunction } from 'util/test-setup';
 
-function noop() {}
+function noop(..._args: any[]) { }
 
 jest.mock('services/stateful-service');
 jest.mock('util/injector');
@@ -530,13 +530,14 @@ test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログ�
   expect(instance.optimizeForNiconicoAndStartStreaming).not.toHaveBeenCalled();
 });
 
-test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログインしていて、番組が定まり、最適化を行う場合', async () => {
+test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログインしていて、番組が定まり(番組放送中)、最適化を行う場合', async () => {
+  const updateStreamSettings = jest.fn(() => {
+    return { key: 'hoge' };
+  });
   setup({
     injectee: createInjectee({
       isNiconicoLoggedIn: true,
-      updateStreamSettings: () => {
-        return { key: 'hoge' };
-      },
+      updateStreamSettings,
       optimizeForNiconico: true,
     }),
     state: {
@@ -555,7 +556,73 @@ test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログ�
   instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve({ ok: true, value: [] }));
 
   await instance.toggleStreamingAsync();
+  expect(updateStreamSettings).toBeCalledWith('lv12345');
+  expect(instance.optimizeForNiconicoAndStartStreaming).toHaveBeenCalledTimes(1);
+  expect(instance.toggleStreaming).not.toHaveBeenCalled();
+});
 
+test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログインしていて、番組が定まり(番組放送中+予約番組あり)、最適化を行う場合', async () => {
+  const updateStreamSettings = jest.fn(() => {
+    return { key: 'hoge' };
+  });
+  setup({
+    injectee: createInjectee({
+      isNiconicoLoggedIn: true,
+      updateStreamSettings,
+      optimizeForNiconico: true,
+    }),
+    state: {
+      StreamingService: {
+        streamingStatus: EStreamingState.Offline,
+      },
+    },
+  });
+
+  const { StreamingService } = require('./streaming');
+  const { instance } = StreamingService;
+  instance.optimizeForNiconicoAndStartStreaming = jest.fn();
+  instance.toggleStreaming = jest.fn();
+
+  instance.client.fetchOnairUserProgram = jest.fn(() => Promise.resolve({
+    programId: 'lv12345',
+    nextProgramId: 'lv67890'
+  }));
+  instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve({ ok: true, value: [] }));
+
+  await instance.toggleStreamingAsync();
+  expect(updateStreamSettings).toBeCalledWith('lv12345');
+  expect(instance.optimizeForNiconicoAndStartStreaming).toHaveBeenCalledTimes(1);
+  expect(instance.toggleStreaming).not.toHaveBeenCalled();
+});
+
+test('toggleStreamingAsyncでstreamingStatusがoffline、ニコニコにログインしていて、番組が定まり(予約番組のみ)、最適化を行う場合', async () => {
+  const updateStreamSettings = jest.fn(() => {
+    return { key: 'hoge' };
+  });
+  setup({
+    injectee: createInjectee({
+      isNiconicoLoggedIn: true,
+      updateStreamSettings,
+      optimizeForNiconico: true,
+    }),
+    state: {
+      StreamingService: {
+        streamingStatus: EStreamingState.Offline,
+      },
+    },
+  });
+
+  const { StreamingService } = require('./streaming');
+  const { instance } = StreamingService;
+  instance.optimizeForNiconicoAndStartStreaming = jest.fn();
+  instance.toggleStreaming = jest.fn();
+
+  instance.client.fetchOnairUserProgram = jest.fn(() => Promise.resolve({ nextProgramId: 'lv67890' }));
+  instance.client.fetchOnairChannels = jest.fn(() => Promise.resolve({ ok: true, value: [] }));
+
+  await instance.toggleStreamingAsync();
+
+  expect(updateStreamSettings).toBeCalledWith('lv67890');
   expect(instance.optimizeForNiconicoAndStartStreaming).toHaveBeenCalledTimes(1);
   expect(instance.toggleStreaming).not.toHaveBeenCalled();
 });
