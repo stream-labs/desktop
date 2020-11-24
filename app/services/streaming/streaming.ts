@@ -29,12 +29,8 @@ import {
   NotificationsService,
 } from 'services/notifications';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
-import { NavigationService } from 'services/navigation';
-import { CustomizationService } from 'services/customization';
-import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService } from 'services/restream';
-import { FacebookService } from 'services/platforms/facebook';
 import Utils from 'services/utils';
 import { cloneDeep, isEqual } from 'lodash';
 import { createStreamError, StreamError, TStreamErrorType } from './stream-error';
@@ -42,7 +38,6 @@ import { authorizedHeaders } from 'util/requests';
 import { HostsService } from '../hosts';
 import { TwitterService } from '../integrations/twitter';
 import { assertIsDefined } from 'util/properties-type-guards';
-import { YoutubeService } from '../platforms/youtube';
 import { StreamInfoView } from './streaming-view';
 
 enum EOBSOutputType {
@@ -77,14 +72,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private notificationsService: NotificationsService;
   @Inject() private userService: UserService;
-  @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
-  @Inject() private navigationService: NavigationService;
-  @Inject() private customizationService: CustomizationService;
   @Inject() private restreamService: RestreamService;
   @Inject() private hostsService: HostsService;
-  @Inject() private facebookService: FacebookService;
-  @Inject() private youtubeService: YoutubeService;
   @Inject() private twitterService: TwitterService;
 
   streamingStatusChange = new Subject<EStreamingState>();
@@ -205,20 +195,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.UPDATE_STREAM_INFO({ lifecycle: 'waitForNewSettings' });
   }
 
-  /**
-   * Make a transition to Live
-   */
-  async goLive(newSettings?: IGoLiveSettings) {
-    // don't interact with API in loged out mode and when protected mode is disabled
-    if (
-      !this.userService.isLoggedIn ||
-      (!this.streamSettingsService.state.protectedModeEnabled &&
-        this.userService.state.auth?.primaryPlatform !== 'twitch') // twitch is a special case
-    ) {
-      this.finishStartStreaming();
-      return;
-    }
-
+  private setPrestreamConditions(newSettings?: IGoLiveSettings) {
     // clear the current stream info
     this.RESET_STREAM_INFO();
 
@@ -235,7 +212,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     // show the GoLive checklist
     this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist' });
 
-    // update channel settings for each platform
+    return { settings, unattendedMode };
+  }
+
+  private async updatePlatformChannelInfo(unattendedMode: boolean, settings: IGoLiveSettings) {
     const platforms = this.views.enabledPlatforms;
     for (const platform of platforms) {
       const service = getPlatformService(platform);
@@ -254,8 +234,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         return;
       }
     }
+  }
 
-    // setup restream
+  private async configureRestream() {
     if (this.views.isMultiplatformMode) {
       // check the Restream service is available
       let ready = false;
@@ -286,8 +267,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         return;
       }
     }
+  }
 
-    // apply optimized settings
+  private async optimizeSettings(unattendedMode: boolean, settings: IGoLiveSettings) {
     const optimizer = this.videoEncodingOptimizationService;
     if (optimizer.state.useOptimizedProfile && settings.optimizedProfile) {
       if (unattendedMode && optimizer.canApplyProfileFromCache()) {
@@ -297,7 +279,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       }
       await this.runCheck('applyOptimizedSettings');
     }
+  }
 
+  private async beginBroadcast(settings: IGoLiveSettings) {
     // start video transmission
     try {
       await this.runCheck('startVideoTransmission', () => this.finishStartStreaming());
@@ -318,8 +302,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     } catch (e) {
       console.error(e);
     }
+  }
 
-    // tweet
+  private async sendTweet(settings: IGoLiveSettings) {
     if (
       settings.tweetText &&
       this.twitterService.state.linked &&
@@ -333,13 +318,40 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         return;
       }
     }
+  }
 
-    // all done
+  private setLiveState(settings: IGoLiveSettings) {
     if (this.state.streamingStatus === EStreamingState.Live) {
       this.UPDATE_STREAM_INFO({ lifecycle: 'live' });
       this.createGameAssociation(this.views.commonFields.game);
       this.recordAfterStreamStartAnalytics(settings);
     }
+  }
+
+  /**
+   * Make a transition to Live
+   */
+  async goLive(newSettings?: IGoLiveSettings) {
+    // don't interact with API in loged out mode and when protected mode is disabled
+    if (
+      !this.userService.isLoggedIn ||
+      (!this.streamSettingsService.state.protectedModeEnabled &&
+        this.userService.state.auth?.primaryPlatform !== 'twitch') // twitch is a special case
+    ) {
+      this.finishStartStreaming();
+      return;
+    }
+
+    const { settings, unattendedMode } = this.setPrestreamConditions(newSettings);
+
+    await this.updatePlatformChannelInfo(unattendedMode, settings);
+    await this.configureRestream();
+    await this.optimizeSettings(unattendedMode, settings);
+    await this.beginBroadcast(settings);
+    await this.sendTweet(settings);
+
+    // all done
+    this.setLiveState(settings);
   }
 
   private recordAfterStreamStartAnalytics(settings: IGoLiveSettings) {
@@ -591,38 +603,68 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     return startStreamingPromise;
   }
 
-  async toggleStreaming(options?: TStartStreamOptions, force = false) {
-    if (this.state.streamingStatus === EStreamingState.Offline) {
-      // in the "force" mode just try to start streaming without updating channel info
-      if (force) {
-        await this.finishStartStreaming();
-        return Promise.resolve();
-      }
-      try {
-        await this.goLive();
-        return Promise.resolve();
-      } catch (e) {
-        return Promise.reject(e);
-      }
+  async handleStreamOffline(force: boolean) {
+    // in the "force" mode just try to start streaming without updating channel info
+    if (force) {
+      await this.finishStartStreaming();
+      return Promise.resolve();
+    }
+    try {
+      await this.goLive();
+      return Promise.resolve();
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
+
+  async showEndStreamConfirmation() {
+    const shouldConfirm = this.streamSettingsService.settings.warnBeforeStoppingStream;
+
+    if (shouldConfirm) {
+      const endStream = await electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
+        title: $t('End Stream'),
+        type: 'warning',
+        message: $t('Are you sure you want to stop streaming?'),
+        buttons: [$t('Cancel'), $t('End Stream')],
+      });
+
+      return endStream.response;
+    }
+  }
+
+  setRecordingStatus() {
+    const keepRecording = this.streamSettingsService.settings.keepRecordingWhenStreamStops;
+    if (!keepRecording && this.state.recordingStatus === ERecordingState.Recording) {
+      this.toggleRecording();
     }
 
+    const keepReplaying = this.streamSettingsService.settings.keepReplayBufferStreamStops;
+    if (!keepReplaying && this.state.replayBufferStatus === EReplayBufferState.Running) {
+      this.stopReplayBuffer();
+    }
+  }
+
+  runPostStreamHooks() {
+    this.windowsService.closeChildWindow();
+    this.views.enabledPlatforms.forEach(platform => {
+      const service = getPlatformService(platform);
+      if (service.afterStopStream) service.afterStopStream();
+    });
+    this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
+  }
+
+  async toggleStreaming(options?: TStartStreamOptions, force = false) {
+    const streamingStatus = this.state.streamingStatus;
+    if (streamingStatus === EStreamingState.Offline) await this.handleStreamOffline(force);
+
+    // Begin stream shutdown if user is in a broadcasting state
     if (
-      this.state.streamingStatus === EStreamingState.Starting ||
-      this.state.streamingStatus === EStreamingState.Live ||
-      this.state.streamingStatus === EStreamingState.Reconnecting
+      [EStreamingState.Starting, EStreamingState.Live, EStreamingState.Reconnecting].includes(
+        streamingStatus,
+      )
     ) {
-      const shouldConfirm = this.streamSettingsService.settings.warnBeforeStoppingStream;
-
-      if (shouldConfirm) {
-        const endStream = await electron.remote.dialog.showMessageBox(Utils.getMainWindow(), {
-          title: $t('End Stream'),
-          type: 'warning',
-          message: $t('Are you sure you want to stop streaming?'),
-          buttons: [$t('Cancel'), $t('End Stream')],
-        });
-
-        if (!endStream.response) return;
-      }
+      const endStreamConfimation = await this.showEndStreamConfirmation();
+      if (!endStreamConfimation) return;
 
       if (this.powerSaveId) {
         electron.remote.powerSaveBlocker.stop(this.powerSaveId);
@@ -630,26 +672,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
       obs.NodeObs.OBS_service_stopStreaming(false);
 
-      const keepRecording = this.streamSettingsService.settings.keepRecordingWhenStreamStops;
-      if (!keepRecording && this.state.recordingStatus === ERecordingState.Recording) {
-        this.toggleRecording();
-      }
-
-      const keepReplaying = this.streamSettingsService.settings.keepReplayBufferStreamStops;
-      if (!keepReplaying && this.state.replayBufferStatus === EReplayBufferState.Running) {
-        this.stopReplayBuffer();
-      }
-
-      this.windowsService.closeChildWindow();
-      this.views.enabledPlatforms.forEach(platform => {
-        const service = getPlatformService(platform);
-        if (service.afterStopStream) service.afterStopStream();
-      });
-      this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
+      this.setRecordingStatus();
+      this.runPostStreamHooks();
       return Promise.resolve();
     }
 
-    if (this.state.streamingStatus === EStreamingState.Ending) {
+    if (streamingStatus === EStreamingState.Ending) {
       obs.NodeObs.OBS_service_stopStreaming(true);
       return Promise.resolve();
     }
