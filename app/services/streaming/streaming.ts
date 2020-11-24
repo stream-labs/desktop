@@ -638,6 +638,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
       return endStream.response;
     }
+    return true;
   }
 
   setRecordingStatus() {
@@ -663,7 +664,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   async toggleStreaming(options?: TStartStreamOptions, force = false) {
     const streamingStatus = this.state.streamingStatus;
-    if (streamingStatus === EStreamingState.Offline) await this.handleStreamOffline(force);
+    if (streamingStatus === EStreamingState.Offline) return await this.handleStreamOffline(force);
 
     // Begin stream shutdown if user is in a broadcasting state
     if (
