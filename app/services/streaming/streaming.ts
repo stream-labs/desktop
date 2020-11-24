@@ -176,17 +176,19 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           }
 
           // 配信可能チャンネルがなく、配信できるユーザー生放送もない場合
-          if (!broadcastableUserProgram.programId) {
+          if (!broadcastableUserProgram.programId && !broadcastableUserProgram.nextProgramId) {
             return this.showNotBroadcastingMessageBox();
           }
         }
 
-        // 配信番組選択ウィンドウでチャンネル番組が選ばれた時はそのチャンネル番組を, それ以外の場合は放送中のユーザー番組を代入
+        // 配信番組選択ウィンドウでチャンネル番組が選ばれた時はそのチャンネル番組を, それ以外の場合は放送中のユーザー番組のIDを代入
+        // ユーザー番組については、即時番組があればそれを優先し、なければ予約番組の番組IDを採用する。
         const programId = 
             opts.nicoliveProgramSelectorResult &&
             opts.nicoliveProgramSelectorResult.providerType === 'channel' &&
             opts.nicoliveProgramSelectorResult.channelProgramId ?
-            opts.nicoliveProgramSelectorResult.channelProgramId : broadcastableUserProgram.programId;
+            opts.nicoliveProgramSelectorResult.channelProgramId :
+            (broadcastableUserProgram.programId || broadcastableUserProgram.nextProgramId)
 
         // 配信番組選択ウィンドウでユーザー番組を選んだが、配信可能なユーザー番組がない場合
         if (!programId) {
