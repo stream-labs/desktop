@@ -231,7 +231,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
             ? 'SETTINGS_UPDATE_FAILED'
             : e.type || 'UNKNOWN_ERROR';
         this.setError(errorType, e.details, platform);
-        return;
+        throw e;
       }
     }
   }
@@ -247,11 +247,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         );
       } catch (e) {
         console.error('Error fetching restreaming service', e);
+        throw e;
       }
       // Assume restream is down
       if (!ready) {
         this.setError('RESTREAM_DISABLED');
-        return;
+        throw new Error('Restream Disabled');
       }
 
       // update restream settings
@@ -264,7 +265,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       } catch (e) {
         console.error('Failed to setup restream', e);
         this.setError('RESTREAM_SETUP_FAILED');
-        return;
+        throw e;
       }
     }
   }
@@ -286,7 +287,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     try {
       await this.runCheck('startVideoTransmission', () => this.finishStartStreaming());
     } catch (e) {
-      return;
+      console.error(e);
+      throw e;
     }
 
     // check if we should show the waring about the disabled Auto-start
@@ -301,6 +303,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       });
     } catch (e) {
       console.error(e);
+      throw e;
     }
   }
 
@@ -315,7 +318,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       } catch (e) {
         console.error('unable to post a tweet', e);
         this.setError(e);
-        return;
+        throw e;
       }
     }
   }
@@ -344,11 +347,16 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
     const { settings, unattendedMode } = this.setPrestreamConditions(newSettings);
 
-    await this.updatePlatformChannelInfo(unattendedMode, settings);
-    await this.configureRestream();
-    await this.optimizeSettings(unattendedMode, settings);
-    await this.beginBroadcast(settings);
-    await this.sendTweet(settings);
+    try {
+      await this.updatePlatformChannelInfo(unattendedMode, settings);
+      await this.configureRestream();
+      await this.optimizeSettings(unattendedMode, settings);
+      await this.beginBroadcast(settings);
+      await this.sendTweet(settings);
+    } catch (e) {
+      // Quit early if any of the above functions error out
+      return;
+    }
 
     // all done
     this.setLiveState(settings);
