@@ -20,7 +20,7 @@
             "name": "node-fontinfo",
             "url": "https://slobs-node-fontinfo.s3-us-west-2.amazonaws.com/",
             "archive": "node-fontinfo-[VERSION]-[OS].tar.gz",
-            "version": "1.0.14",
+            "version": "1.0.15",
             "win64": true,
             "osx": true
         },
