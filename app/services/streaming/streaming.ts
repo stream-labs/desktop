@@ -247,7 +247,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         );
       } catch (e) {
         console.error('Error fetching restreaming service', e);
-        throw e;
       }
       // Assume restream is down
       if (!ready) {
