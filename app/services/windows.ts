@@ -83,6 +83,7 @@ export interface IWindowOptions {
   preservePrevWindow?: boolean;
   prevWindowOptions? : IWindowOptions;
   isFullScreen?: boolean;
+  hideBlankSlate?: boolean;
 }
 
 interface IWindowsState {

@@ -75,6 +75,8 @@ export class MonitorCaptureCroppingService extends StatefulService<IMonitorCaptu
       transparent: true,
       resizable: false,
       alwaysOnTop: true,
+      isFullScreen: true, // hide TitleBar
+      hideBlankSlate: true,
     });
     this.SET_WINDOW_ID(windowId);
 
