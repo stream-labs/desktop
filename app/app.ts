@@ -36,7 +36,11 @@ window['obs'] = window['require']('obs-studio-node');
 
 { // Set up things for IPC
   // Connect to the IPC Server
-  window['obs'].IPC.connect(remote.process.env.NAIR_IPC_PATH);
+  try {
+    window['obs'].IPC.connect(remote.process.env.NAIR_IPC_PATH);
+  } catch (e) {
+    console.log(`obs.IPC.connect failed: ${e}`);
+  }
   document.addEventListener('close', (e) => {
     window['obs'].IPC.disconnect();
   });
