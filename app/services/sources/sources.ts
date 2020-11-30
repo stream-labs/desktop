@@ -294,7 +294,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       this.usageStatisticsService.recordFeatureUsage('DShowInput');
     } else if (type === 'window_capture') {
       this.usageStatisticsService.recordFeatureUsage('WindowCapture');
-    } else if (type === 'display_capture') {
+    } else if (type === 'monitor_capture') {
       this.usageStatisticsService.recordFeatureUsage('DisplayCapture');
     } else if (type === 'game_capture') {
       this.usageStatisticsService.recordFeatureUsage('GameCapture');
