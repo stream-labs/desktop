@@ -12,6 +12,5 @@ export const notes: IPatchNotes = {
     'Fixed a bug related to keyboard shortcuts in the Edit Transform Window',
     'Fixed a bug where the Scenes list appeared empty in some layouts',
     'Fixed a bug loading Alert Box settings with a merged account',
-    'Updated frontend system architecture to Electron 9',
   ],
 };
