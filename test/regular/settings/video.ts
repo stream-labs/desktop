@@ -1,41 +1,32 @@
-import { focusChild, focusMain, test, useSpectron } from '../../helpers/spectron';
-import { addTrailingSpace, createOptionsAssertion } from '../../helpers/spectron/assertions';
-import { FormMonkey } from '../../helpers/form-monkey';
-import { setFormDropdown } from '../../helpers/spectron/forms';
+import { test, useSpectron } from '../../helpers/spectron';
+import { assertOptions } from '../../helpers/spectron/assertions';
+import { showSettings } from '../../helpers/spectron/settings';
 
 useSpectron();
 
 test('Populates video settings', async t => {
-  const form = new FormMonkey(t);
-  const assertOptions = createOptionsAssertion(t, form);
+  await showSettings(t, 'Video');
 
-  const { app } = t.context;
-
-  await focusMain(t);
-  await app.client.click('.side-nav .icon-settings');
-
-  await focusChild(t);
-  await app.client.click('li=Video');
-
-  await assertOptions(
-    '[data-name=ScaleType]',
+  await assertOptions(t, 'ScaleType', 'Bicubic (Sharpened scaling, 16 samples)', [
+    'Bilinear (Fastest, but blurry if scaling)',
     'Bicubic (Sharpened scaling, 16 samples)',
-    [
-      'Bilinear (Fastest, but blurry if scaling)',
-      'Bicubic (Sharpened scaling, 16 samples)',
-      'Lanczos (Sharpened scaling, 32 samples)',
-    ].map(addTrailingSpace),
-  );
+    'Lanczos (Sharpened scaling, 32 samples)',
+  ]);
 
-  await assertOptions(
-    '[data-name=FPSType]',
+  await assertOptions(t, 'FPSType', 'Common FPS Values', [
     'Common FPS Values',
-    ['Common FPS Values', 'Integer FPS Value', 'Fractional FPS Value'].map(addTrailingSpace),
-  );
+    'Integer FPS Value',
+    'Fractional FPS Value',
+  ]);
 
-  await assertOptions(
-    '[data-name=FPSCommon]',
+  await assertOptions(t, 'FPSCommon', '30', [
+    '10',
+    '20',
+    '24 NTSC',
+    '29.97',
     '30',
-    ['10', '20', '24 NTSC', '29.97', '30', '48', '59.94', '60'].map(addTrailingSpace),
-  );
+    '48',
+    '59.94',
+    '60',
+  ]);
 });

@@ -22,7 +22,8 @@ import namingHelpers from '../../util/NamingHelpers';
 import { WindowsService } from 'services/windows';
 import { UserService } from 'services/user';
 import { TcpServerService } from 'services/api/tcp-server';
-import { OverlaysPersistenceService, IDownloadProgress } from './overlays';
+import { OverlaysPersistenceService } from './overlays';
+import { IDownloadProgress } from 'util/requests';
 import {
   ISceneCollectionsManifestEntry,
   ISceneCollectionSchema,
@@ -329,6 +330,9 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     );
     const collectionName = this.suggestName(name);
     await this.loadOverlay(pathName, collectionName);
+
+    // repair scene collection in the case if it has any issues
+    this.scenesService.repair();
   }
 
   /**

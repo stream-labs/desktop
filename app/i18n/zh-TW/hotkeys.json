@@ -21,5 +21,7 @@
   "Play/Pause": "播放/暫停",
   "Restart": "重新啟動",
   "Next Slide": "下一個投影片",
-  "Previous Slide": "上一個投影片"
+  "Previous Slide": "上一個投影片",
+  "Toggle Performance Mode": "Toggle Performance Mode",
+  "Skip Alert": "跳過通知"
 }

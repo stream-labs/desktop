@@ -32,7 +32,7 @@
   "Submit": "Kirim",
   "Save": "Simpan",
   "Edit": "Edit",
-  "Login": "Login",
+  "Log In": "Log In",
   "Yes": "Ya",
   "No": "Tidak",
   "OK": "OK",
@@ -55,6 +55,7 @@
   "Cloudbot": "Cloudbot",
   "Merch": "Merch",
   "App Store": "App Store",
+  "Alertbox Library": "Alertbox Library",
   "New": "Baru",
   "Face Masks": "Masker Wajah",
   "Help": "Bantuan",
@@ -85,13 +86,11 @@
   "Amount": "Jumlah",
   "here": "di sini",
   "Link": "Tautan",
-  "Whitelist": "Daftar putih",
-  "Blacklist": "Daftar hitam",
   "Description": "Deskripsi",
   "OBSInit.UnknownError": "Ditemui kesalahan yang tidak diketahui saat menginisialisasi OBS.",
   "OBSInit.ModuleNotFoundError": "DirectX tidak bisa ditemukan di sistem Anda. Instal versi DirectX terbaru di mesin Anda di sini <https://www.microsoft.com/en-us/download/details.aspx?id=35?> dan coba lagi.",
   "OBSInit.NotSupportedError": "Gagal menginisialisasi OBS. Driver video Anda mungkin sudah kedaluwarsa atau Streamlabs OBS mungkin tidak didukung pada sistem Anda.",
-  "Logout %{username}": "Logout %{username}",
+  "Log Out": "Log Out",
   "Layout Editor": "Editor Tata Letak",
   "Are you sure you want to import multiple files?": "Anda yakin ingin mengimpor beberapa file?",
   "Studio": "Studio",
@@ -118,5 +117,5 @@
   "Apps": "Aplikasi",
   "Finish": "Selesai",
   "Get Prime": "Dapatkan Prime",
-  "System error message:": "System error message:"
+  "System error message:": "Pesan kesalahan sistem:"
 }

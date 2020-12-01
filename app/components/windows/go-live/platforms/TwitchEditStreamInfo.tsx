@@ -9,6 +9,9 @@ import TwitchTagsInput from 'components/shared/inputs/TwitchTagsInput.vue';
 import { IStreamSettings, StreamingService } from 'services/streaming';
 import { SyncWithValue } from 'services/app/app-decorators';
 import BaseEditSteamInfo from './BaseEditSteamInfo';
+import HFormGroup from '../../../shared/inputs/HFormGroup.vue';
+import { $t } from '../../../../services/i18n';
+import GameSelector from '../GameSelector';
 
 class TwitchEditStreamProps {
   value?: IStreamSettings;
@@ -27,6 +30,11 @@ export default class TwitchEditStreamInfo extends BaseEditSteamInfo<TwitchEditSt
         {!canShowOnlyRequiredFields && (
           <CommonPlatformFields vModel={this.settings} platform="twitch" />
         )}
+
+        <HFormGroup title={$t('Twitch Game')}>
+          <GameSelector vModel={this.settings} platform="twitch" />
+        </HFormGroup>
+
         {!canShowOnlyRequiredFields && (
           <TwitchTagsInput
             tags={this.twitchService.state.availableTags}

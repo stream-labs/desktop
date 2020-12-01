@@ -149,12 +149,15 @@ export default class MediaGallery extends Vue {
     this.dragOver = false;
   }
 
-  openFilePicker() {
-    electron.remote.dialog.showOpenDialog(
+  async openFilePicker() {
+    const choices = await electron.remote.dialog.showOpenDialog(
       electron.remote.getCurrentWindow(),
       { properties: ['openFile', 'multiSelections'] },
-      this.upload,
     );
+
+    if (choices && choices.filePaths) {
+      this.upload(choices.filePaths);
+    }
   }
 
   handleFileDrop(e: DragEvent) {
@@ -203,12 +206,13 @@ export default class MediaGallery extends Vue {
   }
 
   handleSelect() {
+    if (!this.selectedFile) return this.windowsService.actions.closeChildWindow();
     if (this.selectedFile.prime && !this.userService.views.isPrime) {
       this.upgradeToPrime();
       return;
     }
     this.mediaGalleryService.resolveFileSelect(this.promiseId, this.selectedFile);
-    this.windowsService.closeChildWindow();
+    this.windowsService.actions.closeChildWindow();
   }
 
   async handleDelete() {

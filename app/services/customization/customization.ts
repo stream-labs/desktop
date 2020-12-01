@@ -171,6 +171,10 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     this.setSettings({ pinnedStatistics: pinned });
   }
 
+  togglePerformanceMode() {
+    this.setSettings({ performanceMode: !this.state.performanceMode });
+  }
+
   get themeOptions() {
     const options = [
       { value: 'night-theme', title: $t('Night') },

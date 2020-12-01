@@ -13,6 +13,7 @@ export abstract class ModifyTransformCommand extends CombinableCommand {
 
   constructor(protected selection: Selection) {
     super();
+    this.selection.freeze();
     this.selection.getItems().forEach(item => {
       this.startTransforms[item.id] = cloneDeep(item.state.transform);
     });

@@ -32,7 +32,7 @@
   "Submit": "提交",
   "Save": "保存",
   "Edit": "编辑",
-  "Login": "登陆",
+  "Log In": "Log In",
   "Yes": "是",
   "No": "否",
   "OK": "好",
@@ -55,6 +55,7 @@
   "Cloudbot": "云机器人",
   "Merch": "Merch",
   "App Store": "App Store",
+  "Alertbox Library": "Alertbox Library",
   "New": "新",
   "Face Masks": "面部蒙版",
   "Help": "帮助",
@@ -85,13 +86,11 @@
   "Amount": "量",
   "here": "此处",
   "Link": "链接",
-  "Whitelist": "白名单",
-  "Blacklist": "黑名单",
   "Description": "描述",
   "OBSInit.UnknownError": "初始化 OBS 时遇到未知错误。",
   "OBSInit.ModuleNotFoundError": "在您的系统上找不到 DirectX。请在此处 <https://www.microsoft.com/en-us/download/details.aspx?id=35?> 为您的计算机安装最新版本的 DirectX 并重试。",
   "OBSInit.NotSupportedError": "初始化 OBS 失败。您的视频驱动程序可能已过期，或者系统不支持 Streamlabs OBS。",
-  "Logout %{username}": "注销 %{username}",
+  "Log Out": "Log Out",
   "Layout Editor": "布局编辑器",
   "Are you sure you want to import multiple files?": "是否确定导入多个文件？",
   "Studio": "工作室",
@@ -118,5 +117,5 @@
   "Apps": "应用程序",
   "Finish": "完成",
   "Get Prime": "获取 Prime",
-  "System error message:": "System error message:"
+  "System error message:": "系统错误信息："
 }

@@ -149,12 +149,16 @@ export default class Connect extends TsxComponent<ConnectProps> {
                 {
                   value: 'dlive',
                   title: 'Dlive',
-                  icon: require('../../../../media/images/platforms/dlive-logo-small.png'),
+                  data: {
+                    image: require('../../../../media/images/platforms/dlive-logo-small.png'),
+                  },
                 },
                 {
                   value: 'nimotv',
                   title: 'NimoTV',
-                  icon: require('../../../../media/images/platforms/nimo-logo-small.png'),
+                  data: {
+                    image: require('../../../../media/images/platforms/nimo-logo-small.png'),
+                  },
                 },
               ] as IListOption<TExtraPlatform>[],
             }}

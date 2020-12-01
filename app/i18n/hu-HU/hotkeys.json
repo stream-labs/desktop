@@ -21,5 +21,7 @@
   "Play/Pause": "Lejátszás / Szünet",
   "Restart": "Újrakezd",
   "Next Slide": "Következő dia",
-  "Previous Slide": "Előző dia"
+  "Previous Slide": "Előző dia",
+  "Toggle Performance Mode": "Toggle Performance Mode",
+  "Skip Alert": "Értesítés átugrása"
 }

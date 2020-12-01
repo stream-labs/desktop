@@ -37,7 +37,6 @@ import AdvancedStatistics from 'components/windows/AdvancedStatistics';
 import OverlayWindow from 'components/windows/OverlayWindow.vue';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
-import ShareStream from 'components/windows/ShareStream';
 import WelcomeToPrime from 'components/windows/WelcomeToPrime';
 import GoLiveWindow from 'components/windows/go-live/GoLiveWindow';
 import EditStreamWindow from 'components/windows/go-live/EditStreamWindow';
@@ -64,6 +63,8 @@ import SpinWheel from 'components/widgets/SpinWheel.vue';
 
 import PerformanceMetrics from 'components/PerformanceMetrics.vue';
 import { byOS, OS } from 'util/operating-systems';
+import { UsageStatisticsService } from './usage-statistics';
+import { Inject } from 'services/core';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -120,7 +121,6 @@ export function getComponents() {
     MediaShare,
     AlertBox,
     SpinWheel,
-    ShareStream,
     WelcomeToPrime,
     GoLiveWindow,
     EditStreamWindow,
@@ -166,6 +166,8 @@ const DEFAULT_WINDOW_OPTIONS: IWindowOptions = {
 };
 
 export class WindowsService extends StatefulService<IWindowsState> {
+  @Inject() usageStatisticsService: UsageStatisticsService;
+
   /**
    * 'main' and 'child' are special window ids that always exist
    * and have special purposes.  All other windows ids are considered
@@ -207,6 +209,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.updateScaleFactor('child');
     this.windows.main.on('move', () => this.updateScaleFactor('main'));
     this.windows.child.on('move', () => this.updateScaleFactor('child'));
+
+    if (electron.remote.screen.getAllDisplays().length > 1) {
+      this.usageStatisticsService.recordFeatureUsage('MultipleDisplays');
+    }
   }
 
   @throttle(500)
@@ -422,6 +428,14 @@ export class WindowsService extends StatefulService<IWindowsState> {
       this.windows[windowId].on('closed', resolve);
       this.windows[windowId].destroy();
     });
+  }
+
+  /**
+   * Should only be called when the app is shutting down.
+   */
+  shutdown() {
+    this.closeAllOneOffs();
+    this.windows.child.close();
   }
 
   // @ExecuteInCurrentWindow()

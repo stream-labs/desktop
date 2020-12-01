@@ -17,6 +17,7 @@
   "Rather do this manually?": "Manuálisan szeretnéd csinálni?",
   "Setup later": "Beállítás később",
   "Widget Theme installed & activated. Click here to manage your Widget Profiles.": "A Widget Témákat installáltuk & aktiváltuk. A Modul Profilok beállításaihoz kattints ide.",
+  "Alertbox Theme installed & activated. Click here to manage your Widget Profiles.": "Alertbox Theme installed & activated. Click here to manage your Widget Profiles.",
   "Follow": "Követés",
   "Subscription": "Feliratkozás",
   "Donation": "Támogatás",
@@ -180,5 +181,6 @@
   "Slide Out Down": "Kicsúsztatás Lentre",
   "Slide Out Left": "Kicsúsztatás Balról",
   "Slide Out Right": "Kicsúsztatás Jobbra",
-  "Slide Out Up": "Kicsúsztatás Fentre"
+  "Slide Out Up": "Kicsúsztatás Fentre",
+  "Pick Screen Color": "Pick Screen Color"
 }

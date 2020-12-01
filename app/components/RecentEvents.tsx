@@ -248,7 +248,8 @@ class EventCell extends TsxComponent<EventCellProps> {
     if (this.timestampInterval) clearInterval(this.timestampInterval);
   }
 
-  platformIcon(platform: string) {
+  get platformIcon() {
+    const platform = this.props.event.platform;
     return {
       twitch_account: <PlatformLogo platform="twitch" />,
       youtube_account: <PlatformLogo platform="youtube" />,
@@ -276,7 +277,7 @@ class EventCell extends TsxComponent<EventCellProps> {
         onClick={() => this.props.readAlert(this.props.event)}
       >
         <span class={styles.timestamp}>{this.timestamp}</span>
-        {this.platformIcon(this.props.event.platform)}
+        {this.platformIcon}
         <span class={styles.name}>{getName(this.props.event)}</span>
         <span class={styles.message}>{this.props.eventString(this.props.event)}</span>
         {this.props.event.gifter && (

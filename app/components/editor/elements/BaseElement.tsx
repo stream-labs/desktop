@@ -29,6 +29,7 @@ export default class BaseElement extends TsxComponent {
 
   mounted() {
     this.sizeWatcher = () => {
+      if (!this.$el?.getBoundingClientRect) return;
       this.height = this.$el.getBoundingClientRect().height;
       this.width = this.$el.getBoundingClientRect().width;
     };

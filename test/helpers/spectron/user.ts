@@ -1,4 +1,4 @@
-import { focusMain, TExecutionContext, focusWorker } from './index';
+import { focusMain, TExecutionContext, focusWorker, focusChild, closeWindow } from './index';
 import { IUserAuth, IPlatformAuth, TPlatform } from '../../../app/services/platforms';
 import { sleep } from '../sleep';
 import { dialogDismiss } from './dialog';
@@ -59,9 +59,16 @@ export async function logOut(t: TExecutionContext, skipUI = false) {
   // logout from the SLOBS app
   if (!skipUI) {
     await focusMain(t);
+    await t.context.app.client.click('.icon-settings');
+    await focusChild(t);
     await t.context.app.client.click('.fa-sign-out-alt');
     await dialogDismiss(t, 'Yes');
+    await focusMain(t);
+    await t.context.app.client.click('.icon-settings');
+    await focusChild(t);
     await t.context.app.client.waitForVisible('.fa-sign-in-alt'); // wait for the log-in button
+    await closeWindow(t);
+    await focusMain(t);
   }
   // release the testing user
   await releaseUserInPool(user);
@@ -70,7 +77,7 @@ export async function logOut(t: TExecutionContext, skipUI = false) {
 
 /**
  * Login SLOBS into user's account
- * If env.USER_POOL_TOKEN is set than request credentials from slobs-users-pool service
+ * If env.SLOBS_TEST_USER_POOL_TOKEN is set than request credentials from slobs-users-pool service
  * otherwise fetch credentials from ENV variables
  */
 export async function logIn(
@@ -85,7 +92,7 @@ export async function logIn(
   if (USER_POOL_TOKEN) {
     user = await reserveUserFromPool(t, platform, features);
   } else {
-    throw new Error('Setup env variable USER_POOL_TOKEN to run this test');
+    throw new Error('Setup env variable SLOBS_TEST_USER_POOL_TOKEN to run this test');
   }
 
   await loginWithAuthInfo(t, user, waitForUI, isOnboardingTest);
@@ -116,12 +123,17 @@ export async function loginWithAuthInfo(
   t.context.app.webContents.send('testing-fakeAuth', authInfo, isOnboardingTest);
   await focusMain(t);
   if (!waitForUI) return true;
-  await t.context.app.client.waitForVisible('.fa-sign-out-alt', 30000); // wait for the log-out button
-  return true;
+  return await isLoggedIn(t);
 }
 
 export async function isLoggedIn(t: TExecutionContext) {
-  return t.context.app.client.isVisible('.fa-sign-out-alt');
+  await t.context.app.client.waitForVisible('.icon-settings');
+  await t.context.app.client.click('.icon-settings');
+  await focusChild(t);
+  const isLoggedIn = await t.context.app.client.isVisible('.fa-sign-out-alt');
+  await closeWindow(t);
+  await focusMain(t);
+  return isLoggedIn;
 }
 
 /**
@@ -144,7 +156,8 @@ export async function reserveUserFromPool(
 ): Promise<ITestUser> {
   // try to get a user account from users-pool service
   // give it several attempts
-  let attempts = 3;
+  const maxAttempts = 5;
+  let attempts = maxAttempts;
   let reservedUser = null;
   while (attempts--) {
     try {
@@ -180,7 +193,7 @@ export async function reserveUserFromPool(
       }
     }
   }
-  if (!reservedUser) throw new Error('Unable to reserve a user after 3 attempts');
+  if (!reservedUser) throw new Error(`Unable to reserve a user after ${maxAttempts} attempts`);
   return reservedUser;
 }
 
