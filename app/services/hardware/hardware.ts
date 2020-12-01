@@ -2,6 +2,8 @@ import { mutation, StatefulService } from '../core/stateful-service';
 import * as obs from '../../../obs-api';
 import uuid from 'uuid/v4';
 import { byOS, OS } from 'util/operating-systems';
+import { Inject } from 'services/core';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 export enum EDeviceType {
   audioInput = 'audioInput',
@@ -21,6 +23,8 @@ export interface IHardwareServiceState {
 }
 
 export class HardwareService extends StatefulService<IHardwareServiceState> {
+  @Inject() usageStatisticsService: UsageStatisticsService;
+
   static initialState: IHardwareServiceState = {
     devices: [],
     dshowDevices: [],
@@ -82,6 +86,10 @@ export class HardwareService extends StatefulService<IHardwareServiceState> {
 
     (obsAudioInput.properties.get('device_id') as obs.IListProperty).details.items.forEach(
       (item: { name: string; value: string }) => {
+        if (item.name === 'NVIDIA Broadcast') {
+          this.usageStatisticsService.recordFeatureUsage('NvidiaVirtualMic');
+        }
+
         devices.push({
           id: item.value,
           description: item.name,
@@ -103,6 +111,10 @@ export class HardwareService extends StatefulService<IHardwareServiceState> {
     (obsVideoInput.properties.get(
       byOS({ [OS.Windows]: 'video_device_id', [OS.Mac]: 'device' }),
     ) as obs.IListProperty).details.items.forEach((item: { name: string; value: string }) => {
+      if (item.name === 'NVIDIA Broadcast') {
+        this.usageStatisticsService.recordFeatureUsage('NvidiaVirtualCam');
+      }
+
       if (item.value) {
         dshowDevices.push({
           id: item.value,

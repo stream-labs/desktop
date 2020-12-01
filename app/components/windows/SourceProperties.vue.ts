@@ -16,6 +16,7 @@ import electron from 'electron';
 import { ErrorField } from 'vee-validate';
 import { CustomizationService } from 'services/customization';
 import { EditorCommandsService } from 'services/editor-commands';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 @Component({
   components: {
@@ -32,6 +33,7 @@ export default class SourceProperties extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() customizationService: CustomizationService;
   @Inject() private editorCommandsService: EditorCommandsService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
 
   sourceId = this.windowsService.getChildWindowQueryParams().sourceId;
   source = this.sourcesService.views.getSource(this.sourceId);
@@ -70,6 +72,10 @@ export default class SourceProperties extends Vue {
   }
 
   onInputHandler(properties: TObsFormData, changedIndex: number) {
+    if (properties[changedIndex].name === 'video_config') {
+      this.usageStatisticsService.actions.recordFeatureUsage('DShowConfigureVideo');
+    }
+
     this.editorCommandsService.executeCommand('EditSourcePropertiesCommand', this.sourceId, [
       properties[changedIndex],
     ]);

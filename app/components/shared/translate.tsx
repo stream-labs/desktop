@@ -45,6 +45,11 @@ export default class Translate extends TsxComponent<TranslateProps> {
   }
 
   private renderXmlNode(node: Node) {
+    // don't handle script nodes
+    if (node.nodeName === 'script') {
+      throw new Error('XSS injection detected');
+    }
+
     // render simple text
     if (node.nodeName === '#text') {
       return node.textContent;

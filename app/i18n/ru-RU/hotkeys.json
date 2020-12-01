@@ -21,5 +21,7 @@
   "Play/Pause": "Воспроизведение/пауза",
   "Restart": "Перезапуск",
   "Next Slide": "Следующий слайд",
-  "Previous Slide": "Предыдущий слайд"
+  "Previous Slide": "Предыдущий слайд",
+  "Toggle Performance Mode": "Toggle Performance Mode",
+  "Skip Alert": "Пропустить оповещение"
 }
