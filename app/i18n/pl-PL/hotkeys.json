@@ -21,5 +21,7 @@
   "Play/Pause": "Odtwarzaj / Przerwij",
   "Restart": "Uruchom ponownie",
   "Next Slide": "Kolejny slajd",
-  "Previous Slide": "Poprzedni slajd"
+  "Previous Slide": "Poprzedni slajd",
+  "Toggle Performance Mode": "Toggle Performance Mode",
+  "Skip Alert": "Pomiń powiadomienie"
 }

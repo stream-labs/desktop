@@ -150,5 +150,6 @@
   "An unkown error occurred": "An unkown error occurred",
   "Please enable your account for live streaming, and wait 24 hours before attempting to stream.": "Please enable your account for live streaming, and wait 24 hours before attempting to stream.",
   "Please try again. If the issue persists, you can stream directly to a single platform instead.": "Please try again. If the issue persists, you can stream directly to a single platform instead.",
-  "Enable Live Streaming": "Enable Live Streaming"
+  "Enable Live Streaming": "Enable Live Streaming",
+  "Destination": "Destination"
 }
