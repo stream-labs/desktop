@@ -114,7 +114,6 @@ export default class StudioFooterComponent extends Vue {
   }
 
   openScheduleStream() {
-    WindowsService.showMessageBox(this, () => 'My message!');
     this.windowsService.showWindow({
       componentName: 'ScheduleStreamWindow',
       title: $t('Schedule Stream'),

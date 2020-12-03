@@ -3,6 +3,10 @@ import TsxComponent from 'components/tsx-component';
 import styles from './MessageBoxModal.m.less';
 import { WindowsService } from 'services/windows';
 
+/**
+ * A MessageBox layout
+ * Should be used as an alternative for `window.alert()`
+ */
 @Component({})
 export default class MessageBoxModal extends TsxComponent {
   private onCloseClickHandler() {
