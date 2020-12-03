@@ -202,6 +202,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       disableAnimationsEl.textContent =
         '*{ transition: none !important; transition-property: none !important; animation: none !important }';
       document.head.appendChild(disableAnimationsEl);
+      0; // Prevent returning a value that cannot be serialized
     `;
     await focusMain(t);
     await t.context.app.webContents.executeJavaScript(disableTransitionsCode);

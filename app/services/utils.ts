@@ -25,7 +25,7 @@ export default class Utils {
    */
   static _env: IEnv;
   static get env() {
-    if (!Utils._env) Utils._env = electron.remote.process.env;
+    if (!Utils._env) Utils._env = electron.remote.process.env as any;
     return Utils._env;
   }
 

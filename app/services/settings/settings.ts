@@ -24,6 +24,9 @@ import { EDeviceType } from 'services/hardware';
 import { StreamingService } from 'services/streaming';
 import { byOS, OS } from 'util/operating-systems';
 import { FacemasksService } from 'services/facemasks';
+import path from 'path';
+import fs from 'fs';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 export interface ISettingsState {
   General: {
@@ -87,12 +90,22 @@ export class SettingsService extends StatefulService<ISettingsState>
   @Inject() private outputSettingsService: OutputSettingsService;
   @Inject() private streamingService: StreamingService;
   @Inject() private facemasksService: FacemasksService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
 
   @Inject()
   private videoEncodingOptimizationService: VideoEncodingOptimizationService;
 
   init() {
     this.loadSettingsIntoStore();
+
+    // TODO: Remove this once we know rough numbers to avoid excess file I/O
+    try {
+      if (fs.existsSync(path.join(this.appService.appDataDirectory, 'HADisable'))) {
+        this.usageStatisticsService.recordFeatureUsage('HardwareAccelDisabled');
+      }
+    } catch (e) {
+      console.error('Error fetching hardware acceleration state', e);
+    }
   }
 
   loadSettingsIntoStore() {
@@ -165,7 +178,7 @@ export class SettingsService extends StatefulService<ISettingsState>
 
     // Names of settings that are disabled because we
     // have not implemented them yet.
-    const BLACK_LIST_NAMES = [
+    const DENY_LIST_NAMES = [
       'SysTrayMinimizeToTray',
       'SysTrayEnabled',
       'CenterSnapping',
@@ -177,7 +190,7 @@ export class SettingsService extends StatefulService<ISettingsState>
 
     for (const group of settings) {
       group.parameters = obsValuesToInputValues(group.parameters, {
-        disabledFields: BLACK_LIST_NAMES,
+        disabledFields: DENY_LIST_NAMES,
         transformListOptions: true,
       });
     }

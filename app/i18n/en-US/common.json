@@ -86,8 +86,6 @@
   "Amount": "Amount",
   "here": "here",
   "Link": "Link",
-  "Whitelist": "Whitelist",
-  "Blacklist": "Blacklist",
   "Description": "Description",
   "OBSInit.UnknownError": "An unknown error was encountered while initializing OBS.",
   "OBSInit.ModuleNotFoundError": "DirectX could not be found on your system. Please install the latest version of DirectX for your machine here <https://www.microsoft.com/en-us/download/details.aspx?id=35?> and try again.",
@@ -126,5 +124,10 @@
   "Thumbnail": "Thumbnail",
   "Maximum file size reached ": "Maximum file size reached ",
   "Select image": "Select image",
-  "Clear": "Clear"
+  "Clear": "Clear",
+  "Width": "Width",
+  "Height": "Height",
+  "Use Custom": "Use Custom",
+  "Apply": "Apply",
+  "Do not show this message again": "Do not show this message again"
 }
