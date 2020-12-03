@@ -85,6 +85,7 @@ test('Youtube streaming is disabled', async t => {
     await client.isExisting('span=YouTube account not enabled for live streaming'),
     'The streaming-disabled message should be visible',
   );
+  await prepareToGoLive(t);
   await clickGoLive(t);
   t.true(
     await client.isVisible('button=Enable Live Streaming'),
