@@ -124,7 +124,7 @@ textarea[type=text] {
 .list-input .multiselect {
   input[type=text] {
     border: none;
-    margin-top: -8px;
+    height: 20px;
     color: var(--title);
     &::placeholder {
       color: var(--paragraph);
@@ -185,6 +185,8 @@ textarea[type=text] {
   .multiselect__content-wrapper {
     background: var(--dropdown-bg);
     border: 1px solid var(--button);
+    border-top: none;
+    margin-top: -4px;
     .shadow();
   }
 

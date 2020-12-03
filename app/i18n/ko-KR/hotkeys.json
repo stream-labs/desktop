@@ -21,5 +21,7 @@
   "Play/Pause": "재생/일시 중지",
   "Restart": "다시 시작",
   "Next Slide": "다음 슬라이드",
-  "Previous Slide": "이전 슬라이드"
+  "Previous Slide": "이전 슬라이드",
+  "Toggle Performance Mode": "Toggle Performance Mode",
+  "Skip Alert": "알림 건너뛰기"
 }

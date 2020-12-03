@@ -64,6 +64,7 @@ export interface IStreamlabelSettingsDefinition {
   item_format?: { tokens: string[] };
   item_separator?: { tokens: string[] };
   settingsStat?: string;
+  // TODO: Change API to settingsAllowlist
   settingsWhitelist?: string[];
 }
 
