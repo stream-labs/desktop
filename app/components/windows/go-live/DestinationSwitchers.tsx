@@ -1,8 +1,8 @@
 import TsxComponent, { createProps } from 'components/tsx-component';
 import { getPlatformService, TPlatform } from '../../../services/platforms';
 import { Component } from 'vue-property-decorator';
-import { ToggleInput } from '../../shared/inputs/inputs';
-import PlatformLogo from '../../shared/PlatformLogo';
+import { ToggleInput } from 'components/shared/inputs/inputs';
+import PlatformLogo from 'components/shared/PlatformLogo';
 import { Inject } from '../../../services/core';
 import { UserService } from '../../../services/user';
 import cx from 'classnames';
