@@ -108,7 +108,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   readonly platform = 'facebook';
   readonly displayName = 'Facebook';
 
-  streamScheduled = new Subject();
+  streamScheduled = new Subject<IFacebookLiveVideo>();
 
   readonly capabilities = new Set<TPlatformCapability>([
     'chat',
@@ -418,8 +418,12 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     const body = JSON.stringify(data);
 
     try {
-      await platformRequest('facebook', { url, body, method: 'POST' }, token);
-      this.streamScheduled.next();
+      const liveVideo = await platformRequest<IFacebookLiveVideo>(
+        'facebook',
+        { url, body, method: 'POST' },
+        token,
+      );
+      this.streamScheduled.next(liveVideo);
     } catch (e) {
       if (e?.result?.error?.code === 100) {
         throw new Error(

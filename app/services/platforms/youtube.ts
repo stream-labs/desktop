@@ -198,7 +198,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
 
   private apiBase = 'https://www.googleapis.com/youtube/v3';
 
-  streamScheduled = new Subject();
+  streamScheduled = new Subject<IYoutubeLiveBroadcast>();
 
   protected init() {
     this.syncSettingsWithLocalStorage();
@@ -392,8 +392,8 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     scheduledStartTime: string,
     options: IYoutubeStartStreamOptions,
   ): Promise<void> {
-    await this.createBroadcast({ ...options, scheduledStartTime });
-    this.streamScheduled.next();
+    const broadcast = await this.createBroadcast({ ...options, scheduledStartTime });
+    this.streamScheduled.next(broadcast);
   }
 
   async fetchNewToken(): Promise<void> {

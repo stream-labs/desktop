@@ -34,7 +34,7 @@ import { CustomizationService } from 'services/customization';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService } from 'services/restream';
-import { FacebookService } from 'services/platforms/facebook';
+import { FacebookService, IFacebookLiveVideo } from 'services/platforms/facebook';
 import Utils from 'services/utils';
 import { cloneDeep, isEqual } from 'lodash';
 import { createStreamError, StreamError, TStreamErrorType } from './stream-error';
@@ -42,7 +42,7 @@ import { authorizedHeaders } from 'util/requests';
 import { HostsService } from '../hosts';
 import { TwitterService } from '../integrations/twitter';
 import { assertIsDefined } from 'util/properties-type-guards';
-import { YoutubeService } from '../platforms/youtube';
+import { IYoutubeLiveBroadcast, YoutubeService } from '../platforms/youtube';
 import { StreamInfoView } from './streaming-view';
 
 enum EOBSOutputType {
@@ -69,6 +69,14 @@ interface IOBSOutputSignalInfo {
   error: string;
 }
 
+export interface IStreamEvent {
+  id: string;
+  platform: TPlatform;
+  status: 'completed' | 'scheduled';
+  title: string;
+  date: number;
+}
+
 export class StreamingService extends StatefulService<IStreamingServiceState>
   implements IStreamingServiceApi {
   @Inject() private streamSettingsService: StreamSettingsService;
@@ -92,7 +100,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   replayBufferStatusChange = new Subject<EReplayBufferState>();
   replayBufferFileWrite = new Subject<string>();
   streamInfoChanged = new Subject<StreamInfoView>();
-  streamScheduled = new Subject();
 
   // Dummy subscription for stream deck
   streamingStateChange = new Subject<void>();
@@ -125,6 +132,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         postTweet: 'not-started',
       },
     },
+    streamEventsLoaded: false,
+    streamEvents: [],
   };
 
   init() {
@@ -149,8 +158,25 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         deep: true,
       },
     );
-    this.youtubeService.streamScheduled.subscribe(() => this.streamScheduled.next());
-    this.facebookService.streamScheduled.subscribe(() => this.streamScheduled.next());
+    this.youtubeService.streamScheduled.subscribe(scheduledLiveStream =>
+      this.onStreamScheduledHandler('youtube', scheduledLiveStream),
+    );
+    this.facebookService.streamScheduled.subscribe(scheduledLiveStream =>
+      this.onStreamScheduledHandler('facebook', scheduledLiveStream),
+    );
+  }
+
+  private onStreamScheduledHandler(
+    platform: TPlatform,
+    scheduledLiveStream: IYoutubeLiveBroadcast | IFacebookLiveVideo,
+  ) {
+    const event =
+      platform === 'youtube'
+        ? this.convertYTBroadcastToEvent(scheduledLiveStream as IYoutubeLiveBroadcast)
+        : this.convertFBLiveVideoToEvent(scheduledLiveStream as IFacebookLiveVideo);
+    if (platform === 'youtube') {
+      this.SET_STREAM_EVENTS(true, [...this.state.streamEvents, event]);
+    }
   }
 
   get views(): StreamInfoView {
@@ -1039,6 +1065,56 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
   }
 
+  async loadStreamEvents() {
+    // load fb and yt events simultaneously
+    this.SET_STREAM_EVENTS(false);
+    const events: IStreamEvent[] = [];
+    const [fbEvents, ytEvents] = await Promise.all([this.loadFbEvents(), this.loadYTBEvents()]);
+
+    // convert fb and yt events to the unified IStreamEvent format
+    ytEvents.forEach(ytEvent => {
+      events.push(this.convertYTBroadcastToEvent(ytEvent));
+    });
+
+    fbEvents.forEach(fbEvent => {
+      events.push(this.convertFBLiveVideoToEvent(fbEvent));
+    });
+
+    this.SET_STREAM_EVENTS(true, events);
+  }
+
+  private convertYTBroadcastToEvent(ytBroadcast: IYoutubeLiveBroadcast): IStreamEvent {
+    return {
+      platform: 'youtube',
+      id: ytBroadcast.id,
+      date: new Date(
+        ytBroadcast.snippet.scheduledStartTime || ytBroadcast.snippet.actualStartTime,
+      ).valueOf(),
+      title: ytBroadcast.snippet.title,
+      status: ytBroadcast.status.lifeCycleStatus === 'complete' ? 'completed' : 'scheduled',
+    };
+  }
+
+  private convertFBLiveVideoToEvent(fbLiveVideo: IFacebookLiveVideo): IStreamEvent {
+    return {
+      platform: 'facebook',
+      id: fbLiveVideo.id,
+      date: new Date(fbLiveVideo.planned_start_time || fbLiveVideo.broadcast_start_time).valueOf(),
+      title: fbLiveVideo.title,
+      status: 'scheduled',
+    };
+  }
+
+  private async loadYTBEvents() {
+    if (!this.views.isPlatformLinked('youtube')) return;
+    return await this.youtubeService.fetchBroadcasts();
+  }
+
+  private async loadFbEvents() {
+    if (!this.views.isPlatformLinked('facebook')) return;
+    return await this.facebookService.fetchAllVideos();
+  }
+
   /**
    * Used to track in aggregate which overlays streamers are using
    * most often for which games, in order to offer a better search
@@ -1084,5 +1160,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @mutation()
   private SET_WARNING(warningType: 'YT_AUTO_START_IS_DISABLED') {
     this.state.info.warning = warningType;
+  }
+
+  @mutation()
+  private SET_STREAM_EVENTS(loaded: boolean, events?: IStreamEvent[]) {
+    if (!loaded) this.state.streamEvents = [];
+    this.state.streamEventsLoaded = loaded;
+    if (events) this.state.streamEvents = events;
   }
 }

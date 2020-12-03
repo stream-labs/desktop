@@ -7,6 +7,7 @@ import { IFacebookStartStreamOptions } from '../platforms/facebook';
 import { IMixerStartStreamOptions } from '../platforms/mixer';
 import { IStreamError } from './stream-error';
 import { ICustomStreamDestination } from '../settings/streaming';
+import { IStreamEvent } from './streaming';
 
 export enum EStreamingState {
   Offline = 'offline',
@@ -89,6 +90,8 @@ export interface IStreamingServiceState {
   replayBufferStatusTime: string;
   selectiveRecording: boolean;
   info: IStreamInfo;
+  streamEventsLoaded: boolean;
+  streamEvents: IStreamEvent[];
 }
 
 export interface IStreamingServiceApi {

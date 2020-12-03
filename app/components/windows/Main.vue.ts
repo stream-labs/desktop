@@ -33,7 +33,7 @@ import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
 import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import PlatformMerge from 'components/pages/PlatformMerge';
-import StreamScheduler from 'components/pages/StreamScheduler';
+import StreamScheduler from 'components/pages/stream-scheduler/StreamScheduler';
 import { getPlatformService } from 'services/platforms';
 import ModalWrapper from '../shared/modals/ModalWrapper';
 

@@ -10,16 +10,9 @@ import { IYoutubeLiveBroadcast, YoutubeService } from 'services/platforms/youtub
 import { FacebookService, IFacebookLiveVideo } from 'services/platforms/facebook';
 import { StreamingService, WindowsService } from 'app-services';
 import { Spinner } from 'streamlabs-beaker';
+import ScheduledStreamEditor from './ScheduledStreamEditor';
 import cx from 'classnames';
-import { scheduleStream } from '../../../test/helpers/spectron/streaming';
-
-interface IStreamEvent {
-  id: string;
-  platform: TPlatform;
-  status: 'completed' | 'scheduled';
-  title: string;
-  date: Date;
-}
+import { IStreamEvent } from '../../../services/streaming';
 
 interface IDay {
   day: number;
@@ -43,10 +36,9 @@ export default class StreamScheduler extends TsxComponent {
   @Inject() private facebookService: FacebookService;
   @Inject() private windowsService: WindowsService;
 
-  private ytEvents: IYoutubeLiveBroadcast[] = [];
-  private fbEvents: IFacebookLiveVideo[] = [];
-  private attributes: IAttribute[] = [];
-  private loading = true;
+  get loading(): boolean {
+    return !this.streamingService.state.streamEventsLoaded;
+  }
 
   get locale() {
     // settings like 'firstDayOfTheWeek' based on the current locale
@@ -62,87 +54,39 @@ export default class StreamScheduler extends TsxComponent {
   }
 
   created() {
-    this.loadEvents();
-    this.streamingService.streamScheduled.subscribe(() => this.loadEvents());
+    this.streamingService.actions.loadStreamEvents();
   }
 
-  private async loadEvents() {
-    // load fb and yt events simultaneously
-    this.loading = true;
-    const events: IStreamEvent[] = [];
-    await Promise.all([this.loadFbEvents(), this.loadYTBEvents()]);
-
-    // convert fb and yt events to the unified IStreamEvent format
-    this.ytEvents.forEach(ytEvent => {
-      const platform = 'youtube';
-      const id = ytEvent.id;
-      const date = new Date(ytEvent.snippet.scheduledStartTime || ytEvent.snippet.actualStartTime);
-      const title = ytEvent.snippet.title;
-      const status = ytEvent.status.lifeCycleStatus === 'complete' ? 'completed' : 'scheduled';
-      events.push({ id, platform, date, title, status });
-    });
-
-    this.fbEvents.forEach(fbEvent => {
-      const platform = 'facebook';
-      const id = fbEvent.id;
-      const date = new Date(fbEvent.planned_start_time || fbEvent.broadcast_start_time);
-      const title = fbEvent.title;
-      const status = 'scheduled';
-      events.push({ id, platform, date, title, status });
-    });
-
+  private get calendarAttrs(): IAttribute[] {
     // convert events to the v-calendar-friendly format
-    this.attributes = events.map((event, key) => {
+    return this.streamingService.state.streamEvents.map((event, key) => {
       return {
         key,
-        dates: event.date,
+        dates: new Date(event.date),
         customData: event,
       };
     });
-    this.loading = false;
   }
 
-  private async loadYTBEvents(): Promise<void> {
-    if (!this.streamingView.isPlatformLinked('youtube')) return;
-    this.ytEvents = await this.youtubeService.actions.return.fetchBroadcasts();
-  }
-
-  private async loadFbEvents() {
-    if (!this.streamingView.isPlatformLinked('facebook')) return;
-    this.fbEvents = await this.facebookService.actions.return.fetchAllVideos();
-  }
-
-  private showScheduleNewDialog(date: Date) {
-    this.windowsService.showWindow({
-      componentName: 'ScheduleStreamWindow',
-      title: $t('Schedule Stream'),
-      size: { width: 800, height: 670 },
-      queryParams: {
-        date: date.valueOf(),
-      },
-    });
+  private showScheduleNewDialog(date: number) {
+    WindowsService.showModal(this, () => <ScheduledStreamEditor date={date} />);
   }
 
   private showUpdateDialog(event?: IStreamEvent) {
-    this.windowsService.showWindow({
-      componentName: 'ScheduleStreamWindow',
-      title: $t('Update Stream'),
-      size: { width: 800, height: 670 },
-      queryParams: {
-        platform: event.platform,
-        id: event.id,
-        date: event.date.valueOf(),
-      },
-    });
+    WindowsService.showModal(this, () => (
+      <ScheduledStreamEditor id={event.id} platform={event.platform} date={event.date} />
+    ));
   }
 
   private renderDay(day: IDay, attributes: IAttribute[]) {
     // show maximum 3 events per day for now TODO:
     attributes = attributes?.slice(0, 3);
     return (
-      <div class={css.daySlot} onClick={() => this.showScheduleNewDialog(day.date)}>
+      <div class={css.daySlot} onClick={() => this.showScheduleNewDialog(day.date.valueOf())}>
         <span class={css.dayLabel}>{day.day}</span>
-        <div>{attributes?.map((attr: any) => this.renderEvent(attr.customData, day.date))}</div>
+        <transition name="fade">
+          {attributes?.map((attr: any) => this.renderEvent(attr.customData, day.date))}
+        </transition>
       </div>
     );
   }
@@ -174,7 +118,7 @@ export default class StreamScheduler extends TsxComponent {
         <Calendar
           isExpanded={true}
           locale={this.locale}
-          attributes={this.attributes}
+          attributes={this.calendarAttrs}
           scopedSlots={{
             'day-content': (params: { day: IDay; attributes: IAttribute[] }) =>
               this.renderDay(params.day, params.attributes),
