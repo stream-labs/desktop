@@ -253,6 +253,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     if (!streamToScheduledBroadcast) {
       broadcast = await this.createBroadcast(ytSettings);
     } else {
+      assertIsDefined(ytSettings.broadcastId);
       await this.updateBroadcast(ytSettings.broadcastId, ytSettings);
       broadcast = await this.fetchBroadcast(ytSettings.broadcastId);
     }
