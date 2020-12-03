@@ -5,9 +5,10 @@ import {
   clickGoLive,
   goLive,
   prepareToGoLive,
-  scheduleStream, stopStream,
+  scheduleStream,
+  stopStream,
   submit,
-  waitForStreamStart
+  waitForStreamStart,
 } from '../../helpers/spectron/streaming';
 import { FormMonkey, selectTitle } from '../../helpers/form-monkey';
 import moment = require('moment');
@@ -78,9 +79,15 @@ test('Start stream twice to the same YT event', async t => {
 
 test('Youtube streaming is disabled', async t => {
   skipCheckingErrorsInLog();
+  const client = t.context.app.client;
   await logIn(t, 'youtube', { streamingIsDisabled: true, notStreamable: true });
   t.true(
-    await t.context.app.client.isExisting('span=YouTube account not enabled for live streaming'),
+    await client.isExisting('span=YouTube account not enabled for live streaming'),
     'The streaming-disabled message should be visible',
+  );
+  await clickGoLive(t);
+  t.true(
+    await client.isVisible('button=Enable Live Streaming'),
+    'The enable livestreaming button should be visible',
   );
 });
