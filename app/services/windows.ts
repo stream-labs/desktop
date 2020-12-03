@@ -430,6 +430,14 @@ export class WindowsService extends StatefulService<IWindowsState> {
     });
   }
 
+  /**
+   * Should only be called when the app is shutting down.
+   */
+  shutdown() {
+    this.closeAllOneOffs();
+    this.windows.child.close();
+  }
+
   // @ExecuteInCurrentWindow()
   getChildWindowOptions(): IWindowOptions {
     return this.state.child;
