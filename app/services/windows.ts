@@ -4,7 +4,7 @@
 import cloneDeep from 'lodash/cloneDeep';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import electron from 'electron';
-import Vue from 'vue';
+import Vue, { Component } from 'vue';
 import Utils from 'services/utils';
 import { Subject } from 'rxjs';
 import { throttle } from 'lodash-decorators';
@@ -65,6 +65,8 @@ import PerformanceMetrics from 'components/PerformanceMetrics.vue';
 import { byOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from './usage-statistics';
 import { Inject } from 'services/core';
+import MessageBoxModal from 'components/shared/modals/MessageBoxModal';
+import Modal from 'components/shared/modals/modal';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -158,6 +160,10 @@ interface IWindowsState {
   [windowId: string]: IWindowOptions;
 }
 
+export interface IModalOptions {
+  renderFn: Function | null;
+}
+
 const DEFAULT_WINDOW_OPTIONS: IWindowOptions = {
   componentName: '',
   scaleFactor: 1,
@@ -188,6 +194,34 @@ export class WindowsService extends StatefulService<IWindowsState> {
       isShown: false,
     },
   };
+
+  static modalOptions: IModalOptions = {
+    renderFn: null,
+  };
+
+  /**
+   * This event is happening when the modal has been shown or hidden
+   */
+  static modalChanged = new Subject<Partial<IModalOptions>>();
+
+  /**
+   * Show modal in the current window
+   * Use a static method instead actions so we can pass an non-serializable renderer method and support reactivity
+   */
+  static showModal(vm: Vue, renderFn: IModalOptions['renderFn']) {
+    // use `vm` to keep reactivity in the renderer function
+    const renderer = () => vm.$createElement(Modal, [renderFn()]);
+    this.modalChanged.next({ renderFn: renderer });
+  }
+
+  static hideModal() {
+    this.modalChanged.next({ renderFn: null });
+  }
+
+  static showMessageBox(vm: Vue, renderFn: Function) {
+    const renderer = () => vm.$createElement(MessageBoxModal, [renderFn()]);
+    this.showModal(vm, renderer);
+  }
 
   // This is a list of components that are registered to be
   // top level components in new child windows.

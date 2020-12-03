@@ -10,6 +10,8 @@ import { $t } from 'services/i18n';
 import styles from './DestinationSwitchers.m.less';
 import { StreamingService } from 'services/streaming';
 import { ICustomStreamDestination } from '../../../services/settings/streaming';
+import { WindowsService } from 'services/windows';
+import Translate from 'components/shared/translate';
 
 type TPlatforms = Record<TPlatform, { enabled: boolean }>;
 
@@ -40,8 +42,34 @@ export class DestinationSwitchers extends TsxComponent<Props> {
   }
 
   private onSwitchPlatformHandler(platform: TPlatform, enabled: boolean) {
-    if (this.view.isPrimaryPlatform(platform)) return;
+    const isPrimary = this.view.isPrimaryPlatform(platform);
+    if (isPrimary && !this.props.canDisablePrimary) {
+      this.showDisablePrimaryPopup();
+      return;
+    }
     this.props.handleOnPlatformSwitch && this.props.handleOnPlatformSwitch(platform, enabled);
+  }
+
+  private async switchAccount() {
+    await this.userService.actions.return.logOut();
+    await this.userService.actions.return.showLogin();
+  }
+
+  private showDisablePrimaryPopup() {
+    WindowsService.showMessageBox(this, () => {
+      return (
+        <Translate
+          message={$t('canNotDisablePrimaryPlatform')}
+          scopedSlots={{
+            switchAccountLink: (text: string) => (
+              <a class={styles.link} onClick={() => this.switchAccount()}>
+                {{ text }}
+              </a>
+            ),
+          }}
+        />
+      );
+    });
   }
 
   private onSwitchCustomDestHandler(destInd: number, enabled: boolean) {
@@ -72,31 +100,26 @@ export class DestinationSwitchers extends TsxComponent<Props> {
     const platformName = platformService.displayName;
     const username = this.userService.state.auth?.platforms[platform]!.username;
     const title = this.props.title ? $t(this.props.title, { platformName }) : platformName;
+    const canDisablePrimary = this.props.canDisablePrimary;
 
-    // don't show toggle inputs if we have only one platform to stream
-    const shouldShowToggles =
-      Object.keys(this.props.platforms).length > 1 || this.props.customDestinations?.length > 0;
     return (
       <div
         class={cx(styles.platformSwitcher, { [styles.platformDisabled]: !enabled })}
         onClick={() => this.onSwitchPlatformHandler(platform, !enabled)}
       >
-        {/* TOGGLE INPUT */}
-        {shouldShowToggles && (
-          <div class={cx(styles.colInput)}>
-            {isPrimary ? (
-              <span
-                vTooltip={$t(
-                  'You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destination.',
-                )}
-              >
-                <ToggleInput value={enabled} metadata={{ disabled: true, name: platform }} />
-              </span>
-            ) : (
-              <ToggleInput value={enabled} metadata={{ disabled: true, name: platform }} />
-            )}
-          </div>
-        )}
+        <div class={cx(styles.colInput)}>
+          {isPrimary && !canDisablePrimary ? (
+            <span
+              vTooltip={$t(
+                'You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destination.',
+              )}
+            >
+              <ToggleInput value={enabled} metadata={{ name: platform }} />
+            </span>
+          ) : (
+            <ToggleInput value={enabled} metadata={{ name: platform }} />
+          )}
+        </div>
 
         {/* PLATFORM LOGO */}
         <div class="logo margin-right--20">
