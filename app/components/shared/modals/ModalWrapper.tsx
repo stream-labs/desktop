@@ -7,7 +7,7 @@ class Props implements IModalOptions {
 }
 
 /**
- * Shows animated modal
+ * Shows an animated modal
  */
 @Component({ props: createProps(Props) })
 export default class ModalWrapper extends TsxComponent<Props> {
