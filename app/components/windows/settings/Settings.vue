@@ -141,6 +141,7 @@
     left: 188px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+    top: 0;
 
     i {
       margin-right: 0;

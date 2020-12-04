@@ -21,5 +21,7 @@
   "Play/Pause": "Reproduzir/Pausar",
   "Restart": "Reiniciar",
   "Next Slide": "Próximo slide",
-  "Previous Slide": "Slide anterior"
+  "Previous Slide": "Slide anterior",
+  "Toggle Performance Mode": "Toggle Performance Mode",
+  "Skip Alert": "Pular alerta"
 }
