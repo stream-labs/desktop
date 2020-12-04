@@ -54,7 +54,7 @@ export interface IListMetadata<TValueType, TOptionData = unknown> extends IInput
   allowEmpty?: boolean;
   loading?: boolean;
   internalSearch?: boolean;
-  allowCustom?: Function;
+  allowCustom?: boolean;
   noResult?: string;
   placeholder?: string;
   fullWidth?: boolean;
