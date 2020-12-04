@@ -51,6 +51,8 @@ if (!isProduction) {
   process.title = `SLOBS Renderer ${windowId}`;
 }
 
+// go
+
 // This is the development DSN
 let sentryDsn = 'https://8f444a81edd446b69ce75421d5e91d4d@sentry.io/252950';
 

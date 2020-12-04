@@ -1,11 +1,10 @@
 const path = require('path');
-const { CheckerPlugin } = require('awesome-typescript-loader');
 const webpack = require('webpack');
 const cp = require('child_process');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
-const plugins = process.env.SLOBS_FORKED_TYPECHECKING ? [new CheckerPlugin()] : [];
+const plugins = [];
 
 const commit = cp
   .execSync('git rev-parse --short HEAD')
