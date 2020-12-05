@@ -1,8 +1,8 @@
 {
-  "Successfully saved %{filename}": "%{filename} bol úspešne uložený",
-  "Successfully loaded %{filename}.overlay": "Úspešne sa načítal súbor %{filename}",
-  "This is an experimental feature.  Use at your own risk.": "Toto je experimentálna funkcia. Používajte na svoje vlastné riziko.",
-  "Export Overlay File": "Exportovať súbor prekrývania",
-  "Import Overlay File": "Importovať prekryvný súbor",
-  "Import Widget File in Current Scene": "Import súboru miniaplikácie v aktuálnej scéne"
+  "Successfully saved %{filename}": "Successfully saved %{filename}",
+  "Successfully loaded %{filename}.overlay": "Successfully loaded %{filename}.overlay",
+  "This is an experimental feature.  Use at your own risk.": "This is an experimental feature.  Use at your own risk.",
+  "Export Overlay File": "Export Overlay File",
+  "Import Overlay File": "Import Overlay File",
+  "Import Widget File in Current Scene": "Import Widget File in Current Scene"
 }
