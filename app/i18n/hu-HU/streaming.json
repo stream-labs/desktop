@@ -108,7 +108,7 @@
   "Multistreaming to these platforms requires Prime": "Multistreaming to these platforms requires Prime",
   "Become a Prime member": "Become a Prime member",
   "You must select a game for %{platformName}": "You must select a game for %{platformName}",
-  "Connect %{platformName} to Streamlabs OBS.": "Connect %{platformName} to Streamlabs OBS.",
+  "Connect %{platformName} to Streamlabs OBS.": "Csatlakoztasd a %{platformName} a Streamlabs OBS-hez.",
   "Connect %{platformName}": "Csatlakozás %{platformName}",
   "Stream to %{platformName}": "Stream to %{platformName}",
   "Schedule to %{platformName}": "Schedule to %{platformName}",
