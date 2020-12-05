@@ -155,7 +155,7 @@
   "Directly capture the OpenVR monitoring video buffer of your HMD.": "Közvetlenül rögzítse a HMD OpenVR figyelő video pufferét.",
   "LIV Client Capture": "LIV Client Capture",
   "Directly capture the LIV compositor output, reducing load and simplifying setup for Mixed Reality.": "Közvetlenül rögzítse a LIV kompozit kimenetet, csökkentve a terhelést és egyszerűsítve a vegyes valóság beállítását.",
-  "Looking for a game to capture": "Keresés a játékot a felvételhez",
+  "Looking for a game to capture": "Looking for a game to capture",
   "VLC Source": "VLC Forrás",
   "Add playlists of videos to your scene.": "Adjon hozzá videókat lejátszási listákhoz a jelenethez.",
   "Settings for %{sourceName}": "Beállítások %{sourceName}",
