@@ -2,7 +2,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { TObsType, IObsListInput, ObsInput, TObsValue } from './ObsInput';
 import { ListInput } from 'components/shared/inputs/inputs';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
-import { $t } from '../../../services/i18n';
+import { $t } from 'services/i18n';
 
 @Component({
   components: { HFormGroup, ListInput },
