@@ -34,7 +34,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
   browser_source: {
     name: $t('Browser Source'),
     description: $t(
-      'Allows you to add web-based content as a source, such as web pages and Flash SWFs.',
+      'Allows you to add web-based content as a source, such as web pages, widgets, and streaming video.',
     ),
     demoFilename: 'browser-source.png',
     supportList: [$t('Websites'), $t('Third party widgets'), 'HTML'],
@@ -77,7 +77,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
   },
   dshow_input: {
     name: $t('Video Capture Device'),
-    description: $t('Select from your built in USB webcam or an external.'),
+    description: $t('Display video from webcams, capture cards, and other devices.'),
     demoFilename: 'video-capture.png',
     supportList: [
       $t('Built in webcam'),
@@ -161,7 +161,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
   },
   av_capture_input: {
     name: $t('Video Capture Device'),
-    description: $t('Select from your built in USB webcam or an external.'),
+    description: $t('Display video from webcams, capture cards, and other devices.'),
     demoFilename: 'video-capture.png',
     supportList: [
       $t('Built in webcam'),
@@ -184,5 +184,11 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
   audio_line: {
     name: $t('JACK Input Client'),
     description: $t(''),
+  },
+  soundtrack_source: {
+    name: $t('Twitch Soundtrack'),
+    description: $t(
+      'Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.',
+    ),
   },
 });

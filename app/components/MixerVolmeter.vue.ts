@@ -9,6 +9,7 @@ import vShaderSrc from 'util/webgl/shaders/volmeter.vert';
 import fShaderSrc from 'util/webgl/shaders/volmeter.frag';
 import electron from 'electron';
 import TsxComponent, { createProps } from './tsx-component';
+import { WindowsService } from 'services/windows';
 
 // Configuration
 const CHANNEL_HEIGHT = 3;
@@ -31,6 +32,7 @@ class MixerVolmeterProps {
 export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
   @Inject() customizationService: CustomizationService;
   @Inject() audioService: AudioService;
+  @Inject() windowsService: WindowsService;
 
   volmeterSubscription: Subscription;
 
@@ -71,6 +73,8 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
   // Used for lazy initialization of the canvas rendering
   renderingInitialized = false;
 
+  styleBlockersSubscription: Subscription;
+
   mounted() {
     this.subscribeVolmeter();
     this.peakHoldCounters = [];
@@ -84,6 +88,7 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
     if (this.gl) window['activeWebglContexts'] -= 1;
     clearInterval(this.canvasWidthInterval);
     this.unsubscribeVolmeter();
+    if (this.styleBlockersSubscription) this.styleBlockersSubscription.unsubscribe();
   }
 
   private setupNewCanvas() {
@@ -109,7 +114,17 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
     this.setChannelCount(2);
 
     this.setCanvasWidth();
-    this.canvasWidthInterval = window.setInterval(() => this.setCanvasWidth(), 500);
+
+    // Style blockers are always hidden whenever something happens that causes main
+    // window elements to change width. We can improve performance by just listening
+    // the style blocker change event.
+    this.styleBlockersSubscription = this.windowsService.styleBlockersUpdated.subscribe(
+      blockers => {
+        if (blockers.windowId === 'main' && !blockers.hideStyleBlockers) {
+          this.setCanvasWidth();
+        }
+      },
+    );
   }
 
   private initRenderingContext() {
@@ -118,19 +133,29 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
     this.gl = this.$refs.canvas.getContext('webgl', { alpha: false });
 
     if (this.gl) {
-      this.initWebglRendering();
+      try {
+        this.initWebglRendering();
 
-      // Get ready to lose this conext if too many are created
-      if (window['activeWebglContexts'] == null) window['activeWebglContexts'] = 0;
-      window['activeWebglContexts'] += 1;
-      this.$refs.canvas.addEventListener('webglcontextlost', this.handleLostWebglContext);
+        // Get ready to lose this conext if too many are created
+        if (window['activeWebglContexts'] == null) window['activeWebglContexts'] = 0;
+        window['activeWebglContexts'] += 1;
+        this.$refs.canvas.addEventListener('webglcontextlost', this.handleLostWebglContext);
+      } catch (e) {
+        console.error('Failed to initialize WebGL rendering, falling back to Canvas 2d', e);
+        this.gl = null;
+        this.initCanvas2dRendering();
+      }
     } else {
-      // This machine does not support hardware acceleration, or it has been disabled
-      // Fall back to canvas 2d rendering instead.
-      this.ctx = this.$refs.canvas.getContext('2d', { alpha: false });
+      this.initCanvas2dRendering();
     }
 
     this.renderingInitialized = true;
+  }
+
+  initCanvas2dRendering() {
+    // This machine does not support hardware acceleration, or it has been disabled
+    // Fall back to canvas 2d rendering instead.
+    this.ctx = this.$refs.canvas.getContext('2d', { alpha: false });
   }
 
   private handleLostWebglContext() {

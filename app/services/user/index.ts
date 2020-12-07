@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
-import { handleResponse, authorizedHeaders } from 'util/requests';
+import { handleResponse, authorizedHeaders, jfetch } from 'util/requests';
 import { mutation } from 'services/core/stateful-service';
 import { Service, Inject, ViewHandler } from 'services/core';
 import electron from 'electron';
@@ -31,6 +31,10 @@ import { lazyModule } from 'util/lazy-module';
 import { AuthModule } from './auth-module';
 import { WebsocketService, TSocketEvent } from 'services/websocket';
 import { MagicLinkService } from 'services/magic-link';
+import fs from 'fs';
+import path from 'path';
+import { AppService } from 'services/app';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 export enum EAuthProcessState {
   Idle = 'idle',
@@ -43,6 +47,8 @@ interface IUserServiceState {
   auth?: IUserAuth;
   authProcessState: EAuthProcessState;
   isPrime: boolean;
+  expires?: string;
+  userId?: number;
 }
 
 interface ILinkedPlatform {
@@ -56,6 +62,7 @@ interface ILinkedPlatformsResponse {
   facebook_account?: ILinkedPlatform;
   youtube_account?: ILinkedPlatform;
   mixer_account?: ILinkedPlatform;
+  user_id: number;
 }
 
 export type LoginLifecycleOptions = {
@@ -106,6 +113,10 @@ class UserViews extends ViewHandler<IUserServiceState> {
   get isFacebookAuthed() {
     return this.isLoggedIn && this.platform.type === 'facebook';
   }
+
+  get auth() {
+    return this.state.auth;
+  }
 }
 
 export class UserService extends PersistentStatefulService<IUserServiceState> {
@@ -119,6 +130,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private websocketService: WebsocketService;
   @Inject() private magicLinkService: MagicLinkService;
+  @Inject() private appService: AppService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
 
   @mutation()
   LOGIN(auth: IUserAuth) {
@@ -142,11 +155,22 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   LOGOUT() {
     Vue.delete(this.state, 'auth');
     this.state.isPrime = false;
+    Vue.delete(this.state, 'userId');
   }
 
   @mutation()
   SET_PRIME(isPrime: boolean) {
     this.state.isPrime = isPrime;
+  }
+
+  @mutation()
+  SET_EXPIRES(expires: string) {
+    this.state.expires = expires;
+  }
+
+  @mutation()
+  SET_USER_ID(userId: number) {
+    this.state.userId = userId;
   }
 
   @mutation()
@@ -287,8 +311,30 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
   }
 
+  /**
+   * Makes a best attempt to write a user id to disk. Does not
+   * guarantee it will succeed. Calling this function will never
+   * fail. This is used by the updater.
+   * @param userId The user id to write
+   */
+  writeUserIdFile(userId?: number) {
+    const filePath = path.join(this.appService.appDataDirectory, 'userId');
+    fs.writeFile(filePath, userId ?? '', err => {
+      if (err) {
+        console.error('Error writing user id file', err);
+      }
+    });
+  }
+
   async updateLinkedPlatforms() {
     const linkedPlatforms = await this.fetchLinkedPlatforms();
+
+    if (!linkedPlatforms) return;
+
+    if (linkedPlatforms.user_id) {
+      this.writeUserIdFile(linkedPlatforms.user_id);
+      this.SET_USER_ID(linkedPlatforms.user_id);
+    }
 
     // TODO: Could metaprogram this a bit more
     if (linkedPlatforms.facebook_account) {
@@ -336,7 +382,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
   }
 
-  fetchLinkedPlatforms(): Promise<ILinkedPlatformsResponse> {
+  fetchLinkedPlatforms() {
     if (!this.isLoggedIn) return;
 
     const host = this.hostsService.streamlabs;
@@ -344,11 +390,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const url = `https://${host}/api/v5/restream/user/info`;
     const request = new Request(url, { headers });
 
-    return fetch(request)
-      .then(res => {
-        return res.json();
-      })
-      .catch(() => {});
+    return jfetch<ILinkedPlatformsResponse>(request).catch(() => {
+      console.warn('Error fetching linked platforms');
+    });
   }
 
   get isPrime() {
@@ -360,10 +404,21 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const url = `https://${host}/api/v5/slobs/prime`;
     const headers = authorizedHeaders(this.apiToken);
     const request = new Request(url, { headers });
-    return fetch(request)
-      .then(handleResponse)
-      .then(response => this.SET_PRIME(response.is_prime))
+    return jfetch<{ expires_soon: boolean; expires_at: string; is_prime: boolean }>(request)
+      .then(response => this.validatePrimeStatus(response))
       .catch(() => null);
+  }
+
+  validatePrimeStatus(response: { expires_soon: boolean; expires_at: string; is_prime: boolean }) {
+    this.SET_PRIME(response.is_prime);
+    if (!response.expires_soon) {
+      this.SET_EXPIRES(null);
+      return;
+    } else if (!this.state.expires) {
+      this.SET_EXPIRES(response.expires_at);
+      this.usageStatisticsService.recordShown('prime-resubscribe-modal');
+      this.onboardingService.start({ isPrimeExpiration: true });
+    }
   }
 
   /**
@@ -371,12 +426,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    */
   flushUserSession(): Promise<void> {
     if (this.isLoggedIn && this.state.auth.partition) {
-      return new Promise(resolve => {
-        const session = electron.remote.session.fromPartition(this.state.auth.partition);
-
-        session.flushStorageData();
-        session.cookies.flushStore(resolve);
-      });
+      const session = electron.remote.session.fromPartition(this.state.auth.partition);
+      session.flushStorageData();
+      return session.cookies.flushStore();
     }
 
     return Promise.resolve();
@@ -457,6 +509,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   onSocketEvent(e: TSocketEvent) {
     if (e.type !== 'streamlabs_prime_subscribe') return;
     this.SET_PRIME(true);
+    if (this.navigationService.state.currentPage === 'Onboarding') return;
     const theme = this.customizationService.isDarkTheme ? 'prime-dark' : 'prime-light';
     this.customizationService.setTheme(theme);
     this.showPrimeWindow();
@@ -527,13 +580,26 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return url;
   }
 
+  alertboxLibraryUrl(id?: string) {
+    const uiTheme = this.customizationService.isDarkTheme ? 'night' : 'day';
+    let url = `https://${this.hostsService.streamlabs}/alertbox-library?mode=${uiTheme}&slobs`;
+
+    if (this.isLoggedIn) {
+      url += `&oauth_token=${this.apiToken}`;
+    }
+
+    if (id) url += `&id=${id}`;
+
+    return url;
+  }
+
   getDonationSettings() {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/donation/settings`;
     const headers = authorizedHeaders(this.apiToken);
     const request = new Request(url, { headers });
 
-    return fetch(request).then(handleResponse);
+    return jfetch<{ donation_url: string; settings: { autopublish: boolean } }>(request);
   }
 
   async showLogin() {
@@ -605,9 +671,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     session.clearStorageData({ storages: ['cookies'] });
     this.settingsService.setSettingValue('Stream', 'key', '');
 
+    this.writeUserIdFile();
     this.unsubscribeFromSocketConnection();
     this.LOGOUT();
     this.userLogout.next();
+  }
+
+  async reLogin() {
+    const platform = this.state.auth.primaryPlatform;
+    await this.logOut();
+    await this.startAuth(platform, 'internal');
   }
 
   /**

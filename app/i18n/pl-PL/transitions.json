@@ -24,7 +24,7 @@
   "This connection is redundant because another connection already connects these scenes.": "To połączenie jest zbędne, ponieważ inne połączenie obsługuje już te sceny.",
   "You need at least 2 scenes to edit transitions.": "Wymagane są przynajmniej 2 sceny, aby edytować przejścia.",
   "This scene transition is managed by an App and cannot be edited.": "To przejście między scenami jest obsługiwane przez aplikację i nie może być edytowane.",
-  "Global Transition": "Global Transition",
-  "Edit": "Edit",
-  "Live": "Live"
+  "Global Transition": "Przejście globalne",
+  "Edit": "Edytuj",
+  "Live": "Na żywo"
 }

@@ -1,4 +1,4 @@
-import { mutation, StatefulService } from 'services/core/stateful-service';
+import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-service';
 import * as obs from '../../obs-api';
 import { Inject } from 'services/core/injector';
 import { TObsValue, TObsFormData } from 'components/obs/inputs/ObsInput';
@@ -11,6 +11,8 @@ import { $t } from 'services/i18n';
 import { DefaultManager } from 'services/sources/properties-managers/default-manager';
 import { Subject } from 'rxjs';
 import { isUrl } from '../util/requests';
+import { getOS, OS } from 'util/operating-systems';
+import { UsageStatisticsService } from './usage-statistics';
 
 export const TRANSITION_DURATION_MAX = 2_000_000_000;
 
@@ -53,6 +55,43 @@ export interface ITransitionCreateOptions {
   duration?: number;
 }
 
+class TransitionsViews extends ViewHandler<ITransitionsState> {
+  getTypes(): IListOption<ETransitionType>[] {
+    const types = [
+      { title: $t('Cut'), value: ETransitionType.Cut },
+      { title: $t('Fade'), value: ETransitionType.Fade },
+      { title: $t('Swipe'), value: ETransitionType.Swipe },
+      { title: $t('Slide'), value: ETransitionType.Slide },
+      { title: $t('Fade to Color'), value: ETransitionType.FadeToColor },
+      { title: $t('Luma Wipe'), value: ETransitionType.LumaWipe },
+      { title: $t('Stinger'), value: ETransitionType.Stinger },
+    ];
+
+    if (getOS() === OS.Windows) types.push({ title: $t('Motion'), value: ETransitionType.Motion });
+
+    return types;
+  }
+
+  /**
+   * Returns true if this connection is redundant.  A redundant
+   * connection has the same from/to scene ids as a connection
+   * earlier in the order.
+   */
+  isConnectionRedundant(id: string) {
+    const connection = this.getConnection(id);
+
+    const match = this.state.connections.find(conn => {
+      return conn.fromSceneId === connection.fromSceneId && conn.toSceneId === connection.toSceneId;
+    });
+
+    return match.id !== connection.id;
+  }
+
+  getConnection(id: string) {
+    return this.state.connections.find(conn => conn.id === id);
+  }
+}
+
 export class TransitionsService extends StatefulService<ITransitionsState> {
   static initialState = {
     transitions: [],
@@ -64,6 +103,11 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   @Inject() windowsService: WindowsService;
   @Inject() scenesService: ScenesService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
+  @Inject() usageStatisticsService: UsageStatisticsService;
+
+  get views() {
+    return new TransitionsViews(this.state);
+  }
 
   studioModeChanged = new Subject<boolean>();
 
@@ -103,22 +147,10 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     });
   }
 
-  getTypes(): IListOption<ETransitionType>[] {
-    return [
-      { title: $t('Cut'), value: ETransitionType.Cut },
-      { title: $t('Fade'), value: ETransitionType.Fade },
-      { title: $t('Swipe'), value: ETransitionType.Swipe },
-      { title: $t('Slide'), value: ETransitionType.Slide },
-      { title: $t('Fade to Color'), value: ETransitionType.FadeToColor },
-      { title: $t('Luma Wipe'), value: ETransitionType.LumaWipe },
-      { title: $t('Stinger'), value: ETransitionType.Stinger },
-      { title: $t('Motion'), value: ETransitionType.Motion },
-    ];
-  }
-
   enableStudioMode() {
     if (this.state.studioMode) return;
 
+    this.usageStatisticsService.recordFeatureUsage('StudioMode');
     this.SET_STUDIO_MODE(true);
     this.studioModeChanged.next(true);
 
@@ -225,6 +257,10 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     const obsScene = this.scenesService.views.getScene(sceneBId).getObsScene();
     const transition = this.getConnectedTransition(sceneAId, sceneBId);
     const obsTransition = this.obsTransitions[transition.id];
+
+    if (transition.type === ETransitionType.Motion) {
+      this.usageStatisticsService.recordFeatureUsage('MotionTransition');
+    }
 
     if (sceneAId) {
       obsTransition.set(this.scenesService.views.getScene(sceneAId).getObsScene());
@@ -390,7 +426,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
       fromSceneId: fromId,
       toSceneId: toId,
     });
-    return this.getConnection(id);
+    return this.views.getConnection(id);
   }
 
   updateConnection(id: string, patch: Partial<ITransitionConnection>) {
@@ -399,25 +435,6 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
 
   deleteConnection(id: string) {
     this.DELETE_CONNECTION(id);
-  }
-
-  /**
-   * Returns true if this connection is redundant.  A redundant
-   * connection has the same from/to scene ids as a connection
-   * earlier in the order.
-   */
-  isConnectionRedundant(id: string) {
-    const connection = this.getConnection(id);
-
-    const match = this.state.connections.find(conn => {
-      return conn.fromSceneId === connection.fromSceneId && conn.toSceneId === connection.toSceneId;
-    });
-
-    return match.id !== connection.id;
-  }
-
-  getConnection(id: string) {
-    return this.state.connections.find(conn => conn.id === id);
   }
 
   setDuration(id: string, duration: number) {
@@ -455,6 +472,19 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
           }),
         );
       });
+  }
+
+  /**
+   * Gets locked states for all transitions
+   */
+  getLockedStates() {
+    const states: Dictionary<boolean> = {};
+
+    this.state.transitions.forEach(transition => {
+      states[transition.id] = this.getPropertiesManagerSettings(transition.id).locked;
+    });
+
+    return states;
   }
 
   @mutation()

@@ -297,12 +297,12 @@ export class PlatformContainerManager {
         }
 
         if (details.resourceType === 'script') {
-          const scriptWhitelist = [
+          const scriptAllowlist = [
             'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.js',
             'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.min.js',
           ];
 
-          const scriptDomainWhitelist = [
+          const scriptDomainAllowlist = [
             'www.googletagmanager.com',
             'www.google-analytics.com',
             'widget.intercom.io',
@@ -311,12 +311,12 @@ export class PlatformContainerManager {
 
           const parsed = url.parse(details.url);
 
-          if (scriptWhitelist.includes(details.url)) {
+          if (scriptAllowlist.includes(details.url)) {
             cb({});
             return;
           }
 
-          if (scriptDomainWhitelist.includes(parsed.hostname)) {
+          if (scriptDomainAllowlist.includes(parsed.hostname)) {
             cb({});
             return;
           }

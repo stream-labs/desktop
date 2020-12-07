@@ -14,7 +14,7 @@ import { AppService } from 'services/app';
 import Tabs, { ITab } from 'components/Tabs.vue';
 import { ChatService } from 'services/chat';
 import { WindowsService } from 'services/windows';
-import { RestreamService, YoutubeService } from 'app-services';
+import { FacebookService, RestreamService, YoutubeService } from 'app-services';
 import { getPlatformService } from 'services/platforms';
 
 @Component({
@@ -28,6 +28,7 @@ import { getPlatformService } from 'services/platforms';
 export default class LiveDock extends Vue {
   @Inject() streamingService: StreamingService;
   @Inject() youtubeService: YoutubeService;
+  @Inject() facebookService: FacebookService;
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() platformAppsService: PlatformAppsService;
@@ -65,7 +66,7 @@ export default class LiveDock extends Vue {
     this.underlyingSelectedChat = val;
   }
 
-  viewStreamTooltip = $t('Go to YouTube to view your live stream');
+  viewStreamTooltip = $t('View your live stream in a web browser');
   editStreamInfoTooltip = $t('Edit your stream title and description');
   controlRoomTooltip = $t('Go to YouTube Live Dashboard');
 
@@ -108,11 +109,11 @@ export default class LiveDock extends Vue {
 
   setCollapsed(livedockCollapsed: boolean) {
     this.canAnimate = true;
-    this.windowsService.updateStyleBlockers('main', true);
-    this.customizationService.setSettings({ livedockCollapsed });
+    this.windowsService.actions.updateStyleBlockers('main', true);
+    this.customizationService.actions.setSettings({ livedockCollapsed });
     setTimeout(() => {
       this.canAnimate = false;
-      this.windowsService.updateStyleBlockers('main', false);
+      this.windowsService.actions.updateStyleBlockers('main', false);
     }, 300);
   }
 
@@ -151,6 +152,10 @@ export default class LiveDock extends Vue {
 
   openYoutubeControlRoom() {
     electron.remote.shell.openExternal(this.youtubeService.dashboardUrl);
+  }
+
+  openFBStreamUrl() {
+    electron.remote.shell.openExternal(this.facebookService.streamPageUrl);
   }
 
   get isTwitch() {
@@ -266,7 +271,7 @@ export default class LiveDock extends Vue {
     this.selectedChat = 'default';
   }
 
-  canEditChannelInfo(): boolean {
+  get canEditChannelInfo(): boolean {
     return (
       this.streamingService.state.info.checklist.startVideoTransmission === 'done' ||
       this.userService.state.auth?.primaryPlatform === 'twitch'

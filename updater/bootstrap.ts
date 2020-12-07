@@ -67,6 +67,12 @@ interface ILatestVersionInfo {
      */
     [version: string]: number;
   };
+
+  /**
+   * If restricted is true, we should check with the server to determine
+   * specific eligibility for this release.
+   */
+  restricted?: boolean;
 }
 
 /**
@@ -104,6 +110,39 @@ async function getUpdateId(info: IUpdateInfo): Promise<string> {
   return updateId;
 }
 
+async function isRestrictedRolloutEligible(info: IUpdateInfo): Promise<boolean> {
+  try {
+    const userIdPath = path.join(info.cacheDir, 'userId');
+    const userId = parseInt((await readFile(userIdPath)).toString(), 10);
+
+    if (!userId) {
+      console.log('User id not found on disk, defaulting elibility to true.');
+      return true;
+    }
+
+    console.log(`Checking eligibility for user ${userId}`);
+
+    const result = await fetch(`https://streamlabs.com/api/v5/slobs/is-rollout-eligible/${userId}`);
+
+    if (!result.ok) {
+      console.log('Got non 2xx response from rollout server, defaulting eligibility to true');
+      return true;
+    }
+
+    const json = await result.json();
+
+    if (!json || !json.success) {
+      console.log('Error checking rollout eligibility. Defaulting to true');
+      return true;
+    }
+
+    return json.isEligible;
+  } catch (e) {
+    console.log('Error checking rollout eligibility. Defaulting to true', e);
+    return true;
+  }
+}
+
 async function isInRolloutGroup(info: IUpdateInfo, latestVersion: ILatestVersionInfo) {
   const updateId = await getUpdateId(info);
 
@@ -127,7 +166,19 @@ async function isInRolloutGroup(info: IUpdateInfo, latestVersion: ILatestVersion
 
   console.log(`Current rollout for ${info.version} is ${rollout}%`);
 
-  return bucket < rollout;
+  if (bucket >= rollout) return false;
+
+  // Final check is for restricted rollout
+  if (latestVersion.restricted) {
+    console.log('Update is restricted. Checking eligibility.');
+
+    if (!(await isRestrictedRolloutEligible(info))) {
+      console.log('User is not eligible for restricted rollout.');
+      return false;
+    }
+  }
+
+  return true;
 }
 
 async function isUpdaterRunning(updaterPath: string, updaterName: string) {

@@ -8,7 +8,7 @@ import {
 } from '.';
 import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
-import { authorizedHeaders, handleResponse } from 'util/requests';
+import { authorizedHeaders, handleResponse, jfetch } from 'util/requests';
 import { UserService } from 'services/user';
 import { getAllTags, getStreamTags, TTwitchTag, updateTags } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
@@ -20,6 +20,7 @@ import { IGoLiveSettings } from 'services/streaming';
 import { InheritMutations, mutation } from 'services/core';
 import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
+import GameSelector from '../../components/windows/go-live/GameSelector';
 
 export interface ITwitchStartStreamOptions {
   title: string;
@@ -86,6 +87,7 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
 
   readonly platform = 'twitch';
   readonly displayName = 'Twitch';
+  readonly gameImageSize = { width: 30, height: 40 };
 
   readonly capabilities = new Set<TPlatformCapability>([
     'chat',
@@ -155,8 +157,10 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
       });
     }
 
-    const channelInfo = goLiveSettings?.platforms.twitch;
-    if (channelInfo) await this.putChannelInfo(channelInfo);
+    if (goLiveSettings) {
+      const channelInfo = goLiveSettings?.platforms.twitch;
+      if (channelInfo) await this.putChannelInfo(channelInfo);
+    }
   }
 
   async validatePlatform() {
@@ -196,9 +200,9 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
     const headers = authorizedHeaders(this.userService.apiToken!);
     const request = new Request(url, { headers });
 
-    return fetch(request)
-      .then(handleResponse)
-      .then(response => this.userService.updatePlatformToken('twitch', response.access_token));
+    return jfetch<{ access_token: string }>(request).then(response =>
+      this.userService.updatePlatformToken('twitch', response.access_token),
+    );
   }
 
   /**
@@ -267,7 +271,7 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
     ).then(json => (json.stream ? json.stream.viewers : 0));
   }
 
-  async putChannelInfo({ title, game, tags = [] }: ITwitchStartStreamOptions): Promise<boolean> {
+  async putChannelInfo({ title, game, tags = [] }: ITwitchStartStreamOptions): Promise<void> {
     await Promise.all([
       platformAuthorizedRequest('twitch', {
         url: `https://api.twitch.tv/kraken/channels/${this.twitchId}`,
@@ -277,14 +281,28 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
       this.setStreamTags(tags),
     ]);
     this.SET_STREAM_SETTINGS({ title, game, tags });
-    return true;
   }
 
-  searchGames(searchString: string): Promise<IGame[]> {
-    return platformRequest<{ games: IGame[] }>(
-      'twitch',
-      `https://api.twitch.tv/kraken/search/games?query=${searchString}`,
-    ).then(json => json.games);
+  async searchGames(searchString: string): Promise<IGame[]> {
+    const gamesResponse = await platformAuthorizedRequest<{
+      data: { id: string; name: string; box_art_url: string }[];
+    }>('twitch', `https://api.twitch.tv/helix/search/categories?query=${searchString}`);
+    if (!gamesResponse.data) return [];
+    return gamesResponse.data.map(g => ({ id: g.id, name: g.name, image: g.box_art_url }));
+  }
+
+  async fetchGame(name: string): Promise<IGame> {
+    const gamesResponse = await platformAuthorizedRequest<{
+      data: { id: string; name: string; box_art_url: string }[];
+    }>('twitch', `https://api.twitch.tv/helix/games?name=${name}`);
+    return gamesResponse.data.map(g => {
+      const imageTemplate = g.box_art_url;
+      const imageSize = this.gameImageSize;
+      const image = imageTemplate
+        .replace('{width}', imageSize.width.toString())
+        .replace('{height}', imageSize.height.toString());
+      return { id: g.id, name: g.name, image };
+    })[0];
   }
 
   get chatUrl(): string {
@@ -344,7 +362,7 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
     };
   }
 
-  liveDockEnabled(): boolean {
+  get liveDockEnabled(): boolean {
     return true;
   }
 }

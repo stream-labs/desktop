@@ -60,7 +60,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
   }
 
   iconForPlatform(platform: TPlatform) {
-    if (this.loading) return 'fas fa-spinner fa-spin';
+    if (this.loading && platform !== 'mixer') return 'fas fa-spinner fa-spin';
 
     return {
       twitch: 'fab fa-twitch',
@@ -149,12 +149,16 @@ export default class Connect extends TsxComponent<ConnectProps> {
                 {
                   value: 'dlive',
                   title: 'Dlive',
-                  icon: require('../../../../media/images/platforms/dlive-logo-small.png'),
+                  data: {
+                    image: require('../../../../media/images/platforms/dlive-logo-small.png'),
+                  },
                 },
                 {
                   value: 'nimotv',
                   title: 'NimoTV',
-                  icon: require('../../../../media/images/platforms/nimo-logo-small.png'),
+                  data: {
+                    image: require('../../../../media/images/platforms/nimo-logo-small.png'),
+                  },
                 },
               ] as IListOption<TExtraPlatform>[],
             }}
@@ -163,7 +167,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
             <i
               class={this.iconForPlatform('mixer')}
               style={{
-                color: '#0078d7',
+                color: 'var(--mixer)',
                 fontSize: '24px',
                 verticalAlign: 'middle',
                 marginRight: '8px',

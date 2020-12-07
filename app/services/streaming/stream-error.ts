@@ -1,45 +1,67 @@
 import { ServiceHelper } from 'services/core';
 import { TPlatform } from '../platforms';
+import { $t } from 'services/i18n';
 
 const errorTypes = {
   PLATFORM_REQUEST_FAILED: {
-    message: 'The request to Platform API has been failed',
-  },
-  FACEBOOK_HAS_NO_PAGES: {
-    message: 'Facebook pages have not been found',
+    get message() {
+      return $t('The request to the platform failed');
+    },
   },
   TWITCH_MISSED_OAUTH_SCOPE: {
-    message: 'Missing required oauth scope',
+    get message() {
+      return $t('Missing required oauth scope');
+    },
   },
   PREPOPULATE_FAILED: {
-    message: 'Failed to fetch platform settings',
+    get message() {
+      return $t('Failed to fetch platform settings');
+    },
   },
   SETTINGS_UPDATE_FAILED: {
-    message: 'Failed to update platform settings',
+    get message() {
+      return $t('Failed to update platform settings');
+    },
   },
   RESTREAM_DISABLED: {
-    message:
-      'The Restream server is temporarily down and streaming to multiple platforms is unavailable',
+    get message() {
+      return $t('The Multistream server is temporarily unavailable');
+    },
   },
   RESTREAM_SETUP_FAILED: {
-    message: 'Failed to setup the Restream',
+    get message() {
+      return $t('Failed to configure the Multistream server');
+    },
   },
   YOUTUBE_STREAMING_DISABLED: {
-    message: 'YouTube account not enabled for live streaming',
+    get message() {
+      return $t('Your YouTube account is not enabled for live streaming');
+    },
   },
   YOUTUBE_PUBLISH_FAILED: {
-    message: 'Failed to publish the Youtube broadcast',
+    get message() {
+      return $t('Failed to publish the YouTube broadcast');
+    },
   },
   TWEET_FAILED: {
-    message: 'Failed to post a tweet',
+    get message() {
+      return $t('Failed to post the Tweet');
+    },
   },
   PRIME_REQUIRED: {
-    message: 'This feature is for Prime members only',
+    get message() {
+      return $t('This feature is for Prime members only');
+    },
+  },
+  MACHINE_LOCKED: {
+    message: 'Your computer is locked',
   },
   UNKNOWN_ERROR: {
     // show this error if we caught a runtime error
-    // we should threat this error as a bug in the codebase
-    message: 'Unknown error',
+    // we should treat this error as a bug in the codebase
+    get message() {
+      return $t('An unkown error occurred');
+    },
   },
 };
 export type TStreamErrorType = keyof typeof errorTypes;

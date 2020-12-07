@@ -1,14 +1,10 @@
-import { Inject, ViewHandler } from '../core';
+import { ViewHandler } from '../core';
 import { IGoLiveSettings, IStreamingServiceState, IStreamSettings } from './streaming-api';
 import { StreamSettingsService } from '../settings/streaming';
 import { UserService } from '../user';
 import { RestreamService } from '../restream';
-import { TwitchService } from '../platforms/twitch';
-import { VideoEncodingOptimizationService } from '../video-encoding-optimizations';
 import { getPlatformService, TPlatform, TPlatformCapability } from '../platforms';
-import { $t } from '../i18n';
 import { cloneDeep, difference } from 'lodash';
-import { CustomizationService } from 'services/customization';
 
 /**
  * The stream info view is responsible for keeping
@@ -17,12 +13,17 @@ import { CustomizationService } from 'services/customization';
  * components to make use of.
  */
 export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
-  @Inject() private streamSettingsService: StreamSettingsService;
-  @Inject() private userService: UserService;
-  @Inject() private restreamService: RestreamService;
-  @Inject() private twitchService: TwitchService;
-  @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
-  @Inject() private customizationService: CustomizationService;
+  private get userView() {
+    return this.getServiceViews(UserService);
+  }
+
+  private get restreamView() {
+    return this.getServiceViews(RestreamService);
+  }
+
+  private get streamSettingsView() {
+    return this.getServiceViews(StreamSettingsService);
+  }
 
   get info() {
     return this.state.info;
@@ -39,12 +40,12 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
    * Returns a list of linked platforms available for restream
    */
   get linkedPlatforms(): TPlatform[] {
-    if (!this.userService.state.auth) return [];
+    if (!this.userView.state.auth) return [];
     if (
-      !this.restreamService.canEnableRestream ||
-      !this.streamSettingsService.state.protectedModeEnabled
+      !this.restreamView.canEnableRestream ||
+      !this.streamSettingsView.state.protectedModeEnabled
     ) {
-      return [this.userService.state.auth.primaryPlatform];
+      return [this.userView.auth!.primaryPlatform];
     }
     return this.allPlatforms.filter(p => this.isPlatformLinked(p));
   }
@@ -68,7 +69,9 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
 
   get isMultiplatformMode(): boolean {
     return (
-      this.streamSettingsService.state.protectedModeEnabled && this.enabledPlatforms.length > 1
+      this.streamSettingsView.state.protectedModeEnabled &&
+      (this.enabledPlatforms.length > 1 ||
+        this.goLiveSettings.customDestinations.filter(dest => dest.enabled).length > 0)
     );
   }
 
@@ -90,8 +93,8 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
    * Chat url of a primary platform
    */
   get chatUrl(): string {
-    if (!this.userService.state.auth) return '';
-    return getPlatformService(this.userService.state.auth.primaryPlatform).chatUrl;
+    if (!this.userView.auth) return '';
+    return getPlatformService(this.userView.auth.primaryPlatform).chatUrl;
   }
 
   /**
@@ -103,10 +106,13 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
       destinations[platform] = this.getPlatformSettings(platform);
     });
 
+    const savedGoLiveSettings = this.streamSettingsView.state.goLiveSettings;
+
     return {
       platforms: destinations as IGoLiveSettings['platforms'],
-      advancedMode: !!this.streamSettingsService.state.goLiveSettings?.advancedMode,
+      advancedMode: !!this.streamSettingsView.state.goLiveSettings?.advancedMode,
       optimizedProfile: undefined,
+      customDestinations: savedGoLiveSettings?.customDestinations || [],
       tweetText: '',
     };
   }
@@ -195,30 +201,28 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   }
 
   isPlatformLinked(platform: TPlatform): boolean {
-    if (!this.userService.state.auth?.platforms) return false;
-    return !!this.userService.state.auth?.platforms[platform];
+    if (!this.userView.auth?.platforms) return false;
+    return !!this.userView.auth?.platforms[platform];
   }
 
   isPrimaryPlatform(platform: TPlatform) {
-    return platform === this.userService.state.auth?.primaryPlatform;
+    return platform === this.userView.auth?.primaryPlatform;
   }
 
   /**
    * Validates settings and returns an error string
    */
   validateSettings<T extends IStreamSettings>(settings: T): string {
-    const platforms = Object.keys(settings.platforms) as TPlatform[];
-    for (const platform of platforms) {
-      const platformSettings = settings.platforms[platform];
-      if (!platformSettings.enabled) continue;
-      const platformName = getPlatformService(platform).displayName;
-      if (platform === 'twitch' || platform === 'facebook') {
-        if (!platformSettings['game']) {
-          return $t('You must select a game for %{platformName}', { platformName });
-        }
-      }
-    }
     return '';
+  }
+
+  /**
+   * Return true if one of the checks has been failed
+   */
+  hasFailedChecks(): boolean {
+    return !!Object.keys(this.state.info.checklist).find(
+      check => this.state.info.checklist[check] === 'failed',
+    );
   }
 
   /**
@@ -226,7 +230,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
    */
   private getPlatformSettings(platform: TPlatform) {
     const service = getPlatformService(platform);
-    const savedDestinations = this.streamSettingsService.state.goLiveSettings?.platforms;
+    const savedDestinations = this.streamSettingsView.state.goLiveSettings?.platforms;
     const { enabled, useCustomFields } = (savedDestinations && savedDestinations[platform]) || {
       enabled: false,
       useCustomFields: false,
@@ -236,46 +240,15 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     // don't reuse broadcastId for Youtube
     if (settings && settings['broadcastId']) settings['broadcastId'] = '';
 
+    // don't reuse liveVideoId for Facebook
+    if (platform === 'facebook' && settings && settings['liveVideoId']) {
+      settings['liveVideoId'] = '';
+    }
+
     return {
       ...settings,
       useCustomFields,
       enabled: enabled || this.isPrimaryPlatform(platform),
     };
-  }
-
-  shouldShowGoLiveWindow() {
-    if (!this.userService.isLoggedIn) return false;
-    const primaryPlatform = this.userService.state.auth?.primaryPlatform;
-
-    if (primaryPlatform === 'twitch') {
-      // For Twitch, we can show the Go Live window even with protected mode off
-      // This is mainly for legacy reasons.
-      return (
-        this.restreamService.shouldGoLiveWithRestream ||
-        this.customizationService.state.updateStreamInfoOnLive
-      );
-    }
-
-    if (primaryPlatform === 'mixer') {
-      return (
-        this.streamSettingsService.protectedModeEnabled &&
-        this.customizationService.state.updateStreamInfoOnLive &&
-        this.streamSettingsService.isSafeToModifyStreamKey()
-      );
-    }
-
-    if (primaryPlatform === 'facebook') {
-      return (
-        this.streamSettingsService.protectedModeEnabled &&
-        this.streamSettingsService.isSafeToModifyStreamKey()
-      );
-    }
-
-    if (primaryPlatform === 'youtube') {
-      return (
-        this.streamSettingsService.protectedModeEnabled &&
-        this.streamSettingsService.isSafeToModifyStreamKey()
-      );
-    }
   }
 }

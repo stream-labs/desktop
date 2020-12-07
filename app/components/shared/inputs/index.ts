@@ -54,7 +54,7 @@ export interface IListMetadata<TValueType, TOptionData = unknown> extends IInput
   allowEmpty?: boolean;
   loading?: boolean;
   internalSearch?: boolean;
-  allowCustom?: Function;
+  allowCustom?: boolean;
   noResult?: string;
   placeholder?: string;
   fullWidth?: boolean;
@@ -83,6 +83,11 @@ export interface ITextMetadata extends IInputMetadata {
 
 export interface IDateMetadata extends IInputMetadata {
   disablePastDates?: boolean;
+}
+
+export interface IColorMetadata extends IInputMetadata {
+  includeAlpha?: boolean;
+  fullWidth?: boolean;
 }
 
 export interface ISliderMetadata extends IInputMetadata {
@@ -132,7 +137,7 @@ export class InputMetadata {
   list<TOptionData = undefined>(options: IListMetadata<string, TOptionData>) {
     return { type: EInputType.list, ...options } as IListMetadata<string, TOptionData>;
   }
-  color = (options: IInputMetadata) => ({ type: EInputType.color, ...options } as IInputMetadata);
+  color = (options: IColorMetadata) => ({ type: EInputType.color, ...options } as IInputMetadata);
   slider = (options: ISliderMetadata) =>
     ({ type: EInputType.slider, ...options } as ISliderMetadata);
   textArea = (options: ITextMetadata) =>

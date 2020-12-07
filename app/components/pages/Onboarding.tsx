@@ -1,5 +1,4 @@
 import cx from 'classnames';
-import electron from 'electron';
 import { Component } from 'vue-property-decorator';
 import TsxComponent from 'components/tsx-component';
 import { OnboardingService } from 'services/onboarding';
@@ -7,7 +6,7 @@ import { Inject } from 'services/core/injector';
 import { $t } from 'services/i18n';
 import styles from './Onboarding.m.less';
 import commonStyles from './onboarding-steps/Common.m.less';
-import { MagicLinkService } from 'services/magic-link';
+import Scrollable from 'components/shared/Scrollable';
 
 export class OnboardingStepProps {
   continue: () => void = () => {};
@@ -17,36 +16,21 @@ export class OnboardingStepProps {
 @Component({})
 export default class OnboardingPage extends TsxComponent<{}> {
   @Inject() onboardingService: OnboardingService;
-  @Inject() magicLinkService: MagicLinkService;
 
   currentStepIndex = 0;
   processing = false;
 
-  continue(skipped?: boolean) {
+  continue() {
     if (this.processing) return;
     if (this.currentStepIndex >= this.steps.length - 1 || this.singletonStep) {
-      return this.complete(skipped);
+      return this.complete();
     }
 
     this.currentStepIndex = this.currentStepIndex + 1;
   }
 
-  complete(skipped?: boolean) {
-    if (!skipped) this.linkToPrime();
+  complete() {
     this.onboardingService.finish();
-  }
-
-  async linkToPrime() {
-    const isPrimeStep = this.currentStep.label === $t('Prime');
-
-    if (isPrimeStep) {
-      try {
-        const link = await this.magicLinkService.getDashboardMagicLink('prime', 'slobs-onboarding');
-        electron.remote.shell.openExternal(link);
-      } catch (e) {
-        console.error('Error generating dashboard magic link', e);
-      }
-    }
   }
 
   setProcessing(bool: boolean) {
@@ -122,18 +106,20 @@ export default class OnboardingPage extends TsxComponent<{}> {
       <div class={styles.onboardingContainer}>
         {this.topBar}
         <div class={styles.onboardingContent}>
-          <Component
-            class={styles.scroll}
-            continue={() => this.continue()}
-            setProcessing={(processing: boolean) => this.setProcessing(processing)}
-          />
+          <Scrollable className={styles.scroll}>
+            <Component
+              style="height: 100%;"
+              continue={() => this.continue()}
+              setProcessing={(processing: boolean) => this.setProcessing(processing)}
+            />
+          </Scrollable>
         </div>
         {(!this.currentStep.hideSkip || !this.currentStep.hideButton) && (
           <div class={styles.footer}>
             {!this.currentStep.hideSkip && (
               <button
                 class={cx('button button--trans', commonStyles.onboardingButton)}
-                onClick={() => this.continue(true)}
+                onClick={() => this.continue()}
                 disabled={this.processing}
               >
                 {$t('Skip')}

@@ -1,26 +1,49 @@
 <template>
-<modal-layout
-  :title="$t('Media Gallery')"
-  :doneHandler="handleSelect">
-
-  <div slot="content">
-    <div class="container" @dragenter.prevent="onDragEnter" @dragover.prevent="onDragOver" @drop.prevent="handleFileDrop($event)">
-      <input type="file" id="media-gallery-input" @change="handleUploadClick($event)" accept=".webm,.gif,.jpg,.png,.mp3,.ogg,.wav,.svg,.eps,.ai,.psd" multiple="multiple" style="display: none;">
-      <div class="flex">
+  <modal-layout :doneHandler="handleSelect">
+    <div
+      slot="content"
+      class="container"
+      @dragenter.prevent="onDragEnter"
+      @dragover.prevent="onDragOver"
+      @drop.prevent="handleFileDrop($event)"
+    >
+      <input
+        type="file"
+        id="media-gallery-input"
+        @change="handleUploadClick($event)"
+        accept=".webm,.gif,.jpg,.png,.mp3,.ogg,.wav,.svg,.eps,.ai,.psd"
+        multiple="multiple"
+        style="display: none;"
+      />
+      <div class="flex" style="height: 100%;">
         <div class="left-panel">
           <div class="dropzone" @click="openFilePicker">
             <i class="icon-cloud-backup"></i>{{ $t('Drag & Drop Upload') }}
           </div>
-          <ul v-for="(cat) in ['uploads', 'stock']" :key="cat" class="nav-list">
+          <ul v-for="cat in ['uploads', 'stock']" :key="cat" class="nav-list">
             <div>
-              <div class="list__title">{{ cat === 'stock' ? $t('Stock Files') : $t('My Uploads') }}</div>
-              <li class="list__item" :class="{ active: type === null && cat === category }" @click="handleTypeFilter(null, cat)">
+              <div class="list__title">
+                {{ cat === 'stock' ? $t('Stock Files') : $t('My Uploads') }}
+              </div>
+              <li
+                class="list__item"
+                :class="{ active: type === null && cat === category }"
+                @click="handleTypeFilter(null, cat)"
+              >
                 <i class="fa fa-file"></i>{{ $t('All Files') }}
               </li>
-              <li class="list__item" :class="{ active: type === 'image' && cat === category }" @click="handleTypeFilter('image', cat)">
+              <li
+                class="list__item"
+                :class="{ active: type === 'image' && cat === category }"
+                @click="handleTypeFilter('image', cat)"
+              >
                 <i class="icon-image"></i>{{ $t('Images') }}
               </li>
-              <li class="list__item" :class="{ active: type === 'audio' && cat === category }" @click="handleTypeFilter('audio', cat)">
+              <li
+                class="list__item"
+                :class="{ active: type === 'audio' && cat === category }"
+                @click="handleTypeFilter('audio', cat)"
+              >
                 <i class="icon-music"></i>{{ $t('Sounds') }}
               </li>
             </div>
@@ -28,7 +51,10 @@
           <div>
             <div>{{ totalUsageLabel }} / {{ maxUsageLabel }}</div>
             <div class="progress-slider radius">
-              <div :style="'width: ' + (usagePct * 100) + '%'" class="progress-slider__fill radius"></div>
+              <div
+                :style="'width: ' + usagePct * 100 + '%'"
+                class="progress-slider__fill radius"
+              ></div>
             </div>
           </div>
         </div>
@@ -36,56 +62,97 @@
           <h4>{{ title }}</h4>
           <div class="toolbar">
             <i class="icon-cloud-backup" @click="openFilePicker"></i>
-            <i class="icon-trash"
-               :class="{ disabled: !selectedFile || selectedFile && selectedFile.isStock }"
-               @click="handleDelete"
+            <i
+              class="icon-trash"
+              :class="{ disabled: !selectedFile || (selectedFile && selectedFile.isStock) }"
+              @click="handleDelete"
             ></i>
-            <i class="fa fa-download" :class="[!selectedFile ? 'disabled' : '']" @click="handleDownload"></i>
+            <i
+              class="fa fa-download"
+              :class="[!selectedFile ? 'disabled' : '']"
+              @click="handleDownload"
+            ></i>
           </div>
-          <div>
-            <div v-if="dragOver" @dragover.prevent="onDragOver" @dragleave.prevent="onDragLeave" class="drag-overlay radius"></div>
-            <div v-if="busy" class="busy-overlay"></div>
-            <ul v-if="files.length" class="uploads-manager__list">
-              <li v-for="file in files" :key="file.href" :class="[selectedFile && selectedFile.href === file.href ? 'selected' : '']" class="uploads-manager__item radius" @click.prevent="selectFile(file)" @dblclick.prevent="selectFile(file, true)">
-                <div>
-                  <div v-if="file.type === 'image' && /\.webm$/.test(file.href)">
-                    <video autoplay muted loop :src="file.href" style="height: 100%; width: 100%;"></video>
-                  </div>
-                  <div v-if="file.type == 'image' && !/\.webm$/.test(file.href)" class="image-preview" :style="'background-image: url(' + file.href + ')'" ></div>
-                  <div v-if="file.type == 'audio'" style="height: 132px;">
-                    <i class="icon-music" style="line-height: 132px; font-size: 28px; text-align: center; display: block;"></i>
-                  </div>
-                  <button class="copy-button button button--action" @click="handleCopy(file.href)">
-                    <i class="icon-copy"></i> {{ $t('Copy URL') }}
-                  </button>
-                  <div class="upload__footer" :class="[file.type === 'image' ? 'image' : '']">
-                    <div class="upload__size">{{ file.size ? formatBytes(file.size) : ' ' }}</div>
-                    <div class="upload__title">{{ file.fileName }}</div>
-                  </div>
-                </div>
-              </li>
-            </ul>
-
-            <div v-if="!files.length" class="empty-box">
-              <div>{{ noFilesCopy }}</div>
-              <div>
-                <button @click="openFilePicker">{{ noFilesBtn }}</button>
-                <button @click="handleBrowseGalleryClick">{{ $t('Browse the Gallery') }}</button>
+          <div
+            v-if="dragOver"
+            @dragover.prevent="onDragOver"
+            @dragleave.prevent="onDragLeave"
+            class="drag-overlay radius"
+          ></div>
+          <div v-if="busy" class="busy-overlay"></div>
+          <scrollable v-if="files.length" className="uploads-manager__list">
+            <li
+              v-for="file in files"
+              :key="file.href"
+              :class="[selectedFile && selectedFile.href === file.href ? 'selected' : '']"
+              class="uploads-manager__item radius"
+              @click.prevent="selectFile(file)"
+              @dblclick.prevent="selectFile(file, true)"
+            >
+              <div v-if="file.type === 'image' && /\.webm$/.test(file.href)">
+                <video
+                  autoplay
+                  muted
+                  loop
+                  :src="file.href"
+                  style="height: 100%; width: 100%;"
+                ></video>
               </div>
+              <div
+                v-if="file.type == 'image' && !/\.webm$/.test(file.href)"
+                class="image-preview"
+                :style="'background-image: url(' + file.href + ')'"
+              ></div>
+              <div v-if="file.type == 'audio'" style="height: 132px;">
+                <i
+                  class="icon-music"
+                  style="line-height: 132px; font-size: 28px; text-align: center; display: block;"
+                />
+              </div>
+              <i
+                v-if="!file.prime"
+                class="icon-copy"
+                v-tooltip.left="$t('Copy URL')"
+                @click="handleCopy(file.href)"
+              />
+              <div class="upload__footer" :class="[file.type === 'image' ? 'image' : '']">
+                <div class="upload__size">{{ file.size ? formatBytes(file.size) : ' ' }}</div>
+                <div class="upload__title">{{ file.filename }}</div>
+                <div v-if="file.prime" class="upload__prime">
+                  {{ $t('Prime') }}
+                  <i class="icon-prime" />
+                </div>
+              </div>
+            </li>
+          </scrollable>
+
+          <div v-if="!files.length" class="empty-box">
+            <div>{{ noFilesCopy }}</div>
+            <div>
+              <button @click="openFilePicker">{{ noFilesBtn }}</button>
+              <button @click="handleBrowseGalleryClick">{{ $t('Browse the Gallery') }}</button>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-
-</modal-layout>
+  </modal-layout>
 </template>
 
 <script lang="ts" src="./MediaGallery.vue.ts"></script>
 
+<style lang="less">
+.uploads-manager__list {
+  .os-content {
+    display: flex;
+    margin: 10px 0 0;
+    flex-wrap: wrap;
+  }
+}
+</style>
+
 <style lang="less" scoped>
-@import "../../styles/index";
+@import '../../styles/index';
 
 .container {
   display: block;
@@ -94,6 +161,7 @@
   left: 0;
   padding: 30px;
   width: 100%;
+  height: 100%;
   font-family: Roboto, sans-serif;
 }
 
@@ -177,7 +245,9 @@
 
 .right-panel {
   width: 100%;
+  height: 100%;
   padding-left: 30px;
+  overflow: hidden;
 }
 
 .toolbar {
@@ -227,7 +297,7 @@
 }
 
 .drag-overlay {
-  border: 1px solid var(--new);
+  border: 1px solid var(--info);
   background: rgba(255, 200, 0, 0.15);
   z-index: 100000;
   box-sizing: border-box;
@@ -253,20 +323,9 @@
 .uploads-manager__list {
   padding: 0;
   list-style: none;
-  height: 400px;
+  height: calc(100% - 64px);
   width: 100%;
-  overflow-y: scroll;
-  display: flex;
-  margin: 10px 0 0;
-  flex-wrap: wrap;
-}
-
-.copy-button {
-  display: none;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  padding-bottom: 30px;
 }
 
 .uploads-manager__item {
@@ -281,15 +340,23 @@
   &:hover {
     border-color: var(--teal);
     background-color: var(--teal-semi);
-
-    .copy-button {
-      display: inline-block;
-    }
+    cursor: pointer;
   }
 
   &.selected {
     border-color: var(--teal);
     background-color: var(--teal-semi);
+  }
+
+  .icon-copy {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: block;
+
+    &:hover {
+      color: var(--title);
+    }
   }
 }
 
@@ -306,6 +373,10 @@
   font-size: 12px;
 }
 
+.upload__prime {
+  color: var(--prime);
+}
+
 .upload__footer {
   position: absolute;
   bottom: 0;
@@ -316,7 +387,12 @@
   border-bottom-right-radius: 3px;
 
   &.image {
-    background: linear-gradient(rgba(55, 71, 79, 0), rgba(55, 71, 79, 0.3), rgba(55, 71, 79, 0.6), rgba(55, 71, 79, 0.9));
+    background: linear-gradient(
+      rgba(55, 71, 79, 0),
+      rgba(55, 71, 79, 0.3),
+      rgba(55, 71, 79, 0.6),
+      rgba(55, 71, 79, 0.9)
+    );
 
     .upload__title {
       color: var(--white);

@@ -17,6 +17,7 @@ import Utils from 'services/utils';
 import { $t } from 'services/i18n';
 import { Inject } from 'services/core';
 import { UserService } from 'services/user';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 // Maps to --background
 const THEME_BACKGROUNDS = {
@@ -49,6 +50,7 @@ const DISPLAY_BACKGROUNDS = {
 export class CustomizationService extends PersistentStatefulService<ICustomizationServiceState>
   implements ICustomizationServiceApi {
   @Inject() userService: UserService;
+  @Inject() usageStatisticsService: UsageStatisticsService;
 
   static get migrations() {
     return [
@@ -95,6 +97,15 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     super.init();
     this.setSettings(this.runMigrations(this.state, CustomizationService.migrations));
     this.setLiveDockCollapsed(true); // livedock is always collapsed on app start
+
+    if (
+      this.state.pinnedStatistics.cpu ||
+      this.state.pinnedStatistics.fps ||
+      this.state.pinnedStatistics.droppedFrames ||
+      this.state.pinnedStatistics.bandwidth
+    ) {
+      this.usageStatisticsService.recordFeatureUsage('PinnedPerformanceStatistics');
+    }
   }
 
   setSettings(settingsPatch: Partial<ICustomizationSettings>) {
@@ -157,6 +168,10 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
 
   setPinnedStatistics(pinned: IPinnedStatistics) {
     this.setSettings({ pinnedStatistics: pinned });
+  }
+
+  togglePerformanceMode() {
+    this.setSettings({ performanceMode: !this.state.performanceMode });
   }
 
   get themeOptions() {

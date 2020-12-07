@@ -1,87 +1,46 @@
 trigger:
-- staging
+  - staging
+  - master
 
 variables:
   CI: true
 
 jobs:
-  - job: Tests
-
+  - job: Test
     pool:
       name: 'Default'
 
     workspace:
       clean: resources
 
-    steps:
-
-    - powershell: echo "IP for RDP connections:" $(Invoke-RestMethod ipinfo.io/ip)
-      displayName: 'Get RDP address'
-
-    - powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
-      displayName: 'Setup Screen Resolution'
-
-    - script: yarn install --frozen-lockfile --check-files 2>&1
-      displayName: 'Install Dependencies'
-
-    - script: node node_modules/electron/install.js
-      displayName: 'Install Electron'
-
-    - script: 'yarn eslint'
-      displayName: 'ESLint'
-
-    - script: 'yarn compile:strictnulls'
-      displayName: 'Check regressions in files with strictNullChecks'
-
-    - script: 'yarn ci:compile'
-      displayName: 'Compile Assets'
-
-    - script: 'yarn ci:tests'
-      displayName: 'Run Tests'
-      env:
-        SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
-        BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
-        SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
-
-  - job: Screenshots
-
-    pool:
-      name: 'Default'
-
-    workspace:
-      clean: resources
+    strategy:
+      parallel: 4
 
     steps:
+      - powershell: echo "IP for RDP connections:" $(Invoke-RestMethod ipinfo.io/ip)
+        displayName: 'Get RDP address'
 
-    - powershell: echo "IP for RDP connections:" $(Invoke-RestMethod ipinfo.io/ip)
-      displayName: 'Get RDP address'
+      - powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
+        displayName: 'Setup Screen Resolution'
 
-    - powershell: Set-DisplayResolution -Width 1920 -Height 1080 -Force
-      displayName: 'Setup Screen Resolution'
+      - script: yarn install --frozen-lockfile --check-files 2>&1
+        displayName: 'Install Dependencies'
 
-    - script: yarn install --frozen-lockfile --check-files 2>&1
-      displayName: 'Install Dependencies'
+      - script: node node_modules/electron/install.js
+        displayName: 'Install Electron'
 
-    - script: node node_modules/electron/install.js
-      displayName: 'Install Electron'
+      - script: 'yarn ci:compile'
+        displayName: 'Compile Assets'
 
-    - script: 'yarn ci:screentests'
-      displayName: 'Snapshot testing'
-      env:
-        BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
-        SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
-        STREAMLABS_BOT_ID: $(streamlabsBotId)
-        STREAMLABS_BOT_KEY: $(streamlabsBotKey)
-        AWS_BUCKET: $(awsBucket)
-        AWS_ACCESS_KEY: $(awsAccessKey)
-        AWS_SECRET_KEY: $(awsSecretKey)
+      - script: 'yarn ci:tests'
+        displayName: 'Run Tests'
+        env:
+          SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
+          BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
+          SLOBS_TEST_STREAM_KEY: $(twitchStreamKey)
+          SLOBS_TEST_RUN_CHUNK: "$(System.JobPositionInPhase)/$(System.TotalJobsInPhase)"
 
-    - task: PublishPipelineArtifact@0
-      inputs:
-        artifactName: 'SnapshotsResults'
-        targetPath: $(Build.SourcesDirectory)/test-dist/screentest
-
-  - job: Performance
+  - job: Check_eslint_and_strict_nulls_regression
 
     pool:
       name: 'Default'
@@ -100,17 +59,11 @@ jobs:
       - script: yarn install --frozen-lockfile --check-files 2>&1
         displayName: 'Install Dependencies'
 
-      - script: node node_modules/electron/install.js
-        displayName: 'Install Electron'
+      - script: 'yarn eslint'
+        displayName: 'ESLint'
 
-      - script: 'yarn ci:compile'
-        displayName: 'Compile Assets'
-
-      - script: 'yarn ci:performance'
-        displayName: 'Performance testing'
-        env:
-          BROWSER_SOURCE_HARDWARE_ACCELERATION: 'OFF'
-          SLOBS_TEST_USER_POOL_TOKEN: $(userPoolToken)
+      - script: 'yarn compile:strictnulls'
+        displayName: 'Check regressions in files with strictNullChecks'
 
   - job: macOS
 
@@ -132,6 +85,7 @@ jobs:
 
       - script: 'yarn compile:strictnulls'
         displayName: 'Check regressions in files with strictNullChecks'
+
 
       - script: 'yarn ci:compile'
         displayName: 'Compile Assets'

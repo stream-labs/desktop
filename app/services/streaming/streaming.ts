@@ -112,15 +112,15 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     info: {
       lifecycle: 'empty',
       error: null,
+      warning: '',
       checklist: {
         applyOptimizedSettings: 'not-started',
         twitch: 'not-started',
         youtube: 'not-started',
         mixer: 'not-started',
         facebook: 'not-started',
-        setupRestream: 'not-started',
+        setupMultistream: 'not-started',
         startVideoTransmission: 'not-started',
-        publishYoutubeBroadcast: 'not-started',
         postTweet: 'not-started',
       },
     },
@@ -200,12 +200,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
         return;
       }
-      // facebook should have pages
-      if (platform === 'facebook' && !this.facebookService.state.facebookPages?.pages?.length) {
-        this.SET_ERROR('FACEBOOK_HAS_NO_PAGES');
-        this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
-        return;
-      }
     }
     // successfully prepopulated
     this.UPDATE_STREAM_INFO({ lifecycle: 'waitForNewSettings' });
@@ -214,7 +208,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   /**
    * Make a transition to Live
    */
-  async goLive(newSettings?: IGoLiveSettings, unattendedMode = false) {
+  async goLive(newSettings?: IGoLiveSettings) {
     // don't interact with API in loged out mode and when protected mode is disabled
     if (
       !this.userService.isLoggedIn ||
@@ -227,6 +221,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
     // clear the current stream info
     this.RESET_STREAM_INFO();
+
+    // if settings are not provided then GoLive window has been not shown
+    // consider this as unattendedMode
+    const unattendedMode = !newSettings;
 
     // use default settings if no new settings provided
     const settings = newSettings || cloneDeep(this.views.goLiveSettings);
@@ -242,7 +240,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     for (const platform of platforms) {
       const service = getPlatformService(platform);
       try {
-        await this.runCheck(platform, () => service.beforeGoLive(settings));
+        // don't update settigns for twitch in unattendedMode
+        const settingsForPlatform = platform === 'twitch' && unattendedMode ? undefined : settings;
+        await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform));
       } catch (e) {
         console.error(e);
         // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
@@ -261,7 +261,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       let ready = false;
       try {
         await this.runCheck(
-          'setupRestream',
+          'setupMultistream',
           async () => (ready = await this.restreamService.checkStatus()),
         );
       } catch (e) {
@@ -275,7 +275,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
       // update restream settings
       try {
-        await this.runCheck('setupRestream', async () => {
+        await this.runCheck('setupMultistream', async () => {
           // enable restream on the backend side
           if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
           await this.restreamService.beforeGoLive();
@@ -305,16 +305,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       return;
     }
 
-    // publish the Youtube broadcast
-    if (this.streamSettingsService.protectedModeEnabled && settings.platforms.youtube?.enabled) {
-      try {
-        await this.runCheck('publishYoutubeBroadcast', () =>
-          this.youtubeService.publishBroadcast(),
-        );
-      } catch (e) {
-        this.setError(e);
-        return;
-      }
+    // check if we should show the waring about the disabled Auto-start
+    if (settings.platforms.youtube?.enabled && !settings.platforms.youtube.enableAutoStart) {
+      this.SET_WARNING('YT_AUTO_START_IS_DISABLED');
     }
 
     // run afterGoLive hooks
@@ -345,6 +338,32 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     if (this.state.streamingStatus === EStreamingState.Live) {
       this.UPDATE_STREAM_INFO({ lifecycle: 'live' });
       this.createGameAssociation(this.views.commonFields.game);
+      this.recordAfterStreamStartAnalytics(settings);
+    }
+  }
+
+  private recordAfterStreamStartAnalytics(settings: IGoLiveSettings) {
+    if (settings.customDestinations.filter(dest => dest.enabled).length) {
+      this.usageStatisticsService.recordFeatureUsage('CustomStreamDestination');
+    }
+
+    // send analytics for Facebook
+    if (settings.platforms.facebook?.enabled) {
+      const fbSettings = settings.platforms.facebook;
+      this.usageStatisticsService.recordFeatureUsage('StreamToFacebook');
+      if (fbSettings.game) {
+        this.usageStatisticsService.recordFeatureUsage('StreamToFacebookGaming');
+      }
+      if (fbSettings.liveVideoId) {
+        this.usageStatisticsService.recordFeatureUsage('StreamToFacebookScheduledVideo');
+      }
+      if (fbSettings.destinationType === 'me') {
+        this.usageStatisticsService.recordFeatureUsage('StreamToFacebookTimeline');
+      } else if (fbSettings.destinationType === 'group') {
+        this.usageStatisticsService.recordFeatureUsage('StreamToFacebookGroup');
+      } else {
+        this.usageStatisticsService.recordFeatureUsage('StreamToFacebookPage');
+      }
     }
   }
 
@@ -352,12 +371,20 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
    * Update stream stetting while being live
    */
   async updateStreamSettings(settings: IGoLiveSettings) {
+    const lifecycle = this.state.info.lifecycle;
+
     // run checklist
-    this.RESET_STREAM_INFO();
     this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist' });
 
     // call putChannelInfo for each platform
     const platforms = this.views.enabledPlatforms;
+
+    platforms.forEach(platform => {
+      this.UPDATE_STREAM_INFO({
+        checklist: { ...this.state.info.checklist, [platform]: 'not-started' },
+      });
+    });
+
     for (const platform of platforms) {
       // don't update settings for a non-primary platform if we're not live
       if (
@@ -380,8 +407,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
     // save updated settings locally
     this.streamSettingsService.setSettings({ goLiveSettings: settings });
-    // return back to the 'live' state
-    this.UPDATE_STREAM_INFO({ lifecycle: 'live' });
+    // finish the 'runChecklist' step
+    this.UPDATE_STREAM_INFO({ lifecycle });
   }
 
   /**
@@ -440,6 +467,13 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       const errorType = errorTypeOrError as TStreamErrorType;
       this.SET_ERROR(errorType, errorDetails, platform);
     }
+    const error = this.state.info.error;
+    assertIsDefined(error);
+    console.error(error.message, error);
+  }
+
+  resetInfo() {
+    this.RESET_STREAM_INFO();
   }
 
   resetError() {
@@ -497,6 +531,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     // Selective recording cannot be toggled while live
     if (this.state.streamingStatus !== EStreamingState.Offline) return;
 
+    if (enabled) this.usageStatisticsService.recordFeatureUsage('SelectiveRecording');
+
     this.SET_SELECTIVE_RECORDING(enabled);
     obs.Global.multipleRendering = enabled;
   }
@@ -515,7 +551,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.toggleStreaming();
   }
 
-  async finishStartStreaming() {
+  async finishStartStreaming(): Promise<unknown> {
     // register a promise that we should reject or resolve in the `handleObsOutputSignal`
     const startStreamingPromise = new Promise((resolve, reject) => {
       this.resolveStartStreaming = resolve;
@@ -533,8 +569,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       });
 
       if (!goLive.response) {
-        this.rejectStartStreaming();
-        return;
+        return Promise.reject();
       }
     }
 
@@ -648,7 +683,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   startReplayBuffer() {
     if (this.state.replayBufferStatus !== EReplayBufferState.Offline) return;
-
+    this.usageStatisticsService.recordFeatureUsage('ReplayBuffer');
     obs.NodeObs.OBS_service_startReplayBuffer();
   }
 
@@ -692,17 +727,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       size: {
         height,
         width,
-      },
-    });
-  }
-
-  openShareStream() {
-    this.windowsService.showWindow({
-      componentName: 'ShareStream',
-      title: $t('Share Your Stream'),
-      size: {
-        height: 450,
-        width: 520,
       },
     });
   }
@@ -838,6 +862,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           code: info.code,
           status: EStreamingState.Live,
         });
+        this.usageStatisticsService.recordFeatureUsage('Streaming');
       } else if (info.signal === EOBSOutputSignal.Starting) {
         this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
         this.streamingStatusChange.next(EStreamingState.Starting);
@@ -846,7 +871,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         this.RESET_STREAM_INFO();
         this.rejectStartStreaming();
         this.streamingStatusChange.next(EStreamingState.Offline);
-        if (this.streamSettingsService.protectedModeEnabled) this.runPlaformAfterStopStreamHook();
         this.usageStatisticsService.recordAnalyticsEvent('StreamingStatus', {
           code: info.code,
           status: EStreamingState.Offline,
@@ -873,6 +897,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       }[info.signal];
 
       if (info.signal === EOBSOutputSignal.Start) {
+        this.usageStatisticsService.recordFeatureUsage('Recording');
         this.usageStatisticsService.recordAnalyticsEvent('RecordingStatus', {
           status: nextState,
           code: info.code,
@@ -1053,13 +1078,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.state.selectiveRecording = enabled;
   }
 
-  private async runPlaformAfterStopStreamHook() {
-    if (!this.userService.isLoggedIn) return;
-    this.views.enabledPlatforms.forEach(platform => {
-      const service = getPlatformService(platform);
-      if (typeof service.afterStopStream === 'function') {
-        service.afterStopStream();
-      }
-    });
+  @mutation()
+  private SET_WARNING(warningType: 'YT_AUTO_START_IS_DISABLED') {
+    this.state.info.warning = warningType;
   }
 }

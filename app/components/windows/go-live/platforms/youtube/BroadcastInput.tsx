@@ -74,7 +74,11 @@ export default class BroadcastInput extends BaseInput<string, IBroadcastInputMet
 
         // Regular options
         return (
-          <div class={styles.broadcast}>
+          <div
+            class={styles.broadcast}
+            data-option-title={broadcast.snippet.title}
+            data-option-value={broadcast.id}
+          >
             <div class={styles['col-image']}>
               <img src={broadcast.snippet.thumbnails.default.url} />
             </div>

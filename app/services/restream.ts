@@ -1,13 +1,14 @@
-import { StatefulService } from 'services';
+import { StatefulService, ViewHandler } from 'services';
 import { Inject, mutation, InitAfter } from 'services/core';
 import { HostsService } from 'services/hosts';
 import { getPlatformService, TPlatform } from 'services/platforms';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { UserService } from 'services/user';
-import { authorizedHeaders } from 'util/requests';
+import { authorizedHeaders, jfetch } from 'util/requests';
 import { IncrementalRolloutService } from './incremental-rollout';
 import electron from 'electron';
 import { StreamingService } from './streaming';
+import { FacebookService } from './platforms/facebook';
 
 interface IRestreamTarget {
   id: number;
@@ -39,6 +40,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   @Inject() streamSettingsService: StreamSettingsService;
   @Inject() streamingService: StreamingService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
+  @Inject() facebookService: FacebookService;
 
   settings: IUserSettingsResponse;
 
@@ -69,40 +71,41 @@ export class RestreamService extends StatefulService<IRestreamState> {
     });
   }
 
+  get views() {
+    return new RestreamView(this.state);
+  }
+
   async loadUserSettings() {
     this.settings = await this.fetchUserSettings();
     this.SET_GRANDFATHERED(this.settings.grandfathered);
-    this.SET_ENABLED(this.settings.enabled && this.canEnableRestream);
+    this.SET_ENABLED(this.settings.enabled && this.views.canEnableRestream);
   }
 
   get host() {
     return this.hostsService.streamlabs;
   }
 
-  /**
-   * This determines whether the user can enable restream
-   * Requirements:
-   * - Has prime, or
-   * - Has a grandfathered status enabled
-   */
-  get canEnableRestream() {
-    return this.userService.isPrime || (this.userService.state.auth && this.state.grandfathered);
-  }
-
   get chatUrl() {
-    return `https://streamlabs.com/embed/chat?oauth_token=${this.userService.apiToken}`;
+    const hasFBTarget = this.streamInfo.enabledPlatforms.includes('facebook');
+    let fbParams = '';
+    if (hasFBTarget) {
+      const videoId = this.facebookService.state.settings.liveVideoId;
+      const token = this.facebookService.views.getDestinationToken();
+      fbParams = `&fbVideoId=${videoId}&fbToken=${token}`;
+    }
+    return `https://streamlabs.com/embed/chat?oauth_token=${this.userService.apiToken}${fbParams}`;
   }
 
   get shouldGoLiveWithRestream() {
     return this.streamInfo.isMultiplatformMode;
   }
 
-  fetchUserSettings() {
+  fetchUserSettings(): Promise<IUserSettingsResponse> {
     const headers = authorizedHeaders(this.userService.apiToken);
     const url = `https://${this.host}/api/v1/rst/user/settings`;
     const request = new Request(url, { headers });
 
-    return fetch(request).then(res => res.json());
+    return jfetch(request);
   }
 
   fetchTargets(): Promise<IRestreamTarget[]> {
@@ -110,7 +113,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
     const url = `https://${this.host}/api/v1/rst/targets`;
     const request = new Request(url, { headers });
 
-    return fetch(request).then(res => res.json());
+    return jfetch(request);
   }
 
   fetchIngest(): Promise<{ server: string }> {
@@ -118,7 +121,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
     const url = `https://${this.host}/api/v1/rst/ingest`;
     const request = new Request(url, { headers });
 
-    return fetch(request).then(res => res.json());
+    return jfetch(request);
   }
 
   setEnabled(enabled: boolean) {
@@ -136,11 +139,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
     });
     const request = new Request(url, { headers, body, method: 'PUT' });
 
-    return fetch(request).then(res => res.json());
-  }
-
-  get platforms(): TPlatform[] {
-    return [this.userService.state.auth.primaryPlatform, 'facebook'];
+    return jfetch(request);
   }
 
   async beforeGoLive() {
@@ -167,30 +166,29 @@ export class RestreamService extends StatefulService<IRestreamState> {
 
     await Promise.all(promises);
 
-    await this.createTargets(
-      this.streamInfo.enabledPlatforms.map(platform => {
+    await this.createTargets([
+      ...this.streamInfo.enabledPlatforms.map(platform => {
         return {
           platform: platform as TPlatform,
           streamKey: getPlatformService(platform).state.streamKey,
         };
       }),
-    );
+      ...this.streamInfo.goLiveSettings.customDestinations
+        .filter(dest => dest.enabled)
+        .map(dest => ({ platform: 'relay' as 'relay', streamKey: `${dest.url}${dest.streamKey}` })),
+    ]);
   }
 
   checkStatus(): Promise<boolean> {
     const url = `https://${this.host}/api/v1/rst/util/status`;
     const request = new Request(url);
 
-    return fetch(request)
-      .then(res => res.json())
-      .then(
-        j =>
-          j.find((service: { name: string; enabled: boolean }) => service.name === 'restream')
-            .status,
-      );
+    return jfetch<{ name: string; status: boolean }[]>(request).then(
+      j => j.find(service => service.name === 'restream').status,
+    );
   }
 
-  async createTargets(targets: { platform: TPlatform; streamKey: string }[]) {
+  async createTargets(targets: { platform: TPlatform | 'relay'; streamKey: string }[]) {
     const headers = authorizedHeaders(
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
@@ -304,5 +302,18 @@ export class RestreamService extends StatefulService<IRestreamState> {
     // @ts-ignore: typings are incorrect
     this.chatView.destroy();
     this.chatView = null;
+  }
+}
+
+class RestreamView extends ViewHandler<IRestreamState> {
+  /**
+   * This determines whether the user can enable restream
+   * Requirements:
+   * - Has prime, or
+   * - Has a grandfathered status enabled
+   */
+  get canEnableRestream() {
+    const userView = this.getServiceViews(UserService);
+    return userView.isPrime || (userView.auth && this.state.grandfathered);
   }
 }

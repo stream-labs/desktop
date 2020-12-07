@@ -27,5 +27,9 @@
   "Roll Speed": "滾動速度",
   "Speed of the rolling credits.": "滾動點數的速度",
   "Roll Time": "滾動時間",
-  "Duration of the rolling credits.": "滾動點數的持續時間"
+  "Duration of the rolling credits.": "滾動點數的持續時間",
+  "Show Donations": "Show Donations",
+  "Show Subscriptions": "顯示訂閱者",
+  "Show Members": "Show Members",
+  "Show Super Chats": "顯示超級聊天者"
 }

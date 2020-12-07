@@ -44,6 +44,14 @@ interface IRGBColor {
   b: number;
 }
 
+/**
+ * This is a much more typesafe type for json to return,
+ * as it requires declaring its type before use.
+ */
+interface Response {
+  json(): Promise<unknown>;
+}
+
 // list of modules without type definitions
 declare module 'raven-js/*';
 declare module 'v-tooltip';
@@ -74,6 +82,8 @@ declare module '*.frag';
 declare module 'mark.js';
 declare module 'vuejs-datepicker';
 declare module 'vuejs-datepicker/dist/locale';
+declare module 'color-picker';
+declare module 'overlayscrollbars-vue';
 
 // uncomment to allow TS to import components without type definitions
 // webpack still checks the module existence

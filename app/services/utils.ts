@@ -14,6 +14,7 @@ export interface IEnv {
   SLOBS_IPC: boolean;
   SLOBS_USE_LOCAL_HOST: boolean;
   SLOBS_VERSION: string;
+  SLOBS_TRACE_SYNC_IPC: boolean;
   CI: boolean;
 }
 
@@ -24,7 +25,7 @@ export default class Utils {
    */
   static _env: IEnv;
   static get env() {
-    if (!Utils._env) Utils._env = electron.remote.process.env;
+    if (!Utils._env) Utils._env = electron.remote.process.env as any;
     return Utils._env;
   }
 
@@ -206,13 +207,6 @@ export default class Utils {
    */
   static measure(msg: string, timestamp?: number) {
     electron.ipcRenderer.send('measure-time', msg, timestamp || Date.now());
-  }
-
-  static makeChildWindowVisible() {
-    const childWindowId: number = electron.ipcRenderer.sendSync('getWindowIds').child;
-    const childWindow = electron.remote.BrowserWindow.fromId(childWindowId);
-    childWindow.show();
-    childWindow.restore();
   }
 
   static copyToClipboard(str: string) {

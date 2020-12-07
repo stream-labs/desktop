@@ -6,15 +6,16 @@ import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
 import { WindowsService } from 'services/windows';
 import uuid from 'uuid';
-import { stockImages, stockSounds } from './stock-library';
 import { $t } from '../i18n';
+import { jfetch } from 'util/requests';
 
 export interface IMediaGalleryFile {
   href: string;
-  fileName: string;
+  filename: string;
   size: number;
   type: string;
   isStock: boolean;
+  prime?: boolean;
 }
 
 interface IMediaGalleryLimits {
@@ -56,27 +57,14 @@ export class MediaGalleryService extends Service {
     reject: () => void;
   }> = {};
 
-  private stockImages = stockImages.map(item => {
-    return {
-      ...item,
-      type: 'image',
-      isStock: true,
-      size: 0,
-    };
-  });
-
-  private stockSounds = stockSounds.map(item => {
-    return {
-      ...item,
-      type: 'audio',
-      isStock: true,
-      size: 0,
-    };
-  });
-
   async fetchGalleryInfo(): Promise<IMediaGalleryInfo> {
-    const [files, limits] = await Promise.all([this.fetchFiles(), this.fetchFileLimits()]);
-    const totalUsage = files.reduce(
+    const [uploads, limits, stockMedia] = await Promise.all([
+      this.fetchFiles(),
+      this.fetchFileLimits(),
+      this.fetchStockMedia(),
+    ]);
+    const files = uploads.concat(stockMedia.audios, stockMedia.images);
+    const totalUsage = uploads.reduce(
       (size: number, file: IMediaGalleryFile) => size + Number(file.size),
       0,
     );
@@ -154,23 +142,31 @@ export class MediaGalleryService extends Service {
     return new Request(url, { ...options, headers });
   }
 
+  private async fetchStockMedia(): Promise<{
+    audios: Array<IMediaGalleryFile>;
+    images: Array<IMediaGalleryFile>;
+  }> {
+    const req = this.formRequest('api/v5/slobs/widget/alertbox/stock-media');
+    return jfetch(req);
+  }
+
   private async fetchFiles(): Promise<IMediaGalleryFile[]> {
     const req = this.formRequest('api/v5/slobs/uploads');
-    const files: { href: string; size?: number }[] = await fetch(req).then(resp => resp.json());
+    const files: { href: string; size?: number }[] = await jfetch(req);
 
     const uploads = files.map(item => {
-      const fileName = decodeURIComponent(item.href.split(/[\\/]/).pop());
-      const ext = fileName
+      const filename = decodeURIComponent(item.href.split(/[\\/]/).pop());
+      const ext = filename
         .toLowerCase()
         .split('.')
         .pop();
       const type = fileTypeMap[ext];
       const size = item.size || 0;
 
-      return { ...item, fileName, type, size, isStock: false };
+      return { ...item, filename, type, size, isStock: false };
     });
 
-    return uploads.concat(this.stockImages, this.stockSounds);
+    return uploads;
   }
 
   private async fetchFileLimits(): Promise<IMediaGalleryLimits> {

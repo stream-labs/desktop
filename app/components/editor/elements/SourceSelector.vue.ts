@@ -1,13 +1,7 @@
 import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { SourcesService } from 'services/sources';
-import {
-  ScenesService,
-  ISceneItemNode,
-  TSceneNode,
-  ISceneItemFolder,
-  ISceneItem,
-} from 'services/scenes';
+import { ScenesService, TSceneNode, ISceneItemFolder, ISceneItem } from 'services/scenes';
 import { SelectionService } from 'services/selection';
 import { EditMenu } from 'util/menus/EditMenu';
 import SlVueTree, { ISlTreeNode, ISlTreeNodeModel, ICursorPosition } from 'sl-vue-tree';
@@ -18,6 +12,7 @@ import { EPlaceType } from 'services/editor-commands/commands/reorder-nodes';
 import { CustomizationService } from 'services/customization';
 import { StreamingService } from 'services/streaming';
 import TsxComponent from 'components/tsx-component';
+import Scrollable from 'components/shared/Scrollable';
 
 const widgetIconMap = {
   [WidgetType.AlertBox]: 'fas fa-bell',
@@ -64,14 +59,13 @@ interface ISceneNodeData {
 }
 
 @Component({
-  components: { SlVueTree },
+  components: { SlVueTree, Scrollable },
 })
 export default class SourceSelector extends TsxComponent {
   @Inject() private scenesService: ScenesService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private selectionService: SelectionService;
   @Inject() private editorCommandsService: EditorCommandsService;
-  @Inject() private customizationService: CustomizationService;
   @Inject() private streamingService: StreamingService;
 
   sourcesTooltip = $t('The building blocks of your scene. Also contains widgets.');
@@ -145,9 +139,6 @@ export default class SourceSelector extends TsxComponent {
     }
 
     if (source.propertiesManagerType === 'widget') {
-      // IPC is unavoidable here, that's ok. Let's eventually put this in
-      // the store as it's something that the UI cares about. Also typing
-      // is weak for properties managers settings.
       const widgetType = this.sourcesService.views
         .getSource(sourceId)
         .getPropertiesManagerSettings().widgetType;
@@ -168,9 +159,9 @@ export default class SourceSelector extends TsxComponent {
     if (this.scenesService.views.activeScene) {
       let itemsToGroup: string[] = [];
       let parentId: string;
-      if (this.selectionService.canGroupIntoFolder()) {
-        itemsToGroup = this.selectionService.getIds();
-        const parent = this.selectionService.getClosestParent();
+      if (this.selectionService.views.globalSelection.canGroupIntoFolder()) {
+        itemsToGroup = this.selectionService.views.globalSelection.getIds();
+        const parent = this.selectionService.views.globalSelection.getClosestParent();
         if (parent) parentId = parent.id;
       }
       this.scenesService.showNameFolder({
@@ -194,12 +185,13 @@ export default class SourceSelector extends TsxComponent {
   }
 
   removeItems() {
-    this.selectionService.remove();
+    this.selectionService.views.globalSelection.remove();
   }
 
   sourceProperties(nodeId: string) {
     const node =
-      this.scenesService.views.getSceneNode(nodeId) || this.selectionService.getNodes()[0];
+      this.scenesService.views.getSceneNode(nodeId) ||
+      this.selectionService.views.globalSelection.getNodes()[0];
 
     if (!node) return;
 
@@ -255,13 +247,13 @@ export default class SourceSelector extends TsxComponent {
         EPlaceType.Inside,
       );
     }
-    this.selectionService.select(nodesToMove.getIds());
+    this.selectionService.views.globalSelection.select(nodesToMove.getIds());
   }
 
   makeActive(treeNodes: ISlTreeNode<ISceneNodeData>[], ev: MouseEvent) {
     const ids = treeNodes.map(treeNode => treeNode.data.id);
     this.callCameFromInsideTheHouse = true;
-    this.selectionService.actions.select(ids);
+    this.selectionService.views.globalSelection.select(ids);
   }
 
   toggleFolder(treeNode: ISlTreeNode<ISceneNodeData>) {
@@ -301,7 +293,7 @@ export default class SourceSelector extends TsxComponent {
   }
 
   get activeItems() {
-    return this.selectionService.getItems();
+    return this.selectionService.views.globalSelection.getItems();
   }
 
   toggleVisibility(sceneNodeId: string) {

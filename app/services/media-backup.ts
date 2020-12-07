@@ -4,7 +4,7 @@ import fs from 'fs';
 import { Inject } from 'services/core/injector';
 import { HostsService } from 'services/hosts';
 import { UserService } from 'services/user';
-import { getChecksum, isUrl, downloadFile } from 'util/requests';
+import { getChecksum, isUrl, downloadFile, jfetch } from 'util/requests';
 import { AppService } from 'services/app';
 
 const uuid = window['require']('uuid/v4');
@@ -41,7 +41,7 @@ interface IMediaFileDataResponse {
   url: string;
 }
 
-const ONE_GIGABYTE = Math.pow(10, 9);
+const ONE_MEGABYTE = 1_048_576;
 
 export class MediaBackupService extends StatefulService<IMediaBackupState> {
   @Inject() hostsService: HostsService;
@@ -106,7 +106,8 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
       return null;
     }
 
-    if (stats.size > ONE_GIGABYTE) {
+    // Upload limit is 350MB
+    if (stats.size > ONE_MEGABYTE * 350) {
       // We don't upload files larger than 1 gigabyte
       return null;
     }
@@ -128,7 +129,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     let data: { id: number };
 
     try {
-      data = await this.withRetry(() => this.uploadFile(filePath));
+      data = await this.withRetry(() => this.uploadFile(file));
     } catch (e) {
       console.error('[Media Backup] Error uploading file:', e);
 
@@ -246,36 +247,28 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     }
   }
 
-  private async uploadFile(filePath: string) {
-    const checksum = await getChecksum(filePath);
-    const file = await new Promise<Blob>(r => {
-      fs.readFile(filePath, (err, data) => r(new Blob([data])));
+  private async uploadFile(file: IMediaFile) {
+    const checksum = await getChecksum(file.filePath);
+    const fileBlob = await new Promise<Blob>(r => {
+      fs.readFile(file.filePath, (err, data) => r(new Blob([data])));
     });
+    const fileObj = new File([fileBlob], file.name);
+
     const formData = new FormData();
     formData.append('checksum', checksum);
-    formData.append('file', file);
+    formData.append('file', fileObj);
     formData.append('modified', new Date().toISOString());
 
-    return await new Promise<{ id: number }>((resolve, reject) => {
-      fetch(`${this.apiBase}/upload`, {
-        method: 'POST',
-        headers: this.authedHeaders,
-        body: formData,
-      }).then(res => {
-        if (Math.floor(res.status / 100) === 2) {
-          res.json().then(json => resolve(json));
-        } else {
-          reject(res);
-        }
-      });
+    return jfetch<{ id: number }>(`${this.apiBase}/upload`, {
+      method: 'POST',
+      headers: this.authedHeaders,
+      body: formData,
     });
   }
 
   private getFileData(id: number): Promise<IMediaFileDataResponse> {
     const req = new Request(`${this.apiBase}/${id}`, { headers: new Headers(this.authedHeaders) });
-    return fetch(req)
-      .then(r => (r.ok ? Promise.resolve(r) : Promise.reject(r)))
-      .then(r => r.json());
+    return jfetch(req);
   }
 
   private async downloadFile(url: string, serverId: number, filename: string) {

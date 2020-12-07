@@ -39,15 +39,15 @@ export class AuthorizationModule extends Module {
       throw new Error('This application already has an open authorization window!');
     }
 
-    // First, make sure they are requesting a whitelisted URL
+    // First, make sure they are requesting a allowlisted URL
     const parsed = url.parse(authUrl);
-    const valid = !!(ctx.app.manifest.authorizationUrls || []).find(whitelistUrl => {
-      const whitelistParsed = url.parse(whitelistUrl);
-      return whitelistParsed.host === parsed.host && whitelistParsed.pathname === parsed.pathname;
+    const valid = !!(ctx.app.manifest.authorizationUrls || []).find(allowlistUrl => {
+      const allowlistParsed = url.parse(allowlistUrl);
+      return allowlistParsed.host === parsed.host && allowlistParsed.pathname === parsed.pathname;
     });
 
     if (!valid) {
-      throw new Error('Authorization URL is not whitelisted in the application manifest!');
+      throw new Error('Authorization URL is not allowlisted in the application manifest!');
     }
 
     const win = new electron.remote.BrowserWindow({

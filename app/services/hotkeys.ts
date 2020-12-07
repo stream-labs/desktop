@@ -10,7 +10,9 @@ import mapValues from 'lodash/mapValues';
 import { $t } from 'services/i18n';
 import * as obs from '../../obs-api';
 import { GameOverlayService } from './game-overlay';
-import Utils from './utils';
+import { CustomizationService } from './customization';
+import { RecentEventsService } from './recent-events';
+import { UsageStatisticsService } from './usage-statistics';
 
 function getScenesService(): ScenesService {
   return ScenesService.instance;
@@ -30,6 +32,14 @@ function getTransitionsService(): TransitionsService {
 
 function getGameOverlayService(): GameOverlayService {
   return GameOverlayService.instance;
+}
+
+function getCustomizationService(): CustomizationService {
+  return CustomizationService.instance;
+}
+
+function getRecentEventsService(): RecentEventsService {
+  return RecentEventsService.instance;
 }
 
 const isAudio = (sourceId: string) => {
@@ -159,6 +169,16 @@ const GENERAL_ACTIONS: HotkeyGroup = {
     description: () => $t('Toggle overlay positioning mode'),
     down: () => getGameOverlayService().setPreviewMode(!getGameOverlayService().state.previewMode),
   },
+  TOGGLE_PERFORMANCE_MODE: {
+    name: 'TOGGLE_PERFORMANCE_MODE',
+    description: () => $t('Toggle Performance Mode'),
+    down: () => getCustomizationService().togglePerformanceMode(),
+  },
+  SKIP_ALERT: {
+    name: 'SKIP_ALERT',
+    description: () => $t('Skip Alert'),
+    down: () => getRecentEventsService().skipAlert(),
+  },
 };
 
 const SOURCE_ACTIONS: HotkeyGroup = {
@@ -238,6 +258,13 @@ const SOURCE_ACTIONS: HotkeyGroup = {
     down: processObsHotkey(true),
     up: processObsHotkey(false),
     shouldApply: isSourceType('slideshow'),
+  },
+  FFMPEG_SOURCE_RESTART: {
+    name: 'FFMPEG_SOURCE_RESTART',
+    description: () => $t('Restart'),
+    down: processObsHotkey(true),
+    up: processObsHotkey(false),
+    shouldApply: isSourceType('ffmpeg_source'),
   },
 };
 
@@ -366,14 +393,10 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     hotkeys: [],
   };
 
-  @Inject()
-  private scenesService: ScenesService;
-
-  @Inject()
-  private sourcesService: SourcesService;
-
-  @Inject()
-  private keyListenerService: KeyListenerService;
+  @Inject() private scenesService: ScenesService;
+  @Inject() private sourcesService: SourcesService;
+  @Inject() private keyListenerService: KeyListenerService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
 
   /**
    * Memoizes the currently registered hotkeys
@@ -595,7 +618,10 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
       this.keyListenerService.register({
         ...binding,
         eventType: 'registerKeydown',
-        callback: () => hotkeys.forEach(hotkey => hotkey.action.downHandler()),
+        callback: () => {
+          this.usageStatisticsService.recordFeatureUsage('HotkeyPress');
+          hotkeys.forEach(hotkey => hotkey.action.downHandler());
+        },
       });
     });
 

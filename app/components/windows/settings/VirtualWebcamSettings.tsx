@@ -4,6 +4,9 @@ import { Inject } from 'services';
 import { VirtualWebcamService, EVirtualWebcamPluginInstallStatus } from 'services/virtual-webcam';
 import styles from './VirtualWebcamSettings.m.less';
 import cx from 'classnames';
+import { $t } from 'services/i18n';
+import Translate from 'components/shared/translate';
+import { getOS, OS } from 'util/operating-systems';
 
 @Component({})
 export default class AppearanceSettings extends Vue {
@@ -19,6 +22,12 @@ export default class AppearanceSettings extends Vue {
     // Intentionally synchronous. Call is blocking until user action in the worker
     // process, so we don't want the user doing anything else.
     this.virtualWebcamService.install();
+    this.checkInstalled();
+  }
+
+  uninstall() {
+    // Intentionally synchronous for the same reasons as above.
+    this.virtualWebcamService.uninstall();
     this.checkInstalled();
   }
 
@@ -39,10 +48,19 @@ export default class AppearanceSettings extends Vue {
   }
 
   needsInstallSection(isUpdate: boolean) {
-    const message = isUpdate
-      ? 'The Virtual Webcam plugin needs to be updated before it can be started. This requires administrator privileges.'
-      : 'Virtual Webcam requires administrator privileges to be installed on your system.';
-    const buttonText = isUpdate ? 'Update Virtual Webcam' : 'Install Virtual Webcam';
+    let message: string;
+
+    // This is an if statement because ESLint literally doesn't know how to format as a ternary
+    if (isUpdate) {
+      message = $t(
+        'The Virtual Webcam plugin needs to be updated before it can be started. This requires administrator privileges.',
+      );
+    } else {
+      message = $t(
+        'Virtual Webcam requires administrator privileges to be installed on your system.',
+      );
+    }
+    const buttonText = isUpdate ? $t('Update Virtual Webcam') : $t('Install Virtual Webcam');
 
     return (
       <div class="section">
@@ -61,16 +79,27 @@ export default class AppearanceSettings extends Vue {
   }
 
   isInstalledSection() {
-    const buttonText = this.running ? 'Stop Virtual Webcam' : 'Start Virtual Webcam';
+    const buttonText = this.running ? $t('Stop Virtual Webcam') : $t('Start Virtual Webcam');
+    const statusText = this.running
+      ? $t('Virtual webcam is <status>Running</status>')
+      : $t('Virtual webcam is <status>Offline</status>');
 
     return (
       <div class="section">
         <div class="section-content">
           <p>
-            Virtual Webcam is{' '}
-            <span class={cx({ [styles.running]: this.running })}>
-              <b>{this.running ? 'Running' : 'Offline'}</b>
-            </span>
+            <Translate
+              message={statusText}
+              scopedSlots={{
+                status: (text: string) => {
+                  return (
+                    <span class={cx({ [styles.running]: this.running })}>
+                      <b>{text}</b>
+                    </span>
+                  );
+                },
+              }}
+            />
           </p>
           <button
             class={cx('button', { 'button--action': !this.running, 'button--warn': this.running })}
@@ -78,6 +107,35 @@ export default class AppearanceSettings extends Vue {
             onClick={this.running ? this.stop : this.start}
           >
             {buttonText}
+          </button>
+          {getOS() === OS.Mac && (
+            <p>
+              {$t(
+                'If the virtual webcam does not appear in other applications, you may need to restart your computer.',
+              )}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  uninstallSection() {
+    return (
+      <div class="section">
+        <div class="section-content">
+          <p>
+            {$t(
+              'Uninstalling Virtual Webcam will remove it as a device option in other applications.',
+            )}
+          </p>
+          <button
+            class="button button--default"
+            style={{ marginBottom: '16px' }}
+            disabled={this.running}
+            onClick={this.uninstall}
+          >
+            {$t('Uninstall Virtual Webcam')}
           </button>
         </div>
       </div>
@@ -101,15 +159,18 @@ export default class AppearanceSettings extends Vue {
       <div>
         <div class="section">
           <div class="section-content">
-            <b>This is an experimental feature.</b>
+            <b>{$t('This is an experimental feature.')}</b>
             <p>
-              Virtual Webcam allows you to display your scenes from Streamlabs OBS in video
-              conferencing software. Streamlabs OBS will appear as a Webcam that can be selected in
-              most video video conferencing apps.
+              {$t(
+                'Virtual Webcam allows you to display your scenes from Streamlabs OBS in video conferencing software. Streamlabs OBS will appear as a Webcam that can be selected in most video conferencing apps.',
+              )}
             </p>
           </div>
         </div>
         {this.installStatus && this.getSection(this.installStatus)}
+        {this.installStatus &&
+          this.installStatus !== EVirtualWebcamPluginInstallStatus.NotPresent &&
+          this.uninstallSection()}
       </div>
     );
   }

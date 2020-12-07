@@ -94,6 +94,9 @@ export class InternalApiClient {
   ) {
     const serviceName = target.constructor.name;
     const isHelper = target['_isHelper'];
+    const resourceId = isHelper ? target['_resourceId'] : serviceName;
+    const isObservable = target[methodName] instanceof Observable;
+    const isDevMode = Utils.isDevMode();
 
     return (...args: any[]) => {
       // args may contain ServiceHelper objects
@@ -107,9 +110,9 @@ export class InternalApiClient {
         }
       });
 
-      if (options.isAction) {
+      if (options.isAction || isObservable) {
         const request = this.jsonrpc.createRequestWithOptions(
-          isHelper ? target['_resourceId'] : serviceName,
+          resourceId,
           methodName as string,
           {
             compactMode: true,
@@ -120,6 +123,13 @@ export class InternalApiClient {
         );
 
         ipcRenderer.send('services-request-async', request);
+
+        if (isObservable) {
+          const observableResourceId = `${resourceId}.${methodName}`;
+
+          return (this.subscriptions[observableResourceId] =
+            this.subscriptions[observableResourceId] || new Subject());
+        }
 
         if (options.shouldReturn) {
           // Return a promise that will be fulfilled later with the response
@@ -132,23 +142,38 @@ export class InternalApiClient {
         return;
       }
 
-      if (Utils.isDevMode()) {
-        console.warn(
-          `Calling synchronous service method from renderer process: ${
-            isHelper ? target['_resourceId'] : serviceName
-          }.${methodName} - Consider calling as an action instead`,
-        );
+      let startMark: number;
+
+      if (isDevMode) {
+        const msg = `Calling synchronous service method from renderer process: ${resourceId}.${methodName} - Consider calling as an action instead`;
+        const func = Utils.env.SLOBS_TRACE_SYNC_IPC ? console.trace : console.warn;
+
+        func(msg);
+
+        startMark = performance.now();
       }
 
       const response: IJsonRpcResponse<any> = electron.ipcRenderer.sendSync(
         'services-request',
         this.jsonrpc.createRequestWithOptions(
-          isHelper ? target['_resourceId'] : serviceName,
+          resourceId,
           methodName,
           { compactMode: true, fetchMutations: true, windowId: this.windowId },
           ...args,
         ),
       );
+
+      if (isDevMode) {
+        const measure = performance.now() - startMark;
+
+        if (measure > 50) {
+          console.warn(
+            `Synchronous method ${resourceId}.${methodName} took ${measure.toFixed(
+              2,
+            )}ms to execute`,
+          );
+        }
+      }
 
       if (response.error) {
         throw new Error('IPC request failed: check the errors in the worker window');

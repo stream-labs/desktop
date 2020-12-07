@@ -23,6 +23,13 @@ export default class Translate extends TsxComponent<TranslateProps> {
   private xmlNodes: Node[] = [];
 
   created() {
+    this.setup();
+  }
+
+  @Watch('props.message')
+  setup() {
+    this.xmlNodes = [];
+
     // use built-in xml parser to extract xml-nodes
     const xmlDoc = new DOMParser().parseFromString(
       `<root> ${this.props.message} </root>`,
@@ -38,6 +45,11 @@ export default class Translate extends TsxComponent<TranslateProps> {
   }
 
   private renderXmlNode(node: Node) {
+    // don't handle script nodes
+    if (node.nodeName === 'script') {
+      throw new Error('XSS injection detected');
+    }
+
     // render simple text
     if (node.nodeName === '#text') {
       return node.textContent;

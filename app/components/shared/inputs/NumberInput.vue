@@ -4,18 +4,19 @@
     data-role="input"
     data-type="number"
     :data-name="options.name"
+    :data-title="options.title"
     :class="{ 'full-width': options.fullWidth, disabled: options.disabled }"
   >
     <input
-        type="text"
-        ref="input"
-        :placeholder="options.placeholder"
-        :value="displayValue"
-        @input="handleInput($event.target.value)"
-        @mousewheel="onMouseWheelHandler"
-        :name="options.uuid"
-        v-validate="validate"
-        :disabled="options.disabled"
+      type="text"
+      ref="input"
+      :placeholder="options.placeholder"
+      :value="displayValue"
+      @input="handleInput($event.target.value)"
+      @mousewheel="onMouseWheelHandler"
+      :name="options.uuid"
+      v-validate="validate"
+      :disabled="options.disabled"
     />
     <div v-if="options.isInteger" class="arrows">
       <div class="arrow arrow-up" @click="increment">
@@ -31,7 +32,7 @@
 <script lang="ts" src="./NumberInput.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../../styles/index";
+@import '../../../styles/index';
 
 .number-input {
   position: relative;
@@ -39,7 +40,7 @@
 
   .arrows {
     .absolute(0, 8px, 0, auto);
-    .transition();
+    transition: opacity 200ms;
 
     width: 30px;
     color: var(--icon);

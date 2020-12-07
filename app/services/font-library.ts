@@ -5,6 +5,7 @@ import https from 'https';
 import electron from 'electron';
 import { AppService } from 'services/app';
 import { Inject } from 'services/core/injector';
+import { jfetch } from 'util/requests';
 
 export interface IFamilyWithStyle {
   family: IFontFamily;
@@ -37,10 +38,7 @@ export class FontLibraryService extends Service {
     if (!this.manifest) {
       const req = new Request(this.libraryUrl('manifest.json'));
 
-      return fetch(req)
-        .then(response => {
-          return response.json();
-        })
+      return jfetch<IFontManifest>(req, null, { forceJson: true })
         .then(json => {
           this.manifest = json;
           return json;

@@ -4,7 +4,7 @@
             "name": "obs-studio-node",
             "url": "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/",
             "archive": "osn-[VERSION]-release-[OS].tar.gz",
-            "version": "0.8.38",
+            "version": "0.12.8",
             "win64": true,
             "osx": true
         },
@@ -12,7 +12,7 @@
             "name": "node-libuiohook",
             "url": "https://slobs-node-libuiohook.s3-us-west-2.amazonaws.com/",
             "archive": "node-libuiohook-[VERSION]-[OS].tar.gz",
-            "version": "1.0.10",
+            "version": "1.0.17",
             "win64": true,
             "osx": true
         },
@@ -20,7 +20,7 @@
             "name": "node-fontinfo",
             "url": "https://slobs-node-fontinfo.s3-us-west-2.amazonaws.com/",
             "archive": "node-fontinfo-[VERSION]-[OS].tar.gz",
-            "version": "1.0.10",
+            "version": "1.0.15",
             "win64": true,
             "osx": true
         },
@@ -28,7 +28,7 @@
             "name": "font-manager",
             "url": "https://slobs-font-manager.s3-us-west-2.amazonaws.com/",
             "archive": "font-manager-[VERSION]-[OS].tar.gz",
-            "version": "1.1.4",
+            "version": "1.1.9",
             "win64": true,
             "osx": true
         },
@@ -36,7 +36,7 @@
             "name": "crash-handler",
             "url": "https://slobs-crash-handler.s3-us-west-2.amazonaws.com/",
             "archive": "crash-handler-[VERSION]-[OS].tar.gz",
-            "version": "1.0.8",
+            "version": "1.1.7",
             "win64": true,
             "osx": true
         },
@@ -44,7 +44,7 @@
             "name": "node-window-rendering",
             "url": "https://slobs-node-window-rendering.s3-us-west-2.amazonaws.com/",
             "archive": "node-window-rendering-[VERSION]-[OS].tar.gz",
-            "version": "1.0.12",
+            "version": "1.0.15",
             "win64": false,
             "osx": true
         },
@@ -52,7 +52,15 @@
             "name": "game-overlay",
             "url": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/",
             "archive": "game-overlay-[VERSION].tar.gz",
-            "version": "v0.0.41",
+            "version": "0.0.44",
+            "win64": true,
+            "osx": false
+        },
+        {
+            "name": "color-picker",
+            "url": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/",
+            "archive": "color-picker-[VERSION]-[OS].tar.gz",
+            "version": "1.2.12",
             "win64": true,
             "osx": false
         }

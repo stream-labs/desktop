@@ -7,19 +7,20 @@ import { TextNode } from './nodes/overlays/text';
 import { WebcamNode } from './nodes/overlays/webcam';
 import { VideoNode } from './nodes/overlays/video';
 import { TransitionNode } from './nodes/overlays/transition';
+import { GameCaptureNode } from './nodes/overlays/game-capture';
 import { parse } from './parse';
 import { StreamlabelNode } from './nodes/overlays/streamlabel';
 import { WidgetNode } from './nodes/overlays/widget';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import https from 'https';
 import { ScenesService } from 'services/scenes';
 import { SelectionService } from 'services/selection';
 import uuid from 'uuid/v4';
 import { SceneSourceNode } from './nodes/overlays/scene';
 import { AppService } from 'services/app';
 import { importExtractZip } from '../../util/slow-imports';
+import { downloadFile, IDownloadProgress } from 'util/requests';
 
 const NODE_TYPES = {
   RootNode,
@@ -33,13 +34,8 @@ const NODE_TYPES = {
   WidgetNode,
   TransitionNode,
   SceneSourceNode,
+  GameCaptureNode,
 };
-
-export interface IDownloadProgress {
-  totalBytes: number;
-  downloadedBytes: number;
-  percent: number;
-}
 
 export class OverlaysPersistenceService extends Service {
   @Inject() private scenesService: ScenesService;
@@ -52,30 +48,8 @@ export class OverlaysPersistenceService extends Service {
   async downloadOverlay(url: string, progressCallback?: (progress: IDownloadProgress) => void) {
     const overlayFilename = `${uuid()}.overlay`;
     const overlayPath = path.join(os.tmpdir(), overlayFilename);
-    const fileStream = fs.createWriteStream(overlayPath);
 
-    await new Promise((resolve, reject) => {
-      https.get(url).on('response', response => {
-        const totalSize = parseInt(response.headers['content-length']!, 10);
-        let downloaded = 0;
-
-        response.on('data', (chunk: any) => {
-          fileStream.write(chunk);
-          downloaded += chunk.length;
-
-          if (progressCallback) {
-            progressCallback({
-              totalBytes: totalSize,
-              downloadedBytes: downloaded,
-              percent: downloaded / totalSize,
-            });
-          }
-        });
-
-        response.on('end', () => resolve());
-        response.on('error', (err: any) => reject(err));
-      });
-    });
+    await downloadFile(url, overlayPath, progressCallback);
 
     return overlayPath;
   }
@@ -104,7 +78,7 @@ export class OverlaysPersistenceService extends Service {
     await root.load({ assetsPath });
 
     this.scenesService.makeSceneActive(this.scenesService.views.scenes[0].id);
-    this.selectionService.reset();
+    this.selectionService.views.globalSelection.reset();
   }
 
   async saveOverlay(overlayFilePath: string) {

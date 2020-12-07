@@ -2,6 +2,9 @@
 
 cd $PSScriptRoot;
 
+# remove offline agents
+Start-Process -NoNewWindow -Wait "node" -ArgumentList "./remove-offline-agents.js"
+
 # register agent
 ."./register-agent.ps1";
 

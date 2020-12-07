@@ -46,8 +46,8 @@ export default class ExtraSettings extends Vue {
     return this.streamSettingsService.state.protectedModeEnabled;
   }
 
-  showCacheDir() {
-    electron.remote.shell.openItem(this.appService.appDataDirectory);
+  async showCacheDir() {
+    await electron.remote.shell.openPath(this.appService.appDataDirectory);
   }
 
   deleteCacheDir() {
@@ -82,7 +82,7 @@ export default class ExtraSettings extends Vue {
     this.streamlabelsService.restartSession().then(result => {
       if (result) {
         electron.remote.dialog.showMessageBox({
-          message: $t('Stream Labels session has been succesfully restarted!'),
+          message: $t('Stream Labels session has been successfully restarted!'),
         });
       }
     });
@@ -99,7 +99,8 @@ export default class ExtraSettings extends Vue {
   }
 
   importFromObs() {
-    this.obsImporterService.import();
+    this.onboardingService.start({ isImport: true });
+    this.windowsService.closeChildWindow();
   }
 
   get isLoggedIn() {

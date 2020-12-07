@@ -10,6 +10,7 @@ import { SceneCollectionsService } from 'services/scene-collections';
 import electron from 'electron';
 import Utils from 'services/utils';
 import { BehaviorSubject } from 'rxjs';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 const COMMANDS = { ...commands };
 
@@ -31,6 +32,7 @@ interface IEditorCommandsServiceState {
 export class EditorCommandsService extends StatefulService<IEditorCommandsServiceState> {
   @Inject() private selectionService: SelectionService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
 
   static initialState: IEditorCommandsServiceState = {
     undoMetadata: [],
@@ -120,6 +122,8 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
   @shortcut('Ctrl+Z')
   undo() {
     if (this.state.operationInProgress) return;
+
+    this.usageStatisticsService.recordFeatureUsage('Undo');
 
     const command = this.undoHistory.pop();
     this.updateUndoHistoryLength();
@@ -244,7 +248,7 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
   }
 
   private nudgeActiveItems(direction: ENudgeDirection) {
-    const selection = this.selectionService.getActiveSelection();
+    const selection = this.selectionService.views.globalSelection;
 
     if (!selection.getNodes().length) return;
     if (selection.isAnyLocked()) return;

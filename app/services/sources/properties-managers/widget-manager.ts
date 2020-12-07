@@ -21,12 +21,13 @@ export class WidgetManager extends PropertiesManager {
 
   settings: IWidgetManagerSettings;
 
-  get blacklist() {
+  get denylist() {
     return ['url', 'is_local_file'];
   }
 
   applySettings(settings: Dictionary<any>) {
-    this.settings.widgetType = parseInt(settings.widgetType, 10);
+    settings.widgetType = parseInt(settings.widgetType, 10);
+    super.applySettings(settings);
     this.setWidgetType(this.settings.widgetType);
   }
 

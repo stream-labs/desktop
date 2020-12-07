@@ -33,6 +33,7 @@ import { HardwareService, DefaultHardwareService } from 'services/hardware';
 import { AudioService, E_AUDIO_CHANNELS } from '../audio';
 import { ReplayManager } from './properties-managers/replay-manager';
 import { assertIsDefined } from 'util/properties-type-guards';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -77,6 +78,7 @@ export const windowsSources: TSourceType[] = [
   'liv_capture',
   'ovrstream_dc_source',
   'vlc_source',
+  'soundtrack_source',
 ];
 
 /**
@@ -152,6 +154,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
   @Inject() private hardwareService: HardwareService;
   @Inject() private audioService: AudioService;
   @Inject() private defaultHardwareService: DefaultHardwareService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
 
   get views() {
     return new SourcesViews(this.state);
@@ -277,9 +280,29 @@ export class SourcesService extends StatefulService<ISourcesState> {
     this.UPDATE_SOURCE({ id, muted });
     this.updateSourceFlags(source.state, obsInput.outputFlags, true);
 
+    if (type === 'ndi_source') {
+      this.usageStatisticsService.recordFeatureUsage('NDI');
+    } else if (type === 'openvr_capture') {
+      this.usageStatisticsService.recordFeatureUsage('OpenVR');
+    } else if (type === 'vlc_source') {
+      this.usageStatisticsService.recordFeatureUsage('VLC');
+    } else if (type === 'soundtrack_source') {
+      this.usageStatisticsService.recordFeatureUsage('soundtrackSource');
+    } else if (type === 'wasapi_input_capture' || type === 'coreaudio_input_capture') {
+      this.usageStatisticsService.recordFeatureUsage('AudioInputSource');
+    } else if (type === 'dshow_input') {
+      this.usageStatisticsService.recordFeatureUsage('DShowInput');
+    } else if (type === 'window_capture') {
+      this.usageStatisticsService.recordFeatureUsage('WindowCapture');
+    } else if (type === 'monitor_capture') {
+      this.usageStatisticsService.recordFeatureUsage('DisplayCapture');
+    } else if (type === 'game_capture') {
+      this.usageStatisticsService.recordFeatureUsage('GameCapture');
+    }
+
     const managerKlass = PROPERTIES_MANAGER_TYPES[managerType];
     this.propertiesManagers[id] = {
-      manager: new managerKlass(obsInput, options.propertiesManagerSettings || {}),
+      manager: new managerKlass(obsInput, options.propertiesManagerSettings || {}, id),
       type: managerType,
     };
 
@@ -430,7 +453,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
   getAvailableSourcesTypesList(): IObsListOption<TSourceType>[] {
     const obsAvailableTypes = obs.InputFactory.types();
-    const whitelistedTypes: IObsListOption<TSourceType>[] = [
+    const allowlistedTypes: IObsListOption<TSourceType>[] = [
       { description: 'Image', value: 'image_source' },
       { description: 'Color Source', value: 'color_source' },
       { description: 'Browser Source', value: 'browser_source' },
@@ -454,15 +477,16 @@ export class SourcesService extends StatefulService<ISourcesState> {
       { description: 'Audio Output Capture', value: 'coreaudio_output_capture' },
       { description: 'Video Capture Device', value: 'av_capture_input' },
       { description: 'Display Capture', value: 'display_capture' },
+      { description: 'Soundtrack source', value: 'soundtrack_source' },
     ];
 
-    const availableWhitelistedType = whitelistedTypes.filter(type =>
+    const availableAllowlistedTypes = allowlistedTypes.filter(type =>
       obsAvailableTypes.includes(type.value),
     );
     // 'scene' is not an obs input type so we have to set it manually
-    availableWhitelistedType.push({ description: 'Scene', value: 'scene' });
+    availableAllowlistedTypes.push({ description: 'Scene', value: 'scene' });
 
-    return availableWhitelistedType;
+    return availableAllowlistedTypes;
   }
 
   getAvailableSourcesTypes(): TSourceType[] {
@@ -507,6 +531,16 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
   reset() {
     this.RESET_SOURCES();
+  }
+
+  /**
+   * DO NOT CALL THIS FUNCTION
+   * This is a plumbing function that allows properties managers to sync their
+   * settings into the Vuex store. It should not be called from anywhere outside
+   * the base PropertiesManager class.
+   */
+  updatePropertiesManagerSettingsInStore(sourceId: string, settings: Dictionary<any>) {
+    this.UPDATE_SOURCE({ id: sourceId, propertiesManagerSettings: settings });
   }
 
   showSourceProperties(sourceId: string) {

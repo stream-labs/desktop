@@ -21,5 +21,7 @@
   "Play/Pause": "Wiedergabe/Pause",
   "Restart": "Neu starten",
   "Next Slide": "Nächstes Bild",
-  "Previous Slide": "Vorheriges Bild"
+  "Previous Slide": "Vorheriges Bild",
+  "Toggle Performance Mode": "Toggle Performance Mode",
+  "Skip Alert": "Benachrichtigung überspringen"
 }

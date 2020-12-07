@@ -13,6 +13,7 @@ import NavItem from 'components/shared/NavItem.vue';
 import Display from 'components/shared/Display.vue';
 import GenericForm from 'components/obs/inputs/GenericForm';
 import { Subscription } from 'rxjs';
+import Scrollable from 'components/shared/Scrollable';
 
 interface IFilterNodeData {
   visible: boolean;
@@ -26,6 +27,7 @@ interface IFilterNodeData {
     GenericForm,
     Display,
     SlVueTree,
+    Scrollable,
   },
 })
 export default class SourceFilters extends Vue {

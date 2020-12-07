@@ -10,7 +10,7 @@ import { TransitionsService } from 'services/transitions';
 import { SourcesService } from 'services/sources';
 import { ScenesService } from 'services/scenes';
 import { VideoService } from 'services/video';
-import { track } from 'services/usage-statistics';
+import { track, UsageStatisticsService } from 'services/usage-statistics';
 import { IpcServerService } from 'services/api/ipc-server';
 import { TcpServerService } from 'services/api/tcp-server';
 import { StreamlabelsService } from 'services/streamlabels';
@@ -70,18 +70,6 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() gameOverlayService: GameOverlayService;
   @Inject() touchBarService: TouchBarService;
-
-  static initialState: IAppState = {
-    loading: true,
-    argv: electron.remote.process.argv,
-    errorAlert: false,
-    onboarded: false,
-  };
-
-  readonly appDataDirectory = electron.remote.app.getPath('userData');
-
-  loadingChanged = new Subject<boolean>();
-
   @Inject() transitionsService: TransitionsService;
   @Inject() sourcesService: SourcesService;
   @Inject() scenesService: ScenesService;
@@ -102,6 +90,18 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private keyListenerService: KeyListenerService;
   @Inject() private metricsService: MetricsService;
   @Inject() private settingsService: SettingsService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
+
+  static initialState: IAppState = {
+    loading: true,
+    argv: electron.remote.process.argv,
+    errorAlert: false,
+    onboarded: false,
+  };
+
+  readonly appDataDirectory = electron.remote.app.getPath('userData');
+
+  loadingChanged = new Subject<boolean>();
 
   private loadingPromises: Dictionary<Promise<any>> = {};
 
@@ -145,6 +145,7 @@ export class AppService extends StatefulService<IAppState> {
     this.dismissablesService.initialize();
 
     electron.ipcRenderer.on('shutdown', () => {
+      this.windowsService.hideMainWindow();
       electron.ipcRenderer.send('acknowledgeShutdown');
       this.shutdownHandler();
     });
@@ -180,13 +181,13 @@ export class AppService extends StatefulService<IAppState> {
     this.tcpServerService.stopListening();
 
     window.setTimeout(async () => {
-      obs.NodeObs.StopCrashHandler();
+      obs.NodeObs.InitShutdownSequence();
       this.crashReporterService.beginShutdown();
       this.shutdownStarted.next();
       this.keyListenerService.shutdown();
       this.platformAppsService.unloadAllApps();
-      this.windowsService.closeChildWindow();
-      await this.windowsService.closeAllOneOffs();
+      await this.usageStatisticsService.flushEvents();
+      this.windowsService.shutdown();
       this.ipcServerService.stopListening();
       await this.userService.flushUserSession();
       await this.sceneCollectionsService.deinitialize();

@@ -3,20 +3,26 @@ import { Inject } from 'services/core/injector';
 import { $t } from 'services/i18n';
 import { ISettingsSubCategory } from 'services/settings';
 import TsxComponent from 'components/tsx-component';
-import { StreamSettingsService } from '../../../services/settings/streaming';
+import {
+  ICustomStreamDestination,
+  StreamSettingsService,
+} from '../../../services/settings/streaming';
 import GenericFormGroups from '../../obs/inputs/GenericFormGroups.vue';
 import { UserService } from 'services/user';
 import styles from './StreamSettings.m.less';
 import PlatformLogo from 'components/shared/PlatformLogo';
 import { RestreamService } from 'services/restream';
-import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
-import { metadata } from 'components/shared/inputs';
 import { NavigationService } from 'services/navigation';
 import { WindowsService } from 'services/windows';
 import { EStreamingState, StreamingService } from 'services/streaming';
 import BrowserView from 'components/shared/BrowserView';
 import { getPlatformService, TPlatform } from '../../../services/platforms';
 import cx from 'classnames';
+import ValidatedForm from '../../shared/inputs/ValidatedForm';
+import { formMetadata, metadata } from 'components/shared/inputs';
+import VFormGroup from '../../shared/inputs/VFormGroup.vue';
+import cloneDeep from 'lodash/cloneDeep';
+import namingHelpers from '../../../util/NamingHelpers';
 
 @Component({ components: { GenericFormGroups, PlatformLogo, BrowserView } })
 export default class StreamSettings extends TsxComponent {
@@ -27,7 +33,24 @@ export default class StreamSettings extends TsxComponent {
   @Inject() private windowsService: WindowsService;
   @Inject() private streamingService: StreamingService;
 
+  $refs: {
+    customDestForm: ValidatedForm;
+  };
+
   private obsSettings = this.streamSettingsService.getObsStreamSettings();
+  private customDestModel: ICustomStreamDestination = {
+    name: '',
+    url: '',
+    streamKey: '',
+    enabled: false,
+  };
+  private customDestMetadata = formMetadata({
+    name: metadata.text({ title: $t('Name'), required: true }),
+    url: metadata.text({ title: 'URL', required: true }),
+    streamKey: metadata.text({ title: $t('Stream Key'), masked: true }),
+  });
+
+  private editCustomDestMode: boolean | number = false;
 
   saveObsSettings(obsSettings: ISettingsSubCategory[]) {
     this.streamSettingsService.setObsStreamSettings(obsSettings);
@@ -38,8 +61,12 @@ export default class StreamSettings extends TsxComponent {
     this.streamSettingsService.setSettings({ protectedModeEnabled: false });
   }
 
-  restoreDefaults() {
-    this.streamSettingsService.resetStreamSettings();
+  private enableProtectedMode() {
+    this.streamSettingsService.actions.setSettings({
+      protectedModeEnabled: true,
+      key: '',
+      streamType: 'rtmp_common',
+    });
   }
 
   get protectedModeEnabled(): boolean {
@@ -58,8 +85,12 @@ export default class StreamSettings extends TsxComponent {
     return this.streamingService.state.streamingStatus === EStreamingState.Offline;
   }
 
+  get customDestinations() {
+    return this.streamingService.views.goLiveSettings.customDestinations;
+  }
+
   private platformMerge(platform: TPlatform) {
-    if (this.restreamService.canEnableRestream) {
+    if (this.restreamService.views.canEnableRestream) {
       this.navigationService.navigate('PlatformMerge', { platform });
       this.windowsService.actions.closeChildWindow();
     } else {
@@ -71,6 +102,61 @@ export default class StreamSettings extends TsxComponent {
     getPlatformService(platform).unlink();
   }
 
+  private editCustomDest(ind: number) {
+    this.customDestModel = cloneDeep(this.customDestinations[ind]);
+    this.editCustomDestMode = ind;
+  }
+
+  private addCustomDest() {
+    if (!this.userService.isPrime) {
+      this.userService.openPrimeUrl('slobs-multistream');
+      return;
+    }
+    this.customDestModel = {
+      name: this.suggestCustomDestName(),
+      streamKey: '',
+      url: '',
+      enabled: false,
+    };
+    this.editCustomDestMode = true;
+  }
+
+  private async saveCustomDest() {
+    if (!(await this.$refs.customDestForm.validate())) return;
+
+    // add "/" to the end of url string
+    if (
+      this.customDestModel.streamKey &&
+      this.customDestModel.url.charAt(this.customDestModel.url.length - 1) !== '/'
+    ) {
+      this.customDestModel.url += '/';
+    }
+
+    const destinations = cloneDeep(this.customDestinations);
+    const isUpdateMode = typeof this.editCustomDestMode === 'number';
+    if (isUpdateMode) {
+      const ind = this.editCustomDestMode as number;
+      destinations.splice(ind, 1, this.customDestModel);
+    } else {
+      destinations.push(this.customDestModel);
+    }
+    this.streamSettingsService.setGoLiveSettings({ customDestinations: destinations });
+    this.editCustomDestMode = false;
+  }
+
+  private suggestCustomDestName() {
+    const destinations = this.customDestinations;
+    return namingHelpers.suggestName($t('Destination'), (name: string) =>
+      destinations.find(dest => dest.name === name),
+    );
+  }
+
+  private removeCustomDest(ind: number) {
+    const destinations = cloneDeep(this.customDestinations);
+    destinations.splice(ind, 1);
+    this.streamSettingsService.setGoLiveSettings({ customDestinations: destinations });
+  }
+
   render() {
     const platforms = this.streamingView.allPlatforms;
     return (
@@ -78,7 +164,10 @@ export default class StreamSettings extends TsxComponent {
         {/* account info */}
         {this.protectedModeEnabled && (
           <div>
+            <h2>{$t('Stream Destinations')}</h2>
             {platforms.map(platform => this.renderPlatform(platform))}
+
+            {<div>{this.renderCustomDestinations()}</div>}
 
             {this.canEditSettings && (
               <div>
@@ -104,7 +193,7 @@ export default class StreamSettings extends TsxComponent {
             <br />
 
             {this.canEditSettings && (
-              <button class="button button--warn" onClick={this.restoreDefaults}>
+              <button class="button button--warn" onClick={() => this.enableProtectedMode()}>
                 {$t('Use recommended settings')}
               </button>
             )}
@@ -119,7 +208,7 @@ export default class StreamSettings extends TsxComponent {
     );
   }
 
-  renderPlatform(platform: TPlatform) {
+  private renderPlatform(platform: TPlatform) {
     const isMerged = this.streamingView.isPlatformLinked(platform);
     const username = this.userService.state.auth.platforms[platform]?.username;
     const platformName = getPlatformService(platform).displayName;
@@ -182,6 +271,89 @@ export default class StreamSettings extends TsxComponent {
           )}
         </div>
       </div>
+    );
+  }
+
+  private renderCustomDestinations() {
+    const isPrime = this.userService.isPrime;
+    const shouldShowPrimeLabel = !isPrime;
+    const destinations = this.customDestinations;
+    const isEditMode = this.editCustomDestMode !== false;
+    const shouldShowAddForm = this.editCustomDestMode === true;
+    const canAddMoreDestinations = destinations.length < 2;
+    return (
+      <p>
+        {destinations.map((dest, ind) => this.renderCustomDestination(dest, ind))}
+        {!isEditMode && canAddMoreDestinations && (
+          <a class={styles.addDestinationBtn} onclick={() => this.addCustomDest()}>
+            <i class="fa fa-plus" />
+            <span>{$t('Add Destination')}</span>
+            {shouldShowPrimeLabel ? (
+              <b class={styles.prime}>prime</b>
+            ) : (
+              <div class={styles.prime} />
+            )}
+          </a>
+        )}
+        {!canAddMoreDestinations && <p>{$t('Maximum custom destinations has been added')}</p>}
+        {shouldShowAddForm && <div class="section">{this.renderCustomDestForm()}</div>}
+      </p>
+    );
+  }
+
+  private renderCustomDestination(dest: ICustomStreamDestination, ind: number) {
+    const isEditMode = this.editCustomDestMode === ind;
+    return (
+      <div class="section">
+        <div class="flex">
+          <div class="margin-right--20" style={{ width: '50px' }}>
+            <i class={cx(styles.destinationLogo, 'fa fa-globe')} />
+          </div>
+          <div class={styles.destinationName}>
+            <span>{dest.name}</span> <br />
+            {dest.url}
+            <br />
+          </div>
+
+          <div style={{ marginLeft: 'auto' }}>
+            {!isEditMode && (
+              <div>
+                <i
+                  class={cx('fa fa-trash', styles.actionIcon)}
+                  onClick={() => this.removeCustomDest(ind)}
+                />
+                <i
+                  class={cx('fa fa-pen', styles.actionIcon)}
+                  onClick={() => this.editCustomDest(ind)}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+        {isEditMode && this.renderCustomDestForm()}
+      </div>
+    );
+  }
+
+  private renderCustomDestForm() {
+    return (
+      <ValidatedForm ref="customDestForm">
+        <VFormGroup vModel={this.customDestModel.name} metadata={this.customDestMetadata.name} />
+        <VFormGroup vModel={this.customDestModel.url} metadata={this.customDestMetadata.url} />
+        <VFormGroup
+          vModel={this.customDestModel.streamKey}
+          metadata={this.customDestMetadata.streamKey}
+        />
+
+        <p style={{ textAlign: 'right' }}>
+          <button class="button button--default" onClick={() => (this.editCustomDestMode = false)}>
+            {$t('Cancel')}
+          </button>
+          <button class="button button--action" onClick={() => this.saveCustomDest()}>
+            {$t('Save')}
+          </button>
+        </p>
+      </ValidatedForm>
     );
   }
 }

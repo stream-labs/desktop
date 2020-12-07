@@ -17,6 +17,7 @@ export interface ISource {
   doNotDuplicate: boolean;
   configurable: boolean;
   propertiesManagerType: TPropertiesManager;
+  propertiesManagerSettings?: Dictionary<any>;
   channel?: number;
 }
 
@@ -111,7 +112,8 @@ export type TSourceType =
   | 'av_capture_input'
   | 'display_capture'
   | 'audio_line'
-  | 'syphon-input';
+  | 'syphon-input'
+  | 'soundtrack_source';
 
 // Register new properties managers here
 export type TPropertiesManager = 'default' | 'widget' | 'streamlabels' | 'platformApp' | 'replay';

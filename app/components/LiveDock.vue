@@ -61,6 +61,13 @@
             >
               <i class="icon-settings" />
             </a>
+            <a
+              @click="openFBStreamUrl"
+              v-if="isFacebook && isStreaming"
+              v-tooltip="viewStreamTooltip"
+            >
+              <i class="icon-studio" />
+            </a>
           </div>
           <div class="flex">
             <a
@@ -119,7 +126,7 @@
   border-left: 1px solid var(--border);
 
   &.can-animate {
-    .transition();
+    transition: width 300ms;
   }
 
   &.live-dock--left {

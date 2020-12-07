@@ -175,6 +175,13 @@ export default class AnimationInput extends BaseInput<string, IAnimationMetadata
         return { ...this.options, options: eventInAnimations() };
       case 'eventOut':
         return { ...this.options, options: eventOutAnimations() };
+      default:
+        return {
+          ...this.options,
+          options: textAnimations()
+            .concat(inAnimations())
+            .concat(outAnimations()),
+        };
     }
   }
 }

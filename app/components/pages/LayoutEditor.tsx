@@ -11,14 +11,13 @@ import { LayoutService, ELayoutElement, ELayout, LayoutSlot } from 'services/lay
 import { $t } from 'services/i18n';
 import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
-import { UserService } from 'services/user';
+import Scrollable from 'components/shared/Scrollable';
 
 @Component({})
 export default class LayoutEditor extends TsxComponent {
   @Inject() private layoutService: LayoutService;
   @Inject() private navigationService: NavigationService;
   @Inject() private customizationService: CustomizationService;
-  @Inject() private userService: UserService;
 
   currentLayout = this.layoutService.views.currentTab.currentLayout || ELayout.Default;
   slottedElements = cloneDeep(this.layoutService.views.currentTab.slottedElements) || {};
@@ -84,15 +83,15 @@ export default class LayoutEditor extends TsxComponent {
     this.currentLayout = layout;
   }
 
-  save() {
+  async save() {
     if (this.currentLayout !== this.layoutService.views.currentTab.currentLayout) {
-      this.layoutService.changeLayout(this.currentLayout);
+      await this.layoutService.actions.return.changeLayout(this.currentLayout);
     }
-    this.layoutService.setSlots(this.slottedElements);
+    await this.layoutService.actions.return.setSlots(this.slottedElements);
     if (this.browserUrl && this.slottedElements[ELayoutElement.Browser]) {
-      this.layoutService.setUrl(this.browserUrl);
+      await this.layoutService.actions.return.setUrl(this.browserUrl);
     }
-    this.navigationService.navigate('Studio');
+    this.navigationService.actions.navigate('Studio');
   }
 
   closeModal() {
@@ -168,7 +167,7 @@ export default class LayoutEditor extends TsxComponent {
       <div class={styles.elementList}>
         <div class={styles.title}>{$t('Elements')}</div>
         <div class={styles.subtitle}>{$t('Drag and drop to edit.')}</div>
-        <div class={styles.elementContainer}>
+        <Scrollable className={styles.elementContainer}>
           {Object.keys(ELayoutElement).map((element: ELayoutElement) => (
             <div
               draggable
@@ -179,7 +178,7 @@ export default class LayoutEditor extends TsxComponent {
               {this.layoutService.views.elementTitle(element)}
             </div>
           ))}
-        </div>
+        </Scrollable>
       </div>
     );
   }
@@ -190,7 +189,7 @@ export default class LayoutEditor extends TsxComponent {
         <div>
           <div class={styles.title}>{$t('Layouts')}</div>
           <div class={styles.subtitle} />
-          <div class={styles.layouts}>
+          <Scrollable className={styles.layouts} autoSizeCapable={true}>
             {Object.keys(ELayout).map(layout => (
               <img
                 class={this.currentLayout === layout ? styles.active : ''}
@@ -198,7 +197,7 @@ export default class LayoutEditor extends TsxComponent {
                 src={this.layoutImage(ELayout[layout])}
               />
             ))}
-          </div>
+          </Scrollable>
         </div>
         {this.elementList}
       </div>

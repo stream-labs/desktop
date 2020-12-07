@@ -20,6 +20,7 @@ import { WindowsService } from 'services/windows';
 import { IAlertBoxVariation } from 'services/widgets/settings/alert-box/alert-box-api';
 import { ERenderingMode } from '../../../obs-api';
 import TsxComponent, { createProps } from 'components/tsx-component';
+import Scrollable from 'components/shared/Scrollable';
 
 class WidgetEditorProps {
   isAlertBox?: boolean = false;
@@ -48,6 +49,7 @@ class WidgetEditorProps {
     Display,
     CustomFieldsEditor,
     CodeEditor,
+    Scrollable,
   },
   props: createProps(WidgetEditorProps),
 })

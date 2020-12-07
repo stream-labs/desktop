@@ -14,8 +14,9 @@ import Utils from 'services/utils';
 import * as obs from '../../../obs-api';
 import isEqual from 'lodash/isEqual';
 import omitBy from 'lodash/omitBy';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, omit } from 'lodash';
 import { assertIsDefined } from '../../util/properties-type-guards';
+import { SourceFiltersService } from '../source-filters';
 
 @ServiceHelper()
 export class Source implements ISourceApi {
@@ -33,11 +34,12 @@ export class Source implements ISourceApi {
   channel?: number;
   resourceId: string;
   propertiesManagerType: TPropertiesManager;
+  propertiesManagerSettings: Dictionary<any>;
 
   state: ISource;
 
-  @Inject()
-  scenesService: ScenesService;
+  @Inject() private scenesService: ScenesService;
+  @Inject() private sourceFiltersService: SourceFiltersService;
 
   /**
    * Should only be called by functions with the ExecuteInWorkerProcess() decorator
@@ -105,10 +107,8 @@ export class Source implements ISourceApi {
     return this.propertiesManagerType;
   }
 
-  // TODO: propertiesMangers should be private
-  @ExecuteInWorkerProcess()
   getPropertiesManagerSettings(): Dictionary<any> {
-    return cloneDeep(this.sourcesService.propertiesManagers[this.sourceId].manager.settings);
+    return this.propertiesManagerSettings;
   }
 
   // TODO: propertiesMangers should be private
@@ -132,6 +132,7 @@ export class Source implements ISourceApi {
     this.sourcesService.propertiesManagers[this.sourceId].manager = new managerKlass(
       this.getObsInput(),
       settings,
+      this.sourceId,
     );
     this.sourcesService.propertiesManagers[this.sourceId].type = type;
     this.SET_PROPERTIES_MANAGER_TYPE(type);
@@ -162,11 +163,21 @@ export class Source implements ISourceApi {
   duplicate(newSourceId?: string): Source | null {
     if (this.doNotDuplicate) return null;
 
-    return this.sourcesService.createSource(this.name, this.type, this.getSettings(), {
+    // create a new source
+    const newSource = this.sourcesService.createSource(this.name, this.type, this.getSettings(), {
       sourceId: newSourceId,
       propertiesManager: this.getPropertiesManagerType(),
-      propertiesManagerSettings: this.getPropertiesManagerSettings(),
+      // Media backup settings are considered per-source and should not be
+      // copied to new sources.
+      propertiesManagerSettings: omit(this.getPropertiesManagerSettings(), 'mediaBackup'),
     });
+
+    // copy filters
+    this.sourceFiltersService.getFilters(this.sourceId).forEach(filter => {
+      this.sourceFiltersService.add(newSource.sourceId, filter.type, filter.name, filter.settings);
+    });
+
+    return newSource;
   }
 
   remove() {

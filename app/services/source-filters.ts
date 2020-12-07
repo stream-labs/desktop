@@ -16,6 +16,7 @@ import namingHelpers from '../util/NamingHelpers';
 import { $t } from 'services/i18n';
 import { EOrderMovement } from 'obs-studio-node';
 import { Subject } from 'rxjs';
+import { UsageStatisticsService } from './usage-statistics';
 
 export type TSourceFilterType =
   | 'mask_filter'
@@ -61,11 +62,9 @@ export interface ISourceFilterIdentifier {
 }
 
 export class SourceFiltersService extends Service {
-  @Inject()
-  sourcesService: SourcesService;
-
-  @Inject()
-  windowsService: WindowsService;
+  @Inject() private sourcesService: SourcesService;
+  @Inject() private windowsService: WindowsService;
+  @Inject() private usageStatisticsService: UsageStatisticsService;
 
   filterAdded = new Subject<ISourceFilterIdentifier>();
   filterRemoved = new Subject<ISourceFilterIdentifier>();
@@ -74,7 +73,7 @@ export class SourceFiltersService extends Service {
 
   getTypesList(): IObsListOption<TSourceFilterType>[] {
     const obsAvailableTypes = obs.FilterFactory.types();
-    const whitelistedTypes: IObsListOption<TSourceFilterType>[] = [
+    const allowlistedTypes: IObsListOption<TSourceFilterType>[] = [
       { description: $t('Image Mask/Blend'), value: 'mask_filter' },
       { description: $t('Crop/Pad'), value: 'crop_filter' },
       { description: $t('Gain'), value: 'gain_filter' },
@@ -98,7 +97,7 @@ export class SourceFiltersService extends Service {
       { description: $t('Shader'), value: 'shader_filter' },
     ];
 
-    return whitelistedTypes.filter(type => obsAvailableTypes.includes(type.value));
+    return allowlistedTypes.filter(type => obsAvailableTypes.includes(type.value));
   }
 
   getTypes(): ISourceFilterType[] {
@@ -168,6 +167,11 @@ export class SourceFiltersService extends Service {
     // We need to release one
     obsFilter.release();
     this.filterAdded.next({ sourceId, name: filterName });
+
+    if (filterType === 'vst_filter') {
+      this.usageStatisticsService.recordFeatureUsage('VST');
+    }
+
     return filterReference;
   }
 
@@ -269,7 +273,7 @@ export class SourceFiltersService extends Service {
       queryParams: { sourceId },
       size: {
         width: 600,
-        height: 400,
+        height: 500,
       },
     });
   }

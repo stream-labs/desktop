@@ -10,7 +10,7 @@
   left: 0;
   top: 0;
   bottom: 0;
-  border-right: 1px solid var(--section-alt);
+  background: var(--section-alt);
 }
 
 .container.left-dock {
@@ -18,25 +18,24 @@
 }
 
 .cell {
+  display: flex;
   height: 46px;
   width: 52px;
   position: relative;
   flex-shrink: 0;
+  font-size: 16px;
 
   i {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    margin: auto;
   }
 
   &:hover {
-    transition: all 0.2s;
     cursor: pointer;
-    background: var(--solid-input);
 
     i {
+      transition: all 0.2s;
       color: var(--title);
+      transform: scale(1.2, 1.2);
     }
   }
 
@@ -54,11 +53,9 @@
     right: 4px;
     font-size: 10px;
     color: var(--title);
-  }
 
-  &.active {
-    .studio-dropdown {
-      color: var(--background);
+    &.studio-dropdown-active {
+      color: var(--teal);
     }
   }
 }
@@ -69,8 +66,9 @@
   top: 46px;
   left: 0;
   overflow-y: auto;
-  background-color: var(--background);
+  background-color: var(--studio-tabs);
   z-index: 10;
+  border-radius: 15px;
 
   &::-webkit-scrollbar {
     display: none;
@@ -80,13 +78,10 @@
 .main-cell {
   .cell;
 
-  border-bottom: 1px solid var(--section-alt);
-
   &.active {
-    background-color: var(--title);
-
     i {
-      color: var(--background);
+      transform: scale(1.2, 1.2);
+      color: var(--teal);
     }
   }
 
@@ -105,8 +100,8 @@
 }
 
 .new-badge {
-  background: var(--teal);
-  color: var(--action-button-text);
+  background: var(--new-badge);
+  color: var(--new-badge-text);
   font-size: 9px;
   position: absolute;
   right: 2px;
@@ -118,6 +113,11 @@
 
 .bottom-tools {
   margin-top: auto;
+  margin-bottom: 12px;
   flex-shrink: 0;
-  background: var(--background);
+
+  .cell {
+    height: 35px;
+    font-size: 14px;
+  }
 }

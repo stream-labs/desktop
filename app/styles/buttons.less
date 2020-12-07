@@ -1,5 +1,4 @@
 .button {
-  .transition();
   .radius();
   .weight(@medium);
   .padding-h-sides();
@@ -122,7 +121,6 @@
 }
 
 .circle-button {
-  .transition();
   .weight(@bold);
 
   position: relative;
@@ -163,7 +161,6 @@
 
 .square-button {
   .radius();
-  .transition();
 
   display: flex;
   justify-content: center;
@@ -197,49 +194,49 @@
 
 .square-button--twitch,
 .button--twitch {
-  background: #6441a4;
+  background: var(--twitch);
 
   &:hover {
-    background: lighten(#6441a4, 4%) !important;
+    background: var(--twitch-hover) !important;
   }
 
   &:focus,
   &:active {
-    background: #6441a4;
+    background: var(--twitch);
   }
 }
 
 .square-button--youtube,
 .button--youtube {
-  background: #d22222;
+  background: var(--youtube);
 
   &:hover {
-    background: lighten(#d22222, 4%) !important;
+    background: var(--youtube-hover) !important;
   }
 
   &:focus,
   &:active,
   &:disabled {
-    background: #d22222;
+    background: var(--youtube);
   }
 }
 
 .square-button--facebook,
 .button--facebook {
-  background: #4267b2;
+  background: var(--facebook);
 
   &:hover,
   &:active {
-    background: lighten(#4267b2, 4%) !important;
+    background: var(--facebook-hover) !important;
   }
 }
 
 .square-button--twitter {
-  background: #1da1f2;
+  background: var(--twitter);
 
   &:hover,
   &:active {
-    background: lighten(#1da1f2, 4%) !important;
+    background: var(--twitter-hover) !important;
   }
 }
 
@@ -287,10 +284,10 @@
 
 .square-button--mixer,
 .button--mixer {
-  background: #0078d7;
+  background: var(--mixer);
 
   &:hover {
-    background: lighten(#0078d7, 4%);
+    background: var(--mixer-hover);
   }
 }
 

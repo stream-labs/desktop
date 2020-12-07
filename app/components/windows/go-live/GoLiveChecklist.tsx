@@ -30,6 +30,19 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
   @Inject() private youtubeService: YoutubeService;
   @Inject() private twitterService: TwitterService;
   @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
+  private delayEnabled = this.streamingService.delayEnabled;
+  private delaySecondsRemaining = 0;
+
+  created() {
+    if (!this.delayEnabled) return;
+    const updateDelaySecondsRemaining = () => {
+      this.delaySecondsRemaining = this.streamingService.delaySecondsRemaining;
+      setTimeout(() => {
+        updateDelaySecondsRemaining();
+      }, 1000);
+    };
+    updateDelaySecondsRemaining();
+  }
 
   private get view() {
     return this.streamingService.views;
@@ -49,10 +62,12 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
 
   @Watch('lifecycle')
   private async watchLifecycle() {
-    // close window in 1s after start streaming
-    if (this.lifecycle === 'live') {
+    // close this window in 1s after start streaming
+    if (this.lifecycle === 'live' && !this.view.info.warning) {
       await Utils.sleep(1000);
-      this.windowsService.closeChildWindow();
+      if (this.windowsService.state.child.componentName === 'GoLiveWindow') {
+        this.windowsService.closeChildWindow();
+      }
     }
   }
 
@@ -72,9 +87,8 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
 
   private render() {
     const checklist = this.view.info.checklist;
-    const { isMultiplatformMode, goLiveSettings } = this.view;
+    const { isMultiplatformMode } = this.view;
     const isUpdateMode = this.props.isUpdateMode;
-    const shouldPublishYT = !isUpdateMode && goLiveSettings.platforms.youtube?.enabled;
     const shouldShowOptimizedProfile =
       this.videoEncodingOptimizationService.state.useOptimizedProfile && !isUpdateMode;
     const shouldPostTweet =
@@ -98,7 +112,7 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
           {/* RESTREAM */}
           {!isUpdateMode &&
             isMultiplatformMode &&
-            this.renderCheck($t('Configure the Restream service'), checklist.setupRestream)}
+            this.renderCheck($t('Configure the Multistream service'), checklist.setupMultistream)}
 
           {/* OPTIMIZED PROFILE */}
           {shouldShowOptimizedProfile &&
@@ -106,19 +120,16 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
 
           {/* START TRANSMISSION */}
           {!isUpdateMode &&
-            this.renderCheck($t('Start video transmission'), checklist.startVideoTransmission)}
-
-          {/* PUBLISH YT BROADCAST */}
-          {shouldPublishYT &&
-            this.renderCheck(
-              $t('Publish Youtube broadcast'),
-              checklist.publishYoutubeBroadcast,
-              true,
-            )}
+            this.renderCheck($t('Start video transmission'), checklist.startVideoTransmission, {
+              renderStreamDelay: this.delayEnabled,
+            })}
 
           {/* POST A TWEET */}
           {shouldPostTweet && this.renderCheck($t('Post a tweet'), checklist.postTweet)}
         </ul>
+
+        {/* WARNING MESSAGE */}
+        {this.renderWarning()}
 
         {/* ERROR MESSAGE */}
         <GoLiveError />
@@ -126,7 +137,14 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
     );
   }
 
-  private renderCheck(title: string, state: TGoLiveChecklistItemState, renderYTPercentage = false) {
+  private renderCheck(
+    title: string,
+    state: TGoLiveChecklistItemState,
+    modificators?: { renderStreamDelay?: boolean },
+  ) {
+    const renderStreamDelay =
+      modificators?.renderStreamDelay &&
+      this.view.info.checklist.startVideoTransmission === 'pending';
     return (
       <li
         key={title}
@@ -136,16 +154,26 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
         }}
       >
         <CheckMark state={state} />
-        {title}
-        {renderYTPercentage && this.renderYoutubePercentage()}
+        <span>{title}</span>
+        {renderStreamDelay && <span class={styles.pending}> {this.delaySecondsRemaining}s</span>}
       </li>
     );
   }
 
-  private renderYoutubePercentage() {
-    if (this.view.info.checklist.publishYoutubeBroadcast === 'not-started') return '';
-    const progressInfo = this.youtubeService.progressInfo;
-    return <span class={styles.pending}> {progressInfo.progress * 100}%</span>;
+  private renderWarning() {
+    if (!this.view.info.warning) return;
+    return (
+      <div class="section selectable">
+        <p>
+          {$t(
+            'Auto-start is disabled for your broadcast. You should manually publish your stream from Youtube Studio',
+          )}
+        </p>
+        <button class="button button--default" onclick={() => this.youtubeService.openDashboard()}>
+          {$t('Open Youtube Studio')}
+        </button>
+      </div>
+    );
   }
 }
 

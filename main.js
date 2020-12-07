@@ -73,6 +73,9 @@ app.commandLine.appendSwitch(
   'streamlabs.com,youtube.com,twitch.tv,facebook.com,mixer.com',
 );
 
+// Remove this when all backend module are on NAPI
+app.allowRendererProcessReuse = false;
+
 /* Determine the current release channel we're
  * on based on name. The channel will always be
  * the premajor identifier, if it exists.
@@ -88,6 +91,11 @@ const releaseChannel = (() => {
 // Main Program
 ////////////////////////////////////////////////////////////////////////////////
 
+// Windows
+let workerWindow;
+let mainWindow;
+let childWindow;
+
 const util = require('util');
 const logFile = path.join(app.getPath('userData'), 'app.log');
 const maxLogBytes = 131072;
@@ -100,6 +108,10 @@ if (fs.existsSync(logFile) && fs.statSync(logFile).size > maxLogBytes) {
 }
 
 ipcMain.on('logmsg', (e, msg) => {
+  if (msg.level === 'error' && mainWindow && process.env.NODE_ENV !== 'production') {
+    mainWindow.send('unhandledErrorState');
+  }
+
   logFromRemote(msg.level, msg.sender, msg.message);
 });
 
@@ -224,11 +236,6 @@ app.on('ready', () => {
   });
 });
 
-// Windows
-let workerWindow;
-let mainWindow;
-let childWindow;
-
 // Somewhat annoyingly, this is needed so that the main window
 // can differentiate between a user closing it vs the app
 // closing the windows before exit.
@@ -251,10 +258,7 @@ let workerInitFinished = false;
 
 async function startApp() {
   const isDevMode = process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test';
-  let crashHandlerLogPath = '';
-  if (process.env.NODE_ENV !== 'production' || !!process.env.SLOBS_PREVIEW) {
-    crashHandlerLogPath = app.getPath('userData');
-  }
+  const crashHandlerLogPath = app.getPath('userData');
 
   await bundleUpdater(__dirname);
 
@@ -300,7 +304,7 @@ async function startApp() {
 
   workerWindow = new BrowserWindow({
     show: false,
-    webPreferences: { nodeIntegration: true },
+    webPreferences: { nodeIntegration: true, enableRemoteModule: true },
   });
 
   // setTimeout(() => {
@@ -332,7 +336,11 @@ async function startApp() {
     titleBarStyle: 'hidden',
     title: 'Streamlabs OBS',
     backgroundColor: '#17242D',
-    webPreferences: { nodeIntegration: true, webviewTag: true },
+    webPreferences: {
+      nodeIntegration: true,
+      webviewTag: true,
+      enableRemoteModule: true,
+    },
   });
 
   // setTimeout(() => {
@@ -400,7 +408,10 @@ async function startApp() {
     fullscreenable: false,
     titleBarStyle: 'hidden',
     backgroundColor: '#17242D',
-    webPreferences: { nodeIntegration: true },
+    webPreferences: {
+      nodeIntegration: true,
+      enableRemoteModule: true,
+    },
   });
 
   childWindow.removeMenu();
@@ -487,15 +498,11 @@ async function startApp() {
   });
 
   if (isDevMode) {
-    require('devtron').install();
-
     // Vue dev tools appears to cause strange non-deterministic
     // interference with certain NodeJS APIs, expecially asynchronous
     // IO from the renderer process.  Enable at your own risk.
-
     // const devtoolsInstaller = require('electron-devtools-installer');
     // devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
-
     // setTimeout(() => {
     //   openDevTools();
     // }, 10 * 1000);

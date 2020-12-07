@@ -2,6 +2,7 @@ import { Component, Watch } from 'vue-property-decorator';
 import TsxComponent from 'components/tsx-component';
 import { $t } from 'services/i18n';
 import styles from './BaseElement.m.less';
+import Scrollable from 'components/shared/Scrollable';
 
 @Component({})
 export default class BaseElement extends TsxComponent {
@@ -12,12 +13,14 @@ export default class BaseElement extends TsxComponent {
   width = 0;
 
   mounted() {
+    this.setDimensions();
+    window.setInterval(() => this.setDimensions(), 500);
+  }
+
+  setDimensions() {
+    if (!this.$el?.getBoundingClientRect) return;
     this.height = this.$el.getBoundingClientRect().height;
     this.width = this.$el.getBoundingClientRect().width;
-    window.setInterval(() => {
-      this.height = this.$el.getBoundingClientRect().height;
-      this.width = this.$el.getBoundingClientRect().width;
-    }, 500);
   }
 
   destroyed() {
@@ -26,9 +29,9 @@ export default class BaseElement extends TsxComponent {
 
   get belowMinWarning() {
     return (
-      <div class={styles.container}>
+      <Scrollable className={styles.container}>
         <span class={styles.empty}>{$t('This element is too small to be displayed')}</span>
-      </div>
+      </Scrollable>
     );
   }
 

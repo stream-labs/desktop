@@ -112,7 +112,7 @@ function patchNavigation() {
 
 function patchLegend() {
   // hide unrelated legend
-  const whitelist = [
+  const allowlist = [
     'Type alias',
     'Enumeration',
     'Enumeration member',
@@ -125,7 +125,7 @@ function patchLegend() {
   ];
 
   document.querySelectorAll('.tsd-legend span').forEach(legend => {
-    if (!whitelist.includes(legend.innerHTML)) {
+    if (!allowlist.includes(legend.innerHTML)) {
       legend.parentElement.style.display = 'none';
     }
   });

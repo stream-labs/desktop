@@ -1,6 +1,8 @@
 import * as input from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../../obs-api';
 import compact from 'lodash/compact';
+import { Inject } from 'services/core';
+import { SourcesService } from 'services/sources';
 
 /**
  * This is the interface that the rest of the app uses
@@ -26,12 +28,19 @@ export interface IPropertyManager {
  * be exposed.
  */
 export abstract class PropertiesManager implements IPropertyManager {
+  @Inject() sourcesService: SourcesService;
+
   /**
    * Create a new properties manager
    * @param obsSource The source this class manages
    * @param settings The manager settings.  These are *NOT* OBS settings
+   * @param sourceId The id of the source being managed
    */
-  constructor(public obsSource: obs.ISource, settings: Dictionary<any>) {
+  constructor(
+    public obsSource: obs.ISource,
+    settings: Dictionary<any>,
+    public readonly sourceId?: string,
+  ) {
     this.settings = {};
     this.applySettings(settings);
     this.init();
@@ -64,10 +73,10 @@ export abstract class PropertiesManager implements IPropertyManager {
   }
 
   /**
-   * The blacklist is a list of OBS property names that
+   * The denylist is a list of OBS property names that
    * should not be displayed to the user.
    */
-  get blacklist(): string[] {
+  get denylist(): string[] {
     return [];
   }
 
@@ -96,6 +105,12 @@ export abstract class PropertiesManager implements IPropertyManager {
       ...this.settings,
       ...settings,
     };
+
+    // If a sourceId isn't present, it means this is probably a transition,
+    // and we don't care to keep the store updated.
+    if (this.sourceId) {
+      this.sourcesService.updatePropertiesManagerSettingsInStore(this.sourceId, this.settings);
+    }
   }
 
   getPropertiesFormData(): input.TObsFormData {
@@ -113,7 +128,7 @@ export abstract class PropertiesManager implements IPropertyManager {
     });
 
     propsArray = propsArray.concat(obsProperties);
-    propsArray = compact(propsArray).filter(prop => !this.blacklist.includes(prop.name));
+    propsArray = compact(propsArray).filter(prop => !this.denylist.includes(prop.name));
 
     return propsArray;
   }

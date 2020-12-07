@@ -15,6 +15,7 @@ import { CustomizationService } from 'services/customization';
 import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
 import { SettingsService } from 'services/settings';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 @Component({
   components: {
@@ -32,6 +33,7 @@ export default class StudioFooterComponent extends Vue {
   @Inject() settingsService: SettingsService;
   @Inject() performanceService: PerformanceService;
   @Inject() youtubeService: YoutubeService;
+  @Inject() usageStatisticsService: UsageStatisticsService;
 
   @Prop() locked: boolean;
 
@@ -139,6 +141,7 @@ export default class StudioFooterComponent extends Vue {
       minWidth: 500,
       minHeight: 400,
     });
+    this.usageStatisticsService.recordFeatureUsage('PerformanceStatistics');
   }
 
   get replayBufferEnabled() {

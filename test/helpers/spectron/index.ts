@@ -3,20 +3,17 @@ import avaTest, { ExecutionContext, TestInterface } from 'ava';
 import { Application } from 'spectron';
 import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
-import { getUser, releaseUserInPool } from './user';
+import { getUser, logOut, releaseUserInPool } from './user';
 import { sleep } from '../sleep';
-import { uniq } from 'lodash';
 import { installFetchMock } from './network';
 
-// save names of all running tests to use them in the retrying mechanism
-const pendingTests: string[] = [];
-export const test: TestInterface<ITestContext> = new Proxy(avaTest, {
-  apply: (target, thisArg, args) => {
-    const testName = args[0];
-    pendingTests.push(testName);
-    return target.apply(thisArg, args);
-  },
-});
+import {
+  removeFailedTestFromFile,
+  saveFailedTestsToFile,
+  saveTestExecutionTimeToDB,
+  testFn,
+} from './runner-utils';
+export const test = testFn; // the overridden "test" function
 
 const path = require('path');
 const fs = require('fs');
@@ -24,8 +21,9 @@ const os = require('os');
 const rimraf = require('rimraf');
 
 const ALMOST_INFINITY = Math.pow(2, 31) - 1; // max 32bit int
-const FAILED_TESTS_PATH = 'test-dist/failed-tests.json';
 
+const testTimings: Record<string, number> = {};
+let testStartTime = 0;
 let activeWindow: string | RegExp;
 
 const afterStartCallbacks: ((t: TExecutionContext) => any)[] = [];
@@ -123,11 +121,11 @@ export interface ITestContext {
 
 export type TExecutionContext = ExecutionContext<ITestContext>;
 
-let startAppFn: (t: TExecutionContext) => Promise<any>;
+let startAppFn: (t: TExecutionContext, reuseCache?: boolean) => Promise<any>;
 let stopAppFn: (t: TExecutionContext, clearCache?: boolean) => Promise<any>;
 
-export async function startApp(t: TExecutionContext) {
-  return startAppFn(t);
+export async function startApp(t: TExecutionContext, reuseCache = false) {
+  return startAppFn(t, reuseCache);
 }
 
 export async function stopApp(t: TExecutionContext, clearCache?: boolean) {
@@ -136,11 +134,10 @@ export async function stopApp(t: TExecutionContext, clearCache?: boolean) {
 
 export async function restartApp(t: TExecutionContext): Promise<Application> {
   await stopAppFn(t, false);
-  return await startAppFn(t);
+  return await startAppFn(t, true);
 }
 
 let skipCheckingErrorsInLogFlag = false;
-let cacheDir: string;
 
 /**
  * Disable checking errors in the log file for a single test
@@ -153,16 +150,22 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   // tslint:disable-next-line:no-parameter-reassignment TODO
   options = Object.assign({}, DEFAULT_OPTIONS, options);
   let appIsRunning = false;
-  let context: any = null;
   let app: any;
   let testPassed = false;
   let failMsg = '';
   let testName = '';
   let logFileLastReadingPos = 0;
-  cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
+  let lastCacheDir: string;
 
-  startAppFn = async function startApp(t: TExecutionContext): Promise<Application> {
-    t.context.cacheDir = cacheDir;
+  startAppFn = async function startApp(
+    t: TExecutionContext,
+    reuseCache = false,
+  ): Promise<Application> {
+    if (!reuseCache) {
+      lastCacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
+    }
+
+    t.context.cacheDir = lastCacheDir;
     const appArgs = options.appArgs ? options.appArgs.split(' ') : [];
     if (options.networkLogging) appArgs.push('--network-logging');
     if (options.noSync) appArgs.push('--nosync');
@@ -187,6 +190,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         // disable deprecation warning and waiting for better docs now
         deprecationWarnings: false,
       },
+      chromeDriverArgs: [`user-data-dir=${path.join(t.context.cacheDir, 'slobs-client')}`],
     });
 
     if (options.beforeAppStartCb) await options.beforeAppStartCb(t);
@@ -198,6 +202,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       disableAnimationsEl.textContent =
         '*{ transition: none !important; transition-property: none !important; animation: none !important }';
       document.head.appendChild(disableAnimationsEl);
+      0; // Prevent returning a value that cannot be serialized
     `;
     await focusMain(t);
     await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
@@ -219,12 +224,12 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     if (await t.context.app.client.isExisting('span=Skip')) {
       if (options.skipOnboarding) {
         await t.context.app.client.click('span=Skip');
+        if (await t.context.app.client.isVisible('div=Choose Starter')) {
+          await t.context.app.client.click('div=Choose Starter');
+        }
         await t.context.app.client.click('h2=Start Fresh');
         await t.context.app.client.click('button=Skip');
         await t.context.app.client.click('button=Skip');
-        if (await t.context.app.client.isVisible('button=Skip')) {
-          await t.context.app.client.click('button=Skip');
-        }
       } else {
         // Wait for the connect screen before moving on
         await t.context.app.client.isExisting('button=Twitch');
@@ -240,8 +245,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     await focusChild(t);
     await t.context.app.webContents.executeJavaScript(disableTransitionsCode);
     await focusMain(t);
-
-    context = t.context;
     appIsRunning = true;
 
     for (const callback of afterStartCallbacks) {
@@ -259,12 +262,12 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       console.error(e);
     }
     appIsRunning = false;
-    await checkErrorsInLogFile();
+    await checkErrorsInLogFile(t);
     logFileLastReadingPos = 0;
 
     if (!clearCache) return;
     await new Promise(resolve => {
-      rimraf(cacheDir, resolve);
+      rimraf(lastCacheDir, resolve);
     });
     for (const callback of afterStopCallbacks) {
       await callback(t);
@@ -274,31 +277,35 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   /**
    * test should be considered as failed if it writes exceptions in to the log file
    */
-  async function checkErrorsInLogFile() {
+  async function checkErrorsInLogFile(t: TExecutionContext) {
     await sleep(1000); // electron-log needs some time to write down logs
-    const filePath = path.join(cacheDir, 'slobs-client', 'app.log');
+    const filePath = path.join(lastCacheDir, 'slobs-client', 'app.log');
     if (!fs.existsSync(filePath)) return;
-    const logs = fs.readFileSync(filePath).toString();
+    const logs: string = fs.readFileSync(filePath).toString();
     const errors = logs
       .substr(logFileLastReadingPos)
       .split('\n')
-      .filter((record: string) => record.match(/\[error\]/));
+      .filter((record: string) => {
+        // This error is outside our control and can be ignored.
+        // See: https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded
+        return record.match(/\[error\]/) && !record.match(/ResizeObserver loop limit exceeded/);
+      });
 
     // save the last reading position, to skip already read records next time
     logFileLastReadingPos = logs.length - 1;
 
+    // remove [vue-i18n] warnings
+    const displayLogs = logs
+      .split('\n')
+      .filter(str => !str.match('Fall back to translate'))
+      .join('\n');
+
     if (errors.length && !skipCheckingErrorsInLogFlag) {
-      fail(`The log-file has errors \n ${logs}`);
+      fail(`The log-file has errors \n ${displayLogs}`);
     } else if (options.networkLogging && !testPassed) {
-      fail(`log-file: \n ${logs}`);
+      fail(`log-file: \n ${displayLogs}`);
     }
   }
-
-  test.before(async t => {
-    // consider all tests as failed until it's not successfully finished
-    // so we can catch failures for tests with timeouts
-    saveFailedTestsToFile(pendingTests);
-  });
 
   test.beforeEach(async t => {
     testName = t.title.replace('beforeEach hook for ', '');
@@ -306,7 +313,13 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     skipCheckingErrorsInLogFlag = false;
 
     t.context.app = app;
-    if (options.restartAppAfterEachTest || !appIsRunning) await startAppFn(t);
+    if (options.restartAppAfterEachTest || !appIsRunning) {
+      await startAppFn(t);
+    } else {
+      // Set the cache dir to what it previously was, since we are re-using it
+      t.context.cacheDir = lastCacheDir;
+    }
+    testStartTime = Date.now();
   });
 
   test.afterEach(async t => {
@@ -314,7 +327,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   });
 
   test.afterEach.always(async t => {
-    await checkErrorsInLogFile();
+    await checkErrorsInLogFile(t);
     if (!testPassed && options.pauseIfFailed) {
       console.log('Test execution has been paused due `pauseIfFailed` enabled');
       await sleep(ALMOST_INFINITY);
@@ -323,7 +336,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     // wrap in try/catch for the situation when we have a crash
     // so we still can read the logs after the crash
     try {
-      await releaseUserInPool();
+      await logOut(t, true);
       if (options.restartAppAfterEachTest) {
         if (appIsRunning) {
           const client = await getClient();
@@ -340,6 +353,8 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     if (testPassed) {
       // consider this test succeed and remove from the `failedTests` list
       removeFailedTestFromFile(testName);
+      // save the test execution time
+      testTimings[testName] = Date.now() - testStartTime;
     } else {
       fail();
       const user = getUser();
@@ -349,10 +364,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   });
 
   test.after.always(async t => {
-    if (!appIsRunning) return;
-    t.context = context;
-    await stopAppFn(t);
+    if (appIsRunning) await stopAppFn(t);
     if (!testPassed) saveFailedTestsToFile([testName]);
+    await saveTestExecutionTimeToDB(testTimings);
   });
 
   /**
@@ -361,22 +375,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   function fail(msg?: string) {
     testPassed = false;
     if (msg) failMsg = msg;
-  }
-}
-
-function saveFailedTestsToFile(failedTests: string[]) {
-  if (fs.existsSync(FAILED_TESTS_PATH)) {
-    // tslint:disable-next-line:no-parameter-reassignment TODO
-    failedTests = JSON.parse(fs.readFileSync(FAILED_TESTS_PATH)).concat(failedTests);
-  }
-  fs.writeFileSync(FAILED_TESTS_PATH, JSON.stringify(uniq(failedTests)));
-}
-
-function removeFailedTestFromFile(testName: string) {
-  if (fs.existsSync(FAILED_TESTS_PATH)) {
-    const failedTests = JSON.parse(fs.readFileSync(FAILED_TESTS_PATH));
-    failedTests.splice(failedTests.indexOf(testName), 1);
-    fs.writeFileSync(FAILED_TESTS_PATH, JSON.stringify(failedTests));
   }
 }
 
@@ -391,8 +389,4 @@ export async function click(t: TExecutionContext, selector: string) {
     const message = `click to "${selector}" failed in window ${windowId}: ${e.message} ${e.type}`;
     throw new Error(message);
   }
-}
-
-export function getCacheDir() {
-  return cacheDir;
 }
