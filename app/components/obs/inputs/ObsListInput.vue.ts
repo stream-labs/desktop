@@ -2,6 +2,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { TObsType, IObsListInput, ObsInput, TObsValue } from './ObsInput';
 import { ListInput } from 'components/shared/inputs/inputs';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import { $t } from 'services/i18n';
 
 @Component({
   components: { HFormGroup, ListInput },
@@ -41,7 +42,13 @@ class ObsListInput extends ObsInput<IObsListInput<TObsValue>> {
       internalSearch: this.internalSearch,
       name: this.value.name,
       title: this.value.description,
-      options: this.value.options.map(opt => ({ title: opt.description, value: opt.value })),
+      options: this.value.options.map(opt => {
+        // treat 0 as an non-selected option if the description is empty
+        if (opt.value === 0 && opt.description === '') {
+          return { title: $t('Select Option'), value: 0 };
+        }
+        return { title: opt.description, value: opt.value };
+      }),
     };
   }
 }
