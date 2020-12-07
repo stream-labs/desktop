@@ -30,7 +30,7 @@ module.exports = smp.wrap(merge(baseConfig, {
   mode: 'development',
   devtool: false,
   watchOptions: {
-    ignored: [/node_modules/, /\.js$/, /\.d\.ts$/],
+    ignored: /node_modules/
   },
 
   // module: {

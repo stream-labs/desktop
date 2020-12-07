@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const cp = require('child_process');
-const ManifestPlugin = require('webpack-manifest-plugin');
+const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const plugins = [];
@@ -18,7 +18,7 @@ plugins.push(
 );
 
 plugins.push(
-  new ManifestPlugin({
+  new WebpackManifestPlugin({
     filter: file => file.isChunk,
   }),
 );
@@ -42,6 +42,7 @@ module.exports = {
   output: {
     path: __dirname + '/bundles',
     filename: '[name].js',
+    publicPath: '',
   },
 
   target: 'electron-renderer',
@@ -77,7 +78,7 @@ module.exports = {
       {
         test: /\.vue$/,
         use: [
-          'cache-loader',
+          // 'cache-loader',
           {
             loader: 'vue-loader',
             options: {
@@ -124,11 +125,11 @@ module.exports = {
         test: /\.ts$/,
         exclude: /node_modules/,
         use: [
-          'cache-loader',
+          // 'cache-loader',
           {
             loader: 'ts-loader',
             options: {
-              experimentalFileCaching: true,
+              // experimentalFileCaching: true,
             },
           },
         ],
@@ -137,14 +138,14 @@ module.exports = {
         test: /\.tsx$/,
         include: path.resolve(__dirname, 'app/components'),
         use: [
-          'cache-loader',
+          // 'cache-loader',
           'babel-loader',
           {
             loader: 'ts-loader',
             options: {
               configFile: 'tsxconfig.json',
               instance: 'tsx-loader',
-              experimentalFileCaching: true,
+              // experimentalFileCaching: true,
             },
           },
         ],
@@ -218,6 +219,7 @@ module.exports = {
   optimization: {
     splitChunks: {
       chunks: chunk => chunk.name === 'renderer',
+      name: 'vendors~renderer',
     },
     moduleIds: 'hashed',
   },

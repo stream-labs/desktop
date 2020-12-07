@@ -11,7 +11,7 @@ module.exports = merge(baseConfig, {
 
   output: {
     filename: chunkData => {
-      return chunkData.chunk.name === 'renderer' ? '[name].[contenthash].js' : '[name].js';
+      return chunkData.chunk.name.match(/renderer/) ? '[name].[contenthash].js' : '[name].js';
     },
     chunkFilename: '[name].[contenthash].js',
   },
