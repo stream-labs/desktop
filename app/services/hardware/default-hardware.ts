@@ -77,6 +77,26 @@ export class DefaultHardwareService extends PersistentStatefulService<
       }));
   }
 
+  findVideoSource(deviceId: string) {
+    const deviceProperty = byOS({ [OS.Windows]: 'video_device_id', [OS.Mac]: 'device' });
+
+    let found = this.sourcesService.views.sources.find(
+      source =>
+        source.type === byOS({ [OS.Windows]: 'dshow_input', [OS.Mac]: 'av_capture_input' }) &&
+        source.getSettings()[deviceProperty] === deviceId,
+    );
+
+    if (!found) {
+      found = this.sourcesService.views.temporarySources.find(
+        source =>
+          source.type === byOS({ [OS.Windows]: 'dshow_input', [OS.Mac]: 'av_capture_input' }) &&
+          source.getSettings()[deviceProperty] === deviceId,
+      );
+    }
+
+    return found;
+  }
+
   clearTemporarySources() {
     this.audioDevices.forEach(device => {
       this.sourcesService.removeSource(device.id);

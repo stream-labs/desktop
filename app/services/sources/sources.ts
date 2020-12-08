@@ -111,6 +111,12 @@ class SourcesViews extends ViewHandler<ISourcesState> {
     );
   }
 
+  get temporarySources(): Source[] {
+    return Object.values(this.state.temporarySources).map(
+      sourceModel => this.getSource(sourceModel.sourceId)!,
+    );
+  }
+
   getSource(id: string): Source | null {
     return this.state.sources[id] || this.state.temporarySources[id] ? new Source(id) : null;
   }

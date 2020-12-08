@@ -56,7 +56,7 @@ export default class HardwareSetup extends TsxComponent {
   }
 
   get selectedVideoSourceId() {
-    return this.sourcesService.views.getSourcesByName(this.selectedVideoDevice)[0]?.sourceId;
+    return this.defaultHardwareService.findVideoSource(this.selectedVideoDevice).sourceId;
   }
 
   setVideoDevice(val: string) {
