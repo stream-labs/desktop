@@ -297,7 +297,7 @@
 }
 
 .drag-overlay {
-  border: 1px solid var(--new);
+  border: 1px solid var(--info);
   background: rgba(255, 200, 0, 0.15);
   z-index: 100000;
   box-sizing: border-box;
