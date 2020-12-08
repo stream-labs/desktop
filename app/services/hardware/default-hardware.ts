@@ -10,6 +10,7 @@ import { byOS, OS } from 'util/operating-systems';
 interface IDefaultHardwareServiceState {
   defaultVideoDevice: string;
   defaultAudioDevice: string;
+  presetFilter: string;
 }
 
 export class DefaultHardwareService extends PersistentStatefulService<
@@ -18,6 +19,7 @@ export class DefaultHardwareService extends PersistentStatefulService<
   static defaultState: IDefaultHardwareServiceState = {
     defaultVideoDevice: null,
     defaultAudioDevice: 'default',
+    presetFilter: '',
   };
 
   @Inject() private hardwareService: HardwareService;
@@ -111,6 +113,10 @@ export class DefaultHardwareService extends PersistentStatefulService<
     });
   }
 
+  setPresetFilter(filter: string) {
+    this.SET_PRESET_FILTER(filter);
+  }
+
   get videoDevices() {
     return this.hardwareService
       .getDshowDevices()
@@ -166,5 +172,10 @@ export class DefaultHardwareService extends PersistentStatefulService<
     } else {
       this.state.defaultAudioDevice = id;
     }
+  }
+
+  @mutation()
+  private SET_PRESET_FILTER(filter: string) {
+    this.state.presetFilter = filter;
   }
 }

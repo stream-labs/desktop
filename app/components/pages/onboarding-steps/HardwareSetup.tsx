@@ -19,14 +19,20 @@ export default class HardwareSetup extends TsxComponent {
   @Inject() sourceFiltersService: SourceFiltersService;
   @Inject() sourcesService: SourcesService;
 
-  presetFilterValue = '';
-
   mounted() {
     this.defaultHardwareService.createTemporarySources();
   }
 
   destroyed() {
     this.defaultHardwareService.clearTemporarySources();
+  }
+
+  get presetFilterValue() {
+    return this.defaultHardwareService.state.presetFilter;
+  }
+
+  set presetFilterValue(filter: string) {
+    this.defaultHardwareService.setPresetFilter(filter);
   }
 
   get audioDevices() {

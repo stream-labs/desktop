@@ -34,6 +34,7 @@ import { AudioService, E_AUDIO_CHANNELS } from '../audio';
 import { ReplayManager } from './properties-managers/replay-manager';
 import { assertIsDefined } from 'util/properties-type-guards';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import { SourceFiltersService } from 'services/source-filters';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -161,6 +162,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
   @Inject() private audioService: AudioService;
   @Inject() private defaultHardwareService: DefaultHardwareService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
+  @Inject() private sourceFiltersService: SourceFiltersService;
 
   get views() {
     return new SourcesViews(this.state);
@@ -260,6 +262,13 @@ export class SourcesService extends StatefulService<ISourcesState> {
     const obsInput = obs.InputFactory.create(type, id, obsInputSettings);
 
     this.addSource(obsInput, name, options);
+
+    if (
+      this.defaultHardwareService.state.defaultVideoDevice === obsInputSettings.video_device_id &&
+      this.defaultHardwareService.state.presetFilter !== ''
+    ) {
+      this.sourceFiltersService.addPresetFilter(id, this.defaultHardwareService.state.presetFilter);
+    }
     return this.views.getSource(id)!;
   }
 
