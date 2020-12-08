@@ -7,6 +7,7 @@ import {
   TObsValue,
   IObsListInput,
 } from 'components/obs/inputs/ObsInput';
+import { metadata } from 'components/shared/inputs';
 
 import { Inject } from './core/injector';
 import { SourcesService } from './sources';
@@ -18,6 +19,7 @@ import { EOrderMovement } from 'obs-studio-node';
 import { Subject } from 'rxjs';
 import { UsageStatisticsService } from './usage-statistics';
 import { getSharedResource } from 'util/get-shared-resource';
+import { ViewHandler } from 'services/core/stateful-service';
 
 export type TSourceFilterType =
   | 'mask_filter'
@@ -62,6 +64,35 @@ export interface ISourceFilterIdentifier {
   name: string;
 }
 
+class SourceFiltersViews extends ViewHandler<{}> {
+  get presetFilterOptions() {
+    return [
+      { title: $t('None'), value: '' },
+      { title: $t('Grayscale'), value: 'luts\\grayscale.png' },
+      { title: $t('Sepiatone'), value: 'luts\\sepia.png' },
+      { title: $t('Dramatic'), value: 'luts\\gazing.png' },
+      { title: $t('Flashback'), value: 'luts\\muted.png' },
+      { title: $t('Inverted'), value: 'luts\\inverted.png' },
+      { title: $t('Action Movie'), value: 'luts\\cool_tone.png' },
+      { title: $t('Hearth'), value: 'luts\\warm_tone.png' },
+      { title: $t('Wintergreen'), value: 'luts\\green_tone.png' },
+      { title: $t('Heat Map'), value: 'luts\\heat_map.png' },
+      { title: $t('Cel Shade'), value: 'luts\\cel_shade.png' },
+    ];
+  }
+
+  get presetFilterMetadata() {
+    return metadata.list({
+      options: this.presetFilterOptions,
+      title: $t('Visual Presets'),
+    });
+  }
+
+  parsePresetValue(path: string) {
+    return path.match(/luts\\[a-z_]+.png$/)[0];
+  }
+}
+
 export class SourceFiltersService extends Service {
   @Inject() private sourcesService: SourcesService;
   @Inject() private windowsService: WindowsService;
@@ -71,6 +102,10 @@ export class SourceFiltersService extends Service {
   filterRemoved = new Subject<ISourceFilterIdentifier>();
   filterUpdated = new Subject<ISourceFilterIdentifier>();
   filtersReordered = new Subject<void>();
+
+  get views() {
+    return new SourceFiltersViews({});
+  }
 
   getTypesList(): IObsListOption<TSourceFilterType>[] {
     const obsAvailableTypes = obs.FilterFactory.types();

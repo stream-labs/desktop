@@ -16,12 +16,7 @@ import GenericForm from 'components/obs/inputs/GenericForm';
 import { Subscription } from 'rxjs';
 import Scrollable from 'components/shared/Scrollable';
 import { $t } from 'services/i18n';
-import { metadata } from 'components/shared/inputs';
 import { TObsValue } from 'components/obs/inputs/ObsInput';
-
-const parsePresetValue = (path: string) => {
-  return path.match(/luts\\[a-z_]+.png$/)[0];
-};
 
 interface IFilterNodeData {
   visible: boolean;
@@ -85,8 +80,11 @@ export default class SourceFilters extends Vue {
     );
 
     const preset = this.sourceFiltersService.presetFilter(this.sourceId);
-    console.log(!!preset, preset?.settings);
-    if (preset) this.presetFilterValue = parsePresetValue(String(preset.settings.image_path));
+    if (preset) {
+      this.presetFilterValue = this.sourceFiltersService.views.parsePresetValue(
+        String(preset.settings.image_path),
+      );
+    }
   }
 
   destroyed() {
@@ -97,26 +95,11 @@ export default class SourceFilters extends Vue {
   }
 
   get presetFilterOptions() {
-    return [
-      { title: $t('None'), value: '' },
-      { title: $t('Grayscale'), value: 'luts\\grayscale.png' },
-      { title: $t('Sepiatone'), value: 'luts\\sepia.png' },
-      { title: $t('Dramatic'), value: 'luts\\gazing.png' },
-      { title: $t('Flashback'), value: 'luts\\muted.png' },
-      { title: $t('Inverted'), value: 'luts\\inverted.png' },
-      { title: $t('Action Movie'), value: 'luts\\cool_tone.png' },
-      { title: $t('Hearth'), value: 'luts\\warm_tone.png' },
-      { title: $t('Wintergreen'), value: 'luts\\green_tone.png' },
-      { title: $t('Heat Map'), value: 'luts\\heat_map.png' },
-      { title: $t('Cel Shade'), value: 'luts\\cel_shade.png' },
-    ];
+    return this.sourceFiltersService.views.presetFilterOptions;
   }
 
   get presetFilterMetadata() {
-    return metadata.list({
-      options: this.presetFilterOptions,
-      title: $t('Visual Presets'),
-    });
+    return this.sourceFiltersService.views.presetFilterMetadata;
   }
 
   addPresetFilter(value: string) {
