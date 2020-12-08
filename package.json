@@ -115,6 +115,7 @@
     "@types/uuid": "3.4.9",
     "@typescript-eslint/eslint-plugin": "2.19.2",
     "@typescript-eslint/parser": "2.19.2",
+    "@vue/babel-preset-jsx": "^1.2.4",
     "@xkeshi/vue-qrcode": "0.3.0",
     "amazon-s3-uri": "^0.0.3",
     "ava": "3.12.1",
@@ -202,9 +203,9 @@
     "vuedraggable": "2.8.5",
     "vuex": "3.0.1",
     "webdriverio": "4.14.1",
-    "webpack": "5.10.0",
+    "webpack": "4.26.1",
     "webpack-cli": "4.2.0",
-    "webpack-manifest-plugin": "3.0.0",
+    "webpack-manifest-plugin": "2.2.0",
     "webpack-merge": "5.2.0"
   },
   "optionalDependencies": {

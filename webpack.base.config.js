@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const cp = require('child_process');
-const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
+const WebpackManifestPlugin = require('webpack-manifest-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const plugins = [];
@@ -24,15 +24,6 @@ plugins.push(
 );
 
 plugins.push(new CleanWebpackPlugin());
-
-// uncomment and install to watch circular dependencies
-// const CircularDependencyPlugin = require('circular-dependency-plugin');
-// plugins.push(new CircularDependencyPlugin({
-//   // exclude detection of files based on a RegExp
-//   exclude: /a\.js|node_modules/,
-//   // add errors to webpack instead of warnings
-//   //failOnError: true
-// }));
 
 // uncomment and install to analyze bundle size
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
@@ -78,7 +69,7 @@ module.exports = {
       {
         test: /\.vue$/,
         use: [
-          // 'cache-loader',
+          'cache-loader',
           {
             loader: 'vue-loader',
             options: {
@@ -125,7 +116,7 @@ module.exports = {
         test: /\.ts$/,
         exclude: /node_modules/,
         use: [
-          // 'cache-loader',
+          'cache-loader',
           {
             loader: 'ts-loader',
             options: {
@@ -138,7 +129,7 @@ module.exports = {
         test: /\.tsx$/,
         include: path.resolve(__dirname, 'app/components'),
         use: [
-          // 'cache-loader',
+          'cache-loader',
           'babel-loader',
           {
             loader: 'ts-loader',
@@ -220,6 +211,11 @@ module.exports = {
     splitChunks: {
       chunks: chunk => chunk.name === 'renderer',
       name: 'vendors~renderer',
+      // cacheGroups: {
+      //   defaultVendors: {
+      //     name: 'vendors~renderer',
+      //   },
+      // },
     },
     moduleIds: 'hashed',
   },
