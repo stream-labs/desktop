@@ -1,22 +1,22 @@
 import electron from 'electron';
-import { StatefulService } from 'services/core/stateful-service';
+import {StatefulService} from 'services/core/stateful-service';
 import fs from 'fs';
 import path from 'path';
-import { ScenesService } from 'services/scenes';
-import { SourcesService, TPropertiesManager } from 'services/sources';
-import { WidgetsService } from 'services/widgets';
-import { TSourceType } from 'services/sources/sources-api';
-import { SourceFiltersService, TSourceFilterType } from 'services/source-filters';
-import { TransitionsService, ETransitionType } from 'services/transitions';
-import { AudioService } from 'services/audio';
-import { Inject } from 'services/core/injector';
-import { SceneCollectionsService } from 'services/scene-collections';
+import {ScenesService} from 'services/scenes';
+import {SourcesService, TPropertiesManager} from 'services/sources';
+import {WidgetsService} from 'services/widgets';
+import {TSourceType} from 'services/sources/sources-api';
+import {SourceFiltersService, TSourceFilterType} from 'services/source-filters';
+import {TransitionsService, ETransitionType} from 'services/transitions';
+import {AudioService} from 'services/audio';
+import {Inject} from 'services/core/injector';
+import {SceneCollectionsService} from 'services/scene-collections';
 import * as obs from '../../obs-api';
-import { SettingsService } from 'services/settings';
-import { AppService } from 'services/app';
-import { RunInLoadingMode } from 'services/app/app-decorators';
+import {SettingsService} from 'services/settings';
+import {AppService} from 'services/app';
+import {RunInLoadingMode} from 'services/app/app-decorators';
 import defaultTo from 'lodash/defaultTo';
-import { $t } from 'services/i18n';
+import {$t} from 'services/i18n';
 
 interface Source {
   name?: string;
@@ -128,6 +128,9 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
 
   private async importCollection(collection: ISceneCollection) {
     const sceneCollectionPath = path.join(this.sceneCollectionsDirectory, collection.filename);
+    if (sceneCollectionPath.indexOf('.json') === -1) {
+      return true;
+    }
     const configJSON: IOBSConfigJSON = JSON.parse(fs.readFileSync(sceneCollectionPath).toString());
 
     await this.sceneCollectionsService.create({
@@ -197,7 +200,7 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
               const widgetType = this.widgetsService.getWidgetTypeByUrl(sourceJSON.settings.url);
               if (widgetType !== -1) {
                 propertiesManager = 'widget';
-                propertiesManagerSettings = { widgetType };
+                propertiesManagerSettings = {widgetType};
               }
             }
 
@@ -360,8 +363,8 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
         const newSource = this.sourcesService.createSource(
           obsAudioSource.name,
           obsAudioSource.id,
-          { device_id: obsAudioSource.settings.device_id },
-          { channel: i + 1 },
+          {device_id: obsAudioSource.settings.device_id},
+          {channel: i + 1},
         );
 
         const audioSource = this.audioService.views.getSource(newSource.sourceId);
@@ -387,7 +390,7 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
       this.transitionsService.createTransition(
         configJSON.transitions[0].id as ETransitionType,
         $t('Global Transition'),
-        { duration: configJSON.transition_duration },
+        {duration: configJSON.transition_duration},
       );
     }
   }
