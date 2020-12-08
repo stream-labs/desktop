@@ -3,12 +3,6 @@ const baseConfig = require('./webpack.base.config.js');
 const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = merge(baseConfig, {
-  entry: {
-    renderer: './app/app.ts',
-    updater: './updater/mac/ui.js',
-    'guest-api': './guest-api',
-  },
-
   output: {
     filename: chunkData => {
       return chunkData.chunk.name.match(/renderer/) ? '[name].[contenthash].js' : '[name].js';

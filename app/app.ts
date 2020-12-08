@@ -7,7 +7,6 @@ window['eval'] = global.eval = () => {
   throw new Error('window.eval() is disabled for security');
 };
 
-import 'reflect-metadata';
 import Vue from 'vue';
 
 import { createStore } from './store';

@@ -1,8 +1,9 @@
 const path = require('path');
 const webpack = require('webpack');
 const cp = require('child_process');
-const WebpackManifestPlugin = require('webpack-manifest-plugin');
+const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 const plugins = [];
 
@@ -25,11 +26,19 @@ plugins.push(
 
 plugins.push(new CleanWebpackPlugin());
 
+plugins.push(new VueLoaderPlugin());
+
 // uncomment and install to analyze bundle size
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 // plugins.push(new BundleAnalyzerPlugin());
 
 module.exports = {
+  entry: {
+    renderer: './app/app.ts',
+    updater: './updater/mac/ui.js',
+    'guest-api': './guest-api',
+  },
+
   output: {
     path: __dirname + '/bundles',
     filename: '[name].js',
@@ -69,7 +78,7 @@ module.exports = {
       {
         test: /\.vue$/,
         use: [
-          'cache-loader',
+          // 'cache-loader',
           {
             loader: 'vue-loader',
             options: {
@@ -116,7 +125,7 @@ module.exports = {
         test: /\.ts$/,
         exclude: /node_modules/,
         use: [
-          'cache-loader',
+          // 'cache-loader',
           {
             loader: 'ts-loader',
             options: {
@@ -129,7 +138,7 @@ module.exports = {
         test: /\.tsx$/,
         include: path.resolve(__dirname, 'app/components'),
         use: [
-          'cache-loader',
+          // 'cache-loader',
           'babel-loader',
           {
             loader: 'ts-loader',
@@ -147,8 +156,8 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
-        test: /\.m\.less$/, // Local style modules
-        include: path.resolve(__dirname, 'app/components'),
+        test: /\.less$/, // Local style modules
+        include: [path.resolve(__dirname, 'app/components'), path.resolve(__dirname, 'updater')],
         use: [
           { loader: 'style-loader' },
           {

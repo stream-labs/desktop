@@ -21,12 +21,6 @@ plugins.push(
 );
 
 module.exports = smp.wrap(merge(baseConfig, {
-  entry: {
-    renderer: './app/app.ts',
-    updater: './updater/mac/ui.js',
-    'guest-api': './guest-api',
-  },
-
   mode: 'development',
   devtool: false,
   watchOptions: {
