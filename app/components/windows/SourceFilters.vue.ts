@@ -11,9 +11,17 @@ import ModalLayout from 'components/ModalLayout.vue';
 import NavMenu from 'components/shared/NavMenu.vue';
 import NavItem from 'components/shared/NavItem.vue';
 import Display from 'components/shared/Display.vue';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import GenericForm from 'components/obs/inputs/GenericForm';
 import { Subscription } from 'rxjs';
 import Scrollable from 'components/shared/Scrollable';
+import { $t } from 'services/i18n';
+import { metadata } from 'components/shared/inputs';
+import { TObsValue } from 'components/obs/inputs/ObsInput';
+
+const parsePresetValue = (path: string) => {
+  return path.match(/luts\\[a-z_]+.png$/)[0];
+};
 
 interface IFilterNodeData {
   visible: boolean;
@@ -28,6 +36,7 @@ interface IFilterNodeData {
     Display,
     SlVueTree,
     Scrollable,
+    VFormGroup,
   },
 })
 export default class SourceFilters extends Vue {
@@ -53,11 +62,12 @@ export default class SourceFilters extends Vue {
   removeFilterSub: Subscription;
   updateFilterSub: Subscription;
   reorderFilterSub: Subscription;
+  presetFilterValue: TObsValue = '';
 
   mounted() {
-    this.addFilterSub = this.sourceFiltersService.filterAdded.subscribe(() =>
-      this.refreshFilters(),
-    );
+    this.addFilterSub = this.sourceFiltersService.filterAdded.subscribe(() => {
+      this.refreshFilters();
+    });
     this.removeFilterSub = this.sourceFiltersService.filterRemoved.subscribe(filter => {
       this.refreshFilters();
       if (this.selectedFilterName === filter.name) {
@@ -73,6 +83,10 @@ export default class SourceFilters extends Vue {
     this.reorderFilterSub = this.sourceFiltersService.filtersReordered.subscribe(() =>
       this.refreshFilters(),
     );
+
+    const preset = this.sourceFiltersService.presetFilter(this.sourceId);
+    console.log(!!preset, preset?.settings);
+    if (preset) this.presetFilterValue = parsePresetValue(String(preset.settings.image_path));
   }
 
   destroyed() {
@@ -80,6 +94,38 @@ export default class SourceFilters extends Vue {
     this.removeFilterSub.unsubscribe();
     this.updateFilterSub.unsubscribe();
     this.reorderFilterSub.unsubscribe();
+  }
+
+  get presetFilterOptions() {
+    return [
+      { title: $t('None'), value: '' },
+      { title: $t('Grayscale'), value: 'luts\\grayscale.png' },
+      { title: $t('Sepiatone'), value: 'luts\\sepia.png' },
+      { title: $t('Dramatic'), value: 'luts\\gazing.png' },
+      { title: $t('Flashback'), value: 'luts\\muted.png' },
+      { title: $t('Inverted'), value: 'luts\\inverted.png' },
+      { title: $t('Action Movie'), value: 'luts\\cool_tone.png' },
+      { title: $t('Hearth'), value: 'luts\\warm_tone.png' },
+      { title: $t('Wintergreen'), value: 'luts\\green_tone.png' },
+      { title: $t('Heat Map'), value: 'luts\\heat_map.png' },
+      { title: $t('Cel Shade'), value: 'luts\\cel_shade.png' },
+    ];
+  }
+
+  get presetFilterMetadata() {
+    return metadata.list({
+      options: this.presetFilterOptions,
+      title: $t('Visual Presets'),
+    });
+  }
+
+  addPresetFilter(value: string) {
+    this.presetFilterValue = value;
+    if (value === '') {
+      this.sourceFiltersService.remove(this.sourceId, '__PRESET');
+    } else {
+      this.sourceFiltersService.addPresetFilter(this.sourceId, value);
+    }
   }
 
   @Watch('selectedFilterName')
@@ -112,16 +158,18 @@ export default class SourceFilters extends Vue {
   }
 
   get nodes() {
-    return this.filters.map(filter => {
-      return {
-        title: filter.name,
-        isSelected: filter.name === this.selectedFilterName,
-        isLeaf: true,
-        data: {
-          visible: filter.visible,
-        },
-      };
-    });
+    return this.filters
+      .filter(filter => filter.name !== '__PRESET')
+      .map(filter => {
+        return {
+          title: filter.name,
+          isSelected: filter.name === this.selectedFilterName,
+          isLeaf: true,
+          data: {
+            visible: filter.visible,
+          },
+        };
+      });
   }
 
   removeFilter() {
@@ -146,12 +194,15 @@ export default class SourceFilters extends Vue {
   ) {
     const sourceNode = nodes[0];
     const sourceInd = this.filters.findIndex(filter => filter.name === sourceNode.title);
+    const presetInd = this.filters.findIndex(filter => filter.name === '__PRESET');
     let targetInd = this.filters.findIndex(filter => filter.name === position.node.title);
-
     if (sourceInd < targetInd) {
       targetInd = position.placement === 'before' ? targetInd - 1 : targetInd;
     } else if (sourceInd > targetInd) {
       targetInd = position.placement === 'before' ? targetInd : targetInd + 1;
+    }
+    if (presetInd === targetInd) {
+      targetInd = targetInd - 1;
     }
 
     this.editorCommandsService.executeCommand(

@@ -17,6 +17,7 @@ import { $t } from 'services/i18n';
 import { EOrderMovement } from 'obs-studio-node';
 import { Subject } from 'rxjs';
 import { UsageStatisticsService } from './usage-statistics';
+import { getSharedResource } from 'util/get-shared-resource';
 
 export type TSourceFilterType =
   | 'mask_filter'
@@ -166,6 +167,9 @@ export class SourceFiltersService extends Service {
     // There is now 2 references to the filter at that point
     // We need to release one
     obsFilter.release();
+    if (this.presetFilter) {
+      this.setOrder(sourceId, '__PRESET', 1);
+    }
     this.filterAdded.next({ sourceId, name: filterName });
 
     if (filterType === 'vst_filter') {
@@ -204,6 +208,22 @@ export class SourceFiltersService extends Service {
         type: obsFilter.id as TSourceFilterType,
         settings: obsFilter.settings,
       }));
+  }
+
+  presetFilter(sourceId: string): ISourceFilter {
+    return this.getFilters(sourceId).find((filter: ISourceFilter) => filter.name === '__PRESET');
+  }
+
+  addPresetFilter(sourceId: string, path: string) {
+    const preset = this.presetFilter(sourceId);
+    if (preset) {
+      this.setPropertiesFormData(sourceId, '__PRESET', [
+        { name: 'image_path', value: getSharedResource(path), options: null, description: null },
+      ]);
+    } else {
+      // Funky name to attempt avoiding namespace collisions with user-set filters
+      this.add(sourceId, 'clut_filter', '__PRESET', { image_path: getSharedResource(path) });
+    }
   }
 
   setVisibility(sourceId: string, filterName: string, visible: boolean) {
