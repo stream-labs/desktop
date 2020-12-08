@@ -27,6 +27,11 @@ module.exports = smp.wrap(merge(baseConfig, {
     ignored: /node_modules/
   },
 
+  cache: {
+    type: 'filesystem'
+  },
+
+
   // module: {
   //   rules: [
   //     {
