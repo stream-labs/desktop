@@ -25,5 +25,17 @@
   "Limiter": "Limiter",
   "Expander": "Bővítő",
   "Shader": "Shader",
-  "No settings are available for this filter": "Ehhez a szűrőhöz nem állnak rendelkezésre beállítások"
+  "No settings are available for this filter": "Ehhez a szűrőhöz nem állnak rendelkezésre beállítások",
+  "Visual Presets": "Visual Presets",
+  "None": "Nincs",
+  "Grayscale": "Grayscale",
+  "Sepiatone": "Sepiatone",
+  "Action Movie": "Action Movie",
+  "Inverted": "Inverted",
+  "Flashback": "Flashback",
+  "Hearth": "Hearth",
+  "Heat Map": "Heat Map",
+  "Cel Shade": "Cel Shade",
+  "Dramatic": "Dramatic",
+  "Wintergreen": "Wintergreen"
 }
