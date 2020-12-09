@@ -87,8 +87,6 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
     // Game overlay is windows only
     if (getOS() !== OS.Windows) return;
 
-    console.log('test');
-
     super.init();
 
     this.userService.userLogout.subscribe(() => this.setEnabled(false));

@@ -49,7 +49,6 @@ export default class EditStreamWindow extends TsxComponent<{}> {
     // reset error for allowing update channel info
     this.streamingService.actions.resetError();
     this.streamingService.actions.prepopulateInfo();
-    console.log('foo');
   }
 
   private get view() {

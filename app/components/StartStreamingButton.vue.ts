@@ -145,7 +145,6 @@ export default class StartStreamingButton extends Vue {
   }
 
   shouldShowGoLiveWindow() {
-    console.log('hello');
     if (!this.userService.isLoggedIn) return false;
     const primaryPlatform = this.userService.state.auth?.primaryPlatform;
     const updateStreamInfoOnLive = this.customizationService.state.updateStreamInfoOnLive;
