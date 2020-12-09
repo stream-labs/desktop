@@ -4,6 +4,7 @@ const cp = require('child_process');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const fs = require('fs');
 
 const plugins = [];
 
@@ -20,12 +21,25 @@ plugins.push(
 
 plugins.push(
   new WebpackManifestPlugin({
-    filter: file => file.isChunk,
+    filter: file => ['renderer.js', 'vendors~renderer.js'].includes(file.name),
   }),
 );
 
 plugins.push(new CleanWebpackPlugin());
 plugins.push(new VueLoaderPlugin());
+
+const tsFiles = [];
+const tsxFiles = [];
+
+if (process.env.SLOBS_STRICT_NULLS) {
+  const filesPath = 'strict-null-check-files';
+  const files = fs.readdirSync(filesPath);
+  files.forEach(file => {
+    const json = JSON.parse(fs.readFileSync(`${filesPath}/${file}`));
+    if (json.ts) tsFiles.push(...json.ts);
+    if (json.tsx) tsxFiles.push(...json.tsx);
+  });
+}
 
 // uncomment and install to analyze bundle size
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
@@ -93,7 +107,15 @@ module.exports = {
       {
         test: /\.ts$/,
         exclude: /node_modules/,
-        use: 'ts-loader',
+        use: {
+          loader: 'ts-loader',
+          options: {
+            reportFiles: tsFiles,
+            compilerOptions: {
+              strictNullChecks: !!process.env.SLOBS_STRICT_NULLS,
+            },
+          },
+        },
       },
       {
         test: /\.tsx$/,
@@ -103,8 +125,10 @@ module.exports = {
           {
             loader: 'ts-loader',
             options: {
-              configFile: 'tsxconfig.json',
-              instance: 'tsx-loader',
+              reportFiles: tsxFiles,
+              compilerOptions: {
+                strictNullChecks: !!process.env.SLOBS_STRICT_NULLS,
+              },
             },
           },
         ],
