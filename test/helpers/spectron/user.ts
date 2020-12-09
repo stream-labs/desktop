@@ -49,6 +49,14 @@ interface ITestUserFeatures {
    */
   prime?: boolean;
   /**
+   * This account is eligible to stream into their FB group
+   */
+  hasFBGroup?: boolean;
+  /**
+   * This account is eligible to stream into their FB personal timeline
+   */
+  allowStreamingToFBTimeline?: boolean;
+  /**
    * Streaming is not available for this account
    * User pool does not return accounts with this flag unless you explicitly set this flag to true in the request
    */

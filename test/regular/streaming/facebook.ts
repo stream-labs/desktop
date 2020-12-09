@@ -26,9 +26,8 @@ test('Streaming to a Facebook Page', async t => {
   t.pass();
 });
 
-// TODO: setup FB permissions in the user-pool to run this test
-test.skip('Streaming to a Facebook User`s timeline', async t => {
-  await logIn(t, 'facebook');
+test('Streaming to a Facebook User`s timeline', async t => {
+  await logIn(t, 'facebook', { allowStreamingToFBTimeline: true });
   await goLive(t, {
     title: 'SLOBS Test Stream',
     facebookGame: selectTitle('Fortnite'),
@@ -38,9 +37,8 @@ test.skip('Streaming to a Facebook User`s timeline', async t => {
   t.pass();
 });
 
-// TODO: setup FB permissions in the user-pool to run this test
-test.skip('Streaming to a Facebook User`s group', async t => {
-  await logIn(t, 'facebook');
+test('Streaming to a Facebook User`s group', async t => {
+  await logIn(t, 'facebook', { hasFBGroup: true });
   await goLive(t, {
     title: 'SLOBS Test Stream',
     facebookGame: selectTitle('Fortnite'),
