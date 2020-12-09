@@ -177,7 +177,7 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
                   name: 'title',
                   required: true,
                   fullWidth: true,
-                  max: 120,
+                  max: this.props.platform === 'twitch' ? 140 : 120,
                   disabled,
                 })}
               />
