@@ -14,47 +14,38 @@
 import { inheritMutations } from './stateful-service';
 import Utils from 'services/utils';
 
-export function ServiceHelper(): ClassDecorator {
-  return function(target: any) {
-    const original = target;
-    const name = target.name;
+export function ServiceHelper() {
+  return function<T extends { new (...args: any[]): {} }>(constr: T) {
+    const klass = class extends constr {
+      constructor(...args: any[]) {
+        super(...args);
+        this['_isHelper'] = true;
+        this['_constructorArgs'] = args;
+        this['_resourceId'] = constr.name + JSON.stringify(args);
 
-    // create new constructor that will save arguments in instance
-    const f: any = function(this: any, ...args: any[]) {
-      original.apply(this, args);
-      this._isHelper = true;
-      this._constructorArgs = args;
-      this._resourceId = target.name + JSON.stringify(args);
+        return new Proxy(this, {
+          get: (target, key: string) => {
+            if (
+              typeof target[key] === 'function' &&
+              key !== 'isDestroyed' &&
+              target['isDestroyed']()
+            ) {
+              return () => {
+                throw new Error(
+                  `Trying to call the method "${key}" on destroyed object "${this['_resourceId']}"`,
+                );
+              };
+            }
 
-      // check if object has been destroyed before each API call
-      if (!this.isDestroyed) {
-        throw new Error(`isDestroyed() method should be defined for "${name}"`);
+            return target[key];
+          },
+        });
       }
-      return new Proxy(this, {
-        get: (target, key: string) => {
-          if (typeof target[key] === 'function' && key !== 'isDestroyed' && target.isDestroyed()) {
-            return () => {
-              throw new Error(
-                `Trying to call the method "${key}" on destroyed object "${this._resourceId}"`,
-              );
-            };
-          }
-          return target[key];
-        },
-      });
     };
 
-    // copy prototype so intanceof operator still works
-    f.prototype = original.prototype;
+    inheritMutations(klass);
 
-    // vuex modules names related to constructor name
-    // so we need to save the name
-    Object.defineProperty(f, 'name', { value: name });
-
-    inheritMutations(f);
-
-    // return new constructor (will override original)
-    return f;
+    return klass;
   };
 }
 

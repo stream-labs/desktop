@@ -84,6 +84,7 @@ export class SceneItem extends SceneItemNode {
       return item.id === sceneItemId;
     }) as ISceneItem;
     assertIsDefined(sceneItemState);
+
     const sourceState = this.sourcesService.state.sources[sourceId];
     this.state = sceneItemState;
     Utils.applyProxy(this, sourceState);

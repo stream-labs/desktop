@@ -3,7 +3,7 @@ const webpack = require('webpack');
 const cp = require('child_process');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-// const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 const plugins = [];
 
@@ -25,8 +25,7 @@ plugins.push(
 );
 
 plugins.push(new CleanWebpackPlugin());
-
-// plugins.push(new VueLoaderPlugin());
+plugins.push(new VueLoaderPlugin());
 
 // uncomment and install to analyze bundle size
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
@@ -78,7 +77,6 @@ module.exports = {
       {
         test: /\.vue$/,
         use: [
-          // 'cache-loader',
           {
             loader: 'vue-loader',
             options: {
@@ -87,65 +85,26 @@ module.exports = {
                 video: 'src',
                 source: 'src',
               },
-              loaders: { ts: 'ts-loader' },
             },
           },
         ],
         include: [path.resolve(__dirname, 'app/components'), path.resolve(__dirname, 'updater')],
       },
-      // {
-      //   test: /\.ts$/,
-      //   loader: 'awesome-typescript-loader',
-      //   options: { useCache: true, reportFiles: ['app/**/*.ts'] },
-      //   exclude: /node_modules|vue\/src/,
-      // },
-      // {
-      //   test: /\.tsx$/,
-      //   include: path.resolve(__dirname, 'app/components'),
-      //   use: [
-      //     'babel-loader',
-      //     {
-      //       loader: 'awesome-typescript-loader',
-      //       options: {
-      //         useCache: true,
-      //         reportFiles: ['app/components/**/*.tsx'],
-      //         configFileName: 'tsxconfig.json',
-      //         instance: 'tsx-loader',
-      //       },
-      //     },
-      //   ],
-      //   exclude: /node_modules/,
-      // },
-      // {
-      //   test: /\.ts$/,
-      //   loader: 'ts-loader',
-      //   exclude: /node_modules/,
-      // },
       {
         test: /\.ts$/,
         exclude: /node_modules/,
-        use: [
-          // 'cache-loader',
-          {
-            loader: 'ts-loader',
-            options: {
-              // experimentalFileCaching: true,
-            },
-          },
-        ],
+        use: 'ts-loader',
       },
       {
         test: /\.tsx$/,
         include: path.resolve(__dirname, 'app/components'),
         use: [
-          // 'cache-loader',
           'babel-loader',
           {
             loader: 'ts-loader',
             options: {
               configFile: 'tsxconfig.json',
               instance: 'tsx-loader',
-              // experimentalFileCaching: true,
             },
           },
         ],
@@ -156,8 +115,13 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
-        test: /\.less$/, // Local style modules
+        test: /(?<!\.[mg])\.less$/, // Vue style tags
         include: [path.resolve(__dirname, 'app/components'), path.resolve(__dirname, 'updater')],
+        use: ['vue-style-loader', 'css-loader', 'less-loader'],
+      },
+      {
+        test: /\.m.less$/, // Local style modules
+        include: path.resolve(__dirname, 'app/components'),
         use: [
           { loader: 'style-loader' },
           {
@@ -220,13 +184,8 @@ module.exports = {
     splitChunks: {
       chunks: chunk => chunk.name === 'renderer',
       name: 'vendors~renderer',
-      // cacheGroups: {
-      //   defaultVendors: {
-      //     name: 'vendors~renderer',
-      //   },
-      // },
     },
-    moduleIds: 'hashed',
+    moduleIds: 'deterministic',
   },
 
   plugins,
