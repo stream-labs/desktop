@@ -105,7 +105,7 @@ export default class BrowseOverlays extends Vue {
         return;
       }
 
-      const path = await this.overlaysPersistenceService.downloadOverlay(url, progressCallback);
+      const path = await this.overlaysPersistenceService.downloadOverlay(url);
       await this.widgetsService.loadWidgetFile(path, this.scenesService.views.activeSceneId);
     }
 

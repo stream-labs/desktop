@@ -18,7 +18,7 @@ import { CustomizationService } from 'services/customization';
 import { assertIsDefined } from 'util/properties-type-guards';
 import { IGoLiveSettings } from 'services/streaming';
 import { InheritMutations, mutation } from 'services/core';
-import { throwStreamError } from 'services/streaming/stream-error';
+import { throwStreamError, TStreamErrorType } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import GameSelector from '../../components/windows/go-live/GameSelector';
 
@@ -215,10 +215,17 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
       const details = e.result
         ? `${e.result.status} ${e.result.error} ${e.result.message}`
         : 'Connection failed';
-      const errorType =
-        e.result?.message === 'missing required oauth scope'
-          ? 'TWITCH_MISSED_OAUTH_SCOPE'
-          : 'PLATFORM_REQUEST_FAILED';
+      let errorType: TStreamErrorType;
+      switch (e.result?.message) {
+        case 'missing required oauth scope':
+          errorType = 'TWITCH_MISSED_OAUTH_SCOPE';
+          break;
+        case 'Status contains banned words.':
+          errorType = 'TWITCH_BANNED_WORDS';
+          break;
+        default:
+          errorType = 'PLATFORM_REQUEST_FAILED';
+      }
       throwStreamError(errorType, details, 'twitch');
     }
   }
@@ -273,7 +280,7 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
 
   async putChannelInfo({ title, game, tags = [] }: ITwitchStartStreamOptions): Promise<void> {
     await Promise.all([
-      platformAuthorizedRequest('twitch', {
+      this.requestTwitch({
         url: `https://api.twitch.tv/kraken/channels/${this.twitchId}`,
         method: 'PUT',
         body: JSON.stringify({ channel: { game, status: title } }),

@@ -1,55 +1,81 @@
 <template>
-<div class="footer">
-  <div class="flex flex--center flex--grow flex--justify-start">
-    <div class="error-wrapper" v-if="loggedIn && !youtubeEnabled">
-      <div class="platform-error">
-        <i class="fa fa-exclamation-triangle" />
-        <span>{{ $t('YouTube account not enabled for live streaming') }}</span>
-        <button class="button alert-button" @click="openYoutubeEnable">{{ $t('Fix') }}</button>
-        <button class="button alert-button" @click="confirmYoutubeEnabled">{{ $t('I\'m set up') }}</button>
+  <div class="footer">
+    <div class="flex flex--center flex--grow flex--justify-start">
+      <div class="error-wrapper" v-if="loggedIn && !youtubeEnabled">
+        <div class="platform-error">
+          <i class="fa fa-exclamation-triangle" />
+          <span>{{ $t('YouTube account not enabled for live streaming') }}</span>
+          <button class="button alert-button" @click="openYoutubeEnable">{{ $t('Fix') }}</button>
+          <button class="button alert-button" @click="confirmYoutubeEnabled">
+            {{ $t("I'm set up") }}
+          </button>
+        </div>
+      </div>
+      <i
+        v-bind:class="['icon-leaderboard-4', 'metrics-icon', performanceIconClassName]"
+        @click="openMetricsWindow"
+      />
+      <performance-metrics mode="limited" class="performance-metrics" />
+      <notifications-area class="notifications-area flex--grow" />
+    </div>
+
+    <div class="nav-right">
+      <div class="nav-item">
+        <test-widgets v-if="loggedIn" />
+      </div>
+      <div v-if="streamingService.isRecording" class="nav-item record-time">
+        {{ recordingTime }}
+      </div>
+      <div class="nav-item">
+        <button
+          :disabled="locked"
+          class="record-button"
+          @click="toggleRecording"
+          :class="{ active: streamingService.isRecording }"
+        >
+          <span>REC</span>
+        </button>
+      </div>
+      <div class="nav-item" v-if="replayBufferEnabled && replayBufferOffline">
+        <button
+          class="circle-button"
+          @click="toggleReplayBuffer"
+          v-tooltip.left="$t('Start Replay Buffer')"
+        >
+          <i class="icon-replay-buffer" />
+        </button>
+      </div>
+      <div class="nav-item replay-button-group" v-if="!replayBufferOffline">
+        <button
+          class="circle-button left-replay button--soft-warning"
+          @click="toggleReplayBuffer"
+          v-tooltip.left="$t('Stop')"
+        >
+          <i class="fa fa-stop" />
+        </button>
+        <button
+          class="circle-button right-replay"
+          @click="saveReplay"
+          :disabled="replayBufferSaving || replayBufferStopping"
+          v-tooltip.left="$t('Save Replay')"
+        >
+          <i class="icon-save" />
+        </button>
+      </div>
+      <div class="nav-item" v-if="canSchedule">
+        <button
+          class="circle-button"
+          @click="openScheduleStream"
+          v-tooltip.left="$t('Schedule Stream')"
+        >
+          <i class="icon-date" />
+        </button>
+      </div>
+      <div class="nav-item">
+        <start-streaming-button :disabled="locked" />
       </div>
     </div>
-    <i
-      v-bind:class="['icon-leaderboard-4', 'metrics-icon', performanceIconClassName]"
-      @click="openMetricsWindow"
-    />
-    <performance-metrics mode="limited" class="performance-metrics" />
-    <notifications-area class="notifications-area flex--grow"/>
   </div>
-
-  <div class="nav-right">
-    <div class="nav-item">
-      <test-widgets v-if="loggedIn" />
-    </div>
-    <div v-if="streamingService.isRecording" class="nav-item record-time">
-      {{ recordingTime }}
-    </div>
-    <div class="nav-item">
-      <button
-        :disabled="locked"
-        class="record-button"
-        @click="toggleRecording"
-        :class="{ active: streamingService.isRecording }">
-        <span>REC</span>
-      </button>
-    </div>
-    <div class="nav-item" v-if="replayBufferEnabled && replayBufferOffline">
-      <button class="circle-button" @click="toggleReplayBuffer" v-tooltip.left="$t('Start Replay Buffer')"><i class="icon-replay-buffer" /></button>
-    </div>
-    <div class="nav-item replay-button-group" v-if="!replayBufferOffline">
-      <button class="circle-button left-replay button--soft-warning" @click="toggleReplayBuffer" v-tooltip.left="$t('Stop')"><i class="fa fa-stop" /></button>
-      <button class="circle-button right-replay" @click="saveReplay" :disabled="replayBufferSaving || replayBufferStopping" v-tooltip.left="$t('Save Replay')">
-        <i class="icon-save" />
-      </button>
-    </div>
-    <div class="nav-item" v-if="canSchedule">
-      <button class="circle-button" @click="openScheduleStream" v-tooltip.left="$t('Schedule Stream')"><i class="icon-date" /></button>
-    </div>
-    <div class="nav-item">
-      <start-streaming-button :disabled="locked" />
-    </div>
-  </div>
-</div>
 </template>
 
 <script lang="ts" src="./StudioFooter.vue.ts"></script>
@@ -125,7 +151,7 @@
 }
 
 .info {
-  color: var(--info-dark);
+  color: var(--info);
 }
 
 .success {
