@@ -92,7 +92,7 @@ function startApp() {
     process.env.NAIR_IPC_PATH = "nair-".concat(uuid());
     process.env.NAIR_IPC_USERDATA = app.getPath('userData');
     // Host a new IPC Server and connect to it.
-    obs.IPC.ConnectOrHost(process.env.NAIR_IPC_PATH);
+    obs.IPC.host(process.env.NAIR_IPC_PATH);
     obs.NodeObs.SetWorkingDirectory(path.join(
       app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
       'node_modules',
