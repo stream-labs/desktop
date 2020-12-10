@@ -13,6 +13,11 @@ const errorTypes = {
       return $t('Missing required oauth scope');
     },
   },
+  TWITCH_BANNED_WORDS: {
+    get message() {
+      return $t('Your stream title or description contain banned words');
+    },
+  },
   PREPOPULATE_FAILED: {
     get message() {
       return $t('Failed to fetch platform settings');
