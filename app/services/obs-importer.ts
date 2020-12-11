@@ -128,6 +128,9 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
 
   private async importCollection(collection: ISceneCollection) {
     const sceneCollectionPath = path.join(this.sceneCollectionsDirectory, collection.filename);
+    if (sceneCollectionPath.indexOf('.json') === -1) {
+      return true;
+    }
     const configJSON: IOBSConfigJSON = JSON.parse(fs.readFileSync(sceneCollectionPath).toString());
 
     await this.sceneCollectionsService.create({
