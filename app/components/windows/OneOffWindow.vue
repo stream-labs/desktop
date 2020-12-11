@@ -1,12 +1,12 @@
 <template>
 <div style="height: 100%">
   <title-bar :title="options.title" class="child-window-titlebar" v-if="!options.isFullScreen" />
-  <div class="blank-slate" v-if="!options.hideBlankSlate">
+  <div :class="['blank-slate', {'no-titlebar': options.isFullScreen}]" v-if="!options.hideBlankSlate">
     <div class="spinner-spacer" />
     <i class="icon-spinner icon-spin modal-layout-spinner"/>
     <div class="spinner-spacer" />
   </div>
-  <div class="child-window-content">
+  <div :class="['child-window-content', {'no-titlebar': options.isFullScreen}]">
     <component :is="options.componentName"/>
   </div>
 </div>
@@ -37,6 +37,10 @@
 
 .child-window-content {
   height: calc(~"100% - 26px"); // TitleBarぶんの高さを引く
+}
+
+.no-titlebar {
+  height: 100%;
 }
 
 .spinner-spacer {
