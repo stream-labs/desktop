@@ -38,10 +38,11 @@ import CustomLoader from 'components/CustomLoader';
 import process from 'process';
 import { MetricsService } from 'services/metrics';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import { AlertLayoutInput } from 'components/widgets/inputs';
 
 const crashHandler = window['require']('crash-handler');
 
-const { ipcRenderer, remote, app, contentTracing } = electron;
+const { ipcRenderer, remote, app, contentTracing, dialog } = electron;
 const slobsVersion = Utils.env.SLOBS_VERSION;
 const isProduction = Utils.env.NODE_ENV === 'production';
 const isPreview = !!Utils.env.SLOBS_PREVIEW;
@@ -282,7 +283,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     window['obs'] = obs;
 
     // Host a new OBS server instance
-    obs.IPC.host(`slobs-${uuid()}`);
+    try {
+      obs.IPC.host(`slobs-${uuid()}`);
+    } catch (e) {
+      dialog.showErrorBox('Streamlabs OBS', e.message);
+      app.exit();
+    }
     obs.NodeObs.SetWorkingDirectory(
       path.join(
         electron.remote.app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
