@@ -6,7 +6,7 @@
     <i class="icon-spinner icon-spin modal-layout-spinner"/>
     <div class="spinner-spacer" />
   </div>
-  <div v-bind:class="['child-window-content', {'no-titlebar': options.isFullScreen}]">
+  <div :class="['child-window-content', {'no-titlebar': options.isFullScreen}]">
     <component :is="options.componentName"/>
   </div>
 </div>
