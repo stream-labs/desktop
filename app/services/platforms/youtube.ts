@@ -374,6 +374,9 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
    * returns perilled data for the GoLive window
    */
   async prepopulateInfo(): Promise<void> {
+    if (!this.state.liveStreamingEnabled) {
+      throw throwStreamError('YOUTUBE_STREAMING_DISABLED', '', 'youtube');
+    }
     const settings = this.state.settings;
     this.UPDATE_STREAM_SETTINGS({
       description: settings.description || (await this.fetchDefaultDescription()),
