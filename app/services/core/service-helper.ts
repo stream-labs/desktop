@@ -43,6 +43,8 @@ export function ServiceHelper() {
       }
     };
 
+    Object.defineProperty(klass, 'name', { value: constr.name });
+
     inheritMutations(klass);
 
     return klass;
