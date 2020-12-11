@@ -22,7 +22,7 @@ export default class FFZSettings extends Vue {
 
   mounted() {
     const webview = this.$refs.ffzSettings;
-    const settings = this.customizationService.getSettings();
+    const settings = this.customizationService.state;
 
     this.nightMode = this.customizationService.isDarkTheme;
 

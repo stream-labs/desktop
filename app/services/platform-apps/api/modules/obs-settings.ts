@@ -1,5 +1,5 @@
 import { Module, EApiPermissions, apiMethod, IApiContext } from './module';
-import { SettingsService, ISettingsState } from 'services/settings';
+import { SettingsService, ISettingsValues } from 'services/settings';
 import { Inject } from 'services/core/injector';
 
 export class ObsSettingsModule extends Module {
@@ -9,12 +9,13 @@ export class ObsSettingsModule extends Module {
   @Inject() settingsService: SettingsService;
 
   @apiMethod()
-  getSettings(): ISettingsState {
-    return this.settingsService.state;
+  getSettings(): ISettingsValues {
+    this.settingsService.loadSettingsIntoStore();
+    return this.settingsService.views.values;
   }
 
   @apiMethod()
-  setSettings(ctx: IApiContext, settingsPatch: Partial<ISettingsState>) {
+  setSettings(ctx: IApiContext, settingsPatch: Partial<ISettingsValues>) {
     this.settingsService.setSettingsPatch(settingsPatch);
   }
 }
