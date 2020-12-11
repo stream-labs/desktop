@@ -76,16 +76,6 @@ if (isProduction) {
 let usingSentry = false;
 const windowId = Utils.getWindowId();
 
-const jsonData = fs.readFileSync('../scripts/repositories.json');
-const root = JSON.parse(jsonData.toString());
-const dependencies = root.root;
-const obsEntry = dependencies.filter(
-  (dependency: { name: string }) => dependency.name === 'obs-studio-node',
-)[0];
-const obsnodeVersion = obsEntry.version;
-
-console.log('OBS node version: ', obsnodeVersion);
-
 function wrapLogFn(fn: string) {
   const old: Function = console[fn];
   console[fn] = (...args: any[]) => {
