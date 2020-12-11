@@ -97,6 +97,10 @@
         "404": {
           "title": "There is no program",
           "message": "You can not extend the program because there is no program.\nIf you want to create a new program, update the program information and then press the \"Create A Program\" button."
+        },
+        "500": {
+          "title": "Under maintenance",
+          "message": "You could not extend the program time because niconico live streaming service is under maintenance.\nCheck niconico information about maintenance from the \"Notification\" button to know the maintenance time."
         }
       },
       "sendOperatorComment": {
