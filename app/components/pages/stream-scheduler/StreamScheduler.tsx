@@ -69,11 +69,11 @@ export default class StreamScheduler extends TsxComponent {
   }
 
   private showScheduleNewDialog(date: number) {
-    WindowsService.showModal(this, () => <ScheduledStreamEditor date={date} />);
+    WindowsService.showModalDialog(this, () => <ScheduledStreamEditor date={date} />);
   }
 
   private showUpdateDialog(event?: IStreamEvent) {
-    WindowsService.showModal(this, () => (
+    WindowsService.showModalDialog(this, () => (
       <ScheduledStreamEditor id={event.id} platform={event.platform} date={event.date} />
     ));
   }
@@ -84,9 +84,9 @@ export default class StreamScheduler extends TsxComponent {
     return (
       <div class={css.daySlot} onClick={() => this.showScheduleNewDialog(day.date.valueOf())}>
         <span class={css.dayLabel}>{day.day}</span>
-        <transition name="fade">
+        <transition-group name="fade">
           {attributes?.map((attr: any) => this.renderEvent(attr.customData, day.date))}
-        </transition>
+        </transition-group>
       </div>
     );
   }
@@ -95,6 +95,7 @@ export default class StreamScheduler extends TsxComponent {
     const time = moment(date).format('hh:ssa');
     return (
       <p
+        key={event.id}
         class={{
           [css.event]: true,
           [css.eventFacebook]: event.platform === 'facebook',

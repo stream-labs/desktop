@@ -14,9 +14,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { StreamSettingsService } from 'services/settings/streaming';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import PlatformSettings from 'components/windows/go-live/PlatformSettings';
-import { TPlatform } from 'services/platforms';
-import moment from 'moment';
-import { ToggleInput } from '../../shared/inputs/inputs';
+import { getPlatformService, TPlatform } from 'services/platforms';
 import cx from 'classnames';
 import { IYoutubeLiveBroadcast, YoutubeService } from 'services/platforms/youtube';
 import { FacebookService, IFacebookLiveVideo } from 'services/platforms/facebook';
@@ -43,8 +41,6 @@ export default class ScheduledStreamEditor extends TsxComponent<Props> {
   };
 
   private selectedPlatform: TPlatform = 'youtube';
-  private ytBroadcast: IYoutubeLiveBroadcast = null;
-  private fbVideo: IFacebookLiveVideo = null;
 
   private get isUpdateMode(): boolean {
     return !!this.props.id;
@@ -87,11 +83,11 @@ export default class ScheduledStreamEditor extends TsxComponent<Props> {
 
     if (this.isUpdateMode) {
       if (this.selectedPlatform === 'youtube') {
-        this.ytBroadcast = await this.youtubeService.fetchBroadcast(this.props.id);
         this.settings.platforms.youtube = {
           ...this.settings.platforms.youtube,
-          title: this.ytBroadcast.snippet.title,
-          description: this.ytBroadcast.snippet.description,
+          ...(await this.youtubeService.actions.return.fetchStartStreamOptionsForBroadcast(
+            this.props.id,
+          )),
         };
       } else {
         // this.fbVideo = await this.facebookService.fetchV
@@ -102,7 +98,7 @@ export default class ScheduledStreamEditor extends TsxComponent<Props> {
   /**
    * validate settings and schedule stream
    */
-  private async scheduleNewStream() {
+  private async save() {
     // validate
     if (!(await this.$refs.form.validate())) return;
 
@@ -112,16 +108,15 @@ export default class ScheduledStreamEditor extends TsxComponent<Props> {
     // convert date to ISO string format
     const scheduledStartTime = new Date(startDate + this.startTimeModel.time * 1000).toISOString();
 
-    // schedule
     try {
       this.isLoading = true;
       await this.streamingService.actions.return.scheduleStream(this.settings, scheduledStartTime);
       this.close();
     } catch (e) {
-      this.$toasted.show(e.message, {
+      this.$toasted.show(e.details, {
         position: 'bottom-center',
         className: 'toast-alert',
-        duration: 50 * e.message.length,
+        duration: 50 * e.details.length,
         singleton: true,
       });
     } finally {
@@ -149,8 +144,9 @@ export default class ScheduledStreamEditor extends TsxComponent<Props> {
         title: $t('Platform'),
         options: this.view.linkedPlatforms
           .filter(p => p !== 'twitch')
-          .map(p => ({ title: p, value: p })),
+          .map(p => ({ title: getPlatformService(p).displayName, value: p })),
         disabled: this.isUpdateMode,
+        fullWidth: true,
       }),
       time: metadata.timer({
         title: $t('Scheduled Time'),
@@ -204,15 +200,15 @@ export default class ScheduledStreamEditor extends TsxComponent<Props> {
 
         {/* SCHEDULE BUTTON */}
         {shouldShowScheduleButton && (
-          <button class={cx('button button--action')} onClick={() => this.scheduleNewStream()}>
+          <button class={cx('button button--action')} onClick={() => this.save()}>
             {$t('Schedule')}
           </button>
         )}
 
         {/* UPDATE BUTTON */}
         {shouldShowUpdateButton && (
-          <button class={cx('button button--action')} onClick={() => this.close()}>
-            {$t('Update')}
+          <button class={cx('button button--action')} onClick={() => this.save()}>
+            {$t('Save')}
           </button>
         )}
       </div>

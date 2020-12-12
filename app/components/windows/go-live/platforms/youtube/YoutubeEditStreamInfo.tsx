@@ -70,28 +70,17 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
   }
 
   private async onSelectBroadcastHandler() {
-    // set title and description fields from the selected broadcast
+    // set fields from the selected broadcast
     const ytSettings = this.settings.platforms.youtube;
     const selectedBroadcast = this.selectedBroadcast;
     if (!selectedBroadcast) return;
-    const { title, description } = selectedBroadcast.snippet;
-    const { privacyStatus, selfDeclaredMadeForKids } = selectedBroadcast.status;
-    const { enableDvr, projection, latencyPreference } = selectedBroadcast.contentDetails;
-    ytSettings.title = title;
-    ytSettings.description = description;
-    ytSettings.enableDvr = enableDvr;
-    ytSettings.latencyPreference = latencyPreference;
-    ytSettings.projection = projection;
-    ytSettings.privacyStatus = privacyStatus;
-    ytSettings.selfDeclaredMadeForKids = selfDeclaredMadeForKids;
 
-    // category id is a property of YoutubeVideo
-    const video = await this.youtubeService.fetchVideo(selectedBroadcast.id);
-    this.setCategory(video.snippet.categoryId);
-  }
-
-  private setCategory(categoryId: string) {
-    this.settings.platforms.youtube.categoryId = categoryId;
+    this.settings.platforms.youtube = {
+      ...ytSettings,
+      ...(await this.youtubeService.actions.return.fetchStartStreamOptionsForBroadcast(
+        selectedBroadcast.id,
+      )),
+    };
   }
 
   private onProjectionChangeHandler(enable360: boolean) {

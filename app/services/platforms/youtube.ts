@@ -1,4 +1,4 @@
-import { mutation, InheritMutations } from '../core/stateful-service';
+import { mutation, InheritMutations, ViewHandler } from '../core/stateful-service';
 import {
   IPlatformService,
   TPlatformCapability,
@@ -34,6 +34,7 @@ export interface IYoutubeStartStreamOptions extends IExtraBroadcastSettings {
   broadcastId?: string;
   description: string;
   privacyStatus?: 'private' | 'public' | 'unlisted';
+  scheduledStartTime?: string;
 }
 
 /**
@@ -199,6 +200,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   private apiBase = 'https://www.googleapis.com/youtube/v3';
 
   streamScheduled = new Subject<IYoutubeLiveBroadcast>();
+  streamRemoved = new Subject<string>();
 
   protected init() {
     this.syncSettingsWithLocalStorage();
@@ -386,13 +388,23 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   }
 
   /**
-   * Create a YT broadcast (event) for the future stream
+   * Create or update a YT broadcast (event) for the future stream
    */
   async scheduleStream(
     scheduledStartTime: string,
     options: IYoutubeStartStreamOptions,
   ): Promise<void> {
-    const broadcast = await this.createBroadcast({ ...options, scheduledStartTime });
+    let broadcast: IYoutubeLiveBroadcast;
+    if (!options.broadcastId) {
+      // create an new event
+      broadcast = await this.createBroadcast({ ...options, scheduledStartTime });
+    } else {
+      // update an existing event
+      broadcast = await this.updateBroadcast(options.broadcastId, {
+        ...options,
+        scheduledStartTime,
+      });
+    }
     this.streamScheduled.next(broadcast);
   }
 
@@ -472,13 +484,13 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     id: string,
     params: Partial<IYoutubeStartStreamOptions>,
     isMidStreamMode = false,
-  ): Promise<void> {
+  ): Promise<IYoutubeLiveBroadcast> {
     const broadcast = await this.fetchBroadcast(id);
 
     const snippet: Partial<IYoutubeLiveBroadcast['snippet']> = {
       title: params.title,
       description: params.description,
-      scheduledStartTime: new Date().toISOString(),
+      scheduledStartTime: params.scheduledStartTime || new Date().toISOString(),
     };
 
     const contentDetails: Dictionary<any> = {
@@ -513,7 +525,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     const endpoint = `liveBroadcasts?part=${fields.join(',')}&id=${id}`;
     const body: Dictionary<any> = { id, snippet, contentDetails, status };
 
-    await this.requestYoutube<IYoutubeLiveBroadcast>({
+    return await this.requestYoutube<IYoutubeLiveBroadcast>({
       body: JSON.stringify(body),
       method: 'PUT',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
@@ -526,6 +538,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       method: 'DELETE',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
     });
+    this.streamRemoved.next(id);
   }
 
   /**
@@ -654,6 +667,32 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     const mode = this.customizationService.isDarkTheme ? 'night' : 'day';
     const youtubeDomain = mode === 'day' ? 'https://youtube.com' : 'https://gaming.youtube.com';
     return `${youtubeDomain}/live_chat?v=${broadcastId}&is_popout=1`;
+  }
+
+  /**
+   * Returns an IYoutubeStartStreamOptions object for a given broadcastId
+   */
+  async fetchStartStreamOptionsForBroadcast(
+    broadcastId: string,
+  ): Promise<IYoutubeStartStreamOptions> {
+    const [broadcast, video] = await Promise.all([
+      this.fetchBroadcast(broadcastId),
+      this.fetchVideo(broadcastId),
+    ]);
+    const { title, description } = broadcast.snippet;
+    const { privacyStatus, selfDeclaredMadeForKids } = broadcast.status;
+    const { enableDvr, projection, latencyPreference } = broadcast.contentDetails;
+    return {
+      broadcastId: broadcast.id,
+      title,
+      description,
+      privacyStatus,
+      selfDeclaredMadeForKids,
+      enableDvr,
+      projection,
+      latencyPreference,
+      categoryId: video.snippet.categoryId,
+    };
   }
 
   openYoutubeEnable() {

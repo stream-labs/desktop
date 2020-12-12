@@ -81,7 +81,10 @@ export default class PlatformSettings extends TsxComponent<Props> {
    * Renders settings for one platform
    */
   private renderPlatformSettings(platform: TPlatform) {
-    const isAdvancedMode = this.view.goLiveSettings.advancedMode && this.view.isMultiplatformMode;
+    const isAdvancedMode =
+      this.view.goLiveSettings.advancedMode &&
+      this.view.isMultiplatformMode &&
+      !this.props.isScheduleMode;
     const title = $t('%{platform} Settings', { platform: this.getPlatformName(platform) });
     const isLive = this.view.isMidStreamMode;
     return (

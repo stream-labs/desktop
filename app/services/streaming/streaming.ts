@@ -44,6 +44,7 @@ import { TwitterService } from '../integrations/twitter';
 import { assertIsDefined } from 'util/properties-type-guards';
 import { IYoutubeLiveBroadcast, YoutubeService } from '../platforms/youtube';
 import { StreamInfoView } from './streaming-view';
+import Vue from 'vue';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -158,12 +159,16 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         deep: true,
       },
     );
+
+    // sync scheduled streams with store
     this.youtubeService.streamScheduled.subscribe(scheduledLiveStream =>
       this.onStreamScheduledHandler('youtube', scheduledLiveStream),
     );
     this.facebookService.streamScheduled.subscribe(scheduledLiveStream =>
       this.onStreamScheduledHandler('facebook', scheduledLiveStream),
     );
+    this.youtubeService.streamRemoved.subscribe(id => this.REMOVE_STREAM_EVENT(id));
+    this.facebookService.streamRemoved.subscribe(id => this.REMOVE_STREAM_EVENT(id));
   }
 
   private onStreamScheduledHandler(
@@ -174,9 +179,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       platform === 'youtube'
         ? this.convertYTBroadcastToEvent(scheduledLiveStream as IYoutubeLiveBroadcast)
         : this.convertFBLiveVideoToEvent(scheduledLiveStream as IFacebookLiveVideo);
-    if (platform === 'youtube') {
-      this.SET_STREAM_EVENTS(true, [...this.state.streamEvents, event]);
-    }
+
+    this.REMOVE_STREAM_EVENT(event.id);
+    this.SET_STREAM_EVENTS(true, [...this.state.streamEvents, event]);
   }
 
   get views(): StreamInfoView {
@@ -1167,5 +1172,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     if (!loaded) this.state.streamEvents = [];
     this.state.streamEventsLoaded = loaded;
     if (events) this.state.streamEvents = events;
+  }
+
+  @mutation()
+  private REMOVE_STREAM_EVENT(eventId: string) {
+    const ind = this.state.streamEvents.findIndex(ev => ev.id === eventId);
+    if (ind === -1) return;
+    Vue.delete(this.state.streamEvents, ind);
   }
 }

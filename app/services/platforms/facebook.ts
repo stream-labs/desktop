@@ -109,6 +109,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   readonly displayName = 'Facebook';
 
   streamScheduled = new Subject<IFacebookLiveVideo>();
+  streamRemoved = new Subject<string>();
 
   readonly capabilities = new Set<TPlatformCapability>([
     'chat',
@@ -240,7 +241,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
 
     return await this.requestFacebook(
       {
-        url: `${this.apiBase}/${liveVideoId}?fields=title,description,stream_url,planned_start_time,permalink_url`,
+        url: `${this.apiBase}/${liveVideoId}?fields=id,title,description,stream_url,planned_start_time,permalink_url`,
         method: 'POST',
         body: JSON.stringify(data),
       },
@@ -248,16 +249,17 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     );
   }
 
-  async removeLiveVideo(id: string): Promise<IFacebookLiveVideo> {
+  async removeLiveVideo(id: string): Promise<void> {
     const token = this.views.getDestinationToken();
 
-    return await this.requestFacebook(
+    await this.requestFacebook(
       {
         url: `${this.apiBase}/${id}`,
         method: 'DELETE',
       },
       token,
     );
+    this.streamRemoved.next(id);
   }
 
   async validatePlatform() {
@@ -404,10 +406,11 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     scheduledStartTime: string,
     options: IFacebookStartStreamOptions,
   ): Promise<void> {
-    const { title, description, game } = options;
+    const { title, description, game, liveVideoId } = options;
     const destinationId = this.views.getDestinationId(options);
     const token = this.views.getDestinationToken(options.destinationType, destinationId);
-    const url = `${this.apiBase}/${destinationId}/live_videos`;
+    const fields = ['id', 'title', 'description', 'planned_start_time', 'permalink_url'];
+    const url = `${this.apiBase}/${destinationId}/live_videos?fields=${fields.join(',')}`;
     const data: Dictionary<any> = {
       title,
       description,

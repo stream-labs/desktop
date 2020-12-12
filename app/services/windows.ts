@@ -225,6 +225,16 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.showModal(vm, renderer);
   }
 
+  static showModalDialog(vm: Vue, renderFn: Function) {
+    const renderer = () =>
+      vm.$createElement(
+        MessageBoxModal,
+        { props: { padding: { top: 0, right: 0, bottom: 0, left: 0 } } },
+        [renderFn()],
+      );
+    this.showModal(vm, renderer);
+  }
+
   // This is a list of components that are registered to be
   // top level components in new child windows.
   components = getComponents();
