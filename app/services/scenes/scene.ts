@@ -166,7 +166,7 @@ export class Scene {
 
     // Default is to select
     if (options.select == null) options.select = true;
-    if (options.select) this.selectionService.select(sceneItemId);
+    if (options.select) this.selectionService.views.globalSelection.select(sceneItemId);
 
     if (options.initialTransform) {
       sceneItem.setTransform(options.initialTransform);
@@ -267,12 +267,8 @@ export class Scene {
     }
 
     if (sourceNode.parentId !== destFolderId) {
-      sourceNode.setParent(destFolderId);
+      this.SET_PARENT(sourceNode.id, destFolderId);
     }
-
-    const itemsToMove: SceneItem[] = sourceNode.isFolder()
-      ? sourceNode.getNestedItems()
-      : [sourceNode];
 
     // move nodes
 
@@ -334,7 +330,8 @@ export class Scene {
     } else if (destNode.parentId) {
       const sourceNode = this.getNode(sourceNodeId);
       assertIsDefined(sourceNode);
-      sourceNode.setParent(destNode.parentId); // place to the top of folder
+
+      this.SET_PARENT(sourceNode.id, destNode.parentId);
     } else {
       this.placeAfter(sourceNodeId); // place to the top of scene
     }
@@ -540,5 +537,15 @@ export class Scene {
         return item.id === id;
       })!;
     });
+  }
+
+  @mutation()
+  private SET_PARENT(childNodeId: string, parentFolderId: string) {
+    if (childNodeId === parentFolderId) {
+      throw new Error('The parent id should not be equal the child id');
+    }
+    const childNodeState = this.state.nodes.find(node => node.id === childNodeId);
+    assertIsDefined(childNodeState);
+    childNodeState.parentId = parentFolderId;
   }
 }

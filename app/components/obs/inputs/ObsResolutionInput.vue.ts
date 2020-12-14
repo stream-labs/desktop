@@ -1,47 +1,70 @@
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import { TObsType, IObsListInput, ObsInput, TObsValue } from './ObsInput';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
-import { ListInput } from 'components/shared/inputs/inputs';
+import { BoolInput, ListInput, NumberInput } from 'components/shared/inputs/inputs';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
+import { $t } from 'services/i18n';
+import { formMetadata, IListMetadata, metadata } from '../../shared/inputs';
 
 @Component({
-  components: { HFormGroup, ListInput },
+  components: { HFormGroup, VFormGroup, ListInput, BoolInput, NumberInput },
 })
 class ObsResolutionInput extends ObsInput<IObsListInput<TObsValue>> {
   static obsType: TObsType;
 
   @Prop()
-  value: IObsListInput<TObsValue>;
+  value: IObsListInput<string>;
 
-  @Prop({ default: 'Select Option or Type New Value' })
+  @Prop({ default: 'Select Option' })
   placeholder: string;
 
   @Prop({ default: false })
   allowEmpty: boolean;
 
-  onInputHandler(value: string) {
+  private customMode = false;
+  private customWidth = 0;
+  private customHeight = 0;
+  private customFieldsMetadata = formMetadata({
+    width: metadata.number({ title: $t('Width'), min: 1 }),
+    height: metadata.number({ title: $t('Height'), min: 1 }),
+  });
+
+  switchToCustomMode() {
+    this.customMode = true;
+    const res = this.parseResolution(this.value.value);
+    this.customWidth = res.width;
+    this.customHeight = res.height;
+  }
+
+  applyCustomRes() {
+    this.customMode = false;
+    const width = Math.max(this.customWidth, 1);
+    const height = Math.max(this.customHeight, 1);
+    const value = `${width}x${height}`;
     this.emitInput({ ...this.value, value });
   }
 
-  onSearchChange(value: string) {
-    this.$emit('search-change', value);
+  onSelectHandler(value: string) {
+    this.emitInput({ ...this.value, value });
   }
 
   get metadata() {
+    const options = this.value.options.map(opt => ({ title: opt.description, value: opt.value }));
     return {
       disabled: this.value.enabled === false,
-      options: this.value.options.map(opt => ({ title: opt.description, value: opt.value })),
+      options,
       allowEmpty: this.allowEmpty,
       placeholder: this.placeholder,
-      allowCustom: this.getCustomResolution,
+      name: this.value.name,
+      allowCustom: true,
     };
   }
 
-  getCustomResolution(search: string) {
-    const match = search.match(/\d+/g) || [];
-    const width = match[0] || 400;
-    const height = match[1] || 400;
-    const value = `${width}x${height}`;
-    return { value, description: value };
+  private parseResolution(resStr: string): { width: number; height: number } {
+    const match = resStr.match(/\d+/g) || [];
+    const width = Number(match[0] || 400);
+    const height = Number(match[1] || 400);
+    return { width, height };
   }
 }
 

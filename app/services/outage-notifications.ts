@@ -6,6 +6,7 @@ import electron from 'electron';
 import { UserService } from 'services/user';
 import { TPlatform } from 'services/platforms';
 import { InitAfter } from './core';
+import { jfetch } from 'util/requests';
 
 interface IOutageNotification {
   /**
@@ -124,13 +125,7 @@ export class OutageNotificationsService extends Service {
     headers.append('Cache-Control', 'no-cache');
 
     try {
-      const response = await fetch(req, { headers });
-
-      if (response.ok) {
-        return await response.json();
-      }
-
-      return;
+      return await jfetch(req, { headers });
     } catch (e) {
       return;
     }

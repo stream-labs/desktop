@@ -32,7 +32,7 @@
   "Submit": "Envoyer",
   "Save": "Enregistrer",
   "Edit": "Modifier",
-  "Login": "Connexion",
+  "Log In": "Log In",
   "Yes": "Oui",
   "No": "Non",
   "OK": "OK",
@@ -55,6 +55,7 @@
   "Cloudbot": "Cloudbot",
   "Merch": "Produits personnalisés",
   "App Store": "Boutique d'applications",
+  "Alertbox Library": "Alertbox Library",
   "New": "Nouveau",
   "Face Masks": "Masques faciaux",
   "Help": "Aide",
@@ -85,13 +86,11 @@
   "Amount": "Quantité",
   "here": "ici",
   "Link": "Lien",
-  "Whitelist": "Liste blanche",
-  "Blacklist": "Liste noire",
   "Description": "Description",
   "OBSInit.UnknownError": "Une erreur inconnue est survenue lors de l'initialisation d'OBS.",
   "OBSInit.ModuleNotFoundError": "DirectX n'a pas pu être trouvé sur votre système. Installez la dernière version de DirectX pour votre système, disponible ici <https://www.microsoft.com/en-us/download/details.aspx?id=35?>, et réessayez.",
   "OBSInit.NotSupportedError": "Échec de l'initialisation d'OBS. Vos pilotes vidéo sont peut-être obsolètes ou Streamlabs OBS n'est peut-être pas pris en charge par votre système.",
-  "Logout %{username}": "Déconnecter %{username}",
+  "Log Out": "Log Out",
   "Layout Editor": "Éditeur de disposition",
   "Are you sure you want to import multiple files?": "Êtes-vous sûr de vouloir importer plusieurs fichiers?",
   "Studio": "Studio",
@@ -118,5 +117,5 @@
   "Apps": "Applications",
   "Finish": "Terminer",
   "Get Prime": "Obtenir Prime",
-  "System error message:": "System error message:"
+  "System error message:": "Message d’erreur système:"
 }

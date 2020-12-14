@@ -28,6 +28,7 @@
 
     <scrollable
       class="patch-notes-container"
+      :isResizable="false"
       :class="{
         'patch-notes-container--opened': notes.showChest,
         'patch-notes-container--opening': patchNotesOpening,
@@ -179,6 +180,7 @@
 
 .patch-notes-container {
   width: 400px;
+  height: 50%;
   position: absolute;
 }
 

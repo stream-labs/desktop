@@ -38,15 +38,15 @@ export interface IStreamInfo {
     | 'runChecklist' // applying new settings and start the stream
     | 'live'; // stream has been successfully started
   error: IStreamError | null;
+  warning: 'YT_AUTO_START_IS_DISABLED' | '';
   checklist: {
     applyOptimizedSettings: TGoLiveChecklistItemState;
     twitch: TGoLiveChecklistItemState;
     youtube: TGoLiveChecklistItemState;
     facebook: TGoLiveChecklistItemState;
     mixer: TGoLiveChecklistItemState;
-    setupRestream: TGoLiveChecklistItemState;
+    setupMultistream: TGoLiveChecklistItemState;
     startVideoTransmission: TGoLiveChecklistItemState;
-    publishYoutubeBroadcast: TGoLiveChecklistItemState;
     postTweet: TGoLiveChecklistItemState;
   };
 }

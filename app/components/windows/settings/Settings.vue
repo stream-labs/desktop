@@ -6,42 +6,58 @@
     :contentStyles="{ padding: '0' }"
   >
     <div slot="content" class="settings">
-      <NavMenu v-model="categoryName">
-        <form-input
-          v-model="searchStr"
-          :metadata="{
-            type: 'text',
-            placeholder: 'Search',
-            icon: 'search',
-          }"
-          class="search"
-        />
-        <button
-          class="button button--default clear-search-button"
-          v-if="searchStr"
-          @click="searchStr = ''"
-        >
-          <i class="fa fa-times"></i>
-        </button>
-        <NavItem
-          v-for="category in categoryNames"
-          :key="category"
-          :to="category"
-          :ico="icons[category]"
-          :class="{ disabled: searchStr && !searchResultPages.includes(category) }"
-        >
-          {{ $t(category) }}
-        </NavItem>
-        <NavItem
-          v-if="!isPrime"
-          key="Prime"
-          to="Prime"
-          ico="icon-prime"
-          :icoStyles="{ color: 'var(--prime)' }"
-          :style="{ color: 'var(--prime)' }"
-        >
-          Prime
-        </NavItem>
+      <NavMenu v-model="categoryName" class="settings-nav">
+        <scrollable style="height: 100%;" :isResizable="false">
+          <form-input
+            :value="searchStr"
+            @input="str => onSearchInput(str)"
+            :metadata="{
+              type: 'text',
+              placeholder: 'Search',
+              icon: 'search',
+            }"
+            class="search"
+          />
+          <button
+            class="button button--default clear-search-button"
+            v-if="searchStr"
+            @click="searchStr = ''"
+          >
+            <i class="fa fa-times"></i>
+          </button>
+          <NavItem
+            v-for="category in categoryNames"
+            :key="category"
+            :to="category"
+            :ico="icons[category]"
+            :class="{ disabled: searchStr && !searchResultPages.includes(category) }"
+          >
+            {{ $t(category) }}
+          </NavItem>
+          <NavItem
+            v-if="!isPrime && isLoggedIn"
+            key="Prime"
+            to="Prime"
+            ico="icon-prime"
+            :icoStyles="{ color: 'var(--prime)' }"
+            :style="{ color: 'var(--prime)' }"
+          >
+            Prime
+          </NavItem>
+          <button
+            class="settings-auth"
+            @click="handleAuth()"
+            v-track-click="{
+              component: 'Settings',
+              target: userService.isLoggedIn ? 'logout' : 'login',
+            }"
+          >
+            <i :class="userService.isLoggedIn ? 'fas fa-sign-out-alt' : 'fas fa-sign-in-alt'" />
+            <strong>{{ userService.isLoggedIn ? $t('Log Out') : $t('Log In') }}</strong>
+            <platform-logo v-if="userService.isLoggedIn" :platform="userService.platform.type" />
+            <span v-if="userService.isLoggedIn">{{ userService.username }}</span>
+          </button>
+        </scrollable>
       </NavMenu>
 
       <scrollable className="settings-container">
@@ -53,7 +69,7 @@
           :onBeforePageScan="onBeforePageScanHandler"
           :onPageRender="onPageRenderHandler"
           @searchCompleted="onSearchCompletedHandler"
-          @scanCompleted="settingsData = getSettingsData(categoryName)"
+          @scanCompleted="onScanCompletedHandler"
           v-slot:default="{ page, scanning }"
         >
           <extra-settings v-if="page === 'General'" />
@@ -62,6 +78,7 @@
             v-if="page === 'Hotkeys'"
             :globalSearchStr="scanning ? '' : searchStr"
             :highlightSearch="highlightSearch"
+            :scanning="scanning"
           />
           <stream-settings v-if="page === 'Stream'" />
           <developer-settings v-if="page === 'Developer'" />
@@ -89,7 +106,7 @@
             "
             :key="page"
             :categoryName="page"
-            v-model="settingsData"
+            :value="settingsData"
             @input="save"
           />
         </searchable-pages>
@@ -125,6 +142,7 @@
     left: 188px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+    top: 0;
 
     i {
       margin-right: 0;
@@ -141,6 +159,41 @@
   .padding-top(2);
 
   flex-grow: 1;
+}
+
+.settings-nav {
+  margin-bottom: 48px;
+}
+
+.settings-auth {
+  cursor: pointer;
+  border-left: 1px solid transparent;
+  padding-left: 24px;
+  font-size: 14px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  position: fixed;
+  bottom: 40px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  width: 240px;
+  border-top: 1px solid var(--border);
+  background: var(--background);
+
+  span {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  i {
+    margin-right: 8px;
+  }
+  strong {
+    margin-right: 16px;
+    white-space: nowrap;
+  }
 }
 </style>
 

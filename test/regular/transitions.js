@@ -1,10 +1,10 @@
 import { useSpectron, focusChild, focusMain, test } from '../helpers/spectron';
 import { clickSceneTransitions, addScene } from '../helpers/spectron/scenes';
-import { setFormDropdown, setFormInput, getFormInput } from '../helpers/spectron/forms';
+import { getFormInput } from '../helpers/spectron/forms';
 import { dismissModal } from '../helpers/spectron/modals';
+import { FormMonkey } from '../helpers/form-monkey';
 
 useSpectron();
-
 
 test('Changing transition options', async t => {
   const app = t.context.app;
@@ -18,8 +18,12 @@ test('Changing transition options', async t => {
   await clickSceneTransitions(t);
   await focusChild(t);
   await app.client.click('.icon-edit');
-  await setFormDropdown(t, 'Type', transitionType);
-  await setFormInput(t, 'Duration', transitionDuration);
+  const form = new FormMonkey(t);
+  await form.fillByTitles({
+    Type: transitionType,
+    Duration: transitionDuration,
+  });
+
   await dismissModal(t);
   await t.context.app.client.click('button=Done');
   await focusMain(t);
@@ -27,10 +31,12 @@ test('Changing transition options', async t => {
   await focusChild(t);
 
   await app.client.click('.icon-edit');
-  const durationValue = await getFormInput(t,'Duration');
-  t.true(durationValue == transitionDuration);
-  const transitionNameValue = await getFormInput(t,'Type');
-  t.true(transitionNameValue == transitionType);
+  t.true(
+    await form.includesByTitles({
+      Type: transitionType,
+      Duration: transitionDuration,
+    }),
+  );
 });
 
 test('Adding and removing transitions', async t => {
@@ -66,9 +72,12 @@ test('Changing connections', async t => {
   await dismissModal(t);
   await app.client.click('button=Connections');
   await app.client.click('button=Add Connection');
-  await setFormDropdown(t, 'Beginning Scene', connectionBegin);
-  await setFormDropdown(t, 'Scene Transition', connectionTransition);
-  await setFormDropdown(t, 'Ending Scene', connectionEnd);
+  const form = new FormMonkey(t);
+  await form.fillByTitles({
+    'Beginning Scene': connectionBegin,
+    'Scene Transition': connectionTransition,
+    'Ending Scene': connectionEnd,
+  });
   await t.context.app.client.click('button=Done');
   await focusMain(t);
   await clickSceneTransitions(t);
@@ -76,12 +85,14 @@ test('Changing connections', async t => {
 
   await app.client.click('button=Connections');
   await app.client.click('.icon-edit');
-  const beginScene = await getFormInput(t, 'Beginning Scene');
-  t.true(beginScene === connectionBegin);
-  const transition = await getFormInput(t, 'Scene Transition');
-  t.true(transition === connectionTransition);
-  const endScene = await getFormInput(t, 'Ending Scene');
-  t.true(endScene === connectionEnd);
+
+  t.true(
+    await form.includesByTitles({
+      'Beginning Scene': connectionBegin,
+      'Scene Transition': connectionTransition,
+      'Ending Scene': connectionEnd,
+    }),
+  );
 });
 
 test('Showing redudant connection warning', async t => {

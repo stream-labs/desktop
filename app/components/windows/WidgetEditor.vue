@@ -55,7 +55,7 @@
               <scrollable style="margin: 0;" :isResizable="false" :autoSizeCapable="true">
                 <li
                   class="settings-title"
-                  v-for="setting in navItems"
+                  v-for="setting in props.navItems"
                   :class="{ active: currentSetting === setting.value }"
                   :key="setting.value"
                   @click="updateCurrentSetting(setting.value)"
@@ -387,8 +387,6 @@
   }
 
   &.active {
-    .weight(@medium);
-
     color: var(--title);
   }
 }

@@ -167,10 +167,10 @@
 }
 
 .transition-redundant {
-  color: var(--new);
+  color: var(--info);
 
   &:hover {
-    color: var(--new);
+    color: var(--info);
   }
 }
 

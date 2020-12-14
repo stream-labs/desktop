@@ -90,7 +90,7 @@ export class Display {
 
     // grid lines are enabled by default
     // switch them off multiple items are selected
-    if (this.selectionService.views.size > 1) {
+    if (this.selectionService.views.globalSelection.getSize() > 1) {
       this.switchGridlines(false);
     }
 
@@ -305,7 +305,7 @@ export class VideoService extends Service {
   }
 
   get baseResolution() {
-    const [widthStr, heightStr] = this.settingsService.state.Video.Base.split('x');
+    const [widthStr, heightStr] = this.settingsService.views.values.Video.Base.split('x');
     const width = parseInt(widthStr, 10);
     const height = parseInt(heightStr, 10);
 

@@ -4,7 +4,7 @@ import { Component } from 'vue-property-decorator';
 import { BoolInput } from 'components/shared/inputs/inputs';
 import { CacheUploaderService } from 'services/cache-uploader';
 import { Inject } from 'services/core/injector';
-import { CustomizationService } from 'services/customization/index';
+import { CustomizationService } from 'services/customization';
 import { StreamlabelsService } from 'services/streamlabels/index';
 import { OnboardingService } from 'services/onboarding';
 import { WindowsService } from 'services/windows';
@@ -46,8 +46,8 @@ export default class ExtraSettings extends Vue {
     return this.streamSettingsService.state.protectedModeEnabled;
   }
 
-  showCacheDir() {
-    electron.remote.shell.openItem(this.appService.appDataDirectory);
+  async showCacheDir() {
+    await electron.remote.shell.openPath(this.appService.appDataDirectory);
   }
 
   deleteCacheDir() {

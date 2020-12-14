@@ -4,7 +4,6 @@ import { StreamSettingsService } from '../settings/streaming';
 import { UserService } from '../user';
 import { RestreamService } from '../restream';
 import { getPlatformService, TPlatform, TPlatformCapability } from '../platforms';
-import { $t } from '../i18n';
 import { cloneDeep, difference } from 'lodash';
 
 /**
@@ -214,17 +213,6 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
    * Validates settings and returns an error string
    */
   validateSettings<T extends IStreamSettings>(settings: T): string {
-    const platforms = Object.keys(settings.platforms) as TPlatform[];
-    for (const platform of platforms) {
-      const platformSettings = settings.platforms[platform];
-      if (!platformSettings.enabled) continue;
-      const platformName = getPlatformService(platform).displayName;
-      if (platform === 'facebook') {
-        if (!platformSettings['game']) {
-          return $t('You must select a game for %{platformName}', { platformName });
-        }
-      }
-    }
     return '';
   }
 
@@ -251,6 +239,11 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
 
     // don't reuse broadcastId for Youtube
     if (settings && settings['broadcastId']) settings['broadcastId'] = '';
+
+    // don't reuse liveVideoId for Facebook
+    if (platform === 'facebook' && settings && settings['liveVideoId']) {
+      settings['liveVideoId'] = '';
+    }
 
     return {
       ...settings,

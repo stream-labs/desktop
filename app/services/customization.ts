@@ -1,12 +1,6 @@
 import { Subject } from 'rxjs';
-import { PersistentStatefulService } from '../core/persistent-stateful-service';
-import { mutation } from '../core/stateful-service';
-import {
-  ICustomizationServiceApi,
-  ICustomizationServiceState,
-  ICustomizationSettings,
-  IPinnedStatistics,
-} from './customization-api';
+import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
+import { mutation, ViewHandler } from 'services/core/stateful-service';
 import {
   IObsInput,
   IObsListInput,
@@ -43,12 +37,116 @@ const DISPLAY_BACKGROUNDS = {
   'prime-light': { r: 255, g: 255, b: 255 },
 };
 
+export interface IPinnedStatistics {
+  cpu: boolean;
+  fps: boolean;
+  droppedFrames: boolean;
+  bandwidth: boolean;
+}
+
+export interface ICustomizationServiceState {
+  nightMode?: string;
+  theme: string;
+  updateStreamInfoOnLive: boolean;
+  livePreviewEnabled: boolean;
+  leftDock: boolean;
+  hideViewerCount: boolean;
+  folderSelection: boolean;
+  livedockCollapsed: boolean;
+  livedockSize: number;
+  eventsSize: number;
+  controlsSize: number;
+  performanceMode: boolean;
+  chatZoomFactor: number;
+  enableBTTVEmotes: boolean;
+  enableFFZEmotes: boolean;
+  mediaBackupOptOut: boolean;
+  navigateToLiveOnStreamStart: boolean;
+  experimental: any;
+  legacyEvents: boolean;
+  pinnedStatistics: IPinnedStatistics;
+}
+
+class CustomizationViews extends ViewHandler<ICustomizationServiceState> {
+  get settingsFormData(): TObsFormData {
+    const settings = this.state;
+
+    const formData: TObsFormData = [
+      <IObsListInput<boolean>>{
+        value: settings.folderSelection,
+        name: 'folderSelection',
+        description: $t('Scene item selection mode'),
+        type: 'OBS_PROPERTY_LIST',
+        options: [
+          { value: true, description: $t('Single click selects group. Double click selects item') },
+          {
+            value: false,
+            description: $t('Double click selects group. Single click selects item'),
+          },
+        ],
+        visible: true,
+        enabled: true,
+      },
+
+      <IObsInput<boolean>>{
+        value: settings.leftDock,
+        name: 'leftDock',
+        description: $t('Show the live dock (chat) on the left side'),
+        type: 'OBS_PROPERTY_BOOL',
+        visible: true,
+        enabled: true,
+      },
+
+      <IObsNumberInputValue>{
+        value: settings.chatZoomFactor,
+        name: 'chatZoomFactor',
+        description: $t('Chat Text Size'),
+        type: 'OBS_PROPERTY_SLIDER',
+        minVal: 0.25,
+        maxVal: 2,
+        stepVal: 0.25,
+        visible: true,
+        enabled: true,
+        usePercentages: true,
+      },
+    ];
+
+    if (
+      this.getServiceViews(UserService).isLoggedIn &&
+      this.getServiceViews(UserService).platform.type === 'twitch'
+    ) {
+      formData.push(<IObsInput<boolean>>{
+        value: settings.enableBTTVEmotes,
+        name: 'enableBTTVEmotes',
+        description: $t('Enable BetterTTV emotes for Twitch'),
+        type: 'OBS_PROPERTY_BOOL',
+        visible: true,
+        enabled: true,
+      });
+
+      formData.push(<IObsInput<boolean>>{
+        value: settings.enableFFZEmotes,
+        name: 'enableFFZEmotes',
+        description: $t('Enable FrankerFaceZ emotes for Twitch'),
+        type: 'OBS_PROPERTY_BOOL',
+        visible: true,
+        enabled: true,
+      });
+    }
+
+    return formData;
+  }
+
+  get experimentalSettingsFormData(): TObsFormData {
+    return [];
+  }
+}
+
 /**
  * This class is used to store general UI behavior flags
  * that are sticky across application runtimes.
  */
-export class CustomizationService extends PersistentStatefulService<ICustomizationServiceState>
-  implements ICustomizationServiceApi {
+export class CustomizationService extends PersistentStatefulService<ICustomizationServiceState> {
   @Inject() userService: UserService;
   @Inject() usageStatisticsService: UsageStatisticsService;
 
@@ -88,11 +186,14 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     },
     experimental: {
       // put experimental features here
-      volmetersFPSLimit: 60,
     },
   };
 
-  settingsChanged = new Subject<Partial<ICustomizationSettings>>();
+  settingsChanged = new Subject<Partial<ICustomizationServiceState>>();
+
+  get views() {
+    return new CustomizationViews(this.state);
+  }
 
   init() {
     super.init();
@@ -109,14 +210,10 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     }
   }
 
-  setSettings(settingsPatch: Partial<ICustomizationSettings>) {
+  setSettings(settingsPatch: Partial<ICustomizationServiceState>) {
     const changedSettings = Utils.getChangedParams(this.state, settingsPatch);
     this.SET_SETTINGS(changedSettings);
     this.settingsChanged.next(changedSettings);
-  }
-
-  getSettings(): ICustomizationSettings {
-    return this.state;
   }
 
   get currentTheme() {
@@ -171,6 +268,10 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     this.setSettings({ pinnedStatistics: pinned });
   }
 
+  togglePerformanceMode() {
+    this.setSettings({ performanceMode: !this.state.performanceMode });
+  }
+
   get themeOptions() {
     const options = [
       { value: 'night-theme', title: $t('Night') },
@@ -186,95 +287,12 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     return options;
   }
 
-  getSettingsFormData(): TObsFormData {
-    const settings = this.getSettings();
-
-    const formData: TObsFormData = [
-      <IObsListInput<boolean>>{
-        value: settings.folderSelection,
-        name: 'folderSelection',
-        description: $t('Scene item selection mode'),
-        type: 'OBS_PROPERTY_LIST',
-        options: [
-          { value: true, description: $t('Single click selects group. Double click selects item') },
-          {
-            value: false,
-            description: $t('Double click selects group. Single click selects item'),
-          },
-        ],
-        visible: true,
-        enabled: true,
-      },
-
-      <IObsInput<boolean>>{
-        value: settings.leftDock,
-        name: 'leftDock',
-        description: $t('Show the live dock (chat) on the left side'),
-        type: 'OBS_PROPERTY_BOOL',
-        visible: true,
-        enabled: true,
-      },
-
-      <IObsNumberInputValue>{
-        value: settings.chatZoomFactor,
-        name: 'chatZoomFactor',
-        description: $t('Chat Text Size'),
-        type: 'OBS_PROPERTY_SLIDER',
-        minVal: 0.25,
-        maxVal: 2,
-        stepVal: 0.25,
-        visible: true,
-        enabled: true,
-        usePercentages: true,
-      },
-    ];
-
-    if (this.userService.isLoggedIn && this.userService.platform.type === 'twitch') {
-      formData.push(<IObsInput<boolean>>{
-        value: settings.enableBTTVEmotes,
-        name: 'enableBTTVEmotes',
-        description: $t('Enable BetterTTV emotes for Twitch'),
-        type: 'OBS_PROPERTY_BOOL',
-        visible: true,
-        enabled: true,
-      });
-
-      formData.push(<IObsInput<boolean>>{
-        value: settings.enableFFZEmotes,
-        name: 'enableFFZEmotes',
-        description: $t('Enable FrankerFaceZ emotes for Twitch'),
-        type: 'OBS_PROPERTY_BOOL',
-        visible: true,
-        enabled: true,
-      });
-    }
-
-    return formData;
-  }
-
-  getExperimentalSettingsFormData(): TObsFormData {
-    const settings = this.getSettings();
-    return [
-      <IObsNumberInputValue>{
-        value: settings.experimental.volmetersFPSLimit,
-        name: 'volmetersFPSLimit',
-        description: 'Volmeters FPS limit',
-        type: 'OBS_PROPERTY_SLIDER',
-        minVal: 1,
-        maxVal: 160,
-        stepVal: 1,
-        visible: true,
-        enabled: true,
-      },
-    ];
-  }
-
   restoreDefaults() {
     this.setSettings(CustomizationService.defaultState);
   }
 
   @mutation()
-  private SET_SETTINGS(settingsPatch: Partial<ICustomizationSettings>) {
+  private SET_SETTINGS(settingsPatch: Partial<ICustomizationServiceState>) {
     Object.assign(this.state, settingsPatch);
   }
 }

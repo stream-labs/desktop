@@ -85,7 +85,7 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
     const shouldShowAddDestButton =
       view.linkedPlatforms.length + view.goLiveSettings.customDestinations.length < 5;
     return (
-      <ValidatedForm class="flex">
+      <ValidatedForm class={cx('flex', styles.goLiveSettings)}>
         {/*LEFT COLUMN*/}
         {shouldShowLeftCol && (
           <div style={{ width: '400px', marginRight: '42px' }}>
@@ -110,7 +110,7 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
         )}
 
         {/*RIGHT COLUMN*/}
-        <div style={{ width: '100%' }}>
+        <div style={{ width: '100%', display: 'flex' }}>
           {isLoadingMode && this.renderLoading()}
           <GoLiveError />
 

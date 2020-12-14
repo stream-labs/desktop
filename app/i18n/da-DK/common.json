@@ -32,7 +32,7 @@
   "Submit": "Indsend",
   "Save": "Gem",
   "Edit": "Rediger",
-  "Login": "Log ind",
+  "Log In": "Log In",
   "Yes": "Ja",
   "No": "Nej",
   "OK": "OK",
@@ -55,6 +55,7 @@
   "Cloudbot": "Cloudbot",
   "Merch": "Merch",
   "App Store": "App Store",
+  "Alertbox Library": "Alertbox Library",
   "New": "Ny",
   "Face Masks": "Ansigtsmasker",
   "Help": "Hjælp",
@@ -85,13 +86,11 @@
   "Amount": "Beløb",
   "here": "her",
   "Link": "Link",
-  "Whitelist": "Whiteliste",
-  "Blacklist": "Sortliste",
   "Description": "Beskrivelse",
   "OBSInit.UnknownError": "Der opstod en ukendt fejl under start af OBS.",
   "OBSInit.ModuleNotFoundError": "DirectX er ikke installeret på computeren. Installer den seneste version af DirectX fra <https://www.microsoft.com/da-us/download/details.aspx?id=35?>, og prøv igen.",
   "OBSInit.NotSupportedError": "OBS kunne ikke startes. Dine videoenheder er muligvis forældede, eller Streamlabs OBS understøttes muligvis ikke på dit system.",
-  "Logout %{username}": "Log %{username} ud",
+  "Log Out": "Log Out",
   "Layout Editor": "Layoutredigering",
   "Are you sure you want to import multiple files?": "Er du sikker på at du vil importere flere filer?",
   "Studio": "Studio",
@@ -118,5 +117,5 @@
   "Apps": "Apps",
   "Finish": "Afslut",
   "Get Prime": "Få Prime",
-  "System error message:": "System error message:"
+  "System error message:": "Systemfejlmeddelelse:"
 }

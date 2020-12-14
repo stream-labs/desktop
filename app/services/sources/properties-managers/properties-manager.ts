@@ -73,10 +73,10 @@ export abstract class PropertiesManager implements IPropertyManager {
   }
 
   /**
-   * The blacklist is a list of OBS property names that
+   * The denylist is a list of OBS property names that
    * should not be displayed to the user.
    */
-  get blacklist(): string[] {
+  get denylist(): string[] {
     return [];
   }
 
@@ -128,7 +128,7 @@ export abstract class PropertiesManager implements IPropertyManager {
     });
 
     propsArray = propsArray.concat(obsProperties);
-    propsArray = compact(propsArray).filter(prop => !this.blacklist.includes(prop.name));
+    propsArray = compact(propsArray).filter(prop => !this.denylist.includes(prop.name));
 
     return propsArray;
   }

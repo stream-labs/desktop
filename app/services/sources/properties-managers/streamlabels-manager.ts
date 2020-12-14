@@ -20,6 +20,7 @@ export class StreamlabelsManager extends DefaultManager {
   private subscription: Subscription;
 
   init() {
+    super.init();
     this.subscription = this.streamlabelsService.output.subscribe(output => {
       if (output[this.settings.statname] !== this.oldOutput) {
         this.oldOutput = output[this.settings.statname];
@@ -32,7 +33,7 @@ export class StreamlabelsManager extends DefaultManager {
     });
   }
 
-  get blacklist() {
+  get denylist() {
     return byOS({
       [OS.Windows]: ['read_from_file', 'text'],
       [OS.Mac]: ['from_file', 'text', 'text_file', 'log_mode', 'log_lines'],

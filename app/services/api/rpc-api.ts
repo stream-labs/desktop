@@ -299,6 +299,10 @@ export abstract class RpcApi extends Service {
    * Send this conformation back to the client
    */
   private sendPromiseMessage(info: { isRejected: boolean; promiseId: string; data: any }) {
+    if (info.data instanceof Error || info.data instanceof Response) {
+      info.data = JSON.parse(JSON.stringify(info.data));
+    }
+
     // serialize errors
     const serializedData = info.isRejected
       ? { message: info.data?.message, ...info.data }

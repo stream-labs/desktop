@@ -14,6 +14,6 @@
   "Always, show last person when inactive": "Vis altid, vis sidste person hvis inaktiv",
   "Include Resubs": "Medtag abonnementsforlængelser",
   "Preview": "Forhåndsvisning",
-  "Note:": "Bemærk:",
-  "Actual label text may take up to 60 seconds to update": "Det kan tage op til 60 sekunder før den opdaterede labeltekst vises"
+  "Tokens: %{tokenList}": "Tokens: %{tokenList}",
+  "Note: Actual label text may take up to 60 seconds to update": "Note: Actual label text may take up to 60 seconds to update"
 }

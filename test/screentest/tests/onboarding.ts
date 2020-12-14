@@ -20,7 +20,11 @@ test('Onboarding steps', async t => {
   await sleep(1000);
   await t.context.app.client.click('span=Skip');
 
-  await app.client.waitForVisible('h2=Start Fresh', 15000);
+  await app.client.waitForVisible('h1=Choose your Streamlabs plan', 15000);
+  await makeScreenshots(t, 'Prime');
+  await app.client.click('div=Choose Starter');
+
+  await app.client.waitForVisible('h2=Start Fresh');
   await makeScreenshots(t, 'Start fresh or import from OBS');
   await app.client.click('h2=Start Fresh');
 
@@ -38,12 +42,8 @@ test('Onboarding steps', async t => {
   await app.client.waitForVisible('h1=Optimizing... 33%');
   await makeScreenshots(t, 'Optimization progress');
 
-  await app.client.waitForVisible('h2=Overlay, Widget & Site Themes', 60000);
-  await makeScreenshots(t, 'Prime');
-  await app.client.click('button=Skip');
-
   // success?
-  await app.client.waitForVisible('h2=Sources');
+  await app.client.waitForVisible('h2=Sources', 60000);
   await makeScreenshots(t, 'Onboarding completed');
   t.pass();
 });
@@ -64,7 +64,7 @@ test('OBS Importer', async t => {
 
   // skip auth
   await client.waitForVisible('h1=Connect');
-  await t.context.app.client.click('span=Skip');
+  await client.click('span=Skip');
 
   // import from OBS
   await client.waitForVisible('h2=Import from OBS');

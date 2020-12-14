@@ -48,7 +48,7 @@ export abstract class SceneItemNode implements ISceneItemNode {
   get childrenIds(): string[] {
     return this.getScene()
       .getModel()
-      .nodes.filter(node => node.parentId === this.id)
+      .nodes.filter(node => node.parentId === this.id && node.id !== this.id)
       .map(node => node.id);
   }
 
@@ -146,19 +146,19 @@ export abstract class SceneItemNode implements ISceneItemNode {
   }
 
   isSelected() {
-    return this.selectionService.isSelected(this.id);
+    return this.selectionService.views.globalSelection.isSelected(this.id);
   }
 
   select() {
-    this.selectionService.select(this.id);
+    this.selectionService.views.globalSelection.select(this.id);
   }
 
   addToSelection() {
-    this.selectionService.add(this.id);
+    this.selectionService.views.globalSelection.add(this.id);
   }
 
   deselect() {
-    this.selectionService.deselect(this.id);
+    this.selectionService.views.globalSelection.deselect(this.id);
   }
 
   isFolder(): this is SceneItemFolder {
@@ -178,6 +178,9 @@ export abstract class SceneItemNode implements ISceneItemNode {
 
   @mutation()
   protected SET_PARENT(parentId?: string) {
+    if (parentId && this.state.id === parentId) {
+      throw new Error('The parent id should not be equal the child id');
+    }
     this.state.parentId = parentId;
   }
 

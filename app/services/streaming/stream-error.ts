@@ -8,14 +8,14 @@ const errorTypes = {
       return $t('The request to the platform failed');
     },
   },
-  FACEBOOK_HAS_NO_PAGES: {
-    get message() {
-      return $t('No Facebook pages were found');
-    },
-  },
   TWITCH_MISSED_OAUTH_SCOPE: {
     get message() {
       return $t('Missing required oauth scope');
+    },
+  },
+  TWITCH_BANNED_WORDS: {
+    get message() {
+      return $t('Your stream title or description contain banned words');
     },
   },
   PREPOPULATE_FAILED: {

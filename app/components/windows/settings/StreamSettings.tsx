@@ -37,7 +37,7 @@ export default class StreamSettings extends TsxComponent {
     customDestForm: ValidatedForm;
   };
 
-  private obsSettings = this.streamSettingsService.getObsStreamSettings();
+  private obsSettings = this.streamSettingsService.views.obsStreamSettings;
   private customDestModel: ICustomStreamDestination = {
     name: '',
     url: '',
@@ -54,7 +54,7 @@ export default class StreamSettings extends TsxComponent {
 
   saveObsSettings(obsSettings: ISettingsSubCategory[]) {
     this.streamSettingsService.setObsStreamSettings(obsSettings);
-    this.obsSettings = this.streamSettingsService.getObsStreamSettings();
+    this.obsSettings = this.streamSettingsService.views.obsStreamSettings;
   }
 
   disableProtectedMode() {
@@ -287,7 +287,7 @@ export default class StreamSettings extends TsxComponent {
         {!isEditMode && canAddMoreDestinations && (
           <a class={styles.addDestinationBtn} onclick={() => this.addCustomDest()}>
             <i class="fa fa-plus" />
-            {$t('Add Destination')}
+            <span>{$t('Add Destination')}</span>
             {shouldShowPrimeLabel ? (
               <b class={styles.prime}>prime</b>
             ) : (

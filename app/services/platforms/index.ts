@@ -1,14 +1,16 @@
-import { ITwitchChannelInfo, ITwitchStartStreamOptions, TwitchService } from './twitch';
+import { ITwitchStartStreamOptions, TwitchService } from './twitch';
 import { IYoutubeStartStreamOptions, YoutubeService } from './youtube';
-import { IMixerChannelInfo, IMixerStartStreamOptions, MixerService } from './mixer';
-import { FacebookService, IFacebookChannelInfo, IFacebookStartStreamOptions } from './facebook';
+import { IMixerStartStreamOptions, MixerService } from './mixer';
+import { FacebookService, IFacebookStartStreamOptions } from './facebook';
 import { TTwitchTag } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
 import { IGoLiveSettings } from 'services/streaming';
 
 export type Tag = TTwitchTag;
 export interface IGame {
+  id: string;
   name: string;
+  image?: string;
 }
 
 /** Authorization scope **/
@@ -60,7 +62,7 @@ interface IPlatformCapabilityUserInfo {
 }
 
 interface IPlatformCapabilityScheduleStream {
-  scheduleStream: (startTime: string, info: TChannelInfo) => Promise<any>;
+  scheduleStream: (startTime: string, info: TStartStreamOptions) => Promise<unknown>;
 }
 
 interface IPlatformCapabilityScopeValidation {
@@ -108,8 +110,6 @@ export type TStartStreamOptions =
   | Partial<IFacebookStartStreamOptions>
   | IMixerStartStreamOptions;
 
-export type TChannelInfo = ITwitchChannelInfo | Partial<IFacebookChannelInfo> | IMixerChannelInfo;
-
 // state applicable for all platforms
 export interface IPlatformState {
   viewersCount: number;
@@ -133,7 +133,7 @@ export interface IPlatformService {
 
   fetchUserInfo: () => Promise<IUserInfo>;
 
-  putChannelInfo: (channelInfo: TStartStreamOptions) => Promise<boolean>;
+  putChannelInfo: (channelInfo: TStartStreamOptions) => Promise<void>;
 
   searchGames?: (searchString: string) => Promise<IGame[]>;
 
@@ -148,7 +148,7 @@ export interface IPlatformService {
 
   prepopulateInfo: () => Promise<unknown>;
 
-  scheduleStream?: (startTime: string, info: TChannelInfo) => Promise<any>;
+  scheduleStream?: (startTime: string, info: TStartStreamOptions) => Promise<any>;
 
   fetchNewToken: () => Promise<void>;
 

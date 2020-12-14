@@ -8,6 +8,7 @@ import { getFormInput } from '../helpers/spectron/forms';
 import { getClient } from '../helpers/api-client';
 import { WidgetsService } from '../../app/services/widgets';
 import { EWidgetType } from '../helpers/widget-helpers';
+import { FormMonkey } from '../helpers/form-monkey';
 
 const path = require('path');
 const _7z = require('7zip')['7z'];
@@ -26,6 +27,12 @@ test('Go through the onboarding and autoconfig', async t => {
 
   if (await t.context.app.client.isExisting('span=Skip')) {
     await t.context.app.client.click('span=Skip');
+    await sleep(1000);
+  }
+
+  // Skip purchasing prime
+  if (await t.context.app.client.isExisting('div=Choose Starter')) {
+    await t.context.app.client.click('div=Choose Starter');
     await sleep(1000);
   }
 
@@ -50,13 +57,7 @@ test('Go through the onboarding and autoconfig', async t => {
   // Start auto config
   t.true(await app.client.isExisting('button=Start'));
   await app.client.click('button=Start');
-  await app.client.waitForVisible('h2=Overlay, Widget & Site Themes', 60000);
-
-  // Skip purchasing prime
-  if (await t.context.app.client.isExisting('button=Skip')) {
-    await t.context.app.client.click('button=Skip');
-    await sleep(1000);
-  }
+  await app.client.waitForVisible('h2=Sources', 60000);
 
   // success?
   t.true(await app.client.isVisible('h2=Sources'), 'Sources selector is visible');
@@ -77,17 +78,17 @@ test('OBS Importer', async t => {
     await sleep(1000);
   }
 
+  // Skip purchasing prime
+  if (await t.context.app.client.isExisting('div=Choose Starter')) {
+    await t.context.app.client.click('div=Choose Starter');
+    await sleep(1000);
+  }
+
   // import from OBS
   if (await t.context.app.client.isExisting('h2=Import from OBS')) {
     await t.context.app.client.click('h2=Import from OBS');
     await t.context.app.client.click('h2=Start');
     await sleep(10000);
-  }
-
-  // Skip purchasing prime
-  if (await t.context.app.client.isExisting('button=Skip')) {
-    await t.context.app.client.click('button=Skip');
-    await sleep(1000);
   }
 
   // check collection 1 and sources
@@ -105,8 +106,9 @@ test('OBS Importer', async t => {
   await client.click('.side-nav .icon-settings');
   await focusChild(t);
   await client.click('li=Output');
-  t.is(await getFormInput(t, 'Video Bitrate'), '5000');
-  t.is(await getFormInput(t, 'Encoder'), 'Software (x264)');
+  const form = new FormMonkey(t);
+  await form.setInputValue(await form.getInputSelectorByTitle('Video Bitrate'), '5000');
+  await form.setInputValue(await form.getInputSelectorByTitle('Encoder'), 'Software (x264)');
 
   // check that widgets have been migrated
   await focusMain(t);

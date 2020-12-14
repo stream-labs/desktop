@@ -3,42 +3,57 @@
  * - fetch average test timings from the DB
  * - run tests
  * - if some tests failed retry only these tests
+ * - save failed tests to DB
  */
-
+const jobStartTime = Date.now();
 const { execSync } = require('child_process');
 const fs = require('fs');
 const rimraf = require('rimraf');
-const request = require('request');
 const fetch = require('node-fetch');
 
 const failedTestsFile = 'test-dist/failed-tests.json';
 const args = process.argv.slice(2);
 const TIMEOUT = 3; // timeout in minutes
+const {
+  BUILD_BUILDID,
+  SYSTEM_JOBID,
+  BUILD_REASON,
+  BUILD_SOURCEBRANCH,
+  SYSTEM_JOBNAME,
+  BUILD_DEFINITIONNAME,
+  SLOBS_TEST_RUN_CHUNK,
+} = process.env;
+let retryingFailed = false;
+
+const RUN_TESTS_CMD = !args.length ? `yarn test --timeout=${TIMEOUT}m ` : args.join(' ') + ' ';
 
 (async function main() {
+  let failedTests = [];
   try {
     rimraf.sync(failedTestsFile);
     await createTestTimingsFile();
-    execSync(`yarn test --timeout=${TIMEOUT}m ` + args.join(' '), { stdio: [0, 1, 2] });
+    execSync(RUN_TESTS_CMD, { stdio: [0, 1, 2] });
   } catch (e) {
     console.log(e);
-    retryTests();
+    failedTests = getFailedTests();
+    retryTests(failedTests);
   }
+  sendJobToAnalytics(failedTests).then(() => {
+    if (retryingFailed) failAndExit();
+  });
 })();
 
-function retryTests() {
+function retryTests(failedTests) {
   log('retrying failed tests');
 
-  if (!fs.existsSync(failedTestsFile)) {
+  if (!failedTests.length) {
     console.error('no tests to retry');
     failAndExit();
   }
 
-  const failedTests = JSON.parse(fs.readFileSync(failedTestsFile, 'utf8'));
   const retryingArgs = failedTests.map(testName => `--match="${testName}"`);
-  let retryingFailed = false;
   try {
-    execSync(`yarn test --timeout=${TIMEOUT}m ` + args.concat(retryingArgs).join(' '), {
+    execSync(RUN_TESTS_CMD + retryingArgs.join(' '), {
       stdio: [0, 1, 2],
     });
     log('retrying succeed');
@@ -46,10 +61,6 @@ function retryTests() {
     retryingFailed = true;
     log('failed to retry tests');
   }
-
-  sendFailedTestsToAnalytics(failedTests).then(() => {
-    if (retryingFailed) failAndExit();
-  });
 }
 
 function log(...args) {
@@ -60,37 +71,43 @@ function failAndExit() {
   process.exit(1);
 }
 
-function sendFailedTestsToAnalytics(failedTests) {
+function getFailedTests() {
+  let failedTests = [];
+  try {
+    failedTests = JSON.parse(fs.readFileSync(failedTestsFile, 'utf8'));
+    rimraf.sync(failedTestsFile);
+  } catch (e) {
+    console.error(e);
+  }
+  return failedTests;
+}
+
+async function sendJobToAnalytics(failedTests) {
+  if (!BUILD_BUILDID) return; // do not send analytics for local builds
+
+  const failedAfterRetryTests = getFailedTests();
+  const testsToSend = failedTests.map(testName => ({
+    name: testName,
+    retrySucceeded: !failedAfterRetryTests.includes(testName),
+  }));
   log('Sending analytics..');
-  return new Promise((resolve, reject) => {
-    const options = {
-      url: 'https://r2d2.streamlabs.com/slobs/data/ping',
-      json: {
-        analyticsTokens: [
-          {
-            event: 'TESTS_FAILED',
-            value: failedTests,
-            product: 'SLOBS',
-            version: this.version,
-            count: 1,
-            uuid: 'test environment',
-          },
-        ],
-      },
-    };
-
-    const callback = error => {
-      if (error) {
-        console.error('Analytics has not been sent');
-        resolve();
-        return;
-      }
-      log('Failed tests has been sent to analytics');
-      resolve();
-    };
-
-    request(options, callback);
-  });
+  const body = {
+    name: SYSTEM_JOBNAME,
+    pipelineName: BUILD_DEFINITIONNAME,
+    duration: Date.now() - jobStartTime,
+    failedTests: testsToSend,
+    buildId: BUILD_BUILDID,
+    jobId: SYSTEM_JOBID,
+    buildReason: BUILD_REASON,
+    branch: BUILD_SOURCEBRANCH,
+    slice: SLOBS_TEST_RUN_CHUNK,
+  };
+  log(body);
+  try {
+    await requestUtilityServer('job', 'post', body);
+  } catch (e) {
+    console.error('failed to send analytics', e);
+  }
 }
 
 /**
@@ -98,32 +115,32 @@ function sendFailedTestsToAnalytics(failedTests) {
  * and save results to a file
  */
 async function createTestTimingsFile() {
-  const utilsServerUrl = 'https://slobs-users-pool.herokuapp.com';
-  const token = process.env.SLOBS_TEST_USER_POOL_TOKEN;
   const testTimingsFile = 'test-dist/test-timings.json';
   rimraf.sync(testTimingsFile);
 
-  return new Promise((resolve, reject) => {
-    fetch(`${utilsServerUrl}/testStats`, {
-      method: 'get',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    })
-      .then(res => {
-        if (res.status !== 200) {
-          reject('Unable to request the utility server', res);
-        } else {
-          res.json().then(data => {
-            if (!fs.existsSync('test-dist')) {
-              fs.mkdirSync('test-dist');
-            }
-            fs.writeFileSync(testTimingsFile, JSON.stringify(data));
-            resolve();
-          });
-        }
-      })
-      .catch(e => reject(`Utility server is not available ${e}`));
-  });
+  const data = await requestUtilityServer('testStats');
+  if (!fs.existsSync('test-dist')) {
+    fs.mkdirSync('test-dist');
+  }
+  fs.writeFileSync(testTimingsFile, JSON.stringify(data));
+}
+
+async function requestUtilityServer(path, method = 'get', body = null) {
+  const utilsServerUrl = 'https://slobs-users-pool.herokuapp.com';
+  const token = process.env.SLOBS_TEST_USER_POOL_TOKEN;
+  const requestPayload = {
+    method,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  };
+  if (body) requestPayload.body = JSON.stringify(body);
+  const response = await fetch(`${utilsServerUrl}/${path}`, requestPayload);
+
+  if (!response.ok) {
+    console.error(response.status);
+    throw new Error('Unable to request the utility server');
+  }
+  return response.json();
 }
