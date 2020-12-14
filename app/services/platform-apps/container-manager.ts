@@ -172,7 +172,7 @@ export class PlatformContainerManager {
   refreshContainers(app: ILoadedApp) {
     this.containers
       .filter(info => info.appId === app.id)
-      .forEach(info => info.container.webContents.reload());
+      .forEach(info => info.container.webContents.loadURL(this.getPageUrlForSlot(app, info.slot)));
   }
 
   private getContainerInfoForSlot(app: ILoadedApp, slot: EAppPageSlot): IContainerInfo {
