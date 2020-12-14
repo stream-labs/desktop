@@ -9,7 +9,7 @@
     </div>
   </div>
 
-  <MixerVolmeter :audioSource="props.audioSource" v-if="!performanceMode"></MixerVolmeter>
+  <MixerVolmeter :audioSource="props.audioSource" :volmetersEnabled="props.volmetersEnabled" v-if="!performanceMode"></MixerVolmeter>
 
   <div class="flex">
     <slider-input
@@ -54,6 +54,9 @@
 
   .source-name {
     flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .db-value {

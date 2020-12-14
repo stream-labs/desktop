@@ -2,7 +2,7 @@ import Vue from 'vue';
 import GenericForm from './GenericForm';
 import AdvancedOutputTabs from './AdvancedOutputTabs.vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
-import { ISettingsSubCategory, SettingsService } from '../../../services/settings';
+import { ISettingsSubCategory, SettingsService, ESettingsCategoryType } from 'services/settings';
 import { Inject } from 'services/core/injector';
 import TsxComponent, { createProps } from 'components/tsx-component';
 
@@ -24,7 +24,7 @@ export default class GenericFormGroups extends TsxComponent<GenericFormGroupProp
   isAdvancedOutput = false;
 
   created() {
-    this.isAdvancedOutput = this.settingsService.isTabbedForm(this.props.categoryName);
+    this.updateIsAdvancedOutput();
   }
 
   toggleGroup(index: string) {
@@ -40,7 +40,8 @@ export default class GenericFormGroups extends TsxComponent<GenericFormGroupProp
 
   @Watch('categoryName')
   updateIsAdvancedOutput() {
-    this.isAdvancedOutput = this.settingsService.isTabbedForm(this.props.categoryName);
+    this.isAdvancedOutput =
+      this.settingsService.state[this.props.categoryName]?.type === ESettingsCategoryType.Tabbed;
   }
 
   hasAnyVisibleSettings(category: ISettingsSubCategory) {

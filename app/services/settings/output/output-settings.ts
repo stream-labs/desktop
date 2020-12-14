@@ -181,8 +181,8 @@ export class OutputSettingsService extends Service {
    * independently of selected mode
    */
   getSettings(): IOutputSettings {
-    const output = this.settingsService.getSettingsFormData('Output');
-    const video = this.settingsService.getSettingsFormData('Video');
+    const output = this.settingsService.state.Output.formData;
+    const video = this.settingsService.state.Video.formData;
     const mode: TOutputSettingsMode = this.settingsService.findSettingValue(
       output,
       'Untitled',

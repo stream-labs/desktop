@@ -92,11 +92,11 @@ export class DragHandler {
    */
   constructor(startEvent: IMouseEvent, options: IDragHandlerOptions) {
     // Load some settings we care about
-    this.snapEnabled = this.settingsService.state.General.SnappingEnabled;
-    this.renderedSnapDistance = this.settingsService.state.General.SnapDistance;
-    this.screenSnapping = this.settingsService.state.General.ScreenSnapping;
-    this.sourceSnapping = this.settingsService.state.General.SourceSnapping;
-    this.centerSnapping = this.settingsService.state.General.CenterSnapping;
+    this.snapEnabled = this.settingsService.views.values.General.SnappingEnabled;
+    this.renderedSnapDistance = this.settingsService.views.values.General.SnapDistance;
+    this.screenSnapping = this.settingsService.views.values.General.ScreenSnapping;
+    this.sourceSnapping = this.settingsService.views.values.General.SourceSnapping;
+    this.centerSnapping = this.settingsService.views.values.General.CenterSnapping;
 
     // Load some attributes about the video canvas
     this.baseWidth = this.videoService.baseWidth;
