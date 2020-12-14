@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import GenericForm from 'components/obs/inputs/GenericForm';
 import { TObsFormData, TObsValue } from 'components/obs/inputs/ObsInput';
-import { ICustomizationServiceApi } from 'services/customization';
+import { CustomizationService } from 'services/customization';
 import { ScenesService } from 'services/scenes';
 import { $t } from '../../../services/i18n';
 import electron from 'electron';
@@ -12,13 +12,13 @@ import electron from 'electron';
   components: { GenericForm },
 })
 export default class ExperimentalSettings extends Vue {
-  @Inject() private customizationService: ICustomizationServiceApi;
+  @Inject() private customizationService: CustomizationService;
   @Inject() private scenesService: ScenesService;
 
   settingsFormData: TObsFormData = null;
 
   created() {
-    this.settingsFormData = this.customizationService.getExperimentalSettingsFormData();
+    this.settingsFormData = this.customizationService.views.experimentalSettingsFormData;
   }
 
   saveSettings(formData: TObsFormData) {
@@ -27,7 +27,7 @@ export default class ExperimentalSettings extends Vue {
       settings[formInput.name] = formInput.value;
     });
     this.customizationService.setSettings({ experimental: settings });
-    this.settingsFormData = this.customizationService.getExperimentalSettingsFormData();
+    this.settingsFormData = this.customizationService.views.experimentalSettingsFormData;
   }
 
   repairSceneCollection() {

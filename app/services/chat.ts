@@ -1,7 +1,7 @@
 import { Service } from 'services/core/service';
 import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
-import { CustomizationService, ICustomizationSettings } from 'services/customization';
+import { CustomizationService, ICustomizationServiceState } from 'services/customization';
 import electron, { ipcRenderer } from 'electron';
 import url from 'url';
 import { WindowsService } from 'services/windows';
@@ -190,7 +190,7 @@ export class ChatService extends Service {
   private bindDomReadyListener() {
     if (!this.chatView) return; // chat was already deinitialized
 
-    const settings = this.customizationService.getSettings();
+    const settings = this.customizationService.state;
 
     this.chatView.webContents.on('dom-ready', () => {
       if (!this.chatView) return; // chat was already deinitialized
@@ -255,7 +255,7 @@ export class ChatService extends Service {
     });
   }
 
-  private handleSettingsChanged(changed: Partial<ICustomizationSettings>) {
+  private handleSettingsChanged(changed: Partial<ICustomizationServiceState>) {
     if (!this.chatView) return;
     if (changed.chatZoomFactor) {
       this.chatView.webContents.setZoomFactor(changed.chatZoomFactor);

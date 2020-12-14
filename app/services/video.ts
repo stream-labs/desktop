@@ -305,7 +305,7 @@ export class VideoService extends Service {
   }
 
   get baseResolution() {
-    const [widthStr, heightStr] = this.settingsService.state.Video.Base.split('x');
+    const [widthStr, heightStr] = this.settingsService.views.values.Video.Base.split('x');
     const width = parseInt(widthStr, 10);
     const height = parseInt(heightStr, 10);
 

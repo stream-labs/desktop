@@ -137,7 +137,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     });
 
     // save settings related to "Settings->Stream" window
-    let streamFormData = this.getObsStreamSettings();
+    let streamFormData = this.views.obsStreamSettings;
 
     streamFormData.forEach(subCategory => {
       subCategory.parameters.forEach(parameter => {
@@ -155,7 +155,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       ['platform', 'key', 'server'].includes(key),
     );
     if (!mustUpdateObsSettings) return;
-    streamFormData = this.getObsStreamSettings();
+    streamFormData = this.views.obsStreamSettings;
 
     streamFormData.forEach(subCategory => {
       subCategory.parameters.forEach(parameter => {
@@ -195,9 +195,9 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
    * obtain stream settings in a single object
    */
   get settings(): IStreamSettings {
-    const obsStreamSettings = this.settingsService.state.Stream;
-    const obsGeneralSettings = this.settingsService.state.General;
-    const obsAdvancedSettings = this.settingsService.state.Advanced;
+    const obsStreamSettings = this.settingsService.views.values.Stream;
+    const obsGeneralSettings = this.settingsService.views.values.General;
+    const obsAdvancedSettings = this.settingsService.views.values.Advanced;
 
     return {
       protectedModeEnabled: this.state.protectedModeEnabled,
@@ -219,10 +219,6 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       delayEnable: obsAdvancedSettings.DelayEnable,
       delaySec: obsAdvancedSettings.DelaySec,
     };
-  }
-
-  getObsStreamSettings(): ISettingsSubCategory[] {
-    return this.settingsService.getSettingsFormData('Stream');
   }
 
   setObsStreamSettings(formData: ISettingsSubCategory[]) {
@@ -326,4 +322,8 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
   }
 }
 
-class StreamSettingsView extends ViewHandler<IStreamSettingsState> {}
+class StreamSettingsView extends ViewHandler<IStreamSettingsState> {
+  get obsStreamSettings(): ISettingsSubCategory[] {
+    return this.getServiceViews(SettingsService).state.Stream.formData;
+  }
+}
