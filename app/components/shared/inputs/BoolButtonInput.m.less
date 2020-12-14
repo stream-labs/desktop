@@ -1,0 +1,21 @@
+.bool-button {
+  height: 20px;
+  width: 20px;
+  border-radius: 4px;
+  background: var(--input-bg);
+  color: var(--paragraph);
+  border: 1px solid var(--button);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.bool-button.active {
+  border-color: var(--teal);
+  background: var(--teal-hover);
+  color: var(--title);
+}
