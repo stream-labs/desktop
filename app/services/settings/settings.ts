@@ -26,6 +26,7 @@ import { FacemasksService } from 'services/facemasks';
 import path from 'path';
 import fs from 'fs';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import { SceneCollectionsService } from 'services/scene-collections';
 
 export interface ISettingsValues {
   General: {
@@ -111,6 +112,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
   @Inject() private streamingService: StreamingService;
   @Inject() private facemasksService: FacemasksService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
+  @Inject() private sceneCollectionsService: SceneCollectionsService;
 
   @Inject()
   private videoEncodingOptimizationService: VideoEncodingOptimizationService;
@@ -130,6 +132,8 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
     } catch (e) {
       console.error('Error fetching hardware acceleration state', e);
     }
+
+    this.sceneCollectionsService.collectionSwitched.subscribe(() => this.refreshAudioSettings());
   }
 
   private fetchSettingsFromObs(categoryName: string): ISettingsCategory {
@@ -200,6 +204,18 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
       settingsFormData[categoryName] = this.fetchSettingsFromObs(categoryName);
     });
     this.SET_SETTINGS(settingsFormData);
+  }
+
+  /**
+   * Audio settings are a special case where switching scene collections will
+   * cause them to become invalid. Calling this function will ensure that the
+   * audio settings are in sync with the currently loaded scene collection.
+   */
+  refreshAudioSettings() {
+    this.PATCH_SETTINGS('Audio', {
+      type: ESettingsCategoryType.Untabbed,
+      formData: this.getAudioSettingsFormData(this.state['Audio'].formData[0]),
+    });
   }
 
   showSettings(categoryName?: string) {
@@ -450,5 +466,10 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
   @mutation()
   SET_SETTINGS(settingsData: ISettingsServiceState) {
     this.state = Object.assign({}, this.state, settingsData);
+  }
+
+  @mutation()
+  PATCH_SETTINGS(categoryName: string, category: ISettingsCategory) {
+    this.state[categoryName] = category;
   }
 }
