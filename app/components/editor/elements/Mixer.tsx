@@ -71,7 +71,7 @@ export default class Mixer extends BaseElement {
         </div>
         <Scrollable className="studio-controls-selector mixer-panel">
           <div style={{ position: 'relative' }}>
-            {this.audioSources.length && !this.performanceMode && (
+            {this.audioSources.length !== 0 && !this.performanceMode && (
               <GLVolmeters style={{ left: '17px', right: '17px', height: '100%' }} />
             )}
             {this.audioSources.map(audioSource => (
