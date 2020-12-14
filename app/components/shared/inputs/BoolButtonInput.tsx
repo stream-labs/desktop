@@ -21,11 +21,11 @@ export default class BoolInput extends BaseInput<boolean, IInputMetadata> {
         class={cx('input-wrapper', { disabled: this.options.disabled })}
         data-role="input"
         data-type="toggle"
-        data-value={this.value}
+        data-value={!!this.value}
         data-name={this.options.name}
       >
         <div
-          class={cx(styles.boolButton, { [styles.active]: this.value })}
+          class={cx(styles.boolButton, { [styles.active]: !!this.value })}
           onClick={() => this.handleClick()}
         >
           {this.options.title || '\u00A0' /* nbsp */}
