@@ -4,7 +4,7 @@ import {
   focusMain,
   test,
   TExecutionContext,
-  useSpectron
+  useSpectron,
 } from '../../helpers/spectron';
 import { FormMonkey } from '../../helpers/form-monkey';
 import { ISceneCollectionsServiceApi } from '../../../app/services/scene-collections';
@@ -54,7 +54,7 @@ test('Change Advanced Audio Settings', async t => {
     flag2: false,
     flag3: false,
     flag4: false,
-    flag5: false
+    flag5: false,
   };
   await desktopAudioForm.fill(updatedSettings);
   await micAuxForm.fill(updatedSettings);

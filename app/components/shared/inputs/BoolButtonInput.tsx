@@ -20,7 +20,8 @@ export default class BoolInput extends BaseInput<boolean, IInputMetadata> {
       <div
         class={cx('input-wrapper', { disabled: this.options.disabled })}
         data-role="input"
-        data-type="bool"
+        data-type="toggle"
+        data-value={this.value}
         data-name={this.options.name}
       >
         <div
