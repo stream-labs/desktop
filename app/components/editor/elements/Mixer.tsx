@@ -18,9 +18,11 @@ export default class Mixer extends BaseElement {
 
   mins = { x: 150, y: 120 };
 
-  advancedSettingsTooltip = $t('Open advanced audio settings');
-  mixerTooltip = $t('Monitor audio levels. If the bars are moving you are outputting audio.');
-  needToRenderVolmetes: boolean = (() => {
+  private advancedSettingsTooltip = $t('Open advanced audio settings');
+  private mixerTooltip = $t(
+    'Monitor audio levels. If the bars are moving you are outputting audio.',
+  );
+  private needToRenderVolmeters: boolean = (() => {
     // render volmeters without hardware acceleration only if we don't have the webgl context
     const canvas = document.createElement('canvas');
     return !canvas.getContext('webgl');
@@ -76,7 +78,7 @@ export default class Mixer extends BaseElement {
               <MixerItem
                 audioSource={audioSource}
                 key={audioSource.sourceId}
-                volmetersEnabled={this.needToRenderVolmetes}
+                volmetersEnabled={this.needToRenderVolmeters}
               />
             ))}
           </div>
