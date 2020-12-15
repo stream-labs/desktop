@@ -1,7 +1,7 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { inputComponents } from 'components/widgets/inputs';
 import WidgetEditor from 'components/windows/WidgetEditor.vue';
-import WidgetSettings from 'components/widgets/WidgetSettings.vue';
+import WidgetSettings, { IWidgetNavItem } from 'components/widgets/WidgetSettings.vue';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm';
@@ -20,8 +20,6 @@ import {
   },
 })
 export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalService> {
-  @Prop() goalType: string;
-
   $refs: {
     form: ValidatedForm;
   };
@@ -33,14 +31,23 @@ export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalSe
     ends_at: '',
   };
 
-  navItems = [
-    { value: 'goal', label: $t('Goal') },
-    { value: 'visual', label: $t('Visual Settings') },
-    { value: 'source', label: $t('Source') },
-  ];
+  get navItems() {
+    const baseNavItems = [
+      { value: 'visual', label: $t('Visual Settings') },
+      { value: 'source', label: $t('Source') },
+    ];
+
+    return this.isCharity
+      ? baseNavItems
+      : [{ value: 'goal', label: $t('Goal') }].concat(baseNavItems);
+  }
 
   get hasGoal() {
     return this.loaded && this.wData.goal;
+  }
+
+  get isCharity() {
+    return this.props?.goalType === 'charity';
   }
 
   async saveGoal() {

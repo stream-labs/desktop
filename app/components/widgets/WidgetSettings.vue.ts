@@ -8,6 +8,7 @@ import { $t } from 'services/i18n/index';
 import { Component } from 'vue-property-decorator';
 import { Debounce } from 'lodash-decorators';
 import { SourcesService } from 'services/sources';
+import TsxComponent from 'components/tsx-component';
 
 export interface IWidgetNavItem {
   value: string;
@@ -18,7 +19,7 @@ export interface IWidgetNavItem {
 export default class WidgetSettings<
   TData extends IWidgetData,
   TService extends WidgetSettingsService<TData>
-> extends Vue {
+> extends TsxComponent<{ goalType?: string }> {
   @Inject() private windowsService: WindowsService;
   @Inject() private widgetsService: IWidgetsServiceApi;
   @Inject() private sourcesService: SourcesService;

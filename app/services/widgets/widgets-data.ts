@@ -30,6 +30,7 @@ export enum WidgetType {
   SubGoal = 15,
   StarsGoal = 16,
   SupporterGoal = 17,
+  CharityGoal = 18,
 }
 
 export const WidgetTesters: IWidgetTester[] = [
@@ -229,6 +230,21 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     name: 'Supporter Goal',
     url(host, token) {
       return `https://${host}/widgets/supporter-goal?token=${token}`;
+    },
+
+    width: 600,
+    height: 200,
+
+    x: 0,
+    y: 1,
+
+    anchor: AnchorPoint.SouthWest,
+  },
+
+  [WidgetType.CharityGoal]: {
+    name: 'Streamlabs Charity Goal',
+    url(host, token) {
+      return `https://${host}/widgets/streamlabscharitydonation-goal?token=${token}`;
     },
 
     width: 600,
@@ -453,6 +469,14 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     demoFilename: 'source-follower-goal.png',
     supportList: [$t('Facebook Supporters')],
     platforms: new Set(['facebook']),
+  },
+  [WidgetType.CharityGoal]: {
+    name: $t('Streamlabs Charity Goal'),
+    description: $t('Set a goal for your viewers to help you reach.'),
+    demoVideo: true,
+    demoFilename: 'source-donation-goal.mp4',
+    supportList: [$t('Streamlabs Charity Donations')],
+    platforms: new Set(['twitch', 'youtube', 'facebook']),
   },
   [WidgetType.DonationTicker]: {
     name: $t('Tip Ticker'),
