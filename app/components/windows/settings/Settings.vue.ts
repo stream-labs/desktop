@@ -148,10 +148,6 @@ export default class Settings extends Vue {
     this.$refs.settingsContainer.scrollTop = 0;
   }
 
-  getSettingsData(categoryName: string) {
-    return this.settingsService.state[categoryName].formData;
-  }
-
   originalCategory: string = null;
 
   onBeforePageScanHandler(page: string) {
