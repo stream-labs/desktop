@@ -483,6 +483,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
   }
 
+  resetStreamInfo() {
+    this.RESET_STREAM_INFO();
+  }
+
   @mutation()
   private SET_ERROR(type: TStreamErrorType, details?: string, platform?: TPlatform) {
     if (!type) type = 'UNKNOWN_ERROR';
