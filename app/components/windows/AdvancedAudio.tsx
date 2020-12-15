@@ -40,7 +40,7 @@ export default class AdvancedAudio extends Vue {
     return (
       <thead>
         <tr>
-          <th>{$t('Name')}</th>
+          <th class={styles.audioSourceName}>{$t('Name')}</th>
           <th>{$t('Volume ( % )')}</th>
           <th>{$t('Downmix to Mono')}</th>
           <th>{$t('Sync Offset ( ms )')}</th>
@@ -60,7 +60,7 @@ export default class AdvancedAudio extends Vue {
 
             {this.audioSources.map(audioSource => (
               <tr key={audioSource.name} name={audioSource.name} class={styles.audioSettingsRow}>
-                <td>{audioSource.name}</td>
+                <td class={styles.audioSourceName}>{audioSource.name}</td>
                 {audioSource.getSettingsForm().map(formInput => {
                   const Component = propertyComponentForType(formInput.type);
                   return (

@@ -20,7 +20,8 @@
   margin-bottom: 0;
   justify-content: flex-start;
   flex-wrap: wrap;
-  width: 86px;
+  width: 72px;
+  margin-right: none;
 }
 
 .row > div {

@@ -1,11 +1,23 @@
 @import '../../styles/index';
 
 .column-deflection {
-  width: 120px;
+  width: 90px;
 }
 
 .column-monitoringType {
   width: 210px;
+}
+
+.column-forceMono {
+  width: 80px;
+}
+
+.column-syncOffset {
+  width: 100px;
+}
+
+.column-audioMixers {
+  margin-left: auto;
 }
 
 .audio-settings td&:nth-child(1) {
@@ -13,15 +25,19 @@
 }
 
 .advanced-audio-input {
-  .alignable-input {
+  :global(.alignable-input) {
     margin-bottom: 0;
-
-    /deep/ .row {
-      justify-content: flex-end;
-    }
   }
 
-  .alignable-input /deep/ .input-body {
+  :global(.alignable-input) :global(.input-body) {
     width: 100%;
   }
+}
+
+.audio-source-name {
+  width: 200px;
+  display: block;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }

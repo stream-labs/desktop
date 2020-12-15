@@ -192,7 +192,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
       componentName: 'AdvancedAudio',
       title: $t('Advanced Audio Settings'),
       size: {
-        width: 1050,
+        width: 840,
         height: 600,
       },
     });
