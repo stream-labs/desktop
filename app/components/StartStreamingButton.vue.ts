@@ -155,14 +155,6 @@ export default class StartStreamingButton extends Vue {
       return this.streamingService.views.isMultiplatformMode || updateStreamInfoOnLive;
     }
 
-    if (primaryPlatform === 'mixer') {
-      return (
-        this.streamSettingsService.state.protectedModeEnabled &&
-        updateStreamInfoOnLive &&
-        this.streamSettingsService.isSafeToModifyStreamKey()
-      );
-    }
-
     if (primaryPlatform === 'facebook') {
       return (
         this.streamSettingsService.state.protectedModeEnabled &&

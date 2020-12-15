@@ -117,7 +117,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         applyOptimizedSettings: 'not-started',
         twitch: 'not-started',
         youtube: 'not-started',
-        mixer: 'not-started',
         facebook: 'not-started',
         setupMultistream: 'not-started',
         startVideoTransmission: 'not-started',

@@ -57,27 +57,10 @@ export class StreamlabelsManager extends DefaultManager {
       session_most_recent_subscriber: 'session_most_recent_youtube_sponsor',
     };
 
-    const mixerKeys = {
-      most_recent_follower: 'most_recent_mixer_follower',
-      session_followers: 'session_mixer_followers',
-      session_follower_count: 'session_mixer_follower_count',
-      session_most_recent_follower: 'session_most_recent_mixer_follower',
-      most_recent_subscriber: 'most_recent_mixer_subscriber',
-      session_subscribers: 'session_mixer_subscribers',
-      session_subscriber_count: 'session_mixer_subscriber_count',
-      session_most_recent_subscriber: 'session_most_recent_mixer_subscriber',
-    };
-
     if (this.userService.platform) {
       if (this.userService.platform.type === 'youtube') {
         if (youtubeKeys[settings.statname]) {
           settings.statname = youtubeKeys[settings.statname];
-        }
-      }
-
-      if (this.userService.platform.type === 'mixer') {
-        if (mixerKeys[settings.statname]) {
-          settings.statname = mixerKeys[settings.statname];
         }
       }
     }

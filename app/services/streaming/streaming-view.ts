@@ -33,7 +33,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
    * Returns a sorted list of all platforms (linked and unlinked)
    */
   get allPlatforms(): TPlatform[] {
-    return this.sortPlatforms(['twitch', 'mixer', 'facebook', 'youtube']);
+    return this.sortPlatforms(['twitch', 'facebook', 'youtube']);
   }
 
   /**
