@@ -1,0 +1,27 @@
+@import '../../styles/index';
+
+.column-deflection {
+  width: 120px;
+}
+
+.column-monitoringType {
+  width: 210px;
+}
+
+.audio-settings td&:nth-child(1) {
+  white-space: nowrap;
+}
+
+.advanced-audio-input {
+  .alignable-input {
+    margin-bottom: 0;
+
+    /deep/ .row {
+      justify-content: flex-end;
+    }
+  }
+
+  .alignable-input /deep/ .input-body {
+    width: 100%;
+  }
+}
