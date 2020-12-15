@@ -1,17 +1,11 @@
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const baseConfig = require('./webpack.base.config.js');
 const TerserPlugin = require('terser-webpack-plugin');
 
-module.exports = merge.smart(baseConfig, {
-  entry: {
-    renderer: './app/app.ts',
-    updater: './updater/mac/ui.js',
-    'guest-api': './guest-api',
-  },
-
+module.exports = merge(baseConfig, {
   output: {
     filename: chunkData => {
-      return chunkData.chunk.name === 'renderer' ? '[name].[contenthash].js' : '[name].js';
+      return chunkData.chunk.name.match(/renderer/) ? '[name].[contenthash].js' : '[name].js';
     },
     chunkFilename: '[name].[contenthash].js',
   },
@@ -22,8 +16,6 @@ module.exports = merge.smart(baseConfig, {
   optimization: {
     minimizer: [
       new TerserPlugin({
-        parallel: true,
-        sourceMap: true,
         terserOptions: { mangle: false },
       }),
     ],
