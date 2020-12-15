@@ -139,7 +139,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       },
       val => {
         // show the error if child window is closed
-        if (val.info.error && !this.windowsService.state.child.isShown) {
+        if (
+          val.info.error &&
+          !this.windowsService.state.child.isShown &&
+          this.streamSettingsService.protectedModeEnabled
+        ) {
           this.showGoLiveWindow();
         }
         this.streamInfoChanged.next(val);
