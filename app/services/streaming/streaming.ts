@@ -110,6 +110,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     replayBufferStatusTime: new Date().toISOString(),
     selectiveRecording: false,
     info: {
+      settings: null,
       lifecycle: 'empty',
       error: null,
       warning: '',
@@ -231,6 +232,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
     // save enabled platforms to reuse setting with the next app start
     this.streamSettingsService.setSettings({ goLiveSettings: settings });
+
+    // save current settings in store so we can re-use them if something will go wrong
+    this.SET_GO_LIVE_SETTINGS(settings);
 
     // show the GoLive checklist
     this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist' });
@@ -1081,5 +1085,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @mutation()
   private SET_WARNING(warningType: 'YT_AUTO_START_IS_DISABLED') {
     this.state.info.warning = warningType;
+  }
+
+  @mutation()
+  private SET_GO_LIVE_SETTINGS(settings: IGoLiveSettings) {
+    this.state.info.settings = settings;
   }
 }
