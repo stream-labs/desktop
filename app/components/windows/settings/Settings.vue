@@ -102,6 +102,8 @@
                 'Appearance',
                 'Experimental',
                 'Remote Control',
+                'Installed Apps',
+                'Virtual Webcam',
               ].includes(page)
             "
             :key="page"
