@@ -16,8 +16,6 @@ export interface IPlatformService {
 
   setupStreamSettings: (programId: string) => Promise<IStreamingSetting>;
 
-  fetchViewerCount: () => Promise<number>;
-
   isLoggedIn?: () => Promise<boolean>;
   logout?: () => Promise<void>;
 
