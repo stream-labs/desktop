@@ -227,46 +227,5 @@ export class NiconicoService extends Service implements IPlatformService {
       );
   }
 
-  /**
-   * getplayerstatusを叩く
-   * 将来的にAPIはN Air向けのものに移行する予定で、暫定的な実装
-   */
-  @requiresToken()
-  private fetchPlayerStatus() {
-    const headers = this.getHeaders(true);
-    const request = new Request(
-      `${this.hostsService.niconicolive}/api/getplayerstatus?v=${this.channelId}`,
-      { headers, credentials: 'include' }
-    );
-
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.text())
-      .then(xml => parseXml(xml))
-      .then(json => {
-        console.log('getplayerstatus => ', JSON.stringify(json)); // DEBUG
-        if (!('getplayerstatus' in json)) {
-          throw 'invalid response from getplayerstatus';
-        }
-        const getplayerstatus = json['getplayerstatus'];
-        return getplayerstatus;
-      });
-  }
-
-  @requiresToken()
-  fetchViewerCount(): Promise<number> {
-    return this.fetchPlayerStatus()
-      .then(o => {
-        return o['stream'][0]['watch_count'][0]
-      });
-  }
-
-  @requiresToken()
-  fetchCommentCount(): Promise<number> {
-    return this.fetchPlayerStatus()
-      .then(o => {
-        return o['stream'][0]['comment_count'][0];
-      });
-  }
 }
 
