@@ -769,7 +769,6 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
           msg.currency = msg.skill_currency;
           msg.skill = msg.skill_name;
         }
-        console.log(msg);
         return msg;
       })
       .filter(msg => this.isAllowed(msg));
