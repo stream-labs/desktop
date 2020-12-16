@@ -1,7 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2015",
     "lib": [
       "dom",
       "es7",
@@ -16,12 +16,10 @@
     "removeComments": true,
     "suppressImplicitAnyIndexErrors": true,
     "allowSyntheticDefaultImports": true,
-
-    "outDir": "bundles/ts",
     "sourceMap": true,
     "allowJs": false,
     "strictNullChecks": false,
-    "emitDecoratorMetadata": true,
+    "emitDecoratorMetadata": false,
     "baseUrl": "./app",
     "jsx": "preserve"
   },
