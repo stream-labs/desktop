@@ -14,9 +14,13 @@ module.exports = merge(baseConfig, {
   devtool: 'source-map',
 
   optimization: {
+    concatenateModules: false,
     minimizer: [
       new TerserPlugin({
-        terserOptions: { mangle: false },
+        terserOptions: {
+          mangle: false,
+          keep_classnames: true,
+        },
       }),
     ],
     usedExports: true,
