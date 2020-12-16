@@ -21,7 +21,10 @@ plugins.push(
 
 plugins.push(
   new WebpackManifestPlugin({
-    filter: file => ['renderer.js', 'vendors~renderer.js'].includes(file.name),
+    filter: file =>
+      ['renderer.js', 'vendors~renderer.js', 'renderer.js.map', 'vendors~renderer.js.map'].includes(
+        file.name,
+      ),
   }),
 );
 
