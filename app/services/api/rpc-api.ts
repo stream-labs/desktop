@@ -1,5 +1,4 @@
 import uuid from 'uuid/v4';
-import 'reflect-metadata';
 import { Service } from 'services/core/service';
 import traverse from 'traverse';
 import { Observable, Subject, Subscription } from 'rxjs';
@@ -254,7 +253,7 @@ export abstract class RpcApi extends Service {
     const keys: string[] = [];
     let proto = resource;
     do {
-      keys.push(...Object.keys(proto));
+      keys.push(...Object.getOwnPropertyNames(proto));
       proto = Object.getPrototypeOf(proto);
     } while (proto.constructor.name !== 'Object');
 

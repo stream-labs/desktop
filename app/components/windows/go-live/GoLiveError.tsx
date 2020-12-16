@@ -166,7 +166,10 @@ export default class GoLiveError extends TsxComponent<{}> {
           message={$t('updateStreamSettingsError')}
           scopedSlots={{
             tryAgainLink: (text: string) => (
-              <a class={styles.link} onClick={() => this.streamingService.actions.goLive()}>
+              <a
+                class={styles.link}
+                onClick={() => this.streamingService.actions.goLive(this.view.info.settings)}
+              >
                 {{ text }}
               </a>
             ),

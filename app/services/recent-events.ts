@@ -7,7 +7,6 @@ import { WindowsService } from 'services/windows';
 import { WebsocketService, TSocketEvent, IEventSocketEvent } from 'services/websocket';
 import { pick, cloneDeep } from 'lodash';
 import uuid from 'uuid/v4';
-import ExecuteInCurrentWindow from 'util/execute-in-current-window';
 import { Subscription } from 'rxjs';
 import mapValues from 'lodash/mapValues';
 
