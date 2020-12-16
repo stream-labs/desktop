@@ -26,6 +26,7 @@ export interface IRecentEvent {
   host_type?: 'manual' | 'auto';
   raiders?: number;
   formatted_amount?: string;
+  formattedAmount?: string;
   sub_plan?: string;
   months?: number;
   streak_months?: number;
@@ -216,6 +217,7 @@ function getHashForRecentEvent(event: IRecentEvent) {
 const SUPPORTED_EVENTS = [
   'merch',
   'donation',
+  'streamlabscharitydonation',
   'facemaskdonation',
   'follow',
   'subscription',
@@ -244,6 +246,7 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
         $t('has donated') +
         (event.crate_item ? $t(' with %{name}', { name: event.crate_item.name }) : ''),
       merch: $t('has purchased %{product} from the store', { product: event.product }),
+      streamlabscharitydonation: $t('has donated via Streamlabs Charity'),
       follow: event.platform === 'youtube_account' ? $t('has subscribed') : $t('has followed'),
       subscription: this.getSubString(event),
       // Twitch
@@ -766,6 +769,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
           msg.currency = msg.skill_currency;
           msg.skill = msg.skill_name;
         }
+        console.log(msg);
         return msg;
       })
       .filter(msg => this.isAllowed(msg));
