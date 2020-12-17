@@ -224,6 +224,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       return;
     }
 
+    if (!this.streamSettingsService.state.protectedModeEnabled) {
+      this.windowsService.actions.closeChildWindow();
+    }
+
     // clear the current stream info
     this.RESET_STREAM_INFO();
 
@@ -248,7 +252,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     for (const platform of platforms) {
       const service = getPlatformService(platform);
       try {
-        // don't update settigns for twitch in unattendedMode
+        // don't update settings for twitch in unattendedMode
         const settingsForPlatform = platform === 'twitch' && unattendedMode ? undefined : settings;
         await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform));
       } catch (e) {
@@ -381,6 +385,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   async updateStreamSettings(settings: IGoLiveSettings) {
     const lifecycle = this.state.info.lifecycle;
 
+    // save current settings in store so we can re-use them if something will go wrong
+    this.SET_GO_LIVE_SETTINGS(settings);
+
     // run checklist
     this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist' });
 
@@ -408,7 +415,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         await this.runCheck(platform, () => service.putChannelInfo(newSettings));
       } catch (e) {
         console.error(e);
-        this.setError('SETTINGS_UPDATE_FAILED', e.details, platform);
+        // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
+        const errorType =
+          (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
+            ? 'SETTINGS_UPDATE_FAILED'
+            : e.type || 'UNKNOWN_ERROR';
+        this.setError(errorType, e.details, platform);
         return;
       }
     }
