@@ -224,10 +224,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       return;
     }
 
-    if (!this.streamSettingsService.state.protectedModeEnabled) {
-      this.windowsService.actions.closeChildWindow();
-    }
-
     // clear the current stream info
     this.RESET_STREAM_INFO();
 
@@ -1057,6 +1053,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         .catch(() => {
           this.outputErrorOpen = false;
         });
+      this.windowsService.actions.closeChildWindow();
     }
   }
 
