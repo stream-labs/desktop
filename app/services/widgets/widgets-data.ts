@@ -244,7 +244,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
   [WidgetType.CharityGoal]: {
     name: 'Streamlabs Charity Goal',
     url(host, token) {
-      return `https://${host}/widgets/streamlabscharitydonation-goal?token=${token}`;
+      return `https://${host}/widgets/streamlabs-charity-donation-goal?token=${token}`;
     },
 
     width: 600,

@@ -12,7 +12,7 @@ export class CharityGoalService extends GenericGoalService {
       type: WidgetType.BitGoal,
       url: WidgetDefinitions[WidgetType.BitGoal].url(this.getHost(), this.getWidgetToken()),
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/streamlabscharitydonationgoal/settings`,
-      previewUrl: `https://${this.getHost()}/widgets/streamlabscharitydonationgoal?token=${this.getWidgetToken()}`,
+      previewUrl: `https://${this.getHost()}/widgets/streamlabs-charity-donation-goal?token=${this.getWidgetToken()}`,
       settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/streamlabscharitydonationgoal/settings`,
       goalUrl: `https://${this.getHost()}/api/v5/slobs/widget/streamlabscharitydonationgoal`,
       settingsUpdateEvent: 'streamlabsCharityDonationGoalSettingsUpdate',
