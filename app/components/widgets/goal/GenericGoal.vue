@@ -55,7 +55,7 @@
       @input="save()"
     >
       <v-form-group
-        v-if="goalType === 'sub'"
+        v-if="props.goalType === 'sub'"
         v-model="wData.settings.include_resubs"
         :metadata="metadata.include_resubs"
       />

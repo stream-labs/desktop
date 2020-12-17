@@ -47,7 +47,7 @@ export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalSe
   }
 
   get isCharity() {
-    return this.props?.goalType === 'charity';
+    return this.props.goalType === 'charity';
   }
 
   async saveGoal() {
