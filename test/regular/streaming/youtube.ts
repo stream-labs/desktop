@@ -27,12 +27,6 @@ test('Streaming to Youtube', async t => {
   });
 
   t.true(await chatIsVisible(t), 'Chat should be visible');
-
-  // give youtube 2 min to publish stream
-  await focusChild(t);
-  await t.context.app.client.waitForVisible("h1=You're live!", 2 * 60 * 1000);
-
-  t.pass();
 });
 
 test('Streaming to the scheduled event on Youtube', async t => {
