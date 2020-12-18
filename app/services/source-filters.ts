@@ -202,7 +202,8 @@ export class SourceFiltersService extends Service {
     // There is now 2 references to the filter at that point
     // We need to release one
     obsFilter.release();
-    if (this.presetFilter?.name !== '') {
+
+    if (this.presetFilter(sourceId)) {
       this.setOrder(sourceId, '__PRESET', 1);
     }
     this.filterAdded.next({ sourceId, name: filterName });

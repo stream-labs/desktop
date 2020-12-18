@@ -4,7 +4,7 @@
             "name": "obs-studio-node",
             "url": "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/",
             "archive": "osn-[VERSION]-release-[OS].tar.gz",
-            "version": "0.13.6",
+            "version": "0.13.7",
             "win64": true,
             "osx": true
         },
@@ -12,7 +12,7 @@
             "name": "node-libuiohook",
             "url": "https://slobs-node-libuiohook.s3-us-west-2.amazonaws.com/",
             "archive": "node-libuiohook-[VERSION]-[OS].tar.gz",
-            "version": "1.0.19",
+            "version": "1.1.2",
             "win64": true,
             "osx": true
         },
