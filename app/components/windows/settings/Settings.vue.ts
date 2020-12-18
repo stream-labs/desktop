@@ -105,7 +105,7 @@ export default class Settings extends Vue {
   }
 
   get settingsData() {
-    return this.settingsService.state[this.categoryName].formData;
+    return this.settingsService.state[this.categoryName]?.formData ?? [];
   }
 
   set categoryName(val: string) {

@@ -104,6 +104,7 @@
                 'Remote Control',
                 'Installed Apps',
                 'Virtual Webcam',
+                'Developer',
               ].includes(page)
             "
             :key="page"
