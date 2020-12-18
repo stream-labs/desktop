@@ -57,6 +57,14 @@ export default class GoLiveError extends TsxComponent<{}> {
     this.userService.actions.openPrimeUrl('slobs-multistream');
   }
 
+  private tryAgain() {
+    if (this.windowsService.state.child.componentName === 'EditStreamWindow') {
+      this.streamingService.actions.updateStreamSettings(this.view.info.settings);
+    } else {
+      this.streamingService.actions.goLive(this.view.info.settings);
+    }
+  }
+
   private render() {
     const error = this.view.info.error;
     if (!error) return;
@@ -166,7 +174,7 @@ export default class GoLiveError extends TsxComponent<{}> {
           message={$t('updateStreamSettingsError')}
           scopedSlots={{
             tryAgainLink: (text: string) => (
-              <a class={styles.link} onClick={() => this.streamingService.actions.goLive()}>
+              <a class={styles.link} onClick={() => this.tryAgain()}>
                 {{ text }}
               </a>
             ),
