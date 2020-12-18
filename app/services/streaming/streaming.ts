@@ -472,6 +472,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     errorDetails?: string,
     platform?: TPlatform,
   ) {
+    console.trace('SET ERROR COMING FROM HERE');
     if (typeof errorTypeOrError === 'object') {
       // an error object has been passed as a first arg
       const error = errorTypeOrError.getModel

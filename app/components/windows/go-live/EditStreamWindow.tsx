@@ -57,7 +57,12 @@ export default class EditStreamWindow extends TsxComponent<{}> {
 
   private async submit() {
     if (!(await this.$refs.form.validate())) return;
+    console.log('BEFORE CALL updateStreamSettings');
     await this.streamingService.actions.return.updateStreamSettings(this.settings);
+    console.log('AFTER CALL updateStreamSettings');
+
+    console.log('this.view.info.error', this.view.info.error);
+
     if (!this.view.info.error) {
       this.$toasted.success($t('Successfully updated'), {
         position: 'bottom-center',
