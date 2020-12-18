@@ -210,11 +210,14 @@ class Toolbar extends TsxComponent<ToolbarProps> {
 
 const classForType = (event: IRecentEvent) => {
   if (event.type === 'sticker' || event.type === 'effect') return event.currency;
-  if (event.type === 'superchat' || event.formatted_amount) return 'donation';
+  if (event.type === 'superchat' || event.formatted_amount || event.formattedAmount) {
+    return 'donation';
+  }
   return event.type;
 };
 
 const amountString = (event: IRecentEvent) => {
+  if (event.formattedAmount) return event.formattedAmount;
   if (event.formatted_amount) return event.formatted_amount;
   if (event.type === 'superchat') return event.displayString;
   if (event.type === 'sticker' || event.type === 'effect') {
@@ -255,6 +258,7 @@ class EventCell extends TsxComponent<EventCellProps> {
       youtube_account: <PlatformLogo platform="youtube" />,
       facebook_account: <PlatformLogo platform="facebook" />,
       streamlabs: <PlatformLogo platform="streamlabs" />,
+      streamlabscharity: <PlatformLogo platform="streamlabs" />,
     }[platform];
   }
 
