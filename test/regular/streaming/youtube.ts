@@ -5,9 +5,10 @@ import {
   clickGoLive,
   goLive,
   prepareToGoLive,
-  scheduleStream, stopStream,
+  scheduleStream,
+  stopStream,
   submit,
-  waitForStreamStart
+  waitForStreamStart,
 } from '../../helpers/spectron/streaming';
 import { FormMonkey, selectTitle } from '../../helpers/form-monkey';
 import moment = require('moment');
@@ -26,12 +27,6 @@ test('Streaming to Youtube', async t => {
   });
 
   t.true(await chatIsVisible(t), 'Chat should be visible');
-
-  // give youtube 2 min to publish stream
-  await focusChild(t);
-  await t.context.app.client.waitForVisible("h1=You're live!", 2 * 60 * 1000);
-
-  t.pass();
 });
 
 test('Streaming to the scheduled event on Youtube', async t => {
@@ -52,6 +47,8 @@ test('Streaming to the scheduled event on Youtube', async t => {
   await form.fill({
     event: await form.getOptionByTitle('event', `Youtube Test Stream (${formattedTomorrow})`),
   });
+  // wait for fields prepopulating
+  await sleep(2000);
   await submit(t);
   await waitForStreamStart(t);
   t.pass();
@@ -78,9 +75,16 @@ test('Start stream twice to the same YT event', async t => {
 
 test('Youtube streaming is disabled', async t => {
   skipCheckingErrorsInLog();
+  const client = t.context.app.client;
   await logIn(t, 'youtube', { streamingIsDisabled: true, notStreamable: true });
   t.true(
-    await t.context.app.client.isExisting('span=YouTube account not enabled for live streaming'),
+    await client.isExisting('span=YouTube account not enabled for live streaming'),
     'The streaming-disabled message should be visible',
+  );
+  await prepareToGoLive(t);
+  await clickGoLive(t);
+  t.true(
+    await client.isVisible('button=Enable Live Streaming'),
+    'The enable livestreaming button should be visible',
   );
 });

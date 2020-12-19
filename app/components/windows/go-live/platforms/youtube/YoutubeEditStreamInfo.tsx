@@ -13,7 +13,7 @@ import {
   YoutubeService,
 } from 'services/platforms/youtube';
 import CommonPlatformFields from '../../CommonPlatformFields';
-import { StreamingService, IStreamSettings } from 'services/streaming';
+import { StreamingService, IStreamSettings, IPlatformFlags } from 'services/streaming';
 import { SyncWithValue } from 'services/app/app-decorators';
 import BaseEditStreamInfo from '../BaseEditSteamInfo';
 import FormInput from 'components/shared/inputs/FormInput.vue';
@@ -75,12 +75,14 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
     const selectedBroadcast = this.selectedBroadcast;
     if (!selectedBroadcast) return;
 
-    this.settings.platforms.youtube = {
-      ...ytSettings,
-      ...(await this.youtubeService.actions.return.fetchStartStreamOptionsForBroadcast(
-        selectedBroadcast.id,
-      )),
-    };
+    const newBroadcastOptions = await this.youtubeService.actions.return.fetchStartStreamOptionsForBroadcast(
+      selectedBroadcast.id,
+    );
+    this.updateBroadcastSettings({ ...ytSettings, ...newBroadcastOptions });
+  }
+
+  private updateBroadcastSettings(settings: IYoutubeStartStreamOptions & IPlatformFlags) {
+    this.settings.platforms.youtube = settings;
   }
 
   private onProjectionChangeHandler(enable360: boolean) {

@@ -9,7 +9,8 @@
       <NavMenu v-model="categoryName" class="settings-nav">
         <scrollable style="height: 100%;" :isResizable="false">
           <form-input
-            v-model="searchStr"
+            :value="searchStr"
+            @input="str => onSearchInput(str)"
             :metadata="{
               type: 'text',
               placeholder: 'Search',
@@ -68,7 +69,7 @@
           :onBeforePageScan="onBeforePageScanHandler"
           :onPageRender="onPageRenderHandler"
           @searchCompleted="onSearchCompletedHandler"
-          @scanCompleted="settingsData = getSettingsData(categoryName)"
+          @scanCompleted="onScanCompletedHandler"
           v-slot:default="{ page, scanning }"
         >
           <extra-settings v-if="page === 'General'" />
@@ -101,11 +102,13 @@
                 'Appearance',
                 'Experimental',
                 'Remote Control',
+                'Installed Apps',
+                'Virtual Webcam',
               ].includes(page)
             "
             :key="page"
             :categoryName="page"
-            v-model="settingsData"
+            :value="settingsData"
             @input="save"
           />
         </searchable-pages>

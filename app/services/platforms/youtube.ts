@@ -34,7 +34,7 @@ export interface IYoutubeStartStreamOptions extends IExtraBroadcastSettings {
   broadcastId?: string;
   description: string;
   privacyStatus?: 'private' | 'public' | 'unlisted';
-  scheduledStartTime?: string;
+  scheduledStartTime?: number;
 }
 
 /**
@@ -379,6 +379,9 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
    * returns perilled data for the GoLive window
    */
   async prepopulateInfo(): Promise<void> {
+    if (!this.state.liveStreamingEnabled) {
+      throw throwStreamError('YOUTUBE_STREAMING_DISABLED', '', 'youtube');
+    }
     const settings = this.state.settings;
     this.UPDATE_STREAM_SETTINGS({
       description: settings.description || (await this.fetchDefaultDescription()),
@@ -391,7 +394,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
    * Create or update a YT broadcast (event) for the future stream
    */
   async scheduleStream(
-    scheduledStartTime: string,
+    scheduledStartTime: number,
     options: IYoutubeStartStreamOptions,
   ): Promise<void> {
     let broadcast: IYoutubeLiveBroadcast;
@@ -443,14 +446,15 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
    * create a new broadcast via API
    */
   private async createBroadcast(
-    params: IYoutubeStartStreamOptions & { scheduledStartTime?: string },
+    params: IYoutubeStartStreamOptions & { scheduledStartTime?: number },
   ): Promise<IYoutubeLiveBroadcast> {
     const fields = ['snippet', 'contentDetails', 'status'];
     const endpoint = `liveBroadcasts?part=${fields.join(',')}`;
+    const scheduledStartTime = new Date(params.scheduledStartTime) || new Date();
     const data: Dictionary<any> = {
       snippet: {
         title: params.title,
-        scheduledStartTime: params.scheduledStartTime || new Date().toISOString(),
+        scheduledStartTime: scheduledStartTime.toISOString(),
         description: params.description,
       },
       contentDetails: {
@@ -487,10 +491,11 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   ): Promise<IYoutubeLiveBroadcast> {
     const broadcast = await this.fetchBroadcast(id);
 
+    const scheduledStartTime = params.scheduledStartTime ? new Date(params.scheduledStartTime) : new Date();
     const snippet: Partial<IYoutubeLiveBroadcast['snippet']> = {
       title: params.title,
       description: params.description,
-      scheduledStartTime: params.scheduledStartTime || new Date().toISOString(),
+      scheduledStartTime: scheduledStartTime.toISOString(),
     };
 
     const contentDetails: Dictionary<any> = {

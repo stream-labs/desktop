@@ -1,12 +1,8 @@
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import { Subscription } from 'rxjs';
 import { AudioSource, AudioService, IVolmeter } from 'services/audio';
 import { Inject } from 'services/core/injector';
 import { CustomizationService } from 'services/customization';
-import { compileShader, createProgram } from 'util/webgl/utils';
-import vShaderSrc from 'util/webgl/shaders/volmeter.vert';
-import fShaderSrc from 'util/webgl/shaders/volmeter.frag';
 import electron from 'electron';
 import TsxComponent, { createProps } from './tsx-component';
 import { WindowsService } from 'services/windows';
@@ -23,11 +19,17 @@ const DANGER_LEVEL = -9;
 const GREEN = [49, 195, 162];
 const YELLOW = [255, 205, 71];
 const RED = [252, 62, 63];
+const FPS_LIMIT = 40;
 
 class MixerVolmeterProps {
   audioSource: AudioSource = null;
+  volmetersEnabled = true;
 }
 
+/**
+ * Render volmeters on canvas
+ * To render multiple volmeters use more optimized Volmeters.tsx instead
+ */
 @Component({ props: createProps(MixerVolmeterProps) })
 export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
   @Inject() customizationService: CustomizationService;
@@ -44,21 +46,6 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
   // Used for Canvas 2D rendering
   ctx: CanvasRenderingContext2D;
 
-  // Used for WebGL rendering
-  gl: WebGLRenderingContext;
-  program: WebGLProgram;
-
-  // GL Attribute locations
-  positionLocation: number;
-
-  // GL Uniform locations
-  resolutionLocation: WebGLUniformLocation;
-  translationLocation: WebGLUniformLocation;
-  scaleLocation: WebGLUniformLocation;
-  volumeLocation: WebGLUniformLocation;
-  peakHoldLocation: WebGLUniformLocation;
-  bgMultiplierLocation: WebGLUniformLocation;
-
   peakHoldCounters: number[];
   peakHolds: number[];
 
@@ -73,6 +60,20 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
   // Used for lazy initialization of the canvas rendering
   renderingInitialized = false;
 
+  // Current peak values
+  currentPeaks: number[];
+  // Store prevPeaks and interpolatedPeaks values for smooth interpolated rendering
+  prevPeaks: number[];
+  interpolatedPeaks: number[];
+  // the time of last received peaks
+  lastEventTime: number;
+  // time between 2 received peaks.
+  // Used to render extra interpolated frames
+  interpolationTime = 35;
+  bg: { r: number; g: number; b: number };
+
+  firstFrameTime: number;
+  frameNumber: number;
   styleBlockersSubscription: Subscription;
 
   mounted() {
@@ -84,8 +85,6 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
   }
 
   beforeDestroy() {
-    this.$refs.canvas.removeEventListener('webglcontextlost', this.handleLostWebglContext);
-    if (this.gl) window['activeWebglContexts'] -= 1;
     clearInterval(this.canvasWidthInterval);
     this.unsubscribeVolmeter();
     if (this.styleBlockersSubscription) this.styleBlockersSubscription.unsubscribe();
@@ -94,15 +93,6 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
   private setupNewCanvas() {
     // Make sure all state is cleared out
     this.ctx = null;
-    this.gl = null;
-    this.program = null;
-    this.positionLocation = null;
-    this.resolutionLocation = null;
-    this.translationLocation = null;
-    this.scaleLocation = null;
-    this.volumeLocation = null;
-    this.peakHoldLocation = null;
-    this.bgMultiplierLocation = null;
     this.canvasWidth = null;
     this.channelCount = null;
     this.canvasHeight = null;
@@ -114,6 +104,11 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
     this.setChannelCount(2);
 
     this.setCanvasWidth();
+
+    this.canvasWidthInterval = window.setInterval(() => this.setCanvasWidth(), 500);
+    if (this.props.volmetersEnabled) {
+      requestAnimationFrame(t => this.onRequestAnimationFrameHandler(t));
+    }
 
     // Style blockers are always hidden whenever something happens that causes main
     // window elements to change width. We can improve performance by just listening
@@ -127,109 +122,38 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
     );
   }
 
+  /**
+   * Render volmeters with FPS capping
+   */
+  private onRequestAnimationFrameHandler(now: DOMHighResTimeStamp) {
+    // init first rendering frame
+    if (!this.frameNumber) {
+      this.frameNumber = -1;
+      this.firstFrameTime = now;
+    }
+
+    const timeElapsed = now - this.firstFrameTime;
+    const timeBetweenFrames = 1000 / FPS_LIMIT;
+    const currentFrameNumber = Math.ceil(timeElapsed / timeBetweenFrames);
+
+    if (currentFrameNumber !== this.frameNumber) {
+      // it's time to render next frame
+      this.frameNumber = currentFrameNumber;
+      // don't render sources then channelsCount is 0
+      // happens when the browser source stops playing audio
+      if (this.renderingInitialized && this.currentPeaks && this.currentPeaks.length) {
+        this.drawVolmeterC2d(this.currentPeaks);
+      }
+    }
+    requestAnimationFrame(t => this.onRequestAnimationFrameHandler(t));
+  }
+
   private initRenderingContext() {
     if (this.renderingInitialized) return;
+    if (!this.props.volmetersEnabled) return;
 
-    this.gl = this.$refs.canvas.getContext('webgl', { alpha: false });
-
-    if (this.gl) {
-      try {
-        this.initWebglRendering();
-
-        // Get ready to lose this conext if too many are created
-        if (window['activeWebglContexts'] == null) window['activeWebglContexts'] = 0;
-        window['activeWebglContexts'] += 1;
-        this.$refs.canvas.addEventListener('webglcontextlost', this.handleLostWebglContext);
-      } catch (e) {
-        console.error('Failed to initialize WebGL rendering, falling back to Canvas 2d', e);
-        this.gl = null;
-        this.initCanvas2dRendering();
-      }
-    } else {
-      this.initCanvas2dRendering();
-    }
-
-    this.renderingInitialized = true;
-  }
-
-  initCanvas2dRendering() {
-    // This machine does not support hardware acceleration, or it has been disabled
-    // Fall back to canvas 2d rendering instead.
     this.ctx = this.$refs.canvas.getContext('2d', { alpha: false });
-  }
-
-  private handleLostWebglContext() {
-    // Only do this if there are free contexts, otherwise we will churn forever
-    if (window['activeWebglContexts'] < 16) {
-      console.warn('Lost WebGL context and attempting restore.');
-
-      if (this.canvasWidthInterval) {
-        clearInterval(this.canvasWidthInterval);
-        this.canvasWidthInterval = null;
-      }
-      this.$refs.canvas.removeEventListener('webglcontextlost', this.handleLostWebglContext);
-      window['activeWebglContexts'] -= 1;
-
-      this.canvasId += 1;
-
-      this.$nextTick(() => {
-        this.setupNewCanvas();
-      });
-    } else {
-      console.warn('Lost WebGL context and not attempting restore due to too many active contexts');
-    }
-  }
-
-  private initWebglRendering() {
-    const vShader = compileShader(this.gl, vShaderSrc, this.gl.VERTEX_SHADER);
-    const fShader = compileShader(this.gl, fShaderSrc, this.gl.FRAGMENT_SHADER);
-    this.program = createProgram(this.gl, vShader, fShader);
-
-    const positionBuffer = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, positionBuffer);
-
-    // Vertex geometry for a unit square
-    // eslint-disable-next-line
-    const positions = [
-      0, 0,
-      0, 1,
-      1, 0,
-      1, 0,
-      0, 1,
-      1, 1,
-    ];
-
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(positions), this.gl.STATIC_DRAW);
-
-    // look up where the vertex data needs to go.
-    this.positionLocation = this.gl.getAttribLocation(this.program, 'a_position');
-
-    // lookup uniforms
-    this.resolutionLocation = this.gl.getUniformLocation(this.program, 'u_resolution');
-    this.translationLocation = this.gl.getUniformLocation(this.program, 'u_translation');
-    this.scaleLocation = this.gl.getUniformLocation(this.program, 'u_scale');
-    this.volumeLocation = this.gl.getUniformLocation(this.program, 'u_volume');
-    this.peakHoldLocation = this.gl.getUniformLocation(this.program, 'u_peakHold');
-    this.bgMultiplierLocation = this.gl.getUniformLocation(this.program, 'u_bgMultiplier');
-
-    this.gl.useProgram(this.program);
-
-    const warningLocation = this.gl.getUniformLocation(this.program, 'u_warning');
-    this.gl.uniform1f(warningLocation, this.dbToUnitScalar(WARNING_LEVEL));
-
-    const dangerLocation = this.gl.getUniformLocation(this.program, 'u_danger');
-    this.gl.uniform1f(dangerLocation, this.dbToUnitScalar(DANGER_LEVEL));
-
-    // Set colors
-    this.setColorUniform('u_green', GREEN);
-    this.setColorUniform('u_yellow', YELLOW);
-    this.setColorUniform('u_red', RED);
-  }
-
-  private setColorUniform(uniform: string, color: number[]) {
-    const location = this.gl.getUniformLocation(this.program, uniform);
-    // eslint-disable-next-line
-    this.gl.uniform3fv(location, color.map(c => c / 255));
+    this.renderingInitialized = true;
   }
 
   private setChannelCount(channels: number) {
@@ -256,6 +180,7 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
       this.$refs.canvas.width = width;
       this.$refs.canvas.style.width = `${width}px`;
     }
+    this.bg = this.customizationService.themeBackground;
   }
 
   private getBgMultiplier() {
@@ -263,51 +188,10 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
     return this.customizationService.isDarkTheme ? 0.2 : 0.5;
   }
 
-  private drawVolmeterWebgl(peaks: number[]) {
-    const bg = this.customizationService.sectionBackground;
-
-    this.gl.clearColor(bg.r / 255, bg.g / 255, bg.b / 255, 1);
-    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-
-    if (this.canvasWidth < 0 || this.canvasHeight < 0) return;
-
-    this.gl.viewport(0, 0, this.canvasWidth, this.canvasHeight);
-
-    this.gl.enableVertexAttribArray(this.positionLocation);
-    this.gl.vertexAttribPointer(this.positionLocation, 2, this.gl.FLOAT, false, 0, 0);
-
-    // Set uniforms
-    this.gl.uniform2f(this.resolutionLocation, 1, this.canvasHeight);
-
-    this.gl.uniform1f(this.bgMultiplierLocation, this.getBgMultiplier());
-
-    peaks.forEach((peak, channel) => {
-      this.drawVolmeterChannelWebgl(peak, channel);
-    });
-  }
-
-  private drawVolmeterChannelWebgl(peak: number, channel: number) {
-    this.updatePeakHold(peak, channel);
-
-    this.gl.uniform2f(this.scaleLocation, 1, CHANNEL_HEIGHT);
-    this.gl.uniform2f(this.translationLocation, 0, channel * (CHANNEL_HEIGHT + PADDING_HEIGHT));
-    this.gl.uniform1f(this.volumeLocation, this.dbToUnitScalar(peak));
-
-    // X component is the location of peak hold from 0 to 1
-    // Y component is width of the peak hold from 0 to 1
-    this.gl.uniform2f(
-      this.peakHoldLocation,
-      this.dbToUnitScalar(this.peakHolds[channel]),
-      PEAK_WIDTH / this.canvasWidth,
-    );
-
-    this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
-  }
-
   private drawVolmeterC2d(peaks: number[]) {
     if (this.canvasWidth < 0 || this.canvasHeight < 0) return;
 
-    const bg = this.customizationService.themeBackground;
+    const bg = this.customizationService.sectionBackground;
     this.ctx.fillStyle = this.rgbToCss([bg.r, bg.g, bg.b]);
     this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
 
@@ -360,10 +244,6 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
     );
   }
 
-  private dbToUnitScalar(db: number) {
-    return Math.max((db + 60) * (1 / 60), 0);
-  }
-
   private dbToPx(db: number) {
     return Math.round((db + 60) * (this.canvasWidth / 60));
   }
@@ -401,15 +281,10 @@ export default class MixerVolmeter extends TsxComponent<MixerVolmeterProps> {
         this.initRenderingContext();
         this.setChannelCount(volmeter.peak.length);
 
-        // don't render sources then channelsCount is 0
-        // happens when the browser source stops playing audio
-        if (!volmeter.peak.length) return;
-
-        if (this.gl) {
-          this.drawVolmeterWebgl(volmeter.peak);
-        } else {
-          this.drawVolmeterC2d(volmeter.peak);
-        }
+        // save peaks value to render it in the next animationFrame
+        this.prevPeaks = this.interpolatedPeaks;
+        this.currentPeaks = Array.from(volmeter.peak);
+        this.lastEventTime = performance.now();
       }
     };
 

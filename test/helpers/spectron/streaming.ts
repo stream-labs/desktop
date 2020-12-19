@@ -96,16 +96,16 @@ export async function scheduleStream(
   const app = t.context.app;
   await focusMain(t);
   await click(t, 'button .icon-date');
-  await focusChild(t);
 
-  // wait fields to be shown
-  await app.client.waitForVisible('[data-name=title]');
+  // wait for the calendar loading
+  await app.client.waitForExist('div.s-spinner', 30000, true);
 
-  await fillForm(t, null, {
-    ...channelInfo,
-    date: moment(date).format('MM/DD/YYYY'),
-  });
-  await click(t, 'button=Done');
+  // click to the day
+  const day = new Date(date).getDate();
+  await click(t, `.day-${day}`);
+
+  await fillForm(t, null, channelInfo);
+  await click(t, 'button=Schedule');
 
   // the success message should be shown
   await app.client.waitForVisible('.toast-success', 20000);

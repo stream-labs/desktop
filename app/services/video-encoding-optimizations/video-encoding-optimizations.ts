@@ -152,8 +152,8 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
 
   applyProfile(encoderProfile: IEncoderProfile) {
     this.previousSettings = {
-      output: cloneDeep(this.settingsService.getSettingsFormData('Output')),
-      video: cloneDeep(this.settingsService.getSettingsFormData('Video')),
+      output: cloneDeep(this.settingsService.state.Output),
+      video: cloneDeep(this.settingsService.state.Video),
     };
     this.SAVE_LAST_SELECTED_PROFILE(encoderProfile);
     const currentSettings = this.outputSettingsService.getSettings();

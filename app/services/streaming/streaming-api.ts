@@ -40,6 +40,7 @@ export interface IStreamInfo {
     | 'live'; // stream has been successfully started
   error: IStreamError | null;
   warning: 'YT_AUTO_START_IS_DISABLED' | '';
+  settings: IGoLiveSettings | null; // settings for the current attempt of going live
   checklist: {
     applyOptimizedSettings: TGoLiveChecklistItemState;
     twitch: TGoLiveChecklistItemState;

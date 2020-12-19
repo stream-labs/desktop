@@ -58,11 +58,13 @@ export default class EditStreamWindow extends TsxComponent<{}> {
   private async submit() {
     if (!(await this.$refs.form.validate())) return;
     await this.streamingService.actions.return.updateStreamSettings(this.settings);
-    this.$toasted.success($t('Successfully updated'), {
-      position: 'bottom-center',
-      duration: 1000,
-      singleton: true,
-    });
+    if (!this.view.info.error) {
+      this.$toasted.success($t('Successfully updated'), {
+        position: 'bottom-center',
+        duration: 1000,
+        singleton: true,
+      });
+    }
   }
 
   private goBack() {
@@ -85,7 +87,7 @@ export default class EditStreamWindow extends TsxComponent<{}> {
     return (
       <ModalLayout customControls={true} showControls={false}>
         <ValidatedForm ref="form" slot="content" name="editStreamForm">
-          {shouldShowSettings && <PlatformSettings vModel={this.settings} />}
+          {shouldShowSettings && <PlatformSettings vModel={this.settings} isUpdateMode={true} />}
           {shouldShowChecklist && <GoLiveChecklist isUpdateMode={true} />}
         </ValidatedForm>
         <div slot="controls">{this.renderControls()}</div>

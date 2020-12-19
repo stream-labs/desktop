@@ -148,7 +148,7 @@ export interface IPlatformService {
 
   prepopulateInfo: () => Promise<unknown>;
 
-  scheduleStream?: (startTime: string, info: TStartStreamOptions) => Promise<any>;
+  scheduleStream?: (startTime: number, info: TStartStreamOptions) => Promise<any>;
 
   fetchNewToken: () => Promise<void>;
 

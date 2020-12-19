@@ -34,7 +34,12 @@ import { CustomizationService } from 'services/customization';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService } from 'services/restream';
-import { FacebookService, IFacebookLiveVideo } from 'services/platforms/facebook';
+import {
+  FacebookService,
+  IFacebookLiveVideo,
+  IFacebookLiveVideoExtended,
+  TDestinationType,
+} from 'services/platforms/facebook';
 import Utils from 'services/utils';
 import { cloneDeep, isEqual } from 'lodash';
 import { createStreamError, StreamError, TStreamErrorType } from './stream-error';
@@ -76,6 +81,13 @@ export interface IStreamEvent {
   status: 'completed' | 'scheduled';
   title: string;
   date: number;
+  /**
+   * We need additional fields for FB
+   */
+  facebook?: {
+    destinationType: TDestinationType;
+    destinationId: string;
+  };
 }
 
 export class StreamingService extends StatefulService<IStreamingServiceState>
@@ -119,6 +131,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     replayBufferStatusTime: new Date().toISOString(),
     selectiveRecording: false,
     info: {
+      settings: null,
       lifecycle: 'empty',
       error: null,
       warning: '',
@@ -150,7 +163,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       },
       val => {
         // show the error if child window is closed
-        if (val.info.error && !this.windowsService.state.child.isShown) {
+        if (
+          val.info.error &&
+          !this.windowsService.state.child.isShown &&
+          this.streamSettingsService.protectedModeEnabled
+        ) {
           this.showGoLiveWindow();
         }
         this.streamInfoChanged.next(val);
@@ -178,7 +195,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const event =
       platform === 'youtube'
         ? this.convertYTBroadcastToEvent(scheduledLiveStream as IYoutubeLiveBroadcast)
-        : this.convertFBLiveVideoToEvent(scheduledLiveStream as IFacebookLiveVideo);
+        : this.convertFBLiveVideoToEvent(scheduledLiveStream as IFacebookLiveVideoExtended);
 
     this.REMOVE_STREAM_EVENT(event.id);
     this.SET_STREAM_EVENTS(true, [...this.state.streamEvents, event]);
@@ -266,6 +283,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     // save enabled platforms to reuse setting with the next app start
     this.streamSettingsService.setSettings({ goLiveSettings: settings });
 
+    // save current settings in store so we can re-use them if something will go wrong
+    this.SET_GO_LIVE_SETTINGS(settings);
+
     // show the GoLive checklist
     this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist' });
 
@@ -274,7 +294,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     for (const platform of platforms) {
       const service = getPlatformService(platform);
       try {
-        // don't update settigns for twitch in unattendedMode
+        // don't update settings for twitch in unattendedMode
         const settingsForPlatform = platform === 'twitch' && unattendedMode ? undefined : settings;
         await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform));
       } catch (e) {
@@ -407,6 +427,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   async updateStreamSettings(settings: IGoLiveSettings) {
     const lifecycle = this.state.info.lifecycle;
 
+    // save current settings in store so we can re-use them if something will go wrong
+    this.SET_GO_LIVE_SETTINGS(settings);
+
     // run checklist
     this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist' });
 
@@ -434,7 +457,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         await this.runCheck(platform, () => service.putChannelInfo(newSettings));
       } catch (e) {
         console.error(e);
-        this.setError('SETTINGS_UPDATE_FAILED', e.details, platform);
+        // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
+        const errorType =
+          (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
+            ? 'SETTINGS_UPDATE_FAILED'
+            : e.type || 'UNKNOWN_ERROR';
+        this.setError(errorType, e.details, platform);
         return;
       }
     }
@@ -448,7 +476,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   /**
    * Schedule stream for eligible platforms
    */
-  async scheduleStream(settings: IStreamSettings, time: string) {
+  async scheduleStream(settings: IStreamSettings, time: number) {
     const destinations = settings.platforms;
     const platforms = (Object.keys(destinations) as TPlatform[]).filter(
       dest => destinations[dest].enabled && this.views.supports('stream-schedule', [dest]),
@@ -515,6 +543,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     if (this.state.info.checklist.startVideoTransmission === 'done') {
       this.UPDATE_STREAM_INFO({ lifecycle: 'live' });
     }
+  }
+
+  resetStreamInfo() {
+    this.RESET_STREAM_INFO();
   }
 
   @mutation()
@@ -1067,12 +1099,14 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         .catch(() => {
           this.outputErrorOpen = false;
         });
+      this.windowsService.actions.closeChildWindow();
     }
   }
 
   async loadStreamEvents() {
     // load fb and yt events simultaneously
     this.SET_STREAM_EVENTS(false);
+    await this.prepopulateInfo();
     const events: IStreamEvent[] = [];
     const [fbEvents, ytEvents] = await Promise.all([this.loadFbEvents(), this.loadYTBEvents()]);
 
@@ -1100,23 +1134,27 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     };
   }
 
-  private convertFBLiveVideoToEvent(fbLiveVideo: IFacebookLiveVideo): IStreamEvent {
+  private convertFBLiveVideoToEvent(fbLiveVideo: IFacebookLiveVideoExtended): IStreamEvent {
     return {
       platform: 'facebook',
       id: fbLiveVideo.id,
       date: new Date(fbLiveVideo.planned_start_time || fbLiveVideo.broadcast_start_time).valueOf(),
       title: fbLiveVideo.title,
       status: 'scheduled',
+      facebook: {
+        destinationType: fbLiveVideo.destinationType,
+        destinationId: fbLiveVideo.destinationId,
+      },
     };
   }
 
   private async loadYTBEvents() {
-    if (!this.views.isPlatformLinked('youtube')) return;
+    if (!this.views.isPlatformLinked('youtube')) return [];
     return await this.youtubeService.fetchBroadcasts();
   }
 
   private async loadFbEvents() {
-    if (!this.views.isPlatformLinked('facebook')) return;
+    if (!this.views.isPlatformLinked('facebook')) return [];
     return await this.facebookService.fetchAllVideos();
   }
 
@@ -1179,5 +1217,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const ind = this.state.streamEvents.findIndex(ev => ev.id === eventId);
     if (ind === -1) return;
     Vue.delete(this.state.streamEvents, ind);
+  }
+
+  @mutation()
+  private SET_GO_LIVE_SETTINGS(settings: IGoLiveSettings) {
+    this.state.info.settings = settings;
   }
 }

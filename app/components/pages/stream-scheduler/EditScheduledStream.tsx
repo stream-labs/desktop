@@ -8,7 +8,7 @@ import { formMetadata, metadata } from 'components/shared/inputs';
 import { SettingsService } from 'services/settings';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { WindowsService } from 'services/windows';
-import { IStreamSettings, StreamingService } from 'services/streaming';
+import { IStreamEvent, IStreamSettings, StreamingService } from 'services/streaming';
 import { Spinner } from 'streamlabs-beaker';
 import cloneDeep from 'lodash/cloneDeep';
 import { StreamSettingsService } from 'services/settings/streaming';
@@ -16,18 +16,24 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import PlatformSettings from 'components/windows/go-live/PlatformSettings';
 import { getPlatformService, TPlatform } from 'services/platforms';
 import cx from 'classnames';
-import { IYoutubeLiveBroadcast, YoutubeService } from 'services/platforms/youtube';
+import { YoutubeService } from 'services/platforms/youtube';
 import { FacebookService, IFacebookLiveVideo } from 'services/platforms/facebook';
-import styles from './ScheduledStreamEditor.m.less';
+import styles from './EditScheduledStream.m.less';
+import { assertIsDefined } from 'util/properties-type-guards';
 
 class Props {
-  id?: string = '';
-  date: number = 0;
-  platform?: TPlatform | '' = '';
+  /**
+   * if the date provided then component works in the "Create" mode
+   */
+  date?: number = 0;
+  /**
+   * if the event provided then component works in the "Update" mode
+   */
+  event?: IStreamEvent | null = null;
 }
 
 @Component({ props: createProps(Props) })
-export default class ScheduledStreamEditor extends TsxComponent<Props> {
+export default class EditScheduledStream extends TsxComponent<Props> {
   @Inject() private userService: UserService;
   @Inject() private settingsService: SettingsService;
   @Inject() private streamingService: StreamingService;
@@ -43,7 +49,7 @@ export default class ScheduledStreamEditor extends TsxComponent<Props> {
   private selectedPlatform: TPlatform = 'youtube';
 
   private get isUpdateMode(): boolean {
-    return !!this.props.id;
+    return !!this.props.event;
   }
 
   private get view() {
@@ -60,7 +66,7 @@ export default class ScheduledStreamEditor extends TsxComponent<Props> {
   private isLoading = false;
 
   created() {
-    this.selectedPlatform = (this.props.platform || this.platforms[0]) as TPlatform;
+    this.selectedPlatform = (this.props.event?.platform || this.platforms[0]) as TPlatform;
     this.updateSettings();
   }
 
@@ -69,12 +75,12 @@ export default class ScheduledStreamEditor extends TsxComponent<Props> {
     // use goLive settings for schedule
     this.settings = cloneDeep(this.view.goLiveSettings);
 
-    // delete not-selected platforms
+    // clear not-selected platforms
     this.view.linkedPlatforms.forEach(p => {
       if (p !== this.selectedPlatform) {
         delete this.settings.platforms[p];
       } else {
-        this.settings.platforms[p].enabled = true;
+        this.$set(this.settings.platforms[p], 'enabled', true);
       }
     });
 
@@ -86,12 +92,26 @@ export default class ScheduledStreamEditor extends TsxComponent<Props> {
         this.settings.platforms.youtube = {
           ...this.settings.platforms.youtube,
           ...(await this.youtubeService.actions.return.fetchStartStreamOptionsForBroadcast(
-            this.props.id,
+            this.props.event.id,
           )),
         };
       } else {
-        // this.fbVideo = await this.facebookService.fetchV
+        // it's a facebook event
+        assertIsDefined(this.props.event.facebook);
+        const { destinationType, destinationId } = this.props.event.facebook;
+        this.settings.platforms.facebook = {
+          ...this.settings.platforms.facebook,
+          ...(await this.facebookService.actions.return.fetchStartStreamOptionsForVideo(
+            this.props.event.id,
+            destinationType,
+            destinationId,
+          )),
+        };
       }
+      // setup the time input
+      const date = new Date(this.props.event.date);
+      const seconds = date.getHours() * 60 * 60 + date.getMinutes() * 60;
+      this.startTimeModel.time = seconds;
     }
   }
 
@@ -103,20 +123,27 @@ export default class ScheduledStreamEditor extends TsxComponent<Props> {
     if (!(await this.$refs.form.validate())) return;
 
     // take the date without hours and minutes
-    const startDate = new Date(this.props.date).setHours(0, 0, 0, 0);
+    const startDate = new Date(this.props.date || this.props.event.date).setHours(0, 0, 0, 0);
 
-    // convert date to ISO string format
-    const scheduledStartTime = new Date(startDate + this.startTimeModel.time * 1000).toISOString();
+    // add hours and minutes
+    const scheduledStartTime = new Date(startDate + this.startTimeModel.time * 1000).valueOf();
 
     try {
       this.isLoading = true;
       await this.streamingService.actions.return.scheduleStream(this.settings, scheduledStartTime);
+      this.$toasted.show($t('Stream scheduled'), {
+        position: 'bottom-center',
+        duration: 3000,
+        className: 'toast-success',
+        singleton: true,
+      });
       this.close();
     } catch (e) {
-      this.$toasted.show(e.details, {
+      const msg = e.details || e.message;
+      this.$toasted.show(msg, {
         position: 'bottom-center',
         className: 'toast-alert',
-        duration: 50 * e.details.length,
+        duration: 50 * msg.length,
         singleton: true,
       });
     } finally {
@@ -129,7 +156,8 @@ export default class ScheduledStreamEditor extends TsxComponent<Props> {
   }
 
   private remove() {
-    const id = this.props.id;
+    assertIsDefined(this.props.event);
+    const id = this.props.event.id;
     if (this.selectedPlatform === 'youtube') {
       this.youtubeService.actions.removeBroadcast(id);
     } else {
@@ -164,10 +192,15 @@ export default class ScheduledStreamEditor extends TsxComponent<Props> {
       <ModalLayout customControls={true} showControls={false} class={styles.dialog}>
         <ValidatedForm ref="form" slot="content" name="editStreamForm" class="flex">
           <div style={{ width: '100%' }}>
+            <h1>{this.isUpdateMode ? $t('Update scheduled event') : $t('Schedule new stream')}</h1>
             {shouldShowSettings && (
               <div>
                 <HFormGroup metadata={this.formMetadata.platform} vModel={this.selectedPlatform} />
-                <PlatformSettings vModel={this.settings} isScheduleMode={true} />
+                <PlatformSettings
+                  vModel={this.settings}
+                  isScheduleMode={true}
+                  isUpdateMode={this.isUpdateMode}
+                />
                 <HFormGroup metadata={this.formMetadata.time} vModel={this.startTimeModel.time} />
               </div>
             )}
@@ -186,30 +219,34 @@ export default class ScheduledStreamEditor extends TsxComponent<Props> {
 
     return (
       <div class="controls" style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        {/* CANCEL BUTTON */}
-        <button class={cx('button button--default')} onclick={() => this.close()}>
-          {$t('Cancel')}
-        </button>
+        {!this.isLoading && (
+          <div>
+            {/* DELETE BUTTON */}
+            {shouldShowDeleteButton && (
+              <button class={cx('button button--warn')} onClick={() => this.remove()}>
+                {$t('Delete')}
+              </button>
+            )}
 
-        {/* DELETE BUTTON */}
-        {shouldShowDeleteButton && (
-          <button class={cx('button button--warn')} onClick={() => this.remove()}>
-            {$t('Delete')}
-          </button>
-        )}
+            {/* CANCEL BUTTON */}
+            <button class={cx('button button--default')} onclick={() => this.close()}>
+              {$t('Cancel')}
+            </button>
 
-        {/* SCHEDULE BUTTON */}
-        {shouldShowScheduleButton && (
-          <button class={cx('button button--action')} onClick={() => this.save()}>
-            {$t('Schedule')}
-          </button>
-        )}
+            {/* SCHEDULE BUTTON */}
+            {shouldShowScheduleButton && (
+              <button class={cx('button button--action')} onClick={() => this.save()}>
+                {$t('Schedule')}
+              </button>
+            )}
 
-        {/* UPDATE BUTTON */}
-        {shouldShowUpdateButton && (
-          <button class={cx('button button--action')} onClick={() => this.save()}>
-            {$t('Save')}
-          </button>
+            {/* UPDATE BUTTON */}
+            {shouldShowUpdateButton && (
+              <button class={cx('button button--action')} onClick={() => this.save()}>
+                {$t('Save')}
+              </button>
+            )}
+          </div>
         )}
       </div>
     );

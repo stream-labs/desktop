@@ -10,9 +10,9 @@ import { IYoutubeLiveBroadcast, YoutubeService } from 'services/platforms/youtub
 import { FacebookService, IFacebookLiveVideo } from 'services/platforms/facebook';
 import { StreamingService, WindowsService } from 'app-services';
 import { Spinner } from 'streamlabs-beaker';
-import ScheduledStreamEditor from './ScheduledStreamEditor';
+import EditScheduledStream from './EditScheduledStream';
 import cx from 'classnames';
-import { IStreamEvent } from '../../../services/streaming';
+import { IStreamEvent } from 'services/streaming';
 
 interface IDay {
   day: number;
@@ -69,30 +69,37 @@ export default class StreamScheduler extends TsxComponent {
   }
 
   private showScheduleNewDialog(date: number) {
-    WindowsService.showModalDialog(this, () => <ScheduledStreamEditor date={date} />);
+    const today = new Date().setHours(0, 0, 0, 0);
+    const isPastDate = new Date(date).getTime() < today;
+    if (isPastDate) {
+      WindowsService.showMessageBox(this, () => $t('You can not schedule to this date'));
+    } else {
+      WindowsService.showModalDialog(this, () => <EditScheduledStream date={date} />);
+    }
   }
 
   private showUpdateDialog(event?: IStreamEvent) {
-    WindowsService.showModalDialog(this, () => (
-      <ScheduledStreamEditor id={event.id} platform={event.platform} date={event.date} />
-    ));
+    WindowsService.showModalDialog(this, () => <EditScheduledStream event={event} />);
   }
 
   private renderDay(day: IDay, attributes: IAttribute[]) {
-    // show maximum 3 events per day for now TODO:
+    // show maximum 3 events per day for now:
     attributes = attributes?.slice(0, 3);
     return (
-      <div class={css.daySlot} onClick={() => this.showScheduleNewDialog(day.date.valueOf())}>
+      <div
+        class={{ [css.daySlot]: true }}
+        onClick={() => this.showScheduleNewDialog(day.date.valueOf())}
+      >
         <span class={css.dayLabel}>{day.day}</span>
         <transition-group name="fade">
-          {attributes?.map((attr: any) => this.renderEvent(attr.customData, day.date))}
+          {attributes?.map((attr: any) => this.renderEvent(attr.customData))}
         </transition-group>
       </div>
     );
   }
 
-  private renderEvent(event: IStreamEvent, date: Date) {
-    const time = moment(date).format('hh:ssa');
+  private renderEvent(event: IStreamEvent) {
+    const time = moment(event.date).format('hh:ssa');
     return (
       <p
         key={event.id}
