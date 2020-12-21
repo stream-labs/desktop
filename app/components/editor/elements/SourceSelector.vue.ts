@@ -26,6 +26,7 @@ const widgetIconMap = {
   [WidgetType.Credits]: 'fas fa-align-center',
   [WidgetType.SponsorBanner]: 'fas fa-heart',
   [WidgetType.DonationGoal]: 'fas fa-calendar',
+  [WidgetType.CharityGoal]: 'fas fa-calendar',
   [WidgetType.BitGoal]: 'fas fa-calendar',
   [WidgetType.FollowerGoal]: 'fas fa-calendar',
   [WidgetType.SubGoal]: 'fas fa-calendar',
