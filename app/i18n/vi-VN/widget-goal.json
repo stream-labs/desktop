@@ -8,11 +8,11 @@
   "Starting Amount": "Mức bắt đầu",
   "End After": "Kết thúc sau",
   "Include resubs?": "Include resubs?",
-  "Layout": "Layout",
-  "Background Color": "Background Color",
+  "Layout": "Sắp đặt",
+  "Background Color": "Màu nền",
   "Bar Color": "Màu thanh",
   "Bar Background Color": "Màu nền thanh",
-  "Text Color": "Text Color",
+  "Text Color": "Màu text",
   "Bar Text Color": "Màu thanh text",
   "Bar Thickness": "Độ dày thanh",
   "Font Family": "Font Family",
@@ -21,5 +21,7 @@
   "Supporter Goal": "Supporter Goal",
   "Facebook Supporters": "Facebook Supporters",
   "Facebook chat": "Facebook chat",
-  "Member Goal": "Member Goal"
+  "Member Goal": "Member Goal",
+  "Streamlabs Charity Goal": "Streamlabs Charity Goal",
+  "Streamlabs Charity Donations": "Streamlabs Charity Donations"
 }
