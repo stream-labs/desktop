@@ -8,8 +8,8 @@ interface IBaseGoalData extends IWidgetData {
 
 interface IGoalWidgetApiSettings extends IWidgetApiSettings {
   goalUrl: string;
-  goalCreateEvent: string;
-  goalResetEvent: string;
+  goalCreateEvent?: string;
+  goalResetEvent?: string;
 }
 
 @InheritMutations()
