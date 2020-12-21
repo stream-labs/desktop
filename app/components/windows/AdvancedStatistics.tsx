@@ -7,16 +7,10 @@ import styles from './AdvancedStatistics.m.less';
 import ModalLayout from 'components/ModalLayout.vue';
 import PerformanceMetrics from '../PerformanceMetrics.vue';
 import { StreamingService, EStreamingState } from 'services/streaming';
-import GlobalSyncStatus from 'components/GlobalSyncStatus.vue';
 import moment from 'moment';
 import { Subscription } from 'rxjs';
 import { PerformanceService, EStreamQuality } from 'services/performance';
-import {
-  ENotificationType,
-  ENotificationSubType,
-  NotificationsService,
-  INotification,
-} from 'services/notifications';
+import { ENotificationSubType, NotificationsService, INotification } from 'services/notifications';
 import Scrollable from 'components/shared/Scrollable';
 
 @Component({})
@@ -197,7 +191,6 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
             <p>{$t('Click on a stat to add it to your footer')}</p>
             <div class={styles.statsRow}>
               <PerformanceMetrics mode="full" />
-              <GlobalSyncStatus />
             </div>
           </div>
           {this.notificationsArea()}
