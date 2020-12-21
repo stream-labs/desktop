@@ -60,7 +60,9 @@ export default class AdvancedAudio extends Vue {
 
             {this.audioSources.map(audioSource => (
               <tr key={audioSource.name} name={audioSource.name} class={styles.audioSettingsRow}>
-                <td class={styles.audioSourceName}>{audioSource.name}</td>
+                <td class={styles.nameCell}>
+                  <div class={styles.audioSourceName}>{audioSource.name}</div>
+                </td>
                 {audioSource.getSettingsForm().map(formInput => {
                   const Component = propertyComponentForType(formInput.type);
                   return (
