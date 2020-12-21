@@ -9,10 +9,10 @@
   "End After": "End After",
   "Include resubs?": "Include resubs?",
   "Layout": "Layout",
-  "Background Color": "Background Color",
+  "Background Color": "Farba pozadia",
   "Bar Color": "Bar Color",
   "Bar Background Color": "Bar Background Color",
-  "Text Color": "Text Color",
+  "Text Color": "Farba textu",
   "Bar Text Color": "Bar Text Color",
   "Bar Thickness": "Bar Thickness",
   "Font Family": "Font Family",
@@ -21,5 +21,7 @@
   "Supporter Goal": "Supporter Goal",
   "Facebook Supporters": "Facebook Supporters",
   "Facebook chat": "Facebook chat",
-  "Member Goal": "Member Goal"
+  "Member Goal": "Member Goal",
+  "Streamlabs Charity Goal": "Streamlabs Charity Goal",
+  "Streamlabs Charity Donations": "Streamlabs Charity Donations"
 }
