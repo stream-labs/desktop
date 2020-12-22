@@ -125,7 +125,7 @@ export default class EditTransform extends TsxComponent<{}> {
             <div style="margin-right: 8px;">
               <NumberInput
                 value={Math.round(this.rect[dir])}
-                metadata={{ isInteger: true, min: type === 'pos' ? null : 1 }}
+                metadata={{ isInteger: true }}
                 onInput={inputHandler(dir)}
               />
             </div>
