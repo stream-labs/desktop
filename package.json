@@ -4,7 +4,7 @@
   "author": "DWANGO Co.,Ltd.",
   "license": "GPL-3.0",
   "//": {
-    "version": "0.9.3-preview.3"
+    "version": "0.11.2"
   },
   "version": "1.0.20200909-unstable.1",
   "main": "main.js",
@@ -73,9 +73,10 @@
     "lodash": "^4.17.4",
     "lodash-decorators": "^4.3.1",
     "moment": "^2.17.1",
-    "node-fontinfo": "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.5/iojs-v2.0.5-node-fontinfo.tar.gz",
-    "node-libuiohook": "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.2/iojs-v2.0.5-node-libuiohook.tar.gz",
-    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.23/iojs-v2.0.8-signed.tar.gz",
+    "font-manager": "https://github.com/stream-labs/font-manager/releases/download/v1.0.4/iojs-v2.0.8-font-manager.tar.gz",
+    "node-fontinfo": "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.7/iojs-v2.0.8-node-fontinfo.tar.gz",
+    "node-libuiohook": "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.6/iojs-v2.0.5-node-libuiohook.tar.gz",
+    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.43/iojs-v2.0.8-signed.tar.gz",
     "progress": "^2.0.0",
     "raven-js": "^3.20.1",
     "recursive-readdir": "^2.2.2",
