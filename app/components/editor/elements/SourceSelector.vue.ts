@@ -144,7 +144,7 @@ export default class SourceSelector extends TsxComponent {
         .getSource(sourceId)
         .getPropertiesManagerSettings().widgetType;
 
-      return widgetIconMap[widgetType];
+      return widgetIconMap[widgetType] || 'icon-error';
     }
 
     return sourceIconMap[source.type] || 'fas fa-file';
