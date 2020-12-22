@@ -15,6 +15,7 @@ import os = require('os');
 import { logIn } from '../helpers/spectron/user';
 import { SceneCollectionsService } from 'services/api/external-api/scene-collections';
 import { ScenesService } from '../../app/services/api/external-api/scenes';
+import { MediaBackupService } from 'app-services';
 
 useSpectron({ noSync: false });
 
@@ -56,6 +57,8 @@ test('Media backup', async t => {
     const image2Filename = 'sun.png';
     const image1Path = path.resolve(tmpDir, image1Filename);
     const image2Path = path.resolve(tmpDir, image2Filename);
+    const mediaBackupService = api.getResource<MediaBackupService>('MediaBackupService');
+    const watcher = api.watchForEvents(['MediaBackupService.mediaBackupCompleted']);
 
     // simply create the first image
     const item1 = scene.createAndAddSource('image', 'image_source', {
@@ -70,9 +73,7 @@ test('Media backup', async t => {
 
     // media-backup sync should be started
     // wait for the sync-succeed icon
-    await t.context.app.client.click('.metrics-icon');
-    await focusChild(t);
-    await t.context.app.client.waitForVisible('.icon-cloud-backup-2');
+    await watcher.waitForAll();
 
     // restart app and delete local images
     await stopApp(t, false);

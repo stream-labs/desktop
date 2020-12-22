@@ -1,5 +1,6 @@
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import path from 'path';
+import { Subject } from 'rxjs';
 import fs from 'fs';
 import { Inject } from 'services/core/injector';
 import { HostsService } from 'services/hosts';
@@ -49,6 +50,8 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
   @Inject() appService: AppService;
 
   static initialState: IMediaBackupState = { files: [] };
+
+  mediaBackupCompleted = new Subject<boolean>();
 
   /**
    * Gets a string suitable to act as a local file id
@@ -145,6 +148,8 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
       file.serverId = data.id;
       file.status = EMediaFileStatus.Synced;
       this.UPDATE_FILE(localId, file);
+
+      if (this.globalSyncStatus === EGlobalSyncStatus.Synced) this.mediaBackupCompleted.next(true);
       return file;
     }
 
@@ -211,6 +216,10 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
             file.filePath = fileToCheck;
             file.status = EMediaFileStatus.Synced;
             this.UPDATE_FILE(localId, file);
+
+            if (this.globalSyncStatus === EGlobalSyncStatus.Synced) {
+              this.mediaBackupCompleted.next(true);
+            }
             return file;
           }
         }
@@ -243,6 +252,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
       file.filePath = downloadedPath;
       this.UPDATE_FILE(localId, file);
 
+      if (this.globalSyncStatus === EGlobalSyncStatus.Synced) this.mediaBackupCompleted.next(true);
       return file;
     }
   }
