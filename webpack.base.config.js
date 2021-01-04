@@ -53,6 +53,7 @@ module.exports = {
     renderer: './app/app.ts',
     updater: './updater/mac/ui.js',
     'guest-api': './guest-api',
+    // 'react-components': './app/components-react/index.ts',
   },
 
   output: {
@@ -109,11 +110,10 @@ module.exports = {
       },
       {
         test: /\.ts$/,
-        exclude: /node_modules/,
+        exclude: [path.resolve(__dirname, 'node_modules'), path.resolve(__dirname, 'app', 'components-react')],
         use: {
           loader: 'ts-loader',
           options: {
-            reportFiles: tsFiles,
             compilerOptions: {
               strictNullChecks: !!process.env.SLOBS_STRICT_NULLS,
             },
@@ -121,7 +121,10 @@ module.exports = {
         },
       },
       {
-        test: /\.tsx$/,
+        test: path => {
+          const match = !!path.match(/components\\.+\.tsx$/);
+          return match;
+        },
         include: path.resolve(__dirname, 'app/components'),
         use: [
           'babel-loader',
@@ -131,6 +134,28 @@ module.exports = {
               reportFiles: tsxFiles,
               compilerOptions: {
                 strictNullChecks: !!process.env.SLOBS_STRICT_NULLS,
+              },
+            },
+          },
+        ],
+      },
+      {
+        test: path => {
+          const match = !!path.match(/react\\.+\.tsx?$/);
+          if (match) console.log('test ', path, 'match', match);
+          return match;
+        },
+        include: path.resolve(__dirname, 'app/components-react'),
+        use: [
+          'babel-loader',
+          {
+            loader: 'ts-loader',
+            options: {
+              reportFiles: ['app/components-react/**/*'],
+              configFile: 'app/components-react/tsconfig.json',
+              instance: 'react-tsx',
+              compilerOptions: {
+                jsx: 'react',
               },
             },
           },

@@ -8,6 +8,7 @@
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && yarn compile:updater && yarn webpack-cli --progress --config ./webpack.dev.config.js",
+    "compile:stats": "yarn clear && yarn compile:updater && yarn webpack-cli --profile --json --config ./webpack.dev.config.js > stats.json",
     "compile:production": "yarn clear && yarn compile:updater && yarn webpack-cli --progress --config ./webpack.prod.config.js",
     "compile:updater": "rimraf updater/build && tsc -p updater",
     "compile:strictnulls": "yarn clear && yarn compile:updater && cross-env SLOBS_STRICT_NULLS=true yarn webpack-cli --config ./webpack.dev.config.js",
@@ -15,7 +16,7 @@
     "webpack-cli": "node --max-old-space-size=4096 node_modules/webpack-cli/bin/cli.js",
     "watch": "yarn clear && yarn compile:updater && yarn webpack-cli --watch --progress --config ./webpack.dev.config.js",
     "watch:strictnulls": "yarn clear && yarn compile:updater && cross-env SLOBS_STRICT_NULLS=true yarn webpack-cli --watch --progress --config ./webpack.dev.config.js",
-    "watch:app": "yarn clear && yarn webpack-cli --watch --progress --config ./webpack.dev-app.config.js",
+    "watch:app": "yarn clear && yarn webpack-cli --watch --progress --config  ./webpack.dev-app.config.js",
     "start": "electron .",
     "clear-plugins": "rimraf plugins",
     "package": "yarn generate-agreement && rimraf dist && electron-builder build -w --x64 --config electron-builder/base.config.js",
@@ -62,6 +63,7 @@
   },
   "dependencies": {
     "@types/node-fetch": "^2.5.5",
+    "@types/react": "^17.0.0",
     "archiver": "2.1.1",
     "aws-sdk": "^2.344.0",
     "color-picker": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/color-picker-0.0.0.tar.gz",
@@ -79,6 +81,8 @@
     "node-window-rendering": "https://slobs-node-window-rendering.s3-us-west-2.amazonaws.com/node-window-rendering-0.0.0.tar.gz",
     "obs-studio-node": "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/osn-0.0.0-release.tar.gz",
     "raven": "^2.6.4",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
     "request": "^2.88.0",
     "rimraf": "^2.6.1",
     "semver": "^5.5.1",

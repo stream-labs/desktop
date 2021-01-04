@@ -1,5 +1,4 @@
 /*global SLOBS_BUNDLE_ID*/
-
 import { I18nService, $t } from 'services/i18n';
 
 // eslint-disable-next-line

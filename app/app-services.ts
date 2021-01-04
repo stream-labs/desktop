@@ -8,7 +8,7 @@ export { InternalApiService } from 'services/api/internal-api';
 export { ExternalApiService } from 'services/api/external-api';
 export { ExternalApiLimitsService } from 'services/api/external-api-limits';
 export { SourcesService, Source } from 'services/sources';
-export { Scene, SceneItem, SceneItemFolder, SceneItemNode, ScenesService } from 'services/scenes';
+export { Scene, SceneItem, SceneItemFolder, ScenesService } from 'services/scenes';
 export { ObsImporterService } from 'services/obs-importer';
 export { ClipboardService } from 'services/clipboard';
 export { AudioService, AudioSource } from 'services/audio';
@@ -56,7 +56,6 @@ export { MetricsService } from 'services/metrics';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';
-export { BasePlatformService } from 'services/platforms/base-platform';
 export { YoutubeService } from 'services/platforms/youtube';
 export { TwitchService } from 'services/platforms/twitch';
 export { MixerService } from 'services/platforms/mixer';
