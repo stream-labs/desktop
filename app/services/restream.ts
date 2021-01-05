@@ -315,10 +315,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
     if (changed.chatZoomFactor) {
       this.chatView.webContents.setZoomFactor(changed.chatZoomFactor);
     }
-
-    if (changed.enableBTTVEmotes != null || changed.enableFFZEmotes != null) {
-      this.refreshChat();
-    }
   }
 }
 
