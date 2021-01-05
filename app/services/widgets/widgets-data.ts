@@ -39,7 +39,7 @@ export const WidgetTesters: IWidgetTester[] = [
     url(host, platform) {
       return `https://${host}/api/v5/slobs/test/${platform}_account/follow`;
     },
-    platforms: ['twitch', 'mixer'],
+    platforms: ['twitch', 'mixer', 'facebook'],
   },
   {
     name: 'Subscriber',
