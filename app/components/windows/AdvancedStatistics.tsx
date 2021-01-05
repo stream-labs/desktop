@@ -145,6 +145,7 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
           {this.notifications.map(notification => (
             <div
               class={cx(styles.notification, styles.hasAction)}
+              name="notification"
               onClick={() => {
                 this.onNotificationClickHandler(notification.id);
               }}

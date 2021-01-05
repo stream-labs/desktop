@@ -12,9 +12,9 @@ test('Troubleshooter notifications', async t => {
   await t.context.app.client.click('.metrics-icon');
   await focusChild(t);
 
-  t.false(await app.client.isExisting('.notification.warning'));
+  t.false(await app.client.isExisting('div[name=notification]'));
 
   performanceMonitor.pushLaggedFramesNotify(0.5);
 
-  t.true(await app.client.isExisting('.notification.warning'));
+  t.true(await app.client.isExisting('div[name=notification]'));
 });
