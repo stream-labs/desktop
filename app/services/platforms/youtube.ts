@@ -694,9 +694,3 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     this.state.categories = categories;
   }
 }
-
-export class YoutubeView extends ViewHandler<IYoutubeServiceState> {
-  getThumbnailUploadUrl(videoId: string) {
-    return;
-  }
-}
