@@ -29,8 +29,6 @@ interface IResizeRegion {
 
 interface IResizeOptions {
   lockRatio: boolean; // preserve the aspect ratio (default: true)
-  lockX: boolean; // prevent changes to the X scale (default: false)
-  lockY: boolean; // lockY: prevent changes to the Y scale (default: false)
   anchor: AnchorPoint; // anchor: an AnchorPoint enum to resize around
 }
 
@@ -144,6 +142,16 @@ export class EditorService extends StatefulService<IEditorServiceState> {
   }
 
   startResizing(event: IMouseEvent, region: IResizeRegion) {
+    this.dragHandler = new DragHandler(event, {
+      displaySize: {
+        x: this.renderedWidth,
+        y: this.renderedHeight,
+      },
+      displayOffset: {
+        x: this.renderedOffsetX,
+        y: this.renderedOffsetY,
+      },
+    });
     this.resizeRegion = region;
     this.currentX = event.pageX;
     this.currentY = event.pageY;
@@ -251,10 +259,10 @@ export class EditorService extends StatefulService<IEditorServiceState> {
         sw: { anchor: AnchorPoint.NorthEast },
         ne: { anchor: AnchorPoint.SouthWest },
         se: { anchor: AnchorPoint.NorthWest },
-        n: { anchor: AnchorPoint.South, lockX: true },
-        s: { anchor: AnchorPoint.North, lockX: true },
-        e: { anchor: AnchorPoint.West, lockY: true },
-        w: { anchor: AnchorPoint.East, lockY: true },
+        n: { anchor: AnchorPoint.South },
+        s: { anchor: AnchorPoint.North },
+        e: { anchor: AnchorPoint.West },
+        w: { anchor: AnchorPoint.East },
       };
 
       const options = {
@@ -265,7 +273,8 @@ export class EditorService extends StatefulService<IEditorServiceState> {
       if (this.isCropping) {
         this.crop(converted.x, converted.y, options);
       } else {
-        this.resize(converted.x, converted.y, options);
+        // this.resize(converted.x, converted.y, options);
+        this.dragHandler.resize(event, optionsMap[name].anchor);
       }
     } else if (this.dragHandler) {
       this.dragHandler.move(event);
@@ -354,13 +363,9 @@ export class EditorService extends StatefulService<IEditorServiceState> {
     // Set defaults
     const opts = {
       lockRatio: true,
-      lockX: false,
-      lockY: false,
       ...options,
     };
 
-    let scaleXDelta = 1;
-    let scaleYDelta = 1;
     const rect = this.selectionService.views.globalSelection.getBoundingRect();
     const anchorPosition = rect.getOffsetFromOrigin(AnchorPositions[opts.anchor]);
 
@@ -373,48 +378,29 @@ export class EditorService extends StatefulService<IEditorServiceState> {
 
     // represents the direction of resizing
     const scaleVector = resizeRegionPosition.sub(v2(AnchorPositions[opts.anchor]));
+    const scaleDelta = v2(x, y)
+      .sub(anchorPosition)
+      .multiply(scaleVector)
+      .divide(v2(rect.width, rect.height));
 
-    if (scaleVector.x && !opts.lockX) {
-      const newWidth = Math.abs(x - anchorPosition.x);
-      scaleXDelta = newWidth / rect.width;
-    }
-
-    if (scaleVector.y && !opts.lockY) {
-      const newHeight = Math.abs(y - anchorPosition.y);
-      scaleYDelta = newHeight / rect.height;
-    }
-
-    // preserve aspect ratio
     if (opts.lockRatio) {
-      // if AnchorPoint is corner point
-      if (
-        [
-          AnchorPoint.SouthEast,
-          AnchorPoint.SouthWest,
-          AnchorPoint.NorthEast,
-          AnchorPoint.NorthWest,
-        ].includes(opts.anchor)
-      ) {
-        scaleYDelta = scaleXDelta = Math.max(scaleXDelta, scaleYDelta);
-      } else if (scaleVector.x) {
-        // if changing width
-        scaleYDelta = scaleXDelta;
-      } else {
-        // if changing height
-        scaleXDelta = scaleYDelta;
-      }
+      scaleDelta.x = scaleDelta.y = Math.max(scaleDelta.x, scaleDelta.y);
+    } else {
+      // Zero out scale deltas if we aren't scaling on that axis
+      if (!scaleVector.x) scaleDelta.x = 1;
+      if (!scaleVector.y) scaleDelta.y = 1;
     }
 
     this.editorCommandsService.executeCommand(
       'ResizeItemsCommand',
       this.selectionService.views.globalSelection,
-      { x: scaleXDelta, y: scaleYDelta },
+      scaleDelta,
       AnchorPositions[opts.anchor],
     );
   }
 
   updateCursor(event: IMouseEvent) {
-    if (this.dragHandler) {
+    if (this.dragHandler && !this.resizeRegion) {
       this.SET_CURSOR('-webkit-grabbing');
     } else if (this.resizeRegion) {
       this.SET_CURSOR(this.resizeRegion.cursor);

@@ -3,11 +3,13 @@ import { Inject } from 'services/core/injector';
 import { SceneItem } from 'services/scenes';
 import { VideoService } from 'services/video';
 import { WindowsService } from 'services/windows';
-import { ScalableRectangle } from 'util/ScalableRectangle';
+import { AnchorPoint, AnchorPositions } from 'util/ScalableRectangle';
 import { SelectionService } from 'services/selection';
 import { EditorCommandsService } from 'services/editor-commands';
 import { IMouseEvent } from 'services/editor';
 import { byOS, OS } from './operating-systems';
+import { v2 } from './vec2';
+import { Rect } from './rect';
 
 /*
  * An edge looks like:
@@ -78,7 +80,7 @@ export class DragHandler {
   snapDistance: number;
 
   // Sources
-  private draggedSource: SceneItem;
+  private draggedRect: Rect;
   private otherSources: SceneItem[];
 
   // Mouse properties
@@ -113,10 +115,7 @@ export class DragHandler {
     this.snapDistance =
       (this.renderedSnapDistance * this.scaleFactor * this.baseWidth) / this.displaySize.x;
 
-    // Load some attributes about sources
-    const lastDragged = this.selectionService.views.globalSelection.getLastSelected();
-
-    if (lastDragged.isItem()) this.draggedSource = lastDragged;
+    this.draggedRect = this.selectionService.views.globalSelection.getBoundingRect();
 
     this.otherSources = this.selectionService.views.globalSelection
       .clone()
@@ -124,23 +123,146 @@ export class DragHandler {
       .getItems()
       .filter(item => item.isVisualSource);
 
-    const rect = new ScalableRectangle(this.draggedSource.rectangle);
-    rect.normalize();
-
     const pos = this.mousePositionInCanvasSpace(startEvent);
 
-    this.mouseOffset.x = pos.x - rect.x;
-    this.mouseOffset.y = pos.y - rect.y;
+    this.mouseOffset.x = pos.x - this.draggedRect.x;
+    this.mouseOffset.y = pos.y - this.draggedRect.y;
 
     // Generate the edges we should snap to
     this.targetEdges = this.generateTargetEdges();
   }
 
+  resize(event: IMouseEvent, anchor: AnchorPoint) {
+    let { x, y } = this.mousePositionInCanvasSpace(event);
+    const rect = this.selectionService.views.globalSelection.getBoundingRect();
+    const anchorPosition = rect.getOffsetFromOrigin(AnchorPositions[anchor]);
+    const lockRatio = !event.shiftKey;
+
+    // Adjust position for snapping
+    // Holding Ctrl temporary disables snapping
+    if (this.snapEnabled && !event.ctrlKey) {
+      const sourceEdges = this.generateRectangleEdges(rect);
+
+      // Only edges touching the resize region can snap
+      const snappableEdges: { top: boolean; bottom: boolean; left: boolean; right: boolean } = {
+        [AnchorPoint.East]: {
+          top: false,
+          bottom: false,
+          left: true,
+          right: false,
+        },
+        [AnchorPoint.North]: {
+          top: false,
+          bottom: true,
+          left: false,
+          right: false,
+        },
+        [AnchorPoint.South]: {
+          top: true,
+          bottom: false,
+          left: false,
+          right: false,
+        },
+        [AnchorPoint.West]: {
+          top: false,
+          bottom: false,
+          left: false,
+          right: true,
+        },
+        [AnchorPoint.NorthWest]: {
+          top: true,
+          bottom: false,
+          left: true,
+          right: false,
+        },
+        [AnchorPoint.NorthEast]: {
+          top: true,
+          bottom: false,
+          left: false,
+          right: true,
+        },
+        [AnchorPoint.SouthEast]: {
+          top: false,
+          bottom: true,
+          left: false,
+          right: true,
+        },
+        [AnchorPoint.SouthWest]: {
+          top: false,
+          bottom: true,
+          left: true,
+          right: false,
+        },
+      }[anchor];
+
+      const leftDistance = snappableEdges.left
+        ? this.getNearestEdgeDistance(sourceEdges.left, this.targetEdges.left)
+        : Infinity;
+      const rightDistance = snappableEdges.right
+        ? this.getNearestEdgeDistance(sourceEdges.right, this.targetEdges.right)
+        : Infinity;
+      const topDistance = snappableEdges.top
+        ? this.getNearestEdgeDistance(sourceEdges.top, this.targetEdges.top)
+        : Infinity;
+      const bottomDistance = snappableEdges.bottom
+        ? this.getNearestEdgeDistance(sourceEdges.bottom, this.targetEdges.bottom)
+        : Infinity;
+
+      let snapDistanceX = 0;
+      let snapDistanceY = 0;
+
+      if (Math.abs(leftDistance) <= Math.abs(rightDistance)) {
+        if (Math.abs(leftDistance) < this.snapDistance) snapDistanceX = leftDistance;
+      } else {
+        if (Math.abs(rightDistance) < this.snapDistance) snapDistanceX = rightDistance;
+      }
+
+      if (Math.abs(topDistance) <= Math.abs(bottomDistance)) {
+        if (Math.abs(topDistance) < this.snapDistance) snapDistanceY = topDistance;
+      } else {
+        if (Math.abs(bottomDistance) < this.snapDistance) snapDistanceY = bottomDistance;
+      }
+
+      if (snapDistanceX) console.log('WOULD SNAP X', snapDistanceX);
+      if (snapDistanceY) console.log('WOULD SNAP Y', snapDistanceY);
+
+      x += snapDistanceX;
+      y += snapDistanceY;
+    }
+
+    // resizeRegion is opposite the anchor point
+    const oppositePointsMap = { 0: 1, 0.5: 0.5, 1: 0 };
+    const resizeRegionPosition = v2(
+      oppositePointsMap[AnchorPositions[anchor].x],
+      oppositePointsMap[AnchorPositions[anchor].y],
+    );
+
+    // represents the direction of resizing
+    const scaleVector = resizeRegionPosition.sub(v2(AnchorPositions[anchor]));
+    const scaleDelta = v2(x, y)
+      .sub(anchorPosition)
+      .multiply(scaleVector)
+      .divide(v2(rect.width, rect.height));
+
+    if (lockRatio) {
+      scaleDelta.x = scaleDelta.y = Math.max(scaleDelta.x, scaleDelta.y);
+    } else {
+      // Zero out scale deltas if we aren't scaling on that axis
+      if (!scaleVector.x) scaleDelta.x = 1;
+      if (!scaleVector.y) scaleDelta.y = 1;
+    }
+
+    this.editorCommandsService.executeCommand(
+      'ResizeItemsCommand',
+      this.selectionService.views.globalSelection,
+      scaleDelta,
+      AnchorPositions[anchor],
+    );
+  }
+
   // Should be called when the mouse moves
   move(event: IMouseEvent) {
-    const rect = new ScalableRectangle(this.draggedSource.rectangle);
-    const denormalize = rect.normalize();
-
+    const rect = { ...this.draggedRect };
     const mousePos = this.mousePositionInCanvasSpace(event);
 
     // Move the rectangle to its new position
@@ -150,7 +272,7 @@ export class DragHandler {
     // Adjust position for snapping
     // Holding Ctrl temporary disables snapping
     if (this.snapEnabled && !event.ctrlKey) {
-      const sourceEdges = this.generateSourceEdges(rect);
+      const sourceEdges = this.generateRectangleEdges(rect);
 
       const leftDistance = this.getNearestEdgeDistance(sourceEdges.left, this.targetEdges.left);
       const rightDistance = this.getNearestEdgeDistance(sourceEdges.right, this.targetEdges.right);
@@ -179,24 +301,26 @@ export class DragHandler {
       rect.y += snapDistanceY;
     }
 
-    denormalize();
-
     // Translate new position into a delta that can be applied
     // to all selected sources equally.
-    const deltaX = rect.x - this.draggedSource.transform.position.x;
-    const deltaY = rect.y - this.draggedSource.transform.position.y;
+    const deltaX = rect.x - this.draggedRect.x;
+    const deltaY = rect.y - this.draggedRect.y;
 
     this.editorCommandsService.executeCommand(
       'MoveItemsCommand',
       this.selectionService.views.globalSelection,
       { x: deltaX, y: deltaY },
     );
+
+    // Update the position of the bounding rect for the next set of calculations
+    this.draggedRect.x = rect.x;
+    this.draggedRect.y = rect.y;
   }
 
   private mousePositionInCanvasSpace(event: IMouseEvent): IVec2 {
     return this.pageSpaceToCanvasSpace({
-      x: event.pageX - this.displayOffset.x,
-      y: event.pageY - this.displayOffset.y,
+      x: event.offsetX - this.displayOffset.x,
+      y: event.offsetY - this.displayOffset.y,
     });
   }
 
@@ -287,7 +411,7 @@ export class DragHandler {
     // Source edge snapping:
     if (this.sourceSnapping) {
       this.otherSources.forEach(source => {
-        const edges = this.generateSourceEdges(new ScalableRectangle(source.rectangle));
+        const edges = this.generateRectangleEdges(source.getBoundingRect());
 
         // The dragged source snaps to the adjacent edge
         // of other sources.  So the right edge snaps to
@@ -303,46 +427,32 @@ export class DragHandler {
   }
 
   /**
-   * Generates edges for the given source at
-   * the given x & y coordinates
+   * Generates edges for the given rectangle.
    */
-  private generateSourceEdges(source: IScalableRectangle): ISourceEdges {
-    const rect = new ScalableRectangle({
-      x: source.x,
-      y: source.y,
-      width: source.width,
-      height: source.height,
-      scaleX: source.scaleX,
-      scaleY: source.scaleY,
-      crop: source.crop,
-      rotation: source.rotation,
-    });
-
-    rect.normalize();
-
+  private generateRectangleEdges(rect: IRectangle): ISourceEdges {
     return {
       left: {
         depth: rect.x,
         offset: rect.y,
-        length: rect.scaledHeight,
+        length: rect.height,
       },
 
       top: {
         depth: rect.y,
         offset: rect.x,
-        length: rect.scaledWidth,
+        length: rect.width,
       },
 
       right: {
-        depth: rect.x + rect.scaledWidth,
+        depth: rect.x + rect.width,
         offset: rect.y,
-        length: rect.scaledHeight,
+        length: rect.height,
       },
 
       bottom: {
-        depth: rect.y + rect.scaledHeight,
+        depth: rect.y + rect.height,
         offset: rect.x,
-        length: rect.scaledWidth,
+        length: rect.width,
       },
     };
   }

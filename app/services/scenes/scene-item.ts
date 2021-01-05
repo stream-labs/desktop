@@ -307,7 +307,7 @@ export class SceneItem extends SceneItemNode {
    */
   scale(scaleDelta: IVec2, origin: IVec2 = AnchorPositions[AnchorPoint.Center]) {
     const rect = new ScalableRectangle(this.rectangle);
-    let currentScale = v2();
+    let currentScale: Vec2;
     rect.normalized(() => {
       currentScale = v2(rect.scaleX, rect.scaleY);
     });
