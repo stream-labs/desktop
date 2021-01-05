@@ -256,6 +256,8 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
   stopAppFn = async function stopApp(t: TExecutionContext, clearCache = true) {
     try {
+      const client = await getClient();
+      await client.unsubscribeAll();
       await app.stop();
     } catch (e) {
       fail('Crash on shutdown');
@@ -340,7 +342,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       if (options.restartAppAfterEachTest) {
         if (appIsRunning) {
           const client = await getClient();
-          await client.unsubscribeAll();
           client.disconnect();
           await stopAppFn(t);
         }
