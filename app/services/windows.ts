@@ -21,7 +21,7 @@ import NameFolder from 'components/windows/NameFolder.vue';
 import SourceProperties from 'components/windows/SourceProperties.vue';
 import SourceFilters from 'components/windows/SourceFilters.vue';
 import AddSourceFilter from 'components/windows/AddSourceFilter';
-import AdvancedAudio from 'components/windows/AdvancedAudio.vue';
+import AdvancedAudio from 'components/windows/AdvancedAudio';
 import Notifications from 'components/windows/Notifications.vue';
 import Troubleshooter from 'components/windows/Troubleshooter.vue';
 import Blank from 'components/windows/Blank.vue';
@@ -42,14 +42,15 @@ import GoLiveWindow from 'components/windows/go-live/GoLiveWindow';
 import EditStreamWindow from 'components/windows/go-live/EditStreamWindow';
 import ScheduleStreamWindow from 'components/windows/go-live/ScheduleStreamWindow';
 
-import BitGoal from 'components/widgets/goal/BitGoal.vue';
-import DonationGoal from 'components/widgets/goal/DonationGoal.vue';
-import SubGoal from 'components/widgets/goal/SubGoal.vue';
-import StarsGoal from 'components/widgets/goal/StarsGoal.vue';
-import SupporterGoal from 'components/widgets/goal/SupporterGoal.vue';
+import BitGoal from 'components/widgets/goal/BitGoal';
+import DonationGoal from 'components/widgets/goal/DonationGoal';
+import SubGoal from 'components/widgets/goal/SubGoal';
+import StarsGoal from 'components/widgets/goal/StarsGoal';
+import SupporterGoal from 'components/widgets/goal/SupporterGoal';
 import SubscriberGoal from 'components/widgets/goal/SubscriberGoal';
+import FollowerGoal from 'components/widgets/goal/FollowerGoal';
+import CharityGoal from 'components/widgets/goal/CharityGoal';
 import ChatBox from 'components/widgets/ChatBox.vue';
-import FollowerGoal from 'components/widgets/goal/FollowerGoal.vue';
 import ViewerCount from 'components/widgets/ViewerCount.vue';
 import StreamBoss from 'components/widgets/StreamBoss.vue';
 import DonationTicker from 'components/widgets/DonationTicker.vue';
@@ -111,6 +112,7 @@ export function getComponents() {
     StarsGoal,
     SupporterGoal,
     SubscriberGoal,
+    CharityGoal,
     ChatBox,
     ViewerCount,
     DonationTicker,
@@ -472,17 +474,14 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.windows.child.close();
   }
 
-  // @ExecuteInCurrentWindow()
   getChildWindowOptions(): IWindowOptions {
     return this.state.child;
   }
 
-  // @ExecuteInCurrentWindow()
   getChildWindowQueryParams(): Dictionary<any> {
     return this.getChildWindowOptions().queryParams || {};
   }
 
-  // @ExecuteInCurrentWindow()
   getWindowOptions(windowId: string) {
     return this.state[windowId].queryParams || {};
   }

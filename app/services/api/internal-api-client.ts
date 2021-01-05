@@ -60,10 +60,6 @@ export class InternalApiClient {
 
         if (!target[property]) return target[property];
 
-        if (Reflect.getMetadata('executeInCurrentWindow', target, property as string)) {
-          return target[property];
-        }
-
         if (typeof target[property] !== 'function' && !(target[property] instanceof Observable)) {
           return target[property];
         }

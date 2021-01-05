@@ -7,7 +7,7 @@
 
 <script lang='ts' src="./Chatbot.vue.ts"></script>
 
-<style lange="less" scoped>
+<style lang="less" scoped>
   .chatbot {
     width: 100%;
   }

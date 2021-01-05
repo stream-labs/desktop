@@ -331,7 +331,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
               imageSize={{ width: 44, height: 44 }}
             />
             <p>
-              {$t('Make sure Streamlabs app is added to your Group.')}
+              {$t('Make sure the Streamlabs app is added to your Group.')}
               <a onClick={() => this.verifyGroup()}> {$t('Click here to verify.')}</a>
             </p>
           </HFormGroup>

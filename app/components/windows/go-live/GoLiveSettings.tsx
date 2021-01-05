@@ -110,7 +110,7 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
         )}
 
         {/*RIGHT COLUMN*/}
-        <div style={{ width: '100%' }}>
+        <div style={{ width: '100%', display: 'flex' }}>
           {isLoadingMode && this.renderLoading()}
           <GoLiveError />
 

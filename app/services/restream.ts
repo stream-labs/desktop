@@ -4,6 +4,7 @@ import { HostsService } from 'services/hosts';
 import { getPlatformService, TPlatform } from 'services/platforms';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { UserService } from 'services/user';
+import { CustomizationService, ICustomizationServiceState } from 'services/customization';
 import { authorizedHeaders, jfetch } from 'util/requests';
 import { IncrementalRolloutService } from './incremental-rollout';
 import electron from 'electron';
@@ -37,6 +38,7 @@ interface IUserSettingsResponse extends IRestreamState {
 export class RestreamService extends StatefulService<IRestreamState> {
   @Inject() hostsService: HostsService;
   @Inject() userService: UserService;
+  @Inject() customizationService: CustomizationService;
   @Inject() streamSettingsService: StreamSettingsService;
   @Inject() streamingService: StreamingService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
@@ -291,6 +293,10 @@ export class RestreamService extends StatefulService<IRestreamState> {
       },
     });
 
+    this.customizationService.settingsChanged.subscribe(changed => {
+      this.handleSettingsChanged(changed);
+    });
+
     this.chatView.webContents.loadURL(this.chatUrl);
 
     electron.ipcRenderer.send('webContents-preventPopup', this.chatView.webContents.id);
@@ -302,6 +308,13 @@ export class RestreamService extends StatefulService<IRestreamState> {
     // @ts-ignore: typings are incorrect
     this.chatView.destroy();
     this.chatView = null;
+  }
+
+  private handleSettingsChanged(changed: Partial<ICustomizationServiceState>) {
+    if (!this.chatView) return;
+    if (changed.chatZoomFactor) {
+      this.chatView.webContents.setZoomFactor(changed.chatZoomFactor);
+    }
   }
 }
 

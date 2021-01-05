@@ -25,7 +25,6 @@ export interface ISceneNodeModel {
 /**
  * A base API for Items and Folders
  */
-@ServiceHelper()
 export abstract class SceneNode {
   @Inject('ScenesService') protected internalScenesService: InternalScenesService;
   @InjectFromExternalApi() protected scenesService: ScenesService;
