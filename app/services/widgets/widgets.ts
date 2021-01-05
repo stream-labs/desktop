@@ -127,7 +127,7 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
   }
 
   getWidgetUrl(type: WidgetType) {
-    if (!this.userService.isLoggedIn) return;
+    if (!this.userService.isLoggedIn || !WidgetDefinitions[type]) return;
     return WidgetDefinitions[type].url(this.hostsService.streamlabs, this.userService.widgetToken);
   }
 

@@ -297,7 +297,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
   }
 
   @throttle(NOTIFICATION_THROTTLE_INTERVAL)
-  private pushLaggedFramesNotify(factor: number) {
+  pushLaggedFramesNotify(factor: number) {
     const code: TIssueCode = 'FRAMES_LAGGED';
     this.notificationsService.push({
       code,

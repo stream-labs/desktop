@@ -96,6 +96,7 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
     if (notification.subType === ENotificationSubType.DEFAULT) {
       return;
     }
+    if (this.notifications[0]?.subType === notification.subType) this.notifications.shift();
     this.notifications.unshift(notification);
   }
 
@@ -144,6 +145,7 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
           {this.notifications.map(notification => (
             <div
               class={cx(styles.notification, styles.hasAction)}
+              name="notification"
               onClick={() => {
                 this.onNotificationClickHandler(notification.id);
               }}

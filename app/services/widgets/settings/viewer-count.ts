@@ -16,6 +16,7 @@ interface IViewerCountSettings extends IWidgetSettings {
   font_weight: number;
   twitch: boolean;
   youtube: boolean;
+  facebook: boolean;
 }
 
 export interface IViewerCountData extends IWidgetData {
@@ -47,6 +48,7 @@ export class ViewerCountService extends WidgetSettingsService<IViewerCountData> 
         ...data.settings,
         twitch: data.settings.types.twitch.enabled,
         youtube: data.settings.types.youtube.enabled,
+        facebook: data.settings.types.facebook.enabled,
       },
     };
   }
@@ -58,6 +60,7 @@ export class ViewerCountService extends WidgetSettingsService<IViewerCountData> 
       types: {
         youtube: { enabled: settings.youtube },
         twitch: { enabled: settings.twitch },
+        facebook: { enabled: settings.facebook },
       },
     };
   }
