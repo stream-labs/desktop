@@ -450,7 +450,9 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   ): Promise<IYoutubeLiveBroadcast> {
     const fields = ['snippet', 'contentDetails', 'status'];
     const endpoint = `liveBroadcasts?part=${fields.join(',')}`;
-    const scheduledStartTime = new Date(params.scheduledStartTime) || new Date();
+    const scheduledStartTime = params.scheduledStartTime
+      ? new Date(params.scheduledStartTime)
+      : new Date();
     const data: Dictionary<any> = {
       snippet: {
         title: params.title,
@@ -491,7 +493,9 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   ): Promise<IYoutubeLiveBroadcast> {
     const broadcast = await this.fetchBroadcast(id);
 
-    const scheduledStartTime = params.scheduledStartTime ? new Date(params.scheduledStartTime) : new Date();
+    const scheduledStartTime = params.scheduledStartTime
+      ? new Date(params.scheduledStartTime)
+      : new Date();
     const snippet: Partial<IYoutubeLiveBroadcast['snippet']> = {
       title: params.title,
       description: params.description,

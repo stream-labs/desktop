@@ -674,16 +674,17 @@ export class FacebookView extends ViewHandler<IFacebookServiceState> {
     return this.state.facebookGroups.find(g => g.id === id) || null;
   }
 
-  getDestinationId(options?: IFacebookStartStreamOptions) {
+  getDestinationId(options?: IFacebookStartStreamOptions): string {
     if (!options) options = this.state.settings;
     switch (options.destinationType) {
       case 'me':
         return 'me';
       case 'page':
-        return options.pageId;
+        return options.pageId as string;
       case 'group':
-        return options.groupId;
+        return options.groupId as string;
     }
+    return '';
   }
 
   getDestinationToken(destinationType?: TDestinationType, destinationId?: string): string {
