@@ -27,6 +27,7 @@ import { InitAfter } from '../core';
 import Utils from 'services/utils';
 import { OS, getOS } from 'util/operating-systems';
 import { SettingsService } from '../settings';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 @InitAfter('UserService')
 export class FacemasksService extends PersistentStatefulService<Interfaces.IFacemasksServiceState> {
@@ -39,6 +40,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   @Inject() private windowsService: WindowsService;
   @Inject() private settingsService: SettingsService;
   @Inject() appService: AppService;
+  @Inject() usageStatisticsService: UsageStatisticsService;
 
   cdn = `https://${this.hostsService.facemaskCDN}`;
   facemaskFilter: obs.IFilter = null;
@@ -161,6 +163,8 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   }
 
   trigger(uuid: string, duration: number) {
+    this.usageStatisticsService.recordFeatureUsage('FacemaskTrigger');
+
     this.updateFilter({
       Mask: `${uuid}.json`,
       alertActivate: true,
@@ -283,6 +287,10 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
 
   checkFacemaskSettings(settings: Interfaces.IFacemaskSettings) {
     this.SET_SETTINGS(settings);
+
+    if (settings.enabled) {
+      this.usageStatisticsService.recordFeatureUsage('FacemasksEnabled');
+    }
 
     if (!settings.enabled) {
       this.SET_ACTIVE(false);

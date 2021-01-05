@@ -1,6 +1,5 @@
 import { ITwitchStartStreamOptions, TwitchService } from './twitch';
 import { IYoutubeStartStreamOptions, YoutubeService } from './youtube';
-import { IMixerStartStreamOptions, MixerService } from './mixer';
 import { FacebookService, IFacebookStartStreamOptions } from './facebook';
 import { TTwitchTag } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
@@ -107,8 +106,7 @@ export enum EPlatformCallResult {
 export type TStartStreamOptions =
   | ITwitchStartStreamOptions
   | IYoutubeStartStreamOptions
-  | Partial<IFacebookStartStreamOptions>
-  | IMixerStartStreamOptions;
+  | Partial<IFacebookStartStreamOptions>;
 
 // state applicable for all platforms
 export interface IPlatformState {
@@ -208,13 +206,12 @@ export interface IUserInfo {
   username?: string;
 }
 
-export type TPlatform = 'twitch' | 'youtube' | 'mixer' | 'facebook';
+export type TPlatform = 'twitch' | 'youtube' | 'facebook';
 
 export function getPlatformService(platform: TPlatform): IPlatformService {
   return {
     twitch: TwitchService.instance,
     youtube: YoutubeService.instance,
-    mixer: MixerService.instance,
     facebook: FacebookService.instance,
   }[platform];
 }

@@ -72,7 +72,7 @@
           <div class="flex">
             <a
               @click="refreshChat"
-              v-if="isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook"
+              v-if="isTwitch || (isYoutube && isStreaming) || isFacebook"
             >
               {{ $t('Refresh Chat') }}
             </a>
@@ -81,7 +81,7 @@
         <div
           class="live-dock-chat"
           v-if="
-            !hideStyleBlockers && (isTwitch || isMixer || (isYoutube && isStreaming) || isFacebook)
+            !hideStyleBlockers && (isTwitch || (isYoutube && isStreaming) || isFacebook)
           "
         >
           <div v-if="hasChatTabs" class="flex">
