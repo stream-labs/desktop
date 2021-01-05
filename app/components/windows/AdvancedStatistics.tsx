@@ -96,7 +96,7 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
     if (notification.subType === ENotificationSubType.DEFAULT) {
       return;
     }
-    if (this.notifications[0].subType === notification.subType) this.notifications.shift();
+    if (this.notifications[0]?.subType === notification.subType) this.notifications.shift();
     this.notifications.unshift(notification);
   }
 
