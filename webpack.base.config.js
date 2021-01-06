@@ -110,7 +110,10 @@ module.exports = {
       },
       {
         test: /\.ts$/,
-        exclude: [path.resolve(__dirname, 'node_modules'), path.resolve(__dirname, 'app', 'components-react')],
+        exclude: [
+          path.resolve(__dirname, 'node_modules'),
+          path.resolve(__dirname, 'app', 'components-react'),
+        ],
         use: {
           loader: 'ts-loader',
           options: {
@@ -168,12 +171,19 @@ module.exports = {
       },
       {
         test: /(?<!\.[mg])\.less$/, // Vue style tags
-        include: [path.resolve(__dirname, 'app/components'), path.resolve(__dirname, 'updater')],
+        include: [
+          path.resolve(__dirname, 'app/components'),
+          path.resolve(__dirname, 'app/components-react'),
+          path.resolve(__dirname, 'updater'),
+        ],
         use: ['vue-style-loader', 'css-loader', 'less-loader'],
       },
       {
         test: /\.m.less$/, // Local style modules
-        include: path.resolve(__dirname, 'app/components'),
+        include: [
+          path.resolve(__dirname, 'app/components'),
+          path.resolve(__dirname, 'app/components-react'),
+        ],
         use: [
           { loader: 'style-loader' },
           {

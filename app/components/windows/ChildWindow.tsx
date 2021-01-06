@@ -8,6 +8,7 @@ import TitleBar from '../TitleBar';
 import { AppService } from 'services/app';
 import Utils from 'services/utils';
 import styles from './ChildWindow.m.less';
+import VueRenderAreaForReact from '../shared/VueRenderAreaFroReact';
 
 @Component({})
 export default class ChildWindow extends Vue {
@@ -128,6 +129,7 @@ export default class ChildWindow extends Vue {
           <i class="fa fa-spinner fa-pulse" />
           <div class={styles.spinnerSpacer} />
         </div>
+        <VueRenderAreaForReact />
         {this.componentsToRender.map((comp, index) => {
           const ChildWindowComponent = getComponents()[comp.componentName];
           return (

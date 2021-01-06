@@ -1,7 +1,7 @@
 import { ICardProps } from '../components/shared/react-component-props';
 import React, { useState, useEffect } from 'react';
 import { Services } from './service-provider';
-import { useVuex } from './hooks/useServiceState';
+import { useVuex } from './hooks';
 import ReactComponent from '../components/shared/ReactComponent';
 // import { useServiceState } from './hooks/useServiceState';
 // import { getResource } from '../app/services/core';

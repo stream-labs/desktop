@@ -10,10 +10,11 @@ import { ICardProps } from './react-component-props';
 class WrapperProps<TComponentProps> {
   name?: string = null;
   componentProps: TComponentProps = null;
+  wrapperStyles?: Dictionary<string> = {};
 }
 
 @Component({ props: createProps(WrapperProps) })
-export default class ReactComponent<TComponentProps> extends TsxComponent<
+export default class ReactComponent<TComponentProps = {}> extends TsxComponent<
   WrapperProps<TComponentProps>
 > {
   $refs: {
@@ -23,12 +24,12 @@ export default class ReactComponent<TComponentProps> extends TsxComponent<
   mounted() {
     const className = this.props.name;
     const componentClass = reactBuild.components[className];
-    // ReactDOM.render(
-    //   React.createElement(componentClass, this.props.componentProps, null),
-    //   this.$refs.container,
-    // );
     ReactDOM.render(
-      React.createElement(componentClass, { ...this.props.componentProps, key: className }, null),
+      React.createElement(
+        componentClass,
+        { ...this.props.componentProps, key: className },
+        null,
+      ),
       this.$refs.container,
     );
   }
@@ -38,9 +39,17 @@ export default class ReactComponent<TComponentProps> extends TsxComponent<
   }
 
   render() {
-    return <div ref="container"></div>;
+    return <div ref="container" style={this.props.wrapperStyles}></div>;
   }
 }
 
-@Component({ props: { name: { default: 'ReactHelloWorld', componentProps: null } } })
+@Component({ props: { name: { default: 'ReactHelloWorld' } } })
 export class ReactHelloWorld extends ReactComponent<ICardProps> {}
+
+@Component({
+  props: {
+    name: { default: 'NameFolder' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class NameFolder extends ReactComponent {}

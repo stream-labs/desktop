@@ -314,7 +314,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // create a root Vue component
   const windowId = Utils.getCurrentUrlParams().windowId;
-  const vm = new Vue({
+  // save the app instance to a global variable so React components can use Vue components inside
+  window['vm'] = new Vue({
     i18n,
     store,
     el: '#app',

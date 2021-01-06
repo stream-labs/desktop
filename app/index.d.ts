@@ -52,11 +52,6 @@ interface Response {
   json(): Promise<unknown>;
 }
 
-// react has been declared in the webpack config
-// let typescript know that variable React exists
-// so it prevents errors from tsx files in react-component directory
-// declare const React: unknown;
-
 // list of modules without type definitions
 declare module 'raven-js/*';
 declare module 'v-tooltip';
