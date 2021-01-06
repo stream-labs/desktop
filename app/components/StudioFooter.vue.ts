@@ -116,11 +116,6 @@ export default class StudioFooterComponent extends Vue {
   }
 
   openScheduleStream() {
-    // this.windowsService.showWindow({
-    //   componentName: 'ScheduleStreamWindow',
-    //   title: $t('Schedule Stream'),
-    //   size: { width: 800, height: 670 },
-    // });
     this.navigationService.navigate('StreamScheduler');
   }
 
