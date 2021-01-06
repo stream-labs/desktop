@@ -34,6 +34,7 @@ import { AudioService, E_AUDIO_CHANNELS } from '../audio';
 import { ReplayManager } from './properties-managers/replay-manager';
 import { assertIsDefined } from 'util/properties-type-guards';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import { SourceFiltersService } from 'services/source-filters';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -111,6 +112,12 @@ class SourcesViews extends ViewHandler<ISourcesState> {
     );
   }
 
+  get temporarySources(): Source[] {
+    return Object.values(this.state.temporarySources).map(
+      sourceModel => this.getSource(sourceModel.sourceId)!,
+    );
+  }
+
   getSource(id: string): Source | null {
     return this.state.sources[id] || this.state.temporarySources[id] ? new Source(id) : null;
   }
@@ -155,6 +162,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
   @Inject() private audioService: AudioService;
   @Inject() private defaultHardwareService: DefaultHardwareService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
+  @Inject() private sourceFiltersService: SourceFiltersService;
 
   get views() {
     return new SourcesViews(this.state);
@@ -254,6 +262,13 @@ export class SourcesService extends StatefulService<ISourcesState> {
     const obsInput = obs.InputFactory.create(type, id, obsInputSettings);
 
     this.addSource(obsInput, name, options);
+
+    if (
+      this.defaultHardwareService.state.defaultVideoDevice === obsInputSettings.video_device_id &&
+      this.defaultHardwareService.state.presetFilter !== ''
+    ) {
+      this.sourceFiltersService.addPresetFilter(id, this.defaultHardwareService.state.presetFilter);
+    }
     return this.views.getSource(id)!;
   }
 
@@ -288,6 +303,16 @@ export class SourcesService extends StatefulService<ISourcesState> {
       this.usageStatisticsService.recordFeatureUsage('VLC');
     } else if (type === 'soundtrack_source') {
       this.usageStatisticsService.recordFeatureUsage('soundtrackSource');
+    } else if (type === 'wasapi_input_capture' || type === 'coreaudio_input_capture') {
+      this.usageStatisticsService.recordFeatureUsage('AudioInputSource');
+    } else if (type === 'dshow_input') {
+      this.usageStatisticsService.recordFeatureUsage('DShowInput');
+    } else if (type === 'window_capture') {
+      this.usageStatisticsService.recordFeatureUsage('WindowCapture');
+    } else if (type === 'monitor_capture') {
+      this.usageStatisticsService.recordFeatureUsage('DisplayCapture');
+    } else if (type === 'game_capture') {
+      this.usageStatisticsService.recordFeatureUsage('GameCapture');
     }
 
     const managerKlass = PROPERTIES_MANAGER_TYPES[managerType];
@@ -443,7 +468,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
   getAvailableSourcesTypesList(): IObsListOption<TSourceType>[] {
     const obsAvailableTypes = obs.InputFactory.types();
-    const whitelistedTypes: IObsListOption<TSourceType>[] = [
+    const allowlistedTypes: IObsListOption<TSourceType>[] = [
       { description: 'Image', value: 'image_source' },
       { description: 'Color Source', value: 'color_source' },
       { description: 'Browser Source', value: 'browser_source' },
@@ -470,13 +495,13 @@ export class SourcesService extends StatefulService<ISourcesState> {
       { description: 'Soundtrack source', value: 'soundtrack_source' },
     ];
 
-    const availableWhitelistedType = whitelistedTypes.filter(type =>
+    const availableAllowlistedTypes = allowlistedTypes.filter(type =>
       obsAvailableTypes.includes(type.value),
     );
     // 'scene' is not an obs input type so we have to set it manually
-    availableWhitelistedType.push({ description: 'Scene', value: 'scene' });
+    availableAllowlistedTypes.push({ description: 'Scene', value: 'scene' });
 
-    return availableWhitelistedType;
+    return availableAllowlistedTypes;
   }
 
   getAvailableSourcesTypes(): TSourceType[] {

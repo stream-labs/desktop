@@ -22,7 +22,6 @@ export function isItem(node: SceneItemNode): node is SceneItem {
   return node.sceneNodeType === 'item';
 }
 
-@ServiceHelper()
 export abstract class SceneItemNode implements ISceneItemNode {
   id: string;
   parentId: string;

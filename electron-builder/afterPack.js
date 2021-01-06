@@ -54,7 +54,7 @@ exports.default = async function(context) {
 
   console.log('Updating dependency paths');
   cp.execSync(
-    `install_name_tool -change ./node_modules/node-libuiohook/libuiohook.0.dylib @executable_path/../Resources/app.asar.unpacked/node_modules/node-libuiohook/libuiohook.0.dylib ${context.appOutDir}/Streamlabs\\ OBS.app/Contents/Resources/app.asar.unpacked/node_modules/node-libuiohook/node_libuiohook.node`,
+    `install_name_tool -change ./node_modules/node-libuiohook/libuiohook.1.dylib @executable_path/../Resources/app.asar.unpacked/node_modules/node-libuiohook/libuiohook.1.dylib ${context.appOutDir}/Streamlabs\\ OBS.app/Contents/Resources/app.asar.unpacked/node_modules/node-libuiohook/node_libuiohook.node`,
   );
 
   signBinaries(

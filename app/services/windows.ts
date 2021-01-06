@@ -21,7 +21,7 @@ import NameFolder from 'components/windows/NameFolder.vue';
 import SourceProperties from 'components/windows/SourceProperties.vue';
 import SourceFilters from 'components/windows/SourceFilters.vue';
 import AddSourceFilter from 'components/windows/AddSourceFilter';
-import AdvancedAudio from 'components/windows/AdvancedAudio.vue';
+import AdvancedAudio from 'components/windows/AdvancedAudio';
 import Notifications from 'components/windows/Notifications.vue';
 import Troubleshooter from 'components/windows/Troubleshooter.vue';
 import Blank from 'components/windows/Blank.vue';
@@ -37,20 +37,20 @@ import AdvancedStatistics from 'components/windows/AdvancedStatistics';
 import OverlayWindow from 'components/windows/OverlayWindow.vue';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
-import ShareStream from 'components/windows/ShareStream';
 import WelcomeToPrime from 'components/windows/WelcomeToPrime';
 import GoLiveWindow from 'components/windows/go-live/GoLiveWindow';
 import EditStreamWindow from 'components/windows/go-live/EditStreamWindow';
 import ScheduleStreamWindow from 'components/windows/go-live/ScheduleStreamWindow';
 
-import BitGoal from 'components/widgets/goal/BitGoal.vue';
-import DonationGoal from 'components/widgets/goal/DonationGoal.vue';
-import SubGoal from 'components/widgets/goal/SubGoal.vue';
-import StarsGoal from 'components/widgets/goal/StarsGoal.vue';
-import SupporterGoal from 'components/widgets/goal/SupporterGoal.vue';
+import BitGoal from 'components/widgets/goal/BitGoal';
+import DonationGoal from 'components/widgets/goal/DonationGoal';
+import SubGoal from 'components/widgets/goal/SubGoal';
+import StarsGoal from 'components/widgets/goal/StarsGoal';
+import SupporterGoal from 'components/widgets/goal/SupporterGoal';
 import SubscriberGoal from 'components/widgets/goal/SubscriberGoal';
+import FollowerGoal from 'components/widgets/goal/FollowerGoal';
+import CharityGoal from 'components/widgets/goal/CharityGoal';
 import ChatBox from 'components/widgets/ChatBox.vue';
-import FollowerGoal from 'components/widgets/goal/FollowerGoal.vue';
 import ViewerCount from 'components/widgets/ViewerCount.vue';
 import StreamBoss from 'components/widgets/StreamBoss.vue';
 import DonationTicker from 'components/widgets/DonationTicker.vue';
@@ -64,6 +64,8 @@ import SpinWheel from 'components/widgets/SpinWheel.vue';
 
 import PerformanceMetrics from 'components/PerformanceMetrics.vue';
 import { byOS, OS } from 'util/operating-systems';
+import { UsageStatisticsService } from './usage-statistics';
+import { Inject } from 'services/core';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -108,6 +110,7 @@ export function getComponents() {
     StarsGoal,
     SupporterGoal,
     SubscriberGoal,
+    CharityGoal,
     ChatBox,
     ViewerCount,
     DonationTicker,
@@ -120,7 +123,6 @@ export function getComponents() {
     MediaShare,
     AlertBox,
     SpinWheel,
-    ShareStream,
     WelcomeToPrime,
     GoLiveWindow,
     EditStreamWindow,
@@ -166,6 +168,8 @@ const DEFAULT_WINDOW_OPTIONS: IWindowOptions = {
 };
 
 export class WindowsService extends StatefulService<IWindowsState> {
+  @Inject() usageStatisticsService: UsageStatisticsService;
+
   /**
    * 'main' and 'child' are special window ids that always exist
    * and have special purposes.  All other windows ids are considered
@@ -207,6 +211,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.updateScaleFactor('child');
     this.windows.main.on('move', () => this.updateScaleFactor('main'));
     this.windows.child.on('move', () => this.updateScaleFactor('child'));
+
+    if (electron.remote.screen.getAllDisplays().length > 1) {
+      this.usageStatisticsService.recordFeatureUsage('MultipleDisplays');
+    }
   }
 
   @throttle(500)
@@ -432,17 +440,14 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.windows.child.close();
   }
 
-  // @ExecuteInCurrentWindow()
   getChildWindowOptions(): IWindowOptions {
     return this.state.child;
   }
 
-  // @ExecuteInCurrentWindow()
   getChildWindowQueryParams(): Dictionary<any> {
     return this.getChildWindowOptions().queryParams || {};
   }
 
-  // @ExecuteInCurrentWindow()
   getWindowOptions(windowId: string) {
     return this.state[windowId].queryParams || {};
   }

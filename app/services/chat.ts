@@ -1,7 +1,7 @@
 import { Service } from 'services/core/service';
 import { Inject } from 'services/core/injector';
 import { UserService } from 'services/user';
-import { CustomizationService, ICustomizationSettings } from 'services/customization';
+import { CustomizationService, ICustomizationServiceState } from 'services/customization';
 import electron, { ipcRenderer } from 'electron';
 import url from 'url';
 import { WindowsService } from 'services/windows';
@@ -108,7 +108,16 @@ export class ChatService extends Service {
   private async loadUrl() {
     if (!this.chatUrl) return; // user has logged out
     if (!this.chatView) return; // chat was already deinitialized
-    this.chatView.webContents.loadURL(this.chatUrl).catch(this.handleRedirectError);
+
+    // try to load chat url
+    await this.chatView.webContents.loadURL(this.chatUrl).catch(this.handleRedirectError);
+
+    // sometimes it fails to load chat
+    // try to load again if needed
+    await Utils.sleep(1000);
+    if (this.chatView.webContents.getURL() !== this.chatUrl) {
+      await this.chatView.webContents.loadURL(this.chatUrl).catch(this.handleRedirectError);
+    }
   }
 
   handleRedirectError(e: Error) {
@@ -181,7 +190,7 @@ export class ChatService extends Service {
   private bindDomReadyListener() {
     if (!this.chatView) return; // chat was already deinitialized
 
-    const settings = this.customizationService.getSettings();
+    const settings = this.customizationService.state;
 
     this.chatView.webContents.on('dom-ready', () => {
       if (!this.chatView) return; // chat was already deinitialized
@@ -228,10 +237,25 @@ export class ChatService extends Service {
           true,
         );
       }
+
+      // the facebook chat does not properly fit in our sidebar and shows ugly scrollbars
+      // inject a script that removing the scrollbars
+      if (this.userService.platform?.type === 'facebook') {
+        Utils.sleep(2000).then(() => {
+          if (!this.chatView) return;
+          this.chatView.webContents.executeJavaScript(
+            `
+                var chatIframe = document.querySelector('iframe');
+                if (chatIframe) chatIframe.setAttribute('scrolling','no');
+        `,
+            true,
+          );
+        });
+      }
     });
   }
 
-  private handleSettingsChanged(changed: Partial<ICustomizationSettings>) {
+  private handleSettingsChanged(changed: Partial<ICustomizationServiceState>) {
     if (!this.chatView) return;
     if (changed.chatZoomFactor) {
       this.chatView.webContents.setZoomFactor(changed.chatZoomFactor);

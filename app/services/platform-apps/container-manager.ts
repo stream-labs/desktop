@@ -172,7 +172,7 @@ export class PlatformContainerManager {
   refreshContainers(app: ILoadedApp) {
     this.containers
       .filter(info => info.appId === app.id)
-      .forEach(info => info.container.webContents.reload());
+      .forEach(info => info.container.webContents.loadURL(this.getPageUrlForSlot(app, info.slot)));
   }
 
   private getContainerInfoForSlot(app: ILoadedApp, slot: EAppPageSlot): IContainerInfo {
@@ -297,12 +297,12 @@ export class PlatformContainerManager {
         }
 
         if (details.resourceType === 'script') {
-          const scriptWhitelist = [
+          const scriptAllowlist = [
             'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.js',
             'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.min.js',
           ];
 
-          const scriptDomainWhitelist = [
+          const scriptDomainAllowlist = [
             'www.googletagmanager.com',
             'www.google-analytics.com',
             'widget.intercom.io',
@@ -311,12 +311,12 @@ export class PlatformContainerManager {
 
           const parsed = url.parse(details.url);
 
-          if (scriptWhitelist.includes(details.url)) {
+          if (scriptAllowlist.includes(details.url)) {
             cb({});
             return;
           }
 
-          if (scriptDomainWhitelist.includes(parsed.hostname)) {
+          if (scriptDomainAllowlist.includes(parsed.hostname)) {
             cb({});
             return;
           }

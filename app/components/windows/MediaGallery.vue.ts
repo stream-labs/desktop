@@ -206,12 +206,13 @@ export default class MediaGallery extends Vue {
   }
 
   handleSelect() {
+    if (!this.selectedFile) return this.windowsService.actions.closeChildWindow();
     if (this.selectedFile.prime && !this.userService.views.isPrime) {
       this.upgradeToPrime();
       return;
     }
     this.mediaGalleryService.resolveFileSelect(this.promiseId, this.selectedFile);
-    this.windowsService.closeChildWindow();
+    this.windowsService.actions.closeChildWindow();
   }
 
   async handleDelete() {

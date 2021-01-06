@@ -9,7 +9,6 @@ import { TPlatform } from 'services/platforms';
 import { IStreamSettings, StreamingService } from 'services/streaming';
 import { SyncWithValue } from 'services/app/app-decorators';
 import { Inject } from 'services/core';
-import GameSelector from './GameSelector';
 import { pick } from 'lodash';
 import { assertIsDefined } from 'util/properties-type-guards';
 
@@ -178,7 +177,7 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
                   name: 'title',
                   required: true,
                   fullWidth: true,
-                  max: 120,
+                  max: this.props.platform === 'twitch' ? 140 : 120,
                   disabled,
                 })}
               />
@@ -195,13 +194,6 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
                     disabled,
                   })}
                 />
-              )}
-
-              {/*GAME*/}
-              {hasGame && (
-                <HFormGroup title={$t('Game')}>
-                  <GameSelector vModel={this.settings} platform={this.props.platform} />
-                </HFormGroup>
               )}
             </div>
           )}

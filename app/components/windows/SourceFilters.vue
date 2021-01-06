@@ -4,6 +4,11 @@
 
     <div slot="content" class="modal--side-nav">
       <NavMenu v-model="selectedFilterName">
+        <v-form-group
+          :value="presetFilterValue"
+          :metadata="presetFilterMetadata"
+          @input="value => addPresetFilter(value)"
+        />
         <div class="controls">
           <i class="icon-add icon-button" @click="addFilter"></i>
           <i class="icon-subtract icon-button" v-if="selectedFilterName" @click="removeFilter"></i>

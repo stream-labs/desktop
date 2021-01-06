@@ -11,6 +11,7 @@ import { SourcesService } from 'services/sources';
 
 class MixerItemProps {
   audioSource: AudioSource = null;
+  volmetersEnabled = false;
 }
 
 @Component({

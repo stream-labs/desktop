@@ -4,7 +4,6 @@ import { IEncoderProfile } from '../video-encoding-optimizations';
 import { ITwitchStartStreamOptions } from '../platforms/twitch';
 import { IYoutubeStartStreamOptions } from '../platforms/youtube';
 import { IFacebookStartStreamOptions } from '../platforms/facebook';
-import { IMixerStartStreamOptions } from '../platforms/mixer';
 import { IStreamError } from './stream-error';
 import { ICustomStreamDestination } from '../settings/streaming';
 
@@ -39,12 +38,12 @@ export interface IStreamInfo {
     | 'live'; // stream has been successfully started
   error: IStreamError | null;
   warning: 'YT_AUTO_START_IS_DISABLED' | '';
+  settings: IGoLiveSettings | null; // settings for the current attempt of going live
   checklist: {
     applyOptimizedSettings: TGoLiveChecklistItemState;
     twitch: TGoLiveChecklistItemState;
     youtube: TGoLiveChecklistItemState;
     facebook: TGoLiveChecklistItemState;
-    mixer: TGoLiveChecklistItemState;
     setupMultistream: TGoLiveChecklistItemState;
     startVideoTransmission: TGoLiveChecklistItemState;
     postTweet: TGoLiveChecklistItemState;
@@ -58,7 +57,6 @@ export interface IStreamSettings {
     twitch: IPlatformFlags & ITwitchStartStreamOptions;
     youtube: IPlatformFlags & IYoutubeStartStreamOptions;
     facebook: IPlatformFlags & IFacebookStartStreamOptions;
-    mixer: IPlatformFlags & IMixerStartStreamOptions;
   };
   customDestinations: ICustomStreamDestination[];
   advancedMode: boolean;

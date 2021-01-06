@@ -4,11 +4,7 @@ import { StreamSettingsService } from '../settings/streaming';
 import { UserService } from '../user';
 import { RestreamService } from '../restream';
 import { getPlatformService, TPlatform, TPlatformCapability } from '../platforms';
-import { $t } from '../i18n';
 import { cloneDeep, difference } from 'lodash';
-import { YoutubeService } from '../platforms/youtube';
-import { FacebookService } from '../platforms/facebook';
-import { TwitchService } from '../platforms/twitch';
 
 /**
  * The stream info view is responsible for keeping
@@ -37,7 +33,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
    * Returns a sorted list of all platforms (linked and unlinked)
    */
   get allPlatforms(): TPlatform[] {
-    return this.sortPlatforms(['twitch', 'mixer', 'facebook', 'youtube']);
+    return this.sortPlatforms(['twitch', 'facebook', 'youtube']);
   }
 
   /**
@@ -217,17 +213,6 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
    * Validates settings and returns an error string
    */
   validateSettings<T extends IStreamSettings>(settings: T): string {
-    const platforms = Object.keys(settings.platforms) as TPlatform[];
-    for (const platform of platforms) {
-      const platformSettings = settings.platforms[platform];
-      if (!platformSettings.enabled) continue;
-      const platformName = getPlatformService(platform).displayName;
-      if (platform === 'facebook') {
-        if (!platformSettings['game']) {
-          return $t('You must select a game for %{platformName}', { platformName });
-        }
-      }
-    }
     return '';
   }
 
@@ -237,6 +222,15 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   hasFailedChecks(): boolean {
     return !!Object.keys(this.state.info.checklist).find(
       check => this.state.info.checklist[check] === 'failed',
+    );
+  }
+
+  /**
+   * Return true if one of the checks is in a pending state
+   */
+  hasPendingChecks(): boolean {
+    return !!Object.keys(this.state.info.checklist).find(
+      check => this.state.info.checklist[check] === 'pending',
     );
   }
 
@@ -254,6 +248,11 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
 
     // don't reuse broadcastId for Youtube
     if (settings && settings['broadcastId']) settings['broadcastId'] = '';
+
+    // don't reuse liveVideoId for Facebook
+    if (platform === 'facebook' && settings && settings['liveVideoId']) {
+      settings['liveVideoId'] = '';
+    }
 
     return {
       ...settings,

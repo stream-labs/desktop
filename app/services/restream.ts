@@ -4,10 +4,12 @@ import { HostsService } from 'services/hosts';
 import { getPlatformService, TPlatform } from 'services/platforms';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { UserService } from 'services/user';
+import { CustomizationService, ICustomizationServiceState } from 'services/customization';
 import { authorizedHeaders, jfetch } from 'util/requests';
 import { IncrementalRolloutService } from './incremental-rollout';
 import electron from 'electron';
 import { StreamingService } from './streaming';
+import { FacebookService } from './platforms/facebook';
 
 interface IRestreamTarget {
   id: number;
@@ -36,9 +38,11 @@ interface IUserSettingsResponse extends IRestreamState {
 export class RestreamService extends StatefulService<IRestreamState> {
   @Inject() hostsService: HostsService;
   @Inject() userService: UserService;
+  @Inject() customizationService: CustomizationService;
   @Inject() streamSettingsService: StreamSettingsService;
   @Inject() streamingService: StreamingService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
+  @Inject() facebookService: FacebookService;
 
   settings: IUserSettingsResponse;
 
@@ -84,7 +88,14 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   get chatUrl() {
-    return `https://streamlabs.com/embed/chat?oauth_token=${this.userService.apiToken}`;
+    const hasFBTarget = this.streamInfo.enabledPlatforms.includes('facebook');
+    let fbParams = '';
+    if (hasFBTarget) {
+      const videoId = this.facebookService.state.settings.liveVideoId;
+      const token = this.facebookService.views.getDestinationToken();
+      fbParams = `&fbVideoId=${videoId}&fbToken=${token}`;
+    }
+    return `https://streamlabs.com/embed/chat?oauth_token=${this.userService.apiToken}${fbParams}`;
   }
 
   get shouldGoLiveWithRestream() {
@@ -131,10 +142,6 @@ export class RestreamService extends StatefulService<IRestreamState> {
     const request = new Request(url, { headers, body, method: 'PUT' });
 
     return jfetch(request);
-  }
-
-  get platforms(): TPlatform[] {
-    return [this.userService.state.auth.primaryPlatform, 'facebook'];
   }
 
   async beforeGoLive() {
@@ -286,6 +293,10 @@ export class RestreamService extends StatefulService<IRestreamState> {
       },
     });
 
+    this.customizationService.settingsChanged.subscribe(changed => {
+      this.handleSettingsChanged(changed);
+    });
+
     this.chatView.webContents.loadURL(this.chatUrl);
 
     electron.ipcRenderer.send('webContents-preventPopup', this.chatView.webContents.id);
@@ -297,6 +308,13 @@ export class RestreamService extends StatefulService<IRestreamState> {
     // @ts-ignore: typings are incorrect
     this.chatView.destroy();
     this.chatView = null;
+  }
+
+  private handleSettingsChanged(changed: Partial<ICustomizationServiceState>) {
+    if (!this.chatView) return;
+    if (changed.chatZoomFactor) {
+      this.chatView.webContents.setZoomFactor(changed.chatZoomFactor);
+    }
   }
 }
 

@@ -37,7 +37,7 @@ export default class StreamSettings extends TsxComponent {
     customDestForm: ValidatedForm;
   };
 
-  private obsSettings = this.streamSettingsService.getObsStreamSettings();
+  private obsSettings = this.streamSettingsService.views.obsStreamSettings;
   private customDestModel: ICustomStreamDestination = {
     name: '',
     url: '',
@@ -54,7 +54,7 @@ export default class StreamSettings extends TsxComponent {
 
   saveObsSettings(obsSettings: ISettingsSubCategory[]) {
     this.streamSettingsService.setObsStreamSettings(obsSettings);
-    this.obsSettings = this.streamSettingsService.getObsStreamSettings();
+    this.obsSettings = this.streamSettingsService.views.obsStreamSettings;
   }
 
   disableProtectedMode() {
@@ -214,7 +214,6 @@ export default class StreamSettings extends TsxComponent {
     const platformName = getPlatformService(platform).displayName;
     const buttonClass = {
       facebook: 'button--facebook',
-      mixer: 'button--mixer',
       youtube: 'button--youtube',
       twitch: 'button--twitch',
     }[platform];
@@ -224,9 +223,6 @@ export default class StreamSettings extends TsxComponent {
     const shouldShowUnlinkBtn = !isPrimary && isMerged && this.canEditSettings;
     const shouldShowPrimeLabel =
       !this.userService.state.isPrime && !this.restreamService.state.grandfathered;
-
-    // RIP Mixer
-    if (platform === 'mixer' && !isPrimary) return;
 
     return (
       <div class="section flex">

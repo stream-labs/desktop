@@ -65,7 +65,7 @@ export class ReplayModule extends Module {
 
   @apiMethod()
   getEnabled() {
-    return this.settingsService.state.Output.RecRB;
+    return this.settingsService.views.values.Output.RecRB;
   }
 
   @apiMethod()
@@ -79,7 +79,7 @@ export class ReplayModule extends Module {
 
   @apiMethod()
   getDuration() {
-    return this.settingsService.state.Output.RecRBTime;
+    return this.settingsService.views.values.Output.RecRBTime;
   }
 
   @apiMethod()

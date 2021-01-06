@@ -60,12 +60,11 @@ export default class Connect extends TsxComponent<ConnectProps> {
   }
 
   iconForPlatform(platform: TPlatform) {
-    if (this.loading && platform !== 'mixer') return 'fas fa-spinner fa-spin';
+    if (this.loading) return 'fas fa-spinner fa-spin';
 
     return {
       twitch: 'fab fa-twitch',
       youtube: 'fab fa-youtube',
-      mixer: 'fab fa-mixer',
       facebook: 'fab fa-facebook',
     }[platform];
   }
@@ -97,12 +96,6 @@ export default class Connect extends TsxComponent<ConnectProps> {
   selectOtherPlatform(platform: TExtraPlatform) {
     this.usageStatisticsService.recordAnalyticsEvent('PlatformLogin', platform);
     this.selectedExtraPlatform = platform;
-  }
-
-  showMixerMigration() {
-    electron.remote.shell.openExternal(
-      'https://blog.streamlabs.com/how-to-migrate-your-mixer-account-settings-on-streamlabs-7c77e0d9a47b',
-    );
   }
 
   render() {
@@ -149,31 +142,20 @@ export default class Connect extends TsxComponent<ConnectProps> {
                 {
                   value: 'dlive',
                   title: 'Dlive',
-                  icon: require('../../../../media/images/platforms/dlive-logo-small.png'),
+                  data: {
+                    image: require('../../../../media/images/platforms/dlive-logo-small.png'),
+                  },
                 },
                 {
                   value: 'nimotv',
                   title: 'NimoTV',
-                  icon: require('../../../../media/images/platforms/nimo-logo-small.png'),
+                  data: {
+                    image: require('../../../../media/images/platforms/nimo-logo-small.png'),
+                  },
                 },
               ] as IListOption<TExtraPlatform>[],
             }}
           />
-          <div style={{ marginTop: '24px' }}>
-            <i
-              class={this.iconForPlatform('mixer')}
-              style={{
-                color: 'var(--mixer)',
-                fontSize: '24px',
-                verticalAlign: 'middle',
-                marginRight: '8px',
-              }}
-            />
-            <span onClick={() => this.showMixerMigration()} style={{ cursor: 'pointer' }}>
-              Mixer was shut down on July 22nd. To migrate your Streamlabs account to another
-              platform, please click here.
-            </span>
-          </div>
           <p>
             <br />
             <span class={styles['link-button']} onClick={this.onSkip}>

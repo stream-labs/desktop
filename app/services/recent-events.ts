@@ -7,7 +7,6 @@ import { WindowsService } from 'services/windows';
 import { WebsocketService, TSocketEvent, IEventSocketEvent } from 'services/websocket';
 import { pick, cloneDeep } from 'lodash';
 import uuid from 'uuid/v4';
-import ExecuteInCurrentWindow from 'util/execute-in-current-window';
 import { Subscription } from 'rxjs';
 import mapValues from 'lodash/mapValues';
 
@@ -27,6 +26,7 @@ export interface IRecentEvent {
   host_type?: 'manual' | 'auto';
   raiders?: number;
   formatted_amount?: string;
+  formattedAmount?: string;
   sub_plan?: string;
   months?: number;
   streak_months?: number;
@@ -217,6 +217,7 @@ function getHashForRecentEvent(event: IRecentEvent) {
 const SUPPORTED_EVENTS = [
   'merch',
   'donation',
+  'streamlabscharitydonation',
   'facemaskdonation',
   'follow',
   'subscription',
@@ -245,6 +246,7 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
         $t('has donated') +
         (event.crate_item ? $t(' with %{name}', { name: event.crate_item.name }) : ''),
       merch: $t('has purchased %{product} from the store', { product: event.product }),
+      streamlabscharitydonation: $t('has donated via Streamlabs Charity'),
       follow: event.platform === 'youtube_account' ? $t('has subscribed') : $t('has followed'),
       subscription: this.getSubString(event),
       // Twitch

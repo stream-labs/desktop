@@ -4,9 +4,9 @@ import { InitAfter, mutation, PersistentStatefulService, ViewHandler } from '../
 import { UserService } from 'services/user';
 import { TPlatform, getPlatformService } from 'services/platforms';
 import { invert, pick } from 'lodash';
-import { MixerService, TwitchService } from '../../../app-services';
+import { TwitchService } from 'services/platforms/twitch';
 import { PlatformAppsService } from 'services/platform-apps';
-import { IGoLiveSettings, IPlatformFlags } from '../../streaming';
+import { IGoLiveSettings, IPlatformFlags } from 'services/streaming';
 import Vue from 'vue';
 
 interface ISavedGoLiveSettings {
@@ -14,7 +14,6 @@ interface ISavedGoLiveSettings {
     twitch: IPlatformFlags;
     facebook: IPlatformFlags;
     youtube: IPlatformFlags;
-    mixer: IPlatformFlags;
   };
   customDestinations?: ICustomStreamDestination[];
   advancedMode: boolean;
@@ -80,7 +79,6 @@ interface IStreamSettings extends IStreamSettingsState {
 const platformToServiceNameMap: { [key in TPlatform]: string } = {
   twitch: 'Twitch',
   youtube: 'YouTube / YouTube Gaming',
-  mixer: 'Mixer.com - FTL',
   facebook: 'Facebook Live',
 };
 
@@ -137,7 +135,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     });
 
     // save settings related to "Settings->Stream" window
-    let streamFormData = this.getObsStreamSettings();
+    let streamFormData = this.views.obsStreamSettings;
 
     streamFormData.forEach(subCategory => {
       subCategory.parameters.forEach(parameter => {
@@ -155,7 +153,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       ['platform', 'key', 'server'].includes(key),
     );
     if (!mustUpdateObsSettings) return;
-    streamFormData = this.getObsStreamSettings();
+    streamFormData = this.views.obsStreamSettings;
 
     streamFormData.forEach(subCategory => {
       subCategory.parameters.forEach(parameter => {
@@ -195,9 +193,9 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
    * obtain stream settings in a single object
    */
   get settings(): IStreamSettings {
-    const obsStreamSettings = this.settingsService.state.Stream;
-    const obsGeneralSettings = this.settingsService.state.General;
-    const obsAdvancedSettings = this.settingsService.state.Advanced;
+    const obsStreamSettings = this.settingsService.views.values.Stream;
+    const obsGeneralSettings = this.settingsService.views.values.General;
+    const obsAdvancedSettings = this.settingsService.views.values.Advanced;
 
     return {
       protectedModeEnabled: this.state.protectedModeEnabled,
@@ -219,10 +217,6 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       delayEnable: obsAdvancedSettings.DelayEnable,
       delaySec: obsAdvancedSettings.DelaySec,
     };
-  }
-
-  getObsStreamSettings(): ISettingsSubCategory[] {
-    return this.settingsService.getSettingsFormData('Stream');
   }
 
   setObsStreamSettings(formData: ISettingsSubCategory[]) {
@@ -307,9 +301,9 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     if (!currentStreamSettings.key) return;
 
     // disable protected mod if fetched streamkey doesn't match streamkey in settings
-    const platform = (getPlatformService(this.userService.platformType) as unknown) as
-      | TwitchService
-      | MixerService;
+    const platform = (getPlatformService(
+      this.userService.platformType,
+    ) as unknown) as TwitchService;
     if ((await platform.fetchStreamKey()) !== currentStreamSettings.key) {
       this.setSettings({ protectedModeEnabled: false });
       return;
@@ -326,4 +320,8 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
   }
 }
 
-class StreamSettingsView extends ViewHandler<IStreamSettingsState> {}
+class StreamSettingsView extends ViewHandler<IStreamSettingsState> {
+  get obsStreamSettings(): ISettingsSubCategory[] {
+    return this.getServiceViews(SettingsService).state.Stream.formData;
+  }
+}

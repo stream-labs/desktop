@@ -14,7 +14,7 @@ import { AppService } from 'services/app';
 import Tabs, { ITab } from 'components/Tabs.vue';
 import { ChatService } from 'services/chat';
 import { WindowsService } from 'services/windows';
-import { RestreamService, YoutubeService } from 'app-services';
+import { FacebookService, RestreamService, YoutubeService } from 'app-services';
 import { getPlatformService } from 'services/platforms';
 
 @Component({
@@ -28,6 +28,7 @@ import { getPlatformService } from 'services/platforms';
 export default class LiveDock extends Vue {
   @Inject() streamingService: StreamingService;
   @Inject() youtubeService: YoutubeService;
+  @Inject() facebookService: FacebookService;
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() platformAppsService: PlatformAppsService;
@@ -65,7 +66,7 @@ export default class LiveDock extends Vue {
     this.underlyingSelectedChat = val;
   }
 
-  viewStreamTooltip = $t('Go to YouTube to view your live stream');
+  viewStreamTooltip = $t('View your live stream in a web browser');
   editStreamInfoTooltip = $t('Edit your stream title and description');
   controlRoomTooltip = $t('Go to YouTube Live Dashboard');
 
@@ -153,12 +154,12 @@ export default class LiveDock extends Vue {
     electron.remote.shell.openExternal(this.youtubeService.dashboardUrl);
   }
 
-  get isTwitch() {
-    return this.userService.platform.type === 'twitch';
+  openFBStreamUrl() {
+    electron.remote.shell.openExternal(this.facebookService.streamPageUrl);
   }
 
-  get isMixer() {
-    return this.userService.platform.type === 'mixer';
+  get isTwitch() {
+    return this.userService.platform.type === 'twitch';
   }
 
   get isYoutube() {

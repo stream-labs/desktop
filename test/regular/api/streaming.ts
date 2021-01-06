@@ -5,7 +5,7 @@ import {
   EStreamingState,
   ERecordingState,
 } from '../../../app/services/streaming/streaming-api';
-import { ISettingsServiceApi } from '../../../app/services/settings';
+import { SettingsService } from '../../../app/services/settings';
 import { reserveUserFromPool } from '../../helpers/spectron/user';
 
 useSpectron({ restartAppAfterEachTest: true });
@@ -14,9 +14,9 @@ test('Streaming to Twitch via API', async t => {
   const streamKey = (await reserveUserFromPool(t, 'twitch')).streamKey;
   const client = await getClient();
   const streamingService = client.getResource<IStreamingServiceApi>('StreamingService');
-  const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
+  const settingsService = client.getResource<SettingsService>('SettingsService');
 
-  const streamSettings = settingsService.getSettingsFormData('Stream');
+  const streamSettings = settingsService.state.Stream.formData;
   streamSettings.forEach(subcategory => {
     subcategory.parameters.forEach(setting => {
       if (setting.name === 'service') setting.value = 'Twitch';
@@ -51,9 +51,9 @@ test('Streaming to Twitch via API', async t => {
 test('Recording via API', async (t: TExecutionContext) => {
   const client = await getClient();
   const streamingService = client.getResource<IStreamingServiceApi>('StreamingService');
-  const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
+  const settingsService = client.getResource<SettingsService>('SettingsService');
 
-  const outputSettings = settingsService.getSettingsFormData('Output');
+  const outputSettings = settingsService.state.Output.formData;
   outputSettings.forEach(subcategory => {
     subcategory.parameters.forEach(setting => {
       if (setting.name === 'FilePath') setting.value = t.context.cacheDir;

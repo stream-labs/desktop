@@ -98,7 +98,10 @@ export class KeyListenerService extends Service {
   }
 
   shutdown() {
-    if (this.hookStarted) this.libuiohook.stopHook();
+    if (this.hookStarted) {
+      this.libuiohook.unregisterAllCallbacks();
+      this.libuiohook.stopHook();
+    }
   }
 
   // Returns a string used for fast lookup of this keybinding

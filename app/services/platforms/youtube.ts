@@ -374,6 +374,9 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
    * returns perilled data for the GoLive window
    */
   async prepopulateInfo(): Promise<void> {
+    if (!this.state.liveStreamingEnabled) {
+      throw throwStreamError('YOUTUBE_STREAMING_DISABLED', '', 'youtube');
+    }
     const settings = this.state.settings;
     this.UPDATE_STREAM_SETTINGS({
       description: settings.description || (await this.fetchDefaultDescription()),
@@ -406,7 +409,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   /**
    * update data for the current active broadcast
    */
-  async putChannelInfo(options: IYoutubeStartStreamOptions): Promise<boolean> {
+  async putChannelInfo(options: IYoutubeStartStreamOptions): Promise<void> {
     const broadcastId = this.state.settings.broadcastId;
     assertIsDefined(broadcastId);
 
@@ -421,7 +424,6 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
 
     await this.updateBroadcast(broadcastId, options, true);
     this.UPDATE_STREAM_SETTINGS({ ...options, broadcastId });
-    return true;
   }
 
   /**

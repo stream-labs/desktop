@@ -78,6 +78,9 @@ export default class StartStreamingButton extends Vue {
       }
 
       if (this.shouldShowGoLiveWindow()) {
+        if (!this.streamingService.views.hasPendingChecks()) {
+          this.streamingService.actions.resetInfo();
+        }
         this.streamingService.actions.showGoLiveWindow();
       } else {
         this.streamingService.actions.goLive();
@@ -153,14 +156,6 @@ export default class StartStreamingButton extends Vue {
       // For Twitch, we can show the Go Live window even with protected mode off
       // This is mainly for legacy reasons.
       return this.streamingService.views.isMultiplatformMode || updateStreamInfoOnLive;
-    }
-
-    if (primaryPlatform === 'mixer') {
-      return (
-        this.streamSettingsService.state.protectedModeEnabled &&
-        updateStreamInfoOnLive &&
-        this.streamSettingsService.isSafeToModifyStreamKey()
-      );
     }
 
     if (primaryPlatform === 'facebook') {
