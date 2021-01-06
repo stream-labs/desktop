@@ -24,7 +24,7 @@ import { CustomizationService } from 'services/customization';
 import { NavigationService } from 'services/navigation';
 import { AppService } from 'services/app';
 import { UserService } from 'services/user';
-import { WindowsService } from 'services/windows';
+import { IModalOptions, WindowsService } from 'services/windows';
 import LiveDock from '../LiveDock.vue';
 import StudioFooter from '../StudioFooter.vue';
 import CustomLoader from '../CustomLoader';
@@ -34,6 +34,7 @@ import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import PlatformMerge from 'components/pages/PlatformMerge';
 import { getPlatformService } from 'services/platforms';
+import ModalWrapper from '../shared/modals/ModalWrapper';
 
 const loadedTheme = () => {
   const customizationState = localStorage.getItem('PersistentStatefulService-CustomizationService');
@@ -61,6 +62,7 @@ const loadedTheme = () => {
     PlatformMerge,
     LayoutEditor,
     AlertboxLibrary,
+    ModalWrapper,
   },
 })
 export default class Main extends Vue {
@@ -73,8 +75,18 @@ export default class Main extends Vue {
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() editorCommandsService: EditorCommandsService;
 
+  private modalOptions: IModalOptions = {
+    renderFn: null,
+  };
+
   created() {
     window.addEventListener('resize', this.windowSizeHandler);
+  }
+
+  mounted() {
+    WindowsService.modalChanged.subscribe(modalOptions => {
+      this.modalOptions = { ...this.modalOptions, ...modalOptions };
+    });
   }
 
   get uiReady() {

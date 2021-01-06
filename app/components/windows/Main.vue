@@ -1,57 +1,58 @@
 <template>
-<div class="main" :class="theme" id="mainWrapper" @drop="onDropHandler">
-  <title-bar :title="title" :class="{ 'titlebar--error': errorAlert }" v-if="uiReady" />
-  <news-banner v-if="uiReady" />
-  <div
-    class="main-contents"
-    v-if="uiReady"
-    :class="{
-      'main-contents--right': renderDock && leftDock && hasLiveDock,
-      'main-contents--left': renderDock && !leftDock && hasLiveDock,
-      'main-contents--onboarding': page === 'Onboarding',
-    }"
-  >
-    <side-nav v-if="page !== 'Onboarding' && !showLoadingSpinner" :locked="applicationLoading" />
-    <div class="live-dock-wrapper" v-if="renderDock && leftDock">
-      <live-dock :onLeft="true" />
-      <resize-bar
-        v-if="!isDockCollapsed"
-        class="live-dock-resize-bar live-dock-resize-bar--left"
-        position="right"
-        @resizestart="onResizeStartHandler"
-        @resizestop="onResizeStopHandler"
-      />
-    </div>
+  <div class="main" :class="theme" id="mainWrapper" @drop="onDropHandler">
+    <title-bar :title="title" :class="{ 'titlebar--error': errorAlert }" v-if="uiReady" />
+    <news-banner v-if="uiReady" />
+    <div
+      class="main-contents"
+      v-if="uiReady"
+      :class="{
+        'main-contents--right': renderDock && leftDock && hasLiveDock,
+        'main-contents--left': renderDock && !leftDock && hasLiveDock,
+        'main-contents--onboarding': page === 'Onboarding',
+      }"
+    >
+      <side-nav v-if="page !== 'Onboarding' && !showLoadingSpinner" :locked="applicationLoading" />
+      <div class="live-dock-wrapper" v-if="renderDock && leftDock">
+        <live-dock :onLeft="true" />
+        <resize-bar
+          v-if="!isDockCollapsed"
+          class="live-dock-resize-bar live-dock-resize-bar--left"
+          position="right"
+          @resizestart="onResizeStartHandler"
+          @resizestop="onResizeStopHandler"
+        />
+      </div>
 
-    <div class="main-middle" :class="mainResponsiveClasses" ref="mainMiddle">
-      <resize-observer @notify="handleResize" />
-      <component
-        class="main-page-container"
-        v-if="!showLoadingSpinner"
-        :is="page"
-        :params="params"
-        @totalWidth="width => handleEditorWidth(width)"
-      />
-      <studio-footer v-if="!applicationLoading && page !== 'Onboarding'" />
-    </div>
+      <div class="main-middle" :class="mainResponsiveClasses" ref="mainMiddle">
+        <resize-observer @notify="handleResize" />
+        <component
+          class="main-page-container"
+          v-if="!showLoadingSpinner"
+          :is="page"
+          :params="params"
+          @totalWidth="width => handleEditorWidth(width)"
+        />
+        <studio-footer v-if="!applicationLoading && page !== 'Onboarding'" />
+      </div>
 
-    <div class="live-dock-wrapper" v-if="renderDock && !leftDock">
-      <resize-bar
-        v-if="!isDockCollapsed"
-        class="live-dock-resize-bar"
-        position="left"
-        @resizestart="onResizeStartHandler"
-        @resizestop="onResizeStopHandler"
-      />
-      <live-dock class="live-dock" />
+      <div class="live-dock-wrapper" v-if="renderDock && !leftDock">
+        <resize-bar
+          v-if="!isDockCollapsed"
+          class="live-dock-resize-bar"
+          position="left"
+          @resizestart="onResizeStartHandler"
+          @resizestop="onResizeStopHandler"
+        />
+        <live-dock class="live-dock" />
+      </div>
     </div>
+    <ModalWrapper :renderFn="modalOptions.renderFn" />
+    <transition name="loader">
+      <div class="main-loading" v-if="!uiReady || showLoadingSpinner">
+        <custom-loader></custom-loader>
+      </div>
+    </transition>
   </div>
-  <transition name="loader">
-    <div class="main-loading" v-if="!uiReady || showLoadingSpinner">
-      <custom-loader></custom-loader>
-    </div>
-  </transition>
-</div>
 </template>
 
 <script lang="ts" src="./Main.vue.ts"></script>
