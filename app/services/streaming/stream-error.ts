@@ -43,6 +43,11 @@ const errorTypes = {
       return $t('Your YouTube account is not enabled for live streaming');
     },
   },
+  YOUTUBE_THUMBNAIL_UPLOAD_FAILED: {
+    get message() {
+      return $t('Failed to upload the thumbnail');
+    },
+  },
   YOUTUBE_PUBLISH_FAILED: {
     get message() {
       return $t('Failed to publish the YouTube broadcast');

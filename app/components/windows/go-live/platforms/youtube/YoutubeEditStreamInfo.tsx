@@ -17,6 +17,7 @@ import { StreamingService, IStreamSettings, IPlatformFlags } from 'services/stre
 import { SyncWithValue } from 'services/app/app-decorators';
 import BaseEditStreamInfo from '../BaseEditSteamInfo';
 import FormInput from 'components/shared/inputs/FormInput.vue';
+import electron from 'electron';
 
 class Props {
   value?: IStreamSettings;
@@ -74,15 +75,27 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
     const ytSettings = this.settings.platforms.youtube;
     const selectedBroadcast = this.selectedBroadcast;
     if (!selectedBroadcast) return;
-
     const newBroadcastOptions = await this.youtubeService.actions.return.fetchStartStreamOptionsForBroadcast(
       selectedBroadcast.id,
     );
     this.updateBroadcastSettings({ ...ytSettings, ...newBroadcastOptions });
   }
 
-  private updateBroadcastSettings(settings: IYoutubeStartStreamOptions & IPlatformFlags) {
+  private async updateBroadcastSettings(settings: IYoutubeStartStreamOptions & IPlatformFlags) {
     this.settings.platforms.youtube = settings;
+    // category id is a property of YoutubeVideo
+    const video = await this.youtubeService.fetchVideo(settings.broadcastId);
+    this.setCategory(video.snippet.categoryId);
+  }
+
+  private openThumbnailsEditor() {
+    electron.remote.shell.openExternal(
+      'https://streamlabs.com/dashboard#/prime/thumbnails?ref=slobs',
+    );
+  }
+
+  private setCategory(categoryId: string) {
+    this.settings.platforms.youtube.categoryId = categoryId;
   }
 
   private onProjectionChangeHandler(enable360: boolean) {
@@ -90,6 +103,7 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
   }
 
   private get formMetadata() {
+    const ytSettings = this.settings.platforms.youtube;
     return formMetadata({
       event: {
         broadcasts: this.broadcasts,
@@ -122,6 +136,15 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
           title: category.snippet.title,
         })),
         fullWidth: true,
+      }),
+      thumbnail: metadata.imageUploader({
+        title: $t('Thumbnail'),
+        maxFileSize: 2 * 1024 * 1024, // 2 mb
+        defaultUrl:
+          ytSettings.broadcastId &&
+          this.broadcastsLoaded &&
+          this.broadcasts.find(broadcast => broadcast.id === ytSettings.broadcastId)?.snippet
+            .thumbnails.high.url,
       }),
       latencyPreference: metadata.list<IYoutubeStartStreamOptions['latencyPreference']>({
         title: $t('Stream Latency'),
@@ -171,7 +194,6 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
   render() {
     const ytSettings = this.settings.platforms.youtube;
     const shouldShowOptionalFields = !this.canShowOnlyRequiredFields;
-    const isUpdate = this.view.isMidStreamMode;
     const is360video = ytSettings.projection === '360';
     const shouldShowSafeForKidsWarn = ytSettings.selfDeclaredMadeForKids;
     return (
@@ -195,6 +217,15 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
             metadata={this.formMetadata.category}
             vModel={this.settings.platforms.youtube.categoryId}
           />
+          <HFormGroup title={this.formMetadata.thumbnail.title}>
+            <FormInput
+              metadata={this.formMetadata.thumbnail}
+              vModel={this.settings.platforms.youtube.thumbnail}
+            />
+            <div class="input-description">
+              <a onclick={() => this.openThumbnailsEditor()}>{$t('Try thumbnails editor')}</a>
+            </div>
+          </HFormGroup>
           <HFormGroup
             metadata={this.formMetadata.latencyPreference}
             vModel={this.settings.platforms.youtube.latencyPreference}
