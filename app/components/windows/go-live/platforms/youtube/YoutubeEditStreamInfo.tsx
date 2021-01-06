@@ -94,7 +94,7 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
 
   private openThumbnailsEditor() {
     electron.remote.shell.openExternal(
-      'https://streamlabs.com/dashboard#/prime/thumbnails?ref=slobs',
+      'https://streamlabs.com/dashboard#/prime/thumbnails?ref=slobs-thumbnail-editor',
     );
   }
 
