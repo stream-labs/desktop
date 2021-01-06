@@ -30,6 +30,11 @@ export default class Troubleshooter extends Vue {
 
   private subscription: Subscription;
 
+  created() {
+    // Make sure we have the latest settings
+    this.settingsService.actions.loadSettingsIntoStore();
+  }
+
   mounted() {
     this.getSettings();
     this.subscription = this.streamingService.streamingStatusChange
