@@ -89,6 +89,11 @@ export default class Settings extends Vue {
 
   internalCategoryName: string = null;
 
+  created() {
+    // Make sure we have the latest settings
+    this.settingsService.actions.loadSettingsIntoStore();
+  }
+
   /**
    * Whether we have built a cache of searchable pages already.
    * If we havne't - we should debounce the user input.
@@ -105,7 +110,7 @@ export default class Settings extends Vue {
   }
 
   get settingsData() {
-    return this.settingsService.state[this.categoryName].formData;
+    return this.settingsService.state[this.categoryName]?.formData ?? [];
   }
 
   set categoryName(val: string) {
