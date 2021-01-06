@@ -117,5 +117,13 @@
   "Apps": "Applications",
   "Finish": "Terminer",
   "Get Prime": "Obtenir Prime",
-  "System error message:": "Message d’erreur système:"
+  "System error message:": "Message d’erreur système:",
+  "List is empty": "List is empty",
+  "Not selected": "Not selected",
+  "Friends": "Friends",
+  "Width": "Largeur",
+  "Height": "Hauteur",
+  "Use Custom": "Use Custom",
+  "Apply": "Apply",
+  "Do not show this message again": "Do not show this message again"
 }

@@ -25,5 +25,17 @@
   "Limiter": "限幅器",
   "Expander": "扩展器",
   "Shader": "着色器",
-  "No settings are available for this filter": "此过滤器没有可用的设置"
+  "No settings are available for this filter": "此过滤器没有可用的设置",
+  "Visual Presets": "Visual Presets",
+  "None": "無",
+  "Grayscale": "Grayscale",
+  "Sepiatone": "Sepiatone",
+  "Action Movie": "Action Movie",
+  "Inverted": "Inverted",
+  "Flashback": "Flashback",
+  "Hearth": "Hearth",
+  "Heat Map": "Heat Map",
+  "Cel Shade": "Cel Shade",
+  "Dramatic": "Dramatic",
+  "Wintergreen": "Wintergreen"
 }

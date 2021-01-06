@@ -1,9 +1,9 @@
 {
-  "You have been logged out": "Kijelentkeztél",
-  "This element is too small to be displayed": "Ez az elem túl kicsi a megjelenítéshez",
-  "This element requires Selective Recording to be enabled": "Ehhez az elemhez engedélyezni kell a szelektív felvételt",
-  "Grant Permissions": "Adjon engedélyeket",
-  "Streamlabs OBS needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "A Streamlabs OBS-nek további engedélyekre van szüksége. A folytatáshoz adjon engedélyeket a felbukkanó párbeszédablakokban.",
-  "Microphone": "Mikrofon",
-  "Webcam": "Webkamera"
+  "You have been logged out": "You have been logged out",
+  "This element is too small to be displayed": "This element is too small to be displayed",
+  "This element requires Selective Recording to be enabled": "This element requires Selective Recording to be enabled",
+  "Grant Permissions": "Grant Permissions",
+  "Streamlabs OBS needs additional permissions. Grant permissions in the pop-up dialogs to continue.": "Streamlabs OBS needs additional permissions. Grant permissions in the pop-up dialogs to continue.",
+  "Microphone": "Microphone",
+  "Webcam": "Webcam"
 }
