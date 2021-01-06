@@ -228,7 +228,7 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
               vModel={this.settings.platforms.youtube.thumbnail}
             />
             <div class="input-description">
-              <a onclick={() => this.openThumbnailsEditor()}>{$t('Try thumbnails editor')}</a>
+              <a onclick={() => this.openThumbnailsEditor()}>{$t('Try our new thumbnail editor')}</a>
             </div>
           </HFormGroup>
           <HFormGroup
