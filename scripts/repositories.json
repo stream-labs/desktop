@@ -7,7 +7,7 @@
             "version": "0.13.8",
             "win64": true,
             "osx": true,
-            "mac_version": "0.13.14"
+            "mac_version": "0.13.17"
         },
         {
             "name": "node-libuiohook",
