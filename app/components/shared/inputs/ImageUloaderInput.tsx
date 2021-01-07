@@ -46,7 +46,7 @@ export default class ImageUploaderInput extends BaseInput<string, IImageUploader
       return;
     }
 
-    // save is as a base64 string
+    // save the file as a base64 string
     fr.readAsDataURL(file);
     fr.addEventListener('load', () => {
       this.emitInput(fr.result as string);

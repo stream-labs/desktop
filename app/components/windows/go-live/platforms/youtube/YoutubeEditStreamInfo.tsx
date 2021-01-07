@@ -94,7 +94,7 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
 
   private openThumbnailsEditor() {
     electron.remote.shell.openExternal(
-      'https://streamlabs.com/dashboard#/prime/thumbnails?ref=slobs',
+      'https://streamlabs.com/dashboard#/prime/thumbnails?refl=slobs-thumbnail-editor',
     );
   }
 
@@ -228,7 +228,9 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
               vModel={this.settings.platforms.youtube.thumbnail}
             />
             <div class="input-description">
-              <a onclick={() => this.openThumbnailsEditor()}>{$t('Try thumbnails editor')}</a>
+              <a onclick={() => this.openThumbnailsEditor()}>
+                {$t('Try our new thumbnail editor')}
+              </a>
             </div>
           </HFormGroup>
           <HFormGroup
