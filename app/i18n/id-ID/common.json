@@ -121,9 +121,13 @@
   "List is empty": "List is empty",
   "Not selected": "Not selected",
   "Friends": "Friends",
-  "Width": "Width",
-  "Height": "Height",
+  "Thumbnail": "Thumbnail",
+  "Maximum file size reached ": "Maximum file size reached ",
+  "Select image": "Select image",
+  "Clear": "Bersihkan",
+  "Width": "Lebar",
+  "Height": "Tinggi",
   "Use Custom": "Use Custom",
-  "Apply": "Apply",
+  "Apply": "Daftar",
   "Do not show this message again": "Do not show this message again"
 }
