@@ -245,7 +245,6 @@ export class InternalApiClient {
         return;
       }
 
-      // response.mutations?.forEach(commitMutation);
       const result = this.handleResult(response.result);
 
       if (result instanceof Promise) {
