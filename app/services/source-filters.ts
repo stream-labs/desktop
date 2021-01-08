@@ -20,6 +20,7 @@ import { Subject } from 'rxjs';
 import { UsageStatisticsService } from './usage-statistics';
 import { getSharedResource } from 'util/get-shared-resource';
 import { ViewHandler } from 'services/core/stateful-service';
+import { byOS, OS } from 'util/operating-systems';
 
 export type TSourceFilterType =
   | 'mask_filter'
@@ -66,18 +67,19 @@ export interface ISourceFilterIdentifier {
 
 class SourceFiltersViews extends ViewHandler<{}> {
   get presetFilterOptions() {
+    const prefix = byOS({ [OS.Windows]: 'luts\\', [OS.Mac]: 'luts/' });
     return [
       { title: $t('None'), value: '' },
-      { title: $t('Grayscale'), value: 'luts\\grayscale.png' },
-      { title: $t('Sepiatone'), value: 'luts\\sepia.png' },
-      { title: $t('Dramatic'), value: 'luts\\gazing.png' },
-      { title: $t('Flashback'), value: 'luts\\muted.png' },
-      { title: $t('Inverted'), value: 'luts\\inverted.png' },
-      { title: $t('Action Movie'), value: 'luts\\cool_tone.png' },
-      { title: $t('Hearth'), value: 'luts\\warm_tone.png' },
-      { title: $t('Wintergreen'), value: 'luts\\green_tone.png' },
-      { title: $t('Heat Map'), value: 'luts\\heat_map.png' },
-      { title: $t('Cel Shade'), value: 'luts\\cel_shade.png' },
+      { title: $t('Grayscale'), value: `${prefix}grayscale.png` },
+      { title: $t('Sepiatone'), value: `${prefix}sepia.png` },
+      { title: $t('Dramatic'), value: `${prefix}gazing.png` },
+      { title: $t('Flashback'), value: `${prefix}muted.png` },
+      { title: $t('Inverted'), value: `${prefix}inverted.png` },
+      { title: $t('Action Movie'), value: `${prefix}cool_tone.png` },
+      { title: $t('Hearth'), value: `${prefix}warm_tone.png` },
+      { title: $t('Wintergreen'), value: `${prefix}green_tone.png` },
+      { title: $t('Heat Map'), value: `${prefix}heat_map.png` },
+      { title: $t('Cel Shade'), value: `${prefix}cel_shade.png` },
     ];
   }
 
