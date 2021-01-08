@@ -52,7 +52,7 @@ module.exports = {
   entry: {
     renderer: './app/app.ts',
     updater: './updater/mac/ui.js',
-    'guest-api': './guest-api'
+    'guest-api': './guest-api',
   },
 
   output: {
