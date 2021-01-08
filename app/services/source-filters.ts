@@ -87,6 +87,7 @@ class SourceFiltersViews extends ViewHandler<{}> {
     return metadata.list({
       options: this.presetFilterOptions,
       title: $t('Visual Presets'),
+      optionsHeight: 230,
     });
   }
 

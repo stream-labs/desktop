@@ -59,6 +59,8 @@ export interface IListMetadata<TValueType, TOptionData = unknown> extends IInput
   noResult?: string;
   placeholder?: string;
   fullWidth?: boolean;
+  openDirection?: 'top' | 'bottom';
+  optionsHeight?: number;
 }
 
 export interface IImagePickerMetadata<TValueType> extends IListMetadata<TValueType> {
