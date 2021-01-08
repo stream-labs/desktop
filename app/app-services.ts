@@ -106,3 +106,16 @@ export { SubGoalService } from 'services/widgets/settings/sub-goal';
 export { MediaShareService } from 'services/widgets/settings/media-share';
 export { AlertBoxService } from 'services/widgets/settings/alert-box';
 export { SpinWheelService } from 'services/widgets/settings/spin-wheel';
+
+import { WindowsService } from './services/windows';
+import { CustomizationService } from './services/customization';
+import { ScenesService } from './services/scenes';
+import { EditorCommandsService } from './services/editor-commands';
+import { PerformanceService } from './services/performance';
+export const AppServices = {
+  WindowsService,
+  ScenesService,
+  CustomizationService,
+  EditorCommandsService,
+  PerformanceService,
+};

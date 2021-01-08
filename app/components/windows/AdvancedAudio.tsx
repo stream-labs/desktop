@@ -9,8 +9,6 @@ import { TObsValue } from 'components/obs/inputs/ObsInput';
 import { EditorCommandsService } from 'services/editor-commands';
 import { $t } from 'services/i18n';
 import styles from './AdvancedAudio.m.less';
-import { ICardProps } from '../shared/react-component-props';
-import { ReactHelloWorld } from '../shared/ReactComponent';
 
 @Component({
   components: { ModalLayout },
@@ -20,84 +18,72 @@ export default class AdvancedAudio extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() editorCommandsService: EditorCommandsService;
 
+  get audioSources() {
+    return this.audioService.views.sourcesForCurrentScene;
+  }
+
+  onInputHandler(audioSource: AudioSource, name: string, value: TObsValue) {
+    if (name === 'deflection') {
+      this.editorCommandsService.executeCommand(
+        'SetDeflectionCommand',
+        audioSource.sourceId,
+        (value as number) / 100,
+      );
+    } else {
+      this.editorCommandsService.executeCommand('SetAudioSettingsCommand', audioSource.sourceId, {
+        [name]: value,
+      });
+    }
+  }
+
+  get tableHeaders() {
+    return (
+      <thead>
+        <tr>
+          <th class={styles.audioSourceName}>{$t('Name')}</th>
+          <th>{$t('Volume ( % )')}</th>
+          <th>{$t('Downmix to Mono')}</th>
+          <th>{$t('Sync Offset ( ms )')}</th>
+          <th>{$t('Audio Monitoring')}</th>
+          <th>{$t('Tracks')}</th>
+        </tr>
+      </thead>
+    );
+  }
+
   render() {
     return (
       <ModalLayout showControls={false}>
         <form slot="content">
-          Hello from Vue Container
-          <ReactHelloWorld componentProps={{ title: 'Test my title' }} />
-          {/*<ReactComponent componentClass={ReactHelloWorld} componentProps={{ title: 'My Title' }} />*/}
+          <table>
+            {this.tableHeaders}
+
+            {this.audioSources.map(audioSource => (
+              <tr key={audioSource.name} name={audioSource.name} class={styles.audioSettingsRow}>
+                <td class={styles.audioSourceName}>{audioSource.name}</td>
+                {audioSource.getSettingsForm().map(formInput => {
+                  const Component = propertyComponentForType(formInput.type);
+                  return (
+                    <td
+                      key={`${audioSource.name}${formInput.name}`}
+                      class={styles['column-' + formInput.name]}
+                    >
+                      <div class={styles.advancedAudioInput}>
+                        <Component
+                          value={formInput}
+                          onInput={(value: { value: TObsValue }) =>
+                            this.onInputHandler(audioSource, formInput.name, value.value)
+                          }
+                        />
+                      </div>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </table>
         </form>
       </ModalLayout>
     );
   }
-
-  // get audioSources() {
-  //   return this.audioService.views.sourcesForCurrentScene;
-  // }
-  //
-  // onInputHandler(audioSource: AudioSource, name: string, value: TObsValue) {
-  //   if (name === 'deflection') {
-  //     this.editorCommandsService.executeCommand(
-  //       'SetDeflectionCommand',
-  //       audioSource.sourceId,
-  //       (value as number) / 100,
-  //     );
-  //   } else {
-  //     this.editorCommandsService.executeCommand('SetAudioSettingsCommand', audioSource.sourceId, {
-  //       [name]: value,
-  //     });
-  //   }
-  // }
-  //
-  // get tableHeaders() {
-  //   return (
-  //     <thead>
-  //       <tr>
-  //         <th class={styles.audioSourceName}>{$t('Name')}</th>
-  //         <th>{$t('Volume ( % )')}</th>
-  //         <th>{$t('Downmix to Mono')}</th>
-  //         <th>{$t('Sync Offset ( ms )')}</th>
-  //         <th>{$t('Audio Monitoring')}</th>
-  //         <th>{$t('Tracks')}</th>
-  //       </tr>
-  //     </thead>
-  //   );
-  // }
-  //
-  // render() {
-  //   return (
-  //     <ModalLayout showControls={false}>
-  //       <form slot="content">
-  //         <table>
-  //           {this.tableHeaders}
-  //
-  //           {this.audioSources.map(audioSource => (
-  //             <tr key={audioSource.name} name={audioSource.name} class={styles.audioSettingsRow}>
-  //               <td class={styles.audioSourceName}>{audioSource.name}</td>
-  //               {audioSource.getSettingsForm().map(formInput => {
-  //                 const Component = propertyComponentForType(formInput.type);
-  //                 return (
-  //                   <td
-  //                     key={`${audioSource.name}${formInput.name}`}
-  //                     class={styles['column-' + formInput.name]}
-  //                   >
-  //                     <div class={styles.advancedAudioInput}>
-  //                       <Component
-  //                         value={formInput}
-  //                         onInput={(value: { value: TObsValue }) =>
-  //                           this.onInputHandler(audioSource, formInput.name, value.value)
-  //                         }
-  //                       />
-  //                     </div>
-  //                   </td>
-  //                 );
-  //               })}
-  //             </tr>
-  //           ))}
-  //         </table>
-  //       </form>
-  //     </ModalLayout>
-  //   );
-  // }
 }

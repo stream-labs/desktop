@@ -1,4 +1,5 @@
 /*global SLOBS_BUNDLE_ID*/
+
 import { I18nService, $t } from 'services/i18n';
 
 // eslint-disable-next-line
@@ -314,8 +315,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // create a root Vue component
   const windowId = Utils.getCurrentUrlParams().windowId;
-  // save the app instance to a global variable so React components can use Vue components inside
-  window['vm'] = new Vue({
+  const vm = new Vue({
     i18n,
     store,
     el: '#app',

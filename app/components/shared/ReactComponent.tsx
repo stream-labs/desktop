@@ -5,7 +5,6 @@ const ReactDOM = require('react-dom');
 const React = require('react');
 
 import { Component } from 'vue-property-decorator';
-import { ICardProps } from './react-component-props';
 
 class WrapperProps<TComponentProps> {
   name?: string = null;
@@ -25,11 +24,7 @@ export default class ReactComponent<TComponentProps = {}> extends TsxComponent<
     const className = this.props.name;
     const componentClass = reactBuild.components[className];
     ReactDOM.render(
-      React.createElement(
-        componentClass,
-        { ...this.props.componentProps, key: className },
-        null,
-      ),
+      React.createElement(componentClass, { ...this.props.componentProps, key: className }, null),
       this.$refs.container,
     );
   }
@@ -42,9 +37,6 @@ export default class ReactComponent<TComponentProps = {}> extends TsxComponent<
     return <div ref="container" style={this.props.wrapperStyles}></div>;
   }
 }
-
-@Component({ props: { name: { default: 'ReactHelloWorld' } } })
-export class ReactHelloWorld extends ReactComponent<ICardProps> {}
 
 @Component({
   props: {

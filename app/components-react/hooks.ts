@@ -1,6 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { StatefulService } from '../services/core';
 
+/**
+ * Creates a reactive state for a React component based on Vuex store
+ */
 export function useVuex<TReturnValue>(selector: () => TReturnValue): TReturnValue;
 export function useVuex<T, TReturnValue>(
   target: T,
@@ -13,7 +16,6 @@ export function useVuex(...args: any[]) {
     const unsubscribe = StatefulService.store.watch(
       () => selector(),
       newState => {
-        console.log('target changed');
         setState(newState);
       },
     );
@@ -23,4 +25,12 @@ export function useVuex(...args: any[]) {
   });
 
   return state;
+}
+
+/**
+ * Call a function once before component first render
+ * Helpful if you need to calculate an immutable initial state for a component
+ */
+export function useOnce<TReturnValue>(cb: () => TReturnValue) {
+  return useMemo(cb, []);
 }

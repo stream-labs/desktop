@@ -52,8 +52,7 @@ module.exports = {
   entry: {
     renderer: './app/app.ts',
     updater: './updater/mac/ui.js',
-    'guest-api': './guest-api',
-    // 'react-components': './app/components-react/index.ts',
+    'guest-api': './guest-api'
   },
 
   output: {
@@ -145,7 +144,6 @@ module.exports = {
       {
         test: path => {
           const match = !!path.match(/react\\.+\.tsx?$/);
-          if (match) console.log('test ', path, 'match', match);
           return match;
         },
         include: path.resolve(__dirname, 'app/components-react'),
