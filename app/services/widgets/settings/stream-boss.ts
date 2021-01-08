@@ -185,10 +185,6 @@ export abstract class StreamBossService extends BaseGoalService<
         { key: 'superchat_multiplier', title: $t('Damage Per Superchat Dollar'), isInteger: true },
         { key: 'follow_multiplier', title: $t('Damage Per Subscriber'), isInteger: true },
       ],
-      mixer: [
-        { key: 'follow_multiplier', title: $t('Damage Per Follower'), isInteger: true },
-        { key: 'sub_multiplier', title: $t('Damage Per Subscriber'), isInteger: true },
-      ],
     }[platform];
   }
 }

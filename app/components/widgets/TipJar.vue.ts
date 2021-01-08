@@ -18,10 +18,6 @@ const nameMap = () => ({
   twitch_bits: $t('Twitch Bits'),
   twitch_subs: $t('Twitch Subs'),
   twitch_resubs: $t('Twitch Resubs'),
-  mixer_follows: $t('Mixer Follows'),
-  mixer_subscriptions: $t('Mixer Subscriptions'),
-  mixer_effects: $t('Mixer Effects'),
-  mixer_stickers: $t('Mixer Stickers'),
   youtube_subscribers: $t('YouTube Subscriptions'),
   youtube_sponsors: $t('YouTube Memberships'),
   youtube_superchats: $t('YouTube Super Chats'),
@@ -38,7 +34,6 @@ const nameMap = () => ({
 const mediaGalleryInputs = {
   twitch: ['twitch_follows'],
   youtube: ['youtube_subscribers', 'youtube_sponsors'],
-  mixer: ['mixer_subscriptions', 'mixer_follows'],
 };
 
 @Component({

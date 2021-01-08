@@ -20,7 +20,6 @@
   margin-bottom: 0;
   justify-content: flex-start;
   flex-wrap: wrap;
-  width: 72px;
   margin-right: none;
 }
 

@@ -162,10 +162,6 @@ export default class LiveDock extends Vue {
     return this.userService.platform.type === 'twitch';
   }
 
-  get isMixer() {
-    return this.userService.platform.type === 'mixer';
-  }
-
   get isYoutube() {
     return this.userService.platform.type === 'youtube';
   }

@@ -61,7 +61,6 @@ interface ILinkedPlatformsResponse {
   twitch_account?: ILinkedPlatform;
   facebook_account?: ILinkedPlatform;
   youtube_account?: ILinkedPlatform;
-  mixer_account?: ILinkedPlatform;
   user_id: number;
 }
 
@@ -346,17 +345,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       });
     } else if (this.state.auth.primaryPlatform !== 'facebook') {
       this.UNLINK_PLATFORM('facebook');
-    }
-
-    if (linkedPlatforms.mixer_account) {
-      this.UPDATE_PLATFORM({
-        type: 'mixer',
-        username: linkedPlatforms.mixer_account.platform_name,
-        id: linkedPlatforms.mixer_account.platform_id,
-        token: linkedPlatforms.mixer_account.access_token,
-      });
-    } else if (this.state.auth.primaryPlatform !== 'mixer') {
-      this.UNLINK_PLATFORM('mixer');
     }
 
     if (linkedPlatforms.twitch_account) {

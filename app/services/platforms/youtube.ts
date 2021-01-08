@@ -1,4 +1,4 @@
-import { mutation, InheritMutations } from '../core/stateful-service';
+import { mutation, InheritMutations, ViewHandler } from '../core/stateful-service';
 import {
   IPlatformService,
   TPlatformCapability,
@@ -19,6 +19,9 @@ import { BasePlatformService } from './base-platform';
 import { assertIsDefined } from 'util/properties-type-guards';
 import electron from 'electron';
 import { omitBy } from 'lodash';
+import { UserService } from '../user';
+import { IFacebookStartStreamOptions, TDestinationType } from './facebook';
+import Utils from '../utils';
 
 interface IYoutubeServiceState extends IPlatformState {
   liveStreamingEnabled: boolean;
@@ -30,6 +33,7 @@ interface IYoutubeServiceState extends IPlatformState {
 
 export interface IYoutubeStartStreamOptions extends IExtraBroadcastSettings {
   title: string;
+  thumbnail?: string | 'default';
   categoryId?: string;
   broadcastId?: string;
   description: string;
@@ -70,6 +74,11 @@ export interface IYoutubeLiveBroadcast {
         url: string;
         width: 120;
         height: 90;
+      };
+      high: {
+        url: string;
+        width: 480;
+        height: 360;
       };
     };
   };
@@ -173,6 +182,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       latencyPreference: 'normal',
       privacyStatus: 'public',
       selfDeclaredMadeForKids: false,
+      thumbnail: '',
     },
   };
 
@@ -216,12 +226,22 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   /**
    * Request Youtube API and handle error response
    */
-  private async requestYoutube<T = unknown>(reqInfo: IPlatformRequest | string): Promise<T> {
+  private async requestYoutube<T = unknown>(
+    reqInfo: IPlatformRequest | string,
+    repeatRequestIfRateLimitExceed = true,
+  ): Promise<T> {
     try {
       return await platformAuthorizedRequest<T>('youtube', reqInfo);
     } catch (e) {
       let details = e.result?.error?.message;
       if (!details) details = 'connection failed';
+
+      // if the rate limit exceeded then repeat request after 3s delay
+      if (details === 'User requests exceed the rate limit.' && repeatRequestIfRateLimitExceed) {
+        await Utils.sleep(3000);
+        return await this.requestYoutube(reqInfo, false);
+      }
+
       const errorType =
         details === 'The user is not enabled for live streaming.'
           ? 'YOUTUBE_STREAMING_DISABLED'
@@ -237,12 +257,14 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
 
   async beforeGoLive(settings: IGoLiveSettings) {
     const ytSettings = settings.platforms.youtube;
+    const streamToScheduledBroadcast = !!ytSettings.broadcastId;
     // update selected LiveBroadcast with new title and description
     // or create a new LiveBroadcast if there are no broadcasts selected
     let broadcast: IYoutubeLiveBroadcast;
-    if (!ytSettings.broadcastId) {
+    if (!streamToScheduledBroadcast) {
       broadcast = await this.createBroadcast(ytSettings);
     } else {
+      assertIsDefined(ytSettings.broadcastId);
       await this.updateBroadcast(ytSettings.broadcastId, ytSettings);
       broadcast = await this.fetchBroadcast(ytSettings.broadcastId);
     }
@@ -458,10 +480,13 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       method: 'POST',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
     });
-    return broadcast;
 
-    // update additional settings
-    // return await this.updateBroadcast(broadcast.id, params);
+    // upload thumbnail
+    if (params.thumbnail && params.thumbnail !== 'default') {
+      await this.uploadThumbnail(params.thumbnail, broadcast.id);
+    }
+
+    return broadcast;
   }
 
   /**
@@ -517,6 +542,9 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       method: 'PUT',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
     });
+
+    // upload thumbnail
+    if (params.thumbnail) await this.uploadThumbnail(params.thumbnail, broadcast.id);
   }
 
   /**
@@ -647,6 +675,27 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     const youtubeDomain =
       nightMode === 'day' ? 'https://youtube.com' : 'https://gaming.youtube.com';
     return `${youtubeDomain}/watch?v=${this.state.settings.broadcastId}`;
+  }
+
+  async uploadThumbnail(base64url: string | 'default', videoId: string) {
+    // if `default` passed as url then upload default url
+    // otherwise convert the passed base64url to blob
+    const url =
+      base64url !== 'default' ? base64url : `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+    const body = await fetch(url).then(res => res.blob());
+
+    try {
+      await jfetch(
+        `https://www.googleapis.com/upload/youtube/v3/thumbnails/set?videoId=${videoId}`,
+        { method: 'POST', body, headers: { Authorization: `Bearer ${this.oauthToken}` } },
+      );
+    } catch (e) {
+      const error = await e.json();
+      let details = error.result?.error?.message;
+      if (!details) details = 'connection failed';
+      const errorType = 'YOUTUBE_THUMBNAIL_UPLOAD_FAILED';
+      throw throwStreamError(errorType, details, 'youtube');
+    }
   }
 
   @mutation()

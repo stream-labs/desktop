@@ -1,13 +1,13 @@
 import Vue from 'vue';
 import electron from 'electron';
-import { Component, Watch } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
-import { getComponents, IWindowOptions, WindowsService } from 'services/windows';
+import { getComponents, IModalOptions, IWindowOptions, WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
 import TitleBar from '../TitleBar';
 import { AppService } from 'services/app';
-import Utils from 'services/utils';
 import styles from './ChildWindow.m.less';
+import ModalWrapper from '../shared/modals/ModalWrapper';
 
 @Component({})
 export default class ChildWindow extends Vue {
@@ -17,8 +17,12 @@ export default class ChildWindow extends Vue {
 
   components: IWindowOptions[] = [];
   private refreshingTimeout: number;
+  private modalOptions: IModalOptions = { renderFn: null };
 
   mounted() {
+    WindowsService.modalChanged.subscribe(modalOptions => {
+      this.modalOptions = { ...this.modalOptions, ...modalOptions };
+    });
     this.onWindowUpdatedHandler(this.options);
     this.windowsService.windowUpdated.subscribe(windowInfo => {
       if (windowInfo.windowId !== 'child') return;
@@ -73,6 +77,7 @@ export default class ChildWindow extends Vue {
     // If the window was closed, just clear the stack
     if (!options.isShown) {
       this.clearComponentStack();
+      WindowsService.hideModal();
       return;
     }
 
@@ -128,6 +133,8 @@ export default class ChildWindow extends Vue {
           <i class="fa fa-spinner fa-pulse" />
           <div class={styles.spinnerSpacer} />
         </div>
+        <ModalWrapper renderFn={this.modalOptions?.renderFn} />
+
         {this.componentsToRender.map((comp, index) => {
           const ChildWindowComponent = getComponents()[comp.componentName];
           return (

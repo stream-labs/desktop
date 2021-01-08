@@ -33,7 +33,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
    * Returns a sorted list of all platforms (linked and unlinked)
    */
   get allPlatforms(): TPlatform[] {
-    return this.sortPlatforms(['twitch', 'mixer', 'facebook', 'youtube']);
+    return this.sortPlatforms(['twitch', 'facebook', 'youtube']);
   }
 
   /**
@@ -246,8 +246,9 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     };
     const settings = cloneDeep(service.state.settings);
 
-    // don't reuse broadcastId for Youtube
+    // don't reuse broadcastId and thumbnail for Youtube
     if (settings && settings['broadcastId']) settings['broadcastId'] = '';
+    if (settings && settings['thumbnail']) settings['thumbnail'] = '';
 
     // don't reuse liveVideoId for Facebook
     if (platform === 'facebook' && settings && settings['liveVideoId']) {
