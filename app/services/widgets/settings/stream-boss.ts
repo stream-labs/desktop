@@ -49,7 +49,10 @@ export interface IStreamBossCreateOptions {
 }
 
 @InheritMutations()
-export class StreamBossService extends BaseGoalService<IStreamBossData, IStreamBossCreateOptions> {
+export class StreamBossService extends BaseGoalService<
+  IStreamBossData,
+  IStreamBossCreateOptions
+> {
   static initialState = WIDGET_INITIAL_STATE;
 
   getApiSettings() {

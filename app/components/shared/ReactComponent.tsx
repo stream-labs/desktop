@@ -12,10 +12,11 @@ class WrapperProps<TComponentProps> {
   wrapperStyles?: Dictionary<string> = {};
 }
 
+/**
+ * Wraps React component into a Vue component
+ */
 @Component({ props: createProps(WrapperProps) })
-export default class ReactComponent<TComponentProps = {}> extends TsxComponent<
-  WrapperProps<TComponentProps>
-> {
+class ReactComponent<TComponentProps = {}> extends TsxComponent<WrapperProps<TComponentProps>> {
   $refs: {
     container: HTMLDivElement;
   };
