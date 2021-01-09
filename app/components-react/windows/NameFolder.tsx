@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Services } from '../service-provider';
 import { useOnce } from '../hooks';
 import { assertIsDefined } from '../../util/properties-type-guards';
+import { PlatformLogoVue } from '../shared/VueComponent';
 
 interface IWindowOptions {
   renameId?: string;
