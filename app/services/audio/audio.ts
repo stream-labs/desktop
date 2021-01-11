@@ -374,6 +374,26 @@ export class AudioSource implements IAudioSourceApi {
       },
 
       <IObsInput<boolean>>{
+        value: this.muted,
+        name: 'muted',
+        description: $t('Muted'),
+        showDescription: false,
+        type: 'OBS_PROPERTY_BOOL',
+        visible: true,
+        enabled: true,
+      },
+
+      <IObsInput<boolean>>{
+        value: this.mixerHidden,
+        name: 'mixerHidden',
+        description: $t('Hide in Mixer'),
+        showDescription: false,
+        type: 'OBS_PROPERTY_BOOL',
+        visible: true,
+        enabled: true,
+      },
+
+      <IObsInput<boolean>>{
         value: this.forceMono,
         name: 'forceMono',
         description: $t('Downmix to Mono'),
