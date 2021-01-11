@@ -89,8 +89,8 @@ export class KeyListenerService extends Service {
     delete this.bindings[keystr][namespace];
 
     if (Object.keys(this.bindings[keystr]).length === 0) {
-       delete this.bindings[keystr];
-       this.libuiohook.unregisterCallback(binding);
+      delete this.bindings[keystr];
+      this.libuiohook.unregisterCallback(binding);
     }
   }
 
