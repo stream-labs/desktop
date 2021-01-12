@@ -116,6 +116,7 @@ module.exports = {
         use: {
           loader: 'ts-loader',
           options: {
+            reportFiles: tsFiles,
             compilerOptions: {
               strictNullChecks: !!process.env.SLOBS_STRICT_NULLS,
             },
