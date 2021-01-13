@@ -124,7 +124,10 @@ module.exports = {
         },
       },
       {
-        test: /\.tsx?$/,
+        test: path => {
+          const match = !!path.match(/components[\\/].+\.tsx$/);
+          return match;
+        },
         include: path.resolve(__dirname, 'app/components'),
         use: [
           'babel-loader',
@@ -140,7 +143,10 @@ module.exports = {
         ],
       },
       {
-        test: /\.tsx?$/,
+        test: path => {
+          const match = !!path.match(/react[\\/].+\.tsx?$/);
+          return match;
+        },
         include: path.resolve(__dirname, 'app/components-react'),
         use: [
           'babel-loader',
