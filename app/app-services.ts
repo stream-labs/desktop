@@ -77,7 +77,6 @@ export { VideoEncodingOptimizationService } from 'services/video-encoding-optimi
 export { StreamingService } from 'services/streaming';
 export { StreamlabelsService } from 'services/streamlabels';
 export { AutoConfigService } from 'services/auto-config';
-export { FacemasksService } from 'services/facemasks';
 export { PlatformAppsService } from 'services/platform-apps';
 export { PlatformAppStoreService } from 'services/platform-app-store';
 export { PlatformAppAssetsService } from 'services/platform-apps/platform-app-assets-service';
