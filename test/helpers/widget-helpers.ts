@@ -6,7 +6,10 @@ import { getClient } from './api-client';
 
 export async function waitForWidgetSettingsSync(t: TExecutionContext) {
   await sleep(2000);
-  await t.context.app.client.waitForVisible('.saving-indicator', 15000, true);
+  await (await t.context.app.client.$('.saving-indicator')).waitForDisplayed({
+    timeout: 15000,
+    reverse: true,
+  });
   await sleep(2000);
 }
 
@@ -40,5 +43,5 @@ export async function addWidget(t: TExecutionContext, type: EWidgetType, name: s
   const widget = widgetService.createWidget((type as unknown) as WidgetType, name);
   sourcesService.showSourceProperties(widget.sourceId);
   await focusChild(t);
-  await t.context.app.client.waitForVisible('button=Widget Editor'); // wait for loading
+  await (await t.context.app.client.$('button=Widget Editor')).waitForDisplayed(); // wait for loading
 }

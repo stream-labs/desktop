@@ -39,9 +39,11 @@ platforms.forEach(platform => {
 
     // open EditStreamInfo window
     await focusMain(t);
-    await app.client.click('button=Go Live');
+    await (await app.client.$('button=Go Live')).click();
     await focusChild(t);
-    if (await app.client.isExisting('button=Go Live')) await app.client.click('button=Go Live');
+    if (await (await app.client.$('button=Go Live')).isExisting()) {
+      await (await app.client.$('button=Go Live')).click();
+    }
 
     // fill streaming data
     switch (platform) {
@@ -71,19 +73,19 @@ platforms.forEach(platform => {
 
     await makeScreenshots(t, 'before_stream');
 
-    await app.client.click('button=Confirm & Go Live');
+    await (await app.client.$('button=Confirm & Go Live')).click();
 
     // check we're streaming
     await focusMain(t);
-    await app.client.waitForExist('button=End Stream', 20 * 1000);
+    await (await app.client.$('button=End Stream')).waitForExist({ timeout: 20 * 1000 });
 
     // give the GoLive window a couple of seconds to become closed
     await sleep(2000);
 
     // open the editStreamInfo dialog
-    await app.client.click('.live-dock-info .icon-edit');
+    await (await app.client.$('.live-dock-info .icon-edit')).click();
     await focusChild(t);
-    await app.client.waitForExist('input', 20 * 1000);
+    await (await app.client.$('input')).waitForExist({ timeout: 20 * 1000 });
     await makeScreenshots(t, 'in_stream');
     t.pass();
   });
@@ -99,7 +101,7 @@ schedulingPlatforms.forEach(platform => {
 
     // open EditStreamInfo window
     await focusMain(t);
-    await app.client.click('button .icon-date');
+    await (await app.client.$('button .icon-date')).click();
     await focusChild(t);
 
     // fill streaming data
@@ -139,11 +141,11 @@ test('Go live error', async t => {
 
   // open EditStreamInfo window
   await focusMain(t);
-  await app.client.click('button=Go Live');
+  await (await app.client.$('button=Go Live')).click();
   await focusChild(t);
 
   // check that the error text is shown
-  await app.client.waitForVisible('a=just go live');
+  await (await app.client.$('a=just go live')).waitForDisplayed();
   await makeScreenshots(t, 'network error');
 
   await resetFetchMock(t);
