@@ -117,5 +117,13 @@
   "Apps": "앱",
   "Finish": "종료",
   "Get Prime": "Prime 이용하기",
-  "System error message:": "시스템 오류 메시지:"
+  "System error message:": "시스템 오류 메시지:",
+  "List is empty": "List is empty",
+  "Not selected": "Not selected",
+  "Friends": "Friends",
+  "Width": "넓이",
+  "Height": "높이",
+  "Use Custom": "Use Custom",
+  "Apply": "Apply",
+  "Do not show this message again": "Do not show this message again"
 }

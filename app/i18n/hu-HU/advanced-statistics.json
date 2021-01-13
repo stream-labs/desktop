@@ -1,15 +1,15 @@
 {
-  "You do not have any notifications": "Nincs értesítése",
-  "Your stream is currently offline": "Stream jelenleg offline állapotban van",
-  "Your stream is experiencing issues": "A stream problémákba ütközik",
-  "Your stream is experiencing minor issues": "A streamed kisebb problémákat vet fel",
-  "Live Stats": "Élő statisztika",
-  "Click on a stat to add it to your footer": "Kattintson egy stat-ra, hogy hozzáadja a lábléchez",
-  "Click to add this info to your footer": "Kattintson, hogy hozzáadja ezt az információt a lábléchez",
-  "When Streamlabs OBS detects performance issues with your stream, such as dropped frames, lagged frames, or a stream disconnection, troubleshooting notifications will be sent to you here.": "Amikor a Streamlabs OBS észleli az adatfolyammal kapcsolatos teljesítményproblémákat, mint például a leesett keretek, elmaradott keretek vagy az adatfolyam leválasztása, itt jelennek meg a hibaelhárítási értesítések.",
-  "Click to add %{stat} info to your footer": "Kattintson a hozzáadáshoz %{stat} információ a lábléchez",
-  "CPU": "Processzor",
+  "You do not have any notifications": "You do not have any notifications",
+  "Your stream is currently offline": "Your stream is currently offline",
+  "Your stream is experiencing issues": "Your stream is experiencing issues",
+  "Your stream is experiencing minor issues": "Your stream is experiencing minor issues",
+  "Live Stats": "Live Stats",
+  "Click on a stat to add it to your footer": "Click on a stat to add it to your footer",
+  "Click to add this info to your footer": "Click to add this info to your footer",
+  "When Streamlabs OBS detects performance issues with your stream, such as dropped frames, lagged frames, or a stream disconnection, troubleshooting notifications will be sent to you here.": "When Streamlabs OBS detects performance issues with your stream, such as dropped frames, lagged frames, or a stream disconnection, troubleshooting notifications will be sent to you here.",
+  "Click to add %{stat} info to your footer": "Click to add %{stat} info to your footer",
+  "CPU": "CPU",
   "FPS": "FPS",
-  "dropped frames": "elejtett Képkockák",
-  "bandwidth": "sávszélesség"
+  "dropped frames": "dropped frames",
+  "bandwidth": "bandwidth"
 }

@@ -10,6 +10,7 @@ import { byOS, OS } from 'util/operating-systems';
 interface IDefaultHardwareServiceState {
   defaultVideoDevice: string;
   defaultAudioDevice: string;
+  presetFilter: string;
 }
 
 export class DefaultHardwareService extends PersistentStatefulService<
@@ -18,6 +19,7 @@ export class DefaultHardwareService extends PersistentStatefulService<
   static defaultState: IDefaultHardwareServiceState = {
     defaultVideoDevice: null,
     defaultAudioDevice: 'default',
+    presetFilter: '',
   };
 
   @Inject() private hardwareService: HardwareService;
@@ -77,6 +79,26 @@ export class DefaultHardwareService extends PersistentStatefulService<
       }));
   }
 
+  findVideoSource(deviceId: string) {
+    const deviceProperty = byOS({ [OS.Windows]: 'video_device_id', [OS.Mac]: 'device' });
+
+    let found = this.sourcesService.views.sources.find(
+      source =>
+        source.type === byOS({ [OS.Windows]: 'dshow_input', [OS.Mac]: 'av_capture_input' }) &&
+        source.getSettings()[deviceProperty] === deviceId,
+    );
+
+    if (!found) {
+      found = this.sourcesService.views.temporarySources.find(
+        source =>
+          source.type === byOS({ [OS.Windows]: 'dshow_input', [OS.Mac]: 'av_capture_input' }) &&
+          source.getSettings()[deviceProperty] === deviceId,
+      );
+    }
+
+    return found;
+  }
+
   clearTemporarySources() {
     this.audioDevices.forEach(device => {
       this.sourcesService.removeSource(device.id);
@@ -89,6 +111,10 @@ export class DefaultHardwareService extends PersistentStatefulService<
       if (existingSource) return;
       this.sourcesService.removeSource(device.id);
     });
+  }
+
+  setPresetFilter(filter: string) {
+    this.SET_PRESET_FILTER(filter);
   }
 
   get videoDevices() {
@@ -146,5 +172,10 @@ export class DefaultHardwareService extends PersistentStatefulService<
     } else {
       this.state.defaultAudioDevice = id;
     }
+  }
+
+  @mutation()
+  private SET_PRESET_FILTER(filter: string) {
+    this.state.presetFilter = filter;
   }
 }

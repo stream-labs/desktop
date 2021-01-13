@@ -117,5 +117,13 @@
   "Apps": "アプリ",
   "Finish": "終了",
   "Get Prime": "Prime を入手",
-  "System error message:": "システムエラーメッセージ："
+  "System error message:": "システムエラーメッセージ：",
+  "List is empty": "List is empty",
+  "Not selected": "Not selected",
+  "Friends": "Friends",
+  "Width": "横幅",
+  "Height": "高さ",
+  "Use Custom": "Use Custom",
+  "Apply": "Apply",
+  "Do not show this message again": "Do not show this message again"
 }

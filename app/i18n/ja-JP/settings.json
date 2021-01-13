@@ -135,5 +135,8 @@
   "Virtual webcam is <status>Offline</status>": "Virtual webcam is <status>Offline</status>",
   "If the virtual webcam does not appear in other applications, you may need to restart your computer.": "If the virtual webcam does not appear in other applications, you may need to restart your computer.",
   "This is an experimental feature.": "This is an experimental feature.",
-  "Virtual Webcam allows you to display your scenes from Streamlabs OBS in video conferencing software. Streamlabs OBS will appear as a Webcam that can be selected in most video conferencing apps.": "Virtual Webcam allows you to display your scenes from Streamlabs OBS in video conferencing software. Streamlabs OBS will appear as a Webcam that can be selected in most video conferencing apps."
+  "Virtual Webcam allows you to display your scenes from Streamlabs OBS in video conferencing software. Streamlabs OBS will appear as a Webcam that can be selected in most video conferencing apps.": "Virtual Webcam allows you to display your scenes from Streamlabs OBS in video conferencing software. Streamlabs OBS will appear as a Webcam that can be selected in most video conferencing apps.",
+  "Uninstalling Virtual Webcam will remove it as a device option in other applications.": "Uninstalling Virtual Webcam will remove it as a device option in other applications.",
+  "Uninstall Virtual Webcam": "Uninstall Virtual Webcam",
+  "Use custom resolution": "Use custom resolution"
 }

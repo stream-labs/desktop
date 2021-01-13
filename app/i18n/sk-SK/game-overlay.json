@@ -1,9 +1,9 @@
 {
-  "Enable in-game overlay": "Povoliť prekrytie v hre",
-  "Enable stream preview in overlay": "Povoliť ukážku toku v prekrytí",
-  "Toggle in-game overlay": "Prepnúť prekrytie v hre",
-  "Toggle positioning mode": "Prepnúť režim určovania",
-  "Set a hotkey in Hotkey Settings to toggle the in-game overlay": "Nastavte klávesovú skratku v nastaveniach klávesových skratiek na prepínanie prekrytia v hre",
-  "The in-game overlay is a new experimental feature that allows you to view chat and events overlayed on top of your game.  This overlay may not work with certain games running in exclusive fullscreen mode.  For best results, we recommend running your game in windowed-fullscreen mode.": "Prekrytie v hre je nová experimentálna funkcia, ktorá vám umožňuje zobraziť rozhovory a udalosti prekryté v hornej časti vašej hry. Toto prekrytie nemusí fungovať pri určitých hrách spustených v exkluzívnom režime na celú obrazovku. Najlepšie výsledky odporúčame spustiť v režime celej obrazovky.",
-  "Please log in to use the in-game overlay.": "Ak chcete použiť prekrytie v hre, prihláste sa."
+  "Enable in-game overlay": "Enable in-game overlay",
+  "Enable stream preview in overlay": "Enable stream preview in overlay",
+  "Toggle in-game overlay": "Toggle in-game overlay",
+  "Toggle positioning mode": "Toggle positioning mode",
+  "Set a hotkey in Hotkey Settings to toggle the in-game overlay": "Set a hotkey in Hotkey Settings to toggle the in-game overlay",
+  "The in-game overlay is a new experimental feature that allows you to view chat and events overlayed on top of your game.  This overlay may not work with certain games running in exclusive fullscreen mode.  For best results, we recommend running your game in windowed-fullscreen mode.": "The in-game overlay is a new experimental feature that allows you to view chat and events overlayed on top of your game.  This overlay may not work with certain games running in exclusive fullscreen mode.  For best results, we recommend running your game in windowed-fullscreen mode.",
+  "Please log in to use the in-game overlay.": "Please log in to use the in-game overlay."
 }

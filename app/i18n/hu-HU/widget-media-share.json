@@ -1,15 +1,15 @@
 {
-  "Banned Media": "Tiltott média",
-  "Check Banned Media": "Ellenőrizze a tiltott médiát",
-  "Price Per Second": "Másodpercenkénti ár",
-  "Min. Amount to Share": "Min. összeg a megosztáshoz",
+  "Banned Media": "Banned Media",
+  "Check Banned Media": "Check Banned Media",
+  "Price Per Second": "Price Per Second",
+  "Min. Amount to Share": "Min. Amount to Share",
   "Max Duration": "Maximális időtartam",
-  "Buffer Time": "Pufferidő",
-  "Spam Security": "Spam szűrő",
-  "The time between videos the next video has to buffer.": "A következő videó videóinak közötti időt pufferolni kell.",
-  "Manage Media Settings": "Kezelje a médiabeállításokat",
-  "The maximum duration in seconds that media can be played, regardless of amount donated. The default value is 60 seconds.": "Maximális időtartam másodpercben, ameddig a média lejátszható, függetlenül a támogatási összegtől. Az alapértelmezett érték 60 másodperc.",
-  "This slider helps you filter shared media before it can be submitted.\nOff: No security\nLow: 65%+ rating, 5k+ views\nMedium: 75%+ rating, 40k+ views\nHigh: 80%+ rating, 300k+ views\nVery High: 85%+ rating, 900k+ views": "Ez a csúszka elősegíti a megosztott adathordozók szűrését a benyújtás előtt.\nKi: Nincs biztonság\nMély: 65% + értékelés, 5 ezer + nézet\nKözepes: 75% + értékelés, 40 ezer + nézet\nMagas: 80% + értékelés, 300 ezer nézet\nNagyon magas: 85% + értékelés, 900 ezer nézet",
-  "The minimum amount a donor must donate in order to share media. The default value is $5.00 USD": "Az a minimális összeg, amelyet az adományozónak adományoznia kell a média megosztása érdekében. Az alapértelmezett érték 5,00 USD",
-  "In order to control length, you can decide how much it costs per second to share media. Setting this to 0.30 would mean that for $10, media would play for 30 seconds. The default value is 0.10.": "Annak érdekében, hogy szabályozd a média hosszát, eldöntheted, hogy mennyibe kerül másodpercenként a média megosztása. Ha ezt beállítod 0,30-ra, azt jelenti, hogy 10 dollárért, a média 30 másodpercen keresztül játszódhat le. Az alapértelmezett érték 0,10."
+  "Buffer Time": "Buffer Time",
+  "Spam Security": "Spam Security",
+  "The time between videos the next video has to buffer.": "The time between videos the next video has to buffer.",
+  "Manage Media Settings": "Manage Media Settings",
+  "The maximum duration in seconds that media can be played, regardless of amount donated. The default value is 60 seconds.": "The maximum duration in seconds that media can be played, regardless of amount donated. The default value is 60 seconds.",
+  "This slider helps you filter shared media before it can be submitted.\nOff: No security\nLow: 65%+ rating, 5k+ views\nMedium: 75%+ rating, 40k+ views\nHigh: 80%+ rating, 300k+ views\nVery High: 85%+ rating, 900k+ views": "This slider helps you filter shared media before it can be submitted.\nOff: No security\nLow: 65%+ rating, 5k+ views\nMedium: 75%+ rating, 40k+ views\nHigh: 80%+ rating, 300k+ views\nVery High: 85%+ rating, 900k+ views",
+  "The minimum amount a donor must donate in order to share media. The default value is $5.00 USD": "The minimum amount a donor must donate in order to share media. The default value is $5.00 USD",
+  "In order to control length, you can decide how much it costs per second to share media. Setting this to 0.30 would mean that for $10, media would play for 30 seconds. The default value is 0.10.": "In order to control length, you can decide how much it costs per second to share media. Setting this to 0.30 would mean that for $10, media would play for 30 seconds. The default value is 0.10."
 }
