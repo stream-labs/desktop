@@ -396,7 +396,7 @@ export class FormMonkey {
     await this.client.performActions([
       {
         type: 'pointer',
-        id: 'finger1',
+        id: 'pointer1',
         parameters: { pointerType: 'mouse' },
         actions: [
           { type: 'pointerMove', duration: 0, x: Math.ceil(dotPos.x), y: Math.ceil(dotPos.y) },
@@ -419,7 +419,7 @@ export class FormMonkey {
     await this.client.performActions([
       {
         type: 'pointer',
-        id: 'finger1',
+        id: 'pointer1',
         parameters: { pointerType: 'mouse' },
         actions: [
           { type: 'pointerMove', duration: 0, x: Math.ceil(dotPos.x), y: Math.ceil(dotPos.y) },
@@ -444,14 +444,14 @@ export class FormMonkey {
       await this.client.performActions([
         {
           type: 'pointer',
-          id: 'finger1',
+          id: 'pointer1',
           parameters: { pointerType: 'mouse' },
           actions: [
             {
               type: 'pointerMove',
               duration: 10,
               origin: 'pointer',
-              x: xOffset,
+              x: Math.round(xOffset),
               y: 0,
             },
           ],
