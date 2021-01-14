@@ -5,9 +5,10 @@ import {
   clickRemoveScene,
   selectScene,
   openRenameWindow,
-  openDuplicateWindow
+  openDuplicateWindow,
 } from '../helpers/spectron/scenes';
 import { getClient } from '../helpers/api-client';
+import { SceneCollectionsService } from 'app-services';
 
 useSpectron();
 
@@ -22,7 +23,7 @@ async function checkDefaultSources(t) {
 test('The default scene', async t => {
   const app = t.context.app;
   await focusMain(t);
-  t.true(await app.client.isExisting('div=Scene'));
+  t.true(await (await app.client.$('div=Scene')).isExisting());
   await checkDefaultSources(t);
 });
 
@@ -33,13 +34,13 @@ test('Adding and removing a scene', async t => {
   await addScene(t, sceneName);
 
   await focusMain(t);
-  t.true(await app.client.isExisting(`div=${sceneName}`));
+  t.true(await (await app.client.$(`div=${sceneName}`)).isExisting());
 
   await selectScene(t, sceneName);
   await checkDefaultSources(t);
   await clickRemoveScene(t);
 
-  t.false(await app.client.isExisting(`div=${sceneName}`));
+  t.false(await (await app.client.$(`div=${sceneName}`)).isExisting());
 });
 
 test('Scene switching with sources', async t => {
@@ -67,12 +68,14 @@ test('Restarting the app preserves the default sources', async t => {
   const client = await getClient();
   const app = t.context.app;
   const sceneName = 'Coolest Scene Ever';
-  const sceneCollectionsService = client.getResource('SceneCollectionsService');
+  const sceneCollectionsService = client.getResource<SceneCollectionsService>(
+    'SceneCollectionsService',
+  );
 
   await addScene(t, sceneName);
 
   await focusMain(t);
-  t.true(await app.client.isExisting(`div=${sceneName}`));
+  t.true(await (await app.client.$(`div=${sceneName}`)).isExisting());
 
   // reload config
   await sceneCollectionsService.load(sceneCollectionsService.collections[0].id);
@@ -82,29 +85,27 @@ test('Restarting the app preserves the default sources', async t => {
   await checkDefaultSources(t);
 });
 
-
 test('Rename scene', async t => {
   const app = t.context.app;
   const newSceneName = 'Scene2';
 
   await openRenameWindow(t, 'Scene');
-  await app.client.setValue('input', newSceneName);
-  await app.client.click('button=Done');
+  await (await app.client.$('input')).setValue(newSceneName);
+  await (await app.client.$('button=Done')).click();
 
   await focusMain(t);
 
-  t.true(await app.client.isExisting(`div=${newSceneName}`));
+  t.true(await (await app.client.$(`div=${newSceneName}`)).isExisting());
 });
-
 
 test('Duplicate scene', async t => {
   const app = t.context.app;
   const sceneName = 'My Scene';
   await addScene(t, sceneName);
   await focusMain(t);
-  t.true(await app.client.isExisting(`div=${sceneName}`));
+  t.true(await (await app.client.$(`div=${sceneName}`)).isExisting());
   await openDuplicateWindow(t, sceneName);
-  await app.client.click('button=Done');
+  await (await app.client.$('button=Done')).click();
   await focusMain(t);
-  t.true(await app.client.isExisting(`div=${sceneName} (1)`));
+  t.true(await (await app.client.$(`div=${sceneName} (1)`)).isExisting());
 });
