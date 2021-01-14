@@ -67,7 +67,8 @@ test('OBS Importer', async t => {
   const client = t.context.app.client;
 
   // extract OBS config to the cache dir
-  const cacheDir = path.resolve(await t.context.app.electron.app.getPath('userData'), '..');
+  // @ts-ignore Spectron typings are wrong - app is actually under remote
+  const cacheDir = path.resolve(await t.context.app.electron.remote.app.getPath('userData'), '..');
   const dataDir = path.resolve(__dirname, '..', '..', '..', 'test', 'data');
   const obsCacheZipPath = path.resolve(dataDir, 'obs-studio.zip');
   spawnSync(_7z, ['x', obsCacheZipPath, `-o${cacheDir}`]);
