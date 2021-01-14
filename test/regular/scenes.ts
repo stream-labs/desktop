@@ -1,4 +1,4 @@
-import { useSpectron, focusMain, test } from '../helpers/spectron';
+import { useSpectron, focusMain, test, TExecutionContext } from '../helpers/spectron';
 import { addSource, sourceIsExisting } from '../helpers/spectron/sources';
 import {
   addScene,
@@ -13,11 +13,11 @@ import { SceneCollectionsService } from 'app-services';
 useSpectron();
 
 // Checks for the default audio sources
-async function checkDefaultSources(t) {
+async function checkDefaultSources(t: TExecutionContext) {
   const app = t.context.app;
   await focusMain(t);
-  t.true(await app.client.isExisting('div=Mic/Aux'));
-  t.true(await app.client.isExisting('div=Desktop Audio'));
+  t.true(await (await app.client.$('div=Mic/Aux')).isExisting());
+  t.true(await (await app.client.$('div=Desktop Audio')).isExisting());
 }
 
 test('The default scene', async t => {
