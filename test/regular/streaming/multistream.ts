@@ -42,6 +42,7 @@ test('Multistream default mode', async t => {
     'Mutlistream should be enabled',
   );
   await client.waitForVisible("h1=You're live!", 60000);
+  await stopStream(t);
 });
 
 test('Multistream advanced mode', async t => {
@@ -91,6 +92,7 @@ test('Multistream advanced mode', async t => {
     'Mutlistream should be enabled',
   );
   await client.waitForVisible("h1=You're live!", 60000);
+  await stopStream(t);
 });
 
 test('Custom stream destinations', async t => {
