@@ -91,9 +91,14 @@ export class RestreamService extends StatefulService<IRestreamState> {
     const hasFBTarget = this.streamInfo.enabledPlatforms.includes('facebook');
     let fbParams = '';
     if (hasFBTarget) {
-      const videoId = this.facebookService.state.settings.liveVideoId;
-      const token = this.facebookService.views.getDestinationToken();
-      fbParams = `&fbVideoId=${videoId}&fbToken=${token}`;
+      const fbView = this.facebookService.views;
+      const videoId = fbView.state.settings.liveVideoId;
+      const token = fbView.getDestinationToken();
+      fbParams = `&fbVideoId=${videoId}`;
+      // all destinations except "page" require a token
+      if (fbView.state.settings.destinationType !== 'page') {
+        fbParams += `&fbToken=${token}`;
+      }
     }
     return `https://streamlabs.com/embed/chat?oauth_token=${this.userService.apiToken}${fbParams}`;
   }
