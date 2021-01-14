@@ -3,6 +3,7 @@ import { logIn } from '../../../helpers/spectron/user';
 import { sleep } from '../../../helpers/sleep';
 import { getClient } from '../../../helpers/api-client';
 import { ScenesService } from 'services/api/external-api/scenes';
+import { Application } from 'spectron';
 
 useSpectron();
 
@@ -64,17 +65,17 @@ test('Twitch Tags', async t => {
   t.false(await hasTag('Competitive'));
 });
 
-const getSelectedTags = async (app: any) => {
+const getSelectedTags = async (app: Application) => {
   const tags = await app.client.execute(() => {
     return Array.from(
       document.querySelectorAll('.sp-input-container .sp-selected-tag > span:first-child'),
     ).map(el => el.textContent);
   });
 
-  return tags.value;
+  return tags;
 };
 
-const hasTagAssertion = (app: any) => async (tag: string) => {
+const hasTagAssertion = (app: Application) => async (tag: string) => {
   try {
     const tags = await getSelectedTags(app);
 
@@ -84,15 +85,16 @@ const hasTagAssertion = (app: any) => async (tag: string) => {
   }
 };
 
-const clearTags = async (app: any) => {
+const clearTags = async (app: Application) => {
   const removeTagButtons = await app.client.$$('.tags-container .sp-selected-tag .sp-icon-close');
 
   for (const removeButton of removeTagButtons.reverse()) {
-    await app.client.click(
-      // @ts-ignore
-      `.tags-container .sp-selected-tag:nth-child(${removeButton.index + 2}) .sp-icon-close`,
-    );
+    await (
+      await app.client.$(
+        `.tags-container .sp-selected-tag:nth-child(${removeButton.index + 2}) .sp-icon-close`,
+      )
+    ).click();
   }
 };
 
-const getTagRows = async (app: any) => app.client.$$('.sp-result-area tbody tr');
+const getTagRows = async (app: Application) => app.client.$$('.sp-result-area tbody tr');
