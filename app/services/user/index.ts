@@ -35,6 +35,7 @@ import fs from 'fs';
 import path from 'path';
 import { AppService } from 'services/app';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import { StreamingService } from 'services/streaming';
 
 export enum EAuthProcessState {
   Idle = 'idle',
