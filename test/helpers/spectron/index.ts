@@ -187,13 +187,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         NODE_ENV: 'test',
         SLOBS_CACHE_DIR: t.context.cacheDir,
       },
-      webdriverOptions: {
-        // most of deprecation warning encourage us to use WebdriverIO actions API
-        // however the documentation for this API looks very poor, it provides only one example:
-        // http://webdriver.io/api/protocol/actions.html
-        // disable deprecation warning and waiting for better docs now
-        deprecationWarnings: false,
-      },
       chromeDriverArgs: [`user-data-dir=${path.join(t.context.cacheDir, 'slobs-client')}`],
     });
 
