@@ -85,6 +85,7 @@ test('Migrate the twitch account to the protected mode', async t => {
     protectedModeMigrationRequired: true,
   });
 
+  await stopStream(t);
   await restartApp(t); // restarting the app should call migration again
   await tryToGoLive(t, {
     title: 'SLOBS Test Stream',
