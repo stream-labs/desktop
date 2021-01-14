@@ -387,16 +387,46 @@ export class FormMonkey {
     const $dot = await this.client.$(`${sliderInputSelector} .vue-slider-dot-handle`);
     const $slider = await this.client.$(`${sliderInputSelector} .vue-slider`);
 
-    let moveOffset = await $dot.getSize('width');
+    let moveOffset = await $slider.getSize('width');
+
+    let dotPos = await $dot.getLocation();
+    const sliderPos = await $slider.getLocation();
 
     // reset slider to 0 position
-    await $dot.moveTo();
-    await this.client.buttonDown(0);
-    await $slider.moveTo();
-    await sleep(100); // wait for transitions
-    await this.client.buttonUp(0);
-    await $dot.moveTo();
-    await this.client.buttonDown();
+    await this.client.performActions([
+      {
+        type: 'pointer',
+        id: 'finger1',
+        parameters: { pointerType: 'mouse' },
+        actions: [
+          { type: 'pointerMove', duration: 0, x: Math.ceil(dotPos.x), y: Math.ceil(dotPos.y) },
+          { type: 'pointerDown', button: 0 },
+          {
+            type: 'pointerMove',
+            duration: 100,
+            x: Math.ceil(sliderPos.x),
+            y: Math.ceil(sliderPos.y),
+          },
+          { type: 'pointerUp', button: 0 },
+        ],
+      },
+    ]);
+
+    // Get new dot position
+    dotPos = await $dot.getLocation();
+
+    // Start the dragging action
+    await this.client.performActions([
+      {
+        type: 'pointer',
+        id: 'finger1',
+        parameters: { pointerType: 'mouse' },
+        actions: [
+          { type: 'pointerMove', duration: 0, x: Math.ceil(dotPos.x), y: Math.ceil(dotPos.y) },
+          { type: 'pointerDown', button: 0 },
+        ],
+      },
+    ]);
 
     // use a bisection method to find the correct slider position
     while (true) {
@@ -404,23 +434,38 @@ export class FormMonkey {
 
       if (currentValue === goalValue) {
         // we've found it
-        await this.client.buttonUp(0);
+        await this.client.releaseActions();
         return;
       }
 
-      const $null = await this.client.$(null);
+      let xOffset = Math.round(moveOffset);
+      if (goalValue < currentValue) xOffset *= -1;
 
-      if (goalValue < currentValue) {
-        await $null.moveTo({ xOffset: -Math.round(moveOffset), yOffset: 0 });
-      } else {
-        await $null.moveTo({ xOffset: Math.round(moveOffset), yOffset: 0 });
-      }
+      await this.client.performActions([
+        {
+          type: 'pointer',
+          id: 'finger1',
+          parameters: { pointerType: 'mouse' },
+          actions: [
+            {
+              type: 'pointerMove',
+              duration: 10,
+              origin: 'pointer',
+              x: xOffset,
+              y: 0,
+            },
+          ],
+        },
+      ]);
 
       // wait for transitions
       await sleep(100);
 
       moveOffset = moveOffset / 2;
-      if (moveOffset < 0.3) throw new Error('Slider position setup failed');
+      if (moveOffset < 0.3) {
+        await this.client.releaseActions();
+        throw new Error('Slider position setup failed');
+      }
     }
   }
 
