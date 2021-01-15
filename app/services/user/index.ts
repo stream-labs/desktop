@@ -35,6 +35,7 @@ import fs from 'fs';
 import path from 'path';
 import { AppService } from 'services/app';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import { StreamingService } from 'services/streaming';
 
 export enum EAuthProcessState {
   Idle = 'idle',
@@ -127,6 +128,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private navigationService: NavigationService;
   @Inject() private settingsService: SettingsService;
   @Inject() private streamSettingsService: StreamSettingsService;
+  @Inject() private streamingService: StreamingService;
   @Inject() private websocketService: WebsocketService;
   @Inject() private magicLinkService: MagicLinkService;
   @Inject() private appService: AppService;
@@ -254,6 +256,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   autoLogin() {
     if (!this.state.auth) return;
+
+    // don't allow to login via deleted Mixer platform
+    const allPlatforms = this.streamingService.views.allPlatforms;
+    if (!allPlatforms.includes(this.state.auth.primaryPlatform)) return;
+
     const service = getPlatformService(this.state.auth.primaryPlatform);
     return this.login(service, this.state.auth);
   }
