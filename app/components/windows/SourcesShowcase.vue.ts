@@ -78,7 +78,7 @@ export default class SourcesShowcase extends Vue {
 
   getLoginSrc() {
     const theme = this.demoMode;
-    return require(`../../../media/source-demos/${theme}/sleeping-kevin.png`);
+    return require(`../../../media/images/sleeping-kevin-${theme}.png`);
   }
 
   selectWidget(type: WidgetType) {
