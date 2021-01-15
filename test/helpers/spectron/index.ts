@@ -8,9 +8,10 @@ import { sleep } from '../sleep';
 import { installFetchMock } from './network';
 
 import {
+  ITestStats,
   removeFailedTestFromFile,
   saveFailedTestsToFile,
-  saveTestExecutionTimeToDB,
+  saveTestStatsToFile,
   testFn,
 } from './runner-utils';
 export const test = testFn; // the overridden "test" function
@@ -22,7 +23,8 @@ const rimraf = require('rimraf');
 
 const ALMOST_INFINITY = Math.pow(2, 31) - 1; // max 32bit int
 
-const testTimings: Record<string, number> = {};
+const testStats: Record<string, ITestStats> = {};
+
 let testStartTime = 0;
 let activeWindow: string | RegExp;
 
@@ -156,6 +158,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   let testName = '';
   let logFileLastReadingPos = 0;
   let lastCacheDir: string;
+  let lastLogs: string;
 
   startAppFn = async function startApp(
     t: TExecutionContext,
@@ -279,9 +282,8 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
    */
   async function checkErrorsInLogFile(t: TExecutionContext) {
     await sleep(1000); // electron-log needs some time to write down logs
-    const filePath = path.join(lastCacheDir, 'slobs-client', 'app.log');
-    if (!fs.existsSync(filePath)) return;
-    const logs: string = fs.readFileSync(filePath).toString();
+    const logs: string = await readLogs();
+    lastLogs = logs;
     const errors = logs
       .substr(logFileLastReadingPos)
       .split('\n')
@@ -354,7 +356,11 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       // consider this test succeed and remove from the `failedTests` list
       removeFailedTestFromFile(testName);
       // save the test execution time
-      testTimings[testName] = Date.now() - testStartTime;
+      console.log('calc stats');
+      testStats[testName] = {
+        duration: Date.now() - testStartTime,
+        syncIPCCalls: getSyncIPCCalls(),
+      };
     } else {
       fail();
       const user = getUser();
@@ -366,7 +372,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   test.after.always(async t => {
     if (appIsRunning) await stopAppFn(t);
     if (!testPassed) saveFailedTestsToFile([testName]);
-    await saveTestExecutionTimeToDB(testTimings);
+    await saveTestStatsToFile(testStats);
   });
 
   /**
@@ -375,6 +381,17 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
   function fail(msg?: string) {
     testPassed = false;
     if (msg) failMsg = msg;
+  }
+
+  function readLogs(): string {
+    const filePath = path.join(lastCacheDir, 'slobs-client', 'app.log');
+    if (!fs.existsSync(filePath)) return;
+    return fs.readFileSync(filePath).toString();
+  }
+
+  function getSyncIPCCalls() {
+    return lastLogs.split('\n').filter(line => line.match('Calling synchronous service method'))
+      .length;
   }
 }
 

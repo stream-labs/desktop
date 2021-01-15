@@ -12,6 +12,7 @@ const rimraf = require('rimraf');
 const fetch = require('node-fetch');
 
 const failedTestsFile = 'test-dist/failed-tests.json';
+const testStatsFile = 'test-dist/test-stats.json';
 const args = process.argv.slice(2);
 const TIMEOUT = 3; // timeout in minutes
 const {
@@ -31,6 +32,7 @@ const RUN_TESTS_CMD = !args.length ? `yarn test --timeout=${TIMEOUT}m ` : args.j
   let failedTests = [];
   try {
     rimraf.sync(failedTestsFile);
+    rimraf.sync(testStatsFile);
     await createTestTimingsFile();
     execSync(RUN_TESTS_CMD, { stdio: [0, 1, 2] });
   } catch (e) {
@@ -82,6 +84,16 @@ function getFailedTests() {
   return failedTests;
 }
 
+function readTestStats() {
+  let stats = {};
+  try {
+    stats = JSON.parse(fs.readFileSync(testStatsFile, 'utf8'));
+  } catch (e) {
+    console.error(e);
+  }
+  return stats;
+}
+
 async function sendJobToAnalytics(failedTests) {
   if (!BUILD_BUILDID) return; // do not send analytics for local builds
 
@@ -101,6 +113,7 @@ async function sendJobToAnalytics(failedTests) {
     buildReason: BUILD_REASON,
     branch: BUILD_SOURCEBRANCH,
     slice: SLOBS_TEST_RUN_CHUNK,
+    stats: readTestStats(),
   };
   log(body);
   try {
