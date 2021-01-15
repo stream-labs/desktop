@@ -12,5 +12,7 @@
   "Volume ( % )": "볼륨( % )",
   "Sync Offset ( ms )": "싱크 오프셋( ms )",
   "Mixer": "믹서",
-  "Monitor audio levels. If the bars are moving you are outputting audio.": "오디오 레벨을 모니터링합니다. 바가 움직이면 오디오를 출력 중이라는 뜻입니다."
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "오디오 레벨을 모니터링합니다. 바가 움직이면 오디오를 출력 중이라는 뜻입니다.",
+  "Muted": "Muted",
+  "Hide in Mixer": "Hide in Mixer"
 }
