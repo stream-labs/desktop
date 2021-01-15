@@ -15,6 +15,7 @@
           :chat="item"
           :getFormattedLiveTime="getFormattedLiveTime"
           :commentMenuOpened="commentMenuTarget === item"
+          :speaking="speakingSeqId === item.seqId"
           @pinned="pin(item)"
           @commentMenu="showCommentMenu(item)"
         />

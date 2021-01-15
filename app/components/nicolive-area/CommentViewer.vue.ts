@@ -99,6 +99,10 @@ export default class CommentViewer extends Vue {
     return this.nicoliveCommentViewerService.items.filter(this.filterFn);
   }
 
+  get speakingSeqId() {
+    return this.nicoliveCommentViewerService.speakingSeqId;
+  }
+
   refreshConnection() {
     this.nicoliveCommentViewerService.refreshConnection();
   }

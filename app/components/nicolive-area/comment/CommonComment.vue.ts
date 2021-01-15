@@ -13,6 +13,8 @@ export default class CommonComment extends Vue {
   commentMenuOpened: boolean;
   @Prop()
   getFormattedLiveTime: (chat: ChatMessage) => string;
+  @Prop()
+  speaking: boolean;
 
   get computedContent() {
     if (this.chat.type === 'normal') {

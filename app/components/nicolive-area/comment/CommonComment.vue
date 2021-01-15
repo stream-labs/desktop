@@ -1,6 +1,7 @@
 <template>
   <div class="root" :class="[chat.type, { pseudoHover: commentMenuOpened }]" :title="computedTitle" @dblclick="$emit('pinned')">
     <div class="comment-number">{{ chat.value.no }}</div>
+    <div class="comment-speaking" v-if="speaking">▶</div>
     <div class="comment-body">{{ computedContent }}</div>
     <div class="comment-misc" @click.stop="$emit('commentMenu')"><i class="icon-btn icon-ellipsis-vertical"></i></div>
   </div>
@@ -31,6 +32,11 @@
 .comment-number {
   .common__comment-number();
   color: @grey;
+}
+
+.comment-speaking {
+  .common__comment-number();
+  color: @red;
 }
 
 .comment-body {

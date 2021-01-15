@@ -55,10 +55,46 @@ interface INicoliveCommentViewerState {
    */
   popoutMessages: WrappedChat[];
   pinnedMessage: WrappedChat | null;
+  speakingSeqId: number | null;
+}
+
+export type Speech = {
+  text: string;
+}
+export class NicoLiveCommentReader {
+
+  makeSpeech(chat: WrappedChat): Speech | null {
+    if (!chat.value || !chat.value.content) {
+      return null;
+    }
+
+    // TODO filter
+
+    return {
+      text: chat.value.content
+    };
+  }
+
+  speakText(speech: Speech,
+    onstart: (this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => any,
+    onend: (this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => any
+  ) {
+    if (!speech || speech.text == '') {
+      return;
+    }
+
+    const uttr = new SpeechSynthesisUtterance(speech.text);
+    uttr.onstart = onstart;
+    uttr.onend = onend;
+    speechSynthesis.speak(uttr);
+  }
+
 }
 
 export class NicoliveCommentViewerService extends StatefulService<INicoliveCommentViewerState> {
   private client: MessageServerClient | null = null;
+  private reader: NicoLiveCommentReader = new NicoLiveCommentReader();
+
   @Inject() private nicoliveProgramService: NicoliveProgramService;
   @Inject() private nicoliveCommentFilterService: NicoliveCommentFilterService;
 
@@ -66,10 +102,15 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
     messages: [],
     popoutMessages: [],
     pinnedMessage: null,
+    speakingSeqId: null,
   };
 
   get items() {
     return this.state.messages;
+  }
+
+  get speakingSeqId() {
+    return this.state.speakingSeqId;
   }
 
   get recentPopouts() {
@@ -177,7 +218,51 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
     this.client.requestLatestMessages();
   }
 
+  private queueToSpeech(values: WrappedChat[]) {
+    for (const chat of values) {
+      const speech = this.reader.makeSpeech(chat);
+      if (speech) {
+        this.reader.speakText(speech,
+          () => {
+            console.log(`#${chat.seqId}: ${chat.value.content}: onstart`);
+            this.SET_STATE({
+              speakingSeqId: chat.seqId
+            });
+          },
+          () => {
+            console.log(`#${chat.seqId}: ${chat.value.content}: onend`);
+            if (this.state.speakingSeqId == chat.seqId) {
+              this.SET_STATE({
+                speakingSeqId: null
+              });
+            }
+          });
+      }
+    }
+  }
+
   private onMessage(values: WrappedChat[]) {
+    const maxQueueToSpeak = 3; // 直近3件つづ読み上げ対象にする...?
+    // TODO 開いたときは直近1分ぐらい読みたいが、コメントリロードボタンでは1秒ぐらいにしたい
+    const recentSeconds = 60;
+
+    // TODO リロードするときは再生も中断したい
+    // TODO コメントごとに読み上げボタンを付けて任意で再生させたい
+    // TODO コメントアートを除外したい
+    // TODO 変換辞書を用意して /w+/ を ワラ, /8+/ をパチパチ とかにしたい
+    // TODO 読み上げ全体のスイッチを用意して、offにすると即座に止めたい
+
+    const now = Date.now() / 1000;
+    this.queueToSpeech(values.slice(-maxQueueToSpeak).filter(c => {
+      if (!c.value || !c.value.date) {
+        return false;
+      }
+      if (c.value.date < (now - recentSeconds)) {
+        return false;
+      }
+      return true;
+    }));
+
     const concatMessages = this.state.messages.concat(values);
     const popoutMessages = concatMessages.slice(0, -100);
     this.SET_STATE({
