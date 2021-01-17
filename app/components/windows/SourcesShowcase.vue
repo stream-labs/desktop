@@ -152,9 +152,9 @@
         </div>
 
         <div class="source-group" v-if="!loggedIn">
-          <h3>{{ $t('Widgets') }}</h3>
+          <h3>{{ $t('You must be logged in for Widgets') }}</h3>
           <button @click="handleAuth()" class="source--login">
-              <h3>{{ $t('Click here to log in for access to Widgets') }}</h3>
+              <h3>{{ $t('Click here to log in') }}</h3>
               <img :src="getLoginSrc()" />
           </button>
         </div>
