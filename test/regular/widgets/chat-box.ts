@@ -11,7 +11,7 @@ test('Chatbox Visual Settings', async t => {
   if (!(await logIn(t))) return;
   await addSource(t, 'Chatbox', '__Chat Box', false);
 
-  await client.click('li=Visual Settings');
+  await (await client.$('li=Visual Settings')).click();
   const formMonkey = new FormMonkey(t, 'form[name=visual-properties-form]');
 
   const testSet1 = {
@@ -54,7 +54,7 @@ test('Chatbox Font Settings', async t => {
   if (!(await logIn(t))) return;
   await addSource(t, 'Chatbox', '__Chat Box', false);
 
-  await client.click('li=Font Settings');
+  await (await client.$('li=Font Settings')).click();
   const formMonkey = new FormMonkey(t, 'form[name=font-properties-form]');
 
   const testSet1 = {

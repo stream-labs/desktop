@@ -1,8 +1,5 @@
-import * as path from 'path';
-import { tmpdir } from 'os';
-import { mkdtemp, readdir } from 'fs-extra';
+import { readdir } from 'fs-extra';
 import { focusChild, focusMain, test, useSpectron } from '../helpers/spectron';
-import { setFormDropdown, setFormInput } from '../helpers/spectron/forms';
 import { sleep } from '../helpers/sleep';
 import { setOutputResolution, setTemporaryRecordingPath } from '../helpers/spectron/output';
 
@@ -13,10 +10,10 @@ test('Replay Buffer', async t => {
   await setOutputResolution(t, '100x100');
   const { client } = t.context.app;
 
-  await client.click('button .icon-replay-buffer');
-  await client.click('button .icon-save');
-  await client.click('button .fa.fa-stop');
-  await client.isVisible('button .icon-replay-buffer');
+  await (await client.$('button .icon-replay-buffer')).click();
+  await (await client.$('button .icon-save')).click();
+  await (await client.$('button .fa.fa-stop')).click();
+  await (await client.$('button .icon-replay-buffer')).isDisplayed();
 
   // Check that the replay-buffer file has been created
   await sleep(3000);
@@ -24,12 +21,12 @@ test('Replay Buffer', async t => {
   t.is(files.length, 1);
 
   // disable replay buffer
-  await client.click('.side-nav .icon-settings');
+  await (await client.$('.side-nav .icon-settings')).click();
   await focusChild(t);
-  await client.click('li=Output');
-  await client.click('label=Enable Replay Buffer');
+  await (await client.$('li=Output')).click();
+  await (await client.$('label=Enable Replay Buffer')).click();
 
   // check Start Replay Buffer is not visible
   await focusMain(t);
-  t.false(await client.isExisting('button .icon-replay-buffer'));
+  t.false(await (await client.$('button .icon-replay-buffer')).isExisting());
 });

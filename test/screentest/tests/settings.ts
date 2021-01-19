@@ -115,7 +115,7 @@ test('Settings Game Overlay', async (t: TExecutionContext) => {
   await logIn(t);
   settingsService.showSettings('Game Overlay');
   await focusChild(t);
-  await t.context.app.client.click('[data-type="toggle"]'); // enable overlays
+  await (await t.context.app.client.$('[data-type="toggle"]')).click(); // enable overlays
   await makeScreenshots(t, 'Online');
   await logOut(t);
 
