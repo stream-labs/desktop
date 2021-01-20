@@ -1,6 +1,6 @@
 {
-  "Vers": "Verz",
-  "Reload": "Újratölt",
-  "Unpacked vers loaded": "Kicsomagolt verz és töltve",
-  "You must unload unpacked version before enabling this app.": "Az alkalmazás engedélyezése előtt ki kell töltenie a kicsomagolt verziót."
+  "Vers": "Vers",
+  "Reload": "Reload",
+  "Unpacked vers loaded": "Unpacked vers loaded",
+  "You must unload unpacked version before enabling this app.": "You must unload unpacked version before enabling this app."
 }

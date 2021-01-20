@@ -17,6 +17,7 @@ import { StreamingService, IStreamSettings } from 'services/streaming';
 import { SyncWithValue } from 'services/app/app-decorators';
 import BaseEditStreamInfo from '../BaseEditSteamInfo';
 import FormInput from 'components/shared/inputs/FormInput.vue';
+import electron from 'electron';
 
 class Props {
   value?: IStreamSettings;
@@ -84,10 +85,17 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
     ytSettings.projection = projection;
     ytSettings.privacyStatus = privacyStatus;
     ytSettings.selfDeclaredMadeForKids = selfDeclaredMadeForKids;
+    ytSettings.thumbnail = '';
 
     // category id is a property of YoutubeVideo
     const video = await this.youtubeService.fetchVideo(selectedBroadcast.id);
     this.setCategory(video.snippet.categoryId);
+  }
+
+  private openThumbnailsEditor() {
+    electron.remote.shell.openExternal(
+      'https://streamlabs.com/dashboard#/prime/thumbnails?refl=slobs-thumbnail-editor',
+    );
   }
 
   private setCategory(categoryId: string) {
@@ -99,6 +107,7 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
   }
 
   private get formMetadata() {
+    const ytSettings = this.settings.platforms.youtube;
     return formMetadata({
       event: {
         broadcasts: this.broadcasts,
@@ -131,6 +140,15 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
           title: category.snippet.title,
         })),
         fullWidth: true,
+      }),
+      thumbnail: metadata.imageUploader({
+        title: $t('Thumbnail'),
+        maxFileSize: 2 * 1024 * 1024, // 2 mb
+        defaultUrl:
+          ytSettings.broadcastId &&
+          this.broadcastsLoaded &&
+          this.broadcasts.find(broadcast => broadcast.id === ytSettings.broadcastId)?.snippet
+            .thumbnails.high.url,
       }),
       latencyPreference: metadata.list<IYoutubeStartStreamOptions['latencyPreference']>({
         title: $t('Stream Latency'),
@@ -204,6 +222,17 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
             metadata={this.formMetadata.category}
             vModel={this.settings.platforms.youtube.categoryId}
           />
+          <HFormGroup title={this.formMetadata.thumbnail.title}>
+            <FormInput
+              metadata={this.formMetadata.thumbnail}
+              vModel={this.settings.platforms.youtube.thumbnail}
+            />
+            <div class="input-description">
+              <a onclick={() => this.openThumbnailsEditor()}>
+                {$t('Try our new thumbnail editor')}
+              </a>
+            </div>
+          </HFormGroup>
           <HFormGroup
             metadata={this.formMetadata.latencyPreference}
             vModel={this.settings.platforms.youtube.latencyPreference}

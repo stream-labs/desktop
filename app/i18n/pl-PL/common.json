@@ -117,5 +117,13 @@
   "Apps": "Aplikacje",
   "Finish": "Zakończ",
   "Get Prime": "Zyskaj Prime",
-  "System error message:": "Komunikat błędu systemu:"
+  "System error message:": "Komunikat błędu systemu:",
+  "List is empty": "List is empty",
+  "Not selected": "Not selected",
+  "Friends": "Friends",
+  "Width": "Szerokość",
+  "Height": "Wysokość",
+  "Use Custom": "Use Custom",
+  "Apply": "Apply",
+  "Do not show this message again": "Do not show this message again"
 }

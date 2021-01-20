@@ -8,11 +8,11 @@
   "Starting Amount": "Start hoeveelheid",
   "End After": "Beëindig na",
   "Include resubs?": "Include resubs?",
-  "Layout": "Layout",
-  "Background Color": "Background Color",
+  "Layout": "Inrichting",
+  "Background Color": "Achtergrondkleur",
   "Bar Color": "Balk kleur",
   "Bar Background Color": "Balk achtergrond kleur",
-  "Text Color": "Text Color",
+  "Text Color": "Tekstkleur",
   "Bar Text Color": "Balk text kleur",
   "Bar Thickness": "Bar dikte",
   "Font Family": "Font Family",
@@ -21,5 +21,7 @@
   "Supporter Goal": "Supporter Goal",
   "Facebook Supporters": "Facebook Supporters",
   "Facebook chat": "Facebook chat",
-  "Member Goal": "Member Goal"
+  "Member Goal": "Member Goal",
+  "Streamlabs Charity Goal": "Streamlabs Charity Goal",
+  "Streamlabs Charity Donations": "Streamlabs Charity Donations"
 }

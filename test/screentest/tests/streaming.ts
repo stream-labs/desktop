@@ -27,7 +27,6 @@ async function addColorSource() {
 }
 
 // test streaming for each platform
-// TODO: Re-enable Mixer streaming
 // TODO: YT tests is flaky on CI
 const platforms: TPlatform[] = ['twitch', 'facebook'];
 platforms.forEach(platform => {
@@ -59,12 +58,6 @@ platforms.forEach(platform => {
           title: 'SLOBS Test Stream',
           game: selectTitle('Fortnite'),
           description: 'SLOBS Test Stream Description',
-        });
-        break;
-
-      case 'mixer':
-        await fillForm(t, 'form[name=editStreamForm]', {
-          title: 'SLOBS Test Stream',
         });
         break;
 

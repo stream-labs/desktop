@@ -1,15 +1,15 @@
 {
-  "You do not have any notifications": "Nemáte žiadne upozornenia",
-  "Your stream is currently offline": "Váš stream je momentálne offline",
-  "Your stream is experiencing issues": "Vo vašom streame sa vyskytujú problémy",
-  "Your stream is experiencing minor issues": "Váš stream má menšie problémy",
-  "Live Stats": "Živé štatistiky",
-  "Click on a stat to add it to your footer": "Kliknutím na stat ho pridáte do päty",
-  "Click to add this info to your footer": "Kliknutím pridajte tieto informácie do päty",
-  "When Streamlabs OBS detects performance issues with your stream, such as dropped frames, lagged frames, or a stream disconnection, troubleshooting notifications will be sent to you here.": "Keď Streamlabs OBS zistí problémy s výkonom vo vašom streame, ako sú napríklad vynechané snímky, oneskorené snímky alebo odpojenie z streamu, upozornenie na riešenie problémov vám bude zaslané tu.",
-  "Click to add %{stat} info to your footer": "Kliknite, ak chcete do päty pridať informácie %{stat}",
+  "You do not have any notifications": "You do not have any notifications",
+  "Your stream is currently offline": "Your stream is currently offline",
+  "Your stream is experiencing issues": "Your stream is experiencing issues",
+  "Your stream is experiencing minor issues": "Your stream is experiencing minor issues",
+  "Live Stats": "Live Stats",
+  "Click on a stat to add it to your footer": "Click on a stat to add it to your footer",
+  "Click to add this info to your footer": "Click to add this info to your footer",
+  "When Streamlabs OBS detects performance issues with your stream, such as dropped frames, lagged frames, or a stream disconnection, troubleshooting notifications will be sent to you here.": "When Streamlabs OBS detects performance issues with your stream, such as dropped frames, lagged frames, or a stream disconnection, troubleshooting notifications will be sent to you here.",
+  "Click to add %{stat} info to your footer": "Click to add %{stat} info to your footer",
   "CPU": "CPU",
   "FPS": "FPS",
-  "dropped frames": "vynechané rámy",
-  "bandwidth": "šírka pásma"
+  "dropped frames": "dropped frames",
+  "bandwidth": "bandwidth"
 }

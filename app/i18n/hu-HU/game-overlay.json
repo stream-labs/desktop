@@ -1,9 +1,9 @@
 {
-  "Enable in-game overlay": "A játékon belüli átfedés engedélyezése",
-  "Enable stream preview in overlay": "A stream előnézetének engedélyezése átfedésben",
-  "Toggle in-game overlay": "Váltás a játékon belüli átfedésre",
-  "Toggle positioning mode": "A helymeghatározási mód váltása",
-  "Set a hotkey in Hotkey Settings to toggle the in-game overlay": "Állítsa be a gyorsbillentyűt a Gyorsbillentyű-beállítások között a játékon belüli overlay váltásához",
-  "The in-game overlay is a new experimental feature that allows you to view chat and events overlayed on top of your game.  This overlay may not work with certain games running in exclusive fullscreen mode.  For best results, we recommend running your game in windowed-fullscreen mode.": "A játékon belüli átfedés egy új kísérleti szolgáltatás, amely lehetővé teszi a csevegés és a játék tetején átfedésben szereplő események megtekintését. Előfordulhat, hogy ez az átfedés nem működik bizonyos játékokkal, amelyek teljes képernyős módban futnak. A legjobb eredmény elérése érdekében azt javasoljuk, hogy a játékot teljes képernyős képernyőn futtassa.",
-  "Please log in to use the in-game overlay.": "Kérjük, jelentkezzen be a játékbeli overlay használatához."
+  "Enable in-game overlay": "Enable in-game overlay",
+  "Enable stream preview in overlay": "Enable stream preview in overlay",
+  "Toggle in-game overlay": "Toggle in-game overlay",
+  "Toggle positioning mode": "Toggle positioning mode",
+  "Set a hotkey in Hotkey Settings to toggle the in-game overlay": "Set a hotkey in Hotkey Settings to toggle the in-game overlay",
+  "The in-game overlay is a new experimental feature that allows you to view chat and events overlayed on top of your game.  This overlay may not work with certain games running in exclusive fullscreen mode.  For best results, we recommend running your game in windowed-fullscreen mode.": "The in-game overlay is a new experimental feature that allows you to view chat and events overlayed on top of your game.  This overlay may not work with certain games running in exclusive fullscreen mode.  For best results, we recommend running your game in windowed-fullscreen mode.",
+  "Please log in to use the in-game overlay.": "Please log in to use the in-game overlay."
 }

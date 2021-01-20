@@ -73,6 +73,7 @@ export class ServicesManager extends Service {
     const statefulServices = {};
     Object.keys(this.services).forEach(serviceName => {
       const ServiceClass = this.services[serviceName];
+      if (typeof ServiceClass === 'object') return; // skip AppServices object
       const isStatefulService = ServiceClass['initialState'];
       const isMutator = ServiceClass.prototype.mutations;
       if (!isStatefulService && !isMutator) return;

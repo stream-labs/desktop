@@ -117,5 +117,13 @@
   "Apps": "应用程序",
   "Finish": "完成",
   "Get Prime": "获取 Prime",
-  "System error message:": "系统错误信息："
+  "System error message:": "系统错误信息：",
+  "List is empty": "List is empty",
+  "Not selected": "Not selected",
+  "Friends": "Friends",
+  "Width": "宽度",
+  "Height": "高度",
+  "Use Custom": "Use Custom",
+  "Apply": "Apply",
+  "Do not show this message again": "Do not show this message again"
 }

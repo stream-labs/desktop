@@ -5,9 +5,9 @@ import {
   clickGoLive,
   goLive,
   prepareToGoLive,
-  scheduleStream,
+  scheduleStream, stopStream,
   submit,
-  waitForStreamStart,
+  waitForStreamStart
 } from '../../helpers/spectron/streaming';
 import { FormMonkey, selectTitle } from '../../helpers/form-monkey';
 import { sleep } from '../../helpers/sleep';
@@ -23,6 +23,7 @@ test('Streaming to a Facebook Page', async t => {
     description: 'SLOBS Test Stream Description',
   });
   t.true(await chatIsVisible(t), 'Chat should be visible');
+  await stopStream(t);
   t.pass();
 });
 
@@ -34,6 +35,7 @@ test('Streaming to a Facebook User`s timeline', async t => {
     description: 'SLOBS Test Stream Description',
     destinationType: 'me',
   });
+  await stopStream(t);
   t.pass();
 });
 
@@ -45,6 +47,7 @@ test('Streaming to a Facebook User`s group', async t => {
     description: 'SLOBS Test Stream Description',
     destinationType: 'group',
   });
+  await stopStream(t);
   t.pass();
 });
 

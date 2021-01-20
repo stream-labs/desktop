@@ -88,13 +88,10 @@ export class KeyListenerService extends Service {
     const keystr = this.getKeyString(binding);
     delete this.bindings[keystr][namespace];
 
-    // TODO: Node-libuiohook unbinding of individual keys does not work.
-    // When that is fixed, this can be uncommented for efficiency.
-
-    // if (Object.keys(this.bindings[keystr]).length === 0) {
-    //   delete this.bindings[keystr];
-    //   this.libuiohook.unregisterCallback(binding);
-    // }
+    if (Object.keys(this.bindings[keystr]).length === 0) {
+      delete this.bindings[keystr];
+      this.libuiohook.unregisterCallback(binding);
+    }
   }
 
   shutdown() {

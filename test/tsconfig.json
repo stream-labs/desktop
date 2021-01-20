@@ -19,7 +19,26 @@
     "strictNullChecks": false,
     "emitDecoratorMetadata": true,
     "baseUrl": "../app",
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "types": [
+      "node-fetch",
+      "archiver",
+      "classnames",
+      "extract-zip",
+      "fs-extra",
+      "humps",
+      "lodash",
+      "mime",
+      "mkdirp",
+      "node",
+      "overlayscrollbars",
+      "request",
+      "semver",
+      "socket.io-client",
+      "tapable",
+      "uuid",
+      "vue-tsx-support"
+    ]
   },
   "exclude": [
     "node_modules",

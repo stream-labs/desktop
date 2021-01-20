@@ -90,6 +90,12 @@ async function runScript() {
         const jsonData = fs.readFileSync(file);
         const root = JSON.parse(jsonData.toString());
         const currentVersion = root['version'];
+        let moduleVersion = '';
+
+        if (os === 'osx' && dependency['mac_version'])
+          moduleVersion = dependency['mac_version'];
+        else
+          moduleVersion = dependency['version'];
 
         if (currentVersion == dependency['version'])
           return;
@@ -97,7 +103,7 @@ async function runScript() {
         sh.rm('-rf', path.join(node_modules, dependency['name']));
 
         let fileName = dependency['archive'];
-        fileName = fileName.replace('[VERSION]', dependency['version']);
+        fileName = fileName.replace('[VERSION]', moduleVersion);
         fileName = fileName.replace('[OS]', os);
         
         const url = dependency['url'] + fileName;

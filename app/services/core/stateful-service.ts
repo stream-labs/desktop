@@ -105,7 +105,7 @@ export function inheritMutations(target: any) {
  * helps to integrate services with Vuex store
  */
 export abstract class StatefulService<TState extends object> extends Service {
-  private static store: Store<any>;
+  static store: Store<any>;
 
   static setupVuexStore(store: Store<any>) {
     this.store = store;

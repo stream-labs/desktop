@@ -10,10 +10,14 @@ import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { metadata } from 'components/widgets/inputs';
 import commonStyles from './Common.m.less';
 import styles from './HardwareSetup.m.less';
+import { SourceFiltersService } from 'services/source-filters';
+import { SourcesService } from 'services/sources';
 
 @Component({})
 export default class HardwareSetup extends TsxComponent {
   @Inject() defaultHardwareService: DefaultHardwareService;
+  @Inject() sourceFiltersService: SourceFiltersService;
+  @Inject() sourcesService: SourcesService;
 
   mounted() {
     this.defaultHardwareService.createTemporarySources();
@@ -21,6 +25,14 @@ export default class HardwareSetup extends TsxComponent {
 
   destroyed() {
     this.defaultHardwareService.clearTemporarySources();
+  }
+
+  get presetFilterValue() {
+    return this.defaultHardwareService.state.presetFilter;
+  }
+
+  set presetFilterValue(filter: string) {
+    this.defaultHardwareService.setPresetFilter(filter);
   }
 
   get audioDevices() {
@@ -49,8 +61,28 @@ export default class HardwareSetup extends TsxComponent {
     return this.defaultHardwareService.state.defaultVideoDevice;
   }
 
+  get selectedVideoSourceId() {
+    return this.defaultHardwareService.findVideoSource(this.selectedVideoDevice).sourceId;
+  }
+
   setVideoDevice(val: string) {
+    const oldPresetValue = this.presetFilterValue;
+    if (oldPresetValue) {
+      this.setPresetFilter('');
+    }
     this.defaultHardwareService.setDefault('video', val);
+    if (oldPresetValue) {
+      this.setPresetFilter(oldPresetValue);
+    }
+  }
+
+  setPresetFilter(value: string) {
+    this.presetFilterValue = value;
+    if (value === '') {
+      this.sourceFiltersService.remove(this.selectedVideoSourceId, '__PRESET');
+    } else {
+      this.sourceFiltersService.addPresetFilter(this.selectedVideoSourceId, value);
+    }
   }
 
   get displayRender() {
@@ -76,11 +108,18 @@ export default class HardwareSetup extends TsxComponent {
         <div class={styles.contentContainer}>
           {this.displayRender}
           {!!this.videoDevices.length && (
-            <VFormGroup
-              metadata={metadata.list({ options: this.videoDevices })}
-              value={this.selectedVideoDevice}
-              onInput={(id: string) => this.setVideoDevice(id)}
-            />
+            <div>
+              <VFormGroup
+                metadata={metadata.list({ options: this.videoDevices })}
+                value={this.selectedVideoDevice}
+                onInput={(id: string) => this.setVideoDevice(id)}
+              />
+              <VFormGroup
+                metadata={this.sourceFiltersService.views.presetFilterMetadata}
+                value={this.presetFilterValue}
+                onInput={(value: string) => this.setPresetFilter(value)}
+              />
+            </div>
           )}
           {this.defaultHardwareService.selectedAudioSource && (
             <div
@@ -95,7 +134,11 @@ export default class HardwareSetup extends TsxComponent {
             </div>
           )}
           <VFormGroup
-            metadata={metadata.list({ options: this.audioDevices })}
+            metadata={metadata.list({
+              options: this.audioDevices,
+              openDirection: 'bottom',
+              optionsHeight: 120,
+            })}
             value={this.selectedAudioDevice}
             onInput={(id: string) => (this.selectedAudioDevice = id)}
           />

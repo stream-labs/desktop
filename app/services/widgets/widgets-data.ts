@@ -39,7 +39,7 @@ export const WidgetTesters: IWidgetTester[] = [
     url(host, platform) {
       return `https://${host}/api/v5/slobs/test/${platform}_account/follow`;
     },
-    platforms: ['twitch', 'mixer'],
+    platforms: ['twitch', 'facebook'],
   },
   {
     name: 'Subscriber',
@@ -53,7 +53,7 @@ export const WidgetTesters: IWidgetTester[] = [
     url(host, platform) {
       return `https://${host}/api/v5/slobs/test/${platform}_account/subscription`;
     },
-    platforms: ['twitch', 'mixer'],
+    platforms: ['twitch'],
   },
   {
     name: 'Membership',
@@ -67,7 +67,7 @@ export const WidgetTesters: IWidgetTester[] = [
     url(host) {
       return `https://${host}/api/v5/slobs/test/streamlabs/donation`;
     },
-    platforms: ['twitch', 'youtube', 'mixer', 'facebook'],
+    platforms: ['twitch', 'youtube', 'facebook'],
   },
   {
     name: 'Bits',

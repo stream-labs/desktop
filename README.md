@@ -13,7 +13,7 @@ This application currently only supports OSX 10.14+ and 64-bit Windows.
 ### Node.js
 
 Node is required for installing npm packages and for running
-various scripts.  We recommend the current LTS release, 8.x.x:
+various scripts. We recommend the current LTS release, 14.x.x:
 
 https://nodejs.org
 
@@ -79,7 +79,7 @@ yarn package
 ```
 
 This will package a distributable installer `.exe` to the `dist/`
-directory.  There is also an unpacked version in `dist/win-unpacked`.
+directory. There is also an unpacked version in `dist/win-unpacked`.
 
 ### Releasing
 
@@ -134,5 +134,5 @@ manual deploy.
 ## ❤ OBS Developers
 
 At its core, Streamlabs OBS is powered by the [OBS](https://obsproject.com/)
-engine.  We want to thank all of the developers over at the OBS project for
+engine. We want to thank all of the developers over at the OBS project for
 their years of tireless hard work, without which Streamlabs OBS wouldn't exist today.
