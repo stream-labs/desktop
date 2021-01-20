@@ -19,6 +19,7 @@ import { BasePlatformService } from './base-platform';
 import { assertIsDefined } from 'util/properties-type-guards';
 import electron from 'electron';
 import { Subject } from 'rxjs';
+import Utils from '../utils';
 
 interface IYoutubeServiceState extends IPlatformState {
   liveStreamingEnabled: boolean;
@@ -228,12 +229,22 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   /**
    * Request Youtube API and handle error response
    */
-  private async requestYoutube<T = unknown>(reqInfo: IPlatformRequest | string): Promise<T> {
+  private async requestYoutube<T = unknown>(
+    reqInfo: IPlatformRequest | string,
+    repeatRequestIfRateLimitExceed = true,
+  ): Promise<T> {
     try {
       return await platformAuthorizedRequest<T>('youtube', reqInfo);
     } catch (e) {
       let details = e.result?.error?.message;
       if (!details) details = 'connection failed';
+
+      // if the rate limit exceeded then repeat request after 3s delay
+      if (details === 'User requests exceed the rate limit.' && repeatRequestIfRateLimitExceed) {
+        await Utils.sleep(3000);
+        return await this.requestYoutube(reqInfo, false);
+      }
+
       const errorType =
         details === 'The user is not enabled for live streaming.'
           ? 'YOUTUBE_STREAMING_DISABLED'

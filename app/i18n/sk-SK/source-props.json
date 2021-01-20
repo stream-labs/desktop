@@ -1,17 +1,17 @@
 {
-    "Image": "Obraz",
-    "Color Source": "Zdroj farieb",
-    "Browser Source": "Zdroj prehliadača",
-    "Media Source": "Zdroj médií",
-    "Image Slide Show": "Obrázková prezentácia",
+    "Image": "Image",
+    "Color Source": "Color Source",
+    "Browser Source": "Browser Source",
+    "Media Source": "Media Source",
+    "Image Slide Show": "Image Slide Show",
     "Text (GDI+)": "Text (GDI+)",
     "Text (FreeType 2)": "Text (FreeType 2)",
-    "Display Capture": "Zachytenie displeja",
-    "Window Capture": "Zachytenie okna",
-    "Game Capture": "Zachytenie hry",
+    "Display Capture": "Display Capture",
+    "Window Capture": "Window Capture",
+    "Game Capture": "Game Capture",
     "Video Capture Device": "Video Capture Device",
-    "Audio Input Capture": "Zachytenie zvukového vstupu",
-    "Audio Output Capture": "Zachytenie zvukového výstupu",
+    "Audio Input Capture": "Audio Input Capture",
+    "Audio Output Capture": "Audio Output Capture",
     "Blackmagic Device": "Blackmagic Device",
-    "NDI Source": "Zdroj NDI"
+    "NDI Source": "NDI Source"
 }

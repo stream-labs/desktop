@@ -7,6 +7,7 @@ import {
   TObsValue,
   IObsListInput,
 } from 'components/obs/inputs/ObsInput';
+import { metadata } from 'components/shared/inputs';
 
 import { Inject } from './core/injector';
 import { SourcesService } from './sources';
@@ -17,6 +18,9 @@ import { $t } from 'services/i18n';
 import { EOrderMovement } from 'obs-studio-node';
 import { Subject } from 'rxjs';
 import { UsageStatisticsService } from './usage-statistics';
+import { getSharedResource } from 'util/get-shared-resource';
+import { ViewHandler } from 'services/core/stateful-service';
+import { byOS, OS } from 'util/operating-systems';
 
 export type TSourceFilterType =
   | 'mask_filter'
@@ -61,6 +65,37 @@ export interface ISourceFilterIdentifier {
   name: string;
 }
 
+class SourceFiltersViews extends ViewHandler<{}> {
+  get presetFilterOptions() {
+    const prefix = byOS({ [OS.Windows]: 'luts\\', [OS.Mac]: 'luts/' });
+    return [
+      { title: $t('None'), value: '' },
+      { title: $t('Grayscale'), value: `${prefix}grayscale.png` },
+      { title: $t('Sepiatone'), value: `${prefix}sepia.png` },
+      { title: $t('Dramatic'), value: `${prefix}gazing.png` },
+      { title: $t('Flashback'), value: `${prefix}muted.png` },
+      { title: $t('Inverted'), value: `${prefix}inverted.png` },
+      { title: $t('Action Movie'), value: `${prefix}cool_tone.png` },
+      { title: $t('Hearth'), value: `${prefix}warm_tone.png` },
+      { title: $t('Wintergreen'), value: `${prefix}green_tone.png` },
+      { title: $t('Heat Map'), value: `${prefix}heat_map.png` },
+      { title: $t('Cel Shade'), value: `${prefix}cel_shade.png` },
+    ];
+  }
+
+  get presetFilterMetadata() {
+    return metadata.list({
+      options: this.presetFilterOptions,
+      title: $t('Visual Presets'),
+      optionsHeight: 230,
+    });
+  }
+
+  parsePresetValue(path: string) {
+    return path.match(/luts\\[a-z_]+.png$/)[0];
+  }
+}
+
 export class SourceFiltersService extends Service {
   @Inject() private sourcesService: SourcesService;
   @Inject() private windowsService: WindowsService;
@@ -70,6 +105,10 @@ export class SourceFiltersService extends Service {
   filterRemoved = new Subject<ISourceFilterIdentifier>();
   filterUpdated = new Subject<ISourceFilterIdentifier>();
   filtersReordered = new Subject<void>();
+
+  get views() {
+    return new SourceFiltersViews({});
+  }
 
   getTypesList(): IObsListOption<TSourceFilterType>[] {
     const obsAvailableTypes = obs.FilterFactory.types();
@@ -166,6 +205,10 @@ export class SourceFiltersService extends Service {
     // There is now 2 references to the filter at that point
     // We need to release one
     obsFilter.release();
+
+    if (this.presetFilter(sourceId)) {
+      this.setOrder(sourceId, '__PRESET', 1);
+    }
     this.filterAdded.next({ sourceId, name: filterName });
 
     if (filterType === 'vst_filter') {
@@ -204,6 +247,22 @@ export class SourceFiltersService extends Service {
         type: obsFilter.id as TSourceFilterType,
         settings: obsFilter.settings,
       }));
+  }
+
+  presetFilter(sourceId: string): ISourceFilter {
+    return this.getFilters(sourceId).find((filter: ISourceFilter) => filter.name === '__PRESET');
+  }
+
+  addPresetFilter(sourceId: string, path: string) {
+    const preset = this.presetFilter(sourceId);
+    if (preset) {
+      this.setPropertiesFormData(sourceId, '__PRESET', [
+        { name: 'image_path', value: getSharedResource(path), options: null, description: null },
+      ]);
+    } else {
+      // Funky name to attempt avoiding namespace collisions with user-set filters
+      this.add(sourceId, 'clut_filter', '__PRESET', { image_path: getSharedResource(path) });
+    }
   }
 
   setVisibility(sourceId: string, filterName: string, visible: boolean) {

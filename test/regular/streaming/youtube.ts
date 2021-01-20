@@ -27,6 +27,7 @@ test('Streaming to Youtube', async t => {
   });
 
   t.true(await chatIsVisible(t), 'Chat should be visible');
+  await stopStream(t);
 });
 
 test('Streaming to the scheduled event on Youtube', async t => {
@@ -51,6 +52,7 @@ test('Streaming to the scheduled event on Youtube', async t => {
   await sleep(2000);
   await submit(t);
   await waitForStreamStart(t);
+  await stopStream(t);
   t.pass();
 });
 
@@ -70,6 +72,7 @@ test('Start stream twice to the same YT event', async t => {
     event: selectTitle(`Youtube Test Stream ${now}`),
     enableAutoStop: true,
   });
+  await stopStream(t);
   t.pass();
 });
 
