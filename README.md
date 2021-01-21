@@ -65,6 +65,9 @@ N Airには外部の多くのオープンソースを利用しております。
 ## Special Thanks
 This Open Source Program is forked from Streamlabs OBS, a software originally created by Streamlabs.
 
+## 開発への参加について
+N Airはオープンソースであり、どなたでも開発に参加できます。プルリクエストはn-air-developmentブランチに出すようお願いいたします。
+
 ## バグ報告
 - フィードバックへのリンク
   - <https://secure.nicovideo.jp/form/entry/n_air_feedback>
