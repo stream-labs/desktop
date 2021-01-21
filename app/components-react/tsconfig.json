@@ -18,32 +18,12 @@
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "allowJs": false,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "emitDecoratorMetadata": false,
-    "baseUrl": "./app",
-    "jsx": "preserve",
+    "jsx": "react",
     "types": [
-      "node-fetch",
-      "archiver",
-      "classnames",
-      "extract-zip",
-      "fs-extra",
-      "humps",
-      "lodash",
-      "mime",
-      "mkdirp",
-      "node",
-      "overlayscrollbars",
-      "request",
-      "semver",
-      "socket.io-client",
-      "tapable",
-      "uuid",
-      "vue-tsx-support"
+      "react"
     ]
   },
-  "files": [
-    "./app/index.d.ts",
-    "./app/app.ts"
-  ]
+  "files": ["./index.ts"]
 }

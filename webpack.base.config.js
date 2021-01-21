@@ -109,7 +109,10 @@ module.exports = {
       },
       {
         test: /\.ts$/,
-        exclude: /node_modules/,
+        exclude: [
+          path.resolve(__dirname, 'node_modules'),
+          path.resolve(__dirname, 'app', 'components-react'),
+        ],
         use: {
           loader: 'ts-loader',
           options: {
@@ -121,7 +124,10 @@ module.exports = {
         },
       },
       {
-        test: /\.tsx$/,
+        test: path => {
+          const match = !!path.match(/components[\\/].+\.tsx$/);
+          return match;
+        },
         include: path.resolve(__dirname, 'app/components'),
         use: [
           'babel-loader',
@@ -137,18 +143,46 @@ module.exports = {
         ],
       },
       {
+        test: path => {
+          const match = !!path.match(/react[\\/].+\.tsx?$/);
+          return match;
+        },
+        include: path.resolve(__dirname, 'app/components-react'),
+        use: [
+          'babel-loader',
+          {
+            loader: 'ts-loader',
+            options: {
+              reportFiles: ['app/components-react/**/*'],
+              configFile: 'app/components-react/tsconfig.json',
+              instance: 'react-tsx',
+              compilerOptions: {
+                jsx: 'react',
+              },
+            },
+          },
+        ],
+      },
+      {
         test: /\.js$/,
         loader: 'babel-loader',
         exclude: /node_modules/,
       },
       {
         test: /(?<!\.[mg])\.less$/, // Vue style tags
-        include: [path.resolve(__dirname, 'app/components'), path.resolve(__dirname, 'updater')],
+        include: [
+          path.resolve(__dirname, 'app/components'),
+          path.resolve(__dirname, 'app/components-react'),
+          path.resolve(__dirname, 'updater'),
+        ],
         use: ['vue-style-loader', 'css-loader', 'less-loader'],
       },
       {
         test: /\.m.less$/, // Local style modules
-        include: path.resolve(__dirname, 'app/components'),
+        include: [
+          path.resolve(__dirname, 'app/components'),
+          path.resolve(__dirname, 'app/components-react'),
+        ],
         use: [
           { loader: 'style-loader' },
           {
