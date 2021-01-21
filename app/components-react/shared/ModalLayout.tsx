@@ -11,6 +11,7 @@ export interface IModalLayoutProps {
   showControls?: boolean;
   showDone?: boolean;
   disableDone?: boolean;
+  customControls?: ReactNode;
   onSubmit?: (...args: unknown[]) => unknown;
 }
 type TProps = IModalLayoutProps & { children: ReactNode };
@@ -49,7 +50,15 @@ export function ModalLayout(partialProps: TProps) {
   }
 
   // pick variables for the template
-  const { showControls, showCancel, children, showDone, disableDone, onSubmit } = props;
+  const {
+    showControls,
+    showCancel,
+    children,
+    showDone,
+    disableDone,
+    customControls,
+    onSubmit,
+  } = props;
 
   // render template
   return (
@@ -58,7 +67,7 @@ export function ModalLayout(partialProps: TProps) {
       <div className={css.modalLayoutContent}>{children}</div>
 
       {/* CONTROLS */}
-      {showControls && (
+      {showControls && !customControls && (
         <div className={css.modalLayoutControls}>
           {showCancel && (
             <button className="button button--default" onClick={close}>
@@ -72,6 +81,7 @@ export function ModalLayout(partialProps: TProps) {
           )}
         </div>
       )}
+      {customControls}
     </div>
   );
 }

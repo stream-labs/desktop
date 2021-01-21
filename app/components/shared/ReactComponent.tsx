@@ -46,3 +46,10 @@ class ReactComponent<TComponentProps = {}> extends TsxComponent<WrapperProps<TCo
   },
 })
 export class NameFolder extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'GoLiveWindow' },
+  },
+})
+export class GoLiveWindow extends ReactComponent {}

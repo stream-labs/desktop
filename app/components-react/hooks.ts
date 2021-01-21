@@ -34,3 +34,12 @@ export function useVuex(...args: any[]) {
 export function useOnce<TReturnValue>(cb: () => TReturnValue) {
   return useMemo(cb, []);
 }
+
+export function useInitState<TReturnValue>(cb: () => TReturnValue) {
+  const initialState = useMemo(cb, []);
+  return useState<TReturnValue>(initialState);
+}
+
+export function useOnDestroy(cb: () => void) {
+  useEffect(() => cb);
+}

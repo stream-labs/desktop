@@ -111,10 +111,16 @@ import { CustomizationService } from './services/customization';
 import { ScenesService } from './services/scenes';
 import { EditorCommandsService } from './services/editor-commands';
 import { PerformanceService } from './services/performance';
+import { StreamingService } from './services/streaming';
+import { StreamSettingsService } from './services/settings/streaming';
+import { RestreamService } from './services/restream';
 export const AppServices = {
   WindowsService,
   ScenesService,
   CustomizationService,
   EditorCommandsService,
   PerformanceService,
+  StreamingService,
+  StreamSettingsService,
+  RestreamService,
 };

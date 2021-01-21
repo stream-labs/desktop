@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { Services } from '../service-provider';
 import { useOnce } from '../hooks';
 import { assertIsDefined } from '../../util/properties-type-guards';
+import { TextInput } from '../shared/inputs/TextInput';
+import { Form, Button } from 'antd';
 
 interface IWindowOptions {
   renameId?: string;
@@ -21,7 +23,9 @@ export default function NameFolder() {
 
   // define stateful variables and setters
   const [name, setName] = useState('');
-  const [error, setError] = useState('');
+
+  // define a form
+  const [form] = Form.useForm();
 
   // get window options on component create
   const options = useOnce(() => {
@@ -36,12 +40,14 @@ export default function NameFolder() {
   });
 
   // define a submit method
-  function submit(e: Event) {
-    e.preventDefault();
-    if (!name) {
-      setError($t('The source name is required'));
+  async function submit(e: Event) {
+    try {
+      await form.validateFields();
+    } catch (e) {
       return;
-    } else if (options.renameId) {
+    }
+
+    if (options.renameId) {
       EditorCommandsService.executeCommand(
         'RenameFolderCommand',
         options.sceneId,
@@ -67,14 +73,15 @@ export default function NameFolder() {
 
   return (
     <ModalLayout onSubmit={submit}>
-      <form>
-        {!error && (
-          <p style={{ marginBottom: '10px' }}>{$t('Please enter the name of the folder')}</p>
-        )}
-
-        {error && <p style={{ marginBottom: '10px', color: 'red' }}>{error}</p>}
-        <input type="text" value={name} onInput={ev => setName(ev.target['value'])} />
-      </form>
+      <Form layout="vertical" form={form}>
+        <TextInput
+          name="name"
+          value={name}
+          title={$t('Please enter the name of the folder')}
+          required={true}
+        />
+        <Button type="primary">Submit</Button>
+      </Form>
     </ModalLayout>
   );
 }
