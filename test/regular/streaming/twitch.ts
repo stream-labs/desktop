@@ -6,10 +6,10 @@ import {
   chatIsVisible,
   clickGoLive,
   goLive,
-  prepareToGoLive,
+  prepareToGoLive, stopStream,
   tryToGoLive,
   waitForStreamStart,
-  waitForStreamStop,
+  waitForStreamStop
 } from '../../helpers/spectron/streaming';
 import { selectTitle } from '../../helpers/form-monkey';
 import { getClient } from '../../helpers/api-client';
@@ -30,7 +30,7 @@ test('Streaming to Twitch without auth', async t => {
   await prepareToGoLive(t);
   await clickGoLive(t);
   await waitForStreamStart(t);
-
+  await stopStream(t);
   t.pass();
 });
 
@@ -50,6 +50,7 @@ test('Streaming to Twitch', async t => {
     ).isExisting(),
     'Stream settings should be not visible',
   );
+  await stopStream(t);
   t.pass();
 });
 
