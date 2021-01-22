@@ -11,6 +11,8 @@ import {
   JsonrpcService,
 } from 'services/api/jsonrpc';
 import { ServicesManager } from '../../services-manager';
+import { getMutationId, getMutationsSince } from 'store/index';
+import { mutation } from 'services/core';
 
 export interface ISerializable {
   // really wish to have something like
@@ -96,7 +98,7 @@ export abstract class RpcApi extends Service {
    */
   protected handleServiceRequest(request: IJsonRpcRequest): IJsonRpcResponse<any> {
     const methodName = request.method;
-    const { resource: resourceId, args, fetchMutations } = request.params;
+    const { resource: resourceId, args, mutationId } = request.params;
 
     // check that the resource and the called method exist
     // return JSON-RPC error if it's not true
@@ -122,10 +124,20 @@ export abstract class RpcApi extends Service {
         return this.getResource(item.resourceId);
       }
     });
+    const mutations: IMutation[] = [];
 
-    // if both resource and method exist
-    // execute request and record all mutations to the buffer
-    if (fetchMutations) this.startBufferingMutations();
+    if (mutationId != null) {
+      // If the renderer making this call is behind on mutations, we first
+      // need to catch it up by pulling the missing recent mutations from
+      // the mutation cache;
+      mutations.push(...getMutationsSince(mutationId));
+
+      // Then start buffering mutations executed during the synchronous request
+      // This guarantees we don't run out of mutation cache, even for very large
+      // requests that commit tons of mutations.
+      this.startBufferingMutations();
+    }
+
     /* eslint-disable */
     const payload =
       typeof resource[methodName] === 'function'
@@ -133,7 +145,14 @@ export abstract class RpcApi extends Service {
         : resource[methodName];
     /* eslint-enable */
     const response = this.serializePayload(resource, payload, request);
-    if (fetchMutations) response.mutations = this.stopBufferingMutations();
+
+    if (mutationId != null) {
+      response.mutations = mutations;
+      response.mutations.push(...this.stopBufferingMutations());
+    }
+
+    response.mutationId = getMutationId();
+
     return response;
   }
 
@@ -187,11 +206,15 @@ export abstract class RpcApi extends Service {
       );
 
       // notify the API client that the Promise is created
-      return this.jsonrpc.createResponse(request.id, {
+      const response = this.jsonrpc.createResponse(request.id, {
         _type: 'SUBSCRIPTION',
         resourceId: promiseId,
         emitter: 'PROMISE',
       });
+
+      response.mutationId = getMutationId();
+
+      return response;
     }
 
     // if responsePayload is a Service then serialize it
@@ -307,13 +330,15 @@ export abstract class RpcApi extends Service {
       ? { message: info.data?.message, ...info.data }
       : info.data;
 
-    this.serviceEvent.next(
-      this.jsonrpc.createEvent({
-        emitter: 'PROMISE',
-        data: serializedData,
-        resourceId: info.promiseId,
-        isRejected: info.isRejected,
-      }),
-    );
+    const event = this.jsonrpc.createEvent({
+      emitter: 'PROMISE',
+      data: serializedData,
+      resourceId: info.promiseId,
+      isRejected: info.isRejected,
+    });
+
+    event.mutationId = getMutationId();
+
+    this.serviceEvent.next(event);
   }
 }
