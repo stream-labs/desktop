@@ -174,6 +174,37 @@ test('chatメッセージはstateに保持する', () => {
   `);
 });
 
+test('chatメッセージはstateに最新100件保持し、あふれた物がpopoutMessagesに残る', () => {
+  jest.spyOn(Date, 'now').mockImplementation(() => 1582175622000);
+  const { instance, clientSubject } = connectionSetup();
+
+  const retainSize = 100;
+  const numberOfSystemMessages = 1; // "サーバーとの接続が終了しました";
+
+  const overflow = 2; // あふれ保持の順序確認用に2以上必要
+  const chats = Array(retainSize - numberOfSystemMessages + overflow).fill(0).map((v,i) => `#${i}`);
+
+  for (const chat of chats) {
+    clientSubject.next({
+      chat: {
+        content: chat,
+      },
+    });
+  }
+
+  // bufferTime tweaks
+  clientSubject.complete();
+
+  expect(instance.state.messages.length).toEqual(retainSize);
+  expect(instance.state.messages[0].value.content).toEqual(chats[overflow]);
+  expect(instance.state.messages[retainSize - numberOfSystemMessages - 1].value.content).toEqual(
+    chats[chats.length - 1]
+  );
+  expect(instance.state.popoutMessages.length).toEqual(overflow);
+  expect(instance.state.popoutMessages[0].value.content).toEqual(chats[0]);
+});
+
+
 test('接続エラー時にメッセージを表示する', () => {
   jest.spyOn(Date, 'now').mockImplementation(() => 1582175622000);
   const { instance, clientSubject } = connectionSetup();

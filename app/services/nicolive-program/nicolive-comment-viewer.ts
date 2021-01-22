@@ -179,7 +179,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
 
   private onMessage(values: WrappedChat[]) {
     const concatMessages = this.state.messages.concat(values);
-    const popoutMessages = concatMessages.slice(100);
+    const popoutMessages = concatMessages.slice(0, -100);
     this.SET_STATE({
       messages: concatMessages.slice(-100),
       popoutMessages,
