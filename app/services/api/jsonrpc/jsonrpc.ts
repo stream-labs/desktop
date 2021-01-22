@@ -7,7 +7,6 @@ import {
   IJsonrpcServiceApi,
 } from './jsonrpc-api';
 import uuid from 'uuid/v4';
-import { getMutationId } from 'store';
 
 export class JsonrpcService extends Service implements IJsonrpcServiceApi {
   static createError(
@@ -49,9 +48,9 @@ export class JsonrpcService extends Service implements IJsonrpcServiceApi {
     method: string,
     options: {
       compactMode: boolean;
+      fetchMutations: boolean;
       noReturn?: boolean;
       windowId?: string;
-      mutationId?: number;
     },
     ...args: any[]
   ): IJsonRpcRequest {

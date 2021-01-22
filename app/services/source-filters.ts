@@ -8,7 +8,7 @@ import {
   IObsListInput,
 } from 'components/obs/inputs/ObsInput';
 import { metadata } from 'components/shared/inputs';
-
+import path from 'path';
 import { Inject } from './core/injector';
 import { SourcesService } from './sources';
 import { WindowsService } from './windows';
@@ -67,19 +67,18 @@ export interface ISourceFilterIdentifier {
 
 class SourceFiltersViews extends ViewHandler<{}> {
   get presetFilterOptions() {
-    const prefix = byOS({ [OS.Windows]: 'luts\\', [OS.Mac]: 'luts/' });
     return [
       { title: $t('None'), value: '' },
-      { title: $t('Grayscale'), value: `${prefix}grayscale.png` },
-      { title: $t('Sepiatone'), value: `${prefix}sepia.png` },
-      { title: $t('Dramatic'), value: `${prefix}gazing.png` },
-      { title: $t('Flashback'), value: `${prefix}muted.png` },
-      { title: $t('Inverted'), value: `${prefix}inverted.png` },
-      { title: $t('Action Movie'), value: `${prefix}cool_tone.png` },
-      { title: $t('Hearth'), value: `${prefix}warm_tone.png` },
-      { title: $t('Wintergreen'), value: `${prefix}green_tone.png` },
-      { title: $t('Heat Map'), value: `${prefix}heat_map.png` },
-      { title: $t('Cel Shade'), value: `${prefix}cel_shade.png` },
+      { title: $t('Grayscale'), value: path.join('luts', 'grayscale.png') },
+      { title: $t('Sepiatone'), value: path.join('luts', 'sepia.png') },
+      { title: $t('Dramatic'), value: path.join('luts', 'gazing.png') },
+      { title: $t('Flashback'), value: path.join('luts', 'muted.png') },
+      { title: $t('Inverted'), value: path.join('luts', 'inverted.png') },
+      { title: $t('Action Movie'), value: path.join('luts', 'cool_tone.png') },
+      { title: $t('Hearth'), value: path.join('luts', 'warm_tone.png') },
+      { title: $t('Wintergreen'), value: path.join('luts', 'green_tone.png') },
+      { title: $t('Heat Map'), value: path.join('luts', 'heat_map.png') },
+      { title: $t('Cel Shade'), value: path.join('luts', 'cel_shade.png') },
     ];
   }
 
