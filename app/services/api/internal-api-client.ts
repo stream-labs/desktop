@@ -4,7 +4,7 @@ import { IJsonRpcEvent, IJsonRpcResponse, IMutation, JsonrpcService } from 'serv
 import * as traverse from 'traverse';
 import { Service } from '../core/service';
 import { ServicesManager } from '../../services-manager';
-import { commitMutation, getMutationId, waitForMutationId } from '../../store';
+import { commitMutation } from '../../store';
 import { ServiceHelper } from 'services/core';
 import Utils from 'services/utils';
 const { ipcRenderer } = electron;
@@ -112,6 +112,7 @@ export class InternalApiClient {
           methodName as string,
           {
             compactMode: true,
+            fetchMutations: options.shouldReturn,
             noReturn: !options.shouldReturn,
           },
           ...args,
@@ -153,7 +154,7 @@ export class InternalApiClient {
         this.jsonrpc.createRequestWithOptions(
           resourceId,
           methodName,
-          { compactMode: true, mutationId: getMutationId(), windowId: this.windowId },
+          { compactMode: true, fetchMutations: true, windowId: this.windowId },
           ...args,
         ),
       );
@@ -239,12 +240,13 @@ export class InternalApiClient {
   private listenWorkerWindowMessages() {
     const promises = this.promises;
 
-    ipcRenderer.on('services-response-async', async (e, response: IJsonRpcResponse<any>) => {
+    ipcRenderer.on('services-response-async', (e, response: IJsonRpcResponse<any>) => {
       if (response.error) {
         this.actionResponses[response.id][1](response.error);
         return;
       }
 
+      response.mutations.forEach(commitMutation);
       const result = this.handleResult(response.result);
 
       if (result instanceof Promise) {
@@ -253,16 +255,13 @@ export class InternalApiClient {
           .then(r => this.actionResponses[response.id][0](r))
           .catch(r => this.actionResponses[response.id][1](r));
       } else {
-        // Wait until we catch up on mutations before proceeding with the result
-        await waitForMutationId(response.mutationId);
-
         this.actionResponses[response.id][0](result);
       }
     });
 
     ipcRenderer.on(
       'services-message',
-      async (event: Electron.Event, message: IJsonRpcResponse<IJsonRpcEvent>) => {
+      (event: Electron.Event, message: IJsonRpcResponse<IJsonRpcEvent>) => {
         // handle only `EVENT` messages here
         if (message.result._type !== 'EVENT') return;
 
@@ -272,9 +271,6 @@ export class InternalApiClient {
           if (promisePayload) {
             // skip the promise result if this promise has been created from another window
             if (!promises[promisePayload.resourceId]) return;
-
-            // Wait for mutations to catch up
-            await waitForMutationId(message.mutationId);
 
             // resolve or reject the promise depending on the response from the main window
             const [resolve, reject] = promises[promisePayload.resourceId];
