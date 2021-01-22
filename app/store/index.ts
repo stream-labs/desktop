@@ -2,18 +2,17 @@ import Vue from 'vue';
 import Vuex, { Store } from 'vuex';
 import each from 'lodash/each';
 import electron from 'electron';
-import { getModule, StatefulService } from '../services/core/stateful-service';
+import { getModule, mutation, StatefulService } from '../services/core/stateful-service';
 import { ServicesManager } from '../services-manager';
 import { IMutation } from 'services/api/jsonrpc';
 import Util from 'services/utils';
 import { InternalApiService } from 'services/api/internal-api';
 import cloneDeep from 'lodash/cloneDeep';
+import { Subject } from 'rxjs';
 
 Vue.use(Vuex);
 
 const { ipcRenderer, remote } = electron;
-
-const debug = process.env.NODE_ENV !== 'production';
 
 const mutations = {
   // tslint:disable-next-line:function-name
@@ -33,22 +32,34 @@ const actions = {};
 
 const plugins: any[] = [];
 
-let mutationId = 1;
+let mutationId = 0;
 const isWorkerWindow = Util.isWorkerWindow();
 let storeCanReceiveMutations = isWorkerWindow;
 
-const appliedForeignMutations = new Set<number>();
+/**
+ * A global cache of the last N mutations that have been
+ * executed. This is used to catch up renderers that make
+ * synchronous calls and are behind on mutations.
+ */
+const globalMutationCache: IMutation[] = [];
+const MUTATION_CACHE_SIZE = 100;
 
 // This plugin will keep all vuex stores in sync via IPC
 plugins.push((store: Store<any>) => {
   store.subscribe((mutation: Dictionary<any>) => {
     const internalApiService: InternalApiService = InternalApiService.instance;
     if (mutation.payload && !mutation.payload.__vuexSyncIgnore) {
+      if (!isWorkerWindow) {
+        throw new Error('Mutation originated from non-worker window!');
+      }
+
       const mutationToSend: IMutation = {
-        id: mutationId++,
+        id: ++mutationId,
         type: mutation.type,
         payload: mutation.payload,
       };
+
+      globalMutationCache[mutationToSend.id % MUTATION_CACHE_SIZE] = mutationToSend;
       internalApiService.handleMutation(mutationToSend);
       sendMutationToRendererWindows(mutationToSend);
     }
@@ -58,19 +69,27 @@ plugins.push((store: Store<any>) => {
   ipcRenderer.on('vuex-sendState', (event: Electron.Event, windowId: number) => {
     const win = remote.BrowserWindow.fromId(windowId);
     flushMutations();
-    win.webContents.send('vuex-loadState', JSON.stringify(store.state));
+    win.webContents.send('vuex-loadState', {
+      mutationId,
+      state: JSON.stringify(store.state),
+    });
   });
 
   // Only renderer windows should ever receive this
-  ipcRenderer.on('vuex-loadState', (event: Electron.Event, state: any) => {
-    store.commit('BULK_LOAD_STATE', {
-      state: JSON.parse(state),
-      __vuexSyncIgnore: true,
-    });
+  ipcRenderer.on(
+    'vuex-loadState',
+    (event: Electron.Event, msg: { mutationId: number; state: any }) => {
+      mutationId = msg.mutationId;
 
-    // renderer windows can't receive mutations until after the BULK_LOAD_STATE event
-    storeCanReceiveMutations = true;
-  });
+      store.commit('BULK_LOAD_STATE', {
+        state: JSON.parse(msg.state),
+        __vuexSyncIgnore: true,
+      });
+
+      // renderer windows can't receive mutations until after the BULK_LOAD_STATE event
+      storeCanReceiveMutations = true;
+    },
+  );
 
   // All windows can receive this
   ipcRenderer.on('vuex-mutation', (event: Electron.Event, mutationString: string) => {
@@ -118,9 +137,17 @@ export function createStore(): Store<any> {
   return store;
 }
 
+const mutationCommitted = new Subject<number>();
+
 export function commitMutation(mutation: IMutation) {
-  if (appliedForeignMutations.has(mutation.id)) return;
-  appliedForeignMutations.add(mutation.id);
+  if (mutation.id > mutationId + 1) {
+    console.error('Received out of order mutation', `${mutationId} -> ${mutation.id}`);
+  } else if (mutation.id <= mutationId) {
+    console.debug(`Skipping outdated mutation ${mutation.id}`);
+    return;
+  }
+
+  mutationId = mutation.id;
 
   store.commit(
     mutation.type,
@@ -128,6 +155,54 @@ export function commitMutation(mutation: IMutation) {
       __vuexSyncIgnore: true,
     }),
   );
+
+  mutationCommitted.next(mutation.id);
+}
+
+export function getMutationId() {
+  return mutationId;
+}
+
+/**
+ * Returns all of the mutations after `id` up to the latest current
+ * mutation in this context, pulled from the mutation cache. This
+ * is used to catch up renderers making synchronous requests that
+ * may be behind on mutations.
+ * @param id The id of the mutations to fetch from
+ */
+export function getMutationsSince(id: number): IMutation[] {
+  const mutations = [];
+
+  for (let i = id + 1; i <= mutationId; i++) {
+    const mutation = globalMutationCache[i % MUTATION_CACHE_SIZE];
+
+    // Double check we got a cache hit
+    if (mutation.id !== i) {
+      console.error(`Failed fetching mutation ${i} from global cache. Cache may be too small`);
+    } else {
+      mutations.push(mutation);
+    }
+  }
+
+  return mutations;
+}
+
+/**
+ * Returns a promise that resolves when the given mutation id
+ * has been commited;
+ * @param id The mutation id to wait for
+ */
+export function waitForMutationId(id: number) {
+  if (mutationId >= id) return Promise.resolve();
+
+  return new Promise(resolve => {
+    const sub = mutationCommitted.subscribe(committedId => {
+      if (committedId >= id) {
+        sub.unsubscribe();
+        resolve();
+      }
+    });
+  });
 }
 
 const mutationsQueue: IMutation[] = [];
