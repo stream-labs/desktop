@@ -17,17 +17,10 @@ export interface IJsonRpcRequest {
   params: {
     resource: string;
     args?: any[];
+    fetchMutations?: boolean;
     compactMode?: boolean;
     noReturn?: boolean;
     windowId?: string;
-
-    /**
-     * Replaces the old `fetchMutations` option.
-     * When passed in a synchronous request, the response will include
-     * all mutations after this id that are required to be fully
-     * caught up.
-     */
-    mutationId?: number;
   };
 }
 
@@ -39,18 +32,7 @@ export interface IJsonRpcResponse<TResponse> {
     code: number;
     message?: string;
   };
-
-  /**
-   * Contains the mutations since `mutationId`, if
-   * `mutationId` was passed in the original request.
-   */
   mutations?: IMutation[];
-
-  /**
-   * The id of the last mutation executed at the time this
-   * response was sent.
-   */
-  mutationId?: number;
 }
 
 declare type TResourceType = 'HELPER' | 'SUBSCRIPTION' | 'EVENT';
