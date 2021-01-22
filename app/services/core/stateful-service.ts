@@ -73,19 +73,12 @@ function registerMutation(
     ...descriptor,
 
     value(...args: any[]) {
-      if (Utils.isWorkerWindow()) {
-        const constructorArgs = this['_constructorArgs'];
-        const store = StatefulService.getStore();
-        store.commit(mutationName, {
-          args,
-          constructorArgs,
-        });
-      } else {
-        window['servicesManager'].internalApiClient.getRequestHandler(this, methodName, {
-          isAction: false,
-          shouldReturn: true,
-        })(...args);
-      }
+      const constructorArgs = this['_constructorArgs'];
+      const store = StatefulService.getStore();
+      store.commit(mutationName, {
+        args,
+        constructorArgs,
+      });
     },
   });
 
