@@ -32,9 +32,11 @@ import { PlatformAppsService } from 'services/platform-apps';
 import { HardwareService, DefaultHardwareService } from 'services/hardware';
 import { AudioService, E_AUDIO_CHANNELS } from '../audio';
 import { ReplayManager } from './properties-managers/replay-manager';
+import { IconLibraryManager } from './properties-managers/icon-library-manager';
 import { assertIsDefined } from 'util/properties-type-guards';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { SourceFiltersService } from 'services/source-filters';
+import { FileReturnWrapper } from 'util/guest-api-handler';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -47,6 +49,7 @@ export const PROPERTIES_MANAGER_TYPES = {
   streamlabels: StreamlabelsManager,
   platformApp: PlatformAppManager,
   replay: ReplayManager,
+  iconLibrary: IconLibraryManager,
 };
 
 interface IObsSourceCallbackInfo {
@@ -562,53 +565,10 @@ export class SourcesService extends StatefulService<ISourcesState> {
     const source = this.views.getSource(sourceId);
     if (!source) return;
     const propertiesManagerType = source.getPropertiesManagerType();
-    const isWidget = propertiesManagerType === 'widget';
 
-    if (isWidget && this.userService.isLoggedIn) {
-      const platform = this.userService.views.platform;
-      assertIsDefined(platform);
-      const widgetType = source.getPropertiesManagerSettings().widgetType;
-      const componentName = this.widgetsService.getWidgetComponent(widgetType);
-      if (componentName) {
-        this.windowsService.showWindow({
-          componentName,
-          title: $t('Settings for %{sourceName}', {
-            sourceName: WidgetDisplayData(platform.type)[widgetType].name,
-          }),
-          queryParams: { sourceId },
-          size: {
-            width: 920,
-            height: 1024,
-          },
-        });
-
-        return;
-      }
-    }
-
-    // Figure out if we should redirect to settings
-    if (propertiesManagerType === 'platformApp') {
-      const settings = source.getPropertiesManagerSettings();
-      const app = this.platformAppsService.views.getApp(settings.appId);
-
-      if (app) {
-        const page = app.manifest.sources.find(appSource => {
-          return appSource.id === settings.appSourceId;
-        });
-
-        if (page && page.redirectPropertiesToTopNavSlot) {
-          this.navigationService.navigate('PlatformAppMainPage', {
-            appId: app.id,
-            sourceId: source.sourceId,
-          });
-
-          // If we navigated, we don't want to open source properties,
-          // and should close any open child windows instead
-          this.windowsService.closeChildWindow();
-          return;
-        }
-      }
-    }
+    if (propertiesManagerType === 'widget') return this.showWidgetProperties(source);
+    if (propertiesManagerType === 'platformApp') return this.showPlatformAppPage(source);
+    if (propertiesManagerType === 'iconLibrary') return this.showIconLibrarySettings(source);
 
     let propertiesName = SourceDisplayData()[source.type].name;
     if (propertiesManagerType === 'replay') propertiesName = $t('Instant Replay');
@@ -621,6 +581,62 @@ export class SourcesService extends StatefulService<ISourcesState> {
       size: {
         width: 600,
         height: 800,
+      },
+    });
+  }
+
+  showWidgetProperties(source: Source) {
+    if (!this.userService.isLoggedIn) return;
+    const platform = this.userService.views.platform;
+    assertIsDefined(platform);
+    const widgetType = source.getPropertiesManagerSettings().widgetType;
+    const componentName = this.widgetsService.getWidgetComponent(widgetType);
+    if (componentName) {
+      this.windowsService.showWindow({
+        componentName,
+        title: $t('Settings for %{sourceName}', {
+          sourceName: WidgetDisplayData(platform.type)[widgetType].name,
+        }),
+        queryParams: { sourceId: source.sourceId },
+        size: {
+          width: 920,
+          height: 1024,
+        },
+      });
+    }
+  }
+
+  showPlatformAppPage(source: Source) {
+    const settings = source.getPropertiesManagerSettings();
+    const app = this.platformAppsService.views.getApp(settings.appId);
+
+    if (app) {
+      const page = app.manifest.sources.find(appSource => {
+        return appSource.id === settings.appSourceId;
+      });
+
+      if (page && page.redirectPropertiesToTopNavSlot) {
+        this.navigationService.navigate('PlatformAppMainPage', {
+          appId: app.id,
+          sourceId: source.sourceId,
+        });
+
+        // If we navigated, we don't want to open source properties,
+        // and should close any open child windows instead
+        this.windowsService.closeChildWindow();
+      }
+    }
+  }
+
+  showIconLibrarySettings(source: Source) {
+    const propertiesName = SourceDisplayData()[source.type].name;
+    this.windowsService.showWindow({
+      componentName: 'SourceProperties',
+      title: $t('Settings for %{sourceName}', { sourceName: propertiesName }),
+      queryParams: { sourceId: source.sourceId },
+      size: {
+        width: 800,
+        height: 600,
       },
     });
   }
