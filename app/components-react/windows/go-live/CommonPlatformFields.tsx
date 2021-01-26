@@ -7,8 +7,9 @@ import { pick, cloneDeep } from 'lodash';
 import { $t } from '../../../services/i18n';
 import { Form } from 'antd';
 import React, { useState } from 'react';
-import { TextInput } from '../../shared/inputs';
+import { TextAreaInput, TextInput } from '../../shared/inputs';
 import { IGoLiveProps, getEnabledPlatforms } from './go-live';
+import Utils from '../../../services/utils';
 
 interface IProps extends IGoLiveProps {
   /**
@@ -26,6 +27,11 @@ type TCustomFieldName = 'title' | 'description';
  */
 export default function CommonPlatformFields(props: IProps) {
   const { settings, setSettings } = props;
+  const { StreamingService } = Services;
+  const view = StreamingService.views;
+  const targetPlatforms = getTargetPlatforms(props);
+  const enabledPlatforms = getEnabledPlatforms(props);
+  const platformSettings = getPlatformSettings(props);
 
   const initialCommonFields = useOnce(
     () =>
@@ -37,11 +43,12 @@ export default function CommonPlatformFields(props: IProps) {
   const [commonFields, setCommonFields] = useState(initialCommonFields);
 
   // set common fields for each target platform
-  useOnce(() =>
+  useOnce(async () => {
+    await Utils.sleep(0);
     Object.keys(commonFields).forEach((fieldName: 'title' | 'description') =>
       updateCommonField(fieldName, commonFields[fieldName]),
-    ),
-  );
+    );
+  });
 
   /**
    * Update a selected field for all target platforms
@@ -54,12 +61,6 @@ export default function CommonPlatformFields(props: IProps) {
     });
     setSettings(newSettings);
   }
-
-  const { StreamingService } = Services;
-  const targetPlatforms = getTargetPlatforms(props);
-  const enabledPlatforms = getEnabledPlatforms(props);
-  const platformSettings = getPlatformSettings(props);
-  const view = StreamingService.views;
 
   const isSinglePlatformMode = !!props.platform;
   const disabled = targetPlatforms.length === 0;
@@ -86,9 +87,10 @@ export default function CommonPlatformFields(props: IProps) {
     title = $t('Use different title');
   }
 
+  console.log('fields', fields);
+
   return (
-    <Form name="common-settings">
-      TEST COMMON SETTINGS
+    <div>
       {/*USE CUSTOM CHECKBOX*/}
       {/*{hasCustomCheckbox && (*/}
       {/*  <HFormGroup>*/}
@@ -114,23 +116,20 @@ export default function CommonPlatformFields(props: IProps) {
               // max: this.props.platform === 'twitch' ? 140 : 120,
             />
 
-            {/*/!*DESCRIPTION*!/*/}
-            {/*{hasDescription && (*/}
-            {/*  <HFormGroup*/}
-            {/*    value={fields['description']}*/}
-            {/*    onInput={(val: string) => this.updateCommonField('description', val)}*/}
-            {/*    metadata={metadata.textArea({*/}
-            {/*      title: $t('Description'),*/}
-            {/*      name: 'description',*/}
-            {/*      fullWidth: true,*/}
-            {/*      disabled,*/}
-            {/*    })}*/}
-            {/*  />*/}
-            {/*)}*/}
+            {/*DESCRIPTION*/}
+            {hasDescription && (
+              <TextAreaInput
+                value={fields['description']}
+                onInput={val => updateCommonField('description', val)}
+                name="description"
+                title={$t('Description')}
+                disabled
+              />
+            )}
           </div>
         )}
       </Transition>
-    </Form>
+    </div>
   );
 }
 

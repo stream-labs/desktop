@@ -1,2 +1,2 @@
-import { TextInput } from './TextInput';
-export { TextInput };
+export { TextInput } from './TextInput';
+export { TextAreaInput } from './TextAreaInput';

@@ -1,11 +1,11 @@
-import styles from 'GoLive.m.less';
+import styles from './GoLive.m.less';
 import Scrollable from '../../shared/Scrollable';
 import PlatformSettings from './PlatformSettings';
 import { Services } from '../../service-provider';
 import cx from 'classnames';
-import { Form } from 'antd';
-import React from 'react';
+import React, { HTMLAttributes } from 'react';
 import { IGoLiveProps } from './go-live';
+import { useVuex } from '../../hooks';
 
 /**
  * Renders settings for starting the stream
@@ -13,23 +13,33 @@ import { IGoLiveProps } from './go-live';
  * - Settings for each platform
  * - Extras settings
  **/
-export default function GoLiveSettings(props: IGoLiveProps) {
+export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>) {
+  console.log('render GoLiveSettings');
   const { StreamingService, RestreamService, StreamSettingsService } = Services;
-  const { settings, setSettings } = props;
-  const view = StreamingService.views;
-  const enabledPlatforms = view.enabledPlatforms;
-  const hasPlatforms = enabledPlatforms.length > 0;
-  const isErrorMode = view.info.error;
-  const isLoadingMode = !isErrorMode && ['empty', 'prepopulate'].includes(view.info.lifecycle);
-  const shouldShowSettings = !isErrorMode && !isLoadingMode && hasPlatforms;
-  const isAdvancedMode = view.goLiveSettings.advancedMode && view.isMultiplatformMode;
-  const shouldShowPrimeLabel = !RestreamService.state.grandfathered;
-  const shouldShowLeftCol = StreamSettingsService.state.protectedModeEnabled;
-  const onlyOnePlatformIsLinked = view.linkedPlatforms.length === 1;
-  const shouldShowAddDestButton =
-    view.linkedPlatforms.length + view.goLiveSettings.customDestinations.length < 5;
+  const { settings, setSettings } = p;
+
+  // define a reactive state
+  const rs = useVuex(() => {
+    const view = StreamingService.views;
+    const goLiveSettings = view.goLiveSettings;
+    const isErrorMode = !!view.info.error;
+    const enabledPlatforms = view.enabledPlatforms;
+    const isLoadingMode = view.isLoading;
+    const linkedPlatformsCnt = view.linkedPlatforms.length;
+    return {
+      linkedPlatformsCnt,
+      isLoadingMode,
+      enabledPlatforms,
+      shouldShowSettings: !isErrorMode && !isLoadingMode && enabledPlatforms.length,
+      isAdvancedMode: goLiveSettings.advancedMode && view.isMultiplatformMode,
+      shouldShowPrimeLabel: !RestreamService.state.grandfathered,
+      shouldShowLeftCol: StreamSettingsService.state.protectedModeEnabled,
+      shouldShowAddDestButton: linkedPlatformsCnt + goLiveSettings.customDestinations.length < 5,
+    };
+  });
+
   return (
-    <Form className={cx('flex', styles.goLiveSettings)}>
+    <div className={cx('flex', styles.goLiveSettings)}>
       {/*/!*LEFT COLUMN*!/*/}
       {/*{shouldShowLeftCol && (*/}
       {/*  <div style={{ width: '400px', marginRight: '42px' }}>*/}
@@ -42,7 +52,6 @@ export default function GoLiveSettings(props: IGoLiveProps) {
       {/*      handleOnPlatformSwitch={(...args) => this.switchPlatform(...args)}*/}
       {/*      handleOnCustomDestSwitch={(...args) => this.switchCustomDest(...args)}*/}
       {/*    />*/}
-
       {/*    /!*ADD DESTINATION BUTTON*!/*/}
       {/*    {shouldShowAddDestButton && (*/}
       {/*      <a class={styles.addDestinationBtn} onclick={this.addDestination}>*/}
@@ -52,24 +61,23 @@ export default function GoLiveSettings(props: IGoLiveProps) {
       {/*    )}*/}
       {/*  </div>*/}
       {/*)}*/}
-
       {/*RIGHT COLUMN*/}
       <div style={{ width: '100%', display: 'flex' }}>
         {/*{isLoadingMode && this.renderLoading()}*/}
         {/*<GoLiveError />*/}
 
-        {shouldShowSettings && (
+        {rs.shouldShowSettings && (
           <Scrollable
             className={cx({
               [styles.settingsContainer]: true,
-              [styles.settingsContainerOnePlatform]: onlyOnePlatformIsLinked,
+              [styles.settingsContainerOnePlatform]: rs.enabledPlatforms.length === 1,
             })}
           >
             {/*PLATFORM SETTINGS*/}
             <PlatformSettings settings={settings} setSettings={setSettings} />
 
             {/*ADD SOME SPACE*/}
-            {!isAdvancedMode && <div className={styles.spacer} />}
+            {!rs.isAdvancedMode && <div className={styles.spacer} />}
 
             {/*/!*EXTRAS*!/*/}
             {/*<Section title={isAdvancedMode ? $t('Extras') : ''}>*/}
@@ -85,7 +93,7 @@ export default function GoLiveSettings(props: IGoLiveProps) {
           </Scrollable>
         )}
       </div>
-    </Form>
+    </div>
   );
 }
 

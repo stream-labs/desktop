@@ -209,6 +209,10 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     return platform === this.userView.auth?.primaryPlatform;
   }
 
+  get isLoading() {
+    return !this.info.error && ['empty', 'prepopulate'].includes(this.info.lifecycle);
+  }
+
   /**
    * Validates settings and returns an error string
    */

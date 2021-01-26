@@ -1,11 +1,9 @@
-import ValidatedForm from '../../../components/shared/inputs/ValidatedForm';
 import CommonPlatformFields from './CommonPlatformFields';
 import { getEnabledPlatforms, IGoLiveProps } from './go-live';
-import { TPlatform } from '../../../services/platforms';
 import { Services } from '../../service-provider';
-import { Form } from 'antd';
 import { $t } from '../../../services/i18n';
 import React from 'react';
+import { useVuex } from '../../hooks';
 
 interface IProps extends IGoLiveProps {
   isScheduleMode?: boolean;
@@ -16,18 +14,22 @@ export default function PlatformSettings(props: IProps) {
   const enabledPlatforms = getEnabledPlatforms(props);
   const { StreamingService } = Services;
   const view = StreamingService.views;
+  const isMultiplePlatformMode = enabledPlatforms.length > 1;
+  const hasPlatforms = enabledPlatforms.length > 0;
+
+  const rs = useVuex(() => {
+    return {
+      shouldShowSettings: !view.info.error && !view.isLoading && hasPlatforms,
+    };
+  });
 
   // don't render platform settings if platform has not prepopulated the channel data
   if (!view.isPrepopulated(enabledPlatforms)) {
-    return '';
+    return null;
   }
-  const hasPlatforms = enabledPlatforms.length > 0;
-  const isErrorMode = view.info.error;
-  const isLoadingMode = !isErrorMode && ['empty', 'prepopulate'].includes(view.info.lifecycle);
-  const shouldShowSettings = !isErrorMode && !isLoadingMode && hasPlatforms;
-  const isMultiplePlatformMode = enabledPlatforms.length > 1;
+
   return (
-    <Form className="flex">
+    <div className="flex">
       <div style={{ width: '100%' }}>
         {!hasPlatforms && $t('Enable at least one destination to start streaming')}
 
@@ -35,7 +37,7 @@ export default function PlatformSettings(props: IProps) {
         {/*{isLoadingMode && this.renderLoading()}*/}
         {/*<GoLiveError />*/}
 
-        {shouldShowSettings && (
+        {rs.shouldShowSettings && (
           <div style={{ width: '100%' }}>
             {/*COMMON FIELDS*/}
             {isMultiplePlatformMode && (
@@ -48,7 +50,7 @@ export default function PlatformSettings(props: IProps) {
           </div>
         )}
       </div>
-    </Form>
+    </div>
   );
 }
 

@@ -3,7 +3,7 @@ import { InputProps } from 'antd/lib/input';
  * Shared code for inputs
  */
 
-type TInputType = 'text';
+type TInputType = 'text' | 'textarea';
 
 export interface IInputMetadata {
   name: string;
@@ -47,6 +47,7 @@ export function useInputAttrs(type: TInputType, inputProps: IInputMetadata & Inp
     value,
     name,
     placeholder,
+    defaultValue: value,
   };
   return { wrapperAttrs, inputAttrs };
 }

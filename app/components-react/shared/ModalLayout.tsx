@@ -11,7 +11,7 @@ export interface IModalLayoutProps {
   showControls?: boolean;
   showDone?: boolean;
   disableDone?: boolean;
-  customControls?: ReactNode;
+  customControls?: () => ReactNode;
   onSubmit?: (...args: unknown[]) => unknown;
 }
 type TProps = IModalLayoutProps & { children: ReactNode };
@@ -66,7 +66,7 @@ export function ModalLayout(partialProps: TProps) {
       {/* CONTENT */}
       <div className={css.modalLayoutContent}>{children}</div>
 
-      {/* CONTROLS */}
+      {/* DEFAULT CONTROLS */}
       {showControls && !customControls && (
         <div className={css.modalLayoutControls}>
           {showCancel && (
@@ -81,7 +81,9 @@ export function ModalLayout(partialProps: TProps) {
           )}
         </div>
       )}
-      {customControls}
+
+      {/* CUSTOM CONTROLS */}
+      {customControls && <div className={css.modalLayoutControls}>{customControls()}</div>}
     </div>
   );
 }

@@ -41,5 +41,5 @@ export function useInitState<TReturnValue>(cb: () => TReturnValue) {
 }
 
 export function useOnDestroy(cb: () => void) {
-  useEffect(() => cb);
+  useEffect(() => cb, []);
 }

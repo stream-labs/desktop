@@ -2,27 +2,50 @@ import styles from './GoLive.m.less';
 import cx from 'classnames';
 import { ModalLayout } from '../../shared/ModalLayout';
 import { Form } from 'antd';
-import { useInitState, useOnce, useOnDestroy } from '../../hooks';
+import { useInitState, useOnce, useOnDestroy, useVuex } from '../../hooks';
 import { Services } from '../../service-provider';
 import cloneDeep from 'lodash/cloneDeep';
 import Transition from '../../shared/Transition';
 import GoLiveSettings from './GoLiveSettings';
 import React from 'react';
+import { $t } from '../../../services/i18n';
+import GoLiveChecklist from './GoLiveChecklist';
 
 export default function GoLiveWindow() {
-  const { StreamingService } = Services;
+  console.log('render GoLiveWindow');
+  const { StreamingService, WindowsService } = Services;
+  const [form] = Form.useForm();
   const view = StreamingService.views;
-  const lifecycle = view.info.lifecycle;
+
+  // define a reactive state
+  const rs = useVuex(() => {
+    const lifecycle = view.info.lifecycle;
+    const shouldShowConfirm =
+      lifecycle === 'waitForNewSettings' && view.enabledPlatforms.length > 0;
+    const hasError = !!view.info.error;
+    return {
+      lifecycle,
+      shouldShowConfirm,
+      shouldShowSettings: ['empty', 'prepopulate', 'waitForNewSettings'].includes(lifecycle),
+      shouldShowChecklist: ['runChecklist', 'live'].includes(lifecycle),
+      shouldShowAdvancedSwitch: shouldShowConfirm && view.isMultiplatformMode,
+      shouldShowGoBackButton:
+        lifecycle === 'runChecklist' &&
+        hasError &&
+        view.info.checklist.startVideoTransmission !== 'done',
+    };
+  });
 
   // prepopulate data for all platforms
   useOnce(() => {
-    if (['empty', 'waitingForNewSettings'].includes(lifecycle)) {
+    if (['empty', 'waitingForNewSettings'].includes(rs.lifecycle)) {
+      console.log('Prepopulate');
       StreamingService.actions.prepopulateInfo();
     }
   });
 
+  // clear failed checks and warnings on window close
   useOnDestroy(() => {
-    // clear failed checks and warnings on window close
     if (view.info.checklist.startVideoTransmission !== 'done') {
       StreamingService.actions.resetInfo();
     }
@@ -33,22 +56,78 @@ export default function GoLiveWindow() {
     cloneDeep(StreamingService.views.goLiveSettings),
   );
 
-  const shouldShowSettings = ['empty', 'prepopulate', 'waitForNewSettings'].includes(lifecycle);
-  const shouldShowChecklist = ['runChecklist', 'live'].includes(lifecycle);
+  function goLive() {
+    StreamingService.actions.goLive(settings);
+  }
 
-  return (
-    <ModalLayout customControls={true} showControls={false}>
-      <Form style={{ position: 'relative', height: '100%' }} name="editStreamForm">
-        <Transition name="zoom">
-          {shouldShowSettings && (
-            <GoLiveSettings className={styles.page} settings={settings} setSettings={setSettings} />
-          )}
-          {/*{shouldShowChecklist && <GoLiveChecklist class={styles.page} />}*/}
-        </Transition>
-      </Form>
-      {/*<div slot="controls">{this.renderControls()}</div>*/}
-    </ModalLayout>
-  );
+  function close() {
+    WindowsService.actions.closeChildWindow();
+  }
+
+  function goBackToSettings() {
+    StreamingService.actions.prepopulateInfo();
+  }
+
+  function render() {
+    return (
+      <ModalLayout customControls={renderControls} showControls={false}>
+        <Form form={form} style={{ position: 'relative', height: '100%' }} name="editStreamForm">
+          <Transition name="zoom">
+            {rs.shouldShowSettings && (
+              <GoLiveSettings
+                className={styles.page}
+                settings={settings}
+                setSettings={setSettings}
+              />
+            )}
+            {rs.shouldShowChecklist && <GoLiveChecklist className={styles.page} />}
+          </Transition>
+        </Form>
+      </ModalLayout>
+    );
+  }
+
+  function renderControls() {
+    return (
+      <div className="controls" style={{ display: 'flex', flexDirection: 'row-reverse' }}>
+        {/* GO LIVE BUTTON */}
+        {rs.shouldShowConfirm && (
+          <button className={cx('button button--action', styles.goLiveButton)} onClick={goLive}>
+            {$t('Confirm & Go Live')}
+          </button>
+        )}
+
+        {/* GO BACK BUTTON */}
+        {rs.shouldShowGoBackButton && (
+          <button
+            className={cx('button button--action', styles.goLiveButton)}
+            onClick={goBackToSettings}
+          >
+            {$t('Go back to settings')}
+          </button>
+        )}
+
+        {/* CLOSE BUTTON */}
+        <button onClick={close} className={cx('button button--default', styles.cancelButton)}>
+          {$t('Close')}
+        </button>
+
+        {/* ADVANCED MODE SWITCHER */}
+        {/*{shouldShowAdvancedSwitch && (*/}
+        {/*  <div className={styles.modeToggle}>*/}
+        {/*    <div>{$t('Show Advanced Settings')}</div>*/}
+        {/*    <ToggleInput*/}
+        {/*      onInput={(val: boolean) => this.switchAdvancedMode(val)}*/}
+        {/*      value={this.settings.advancedMode}*/}
+        {/*      metadata={{ name: 'advancedMode' }}*/}
+        {/*    />*/}
+        {/*  </div>*/}
+        {/*)}*/}
+      </div>
+    );
+  }
+
+  return render();
 }
 
 //

@@ -9,7 +9,7 @@ import { Component } from 'vue-property-decorator';
 class WrapperProps<TComponentProps> {
   name?: string = null;
   componentProps: TComponentProps = null;
-  wrapperStyles?: Dictionary<string> = {};
+  wrapperStyles?: unknown = () => {};
 }
 
 /**
@@ -50,6 +50,7 @@ export class NameFolder extends ReactComponent {}
 @Component({
   props: {
     name: { default: 'GoLiveWindow' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
   },
 })
 export class GoLiveWindow extends ReactComponent {}
