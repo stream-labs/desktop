@@ -5,6 +5,7 @@ import TsxComponent from 'components/tsx-component';
 import { Component, Watch } from 'vue-property-decorator';
 import styles from './LayoutEditor.m.less';
 import AddTabModal from './AddTabModal';
+import EditTabModal from './EditTabModal';
 import { ListInput, TextInput } from 'components/shared/inputs/inputs';
 import { Inject } from 'services/core/injector';
 import { LayoutService, ELayoutElement, ELayout, LayoutSlot } from 'services/layout';
@@ -24,7 +25,8 @@ export default class LayoutEditor extends TsxComponent {
   browserUrl: string = '';
 
   private highlightedSlot: LayoutSlot = null;
-  private showModal = false;
+  private showCreateModal = false;
+  private showEditModal = false;
   canDragSlot = true;
 
   mounted() {
@@ -94,12 +96,20 @@ export default class LayoutEditor extends TsxComponent {
     this.navigationService.actions.navigate('Studio');
   }
 
-  closeModal() {
-    this.showModal = false;
+  closeCreateModal() {
+    this.showCreateModal = false;
   }
 
-  openModal() {
-    this.showModal = true;
+  openCreateModal() {
+    this.showCreateModal = true;
+  }
+
+  closeEditModal() {
+    this.showEditModal = false;
+  }
+
+  openEditModal() {
+    this.showEditModal = true;
   }
 
   get tabOptions() {
@@ -135,7 +145,7 @@ export default class LayoutEditor extends TsxComponent {
         <button
           class="button button--action"
           style="margin: 0 16px;"
-          onClick={() => this.openModal()}
+          onClick={() => this.openCreateModal()}
         >
           {$t('Add Tab')}
         </button>
@@ -153,6 +163,16 @@ export default class LayoutEditor extends TsxComponent {
             onClick={() => this.removeCurrentTab()}
           >
             <i class="icon-trash" />
+          </button>
+        )}
+        {this.layoutService.state.currentTab !== 'default' && (
+          <button
+          style="margin: 0 16px 0 16px"
+            class={cx('button button--action', styles.editButton)}
+            v-tooltip={{ content: $t('Rename Current Tab'), placement: 'bottom' }}
+            onClick={() => this.openEditModal()}
+          >
+            <i class="icon-edit" />
           </button>
         )}
         <button class="button button--action" onClick={() => this.save()}>
@@ -230,10 +250,18 @@ export default class LayoutEditor extends TsxComponent {
     ));
   }
 
-  get modal() {
+  get createModal() {
     return (
       <div class={styles.modalBackdrop}>
-        <AddTabModal onClose={() => this.closeModal()} />
+        <AddTabModal onClose={() => this.closeCreateModal()} />
+      </div>
+    );
+  }
+
+  get editModal() {
+    return (
+      <div class={styles.modalBackdrop}>
+        <EditTabModal onClose={() => this.closeEditModal()} />
       </div>
     );
   }
@@ -253,7 +281,8 @@ export default class LayoutEditor extends TsxComponent {
             {this.layout}
           </div>
         </div>
-        {this.showModal && this.modal}
+        {this.showCreateModal && this.createModal}
+        {this.showEditModal && this.editModal}
       </div>
     );
   }
