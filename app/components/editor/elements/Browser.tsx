@@ -26,7 +26,10 @@ export default class Display extends BaseElement {
 
   get element() {
     return (
-      <BrowserView src={this.url} options={{ webPreferences: { partition: this.partition } }} />
+      <BrowserView
+        src={this.url}
+        options={{ webPreferences: { partition: this.partition, contextIsolation: true } }}
+      />
     );
   }
 
