@@ -36,7 +36,7 @@ export default function NameFolder() {
   });
 
   // define a submit method
-  function submit(e: Event) {
+  function submit(e: any) {
     e.preventDefault();
     if (!name) {
       setError($t('The source name is required'));
@@ -67,7 +67,7 @@ export default function NameFolder() {
 
   return (
     <ModalLayout onSubmit={submit}>
-      <form>
+      <form onSubmit={submit}>
         {!error && (
           <p style={{ marginBottom: '10px' }}>{$t('Please enter the name of the folder')}</p>
         )}
