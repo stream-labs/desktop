@@ -101,15 +101,19 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
    * Prepares and returns the initial settings for the GoLive window
    */
   get goLiveSettings(): IGoLiveSettings {
-    const destinations = {};
+    const destinations = {} as IGoLiveSettings['platforms'];
     this.linkedPlatforms.forEach(platform => {
-      destinations[platform] = this.getPlatformSettings(platform);
+      destinations[platform as string] = this.getPlatformSettings(platform);
     });
+
+    // if user recently added a new platform then it doesn't have default title and description
+    // so set the title and description from other platforms
+    const platforms = this.applyCommonFields(destinations);
 
     const savedGoLiveSettings = this.streamSettingsView.state.goLiveSettings;
 
     return {
-      platforms: destinations as IGoLiveSettings['platforms'],
+      platforms,
       advancedMode: !!this.streamSettingsView.state.goLiveSettings?.advancedMode,
       optimizedProfile: undefined,
       customDestinations: savedGoLiveSettings?.customDestinations || [],
@@ -120,16 +124,16 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   /**
    * Returns common fields for the stream such as title, description, game
    */
-  getCommonFields(settings: IStreamSettings) {
+  getCommonFields(platforms: IGoLiveSettings['platforms']) {
     const commonFields = {
       title: '',
       description: '',
       game: '',
     };
-    const destinations = Object.keys(settings.platforms) as TPlatform[];
-    const enabledDestinations = destinations.filter(dest => settings.platforms[dest].enabled);
+    const destinations = Object.keys(platforms) as TPlatform[];
+    const enabledDestinations = destinations.filter(dest => platforms[dest].enabled);
     const destinationsWithCommonSettings = enabledDestinations.filter(
-      dest => !settings.platforms[dest].useCustomFields,
+      dest => !platforms[dest].useCustomFields,
     );
     const destinationWithCustomSettings = difference(
       enabledDestinations,
@@ -138,7 +142,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
 
     // search fields in platforms that don't use custom settings first
     destinationsWithCommonSettings.forEach(platform => {
-      const destSettings = settings.platforms[platform];
+      const destSettings = platforms[platform];
       Object.keys(commonFields).forEach(fieldName => {
         if (commonFields[fieldName] || !destSettings[fieldName]) return;
         commonFields[fieldName] = destSettings[fieldName];
@@ -147,7 +151,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
 
     // search fields in platforms that have custom fields
     destinationWithCustomSettings.forEach(platform => {
-      const destSettings = settings.platforms[platform];
+      const destSettings = platforms[platform];
       Object.keys(commonFields).forEach(fieldName => {
         if (commonFields[fieldName] || !destSettings[fieldName]) return;
         commonFields[fieldName] = destSettings[fieldName];
@@ -157,11 +161,22 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     return commonFields;
   }
 
+  applyCommonFields(platforms: IGoLiveSettings['platforms']): IGoLiveSettings['platforms'] {
+    const commonFields = this.getCommonFields(platforms);
+    const result = {} as IGoLiveSettings['platforms'];
+    Object.keys(platforms).forEach(platform => {
+      result[platform] = platforms[platform];
+      result[platform].title = platforms[platform].title || commonFields.title;
+      result[platform].description = platforms[platform].description || commonFields.description;
+    });
+    return result;
+  }
+
   /**
    * return common fields for the stream such title, description, game
    */
   get commonFields(): { title: string; description: string; game: string } {
-    return this.getCommonFields(this.goLiveSettings);
+    return this.getCommonFields(this.goLiveSettings.platforms);
   }
 
   /**

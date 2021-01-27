@@ -35,20 +35,22 @@ export default function CommonPlatformFields(props: IProps) {
 
   const initialCommonFields = useOnce(
     () =>
-      pick(props.platform ? settings.platforms[props.platform] : view.getCommonFields(settings), [
-        'title',
-        'description',
-      ]) as { title: string; description: string },
+      pick(
+        props.platform
+          ? settings.platforms[props.platform]
+          : view.getCommonFields(settings.platforms),
+        ['title', 'description'],
+      ) as { title: string; description: string },
   );
   const [commonFields, setCommonFields] = useState(initialCommonFields);
 
-  // set common fields for each target platform
-  useOnce(async () => {
-    await Utils.sleep(0);
-    Object.keys(commonFields).forEach((fieldName: 'title' | 'description') =>
-      updateCommonField(fieldName, commonFields[fieldName]),
-    );
-  });
+  // // set common fields for each target platform
+  // useOnce(async () => {
+  //   await Utils.sleep(0);
+  //   Object.keys(commonFields).forEach((fieldName: 'title' | 'description') =>
+  //     updateCommonField(fieldName, commonFields[fieldName]),
+  //   );
+  // });
 
   /**
    * Update a selected field for all target platforms
@@ -116,16 +118,16 @@ export default function CommonPlatformFields(props: IProps) {
               // max: this.props.platform === 'twitch' ? 140 : 120,
             />
 
-            {/*DESCRIPTION*/}
-            {hasDescription && (
-              <TextAreaInput
-                value={fields['description']}
-                onInput={val => updateCommonField('description', val)}
-                name="description"
-                title={$t('Description')}
-                disabled
-              />
-            )}
+            {/*/!*DESCRIPTION*!/*/}
+            {/*{hasDescription && (*/}
+            {/*  <TextAreaInput*/}
+            {/*    value={fields['description']}*/}
+            {/*    onInput={val => updateCommonField('description', val)}*/}
+            {/*    name="description"*/}
+            {/*    title={$t('Description')}*/}
+            {/*    disabled*/}
+            {/*  />*/}
+            {/*)}*/}
           </div>
         )}
       </Transition>

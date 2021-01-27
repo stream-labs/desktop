@@ -6,6 +6,9 @@ import cx from 'classnames';
 import React, { HTMLAttributes } from 'react';
 import { IGoLiveProps } from './go-live';
 import { useVuex } from '../../hooks';
+import { DestinationSwitchers } from './DestinationSwitchers';
+import { TPlatform } from '../../../services/platforms';
+import { $t } from '../../../services/i18n';
 
 /**
  * Renders settings for starting the stream
@@ -15,7 +18,13 @@ import { useVuex } from '../../hooks';
  **/
 export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>) {
   console.log('render GoLiveSettings');
-  const { StreamingService, RestreamService, StreamSettingsService } = Services;
+  const {
+    StreamingService,
+    RestreamService,
+    StreamSettingsService,
+    SettingsService,
+    UserService,
+  } = Services;
   const { settings, setSettings } = p;
 
   // define a reactive state
@@ -38,29 +47,54 @@ export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>
     };
   });
 
+  function switchPlatform(platform: TPlatform, enabled: boolean) {
+    // save settings
+    settings.platforms[platform].enabled = enabled;
+    StreamSettingsService.setGoLiveSettings(settings);
+
+    // preload channel data
+    StreamingService.actions.prepopulateInfo();
+  }
+
+  function switchCustomDest(destInd: number, enabled: boolean) {
+    // save settings
+    settings.customDestinations[destInd].enabled = enabled;
+    StreamSettingsService.actions.setGoLiveSettings(settings);
+  }
+
+  function addDestination() {
+    // open the stream settings or prime page
+    if (RestreamService.views.canEnableRestream) {
+      SettingsService.actions.showSettings('Stream');
+    } else {
+      UserService.openPrimeUrl('slobs-multistream');
+    }
+  }
+
   return (
     <div className={cx('flex', styles.goLiveSettings)}>
-      {/*/!*LEFT COLUMN*!/*/}
-      {/*{shouldShowLeftCol && (*/}
-      {/*  <div style={{ width: '400px', marginRight: '42px' }}>*/}
-      {/*    /!*DESTINATION SWITCHERS*!/*/}
-      {/*    <DestinationSwitchers*/}
-      {/*      platforms={this.settings.platforms}*/}
-      {/*      customDestinations={this.settings.customDestinations}*/}
-      {/*      title="Stream to %{platformName}"*/}
-      {/*      canDisablePrimary={false}*/}
-      {/*      handleOnPlatformSwitch={(...args) => this.switchPlatform(...args)}*/}
-      {/*      handleOnCustomDestSwitch={(...args) => this.switchCustomDest(...args)}*/}
-      {/*    />*/}
-      {/*    /!*ADD DESTINATION BUTTON*!/*/}
-      {/*    {shouldShowAddDestButton && (*/}
-      {/*      <a class={styles.addDestinationBtn} onclick={this.addDestination}>*/}
-      {/*        <i class="fa fa-plus" />*/}
-      {/*        {$t('Add Destination')} {shouldShowPrimeLabel && <b class={styles.prime}>prime</b>}*/}
-      {/*      </a>*/}
-      {/*    )}*/}
-      {/*  </div>*/}
-      {/*)}*/}
+      {/*LEFT COLUMN*/}
+      {rs.shouldShowLeftCol && (
+        <div style={{ width: '400px', marginRight: '42px' }}>
+          {/*DESTINATION SWITCHERS*/}
+          <DestinationSwitchers
+            platforms={settings.platforms}
+            customDestinations={settings.customDestinations}
+            title="Stream to %{platformName}"
+            canDisablePrimary={false}
+            onPlatformSwitch={switchPlatform}
+            onCustomDestSwitch={switchCustomDest}
+          />
+          {/*ADD DESTINATION BUTTON*/}
+          {rs.shouldShowAddDestButton && (
+            <a className={styles.addDestinationBtn} onClick={addDestination}>
+              <i className="fa fa-plus" />
+              {$t('Add Destination')}{' '}
+              {rs.shouldShowPrimeLabel && <b className={styles.prime}>prime</b>}
+            </a>
+          )}
+        </div>
+      )}
       {/*RIGHT COLUMN*/}
       <div style={{ width: '100%', display: 'flex' }}>
         {/*{isLoadingMode && this.renderLoading()}*/}

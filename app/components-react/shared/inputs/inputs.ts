@@ -1,4 +1,9 @@
 import { InputProps } from 'antd/lib/input';
+import { Ref, useEffect, RefObject, useRef, useContext } from 'react';
+import { Input } from 'antd';
+import { FormContext } from './SlobsForm';
+import { useOnce } from '../../hooks';
+import uuid from 'uuid';
 /**
  * Shared code for inputs
  */
@@ -32,10 +37,21 @@ export function useDataAttrs(type: TInputType, name: string) {
   };
 }
 
-export function useInputAttrs(type: TInputType, inputProps: IInputMetadata & InputProps) {
+export function useInput(type: TInputType, inputProps: IInputMetadata & InputProps) {
   const { name, title, value, placeholder } = inputProps;
+  const formContext = useContext(FormContext);
+  const form = formContext?.form;
+
+  const uniqueName = useOnce(() => {
+    const uniqueName = `${name}-${uuid()}`;
+    if (form) {
+      form.setFieldsValue({ [uniqueName]: value });
+    }
+    return uniqueName;
+  });
+
   const wrapperAttrs = {
-    name,
+    name: uniqueName,
     label: title,
     rules: inputProps.required ? [{ required: true }] : [],
     'data-role': 'input',
@@ -44,10 +60,23 @@ export function useInputAttrs(type: TInputType, inputProps: IInputMetadata & Inp
     'data-title': title,
   };
   const inputAttrs = {
-    value,
-    name,
+    value: undefined,
+    name: uniqueName,
     placeholder,
-    defaultValue: value,
+    // ref: inputRef as any,
   };
+
+  // useEffect(() => {
+  //   form.set;
+  // }, [value]);
+
+  // useEffect(() => {
+  //   if (!inputRef.current) return;
+  //
+  //   if (['text', 'textarea', 'number'].includes(type)) {
+  //     inputRef.current.input.value = value as string;
+  //   }
+  // }, [value]);
+
   return { wrapperAttrs, inputAttrs };
 }

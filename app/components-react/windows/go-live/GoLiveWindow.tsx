@@ -10,6 +10,9 @@ import GoLiveSettings from './GoLiveSettings';
 import React from 'react';
 import { $t } from '../../../services/i18n';
 import GoLiveChecklist from './GoLiveChecklist';
+import { IGoLiveSettings } from '../../../services/streaming';
+import SlobsForm from '../../shared/inputs/SlobsForm';
+import ContextForm from '../../shared/inputs/SlobsForm';
 
 export default function GoLiveWindow() {
   console.log('render GoLiveWindow');
@@ -51,10 +54,21 @@ export default function GoLiveWindow() {
     }
   });
 
-  // initialize state
-  const [settings, setSettings] = useInitState(() =>
-    cloneDeep(StreamingService.views.goLiveSettings),
-  );
+  // initialize the GoLive settings
+  const [settings, setSettingsRaw] = useInitState(() => {
+    // read saved settings from the local storage
+    return StreamingService.views.goLiveSettings;
+  });
+
+  // define a setter for goLiveSettings
+  function setSettings(newSettings: IGoLiveSettings) {
+    // we should re-calculate common fields before applying new settings
+    const platforms = view.applyCommonFields(newSettings.platforms);
+    setSettingsRaw({
+      ...newSettings,
+      platforms,
+    });
+  }
 
   function goLive() {
     StreamingService.actions.goLive(settings);
@@ -71,7 +85,11 @@ export default function GoLiveWindow() {
   function render() {
     return (
       <ModalLayout customControls={renderControls} showControls={false}>
-        <Form form={form} style={{ position: 'relative', height: '100%' }} name="editStreamForm">
+        <ContextForm
+          form={form}
+          style={{ position: 'relative', height: '100%' }}
+          name="editStreamForm"
+        >
           <Transition name="zoom">
             {rs.shouldShowSettings && (
               <GoLiveSettings
@@ -82,7 +100,7 @@ export default function GoLiveWindow() {
             )}
             {rs.shouldShowChecklist && <GoLiveChecklist className={styles.page} />}
           </Transition>
-        </Form>
+        </ContextForm>
       </ModalLayout>
     );
   }

@@ -6,6 +6,7 @@ import { useOnce } from '../hooks';
 import { assertIsDefined } from '../../util/properties-type-guards';
 import { TextInput } from '../shared/inputs/TextInput';
 import { Form, Button } from 'antd';
+import ContextForm from '../shared/inputs/SlobsForm';
 
 interface IWindowOptions {
   renameId?: string;
@@ -73,7 +74,7 @@ export default function NameFolder() {
 
   return (
     <ModalLayout onSubmit={submit}>
-      <Form layout="vertical" form={form}>
+      <ContextForm layout="vertical" form={form}>
         <TextInput
           name="name"
           value={name}
@@ -81,7 +82,7 @@ export default function NameFolder() {
           required={true}
         />
         <Button type="primary">Submit</Button>
-      </Form>
+      </ContextForm>
     </ModalLayout>
   );
 }
