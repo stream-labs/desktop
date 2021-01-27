@@ -35,6 +35,14 @@ enum EResponseResultProcessing {
   File = 'file',
 }
 
+interface IRequestHandlerSchema {
+  [key: string]: boolean | IRequestHandlerSchema;
+}
+
+export interface IRequestHandler {
+  [key: string]: ((...args: any[]) => Promise<any>) | IRequestHandler | Promise<void>;
+}
+
 (() => {
   const readFile = util.promisify(fs.readFile);
 
@@ -60,23 +68,19 @@ enum EResponseResultProcessing {
     [requestId: string]: IRequest;
   } = {};
 
-  let hostWebContents: Electron.WebContents;
-  let ipcChannel: string;
   const webContentsId = electron.remote.getCurrentWebContents().id;
-  const requestBuffer: IGuestApiRequest[] = [];
 
-  let readyFunc: Function;
-  const readyPromise = new Promise<boolean>(resolve => {
-    readyFunc = (webContentsId: number, ipc: string) => {
-      hostWebContents = electron.remote.webContents.fromId(webContentsId);
-      ipcChannel = ipc;
+  const {
+    schema,
+    hostWebContentsId,
+    ipcChannel,
+  }: {
+    schema: IRequestHandlerSchema;
+    hostWebContentsId: number;
+    ipcChannel: string;
+  } = electron.ipcRenderer.sendSync('guestApi-getInfo');
 
-      requestBuffer.forEach(req => {
-        hostWebContents.send(ipcChannel, req);
-      });
-      resolve();
-    };
-  });
+  const hostWebContents = electron.remote.webContents.fromId(hostWebContentsId);
 
   electron.ipcRenderer.on('guestApiCallback', (event: any, response: IGuestApiCallback) => {
     // This window was likely reloaded and no longer cares about this callback.
@@ -112,70 +116,64 @@ enum EResponseResultProcessing {
     }
   });
 
-  electron.ipcRenderer.on(
-    'guestApiReady',
-    (e: Electron.Event, info: { webContentsId: number; ipcChannel: string }) => {
-      readyFunc(info.webContentsId, info.ipcChannel);
-    },
-  );
+  function getApi(schema: IRequestHandlerSchema, path: string[] = []): IRequestHandler {
+    const newApi: IRequestHandler = {};
 
-  /**
-   * Returns a proxy rooted at the given path
-   * @param path the current path
-   */
-  function getProxy(path: string[] = []): any {
-    return new Proxy(() => {}, {
-      get(target, key) {
-        if (key === 'apiReady') {
-          return readyPromise;
-        }
+    Object.keys(schema).forEach(key => {
+      if (typeof schema[key] === 'object') {
+        newApi[key] = getApi(schema[key] as IRequestHandlerSchema, path.concat([key]));
+      } else {
+        newApi[key] = function(...args) {
+          console.log(`You called ${path.join('.')}.${key}`);
 
-        return getProxy(path.concat([key.toString()]));
-      },
+          const requestId = uuid();
+          requests[requestId] = {
+            resolve: null,
+            reject: null,
+            callbacks: {},
+          };
+          const promise = new Promise((resolve, reject) => {
+            requests[requestId].resolve = resolve;
+            requests[requestId].reject = reject;
+          });
+          const mappedArgs = args.map(arg => {
+            if (typeof arg === 'function') {
+              const callbackId = uuid();
 
-      apply(target, thisArg, args: any[]) {
-        const requestId = uuid();
-        requests[requestId] = {
-          resolve: null,
-          reject: null,
-          callbacks: {},
-        };
-        const promise = new Promise((resolve, reject) => {
-          requests[requestId].resolve = resolve;
-          requests[requestId].reject = reject;
-        });
-        const mappedArgs = args.map(arg => {
-          if (typeof arg === 'function') {
-            const callbackId = uuid();
+              requests[requestId].callbacks[callbackId] = arg;
 
-            requests[requestId].callbacks[callbackId] = arg;
+              return {
+                __guestApiCallback: true,
+                id: callbackId,
+              };
+            }
 
-            return {
-              __guestApiCallback: true,
-              id: callbackId,
-            };
-          }
+            return arg;
+          });
 
-          return arg;
-        });
+          const apiRequest: IGuestApiRequest = {
+            webContentsId,
+            id: requestId,
+            methodPath: path.concat([key]),
+            args: mappedArgs,
+          };
 
-        const apiRequest: IGuestApiRequest = {
-          webContentsId,
-          id: requestId,
-          methodPath: path,
-          args: mappedArgs,
-        };
-
-        if (hostWebContents && ipcChannel) {
           hostWebContents.send(ipcChannel, apiRequest);
-        } else {
-          requestBuffer.push(apiRequest);
-        }
 
-        return promise;
-      },
+          return promise;
+        };
+      }
     });
+
+    return newApi;
   }
 
-  global['streamlabsOBS'] = getProxy();
+  const api = getApi(schema);
+
+  // Older versions of the API were not set up sycnhronously and did
+  // not buffer requests. So some applications are still waiting on
+  // this promise that no longer serves a purpose.
+  api.apiReady = Promise.resolve();
+
+  electron.contextBridge.exposeInMainWorld('streamlabsOBS', api);
 })();
