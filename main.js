@@ -654,6 +654,20 @@ ipcMain.on('streamlabels-writeFile', (e, info) => {
   });
 });
 
+const guestApiInfo = {};
+
+ipcMain.on('guestApi-setInfo', (e, info) => {
+  guestApiInfo[info.webContentsId] = {
+    schema: info.schema,
+    hostWebContentsId: info.hostWebContentsId,
+    ipcChannel: info.ipcChannel,
+  };
+});
+
+ipcMain.on('guestApi-getInfo', e => {
+  e.returnValue = guestApiInfo[e.sender.id];
+});
+
 /* The following 3 methods need to live in the main process
     because events bound using the remote module are not
     executed synchronously and therefore default actions

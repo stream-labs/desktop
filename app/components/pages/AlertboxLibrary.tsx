@@ -37,10 +37,8 @@ export default class AlertboxLibrary extends TsxComponent<AlertboxLibraryProps> 
   @Inject() private restreamService: RestreamService;
 
   onBrowserViewReady(view: Electron.BrowserView) {
-    view.webContents.on('did-finish-load', () => {
-      new GuestApiHandler().exposeApi(view.webContents.id, {
-        installWidgets: this.installWidgets,
-      });
+    new GuestApiHandler().exposeApi(view.webContents.id, {
+      installWidgets: this.installWidgets,
     });
 
     electron.ipcRenderer.send('webContents-preventPopup', view.webContents.id);
