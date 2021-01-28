@@ -278,9 +278,7 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
 
   @mutation()
   EDIT_TAB(name: string, icon: string, id: string) {
-    Vue.set(this.state.tabs, id, {
-      name,
-      icon
-    });
+    Vue.set(this.state.tabs[id], 'name', name);
+    Vue.set(this.state.tabs[id], 'icon', icon);
   }
 }
