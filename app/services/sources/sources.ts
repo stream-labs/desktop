@@ -631,7 +631,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
   showIconLibrarySettings(source: Source) {
     const propertiesName = SourceDisplayData()[source.type].name;
     this.windowsService.showWindow({
-      componentName: 'SourceProperties',
+      componentName: 'IconLibraryProperties',
       title: $t('Settings for %{sourceName}', { sourceName: propertiesName }),
       queryParams: { sourceId: source.sourceId },
       size: {

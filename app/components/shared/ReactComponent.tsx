@@ -46,3 +46,11 @@ class ReactComponent<TComponentProps = {}> extends TsxComponent<WrapperProps<TCo
   },
 })
 export class NameFolder extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'IconLibraryProperties' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class IconLibraryProperties extends ReactComponent {}

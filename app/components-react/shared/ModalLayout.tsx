@@ -7,6 +7,7 @@ import { $t } from '../../services/i18n';
 import css from './ModalLayout.m.less';
 
 export interface IModalLayoutProps {
+  fixedChild?: ReactNode;
   hasTitleBar?: boolean;
   showControls?: boolean;
   showDone?: boolean;
@@ -49,11 +50,13 @@ export function ModalLayout(partialProps: TProps) {
   }
 
   // pick variables for the template
-  const { showControls, showCancel, children, showDone, disableDone, onSubmit } = props;
+  const { showControls, showCancel, children, showDone, disableDone, onSubmit, fixedChild } = props;
 
   // render template
   return (
     <div className={wrapperClassNames}>
+      {/* FIXED SLOT */}
+      {fixedChild && <div>{fixedChild}</div>}
       {/* CONTENT */}
       <div className={css.modalLayoutContent}>{children}</div>
 
