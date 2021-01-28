@@ -37,8 +37,8 @@ export default class EditTabModal extends TsxComponent<EditTabModalProps> {
   name = '';
   icon = '';
 
-  async createTab() {
-    this.layoutService.addTab(this.name, this.icon);
+  async editTab() {
+    this.layoutService.editTab(this.name, this.icon);
     this.$emit('close');
   }
 
@@ -70,7 +70,7 @@ export default class EditTabModal extends TsxComponent<EditTabModalProps> {
           </button>
           <button
             class="button button--action"
-            onClick={() => this.createTab()}
+            onClick={() => this.editTab()}
             disabled={!this.canSave}
           >
             {$t('Save Changes')}

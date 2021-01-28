@@ -201,6 +201,11 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
     this.checkUsage();
   }
 
+  editTab(name: string, icon: string) {
+    const id = this.state.currentTab;
+    this.EDIT_TAB(name, icon, id);
+  }
+
   removeCurrentTab() {
     this.REMOVE_TAB(this.state.currentTab);
   }
@@ -269,5 +274,13 @@ export class LayoutService extends PersistentStatefulService<ILayoutServiceState
       },
     });
     this.state.currentTab = id;
+  }
+
+  @mutation()
+  EDIT_TAB(name: string, icon: string, id: string) {
+    Vue.set(this.state.tabs, id, {
+      name,
+      icon
+    });
   }
 }
