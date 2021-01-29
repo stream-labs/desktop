@@ -140,19 +140,6 @@ class SourcesViews extends ViewHandler<ISourcesState> {
     });
     return sourceModels.map(sourceModel => this.getSource(sourceModel.sourceId)!);
   }
-
-  isAudioSource(sourceId: string): boolean {
-    const source = this.getSource(sourceId);
-    if (!source) return false;
-    return [
-      'coreaudio_input_capture',
-      'coreaudio_output_capture',
-      'syphon-input',
-      'soundtrack_source',
-      'wasapi_input_capture',
-      'wasapi_output_capture',
-    ].includes(source.type);
-  }
 }
 
 export class SourcesService extends StatefulService<ISourcesState> {

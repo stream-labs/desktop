@@ -95,7 +95,9 @@ export default class SourceFilters extends Vue {
   }
 
   get isAudioSource() {
-    return this.sourcesService.views.isAudioSource(this.sourceId);
+    const source = this.sourcesService.views.getSource(this.sourceId);
+    if (!source) return false;
+    return source.audio;
   }
 
   get presetFilterOptions() {
