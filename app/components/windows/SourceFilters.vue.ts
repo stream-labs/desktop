@@ -94,10 +94,10 @@ export default class SourceFilters extends Vue {
     this.reorderFilterSub.unsubscribe();
   }
 
-  get isAudioSource() {
+  get isVisualSource() {
     const source = this.sourcesService.views.getSource(this.sourceId);
     if (!source) return false;
-    return source.audio;
+    return source.video;
   }
 
   get presetFilterOptions() {

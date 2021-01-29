@@ -5,7 +5,7 @@
     <div slot="content" class="modal--side-nav">
       <NavMenu v-model="selectedFilterName">
         <v-form-group
-          v-if="!isAudioSource"
+          v-if="isVisualSource"
           :value="presetFilterValue"
           :metadata="presetFilterMetadata"
           @input="value => addPresetFilter(value)"
