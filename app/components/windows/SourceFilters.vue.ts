@@ -94,6 +94,12 @@ export default class SourceFilters extends Vue {
     this.reorderFilterSub.unsubscribe();
   }
 
+  get isVisualSource() {
+    const source = this.sourcesService.views.getSource(this.sourceId);
+    if (!source) return false;
+    return source.video;
+  }
+
   get presetFilterOptions() {
     return this.sourceFiltersService.views.presetFilterOptions;
   }
