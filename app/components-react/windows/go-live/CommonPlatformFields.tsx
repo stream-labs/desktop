@@ -1,21 +1,26 @@
 import Transition from '../../shared/Transition';
 import { TPlatform } from '../../../services/platforms';
-import { IStreamSettings } from '../../../services/streaming';
+import { IGoLiveSettings, IStreamSettings } from '../../../services/streaming';
 import { Services } from '../../service-provider';
 import { useOnce } from '../../hooks';
 import { pick, cloneDeep } from 'lodash';
 import { $t } from '../../../services/i18n';
 import { Form } from 'antd';
 import React, { useState } from 'react';
-import { TextAreaInput, TextInput } from '../../shared/inputs';
-import { IGoLiveProps, getEnabledPlatforms } from './go-live';
+import { CheckboxInput, InputGroup, TextAreaInput, TextInput } from '../../shared/inputs';
+import { IGoLiveProps, getEnabledPlatforms, TSetPlatformSettingsFn } from './go-live';
 import Utils from '../../../services/utils';
+import { assertIsDefined } from '../../../util/properties-type-guards';
+import InputWrapper from '../../shared/inputs/InputWrapper';
+import { createVModel } from '../../shared/inputs/inputs';
 
-interface IProps extends IGoLiveProps {
+interface IProps {
   /**
    * if provided then change props only for the provided platform
    */
   platform?: TPlatform;
+  settings: IGoLiveSettings;
+  setPlatformSettings: TSetPlatformSettingsFn;
 }
 
 type TCustomFieldName = 'title' | 'description';
@@ -25,57 +30,63 @@ type TCustomFieldName = 'title' | 'description';
  * if "props.platform" is provided it changes props for a single platform
  * otherwise it changes props for all enabled platforms
  */
-export default function CommonPlatformFields(props: IProps) {
-  const { settings, setSettings } = props;
+export default function CommonPlatformFields(p: IProps) {
+  const { settings, setPlatformSettings } = p;
   const { StreamingService } = Services;
   const view = StreamingService.views;
-  const targetPlatforms = getTargetPlatforms(props);
-  const enabledPlatforms = getEnabledPlatforms(props);
-  const platformSettings = getPlatformSettings(props);
+  const targetPlatforms = getTargetPlatforms(p);
+  const enabledPlatforms = getEnabledPlatforms(settings);
+  const platformSettings = getPlatformSettings(p);
 
   const initialCommonFields = useOnce(
     () =>
-      pick(
-        props.platform
-          ? settings.platforms[props.platform]
-          : view.getCommonFields(settings.platforms),
-        ['title', 'description'],
-      ) as { title: string; description: string },
+      pick(p.platform ? settings.platforms[p.platform] : view.getCommonFields(settings.platforms), [
+        'title',
+        'description',
+      ]) as { title: string; description: string },
   );
   const [commonFields, setCommonFields] = useState(initialCommonFields);
-
-  // // set common fields for each target platform
-  // useOnce(async () => {
-  //   await Utils.sleep(0);
-  //   Object.keys(commonFields).forEach((fieldName: 'title' | 'description') =>
-  //     updateCommonField(fieldName, commonFields[fieldName]),
-  //   );
-  // });
 
   /**
    * Update a selected field for all target platforms
    **/
   function updateCommonField(fieldName: TCustomFieldName, value: string) {
-    const newSettings = cloneDeep(settings);
     setCommonFields({ ...commonFields, [fieldName]: value });
     targetPlatforms.forEach(platform => {
-      newSettings.platforms[platform][fieldName] = value;
+      const platformSettings = settings.platforms[platform];
+      setPlatformSettings(platform, {
+        ...platformSettings,
+        ...commonFields,
+      });
     });
-    setSettings(newSettings);
   }
 
-  const isSinglePlatformMode = !!props.platform;
-  const disabled = targetPlatforms.length === 0;
+  /**
+   * Toggle the "Use different title... " checkbox
+   **/
+  function toggleUseCustom() {
+    // this method is applicable only for a single platform component's mode
+    const platform = p.platform;
+    assertIsDefined(platform);
+
+    // set new platforms settings
+    const platformSettings = settings.platforms[platform];
+    const newPlatformSettings = {
+      ...platformSettings,
+      useCustomFields: !platformSettings.useCustomFields,
+    };
+    setPlatformSettings(platform, newPlatformSettings);
+  }
+
+  const isSinglePlatformMode = !!p.platform;
   const hasCustomCheckbox =
     isSinglePlatformMode && settings.advancedMode && enabledPlatforms.length > 1;
   const fieldsAreVisible = !hasCustomCheckbox || platformSettings?.useCustomFields;
   const hasDescription = isSinglePlatformMode
-    ? view.supports('description', [props.platform as TPlatform])
+    ? view.supports('description', [p.platform as TPlatform])
     : view.supports('description');
   const hasGame = view.supports('game', targetPlatforms);
-  const fields = isSinglePlatformMode
-    ? settings.platforms[props.platform as TPlatform]
-    : commonFields;
+  const fields = isSinglePlatformMode ? settings.platforms[p.platform as TPlatform] : commonFields;
 
   // find out the best title for common fields
   let title = '';
@@ -89,21 +100,19 @@ export default function CommonPlatformFields(props: IProps) {
     title = $t('Use different title');
   }
 
-  console.log('fields', fields);
-
   return (
     <div>
-      {/*USE CUSTOM CHECKBOX*/}
-      {/*{hasCustomCheckbox && (*/}
-      {/*  <HFormGroup>*/}
-      {/*    <BoolInput*/}
-      {/*      value={this.platformSettings?.useCustomFields}*/}
-      {/*      onInput={(enabled: boolean) => this.toggleUseCustom(enabled)}*/}
-      {/*      metadata={{ title, name: 'customEnabled' }}*/}
-      {/*      title={title}*/}
-      {/*    />*/}
-      {/*  </HFormGroup>*/}
-      {/*)}*/}
+      {/* USE CUSTOM CHECKBOX */}
+      {hasCustomCheckbox && (
+        <InputGroup>
+          <CheckboxInput
+            name="customEnabled"
+            value={!!platformSettings?.useCustomFields}
+            onInput={toggleUseCustom}
+            label={title}
+          />
+        </InputGroup>
+      )}
       <Transition name="slidedown">
         {fieldsAreVisible && (
           <div>
@@ -112,22 +121,20 @@ export default function CommonPlatformFields(props: IProps) {
               value={fields.title}
               name="title"
               onInput={val => updateCommonField('title', val)}
-              title={$t('Title')}
+              label={$t('Title')}
               required={true}
-              disabled
               // max: this.props.platform === 'twitch' ? 140 : 120,
             />
 
-            {/*/!*DESCRIPTION*!/*/}
-            {/*{hasDescription && (*/}
-            {/*  <TextAreaInput*/}
-            {/*    value={fields['description']}*/}
-            {/*    onInput={val => updateCommonField('description', val)}*/}
-            {/*    name="description"*/}
-            {/*    title={$t('Description')}*/}
-            {/*    disabled*/}
-            {/*  />*/}
-            {/*)}*/}
+            {/*DESCRIPTION*/}
+            {hasDescription && (
+              <TextAreaInput
+                value={fields['description']}
+                onInput={val => updateCommonField('description', val)}
+                name="description"
+                label={$t('Description')}
+              />
+            )}
           </div>
         )}
       </Transition>
@@ -146,12 +153,12 @@ function getTargetPlatforms(props: IProps): TPlatform[] {
   // component in the simple multiplatform mode
   // return all enabled platforms
   if (!props.settings.advancedMode) {
-    return getEnabledPlatforms(props);
+    return getEnabledPlatforms(props.settings);
   }
 
   // component in the advanced multiplatform mode
   // return platforms with "useCustomFields=false"
-  return getEnabledPlatforms(props).filter(
+  return getEnabledPlatforms(props.settings).filter(
     platform => !props.settings.platforms[platform].useCustomFields,
   );
 }

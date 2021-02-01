@@ -11,8 +11,8 @@ import React from 'react';
 import { $t } from '../../../services/i18n';
 import GoLiveChecklist from './GoLiveChecklist';
 import { IGoLiveSettings } from '../../../services/streaming';
-import SlobsForm from '../../shared/inputs/SlobsForm';
-import ContextForm from '../../shared/inputs/SlobsForm';
+import SlobsForm from '../../shared/inputs/ContextForm';
+import ContextForm from '../../shared/inputs/ContextForm';
 
 export default function GoLiveWindow() {
   console.log('render GoLiveWindow');
@@ -88,6 +88,7 @@ export default function GoLiveWindow() {
         <ContextForm
           form={form}
           style={{ position: 'relative', height: '100%' }}
+          layout="horizontal"
           name="editStreamForm"
         >
           <Transition name="zoom">

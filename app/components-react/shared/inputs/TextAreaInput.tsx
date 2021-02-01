@@ -1,12 +1,20 @@
-import { Input, Form } from 'antd';
+import { Input } from 'antd';
 import React from 'react';
-import { TInputProps, useInput } from './inputs';
+import { IInputCustomProps, TCombinedProps, useTextInput } from './inputs';
+import InputWrapper from './InputWrapper';
+import { TextAreaProps } from 'antd/lib/input';
+import { FormItemProps } from 'antd/lib/form/FormItem';
 
-export function TextAreaInput(props: TInputProps<string>) {
-  const { wrapperAttrs, inputAttrs } = useInput('textarea', props);
+type CombinedProps = TCombinedProps<TextAreaProps, string>;
+type InputProps = Omit<CombinedProps, 'onPressEnter'>;
+
+export function TextAreaInput(p: TCombinedProps<InputProps, string>) {
+  const { inputAttrs, wrapperAttrs } = useTextInput(p);
+
+  // TODO: replace to textarea
   return (
-    <Form.Item {...wrapperAttrs}>
+    <InputWrapper {...wrapperAttrs}>
       <Input.TextArea {...inputAttrs} />
-    </Form.Item>
+    </InputWrapper>
   );
 }

@@ -6,7 +6,7 @@ import { useOnce } from '../hooks';
 import { assertIsDefined } from '../../util/properties-type-guards';
 import { TextInput } from '../shared/inputs/TextInput';
 import { Form, Button } from 'antd';
-import ContextForm from '../shared/inputs/SlobsForm';
+import ContextForm from '../shared/inputs/ContextForm';
 
 interface IWindowOptions {
   renameId?: string;
@@ -78,7 +78,7 @@ export default function NameFolder() {
         <TextInput
           name="name"
           value={name}
-          title={$t('Please enter the name of the folder')}
+          label={$t('Please enter the name of the folder')}
           required={true}
         />
         <Button type="primary">Submit</Button>

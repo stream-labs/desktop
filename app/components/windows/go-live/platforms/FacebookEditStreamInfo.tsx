@@ -374,7 +374,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
             )}
 
             <HFormGroup title={$t('Facebook Game')}>
-              <GameSelector vModel={this.settings} platform="facebook" />
+              {/*<GameSelector vModel={this.settings} platform="facebook" />*/}
               {shouldShowGamingWarning && (
                 <p>
                   <Translate

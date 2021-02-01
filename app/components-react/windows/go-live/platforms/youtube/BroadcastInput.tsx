@@ -1,108 +1,57 @@
-import { Component, Prop } from 'vue-property-decorator';
-import { IInputMetadata, IListOption } from '../../../../shared/inputs';
-import { ListInput } from 'components/shared/inputs/inputs';
-import { BaseInput } from 'components/shared/inputs/BaseInput';
-import { IYoutubeLiveBroadcast } from 'services/platforms/youtube';
-import { $t } from 'services/i18n';
+import React from 'react';
+import { $t } from '../../../../../services/i18n';
 import * as moment from 'moment';
-import styles from './BroadcastInput.m.less';
+import css from './BroadcastInput.m.less';
 import cx from 'classnames';
-
-interface IBroadcastInputMetadata extends IInputMetadata {
-  broadcasts: IYoutubeLiveBroadcast[];
-}
+import { IYoutubeLiveBroadcast } from '../../../../../services/platforms/youtube';
+import { ListInput, Option, IInputCustomProps } from '../../../../shared/inputs';
+import { FormItemProps } from 'antd/lib/form';
+import { SelectProps } from 'antd/lib/select';
 
 /**
- * Youtube broadcast-selector input
+ * Broadcast-selector for Youtube
  */
-@Component({ components: { ListInput } })
-export default class BroadcastInput extends BaseInput<string, IBroadcastInputMetadata> {
-  @Prop() readonly value: string;
-  @Prop() readonly metadata: IBroadcastInputMetadata;
-  @Prop() readonly title: string;
-
-  get listInputMetadata() {
-    // prepare data for the nested list-input
-    const newBroadCastOption = {
-      title: $t('Create New Event'),
-      value: '',
-    };
-    return {
-      ...this.options,
-      options: [
-        newBroadCastOption,
-        ...this.options.broadcasts.map(broadcast => ({
-          value: broadcast.id,
-          title: `${broadcast.snippet.title} (${this.formatDate(
-            broadcast.snippet.scheduledStartTime,
-          )})`,
-        })),
-      ],
-    };
-  }
-
+export default function BroadcastInput(
+  p: { broadcasts: IYoutubeLiveBroadcast[] } & Omit<SelectProps<string>, 'options'> &
+    IInputCustomProps<string> &
+    FormItemProps,
+) {
   /**
    * format the isoDate to the locale-dependent format
    */
-  formatDate(isoDate: string): string {
+  function formatDate(isoDate: string): string {
     return moment(new Date(isoDate)).format(moment.localeData().longDateFormat('ll'));
   }
 
-  render() {
-    // define custom slot for the list-item
-    const scopedSlots = {
-      item: (props: { option: IListOption<string> }) => {
-        const broadcast = this.options.broadcasts.find(
-          broadcast => broadcast.id === props.option.value,
-        );
-
-        // "Create New" option
-        if (!broadcast) {
-          return (
-            <div class={cx(styles['new-broadcast'], styles.broadcast)}>
-              <div class={styles['col-image']}>
-                <div>
-                  <i class="fa fa-plus" />
-                </div>
-              </div>
-              <div class={styles['col-description']}>
-                <div>{$t('Create New Event')}</div>
-              </div>
-            </div>
-          );
-        }
-
-        // Regular options
-        return (
-          <div
-            class={styles.broadcast}
-            data-option-title={broadcast.snippet.title}
-            data-option-value={broadcast.id}
-          >
-            <div class={styles['col-image']}>
-              <img src={broadcast.snippet.thumbnails.default.url} />
-            </div>
-            <div class={styles['col-description']}>
-              <div>{broadcast.snippet.title}</div>
-              <div>{broadcast.snippet.description}</div>
-            </div>
-            <div class={styles['col-date']}>
-              <div>{this.formatDate(broadcast.snippet.scheduledStartTime)}</div>
-            </div>
+  return (
+    <ListInput value={p.value} onInput={p.onInput} {...p}>
+      {/* "Create New" option*/}
+      <Option className={cx(css.newBroadcast, css.broadcast)} value={''}>
+        <div className={css.colImage}>
+          <div>
+            <i className="fa fa-plus" />
           </div>
-        );
-      },
-    };
+        </div>
+        <div className={css.colDescription}>
+          <div>{$t('Create New Event')}</div>
+        </div>
+      </Option>
 
-    // render customized ListInput
-    return (
-      <ListInput
-        class={styles['broadcast-input']}
-        value={this.value}
-        metadata={this.listInputMetadata}
-        onInput={(value: any, event: any) => this.emitInput(value, event)}
-        scopedSlots={scopedSlots}
-      />
-    );
-  }
+      {/* Other options*/}
+      {p.broadcasts.map(broadcast => (
+        <Option value={broadcast.id} label={broadcast.snippet.title}>
+          <div className={css.colImage}>
+            <img src={broadcast.snippet.thumbnails.default.url} />
+          </div>
+          <div className={css.colDescription}>
+            <div>{broadcast.snippet.title}</div>
+            <div>{broadcast.snippet.description}</div>
+          </div>
+          <div className={css.colDate}>
+            <div>{formatDate(broadcast.snippet.scheduledStartTime)}</div>
+          </div>
+        </Option>
+      ))}
+    </ListInput>
+  );
 }

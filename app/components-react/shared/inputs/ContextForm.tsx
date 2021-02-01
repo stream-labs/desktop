@@ -1,6 +1,5 @@
 import React, { useState, HTMLAttributes, useRef } from 'react';
 import { Form } from 'antd';
-import { IInputMetadata } from './inputs';
 import { FormInstance, FormProps } from 'antd/lib/form';
 //
 // export default function SlobsForm(p: HTMLAttributes<unknown>) {
@@ -49,9 +48,18 @@ export const FormContext = React.createContext<IFormContext | null>(null);
 
 export default function ContextForm(p: FormProps) {
   const form = p.form || Form.useForm()[0];
+  const layouts = {
+    horizontal: {
+      labelCol: { span: 8 },
+      wrapperCol: { span: 16 },
+    },
+  };
+  const layout = layouts[p.layout || 'horizontal'];
   return (
     <FormContext.Provider value={{ form }}>
-      <Form form={form}>{p.children}</Form>
+      <Form {...layout} {...p} form={form}>
+        {p.children}
+      </Form>
     </FormContext.Provider>
   );
 }

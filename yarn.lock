@@ -8143,6 +8143,11 @@ os-tmpdir@~1.0.2:
   resolved "https://registry.yarnpkg.com/os-tmpdir/-/os-tmpdir-1.0.2.tgz#bbe67406c79aa85c5cfec766fe5734555dfa1274"
   integrity sha1-u+Z0BseaqFxc/sdm/lc0VV36EnQ=
 
+overlayscrollbars-react@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/overlayscrollbars-react/-/overlayscrollbars-react-0.2.2.tgz#330b5d298090d714af660ef45a73d89964f9172e"
+  integrity sha512-sRJDaKIxD+No6ygMRaCxejuIH2CksSCUTfaDOzDhPt22lI3IPZq/+Ifw2RT4j+U7hgXLn9P5QqA00f2bsZVwPA==
+
 overlayscrollbars-vue@^0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/overlayscrollbars-vue/-/overlayscrollbars-vue-0.2.2.tgz#4a3d4eaf09dbbaae8c52ff0e9219909075eb920e"

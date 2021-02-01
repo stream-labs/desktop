@@ -5,6 +5,8 @@ import { $t } from '../../../services/i18n';
 import styles from './DestinationSwitchers.m.less';
 import { ICustomStreamDestination } from '../../../services/settings/streaming';
 import { Services } from '../../service-provider';
+import { ToggleInput } from '../../shared/inputs';
+import PlatformLogo from '../../shared/PlatformLogo';
 
 type TPlatforms = Record<TPlatform, { enabled: boolean }>;
 
@@ -98,11 +100,12 @@ export function DestinationSwitchers(p: IProps) {
           {/*) : (*/}
           {/*  <ToggleInput value={enabled} metadata={{ name: platform }} />*/}
           {/*)}*/}
+          <ToggleInput value={enabled} name={platform} />
         </div>
 
         {/* PLATFORM LOGO */}
         <div className="logo margin-right--20">
-          {/*<PlatformLogo platform={platform} class={styles[`platform-logo-${platform}`]} />*/}
+          <PlatformLogo platform={platform} className={styles[`platform-logo-${platform}`]} />
         </div>
 
         {/* PLATFORM TITLE AND ACCOUNT */}

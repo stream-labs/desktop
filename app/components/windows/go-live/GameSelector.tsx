@@ -6,13 +6,15 @@ import { $t } from 'services/i18n';
 import { Debounce } from 'lodash-decorators';
 import TsxComponent, { createProps } from '../../tsx-component';
 import { SyncWithValue } from 'services/app/app-decorators';
-import { IStreamSettings, StreamingService } from 'services/streaming';
+import { IGoLiveSettings, IStreamSettings, StreamingService } from 'services/streaming';
 import { Inject } from 'services/core';
 import { TwitchService } from 'services/platforms/twitch';
 
 class Props {
-  value?: IStreamSettings;
+  value?: IStreamSettings = null;
   platform?: TPlatform | null = null;
+  settings: IGoLiveSettings = null;
+  onInput: (name: string) => unknown = () => null;
 }
 
 /**
@@ -22,7 +24,6 @@ class Props {
 export default class GameSelector extends TsxComponent<Props> {
   @Inject() private streamingService: StreamingService;
   @Inject() private twitchService: TwitchService;
-  @SyncWithValue() private settings: IStreamSettings;
 
   private searchingGames = false;
   private games: IListOption<string, { image: string }>[] = [];
@@ -32,11 +33,11 @@ export default class GameSelector extends TsxComponent<Props> {
   };
 
   private get selectedGameName(): string {
-    return this.settings.platforms[this.props.platform]['game'];
+    return this.props.settings.platforms[this.props.platform]['game'];
   }
 
   private set selectedGameName(name: string) {
-    this.$set(this.settings.platforms[this.props.platform], 'game', name);
+    this.props.onInput(name);
   }
 
   get imageSize() {
@@ -104,12 +105,15 @@ export default class GameSelector extends TsxComponent<Props> {
   render() {
     // use TagsInput for a multiplatform mode and ListInput for a single platform mode
     return (
-      <ListInput
-        handleSearchChange={searchStr => this.onGameSearchHandler(searchStr)}
-        imageSize={this.imageSize}
-        vModel={this.selectedGameName}
-        metadata={this.gameMetadata}
-      />
+      <div>
+        {this.selectedGameName}
+        <ListInput
+          handleSearchChange={searchStr => this.onGameSearchHandler(searchStr)}
+          imageSize={this.imageSize}
+          vModel={this.selectedGameName}
+          metadata={this.gameMetadata}
+        />
+      </div>
     );
   }
 }

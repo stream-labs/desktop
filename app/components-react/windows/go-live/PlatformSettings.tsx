@@ -4,22 +4,30 @@ import { Services } from '../../service-provider';
 import { $t } from '../../../services/i18n';
 import React from 'react';
 import { useVuex } from '../../hooks';
+import { getPlatformService, TPlatform } from '../../../services/platforms';
+import { TwitchEditStreamInfo } from './platforms/TwitchEditStreamInfo';
+import { Section } from './Section';
+import { IGoLiveSettings } from '../../../services/streaming';
+import { TTwitchTag } from '../../../services/platforms/twitch/tags';
+import { YoutubeEditStreamInfo } from './platforms/youtube/YoutubeEditStreamInfo';
 
 interface IProps extends IGoLiveProps {
   isScheduleMode?: boolean;
 }
 
-export default function PlatformSettings(props: IProps) {
-  const { settings, setSettings } = props;
-  const enabledPlatforms = getEnabledPlatforms(props);
+export default function PlatformSettings(p: IProps) {
+  const { settings, setSettings } = p;
+  const enabledPlatforms = getEnabledPlatforms(settings);
   const { StreamingService } = Services;
   const view = StreamingService.views;
   const isMultiplePlatformMode = enabledPlatforms.length > 1;
   const hasPlatforms = enabledPlatforms.length > 0;
 
-  const rs = useVuex(() => {
+  const v = useVuex(() => {
     return {
       shouldShowSettings: !view.info.error && !view.isLoading && hasPlatforms,
+      isAdvancedMode: view.goLiveSettings.advancedMode && view.isMultiplatformMode,
+      isLive: view.isMidStreamMode,
     };
   });
 
@@ -28,30 +36,93 @@ export default function PlatformSettings(props: IProps) {
     return null;
   }
 
-  return (
-    <div className="flex">
-      <div style={{ width: '100%' }}>
-        {!hasPlatforms && $t('Enable at least one destination to start streaming')}
+  function getPlatformName(platform: TPlatform): string {
+    return getPlatformService(platform).displayName;
+  }
 
-        {/*// TODO:*/}
-        {/*{isLoadingMode && this.renderLoading()}*/}
-        {/*<GoLiveError />*/}
+  function setPlatformSettings<T extends TPlatform>(
+    platform: T,
+    newPlatformSettings: IGoLiveSettings['platforms'][T],
+  ) {
+    setSettings({
+      ...settings,
+      platforms: {
+        ...settings.platforms,
+        [platform]: newPlatformSettings,
+      },
+    });
+  }
 
-        {rs.shouldShowSettings && (
-          <div style={{ width: '100%' }}>
-            {/*COMMON FIELDS*/}
-            {isMultiplePlatformMode && (
-              <CommonPlatformFields settings={settings} setSettings={setSettings} />
-            )}
+  function setGame(platform: TPlatform, game: string) {
+    const platformSettings = settings.platforms[platform];
+    setPlatformSettings(platform, {
+      ...platformSettings,
+      game,
+    });
+  }
 
-            {/*// TODO:*/}
-            {/*/!*SETTINGS FOR EACH ENABLED PLATFORM*!/*/}
-            {/*{enabledPlatforms.map((platform: TPlatform) => this.renderPlatformSettings(platform))}*/}
-          </div>
-        )}
+  function render() {
+    return (
+      <div className="flex">
+        <div style={{ width: '100%' }}>
+          {!hasPlatforms && $t('Enable at least one destination to start streaming')}
+
+          {/*// TODO:*/}
+          {/*{isLoadingMode && this.renderLoading()}*/}
+          {/*<GoLiveError />*/}
+
+          {v.shouldShowSettings && (
+            <div style={{ width: '100%' }}>
+              {/*COMMON FIELDS*/}
+              {isMultiplePlatformMode && (
+                <CommonPlatformFields
+                  settings={settings}
+                  setPlatformSettings={setPlatformSettings}
+                />
+              )}
+
+              {/*SETTINGS FOR EACH ENABLED PLATFORM*/}
+              {enabledPlatforms.map((platform: TPlatform) => renderPlatformSettings(platform))}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  /**
+   * Renders settings for one platform
+   */
+  function renderPlatformSettings(platform: TPlatform) {
+    const title = $t('%{platform} Settings', { platform: getPlatformName(platform) });
+    return (
+      <Section title={title} isSimpleMode={!v.isAdvancedMode} key={platform}>
+        {platform === 'twitch' && (
+          <TwitchEditStreamInfo
+            settings={settings}
+            setPlatformSettings={setPlatformSettings}
+            setGame={setGame}
+          />
+        )}
+        {/*{platform === 'facebook' && (*/}
+        {/*  <FacebookEditStreamInfo*/}
+        {/*    vModel={this.settings}*/}
+        {/*    isScheduleMode={this.props.isScheduleMode}*/}
+        {/*    isUpdateMode={isLive}*/}
+        {/*  />*/}
+        {/*)}*/}
+        {platform === 'youtube' && (
+          <YoutubeEditStreamInfo
+            settings={settings}
+            setPlatformSettings={setPlatformSettings}
+            isScheduleMode={p.isScheduleMode}
+          />
+        )}
+      </Section>
+    );
+  }
+
+  return render();
 }
 
 // import TsxComponent, { createProps } from 'components/tsx-component';

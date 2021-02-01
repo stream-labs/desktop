@@ -116,9 +116,11 @@ import { StreamSettingsService } from './services/settings/streaming';
 import { RestreamService } from './services/restream';
 import { VideoEncodingOptimizationService } from './services/video-encoding-optimizations';
 import { TwitterService } from './services/integrations/twitter';
-import { YoutubeService } from './services/platforms/youtube';
 import { SettingsService } from './services/settings';
 import { UserService } from './services/user';
+import { TwitchService } from './services/platforms/twitch';
+import { YoutubeService } from './services/platforms/youtube';
+import { FacebookService } from './services/platforms/facebook';
 
 export const AppServices = {
   WindowsService,
@@ -134,4 +136,5 @@ export const AppServices = {
   YoutubeService,
   SettingsService,
   UserService,
+  TwitchService,
 };
