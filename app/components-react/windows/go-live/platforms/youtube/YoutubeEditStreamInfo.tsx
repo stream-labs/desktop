@@ -10,6 +10,7 @@ import { $t } from '../../../../../services/i18n';
 import { IYoutubeStartStreamOptions } from '../../../../../services/platforms/youtube';
 import { createVModel } from '../../../../shared/inputs/inputs';
 import BroadcastInput from './BroadcastInput';
+import { useOnce } from '../../../../hooks';
 
 interface IProps {
   settings: IGoLiveSettings;
@@ -51,6 +52,12 @@ export function YoutubeEditStreamInfo(p: IProps) {
     fieldName => ({ disabled: fieldIsDisabled(fieldName) }),
   );
 
+  const s = useOnce(async () => {
+    const [state, setState] = useState({ broadcastLoading: true, broadcasts: [] });
+    YoutubeService.fetchBroadcasts()
+    setState()
+  });
+
   function fieldIsDisabled(fieldName: keyof IGoLiveSettings['platforms']['youtube']): boolean {
     // TODO:
     return false;
@@ -67,7 +74,14 @@ export function YoutubeEditStreamInfo(p: IProps) {
 
   return (
     <FormSection name="youtube-settings">
-      {!p.isScheduleMode && <BroadcastInput label={$t('Event')} broadcasts={[]} loading />}
+      {!p.isScheduleMode && (
+        <BroadcastInput
+          label={$t('Event')}
+          broadcasts={[]}
+          loading
+          disabled={view.isMidStreamMode}
+        />
+      )}
       <CommonPlatformFields
         settings={settings}
         setPlatformSettings={setPlatformSettings}

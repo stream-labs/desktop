@@ -35,11 +35,29 @@ export function useOnce<TReturnValue>(cb: () => TReturnValue) {
   return useMemo(cb, []);
 }
 
+/**
+ * Init state with a callback
+ */
 export function useInitState<TReturnValue>(cb: () => TReturnValue) {
   const initialState = useMemo(cb, []);
   return useState<TReturnValue>(initialState);
 }
 
+/**
+ * Init state with a callback
+ */
+export function useLazyLoadState<TStateType>(
+  defaultState: TStateType | (() => TStateType),
+  asyncCb: () => Promise<TStateType>,
+) {
+  const initializationCb = typeof defaultState === 'function' ? defaultState : () => defaultState;
+  const initialState = useMemo(cb, []);
+  return useState<TReturnValue>(initialState);
+}
+
+/**
+ * A shortcut for component destroy
+ */
 export function useOnDestroy(cb: () => void) {
   useEffect(() => cb, []);
 }
