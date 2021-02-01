@@ -2,7 +2,7 @@
   <div class="program-description">
     <div class="program-description-header">
     </div>
-    <div class="program-description-body">
+    <div @click="handleAnchorClick" class="program-description-body">
       <div v-html="programDescription" class="program-description-text"></div>
     </div>
   </div>
