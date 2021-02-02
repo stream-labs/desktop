@@ -124,6 +124,7 @@ export class InternalApiClient {
           console.error('Failed to send async services request', e, {
             request,
           });
+          throw e; // Re-raise original exception
         }
 
         if (isObservable) {
