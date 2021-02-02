@@ -123,6 +123,13 @@ if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
 
   usingSentry = true;
 
+  // Get actual filenames we are using from the bundle updater,
+  // so we can ensure accurate stack traces on sentry. The mechanism
+  // by which the bundle updater works hides the true source names
+  // from us.
+  const bundles = ['renderer.js', 'vendors~renderer.js'];
+  const bundleNames = electron.ipcRenderer.sendSync('getBundleNames', bundles);
+
   Sentry.init({
     dsn: sentryDsn,
     release: `${slobsVersion}-${SLOBS_BUNDLE_ID}`,
@@ -134,7 +141,13 @@ if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
       // Some discussion here: https://github.com/getsentry/sentry/issues/2708
       const normalize = (filename: string) => {
         const splitArray = filename.split('/');
-        return splitArray[splitArray.length - 1];
+        const fileName = splitArray[splitArray.length - 1];
+
+        if (bundles.includes(fileName)) {
+          return bundleNames[fileName];
+        }
+
+        return fileName;
       };
 
       if (hint.originalException) {

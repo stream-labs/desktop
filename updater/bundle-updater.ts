@@ -190,6 +190,22 @@ module.exports = async (basePath: string) => {
     }
   }
 
+  // Used for sending accurate stack traces to sentry
+  electron.ipcMain.on('getBundleNames', (e: Electron.Event, bundles: string[]) => {
+    const bundleNames: { [bundle: string]: string } = {};
+
+    bundles.forEach(bundle => {
+      if (!useLocalBundles && serverManifest && serverManifest[bundle]) {
+        bundleNames[bundle] = serverManifest[bundle];
+      } else {
+        bundleNames[bundle] = localManifest[bundle];
+      }
+    });
+
+    // @ts-ignore Electron types are wrong here
+    e.returnValue = bundleNames;
+  });
+
   electron.session.defaultSession?.webRequest.onBeforeRequest(
     { urls: ['https://slobs-cdn.streamlabs.com/bundles/*.js'] },
     (request, cb) => {
