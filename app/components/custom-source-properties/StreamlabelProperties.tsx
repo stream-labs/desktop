@@ -102,6 +102,7 @@ export default class StreamlabelProperties extends Vue {
 
   get preview() {
     if (this.labelSettings.format == null) return '';
+    const isBits = /cheer/.test(this.currentlySelected.name);
 
     let replaced = this.labelSettings.format
       .replace(/{name}/gi, 'Fishstickslol')
@@ -109,7 +110,7 @@ export default class StreamlabelProperties extends Vue {
       .replace(/{currentAmount}/gi, '$12')
       .replace(/{count}/gi, '123')
       .replace(/{goalAmount}/gi, '$47')
-      .replace(/{amount}/gi, '$4.99')
+      .replace(/{amount}/gi, isBits ? '499 Bits' : '$4.99')
       .replace(/{months}/gi, '3')
       .replace(/{either_amount}/gi, ['$4.99', '499 Bits'][Math.floor(Math.random() * 2)]);
 
