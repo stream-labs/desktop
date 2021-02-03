@@ -2,7 +2,7 @@ import styles from './GoLive.m.less';
 import cx from 'classnames';
 import { ModalLayout } from '../../shared/ModalLayout';
 import { Form } from 'antd';
-import { useInitState, useOnce, useOnDestroy, useVuex } from '../../hooks';
+import { useInitState, useOnCreate, useOnDestroy, useVuex } from '../../hooks';
 import { Services } from '../../service-provider';
 import cloneDeep from 'lodash/cloneDeep';
 import Transition from '../../shared/Transition';
@@ -40,7 +40,7 @@ export default function GoLiveWindow() {
   });
 
   // prepopulate data for all platforms
-  useOnce(() => {
+  useOnCreate(() => {
     if (['empty', 'waitingForNewSettings'].includes(rs.lifecycle)) {
       console.log('Prepopulate');
       StreamingService.actions.prepopulateInfo();

@@ -1,7 +1,7 @@
 import { IGoLiveProps } from './go-live';
 import css from './GoLiveChecklist.m.less';
 import React, { HTMLAttributes } from 'react';
-import { useOnce, useVuex } from '../../hooks';
+import { useOnCreate, useVuex } from '../../hooks';
 import { Services } from '../../service-provider';
 import { $t } from '../../../services/i18n';
 import { TGoLiveChecklistItemState } from '../../../services/streaming';
@@ -33,7 +33,7 @@ export default function GoLiveChecklist(p: { isUpdateMode?: boolean } & HTMLAttr
     };
   });
 
-  useOnce(() => {
+  useOnCreate(() => {
     // if (!rs.delayEnabled) return;
     // const updateDelaySecondsRemaining = () => {
     //   this.delaySecondsRemaining = this.streamingService.delaySecondsRemaining;

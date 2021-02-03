@@ -2,7 +2,7 @@ import { InputProps } from 'antd/lib/input';
 import { Ref, useEffect, RefObject, useRef, useContext, ChangeEvent } from 'react';
 import { Input } from 'antd';
 import { FormContext } from './ContextForm';
-import { useOnce } from '../../hooks';
+import { useOnCreate } from '../../hooks';
 import uuid from 'uuid';
 import { FormItemProps } from 'antd/lib/form';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
@@ -11,9 +11,10 @@ import omit from 'lodash/omit';
  * Shared code for inputs
  */
 
-type TInputType = 'text' | 'textarea' | 'toggle' | 'checkbox' | 'list';
+type TInputType = 'text' | 'textarea' | 'toggle' | 'checkbox' | 'list' | 'tags';
 
-const customProps = ['onInputChange', 'nowrap', 'uncontrolled', 'debounce'];
+const customProps = ['onInputChange', 'uncontrolled', 'debounce'];
+const customWrapperProps = ['nowrap'];
 export interface IInputCustomProps<TValue> {
   value?: TValue;
   name?: string;
@@ -45,10 +46,9 @@ export function useInput<
   const formContext = useContext(FormContext);
   const form = formContext?.form;
 
-  const inputId = useOnce(() => {
+  const inputId = useOnCreate(() => {
     const id = `${name}-${uuid()}`;
     if (form) {
-      console.log('set initial value for', type, name);
       form.setFieldsValue({ [id]: value });
     }
     return id;
@@ -71,9 +71,19 @@ export function useInput<
     name: inputId,
   };
 
+  const wrapperAttrs = {
+    ...commonAttrs,
+    'data-role': 'input-wrapper',
+  };
+
+  const inputAttrs = {
+    ...omit(commonAttrs, ...customWrapperProps),
+    'data-role': 'input',
+  };
+
   return {
-    inputAttrs: { ...commonAttrs, 'data-role': 'input' },
-    wrapperAttrs: { ...commonAttrs, 'data-role': 'input-wrapper' },
+    inputAttrs,
+    wrapperAttrs,
   };
 }
 

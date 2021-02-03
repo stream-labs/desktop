@@ -121,6 +121,7 @@ import { UserService } from './services/user';
 import { TwitchService } from './services/platforms/twitch';
 import { YoutubeService } from './services/platforms/youtube';
 import { FacebookService } from './services/platforms/facebook';
+import { DismissablesService } from './services/dismissables'
 
 export const AppServices = {
   WindowsService,
@@ -134,7 +135,9 @@ export const AppServices = {
   VideoEncodingOptimizationService,
   TwitterService,
   YoutubeService,
+  FacebookService,
   SettingsService,
   UserService,
   TwitchService,
+  DismissablesService,
 };

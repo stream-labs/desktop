@@ -31,28 +31,39 @@ export function useVuex(...args: any[]) {
  * Call a function once before component first render
  * Helpful if you need to calculate an immutable initial state for a component
  */
-export function useOnce<TReturnValue>(cb: () => TReturnValue) {
+export function useOnCreate<TReturnValue>(cb: () => TReturnValue) {
   return useMemo(cb, []);
 }
 
 /**
  * Init state with a callback
+ *
+ * Use when
+ *  - you need to initialized
  */
-export function useInitState<TReturnValue>(cb: () => TReturnValue) {
-  const initialState = useMemo(cb, []);
-  return useState<TReturnValue>(initialState);
-}
-
-/**
- * Init state with a callback
- */
-export function useLazyLoadState<TStateType>(
+export function useInitState<TStateType>(
   defaultState: TStateType | (() => TStateType),
-  asyncCb: () => Promise<TStateType>,
-) {
-  const initializationCb = typeof defaultState === 'function' ? defaultState : () => defaultState;
-  const initialState = useMemo(cb, []);
-  return useState<TReturnValue>(initialState);
+  asyncCb?: (initialState: TStateType) => Promise<TStateType>,
+): [TStateType, (newState: TStateType) => unknown, Promise<TStateType> | undefined] {
+  // save the initial state so we don't calculate it each call
+  const initializationCb =
+    typeof defaultState === 'function' ? (defaultState as () => TStateType) : () => defaultState;
+  const initialState = useMemo(initializationCb, []);
+
+  // define a state
+  const [state, setState] = useState(initialState);
+
+  // call and save callback if provided
+  const promise = useMemo(() => {
+    if (asyncCb) {
+      return asyncCb(initialState).then(newState => {
+        setState(newState);
+        return newState;
+      });
+    }
+  }, []);
+
+  return [state, setState, promise];
 }
 
 /**

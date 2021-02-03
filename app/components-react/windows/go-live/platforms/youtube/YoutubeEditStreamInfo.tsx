@@ -10,7 +10,7 @@ import { $t } from '../../../../../services/i18n';
 import { IYoutubeStartStreamOptions } from '../../../../../services/platforms/youtube';
 import { createVModel } from '../../../../shared/inputs/inputs';
 import BroadcastInput from './BroadcastInput';
-import { useOnce } from '../../../../hooks';
+import { useInitState, useOnCreate } from '../../../../hooks';
 
 interface IProps {
   settings: IGoLiveSettings;
@@ -52,10 +52,17 @@ export function YoutubeEditStreamInfo(p: IProps) {
     fieldName => ({ disabled: fieldIsDisabled(fieldName) }),
   );
 
-  const s = useOnce(async () => {
-    const [state, setState] = useState({ broadcastLoading: true, broadcasts: [] });
-    YoutubeService.fetchBroadcasts()
-    setState()
+  // const s = useOnce(async () => {
+  //   const [state, setState] = useState({ broadcastLoading: true, broadcasts: [] });
+  //   YoutubeService.fetchBroadcasts()
+  //   setState()
+  // });
+  //
+  const [s] = useInitState({ broadcastLoading: true, broadcasts: [] }, async () => {
+    return {
+      broadcastLoading: false,
+      broadcasts: await YoutubeService.fetchBroadcasts(),
+    };
   });
 
   function fieldIsDisabled(fieldName: keyof IGoLiveSettings['platforms']['youtube']): boolean {
@@ -77,8 +84,8 @@ export function YoutubeEditStreamInfo(p: IProps) {
       {!p.isScheduleMode && (
         <BroadcastInput
           label={$t('Event')}
-          broadcasts={[]}
-          loading
+          loading={s.broadcastLoading}
+          broadcasts={s.broadcasts}
           disabled={view.isMidStreamMode}
         />
       )}
@@ -110,7 +117,7 @@ export function YoutubeEditStreamInfo(p: IProps) {
         showSearch
         options={YoutubeService.state.categories.map(category => ({
           value: category.id,
-          label: category.snippet.title,
+          title: category.snippet.title,
         }))}
       />
       {/*<HFormGroup title={this.formMetadata.thumbnail.title}>*/}

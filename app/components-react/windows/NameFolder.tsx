@@ -2,7 +2,7 @@ import { ModalLayout } from '../shared/ModalLayout';
 import { $t } from '../../services/i18n';
 import React, { useState } from 'react';
 import { Services } from '../service-provider';
-import { useOnce } from '../hooks';
+import { useOnCreate } from '../hooks';
 import { assertIsDefined } from '../../util/properties-type-guards';
 import { TextInput } from '../shared/inputs/TextInput';
 import { Form, Button } from 'antd';
@@ -29,7 +29,7 @@ export default function NameFolder() {
   const [form] = Form.useForm();
 
   // get window options on component create
-  const options = useOnce(() => {
+  const options = useOnCreate(() => {
     const options = (WindowsService.state.child.queryParams as unknown) as IWindowOptions;
     const scene = ScenesService.views.getScene(options.sceneId);
     assertIsDefined(scene);

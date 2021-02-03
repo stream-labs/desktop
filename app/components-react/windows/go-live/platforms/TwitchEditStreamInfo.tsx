@@ -7,6 +7,10 @@ import { Services } from '../../../service-provider';
 import { TTwitchTag } from '../../../../services/platforms/twitch/tags';
 import { IGoLiveSettings } from '../../../../services/streaming';
 import { TPlatform } from '../../../../services/platforms';
+import { createVModel, TagsInput } from '../../../shared/inputs';
+import { $t } from '../../../../services/i18n';
+import { Tag } from 'antd';
+import { TwitchTagsInput } from './TwitchTagsInput';
 
 interface IProps {
   settings: IGoLiveSettings;
@@ -16,17 +20,22 @@ interface IProps {
 
 export function TwitchEditStreamInfo(p: IProps) {
   const { settings, setPlatformSettings, setGame } = p;
+  const twSettings = settings.platforms.twitch;
   const showOnlyRequiredFields = canShowOnlyRequiredFields(p.settings);
   const { TwitchService } = Services;
   const platformSettings = settings.platforms.twitch;
 
-  function setTags(tags: TTwitchTag[]) {
-    const newPlatformSettings = {
-      ...platformSettings,
-      tags,
-    };
-    setPlatformSettings('twitch', newPlatformSettings);
-  }
+  // function setTags(tags: TTwitchTag[]) {
+  //   const newPlatformSettings = {
+  //     ...platformSettings,
+  //     tags,
+  //   };
+  //   setPlatformSettings('twitch', newPlatformSettings);
+  // }
+
+  const vModel = createVModel(twSettings, newTwSettings =>
+    setPlatformSettings('twitch', newTwSettings),
+  );
 
   return (
     <FormSection name="twitch-settings">
@@ -35,24 +44,34 @@ export function TwitchEditStreamInfo(p: IProps) {
       {/*<HFormGroup title={$t('Twitch Game')}>*/}
       {/*  <GameSelector vModel={this.settings} platform="twitch" />*/}
       {/*</HFormGroup>*/}
-      <GameSelectorVue
-        key={'game-selector'}
-        value={platformSettings.game}
-        platform={'twitch'}
-        settings={settings}
-        onInput={name => setGame('twitch', name)}
+      {/*<GameSelectorVue*/}
+      {/*  key={'game-selector'}*/}
+      {/*  value={platformSettings.game}*/}
+      {/*  platform={'twitch'}*/}
+      {/*  settings={settings}*/}
+      {/*  onInput={name => setGame('twitch', name)}*/}
+      {/*/>*/}
+
+      <TagsInput
+        label={$t('Tags Example')}
+        tagRender={props => <Tag>{props.label!['props']['data-label']}</Tag>}
+        options={[1, 2, 3, 4].map(value => ({
+          value: String(value),
+          label: `el${value}`,
+          title: `elt${value}`,
+          template: () => <span data-label={`label-for-${value}`}>tmpl{value}</span>,
+        }))}
+        value={['2', '3']}
       />
 
-      {/*{!showOnlyRequiredFields && (*/}
-      {/*  <TwitchTagsInputVue*/}
-      {/*    key={'tags-input'}*/}
-      {/*    tags={TwitchService.state.availableTags}*/}
-      {/*    hasPermission={TwitchService.state.hasUpdateTagsPermission}*/}
-      {/*    value={settings.platforms.twitch.tags}*/}
-      {/*    onInput={setTags}*/}
-      {/*    name={'tags'}*/}
-      {/*  />*/}
-      {/*)}*/}
+      {!showOnlyRequiredFields && (
+        <TwitchTagsInput
+          label={$t('Twitch Tags')}
+          {...vModel('tags')}
+          setPlatformSettings={setPlatformSettings}
+          twitchSettings={twSettings}
+        />
+      )}
     </FormSection>
   );
 }

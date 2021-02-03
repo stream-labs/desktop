@@ -10,6 +10,7 @@ import { Section } from './Section';
 import { IGoLiveSettings } from '../../../services/streaming';
 import { TTwitchTag } from '../../../services/platforms/twitch/tags';
 import { YoutubeEditStreamInfo } from './platforms/youtube/YoutubeEditStreamInfo';
+import FacebookEditStreamInfo from './platforms/FacebookEditStreamInfo';
 
 interface IProps extends IGoLiveProps {
   isScheduleMode?: boolean;
@@ -104,13 +105,14 @@ export default function PlatformSettings(p: IProps) {
             setGame={setGame}
           />
         )}
-        {/*{platform === 'facebook' && (*/}
-        {/*  <FacebookEditStreamInfo*/}
-        {/*    vModel={this.settings}*/}
-        {/*    isScheduleMode={this.props.isScheduleMode}*/}
-        {/*    isUpdateMode={isLive}*/}
-        {/*  />*/}
-        {/*)}*/}
+        {platform === 'facebook' && (
+          <FacebookEditStreamInfo
+            settings={settings}
+            setPlatformSettings={setPlatformSettings}
+            isUpdateMode={v.isLive}
+            isScheduleMode={p.isScheduleMode}
+          />
+        )}
         {platform === 'youtube' && (
           <YoutubeEditStreamInfo
             settings={settings}

@@ -4,4 +4,5 @@ export { TextAreaInput } from './TextAreaInput';
 export { ToggleInput } from './ToggleInput';
 export { CheckboxInput } from './CheckboxInput';
 export { InputGroup } from './InputGroup';
-export { ListInput, Option } from './ListInput';
+export { ListInput } from './ListInput';
+export { TagsInput } from './TagsInput';

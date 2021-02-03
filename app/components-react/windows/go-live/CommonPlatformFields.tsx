@@ -2,7 +2,7 @@ import Transition from '../../shared/Transition';
 import { TPlatform } from '../../../services/platforms';
 import { IGoLiveSettings, IStreamSettings } from '../../../services/streaming';
 import { Services } from '../../service-provider';
-import { useOnce } from '../../hooks';
+import { useOnCreate } from '../../hooks';
 import { pick, cloneDeep } from 'lodash';
 import { $t } from '../../../services/i18n';
 import { Form } from 'antd';
@@ -38,7 +38,7 @@ export default function CommonPlatformFields(p: IProps) {
   const enabledPlatforms = getEnabledPlatforms(settings);
   const platformSettings = getPlatformSettings(p);
 
-  const initialCommonFields = useOnce(
+  const initialCommonFields = useOnCreate(
     () =>
       pick(p.platform ? settings.platforms[p.platform] : view.getCommonFields(settings.platforms), [
         'title',
