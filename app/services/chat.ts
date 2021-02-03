@@ -222,6 +222,7 @@ export class ChatService extends Service {
           }
 
           loadLazyEmotes();
+          0;
         ` /*eslint-enable */,
           true,
         );
@@ -233,6 +234,7 @@ export class ChatService extends Service {
           var ffzscript1 = document.createElement('script');
           ffzscript1.setAttribute('src','https://cdn.frankerfacez.com/script/script.min.js');
           document.head.appendChild(ffzscript1);
+          0;
         `,
           true,
         );
@@ -247,6 +249,7 @@ export class ChatService extends Service {
             `
                 var chatIframe = document.querySelector('iframe');
                 if (chatIframe) chatIframe.setAttribute('scrolling','no');
+                0;
         `,
             true,
           );
