@@ -28,12 +28,8 @@ export function TwitchTagsInput(p: TTwitchTagsInputProps) {
 
   const options = s.translatedTags.map(tag => ({ label: tag.name, value: tag.tag_id, data: tag }));
 
-  // exclude custom props from props object for TagsInput
-  const customProps: (keyof TTwitchTagsInputProps)[] = ['twitchSettings', 'setPlatformSettings'];
-  const tagsInputProps = omit(p, customProps);
-
   function render() {
-    return <TagsInput {...tagsInputProps} options={options} onInput={onInputHandler} />;
+    return <TagsInput label={p.label} options={options} onInput={onInputHandler} />;
   }
 
   function onInputHandler(values: string[]) {
