@@ -357,7 +357,7 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
 
     this.gl.uniform1f(this.bgMultiplierLocation, this.bgMultiplier);
 
-    // calculate offsetRop and render each volmeter
+    // calculate offsetTop and render each volmeter
     let offsetTop = 0;
     this.sourcesOrder.forEach((sourceId, ind) => {
       offsetTop += PADDING_TOP;
@@ -369,9 +369,9 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
   }
 
   private drawVolmeterWebgl(volmeter: IVolmeterSubscription, offsetTop: number) {
-    volmeter.currentPeaks.forEach((peak, channel) => {
+    for (let channel = 0; channel < volmeter.channelsCount; channel++) {
       this.drawVolmeterChannelWebgl(volmeter, channel, offsetTop);
-    });
+    }
   }
 
   private drawVolmeterChannelWebgl(
