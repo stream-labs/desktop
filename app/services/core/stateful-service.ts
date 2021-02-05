@@ -128,7 +128,7 @@ export abstract class StatefulService<TState extends object> extends Service {
     Vue.set(this.store.state, this.serviceName, newState);
   }
 
-  get views(): ViewHandler<TState> {
+  get views(): ViewHandler<TState> | void {
     return;
   }
 }
