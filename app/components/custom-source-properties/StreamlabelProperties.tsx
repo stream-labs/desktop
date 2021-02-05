@@ -62,6 +62,23 @@ export default class StreamlabelProperties extends Vue {
         }
       });
     });
+
+    // Default to first selectable label if none matching settings are found
+    if (!this.labelSettings) this.defaultToFirstLabel();
+  }
+
+  defaultToFirstLabel() {
+    const file = this.statOptions[0]?.files[0];
+    this.currentlySelected = file;
+    let settingsStat = file.name;
+    if (file?.settings?.settingsStat) settingsStat = file.settings.settingsStat;
+    this.labelSettings = this.streamlabelsService.getSettingsForStat(settingsStat);
+    if (file?.settings?.settingsWhitelist) {
+      this.labelSettings = pick(
+        this.labelSettings,
+        file.settings.settingsWhitelist,
+      ) as IStreamlabelSettings;
+    }
   }
 
   handleInput(value: string) {

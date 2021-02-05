@@ -110,6 +110,7 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
   private requestedFrameId: number;
   private bgMultiplier = this.customizationService.isDarkTheme ? 0.2 : 0.5;
   private customizationServiceSubscription: Subscription = null;
+  private lastEventTime: number;
 
   mounted() {
     this.workerId = electron.ipcRenderer.sendSync('getWorkerWindowId');
@@ -153,10 +154,12 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
       const listener = (sourceId => (e: Electron.Event, volmeter: IVolmeter) => {
         const subscription = this.subscriptions[sourceId];
         if (!subscription) return;
+        const now = performance.now();
         subscription.channelsCount = volmeter.peak.length;
         subscription.prevPeaks = subscription.interpolatedPeaks;
         subscription.currentPeaks = Array.from(volmeter.peak);
-        subscription.lastEventTime = performance.now();
+        subscription.lastEventTime = now;
+        this.lastEventTime = now;
       })(sourceId);
 
       // create a subscription object
@@ -254,9 +257,11 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
     if (currentFrameNumber !== this.frameNumber) {
       // it's time to render next frame
       this.frameNumber = currentFrameNumber;
-      // don't render sources then channelsCount is 0
-      // happens when the browser source stops playing audio
-      this.drawVolmeters();
+      // if there is no new data for Volmeters we need to render only  the interpolation animation
+      const needToReRender = now - this.lastEventTime <= this.interpolationTime;
+      if (needToReRender) {
+        this.drawVolmeters();
+      }
     }
     this.requestedFrameId = requestAnimationFrame(t => this.onRequestAnimationFrameHandler(t));
   }
@@ -352,7 +357,7 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
 
     this.gl.uniform1f(this.bgMultiplierLocation, this.bgMultiplier);
 
-    // calculate offsetRop and render each volmeter
+    // calculate offsetTop and render each volmeter
     let offsetTop = 0;
     this.sourcesOrder.forEach((sourceId, ind) => {
       offsetTop += PADDING_TOP;
@@ -364,9 +369,9 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
   }
 
   private drawVolmeterWebgl(volmeter: IVolmeterSubscription, offsetTop: number) {
-    volmeter.currentPeaks.forEach((peak, channel) => {
+    for (let channel = 0; channel < volmeter.channelsCount; channel++) {
       this.drawVolmeterChannelWebgl(volmeter, channel, offsetTop);
-    });
+    }
   }
 
   private drawVolmeterChannelWebgl(
