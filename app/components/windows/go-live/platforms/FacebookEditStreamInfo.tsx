@@ -205,7 +205,11 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
           ...this.scheduledVideos.map(vid => ({
             value: vid.id,
             title: vid.title,
-            data: { startTime: moment(new Date(vid.planned_start_time)).calendar() },
+            data: {
+              startTime: vid.planned_start_time
+                ? moment(new Date(vid.planned_start_time)).calendar()
+                : '',
+            },
           })),
         ],
         required: false,
