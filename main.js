@@ -529,7 +529,7 @@ app.on('second-instance', (event, argv, cwd) => {
     }
 
     mainWindow.focus();
-  } else {
+  } else if (!shutdownStarted) {
     // This instance is a zombie and we should shut down.
     app.exit();
   }
