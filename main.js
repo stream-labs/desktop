@@ -523,12 +523,15 @@ app.on('second-instance', (event, argv, cwd) => {
   });
 
   // Someone tried to run a second instance, we should focus our window.
-  if (mainWindow) {
+  if (mainWindow && !mainWindow.isDestroyed()) {
     if (mainWindow.isMinimized()) {
       mainWindow.restore();
     }
 
     mainWindow.focus();
+  } else if (!shutdownStarted) {
+    // This instance is a zombie and we should shut down.
+    app.exit();
   }
 });
 
