@@ -58,13 +58,12 @@ export default class StreamSettings extends TsxComponent {
   }
 
   disableProtectedMode() {
-    this.streamSettingsService.setSettings({ protectedModeEnabled: false });
+    this.streamSettingsService.actions.setSettings({ protectedModeEnabled: false });
   }
 
   private enableProtectedMode() {
     this.streamSettingsService.actions.setSettings({
       protectedModeEnabled: true,
-      key: '',
       streamType: 'rtmp_common',
     });
   }
