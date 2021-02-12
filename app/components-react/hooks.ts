@@ -27,26 +27,8 @@ export function useVuex(...args: any[]) {
   return state;
 }
 
-// export function useVuexT(...args: any[]) {
-//   const selector = args.length === 1 ? args[0] : () => args[1](args[0]);
-//   const [state, setState] = useState(selector);
-//   useEffect(() => {
-//     const unsubscribe = StatefulService.store.watch(
-//       () => selector(),
-//       newState => {
-//         setState(newState);
-//       },
-//     );
-//     return () => {
-//       unsubscribe();
-//     };
-//   }, []);
-//
-//   return state;
-// }
-
 /**
- * Call a function once before component first render
+ * An onCreate shortcut
  * Helpful if you need to calculate an immutable initial state for a component
  */
 export function useOnCreate<TReturnValue>(cb: () => TReturnValue) {
@@ -54,12 +36,14 @@ export function useOnCreate<TReturnValue>(cb: () => TReturnValue) {
 }
 
 /**
- * Init state with a callback
- *
- * TODO: remove
- *
- * Use when
- *  - you need to initialized
+ * An onDestroy shortcut
+ */
+export function useOnDestroy(cb: () => void) {
+  useEffect(() => cb, []);
+}
+
+/**
+ * Init state with an async callback
  */
 export function useAsyncState<TStateType>(
   defaultState: TStateType | (() => TStateType),
@@ -74,6 +58,7 @@ export function useAsyncState<TStateType>(
   const promise = useMemo(() => {
     if (asyncCb) {
       return asyncCb(state).then(newState => {
+        // do not set state if the component has been destroyed
         if (isDestroyed) return null;
         setState(newState);
         return newState;
@@ -86,11 +71,4 @@ export function useAsyncState<TStateType>(
   });
 
   return [state, setState, promise];
-}
-
-/**
- * A shortcut for component destroy
- */
-export function useOnDestroy(cb: () => void) {
-  useEffect(() => cb, []);
 }

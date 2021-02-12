@@ -1,18 +1,7 @@
 {
-  "presets": [
-    "@vue/babel-preset-jsx",
-    ["@babel/preset-env", {
-      "modules": false
-    }]
-  ],
+  "presets": ["@vue/babel-preset-jsx"],
   "plugins": [
     ["@babel/plugin-proposal-decorators", { "decoratorsBeforeExport": false }],
-    "transform-class-properties",
-    [
-      "@babel/plugin-transform-runtime",
-      {
-        "useESModules": true
-      }
-    ]
+    "transform-class-properties"
   ]
 }
