@@ -46,3 +46,4 @@ class ReactComponent<TComponentProps = {}> extends TsxComponent<WrapperProps<TCo
   },
 })
 export class NameFolder extends ReactComponent {}
+export class NewsBanner extends ReactComponent {}
