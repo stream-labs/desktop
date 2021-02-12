@@ -10,10 +10,6 @@ interface ICustomListProps {
   imageSize?: { width: number; height: number };
 }
 
-type TImageOptionProps = Omit<OptionProps, 'children'> & {
-  data?: { image: string };
-};
-
 type TUnresolvedProps = TSlobsInputProps<SelectProps<string> & ICustomListProps, string>;
 type TResolvedProps = Omit<TUnresolvedProps, 'onChange' | 'defaultValue' | 'children'>;
 
@@ -81,14 +77,3 @@ function getOptionDataAttrs(p: { label: string; value: string }) {
     'data-option-value': p.value,
   };
 }
-
-function Option(p: OptionProps) {
-  return <Select.Option {...p} />;
-}
-
-// Antd shows a warning if you try to override the Option
-// @see https://github.com/ant-design/ant-design/issues/1891
-// dismiss that warning by settings `isSelectOption=true`
-// Warning! it's not a documented feature
-Option.isSelectOption = true;
-// ImageOption.isSelectOption = true;
