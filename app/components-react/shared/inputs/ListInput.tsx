@@ -1,6 +1,6 @@
 import { Select } from 'antd';
 import React, { useContext } from 'react';
-import { TCombinedProps, useInput } from './inputs';
+import { TSlobsInputProps, useInput } from './inputs';
 import InputWrapper from './InputWrapper';
 import { SelectProps, OptionProps } from 'antd/lib/select';
 import { omit } from 'lodash';
@@ -14,10 +14,11 @@ type TImageOptionProps = Omit<OptionProps, 'children'> & {
   data?: { image: string };
 };
 
-type TUnresolvedProps = TCombinedProps<SelectProps<string> & ICustomListProps, string>;
+type TUnresolvedProps = TSlobsInputProps<SelectProps<string> & ICustomListProps, string>;
 type TResolvedProps = Omit<TUnresolvedProps, 'onChange' | 'defaultValue' | 'children'>;
 
 export function ListInput(p: TResolvedProps) {
+  // TODO: extract common code for ListInput and TagsInput
   const { inputAttrs, wrapperAttrs } = useInput('list', p);
   const options = p.options;
   const customAttrs = ['hasImage', 'imageSize'];

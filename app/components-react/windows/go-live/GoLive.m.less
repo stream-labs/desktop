@@ -31,14 +31,10 @@
 
 .settings-container {
   width: 100%;
+  height: 100%;
   position: relative;
   left: 16px;
   padding-right: 16px;
-}
-
-// window should have less height if only one platform is linked
-.settings-container-one-platform {
-  height: 550px;
 }
 
 .mode-toggle {
@@ -64,7 +60,7 @@
     border-color: (var(--button));
     box-shadow: 0 0 50px rgba(255, 255, 255, 0.1) inset;
   }
-  i {
+  span {
     position: absolute;
     left: 19px;
     top: 17px;
@@ -78,21 +74,6 @@
   text-align: right;
 }
 
-.go-live-button {
-  .margin-left(5);
-}
-
-.cancel-button, .go-live-button {
-  z-index: 1;
-}
-
-.copy-links-buttons {
-  text-align: right;
-  a {
-    margin-left: 16px;
-  }
-}
-
 .success-container {
   display: flex;
   flex-direction: column;
@@ -100,39 +81,6 @@
   justify-content: center;
   height: 100%;
 }
-
-.links-container {
-  width: 750px;
-  background-color: var(--section-alt) !important;
-  span {
-    display: inline-block;
-  }
-  button {
-    margin-left: 16px;
-  }
-  input {
-    width: 380px;
-  }
-}
-
-.stream-links {
-  td {
-    text-align: left !important;
-  }
-  td:first-child {
-    width: 150px;
-  }
-
-  // show/hide the copy button
-  tr a:nth-child(2) {
-    margin-left: 16px;
-    display: none;
-  }
-  tr:hover a:nth-child(2) {
-    display: inline-block;
-  }
-}
-
 
 .spacer {
   width: 1px;

@@ -9,6 +9,11 @@ import { useVuex } from '../../hooks';
 import { DestinationSwitchers } from './DestinationSwitchers';
 import { TPlatform } from '../../../services/platforms';
 import { $t } from '../../../services/i18n';
+import GoLiveError from './GoLiveError';
+import { Spin } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+
+const PlusIcon = PlusOutlined as Function;
 
 /**
  * Renders settings for starting the stream
@@ -18,6 +23,7 @@ import { $t } from '../../../services/i18n';
  **/
 export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>) {
   console.log('render GoLiveSettings');
+  const { settings, setSettings } = p;
   const {
     StreamingService,
     RestreamService,
@@ -25,10 +31,9 @@ export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>
     SettingsService,
     UserService,
   } = Services;
-  const { settings, setSettings } = p;
 
   // define a reactive state
-  const rs = useVuex(() => {
+  const v = useVuex(() => {
     const view = StreamingService.views;
     const goLiveSettings = view.goLiveSettings;
     const isErrorMode = !!view.info.error;
@@ -49,6 +54,7 @@ export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>
 
   function switchPlatform(platform: TPlatform, enabled: boolean) {
     // save settings
+    // TODO:
     settings.platforms[platform].enabled = enabled;
     StreamSettingsService.setGoLiveSettings(settings);
 
@@ -58,6 +64,7 @@ export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>
 
   function switchCustomDest(destInd: number, enabled: boolean) {
     // save settings
+    // TODO:
     settings.customDestinations[destInd].enabled = enabled;
     StreamSettingsService.actions.setGoLiveSettings(settings);
   }
@@ -71,10 +78,11 @@ export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>
     }
   }
 
+  console.log('GoLiveSettings isLoading', v.isLoadingMode);
   return (
-    <div className={cx('flex', styles.goLiveSettings)}>
+    <div className={cx('flex', styles.goLiveSettings, p.className)}>
       {/*LEFT COLUMN*/}
-      {rs.shouldShowLeftCol && (
+      {v.shouldShowLeftCol && (
         <div style={{ width: '400px', marginRight: '42px' }}>
           {/*DESTINATION SWITCHERS*/}
           <DestinationSwitchers
@@ -86,32 +94,27 @@ export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>
             onCustomDestSwitch={switchCustomDest}
           />
           {/*ADD DESTINATION BUTTON*/}
-          {rs.shouldShowAddDestButton && (
+          {v.shouldShowAddDestButton && (
             <a className={styles.addDestinationBtn} onClick={addDestination}>
-              <i className="fa fa-plus" />
+              <PlusIcon />
               {$t('Add Destination')}{' '}
-              {rs.shouldShowPrimeLabel && <b className={styles.prime}>prime</b>}
+              {v.shouldShowPrimeLabel && <b className={styles.prime}>prime</b>}
             </a>
           )}
         </div>
       )}
       {/*RIGHT COLUMN*/}
-      <div style={{ width: '100%', display: 'flex' }}>
-        {/*{isLoadingMode && this.renderLoading()}*/}
-        {/*<GoLiveError />*/}
+      <div style={{ width: '100%' }}>
+        {v.isLoadingMode && <Spin size="large" />}
+        <GoLiveError />
 
-        {rs.shouldShowSettings && (
-          <Scrollable
-            className={cx({
-              [styles.settingsContainer]: true,
-              [styles.settingsContainerOnePlatform]: rs.enabledPlatforms.length === 1,
-            })}
-          >
+        {v.shouldShowSettings && (
+          <Scrollable className={styles.settingsContainer}>
             {/*PLATFORM SETTINGS*/}
             <PlatformSettings settings={settings} setSettings={setSettings} />
 
             {/*ADD SOME SPACE*/}
-            {!rs.isAdvancedMode && <div className={styles.spacer} />}
+            {!v.isAdvancedMode && <div className={styles.spacer} />}
 
             {/*/!*EXTRAS*!/*/}
             {/*<Section title={isAdvancedMode ? $t('Extras') : ''}>*/}

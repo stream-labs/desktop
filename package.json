@@ -36,7 +36,7 @@
     "ci:screentests": "node test/screentest/runner.js",
     "ci:performance": "node test/performance/performance-test-runner.js",
     "commit": "commit",
-    "postinstall": "node ./scripts/install-native-deps.js",
+    "postinstall": "node ./scripts/postinstall.js",
     "tail-obs-logs": "yarn install --cwd bin && node bin/tail-obs-logs.js",
     "generate-agreement": "cat BASEAGREEMENT > AGREEMENT && yarn licenses generate-disclaimer --ignore-platform >> AGREEMENT",
     "generate-agreement:mac": "cat BASEAGREEMENT > license_en.txt && yarn licenses generate-disclaimer --ignore-platform >> license_en.txt"
@@ -61,6 +61,7 @@
     "serial": true
   },
   "dependencies": {
+    "@types/react-transition-group": "^4.4.0",
     "archiver": "2.1.1",
     "aws-sdk": "^2.344.0",
     "color-picker": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/color-picker-0.0.0.tar.gz",
@@ -79,6 +80,7 @@
     "obs-studio-node": "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/osn-0.0.0-release.tar.gz",
     "overlayscrollbars-react": "^0.2.2",
     "raven": "^2.6.4",
+    "react-transition-group": "^4.4.1",
     "request": "^2.88.0",
     "rimraf": "^2.6.1",
     "semver": "^5.5.1",
@@ -89,6 +91,7 @@
   },
   "devDependencies": {
     "7zip-bin": "2.4.1",
+    "@ant-design/icons": "^4.5.0",
     "@babel/core": "7.12.10",
     "@babel/plugin-proposal-decorators": "7.8.3",
     "@babel/plugin-transform-runtime": "^7.12.10",
@@ -109,7 +112,7 @@
     "@types/node": "12.12.38",
     "@types/node-fetch": "^2.5.7",
     "@types/overlayscrollbars": "^1.12.0",
-    "@types/react": "^17.0.0",
+    "@types/react": "^17.0.1",
     "@types/request": "2.48.4",
     "@types/semver": "6.2.1",
     "@types/socket.io-client": "1.4.32",
@@ -163,6 +166,7 @@
     "prettier-eslint": "9.0.1",
     "progress": "2.0.0",
     "raw-loader": "2.0.0",
+    "rc-animate": "^3.1.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "recursive-readdir": "2.2.2",

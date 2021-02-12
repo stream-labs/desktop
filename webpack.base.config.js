@@ -67,10 +67,6 @@ module.exports = {
     extensions: ['.js', '.ts', '.json', '.tsx'],
     modules: [path.resolve(__dirname, 'app'), 'node_modules'],
     symlinks: false,
-    alias: {
-      // https://github.com/ant-design/ant-design/issues/26718#issuecomment-691846966
-      // antd: path.resolve(__dirname, 'node_modules/antd/dist/antd.js')
-    },
   },
 
   // We want to dynamically require native addons

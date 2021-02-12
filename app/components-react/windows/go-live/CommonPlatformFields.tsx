@@ -1,4 +1,4 @@
-import Transition from '../../shared/Transition';
+import { CSSTransition } from 'react-transition-group';
 import { TPlatform } from '../../../services/platforms';
 import { IGoLiveSettings, IStreamSettings } from '../../../services/streaming';
 import { Services } from '../../service-provider';
@@ -7,12 +7,13 @@ import { pick, cloneDeep } from 'lodash';
 import { $t } from '../../../services/i18n';
 import { Form } from 'antd';
 import React, { useState } from 'react';
-import { CheckboxInput, InputGroup, TextAreaInput, TextInput } from '../../shared/inputs';
+import { CheckboxInput, TextAreaInput, TextInput } from '../../shared/inputs';
 import { IGoLiveProps, getEnabledPlatforms, TSetPlatformSettingsFn } from './go-live';
 import Utils from '../../../services/utils';
 import { assertIsDefined } from '../../../util/properties-type-guards';
 import InputWrapper from '../../shared/inputs/InputWrapper';
 import { createVModel } from '../../shared/inputs/inputs';
+import Animate from 'rc-animate';
 
 interface IProps {
   /**
@@ -104,16 +105,17 @@ export default function CommonPlatformFields(p: IProps) {
     <div>
       {/* USE CUSTOM CHECKBOX */}
       {hasCustomCheckbox && (
-        <InputGroup>
+        <InputWrapper>
           <CheckboxInput
             name="customEnabled"
             value={!!platformSettings?.useCustomFields}
             onInput={toggleUseCustom}
             label={title}
           />
-        </InputGroup>
+        </InputWrapper>
       )}
-      <Transition name="slidedown">
+
+      <Animate transitionName="slidedown">
         {fieldsAreVisible && (
           <div>
             {/*TITLE*/}
@@ -137,7 +139,31 @@ export default function CommonPlatformFields(p: IProps) {
             )}
           </div>
         )}
-      </Transition>
+      </Animate>
+
+      {/*<CSSTransition in={fieldsAreVisible} classNames="slidedown" timeout={1500}>*/}
+      {/*  <div>*/}
+      {/*    /!*TITLE*!/*/}
+      {/*    <TextInput*/}
+      {/*      value={fields.title}*/}
+      {/*      name="title"*/}
+      {/*      onInput={val => updateCommonField('title', val)}*/}
+      {/*      label={$t('Title')}*/}
+      {/*      required={true}*/}
+      {/*      // max: this.props.platform === 'twitch' ? 140 : 120,*/}
+      {/*    />*/}
+
+      {/*    /!*DESCRIPTION*!/*/}
+      {/*    {hasDescription && (*/}
+      {/*      <TextAreaInput*/}
+      {/*        value={fields['description']}*/}
+      {/*        onInput={val => updateCommonField('description', val)}*/}
+      {/*        name="description"*/}
+      {/*        label={$t('Description')}*/}
+      {/*      />*/}
+      {/*    )}*/}
+      {/*  </div>*/}
+      {/*</CSSTransition>*/}
     </div>
   );
 }

@@ -1,11 +1,9 @@
 import styles from './GoLive.m.less';
 import cx from 'classnames';
 import { ModalLayout } from '../../shared/ModalLayout';
-import { Form } from 'antd';
-import { useInitState, useOnCreate, useOnDestroy, useVuex } from '../../hooks';
+import { Form, Button } from 'antd';
+import { useAsyncState, useOnCreate, useOnDestroy, useVuex } from '../../hooks';
 import { Services } from '../../service-provider';
-import cloneDeep from 'lodash/cloneDeep';
-import Transition from '../../shared/Transition';
 import GoLiveSettings from './GoLiveSettings';
 import React from 'react';
 import { $t } from '../../../services/i18n';
@@ -13,15 +11,17 @@ import GoLiveChecklist from './GoLiveChecklist';
 import { IGoLiveSettings } from '../../../services/streaming';
 import SlobsForm from '../../shared/inputs/ContextForm';
 import ContextForm from '../../shared/inputs/ContextForm';
+import Animation from 'rc-animate';
+import { SwitchInput } from '../../shared/inputs';
 
 export default function GoLiveWindow() {
   console.log('render GoLiveWindow');
-  const { StreamingService, WindowsService } = Services;
+  const { StreamingService, WindowsService, StreamSettingsService } = Services;
   const [form] = Form.useForm();
   const view = StreamingService.views;
 
   // define a reactive state
-  const rs = useVuex(() => {
+  const v = useVuex(() => {
     const lifecycle = view.info.lifecycle;
     const shouldShowConfirm =
       lifecycle === 'waitForNewSettings' && view.enabledPlatforms.length > 0;
@@ -41,7 +41,7 @@ export default function GoLiveWindow() {
 
   // prepopulate data for all platforms
   useOnCreate(() => {
-    if (['empty', 'waitingForNewSettings'].includes(rs.lifecycle)) {
+    if (['empty', 'waitingForNewSettings'].includes(v.lifecycle)) {
       console.log('Prepopulate');
       StreamingService.actions.prepopulateInfo();
     }
@@ -55,7 +55,7 @@ export default function GoLiveWindow() {
   });
 
   // initialize the GoLive settings
-  const [settings, setSettingsRaw] = useInitState(() => {
+  const [settings, setSettingsRaw] = useAsyncState(() => {
     // read saved settings from the local storage
     return StreamingService.views.goLiveSettings;
   });
@@ -82,67 +82,60 @@ export default function GoLiveWindow() {
     StreamingService.actions.prepopulateInfo();
   }
 
+  function switchAdvancedMode(enabled: boolean) {
+    StreamSettingsService.setGoLiveSettings({ advancedMode: enabled });
+  }
+
   function render() {
     return (
-      <ModalLayout customControls={renderControls} showControls={false}>
+      <ModalLayout footer={renderFooter()}>
         <ContextForm
           form={form}
           style={{ position: 'relative', height: '100%' }}
           layout="horizontal"
           name="editStreamForm"
         >
-          <Transition name="zoom">
-            {rs.shouldShowSettings && (
+          <Animation transitionName="slideright">
+            {v.shouldShowSettings && (
               <GoLiveSettings
+                key={'settings'}
                 className={styles.page}
                 settings={settings}
                 setSettings={setSettings}
               />
             )}
-            {rs.shouldShowChecklist && <GoLiveChecklist className={styles.page} />}
-          </Transition>
+            {v.shouldShowChecklist && <GoLiveChecklist className={styles.page} key={'checklist'} />}
+          </Animation>
         </ContextForm>
       </ModalLayout>
     );
   }
 
-  function renderControls() {
+  function renderFooter() {
     return (
-      <div className="controls" style={{ display: 'flex', flexDirection: 'row-reverse' }}>
-        {/* GO LIVE BUTTON */}
-        {rs.shouldShowConfirm && (
-          <button className={cx('button button--action', styles.goLiveButton)} onClick={goLive}>
-            {$t('Confirm & Go Live')}
-          </button>
-        )}
-
-        {/* GO BACK BUTTON */}
-        {rs.shouldShowGoBackButton && (
-          <button
-            className={cx('button button--action', styles.goLiveButton)}
-            onClick={goBackToSettings}
-          >
-            {$t('Go back to settings')}
-          </button>
-        )}
+      <>
+        <SwitchInput
+          label={$t('Show Advanced Settings')}
+          name="advancedMode"
+          onInput={enabled => switchAdvancedMode(enabled)}
+          value={settings.advancedMode}
+        />
 
         {/* CLOSE BUTTON */}
-        <button onClick={close} className={cx('button button--default', styles.cancelButton)}>
-          {$t('Close')}
-        </button>
+        <Button onClick={close}>{$t('Close')}</Button>
 
-        {/* ADVANCED MODE SWITCHER */}
-        {/*{shouldShowAdvancedSwitch && (*/}
-        {/*  <div className={styles.modeToggle}>*/}
-        {/*    <div>{$t('Show Advanced Settings')}</div>*/}
-        {/*    <ToggleInput*/}
-        {/*      onInput={(val: boolean) => this.switchAdvancedMode(val)}*/}
-        {/*      value={this.settings.advancedMode}*/}
-        {/*      metadata={{ name: 'advancedMode' }}*/}
-        {/*    />*/}
-        {/*  </div>*/}
-        {/*)}*/}
-      </div>
+        {/* GO BACK BUTTON */}
+        {v.shouldShowGoBackButton && (
+          <Button onClick={goBackToSettings}>{$t('Go back to settings')}</Button>
+        )}
+
+        {/* GO LIVE BUTTON */}
+        {v.shouldShowConfirm && (
+          <Button type="primary" onClick={goLive}>
+            {$t('Confirm & Go Live')}
+          </Button>
+        )}
+      </>
     );
   }
 

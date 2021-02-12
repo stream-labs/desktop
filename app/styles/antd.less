@@ -1,4 +1,18 @@
 @import '~antd/dist/antd.dark.less';
 @import './colors';
 
+// DARK THEME COLORS
+// TODO: join with css vars
+@background: @dark-3;
+@section: @dark-2;
+@border: @dark-4;
+
+// apply theme colors for the antd lib
 @primary-color: @teal-dark;
+@popover-background: @background;
+@border-color-split: @border;
+
+// ADDITIONAL STYLES
+.ant-modal-footer {
+  background-color: @section;
+}

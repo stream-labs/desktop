@@ -1,89 +1,69 @@
-import React, { ReactNode } from 'react';
-import { useVuex } from '../hooks';
+import React, { ReactNode, CSSProperties } from 'react';
+import { useOnCreate, useVuex } from '../hooks';
 import { Services } from '../service-provider';
 import { getOS, OS } from '../../util/operating-systems';
-import classNames from 'classnames';
+import cx from 'classnames';
 import { $t } from '../../services/i18n';
-import css from './ModalLayout.m.less';
+import { Button } from 'antd';
+import { ModalProps } from 'antd/lib/modal';
 
-export interface IModalLayoutProps {
-  hasTitleBar?: boolean;
-  showControls?: boolean;
-  showDone?: boolean;
-  disableDone?: boolean;
-  customControls?: () => ReactNode;
-  onSubmit?: (...args: unknown[]) => unknown;
-}
-type TProps = IModalLayoutProps & { children: ReactNode };
+// use props of Modal from the antd lib
+type TProps = { children: ReactNode } & Pick<ModalProps, 'footer' | 'onOk' | 'okText'>;
 
 /**
  * A modal layout for showing dialogs
  */
-export function ModalLayout(partialProps: TProps) {
+export function ModalLayout(p: TProps) {
   // inject services
   const { WindowsService, CustomizationService } = Services;
 
-  // define default props
-  const props = {
-    hasTitleBar: true,
-    showCancel: true,
-    showControls: true,
-    showDone: true,
-    onSubmit: () => {},
-    ...partialProps,
-  };
+  // calculate styles
+  const s = useOnCreate(() => {
+    const titleHeight = getOS() === OS.Mac ? 22 : 30;
+    const footerHeight = 53;
+    const wrapperStyles: CSSProperties = {
+      height: `calc(100% - ${titleHeight}px)`,
+    };
+    const bodyStyles: CSSProperties = {
+      height: `calc(100% - ${footerHeight}px)`,
+    };
+    return { wrapperStyles, bodyStyles };
+  });
 
   // define a reactive state
-  const state = useVuex(() => ({ currentTheme: CustomizationService.currentTheme }));
-
-  // calculate classnames for a wrapper
-  const wrapperClassNames = classNames({
-    [css.modalLayout]: true,
-    [state.currentTheme]: true,
-    [css.hasTitlebar]: props.hasTitleBar,
-    [css.modalLayoutMac]: getOS() === OS.Mac,
-  });
+  const v = useVuex(() => ({ currentTheme: CustomizationService.currentTheme }));
 
   // define a close method for the modal
   function close() {
     WindowsService.actions.closeChildWindow();
   }
 
-  // pick variables for the template
-  const {
-    showControls,
-    showCancel,
-    children,
-    showDone,
-    disableDone,
-    customControls,
-    onSubmit,
-  } = props;
-
   // render template
-  return (
-    <div className={wrapperClassNames}>
-      {/* CONTENT */}
-      <div className={css.modalLayoutContent}>{children}</div>
-
-      {/* DEFAULT CONTROLS */}
-      {showControls && !customControls && (
-        <div className={css.modalLayoutControls}>
-          {showCancel && (
-            <button className="button button--default" onClick={close}>
-              {$t('Cancel')}
-            </button>
-          )}
-          {showDone && (
-            <button disabled={disableDone} className="button button--action" onClick={onSubmit}>
-              {$t('Done')}
-            </button>
-          )}
+  function render() {
+    return (
+      <div className={cx('ant-modal-content', v.currentTheme)} style={s.wrapperStyles}>
+        <div className="ant-modal-body" style={s.bodyStyles}>
+          {p.children}
         </div>
-      )}
+        <div className="ant-modal-footer">{p.footer || renderDefaultFooter()}</div>
+      </div>
+    );
+  }
 
-      {/* CUSTOM CONTROLS */}
-      {customControls && <div className={css.modalLayoutControls}>{customControls()}</div>}
-    </div>
-  );
+  // render a default footer with action buttons
+  function renderDefaultFooter() {
+    const okText = p.okText && $t('Done');
+    return (
+      <>
+        <Button onClick={close}>{$t('Close')}</Button>
+        {p.onOk && (
+          <Button onClick={p.onOk} type="primary">
+            {okText}
+          </Button>
+        )}
+      </>
+    );
+  }
+
+  return render();
 }

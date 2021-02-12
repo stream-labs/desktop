@@ -41,7 +41,7 @@ export default function NameFolder() {
   });
 
   // define a submit method
-  async function submit(e: Event) {
+  async function submit() {
     try {
       await form.validateFields();
     } catch (e) {
@@ -73,15 +73,15 @@ export default function NameFolder() {
   }
 
   return (
-    <ModalLayout onSubmit={submit}>
+    <ModalLayout onOk={submit} okText={$t('Submit')}>
       <ContextForm layout="vertical" form={form}>
         <TextInput
           name="name"
           value={name}
+          onInput={v => setName(v)}
           label={$t('Please enter the name of the folder')}
           required={true}
         />
-        <Button type="primary">Submit</Button>
       </ContextForm>
     </ModalLayout>
   );

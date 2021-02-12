@@ -1,8 +1,7 @@
 export * from './inputs';
 export { TextInput } from './TextInput';
 export { TextAreaInput } from './TextAreaInput';
-export { ToggleInput } from './ToggleInput';
+export { SwitchInput } from './SwitchInput';
 export { CheckboxInput } from './CheckboxInput';
-export { InputGroup } from './InputGroup';
 export { ListInput } from './ListInput';
 export { TagsInput } from './TagsInput';

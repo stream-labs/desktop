@@ -162,6 +162,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
    * sync the settings from platforms with the local state
    */
   async prepopulateInfo(platforms?: TPlatform[]) {
+    console.log('start prepopulate');
     platforms = platforms || this.views.enabledPlatforms;
     this.UPDATE_STREAM_INFO({ lifecycle: 'prepopulate', error: null });
     for (const platform of platforms) {
@@ -207,6 +208,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
     // successfully prepopulated
     this.UPDATE_STREAM_INFO({ lifecycle: 'waitForNewSettings' });
+    console.log('finish prepopulate');
   }
 
   /**
@@ -505,7 +507,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @mutation()
   private SET_ERROR(type: TStreamErrorType, details?: string, platform?: TPlatform) {
     if (!type) type = 'UNKNOWN_ERROR';
-    this.state.info.error = createStreamError(type, details, platform).getModel();
+    const error = createStreamError(type, details, platform).getModel();
+    this.state.info.error = error;
   }
 
   @mutation()

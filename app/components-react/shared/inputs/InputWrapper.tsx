@@ -9,9 +9,12 @@ import omit from 'lodash/omit';
  */
 export default function InputWrapper(p: FormItemProps & { nowrap?: boolean }) {
   const formItemProps = omit(p, 'nowrap');
+  const label = p.label || ' ';
   return p.nowrap ? (
     <>{p.children}</>
   ) : (
-    <Form.Item {...formItemProps}>{formItemProps.children}</Form.Item>
+    <Form.Item colon={false} {...formItemProps} label={label}>
+      {formItemProps.children}
+    </Form.Item>
   );
 }

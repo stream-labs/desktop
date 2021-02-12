@@ -35,12 +35,3 @@ export default function Scrollable(initialProps: IScrollableProps & HTMLAttribut
     </OverlayScrollbarsComponent>
   );
 }
-//
-// //TODO: npm install overlayscrollbars-react
-// export default function Scrollable(props: HTMLAttributes<unknown>) {
-//   return (
-//     <div className="scrollable" style={{ width: '100%' }}>
-//       {props.children}
-//     </div>
-//   );
-// }

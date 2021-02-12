@@ -1,6 +1,6 @@
 import { IGoLiveSettings } from '../../../../services/streaming';
 import { TSetPlatformSettingsFn } from '../go-live';
-import { TagsInput, TCombinedProps } from '../../../shared/inputs';
+import { TagsInput, TSlobsInputProps } from '../../../shared/inputs';
 import { useOnCreate, useVuex } from '../../../hooks';
 import { Services } from '../../../service-provider';
 import { prepareOptions, TTwitchTag } from '../../../../services/platforms/twitch/tags';
@@ -13,7 +13,7 @@ interface IDataProps {
   setPlatformSettings: TSetPlatformSettingsFn;
 }
 
-type TTwitchTagsInputProps = TCombinedProps<IDataProps, TTwitchTag[]>;
+type TTwitchTagsInputProps = TSlobsInputProps<IDataProps, TTwitchTag[]>;
 
 export function TwitchTagsInput(p: TTwitchTagsInputProps) {
   const s = useOnCreate(() => {

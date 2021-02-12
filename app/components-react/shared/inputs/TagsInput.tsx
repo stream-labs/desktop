@@ -1,6 +1,6 @@
 import { Select } from 'antd';
 import React, { useContext, ReactNode } from 'react';
-import { TCombinedProps, useInput } from './inputs';
+import { TSlobsInputProps, useInput } from './inputs';
 import InputWrapper from './InputWrapper';
 import { SelectProps, OptionProps } from 'antd/lib/select';
 import { omit } from 'lodash';
@@ -9,12 +9,13 @@ type TTagOption = Omit<OptionProps, 'children'> & {
   label: string;
   template?: (opt: TTagOption) => ReactNode;
 };
-type TUnresolvedProps = TCombinedProps<SelectProps<string[]>, string[]>;
+type TUnresolvedProps = TSlobsInputProps<SelectProps<string[]>, string[]>;
 type TTagsProps = Omit<TUnresolvedProps, 'defaultValue' | 'options'> & {
   options: TTagOption[];
 };
 
 export function TagsInput(p: TTagsProps) {
+  // TODO: extract common code for ListInput and TagsInput
   const { inputAttrs, wrapperAttrs } = useInput('tags', p);
   const options = p.options;
   const calculatedInputAttrs = omit(inputAttrs, 'options', 'children', 'onInput');

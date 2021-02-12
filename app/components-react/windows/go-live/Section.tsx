@@ -1,6 +1,7 @@
 import styles from './GoLive.m.less';
 import React, { HTMLAttributes } from 'react';
 import cx from 'classnames';
+import InputWrapper from '../../shared/inputs/InputWrapper';
 
 interface ISectionProps {
   title?: string;
@@ -17,7 +18,11 @@ export function Section(p: ISectionProps & HTMLAttributes<unknown>) {
   if (!p.isSimpleMode) {
     return (
       <div className={cx({ [styles.section]: true, [styles.sectionWithoutTitle]: !title })}>
-        {title && <h2>{title}</h2>}
+        {title && (
+          <InputWrapper label={' '}>
+            <h2 style={{ marginBottom: 0 }}>{title}</h2>
+          </InputWrapper>
+        )}
         <div>{p.children}</div>
       </div>
     );

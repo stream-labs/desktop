@@ -22,10 +22,28 @@ export function useVuex(...args: any[]) {
     return () => {
       unsubscribe();
     };
-  });
+  }, []);
 
   return state;
 }
+
+// export function useVuexT(...args: any[]) {
+//   const selector = args.length === 1 ? args[0] : () => args[1](args[0]);
+//   const [state, setState] = useState(selector);
+//   useEffect(() => {
+//     const unsubscribe = StatefulService.store.watch(
+//       () => selector(),
+//       newState => {
+//         setState(newState);
+//       },
+//     );
+//     return () => {
+//       unsubscribe();
+//     };
+//   }, []);
+//
+//   return state;
+// }
 
 /**
  * Call a function once before component first render
@@ -38,30 +56,34 @@ export function useOnCreate<TReturnValue>(cb: () => TReturnValue) {
 /**
  * Init state with a callback
  *
+ * TODO: remove
+ *
  * Use when
  *  - you need to initialized
  */
-export function useInitState<TStateType>(
+export function useAsyncState<TStateType>(
   defaultState: TStateType | (() => TStateType),
   asyncCb?: (initialState: TStateType) => Promise<TStateType>,
-): [TStateType, (newState: TStateType) => unknown, Promise<TStateType> | undefined] {
-  // save the initial state so we don't calculate it each call
-  const initializationCb =
-    typeof defaultState === 'function' ? (defaultState as () => TStateType) : () => defaultState;
-  const initialState = useMemo(initializationCb, []);
-
+): [TStateType, (newState: TStateType) => unknown, Promise<TStateType | null> | undefined] {
   // define a state
-  const [state, setState] = useState(initialState);
+  const [state, setState] = useState(defaultState);
 
-  // call and save callback if provided
+  let isDestroyed = false;
+
+  // create and save the promise if provided
   const promise = useMemo(() => {
     if (asyncCb) {
-      return asyncCb(initialState).then(newState => {
+      return asyncCb(state).then(newState => {
+        if (isDestroyed) return null;
         setState(newState);
         return newState;
       });
     }
   }, []);
+
+  useOnDestroy(() => {
+    isDestroyed = true;
+  });
 
   return [state, setState, promise];
 }

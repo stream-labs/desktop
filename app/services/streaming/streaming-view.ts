@@ -225,7 +225,8 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   }
 
   get isLoading() {
-    return !this.info.error && ['empty', 'prepopulate'].includes(this.info.lifecycle);
+    const { error, lifecycle } = this.info;
+    return !error && ['empty', 'prepopulate'].includes(lifecycle);
   }
 
   /**

@@ -1,5 +1,5 @@
 import { InputProps } from 'antd/lib/input';
-import { Ref, useEffect, RefObject, useRef, useContext, ChangeEvent } from 'react';
+import { Ref, useEffect, RefObject, useRef, useContext, ChangeEvent, FocusEvent } from 'react';
 import { Input } from 'antd';
 import { FormContext } from './ContextForm';
 import { useOnCreate } from '../../hooks';
@@ -7,13 +7,14 @@ import uuid from 'uuid';
 import { FormItemProps } from 'antd/lib/form';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import omit from 'lodash/omit';
+import { $t } from '../../../services/i18n';
 /**
  * Shared code for inputs
  */
 
-type TInputType = 'text' | 'textarea' | 'toggle' | 'checkbox' | 'list' | 'tags';
+type TInputType = 'text' | 'textarea' | 'toggle' | 'checkbox' | 'list' | 'tags' | 'switch';
 
-const customProps = ['onInputChange', 'uncontrolled', 'debounce'];
+const customProps = ['onInputChange', 'uncontrolled'];
 const customWrapperProps = ['nowrap'];
 export interface IInputCustomProps<TValue> {
   value?: TValue;
@@ -21,10 +22,10 @@ export interface IInputCustomProps<TValue> {
   nowrap?: boolean;
   onInput?: (val: TValue, ev?: ChangeEvent | CheckboxChangeEvent) => unknown;
   uncontrolled?: boolean;
-  debounce?: number;
+  required?: boolean;
 }
 
-export type TCombinedProps<TInputProps, TValue> = Omit<
+export type TSlobsInputProps<TInputProps, TValue> = Omit<
   FormItemProps & TInputProps,
   keyof IInputCustomProps<TValue>
 > &
@@ -35,33 +36,48 @@ export type TCombinedProps<TInputProps, TValue> = Omit<
  * and returns props for Input and Wrapper components
  *
  * This hook does not handle 'onChange' events because it may be different for each Input component.
- * You should define onChange handler in component itself or use specific hooks like useTextInput() instead
+ * You should define onChange handler in the component itself or use specific hooks like useTextInput() instead
  */
 export function useInput<
   TValue,
   TLabel,
-  TInputProps extends { name?: string; label?: TLabel; value?: TValue }
+  TInputProps extends {
+    name?: string;
+    label?: TLabel;
+    value?: TValue;
+    rules?: FormItemProps['rules'];
+  }
 >(type: TInputType, inputProps: TInputProps & IInputCustomProps<TValue>) {
   const { name, value, label } = inputProps;
+
+  // get parent form
   const formContext = useContext(FormContext);
   const form = formContext?.form;
 
   const inputId = useOnCreate(() => {
+    // generate an unique id
     const id = `${name}-${uuid()}`;
-    if (form) {
-      form.setFieldsValue({ [id]: value });
-    }
+
+    // if the input is inside the form
+    // then we need to setup it's value via Form API
+    if (form) form.setFieldsValue({ [id]: value });
     return id;
   });
 
   // Create data-attributes for an Input element
-  // These attributes help to find input in auto-tests
+  // These attributes help to find inputs in auto-tests
   const dataAttrs = {
     'data-type': type,
     'data-name': name,
     'data-title': label,
     'data-id': inputId,
   };
+
+  // Create the "required" validation rule
+  const rules = inputProps.rules ? [...inputProps.rules] : [];
+  if (inputProps.required) {
+    rules.push({ required: true, message: $t('The field is required') });
+  }
 
   const commonAttrs = {
     // omit custom props, because attributes must contain only html props and props from the antd lib
@@ -72,7 +88,8 @@ export function useInput<
   };
 
   const wrapperAttrs = {
-    ...commonAttrs,
+    ...omit(commonAttrs, 'onInput', 'onChange'),
+    rules,
     'data-role': 'input-wrapper',
   };
 
@@ -91,20 +108,41 @@ export function useInput<
  * Hook for text fields: input, textarea, password
  * Use useInput() under the hood and handles onChange event
  */
-export function useTextInput(inputProps: Parameters<typeof useInput>[1]) {
-  const { inputAttrs, wrapperAttrs } = useInput('text', inputProps);
+export function useTextInput(
+  p: Omit<Parameters<typeof useInput>[1] & TSlobsInputProps<InputProps, string>, 'onChange'>,
+) {
+  const { inputAttrs, wrapperAttrs } = useInput('text', p);
 
-  // redirect `onChange` to the custom `onInputChange` handler
-  // `onInputChange` accepts a value as a first argument
+  // Text inputs are uncontrolled by default for better performance
+  const uncontrolled = p.uncontrolled !== false;
+
+  // redirect `onChange` to the custom `onInput` handler
+  // `onInput` accepts a value as a first argument
   // so it's more convenient to use in most situations
-  const onChange = (ev: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    inputProps.onInput && inputProps.onInput(ev.target.value, ev);
+  const onChange = (ev: ChangeEvent<any>) => {
+    if (uncontrolled) return;
+    p.onInput && p.onInput(ev.target.value, ev);
   };
+
+  const onInput = (ev: ChangeEvent<any>) => {
+    // ignore native onInput() for uncontrolled components
+    if (uncontrolled) return;
+    p.onInput && p.onInput(ev.target.value, ev);
+  };
+
+  const onBlur = (ev: FocusEvent<any>) => {
+    // for uncontrolled components call the onInput() handler on blur
+    if (uncontrolled) p.onInput && p.onInput(ev.target.value, ev);
+    p.onBlur && p.onBlur(ev);
+  };
+
   return {
     wrapperAttrs,
     inputAttrs: {
       ...inputAttrs,
       onChange,
+      onBlur,
+      onInput,
     },
   };
 }
