@@ -7,7 +7,7 @@ import styles from './NewsBanner.m.less';
 import { TAppPage } from '../../services/navigation';
 import { useVuex } from '../hooks';
 
-export default () => {
+export default function NewsBanner() {
   const { AnnouncementsService, NavigationService, WindowsService, SettingsService } = Services;
 
   const [processingClose, setProcessingClose] = useState(false);
@@ -28,17 +28,17 @@ export default () => {
     oldBannerState.current = v.bannerExists;
   }
 
-  const closeBanner = async (
+  async function closeBanner(
     e?: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     clickType: 'action' | 'dismissal' = 'dismissal',
-  ) => {
+  ) {
     if (e) e.stopPropagation();
     setProcessingClose(true);
     await AnnouncementsService.closeBanner(clickType);
     setProcessingClose(false);
-  };
+  }
 
-  const followLink = () => {
+  function followLink() {
     if (!v.currentBanner) return;
     if (v.currentBanner.linkTarget === 'slobs') {
       // This isn't actually a page, but we want to be able to open it from a banner
@@ -53,7 +53,7 @@ export default () => {
     if (v.currentBanner.closeOnLink) {
       closeBanner(undefined, 'action');
     }
-  };
+  }
 
   return (
     <div>
@@ -83,4 +83,4 @@ export default () => {
       </div>
     </div>
   );
-};
+}
