@@ -1,6 +1,6 @@
 import { shell } from 'electron';
 import { $t } from '../../services/i18n';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Services } from '../service-provider';
 import cx from 'classnames';
 import styles from './NewsBanner.m.less';
@@ -17,13 +17,16 @@ export default () => {
     bannerExists: AnnouncementsService.bannerExists,
   }));
 
-  // TODO: use hook after Alex's branch is merged
-  // const toggleAnimation = () => {
-  //   WindowsService.actions.updateStyleBlockers('main', true);
-  //   window.setTimeout(() => {
-  //     WindowsService.actions.updateStyleBlockers('main', false);
-  //   }, 500);
-  // };
+  const oldBannerState = useRef(v.bannerExists);
+
+  if (oldBannerState.current !== v.bannerExists) {
+    // Toggle style blockers while banner animates
+    WindowsService.actions.updateStyleBlockers('main', true);
+    window.setTimeout(() => {
+      WindowsService.actions.updateStyleBlockers('main', false);
+    }, 500);
+    oldBannerState.current = v.bannerExists;
+  }
 
   const closeBanner = async (
     e?: React.MouseEvent<HTMLButtonElement, MouseEvent>,
