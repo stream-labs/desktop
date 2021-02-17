@@ -43,6 +43,7 @@
   "Refresh Chat": "刷新聊天",
   "Your chat is currently offline": "您的聊天当前处于脱机状态",
   "Set path in Settings > Output.": "在设置 > 输出中设置路径。",
+  "Open Performance Window": "Open Performance Window",
   "Start Replay Buffer": "启动重播缓冲",
   "Stop Replay Buffer": "停止重播缓冲",
   "Stopping...": "正在停止...",
