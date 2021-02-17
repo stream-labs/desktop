@@ -43,6 +43,7 @@
   "Refresh Chat": "Aggiorna chat",
   "Your chat is currently offline": "La tua chat è attualmente offline",
   "Set path in Settings > Output.": "Imposta il percorso in Impostazioni > Output.",
+  "Open Performance Window": "Open Performance Window",
   "Start Replay Buffer": "Avvia buffer replay",
   "Stop Replay Buffer": "Interrompi buffer replay",
   "Stopping...": "Interruzione...",
