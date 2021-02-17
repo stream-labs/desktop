@@ -9,7 +9,7 @@ import { Component } from 'vue-property-decorator';
 class WrapperProps<TComponentProps> {
   name?: string = null;
   componentProps: TComponentProps = null;
-  wrapperStyles?: Dictionary<string> = {};
+  wrapperStyles?: Dictionary<string> = null;
 }
 
 /**
@@ -39,10 +39,10 @@ class ReactComponent<TComponentProps = {}> extends TsxComponent<WrapperProps<TCo
   }
 }
 
+export class NameFolder extends ReactComponent {}
 @Component({
   props: {
-    name: { default: 'NameFolder' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
+    name: { default: 'NewsBanner' },
   },
 })
-export class NameFolder extends ReactComponent {}
+export class NewsBanner extends ReactComponent {}

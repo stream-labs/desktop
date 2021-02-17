@@ -110,9 +110,15 @@ import { CustomizationService } from './services/customization';
 import { ScenesService } from './services/scenes';
 import { EditorCommandsService } from './services/editor-commands';
 import { PerformanceService } from './services/performance';
+import { NavigationService } from './services/navigation';
+import { AnnouncementsService } from './services/announcements';
+import { SettingsService } from './services/settings';
 export const AppServices = {
   WindowsService,
   ScenesService,
+  NavigationService,
+  AnnouncementsService,
+  SettingsService,
   CustomizationService,
   EditorCommandsService,
   PerformanceService,
