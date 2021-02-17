@@ -9,7 +9,7 @@ import { Component } from 'vue-property-decorator';
 class WrapperProps<TComponentProps> {
   name?: string = null;
   componentProps: TComponentProps = null;
-  wrapperStyles?: Dictionary<string> = {};
+  wrapperStyles?: Dictionary<string> = null;
 }
 
 /**
