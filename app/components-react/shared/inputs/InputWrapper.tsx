@@ -4,7 +4,7 @@ import { FormItemProps } from 'antd/lib/form/FormItem';
 import omit from 'lodash/omit';
 
 /**
- * Wraps Form.Item and adds data-attributes
+ * Wraps Form.Item
  * Can display unwrapped content if nowWrap parameter is set to true
  */
 export default function InputWrapper(p: FormItemProps & { nowrap?: boolean }) {

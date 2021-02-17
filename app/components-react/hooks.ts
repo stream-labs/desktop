@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { debounce } from 'lodash';
 import { StatefulService } from '../services/core';
 
 /**
@@ -71,4 +72,43 @@ export function useAsyncState<TStateType>(
   });
 
   return [state, setState, promise];
+}
+
+type TStateActions<StateType> = {
+  s: StateType;
+  setState: (p: StateType) => unknown;
+  updateState: (p: Partial<StateType>) => unknown;
+  setItem: <TDict extends keyof StateType, TKey extends keyof StateType[TDict]>(
+    dictionaryName: TDict,
+    key: TKey,
+    value: StateType[TDict][TKey],
+  ) => unknown;
+};
+
+export function useStateActions<T extends object>(initializer: T): TStateActions<T>;
+export function useStateActions<T extends object>(initializer: () => T): TStateActions<T>;
+export function useStateActions<T>(initializer: any) {
+  const [s, setState] = useState<T>(initializer);
+  return {
+    s,
+    setState,
+    setItem<TDict extends keyof T, TKey extends keyof T[TDict]>(
+      dictionaryName: TDict,
+      key: TKey,
+      value: T[TDict][TKey],
+    ): void {
+      setState({ ...s, [dictionaryName]: {} });
+    },
+    updateState(patch: Partial<T>) {
+      setState({ ...s, ...patch });
+    },
+  };
+}
+
+export function useDebounce<T extends (...args: any[]) => any>(ms: number, cb: T) {
+  return useCallback(debounce(cb, ms), []);
+}
+
+function MyDecorator(...args: any) {
+  console.log('call my decorator', args);
 }

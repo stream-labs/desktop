@@ -7,13 +7,10 @@ import { prepareOptions, TTwitchTag } from '../../../../services/platforms/twitc
 import { ITwitchStartStreamOptions } from '../../../../services/platforms/twitch';
 import React from 'react';
 import { keyBy, omit } from 'lodash';
+import { IOption } from '../../../shared/inputs/ListInput';
+import { Row, Col, Tag } from 'antd';
 
-interface IDataProps {
-  twitchSettings: ITwitchStartStreamOptions;
-  setPlatformSettings: TSetPlatformSettingsFn;
-}
-
-type TTwitchTagsInputProps = TSlobsInputProps<IDataProps, TTwitchTag[]>;
+type TTwitchTagsInputProps = TSlobsInputProps<{}, TTwitchTag[]>;
 
 export function TwitchTagsInput(p: TTwitchTagsInputProps) {
   const s = useOnCreate(() => {
@@ -26,15 +23,34 @@ export function TwitchTagsInput(p: TTwitchTagsInputProps) {
     return { disabled, translatedTags, tagsMap };
   });
 
-  const options = s.translatedTags.map(tag => ({ label: tag.name, value: tag.tag_id, data: tag }));
+  const options = s.translatedTags.map(tag => ({
+    label: tag.name,
+    value: tag.tag_id,
+    description: tag.description,
+  }));
 
   function render() {
-    return <TagsInput label={p.label} options={options} onInput={onInputHandler} />;
+    return (
+      <TagsInput
+        label={p.label}
+        onInput={values => p.onInput && p.onInput(values.map(tagName => s.tagsMap[tagName]))}
+        value={p.value && p.value.map(tag => tag.tag_id)}
+        options={options}
+        tagRender={(tagProps, tag) => (
+          <Tag {...tagProps} color="#9146FF">
+            {tag.label}
+          </Tag>
+        )}
+        optionRender={opt => (
+          <Row gutter={8}>
+            <Col span={10}>{opt.label}</Col>
+            <Col span={14} style={{ whiteSpace: 'normal' }}>
+              {opt.description}
+            </Col>
+          </Row>
+        )}
+      />
+    );
   }
-
-  function onInputHandler(values: string[]) {
-    p.onInput && p.onInput(values.map(tagId => s.tagsMap[tagId]));
-  }
-
   return render();
 }

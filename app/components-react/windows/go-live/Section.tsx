@@ -17,9 +17,9 @@ export function Section(p: ISectionProps & HTMLAttributes<unknown>) {
   // render header and section wrapper in advanced mode
   if (!p.isSimpleMode) {
     return (
-      <div className={cx({ [styles.section]: true, [styles.sectionWithoutTitle]: !title })}>
+      <div className={cx({ section: true, [styles.sectionWithoutTitle]: !title })}>
         {title && (
-          <InputWrapper label={' '}>
+          <InputWrapper>
             <h2 style={{ marginBottom: 0 }}>{title}</h2>
           </InputWrapper>
         )}

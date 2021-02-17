@@ -1,17 +1,20 @@
-import { canShowOnlyRequiredFields, TSetPlatformSettingsFn } from '../go-live';
+import { isAdvancedMode, TSetPlatformSettingsFn } from '../go-live';
 import FormSection from '../../../shared/inputs/FormSection';
 import CommonPlatformFields from '../CommonPlatformFields';
-import React from 'react';
+import React, { useState } from 'react';
 import { Services } from '../../../service-provider';
 import { TTwitchTag } from '../../../../services/platforms/twitch/tags';
 import { IGoLiveSettings } from '../../../../services/streaming';
 import { TPlatform } from '../../../../services/platforms';
 import ContextForm from '../../../shared/inputs/ContextForm';
-import { useVuex } from '../../../hooks';
+import { useStateActions, useVuex } from '../../../hooks';
 import { assertIsDefined } from '../../../../util/properties-type-guards';
 import { EDismissable } from '../../../../services/dismissables';
 import { $t } from '../../../../services/i18n';
 import { createVModel, ListInput } from '../../../shared/inputs';
+import { TwitchTagsInput } from './TwitchTagsInput';
+import GameSelector from '../GameSelector';
+import { IFacebookStartStreamOptions } from '../../../../services/platforms/facebook';
 
 interface IProps {
   settings: IGoLiveSettings;
@@ -24,7 +27,7 @@ export default function FacebookEditStreamInfo(p: IProps) {
   // calculate variables from props
   const fbSettings = p.settings.platforms.facebook;
   assertIsDefined(fbSettings);
-  const shouldShowOnlyRequiredFields = canShowOnlyRequiredFields(p.settings);
+  const isAdvanced = isAdvancedMode(p.settings);
   const shouldShowGroups = fbSettings.destinationType === 'group' && !p.isUpdateMode;
   const shouldShowPages = fbSettings.destinationType === 'page' && !p.isUpdateMode;
   const shouldShowEvents = !p.isUpdateMode && !p.isScheduleMode;
@@ -38,6 +41,9 @@ export default function FacebookEditStreamInfo(p: IProps) {
 
   // inject services
   const { FacebookService, DismissablesService } = Services;
+
+  // define local state
+  const { s, setItem } = useStateActions({ pictures: {} as Record<string, string> });
 
   // define vuex state
   const v = useVuex(() => {
@@ -56,22 +62,27 @@ export default function FacebookEditStreamInfo(p: IProps) {
     };
   });
 
+  async function loadPicture(objectId: string) {
+    if (s.pictures[objectId]) return s.pictures[objectId];
+    setItem('pictures', objectId, await FacebookService.fetchPicture(objectId));
+  }
+
+  function loadPictures(groupOrPage: IFacebookStartStreamOptions['destinationType']) {
+    const ids =
+      groupOrPage === 'group'
+        ? FacebookService.state.facebookGroups.map(item => item.id)
+        : FacebookService.state.facebookPages.map(item => item.id);
+    ids.forEach(id => loadPicture(id));
+  }
+
   function render() {
     return (
       <FormSection name="facebook-settings">
-        {!p.isUpdateMode && (
-          <div>
-            {v.shouldShowPermissionWarn && renderMissedPermissionsWarning()}
-            <ListInput
-              label={$t('Facebook Destination')}
-              {...vModel('destinationType')}
-              required
-              hasImage
-              imageSize={{ width: 35, height: 35 }}
-              options={getDestinationOptions()}
-            />
-          </div>
-        )}
+        {isAdvanced
+          ? [renderRequiredFields(), renderOptionalFields(), renderCommonFields()]
+          : [renderCommonFields(), renderRequiredFields()]}
+
+        {v.shouldShowPermissionWarn && renderMissedPermissionsWarning()}
 
         {/*{shouldShowPages && (*/}
         {/*  <HFormGroup title={this.formMetadata.page.title}>*/}
@@ -100,67 +111,98 @@ export default function FacebookEditStreamInfo(p: IProps) {
         {/*    </p>*/}
         {/*  </HFormGroup>*/}
         {/*)}*/}
-
-        {!shouldShowOnlyRequiredFields && (
-          <div>
-            {/*{shouldShowEvents && (*/}
-            {/*  <HFormGroup title={this.formMetadata.fbEvent.title}>*/}
-            {/*    <ListInput*/}
-            {/*      vModel={fbSettings.liveVideoId}*/}
-            {/*      metadata={this.formMetadata.fbEvent}*/}
-            {/*      onInput={() => this.onSelectScheduledVideoHandler()}*/}
-            {/*      scopedSlots={this.eventInputSlots}*/}
-            {/*    />*/}
-            {/*  </HFormGroup>*/}
-            {/*)}*/}
-
-            {/*{shouldShowPrivacy && (*/}
-            {/*  <HFormGroup title={this.formMetadata.privacy.title}>*/}
-            {/*    <ListInput*/}
-            {/*      vModel={this.settings.platforms.facebook.privacy.value}*/}
-            {/*      metadata={this.formMetadata.privacy}*/}
-            {/*      imageSize={{ width: 24, height: 24 }}*/}
-            {/*      class={styles.privacySelector}*/}
-            {/*    />*/}
-            {/*    {shouldShowPrivacyWarn && (*/}
-            {/*      <div class="input-description">*/}
-            {/*        <Translate*/}
-            {/*          message={$t('FBPrivacyWarning')}*/}
-            {/*          scopedSlots={{*/}
-            {/*            link: (text: string) => (*/}
-            {/*              <a onClick={() => this.openIntegrationSettings()}>{{ text }}</a>*/}
-            {/*            ),*/}
-            {/*          }}*/}
-            {/*        />*/}
-            {/*      </div>*/}
-            {/*    )}*/}
-            {/*  </HFormGroup>*/}
-            {/*)}*/}
-
-            {/*<HFormGroup title={$t('Facebook Game')}>*/}
-            {/*  <GameSelector vModel={this.settings} platform="facebook" />*/}
-            {/*  {shouldShowGamingWarning && (*/}
-            {/*    <p>*/}
-            {/*      <Translate*/}
-            {/*        message={$t('facebookGamingWarning')}*/}
-            {/*        scopedSlots={{*/}
-            {/*          createPageLink: (text: string) => (*/}
-            {/*            <a onClick={() => this.openCreateGamingPage()}>{{ text }}</a>*/}
-            {/*          ),*/}
-            {/*        }}*/}
-            {/*      />*/}
-            {/*    </p>*/}
-            {/*  )}*/}
-            {/*</HFormGroup>*/}
-
-            <CommonPlatformFields
-              platform={'facebook'}
-              setPlatformSettings={p.setPlatformSettings}
-              settings={p.settings}
-            />
-          </div>
-        )}
       </FormSection>
+    );
+  }
+
+  function renderCommonFields() {
+    return <CommonPlatformFields {...p} platform="facebook" />;
+  }
+
+  function renderRequiredFields() {
+    return (
+      <>
+        {!p.isUpdateMode && (
+          <>
+            <ListInput
+              label={$t('Facebook Destination')}
+              {...vModel('destinationType')}
+              hasImage
+              imageSize={{ width: 35, height: 35 }}
+              options={getDestinationOptions()}
+            />
+            {shouldShowPages && (
+              <ListInput
+                {...vModel('pageId')}
+                onDropdownVisibleChange={() => loadPictures('page')}
+                hasImage
+                imageSize={{ width: 44, height: 44 }}
+                options={FacebookService.state.facebookPages.map(page => ({
+                  value: page.id,
+                  label: `${page.name} | ${page.category}`,
+                  image: s.pictures[page.id],
+                }))}
+              />
+            )}
+          </>
+        )}
+      </>
+    );
+  }
+
+  function renderOptionalFields() {
+    return (
+      <>
+        {/*{shouldShowEvents && (*/}
+        {/*  <HFormGroup title={this.formMetadata.fbEvent.title}>*/}
+        {/*    <ListInput*/}
+        {/*      vModel={fbSettings.liveVideoId}*/}
+        {/*      metadata={this.formMetadata.fbEvent}*/}
+        {/*      onInput={() => this.onSelectScheduledVideoHandler()}*/}
+        {/*      scopedSlots={this.eventInputSlots}*/}
+        {/*    />*/}
+        {/*  </HFormGroup>*/}
+        {/*)}*/}
+
+        {/*{shouldShowPrivacy && (*/}
+        {/*  <HFormGroup title={this.formMetadata.privacy.title}>*/}
+        {/*    <ListInput*/}
+        {/*      vModel={this.settings.platforms.facebook.privacy.value}*/}
+        {/*      metadata={this.formMetadata.privacy}*/}
+        {/*      imageSize={{ width: 24, height: 24 }}*/}
+        {/*      class={styles.privacySelector}*/}
+        {/*    />*/}
+        {/*    {shouldShowPrivacyWarn && (*/}
+        {/*      <div class="input-description">*/}
+        {/*        <Translate*/}
+        {/*          message={$t('FBPrivacyWarning')}*/}
+        {/*          scopedSlots={{*/}
+        {/*            link: (text: string) => (*/}
+        {/*              <a onClick={() => this.openIntegrationSettings()}>{{ text }}</a>*/}
+        {/*            ),*/}
+        {/*          }}*/}
+        {/*        />*/}
+        {/*      </div>*/}
+        {/*    )}*/}
+        {/*  </HFormGroup>*/}
+        {/*)}*/}
+
+        {/*<HFormGroup title={$t('Facebook Game')}>*/}
+        {/*  <GameSelector vModel={this.settings} platform="facebook" />*/}
+        {/*  {shouldShowGamingWarning && (*/}
+        {/*    <p>*/}
+        {/*      <Translate*/}
+        {/*        message={$t('facebookGamingWarning')}*/}
+        {/*        scopedSlots={{*/}
+        {/*          createPageLink: (text: string) => (*/}
+        {/*            <a onClick={() => this.openCreateGamingPage()}>{{ text }}</a>*/}
+        {/*          ),*/}
+        {/*        }}*/}
+        {/*      />*/}
+        {/*    </p>*/}
+        {/*  )}*/}
+        {/*</HFormGroup>*/}
+      </>
     );
   }
 
@@ -203,24 +245,18 @@ export default function FacebookEditStreamInfo(p: IProps) {
     return [
       {
         value: 'me',
-        title: $t('Share to Your Timeline'),
-        data: {
-          image: FacebookService.state.userAvatar,
-        },
+        label: $t('Share to Your Timeline'),
+        image: FacebookService.state.userAvatar,
       },
       {
         value: 'page',
-        title: $t('Share to a Page You Manage'),
-        data: {
-          image: 'https://slobs-cdn.streamlabs.com/media/fb-page.png',
-        },
+        label: $t('Share to a Page You Manage'),
+        image: 'https://slobs-cdn.streamlabs.com/media/fb-page.png',
       },
       {
         value: 'group',
-        title: $t('Share in a Group'),
-        data: {
-          image: 'https://slobs-cdn.streamlabs.com/media/fb-group.png',
-        },
+        label: $t('Share in a Group'),
+        image: 'https://slobs-cdn.streamlabs.com/media/fb-group.png',
       },
     ].filter(opt => {
       if (opt.value === 'me' && !v.canStreamToTimeline) return false;

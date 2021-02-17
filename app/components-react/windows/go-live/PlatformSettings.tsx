@@ -57,41 +57,30 @@ export default function PlatformSettings(p: IProps) {
     });
   }
 
-  /**
-   * Set a game for a single platform
-   **/
-  function setGame(platform: TPlatform, game: string) {
-    const platformSettings = settings.platforms[platform];
-    setPlatformSettings(platform, {
-      ...platformSettings,
-      game,
-    });
-  }
-
   function render() {
     return (
-      <div className="flex">
-        <div style={{ width: '100%' }}>
-          {!hasPlatforms && $t('Enable at least one destination to start streaming')}
+      <div>
+        {!hasPlatforms && $t('Enable at least one destination to start streaming')}
 
-          {v.isLoadingMode && <Spin size="large" />}
-          <GoLiveError />
+        {v.isLoadingMode && <Spin size="large" />}
+        <GoLiveError />
 
-          {v.shouldShowSettings && (
-            <div style={{ width: '100%' }}>
-              {/*COMMON FIELDS*/}
-              {isMultiplePlatformMode && (
+        {v.shouldShowSettings && (
+          <div style={{ width: '100%' }}>
+            {/*COMMON FIELDS*/}
+            {isMultiplePlatformMode && (
+              <Section isSimpleMode={!v.isAdvancedMode} title={$t('Common Stream Settings')}>
                 <CommonPlatformFields
                   settings={settings}
                   setPlatformSettings={setPlatformSettings}
                 />
-              )}
+              </Section>
+            )}
 
-              {/*SETTINGS FOR EACH ENABLED PLATFORM*/}
-              {enabledPlatforms.map((platform: TPlatform) => renderPlatformSettings(platform))}
-            </div>
-          )}
-        </div>
+            {/*SETTINGS FOR EACH ENABLED PLATFORM*/}
+            {enabledPlatforms.map((platform: TPlatform) => renderPlatformSettings(platform))}
+          </div>
+        )}
       </div>
     );
   }
@@ -105,11 +94,7 @@ export default function PlatformSettings(p: IProps) {
     return (
       <Section title={title} isSimpleMode={!v.isAdvancedMode} key={platform}>
         {platform === 'twitch' && (
-          <TwitchEditStreamInfo
-            settings={settings}
-            setPlatformSettings={setPlatformSettings}
-            setGame={setGame}
-          />
+          <TwitchEditStreamInfo settings={settings} setPlatformSettings={setPlatformSettings} />
         )}
         {platform === 'facebook' && (
           <FacebookEditStreamInfo

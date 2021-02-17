@@ -8,15 +8,16 @@ import { FormItemProps } from 'antd/lib/form';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import omit from 'lodash/omit';
 import { $t } from '../../../services/i18n';
+import { pick } from 'lodash';
 /**
  * Shared code for inputs
  */
 
 type TInputType = 'text' | 'textarea' | 'toggle' | 'checkbox' | 'list' | 'tags' | 'switch';
 
-const customProps = ['onInputChange', 'uncontrolled'];
+const customProps = ['uncontrolled'];
 const customWrapperProps = ['nowrap'];
-export interface IInputCustomProps<TValue> {
+export interface IInputCommonProps<TValue> {
   value?: TValue;
   name?: string;
   nowrap?: boolean;
@@ -25,11 +26,28 @@ export interface IInputCustomProps<TValue> {
   required?: boolean;
 }
 
-export type TSlobsInputProps<TInputProps, TValue> = Omit<
-  FormItemProps & TInputProps,
-  keyof IInputCustomProps<TValue>
-> &
-  IInputCustomProps<TValue>;
+// export type TSlobsInputProps<TInputProps, TValue> = Omit<
+//   FormItemProps & TInputProps,
+//   keyof IInputCustomProps<TValue>
+// > &
+//   IInputCustomProps<TValue>;
+
+export type ValuesOf<T extends ReadonlyArray<string>> = T[number];
+
+/**
+ * From T, pick a set of properties whose keys are in the union K
+ */
+type MyPick<T, K extends keyof T> = {
+  [P in K]: T[P];
+};
+
+export type TSlobsInputProps<
+  TCustomProps extends object,
+  TValue,
+  TAntProps = {},
+  TFeatures extends keyof Partial<TAntProps> = never
+> = Pick<TAntProps, TFeatures> & FormItemProps & IInputCommonProps<TValue> & TCustomProps;
+
 /**
  * Base hook for inputs
  * Registers input in the Form to properly handle validations
@@ -47,7 +65,11 @@ export function useInput<
     value?: TValue;
     rules?: FormItemProps['rules'];
   }
->(type: TInputType, inputProps: TInputProps & IInputCustomProps<TValue>) {
+>(
+  type: TInputType,
+  inputProps: TInputProps & IInputCommonProps<TValue>,
+  antFeatures?: readonly string[],
+) {
   const { name, value, label } = inputProps;
 
   // get parent form
@@ -79,23 +101,18 @@ export function useInput<
     rules.push({ required: true, message: $t('The field is required') });
   }
 
-  const commonAttrs = {
-    // omit custom props, because attributes must contain only html props and props from the antd lib
-    ...omit(inputProps, ...customProps),
-    // data attributes are valid html attributes
-    ...dataAttrs,
+  const wrapperAttrs = {
+    ...pick(inputProps, ['className', 'style', 'key', 'label', 'colon']),
+    rules,
+    'data-role': 'input-wrapper',
     name: inputId,
   };
 
-  const wrapperAttrs = {
-    ...omit(commonAttrs, 'onInput', 'onChange'),
-    rules,
-    'data-role': 'input-wrapper',
-  };
-
   const inputAttrs = {
-    ...omit(commonAttrs, ...customWrapperProps),
+    ...(pick(inputProps, antFeatures || []) as {}),
+    ...dataAttrs,
     'data-role': 'input',
+    name: inputId,
   };
 
   return {

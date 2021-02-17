@@ -16,10 +16,21 @@ export function getEnabledPlatforms(settings: IGoLiveSettings): TPlatform[] {
   return platforms.filter(platform => settings.platforms[platform].enabled);
 }
 
-/**
- * Returns true if the component should show only required fields
- */
-export function canShowOnlyRequiredFields(settings: IGoLiveSettings): boolean {
+// /**
+//  * Returns true if the component should show only required fields
+//  */
+// export function canShowOnlyRequiredFields(settings: IGoLiveSettings): boolean {
+//   const enabledPlatforms = getEnabledPlatforms(settings);
+//   return enabledPlatforms.length > 1 && !settings.advancedMode;
+// }
+
+// export function (settings: IGoLiveSettings): boolean {
+//   const enabledPlatforms = getEnabledPlatforms(settings);
+//   return enabledPlatforms.length > 1 && !settings.advancedMode;
+// }
+
+export function isAdvancedMode(settings: IGoLiveSettings): boolean {
   const enabledPlatforms = getEnabledPlatforms(settings);
-  return enabledPlatforms.length > 1 && !settings.advancedMode;
+  return enabledPlatforms.length == 1 || settings.advancedMode;
 }
+

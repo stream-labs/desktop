@@ -1,65 +1,57 @@
-import { Select } from 'antd';
-import React, { useContext, ReactNode } from 'react';
-import { TSlobsInputProps, useInput } from './inputs';
+import { Select, Tag } from 'antd';
+import React, { useContext, ReactNode, useMemo, ReactElement } from 'react';
+import { TSlobsInputProps, useInput, ValuesOf } from './inputs';
 import InputWrapper from './InputWrapper';
-import { SelectProps, OptionProps } from 'antd/lib/select';
-import { omit } from 'lodash';
+import { SelectProps } from 'antd/lib/select';
+import { ICustomListProps, IOption, renderOption } from './ListInput';
+import { TagProps } from 'antd/lib/tag';
+import { keyBy } from 'lodash';
 
-type TTagOption = Omit<OptionProps, 'children'> & {
-  label: string;
-  template?: (opt: TTagOption) => ReactNode;
-};
-type TUnresolvedProps = TSlobsInputProps<SelectProps<string[]>, string[]>;
-type TTagsProps = Omit<TUnresolvedProps, 'defaultValue' | 'options'> & {
-  options: TTagOption[];
-};
+// select which features from the antd lib we are going to use
+const ANT_SELECT_FEATURES = ['showSearch', 'loading'] as const;
 
-export function TagsInput(p: TTagsProps) {
-  // TODO: extract common code for ListInput and TagsInput
+interface ICustomTagsProps extends ICustomListProps {
+  tagRender?: (tagProps: TagProps, tag: IOption) => ReactElement<typeof Tag>;
+}
+
+type TProps = TSlobsInputProps<
+  ICustomTagsProps,
+  string[],
+  SelectProps<string>,
+  ValuesOf<typeof ANT_SELECT_FEATURES>
+>;
+
+export function TagsInput(p: TProps) {
   const { inputAttrs, wrapperAttrs } = useInput('tags', p);
   const options = p.options;
-  const calculatedInputAttrs = omit(inputAttrs, 'options', 'children', 'onInput');
-  const calculatedWrapperAttrs = omit(
-    wrapperAttrs,
-    'showSearch',
-    'loading',
-    'options',
-    'tagRender',
-    'onInput',
-  );
+  const tagsMap = useMemo(() => keyBy(options, 'value'), [options]);
 
   function render() {
     return (
-      <InputWrapper {...calculatedWrapperAttrs}>
+      <InputWrapper {...wrapperAttrs}>
         <Select
+          {...inputAttrs}
           // search by label instead value
           optionFilterProp={'label'}
           mode={'multiple'}
-          {...calculatedInputAttrs}
-          onChange={onChangeHandler}
+          allowClear
+          // convert onSelect into onInput to fit Inputs shape
+          onChange={(val: string[]) => p.onInput && p.onInput(val)}
+          tagRender={renderTag}
         >
-          {options.map((opt, ind) => (
-            <Select.Option {...opt} value={opt.value} key={`${ind}-${opt.value}`}>
-              {(opt.template && opt.template(opt)) || opt.label}
-            </Select.Option>
-          ))}
+          {options && options.map((opt, ind) => renderOption(opt, ind, p))}
         </Select>
       </InputWrapper>
     );
   }
 
-  function onChangeHandler(value: string[], opt: OptionProps) {
-    // convert onChange into onInput to fit Inputs shape
-    p.onChange && p.onChange(value, opt);
-    p.onInput && p.onInput(value);
+  function renderTag(tagProps: TagProps) {
+    const tag = tagsMap[tagProps['value']];
+    if (p.tagRender) {
+      return p.tagRender(tagProps, tag);
+    }
+    return <Tag {...tagProps}>{tag.label}</Tag>;
   }
 
   return render();
-}
-
-function getOptionDataAttrs(p: { label: string; value: string }) {
-  return {
-    'data-option-label': p.label,
-    'data-option-value': p.value,
-  };
 }

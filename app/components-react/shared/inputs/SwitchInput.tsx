@@ -8,7 +8,7 @@ export function SwitchInput(p: TSlobsInputProps<SwitchProps, boolean>) {
   const { wrapperAttrs } = useInput('switch', p);
   return (
     <InputWrapper {...wrapperAttrs}>
-      <Switch checked={p.value} size="small" />
+      <Switch checked={p.value} size="small" onChange={() => p.onInput && p.onInput(!p.value)} />
     </InputWrapper>
   );
 }

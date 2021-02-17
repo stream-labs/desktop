@@ -1,13 +1,14 @@
 import React from 'react';
 import { Input } from 'antd';
-import { TSlobsInputProps, useTextInput } from './inputs';
+import { TSlobsInputProps, useTextInput, ValuesOf } from './inputs';
 import InputWrapper from './InputWrapper';
 import { TextAreaProps } from 'antd/lib/input';
 
-type CombinedProps = TSlobsInputProps<TextAreaProps, string>;
-type InputProps = Omit<CombinedProps, 'onPressEnter'>;
+const ANT_SELECT_FEATURES = ['disabled'] as const;
 
-export function TextAreaInput(p: TSlobsInputProps<InputProps, string>) {
+export function TextAreaInput(
+  p: TSlobsInputProps<{}, string, TextAreaProps, ValuesOf<typeof ANT_SELECT_FEATURES>>,
+) {
   const { inputAttrs, wrapperAttrs } = useTextInput(p);
   return (
     <InputWrapper {...wrapperAttrs}>

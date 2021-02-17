@@ -4,7 +4,7 @@ import { TSlobsInputProps, useTextInput } from './inputs';
 import InputWrapper from './InputWrapper';
 import { InputProps } from 'antd/lib/input';
 
-export function TextInput(p: TSlobsInputProps<InputProps, string>) {
+export function TextInput(p: TSlobsInputProps<{}, string, InputProps>) {
   const { inputAttrs, wrapperAttrs } = useTextInput(p);
   return (
     <InputWrapper {...wrapperAttrs}>

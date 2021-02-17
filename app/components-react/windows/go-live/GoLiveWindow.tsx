@@ -70,6 +70,11 @@ export default function GoLiveWindow() {
     });
   }
 
+  // a shortcut for partially settings update
+  function updateSettings(patch: Partial<IGoLiveSettings>) {
+    setSettings({ ...settings, ...patch });
+  }
+
   function goLive() {
     StreamingService.actions.goLive(settings);
   }
@@ -83,6 +88,9 @@ export default function GoLiveWindow() {
   }
 
   function switchAdvancedMode(enabled: boolean) {
+    // update the local value
+    updateSettings({ advancedMode: enabled });
+    // save it globally
     StreamSettingsService.setGoLiveSettings({ advancedMode: enabled });
   }
 
@@ -113,7 +121,7 @@ export default function GoLiveWindow() {
 
   function renderFooter() {
     return (
-      <>
+      <ContextForm layout={'inline'}>
         <SwitchInput
           label={$t('Show Advanced Settings')}
           name="advancedMode"
@@ -135,7 +143,7 @@ export default function GoLiveWindow() {
             {$t('Confirm & Go Live')}
           </Button>
         )}
-      </>
+      </ContextForm>
     );
   }
 

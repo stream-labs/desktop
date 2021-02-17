@@ -10,7 +10,7 @@ import { DestinationSwitchers } from './DestinationSwitchers';
 import { TPlatform } from '../../../services/platforms';
 import { $t } from '../../../services/i18n';
 import GoLiveError from './GoLiveError';
-import { Spin } from 'antd';
+import { Spin, Row, Col } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 
 const PlusIcon = PlusOutlined as Function;
@@ -80,10 +80,10 @@ export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>
 
   console.log('GoLiveSettings isLoading', v.isLoadingMode);
   return (
-    <div className={cx('flex', styles.goLiveSettings, p.className)}>
+    <Row gutter={16} style={{ height: 'calc(100% + 24px)' }}>
       {/*LEFT COLUMN*/}
       {v.shouldShowLeftCol && (
-        <div style={{ width: '400px', marginRight: '42px' }}>
+        <Col span={8}>
           {/*DESTINATION SWITCHERS*/}
           <DestinationSwitchers
             platforms={settings.platforms}
@@ -101,35 +101,38 @@ export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>
               {v.shouldShowPrimeLabel && <b className={styles.prime}>prime</b>}
             </a>
           )}
-        </div>
+        </Col>
       )}
+
       {/*RIGHT COLUMN*/}
-      <div style={{ width: '100%' }}>
-        {v.isLoadingMode && <Spin size="large" />}
-        <GoLiveError />
+      <Col span={16} style={{ height: '100%' }}>
+        <Scrollable style={{ maxHeight: '100%' }} snapToWindowEdge>
+          {v.isLoadingMode && <Spin size="large" />}
+          <GoLiveError />
 
-        {v.shouldShowSettings && (
-          <Scrollable className={styles.settingsContainer}>
-            {/*PLATFORM SETTINGS*/}
-            <PlatformSettings settings={settings} setSettings={setSettings} />
+          {v.shouldShowSettings && (
+            <>
+              {/*PLATFORM SETTINGS*/}
+              <PlatformSettings settings={settings} setSettings={setSettings} />
 
-            {/*ADD SOME SPACE*/}
-            {!v.isAdvancedMode && <div className={styles.spacer} />}
+              {/*ADD SOME SPACE*/}
+              {!v.isAdvancedMode && <div className={styles.spacer} />}
 
-            {/*/!*EXTRAS*!/*/}
-            {/*<Section title={isAdvancedMode ? $t('Extras') : ''}>*/}
-            {/*  <Twitter*/}
-            {/*    vModel={this.settings.tweetText}*/}
-            {/*    streamTitle={this.view.getCommonFields(this.settings).title}*/}
-            {/*  />*/}
-            {/*  <OptimizedProfileSwitcher*/}
-            {/*    vModel={this.settings.optimizedProfile}*/}
-            {/*    settings={this.settings}*/}
-            {/*  />*/}
-            {/*</Section>*/}
-          </Scrollable>
-        )}
-      </div>
-    </div>
+              {/*/!*EXTRAS*!/*/}
+              {/*<Section title={isAdvancedMode ? $t('Extras') : ''}>*/}
+              {/*  <Twitter*/}
+              {/*    vModel={this.settings.tweetText}*/}
+              {/*    streamTitle={this.view.getCommonFields(this.settings).title}*/}
+              {/*  />*/}
+              {/*  <OptimizedProfileSwitcher*/}
+              {/*    vModel={this.settings.optimizedProfile}*/}
+              {/*    settings={this.settings}*/}
+              {/*  />*/}
+              {/*</Section>*/}
+            </>
+          )}
+        </Scrollable>
+      </Col>
+    </Row>
   );
 }

@@ -1,5 +1,5 @@
 import { IGoLiveSettings, IStreamSettings } from '../../../../../services/streaming';
-import { canShowOnlyRequiredFields, TSetPlatformSettingsFn } from '../../go-live';
+import { isAdvancedMode, TSetPlatformSettingsFn } from '../../go-live';
 import { TPlatform } from '../../../../../services/platforms';
 import FormSection from '../../../../shared/inputs/FormSection';
 import CommonPlatformFields from '../../CommonPlatformFields';
@@ -12,6 +12,8 @@ import { createVModel } from '../../../../shared/inputs/inputs';
 import BroadcastInput from './BroadcastInput';
 import { useAsyncState, useOnCreate } from '../../../../hooks';
 import InputWrapper from '../../../../shared/inputs/InputWrapper';
+import { TwitchTagsInput } from '../TwitchTagsInput';
+import GameSelector from '../../GameSelector';
 
 interface IProps {
   settings: IGoLiveSettings;
@@ -27,7 +29,7 @@ export function YoutubeEditStreamInfo(p: IProps) {
   const { StreamingService, YoutubeService } = Services;
   const view = StreamingService.views;
   const ytSettings = settings.platforms.youtube;
-  const shouldShowOptionalFields = !canShowOnlyRequiredFields(settings);
+  const isAdvanced = isAdvancedMode(settings);
   const isUpdate = view.isMidStreamMode;
   const is360video = ytSettings.projection === '360';
   const shouldShowSafeForKidsWarn = ytSettings.selfDeclaredMadeForKids;
@@ -58,112 +60,130 @@ export function YoutubeEditStreamInfo(p: IProps) {
     // return !this.youtubeService.updatableSettings.includes(fieldName);
   }
 
-  return (
-    <FormSection name="youtube-settings">
-      {!p.isScheduleMode && (
-        <BroadcastInput
-          label={$t('Event')}
-          loading={s.broadcastLoading}
-          broadcasts={s.broadcasts}
-          disabled={view.isMidStreamMode}
+  function render() {
+    return (
+      <FormSection name="youtube-settings">
+        {isAdvanced
+          ? [renderOptionalFields(), renderCommonFields()]
+          : [renderCommonFields(), renderOptionalFields()]}
+      </FormSection>
+    );
+  }
+
+  function renderCommonFields() {
+    return <CommonPlatformFields key="common" {...p} platform="youtube" />;
+  }
+
+  function renderOptionalFields() {
+    return (
+      <div key="optional">
+        {!p.isScheduleMode && (
+          <BroadcastInput
+            label={$t('Event')}
+            loading={s.broadcastLoading}
+            broadcasts={s.broadcasts}
+            disabled={view.isMidStreamMode}
+          />
+        )}
+        <CommonPlatformFields
+          settings={settings}
+          setPlatformSettings={setPlatformSettings}
+          platform={'youtube'}
         />
-      )}
-      <CommonPlatformFields
-        settings={settings}
-        setPlatformSettings={setPlatformSettings}
-        platform={'youtube'}
-      />
-      <ListInput
-        {...vModel('privacyStatus')}
-        label={$t('Privacy')}
-        options={[
-          {
-            value: 'public',
-            label: $t('Public'),
-            description: $t('Anyone can search for and view'),
-          },
-          {
-            value: 'unlisted',
-            label: $t('Unlisted'),
-            description: $t('Anyone with the link can view'),
-          },
-          { value: 'private', title: $t('Private'), description: $t('Only you can view') },
-        ]}
-      />
-      <ListInput
-        {...vModel('categoryId')}
-        label={$t('Category')}
-        showSearch
-        options={YoutubeService.state.categories.map(category => ({
-          value: category.id,
-          title: category.snippet.title,
-        }))}
-      />
-      {/*<HFormGroup title={this.formMetadata.thumbnail.title}>*/}
-      {/*  <FormInput*/}
-      {/*    metadata={this.formMetadata.thumbnail}*/}
-      {/*    vModel={this.settings.platforms.youtube.thumbnail}*/}
-      {/*  />*/}
-      {/*  <div class="input-description">*/}
-      {/*    <a onclick={() => this.openThumbnailsEditor()}>{$t('Try our new thumbnail editor')}</a>*/}
-      {/*  </div>*/}
-      {/*</HFormGroup>*/}
+        <ListInput
+          {...vModel('privacyStatus')}
+          label={$t('Privacy')}
+          options={[
+            {
+              value: 'public',
+              label: $t('Public'),
+              description: $t('Anyone can search for and view'),
+            },
+            {
+              value: 'unlisted',
+              label: $t('Unlisted'),
+              description: $t('Anyone with the link can view'),
+            },
+            { value: 'private', label: $t('Private'), description: $t('Only you can view') },
+          ]}
+        />
+        <ListInput
+          {...vModel('categoryId')}
+          label={$t('Category')}
+          showSearch
+          options={YoutubeService.state.categories.map(category => ({
+            value: category.id,
+            label: category.snippet.title,
+          }))}
+        />
+        {/*<HFormGroup title={this.formMetadata.thumbnail.title}>*/}
+        {/*  <FormInput*/}
+        {/*    metadata={this.formMetadata.thumbnail}*/}
+        {/*    vModel={this.settings.platforms.youtube.thumbnail}*/}
+        {/*  />*/}
+        {/*  <div class="input-description">*/}
+        {/*    <a onclick={() => this.openThumbnailsEditor()}>{$t('Try our new thumbnail editor')}</a>*/}
+        {/*  </div>*/}
+        {/*</HFormGroup>*/}
 
-      {/* TODO: add description */}
-      <ListInput
-        label={$t('Stream Latency')}
-        tooltip={$t('latencyTooltip')}
-        options={[
-          { value: 'normal', label: $t('Normal Latency') },
-          { value: 'low', label: $t('Low-latency') },
-          {
-            value: 'ultraLow',
-            label: $t('Ultra low-latency'),
-          },
-        ]}
-        {...vModel('latencyPreference')}
-      />
+        {/* TODO: add description */}
+        <ListInput
+          label={$t('Stream Latency')}
+          tooltip={$t('latencyTooltip')}
+          options={[
+            { value: 'normal', label: $t('Normal Latency') },
+            { value: 'low', label: $t('Low-latency') },
+            {
+              value: 'ultraLow',
+              label: $t('Ultra low-latency'),
+            },
+          ]}
+          {...vModel('latencyPreference')}
+        />
 
-      <InputWrapper label={$t('Additional Settings')}>
-        {!isScheduleMode && (
-          <CheckboxInput
-            {...vModel('enableAutoStart')}
-            label={$t('Enable Auto-start')}
-            tooltip={$t(
-              'Enabling auto-start will automatically start the stream when you start sending data from your streaming software',
-            )}
-          />
-        )}
-        {!isScheduleMode && (
-          <CheckboxInput
-            {...vModel('enableAutoStop')}
-            label={$t('Enable Auto-stop')}
-            tooltip={$t(
-              'Enabling auto-stop will automatically stop the stream when you stop sending data from your streaming software',
-            )}
-          />
-        )}
-        <CheckboxInput
-          {...vModel('enableDvr')}
-          label={$t('Enable DVR')}
-          tooltip={$t(
-            'DVR controls enable the viewer to control the video playback experience by pausing, rewinding, or fast forwarding content',
+        <InputWrapper label={$t('Additional Settings')}>
+          {!isScheduleMode && (
+            <CheckboxInput
+              {...vModel('enableAutoStart')}
+              label={$t('Enable Auto-start')}
+              tooltip={$t(
+                'Enabling auto-start will automatically start the stream when you start sending data from your streaming software',
+              )}
+            />
           )}
-        />
-        {/*<CheckboxInput*/}
-        {/*  metadata={this.formMetadata.projection}*/}
-        {/*  value={is360video}*/}
-        {/*  onInput={(val: boolean) => this.onProjectionChangeHandler(val)}*/}
-        {/*/>*/}
-        <CheckboxInput label={$t('Made for kids')} {...vModel('selfDeclaredMadeForKids')} />
-        {shouldShowSafeForKidsWarn && (
-          <p>
-            {$t(
-              "Features like personalized ads and live chat won't be available on live streams made for kids.",
+          {!isScheduleMode && (
+            <CheckboxInput
+              {...vModel('enableAutoStop')}
+              label={$t('Enable Auto-stop')}
+              tooltip={$t(
+                'Enabling auto-stop will automatically stop the stream when you stop sending data from your streaming software',
+              )}
+            />
+          )}
+          <CheckboxInput
+            {...vModel('enableDvr')}
+            label={$t('Enable DVR')}
+            tooltip={$t(
+              'DVR controls enable the viewer to control the video playback experience by pausing, rewinding, or fast forwarding content',
             )}
-          </p>
-        )}
-      </InputWrapper>
-    </FormSection>
-  );
+          />
+          {/*<CheckboxInput*/}
+          {/*  metadata={this.formMetadata.projection}*/}
+          {/*  value={is360video}*/}
+          {/*  onInput={(val: boolean) => this.onProjectionChangeHandler(val)}*/}
+          {/*/>*/}
+          <CheckboxInput label={$t('Made for kids')} {...vModel('selfDeclaredMadeForKids')} />
+          {shouldShowSafeForKidsWarn && (
+            <p>
+              {$t(
+                "Features like personalized ads and live chat won't be available on live streams made for kids.",
+              )}
+            </p>
+          )}
+        </InputWrapper>
+      </div>
+    );
+  }
+
+  return render();
 }

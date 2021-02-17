@@ -3,7 +3,7 @@ import React from 'react';
 import { TSlobsInputProps, useInput } from './inputs';
 import { CheckboxProps } from 'antd/lib/checkbox';
 
-export function CheckboxInput(p: TSlobsInputProps<CheckboxProps, boolean>) {
+export function CheckboxInput(p: TSlobsInputProps<{}, boolean, CheckboxProps>) {
   const { inputAttrs } = useInput('checkbox', p);
   return (
     <div>
