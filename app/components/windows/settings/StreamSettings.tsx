@@ -37,7 +37,6 @@ export default class StreamSettings extends TsxComponent {
     customDestForm: ValidatedForm;
   };
 
-  private obsSettings = this.streamSettingsService.views.obsStreamSettings;
   private customDestModel: ICustomStreamDestination = {
     name: '',
     url: '',
@@ -54,11 +53,14 @@ export default class StreamSettings extends TsxComponent {
 
   saveObsSettings(obsSettings: ISettingsSubCategory[]) {
     this.streamSettingsService.setObsStreamSettings(obsSettings);
-    this.obsSettings = this.streamSettingsService.views.obsStreamSettings;
+  }
+
+  get obsSettings() {
+    return this.streamSettingsService.views.obsStreamSettings;
   }
 
   disableProtectedMode() {
-    this.streamSettingsService.setSettings({ protectedModeEnabled: false });
+    this.streamSettingsService.actions.setSettings({ protectedModeEnabled: false });
   }
 
   private enableProtectedMode() {
