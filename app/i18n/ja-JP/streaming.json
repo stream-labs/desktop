@@ -43,6 +43,7 @@
   "Refresh Chat": "チャットを更新",
   "Your chat is currently offline": "チャットは現在オフラインです",
   "Set path in Settings > Output.": "[設定] > [出力] でパスを設定します。",
+  "Open Performance Window": "Open Performance Window",
   "Start Replay Buffer": "リプレイバッファーを開始",
   "Stop Replay Buffer": "リプレイバッファーを停止",
   "Stopping...": "停止しています...",
