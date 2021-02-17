@@ -43,6 +43,7 @@
   "Refresh Chat": "Opdater chat",
   "Your chat is currently offline": "Din chat er i øjeblikket offline",
   "Set path in Settings > Output.": "Stien kan angives i Indstillinger > Output.",
+  "Open Performance Window": "Open Performance Window",
   "Start Replay Buffer": "Start replay-buffer",
   "Stop Replay Buffer": "Stop replay-buffer",
   "Stopping...": "Stopper ...",
