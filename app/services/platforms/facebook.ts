@@ -56,6 +56,8 @@ interface IFacebookServiceState extends IPlatformState {
   userAvatar: string;
 }
 
+export type TFacebookStreamPrivacy = 'SELF' | 'ALL_FRIENDS' | 'EVERYONE' | '';
+
 export interface IFacebookStartStreamOptions {
   title: string;
   game?: string;
@@ -64,7 +66,7 @@ export interface IFacebookStartStreamOptions {
   groupId?: string;
   description?: string;
   liveVideoId?: string;
-  privacy?: { value: 'SELF' | 'ALL_FRIENDS' | 'EVERYONE' | '' };
+  privacy?: { value: TFacebookStreamPrivacy };
 }
 
 export type TDestinationType = 'me' | 'page' | 'group' | '';

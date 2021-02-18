@@ -44,15 +44,15 @@ export default function PlatformSettings(p: IProps) {
   /**
    * Update settings of a single platform
    **/
-  function setPlatformSettings<T extends TPlatform>(
+  function updatePlatformSettings<T extends TPlatform>(
     platform: T,
-    newPlatformSettings: IGoLiveSettings['platforms'][T],
+    settingsPatch: Partial<IGoLiveSettings['platforms'][T]>,
   ) {
     setSettings({
       ...settings,
       platforms: {
         ...settings.platforms,
-        [platform]: newPlatformSettings,
+        [platform]: { ...settings.platforms[platform], ...settingsPatch },
       },
     });
   }
@@ -72,7 +72,7 @@ export default function PlatformSettings(p: IProps) {
               <Section isSimpleMode={!v.isAdvancedMode} title={$t('Common Stream Settings')}>
                 <CommonPlatformFields
                   settings={settings}
-                  setPlatformSettings={setPlatformSettings}
+                  updatePlatformSettings={updatePlatformSettings}
                 />
               </Section>
             )}
@@ -94,12 +94,15 @@ export default function PlatformSettings(p: IProps) {
     return (
       <Section title={title} isSimpleMode={!v.isAdvancedMode} key={platform}>
         {platform === 'twitch' && (
-          <TwitchEditStreamInfo settings={settings} setPlatformSettings={setPlatformSettings} />
+          <TwitchEditStreamInfo
+            settings={settings}
+            updatePlatformSettings={updatePlatformSettings}
+          />
         )}
         {platform === 'facebook' && (
           <FacebookEditStreamInfo
             settings={settings}
-            setPlatformSettings={setPlatformSettings}
+            updatePlatformSettings={updatePlatformSettings}
             isUpdateMode={v.isLive}
             isScheduleMode={p.isScheduleMode}
           />
@@ -107,7 +110,7 @@ export default function PlatformSettings(p: IProps) {
         {platform === 'youtube' && (
           <YoutubeEditStreamInfo
             settings={settings}
-            setPlatformSettings={setPlatformSettings}
+            updatePlatformSettings={updatePlatformSettings}
             isScheduleMode={p.isScheduleMode}
           />
         )}

@@ -7,7 +7,7 @@ import { prepareOptions, TTwitchTag } from '../../../../services/platforms/twitc
 import { ITwitchStartStreamOptions } from '../../../../services/platforms/twitch';
 import React from 'react';
 import { keyBy, omit } from 'lodash';
-import { IOption } from '../../../shared/inputs/ListInput';
+import { IListOption } from '../../../shared/inputs/ListInput';
 import { Row, Col, Tag } from 'antd';
 
 type TTwitchTagsInputProps = TSlobsInputProps<{}, TTwitchTag[]>;

@@ -7,7 +7,7 @@ import { IYoutubeLiveBroadcast } from '../../../../../services/platforms/youtube
 import { ListInput, IInputCommonProps } from '../../../../shared/inputs';
 import { FormItemProps } from 'antd/lib/form';
 import { SelectProps } from 'antd/lib/select';
-import { IOption } from '../../../../shared/inputs/ListInput';
+import { IListOption } from '../../../../shared/inputs/ListInput';
 
 /**
  * Broadcast-selector for Youtube
@@ -24,7 +24,7 @@ export default function BroadcastInput(
     return moment(new Date(isoDate)).format(moment.localeData().longDateFormat('ll'));
   }
 
-  function optionRender(opt: IOption) {
+  function optionRender(opt: IListOption) {
     return (
       <>
         <div className={css.colImage}>

@@ -1,5 +1,5 @@
 import { IGoLiveSettings, IStreamSettings } from '../../../../../services/streaming';
-import { isAdvancedMode, TSetPlatformSettingsFn } from '../../go-live';
+import { isAdvancedMode, TUpdatePlatformSettingsFn } from '../../go-live';
 import { TPlatform } from '../../../../../services/platforms';
 import FormSection from '../../../../shared/inputs/FormSection';
 import CommonPlatformFields from '../../CommonPlatformFields';
@@ -17,25 +17,25 @@ import GameSelector from '../../GameSelector';
 
 interface IProps {
   settings: IGoLiveSettings;
-  setPlatformSettings: TSetPlatformSettingsFn;
+  updatePlatformSettings: TUpdatePlatformSettingsFn;
   isScheduleMode?: boolean;
+  isUpdateMode?: boolean;
 }
 
 /***
  * Stream Settings for YT
  */
 export function YoutubeEditStreamInfo(p: IProps) {
-  const { settings, setPlatformSettings, isScheduleMode } = p;
+  const { settings, updatePlatformSettings, isScheduleMode, isUpdateMode } = p;
   const { StreamingService, YoutubeService } = Services;
   const view = StreamingService.views;
   const ytSettings = settings.platforms.youtube;
   const isAdvanced = isAdvancedMode(settings);
-  const isUpdate = view.isMidStreamMode;
   const is360video = ytSettings.projection === '360';
   const shouldShowSafeForKidsWarn = ytSettings.selfDeclaredMadeForKids;
   const vModel = createVModel(
     ytSettings,
-    newYtSettings => setPlatformSettings('youtube', newYtSettings),
+    newYtSettings => updatePlatformSettings('youtube', newYtSettings),
     fieldName => ({ disabled: fieldIsDisabled(fieldName) }),
   );
 
@@ -58,6 +58,10 @@ export function YoutubeEditStreamInfo(p: IProps) {
     //
     // if (!this.view.isMidStreamMode) return false;
     // return !this.youtubeService.updatableSettings.includes(fieldName);
+  }
+
+  function projectionChangeHandler(enable360: boolean) {
+    updatePlatformSettings('youtube', { projection: enable360 ? '360' : 'rectangular' });
   }
 
   function render() {
@@ -85,11 +89,6 @@ export function YoutubeEditStreamInfo(p: IProps) {
             disabled={view.isMidStreamMode}
           />
         )}
-        <CommonPlatformFields
-          settings={settings}
-          setPlatformSettings={setPlatformSettings}
-          platform={'youtube'}
-        />
         <ListInput
           {...vModel('privacyStatus')}
           label={$t('Privacy')}
@@ -167,11 +166,11 @@ export function YoutubeEditStreamInfo(p: IProps) {
               'DVR controls enable the viewer to control the video playback experience by pausing, rewinding, or fast forwarding content',
             )}
           />
-          {/*<CheckboxInput*/}
-          {/*  metadata={this.formMetadata.projection}*/}
-          {/*  value={is360video}*/}
-          {/*  onInput={(val: boolean) => this.onProjectionChangeHandler(val)}*/}
-          {/*/>*/}
+          <CheckboxInput
+            label={$t('360° video')}
+            value={is360video}
+            onInput={projectionChangeHandler}
+          />
           <CheckboxInput label={$t('Made for kids')} {...vModel('selfDeclaredMadeForKids')} />
           {shouldShowSafeForKidsWarn && (
             <p>

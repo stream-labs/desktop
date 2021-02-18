@@ -18,15 +18,15 @@ import { $t } from '../../../services/i18n';
 import { useOnCreate, useAsyncState, useStateActions, useDebounce } from '../../hooks';
 import { Services } from '../../service-provider';
 import { debounce } from 'lodash';
-import { IOption } from '../../shared/inputs/ListInput';
+import { IListOption } from '../../shared/inputs/ListInput';
 import { TSetPlatformSettingsFn } from './go-live';
 
 type TState = {
-  games: IOption[];
+  games: IListOption[];
   loading: boolean;
 };
 
-type TProps = TSlobsInputProps<{ platform: string }, string>;
+type TProps = TSlobsInputProps<{ platform: TPlatform }, string>;
 
 export default function GameSelector(p: TProps) {
   const { platform } = p;
@@ -36,7 +36,7 @@ export default function GameSelector(p: TProps) {
 
   const { s, updateState } = useStateActions<TState>(() => {
     return {
-      games: selectedGame ? [{ label: selectedGame, value: selectedGame }] : ([] as IOption[]),
+      games: selectedGame ? [{ label: selectedGame, value: selectedGame }] : ([] as IListOption[]),
       loading: false,
     };
   });
@@ -73,9 +73,10 @@ export default function GameSelector(p: TProps) {
 
   return (
     <ListInput
-      label={$t('Twitch Game')}
+      label={platform === 'twitch' ? $t('Twitch Game') : $t('Facebook Game')}
       name={`${p.platform}Game`}
       value={selectedGame}
+      extra={p.extra}
       onInput={p.onInput}
       placeholder={$t('Start typing to search')}
       options={s.games}

@@ -102,7 +102,8 @@ export function useInput<
   }
 
   const wrapperAttrs = {
-    ...pick(inputProps, ['className', 'style', 'key', 'label', 'colon']),
+    // pick used features of Form.Item
+    ...pick(inputProps, ['className', 'style', 'key', 'label', 'colon', 'extra']),
     rules,
     'data-role': 'input-wrapper',
     name: inputId,

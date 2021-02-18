@@ -6,9 +6,15 @@ export interface IGoLiveProps {
   setSettings: (newSettings: IGoLiveSettings) => unknown;
 }
 
+// TODO: remove
 export type TSetPlatformSettingsFn = <T extends TPlatform>(
   platform: T,
   newPlatformSettings: IGoLiveSettings['platforms'][T],
+) => unknown;
+
+export type TUpdatePlatformSettingsFn = <T extends TPlatform>(
+  platform: T,
+  patch: Partial<IGoLiveSettings['platforms'][T]>,
 ) => unknown;
 
 export function getEnabledPlatforms(settings: IGoLiveSettings): TPlatform[] {

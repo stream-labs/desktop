@@ -9,18 +9,19 @@ const ANT_SELECT_FEATURES = [
   'showSearch',
   'loading',
   'placeholder',
-  'onSearch',
   'notFoundContent',
   'onDropdownVisibleChange',
+  'onSearch',
+  'onSelect',
 ] as const;
 
 // define custom props
 export interface ICustomListProps {
   hasImage?: boolean;
   imageSize?: { width: number; height: number };
-  optionRender?: (opt: IOption) => ReactNode;
-  labelRender?: (opt: IOption) => ReactNode;
-  options: IOption[];
+  optionRender?: (opt: IListOption) => ReactNode;
+  labelRender?: (opt: IListOption) => ReactNode;
+  options: IListOption[];
 }
 
 // define a type for the component's props
@@ -34,7 +35,7 @@ type TProps = TSlobsInputProps<
 /**
  * data for a single option
  */
-export interface IOption {
+export interface IListOption {
   label: string;
   value: string;
   description?: string; // TODO
@@ -65,7 +66,7 @@ export function ListInput(p: TProps) {
   return render();
 }
 
-export function renderOption(opt: IOption, ind: number, inputProps: ICustomListProps) {
+export function renderOption(opt: IListOption, ind: number, inputProps: ICustomListProps) {
   const attrs = {
     'data-option-label': opt.label,
     'data-option-value': opt.value,
@@ -101,7 +102,7 @@ export function renderOption(opt: IOption, ind: number, inputProps: ICustomListP
   );
 }
 
-function renderOptionWithImage(opt: IOption, inputProps: ICustomListProps) {
+function renderOptionWithImage(opt: IListOption, inputProps: ICustomListProps) {
   const src = opt.image;
   const { width, height } = inputProps.imageSize ? inputProps.imageSize : { width: 15, height: 15 };
   const imageStyle = {
@@ -119,7 +120,7 @@ function renderOptionWithImage(opt: IOption, inputProps: ICustomListProps) {
   );
 }
 
-function renderLabelWithImage(opt: IOption) {
+function renderLabelWithImage(opt: IListOption) {
   const src = opt.image;
   const [width, height] = [15, 15];
   const imageStyle = {

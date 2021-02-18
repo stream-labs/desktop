@@ -1,4 +1,4 @@
-import { isAdvancedMode, TSetPlatformSettingsFn } from '../go-live';
+import { isAdvancedMode, TUpdatePlatformSettingsFn } from '../go-live';
 import FormSection from '../../../shared/inputs/FormSection';
 import CommonPlatformFields from '../CommonPlatformFields';
 import React from 'react';
@@ -10,15 +10,15 @@ import GameSelector from '../GameSelector';
 
 interface IProps {
   settings: IGoLiveSettings;
-  setPlatformSettings: TSetPlatformSettingsFn;
+  updatePlatformSettings: TUpdatePlatformSettingsFn;
 }
 
 export function TwitchEditStreamInfo(p: IProps) {
-  const { settings, setPlatformSettings } = p;
+  const { settings, updatePlatformSettings } = p;
   const twSettings = settings.platforms.twitch;
   const isAdvanced = isAdvancedMode(p.settings);
   const vModel = createVModel(twSettings, newTwSettings =>
-    setPlatformSettings('twitch', newTwSettings),
+    updatePlatformSettings('twitch', newTwSettings),
   );
 
   function render() {
@@ -32,15 +32,15 @@ export function TwitchEditStreamInfo(p: IProps) {
   }
 
   function renderCommonFields() {
-    return <CommonPlatformFields {...p} platform="twitch" />;
+    return <CommonPlatformFields key="common" {...p} platform="twitch" />;
   }
 
   function renderRequiredFields() {
-    return <TwitchTagsInput label={$t('Twitch Tags')} {...vModel('tags')} />;
+    return <TwitchTagsInput key="required" label={$t('Twitch Tags')} {...vModel('tags')} />;
   }
 
   function renderOptionalFields() {
-    return <GameSelector platform={'twitch'} {...vModel('game')} />;
+    return <GameSelector key="optional" platform={'twitch'} {...vModel('game')} />;
   }
 
   return render();

@@ -7,7 +7,7 @@ import { $t } from '../../../services/i18n';
 import { Form } from 'antd';
 import React, { useState } from 'react';
 import { CheckboxInput, TextAreaInput, TextInput } from '../../shared/inputs';
-import { IGoLiveProps, getEnabledPlatforms, TSetPlatformSettingsFn } from './go-live';
+import { IGoLiveProps, getEnabledPlatforms, TUpdatePlatformSettingsFn } from './go-live';
 import Utils from '../../../services/utils';
 import { assertIsDefined } from '../../../util/properties-type-guards';
 import InputWrapper from '../../shared/inputs/InputWrapper';
@@ -20,7 +20,7 @@ interface IProps {
    */
   platform?: TPlatform;
   settings: IGoLiveSettings;
-  setPlatformSettings: TSetPlatformSettingsFn;
+  updatePlatformSettings: TUpdatePlatformSettingsFn;
 }
 
 type TCustomFieldName = 'title' | 'description';
@@ -31,7 +31,7 @@ type TCustomFieldName = 'title' | 'description';
  * otherwise it changes props for all enabled platforms
  */
 export default function CommonPlatformFields(p: IProps) {
-  const { settings, setPlatformSettings } = p;
+  const { settings, updatePlatformSettings } = p;
   const { StreamingService } = Services;
   const view = StreamingService.views;
   const targetPlatforms = getTargetPlatforms(p);
@@ -46,16 +46,12 @@ export default function CommonPlatformFields(p: IProps) {
   );
 
   /**
-   * Update a selected field for all target platforms
+   * Update the selected field for all target platforms
    **/
   function updateCommonField(fieldName: TCustomFieldName, value: string) {
     setCommonFields({ ...commonFields, [fieldName]: value });
     targetPlatforms.forEach(platform => {
-      const platformSettings = settings.platforms[platform];
-      setPlatformSettings(platform, {
-        ...platformSettings,
-        ...commonFields,
-      });
+      updatePlatformSettings(platform, commonFields);
     });
   }
 
@@ -67,13 +63,9 @@ export default function CommonPlatformFields(p: IProps) {
     const platform = p.platform;
     assertIsDefined(platform);
 
-    // set new platforms settings
+    // update platforms settings
     const platformSettings = settings.platforms[platform];
-    const newPlatformSettings = {
-      ...platformSettings,
-      useCustomFields: !platformSettings.useCustomFields,
-    };
-    setPlatformSettings(platform, newPlatformSettings);
+    updatePlatformSettings(platform, { useCustomFields: !platformSettings.useCustomFields });
   }
 
   const isSinglePlatformMode = !!p.platform;
@@ -114,6 +106,7 @@ export default function CommonPlatformFields(p: IProps) {
               onInput={val => updateCommonField('title', val)}
               label={$t('Title')}
               required={true}
+              // TODO:
               // max: this.props.platform === 'twitch' ? 140 : 120,
             />
 

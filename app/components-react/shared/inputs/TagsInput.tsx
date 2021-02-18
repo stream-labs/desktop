@@ -3,7 +3,7 @@ import React, { useContext, ReactNode, useMemo, ReactElement } from 'react';
 import { TSlobsInputProps, useInput, ValuesOf } from './inputs';
 import InputWrapper from './InputWrapper';
 import { SelectProps } from 'antd/lib/select';
-import { ICustomListProps, IOption, renderOption } from './ListInput';
+import { ICustomListProps, IListOption, renderOption } from './ListInput';
 import { TagProps } from 'antd/lib/tag';
 import { keyBy } from 'lodash';
 
@@ -11,7 +11,7 @@ import { keyBy } from 'lodash';
 const ANT_SELECT_FEATURES = ['showSearch', 'loading'] as const;
 
 interface ICustomTagsProps extends ICustomListProps {
-  tagRender?: (tagProps: TagProps, tag: IOption) => ReactElement<typeof Tag>;
+  tagRender?: (tagProps: TagProps, tag: IListOption) => ReactElement<typeof Tag>;
 }
 
 type TProps = TSlobsInputProps<

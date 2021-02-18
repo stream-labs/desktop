@@ -104,6 +104,7 @@ export default function GoLiveWindow() {
           name="editStreamForm"
         >
           <Animation transitionName="slideright">
+            {/* STEP 1 - FILL OUT THE SETTINGS FORM */}
             {v.shouldShowSettings && (
               <GoLiveSettings
                 key={'settings'}
@@ -112,6 +113,8 @@ export default function GoLiveWindow() {
                 setSettings={setSettings}
               />
             )}
+
+            {/* STEP 2 - RUN THE CHECKLIST */}
             {v.shouldShowChecklist && <GoLiveChecklist className={styles.page} key={'checklist'} />}
           </Animation>
         </ContextForm>

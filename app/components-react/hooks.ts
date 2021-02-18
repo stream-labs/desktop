@@ -85,6 +85,7 @@ type TStateActions<StateType> = {
   ) => unknown;
 };
 
+// safe for async/await
 export function useStateActions<T extends object>(initializer: T): TStateActions<T>;
 export function useStateActions<T extends object>(initializer: () => T): TStateActions<T>;
 export function useStateActions<T>(initializer: any) {
@@ -97,18 +98,17 @@ export function useStateActions<T>(initializer: any) {
       key: TKey,
       value: T[TDict][TKey],
     ): void {
-      setState({ ...s, [dictionaryName]: {} });
+      setState(prevState => ({
+        ...prevState,
+        [dictionaryName]: { ...prevState[dictionaryName], [key]: value },
+      }));
     },
     updateState(patch: Partial<T>) {
-      setState({ ...s, ...patch });
+      setState(prevState => ({ ...prevState, ...patch }));
     },
   };
 }
 
 export function useDebounce<T extends (...args: any[]) => any>(ms: number, cb: T) {
   return useCallback(debounce(cb, ms), []);
-}
-
-function MyDecorator(...args: any) {
-  console.log('call my decorator', args);
 }
