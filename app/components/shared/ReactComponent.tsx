@@ -39,10 +39,14 @@ class ReactComponent<TComponentProps = {}> extends TsxComponent<WrapperProps<TCo
   }
 }
 
-export class NameFolder extends ReactComponent {}
 @Component({
   props: {
-    name: { default: 'NewsBanner' },
+    name: { default: 'NameFolder' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
   },
 })
+export class NameFolder extends ReactComponent {}
+@Component({ props: { name: { default: 'NewsBanner' } } })
 export class NewsBanner extends ReactComponent {}
+@Component({ props: { name: { default: 'PatchNotes' } } })
+export class PatchNotes extends ReactComponent {}
