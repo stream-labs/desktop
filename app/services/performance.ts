@@ -15,6 +15,7 @@ import { TroubleshooterService, TIssueCode } from 'services/troubleshooter';
 import { $t } from 'services/i18n';
 import { StreamingService, EStreamingState } from 'services/streaming';
 import { UsageStatisticsService } from './usage-statistics';
+import { ViewHandler } from './core';
 
 interface IPerformanceState {
   CPU: number;
@@ -60,6 +61,28 @@ interface IMonitorState {
   framesRendered: number;
   framesSkipped: number;
   framesEncoded: number;
+}
+
+class PerformanceServiceViews extends ViewHandler<IPerformanceState> {
+  get cpuPercent() {
+    return this.state.CPU.toFixed(1);
+  }
+
+  get frameRate() {
+    return this.state.frameRate.toFixed(2);
+  }
+
+  get droppedFrames() {
+    return this.state.numberDroppedFrames;
+  }
+
+  get percentDropped() {
+    return (this.state.percentageDroppedFrames || 0).toFixed(1);
+  }
+
+  get bandwidth() {
+    return this.state.streamingBandwidth.toFixed(0);
+  }
 }
 
 // Keeps a store of up-to-date performance metrics
@@ -109,6 +132,10 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
       if (state === EStreamingState.Live) this.startStreamQualityMonitoring();
       if (state === EStreamingState.Ending) this.stopStreamQualityMonitoring();
     });
+  }
+
+  get views() {
+    return new PerformanceServiceViews(this.state);
   }
 
   // Starts interval to poll updates from OBS
