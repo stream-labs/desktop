@@ -20,6 +20,8 @@ export default function PerformanceMetrics(props: { mode: TPerformanceMetricsMod
     bandwidth: PerformanceService.views.bandwidth,
   }));
 
+  console.log(props);
+
   function showAttribute(attribute: string) {
     return props.mode === 'full' || v.pinnedStats[attribute];
   }
@@ -58,7 +60,7 @@ export default function PerformanceMetrics(props: { mode: TPerformanceMetricsMod
   );
 
   function showLabel(attribute: string) {
-    if (attribute !== 'bandwidth') return true;
+    if (attribute !== 'droppedFrames') return true;
     return props.mode === 'full';
   }
 
@@ -69,7 +71,11 @@ export default function PerformanceMetrics(props: { mode: TPerformanceMetricsMod
         return (
           <span
             key={attribute}
-            className={cx({ [styles.performanceMetricWrapper]: classForStat(attribute) })}
+            className={cx(
+              styles.performanceMetricWrapper,
+              classForStat(attribute),
+              'performance-metric-wrapper',
+            )}
             onClick={() => updatePinnedStats(attribute, !v.pinnedStats[attribute])}
             // v-tooltip="pinTooltip('CPU')"
           >
@@ -77,7 +83,7 @@ export default function PerformanceMetrics(props: { mode: TPerformanceMetricsMod
             <span className={styles.performanceMetric}>
               <span className={styles.performanceMetricValue}>{data.value}</span>
               {showLabel(attribute) && (
-                <span className={styles.performanceMetricLabel}>{data.label}</span>
+                <span className={styles.performanceMetricLabel}> {data.label}</span>
               )}
             </span>
           </span>
