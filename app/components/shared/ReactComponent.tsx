@@ -52,3 +52,15 @@ export class NameFolder extends ReactComponent {}
   },
 })
 export class NewsBanner extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'Display' },
+    componentProps: {
+      default: () => ({
+        paddingSize: 0,
+        drawUI: false,
+      }),
+    },
+  },
+})
+export class Display extends ReactComponent {}

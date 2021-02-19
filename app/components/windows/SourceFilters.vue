@@ -1,6 +1,6 @@
 <template>
   <modal-layout :show-cancel="false" :done-handler="done" :fixedSectionHeight="250">
-    <display slot="fixed" :sourceId="sourceId" />
+    <display slot="fixed" :componentProps="{ sourceId: sourceId }" />
 
     <div slot="content" class="modal--side-nav">
       <NavMenu v-model="selectedFilterName">

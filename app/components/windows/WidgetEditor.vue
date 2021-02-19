@@ -36,8 +36,10 @@
           <div class="display">
             <display
               v-if="!animating && !hideStyleBlockers"
-              :sourceId="widget.previewSourceId"
-              @click="createProjector"
+              :componentProps="{
+                sourceId: widget.previewSourceId,
+                clickHandler: e => createProjector(e),
+              }"
             />
           </div>
           <div class="sidebar">
