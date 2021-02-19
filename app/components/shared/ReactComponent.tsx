@@ -55,7 +55,7 @@ export class NewsBanner extends ReactComponent {}
 @Component({
   props: {
     name: { default: 'PerformanceMetrics' },
-    componentProps: { default: { mode: 'limited' } },
+    componentProps: { default: () => ({ mode: 'limited' }) },
   },
 })
 export class PerformanceMetrics extends ReactComponent<{ mode: 'full' | 'limited' }> {}

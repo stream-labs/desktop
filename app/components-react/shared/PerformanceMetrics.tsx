@@ -50,7 +50,7 @@ export default function PerformanceMetrics(props: { mode: TPerformanceMetricsMod
       label: $t('Dropped Frames'),
       icon: 'icon-dropped-frames',
     },
-    bandwidth: { value: v.bandwidth, label: $t('Bandwidth'), icon: 'icon-bitrate' },
+    bandwidth: { value: v.bandwidth, label: 'kb/s', icon: 'icon-bitrate' },
   };
 
   const shownCells = ['cpu', 'fps', 'droppedFrames', 'bandwidth'].filter((val: string) =>
@@ -68,8 +68,9 @@ export default function PerformanceMetrics(props: { mode: TPerformanceMetricsMod
         const data = metadata[attribute];
         return (
           <span
+            key={attribute}
             className={cx({ [styles.performanceMetricWrapper]: classForStat(attribute) })}
-            onClick={() => updatePinnedStats('cpu', !v.pinnedStats[attribute])}
+            onClick={() => updatePinnedStats(attribute, !v.pinnedStats[attribute])}
             // v-tooltip="pinTooltip('CPU')"
           >
             <i className={cx(styles.performanceMetricIcon, data.icon)} />
