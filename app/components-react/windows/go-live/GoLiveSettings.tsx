@@ -12,6 +12,9 @@ import { $t } from '../../../services/i18n';
 import GoLiveError from './GoLiveError';
 import { Spin, Row, Col } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import TwitterInput from './Twitter';
+import { Section } from './Section';
+import { createVModel } from '../../shared/inputs';
 
 const PlusIcon = PlusOutlined as Function;
 
@@ -31,6 +34,16 @@ export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>
     SettingsService,
     UserService,
   } = Services;
+
+  // function MyComponent() {
+  //   const [myState, setMyState] = useState({name: '', email: ''});
+  //   const bind = createBinding(myState, setMyState);
+  //   return <form>
+  //     <input label="User Name" {...bind('name')}>
+  //     <input label="User Email" {...bind('email')}>
+  //   </form>
+  // }
+
 
   // define a reactive state
   const v = useVuex(() => {
@@ -118,17 +131,18 @@ export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>
               {/*ADD SOME SPACE*/}
               {!v.isAdvancedMode && <div className={styles.spacer} />}
 
-              {/*/!*EXTRAS*!/*/}
-              {/*<Section title={isAdvancedMode ? $t('Extras') : ''}>*/}
-              {/*  <Twitter*/}
-              {/*    vModel={this.settings.tweetText}*/}
-              {/*    streamTitle={this.view.getCommonFields(this.settings).title}*/}
-              {/*  />*/}
-              {/*  <OptimizedProfileSwitcher*/}
-              {/*    vModel={this.settings.optimizedProfile}*/}
-              {/*    settings={this.settings}*/}
-              {/*  />*/}
-              {/*</Section>*/}
+              {/*EXTRAS*/}
+              <Section title={v.isAdvancedMode ? $t('Extras') : ''}>
+                <TwitterInput
+                  value={settings.tweetText}
+                  onChange{}
+                  streamTitle={this.view.getCommonFields(this.settings).title}
+                />
+                {/*<OptimizedProfileSwitcher*/}
+                {/*  vModel={this.settings.optimizedProfile}*/}
+                {/*  settings={this.settings}*/}
+                {/*/>*/}
+              </Section>
             </>
           )}
         </Scrollable>
