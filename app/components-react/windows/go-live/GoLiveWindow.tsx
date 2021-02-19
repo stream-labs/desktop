@@ -128,7 +128,7 @@ export default function GoLiveWindow() {
         <SwitchInput
           label={$t('Show Advanced Settings')}
           name="advancedMode"
-          onInput={enabled => switchAdvancedMode(enabled)}
+          onChange={enabled => switchAdvancedMode(enabled)}
           value={settings.advancedMode}
         />
 

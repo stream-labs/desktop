@@ -77,7 +77,7 @@ export default function GameSelector(p: TProps) {
       name={`${p.platform}Game`}
       value={selectedGame}
       extra={p.extra}
-      onInput={p.onInput}
+      onChange={p.onChange}
       placeholder={$t('Start typing to search')}
       options={s.games}
       loading={s.loading}

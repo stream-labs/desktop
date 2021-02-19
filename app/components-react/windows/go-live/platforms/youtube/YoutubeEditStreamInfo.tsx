@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { Services } from '../../../../service-provider';
 import { $t } from '../../../../../services/i18n';
 import { IYoutubeStartStreamOptions } from '../../../../../services/platforms/youtube';
-import { createVModel } from '../../../../shared/inputs/inputs';
+import { createBinding } from '../../../../shared/inputs/inputs';
 import BroadcastInput from './BroadcastInput';
 import { useAsyncState, useOnCreate } from '../../../../hooks';
 import InputWrapper from '../../../../shared/inputs/InputWrapper';
@@ -33,7 +33,7 @@ export function YoutubeEditStreamInfo(p: IProps) {
   const isAdvanced = isAdvancedMode(settings);
   const is360video = ytSettings.projection === '360';
   const shouldShowSafeForKidsWarn = ytSettings.selfDeclaredMadeForKids;
-  const vModel = createVModel(
+  const vModel = createBinding(
     ytSettings,
     newYtSettings => updatePlatformSettings('youtube', newYtSettings),
     fieldName => ({ disabled: fieldIsDisabled(fieldName) }),
@@ -169,7 +169,7 @@ export function YoutubeEditStreamInfo(p: IProps) {
           <CheckboxInput
             label={$t('360° video')}
             value={is360video}
-            onInput={projectionChangeHandler}
+            onChange={projectionChangeHandler}
           />
           <CheckboxInput label={$t('Made for kids')} {...vModel('selfDeclaredMadeForKids')} />
           {shouldShowSafeForKidsWarn && (

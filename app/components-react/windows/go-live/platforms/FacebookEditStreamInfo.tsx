@@ -12,7 +12,7 @@ import { useOnCreate, useStateActions, useVuex } from '../../../hooks';
 import { assertIsDefined } from '../../../../util/properties-type-guards';
 import { EDismissable } from '../../../../services/dismissables';
 import { $t } from '../../../../services/i18n';
-import { createVModel, ListInput } from '../../../shared/inputs';
+import { createBinding, ListInput } from '../../../shared/inputs';
 import { TwitchTagsInput } from './TwitchTagsInput';
 import GameSelector from '../GameSelector';
 import {
@@ -44,7 +44,7 @@ export default function FacebookEditStreamInfo(p: IProps) {
   const shouldShowPrivacyWarn =
     (!fbSettings.liveVideoId && fbSettings.privacy?.value !== 'SELF') ||
     (fbSettings.liveVideoId && fbSettings.privacy?.value);
-  const vModel = createVModel(fbSettings, newFbSettings =>
+  const vModel = createBinding(fbSettings, newFbSettings =>
     updatePlatformSettings('facebook', newFbSettings),
   );
 
@@ -265,7 +265,7 @@ export default function FacebookEditStreamInfo(p: IProps) {
         {shouldShowPrivacy && (
           <ListInput
             value={fbSettings.privacy?.value}
-            onInput={setPrivacy}
+            onChange={setPrivacy}
             hasImage={true}
             imageSize={{ width: 24, height: 24 }}
             options={getPrivacyOptions()}

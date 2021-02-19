@@ -33,7 +33,7 @@ export function TwitchTagsInput(p: TTwitchTagsInputProps) {
     return (
       <TagsInput
         label={p.label}
-        onInput={values => p.onInput && p.onInput(values.map(tagName => s.tagsMap[tagName]))}
+        onChange={values => p.onChange && p.onChange(values.map(tagName => s.tagsMap[tagName]))}
         value={p.value && p.value.map(tag => tag.tag_id)}
         options={options}
         tagRender={(tagProps, tag) => (

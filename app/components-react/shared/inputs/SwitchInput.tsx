@@ -4,11 +4,11 @@ import { TSlobsInputProps, useInput } from './inputs';
 import InputWrapper from './InputWrapper';
 import { SwitchProps } from 'antd/lib/switch';
 
-export function SwitchInput(p: TSlobsInputProps<SwitchProps, boolean>) {
+export function SwitchInput(p: TSlobsInputProps<{}, boolean, SwitchProps>) {
   const { wrapperAttrs } = useInput('switch', p);
   return (
     <InputWrapper {...wrapperAttrs}>
-      <Switch checked={p.value} size="small" onChange={() => p.onInput && p.onInput(!p.value)} />
+      <Switch checked={p.value} size="small" onChange={() => p.onChange && p.onChange(!p.value)} />
     </InputWrapper>
   );
 }

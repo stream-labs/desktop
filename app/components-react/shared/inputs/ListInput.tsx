@@ -55,7 +55,7 @@ export function ListInput(p: TProps) {
           optionFilterProp="label"
           optionLabelProp="labelrender"
           // convert onSelect into onInput to fit Inputs shape
-          onSelect={(val: string) => p.onInput && p.onInput(val)}
+          onSelect={(val: string) => p.onChange && p.onChange(val)}
         >
           {options && options.map((opt, ind) => renderOption(opt, ind, p))}
         </Select>

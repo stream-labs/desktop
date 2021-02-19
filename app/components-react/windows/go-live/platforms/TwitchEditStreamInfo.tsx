@@ -3,7 +3,7 @@ import FormSection from '../../../shared/inputs/FormSection';
 import CommonPlatformFields from '../CommonPlatformFields';
 import React from 'react';
 import { IGoLiveSettings } from '../../../../services/streaming';
-import { createVModel, TagsInput } from '../../../shared/inputs';
+import { createBinding, TagsInput } from '../../../shared/inputs';
 import { $t } from '../../../../services/i18n';
 import { TwitchTagsInput } from './TwitchTagsInput';
 import GameSelector from '../GameSelector';
@@ -17,7 +17,7 @@ export function TwitchEditStreamInfo(p: IProps) {
   const { settings, updatePlatformSettings } = p;
   const twSettings = settings.platforms.twitch;
   const isAdvanced = isAdvancedMode(p.settings);
-  const vModel = createVModel(twSettings, newTwSettings =>
+  const vModel = createBinding(twSettings, newTwSettings =>
     updatePlatformSettings('twitch', newTwSettings),
   );
 

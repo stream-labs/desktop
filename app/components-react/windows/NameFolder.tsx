@@ -78,7 +78,7 @@ export default function NameFolder() {
         <TextInput
           name="name"
           value={name}
-          onInput={v => setName(v)}
+          onChange={v => setName(v)}
           label={$t('Please enter the name of the folder')}
           required={true}
         />

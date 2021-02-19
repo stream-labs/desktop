@@ -36,7 +36,7 @@ export function TagsInput(p: TProps) {
           mode={'multiple'}
           allowClear
           // convert onSelect into onInput to fit Inputs shape
-          onChange={(val: string[]) => p.onInput && p.onInput(val)}
+          onChange={(val: string[]) => p.onChange && p.onChange(val)}
           tagRender={renderTag}
         >
           {options && options.map((opt, ind) => renderOption(opt, ind, p))}

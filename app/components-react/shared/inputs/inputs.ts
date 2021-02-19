@@ -15,14 +15,11 @@ import { pick } from 'lodash';
 
 type TInputType = 'text' | 'textarea' | 'toggle' | 'checkbox' | 'list' | 'tags' | 'switch';
 
-const customProps = ['uncontrolled'];
-const customWrapperProps = ['nowrap'];
 export interface IInputCommonProps<TValue> {
   value?: TValue;
   name?: string;
   nowrap?: boolean;
-  onInput?: (val: TValue, ev?: ChangeEvent | CheckboxChangeEvent) => unknown;
-  uncontrolled?: boolean;
+  onChange?: (val: TValue, ev?: ChangeEvent | CheckboxChangeEvent) => unknown;
   required?: boolean;
 }
 
@@ -79,12 +76,14 @@ export function useInput<
   const inputId = useOnCreate(() => {
     // generate an unique id
     const id = `${name}-${uuid()}`;
-
-    // if the input is inside the form
-    // then we need to setup it's value via Form API
-    if (form) form.setFieldsValue({ [id]: value });
     return id;
   });
+
+  useEffect(() => {
+    // if the input is inside the form
+    // then we need to setup it's value via Form API
+    if (form) form.setFieldsValue({ [inputId]: value });
+  }, [value]);
 
   // Create data-attributes for an Input element
   // These attributes help to find inputs in auto-tests
@@ -103,14 +102,14 @@ export function useInput<
 
   const wrapperAttrs = {
     // pick used features of Form.Item
-    ...pick(inputProps, ['className', 'style', 'key', 'label', 'colon', 'extra']),
+    ...pick(inputProps, ['className', 'style', 'key', 'label', 'colon', 'extra', 'labelCol', 'wrapperCol']),
     rules,
     'data-role': 'input-wrapper',
     name: inputId,
   };
 
   const inputAttrs = {
-    ...(pick(inputProps, antFeatures || []) as {}),
+    ...(pick(inputProps, 'value', antFeatures || []) as {}),
     ...dataAttrs,
     'data-role': 'input',
     name: inputId,
@@ -127,30 +126,20 @@ export function useInput<
  * Use useInput() under the hood and handles the onChange event
  */
 export function useTextInput(
-  p: Omit<Parameters<typeof useInput>[1] & TSlobsInputProps<InputProps, string>, 'onChange'>,
+  p: Parameters<typeof useInput>[1] & TSlobsInputProps<InputProps, string>,
+  antFeatures?: Parameters<typeof useInput>[2],
 ) {
-  const { inputAttrs, wrapperAttrs } = useInput('text', p);
+  const { inputAttrs, wrapperAttrs } = useInput('text', p, antFeatures);
 
-  // Text inputs are uncontrolled by default for better performance
-  const uncontrolled = p.uncontrolled !== false;
-
-  // redirect `onChange` to the custom `onInput` handler
-  // `onInput` accepts a value as a first argument
-  // so it's more convenient to use in most situations
   const onChange = (ev: ChangeEvent<any>) => {
-    if (uncontrolled) return;
-    p.onInput && p.onInput(ev.target.value, ev);
-  };
-
-  const onInput = (ev: ChangeEvent<any>) => {
-    // ignore native onInput() for uncontrolled components
-    if (uncontrolled) return;
-    p.onInput && p.onInput(ev.target.value, ev);
+    // Text inputs are uncontrolled by default for better performance
+    // onChange handles by onBlur
+    // use the `onInput` event if you need to handle any keypress
   };
 
   const onBlur = (ev: FocusEvent<any>) => {
     // for uncontrolled components call the onInput() handler on blur
-    if (uncontrolled) p.onInput && p.onInput(ev.target.value, ev);
+    p.onChange && p.onChange(ev.target.value, ev);
     p.onBlur && p.onBlur(ev);
   };
 
@@ -160,15 +149,26 @@ export function useTextInput(
       ...inputAttrs,
       onChange,
       onBlur,
-      onInput,
     },
   };
 }
 
 /**
  * 2-way binding util for inputs
+ *
+ * @example
+ * <pre>
+ * function MyComponent() {
+ *  const [myState, setMyState] = useState({name: '', email: ''});
+ *  const bind = createBinding(myState, setMyState);
+ * return <form>
+ *     <input label="User Name" {...bind('name')}>
+ *     <input label="User Email" {...bind('email')}>
+ *   </form>
+ *  }
+ * </pre>
  */
-export function createVModel<TTarget extends object, TExtraProps extends object = {}>(
+export function createBinding<TTarget extends object, TExtraProps extends object = {}>(
   target: TTarget,
   setter: (newTarget: TTarget) => unknown,
   extraPropsGenerator?: (fieldName: keyof TTarget) => TExtraProps,
@@ -178,7 +178,7 @@ export function createVModel<TTarget extends object, TExtraProps extends object 
     return {
       name: fieldName,
       value: target[fieldName] as Required<TTarget>[TFieldName],
-      onInput(newVal: unknown) {
+      onChange(newVal: unknown) {
         setter({ ...target, [fieldName]: newVal });
       },
       ...extraProps,

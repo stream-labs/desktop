@@ -14,7 +14,8 @@ import { Spin, Row, Col } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import TwitterInput from './Twitter';
 import { Section } from './Section';
-import { createVModel } from '../../shared/inputs';
+import { createBinding } from '../../shared/inputs';
+import OptimizedProfileSwitcher from './OptimizedProfileSwitcher';
 
 const PlusIcon = PlusOutlined as Function;
 
@@ -34,20 +35,11 @@ export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>
     SettingsService,
     UserService,
   } = Services;
-
-  // function MyComponent() {
-  //   const [myState, setMyState] = useState({name: '', email: ''});
-  //   const bind = createBinding(myState, setMyState);
-  //   return <form>
-  //     <input label="User Name" {...bind('name')}>
-  //     <input label="User Email" {...bind('email')}>
-  //   </form>
-  // }
-
+  const view = StreamingService.views;
+  const bind = createBinding(settings, setSettings);
 
   // define a reactive state
   const v = useVuex(() => {
-    const view = StreamingService.views;
     const goLiveSettings = view.goLiveSettings;
     const isErrorMode = !!view.info.error;
     const enabledPlatforms = view.enabledPlatforms;
@@ -134,14 +126,12 @@ export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>
               {/*EXTRAS*/}
               <Section title={v.isAdvancedMode ? $t('Extras') : ''}>
                 <TwitterInput
-                  value={settings.tweetText}
-                  onChange{}
-                  streamTitle={this.view.getCommonFields(this.settings).title}
+                  {...bind('tweetText')}
+                  streamTitle={view.getCommonFields(settings.platforms).title}
                 />
-                {/*<OptimizedProfileSwitcher*/}
-                {/*  vModel={this.settings.optimizedProfile}*/}
-                {/*  settings={this.settings}*/}
-                {/*/>*/}
+                <OptimizedProfileSwitcher
+                  value
+                />
               </Section>
             </>
           )}

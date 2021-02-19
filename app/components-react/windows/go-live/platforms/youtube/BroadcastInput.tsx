@@ -64,6 +64,6 @@ export default function BroadcastInput(
   }));
 
   return (
-    <ListInput {...p} onInput={p.onInput} options={[firstOption]} optionRender={optionRender} />
+    <ListInput {...p} onChange={p.onChange} options={[firstOption]} optionRender={optionRender} />
   );
 }

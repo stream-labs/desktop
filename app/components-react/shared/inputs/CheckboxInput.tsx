@@ -10,7 +10,7 @@ export function CheckboxInput(p: TSlobsInputProps<{}, boolean, CheckboxProps>) {
       <Checkbox
         checked={p.value}
         {...inputAttrs}
-        onChange={ev => p.onInput && p.onInput(!p.value, ev)}
+        onChange={ev => p.onChange && p.onChange(!p.value, ev)}
       >
         {p.label}
       </Checkbox>

@@ -11,7 +11,7 @@ import { IGoLiveProps, getEnabledPlatforms, TUpdatePlatformSettingsFn } from './
 import Utils from '../../../services/utils';
 import { assertIsDefined } from '../../../util/properties-type-guards';
 import InputWrapper from '../../shared/inputs/InputWrapper';
-import { createVModel } from '../../shared/inputs/inputs';
+import { createBinding } from '../../shared/inputs/inputs';
 import Animate from 'rc-animate';
 
 interface IProps {
@@ -90,7 +90,7 @@ export default function CommonPlatformFields(p: IProps) {
           <CheckboxInput
             name="customEnabled"
             value={!!platformSettings?.useCustomFields}
-            onInput={toggleUseCustom}
+            onChange={toggleUseCustom}
             label={title}
           />
         </InputWrapper>
@@ -103,7 +103,7 @@ export default function CommonPlatformFields(p: IProps) {
             <TextInput
               value={fields.title}
               name="title"
-              onInput={val => updateCommonField('title', val)}
+              onChange={val => updateCommonField('title', val)}
               label={$t('Title')}
               required={true}
               // TODO:
@@ -114,7 +114,7 @@ export default function CommonPlatformFields(p: IProps) {
             {hasDescription && (
               <TextAreaInput
                 value={fields['description']}
-                onInput={val => updateCommonField('description', val)}
+                onChange={val => updateCommonField('description', val)}
                 name="description"
                 label={$t('Description')}
               />
