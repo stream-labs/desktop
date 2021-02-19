@@ -29,7 +29,7 @@ export function useVuex(...args: any[]) {
 }
 
 /**
- * An onCreate shortcut
+ * onCreate shortcut
  * Helpful if you need to calculate an immutable initial state for a component
  */
 export function useOnCreate<TReturnValue>(cb: () => TReturnValue) {
@@ -37,7 +37,7 @@ export function useOnCreate<TReturnValue>(cb: () => TReturnValue) {
 }
 
 /**
- * An onDestroy shortcut
+ * onDestroy shortcut
  */
 export function useOnDestroy(cb: () => void) {
   useEffect(() => cb, []);
