@@ -35,6 +35,7 @@ import fs from 'fs';
 import path from 'path';
 import { AppService } from 'services/app';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import { StreamingService } from 'services/streaming';
 
 export enum EAuthProcessState {
   Idle = 'idle',
@@ -61,7 +62,6 @@ interface ILinkedPlatformsResponse {
   twitch_account?: ILinkedPlatform;
   facebook_account?: ILinkedPlatform;
   youtube_account?: ILinkedPlatform;
-  mixer_account?: ILinkedPlatform;
   user_id: number;
 }
 
@@ -128,6 +128,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private navigationService: NavigationService;
   @Inject() private settingsService: SettingsService;
   @Inject() private streamSettingsService: StreamSettingsService;
+  @Inject() private streamingService: StreamingService;
   @Inject() private websocketService: WebsocketService;
   @Inject() private magicLinkService: MagicLinkService;
   @Inject() private appService: AppService;
@@ -255,6 +256,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   autoLogin() {
     if (!this.state.auth) return;
+
+    // don't allow to login via deleted Mixer platform
+    const allPlatforms = this.streamingService.views.allPlatforms;
+    if (!allPlatforms.includes(this.state.auth.primaryPlatform)) return;
+
     const service = getPlatformService(this.state.auth.primaryPlatform);
     return this.login(service, this.state.auth);
   }
@@ -346,17 +352,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       });
     } else if (this.state.auth.primaryPlatform !== 'facebook') {
       this.UNLINK_PLATFORM('facebook');
-    }
-
-    if (linkedPlatforms.mixer_account) {
-      this.UPDATE_PLATFORM({
-        type: 'mixer',
-        username: linkedPlatforms.mixer_account.platform_name,
-        id: linkedPlatforms.mixer_account.platform_id,
-        token: linkedPlatforms.mixer_account.access_token,
-      });
-    } else if (this.state.auth.primaryPlatform !== 'mixer') {
-      this.UNLINK_PLATFORM('mixer');
     }
 
     if (linkedPlatforms.twitch_account) {

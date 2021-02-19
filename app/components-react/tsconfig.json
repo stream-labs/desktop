@@ -1,0 +1,29 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "target": "es2015",
+    "lib": [
+      "dom",
+      "es7",
+      "es2017"
+    ],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "isolatedModules": false,
+    "experimentalDecorators": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "removeComments": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "allowJs": false,
+    "strictNullChecks": true,
+    "emitDecoratorMetadata": false,
+    "jsx": "react",
+    "types": [
+      "react"
+    ]
+  },
+  "files": ["./index.ts"]
+}

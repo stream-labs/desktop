@@ -14,7 +14,6 @@ import CommonPlatformFields from './CommonPlatformFields';
 import TwitchEditStreamInfo from './platforms/TwitchEditStreamInfo';
 import FacebookEditStreamInfo from './platforms/FacebookEditStreamInfo';
 import YoutubeEditStreamInfo from './platforms/youtube/YoutubeEditStreamInfo';
-import MixerEditStreamInfo from './platforms/MixerEditStreamInfo';
 import Section from './Section';
 
 class Props {
@@ -100,7 +99,6 @@ export default class PlatformSettings extends TsxComponent<Props> {
             isScheduleMode={this.props.isScheduleMode}
           />
         )}
-        {platform === 'mixer' && <MixerEditStreamInfo vModel={this.settings} />}
       </Section>
     );
   }

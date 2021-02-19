@@ -178,6 +178,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       await this.setActiveCollection(id);
 
       await this.readCollectionDataAndLoadIntoApplicationState(id);
+      this.collectionSwitched.next(this.getCollection(id)!);
     } catch (e) {
       console.error('Error loading collection!', e);
 
@@ -208,7 +209,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     const name = options.name || this.suggestName(DEFAULT_COLLECTION_NAME);
     const id = uuid();
 
-    await this.insertCollection(id, name, getOS(), options.auto || false);
+    const collection = await this.insertCollection(id, name, getOS(), options.auto || false);
     await this.setActiveCollection(id);
     if (options.needsRename) this.stateService.SET_NEEDS_RENAME(id);
 
@@ -220,7 +221,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
     this.collectionLoaded = true;
     await this.save();
-    return this.getCollection(id)!;
+    this.collectionSwitched.next(collection);
+    return collection;
   }
 
   /**
@@ -345,7 +347,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     await this.deloadCurrentApplicationState();
 
     const id: string = uuid();
-    await this.insertCollection(id, name, getOS());
+    const collection = await this.insertCollection(id, name, getOS());
     await this.setActiveCollection(id);
 
     try {
@@ -355,6 +357,8 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       // We tried really really hard :(
       console.error('Overlay installation failed', e);
     }
+
+    this.collectionSwitched.next(collection);
 
     this.collectionLoaded = true;
     await this.save();
@@ -662,7 +666,10 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
     this.stateService.ADD_COLLECTION(id, name, new Date().toISOString(), os, auto);
     await this.safeSync();
-    this.collectionAdded.next(this.collections.find(coll => coll.id === id));
+    const collection = this.getCollection(id)!;
+    this.collectionAdded.next(collection);
+
+    return collection;
   }
 
   /**
@@ -710,7 +717,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
           .catch(e => console.warn('Failed setting active collection'));
       }
       this.stateService.SET_ACTIVE_COLLECTION(id);
-      this.collectionSwitched.next(collection);
     }
   }
 

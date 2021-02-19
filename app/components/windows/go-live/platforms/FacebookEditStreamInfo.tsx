@@ -1,4 +1,4 @@
-import { Component, Watch } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
@@ -70,7 +70,6 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
     if (this.fbSettings.groupId) this.loadPicture(this.fbSettings.groupId);
   }
 
-  @Watch('settings.platforms.facebook.destinationType')
   private async loadScheduledBroadcasts() {
     const fbSettings = this.fbSettings;
     let destinationId = this.facebookService.views.getDestinationId(this.fbSettings);
@@ -206,7 +205,11 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
           ...this.scheduledVideos.map(vid => ({
             value: vid.id,
             title: vid.title,
-            data: { startTime: moment(new Date(vid.planned_start_time)).calendar() },
+            data: {
+              startTime: vid.planned_start_time
+                ? moment(new Date(vid.planned_start_time)).calendar()
+                : '',
+            },
           })),
         ],
         required: false,
@@ -304,6 +307,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
                 vModel={this.settings.platforms.facebook.destinationType}
                 metadata={this.formMetadata.destinationType}
                 imageSize={{ width: 35, height: 35 }}
+                onInput={() => this.loadScheduledBroadcasts()}
               />
             </HFormGroup>
           </div>
@@ -317,6 +321,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
               handleOpen={() => this.loadPictures('page')}
               showImagePlaceholder={true}
               imageSize={{ width: 44, height: 44 }}
+              onInput={() => this.loadScheduledBroadcasts()}
             />
           </HFormGroup>
         )}

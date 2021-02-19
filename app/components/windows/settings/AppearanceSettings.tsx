@@ -4,7 +4,7 @@ import { Inject } from 'services/core/injector';
 import GenericForm from 'components/obs/inputs/GenericForm';
 import { $t } from 'services/i18n';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
-import { ICustomizationSettings, CustomizationService } from 'services/customization';
+import { ICustomizationServiceState, CustomizationService } from 'services/customization';
 import { WindowsService } from 'services/windows';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { metadata } from 'components/shared/inputs';
@@ -39,18 +39,18 @@ export default class AppearanceSettings extends Vue {
   }
 
   created() {
-    this.settingsFormData = this.customizationService.getSettingsFormData();
-    this.enableFFZEmotes = this.customizationService.getSettings().enableFFZEmotes;
+    this.settingsFormData = this.customizationService.views.settingsFormData;
+    this.enableFFZEmotes = this.customizationService.state.enableFFZEmotes;
   }
 
   saveSettings(formData: TObsFormData) {
-    const settings: Partial<ICustomizationSettings> = {};
+    const settings: Partial<ICustomizationServiceState> = {};
     formData.forEach(formInput => {
       settings[formInput.name] = formInput.value;
     });
     this.customizationService.setSettings(settings);
-    this.settingsFormData = this.customizationService.getSettingsFormData();
-    this.enableFFZEmotes = this.customizationService.getSettings().enableFFZEmotes;
+    this.settingsFormData = this.customizationService.views.settingsFormData;
+    this.enableFFZEmotes = this.customizationService.state.enableFFZEmotes;
   }
 
   openFFZSettings() {

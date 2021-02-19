@@ -163,6 +163,7 @@ export default class MediaGallery extends Vue {
   handleFileDrop(e: DragEvent) {
     const mappedFiles = Array.from(e.dataTransfer.files).map(file => file.path);
     this.upload(mappedFiles);
+    this.dragOver = false;
   }
 
   handleTypeFilter(type: 'audio' | 'image', category: 'stock' | 'uploads') {

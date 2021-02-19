@@ -4,7 +4,7 @@
 import cloneDeep from 'lodash/cloneDeep';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import electron from 'electron';
-import Vue from 'vue';
+import Vue, { Component } from 'vue';
 import Utils from 'services/utils';
 import { Subject } from 'rxjs';
 import { throttle } from 'lodash-decorators';
@@ -17,11 +17,11 @@ import SceneTransitions from 'components/windows/SceneTransitions.vue';
 import AddSource from 'components/windows/AddSource.vue';
 import RenameSource from 'components/windows/RenameSource.vue';
 import NameScene from 'components/windows/NameScene.vue';
-import NameFolder from 'components/windows/NameFolder.vue';
+import { NameFolder } from 'components/shared/ReactComponent';
 import SourceProperties from 'components/windows/SourceProperties.vue';
 import SourceFilters from 'components/windows/SourceFilters.vue';
 import AddSourceFilter from 'components/windows/AddSourceFilter';
-import AdvancedAudio from 'components/windows/AdvancedAudio.vue';
+import AdvancedAudio from 'components/windows/AdvancedAudio';
 import Notifications from 'components/windows/Notifications.vue';
 import Troubleshooter from 'components/windows/Troubleshooter.vue';
 import Blank from 'components/windows/Blank.vue';
@@ -42,14 +42,15 @@ import GoLiveWindow from 'components/windows/go-live/GoLiveWindow';
 import EditStreamWindow from 'components/windows/go-live/EditStreamWindow';
 import ScheduleStreamWindow from 'components/windows/go-live/ScheduleStreamWindow';
 
-import BitGoal from 'components/widgets/goal/BitGoal.vue';
-import DonationGoal from 'components/widgets/goal/DonationGoal.vue';
-import SubGoal from 'components/widgets/goal/SubGoal.vue';
-import StarsGoal from 'components/widgets/goal/StarsGoal.vue';
-import SupporterGoal from 'components/widgets/goal/SupporterGoal.vue';
+import BitGoal from 'components/widgets/goal/BitGoal';
+import DonationGoal from 'components/widgets/goal/DonationGoal';
+import SubGoal from 'components/widgets/goal/SubGoal';
+import StarsGoal from 'components/widgets/goal/StarsGoal';
+import SupporterGoal from 'components/widgets/goal/SupporterGoal';
 import SubscriberGoal from 'components/widgets/goal/SubscriberGoal';
+import FollowerGoal from 'components/widgets/goal/FollowerGoal';
+import CharityGoal from 'components/widgets/goal/CharityGoal';
 import ChatBox from 'components/widgets/ChatBox.vue';
-import FollowerGoal from 'components/widgets/goal/FollowerGoal.vue';
 import ViewerCount from 'components/widgets/ViewerCount.vue';
 import StreamBoss from 'components/widgets/StreamBoss.vue';
 import DonationTicker from 'components/widgets/DonationTicker.vue';
@@ -65,6 +66,8 @@ import PerformanceMetrics from 'components/PerformanceMetrics.vue';
 import { byOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from './usage-statistics';
 import { Inject } from 'services/core';
+import MessageBoxModal from 'components/shared/modals/MessageBoxModal';
+import Modal from 'components/shared/modals/modal';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -109,6 +112,7 @@ export function getComponents() {
     StarsGoal,
     SupporterGoal,
     SubscriberGoal,
+    CharityGoal,
     ChatBox,
     ViewerCount,
     DonationTicker,
@@ -158,6 +162,10 @@ interface IWindowsState {
   [windowId: string]: IWindowOptions;
 }
 
+export interface IModalOptions {
+  renderFn: Function | null;
+}
+
 const DEFAULT_WINDOW_OPTIONS: IWindowOptions = {
   componentName: '',
   scaleFactor: 1,
@@ -188,6 +196,34 @@ export class WindowsService extends StatefulService<IWindowsState> {
       isShown: false,
     },
   };
+
+  static modalOptions: IModalOptions = {
+    renderFn: null,
+  };
+
+  /**
+   * This event is happening when the modal has been shown or hidden
+   */
+  static modalChanged = new Subject<Partial<IModalOptions>>();
+
+  /**
+   * Show modal in the current window
+   * Use a static method instead actions so we can pass an non-serializable renderer method and support reactivity
+   */
+  static showModal(vm: Vue, renderFn: IModalOptions['renderFn']) {
+    // use `vm` to keep reactivity in the renderer function
+    const renderer = () => vm.$createElement(Modal, [renderFn()]);
+    this.modalChanged.next({ renderFn: renderer });
+  }
+
+  static hideModal() {
+    this.modalChanged.next({ renderFn: null });
+  }
+
+  static showMessageBox(vm: Vue, renderFn: Function) {
+    const renderer = () => vm.$createElement(MessageBoxModal, [renderFn()]);
+    this.showModal(vm, renderer);
+  }
 
   // This is a list of components that are registered to be
   // top level components in new child windows.
@@ -364,7 +400,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       height: 400,
       title: 'New Window',
       backgroundColor: '#17242D',
-      webPreferences: { nodeIntegration: true, webviewTag: true },
+      webPreferences: { nodeIntegration: true, webviewTag: true, enableRemoteModule: true },
       ...options,
       ...options.size,
     }));
@@ -438,17 +474,14 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.windows.child.close();
   }
 
-  // @ExecuteInCurrentWindow()
   getChildWindowOptions(): IWindowOptions {
     return this.state.child;
   }
 
-  // @ExecuteInCurrentWindow()
   getChildWindowQueryParams(): Dictionary<any> {
     return this.getChildWindowOptions().queryParams || {};
   }
 
-  // @ExecuteInCurrentWindow()
   getWindowOptions(windowId: string) {
     return this.state[windowId].queryParams || {};
   }

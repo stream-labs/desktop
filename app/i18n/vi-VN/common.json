@@ -117,5 +117,13 @@
   "Apps": "Apps",
   "Finish": "Finish",
   "Get Prime": "Get Prime",
-  "System error message:": "System error message:"
+  "System error message:": "System error message:",
+  "List is empty": "List is empty",
+  "Not selected": "Not selected",
+  "Friends": "Friends",
+  "Width": "Chiều rộng",
+  "Height": "Chiều cao",
+  "Use Custom": "Use Custom",
+  "Apply": "Apply",
+  "Do not show this message again": "Do not show this message again"
 }

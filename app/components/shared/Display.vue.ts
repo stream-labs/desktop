@@ -75,6 +75,15 @@ export default class Display extends TsxComponent<DisplayProps> {
     this.createDisplay();
   }
 
+  get baseResolution() {
+    return this.videoService.baseResolution;
+  }
+
+  @Watch('baseResolution')
+  refreshOutputRegion() {
+    if (this.display) this.display.refreshOutputRegion();
+  }
+
   beforeDestroy() {
     this.destroyDisplay();
   }

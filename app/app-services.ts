@@ -8,7 +8,7 @@ export { InternalApiService } from 'services/api/internal-api';
 export { ExternalApiService } from 'services/api/external-api';
 export { ExternalApiLimitsService } from 'services/api/external-api-limits';
 export { SourcesService, Source } from 'services/sources';
-export { Scene, SceneItem, SceneItemFolder, SceneItemNode, ScenesService } from 'services/scenes';
+export { Scene, SceneItem, SceneItemFolder, ScenesService } from 'services/scenes';
 export { ObsImporterService } from 'services/obs-importer';
 export { ClipboardService } from 'services/clipboard';
 export { AudioService, AudioSource } from 'services/audio';
@@ -56,10 +56,8 @@ export { MetricsService } from 'services/metrics';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';
-export { BasePlatformService } from 'services/platforms/base-platform';
 export { YoutubeService } from 'services/platforms/youtube';
 export { TwitchService } from 'services/platforms/twitch';
-export { MixerService } from 'services/platforms/mixer';
 export { FacebookService } from 'services/platforms/facebook';
 export { RestreamService } from 'services/restream';
 export { TwitterService } from 'services/integrations/twitter';
@@ -78,7 +76,6 @@ export { VideoEncodingOptimizationService } from 'services/video-encoding-optimi
 export { StreamingService } from 'services/streaming';
 export { StreamlabelsService } from 'services/streamlabels';
 export { AutoConfigService } from 'services/auto-config';
-export { FacemasksService } from 'services/facemasks';
 export { PlatformAppsService } from 'services/platform-apps';
 export { PlatformAppStoreService } from 'services/platform-app-store';
 export { PlatformAppAssetsService } from 'services/platform-apps/platform-app-assets-service';
@@ -95,6 +92,7 @@ export { FollowerGoalService } from 'services/widgets/settings/follower-goal';
 export { StarsGoalService } from 'services/widgets/settings/stars-goal';
 export { SupporterGoalService } from 'services/widgets/settings/supporter-goal';
 export { SubscriberGoalService } from 'services/widgets/settings/subscriber-goal';
+export { CharityGoalService } from 'services/widgets/settings/charity-goal';
 export { ViewerCountService } from 'services/widgets/settings/viewer-count';
 export { StreamBossService } from 'services/widgets/settings/stream-boss';
 export { DonationTickerService } from 'services/widgets/settings/donation-ticker';
@@ -106,3 +104,22 @@ export { SubGoalService } from 'services/widgets/settings/sub-goal';
 export { MediaShareService } from 'services/widgets/settings/media-share';
 export { AlertBoxService } from 'services/widgets/settings/alert-box';
 export { SpinWheelService } from 'services/widgets/settings/spin-wheel';
+
+import { WindowsService } from './services/windows';
+import { CustomizationService } from './services/customization';
+import { ScenesService } from './services/scenes';
+import { EditorCommandsService } from './services/editor-commands';
+import { PerformanceService } from './services/performance';
+import { NavigationService } from './services/navigation';
+import { AnnouncementsService } from './services/announcements';
+import { SettingsService } from './services/settings';
+export const AppServices = {
+  WindowsService,
+  ScenesService,
+  NavigationService,
+  AnnouncementsService,
+  SettingsService,
+  CustomizationService,
+  EditorCommandsService,
+  PerformanceService,
+};

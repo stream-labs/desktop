@@ -128,12 +128,17 @@ export default class HardwareSetup extends TsxComponent {
             >
               <MixerVolmeter
                 audioSource={this.defaultHardwareService.selectedAudioSource}
+                volmetersEnabled={true}
                 class={styles.volmeterCenter}
               />
             </div>
           )}
           <VFormGroup
-            metadata={metadata.list({ options: this.audioDevices })}
+            metadata={metadata.list({
+              options: this.audioDevices,
+              openDirection: 'bottom',
+              optionsHeight: 120,
+            })}
             value={this.selectedAudioDevice}
             onInput={(id: string) => (this.selectedAudioDevice = id)}
           />

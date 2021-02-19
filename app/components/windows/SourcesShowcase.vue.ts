@@ -76,6 +76,11 @@ export default class SourcesShowcase extends Vue {
     return require(`../../../media/source-demos/${theme}/${dataSource(type).demoFilename}`);
   }
 
+  getLoginSrc() {
+    const theme = this.demoMode;
+    return require(`../../../media/images/sleeping-kevin-${theme}.png`);
+  }
+
   selectWidget(type: WidgetType) {
     this.selectSource('browser_source', {
       propertiesManager: 'widget',
@@ -196,5 +201,10 @@ export default class SourcesShowcase extends Vue {
 
   getAppAssetUrl(appId: string, asset: string) {
     return this.platformAppsService.views.getAssetUrl(appId, asset);
+  }
+
+  handleAuth() {
+    this.windowsService.closeChildWindow();
+    this.userService.showLogin();
   }
 }

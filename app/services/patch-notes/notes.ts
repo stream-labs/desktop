@@ -1,16 +1,18 @@
 import { IPatchNotes } from '.';
 
 export const notes: IPatchNotes = {
-  version: '0.26.0',
-  title: 'User Experience Improvements',
+  version: '0.27.0',
+  title: 'Visual Filter Presets',
   showChest: false,
   notes: [
-    'Revamped the Go Live flow for Facebook users and multistreamers',
-    'Moved Login/Logout to the Settings Window',
-    'Added Follower Goals for Facebook users',
-    'Updated the Custom Resolution input for easier use',
-    'Fixed a bug related to keyboard shortcuts in the Edit Transform Window',
-    'Fixed a bug where the Scenes list appeared empty in some layouts',
-    'Fixed a bug loading Alert Box settings with a merged account',
+    'Added preset filters to the filter menu for non-audio sources',
+    'Fixed compatability issues with users on MacOS Big Sur',
+    'Added Viewer Count widget for Facebook users',
+    'Added a thumbnail uploader for YouTube users',
+    'Added Streamlabs Charity Goal widget',
+    'Refactored audio volmeters to respond at 60fps',
+    'Redesigned and condensed the Advanced Audio window',
+    'Fixed a bug in Edit Transform position with negative values',
+    'Fixed a bug related to chat zoom while multistreaming',
   ],
 };

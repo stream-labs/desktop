@@ -4,7 +4,7 @@
   "Days Remaining": "Hátralévő napok",
   "Start Goal": "Cél Indítása",
   "Goal": "Cél",
-  "End Goal": "Cél befejezése",
+  "End Goal": "End Goal",
   "Starting Amount": "Induló összeg",
   "End After": "Véget ér ezután",
   "Include resubs?": "Tartalmazza az Újra Feliratkozásokat is?",
@@ -16,10 +16,12 @@
   "Bar Text Color": "Szöveg színe a sávban",
   "Bar Thickness": "Sáv vastagság",
   "Font Family": "Betűtípus család",
-  "Stars Goal": "Csillagok célja",
+  "Stars Goal": "Stars Goal",
   "Facebook Stars": "Facebook Csillagok",
-  "Supporter Goal": "Támogató cél",
-  "Facebook Supporters": "A Facebook támogatói",
+  "Supporter Goal": "Supporter Goal",
+  "Facebook Supporters": "Facebook Supporters",
   "Facebook chat": "Facebook chat",
-  "Member Goal": "Tag Cél"
+  "Member Goal": "Tag Cél",
+  "Streamlabs Charity Goal": "Streamlabs Charity Goal",
+  "Streamlabs Charity Donations": "Streamlabs Charity Donations"
 }

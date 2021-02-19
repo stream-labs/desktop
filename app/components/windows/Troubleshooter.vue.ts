@@ -7,7 +7,7 @@ import { Inject } from '../../services/core/injector';
 import ModalLayout from '../ModalLayout.vue';
 import { TIssueCode } from 'services/troubleshooter';
 import { INotification, INotificationsServiceApi } from 'services/notifications';
-import { ISettingsServiceApi, ISettingsSubCategory } from 'services/settings';
+import { SettingsService, ISettingsSubCategory } from 'services/settings';
 import { WindowsService } from 'services/windows';
 import { StreamingService } from 'services/streaming';
 import { TObsFormData } from '../obs/inputs/ObsInput';
@@ -19,21 +19,22 @@ import StartStreamingButton from '../StartStreamingButton.vue';
 })
 export default class Troubleshooter extends Vue {
   @Inject() private notificationsService: INotificationsServiceApi;
-  @Inject() private settingsService: ISettingsServiceApi;
+  @Inject() private settingsService: SettingsService;
   @Inject() private windowsService: WindowsService;
   @Inject() streamingService: StreamingService;
-
-  streamingSettings: ISettingsSubCategory[] | null = null;
-  outputSettings: ISettingsSubCategory[] | null = null;
 
   issueCode = this.windowsService.getChildWindowQueryParams().issueCode as TIssueCode;
 
   private subscription: Subscription;
 
+  created() {
+    // Make sure we have the latest settings
+    this.settingsService.actions.loadSettingsIntoStore();
+  }
+
   mounted() {
-    this.getSettings();
     this.subscription = this.streamingService.streamingStatusChange
-      .pipe(debounceTime(500), tap(this.getSettings))
+      .pipe(debounceTime(500), tap(this.settingsService.actions.loadSettingsIntoStore))
       .subscribe();
   }
 
@@ -41,12 +42,14 @@ export default class Troubleshooter extends Vue {
     return this.notificationsService.views.getAll().find(notify => notify.code === this.issueCode);
   }
 
-  getSettings() {
-    if (this.issueCode === 'FRAMES_DROPPED') {
-      [this.streamingSettings, this.outputSettings] = getStreamSettings(
-        this.settingsService.getSettingsFormData,
-      );
-    }
+  get streamingSettings(): ISettingsSubCategory[] | null {
+    if (this.issueCode !== 'FRAMES_DROPPED') return null;
+    return this.settingsService.state.Stream.formData.map(hideParamsForCategory);
+  }
+
+  get outputSettings(): ISettingsSubCategory[] | null {
+    if (this.issueCode !== 'FRAMES_DROPPED') return null;
+    return this.settingsService.state.Output.formData.map(hideParamsForCategory);
   }
 
   showSettings() {
@@ -73,13 +76,6 @@ export default class Troubleshooter extends Vue {
     this.subscription.unsubscribe();
   }
 }
-
-const getStreamSettings = (getSettingsFn: (categoryName: string) => ISettingsSubCategory[]) => {
-  return [
-    getSettingsFn('Stream').map(hideParamsForCategory),
-    getSettingsFn('Output').map(hideParamsForCategory),
-  ];
-};
 
 const paramsToShow = ['server', 'VBitrate', 'ABitrate'];
 

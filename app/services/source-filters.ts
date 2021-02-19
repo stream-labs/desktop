@@ -8,7 +8,7 @@ import {
   IObsListInput,
 } from 'components/obs/inputs/ObsInput';
 import { metadata } from 'components/shared/inputs';
-
+import path from 'path';
 import { Inject } from './core/injector';
 import { SourcesService } from './sources';
 import { WindowsService } from './windows';
@@ -20,6 +20,7 @@ import { Subject } from 'rxjs';
 import { UsageStatisticsService } from './usage-statistics';
 import { getSharedResource } from 'util/get-shared-resource';
 import { ViewHandler } from 'services/core/stateful-service';
+import { byOS, OS } from 'util/operating-systems';
 
 export type TSourceFilterType =
   | 'mask_filter'
@@ -68,16 +69,16 @@ class SourceFiltersViews extends ViewHandler<{}> {
   get presetFilterOptions() {
     return [
       { title: $t('None'), value: '' },
-      { title: $t('Grayscale'), value: 'luts\\grayscale.png' },
-      { title: $t('Sepiatone'), value: 'luts\\sepia.png' },
-      { title: $t('Dramatic'), value: 'luts\\gazing.png' },
-      { title: $t('Flashback'), value: 'luts\\muted.png' },
-      { title: $t('Inverted'), value: 'luts\\inverted.png' },
-      { title: $t('Action Movie'), value: 'luts\\cool_tone.png' },
-      { title: $t('Hearth'), value: 'luts\\warm_tone.png' },
-      { title: $t('Wintergreen'), value: 'luts\\green_tone.png' },
-      { title: $t('Heat Map'), value: 'luts\\heat_map.png' },
-      { title: $t('Cel Shade'), value: 'luts\\cel_shade.png' },
+      { title: $t('Grayscale'), value: path.join('luts', 'grayscale.png') },
+      { title: $t('Sepiatone'), value: path.join('luts', 'sepia.png') },
+      { title: $t('Dramatic'), value: path.join('luts', 'gazing.png') },
+      { title: $t('Flashback'), value: path.join('luts', 'muted.png') },
+      { title: $t('Inverted'), value: path.join('luts', 'inverted.png') },
+      { title: $t('Action Movie'), value: path.join('luts', 'cool_tone.png') },
+      { title: $t('Hearth'), value: path.join('luts', 'warm_tone.png') },
+      { title: $t('Wintergreen'), value: path.join('luts', 'green_tone.png') },
+      { title: $t('Heat Map'), value: path.join('luts', 'heat_map.png') },
+      { title: $t('Cel Shade'), value: path.join('luts', 'cel_shade.png') },
     ];
   }
 
@@ -85,6 +86,7 @@ class SourceFiltersViews extends ViewHandler<{}> {
     return metadata.list({
       options: this.presetFilterOptions,
       title: $t('Visual Presets'),
+      optionsHeight: 230,
     });
   }
 
@@ -202,7 +204,8 @@ export class SourceFiltersService extends Service {
     // There is now 2 references to the filter at that point
     // We need to release one
     obsFilter.release();
-    if (this.presetFilter?.name !== '') {
+
+    if (this.presetFilter(sourceId)) {
       this.setOrder(sourceId, '__PRESET', 1);
     }
     this.filterAdded.next({ sourceId, name: filterName });

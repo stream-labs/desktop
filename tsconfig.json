@@ -1,7 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2015",
     "lib": [
       "dom",
       "es7",
@@ -16,20 +16,34 @@
     "removeComments": true,
     "suppressImplicitAnyIndexErrors": true,
     "allowSyntheticDefaultImports": true,
-
-    "outDir": "bundles/ts",
     "sourceMap": true,
     "allowJs": false,
     "strictNullChecks": false,
-    "emitDecoratorMetadata": true,
+    "emitDecoratorMetadata": false,
     "baseUrl": "./app",
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "types": [
+      "node-fetch",
+      "archiver",
+      "classnames",
+      "extract-zip",
+      "fs-extra",
+      "humps",
+      "lodash",
+      "mime",
+      "mkdirp",
+      "node",
+      "overlayscrollbars",
+      "request",
+      "semver",
+      "socket.io-client",
+      "tapable",
+      "uuid",
+      "vue-tsx-support"
+    ]
   },
-  "exclude": [
-    "node_modules"
-  ],
-  "include": [
-    "node_modules/vue-tsx-support/enable-check.d.ts",
-    "./app/**/*.ts"
+  "files": [
+    "./app/index.d.ts",
+    "./app/app.ts"
   ]
 }

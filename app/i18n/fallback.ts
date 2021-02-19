@@ -18,7 +18,6 @@ const fallbackDictionary = {
   ...require('./en-US/common.json'),
   ...require('./en-US/customization.json'),
   ...require('./en-US/facebook.json'),
-  ...require('./en-US/facemasks.json'),
   ...require('./en-US/filters.json'),
   ...require('./en-US/game-overlay.json'),
   ...require('./en-US/hotkeys.json'),

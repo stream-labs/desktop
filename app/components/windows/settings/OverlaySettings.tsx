@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { SceneCollectionsService } from 'services/scene-collections/index';
 import { OverlaysPersistenceService } from 'services/scene-collections/overlays';
-import { CustomizationService } from 'services/customization/index';
+import { CustomizationService } from 'services/customization';
 import electron from 'electron';
 import path from 'path';
 import { AppService } from 'services/app/index';
@@ -58,7 +58,7 @@ export default class OverlaySettings extends Vue {
       })
     ).filePaths;
 
-    if (!chosenPath) return;
+    if (!chosenPath[0]) return;
 
     this.busy = true;
     this.message = '';
@@ -72,14 +72,17 @@ export default class OverlaySettings extends Vue {
     });
   }
 
-  loadWidget() {
-    const chosenPath = electron.remote.dialog.showOpenDialog({
-      filters: [{ name: 'Widget File', extensions: ['widget'] }],
-    });
+  async loadWidget() {
+    const chosenPath = (
+      await electron.remote.dialog.showOpenDialog({
+        filters: [{ name: 'Widget File', extensions: ['widget'] }],
+      })
+    ).filePaths;
 
-    if (!chosenPath) return;
+    if (!chosenPath[0]) return;
 
     this.busy = true;
+    this.message = '';
 
     this.widgetsService
       .loadWidgetFile(chosenPath[0], this.scenesService.views.activeSceneId)

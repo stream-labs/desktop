@@ -60,10 +60,6 @@ export class InternalApiClient {
 
         if (!target[property]) return target[property];
 
-        if (Reflect.getMetadata('executeInCurrentWindow', target, property as string)) {
-          return target[property];
-        }
-
         if (typeof target[property] !== 'function' && !(target[property] instanceof Observable)) {
           return target[property];
         }
@@ -122,7 +118,14 @@ export class InternalApiClient {
           ...args,
         );
 
-        ipcRenderer.send('services-request-async', request);
+        try {
+          ipcRenderer.send('services-request-async', request);
+        } catch (e) {
+          console.error('Failed to send async services request', e, {
+            request,
+          });
+          throw e; // Re-raise original exception
+        }
 
         if (isObservable) {
           const observableResourceId = `${resourceId}.${methodName}`;

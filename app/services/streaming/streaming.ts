@@ -110,6 +110,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     replayBufferStatusTime: new Date().toISOString(),
     selectiveRecording: false,
     info: {
+      settings: null,
       lifecycle: 'empty',
       error: null,
       warning: '',
@@ -117,7 +118,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         applyOptimizedSettings: 'not-started',
         twitch: 'not-started',
         youtube: 'not-started',
-        mixer: 'not-started',
         facebook: 'not-started',
         setupMultistream: 'not-started',
         startVideoTransmission: 'not-started',
@@ -139,7 +139,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       },
       val => {
         // show the error if child window is closed
-        if (val.info.error && !this.windowsService.state.child.isShown) {
+        if (
+          val.info.error &&
+          !this.windowsService.state.child.isShown &&
+          this.streamSettingsService.protectedModeEnabled
+        ) {
           this.showGoLiveWindow();
         }
         this.streamInfoChanged.next(val);
@@ -232,6 +236,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     // save enabled platforms to reuse setting with the next app start
     this.streamSettingsService.setSettings({ goLiveSettings: settings });
 
+    // save current settings in store so we can re-use them if something will go wrong
+    this.SET_GO_LIVE_SETTINGS(settings);
+
     // show the GoLive checklist
     this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist' });
 
@@ -240,7 +247,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     for (const platform of platforms) {
       const service = getPlatformService(platform);
       try {
-        // don't update settigns for twitch in unattendedMode
+        // don't update settings for twitch in unattendedMode
         const settingsForPlatform = platform === 'twitch' && unattendedMode ? undefined : settings;
         await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform));
       } catch (e) {
@@ -373,6 +380,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   async updateStreamSettings(settings: IGoLiveSettings) {
     const lifecycle = this.state.info.lifecycle;
 
+    // save current settings in store so we can re-use them if something will go wrong
+    this.SET_GO_LIVE_SETTINGS(settings);
+
     // run checklist
     this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist' });
 
@@ -400,7 +410,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         await this.runCheck(platform, () => service.putChannelInfo(newSettings));
       } catch (e) {
         console.error(e);
-        this.setError('SETTINGS_UPDATE_FAILED', e.details, platform);
+        // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
+        const errorType =
+          (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
+            ? 'SETTINGS_UPDATE_FAILED'
+            : e.type || 'UNKNOWN_ERROR';
+        this.setError(errorType, e.details, platform);
         return;
       }
     }
@@ -481,6 +496,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     if (this.state.info.checklist.startVideoTransmission === 'done') {
       this.UPDATE_STREAM_INFO({ lifecycle: 'live' });
     }
+  }
+
+  resetStreamInfo() {
+    this.RESET_STREAM_INFO();
   }
 
   @mutation()
@@ -1033,6 +1052,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         .catch(() => {
           this.outputErrorOpen = false;
         });
+      this.windowsService.actions.closeChildWindow();
     }
   }
 
@@ -1081,5 +1101,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @mutation()
   private SET_WARNING(warningType: 'YT_AUTO_START_IS_DISABLED') {
     this.state.info.warning = warningType;
+  }
+
+  @mutation()
+  private SET_GO_LIVE_SETTINGS(settings: IGoLiveSettings) {
+    this.state.info.settings = settings;
   }
 }

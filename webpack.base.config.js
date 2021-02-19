@@ -1,11 +1,12 @@
 const path = require('path');
-const { CheckerPlugin } = require('awesome-typescript-loader');
 const webpack = require('webpack');
 const cp = require('child_process');
-const ManifestPlugin = require('webpack-manifest-plugin');
+const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const fs = require('fs');
 
-const plugins = process.env.SLOBS_FORKED_TYPECHECKING ? [new CheckerPlugin()] : [];
+const plugins = [];
 
 const commit = cp
   .execSync('git rev-parse --short HEAD')
@@ -19,30 +20,45 @@ plugins.push(
 );
 
 plugins.push(
-  new ManifestPlugin({
-    filter: file => file.isChunk,
+  new WebpackManifestPlugin({
+    filter: file =>
+      ['renderer.js', 'vendors~renderer.js', 'renderer.js.map', 'vendors~renderer.js.map'].includes(
+        file.name,
+      ),
   }),
 );
 
 plugins.push(new CleanWebpackPlugin());
+plugins.push(new VueLoaderPlugin());
 
-// uncomment and install to watch circular dependencies
-// const CircularDependencyPlugin = require('circular-dependency-plugin');
-// plugins.push(new CircularDependencyPlugin({
-//   // exclude detection of files based on a RegExp
-//   exclude: /a\.js|node_modules/,
-//   // add errors to webpack instead of warnings
-//   //failOnError: true
-// }));
+const tsFiles = [];
+const tsxFiles = [];
+
+if (process.env.SLOBS_STRICT_NULLS) {
+  const filesPath = 'strict-null-check-files';
+  const files = fs.readdirSync(filesPath);
+  files.forEach(file => {
+    const json = JSON.parse(fs.readFileSync(`${filesPath}/${file}`));
+    if (json.ts) tsFiles.push(...json.ts);
+    if (json.tsx) tsxFiles.push(...json.tsx);
+  });
+}
 
 // uncomment and install to analyze bundle size
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 // plugins.push(new BundleAnalyzerPlugin());
 
 module.exports = {
+  entry: {
+    renderer: './app/app.ts',
+    updater: './updater/mac/ui.js',
+    'guest-api': './guest-api',
+  },
+
   output: {
     path: __dirname + '/bundles',
     filename: '[name].js',
+    publicPath: '',
   },
 
   target: 'electron-renderer',
@@ -77,39 +93,75 @@ module.exports = {
     rules: [
       {
         test: /\.vue$/,
-        loader: 'vue-loader',
-        include: [path.resolve(__dirname, 'app/components'), path.resolve(__dirname, 'updater')],
-        options: {
-          esModule: true,
-          transformToRequire: {
-            video: 'src',
-            source: 'src',
-          },
-          loaders: { ts: 'awesome-typescript-loader' },
-        },
-      },
-      {
-        test: /\.ts$/,
-        loader: 'awesome-typescript-loader',
-        options: { useCache: true, reportFiles: ['app/**/*.ts'] },
-        exclude: /node_modules|vue\/src/,
-      },
-      {
-        test: /\.tsx$/,
-        include: path.resolve(__dirname, 'app/components'),
-        loader: [
-          'babel-loader',
+        use: [
           {
-            loader: 'awesome-typescript-loader',
+            loader: 'vue-loader',
             options: {
-              useCache: true,
-              reportFiles: ['app/components/**/*.tsx'],
-              configFileName: 'tsxconfig.json',
-              instance: 'tsx-loader',
+              esModule: true,
+              transformToRequire: {
+                video: 'src',
+                source: 'src',
+              },
             },
           },
         ],
-        exclude: /node_modules/,
+        include: [path.resolve(__dirname, 'app/components'), path.resolve(__dirname, 'updater')],
+      },
+      {
+        test: /\.ts$/,
+        exclude: [
+          path.resolve(__dirname, 'node_modules'),
+          path.resolve(__dirname, 'app', 'components-react'),
+        ],
+        use: {
+          loader: 'ts-loader',
+          options: {
+            reportFiles: tsFiles,
+            compilerOptions: {
+              strictNullChecks: !!process.env.SLOBS_STRICT_NULLS,
+            },
+          },
+        },
+      },
+      {
+        test: path => {
+          const match = !!path.match(/components[\\/].+\.tsx$/);
+          return match;
+        },
+        include: path.resolve(__dirname, 'app/components'),
+        use: [
+          'babel-loader',
+          {
+            loader: 'ts-loader',
+            options: {
+              reportFiles: tsxFiles,
+              compilerOptions: {
+                strictNullChecks: !!process.env.SLOBS_STRICT_NULLS,
+              },
+            },
+          },
+        ],
+      },
+      {
+        test: path => {
+          const match = !!path.match(/react[\\/].+\.tsx?$/);
+          return match;
+        },
+        include: path.resolve(__dirname, 'app/components-react'),
+        use: [
+          'babel-loader',
+          {
+            loader: 'ts-loader',
+            options: {
+              reportFiles: ['app/components-react/**/*'],
+              configFile: 'app/components-react/tsconfig.json',
+              instance: 'react-tsx',
+              compilerOptions: {
+                jsx: 'react',
+              },
+            },
+          },
+        ],
       },
       {
         test: /\.js$/,
@@ -117,8 +169,20 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
-        test: /\.m\.less$/, // Local style modules
-        include: path.resolve(__dirname, 'app/components'),
+        test: /(?<!\.[mg])\.less$/, // Vue style tags
+        include: [
+          path.resolve(__dirname, 'app/components'),
+          path.resolve(__dirname, 'app/components-react'),
+          path.resolve(__dirname, 'updater'),
+        ],
+        use: ['vue-style-loader', 'css-loader', 'less-loader'],
+      },
+      {
+        test: /\.m.less$/, // Local style modules
+        include: [
+          path.resolve(__dirname, 'app/components'),
+          path.resolve(__dirname, 'app/components-react'),
+        ],
         use: [
           { loader: 'style-loader' },
           {
@@ -180,8 +244,9 @@ module.exports = {
   optimization: {
     splitChunks: {
       chunks: chunk => chunk.name === 'renderer',
+      name: 'vendors~renderer',
     },
-    moduleIds: 'hashed',
+    moduleIds: 'deterministic',
   },
 
   plugins,

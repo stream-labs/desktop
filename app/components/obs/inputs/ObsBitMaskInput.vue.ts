@@ -2,9 +2,9 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
 import { ObsInput, TObsType, IObsBitmaskInput } from './ObsInput';
 import { EBit, default as Utils } from 'services/utils';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
-import { BoolInput } from 'components/shared/inputs/inputs';
+import { BoolButtonInput } from 'components/shared/inputs/inputs';
 
-@Component({ components: { HFormGroup, BoolInput } })
+@Component({ components: { HFormGroup, BoolButtonInput } })
 class ObsBitMaskInput extends ObsInput<IObsBitmaskInput> {
   static obsType: TObsType;
 

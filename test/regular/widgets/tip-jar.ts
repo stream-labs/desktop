@@ -1,7 +1,6 @@
 import { test, useSpectron } from '../../helpers/spectron';
 import { addSource } from '../../helpers/spectron/sources';
 import { logIn } from '../../helpers/spectron/user';
-import { sleep } from '../../helpers/sleep';
 
 useSpectron();
 
@@ -13,8 +12,8 @@ test('Set tip-jar settings', async t => {
   const martiniGlass = '[src="https://cdn.streamlabs.com/static/tip-jar/jars/glass-martini.png"]';
   const activeMartiniGlass =
     '.active img[src="https://cdn.streamlabs.com/static/tip-jar/jars/glass-martini.png"]';
-  await client.waitForVisible(martiniGlass);
-  await client.click(martiniGlass);
-  await client.waitForVisible(activeMartiniGlass);
+  await (await client.$(martiniGlass)).waitForDisplayed();
+  await (await client.$(martiniGlass)).click();
+  await (await client.$(activeMartiniGlass)).waitForDisplayed();
   t.pass();
 });
