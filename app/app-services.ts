@@ -114,6 +114,8 @@ import { PerformanceService } from './services/performance';
 import { NavigationService } from './services/navigation';
 import { AnnouncementsService } from './services/announcements';
 import { SettingsService } from './services/settings';
+import { ChatService } from './services/chat';
+import { RestreamService } from './services/restream';
 export const AppServices = {
   WindowsService,
   ScenesService,
@@ -123,4 +125,6 @@ export const AppServices = {
   CustomizationService,
   EditorCommandsService,
   PerformanceService,
+  ChatService,
+  RestreamService,
 };
