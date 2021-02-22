@@ -55,6 +55,7 @@ export class NewsBanner extends ReactComponent {}
 @Component({
   props: {
     name: { default: 'Display' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
     componentProps: {
       default: () => ({
         paddingSize: 0,
