@@ -52,3 +52,10 @@ export class NameFolder extends ReactComponent {}
   },
 })
 export class NewsBanner extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'TitleBar' },
+    componentProps: { default: () => ({ windowId: '' }) },
+  },
+})
+export class TitleBar extends ReactComponent {}
