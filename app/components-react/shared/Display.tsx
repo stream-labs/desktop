@@ -33,6 +33,8 @@ export default function Display(props: DisplayProps) {
   const displayEl = useRef<HTMLDivElement>(null);
 
   useEffect(lifecycle, []);
+  useEffect(updateDisplay, [p.sourceId, v.paddingColor]);
+  useEffect(refreshOutputRegion, [v.baseResolution]);
 
   function lifecycle() {
     // componentDidMount
@@ -44,22 +46,9 @@ export default function Display(props: DisplayProps) {
     };
   }
 
-  const watchers = useRef({
-    sourceId: p.sourceId,
-    paddingColor: v.paddingColor,
-    baseResolution: v.baseResolution,
-  });
-  if (watchers.current.sourceId !== p.sourceId) {
-    watchers.current.sourceId = p.sourceId;
-    updateDisplay();
-  }
-  if (watchers.current.paddingColor !== v.paddingColor) {
-    watchers.current.paddingColor = v.paddingColor;
-    updateDisplay();
-  }
-  if (watchers.current.baseResolution !== v.baseResolution) {
-    watchers.current.baseResolution = v.baseResolution;
-    if (obsDisplay.current) obsDisplay.current.refreshOutputRegion();
+  function refreshOutputRegion() {
+    if (!obsDisplay.current) return;
+    obsDisplay.current.refreshOutputRegion();
   }
 
   function onClickHandler(event: React.MouseEvent) {
