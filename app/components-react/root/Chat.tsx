@@ -22,12 +22,7 @@ export default function Chat(props: { restream: boolean }) {
   let leaveFullScreenTrigger: Function;
 
   useEffect(lifecycle, []);
-  const restream = useRef(props.restream);
-
-  if (restream.current !== props.restream) {
-    changeChat();
-    restream.current = props.restream;
-  }
+  useEffect(changeChat, [props.restream]);
 
   function lifecycle() {
     mounted();
