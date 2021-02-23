@@ -20,8 +20,6 @@ export default function PerformanceMetrics(props: { mode: TPerformanceMetricsMod
     bandwidth: PerformanceService.views.bandwidth,
   }));
 
-  console.log(props);
-
   function showAttribute(attribute: string) {
     return props.mode === 'full' || v.pinnedStats[attribute];
   }
