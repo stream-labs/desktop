@@ -31,9 +31,9 @@ export default class TwitchEditStreamInfo extends BaseEditSteamInfo<TwitchEditSt
           <CommonPlatformFields vModel={this.settings} platform="twitch" />
         )}
 
-        {/*<HFormGroup title={$t('Twitch Game')}>*/}
-        {/*  <GameSelector vModel={this.settings} platform="twitch" />*/}
-        {/*</HFormGroup>*/}
+        <HFormGroup title={$t('Twitch Game')}>
+          <GameSelector vModel={this.settings} platform="twitch" />
+        </HFormGroup>
 
         {!canShowOnlyRequiredFields && (
           <TwitchTagsInput
