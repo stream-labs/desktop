@@ -126,6 +126,7 @@ export async function loginWithAuthInfo(
         channelId: user.channelId,
       },
     },
+    hasRelogged: true,
   };
   await focusWorker(t);
   t.context.app.webContents.send('testing-fakeAuth', authInfo, isOnboardingTest);
