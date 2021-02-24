@@ -12,8 +12,11 @@ import { InputComponent } from './inputs';
 export default InputComponent(function InputWrapper(p: FormItemProps & { nowrap?: boolean }) {
   const formItemProps = omit(p, 'nowrap');
   const label = p.label || ' ';
+
+  // take layout from the form context
   const context = useContext(FormContext);
   const layout = context ? pick(context, 'labelCol', 'wrapperCol') : {};
+
   return p.nowrap ? (
     <>{p.children}</>
   ) : (

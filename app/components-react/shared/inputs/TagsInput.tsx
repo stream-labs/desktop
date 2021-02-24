@@ -14,14 +14,14 @@ interface ICustomTagsProps extends ICustomListProps {
   tagRender?: (tagProps: TagProps, tag: IListOption) => ReactElement<typeof Tag>;
 }
 
-type TProps = TSlobsInputProps<
+export type TTagsInputProps = TSlobsInputProps<
   ICustomTagsProps,
   string[],
   SelectProps<string>,
   ValuesOf<typeof ANT_SELECT_FEATURES>
 >;
 
-export const TagsInput = InputComponent((p: TProps) => {
+export const TagsInput = InputComponent((p: TTagsInputProps) => {
   const { inputAttrs, wrapperAttrs } = useInput('tags', p);
   const options = p.options;
   const tagsMap = useMemo(() => keyBy(options, 'value'), [options]);

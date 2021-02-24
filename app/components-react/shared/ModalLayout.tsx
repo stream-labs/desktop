@@ -11,7 +11,7 @@ import { ModalProps } from 'antd/lib/modal';
 type TProps = { children: ReactNode } & Pick<ModalProps, 'footer' | 'onOk' | 'okText'>;
 
 /**
- * A modal layout for showing dialogs
+ * Wraps content for the child windows
  */
 export function ModalLayout(p: TProps) {
   // inject services

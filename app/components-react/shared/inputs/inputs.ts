@@ -1,26 +1,15 @@
+/**
+ * Shared code for inputs
+ */
 import { InputProps } from 'antd/lib/input';
-import React, {
-  Ref,
-  useEffect,
-  RefObject,
-  useRef,
-  useContext,
-  ChangeEvent,
-  FocusEvent,
-  useCallback,
-} from 'react';
-import { Input } from 'antd';
+import React, { useEffect, useContext, ChangeEvent, FocusEvent, useCallback } from 'react';
 import { FormContext } from './Form';
 import { useDebounce, useOnCreate, useStateHelper } from '../../hooks';
 import uuid from 'uuid';
 import { FormItemProps } from 'antd/lib/form';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
-import omit from 'lodash/omit';
 import { $t } from '../../../services/i18n';
 import { pick } from 'lodash';
-/**
- * Shared code for inputs
- */
 
 type TInputType =
   | 'text'
@@ -45,30 +34,20 @@ export interface IInputCommonProps<TValue> {
   debounce?: number;
 }
 
-// export type TSlobsInputProps<TInputProps, TValue> = Omit<
-//   FormItemProps & TInputProps,
-//   keyof IInputCustomProps<TValue>
-// > &
-//   IInputCustomProps<TValue>;
-
 export type ValuesOf<T extends ReadonlyArray<string>> = T[number];
 
 /**
- * From T, pick a set of properties whose keys are in the union K
+ * A helper type for input props
  */
-type MyPick<T, K extends keyof T> = {
-  [P in K]: T[P];
-};
-
 export type TSlobsInputProps<
-  TCustomProps extends object,
-  TValue,
-  TAntProps = {},
-  TFeatures extends keyof Partial<TAntProps> = never
+  TCustomProps extends object, // custom input props defined for SLOBS
+  TValue, // the input value type
+  TAntProps = {}, // props of the antd input that is working under the hood
+  TFeatures extends keyof Partial<TAntProps> = never // props of antd input that we support
 > = Pick<TAntProps, TFeatures> & FormItemProps & IInputCommonProps<TValue> & TCustomProps;
 
 /**
- * Base hook for inputs
+ * A base hook for inputs
  * Registers input in the Form to properly handle validations
  * and returns props for Input and Wrapper components
  */
@@ -88,7 +67,7 @@ export function useInput<
 ) {
   const { name, value, label } = inputProps;
 
-  // get parent form
+  // get parent form if exist
   const formContext = useContext(FormContext);
   const form = formContext?.antForm;
 
@@ -104,13 +83,16 @@ export function useInput<
     if (form) form.setFieldsValue({ [inputId]: value });
   }, [value]);
 
+  // create a local state for the input
   const { stateRef, updateState } = useStateHelper({ value: inputProps.value });
-  const emitChangeDebounced = useDebounce(inputProps.debounce, emitChange);
 
+  // create an `emitChange()` method and it's debounced version
   function emitChange() {
     inputProps.onChange && inputProps.onChange(stateRef.current.value!);
   }
+  const emitChangeDebounced = useDebounce(inputProps.debounce, emitChange);
 
+  // create onChange handler
   const onChange = useCallback((newVal: TValue) => {
     if (newVal === stateRef.current.value) return;
     updateState({ value: newVal });
@@ -132,20 +114,19 @@ export function useInput<
     'data-id': inputId,
   };
 
-  // Create the "required" validation rule
+  // Handle a shortcut for the "required" validation rule
   const rules = inputProps.rules ? [...inputProps.rules] : [];
   if (inputProps.required) {
     rules.push({ required: true, message: $t('The field is required') });
   }
 
+  // pick props for the input wrapper
   const wrapperAttrs = {
-    // pick used features of Form.Item
     ...pick(inputProps, [
       'className',
       'style',
       'key',
       'label',
-      'colon',
       'extra',
       'labelCol',
       'wrapperCol',
@@ -157,6 +138,7 @@ export function useInput<
     name: inputId,
   };
 
+  // pick props for the input element
   const inputAttrs = {
     ...(pick(inputProps, 'disabled', 'placeholder', antFeatures || []) as {}),
     ...dataAttrs,
@@ -186,7 +168,9 @@ export function useTextInput<T = string>(
   // Text inputs are uncontrolled by default for better performance
   const uncontrolled = p.uncontrolled === true || p.uncontrolled !== false;
 
+  // we need to handle onChange differently for text inputs
   const onChange = useCallback((ev: ChangeEvent<any>) => {
+    // for controlled and debounced inputs call the `onChange()` handler immediately
     if (!uncontrolled || p.debounce) {
       inputAttrs.onChange(ev.target.value);
     }
@@ -196,7 +180,7 @@ export function useTextInput<T = string>(
   }, []);
 
   const onBlur = useCallback((ev: FocusEvent<any>) => {
-    // for uncontrolled components call the onChange() handler on blur
+    // for uncontrolled components call the `onChange()` handler on blur
     if (uncontrolled) {
       inputAttrs.onChange(ev.target.value);
     }
@@ -210,6 +194,7 @@ export function useTextInput<T = string>(
       onChange,
       onBlur,
     },
+    stateRef,
     originalOnChange: inputAttrs.onChange,
   };
 }

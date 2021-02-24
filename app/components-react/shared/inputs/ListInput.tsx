@@ -1,11 +1,11 @@
 import { Select, Row, Col } from 'antd';
-import React, { useContext, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import { InputComponent, TSlobsInputProps, useInput, ValuesOf } from './inputs';
 import InputWrapper from './InputWrapper';
-import { SelectProps, OptionProps } from 'antd/lib/select';
+import { SelectProps } from 'antd/lib/select';
 import { useDebounce } from '../../hooks';
 
-// select which features from the antd lib we are going to use
+// select what features from the antd lib we are going to use
 const ANT_SELECT_FEATURES = [
   'showSearch',
   'loading',
@@ -26,7 +26,7 @@ export interface ICustomListProps {
 }
 
 // define a type for the component's props
-type TProps = TSlobsInputProps<
+export type TListInputProps = TSlobsInputProps<
   ICustomListProps,
   string,
   SelectProps<string>,
@@ -43,9 +43,11 @@ export interface IListOption {
   image?: string;
 }
 
-export const ListInput = InputComponent((p: TProps) => {
+export const ListInput = InputComponent((p: TListInputProps) => {
   const { inputAttrs, wrapperAttrs } = useInput('list', p, ANT_SELECT_FEATURES);
   const options = p.options;
+
+  // create onSearch handler and it's debounced version
   const onSearchHandlerDebounced = p.debounce
     ? useDebounce(p.debounce, onSearchHandler)
     : onSearchHandler;

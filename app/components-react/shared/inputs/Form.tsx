@@ -8,8 +8,14 @@ type TFormContext = {
   nowrap?: boolean;
 } & Pick<FormItemProps, 'labelCol' | 'wrapperCol'>;
 
+/**
+ * stores the antForm instance and layout parameters for form inputs
+ */
 export const FormContext = React.createContext<TFormContext | null>(null);
 
+/**
+ * Form handle validations and sets the layout for the input components
+ */
 export default React.memo(function Form(p: FormProps) {
   const context = useContext(FormContext);
   const [antForm] = AntForm.useForm(context?.antForm || p.form);
@@ -31,6 +37,7 @@ export default React.memo(function Form(p: FormProps) {
     };
   });
 
+  // data attributes helps to find this form in DOM in tests
   const dataAttrs = {
     'data-role': 'form',
     'data-name': p.name,
@@ -39,8 +46,12 @@ export default React.memo(function Form(p: FormProps) {
   return (
     <FormContext.Provider value={contextValue}>
       {context ? (
+        // if the context exists then AntForm is already created as an ancestor
+        // create a simple div
         <div {...dataAttrs}>{p.children}</div>
       ) : (
+        // there is no AntForm in ancestor, this is a root form
+        // create the AntForm container for children
         <AntForm {...dataAttrs} {...contextValue.layout} {...p} form={antForm}>
           {p.children}
         </AntForm>

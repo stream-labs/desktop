@@ -1,8 +1,7 @@
-import { Input, InputNumber } from 'antd';
+import { InputNumber } from 'antd';
 import React from 'react';
 import { TSlobsInputProps, useTextInput, ValuesOf } from './inputs';
 import InputWrapper from './InputWrapper';
-import { InputProps } from 'antd/lib/input';
 import { InputNumberProps } from 'antd/lib/input-number';
 
 // select which features from the antd lib we are going to use

@@ -3,7 +3,9 @@ import React from 'react';
 import { InputComponent, TSlobsInputProps, useInput } from './inputs';
 import { CheckboxProps } from 'antd/lib/checkbox';
 
-export const CheckboxInput = InputComponent((p: TSlobsInputProps<{}, boolean, CheckboxProps>) => {
+export type TCheckboxInputProps = TSlobsInputProps<{}, boolean, CheckboxProps>;
+
+export const CheckboxInput = InputComponent((p: TCheckboxInputProps) => {
   const { inputAttrs, stateRef } = useInput('checkbox', p);
   const value = stateRef.current.value;
   return (
@@ -13,4 +15,4 @@ export const CheckboxInput = InputComponent((p: TSlobsInputProps<{}, boolean, Ch
       </Checkbox>
     </div>
   );
-})
+});

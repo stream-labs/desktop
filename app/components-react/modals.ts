@@ -9,7 +9,7 @@ import { $t } from '../services/i18n';
  * Uses Modal.confirm under the hood
  *
  * @example
- * confirm({ title: 'Confirm me' })
+ * confirm('Confirm me')
  * .then(confirmed => console.log(confirmed ? 'Confirmed' : 'Canceled'))
  *
  */

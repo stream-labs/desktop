@@ -1,21 +1,20 @@
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import { InputComponent, TSlobsInputProps, useInput, ValuesOf } from './inputs';
 import { Slider, InputNumber, Row, Col } from 'antd';
 import { SliderSingleProps } from 'antd/lib/slider';
-import InputWrapper from './InputWrapper';
-import { useDebounce, useStateHelper } from '../../hooks';
+import InputWrapper from './InputWrapper';;
 
 // select which features from the antd lib we are going to use
 const ANT_SLIDER_FEATURES = ['min', 'max'] as const;
 
-type TProps = TSlobsInputProps<
+export type TSliderInputProps = TSlobsInputProps<
   { hasNumberInput?: boolean },
   number,
   SliderSingleProps,
   ValuesOf<typeof ANT_SLIDER_FEATURES>
 >;
 
-export const SliderInput = InputComponent((partialProps: TProps) => {
+export const SliderInput = InputComponent((partialProps: TSliderInputProps) => {
   // apply default props
   const p = {
     hasNumberInput: true,

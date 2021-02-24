@@ -60,7 +60,7 @@ export function useAsyncState<TStateType>(
   const promise = useMemo(() => {
     if (asyncCb) {
       return asyncCb(state).then(newState => {
-        // do not set state if the component has been destroyed
+        // do not update the state if the component has been destroyed
         if (isDestroyed) return null;
         setState(newState);
         return newState;
@@ -75,7 +75,7 @@ export function useAsyncState<TStateType>(
   return [state, setState, promise];
 }
 
-type TStateActions<StateType> = {
+type TStateHelper<StateType> = {
   s: StateType;
   setState: (p: StateType) => unknown;
   updateState: (p: Partial<StateType>) => unknown;
@@ -94,8 +94,10 @@ type TStateActions<StateType> = {
   stateRef: { current: StateType };
 };
 
-// safe for async/await
-export function useStateHelper<T extends object>(initializer: T | (() => T)): TStateActions<T> {
+/**
+ * Create the state object and return helper methods
+ */
+export function useStateHelper<T extends object>(initializer: T | (() => T)): TStateHelper<T> {
   const [s, setStateRaw] = useState<T>(initializer);
 
   // create a reference to the last actual state
@@ -115,7 +117,6 @@ export function useStateHelper<T extends object>(initializer: T | (() => T)): TS
   return {
     s,
     setState,
-    // TODO rename to setRecord or smth
     setItem<TDict extends keyof T, TKey extends keyof T[TDict]>(
       dictionaryName: TDict,
       key: TKey,
@@ -132,6 +133,9 @@ export function useStateHelper<T extends object>(initializer: T | (() => T)): TS
   };
 }
 
+/**
+ * Create a debounced version of the function
+ */
 export function useDebounce<T extends (...args: any[]) => any>(ms = 0, cb: T) {
   return useCallback(debounce(cb, ms), []);
 }

@@ -25,7 +25,7 @@ export default function Scrollable(initialProps: IScrollableProps & HTMLAttribut
     ...initialProps,
   };
 
-  const [wrapperStyles, setWrapperStyles] = useState<CSSProperties>({}); // p.snapToWindowEdge ? { marginRight: '-24px', paddingRight: '24px' } : {};
+  const [wrapperStyles, setWrapperStyles] = useState<CSSProperties>({});
 
   function onOverflowChanged(ev?: { yScrollable: boolean }) {
     if (!ev) return;
