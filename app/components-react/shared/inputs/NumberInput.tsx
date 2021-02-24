@@ -16,8 +16,6 @@ export const NumberInput = React.memo((p: TProps) => {
     ANT_NUMBER_FEATURES,
   );
 
-  console.log(`Render number input ${p.name} with value`, p.value);
-
   function onChangeHandler(val: number | string) {
     // don't emit onChange if the value is out of range
     if (typeof val !== 'number') return;

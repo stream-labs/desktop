@@ -7,8 +7,6 @@ import { InputProps } from 'antd/lib/input';
 export const TextInput = InputComponent(
   (p: TSlobsInputProps<{ uncontrolled?: boolean }, string, InputProps>) => {
     const { inputAttrs, wrapperAttrs } = useTextInput(p);
-
-    console.log(`Render text input ${p.name} with value`, p.value);
     return (
       <InputWrapper {...wrapperAttrs}>
         <Input {...inputAttrs} />

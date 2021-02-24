@@ -8,7 +8,6 @@ export type TSwitchInputProps = TSlobsInputProps<{}, boolean, SwitchProps>;
 
 export const SwitchInput = InputComponent((p: TSwitchInputProps) => {
   const { wrapperAttrs, inputAttrs, stateRef } = useInput('switch', p);
-  console.log(`Render switch input ${p.name} with value`, p.value);
   return (
     <InputWrapper {...wrapperAttrs}>
       <Switch checked={stateRef.current.value} size="small" {...inputAttrs} />

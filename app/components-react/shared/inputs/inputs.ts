@@ -108,7 +108,6 @@ export function useInput<
   const emitChangeDebounced = useDebounce(inputProps.debounce, emitChange);
 
   function emitChange() {
-    console.log('emit change', stateRef.current);
     inputProps.onChange && inputProps.onChange(stateRef.current.value!);
   }
 
@@ -189,7 +188,6 @@ export function useTextInput<T = string>(
 
   const onChange = useCallback((ev: ChangeEvent<any>) => {
     if (!uncontrolled || p.debounce) {
-      console.log('Component is controlled, call onChange', ev.target.value);
       inputAttrs.onChange(ev.target.value);
     }
 
@@ -200,7 +198,6 @@ export function useTextInput<T = string>(
   const onBlur = useCallback((ev: FocusEvent<any>) => {
     // for uncontrolled components call the onChange() handler on blur
     if (uncontrolled) {
-      console.log('Component is UNcontrolled, call onBlur', ev.target.value);
       inputAttrs.onChange(ev.target.value);
     }
     p.onBlur && p.onBlur(ev);

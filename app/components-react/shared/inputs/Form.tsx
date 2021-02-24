@@ -11,7 +11,6 @@ type TFormContext = {
 export const FormContext = React.createContext<TFormContext | null>(null);
 
 export default React.memo(function Form(p: FormProps) {
-  console.log('render form', p);
   const context = useContext(FormContext);
   const [antForm] = AntForm.useForm(context?.antForm || p.form);
   const contextValue = useOnCreate(() => {

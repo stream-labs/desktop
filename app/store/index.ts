@@ -122,7 +122,6 @@ export function commitMutation(mutation: IMutation) {
   if (appliedForeignMutations.has(mutation.id)) return;
   appliedForeignMutations.add(mutation.id);
 
-  console.log('commitMutation', mutation);
   store.commit(
     mutation.type,
     Object.assign({}, mutation.payload, {
