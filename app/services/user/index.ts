@@ -268,6 +268,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       await electron.remote.session.defaultSession.clearStorageData({
         storages: ['appcache, cookies', 'cachestorage'],
       });
+      this.streamSettingsService.resetStreamSettings();
       this.LOGOUT();
       this.SET_IS_RELOG(true);
       this.showLogin();
