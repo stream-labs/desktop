@@ -10,10 +10,26 @@ const fs = require('fs');
 const fetch = require('node-fetch');
 const request = require('request');
 
+export interface ITestStats {
+  duration: number;
+  syncIPCCalls: number;
+}
+
+const {
+  BUILD_BUILDID,
+  SYSTEM_JOBID,
+  BUILD_REASON,
+  BUILD_SOURCEBRANCH,
+  SYSTEM_JOBNAME,
+  BUILD_DEFINITIONNAME,
+  SLOBS_TEST_RUN_CHUNK,
+} = process.env;
+
 export const USER_POOL_TOKEN = process.env.SLOBS_TEST_USER_POOL_TOKEN;
 const USER_POOL_URL = 'https://slobs-users-pool.herokuapp.com';
 const FAILED_TESTS_PATH = 'test-dist/failed-tests.json'; // failed will be written down to this file
 const TESTS_TIMINGS_PATH = 'test-dist/test-timings.json'; // a known timings for tests should be provided in this file
+const TEST_STATS_PATH = 'test-dist/test-stats.json'; // each successfully completed tests save stats like duration, syncIPCCalls in this file
 
 // save names of all running tests in this array to use them in the retrying mechanism
 const pendingTests: string[] = [];
@@ -103,16 +119,17 @@ function isTestEligibleToRun(testName: string) {
   return testChunkNum === currentChunkNum;
 }
 
-export function saveTestExecutionTimeToDB(timings: Record<string, number>) {
+export function saveTestStatsToFile(stats: Record<string, ITestStats>) {
+  console.log('save test stats', stats);
   if (!process.env.SLOBS_TEST_RUN_CHUNK) {
     // don't save timings for tests that are not sliced
     return;
   }
-  try {
-    return requestUtilsServer('testTimings', 'post', timings);
-  } catch (e) {
-    console.error('Failed to send timings');
+  if (fs.existsSync(TEST_STATS_PATH)) {
+    // tslint:disable-next-line:no-parameter-reassignment
+    stats = { ...JSON.parse(fs.readFileSync(TEST_STATS_PATH, 'utf8')), ...stats };
   }
+  fs.writeFileSync(TEST_STATS_PATH, JSON.stringify(stats));
 }
 
 export function requestUtilsServer(path: string, method = 'get', body?: unknown) {

@@ -151,6 +151,14 @@
           </scrollable>
         </div>
 
+        <div class="source-group" v-if="!loggedIn">
+          <h3>{{ $t('You must be logged in for Widgets') }}</h3>
+          <button @click="handleAuth()" class="source--login">
+              <h3>{{ $t('Click here to log in') }}</h3>
+              <img :src="getLoginSrc()" />
+          </button>
+        </div>
+        
         <div class="source-group" v-if="loggedIn">
           <h3>{{ $t('Widgets') }}</h3>
           <scrollable className="source-list">
@@ -362,5 +370,40 @@ h2 {
 .source__icon {
   margin-right: 10px;
   width: 30px;
+}
+
+.source--login {
+  .radius();
+
+  cursor: pointer;
+  padding: 4px 8px;
+  background-color: var(--section);
+  width: 100%;
+  height: 90%;
+  margin-right: 4px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: inline-block;
+  overflow: hidden;
+
+  &:hover {
+    .weight(@medium);
+    color: var(--title);
+    background-color: var(--button);
+  }
+
+  > div {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: inline-block;
+    overflow: hidden;
+  }
+
+  img {
+    width: 50%;
+    height: 50%;
+  }
 }
 </style>

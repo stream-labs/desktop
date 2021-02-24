@@ -87,11 +87,6 @@ export class KeyListenerService extends Service {
   unregister(binding: IKeyBinding, namespace = 'global') {
     const keystr = this.getKeyString(binding);
     delete this.bindings[keystr][namespace];
-
-    if (Object.keys(this.bindings[keystr]).length === 0) {
-      delete this.bindings[keystr];
-      this.libuiohook.unregisterCallback(binding);
-    }
   }
 
   shutdown() {

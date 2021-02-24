@@ -20,7 +20,16 @@ export class IpcServerService extends Service {
     this.requestHandler = (event: Electron.Event, request: IJsonRpcRequest) => {
       const response: IJsonRpcResponse<any> = this.exec(request);
 
-      if (!request.params.noReturn) ipcRenderer.send('services-response', response);
+      if (!request.params.noReturn) {
+        try {
+          ipcRenderer.send('services-response', response);
+        } catch (e) {
+          console.error('Failed to send services response', e, {
+            request,
+            response,
+          });
+        }
+      }
     };
     ipcRenderer.on('services-request', this.requestHandler);
     ipcRenderer.send('services-ready');
@@ -33,6 +42,7 @@ export class IpcServerService extends Service {
         console.error(
           'Failed to send event to an IPC client. Make sure the object is serializable',
           e,
+          event,
         );
       }
     });

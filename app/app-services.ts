@@ -123,10 +123,14 @@ import { YoutubeService } from './services/platforms/youtube';
 import { FacebookService } from './services/platforms/facebook';
 import { DismissablesService } from './services/dismissables';
 import { NavigationService } from './services/navigation';
+import { AnnouncementsService } from './services/announcements';
 
 export const AppServices = {
   WindowsService,
   ScenesService,
+  NavigationService,
+  AnnouncementsService,
+  SettingsService,
   CustomizationService,
   EditorCommandsService,
   PerformanceService,
@@ -137,9 +141,7 @@ export const AppServices = {
   TwitterService,
   YoutubeService,
   FacebookService,
-  SettingsService,
   UserService,
   TwitchService,
   DismissablesService,
-  NavigationService,
 };

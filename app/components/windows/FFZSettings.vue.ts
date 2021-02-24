@@ -34,6 +34,7 @@ export default class FFZSettings extends Vue {
         var ffzscript1 = document.createElement('script');
         ffzscript1.setAttribute('src','https://cdn.frankerfacez.com/script/script.min.js');
         document.head.appendChild(ffzscript1);
+        0;
       `,
         true,
       );

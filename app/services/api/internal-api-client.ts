@@ -118,7 +118,14 @@ export class InternalApiClient {
           ...args,
         );
 
-        ipcRenderer.send('services-request-async', request);
+        try {
+          ipcRenderer.send('services-request-async', request);
+        } catch (e) {
+          console.error('Failed to send async services request', e, {
+            request,
+          });
+          throw e; // Re-raise original exception
+        }
 
         if (isObservable) {
           const observableResourceId = `${resourceId}.${methodName}`;

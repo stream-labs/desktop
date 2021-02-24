@@ -9,7 +9,7 @@ import { Component } from 'vue-property-decorator';
 class WrapperProps<TComponentProps> {
   name?: string = null;
   componentProps: TComponentProps = null;
-  wrapperStyles?: unknown = () => {};
+  wrapperStyles?: Dictionary<string> = null;
 }
 
 /**
@@ -54,6 +54,13 @@ export class Playground extends ReactComponent {}
   },
 })
 export class NameFolder extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'NewsBanner' },
+  },
+})
+export class NewsBanner extends ReactComponent {}
 
 @Component({
   props: {
