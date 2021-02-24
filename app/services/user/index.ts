@@ -50,6 +50,7 @@ interface IUserServiceState {
   isPrime: boolean;
   expires?: string;
   userId?: number;
+  isRelog?: boolean;
 }
 
 interface ILinkedPlatform {
@@ -199,6 +200,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     Vue.set(this.state, 'authProcessState', state);
   }
 
+  @mutation()
+  private SET_IS_RELOG(isrelog: boolean) {
+    Vue.set(this.state, 'isRelog', isrelog);
+  }
+
   /**
    * Checks for v1 auth schema and migrates if needed
    */
@@ -254,15 +260,25 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     );
   }
 
-  autoLogin() {
+  async autoLogin() {
     if (!this.state.auth) return;
 
-    // don't allow to login via deleted Mixer platform
-    const allPlatforms = this.streamingService.views.allPlatforms;
-    if (!allPlatforms.includes(this.state.auth.primaryPlatform)) return;
+    if (!this.state.auth.hasRelogged) {
+      await electron.remote.session.defaultSession.clearCache();
+      await electron.remote.session.defaultSession.clearStorageData({
+        storages: ['appcache, cookies', 'cachestorage'],
+      });
+      this.LOGOUT();
+      this.SET_IS_RELOG(true);
+      this.showLogin();
+    } else {
+      // don't allow to login via deleted Mixer platform
+      const allPlatforms = this.streamingService.views.allPlatforms;
+      if (!allPlatforms.includes(this.state.auth.primaryPlatform)) return;
 
-    const service = getPlatformService(this.state.auth.primaryPlatform);
-    return this.login(service, this.state.auth);
+      const service = getPlatformService(this.state.auth.primaryPlatform);
+      return this.login(service, this.state.auth);
+    }
   }
 
   subscribeToSocketConnection() {
@@ -710,6 +726,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         /* eslint-enable */
 
     this.SET_AUTH_STATE(EAuthProcessState.Busy);
+    this.SET_IS_RELOG(false);
 
     let result: EPlatformCallResult;
 
