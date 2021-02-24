@@ -41,14 +41,6 @@ class ReactComponent<TComponentProps = {}> extends TsxComponent<WrapperProps<TCo
 
 @Component({
   props: {
-    name: { default: 'Playground' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
-export class Playground extends ReactComponent {}
-
-@Component({
-  props: {
     name: { default: 'NameFolder' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },
@@ -61,11 +53,3 @@ export class NameFolder extends ReactComponent {}
   },
 })
 export class NewsBanner extends ReactComponent {}
-
-@Component({
-  props: {
-    name: { default: 'GoLiveWindow' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
-export class GoLiveWindow extends ReactComponent {}

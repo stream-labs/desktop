@@ -61,7 +61,6 @@
     "serial": true
   },
   "dependencies": {
-    "@types/react-transition-group": "^4.4.0",
     "archiver": "2.1.1",
     "aws-sdk": "^2.344.0",
     "color-picker": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/color-picker-0.0.0.tar.gz",
@@ -81,11 +80,8 @@
     "obs-studio-node": "https://s3-us-west-2.amazonaws.com/obsstudionodes3.streamlabs.com/osn-0.0.0-release.tar.gz",
     "overlayscrollbars-react": "^0.2.2",
     "raven": "^2.6.4",
-    "react-devtools-electron": "^4.7.0",
-    "react-transition-group": "^4.4.1",
     "request": "^2.88.0",
     "rimraf": "^2.6.1",
-    "save-dev": "^0.0.1-security",
     "semver": "^5.5.1",
     "socket.io-client": "2.1.1",
     "tasklist": "^3.1.1",
@@ -97,7 +93,6 @@
     "@ant-design/icons": "^4.5.0",
     "@babel/core": "7.12.10",
     "@babel/plugin-proposal-decorators": "7.8.3",
-    "@babel/plugin-transform-runtime": "^7.12.10",
     "@babel/preset-env": "^7.12.11",
     "@octokit/app": "3.0.2",
     "@octokit/request": "4.1.1",

@@ -157,7 +157,6 @@ export function useInput<
 
 /**
  * Hook for text fields: input, textarea, password, number
- * Use useInput() under the hood and handles the onChange event
  */
 export function useTextInput<T = string>(
   p: Parameters<typeof useInput>[1] & TSlobsInputProps<InputProps, T> & { uncontrolled?: boolean },
