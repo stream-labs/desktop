@@ -1,8 +1,9 @@
 import { Select, Row, Col } from 'antd';
 import React, { useContext, ReactNode } from 'react';
-import { TSlobsInputProps, useInput, ValuesOf } from './inputs';
+import { InputComponent, TSlobsInputProps, useInput, ValuesOf } from './inputs';
 import InputWrapper from './InputWrapper';
 import { SelectProps, OptionProps } from 'antd/lib/select';
+import { useDebounce } from '../../hooks';
 
 // select which features from the antd lib we are going to use
 const ANT_SELECT_FEATURES = [
@@ -42,9 +43,12 @@ export interface IListOption {
   image?: string;
 }
 
-export function ListInput(p: TProps) {
+export const ListInput = InputComponent((p: TProps) => {
   const { inputAttrs, wrapperAttrs } = useInput('list', p, ANT_SELECT_FEATURES);
   const options = p.options;
+  const onSearchHandlerDebounced = p.debounce
+    ? useDebounce(p.debounce, onSearchHandler)
+    : onSearchHandler;
 
   function render() {
     return (
@@ -54,7 +58,7 @@ export function ListInput(p: TProps) {
           // search by label instead value
           optionFilterProp="label"
           optionLabelProp="labelrender"
-          // convert onSelect into onInput to fit Inputs shape
+          onSearch={onSearchHandlerDebounced}
           onSelect={(val: string) => p.onChange && p.onChange(val)}
         >
           {options && options.map((opt, ind) => renderOption(opt, ind, p))}
@@ -63,8 +67,12 @@ export function ListInput(p: TProps) {
     );
   }
 
+  function onSearchHandler(searchStr: string) {
+    p.onSearch && p.onSearch(searchStr);
+  }
+
   return render();
-}
+});
 
 export function renderOption(opt: IListOption, ind: number, inputProps: ICustomListProps) {
   const attrs = {

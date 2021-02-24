@@ -1,7 +1,7 @@
 import styles from './GoLive.m.less';
 import cx from 'classnames';
 import { ModalLayout } from '../../shared/ModalLayout';
-import { Form, Button } from 'antd';
+import { Button } from 'antd';
 import { useAsyncState, useOnCreate, useOnDestroy, useVuex } from '../../hooks';
 import { Services } from '../../service-provider';
 import GoLiveSettings from './GoLiveSettings';
@@ -9,15 +9,15 @@ import React from 'react';
 import { $t } from '../../../services/i18n';
 import GoLiveChecklist from './GoLiveChecklist';
 import { IGoLiveSettings } from '../../../services/streaming';
-import SlobsForm from '../../shared/inputs/ContextForm';
-import ContextForm from '../../shared/inputs/ContextForm';
+import Form, { useForm } from '../../shared/inputs/Form';
 import Animation from 'rc-animate';
 import { SwitchInput } from '../../shared/inputs';
+import TsxComponent, { createProps } from '../../../components/tsx-component';
 
 export default function GoLiveWindow() {
   console.log('render GoLiveWindow');
   const { StreamingService, WindowsService, StreamSettingsService } = Services;
-  const [form] = Form.useForm();
+  const form = useForm();
   const view = StreamingService.views;
 
   // define a reactive state
@@ -97,7 +97,7 @@ export default function GoLiveWindow() {
   function render() {
     return (
       <ModalLayout footer={renderFooter()}>
-        <ContextForm
+        <Form
           form={form}
           style={{ position: 'relative', height: '100%' }}
           layout="horizontal"
@@ -117,14 +117,14 @@ export default function GoLiveWindow() {
             {/* STEP 2 - RUN THE CHECKLIST */}
             {v.shouldShowChecklist && <GoLiveChecklist className={styles.page} key={'checklist'} />}
           </Animation>
-        </ContextForm>
+        </Form>
       </ModalLayout>
     );
   }
 
   function renderFooter() {
     return (
-      <ContextForm layout={'inline'}>
+      <Form layout={'inline'}>
         <SwitchInput
           label={$t('Show Advanced Settings')}
           name="advancedMode"
@@ -146,7 +146,7 @@ export default function GoLiveWindow() {
             {$t('Confirm & Go Live')}
           </Button>
         )}
-      </ContextForm>
+      </Form>
     );
   }
 

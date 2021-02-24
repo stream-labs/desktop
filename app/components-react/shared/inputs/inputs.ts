@@ -1,8 +1,17 @@
 import { InputProps } from 'antd/lib/input';
-import { Ref, useEffect, RefObject, useRef, useContext, ChangeEvent, FocusEvent } from 'react';
+import React, {
+  Ref,
+  useEffect,
+  RefObject,
+  useRef,
+  useContext,
+  ChangeEvent,
+  FocusEvent,
+  useCallback,
+} from 'react';
 import { Input } from 'antd';
-import { FormContext } from './ContextForm';
-import { useOnCreate } from '../../hooks';
+import { FormContext } from './Form';
+import { useDebounce, useOnCreate, useStateHelper } from '../../hooks';
 import uuid from 'uuid';
 import { FormItemProps } from 'antd/lib/form';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
@@ -13,14 +22,27 @@ import { pick } from 'lodash';
  * Shared code for inputs
  */
 
-type TInputType = 'text' | 'textarea' | 'toggle' | 'checkbox' | 'list' | 'tags' | 'switch';
+type TInputType =
+  | 'text'
+  | 'textarea'
+  | 'toggle'
+  | 'checkbox'
+  | 'list'
+  | 'tags'
+  | 'switch'
+  | 'slider';
 
 export interface IInputCommonProps<TValue> {
   value?: TValue;
+  defaultValue?: TValue;
   name?: string;
   nowrap?: boolean;
   onChange?: (val: TValue, ev?: ChangeEvent | CheckboxChangeEvent) => unknown;
+  onInput?: (val: TValue, ev?: ChangeEvent | CheckboxChangeEvent) => unknown;
   required?: boolean;
+  placeholder?: string;
+  disabled?: boolean;
+  debounce?: number;
 }
 
 // export type TSlobsInputProps<TInputProps, TValue> = Omit<
@@ -49,9 +71,6 @@ export type TSlobsInputProps<
  * Base hook for inputs
  * Registers input in the Form to properly handle validations
  * and returns props for Input and Wrapper components
- *
- * This hook does not handle 'onChange' events because it may be different for each Input component.
- * You should define onChange handler in the component itself or use specific hooks like useTextInput() instead
  */
 export function useInput<
   TValue,
@@ -71,7 +90,7 @@ export function useInput<
 
   // get parent form
   const formContext = useContext(FormContext);
-  const form = formContext?.form;
+  const form = formContext?.antForm;
 
   const inputId = useOnCreate(() => {
     // generate an unique id
@@ -84,6 +103,26 @@ export function useInput<
     // then we need to setup it's value via Form API
     if (form) form.setFieldsValue({ [inputId]: value });
   }, [value]);
+
+  const { stateRef, updateState } = useStateHelper({ value: inputProps.value });
+  const emitChangeDebounced = useDebounce(inputProps.debounce, emitChange);
+
+  function emitChange() {
+    console.log('emit change', stateRef.current);
+    inputProps.onChange && inputProps.onChange(stateRef.current.value!);
+  }
+
+  const onChange = useCallback((newVal: TValue) => {
+    if (newVal === stateRef.current.value) return;
+    updateState({ value: newVal });
+    inputProps.onInput && inputProps.onInput(newVal);
+    if (!inputProps.onChange) return;
+    if (inputProps.debounce) {
+      emitChangeDebounced();
+    } else {
+      emitChange();
+    }
+  }, []);
 
   // Create data-attributes for an Input element
   // These attributes help to find inputs in auto-tests
@@ -102,46 +141,70 @@ export function useInput<
 
   const wrapperAttrs = {
     // pick used features of Form.Item
-    ...pick(inputProps, ['className', 'style', 'key', 'label', 'colon', 'extra', 'labelCol', 'wrapperCol']),
+    ...pick(inputProps, [
+      'className',
+      'style',
+      'key',
+      'label',
+      'colon',
+      'extra',
+      'labelCol',
+      'wrapperCol',
+      'disabled',
+      'nowrap',
+    ]),
     rules,
     'data-role': 'input-wrapper',
     name: inputId,
   };
 
   const inputAttrs = {
-    ...(pick(inputProps, 'value', antFeatures || []) as {}),
+    ...(pick(inputProps, 'disabled', 'placeholder', antFeatures || []) as {}),
     ...dataAttrs,
     'data-role': 'input',
     name: inputId,
+    value: stateRef.current.value,
+    onChange,
   };
 
   return {
     inputAttrs,
     wrapperAttrs,
+    stateRef,
   };
 }
 
 /**
- * Hook for text fields: input, textarea, password
+ * Hook for text fields: input, textarea, password, number
  * Use useInput() under the hood and handles the onChange event
  */
-export function useTextInput(
-  p: Parameters<typeof useInput>[1] & TSlobsInputProps<InputProps, string>,
+export function useTextInput<T = string>(
+  p: Parameters<typeof useInput>[1] & TSlobsInputProps<InputProps, T> & { uncontrolled?: boolean },
   antFeatures?: Parameters<typeof useInput>[2],
 ) {
-  const { inputAttrs, wrapperAttrs } = useInput('text', p, antFeatures);
+  const { inputAttrs, wrapperAttrs, stateRef } = useInput('text', p, antFeatures);
 
-  const onChange = (ev: ChangeEvent<any>) => {
-    // Text inputs are uncontrolled by default for better performance
-    // onChange handles by onBlur
-    // use the `onInput` event if you need to handle any keypress
-  };
+  // Text inputs are uncontrolled by default for better performance
+  const uncontrolled = p.uncontrolled === true || p.uncontrolled !== false;
 
-  const onBlur = (ev: FocusEvent<any>) => {
-    // for uncontrolled components call the onInput() handler on blur
-    p.onChange && p.onChange(ev.target.value, ev);
+  const onChange = useCallback((ev: ChangeEvent<any>) => {
+    if (!uncontrolled || p.debounce) {
+      console.log('Component is controlled, call onChange', ev.target.value);
+      inputAttrs.onChange(ev.target.value);
+    }
+
+    // for uncontrolled inputs the `onChange()` event handles in `onBlur()`
+    // use the `onInput()` event if you need to handle every keypress in controlled input
+  }, []);
+
+  const onBlur = useCallback((ev: FocusEvent<any>) => {
+    // for uncontrolled components call the onChange() handler on blur
+    if (uncontrolled) {
+      console.log('Component is UNcontrolled, call onBlur', ev.target.value);
+      inputAttrs.onChange(ev.target.value);
+    }
     p.onBlur && p.onBlur(ev);
-  };
+  }, []);
 
   return {
     wrapperAttrs,
@@ -150,6 +213,7 @@ export function useTextInput(
       onChange,
       onBlur,
     },
+    originalOnChange: inputAttrs.onChange,
   };
 }
 
@@ -184,4 +248,20 @@ export function createBinding<TTarget extends object, TExtraProps extends object
       ...extraProps,
     };
   };
+}
+
+/**
+ * Function for creating new input components
+ * For performance optimization ignores changing of all function props like onChange and onInput
+ */
+export function InputComponent<T extends Function>(f: T): T {
+  return (React.memo(f as any, (prevProps: any, newProps: any) => {
+    const keys = Object.keys(newProps);
+    if (keys.length !== Object.keys(prevProps).length) return false;
+    for (const key of keys) {
+      if (typeof newProps[key] === 'function') continue;
+      if (newProps[key] !== prevProps[key]) return false;
+    }
+    return true;
+  }) as any) as T;
 }

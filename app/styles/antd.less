@@ -20,6 +20,17 @@
 // THEME INDEPENDENT STYLES
 
 // justify all inputs of form to the right in the modal footer
-.ant-modal-footer  .ant-form-inline {
+#mainWrapper .ant-modal-footer  .ant-form-inline {
   justify-content: flex-end;
+}
+
+
+// Use primary color for required marks
+#mainWrapper label.ant-form-item-required::before {
+  color: @primary-color;
+}
+
+// change color for the search box
+#mainWrapper .ant-select-selector input {
+  color: var(--paragraph);
 }

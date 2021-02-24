@@ -1,14 +1,18 @@
 import { Input } from 'antd';
 import React from 'react';
-import { TSlobsInputProps, useTextInput } from './inputs';
+import { InputComponent, TSlobsInputProps, useTextInput } from './inputs';
 import InputWrapper from './InputWrapper';
 import { InputProps } from 'antd/lib/input';
 
-export function TextInput(p: TSlobsInputProps<{}, string, InputProps>) {
-  const { inputAttrs, wrapperAttrs } = useTextInput(p);
-  return (
-    <InputWrapper {...wrapperAttrs}>
-      <Input {...inputAttrs} />
-    </InputWrapper>
-  );
-}
+export const TextInput = InputComponent(
+  (p: TSlobsInputProps<{ uncontrolled?: boolean }, string, InputProps>) => {
+    const { inputAttrs, wrapperAttrs } = useTextInput(p);
+
+    console.log(`Render text input ${p.name} with value`, p.value);
+    return (
+      <InputWrapper {...wrapperAttrs}>
+        <Input {...inputAttrs} />
+      </InputWrapper>
+    );
+  },
+);

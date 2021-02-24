@@ -1,19 +1,16 @@
 import { Checkbox } from 'antd';
 import React from 'react';
-import { TSlobsInputProps, useInput } from './inputs';
+import { InputComponent, TSlobsInputProps, useInput } from './inputs';
 import { CheckboxProps } from 'antd/lib/checkbox';
 
-export function CheckboxInput(p: TSlobsInputProps<{}, boolean, CheckboxProps>) {
-  const { inputAttrs } = useInput('checkbox', p);
+export const CheckboxInput = InputComponent((p: TSlobsInputProps<{}, boolean, CheckboxProps>) => {
+  const { inputAttrs, stateRef } = useInput('checkbox', p);
+  const value = stateRef.current.value;
   return (
     <div>
-      <Checkbox
-        checked={p.value}
-        {...inputAttrs}
-        onChange={ev => p.onChange && p.onChange(!p.value, ev)}
-      >
+      <Checkbox checked={value} {...inputAttrs} onChange={() => inputAttrs.onChange(!value)}>
         {p.label}
       </Checkbox>
     </div>
   );
-}
+})

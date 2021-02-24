@@ -1,6 +1,7 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { debounce } from 'lodash';
 import { StatefulService } from '../services/core';
+import { createBinding } from './shared/inputs';
 
 /**
  * Creates a reactive state for a React component based on Vuex store
@@ -83,32 +84,54 @@ type TStateActions<StateType> = {
     key: TKey,
     value: StateType[TDict][TKey],
   ) => unknown;
+  bind: <TFieldName extends keyof StateType>(
+    fieldName: TFieldName,
+  ) => {
+    name: TFieldName;
+    value: StateType[TFieldName];
+    onChange: (newVal: StateType[TFieldName]) => unknown;
+  };
+  stateRef: { current: StateType };
 };
 
 // safe for async/await
-export function useStateActions<T extends object>(initializer: T): TStateActions<T>;
-export function useStateActions<T extends object>(initializer: () => T): TStateActions<T>;
-export function useStateActions<T>(initializer: any) {
-  const [s, setState] = useState<T>(initializer);
+export function useStateHelper<T extends object>(initializer: T | (() => T)): TStateActions<T> {
+  const [s, setStateRaw] = useState<T>(initializer);
+
+  // create a reference to the last actual state
+  const stateRef = useRef(s);
+
+  function setState(newState: T) {
+    // keep the reference in sync when we update the state
+    stateRef.current = newState;
+    setStateRaw(newState);
+  }
+
+  // create a function for state patching
+  function updateState(patch: Partial<T>) {
+    setState({ ...stateRef.current, ...patch });
+  }
+
   return {
     s,
     setState,
+    // TODO rename to setRecord or smth
     setItem<TDict extends keyof T, TKey extends keyof T[TDict]>(
       dictionaryName: TDict,
       key: TKey,
       value: T[TDict][TKey],
     ): void {
-      setState(prevState => ({
-        ...prevState,
-        [dictionaryName]: { ...prevState[dictionaryName], [key]: value },
-      }));
+      setState({
+        ...stateRef.current,
+        [dictionaryName]: { ...stateRef.current[dictionaryName], [key]: value },
+      });
     },
-    updateState(patch: Partial<T>) {
-      setState(prevState => ({ ...prevState, ...patch }));
-    },
+    updateState,
+    bind: createBinding(s, setState),
+    stateRef,
   };
 }
 
-export function useDebounce<T extends (...args: any[]) => any>(ms: number, cb: T) {
+export function useDebounce<T extends (...args: any[]) => any>(ms = 0, cb: T) {
   return useCallback(debounce(cb, ms), []);
 }

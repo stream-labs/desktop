@@ -30,24 +30,12 @@ export function ModalLayout(p: TProps) {
     return { wrapperStyles, bodyStyles };
   });
 
-  // define a reactive state
+  // define a vuex state
   const v = useVuex(() => ({ currentTheme: CustomizationService.currentTheme }));
 
   // define a close method for the modal
   function close() {
     WindowsService.actions.closeChildWindow();
-  }
-
-  // render template
-  function render() {
-    return (
-      <div className={cx('ant-modal-content', v.currentTheme)} style={s.wrapperStyles}>
-        <div className="ant-modal-body" style={s.bodyStyles}>
-          {p.children}
-        </div>
-        <div className="ant-modal-footer">{p.footer || renderDefaultFooter()}</div>
-      </div>
-    );
   }
 
   // render a default footer with action buttons
@@ -65,5 +53,12 @@ export function ModalLayout(p: TProps) {
     );
   }
 
-  return render();
+  return (
+    <div className={cx('ant-modal-content', v.currentTheme)} style={s.wrapperStyles}>
+      <div className="ant-modal-body" style={s.bodyStyles}>
+        {p.children}
+      </div>
+      <div className="ant-modal-footer">{p.footer || renderDefaultFooter()}</div>
+    </div>
+  );
 }

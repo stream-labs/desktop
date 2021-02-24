@@ -1,19 +1,17 @@
 import electron from 'electron';
 import { isAdvancedMode, TSetPlatformSettingsFn, TUpdatePlatformSettingsFn } from '../go-live';
-import FormSection from '../../../shared/inputs/FormSection';
 import CommonPlatformFields from '../CommonPlatformFields';
 import React, { useState } from 'react';
 import { Services } from '../../../service-provider';
 import { TTwitchTag } from '../../../../services/platforms/twitch/tags';
 import { IGoLiveSettings } from '../../../../services/streaming';
 import { TPlatform } from '../../../../services/platforms';
-import ContextForm from '../../../shared/inputs/ContextForm';
-import { useOnCreate, useStateActions, useVuex } from '../../../hooks';
+import Form from '../../../shared/inputs/Form';
+import { useOnCreate, useStateHelper, useVuex } from '../../../hooks';
 import { assertIsDefined } from '../../../../util/properties-type-guards';
 import { EDismissable } from '../../../../services/dismissables';
 import { $t } from '../../../../services/i18n';
 import { createBinding, ListInput } from '../../../shared/inputs';
-import { TwitchTagsInput } from './TwitchTagsInput';
 import GameSelector from '../GameSelector';
 import {
   IFacebookLiveVideo,
@@ -59,7 +57,7 @@ export default function FacebookEditStreamInfo(p: IProps) {
   } = Services;
 
   // define the local state
-  const { s, setItem, updateState } = useStateActions({
+  const { s, setItem, updateState } = useStateHelper({
     pictures: {} as Record<string, string>,
     scheduledVideos: [] as IFacebookLiveVideo[],
     scheduledVideosLoaded: false,
@@ -168,18 +166,6 @@ export default function FacebookEditStreamInfo(p: IProps) {
   async function reLogin() {
     await UserService.actions.return.reLogin();
     await StreamingService.actions.showGoLiveWindow();
-  }
-
-  function render() {
-    return (
-      <FormSection name="facebook-settings">
-        {isAdvanced
-          ? [renderRequiredFields(), renderOptionalFields(), renderCommonFields()]
-          : [renderCommonFields(), renderRequiredFields()]}
-
-        {v.shouldShowPermissionWarn && renderMissedPermissionsWarning()}
-      </FormSection>
-    );
   }
 
   function renderCommonFields() {
@@ -358,5 +344,13 @@ export default function FacebookEditStreamInfo(p: IProps) {
     });
   }
 
-  return render();
+  return (
+    <Form name="facebook-settings">
+      {isAdvanced
+        ? [renderRequiredFields(), renderOptionalFields(), renderCommonFields()]
+        : [renderCommonFields(), renderRequiredFields()]}
+
+      {v.shouldShowPermissionWarn && renderMissedPermissionsWarning()}
+    </Form>
+  );
 }

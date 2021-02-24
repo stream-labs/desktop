@@ -17,7 +17,7 @@ import SceneTransitions from 'components/windows/SceneTransitions.vue';
 import AddSource from 'components/windows/AddSource.vue';
 import RenameSource from 'components/windows/RenameSource.vue';
 import NameScene from 'components/windows/NameScene.vue';
-import { NameFolder, GoLiveWindow } from 'components/shared/ReactComponent';
+import { NameFolder, GoLiveWindow, Playground } from 'components/shared/ReactComponent';
 import SourceProperties from 'components/windows/SourceProperties.vue';
 import SourceFilters from 'components/windows/SourceFilters.vue';
 import AddSourceFilter from 'components/windows/AddSourceFilter';
@@ -128,6 +128,7 @@ export function getComponents() {
     GoLiveWindow,
     EditStreamWindow,
     ScheduleStreamWindow,
+    Playground,
   };
 }
 

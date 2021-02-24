@@ -5,8 +5,8 @@ import { Services } from '../service-provider';
 import { useOnCreate } from '../hooks';
 import { assertIsDefined } from '../../util/properties-type-guards';
 import { TextInput } from '../shared/inputs/TextInput';
-import { Form, Button } from 'antd';
-import ContextForm from '../shared/inputs/ContextForm';
+import { Button } from 'antd';
+import Form, { useForm } from '../shared/inputs/Form';
 
 interface IWindowOptions {
   renameId?: string;
@@ -26,7 +26,7 @@ export default function NameFolder() {
   const [name, setName] = useState('');
 
   // define a form
-  const [form] = Form.useForm();
+  const form = useForm();
 
   // get window options on component create
   const options = useOnCreate(() => {
@@ -74,7 +74,7 @@ export default function NameFolder() {
 
   return (
     <ModalLayout onOk={submit} okText={$t('Submit')}>
-      <ContextForm layout="vertical" form={form}>
+      <Form layout="vertical" form={form}>
         <TextInput
           name="name"
           value={name}
@@ -82,7 +82,7 @@ export default function NameFolder() {
           label={$t('Please enter the name of the folder')}
           required={true}
         />
-      </ContextForm>
+      </Form>
     </ModalLayout>
   );
 }

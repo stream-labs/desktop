@@ -1,7 +1,6 @@
 import { IGoLiveSettings, IStreamSettings } from '../../../../../services/streaming';
 import { isAdvancedMode, TUpdatePlatformSettingsFn } from '../../go-live';
 import { TPlatform } from '../../../../../services/platforms';
-import FormSection from '../../../../shared/inputs/FormSection';
 import CommonPlatformFields from '../../CommonPlatformFields';
 import { CheckboxInput, ListInput } from '../../../../shared/inputs';
 import React, { useState } from 'react';
@@ -14,6 +13,7 @@ import { useAsyncState, useOnCreate } from '../../../../hooks';
 import InputWrapper from '../../../../shared/inputs/InputWrapper';
 import { TwitchTagsInput } from '../TwitchTagsInput';
 import GameSelector from '../../GameSelector';
+import Form from '../../../../shared/inputs/Form';
 
 interface IProps {
   settings: IGoLiveSettings;
@@ -64,16 +64,6 @@ export function YoutubeEditStreamInfo(p: IProps) {
     updatePlatformSettings('youtube', { projection: enable360 ? '360' : 'rectangular' });
   }
 
-  function render() {
-    return (
-      <FormSection name="youtube-settings">
-        {isAdvanced
-          ? [renderOptionalFields(), renderCommonFields()]
-          : [renderCommonFields(), renderOptionalFields()]}
-      </FormSection>
-    );
-  }
-
   function renderCommonFields() {
     return <CommonPlatformFields key="common" {...p} platform="youtube" />;
   }
@@ -83,6 +73,7 @@ export function YoutubeEditStreamInfo(p: IProps) {
       <div key="optional">
         {!p.isScheduleMode && (
           <BroadcastInput
+            value=""
             label={$t('Event')}
             loading={s.broadcastLoading}
             broadcasts={s.broadcasts}
@@ -184,5 +175,11 @@ export function YoutubeEditStreamInfo(p: IProps) {
     );
   }
 
-  return render();
+  return (
+    <Form name="youtube-settings">
+      {isAdvanced
+        ? [renderOptionalFields(), renderCommonFields()]
+        : [renderCommonFields(), renderOptionalFields()]}
+    </Form>
+  );
 }

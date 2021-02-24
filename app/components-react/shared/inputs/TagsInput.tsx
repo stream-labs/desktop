@@ -1,6 +1,6 @@
 import { Select, Tag } from 'antd';
 import React, { useContext, ReactNode, useMemo, ReactElement } from 'react';
-import { TSlobsInputProps, useInput, ValuesOf } from './inputs';
+import { InputComponent, TSlobsInputProps, useInput, ValuesOf } from './inputs';
 import InputWrapper from './InputWrapper';
 import { SelectProps } from 'antd/lib/select';
 import { ICustomListProps, IListOption, renderOption } from './ListInput';
@@ -21,7 +21,7 @@ type TProps = TSlobsInputProps<
   ValuesOf<typeof ANT_SELECT_FEATURES>
 >;
 
-export function TagsInput(p: TProps) {
+export const TagsInput = InputComponent((p: TProps) => {
   const { inputAttrs, wrapperAttrs } = useInput('tags', p);
   const options = p.options;
   const tagsMap = useMemo(() => keyBy(options, 'value'), [options]);
@@ -35,7 +35,6 @@ export function TagsInput(p: TProps) {
           optionFilterProp={'label'}
           mode={'multiple'}
           allowClear
-          // convert onSelect into onInput to fit Inputs shape
           onChange={(val: string[]) => p.onChange && p.onChange(val)}
           tagRender={renderTag}
         >
@@ -54,4 +53,4 @@ export function TagsInput(p: TProps) {
   }
 
   return render();
-}
+})

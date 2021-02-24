@@ -14,7 +14,7 @@ import { keyBy } from 'lodash';
  * <pre>
  *
  *   <Translate message="To continue please <my-link>click here </my-link>">
- *      <a slot="myLink" onClick="onClickHandler" className="description-link"/>
+ *      <a slot="myLink" onClick="onClickHandler"/>
  *   </Translate>
  *
  * </pre>
