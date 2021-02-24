@@ -41,7 +41,7 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
     this.commonFields = pick(
       this.props.platform
         ? this.settings.platforms[this.props.platform]
-        : this.view.getCommonFields(this.settings.platforms),
+        : this.view.getCommonFields(this.settings),
       ['title', 'description'],
     ) as { title: string; description: string };
   }
@@ -108,7 +108,7 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
     // if we disabled customFields for a platform
     // than we should return common fields values for this platform
     if (!useCustomFields) {
-      const commonFields = this.view.getCommonFields(this.settings.platforms);
+      const commonFields = this.view.getCommonFields(this.settings);
       // TODO: figure out how to resolve types
       // @ts-ignore
       this.settings.platforms[platform] = {

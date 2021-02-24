@@ -505,8 +505,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @mutation()
   private SET_ERROR(type: TStreamErrorType, details?: string, platform?: TPlatform) {
     if (!type) type = 'UNKNOWN_ERROR';
-    const error = createStreamError(type, details, platform).getModel();
-    this.state.info.error = error;
+    this.state.info.error = createStreamError(type, details, platform).getModel();
   }
 
   @mutation()
