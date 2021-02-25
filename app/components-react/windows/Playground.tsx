@@ -5,13 +5,14 @@ import { Services } from '../service-provider';
 import { useOnCreate, useStateHelper } from '../hooks';
 import { assertIsDefined } from '../../util/properties-type-guards';
 import { TextInput } from '../shared/inputs/TextInput';
-import { Button } from 'antd';
+import { Button, Row, Col } from 'antd';
 import Form, { useForm } from '../shared/inputs/Form';
 import { ListInput, SliderInput, SwitchInput, NumberInput, CheckboxInput } from '../shared/inputs';
 import Scrollable from '../shared/Scrollable';
 import Animate from 'rc-animate';
 import { DestinationSwitchers } from './go-live/DestinationSwitchers';
 import styles from './go-live/GoLive.m.less';
+import InputWrapper from '../shared/inputs/InputWrapper';
 
 interface IWindowOptions {
   renameId?: string;
@@ -56,29 +57,45 @@ export default function Playground() {
         {/*  value={s.switched}*/}
         {/*  onChange={val => updateState({ switched: val })}*/}
         {/*/>*/}
-        <TextInput
-          label="UncontrolledText"
-          name={'UncontrolledText'}
-          value={s.uncontrolledTextValue}
-          onChange={val => updateState({ uncontrolledTextValue: val })}
-        />
-        Val: {s.uncontrolledTextValue}
-        <TextInput
-          label="ControlledText"
-          name={'ControlledText'}
-          uncontrolled={false}
-          value={s.controlledTextValue}
-          onChange={val => updateState({ controlledTextValue: val })}
-        />
-        Val: {s.controlledTextValue}
-        <TextInput
-          label="DebouncedText"
-          name={'DebouncedText'}
-          debounce={500}
-          value={s.debouncedTextValue}
-          onChange={val => updateState({ debouncedTextValue: val })}
-        />
-        Val: {s.debouncedTextValue}
+        <Row gutter={16}>
+          <Col span={12}>
+            <TextInput
+              label="Uncontrolled Input"
+              name={'UncontrolledText'}
+              value={s.uncontrolledTextValue}
+              onChange={val => updateState({ uncontrolledTextValue: val })}
+            />
+          </Col>
+          <Col span={12}>
+            <InputWrapper label={'Value'}>{s.uncontrolledTextValue}</InputWrapper>
+          </Col>
+
+          <Col span={12}>
+            <TextInput
+              label="Controlled Input"
+              name={'ControlledText'}
+              uncontrolled={false}
+              value={s.controlledTextValue}
+              onChange={val => updateState({ controlledTextValue: val })}
+            />
+          </Col>
+          <Col span={12}>
+            <InputWrapper label={'Value'}>{s.controlledTextValue}</InputWrapper>
+          </Col>
+
+          <Col span={12}>
+            <TextInput
+              label="Debounced Input"
+              name={'DebouncedText'}
+              debounce={500}
+              value={s.debouncedTextValue}
+              onChange={val => updateState({ debouncedTextValue: val })}
+            />
+          </Col>
+          <Col span={12}>
+            <InputWrapper label={'Value'}>{s.debouncedTextValue}</InputWrapper>
+          </Col>
+        </Row>
         <NumberInput
           label="NumberInput"
           name="MyNumber"
