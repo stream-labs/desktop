@@ -53,4 +53,4 @@ export const TagsInput = InputComponent((p: TTagsInputProps) => {
   }
 
   return render();
-})
+});
