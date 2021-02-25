@@ -12,5 +12,7 @@
   "Volume ( % )": "音量 ( % )",
   "Sync Offset ( ms )": "同期オフセット ( ms )",
   "Mixer": "Mixer",
-  "Monitor audio levels. If the bars are moving you are outputting audio.": "オーディオレベルをモニターします。バーが動いている場合、オーディオが出力されています。"
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "オーディオレベルをモニターします。バーが動いている場合、オーディオが出力されています。",
+  "Muted": "Muted",
+  "Hide in Mixer": "Hide in Mixer"
 }

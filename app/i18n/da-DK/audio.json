@@ -12,5 +12,7 @@
   "Volume ( % )": "Lydstyrke (%)",
   "Sync Offset ( ms )": "Synkroniseringsforskydning (ms)",
   "Mixer": "Lydmixer",
-  "Monitor audio levels. If the bars are moving you are outputting audio.": "Overvåg lydniveauer. Hvis søjlerne bevæger sig, udsender du lyd."
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "Overvåg lydniveauer. Hvis søjlerne bevæger sig, udsender du lyd.",
+  "Muted": "Muted",
+  "Hide in Mixer": "Hide in Mixer"
 }
