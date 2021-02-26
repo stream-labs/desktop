@@ -5,8 +5,8 @@ import { Services } from '../service-provider';
 import { useOnCreate } from '../hooks';
 import { assertIsDefined } from '../../util/properties-type-guards';
 import { TextInput } from '../shared/inputs/TextInput';
-import { Button } from 'antd';
 import Form, { useForm } from '../shared/inputs/Form';
+import { createBinding } from '../shared/inputs';
 
 interface IWindowOptions {
   renameId?: string;
@@ -27,6 +27,10 @@ export default function NameFolder() {
 
   // define a form
   const form = useForm();
+
+  const bind = createBinding({ name: '1' }, name => {});
+  const b = bind.name;
+  b.foo = '1';
 
   // get window options on component create
   const options = useOnCreate(() => {

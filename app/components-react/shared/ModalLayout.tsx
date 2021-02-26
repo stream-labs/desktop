@@ -10,25 +10,22 @@ import { ModalProps } from 'antd/lib/modal';
 // use props of Modal from the antd lib
 type TProps = { children: ReactNode } & Pick<ModalProps, 'footer' | 'onOk' | 'okText'>;
 
+// calculate OS dependent styles
+const titleHeight = getOS() === OS.Mac ? 22 : 30;
+const footerHeight = 53;
+const wrapperStyles: CSSProperties = {
+  height: `calc(100% - ${titleHeight}px)`,
+};
+const bodyStyles: CSSProperties = {
+  height: `calc(100% - ${footerHeight}px)`,
+};
+
 /**
  * Wraps content for the child windows
  */
 export function ModalLayout(p: TProps) {
   // inject services
   const { WindowsService, CustomizationService } = Services;
-
-  // calculate styles
-  const s = useOnCreate(() => {
-    const titleHeight = getOS() === OS.Mac ? 22 : 30;
-    const footerHeight = 53;
-    const wrapperStyles: CSSProperties = {
-      height: `calc(100% - ${titleHeight}px)`,
-    };
-    const bodyStyles: CSSProperties = {
-      height: `calc(100% - ${footerHeight}px)`,
-    };
-    return { wrapperStyles, bodyStyles };
-  });
 
   // define a vuex state
   const v = useVuex(() => ({ currentTheme: CustomizationService.currentTheme }));
@@ -54,8 +51,8 @@ export function ModalLayout(p: TProps) {
   }
 
   return (
-    <div className={cx('ant-modal-content', v.currentTheme)} style={s.wrapperStyles}>
-      <div className="ant-modal-body" style={s.bodyStyles}>
+    <div className={cx('ant-modal-content', v.currentTheme)} style={wrapperStyles}>
+      <div className="ant-modal-body" style={bodyStyles}>
         {p.children}
       </div>
       <div className="ant-modal-footer">{p.footer || renderDefaultFooter()}</div>

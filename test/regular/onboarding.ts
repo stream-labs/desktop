@@ -4,14 +4,13 @@ import { spawnSync } from 'child_process';
 import { sleep } from '../helpers/sleep';
 import { sceneExisting, switchCollection } from '../helpers/spectron/scenes';
 import { sourceIsExisting } from '../helpers/spectron/sources';
-import { getFormInput } from '../helpers/spectron/forms';
 import { getClient } from '../helpers/api-client';
 import { WidgetsService } from '../../app/services/widgets';
 import { EWidgetType } from '../helpers/widget-helpers';
 import { FormMonkey } from '../helpers/form-monkey';
+import { importExtractZip } from '../../app/util/slow-imports';
 
 const path = require('path');
-const _7z = require('7zip')['7z'];
 
 useSpectron({ skipOnboarding: false });
 
@@ -70,7 +69,18 @@ test('OBS Importer', async t => {
   const cacheDir = path.resolve(await t.context.app.electron.remote.app.getPath('userData'), '..');
   const dataDir = path.resolve(__dirname, '..', '..', '..', 'test', 'data');
   const obsCacheZipPath = path.resolve(dataDir, 'obs-studio.zip');
-  spawnSync(_7z, ['x', obsCacheZipPath, `-o${cacheDir}`]);
+
+  await new Promise(async (resolve, reject) => {
+    // import of extractZip takes to much time on startup, so import it dynamically
+    const extractZip = (await importExtractZip()).default;
+    extractZip(obsCacheZipPath, { dir: cacheDir }, err => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
 
   // skip auth
   if (await t.context.app.client.isExisting('span=Skip')) {
