@@ -4,9 +4,6 @@ import React, { useState } from 'react';
 import { Services } from '../service-provider';
 import { useOnCreate } from '../hooks';
 import { assertIsDefined } from '../../util/properties-type-guards';
-import { TextInput } from '../shared/inputs/TextInput';
-import Form, { useForm } from '../shared/inputs/Form';
-import { createBinding } from '../shared/inputs';
 
 interface IWindowOptions {
   renameId?: string;
@@ -24,13 +21,7 @@ export default function NameFolder() {
 
   // define stateful variables and setters
   const [name, setName] = useState('');
-
-  // define a form
-  const form = useForm();
-
-  const bind = createBinding({ name: '1' }, name => {});
-  const b = bind.name;
-  b.foo = '1';
+  const [error, setError] = useState('');
 
   // get window options on component create
   const options = useOnCreate(() => {
@@ -45,14 +36,12 @@ export default function NameFolder() {
   });
 
   // define a submit method
-  async function submit() {
-    try {
-      await form.validateFields();
-    } catch (e) {
+  function submit(e: any) {
+    e.preventDefault();
+    if (!name) {
+      setError($t('The source name is required'));
       return;
-    }
-
-    if (options.renameId) {
+    } else if (options.renameId) {
       EditorCommandsService.executeCommand(
         'RenameFolderCommand',
         options.sceneId,
@@ -77,16 +66,15 @@ export default function NameFolder() {
   }
 
   return (
-    <ModalLayout onOk={submit} okText={$t('Submit')}>
-      <Form layout="vertical" form={form}>
-        <TextInput
-          name="name"
-          value={name}
-          onChange={v => setName(v)}
-          label={$t('Please enter the name of the folder')}
-          required={true}
-        />
-      </Form>
+    <ModalLayout onOk={submit}>
+      <form onSubmit={submit}>
+        {!error && (
+          <p style={{ marginBottom: '10px' }}>{$t('Please enter the name of the folder')}</p>
+        )}
+
+        {error && <p style={{ marginBottom: '10px', color: 'red' }}>{error}</p>}
+        <input type="text" value={name} onInput={ev => setName(ev.target['value'])} />
+      </form>
     </ModalLayout>
   );
 }

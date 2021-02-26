@@ -120,6 +120,7 @@
     "@typescript-eslint/parser": "2.19.2",
     "@vue/babel-preset-jsx": "^1.2.4",
     "@xkeshi/vue-qrcode": "0.3.0",
+    "@types/vfile-message": "^2.0.0",
     "amazon-s3-uri": "^0.0.3",
     "antd": "^4.10.3",
     "ava": "3.12.1",
