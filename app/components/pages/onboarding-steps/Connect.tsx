@@ -70,6 +70,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
       twitch: 'fab fa-twitch',
       youtube: 'fab fa-youtube',
       facebook: 'fab fa-facebook',
+      keakr: 'fab fa-keakr',
     }[platform];
   }
 
@@ -132,7 +133,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
             </h3>
           )}
           <div class={styles.signupButtons}>
-            {['twitch', 'youtube', 'facebook'].map((platform: TPlatform) => (
+            {['twitch', 'youtube', 'facebook', 'keakr'].map((platform: TPlatform) => (
               <button
                 class={cx(`button button--${platform}`, styles.loginButton)}
                 disabled={this.loading}

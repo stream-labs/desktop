@@ -16,6 +16,7 @@ export default class PlatformLogo extends TsxComponent<LogoProps> {
       twitch: 'fab fa-twitch',
       youtube: 'fab fa-youtube',
       facebook: 'fab fa-facebook',
+      keakr: 'fab fa-keakr',
       dlive: 'dlive',
       nimotv: 'nimotv',
       streamlabs: 'icon-kevin-day',

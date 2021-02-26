@@ -4,6 +4,7 @@ import { IEncoderProfile } from '../video-encoding-optimizations';
 import { ITwitchStartStreamOptions } from '../platforms/twitch';
 import { IYoutubeStartStreamOptions } from '../platforms/youtube';
 import { IFacebookStartStreamOptions } from '../platforms/facebook';
+import { IKeakrStartStreamOptions } from '../platforms/keakr';
 import { IStreamError } from './stream-error';
 import { ICustomStreamDestination } from '../settings/streaming';
 
@@ -44,6 +45,7 @@ export interface IStreamInfo {
     twitch: TGoLiveChecklistItemState;
     youtube: TGoLiveChecklistItemState;
     facebook: TGoLiveChecklistItemState;
+    keakr: TGoLiveChecklistItemState;
     setupMultistream: TGoLiveChecklistItemState;
     startVideoTransmission: TGoLiveChecklistItemState;
     postTweet: TGoLiveChecklistItemState;
@@ -57,6 +59,7 @@ export interface IStreamSettings {
     twitch: IPlatformFlags & ITwitchStartStreamOptions;
     youtube: IPlatformFlags & IYoutubeStartStreamOptions;
     facebook: IPlatformFlags & IFacebookStartStreamOptions;
+    keakr: IPlatformFlags & IKeakrStartStreamOptions;
   };
   customDestinations: ICustomStreamDestination[];
   advancedMode: boolean;

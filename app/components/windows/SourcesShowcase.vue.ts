@@ -113,7 +113,9 @@ export default class SourcesShowcase extends Vue {
   }
 
   get loggedIn() {
-    return this.userService.isLoggedIn;
+    // actually, keakr is not supported as an authentication provider to streamlabs.com
+    // so it cannot use the widgets editor within streamlabs obs
+    return this.userService.isLoggedIn && this.userService.platform.id != 'keakr';
   }
 
   get platform() {

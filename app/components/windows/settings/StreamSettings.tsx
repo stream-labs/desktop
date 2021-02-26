@@ -218,6 +218,7 @@ export default class StreamSettings extends TsxComponent {
       facebook: 'button--facebook',
       youtube: 'button--youtube',
       twitch: 'button--twitch',
+      keakr: 'button--keakr',
     }[platform];
     const isPrimary = this.streamingView.isPrimaryPlatform(platform);
     const shouldShowPrimaryBtn = isPrimary;

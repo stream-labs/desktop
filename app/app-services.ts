@@ -57,6 +57,7 @@ export { MetricsService } from 'services/metrics';
 // ONLINE SERVICES
 export { UserService } from './services/user';
 export { YoutubeService } from 'services/platforms/youtube';
+export { KeakrService } from 'services/platforms/keakr';
 export { TwitchService } from 'services/platforms/twitch';
 export { FacebookService } from 'services/platforms/facebook';
 export { RestreamService } from 'services/restream';

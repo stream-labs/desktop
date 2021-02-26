@@ -1,6 +1,7 @@
 import { ITwitchStartStreamOptions, TwitchService } from './twitch';
 import { IYoutubeStartStreamOptions, YoutubeService } from './youtube';
 import { FacebookService, IFacebookStartStreamOptions } from './facebook';
+import { IKeakrStartStreamOptions, KeakrService } from './keakr';
 import { TTwitchTag } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
 import { IGoLiveSettings } from 'services/streaming';
@@ -106,6 +107,7 @@ export enum EPlatformCallResult {
 export type TStartStreamOptions =
   | ITwitchStartStreamOptions
   | IYoutubeStartStreamOptions
+  | IKeakrStartStreamOptions
   | Partial<IFacebookStartStreamOptions>;
 
 // state applicable for all platforms
@@ -211,13 +213,14 @@ export interface IUserInfo {
   username?: string;
 }
 
-export type TPlatform = 'twitch' | 'youtube' | 'facebook';
+export type TPlatform = 'twitch' | 'youtube' | 'facebook' | 'keakr';
 
 export function getPlatformService(platform: TPlatform): IPlatformService {
   return {
     twitch: TwitchService.instance,
     youtube: YoutubeService.instance,
     facebook: FacebookService.instance,
+    keakr: KeakrService.instance,
   }[platform];
 }
 

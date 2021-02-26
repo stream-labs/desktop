@@ -119,6 +119,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         twitch: 'not-started',
         youtube: 'not-started',
         facebook: 'not-started',
+        keakr: 'not-started',
         setupMultistream: 'not-started',
         startVideoTransmission: 'not-started',
         postTweet: 'not-started',

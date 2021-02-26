@@ -171,5 +171,9 @@ export default class StartStreamingButton extends Vue {
         this.streamSettingsService.isSafeToModifyStreamKey()
       );
     }
+
+    if (primaryPlatform === 'keakr') {
+      return true;
+    }
   }
 }

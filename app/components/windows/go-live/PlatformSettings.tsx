@@ -14,6 +14,7 @@ import CommonPlatformFields from './CommonPlatformFields';
 import TwitchEditStreamInfo from './platforms/TwitchEditStreamInfo';
 import FacebookEditStreamInfo from './platforms/FacebookEditStreamInfo';
 import YoutubeEditStreamInfo from './platforms/youtube/YoutubeEditStreamInfo';
+import KeakrEditStreamInfo from './platforms/KeakrEditStreamInfo';
 import Section from './Section';
 
 class Props {
@@ -97,6 +98,11 @@ export default class PlatformSettings extends TsxComponent<Props> {
           <YoutubeEditStreamInfo
             vModel={this.settings}
             isScheduleMode={this.props.isScheduleMode}
+          />
+        )}
+        {platform === 'keakr' && (
+          <KeakrEditStreamInfo
+            vModel={this.settings}
           />
         )}
       </Section>
