@@ -1,4 +1,4 @@
-import { useSpectron, focusChild, test } from '../helpers/spectron';
+import { useSpectron, focusChild, test, closeWindow } from '../helpers/spectron';
 import { addFilter, openFiltersWindow, removeFilter } from '../helpers/spectron/filters';
 import { addSource } from '../helpers/spectron/sources';
 
@@ -32,6 +32,7 @@ test('Adding and removing a Color Correction filter', async t => {
   t.false(await app.client.isExisting('label=Hue Shift'));
   t.false(await app.client.isExisting('label=Opacity'));
   t.false(await app.client.isExisting('label=Color'));
+  await closeWindow(t);
 });
 
 test('Adding and removing a Image Mask filter', async t => {
@@ -56,6 +57,7 @@ test('Adding and removing a Image Mask filter', async t => {
   t.false(await app.client.isExisting('label=Path'));
   t.false(await app.client.isExisting('label=Color'));
   t.false(await app.client.isExisting('label=Opacity'));
+  await closeWindow(t);
 });
 
 test('Adding and removing a Crop Pad filter', async t => {
@@ -80,6 +82,7 @@ test('Adding and removing a Crop Pad filter', async t => {
   t.false(await app.client.isExisting('label=Top'));
   t.false(await app.client.isExisting('label=Right'));
   t.false(await app.client.isExisting('label=Bottom'));
+  await closeWindow(t);
 });
 
 test('Adding and removing a Scaling aspect filter', async t => {
@@ -100,6 +103,7 @@ test('Adding and removing a Scaling aspect filter', async t => {
 
   t.false(await app.client.isExisting('label=Scale Filtering'));
   t.false(await app.client.isExisting('label=Resolution'));
+  await closeWindow(t);
 });
 
 test('Adding and removing a Scroll filter', async t => {
@@ -124,6 +128,7 @@ test('Adding and removing a Scroll filter', async t => {
   t.false(await app.client.isExisting('label=Limit Width'));
   t.false(await app.client.isExisting('label=Limit Height'));
 
+  await closeWindow(t);
 });
 
 test('Adding and removing a Render Delay filter', async t => {
@@ -141,6 +146,7 @@ test('Adding and removing a Render Delay filter', async t => {
   await openFiltersWindow(t, sourceName);
 
   t.false(await app.client.isExisting('label=Delay'));
+  await closeWindow(t);
 });
 
 test('Adding and removing a Color Key filter', async t => {
@@ -171,6 +177,7 @@ test('Adding and removing a Color Key filter', async t => {
   t.false(await app.client.isExisting('label=Contrast'));
   t.false(await app.client.isExisting('label=Brightness'));
   t.false(await app.client.isExisting('label=Gamma'));
+  await closeWindow(t);
 
 });
 
@@ -192,6 +199,7 @@ test('Adding and removing a LUT filter', async t => {
 
   t.false(await app.client.isExisting('label=Path'));
   t.false(await app.client.isExisting('label=Amount'));
+  await closeWindow(t);
 });
 
 test('Adding and removing a Sharpen filter', async t => {
@@ -210,6 +218,8 @@ test('Adding and removing a Sharpen filter', async t => {
   await openFiltersWindow(t, sourceName);
 
   t.false(await app.client.isExisting('label=Sharpness'));
+
+  await closeWindow(t);
 });
 
 test('Adding and removing a Chroma Key filter', async t => {
@@ -240,6 +250,8 @@ test('Adding and removing a Chroma Key filter', async t => {
   t.false(await app.client.isExisting('label=Contrast'));
   t.false(await app.client.isExisting('label=Brightness'));
   t.false(await app.client.isExisting('label=Gamma'));
+
+  await closeWindow(t);
 });
 
 
@@ -253,4 +265,6 @@ test('Adding and removing a Invert Polarity filter', async t => {
   // this filter does't have settings. Just check we have no errors
   await openFiltersWindow(t, sourceName);
   t.pass();
+
+  await closeWindow(t);
 });
