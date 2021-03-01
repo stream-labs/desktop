@@ -451,6 +451,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   sendExpiresSoonNotification() {
     this.notificationsService.push({
       type: ENotificationType.WARNING,
+      lifeTime: -1,
       action: this.jsonrpcService.createRequest(Service.getResourceId(this), 'openCreditCardLink'),
       message: $t('Your credit card expires soon. Click here to retain your Prime benefits'),
     });
