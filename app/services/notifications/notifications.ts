@@ -94,6 +94,10 @@ export class NotificationsService extends PersistentStatefulService<INotificatio
     return new NotificationsViews(this.state);
   }
 
+  filter(state: INotificationsState) {
+    return { ...state, notifications: [] as INotification[] };
+  }
+
   push(notifyInfo: INotificationOptions): INotification {
     const notify = {
       id: this.nextId++,

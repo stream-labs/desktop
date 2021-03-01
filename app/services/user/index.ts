@@ -459,7 +459,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   async openCreditCardLink() {
     try {
-      const link = await this.magicLinkService.getDashboardMagicLink();
+      const link = await this.magicLinkService.getDashboardMagicLink('expiring_cc');
       electron.shell.openExternal(link);
     } catch (e) {}
   }
