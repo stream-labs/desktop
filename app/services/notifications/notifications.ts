@@ -87,7 +87,6 @@ export class NotificationsService extends PersistentStatefulService<INotificatio
 
   init() {
     super.init();
-    this.CLEAR();
   }
 
   get views() {
