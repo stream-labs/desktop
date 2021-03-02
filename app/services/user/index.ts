@@ -36,6 +36,8 @@ import path from 'path';
 import { AppService } from 'services/app';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { StreamingService } from 'services/streaming';
+import { NotificationsService, ENotificationType } from 'services/notifications';
+import { JsonrpcService } from 'services/api/jsonrpc';
 
 export enum EAuthProcessState {
   Idle = 'idle',
@@ -134,6 +136,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private magicLinkService: MagicLinkService;
   @Inject() private appService: AppService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
+  @Inject() private notificationsService: NotificationsService;
+  @Inject() private jsonrpcService: JsonrpcService;
 
   @mutation()
   LOGIN(auth: IUserAuth) {
@@ -416,13 +420,24 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const url = `https://${host}/api/v5/slobs/prime`;
     const headers = authorizedHeaders(this.apiToken);
     const request = new Request(url, { headers });
-    return jfetch<{ expires_soon: boolean; expires_at: string; is_prime: boolean }>(request)
+    return jfetch<{
+      expires_soon: boolean;
+      expires_at: string;
+      is_prime: boolean;
+      cc_expires_in_days?: number;
+    }>(request)
       .then(response => this.validatePrimeStatus(response))
       .catch(() => null);
   }
 
-  validatePrimeStatus(response: { expires_soon: boolean; expires_at: string; is_prime: boolean }) {
+  validatePrimeStatus(response: {
+    expires_soon: boolean;
+    expires_at: string;
+    is_prime: boolean;
+    cc_expires_in_days?: number;
+  }) {
     this.SET_PRIME(response.is_prime);
+    if (response.cc_expires_in_days != null) this.sendExpiresSoonNotification();
     if (!response.expires_soon) {
       this.SET_EXPIRES(null);
       return;
@@ -431,6 +446,22 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       this.usageStatisticsService.recordShown('prime-resubscribe-modal');
       this.onboardingService.start({ isPrimeExpiration: true });
     }
+  }
+
+  sendExpiresSoonNotification() {
+    this.notificationsService.push({
+      type: ENotificationType.WARNING,
+      lifeTime: -1,
+      action: this.jsonrpcService.createRequest(Service.getResourceId(this), 'openCreditCardLink'),
+      message: $t('Your credit card expires soon. Click here to retain your Prime benefits'),
+    });
+  }
+
+  async openCreditCardLink() {
+    try {
+      const link = await this.magicLinkService.getDashboardMagicLink('expiring_cc');
+      electron.shell.openExternal(link);
+    } catch (e) {}
   }
 
   /**
