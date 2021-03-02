@@ -8,7 +8,7 @@
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && yarn compile:updater && yarn webpack-cli --progress --config ./webpack.dev.config.js",
-    "compile:production": "yarn clear && yarn compile:updater && yarn webpack-cli --progress --config ./webpack.prod.config.js",
+    "compile:production": "yarn clear && yarn compile:updater && yarn webpack-cli --progress --json --config ./webpack.prod.config.js",
     "compile:updater": "rimraf updater/build && tsc -p updater",
     "compile:strictnulls": "yarn clear && yarn compile:updater && cross-env SLOBS_STRICT_NULLS=true yarn webpack-cli --config ./webpack.dev.config.js",
     "compile:tests": "tsc -p test",
@@ -156,7 +156,7 @@
     "lodash-decorators": "4.5.0",
     "mark.js": "8.11.1",
     "mime": "2.4.3",
-    "moment": "2.22.2",
+    "moment": "^2.25.3",
     "overlayscrollbars": "^1.13.0",
     "overlayscrollbars-vue": "^0.2.2",
     "pixelmatch": "4.0.2",
