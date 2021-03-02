@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import moment from 'moment';
 import { Component } from 'vue-property-decorator';
-import cloneDeep from 'lodash/cloneDeep';
 import { Inject } from 'services/core/injector';
 import {
   ENotificationType,
@@ -40,11 +39,6 @@ export default class NotificationsArea extends Vue {
 
   mounted() {
     this.notifyAudio = new Audio(notificationAudio);
-
-    if (this.notificationsService.state.notifications) {
-      this.notificationQueue = cloneDeep(this.notificationsService.state.notifications);
-      this.checkQueue();
-    }
 
     this.notificationsService.notificationPushed.subscribe(notify => {
       this.onNotificationHandler(notify);
