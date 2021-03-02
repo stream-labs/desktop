@@ -141,6 +141,7 @@ export class AuthModule {
             id: query.platform_id,
           },
         },
+        hasRelogged: true,
       };
     }
   }

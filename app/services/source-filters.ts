@@ -206,6 +206,7 @@ export class SourceFiltersService extends Service {
     obsFilter.release();
 
     if (this.presetFilter(sourceId)) {
+      this.usageStatisticsService.recordFeatureUsage('PresetFilter');
       this.setOrder(sourceId, '__PRESET', 1);
     }
     this.filterAdded.next({ sourceId, name: filterName });
