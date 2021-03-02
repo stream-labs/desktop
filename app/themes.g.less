@@ -1,65 +1,4 @@
-// LESS Color Varaibles -- DO NOT REFERENCE DIRECTLY
-
-// Legacy Brand Color Variables
-// @teal: #31C3A2;
-// @teal-semi: rgba(49, 195, 162, 0.08);
-// @purple: #8736E0;
-// @blue: #36ADE0;
-// @purple-semi: rgba(135, 54, 224, 0.08);
-// @red: #F85640;
-// @red-semi: rgba(248, 86, 64, 0.08);
-// @yellow: #FFC803;
-// @yellow-dark: #CA9D00;
-// @yellow-dark-semi: rgba(202, 157, 0, 0.08);
-// @yellow-light: #FFF9E5;
-// @goldenrod: #CAA368;
-// @goldenrod-dark: #8F6F3F;
-
-// Brand colors-- postfix indicates with which type of UI the color should be used with
-@teal-dark: #31C3A2;
-@teal-light: #128079;
-@red-dark: #F85640;
-@red-light: #B14334;
-@yellow-dark: #E3973E;
-@yellow-light: #A96311;
-@blue-dark: #36ADE0;
-@blue-light: #2B5BD7;
-@pink-dark: #EB7777;
-@pink-light: #C22571;
-@purple-dark: #C57BFF;
-@purple-light: #5E3BEC;
-@navy: #233A4A;
-@prime-dark: #CAA368;
-@prime-light: #8F6F3F;
-
-@light-1: #ffffff;
-@light-2: #F5F8FA;
-@light-3: #E3E8EB;
-@light-4: #BDC2C4;
-@light-5: #91979A;
-
-@dark-1: #050D12;
-@dark-2: #09161D;
-@dark-3: #17242D;
-@dark-4: #2B383F;
-@dark-5: #4F5E65;
-
-@primedark-1: #0D0D0D;
-@primedark-2: #000000;
-@primedark-3: #111111;
-@primedark-4: #252525;
-@primedark-5: #969696;
-
-@primelight-1: #F3F3F3;
-@primelight-2: #FFFFFF;
-@primelight-3: #D3D3D3;
-@primelight-4: #C3C4C6;
-@primelight-5: #767676;
-
-@twitch: #9146FF;
-@facebook: #1778F2;
-@youtube: #D22222;
-@twitter: #1DA1F2;
+@import './styles/colors';
 
 // Variables for use
 :root {
@@ -127,6 +66,7 @@
 }
 
 .night-theme {
+
   --teal: @teal-dark;
   --teal-semi: fade(@teal-dark, 8%);
   --teal-hover: darken(@teal-dark, 4%);
