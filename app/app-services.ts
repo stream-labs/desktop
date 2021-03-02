@@ -111,10 +111,21 @@ import { CustomizationService } from './services/customization';
 import { ScenesService } from './services/scenes';
 import { EditorCommandsService } from './services/editor-commands';
 import { PerformanceService } from './services/performance';
+import { StreamingService } from './services/streaming';
+import { StreamSettingsService } from './services/settings/streaming';
+import { RestreamService } from './services/restream';
+import { VideoEncodingOptimizationService } from './services/video-encoding-optimizations';
+import { TwitterService } from './services/integrations/twitter';
+import { SettingsService } from './services/settings';
+import { UserService } from './services/user';
+import { TwitchService } from './services/platforms/twitch';
+import { YoutubeService } from './services/platforms/youtube';
+import { FacebookService } from './services/platforms/facebook';
+import { DismissablesService } from './services/dismissables';
 import { NavigationService } from './services/navigation';
 import { AnnouncementsService } from './services/announcements';
-import { SettingsService } from './services/settings';
 import { VideoService } from './services/video';
+
 export const AppServices = {
   WindowsService,
   ScenesService,
@@ -125,4 +136,14 @@ export const AppServices = {
   EditorCommandsService,
   PerformanceService,
   VideoService,
+  StreamingService,
+  StreamSettingsService,
+  RestreamService,
+  VideoEncodingOptimizationService,
+  TwitterService,
+  YoutubeService,
+  FacebookService,
+  UserService,
+  TwitchService,
+  DismissablesService,
 };

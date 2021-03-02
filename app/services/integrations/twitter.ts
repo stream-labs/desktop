@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import URI from 'urijs';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { Inject } from 'services/core/injector';
