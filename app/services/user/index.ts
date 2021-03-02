@@ -36,6 +36,8 @@ import path from 'path';
 import { AppService } from 'services/app';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { StreamingService } from 'services/streaming';
+import { NotificationsService, ENotificationType } from 'services/notifications';
+import { JsonrpcService } from 'services/api/jsonrpc';
 
 export enum EAuthProcessState {
   Idle = 'idle',
@@ -50,6 +52,7 @@ interface IUserServiceState {
   isPrime: boolean;
   expires?: string;
   userId?: number;
+  isRelog?: boolean;
 }
 
 interface ILinkedPlatform {
@@ -133,6 +136,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private magicLinkService: MagicLinkService;
   @Inject() private appService: AppService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
+  @Inject() private notificationsService: NotificationsService;
+  @Inject() private jsonrpcService: JsonrpcService;
 
   @mutation()
   LOGIN(auth: IUserAuth) {
@@ -199,6 +204,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     Vue.set(this.state, 'authProcessState', state);
   }
 
+  @mutation()
+  private SET_IS_RELOG(isrelog: boolean) {
+    Vue.set(this.state, 'isRelog', isrelog);
+  }
+
   /**
    * Checks for v1 auth schema and migrates if needed
    */
@@ -254,15 +264,26 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     );
   }
 
-  autoLogin() {
+  async autoLogin() {
     if (!this.state.auth) return;
 
-    // don't allow to login via deleted Mixer platform
-    const allPlatforms = this.streamingService.views.allPlatforms;
-    if (!allPlatforms.includes(this.state.auth.primaryPlatform)) return;
+    if (!this.state.auth.hasRelogged) {
+      await electron.remote.session.defaultSession.clearCache();
+      await electron.remote.session.defaultSession.clearStorageData({
+        storages: ['appcache, cookies', 'cachestorage', 'filesystem'],
+      });
+      this.streamSettingsService.resetStreamSettings();
+      this.LOGOUT();
+      this.SET_IS_RELOG(true);
+      this.showLogin();
+    } else {
+      // don't allow to login via deleted Mixer platform
+      const allPlatforms = this.streamingService.views.allPlatforms;
+      if (!allPlatforms.includes(this.state.auth.primaryPlatform)) return;
 
-    const service = getPlatformService(this.state.auth.primaryPlatform);
-    return this.login(service, this.state.auth);
+      const service = getPlatformService(this.state.auth.primaryPlatform);
+      return this.login(service, this.state.auth);
+    }
   }
 
   subscribeToSocketConnection() {
@@ -399,13 +420,24 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const url = `https://${host}/api/v5/slobs/prime`;
     const headers = authorizedHeaders(this.apiToken);
     const request = new Request(url, { headers });
-    return jfetch<{ expires_soon: boolean; expires_at: string; is_prime: boolean }>(request)
+    return jfetch<{
+      expires_soon: boolean;
+      expires_at: string;
+      is_prime: boolean;
+      cc_expires_in_days?: number;
+    }>(request)
       .then(response => this.validatePrimeStatus(response))
       .catch(() => null);
   }
 
-  validatePrimeStatus(response: { expires_soon: boolean; expires_at: string; is_prime: boolean }) {
+  validatePrimeStatus(response: {
+    expires_soon: boolean;
+    expires_at: string;
+    is_prime: boolean;
+    cc_expires_in_days?: number;
+  }) {
     this.SET_PRIME(response.is_prime);
+    if (response.cc_expires_in_days != null) this.sendExpiresSoonNotification();
     if (!response.expires_soon) {
       this.SET_EXPIRES(null);
       return;
@@ -414,6 +446,22 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       this.usageStatisticsService.recordShown('prime-resubscribe-modal');
       this.onboardingService.start({ isPrimeExpiration: true });
     }
+  }
+
+  sendExpiresSoonNotification() {
+    this.notificationsService.push({
+      type: ENotificationType.WARNING,
+      lifeTime: -1,
+      action: this.jsonrpcService.createRequest(Service.getResourceId(this), 'openCreditCardLink'),
+      message: $t('Your credit card expires soon. Click here to retain your Prime benefits'),
+    });
+  }
+
+  async openCreditCardLink() {
+    try {
+      const link = await this.magicLinkService.getDashboardMagicLink('expiring_cc');
+      electron.shell.openExternal(link);
+    } catch (e) {}
   }
 
   /**
@@ -710,6 +758,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         /* eslint-enable */
 
     this.SET_AUTH_STATE(EAuthProcessState.Busy);
+    this.SET_IS_RELOG(false);
 
     let result: EPlatformCallResult;
 
