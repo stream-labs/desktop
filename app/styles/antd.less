@@ -1,0 +1,36 @@
+@import '~antd/dist/antd.dark.less';
+@import './colors';
+
+// DARK THEME COLORS
+// TODO: join with css vars
+@background: @dark-3;
+@section: @dark-2;
+@border: @dark-4;
+
+// apply theme colors for the antd lib
+@primary-color: @teal-dark;
+@popover-background: @background;
+@border-color-split: @border;
+
+// ADDITIONAL STYLES
+.ant-modal-footer {
+  background-color: @section;
+}
+
+// THEME INDEPENDENT STYLES
+
+// justify all inputs of form to the right in the modal footer
+#mainWrapper .ant-modal-footer  .ant-form-inline {
+  justify-content: flex-end;
+}
+
+
+// Use primary color for required marks
+#mainWrapper label.ant-form-item-required::before {
+  color: @primary-color;
+}
+
+// change color for the search box
+#mainWrapper .ant-select-selector input {
+  color: var(--paragraph);
+}

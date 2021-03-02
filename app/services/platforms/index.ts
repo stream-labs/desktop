@@ -192,6 +192,11 @@ export interface IUserAuth {
    * with this user login.
    */
   partition?: string;
+
+  /**
+   * Whether re-login has been forced
+   */
+  hasRelogged: boolean;
 }
 
 export interface IPlatformAuth {

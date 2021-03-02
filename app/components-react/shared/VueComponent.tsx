@@ -32,16 +32,16 @@ export class VueComponent extends Component<IProps, { id: string; vueInstance: V
         return { componentClass, componentProps };
       },
       methods: {
-        updateProps(componentClass: typeof Vue, componentProps: unknown) {
-          this['componentClass'] = componentClass;
-          this['componenentProps'] = componentProps;
+        updateProps(newProps: { componentClass: typeof Vue; componentProps: unknown }) {
+          this['componentClass'] = newProps.componentClass;
+          this['componenentProps'] = newProps.componentProps;
         },
       },
       render(h) {
         return h(this['componentClass'], { props: this['componentProps'] });
       },
     });
-    this.setState({ vueInstance, ...this.state });
+    this.setState({ ...this.state, vueInstance });
   }
 
   componentDidUpdate(props: IProps): void {
