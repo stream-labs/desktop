@@ -83,8 +83,6 @@ export default class GoLiveError extends TsxComponent<{}> {
         return this.renderRestreamError(error);
       case 'YOUTUBE_STREAMING_DISABLED':
         return this.renderYoutubeStreamingDisabled(error);
-      case 'YOUTUBE_PUBLISH_FAILED':
-        return this.renderYoutubePublishError(error);
       case 'MACHINE_LOCKED':
         return this.renderMachineLockedError(error);
       default:
