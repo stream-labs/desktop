@@ -15,8 +15,9 @@ import { createBinding, ListInput } from '../../../shared/inputs';
 import GameSelector from '../GameSelector';
 import {
   IFacebookLiveVideo,
-  IFacebookStartStreamOptions, TDestinationType,
-  TFacebookStreamPrivacy
+  IFacebookStartStreamOptions,
+  TDestinationType,
+  TFacebookStreamPrivacy,
 } from '../../../../services/platforms/facebook';
 import moment from 'moment';
 import Translate from '../../../shared/Translate';
@@ -137,7 +138,7 @@ export default function FacebookEditStreamInfo(p: IProps) {
     WindowsService.actions.closeChildWindow();
   }
 
-  function getPrivacyOptions(): IListOption[] {
+  function getPrivacyOptions(): IListOption<TFacebookStreamPrivacy>[] {
     const options: any = [
       {
         value: 'EVERYONE',

@@ -44,13 +44,7 @@ export interface IListOption<TValue> {
   image?: string;
 }
 
-function TempInput<T extends { value: T['value']; options: T['value'][] }>(p: T) {
-  return p;
-}
-
-const prop = TempInput({ value: 123, options: [123, '123'] });
-
-export const ListInput = <T extends TListInputProps<T['value']>>(p: T) => {
+export const ListInput = InputComponent(<T extends any>(p: TListInputProps<T>) => {
   const { inputAttrs, wrapperAttrs } = useInput('list', p, ANT_SELECT_FEATURES);
   const options = p.options;
 
@@ -69,7 +63,7 @@ export const ListInput = <T extends TListInputProps<T['value']>>(p: T) => {
           optionFilterProp="label"
           optionLabelProp="labelrender"
           onSearch={onSearchHandlerDebounced}
-          onSelect={(val: string) => p.onChange && p.onChange(val)}
+          onSelect={val => p.onChange && p.onChange(val as T)}
         >
           {options && options.map((opt, ind) => renderOption(opt, ind, p))}
         </Select>
@@ -82,7 +76,7 @@ export const ListInput = <T extends TListInputProps<T['value']>>(p: T) => {
   }
 
   return render();
-};
+});
 
 export function renderOption<T>(opt: IListOption<T>, ind: number, inputProps: ICustomListProps<T>) {
   const attrs = {
@@ -155,6 +149,3 @@ function renderLabelWithImage<T>(opt: IListOption<T>) {
     </Row>
   );
 }
-
-const i = ListInput({ value: 1, options: [{ label: 'opt1', value: 2 }] });
-i.value;

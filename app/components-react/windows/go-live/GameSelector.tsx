@@ -18,7 +18,9 @@ export default function GameSelector(p: TProps) {
 
   const { s, updateState } = useFormState(() => {
     return {
-      games: selectedGame ? [{ label: selectedGame, value: selectedGame }] : ([] as IListOption[]),
+      games: selectedGame
+        ? [{ label: selectedGame, value: selectedGame }]
+        : ([] as IListOption<string>[]),
     };
   });
 

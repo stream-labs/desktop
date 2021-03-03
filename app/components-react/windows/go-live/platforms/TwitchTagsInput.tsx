@@ -23,7 +23,7 @@ export function TwitchTagsInput(p: TTwitchTagsInputProps) {
     return { disabled, translatedTags, tagsMap };
   });
 
-  const options = s.translatedTags.map(tag => ({
+  const options: IListOption<string>[] = s.translatedTags.map(tag => ({
     label: tag.name,
     value: tag.tag_id,
     description: tag.description,
@@ -33,8 +33,8 @@ export function TwitchTagsInput(p: TTwitchTagsInputProps) {
     return (
       <TagsInput
         label={p.label}
-        onChange={values => p.onChange && p.onChange(values.map(tagName => s.tagsMap[tagName]))}
         value={p.value && p.value.map(tag => tag.tag_id)}
+        onChange={values => p.onChange && p.onChange(values.map(tagName => s.tagsMap[tagName]))}
         options={options}
         tagRender={(tagProps, tag) => (
           <Tag {...tagProps} color="#9146FF">

@@ -44,8 +44,9 @@ export type TSlobsInputProps<
   TCustomProps extends object, // custom input props defined for SLOBS
   TValue, // the input value type
   TAntProps = {}, // props of the antd input that is working under the hood
-  TFeatures extends keyof Partial<TAntProps> = never // props of antd input that we support
-> = Pick<TAntProps, TFeatures> & FormItemProps & IInputCommonProps<TValue> & TCustomProps;
+  TFeatures extends keyof Partial<TAntProps> = never, // props of antd input that we support
+  TGeneratedProps = Pick<TAntProps, TFeatures> & FormItemProps & IInputCommonProps<TValue>
+> = Omit<TGeneratedProps, keyof TCustomProps> & TCustomProps;
 
 /**
  * A base hook for inputs

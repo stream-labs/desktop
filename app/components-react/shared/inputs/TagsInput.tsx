@@ -1,32 +1,33 @@
 import { Select, Tag } from 'antd';
-import React, { useContext, ReactNode, useMemo, ReactElement } from 'react';
-import { InputComponent, TSlobsInputProps, useInput, ValuesOf } from './inputs';
+import React, { useMemo, ReactElement } from 'react';
+import { InputComponent, SingleType, TSlobsInputProps, useInput, ValuesOf } from './inputs';
 import InputWrapper from './InputWrapper';
-import { SelectProps } from 'antd/lib/select';
-import { ICustomListProps, IListOption, renderOption } from './ListInput';
+import { SelectProps, SelectValue } from 'antd/lib/select';
+import { ICustomListProps, IListOption, renderOption, TListInputProps } from './ListInput';
 import { TagProps } from 'antd/lib/tag';
 import { keyBy } from 'lodash';
 
 // select which features from the antd lib we are going to use
 const ANT_SELECT_FEATURES = ['showSearch', 'loading'] as const;
 
-interface ICustomTagsProps extends ICustomListProps {
-  tagRender?: (tagProps: TagProps, tag: IListOption) => ReactElement<typeof Tag>;
+interface ICustomTagsProps<TValue> extends ICustomListProps<SingleType<TValue>> {
+  tagRender?: (
+    tagProps: TagProps,
+    tag: IListOption<SingleType<TValue>>,
+  ) => ReactElement<typeof Tag>;
 }
 
-export type TTagsInputProps = TSlobsInputProps<
-  ICustomTagsProps,
-  string[],
-  SelectProps<string>,
+export type TTagsInputProps<TValue> = TSlobsInputProps<
+  ICustomTagsProps<TValue>,
+  TValue,
+  SelectProps<TValue>,
   ValuesOf<typeof ANT_SELECT_FEATURES>
 >;
 
-export const TagsInput = InputComponent((p: TTagsInputProps) => {
+export const TagsInput = InputComponent(<T extends any>(p: TTagsInputProps<T>) => {
   const { inputAttrs, wrapperAttrs } = useInput('tags', p);
   const options = p.options;
   const tagsMap = useMemo(() => keyBy(options, 'value'), [options]);
-
-
 
   function renderTag(tagProps: TagProps) {
     const tag = tagsMap[tagProps['value']];
@@ -44,7 +45,8 @@ export const TagsInput = InputComponent((p: TTagsInputProps) => {
         optionFilterProp={'label'}
         mode={'multiple'}
         allowClear
-        onChange={(val: string[]) => p.onChange && p.onChange(val)}
+        value={p.value as string | number}
+        onChange={val => inputAttrs.onChange(val as T)}
         tagRender={renderTag}
       >
         {options && options.map((opt, ind) => renderOption(opt, ind, p))}

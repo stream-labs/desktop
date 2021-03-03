@@ -24,7 +24,7 @@ export default function BroadcastInput(
     return moment(new Date(isoDate)).format(moment.localeData().longDateFormat('ll'));
   }
 
-  function optionRender(opt: IListOption) {
+  function optionRender(opt: IListOption<string>) {
     return (
       <>
         <div className={css.colImage}>
