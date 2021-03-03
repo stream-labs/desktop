@@ -1,4 +1,5 @@
 import React from 'react';
+import { Tooltip } from 'antd';
 import cx from 'classnames';
 import { useVuex } from '../hooks';
 import { Services } from '../service-provider';
@@ -67,24 +68,25 @@ export default function PerformanceMetrics(props: { mode: TPerformanceMetricsMod
       {shownCells.map(attribute => {
         const data = metadata[attribute];
         return (
-          <span
-            key={attribute}
-            className={cx(
-              styles.performanceMetricWrapper,
-              classForStat(attribute),
-              'performance-metric-wrapper',
-            )}
-            onClick={() => updatePinnedStats(attribute, !v.pinnedStats[attribute])}
-            // v-tooltip="pinTooltip('CPU')"
-          >
-            <i className={cx(styles.performanceMetricIcon, data.icon)} />
-            <span className={styles.performanceMetric}>
-              <span className={styles.performanceMetricValue}>{data.value}</span>
-              {showLabel(attribute) && (
-                <span className={styles.performanceMetricLabel}> {data.label}</span>
+          <Tooltip placement="bottom" title={pinTooltip(data.label)}>
+            <span
+              key={attribute}
+              className={cx(
+                styles.performanceMetricWrapper,
+                classForStat(attribute),
+                'performance-metric-wrapper',
               )}
+              onClick={() => updatePinnedStats(attribute, !v.pinnedStats[attribute])}
+            >
+              <i className={cx(styles.performanceMetricIcon, data.icon)} />
+              <span className={styles.performanceMetric}>
+                <span className={styles.performanceMetricValue}>{data.value}</span>
+                {showLabel(attribute) && (
+                  <span className={styles.performanceMetricLabel}> {data.label}</span>
+                )}
+              </span>
             </span>
-          </span>
+          </Tooltip>
         );
       })}
     </div>
