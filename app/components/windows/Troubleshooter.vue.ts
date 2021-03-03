@@ -23,6 +23,7 @@ export default class Troubleshooter extends Vue {
   @Inject() private windowsService: WindowsService;
   @Inject() streamingService: StreamingService;
 
+  // @ts-ignore
   issueCode = this.windowsService.getChildWindowQueryParams().issueCode as TIssueCode;
 
   private subscription: Subscription;

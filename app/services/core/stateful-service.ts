@@ -128,7 +128,9 @@ export abstract class StatefulService<TState extends object> extends Service {
     Vue.set(this.store.state, this.serviceName, newState);
   }
 
-  views: ViewHandler<TState>;
+  get views(): ViewHandler<TState> {
+    return new EmptyView<TState>(this.state);
+  }
 }
 
 /**
@@ -177,3 +179,8 @@ export abstract class ViewHandler<TState extends object> {
     return window['servicesManager'].getResource(service.name).views;
   }
 }
+
+/**
+ * A default view for statefull services
+ */
+class EmptyView<TState extends object> extends ViewHandler<TState> {}

@@ -60,7 +60,9 @@ export default class WidgetEditor extends TsxComponent<WidgetEditorProps> {
 
   $refs: { content: HTMLElement; sidebar: HTMLElement; code: HTMLElement };
 
+  // @ts-ignore
   sourceId = this.windowsService.getChildWindowOptions().queryParams.sourceId;
+  // @ts-ignore
   widget = this.widgetsService.getWidgetSource(this.sourceId);
   apiSettings = this.widget.getSettingsService().getApiSettings();
   properties: TObsFormData = [];

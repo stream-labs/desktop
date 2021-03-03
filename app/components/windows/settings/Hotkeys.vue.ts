@@ -40,6 +40,7 @@ export default class Hotkeys extends Vue {
 
   @Prop()
   highlightSearch: (searchStr: string) => any;
+  // @ts-ignore
   searchString = this.globalSearchStr || '';
   @Watch('searchString')
   onSearchStringChangedHandler(val: string) {

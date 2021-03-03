@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import cloneDeep from 'lodash/cloneDeep';
 import { Inject } from '../../services/core/injector';
 import { WindowsService } from 'services/windows';
@@ -28,7 +27,9 @@ export default class WidgetSettings<
   @Inject() private sourcesService: SourcesService;
 
   service: TService;
+  // @ts-ignore
   sourceId = this.windowsService.getChildWindowOptions().queryParams.sourceId;
+  // @ts-ignore
   widget = this.widgetsService.getWidgetSource(this.sourceId);
   wData: TData = null;
   tab = 'settings';
@@ -39,7 +40,7 @@ export default class WidgetSettings<
       ' Open Sans, Roboto, Oswald, Lato, and Droid Sans.',
   );
 
-  navItems: IWidgetNavItem[];
+  readonly navItems: IWidgetNavItem[];
 
   private lastSuccessfullySavedWData: TData = null;
   private dataUpdatedSubscr: Subscription;

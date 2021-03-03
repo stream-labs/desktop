@@ -93,6 +93,7 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
     return alertNameMap()[alertType];
   }
 
+  // @ts-ignore
   alertTypes = this.alertBoxService.apiNames();
 
   addAlertMenuOpen = false;
@@ -118,6 +119,7 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
     );
   }
 
+  // @ts-ignore
   get navItems() {
     if (this.selectedAlert === 'general') {
       return [

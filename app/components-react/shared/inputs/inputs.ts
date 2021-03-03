@@ -163,10 +163,13 @@ export function useInput<
 =======
 >>>>>>> master
  */
-export function useTextInput<T = string>(
-  p: Parameters<typeof useInput>[1] & TSlobsInputProps<InputProps, T> & { uncontrolled?: boolean },
-  antFeatures?: Parameters<typeof useInput>[2],
-) {
+export function useTextInput<
+  TProps extends TSlobsInputProps<
+    { uncontrolled?: boolean; onBlur?: (ev: FocusEvent<any>) => unknown },
+    TValue
+  >,
+  TValue extends string | number = string
+>(p: TProps, antFeatures?: Parameters<typeof useInput>[2]) {
   const { inputAttrs, wrapperAttrs, stateRef } = useInput('text', p, antFeatures);
 
   // Text inputs are uncontrolled by default for better performance
@@ -230,8 +233,10 @@ export function createBinding<
   return new Proxy(
     {},
     {
-      get(t, fieldName: keyof TState) {
-        const extraProps = extraPropsGenerator ? extraPropsGenerator(fieldName) : {};
+      get(t, fieldName: string) {
+        const extraProps = extraPropsGenerator
+          ? extraPropsGenerator(fieldName as keyof TState)
+          : {};
         return {
           name: fieldName,
           value: target[fieldName],

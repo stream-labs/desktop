@@ -51,15 +51,24 @@ interface IFormSettings {
 export default class FacemaskSettings extends Vue {
   @Inject() facemasksService: FacemasksService;
   updatingInfo = false;
+  // @ts-ignore
   enabledModel = this.facemasksService.state.settings.enabled;
+  // @ts-ignore
   donationsEnabledModel = this.facemasksService.state.settings.donations_enabled;
+  // @ts-ignore
   subsEnabledModel = this.facemasksService.state.settings.subs_enabled;
+  // @ts-ignore
   bitsEnabledModel = this.facemasksService.state.settings.bits_enabled;
+  // @ts-ignore
   bitsPriceModel = this.facemasksService.state.settings.bits_price;
+  // @ts-ignore
   durationModel = this.facemasksService.state.settings.duration;
+  // @ts-ignore
   videoInputModel = this.facemasksService.state.settings.device.value;
+  // @ts-ignore
   availableMasks = this.facemasksService.state.settings.facemasks as IFacemaskSelection[];
 
+  // @ts-ignore
   inputDevices = this.facemasksService.getInputDevicesList().map(device => {
     return {
       title: device.name,
@@ -67,6 +76,7 @@ export default class FacemaskSettings extends Vue {
     };
   });
 
+  // @ts-ignore
   pricingOptions = this.facemasksService.state.settings.pricing_options.map(option => {
     return {
       title: option,

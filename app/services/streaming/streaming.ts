@@ -909,12 +909,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         this.clearReconnectingNotification();
       }
     } else if (info.type === EOBSOutputType.Recording) {
-      const nextState: ERecordingState = {
+      const nextState: ERecordingState = ({
         [EOBSOutputSignal.Start]: ERecordingState.Recording,
         [EOBSOutputSignal.Starting]: ERecordingState.Starting,
         [EOBSOutputSignal.Stop]: ERecordingState.Offline,
         [EOBSOutputSignal.Stopping]: ERecordingState.Stopping,
-      }[info.signal];
+      } as Dictionary<ERecordingState>)[info.signal];
 
       if (info.signal === EOBSOutputSignal.Start) {
         this.usageStatisticsService.recordFeatureUsage('Recording');
@@ -927,13 +927,13 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       this.SET_RECORDING_STATUS(nextState, time);
       this.recordingStatusChange.next(nextState);
     } else if (info.type === EOBSOutputType.ReplayBuffer) {
-      const nextState: EReplayBufferState = {
+      const nextState: EReplayBufferState = ({
         [EOBSOutputSignal.Start]: EReplayBufferState.Running,
         [EOBSOutputSignal.Stopping]: EReplayBufferState.Stopping,
         [EOBSOutputSignal.Stop]: EReplayBufferState.Offline,
         [EOBSOutputSignal.Wrote]: EReplayBufferState.Running,
         [EOBSOutputSignal.WriteError]: EReplayBufferState.Running,
-      }[info.signal];
+      } as Dictionary<EReplayBufferState>)[info.signal];
 
       if (nextState) {
         this.SET_REPLAY_BUFFER_STATUS(nextState, time);

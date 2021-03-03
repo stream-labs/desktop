@@ -10,7 +10,7 @@ const ANT_NUMBER_FEATURES = ['min', 'max'] as const;
 type TProps = TSlobsInputProps<{}, number, InputNumberProps, ValuesOf<typeof ANT_NUMBER_FEATURES>>;
 
 export const NumberInput = React.memo((p: TProps) => {
-  const { inputAttrs, wrapperAttrs, originalOnChange } = useTextInput<number>(
+  const { inputAttrs, wrapperAttrs, originalOnChange } = useTextInput<typeof p, number>(
     p,
     ANT_NUMBER_FEATURES,
   );
