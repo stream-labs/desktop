@@ -66,7 +66,7 @@ enum EResponseResultProcessing {
   const requestBuffer: IGuestApiRequest[] = [];
 
   let readyFunc: Function;
-  const readyPromise = new Promise<boolean>(resolve => {
+  const readyPromise = new Promise<void>(resolve => {
     readyFunc = (webContentsId: number, ipc: string) => {
       hostWebContents = electron.remote.webContents.fromId(webContentsId);
       ipcChannel = ipc;

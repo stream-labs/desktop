@@ -35,7 +35,9 @@ export default class SourceProperties extends Vue {
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
 
+  // @ts-ignore
   sourceId = this.windowsService.getChildWindowQueryParams().sourceId;
+  // @ts-ignore
   source = this.sourcesService.views.getSource(this.sourceId);
   properties: TObsFormData = [];
   hasErrors = false;

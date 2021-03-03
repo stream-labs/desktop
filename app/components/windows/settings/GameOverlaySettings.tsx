@@ -11,6 +11,7 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
   @Inject() gameOverlayService: GameOverlayService;
 
   enabling = false;
+  // @ts-ignore
   overlayOpacity = this.gameOverlayService.state.opacity / 100;
 
   get enableGameOverlay() {

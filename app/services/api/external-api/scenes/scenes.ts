@@ -51,16 +51,21 @@ export class ScenesService {
   }
 
   // convert internal models from events to external models
+  // @ts-ignore
   sceneAdded = this.scenesService.sceneAdded.pipe(map(m => this.convertToExternalSceneModel(m)));
+  // @ts-ignore
   sceneRemoved = this.scenesService.sceneRemoved.pipe(
     map(m => this.convertToExternalSceneModel(m)),
   );
+  // @ts-ignore
   sceneSwitched = this.scenesService.sceneSwitched.pipe(
     map(m => this.convertToExternalSceneModel(m)),
   );
+  // @ts-ignore
   itemRemoved = this.scenesService.itemRemoved.pipe(
     map(m => this.convertToExternalSceneItemModel(m)),
   );
+  // @ts-ignore
   itemAdded = this.scenesService.itemAdded.pipe(map(m => this.convertToExternalSceneItemModel(m)));
 
   itemUpdated = (() => {

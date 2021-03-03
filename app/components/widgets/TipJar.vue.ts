@@ -55,6 +55,7 @@ export default class TipJar extends WidgetSettings<ITipJarData, TipJarService> {
     'Note: This background color is for preview purposes only. It will not be shown in your stream.',
   );
 
+  // @ts-ignore
   jarSrc = `https://${this.hostsService.cdn}/static/tip-jar/jars/glass-`;
   inputOptions: { description: string; value: string }[] = [];
   navItems = [

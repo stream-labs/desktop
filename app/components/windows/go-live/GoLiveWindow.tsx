@@ -31,6 +31,7 @@ export default class GoLiveWindow extends TsxComponent<{}> {
     form: ValidatedForm;
   };
 
+  // @ts-ignore
   private settings: IGoLiveSettings = cloneDeep(this.streamingService.views.goLiveSettings);
 
   private get view() {

@@ -19,7 +19,9 @@ export default class LayoutEditor extends TsxComponent {
   @Inject() private navigationService: NavigationService;
   @Inject() private customizationService: CustomizationService;
 
+  // @ts-ignore
   currentLayout = this.layoutService.views.currentTab.currentLayout || ELayout.Default;
+  // @ts-ignore
   slottedElements = cloneDeep(this.layoutService.views.currentTab.slottedElements) || {};
   browserUrl: string = '';
 

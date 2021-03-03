@@ -108,6 +108,7 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
   private sourcesOrder: string[];
   private workerId: number;
   private requestedFrameId: number;
+  // @ts-ignore
   private bgMultiplier = this.customizationService.isDarkTheme ? 0.2 : 0.5;
   private customizationServiceSubscription: Subscription = null;
 

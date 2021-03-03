@@ -21,6 +21,7 @@ export default class RenameSource extends Vue {
 
   options: {
     sourceId?: string;
+    // @ts-ignore
   } = this.windowsService.getChildWindowQueryParams();
 
   name = '';

@@ -31,6 +31,7 @@ export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalSe
     ends_at: '',
   };
 
+  // @ts-ignore
   get navItems() {
     const baseNavItems = [
       { value: 'visual', label: $t('Visual Settings') },

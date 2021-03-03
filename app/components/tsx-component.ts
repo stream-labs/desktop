@@ -42,6 +42,7 @@ export default abstract class TsxComponent<
   }> &
     Readonly<TProps>;
 
+  // @ts-ignore
   value: TProps['value'];
 
   get props(): TProps {
