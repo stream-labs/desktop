@@ -2,7 +2,7 @@ import { ModalLayout } from '../shared/ModalLayout';
 import { $t } from '../../services/i18n';
 import React, { useState } from 'react';
 import { Services } from '../service-provider';
-import { useOnce } from '../hooks';
+import { useOnCreate } from '../hooks';
 import { assertIsDefined } from '../../util/properties-type-guards';
 
 interface IWindowOptions {
@@ -24,7 +24,7 @@ export default function NameFolder() {
   const [error, setError] = useState('');
 
   // get window options on component create
-  const options = useOnce(() => {
+  const options = useOnCreate(() => {
     const options = (WindowsService.state.child.queryParams as unknown) as IWindowOptions;
     const scene = ScenesService.views.getScene(options.sceneId);
     assertIsDefined(scene);
@@ -66,7 +66,7 @@ export default function NameFolder() {
   }
 
   return (
-    <ModalLayout onSubmit={submit}>
+    <ModalLayout onOk={submit}>
       <form onSubmit={submit}>
         {!error && (
           <p style={{ marginBottom: '10px' }}>{$t('Please enter the name of the folder')}</p>

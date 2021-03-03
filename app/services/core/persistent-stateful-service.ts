@@ -32,7 +32,7 @@ export abstract class PersistentStatefulService<TState extends object> extends S
   init() {
     this.store.watch(
       () => {
-        return JSON.stringify(this.state);
+        return JSON.stringify(this.filter(this.state));
       },
       val => {
         // save only non-default values to the localStorage
@@ -44,6 +44,11 @@ export abstract class PersistentStatefulService<TState extends object> extends S
         localStorage.setItem(PersistentService.localStorageKey, JSON.stringify(valueToSave));
       },
     );
+  }
+
+  // Overwrite to exclude persisting portions of state to local storage
+  filter(state: TState) {
+    return state;
   }
 
   runMigrations(persistedState: any, migrations: IMigration[]) {
