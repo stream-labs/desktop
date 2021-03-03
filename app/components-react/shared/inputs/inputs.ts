@@ -45,7 +45,7 @@ export type TSlobsInputProps<
   TValue, // the input value type
   TAntProps = {}, // props of the antd input that is working under the hood
   TFeatures extends keyof Partial<TAntProps> = never, // props of antd input that we support
-  TGeneratedProps = Pick<TAntProps, TFeatures> & FormItemProps & IInputCommonProps<TValue>
+  TGeneratedProps = Pick<TAntProps, TFeatures> & FormItemProps & IInputCommonProps<TValue> // just a helper type, don't override it
 > = Omit<TGeneratedProps, keyof TCustomProps> & TCustomProps;
 
 /**
@@ -159,10 +159,6 @@ export function useInput<
 
 /**
  * Hook for text fields: input, textarea, password, number
-<<<<<<< HEAD
- * Use useInput() under the hood and handles the onChange event
-=======
->>>>>>> master
  */
 export function useTextInput<
   TProps extends TSlobsInputProps<
