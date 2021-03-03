@@ -48,11 +48,6 @@ const errorTypes = {
       return $t('Failed to upload the thumbnail');
     },
   },
-  YOUTUBE_PUBLISH_FAILED: {
-    get message() {
-      return $t('Failed to publish the YouTube broadcast');
-    },
-  },
   TWEET_FAILED: {
     get message() {
       return $t('Failed to post the Tweet');

@@ -148,6 +148,7 @@ module.exports = {
           return match;
         },
         include: path.resolve(__dirname, 'app/components-react'),
+        exclude: /node_modules/,
         use: [
           'babel-loader',
           {
@@ -175,7 +176,18 @@ module.exports = {
           path.resolve(__dirname, 'app/components-react'),
           path.resolve(__dirname, 'updater'),
         ],
-        use: ['vue-style-loader', 'css-loader', 'less-loader'],
+        use: [
+          'vue-style-loader',
+          'css-loader',
+          {
+            loader: 'less-loader',
+            options: {
+              lessOptions: {
+                javascriptEnabled: true,
+              },
+            },
+          },
+        ],
       },
       {
         test: /\.m.less$/, // Local style modules
@@ -194,7 +206,14 @@ module.exports = {
               importLoaders: 1,
             },
           },
-          { loader: 'less-loader' },
+          {
+            loader: 'less-loader',
+            options: {
+              lessOptions: {
+                javascriptEnabled: true,
+              },
+            },
+          },
         ],
       },
       {
@@ -211,7 +230,41 @@ module.exports = {
               importLoaders: 1,
             },
           },
-          'less-loader',
+          {
+            loader: 'less-loader',
+            options: {
+              lessOptions: {
+                javascriptEnabled: true,
+              },
+            },
+          },
+        ],
+      },
+      {
+        test: /\.less$/, // Local style modules
+        exclude: [
+          path.resolve(__dirname, 'updater'),
+          path.resolve(__dirname, 'app/components'),
+          path.resolve(__dirname, 'app/components-react'),
+          path.resolve(__dirname, 'app/app.g.less'),
+          path.resolve(__dirname, 'app/themes.g.less'),
+        ],
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1,
+            },
+          },
+          {
+            loader: 'less-loader',
+            options: {
+              lessOptions: {
+                javascriptEnabled: true,
+              },
+            },
+          },
         ],
       },
       {
