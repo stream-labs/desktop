@@ -17,7 +17,7 @@ export function TwitchEditStreamInfo(p: IProps) {
   const { settings, updatePlatformSettings } = p;
   const twSettings = settings.platforms.twitch;
   const isAdvanced = isAdvancedMode(p.settings);
-  const vModel = createBinding(twSettings, newTwSettings =>
+  const bind = createBinding(twSettings, newTwSettings =>
     updatePlatformSettings('twitch', newTwSettings),
   );
 
@@ -26,11 +26,11 @@ export function TwitchEditStreamInfo(p: IProps) {
   }
 
   function renderRequiredFields() {
-    return <TwitchTagsInput key="required" label={$t('Twitch Tags')} {...vModel('tags')} />;
+    return <TwitchTagsInput key="required" label={$t('Twitch Tags')} {...bind.tags} />;
   }
 
   function renderOptionalFields() {
-    return <GameSelector key="optional" platform={'twitch'} {...vModel('game')} />;
+    return <GameSelector key="optional" platform={'twitch'} {...bind.game} />;
   }
 
   return (

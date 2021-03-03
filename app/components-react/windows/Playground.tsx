@@ -2,7 +2,7 @@ import { ModalLayout } from '../shared/ModalLayout';
 import { $t } from '../../services/i18n';
 import React, { useState, HTMLAttributes } from 'react';
 import { Services } from '../service-provider';
-import { useOnCreate, useStateHelper } from '../hooks';
+import { useOnCreate, useFormState } from '../hooks';
 import { assertIsDefined } from '../../util/properties-type-guards';
 import { TextInput } from '../shared/inputs/TextInput';
 import { Button, Row, Col } from 'antd';
@@ -26,7 +26,7 @@ interface IWindowOptions {
  */
 export default function Playground() {
   const [myState, setMyState] = useState({ foo: 0 });
-  const { s, updateState } = useStateHelper({
+  const { s, updateState } = useFormState({
     displayValue: 0,
     actualValue: 0,
     switched: false,

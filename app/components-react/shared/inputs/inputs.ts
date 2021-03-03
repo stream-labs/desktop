@@ -4,7 +4,7 @@
 import { InputProps } from 'antd/lib/input';
 import React, { useEffect, useContext, ChangeEvent, FocusEvent, useCallback } from 'react';
 import { FormContext } from './Form';
-import { useDebounce, useOnCreate, useStateHelper } from '../../hooks';
+import { useDebounce, useOnCreate, useFormState } from '../../hooks';
 import uuid from 'uuid';
 import { FormItemProps } from 'antd/lib/form';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
@@ -35,6 +35,7 @@ export interface IInputCommonProps<TValue> {
 }
 
 export type ValuesOf<T extends ReadonlyArray<string>> = T[number];
+export declare type SingleType<MixType> = MixType extends (infer Single)[] ? Single : MixType;
 
 /**
  * A helper type for input props
@@ -84,7 +85,7 @@ export function useInput<
   }, [value]);
 
   // create a local state for the input
-  const { stateRef, updateState } = useStateHelper({ value: inputProps.value });
+  const { stateRef, updateState } = useFormState({ value: inputProps.value });
 
   // create an `emitChange()` method and it's debounced version
   function emitChange() {
@@ -157,7 +158,10 @@ export function useInput<
 
 /**
  * Hook for text fields: input, textarea, password, number
+<<<<<<< HEAD
  * Use useInput() under the hood and handles the onChange event
+=======
+>>>>>>> master
  */
 export function useTextInput<T = string>(
   p: Parameters<typeof useInput>[1] & TSlobsInputProps<InputProps, T> & { uncontrolled?: boolean },
@@ -208,29 +212,50 @@ export function useTextInput<T = string>(
  *  const [myState, setMyState] = useState({name: '', email: ''});
  *  const bind = createBinding(myState, setMyState);
  * return <form>
- *     <input label="User Name" {...bind('name')}>
- *     <input label="User Email" {...bind('email')}>
+ *     <input label="User Name" {...bind.name}>
+ *     <input label="User Email" {...bind.email}>
  *   </form>
  *  }
  * </pre>
  */
-export function createBinding<TTarget extends object, TExtraProps extends object = {}>(
-  target: TTarget,
-  setter: (newTarget: TTarget) => unknown,
-  extraPropsGenerator?: (fieldName: keyof TTarget) => TExtraProps,
-) {
-  return function<TFieldName extends keyof TTarget>(fieldName: TFieldName) {
-    const extraProps = extraPropsGenerator ? extraPropsGenerator(fieldName) : {};
-    return {
-      name: fieldName,
-      value: target[fieldName] as Required<TTarget>[TFieldName],
-      onChange(newVal: unknown) {
-        setter({ ...target, [fieldName]: newVal });
+export function createBinding<
+  TState extends object,
+  TFieldName extends keyof TState,
+  TExtraProps extends object = {}
+>(
+  target: TState,
+  setter: (newTarget: TState) => unknown,
+  extraPropsGenerator?: (fieldName: keyof TState) => TExtraProps,
+): TBindings<TState, TFieldName, TExtraProps> {
+  return new Proxy(
+    {},
+    {
+      get(t, fieldName: keyof TState) {
+        const extraProps = extraPropsGenerator ? extraPropsGenerator(fieldName) : {};
+        return {
+          name: fieldName,
+          value: target[fieldName],
+          onChange(newVal: unknown) {
+            setter({ ...target, [fieldName]: newVal });
+          },
+          ...extraProps,
+        };
       },
-      ...extraProps,
-    };
-  };
+    },
+  ) as TBindings<TState, TFieldName, TExtraProps>;
 }
+
+export type TBindings<
+  TState extends object,
+  TFieldName extends keyof TState,
+  TExtraProps extends object = {}
+> = {
+  [K in TFieldName]: {
+    name: K;
+    value: TState[K];
+    onChange: (newVal: TState[K]) => unknown;
+  } & TExtraProps;
+};
 
 /**
  * Function for creating new input components

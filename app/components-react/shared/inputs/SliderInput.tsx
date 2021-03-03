@@ -2,7 +2,7 @@ import React from 'react';
 import { InputComponent, TSlobsInputProps, useInput, ValuesOf } from './inputs';
 import { Slider, InputNumber, Row, Col } from 'antd';
 import { SliderSingleProps } from 'antd/lib/slider';
-import InputWrapper from './InputWrapper';;
+import InputWrapper from './InputWrapper';
 
 // select which features from the antd lib we are going to use
 const ANT_SLIDER_FEATURES = ['min', 'max'] as const;

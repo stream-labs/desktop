@@ -1,7 +1,9 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { debounce } from 'lodash';
 import { StatefulService } from '../services/core';
-import { createBinding } from './shared/inputs';
+import { createBinding, TBindings } from './shared/inputs';
+import { useForm } from './shared/inputs/Form';
+import { FormInstance } from 'antd/lib/form/hooks/useForm';
 
 /**
  * Creates a reactive state for a React component based on Vuex store
@@ -34,7 +36,7 @@ export function useVuex(...args: any[]) {
  * Helpful if you need to calculate an immutable initial state for a component
  */
 export function useOnCreate<TReturnValue>(cb: () => TReturnValue) {
-  return useMemo(cb, []);
+  return useState(cb)[0];
 }
 
 /**
@@ -42,6 +44,13 @@ export function useOnCreate<TReturnValue>(cb: () => TReturnValue) {
  */
 export function useOnDestroy(cb: () => void) {
   useEffect(() => cb, []);
+}
+
+/**
+ * Create a debounced version of the function
+ */
+export function useDebounce<T extends (...args: any[]) => any>(ms = 0, cb: T) {
+  return useCallback(debounce(cb, ms), []);
 }
 
 /**
@@ -57,7 +66,7 @@ export function useAsyncState<TStateType>(
   let isDestroyed = false;
 
   // create and save the promise if provided
-  const promise = useMemo(() => {
+  const [promise] = useState(() => {
     if (asyncCb) {
       return asyncCb(state).then(newState => {
         // do not update the state if the component has been destroyed
@@ -66,7 +75,7 @@ export function useAsyncState<TStateType>(
         return newState;
       });
     }
-  }, []);
+  });
 
   useOnDestroy(() => {
     isDestroyed = true;
@@ -75,33 +84,17 @@ export function useAsyncState<TStateType>(
   return [state, setState, promise];
 }
 
-type TStateHelper<StateType> = {
-  s: StateType;
-  setState: (p: StateType) => unknown;
-  updateState: (p: Partial<StateType>) => unknown;
-  setItem: <TDict extends keyof StateType, TKey extends keyof StateType[TDict]>(
-    dictionaryName: TDict,
-    key: TKey,
-    value: StateType[TDict][TKey],
-  ) => unknown;
-  bind: <TFieldName extends keyof StateType>(
-    fieldName: TFieldName,
-  ) => {
-    name: TFieldName;
-    value: StateType[TFieldName];
-    onChange: (newVal: StateType[TFieldName]) => unknown;
-  };
-  stateRef: { current: StateType };
-};
-
 /**
  * Create the state object and return helper methods
  */
-export function useStateHelper<T extends object>(initializer: T | (() => T)): TStateHelper<T> {
+export function useFormState<T extends object>(initializer: T | (() => T)): TUseFormStateResult<T> {
   const [s, setStateRaw] = useState<T>(initializer);
 
   // create a reference to the last actual state
   const stateRef = useRef(s);
+
+  // create a reference to AntForm
+  const form = useForm();
 
   function setState(newState: T) {
     // keep the reference in sync when we update the state
@@ -114,28 +107,38 @@ export function useStateHelper<T extends object>(initializer: T | (() => T)): TS
     setState({ ...stateRef.current, ...patch });
   }
 
+  function setItem<TDict extends keyof T, TKey extends keyof T[TDict]>(
+    dictionaryName: TDict,
+    key: TKey,
+    value: T[TDict][TKey],
+  ): void {
+    setState({
+      ...stateRef.current,
+      [dictionaryName]: { ...stateRef.current[dictionaryName], [key]: value },
+    });
+  }
+
   return {
     s,
     setState,
-    setItem<TDict extends keyof T, TKey extends keyof T[TDict]>(
-      dictionaryName: TDict,
-      key: TKey,
-      value: T[TDict][TKey],
-    ): void {
-      setState({
-        ...stateRef.current,
-        [dictionaryName]: { ...stateRef.current[dictionaryName], [key]: value },
-      });
-    },
     updateState,
+    setItem,
     bind: createBinding(s, setState),
     stateRef,
+    form,
   };
 }
 
-/**
- * Create a debounced version of the function
- */
-export function useDebounce<T extends (...args: any[]) => any>(ms = 0, cb: T) {
-  return useCallback(debounce(cb, ms), []);
-}
+type TUseFormStateResult<TState extends object> = {
+  s: TState;
+  setState: (p: TState) => unknown;
+  updateState: (p: Partial<TState>) => unknown;
+  setItem: <TDict extends keyof TState, TKey extends keyof TState[TDict]>(
+    dictionaryName: TDict,
+    key: TKey,
+    value: TState[TDict][TKey],
+  ) => unknown;
+  bind: TBindings<TState, keyof TState>;
+  stateRef: { current: TState };
+  form: FormInstance<TState>;
+};

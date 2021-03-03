@@ -1,7 +1,6 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Form as AntForm } from 'antd';
 import { FormInstance, FormProps, FormItemProps } from 'antd/lib/form';
-import { useOnCreate } from '../../hooks';
 
 type TFormContext = {
   antForm: FormInstance;
@@ -19,7 +18,7 @@ export const FormContext = React.createContext<TFormContext | null>(null);
 export default React.memo(function Form(p: FormProps) {
   const context = useContext(FormContext);
   const [antForm] = AntForm.useForm(context?.antForm || p.form);
-  const contextValue = useOnCreate(() => {
+  const [contextValue] = useState(() => {
     const layouts = {
       horizontal: {
         labelCol: { span: 8 },

@@ -7,7 +7,7 @@ import { TTwitchTag } from '../../../../services/platforms/twitch/tags';
 import { IGoLiveSettings } from '../../../../services/streaming';
 import { TPlatform } from '../../../../services/platforms';
 import Form from '../../../shared/inputs/Form';
-import { useOnCreate, useStateHelper, useVuex } from '../../../hooks';
+import { useOnCreate, useFormState, useVuex } from '../../../hooks';
 import { assertIsDefined } from '../../../../util/properties-type-guards';
 import { EDismissable } from '../../../../services/dismissables';
 import { $t } from '../../../../services/i18n';
@@ -15,8 +15,8 @@ import { createBinding, ListInput } from '../../../shared/inputs';
 import GameSelector from '../GameSelector';
 import {
   IFacebookLiveVideo,
-  IFacebookStartStreamOptions,
-  TFacebookStreamPrivacy,
+  IFacebookStartStreamOptions, TDestinationType,
+  TFacebookStreamPrivacy
 } from '../../../../services/platforms/facebook';
 import moment from 'moment';
 import Translate from '../../../shared/Translate';
@@ -42,7 +42,7 @@ export default function FacebookEditStreamInfo(p: IProps) {
   const shouldShowPrivacyWarn =
     (!fbSettings.liveVideoId && fbSettings.privacy?.value !== 'SELF') ||
     (fbSettings.liveVideoId && fbSettings.privacy?.value);
-  const vModel = createBinding(fbSettings, newFbSettings =>
+  const bind = createBinding(fbSettings, newFbSettings =>
     updatePlatformSettings('facebook', newFbSettings),
   );
 
@@ -57,7 +57,7 @@ export default function FacebookEditStreamInfo(p: IProps) {
   } = Services;
 
   // define the local state
-  const { s, setItem, updateState } = useStateHelper({
+  const { s, setItem, updateState } = useFormState({
     pictures: {} as Record<string, string>,
     scheduledVideos: [] as IFacebookLiveVideo[],
     scheduledVideosLoaded: false,
@@ -179,7 +179,7 @@ export default function FacebookEditStreamInfo(p: IProps) {
           <>
             <ListInput
               label={$t('Facebook Destination')}
-              {...vModel('destinationType')}
+              {...bind.destinationType}
               hasImage
               imageSize={{ width: 35, height: 35 }}
               onSelect={loadScheduledBroadcasts}
@@ -187,8 +187,9 @@ export default function FacebookEditStreamInfo(p: IProps) {
             />
             {shouldShowPages && (
               <ListInput
-                {...vModel('pageId')}
+                {...bind.pageId}
                 label={$t('Facebook Page')}
+                onChange={val => console.log(val)}
                 hasImage
                 imageSize={{ width: 44, height: 44 }}
                 onDropdownVisibleChange={shown => shown && loadPictures('page')}
@@ -203,7 +204,7 @@ export default function FacebookEditStreamInfo(p: IProps) {
             {shouldShowGroups && (
               <>
                 <ListInput
-                  {...vModel('groupId')}
+                  {...bind.groupId}
                   label={$t('Facebook Group')}
                   hasImage
                   imageSize={{ width: 44, height: 44 }}
@@ -233,7 +234,7 @@ export default function FacebookEditStreamInfo(p: IProps) {
       <div key="optional">
         {shouldShowEvents && (
           <ListInput
-            {...vModel('liveVideoId')}
+            {...bind.liveVideoId}
             label={$t('Scheduled Video')}
             loading={!s.scheduledVideosLoaded}
             placeholder={$t('Not selected')}
@@ -274,7 +275,7 @@ export default function FacebookEditStreamInfo(p: IProps) {
         )}
 
         <GameSelector
-          {...vModel('game')}
+          {...bind.game}
           platform="facebook"
           extra={
             v.shouldShowGamingWarning && (
@@ -320,20 +321,20 @@ export default function FacebookEditStreamInfo(p: IProps) {
     );
   }
 
-  function getDestinationOptions() {
-    return [
+  function getDestinationOptions(): IListOption<TDestinationType>[] {
+    const options: IListOption<TDestinationType>[] = [
       {
-        value: 'me',
+        value: 'me' as TDestinationType,
         label: $t('Share to Your Timeline'),
         image: FacebookService.state.userAvatar,
       },
       {
-        value: 'page',
+        value: 'page' as TDestinationType,
         label: $t('Share to a Page You Manage'),
         image: 'https://slobs-cdn.streamlabs.com/media/fb-page.png',
       },
       {
-        value: 'group',
+        value: 'group' as TDestinationType,
         label: $t('Share in a Group'),
         image: 'https://slobs-cdn.streamlabs.com/media/fb-group.png',
       },
@@ -342,6 +343,7 @@ export default function FacebookEditStreamInfo(p: IProps) {
       if (opt.value === 'group' && !v.canStreamToGroup) return false;
       return true;
     });
+    return options;
   }
 
   return (

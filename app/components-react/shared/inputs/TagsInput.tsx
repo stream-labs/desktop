@@ -26,23 +26,7 @@ export const TagsInput = InputComponent((p: TTagsInputProps) => {
   const options = p.options;
   const tagsMap = useMemo(() => keyBy(options, 'value'), [options]);
 
-  function render() {
-    return (
-      <InputWrapper {...wrapperAttrs}>
-        <Select
-          {...inputAttrs}
-          // search by label instead value
-          optionFilterProp={'label'}
-          mode={'multiple'}
-          allowClear
-          onChange={(val: string[]) => p.onChange && p.onChange(val)}
-          tagRender={renderTag}
-        >
-          {options && options.map((opt, ind) => renderOption(opt, ind, p))}
-        </Select>
-      </InputWrapper>
-    );
-  }
+
 
   function renderTag(tagProps: TagProps) {
     const tag = tagsMap[tagProps['value']];
@@ -52,5 +36,19 @@ export const TagsInput = InputComponent((p: TTagsInputProps) => {
     return <Tag {...tagProps}>{tag.label}</Tag>;
   }
 
-  return render();
-})
+  return (
+    <InputWrapper {...wrapperAttrs}>
+      <Select
+        {...inputAttrs}
+        // search by label instead value
+        optionFilterProp={'label'}
+        mode={'multiple'}
+        allowClear
+        onChange={(val: string[]) => p.onChange && p.onChange(val)}
+        tagRender={renderTag}
+      >
+        {options && options.map((opt, ind) => renderOption(opt, ind, p))}
+      </Select>
+    </InputWrapper>
+  );
+});

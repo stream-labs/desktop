@@ -22,6 +22,8 @@ interface IProps {
   isUpdateMode?: boolean;
 }
 
+// const PrivacyInput =
+
 /***
  * Stream Settings for YT
  */
@@ -33,7 +35,7 @@ export function YoutubeEditStreamInfo(p: IProps) {
   const isAdvanced = isAdvancedMode(settings);
   const is360video = ytSettings.projection === '360';
   const shouldShowSafeForKidsWarn = ytSettings.selfDeclaredMadeForKids;
-  const vModel = createBinding(
+  const bind = createBinding(
     ytSettings,
     newYtSettings => updatePlatformSettings('youtube', newYtSettings),
     fieldName => ({ disabled: fieldIsDisabled(fieldName) }),
@@ -81,7 +83,7 @@ export function YoutubeEditStreamInfo(p: IProps) {
           />
         )}
         <ListInput
-          {...vModel('privacyStatus')}
+          {...bind.privacyStatus}
           label={$t('Privacy')}
           options={[
             {
@@ -98,7 +100,7 @@ export function YoutubeEditStreamInfo(p: IProps) {
           ]}
         />
         <ListInput
-          {...vModel('categoryId')}
+          {...bind.categoryId}
           label={$t('Category')}
           showSearch
           options={YoutubeService.state.categories.map(category => ({
@@ -128,13 +130,13 @@ export function YoutubeEditStreamInfo(p: IProps) {
               label: $t('Ultra low-latency'),
             },
           ]}
-          {...vModel('latencyPreference')}
+          {...bind.latencyPreference}
         />
 
         <InputWrapper label={$t('Additional Settings')}>
           {!isScheduleMode && (
             <CheckboxInput
-              {...vModel('enableAutoStart')}
+              {...bind.enableAutoStart}
               label={$t('Enable Auto-start')}
               tooltip={$t(
                 'Enabling auto-start will automatically start the stream when you start sending data from your streaming software',
@@ -143,7 +145,7 @@ export function YoutubeEditStreamInfo(p: IProps) {
           )}
           {!isScheduleMode && (
             <CheckboxInput
-              {...vModel('enableAutoStop')}
+              {...bind.enableAutoStop}
               label={$t('Enable Auto-stop')}
               tooltip={$t(
                 'Enabling auto-stop will automatically stop the stream when you stop sending data from your streaming software',
@@ -151,7 +153,7 @@ export function YoutubeEditStreamInfo(p: IProps) {
             />
           )}
           <CheckboxInput
-            {...vModel('enableDvr')}
+            {...bind.enableDvr}
             label={$t('Enable DVR')}
             tooltip={$t(
               'DVR controls enable the viewer to control the video playback experience by pausing, rewinding, or fast forwarding content',
@@ -162,7 +164,7 @@ export function YoutubeEditStreamInfo(p: IProps) {
             value={is360video}
             onChange={projectionChangeHandler}
           />
-          <CheckboxInput label={$t('Made for kids')} {...vModel('selfDeclaredMadeForKids')} />
+          <CheckboxInput label={$t('Made for kids')} {...bind.selfDeclaredMadeForKids} />
           {shouldShowSafeForKidsWarn && (
             <p>
               {$t(

@@ -4,6 +4,7 @@ import { InputComponent, TSlobsInputProps, useInput, ValuesOf } from './inputs';
 import InputWrapper from './InputWrapper';
 import { SelectProps } from 'antd/lib/select';
 import { useDebounce } from '../../hooks';
+import omit from 'lodash/omit';
 
 // select what features from the antd lib we are going to use
 const ANT_SELECT_FEATURES = [
@@ -17,18 +18,18 @@ const ANT_SELECT_FEATURES = [
 ] as const;
 
 // define custom props
-export interface ICustomListProps {
+export interface ICustomListProps<TValue> {
   hasImage?: boolean;
   imageSize?: { width: number; height: number };
-  optionRender?: (opt: IListOption) => ReactNode;
-  labelRender?: (opt: IListOption) => ReactNode;
-  options: IListOption[];
+  optionRender?: (opt: IListOption<TValue>) => ReactNode;
+  labelRender?: (opt: IListOption<TValue>) => ReactNode;
+  options: IListOption<TValue>[];
 }
 
 // define a type for the component's props
-export type TListInputProps = TSlobsInputProps<
-  ICustomListProps,
-  string,
+export type TListInputProps<TValue> = TSlobsInputProps<
+  ICustomListProps<TValue>,
+  TValue,
   SelectProps<string>,
   ValuesOf<typeof ANT_SELECT_FEATURES>
 >;
@@ -36,14 +37,20 @@ export type TListInputProps = TSlobsInputProps<
 /**
  * data for a single option
  */
-export interface IListOption {
+export interface IListOption<TValue> {
   label: string;
-  value: string;
+  value: TValue;
   description?: string; // TODO
   image?: string;
 }
 
-export const ListInput = InputComponent((p: TListInputProps) => {
+function TempInput<T extends { value: T['value']; options: T['value'][] }>(p: T) {
+  return p;
+}
+
+const prop = TempInput({ value: 123, options: [123, '123'] });
+
+export const ListInput = <T extends TListInputProps<T['value']>>(p: T) => {
   const { inputAttrs, wrapperAttrs } = useInput('list', p, ANT_SELECT_FEATURES);
   const options = p.options;
 
@@ -56,8 +63,9 @@ export const ListInput = InputComponent((p: TListInputProps) => {
     return (
       <InputWrapper {...wrapperAttrs}>
         <Select
-          {...inputAttrs}
+          {...omit(inputAttrs, 'onChange')}
           // search by label instead value
+          value={inputAttrs.value as string}
           optionFilterProp="label"
           optionLabelProp="labelrender"
           onSearch={onSearchHandlerDebounced}
@@ -74,14 +82,14 @@ export const ListInput = InputComponent((p: TListInputProps) => {
   }
 
   return render();
-});
+};
 
-export function renderOption(opt: IListOption, ind: number, inputProps: ICustomListProps) {
+export function renderOption<T>(opt: IListOption<T>, ind: number, inputProps: ICustomListProps<T>) {
   const attrs = {
     'data-option-label': opt.label,
     'data-option-value': opt.value,
     label: opt.label,
-    value: opt.value,
+    value: (opt.value as unknown) as string,
     key: `${ind}-${opt.value}`,
   };
 
@@ -112,7 +120,7 @@ export function renderOption(opt: IListOption, ind: number, inputProps: ICustomL
   );
 }
 
-function renderOptionWithImage(opt: IListOption, inputProps: ICustomListProps) {
+function renderOptionWithImage<T>(opt: IListOption<T>, inputProps: ICustomListProps<T>) {
   const src = opt.image;
   const { width, height } = inputProps.imageSize ? inputProps.imageSize : { width: 15, height: 15 };
   const imageStyle = {
@@ -130,7 +138,7 @@ function renderOptionWithImage(opt: IListOption, inputProps: ICustomListProps) {
   );
 }
 
-function renderLabelWithImage(opt: IListOption) {
+function renderLabelWithImage<T>(opt: IListOption<T>) {
   const src = opt.image;
   const [width, height] = [15, 15];
   const imageStyle = {
@@ -147,3 +155,6 @@ function renderLabelWithImage(opt: IListOption) {
     </Row>
   );
 }
+
+const i = ListInput({ value: 1, options: [{ label: 'opt1', value: 2 }] });
+i.value;

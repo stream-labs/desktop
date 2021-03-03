@@ -1,29 +1,10 @@
-// import { Component } from 'vue-property-decorator';
-// import { IListOption, metadata } from 'components/shared/inputs';
-// import { ListInput, TagsInput } from 'components/shared/inputs/inputs';
-// import { getPlatformService, IPlatformCapabilityGame, TPlatform } from 'services/platforms';
-// import { $t } from 'services/i18n';
-// import { Debounce } from 'lodash-decorators';
-// import TsxComponent, { createProps } from '../../tsx-component';
-// import { SyncWithValue } from 'services/app/app-decorators';
-// import { IGoLiveSettings, IStreamSettings, StreamingService } from 'services/streaming';
-// import { Inject } from 'services/core';
-// import { TwitchService } from 'services/platforms/twitch';
-
-import React, { useState } from 'react';
-import { IGoLiveSettings } from '../../../services/streaming';
-import { getPlatformService, TPlatform } from '../../../services/platforms';
+import React from 'react';
+import { TPlatform } from '../../../services/platforms';
 import { ListInput, TSlobsInputProps } from '../../shared/inputs';
 import { $t } from '../../../services/i18n';
-import { useOnCreate, useAsyncState, useStateHelper, useDebounce } from '../../hooks';
+import { useOnCreate, useFormState } from '../../hooks';
 import { Services } from '../../service-provider';
-import { debounce } from 'lodash';
 import { IListOption } from '../../shared/inputs/ListInput';
-import { TSetPlatformSettingsFn } from './go-live';
-
-type TState = {
-  games: IListOption[];
-};
 
 type TProps = TSlobsInputProps<{ platform: TPlatform }, string>;
 
@@ -35,7 +16,7 @@ export default function GameSelector(p: TProps) {
       ? TwitchService.state.settings.game
       : FacebookService.state.settings.game) || '';
 
-  const { s, updateState } = useStateHelper(() => {
+  const { s, updateState } = useFormState(() => {
     return {
       games: selectedGame ? [{ label: selectedGame, value: selectedGame }] : ([] as IListOption[]),
     };

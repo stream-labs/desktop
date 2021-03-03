@@ -5,7 +5,7 @@ import { Services } from '../../service-provider';
 import cx from 'classnames';
 import React, { HTMLAttributes, useState } from 'react';
 import { IGoLiveProps } from './go-live';
-import { useStateHelper, useVuex } from '../../hooks';
+import { useFormState, useVuex } from '../../hooks';
 import { DestinationSwitchers } from './DestinationSwitchers';
 import { TPlatform } from '../../../services/platforms';
 import { $t } from '../../../services/i18n';
@@ -62,18 +62,6 @@ export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>
       shouldShowAddDestButton: linkedPlatformsCnt + goLiveSettings.customDestinations.length < 5,
     };
   });
-
-
-  // function PerformanceMetrics() {
-  //   const v = useVuex(() => {
-  //     const performanceState = Services.PerformanceService.state;
-  //     return pick(performanceState, 'CPU', 'memory');
-  //   });
-  //   return [
-  //     <div>CPU: {v.CPU}</div>,
-  //     <div>memory: {v.memory}</div>,
-  //   ];
-  // }
 
   function switchPlatform(platform: TPlatform, enabled: boolean) {
     // save settings
@@ -143,24 +131,6 @@ export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>
           {v.isLoadingMode && <Spin size="large" />}
           <GoLiveError />
 
-          <Button onClick={confirmButton}>Confirm</Button>
-
-          <Row>
-            <Col span={12}>
-              <Form layout="vertical">
-                <TextInput placeholder="Name" nowrap />
-                <br />
-                <TextInput placeholder="Email" nowrap />
-                <br />
-              </Form>
-
-              {/*<TextInput label="Promo Code" disabled value={'FA9788'} />*/}
-              {/*<InputWrapper>*/}
-              {/*  <Button type="primary">Sign In</Button>*/}
-              {/*</InputWrapper>*/}
-            </Col>
-          </Row>
-
           {v.shouldShowSettings && (
             <>
               {/*PLATFORM SETTINGS*/}
@@ -172,7 +142,7 @@ export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>
               {/*EXTRAS*/}
               <Section title={v.isAdvancedMode ? $t('Extras') : ''}>
                 <TwitterInput
-                  {...bind('tweetText')}
+                  {...bind.tweetText}
                   streamTitle={view.getCommonFields(settings.platforms).title}
                 />
                 {/*<OptimizedProfileSwitcher*/}
