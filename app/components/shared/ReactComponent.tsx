@@ -60,3 +60,13 @@ export class NewsBanner extends ReactComponent {}
   },
 })
 export class TitleBar extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'Chat' },
+    componenProps: { default: () => ({ restream: false }) },
+    wrapperStyles: {
+      default: () => ({ height: '100%', display: 'flex', flexDirection: 'column' }),
+    },
+  },
+})
+export class Chat extends ReactComponent {}
