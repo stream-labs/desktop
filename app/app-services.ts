@@ -125,6 +125,7 @@ import { DismissablesService } from './services/dismissables';
 import { NavigationService } from './services/navigation';
 import { AnnouncementsService } from './services/announcements';
 import { PatchNotesService } from './services/patch-notes';
+import { ChatService } from './services/chat';
 
 export const AppServices = {
   WindowsService,
@@ -136,6 +137,7 @@ export const AppServices = {
   EditorCommandsService,
   PerformanceService,
   PatchNotesService,
+  ChatService,
   StreamingService,
   StreamSettingsService,
   RestreamService,
