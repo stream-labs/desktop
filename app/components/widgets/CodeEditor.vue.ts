@@ -32,8 +32,7 @@ export default class CodeEditor extends Vue {
   value: IWidgetData;
 
   editorInputValue =
-    // @ts-ignore
-    this.value.settings[`custom_${this.metadata.type}`] ||
+    this!.value.settings[`custom_${this!.metadata.type}`] ||
     this.selectedVariation.settings[this.alertBoxValue];
 
   private serverInputValue = this.editorInputValue;

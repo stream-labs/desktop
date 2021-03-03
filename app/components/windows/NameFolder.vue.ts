@@ -20,8 +20,7 @@ export default class NameFolder extends Vue {
     itemsToGroup?: string[];
     parentId?: string;
     sceneId?: string;
-    // @ts-ignore
-  } = this.windowsService.getChildWindowQueryParams();
+  } = this!.windowsService.getChildWindowQueryParams();
 
   name = '';
   error = '';

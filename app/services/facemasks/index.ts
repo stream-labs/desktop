@@ -42,8 +42,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   @Inject() appService: AppService;
   @Inject() usageStatisticsService: UsageStatisticsService;
 
-  // @ts-ignore
-  cdn = `https://${this.hostsService.facemaskCDN}`;
+  cdn = `https://${this!.hostsService.facemaskCDN}`;
   facemaskFilter: obs.IFilter = null;
   socketConnectionActive = false;
   downloadProgress = {};

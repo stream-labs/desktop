@@ -27,10 +27,8 @@ export default class WidgetSettings<
   @Inject() private sourcesService: SourcesService;
 
   service: TService;
-  // @ts-ignore
-  sourceId = this.windowsService.getChildWindowOptions().queryParams.sourceId;
-  // @ts-ignore
-  widget = this.widgetsService.getWidgetSource(this.sourceId);
+  sourceId = this['windowsService'].getChildWindowOptions().queryParams.sourceId;
+  widget = this['widgetsService'].getWidgetSource(this.sourceId);
   wData: TData = null;
   tab = 'settings';
   requestState: 'success' | 'pending' | 'fail' = 'pending';
@@ -40,7 +38,9 @@ export default class WidgetSettings<
       ' Open Sans, Roboto, Oswald, Lato, and Droid Sans.',
   );
 
-  readonly navItems: IWidgetNavItem[];
+  get navItems(): IWidgetNavItem[] {
+    return [];
+  }
 
   private lastSuccessfullySavedWData: TData = null;
   private dataUpdatedSubscr: Subscription;

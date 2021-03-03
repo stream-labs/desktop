@@ -26,10 +26,8 @@ export default class ObsImport extends TsxComponent<ObsImportProps> {
   importing = false;
   pathChosen = false;
 
-  // @ts-ignore
-  sceneCollections = this.obsImporterService.getSceneCollections();
-  // @ts-ignore
-  profiles = this.obsImporterService.getProfiles();
+  sceneCollections = this['obsImporterService'].getSceneCollections();
+  profiles = this['obsImporterService'].getProfiles();
   selectedProfile = this.profiles[0] || null;
 
   startImport(forceStart?: boolean) {

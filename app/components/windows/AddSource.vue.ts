@@ -29,10 +29,8 @@ export default class AddSource extends Vue {
 
   name = '';
   error = '';
-  // @ts-ignore
-  sourceType = this.windowsService.getChildWindowQueryParams().sourceType as TSourceType;
-  // @ts-ignore
-  sourceAddOptions = (this.windowsService.getChildWindowQueryParams().sourceAddOptions || {
+  sourceType = this!.windowsService.getChildWindowQueryParams().sourceType as TSourceType;
+  sourceAddOptions = (this!.windowsService.getChildWindowQueryParams().sourceAddOptions || {
     propertiesManagerSettings: {},
   }) as ISourceAddOptions;
 
@@ -40,8 +38,7 @@ export default class AddSource extends Vue {
     return this.sourceAddOptions.propertiesManagerSettings.widgetType;
   }
 
-  // @ts-ignore
-  sources = this.sourcesService.views.getSources().filter(source => {
+  sources = this!.sourcesService.views.getSources().filter(source => {
     const comparison = {
       type: this.sourceType,
       propertiesManager: this.sourceAddOptions.propertiesManager,
