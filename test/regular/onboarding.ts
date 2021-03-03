@@ -71,7 +71,7 @@ test('OBS Importer', async t => {
   const obsCacheZipPath = path.resolve(dataDir, 'obs-studio.zip');
 
   const extractZip = require('extract-zip');
-  await new Promise(async (resolve, reject) => {
+  await new Promise<void>(async (resolve, reject) => {
     extractZip(obsCacheZipPath, { dir: cacheDir }, (err: any) => {
       if (err) {
         reject(err);
