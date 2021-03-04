@@ -209,7 +209,3 @@ export default class FacemaskSettings extends Vue {
     return this.facemasksService.state.settings.partnered;
   }
 }
-
-function initialized<T extends object, P extends keyof T>(target: T, prop: P): T[P] {
-  return target[prop];
-}

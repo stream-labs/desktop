@@ -40,7 +40,7 @@ export default class SourceFilters extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() private editorCommandsService: EditorCommandsService;
 
-  windowOptions = this['windowsService'].getChildWindowQueryParams() as {
+  windowOptions = this!.windowsService.getChildWindowQueryParams() as {
     sourceId: string;
     selectedFilterName: string;
   };

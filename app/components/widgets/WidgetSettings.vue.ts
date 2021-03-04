@@ -27,8 +27,8 @@ export default class WidgetSettings<
   @Inject() private sourcesService: SourcesService;
 
   service: TService;
-  sourceId = this['windowsService'].getChildWindowOptions().queryParams.sourceId;
-  widget = this['widgetsService'].getWidgetSource(this.sourceId);
+  sourceId = this!.windowsService.getChildWindowOptions().queryParams.sourceId;
+  widget = this!.widgetsService.getWidgetSource(this.sourceId);
   wData: TData = null;
   tab = 'settings';
   requestState: 'success' | 'pending' | 'fail' = 'pending';

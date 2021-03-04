@@ -93,7 +93,7 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
     return alertNameMap()[alertType];
   }
 
-  alertTypes = this['alertBoxService'].apiNames();
+  alertTypes = this!.alertBoxService.apiNames();
 
   addAlertMenuOpen = false;
   selectedAlert = 'general';
