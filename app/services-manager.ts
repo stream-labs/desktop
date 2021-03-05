@@ -68,6 +68,7 @@ import { NicoliveProgramSelectorService } from 'services/nicolive-program/nicoli
 import { NicoliveCommentViewerService } from 'services/nicolive-program/nicolive-comment-viewer';
 import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
 import { NicoliveCommentLocalFilterService } from 'services/nicolive-program/nicolive-comment-local-filter';
+import { NicoliveCommentSynthesizerService } from 'services/nicolive-program/nicolive-comment-synthesizer';
 
 const { ipcRenderer } = electron;
 
@@ -139,6 +140,7 @@ export class ServicesManager extends Service {
     NicoliveCommentViewerService,
     NicoliveCommentFilterService,
     NicoliveCommentLocalFilterService,
+    NicoliveCommentSynthesizerService,
   };
 
   private instances: Dictionary<Service> = {};

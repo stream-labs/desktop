@@ -24,6 +24,7 @@ import {
 import { ChatMessageType, classify } from './ChatMessage/classifier';
 import { isOperatorCommand } from './ChatMessage/util';
 import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
+import { NicoliveCommentSynthesizerService } from './nicolive-comment-synthesizer';
 
 export type WrappedChat = {
   type: ChatMessageType;
@@ -58,45 +59,12 @@ interface INicoliveCommentViewerState {
   speakingSeqId: number | null;
 }
 
-export type Speech = {
-  text: string;
-}
-export class NicoLiveCommentReader {
-
-  makeSpeech(chat: WrappedChat): Speech | null {
-    if (!chat.value || !chat.value.content) {
-      return null;
-    }
-
-    // TODO filter
-
-    return {
-      text: chat.value.content
-    };
-  }
-
-  speakText(speech: Speech,
-    onstart: (this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => any,
-    onend: (this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => any
-  ) {
-    if (!speech || speech.text == '') {
-      return;
-    }
-
-    const uttr = new SpeechSynthesisUtterance(speech.text);
-    uttr.onstart = onstart;
-    uttr.onend = onend;
-    speechSynthesis.speak(uttr);
-  }
-
-}
-
 export class NicoliveCommentViewerService extends StatefulService<INicoliveCommentViewerState> {
   private client: MessageServerClient | null = null;
-  private reader: NicoLiveCommentReader = new NicoLiveCommentReader();
 
   @Inject() private nicoliveProgramService: NicoliveProgramService;
   @Inject() private nicoliveCommentFilterService: NicoliveCommentFilterService;
+  @Inject() private nicoliveCommentSynthesizerService: NicoliveCommentSynthesizerService;
 
   static initialState: INicoliveCommentViewerState = {
     messages: [],
@@ -220,9 +188,9 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
 
   private queueToSpeech(values: WrappedChat[]) {
     for (const chat of values) {
-      const speech = this.reader.makeSpeech(chat);
+      const speech = this.nicoliveCommentSynthesizerService.makeSpeech(chat);
       if (speech) {
-        this.reader.speakText(speech,
+        this.nicoliveCommentSynthesizerService.speakText(speech,
           () => {
             console.log(`#${chat.seqId}: ${chat.value.content}: onstart`);
             this.SET_STATE({
@@ -251,6 +219,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
     // TODO コメントアートを除外したい
     // TODO 変換辞書を用意して /w+/ を ワラ, /8+/ をパチパチ とかにしたい
     // TODO 読み上げ全体のスイッチを用意して、offにすると即座に止めたい
+    // TODO システムメッセージはon/offできるようにする(設定保存)
 
     const now = Date.now() / 1000;
     this.queueToSpeech(values.slice(-maxQueueToSpeak).filter(c => {

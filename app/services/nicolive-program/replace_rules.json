@@ -1,0 +1,110 @@
+{
+  "elements": [
+    {
+      "note": "最初に改行あるかどうかを優先してチェック",
+      "regularExpression": ".*[\n\r].*",
+      "replacement": ""
+    },
+    {
+      "regularExpression": "HTTPS?://[\\w/:%#\\$&\\?\\(\\)~\\.=\\+\\-]+",
+      "replacement": "URLショウリャク"
+    },
+    {
+      "regularExpression": "[8８]{4,}",
+      "replacement": "パチパチパチ"
+    },
+    {
+      "regularExpression": "[WＷ]{2,}",
+      "replacement": "ワラワラ"
+    },
+    {
+      "regularExpression": "([^A-Z])[WＷ]$",
+      "replacement": "$1、ワラ"
+    },
+    {
+      "regularExpression": "([^A-Z\\s])[WＷ]([！。\\s].*)",
+      "replacement": "$1、ワラ$2"
+    },
+    {
+      "regularExpression": "㌧",
+      "replacement": "トン"
+    },
+    {
+      "regularExpression": "(\\(RY|（ＲＹ)",
+      "replacement": "リャク"
+    },
+    {
+      "regularExpression": "う[PＰ]",
+      "replacement": "ウプ"
+    },
+    {
+      "regularExpression": "厨",
+      "replacement": "チュウ"
+    },
+    {
+      "regularExpression": "CH",
+      "replacement": "チャンネル"
+    },
+    {
+      "regularExpression": "行って",
+      "replacement": "イッテ"
+    },
+    {
+      "regularExpression": "行った",
+      "replacement": "イッタ"
+    },
+    {
+      "regularExpression": "ニコ生",
+      "replacement": "ニコナマ"
+    },
+    {
+      "regularExpression": "〜",
+      "replacement": "ー"
+    },
+    {
+      "regularExpression": "~",
+      "replacement": "ー"
+    },
+    {
+      "regularExpression": "━",
+      "replacement": "ー"
+    },
+    {
+      "regularExpression": "&(APOS|LT|GT|QUOT);",
+      "replacement": ""
+    },
+    {
+      "regularExpression": "[＾Ω∞☠♭〇㈲＃#＄$＊\\*＾≧≦･＞＜．.×\"'<>^°]+",
+      "replacement": ""
+    },
+    {
+      "regularExpression": "♥",
+      "replacement": "ハート"
+    },
+    {
+      "regularExpression": "★",
+      "replacement": "ほし"
+    },
+    {
+      "regularExpression": "^[WＷ]$",
+      "replacement": "ワラ"
+    },
+    {
+      "regularExpression": "^[!！]$",
+      "replacement": "びっくり"
+    },
+    {
+      "regularExpression": "^[\\?？]$",
+      "replacement": "はてな"
+    },
+    {
+      "regularExpression": "^(!\\?|！？|⁉)$",
+      "replacement": "びっくりはてな"
+    },
+    {
+      "note": "最後に長さチェック40文字を超える場合は41文字以降をリャク",
+      "regularExpression": "(.{40,40}).+",
+      "replacement": "$1リャク"
+    }
+  ]
+}
