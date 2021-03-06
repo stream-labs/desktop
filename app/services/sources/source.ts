@@ -55,8 +55,11 @@ export class Source implements ISourceApi {
   // TODO: propertiesMangers should be private
   @ExecuteInWorkerProcess()
   updateSettings(settings: Dictionary<any>) {
-    this.getObsInput().update(settings);
-    this.sourcesService.propertiesManagers[this.sourceId].manager.handleSettingsChange(settings);
+    const obsInputSettings = this.sourcesService.getObsSourceSettings(this.type, settings);
+    this.getObsInput().update(obsInputSettings);
+    this.sourcesService.propertiesManagers[this.sourceId].manager.handleSettingsChange(
+      obsInputSettings,
+    );
     this.sourcesService.sourceUpdated.next(this.state);
   }
 
