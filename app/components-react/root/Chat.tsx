@@ -1,7 +1,11 @@
 import { remote } from 'electron';
-import React, { useEffect, useRef } from 'react';
+import { $t } from '../../services/i18n';
+import React, { useEffect, useRef, useState } from 'react';
 import { Services } from '../service-provider';
+import cx from 'classnames';
 import styles from './Chat.m.less';
+import { TAppPage } from '../../services/navigation';
+import { useVuex } from '../hooks';
 import { OS, getOS } from '../../util/operating-systems';
 
 export default function Chat(props: { restream: boolean }) {
