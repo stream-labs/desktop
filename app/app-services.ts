@@ -123,6 +123,7 @@ import { FacebookService } from './services/platforms/facebook';
 import { DismissablesService } from './services/dismissables';
 import { NavigationService } from './services/navigation';
 import { AnnouncementsService } from './services/announcements';
+import { ChatService } from './services/chat';
 
 export const AppServices = {
   WindowsService,
@@ -133,6 +134,7 @@ export const AppServices = {
   CustomizationService,
   EditorCommandsService,
   PerformanceService,
+  ChatService,
   StreamingService,
   StreamSettingsService,
   RestreamService,
