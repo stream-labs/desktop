@@ -4,7 +4,7 @@ const reactBuild = require('components-react');
 const ReactDOM = require('react-dom');
 const React = require('react');
 
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 
 class WrapperProps<TComponentProps> {
   name?: string = null;
@@ -32,6 +32,21 @@ class ReactComponent<TComponentProps = {}> extends TsxComponent<WrapperProps<TCo
 
   beforeDestroy() {
     ReactDOM.unmountComponentAtNode(this.$refs.container);
+  }
+
+  get componentProps() {
+    return this.props.componentProps;
+  }
+
+  @Watch('componentProps', { deep: true })
+  refreshComponent() {
+    ReactDOM.unmountComponentAtNode(this.$refs.container);
+    const className = this.props.name;
+    const componentClass = reactBuild.components[className];
+    ReactDOM.render(
+      React.createElement(componentClass, { ...this.props.componentProps, key: className }, null),
+      this.$refs.container,
+    );
   }
 
   render() {
