@@ -63,7 +63,7 @@ export class TitleBar extends ReactComponent {}
 @Component({
   props: {
     name: { default: 'Chat' },
-    componenProps: { default: () => ({ restream: false }) },
+    componentProps: { default: () => ({ restream: false }) },
     wrapperStyles: {
       default: () => ({ height: '100%', display: 'flex', flexDirection: 'column' }),
     },
