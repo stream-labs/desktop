@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 import SideNav from '../SideNav';
-import { NewsBanner } from 'components/shared/ReactComponent';
+import { NewsBanner, TitleBar } from 'components/shared/ReactComponent';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService } from 'services/platform-apps';
 import { EditorCommandsService } from '../../app-services';
@@ -18,7 +18,6 @@ import BrowseOverlays from 'components/pages/BrowseOverlays.vue';
 import AlertboxLibrary from 'components/pages/AlertboxLibrary';
 import Onboarding from '../pages/Onboarding';
 import LayoutEditor from '../pages/LayoutEditor';
-import TitleBar from '../TitleBar';
 import { Inject } from '../../services/core/injector';
 import { CustomizationService } from 'services/customization';
 import { NavigationService } from 'services/navigation';
