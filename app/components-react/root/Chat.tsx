@@ -1,11 +1,7 @@
 import { remote } from 'electron';
-import { $t } from '../../services/i18n';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Services } from '../service-provider';
-import cx from 'classnames';
 import styles from './Chat.m.less';
-import { TAppPage } from '../../services/navigation';
-import { useVuex } from '../hooks';
 import { OS, getOS } from '../../util/operating-systems';
 
 export default function Chat(props: { restream: boolean }) {
@@ -58,6 +54,7 @@ export default function Chat(props: { restream: boolean }) {
   }
 
   function changeChat() {
+    console.log(props.restream);
     const windowId = remote.getCurrentWindow().id;
 
     ChatService.unmountChat();
