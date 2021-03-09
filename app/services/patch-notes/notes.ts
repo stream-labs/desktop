@@ -7,7 +7,7 @@ export const notes: IPatchNotes = {
   notes: [
     'Improve stability of many VST plugins',
     'Fixed a bug when editing Slide Show file paths',
-    'Fixed a bug where platform specific sttreamlabels could break',
+    'Fixed a bug where platform specific streamlabels could break',
     'Fixed issue where language names were being incorrectly translated to English',
     'Minor bugfixes and stability improvements',
   ],
