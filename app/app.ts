@@ -234,19 +234,19 @@ document.addEventListener('drop', event => event.preventDefault());
 export const apiInitErrorResultToMessage = (resultCode: obs.EVideoCodes) => {
   switch (resultCode) {
     case obs.EVideoCodes.NotSupported: {
-      return $t('OBSInit.NotSupportedError');
+      return 'Failed to initialize OBS. Your video drivers may be out of date, or Streamlabs OBS may not be supported on your system.';
     }
     case obs.EVideoCodes.ModuleNotFound: {
-      return $t('OBSInit.ModuleNotFoundError');
+      return 'DirectX could not be found on your system. Please install the latest version of DirectX for your machine here <https://www.microsoft.com/en-us/download/details.aspx?id=35?> and try again.';
     }
     default: {
-      return $t('OBSInit.UnknownError');
+      return 'An unknown error was encountered while initializing OBS.';
     }
   }
 };
 
 const showDialog = (message: string): void => {
-  electron.remote.dialog.showErrorBox($t('OBSInit.ErrorTitle'), message);
+  electron.remote.dialog.showErrorBox('Initialization Error', message);
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -301,13 +301,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       electron.remote.process.env.SLOBS_VERSION,
     );
 
-    if (apiResult !== obs.EVideoCodes.Success) {
+    if (apiResult !== obs.EVideoCodes.Success || true) {
       const message = apiInitErrorResultToMessage(apiResult);
       showDialog(message);
 
       crashHandler.unregisterProcess(process.pid);
 
-      obs.NodeObs.StopCrashHandler();
+      obs.NodeObs.InitShutdownSequence();
       obs.IPC.disconnect();
 
       electron.ipcRenderer.send('shutdownComplete');
