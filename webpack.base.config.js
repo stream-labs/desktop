@@ -217,6 +217,27 @@ module.exports = {
         ],
       },
       {
+        test: /\.lazy.less$/, // antd themes
+        include: [path.resolve(__dirname, 'app/styles/antd')],
+        use: [
+          { loader: 'style-loader', options: { injectType: 'lazyStyleTag' } },
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1,
+            },
+          },
+          {
+            loader: 'less-loader',
+            options: {
+              lessOptions: {
+                javascriptEnabled: true,
+              },
+            },
+          },
+        ],
+      },
+      {
         test: /\.g\.less$/, // Global styles
         include: [
           path.resolve(__dirname, 'app/app.g.less'),
