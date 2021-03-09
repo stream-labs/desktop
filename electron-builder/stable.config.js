@@ -38,7 +38,8 @@ const config = {
     publisherName: [
       'DWANGO Co.,Ltd.'
     ],
-    rfc3161TimeStampServer: 'http://timestamp.digicert.com'
+    rfc3161TimeStampServer: 'http://timestamp.digicert.com/?alg=sha1',
+    timeStampServer: 'http://timestamp.digicert.com'
   },
   extraMetadata: {
     env: 'production'
