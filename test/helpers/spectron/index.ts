@@ -358,7 +358,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       // consider this test succeed and remove from the `failedTests` list
       removeFailedTestFromFile(testName);
       // save the test execution time
-      console.log('calc stats');
       testStats[testName] = {
         duration: Date.now() - testStartTime,
         syncIPCCalls: getSyncIPCCalls(),
