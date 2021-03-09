@@ -301,7 +301,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       electron.remote.process.env.SLOBS_VERSION,
     );
 
-    if (apiResult !== obs.EVideoCodes.Success || true) {
+    if (apiResult !== obs.EVideoCodes.Success) {
       const message = apiInitErrorResultToMessage(apiResult);
       showDialog(message);
 
