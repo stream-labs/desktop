@@ -187,6 +187,9 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   }
 
   private queueToSpeech(values: WrappedChat[]) {
+    if (!this.nicoliveCommentSynthesizerService.enabled) {
+      return;
+    }
     for (const chat of values) {
       const speech = this.nicoliveCommentSynthesizerService.makeSpeech(chat);
       if (speech) {

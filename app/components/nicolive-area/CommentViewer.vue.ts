@@ -5,6 +5,7 @@ import { NicoliveCommentViewerService, WrappedChat } from 'services/nicolive-pro
 import CommentForm from './CommentForm.vue';
 import CommentFilter from './CommentFilter.vue';
 import CommentLocalFilter from './CommentLocalFilter.vue';
+import CommentSynthesizer from './CommentSynthesizer.vue';
 import { NicoliveCommentLocalFilterService } from 'services/nicolive-program/nicolive-comment-local-filter';
 import { ChatMessage } from 'services/nicolive-program/MessageServerClient';
 import { Menu } from 'util/menus/Menu';
@@ -37,6 +38,7 @@ const componentMap: { [type in ChatMessageType]: Vue.Component } = {
     CommentForm,
     CommentFilter,
     CommentLocalFilter,
+    CommentSynthesizer,
     CommonComment,
     NicoadComment,
     GiftComment,
@@ -60,10 +62,12 @@ export default class CommentViewer extends Vue {
   commentReloadTooltip = 'コメント再取得';
   filterTooltip = 'NG設定';
   localFilterTooltip = 'フィルター設定';
+  commentSynthesizerTooltip = 'コメント読み上げ設定';
 
   isFilterOpened = false;
 
   isLocalFilterOpened = false;
+  isCommentSynthesizerOpened = false;
   isLatestVisible = true;
 
   get pinnedComment(): WrappedChat | null {

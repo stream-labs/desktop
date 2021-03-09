@@ -4,6 +4,7 @@
       <i class="icon-reload icon-btn" v-tooltip.bottom="commentReloadTooltip" @click="refreshConnection"></i>
       <i class="icon-ng icon-btn" v-tooltip.bottom="filterTooltip" @click="isFilterOpened = true"></i>
       <i class="icon-settings icon-btn" v-tooltip.bottom="localFilterTooltip" @click="isLocalFilterOpened = true"></i>
+      <i class="icon-settings icon-btn" v-tooltip.bottom="commentSynthesizerTooltip" @click="isCommentSynthesizerOpened = true"></i>
     </div>
     <div class="content">
       <div class="list" ref="scroll">
@@ -33,6 +34,7 @@
     <comment-form class="comment-form" />
     <comment-filter class="overlay" @close="isFilterOpened = false" v-if="isFilterOpened"/>
     <comment-local-filter class="overlay" @close="isLocalFilterOpened = false" v-if="isLocalFilterOpened" />
+    <comment-synthesizer class="overlay" @close="isCommentSynthesizerOpened = false" v-if="isCommentSynthesizerOpened" />
   </div>
 </template>
 
