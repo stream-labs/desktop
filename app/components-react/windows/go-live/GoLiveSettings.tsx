@@ -1,10 +1,8 @@
 import styles from './GoLive.m.less';
 import Scrollable from '../../shared/Scrollable';
-import PlatformSettings from './PlatformSettings';
 import { Services } from '../../service-provider';
-import cx from 'classnames';
 import React, { HTMLAttributes, useState } from 'react';
-import { IGoLiveProps } from './go-live';
+import { IGoLiveProps, useGoLiveSettings } from './go-live';
 import { useFormState, useVuex } from '../../hooks';
 import { DestinationSwitchers } from './DestinationSwitchers';
 import { TPlatform } from '../../../services/platforms';
@@ -12,15 +10,9 @@ import { $t } from '../../../services/i18n';
 import GoLiveError from './GoLiveError';
 import { Spin, Row, Col, Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import TwitterInput from './Twitter';
 import { Section } from './Section';
-import { createBinding, SliderInput, TextInput } from '../../shared/inputs';
-import OptimizedProfileSwitcher from './OptimizedProfileSwitcher';
-import { confirm, alert } from '../../modals';
-import Form from '../../shared/inputs/Form';
-import InputWrapper from '../../shared/inputs/InputWrapper';
-import { pick } from 'lodash';
-import Translate from '../../shared/Translate';
+import { createBinding, TextInput } from '../../shared/inputs';
+import PlatformSettings from './PlatformSettings';
 
 const PlusIcon = PlusOutlined as Function;
 
@@ -32,7 +24,6 @@ const PlusIcon = PlusOutlined as Function;
  **/
 export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>) {
   console.log('render GoLiveSettings');
-  const { settings, setSettings } = p;
   const {
     StreamingService,
     RestreamService,
@@ -40,44 +31,66 @@ export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>
     SettingsService,
     UserService,
   } = Services;
-  const view = StreamingService.views;
-  const bind = createBinding(settings, setSettings);
 
-  // define a reactive state
-  const v = useVuex(() => {
-    const goLiveSettings = view.goLiveSettings;
-    const isErrorMode = !!view.info.error;
-    const enabledPlatforms = view.enabledPlatforms;
-    const isLoadingMode = view.isLoading;
-    const linkedPlatformsCnt = view.linkedPlatforms.length;
+  const {
+    tweetText,
+    updateSettings,
+    isAdvancedMode,
+    protectedModeEnabled,
+    error,
+    linkedPlatforms,
+    enabledPlatforms,
+    isLoading,
+    customDestinations,
+    streamTitle,
+  } = useGoLiveSettings('GoLiveSettings', view => ({ streamTitle: view.platforms.twitch.title }));
+  const bind = createBinding({ tweetText }, patch => updateSettings(patch));
+  // const view = StreamingService.views;
+  const shouldShowSettings = !error && !isLoading && enabledPlatforms.length;
+  const shouldShowPrimeLabel = !RestreamService.state.grandfathered;
+  const shouldShowLeftCol = protectedModeEnabled;
+  const shouldShowAddDestButton = linkedPlatforms.length + customDestinations.length < 5;
 
-    return {
-      linkedPlatformsCnt,
-      isLoadingMode,
-      enabledPlatforms,
-      shouldShowSettings: !isErrorMode && !isLoadingMode && enabledPlatforms.length,
-      isAdvancedMode: goLiveSettings.advancedMode && view.isMultiplatformMode,
-      shouldShowPrimeLabel: !RestreamService.state.grandfathered,
-      shouldShowLeftCol: StreamSettingsService.state.protectedModeEnabled,
-      shouldShowAddDestButton: linkedPlatformsCnt + goLiveSettings.customDestinations.length < 5,
-    };
-  });
+  // // define a reactive state
+  // const v = useVuex(() => {
+  //   const goLiveSettings = view.savedSettings;
+  //   const isErrorMode = !!view.info.error;
+  //   const enabledPlatforms = view.enabledPlatforms;
+  //   const isLoadingMode = view.isLoading;
+  //   const linkedPlatformsCnt = view.linkedPlatforms.length;
+  //
+  //   return {
+  //     linkedPlatformsCnt,
+  //     isLoadingMode,
+  //     enabledPlatforms,
+  //     shouldShowSettings: !isErrorMode && !isLoadingMode && enabledPlatforms.length,
+  //     // isAdvancedMode: goLiveSettings.advancedMode && view.isMultiplatformMode,
+  //     shouldShowPrimeLabel: !RestreamService.state.grandfathered,
+  //     shouldShowLeftCol: StreamSettingsService.state.protectedModeEnabled,
+  //     shouldShowAddDestButton: linkedPlatformsCnt + goLiveSettings.customDestinations.length < 5,
+  //   };
+  // });
 
   function switchPlatform(platform: TPlatform, enabled: boolean) {
-    // save settings
-    // TODO:
-    settings.platforms[platform].enabled = enabled;
-    StreamSettingsService.setGoLiveSettings(settings);
-
-    // preload channel data
-    StreamingService.actions.prepopulateInfo();
+    // // save settings
+    // const platforms = cloneDeep(settings.platforms);
+    // platforms[platform].enabled = enabled;
+    // updateSettings({ platforms });
   }
 
   function switchCustomDest(destInd: number, enabled: boolean) {
-    // save settings
-    // TODO:
-    settings.customDestinations[destInd].enabled = enabled;
-    StreamSettingsService.actions.setGoLiveSettings(settings);
+    // // save settings
+    // const customDestinations = cloneDeep(settings.customDestinations);
+    // customDestinations[destInd].enabled = enabled;
+    // updateSettings({ customDestinations });
+  }
+
+  function onDestinationSwitchHandler(enabledPlatforms: TPlatform[], enabledCutomDests: number[]) {
+    // const platforms = cloneDeep(settings.platforms);
+    // keys(platforms).forEach(
+    //   platform => platforms[platform].enabled === enabledPlatforms.includes(platform),
+    // );
+    // updateSettings({ platforms });
   }
 
   function addDestination() {
@@ -99,27 +112,26 @@ export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>
     // );
   }
 
-  console.log('GoLiveSettings isLoading', v.isLoadingMode);
+  console.log('GoLiveSettings isLoading', isLoading);
   return (
     <Row gutter={16} style={{ height: 'calc(100% + 24px)' }}>
       {/*LEFT COLUMN*/}
-      {v.shouldShowLeftCol && (
+      {shouldShowLeftCol && (
         <Col span={8}>
           {/*DESTINATION SWITCHERS*/}
           <DestinationSwitchers
-            platforms={settings.platforms}
-            customDestinations={settings.customDestinations}
-            title="Stream to %{platformName}"
-            canDisablePrimary={false}
-            onPlatformSwitch={switchPlatform}
-            onCustomDestSwitch={switchCustomDest}
+          // platforms={settings.platforms}
+          // customDestinations={settings.customDestinations}
+          // title="Stream to %{platformName}"
+          // canDisablePrimary={false}
+          // onChange={onDestinationSwitchHandler}
           />
           {/*ADD DESTINATION BUTTON*/}
-          {v.shouldShowAddDestButton && (
+          {shouldShowAddDestButton && (
             <a className={styles.addDestinationBtn} onClick={addDestination}>
               <PlusIcon />
               {$t('Add Destination')}{' '}
-              {v.shouldShowPrimeLabel && <b className={styles.prime}>prime</b>}
+              {shouldShowPrimeLabel && <b className={styles.prime}>prime</b>}
             </a>
           )}
         </Col>
@@ -128,23 +140,25 @@ export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>
       {/*RIGHT COLUMN*/}
       <Col span={16} style={{ height: '100%' }}>
         <Scrollable style={{ maxHeight: '100%' }} snapToWindowEdge>
-          {v.isLoadingMode && <Spin size="large" />}
+          {isLoading && <Spin size="large" />}
           <GoLiveError />
 
-          {v.shouldShowSettings && (
+          {shouldShowSettings && (
             <>
               {/*PLATFORM SETTINGS*/}
-              <PlatformSettings settings={settings} setSettings={setSettings} />
-
+              <PlatformSettings />
               {/*ADD SOME SPACE*/}
-              {!v.isAdvancedMode && <div className={styles.spacer} />}
-
+              {!isAdvancedMode && <div className={styles.spacer} />}
+              <TextInput uncontrolled={false} {...bind.tweetText} />
+              {tweetText}
+              TwitchTitle
+              {streamTitle}
               {/*EXTRAS*/}
-              <Section title={v.isAdvancedMode ? $t('Extras') : ''}>
-                <TwitterInput
-                  {...bind.tweetText}
-                  streamTitle={view.getCommonFields(settings.platforms).title}
-                />
+              <Section title={isAdvancedMode ? $t('Extras') : ''}>
+                {/*<TwitterInput*/}
+                {/*  {...bind.tweetText}*/}
+                {/*  streamTitle={view.getCommonFields(settings.platforms).title}*/}
+                {/*/>*/}
                 {/*<OptimizedProfileSwitcher*/}
                 {/*  value*/}
                 {/*/>*/}

@@ -164,47 +164,66 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   async prepopulateInfo(platforms?: TPlatform[]) {
     platforms = platforms || this.views.enabledPlatforms;
     this.UPDATE_STREAM_INFO({ lifecycle: 'prepopulate', error: null });
-    for (const platform of platforms) {
-      const service = getPlatformService(platform);
 
-      // check eligibility for restream
-      // primary platform is always available to stream into
-      // prime users are eligeble for streaming to any platform
-      let primeRequired = false;
-      if (!this.views.isPrimaryPlatform(platform) && !this.userService.isPrime) {
-        const primaryPlatform = this.userService.state.auth?.primaryPlatform;
+    // prepopulate settings for all platforms in parallel mode
+    await Promise.all(
+      platforms.map(async platform => {
+        const service = getPlatformService(platform);
 
-        // grandfathared users allowed to stream primary + FB
-        if (!this.restreamService.state.grandfathered) {
-          primeRequired = true;
-        } else if (
-          isEqual([primaryPlatform, platform], ['twitch', 'facebook']) ||
-          isEqual([primaryPlatform, platform], ['youtube', 'facebook'])
-        ) {
-          primeRequired = false;
-        } else {
-          primeRequired = true;
+        // check eligibility for restream
+        // primary platform is always available to stream into
+        // prime users are eligeble for streaming to any platform
+        let primeRequired = false;
+        if (!this.views.checkPrimaryPlatform(platform) && !this.userService.isPrime) {
+          const primaryPlatform = this.userService.state.auth?.primaryPlatform;
+
+          // grandfathared users allowed to stream primary + FB
+          if (!this.restreamService.state.grandfathered) {
+            primeRequired = true;
+          } else if (
+            isEqual([primaryPlatform, platform], ['twitch', 'facebook']) ||
+            isEqual([primaryPlatform, platform], ['youtube', 'facebook'])
+          ) {
+            primeRequired = false;
+          } else {
+            primeRequired = true;
+          }
+          if (primeRequired) {
+            this.SET_ERROR('PRIME_REQUIRED', undefined, platform);
+            this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
+            return;
+          }
         }
-        if (primeRequired) {
-          this.SET_ERROR('PRIME_REQUIRED', undefined, platform);
+
+        try {
+          await service.prepopulateInfo();
+        } catch (e) {
+          // cast all PLATFORM_REQUEST_FAILED errors to PREPOPULATE_FAILED
+          const errorType =
+            (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
+              ? 'PREPOPULATE_FAILED'
+              : e.type || 'UNKNOWN_ERROR';
+          this.SET_ERROR(errorType, e.details, platform);
           this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
           return;
         }
-      }
+      }),
+    );
 
-      try {
-        await service.prepopulateInfo();
-      } catch (e) {
-        // cast all PLATFORM_REQUEST_FAILED errors to PREPOPULATE_FAILED
-        const errorType =
-          (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
-            ? 'PREPOPULATE_FAILED'
-            : e.type || 'UNKNOWN_ERROR';
-        this.SET_ERROR(errorType, e.details, platform);
-        this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
-        return;
+    // prepopulate Twitter
+    try {
+      if (this.twitterService.state.linked && this.twitterService.state.tweetWhenGoingLive) {
+        await this.twitterService.getTwitterStatus();
+        const streamTitle = this.views.commonFields.title;
+        await this.streamSettingsService.setGoLiveSettings({
+          tweetText: this.twitterService.getDefaultTweetText(streamTitle),
+        });
       }
+    } catch (e) {
+      // do not block streaming if something is wrong on the Twitter side
+      console.error(e);
     }
+
     // successfully prepopulated
     this.UPDATE_STREAM_INFO({ lifecycle: 'waitForNewSettings' });
   }
@@ -231,7 +250,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const unattendedMode = !newSettings;
 
     // use default settings if no new settings provided
-    const settings = newSettings || cloneDeep(this.views.goLiveSettings);
+    const settings = newSettings || cloneDeep(this.views.savedSettings);
 
     // save enabled platforms to reuse setting with the next app start
     this.streamSettingsService.setSettings({ goLiveSettings: settings });
@@ -399,7 +418,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       // don't update settings for a non-primary platform if we're not live
       if (
         this.state.info.checklist.startVideoTransmission !== 'done' &&
-        !this.views.isPrimaryPlatform(platform)
+        !this.views.checkPrimaryPlatform(platform)
       ) {
         continue;
       }

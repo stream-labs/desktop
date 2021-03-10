@@ -7,35 +7,16 @@ import { $t } from '../../../services/i18n';
 import css from './Twitter.m.less';
 import { SwitchInput, TextAreaInput, TSlobsInputProps, TextInput } from '../../shared/inputs';
 import { pick } from 'lodash';
-import { assertIsDefined } from '../../../util/properties-type-guards';
 import { Row, Col } from 'antd';
 
 export default function TwitterInput(
   p: TSlobsInputProps<{ streamTitle: string; onChange: (tweetText: string) => unknown }, string>,
 ) {
   const { TwitterService, UserService } = Services;
-  const v = useVuex(() => ({
-    ...pick(
-      TwitterService.state,
-      'tweetWhenGoingLive',
-      'linked',
-      'screenName',
-      'creatorSiteUrl',
-      'creatorSiteOnboardingComplete',
-    ),
+  const { tweetWhenGoingLive, linked, screenName, isTwitch } = useVuex(() => ({
+    ...pick(TwitterService.state, 'tweetWhenGoingLive', 'linked', 'screenName'),
     isTwitch: UserService.platform?.type === 'twitch',
   }));
-
-  useOnCreate(async () => {
-    await TwitterService.actions.return.getTwitterStatus();
-    assertIsDefined(v.creatorSiteUrl);
-    assertIsDefined(UserService.platform);
-    let url = `${v.creatorSiteUrl}/home`;
-    if (!v.creatorSiteOnboardingComplete && v.isTwitch) {
-      url = `https://twitch.tv/${UserService.platform.username}`;
-    }
-    p.onChange(`${p.streamTitle} ${url}`);
-  });
 
   function unlink() {
     TwitterService.actions.return
@@ -52,12 +33,12 @@ export default function TwitterInput(
             <SwitchInput
               label={$t('Enable Tweet Sharing')}
               onChange={shouldTweet => TwitterService.actions.setTweetPreference(shouldTweet)}
-              value={v.tweetWhenGoingLive}
+              value={tweetWhenGoingLive}
               className={css.twitterTweetToggle}
             />
           </Col>
           <Col span={10} style={{ textAlign: 'right' }}>
-            <InputWrapper>@{v.screenName}</InputWrapper>
+            <InputWrapper>@{screenName}</InputWrapper>
           </Col>
         </Row>
 
@@ -67,7 +48,7 @@ export default function TwitterInput(
           showCount={true}
           autoSize={true}
           maxLength={280}
-          disabled={!v.tweetWhenGoingLive}
+          disabled={!tweetWhenGoingLive}
         />
         <div className={css.twitterButtons}>
           <button className={cx('button', 'button--default', css.adjustButton)} onClick={unlink}>
@@ -93,5 +74,5 @@ export default function TwitterInput(
     );
   }
 
-  return <InputWrapper>{v.linked ? renderLinkedView() : renderUnlinkedView()}</InputWrapper>;
+  return <InputWrapper>{linked ? renderLinkedView() : renderUnlinkedView()}</InputWrapper>;
 }

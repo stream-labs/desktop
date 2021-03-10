@@ -178,6 +178,33 @@ export abstract class ViewHandler<TState extends object> {
     // TODO: Working around circular reference
     return window['servicesManager'].getResource(service.name).views;
   }
+
+  exposeProps(): this {
+    const self = this;
+
+    function exposeObjectProps(fromObject: object, toObject: object) {
+      Object.getOwnPropertyNames(fromObject).forEach(propName => {
+        const descriptor = Object.getOwnPropertyDescriptor(fromObject, propName);
+        if (descriptor.get) {
+          Object.defineProperty(toObject, propName, {
+            enumerable: true,
+            get() {
+              return self[propName];
+            },
+          });
+        } else if (typeof descriptor.value === 'function') {
+          toObject[propName] = self[propName].bind(self);
+        } else {
+          toObject[propName] = self[propName];
+        }
+      });
+    }
+
+    const exposedProps = {};
+    exposeObjectProps(this.constructor.prototype, exposedProps);
+    exposeObjectProps(this, exposedProps);
+    return exposedProps as this;
+  }
 }
 
 /**

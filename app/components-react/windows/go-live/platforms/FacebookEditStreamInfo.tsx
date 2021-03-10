@@ -1,5 +1,5 @@
 import electron from 'electron';
-import { isAdvancedMode, TSetPlatformSettingsFn, TUpdatePlatformSettingsFn } from '../go-live';
+import { TSetPlatformSettingsFn, TUpdatePlatformSettingsFn, useGoLiveSettings } from '../go-live';
 import CommonPlatformFields from '../CommonPlatformFields';
 import React, { useState } from 'react';
 import { Services } from '../../../service-provider';
@@ -29,13 +29,17 @@ interface IProps {
   updatePlatformSettings: TUpdatePlatformSettingsFn;
   isScheduleMode?: boolean;
   isUpdateMode?: boolean;
+  isAdvancedMode: (p: any) => boolean;
 }
 
 export default function FacebookEditStreamInfo(p: IProps) {
-  const { updatePlatformSettings, isScheduleMode, isUpdateMode } = p;
-  const fbSettings = p.settings.platforms.facebook;
+  const { isScheduleMode, isUpdateMode } = p;
+  const { settings, updatePlatform } = useGoLiveSettings('FacebookEditStreamInfo', state => [
+    state.platforms.facebook,
+  ]);
+  const fbSettings = settings.platforms.facebook;
   assertIsDefined(fbSettings);
-  const isAdvanced = isAdvancedMode(p.settings);
+  const isAdvanced = p.isAdvancedMode(p.settings);
   const shouldShowGroups = fbSettings.destinationType === 'group' && !isUpdateMode;
   const shouldShowPages = fbSettings.destinationType === 'page' && !isUpdateMode;
   const shouldShowEvents = !isUpdateMode && !isScheduleMode;
@@ -44,7 +48,7 @@ export default function FacebookEditStreamInfo(p: IProps) {
     (!fbSettings.liveVideoId && fbSettings.privacy?.value !== 'SELF') ||
     (fbSettings.liveVideoId && fbSettings.privacy?.value);
   const bind = createBinding(fbSettings, newFbSettings =>
-    updatePlatformSettings('facebook', newFbSettings),
+    updatePlatform('facebook', newFbSettings),
   );
 
   // inject services
@@ -80,7 +84,7 @@ export default function FacebookEditStreamInfo(p: IProps) {
         DismissablesService.views.shouldShow(EDismissable.FacebookNeedPermissionsTip),
       groups: state.facebookGroups,
       pages: state.facebookPages,
-      isPrimary: StreamingService.views.isPrimaryPlatform('facebook'),
+      isPrimary: StreamingService.views.checkPrimaryPlatform('facebook'),
     };
   });
 
@@ -91,7 +95,7 @@ export default function FacebookEditStreamInfo(p: IProps) {
   });
 
   function setPrivacy(privacy: TFacebookStreamPrivacy) {
-    updatePlatformSettings('facebook', { privacy: { value: privacy } });
+    updatePlatform('facebook', { privacy: { value: privacy } });
   }
 
   async function loadScheduledBroadcasts() {

@@ -10,6 +10,7 @@ import { FormItemProps } from 'antd/lib/form';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import { $t } from '../../../services/i18n';
 import { pick } from 'lodash';
+import FormInput from '../../../components/shared/inputs/FormInput.vue';
 
 type TInputType =
   | 'text'
@@ -41,12 +42,28 @@ export declare type SingleType<MixType> = MixType extends (infer Single)[] ? Sin
  * A helper type for input props
  */
 export type TSlobsInputProps<
+  // required props
   TCustomProps extends object, // custom input props defined for SLOBS
   TValue, // the input value type
+  // optional props
   TAntProps = {}, // props of the antd input that is working under the hood
-  TFeatures extends keyof Partial<TAntProps> = never, // props of antd input that we support
-  TGeneratedProps = Pick<TAntProps, TFeatures> & FormItemProps & IInputCommonProps<TValue> // just a helper type, don't override it
-> = Omit<TGeneratedProps, keyof TCustomProps> & TCustomProps;
+  TFeatures extends keyof Partial<TAntProps> = never // props of antd input that we support
+> = TCreateSlobsInputProps<TCustomProps, TValue, TAntProps, TFeatures>;
+
+/**
+ * A private helper for creating input props
+ */
+type TCreateSlobsInputProps<
+  // use props from TSlobsInputProps:
+  TCustomProps,
+  TValue,
+  TAntProps,
+  TFeatures extends keyof Partial<TAntProps> = never,
+  // generate helper props:
+  TGeneratedProps = Pick<TAntProps, TFeatures> &
+    FormItemProps &
+    IInputCommonProps<TValue> & { inputRef?: React.Ref<HTMLInputElement> }
+> = Omit<TGeneratedProps, keyof TCustomProps> & TCustomProps; // join generated props with custom props
 
 /**
  * A base hook for inputs
@@ -54,19 +71,9 @@ export type TSlobsInputProps<
  * and returns props for Input and Wrapper components
  */
 export function useInput<
-  TValue,
-  TLabel,
-  TInputProps extends {
-    name?: string;
-    label?: TLabel;
-    value?: TValue;
-    rules?: FormItemProps['rules'];
-  }
->(
-  type: TInputType,
-  inputProps: TInputProps & IInputCommonProps<TValue>,
-  antFeatures?: readonly string[],
-) {
+  TInputProps extends TSlobsInputProps<{}, any>,
+  TValue = TInputProps['value']
+>(type: TInputType, inputProps: TInputProps, antFeatures?: readonly string[]) {
   const { name, value, label } = inputProps;
 
   // get parent form if exist
@@ -147,6 +154,7 @@ export function useInput<
     'data-role': 'input',
     name: inputId,
     value: stateRef.current.value,
+    ref: inputProps.inputRef as any,
     onChange,
   };
 
@@ -223,8 +231,8 @@ export function createBinding<
   TFieldName extends keyof TState,
   TExtraProps extends object = {}
 >(
-  target: TState,
-  setter: (newTarget: TState) => unknown,
+  state: TState,
+  setter: (newTarget: Partial<TState>) => unknown,
   extraPropsGenerator?: (fieldName: keyof TState) => TExtraProps,
 ): TBindings<TState, TFieldName, TExtraProps> {
   return new Proxy(
@@ -236,9 +244,9 @@ export function createBinding<
           : {};
         return {
           name: fieldName,
-          value: target[fieldName],
+          value: state[fieldName],
           onChange(newVal: unknown) {
-            setter({ ...target, [fieldName]: newVal });
+            setter({ ...state, [fieldName]: newVal });
           },
           ...extraProps,
         };

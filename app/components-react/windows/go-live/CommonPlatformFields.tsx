@@ -7,7 +7,12 @@ import { $t } from '../../../services/i18n';
 import { Form } from 'antd';
 import React, { useState } from 'react';
 import { CheckboxInput, TextAreaInput, TextInput } from '../../shared/inputs';
-import { IGoLiveProps, getEnabledPlatforms, TUpdatePlatformSettingsFn } from './go-live';
+import {
+  IGoLiveProps,
+  getEnabledPlatforms,
+  TUpdatePlatformSettingsFn,
+  useGoLiveSettings,
+} from './go-live';
 import Utils from '../../../services/utils';
 import { assertIsDefined } from '../../../util/properties-type-guards';
 import InputWrapper from '../../shared/inputs/InputWrapper';
@@ -19,8 +24,8 @@ interface IProps {
    * if provided then change props only for the provided platform
    */
   platform?: TPlatform;
-  settings: IGoLiveSettings;
-  updatePlatformSettings: TUpdatePlatformSettingsFn;
+  // settings: IGoLiveSettings;
+  // updatePlatformSettings: TUpdatePlatformSettingsFn;
 }
 
 type TCustomFieldName = 'title' | 'description';
@@ -31,51 +36,48 @@ type TCustomFieldName = 'title' | 'description';
  * otherwise it changes props for all enabled platforms
  */
 export default function CommonPlatformFields(p: IProps) {
-  const { settings, updatePlatformSettings } = p;
-  const { StreamingService } = Services;
-  const view = StreamingService.views;
-  const targetPlatforms = getTargetPlatforms(p);
-  const enabledPlatforms = getEnabledPlatforms(settings);
-  const platformSettings = getPlatformSettings(p);
-  const [commonFields, setCommonFields] = useState(
-    () =>
-      pick(p.platform ? settings.platforms[p.platform] : view.getCommonFields(settings.platforms), [
-        'title',
-        'description',
-      ]) as { title: string; description: string },
-  );
+  const {
+    updatePlatform,
+    isAdvancedMode,
+    enabledPlatforms,
+    getPlatformSettings,
+    commonFields,
+    updateCommonFields,
+    toggleCustomFields,
+    isMultiplatformMode,
+    supports,
+  } = useGoLiveSettings('CommonPlatformFields');
+  const shouldShowPropsForSinglePlatform = !!p.platform;
+  const platformSettings = shouldShowPropsForSinglePlatform
+    ? getPlatformSettings(p.platform!)
+    : null;
 
   /**
-   * Update the selected field for all target platforms
-   **/
-  function updateCommonField(fieldName: TCustomFieldName, value: string) {
-    setCommonFields({ ...commonFields, [fieldName]: value });
-    targetPlatforms.forEach(platform => {
-      updatePlatformSettings(platform, commonFields);
-    });
-  }
-
-  /**
-   * Toggle the "Use different title... " checkbox
+   * Toggle the "Use different title and description " checkbox
    **/
   function toggleUseCustom() {
-    // this method is applicable only for a single platform component's mode
-    const platform = p.platform;
-    assertIsDefined(platform);
-
-    // update platforms settings
-    const platformSettings = settings.platforms[platform];
-    updatePlatformSettings(platform, { useCustomFields: !platformSettings.useCustomFields });
+    assertIsDefined(p.platform);
+    toggleCustomFields(p.platform);
   }
 
-  const isSinglePlatformMode = !!p.platform;
+  function updateCommonField(fieldName: TCustomFieldName, value: string) {
+    if (shouldShowPropsForSinglePlatform) {
+      assertIsDefined(p.platform);
+      updatePlatform(p.platform, { [fieldName]: value });
+    } else {
+      updateCommonFields(fieldName, value);
+    }
+  }
+
   const hasCustomCheckbox =
-    isSinglePlatformMode && settings.advancedMode && enabledPlatforms.length > 1;
+    shouldShowPropsForSinglePlatform && isAdvancedMode && isMultiplatformMode;
   const fieldsAreVisible = !hasCustomCheckbox || platformSettings?.useCustomFields;
-  const hasDescription = isSinglePlatformMode
-    ? view.supports('description', [p.platform as TPlatform])
-    : view.supports('description');
-  const fields = isSinglePlatformMode ? settings.platforms[p.platform as TPlatform] : commonFields;
+  const hasDescription = shouldShowPropsForSinglePlatform
+    ? supports('description', [p.platform as TPlatform])
+    : supports('description');
+  const fields = shouldShowPropsForSinglePlatform
+    ? getPlatformSettings(p.platform as TPlatform)
+    : commonFields;
 
   // find out the best title for common fields
   const title = hasDescription
@@ -124,33 +126,4 @@ export default function CommonPlatformFields(p: IProps) {
       </Animate>
     </div>
   );
-}
-
-/**
- * Returns platforms that we should apply settings to
- **/
-function getTargetPlatforms(props: IProps): TPlatform[] {
-  // component in the single platform mode
-  // just return "props.platform"
-  if (props.platform) return [props.platform];
-
-  // component in the simple multiplatform mode
-  // return all enabled platforms
-  if (!props.settings.advancedMode) {
-    return getEnabledPlatforms(props.settings);
-  }
-
-  // component in the advanced multiplatform mode
-  // return platforms with "useCustomFields=false"
-  return getEnabledPlatforms(props.settings).filter(
-    platform => !props.settings.platforms[platform].useCustomFields,
-  );
-}
-
-/**
- * Returns platform settings for a single-platform mode
- **/
-function getPlatformSettings(props: IProps) {
-  if (!props.platform) return null;
-  return props.settings.platforms[props.platform];
 }

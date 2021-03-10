@@ -9,7 +9,7 @@ import { InputComponent } from './inputs';
  * Wraps Form.Item
  * Can display unwrapped content if nowrap parameter is set to true
  */
-export default InputComponent(function InputWrapper(p: FormItemProps & { nowrap?: boolean }) {
+export default InputComponent(function InputWrapper(p: FormItemProps & { nowrap?: boolean, inputRef?: unknown }) {
   const formItemProps = omit(p, 'nowrap');
   const label = p.label || ' ';
 

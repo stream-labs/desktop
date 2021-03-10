@@ -1,4 +1,4 @@
-import { isAdvancedMode, TUpdatePlatformSettingsFn } from '../go-live';
+import { TUpdatePlatformSettingsFn, useGoLiveSettings } from '../go-live';
 import CommonPlatformFields from '../CommonPlatformFields';
 import React from 'react';
 import { IGoLiveSettings } from '../../../../services/streaming';
@@ -9,20 +9,29 @@ import GameSelector from '../GameSelector';
 import Form from '../../../shared/inputs/Form';
 
 interface IProps {
-  settings: IGoLiveSettings;
-  updatePlatformSettings: TUpdatePlatformSettingsFn;
+  // settings: IGoLiveSettings;
+  // updatePlatformSettings: TUpdatePlatformSettingsFn;
 }
 
-export function TwitchEditStreamInfo(p: IProps) {
-  const { settings, updatePlatformSettings } = p;
-  const twSettings = settings.platforms.twitch;
-  const isAdvanced = isAdvancedMode(p.settings);
-  const bind = createBinding(twSettings, newTwSettings =>
-    updatePlatformSettings('twitch', newTwSettings),
+export function TwitchEditStreamInfo() {
+  const { updatePlatform, twSettings, settingsMode } = useGoLiveSettings(
+    'TwitchEditStreamInfo',
+    state => ({
+      twSettings: state.platforms.twitch,
+    }),
   );
 
+  const bind = createBinding(twSettings, updatedSettings =>
+    updatePlatform('twitch', updatedSettings),
+  );
+
+  // const twSettings = settings.platforms.twitch;
+  // const bind = createBinding(twSettings, newTwSettings =>
+  //   updatePlatformSettings('twitch', newTwSettings),
+  // );
+
   function renderCommonFields() {
-    return <CommonPlatformFields key="common" {...p} platform="twitch" />;
+    return <CommonPlatformFields key="common" platform="twitch" />;
   }
 
   function renderRequiredFields() {
@@ -35,9 +44,17 @@ export function TwitchEditStreamInfo(p: IProps) {
 
   return (
     <Form name="twitch-settings">
-      {isAdvanced
-        ? [renderRequiredFields(), renderOptionalFields(), renderCommonFields()]
-        : [renderCommonFields(), renderRequiredFields()]}
+      {settingsMode === 'singlePlatform' && [
+        renderCommonFields(),
+        renderRequiredFields(),
+        renderOptionalFields(),
+      ]}
+      {settingsMode === 'multiplatformSimple' && renderRequiredFields()}
+      {settingsMode === 'multiplatformAdvanced' && [
+        renderRequiredFields(),
+        renderOptionalFields(),
+        renderCommonFields(),
+      ]}
     </Form>
   );
 }

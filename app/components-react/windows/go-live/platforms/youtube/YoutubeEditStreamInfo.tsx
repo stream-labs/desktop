@@ -1,5 +1,4 @@
 import { IGoLiveSettings, IStreamSettings } from '../../../../../services/streaming';
-import { isAdvancedMode, TUpdatePlatformSettingsFn } from '../../go-live';
 import { TPlatform } from '../../../../../services/platforms';
 import CommonPlatformFields from '../../CommonPlatformFields';
 import { CheckboxInput, ListInput } from '../../../../shared/inputs';
@@ -14,12 +13,14 @@ import InputWrapper from '../../../../shared/inputs/InputWrapper';
 import { TwitchTagsInput } from '../TwitchTagsInput';
 import GameSelector from '../../GameSelector';
 import Form from '../../../../shared/inputs/Form';
+import { TUpdatePlatformSettingsFn } from '../../go-live';
 
 interface IProps {
   settings: IGoLiveSettings;
   updatePlatformSettings: TUpdatePlatformSettingsFn;
   isScheduleMode?: boolean;
   isUpdateMode?: boolean;
+  isAdvancedMode: (p: any) => boolean;
 }
 
 // const PrivacyInput =
@@ -32,7 +33,7 @@ export function YoutubeEditStreamInfo(p: IProps) {
   const { StreamingService, YoutubeService } = Services;
   const view = StreamingService.views;
   const ytSettings = settings.platforms.youtube;
-  const isAdvanced = isAdvancedMode(settings);
+  const isAdvanced = p.isAdvancedMode(settings);
   const is360video = ytSettings.projection === '360';
   const shouldShowSafeForKidsWarn = ytSettings.selfDeclaredMadeForKids;
   const bind = createBinding(

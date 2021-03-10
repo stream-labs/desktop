@@ -91,6 +91,7 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
   }
 
   async unlinkTwitter() {
+    this.SET_TWEET_PREFERENCE(false);
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/twitter/unlink`;
     const headers = authorizedHeaders(this.userService.apiToken);
@@ -123,6 +124,14 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
     return jfetch(request).catch(e =>
       throwStreamError('TWEET_FAILED', e.error || $t('Could not connect to Twitter')),
     );
+  }
+
+  getDefaultTweetText(streamTitle: string) {
+    let url = `${this.state.creatorSiteUrl}/home`;
+    if (!this.state.creatorSiteOnboardingComplete && this.userService.platform?.type === 'twitch') {
+      url = `https://twitch.tv/${this.userService.platform.username}`;
+    }
+    return `${streamTitle} ${url}`;
   }
 
   openLinkTwitterDialog() {

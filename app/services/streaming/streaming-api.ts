@@ -67,12 +67,6 @@ export interface IGoLiveSettings extends IStreamSettings {
   tweetText: string;
 }
 
-export interface IPlatformCommonFields {
-  title: string;
-  description?: string;
-  game?: string;
-}
-
 export interface IPlatformFlags {
   enabled: boolean;
   useCustomFields: boolean;

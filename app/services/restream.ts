@@ -180,7 +180,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
           streamKey: getPlatformService(platform).state.streamKey,
         };
       }),
-      ...this.streamInfo.goLiveSettings.customDestinations
+      ...this.streamInfo.savedSettings.customDestinations
         .filter(dest => dest.enabled)
         .map(dest => ({ platform: 'relay' as 'relay', streamKey: `${dest.url}${dest.streamKey}` })),
     ]);

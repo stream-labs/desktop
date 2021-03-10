@@ -1,5 +1,5 @@
 import CommonPlatformFields from './CommonPlatformFields';
-import { getEnabledPlatforms, IGoLiveProps } from './go-live';
+import { getEnabledPlatforms, IGoLiveProps, useGoLiveSettings } from './go-live';
 import { Services } from '../../service-provider';
 import { $t } from '../../../services/i18n';
 import React from 'react';
@@ -17,73 +17,33 @@ interface IProps extends IGoLiveProps {
   isScheduleMode?: boolean;
 }
 
-export default function PlatformSettings(p: IProps) {
+export default function PlatformSettings() {
   console.log('render platform settings');
-  const { settings, setSettings } = p;
-  const enabledPlatforms = getEnabledPlatforms(settings);
-  const { StreamingService } = Services;
-  const view = StreamingService.views;
-  const isMultiplePlatformMode = enabledPlatforms.length > 1;
-  const hasPlatforms = enabledPlatforms.length > 0;
-
-  const v = useVuex(() => {
-    return {
-      shouldShowSettings: !view.info.error && !view.isLoading && hasPlatforms,
-      isAdvancedMode: view.goLiveSettings.advancedMode && view.isMultiplatformMode,
-      isLive: view.isMidStreamMode,
-      isPrepopulated: view.isPrepopulated(enabledPlatforms),
-      isLoadingMode: view.isLoading,
-    };
-  });
-
-  // don't render platform settings if platforms have not prepopulated the channel data
-  if (!v.isPrepopulated) {
-    return null;
-  }
+  const {
+    isMultiplatformMode,
+    error,
+    isLoading,
+    isAdvancedMode,
+    enabledPlatforms,
+  } = useGoLiveSettings('PlatformSettings');
+  const shouldShowSettings = !error && !isLoading;
 
   /**
    * Update settings of a single platform
    **/
-  function updatePlatformSettings<T extends TPlatform>(
-    platform: T,
-    settingsPatch: Partial<IGoLiveSettings['platforms'][T]>,
-  ) {
-    setSettings({
-      ...settings,
-      platforms: {
-        ...settings.platforms,
-        [platform]: { ...settings.platforms[platform], ...settingsPatch },
-      },
-    });
-  }
+  // function updatePlatformSettings<T extends TPlatform>(
+  //   platform: T,
+  //   settingsPatch: Partial<IGoLiveSettings['platforms'][T]>,
+  // ) {
+  //   updateSettings({
+  //     ...settings,
+  //     platforms: {
+  //       ...settings.platforms,
+  //       [platform]: { ...settings.platforms[platform], ...settingsPatch },
+  //     },
+  //   });
+  // }
 
-  function render() {
-    return (
-      <div>
-        {!hasPlatforms && $t('Enable at least one destination to start streaming')}
-
-        {v.isLoadingMode && <Spin size="large" />}
-        <GoLiveError />
-
-        {v.shouldShowSettings && (
-          <div style={{ width: '100%' }}>
-            {/*COMMON FIELDS*/}
-            {isMultiplePlatformMode && (
-              <Section isSimpleMode={!v.isAdvancedMode} title={$t('Common Stream Settings')}>
-                <CommonPlatformFields
-                  settings={settings}
-                  updatePlatformSettings={updatePlatformSettings}
-                />
-              </Section>
-            )}
-
-            {/*SETTINGS FOR EACH ENABLED PLATFORM*/}
-            {enabledPlatforms.map((platform: TPlatform) => renderPlatformSettings(platform))}
-          </div>
-        )}
-      </div>
-    );
-  }
 
   /**
    * Renders settings for one platform
@@ -92,31 +52,45 @@ export default function PlatformSettings(p: IProps) {
     const platformName = getPlatformService(platform).displayName;
     const title = $t('%{platform} Settings', { platform: platformName });
     return (
-      <Section title={title} isSimpleMode={!v.isAdvancedMode} key={platform}>
-        {platform === 'twitch' && (
-          <TwitchEditStreamInfo
-            settings={settings}
-            updatePlatformSettings={updatePlatformSettings}
-          />
-        )}
-        {platform === 'facebook' && (
-          <FacebookEditStreamInfo
-            settings={settings}
-            updatePlatformSettings={updatePlatformSettings}
-            isUpdateMode={v.isLive}
-            isScheduleMode={p.isScheduleMode}
-          />
-        )}
-        {platform === 'youtube' && (
-          <YoutubeEditStreamInfo
-            settings={settings}
-            updatePlatformSettings={updatePlatformSettings}
-            isScheduleMode={p.isScheduleMode}
-          />
-        )}
+      <Section title={title} isSimpleMode={!isAdvancedMode} key={platform}>
+        {platform === 'twitch' && <TwitchEditStreamInfo />}
+        {/*{platform === 'facebook' && (*/}
+        {/*  <FacebookEditStreamInfo*/}
+        {/*    // settings={settings}*/}
+        {/*    // updatePlatformSettings={updatePlatformSettings}*/}
+        {/*    // isUpdateMode={v.isLive}*/}
+        {/*    // isScheduleMode={p.isScheduleMode}*/}
+        {/*  />*/}
+        {/*)}*/}
+        {/*{platform === 'youtube' && (*/}
+        {/*  <YoutubeEditStreamInfo*/}
+        {/*    // settings={settings}*/}
+        {/*    // updatePlatformSettings={updatePlatformSettings}*/}
+        {/*    // isScheduleMode={p.isScheduleMode}*/}
+        {/*  />*/}
+        {/*)}*/}
       </Section>
     );
   }
 
-  return render();
+  return (
+    <div>
+      {isLoading && <Spin size="large" />}
+      <GoLiveError />
+
+      {shouldShowSettings && (
+        <div style={{ width: '100%' }}>
+          {/*COMMON FIELDS*/}
+          {isMultiplatformMode && (
+            <Section isSimpleMode={!isAdvancedMode} title={$t('Common Stream Settings')}>
+              <CommonPlatformFields />
+            </Section>
+          )}
+
+          {/*SETTINGS FOR EACH ENABLED PLATFORM*/}
+          {enabledPlatforms.map((platform: TPlatform) => renderPlatformSettings(platform))}
+        </div>
+      )}
+    </div>
+  );
 }
