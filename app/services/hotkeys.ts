@@ -193,7 +193,7 @@ const SOURCE_ACTIONS: HotkeyGroup = {
     name: 'TOGGLE_UNMUTE',
     description: () => $t('Unmute'),
     down: sourceId => getSourcesService().setMuted(sourceId, false),
-    isActive: sourceId => !getSourcesService().views.getSource(sourceId)?.muted,
+    isActive: sourceId => getSourcesService().views.getSource(sourceId)?.muted === false,
     shouldApply: isAudio,
   },
   PUSH_TO_MUTE: {
@@ -297,7 +297,7 @@ const SCENE_ITEM_ACTIONS: HotkeyGroup = {
       return $t('Hide %{sourcename}', { sourcename: sceneItem?.source.name });
     },
     shouldApply: sceneItemId => !!getScenesService().views.getSceneItem(sceneItemId)?.video,
-    isActive: sceneItemId => !getScenesService().views.getSceneItem(sceneItemId)?.visible,
+    isActive: sceneItemId => getScenesService().views.getSceneItem(sceneItemId)?.visible === false,
     down: sceneItemId =>
       getScenesService()
         .views.getSceneItem(sceneItemId)
