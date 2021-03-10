@@ -8,11 +8,7 @@ import TitleBar from '../TitleBar';
 import { AppService } from 'services/app';
 import styles from './ChildWindow.m.less';
 import ModalWrapper from '../shared/modals/ModalWrapper';
-import antdNightTheme from 'styles/antd/night-theme.lazy.less';
-
-const ANTD_THEMES = {
-  ['night-theme']: antdNightTheme,
-};
+import antdThemes from 'styles/antd/index';
 
 @Component({})
 export default class ChildWindow extends Vue {
@@ -25,6 +21,7 @@ export default class ChildWindow extends Vue {
   private modalOptions: IModalOptions = { renderFn: null };
 
   mounted() {
+    antdThemes[this.theme].use();
     WindowsService.modalChanged.subscribe(modalOptions => {
       this.modalOptions = { ...this.modalOptions, ...modalOptions };
     });
@@ -57,8 +54,8 @@ export default class ChildWindow extends Vue {
 
   @Watch('theme')
   updateAntd(newTheme: string, oldTheme: string) {
-    ANTD_THEMES[oldTheme].unuse();
-    ANTD_THEMES[newTheme].use();
+    antdThemes[oldTheme].unuse();
+    antdThemes[newTheme].use();
   }
 
   clearComponentStack() {
