@@ -63,3 +63,9 @@ export class NewsBanner extends ReactComponent {}
   },
 })
 export class Chat extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'InputTest' },
+  },
+})
+export class InputTest extends ReactComponent {}
