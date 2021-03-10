@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import electron from 'electron';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { getComponents, IModalOptions, IWindowOptions, WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
@@ -8,6 +8,11 @@ import TitleBar from '../TitleBar';
 import { AppService } from 'services/app';
 import styles from './ChildWindow.m.less';
 import ModalWrapper from '../shared/modals/ModalWrapper';
+import antdNightTheme from 'styles/antd/night-theme.lazy.less';
+
+const ANTD_THEMES = {
+  ['night-theme']: antdNightTheme,
+};
 
 @Component({})
 export default class ChildWindow extends Vue {
@@ -48,6 +53,12 @@ export default class ChildWindow extends Vue {
 
   get appLoading() {
     return this.appService.state.loading;
+  }
+
+  @Watch('theme')
+  updateAntd(newTheme: string, oldTheme: string) {
+    ANTD_THEMES[oldTheme].unuse();
+    ANTD_THEMES[newTheme].use();
   }
 
   clearComponentStack() {
