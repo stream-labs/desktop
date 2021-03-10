@@ -34,10 +34,6 @@ class ReactComponent<TComponentProps = {}> extends TsxComponent<WrapperProps<TCo
     ReactDOM.unmountComponentAtNode(this.$refs.container);
   }
 
-  get componentProps() {
-    return this.props.componentProps;
-  }
-
   @Watch('componentProps', { deep: true })
   refreshComponent() {
     ReactDOM.unmountComponentAtNode(this.$refs.container);
