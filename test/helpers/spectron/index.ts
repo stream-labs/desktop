@@ -37,50 +37,54 @@ export function afterAppStop(cb: (t: TExecutionContext) => any) {
   afterStopCallbacks.push(cb);
 }
 
-export async function focusWindow(t: any, regex: RegExp): Promise<boolean> {
-  const handles = await t.context.app.client.windowHandles();
+export async function focusWindow(t: TExecutionContext, regex: RegExp): Promise<boolean> {
+  const count = await t.context.app.client.getWindowCount();
 
-  for (const handle of handles.value) {
-    await t.context.app.client.window(handle);
+  for (let i = 0; i < count; i++) {
+    await t.context.app.client.windowByIndex(i);
     const url = await t.context.app.client.getUrl();
     if (url.match(regex)) {
       activeWindow = regex;
       return true;
     }
   }
+
   return false;
 }
 
 // Focuses the worker window
 // Should not usually be used
-export async function focusWorker(t: any) {
+export async function focusWorker(t: TExecutionContext) {
   await focusWindow(t, /windowId=worker$/);
 }
 
 // Focuses the main window
-export async function focusMain(t: any) {
+export async function focusMain(t: TExecutionContext) {
   await focusWindow(t, /windowId=main$/);
 }
 
 // Focuses the child window
-export async function focusChild(t: any) {
+export async function focusChild(t: TExecutionContext) {
   await focusWindow(t, /windowId=child/);
 }
 
 // Focuses the Library webview
-export async function focusLibrary(t: any) {
+export async function focusLibrary(t: TExecutionContext) {
   // doesn't work without delay, probably need to wait until load
   await sleep(2000);
   await focusWindow(t, /streamlabs\.com\/library/);
 }
 
 // Close current focused window
-export async function closeWindow(t: any) {
+export async function closeWindow(t: TExecutionContext) {
   await t.context.app.browserWindow.close();
 }
 
-export async function waitForLoader(t: any) {
-  await t.context.app.client.waitForExist('.main-loading', 20000, true);
+export async function waitForLoader(t: TExecutionContext) {
+  await (await t.context.app.client.$('.main-loading')).waitForExist({
+    timeout: 20000,
+    reverse: true,
+  });
 }
 
 interface ITestRunnerOptions {
@@ -105,7 +109,7 @@ interface ITestRunnerOptions {
    * some known state in the cache directory before the
    * app starts up and loads it.
    */
-  beforeAppStartCb?(t: any): Promise<any>;
+  beforeAppStartCb?(t: TExecutionContext): Promise<any>;
 }
 
 const DEFAULT_OPTIONS: ITestRunnerOptions = {
@@ -186,13 +190,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         NODE_ENV: 'test',
         SLOBS_CACHE_DIR: t.context.cacheDir,
       },
-      webdriverOptions: {
-        // most of deprecation warning encourage us to use WebdriverIO actions API
-        // however the documentation for this API looks very poor, it provides only one example:
-        // http://webdriver.io/api/protocol/actions.html
-        // disable deprecation warning and waiting for better docs now
-        deprecationWarnings: false,
-      },
       chromeDriverArgs: [`user-data-dir=${path.join(t.context.cacheDir, 'slobs-client')}`],
     });
 
@@ -217,25 +214,30 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     // Wait up to 2 seconds before giving up looking for an element.
     // This will slightly slow down negative assertions, but makes
     // the tests much more stable, especially on slow systems.
-    t.context.app.client.timeouts('implicit', 2000);
-
-    // await sleep(10000);
+    await t.context.app.client.setTimeout({ implicit: 2000 });
 
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
     await waitForLoader(t);
-    if (await t.context.app.client.isExisting('span=Skip')) {
+
+    const $skip = await t.context.app.client.$('span=Skip');
+
+    if (await $skip.isExisting()) {
       if (options.skipOnboarding) {
-        await t.context.app.client.click('span=Skip');
-        if (await t.context.app.client.isVisible('div=Choose Starter')) {
-          await t.context.app.client.click('div=Choose Starter');
+        await $skip.click();
+
+        const $chooseStarter = await t.context.app.client.$('div=Choose Starter');
+
+        if (await $chooseStarter.isDisplayed()) {
+          await $chooseStarter.click();
         }
-        await t.context.app.client.click('h2=Start Fresh');
-        await t.context.app.client.click('button=Skip');
-        await t.context.app.client.click('button=Skip');
+
+        await (await t.context.app.client.$('h2=Start Fresh')).click();
+        await (await t.context.app.client.$('button=Skip')).click();
+        await (await t.context.app.client.$('button=Skip')).click();
       } else {
         // Wait for the connect screen before moving on
-        await t.context.app.client.isExisting('button=Twitch');
+        await (await t.context.app.client.$('button=Twitch')).isExisting();
       }
     }
 
@@ -356,7 +358,6 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       // consider this test succeed and remove from the `failedTests` list
       removeFailedTestFromFile(testName);
       // save the test execution time
-      console.log('calc stats');
       testStats[testName] = {
         duration: Date.now() - testStartTime,
         syncIPCCalls: getSyncIPCCalls(),
@@ -400,7 +401,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
 export async function click(t: TExecutionContext, selector: string) {
   try {
-    return await t.context.app.client.click(selector);
+    return await (await t.context.app.client.$(selector)).click();
   } catch (e) {
     const windowId = String(activeWindow);
     const message = `click to "${selector}" failed in window ${windowId}: ${e.message} ${e.type}`;

@@ -1,4 +1,4 @@
-import { focusLibrary, focusMain, test, useSpectron } from '../helpers/spectron';
+import { focusLibrary, focusMain, test, TExecutionContext, useSpectron } from '../helpers/spectron';
 import { logIn } from '../helpers/spectron/user';
 import { sleep } from '../helpers/sleep';
 import { FormMonkey } from '../helpers/form-monkey';
@@ -9,12 +9,12 @@ useSpectron();
 const OVERLAY_NAME = 'Portals';
 const OVERLAY_SCENES = ['Live Scene', 'Starting Soon', 'Be Right Back', 'Offline'];
 
-test('Installing a theme', async (t: any) => {
+test('Installing a theme', async (t: TExecutionContext) => {
   const { app } = t.context;
   const formMonkey = new FormMonkey(t);
 
   await logIn(t);
-  await app.client.click('div[title=Themes]');
+  await (await app.client.$('div[title=Themes]')).click();
 
   await focusLibrary(t);
 
@@ -24,19 +24,19 @@ test('Installing a theme', async (t: any) => {
   // the input field has a debounce search
   await sleep(2000);
   // wait items load
-  await app.client.click('.market-item');
+  await (await app.client.$('.market-item')).click();
 
   // install overlay
-  await app.client.waitForVisible('button=Install Overlay');
+  await (await app.client.$('button=Install Overlay')).waitForDisplayed();
   await sleep(2000); // wait for the scroll animation
-  await app.client.click('button=Install Overlay');
+  await (await app.client.$('button=Install Overlay')).click();
 
   // wait for installation complete
   await focusMain(t);
-  await app.client.waitForExist('.editor-page', 60000);
+  await (await app.client.$('.editor-page')).waitForExist({ timeout: 60000 });
 
   // Should've loaded the overlay as a new scene collection
-  t.true(await app.client.isExisting(`span=${OVERLAY_NAME}`));
+  t.true(await (await app.client.$(`span=${OVERLAY_NAME}`)).isExisting());
 
   // Should've populated scenes
   for (const scene of OVERLAY_SCENES) {
@@ -45,6 +45,9 @@ test('Installing a theme', async (t: any) => {
 
   // Should've populated sources (this checks Starting Soon scene sources)
   for (const source of ['Starting']) {
-    t.true(await app.client.isExisting(`span.item-title=${source}`), `Source ${source}`);
+    t.true(
+      await (await app.client.$(`span.item-title=${source}`)).isExisting(),
+      `Source ${source}`,
+    );
   }
 });

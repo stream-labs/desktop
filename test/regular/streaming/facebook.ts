@@ -10,7 +10,6 @@ import {
   waitForStreamStart
 } from '../../helpers/spectron/streaming';
 import { FormMonkey, selectTitle } from '../../helpers/form-monkey';
-import { sleep } from '../../helpers/sleep';
 import moment = require('moment');
 
 useSpectron();
@@ -83,13 +82,13 @@ test.skip('Schedule stream to facebook', async t => {
 
   // open EditStreamInfo window
   await focusMain(t);
-  await app.client.click('button .icon-date');
+  await (await app.client.$('button .icon-date')).click();
 
   await focusChild(t);
   const formMonkey = new FormMonkey(t);
 
   // wait fields to be shown
-  await app.client.waitForVisible('[data-name=title]');
+  await (await app.client.$('[data-name=title]')).waitForDisplayed();
 
   // set the date to tomorrow
   const today = new Date();
@@ -103,7 +102,7 @@ test.skip('Schedule stream to facebook', async t => {
     date: moment(tomorrow).format('MM/DD/YYYY'),
   });
 
-  await app.client.click('button=Done');
-  await app.client.waitForVisible('.toast-success', 30000);
+  await (await app.client.$('button=Done')).click();
+  await (await app.client.$('.toast-success')).waitForDisplayed({ timeout: 30000 });
   t.pass();
 });

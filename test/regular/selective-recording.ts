@@ -20,35 +20,41 @@ test('Selective Recording', async t => {
 
   // Toggle selective recording
   await focusMain(t);
-  await client.click('.studio-controls-top .icon-smart-record');
+  await (await client.$('.studio-controls-top .icon-smart-record')).click();
 
   // Check that selective recording icon is active
-  await client.waitForExist('.icon-smart-record.icon--active');
+  await (await client.$('.icon-smart-record.icon--active')).waitForExist();
 
   // Check that browser source has a selective recording toggle
-  t.true(await client.isExisting('.sl-vue-tree-sidebar .source-selector-action.icon-smart-record'));
+  t.true(
+    await (
+      await client.$('.sl-vue-tree-sidebar .source-selector-action.icon-smart-record')
+    ).isExisting(),
+  );
 
   // Cycle selective recording mode on browser source
-  await client.click('.sl-vue-tree-sidebar .source-selector-action.icon-smart-record');
+  await (await client.$('.sl-vue-tree-sidebar .source-selector-action.icon-smart-record')).click();
 
   // Check that source is set to stream only
-  await client.waitForExist('.sl-vue-tree-sidebar .source-selector-action.icon-broadcast');
+  await (
+    await client.$('.sl-vue-tree-sidebar .source-selector-action.icon-broadcast')
+  ).waitForExist();
 
   // Cycle selective recording mode to record only
-  await client.click('.sl-vue-tree-sidebar .source-selector-action.icon-broadcast');
+  await (await client.$('.sl-vue-tree-sidebar .source-selector-action.icon-broadcast')).click();
 
   // Check that source is set to record only
-  await client.waitForExist('.sl-vue-tree-sidebar .source-selector-action.icon-studio');
+  await (await client.$('.sl-vue-tree-sidebar .source-selector-action.icon-studio')).waitForExist();
 
   // Start recording and wait
-  await client.click('.record-button');
+  await (await client.$('.record-button')).click();
 
   // Ensure recording indicator is active
-  await client.waitForVisible('.record-button.active', 15000);
+  await (await client.$('.record-button.active')).waitForDisplayed({ timeout: 15000 });
 
   // Stop recording
-  await client.click('.record-button');
-  await client.waitForVisible('.record-button:not(.active)', 40000); // stopping recording takes too much time on CI
+  await (await client.$('.record-button')).click();
+  await (await client.$('.record-button:not(.active)')).waitForDisplayed({ timeout: 40000 }); // stopping recording takes too much time on CI
 
   // Check that file exists
   const files = await readdir(tmpDir);

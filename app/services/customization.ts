@@ -143,6 +143,9 @@ class CustomizationViews extends ViewHandler<ICustomizationServiceState> {
 
   get pinnedStatistics() {
     return this.state.pinnedStatistics;
+
+  get currentTheme() {
+    return this.state.theme;
   }
 }
 
