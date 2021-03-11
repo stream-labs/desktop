@@ -32,7 +32,6 @@ export class AuthModule {
           partition,
           nodeIntegration: false,
           nativeWindowOpen: true,
-          sandbox: true,
         },
       });
 
@@ -141,6 +140,7 @@ export class AuthModule {
             id: query.platform_id,
           },
         },
+        hasRelogged: true,
       };
     }
   }

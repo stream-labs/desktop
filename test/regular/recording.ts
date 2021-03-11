@@ -20,13 +20,13 @@ test('Recording', async t => {
   // Record 2s video in every format
   for (const format of formats) {
     await focusMain(t);
-    await app.client.click('.side-nav .icon-settings');
+    await (await app.client.$('.side-nav .icon-settings')).click();
 
     await focusChild(t);
-    await app.client.click('li=Output');
+    await (await app.client.$('li=Output')).click();
     const form = new FormMonkey(t);
     await form.setInputValue(await form.getInputSelectorByTitle('Recording Format'), format);
-    await app.client.click('button=Done');
+    await (await app.client.$('button=Done')).click();
     await focusMain(t);
 
     await startRecording(t);

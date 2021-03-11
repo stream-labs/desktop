@@ -70,9 +70,9 @@ test('Media backup', async t => {
 
     // media-backup sync should be started
     // wait for the sync-succeed icon
-    await t.context.app.client.click('.metrics-icon');
+    await (await t.context.app.client.$('.metrics-icon')).click();
     await focusChild(t);
-    await t.context.app.client.waitForVisible('.icon-cloud-backup-2');
+    await (await t.context.app.client.$('.icon-cloud-backup-2')).waitForDisplayed();
 
     // restart app and delete local images
     await stopApp(t, false);

@@ -4,14 +4,13 @@ import { spawnSync } from 'child_process';
 import { sleep } from '../helpers/sleep';
 import { sceneExisting, switchCollection } from '../helpers/spectron/scenes';
 import { sourceIsExisting } from '../helpers/spectron/sources';
-import { getFormInput } from '../helpers/spectron/forms';
 import { getClient } from '../helpers/api-client';
 import { WidgetsService } from '../../app/services/widgets';
 import { EWidgetType } from '../helpers/widget-helpers';
 import { FormMonkey } from '../helpers/form-monkey';
+import { importExtractZip } from '../../app/util/slow-imports';
 
 const path = require('path');
-const _7z = require('7zip')['7z'];
 
 useSpectron({ skipOnboarding: false });
 
@@ -20,74 +19,85 @@ test('Go through the onboarding and autoconfig', async t => {
   await focusMain(t);
 
   // Wait for the auth screen to appear
-  await app.client.isExisting('button=Twitch');
+  await (await app.client.$('button=Twitch')).isExisting();
 
   await logIn(t, 'twitch', { prime: false }, false, true);
   await sleep(1000);
 
-  if (await t.context.app.client.isExisting('span=Skip')) {
-    await t.context.app.client.click('span=Skip');
+  if (await (await t.context.app.client.$('span=Skip')).isExisting()) {
+    await (await t.context.app.client.$('span=Skip')).click();
     await sleep(1000);
   }
 
   // Skip purchasing prime
-  if (await t.context.app.client.isExisting('div=Choose Starter')) {
-    await t.context.app.client.click('div=Choose Starter');
+  if (await (await t.context.app.client.$('div=Choose Starter')).isExisting()) {
+    await (await t.context.app.client.$('div=Choose Starter')).click();
     await sleep(1000);
   }
 
   // Don't Import from OBS
-  if (await t.context.app.client.isExisting('h2=Start Fresh')) {
-    await t.context.app.client.click('h2=Start Fresh');
+  if (await (await t.context.app.client.$('h2=Start Fresh')).isExisting()) {
+    await (await t.context.app.client.$('h2=Start Fresh')).click();
     await sleep(1000);
   }
 
   // Skip hardware config
-  if (await t.context.app.client.isExisting('button=Skip')) {
-    await t.context.app.client.click('button=Skip');
+  if (await (await t.context.app.client.$('button=Skip')).isExisting()) {
+    await (await t.context.app.client.$('button=Skip')).click();
     await sleep(1000);
   }
 
   // Skip picking a theme
-  if (await t.context.app.client.isExisting('button=Skip')) {
-    await t.context.app.client.click('button=Skip');
+  if (await (await t.context.app.client.$('button=Skip')).isExisting()) {
+    await (await t.context.app.client.$('button=Skip')).click();
     await sleep(1000);
   }
 
   // Start auto config
-  t.true(await app.client.isExisting('button=Start'));
-  await app.client.click('button=Start');
-  await app.client.waitForVisible('h2=Sources', 60000);
+  t.true(await (await app.client.$('button=Start')).isExisting());
+  await (await app.client.$('button=Start')).click();
+  await (await app.client.$('h2=Sources')).waitForDisplayed({ timeout: 60000 });
 
   // success?
-  t.true(await app.client.isVisible('h2=Sources'), 'Sources selector is visible');
+  t.true(await (await app.client.$('h2=Sources')).isDisplayed(), 'Sources selector is visible');
 });
 
 test('OBS Importer', async t => {
   const client = t.context.app.client;
 
   // extract OBS config to the cache dir
+  // @ts-ignore Spectron typings are wrong - app is actually under remote
   const cacheDir = path.resolve(await t.context.app.electron.remote.app.getPath('userData'), '..');
   const dataDir = path.resolve(__dirname, '..', '..', '..', 'test', 'data');
   const obsCacheZipPath = path.resolve(dataDir, 'obs-studio.zip');
-  spawnSync(_7z, ['x', obsCacheZipPath, `-o${cacheDir}`]);
+
+  const extractZip = require('extract-zip');
+  await new Promise(async (resolve, reject) => {
+    extractZip(obsCacheZipPath, { dir: cacheDir }, (err: any) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
 
   // skip auth
-  if (await t.context.app.client.isExisting('span=Skip')) {
-    await t.context.app.client.click('span=Skip');
+  if (await (await t.context.app.client.$('span=Skip')).isExisting()) {
+    await (await t.context.app.client.$('span=Skip')).click();
     await sleep(1000);
   }
 
   // Skip purchasing prime
-  if (await t.context.app.client.isExisting('div=Choose Starter')) {
-    await t.context.app.client.click('div=Choose Starter');
+  if (await (await t.context.app.client.$('div=Choose Starter')).isExisting()) {
+    await (await t.context.app.client.$('div=Choose Starter')).click();
     await sleep(1000);
   }
 
   // import from OBS
-  if (await t.context.app.client.isExisting('h2=Import from OBS')) {
-    await t.context.app.client.click('h2=Import from OBS');
-    await t.context.app.client.click('h2=Start');
+  if (await (await t.context.app.client.$('h2=Import from OBS')).isExisting()) {
+    await (await t.context.app.client.$('h2=Import from OBS')).click();
+    await (await t.context.app.client.$('h2=Start')).click();
     await sleep(10000);
   }
 
@@ -103,9 +113,9 @@ test('OBS Importer', async t => {
   await switchCollection(t, 'Collection 2');
 
   // check settings
-  await client.click('.side-nav .icon-settings');
+  await (await client.$('.side-nav .icon-settings')).click();
   await focusChild(t);
-  await client.click('li=Output');
+  await (await client.$('li=Output')).click();
   const form = new FormMonkey(t);
   await form.setInputValue(await form.getInputSelectorByTitle('Video Bitrate'), '5000');
   await form.setInputValue(await form.getInputSelectorByTitle('Encoder'), 'Software (x264)');

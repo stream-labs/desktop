@@ -123,6 +123,13 @@ if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
 
   usingSentry = true;
 
+  // Get actual filenames we are using from the bundle updater,
+  // so we can ensure accurate stack traces on sentry. The mechanism
+  // by which the bundle updater works hides the true source names
+  // from us.
+  const bundles = ['renderer.js', 'vendors~renderer.js'];
+  const bundleNames = electron.ipcRenderer.sendSync('getBundleNames', bundles);
+
   Sentry.init({
     dsn: sentryDsn,
     release: `${slobsVersion}-${SLOBS_BUNDLE_ID}`,
@@ -134,7 +141,13 @@ if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
       // Some discussion here: https://github.com/getsentry/sentry/issues/2708
       const normalize = (filename: string) => {
         const splitArray = filename.split('/');
-        return splitArray[splitArray.length - 1];
+        const fileName = splitArray[splitArray.length - 1];
+
+        if (bundles.includes(fileName)) {
+          return bundleNames[fileName];
+        }
+
+        return fileName;
       };
 
       if (hint.originalException) {
@@ -221,19 +234,19 @@ document.addEventListener('drop', event => event.preventDefault());
 export const apiInitErrorResultToMessage = (resultCode: obs.EVideoCodes) => {
   switch (resultCode) {
     case obs.EVideoCodes.NotSupported: {
-      return $t('OBSInit.NotSupportedError');
+      return 'Failed to initialize OBS. Your video drivers may be out of date, or Streamlabs OBS may not be supported on your system.';
     }
     case obs.EVideoCodes.ModuleNotFound: {
-      return $t('OBSInit.ModuleNotFoundError');
+      return 'DirectX could not be found on your system. Please install the latest version of DirectX for your machine here <https://www.microsoft.com/en-us/download/details.aspx?id=35?> and try again.';
     }
     default: {
-      return $t('OBSInit.UnknownError');
+      return 'An unknown error was encountered while initializing OBS.';
     }
   }
 };
 
 const showDialog = (message: string): void => {
-  electron.remote.dialog.showErrorBox($t('OBSInit.ErrorTitle'), message);
+  electron.remote.dialog.showErrorBox('Initialization Error', message);
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -294,7 +307,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       crashHandler.unregisterProcess(process.pid);
 
-      obs.NodeObs.StopCrashHandler();
+      obs.NodeObs.InitShutdownSequence();
       obs.IPC.disconnect();
 
       electron.ipcRenderer.send('shutdownComplete');

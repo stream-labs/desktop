@@ -5,6 +5,7 @@
     <div slot="content" class="modal--side-nav">
       <NavMenu v-model="selectedFilterName">
         <v-form-group
+          v-if="isVisualSource"
           :value="presetFilterValue"
           :metadata="presetFilterMetadata"
           @input="value => addPresetFilter(value)"
@@ -43,7 +44,7 @@
       </NavMenu>
 
       <scrollable className="modal-container--side-nav" :isResizable="false">
-        <div v-if="selectedFilterName">
+        <div v-if="selectedFilterName && selectedFilterName !== '__PRESET'">
           <GenericForm
             v-if="properties.length"
             v-model="properties"

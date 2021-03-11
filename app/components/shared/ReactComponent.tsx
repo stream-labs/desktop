@@ -9,7 +9,7 @@ import { Component } from 'vue-property-decorator';
 class WrapperProps<TComponentProps> {
   name?: string = null;
   componentProps: TComponentProps = null;
-  wrapperStyles?: Dictionary<string> = {};
+  wrapperStyles?: Dictionary<string> = null;
 }
 
 /**
@@ -54,3 +54,26 @@ export class NameFolder extends ReactComponent {}
   },
 })
 export class IconLibraryProperties extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'NewsBanner' },
+  },
+})
+export class NewsBanner extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'TitleBar' },
+    componentProps: { default: () => ({ windowId: '' }) },
+  },
+})
+export class TitleBar extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'Chat' },
+    componentProps: { default: () => ({ restream: false }) },
+    wrapperStyles: {
+      default: () => ({ height: '100%', display: 'flex', flexDirection: 'column' }),
+    },
+  },
+})
+export class Chat extends ReactComponent {}

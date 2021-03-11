@@ -30,6 +30,10 @@ export default class Connect extends TsxComponent<ConnectProps> {
     return this.userService.state.authProcessState === EAuthProcessState.Busy;
   }
 
+  get isRelog() {
+    return this.userService.state.isRelog;
+  }
+
   async authPlatform(platform: TPlatform) {
     this.usageStatisticsService.recordAnalyticsEvent('PlatformLogin', platform);
     const result = await this.userService.startAuth(
@@ -115,11 +119,18 @@ export default class Connect extends TsxComponent<ConnectProps> {
           <h1 class={commonStyles.titleContainer}>
             {this.isSecurityUpgrade ? $t('Re-Authorize') : $t('Connect')}
           </h1>
-          <p style="margin-bottom: 80px;">
-            {this.isSecurityUpgrade
-              ? this.securityUpgradeLink
-              : $t('Sign in with your streaming account to get started with Streamlabs OBS')}
-          </p>
+          {!this.isRelog && (
+            <p style="margin-bottom: 80px;">
+              {this.isSecurityUpgrade
+                ? this.securityUpgradeLink
+                : $t('Sign in with your streaming account to get started with Streamlabs OBS')}
+            </p>
+          )}
+          {this.isRelog && (
+            <h3 style={{ marginBottom: '16px' }}>
+              Your login has expired. Please re-login to continue using Streamlabs OBS
+            </h3>
+          )}
           <div class={styles.signupButtons}>
             {['twitch', 'youtube', 'facebook'].map((platform: TPlatform) => (
               <button

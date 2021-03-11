@@ -58,7 +58,7 @@ export default class OverlaySettings extends Vue {
       })
     ).filePaths;
 
-    if (!chosenPath) return;
+    if (!chosenPath[0]) return;
 
     this.busy = true;
     this.message = '';
@@ -79,7 +79,7 @@ export default class OverlaySettings extends Vue {
       })
     ).filePaths;
 
-    if (!chosenPath) return;
+    if (!chosenPath[0]) return;
 
     this.busy = true;
     this.message = '';

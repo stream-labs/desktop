@@ -67,14 +67,14 @@ export async function logOut(t: TExecutionContext, skipUI = false) {
   // logout from the SLOBS app
   if (!skipUI) {
     await focusMain(t);
-    await t.context.app.client.click('.icon-settings');
+    await (await t.context.app.client.$('.icon-settings')).click();
     await focusChild(t);
-    await t.context.app.client.click('.fa-sign-out-alt');
+    await (await t.context.app.client.$('.fa-sign-out-alt')).click();
     await dialogDismiss(t, 'Yes');
     await focusMain(t);
-    await t.context.app.client.click('.icon-settings');
+    await (await t.context.app.client.$('.icon-settings')).click();
     await focusChild(t);
-    await t.context.app.client.waitForVisible('.fa-sign-in-alt'); // wait for the log-in button
+    await (await t.context.app.client.$('.fa-sign-in-alt')).waitForDisplayed(); // wait for the log-in button
     await closeWindow(t);
     await focusMain(t);
   }
@@ -95,7 +95,7 @@ export async function logIn(
   waitForUI = true,
   isOnboardingTest = false,
 ): Promise<ITestUser> {
-  if (user) throw 'User already logged in';
+  if (user) throw new Error('User already logged in');
 
   if (USER_POOL_TOKEN) {
     user = await reserveUserFromPool(t, platform, features);
@@ -126,6 +126,7 @@ export async function loginWithAuthInfo(
         channelId: user.channelId,
       },
     },
+    hasRelogged: true,
   };
   await focusWorker(t);
   t.context.app.webContents.send('testing-fakeAuth', authInfo, isOnboardingTest);
@@ -135,10 +136,10 @@ export async function loginWithAuthInfo(
 }
 
 export async function isLoggedIn(t: TExecutionContext) {
-  await t.context.app.client.waitForVisible('.icon-settings');
-  await t.context.app.client.click('.icon-settings');
+  await (await t.context.app.client.$('.icon-settings')).waitForDisplayed();
+  await (await t.context.app.client.$('.icon-settings')).click();
   await focusChild(t);
-  const isLoggedIn = await t.context.app.client.isVisible('.fa-sign-out-alt');
+  const isLoggedIn = await (await t.context.app.client.$('.fa-sign-out-alt')).isDisplayed();
   await closeWindow(t);
   await focusMain(t);
   return isLoggedIn;

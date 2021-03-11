@@ -1,7 +1,14 @@
 // The stress test will not be run when normally running tests.
 
 import { uniqueId, sample } from 'lodash';
-import { useSpectron, focusMain, TExecutionContext, focusWindow, closeWindow, test } from '../helpers/spectron/index';
+import {
+  useSpectron,
+  focusMain,
+  TExecutionContext,
+  focusWindow,
+  closeWindow,
+  test,
+} from '../helpers/spectron/index';
 import { addScene, clickRemoveScene } from '../helpers/spectron/scenes';
 import { addSource, clickRemoveSource, rightClickSource } from '../helpers/spectron/sources';
 import { contextMenuClick } from '../helpers/spectron/context-menu';
@@ -20,7 +27,7 @@ const SOURCE_TYPES = [
   'Game Capture',
   'Video Capture Device',
   'Audio Input Capture',
-  'Audio Output Capture'
+  'Audio Output Capture',
 ];
 
 type TSourceName = string;
@@ -28,13 +35,14 @@ type TSourceName = string;
 // Utilities
 
 async function getSceneElements(t: TExecutionContext) {
-  return t.context.app.client.$('.selector-list').$$('li');
+  return (await t.context.app.client.$('.selector-list')).$$('li');
 }
 
 async function getSourceElements(t: TExecutionContext) {
-  return t.context.app.client.$('h2=Sources').$('../..').$$('.sl-vue-tree-node-item');
+  return (await (await t.context.app.client.$('h2=Sources')).$('../..')).$$(
+    '.sl-vue-tree-node-item',
+  );
 }
-
 
 // Actions
 
@@ -51,7 +59,7 @@ async function removeRandomScene(t: TExecutionContext) {
 
   if (scenes.length > 1) {
     const scene = sample(scenes);
-    await t.context.app.client.elementIdClick(scene.value.ELEMENT);
+    await await scene.click();
     await clickRemoveScene(t);
   }
 }
@@ -62,7 +70,7 @@ async function selectRandomScene(t: TExecutionContext) {
 
   if (scenes.length > 0) {
     const scene = sample(scenes);
-    await t.context.app.client.elementIdClick(scene.value.ELEMENT);
+    await await scene.click();
   }
 }
 
@@ -82,11 +90,11 @@ async function removeRandomSource(t: TExecutionContext) {
 
   if (sources.length > 0) {
     const source = sample(sources);
-    const text = await t.context.app.client.elementIdText(source.value.ELEMENT);
+    const text = await source.getText();
 
-    console.log('  Source:', text.value);
+    console.log('  Source:', text);
 
-    await t.context.app.client.elementIdClick(source.value.ELEMENT);
+    await source.click();
     await clickRemoveSource(t);
   }
 }
@@ -97,12 +105,12 @@ async function selectRandomSource(t: TExecutionContext): Promise<TSourceName> {
 
   if (sources.length > 0) {
     const source = sample(sources);
-    await t.context.app.client.elementIdClick(source.value.ELEMENT);
-    const text = await t.context.app.client.elementIdText(source.value.ELEMENT);
+    await source.click();
+    const text = await source.getText();
 
-    console.log('  Source:', text.value);
+    console.log('  Source:', text);
 
-    return text.value;
+    return text;
   }
 
   return '';
@@ -125,12 +133,12 @@ async function destroyProjector(t: TExecutionContext) {
 
 async function toggleDayNightMode(t: TExecutionContext) {
   await focusMain(t);
-  await t.context.app.client.click('button.theme-toggle');
+  await (await t.context.app.client.$('button.theme-toggle')).click();
 }
 
 async function toggleStudioNode(t: TExecutionContext) {
   await focusMain(t);
-  await t.context.app.client.click('.icon-studio-mode-3');
+  await (await t.context.app.client.$('.icon-studio-mode-3')).click();
 }
 
 const ACTION_FUNCTIONS = [
@@ -155,7 +163,7 @@ test('Stress test', async (t: TExecutionContext) => {
     quit = true;
   }, 60 * 60 * 1000);
 
-  while(!quit) {
+  while (!quit) {
     const action = sample(ACTION_FUNCTIONS);
     console.log(action.name);
     await action(t);

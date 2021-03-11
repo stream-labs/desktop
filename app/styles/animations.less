@@ -1,0 +1,130 @@
+
+/*SLIDE DOWN*/
+
+.slidedown-enter {
+  opacity: 0;
+  animation-duration: .5s;
+  animation-fill-mode: both;
+  animation-timing-function: cubic-bezier(0.55, 0, 0.55, 0.2);
+  animation-play-state: paused;
+}
+
+.slidedown-appear {
+  opacity: 0;
+  animation-duration: .5s;
+  animation-fill-mode: both;
+  animation-timing-function: cubic-bezier(0.55, 0, 0.55, 0.2);
+  animation-play-state: paused;
+}
+
+.slidedown-leave {
+  animation-duration: .5s;
+  animation-fill-mode: both;
+  animation-timing-function: cubic-bezier(0.55, 0, 0.55, 0.2);
+  animation-play-state: paused;
+}
+
+.slidedown-enter.slidedown-enter-active {
+  animation-name: slidedownIn;
+  animation-play-state: running;
+}
+
+.slidedown-appear.slidedown-appear-active {
+  animation-name: slidedownIn;
+  animation-play-state: running;
+}
+
+.slidedown-leave.slidedown-leave-active {
+  animation-name: slidedownOut;
+  animation-play-state: running;
+}
+
+@keyframes slidedownIn {
+  0% {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+  }
+  100% {
+    opacity: 1;
+    max-height: 100px;
+    overflow: hidden;
+  }
+}
+
+@keyframes slidedownOut {
+  0% {
+    opacity: 1;
+    max-height: 100px;
+    overflow: hidden;
+  }
+  100% {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+  }
+}
+
+
+
+/*SLIDE RIGHT*/
+
+.slideright-enter {
+  opacity: 0;
+  animation-duration: .5s;
+  animation-fill-mode: both;
+  animation-timing-function: ease-out;
+  animation-play-state: paused;
+}
+
+.slideright-appear {
+  opacity: 0;
+  animation-duration: .5s;
+  animation-fill-mode: both;
+  animation-timing-function: ease-out;
+  animation-play-state: paused;
+}
+
+.slideright-leave {
+  animation-duration: .5s;
+  animation-fill-mode: both;
+  animation-timing-function: ease-out;
+  animation-play-state: paused;
+}
+
+.slideright-enter.slideright-enter-active {
+  animation-name: sliderightIn;
+  animation-play-state: running;
+}
+
+.slideright-appear.slideright-appear-active {
+  animation-name: sliderightIn;
+  animation-play-state: running;
+}
+
+.slideright-leave.slideright-leave-active {
+  animation-name: sliderightOut;
+  animation-play-state: running;
+}
+
+@keyframes sliderightIn {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0%);
+  }
+}
+
+@keyframes sliderightOut {
+  0% {
+    opacity: 1;
+    transform: translateX(0%);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+}

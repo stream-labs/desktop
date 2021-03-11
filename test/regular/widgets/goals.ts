@@ -1,9 +1,8 @@
-import { TExecutionContext, test, useSpectron } from '../../helpers/spectron';
+import { test, useSpectron } from '../../helpers/spectron';
 import { addSource } from '../../helpers/spectron/sources';
 import { logIn } from '../../helpers/spectron/user';
 import { FormMonkey } from '../../helpers/form-monkey';
 import { waitForWidgetSettingsSync } from '../../helpers/widget-helpers';
-import { sleep } from '../../helpers/sleep';
 
 useSpectron();
 
@@ -18,11 +17,11 @@ function testGoal(goalType: string) {
     await addSource(t, goalType, goalType, false);
 
     // end goal if it's already exist
-    if (await client.isVisible('button=End Goal')) {
-      await client.click('button=End Goal');
+    if (await (await client.$('button=End Goal')).isDisplayed()) {
+      await (await client.$('button=End Goal')).click();
     }
 
-    await client.waitForVisible('button=Start Goal', 20000);
+    await (await client.$('button=Start Goal')).waitForDisplayed({ timeout: 20000 });
 
     const formMonkey = new FormMonkey(t, 'form[name=new-goal-form]');
     await formMonkey.fill({
@@ -31,11 +30,11 @@ function testGoal(goalType: string) {
       manual_goal_amount: 0,
       ends_at: '12/12/2030',
     });
-    await client.click('button=Start Goal');
-    await client.waitForVisible('button=End Goal');
-    t.true(await client.isExisting('span=My Goal'));
-    await client.click('button=End Goal');
-    await client.waitForVisible('button=Start Goal', 20000);
+    await (await client.$('button=Start Goal')).click();
+    await (await client.$('button=End Goal')).waitForDisplayed();
+    t.true(await (await client.$('span=My Goal')).isExisting());
+    await (await client.$('button=End Goal')).click();
+    await (await client.$('button=Start Goal')).waitForDisplayed({ timeout: 20000 });
   });
 
   test(`${goalType} change settings`, async t => {
@@ -44,8 +43,8 @@ function testGoal(goalType: string) {
 
     await addSource(t, goalType, goalType, false);
 
-    await client.waitForExist('li=Visual Settings');
-    await client.click('li=Visual Settings');
+    await (await client.$('li=Visual Settings')).waitForExist();
+    await (await client.$('li=Visual Settings')).click();
     const formMonkey = new FormMonkey(t, 'form[name=visual-properties-form]');
 
     const testSet1 = {

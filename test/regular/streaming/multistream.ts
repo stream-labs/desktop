@@ -38,10 +38,10 @@ test('Multistream default mode', async t => {
 
   await submit(t);
   t.true(
-    await client.isExisting('span=Configure the Multistream service'),
+    await (await client.$('span=Configure the Multistream service')).isExisting(),
     'Mutlistream should be enabled',
   );
-  await client.waitForVisible("h1=You're live!", 60000);
+  await (await client.$("h1=You're live!")).waitForDisplayed({ timeout: 60000 });
   await stopStream(t);
 });
 
@@ -88,10 +88,10 @@ test('Multistream advanced mode', async t => {
 
   await submit(t);
   t.true(
-    await client.isExisting('span=Configure the Multistream service'),
+    await (await client.$('span=Configure the Multistream service')).isExisting(),
     'Mutlistream should be enabled',
   );
-  await client.waitForVisible("h1=You're live!", 60000);
+  await (await client.$("h1=You're live!")).waitForDisplayed({ timeout: 60000 });
   await stopStream(t);
 });
 
@@ -111,7 +111,7 @@ test('Custom stream destinations', async t => {
     streamKey: user.streamKey,
   });
   await click(t, 'button=Save');
-  await t.true(await client.isExisting('span=MyCustomDest'), 'New destination is created');
+  t.true(await (await client.$('span=MyCustomDest')).isExisting(), 'New destination is created');
 
   // update destinations
   await click(t, 'i.fa-pen');
@@ -119,7 +119,10 @@ test('Custom stream destinations', async t => {
     name: 'MyCustomDestUpdated',
   });
   await click(t, 'button=Save');
-  await t.true(await client.isExisting('span=MyCustomDestUpdated'), 'Destination is updated');
+  await t.true(
+    await (await client.$('span=MyCustomDestUpdated')).isExisting(),
+    'Destination is updated',
+  );
 
   // add one more destination
   await click(t, 'span=Add Destination');
@@ -130,17 +133,20 @@ test('Custom stream destinations', async t => {
   });
   await click(t, 'button=Save');
   await t.false(
-    await client.isExisting('span=Add Destination'),
+    await (await client.$('span=Add Destination')).isExisting(),
     'Do not allow more than 2 custom dest',
   );
 
   // open the GoLiveWindow and check destinations
   await prepareToGoLive(t);
   await clickGoLive(t);
-  await t.true(await client.isExisting('span=MyCustomDest'), 'Destination is available');
+  await t.true(
+    await (await client.$('span=MyCustomDest')).isExisting(),
+    'Destination is available',
+  );
   await click(t, 'span=MyCustomDest'); // switch the destination on
   await tryToGoLive(t);
-  await client.waitForExist('span=Configure the Multistream service'); // the multistream should be started
+  await (await client.$('span=Configure the Multistream service')).waitForExist(); // the multistream should be started
   await stopStream(t);
   await releaseUserInPool(user);
 
@@ -148,5 +154,5 @@ test('Custom stream destinations', async t => {
   await showSettings(t, 'Stream');
   await click(t, 'i.fa-trash');
   await click(t, 'i.fa-trash');
-  t.false(await client.isExisting('i.fa-trash'), 'Destinations should be removed');
+  t.false(await (await client.$('i.fa-trash')).isExisting(), 'Destinations should be removed');
 });
