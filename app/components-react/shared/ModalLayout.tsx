@@ -18,7 +18,10 @@ export interface IModalLayoutProps {
 }
 
 // use props of Modal from the antd lib
-type TProps = { children: ReactNode } & Pick<ModalProps, 'footer' | 'onOk' | 'okText'>;
+type TProps = { children: ReactNode; fixedChild?: ReactNode } & Pick<
+  ModalProps,
+  'footer' | 'onOk' | 'okText'
+>;
 
 // calculate OS dependent styles
 const titleHeight = getOS() === OS.Mac ? 22 : 30;
