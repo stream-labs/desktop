@@ -32,7 +32,6 @@ export class AuthModule {
           partition,
           nodeIntegration: false,
           nativeWindowOpen: true,
-          sandbox: true,
         },
       });
 

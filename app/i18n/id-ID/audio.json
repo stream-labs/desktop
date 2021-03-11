@@ -12,5 +12,7 @@
   "Volume ( % )": "Volume ( % )",
   "Sync Offset ( ms )": "Sync Offset ( ms )",
   "Mixer": "Mixer",
-  "Monitor audio levels. If the bars are moving you are outputting audio.": "Pantau level audio. Jika bar bergerak, Anda harus outputting audio."
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "Pantau level audio. Jika bar bergerak, Anda harus outputting audio.",
+  "Muted": "Muted",
+  "Hide in Mixer": "Hide in Mixer"
 }

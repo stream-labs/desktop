@@ -140,6 +140,10 @@ class CustomizationViews extends ViewHandler<ICustomizationServiceState> {
   get experimentalSettingsFormData(): TObsFormData {
     return [];
   }
+
+  get currentTheme() {
+    return this.state.theme;
+  }
 }
 
 /**
