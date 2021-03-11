@@ -69,8 +69,6 @@ import { Inject } from 'services/core';
 import MessageBoxModal from 'components/shared/modals/MessageBoxModal';
 import Modal from 'components/shared/modals/modal';
 
-import { InputTest } from 'components/shared/ReactComponent';
-
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
 const uuid = window['require']('uuid/v4');
@@ -131,7 +129,6 @@ export function getComponents() {
     GoLiveWindow,
     EditStreamWindow,
     ScheduleStreamWindow,
-    InputTest,
   };
 }
 

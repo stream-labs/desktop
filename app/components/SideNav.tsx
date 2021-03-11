@@ -51,12 +51,6 @@ export default class SideNav extends Vue {
   navigateToStudioTab(tabId: string) {
     this.navigate('Studio');
     this.layoutService.setCurrentTab(tabId);
-
-    this.windowsService.createOneOffWindow({
-      componentName: 'InputTest',
-      title: 'InputTest',
-      size: { width: 800, height: 600 },
-    });
   }
 
   featureIsEnabled(feature: EAvailableFeatures) {
