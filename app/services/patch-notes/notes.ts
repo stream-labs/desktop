@@ -1,18 +1,14 @@
 import { IPatchNotes } from '.';
 
 export const notes: IPatchNotes = {
-  version: '0.27.0',
-  title: 'Visual Filter Presets',
+  version: '1.0.0',
+  title: "It's About Time",
   showChest: false,
   notes: [
-    'Added preset filters to the filter menu for non-audio sources',
-    'Fixed compatability issues with users on MacOS Big Sur',
-    'Added Viewer Count widget for Facebook users',
-    'Added a thumbnail uploader for YouTube users',
-    'Added Streamlabs Charity Goal widget',
-    'Refactored audio volmeters to respond at 60fps',
-    'Redesigned and condensed the Advanced Audio window',
-    'Fixed a bug in Edit Transform position with negative values',
-    'Fixed a bug related to chat zoom while multistreaming',
+    'Improve stability of many VST plugins',
+    'Fixed a bug when editing Slide Show file paths',
+    'Fixed a bug where platform specific streamlabels could break',
+    'Fixed issue where language names were being incorrectly translated to English',
+    'Minor bugfixes and stability improvements',
   ],
 };

@@ -1,8 +1,4 @@
-import {
-  focusMain,
-  test,
-  useSpectron,
-} from '../../helpers/spectron';
+import { focusMain, test, useSpectron } from '../../helpers/spectron';
 import { assertOptions } from '../../helpers/spectron/assertions';
 import { showSettings } from '../../helpers/spectron/settings';
 
@@ -28,17 +24,17 @@ test('Populates audio settings', async t => {
    * that we have two audio devices and 3 mic/aux.
    */
   const { app } = t.context;
-  t.true(await app.client.isExisting('label=Desktop Audio Device 1'));
-  t.true(await app.client.isExisting('label=Desktop Audio Device 2'));
+  t.true(await (await app.client.$('label=Desktop Audio Device 1')).isExisting());
+  t.true(await (await app.client.$('label=Desktop Audio Device 2')).isExisting());
 
-  t.true(await app.client.isExisting('label=Mic/Auxiliary Device 1'));
-  t.true(await app.client.isExisting('label=Mic/Auxiliary Device 2'));
-  t.true(await app.client.isExisting('label=Mic/Auxiliary Device 3'));
+  t.true(await (await app.client.$('label=Mic/Auxiliary Device 1')).isExisting());
+  t.true(await (await app.client.$('label=Mic/Auxiliary Device 2')).isExisting());
+  t.true(await (await app.client.$('label=Mic/Auxiliary Device 3')).isExisting());
 
   // Test that we're displaying mixer settings in the footer
-  await app.client.click('button=Done');
+  await (await app.client.$('button=Done')).click();
   await focusMain(t);
-  t.true(await app.client.isExisting('.source-name=Desktop Audio'));
-  t.true(await app.client.isExisting('.source-name*=Mic'));
-  t.true(await app.client.isExisting('.volmeter-container'));
+  t.true(await (await app.client.$('.source-name=Desktop Audio')).isExisting());
+  t.true(await (await app.client.$('.source-name*=Mic')).isExisting());
+  t.true(await (await app.client.$('.volmeter-container')).isExisting());
 });

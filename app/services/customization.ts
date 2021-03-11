@@ -144,6 +144,10 @@ class CustomizationViews extends ViewHandler<ICustomizationServiceState> {
   get displayBackground() {
     return DISPLAY_BACKGROUNDS[this.state.theme];
   }
+
+  get currentTheme() {
+    return this.state.theme;
+  }
 }
 
 /**

@@ -37,15 +37,13 @@ export default class BrowseOverlays extends Vue {
   };
 
   onBrowserViewReady(view: Electron.BrowserView) {
-    view.webContents.on('did-finish-load', () => {
-      new GuestApiHandler().exposeApi(view.webContents.id, {
-        installOverlay: this.installOverlay,
-        installWidgets: this.installWidgets,
-        eligibleToRestream: () => {
-          // assume all users are eligible
-          return Promise.resolve(true);
-        },
-      });
+    new GuestApiHandler().exposeApi(view.webContents.id, {
+      installOverlay: this.installOverlay,
+      installWidgets: this.installWidgets,
+      eligibleToRestream: () => {
+        // assume all users are eligible
+        return Promise.resolve(true);
+      },
     });
 
     electron.ipcRenderer.send('webContents-preventPopup', view.webContents.id);

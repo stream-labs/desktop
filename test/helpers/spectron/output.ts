@@ -15,7 +15,7 @@ export async function setTemporaryRecordingPath(t: TExecutionContext): Promise<s
   await showSettings(t, 'Output');
   const form = new FormMonkey(t);
   await form.setInputValue(await form.getInputSelectorByTitle('Recording Path'), tmpDir);
-  await app.client.click('button=Done');
+  await (await app.client.$('button=Done')).click();
   await focusMain(t);
   return tmpDir;
 }
@@ -24,10 +24,10 @@ export async function setOutputResolution(t: TExecutionContext, resolution: stri
   const { app } = t.context;
   const [width, height] = resolution.split('x');
   await showSettings(t, 'Video');
-  await app.client.click('button=Use Custom');
+  await (await app.client.$('button=Use Custom')).click();
   const form = new FormMonkey(t);
   await form.fill({ width, height });
-  await app.client.click('button=Apply');
-  await app.client.click('button=Done');
+  await (await app.client.$('button=Apply')).click;
+  await (await app.client.$('button=Done')).click();
   await focusMain(t);
 }

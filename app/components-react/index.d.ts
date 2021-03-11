@@ -7,3 +7,8 @@ interface IRectangle {
   width: number;
   height: number;
 }
+
+interface IVec2 {
+  x: number;
+  y: number;
+}

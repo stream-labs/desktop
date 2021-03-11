@@ -66,3 +66,20 @@ export class NewsBanner extends ReactComponent {}
   },
 })
 export class Display extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'TitleBar' },
+    componentProps: { default: () => ({ windowId: '' }) },
+  },
+})
+export class TitleBar extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'Chat' },
+    componentProps: { default: () => ({ restream: false }) },
+    wrapperStyles: {
+      default: () => ({ height: '100%', display: 'flex', flexDirection: 'column' }),
+    },
+  },
+})
+export class Chat extends ReactComponent {}

@@ -47,6 +47,15 @@ export interface IRequestHandler {
 }
 
 /**
+ * Like a RequestHandler, but each endpoint is denoted by a boolean.
+ * This lets the preload script set up the proper structure of the
+ * API in the context bridge.
+ */
+export interface IRequestHandlerSchema {
+  [key: string]: boolean | IRequestHandlerSchema;
+}
+
+/**
  * Guest API functions that need to return a `File` object to
  * the remote guest can return an instance of this wrapper
  * containing the file path instead.
@@ -59,6 +68,18 @@ export class FileReturnWrapper {
  * This class allows injection of functions into webviews.
  */
 export class GuestApiHandler {
+  /**
+   * Exposes an API in a guest webcontents (generally a BrowserView)
+   * For this to work, the following must be true:
+   * - The guest-api.js preload script must have been set up when
+   *   creating the WebContents
+   * - contextIsolation should be enabled in the webPreferences
+   *   options when creating the WebContents
+   * - This function must be called before loadURL is called on
+   *   the WebContents for the first time.
+   * @param targetWebContentsId The webcontents to expose the API in
+   * @param api An object containing the API
+   */
   exposeApi(targetWebContentsId: number, api: IRequestHandler) {
     const ipcChannel = `guestApiRequest-${uuid()}`;
     const webContents = electron.remote.webContents.fromId(targetWebContentsId);
@@ -98,10 +119,28 @@ export class GuestApiHandler {
       requestHandler(request);
     });
 
-    this.safeSend(webContents, 'guestApiReady', {
-      webContentsId: electron.remote.getCurrentWebContents().id,
+    // This is done via the main process so the injected preload script can
+    // request all of this information synchronously and set up the API.
+    electron.ipcRenderer.send('guestApi-setInfo', {
+      webContentsId: targetWebContentsId,
+      schema: this.getSchema(api),
+      hostWebContentsId: electron.remote.getCurrentWebContents().id,
       ipcChannel,
     });
+  }
+
+  private getSchema(api: IRequestHandler): IRequestHandlerSchema {
+    const newObj: IRequestHandlerSchema = {};
+
+    Object.keys(api).forEach(key => {
+      if (api[key] instanceof Function || api[key] instanceof Observable) {
+        newObj[key] = true;
+      } else {
+        newObj[key] = this.getSchema(api[key] as IRequestHandler);
+      }
+    });
+
+    return newObj;
   }
 
   /**

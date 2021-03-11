@@ -1,6 +1,5 @@
 import { focusChild, focusMain, test, useSpectron } from '../../helpers/spectron';
 import { setFormDropdown } from '../../helpers/spectron/forms';
-import { sleep } from '../../helpers/sleep';
 
 useSpectron();
 
@@ -8,26 +7,28 @@ test('Populates simple output mode settings', async t => {
   const { app } = t.context;
 
   await focusMain(t);
-  await app.client.click('.side-nav .icon-settings');
+  await (await app.client.$('.side-nav .icon-settings')).click();
 
   await focusChild(t);
-  await app.client.click('li=Output');
+  await (await app.client.$('li=Output')).click();
 
   await setFormDropdown(t, 'Output Mode', 'Simple');
 
   // Video Bitrate
-  const videoBitrate = await app.client.getValue(
-    // TODO: this selector is too brittle, but unfortunately we don't have control over this
-    '.input-label + .input-body .number-input input',
-  );
+  const videoBitrate = await (
+    await app.client.$(
+      // TODO: this selector is too brittle, but unfortunately we don't have control over this
+      '.input-label + .input-body .number-input input',
+    )
+  ).getValue();
   t.is(parseInt(videoBitrate, 10), 2500);
 
   // Audio Bitrates dropdown
-  const audioBitrates = (await app.client.execute(() => {
-    return Array.from(document.querySelectorAll('div[data-name=ABitrate] ul li span span')).map(
-      el => parseInt(el.textContent, 10),
-    );
-  })).value;
+  const audioBitrates = await app.client.execute(() => {
+    return Array.from(
+      document.querySelectorAll('div[data-name=ABitrate] ul li span span'),
+    ).map(el => parseInt(el.textContent, 10));
+  });
 
   t.true(audioBitrates.length > 0, 'Audio bitrates exists');
 
@@ -42,5 +43,7 @@ test('Populates simple output mode settings', async t => {
   }
 
   // We can enable replay buffer
-  await t.notThrowsAsync(async () => await app.client.click('label=Enable Replay Buffer'));
+  await t.notThrowsAsync(
+    async () => await (await app.client.$('label=Enable Replay Buffer')).click(),
+  );
 });

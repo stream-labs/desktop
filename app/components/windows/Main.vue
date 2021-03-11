@@ -1,6 +1,10 @@
 <template>
   <div class="main" :class="theme" id="mainWrapper" @drop="onDropHandler">
-    <title-bar :title="title" :class="{ 'titlebar--error': errorAlert }" v-if="uiReady" />
+    <title-bar
+      :componentProps="{ windowId: 'main' }"
+      :class="{ 'titlebar--error': errorAlert }"
+      v-if="uiReady"
+    />
     <news-banner v-if="uiReady" />
     <div
       class="main-contents"

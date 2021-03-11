@@ -12,5 +12,7 @@
   "Volume ( % )": "Volym (%)",
   "Sync Offset ( ms )": "Korrigeringstid (ms )",
   "Mixer": "Mixer",
-  "Monitor audio levels. If the bars are moving you are outputting audio.": "Övervaka ljudnivåerna. Om mätarna flyttar sig sänder du ut ljud."
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "Övervaka ljudnivåerna. Om mätarna flyttar sig sänder du ut ljud.",
+  "Muted": "Muted",
+  "Hide in Mixer": "Hide in Mixer"
 }
