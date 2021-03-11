@@ -4,7 +4,7 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { getComponents, IModalOptions, IWindowOptions, WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
-import TitleBar from '../TitleBar';
+import { TitleBar } from 'components/shared/ReactComponent';
 import { AppService } from 'services/app';
 import styles from './ChildWindow.m.less';
 import ModalWrapper from '../shared/modals/ModalWrapper';
@@ -127,7 +127,7 @@ export default class ChildWindow extends Vue {
   render() {
     return (
       <div style="height: 100%;" class={this.theme} id="mainWrapper">
-        <TitleBar title={this.options.title} class={styles.childWindowTitlebar} />
+        <TitleBar componentProps={{ windowId: 'child' }} class={styles.childWindowTitlebar} />
         <div class={styles.blankSlate}>
           <div class={styles.spinnerSpacer} />
           <i class="fa fa-spinner fa-pulse" />

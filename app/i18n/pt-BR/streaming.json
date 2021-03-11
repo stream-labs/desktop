@@ -43,6 +43,7 @@
   "Refresh Chat": "Atualizar o bate-papo",
   "Your chat is currently offline": "Seu bate-papo está atualmente offline",
   "Set path in Settings > Output.": "Defina o caminho em Configurações > Saída.",
+  "Open Performance Window": "Open Performance Window",
   "Start Replay Buffer": "Iniciar buffer de replay",
   "Stop Replay Buffer": "Interromper o buffer de replay",
   "Stopping...": "Interrompendo...",
@@ -153,5 +154,6 @@
   "Enable Live Streaming": "Enable Live Streaming",
   "Destination": "Destination",
   "You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destinationType.": "You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destinationType.",
+  "canNotDisablePrimaryPlatform": "You cannot disable the platform you logged in with.<br/> Do you want to <switch-account-link>log in to another account</switch-account-link> instead?",
   "Your stream title or description contain banned words": "Your stream title or description contain banned words"
 }

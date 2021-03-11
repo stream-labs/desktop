@@ -48,6 +48,7 @@ export default class BrowserView extends TsxComponent<BrowserViewProps> {
 
     if (this.props.enableGuestApi) {
       options.webPreferences.enableRemoteModule = true;
+      options.webPreferences.contextIsolation = true;
       options.webPreferences.preload = path.resolve(
         electron.remote.app.getAppPath(),
         'bundles',

@@ -15,13 +15,13 @@ test.skip('Set stream-boss health', async t => {
   const setButtonSelector = 'button=Set Stream Boss Health';
   const resetButtonSelector = 'button=Reset Stream Boss';
 
-  if (await client.isVisible(resetButtonSelector)) {
-    await client.click(resetButtonSelector);
+  if (await (await client.$(resetButtonSelector)).isDisplayed()) {
+    await (await client.$(resetButtonSelector)).click();
   }
 
-  await client.waitForVisible(setButtonSelector, 20000);
-  await client.click(setButtonSelector);
-  await client.waitForVisible('div=fixed'); // 'fixed' is a default streamboss mode
+  await (await client.$(setButtonSelector)).waitForDisplayed({ timeout: 20000 });
+  await (await client.$(setButtonSelector)).click();
+  await (await client.$('div=fixed')).waitForDisplayed(); // 'fixed' is a default streamboss mode
 
   t.pass();
 });
@@ -31,7 +31,7 @@ test('Stream Boss Manage Battle settings', async t => {
   if (!(await logIn(t))) return;
   await addSource(t, 'Stream Boss', '__Stream Boss', false);
 
-  await client.click('li=Manage Battle');
+  await (await client.$('li=Manage Battle')).click();
 
   const formMonkey = new FormMonkey(t, 'form[name=manage-battle-form]');
 
@@ -59,7 +59,7 @@ test('Stream Boss Manage Visual Settings', async t => {
   if (!(await logIn(t))) return;
   await addSource(t, 'Stream Boss', '__Stream Boss', false);
 
-  await client.click('li=Visual Settings');
+  await (await client.$('li=Visual Settings')).click();
   const formMonkey = new FormMonkey(t, 'form[name=visual-settings-form]');
 
   const testSet1 = {

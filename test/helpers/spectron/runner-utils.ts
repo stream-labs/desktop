@@ -120,7 +120,6 @@ function isTestEligibleToRun(testName: string) {
 }
 
 export function saveTestStatsToFile(stats: Record<string, ITestStats>) {
-  console.log('save test stats', stats);
   if (!process.env.SLOBS_TEST_RUN_CHUNK) {
     // don't save timings for tests that are not sliced
     return;
