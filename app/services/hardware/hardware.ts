@@ -4,6 +4,7 @@ import uuid from 'uuid/v4';
 import { byOS, OS } from 'util/operating-systems';
 import { Inject } from 'services/core';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import { wrapMeasure } from 'util/performance';
 
 export enum EDeviceType {
   audioInput = 'audioInput',
@@ -58,7 +59,23 @@ export class HardwareService extends StatefulService<IHardwareServiceState> {
     const devices: IDevice[] = [];
     const dshowDevices: IDevice[] = [];
 
-    (obs.NodeObs.OBS_settings_getInputAudioDevices() as IOBSDevice[]).forEach(device => {
+    let audioInput: IOBSDevice[];
+    let audioOutput: IOBSDevice[];
+    let video: IOBSDevice[];
+
+    wrapMeasure('OBS_settings_getInputAudioDevices', () => {
+      audioInput = obs.NodeObs.OBS_settings_getInputAudioDevices();
+    });
+
+    wrapMeasure('OBS_settings_getOutputAudioDevices', () => {
+      audioOutput = obs.NodeObs.OBS_settings_getInputAudioDevices();
+    });
+
+    wrapMeasure('OBS_settings_getVideoDevices', () => {
+      video = obs.NodeObs.OBS_settings_getVideoDevices();
+    });
+
+    audioInput.forEach(device => {
       if (device.description === 'NVIDIA Broadcast') {
         this.usageStatisticsService.recordFeatureUsage('NvidiaVirtualMic');
       }
@@ -70,7 +87,7 @@ export class HardwareService extends StatefulService<IHardwareServiceState> {
       });
     });
 
-    (obs.NodeObs.OBS_settings_getOutputAudioDevices() as IOBSDevice[]).forEach(device => {
+    audioOutput.forEach(device => {
       devices.push({
         id: device.id,
         description: device.description,
@@ -78,7 +95,7 @@ export class HardwareService extends StatefulService<IHardwareServiceState> {
       });
     });
 
-    (obs.NodeObs.OBS_settings_getVideoDevices() as IOBSDevice[]).forEach(device => {
+    video.forEach(device => {
       if (device.description === 'NVIDIA Broadcast') {
         this.usageStatisticsService.recordFeatureUsage('NvidiaVirtualCam');
       }
