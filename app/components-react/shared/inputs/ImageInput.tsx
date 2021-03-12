@@ -10,13 +10,17 @@ import Utils from '../../../services/utils';
 
 export type TImageInputProps = TSlobsInputProps<{ maxFileSize: number }, string, UploadProps>;
 
+/**
+ * Allows to select an image file from FS
+ * Keeps it's content in the base64 format as an input value
+ */
 export const ImageInput = InputComponent((p: TImageInputProps) => {
   const { inputAttrs, wrapperAttrs } = useInput('image', p);
   const [isPreviewVisible, setPreviewVisible] = useState(false);
   const elRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // stretch the image width on 100%
+    // stretch the image preview on 100%
     elRef.current?.parentNode
       ?.querySelectorAll<HTMLElement>(
         '.ant-upload-list-picture-card-container,.ant-upload-select-picture-card',
@@ -35,12 +39,11 @@ export const ImageInput = InputComponent((p: TImageInputProps) => {
 
   const [fileInfo, setFileInfo] = useState({ ...defaultFileInfo, url: p.value });
 
+  // check if the value has been changed
   useEffect(() => {
     if (fileInfo.url === p.value) return;
     setFileInfo({ ...defaultFileInfo, url: p.value });
   }, [p.value]);
-
-  const fileList = (fileInfo.url && [fileInfo]) || [];
 
   async function onPreviewHandler(file: UploadFile) {
     if (!file.url && !file.preview) {
@@ -51,7 +54,6 @@ export const ImageInput = InputComponent((p: TImageInputProps) => {
   }
 
   function onBeforeUploadHandler(file: RcFile): boolean {
-    console.log('on before upload', file);
     let error = '';
     if (!['image/png', 'image/jpeg'].includes(file.type)) {
       error = $t('Only .jpeg and .png is supported');
@@ -83,7 +85,7 @@ export const ImageInput = InputComponent((p: TImageInputProps) => {
         {...inputAttrs}
         accept="image/png, image/jpeg"
         listType="picture-card"
-        fileList={fileList}
+        fileList={(fileInfo.url && [fileInfo]) || []}
         beforeUpload={onBeforeUploadHandler}
         onPreview={onPreviewHandler}
         onRemove={onRemoveHandler}
@@ -91,17 +93,17 @@ export const ImageInput = InputComponent((p: TImageInputProps) => {
         customRequest={() => null}
         onChange={() => null}
       >
-        {fileList.length === 0 && '+ Upload'}
+        {!p.value && '+ Upload'}
       </Upload>
-      <div ref={elRef} />
       <Modal
         visible={isPreviewVisible}
         title={$t('Preview')}
         footer={null}
         onCancel={() => setPreviewVisible(false)}
       >
-        <img alt="example" style={{ width: '100%' }} src={fileInfo?.url} />
+        <img alt="example" style={{ width: '100%' }} src={p.value} />
       </Modal>
+      <div ref={elRef} />
     </InputWrapper>
   );
 });
