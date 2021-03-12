@@ -288,11 +288,14 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
 
     // setup key and platform type in the OBS settings
     const streamKey = stream.cdn.ingestionInfo.streamName;
-    this.streamSettingsService.setSettings({
-      platform: 'youtube',
-      key: streamKey,
-      streamType: 'rtmp_common',
-    });
+
+    if (!this.streamingService.views.isMultiplatformMode) {
+      this.streamSettingsService.setSettings({
+        platform: 'youtube',
+        key: streamKey,
+        streamType: 'rtmp_common',
+      });
+    }
 
     // update the local state
     this.UPDATE_STREAM_SETTINGS({ ...ytSettings, broadcastId: broadcast.id });
@@ -619,13 +622,14 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
 
     // cap the upcoming broadcasts list depending on the current date
     // unfortunately YT API doesn't provide a way to filter broadcasts by date
-    upcomingBroadcasts = upcomingBroadcasts.filter(broadcast => {
-      const timeRange = 1000 * 60 * 60 * 24;
-      const maxDate = Date.now() + timeRange;
-      const minDate = Date.now() - timeRange;
-      const broadcastDate = new Date(broadcast.snippet.scheduledStartTime).valueOf();
-      return broadcastDate > minDate && broadcastDate < maxDate;
-    });
+    // TODO: restore filter
+    // upcomingBroadcasts = upcomingBroadcasts.filter(broadcast => {
+    //   const timeRange = 1000 * 60 * 60 * 24;
+    //   const maxDate = Date.now() + timeRange;
+    //   const minDate = Date.now() - timeRange;
+    //   const broadcastDate = new Date(broadcast.snippet.scheduledStartTime).valueOf();
+    //   return broadcastDate > minDate && broadcastDate < maxDate;
+    // });
 
     return [...activeBroadcasts, ...upcomingBroadcasts];
   }
@@ -648,6 +652,33 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
         `${this.apiBase}/liveBroadcasts?${query}`,
       )
     ).items[0];
+  }
+
+  /**
+   * Returns an IYoutubeStartStreamOptions object for a given broadcastId
+   */
+  async fetchStartStreamOptionsForBroadcast(
+    broadcastId: string,
+  ): Promise<IYoutubeStartStreamOptions> {
+    const [broadcast, video] = await Promise.all([
+      this.fetchBroadcast(broadcastId),
+      this.fetchVideo(broadcastId),
+    ]);
+    const { title, description } = broadcast.snippet;
+    const { privacyStatus, selfDeclaredMadeForKids } = broadcast.status;
+    const { enableDvr, projection, latencyPreference } = broadcast.contentDetails;
+    return {
+      broadcastId: broadcast.id,
+      title,
+      description,
+      privacyStatus,
+      selfDeclaredMadeForKids,
+      enableDvr,
+      projection,
+      latencyPreference,
+      categoryId: video.snippet.categoryId,
+      thumbnail: broadcast.snippet.thumbnails.default.url,
+    };
   }
 
   get chatUrl() {

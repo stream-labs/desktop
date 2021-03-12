@@ -1,11 +1,19 @@
 import { IGoLiveSettings, StreamInfoView } from '../../../services/streaming';
 import { TPlatform } from '../../../services/platforms';
 import { Services } from '../../service-provider';
-import { mergeToProxy, useOnCreate, useStateManager } from '../../hooks';
+import {
+  createMutations,
+  createReducers,
+  mergeToProxy,
+  TReducers,
+  useOnCreate,
+  useStateManager,
+} from '../../hooks';
 import { useState } from 'react';
 import { keys } from '../../../services/utils';
 import { ViewHandler } from '../../../services/core';
-import { cloneDeep, mapValues } from 'lodash';
+import { cloneDeep, debounce, mapValues, omit } from 'lodash';
+import Form from '../../shared/inputs/Form';
 
 export interface IGoLiveProps {
   // settings: IGoLiveSettings;
@@ -48,87 +56,185 @@ export function getEnabledPlatforms(settings: IGoLiveSettings): TPlatform[] {
 
 type TCustomFieldName = 'title' | 'description';
 
+type IGoLiveSettingsState = IGoLiveSettings & { locked: boolean; loaded: boolean };
+
+function getInitialStreamSettings(modificators: TModificators) {
+  const view = Services.StreamingService.views;
+  const settings = {
+    ...view.savedSettings,
+    locked: false,
+    loaded: false,
+  };
+  // if stream has not been started than we allow to change settings only for a primary platform
+  // so delete other platforms from the settings object
+  if (modificators.isUpdateMode && !view.isMidStreamMode) {
+    Object.keys(settings.platforms).forEach((platform: TPlatform) => {
+      if (!view.checkPrimaryPlatform(platform)) delete settings.platforms[platform];
+    });
+  }
+  return settings;
+}
+
+type TModificators = { isScheduleMode?: boolean; isUpdateMode?: boolean };
+
 export function useGoLiveSettings<TWatchResult extends object = {}>(
   debug: string,
-  watch?: (settings: StreamInfoView) => TWatchResult,
-  modificators: { isScheduleMode?: boolean; isUpdateMode?: boolean } = {},
+  watch?: (settings: StreamInfoView & TModificators) => TWatchResult,
+  modificators: TModificators = {} as TModificators,
 ) {
   const { StreamingService, StreamSettingsService } = Services;
 
   const stateManager = useStateManager(
-    () => StreamingService.views.savedSettings,
+    () => getInitialStreamSettings(modificators),
     (getState, setState) => {
+      type TState = IGoLiveSettingsState;
+      function getView(state: TState) {
+        return new StreamInfoView(StreamingService.state, () => state);
+      }
+
+      const reducers = {
+        updateSettings(state: TState, patch: Partial<TState>) {
+          const newSettings = { ...state, ...patch };
+          // we should re-calculate common fields before applying new settings
+          const platforms = getView(newSettings).applyCommonFields(newSettings.platforms);
+          return { ...newSettings, platforms };
+        },
+        updatePlatform(
+          state: TState,
+          platform: TPlatform,
+          patch: Partial<IGoLiveSettings['platforms'][TPlatform]>,
+        ) {
+          return this.updateSettings(state, {
+            platforms: {
+              ...state.platforms,
+              [platform]: { ...state.platforms[platform], ...patch },
+            },
+          });
+        },
+        switchCustomDestination(state: TState, destInd: number, enabled: boolean) {
+          const customDestinations = cloneDeep(getView(state).customDestinations);
+          customDestinations[destInd].enabled = enabled;
+          return this.updateSettings(state, { customDestinations });
+        },
+        switchAdvancedMode(state: TState, enabled: boolean) {
+          return this.updateSettings(state, { advancedMode: enabled });
+        },
+        /**
+         * Update the selected field for all target platforms
+         **/
+        updateCommonFields(state: TState, fieldName: TCustomFieldName, value: string) {
+          const view = getView(state);
+          let updatedState = state;
+          view.platformsWithoutCustomFields.forEach(platform => {
+            if (!view.supports(fieldName, [platform])) return;
+            updatedState = this.updatePlatform(state, platform, { [fieldName]: value });
+          });
+          return updatedState;
+        },
+        toggleCustomFields(state: TState, platform: TPlatform) {
+          const enabled = state.platforms[platform].useCustomFields;
+          return this.updatePlatform(state, platform, { useCustomFields: !enabled });
+        },
+        lock(state: TState) {
+          return this.updateSettings(state, { locked: true });
+        },
+      };
+
+      const mutations = createMutations(reducers, getState, setState);
+
+      const actions = {
+        switchPlatforms: debounce((enabledPlatforms: TPlatform[]) => {
+          let platformHasBeenEnabled = false;
+          let newSettings = getState();
+          view.linkedPlatforms.forEach(platform => {
+            const enabled = view.getPlatformSettings(platform).enabled;
+            const shouldEnable = !enabled && enabledPlatforms.includes(platform);
+            if (shouldEnable) platformHasBeenEnabled = true;
+            newSettings = reducers.updatePlatform(newSettings, platform, {
+              enabled: enabledPlatforms.includes(platform),
+            });
+          });
+          actions.save(newSettings);
+          if (platformHasBeenEnabled) {
+            actions.prepopulate();
+          } else {
+            mutations.updateSettings(newSettings);
+          }
+        }, 100),
+
+        renderPlatformSettings(
+          commonFields: JSX.Element,
+          requiredFields: JSX.Element,
+          ptionalFields: JSX.Element,
+        ) {
+          let settingsMode: 'singlePlatform' | 'multiplatformAdvanced' | 'multiplatformSimple';
+          if (view.isMultiplatformMode) {
+            settingsMode = view.isAdvancedMode ? 'multiplatformAdvanced' : 'multiplatformSimple';
+          } else {
+            settingsMode = 'singlePlatform';
+          }
+          switch (settingsMode) {
+            case 'singlePlatform':
+              return [commonFields, requiredFields, ptionalFields];
+            case 'multiplatformSimple':
+              return requiredFields;
+            case 'multiplatformAdvanced':
+              return [requiredFields, ptionalFields, commonFields];
+          }
+        },
+
+        goLive() {
+          StreamingService.actions.goLive(getState());
+        },
+
+        updateStream() {
+          StreamingService.actions.updateStreamSettings(getState());
+        },
+
+        save(settings: TState) {
+          const settingsToSave = omit(settings, 'locked');
+          StreamSettingsService.setGoLiveSettings(settingsToSave);
+        },
+
+        reload() {
+          mutations.updateSettings(getInitialStreamSettings(modificators));
+        },
+
+        async prepopulate() {
+          mutations.lock();
+          await StreamingService.actions.return.prepopulateInfo();
+          actions.reload();
+          if (!view.error) mutations.updateSettings({ loaded: true });
+        },
+      };
+
       const view = new StreamInfoView(StreamingService.state, getState);
 
-      function updateSettings(patch: Partial<IGoLiveSettings>) {
-        const newSettings = { ...getState(), ...patch };
-        // we should re-calculate common fields before applying new settings
-        const platforms = view.applyCommonFields(newSettings.platforms);
-        setState({ ...newSettings, platforms });
-      }
-
-      function updatePlatform<TPlatformType extends TPlatform>(
-        platform: TPlatform,
-        patch: Partial<IGoLiveSettings['platforms'][TPlatform]>,
-      ) {
-        const state = getState();
-        updateSettings({
-          platforms: {
-            ...state.platforms,
-            [platform]: { ...state.platforms[platform], ...patch },
-          },
-        });
-      }
-
-      function switchPlatform(platformName: TPlatform, enabled: boolean) {
-        updatePlatform(platformName, { enabled });
-        StreamSettingsService.setGoLiveSettings(view.settings);
-        StreamingService.actions.prepopulateInfo();
-      }
-
-      function switchCustomDestination(destInd: number, enabled: boolean) {
-        const customDestinations = cloneDeep(view.customDestinations);
-        customDestinations[destInd].enabled = enabled;
-        updateSettings({ customDestinations });
-      }
-
-      function switchAdvancedMode(enabled: boolean) {
-        updateSettings({ advancedMode: enabled });
-      }
-
-      /**
-       * Update the selected field for all target platforms
-       **/
-      function updateCommonFields(fieldName: TCustomFieldName, value: string) {
-        view.platformsWithoutCustomFields.forEach(platform => {
-          if (!view.supports(fieldName, [platform])) return;
-          updatePlatform(platform, { [fieldName]: value });
-        });
-      }
-
-      function toggleCustomFields(platform: TPlatform) {
-        const enabled = view.platforms[platform].useCustomFields;
-        updatePlatform(platform, { useCustomFields: !enabled });
-      }
-
-      function goLive() {
-        StreamingService.actions.goLive(view.settings);
-      }
-
-      return mergeToProxy(
+      const result = mergeToProxy(
         {
-          updateSettings,
-          updatePlatform,
-          switchPlatform,
-          updateCommonFields,
-          toggleCustomFields,
-          switchAdvancedMode,
-          switchCustomDestination,
-          goLive,
+          ...mutations,
+          ...actions,
           ...modificators,
         },
         view.exposeProps(),
       );
+
+      return result;
+
+      // return mergeToProxy(
+      //   {
+      //     updateSettings,
+      //     updatePlatform,
+      //     switchPlatform,
+      //     updateCommonFields,
+      //     toggleCustomFields,
+      //     switchAdvancedMode,
+      //     switchCustomDestination,
+      //     goLive,
+      //     ...modificators,
+      //   },
+      //   view.exposeProps(),
+      // );
     },
     debug,
     watch,

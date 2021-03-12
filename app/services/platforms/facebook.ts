@@ -192,11 +192,9 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     // setup stream key and new settings
     const streamUrl = liveVideo.stream_url;
     const streamKey = streamUrl.substr(streamUrl.lastIndexOf('/') + 1);
-    this.streamSettingsService.setSettings({
-      key: streamKey,
-      platform: 'facebook',
-      streamType: 'rtmp_common',
-    });
+    if (!this.streamingService.views.isMultiplatformMode) {
+      this.streamSettingsService.setSettings({ key: streamKey, platform: 'facebook', streamType: 'rtmp_common'});
+    }
     this.SET_STREAM_KEY(streamKey);
     this.SET_STREAM_PAGE_URL(`https://facebook.com/${liveVideo.permalink_url}`);
     this.UPDATE_STREAM_SETTINGS({ ...fbOptions, liveVideoId: liveVideo.id });

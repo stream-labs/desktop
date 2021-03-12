@@ -43,8 +43,7 @@ export function DestinationSwitchers() {
     linkedPlatforms,
     enabledPlatforms,
     customDestinations,
-    switchPlatform,
-    checkEnabled,
+    switchPlatforms,
     switchCustomDestination,
   } = useGoLiveSettings('DestinationSwitchers');
 
@@ -54,38 +53,11 @@ export function DestinationSwitchers() {
     return enabledPlatformsRef.current.includes(platform);
   }
 
-  const triggerOnChange = useDebounce(500, () => {
-    linkedPlatforms.forEach(platform => {
-      if (checkEnabled(platform) && !isEnabled(platform)) switchPlatform(platform, false);
-      if (!checkEnabled(platform) && isEnabled(platform)) switchPlatform(platform, true);
-    });
-  });
-
   function togglePlatform(platform: TPlatform, enabled: boolean) {
     enabledPlatformsRef.current = enabledPlatformsRef.current.filter(p => p !== platform);
     if (enabled) enabledPlatformsRef.current.push(platform);
-    triggerOnChange();
+    switchPlatforms(enabledPlatformsRef.current);
   }
-
-  // const [enabledPlatforms, setEnabledPlatforms] = useState(() =>
-  //   view.enabledPlatforms.filter(platform => availablePlatforms.includes(platform)),
-  // );
-
-  // const [enabledCustomDestinations, setEnabledCustomDestinations] = useState(() =>
-  //   p.customDestinations?.map((dest, ind) => (dest.enabled ? ind : -1)).filter(ind => ind !== -1),
-  // );
-
-  // function switchPlatform(platform: TPlatform, enabled: boolean) {
-  //
-  //   // setEnabledPlatforms(prevEnabledPlatforms => {
-  //   //   const rest = prevEnabledPlatforms.filter(p => p !== platform);
-  //   //   if (enabled) rest.push(platform);
-  //   //   return rest;
-  //   // });
-  //   // triggerOnChange();
-  // }
-
-  function switchCustomDest(destInd: number, enabled: boolean) {}
 
   return (
     <div>
@@ -213,12 +185,12 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
     // always proxy the click to the SwitchInput
     // so it can play a transition animation
     switchInputRef.current?.click();
-    // // switch the container class without re-rendering to not stop the animation
-    // if (enabled) {
-    //   containerRef.current?.classList.remove(styles.platformDisabled);
-    // } else {
-    //   containerRef.current?.classList.add(styles.platformDisabled);
-    // }
+    // switch the container class without re-rendering to not stop the animation
+    if (enabled) {
+      containerRef.current?.classList.remove(styles.platformDisabled);
+    } else {
+      containerRef.current?.classList.add(styles.platformDisabled);
+    }
   }
 
   const { title, description, Switch, Logo } = (() => {
@@ -240,6 +212,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
             value={p.enabled}
             name={platform}
             onChange={p.onChange}
+            debounce={300}
           />
         ),
       };

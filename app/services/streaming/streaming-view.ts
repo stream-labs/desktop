@@ -57,6 +57,11 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     return this.settings.platforms;
   }
 
+  get checklist() {
+    // read all nested fields of the  `info.checklist` to make it deep-reactive
+    return { ...this.info.checklist };
+  }
+
   getPlatformDisplayName(platform: TPlatform): string {
     return getPlatformService(platform).displayName;
   }
@@ -171,14 +176,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   }
 
   get isAdvancedMode(): boolean {
-    return this.enabledPlatforms.length === 1 || this.settings.advancedMode;
-  }
-
-  get settingsMode(): 'singlePlatform' | 'multiplatformAdvanced' | 'multiplatformSimple' {
-    if (this.isMultiplatformMode) {
-      return this.isAdvancedMode ? 'multiplatformAdvanced' : 'multiplatformSimple';
-    }
-    return 'singlePlatform';
+    return this.enabledPlatforms.length > 1 && this.settings.advancedMode;
   }
 
   /**

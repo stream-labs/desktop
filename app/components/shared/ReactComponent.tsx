@@ -69,3 +69,11 @@ export class NewsBanner extends ReactComponent {}
   },
 })
 export class GoLiveWindow extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'EditStreamWindow' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class EditStreamWindow extends ReactComponent {}

@@ -24,22 +24,50 @@ import Translate from '../../../shared/Translate';
 import { IListOption } from '../../../shared/inputs/ListInput';
 import MessageLayout from '../MessageLayout';
 
-interface IProps {
-  settings: IGoLiveSettings;
-  updatePlatformSettings: TUpdatePlatformSettingsFn;
-  isScheduleMode?: boolean;
-  isUpdateMode?: boolean;
-  isAdvancedMode: (p: any) => boolean;
-}
+export default function FacebookEditStreamInfo() {
+  // inject services
+  const {
+    FacebookService,
+    DismissablesService,
+    StreamingService,
+    UserService,
+    NavigationService,
+    WindowsService,
+  } = Services;
 
-export default function FacebookEditStreamInfo(p: IProps) {
-  const { isScheduleMode, isUpdateMode } = p;
-  const { settings, updatePlatform } = useGoLiveSettings('FacebookEditStreamInfo', state => [
-    state.platforms.facebook,
-  ]);
-  const fbSettings = settings.platforms.facebook;
-  assertIsDefined(fbSettings);
-  const isAdvanced = p.isAdvancedMode(p.settings);
+  const {
+    updatePlatform,
+    isScheduleMode,
+    isUpdateMode,
+    fbSettings,
+    pages,
+    groups,
+    canStreamToTimeline,
+    canStreamToGroup,
+    isPrimary,
+    shouldShowGamingWarning,
+    renderPlatformSettings,
+    shouldShowPermissionWarn,
+  } = useGoLiveSettings('FacebookEditStreamInfo', view => {
+    const fbState = FacebookService.state;
+    const hasPages = !!fbState.facebookPages.length;
+    const canStreamToTimeline = fbState.grantedPermissions.includes('publish_video');
+    const canStreamToGroup = fbState.grantedPermissions.includes('publish_to_groups');
+    const fbSettings = view.platforms.facebook;
+    return {
+      canStreamToTimeline,
+      canStreamToGroup,
+      hasPages,
+      fbSettings,
+      shouldShowGamingWarning: hasPages && fbSettings.game,
+      shouldShowPermissionWarn:
+        (!canStreamToTimeline || !canStreamToGroup) &&
+        DismissablesService.views.shouldShow(EDismissable.FacebookNeedPermissionsTip),
+      groups: fbState.facebookGroups,
+      pages: fbState.facebookPages,
+      isPrimary: view.checkPrimaryPlatform('facebook'),
+    };
+  });
   const shouldShowGroups = fbSettings.destinationType === 'group' && !isUpdateMode;
   const shouldShowPages = fbSettings.destinationType === 'page' && !isUpdateMode;
   const shouldShowEvents = !isUpdateMode && !isScheduleMode;
@@ -51,41 +79,11 @@ export default function FacebookEditStreamInfo(p: IProps) {
     updatePlatform('facebook', newFbSettings),
   );
 
-  // inject services
-  const {
-    FacebookService,
-    DismissablesService,
-    StreamingService,
-    UserService,
-    NavigationService,
-    WindowsService,
-  } = Services;
-
   // define the local state
   const { s, setItem, updateState } = useFormState({
     pictures: {} as Record<string, string>,
     scheduledVideos: [] as IFacebookLiveVideo[],
     scheduledVideosLoaded: false,
-  });
-
-  // define the vuex state
-  const v = useVuex(() => {
-    const state = FacebookService.state;
-    const hasPages = !!state.facebookPages.length;
-    const canStreamToTimeline = state.grantedPermissions.includes('publish_video');
-    const canStreamToGroup = state.grantedPermissions.includes('publish_to_groups');
-    return {
-      canStreamToTimeline,
-      canStreamToGroup,
-      hasPages,
-      shouldShowGamingWarning: hasPages && fbSettings.game,
-      shouldShowPermissionWarn:
-        (!canStreamToTimeline || !canStreamToGroup) &&
-        DismissablesService.views.shouldShow(EDismissable.FacebookNeedPermissionsTip),
-      groups: state.facebookGroups,
-      pages: state.facebookPages,
-      isPrimary: StreamingService.views.checkPrimaryPlatform('facebook'),
-    };
   });
 
   useOnCreate(() => {
@@ -170,17 +168,17 @@ export default function FacebookEditStreamInfo(p: IProps) {
 
   async function reLogin() {
     await UserService.actions.return.reLogin();
-    await StreamingService.actions.showGoLiveWindow();
+    StreamingService.actions.showGoLiveWindow();
   }
 
   function renderCommonFields() {
-    return <CommonPlatformFields key="common" {...p} platform="facebook" />;
+    return <CommonPlatformFields key="common" platform="facebook" />;
   }
 
   function renderRequiredFields() {
     return (
       <div key="required">
-        {!p.isUpdateMode && (
+        {!isUpdateMode && (
           <>
             <ListInput
               label={$t('Facebook Destination')}
@@ -199,7 +197,7 @@ export default function FacebookEditStreamInfo(p: IProps) {
                 imageSize={{ width: 44, height: 44 }}
                 onDropdownVisibleChange={shown => shown && loadPictures('page')}
                 onSelect={loadScheduledBroadcasts}
-                options={v.pages.map(page => ({
+                options={pages.map(page => ({
                   value: page.id,
                   label: `${page.name} | ${page.category}`,
                   image: s.pictures[page.id],
@@ -213,7 +211,7 @@ export default function FacebookEditStreamInfo(p: IProps) {
                   label={$t('Facebook Group')}
                   hasImage
                   imageSize={{ width: 44, height: 44 }}
-                  options={v.groups.map(group => ({
+                  options={groups.map(group => ({
                     value: group.id,
                     label: group.name,
                     image: s.pictures[group.id],
@@ -283,7 +281,7 @@ export default function FacebookEditStreamInfo(p: IProps) {
           {...bind.game}
           platform="facebook"
           extra={
-            v.shouldShowGamingWarning && (
+            shouldShowGamingWarning && (
               <Translate message={$t('facebookGamingWarning')}>
                 <a slot="createPageLink" onClick={() => FacebookService.actions.createFBPage()} />
               </Translate>
@@ -300,7 +298,7 @@ export default function FacebookEditStreamInfo(p: IProps) {
         message={$t('You can stream to your timeline and groups now')}
         type={'success'}
       >
-        {v.isPrimary && (
+        {isPrimary && (
           <div>
             <p>{$t('Please log-out and log-in again to get these new features')}</p>
             <button className="button button--facebook" onClick={reLogin}>
@@ -311,7 +309,7 @@ export default function FacebookEditStreamInfo(p: IProps) {
             </button>
           </div>
         )}
-        {!v.isPrimary && (
+        {!isPrimary && (
           <div>
             <p>{$t('Please reconnect Facebook to get these new features')}</p>
             <button className="button button--facebook" onClick={reconnectFB}>
@@ -344,8 +342,8 @@ export default function FacebookEditStreamInfo(p: IProps) {
         image: 'https://slobs-cdn.streamlabs.com/media/fb-group.png',
       },
     ].filter(opt => {
-      if (opt.value === 'me' && !v.canStreamToTimeline) return false;
-      if (opt.value === 'group' && !v.canStreamToGroup) return false;
+      if (opt.value === 'me' && !canStreamToTimeline) return false;
+      if (opt.value === 'group' && !canStreamToGroup) return false;
       return true;
     });
     return options;
@@ -353,11 +351,8 @@ export default function FacebookEditStreamInfo(p: IProps) {
 
   return (
     <Form name="facebook-settings">
-      {isAdvanced
-        ? [renderRequiredFields(), renderOptionalFields(), renderCommonFields()]
-        : [renderCommonFields(), renderRequiredFields()]}
-
-      {v.shouldShowPermissionWarn && renderMissedPermissionsWarning()}
+      {shouldShowPermissionWarn && renderMissedPermissionsWarning()}
+      {renderPlatformSettings(renderCommonFields(), renderRequiredFields(), renderOptionalFields())}
     </Form>
   );
 }

@@ -1,8 +1,8 @@
 import { IGoLiveSettings, IStreamSettings } from '../../../../../services/streaming';
 import { TPlatform } from '../../../../../services/platforms';
 import CommonPlatformFields from '../../CommonPlatformFields';
-import { CheckboxInput, ListInput } from '../../../../shared/inputs';
-import React, { useState } from 'react';
+import { CheckboxInput, ImageInput, ListInput } from '../../../../shared/inputs';
+import React, { useEffect, useState } from 'react';
 import { Services } from '../../../../service-provider';
 import { $t } from '../../../../../services/i18n';
 import { IYoutubeStartStreamOptions } from '../../../../../services/platforms/youtube';
@@ -13,41 +13,56 @@ import InputWrapper from '../../../../shared/inputs/InputWrapper';
 import { TwitchTagsInput } from '../TwitchTagsInput';
 import GameSelector from '../../GameSelector';
 import Form from '../../../../shared/inputs/Form';
-import { TUpdatePlatformSettingsFn } from '../../go-live';
-
-interface IProps {
-  settings: IGoLiveSettings;
-  updatePlatformSettings: TUpdatePlatformSettingsFn;
-  isScheduleMode?: boolean;
-  isUpdateMode?: boolean;
-  isAdvancedMode: (p: any) => boolean;
-}
-
-// const PrivacyInput =
+import { useGoLiveSettings } from '../../go-live';
+import electron from 'electron';
 
 /***
  * Stream Settings for YT
  */
-export function YoutubeEditStreamInfo(p: IProps) {
-  const { settings, updatePlatformSettings, isScheduleMode, isUpdateMode } = p;
-  const { StreamingService, YoutubeService } = Services;
-  const view = StreamingService.views;
-  const ytSettings = settings.platforms.youtube;
-  const isAdvanced = p.isAdvancedMode(settings);
+export function YoutubeEditStreamInfo() {
+  const { YoutubeService } = Services;
+  const {
+    updatePlatform,
+    ytSettings,
+    isUpdateMode,
+    isScheduleMode,
+    renderPlatformSettings,
+  } = useGoLiveSettings('YoutubeEditStreamInfo', view => ({
+    ytSettings: view.platforms.youtube,
+  }));
   const is360video = ytSettings.projection === '360';
   const shouldShowSafeForKidsWarn = ytSettings.selfDeclaredMadeForKids;
+  const broadcastId = ytSettings.broadcastId;
   const bind = createBinding(
     ytSettings,
-    newYtSettings => updatePlatformSettings('youtube', newYtSettings),
+    newYtSettings => updatePlatform('youtube', newYtSettings),
     fieldName => ({ disabled: fieldIsDisabled(fieldName) }),
   );
 
-  const [s] = useAsyncState({ broadcastLoading: true, broadcasts: [] }, async () => {
-    return {
-      broadcastLoading: false,
-      broadcasts: await YoutubeService.actions.return.fetchBroadcasts(),
-    };
-  });
+  const [{ broadcastLoading, broadcasts }] = useAsyncState(
+    { broadcastLoading: true, broadcasts: [] },
+    async () => {
+      return {
+        broadcastLoading: false,
+        broadcasts: await YoutubeService.actions.return.fetchBroadcasts(),
+      };
+    },
+  );
+
+  useEffect(() => {
+    if (!broadcastId) return;
+    YoutubeService.actions.return
+      .fetchStartStreamOptionsForBroadcast(broadcastId)
+      .then(newYtSettings => {
+        updatePlatform('youtube', newYtSettings);
+      });
+  }, [broadcastId]);
+
+  function openThumbnailsEditor() {
+    electron.remote.shell.openExternal(
+      'https://streamlabs.com/dashboard#/prime/thumbnails?refl=slobs-thumbnail-editor',
+    );
+  }
 
   function fieldIsDisabled(fieldName: keyof IGoLiveSettings['platforms']['youtube']): boolean {
     // TODO:
@@ -64,23 +79,24 @@ export function YoutubeEditStreamInfo(p: IProps) {
   }
 
   function projectionChangeHandler(enable360: boolean) {
-    updatePlatformSettings('youtube', { projection: enable360 ? '360' : 'rectangular' });
+    updatePlatform('youtube', { projection: enable360 ? '360' : 'rectangular' });
   }
 
   function renderCommonFields() {
-    return <CommonPlatformFields key="common" {...p} platform="youtube" />;
+    return <CommonPlatformFields key="common" platform="youtube" />;
   }
 
   function renderOptionalFields() {
     return (
       <div key="optional">
-        {!p.isScheduleMode && (
+        {!isScheduleMode && (
           <BroadcastInput
             value=""
             label={$t('Event')}
-            loading={s.broadcastLoading}
-            broadcasts={s.broadcasts}
-            disabled={view.isMidStreamMode}
+            loading={broadcastLoading}
+            broadcasts={broadcasts}
+            disabled={isUpdateMode}
+            {...bind.broadcastId}
           />
         )}
         <ListInput
@@ -109,15 +125,12 @@ export function YoutubeEditStreamInfo(p: IProps) {
             label: category.snippet.title,
           }))}
         />
-        {/*<HFormGroup title={this.formMetadata.thumbnail.title}>*/}
-        {/*  <FormInput*/}
-        {/*    metadata={this.formMetadata.thumbnail}*/}
-        {/*    vModel={this.settings.platforms.youtube.thumbnail}*/}
-        {/*  />*/}
-        {/*  <div class="input-description">*/}
-        {/*    <a onclick={() => this.openThumbnailsEditor()}>{$t('Try our new thumbnail editor')}</a>*/}
-        {/*  </div>*/}
-        {/*</HFormGroup>*/}
+        <ImageInput
+          label={$t('Thumbnail')}
+          maxFileSize={2 * 1024 * 1024} // 2 mb
+          extra={<a onClick={openThumbnailsEditor}>{$t('Try our new thumbnail editor')}</a>}
+          {...bind.thumbnail}
+        />
 
         {/* TODO: add description */}
         <ListInput
@@ -180,9 +193,7 @@ export function YoutubeEditStreamInfo(p: IProps) {
 
   return (
     <Form name="youtube-settings">
-      {isAdvanced
-        ? [renderOptionalFields(), renderCommonFields()]
-        : [renderCommonFields(), renderOptionalFields()]}
+      {renderPlatformSettings(renderCommonFields(), <div key={'empty'} />, renderOptionalFields())}
     </Form>
   );
 }

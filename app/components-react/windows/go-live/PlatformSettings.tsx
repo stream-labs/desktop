@@ -11,75 +11,44 @@ import { IGoLiveSettings } from '../../../services/streaming';
 import { YoutubeEditStreamInfo } from './platforms/youtube/YoutubeEditStreamInfo';
 import FacebookEditStreamInfo from './platforms/FacebookEditStreamInfo';
 import GoLiveError from './GoLiveError';
-import { Spin } from 'antd';
-
-interface IProps extends IGoLiveProps {
-  isScheduleMode?: boolean;
-}
+import LazySpinner from '../../shared/LazySpinner';
+import { Skeleton } from 'antd';
+import InputWrapper from '../../shared/inputs/InputWrapper';
 
 export default function PlatformSettings() {
   console.log('render platform settings');
   const {
     isMultiplatformMode,
     error,
-    isLoading,
     isAdvancedMode,
     enabledPlatforms,
+    getPlatformDisplayName,
+    locked,
+    loaded,
   } = useGoLiveSettings('PlatformSettings');
-  const shouldShowSettings = !error && !isLoading;
-
-  /**
-   * Update settings of a single platform
-   **/
-  // function updatePlatformSettings<T extends TPlatform>(
-  //   platform: T,
-  //   settingsPatch: Partial<IGoLiveSettings['platforms'][T]>,
-  // ) {
-  //   updateSettings({
-  //     ...settings,
-  //     platforms: {
-  //       ...settings.platforms,
-  //       [platform]: { ...settings.platforms[platform], ...settingsPatch },
-  //     },
-  //   });
-  // }
-
-
-  /**
-   * Renders settings for one platform
-   */
-  function renderPlatformSettings(platform: TPlatform) {
-    const platformName = getPlatformService(platform).displayName;
-    const title = $t('%{platform} Settings', { platform: platformName });
-    return (
-      <Section title={title} isSimpleMode={!isAdvancedMode} key={platform}>
-        {platform === 'twitch' && <TwitchEditStreamInfo />}
-        {/*{platform === 'facebook' && (*/}
-        {/*  <FacebookEditStreamInfo*/}
-        {/*    // settings={settings}*/}
-        {/*    // updatePlatformSettings={updatePlatformSettings}*/}
-        {/*    // isUpdateMode={v.isLive}*/}
-        {/*    // isScheduleMode={p.isScheduleMode}*/}
-        {/*  />*/}
-        {/*)}*/}
-        {/*{platform === 'youtube' && (*/}
-        {/*  <YoutubeEditStreamInfo*/}
-        {/*    // settings={settings}*/}
-        {/*    // updatePlatformSettings={updatePlatformSettings}*/}
-        {/*    // isScheduleMode={p.isScheduleMode}*/}
-        {/*  />*/}
-        {/*)}*/}
-      </Section>
-    );
-  }
+  const shouldShowSettings = !error && loaded;
 
   return (
-    <div>
-      {isLoading && <Spin size="large" />}
+    // minHeight is required for the loading spinner
+    <div style={{ minHeight: '150px' }}>
       <GoLiveError />
+
+      <LazySpinner visible={!loaded || locked} />
 
       {shouldShowSettings && (
         <div style={{ width: '100%' }}>
+          {/*<Section isSimpleMode={!isAdvancedMode}>*/}
+          {/*  <InputWrapper>*/}
+          {/*    <Skeleton active={true} paragraph={false} />*/}
+          {/*  </InputWrapper>*/}
+          {/*  <InputWrapper>*/}
+          {/*    <Skeleton.Input active={true} style={{ width: '100px' }} />*/}
+          {/*  </InputWrapper>*/}
+          {/*  <InputWrapper>*/}
+          {/*    <Skeleton.Input active={true} style={{ width: '100%' }} />*/}
+          {/*  </InputWrapper>*/}
+          {/*</Section>*/}
+
           {/*COMMON FIELDS*/}
           {isMultiplatformMode && (
             <Section isSimpleMode={!isAdvancedMode} title={$t('Common Stream Settings')}>
@@ -88,7 +57,17 @@ export default function PlatformSettings() {
           )}
 
           {/*SETTINGS FOR EACH ENABLED PLATFORM*/}
-          {enabledPlatforms.map((platform: TPlatform) => renderPlatformSettings(platform))}
+          {enabledPlatforms.map((platform: TPlatform) => (
+            <Section
+              title={$t('%{platform} Settings', { platform: getPlatformDisplayName(platform) })}
+              isSimpleMode={!isAdvancedMode}
+              key={platform}
+            >
+              {platform === 'twitch' && <TwitchEditStreamInfo />}
+              {platform === 'facebook' && <FacebookEditStreamInfo />}
+              {platform === 'youtube' && <YoutubeEditStreamInfo />}
+            </Section>
+          ))}
         </div>
       )}
     </div>

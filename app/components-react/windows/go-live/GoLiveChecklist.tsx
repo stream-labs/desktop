@@ -8,6 +8,8 @@ import { TGoLiveChecklistItemState } from '../../../services/streaming';
 import cx from 'classnames';
 import GoLiveError from './GoLiveError';
 import MessageLayout from './MessageLayout';
+import { Timeline } from 'antd';
+import { CheckCircleOutlined, CloseCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 
 /**
  * Shows transition to live progress and helps troubleshoot related problems
@@ -29,10 +31,11 @@ export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
   } = useGoLiveSettings('GoLiveChecklist', view => ({
     shouldShowOptimizedProfile:
       VideoEncodingOptimizationService.state.useOptimizedProfile && view.isMidStreamMode,
-    shouldPostTweet: TwitterService.state.tweetWhenGoingLive,
+    shouldPostTweet: !view.isUpdateMode && TwitterService.state.tweetWhenGoingLive,
     delayEnabled: StreamingService.delayEnabled,
-    checklist: view.info.checklist,
   }));
+
+  const success = lifecycle === 'live';
 
   useOnCreate(() => {
     // TODO:
@@ -48,9 +51,10 @@ export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
 
   function render() {
     return (
-      <div className={cx(css.container, p.className)}>
-        <h1>{getHeaderText()}</h1>
-        <ul className={css.checklist}>
+      <div className={cx(css.container, p.className, { [css.success]: success })}>
+        <h1 className={css.success}>{getHeaderText()}</h1>
+
+        <Timeline>
           {/* PLATFORMS UPDATE */}
           {enabledPlatforms.map(platform =>
             renderCheck(
@@ -78,7 +82,8 @@ export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
 
           {/* POST A TWEET */}
           {shouldPostTweet && renderCheck($t('Post a tweet'), checklist.postTweet)}
-        </ul>
+        </Timeline>
+
         {/* WARNING MESSAGE */}
         {warning === 'YT_AUTO_START_IS_DISABLED' && renderYtWarning()}
 
@@ -99,7 +104,7 @@ export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
     if (lifecycle === 'live') {
       return $t("You're live!");
     }
-    return $t('Working on your live stream');
+    return $t('Working on your live stream') + '...';
   }
 
   function renderCheck(
@@ -107,23 +112,55 @@ export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
     state: TGoLiveChecklistItemState,
     modificators?: { renderStreamDelay?: boolean },
   ) {
-    // TODO:
-    // const renderStreamDelay =
-    //   modificators?.renderStreamDelay &&
-    //   this.view.info.checklist.startVideoTransmission === 'pending';
+    let dot;
+    let color;
+    switch (state) {
+      case 'not-started':
+        dot = null;
+        color = 'grey';
+        break;
+      case 'pending':
+        color = 'orange';
+        dot = <LoadingOutlined spin={false} color={color} />;
+        break;
+      case 'done':
+        color = 'green';
+        dot = <CheckCircleOutlined color={color} />;
+        break;
+      case 'failed':
+        color = '#B14334'; // var(--red)
+        dot = <CloseCircleOutlined color={color} />;
+        break;
+    }
+
     return (
-      <li
+      <Timeline.Item
         key={title}
-        className={cx({
-          [css.notStarted]: state === 'not-started',
-          [css.itemError]: state === 'failed',
-        })}
+        dot={dot}
+        color={color}
+        className={state === 'pending' ? 'floating' : ''}
       >
-        <CheckMark state={state} />
-        <span>{title}</span>
-        {/*{renderStreamDelay && <span className={css.pending}> {this.delaySecondsRemaining}s</span>}*/}
-      </li>
+        <span className={state === 'pending' ? css.floating : ''}>{title}</span>
+      </Timeline.Item>
     );
+
+    // // TODO:
+    // // const renderStreamDelay =
+    // //   modificators?.renderStreamDelay &&
+    // //   this.view.info.checklist.startVideoTransmission === 'pending';
+    // return (
+    //   <li
+    //     key={title}
+    //     className={cx({
+    //       [css.notStarted]: state === 'not-started',
+    //       [css.itemError]: state === 'failed',
+    //     })}
+    //   >
+    //     <CheckMark state={state} />
+    //     <span>{title}</span>
+    //     {/*{renderStreamDelay && <span className={css.pending}> {this.delaySecondsRemaining}s</span>}*/}
+    //   </li>
+    // );
   }
 
   function renderYtWarning() {

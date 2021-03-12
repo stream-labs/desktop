@@ -8,15 +8,27 @@ import { ListInput, IInputCommonProps } from '../../../../shared/inputs';
 import { FormItemProps } from 'antd/lib/form';
 import { SelectProps } from 'antd/lib/select';
 import { IListOption } from '../../../../shared/inputs/ListInput';
-
+import { assertIsDefined } from '../../../../../util/properties-type-guards';
+import { Col, Row } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+const PlusIcon = PlusOutlined as Function;
 /**
- * Broadcast-selector for Youtube
+ * Broadcast-selector for Youtub
  */
 export default function BroadcastInput(
   p: { broadcasts: IYoutubeLiveBroadcast[] } & Omit<SelectProps<string>, 'options'> &
     IInputCommonProps<string> &
     FormItemProps,
 ) {
+  const imageStyle = { width: '60px', minWidth: '60px', height: '44px', borderRadius: '2px' };
+  const centerFlexStyle = { display: 'flex', alignItems: 'center', justifyContent: 'center' };
+  const options = [
+    {
+      label: $t('Create New Event'),
+      value: '',
+    },
+    ...p.broadcasts.map(b => ({ label: b.snippet.title, value: b.id })),
+  ];
   /**
    * format the isoDate to the locale-dependent format
    */
@@ -24,46 +36,61 @@ export default function BroadcastInput(
     return moment(new Date(isoDate)).format(moment.localeData().longDateFormat('ll'));
   }
 
+  function getBroadcast(id: string) {
+    return p.broadcasts.find(b => b.id === id);
+  }
+
   function optionRender(opt: IListOption<string>) {
+    if (!opt.value) return renderEmptyOption();
+    const broadcast = getBroadcast(opt.value);
+    assertIsDefined(broadcast);
     return (
-      <>
-        <div className={css.colImage}>
-          <div>
-            <i className="fa fa-plus" />
-          </div>
-        </div>
-        <div className={css.colDescription}>
-          <div>{$t('Create New Event')}</div>
-        </div>
-      </>
+      <Row style={{ height: '60px' }} gutter={8} wrap={false} align="middle">
+        <Col>
+          <img src={broadcast.snippet.thumbnails.default.url} style={imageStyle} />
+        </Col>
+        <Col flex="auto" style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <div>{broadcast.snippet.title}</div>
+          <div>{broadcast.snippet.description}</div>
+        </Col>
+        <Col flex="80px">
+          <div>{formatDate(broadcast.snippet.scheduledStartTime)}</div>
+        </Col>
+      </Row>
     );
   }
 
-  const firstOption = {
-    label: $t('Create New Event'),
-    className: cx(css.newBroadcast, css.broadcast),
-    value: '',
-    // el: () => (
-    //   <>
-    //     <div className={css.colImage}>
-    //       <div>
-    //         <i className="fa fa-plus" />
-    //       </div>
-    //     </div>
-    //     <div className={css.colDescription}>
-    //       <div>{$t('Create New Event')}</div>
-    //     </div>
-    //   </>
-    // ),
-  };
+  function renderEmptyOption() {
+    return (
+      <Row style={{ height: '60px' }} gutter={8} wrap={false} align="middle">
+        <Col>
+          <div
+            style={{ ...imageStyle, ...centerFlexStyle }}
+            className={'ant-upload ant-upload-select ant-upload-select-picture-card'}
+          >
+            <PlusIcon />
+          </div>
+        </Col>
+        <Col flex="auto">{$t('Create New Event')}</Col>
+      </Row>
+    );
+  }
 
-  // TODO:
-  const restOptions = p.broadcasts.map(broadcast => ({
-    title: '',
-    className: '',
-  }));
+  function labelRender(opt: IListOption<string>) {
+    if (!opt.value) return opt.label;
+    const broadcast = getBroadcast(opt.value);
+    assertIsDefined(broadcast);
+    return `${opt.label} (${formatDate(broadcast.snippet.scheduledStartTime)})`;
+  }
 
   return (
-    <ListInput {...p} onChange={p.onChange} options={[firstOption]} optionRender={optionRender} />
+    <ListInput
+      {...p}
+      onChange={p.onChange}
+      options={options}
+      optionRender={optionRender}
+      labelRender={labelRender}
+      showSearch
+    />
   );
 }

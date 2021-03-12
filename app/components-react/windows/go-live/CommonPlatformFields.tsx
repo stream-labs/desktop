@@ -39,7 +39,6 @@ export default function CommonPlatformFields(p: IProps) {
   const {
     updatePlatform,
     isAdvancedMode,
-    enabledPlatforms,
     getPlatformSettings,
     commonFields,
     updateCommonFields,

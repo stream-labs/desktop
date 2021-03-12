@@ -27,28 +27,32 @@ export default function GoLiveWindow() {
     goLive,
     isAdvancedMode,
     switchAdvancedMode,
+    prepopulate,
+    locked,
   } = useGoLiveSettings('GoLiveWindow');
 
-  const shouldShowConfirm = lifecycle === 'waitForNewSettings' && enabledPlatforms.length > 0;
+  const shouldShowConfirm = ['prepopulate', 'waitForNewSettings'].includes(lifecycle);
   const shouldShowSettings = ['empty', 'prepopulate', 'waitForNewSettings'].includes(lifecycle);
   const shouldShowChecklist = ['runChecklist', 'live'].includes(lifecycle);
   const shouldShowAdvancedSwitch = shouldShowConfirm && isMultiplatformMode;
   const shouldShowGoBackButton =
     lifecycle === 'runChecklist' && error && info.checklist.startVideoTransmission !== 'done';
 
+  // const shouldShowChecklist = true;
+  // const shouldShowSettings = false;
+
   // prepopulate data for all platforms
   useOnCreate(() => {
-    if (['empty', 'waitingForNewSettings'].includes(lifecycle)) {
-      console.log('Prepopulate');
-      StreamingService.actions.prepopulateInfo();
+    if (['empty', 'waitForNewSettings'].includes(lifecycle)) {
+      prepopulate();
     }
   });
 
   // clear failed checks and warnings on window close
   useOnDestroy(() => {
-    // if (info.checklist.startVideoTransmission !== 'done') {
-    //   StreamingService.actions.resetInfo();
-    // }
+    if (info.checklist.startVideoTransmission !== 'done') {
+      StreamingService.actions.resetInfo();
+    }
   });
 
   function close() {
@@ -56,7 +60,7 @@ export default function GoLiveWindow() {
   }
 
   function goBackToSettings() {
-    StreamingService.actions.prepopulateInfo();
+    prepopulate();
   }
 
   function render() {
@@ -71,14 +75,7 @@ export default function GoLiveWindow() {
           >
             <Animation transitionName="slideright">
               {/* STEP 1 - FILL OUT THE SETTINGS FORM */}
-              {shouldShowSettings && (
-                <GoLiveSettings
-                  key={'settings'}
-                  className={styles.page}
-                  // settings={settings}
-                  // updateSettings={updateSettings}
-                />
-              )}
+              {shouldShowSettings && <GoLiveSettings key={'settings'} className={styles.page} />}
 
               {/* STEP 2 - RUN THE CHECKLIST */}
               {shouldShowChecklist && <GoLiveChecklist className={styles.page} key={'checklist'} />}
@@ -92,13 +89,16 @@ export default function GoLiveWindow() {
   function renderFooter() {
     return (
       <Form layout={'inline'}>
-        <SwitchInput
-          label={$t('Show Advanced Settings')}
-          name="advancedMode"
-          onChange={switchAdvancedMode}
-          value={isAdvancedMode}
-          debounce={300}
-        />
+        {shouldShowAdvancedSwitch && (
+          <SwitchInput
+            label={$t('Show Advanced Settings')}
+            name="advancedMode"
+            onChange={switchAdvancedMode}
+            value={isAdvancedMode}
+            debounce={200}
+            disabled={locked}
+          />
+        )}
 
         {/* CLOSE BUTTON */}
         <Button onClick={close}>{$t('Close')}</Button>
@@ -110,7 +110,7 @@ export default function GoLiveWindow() {
 
         {/* GO LIVE BUTTON */}
         {shouldShowConfirm && (
-          <Button type="primary" onClick={goLive}>
+          <Button type="primary" onClick={goLive} disabled={locked}>
             {$t('Confirm & Go Live')}
           </Button>
         )}

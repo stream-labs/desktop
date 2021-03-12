@@ -20,7 +20,8 @@ type TInputType =
   | 'list'
   | 'tags'
   | 'switch'
-  | 'slider';
+  | 'slider'
+  | 'image';
 
 export interface IInputCommonProps<TValue> {
   value?: TValue;

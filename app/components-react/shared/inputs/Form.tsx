@@ -4,7 +4,7 @@ import { FormInstance, FormProps, FormItemProps } from 'antd/lib/form';
 
 type TFormContext = {
   antForm: FormInstance;
-  nowrap?: boolean;
+  disabled?: boolean;
 } & Pick<FormItemProps, 'labelCol' | 'wrapperCol'>;
 
 /**
@@ -15,10 +15,10 @@ export const FormContext = React.createContext<TFormContext | null>(null);
 /**
  * Form handle validations and sets the layout for the input components
  */
-export default React.memo(function Form(p: FormProps) {
+export default React.memo(function Form(p: FormProps & { disabled?: boolean }) {
   const context = useContext(FormContext);
   const [antForm] = AntForm.useForm(context?.antForm || p.form);
-  const [contextValue] = useState(() => {
+  const [contextValue, updateContextValue] = useState(() => {
     const layouts = {
       horizontal: {
         labelCol: { span: 8 },
@@ -32,6 +32,7 @@ export default React.memo(function Form(p: FormProps) {
     const layout = layouts[p.layout || 'horizontal'];
     return {
       ...layout,
+      disabled: p.disabled,
       antForm,
     };
   });

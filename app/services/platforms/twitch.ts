@@ -150,11 +150,13 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
     ) {
       const key = await this.fetchStreamKey();
       this.SET_STREAM_KEY(key);
-      this.streamSettingsService.setSettings({
-        key,
-        platform: 'twitch',
-        streamType: 'rtmp_common',
-      });
+      if (!this.streamingService.views.isMultiplatformMode) {
+        this.streamSettingsService.setSettings({
+          key,
+          platform: 'twitch',
+          streamType: 'rtmp_common',
+        });
+      }
     }
 
     if (goLiveSettings) {

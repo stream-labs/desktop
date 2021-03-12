@@ -1,6 +1,7 @@
 /// <reference path="./index.d.ts" />
 import NameFolder from './windows/NameFolder';
 import GoLiveWindow from './windows/go-live/GoLiveWindow';
+import EditStreamWindow from './windows/go-live/EditStreamWindow';
 import Playground from './windows/Playground';
 import NewsBanner from './root/NewsBanner';
 
@@ -8,6 +9,7 @@ import NewsBanner from './root/NewsBanner';
 export const components = {
   NameFolder,
   GoLiveWindow,
+  EditStreamWindow,
   Playground,
   NewsBanner,
 };

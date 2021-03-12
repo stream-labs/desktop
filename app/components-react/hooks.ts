@@ -6,6 +6,7 @@ import { useForm } from './shared/inputs/Form';
 import { FormInstance } from 'antd/lib/form/hooks/useForm';
 import { assertIsDefined } from '../util/properties-type-guards';
 import { Observable, Subject, Subscription } from 'rxjs';
+import { keys } from '../services/utils';
 
 /**
  * Creates a reactive state for a React component based on Vuex store
@@ -233,7 +234,7 @@ type TMergedTipple<T1,T2, T3> = TMerged<TMerged<T1, T2>, T3>;
 
 export function applyReactiveWatcher<T>(observable: T, changed: Observable<unknown>, updater: Function, destoryed: Observable<unknown>, debug: string): T {
   const watchedProps = {};
-  let prevState: object | null = null;
+  let prevState: object = {};
   const proxyObject = new Proxy({}, {
     get: (target, propName: string) => {
       const value = observable[propName];
@@ -288,6 +289,52 @@ export function applyReactiveWatcher<T>(observable: T, changed: Observable<unkno
 
   return proxyObject as T;
 }
+
+
+type TConvertMutationToAction<TState, TMutation> = TMutation extends (state: TState, ...args: infer TArgs) => TState ? (...args: TArgs) => TState : never;
+type TConvertMutationsToActions<TState, TMutations extends object, TMutationName extends keyof TMutations > = {[K in TMutationName]: TConvertMutationToAction<TState, TMutations[K]>}
+
+export type TReducer<TState> = (state: TState, ...args: any[]) => TState;
+
+export type TReducers<TState, TKey extends keyof any> = Record<TKey, TReducer<TState>>
+
+
+
+// export type TReducers<TState, TReducerSet = {}> = TReducerSet extends Record<infer Key, TReducer<TState>> ? Record<Key, TReducer<TState>> : never;
+
+// this method is only for typechecking
+export function createReducers<TState, TReducersSet extends TReducers<TState, any>>(getState: () => TState, reducers: TReducersSet) {
+  return reducers as TReducers<TState, keyof TReducersSet>;
+}
+
+export function createMutations<TState, TReducersSet extends Record<string, TReducer<TState>>, TMutationName extends keyof TReducersSet >(reducers: TReducersSet, getState: () => TState, setState: (newState: TState) => any): {[K in TMutationName]: TConvertMutationToAction<TState, TReducersSet[K]>}  {
+  const mutations = {} as any;
+  keys(reducers).forEach(key => {
+    mutations[key] = (...args: any[]) => setState(reducers[key](getState(), ...args))
+  });
+  return mutations
+}
+
+type MState = {foo: number, bar: string};
+const mutations = {
+  updateFoo(state: MState, fooValue: number) {
+    return state;
+  },
+  updateBar(state: MState, barValue: string) {
+    return state;
+  }
+}
+
+function getState(): MState {
+  return {foo: 1, bar: 'bar'}
+}
+
+function setState(newState: MState) {
+}
+
+const acts = createMutations(mutations, getState, setState);
+acts.updateBar('22')
+
 
 // function combineWithComputed<TComputed, TState extends object>(watcher: (state: TState) => TComputed) {
 //   const myState: TState = { a: 1, b: 2};
