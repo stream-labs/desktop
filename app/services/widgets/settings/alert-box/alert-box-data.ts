@@ -32,6 +32,7 @@ export const API_NAME_MAP = {
   loyalty_store_redemption: 'loyaltystore',
 };
 
+// different tests are required due to api idiosyncracies
 const determineTester = (key: string) => {
   switch (key) {
     case 'facebook_stars':
