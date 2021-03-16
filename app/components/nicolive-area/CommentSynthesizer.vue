@@ -11,15 +11,11 @@
       </div>
       <div class="row">
         <div class="name">声の高さ(基本=1.0)</div>
-        <div class="value"><VueSlider
-          :data="[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2]"
-          :width="128" v-model="pitch" /></div>
+        <div class="value"><VueSlider :data="pitchCandidates" :width="128" v-model="pitch" /></div>
       </div>
       <div class="row">
         <div class="name">読み上げ速度(基本=1.0)</div>
-        <div class="value"><VueSlider
-          :data="[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.5, 1.75, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
-          :width="128" v-model="rate" /></div>
+        <div class="value"><VueSlider :data="rateCandidates" :width="128" v-model="rate" /></div>
       </div>
       <div class="row">
           <button type="button" class="item-misc icon-btn icon-play" @click="play">テスト再生</button>

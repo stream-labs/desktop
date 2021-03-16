@@ -23,22 +23,22 @@ export default class CommentSynthesizer extends Vue {
   private index: number = 0;
 
   async play() {
-      const service = this.nicoliveCommentSynthesizerService;
+    const service = this.nicoliveCommentSynthesizerService;
 
-      const speech = service.makeSimpleTextSpeech('これは読み上げ設定のテスト音声です');
-      if (speech) {
-        this.index++;
-        if (service.speaking) {
-            service.cancelSpeak();
-            await sleep(200);
-        }
-        service.speakText(speech,
-            (e) => {
-                console.log(`#${this.index}: onstart`, e);
-            }, (e) => {
-                console.log(`#${this.index}: onend`, e);
-            } );
+    const speech = service.makeSimpleTextSpeech('これは読み上げ設定のテスト音声です');
+    if (speech) {
+      this.index++;
+      if (service.speaking) {
+        service.cancelSpeak();
+        await sleep(200);
       }
+      service.speakText(speech,
+        (e) => {
+          console.log(`#${this.index}: onstart`, e);
+        }, (e) => {
+          console.log(`#${this.index}: onend`, e);
+        });
+    }
   }
 
   get enabled(): boolean {
@@ -54,11 +54,17 @@ export default class CommentSynthesizer extends Vue {
   set pitch(e: number) {
     this.nicoliveCommentSynthesizerService.pitch = e;
   }
+  get pitchCandidates(): number[] {
+    return [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2]
+  }
 
   get rate(): number {
     return this.nicoliveCommentSynthesizerService.rate;
   }
   set rate(e: number) {
     this.nicoliveCommentSynthesizerService.rate = e;
+  }
+  get rateCandidates(): number[] {
+    return [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.5, 1.75, 2, 3, 4, 5, 6, 7, 8, 9, 10]
   }
 }
