@@ -5,7 +5,7 @@ import { ModalLayout } from '../shared/ModalLayout';
 import { $t } from '../../services/i18n';
 import React, { useState } from 'react';
 import { Services } from '../service-provider';
-import { useOnce } from '../hooks';
+import { FileInput } from '../shared/inputs';
 import styles from './IconLibraryProperties.m.less';
 
 export default () => {
@@ -42,6 +42,7 @@ export default () => {
   return (
     <ModalLayout fixedChild={PreviewImage}>
       <div>
+        <FileInput onChange={selectFolder} value={folderPath} />
         {folderImages.map(image => (
           <ImageCell path={image} isSelected={image === selectedIcon} handleClick={selectIcon} />
         ))}
