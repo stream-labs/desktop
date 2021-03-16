@@ -1,6 +1,8 @@
 import { mutation, StatefulService } from 'services/stateful-service';
+import { Inject } from 'util/injector';
 import { WrappedChat } from './nicolive-comment-viewer';
 import replace_rules from './replace_rules.json';
+import { NicoliveProgramStateService } from './state';
 
 export class ParaphraseDictionary {
   dictionary = replace_rules.elements.map(e => ({
@@ -31,11 +33,22 @@ interface ICommentSynthesizerState {
 };
 
 export class NicoliveCommentSynthesizerService extends StatefulService<ICommentSynthesizerState> {
+  @Inject('NicoliveProgramStateService') stateService: NicoliveProgramStateService;
+
   static initialState: ICommentSynthesizerState = {
     enabled: true,
     pitch: 1,
     rate: 1,
     volume: 1,
+  }
+
+  init(): void {
+    this.stateService.updated.subscribe({
+      next: persistentState => {
+        const newState = persistentState.speechSynthesizerSettings || NicoliveCommentSynthesizerService.initialState;
+        this.SET_STATE(newState);
+      }
+    });
   }
 
   setEnabled(enabled: boolean) {
@@ -80,7 +93,7 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
 
   private setState(partialState: Partial<ICommentSynthesizerState>) {
     const nextState = { ...this.state, ...partialState };
-    this.SET_STATE(nextState);
+    this.stateService.updateSpeechSynthesizerSettings(nextState);
   }
 
   @mutation()
