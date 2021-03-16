@@ -32,6 +32,7 @@ const alertNameMap = () => ({
   subscribers: $t('Subscribers'), // YouTube
   stars: $t('Stars'),
   support: $t('Support'),
+  giftSupport: $t('Gifted Support'),
   likes: $t('Likes'),
   shares: $t('Shares'),
   fbfollows: $t('Follows'),
