@@ -103,6 +103,10 @@ export default class CommentViewer extends Vue {
     return this.nicoliveCommentViewerService.items.filter(this.filterFn);
   }
 
+  get speakingEnabled(): boolean {
+    return this.nicoliveCommentViewerService.speakingEnabled;
+  }
+
   get speakingSeqId() {
     return this.nicoliveCommentViewerService.speakingSeqId;
   }

@@ -4,7 +4,7 @@
       <i class="icon-reload icon-btn" v-tooltip.bottom="commentReloadTooltip" @click="refreshConnection"></i>
       <i class="icon-ng icon-btn" v-tooltip.bottom="filterTooltip" @click="isFilterOpened = true"></i>
       <i class="icon-settings icon-btn" v-tooltip.bottom="localFilterTooltip" @click="isLocalFilterOpened = true"></i>
-      <i class="icon-settings icon-btn" v-tooltip.bottom="commentSynthesizerTooltip" @click="isCommentSynthesizerOpened = true"></i>
+      <i :class="['icon-btn', speakingEnabled ? 'icon-settings' : 'icon-mute']" v-tooltip.bottom="commentSynthesizerTooltip" @click="isCommentSynthesizerOpened = true"></i>
     </div>
     <div class="content">
       <div class="list" ref="scroll">

@@ -77,6 +77,9 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
     return this.state.messages;
   }
 
+  get speakingEnabled(): boolean {
+    return this.nicoliveCommentSynthesizerService.enabled;
+  }
   get speakingSeqId() {
     return this.state.speakingSeqId;
   }

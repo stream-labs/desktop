@@ -27,9 +27,6 @@
       <div class="row">
           <button class="button" @click="play">テスト再生</button>
       </div>
-      <div class="row">
-          <button class="button button--go-live" @click="apply(); close();">OK</button>
-      </div>
     </div>
   </div>
 </template>
@@ -113,11 +110,6 @@
   &:focus {
     border: 1px solid @text-primary;
   }
-}
-
-
-.button--go-live {
-  font-size: 12px;
 }
 </style>
 
