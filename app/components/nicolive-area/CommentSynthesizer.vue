@@ -20,6 +20,11 @@
         <button type="button" @click="resetRate">リセット</button>
       </div>
       <div class="row">
+        <div class="name">読み上げ音量(最大=1.0)</div>
+        <div class="value"><VueSlider :data="volumeCandidates" :max="1" :width="128" v-model="volume" /></div>
+        <button type="button" @click="resetVolume">リセット</button>
+      </div>
+      <div class="row">
           <button class="button" @click="play">テスト再生</button>
       </div>
       <div class="row">

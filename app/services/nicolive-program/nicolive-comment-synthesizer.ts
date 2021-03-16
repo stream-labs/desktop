@@ -20,12 +20,14 @@ export type Speech = {
   text: string;
   pitch?: number;
   rate?: number;
+  volume?: number;
 }
 
 interface ICommentSynthesizerState {
   enabled: boolean;
   pitch: number; // SpeechSynthesisUtterance.pitch; 0(lowest) to 2(highest) (default: 1)
   rate: number; // SpeechSynthesisUtterence.rate; 0.1(lowest) to 10(highest); default:1
+  volume: number; // SpeechSynthesisUtterance.volume; 0(lowest) to 1(highest)
 };
 
 export class NicoliveCommentSynthesizerService extends StatefulService<ICommentSynthesizerState> {
@@ -33,6 +35,7 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     enabled: true,
     pitch: 1,
     rate: 1,
+    volume: 1,
   }
 
   setEnabled(enabled: boolean) {
@@ -65,6 +68,16 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     this.setRate(r);
   }
 
+  setVolume(volume: number) {
+    this.setState({ volume });
+  }
+  get volume(): number {
+    return this.state.volume;
+  }
+  set volume(r: number) {
+    this.setVolume(r);
+  }
+
   private setState(partialState: Partial<ICommentSynthesizerState>) {
     const nextState = { ...this.state, ...partialState };
     this.SET_STATE(nextState);
@@ -88,6 +101,7 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
       return {
         pitch: this.state.pitch,
         rate: this.state.rate,
+        volume: this.state.volume,
         ...r,
       };
     }
@@ -152,6 +166,7 @@ export class NicoliveCommentSynthesizer {
     const uttr = new SpeechSynthesisUtterance(speech.text);
     uttr.pitch = speech.pitch || 1;
     uttr.rate = speech.rate || 1;
+    uttr.volume = speech.volume || 1;
     uttr.onstart = onstart;
     uttr.onend = onend;
     speechSynthesis.speak(uttr);
