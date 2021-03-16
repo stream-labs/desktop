@@ -16,6 +16,19 @@ export default class CommentSynthesizer extends Vue {
   @Inject()
   private nicoliveCommentSynthesizerService: NicoliveCommentSynthesizerService;
 
+  pitch: number = 0;
+  rate: number = 0;
+
+  mounted() {
+    this.pitch = this.nicoliveCommentSynthesizerService.pitch;
+    this.rate = this.nicoliveCommentSynthesizerService.rate;
+  }
+
+  apply() {
+    this.nicoliveCommentSynthesizerService.pitch = this.pitch;
+    this.nicoliveCommentSynthesizerService.rate = this.rate;
+  }
+
   close() {
     this.$emit('close');
   }
@@ -32,6 +45,10 @@ export default class CommentSynthesizer extends Vue {
         service.cancelSpeak();
         await sleep(200);
       }
+
+      speech.pitch = this.pitch;
+      speech.rate = this.rate;
+
       service.speakText(speech,
         (e) => {
           console.log(`#${this.index}: onstart`, e);
@@ -48,29 +65,17 @@ export default class CommentSynthesizer extends Vue {
     this.nicoliveCommentSynthesizerService.enabled = e;
   }
 
-  get pitch(): number {
-    return this.nicoliveCommentSynthesizerService.pitch;
-  }
-  set pitch(e: number) {
-    this.nicoliveCommentSynthesizerService.pitch = e;
-  }
   get pitchCandidates(): number[] {
     return [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2]
   }
   resetPitch() {
-    this.pitch = 1.0
+    this.pitch = 1.0;
   }
 
-  get rate(): number {
-    return this.nicoliveCommentSynthesizerService.rate;
-  }
-  set rate(e: number) {
-    this.nicoliveCommentSynthesizerService.rate = e;
-  }
   get rateCandidates(): number[] {
     return [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.5, 1.75, 2, 3, 4, 5, 6, 7, 8, 9, 10]
   }
   resetRate() {
-    this.rate = 1.0
+    this.rate = 1.0;
   }
 }

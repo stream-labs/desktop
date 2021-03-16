@@ -20,7 +20,10 @@
         <button type="button" @click="resetRate">リセット</button>
       </div>
       <div class="row">
-          <button type="button" class="item-misc icon-btn icon-play" @click="play">テスト再生</button>
+          <button class="button" @click="play">テスト再生</button>
+      </div>
+      <div class="row">
+          <button class="button button--go-live" @click="apply(); close();">OK</button>
       </div>
     </div>
   </div>
@@ -105,6 +108,11 @@
   &:focus {
     border: 1px solid @text-primary;
   }
+}
+
+
+.button--go-live {
+  font-size: 12px;
 }
 </style>
 
