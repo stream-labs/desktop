@@ -137,6 +137,10 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
 export class NicoliveCommentSynthesizer {
   dictionary = new ParaphraseDictionary();
 
+  get available(): boolean {
+    return window.speechSynthesis !== undefined
+  }
+
   makeSpeech(chat: WrappedChat): Speech | null {
     if (!chat.value || !chat.value.content) {
       return null;
@@ -158,7 +162,7 @@ export class NicoliveCommentSynthesizer {
     onstart: (this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => any,
     onend: (this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => any
   ) {
-    if (!speech || speech.text == '') {
+    if (!speech || speech.text == '' || !this.available) {
       return;
     }
     console.log(`speechText: ${speech.text}`);
@@ -173,10 +177,13 @@ export class NicoliveCommentSynthesizer {
   }
 
   get speaking(): boolean {
-    return speechSynthesis.speaking;
+    return this.available && speechSynthesis.speaking;
   }
 
   cancelSpeak() {
+    if (!this.available) {
+      return;
+    }
     speechSynthesis.cancel();
   }
 }

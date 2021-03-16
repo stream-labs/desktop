@@ -7,11 +7,16 @@ const setup = createSetupFunction({
     NicoliveCommentFilterService: {
       stateChange: new Subject(),
     },
+    NicoliveCommentSynthesizerService: {
+      stateChange: new Subject(),
+      available: false,
+    }
   },
 });
 
 jest.mock('services/nicolive-program/nicolive-program', () => ({ NicoliveProgramService: {} }));
 jest.mock('services/nicolive-program/nicolive-comment-filter', () => ({ NicoliveCommentFilterService: {} }));
+jest.mock('services/nicolive-program/nicolive-comment-synthesizer', () => ({ NicoliveCommentSynthesizerService: {} }));
 
 beforeEach(() => {
   jest.doMock('services/stateful-service');
@@ -145,6 +150,8 @@ test('chatメッセージはstateに保持する', () => {
 
   // bufferTime tweaks
   clientSubject.complete();
+  expect(clientSubject.hasError).toBeFalsy()
+  expect(clientSubject.thrownError).toBeNull()
 
   expect(instance.state.messages).toMatchInlineSnapshot(`
     Array [
