@@ -12,10 +12,12 @@
       <div class="row">
         <div class="name">声の高さ(基本=1.0)</div>
         <div class="value"><VueSlider :data="pitchCandidates" :width="128" v-model="pitch" /></div>
+        <button type="button" @click="resetPitch">リセット</button>
       </div>
       <div class="row">
         <div class="name">読み上げ速度(基本=1.0)</div>
         <div class="value"><VueSlider :data="rateCandidates" :width="128" v-model="rate" /></div>
+        <button type="button" @click="resetRate">リセット</button>
       </div>
       <div class="row">
           <button type="button" class="item-misc icon-btn icon-play" @click="play">テスト再生</button>
