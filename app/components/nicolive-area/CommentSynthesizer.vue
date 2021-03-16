@@ -11,21 +11,21 @@
       </div>
       <div class="row">
         <div class="name">声の高さ(基本=1.0)</div>
-        <div class="value"><VueSlider :data="pitchCandidates" :width="128" v-model="pitch" /></div>
-        <button type="button" @click="resetPitch">リセット</button>
+        <div class="value"><VueSlider :disabled="!enabled" :data="pitchCandidates" :width="128" v-model="pitch" /></div>
+        <button type="button" :disabled="!enabled" @click="resetPitch">リセット</button>
       </div>
       <div class="row">
         <div class="name">読み上げ速度(基本=1.0)</div>
-        <div class="value"><VueSlider :data="rateCandidates" :width="128" v-model="rate" /></div>
-        <button type="button" @click="resetRate">リセット</button>
+        <div class="value"><VueSlider :disabled="!enabled" :data="rateCandidates" :width="128" v-model="rate" /></div>
+        <button type="button" :disabled="!enabled" @click="resetRate">リセット</button>
       </div>
       <div class="row">
         <div class="name">読み上げ音量(最大=1.0)</div>
-        <div class="value"><VueSlider :data="volumeCandidates" :max="1" :width="128" v-model="volume" /></div>
-        <button type="button" @click="resetVolume">リセット</button>
+        <div class="value"><VueSlider :disabled="!enabled" :data="volumeCandidates" :max="1" :width="128" v-model="volume" /></div>
+        <button type="button" :disabled="!enabled" @click="resetVolume">リセット</button>
       </div>
       <div class="row">
-          <button class="button" @click="play">テスト再生</button>
+          <button class="button" :disabled="!enabled" @click="play">テスト再生</button>
       </div>
     </div>
   </div>
