@@ -32,11 +32,6 @@ export const API_NAME_MAP = {
   loyalty_store_redemption: 'loyaltystore',
 };
 
-export const REGEX_TESTERS = Object.keys(API_NAME_MAP).map(key => ({
-  name: API_NAME_MAP[key],
-  tester: determineTester(key),
-}));
-
 const determineTester = (key: string) => {
   switch (key) {
     case 'facebook_stars':
@@ -47,6 +42,11 @@ const determineTester = (key: string) => {
       return new RegExp(`^${key}s?_|show_${key}_`);
   }
 };
+
+export const REGEX_TESTERS = Object.keys(API_NAME_MAP).map(key => ({
+  name: API_NAME_MAP[key],
+  tester: determineTester(key),
+}));
 
 export const conditions = () => ({
   base: [{ value: 'RANDOM', title: $t('Randomly') }],
