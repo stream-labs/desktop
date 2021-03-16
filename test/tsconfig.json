@@ -12,6 +12,7 @@
     "allowJs": true,
     "noImplicitAny": true,
     "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
     "experimentalDecorators": true,
     "noImplicitThis": true,
     "removeComments": true,
