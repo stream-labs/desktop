@@ -18,7 +18,6 @@ import {
 } from './ResponseTypes';
 import { addClipboardMenu } from 'util/addClipboardMenu';
 import { handleErrors } from 'util/requests';
-import Util from 'services/utils';
 const { BrowserWindow } = remote;
 
 export enum CreateResult {
@@ -61,7 +60,7 @@ export function isOk<T>(result: WrappedResult<T>): result is SucceededResult<T> 
   return result.ok === true;
 }
 
-export class NotLoggedInError { }
+export class NotLoggedInError {}
 
 export class NicoliveClient {
   static live2BaseURL = 'https://live2.nicovideo.jp';
@@ -428,13 +427,13 @@ export class NicoliveClient {
   async fetchOnairChannelProgram(channelId: string): Promise<WrappedResult<OnairChannelProgramData>> {
     const url = `${NicoliveClient.live2BaseURL}/unama/tool/v2/onairs/channels/${channelId}`
     const headers = new Headers();
-    try {
+   try {
       const userSession = await this.fetchSession();
       headers.append('X-niconico-session', userSession);
       const request = new Request(url, { headers });
       const response = await fetch(request);
       return NicoliveClient.wrapResult<OnairChannelProgramData>(response);
-    } catch (error) {
+    } catch(error) {
       return NicoliveClient.wrapFetchError(error);
     }
   }
@@ -518,9 +517,6 @@ export class NicoliveClient {
       });
       ipcRenderer.send('window-preventLogout', win.id);
       ipcRenderer.send('window-preventNewWindow', win.id);
-      if (Util.isDevMode()) {
-        win.webContents.openDevTools({ mode: 'detach' });
-      }
       win.loadURL('https://live2.nicovideo.jp/create');
     });
   }
