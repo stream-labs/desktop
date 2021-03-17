@@ -1,24 +1,30 @@
 import React from 'react';
 import { remote } from 'electron';
 import { Button, Input } from 'antd';
-import { InputComponent, useInput } from './inputs';
-import { TTextInputProps } from './TextInput';
+import { InputProps } from 'antd/lib/input';
+import { InputComponent, useInput, TSlobsInputProps } from './inputs';
 import InputWrapper from './InputWrapper';
 import { $t } from '../../../services/i18n';
 
-export const FileInput = InputComponent((p: TTextInputProps) => {
+type TFileInputProps = TSlobsInputProps<
+  { directory?: boolean; filters?: Electron.FileFilter[] },
+  string,
+  InputProps
+>;
+
+export const FileInput = InputComponent((p: TFileInputProps) => {
   const { inputAttrs, wrapperAttrs } = useInput('text', p);
 
   async function showFileDialog() {
     const options: Electron.OpenDialogOptions = {
-      defaultPath: this.value,
-      filters: this.metadata.filters,
+      defaultPath: inputAttrs.value,
+      filters: p.filters,
       properties: [],
     };
 
-    if (this.metadata.directory) {
+    if (p.directory && options.properties) {
       options.properties.push('openDirectory');
-    } else {
+    } else if (options.properties) {
       options.properties.push('openFile');
     }
 
