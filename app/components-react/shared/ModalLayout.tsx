@@ -67,7 +67,7 @@ export function ModalLayout(p: TProps) {
 
   return (
     <div className={cx('ant-modal-content', v.currentTheme)} style={wrapperStyles}>
-      {p.fixedChild && <div>{p.fixedChild}</div>}
+      {p.fixedChild}
       <div className="ant-modal-body" style={bodyStyles}>
         {p.children}
       </div>

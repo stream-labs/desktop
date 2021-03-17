@@ -134,6 +134,8 @@ export default class SourcesShowcase extends Vue {
       this.selectStreamlabel();
     } else if (this.inspectedSource === 'replay') {
       this.selectSource('ffmpeg_source', { propertiesManager: 'replay' });
+    } else if (this.inspectedSource === 'icon_library') {
+      this.selectSource('image_source', { propertiesManager: 'iconLibrary' });
     } else if (this.inspectedSource === 'app_source') {
       this.selectAppSource(this.inspectedAppId, this.inspectedAppSourceId);
     } else {

@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { Services } from '../service-provider';
 import { FileInput } from '../shared/inputs';
 import styles from './IconLibraryProperties.m.less';
+import { TObsType } from '../../components/obs/inputs/ObsInput';
 
 export default () => {
   // inject services
@@ -31,8 +32,18 @@ export default () => {
   const selectIcon = (iconPath: string) => {
     if (!source) return;
     setSelectedIcon(iconPath);
-    source.updateSettings({ path: iconPath });
+    source.setPropertiesFormData([
+      {
+        description: 'Image File',
+        name: 'file',
+        type: 'OBS_PROPERTY_FILE' as TObsType,
+        value: iconPath,
+        visible: true,
+      },
+    ]);
   };
+
+  const filters = [{ name: 'Images', extensions: ['jpg', 'png', 'gif'] }];
 
   const PreviewImage = () => {
     if (!selectedIcon) return <div />;
@@ -40,12 +51,19 @@ export default () => {
   };
 
   return (
-    <ModalLayout fixedChild={PreviewImage}>
+    <ModalLayout fixedChild={<PreviewImage />}>
       <div>
-        <FileInput onChange={selectFolder} value={folderPath} />
-        {folderImages.map(image => (
-          <ImageCell path={image} isSelected={image === selectedIcon} handleClick={selectIcon} />
-        ))}
+        <FileInput onChange={selectFolder} value={folderPath} directory={true} filters={filters} />
+        <div style={{ display: 'flex' }}>
+          {folderImages.map(image => (
+            <ImageCell
+              path={image}
+              isSelected={image === selectedIcon}
+              handleClick={selectIcon}
+              key={image}
+            />
+          ))}
+        </div>
       </div>
     </ModalLayout>
   );
