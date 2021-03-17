@@ -3,11 +3,11 @@ import path from 'path';
 import fs from 'fs';
 import { ModalLayout } from '../shared/ModalLayout';
 import { $t } from '../../services/i18n';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Services } from '../service-provider';
 import { FileInput } from '../shared/inputs';
 import styles from './IconLibraryProperties.m.less';
-import { TObsType } from '../../components/obs/inputs/ObsInput';
+import { TObsType, IObsPathInputValue } from '../../components/obs/inputs/ObsInput';
 
 export default () => {
   // inject services
@@ -20,16 +20,31 @@ export default () => {
   const [folderImages, setFolderImages] = useState(['']);
   const [selectedIcon, setSelectedIcon] = useState('');
 
-  const selectFolder = (folder: string) => {
+  useEffect(lifecycle, []);
+
+  function lifecycle() {
+    if (source) {
+      const formData = source.getPropertiesFormData()[0] as IObsPathInputValue;
+      setFolderPath(formData.defaultPath);
+
+      fs.readdir(formData.defaultPath, (err: Error, files: string[]) => {
+        setFolderImages(files.map((file: string) => path.join(formData.defaultPath, file)));
+      });
+
+      setSelectedIcon(formData.value);
+    }
+  }
+
+  function selectFolder(folder: string) {
     setFolderPath(folder);
 
     fs.readdir(folder, (err: Error, files: string[]) => {
       setFolderImages(files.map((file: string) => path.join(folder, file)));
       selectIcon(path.join(folder, files[0]));
     });
-  };
+  }
 
-  const selectIcon = (iconPath: string) => {
+  function selectIcon(iconPath: string) {
     if (!source) return;
     setSelectedIcon(iconPath);
     source.setPropertiesFormData([
@@ -41,7 +56,7 @@ export default () => {
         visible: true,
       },
     ]);
-  };
+  }
 
   const filters = [{ name: 'Images', extensions: ['jpg', 'png', 'gif'] }];
 
