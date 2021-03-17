@@ -1,16 +1,15 @@
 import { Node } from './node';
+import { ScenesService } from '../../scenes';
 import { Scene } from '../../scenes/scene';
 import { HotkeysNode } from './hotkeys';
 import { SourcesService } from '../../sources';
-import { ISceneItemFolder, ScenesService, TSceneNodeType } from '../../scenes';
 import { Inject } from '../../core/injector';
 
 interface ISchema {
   items: TSceneNodeInfo[];
 }
 
-export interface ISceneItemInfo {
-  id: string;
+export interface ISceneItemInfo extends ISceneNodeInfo {
   sourceId: string;
   x: number;
   y: number;
@@ -21,13 +20,21 @@ export interface ISceneItemInfo {
   hotkeys?: HotkeysNode;
   locked?: boolean;
   rotation?: number;
-
-  sceneNodeType?: TSceneNodeType;
-  parentId?: string;
-
+  sceneNodeType: 'item';
 }
 
-export type TSceneNodeInfo =  ISceneItemInfo | ISceneItemFolder;
+interface ISceneItemFolderInfo extends ISceneNodeInfo {
+  name: string;
+  sceneNodeType: 'folder';
+  childrenIds: string[];
+}
+
+interface ISceneNodeInfo {
+  id: string;
+  sceneNodeType: 'item' | 'folder';
+}
+
+export type TSceneNodeInfo = ISceneItemInfo | ISceneItemFolderInfo;
 
 interface IContext {
   scene: Scene;
@@ -58,6 +65,7 @@ export class SceneItemsNode extends Node<ISchema, {}> {
           hotkeys.save({ sceneItemId: sceneItem.sceneItemId }).then(() => {
             const transform = sceneItem.transform;
             resolve({
+              hotkeys,
               id: sceneItem.sceneItemId,
               sourceId: sceneItem.sourceId,
               x: transform.position.x,
@@ -67,12 +75,15 @@ export class SceneItemsNode extends Node<ISchema, {}> {
               visible: sceneItem.visible,
               crop: transform.crop,
               locked: sceneItem.locked,
-              hotkeys,
               rotation: transform.rotation,
+              sceneNodeType: 'item',
             });
           });
         } else {
-          resolve(sceneItem.getModel());
+          resolve({
+            ...sceneItem.getModel(),
+            childrenIds: sceneItem.childrenIds,
+          });
         }
       });
     });
@@ -109,7 +120,7 @@ export class SceneItemsNode extends Node<ISchema, {}> {
 
     this.data.items.forEach(item => {
       if (item.sceneNodeType === 'folder') return;
-      const hotkeys = (item as ISceneItemInfo).hotkeys;
+      const hotkeys = item.hotkeys;
       if (hotkeys) promises.push(hotkeys.load({ sceneItemId: item.id }));
     });
 

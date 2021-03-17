@@ -133,7 +133,7 @@ export class SceneCollectionsService extends Service
   /// install preset scene collection into active scene collection
   async installPresetSceneCollection() {
     // 既存scene を消す
-    this.scenesService.scenes.forEach(scene => scene.remove(true));
+    this.scenesService.removeAllScenes();
 
     // キャンバス解像度を 1280x720 に変更する
     const CanvasResolution = '1280x720';
@@ -578,7 +578,7 @@ export class SceneCollectionsService extends Service
       this.transitionsService.deleteAllTransitions();
       this.transitionsService.deleteAllConnections();
     } catch (e) {
-      console.error('Error deloading application state');
+      console.error('Error deloading application state', e);
     }
 
     this.hotkeysService.clearAllHotkeys();

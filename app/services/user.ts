@@ -119,12 +119,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   /**
-   * @deprecated
    * This is a uuid that persists across the application lifetime and uniquely
    * identifies this particular installation of N Air, even when the user is
    * not logged in.
    */
-  private getLocalUserId() {
+  getLocalUserId() {
     const localStorageKey = 'NAirLocalUserId';
     let userId = localStorage.getItem(localStorageKey);
 
@@ -366,17 +365,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         exceptionWhenGetSystemInfo: err,
       };
     }
-  }
-
-  popoutRecentEvents() {
-    this.windowsService.createOneOffWindow({
-      componentName: 'RecentEvents',
-      title: $t('Recent Events'),
-      size: {
-        width: 800,
-        height: 600
-      }
-    }, 'RecentEvents');
   }
 
   async updateStreamSettings(programId: string): Promise<IStreamingSetting> {

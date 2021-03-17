@@ -29,7 +29,7 @@ export default class RenameSource extends Vue {
 
   submit() {
     if (!this.name) {
-      this.error = $t('The source name is required');
+      this.error = $t('sources.sourceNameIsRequired');
     } else {
       this.sourcesService.getSource(this.options.sourceId).setName(this.name);
       this.windowsService.closeChildWindow();

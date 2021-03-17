@@ -12,5 +12,6 @@
   "pushToTalk": "Push to Talk",
   "enableStudioMode": "Enable Studio Mode",
   "disableStudioMode": "Disable Studio Mode",
-  "studioModeTransition": "Transition (Studio Mode)"
+  "studioModeTransition": "Transition (Studio Mode)",
+  "saveReplay": "Save Replay"
 }

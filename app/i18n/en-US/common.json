@@ -60,5 +60,17 @@
   "help": "Help",
   "simpleMode": "Simple Mode",
   "twitter": "Post to Twitter",
-  "manualExtendButton": "Extend 30 minutes"
+  "manualExtendButton": "Extend 30 minutes",
+  "Hr": "Hr",
+  "Min": "Min",
+  "Sec": "Sec",
+  "fieldIsRequired": "The field is required",
+  "fieldMustBeLarger": "The field value must be %{value} or larger",
+  "fieldMustBeLess": "The field value must be %{value} or less",
+  "dateFieldFormat": "The date must be in %{format} format",
+  "fieldAlphaNumeric": "This field may only contain alphabetic characters or numbers",
+  "OBSInit.ErrorTitle": "Initialization Error",
+  "OBSInit.UnknownError": "An unknown error was encountered while initializing OBS.",
+  "OBSInit.ModuleNotFoundError": "DirectX could not be found on your system. Please install the latest version of DirectX for your machine here <https://www.microsoft.com/en-us/download/details.aspx?id=35?> and try again.",
+  "OBSInit.NotSupportedError": "Failed to initialize OBS. Your video drivers may be out of date, or N Air may not be supported on your system."
 }

@@ -115,7 +115,8 @@
         "ffmpeg_nvenc": "@:settings.Output.Streaming.Encoder.ffmpeg_nvenc",
         "x264": "@:settings.Output.Streaming.Encoder.obs_x264",
         "qsv": "@:settings.Output.Streaming.Encoder.obs_qsv11",
-        "nvenc": "@:settings.Output.Streaming.Encoder.ffmpeg_nvenc"
+        "nvenc": "@:settings.Output.Streaming.Encoder.ffmpeg_nvenc",
+        "jim_nvenc": "@:settings.Output.Streaming.Encoder.jim_nvenc"
       },
       "ABitrate": {
         "name": null
@@ -150,6 +151,7 @@
       "NVENCPreset": {
         "name": null,
         "default": null,
+        "mq": null,
         "hq": null,
         "hp": null,
         "ll": null,
@@ -166,7 +168,8 @@
         "name": "Encoder",
         "obs_x264": "Software (x264)",
         "obs_qsv11": "Hardware (QSV)",
-        "ffmpeg_nvenc": "Hardware (NVENC)"
+        "ffmpeg_nvenc": "Hardware (NVENC)",
+        "jim_nvenc": "Hardware (NVENC NEW)"
       },
       "ApplyServiceSettings": {
         "name": "@:settings.Output.Streaming.EnforceBitrate.name"
@@ -201,6 +204,13 @@
       },
       "preset": {
         "name": null,
+        "mq": "@:settings.Output.Streaming.NVENCPreset.mq",
+        "hq": "@:settings.Output.Streaming.NVENCPreset.hq",
+        "default": "@:settings.Output.Streaming.NVENCPreset.default",
+        "hp": "@:settings.Output.Streaming.NVENCPreset.hp",
+        "ll": "@:settings.Output.Streaming.NVENCPreset.ll",
+        "llhq": "@:settings.Output.Streaming.NVENCPreset.llhq",
+        "llhp": "@:settings.Output.Streaming.NVENCPreset.llhp",
         "ultrafast": null,
         "superfast": null,
         "veryfast": null,
@@ -393,10 +403,31 @@
       "Track6Bitrate": {
         "name": "@:settings.audioBitrate"
       }
+    },
+    "Replay Buffer": {
+      "name": null,
+      "RecRB": {
+        "name": null
+      },
+      "RecRBTime": {
+        "name": null
+      }
     }
   },
   "Audio": {
-    "name": null
+    "name": null,
+    "Untitled": {
+      "SampleRate": {
+        "name": null,
+        "44100": "44.1kHz",
+        "48000": "48kHz"
+      },
+      "ChannelSetup": {
+        "name": null,
+        "Mono": null,
+        "Stereo": null
+      }
+    }
   },
   "Video": {
     "name": null,
@@ -484,6 +515,9 @@
         "name": null,
         "Partial": null,
         "Full": null
+      },
+      "ForceGPUAsRenderDevice": {
+        "name": null
       }
     },
     "Audio": {
@@ -502,12 +536,6 @@
         "name": null
       },
       "OverwriteIfExists": {
-        "name": null
-      },
-      "RecRBPrefix": {
-        "name": null
-      },
-      "RecRBSuffix": {
         "name": null
       }
     },
@@ -538,12 +566,34 @@
     "Network": {
       "name": null,
       "BindIP": {
-        "name": null
+        "name": null,
+        "default": null
       },
       "NewSocketLoopEnable": {
         "name": null
       },
       "LowLatencyEnable": {
+        "name": null
+      }
+    },
+    "Replay Buffer": {
+      "name": null,
+      "RecRBPrefix": {
+        "name": null
+      },
+      "RecRBSuffix": {
+        "name": null
+      }
+    },
+    "Sources": {
+      "name": null,
+      "browserHWAccel": {
+        "name": null
+      }
+    },
+    "Media Files": {
+      "name": null,
+      "fileCaching": {
         "name": null
       }
     }

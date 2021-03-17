@@ -7,12 +7,19 @@ import { Inject } from '../core/injector';
 import { ScenesService, Scene, ISceneItemNode, SceneItemFolder, SceneItem, TSceneNode } from './index';
 import { SelectionService } from 'services/selection';
 
+export function isFolder(node: SceneItemNode): node is SceneItemFolder {
+  return node.sceneNodeType === 'folder';
+}
+
+export function isItem(node: SceneItemNode): node is SceneItem {
+  return node.sceneNodeType === 'item';
+}
+
 @ServiceHelper()
 export abstract class SceneItemNode implements ISceneItemNode {
   id: string;
   parentId: string;
-  childrenIds: string[];
-  sceneNodeType: TSceneNodeType;
+  abstract sceneNodeType: TSceneNodeType;
   resourceId: string;
   sceneId: string;
 
@@ -23,6 +30,13 @@ export abstract class SceneItemNode implements ISceneItemNode {
 
   getScene(): Scene {
     return this.scenesService.getScene(this.sceneId);
+  }
+
+  get childrenIds(): string[] {
+    return this.getScene()
+      .getModel()
+      .nodes.filter(node => node.parentId === this.id)
+      .map(node => node.id);
   }
 
   setParent(parentId: string) {
@@ -129,11 +143,11 @@ export abstract class SceneItemNode implements ISceneItemNode {
   }
 
   isFolder(): this is SceneItemFolder {
-    return this.sceneNodeType === 'folder';
+    return isFolder(this);
   }
 
   isItem(): this is SceneItem {
-    return this.sceneNodeType === 'item';
+    return isItem(this);
   }
 
   getResourceId() {
@@ -141,21 +155,10 @@ export abstract class SceneItemNode implements ISceneItemNode {
   }
 
   protected abstract get state(): ISceneItemNode;
-  protected abstract remove(): void;
+  abstract remove(): void;
 
   @mutation()
   protected SET_PARENT(parentId?: string) {
-    const nodeState = this.state;
-    const sceneState = this.scenesService.state.scenes[nodeState.sceneId];
-
-    const currentParent = sceneState.nodes.find(node => node.id === nodeState.parentId);
-    if (currentParent) {
-      const childInd = currentParent.childrenIds.indexOf(this.id);
-      currentParent.childrenIds.splice(childInd, 1);
-    }
-    nodeState.parentId = parentId;
-    if (!parentId) return;
-    const newParent = sceneState.nodes.find(node => node.id === parentId);
-    newParent.childrenIds.unshift(this.id);
+    this.state.parentId = parentId;
   }
 }

@@ -105,6 +105,9 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
 
   getSourcesForScene(sceneId: string): AudioSource[] {
     const scene = this.scenesService.getScene(sceneId);
+    if (!scene) {
+      return [];
+    }
     const sceneSources = scene.getNestedSources({ excludeScenes: true })
       .filter(sceneItem => sceneItem.audio);
 
@@ -340,7 +343,7 @@ export class AudioSource implements IAudioSourceApi {
   }
 
   getModel(): IAudioSource & ISource {
-    return { ...this.source.sourceState, ...this.audioSourceState };
+    return { ...this.source.state, ...this.audioSourceState };
   }
 
   getSettingsForm(): TObsFormData {

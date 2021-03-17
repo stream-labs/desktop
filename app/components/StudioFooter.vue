@@ -18,6 +18,15 @@
         <span>{{ $t('streaming.recording') }}</span>
       </button>
     </div>
+    <div class="nav-item" v-if="replayBufferEnabled && replayBufferOffline">
+      <button class="button button--default replay-button" @click="toggleReplayBuffer">{{ $t('streaming.startReplayBuffer') }}</button>
+    </div>
+    <div class="nav-item replay-button-group" v-if="!replayBufferOffline">
+      <button class="button button--soft-warning" @click="toggleReplayBuffer">{{ $t('streaming.stopReplayBuffer') }}</button>
+      <button class="button button--default" @click="saveReplay" :disabled="replayBufferSaving || replayBufferStopping">
+        {{ $t('streaming.saveReplay') }}
+      </button>
+    </div>
     <div class="nav-item">
       <start-streaming-button :disabled="locked" />
     </div>

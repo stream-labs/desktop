@@ -107,8 +107,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
     main: {
       componentName: 'Main',
       scaleFactor: 1,
-      title: `${remote.process.env.NAIR_PRODUCT_NAME} - Ver: ${remote.process.env.NAIR_VERSION}`,
       isShown: true,
+      title: `${remote.process.env.NAIR_PRODUCT_NAME} - Ver: ${remote.process.env.NAIR_VERSION}`,
     },
     child: {
       componentName: '',
@@ -139,9 +139,11 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
   private updateScaleFactor(windowId: string) {
     const window = this.windows[windowId];
-    const bounds = window.getBounds();
-    const currentDisplay = electron.screen.getDisplayMatching(bounds);
-    this.UPDATE_SCALE_FACTOR(windowId, currentDisplay.scaleFactor);
+    if (window) {
+      const bounds = window.getBounds();
+      const currentDisplay = electron.remote.screen.getDisplayMatching(bounds);
+      this.UPDATE_SCALE_FACTOR(windowId, currentDisplay.scaleFactor);
+    }
   }
 
   showWindow(options: Partial<IWindowOptions>) {
@@ -198,7 +200,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       return windowId;
     }
 
-    this.CREATE_ONE_OFF_WINDOW(windowId, options);
+    this.CREATE_ONE_OFF_WINDOW(windowId, { ...DEFAULT_WINDOW_OPTIONS, ...options });
 
     const newWindow = (this.windows[windowId] = new BrowserWindow({
       frame: false,
@@ -206,6 +208,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       transparent: options.transparent,
       resizable: options.resizable,
       alwaysOnTop: options.alwaysOnTop,
+      webPreferences: { nodeIntegration: true, webviewTag: true },
     }));
 
     newWindow.setMenu(null);
@@ -214,6 +217,9 @@ export class WindowsService extends StatefulService<IWindowsState> {
       delete this.windows[windowId];
       this.DELETE_ONE_OFF_WINDOW(windowId);
     });
+
+    this.updateScaleFactor(windowId);
+    newWindow.on('move', () => this.updateScaleFactor(windowId));
 
     if (Util.isDevMode()) {
       newWindow.webContents.openDevTools({ mode: 'detach' });
@@ -247,20 +253,23 @@ export class WindowsService extends StatefulService<IWindowsState> {
   /**
    * Closes all one-off windows
    */
-  closeAllOneOffs() {
+  closeAllOneOffs(): Promise<any> {
+    const closingPromises: Promise<void>[] = [];
     Object.keys(this.windows).forEach(windowId => {
       if (windowId === 'main') return;
       if (windowId === 'child') return;
       this.closeOneOffWindow(windowId);
+      closingPromises.push(this.closeOneOffWindow(windowId));
     });
+    return Promise.all(closingPromises);
   }
 
-  closeOneOffWindow(windowId: string) {
-    if (this.windows[windowId]) {
-      if (!this.windows[windowId].isDestroyed()) {
-        this.windows[windowId].destroy();
-      }
-    }
+  closeOneOffWindow(windowId: string): Promise<void> {
+    if (!this.windows[windowId] || this.windows[windowId].isDestroyed()) return Promise.resolve();
+    return new Promise(resolve => {
+      this.windows[windowId].on('closed', resolve);
+      this.windows[windowId].destroy();
+    });
   }
 
   // @ExecuteInCurrentWindow()

@@ -235,8 +235,13 @@ export class SourcesNode extends Node<ISchema, {}> {
             enabled: filter.enabled === void 0 ? true : filter.enabled,
           };
         }),
+        syncOffset: {sec: 0, nsec: 0}, // streamlabs v0.16.3 にはないが無いとコンパイルエラーが出る
       };
     });
+
+    // This ensures we have bound the source size callback
+    // before creating any sources in OBS.
+    this.sourcesService;
 
     const sources = obs.createSources(sourceCreateData);
     const promises: Promise<void>[] = [];
@@ -272,8 +277,6 @@ export class SourcesNode extends Node<ISchema, {}> {
         });
         this.audioService.getSource(sourceInfo.id).setHidden(!!sourceInfo.mixerHidden);
       }
-
-      this.checkTextSourceValidity(sourceInfo);
 
       if (sourceInfo.hotkeys) {
         promises.push(this.data.items[index].hotkeys.load({ sourceId: sourceInfo.id }));

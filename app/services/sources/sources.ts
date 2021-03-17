@@ -1,10 +1,10 @@
 import * as fs from 'fs';
 import Vue from 'vue';
 import { Subject } from 'rxjs';
-import { IObsListOption, setupConfigurableDefaults, TObsValue } from 'components/obs/inputs/ObsInput';
+import cloneDeep from 'lodash/cloneDeep';
+import { IObsListOption, TObsValue } from 'components/obs/inputs/ObsInput';
 import { StatefulService, mutation } from 'services/core/stateful-service';
 import * as obs from '../../../obs-api';
-import electron from 'electron';
 import { Inject } from 'services/core/injector';
 import namingHelpers from 'util/NamingHelpers';
 import { WindowsService } from 'services/windows';
@@ -13,20 +13,16 @@ import { ScenesService, ISceneItem } from 'services/scenes';
 import {
   IActivePropertyManager,
   ISource,
-  ISourceCreateOptions,
+  ISourceAddOptions,
   ISourcesServiceApi,
   ISourcesState,
   TSourceType,
   Source,
-  ISourceAddOptions,
+  TPropertiesManager,
 } from './index';
 import { $t } from 'services/i18n';
+import { AudioService } from '../audio';
 import uuid from 'uuid/v4';
-
-
-const SOURCES_UPDATE_INTERVAL = 1000;
-
-const { ipcRenderer } = electron;
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -37,8 +33,14 @@ export const PROPERTIES_MANAGER_TYPES = {
   default: DefaultManager,
 };
 
-export class SourcesService extends StatefulService<ISourcesState> implements ISourcesServiceApi {
+interface IObsSourceCallbackInfo {
+  name: string;
+  width: number;
+  height: number;
+  flags: number;
+}
 
+export class SourcesService extends StatefulService<ISourcesState> implements ISourcesServiceApi {
   static initialState = {
     sources: {},
     temporarySources: {}, // don't save temporarySources in the config file
@@ -50,6 +52,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   @Inject() private scenesService: ScenesService;
   @Inject() private windowsService: WindowsService;
+  @Inject() private audioService: AudioService;
 
   /**
    * Maps a source id to a property manager
@@ -57,15 +60,15 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   propertiesManagers: Dictionary<IActivePropertyManager> = {};
 
   protected init() {
-    setInterval(() => this.requestSourceSizes(), SOURCES_UPDATE_INTERVAL);
-
-    this.scenesService.itemRemoved.subscribe(
-      (sceneSourceModel) => this.onSceneItemRemovedHandler(sceneSourceModel)
+    obs.NodeObs.RegisterSourceCallback((objs: IObsSourceCallbackInfo[]) =>
+      this.handleSourceCallback(objs),
     );
 
-    this.scenesService.sceneRemoved.subscribe(
-      (sceneModel) => this.removeSource(sceneModel.id)
+    this.scenesService.itemRemoved.subscribe(sceneSourceModel =>
+      this.onSceneItemRemovedHandler(sceneSourceModel),
     );
+
+    this.scenesService.sceneRemoved.subscribe(sceneModel => this.removeSource(sceneModel.id));
   }
 
   @mutation()
@@ -74,11 +77,20 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
   @mutation()
-  private ADD_SOURCE(id: string, name: string, type: TSourceType, channel?: number, isTemporary?: boolean) {
+  private ADD_SOURCE(addOptions: {
+    id: string;
+    name: string;
+    type: TSourceType;
+    channel?: number;
+    isTemporary?: boolean;
+    propertiesManagerType?: TPropertiesManager;
+  }) {
+    const id = addOptions.id;
     const sourceModel: ISource = {
       sourceId: id,
-      name,
-      type,
+      name: addOptions.name,
+      type: addOptions.type,
+      propertiesManagerType: addOptions.propertiesManagerType || 'default',
 
       // Whether the source has audio and/or video
       // Will be updated periodically
@@ -93,12 +105,12 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
       muted: false,
       resourceId: 'Source' + JSON.stringify([id]),
-      channel,
+      channel: addOptions.channel,
       deinterlaceMode: obs.EDeinterlaceMode.Disable,
       deinterlaceFieldOrder: obs.EDeinterlaceFieldOrder.Top,
     };
 
-    if (isTemporary) {
+    if (addOptions.isTemporary) {
       Vue.set(this.state.temporarySources, id, sourceModel);
     } else {
       Vue.set(this.state.sources, id, sourceModel);
@@ -119,48 +131,46 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     name: string,
     type: TSourceType,
     settings: Dictionary<any> = {},
-    options: ISourceCreateOptions = {},
+    options: ISourceAddOptions = {},
   ): Source {
 
     const id: string = options.sourceId || `${type}_${uuid()}`;
-
-    if (type === 'browser_source') {
-      if (settings.shutdown === void 0) settings.shutdown = true;
-      if (settings.url === void 0) settings.url = 'https://n-air-app.nicovideo.jp/browser-source/';
-    }
-
-    if (type === 'text_gdiplus') {
-      if (settings.text === void 0) settings.text = name;
-    }
-
-    const obsInput = obs.InputFactory.create(type, id, settings);
+    const obsInputSettings = this.getObsSourceCreateSettings(type, settings);
+    const obsInput = obs.InputFactory.create(type, id, obsInputSettings);
 
     this.addSource(obsInput, name, options);
 
     return this.getSource(id);
   }
 
-  addSource(obsInput: obs.IInput, name: string, options: ISourceCreateOptions = {}) {
+  addSource(obsInput: obs.IInput, name: string, options: ISourceAddOptions = {}) {
     if (options.channel !== void 0) {
       obs.Global.setOutputSource(options.channel, obsInput);
     }
     const id = obsInput.name;
     const type: TSourceType = obsInput.id as TSourceType;
-    this.ADD_SOURCE(id, name, type, options.channel, options.isTemporary);
+    const managerType = options.propertiesManager || 'default';
+    this.ADD_SOURCE({
+      id,
+      name,
+      type,
+      channel: options.channel,
+      isTemporary: options.isTemporary,
+      propertiesManagerType: managerType,
+    });
     const source = this.getSource(id);
     const muted = obsInput.muted;
     this.UPDATE_SOURCE({ id, muted });
-    this.updateSourceFlags(source.sourceState, obsInput.outputFlags, true);
+    this.updateSourceFlags(source.state, obsInput.outputFlags, true);
 
-    const managerType = options.propertiesManager || 'default';
     const managerKlass = PROPERTIES_MANAGER_TYPES[managerType];
     this.propertiesManagers[id] = {
-      manager: new managerKlass(obsInput, options.propertiesManagerSettings),
-      type: managerType
+      manager: new managerKlass(obsInput, options.propertiesManagerSettings || {}),
+      type: managerType,
     };
 
-    if (source.hasProps()) setupConfigurableDefaults(obsInput);
-    this.sourceAdded.next(source.sourceState);
+    this.sourceAdded.next(source.state);
+    if (options.audioSettings) this.audioService.getSource(id).setSettings(options.audioSettings);
   }
 
   removeSource(id: string) {
@@ -179,7 +189,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     this.REMOVE_SOURCE(id);
     this.propertiesManagers[id].manager.destroy();
     delete this.propertiesManagers[id];
-    this.sourceRemoved.next(source.sourceState);
+    this.sourceRemoved.next(source.state);
     source.getObsInput().release();
   }
 
@@ -234,6 +244,44 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     this.removeSource(source.sourceId);
   }
 
+  getObsSourceSettings(type: TSourceType, settings: Dictionary<any>): Dictionary<any> {
+    const resolvedSettings = cloneDeep(settings);
+
+    Object.keys(resolvedSettings).forEach(propName => {
+      // device_id is unique for each PC
+      // so we allow to provide a device name instead device id
+      // resolve the device id by the device name here
+      if (!['device_id', 'video_device_id', 'audio_device_id'].includes(propName)) return;
+
+      /* N Airには　hardwareService がないため無効
+      const device =
+        type === 'dshow_input'
+          ? this.hardwareService.getDshowDeviceByName(settings[propName])
+          : this.hardwareService.getDeviceByName(settings[propName]);
+
+      if (!device) return;
+      resolvedSettings[propName] = device.id;
+      */
+    });
+    return resolvedSettings;
+  }
+
+  private getObsSourceCreateSettings(type: TSourceType, settings: Dictionary<any>) {
+    const resolvedSettings = this.getObsSourceSettings(type, settings);
+
+    // setup default settings
+    if (type === 'browser_source') {
+      if (resolvedSettings.shutdown === void 0) resolvedSettings.shutdown = true;
+      if (resolvedSettings.url === void 0) {
+        resolvedSettings.url = 'https://n-air-app.nicovideo.jp/browser-source/';
+      }
+    }
+
+    if (type === 'text_gdiplus') {
+      if (resolvedSettings.text === void 0) resolvedSettings.text = name;
+    }
+    return resolvedSettings;
+  }
 
   getAvailableSourcesTypesList(): IObsListOption<TSourceType>[] {
     const obsAvailableTypes = obs.InputFactory.types();
@@ -256,6 +304,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       'openvr_capture',
       'liv_capture',
       'ovrstream_dc_source',
+      'vlc_source',
     ];
 
     const availableWhitelistedType = whitelistedTypes.filter(type => obsAvailableTypes.includes(type));
@@ -303,30 +352,19 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     });
   }
 
-  requestSourceSizes() {
-    const activeScene = this.scenesService.activeScene;
-    if (activeScene) {
-      const activeItems = activeScene.getItems();
-      const sourcesNames: string[] = [];
+  private handleSourceCallback(objs: IObsSourceCallbackInfo[]) {
+    objs.forEach(info => {
+      const source = this.getSource(info.name);
 
-      activeItems.forEach(activeItem => {
-        sourcesNames.push(activeItem.sourceId);
-      });
+      // This is probably a transition or something else we don't care about
+      if (!source) return;
 
-      const sizes: obs.ISourceSize[] = obs.getSourcesSize(sourcesNames);
-      sizes.forEach(update => {
-        const source = this.getSource(update.name);
-
-        if (!source) return;
-
-        if ((source.width !== update.width) || (source.height !== update.height)) {
-          const size = { id: source.sourceId, width: update.width,
-            height: update.height };
-          this.UPDATE_SOURCE(size);
-        }
-        this.updateSourceFlags(source, update.outputFlags);
-      });
-    }
+      if (source.width !== info.width || source.height !== info.height) {
+        const size = { id: source.sourceId, width: info.width, height: info.height };
+        this.UPDATE_SOURCE(size);
+      }
+      this.updateSourceFlags(source, info.flags);
+    });
   }
 
   private updateSourceFlags(source: ISource, flags: number, doNotEmit?: boolean) {
@@ -346,7 +384,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     const source = this.getSource(id);
     source.getObsInput().muted = muted;
     this.UPDATE_SOURCE({ id, muted });
-    this.sourceUpdated.next(source.sourceState);
+    this.sourceUpdated.next(source.state);
   }
 
   reset() {

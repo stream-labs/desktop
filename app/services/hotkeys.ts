@@ -4,7 +4,7 @@ import { SourcesService } from 'services/sources';
 import { TransitionsService } from 'services/transitions';
 import { KeyListenerService } from 'services/key-listener';
 import { StatefulService, mutation, ServiceHelper, Inject } from './core';
-import { defer } from 'lodash';
+import { defer, mapValues } from 'lodash';
 import { $t } from 'services/i18n';
 
 function getScenesService(): ScenesService {
@@ -114,6 +114,11 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
       name: 'TRANSITION_STUDIO_MODE',
       description: () => $t('hotkeys.studioModeTransition'),
       down: () => getTransitionsService().executeStudioModeTransition()
+    },
+    {
+      name: 'SAVE_REPLAY',
+      description: () => $t('hotkeys.saveReplay'),
+      down: () => getStreamingService().saveReplay(),
     },
   ],
 
@@ -319,10 +324,27 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     });
 
     return {
-      general: this.getGeneralHotkeys(),
-      sources: sourcesHotkeys,
-      scenes: scenesHotkeys
+      general: this.serializeHotkeys(this.getGeneralHotkeys()),
+      sources: this.serializeHotkeys(sourcesHotkeys),
+      scenes: this.serializeHotkeys(scenesHotkeys),
     };
+  }
+
+  /**
+   * Hotkey service helpers are extremely expensive to create from the
+   * child window, so we serialize them here first.
+   * @param hotkeys A group of hotkeys, either an array or a dictionary
+   */
+  private serializeHotkeys(hotkeys: Dictionary<Hotkey[]>): Dictionary<IHotkey[]>;
+  private serializeHotkeys(hotkeys: Hotkey[]): IHotkey[];
+  private serializeHotkeys(
+    hotkeys: Dictionary<Hotkey[]> | Hotkey[],
+  ): Dictionary<IHotkey[]> | IHotkey[] {
+    if (Array.isArray(hotkeys)) {
+      return hotkeys.map(h => ({ ...h.getModel(), description: h.description }));
+    }
+
+    return mapValues(hotkeys, h => this.serializeHotkeys(h));
   }
 
   clearAllHotkeys() {
@@ -453,9 +475,7 @@ export class Hotkey implements IHotkey {
   action: IHotkeyAction;
   shouldApply: boolean;
 
-  @Inject() private hotkeysService: HotkeysService;
-
-  private hotkeyModel: IHotkey;
+  private readonly hotkeyModel: IHotkey;
 
   constructor(hotkeyModel: IHotkey) {
     Object.assign(this, hotkeyModel);

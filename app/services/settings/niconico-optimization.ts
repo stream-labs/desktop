@@ -37,7 +37,13 @@ export function getBestSettingsForNiconico(
         encoderPreset: 'ultrafast',
     };
     if (!('useHardwareEncoder' in options) || options.useHardwareEncoder) {
-        if (settings.hasSpecificValue(OptimizationKey.encoder, EncoderType.nvenc) ||
+        if (settings.hasSpecificValue(OptimizationKey.encoder, EncoderType.nvencNew)) {
+            encoderSettings = {
+                encoder: EncoderType.nvencNew,
+                simpleUseAdvanced: true,
+                NVENCPreset: 'llhq',
+            };
+        } else if (settings.hasSpecificValue(OptimizationKey.encoder, EncoderType.nvenc) ||
             settings.hasSpecificValue(OptimizationKey.encoder, EncoderType.advancedNvenc)) {
             encoderSettings = {
                 encoder: EncoderType.nvenc,
@@ -61,6 +67,7 @@ export function getBestSettingsForNiconico(
         quality: resolution,
         fpsType: 'Common FPS Values',
         fpsCommon: '30',
+        audioSampleRate: 48000,
     };
 
     // 出力=詳細(Output: Advanced) のときのエンコーダー以外の設定

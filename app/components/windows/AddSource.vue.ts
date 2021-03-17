@@ -62,7 +62,7 @@ export default class AddSource extends Vue {
 
   addNew() {
     if (!this.name) {
-      this.error = 'The source name is required';
+      this.error = $t('sources.sourceNameIsRequired');
     } else {
       let source: ISourceApi;
 

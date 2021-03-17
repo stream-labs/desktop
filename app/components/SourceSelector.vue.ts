@@ -72,7 +72,7 @@ export default class SourceSelector extends Vue {
       });
     };
 
-    return getSlVueTreeNodes(this.scene.getRootNodes());
+    return getSlVueTreeNodes(this.scene?.getRootNodes() || []);
   }
 
   determineIcon(isLeaf: boolean, sourceId: string) {

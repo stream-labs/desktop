@@ -18,6 +18,7 @@ import {
   ISceneItemInfo,
 } from './index';
 import { SceneItemNode } from './scene-node';
+import { TSceneNodeType } from './scenes';
 /**
  * A SceneItem is a source that contains
  * all of the information about that source, and
@@ -44,6 +45,9 @@ export class SceneItem extends SceneItemNode {
   transform: ITransform;
   visible: boolean;
   locked: boolean;
+
+  sceneNodeType: TSceneNodeType = 'item';
+
   deinterlaceMode: obs.EDeinterlaceMode;
   deinterlaceFieldOrder: obs.EDeinterlaceFieldOrder;
 
@@ -62,7 +66,7 @@ export class SceneItem extends SceneItemNode {
     return (this.video && (this.width > 0) && (this.height > 0)) && !this.locked;
   }
 
-  sceneItemState: ISceneItem;
+  state: ISceneItem;
 
   @Inject() protected scenesService: ScenesService;
   @Inject() private sourcesService: SourcesService;
@@ -74,13 +78,13 @@ export class SceneItem extends SceneItemNode {
       return item.id === sceneItemId;
     }) as ISceneItem;
     const sourceState = this.sourcesService.state.sources[sourceId];
-    this.sceneItemState = sceneItemState;
+    this.state = sceneItemState;
     Utils.applyProxy(this, sourceState);
-    Utils.applyProxy(this, this.sceneItemState);
+    Utils.applyProxy(this, this.state);
   }
 
   getModel(): ISceneItem & ISource {
-    return { ...this.source.sourceState, ...this.sceneItemState };
+    return { ...this.source.state, ...this.state };
   }
 
   getScene(): Scene {
@@ -115,12 +119,12 @@ export class SceneItem extends SceneItemNode {
 
     // update only changed settings to reduce the amount of IPC calls
     const obsSceneItem = this.getObsSceneItem();
-    const changed = Utils.getChangedParams(this.sceneItemState, patch);
-    const newSettings = merge({}, this.sceneItemState, patch);
+    const changed = Utils.getChangedParams(this.state, patch);
+    const newSettings = merge({}, this.state, patch);
 
     if (changed.transform) {
       const changedTransform = Utils.getChangedParams(
-        this.sceneItemState.transform,
+        this.state.transform,
         patch.transform
       );
 
@@ -310,10 +314,6 @@ export class SceneItem extends SceneItemNode {
       .findIndex(sceneItemModel => sceneItemModel.id === this.id);
   }
 
-  protected get state() {
-    return this.sceneItemState;
-  }
-
   /**
    * only for scene sources
    */
@@ -392,6 +392,6 @@ export class SceneItem extends SceneItemNode {
 
   @mutation()
   private UPDATE(patch: {sceneItemId: string} & IPartialSettings) {
-    merge(this.sceneItemState, patch);
+    merge(this.state, patch);
   }
 }

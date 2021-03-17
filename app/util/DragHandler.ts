@@ -7,8 +7,6 @@ import { ScalableRectangle } from 'util/ScalableRectangle';
 import { SelectionService } from 'services/selection';
 import electron from 'electron';
 
-const { webFrame, screen } = electron;
-
 /*
   * An edge looks like:
   * ________________________________

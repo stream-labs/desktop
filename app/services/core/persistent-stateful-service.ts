@@ -1,13 +1,20 @@
 import { merge } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { StatefulService } from './stateful-service';
 import Utils from '../utils';
 
 // Extends StatefulService with code that will persist the
 // state across executions of the application.
 
-export abstract class PersistentStatefulService<
-  TState extends object
-> extends StatefulService<TState> {
+interface IMigration {
+  oldKey: string;
+  newKey: string;
+  transform: Function;
+}
+
+export abstract class PersistentStatefulService<TState extends object> extends StatefulService<
+  TState
+> {
   // This is the default state if the state is not found
   // in local storage.
   static defaultState = {};
@@ -38,5 +45,16 @@ export abstract class PersistentStatefulService<
         localStorage.setItem(PersistentService.localStorageKey, JSON.stringify(valueToSave));
       },
     );
+  }
+
+  runMigrations(persistedState: any, migrations: IMigration[]) {
+    const migratedState = cloneDeep(persistedState);
+    migrations.forEach(migration => {
+      if (persistedState[migration.oldKey] == null) return;
+      migratedState[migration.newKey] = migration.transform(persistedState[migration.oldKey]);
+      delete migratedState[migration.oldKey];
+    });
+
+    return migratedState;
   }
 }
