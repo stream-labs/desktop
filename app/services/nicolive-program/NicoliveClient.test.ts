@@ -251,7 +251,7 @@ describe('webviews', () => {
 
     // don't await
     const result = expect(client.createProgram()).resolves.toBe('CREATED');
-    mock.browserWindow.loadURL(`https://live2.nicovideo.jp/watch/${programID}`);
+    mock.browserWindow.loadURL(`https://live.nicovideo.jp/watch/${programID}`);
 
     await result;
     expect(mock.browserWindow.close).toHaveBeenCalled();
