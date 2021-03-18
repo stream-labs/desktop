@@ -201,15 +201,14 @@ export class SourcesNode extends Node<ISchema, {}> {
           if (filter.type === 'vst_filter') {
             this.usageStatisticsService.recordFeatureUsage('VST');
           }
-          if (filter.type === 'vst_filter') { 
-              if (filter.settings.plugin_path.includes("reacontrolmidi-standalone.dll"))
-              {
-                filter.settings.chunk_data_0_v3 = "";
-                filter.settings.chunk_data_1_v3 = "";
-                filter.settings.chunk_data_p_v3 = "";
-                filter.settings.chunk_data_v2 = "";
-                filter.settings.chunk_data = "";
-              }
+          if (filter.type === 'vst_filter') {
+            if (filter.settings.plugin_path.includes('reacontrolmidi-standalone.dll')) {
+              filter.settings.chunk_data_0_v3 = '';
+              filter.settings.chunk_data_1_v3 = '';
+              filter.settings.chunk_data_p_v3 = '';
+              filter.settings.chunk_data_v2 = '';
+              filter.settings.chunk_data = '';
+            }
           }
           return {
             name: filter.name,
