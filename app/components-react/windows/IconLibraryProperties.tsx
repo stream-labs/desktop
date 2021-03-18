@@ -26,6 +26,7 @@ export default () => {
     if (source) {
       const settings = source.getPropertiesManagerSettings();
       if (settings.folder) {
+        if (!settings.activeIcon) return selectFolder(settings.folder);
         const { folder, activeIcon } = settings;
         setFolderPath(folder);
 
