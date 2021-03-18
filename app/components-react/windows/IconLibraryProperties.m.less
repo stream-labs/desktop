@@ -1,20 +1,38 @@
+.cell-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 .image-cell {
   width: 40px;
   height: 40px;
   border-radius: 4px;
+  padding: 4px;
+  margin: 2px 4px;
+  box-sizing: border-box;
+
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 .image-cell.selected {
   background: var(--teal-semi);
+  border: 1px solid var(--teal);
+  padding: 3px;
 }
 
 .image-cell.large {
   height: 200px;
-  width: 100%;
+  width: 200px;
   background: var(--section);
   border-radius: 0;
 
   img {
-    margin: auto;
+    height: 100%;
+  }
+
+  &:hover {
+    cursor: default;
   }
 }

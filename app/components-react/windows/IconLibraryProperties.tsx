@@ -24,14 +24,17 @@ export default () => {
 
   function lifecycle() {
     if (source) {
-      const formData = source.getPropertiesFormData()[0] as IObsPathInputValue;
-      setFolderPath(formData.defaultPath);
+      const settings = source.getPropertiesManagerSettings();
+      if (settings.folder) {
+        const { folder, activeIcon } = settings;
+        setFolderPath(folder);
 
-      fs.readdir(formData.defaultPath, (err: Error, files: string[]) => {
-        setFolderImages(files.map((file: string) => path.join(formData.defaultPath, file)));
-      });
+        fs.readdir(folder, (err: Error, files: string[]) => {
+          setFolderImages(files.map((file: string) => path.join(folder, file)));
+        });
 
-      setSelectedIcon(formData.value);
+        setSelectedIcon(activeIcon);
+      }
     }
   }
 
@@ -40,7 +43,14 @@ export default () => {
 
     fs.readdir(folder, (err: Error, files: string[]) => {
       setFolderImages(files.map((file: string) => path.join(folder, file)));
-      selectIcon(path.join(folder, files[0]));
+      const activeIconPath = path.join(folder, files[0]);
+      selectIcon(activeIconPath);
+      if (source) {
+        source.setPropertiesManagerSettings({
+          folder,
+          activeIcon: activeIconPath,
+        });
+      }
     });
   }
 
@@ -60,16 +70,16 @@ export default () => {
 
   const filters = [{ name: 'Images', extensions: ['jpg', 'png', 'gif'] }];
 
-  const PreviewImage = () => {
+  function PreviewImage() {
     if (!selectedIcon) return <div />;
     return <ImageCell path={selectedIcon} isSelected={false} large={true} handleClick={() => {}} />;
-  };
+  }
 
   return (
-    <ModalLayout fixedChild={<PreviewImage />}>
+    <ModalLayout fixedChild={<PreviewImage />} onOk={() => WindowsService.closeChildWindow()}>
       <div>
         <FileInput onChange={selectFolder} value={folderPath} directory={true} filters={filters} />
-        <div style={{ display: 'flex' }}>
+        <div className={styles.cellContainer}>
           {folderImages.map(image => (
             <ImageCell
               path={image}
@@ -91,11 +101,14 @@ interface IImageCellProps {
   large?: boolean;
 }
 
-const ImageCell = (props: IImageCellProps) => (
+const ImageCell = (p: IImageCellProps) => (
   <div
-    className={cx(styles.imageCell, { [styles.selected]: props.isSelected })}
-    onClick={() => props.handleClick(props.path)}
+    className={cx(styles.imageCell, {
+      [styles.selected]: p.isSelected,
+      [styles.large]: p.large,
+    })}
+    onClick={() => p.handleClick(p.path)}
   >
-    <img src={props.path} />
+    <img src={p.path} />
   </div>
 );

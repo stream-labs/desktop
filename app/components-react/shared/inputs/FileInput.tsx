@@ -1,6 +1,6 @@
 import React from 'react';
 import { remote } from 'electron';
-import { Button, Input } from 'antd';
+import { Input, Button } from 'antd';
 import { InputProps } from 'antd/lib/input';
 import { InputComponent, useInput, TSlobsInputProps } from './inputs';
 import InputWrapper from './InputWrapper';
@@ -35,10 +35,21 @@ export const FileInput = InputComponent((p: TFileInputProps) => {
     }
   }
 
+  console.log(p.value);
+  console.log(inputAttrs.value);
+
   return (
     <InputWrapper {...wrapperAttrs}>
-      <Input disabled value={inputAttrs.value} />
-      <Button onClick={showFileDialog}>{$t('Browse')}</Button>
+      <Input
+        disabled
+        value={p.value}
+        style={{ marginRight: '16px' }}
+        addonAfter={
+          <Button onClick={showFileDialog} style={{ margin: '0 -11px' }}>
+            {$t('Browse')}
+          </Button>
+        }
+      />
     </InputWrapper>
   );
 });
