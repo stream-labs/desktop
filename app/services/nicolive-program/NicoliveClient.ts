@@ -69,7 +69,7 @@ export class NicoliveClient {
   private static frontendID = 134;
 
   static isProgramPage(url: string): boolean {
-    return /^https?:\/\/live2\.nicovideo\.jp\/watch\/lv\d+/.test(url);
+    return /^https?:\/\/live2?\.nicovideo\.jp\/watch\/lv\d+/.test(url);
   }
 
   static isMyPage(url: string): boolean {
