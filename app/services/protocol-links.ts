@@ -5,6 +5,7 @@ import { Inject } from 'services/core/injector';
 import { NavigationService } from 'services/navigation';
 import { PlatformAppsService } from 'services/platform-apps';
 import { PlatformAppStoreService } from 'services/platform-app-store';
+import { FacemasksService } from 'services/facemasks';
 import { UserService } from 'services/user';
 import { SettingsService } from './settings';
 import { byOS, OS } from 'util/operating-systems';
@@ -30,6 +31,7 @@ export class ProtocolLinksService extends Service {
   @Inject() navigationService: NavigationService;
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() platformAppStoreService: PlatformAppStoreService;
+  @Inject() facemasksService: FacemasksService;
   @Inject() userService: UserService;
   @Inject() settingsService: SettingsService;
 
@@ -110,6 +112,13 @@ export class ProtocolLinksService extends Service {
     } else {
       this.navigationService.navigate('PlatformAppStore', { appId });
     }
+  }
+
+  @protocolHandler('facemasks')
+  private openFacemaskSettings() {
+    if (!this.userService.isLoggedIn) return;
+
+    this.facemasksService.showSettings();
   }
 
   @protocolHandler('settings')

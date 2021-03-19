@@ -1,11 +1,13 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { WidgetsService } from 'services/widgets';
+import { FacemasksService } from 'services/facemasks';
 import { Inject } from '../../services/core/injector';
 
 @Component({})
 export default class TestButtons extends Vue {
   @Inject() private widgetsService: WidgetsService;
+  @Inject() private facemasksService: FacemasksService;
 
   @Prop() testers: string[];
 

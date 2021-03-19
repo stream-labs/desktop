@@ -218,6 +218,7 @@ const SUPPORTED_EVENTS = [
   'merch',
   'donation',
   'streamlabscharitydonation',
+  'facemaskdonation',
   'follow',
   'subscription',
   'bits',
