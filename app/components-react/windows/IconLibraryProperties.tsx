@@ -7,11 +7,10 @@ import React, { useEffect, useState } from 'react';
 import { Services } from '../service-provider';
 import { FileInput } from '../shared/inputs';
 import styles from './IconLibraryProperties.m.less';
-import { TObsType, IObsPathInputValue } from '../../components/obs/inputs/ObsInput';
 
 export default () => {
   // inject services
-  const { SourcesService, WindowsService } = Services;
+  const { SourcesService, WindowsService, CustomizationService } = Services;
 
   const sourceId = WindowsService.getChildWindowQueryParams().sourceId;
   const source = SourcesService.views.getSource(sourceId);
@@ -69,7 +68,14 @@ export default () => {
   return (
     <ModalLayout fixedChild={<PreviewImage />} onOk={() => WindowsService.closeChildWindow()}>
       <div>
-        <FileInput onChange={selectFolder} value={folderPath} directory={true} filters={filters} />
+        {CustomizationService.views.designerMode && (
+          <FileInput
+            onChange={selectFolder}
+            value={folderPath}
+            directory={true}
+            filters={filters}
+          />
+        )}
         <div className={styles.cellContainer}>
           {folderImages.map(image => (
             <ImageCell

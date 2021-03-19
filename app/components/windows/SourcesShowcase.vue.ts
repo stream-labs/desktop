@@ -153,6 +153,10 @@ export default class SourcesShowcase extends Vue {
     return this.customizationService.isDarkTheme ? 'night' : 'day';
   }
 
+  get designerMode() {
+    return this.customizationService.views.designerMode;
+  }
+
   get availableSources(): ISourceDefinition[] {
     const sourcesList: ISourceDefinition[] = this.sourcesService
       .getAvailableSourcesTypesList()

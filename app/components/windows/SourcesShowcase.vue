@@ -163,6 +163,7 @@
             </li>
 
             <li
+              v-if="designerMode"
               class="source source--standard"
               :class="{ 'source--active': inspectedSource === 'icon_library' }"
               @click="inspectSource('icon_library')"
