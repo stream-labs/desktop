@@ -40,33 +40,24 @@ export default () => {
   }
 
   function selectFolder(folder: string) {
+    if (!source) return;
     setFolderPath(folder);
 
     fs.readdir(folder, (err: Error, files: string[]) => {
       setFolderImages(files.map((file: string) => path.join(folder, file)));
       const activeIconPath = path.join(folder, files[0]);
       selectIcon(activeIconPath);
-      if (source) {
-        source.setPropertiesManagerSettings({
-          folder,
-          activeIcon: activeIconPath,
-        });
-      }
+      source.setPropertiesManagerSettings({
+        folder,
+        activeIcon: activeIconPath,
+      });
     });
   }
 
   function selectIcon(iconPath: string) {
     if (!source) return;
     setSelectedIcon(iconPath);
-    source.setPropertiesFormData([
-      {
-        description: 'Image File',
-        name: 'file',
-        type: 'OBS_PROPERTY_FILE' as TObsType,
-        value: iconPath,
-        visible: true,
-      },
-    ]);
+    source.setPropertiesManagerSettings({ activeIcon: iconPath });
   }
 
   const filters = [{ name: 'Images', extensions: ['jpg', 'png', 'gif'] }];

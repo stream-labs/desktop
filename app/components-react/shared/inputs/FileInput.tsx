@@ -13,11 +13,9 @@ type TFileInputProps = TSlobsInputProps<
 >;
 
 export const FileInput = InputComponent((p: TFileInputProps) => {
-  const { inputAttrs, wrapperAttrs } = useInput('text', p);
-
   async function showFileDialog() {
     const options: Electron.OpenDialogOptions = {
-      defaultPath: inputAttrs.value,
+      defaultPath: p.value,
       filters: p.filters,
       properties: [],
     };
@@ -30,16 +28,13 @@ export const FileInput = InputComponent((p: TFileInputProps) => {
 
     const { filePaths } = await remote.dialog.showOpenDialog(options);
 
-    if (filePaths[0]) {
-      inputAttrs.onChange(filePaths[0]);
+    if (filePaths[0] && p.onChange) {
+      p.onChange(filePaths[0]);
     }
   }
 
-  console.log(p.value);
-  console.log(inputAttrs.value);
-
   return (
-    <InputWrapper {...wrapperAttrs}>
+    <InputWrapper>
       <Input
         disabled
         value={p.value}

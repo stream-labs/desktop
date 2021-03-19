@@ -8,7 +8,7 @@ export class IconLibraryManager extends DefaultManager {
   settings: IIconLibraryManagerSettings;
 
   applySettings(settings: Dictionary<any>) {
-    if (settings.folder !== this.settings.folder) {
+    if (settings.activeIcon !== this.settings.activeIcon) {
       this.obsSource.update({
         file: settings.activeIcon,
       });
