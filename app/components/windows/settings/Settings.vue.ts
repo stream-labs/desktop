@@ -19,6 +19,7 @@ import ExperimentalSettings from './ExperimentalSettings.vue';
 import RemoteControlSettings from './RemoteControlSettings.vue';
 import LanguageSettings from './LanguageSettings.vue';
 import GameOverlaySettings from './GameOverlaySettings';
+import FacemaskSettings from './FacemaskSettings.vue';
 import SearchablePages from 'components/shared/SearchablePages';
 import FormInput from 'components/shared/inputs/FormInput.vue';
 import StreamSettings from './StreamSettings';
@@ -48,6 +49,7 @@ import { debounce } from 'lodash-decorators';
     LanguageSettings,
     InstalledApps,
     GameOverlaySettings,
+    FacemaskSettings,
     FormInput,
     StreamSettings,
     VirtualWebcamSettings,

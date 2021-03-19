@@ -654,6 +654,7 @@ export interface IAlertBoxSettings extends IAlertBoxGeneralSettings {
   hosts: IAlertBoxSetting;
   raids: IAlertBoxSetting;
   merch: IAlertBoxSetting;
+  facemasks: IAlertBoxSetting;
   support?: IAlertBoxSetting;
   likes?: IAlertBoxSetting;
   stars?: IAlertBoxSettings;

@@ -90,6 +90,7 @@
           <remote-control-settings v-if="page === 'Remote Control'" />
           <game-overlay-settings v-if="page === 'Game Overlay'" />
           <virtual-webcam-settings v-if="page === 'Virtual Webcam'" />
+          <facemask-settings v-if="page === 'Face Masks'" />
           <GenericFormGroups
             v-if="
               ![
