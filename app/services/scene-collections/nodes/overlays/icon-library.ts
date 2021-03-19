@@ -39,10 +39,9 @@ export class IconLibraryNode extends Node<ISchema, IContext> {
 
   async load(context: IContext) {
     const folder = path.join(context.assetsPath, this.data.folder);
-    context.sceneItem.getSource().setPropertiesManagerSettings({ folder });
-
-    // This is a bit of a hack to force us to immediately back up
-    // the media upon overlay install.
-    // context.sceneItem.getSource().replacePropertiesManager('iconLibrary', {});
+    fs.readdir(folder, (err: Error, files: string[]) => {
+      const activeIcon = path.join(folder, files[0]);
+      context.sceneItem.getSource().setPropertiesManagerSettings({ folder, activeIcon });
+    });
   }
 }

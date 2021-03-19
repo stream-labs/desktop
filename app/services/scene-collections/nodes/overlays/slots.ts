@@ -267,7 +267,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
         obj.name,
         'image_source',
         {},
-        { id, select: false },
+        { id, select: false, sourceAddOptions: { propertiesManager: 'iconLibrary' } },
       );
     } else if (obj.content instanceof StreamlabelNode) {
       sceneItem = context.scene.createAndAddSource(
