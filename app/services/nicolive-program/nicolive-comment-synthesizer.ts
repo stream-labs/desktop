@@ -1,22 +1,8 @@
 import { mutation, StatefulService } from 'services/stateful-service';
 import { Inject } from 'util/injector';
-import { WrappedChat } from './nicolive-comment-viewer';
-import replace_rules from './replace_rules.json';
 import { NicoliveProgramStateService } from './state';
-
-export class ParaphraseDictionary {
-  dictionary = replace_rules.elements.map(e => ({
-    pattern: new RegExp(e.regularExpression, 'i'),
-    to: e.replacement
-  }));
-
-  process(input: string): string {
-    return this.dictionary.reduce<string>(
-      (acc, item) => acc.replace(item.pattern, item.to),
-      input
-    );
-  }
-}
+import { ParaphraseDictionary } from './ParaphraseDictionary';
+import { WrappedChat } from './nicolive-comment-viewer';
 
 export type Speech = {
   text: string;
@@ -105,20 +91,17 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
   synth = new NicoliveCommentSynthesizer();
 
   makeSpeech(chat: WrappedChat): Speech | null {
-    if (!this.enabled) {
+    console.log(`makeSpeech proxy: ${chat}`);
+    const r = this.synth.makeSpeechText(chat);
+    if (r === '') {
       return null;
     }
-    console.log(`makeSpeech proxy: ${chat}`);
-    const r = this.synth.makeSpeech(chat);
-    if (r) {
-      return {
-        pitch: this.state.pitch,
-        rate: this.state.rate,
-        volume: this.state.volume,
-        ...r,
-      };
-    }
-    return r;
+    return {
+      pitch: this.state.pitch,
+      rate: this.state.rate,
+      volume: this.state.volume,
+      text: r,
+    };
   }
 
   makeSimpleTextSpeech(text: string): Speech | null {
@@ -135,7 +118,10 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     onstart: (this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => any,
     onend: (this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => any
   ) {
-    return this.synth.speakText(speech, onstart, onend);
+    if (!this.enabled) {
+      return;
+    }
+    this.synth.speakText(speech, onstart, onend);
   }
 
   get speaking(): boolean {
@@ -151,12 +137,12 @@ export class NicoliveCommentSynthesizer {
   dictionary = new ParaphraseDictionary();
 
   get available(): boolean {
-    return window.speechSynthesis !== undefined
+    return window.speechSynthesis !== undefined;
   }
 
-  makeSpeech(chat: WrappedChat): Speech | null {
+  makeSpeechText(chat: WrappedChat): string {
     if (!chat.value || !chat.value.content) {
-      return null;
+      return '';
     }
 
     const converted = this.dictionary.process(chat.value.content);
@@ -166,9 +152,7 @@ export class NicoliveCommentSynthesizer {
       console.log(`makeSpeech: ${chat.value.content} -> ${converted}`);
     }
 
-    return {
-      text: converted,
-    };
+    return converted;
   }
 
   speakText(speech: Speech,
