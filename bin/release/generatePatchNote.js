@@ -121,7 +121,10 @@ async function generateRoutine({ githubTokenForReadPullRequest }) {
       owner: 'n-air-app',
       repo: 'n-air-app',
     },
-    previousVersion
+    previousVersion,
+    {
+      addAuthor: !(environment === 'public' && channel === 'stable'),
+    }
   );
 
   const directCommits = executeCmd(`git log --no-merges --first-parent --pretty=format:"%s (%t)" v${previousVersion}..`, {
