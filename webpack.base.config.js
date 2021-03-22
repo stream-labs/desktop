@@ -196,7 +196,7 @@ module.exports = {
           path.resolve(__dirname, 'app/components-react'),
         ],
         use: [
-          { loader: 'style-loader' },
+          { loader: 'style-loader', options: { attributes: { name: 'local' } } },
           {
             loader: 'css-loader',
             options: {
@@ -217,13 +217,37 @@ module.exports = {
         ],
       },
       {
+        test: /\.lazy.less$/, // antd themes
+        include: [path.resolve(__dirname, 'app/styles/antd')],
+        use: [
+          {
+            loader: 'style-loader',
+            options: { injectType: 'lazyStyleTag', attributes: { name: 'antd' } },
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1,
+            },
+          },
+          {
+            loader: 'less-loader',
+            options: {
+              lessOptions: {
+                javascriptEnabled: true,
+              },
+            },
+          },
+        ],
+      },
+      {
         test: /\.g\.less$/, // Global styles
         include: [
           path.resolve(__dirname, 'app/app.g.less'),
           path.resolve(__dirname, 'app/themes.g.less'),
         ],
         use: [
-          'style-loader',
+          { loader: 'style-loader', options: { attributes: { name: 'global' } } },
           {
             loader: 'css-loader',
             options: {
@@ -248,6 +272,7 @@ module.exports = {
           path.resolve(__dirname, 'app/components-react'),
           path.resolve(__dirname, 'app/app.g.less'),
           path.resolve(__dirname, 'app/themes.g.less'),
+          path.resolve(__dirname, 'app/styles/antd'),
         ],
         use: [
           'style-loader',
