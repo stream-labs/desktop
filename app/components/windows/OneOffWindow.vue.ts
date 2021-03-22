@@ -21,9 +21,9 @@ export default class OneOffWindow extends Vue {
     window.addEventListener('resize', this.windowSizeHandler);
   }
 
-  mounted() {
-    antdThemes[this.theme].use();
-  }
+  // mounted() {
+  //   antdThemes[this.theme].use();
+  // }
 
   destroyed() {
     window.removeEventListener('resize', this.windowSizeHandler);
@@ -41,11 +41,11 @@ export default class OneOffWindow extends Vue {
     return this.customizationService.currentTheme;
   }
 
-  @Watch('theme')
-  updateAntd(newTheme: string, oldTheme: string) {
-    antdThemes[oldTheme].unuse();
-    antdThemes[newTheme].use();
-  }
+  // @Watch('theme')
+  // updateAntd(newTheme: string, oldTheme: string) {
+  //   antdThemes[oldTheme].unuse();
+  //   antdThemes[newTheme].use();
+  // }
 
   windowResizeTimeout: number;
 
