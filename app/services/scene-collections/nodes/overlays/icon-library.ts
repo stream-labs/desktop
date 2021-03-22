@@ -26,10 +26,15 @@ export class IconLibraryNode extends Node<ISchema, IContext> {
     fs.mkdirSync(destination);
 
     fs.readdir(folder, (err: Error, files: string[]) => {
-      files.forEach(file => {
-        const filePath = path.join(folder, file);
-        fs.writeFileSync(path.join(destination, file), fs.readFileSync(filePath));
-      });
+      if (err) {
+        console.error('error reading icon library directory', err);
+        throw err;
+      } else {
+        files.forEach(file => {
+          const filePath = path.join(folder, file);
+          fs.writeFileSync(path.join(destination, file), fs.readFileSync(filePath));
+        });
+      }
     });
 
     this.data = {
@@ -40,8 +45,13 @@ export class IconLibraryNode extends Node<ISchema, IContext> {
   async load(context: IContext) {
     const folder = path.join(context.assetsPath, this.data.folder);
     fs.readdir(folder, (err: Error, files: string[]) => {
-      const activeIcon = path.join(folder, files[0]);
-      context.sceneItem.getSource().setPropertiesManagerSettings({ folder, activeIcon });
+      if (err) {
+        console.error('error reading icon library directory', err);
+        throw err;
+      } else {
+        const activeIcon = path.join(folder, files[0]);
+        context.sceneItem.getSource().setPropertiesManagerSettings({ folder, activeIcon });
+      }
     });
   }
 }

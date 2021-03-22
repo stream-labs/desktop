@@ -16,8 +16,9 @@ export default () => {
   const source = SourcesService.views.getSource(sourceId);
 
   const [folderPath, setFolderPath] = useState('');
-  const [folderImages, setFolderImages] = useState(['']);
+  const [folderImages, setFolderImages] = useState([] as string[]);
   const [selectedIcon, setSelectedIcon] = useState('');
+  const [errorState, setErrorState] = useState(false);
 
   useEffect(lifecycle, []);
 
@@ -29,6 +30,7 @@ export default () => {
         setFolderPath(folder);
 
         fs.readdir(folder, (err: Error, files: string[]) => {
+          if (err) return setErrorState(true);
           setFolderImages(files.map((file: string) => path.join(folder, file)));
         });
 
@@ -42,6 +44,7 @@ export default () => {
     setFolderPath(folder);
 
     fs.readdir(folder, (err: Error, files: string[]) => {
+      if (err) return setErrorState(true);
       setFolderImages(files.map((file: string) => path.join(folder, file)));
       const activeIconPath = path.join(folder, files[0]);
       selectIcon(activeIconPath);
@@ -77,14 +80,18 @@ export default () => {
           />
         )}
         <div className={styles.cellContainer}>
-          {folderImages.map(image => (
-            <ImageCell
-              path={image}
-              isSelected={image === selectedIcon}
-              handleClick={selectIcon}
-              key={image}
-            />
-          ))}
+          {errorState ? (
+            <div>{$t('An error has occured, please try re-opening this window')}</div>
+          ) : (
+            folderImages.map(image => (
+              <ImageCell
+                path={image}
+                isSelected={image === selectedIcon}
+                handleClick={selectIcon}
+                key={image}
+              />
+            ))
+          )}
         </div>
       </div>
     </ModalLayout>
