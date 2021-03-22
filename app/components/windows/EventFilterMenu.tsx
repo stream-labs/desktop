@@ -1,4 +1,5 @@
 import { Component } from 'vue-property-decorator';
+import { UserService } from '../../services/user';
 import { Inject } from 'services/core/injector';
 import ModalLayout from 'components/ModalLayout.vue';
 import TsxComponent from 'components/tsx-component';
@@ -12,6 +13,7 @@ import styles from './EventFilterMenu.m.less';
 export default class EventFilterMenu extends TsxComponent<{}> {
   @Inject() windowsService: WindowsService;
   @Inject() recentEventsService: RecentEventsService;
+  @Inject() userService: UserService;
 
   cancel() {
     this.windowsService.closeChildWindow();
@@ -39,6 +41,10 @@ export default class EventFilterMenu extends TsxComponent<{}> {
 
   get resubsEnabled() {
     return this.resubFilters.hasOwnProperty('resub') && this.resubFilters['resub'].value;
+  }
+
+  get isTwitch() {
+    return this.userService.platform.type === 'twitch';
   }
 
   updateFilter(filter: string, value: boolean | number) {
@@ -71,6 +77,9 @@ export default class EventFilterMenu extends TsxComponent<{}> {
   }
 
   get renderSubFilters() {
+    if (!this.isTwitch) {
+      return;
+    }
     return (
       <div class={styles.halfWidth}>
         <div>{this.renderBooleanInput('subscription', this.subFilters['subscription'], true)}</div>
@@ -83,6 +92,9 @@ export default class EventFilterMenu extends TsxComponent<{}> {
   }
 
   get renderResubFilters() {
+    if (!this.isTwitch) {
+      return;
+    }
     return (
       <div class={styles.halfWidth}>
         <div>{this.renderBooleanInput('resub', this.resubFilters['resub'], true)}</div>
@@ -105,6 +117,9 @@ export default class EventFilterMenu extends TsxComponent<{}> {
   }
 
   get renderResubMonthsFilter() {
+    if (!this.isTwitch) {
+      return;
+    }
     const minEnabledFilter = this.resubFilters['filter_subscription_minimum_enabled'];
     const minMonthsFilter = this.minMonthsFilter['filter_subscription_minimum_months'];
     return (
@@ -132,10 +147,12 @@ export default class EventFilterMenu extends TsxComponent<{}> {
       <ModalLayout customControls showControls={false}>
         <div slot="content" class={styles.flexColumn}>
           {this.renderGeneralFilters}
-          <div class={styles.subFilters}>
+          {this.isTwitch && (
+            <div class={styles.subFilters}>
             {this.renderSubFilters}
             {this.renderResubFilters}
           </div>
+          )}
         </div>
         <div slot="controls">
           <button class="button button--action" onClick={this.cancel}>
