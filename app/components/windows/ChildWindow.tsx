@@ -21,7 +21,7 @@ export default class ChildWindow extends Vue {
   private modalOptions: IModalOptions = { renderFn: null };
 
   mounted() {
-    antdThemes[this.theme].use();
+    // antdThemes[this.theme].use();
     WindowsService.modalChanged.subscribe(modalOptions => {
       this.modalOptions = { ...this.modalOptions, ...modalOptions };
     });
@@ -52,11 +52,11 @@ export default class ChildWindow extends Vue {
     return this.appService.state.loading;
   }
 
-  @Watch('theme')
-  updateAntd(newTheme: string, oldTheme: string) {
-    antdThemes[oldTheme].unuse();
-    antdThemes[newTheme].use();
-  }
+  // @Watch('theme')
+  // updateAntd(newTheme: string, oldTheme: string) {
+  //   antdThemes[oldTheme].unuse();
+  //   antdThemes[newTheme].use();
+  // }
 
   clearComponentStack() {
     this.components = [];
