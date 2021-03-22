@@ -84,7 +84,7 @@ export default class Main extends Vue {
   }
 
   mounted() {
-    antdThemes[this.theme].use();
+    // antdThemes[this.theme].use();
     WindowsService.modalChanged.subscribe(modalOptions => {
       this.modalOptions = { ...this.modalOptions, ...modalOptions };
     });
@@ -94,11 +94,11 @@ export default class Main extends Vue {
     return this.$store.state.bulkLoadFinished && this.$store.state.i18nReady;
   }
 
-  @Watch('theme')
-  updateAntd(newTheme: string, oldTheme: string) {
-    antdThemes[oldTheme].unuse();
-    antdThemes[newTheme].use();
-  }
+  // @Watch('theme')
+  // updateAntd(newTheme: string, oldTheme: string) {
+  //   antdThemes[oldTheme].unuse();
+  //   antdThemes[newTheme].use();
+  // }
 
   @Watch('uiReady')
   initializeResize() {
