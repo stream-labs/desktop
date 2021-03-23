@@ -369,7 +369,6 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
   }
 
   private drawVolmeters() {
-    console.log('draw volmeters', this.canvasWidth, this.canvasHeight);
     const bg = this.bg;
 
     this.gl.clearColor(bg.r / 255, bg.g / 255, bg.b / 255, 1);
