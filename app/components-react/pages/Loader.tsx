@@ -23,20 +23,19 @@ export default function Loader() {
   useEffect(lifecycle, []);
 
   function lifecycle() {
-    let timeout: NodeJS.Timeout;
     function loopRandomText() {
       const randomIndex = Math.floor(Math.random() * loadingStrings.length);
       if (loaderText === loadingStrings[randomIndex]) {
         loopRandomText();
       } else {
         setLoaderText(loadingStrings[randomIndex]);
-        timeout = setTimeout(loopRandomText, 4000);
       }
     }
     loopRandomText();
+    const interval = setInterval(loopRandomText, 4000);
 
     return function cleanup() {
-      clearTimeout(timeout);
+      clearInterval(interval);
     };
   }
 
