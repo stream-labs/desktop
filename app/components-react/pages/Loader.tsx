@@ -20,16 +20,24 @@ const loadingStrings = [
 
 export default function Loader() {
   const [loaderText, setLoaderText] = useState('');
-  useEffect(loopRandomText, []);
+  useEffect(lifecycle, []);
 
-  function loopRandomText() {
-    const randomIndex = Math.floor(Math.random() * loadingStrings.length);
-    if (loaderText === loadingStrings[randomIndex]) {
-      loopRandomText();
-    } else {
-      setLoaderText(loadingStrings[randomIndex]);
-      setTimeout(loopRandomText, 4000);
+  function lifecycle() {
+    let timeout: NodeJS.Timeout;
+    function loopRandomText() {
+      const randomIndex = Math.floor(Math.random() * loadingStrings.length);
+      if (loaderText === loadingStrings[randomIndex]) {
+        loopRandomText();
+      } else {
+        setLoaderText(loadingStrings[randomIndex]);
+        timeout = setTimeout(loopRandomText, 4000);
+      }
     }
+    loopRandomText();
+
+    return function cleanup() {
+      clearTimeout(timeout);
+    };
   }
 
   return (
