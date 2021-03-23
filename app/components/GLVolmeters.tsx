@@ -190,6 +190,7 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
         lastEventTime: 0,
         peakHolds: [],
         peakHoldCounters: [],
+        muted: false,
       };
 
       // bind listener
