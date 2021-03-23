@@ -111,6 +111,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
       if (audioSource && !source.audio) {
         this.removeAudioSource(source.sourceId);
       }
+      this.UPDATE_AUDIO_SOURCE(source.sourceId, this.generateAudioSourceData(source.sourceId));
     });
 
     this.sourcesService.sourceRemoved.subscribe(source => {

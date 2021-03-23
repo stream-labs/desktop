@@ -26,8 +26,12 @@ const GREEN = [49, 195, 162];
 const YELLOW = [255, 205, 71];
 const RED = [252, 62, 63];
 
+// a peak value that indicates silence
+const SILENCE = -65535;
+
 interface IVolmeterSubscription {
   sourceId: string;
+  muted: boolean;
   channelsCount: number;
   // peakHolds show the maximum peak value for a given time range
   peakHoldCounters: number[];
@@ -142,6 +146,7 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
   private subscribeVolmeters() {
     const audioSources = this.audioSources;
     const sourcesOrder = audioSources.map(source => source.sourceId);
+    this.lastEventTime = performance.now();
 
     // subscribe volmeters
     audioSources.forEach(source => {
@@ -155,9 +160,22 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
         const subscription = this.subscriptions[sourceId];
         if (!subscription) return;
         const now = performance.now();
-        subscription.channelsCount = volmeter.peak.length;
-        subscription.prevPeaks = subscription.interpolatedPeaks;
-        subscription.currentPeaks = Array.from(volmeter.peak);
+        const muted = this.audioService.state.audioSources[source.sourceId].muted;
+        if (muted) {
+          // if subscription already marked as muted then just ignore updates
+          if (subscription.muted) return;
+          // mark subscription as muted and reset peaks
+          subscription.muted = true;
+          subscription.prevPeaks = [];
+          subscription.currentPeaks = [];
+          subscription.peakHolds = [];
+          subscription.peakHoldCounters = [];
+        } else {
+          subscription.muted = false;
+          subscription.channelsCount = volmeter.peak.length;
+          subscription.prevPeaks = subscription.interpolatedPeaks;
+          subscription.currentPeaks = Array.from(volmeter.peak);
+        }
         subscription.lastEventTime = now;
         this.lastEventTime = now;
       })(sourceId);
@@ -257,9 +275,11 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
     if (currentFrameNumber !== this.frameNumber) {
       // it's time to render next frame
       this.frameNumber = currentFrameNumber;
-      // if there is no new data for Volmeters we need to render only  the interpolation animation
-      const needToReRender = now - this.lastEventTime <= this.interpolationTime;
-      if (needToReRender) {
+
+      const shouldRender =
+        // if there is no new data for Volmeters we need to render only  the interpolation animation
+        now - this.lastEventTime <= this.interpolationTime;
+      if (shouldRender) {
         this.drawVolmeters();
       }
     }
@@ -320,7 +340,16 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
 
   private setCanvasSize() {
     const width = Math.floor(this.$refs.canvas.parentElement.offsetWidth);
-    const height = Math.floor(this.$refs.canvas.parentElement.offsetHeight);
+    // const height = Math.floor(this.$refs.canvas.parentElement.offsetHeight);
+    const mixerItemHeights = this.sourcesOrder
+      .map(sourceId => this.subscriptions[sourceId])
+      .map(
+        volmeter =>
+          PADDING_TOP +
+          (volmeter.channelsCount * CHANNEL_HEIGHT + SPACE_BETWEEN_CHANNELS) +
+          PADDING_BOTTOM,
+      );
+    const height = mixerItemHeights.reduce((acc, val) => acc + val);
 
     if (width !== this.canvasWidth) {
       this.canvasWidth = width;
@@ -340,6 +369,7 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
   }
 
   private drawVolmeters() {
+    console.log('draw volmeters', this.canvasWidth, this.canvasHeight);
     const bg = this.bg;
 
     this.gl.clearColor(bg.r / 255, bg.g / 255, bg.b / 255, 1);
