@@ -26,9 +26,6 @@ const GREEN = [49, 195, 162];
 const YELLOW = [255, 205, 71];
 const RED = [252, 62, 63];
 
-// a peak value that indicates silence
-const SILENCE = -65535;
-
 interface IVolmeterSubscription {
   sourceId: string;
   muted: boolean;
@@ -339,8 +336,7 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
   }
 
   private setCanvasSize() {
-    const width = Math.floor(this.$refs.canvas.parentElement.offsetWidth);
-    // const height = Math.floor(this.$refs.canvas.parentElement.offsetHeight);
+    // take item height values to calculate the canvas height
     const mixerItemHeights = this.sourcesOrder
       .map(sourceId => this.subscriptions[sourceId])
       .map(
@@ -349,7 +345,9 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
           (volmeter.channelsCount * CHANNEL_HEIGHT + SPACE_BETWEEN_CHANNELS) +
           PADDING_BOTTOM,
       );
+    // calculate the canvas height as a sum of all item heights
     const height = mixerItemHeights.reduce((acc, val) => acc + val);
+    const width = Math.floor(this.$refs.canvas.parentElement.offsetWidth);
 
     if (width !== this.canvasWidth) {
       this.canvasWidth = width;
