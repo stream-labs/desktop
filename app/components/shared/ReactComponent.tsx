@@ -66,6 +66,19 @@ export class NameFolder extends ReactComponent {}
 export class NewsBanner extends ReactComponent {}
 @Component({
   props: {
+    name: { default: 'Display' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+    componentProps: {
+      default: () => ({
+        paddingSize: 0,
+        drawUI: false,
+      }),
+    },
+  },
+})
+export class Display extends ReactComponent {}
+@Component({
+  props: {
     name: { default: 'TitleBar' },
     componentProps: { default: () => ({ windowId: '' }) },
   },
