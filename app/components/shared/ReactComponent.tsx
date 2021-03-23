@@ -70,3 +70,9 @@ export class TitleBar extends ReactComponent {}
   },
 })
 export class Chat extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'Loader' },
+  },
+})
+export class Loader extends ReactComponent {}

@@ -3,6 +3,7 @@ import NameFolder from './windows/NameFolder';
 import NewsBanner from './root/NewsBanner';
 import TitleBar from './shared/TitleBar';
 import Chat from './root/Chat';
+import Loader from './pages/Loader';
 
 // list of React components for usage inside Vue components
 export const components = {
@@ -10,4 +11,5 @@ export const components = {
   NewsBanner,
   TitleBar,
   Chat,
+  Loader,
 };

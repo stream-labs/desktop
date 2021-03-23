@@ -26,7 +26,7 @@ import { UserService } from 'services/user';
 import { IModalOptions, WindowsService } from 'services/windows';
 import LiveDock from '../LiveDock.vue';
 import StudioFooter from '../StudioFooter.vue';
-import CustomLoader from '../CustomLoader';
+import { Loader } from '../shared/ReactComponent';
 import PatchNotes from '../pages/PatchNotes.vue';
 import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
 import electron from 'electron';
@@ -52,7 +52,7 @@ const loadedTheme = () => {
     Onboarding,
     LiveDock,
     StudioFooter,
-    CustomLoader,
+    CustomLoader: Loader,
     PatchNotes,
     NewsBanner,
     Chatbot,
