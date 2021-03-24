@@ -1,4 +1,5 @@
 import TsxComponent, { createProps } from '../tsx-component';
+import isEqual from 'lodash/isEqual';
 
 const reactBuild = require('components-react');
 const ReactDOM = require('react-dom');
@@ -35,7 +36,10 @@ class ReactComponent<TComponentProps = {}> extends TsxComponent<WrapperProps<TCo
   }
 
   @Watch('componentProps', { deep: true })
-  refreshComponent() {
+  refreshReactComponent(componentProps: TComponentProps, oldComponentProps: TComponentProps) {
+    const serializedProps = JSON.parse(JSON.stringify(componentProps));
+    const serializedOldProps = JSON.parse(JSON.stringify(oldComponentProps));
+    if (isEqual(serializedProps, serializedOldProps)) return;
     ReactDOM.unmountComponentAtNode(this.$refs.container);
     const className = this.props.name;
     const componentClass = reactBuild.components[className];
