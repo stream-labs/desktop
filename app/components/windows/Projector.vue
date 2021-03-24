@@ -17,7 +17,10 @@
             </button>
           </div>
         </scrollable>
-        <display v-if="!hideStyleBlockers" :source-id="sourceId" :rendering-mode="renderingMode" />
+        <display
+          v-if="!hideStyleBlockers"
+          :componentProps="{ sourceId: sourceId, renderingMode: renderingMode }"
+        />
       </div>
     </modal-layout>
   </div>

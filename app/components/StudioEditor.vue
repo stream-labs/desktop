@@ -1,51 +1,63 @@
 <template>
-<div class="main-container" ref="studioModeContainer">
-  <div v-if="displayEnabled" class="studio-mode-container" :class="{ stacked }">
-    <studio-mode-controls v-if="studioMode" :stacked="stacked" />
-    <div
-      class="studio-display-container"
-      :class="{ stacked }">
-      <div
-        class="studio-editor-display-container noselect"
-        ref="display"
-        :style="{ cursor: cursor }"
-        @mousedown="handleMouseDown"
-        @mouseup="handleMouseUp"
-        @mousemove="handleMouseMove"
-        @mouseenter="handleMouseEnter"
-        @dblclick="handleMouseDblClick"
+  <div class="main-container" ref="studioModeContainer">
+    <div v-if="displayEnabled" class="studio-mode-container" :class="{ stacked }">
+      <studio-mode-controls v-if="studioMode" :stacked="stacked" />
+      <div class="studio-display-container" :class="{ stacked }">
+        <div
+          class="studio-editor-display-container noselect"
+          ref="display"
+          :style="{ cursor: cursor }"
+          @mousedown="handleMouseDown"
+          @mouseup="handleMouseUp"
+          @mousemove="handleMouseMove"
+          @mouseenter="handleMouseEnter"
+          @dblclick="handleMouseDblClick"
         >
-        <display
-          class="studio-editor-display"
-          :drawUI="true"
-          :paddingSize="10"
-          :sourceId="studioMode ? getStudioTransitionName() : void 0"
-          :renderingMode="renderingMode"
-          @outputResize="onOutputResize"/>
+          <display
+            class="studio-editor-display"
+            :componentProps="{
+              drawUI: true,
+              paddingSize: 10,
+              sourceId: studioMode ? getStudioTransitionName() : void 0,
+              renderingMode: renderingMode,
+              onOutputResize: e => onOutputResize(e),
+            }"
+          />
+        </div>
+        <div v-if="studioMode" class="studio-mode-display-container">
+          <display class="studio-mode-display" :paddingSize="10" />
+        </div>
       </div>
-      <div v-if="studioMode" class="studio-mode-display-container">
-        <display class="studio-mode-display" :paddingSize="10" />
+    </div>
+    <div v-else class="no-preview">
+      <div class="message" v-if="performanceMode">
+        {{ $t('Preview is disabled in performance mode') }}
+        <div class="button button--action" @click="enablePreview">
+          {{ $t('Disable Performance Mode') }}
+        </div>
+      </div>
+      <div ref="placeholder" class="placeholder" v-else>
+        <div v-if="studioMode" class="placeholder-controls" :class="{ stacked }" />
+        <img
+          src="../../media/images/16x9.png"
+          :class="{ vertical: verticalPlaceholder, studioMode, stacked }"
+          @dragstart.prevent
+        />
+        <img
+          v-if="studioMode"
+          src="../../media/images/16x9.png"
+          :class="{ vertical: verticalPlaceholder, studioMode, stacked, right: true }"
+          @dragstart.prevent
+        />
       </div>
     </div>
   </div>
-  <div v-else class="no-preview">
-    <div class="message" v-if="performanceMode">
-      {{ $t('Preview is disabled in performance mode') }}
-      <div class="button button--action" @click="enablePreview">{{ $t('Disable Performance Mode') }}</div>
-    </div>
-    <div ref="placeholder" class="placeholder" v-else>
-      <div v-if="studioMode" class="placeholder-controls" :class="{ stacked }" />
-      <img src="../../media/images/16x9.png" :class="{ vertical: verticalPlaceholder, studioMode, stacked }" @dragstart.prevent />
-      <img v-if="studioMode" src="../../media/images/16x9.png" :class="{ vertical: verticalPlaceholder, studioMode, stacked, right: true }" @dragstart.prevent />
-    </div>
-  </div>
-</div>
 </template>
 
 <script lang="ts" src="./StudioEditor.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../styles/index";
+@import '../styles/index';
 
 .main-container {
   height: 100%;

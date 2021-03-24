@@ -6,7 +6,7 @@ import { ScenesService } from 'services/scenes';
 import { TSourceType, ISourceApi, ISourceAddOptions, SourcesService } from 'services/sources';
 import ModalLayout from 'components/ModalLayout.vue';
 import Selector from 'components/Selector.vue';
-import Display from 'components/shared/Display.vue';
+import { Display } from 'components/shared/ReactComponent';
 import { WidgetsService, WidgetDisplayData } from 'services/widgets';
 import { $t } from 'services/i18n';
 import { PlatformAppsService } from 'services/platform-apps';
