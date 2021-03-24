@@ -103,6 +103,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
 
     this.sourcesService.sourceUpdated.subscribe(source => {
       const audioSource = this.views.getSource(source.sourceId);
+      if (!audioSource) return;
 
       if (!audioSource && source.audio) {
         this.createAudioSource(this.sourcesService.views.getSource(source.sourceId));
