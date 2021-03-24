@@ -14,8 +14,8 @@ export default class Highlighter extends TsxComponent {
     console.log('mount');
     console.log(this.$refs.canvas);
 
-    this.$refs.canvas.width = 1280;
-    this.$refs.canvas.height = 720;
+    this.$refs.canvas.width = this.frameSource.width;
+    this.$refs.canvas.height = this.frameSource.height;
     this.$refs.canvas.style.width = '1280px';
     this.$refs.canvas.style.height = '720px';
   }
@@ -26,7 +26,11 @@ export default class Highlighter extends TsxComponent {
     this.frameSource.readNextFrame().then(() => {
       console.log('Frame read complete', this.frameSource.readBuffer);
       const ctx = this.$refs.canvas.getContext('2d');
-      const data = new ImageData(Uint8ClampedArray.from(this.frameSource.readBuffer), 1280, 720);
+      const data = new ImageData(
+        Uint8ClampedArray.from(this.frameSource.readBuffer),
+        this.frameSource.width,
+        this.frameSource.height,
+      );
       ctx.putImageData(data, 0, 0);
     });
   }
