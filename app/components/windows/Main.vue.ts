@@ -35,6 +35,7 @@ import PlatformMerge from 'components/pages/PlatformMerge';
 import { getPlatformService } from 'services/platforms';
 import ModalWrapper from '../shared/modals/ModalWrapper';
 import antdThemes from 'styles/antd/index';
+import Highlighter from 'components/pages/Highlighter';
 
 const loadedTheme = () => {
   const customizationState = localStorage.getItem('PersistentStatefulService-CustomizationService');
@@ -63,6 +64,7 @@ const loadedTheme = () => {
     LayoutEditor,
     AlertboxLibrary,
     ModalWrapper,
+    Highlighter,
   },
 })
 export default class Main extends Vue {

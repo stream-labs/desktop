@@ -144,6 +144,7 @@
     "eslint-plugin-import": "2.20.2",
     "eslint-plugin-prettier": "3.1.2",
     "eslint-plugin-vue": "6.1.2",
+    "execa": "^5.0.0",
     "fetch-mock": "7.7.3",
     "file-loader": "1.1.11",
     "fuse.js": "3.4.6",

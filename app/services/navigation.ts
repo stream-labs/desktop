@@ -12,7 +12,8 @@ export type TAppPage =
   | 'PlatformMerge'
   | 'LayoutEditor'
   | 'PrimeExpiration'
-  | 'AlertboxLibrary';
+  | 'AlertboxLibrary'
+  | 'Highlighter';
 
 interface INavigationState {
   currentPage: TAppPage;
@@ -21,7 +22,7 @@ interface INavigationState {
 
 export class NavigationService extends StatefulService<INavigationState> {
   static initialState: INavigationState = {
-    currentPage: 'Studio',
+    currentPage: 'Highlighter',
     params: {},
   };
 
