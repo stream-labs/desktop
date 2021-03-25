@@ -33,6 +33,34 @@ const SCRUB_FRAME_BYTE_SIZE = SCRUB_WIDTH * SCRUB_HEIGHT * 4;
 const TRANSITION_DURATION = 1;
 const TRANSITION_FRAMES = TRANSITION_DURATION * FPS;
 
+/**
+ * Extracts an audio file from a video file
+ */
+export class AudioExtractor {
+  readonly outPath: string;
+
+  constructor(public readonly sourcePath: string) {
+    const parsed = path.parse(this.sourcePath);
+    this.outPath = path.join(parsed.dir, `${parsed.name}-audio.flac`);
+  }
+
+  async extract() {
+    /* eslint-disable */
+    const args = [
+      '-i', this.sourcePath,
+      '-sample_fmt', 's32',
+      '-ar', '48000',
+      '-map', 'a:0',
+      '-c:a', 'flac',
+      '-y',
+      this.outPath,
+    ];
+    /* eslint-enable */
+
+    await execa(FFMPEG_EXE, args);
+  }
+}
+
 export class FrameSource {
   writeBuffer = Buffer.allocUnsafe(FRAME_BYTE_SIZE);
   readBuffer = Buffer.allocUnsafe(FRAME_BYTE_SIZE);
@@ -414,6 +442,12 @@ export class Transitioner {
 }
 
 export class HighlighterService extends Service {
+  async runAudio() {
+    const extractor = new AudioExtractor(CLIP_1);
+
+    await extractor.extract();
+  }
+
   async run() {
     const sources = [
       new FrameSource(CLIP_1),

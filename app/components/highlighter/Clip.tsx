@@ -82,7 +82,7 @@ export default class Clip extends TsxComponent<ClipProps> {
             background: 'rgba(0,0,0,0.7)',
             width: '100%',
             padding: '0 10px',
-            borderRadius: '0 0 10px',
+            borderRadius: '0 0 10px 10px',
           }}
         >
           {this.filename}
