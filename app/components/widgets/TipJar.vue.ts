@@ -29,6 +29,7 @@ const nameMap = () => ({
   facebook_shares: $t('Facebook Shares'),
   facebook_stars: $t('Facebook Stars'),
   facebook_supports: $t('Facebook Supports'),
+  facebook_support_gifters: $t('Facebook Support Gifters')
 });
 
 const mediaGalleryInputs = {
@@ -69,7 +70,7 @@ export default class TipJar extends WidgetSettings<ITipJarData, TipJarService> {
   }
 
   get iterableTypes() {
-    return Object.keys(this.wData.settings.types).filter(key => key !== '_id');
+    return Object.keys(this.wData.settings.types).filter(key => key !== '_id' && key !== 'priority');
   }
 
   get platform() {
