@@ -13,7 +13,7 @@ import InputWrapper from '../../../../shared/inputs/InputWrapper';
 import { TwitchTagsInput } from '../TwitchTagsInput';
 import GameSelector from '../../GameSelector';
 import Form from '../../../../shared/inputs/Form';
-import { useGoLiveSettings } from '../../go-live';
+import { useGoLiveSettings } from '../../useGoLiveSettings';
 import electron from 'electron';
 
 /***
@@ -27,9 +27,13 @@ export function YoutubeEditStreamInfo() {
     isUpdateMode,
     isScheduleMode,
     renderPlatformSettings,
-  } = useGoLiveSettings('YoutubeEditStreamInfo', view => ({
-    ytSettings: view.platforms.youtube,
-  }));
+  } = useGoLiveSettings(
+    view => ({
+      ytSettings: view.platforms.youtube,
+    }),
+    undefined,
+    'YoutubeEditStreamInfo',
+  );
   const is360video = ytSettings.projection === '360';
   const shouldShowSafeForKidsWarn = ytSettings.selfDeclaredMadeForKids;
   const broadcastId = ytSettings.broadcastId;

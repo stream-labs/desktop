@@ -2,7 +2,7 @@ import styles from './GoLive.m.less';
 import Scrollable from '../../shared/Scrollable';
 import { Services } from '../../service-provider';
 import React, { HTMLAttributes, useState } from 'react';
-import { IGoLiveProps, useGoLiveSettings } from './go-live';
+import { IGoLiveProps, useGoLiveSettings } from './useGoLiveSettings';
 import { useFormState, useVuex } from '../../hooks';
 import { DestinationSwitchers } from './DestinationSwitchers';
 import { TPlatform } from '../../../services/platforms';
@@ -22,7 +22,7 @@ const PlusIcon = PlusOutlined as Function;
  * - Settings for each platform
  * - Extras settings
  **/
-export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>) {
+export default function GoLiveSettings(p: HTMLAttributes<unknown>) {
   console.log('render GoLiveSettings');
   const { RestreamService, SettingsService, UserService } = Services;
 
@@ -30,15 +30,25 @@ export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>
     isAdvancedMode,
     protectedModeEnabled,
     error,
-    linkedPlatforms,
-    customDestinations,
-    loaded,
-  } = useGoLiveSettings('GoLiveSettings');
+    canAddDestinations,
+    isLoading,
+  } = useGoLiveSettings(view => {
+    const linkedPlatforms = view.linkedPlatforms;
+    const customDestinations = view.customDestinations;
+    console.log('computed settigns for GoLiveSettings', linkedPlatforms, customDestinations);
+    return {
+      canAddDestinations: linkedPlatforms.length + customDestinations.length < 5,
+    };
+  });
 
-  const shouldShowExtras = !error && loaded;
+  // result.contextView;
+  // result.computedProps;
+  // result.componentView;
+
+  const shouldShowSettings = !error && !isLoading;
   const shouldShowPrimeLabel = !RestreamService.state.grandfathered;
   const shouldShowLeftCol = protectedModeEnabled;
-  const shouldShowAddDestButton = linkedPlatforms.length + customDestinations.length < 5;
+  const shouldShowAddDestButton = canAddDestinations;
 
   function addDestination() {
     // open the stream settings or prime page
@@ -69,13 +79,13 @@ export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>
 
       {/*RIGHT COLUMN*/}
       <Col span={16} style={{ height: '100%' }}>
-        <Scrollable style={{ maxHeight: '100%' }} snapToWindowEdge>
-          {/*PLATFORM SETTINGS*/}
-          <PlatformSettings />
-          {/*ADD SOME SPACE IN ADVANCED MODE*/}
-          {!isAdvancedMode && <div className={styles.spacer} />}
-          {/*EXTRAS*/}
-          {shouldShowExtras && (
+        {shouldShowSettings && (
+          <Scrollable style={{ maxHeight: '100%' }} snapToWindowEdge>
+            {/*PLATFORM SETTINGS*/}
+            <PlatformSettings />
+            {/*ADD SOME SPACE IN ADVANCED MODE*/}
+            {!isAdvancedMode && <div className={styles.spacer} />}
+            {/*EXTRAS*/}
             <Section title={isAdvancedMode ? $t('Extras') : ''}>
               {/*<TwitterInput*/}
               {/*  {...bind.tweetText}*/}
@@ -85,8 +95,8 @@ export default function GoLiveSettings(p: IGoLiveProps & HTMLAttributes<unknown>
               {/*  value*/}
               {/*/>*/}
             </Section>
-          )}
-        </Scrollable>
+          </Scrollable>
+        )}
       </Col>
     </Row>
   );

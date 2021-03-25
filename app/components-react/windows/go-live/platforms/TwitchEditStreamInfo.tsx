@@ -1,4 +1,4 @@
-import { useGoLiveSettings } from '../go-live';
+import { useGoLiveSettings } from '../useGoLiveSettings';
 import CommonPlatformFields from '../CommonPlatformFields';
 import React from 'react';
 import { createBinding, TagsInput } from '../../../shared/inputs';
@@ -9,10 +9,11 @@ import Form from '../../../shared/inputs/Form';
 
 export function TwitchEditStreamInfo() {
   const { updatePlatform, twSettings, renderPlatformSettings } = useGoLiveSettings(
-    'TwitchEditStreamInfo',
     state => ({
       twSettings: state.platforms.twitch,
     }),
+    undefined,
+    'TwitchEditStreamInfo',
   );
 
   const bind = createBinding(twSettings, updatedSettings =>

@@ -1,5 +1,9 @@
 import electron from 'electron';
-import { TSetPlatformSettingsFn, TUpdatePlatformSettingsFn, useGoLiveSettings } from '../go-live';
+import {
+  TSetPlatformSettingsFn,
+  TUpdatePlatformSettingsFn,
+  useGoLiveSettings,
+} from '../useGoLiveSettings';
 import CommonPlatformFields from '../CommonPlatformFields';
 import React, { useState } from 'react';
 import { Services } from '../../../service-provider';
@@ -48,26 +52,30 @@ export default function FacebookEditStreamInfo() {
     shouldShowGamingWarning,
     renderPlatformSettings,
     shouldShowPermissionWarn,
-  } = useGoLiveSettings('FacebookEditStreamInfo', view => {
-    const fbState = FacebookService.state;
-    const hasPages = !!fbState.facebookPages.length;
-    const canStreamToTimeline = fbState.grantedPermissions.includes('publish_video');
-    const canStreamToGroup = fbState.grantedPermissions.includes('publish_to_groups');
-    const fbSettings = view.platforms.facebook;
-    return {
-      canStreamToTimeline,
-      canStreamToGroup,
-      hasPages,
-      fbSettings,
-      shouldShowGamingWarning: hasPages && fbSettings.game,
-      shouldShowPermissionWarn:
-        (!canStreamToTimeline || !canStreamToGroup) &&
-        DismissablesService.views.shouldShow(EDismissable.FacebookNeedPermissionsTip),
-      groups: fbState.facebookGroups,
-      pages: fbState.facebookPages,
-      isPrimary: view.checkPrimaryPlatform('facebook'),
-    };
-  });
+  } = useGoLiveSettings(
+    view => {
+      const fbState = FacebookService.state;
+      const hasPages = !!fbState.facebookPages.length;
+      const canStreamToTimeline = fbState.grantedPermissions.includes('publish_video');
+      const canStreamToGroup = fbState.grantedPermissions.includes('publish_to_groups');
+      const fbSettings = view.platforms.facebook;
+      return {
+        canStreamToTimeline,
+        canStreamToGroup,
+        hasPages,
+        fbSettings,
+        shouldShowGamingWarning: hasPages && fbSettings.game,
+        shouldShowPermissionWarn:
+          (!canStreamToTimeline || !canStreamToGroup) &&
+          DismissablesService.views.shouldShow(EDismissable.FacebookNeedPermissionsTip),
+        groups: fbState.facebookGroups,
+        pages: fbState.facebookPages,
+        isPrimary: view.checkPrimaryPlatform('facebook'),
+      };
+    },
+    undefined,
+    'FacebookEditStreamInfo',
+  );
   const shouldShowGroups = fbSettings.destinationType === 'group' && !isUpdateMode;
   const shouldShowPages = fbSettings.destinationType === 'page' && !isUpdateMode;
   const shouldShowEvents = !isUpdateMode && !isScheduleMode;

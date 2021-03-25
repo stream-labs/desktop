@@ -1,4 +1,4 @@
-import { useGoLiveSettings } from './go-live';
+import { useGoLiveSettings } from './useGoLiveSettings';
 import css from './GoLiveChecklist.m.less';
 import React, { HTMLAttributes } from 'react';
 import { useOnCreate, useVuex } from '../../hooks';
@@ -28,12 +28,16 @@ export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
     warning,
     getPlatformDisplayName,
     isUpdateMode,
-  } = useGoLiveSettings('GoLiveChecklist', view => ({
-    shouldShowOptimizedProfile:
-      VideoEncodingOptimizationService.state.useOptimizedProfile && view.isMidStreamMode,
-    shouldPostTweet: !view.isUpdateMode && TwitterService.state.tweetWhenGoingLive,
-    delayEnabled: StreamingService.delayEnabled,
-  }));
+  } = useGoLiveSettings(
+    view => ({
+      shouldShowOptimizedProfile:
+        VideoEncodingOptimizationService.state.useOptimizedProfile && view.isMidStreamMode,
+      shouldPostTweet: !view.isUpdateMode && TwitterService.state.tweetWhenGoingLive,
+      delayEnabled: StreamingService.delayEnabled,
+    }),
+    undefined,
+    'GoLiveChecklist',
+  );
 
   const success = lifecycle === 'live';
 

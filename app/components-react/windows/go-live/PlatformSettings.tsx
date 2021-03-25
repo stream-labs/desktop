@@ -1,5 +1,5 @@
 import CommonPlatformFields from './CommonPlatformFields';
-import { getEnabledPlatforms, IGoLiveProps, useGoLiveSettings } from './go-live';
+import { getEnabledPlatforms, IGoLiveProps, useGoLiveSettings } from './useGoLiveSettings';
 import { Services } from '../../service-provider';
 import { $t } from '../../../services/i18n';
 import React from 'react';
@@ -23,17 +23,16 @@ export default function PlatformSettings() {
     isAdvancedMode,
     enabledPlatforms,
     getPlatformDisplayName,
-    locked,
-    loaded,
-  } = useGoLiveSettings('PlatformSettings');
-  const shouldShowSettings = !error && loaded;
+    isLoading
+  } = useGoLiveSettings(undefined, undefined, 'PlatformSettings');
+  const shouldShowSettings = !error && isLoading;
 
   return (
     // minHeight is required for the loading spinner
     <div style={{ minHeight: '150px' }}>
       <GoLiveError />
 
-      <LazySpinner visible={!loaded || locked} />
+      <LazySpinner visible={!error && isLoading} />
 
       {shouldShowSettings && (
         <div style={{ width: '100%' }}>

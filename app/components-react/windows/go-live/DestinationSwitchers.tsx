@@ -12,7 +12,7 @@ import { TSwitchInputProps } from '../../shared/inputs/SwitchInput';
 import { assertIsDefined } from '../../../util/properties-type-guards';
 import { useDebounce, useFormState } from '../../hooks';
 import pick from 'lodash/pick';
-import { useGoLiveSettings } from './go-live';
+import { useGoLiveSettings } from './useGoLiveSettings';
 import { mapValues, values } from 'lodash';
 
 type TPlatforms = Record<TPlatform, { enabled: boolean }>;
@@ -45,7 +45,7 @@ export function DestinationSwitchers() {
     customDestinations,
     switchPlatforms,
     switchCustomDestination,
-  } = useGoLiveSettings('DestinationSwitchers');
+  } = useGoLiveSettings(undefined, undefined, 'DestinationSwitchers');
 
   const enabledPlatformsRef = useRef(enabledPlatforms);
 

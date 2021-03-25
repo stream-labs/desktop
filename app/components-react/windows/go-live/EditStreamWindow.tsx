@@ -10,12 +10,12 @@ import GoLiveChecklist from './GoLiveChecklist';
 import Form, { useForm } from '../../shared/inputs/Form';
 import Animation from 'rc-animate';
 import { SwitchInput } from '../../shared/inputs';
-import { useGoLiveSettings } from './go-live';
+import { useGoLiveSettings } from './useGoLiveSettings';
 import PlatformSettings from './PlatformSettings';
 import Scrollable from '../../shared/Scrollable';
 
 export default function EditStreamWindow() {
-  const { StreamingService, WindowsService, StreamSettingsService } = Services;
+  const { StreamingService, WindowsService } = Services;
   const form = useForm();
   const {
     contextValue,
@@ -26,9 +26,9 @@ export default function EditStreamWindow() {
     updateStream,
     isAdvancedMode,
     switchAdvancedMode,
-    locked,
     prepopulate,
-  } = useGoLiveSettings('GoLiveWindow', undefined, { isUpdateMode: true });
+    isLoading,
+  } = useGoLiveSettings(undefined, { isUpdateMode: true }, 'EditStreamWindow');
 
   // TODO: show success
   const shouldShowChecklist = lifecycle === 'runChecklist';
@@ -62,7 +62,7 @@ export default function EditStreamWindow() {
             onChange={switchAdvancedMode}
             value={isAdvancedMode}
             debounce={300}
-            disabled={locked}
+            disabled={isLoading}
           />
         )}
 
@@ -76,7 +76,7 @@ export default function EditStreamWindow() {
 
         {/* UPDATE BUTTON */}
         {shouldShowUpdateButton && (
-          <Button type="primary" onClick={updateStream} disabled={locked}>
+          <Button type="primary" onClick={updateStream} disabled={isLoading}>
             {$t('Update')}
           </Button>
         )}

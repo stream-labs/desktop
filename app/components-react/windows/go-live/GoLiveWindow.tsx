@@ -10,7 +10,7 @@ import GoLiveChecklist from './GoLiveChecklist';
 import Form, { useForm } from '../../shared/inputs/Form';
 import Animation from 'rc-animate';
 import { SwitchInput } from '../../shared/inputs';
-import { useGoLiveSettings } from './go-live';
+import { useGoLiveSettings } from './useGoLiveSettings';
 
 export default function GoLiveWindow() {
   console.log('render GoLiveWindow');
@@ -22,14 +22,13 @@ export default function GoLiveWindow() {
     error,
     lifecycle,
     info,
-    enabledPlatforms,
     isMultiplatformMode,
     goLive,
     isAdvancedMode,
     switchAdvancedMode,
     prepopulate,
-    locked,
-  } = useGoLiveSettings('GoLiveWindow');
+    isLoading,
+  } = useGoLiveSettings(undefined, undefined, 'GoLiveWindow');
 
   const shouldShowConfirm = ['prepopulate', 'waitForNewSettings'].includes(lifecycle);
   const shouldShowSettings = ['empty', 'prepopulate', 'waitForNewSettings'].includes(lifecycle);
@@ -96,7 +95,7 @@ export default function GoLiveWindow() {
             onChange={switchAdvancedMode}
             value={isAdvancedMode}
             debounce={200}
-            disabled={locked}
+            disabled={isLoading}
           />
         )}
 
@@ -110,7 +109,7 @@ export default function GoLiveWindow() {
 
         {/* GO LIVE BUTTON */}
         {shouldShowConfirm && (
-          <Button type="primary" onClick={goLive} disabled={locked}>
+          <Button type="primary" onClick={goLive} disabled={isLoading}>
             {$t('Confirm & Go Live')}
           </Button>
         )}

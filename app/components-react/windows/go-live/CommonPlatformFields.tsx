@@ -12,7 +12,7 @@ import {
   getEnabledPlatforms,
   TUpdatePlatformSettingsFn,
   useGoLiveSettings,
-} from './go-live';
+} from './useGoLiveSettings';
 import Utils from '../../../services/utils';
 import { assertIsDefined } from '../../../util/properties-type-guards';
 import InputWrapper from '../../shared/inputs/InputWrapper';
@@ -45,7 +45,7 @@ export default function CommonPlatformFields(p: IProps) {
     toggleCustomFields,
     isMultiplatformMode,
     supports,
-  } = useGoLiveSettings('CommonPlatformFields');
+  } = useGoLiveSettings(undefined, undefined, 'CommonPlatformFields');
   const shouldShowPropsForSinglePlatform = !!p.platform;
   const platformSettings = shouldShowPropsForSinglePlatform
     ? getPlatformSettings(p.platform!)
