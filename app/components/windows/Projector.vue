@@ -1,7 +1,7 @@
 <template>
   <div class="projector-container">
     <div class="projector-fullscreen" @keydown="exitFullscreen" v-if="fullscreen">
-      <display :source-id="sourceId" />
+      <display :componentProps="{ sourceId: sourceId }" style="flex-grow: 1;" />
     </div>
     <modal-layout v-else :content-styles="{ padding: 0 }" :showControls="false">
       <div slot="content" class="projector-windowed">
