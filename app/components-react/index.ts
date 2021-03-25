@@ -2,6 +2,7 @@
 import NameFolder from './windows/NameFolder';
 import NewsBanner from './root/NewsBanner';
 import PatchNotes from './pages/PatchNotes';
+import Display from './shared/Display';
 import TitleBar from './shared/TitleBar';
 import Chat from './root/Chat';
 
@@ -10,6 +11,7 @@ export const components = {
   NameFolder,
   NewsBanner,
   PatchNotes,
+  Display,
   TitleBar,
   Chat,
 };

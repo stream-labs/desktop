@@ -23,22 +23,30 @@ export const API_NAME_MAP = {
   fanfunding: 'fanfunding',
   subscriber: 'subscribers', // YouTube
   sponsor: 'sponsors',
+  facebook_support_gifter: 'giftSupport',
   facebook_support: 'support',
   facebook_like: 'likes',
   facebook_stars: 'stars',
   facebook_share: 'shares',
   facebook_follow: 'fbfollows',
   loyalty_store_redemption: 'loyaltystore',
-  effect: 'effects',
-  sticker: 'stickers',
+};
+
+// different tests are required due to api idiosyncracies
+const determineTester = (key: string) => {
+  switch (key) {
+    case 'facebook_stars':
+      return new RegExp(`^${key}_|facebook_show_stars_`);
+    case 'facebook_support':
+      return new RegExp(`^${key}s?_(?!gifter)|show_${key}_(?!gifter)`);
+    default:
+      return new RegExp(`^${key}s?_|show_${key}_`);
+  }
 };
 
 export const REGEX_TESTERS = Object.keys(API_NAME_MAP).map(key => ({
   name: API_NAME_MAP[key],
-  tester:
-    key === 'facebook_stars'
-      ? new RegExp(`^${key}_|facebook_show_stars_`)
-      : new RegExp(`^${key}s?_|show_${key}_`),
+  tester: determineTester(key),
 }));
 
 export const conditions = () => ({
@@ -117,18 +125,6 @@ export const conditions = () => ({
   loyaltystore: [
     { value: 'LOYALTY_STORE_REDEMPTION_ITEM_TYPE', title: $t('Item type is <type>') },
     { value: 'LOYALTY_STORE_REDEMPTION_ITEM_NAME', title: $t('Item name is <name>') },
-  ],
-  effects: [
-    { value: 'MIN_SPARKS_USED', title: $t('Sparks sent are at least <amount>') },
-    { value: 'EXACT_SPARKS_AMOUNT', title: $t('Sparks sent are exactly <amount>') },
-    { value: 'MIN_EMBERS_USED', title: $t('Ember amount is at least <amount>') },
-    { value: 'EXACT_EMBERS_AMOUNT', title: $t('Ember amount is exactly <amopunt>') },
-  ],
-  stickers: [
-    { value: 'MIN_SPARKS_USED', title: $t('Sparks sent are at least <amount>') },
-    { value: 'EXACT_SPARKS_AMOUNT', title: $t('Sparks sent are exactly <amount>') },
-    { value: 'MIN_EMBERS_USED', title: $t('Ember amount is at least <amount>') },
-    { value: 'EXACT_EMBERS_AMOUNT', title: $t('Ember amount is exactly <amopunt>') },
   ],
 });
 
@@ -213,6 +209,4 @@ const DEFAULT_ALERT_FORMATS = {
   shares: '{name} has shared!',
   fbfollows: '{name} has followed!',
   loyaltystore: '{name} redeemed {product}',
-  effects: '{name} sent {skill} worth {currency_image} {amount}!',
-  stickers: '{name} sent {skill} worth {currency_image} {amount}!',
 };
