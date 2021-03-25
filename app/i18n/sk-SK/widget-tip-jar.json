@@ -3,11 +3,11 @@
   "Enabled Events": "Enabled Events",
   "Minimum Bits": "Minimum Bits",
   "Minimum Tips": "Minimum Tips",
-  "Background Color": "Background Color",
+  "Background Color": "Farba pozadia",
   "Text": "Text",
   "Show Text": "Show Text",
-  "Text Color": "Text Color",
-  "Font Size": "Font Size",
+  "Text Color": "Farba textu",
+  "Font Size": "Veľkosť písma",
   "Tips over": "Tips over",
   "Tips & Donations": "Tips & Donations",
   "Twitch Subs": "Twitch Subs",
@@ -19,5 +19,6 @@
   "Periscope Super Hearts": "Periscope Super Hearts",
   "Picarto Follows": "Picarto Follows",
   "Picarto Subscriptions": "Picarto Subscriptions",
+  "Facebook Support Gifters": "Facebook Support Gifters",
   "Manage Jar": "Manage Jar"
 }
