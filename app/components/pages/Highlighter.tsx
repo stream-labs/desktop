@@ -1,45 +1,19 @@
 import TsxComponent from 'components/tsx-component';
-import { CLIP_1, FrameSource } from 'services/highlighter';
+import { CLIP_1, CLIP_2, CLIP_3 } from 'services/highlighter';
 import { Component } from 'vue-property-decorator';
+import Clip from 'components/highlighter/Clip';
 
-@Component({})
+@Component({
+  components: { Clip },
+})
 export default class Highlighter extends TsxComponent {
-  $refs: {
-    canvas: HTMLCanvasElement;
-  };
-
-  frameSource = new FrameSource(CLIP_1);
-
-  mounted() {
-    console.log('mount');
-    console.log(this.$refs.canvas);
-
-    this.$refs.canvas.width = this.frameSource.width;
-    this.$refs.canvas.height = this.frameSource.height;
-    this.$refs.canvas.style.width = '1280px';
-    this.$refs.canvas.style.height = '720px';
-  }
-
-  readNextFrame() {
-    console.log('READ NEXT');
-
-    this.frameSource.readNextFrame().then(() => {
-      console.log('Frame read complete', this.frameSource.readBuffer);
-      const ctx = this.$refs.canvas.getContext('2d');
-      const data = new ImageData(
-        Uint8ClampedArray.from(this.frameSource.readBuffer),
-        this.frameSource.width,
-        this.frameSource.height,
-      );
-      ctx.putImageData(data, 0, 0);
-    });
-  }
-
   render() {
     return (
       <div>
-        <button onClick={this.readNextFrame}>Next Frame</button>
-        <canvas ref="canvas"></canvas>
+        {/* <button onClick={this.readNextFrame}>Next Frame</button> */}
+        <Clip path={CLIP_1} style={{ margin: '10px' }} />
+        <Clip path={CLIP_2} style={{ margin: '10px' }} />
+        <Clip path={CLIP_3} style={{ margin: '10px' }} />
       </div>
     );
   }

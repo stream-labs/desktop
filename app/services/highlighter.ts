@@ -21,16 +21,26 @@ const WIDTH = 1280;
 const HEIGHT = 720;
 const FPS = 30;
 
-const TRANSITION_DURATION = 1;
-const TRANSITION_FRAMES = TRANSITION_DURATION * FPS;
-
 // Frames are RGBA, 4 bytes per pixel
 const FRAME_BYTE_SIZE = WIDTH * HEIGHT * 4;
+
+export const SCRUB_WIDTH = 320;
+export const SCRUB_HEIGHT = 180;
+export const SCRUB_FRAMES = 20;
+const SCRUB_FRAME_BYTE_SIZE = SCRUB_WIDTH * SCRUB_HEIGHT * 4;
+
+const TRANSITION_DURATION = 1;
+const TRANSITION_FRAMES = TRANSITION_DURATION * FPS;
 
 export class FrameSource {
   writeBuffer = Buffer.allocUnsafe(FRAME_BYTE_SIZE);
   readBuffer = Buffer.allocUnsafe(FRAME_BYTE_SIZE);
   private byteIndex = 0;
+
+  /**
+   * Allocated on demand to save memory
+   */
+  scrubFrames: Buffer[];
 
   readonly width = WIDTH;
   readonly height = HEIGHT;
@@ -64,6 +74,68 @@ export class FrameSource {
       this.sourcePath,
     ]);
     this.duration = parseFloat(stdout);
+  }
+
+  private allocScrubbingFrames() {
+    if (this.scrubFrames) {
+      console.log('Scrub frames already allocated');
+      return;
+    }
+
+    this.scrubFrames = Array(SCRUB_FRAMES)
+      .fill(0)
+      .map(() => {
+        return Buffer.allocUnsafe(SCRUB_FRAME_BYTE_SIZE);
+      });
+  }
+
+  async readScrubbingFrames() {
+    this.allocScrubbingFrames();
+    await this.readDuration();
+
+    await Promise.all(
+      this.scrubFrames.map((f, idx) => {
+        return this.readScrubbingFrame(idx);
+      }),
+    );
+  }
+
+  private async readScrubbingFrame(idx: number) {
+    /* eslint-disable */
+    const args = [
+      '-ss', `${this.duration / SCRUB_FRAMES * idx * 1000}ms`,
+      '-i', this.sourcePath,
+      '-vf', `scale=${SCRUB_WIDTH}:${SCRUB_HEIGHT}`,
+      '-frames:v', '1',
+      '-vcodec', 'rawvideo',
+      '-pix_fmt', 'rgba',
+      '-f', 'image2pipe',
+      '-'
+    ];
+    /* eslint-enable */
+
+    let byteIdx = 0;
+
+    const ffmpeg = execa(FFMPEG_EXE, args, {
+      encoding: null,
+      buffer: false,
+      stdin: 'ignore',
+      stdout: 'pipe',
+      stderr: process.stderr,
+    });
+
+    return new Promise<void>(resolve => {
+      ffmpeg.stdout.once('end', () => {
+        console.log('FFMPEG SEEK ENDED', byteIdx, SCRUB_FRAME_BYTE_SIZE);
+        resolve();
+      });
+
+      ffmpeg.stdout.on('data', (chunk: Buffer) => {
+        console.log('GOT CHUNK', chunk);
+        chunk.copy(this.scrubFrames[idx], byteIdx, 0);
+        byteIdx += chunk.length;
+      });
+    });
   }
 
   private startFfmpeg() {
@@ -134,7 +206,7 @@ export class FrameSource {
     });
   }
 
-  handleChunk(chunk: Buffer) {
+  private handleChunk(chunk: Buffer) {
     // If the chunk is larger than what's needed to fill the rest of the frame buffer,
     // only copy enough to fill the buffer.
     const bytesToCopy =
@@ -291,7 +363,7 @@ export class Transitioner {
       this.gl.STATIC_DRAW,
     );
 
-    const transitionSrc = transitions.find((t: any) => t.name === 'cube');
+    const transitionSrc = transitions.find((t: any) => t.name === 'wind');
     const transition = createTransition(this.gl, transitionSrc);
 
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
