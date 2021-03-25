@@ -264,7 +264,7 @@
   }
 
   .display {
-    transform: scale(0.82, 0.8) translate(-10%);
+    transform: scale(0.7, 0.7) translate(-21.4%);
   }
 }
 
@@ -280,7 +280,7 @@
   }
 
   .display {
-    transform: scale(1, 0.63) translate(0, -29%);
+    transform: scale(0.7, 0.7) translate(-21.4%);
   }
 }
 
@@ -291,13 +291,13 @@
   }
 
   .display {
-    transform: scale(0.7, 0.7) translate(-3.7%);
+    transform: scale(0.5, 0.5) translate(-10%);
   }
 }
 
 .content-container.has-leftbar.vertical {
   .display {
-    transform: scale(0.6, 0.6) translate(5%, -31%);
+    transform: scale(0.5, 0.5) translate(-10%);
   }
 }
 
