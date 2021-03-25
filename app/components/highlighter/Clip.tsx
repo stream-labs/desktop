@@ -1,6 +1,8 @@
 import TsxComponent, { createProps } from 'components/tsx-component';
-import { CLIP_1, FrameSource, SCRUB_HEIGHT, SCRUB_WIDTH, SCRUB_FRAMES } from 'services/highlighter';
+import { FrameSource, SCRUB_HEIGHT, SCRUB_WIDTH, SCRUB_FRAMES } from 'services/highlighter';
 import { Component } from 'vue-property-decorator';
+import path from 'path';
+import { throttle } from 'lodash-decorators';
 
 class ClipProps {
   path: string = '';
@@ -17,6 +19,12 @@ export default class Clip extends TsxComponent<ClipProps> {
   scrubFrame: number;
   scrubFramesLoaded: boolean;
   ctx: CanvasRenderingContext2D;
+
+  filename: string;
+
+  created() {
+    this.filename = path.basename(this.props.path);
+  }
 
   mounted() {
     console.log('mount', this.props.path);
@@ -38,6 +46,7 @@ export default class Clip extends TsxComponent<ClipProps> {
     });
   }
 
+  @throttle(50)
   renderScrubFrame() {
     if (!this.scrubFramesLoaded) return;
 
@@ -47,21 +56,6 @@ export default class Clip extends TsxComponent<ClipProps> {
       SCRUB_HEIGHT,
     );
     this.ctx.putImageData(data, 0, 0);
-  }
-
-  readNextFrame() {
-    console.log('READ NEXT');
-
-    // this.frameSource.readNextFrame().then(() => {
-    //   console.log('Frame read complete', this.frameSource.readBuffer);
-    //   const ctx = this.$refs.canvas.getContext('2d');
-    //   const data = new ImageData(
-    //     Uint8ClampedArray.from(this.frameSource.readBuffer),
-    //     this.frameSource.width,
-    //     this.frameSource.height,
-    //   );
-    //   ctx.putImageData(data, 0, 0);
-    // });
   }
 
   onMouseMove(e: MouseEvent) {
@@ -75,8 +69,24 @@ export default class Clip extends TsxComponent<ClipProps> {
 
   render() {
     return (
-      <div>
-        <canvas ref="canvas" onMousemove={this.onMouseMove}></canvas>
+      <div style={{ height: `${SCRUB_HEIGHT}px`, position: 'relative' }}>
+        <canvas
+          ref="canvas"
+          onMousemove={this.onMouseMove}
+          style={{ borderRadius: '10px' }}
+        ></canvas>
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            background: 'rgba(0,0,0,0.7)',
+            width: '100%',
+            padding: '0 10px',
+            borderRadius: '0 0 10px',
+          }}
+        >
+          {this.filename}
+        </div>
       </div>
     );
   }

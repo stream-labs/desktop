@@ -15,6 +15,7 @@ const CLIP_DIR = path.resolve('../../', 'Videos');
 export const CLIP_1 = path.join(CLIP_DIR, '1.mp4');
 export const CLIP_2 = path.join(CLIP_DIR, '2.mp4');
 export const CLIP_3 = path.join(CLIP_DIR, '3.mp4');
+export const CLIP_4 = path.join(CLIP_DIR, 'Facebook Refactor.mov');
 const EXPORT_FILE = path.join(CLIP_DIR, 'output.mp4');
 
 const WIDTH = 1280;
@@ -56,7 +57,8 @@ export class FrameSource {
   currentFrame = 0;
 
   get nFrames() {
-    return Math.floor(this.duration * FPS);
+    // Not sure why last frame is sometimes missing
+    return Math.floor(this.duration * FPS) - 1;
   }
 
   constructor(public readonly sourcePath: string) {}
@@ -413,7 +415,12 @@ export class Transitioner {
 
 export class HighlighterService extends Service {
   async run() {
-    const sources = [new FrameSource(CLIP_1), new FrameSource(CLIP_2), new FrameSource(CLIP_3)];
+    const sources = [
+      new FrameSource(CLIP_1),
+      new FrameSource(CLIP_2),
+      new FrameSource(CLIP_3),
+      new FrameSource(CLIP_4),
+    ];
 
     // Read all durations
     await Promise.all(sources.map(s => s.readDuration()));
@@ -448,9 +455,11 @@ export class HighlighterService extends Service {
         );
         frameToRender = transitioner.getFrame();
 
+        console.log(fromSource.currentFrame, fromSource.nFrames);
         const transitionEnded = fromSource.currentFrame === fromSource.nFrames;
 
         if (transitionEnded) {
+          console.log('TRANSITION ENDED', sources);
           fromSource = toSource;
           toSource = sources.shift();
         }
