@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import * as obs from '../../../obs-api';
 import { Inject } from 'services/core/injector';
@@ -539,7 +540,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     itemName: keyof IStreamInfo['checklist'],
     state: TGoLiveChecklistItemState,
   ) {
-    this.state.info.checklist[itemName] = state;
+    Vue.set(this.state.info, 'checklist', { ...this.state.info.checklist, [itemName]: state });
   }
 
   @mutation()

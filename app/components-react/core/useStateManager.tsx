@@ -54,6 +54,7 @@ export function useStateManager<
   const globalStateRevisionRef = useRef(1);
   const computedPropsRef = useRef<TComputedProps | null>(null);
   const updateCounterRef = useRef<number>(1);
+  const isDestroyedRef = useRef<boolean>(false);
   const [componentRevision, setComponentRevision] = useState(1);
 
   function updateComponent() {
@@ -78,20 +79,21 @@ export function useStateManager<
       typeof initState === 'function' ? (initState as Function)() : cloneDeep(initState);
 
     let localStateRevision = 1;
-    const stateWatcher = createStateWatcher();
+    const stateWatcher = createStateWatcher(debug);
 
     function getState() {
       return state;
     }
 
     function setState(newState: TState) {
+      const prevState = state;
       state = newState;
       localStateRevision++;
-      stateWatcher.handleLocalStateChange(localStateRevision);
+      stateWatcher.handleLocalStateChange(localStateRevision, prevState, newState);
     }
 
     const initializerView = initializer(getState, setState) as TInitializerReturnType;
-    const contextView = (merge(state, initializerView) as unknown) as TContextView;
+    const contextView = merge(getState(), initializerView) as TContextView;
 
     function getLocalStateRevision() {
       return localStateRevision;
@@ -103,7 +105,9 @@ export function useStateManager<
 
     const contextValue = {
       contextView,
-      Context: React.createContext<TStateManagerContext<TContextView> | null>(null),
+      Context: GenericStateManagerContext as React.Context<TStateManagerContext<
+        TContextView
+      > | null>,
       stateWatcher,
       getLocalStateRevision,
       getGlobalStateRevision,
@@ -135,6 +139,10 @@ export function useStateManager<
     const dependencyWatcher = createDependencyWatcher(componentView);
 
     function onChange(change: TStateChange) {
+      if (isDestroyedRef.current) {
+        console.log('component is destoryed', componentId);
+        return;
+      }
       const { globalStateRevision, localStateRevision } = change;
       if (globalStateRevision) {
         if (globalStateRevisionRef.current >= globalStateRevision) {
@@ -146,7 +154,7 @@ export function useStateManager<
           console.log('vuex nothing changed', componentId);
           return;
         } else {
-          console.log('vuex changed', componentId, prevState, newState);
+          if (debug) logChange(prevState, newState, componentId, true, globalStateRevision);
           updateComponent();
         }
       } else if (localStateRevision) {
@@ -160,6 +168,7 @@ export function useStateManager<
             console.log('local nothing changed', componentId);
             return;
           } else {
+            if (debug) logChange(prevState, newState, componentId, false, localStateRevision);
             console.log('local changed', componentId, prevState, newState);
             updateComponent();
           }
@@ -208,6 +217,7 @@ export function useStateManager<
     return () => {
       if (isRoot) stateWatcher.stopWatching();
       stateWatcher.unsubscribe(componentId);
+      isDestroyedRef.current = true;
     };
   }, []);
 
@@ -249,7 +259,7 @@ function createDependencyWatcher<T extends object>(watchedObject: T) {
   return { watcherProxy, getDependentFields, getPrevState, savePrevState };
 }
 
-function createStateWatcher() {
+function createStateWatcher(debug = false) {
   type TComponentId = string;
   type TSubscription = {
     componentId: TComponentId;
@@ -303,6 +313,7 @@ function createStateWatcher() {
       },
       (newState, prevState) => {
         stateRevision++;
+        if (debug) logMutation(stateRevision, prevState, newState, true);
         // walk through newState and generate a `changes` object with newState and prevState
         // for each component
         const changes: Record<TComponentId, { newState: object; prevState: object }> = {};
@@ -318,7 +329,7 @@ function createStateWatcher() {
         });
 
         // walk through components and emit onChange
-        subscriptions.forEach(subscr => {
+        subscriptions.slice().forEach(subscr => {
           const { newState, prevState } = changes[subscr.componentId];
           subscr.onChange({ newState, prevState, globalStateRevision: stateRevision });
         });
@@ -332,8 +343,9 @@ function createStateWatcher() {
     isWatching = false;
   }
 
-  function handleLocalStateChange(localStateRevision: number) {
+  function handleLocalStateChange(localStateRevision: number, prevState: any, newState: any) {
     // walk through components and emit onChange
+    if (debug) logMutation(stateRevision, prevState, newState, true);
     subscriptions.forEach(subscr => {
       subscr.onChange({ localStateRevision });
     });
@@ -368,7 +380,7 @@ function isSimilar(obj1: any, obj2: any) {
 function isDeepEqual(obj1: any, obj2: any, currentDepth: number, maxDepth: number) {
   if (obj1 === obj2) return true;
   if (currentDepth === maxDepth) return false;
-  if (Array.isArray(obj1) && Array.isArray(obj2)) isArrayEqual(obj1, obj2);
+  if (Array.isArray(obj1) && Array.isArray(obj2)) return isArrayEqual(obj1, obj2);
   if (isPlainObject(obj1) && isPlainObject(obj2)) {
     const [keys1, keys2] = [Object.keys(obj1), Object.keys(obj2)];
     if (keys1.length !== keys2.length) return false;
@@ -398,29 +410,50 @@ function pick<T extends object>(obj: T, ...props: Array<string>): Partial<T> {
   return result as Partial<T>;
 }
 
-function useDepWatch() {
-  const result = useStateManager(
-    () => ({ foo: '1', bar: 2 }),
-    (getState, setState) => {
-      return {
-        setFoo(foo: string) {
-          setState({ ...getState(), foo });
-        },
-        setBar(bar: number) {
-          setState({ ...getState(), bar });
-        },
-      };
-    },
-    v => {
-      return { fooBar: v.foo + v.bar };
-    },
-  );
-  // result.initializerReturnType;
-  // result.contextView;
-  // result.computedProps;
-  result.dependencyWatcher;
-  result.componentView;
+function getDiff(prevState: any, newState: any) {
+  const changedFields = Object.keys(newState).filter(key => !isSimilar(newState[key], prevState[key]));
+  const diff = {};
+  changedFields.forEach(key => diff[key] = ({ prevState: prevState[key], newState: newState[key] }));
+  return [changedFields, diff];
 }
+
+function logChange(prevState: any, newState: any, componentId: string, isGlobalState: boolean, revision: number) {
+  const mutationType = isGlobalState ? 'global' : 'local';
+  const [changedFields, diff] = getDiff(prevState, newState);
+  const triggeredByMsg = `Triggered by ${mutationType} mutation #${revision}`;
+  console.log('Should update component', componentId, triggeredByMsg, 'Changed fields:', changedFields, 'Diff', diff);
+}
+
+function logMutation(revision: number, prevState: any, newState: any, isGlobal: boolean) {
+  const mutationType = isGlobal ? 'global' : 'local';
+  const [changedFields, diff] = getDiff(prevState, newState);
+  console.log(`New ${mutationType} mutation # ${revision}. Changed fields:`, changedFields, 'Diff:', diff);
+}
+
+//
+// function useDepWatch() {
+//   const result = useStateManager(
+//     () => ({ foo: '1', bar: 2 }),
+//     (getState, setState) => {
+//       return {
+//         setFoo(foo: string) {
+//           setState({ ...getState(), foo });
+//         },
+//         setBar(bar: number) {
+//           setState({ ...getState(), bar });
+//         },
+//       };
+//     },
+//     v => {
+//       return { fooBar: v.foo + v.bar };
+//     },
+//   );
+//   // result.initializerReturnType;
+//   // result.contextView;
+//   // result.computedProps;
+//   result.dependencyWatcher;
+//   result.componentView;
+// }
 
 /**
  * Get component name from the callstack
@@ -438,22 +471,6 @@ function getComponentName(): string {
   }
 }
 
-type TUseStateManagerResult<
-  TState extends object,
-  TActions extends object,
-  TComputedProps,
-  TContextValue = TMerge<{ Context: React.Context<any> }, TMerge<TState, TActions>>
-> = TContextValue & { contextValue: TContextValue };
-
-// type TUseStateManagerResult<TState extends object, TActions extends object, TWatcherProps> = {
-//   Context: React.Context<{state: TState, actions: TActions}>,
-//   contextValue: {state: TState, actions: TActions},
-//   state: TState,
-//   actions: TActions,
-//   watchedProps: TWatcherProps,
-//   view: Omit<TState, keyof TActions> & TActions;
-// }
-
 export type TMerge<
   T1,
   T2,
@@ -464,108 +481,16 @@ export type TMerge<
 
 type TMerge3<T1, T2, T3> = TMerge<TMerge<T1, T2>, T3>;
 
-// export type TMerge<T1, T2, R extends object = Omit<T1, keyof T2> & T2> = R;
-type TMergedTipple<T1, T2, T3> = TMerge<TMerge<T1, T2>, T3>;
-
-type Tbar = { one: '1' };
-type Tfoo = { second: '2' };
-type TZoo = () => { third: '3' };
-type TRes = TMerge<Tbar, TZoo>;
-type TForceObj<T> = T extends object ? object : void;
-
-type TFine = TForceObj<TRes>;
-
-//
-// export function applyReactiveWatcher<T>(
-//   observable: T,
-//   changed: Observable<unknown>,
-//   updater: Function,
-//   destoryed: Observable<unknown>,
-//   debug: string,
-// ): T {
-//   const watchedProps = {};
-//   let prevState: object = {};
-//   const proxyObject = new Proxy(
-//     {},
-//     {
-//       get: (target, propName: string) => {
-//         const value = observable[propName];
-//         if (!propName.startsWith('_')) watchedProps[propName] = value;
-//         return value;
-//       },
-//     },
-//   );
-//
-//   function getState() {
-//     const currentState: Record<string, unknown> = {};
-//     Object.keys(watchedProps).forEach(propName => (currentState[propName] = observable[propName]));
-//     return currentState;
-//   }
-//
-//   let destroyedSubscription: Subscription;
-//   let unsubscribeVuex: Function;
-//
-//   setTimeout(() => {
-//     prevState = getState();
-//     unsubscribeVuex = StatefulService.store.watch(
-//       () => {
-//         return Object.keys(watchedProps).map(propName => observable[propName]);
-//       },
-//       () => {
-//         console.log('vuex changed', debug);
-//         updater();
-//       },
-//     );
-//   }, 0);
-//
-//   const changedSubscription = changed.subscribe(() => {
-//     console.log('verify', debug);
-//     const newState = getState();
-//     if (!isEqual(prevState, newState)) {
-//       Object.keys(prevState as object).forEach(key => {
-//         if (!isEqual(prevState![key], newState[key])) console.log('CHANGED', key);
-//       });
-//       prevState = newState;
-//       updater();
-//     } else {
-//       console.log('no changes');
-//     }
-//   });
-//
-//   destroyedSubscription = destoryed.subscribe(() => {
-//     changedSubscription.unsubscribe();
-//     destroyedSubscription.unsubscribe();
-//     unsubscribeVuex();
-//   });
-//
-//   return proxyObject as T;
-// }
-
 type TConvertMutationToAction<TState, TMutation> = TMutation extends (
   state: TState,
   ...args: infer TArgs
 ) => TState
   ? (...args: TArgs) => TState
   : never;
-type TConvertMutationsToActions<
-  TState,
-  TMutations extends object,
-  TMutationName extends keyof TMutations
-> = { [K in TMutationName]: TConvertMutationToAction<TState, TMutations[K]> };
 
 export type TReducer<TState> = (state: TState, ...args: any[]) => TState;
 
 export type TReducers<TState, TKey extends keyof any> = Record<TKey, TReducer<TState>>;
-
-// export type TReducers<TState, TReducerSet = {}> = TReducerSet extends Record<infer Key, TReducer<TState>> ? Record<Key, TReducer<TState>> : never;
-
-// this method is only for typechecking
-export function createReducers<TState, TReducersSet extends TReducers<TState, any>>(
-  getState: () => TState,
-  reducers: TReducersSet,
-) {
-  return reducers as TReducers<TState, keyof TReducersSet>;
-}
 
 export function createMutations<
   TState,
@@ -582,97 +507,6 @@ export function createMutations<
   });
   return mutations;
 }
-
-type MState = { foo: number; bar: string };
-const mutations = {
-  updateFoo(state: MState, fooValue: number) {
-    return state;
-  },
-  updateBar(state: MState, barValue: string) {
-    return state;
-  },
-};
-
-function getState(): MState {
-  return { foo: 1, bar: 'bar' };
-}
-
-function setState(newState: MState) {}
-
-const acts = createMutations(mutations, getState, setState);
-acts.updateBar('22');
-
-// export function applyReactiveWatcher<T>(observable: T, changed: Observable<unknown>): T {
-//   const watchedProps = {};
-//   // const ownPropsRef = useRef<any>({});
-//   const [proxyObject] = useState(() => new Proxy({}, {
-//     get: (target, propName: string) => {
-//       // if (ownPropsRef.current[propName]) return ownPropsRef.current[propName];
-//       const value = observable[propName];
-//       if (!propName.startsWith('_')) watchedProps[propName] = value;
-//       return value;
-//     },
-//     // set: (target, propName: string, val) => {
-//     //   ownPropsRef.current[propName] = val;
-//     //   return true;
-//     // }
-//   }));
-//   const isInitialCall = useRef(true);
-//   const [reactiveState, setReactiveState] = useState<any>(null);
-//   useEffect(() => {
-//     const subscription = changed.subscribe(() => {
-//       console.log('something has been changed');
-//       let newState: Record<string, unknown> = {};
-//       Object.keys(watchedPropsRef.current).forEach(propName => newState[propName] = observable[propName]);
-//       const prevState = reactiveState || watchedPropsRef.current;
-//       if (!isEqual(prevState, newState)) {
-//         console.log('Need to re-render', prevState, newState);
-//         setReactiveState(observable);
-//       }
-//     });
-//     isInitialCall.current = false;
-//     return () => subscription.unsubscribe();
-//   }, []);
-//
-//   return isInitialCall ? proxyObject as T : observable;
-// }
-
-//
-//
-// export type NonObjectKeysOf<T> = {
-//   [K in keyof T]: T[K] extends Array<any> ? K : T[K] extends object ? never : K
-// }[keyof T];
-//
-// export type ValuesOf<T> = T[keyof T];
-// export type ObjectValuesOf<T extends Object> = Exclude<
-//   Exclude<Extract<ValuesOf<T>, object>, never>,
-//   Array<any>
-//   >;
-//
-// export type UnionToIntersection<U> = (U extends any
-//   ? (k: U) => void
-//   : never) extends ((k: infer I) => void)
-//   ? I
-//   : never;
-//
-// type Flatten<T> = Pick<T, NonObjectKeysOf<T>> &
-//   UnionToIntersection<ObjectValuesOf<T>>;
-
-type TValueOrReturnType<T extends object> = T extends (...args: any[]) => infer R ? R : T;
-
-const foo = {
-  a: 1,
-  b: 2,
-};
-
-const bar = function() {
-  return {
-    c: 1,
-    d: 2,
-  };
-};
-
-const wee = merge(bar, foo);
 
 export function merge<TObj1 extends object, TObj2 extends object>(
   obj1: TObj1,
@@ -715,7 +549,7 @@ export function merge<TObj1 extends object, TObj2 extends object>(
       if (propName in metadata) return metadata[propName];
       const target = findTarget(propName);
       if (!target) return;
-      return target[propName];
+      return getTargetValue(target, propName);
     },
     set: (target, propName: string, val) => {
       metadata[propName] = val;
@@ -723,45 +557,3 @@ export function merge<TObj1 extends object, TObj2 extends object>(
     },
   }) as unknown) as TMerge<TObj1, TObj2>;
 }
-
-function joinActionsAndViews<
-  TActions extends object,
-  TView extends object,
-  TViews extends object,
-  TViewName extends keyof TViews
->(actions: TActions, views: TViews): TActions & Flatten<TViews> {
-  return {} as any;
-}
-
-function act1(arg1: number) {
-  return;
-}
-
-function act2(arg1: string) {
-  return;
-}
-
-class MyView {
-  foo: 'foo';
-  bar: {
-    zoom: '1';
-  };
-}
-
-const myView = new MyView();
-
-// let flatten: Flatten<typeof MyView>;
-// const prot = MyView.prototype;
-//
-// const joined = mergeToProxy([{ act1, act2}, myView]);
-// const joined2 = joinActionsAndViews({act1, act2}, [myView]);
-// joined2.foo;
-// joined2.act1;
-
-// const a = [{foo: 1}, {bar: 2}];
-// let fl: FlattenIfArray<typeof a>;
-// fl.foo
-
-export function useView() {}
-
-type Flatten<T> = T extends (infer R)[] ? R : never;

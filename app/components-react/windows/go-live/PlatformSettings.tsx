@@ -23,9 +23,9 @@ export default function PlatformSettings() {
     isAdvancedMode,
     enabledPlatforms,
     getPlatformDisplayName,
-    isLoading
+    isLoading,
   } = useGoLiveSettings(undefined, undefined, 'PlatformSettings');
-  const shouldShowSettings = !error && isLoading;
+  const shouldShowSettings = !error && !isLoading;
 
   return (
     // minHeight is required for the loading spinner

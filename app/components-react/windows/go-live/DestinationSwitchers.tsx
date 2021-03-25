@@ -201,7 +201,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
       const platformAuthData = UserService.state.auth?.platforms[platform];
       assertIsDefined(platformAuthData);
       return {
-        title: $t('Stream to %platformName%', { platformName: service.displayName }),
+        title: $t('Stream to %{platformName}', { platformName: service.displayName }),
         description: platformAuthData.username,
         Logo: () => (
           <PlatformLogo platform={platform} className={styles[`platform-logo-${platform}`]} />

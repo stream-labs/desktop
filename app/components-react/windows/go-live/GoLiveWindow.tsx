@@ -21,7 +21,7 @@ export default function GoLiveWindow() {
     Context: GoLiveSettingsContext,
     error,
     lifecycle,
-    info,
+    checklist,
     isMultiplatformMode,
     goLive,
     isAdvancedMode,
@@ -35,21 +35,21 @@ export default function GoLiveWindow() {
   const shouldShowChecklist = ['runChecklist', 'live'].includes(lifecycle);
   const shouldShowAdvancedSwitch = shouldShowConfirm && isMultiplatformMode;
   const shouldShowGoBackButton =
-    lifecycle === 'runChecklist' && error && info.checklist.startVideoTransmission !== 'done';
+    lifecycle === 'runChecklist' && error && checklist.startVideoTransmission !== 'done';
 
   // const shouldShowChecklist = true;
   // const shouldShowSettings = false;
 
-  // prepopulate data for all platforms
-  useOnCreate(() => {
-    if (['empty', 'waitForNewSettings'].includes(lifecycle)) {
-      prepopulate();
-    }
-  });
+  // // prepopulate data for all platforms
+  // useOnCreate(() => {
+  //   if (['empty', 'waitForNewSettings'].includes(lifecycle)) {
+  //     prepopulate();
+  //   }
+  // });
 
   // clear failed checks and warnings on window close
   useOnDestroy(() => {
-    if (info.checklist.startVideoTransmission !== 'done') {
+    if (checklist.startVideoTransmission !== 'done') {
       StreamingService.actions.resetInfo();
     }
   });

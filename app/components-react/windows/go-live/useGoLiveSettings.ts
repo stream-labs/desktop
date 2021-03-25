@@ -3,7 +3,6 @@ import { TPlatform } from '../../../services/platforms';
 import { Services } from '../../service-provider';
 import {
   createMutations,
-  createReducers,
   merge,
   TReducers,
   useStateManager,
@@ -96,6 +95,7 @@ export function useGoLiveSettings<
 
   useOnCreate(() => {
     if (isRoot && contextView.needPrepopulate) {
+      console.log('call prepopulate');
       contextView.prepopulate();
     }
   });
@@ -183,7 +183,7 @@ function initializeGoLiveSettings(
       let updatedState = state;
       view.platformsWithoutCustomFields.forEach(platform => {
         if (!view.supports(fieldName, [platform])) return;
-        updatedState = this.updatePlatform(state, platform, { [fieldName]: value });
+        updatedState = this.updatePlatform(updatedState, platform, { [fieldName]: value });
       });
       return updatedState;
     },
@@ -252,21 +252,6 @@ function initializeGoLiveSettings(
   return merge(view.exposeProps(), mergedActionsAndGetters);
 }
 
-function mergeActionsAndView<TActions extends object, TView extends ViewHandler<any>>(
-  actions: TActions,
-  view: TView,
-): TActions & TView {
-  return new Proxy(
-    {},
-    {
-      get(key) {
-        const propName = key as string;
-        return actions.hasOwnProperty(propName) ? actions[propName] : view[propName];
-      },
-    },
-  ) as TActions & TView;
-}
-
 function exposeView<
   TState extends object,
   TView extends object,
@@ -284,15 +269,3 @@ function exposeView<
   console.log('exposed props', result);
   return result as TResult;
 }
-
-//
-// function exposeActions<
-//   TState,
-//   TRest extends any[],
-//   TActionName extends keyof TActions,
-//   TActions extends { [K in TActionName]: (prevState: TState, ...args: TRest) => void }
-//   >(actions: TActions, stateRef: { current: TState}): { [K in TActionName]: (...args: TRest) => void } {
-//   return mapValues(actions, actionName => {
-//     (...args: any[]) => actions[actionName]
-//   });
-// }
