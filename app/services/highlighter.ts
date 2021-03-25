@@ -1,6 +1,11 @@
 import { Service } from 'services/core';
 import path from 'path';
 import execa from 'execa';
+import ndarray from 'ndarray';
+import createBuffer from 'gl-buffer';
+import transitions from 'gl-transitions';
+import createTransition from 'gl-transition';
+import createTexture from 'gl-texture2d';
 
 const FFMPEG_DIR = path.resolve('../../', 'Downloads', 'ffmpeg', 'bin');
 const FFMPEG_EXE = path.join(FFMPEG_DIR, 'ffmpeg.exe');
@@ -15,6 +20,9 @@ const EXPORT_FILE = path.join(CLIP_DIR, 'output.mp4');
 const WIDTH = 1280;
 const HEIGHT = 720;
 const FPS = 30;
+
+const TRANSITION_DURATION = 1;
+const TRANSITION_FRAMES = TRANSITION_DURATION * FPS;
 
 // Frames are RGBA, 4 bytes per pixel
 const FRAME_BYTE_SIZE = WIDTH * HEIGHT * 4;
@@ -33,7 +41,30 @@ export class FrameSource {
 
   private finished = false;
 
+  duration: number;
+
+  currentFrame = 0;
+
+  get nFrames() {
+    return Math.floor(this.duration * FPS);
+  }
+
   constructor(public readonly sourcePath: string) {}
+
+  async readDuration() {
+    if (this.duration) return;
+
+    const { stdout } = await execa(FFPROBE_EXE, [
+      '-v',
+      'error',
+      '-show_entries',
+      'format=duration',
+      '-of',
+      'default=noprint_wrappers=1:nokey=1',
+      this.sourcePath,
+    ]);
+    this.duration = parseFloat(stdout);
+  }
 
   private startFfmpeg() {
     /* eslint-disable */
@@ -120,6 +151,7 @@ export class FrameSource {
       console.log('FRAME BUFFER IS FILLED');
       this.swapBuffers();
 
+      this.currentFrame++;
       this.onFrameComplete(true);
       this.onFrameComplete = null;
 
@@ -209,7 +241,7 @@ export class FrameWriter {
   }
 }
 
-export class Compositor {
+export class Compositor2D {
   private canvas = document.createElement('canvas');
   private ctx = this.canvas.getContext('2d');
 
@@ -236,39 +268,135 @@ export class Compositor {
   }
 }
 
+export class Transitioner {
+  private canvas = document.createElement('canvas');
+  private gl = this.canvas.getContext('webgl');
+
+  readonly width = WIDTH;
+  readonly height = HEIGHT;
+
+  private readBuffer = Buffer.allocUnsafe(FRAME_BYTE_SIZE);
+
+  constructor() {
+    this.canvas.width = this.width;
+    this.canvas.height = this.height;
+    this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
+  }
+
+  renderTransition(fromFrame: Buffer, toFrame: Buffer, progress: number) {
+    const buffer = createBuffer(
+      this.gl,
+      [-1, -1, -1, 4, 4, -1],
+      this.gl.ARRAY_BUFFER,
+      this.gl.STATIC_DRAW,
+    );
+
+    const transitionSrc = transitions.find((t: any) => t.name === 'cube');
+    const transition = createTransition(this.gl, transitionSrc);
+
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+
+    const fromArray = this.convertFrame(fromFrame);
+    const fromTexture = createTexture(this.gl, fromArray);
+    fromTexture.minFilter = this.gl.LINEAR;
+    fromTexture.magFilter = this.gl.LINEAR;
+
+    const toArray = this.convertFrame(toFrame);
+    const toTexture = createTexture(this.gl, toArray);
+    fromTexture.minFilter = this.gl.LINEAR;
+    fromTexture.magFilter = this.gl.LINEAR;
+
+    buffer.bind();
+    console.log('draw progress', progress);
+    transition.draw(
+      progress,
+      fromTexture,
+      toTexture,
+      this.gl.drawingBufferWidth,
+      this.gl.drawingBufferHeight,
+    );
+
+    fromTexture.dispose();
+    toTexture.dispose();
+  }
+
+  getFrame(): Buffer {
+    this.gl.readPixels(
+      0,
+      0,
+      this.width,
+      this.height,
+      this.gl.RGBA,
+      this.gl.UNSIGNED_BYTE,
+      this.readBuffer,
+    );
+
+    return this.readBuffer;
+  }
+
+  private convertFrame(frame: Buffer) {
+    return ndarray(frame, [this.width, this.height, 4], [4, this.width * 4, 1]);
+  }
+}
+
 export class HighlighterService extends Service {
   async run() {
     const sources = [new FrameSource(CLIP_1), new FrameSource(CLIP_2), new FrameSource(CLIP_3)];
-    let source = sources.shift();
+
+    // Read all durations
+    await Promise.all(sources.map(s => s.readDuration()));
+
+    let fromSource = sources.shift();
+    let toSource = sources.shift();
+
+    const transitioner = new Transitioner();
 
     const writer = new FrameWriter(EXPORT_FILE);
 
-    const compositor = new Compositor();
+    // const compositor = new Compositor2D();
+
+    // console.log('DURATION', source.duration);
+    // console.log('ESTIMATED FRAMES', source.duration * FPS);
 
     let frameCounter = 0;
 
     while (true) {
-      console.log('Reading frame', frameCounter);
-      const frameRead = await source.readNextFrame();
+      console.log('Reading from frame');
+      const fromFrameRead = await fromSource.readNextFrame();
+      const inTransition = fromSource.currentFrame >= fromSource.nFrames - TRANSITION_FRAMES;
+      let frameToRender = fromSource.readBuffer;
 
-      if (frameRead) {
+      if (inTransition && toSource) {
+        await toSource.readNextFrame();
+
+        transitioner.renderTransition(
+          fromSource.readBuffer,
+          toSource.readBuffer,
+          toSource.currentFrame / TRANSITION_FRAMES,
+        );
+        frameToRender = transitioner.getFrame();
+
+        const transitionEnded = fromSource.currentFrame === fromSource.nFrames;
+
+        if (transitionEnded) {
+          fromSource = toSource;
+          toSource = sources.shift();
+        }
+      }
+
+      if (fromFrameRead) {
         console.log('Writing frame', frameCounter);
 
-        compositor.drawFrame(source.readBuffer);
-        compositor.drawText();
+        // transitioner.renderTransition(source.readBuffer, source.readBuffer, 0.5);
 
-        await writer.writeNextFrame(compositor.getFrame());
+        // compositor.drawFrame(source.readBuffer);
+        // compositor.drawText();
+
+        await writer.writeNextFrame(frameToRender);
       } else {
-        console.log('Out of frames!');
-
-        // Get the next source
-        source = sources.shift();
-
-        if (!source) {
-          console.log('Out of sources, closing file');
-          writer.end();
-          break;
-        }
+        console.log('Out of sources, closing file');
+        writer.end();
+        break;
       }
 
       frameCounter++;
