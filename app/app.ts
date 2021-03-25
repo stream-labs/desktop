@@ -56,7 +56,7 @@ if (isProduction) {
     productName: 'streamlabs-obs',
     companyName: 'streamlabs',
     ignoreSystemCrashHandler: true,
-    submitURL: `${SLOBS_SENTRY_URL_BE_CLIENT}`,
+    submitURL: SLOBS_SENTRY_URL_BE_CLIENT,
     extra: {
       'sentry[release]': slobsVersion,
       windowId: Utils.getWindowId(),
@@ -125,7 +125,7 @@ if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
   const bundleNames = electron.ipcRenderer.sendSync('getBundleNames', bundles);
 
   Sentry.init({
-    dsn: `${SLOBS_SENTRY_URL_FE_DSN}`,
+    dsn: SLOBS_SENTRY_URL_FE_DSN,
     release: `${slobsVersion}-${SLOBS_BUNDLE_ID}`,
     beforeSend: (event, hint) => {
       // Because our URLs are local files and not publicly
@@ -292,7 +292,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       'en-US',
       appService.appDataDirectory,
       electron.remote.process.env.SLOBS_VERSION,
-      `${SLOBS_SENTRY_URL_BE_SERVER}`,
+      SLOBS_SENTRY_URL_BE_SERVER,
     );
 
     if (apiResult !== obs.EVideoCodes.Success) {

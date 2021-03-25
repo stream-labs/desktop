@@ -285,7 +285,7 @@ async function startApp() {
   }
 
   if (pjson.env === 'production') {
-    Raven.config(`${SLOBS_SENTRY_URL_FE_DSN}`, {
+    Raven.config(SLOBS_SENTRY_URL_FE_DSN, {
       release: process.env.SLOBS_VERSION,
     }).install((err, initialErr, eventId) => {
       handleFinishedReport();
@@ -295,7 +295,7 @@ async function startApp() {
       productName: 'streamlabs-obs',
       companyName: 'streamlabs',
       ignoreSystemCrashHandler: true,
-      submitURL: `${SLOBS_SENTRY_URL_BE_CLIENT}`,
+      submitURL: SLOBS_SENTRY_URL_BE_CLIENT,
       extra: {
         'sentry[release]': pjson.version,
         processType: 'main',
