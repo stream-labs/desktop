@@ -160,6 +160,7 @@ export class ClipboardService extends StatefulService<IClipboardState> {
 
   @shortcut('Ctrl+C')
   copy() {
+    clipboard.clear();
     this.SET_SCENE_ITEMS_IDS(this.selectionService.views.globalSelection.getIds());
     this.SET_SCENE_ITEMS_SCENE(this.scenesService.views.activeScene.id);
   }

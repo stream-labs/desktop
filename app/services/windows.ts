@@ -255,7 +255,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
   private updateScaleFactor(windowId: string) {
     const window = this.windows[windowId];
     if (window && !window.isDestroyed()) {
-      const bounds = electron.remote.screen.dipToScreenRect(window, window.getBounds());
+      const bounds = byOS({
+        [OS.Windows]: () => electron.remote.screen.dipToScreenRect(window, window.getBounds()),
+        [OS.Mac]: () => window.getBounds(),
+      });
       const currentDisplay = electron.remote.screen.getDisplayMatching(bounds);
       this.UPDATE_SCALE_FACTOR(windowId, currentDisplay.scaleFactor);
     }
