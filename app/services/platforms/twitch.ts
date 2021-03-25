@@ -154,6 +154,7 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
         key,
         platform: 'twitch',
         streamType: 'rtmp_common',
+        server: 'auto',
       });
     }
 
