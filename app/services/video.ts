@@ -205,8 +205,10 @@ export class Display {
     // recreate the window and IOSurface for the new size
     if (getOS() === OS.Mac) {
       if (this.existingWindow) {
-        nwr.destroyWindow(this.name);
-        nwr.destroyIOSurface(this.name);
+        console.log('nwr Destroy window and surface ', this.name);
+        // nwr.destroyWindow(this.name);
+        // nwr.destroyIOSurface(this.name);
+        nwr.destroyWindowAndSurface(this.name);
       }
 
       const surface = this.videoService.createOBSIOSurface(this.name);
