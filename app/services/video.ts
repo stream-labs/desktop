@@ -204,10 +204,7 @@ export class Display {
     // On mac, resizing the display is not enough, we also have to
     // recreate the window and IOSurface for the new size
     if (getOS() === OS.Mac) {
-      if (this.existingWindow) {
-        console.log('nwr Destroy window and surface ', this.name);
-        // nwr.destroyWindow(this.name);
-        // nwr.destroyIOSurface(this.name);
+      if (this.existingWindow) {      
         nwr.destroyWindowAndSurface(this.name);
       }
 
