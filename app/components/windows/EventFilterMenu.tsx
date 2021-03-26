@@ -149,9 +149,9 @@ export default class EventFilterMenu extends TsxComponent<{}> {
           {this.renderGeneralFilters}
           {this.isTwitch && (
             <div class={styles.subFilters}>
-            {this.renderSubFilters}
-            {this.renderResubFilters}
-          </div>
+              {this.renderSubFilters}
+              {this.renderResubFilters}
+            </div>
           )}
         </div>
         <div slot="controls">
