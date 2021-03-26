@@ -59,6 +59,7 @@ type TModificators = { isScheduleMode?: boolean; isUpdateMode?: boolean };
 type IGoLiveSettingsState = IGoLiveSettings & TModificators & { needPrepopulate: boolean };
 
 function getInitialStreamSettings(modificators: TModificators): IGoLiveSettingsState {
+  modificators = { isScheduleMode: false, isUpdateMode: false, ...modificators };
   const view = Services.StreamingService.views;
   const settings = {
     ...view.savedSettings,

@@ -58,8 +58,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   }
 
   get checklist() {
-    // read all nested fields of the  `info.checklist` to make it deep-reactive
-    return { ...this.info.checklist };
+    return this.info.checklist;
   }
 
   getPlatformDisplayName(platform: TPlatform): string {

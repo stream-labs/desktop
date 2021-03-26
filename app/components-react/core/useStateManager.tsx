@@ -93,7 +93,7 @@ export function useStateManager<
     }
 
     const initializerView = initializer(getState, setState) as TInitializerReturnType;
-    const contextView = merge(getState(), initializerView) as TContextView;
+    const contextView = merge(getState, initializerView) as TContextView;
 
     function getLocalStateRevision() {
       return localStateRevision;
@@ -138,36 +138,43 @@ export function useStateManager<
 
     const dependencyWatcher = createDependencyWatcher(componentView);
 
+    // define a onChange handler for the StateWatcher
     function onChange(change: TStateChange) {
-      if (isDestroyedRef.current) {
-        console.log('component is destoryed', componentId);
-        return;
-      }
+      // prevent state changes on unmounted components
+      if (isDestroyedRef.current) return;
+
       const { globalStateRevision, localStateRevision } = change;
+
+      // handle vuex state change
       if (globalStateRevision) {
         if (globalStateRevisionRef.current >= globalStateRevision) {
-          console.log('vuex already updated ', componentId);
+          // component is already up to date
           return;
         }
         const { prevState, newState } = change;
         if (isSimilar(prevState, newState)) {
-          console.log('vuex nothing changed', componentId);
+          // the state is not changed
           return;
         } else {
+          // the state has been changed, update the component
           if (debug) logChange(prevState, newState, componentId, true, globalStateRevision);
           updateComponent();
         }
+
+      // handle local state changes inside React.Context
       } else if (localStateRevision) {
         if (localStateRevisionRef.current >= localStateRevision) {
-          console.log('local already updated ', componentId);
+          // component is already up to date
           return;
         } else {
+          calculateComputedProps();
           const prevState = dependencyWatcher.getPrevState();
           const newState = pick(componentView, ...dependencyWatcher.getDependentFields());
           if (isSimilar(prevState, newState)) {
-            console.log('local nothing changed', componentId);
+            // prevState and newState are equal, no action needed
             return;
           } else {
+            // prevState and newState are not equal, update the component
             if (debug) logChange(prevState, newState, componentId, false, localStateRevision);
             console.log('local changed', componentId, prevState, newState);
             updateComponent();
@@ -176,6 +183,7 @@ export function useStateManager<
       }
     }
 
+    // calculate computed props and save them in the ref object
     function calculateComputedProps(): TComputedProps {
       computedPropsRef.current =
         typeof computedPropsCb === 'function' ? computedPropsCb(contextView) : {};
@@ -194,6 +202,8 @@ export function useStateManager<
   localStateRevisionRef.current = contextValue.getLocalStateRevision();
   globalStateRevisionRef.current = contextValue.getLocalStateRevision();
   dependencyWatcher.savePrevState();
+
+
   if (debug) {
     if (updateCounterRef.current === 1) {
       console.log('Create component', componentId);
@@ -248,8 +258,9 @@ function createDependencyWatcher<T extends object>(watchedObject: T) {
     return Object.keys(dependencies);
   }
 
+  // TODO: move to StateManager
   function savePrevState() {
-    prevState = { ...dependencies };
+    prevState = pick(watchedObject, ...getDependentFields());
   }
 
   function getPrevState() {
@@ -273,6 +284,7 @@ function createStateWatcher(debug = false) {
   let unsubscribeVuex: Function;
 
   function subscribe(subscription: TSubscription) {
+    console.log('subscribe', subscription.componentId);
     subscriptions.push(subscription);
     subscriptions.sort((s1, s2) => (s1.componentId > s2.componentId ? 1 : -1));
     if (isWatching) {
@@ -282,7 +294,8 @@ function createStateWatcher(debug = false) {
   }
 
   function unsubscribe(componentId: string) {
-    remove(subscriptions, s => s.componentId !== componentId);
+    console.log('unsubscribe', componentId);
+    remove(subscriptions, s => s.componentId === componentId);
     if (isWatching) {
       stopWatching();
       startWatching();
@@ -290,6 +303,7 @@ function createStateWatcher(debug = false) {
   }
 
   function startWatching() {
+    console.log('start watching', subscriptions.map(s => s.componentId));
     function getPrefixedField(componentId: string, fieldName: string) {
       return `${componentId}__${fieldName}`;
     }
@@ -305,6 +319,7 @@ function createStateWatcher(debug = false) {
 
     unsubscribeVuex = vuexStore.watch(
       () => {
+        console.log('call vuex getter');
         // create one cb for all subscribed components
         const mixedState: object = {};
         const prefixedStates = subscriptions.map(getPrefixedState);
@@ -312,6 +327,7 @@ function createStateWatcher(debug = false) {
         return mixedState;
       },
       (newState, prevState) => {
+        console.log('call vuex change');
         stateRevision++;
         if (debug) logMutation(stateRevision, prevState, newState, true);
         // walk through newState and generate a `changes` object with newState and prevState
@@ -345,7 +361,7 @@ function createStateWatcher(debug = false) {
 
   function handleLocalStateChange(localStateRevision: number, prevState: any, newState: any) {
     // walk through components and emit onChange
-    if (debug) logMutation(stateRevision, prevState, newState, true);
+    if (debug) logMutation(localStateRevision, prevState, newState, false);
     subscriptions.forEach(subscr => {
       subscr.onChange({ localStateRevision });
     });
@@ -531,16 +547,17 @@ export function merge<TObj1 extends object, TObj2 extends object>(
       return target;
     }
 
-    return mergedObjects
+    const target = mergedObjects
       .slice()
       .reverse()
       .find(target => {
         const obj = typeof target === 'function' ? target() : target;
         if (obj.hasOwnProperty(propName) || obj.constructor?.prototype?.hasOwnProperty(propName)) {
-          metadata._cache[propName] = target;
           return true;
         }
       });
+    metadata._cache[propName] = target;
+    return target;
   }
 
   return (new Proxy(metadata, {
