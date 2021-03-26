@@ -280,7 +280,7 @@
   }
 
   .display {
-    transform: scale(0.7, 0.7) translate(-21.4%);
+    transform: scale(1, 0.4) translate(0, -73%);
   }
 }
 
@@ -297,7 +297,7 @@
 
 .content-container.has-leftbar.vertical {
   .display {
-    transform: scale(0.5, 0.5) translate(-10%);
+    transform: scale(0.8, 0.4) translate(12.7%, -75%);
   }
 }
 
