@@ -36,7 +36,7 @@ const TRANSITION_FRAMES = TRANSITION_DURATION * FPS;
 /**
  * Extracts an audio file from a video file
  */
-export class AudioExtractor {
+export class AudioSource {
   readonly outPath: string;
 
   constructor(public readonly sourcePath: string) {
@@ -80,8 +80,6 @@ export class FrameSource {
 
   private finished = false;
 
-  duration: number;
-
   currentFrame = 0;
 
   get nFrames() {
@@ -89,22 +87,7 @@ export class FrameSource {
     return Math.floor(this.duration * FPS) - 1;
   }
 
-  constructor(public readonly sourcePath: string) {}
-
-  async readDuration() {
-    if (this.duration) return;
-
-    const { stdout } = await execa(FFPROBE_EXE, [
-      '-v',
-      'error',
-      '-show_entries',
-      'format=duration',
-      '-of',
-      'default=noprint_wrappers=1:nokey=1',
-      this.sourcePath,
-    ]);
-    this.duration = parseFloat(stdout);
-  }
+  constructor(public readonly sourcePath: string, public readonly duration: number) {}
 
   private allocScrubbingFrames() {
     if (this.scrubFrames) {
@@ -121,7 +104,6 @@ export class FrameSource {
 
   async readScrubbingFrames() {
     this.allocScrubbingFrames();
-    await this.readDuration();
 
     await Promise.all(
       this.scrubFrames.map((f, idx) => {
@@ -274,6 +256,36 @@ export class FrameSource {
     this.writeBuffer = this.readBuffer;
     this.readBuffer = newRead;
     this.byteIndex = 0;
+  }
+}
+
+export class Clip {
+  frameSource: FrameSource;
+  audioSource: AudioSource;
+
+  duration: number;
+
+  constructor(public readonly sourcePath: string) {}
+
+  async init() {
+    await this.readDuration();
+    this.frameSource = new FrameSource(this.sourcePath, this.duration);
+    this.audioSource = new AudioSource(this.sourcePath);
+  }
+
+  private async readDuration() {
+    if (this.duration) return;
+
+    const { stdout } = await execa(FFPROBE_EXE, [
+      '-v',
+      'error',
+      '-show_entries',
+      'format=duration',
+      '-of',
+      'default=noprint_wrappers=1:nokey=1',
+      this.sourcePath,
+    ]);
+    this.duration = parseFloat(stdout);
   }
 }
 
@@ -442,25 +454,15 @@ export class Transitioner {
 }
 
 export class HighlighterService extends Service {
-  async runAudio() {
-    const extractor = new AudioExtractor(CLIP_1);
-
-    await extractor.extract();
-  }
-
   async run() {
-    const sources = [
-      new FrameSource(CLIP_1),
-      new FrameSource(CLIP_2),
-      new FrameSource(CLIP_3),
-      new FrameSource(CLIP_4),
-    ];
+    const clips = [new Clip(CLIP_1), new Clip(CLIP_2), new Clip(CLIP_3), new Clip(CLIP_4)];
 
     // Read all durations
-    await Promise.all(sources.map(s => s.readDuration()));
+    // TODO: pMap
+    await Promise.all(clips.map(s => s.init()));
 
-    let fromSource = sources.shift();
-    let toSource = sources.shift();
+    let fromClip = clips.shift();
+    let toClip = clips.shift();
 
     const transitioner = new Transitioner();
 
@@ -475,8 +477,8 @@ export class HighlighterService extends Service {
 
     while (true) {
       console.log('Reading from frame');
-      const fromFrameRead = await fromSource.readNextFrame();
-      const inTransition = fromSource.currentFrame >= fromSource.nFrames - TRANSITION_FRAMES;
+      const fromFrameRead = await fromClip.frameSource.readNextFrame();
+      const inTransition = fromClip.frameSource.currentFrame >= fromClip.frameSource.nFrames - TRANSITION_FRAMES;
       let frameToRender = fromSource.readBuffer;
 
       if (inTransition && toSource) {
