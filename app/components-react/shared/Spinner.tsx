@@ -1,53 +1,33 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Spin } from 'antd';
+import React from 'react';
 import Animation from 'rc-animate';
 
+const spinnerSvg =
+  '<div class="s-spinner"><div size="small" class="s-bars"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 28 40" class="s-spinner--small"><path d="M0 0, l0 4, l0 -4" id="s-bar-y-path"></path> <rect width="4" height="34.3707" x="0" y="0" ry="2" rx="2" class="s-spinner__bar"><animate attributeName="opacity" values=".24; .08; .24" begin="0s" dur="1.2s" repeatCount="indefinite"></animate> <animate attributeName="height" values="40; 32; 40" begin="0s" dur="1.2s" repeatCount="indefinite"></animate> <!----> <animateMotion begin="0s" dur="1.2s" repeatCount="indefinite"><mpath xlink:href="#s-bar-y-path"></mpath></animateMotion></rect> <rect width="4" height="34.9627" x="12" y="0" ry="2" rx="2" class="s-spinner__bar"><animate attributeName="opacity" values=".24; .24; .24" begin="0s" dur="0.4s"></animate> <animate attributeName="opacity" values=".24; .08; .24" begin="0.4s" dur="1.2s" repeatCount="indefinite"></animate> <animate attributeName="height" values="40; 32; 40" begin="0.4s" dur="1.2s" repeatCount="indefinite"></animate> <!----> <animateMotion begin="0.4s" dur="1.2s" repeatCount="indefinite"><mpath xlink:href="#s-bar-y-path"></mpath></animateMotion></rect> <rect width="4" height="40" x="24" y="0" ry="2" rx="2" class="s-spinner__bar"><animate attributeName="opacity" values=".24; .24; .24" begin="0s" dur="0.8s"></animate> <animate attributeName="opacity" values=".24; .08; .24" begin="0.8s" dur="1.2s" repeatCount="indefinite"></animate> <animate attributeName="height" values="40; 32; 40" begin="0.8s" dur="1.2s" repeatCount="indefinite"></animate> <!----> <animateMotion begin="0.8s" dur="1.2s" repeatCount="indefinite"><mpath xlink:href="#s-bar-y-path"></mpath></animateMotion></rect></svg></div></div>';
+
 export default function Spinner(props: { visible?: boolean } = {}) {
-  const defaultProps = { delay: 300, transitionTime: 300 };
+  const defaultProps = { visible: false };
   const p = { ...defaultProps, ...props };
   const color = '#17242D'; // TODO: pick color from theme
-  const [spinnerIsVisible, setSpinnerIsVisible] = useState(p.visible);
 
-  useEffect(() => {
-    setSpinnerIsVisible(p.visible);
-    // setTimeout(() => setSpinnerIsVisible(p.visible), 200);
-  }, [p.visible]);
-
-  const stretchStyles: React.CSSProperties = {
+  const containerStyles: React.CSSProperties = {
+    backgroundColor: color,
     position: 'absolute',
     width: '100%',
     height: '100%',
-    minWidth: '100px',
-    minHeight: '150px',
-  };
-
-  const containerStyles: React.CSSProperties = {
-    ...stretchStyles,
-    background: color,
-    display: 'flex',
-    justifyContent: 'center',
+    textAlign: 'center',
     zIndex: 1,
   };
 
-  const spinnerStyles: React.CSSProperties = {
-    marginTop: '100px',
-    transition: 'opacity 0.5s ease-in 0.5s',
-    opacity: spinnerIsVisible ? 1 : 0,
-  };
-  //
-  // useEffect(() => {
-  //   setTimeout(() => setVisible(true), p.delay);
-  // }, []);
-
   return (
-    <div>
-      <Animation transitionName="ant-fade">
-        {p.visible && (
-          <div style={containerStyles} >
-            <Spin size="large" style={spinnerStyles} />
-          </div>
-        )}
-      </Animation>
-    </div>
+    <Animation transitionName="ant-fade">
+      {p.visible && (
+        <div style={containerStyles}>
+          <span
+            style={{ visibility: p.visible ? 'visible' : 'hidden' }}
+            dangerouslySetInnerHTML={{ __html: spinnerSvg }}
+          ></span>
+        </div>
+      )}
+    </Animation>
   );
 }

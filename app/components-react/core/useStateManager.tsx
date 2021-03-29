@@ -1,10 +1,8 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Observable, Subject, Subscription } from 'rxjs';
+import React, { useContext, useEffect, useRef } from 'react';
 import { StatefulService } from '../../services';
 import { cloneDeep, isPlainObject, mapKeys, remove } from 'lodash';
 import { keys } from '../../services/utils';
 import { useForceUpdate, useOnCreate } from '../hooks';
-import { assertIsDefined } from '../../util/properties-type-guards';
 
 type TStateManagerContext<TContextView extends object> = {
   contextView: TContextView;
@@ -19,6 +17,7 @@ let nextComponentId = 1;
 
 /**
  * Manage the state in React.Context
+ * Use it when you have a complex state that you need to share between several components via React.context
  */
 export function useStateManager<
   TState extends object, // state type
@@ -43,29 +42,28 @@ export function useStateManager<
   computedPropsCb: TComputedPropsCb,
   debug = false,
 ) {
-  // return {
-  //   initializerReturnType: {} as TInitializerReturnType,
-  //   dependencyWatcher: {} as TComponentView,
-  //   componentView: {} as TComponentView,
-  //   contextView: {} as TContextView,
-  //   computedProps: {} as TComputedProps,
-  //   computedView: {} as TComputedView,
-  //   isRoot: false,
-  // };
-
+  // keep revision numbers for local and global (vuex) state
+  // we need this numbers to check if component is synced with the last state
   const localStateRevisionRef = useRef(1);
   const globalStateRevisionRef = useRef(1);
+
+  // keep computed props in ref
   const computedPropsRef = useRef<TComputedProps | null>(null);
-  const updateCounterRef = useRef<number>(1);
+
+  // true if component is destroyed
   const isDestroyedRef = useRef<boolean>(false);
 
-  const forceUpdate = useForceUpdate();
+  // current update counter, needed in the debug mode
+  const updateCounterRef = useRef<number>(1);
 
+  const forceUpdate = useForceUpdate();
   const context = useContext(GenericStateManagerContext) as React.Context<
     TStateManagerContext<TContextView>
   > | null;
 
+  // get current React.Context or create new if not exist
   const { contextValue, isRoot } = useOnCreate(() => {
+    // the context exists just
     if (context) {
       return {
         contextValue: (context as unknown) as TStateManagerContext<TContextView>,
@@ -73,13 +71,20 @@ export function useStateManager<
       };
     }
 
+    // context is not found we should create a new one
     // THIS CODE RUNS ONLY ONES PER CONTEXT
 
+    // create initial state
     let state: TState =
       typeof initState === 'function' ? (initState as Function)() : cloneDeep(initState);
-
+    // the local state revision number, this number will be increased after each state mutation
     let localStateRevision = 1;
+
+    // create StateWatcher to observe changes from vuex
+    // and update depending components
     const stateWatcher = createStateWatcher(debug);
+
+    // CREATE STATE GETTER AND SETTER
 
     function getState() {
       return state;
@@ -92,8 +97,12 @@ export function useStateManager<
       stateWatcher.handleLocalStateChange(localStateRevision, prevState, newState);
     }
 
+    // create getters/mutations/actions
     const initializerView = initializer(getState, setState) as TInitializerReturnType;
+    // merge it with state
     const contextView = merge(getState, initializerView) as TContextView;
+
+    // CREATE GETTERS FOR LOCAL AND GLOBAL REVISIONS
 
     function getLocalStateRevision() {
       return localStateRevision;
@@ -103,6 +112,7 @@ export function useStateManager<
       return stateWatcher.getRevision();
     }
 
+    // new React.Context is ready
     const contextValue = {
       contextView,
       Context: GenericStateManagerContext as React.Context<TStateManagerContext<
@@ -117,6 +127,7 @@ export function useStateManager<
 
   const { contextView, stateWatcher } = contextValue;
 
+  // handle component creation
   const {
     dependencyWatcher,
     componentId,
@@ -128,29 +139,40 @@ export function useStateManager<
       ? `${nextComponentId++}_${getComponentName()}`
       : `${nextComponentId++}`;
 
+    // computed props are unique for each component
+    // calculate them and merge with ContextView
     calculateComputedProps();
     const viewWithComputedProps = merge(contextView, () => computedPropsRef.current);
 
+    // prepare Context and contextValue for the component
     const componentView = merge(viewWithComputedProps, {
       contextValue,
       Context: contextValue.Context,
     }) as TComponentView;
 
+    // create a dependency watcher for the component
+    // to track which state properties or getters does component use
+    // and update the component only if it's dependencies have been changed
     const dependencyWatcher = createDependencyWatcher(componentView);
 
-    // define a onChange handler for the StateWatcher
+    // define a onChange handler
+    // when StateWatcher detects changes in store or local state this function will be called
     function onChange(change: TStateChange) {
-      // prevent state changes on unmounted components
+      // do not handle unmounted components
       if (isDestroyedRef.current) return;
 
       const { globalStateRevision, localStateRevision } = change;
 
+      if (
+        (globalStateRevision && globalStateRevisionRef.current >= globalStateRevision) ||
+        (localStateRevision && localStateRevisionRef.current >= localStateRevision)
+      ) {
+        // component is already up to date
+        return;
+      }
+
       // handle vuex state change
       if (globalStateRevision) {
-        if (globalStateRevisionRef.current >= globalStateRevision) {
-          // component is already up to date
-          return;
-        }
         const { prevState, newState } = change;
         if (isSimilar(prevState, newState)) {
           // the state is not changed
@@ -163,21 +185,16 @@ export function useStateManager<
 
       // handle local state changes inside React.Context
       } else if (localStateRevision) {
-        if (localStateRevisionRef.current >= localStateRevision) {
-          // component is already up to date
+        calculateComputedProps();
+        const prevState = dependencyWatcher.getPrevState();
+        const newState = pick(componentView, ...dependencyWatcher.getDependentFields());
+        if (isSimilar(prevState, newState)) {
+          // prevState and newState are equal, no action needed
           return;
         } else {
-          calculateComputedProps();
-          const prevState = dependencyWatcher.getPrevState();
-          const newState = pick(componentView, ...dependencyWatcher.getDependentFields());
-          if (isSimilar(prevState, newState)) {
-            // prevState and newState are equal, no action needed
-            return;
-          } else {
-            // prevState and newState are not equal, update the component
-            if (debug) logChange(prevState, newState, componentId, false, localStateRevision);
-            forceUpdate();
-          }
+          // prevState and newState are not equal, update the component
+          if (debug) logChange(prevState, newState, componentId, false, localStateRevision);
+          forceUpdate();
         }
       }
     }
@@ -198,11 +215,13 @@ export function useStateManager<
     };
   });
 
+  // sync revisions for the each component update cycle
   localStateRevisionRef.current = contextValue.getLocalStateRevision();
   globalStateRevisionRef.current = contextValue.getGlobalStateRevision();
   dependencyWatcher.savePrevState();
 
 
+  // log lifecycle if in the debug mode
   if (debug) {
     if (updateCounterRef.current === 1) {
       console.log('Create component', componentId);
@@ -212,8 +231,11 @@ export function useStateManager<
     updateCounterRef.current++;
   }
 
+  // start watching for local and global state change after the component mounted
   useEffect(() => {
+    // create a state selector to watch state from vuex
     const selector = () => {
+      // we should watch only component's dependencies
       const dependentFields = dependencyWatcher.getDependentFields();
       return {
         ...pick(contextView, ...dependentFields),
@@ -222,9 +244,15 @@ export function useStateManager<
     };
     stateWatcher.subscribe({ componentId, onChange, selector });
     dependencyWatcher.savePrevState();
+
+    // tell StateWatcher to start watching if the root component is mounted
     if (isRoot) stateWatcher.startWatching();
+
+    // handle unmount
     return () => {
+      // tell StateWatcher to stop watching if the root component is unmounted
       if (isRoot) stateWatcher.stopWatching();
+      // unsubscribe the component from the state watcher and mark it as destroyed
       stateWatcher.unsubscribe(componentId);
       isDestroyedRef.current = true;
     };
@@ -286,6 +314,7 @@ function createStateWatcher(debug = false) {
     subscriptions.push(subscription);
     subscriptions.sort((s1, s2) => (s1.componentId > s2.componentId ? 1 : -1));
     if (isWatching) {
+      console.log('Subscribe and rebuild state watcher', subscription.componentId);
       stopWatching();
       startWatching();
     }
@@ -300,6 +329,7 @@ function createStateWatcher(debug = false) {
   }
 
   function startWatching() {
+    console.log('start watching');
     function getPrefixedField(componentId: string, fieldName: string) {
       return `${componentId}__${fieldName}`;
     }
@@ -338,11 +368,25 @@ function createStateWatcher(debug = false) {
           changes[componentId] = { newState: componentNewState, prevState: componentPrevState };
         });
 
+        const currentSubscriptions = subscriptions.slice();
+        isWatching = false;
         // walk through components and emit onChange
-        subscriptions.slice().forEach(subscr => {
+        currentSubscriptions.forEach(subscr => {
           const { newState, prevState } = changes[subscr.componentId];
           subscr.onChange({ newState, prevState, globalStateRevision: stateRevision });
         });
+
+        const prevSubscriptionIds = currentSubscriptions.map(s => s.componentId);
+        const newSubscriptionIds = subscriptions.map(s => s.componentId);
+        const shouldResubscribeVuex = !isArrayEqual(prevSubscriptionIds, newSubscriptionIds);
+
+        if (shouldResubscribeVuex) {
+          stopWatching();
+          startWatching();
+        } else {
+          isWatching = true;
+        }
+
       },
     );
     isWatching = true;

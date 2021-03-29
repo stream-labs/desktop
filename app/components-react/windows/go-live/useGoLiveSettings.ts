@@ -1,61 +1,13 @@
 import { IGoLiveSettings, StreamInfoView } from '../../../services/streaming';
 import { TPlatform } from '../../../services/platforms';
 import { Services } from '../../service-provider';
-import {
-  createMutations,
-  merge,
-  TReducers,
-  useStateManager,
-  TMerge,
-} from '../../core/useStateManager';
-import { ViewHandler } from '../../../services/core';
+import { createMutations, merge, useStateManager } from '../../core/useStateManager';
 import { cloneDeep, debounce, mapValues, omit, pick } from 'lodash';
 import Form, { useForm } from '../../shared/inputs/Form';
 import { useOnCreate } from '../../hooks';
 import { FormInstance } from 'antd/lib/form';
 import { message } from 'antd';
 import { $t } from '../../../services/i18n';
-
-let tm: TMerge<{}, {}>;
-
-export interface IGoLiveProps {
-  // settings: IGoLiveSettings;
-  // updateSettings: (settingsPatch: Partial<IGoLiveSettings>) => unknown;
-}
-
-// TODO: remove
-export type TSetPlatformSettingsFn = <T extends TPlatform>(
-  platform: T,
-  newPlatformSettings: IGoLiveSettings['platforms'][T],
-) => unknown;
-
-export type TUpdatePlatformSettingsFn = <T extends TPlatform>(
-  platform: T,
-  patch: Partial<IGoLiveSettings['platforms'][T]>,
-) => unknown;
-
-export function getEnabledPlatforms(settings: IGoLiveSettings): TPlatform[] {
-  const platforms = Object.keys(settings.platforms) as TPlatform[];
-  return platforms.filter(platform => settings.platforms[platform].enabled);
-}
-
-// /**
-//  * Returns true if the component should show only required fields
-//  */
-// export function canShowOnlyRequiredFields(settings: IGoLiveSettings): boolean {
-//   const enabledPlatforms = getEnabledPlatforms(settings);
-//   return enabledPlatforms.length > 1 && !settings.advancedMode;
-// }
-
-// export function (settings: IGoLiveSettings): boolean {
-//   const enabledPlatforms = getEnabledPlatforms(settings);
-//   return enabledPlatforms.length > 1 && !settings.advancedMode;
-// }
-
-// export function isAdvancedMode(settings: IGoLiveSettings): boolean {
-//   const enabledPlatforms = getEnabledPlatforms(settings);
-//   return enabledPlatforms.length == 1 || settings.advancedMode;
-// }
 
 type TCustomFieldName = 'title' | 'description';
 type TModificators = { isScheduleMode?: boolean; isUpdateMode?: boolean };
@@ -94,7 +46,6 @@ export function useGoLiveSettings<
 
   useOnCreate(() => {
     if (isRoot && contextView.needPrepopulate) {
-      console.log('call prepopulate');
       contextView.prepopulate();
     }
   });
@@ -223,7 +174,7 @@ function initializeGoLiveSettings(
       try {
         await form.validateFields();
       } catch (e) {
-        message.error($t('Invalid settings Please check the form'));
+        message.error($t('Invalid settings. Please check the form'));
         return;
       }
       StreamingService.actions.goLive(getState());

@@ -1,10 +1,8 @@
 import CommonPlatformFields from './CommonPlatformFields';
-import { getEnabledPlatforms, IGoLiveProps, useGoLiveSettings } from './useGoLiveSettings';
-import { Services } from '../../service-provider';
+import { useGoLiveSettings } from './useGoLiveSettings';
 import { $t } from '../../../services/i18n';
 import React from 'react';
-import { useVuex } from '../../hooks';
-import { getPlatformService, TPlatform } from '../../../services/platforms';
+import { TPlatform } from '../../../services/platforms';
 import { TwitchEditStreamInfo } from './platforms/TwitchEditStreamInfo';
 import { Section } from './Section';
 import { YoutubeEditStreamInfo } from './platforms/YoutubeEditStreamInfo';

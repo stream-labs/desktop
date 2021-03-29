@@ -11,6 +11,7 @@ import { Section } from './Section';
 import PlatformSettings from './PlatformSettings';
 import TwitterInput from './Twitter';
 import OptimizedProfileSwitcher from './OptimizedProfileSwitcher';
+import Spinner from "../../shared/Spinner";
 
 const PlusIcon = PlusOutlined as Function;
 
@@ -75,6 +76,22 @@ export default function GoLiveSettings() {
 
       {/*RIGHT COLUMN*/}
       <Col span={16} style={{ height: '100%' }}>
+        <Spinner visible={isLoading} />
+
+        {/*{shouldShowSettings && (*/}
+        {/*  <div>*/}
+        {/*    /!*PLATFORM SETTINGS*!/*/}
+        {/*    <PlatformSettings />*/}
+        {/*    /!*ADD SOME SPACE IN ADVANCED MODE*!/*/}
+        {/*    {!isAdvancedMode && <div className={styles.spacer} />}*/}
+        {/*    /!*EXTRAS*!/*/}
+        {/*    <Section isSimpleMode={!isAdvancedMode} title={$t('Extras')}>*/}
+        {/*      <TwitterInput />*/}
+        {/*      <OptimizedProfileSwitcher />*/}
+        {/*    </Section>*/}
+        {/*  </div>*/}
+        {/*)}*/}
+
         {shouldShowSettings && (
           <Scrollable style={{ maxHeight: '100%' }} snapToWindowEdge>
             {/*PLATFORM SETTINGS*/}

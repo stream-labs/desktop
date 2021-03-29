@@ -1,10 +1,7 @@
-import { IGoLiveSettings } from '../../../../services/streaming';
-import { TSetPlatformSettingsFn } from '../useGoLiveSettings';
 import { TagsInput, TSlobsInputProps } from '../../../shared/inputs';
 import { useOnCreate, useVuex } from '../../../hooks';
 import { Services } from '../../../service-provider';
 import { prepareOptions, TTwitchTag } from '../../../../services/platforms/twitch/tags';
-import { ITwitchStartStreamOptions } from '../../../../services/platforms/twitch';
 import React from 'react';
 import { keyBy, omit } from 'lodash';
 import { IListOption } from '../../../shared/inputs/ListInput';

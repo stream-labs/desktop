@@ -17,7 +17,15 @@ import SceneTransitions from 'components/windows/SceneTransitions.vue';
 import AddSource from 'components/windows/AddSource.vue';
 import RenameSource from 'components/windows/RenameSource.vue';
 import NameScene from 'components/windows/NameScene.vue';
-import { NameFolder, GoLiveWindow, Playground, EditStreamWindow } from 'components/shared/ReactComponent';
+import {
+  NameFolder,
+  GoLiveWindow,
+  Playground,
+  EditStreamWindow,
+} from 'components/shared/ReactComponent';
+
+import GoLiveWindowDeprecated from 'components/windows/go-live/GoLiveWindow';
+import EditStreamWindowDeprecated from 'components/windows/go-live/EditStreamWindow';
 import SourceProperties from 'components/windows/SourceProperties.vue';
 import SourceFilters from 'components/windows/SourceFilters.vue';
 import AddSourceFilter from 'components/windows/AddSourceFilter';
@@ -126,6 +134,8 @@ export function getComponents() {
     WelcomeToPrime,
     GoLiveWindow,
     EditStreamWindow,
+    GoLiveWindowDeprecated,
+    EditStreamWindowDeprecated,
     ScheduleStreamWindow,
     Playground,
   };

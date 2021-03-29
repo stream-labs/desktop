@@ -12,8 +12,11 @@ import { assertIsDefined } from '../../../../util/properties-type-guards';
 import { Col, Row } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 const PlusIcon = PlusOutlined as Function;
+
+const textOverflowStyle = { overflow: 'hidden', textOverflow: 'ellipsis' };
+
 /**
- * Broadcast-selector for Youtub
+ * Broadcast-selector for Youtube
  */
 export default function BroadcastInput(
   p: { broadcasts: IYoutubeLiveBroadcast[] } & Omit<SelectProps<string>, 'options'> &
@@ -49,12 +52,13 @@ export default function BroadcastInput(
         <Col>
           <img src={broadcast.snippet.thumbnails.default.url} style={imageStyle} />
         </Col>
-        <Col flex="auto" style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          <div>{broadcast.snippet.title}</div>
-          <div>{broadcast.snippet.description}</div>
+        <Col flex="auto">
+          <div style={textOverflowStyle}>{broadcast.snippet.title}</div>
+          <div style={textOverflowStyle}>{broadcast.snippet.description}</div>
         </Col>
         <Col flex="80px">
           <div>{formatDate(broadcast.snippet.scheduledStartTime)}</div>
+          <div>&nbsp;</div>
         </Col>
       </Row>
     );

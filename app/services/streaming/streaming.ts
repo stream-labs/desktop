@@ -748,8 +748,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const height = this.views.linkedPlatforms.length > 1 ? 750 : 650;
     const width = 900;
 
+    const componentName = this.customizationService.state.experimental.reactGoLive
+      ? 'GoLiveWindow'
+      : 'GoLiveWindowDeprecated';
+
     this.windowsService.showWindow({
-      componentName: 'GoLiveWindow',
+      componentName,
       title: $t('Go Live'),
       size: {
         height,
@@ -761,9 +765,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   showEditStream() {
     const height = 750;
     const width = 900;
+    const componentName = this.customizationService.state.experimental.reactGoLive
+      ? 'EditStreamWindow'
+      : 'EditStreamWindowDeprecated';
 
     this.windowsService.showWindow({
-      componentName: 'EditStreamWindow',
+      componentName,
       title: $t('Update Stream Info'),
       size: {
         height,

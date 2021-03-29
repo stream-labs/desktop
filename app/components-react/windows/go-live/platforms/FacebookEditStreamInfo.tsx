@@ -1,18 +1,10 @@
 import electron from 'electron';
-import {
-  TSetPlatformSettingsFn,
-  TUpdatePlatformSettingsFn,
-  useGoLiveSettings,
-} from '../useGoLiveSettings';
+import { useGoLiveSettings } from '../useGoLiveSettings';
 import CommonPlatformFields from '../CommonPlatformFields';
-import React, { useState } from 'react';
+import React from 'react';
 import { Services } from '../../../service-provider';
-import { TTwitchTag } from '../../../../services/platforms/twitch/tags';
-import { IGoLiveSettings } from '../../../../services/streaming';
-import { TPlatform } from '../../../../services/platforms';
 import Form from '../../../shared/inputs/Form';
-import { useOnCreate, useFormState, useVuex } from '../../../hooks';
-import { assertIsDefined } from '../../../../util/properties-type-guards';
+import { useOnCreate, useFormState } from '../../../hooks';
 import { EDismissable } from '../../../../services/dismissables';
 import { $t } from '../../../../services/i18n';
 import { createBinding, ListInput } from '../../../shared/inputs';

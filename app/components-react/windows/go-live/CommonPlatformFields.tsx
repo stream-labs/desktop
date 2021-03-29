@@ -1,22 +1,10 @@
 import { TPlatform } from '../../../services/platforms';
-import { IGoLiveSettings, IStreamSettings } from '../../../services/streaming';
-import { Services } from '../../service-provider';
-import { useOnCreate } from '../../hooks';
-import { pick, cloneDeep } from 'lodash';
 import { $t } from '../../../services/i18n';
-import { Form } from 'antd';
 import React, { useState } from 'react';
 import { CheckboxInput, TextAreaInput, TextInput } from '../../shared/inputs';
-import {
-  IGoLiveProps,
-  getEnabledPlatforms,
-  TUpdatePlatformSettingsFn,
-  useGoLiveSettings,
-} from './useGoLiveSettings';
-import Utils from '../../../services/utils';
+import { useGoLiveSettings } from './useGoLiveSettings';
 import { assertIsDefined } from '../../../util/properties-type-guards';
 import InputWrapper from '../../shared/inputs/InputWrapper';
-import { createBinding } from '../../shared/inputs/inputs';
 import Animate from 'rc-animate';
 
 interface IProps {
@@ -24,8 +12,6 @@ interface IProps {
    * if provided then change props only for the provided platform
    */
   platform?: TPlatform;
-  // settings: IGoLiveSettings;
-  // updatePlatformSettings: TUpdatePlatformSettingsFn;
 }
 
 type TCustomFieldName = 'title' | 'description';
