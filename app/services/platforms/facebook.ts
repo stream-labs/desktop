@@ -37,7 +37,7 @@ interface IFacebookGroup {
 }
 
 export interface IFacebookLiveVideo {
-  status: 'SCHEDULED_UNPUBLISHED' | 'LIVE_STOPPED' | 'LIVE';
+  status: 'UNPUBLISHED' | 'SCHEDULED_UNPUBLISHED' | 'LIVE_STOPPED' | 'LIVE';
   id: string;
   stream_url: string;
   title: string;
@@ -56,6 +56,8 @@ interface IFacebookServiceState extends IPlatformState {
   userAvatar: string;
 }
 
+export type TFacebookStreamPrivacy = 'SELF' | 'ALL_FRIENDS' | 'EVERYONE' | '';
+
 export interface IFacebookStartStreamOptions {
   title: string;
   game?: string;
@@ -64,7 +66,7 @@ export interface IFacebookStartStreamOptions {
   groupId?: string;
   description?: string;
   liveVideoId?: string;
-  privacy?: { value: 'SELF' | 'ALL_FRIENDS' | 'EVERYONE' | '' };
+  privacy?: { value: TFacebookStreamPrivacy };
 }
 
 export type TDestinationType = 'me' | 'page' | 'group' | '';
@@ -433,7 +435,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
 
     const videos = (
       await this.requestFacebook<{ data: IFacebookLiveVideo[] }>(
-        `${this.apiBase}/${destinationId}/live_videos?broadcast_status=["SCHEDULED_UNPUBLISHED"]&fields=title,description,planned_start_time,permalink_url,from${sourceParam}&since=${minDateUnix}&until=${maxDateUnix}`,
+        `${this.apiBase}/${destinationId}/live_videos?broadcast_status=["UNPUBLISHED","SCHEDULED_UNPUBLISHED"]&fields=title,description,status,planned_start_time,permalink_url,from${sourceParam}&since=${minDateUnix}&until=${maxDateUnix}`,
         token,
       )
     ).data;
@@ -441,6 +443,9 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     // the FB filter doesn't work for some livevideos,
     // filter manually here
     return videos.filter(v => {
+      // videos created in the new Live Producer don't have `planned_start_time`
+      if (!v.planned_start_time) return true;
+
       const videoDate = new Date(v.planned_start_time).valueOf();
       return videoDate >= minDate && videoDate <= maxDate;
     });
@@ -501,7 +506,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   private async fetchPages(): Promise<IFacebookPage[]> {
     return (
       await this.requestFacebook<{ data: IFacebookPage[] }>(
-        `${this.apiBase}/me/accounts`,
+        `${this.apiBase}/me/accounts?limit=50`,
         this.oauthToken,
       )
     ).data;

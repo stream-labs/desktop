@@ -121,9 +121,13 @@
   "List is empty": "List is empty",
   "Not selected": "Not selected",
   "Friends": "Friends",
+  "Thumbnail": "Thumbnail",
+  "Maximum file size reached ": "Maximum file size reached ",
+  "Select image": "Select image",
+  "Clear": "Vider",
   "Width": "Largeur",
   "Height": "Hauteur",
   "Use Custom": "Use Custom",
-  "Apply": "Apply",
+  "Apply": "Poser une candidature",
   "Do not show this message again": "Do not show this message again"
 }

@@ -12,5 +12,7 @@
   "Volume ( % )": "Громкость (%)",
   "Sync Offset ( ms )": "Сдвиг синхронизации (мс)",
   "Mixer": "Микшер",
-  "Monitor audio levels. If the bars are moving you are outputting audio.": "Уровни звука. Движение ползунков свидетельствует о наличии звука."
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "Уровни звука. Движение ползунков свидетельствует о наличии звука.",
+  "Muted": "Muted",
+  "Hide in Mixer": "Hide in Mixer"
 }

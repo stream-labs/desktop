@@ -36,7 +36,7 @@
     <div class="input-container">
       <div>
         {{ $t('You can now control Streamlabs OBS from your phone.') }} <br/>
-        {{ $t('To begin, Scan this QR code with your phone.') }}<br/>
+        {{ $t('To begin, scan this QR code with your phone.') }}<br/>
         {{ $t('This feature will only work with the most recent version of the Streamlabs mobile app.') }}<br/>
       </div>
     </div>

@@ -37,6 +37,9 @@ module.exports = {
     "function-name": OFF,
     "no-boolean-literal-compare": OFF,
 
+    // this rule preventing us using React.memo syntax described here https://reactjs.org/docs/react-api.html#reactmemo
+    "prefer-arrow-callback": OFF,
+
     // these rules have been disable after the migration from tslint
     // TODO: make decision about what rules we should enable
     "no-shadow": OFF,

@@ -1,13 +1,14 @@
 import Vue from 'vue';
 import electron from 'electron';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { getComponents, IModalOptions, IWindowOptions, WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
-import TitleBar from '../TitleBar';
+import { TitleBar } from 'components/shared/ReactComponent';
 import { AppService } from 'services/app';
 import styles from './ChildWindow.m.less';
 import ModalWrapper from '../shared/modals/ModalWrapper';
+import antdThemes from 'styles/antd/index';
 
 @Component({})
 export default class ChildWindow extends Vue {
@@ -20,6 +21,7 @@ export default class ChildWindow extends Vue {
   private modalOptions: IModalOptions = { renderFn: null };
 
   mounted() {
+    // antdThemes[this.theme].use();
     WindowsService.modalChanged.subscribe(modalOptions => {
       this.modalOptions = { ...this.modalOptions, ...modalOptions };
     });
@@ -49,6 +51,12 @@ export default class ChildWindow extends Vue {
   get appLoading() {
     return this.appService.state.loading;
   }
+
+  // @Watch('theme')
+  // updateAntd(newTheme: string, oldTheme: string) {
+  //   antdThemes[oldTheme].unuse();
+  //   antdThemes[newTheme].use();
+  // }
 
   clearComponentStack() {
     this.components = [];
@@ -127,7 +135,7 @@ export default class ChildWindow extends Vue {
   render() {
     return (
       <div style="height: 100%;" class={this.theme} id="mainWrapper">
-        <TitleBar title={this.options.title} class={styles.childWindowTitlebar} />
+        <TitleBar componentProps={{ windowId: 'child' }} class={styles.childWindowTitlebar} />
         <div class={styles.blankSlate}>
           <div class={styles.spinnerSpacer} />
           <i class="fa fa-spinner fa-pulse" />

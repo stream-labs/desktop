@@ -140,6 +140,14 @@ class CustomizationViews extends ViewHandler<ICustomizationServiceState> {
   get experimentalSettingsFormData(): TObsFormData {
     return [];
   }
+
+  get displayBackground() {
+    return DISPLAY_BACKGROUNDS[this.state.theme];
+  }
+
+  get currentTheme() {
+    return this.state.theme;
+  }
 }
 
 /**
@@ -230,10 +238,6 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
 
   get sectionBackground() {
     return SECTION_BACKGROUNDS[this.currentTheme];
-  }
-
-  get displayBackground() {
-    return DISPLAY_BACKGROUNDS[this.currentTheme];
   }
 
   get isDarkTheme() {
