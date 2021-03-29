@@ -15,20 +15,20 @@ test.skip('Shows optimized encoder for specific games', async t => {
   await setOutputResolution(t, '100x100');
 
   await focusMain(t);
-  await app.client.waitForExist('button=Go Live');
-  await app.client.click('button=Go Live');
+  await (await app.client.$('button=Go Live')).waitForExist();
+  await (await app.client.$('button=Go Live')).click();
   await focusChild(t);
-  await app.client.waitForExist('label=Title');
+  await (await app.client.$('label=Title')).waitForExist();
 
   // This part also tests game search in some way
-  app.client.setValue('.multiselect__input', 'starcraft');
+  await (await app.client.$('.multiselect__input')).setValue('starcraft');
   const sc2Selector = '.multiselect__element=StarCraft II';
 
-  await app.client.waitForExist(sc2Selector, 10000);
-  await app.client.click(sc2Selector);
+  await (await app.client.$(sc2Selector)).waitForExist({ timeout: 10000 });
+  await (await app.client.$(sc2Selector)).click();
 
   // Unsupported games show "use optimized encoder settings" without the game
-  t.true(await app.client.isExisting('.profile-default'));
+  t.true(await (await app.client.$('.profile-default')).isExisting());
 
   /*
    * Overwatch is a supported game, so it should display the following label:
@@ -38,11 +38,11 @@ test.skip('Shows optimized encoder for specific games', async t => {
    * so we workaround by adding a CSS class for when it's using the default profile
    */
   const owSelector = '.multiselect__element=Overwatch';
-  await app.client.setValue('.multiselect__input', 'Overwa');
-  await app.client.waitForExist(owSelector, 10000);
-  await app.client.click(owSelector);
+  await (await app.client.$('.multiselect__input')).setValue('Overwa');
+  await (await app.client.$(owSelector)).waitForExist({ timeout: 10000 });
+  await (await app.client.$(owSelector)).click();
   await sleep(1000);
-  t.false(await app.client.isExisting('.profile-default'));
+  t.false(await (await app.client.$('.profile-default')).isExisting());
 
   /*
    * Overwatch profile sends the following settings to AppVeyor RDP:
@@ -60,23 +60,23 @@ test.skip('Shows optimized encoder for specific games', async t => {
    * Unfortunately, only a handful of these are actually testable. We also only test on CI as this
    * is going to be different for each developer machine.
    */
-  await app.client.click('.profile input[type=checkbox]');
+  await (await app.client.$('.profile input[type=checkbox]')).click();
   await sleep(1000);
-  await app.client.click('button=Confirm & Go Live');
+  await (await app.client.$('button=Confirm & Go Live')).click();
   await focusMain(t);
-  await app.client.waitForExist('button=End Stream', 20000);
+  await (await app.client.$('button=End Stream')).waitForExist({ timeout: 20000 });
   await sleep(1000);
-  await app.client.click('.side-nav .icon-settings');
+  await (await app.client.$('.side-nav .icon-settings')).click();
 
   await focusChild(t);
-  await app.client.click('li=Output');
+  await (await app.client.$('li=Output')).click();
 
-  t.is('Advanced', await app.client.getValue('[data-name=Mode] input'));
-  t.is('Software (x264)', await app.client.getValue('[data-name=Encoder] input'));
+  t.is('Advanced', await (await app.client.$('[data-name=Mode] input')).getValue());
+  t.is('Software (x264)', await (await app.client.$('[data-name=Encoder] input')).getValue());
   t.is('2500', await getFormInput(t, 'Bitrate'));
 
-  await app.client.click('button=2');
+  await (await app.client.$('button=2')).click();
   await focusMain(t);
-  await app.client.click('button=End Stream');
-  await app.client.isExisting('button=Go Live');
+  await (await app.client.$('button=End Stream')).click();
+  await (await app.client.$('button=Go Live')).isExisting();
 });

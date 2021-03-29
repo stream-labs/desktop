@@ -1,9 +1,13 @@
 import { useSpectron, focusMain, test } from '../helpers/spectron';
-import { addSource, selectSource, clickRemoveSource, addExistingSource} from '../helpers/spectron/sources';
+import {
+  addSource,
+  selectSource,
+  clickRemoveSource,
+  addExistingSource,
+} from '../helpers/spectron/sources';
 import { addScene } from '../helpers/spectron/scenes';
 
 useSpectron();
-
 
 test('Adding and removing a AudioSource', async t => {
   const app = t.context.app;
@@ -12,17 +16,21 @@ test('Adding and removing a AudioSource', async t => {
   await addSource(t, 'Color Source', 'Source Without Audio');
   await focusMain(t);
 
-
-  t.true(await app.client.$('.mixer-panel').isExisting('div=Source With Audio'));
-  t.false(await app.client.$('.mixer-panel').isExisting('div=Source Without Audio'));
-
+  t.true(
+    await (await (await app.client.$('.mixer-panel')).$('div=Source With Audio')).isExisting(),
+  );
+  t.false(
+    await (await (await app.client.$('.mixer-panel')).$('div=Source Without Audio')).isExisting(),
+  );
 
   await selectSource(t, 'Source With Audio');
   await clickRemoveSource(t);
 
-  await app.client.$('.mixer-panel').waitForExist('div=Source With Audio', 5000, true);
+  await (await (await app.client.$('.mixer-panel')).$('div=Source With Audio')).waitForExist({
+    timeout: 5000,
+    reverse: true,
+  });
 });
-
 
 test('Nested scenes should provide audio sources to mixer', async t => {
   const app = t.context.app;
@@ -35,7 +43,10 @@ test('Nested scenes should provide audio sources to mixer', async t => {
   await addExistingSource(t, 'Scene', 'Scene');
 
   await focusMain(t);
-  t.true(await app.client.$('.mixer-panel').isExisting('div=Simple Media Source'));
-  t.true(await app.client.$('.mixer-panel').isExisting('div=Nested Media Source'));
-
+  t.true(
+    await (await (await app.client.$('.mixer-panel')).$('div=Simple Media Source')).isExisting(),
+  );
+  t.true(
+    await (await (await app.client.$('.mixer-panel')).$('div=Nested Media Source')).isExisting(),
+  );
 });

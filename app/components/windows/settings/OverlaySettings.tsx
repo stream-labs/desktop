@@ -72,14 +72,17 @@ export default class OverlaySettings extends Vue {
     });
   }
 
-  loadWidget() {
-    const chosenPath = electron.remote.dialog.showOpenDialog({
-      filters: [{ name: 'Widget File', extensions: ['widget'] }],
-    });
+  async loadWidget() {
+    const chosenPath = (
+      await electron.remote.dialog.showOpenDialog({
+        filters: [{ name: 'Widget File', extensions: ['widget'] }],
+      })
+    ).filePaths;
 
     if (!chosenPath) return;
 
     this.busy = true;
+    this.message = '';
 
     this.widgetsService
       .loadWidgetFile(chosenPath[0], this.scenesService.views.activeSceneId)

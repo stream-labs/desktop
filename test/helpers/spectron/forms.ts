@@ -2,25 +2,18 @@
 
 import { TExecutionContext } from './index';
 
-async function getNthLabelId(t: TExecutionContext, label: string, index: number) {
-  const el = await t.context.app.client.$$(`label=${label}`);
-  try {
-    return (el[index] as any).ELEMENT;
-  } catch (e) {
-    throw new Error(`Could not find element with label ${label}`);
-  }
-}
-
 export async function setFormInput(t: TExecutionContext, label: string, value: string, index = 0) {
-  const id = await getNthLabelId(t, label, index);
+  const $el = (await t.context.app.client.$$(`label=${label}`))[index];
+  const $input = await (await $el.$('../..')).$('input');
 
-  await t.context.app.client.elementIdElement(id, '../..').setValue('input', value);
+  await $input.setValue(value);
 }
 
 export async function getFormInput(t: TExecutionContext, label: string, index = 0) {
-  const id = await getNthLabelId(t, label, index);
+  const $el = (await t.context.app.client.$$(`label=${label}`))[index];
+  const $input = await (await $el.$('../..')).$('input');
 
-  return t.context.app.client.elementIdElement(id, '../..').getValue('input');
+  return $input.getValue();
 }
 
 export async function getFormCheckbox(
@@ -28,15 +21,17 @@ export async function getFormCheckbox(
   label: string,
   index = 0,
 ): Promise<boolean> {
-  const id = await getNthLabelId(t, label, index);
+  const $el = (await t.context.app.client.$$(`label=${label}`))[index];
+  const $input = await $el.$('../input');
 
-  return t.context.app.client.elementIdElement(id, '../input').isSelected();
+  return $input.isSelected();
 }
 
 export async function clickFormInput(t: TExecutionContext, label: string, index = 0) {
-  const id = await getNthLabelId(t, label, index);
+  const $el = (await t.context.app.client.$$(`label=${label}`))[index];
+  const $input = await (await $el.$('../..')).$('input');
 
-  await t.context.app.client.elementIdElement(id, '../..').click('input');
+  await $input.click();
 }
 
 export async function setFormDropdown(
@@ -45,11 +40,12 @@ export async function setFormDropdown(
   value: string,
   index = 0,
 ) {
-  const id = await getNthLabelId(t, label, index);
+  const $el = (await t.context.app.client.$$(`label=${label}`))[index];
+  const $multiselect = await (await $el.$('../..')).$('.multiselect');
+  await $multiselect.click();
 
-  await t.context.app.client.elementIdElement(id, '../..').click('.multiselect');
-
-  await t.context.app.client.elementIdElement(id, '../..').click(`li=${value}`);
+  const $li = await (await $el.$('../..')).$(`li=${value}`);
+  await $li.click();
 }
 
 // Percent is a value between 0 and 1
@@ -59,14 +55,14 @@ export async function setSliderPercent(
   percent: number,
   index = 0,
 ) {
-  const id = await getNthLabelId(t, label, index);
+  const $el = (await t.context.app.client.$$(`label=${label}`))[index];
+  const $slider = await (await $el.$('../..')).$('.vue-slider');
 
-  const width = await t.context.app.client
-    .elementIdElement(id, '../..')
-    .$('.vue-slider')
-    .getCssProperty('width');
+  const width = await $slider.getCSSProperty('width');
 
-  await t.context.app.client
-    .elementIdElement(id, '../..')
-    .leftClick('.vue-slider', Math.floor(Number(width.parsed.value) * percent), 0);
+  await $slider.click({
+    button: 'left',
+    x: Math.floor(Number(width.parsed.value) * percent),
+    y: 0,
+  });
 }

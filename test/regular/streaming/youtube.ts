@@ -27,6 +27,7 @@ test('Streaming to Youtube', async t => {
   });
 
   t.true(await chatIsVisible(t), 'Chat should be visible');
+  await stopStream(t);
 });
 
 test('Streaming to the scheduled event on Youtube', async t => {
@@ -49,6 +50,7 @@ test('Streaming to the scheduled event on Youtube', async t => {
   });
   await submit(t);
   await waitForStreamStart(t);
+  await stopStream(t);
   t.pass();
 });
 
@@ -68,6 +70,7 @@ test('Start stream twice to the same YT event', async t => {
     event: selectTitle(`Youtube Test Stream ${now}`),
     enableAutoStop: true,
   });
+  await stopStream(t);
   t.pass();
 });
 
@@ -76,13 +79,13 @@ test('Youtube streaming is disabled', async t => {
   const client = t.context.app.client;
   await logIn(t, 'youtube', { streamingIsDisabled: true, notStreamable: true });
   t.true(
-    await client.isExisting('span=YouTube account not enabled for live streaming'),
+    await (await client.$('span=YouTube account not enabled for live streaming')).isExisting(),
     'The streaming-disabled message should be visible',
   );
   await prepareToGoLive(t);
   await clickGoLive(t);
   t.true(
-    await client.isVisible('button=Enable Live Streaming'),
+    await (await client.$('button=Enable Live Streaming')).isDisplayed(),
     'The enable livestreaming button should be visible',
   );
 });

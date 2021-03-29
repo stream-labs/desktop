@@ -6,10 +6,10 @@ import {
   chatIsVisible,
   clickGoLive,
   goLive,
-  prepareToGoLive,
+  prepareToGoLive, stopStream,
   tryToGoLive,
   waitForStreamStart,
-  waitForStreamStop,
+  waitForStreamStop
 } from '../../helpers/spectron/streaming';
 import { selectTitle } from '../../helpers/form-monkey';
 import { getClient } from '../../helpers/api-client';
@@ -24,13 +24,13 @@ test('Streaming to Twitch without auth', async t => {
 
   // This is the twitch.tv/slobstest stream key
   await setFormInput(t, 'Stream key', userInfo.streamKey);
-  await t.context.app.client.click('button=Done');
+  await (await t.context.app.client.$('button=Done')).click();
 
   // go live
   await prepareToGoLive(t);
   await clickGoLive(t);
   await waitForStreamStart(t);
-
+  await stopStream(t);
   t.pass();
 });
 
@@ -45,9 +45,12 @@ test('Streaming to Twitch', async t => {
   // check we can't change stream setting while live
   await showSettings(t, 'Stream');
   await t.true(
-    await t.context.app.client.isExisting("div=You can not change these settings when you're live"),
+    await (
+      await t.context.app.client.$("div=You can not change these settings when you're live")
+    ).isExisting(),
     'Stream settings should be not visible',
   );
+  await stopStream(t);
   t.pass();
 });
 
@@ -72,12 +75,12 @@ test('Migrate the twitch account to the protected mode', async t => {
   // check that settings have been switched to the Custom Ingest mode
   await showSettings(t, 'Stream');
   t.true(
-    await t.context.app.client.isVisible('button=Use recommended settings'),
+    await (await t.context.app.client.$('button=Use recommended settings')).isDisplayed(),
     'Protected mode should be disabled',
   );
 
   // use recommended settings
-  await t.context.app.client.click('button=Use recommended settings');
+  await (await t.context.app.client.$('button=Use recommended settings')).click();
   // setup custom server
   streamSettings.setSettings({
     server: 'rtmp://live-sjc.twitch.tv/app',
@@ -94,7 +97,7 @@ test('Migrate the twitch account to the protected mode', async t => {
   // check that settings have been switched to the Custom Ingest mode
   await showSettings(t, 'Stream');
   t.true(
-    await t.context.app.client.isVisible('button=Use recommended settings'),
+    await (await t.context.app.client.$('button=Use recommended settings')).isDisplayed(),
     'Protected mode should be disabled',
   );
 });
