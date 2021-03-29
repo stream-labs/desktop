@@ -10,7 +10,7 @@ import { Section } from './Section';
 import { YoutubeEditStreamInfo } from './platforms/YoutubeEditStreamInfo';
 import FacebookEditStreamInfo from './platforms/FacebookEditStreamInfo';
 import GoLiveError from './GoLiveError';
-import LazySpinner from '../../shared/LazySpinner';
+import Spinner from '../../shared/Spinner';
 
 export default function PlatformSettings() {
   console.log('render platform settings');
@@ -21,7 +21,7 @@ export default function PlatformSettings() {
     enabledPlatforms,
     getPlatformDisplayName,
     isLoading,
-  } = useGoLiveSettings(undefined, undefined, 'PlatformSettings');
+  } = useGoLiveSettings();
   const shouldShowSettings = !error && !isLoading;
 
   return (
@@ -29,7 +29,7 @@ export default function PlatformSettings() {
     <div style={{ minHeight: '150px' }}>
       <GoLiveError />
 
-      <LazySpinner visible={!error && isLoading} />
+      <Spinner visible={!error && isLoading} />
 
       {shouldShowSettings && (
         <div style={{ width: '100%' }}>

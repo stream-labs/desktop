@@ -23,9 +23,7 @@ export default React.memo(function Form(p: FormProps & { disabled?: boolean }) {
   const [contextValue] = useState(() => {
     // set default layout to horizontal
     const layout = p.layout || 'horizontal';
-    // const layout = layoutPresets[p.layout || 'horizontal'];
     return {
-      // ...layout,
       layout,
       disabled: p.disabled,
       antForm,

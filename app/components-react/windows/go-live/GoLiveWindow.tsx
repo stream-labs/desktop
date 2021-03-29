@@ -14,7 +14,6 @@ import { useGoLiveSettings } from './useGoLiveSettings';
 
 export default function GoLiveWindow() {
   const { StreamingService, WindowsService, StreamSettingsService } = Services;
-  const form = useForm();
   const {
     contextValue,
     Context: GoLiveSettingsContext,
@@ -27,7 +26,8 @@ export default function GoLiveWindow() {
     switchAdvancedMode,
     prepopulate,
     isLoading,
-  } = useGoLiveSettings(undefined, undefined, 'GoLiveWindow');
+    form,
+  } = useGoLiveSettings();
 
   const shouldShowConfirm = ['prepopulate', 'waitForNewSettings'].includes(lifecycle);
   const shouldShowSettings = ['empty', 'prepopulate', 'waitForNewSettings'].includes(lifecycle);

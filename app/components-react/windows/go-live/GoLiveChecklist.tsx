@@ -27,16 +27,12 @@ export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
     warning,
     getPlatformDisplayName,
     isUpdateMode,
-  } = useGoLiveSettings(
-    view => ({
-      shouldShowOptimizedProfile:
-        VideoEncodingOptimizationService.state.useOptimizedProfile && view.isMidStreamMode,
-      shouldPostTweet: !view.isUpdateMode && TwitterService.state.tweetWhenGoingLive,
-      delayEnabled: StreamingService.delayEnabled,
-    }),
-    undefined,
-    'GoLiveChecklist',
-  );
+  } = useGoLiveSettings(view => ({
+    shouldShowOptimizedProfile:
+      VideoEncodingOptimizationService.state.useOptimizedProfile && view.isMidStreamMode,
+    shouldPostTweet: !view.isUpdateMode && TwitterService.state.tweetWhenGoingLive,
+    delayEnabled: StreamingService.delayEnabled,
+  }));
 
   const success = lifecycle === 'live';
 

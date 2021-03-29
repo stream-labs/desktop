@@ -45,7 +45,7 @@ export default function CommonPlatformFields(p: IProps) {
     toggleCustomFields,
     isMultiplatformMode,
     supports,
-  } = useGoLiveSettings(undefined, undefined, 'CommonPlatformFields');
+  } = useGoLiveSettings();
   const shouldShowPropsForSinglePlatform = !!p.platform;
   const platformSettings = shouldShowPropsForSinglePlatform
     ? getPlatformSettings(p.platform!)

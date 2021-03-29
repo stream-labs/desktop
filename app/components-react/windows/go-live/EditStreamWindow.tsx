@@ -28,7 +28,7 @@ export default function EditStreamWindow() {
     switchAdvancedMode,
     prepopulate,
     isLoading,
-  } = useGoLiveSettings(undefined, { isUpdateMode: true }, 'EditStreamWindow');
+  } = useGoLiveSettings(undefined, { isUpdateMode: true });
 
   // TODO: show success
   const shouldShowChecklist = lifecycle === 'runChecklist';

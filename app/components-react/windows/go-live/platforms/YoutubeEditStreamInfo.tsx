@@ -23,13 +23,9 @@ export function YoutubeEditStreamInfo() {
     isUpdateMode,
     isScheduleMode,
     renderPlatformSettings,
-  } = useGoLiveSettings(
-    view => ({
-      ytSettings: view.platforms.youtube,
-    }),
-    undefined,
-    'YoutubeEditStreamInfo',
-  );
+  } = useGoLiveSettings(view => ({
+    ytSettings: view.platforms.youtube,
+  }));
   const is360video = ytSettings.projection === '360';
   const shouldShowSafeForKidsWarn = ytSettings.selfDeclaredMadeForKids;
   const broadcastId = ytSettings.broadcastId;

@@ -8,13 +8,9 @@ import GameSelector from '../GameSelector';
 import Form from '../../../shared/inputs/Form';
 
 export function TwitchEditStreamInfo() {
-  const { updatePlatform, twSettings, renderPlatformSettings } = useGoLiveSettings(
-    state => ({
-      twSettings: state.platforms.twitch,
-    }),
-    undefined,
-    'TwitchEditStreamInfo',
-  );
+  const { updatePlatform, twSettings, renderPlatformSettings } = useGoLiveSettings(state => ({
+    twSettings: state.platforms.twitch,
+  }));
 
   const bind = createBinding(twSettings, updatedSettings =>
     updatePlatform('twitch', updatedSettings),

@@ -53,6 +53,7 @@ export default function TwitterInput() {
           nowrap={true}
           showCount={true}
           maxLength={280}
+          rows={5}
           disabled={!tweetWhenGoingLive}
         />
         <div style={{ marginTop: '30px', textAlign: 'right' }}>

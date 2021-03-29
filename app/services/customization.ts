@@ -62,7 +62,10 @@ export interface ICustomizationServiceState {
   enableFFZEmotes: boolean;
   mediaBackupOptOut: boolean;
   navigateToLiveOnStreamStart: boolean;
-  experimental: any;
+  experimental?: {
+    reactGoLive?: boolean;
+    volmetersFPSLimit?: number;
+  };
   legacyEvents: boolean;
   pinnedStatistics: IPinnedStatistics;
 }
@@ -138,7 +141,16 @@ class CustomizationViews extends ViewHandler<ICustomizationServiceState> {
   }
 
   get experimentalSettingsFormData(): TObsFormData {
-    return [];
+    return [
+      <IObsInput<boolean>>{
+        value: this.state.experimental.reactGoLive,
+        name: 'reactGoLive',
+        description: 'Enable react GoLive window',
+        type: 'OBS_PROPERTY_BOOL',
+        visible: true,
+        enabled: true,
+      },
+    ];
   }
 }
 

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Spin } from 'antd';
 import Animation from 'rc-animate';
 
-export default function LazySpinner(props: { visible?: boolean } = {}) {
+export default function Spinner(props: { visible?: boolean } = {}) {
   const defaultProps = { delay: 300, transitionTime: 300 };
   const p = { ...defaultProps, ...props };
   const color = '#17242D'; // TODO: pick color from theme
@@ -43,7 +43,7 @@ export default function LazySpinner(props: { visible?: boolean } = {}) {
     <div>
       <Animation transitionName="ant-fade">
         {p.visible && (
-          <div style={containerStyles}>
+          <div style={containerStyles} >
             <Spin size="large" style={spinnerStyles} />
           </div>
         )}

@@ -52,30 +52,26 @@ export default function FacebookEditStreamInfo() {
     shouldShowGamingWarning,
     renderPlatformSettings,
     shouldShowPermissionWarn,
-  } = useGoLiveSettings(
-    view => {
-      const fbState = FacebookService.state;
-      const hasPages = !!fbState.facebookPages.length;
-      const canStreamToTimeline = fbState.grantedPermissions.includes('publish_video');
-      const canStreamToGroup = fbState.grantedPermissions.includes('publish_to_groups');
-      const fbSettings = view.platforms.facebook;
-      return {
-        canStreamToTimeline,
-        canStreamToGroup,
-        hasPages,
-        fbSettings,
-        shouldShowGamingWarning: hasPages && fbSettings.game,
-        shouldShowPermissionWarn:
-          (!canStreamToTimeline || !canStreamToGroup) &&
-          DismissablesService.views.shouldShow(EDismissable.FacebookNeedPermissionsTip),
-        groups: fbState.facebookGroups,
-        pages: fbState.facebookPages,
-        isPrimary: view.checkPrimaryPlatform('facebook'),
-      };
-    },
-    undefined,
-    'FacebookEditStreamInfo',
-  );
+  } = useGoLiveSettings(view => {
+    const fbState = FacebookService.state;
+    const hasPages = !!fbState.facebookPages.length;
+    const canStreamToTimeline = fbState.grantedPermissions.includes('publish_video');
+    const canStreamToGroup = fbState.grantedPermissions.includes('publish_to_groups');
+    const fbSettings = view.platforms.facebook;
+    return {
+      canStreamToTimeline,
+      canStreamToGroup,
+      hasPages,
+      fbSettings,
+      shouldShowGamingWarning: hasPages && fbSettings.game,
+      shouldShowPermissionWarn:
+        (!canStreamToTimeline || !canStreamToGroup) &&
+        DismissablesService.views.shouldShow(EDismissable.FacebookNeedPermissionsTip),
+      groups: fbState.facebookGroups,
+      pages: fbState.facebookPages,
+      isPrimary: view.checkPrimaryPlatform('facebook'),
+    };
+  });
   const shouldShowGroups = fbSettings.destinationType === 'group' && !isUpdateMode;
   const shouldShowPages = fbSettings.destinationType === 'page' && !isUpdateMode;
   const shouldShowEvents = !isUpdateMode && !isScheduleMode;

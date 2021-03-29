@@ -10,8 +10,11 @@ import {
 } from '../../core/useStateManager';
 import { ViewHandler } from '../../../services/core';
 import { cloneDeep, debounce, mapValues, omit, pick } from 'lodash';
-import Form from '../../shared/inputs/Form';
+import Form, { useForm } from '../../shared/inputs/Form';
 import { useOnCreate } from '../../hooks';
+import { FormInstance } from 'antd/lib/form';
+import { message } from 'antd';
+import { $t } from '../../../services/i18n';
 
 let tm: TMerge<{}, {}>;
 
@@ -80,16 +83,11 @@ function getInitialStreamSettings(modificators: TModificators): IGoLiveSettingsS
 export function useGoLiveSettings<
   TComputedProps extends object,
   TComputedPropsCb extends (settings: StreamInfoView & TModificators) => TComputedProps
->(
-  // computedProps: (settings: StreamInfoView & TModificators) => TComputedProps,
-  computedPropsCb?: TComputedPropsCb,
-  modificators: TModificators = {} as TModificators,
-  debug?: string,
-) {
+>(computedPropsCb?: TComputedPropsCb, modificators: TModificators = {} as TModificators) {
+  const form = useForm();
   const { dependencyWatcher, isRoot, contextView } = useStateManager(
     () => getInitialStreamSettings(modificators),
-    initializeGoLiveSettings,
-    //v => ({ fooBar: v.bar + v.foo }),
+    (getState, setState) => initializeGoLiveSettings(getState, setState, form),
     computedPropsCb as TComputedPropsCb,
     true,
   );
@@ -114,6 +112,7 @@ export function useGoLiveSettings<
 function initializeGoLiveSettings(
   getState: () => IGoLiveSettingsState,
   setState: (newState: IGoLiveSettingsState) => void,
+  form: FormInstance,
 ) {
   const { StreamingService, StreamSettingsService } = Services;
   type TState = IGoLiveSettingsState;
@@ -125,6 +124,10 @@ function initializeGoLiveSettings(
     get isLoading() {
       const state = getState();
       return state.needPrepopulate || getView(state).isLoading;
+    },
+
+    get form() {
+      return form;
     },
 
     renderPlatformSettings(
@@ -216,7 +219,13 @@ function initializeGoLiveSettings(
       }
     }, 100),
 
-    goLive() {
+    async goLive() {
+      try {
+        await form.validateFields();
+      } catch (e) {
+        message.error($t('Invalid settings Please check the form'));
+        return;
+      }
       StreamingService.actions.goLive(getState());
     },
 

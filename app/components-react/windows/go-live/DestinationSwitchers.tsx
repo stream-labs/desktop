@@ -45,7 +45,7 @@ export function DestinationSwitchers() {
     customDestinations,
     switchPlatforms,
     switchCustomDestination,
-  } = useGoLiveSettings(undefined, undefined, 'DestinationSwitchers');
+  } = useGoLiveSettings();
 
   const enabledPlatformsRef = useRef(enabledPlatforms);
 
