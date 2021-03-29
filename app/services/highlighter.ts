@@ -6,6 +6,7 @@ import createBuffer from 'gl-buffer';
 import transitions from 'gl-transitions';
 import createTransition from 'gl-transition';
 import createTexture from 'gl-texture2d';
+import fs from 'fs';
 
 const FFMPEG_DIR = path.resolve('../../', 'Downloads', 'ffmpeg', 'bin');
 const FFMPEG_EXE = path.join(FFMPEG_DIR, 'ffmpeg.exe');
@@ -16,7 +17,7 @@ export const CLIP_1 = path.join(CLIP_DIR, '1.mp4');
 export const CLIP_2 = path.join(CLIP_DIR, '2.mp4');
 export const CLIP_3 = path.join(CLIP_DIR, '3.mp4');
 export const CLIP_4 = path.join(CLIP_DIR, 'Facebook Refactor.mov');
-const EXPORT_FILE = path.join(CLIP_DIR, 'output.mp4');
+const EXPORT_NAME = path.join(CLIP_DIR, 'output');
 
 const WIDTH = 1280;
 const HEIGHT = 720;
@@ -59,6 +60,20 @@ export class AudioSource {
 
     await execa(FFMPEG_EXE, args);
   }
+
+  async cleanup() {
+    return new Promise<void>((resolve, reject) => {
+      fs.unlink(this.outPath, e => {
+        if (e) {
+          console.log(e);
+          reject();
+          return;
+        }
+
+        resolve();
+      });
+    });
+  }
 }
 
 export class FrameSource {
@@ -84,7 +99,7 @@ export class FrameSource {
 
   get nFrames() {
     // Not sure why last frame is sometimes missing
-    return Math.floor(this.duration * FPS) - 1;
+    return Math.round(this.duration * FPS);
   }
 
   constructor(public readonly sourcePath: string, public readonly duration: number) {}
@@ -175,6 +190,7 @@ export class FrameSource {
 
     this.ffmpeg.stdout.once('end', () => {
       console.log('STREAM HAS ENDED');
+      console.log(`FRAME COUNT: Expected: ${this.nFrames} Actual: ${this.currentFrame}`);
       this.finished = true;
 
       // If a frame request is in progress, immediately resolve it
@@ -232,7 +248,6 @@ export class FrameSource {
     if (this.byteIndex >= FRAME_BYTE_SIZE) {
       this.ffmpeg.stdout.pause();
 
-      console.log('FRAME BUFFER IS FILLED');
       this.swapBuffers();
 
       this.currentFrame++;
@@ -289,29 +304,103 @@ export class Clip {
   }
 }
 
+export class AudioCrossfader {
+  constructor(public readonly outputPath: string, public readonly clips: Clip[]) {}
+
+  async export() {
+    const inputArgs = this.clips.reduce((args: string[], clip) => {
+      return [...args, '-i', clip.audioSource.outPath];
+    }, []);
+
+    /* eslint-disable */
+    const args = [
+      ...inputArgs,
+      '-filter_complex', this.getFilterGraph(),
+      '-c:a', 'flac',
+      '-y',
+      this.outputPath,
+    ];
+    /* eslint-enable */
+
+    await execa(FFMPEG_EXE, args);
+  }
+
+  getFilterGraph() {
+    let inStream = '[0:a]';
+
+    const filterGraph = this.clips
+      .slice(0, -1)
+      .map((clip, i) => {
+        const outStream = `[concat${i}]`;
+
+        let ret = `${inStream}[${i + 1}:a]acrossfade=d=${TRANSITION_DURATION}:c1=tri:c2=tri`;
+
+        inStream = outStream;
+
+        if (i < this.clips.length - 2) ret += outStream;
+
+        return ret;
+      })
+      .join(',');
+
+    return filterGraph;
+  }
+
+  async cleanup() {
+    return new Promise<void>((resolve, reject) => {
+      fs.unlink(this.outputPath, e => {
+        if (e) {
+          console.log(e);
+          reject();
+          return;
+        }
+
+        resolve();
+      });
+    });
+  }
+}
+
 export class FrameWriter {
-  constructor(public readonly outputPath: string) {}
+  constructor(public readonly outputPath: string, public readonly audioInput: string) {}
 
   readonly width = WIDTH;
   readonly height = HEIGHT;
 
   private ffmpeg: execa.ExecaChildProcess<string>;
 
+  exitPromise: Promise<void>;
+
   private startFfmpeg() {
     /* eslint-disable */
     const args = [
+      // Video Input
       '-f', 'rawvideo',
       '-vcodec', 'rawvideo',
       '-pix_fmt', 'rgba',
       '-s', `${this.width}x${this.height}`,
       '-r', `${FPS}`,
       '-i', '-',
+
+      // Audio Input
+      '-i', this.audioInput,
+
+      // Input Mapping
+      '-map', '0:v:0',
+      '-map', '1:a:0',
+
+      // Video Output
       '-vf', 'format=yuv420p',
       '-vcodec', 'libx264',
       '-profile:v', 'high',
       '-preset:v', 'ultrafast',
       '-crf', '18',
       '-movflags', 'faststart',
+
+      // Audio Output
+      '-acodec', 'aac',
+      '-b:a', '128k',
+
       '-y', this.outputPath,
     ];
     /* eslint-enable */
@@ -326,8 +415,11 @@ export class FrameWriter {
       stderr: 'pipe',
     });
 
-    this.ffmpeg.on('exit', code => {
-      console.log('ffmpeg writer exited with code', code);
+    this.exitPromise = new Promise<void>(resolve => {
+      this.ffmpeg.on('exit', code => {
+        console.log('ffmpeg writer exited with code', code);
+        resolve();
+      });
     });
 
     this.ffmpeg.catch(e => {
@@ -342,9 +434,13 @@ export class FrameWriter {
   async writeNextFrame(frameBuffer: Buffer) {
     if (!this.ffmpeg) this.startFfmpeg();
 
-    await new Promise<void>(resolve => {
+    await new Promise<void>((resolve, reject) => {
       this.ffmpeg.stdin.write(frameBuffer, e => {
-        if (e) console.log(e);
+        if (e) {
+          console.log(e);
+          reject();
+          return;
+        }
         resolve();
       });
     });
@@ -352,6 +448,7 @@ export class FrameWriter {
 
   end() {
     this.ffmpeg.stdin.end();
+    return this.exitPromise;
   }
 }
 
@@ -455,68 +552,63 @@ export class Transitioner {
 
 export class HighlighterService extends Service {
   async run() {
-    const clips = [new Clip(CLIP_1), new Clip(CLIP_2), new Clip(CLIP_3), new Clip(CLIP_4)];
+    const clips = [new Clip(CLIP_1), new Clip(CLIP_2), new Clip(CLIP_3)];
 
     // Read all durations
-    // TODO: pMap
     await Promise.all(clips.map(s => s.init()));
+
+    // Mix audio first
+    console.log('MIXING AUDIO');
+    await Promise.all(clips.map(clip => clip.audioSource.extract()));
+    const audioMix = `${EXPORT_NAME}-audio.flac`;
+    const fader = new AudioCrossfader(audioMix, clips);
+    await fader.export();
+    await Promise.all(clips.map(clip => clip.audioSource.cleanup()));
+    console.log('AUDIO DONE');
 
     let fromClip = clips.shift();
     let toClip = clips.shift();
 
     const transitioner = new Transitioner();
 
-    const writer = new FrameWriter(EXPORT_FILE);
-
-    // const compositor = new Compositor2D();
-
-    // console.log('DURATION', source.duration);
-    // console.log('ESTIMATED FRAMES', source.duration * FPS);
-
-    let frameCounter = 0;
+    const writer = new FrameWriter(`${EXPORT_NAME}.mp4`, audioMix);
 
     while (true) {
-      console.log('Reading from frame');
       const fromFrameRead = await fromClip.frameSource.readNextFrame();
-      const inTransition = fromClip.frameSource.currentFrame >= fromClip.frameSource.nFrames - TRANSITION_FRAMES;
-      let frameToRender = fromSource.readBuffer;
+      const inTransition =
+        fromClip.frameSource.currentFrame >= fromClip.frameSource.nFrames - TRANSITION_FRAMES;
+      let frameToRender = fromClip.frameSource.readBuffer;
 
-      if (inTransition && toSource) {
-        await toSource.readNextFrame();
+      if (inTransition && toClip) {
+        await toClip.frameSource.readNextFrame();
 
         transitioner.renderTransition(
-          fromSource.readBuffer,
-          toSource.readBuffer,
-          toSource.currentFrame / TRANSITION_FRAMES,
+          fromClip.frameSource.readBuffer,
+          toClip.frameSource.readBuffer,
+
+          // Frame counter refers to next frame we will read
+          // Subtract 1 to get the frame we just read
+          (toClip.frameSource.currentFrame - 1) / TRANSITION_FRAMES,
         );
         frameToRender = transitioner.getFrame();
 
-        console.log(fromSource.currentFrame, fromSource.nFrames);
-        const transitionEnded = fromSource.currentFrame === fromSource.nFrames;
+        const transitionEnded = fromClip.frameSource.currentFrame === fromClip.frameSource.nFrames;
 
         if (transitionEnded) {
-          console.log('TRANSITION ENDED', sources);
-          fromSource = toSource;
-          toSource = sources.shift();
+          fromClip = toClip;
+          toClip = clips.shift();
         }
       }
 
       if (fromFrameRead) {
-        console.log('Writing frame', frameCounter);
-
-        // transitioner.renderTransition(source.readBuffer, source.readBuffer, 0.5);
-
-        // compositor.drawFrame(source.readBuffer);
-        // compositor.drawText();
-
         await writer.writeNextFrame(frameToRender);
       } else {
         console.log('Out of sources, closing file');
-        writer.end();
+        await writer.end();
         break;
       }
-
-      frameCounter++;
     }
+
+    await fader.cleanup();
   }
 }

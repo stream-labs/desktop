@@ -1,20 +1,20 @@
 import TsxComponent, { createProps } from 'components/tsx-component';
-import { FrameSource, SCRUB_HEIGHT, SCRUB_WIDTH, SCRUB_FRAMES } from 'services/highlighter';
+import { Clip, SCRUB_HEIGHT, SCRUB_WIDTH, SCRUB_FRAMES } from 'services/highlighter';
 import { Component } from 'vue-property-decorator';
 import path from 'path';
 import { throttle } from 'lodash-decorators';
 
-class ClipProps {
+class ClipPreviewProps {
   path: string = '';
 }
 
-@Component({ props: createProps(ClipProps) })
-export default class Clip extends TsxComponent<ClipProps> {
+@Component({ props: createProps(ClipPreviewProps) })
+export default class ClipPreview extends TsxComponent<ClipPreviewProps> {
   $refs: {
     canvas: HTMLCanvasElement;
   };
 
-  frameSource: FrameSource;
+  clip: Clip;
 
   scrubFrame: number;
   scrubFramesLoaded: boolean;
@@ -30,19 +30,20 @@ export default class Clip extends TsxComponent<ClipProps> {
     console.log('mount', this.props.path);
     console.log(this.$refs.canvas);
 
-    this.frameSource = new FrameSource(this.props.path);
-
     this.$refs.canvas.width = SCRUB_WIDTH;
     this.$refs.canvas.height = SCRUB_HEIGHT;
     this.$refs.canvas.style.width = `${SCRUB_WIDTH}px`;
     this.$refs.canvas.style.height = `${SCRUB_HEIGHT}px`;
 
-    this.scrubFrame = 0;
-    this.scrubFramesLoaded = false;
-    this.ctx = this.$refs.canvas.getContext('2d');
-    this.frameSource.readScrubbingFrames().then(() => {
-      this.scrubFramesLoaded = true;
-      this.renderScrubFrame();
+    this.clip = new Clip(this.props.path);
+    this.clip.init().then(() => {
+      this.scrubFrame = 0;
+      this.scrubFramesLoaded = false;
+      this.ctx = this.$refs.canvas.getContext('2d');
+      this.clip.frameSource.readScrubbingFrames().then(() => {
+        this.scrubFramesLoaded = true;
+        this.renderScrubFrame();
+      });
     });
   }
 
@@ -51,7 +52,7 @@ export default class Clip extends TsxComponent<ClipProps> {
     if (!this.scrubFramesLoaded) return;
 
     const data = new ImageData(
-      Uint8ClampedArray.from(this.frameSource.scrubFrames[this.scrubFrame]),
+      Uint8ClampedArray.from(this.clip.frameSource.scrubFrames[this.scrubFrame]),
       SCRUB_WIDTH,
       SCRUB_HEIGHT,
     );

@@ -1,10 +1,10 @@
 import TsxComponent from 'components/tsx-component';
 import { CLIP_1, CLIP_2, CLIP_3, CLIP_4 } from 'services/highlighter';
 import { Component } from 'vue-property-decorator';
-import Clip from 'components/highlighter/Clip';
+import ClipPreview from 'components/highlighter/ClipPreview';
 
 @Component({
-  components: { Clip },
+  components: { ClipPreview },
 })
 export default class Highlighter extends TsxComponent {
   render() {
