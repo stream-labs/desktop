@@ -22,9 +22,11 @@
   font-size: 25px;
   margin-top: 8px;
   &:not(:global(.anticon-loading)){
+    // add a bounce animation
     :global {
       animation: 0.8s ease-out bounce;
     }
+    // add a fade animation
     &:after {
       content: ' ';
       display: block;
@@ -56,6 +58,16 @@
   padding-left: 20px;
 }
 
+// set color off done and not-done checklist item
+.container :global(.ant-timeline-item) {
+  :global(.ant-timeline-item-content) {
+    color: var(--midtone);
+  }
+  &.done :global(.ant-timeline-item-content) {
+    color: var(--paragraph);
+  }
+}
+
 .container {
   h1 {
     margin-bottom: 50px;
@@ -67,18 +79,4 @@
   :global{
     animation: 0.8s ease-out bounce;
   }
-  //&:after {
-  //  content: ' ';
-  //  display: block;
-  //  width: 100%;
-  //  height: 100%;
-  //  background-color: green;
-  //  border-radius: 50%;
-  //  opacity: 0;
-  //  position: relative;
-  //  top: -100%;
-  //  :global{
-  //      animation: 0.8s ease-out scaleAndFadeOut
-  //  }
-  //}
 }

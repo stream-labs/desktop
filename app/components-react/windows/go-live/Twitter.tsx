@@ -1,22 +1,25 @@
 import React from 'react';
 import InputWrapper from '../../shared/inputs/InputWrapper';
-import { useOnCreate, useVuex } from '../../hooks';
 import { Services } from '../../service-provider';
 import cx from 'classnames';
 import { $t } from '../../../services/i18n';
 import css from './Twitter.m.less';
-import { SwitchInput, TextAreaInput, TSlobsInputProps, TextInput } from '../../shared/inputs';
+import { SwitchInput, TextAreaInput, TextInput } from '../../shared/inputs';
 import { pick } from 'lodash';
-import { Row, Col } from 'antd';
+import { Row, Col, Button } from 'antd';
+import { useGoLiveSettings } from './useGoLiveSettings';
 
-export default function TwitterInput(
-  p: TSlobsInputProps<{ streamTitle: string; onChange: (tweetText: string) => unknown }, string>,
-) {
-  const { TwitterService, UserService } = Services;
-  const { tweetWhenGoingLive, linked, screenName, isTwitch } = useVuex(() => ({
-    ...pick(TwitterService.state, 'tweetWhenGoingLive', 'linked', 'screenName'),
-    isTwitch: UserService.platform?.type === 'twitch',
-  }));
+export default function TwitterInput() {
+  const { TwitterService } = Services;
+  const {
+    tweetText,
+    updateSettings,
+    tweetWhenGoingLive,
+    linked,
+    screenName,
+  } = useGoLiveSettings(() =>
+    pick(TwitterService.state, 'tweetWhenGoingLive', 'linked', 'screenName'),
+  );
 
   function unlink() {
     TwitterService.actions.return
@@ -32,28 +35,28 @@ export default function TwitterInput(
           <Col span={14}>
             <SwitchInput
               label={$t('Enable Tweet Sharing')}
+              layout="inline"
               onChange={shouldTweet => TwitterService.actions.setTweetPreference(shouldTweet)}
               value={tweetWhenGoingLive}
               className={css.twitterTweetToggle}
             />
           </Col>
           <Col span={10} style={{ textAlign: 'right' }}>
-            <InputWrapper>@{screenName}</InputWrapper>
+            <InputWrapper layout="inline">@{screenName}</InputWrapper>
           </Col>
         </Row>
 
         <TextAreaInput
-          {...p}
+          name="tweetText"
+          value={tweetText}
+          onChange={tweetText => updateSettings({ tweetText })}
           nowrap={true}
           showCount={true}
-          autoSize={true}
           maxLength={280}
           disabled={!tweetWhenGoingLive}
         />
-        <div className={css.twitterButtons}>
-          <button className={cx('button', 'button--default', css.adjustButton)} onClick={unlink}>
-            {$t('Unlink Twitter')}
-          </button>
+        <div style={{ marginTop: '30px', textAlign: 'right' }}>
+          <Button onClick={unlink}>{$t('Unlink Twitter')}</Button>
         </div>
       </div>
     );

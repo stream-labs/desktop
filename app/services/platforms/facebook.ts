@@ -109,8 +109,9 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   readonly displayName = 'Facebook';
 
   readonly capabilities = new Set<TPlatformCapability>([
-    'chat',
+    'title',
     'description',
+    'chat',
     'game',
     'user-info',
     'stream-schedule',

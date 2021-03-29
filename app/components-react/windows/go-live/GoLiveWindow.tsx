@@ -13,7 +13,6 @@ import { SwitchInput } from '../../shared/inputs';
 import { useGoLiveSettings } from './useGoLiveSettings';
 
 export default function GoLiveWindow() {
-  console.log('render GoLiveWindow');
   const { StreamingService, WindowsService, StreamSettingsService } = Services;
   const form = useForm();
   const {
@@ -74,7 +73,7 @@ export default function GoLiveWindow() {
           >
             <Animation transitionName="slideright">
               {/* STEP 1 - FILL OUT THE SETTINGS FORM */}
-              {shouldShowSettings && <GoLiveSettings key={'settings'} className={styles.page} />}
+              {shouldShowSettings && <GoLiveSettings key={'settings'} />}
 
               {/* STEP 2 - RUN THE CHECKLIST */}
               {shouldShowChecklist && <GoLiveChecklist className={styles.page} key={'checklist'} />}

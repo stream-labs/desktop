@@ -1,19 +1,15 @@
-import { IGoLiveSettings, IStreamSettings } from '../../../../../services/streaming';
-import { TPlatform } from '../../../../../services/platforms';
-import CommonPlatformFields from '../../CommonPlatformFields';
-import { CheckboxInput, ImageInput, ListInput } from '../../../../shared/inputs';
-import React, { useEffect, useState } from 'react';
-import { Services } from '../../../../service-provider';
-import { $t } from '../../../../../services/i18n';
-import { IYoutubeStartStreamOptions } from '../../../../../services/platforms/youtube';
-import { createBinding } from '../../../../shared/inputs/inputs';
+import { IGoLiveSettings } from '../../../../services/streaming';
+import CommonPlatformFields from '../CommonPlatformFields';
+import { CheckboxInput, ImageInput, ListInput } from '../../../shared/inputs';
+import React, { useEffect } from 'react';
+import { Services } from '../../../service-provider';
+import { $t } from '../../../../services/i18n';
+import { createBinding } from '../../../shared/inputs/inputs';
 import BroadcastInput from './BroadcastInput';
-import { useAsyncState, useOnCreate } from '../../../../hooks';
-import InputWrapper from '../../../../shared/inputs/InputWrapper';
-import { TwitchTagsInput } from '../TwitchTagsInput';
-import GameSelector from '../../GameSelector';
-import Form from '../../../../shared/inputs/Form';
-import { useGoLiveSettings } from '../../useGoLiveSettings';
+import { useAsyncState, useOnCreate } from '../../../hooks';
+import InputWrapper from '../../../shared/inputs/InputWrapper';
+import Form from '../../../shared/inputs/Form';
+import { useGoLiveSettings } from '../useGoLiveSettings';
 import electron from 'electron';
 
 /***

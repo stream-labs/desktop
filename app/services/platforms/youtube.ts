@@ -162,7 +162,12 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   @Inject() private windowsService: WindowsService;
   @Inject() private i18nService: I18nService;
 
-  readonly capabilities = new Set<TPlatformCapability>(['chat', 'description', 'stream-schedule']);
+  readonly capabilities = new Set<TPlatformCapability>([
+    'title',
+    'description',
+    'chat',
+    'stream-schedule',
+  ]);
 
   static initialState: IYoutubeServiceState = {
     ...BasePlatformService.initialState,

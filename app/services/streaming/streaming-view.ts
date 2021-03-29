@@ -61,6 +61,10 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     return this.info.checklist;
   }
 
+  get game() {
+    return this.commonFields.game;
+  }
+
   getPlatformDisplayName(platform: TPlatform): string {
     return getPlatformService(platform).displayName;
   }
@@ -170,7 +174,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
       advancedMode: !!this.streamSettingsView.state.goLiveSettings?.advancedMode,
       optimizedProfile: undefined,
       customDestinations: savedGoLiveSettings?.customDestinations || [],
-      tweetText: '',
+      tweetText: savedGoLiveSettings?.tweetText || '',
     };
   }
 

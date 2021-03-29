@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef, useContext } from 'react';
-import { debounce, isEqual, pick } from 'lodash';
-import { StatefulService, ViewHandler } from '../services/core';
+import { debounce } from 'lodash';
+import { StatefulService } from '../services/core';
 import { createBinding, TBindings } from './shared/inputs';
 import { useForm } from './shared/inputs/Form';
 import { FormInstance } from 'antd/lib/form/hooks/useForm';
-import { assertIsDefined } from '../util/properties-type-guards';
-import { Observable, Subject, Subscription } from 'rxjs';
-import { keys } from '../services/utils';
 
 /**
  * Creates a reactive state for a React component based on Vuex store
@@ -146,3 +143,16 @@ type TUseFormStateResult<TState extends object> = {
   stateRef: { current: TState };
   form: FormInstance<TState>;
 };
+
+
+/**
+ * Returns a function for force updating of the component
+ * Use it only for frequently used components for optimization purposes
+ */
+export function useForceUpdate(): () => void {
+  const [revision, setRevision] = useState(0);
+  return () => {
+    // changing a state variable updates the component
+    setRevision(revision => revision + 1);
+  }
+}

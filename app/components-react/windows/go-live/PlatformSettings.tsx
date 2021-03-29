@@ -7,13 +7,10 @@ import { useVuex } from '../../hooks';
 import { getPlatformService, TPlatform } from '../../../services/platforms';
 import { TwitchEditStreamInfo } from './platforms/TwitchEditStreamInfo';
 import { Section } from './Section';
-import { IGoLiveSettings } from '../../../services/streaming';
-import { YoutubeEditStreamInfo } from './platforms/youtube/YoutubeEditStreamInfo';
+import { YoutubeEditStreamInfo } from './platforms/YoutubeEditStreamInfo';
 import FacebookEditStreamInfo from './platforms/FacebookEditStreamInfo';
 import GoLiveError from './GoLiveError';
 import LazySpinner from '../../shared/LazySpinner';
-import { Skeleton } from 'antd';
-import InputWrapper from '../../shared/inputs/InputWrapper';
 
 export default function PlatformSettings() {
   console.log('render platform settings');

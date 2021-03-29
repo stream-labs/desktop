@@ -1,7 +1,6 @@
 import { useGoLiveSettings } from './useGoLiveSettings';
 import css from './GoLiveChecklist.m.less';
 import React, { HTMLAttributes } from 'react';
-import { useOnCreate, useVuex } from '../../hooks';
 import { Services } from '../../service-provider';
 import { $t } from '../../../services/i18n';
 import { TGoLiveChecklistItemState } from '../../../services/streaming';
@@ -40,18 +39,6 @@ export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
   );
 
   const success = lifecycle === 'live';
-
-  useOnCreate(() => {
-    // TODO:
-    // if (!rs.delayEnabled) return;
-    // const updateDelaySecondsRemaining = () => {
-    //   this.delaySecondsRemaining = this.streamingService.delaySecondsRemaining;
-    //   setTimeout(() => {
-    //     updateDelaySecondsRemaining();
-    //   }, 1000);
-    // };
-    // updateDelaySecondsRemaining();
-  });
 
   function render() {
     return (
@@ -111,6 +98,9 @@ export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
     return $t('Working on your live stream') + '...';
   }
 
+  /**
+   * Renders a Timeline item in one of 4 states - 'not-started', 'pending', 'done', 'error'
+   */
   function renderCheck(
     title: string,
     state: TGoLiveChecklistItemState,
@@ -142,29 +132,11 @@ export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
         key={title}
         dot={dot}
         color={color}
-        className={state === 'pending' ? 'floating' : ''}
+        className={state === 'done' ? css.done : ''}
       >
-        <span className={state === 'pending' ? css.floating : ''}>{title}</span>
+        <span>{title}</span>
       </Timeline.Item>
     );
-
-    // // TODO:
-    // // const renderStreamDelay =
-    // //   modificators?.renderStreamDelay &&
-    // //   this.view.info.checklist.startVideoTransmission === 'pending';
-    // return (
-    //   <li
-    //     key={title}
-    //     className={cx({
-    //       [css.notStarted]: state === 'not-started',
-    //       [css.itemError]: state === 'failed',
-    //     })}
-    //   >
-    //     <CheckMark state={state} />
-    //     <span>{title}</span>
-    //     {/*{renderStreamDelay && <span className={css.pending}> {this.delaySecondsRemaining}s</span>}*/}
-    //   </li>
-    // );
   }
 
   function renderYtWarning() {
@@ -186,20 +158,4 @@ export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
   }
 
   return render();
-}
-
-/**
- * Renders a check mark in one of 4 states - 'not-started', 'pending', 'done', 'error'
- */
-function CheckMark(p: { state: TGoLiveChecklistItemState }) {
-  const state = p.state || 'not-started';
-  const cssClass = cx(css.check, css[state]);
-  return (
-    <span className={cssClass}>
-      {state === 'not-started' && <i className="fa fa-circle" />}
-      {state === 'pending' && <i className="fa fa-spinner fa-pulse" />}
-      {state === 'done' && <i key="done" className="fa fa-check" />}
-      {state === 'failed' && <i className="fa fa-times" />}
-    </span>
-  );
 }

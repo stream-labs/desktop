@@ -1,18 +1,16 @@
 import styles from './GoLive.m.less';
 import Scrollable from '../../shared/Scrollable';
 import { Services } from '../../service-provider';
-import React, { HTMLAttributes, useState } from 'react';
-import { IGoLiveProps, useGoLiveSettings } from './useGoLiveSettings';
-import { useFormState, useVuex } from '../../hooks';
+import React from 'react';
+import { useGoLiveSettings } from './useGoLiveSettings';
 import { DestinationSwitchers } from './DestinationSwitchers';
-import { TPlatform } from '../../../services/platforms';
 import { $t } from '../../../services/i18n';
-import GoLiveError from './GoLiveError';
-import { Spin, Row, Col, Button } from 'antd';
+import { Row, Col } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Section } from './Section';
-import { createBinding, TextInput } from '../../shared/inputs';
 import PlatformSettings from './PlatformSettings';
+import TwitterInput from './Twitter';
+import OptimizedProfileSwitcher from './OptimizedProfileSwitcher';
 
 const PlusIcon = PlusOutlined as Function;
 
@@ -22,8 +20,7 @@ const PlusIcon = PlusOutlined as Function;
  * - Settings for each platform
  * - Extras settings
  **/
-export default function GoLiveSettings(p: HTMLAttributes<unknown>) {
-  console.log('render GoLiveSettings');
+export default function GoLiveSettings() {
   const { RestreamService, SettingsService, UserService } = Services;
 
   const {
@@ -35,7 +32,6 @@ export default function GoLiveSettings(p: HTMLAttributes<unknown>) {
   } = useGoLiveSettings(view => {
     const linkedPlatforms = view.linkedPlatforms;
     const customDestinations = view.customDestinations;
-    console.log('computed settigns for GoLiveSettings', linkedPlatforms, customDestinations);
     return {
       canAddDestinations: linkedPlatforms.length + customDestinations.length < 5,
     };
@@ -86,14 +82,9 @@ export default function GoLiveSettings(p: HTMLAttributes<unknown>) {
             {/*ADD SOME SPACE IN ADVANCED MODE*/}
             {!isAdvancedMode && <div className={styles.spacer} />}
             {/*EXTRAS*/}
-            <Section title={isAdvancedMode ? $t('Extras') : ''}>
-              {/*<TwitterInput*/}
-              {/*  {...bind.tweetText}*/}
-              {/*  streamTitle={view.getCommonFields(settings.platforms).title}*/}
-              {/*/>*/}
-              {/*<OptimizedProfileSwitcher*/}
-              {/*  value*/}
-              {/*/>*/}
+            <Section isSimpleMode={!isAdvancedMode} title={$t('Extras')}>
+              <TwitterInput />
+              <OptimizedProfileSwitcher />
             </Section>
           </Scrollable>
         )}

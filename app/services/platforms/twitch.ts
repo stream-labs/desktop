@@ -20,7 +20,6 @@ import { IGoLiveSettings } from 'services/streaming';
 import { InheritMutations, mutation } from 'services/core';
 import { throwStreamError, TStreamErrorType } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
-import GameSelector from '../../components/windows/go-live/GameSelector';
 
 export interface ITwitchStartStreamOptions {
   title: string;
@@ -90,6 +89,8 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
   readonly gameImageSize = { width: 30, height: 40 };
 
   readonly capabilities = new Set<TPlatformCapability>([
+    'title',
+    'description',
     'chat',
     'scope-validation',
     'tags',

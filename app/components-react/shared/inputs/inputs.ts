@@ -1,16 +1,14 @@
 /**
  * Shared code for inputs
  */
-import { InputProps } from 'antd/lib/input';
-import React, { useEffect, useContext, ChangeEvent, FocusEvent, useCallback } from 'react';
+import React, { useEffect, useContext, ChangeEvent, FocusEvent, useCallback, useRef } from 'react';
 import { FormContext } from './Form';
-import { useDebounce, useOnCreate, useFormState } from '../../hooks';
+import { useDebounce, useOnCreate, useForceUpdate } from '../../hooks';
 import uuid from 'uuid';
 import { FormItemProps } from 'antd/lib/form';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import { $t } from '../../../services/i18n';
 import { pick } from 'lodash';
-import FormInput from '../../../components/shared/inputs/FormInput.vue';
 
 type TInputType =
   | 'text'
@@ -23,6 +21,8 @@ type TInputType =
   | 'slider'
   | 'image';
 
+export type TInputLayout = 'horizontal' | 'vertical' | 'inline';
+
 export interface IInputCommonProps<TValue> {
   value?: TValue;
   defaultValue?: TValue;
@@ -34,10 +34,28 @@ export interface IInputCommonProps<TValue> {
   placeholder?: string;
   disabled?: boolean;
   debounce?: number;
+  /**
+   * true if the input is in the uncontrolled mode
+   * all input components except text inputs are controlled by default
+   * @see https://reactjs.org/docs/uncontrolled-components.html
+   */
+  uncontrolled?: boolean;
+  layout?: TInputLayout;
 }
 
 export type ValuesOf<T extends ReadonlyArray<string>> = T[number];
 export declare type SingleType<MixType> = MixType extends (infer Single)[] ? Single : MixType;
+
+export const layoutPresets = {
+  horizontal: {
+    labelCol: { span: 8 },
+    wrapperCol: { span: 16 },
+  },
+  vertical: {
+    labelCol: { span: 24 },
+    wrapperCol: { span: 24 },
+  },
+};
 
 /**
  * A helper type for input props
@@ -77,6 +95,15 @@ export function useInput<
 >(type: TInputType, inputProps: TInputProps, antFeatures?: readonly string[]) {
   const { name, value, label } = inputProps;
 
+  const uncontrolled = (() => {
+    // inputs with debounce are always uncontrolled
+    if (inputProps.debounce) return true;
+    // use the value from props if provided
+    if ('uncontrolled' in inputProps) return inputProps.uncontrolled;
+    // the input is controlled by default
+    return false;
+  })();
+
   // get parent form if exist
   const formContext = useContext(FormContext);
   const form = formContext?.antForm;
@@ -87,31 +114,48 @@ export function useInput<
     return id;
   });
 
+  // create a ref for the localValue
+  const localValueRef = useRef(value);
+  // always keep localValue in sync for controlled inputs
+  if (!uncontrolled) localValueRef.current = value;
+
+  // set new local value
+  // this function won't update the component
+  function setLocalValue(newVal: TValue) {
+    localValueRef.current = newVal;
+  }
+
   useEffect(() => {
     // if the input is inside the form
     // then we need to setup it's value via Form API
     if (form) form.setFieldsValue({ [inputId]: value });
   }, [value]);
 
-  // create a local state for the input
-  const { stateRef, updateState } = useFormState({ value: inputProps.value });
+  const forceUpdate = useForceUpdate();
 
   // create an `emitChange()` method and it's debounced version
-  function emitChange() {
-    inputProps.onChange && inputProps.onChange(stateRef.current.value!);
+  function emitChange(newVal: TValue) {
+    inputProps.onChange && inputProps.onChange(newVal);
   }
   const emitChangeDebounced = useDebounce(inputProps.debounce, emitChange);
 
   // create onChange handler
   const onChange = useCallback((newVal: TValue) => {
-    if (newVal === stateRef.current.value) return;
-    updateState({ value: newVal });
+    if (newVal === localValueRef.current) return;
+
+    // call forceUpdate if component is uncontrolled
+    // controlled components should be updated automatically via props changing
+    if (uncontrolled) {
+      localValueRef.current = newVal;
+      forceUpdate();
+    }
+
     inputProps.onInput && inputProps.onInput(newVal);
     if (!inputProps.onChange) return;
     if (inputProps.debounce) {
-      emitChangeDebounced();
+      emitChangeDebounced(newVal);
     } else {
-      emitChange();
+      emitChange(newVal);
     }
   }, []);
 
@@ -142,6 +186,7 @@ export function useInput<
       'wrapperCol',
       'disabled',
       'nowrap',
+      'layout',
     ]),
     rules,
     'data-role': 'input-wrapper',
@@ -154,7 +199,7 @@ export function useInput<
     ...dataAttrs,
     'data-role': 'input',
     name: inputId,
-    value: stateRef.current.value,
+    value: localValueRef.current,
     ref: inputProps.inputRef as any,
     onChange,
   };
@@ -162,7 +207,10 @@ export function useInput<
   return {
     inputAttrs,
     wrapperAttrs,
-    stateRef,
+    forceUpdate,
+    localValueRef,
+    setLocalValue,
+    emitChange,
   };
 }
 
@@ -176,26 +224,34 @@ export function useTextInput<
   >,
   TValue extends string | number = string
 >(p: TProps, antFeatures?: Parameters<typeof useInput>[2]) {
-  const { inputAttrs, wrapperAttrs, stateRef } = useInput('text', p, antFeatures);
-
   // Text inputs are uncontrolled by default for better performance
   const uncontrolled = p.uncontrolled === true || p.uncontrolled !== false;
+  const { inputAttrs, wrapperAttrs, forceUpdate, setLocalValue, emitChange } = useInput(
+    'text',
+    { uncontrolled, ...p },
+    antFeatures,
+  );
 
   // we need to handle onChange differently for text inputs
   const onChange = useCallback((ev: ChangeEvent<any>) => {
-    // for controlled and debounced inputs call the `onChange()` handler immediately
-    if (!uncontrolled || p.debounce) {
+    if (!uncontrolled) {
+      // for controlled inputs call the `onChange()` handler immediately
       inputAttrs.onChange(ev.target.value);
+    } else {
+      // for uncontrolled text inputs just set new localValue and update the component
+      setLocalValue(ev.target.value);
+      forceUpdate();
     }
 
-    // for uncontrolled inputs the `onChange()` event handles in `onBlur()`
+    // for uncontrolled inputs the `onChange()` event handles in the `onBlur()` handler
     // use the `onInput()` event if you need to handle every keypress in controlled input
   }, []);
 
   const onBlur = useCallback((ev: FocusEvent<any>) => {
     // for uncontrolled components call the `onChange()` handler on blur
-    if (uncontrolled) {
-      inputAttrs.onChange(ev.target.value);
+    const newVal = ev.target.value;
+    if (uncontrolled && p.value !== newVal) {
+      emitChange(newVal);
     }
     p.onBlur && p.onBlur(ev);
   }, []);
@@ -207,7 +263,6 @@ export function useTextInput<
       onChange,
       onBlur,
     },
-    stateRef,
     originalOnChange: inputAttrs.onChange,
   };
 }
