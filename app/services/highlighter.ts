@@ -1,4 +1,4 @@
-import { Service } from 'services/core';
+import { mutation, StatefulService, ViewHandler } from 'services/core';
 import path from 'path';
 import execa from 'execa';
 import ndarray from 'ndarray';
@@ -33,6 +33,77 @@ const SCRUB_FRAME_BYTE_SIZE = SCRUB_WIDTH * SCRUB_HEIGHT * 4;
 
 const TRANSITION_DURATION = 1;
 const TRANSITION_FRAMES = TRANSITION_DURATION * FPS;
+
+interface PmapOptions {
+  concurrency?: number;
+  onProgress?: (nComplete: number, nTotal: number) => void;
+}
+
+/**
+ * Allows waiting on a bulk set of computationally expensive async
+ * bulk operations. It behaves similarly to Promise.all, but
+ * allows passing a concurency number, which restricts the number
+ * of inflight operations at once.
+ * @param items A set of iterms to operate on
+ * @param executor Takes an item and returns a rpmoise
+ * @param options The max number of operations to process at once
+ * @returns An array of return values in the same order as the original items
+ */
+export function pmap<TVal, TRet>(
+  items: TVal[],
+  executor: (val: TVal) => Promise<TRet>,
+  options: PmapOptions = {},
+): Promise<TRet[]> {
+  const opts: PmapOptions = {
+    concurrency: Infinity,
+    ...options,
+  };
+
+  return new Promise<TRet[]>((resolve, reject) => {
+    // Store each item with its index for ordering of
+    // return values later.
+    const toExecute: [TVal, number][] = items.map((item, index) => [item, index]);
+    const returns: [TRet, number][] = [];
+    const totalNum = toExecute.length;
+    let errored = false;
+
+    function executeNext() {
+      const item = toExecute.shift();
+
+      executor(item[0])
+        .then(ret => {
+          // Another promise rejected, so abort
+          if (errored) return;
+
+          returns.push([ret, item[1]]);
+
+          // Update progress callback
+          if (opts.onProgress) options.onProgress(returns.length, totalNum);
+
+          if (toExecute.length > 0) {
+            executeNext();
+          } else if (returns.length === totalNum) {
+            const orderedReturns: TRet[] = [];
+
+            returns.forEach(set => {
+              orderedReturns[set[1]] = set[0];
+            });
+
+            resolve(orderedReturns);
+          }
+        })
+        .catch(e => {
+          errored = true;
+          reject(e);
+        });
+    }
+
+    // Fire off the initial set of requests
+    Array(Math.min(items.length, opts.concurrency))
+      .fill(0)
+      .forEach(() => executeNext());
+  });
+}
 
 /**
  * Extracts an audio file from a video file
@@ -81,10 +152,7 @@ export class FrameSource {
   readBuffer = Buffer.allocUnsafe(FRAME_BYTE_SIZE);
   private byteIndex = 0;
 
-  /**
-   * Allocated on demand to save memory
-   */
-  scrubFrames: Buffer[];
+  scrubJpg: string;
 
   readonly width = WIDTH;
   readonly height = HEIGHT;
@@ -104,65 +172,21 @@ export class FrameSource {
 
   constructor(public readonly sourcePath: string, public readonly duration: number) {}
 
-  private allocScrubbingFrames() {
-    if (this.scrubFrames) {
-      console.log('Scrub frames already allocated');
-      return;
-    }
+  async exportScrubbingSprite() {
+    const parsed = path.parse(this.sourcePath);
+    this.scrubJpg = path.join(parsed.dir, `${parsed.name}-scrub.jpg`);
 
-    this.scrubFrames = Array(SCRUB_FRAMES)
-      .fill(0)
-      .map(() => {
-        return Buffer.allocUnsafe(SCRUB_FRAME_BYTE_SIZE);
-      });
-  }
-
-  async readScrubbingFrames() {
-    this.allocScrubbingFrames();
-
-    await Promise.all(
-      this.scrubFrames.map((f, idx) => {
-        return this.readScrubbingFrame(idx);
-      }),
-    );
-  }
-
-  private async readScrubbingFrame(idx: number) {
     /* eslint-disable */
     const args = [
-      '-ss', `${this.duration / SCRUB_FRAMES * idx * 1000}ms`,
       '-i', this.sourcePath,
-      '-vf', `scale=${SCRUB_WIDTH}:${SCRUB_HEIGHT}`,
+      '-vf', `scale=${SCRUB_WIDTH}:${SCRUB_HEIGHT},fps=${SCRUB_FRAMES / this.duration},tile=${SCRUB_FRAMES}x1`,
       '-frames:v', '1',
-      '-vcodec', 'rawvideo',
-      '-pix_fmt', 'rgba',
-      '-f', 'image2pipe',
-      '-'
+      '-y',
+      this.scrubJpg,
     ];
     /* eslint-enable */
 
-    let byteIdx = 0;
-
-    const ffmpeg = execa(FFMPEG_EXE, args, {
-      encoding: null,
-      buffer: false,
-      stdin: 'ignore',
-      stdout: 'pipe',
-      stderr: process.stderr,
-    });
-
-    return new Promise<void>(resolve => {
-      ffmpeg.stdout.once('end', () => {
-        console.log('FFMPEG SEEK ENDED', byteIdx, SCRUB_FRAME_BYTE_SIZE);
-        resolve();
-      });
-
-      ffmpeg.stdout.on('data', (chunk: Buffer) => {
-        console.log('GOT CHUNK', chunk);
-        chunk.copy(this.scrubFrames[idx], byteIdx, 0);
-        byteIdx += chunk.length;
-      });
-    });
+    await execa(FFMPEG_EXE, args);
   }
 
   private startFfmpeg() {
@@ -282,10 +306,17 @@ export class Clip {
 
   constructor(public readonly sourcePath: string) {}
 
+  /**
+   * Performs all async operations needed to display
+   * this clip to the user and starting working with it:
+   * - Read duration
+   * - Generate scrubbing sprite on disk
+   */
   async init() {
     await this.readDuration();
     this.frameSource = new FrameSource(this.sourcePath, this.duration);
     this.audioSource = new AudioSource(this.sourcePath);
+    await this.frameSource.exportScrubbingSprite();
   }
 
   private async readDuration() {
@@ -550,7 +581,90 @@ export class Transitioner {
   }
 }
 
-export class HighlighterService extends Service {
+export interface IClip {
+  path: string;
+  scrubSprite: string;
+}
+
+interface IHighligherState {
+  loading: boolean;
+  loadedClips: number;
+  toLoadClips: number;
+  clips: IClip[];
+}
+
+class HighligherViews extends ViewHandler<IHighligherState> {
+  getClips() {
+    return this.state.clips.forEach(clip => {
+      return new Clip(clip.path);
+    });
+  }
+}
+
+export class HighlighterService extends StatefulService<IHighligherState> {
+  static initialState = {
+    loading: true,
+    loadedClips: 0,
+    toLoadClips: 0,
+    clips: [],
+  } as IHighligherState;
+
+  initializeStated = false;
+
+  @mutation()
+  ADD_CLIP(clip: IClip) {
+    this.state.clips.push(clip);
+  }
+
+  @mutation()
+  SET_LOADING(loading: boolean) {
+    this.state.loading = loading;
+  }
+
+  @mutation()
+  SET_LOADED_CLIPS(num: number, total: number) {
+    this.state.loadedClips = num;
+    this.state.toLoadClips = total;
+  }
+
+  get views() {
+    return new HighligherViews(this.state);
+  }
+
+  async initialize() {
+    if (this.initializeStated) return;
+    this.initializeStated = true;
+
+    const clipsToLoad = [CLIP_1, CLIP_2, CLIP_3, CLIP_4];
+    const clips = clipsToLoad.map(clipPath => new Clip(clipPath));
+
+    this.SET_LOADED_CLIPS(0, clips.length);
+
+    console.log('START LOAD');
+    await pmap(clips, c => c.init(), {
+      concurrency: 2,
+      onProgress: complete => {
+        this.SET_LOADED_CLIPS(complete, clips.length);
+      },
+    });
+    console.log('END LOAD');
+
+    clips.forEach(c => {
+      this.ADD_CLIP({
+        path: c.sourcePath,
+        scrubSprite: c.frameSource.scrubJpg,
+      });
+    });
+
+    this.SET_LOADING(false);
+  }
+
+  async test() {
+    const clip = new Clip(CLIP_1);
+    await clip.init();
+    await clip.frameSource.exportScrubbingSprite();
+  }
+
   async run() {
     const clips = [new Clip(CLIP_1), new Clip(CLIP_2), new Clip(CLIP_3)];
 

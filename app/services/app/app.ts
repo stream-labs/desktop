@@ -41,6 +41,7 @@ import { KeyListenerService } from 'services/key-listener';
 import { MetricsService } from '../metrics';
 import { SettingsService } from '../settings';
 import { OS, getOS } from 'util/operating-systems';
+import { HighlighterService } from 'services/highlighter';
 
 interface IAppState {
   loading: boolean;
