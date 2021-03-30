@@ -76,6 +76,7 @@ declare module 'vue-resize';
 declare module 'serve-handler';
 declare module 'v-selectpage';
 declare module '*.m.less';
+declare module '*.lazy.less';
 declare module 'streamlabs-beaker';
 declare module '*.vert';
 declare module '*.frag';
