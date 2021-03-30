@@ -16,10 +16,6 @@ const commit = cp
 plugins.push(
   new webpack.DefinePlugin({
     SLOBS_BUNDLE_ID: JSON.stringify(commit),
-  }),
-);
-plugins.push(
-  new webpack.DefinePlugin({
     SLOBS_SENTRY_URL_FE_DSN: JSON.stringify(process.env.SLOBS_SENTRY_URL_FE_DSN),
     SLOBS_SENTRY_URL_BE_SERVER: JSON.stringify(process.env.SLOBS_SENTRY_URL_BE_SERVER),
     SLOBS_SENTRY_URL_BE_CLIENT: JSON.stringify(process.env.SLOBS_SENTRY_URL_BE_CLIENT),

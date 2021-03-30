@@ -1,5 +1,3 @@
-/*global SLOBS_SENTRY_URL_BE_SERVER, SLOBS_SENTRY_URL_BE_CLIENT, SLOBS_SENTRY_URL_FE_DSN*/
-
 const appStartTime = Date.now();
 let lastEventTime = 0;
 
@@ -285,7 +283,7 @@ async function startApp() {
   }
 
   if (pjson.env === 'production') {
-    Raven.config(SLOBS_SENTRY_URL_FE_DSN, {
+    Raven.config(pjson.sentry_url_fe_dsn, {
       release: process.env.SLOBS_VERSION,
     }).install((err, initialErr, eventId) => {
       handleFinishedReport();
@@ -295,7 +293,7 @@ async function startApp() {
       productName: 'streamlabs-obs',
       companyName: 'streamlabs',
       ignoreSystemCrashHandler: true,
-      submitURL: SLOBS_SENTRY_URL_BE_CLIENT,
+      submitURL: pjson.sentry_url_be_client,
       extra: {
         'sentry[release]': pjson.version,
         processType: 'main',
