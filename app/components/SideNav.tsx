@@ -167,6 +167,13 @@ export default class SideNav extends Vue {
       });
     }
 
+    pageData.push({
+      target: 'Highlighter',
+      icon: 'fab fa-youtube',
+      title: 'Highlighter',
+      trackingTarget: 'highlighter',
+    });
+
     return (
       <div class={cx('side-nav', styles.container, { [styles.leftDock]: this.leftDock })}>
         {this.primaryStudioTab}

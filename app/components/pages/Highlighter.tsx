@@ -1,6 +1,6 @@
 import TsxComponent from 'components/tsx-component';
-import { Clip, CLIP_1, CLIP_2, CLIP_3, CLIP_4, HighlighterService } from 'services/highlighter';
-import { Component } from 'vue-property-decorator';
+import { HighlighterService } from 'services/highlighter';
+import { Component, Watch } from 'vue-property-decorator';
 import ClipPreview from 'components/highlighter/ClipPreview';
 import { Inject } from 'services';
 
@@ -10,38 +10,45 @@ import { Inject } from 'services';
 export default class Highlighter extends TsxComponent {
   @Inject() highlighterService: HighlighterService;
 
-  get clips() {
-    return this.highlighterService.state.clips;
+  get views() {
+    return this.highlighterService.views;
   }
 
-  get loading() {
-    return this.highlighterService.state.loading;
-  }
-
-  get loadedClips() {
-    return this.highlighterService.state.loadedClips;
-  }
-
-  get totalClips() {
-    return this.highlighterService.state.toLoadClips;
+  get numClips() {
+    return this.highlighterService.views.clips.length;
   }
 
   created() {
-    this.highlighterService.initialize();
+    this.reloadClips();
+  }
+
+  @Watch('numClips')
+  reloadClips() {
+    this.highlighterService.loadClips();
   }
 
   render() {
     return (
-      <div>
-        {this.loading && (
+      <div style={{ height: 0 }}>
+        {!!this.views.clips.length && !this.views.loaded && (
           <div style={{ fontSize: '24px', margin: 'auto' }}>
-            Loading: {this.loadedClips}/{this.totalClips} Clips
+            Loading: {this.views.loadedCount}/{this.views.clips.length} Clips
           </div>
         )}
-        {!this.loading &&
-          this.clips.map(clip => {
-            return <ClipPreview clip={clip} style={{ margin: '10px' }} />;
-          })}
+        {!this.views.clips.length && (
+          <div style={{ fontSize: '16px', margin: 'auto' }}>
+            Start the replay buffer and record some clips to get started!
+          </div>
+        )}
+        {this.views.loaded && !!this.views.clips.length && (
+          <div style={{ overflowY: 'auto', width: '100%' }}>
+            {this.views.clips.map(clip => {
+              return (
+                <ClipPreview clip={clip} style={{ margin: '10px', display: 'inline-block' }} />
+              );
+            })}
+          </div>
+        )}
       </div>
     );
   }

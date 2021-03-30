@@ -1,4 +1,4 @@
-import { mutation, StatefulService, ViewHandler } from 'services/core';
+import { mutation, StatefulService, ViewHandler, Inject } from 'services/core';
 import path from 'path';
 import execa from 'execa';
 import ndarray from 'ndarray';
@@ -6,7 +6,11 @@ import createBuffer from 'gl-buffer';
 import transitions from 'gl-transitions';
 import createTransition from 'gl-transition';
 import createTexture from 'gl-texture2d';
-import fs from 'fs';
+import Vue from 'vue';
+import fs from 'fs-extra';
+
+import { StreamingService } from './streaming';
+import electron from 'electron';
 
 const FFMPEG_DIR = path.resolve('../../', 'Downloads', 'ffmpeg', 'bin');
 const FFMPEG_EXE = path.join(FFMPEG_DIR, 'ffmpeg.exe');
@@ -29,21 +33,25 @@ const FRAME_BYTE_SIZE = WIDTH * HEIGHT * 4;
 export const SCRUB_WIDTH = 320;
 export const SCRUB_HEIGHT = 180;
 export const SCRUB_FRAMES = 20;
-const SCRUB_FRAME_BYTE_SIZE = SCRUB_WIDTH * SCRUB_HEIGHT * 4;
+export const SCRUB_SPRITE_DIRECTORY = path.join(
+  electron.remote.app.getPath('userData'),
+  'highlighter',
+);
 
 const TRANSITION_DURATION = 1;
 const TRANSITION_FRAMES = TRANSITION_DURATION * FPS;
 
-interface PmapOptions {
+interface PmapOptions<TVal, TRet> {
   concurrency?: number;
-  onProgress?: (nComplete: number, nTotal: number) => void;
+  onProgress?: (completedItem: TVal, returnVal: TRet, nComplete: number) => void;
 }
 
 /**
  * Allows waiting on a bulk set of computationally expensive async
  * bulk operations. It behaves similarly to Promise.all, but
  * allows passing a concurency number, which restricts the number
- * of inflight operations at once.
+ * of inflight operations at once, and also allows processing of
+ * each item as it completes.
  * @param items A set of iterms to operate on
  * @param executor Takes an item and returns a rpmoise
  * @param options The max number of operations to process at once
@@ -52,9 +60,9 @@ interface PmapOptions {
 export function pmap<TVal, TRet>(
   items: TVal[],
   executor: (val: TVal) => Promise<TRet>,
-  options: PmapOptions = {},
+  options: PmapOptions<TVal, TRet> = {},
 ): Promise<TRet[]> {
-  const opts: PmapOptions = {
+  const opts: PmapOptions<TVal, TRet> = {
     concurrency: Infinity,
     ...options,
   };
@@ -78,7 +86,9 @@ export function pmap<TVal, TRet>(
           returns.push([ret, item[1]]);
 
           // Update progress callback
-          if (opts.onProgress) options.onProgress(returns.length, totalNum);
+          if (opts.onProgress) {
+            options.onProgress(item[0], ret, returns.length);
+          }
 
           if (toExecute.length > 0) {
             executeNext();
@@ -174,7 +184,7 @@ export class FrameSource {
 
   async exportScrubbingSprite() {
     const parsed = path.parse(this.sourcePath);
-    this.scrubJpg = path.join(parsed.dir, `${parsed.name}-scrub.jpg`);
+    this.scrubJpg = path.join(SCRUB_SPRITE_DIRECTORY, `${parsed.name}-scrub.jpg`);
 
     /* eslint-disable */
     const args = [
@@ -304,6 +314,8 @@ export class Clip {
 
   duration: number;
 
+  initPromise: Promise<void>;
+
   constructor(public readonly sourcePath: string) {}
 
   /**
@@ -312,7 +324,19 @@ export class Clip {
    * - Read duration
    * - Generate scrubbing sprite on disk
    */
-  async init() {
+  init() {
+    if (!this.initPromise) {
+      this.initPromise = new Promise<void>((resolve, reject) => {
+        this.doInit()
+          .then(resolve)
+          .catch(reject);
+      });
+    }
+
+    return this.initPromise;
+  }
+
+  private async doInit() {
     await this.readDuration();
     this.frameSource = new FrameSource(this.sourcePath, this.duration);
     this.audioSource = new AudioSource(this.sourcePath);
@@ -583,86 +607,142 @@ export class Transitioner {
 
 export interface IClip {
   path: string;
-  scrubSprite: string;
+  loaded: boolean;
+  scrubSprite?: string;
 }
 
 interface IHighligherState {
-  loading: boolean;
-  loadedClips: number;
-  toLoadClips: number;
-  clips: IClip[];
+  clips: Dictionary<IClip>;
+  clipOrder: string[];
 }
 
 class HighligherViews extends ViewHandler<IHighligherState> {
-  getClips() {
-    return this.state.clips.forEach(clip => {
-      return new Clip(clip.path);
+  /**
+   * Returns an array of clips in their display order
+   */
+  get clips() {
+    return this.state.clipOrder.map(p => this.state.clips[p]);
+  }
+
+  /**
+   * Whether any clips need to be loaded
+   */
+  get loaded() {
+    return !this.clips.some(c => !c.loaded);
+  }
+
+  get loadedCount() {
+    let count = 0;
+
+    this.clips.forEach(c => {
+      if (c.loaded) count++;
     });
+
+    return count;
   }
 }
 
+/**
+ * Enable to use predefined clips instead of pulling from
+ * the replay buffer.
+ */
+const TEST_MODE = false;
+
 export class HighlighterService extends StatefulService<IHighligherState> {
   static initialState = {
-    loading: true,
-    loadedClips: 0,
-    toLoadClips: 0,
-    clips: [],
+    clips: {},
+    clipOrder: [],
   } as IHighligherState;
 
-  initializeStated = false;
+  @Inject() streamingService: StreamingService;
+
+  /**
+   * A dictionary of actual clip classes.
+   * These are not serializable so kept out of state.
+   */
+  clips: Dictionary<Clip> = {};
+
+  directoryCleared = false;
 
   @mutation()
   ADD_CLIP(clip: IClip) {
-    this.state.clips.push(clip);
+    Vue.set(this.state.clips, clip.path, clip);
+    this.state.clipOrder.push(clip.path);
   }
 
   @mutation()
-  SET_LOADING(loading: boolean) {
-    this.state.loading = loading;
-  }
-
-  @mutation()
-  SET_LOADED_CLIPS(num: number, total: number) {
-    this.state.loadedClips = num;
-    this.state.toLoadClips = total;
+  UPDATE_CLIP(clip: Partial<IClip> & { path: string }) {
+    Vue.set(this.state.clips, clip.path, {
+      ...this.state.clips[clip.path],
+      ...clip,
+    });
   }
 
   get views() {
     return new HighligherViews(this.state);
   }
 
-  async initialize() {
-    if (this.initializeStated) return;
-    this.initializeStated = true;
+  init() {
+    if (TEST_MODE) {
+      const clipsToLoad = [
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-08-13.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-20.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-29.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-41.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-49.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-58.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-03.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-06.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-30-53.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-32-34.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-33.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-48.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-03.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-23.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-51.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-18.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-30.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-44.mp4'),
+      ];
 
-    const clipsToLoad = [CLIP_1, CLIP_2, CLIP_3, CLIP_4];
-    const clips = clipsToLoad.map(clipPath => new Clip(clipPath));
-
-    this.SET_LOADED_CLIPS(0, clips.length);
-
-    console.log('START LOAD');
-    await pmap(clips, c => c.init(), {
-      concurrency: 2,
-      onProgress: complete => {
-        this.SET_LOADED_CLIPS(complete, clips.length);
-      },
-    });
-    console.log('END LOAD');
-
-    clips.forEach(c => {
-      this.ADD_CLIP({
-        path: c.sourcePath,
-        scrubSprite: c.frameSource.scrubJpg,
+      clipsToLoad.forEach(c => {
+        this.ADD_CLIP({ path: c, loaded: false });
       });
-    });
-
-    this.SET_LOADING(false);
+    } else {
+      this.streamingService.replayBufferFileWrite.subscribe(clipPath => {
+        this.ADD_CLIP({ path: clipPath, loaded: false });
+      });
+    }
   }
 
-  async test() {
-    const clip = new Clip(CLIP_1);
-    await clip.init();
-    await clip.frameSource.exportScrubbingSprite();
+  async loadClips() {
+    await this.ensureScrubDirectory();
+
+    // Ensure we have a Clip class for every clip in the store
+    this.views.clips.forEach(c => {
+      this.clips[c.path] = this.clips[c.path] ?? new Clip(c.path);
+      console.log(this.clips);
+    });
+
+    await pmap(this.views.clips, c => this.clips[c.path].init(), {
+      concurrency: 5, // TODO
+      onProgress: completed => {
+        this.UPDATE_CLIP({
+          path: completed.path,
+          loaded: true,
+          scrubSprite: this.clips[completed.path].frameSource.scrubJpg,
+        });
+      },
+    });
+  }
+
+  private async ensureScrubDirectory() {
+    // We clear this out once per application run
+    if (this.directoryCleared) return;
+    this.directoryCleared = true;
+
+    await fs.remove(SCRUB_SPRITE_DIRECTORY);
+    await fs.mkdir(SCRUB_SPRITE_DIRECTORY);
   }
 
   async run() {
