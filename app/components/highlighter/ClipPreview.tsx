@@ -1,7 +1,15 @@
 import TsxComponent, { createProps } from 'components/tsx-component';
-import { IClip, Clip, SCRUB_HEIGHT, SCRUB_WIDTH, SCRUB_FRAMES } from 'services/highlighter';
+import {
+  IClip,
+  SCRUB_HEIGHT,
+  SCRUB_WIDTH,
+  SCRUB_FRAMES,
+  HighlighterService,
+} from 'services/highlighter';
 import { Component } from 'vue-property-decorator';
 import path from 'path';
+import BoolButtonInput from 'components/shared/inputs/BoolButtonInput';
+import { Inject } from 'services';
 
 class ClipPreviewProps {
   clip: IClip = null;
@@ -9,6 +17,8 @@ class ClipPreviewProps {
 
 @Component({ props: createProps(ClipPreviewProps) })
 export default class ClipPreview extends TsxComponent<ClipPreviewProps> {
+  @Inject() highlighterService: HighlighterService;
+
   scrubFrame = 0;
 
   get filename() {
@@ -23,6 +33,10 @@ export default class ClipPreview extends TsxComponent<ClipPreviewProps> {
     }
   }
 
+  setEnabled(enabled: boolean) {
+    this.highlighterService.actions.enableClip(this.props.clip.path, enabled);
+  }
+
   render() {
     return (
       <div style={{ height: `${SCRUB_HEIGHT}px`, position: 'relative' }}>
@@ -34,10 +48,23 @@ export default class ClipPreview extends TsxComponent<ClipPreviewProps> {
             objectFit: 'none',
             objectPosition: `-${this.scrubFrame * SCRUB_WIDTH}px`,
             borderRadius: '10px',
+            opacity: this.props.clip.enabled ? 1.0 : 0.3,
           }}
           onMousemove={this.onMouseMove}
-          ref="scrubimg"
         ></img>
+        <BoolButtonInput
+          value={this.props.clip.enabled}
+          onInput={this.setEnabled}
+          style={{ position: 'absolute', top: '10px', left: '10px' }}
+          checkboxStyles={{
+            width: '16px',
+            height: '16px',
+            fontSize: '10px',
+            background: 'white',
+            borderColor: '#333',
+          }}
+          checkboxActiveStyles={{ background: 'var(--teal-hover)' }}
+        />
         <div
           style={{
             position: 'absolute',

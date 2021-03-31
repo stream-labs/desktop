@@ -608,6 +608,7 @@ export class Transitioner {
 export interface IClip {
   path: string;
   loaded: boolean;
+  enabled: boolean;
   scrubSprite?: string;
 }
 
@@ -646,7 +647,7 @@ class HighligherViews extends ViewHandler<IHighligherState> {
  * Enable to use predefined clips instead of pulling from
  * the replay buffer.
  */
-const TEST_MODE = false;
+const TEST_MODE = true;
 
 export class HighlighterService extends StatefulService<IHighligherState> {
   static initialState = {
@@ -706,13 +707,20 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       ];
 
       clipsToLoad.forEach(c => {
-        this.ADD_CLIP({ path: c, loaded: false });
+        this.ADD_CLIP({ path: c, loaded: false, enabled: true });
       });
     } else {
       this.streamingService.replayBufferFileWrite.subscribe(clipPath => {
-        this.ADD_CLIP({ path: clipPath, loaded: false });
+        this.ADD_CLIP({ path: clipPath, loaded: false, enabled: true });
       });
     }
+  }
+
+  enableClip(path: string, enabled: boolean) {
+    this.UPDATE_CLIP({
+      path,
+      enabled,
+    });
   }
 
   async loadClips() {
@@ -721,7 +729,6 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     // Ensure we have a Clip class for every clip in the store
     this.views.clips.forEach(c => {
       this.clips[c.path] = this.clips[c.path] ?? new Clip(c.path);
-      console.log(this.clips);
     });
 
     await pmap(this.views.clips, c => this.clips[c.path].init(), {

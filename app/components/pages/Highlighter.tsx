@@ -24,7 +24,7 @@ export default class Highlighter extends TsxComponent {
 
   @Watch('numClips')
   reloadClips() {
-    this.highlighterService.loadClips();
+    this.highlighterService.actions.loadClips();
   }
 
   render() {
