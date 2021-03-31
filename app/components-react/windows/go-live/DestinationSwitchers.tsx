@@ -14,6 +14,7 @@ import { useDebounce, useFormState } from '../../hooks';
 import pick from 'lodash/pick';
 import { useGoLiveSettings } from './useGoLiveSettings';
 import { mapValues, values } from 'lodash';
+import { Tooltip } from 'antd';
 
 type TPlatforms = Record<TPlatform, { enabled: boolean }>;
 
@@ -36,7 +37,7 @@ interface IProps {
 /**
  * Allows enabling/disabling platforms for the stream
  */
-export function DestinationSwitchers() {
+export function DestinationSwitchers(p: IProps) {
   // const view = Services.StreamingService.views;
 
   const {
@@ -57,6 +58,10 @@ export function DestinationSwitchers() {
     enabledPlatformsRef.current = enabledPlatformsRef.current.filter(p => p !== platform);
     if (enabled) enabledPlatformsRef.current.push(platform);
     switchPlatforms(enabledPlatformsRef.current);
+  }
+
+  function canDisable(platform: TPlatform) {
+    return p.canDisablePrimary
   }
 
   return (
@@ -184,13 +189,13 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
   function onClickHandler(enabled: boolean) {
     // always proxy the click to the SwitchInput
     // so it can play a transition animation
-    switchInputRef.current?.click();
-    // switch the container class without re-rendering to not stop the animation
-    if (enabled) {
-      containerRef.current?.classList.remove(styles.platformDisabled);
-    } else {
-      containerRef.current?.classList.add(styles.platformDisabled);
-    }
+    // switchInputRef.current?.click();
+    // // switch the container class without re-rendering to not stop the animation
+    // if (enabled) {
+    //   containerRef.current?.classList.remove(styles.platformDisabled);
+    // } else {
+    //   containerRef.current?.classList.add(styles.platformDisabled);
+    // }
   }
 
   const { title, description, Switch, Logo } = (() => {
@@ -243,19 +248,13 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
       onClick={() => onClickHandler(!p.enabled)}
     >
       <div className={cx(styles.colInput)}>
-        {/*TODO:*/}
-        {/*{isPrimary && !canDisablePrimary ? (*/}
-        {/*  <span*/}
-        {/*    vTooltip={$t(*/}
-        {/*      'You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destination.',*/}
-        {/*    )}*/}
-        {/*  >*/}
-        {/*    <ToggleInput value={enabled} metadata={{ name: platform }} />*/}
-        {/*  </span>*/}
-        {/*) : (*/}
-        {/*  <ToggleInput value={enabled} metadata={{ name: platform }} />*/}
-        {/*)}*/}
-        <Switch />
+        TODO:
+        {isPrimary && !canDisablePrimary ? (
+
+          <Tooltip> <Switch/></Tooltip>
+        ) : (
+          <Switch/>
+        )}
       </div>
 
       {/* PLATFORM LOGO */}

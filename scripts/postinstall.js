@@ -11,5 +11,5 @@ execSync('node ./scripts/install-native-deps.js', { stdio: [0, 1, 2] });
 const antdLibSettingsPath = path.resolve('./node_modules/antd/package.json');
 const antdlibSettings = JSON.parse(fs.readFileSync(antdLibSettingsPath, 'utf8'));
 delete antdlibSettings.module;
-antdlibSettings.main = 'dist/antd.min.js';
+antdlibSettings.main = 'dist/antd.js';
 fs.writeFileSync(antdLibSettingsPath, JSON.stringify(antdlibSettings, null, 2));

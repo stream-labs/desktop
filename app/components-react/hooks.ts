@@ -148,11 +148,11 @@ type TUseFormStateResult<TState extends object> = {
 /**
  * Returns a function for force updating of the component
  * Use it only for frequently used components for optimization purposes
+ *
+ * Current implementation from
+ * https://github.com/ant-design/ant-design/blob/master/components/_util/hooks/useForceUpdate.ts
  */
-export function useForceUpdate(): () => void {
-  const [revision, setRevision] = useState(0);
-  return () => {
-    // changing a state variable updates the component
-    setRevision(revision => revision + 1);
-  }
+export function useForceUpdate() {
+  const [, forceUpdate] = React.useReducer(x => x + 1, 0);
+  return forceUpdate;
 }

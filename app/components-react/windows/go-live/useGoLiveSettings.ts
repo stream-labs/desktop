@@ -8,6 +8,7 @@ import { useOnCreate } from '../../hooks';
 import { FormInstance } from 'antd/lib/form';
 import { message } from 'antd';
 import { $t } from '../../../services/i18n';
+import { useEffect } from 'react';
 
 type TCustomFieldName = 'title' | 'description';
 type TModificators = { isScheduleMode?: boolean; isUpdateMode?: boolean };
@@ -41,14 +42,13 @@ export function useGoLiveSettings<
     () => getInitialStreamSettings(modificators),
     (getState, setState) => initializeGoLiveSettings(getState, setState, form),
     computedPropsCb as TComputedPropsCb,
-    true,
   );
 
-  useOnCreate(() => {
+  useEffect(() => {
     if (isRoot && contextView.needPrepopulate) {
       contextView.prepopulate();
     }
-  });
+  }, []);
 
   return dependencyWatcher;
 
@@ -125,10 +125,10 @@ function initializeGoLiveSettings(
     switchCustomDestination(state: TState, destInd: number, enabled: boolean) {
       const customDestinations = cloneDeep(getView(state).customDestinations);
       customDestinations[destInd].enabled = enabled;
-      return this.updateSettings(state, { customDestinations });
+      return reducers.updateSettings(state, { customDestinations });
     },
     switchAdvancedMode(state: TState, enabled: boolean) {
-      return this.updateSettings(state, { advancedMode: enabled });
+      return reducers.updateSettings(state, { advancedMode: enabled });
     },
     /**
      * Update the selected field for all target platforms
@@ -190,14 +190,16 @@ function initializeGoLiveSettings(
 
     reload() {
       mutations.updateSettings(
-        getInitialStreamSettings(pick(getState(), 'isUpdateMode', 'isScheduleMode')),
+        getInitialStreamSettings(
+          pick(getState(), 'isUpdateMode', 'isScheduleMode'),
+        ),
       );
+      mutations.updateSettings({ needPrepopulate: false });
     },
 
     async prepopulate() {
       await StreamingService.actions.return.prepopulateInfo();
       actions.reload();
-      mutations.updateSettings({ needPrepopulate: false });
     },
   };
 

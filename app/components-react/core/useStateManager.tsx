@@ -2,18 +2,20 @@ import React, { useContext, useEffect, useRef } from 'react';
 import { StatefulService } from '../../services';
 import { cloneDeep, isPlainObject, mapKeys, remove } from 'lodash';
 import { keys } from '../../services/utils';
-import { useForceUpdate, useOnCreate } from '../hooks';
+import { useForceUpdate, useOnCreate, useOnDestroy } from '../hooks';
+import { unstable_batchedUpdates } from 'react-dom'; // that is what Redux use for batched updates
 
 type TStateManagerContext<TContextView extends object> = {
   contextView: TContextView;
   Context: typeof GenericStateManagerContext;
+  dispatcher: TDispatcher<unknown, unknown>
   stateWatcher: ReturnType<typeof createStateWatcher>;
-  getLocalStateRevision(): number;
-  getGlobalStateRevision(): number;
 };
 
 const GenericStateManagerContext = React.createContext(null);
 let nextComponentId = 1;
+
+const DEBUG = true;
 
 /**
  * Manage the state in React.Context
@@ -40,30 +42,15 @@ export function useStateManager<
     setState: (newState: TState) => void,
   ) => TInitializerReturnType,
   computedPropsCb: TComputedPropsCb,
-  debug = false,
 ) {
-  // keep revision numbers for local and global (vuex) state
-  // we need this numbers to check if component is synced with the last state
-  const localStateRevisionRef = useRef(1);
-  const globalStateRevisionRef = useRef(1);
 
-  // keep computed props in ref
-  const computedPropsRef = useRef<TComputedProps | null>(null);
-
-  // true if component is destroyed
-  const isDestroyedRef = useRef<boolean>(false);
-
-  // current update counter, needed in the debug mode
-  const updateCounterRef = useRef<number>(1);
-
-  const forceUpdate = useForceUpdate();
+  // initialize React.Context or create new if not exist
   const context = useContext(GenericStateManagerContext) as React.Context<
     TStateManagerContext<TContextView>
-  > | null;
+    > | null;
 
-  // get current React.Context or create new if not exist
   const { contextValue, isRoot } = useOnCreate(() => {
-    // the context exists just
+    // the context already exists, use it
     if (context) {
       return {
         contextValue: (context as unknown) as TStateManagerContext<TContextView>,
@@ -71,73 +58,46 @@ export function useStateManager<
       };
     }
 
-    // context is not found we should create a new one
-    // THIS CODE RUNS ONLY ONES PER CONTEXT
-
-    // create initial state
-    let state: TState =
-      typeof initState === 'function' ? (initState as Function)() : cloneDeep(initState);
-    // the local state revision number, this number will be increased after each state mutation
-    let localStateRevision = 1;
-
-    // create StateWatcher to observe changes from vuex
-    // and update depending components
-    const stateWatcher = createStateWatcher(debug);
-
-    // CREATE STATE GETTER AND SETTER
-
-    function getState() {
-      return state;
-    }
-
-    function setState(newState: TState) {
-      const prevState = state;
-      state = newState;
-      localStateRevision++;
-      stateWatcher.handleLocalStateChange(localStateRevision, prevState, newState);
-    }
-
-    // create getters/mutations/actions
-    const initializerView = initializer(getState, setState) as TInitializerReturnType;
-    // merge it with state
-    const contextView = merge(getState, initializerView) as TContextView;
-
-    // CREATE GETTERS FOR LOCAL AND GLOBAL REVISIONS
-
-    function getLocalStateRevision() {
-      return localStateRevision;
-    }
-
-    function getGlobalStateRevision() {
-      return stateWatcher.getRevision();
-    }
-
-    // new React.Context is ready
-    const contextValue = {
-      contextView,
-      Context: GenericStateManagerContext as React.Context<TStateManagerContext<
-        TContextView
-      > | null>,
-      stateWatcher,
-      getLocalStateRevision,
-      getGlobalStateRevision,
-    } as TStateManagerContext<TContextView>;
-    return { contextValue, isRoot: true };
+    // context is not found, create a new one
+    return { contextValue: createContext(initState, initializer), isRoot: true };
   });
 
-  const { contextView, stateWatcher } = contextValue;
+  // now working on a component instance
+
+  // keep revision numbers for local and global (vuex) states
+  // we need this numbers to check if component is synced with the last state
+  const localStateRevisionRef = useRef(1);
+  const globalStateRevisionRef = useRef(1);
+
+  // keep computed props in ref
+  const computedPropsRef = useRef<TComputedProps | null>(null);
+
+  // save the previous component state in ref
+  const prevComponentState = useRef<Partial<TComponentView> | null>(null);
+
+  // true if component is destroyed
+  const isDestroyedRef = useRef<boolean>(false);
+
+  // current update counter, needed for the debug mode
+  const updateCounterRef = useRef<number>(1);
+
+  // we keep state is refs so we need to manually update components when it's changed
+  const forceUpdate = useForceUpdate();
+
 
   // handle component creation
   const {
     dependencyWatcher,
     componentId,
     onChange,
-    calculateComputedProps,
+    vuexSelector,
     componentView,
   } = useOnCreate(() => {
-    const componentId = debug
+    const componentId = DEBUG
       ? `${nextComponentId++}_${getComponentName()}`
       : `${nextComponentId++}`;
+
+    const { contextView } = contextValue;
 
     // computed props are unique for each component
     // calculate them and merge with ContextView
@@ -151,7 +111,7 @@ export function useStateManager<
     }) as TComponentView;
 
     // create a dependency watcher for the component
-    // to track which state properties or getters does component use
+    // to track which state properties or getters does the component use
     // and update the component only if it's dependencies have been changed
     const dependencyWatcher = createDependencyWatcher(componentView);
 
@@ -163,14 +123,6 @@ export function useStateManager<
 
       const { globalStateRevision, localStateRevision } = change;
 
-      if (
-        (globalStateRevision && globalStateRevisionRef.current >= globalStateRevision) ||
-        (localStateRevision && localStateRevisionRef.current >= localStateRevision)
-      ) {
-        // component is already up to date
-        return;
-      }
-
       // handle vuex state change
       if (globalStateRevision) {
         const { prevState, newState } = change;
@@ -179,21 +131,21 @@ export function useStateManager<
           return;
         } else {
           // the state has been changed, update the component
-          if (debug) logChange(prevState, newState, componentId, true, globalStateRevision);
+          if (DEBUG) logChange(prevState, newState, componentId, true, globalStateRevision);
           forceUpdate();
         }
 
       // handle local state changes inside React.Context
       } else if (localStateRevision) {
         calculateComputedProps();
-        const prevState = dependencyWatcher.getPrevState();
+        const prevState = prevComponentState.current;
         const newState = pick(componentView, ...dependencyWatcher.getDependentFields());
         if (isSimilar(prevState, newState)) {
           // prevState and newState are equal, no action needed
           return;
         } else {
           // prevState and newState are not equal, update the component
-          if (debug) logChange(prevState, newState, componentId, false, localStateRevision);
+          if (DEBUG) logChange(prevState, newState, componentId, false, localStateRevision);
           forceUpdate();
         }
       }
@@ -206,68 +158,102 @@ export function useStateManager<
       return computedPropsRef.current as TComputedProps;
     }
 
-    return {
-      componentView,
-      componentId,
-      onChange,
-      dependencyWatcher,
-      calculateComputedProps,
-    };
-  });
-
-  // sync revisions for the each component update cycle
-  localStateRevisionRef.current = contextValue.getLocalStateRevision();
-  globalStateRevisionRef.current = contextValue.getGlobalStateRevision();
-  dependencyWatcher.savePrevState();
-
-
-  // log lifecycle if in the debug mode
-  if (debug) {
-    if (updateCounterRef.current === 1) {
-      console.log('Create component', componentId);
-    } else {
-      console.log('Update component', componentId);
-    }
-    updateCounterRef.current++;
-  }
-
-  // start watching for local and global state change after the component mounted
-  useEffect(() => {
-    // create a state selector to watch state from vuex
-    const selector = () => {
+    // create a state selector for watching state from vuex
+    function vuexSelector() {
       // we should watch only component's dependencies
       const dependentFields = dependencyWatcher.getDependentFields();
       return {
         ...pick(contextView, ...dependentFields),
         ...pick(calculateComputedProps(), ...dependentFields),
       };
-    };
-    stateWatcher.subscribe({ componentId, onChange, selector });
-    dependencyWatcher.savePrevState();
+    }
 
-    // tell StateWatcher to start watching if the root component is mounted
-    if (isRoot) stateWatcher.startWatching();
-
-    // handle unmount
-    return () => {
-      // tell StateWatcher to stop watching if the root component is unmounted
-      if (isRoot) stateWatcher.stopWatching();
-      // unsubscribe the component from the state watcher and mark it as destroyed
-      stateWatcher.unsubscribe(componentId);
-      isDestroyedRef.current = true;
+    return {
+      componentView,
+      componentId,
+      onChange,
+      dependencyWatcher,
+      calculateComputedProps,
+      vuexSelector
     };
-  }, []);
+  });
+
+  // sync revisions for the each component update cycle
+  localStateRevisionRef.current = contextValue.dispatcher.getRevision();
+  globalStateRevisionRef.current = contextValue.stateWatcher.getRevision();
+
+
+  // log lifecycle if in the debug mode
+  if (DEBUG) {
+    if (updateCounterRef.current === 1) {
+      log('Create component', componentId);
+    } else {
+      log('Update component', componentId);
+    }
+    updateCounterRef.current++;
+  }
+
+  const { stateWatcher } = contextValue;
+  stateWatcher.registerComponent(
+    componentId,
+    vuexSelector,
+    onChange,
+    () => globalStateRevisionRef.current,
+    () => localStateRevisionRef.current
+  );
+  useEffect(() => {
+    prevComponentState.current = pick(
+      componentView,
+      ...dependencyWatcher.getDependentFields()
+    );
+    stateWatcher.startWatching(componentId);
+    log('Update component finished', componentId);
+  });
+
+  useOnDestroy(() => {
+    isDestroyedRef.current = true;
+    stateWatcher.unregisterComponent(componentId);
+  })
 
   return {
     dependencyWatcher: dependencyWatcher.watcherProxy as TComponentView,
-    contextView: contextView as TContextView,
+    contextView: contextValue.contextView as TContextView,
     componentView: componentView as TComponentView,
     isRoot,
   };
 }
 
+function createContext<TState, TActions extends Object, TContextView extends TMerge<TState, TActions>>(
+  initState: TState | (() => TState),
+  actionsCreator: (getState: () => TState, setState: (newState: TState) => unknown ) => TActions)
+{
+
+  // create initial state
+  let state: TState =
+    typeof initState === 'function' ? (initState as Function)() : cloneDeep(initState);
+
+  // create a local state and dispatcher
+  const dispatcher = createDispatcher(state, actionsCreator)
+
+  // create StateWatcher to observe changes from the local state and vuex
+  // and update dependent components
+  const stateWatcher = createStateWatcher(dispatcher);
+
+  // merge it with state
+  const contextView = merge(dispatcher.getState, dispatcher.actions) as TContextView;
+
+  // new React.Context is ready
+  return {
+    contextView,
+    Context: GenericStateManagerContext as React.Context<TStateManagerContext<
+      TContextView
+      > | null>,
+    dispatcher,
+    stateWatcher,
+  } as TStateManagerContext<TContextView>;
+}
+
 function createDependencyWatcher<T extends object>(watchedObject: T) {
-  let prevState: Record<string, any> = {};
   const dependencies: Record<string, any> = {};
   const watcherProxy = new Proxy(
     { _proxyName: 'DependencyWatcher' },
@@ -285,75 +271,101 @@ function createDependencyWatcher<T extends object>(watchedObject: T) {
     return Object.keys(dependencies);
   }
 
-  // TODO: move to StateManager
-  function savePrevState() {
-    prevState = pick(watchedObject, ...getDependentFields());
-  }
-
-  function getPrevState() {
-    return prevState;
-  }
-
-  return { watcherProxy, getDependentFields, getPrevState, savePrevState };
+  return { watcherProxy, getDependentFields };
 }
 
-function createStateWatcher(debug = false) {
+function createStateWatcher(
+  dispatcher: TDispatcher<unknown, unknown>,
+  debug = false
+) {
   type TComponentId = string;
   type TSubscription = {
     componentId: TComponentId;
+    getGlobalStateRevision(): number;
+    getLocalStateRevision(): number;
+    isReady: boolean,
     selector: Function;
     onChange: (change: TStateChange) => unknown;
   };
+  const components: Record<TComponentId, TSubscription> = {}
   const vuexStore = StatefulService.store;
-  const subscriptions: TSubscription[] = [];
-  let stateRevision = 1;
+  let watchedComponentsIds: string[] = [];
+  // TODO: remove
+  let vuexGetterRevision = 0;
+  let stateRevision = 0;
   let isWatching = false;
-  let unsubscribeVuex: Function;
+  let unsubscribeVuex: Function | null = null;
 
-  function subscribe(subscription: TSubscription) {
-    subscriptions.push(subscription);
-    subscriptions.sort((s1, s2) => (s1.componentId > s2.componentId ? 1 : -1));
-    if (isWatching) {
-      console.log('Subscribe and rebuild state watcher', subscription.componentId);
-      stopWatching();
-      startWatching();
+  dispatcher.subscribe((newState, revision) => {
+    if (DEBUG) logMutation(revision, null, newState, false);
+    getComponents().forEach(component => {
+      if (component.getLocalStateRevision() >= revision) return;
+      component.onChange({localStateRevision: revision});
+    });
+  });
+
+  function checkIsRegistered(componentId: string): boolean {
+    return componentId in components;
+  }
+
+  function registerComponent(
+    componentId: string,
+    selector: Function,
+    onChange: (change: TStateChange) => unknown,
+    getGlobalStateRevision: () => number,
+    getLocalStateRevision: () => number
+  ) {
+    if (!checkIsRegistered(componentId)) {
+      components[componentId] = { componentId, selector, onChange, getGlobalStateRevision, getLocalStateRevision, isReady: false };
+    } else {
+      components[componentId].isReady = false;
     }
   }
 
-  function unsubscribe(componentId: string) {
-    remove(subscriptions, s => s.componentId === componentId);
-    if (isWatching) {
-      stopWatching();
-      startWatching();
+  function startWatching(componentId: string) {
+    // mark component as ready to receiving state updates
+    components[componentId].isReady = true;
+
+    // if some component is not in the ready state, then just exit
+    const hasPendingComponents = Object.keys(components).find(id => !components[id].isReady);
+    if (hasPendingComponents) return;
+
+    // it's the last component that was in unready state
+    // check if we should restart vuex watcher now
+    const registeredComponentIds = getComponents().map(c => c.componentId);
+    if (!isArrayEqual(watchedComponentsIds, registeredComponentIds)) {
+      stopWatchingVuex();
+      watchVuex(createVuexGetter());
     }
   }
 
-  function startWatching() {
-    console.log('start watching');
-    function getPrefixedField(componentId: string, fieldName: string) {
-      return `${componentId}__${fieldName}`;
-    }
+  function unregisterComponent(componentId: string) {
+    delete components[componentId];
+  }
 
-    function getUnprefixed(prefixedField: string) {
-      return prefixedField.split('__') as [string, string];
+  function createVuexGetter() {
+    vuexGetterRevision++;
+    watchedComponentsIds = getComponents().map(comp => comp.componentId);
+    return () => {
+      // create one cb for all subscribed components
+      const mixedState: Record<string, any> = {};
+      const prefixedStates = getComponents().map(comp => {
+        const componentState = comp.selector();
+        return mapKeys(componentState, (value, key) => getPrefixedField(comp.componentId, key))
+      });
+      prefixedStates.forEach(state => Object.assign(mixedState, state));
+      mixedState.vuexGetterRevision = vuexGetterRevision;
+      return mixedState;
     }
+  }
 
-    function getPrefixedState(subscr: TSubscription) {
-      const componentState = subscr.selector();
-      return mapKeys(componentState, (value, key) => getPrefixedField(subscr.componentId, key));
-    }
-
+  function watchVuex(vuexGetter: () => Object) {
+    log('subscribe to vuex');
     unsubscribeVuex = vuexStore.watch(
-      () => {
-        // create one cb for all subscribed components
-        const mixedState: object = {};
-        const prefixedStates = subscriptions.map(getPrefixedState);
-        prefixedStates.forEach(state => Object.assign(mixedState, state));
-        return mixedState;
-      },
+      vuexGetter,
       (newState, prevState) => {
         stateRevision++;
-        if (debug) logMutation(stateRevision, prevState, newState, true);
+        if (DEBUG) logMutation(stateRevision, prevState, newState, true);
         // walk through newState and generate a `changes` object with newState and prevState
         // for each component
         const changes: Record<TComponentId, { newState: object; prevState: object }> = {};
@@ -368,41 +380,40 @@ function createStateWatcher(debug = false) {
           changes[componentId] = { newState: componentNewState, prevState: componentPrevState };
         });
 
-        const currentSubscriptions = subscriptions.slice();
-        isWatching = false;
-        // walk through components and emit onChange
-        currentSubscriptions.forEach(subscr => {
-          const { newState, prevState } = changes[subscr.componentId];
-          subscr.onChange({ newState, prevState, globalStateRevision: stateRevision });
+
+        const currentRevision = stateRevision;
+        getComponents().forEach(component => {
+          if (component.getGlobalStateRevision() >= currentRevision) return;
+          const { newState, prevState } = changes[component.componentId];
+          component.onChange({ newState, prevState, globalStateRevision: currentRevision });
         });
-
-        const prevSubscriptionIds = currentSubscriptions.map(s => s.componentId);
-        const newSubscriptionIds = subscriptions.map(s => s.componentId);
-        const shouldResubscribeVuex = !isArrayEqual(prevSubscriptionIds, newSubscriptionIds);
-
-        if (shouldResubscribeVuex) {
-          stopWatching();
-          startWatching();
-        } else {
-          isWatching = true;
-        }
-
       },
     );
     isWatching = true;
   }
 
-  function stopWatching() {
-    unsubscribeVuex();
+  function stopWatchingVuex() {
+    unsubscribeVuex && unsubscribeVuex();
+    unsubscribeVuex = null;
+    watchedComponentsIds = [];
     isWatching = false;
   }
 
-  function handleLocalStateChange(localStateRevision: number, prevState: any, newState: any) {
-    // walk through components and emit onChange
-    if (debug) logMutation(localStateRevision, prevState, newState, false);
-    subscriptions.forEach(subscr => {
-      subscr.onChange({ localStateRevision });
-    });
+
+  function getPrefixedField(componentId: string, fieldName: string) {
+    return `${componentId}__${fieldName}`;
+  }
+
+  function getUnprefixed(prefixedField: string) {
+    return prefixedField.split('__') as [string, string];
+  }
+
+  function getComponents() {
+    return Object.keys(components)
+      .sort()
+      .map(id => {
+        return components[id] as Required<TSubscription>;
+      });
   }
 
   function getRevision(): number {
@@ -410,11 +421,9 @@ function createStateWatcher(debug = false) {
   }
 
   return {
+    registerComponent,
+    unregisterComponent,
     startWatching,
-    stopWatching,
-    subscribe,
-    unsubscribe,
-    handleLocalStateChange,
     getRevision,
   };
 }
@@ -424,6 +433,83 @@ type TStateChange = {
   globalStateRevision?: number;
   localStateRevision?: number;
 };
+
+function createDispatcher<TState, TActions extends Object>(
+  initialState: TState,
+  actionCreators: (getState: () => TState, setState: (newState: TState) => unknown ) => TActions,
+): TDispatcher<TState, TActions> {
+
+  // the local state revision number, this number will be increased after each state mutation
+  let localStateRevision = 0;
+  function getRevision() {
+    return localStateRevision;
+  }
+
+  // create state, state getter and state setter
+  let state = initialState;
+
+  function getState() {
+    return state;
+  }
+
+  function setState(newState: TState) {
+    localStateRevision++;
+    state = newState;
+    queueOnChange();
+  }
+
+  let timeoutId = 0;
+  function queueOnChange() {
+    if (timeoutId) return;
+    timeoutId = setTimeout(() => {
+      onChangeHandler && onChangeHandler(getState(), getRevision());
+      timeoutId = 0;
+    })
+  }
+
+  // allow to subscribe on state changes
+  let onChangeHandler: (newState: TState, revision: number) => unknown | null
+  function subscribe(cb: (newState: TState, revision: number) => unknown) {
+    onChangeHandler = cb;
+  }
+
+  const actions = actionCreators(getState, setState);
+
+  // function dispatchAction(actionName: string, ...payload: any[]) {
+  //   console.log('dispatch action', actionName);
+  //   const currentRevision = getRevision();
+  //   const result = actions[actionName](...payload);
+  //   if (result.finally) {
+  //     result.finally(() )
+  //   }
+  //   if (currentRevision !== getRevision()) {
+  //     console.log('mutations detected');
+  //     queueOnChange()
+  //   }
+  //   return result;
+  // }
+  //
+  // const actionsProxy = new Proxy({_proxyName: 'StateDispatcher'}, {
+  //   get(t, propName: string) {
+  //     const target = actions[propName];
+  //     if (propName === 'hasOwnProperty') return (prop: string) => actions.hasOwnProperty(prop);
+  //     if (typeof target === 'function') {
+  //       return (...payload: unknown[]) => dispatchAction(propName, ...payload);
+  //     }
+  //     if (propName in t) return t[propName];
+  //     return target;
+  //   }
+  // }) as unknown as TActions;
+
+  return { getState, subscribe, actions, getRevision };
+}
+type TDispatcher<TState, TActions> = {
+  getState: () => TState,
+  actions: TActions,
+  subscribe: (cb: (newState: TState, revision: number) => unknown) => unknown
+  getRevision: () => number;
+}
+
 
 // consider isSimilar as isDeepEqual with depth 2
 // depth 2 should be enough for the most cases
@@ -475,13 +561,37 @@ function logChange(prevState: any, newState: any, componentId: string, isGlobalS
   const mutationType = isGlobalState ? 'global' : 'local';
   const diff = getDiff(prevState, newState);
   const triggeredByMsg = `Triggered by ${mutationType} mutation #${revision}`;
-  console.log('Should update component', componentId, triggeredByMsg, '. Diff:', diff);
+  log('Should update component', componentId, triggeredByMsg, '. Diff:', diff);
 }
 
 function logMutation(revision: number, prevState: any, newState: any, isGlobal: boolean) {
-  const mutationType = isGlobal ? 'global' : 'local';
-  const diff = getDiff(prevState, newState);
-  console.log(`New ${mutationType} mutation # ${revision}. Diff:`, diff);
+  const mutationType = isGlobal ? 'GLOBAL' : 'LOCAL';
+  const diff = prevState ? getDiff(prevState, newState) : 'unavailable';
+  log(`${mutationType} MUTATION #${revision}. Diff:`, diff);
+}
+
+let logResetTimeout = 0;
+let lastLogTime = 0;
+function log(msg: string, ...args: any) {
+  const now = Date.now();
+  const ms = lastLogTime ? now - lastLogTime : 0;
+
+  // select console.log color based on elapsed time
+  let msColor = 'green';
+  if (ms >= 200) {
+    msColor = 'red';
+  } else if (ms >= 100) {
+    msColor = 'orange';
+  } else if (ms >= 50) {
+    msColor = 'yellow';
+  }
+
+  lastLogTime = now;
+  console.log('%c%s', `color: ${msColor}`, `+${ms}ms`, `${msg}`, ...args);
+  if (!logResetTimeout) setTimeout(() => {
+    logResetTimeout = 0;
+    lastLogTime = 0;
+  })
 }
 
 //
@@ -493,7 +603,7 @@ function logMutation(revision: number, prevState: any, newState: any, isGlobal: 
 //         setFoo(foo: string) {
 //           setState({ ...getState(), foo });
 //         },
-//         setBar(bar: number) {
+//          setBar(bar: number) {
 //           setState({ ...getState(), bar });
 //         },
 //       };
@@ -566,14 +676,19 @@ export function merge<TObj1 extends object, TObj2 extends object>(
   obj1: TObj1,
   obj2: TObj2,
 ): TMerge<TObj1, TObj2> {
-  const obj1MergedObjects = obj1['_mergedObjects'] || [obj1];
-  const obj2MergedObjects = obj2['_mergedObjects'] || [obj2];
+  const obj1MergedObjects = getMergedObjects(obj1)
+  const obj2MergedObjects = getMergedObjects(obj2)
   const mergedObjects = [...obj1MergedObjects, ...obj2MergedObjects];
   const metadata = {
     _proxyName: 'MergeResult',
     _cache: {},
     _mergedObjects: mergedObjects,
   };
+
+  function getMergedObjects(obj: any) {
+    if (obj._proxyName === 'MergeResult') return obj._mergedObjects;
+    return [obj];
+  }
 
   function getTargetValue(target: object | Function, propName: string) {
     return typeof target === 'function' ? target()[propName] : target[propName];

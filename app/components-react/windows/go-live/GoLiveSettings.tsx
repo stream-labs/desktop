@@ -11,7 +11,7 @@ import { Section } from './Section';
 import PlatformSettings from './PlatformSettings';
 import TwitterInput from './Twitter';
 import OptimizedProfileSwitcher from './OptimizedProfileSwitcher';
-import Spinner from "../../shared/Spinner";
+import Spinner from '../../shared/Spinner';
 
 const PlusIcon = PlusOutlined as Function;
 

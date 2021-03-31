@@ -4734,7 +4734,7 @@ electron-chromedriver@^9.0.0:
     "@electron/get" "^1.12.2"
     extract-zip "^2.0.0"
 
-electron-devtools-installer@3.1.1:
+electron-devtools-installer@^3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/electron-devtools-installer/-/electron-devtools-installer-3.1.1.tgz#7b56c8c86475c5e4e10de6917d150c53c9ceb55e"
   integrity sha512-g2D4J6APbpsiIcnLkFMyKZ6bOpEJ0Ltcc2m66F7oKUymyGAt628OWeU9nRZoh1cNmUs/a6Cls2UfOmsZtE496Q==
