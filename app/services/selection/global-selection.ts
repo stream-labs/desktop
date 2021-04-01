@@ -26,12 +26,10 @@ export class GlobalSelection extends Selection {
   frozenState: ISelectionState;
   frozenSceneId: string;
 
-  // @ts-ignore
   protected get state() {
     return this.isFrozen ? this.frozenState : this.selectionService.state;
   }
 
-  // @ts-ignore
   get sceneId() {
     return this.isFrozen ? this.frozenSceneId : this.scenesService.views.activeSceneId;
   }
