@@ -5,7 +5,10 @@ import { keys } from '../../services/utils';
 import { useForceUpdate, useOnCreate, useOnDestroy } from '../hooks';
 const GenericStateManagerContext = React.createContext(null);
 
-const DEBUG = true;
+// React devtools are broken for Electron 9 and 10
+// as an alternative set DEBUG=true
+// to track components re-renders and timings in the console
+const DEBUG = false;
 
 /**
  * Flux-like state manager for React.Context
@@ -158,6 +161,7 @@ export function useStateManager<
   localStateRevisionRef.current = contextValue.dispatcher.getRevision();
   globalStateRevisionRef.current = contextValue.stateWatcher.getRevision();
 
+  // register the component in the stateWatcher
   const { stateWatcher } = contextValue;
   stateWatcher.registerComponent(
     componentId,
@@ -167,8 +171,12 @@ export function useStateManager<
     () => localStateRevisionRef.current,
     () => isDestroyedRef.current,
   );
+  // component mounted/updated
   useEffect(() => {
+    // save the prev state
     prevComponentState.current = pick(componentView, ...dependencyWatcher.getDependentFields());
+
+    // start watching for changes
     stateWatcher.startWatching(componentId);
   });
 
@@ -192,6 +200,9 @@ type TStateManagerContext<TContextView extends object> = {
   stateWatcher: ReturnType<typeof createStateWatcher>;
 };
 
+/**
+ * Create context variables
+ */
 function createContext<
   TState,
   TActions extends Object,
@@ -307,6 +318,7 @@ function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
   let isWatching = false;
   let unsubscribeVuex: Function | null = null;
 
+  // subscribe on changes from the local state
   dispatcher.subscribe((newState, revision) => {
     if (DEBUG) logMutation(revision, null, newState, false);
     getComponents().forEach(component => {
@@ -329,6 +341,7 @@ function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
     checkIsDestroyed: () => boolean,
   ) {
     if (!checkIsRegistered(componentId)) {
+      // register a new component in the state watcher
       const sequence = Number(componentId.split('_')[0]);
       components[componentId] = {
         componentId,
@@ -341,6 +354,7 @@ function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
         isReady: false,
       };
     } else {
+      // if component is already registered then stop listen changes until mount
       components[componentId].isReady = false;
     }
   }
@@ -366,6 +380,9 @@ function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
     delete components[componentId];
   }
 
+  /**
+   * Create a single Vuex watcher for all components in the context
+   */
   function createVuexGetter() {
     watchedComponentsIds = getComponents().map(comp => comp.componentId);
     return () => {
@@ -379,7 +396,9 @@ function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
       return mixedState;
     };
   }
-
+  /**
+   * Start watching Vuex
+   */
   function watchVuex(vuexGetter: () => Object) {
     unsubscribeVuex = vuexStore.watch(vuexGetter, (newState, prevState) => {
       stateRevision++;
@@ -399,6 +418,8 @@ function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
       });
 
       const currentRevision = stateRevision;
+
+      // walk through registered components and trigger onChange
       getComponents().forEach(component => {
         if (component.checkIsDestroyed()) return;
         if (component.getGlobalStateRevision() >= currentRevision) return;
@@ -425,6 +446,11 @@ function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
     return prefixedField.split('__') as [string, string];
   }
 
+  /**
+   * return registered components
+   * returned components are sorted by sequence
+   * that ensures we update them in the most optimized order
+   */
   function getComponents() {
     return Object.keys(components)
       .sort((id1, id2) => components[id1].sequence - components[id2].sequence)
@@ -637,8 +663,8 @@ function isArrayEqual(a: any[], b: any[]) {
 }
 
 /**
- * Alternative to lodash.pick
  * TODO: figure out why lodash.pick doesn't work with objects from the merge() function
+ * Alternative to a lodash.pick()
  */
 function pick<T extends Object>(obj: T, ...props: Array<string>): Partial<T> {
   const result: any = {};
