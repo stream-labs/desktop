@@ -17,7 +17,6 @@ interface ISavedGoLiveSettings {
     facebook: IPlatformFlags;
     youtube: IPlatformFlags;
   };
-  tweetText?: string;
   customDestinations?: ICustomStreamDestination[];
   advancedMode: boolean;
 }

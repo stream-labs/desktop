@@ -7,7 +7,7 @@ const spinnerSvg =
 export default function Spinner(props: { visible?: boolean } = {}) {
   const defaultProps = { visible: false };
   const p = { ...defaultProps, ...props };
-  const color = '#17242D'; // TODO: pick color from theme
+  const color = 'var(--background)';
 
   const containerStyles: React.CSSProperties = {
     backgroundColor: color,

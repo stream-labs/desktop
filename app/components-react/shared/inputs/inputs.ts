@@ -116,8 +116,13 @@ export function useInput<
 
   // create a ref for the localValue
   const localValueRef = useRef(value);
-  // always keep localValue in sync for controlled inputs
-  if (!uncontrolled) localValueRef.current = value;
+  const prevValueRef = useRef(value);
+
+  // sync local value on props value change
+  if (value !== prevValueRef.current) {
+    localValueRef.current = value;
+    prevValueRef.current = value;
+  }
 
   // set new local value
   // this function won't update the component
@@ -135,6 +140,7 @@ export function useInput<
 
   // create an `emitChange()` method and it's debounced version
   function emitChange(newVal: TValue) {
+    prevValueRef.current = newVal;
     inputProps.onChange && inputProps.onChange(newVal);
   }
   const emitChangeDebounced = useDebounce(inputProps.debounce, emitChange);

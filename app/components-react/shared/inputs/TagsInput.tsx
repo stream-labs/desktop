@@ -2,7 +2,7 @@ import { Select, Tag } from 'antd';
 import React, { useMemo, ReactElement } from 'react';
 import { InputComponent, SingleType, TSlobsInputProps, useInput, ValuesOf } from './inputs';
 import InputWrapper from './InputWrapper';
-import { SelectProps, SelectValue } from 'antd/lib/select';
+import { SelectProps } from 'antd/lib/select';
 import { ICustomListProps, IListOption, renderOption, TListInputProps } from './ListInput';
 import { TagProps } from 'antd/lib/tag';
 import { keyBy } from 'lodash';

@@ -215,10 +215,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     try {
       if (this.twitterService.state.linked && this.twitterService.state.tweetWhenGoingLive) {
         await this.twitterService.getTwitterStatus();
-        const streamTitle = this.views.commonFields.title;
-        await this.streamSettingsService.setGoLiveSettings({
-          tweetText: this.twitterService.getDefaultTweetText(streamTitle),
-        });
       }
     } catch (e) {
       // do not block streaming if something is wrong on the Twitter side

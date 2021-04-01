@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import InputWrapper from '../../shared/inputs/InputWrapper';
 import { Services } from '../../service-provider';
 import cx from 'classnames';
@@ -17,9 +17,18 @@ export default function TwitterInput() {
     tweetWhenGoingLive,
     linked,
     screenName,
-  } = useGoLiveSettings(() =>
-    pick(TwitterService.state, 'tweetWhenGoingLive', 'linked', 'screenName'),
-  );
+    streamTitle,
+    getTweetText,
+  } = useGoLiveSettings(view => ({
+    ...pick(TwitterService.state, 'tweetWhenGoingLive', 'linked', 'screenName'),
+    streamTitle: view.commonFields.title,
+  }));
+
+  useEffect(() => {
+    console.log('update tweet text');
+    const tweetText = getTweetText(streamTitle);
+    updateSettings({ tweetText });
+  }, [streamTitle]);
 
   function unlink() {
     TwitterService.actions.return

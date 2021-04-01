@@ -33,7 +33,6 @@ export default function FacebookEditStreamInfo() {
 
   const {
     updatePlatform,
-    isScheduleMode,
     isUpdateMode,
     fbSettings,
     pages,
@@ -66,7 +65,7 @@ export default function FacebookEditStreamInfo() {
   });
   const shouldShowGroups = fbSettings.destinationType === 'group' && !isUpdateMode;
   const shouldShowPages = fbSettings.destinationType === 'page' && !isUpdateMode;
-  const shouldShowEvents = !isUpdateMode && !isScheduleMode;
+  const shouldShowEvents = !isUpdateMode;
   const shouldShowPrivacy = fbSettings.destinationType === 'me';
   const shouldShowPrivacyWarn =
     (!fbSettings.liveVideoId && fbSettings.privacy?.value !== 'SELF') ||
@@ -174,56 +173,56 @@ export default function FacebookEditStreamInfo() {
   function renderRequiredFields() {
     return (
       <div key="required">
-        {/*{!isUpdateMode && (*/}
-        {/*  <>*/}
-        {/*    <ListInput*/}
-        {/*      label={$t('Facebook Destination')}*/}
-        {/*      {...bind.destinationType}*/}
-        {/*      hasImage*/}
-        {/*      imageSize={{ width: 35, height: 35 }}*/}
-        {/*      onSelect={loadScheduledBroadcasts}*/}
-        {/*      options={getDestinationOptions()}*/}
-        {/*    />*/}
-        {/*    {shouldShowPages && (*/}
-        {/*      <ListInput*/}
-        {/*        {...bind.pageId}*/}
-        {/*        label={$t('Facebook Page')}*/}
-        {/*        onChange={val => console.log(val)}*/}
-        {/*        hasImage*/}
-        {/*        imageSize={{ width: 44, height: 44 }}*/}
-        {/*        onDropdownVisibleChange={shown => shown && loadPictures('page')}*/}
-        {/*        onSelect={loadScheduledBroadcasts}*/}
-        {/*        options={pages.map(page => ({*/}
-        {/*          value: page.id,*/}
-        {/*          label: `${page.name} | ${page.category}`,*/}
-        {/*          image: s.pictures[page.id],*/}
-        {/*        }))}*/}
-        {/*      />*/}
-        {/*    )}*/}
-        {/*    {shouldShowGroups && (*/}
-        {/*      <>*/}
-        {/*        <ListInput*/}
-        {/*          {...bind.groupId}*/}
-        {/*          label={$t('Facebook Group')}*/}
-        {/*          hasImage*/}
-        {/*          imageSize={{ width: 44, height: 44 }}*/}
-        {/*          options={groups.map(group => ({*/}
-        {/*            value: group.id,*/}
-        {/*            label: group.name,*/}
-        {/*            image: s.pictures[group.id],*/}
-        {/*          }))}*/}
-        {/*          onDropdownVisibleChange={() => loadPictures('group')}*/}
-        {/*          extra={*/}
-        {/*            <p>*/}
-        {/*              {$t('Make sure the Streamlabs app is added to your Group.')}*/}
-        {/*              <a onClick={verifyGroup}> {$t('Click here to verify.')}</a>*/}
-        {/*            </p>*/}
-        {/*          }*/}
-        {/*        />*/}
-        {/*      </>*/}
-        {/*    )}*/}
-        {/*  </>*/}
-        {/*)}*/}
+        {!isUpdateMode && (
+          <>
+            <ListInput
+              label={$t('Facebook Destination')}
+              {...bind.destinationType}
+              hasImage
+              imageSize={{ width: 35, height: 35 }}
+              onSelect={loadScheduledBroadcasts}
+              options={getDestinationOptions()}
+            />
+            {shouldShowPages && (
+              <ListInput
+                {...bind.pageId}
+                label={$t('Facebook Page')}
+                onChange={val => console.log(val)}
+                hasImage
+                imageSize={{ width: 44, height: 44 }}
+                onDropdownVisibleChange={shown => shown && loadPictures('page')}
+                onSelect={loadScheduledBroadcasts}
+                options={pages.map(page => ({
+                  value: page.id,
+                  label: `${page.name} | ${page.category}`,
+                  image: s.pictures[page.id],
+                }))}
+              />
+            )}
+            {shouldShowGroups && (
+              <>
+                <ListInput
+                  {...bind.groupId}
+                  label={$t('Facebook Group')}
+                  hasImage
+                  imageSize={{ width: 44, height: 44 }}
+                  options={groups.map(group => ({
+                    value: group.id,
+                    label: group.name,
+                    image: s.pictures[group.id],
+                  }))}
+                  onDropdownVisibleChange={() => loadPictures('group')}
+                  extra={
+                    <p>
+                      {$t('Make sure the Streamlabs app is added to your Group.')}
+                      <a onClick={verifyGroup}> {$t('Click here to verify.')}</a>
+                    </p>
+                  }
+                />
+              </>
+            )}
+          </>
+        )}
       </div>
     );
   }

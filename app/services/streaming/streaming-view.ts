@@ -5,6 +5,7 @@ import { UserService } from '../user';
 import { RestreamService } from '../restream';
 import { getPlatformService, TPlatform, TPlatformCapability } from '../platforms';
 import { cloneDeep, difference } from 'lodash';
+import { Services } from '../../components-react/service-provider';
 
 /**
  * The stream info view is responsible for keeping
@@ -43,10 +44,6 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
 
   get lifecycle() {
     return this.info.lifecycle;
-  }
-
-  get tweetText() {
-    return this.settings.tweetText;
   }
 
   get customDestinations() {
@@ -154,6 +151,10 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     return getPlatformService(this.userView.auth.primaryPlatform).chatUrl;
   }
 
+  getTweetText(streamTitle: string) {
+    return `${streamTitle} ${Services.TwitterService.url}`;
+  }
+
   /**
    * Prepares and returns the initial settings for the GoLive window
    */
@@ -174,7 +175,6 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
       advancedMode: !!this.streamSettingsView.state.goLiveSettings?.advancedMode,
       optimizedProfile: undefined,
       customDestinations: savedGoLiveSettings?.customDestinations || [],
-      tweetText: savedGoLiveSettings?.tweetText || '',
     };
   }
 

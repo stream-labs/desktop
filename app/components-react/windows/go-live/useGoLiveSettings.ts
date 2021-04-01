@@ -11,17 +11,19 @@ import { $t } from '../../../services/i18n';
 import { useEffect } from 'react';
 
 type TCustomFieldName = 'title' | 'description';
-type TModificators = { isScheduleMode?: boolean; isUpdateMode?: boolean };
+type TModificators = { isUpdateMode?: boolean; isScheduleMode?: boolean };
 type IGoLiveSettingsState = IGoLiveSettings & TModificators & { needPrepopulate: boolean };
 
 function getInitialStreamSettings(modificators: TModificators): IGoLiveSettingsState {
-  modificators = { isScheduleMode: false, isUpdateMode: false, ...modificators };
-  const view = Services.StreamingService.views;
+  const { StreamingService, TwitterService } = Services;
+  modificators = { isUpdateMode: false, isScheduleMode: false, ...modificators };
+  const view = StreamingService.views;
   const settings = {
     ...view.savedSettings,
     needPrepopulate: true,
     modificators,
     ...modificators,
+    tweetText: view.getTweetText(view.commonFields.title),
   };
   // if stream has not been started than we allow to change settings only for a primary platform
   // so delete other platforms from the settings object
@@ -198,9 +200,7 @@ function initializeGoLiveSettings(
 
     reload() {
       mutations.updateSettings(
-        getInitialStreamSettings(
-          pick(getState(), 'isUpdateMode', 'isScheduleMode'),
-        ),
+        getInitialStreamSettings(pick(getState(), 'isUpdateMode', 'isScheduleMode')),
       );
       mutations.updateSettings({ needPrepopulate: false });
     },

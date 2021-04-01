@@ -1,14 +1,13 @@
 import React, { useContext, useEffect, useRef } from 'react';
 import { StatefulService } from '../../services';
-import { cloneDeep, isPlainObject, mapKeys, remove } from 'lodash';
+import { cloneDeep, isPlainObject, mapKeys } from 'lodash';
 import { keys } from '../../services/utils';
 import { useForceUpdate, useOnCreate, useOnDestroy } from '../hooks';
-import { unstable_batchedUpdates } from 'react-dom'; // that is what Redux use for batched updates
 
 type TStateManagerContext<TContextView extends object> = {
   contextView: TContextView;
   Context: typeof GenericStateManagerContext;
-  dispatcher: TDispatcher<unknown, unknown>
+  dispatcher: TDispatcher<unknown, unknown>;
   stateWatcher: ReturnType<typeof createStateWatcher>;
 };
 
@@ -19,7 +18,7 @@ const DEBUG = true;
 
 /**
  * Manages the state in React.Context
- * Use it when you have a complex state that depends on Vuex as an alternative for React.useReducer
+ * Use it when you have a complex state with computed fields that depends on Vuex
  */
 export function useStateManager<
   TState extends object, // state type

@@ -64,7 +64,7 @@ export interface IStreamSettings {
 
 export interface IGoLiveSettings extends IStreamSettings {
   optimizedProfile?: IEncoderProfile;
-  tweetText: string;
+  tweetText?: string;
 }
 
 export interface IPlatformFlags {

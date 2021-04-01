@@ -1,12 +1,10 @@
 import URI from 'urijs';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { Inject } from 'services/core/injector';
-import { handleResponse, authorizedHeaders, jfetch } from 'util/requests';
+import { authorizedHeaders, jfetch } from 'util/requests';
 import { mutation } from 'services/core/stateful-service';
-import { Service } from 'services/core';
 import electron from 'electron';
 import { HostsService } from 'services/hosts';
-import Util from 'services/utils';
 import { UserService } from 'services/user';
 import { $t, I18nService } from 'services/i18n';
 import uuid from 'uuid/v4';
@@ -126,12 +124,12 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
     );
   }
 
-  getDefaultTweetText(streamTitle: string) {
+  get url() {
     let url = `${this.state.creatorSiteUrl}/home`;
     if (!this.state.creatorSiteOnboardingComplete && this.userService.platform?.type === 'twitch') {
       url = `https://twitch.tv/${this.userService.platform.username}`;
     }
-    return `${streamTitle} ${url}`;
+    return url;
   }
 
   openLinkTwitterDialog() {
