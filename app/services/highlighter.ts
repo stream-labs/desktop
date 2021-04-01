@@ -11,12 +11,17 @@ import fs from 'fs-extra';
 
 import { StreamingService } from './streaming';
 import electron from 'electron';
+import Utils from './utils';
 
-const FFMPEG_DIR = path.resolve('../../', 'Downloads', 'ffmpeg', 'bin');
+// const FFMPEG_DIR = path.resolve('../../', 'Downloads', 'ffmpeg', 'bin');
+const FFMPEG_DIR = Utils.isDevMode()
+  ? path.resolve('node_modules', 'ffmpeg-ffprobe-static')
+  : path.resolve(process.resourcesPath, 'node_modules', 'ffmpeg-ffprobe-static');
+
 const FFMPEG_EXE = path.join(FFMPEG_DIR, 'ffmpeg.exe');
 const FFPROBE_EXE = path.join(FFMPEG_DIR, 'ffprobe.exe');
 
-const CLIP_DIR = path.resolve('../../', 'Videos');
+const CLIP_DIR = path.resolve('C:/', 'Users', 'acree', 'Videos');
 export const CLIP_1 = path.join(CLIP_DIR, '1.mp4');
 export const CLIP_2 = path.join(CLIP_DIR, '2.mp4');
 export const CLIP_3 = path.join(CLIP_DIR, '3.mp4');
