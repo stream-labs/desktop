@@ -1,10 +1,11 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import { getComponents, WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
 import Util from 'services/utils';
-import TitleBar from '../TitleBar';
+import { TitleBar } from 'components/shared/ReactComponent';
+import antdThemes from 'styles/antd/index';
 
 @Component({
   components: {
@@ -19,6 +20,10 @@ export default class OneOffWindow extends Vue {
   created() {
     window.addEventListener('resize', this.windowSizeHandler);
   }
+
+  // mounted() {
+  //   antdThemes[this.theme].use();
+  // }
 
   destroyed() {
     window.removeEventListener('resize', this.windowSizeHandler);
@@ -35,6 +40,12 @@ export default class OneOffWindow extends Vue {
   get theme() {
     return this.customizationService.currentTheme;
   }
+
+  // @Watch('theme')
+  // updateAntd(newTheme: string, oldTheme: string) {
+  //   antdThemes[oldTheme].unuse();
+  //   antdThemes[newTheme].use();
+  // }
 
   windowResizeTimeout: number;
 

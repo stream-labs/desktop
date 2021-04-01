@@ -121,9 +121,13 @@
   "List is empty": "List is empty",
   "Not selected": "Not selected",
   "Friends": "Friends",
+  "Thumbnail": "Thumbnail",
+  "Maximum file size reached ": "Maximum file size reached ",
+  "Select image": "Select image",
+  "Clear": "清除",
   "Width": "寬度",
   "Height": "高度",
   "Use Custom": "Use Custom",
-  "Apply": "Apply",
+  "Apply": "申請",
   "Do not show this message again": "Do not show this message again"
 }

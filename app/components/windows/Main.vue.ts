@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 import SideNav from '../SideNav';
-import { NewsBanner } from 'components/shared/ReactComponent';
+import { NewsBanner, TitleBar } from 'components/shared/ReactComponent';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService } from 'services/platform-apps';
 import { EditorCommandsService } from '../../app-services';
@@ -18,7 +18,6 @@ import BrowseOverlays from 'components/pages/BrowseOverlays.vue';
 import AlertboxLibrary from 'components/pages/AlertboxLibrary';
 import Onboarding from '../pages/Onboarding';
 import LayoutEditor from '../pages/LayoutEditor';
-import TitleBar from '../TitleBar';
 import { Inject } from '../../services/core/injector';
 import { CustomizationService } from 'services/customization';
 import { NavigationService } from 'services/navigation';
@@ -28,13 +27,14 @@ import { IModalOptions, WindowsService } from 'services/windows';
 import LiveDock from '../LiveDock.vue';
 import StudioFooter from '../StudioFooter.vue';
 import CustomLoader from '../CustomLoader';
-import PatchNotes from '../pages/PatchNotes.vue';
+import { PatchNotes } from '../shared/ReactComponent';
 import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
 import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
 import PlatformMerge from 'components/pages/PlatformMerge';
 import { getPlatformService } from 'services/platforms';
 import ModalWrapper from '../shared/modals/ModalWrapper';
+import antdThemes from 'styles/antd/index';
 
 const loadedTheme = () => {
   const customizationState = localStorage.getItem('PersistentStatefulService-CustomizationService');
@@ -84,6 +84,7 @@ export default class Main extends Vue {
   }
 
   mounted() {
+    // antdThemes[this.theme].use();
     WindowsService.modalChanged.subscribe(modalOptions => {
       this.modalOptions = { ...this.modalOptions, ...modalOptions };
     });
@@ -92,6 +93,12 @@ export default class Main extends Vue {
   get uiReady() {
     return this.$store.state.bulkLoadFinished && this.$store.state.i18nReady;
   }
+
+  // @Watch('theme')
+  // updateAntd(newTheme: string, oldTheme: string) {
+  //   antdThemes[oldTheme].unuse();
+  //   antdThemes[newTheme].use();
+  // }
 
   @Watch('uiReady')
   initializeResize() {

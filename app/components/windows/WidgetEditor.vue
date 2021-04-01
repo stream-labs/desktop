@@ -36,8 +36,10 @@
           <div class="display">
             <display
               v-if="!animating && !hideStyleBlockers"
-              :sourceId="widget.previewSourceId"
-              @click="createProjector"
+              :componentProps="{
+                sourceId: widget.previewSourceId,
+                clickHandler: e => createProjector(e),
+              }"
             />
           </div>
           <div class="sidebar">
@@ -52,7 +54,12 @@
             </div>
             <div class="subsection">
               <h2 class="subsection__title">{{ $t('Sources and Settings') }}</h2>
-              <scrollable style="margin: 0;" :isResizable="false" :autoSizeCapable="true">
+              <scrollable
+                class="os-host-flexbox"
+                style="margin: 0;"
+                :isResizable="false"
+                :autoSizeCapable="true"
+              >
                 <li
                   class="settings-title"
                   v-for="setting in props.navItems"
@@ -257,7 +264,7 @@
   }
 
   .display {
-    transform: scale(0.82, 0.8) translate(-10%);
+    transform: scale(0.7, 0.7) translate(-21.4%);
   }
 }
 
@@ -273,7 +280,7 @@
   }
 
   .display {
-    transform: scale(1, 0.63) translate(0, -29%);
+    transform: scale(1, 0.4) translate(0, -73%);
   }
 }
 
@@ -284,13 +291,13 @@
   }
 
   .display {
-    transform: scale(0.7, 0.7) translate(-3.7%);
+    transform: scale(0.5, 0.5) translate(-10%);
   }
 }
 
 .content-container.has-leftbar.vertical {
   .display {
-    transform: scale(0.6, 0.6) translate(5%, -31%);
+    transform: scale(0.8, 0.4) translate(12.7%, -75%);
   }
 }
 

@@ -36,7 +36,6 @@ export default class SponsorBanner extends WidgetSettings<
     return this.wData.settings.placement_options === 'double' ? ['1', '2'] : ['1'];
   }
 
-  // @ts-ignore
   get navItems() {
     const baseSettings = [
       { value: 'visual', label: $t('Visual Settings') },

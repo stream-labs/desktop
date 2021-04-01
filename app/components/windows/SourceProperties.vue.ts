@@ -5,7 +5,7 @@ import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { WindowsService } from 'services/windows';
 import { SourcesService } from 'services/sources';
 import ModalLayout from 'components/ModalLayout.vue';
-import Display from 'components/shared/Display.vue';
+import { Display } from 'components/shared/ReactComponent';
 import GenericForm from 'components/obs/inputs/GenericForm';
 import WidgetProperties from 'components/custom-source-properties/WidgetProperties.vue';
 import StreamlabelProperties from 'components/custom-source-properties/StreamlabelProperties';
@@ -35,10 +35,8 @@ export default class SourceProperties extends Vue {
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
 
-  // @ts-ignore
-  sourceId = this.windowsService.getChildWindowQueryParams().sourceId;
-  // @ts-ignore
-  source = this.sourcesService.views.getSource(this.sourceId);
+  sourceId = this!.windowsService.getChildWindowQueryParams().sourceId;
+  source = this!.sourcesService.views.getSource(this.sourceId);
   properties: TObsFormData = [];
   hasErrors = false;
 

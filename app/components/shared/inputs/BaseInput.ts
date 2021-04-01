@@ -20,7 +20,6 @@ export abstract class BaseInput<
     onBlur?: () => void;
   } & TProps
 > {
-  // @ts-ignore
   abstract readonly value: TValueType;
   abstract readonly title: string;
   abstract readonly metadata: TMetadataType;

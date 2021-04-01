@@ -35,8 +35,7 @@ export class EditMenu extends Menu {
   @Inject() private audioService: AudioService;
   @Inject() private editorCommandsService: EditorCommandsService;
 
-  // @ts-ignore
-  private scene = this.scenesService.views.getScene(this.options.selectedSceneId);
+  private scene = this!.scenesService.views.getScene(this.options.selectedSceneId);
 
   private readonly source: Source;
 

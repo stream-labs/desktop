@@ -30,8 +30,7 @@ export default class DateInput extends BaseInput<number, IDateMetadata> {
     };
   }
 
-  // @ts-ignore
-  locale = locales[this.i18nService.state.locale.split('-')[0]]; // use 2 letters code
+  locale = locales[this!.i18nService.state.locale.split('-')[0]]; // use 2 letters code
 
   get disabledDates() {
     if (this.options.disablePastDates) return null;

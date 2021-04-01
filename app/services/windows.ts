@@ -264,7 +264,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
   private updateScaleFactor(windowId: string) {
     const window = this.windows[windowId];
     if (window && !window.isDestroyed()) {
-      const bounds = window.getBounds();
+      const bounds = byOS({
+        [OS.Windows]: () => electron.remote.screen.dipToScreenRect(window, window.getBounds()),
+        [OS.Mac]: () => window.getBounds(),
+      });
       const currentDisplay = electron.remote.screen.getDisplayMatching(bounds);
       this.UPDATE_SCALE_FACTOR(windowId, currentDisplay.scaleFactor);
     }
@@ -409,7 +412,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       height: 400,
       title: 'New Window',
       backgroundColor: '#17242D',
-      webPreferences: { nodeIntegration: true, webviewTag: true },
+      webPreferences: { nodeIntegration: true, webviewTag: true, enableRemoteModule: true },
       ...options,
       ...options.size,
     }));

@@ -12,5 +12,7 @@
   "Volume ( % )": "音量 (%)",
   "Sync Offset ( ms )": "同步偏移（毫秒）",
   "Mixer": "Mixer",
-  "Monitor audio levels. If the bars are moving you are outputting audio.": "监控音频电平。如果条移动，则说明您正在输出音频。"
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "监控音频电平。如果条移动，则说明您正在输出音频。",
+  "Muted": "Muted",
+  "Hide in Mixer": "Hide in Mixer"
 }

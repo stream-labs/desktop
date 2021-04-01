@@ -17,7 +17,7 @@ test('Changing transition options', async t => {
   await focusMain(t);
   await clickSceneTransitions(t);
   await focusChild(t);
-  await app.client.click('.icon-edit');
+  await (await app.client.$('.icon-edit')).click();
   const form = new FormMonkey(t);
   await form.fillByTitles({
     Type: transitionType,
@@ -25,12 +25,12 @@ test('Changing transition options', async t => {
   });
 
   await dismissModal(t);
-  await t.context.app.client.click('button=Done');
+  await (await t.context.app.client.$('button=Done')).click();
   await focusMain(t);
   await clickSceneTransitions(t);
   await focusChild(t);
 
-  await app.client.click('.icon-edit');
+  await (await app.client.$('.icon-edit')).click();
   t.true(
     await form.includesByTitles({
       Type: transitionType,
@@ -48,10 +48,10 @@ test('Adding and removing transitions', async t => {
   await focusMain(t);
   await clickSceneTransitions(t);
   await focusChild(t);
-  await app.client.click('button=Add Transition');
+  await (await app.client.$('button=Add Transition')).click();
   await dismissModal(t);
-  await app.client.click('.icon-trash');
-  await app.client.click('.icon-edit');
+  await (await app.client.$('.icon-trash')).click();
+  await (await app.client.$('.icon-edit')).click();
   const title = await getFormInput(t, 'Name');
   t.true(title === 'New Transition');
 });
@@ -68,23 +68,23 @@ test('Changing connections', async t => {
   await focusMain(t);
   await clickSceneTransitions(t);
   await focusChild(t);
-  await app.client.click('button=Add Transition');
+  await (await app.client.$('button=Add Transition')).click();
   await dismissModal(t);
-  await app.client.click('button=Connections');
-  await app.client.click('button=Add Connection');
+  await (await app.client.$('button=Connections')).click();
+  await (await app.client.$('button=Add Connection')).click();
   const form = new FormMonkey(t);
   await form.fillByTitles({
     'Beginning Scene': connectionBegin,
     'Scene Transition': connectionTransition,
     'Ending Scene': connectionEnd,
   });
-  await t.context.app.client.click('button=Done');
+  await (await t.context.app.client.$('button=Done')).click();
   await focusMain(t);
   await clickSceneTransitions(t);
   await focusChild(t);
 
-  await app.client.click('button=Connections');
-  await app.client.click('.icon-edit');
+  await (await app.client.$('button=Connections')).click();
+  await (await app.client.$('.icon-edit')).click();
 
   t.true(
     await form.includesByTitles({
@@ -104,14 +104,14 @@ test('Showing redudant connection warning', async t => {
   await focusMain(t);
   await clickSceneTransitions(t);
   await focusChild(t);
-  await app.client.click('button=Add Transition');
+  await (await app.client.$('button=Add Transition')).click();
   await dismissModal(t);
-  await app.client.click('button=Connections');
-  await app.client.click('button=Add Connection');
+  await (await app.client.$('button=Connections')).click();
+  await (await app.client.$('button=Add Connection')).click();
   await dismissModal(t);
-  await app.client.click('button=Add Connection');
+  await (await app.client.$('button=Add Connection')).click();
   await dismissModal(t);
 
-  await app.client.waitForVisible('.transition-redundant');
+  await (await app.client.$('.transition-redundant')).waitForDisplayed();
   t.pass();
 });

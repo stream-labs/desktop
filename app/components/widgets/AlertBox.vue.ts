@@ -32,6 +32,7 @@ const alertNameMap = () => ({
   subscribers: $t('Subscribers'), // YouTube
   stars: $t('Stars'),
   support: $t('Support'),
+  giftSupport: $t('Gifted Support'),
   likes: $t('Likes'),
   shares: $t('Shares'),
   fbfollows: $t('Follows'),
@@ -93,8 +94,7 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
     return alertNameMap()[alertType];
   }
 
-  // @ts-ignore
-  alertTypes = this.alertBoxService.apiNames();
+  alertTypes = this!.alertBoxService.apiNames();
 
   addAlertMenuOpen = false;
   selectedAlert = 'general';
@@ -119,7 +119,6 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
     );
   }
 
-  // @ts-ignore
   get navItems() {
     if (this.selectedAlert === 'general') {
       return [

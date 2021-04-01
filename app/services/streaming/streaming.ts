@@ -494,7 +494,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   ) {
     if (typeof errorTypeOrError === 'object') {
       // an error object has been passed as a first arg
-      const error = errorTypeOrError.getModel
+      const error = errorTypeOrError['getModel']
         ? (errorTypeOrError as StreamError).getModel()
         : errorTypeOrError;
       this.SET_ERROR(error.type, error.details, error.platform);

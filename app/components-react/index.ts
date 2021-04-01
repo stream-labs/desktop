@@ -4,6 +4,10 @@ import GoLiveWindow from './windows/go-live/GoLiveWindow';
 import EditStreamWindow from './windows/go-live/EditStreamWindow';
 import Playground from './windows/Playground';
 import NewsBanner from './root/NewsBanner';
+import PatchNotes from './pages/PatchNotes';
+import Display from './shared/Display';
+import TitleBar from './shared/TitleBar';
+import Chat from './root/Chat';
 
 // list of React components for usage inside Vue components
 export const components = {
@@ -12,4 +16,8 @@ export const components = {
   EditStreamWindow,
   Playground,
   NewsBanner,
+  PatchNotes,
+  Display,
+  TitleBar,
+  Chat,
 };

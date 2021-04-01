@@ -3,7 +3,6 @@ import { cloneDeep, isMatch } from 'lodash';
 import { click, TExecutionContext } from './spectron';
 
 interface IUIInput {
-  id: string;
   type: string;
   name: string;
   title: string;
@@ -53,7 +52,7 @@ export class FormMonkey {
     const formSelector = this.formSelector;
 
     if (formSelector !== DEFAULT_SELECTOR) {
-      await this.client.waitForExist(formSelector, 15000);
+      (await this.client.$(formSelector)).waitForExist({ timeout: 15000 });
     }
 
     const result = [];
@@ -61,8 +60,7 @@ export class FormMonkey {
     this.log(`${$inputs.length} inputs found in ${formSelector}`);
 
     for (const $input of $inputs) {
-      const id = ($input as any).ELEMENT;
-      const name = (await this.client.elementIdAttribute(id, 'data-name')).value;
+      const name = await $input.getAttribute('data-name');
       if (!name) continue;
       result.push(await this.getInput(name));
     }
@@ -71,14 +69,13 @@ export class FormMonkey {
 
   async getInput(name: string): Promise<IUIInput> {
     const selector = `${this.formSelector} [data-name="${name}"]`;
-    await this.client.waitForVisible(selector);
     const $el = await this.client.$(selector);
-    const id = ($el as any).value.ELEMENT;
-    const type = await this.getAttribute(selector, 'data-type');
-    const title = await this.getAttribute(selector, 'data-title');
-    const loadingAttr = await this.getAttribute(selector, 'data-loading');
+    await $el.waitForDisplayed();
+    const type = await $el.getAttribute('data-type');
+    const title = await $el.getAttribute('data-title');
+    const loadingAttr = await $el.getAttribute('data-loading');
     const loading = loadingAttr === 'true';
-    return { id, name, type, selector, loading, title };
+    return { name, type, selector, loading, title };
   }
 
   /**
@@ -230,13 +227,14 @@ export class FormMonkey {
   }
 
   async setTextValue(selector: string, value: string) {
-    const inputSelector = `${selector} input, ${selector} textarea`;
-    await this.client.clearElement(inputSelector);
-    await this.client.setValue(inputSelector, value);
+    const $input = await this.client.$(`${selector} input, ${selector} textarea`);
+    await $input.clearValue();
+    await $input.setValue(value);
   }
 
   async getTextValue(selector: string): Promise<string> {
-    return await this.client.getValue(`${selector} input`);
+    const $input = await this.client.$(`${selector} input`);
+    return $input.getValue();
   }
 
   async getNumberValue(selector: string): Promise<number> {
@@ -248,8 +246,10 @@ export class FormMonkey {
     valueSetter: string | FNValueSetter,
     useTitleAsValue = false,
   ) {
+    const $input = await this.client.$(selector);
+
     if (typeof valueSetter === 'function') {
-      const inputName = await this.getAttribute(selector, 'data-name');
+      const inputName = await $input.getAttribute('data-name');
       const input = inputName && (await this.getInput(inputName));
       await (valueSetter as FNValueSetter)(this, input);
       // the vue-multiselect's popup-div needs time to be closed
@@ -260,25 +260,28 @@ export class FormMonkey {
 
     const value = valueSetter as string;
     const hasInternalSearch: boolean = JSON.parse(
-      await this.getAttribute(selector, 'data-internal-search'),
+      await $input.getAttribute('data-internal-search'),
     );
 
     const optionSelector = useTitleAsValue
       ? `${selector} .multiselect__element [data-option-title="${value}"]`
       : `${selector} .multiselect__element [data-option-value="${value}"]`;
+    const $options = await this.client.$(optionSelector);
 
     if (hasInternalSearch) {
       // the list input has a static list of options
-      await this.client.click(`${selector} .multiselect`);
-      await this.client.click(optionSelector);
+      const $multiselect = await this.client.$(`${selector} .multiselect`);
+      await $multiselect.click();
+      await $options.click();
     } else {
       // the list input has a dynamic list of options
 
       // type searching text
       await this.setTextValue(selector, value);
       // wait the options list load
-      await this.client.waitForExist(`${selector} .multiselect__element`);
-      await this.client.click(optionSelector);
+      const $multiselectElement = await this.client.$(`${selector} .multiselect__element`);
+      await $multiselectElement.waitForExist();
+      await $options.click();
     }
 
     // the vue-multiselect's popup-div needs time to be closed
@@ -287,18 +290,20 @@ export class FormMonkey {
   }
 
   async setColorValue(selector: string, value: string) {
-    await this.client.click(`${selector} [name="colorpicker-input"]`); // open colorpicker
+    const $colorPicker = await this.client.$(`${selector} [name="colorpicker-input"]`);
+    await $colorPicker.click(); // open colorpicker
     // tslint:disable-next-line:no-parameter-reassignment TODO
     value = value.substr(1); // get rid of # character in value
     const inputSelector = `${selector} .vc-input__input`;
     await sleep(100); // give colorpicker some time to be opened
     await this.setInputValue(inputSelector, value);
-    await this.client.click(`${selector} [name="colorpicker-input"]`); // close colorpicker
+    await $colorPicker.click(); // close colorpicker
     await sleep(100); // give colorpicker some time to be closed
   }
 
   async getColorValue(selector: string) {
-    return await this.client.getValue(`${selector} [name="colorpicker-input"]`);
+    const $colorPicker = await this.client.$(`${selector} [name="colorpicker-input"]`);
+    return $colorPicker.getValue();
   }
 
   async getListValue(selector: string): Promise<string> {
@@ -310,9 +315,10 @@ export class FormMonkey {
   }
 
   async getListSelectedOption(selector: string): Promise<TListOption> {
+    const $el = await this.client.$(selector);
     return {
-      value: await this.getAttribute(selector, 'data-value'),
-      title: await this.getAttribute(selector, 'data-option-title'),
+      value: await $el.getAttribute('data-value'),
+      title: await $el.getAttribute('data-option-title'),
     };
   }
 
@@ -322,12 +328,11 @@ export class FormMonkey {
   async getListOptions(fieldName: string): Promise<TListOption[]> {
     await this.waitForLoading(fieldName);
     const input = await this.getInput(fieldName);
-    const optionsEls = await this.client.$$(`${input.selector} [data-option-value]`);
+    const $optionsEls = await this.client.$$(`${input.selector} [data-option-value]`);
     const values: { value: string; title: string }[] = [];
-    for (const el of optionsEls) {
-      const id = (el as any).ELEMENT;
-      const value = (await this.client.elementIdAttribute(id, 'data-option-value')).value;
-      const title = (await this.client.elementIdAttribute(id, 'data-option-title')).value;
+    for (const $el of $optionsEls) {
+      const value = await $el.getAttribute('data-option-value');
+      const title = await $el.getAttribute('data-option-title');
       values.push({ value, title });
     }
     return values;
@@ -344,54 +349,84 @@ export class FormMonkey {
   }
 
   async setBoolValue(selector: string, value: boolean) {
-    const checkboxSelector = `${selector} input`;
+    const $checkbox = await this.client.$(`${selector} input`);
 
     // click to change the checkbox state
-    await this.client.click(checkboxSelector);
+    await $checkbox.click();
 
     // if the current value is not what we need than click one more time
     if (value !== (await this.getBoolValue(selector))) {
-      await this.client.click(checkboxSelector);
+      await $checkbox.click();
     }
   }
 
   async getBoolValue(selector: string): Promise<boolean> {
-    const checkboxSelector = `${selector} input`;
-    return await this.client.isSelected(checkboxSelector);
+    const $checkbox = await this.client.$(`${selector} input`);
+    return await $checkbox.isSelected();
   }
 
   async setToggleValue(selector: string, value: boolean) {
     // if the current value is not what we need than click one more time
-    const selected = (await this.getAttribute(selector, 'data-value')) === 'true';
+    const $el = await this.client.$(selector);
+    const selected = (await $el.getAttribute('data-value')) === 'true';
 
     if ((selected && !value) || (!selected && value)) {
-      await this.client.click(selector);
+      await $el.click();
     }
   }
 
   async getToggleValue(selector: string): Promise<boolean> {
-    const val = await this.getAttribute(selector, 'data-value');
+    const $el = await this.client.$(selector);
+    const val = await $el.getAttribute('data-value');
     return val === 'true';
   }
 
   async setSliderValue(sliderInputSelector: string, goalValue: number) {
     await sleep(500); // slider has an initialization delay
 
-    const dotSelector = `${sliderInputSelector} .vue-slider-dot-handle`;
+    const $dot = await this.client.$(`${sliderInputSelector} .vue-slider-dot-handle`);
+    const $slider = await this.client.$(`${sliderInputSelector} .vue-slider`);
 
-    let moveOffset = await this.client.getElementSize(
-      `${sliderInputSelector} .vue-slider`,
-      'width',
-    );
+    let moveOffset = await $slider.getSize('width');
+
+    let dotPos = await $dot.getLocation();
+    const sliderPos = await $slider.getLocation();
 
     // reset slider to 0 position
-    await this.client.moveToObject(dotSelector);
-    await this.client.buttonDown(0);
-    await this.client.moveToObject(`${sliderInputSelector} .vue-slider`, 0, 0);
-    await sleep(100); // wait for transitions
-    await this.client.buttonUp(0);
-    await this.client.moveToObject(dotSelector);
-    await this.client.buttonDown();
+    await this.client.performActions([
+      {
+        type: 'pointer',
+        id: 'pointer1',
+        parameters: { pointerType: 'mouse' },
+        actions: [
+          { type: 'pointerMove', duration: 0, x: Math.ceil(dotPos.x), y: Math.ceil(dotPos.y) },
+          { type: 'pointerDown', button: 0 },
+          {
+            type: 'pointerMove',
+            duration: 100,
+            x: Math.ceil(sliderPos.x),
+            y: Math.ceil(sliderPos.y),
+          },
+          { type: 'pointerUp', button: 0 },
+        ],
+      },
+    ]);
+
+    // Get new dot position
+    dotPos = await $dot.getLocation();
+
+    // Start the dragging action
+    await this.client.performActions([
+      {
+        type: 'pointer',
+        id: 'pointer1',
+        parameters: { pointerType: 'mouse' },
+        actions: [
+          { type: 'pointerMove', duration: 0, x: Math.ceil(dotPos.x), y: Math.ceil(dotPos.y) },
+          { type: 'pointerDown', button: 0 },
+        ],
+      },
+    ]);
 
     // use a bisection method to find the correct slider position
     while (true) {
@@ -399,31 +434,48 @@ export class FormMonkey {
 
       if (currentValue === goalValue) {
         // we've found it
-        await this.client.buttonUp(0);
+        await this.client.releaseActions();
         return;
       }
 
-      if (goalValue < currentValue) {
-        await this.client.moveTo(null, -Math.round(moveOffset), 0);
-      } else {
-        await this.client.moveTo(null, Math.round(moveOffset), 0);
-      }
+      let xOffset = Math.round(moveOffset);
+      if (goalValue < currentValue) xOffset *= -1;
+
+      await this.client.performActions([
+        {
+          type: 'pointer',
+          id: 'pointer1',
+          parameters: { pointerType: 'mouse' },
+          actions: [
+            {
+              type: 'pointerMove',
+              duration: 10,
+              origin: 'pointer',
+              x: Math.round(xOffset),
+              y: 0,
+            },
+          ],
+        },
+      ]);
 
       // wait for transitions
       await sleep(100);
 
       moveOffset = moveOffset / 2;
-      if (moveOffset < 0.3) throw new Error('Slider position setup failed');
+      if (moveOffset < 0.3) {
+        await this.client.releaseActions();
+        throw new Error('Slider position setup failed');
+      }
     }
   }
 
   async getSliderValue(sliderInputSelector: string): Promise<number> {
-    // fetch the value from the slider's tooltip
-    return Number(
-      await this.client.getText(
-        `${sliderInputSelector} .vue-slider-tooltip-bottom .vue-slider-tooltip`,
-      ),
+    const $el = await this.client.$(
+      `${sliderInputSelector} .vue-slider-tooltip-bottom .vue-slider-tooltip`,
     );
+
+    // fetch the value from the slider's tooltip
+    return Number(await $el.getText());
   }
 
   async setDateValue(selector: string, date: Date | number) {
@@ -441,43 +493,43 @@ export class FormMonkey {
     // switch to year selection
     await click(this.t, `${selector} .month__year_btn`);
 
+    const $el = await this.client.$(selector);
+
     // select year
-    let els: any[];
-    els = await this.client.$(selector).$$(`span.year=${year}`);
-    this.client.elementIdClick(els[1].ELEMENT);
+    const $year = await $el.$$(`span.year=${year}`);
+    await $year[1].click();
 
     // select month
-    await this.client
-      .$(selector)
-      .$(`span.month=${months[month]}`)
-      .click();
+    const $month = await $el.$(`span.month=${months[month]}`);
+    await $month.click();
 
     // select day
-    await this.client
-      .$(selector)
-      .$(`span.day=${day}`)
-      .click();
+    const $day = await $el.$(`span.day=${day}`);
+    await $day.click();
   }
 
   async setInputValue(selector: string, value: string) {
-    await this.client.waitForVisible(selector);
-    await this.client.click(selector);
+    const $el = await this.client.$(selector);
+
+    await $el.waitForDisplayed();
+    await $el.click();
     await ((this.client.keys(['Control', 'a']) as any) as Promise<any>); // select all
     await ((this.client.keys('Control') as any) as Promise<any>); // release ctrl key
     await ((this.client.keys('Backspace') as any) as Promise<any>); // clear
-    await this.client.click(selector); // click again if it's a list input
+    await $el.click(); // click again if it's a list input
     await ((this.client.keys(value) as any) as Promise<any>); // type text
   }
 
   async setTwitchTagsValue(selector: string, values: string[]) {
     // clear tags
-    const closeSelector = `${selector} .sp-icon-close`;
-    while (await this.client.isExisting(closeSelector)) {
-      await this.client.click(closeSelector);
+    const $el = await this.client.$(selector);
+    const $close = await this.client.$(`${selector} .sp-icon-close`);
+    while (await $close.isExisting()) {
+      await $close.click();
     }
 
     // click to open the popup
-    await this.client.click(selector);
+    await $el.click();
 
     // select values
     const inputSelector = '.v-dropdown-container .sp-search-input';
@@ -488,8 +540,11 @@ export class FormMonkey {
     }
 
     // click away and wait for the control to dismiss
-    await this.client.click('.tags-container .input-label');
-    await this.client.waitForExist('.sp-input-container.sp-open', 500, true);
+    await (await this.client.$('.tags-container .input-label')).click();
+    await (await this.client.$('.sp-input-container.sp-open')).waitForExist({
+      timeout: 500,
+      reverse: true,
+    });
   }
 
   /**
@@ -506,17 +561,6 @@ export class FormMonkey {
     return Promise.all(watchers);
   }
 
-  public async getAttribute(selectorOrElement: string | any, attrName: string) {
-    let element;
-    if (typeof selectorOrElement === 'string') {
-      element = await this.client.$(selectorOrElement);
-    } else {
-      element = selectorOrElement;
-    }
-    const id = element.value.ELEMENT;
-    return (await this.client.elementIdAttribute(id, attrName)).value;
-  }
-
   /**
    * returns selector for the input element by a title
    */
@@ -529,11 +573,10 @@ export class FormMonkey {
    * returns name for the input element by a title
    */
   async getInputNameByTitle(inputTitle: string): Promise<string> {
-    const el = await this.client
-      .$(`label=${inputTitle}`)
-      .$('../..')
-      .$('[data-role="input"]');
-    return await this.getAttribute(el, 'data-name');
+    const $el = await (await (await this.client.$(`label=${inputTitle}`)).$('../..')).$(
+      '[data-role="input"]',
+    );
+    return await $el.getAttribute('data-name');
   }
 
   private log(...args: any[]) {
@@ -553,7 +596,8 @@ export function selectTitle(optionTitle: string): FNValueSetter {
     await form.setInputValue(input.selector, title);
 
     // wait the options list loading
-    await form.client.waitForExist(`${input.selector} .multiselect__element`);
+    const $el = await form.client.$(`${input.selector} .multiselect__element`);
+    await $el.waitForExist();
     await form.waitForLoading(input.name);
 
     // click on the first option
@@ -573,7 +617,8 @@ export function selectGamesByTitles(
   return async (form: FormMonkey, input: IUIInput) => {
     await form.setInputValue(input.selector, games[0].title);
     // wait the options list loading
-    await form.client.waitForExist(`${input.selector} .multiselect__element`);
+    const $el = await form.client.$(`${input.selector} .multiselect__element`);
+    await $el.waitForExist();
     for (const game of games) {
       // click to the option
       await click(

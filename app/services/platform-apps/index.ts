@@ -518,6 +518,10 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     if (!app) return null;
 
     const source = app.manifest.sources.find(source => source.id === appSourceId);
+
+    // The app no longer supports this source type
+    if (!source) return null;
+
     let url = getPageUrl(app, source.file);
 
     if (settings) {

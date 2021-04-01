@@ -29,6 +29,7 @@ const nameMap = () => ({
   facebook_shares: $t('Facebook Shares'),
   facebook_stars: $t('Facebook Stars'),
   facebook_supports: $t('Facebook Supports'),
+  facebook_support_gifters: $t('Facebook Support Gifters'),
 });
 
 const mediaGalleryInputs = {
@@ -55,22 +56,25 @@ export default class TipJar extends WidgetSettings<ITipJarData, TipJarService> {
     'Note: This background color is for preview purposes only. It will not be shown in your stream.',
   );
 
-  // @ts-ignore
-  jarSrc = `https://${this.hostsService.cdn}/static/tip-jar/jars/glass-`;
+  jarSrc = `https://${this!.hostsService.cdn}/static/tip-jar/jars/glass-`;
   inputOptions: { description: string; value: string }[] = [];
-  navItems = [
-    { value: 'manage-jar', label: $t('Manage Jar') },
-    { value: 'font', label: $t('Font Settings') },
-    { value: 'images', label: $t('Images') },
-    { value: 'source', label: $t('Source') },
-  ];
+  get navItems() {
+    return [
+      { value: 'manage-jar', label: $t('Manage Jar') },
+      { value: 'font', label: $t('Font Settings') },
+      { value: 'images', label: $t('Images') },
+      { value: 'source', label: $t('Source') },
+    ];
+  }
 
   titleFromKey(key: string) {
     return nameMap()[key];
   }
 
   get iterableTypes() {
-    return Object.keys(this.wData.settings.types).filter(key => key !== '_id');
+    return Object.keys(this.wData.settings.types).filter(
+      key => key !== '_id' && key !== 'priority',
+    );
   }
 
   get platform() {

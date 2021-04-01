@@ -26,8 +26,7 @@ export default class EditTransform extends TsxComponent<{}> {
   @Inject() windowsService: WindowsService;
   @Inject() private editorCommandsService: EditorCommandsService;
 
-  // @ts-ignore
-  selection = this.selectionService.views.globalSelection;
+  selection = this!.selectionService.views.globalSelection;
 
   // We only care about the attributes of the rectangle not the functionality
   rect = { ...this.selection.getBoundingRect() };

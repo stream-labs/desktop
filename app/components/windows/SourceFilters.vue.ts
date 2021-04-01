@@ -10,7 +10,7 @@ import { EditorCommandsService } from 'services/editor-commands';
 import ModalLayout from 'components/ModalLayout.vue';
 import NavMenu from 'components/shared/NavMenu.vue';
 import NavItem from 'components/shared/NavItem.vue';
-import Display from 'components/shared/Display.vue';
+import { Display } from 'components/shared/ReactComponent';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import GenericForm from 'components/obs/inputs/GenericForm';
 import { Subscription } from 'rxjs';
@@ -40,18 +40,15 @@ export default class SourceFilters extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() private editorCommandsService: EditorCommandsService;
 
-  // @ts-ignore
-  windowOptions = this.windowsService.getChildWindowQueryParams() as {
+  windowOptions = this!.windowsService.getChildWindowQueryParams() as {
     sourceId: string;
     selectedFilterName: string;
   };
   sourceId = this.windowOptions.sourceId;
-  // @ts-ignore
-  filters = this.sourceFiltersService.getFilters(this.sourceId);
+  filters = this!.sourceFiltersService.getFilters(this.sourceId);
   selectedFilterName =
     this.windowOptions.selectedFilterName || (this.filters[0] && this.filters[0].name) || null;
-  // @ts-ignore
-  properties = this.sourceFiltersService.getPropertiesFormData(
+  properties = this!.sourceFiltersService.getPropertiesFormData(
     this.sourceId,
     this.selectedFilterName,
   );

@@ -14,7 +14,7 @@ test('Populates stream settings after go live', async t => {
   await goLive(t);
   await stopStream(t);
   await showSettings(t, 'Stream');
-  await app.client.click('a=Stream to custom ingest');
+  await (await app.client.$('a=Stream to custom ingest')).click();
   const form = new FormMonkey(t);
   t.true(
     await form.includesByTitles({
@@ -32,11 +32,11 @@ test('Populates stream key after go live', async t => {
   await goLive(t);
   await stopStream(t);
   await showSettings(t, 'Stream');
-  await app.client.click('a=Stream to custom ingest');
+  await (await app.client.$('a=Stream to custom ingest')).click();
 
   // Test that we can toggle show stream key, also helps us fetch the value
-  await app.client.click('button=Show');
-  t.false(await app.client.isExisting('input[type=password]'));
+  await (await app.client.$('button=Show')).click();
+  t.false(await (await app.client.$('input[type=password]')).isExisting());
 
   // Check that is a somewhat valid Twitch stream key
   const streamKey = await getFormInput(t, 'Stream key');
@@ -44,6 +44,6 @@ test('Populates stream key after go live', async t => {
   t.true(streamKey.length > 40);
 
   // Test that we can hide back the stream key
-  await app.client.click('button=Hide');
-  t.true(await app.client.isExisting('input[type=password]'));
+  await (await app.client.$('button=Hide')).click();
+  t.true(await (await app.client.$('input[type=password]')).isExisting());
 });

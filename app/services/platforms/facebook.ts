@@ -505,7 +505,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   private async fetchPages(): Promise<IFacebookPage[]> {
     return (
       await this.requestFacebook<{ data: IFacebookPage[] }>(
-        `${this.apiBase}/me/accounts`,
+        `${this.apiBase}/me/accounts?limit=50`,
         this.oauthToken,
       )
     ).data;
