@@ -30,7 +30,6 @@ export default function EditStreamWindow() {
     isLoading,
   } = useGoLiveSettings(undefined, { isUpdateMode: true });
 
-  // TODO: show success
   const shouldShowChecklist = lifecycle === 'runChecklist';
   const shouldShowSettings = !shouldShowChecklist;
   const shouldShowUpdateButton = lifecycle !== 'runChecklist';
@@ -93,7 +92,7 @@ export default function EditStreamWindow() {
           layout="horizontal"
           name="editStreamForm"
         >
-          <Animation transitionName="slideright">
+          <Animation transitionName="fade">
             {/* STEP 1 - FILL OUT THE SETTINGS FORM */}
             {shouldShowSettings && (
               <Scrollable key={'settings'} style={{ maxHeight: '100%' }} snapToWindowEdge>

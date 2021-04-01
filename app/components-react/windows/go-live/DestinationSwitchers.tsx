@@ -18,7 +18,7 @@ import { Tooltip } from 'antd';
 import { alertAsync } from '../../modals';
 
 /**
- * Allows enabling/disabling platforms for the stream
+ * Allows enabling/disabling platforms and custom destinations for the stream
  */
 export function DestinationSwitchers() {
   const {
@@ -32,6 +32,10 @@ export function DestinationSwitchers() {
 
   const enabledPlatformsRef = useRef(enabledPlatforms);
 
+  const emitSwitch = useDebounce(500, () => {
+    switchPlatforms(enabledPlatformsRef.current);
+  });
+
   function isEnabled(platform: TPlatform) {
     return enabledPlatformsRef.current.includes(platform);
   }
@@ -39,7 +43,7 @@ export function DestinationSwitchers() {
   function togglePlatform(platform: TPlatform, enabled: boolean) {
     enabledPlatformsRef.current = enabledPlatformsRef.current.filter(p => p !== platform);
     if (enabled) enabledPlatformsRef.current.push(platform);
-    switchPlatforms(enabledPlatformsRef.current);
+    emitSwitch();
   }
 
   return (
@@ -65,92 +69,6 @@ export function DestinationSwitchers() {
   );
 }
 
-// /**
-//  * Renders a switcher for a custom destination
-//  */
-// function renderCustomDestination(dest: ICustomStreamDestination, ind: number) {
-//   const enabled = dest.enabled;
-//   return (
-//     <div
-//       key={`custom-dest-${ind}`}
-//       className={cx(styles.platformSwitcher, { [styles.platformDisabled]: !enabled })}
-//       onClick={() => p.onCustomDestSwitch && p.onCustomDestSwitch(ind, !enabled)}
-//     >
-//       {/* TOGGLE INPUT */}
-//       <div className={cx(styles.colInput)}>{/*<ToggleInput value={enabled} />*/}</div>
-//
-//       {/* DEST LOGO */}
-//       <div className="logo margin-right--20">
-//         <i className={cx(styles.destinationLogo, 'fa fa-globe')} />
-//       </div>
-//
-//       {/* DESTINATION NAME AND URL */}
-//       <div className={styles.colAccount}>
-//         <span className={styles.platformName}>{dest.name}</span> <br />
-//         {dest.url} <br />
-//       </div>
-//     </div>
-//   );
-// }
-//
-// async function onPlatformClick(platform: TPlatform) {
-//   const enabled = p.platforms[platform].enabled;
-//   await Utils.sleep(300); // wait for the switcher animation
-//   p.onPlatformSwitch(platform, !enabled);
-// }
-//
-// /**
-//  * Renders a single platform switcher
-//  */
-// function renderPlatform(platform: TPlatform) {
-//   const destination = p.platforms[platform];
-//   const enabled = destination.enabled;
-//   const isPrimary = view.isPrimaryPlatform(platform);
-//   const platformService = getPlatformService(platform);
-//   const platformName = platformService.displayName;
-//   const username = UserService.state.auth?.platforms[platform]!.username;
-//   const title = p.title ? $t(p.title, { platformName }) : platformName;
-//   const canDisablePrimary = p.canDisablePrimary;
-//
-//   return (
-//     <div
-//       key={platform}
-//       className={cx(styles.platformSwitcher, { [styles.platformDisabled]: !enabled })}
-//       onClick={() => onPlatformClick(platform)}
-//     >
-//       <div className={cx(styles.colInput)}>
-//         {/*TODO:*/}
-//         {/*{isPrimary && !canDisablePrimary ? (*/}
-//         {/*  <span*/}
-//         {/*    vTooltip={$t(*/}
-//         {/*      'You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destination.',*/}
-//         {/*    )}*/}
-//         {/*  >*/}
-//         {/*    <ToggleInput value={enabled} metadata={{ name: platform }} />*/}
-//         {/*  </span>*/}
-//         {/*) : (*/}
-//         {/*  <ToggleInput value={enabled} metadata={{ name: platform }} />*/}
-//         {/*)}*/}
-//         <SwitchInput value={enabled} name={platform} />
-//       </div>
-//
-//       {/* PLATFORM LOGO */}
-//       <div className="logo margin-right--20">
-//         <PlatformLogo platform={platform} className={styles[`platform-logo-${platform}`]} />
-//       </div>
-//
-//       {/* PLATFORM TITLE AND ACCOUNT */}
-//       <div className={styles.colAccount}>
-//         <span className={styles.platformName}>{title}</span> <br />
-//         {username} <br />
-//       </div>
-//     </div>
-//   );
-// }
-//
-// return render();
-//}
-
 interface IDestinationSwitcherProps {
   destination: TPlatform | ICustomStreamDestination;
   enabled: boolean;
@@ -175,15 +93,17 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
       );
       return;
     }
+    const enable = !p.enabled;
+    p.onChange(enable);
     // always proxy the click to the SwitchInput
     // so it can play a transition animation
-    // switchInputRef.current?.click();
-    // // switch the container class without re-rendering to not stop the animation
-    // if (enabled) {
-    //   containerRef.current?.classList.remove(styles.platformDisabled);
-    // } else {
-    //   containerRef.current?.classList.add(styles.platformDisabled);
-    // }
+    switchInputRef.current?.click();
+    // switch the container class without re-rendering to not stop the animation
+    if (enable) {
+      containerRef.current?.classList.remove(styles.platformDisabled);
+    } else {
+      containerRef.current?.classList.add(styles.platformDisabled);
+    }
   }
 
   const { title, description, Switch, Logo } = (() => {
@@ -205,7 +125,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
             value={p.enabled}
             name={platform}
             disabled={p.isPrimary}
-            debounce={300}
+            uncontrolled
           />
         ),
       };
@@ -221,8 +141,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
             inputRef={switchInputRef}
             value={destination.enabled}
             name={`destination_${destination.name}`}
-            onChange={p.onChange}
-            debounce={300}
+            uncontrolled
           />
         ),
       };

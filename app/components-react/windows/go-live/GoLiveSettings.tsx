@@ -75,29 +75,14 @@ export default function GoLiveSettings() {
       )}
 
       {/*RIGHT COLUMN*/}
-      <Col span={16} style={{ height: '100%' }}>
+      <Col span={shouldShowLeftCol ? 16 : 24} style={{ height: '100%' }}>
         <Spinner visible={isLoading} />
-
-        {/*{shouldShowSettings && (*/}
-        {/*  <div>*/}
-        {/*    /!*PLATFORM SETTINGS*!/*/}
-        {/*    <PlatformSettings />*/}
-        {/*    /!*ADD SOME SPACE IN ADVANCED MODE*!/*/}
-        {/*    {!isAdvancedMode && <div className={styles.spacer} />}*/}
-        {/*    /!*EXTRAS*!/*/}
-        {/*    <Section isSimpleMode={!isAdvancedMode} title={$t('Extras')}>*/}
-        {/*      <TwitterInput />*/}
-        {/*      <OptimizedProfileSwitcher />*/}
-        {/*    </Section>*/}
-        {/*  </div>*/}
-        {/*)}*/}
-
         {shouldShowSettings && (
           <Scrollable style={{ maxHeight: '100%' }} snapToWindowEdge>
             {/*PLATFORM SETTINGS*/}
             <PlatformSettings />
             {/*ADD SOME SPACE IN ADVANCED MODE*/}
-            {!isAdvancedMode && <div className={styles.spacer} />}
+            {isAdvancedMode && <div className={styles.spacer} />}
             {/*EXTRAS*/}
             <Section isSimpleMode={!isAdvancedMode} title={$t('Extras')}>
               <TwitterInput />

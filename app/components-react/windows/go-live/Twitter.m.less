@@ -22,6 +22,17 @@
 
   background: var(--section-alt) !important;
 
+  // add smaller font-size for the switcher input
+  .switcher-row {
+    :global(.ant-form-item-label) > label,
+    :global(.ant-form-item-control-input-content){
+      font-size: 12px;
+    }
+    :global(.ant-form-item) {
+      .margin-bottom(1);
+    }
+  }
+
   .twitter-buttons {
     margin-top: 6px;
     display: inline-flex;
@@ -34,6 +45,7 @@
       margin-left: 10px;
     }
   }
+
 }
 
 .twitter-share-text {

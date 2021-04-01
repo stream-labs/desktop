@@ -151,7 +151,7 @@ function initializeGoLiveSettings(
   const mutations = createMutations(reducers, getState, setState);
 
   const actions = {
-    switchPlatforms: debounce((enabledPlatforms: TPlatform[]) => {
+    switchPlatforms(enabledPlatforms: TPlatform[]) {
       let platformHasBeenEnabled = false;
       let newSettings = getState();
       view.linkedPlatforms.forEach(platform => {
@@ -168,20 +168,28 @@ function initializeGoLiveSettings(
       } else {
         mutations.updateSettings(newSettings);
       }
-    }, 100),
-
-    async goLive() {
-      try {
-        await form.validateFields();
-      } catch (e) {
-        message.error($t('Invalid settings. Please check the form'));
-        return;
-      }
-      StreamingService.actions.goLive(getState());
     },
 
-    updateStream() {
-      StreamingService.actions.return.updateStreamSettings(getState());
+    async validate() {
+      try {
+        await form.validateFields();
+        return true;
+      } catch (e) {
+        message.error($t('Invalid settings. Please check the form'));
+        return false;
+      }
+    },
+
+    async goLive() {
+      if (await actions.validate()) {
+        StreamingService.actions.goLive(getState());
+      }
+    },
+
+    async updateStream() {
+      if (await actions.validate()) {
+        StreamingService.actions.return.updateStreamSettings(getState());
+      }
     },
 
     save(settings: TState) {

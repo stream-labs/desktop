@@ -13,7 +13,7 @@ import { SwitchInput } from '../../shared/inputs';
 import { useGoLiveSettings } from './useGoLiveSettings';
 
 export default function GoLiveWindow() {
-  const { StreamingService, WindowsService, StreamSettingsService } = Services;
+  const { StreamingService, WindowsService } = Services;
   const {
     contextValue,
     Context: GoLiveSettingsContext,
@@ -32,21 +32,11 @@ export default function GoLiveWindow() {
 
   const shouldShowConfirm = ['prepopulate', 'waitForNewSettings'].includes(lifecycle);
   const shouldShowSettings =
-    ['empty', 'prepopulate', 'waitForNewSettings'].includes(lifecycle) && !needPrepopulate;
+    ['empty', 'prepopulate', 'waitForNewSettings'].includes(lifecycle);
   const shouldShowChecklist = ['runChecklist', 'live'].includes(lifecycle);
   const shouldShowAdvancedSwitch = shouldShowConfirm && isMultiplatformMode;
   const shouldShowGoBackButton =
     lifecycle === 'runChecklist' && error && checklist.startVideoTransmission !== 'done';
-
-  // const shouldShowChecklist = true;
-  // const shouldShowSettings = false;
-
-  // // prepopulate data for all platforms
-  // useOnCreate(() => {
-  //   if (['empty', 'waitForNewSettings'].includes(lifecycle)) {
-  //     prepopulate();
-  //   }
-  // });
 
   // clear failed checks and warnings on window close
   useOnDestroy(() => {
@@ -90,29 +80,6 @@ export default function GoLiveWindow() {
     ); // the);
   }
 
-  function render() {
-    return (
-      <GoLiveSettingsContext.Provider value={contextValue}>
-        <ModalLayout footer={renderFooter()}>
-          <Form
-            form={form}
-            style={{ position: 'relative', height: '100%' }}
-            layout="horizontal"
-            name="editStreamForm"
-          >
-            <Animation transitionName="slideright">
-              {/* STEP 1 - FILL OUT THE SETTINGS FORM */}
-              {shouldShowSettings && <GoLiveSettings key={'settings'} />}
-
-              {/* STEP 2 - RUN THE CHECKLIST */}
-              {shouldShowChecklist && <GoLiveChecklist className={styles.page} key={'checklist'} />}
-            </Animation>
-          </Form>
-        </ModalLayout>
-      </GoLiveSettingsContext.Provider>
-    );
-  }
-
   function renderFooter() {
     return (
       <Form layout={'inline'}>
@@ -145,5 +112,24 @@ export default function GoLiveWindow() {
     );
   }
 
-  return render();
+  return (
+    <GoLiveSettingsContext.Provider value={contextValue}>
+      <ModalLayout footer={renderFooter()}>
+        <Form
+          form={form}
+          style={{ position: 'relative', height: '100%' }}
+          layout="horizontal"
+          name="editStreamForm"
+        >
+          <Animation transitionName={shouldShowChecklist ? 'slideright' : ''}>
+            {/* STEP 1 - FILL OUT THE SETTINGS FORM */}
+            {shouldShowSettings && <GoLiveSettings key={'settings'} />}
+
+            {/* STEP 2 - RUN THE CHECKLIST */}
+            {shouldShowChecklist && <GoLiveChecklist className={styles.page} key={'checklist'} />}
+          </Animation>
+        </Form>
+      </ModalLayout>
+    </GoLiveSettingsContext.Provider>
+  );
 }

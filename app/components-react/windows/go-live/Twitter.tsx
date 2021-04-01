@@ -31,7 +31,7 @@ export default function TwitterInput() {
     return (
       <div className={cx('section', css.section)}>
         <p className={css.twitterShareText}>{$t('Share Your Stream')}</p>
-        <Row>
+        <Row className={css.switcherRow}>
           <Col span={14}>
             <SwitchInput
               label={$t('Enable Tweet Sharing')}
