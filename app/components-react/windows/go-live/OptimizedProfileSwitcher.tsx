@@ -13,7 +13,7 @@ export default function OptimizedProfileSwitcher() {
   const enabled = useVuex(() => VideoEncodingOptimizationService.state.useOptimizedProfile);
 
   function setEnabled(enabled: boolean) {
-    VideoEncodingOptimizationService.actions.useOptimizedProfile(enabled);
+    VideoEncodingOptimizationService.actions.return.useOptimizedProfile(enabled);
   }
 
   const [isLoading, setIsLoading] = useState(true);
@@ -25,7 +25,9 @@ export default function OptimizedProfileSwitcher() {
 
   async function loadAvailableProfiles() {
     setIsLoading(true);
-    setSelectedProfile(await VideoEncodingOptimizationService.fetchOptimizedProfile(game));
+    setSelectedProfile(
+      await VideoEncodingOptimizationService.actions.return.fetchOptimizedProfile(game),
+    );
     setIsLoading(false);
   }
 

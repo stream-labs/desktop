@@ -11,7 +11,6 @@ import GoLiveError from './GoLiveError';
 import Spinner from '../../shared/Spinner';
 
 export default function PlatformSettings() {
-  console.log('render platform settings');
   const {
     isMultiplatformMode,
     error,

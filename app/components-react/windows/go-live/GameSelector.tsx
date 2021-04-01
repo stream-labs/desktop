@@ -30,7 +30,7 @@ export default function GameSelector(p: TProps) {
 
   async function loadImageForSelectedGame() {
     if (!selectedGame) return;
-    const game = await TwitchService.fetchGame(selectedGame);
+    const game = await TwitchService.actions.return.fetchGame(selectedGame);
     if (!game || game.name !== selectedGame) return;
     updateState({
       games: s.games.map(opt => (opt.value === selectedGame ? { ...opt, image: game.image } : opt)),
@@ -40,8 +40,8 @@ export default function GameSelector(p: TProps) {
   async function onSearch(searchString: string) {
     if (searchString.length < 2) return;
     const games = (platform === 'twitch'
-      ? await TwitchService.searchGames(searchString)
-      : await FacebookService.searchGames(searchString)
+      ? await TwitchService.actions.return.searchGames(searchString)
+      : await FacebookService.actions.return.searchGames(searchString)
     ).map(g => ({ value: g.name, label: g.name, image: g.image }));
     updateState({ games });
   }

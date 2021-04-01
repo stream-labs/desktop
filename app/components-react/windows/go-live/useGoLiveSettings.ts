@@ -181,11 +181,11 @@ function initializeGoLiveSettings(
     },
 
     updateStream() {
-      StreamingService.actions.updateStreamSettings(getState());
+      StreamingService.actions.return.updateStreamSettings(getState());
     },
 
     save(settings: TState) {
-      StreamSettingsService.setGoLiveSettings(settings);
+      StreamSettingsService.actions.return.setGoLiveSettings(settings);
     },
 
     reload() {

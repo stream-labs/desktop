@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, MouseEvent } from 'react';
 import { getPlatformService, TPlatform } from '../../../services/platforms';
 import cx from 'classnames';
 import { $t } from '../../../services/i18n';
@@ -15,37 +15,19 @@ import pick from 'lodash/pick';
 import { useGoLiveSettings } from './useGoLiveSettings';
 import { mapValues, values } from 'lodash';
 import { Tooltip } from 'antd';
-
-type TPlatforms = Record<TPlatform, { enabled: boolean }>;
-
-interface IProps {
-  title?: string;
-  platforms: TPlatforms;
-  customDestinations?: ICustomStreamDestination[];
-
-  /**
-   * allow to disable the primary platform
-   * we can disable primary platform in the ScheduleStream window
-   */
-  canDisablePrimary: boolean;
-  // onPlatformSwitch: (platform: TPlatform, enabled: boolean) => unknown;
-  // onCustomDestSwitch?: (destInd: number, enabled: boolean) => unknown;
-
-  onChange: (enabledPlatforms: TPlatform[], enabledCustomDestinations?: number[]) => unknown;
-}
+import { alertAsync } from '../../modals';
 
 /**
  * Allows enabling/disabling platforms for the stream
  */
-export function DestinationSwitchers(p: IProps) {
-  // const view = Services.StreamingService.views;
-
+export function DestinationSwitchers() {
   const {
     linkedPlatforms,
     enabledPlatforms,
     customDestinations,
     switchPlatforms,
     switchCustomDestination,
+    checkPrimaryPlatform,
   } = useGoLiveSettings();
 
   const enabledPlatformsRef = useRef(enabledPlatforms);
@@ -60,10 +42,6 @@ export function DestinationSwitchers(p: IProps) {
     switchPlatforms(enabledPlatformsRef.current);
   }
 
-  function canDisable(platform: TPlatform) {
-    return p.canDisablePrimary
-  }
-
   return (
     <div>
       {linkedPlatforms.map(platform => (
@@ -72,6 +50,7 @@ export function DestinationSwitchers(p: IProps) {
           destination={platform}
           enabled={isEnabled(platform)}
           onChange={enabled => togglePlatform(platform, enabled)}
+          isPrimary={checkPrimaryPlatform(platform)}
         />
       ))}
       {customDestinations?.map((dest, ind) => (
@@ -176,6 +155,7 @@ interface IDestinationSwitcherProps {
   destination: TPlatform | ICustomStreamDestination;
   enabled: boolean;
   onChange: (enabled: boolean) => unknown;
+  isPrimary?: boolean;
 }
 
 /**
@@ -186,7 +166,15 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
 
-  function onClickHandler(enabled: boolean) {
+  function onClickHandler(ev: MouseEvent) {
+    if (p.isPrimary) {
+      alertAsync(
+        $t(
+          'You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destination.',
+        ),
+      );
+      return;
+    }
     // always proxy the click to the SwitchInput
     // so it can play a transition animation
     // switchInputRef.current?.click();
@@ -216,7 +204,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
             inputRef={switchInputRef}
             value={p.enabled}
             name={platform}
-            onChange={p.onChange}
+            disabled={p.isPrimary}
             debounce={300}
           />
         ),
@@ -245,16 +233,10 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
     <div
       ref={containerRef}
       className={cx(styles.platformSwitcher, { [styles.platformDisabled]: !p.enabled })}
-      onClick={() => onClickHandler(!p.enabled)}
+      onClick={onClickHandler}
     >
       <div className={cx(styles.colInput)}>
-        TODO:
-        {isPrimary && !canDisablePrimary ? (
-
-          <Tooltip> <Switch/></Tooltip>
-        ) : (
-          <Switch/>
-        )}
+        <Switch />
       </div>
 
       {/* PLATFORM LOGO */}

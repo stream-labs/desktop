@@ -32,13 +32,13 @@ export function confirm(
 }
 
 /**
- * The asynchronous version of Windows.alert
+ * The asynchronous alternative for Windows.alert
  * Uses Modal.info under the hood
  * @example
  * alert('This is Alert').then(() => console.log('Alert closed'))
  *
  */
-export function alert(p: Omit<ModalFuncProps, 'afterClose'> | string): Promise<void> {
+export function alertAsync(p: Omit<ModalFuncProps, 'afterClose'> | string): Promise<void> {
   const modalProps = typeof p === 'string' ? { title: p } : p;
   const { WindowsService } = Services;
   WindowsService.updateStyleBlockers(Utils.getWindowId(), true);

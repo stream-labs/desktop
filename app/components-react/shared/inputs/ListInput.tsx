@@ -62,7 +62,7 @@ export const ListInput = InputComponent(<T extends any>(p: TListInputProps<T>) =
           value={inputAttrs.value as string}
           optionFilterProp="label"
           optionLabelProp="labelrender"
-          onSearch={onSearchHandlerDebounced}
+          onSearch={p.showSearch ? onSearchHandlerDebounced : undefined}
           onSelect={val => p.onChange && p.onChange(val as T)}
         >
           {options && options.map((opt, ind) => renderOption(opt, ind, p))}

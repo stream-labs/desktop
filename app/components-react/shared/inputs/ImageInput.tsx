@@ -5,7 +5,7 @@ import { InputComponent, TSlobsInputProps, useInput } from './inputs';
 import InputWrapper from './InputWrapper';
 import { assertIsDefined } from '../../../util/properties-type-guards';
 import { $t } from '../../../services/i18n';
-import { alert } from '../../modals';
+import { alertAsync } from '../../modals';
 import Utils from '../../../services/utils';
 
 export type TImageInputProps = TSlobsInputProps<{ maxFileSize: number, onRemoveHandler?: Function }, string, UploadProps>;
@@ -70,7 +70,7 @@ export const ImageInput = InputComponent((p: TImageInputProps) => {
       error = $t('Maximum file size reached ') + Utils.getReadableFileSizeString(p.maxFileSize);
     }
     if (error) {
-      alert(error);
+      alertAsync(error);
       // a hack for removing this file from the list
       // @see https://ant.design/components/upload/#components-upload-demo-upload-png-only
       return Upload.LIST_IGNORE as boolean;

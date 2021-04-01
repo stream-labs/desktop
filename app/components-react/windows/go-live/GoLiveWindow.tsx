@@ -92,28 +92,24 @@ export default function GoLiveWindow() {
 
   function render() {
     return (
-      <Profiler id="GoLiveWindow" onRender={onRender}>
-        <GoLiveSettingsContext.Provider value={contextValue}>
-          <ModalLayout footer={renderFooter()}>
-            <Form
-              form={form}
-              style={{ position: 'relative', height: '100%' }}
-              layout="horizontal"
-              name="editStreamForm"
-            >
-              <Animation transitionName="slideright">
-                {/* STEP 1 - FILL OUT THE SETTINGS FORM */}
-                {shouldShowSettings && <GoLiveSettings key={'settings'} />}
+      <GoLiveSettingsContext.Provider value={contextValue}>
+        <ModalLayout footer={renderFooter()}>
+          <Form
+            form={form}
+            style={{ position: 'relative', height: '100%' }}
+            layout="horizontal"
+            name="editStreamForm"
+          >
+            <Animation transitionName="slideright">
+              {/* STEP 1 - FILL OUT THE SETTINGS FORM */}
+              {shouldShowSettings && <GoLiveSettings key={'settings'} />}
 
-                {/* STEP 2 - RUN THE CHECKLIST */}
-                {shouldShowChecklist && (
-                  <GoLiveChecklist className={styles.page} key={'checklist'} />
-                )}
-              </Animation>
-            </Form>
-          </ModalLayout>
-        </GoLiveSettingsContext.Provider>
-      </Profiler>
+              {/* STEP 2 - RUN THE CHECKLIST */}
+              {shouldShowChecklist && <GoLiveChecklist className={styles.page} key={'checklist'} />}
+            </Animation>
+          </Form>
+        </ModalLayout>
+      </GoLiveSettingsContext.Provider>
     );
   }
 
