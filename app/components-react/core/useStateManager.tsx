@@ -303,8 +303,6 @@ function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
   const components: Record<TComponentId, TSubscription> = {};
   const vuexStore = StatefulService.store;
   let watchedComponentsIds: string[] = [];
-  // TODO: remove
-  let vuexGetterRevision = 0;
   let stateRevision = 0;
   let isWatching = false;
   let unsubscribeVuex: Function | null = null;
@@ -369,7 +367,6 @@ function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
   }
 
   function createVuexGetter() {
-    vuexGetterRevision++;
     watchedComponentsIds = getComponents().map(comp => comp.componentId);
     return () => {
       // create one cb for all subscribed components
@@ -379,7 +376,6 @@ function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
         return mapKeys(componentState, (value, key) => getPrefixedField(comp.componentId, key));
       });
       prefixedStates.forEach(state => Object.assign(mixedState, state));
-      mixedState.vuexGetterRevision = vuexGetterRevision;
       return mixedState;
     };
   }
@@ -655,6 +651,26 @@ function pick<T extends Object>(obj: T, ...props: Array<string>): Partial<T> {
 
 // LOGGER UTILS
 
+function useLogLifecycle(componentId: string) {
+  const updateCounterRef = useRef<number>(1);
+
+  // log lifecycle if in the debug mode
+  if (DEBUG) {
+    if (updateCounterRef.current === 1) {
+      log('Create component', componentId);
+    } else {
+      log('Update component', componentId);
+    }
+    updateCounterRef.current++;
+  }
+  useEffect(() => {
+    log('Effects applied to component', componentId);
+  });
+  useEffect(() => {
+    return () => log('Destroy component', componentId);
+  }, []);
+}
+
 function logChange(
   prevState: any,
   newState: any,
@@ -686,26 +702,6 @@ function getDiff(prevState: any, newState: any) {
     key => (diff[key] = { prevState: prevState[key], newState: newState[key] }),
   );
   return diff;
-}
-
-function useLogLifecycle(componentId: string) {
-  const updateCounterRef = useRef<number>(1);
-
-  // log lifecycle if in the debug mode
-  if (DEBUG) {
-    if (updateCounterRef.current === 1) {
-      log('Create component', componentId);
-    } else {
-      log('Update component', componentId);
-    }
-    updateCounterRef.current++;
-  }
-  useEffect(() => {
-    log('Effects applied to component', componentId);
-  });
-  useEffect(() => {
-    return () => log('Destroy component', componentId);
-  }, []);
 }
 
 let logResetTimeout = 0;
