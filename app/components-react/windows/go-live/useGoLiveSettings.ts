@@ -14,6 +14,30 @@ type TCustomFieldName = 'title' | 'description';
 type TModificators = { isUpdateMode?: boolean; isScheduleMode?: boolean };
 type IGoLiveSettingsState = IGoLiveSettings & TModificators & { needPrepopulate: boolean };
 
+
+/**
+ * Shared state and utils for for GoLiveWindow and EditStreamWindow
+ */
+export function useGoLiveSettings<
+  TComputedProps extends object,
+  TComputedPropsCb extends (settings: StreamInfoView & TModificators) => TComputedProps
+>(computedPropsCb?: TComputedPropsCb, modificators: TModificators = {} as TModificators) {
+  const form = useForm();
+  const { dependencyWatcher, isRoot, contextView } = useStateManager(
+    () => getInitialStreamSettings(modificators),
+    (getState, setState) => initializeGoLiveSettings(getState, setState, form),
+    computedPropsCb as TComputedPropsCb,
+  );
+
+  useEffect(() => {
+    if (isRoot && contextView.needPrepopulate) {
+      contextView.prepopulate();
+    }
+  }, []);
+
+  return dependencyWatcher;
+}
+
 function getInitialStreamSettings(modificators: TModificators): IGoLiveSettingsState {
   const { StreamingService, TwitterService } = Services;
   modificators = { isUpdateMode: false, isScheduleMode: false, ...modificators };
@@ -33,33 +57,6 @@ function getInitialStreamSettings(modificators: TModificators): IGoLiveSettingsS
     });
   }
   return settings;
-}
-
-export function useGoLiveSettings<
-  TComputedProps extends object,
-  TComputedPropsCb extends (settings: StreamInfoView & TModificators) => TComputedProps
->(computedPropsCb?: TComputedPropsCb, modificators: TModificators = {} as TModificators) {
-  const form = useForm();
-  const { dependencyWatcher, isRoot, contextView } = useStateManager(
-    () => getInitialStreamSettings(modificators),
-    (getState, setState) => initializeGoLiveSettings(getState, setState, form),
-    computedPropsCb as TComputedPropsCb,
-  );
-
-  useEffect(() => {
-    if (isRoot && contextView.needPrepopulate) {
-      contextView.prepopulate();
-    }
-  }, []);
-
-  return dependencyWatcher;
-
-  // result.contextView
-  // result.computedProps
-  // result.computedView
-  // result.componentView
-  // result.initializerReturnType
-  // return result.dependencyWatcher;
 }
 
 function initializeGoLiveSettings(
@@ -212,14 +209,7 @@ function initializeGoLiveSettings(
   };
 
   const view = new StreamInfoView(StreamingService.state, getState);
-
-  // return {
-  //   ...mutations,
-  //   ...actions,
-  // }
-
   const mergedActionsAndGetters = merge(getters, { ...mutations, ...actions });
-
   return merge(view.exposeProps(), mergedActionsAndGetters);
 }
 

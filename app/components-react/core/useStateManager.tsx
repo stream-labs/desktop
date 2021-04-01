@@ -3,21 +3,13 @@ import { StatefulService } from '../../services';
 import { cloneDeep, isPlainObject, mapKeys } from 'lodash';
 import { keys } from '../../services/utils';
 import { useForceUpdate, useOnCreate, useOnDestroy } from '../hooks';
-
-type TStateManagerContext<TContextView extends object> = {
-  contextView: TContextView;
-  Context: typeof GenericStateManagerContext;
-  dispatcher: TDispatcher<unknown, unknown>;
-  stateWatcher: ReturnType<typeof createStateWatcher>;
-};
-
 const GenericStateManagerContext = React.createContext(null);
-let nextComponentId = 1;
 
 const DEBUG = true;
 
 /**
- * Manages the state in React.Context
+ * Flux-like state manager for React.Context
+ * Helps to track local and global (vuex) state and re-render components in optimized way
  * Use it when you have a complex state with computed fields that depends on Vuex
  */
 export function useStateManager<
@@ -49,7 +41,7 @@ export function useStateManager<
   // initialize React.Context or create a new one if not exist
   const context = useContext(GenericStateManagerContext) as React.Context<
     TStateManagerContext<TContextView>
-    > | null;
+  > | null;
 
   const { contextValue, isRoot } = useOnCreate(() => {
     // the context already exists, use it
@@ -83,14 +75,8 @@ export function useStateManager<
   // we keep state is refs so we need to manually update components when it's changed
   const forceUpdate = useForceUpdate();
 
-
   // handle component creation
-  const {
-    dependencyWatcher,
-    onChange,
-    vuexSelector,
-    componentView,
-  } = useOnCreate(() => {
+  const { dependencyWatcher, onChange, vuexSelector, componentView } = useOnCreate(() => {
     const { contextView } = contextValue;
 
     // computed props are unique for each component
@@ -126,7 +112,7 @@ export function useStateManager<
           forceUpdate();
         }
 
-      // handle local state changes inside React.Context
+        // handle local state changes inside React.Context
       } else if (localStateRevision) {
         calculateComputedProps();
         const prevState = prevComponentState.current;
@@ -164,7 +150,7 @@ export function useStateManager<
       onChange,
       dependencyWatcher,
       calculateComputedProps,
-      vuexSelector
+      vuexSelector,
     };
   });
 
@@ -182,17 +168,14 @@ export function useStateManager<
     () => isDestroyedRef.current,
   );
   useEffect(() => {
-    prevComponentState.current = pick(
-      componentView,
-      ...dependencyWatcher.getDependentFields()
-    );
+    prevComponentState.current = pick(componentView, ...dependencyWatcher.getDependentFields());
     stateWatcher.startWatching(componentId);
   });
 
   useOnDestroy(() => {
     isDestroyedRef.current = true;
     stateWatcher.unregisterComponent(componentId);
-  })
+  });
 
   return {
     dependencyWatcher: dependencyWatcher.watcherProxy as TComponentView,
@@ -202,17 +185,27 @@ export function useStateManager<
   };
 }
 
-function createContext<TState, TActions extends Object, TContextView extends TMerge<TState, TActions>>(
-  initState: TState | (() => TState),
-  actionsCreator: (getState: () => TState, setState: (newState: TState) => unknown ) => TActions)
-{
+type TStateManagerContext<TContextView extends object> = {
+  contextView: TContextView;
+  Context: typeof GenericStateManagerContext;
+  dispatcher: TDispatcher<unknown, unknown>;
+  stateWatcher: ReturnType<typeof createStateWatcher>;
+};
 
+function createContext<
+  TState,
+  TActions extends Object,
+  TContextView extends TMerge<TState, TActions>
+>(
+  initState: TState | (() => TState),
+  actionsCreator: (getState: () => TState, setState: (newState: TState) => unknown) => TActions,
+) {
   // create initial state
   const state: TState =
     typeof initState === 'function' ? (initState as Function)() : cloneDeep(initState);
 
   // create a local state and dispatcher
-  const dispatcher = createDispatcher(state, actionsCreator)
+  const dispatcher = createDispatcher(state, actionsCreator);
 
   // create StateWatcher to observe changes from the local state and vuex
   // and update dependent components
@@ -224,20 +217,19 @@ function createContext<TState, TActions extends Object, TContextView extends TMe
   // new React.Context is ready
   return {
     contextView,
-    Context: GenericStateManagerContext as React.Context<TStateManagerContext<
-      TContextView
-      > | null>,
+    Context: GenericStateManagerContext as React.Context<TStateManagerContext<TContextView> | null>,
     dispatcher,
     stateWatcher,
   } as TStateManagerContext<TContextView>;
 }
 
+let nextComponentId = 1;
+
 /**
- * Returns unique component
+ * Returns an unique component id
  * If DEBUG=true then the componentId includes a component name
  */
 function useComponentId() {
-
   /**
    * Get component name from the callstack
    * Use for debugging only
@@ -255,7 +247,7 @@ function useComponentId() {
   }
 
   return useOnCreate(() => {
-    return DEBUG ? `${nextComponentId++}_${getComponentName()}` : `${nextComponentId++}`
+    return DEBUG ? `${nextComponentId++}_${getComponentName()}` : `${nextComponentId++}`;
   });
 }
 
@@ -291,10 +283,12 @@ function createDependencyWatcher<T extends object>(watchedObject: T) {
   return { watcherProxy, getDependentFields };
 }
 
-function createStateWatcher(
-  dispatcher: TDispatcher<unknown, unknown>,
-  debug = false
-) {
+/**
+ * State watcher detects changes from Vuex store and local context state
+ * And trigger components to re-render
+ * @param dispatcher local state dispatcher
+ */
+function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
   type TComponentId = string;
   type TSubscription = {
     componentId: TComponentId;
@@ -302,11 +296,11 @@ function createStateWatcher(
     checkIsDestroyed(): boolean;
     getGlobalStateRevision(): number;
     getLocalStateRevision(): number;
-    isReady: boolean,
+    isReady: boolean;
     selector: Function;
     onChange: (change: TStateChange) => unknown;
   };
-  const components: Record<TComponentId, TSubscription> = {}
+  const components: Record<TComponentId, TSubscription> = {};
   const vuexStore = StatefulService.store;
   let watchedComponentsIds: string[] = [];
   // TODO: remove
@@ -320,7 +314,7 @@ function createStateWatcher(
     getComponents().forEach(component => {
       if (component.checkIsDestroyed()) return;
       if (component.getLocalStateRevision() >= revision) return;
-      component.onChange({localStateRevision: revision});
+      component.onChange({ localStateRevision: revision });
     });
   });
 
@@ -334,11 +328,20 @@ function createStateWatcher(
     onChange: (change: TStateChange) => unknown,
     getGlobalStateRevision: () => number,
     getLocalStateRevision: () => number,
-    checkIsDestroyed: () => boolean
+    checkIsDestroyed: () => boolean,
   ) {
     if (!checkIsRegistered(componentId)) {
       const sequence = Number(componentId.split('_')[0]);
-      components[componentId] = { componentId, sequence, selector, onChange, getGlobalStateRevision, getLocalStateRevision, checkIsDestroyed, isReady: false };
+      components[componentId] = {
+        componentId,
+        sequence,
+        selector,
+        onChange,
+        getGlobalStateRevision,
+        getLocalStateRevision,
+        checkIsDestroyed,
+        isReady: false,
+      };
     } else {
       components[componentId].isReady = false;
     }
@@ -373,44 +376,40 @@ function createStateWatcher(
       const mixedState: Record<string, any> = {};
       const prefixedStates = getComponents().map(comp => {
         const componentState = comp.selector();
-        return mapKeys(componentState, (value, key) => getPrefixedField(comp.componentId, key))
+        return mapKeys(componentState, (value, key) => getPrefixedField(comp.componentId, key));
       });
       prefixedStates.forEach(state => Object.assign(mixedState, state));
       mixedState.vuexGetterRevision = vuexGetterRevision;
       return mixedState;
-    }
+    };
   }
 
   function watchVuex(vuexGetter: () => Object) {
-    unsubscribeVuex = vuexStore.watch(
-      vuexGetter,
-      (newState, prevState) => {
-        stateRevision++;
-        if (DEBUG) logMutation(stateRevision, prevState, newState, true);
-        // walk through newState and generate a `changes` object with newState and prevState
-        // for each component
-        const changes: Record<TComponentId, { newState: object; prevState: object }> = {};
-        Object.keys(newState).forEach(prefixedField => {
-          const newVal = newState[prefixedField];
-          const prevVal = prevState[prefixedField];
-          const [componentId, fieldName] = getUnprefixed(prefixedField);
-          const componentPrevState = changes[componentId]?.prevState || {};
-          const componentNewState = changes[componentId]?.newState || {};
-          componentPrevState[fieldName] = prevVal;
-          componentNewState[fieldName] = newVal;
-          changes[componentId] = { newState: componentNewState, prevState: componentPrevState };
-        });
+    unsubscribeVuex = vuexStore.watch(vuexGetter, (newState, prevState) => {
+      stateRevision++;
+      if (DEBUG) logMutation(stateRevision, prevState, newState, true);
+      // walk through newState and generate a `changes` object with newState and prevState
+      // for each component
+      const changes: Record<TComponentId, { newState: object; prevState: object }> = {};
+      Object.keys(newState).forEach(prefixedField => {
+        const newVal = newState[prefixedField];
+        const prevVal = prevState[prefixedField];
+        const [componentId, fieldName] = getUnprefixed(prefixedField);
+        const componentPrevState = changes[componentId]?.prevState || {};
+        const componentNewState = changes[componentId]?.newState || {};
+        componentPrevState[fieldName] = prevVal;
+        componentNewState[fieldName] = newVal;
+        changes[componentId] = { newState: componentNewState, prevState: componentPrevState };
+      });
 
-
-        const currentRevision = stateRevision;
-        getComponents().forEach(component => {
-          if (component.checkIsDestroyed()) return;
-          if (component.getGlobalStateRevision() >= currentRevision) return;
-          const { newState, prevState } = changes[component.componentId];
-          component.onChange({ newState, prevState, globalStateRevision: currentRevision });
-        });
-      },
-    );
+      const currentRevision = stateRevision;
+      getComponents().forEach(component => {
+        if (component.checkIsDestroyed()) return;
+        if (component.getGlobalStateRevision() >= currentRevision) return;
+        const { newState, prevState } = changes[component.componentId];
+        component.onChange({ newState, prevState, globalStateRevision: currentRevision });
+      });
+    });
     isWatching = true;
     log('subscribed to vuex');
   }
@@ -421,7 +420,6 @@ function createStateWatcher(
     watchedComponentsIds = [];
     isWatching = false;
   }
-
 
   function getPrefixedField(componentId: string, fieldName: string) {
     return `${componentId}__${fieldName}`;
@@ -463,9 +461,8 @@ type TStateChange = {
  */
 function createDispatcher<TState, TActions extends Object>(
   initialState: TState,
-  actionCreators: (getState: () => TState, setState: (newState: TState) => unknown ) => TActions,
+  actionCreators: (getState: () => TState, setState: (newState: TState) => unknown) => TActions,
 ): TDispatcher<TState, TActions> {
-
   // the local state revision number, this number will be increased after each state mutation
   let localStateRevision = 0;
   function getRevision() {
@@ -492,11 +489,11 @@ function createDispatcher<TState, TActions extends Object>(
     timeoutId = setTimeout(() => {
       onChangeHandler && onChangeHandler(getState(), getRevision());
       timeoutId = 0;
-    })
+    });
   }
 
   // allow to subscribe on state changes
-  let onChangeHandler: (newState: TState, revision: number) => unknown | null
+  let onChangeHandler: (newState: TState, revision: number) => unknown | null;
   function subscribe(cb: (newState: TState, revision: number) => unknown) {
     onChangeHandler = cb;
   }
@@ -505,166 +502,21 @@ function createDispatcher<TState, TActions extends Object>(
   return { getState, subscribe, actions, getRevision };
 }
 type TDispatcher<TState, TActions> = {
-  getState: () => TState,
-  actions: TActions,
-  subscribe: (cb: (newState: TState, revision: number) => unknown) => unknown
+  getState: () => TState;
+  actions: TActions;
+  subscribe: (cb: (newState: TState, revision: number) => unknown) => unknown;
   getRevision: () => number;
-}
+};
 
-
-// consider isSimilar as isDeepEqual with depth 2
-// depth 2 should be enough for the most cases
-function isSimilar(obj1: any, obj2: any) {
-  return isDeepEqual(obj1, obj2, 0, 2);
-}
-
-function isDeepEqual(obj1: any, obj2: any, currentDepth: number, maxDepth: number) {
-  if (obj1 === obj2) return true;
-  if (currentDepth === maxDepth) return false;
-  if (Array.isArray(obj1) && Array.isArray(obj2)) return isArrayEqual(obj1, obj2);
-  if (isPlainObject(obj1) && isPlainObject(obj2)) {
-    const [keys1, keys2] = [Object.keys(obj1), Object.keys(obj2)];
-    if (keys1.length !== keys2.length) return false;
-    for (const key of keys1) {
-      if (!isDeepEqual(obj1[key], obj2[key], currentDepth + 1, maxDepth)) return false;
-    }
-    return true;
-  }
-  return false;
-}
-
-function isArrayEqual(a: any[], b: any[]) {
-  if (a === b) return true;
-  if (a.length !== b.length) return false;
-  for (let i = 0; i < a.length; i++) {
-    if (a[i] !== b[i]) return false;
-  }
-  return true;
-}
-
-function pick<T extends Object>(obj: T, ...props: Array<string>): Partial<T> {
-  const result: any = {};
-  props.forEach(prop => {
-    const propName = prop as string;
-    if (obj.hasOwnProperty(propName)) result[propName] = obj[propName];
-  });
-  return result as Partial<T>;
-}
-
-function getDiff(prevState: any, newState: any) {
-  const changedFields = Object.keys(newState).filter(key => !isSimilar(newState[key], prevState[key]));
-  const diff = {};
-  changedFields.forEach(key => diff[key] = ({ prevState: prevState[key], newState: newState[key] }));
-  return diff;
-}
-
-function logChange(prevState: any, newState: any, componentId: string, isGlobalState: boolean, revision: number) {
-  const mutationType = isGlobalState ? 'global' : 'local';
-  const diff = getDiff(prevState, newState);
-  const triggeredByMsg = `Triggered by ${mutationType} mutation #${revision}`;
-  log('Should update component', componentId, triggeredByMsg, '. Diff:', diff);
-}
-
-function logMutation(revision: number, prevState: any, newState: any, isGlobal: boolean) {
-  const mutationType = isGlobal ? 'GLOBAL' : 'LOCAL';
-  const diff = prevState ? getDiff(prevState, newState) : 'unavailable';
-  const diffMessage = Object.keys(diff).length ? diff : 'no changes detected with shallow comparison';
-  log(`${mutationType} MUTATION #${revision}. Diff:`, diffMessage);
-}
-
-function useLogLifecycle(componentId: string) {
-  const updateCounterRef = useRef<number>(1);
-
-  // log lifecycle if in the debug mode
-  if (DEBUG) {
-    if (updateCounterRef.current === 1) {
-      log('Create component', componentId);
-    } else {
-      log('Update component', componentId);
-    }
-    updateCounterRef.current++;
-  }
-  useEffect(() => {
-    log('Effects applied to component', componentId);
-  });
-  useEffect(() => {
-    return () => log('Destroy component', componentId);
-  }, []);
-}
-
-let logResetTimeout = 0;
-let lastLogTime = 0;
-let taskStartTime = 0;
-function log(msg: string, ...args: any) {
-  if (!DEBUG) return;
-  const now = Date.now();
-  if (!lastLogTime) taskStartTime = now;
-  const ms = lastLogTime ? now - lastLogTime : 0;
-
-  // select console.log color based on elapsed time
-  let msColor = 'green';
-  if (ms >= 200) {
-    msColor = 'red';
-  } else if (ms >= 100) {
-    msColor = 'orange';
-  } else if (ms >= 50) {
-    msColor = 'yellow';
-  }
-
-  lastLogTime = now;
-  console.log('%c%s', `color: ${msColor}`, `+${ms}ms`, `${msg}`, ...args);
-  if (!logResetTimeout) logResetTimeout = setTimeout(() => {
-    const taskTime = Date.now() - taskStartTime;
-    logResetTimeout = 0;
-    lastLogTime = 0;
-    taskStartTime = 0;
-    console.log('%c%s', `color: teal`, `end task for ${taskTime}ms`);
-  })
-}
-
-export type TMerge<
-  T1,
-  T2,
-  TObj1 = T1 extends (...args: any[]) => infer R1 ? R1 : T1,
-  TObj2 = T2 extends (...args: any[]) => infer R2 ? R2 : T2,
-  R extends object = Omit<TObj1, keyof TObj2> & TObj2
-> = R;
-
-type TMerge3<T1, T2, T3> = TMerge<TMerge<T1, T2>, T3>;
-
-type TConvertMutationToAction<TState, TMutation> = TMutation extends (
-  state: TState,
-  ...args: infer TArgs
-) => TState
-  ? (...args: TArgs) => TState
-  : never;
-
-export type TReducer<TState> = (state: TState, ...args: any[]) => TState;
-
-export type TReducers<TState, TKey extends keyof any> = Record<TKey, TReducer<TState>>;
-
-export function createMutations<
-  TState,
-  TReducersSet extends Record<string, TReducer<TState>>,
-  TMutationName extends keyof TReducersSet
->(
-  reducers: TReducersSet,
-  getState: () => TState,
-  setState: (newState: TState) => any,
-): { [K in TMutationName]: TConvertMutationToAction<TState, TReducersSet[K]> } {
-  const mutations = {} as any;
-  keys(reducers).forEach(key => {
-    mutations[key] = (...args: any[]) => setState(reducers[key](getState(), ...args));
-  });
-  return mutations;
-}
-
+/**
+ * Merge 2 object without reading their props
+ */
 export function merge<TObj1 extends object, TObj2 extends object>(
   obj1: TObj1,
   obj2: TObj2,
 ): TMerge<TObj1, TObj2> {
-  const obj1MergedObjects = getMergedObjects(obj1)
-  const obj2MergedObjects = getMergedObjects(obj2)
+  const obj1MergedObjects = getMergedObjects(obj1);
+  const obj2MergedObjects = getMergedObjects(obj2);
   const mergedObjects = [...obj1MergedObjects, ...obj2MergedObjects];
   const metadata = {
     _proxyName: 'MergeResult',
@@ -713,4 +565,180 @@ export function merge<TObj1 extends object, TObj2 extends object>(
       return true;
     },
   }) as unknown) as TMerge<TObj1, TObj2>;
+}
+
+export type TMerge<
+  T1,
+  T2,
+  TObj1 = T1 extends (...args: any[]) => infer R1 ? R1 : T1,
+  TObj2 = T2 extends (...args: any[]) => infer R2 ? R2 : T2,
+  R extends object = Omit<TObj1, keyof TObj2> & TObj2
+> = R;
+
+/**
+ * Create mutations from reducers
+ */
+export function createMutations<
+  TState,
+  TReducersSet extends Record<string, TReducer<TState>>,
+  TMutationName extends keyof TReducersSet
+>(
+  reducers: TReducersSet,
+  getState: () => TState,
+  setState: (newState: TState) => any,
+): { [K in TMutationName]: TConvertMutationToAction<TState, TReducersSet[K]> } {
+  const mutations = {} as any;
+  keys(reducers).forEach(key => {
+    mutations[key] = (...args: any[]) => setState(reducers[key](getState(), ...args));
+  });
+  return mutations;
+}
+
+type TConvertMutationToAction<TState, TMutation> = TMutation extends (
+  state: TState,
+  ...args: infer TArgs
+) => TState
+  ? (...args: TArgs) => TState
+  : never;
+
+export type TReducer<TState> = (state: TState, ...args: any[]) => TState;
+
+/**
+ * consider isSimilar as isDeepEqual with depth 2
+ */
+function isSimilar(obj1: any, obj2: any) {
+  return isDeepEqual(obj1, obj2, 0, 2);
+}
+
+/**
+ * Compare 2 object with limited depth
+ */
+function isDeepEqual(obj1: any, obj2: any, currentDepth: number, maxDepth: number) {
+  if (obj1 === obj2) return true;
+  if (currentDepth === maxDepth) return false;
+  if (Array.isArray(obj1) && Array.isArray(obj2)) return isArrayEqual(obj1, obj2);
+  if (isPlainObject(obj1) && isPlainObject(obj2)) {
+    const [keys1, keys2] = [Object.keys(obj1), Object.keys(obj2)];
+    if (keys1.length !== keys2.length) return false;
+    for (const key of keys1) {
+      if (!isDeepEqual(obj1[key], obj2[key], currentDepth + 1, maxDepth)) return false;
+    }
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Shallow compare 2 arrays
+ */
+function isArrayEqual(a: any[], b: any[]) {
+  if (a === b) return true;
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+}
+
+/**
+ * Alternative to lodash.pick
+ * TODO: figure out why lodash.pick doesn't work with objects from the merge() function
+ */
+function pick<T extends Object>(obj: T, ...props: Array<string>): Partial<T> {
+  const result: any = {};
+  props.forEach(prop => {
+    const propName = prop as string;
+    if (obj.hasOwnProperty(propName)) result[propName] = obj[propName];
+  });
+  return result as Partial<T>;
+}
+
+// LOGGER UTILS
+
+function logChange(
+  prevState: any,
+  newState: any,
+  componentId: string,
+  isGlobalState: boolean,
+  revision: number,
+) {
+  const mutationType = isGlobalState ? 'global' : 'local';
+  const diff = getDiff(prevState, newState);
+  const triggeredByMsg = `Triggered by ${mutationType} mutation #${revision}`;
+  log('Should update component', componentId, triggeredByMsg, '. Diff:', diff);
+}
+
+function logMutation(revision: number, prevState: any, newState: any, isGlobal: boolean) {
+  const mutationType = isGlobal ? 'GLOBAL' : 'LOCAL';
+  const diff = prevState ? getDiff(prevState, newState) : 'unavailable';
+  const diffMessage = Object.keys(diff).length
+    ? diff
+    : 'no changes detected with shallow comparison';
+  log(`${mutationType} MUTATION #${revision}. Diff:`, diffMessage);
+}
+
+function getDiff(prevState: any, newState: any) {
+  const changedFields = Object.keys(newState).filter(
+    key => !isSimilar(newState[key], prevState[key]),
+  );
+  const diff = {};
+  changedFields.forEach(
+    key => (diff[key] = { prevState: prevState[key], newState: newState[key] }),
+  );
+  return diff;
+}
+
+function useLogLifecycle(componentId: string) {
+  const updateCounterRef = useRef<number>(1);
+
+  // log lifecycle if in the debug mode
+  if (DEBUG) {
+    if (updateCounterRef.current === 1) {
+      log('Create component', componentId);
+    } else {
+      log('Update component', componentId);
+    }
+    updateCounterRef.current++;
+  }
+  useEffect(() => {
+    log('Effects applied to component', componentId);
+  });
+  useEffect(() => {
+    return () => log('Destroy component', componentId);
+  }, []);
+}
+
+let logResetTimeout = 0;
+let lastLogTime = 0;
+let taskStartTime = 0;
+
+/**
+ * log and track elapsed time between logs
+ */
+function log(msg: string, ...args: any) {
+  if (!DEBUG) return;
+  const now = Date.now();
+  if (!lastLogTime) taskStartTime = now;
+  const ms = lastLogTime ? now - lastLogTime : 0;
+
+  // select console.log color based on elapsed time
+  let msColor = 'green';
+  if (ms >= 200) {
+    msColor = 'red';
+  } else if (ms >= 100) {
+    msColor = 'orange';
+  } else if (ms >= 50) {
+    msColor = 'yellow';
+  }
+
+  lastLogTime = now;
+  console.log('%c%s', `color: ${msColor}`, `+${ms}ms`, `${msg}`, ...args);
+  if (logResetTimeout) return;
+  logResetTimeout = setTimeout(() => {
+    const taskTime = Date.now() - taskStartTime;
+    logResetTimeout = 0;
+    lastLogTime = 0;
+    taskStartTime = 0;
+    console.log('%c%s', 'color: teal', `end task for ${taskTime}ms`);
+  });
 }
