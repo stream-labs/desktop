@@ -227,8 +227,7 @@ export class Display {
 
       // On mac, we also deinit NWR
       if (getOS() === OS.Mac) {
-        nwr.destroyWindow(this.name);
-        nwr.destroyIOSurface(this.name);
+        nwr.destroyWindowAndSurface(this.name);
       }
 
       this.displayDestroyed = true;
