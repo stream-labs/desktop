@@ -1,7 +1,7 @@
 <template>
   <div style="height: 100%" :class="theme">
     <title-bar
-      :title="options.title"
+      :componentProps="{ windowId: windowId }"
       class="child-window-titlebar"
       v-if="$store.state.bulkLoadFinished && $store.state.i18nReady && !options.isFullScreen"
     />

@@ -12,5 +12,7 @@
   "Volume ( % )": "Volume (%)",
   "Sync Offset ( ms )": "Atraso de sincronização (ms)",
   "Mixer": "Misturador",
-  "Monitor audio levels. If the bars are moving you are outputting audio.": "Monitorizar níveis de áudio. Se as barras se movimentarem, significa que está a enviar áudio."
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "Monitorizar níveis de áudio. Se as barras se movimentarem, significa que está a enviar áudio.",
+  "Muted": "Muted",
+  "Hide in Mixer": "Hide in Mixer"
 }

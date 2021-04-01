@@ -4,7 +4,7 @@ import { Inject } from 'services/core/injector';
 import { $t } from 'services/i18n';
 import { DefaultHardwareService } from 'services/hardware';
 import MixerVolmeter from 'components/MixerVolmeter.vue';
-import Display from 'components/shared/Display.vue';
+import { Display } from 'components/shared/ReactComponent';
 import { ERenderingMode } from '../../../../obs-api';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { metadata } from 'components/widgets/inputs';
@@ -89,8 +89,10 @@ export default class HardwareSetup extends TsxComponent {
     return this.defaultHardwareService.selectedVideoSource && !!this.videoDevices.length ? (
       <div class={styles.display}>
         <Display
-          sourceId={this.defaultHardwareService.selectedVideoSource.sourceId}
-          renderingMode={ERenderingMode.OBS_MAIN_RENDERING}
+          componentProps={{
+            sourceId: this.defaultHardwareService.selectedVideoSource.sourceId,
+            renderingMode: ERenderingMode.OBS_MAIN_RENDERING,
+          }}
           key={this.defaultHardwareService.selectedVideoSource.sourceId}
         />
       </div>

@@ -12,5 +12,7 @@
   "Volume ( % )": "Âm lượng ( % )",
   "Sync Offset ( ms )": "Sync Offset ( ms )",
   "Mixer": "Mixer",
-  "Monitor audio levels. If the bars are moving you are outputting audio.": "Monitor audio levels. If the bars are moving you are outputting audio."
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "Monitor audio levels. If the bars are moving you are outputting audio.",
+  "Muted": "Muted",
+  "Hide in Mixer": "Hide in Mixer"
 }

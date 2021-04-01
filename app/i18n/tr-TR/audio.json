@@ -12,5 +12,7 @@
   "Volume ( % )": "Ses Düzeyi ( % )",
   "Sync Offset ( ms )": "Senk. Dengesi (msn.)",
   "Mixer": "Mixer",
-  "Monitor audio levels. If the bars are moving you are outputting audio.": "Ses seviyelerini görüntüle. Ses çubukları hareket ediyorsa ses çıkışı vardır."
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "Ses seviyelerini görüntüle. Ses çubukları hareket ediyorsa ses çıkışı vardır.",
+  "Muted": "Muted",
+  "Hide in Mixer": "Hide in Mixer"
 }

@@ -124,6 +124,9 @@ import { FacebookService } from './services/platforms/facebook';
 import { DismissablesService } from './services/dismissables';
 import { NavigationService } from './services/navigation';
 import { AnnouncementsService } from './services/announcements';
+import { PatchNotesService } from './services/patch-notes';
+import { VideoService } from './services/video';
+import { ChatService } from './services/chat';
 
 export const AppServices = {
   WindowsService,
@@ -134,6 +137,9 @@ export const AppServices = {
   CustomizationService,
   EditorCommandsService,
   PerformanceService,
+  PatchNotesService,
+  VideoService,
+  ChatService,
   StreamingService,
   StreamSettingsService,
   RestreamService,

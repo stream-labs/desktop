@@ -5,9 +5,9 @@ import {
   clickSourceProperties,
   selectSource,
   openRenameWindow,
-  sourceIsExisting, waitForSourceExist
+  sourceIsExisting,
+  waitForSourceExist,
 } from '../helpers/spectron/sources';
-import { sleep } from '../helpers/sleep';
 
 useSpectron();
 
@@ -23,9 +23,8 @@ const sourceTypes = [
   'Media Source',
   'Text (GDI+)',
   'Color Source',
-  'Browser Source'
+  'Browser Source',
 ];
-
 
 test('Adding and removing some sources', async t => {
   const app = t.context.app;
@@ -55,9 +54,8 @@ test('Viewing source properties', async t => {
   await clickSourceProperties(t);
 
   await focusChild(t);
-  t.true(await app.client.isExisting('label=Color'));
+  t.true(await (await app.client.$('label=Color')).isExisting());
 });
-
 
 test('Rename source', async t => {
   const app = t.context.app;
@@ -67,9 +65,8 @@ test('Rename source', async t => {
   await addSource(t, 'Color Source', sourceName);
 
   await openRenameWindow(t, sourceName);
-  await app.client.setValue('input', newSourceName);
-  await app.client.click('button=Done');
-
+  await (await app.client.$('input')).setValue(newSourceName);
+  await (await app.client.$('button=Done')).click();
 
   await focusMain(t);
   t.true(await sourceIsExisting(t, newSourceName));

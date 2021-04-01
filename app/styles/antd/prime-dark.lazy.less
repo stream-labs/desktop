@@ -1,0 +1,154 @@
+@import '~antd/dist/antd.dark.less';
+@import '../colors';
+
+// ANTD COLOR MAPPING
+@primary-color: @prime-dark; // var(--teal)
+@info-color: @prime-dark; // var(--info)
+@success-color: @prime-dark; // var(--teal)
+@processing-color: @prime-dark; // var(--teal)
+@error-color: @red-dark; // var(--warning)
+@highlight-color: @prime-dark; // var(--accent)
+@warning-color: @prime-dark; // var(--info)
+@normal-color: @primedark-5; // var(--midtone)
+@disabled-color: @primelight-4; // var(--paragraph)
+@disabled-bg: @dark-5; // var(--button)
+
+@primary-1: darken(@prime-dark, 4%); // var(--teal-hover)
+@primary-2: darken(@prime-dark, 4%); // var(--teal-hover)
+@primary-5: fade(@prime-dark, 8%); // var(--teal-semi)
+@primary-7: fade(@prime-dark, 8%); // var(--teal-semi)
+
+@text-color: @primelight-4; // var(--paragraph)
+@text-color-secondary: @primelight-4; // var(--paragraph)
+@text-color-dark: @primelight-4; // var(--paragraph)
+@text-color-secondary-dark: @primelight-4; // var(--paragraph)
+@icon-color: @prime-dark; // var(--icon)
+@icon-color-hover: @prime-dark; // var(--icon)
+@heading-color: @primelight-1; // var(--title)
+
+
+@component-background: @primedark-3; // var(--background)
+@popover-background: @primedark-3; // var(--background)
+@background-color-light: @primedark-3; // var(--background)
+@background-color-base: @primedark-3; // var(--background)
+@border-color-split: @primedark-4; // var(--border)
+
+@item-active-bg: darken(@primedark-4, 4%); // var(--dropdown-alt-bg)
+@item-hover-bg: darken(@primedark-4, 4%); // var(--dropdown-alt-bg)
+
+@link-color: @primelight-1; // var(--title)
+@link-hover-color: @primelight-1; // var(--title)
+@link-active-color: @primelight-1; // var(--title)
+
+@border-color-base: @primedark-4; // var(--border)
+@border-color-split: @primedark-4; // var(--border)
+@border-color-inverse: @primedark-4; // var(--border)
+
+@shadow-color: rgba(1, 2, 2, 0.16); // var(--shadow)
+@shadow-color-inverse: rgba(1, 2, 2, 0.16); // var(--shadow)
+@btn-shadow: rgba(1, 2, 2, 0.16); // var(--shadow)
+@btn-primary-shadow: rgba(1, 2, 2, 0.16); // var(--shadow)
+@btn-text-shadow: rgba(1, 2, 2, 0.16); // var(--shadow)
+
+@btn-danger-color: @red-dark; // var(--warning)
+@btn-danger-bg: fade(@red-dark, 28%); // var(--warning-bg)
+@btn-text-hover-bg: transparent;
+
+@checkbox-check-color: @primelight-1; // var(--title)
+
+@radio-dot-disabled-color: @primedark-3; // var(--background)
+@radio-disabled-button-checked-bg: @primedark-3; // var(--background)
+
+@select-multiple-item-disabled-color: @primelight-4; // var(--paragraph)
+
+@slider-rail-background-color: @prime-dark; // var(--slider-bg)
+@slider-rail-background-color-hover: @prime-dark; // var(--slider-bg)
+@slider-track-background-color: @prime-dark; // var(--teal)
+@slider-track-background-color-hover: @prime-dark; // var(--teal)
+@slider-handle-background-color: @prime-dark; // var(--icon)
+@slider-handle-color: @prime-dark; // var(--icon)
+@slider-handle-color-hover: @prime-dark; // var(--icon)
+@slider-handle-color-focus: @prime-dark; // var(--icon)
+@slider-handle-color-focus-shadow: rgba(1, 2, 2, 0.16); // var(--shadow)
+@slider-handle-color-tooltip-open: @prime-dark; // var(--icon)
+@slider-dot-border-color-active: @primedark-4; // var(--border)
+
+
+@input-placeholder-color: @primelight-4; // var(--paragraph)
+@input-number-handler-active-bg: @primelight-4; // var(--paragraph)
+@input-icon-hover-color: @prime-dark; // var(--icon)
+@input-disabled-color: @disabled-color;
+
+@layout-body-background: @primedark-3; // var(--background)
+@layout-header-background: @primedark-3; // var(--background)
+@layout-trigger-background: @primedark-3; // var(--background)
+@layout-trigger-color: @primelight-4; // var(--paragraph)
+@layout-sider-background-light: @primedark-3; // var(--background)
+@layout-trigger-background-light: @primedark-3; // var(--background)
+
+@divider-color: @primedark-4; // var(--border)
+
+@tooltip-color: @primelight-4; // var(--paragraph)
+@tooltip-bg: @primedark-2; // var(--section)
+@tooltip-arrow-width: 4px;
+
+@modal-mask-bg: rgba(0, 0, 0, 0.5); // var(--modal-overlay)
+
+@menu-item-active-danger-bg: @red-dark; // var(--warning)
+@menu-dark-arrow-color: @primelight-1; // var(--title)
+@menu-dark-inline-submenu-bg: @primedark-2; // var(--section)
+@menu-dark-highlight-color: @primelight-1; // var(--title)
+
+@table-selected-row-hover-bg: @primary-5;
+@table-expanded-row-bg: @primedark-2; // var(--section)
+@table-header-filter-active-bg: @primedark-2; // var(--section)
+
+@picker-basic-cell-hover-with-range-color: fade(@prime-dark, 8%); // var(--teal-semi)
+@picker-date-hover-range-border-color: fade(@prime-dark, 8%); // var(--teal-semi)
+
+@comment-author-time-color: @primelight-4; // var(--paragraph)
+@comment-action-hover-color: @primedark-3; // var(--background)
+
+@back-top-color: @primelight-1; // var(--title)
+
+@alert-success-border-color: @prime-dark; // var(--teal)
+@alert-success-bg-color: fade(@prime-dark, 8%); // var(--teal-semi)
+@alert-success-icon-color: @prime-dark; // var(--teal)
+@alert-info-border-color: @prime-dark; // var(--info)
+@alert-info-bg-color: fade(@yellow-dark, 8%); // var(--info-semi)
+@alert-info-icon-color: @prime-dark; // var(--info)
+@alert-warning-border-color: @red-dark; // var(--warning)
+@alert-warning-bg-color: fade(@red-dark, 28%); // var(--warning-bg)
+@alert-warning-icon-color: @red-dark; // var(--warning)
+@alert-error-border-color: @red-dark; // var(--warning)
+@alert-error-bg-color: fade(@red-dark, 28%); // var(--warning-bg)
+@alert-error-icon-color: @red-dark; // var(--warning)
+@alert-message-color: @primelight-1; // var(--title)
+
+@image-bg: transparent;
+@image-color: transparent;
+
+@border-radius-base: 4px;
+
+// ADDITIONAL STYLES
+.ant-modal-footer {
+  background-color: @primedark-2; // var(--section)
+}
+
+// THEME INDEPENDENT STYLES
+
+// justify all inputs of form to the right in the modal footer
+#mainWrapper .ant-modal-footer  .ant-form-inline {
+  justify-content: flex-end;
+}
+
+
+// Use primary color for required marks
+#mainWrapper label.ant-form-item-required::before {
+  color: @primary-color;
+}
+
+// change color for the search box
+#mainWrapper .ant-select-selector input {
+  color: @primelight-4; // var(--paragraph)
+}

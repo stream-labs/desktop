@@ -26,16 +26,17 @@ export default class PlatformAppStore extends Vue {
   };
 
   onBrowserViewReady(view: Electron.BrowserView) {
+    new GuestApiHandler().exposeApi(view.webContents.id, {
+      reloadProductionApps: this.reloadProductionApps,
+      openLinkInBrowser: this.openLinkInBrowser,
+      onPaypalAuthSuccess: this.onPaypalAuthSuccessHandler,
+      navigateToApp: this.navigateToApp,
+    });
+
     view.webContents.on('did-finish-load', () => {
       if (Utils.isDevMode()) {
         view.webContents.openDevTools();
       }
-      new GuestApiHandler().exposeApi(view.webContents.id, {
-        reloadProductionApps: this.reloadProductionApps,
-        openLinkInBrowser: this.openLinkInBrowser,
-        onPaypalAuthSuccess: this.onPaypalAuthSuccessHandler,
-        navigateToApp: this.navigateToApp,
-      });
     });
   }
 

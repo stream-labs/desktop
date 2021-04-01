@@ -188,6 +188,8 @@ export class PlatformContainerManager {
   private createContainer(app: ILoadedApp, slot: EAppPageSlot, persistent = false): IContainerInfo {
     const view = new electron.remote.BrowserView({
       webPreferences: {
+        contextIsolation: true,
+        enableRemoteModule: true,
         nodeIntegration: false,
         partition: this.getAppPartition(app),
         preload: path.resolve(electron.remote.app.getAppPath(), 'bundles', 'guest-api'),
@@ -210,9 +212,7 @@ export class PlatformContainerManager {
 
     if (app.unpacked) view.webContents.openDevTools();
 
-    view.webContents.on('did-finish-load', () => {
-      this.exposeApi(app, view.webContents.id, info.transform);
-    });
+    this.exposeApi(app, view.webContents.id, info.transform);
 
     /**
      * This has to be done from the main process to work properly
