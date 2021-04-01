@@ -179,4 +179,3 @@ export abstract class ViewHandler<TState extends object> {
     return window['servicesManager'].getResource(service.name).views;
   }
 }
-
