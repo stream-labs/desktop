@@ -271,6 +271,10 @@ export class FrameSource {
     });
   }
 
+  end() {
+    if (this.ffmpeg) this.ffmpeg.kill();
+  }
+
   private handleChunk(chunk: Buffer) {
     // If the chunk is larger than what's needed to fill the rest of the frame buffer,
     // only copy enough to fill the buffer.
@@ -622,9 +626,23 @@ export interface IClip {
   scrubSprite?: string;
 }
 
+export enum EExportStep {
+  AudioMix = 'audio',
+  FrameRender = 'frames',
+}
+
+export interface IExportInfo {
+  exporting: boolean;
+  currentFrame: number;
+  totalFrames: number;
+  step: EExportStep;
+  cancelRequested: boolean;
+}
+
 interface IHighligherState {
   clips: Dictionary<IClip>;
   clipOrder: string[];
+  export: IExportInfo;
 }
 
 class HighligherViews extends ViewHandler<IHighligherState> {
@@ -651,6 +669,10 @@ class HighligherViews extends ViewHandler<IHighligherState> {
 
     return count;
   }
+
+  get exportInfo() {
+    return this.state.export;
+  }
 }
 
 /**
@@ -663,6 +685,13 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   static initialState = {
     clips: {},
     clipOrder: [],
+    export: {
+      exporting: false,
+      currentFrame: 0,
+      totalFrames: 0,
+      step: EExportStep.AudioMix,
+      cancelRequested: false,
+    },
   } as IHighligherState;
 
   @Inject() streamingService: StreamingService;
@@ -692,6 +721,14 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   @mutation()
   SET_ORDER(order: string[]) {
     this.state.clipOrder = order;
+  }
+
+  @mutation()
+  SET_EXPORT_INFO(exportInfo: Partial<IExportInfo>) {
+    this.state.export = {
+      ...this.state.export,
+      ...exportInfo,
+    };
   }
 
   get views() {
@@ -771,10 +808,18 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     await fs.mkdir(SCRUB_SPRITE_DIRECTORY);
   }
 
+  cancelExport() {
+    this.SET_EXPORT_INFO({ cancelRequested: true });
+  }
+
   async export() {
     if (!this.views.loaded) {
       console.error('Highlighter: Export called while clips are not fully loaded!');
       return;
+    }
+
+    if (this.views.exportInfo.exporting) {
+      console.log('Highlighter: Cannot export until current export operation is finished');
     }
 
     const clips = this.views.clips.filter(c => c.enabled).map(c => this.clips[c.path]);
@@ -782,14 +827,29 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     // Reset all clips
     clips.forEach(c => c.reset());
 
+    // Estimate the total number of frames to set up export info
+    const totalFrames = clips.reduce((count: number, clip) => {
+      return count + clip.frameSource.nFrames;
+    }, 0);
+    const numTransitions = clips.length - 1;
+    const totalFramesAfterTransitions = totalFrames - numTransitions * TRANSITION_FRAMES;
+
+    this.SET_EXPORT_INFO({
+      exporting: true,
+      currentFrame: 0,
+      totalFrames: totalFramesAfterTransitions,
+      step: EExportStep.AudioMix,
+      cancelRequested: false,
+    });
+
     // Mix audio first
-    console.log('MIXING AUDIO');
     await Promise.all(clips.map(clip => clip.audioSource.extract()));
     const audioMix = `${EXPORT_NAME}-audio.flac`;
     const fader = new AudioCrossfader(audioMix, clips);
     await fader.export();
     await Promise.all(clips.map(clip => clip.audioSource.cleanup()));
-    console.log('AUDIO DONE');
+
+    this.SET_EXPORT_INFO({ step: EExportStep.FrameRender });
 
     let fromClip = clips.shift();
     let toClip = clips.shift();
@@ -799,6 +859,13 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     const writer = new FrameWriter(`${EXPORT_NAME}.mp4`, audioMix);
 
     while (true) {
+      if (this.views.exportInfo.cancelRequested) {
+        if (fromClip) fromClip.frameSource.end();
+        if (toClip) toClip.frameSource.end();
+        await writer.end();
+        break;
+      }
+
       const fromFrameRead = await fromClip.frameSource.readNextFrame();
       const inTransition =
         fromClip.frameSource.currentFrame >= fromClip.frameSource.nFrames - TRANSITION_FRAMES;
@@ -820,6 +887,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         const transitionEnded = fromClip.frameSource.currentFrame === fromClip.frameSource.nFrames;
 
         if (transitionEnded) {
+          fromClip.frameSource.end();
           fromClip = toClip;
           toClip = clips.shift();
         }
@@ -827,6 +895,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
 
       if (fromFrameRead) {
         await writer.writeNextFrame(frameToRender);
+        this.SET_EXPORT_INFO({ currentFrame: this.state.export.currentFrame + 1 });
       } else {
         console.log('Out of sources, closing file');
         await writer.end();
@@ -835,5 +904,6 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     }
 
     await fader.cleanup();
+    this.SET_EXPORT_INFO({ exporting: false });
   }
 }
