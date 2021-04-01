@@ -217,8 +217,6 @@ export class FrameSource {
     ];
     /* eslint-enable */
 
-    console.log(args);
-
     this.ffmpeg = execa(FFMPEG_EXE, args, {
       encoding: null,
       buffer: false,
@@ -341,10 +339,18 @@ export class Clip {
     return this.initPromise;
   }
 
-  private async doInit() {
-    await this.readDuration();
+  /**
+   * FrameSource and AudioSource are disposable. Call this to reset them
+   * to start reading from the file again.
+   */
+  reset() {
     this.frameSource = new FrameSource(this.sourcePath, this.duration);
     this.audioSource = new AudioSource(this.sourcePath);
+  }
+
+  private async doInit() {
+    await this.readDuration();
+    this.reset();
     await this.frameSource.exportScrubbingSprite();
   }
 
@@ -487,7 +493,7 @@ export class FrameWriter {
     });
 
     this.ffmpeg.stderr.on('data', (data: Buffer) => {
-      console.log('ffmpeg stderr:', data.toString());
+      console.log('ffmpeg:', data.toString());
     });
   }
 
@@ -578,7 +584,6 @@ export class Transitioner {
     fromTexture.magFilter = this.gl.LINEAR;
 
     buffer.bind();
-    console.log('draw progress', progress);
     transition.draw(
       progress,
       fromTexture,
@@ -766,11 +771,16 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     await fs.mkdir(SCRUB_SPRITE_DIRECTORY);
   }
 
-  async run() {
-    const clips = [new Clip(CLIP_1), new Clip(CLIP_2), new Clip(CLIP_3)];
+  async export() {
+    if (!this.views.loaded) {
+      console.error('Highlighter: Export called while clips are not fully loaded!');
+      return;
+    }
 
-    // Read all durations
-    await Promise.all(clips.map(s => s.init()));
+    const clips = this.views.clips.filter(c => c.enabled).map(c => this.clips[c.path]);
+
+    // Reset all clips
+    clips.forEach(c => c.reset());
 
     // Mix audio first
     console.log('MIXING AUDIO');
