@@ -679,6 +679,11 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     });
   }
 
+  @mutation()
+  SET_ORDER(order: string[]) {
+    this.state.clipOrder = order;
+  }
+
   get views() {
     return new HighligherViews(this.state);
   }
@@ -721,6 +726,10 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       path,
       enabled,
     });
+  }
+
+  setOrder(order: string[]) {
+    this.SET_ORDER(order);
   }
 
   async loadClips() {

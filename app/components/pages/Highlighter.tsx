@@ -1,11 +1,13 @@
 import TsxComponent from 'components/tsx-component';
-import { HighlighterService } from 'services/highlighter';
+import { HighlighterService, IClip } from 'services/highlighter';
 import { Component, Watch } from 'vue-property-decorator';
 import ClipPreview from 'components/highlighter/ClipPreview';
 import { Inject } from 'services';
+import draggable from 'vuedraggable';
+import styles from './Highlighter.m.less';
 
 @Component({
-  components: { ClipPreview },
+  components: { ClipPreview, draggable },
 })
 export default class Highlighter extends TsxComponent {
   @Inject() highlighterService: HighlighterService;
@@ -27,11 +29,20 @@ export default class Highlighter extends TsxComponent {
     this.highlighterService.actions.loadClips();
   }
 
+  get clips() {
+    return this.views.clips;
+  }
+
+  set clips(val: IClip[]) {
+    // Intentionally synchronous to avoid visual jank on drop
+    this.highlighterService.setOrder(val.map(c => c.path));
+  }
+
   render() {
     return (
       <div style={{ height: 0 }}>
         {!!this.views.clips.length && !this.views.loaded && (
-          <div style={{ fontSize: '24px', margin: 'auto' }}>
+          <div class={styles.clipLoader}>
             Loading: {this.views.loadedCount}/{this.views.clips.length} Clips
           </div>
         )}
@@ -42,11 +53,17 @@ export default class Highlighter extends TsxComponent {
         )}
         {this.views.loaded && !!this.views.clips.length && (
           <div style={{ overflowY: 'auto', width: '100%' }}>
-            {this.views.clips.map(clip => {
-              return (
-                <ClipPreview clip={clip} style={{ margin: '10px', display: 'inline-block' }} />
-              );
-            })}
+            <draggable vModel={this.clips} animation={200}>
+              {this.views.clips.map(clip => {
+                return (
+                  <ClipPreview
+                    clip={clip}
+                    style={{ margin: '10px', display: 'inline-block' }}
+                    key={clip.path}
+                  />
+                );
+              })}
+            </draggable>
           </div>
         )}
       </div>
