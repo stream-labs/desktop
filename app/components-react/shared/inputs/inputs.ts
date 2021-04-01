@@ -31,6 +31,7 @@ export interface IInputCommonProps<TValue> {
   onChange?: (val: TValue, ev?: ChangeEvent | CheckboxChangeEvent) => unknown;
   onInput?: (val: TValue, ev?: ChangeEvent | CheckboxChangeEvent) => unknown;
   required?: boolean;
+  max?: number;
   placeholder?: string;
   disabled?: boolean;
   debounce?: number;
@@ -41,6 +42,7 @@ export interface IInputCommonProps<TValue> {
    */
   uncontrolled?: boolean;
   layout?: TInputLayout;
+  rules?: unknown[];
 }
 
 export type ValuesOf<T extends ReadonlyArray<string>> = T[number];
@@ -118,7 +120,7 @@ export function useInput<
   const localValueRef = useRef(value);
   const prevValueRef = useRef(value);
 
-  // sync local value on props value change
+  // sync local value on props change
   if (value !== prevValueRef.current) {
     localValueRef.current = value;
     prevValueRef.current = value;
@@ -148,11 +150,11 @@ export function useInput<
   // create onChange handler
   const onChange = useCallback((newVal: TValue) => {
     if (newVal === localValueRef.current) return;
+    localValueRef.current = newVal;
 
     // call forceUpdate if component is uncontrolled
     // controlled components should be updated automatically via props changing
     if (uncontrolled) {
-      localValueRef.current = newVal;
       forceUpdate();
     }
 
@@ -174,11 +176,8 @@ export function useInput<
     'data-id': inputId,
   };
 
-  // Handle a shortcut for the "required" validation rule
-  const rules = inputProps.rules ? [...inputProps.rules] : [];
-  if (inputProps.required) {
-    rules.push({ required: true, message: $t('The field is required') });
-  }
+  // Create validation rules
+  const rules = createValidationRules(inputProps);
 
   // pick props for the input wrapper
   const wrapperAttrs = {
@@ -214,7 +213,6 @@ export function useInput<
     inputAttrs,
     wrapperAttrs,
     forceUpdate,
-    localValueRef,
     setLocalValue,
     emitChange,
   };
@@ -240,8 +238,8 @@ export function useTextInput<
 
   // we need to handle onChange differently for text inputs
   const onChange = useCallback((ev: ChangeEvent<any>) => {
-    if (!uncontrolled) {
-      // for controlled inputs call the `onChange()` handler immediately
+    if (!uncontrolled || p.debounce) {
+      // for controlled and debounced inputs call the `onChange()` handler immediately
       inputAttrs.onChange(ev.target.value);
     } else {
       // for uncontrolled text inputs just set new localValue and update the component
@@ -328,6 +326,21 @@ export type TBindings<
     onChange: (newVal: TState[K]) => unknown;
   } & TExtraProps;
 };
+
+function createValidationRules(inputProps: IInputCommonProps<unknown>) {
+  const rules = inputProps.rules ? [...inputProps.rules] : [];
+  if (inputProps.required) {
+    rules.push({ required: true, message: $t('The field is required') });
+  }
+  if (inputProps.max) {
+    rules.push({
+      max: inputProps.max,
+      message: $t('This field may not be greater than %{value} characters.', {
+        value: inputProps.max,
+      }),
+    });
+  }
+}
 
 /**
  * Function for creating new input components

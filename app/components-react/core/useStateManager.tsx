@@ -208,7 +208,7 @@ function createContext<TState, TActions extends Object, TContextView extends TMe
 {
 
   // create initial state
-  let state: TState =
+  const state: TState =
     typeof initState === 'function' ? (initState as Function)() : cloneDeep(initState);
 
   // create a local state and dispatcher

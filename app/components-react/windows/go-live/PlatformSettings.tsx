@@ -30,18 +30,6 @@ export default function PlatformSettings() {
 
       {shouldShowSettings && (
         <div style={{ width: '100%' }}>
-          {/*<Section isSimpleMode={!isAdvancedMode}>*/}
-          {/*  <InputWrapper>*/}
-          {/*    <Skeleton active={true} paragraph={false} />*/}
-          {/*  </InputWrapper>*/}
-          {/*  <InputWrapper>*/}
-          {/*    <Skeleton.Input active={true} style={{ width: '100px' }} />*/}
-          {/*  </InputWrapper>*/}
-          {/*  <InputWrapper>*/}
-          {/*    <Skeleton.Input active={true} style={{ width: '100%' }} />*/}
-          {/*  </InputWrapper>*/}
-          {/*</Section>*/}
-
           {/*COMMON FIELDS*/}
           {isMultiplatformMode && (
             <Section isSimpleMode={!isAdvancedMode} title={$t('Common Stream Settings')}>

@@ -93,8 +93,7 @@ export default function CommonPlatformFields(p: IProps) {
               onChange={val => updateCommonField('title', val)}
               label={$t('Title')}
               required={true}
-              // TODO:
-              // max: this.props.platform === 'twitch' ? 140 : 120,
+              max={p.platform === 'twitch' ? 140 : 120}
             />
 
             {/*DESCRIPTION*/}

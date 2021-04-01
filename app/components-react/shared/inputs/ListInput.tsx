@@ -53,9 +53,11 @@ export const ListInput = InputComponent(<T extends any>(p: TListInputProps<T>) =
     ? useDebounce(p.debounce, onSearchHandler)
     : onSearchHandler;
 
+  const selectedOption = options.find(opt => opt.value === p.value);
+
   function render() {
     return (
-      <InputWrapper {...wrapperAttrs}>
+      <InputWrapper {...wrapperAttrs} extra={selectedOption?.description}>
         <Select
           {...omit(inputAttrs, 'onChange')}
           // search by label instead value

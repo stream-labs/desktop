@@ -629,14 +629,13 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
 
     // cap the upcoming broadcasts list depending on the current date
     // unfortunately YT API doesn't provide a way to filter broadcasts by date
-    // TODO: restore filter
-    // upcomingBroadcasts = upcomingBroadcasts.filter(broadcast => {
-    //   const timeRange = 1000 * 60 * 60 * 24;
-    //   const maxDate = Date.now() + timeRange;
-    //   const minDate = Date.now() - timeRange;
-    //   const broadcastDate = new Date(broadcast.snippet.scheduledStartTime).valueOf();
-    //   return broadcastDate > minDate && broadcastDate < maxDate;
-    // });
+    upcomingBroadcasts = upcomingBroadcasts.filter(broadcast => {
+      const timeRange = 1000 * 60 * 60 * 24;
+      const maxDate = Date.now() + timeRange;
+      const minDate = Date.now() - timeRange;
+      const broadcastDate = new Date(broadcast.snippet.scheduledStartTime).valueOf();
+      return broadcastDate > minDate && broadcastDate < maxDate;
+    });
 
     return [...activeBroadcasts, ...upcomingBroadcasts];
   }

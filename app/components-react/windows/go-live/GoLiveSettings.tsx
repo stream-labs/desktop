@@ -38,10 +38,6 @@ export default function GoLiveSettings() {
     };
   });
 
-  // result.contextView;
-  // result.computedProps;
-  // result.componentView;
-
   const shouldShowSettings = !error && !isLoading;
   const shouldShowPrimeLabel = !RestreamService.state.grandfathered;
   const shouldShowLeftCol = protectedModeEnabled;

@@ -1,4 +1,5 @@
 import electron from 'electron';
+import css from './FacebookEditStreamInfo.m.less';
 import { useGoLiveSettings } from '../useGoLiveSettings';
 import CommonPlatformFields from '../CommonPlatformFields';
 import React from 'react';
@@ -254,7 +255,7 @@ export default function FacebookEditStreamInfo() {
             hasImage={true}
             imageSize={{ width: 24, height: 24 }}
             options={getPrivacyOptions()}
-            // TODO: class={styles.privacySelector}
+            className={css.privacySelector}
             extra={
               shouldShowPrivacyWarn && (
                 <Translate message={$t('FBPrivacyWarning')}>

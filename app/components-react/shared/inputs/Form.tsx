@@ -6,7 +6,6 @@ import { TInputLayout } from './inputs';
 type TFormContext = {
   antForm: FormInstance;
   layout?: TInputLayout;
-  disabled?: boolean;
 } & Pick<FormItemProps, 'labelCol' | 'wrapperCol'>;
 
 /**
@@ -25,7 +24,6 @@ export default React.memo(function Form(p: FormProps & { disabled?: boolean }) {
     const layout = p.layout || 'horizontal';
     return {
       layout,
-      disabled: p.disabled,
       antForm,
     };
   });

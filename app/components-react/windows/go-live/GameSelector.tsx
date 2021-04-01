@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { TPlatform } from '../../../services/platforms';
 import { ListInput, TSlobsInputProps } from '../../shared/inputs';
 import { $t } from '../../../services/i18n';
@@ -24,9 +24,9 @@ export default function GameSelector(p: TProps) {
     };
   });
 
-  useOnCreate(() => {
+  useEffect(() => {
     loadImageForSelectedGame();
-  });
+  }, []);
 
   async function loadImageForSelectedGame() {
     if (!selectedGame) return;

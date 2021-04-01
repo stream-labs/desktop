@@ -113,36 +113,35 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
 
   // Starts interval to poll updates from OBS
   startMonitoringPerformance() {
-    // TODO:
-    // const statsInterval = () => {
-    //   if (this.shutdown) return;
-    //
-    //   // Don't request more stats if we haven't finished processing the last bunch
-    //   if (!this.statsRequestInProgress) {
-    //     this.statsRequestInProgress = true;
-    //     electron.ipcRenderer.send('requestPerformanceStats');
-    //   }
-    //
-    //   setTimeout(statsInterval, STATS_UPDATE_INTERVAL);
-    // };
-    // statsInterval();
-    //
-    // electron.ipcRenderer.on(
-    //   'performanceStatsResponse',
-    //   (e: electron.Event, am: electron.ProcessMetric[]) => {
-    //     const stats: IPerformanceState = obs.NodeObs.OBS_API_getPerformanceStatistics();
-    //
-    //     stats.CPU += am
-    //       .map(proc => {
-    //         return proc.cpu.percentCPUUsage;
-    //       })
-    //       .reduce((sum, usage) => sum + usage);
-    //
-    //     this.SET_PERFORMANCE_STATS(stats);
-    //     this.monitorAndUpdateStats();
-    //     this.statsRequestInProgress = false;
-    //   },
-    // );
+    const statsInterval = () => {
+      if (this.shutdown) return;
+
+      // Don't request more stats if we haven't finished processing the last bunch
+      if (!this.statsRequestInProgress) {
+        this.statsRequestInProgress = true;
+        electron.ipcRenderer.send('requestPerformanceStats');
+      }
+
+      setTimeout(statsInterval, STATS_UPDATE_INTERVAL);
+    };
+    statsInterval();
+
+    electron.ipcRenderer.on(
+      'performanceStatsResponse',
+      (e: electron.Event, am: electron.ProcessMetric[]) => {
+        const stats: IPerformanceState = obs.NodeObs.OBS_API_getPerformanceStatistics();
+
+        stats.CPU += am
+          .map(proc => {
+            return proc.cpu.percentCPUUsage;
+          })
+          .reduce((sum, usage) => sum + usage);
+
+        this.SET_PERFORMANCE_STATS(stats);
+        this.monitorAndUpdateStats();
+        this.statsRequestInProgress = false;
+      },
+    );
   }
 
   /**

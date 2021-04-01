@@ -5,16 +5,11 @@ import { $t } from '../../../services/i18n';
 import styles from './DestinationSwitchers.m.less';
 import { ICustomStreamDestination } from '../../../services/settings/streaming';
 import { Services } from '../../service-provider';
-import { InputComponent, SwitchInput } from '../../shared/inputs';
+import { SwitchInput } from '../../shared/inputs';
 import PlatformLogo from '../../shared/PlatformLogo';
-import Utils, { keys } from '../../../services/utils';
-import { TSwitchInputProps } from '../../shared/inputs/SwitchInput';
 import { assertIsDefined } from '../../../util/properties-type-guards';
-import { useDebounce, useFormState } from '../../hooks';
-import pick from 'lodash/pick';
+import { useDebounce } from '../../hooks';
 import { useGoLiveSettings } from './useGoLiveSettings';
-import { mapValues, values } from 'lodash';
-import { Tooltip } from 'antd';
 import { alertAsync } from '../../modals';
 
 /**
@@ -171,60 +166,3 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
     </div>
   );
 }
-
-function getPlatformName(platform: TPlatform): string {
-  const service = getPlatformService(platform);
-  return service.displayName;
-}
-
-function getPlatformUsername(platform: TPlatform) {
-  const platformAuthData = Services.UserService.state.auth?.platforms[platform];
-  assertIsDefined(platformAuthData);
-  return platformAuthData.username;
-}
-
-//
-// const PlatformSwitcher = InputComponent((p: TSwitchInputProps & {platform: TPlatform}) => {
-//   const destination = p.platforms[platform];
-//   const enabled = destination.enabled;
-//   const isPrimary = view.isPrimaryPlatform(platform);
-//   const platformService = getPlatformService(platform);
-//   const platformName = platformService.displayName;
-//   const username = UserService.state.auth?.platforms[platform]!.username;
-//   const title = p.title ? $t(p.title, { platformName }) : platformName;
-//   const canDisablePrimary = p.canDisablePrimary;
-//
-//   return (
-//     <div
-//       key={platform}
-//       className={cx(styles.platformSwitcher, { [styles.platformDisabled]: !enabled })}
-//     >
-//       <div className={cx(styles.colInput)}>
-//         {/*TODO:*/}
-//         {/*{isPrimary && !canDisablePrimary ? (*/}
-//         {/*  <span*/}
-//         {/*    vTooltip={$t(*/}
-//         {/*      'You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destination.',*/}
-//         {/*    )}*/}
-//         {/*  >*/}
-//         {/*    <ToggleInput value={enabled} metadata={{ name: platform }} />*/}
-//         {/*  </span>*/}
-//         {/*) : (*/}
-//         {/*  <ToggleInput value={enabled} metadata={{ name: platform }} />*/}
-//         {/*)}*/}
-//         <SwitchInput value={enabled} name={platform} />
-//       </div>
-//
-//       {/* PLATFORM LOGO */}
-//       <div className="logo margin-right--20">
-//         <PlatformLogo platform={platform} className={styles[`platform-logo-${platform}`]} />
-//       </div>
-//
-//       {/* PLATFORM TITLE AND ACCOUNT */}
-//       <div className={styles.colAccount}>
-//         <span className={styles.platformName}>{title}</span> <br />
-//         {username} <br />
-//       </div>
-//     </div>
-//   );
-// }

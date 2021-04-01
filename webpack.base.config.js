@@ -87,8 +87,6 @@ module.exports = {
     archiver: 'require("archiver")',
     'extract-zip': 'require("extract-zip")',
     'fs-extra': 'require("fs-extra")',
-    // react: 'React',
-    // 'react-dom': 'ReactDOM',
   },
 
   module: {

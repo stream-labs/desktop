@@ -11,6 +11,7 @@ import InputWrapper from '../../../shared/inputs/InputWrapper';
 import Form from '../../../shared/inputs/Form';
 import { useGoLiveSettings } from '../useGoLiveSettings';
 import electron from 'electron';
+import { IYoutubeStartStreamOptions } from '../../../../services/platforms/youtube';
 
 /***
  * Stream Settings for YT
@@ -23,6 +24,7 @@ export function YoutubeEditStreamInfo() {
     isUpdateMode,
     isScheduleMode,
     renderPlatformSettings,
+    isMidStreamMode,
   } = useGoLiveSettings(view => ({
     ytSettings: view.platforms.youtube,
   }));
@@ -32,7 +34,7 @@ export function YoutubeEditStreamInfo() {
   const bind = createBinding(
     ytSettings,
     newYtSettings => updatePlatform('youtube', newYtSettings),
-    fieldName => ({ disabled: fieldIsDisabled(fieldName) }),
+    fieldName => ({ disabled: fieldIsDisabled(fieldName as keyof IYoutubeStartStreamOptions) }),
   );
 
   const [{ broadcastLoading, broadcasts }] = useAsyncState(
@@ -60,18 +62,14 @@ export function YoutubeEditStreamInfo() {
     );
   }
 
-  function fieldIsDisabled(fieldName: keyof IGoLiveSettings['platforms']['youtube']): boolean {
-    // TODO:
-    return false;
-    // const selectedBroadcast = this.selectedBroadcast;
-    //
-    // // selfDeclaredMadeForKids can be set only on the broadcast creating step
-    // if (selectedBroadcast && fieldName === 'selfDeclaredMadeForKids') {
-    //   return true;
-    // }
-    //
-    // if (!this.view.isMidStreamMode) return false;
-    // return !this.youtubeService.updatableSettings.includes(fieldName);
+  function fieldIsDisabled(fieldName: keyof IYoutubeStartStreamOptions): boolean {
+    // selfDeclaredMadeForKids can be set only on the broadcast creating step
+    if (broadcastId && fieldName === 'selfDeclaredMadeForKids') {
+      return true;
+    }
+
+    if (!isMidStreamMode) return false;
+    return !YoutubeService.updatableSettings.includes(fieldName);
   }
 
   function projectionChangeHandler(enable360: boolean) {
@@ -138,6 +136,7 @@ export function YoutubeEditStreamInfo() {
             {
               value: 'ultraLow',
               label: $t('Ultra low-latency'),
+              description: $t('Does not support: Closed captions, 1440p, and 4k resolutions'),
             },
           ]}
           {...bind.latencyPreference}

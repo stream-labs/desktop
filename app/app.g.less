@@ -10,6 +10,7 @@
 @import "./styles/sl-vue-tree";
 @import "./styles/tooltips";
 @import "./styles/animations";
+@import "./styles/antd/antd";
 
 html {
   height: 100%;
@@ -480,6 +481,10 @@ select {
   opacity: 0;
   transform: translateX(-100%);
 }
+
+.checkboxdone-enter-active {transition: width 0.3s;}
+.checkboxdone-enter {width: 0;}
+.checkboxdone-enter-to {width: 16px;}
 
 .v--modal-overlay {
   background: var(--modal-overlay);
