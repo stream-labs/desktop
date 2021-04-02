@@ -45,6 +45,9 @@ export interface IFacebookLiveVideo {
   description: string;
   permalink_url: string;
   planned_start_time: string;
+  video: {
+    id: string;
+  };
 }
 
 interface IFacebookServiceState extends IPlatformState {
@@ -52,6 +55,11 @@ interface IFacebookServiceState extends IPlatformState {
   facebookGroups: IFacebookGroup[];
   settings: IFacebookStartStreamOptions;
   grantedPermissions: TFacebookPermissionName[];
+  /**
+   * use videoId for facebook urls,
+   * for the Facebook Graphql API use liveVideoId
+   */
+  videoId: string;
   streamPageUrl: string;
   userAvatar: string;
 }
@@ -82,6 +90,7 @@ const initialState: IFacebookServiceState = {
   grantedPermissions: [],
   streamPageUrl: '',
   userAvatar: '',
+  videoId: '',
   settings: {
     destinationType: 'page',
     pageId: '',
@@ -151,6 +160,11 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     this.state.userAvatar = avatar;
   }
 
+  @mutation()
+  protected SET_VIDEO_ID(id: string) {
+    this.state.videoId = id;
+  }
+
   apiBase = 'https://graph.facebook.com';
 
   get authUrl() {
@@ -200,6 +214,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     this.SET_STREAM_KEY(streamKey);
     this.SET_STREAM_PAGE_URL(`https://facebook.com/${liveVideo.permalink_url}`);
     this.UPDATE_STREAM_SETTINGS({ ...fbOptions, liveVideoId: liveVideo.id });
+    this.SET_VIDEO_ID(liveVideo.video.id);
 
     // send selected pageId to streamlabs.com
     if (fbOptions.destinationType === 'page') {
@@ -238,7 +253,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
 
     return await this.requestFacebook(
       {
-        url: `${this.apiBase}/${liveVideoId}?fields=title,description,stream_url,planned_start_time,permalink_url`,
+        url: `${this.apiBase}/${liveVideoId}?fields=title,description,stream_url,planned_start_time,permalink_url,video`,
         method: 'POST',
         body: JSON.stringify(data),
       },
@@ -326,7 +341,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
 
     return this.requestFacebook<IFacebookLiveVideo>(
       {
-        url: `${this.apiBase}/${destinationId}/live_videos?&fields=title,description,planned_start_time,permalink_url,stream_url,dash_preview_url`,
+        url: `${this.apiBase}/${destinationId}/live_videos?&fields=title,description,planned_start_time,permalink_url,stream_url,dash_preview_url,video`,
         method: 'POST',
         body: JSON.stringify(body),
       },
@@ -481,7 +496,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
 
   get chatUrl(): string {
     if (this.state.settings.destinationType === 'page' && this.state.settings.game) {
-      return 'https://www.facebook.com/gaming/streamer/chat/';
+      return `https://www.facebook.com/live/producer/dashboard/${this.state.videoId}/COMMENTS/`;
     } else {
       const token = this.views.getDestinationToken(
         this.state.settings.destinationType,
