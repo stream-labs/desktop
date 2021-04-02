@@ -495,11 +495,15 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   }
 
   get chatUrl(): string {
+    // don't show chat if the stream has not been started
     if (!this.state.videoId) return '';
+
+    // take a selected page if exists
     const page =
       this.state.settings.destinationType === 'page' &&
       this.state.facebookPages.find(p => p.id === this.state.settings.pageId);
 
+    // determine the chat url
     if (page && page.category === 'Gaming Video Creator') {
       // GVC pages have a specific chat url
       return `https://www.facebook.com/live/producer/dashboard/${this.state.videoId}/COMMENTS/`;
