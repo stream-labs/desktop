@@ -4,20 +4,19 @@ import { $t } from '../../../services/i18n';
 import { useVuex } from '../../hooks';
 import { CheckboxInput } from '../../shared/inputs';
 import { Services } from '../../service-provider';
-import { IEncoderProfile } from '../../../services/video-encoding-optimizations';
 import InputWrapper from '../../shared/inputs/InputWrapper';
 
 export default function OptimizedProfileSwitcher() {
   const { VideoEncodingOptimizationService } = Services;
-  const { game } = useGoLiveSettings();
+  const { game, optimizedProfile, updateSettings } = useGoLiveSettings();
   const enabled = useVuex(() => VideoEncodingOptimizationService.state.useOptimizedProfile);
+  const actions = VideoEncodingOptimizationService.actions;
 
   function setEnabled(enabled: boolean) {
     VideoEncodingOptimizationService.actions.return.useOptimizedProfile(enabled);
   }
 
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedProfile, setSelectedProfile] = useState<IEncoderProfile | null>(null);
 
   useEffect(() => {
     loadAvailableProfiles();
@@ -25,14 +24,13 @@ export default function OptimizedProfileSwitcher() {
 
   async function loadAvailableProfiles() {
     setIsLoading(true);
-    setSelectedProfile(
-      await VideoEncodingOptimizationService.actions.return.fetchOptimizedProfile(game),
-    );
+    const optimizedProfile = await actions.return.fetchOptimizedProfile(game);
+    updateSettings({ optimizedProfile });
     setIsLoading(false);
   }
 
   const label =
-    selectedProfile?.game !== 'DEFAULT'
+    optimizedProfile?.game !== 'DEFAULT'
       ? $t('Use optimized encoder settings for %{game}', { game })
       : $t('Use optimized encoder settings');
   const tooltip = $t(

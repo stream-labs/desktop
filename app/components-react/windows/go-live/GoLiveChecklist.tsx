@@ -29,7 +29,7 @@ export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
     isUpdateMode,
   } = useGoLiveSettings(view => ({
     shouldShowOptimizedProfile:
-      VideoEncodingOptimizationService.state.useOptimizedProfile && view.isMidStreamMode,
+      VideoEncodingOptimizationService.state.useOptimizedProfile && !view.isUpdateMode,
     shouldPostTweet: !view.isUpdateMode && TwitterService.state.tweetWhenGoingLive,
     delayEnabled: StreamingService.delayEnabled,
   }));
