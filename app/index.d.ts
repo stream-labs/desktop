@@ -88,8 +88,8 @@ declare module 'overlayscrollbars-vue';
 declare module 'ndarray';
 declare module 'gl-buffer';
 declare module 'gl-transitions';
-declare module 'gl-transition';
 declare module 'gl-texture2d';
+declare module 'gl-shader';
 
 // uncomment to allow TS to import components without type definitions
 // webpack still checks the module existence

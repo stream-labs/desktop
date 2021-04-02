@@ -4,14 +4,14 @@ import execa from 'execa';
 import ndarray from 'ndarray';
 import createBuffer from 'gl-buffer';
 import transitions from 'gl-transitions';
-import createTransition from 'gl-transition';
 import createTexture from 'gl-texture2d';
+import createTransition from './create-transition';
 import Vue from 'vue';
 import fs from 'fs-extra';
 
-import { StreamingService } from './streaming';
+import { StreamingService } from 'services/streaming';
 import electron from 'electron';
-import Utils from './utils';
+import Utils from 'services/utils';
 
 // const FFMPEG_DIR = path.resolve('../../', 'Downloads', 'ffmpeg', 'bin');
 const FFMPEG_DIR = Utils.isDevMode()
@@ -43,8 +43,8 @@ export const SCRUB_SPRITE_DIRECTORY = path.join(
   'highlighter',
 );
 
-const TRANSITION_DURATION = 1;
-const TRANSITION_FRAMES = TRANSITION_DURATION * FPS;
+// const TRANSITION_DURATION = 1;
+// const TRANSITION_FRAMES = TRANSITION_DURATION * FPS;
 
 interface PmapOptions<TVal, TRet> {
   concurrency?: number;
@@ -375,22 +375,28 @@ export class Clip {
 }
 
 export class AudioCrossfader {
-  constructor(public readonly outputPath: string, public readonly clips: Clip[]) {}
+  constructor(
+    public readonly outputPath: string,
+    public readonly clips: Clip[],
+    public readonly transitionDuration: number,
+  ) {}
 
   async export() {
     const inputArgs = this.clips.reduce((args: string[], clip) => {
       return [...args, '-i', clip.audioSource.outPath];
     }, []);
 
-    /* eslint-disable */
-    const args = [
-      ...inputArgs,
-      '-filter_complex', this.getFilterGraph(),
-      '-c:a', 'flac',
-      '-y',
-      this.outputPath,
-    ];
-    /* eslint-enable */
+    const args = [...inputArgs];
+
+    const filterGraph = this.getFilterGraph();
+
+    if (filterGraph.length > 0) {
+      args.push('-filter_complex', filterGraph);
+    }
+
+    args.push('-c:a', 'flac', '-y', this.outputPath);
+
+    console.log(args);
 
     await execa(FFMPEG_EXE, args);
   }
@@ -403,7 +409,7 @@ export class AudioCrossfader {
       .map((clip, i) => {
         const outStream = `[concat${i}]`;
 
-        let ret = `${inStream}[${i + 1}:a]acrossfade=d=${TRANSITION_DURATION}:c1=tri:c2=tri`;
+        let ret = `${inStream}[${i + 1}:a]acrossfade=d=${this.transitionDuration}:c1=tri:c2=tri`;
 
         inStream = outStream;
 
@@ -558,10 +564,15 @@ export class Transitioner {
 
   private readBuffer = Buffer.allocUnsafe(FRAME_BYTE_SIZE);
 
-  constructor() {
+  private transitionSrc: any;
+
+  constructor(public readonly transitionType: string) {
     this.canvas.width = this.width;
     this.canvas.height = this.height;
     this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
+    this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
+
+    this.transitionSrc = transitions.find((t: any) => t.name === this.transitionType);
   }
 
   renderTransition(fromFrame: Buffer, toFrame: Buffer, progress: number) {
@@ -572,8 +583,7 @@ export class Transitioner {
       this.gl.STATIC_DRAW,
     );
 
-    const transitionSrc = transitions.find((t: any) => t.name === 'wind');
-    const transition = createTransition(this.gl, transitionSrc);
+    const transition = createTransition(this.gl, this.transitionSrc);
 
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
@@ -639,9 +649,15 @@ export interface IExportInfo {
   cancelRequested: boolean;
 }
 
+export interface ITransitionInfo {
+  type: string;
+  duration: number;
+}
+
 interface IHighligherState {
   clips: Dictionary<IClip>;
   clipOrder: string[];
+  transition: ITransitionInfo;
   export: IExportInfo;
 }
 
@@ -673,6 +689,18 @@ class HighligherViews extends ViewHandler<IHighligherState> {
   get exportInfo() {
     return this.state.export;
   }
+
+  get transitionDuration() {
+    return this.state.transition.duration;
+  }
+
+  get transitionFrames() {
+    return this.transitionDuration * FPS;
+  }
+
+  get transitions() {
+    return transitions;
+  }
 }
 
 /**
@@ -685,6 +713,10 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   static initialState = {
     clips: {},
     clipOrder: [],
+    transition: {
+      type: 'cube',
+      duration: 1,
+    },
     export: {
       exporting: false,
       currentFrame: 0,
@@ -731,6 +763,14 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     };
   }
 
+  @mutation()
+  SET_TRANSITION_INFO(transitionInfo: Partial<ITransitionInfo>) {
+    this.state.transition = {
+      ...this.state.transition,
+      ...transitionInfo,
+    };
+  }
+
   get views() {
     return new HighligherViews(this.state);
   }
@@ -748,14 +788,14 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-06.mp4'),
         path.join(CLIP_DIR, 'Replay 2021-03-30 14-30-53.mp4'),
         path.join(CLIP_DIR, 'Replay 2021-03-30 14-32-34.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-33.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-48.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-03.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-23.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-51.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-18.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-30.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-44.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-33.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-48.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-03.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-23.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-51.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-18.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-30.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-44.mp4'),
       ];
 
       clipsToLoad.forEach(c => {
@@ -832,7 +872,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       return count + clip.frameSource.nFrames;
     }, 0);
     const numTransitions = clips.length - 1;
-    const totalFramesAfterTransitions = totalFrames - numTransitions * TRANSITION_FRAMES;
+    const totalFramesAfterTransitions = totalFrames - numTransitions * this.views.transitionFrames;
 
     this.SET_EXPORT_INFO({
       exporting: true,
@@ -845,7 +885,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     // Mix audio first
     await Promise.all(clips.map(clip => clip.audioSource.extract()));
     const audioMix = `${EXPORT_NAME}-audio.flac`;
-    const fader = new AudioCrossfader(audioMix, clips);
+    const fader = new AudioCrossfader(audioMix, clips, this.views.transitionDuration);
     await fader.export();
     await Promise.all(clips.map(clip => clip.audioSource.cleanup()));
 
@@ -854,7 +894,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     let fromClip = clips.shift();
     let toClip = clips.shift();
 
-    const transitioner = new Transitioner();
+    const transitioner = new Transitioner(this.state.transition.type);
 
     const writer = new FrameWriter(`${EXPORT_NAME}.mp4`, audioMix);
 
@@ -868,7 +908,8 @@ export class HighlighterService extends StatefulService<IHighligherState> {
 
       const fromFrameRead = await fromClip.frameSource.readNextFrame();
       const inTransition =
-        fromClip.frameSource.currentFrame >= fromClip.frameSource.nFrames - TRANSITION_FRAMES;
+        fromClip.frameSource.currentFrame >=
+        fromClip.frameSource.nFrames - this.views.transitionFrames;
       let frameToRender = fromClip.frameSource.readBuffer;
 
       if (inTransition && toClip) {
@@ -880,7 +921,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
 
           // Frame counter refers to next frame we will read
           // Subtract 1 to get the frame we just read
-          (toClip.frameSource.currentFrame - 1) / TRANSITION_FRAMES,
+          (toClip.frameSource.currentFrame - 1) / this.views.transitionFrames,
         );
         frameToRender = transitioner.getFrame();
 

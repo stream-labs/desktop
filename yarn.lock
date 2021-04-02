@@ -5937,13 +5937,6 @@ gl-texture2d@^2.1.0:
     ndarray-ops "^1.2.2"
     typedarray-pool "^1.1.0"
 
-gl-transition@^1.13.0:
-  version "1.13.0"
-  resolved "https://registry.yarnpkg.com/gl-transition/-/gl-transition-1.13.0.tgz#69b07f26e51930edd24a6922b10cb74e134603fd"
-  integrity sha1-abB/JuUZMO3SSmkisQy3ThNGA/0=
-  dependencies:
-    gl-shader "^4.2.1"
-
 gl-transitions@^1.43.0:
   version "1.43.0"
   resolved "https://registry.yarnpkg.com/gl-transitions/-/gl-transitions-1.43.0.tgz#790ce78f6713c75caba2b354764d7497971edcfd"
