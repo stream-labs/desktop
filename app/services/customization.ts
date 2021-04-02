@@ -63,7 +63,7 @@ export interface ICustomizationServiceState {
   mediaBackupOptOut: boolean;
   navigateToLiveOnStreamStart: boolean;
   experimental?: {
-    reactGoLive?: boolean;
+    legacyGoLive?: boolean;
     volmetersFPSLimit?: number;
   };
   legacyEvents: boolean;
@@ -143,9 +143,9 @@ class CustomizationViews extends ViewHandler<ICustomizationServiceState> {
   get experimentalSettingsFormData(): TObsFormData {
     return [
       <IObsInput<boolean>>{
-        value: this.state.experimental.reactGoLive,
-        name: 'reactGoLive',
-        description: 'Enable react GoLive window',
+        value: this.state.experimental.legacyGoLive,
+        name: 'legacyGoLive',
+        description: 'Use legacy GoLive window',
         type: 'OBS_PROPERTY_BOOL',
         visible: true,
         enabled: true,
