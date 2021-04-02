@@ -495,6 +495,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   }
 
   get chatUrl(): string {
+    if (!this.state.videoId) return '';
     if (this.state.settings.destinationType === 'page' && this.state.settings.game) {
       return `https://www.facebook.com/live/producer/dashboard/${this.state.videoId}/COMMENTS/`;
     } else {
