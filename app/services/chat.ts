@@ -247,10 +247,12 @@ export class ChatService extends Service {
           if (!this.chatView) return;
           this.chatView.webContents.executeJavaScript(
             `
+            try {
                 document.querySelector('html').style.overflowY='hidden !important';
                 var chatContainer = document.querySelector('div[data-pagelet="page"] > div');
                 chatContainer.style.marginLeft = '0';
                 chatContainer.style.marginRight = '0';
+            } catch (e) {}
         `,
             true,
           );
