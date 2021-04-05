@@ -340,6 +340,7 @@ function createValidationRules(inputProps: IInputCommonProps<unknown>) {
       }),
     });
   }
+  return rules;
 }
 
 /**
