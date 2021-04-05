@@ -6,6 +6,7 @@ import { $t } from '../../services/i18n';
 import React, { useEffect, useState } from 'react';
 import { Services } from '../service-provider';
 import { FileInput } from '../shared/inputs';
+import Scrollable from '../shared/Scrollable';
 import styles from './IconLibraryProperties.m.less';
 
 export default () => {
@@ -79,20 +80,22 @@ export default () => {
             filters={filters}
           />
         )}
-        <div className={styles.cellContainer}>
-          {errorState ? (
-            <div>{$t('An error has occured, please try re-opening this window')}</div>
-          ) : (
-            folderImages.map(image => (
-              <ImageCell
-                path={image}
-                isSelected={image === selectedIcon}
-                handleClick={selectIcon}
-                key={image}
-              />
-            ))
-          )}
-        </div>
+        <Scrollable snapToWindowEdge isResizable={false}>
+          <div className={styles.cellContainer}>
+            {errorState ? (
+              <div>{$t('An error has occured, please try re-opening this window')}</div>
+            ) : (
+              folderImages.map(image => (
+                <ImageCell
+                  path={image}
+                  isSelected={image === selectedIcon}
+                  handleClick={selectIcon}
+                  key={image}
+                />
+              ))
+            )}
+          </div>
+        </Scrollable>
       </div>
     </ModalLayout>
   );
