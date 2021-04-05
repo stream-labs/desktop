@@ -15,6 +15,7 @@ import electron from 'electron';
 import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
 import { ERenderingMode } from '../../../obs-api';
+import { StreamingService } from 'services/streaming';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;
@@ -32,8 +33,8 @@ export class EditMenu extends Menu {
   @Inject() private customizationService: CustomizationService;
   @Inject() private selectionService: SelectionService;
   @Inject() private projectorService: ProjectorService;
-  @Inject() private audioService: AudioService;
   @Inject() private editorCommandsService: EditorCommandsService;
+  @Inject() private streamingService: StreamingService;
 
   private scene = this.scenesService.views.getScene(this.options.selectedSceneId);
 
@@ -128,12 +129,14 @@ export class EditMenu extends Menu {
             click: () => {
               selectedItem.setStreamVisible(!selectedItem.streamVisible);
             },
+            enabled: this.streamingService.state.selectiveRecording,
           });
           this.append({
             label: recordingVisLabel,
             click: () => {
               selectedItem.setRecordingVisible(!selectedItem.recordingVisible);
             },
+            enabled: this.streamingService.state.selectiveRecording,
           });
           this.append({
             label: $t('Create Source Projector'),
