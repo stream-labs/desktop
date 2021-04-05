@@ -71,7 +71,7 @@ export default () => {
 
   return (
     <ModalLayout fixedChild={<PreviewImage />} onOk={() => WindowsService.closeChildWindow()}>
-      <div>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         {CustomizationService.views.designerMode && (
           <FileInput
             onChange={selectFolder}
@@ -80,7 +80,7 @@ export default () => {
             filters={filters}
           />
         )}
-        <Scrollable snapToWindowEdge isResizable={false}>
+        <Scrollable snapToWindowEdge isResizable={false} style={{ height: '100%' }}>
           <div className={styles.cellContainer}>
             {errorState ? (
               <div>{$t('An error has occured, please try re-opening this window')}</div>
