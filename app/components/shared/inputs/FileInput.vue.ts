@@ -22,6 +22,10 @@ export default class FileInput extends BaseInput<string, IFileMetadata> {
       options.properties.push('openFile');
     }
 
+    if (this.metadata.create) {
+      options.properties.push('promptToCreate');
+    }
+
     const { filePaths } = await electron.remote.dialog.showOpenDialog(options);
 
     if (filePaths[0]) {

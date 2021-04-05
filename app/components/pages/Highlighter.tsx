@@ -5,9 +5,12 @@ import ClipPreview from 'components/highlighter/ClipPreview';
 import { Inject } from 'services';
 import draggable from 'vuedraggable';
 import styles from './Highlighter.m.less';
+import { ListInput } from 'components/shared/inputs/inputs';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
+import { metadata } from 'components/shared/inputs';
 
 @Component({
-  components: { ClipPreview, draggable },
+  components: { ClipPreview, draggable, ListInput },
 })
 export default class Highlighter extends TsxComponent {
   @Inject() highlighterService: HighlighterService;
@@ -91,6 +94,80 @@ export default class Highlighter extends TsxComponent {
     );
   }
 
+  get transitionTypeMetadata() {
+    return metadata.list({
+      title: 'Transition Type',
+      options: this.highlighterService.views.transitions.map((transition: any) => {
+        return {
+          value: transition.name,
+          title: transition.name,
+        };
+      }),
+    });
+  }
+
+  get transitionType() {
+    return this.highlighterService.views.transition.type;
+  }
+
+  set transitionType(val: string) {
+    this.highlighterService.actions.setTransition({ type: val });
+  }
+
+  get transitionDurationMetadata() {
+    return metadata.slider({
+      title: 'Transition Duration',
+      min: 0.5,
+      max: 5,
+      interval: 0.1,
+    });
+  }
+
+  get transitionDuration() {
+    return this.highlighterService.views.transition.duration;
+  }
+
+  set transitionDuration(val: number) {
+    this.highlighterService.actions.setTransition({ duration: val });
+  }
+
+  get exportFileMetadata() {
+    return metadata.file({
+      title: 'Export File',
+      create: true,
+      filters: [{ name: 'MP4 Video File', extensions: ['mp4'] }],
+    });
+  }
+
+  get exportFile() {
+    return this.highlighterService.views.exportInfo.file;
+  }
+
+  set exportFile(val: string) {
+    this.highlighterService.actions.setExportFile(val);
+  }
+
+  getControls() {
+    return (
+      <div
+        style={{
+          width: '300px',
+          flexShrink: 0,
+          background: 'var(--section)',
+          borderLeft: '1px solid var(--border)',
+          padding: '20px',
+        }}
+      >
+        <VFormGroup metadata={this.transitionTypeMetadata} vModel={this.transitionType} />
+        <VFormGroup metadata={this.transitionDurationMetadata} vModel={this.transitionDuration} />
+        <VFormGroup metadata={this.exportFileMetadata} vModel={this.exportFile} />
+        <button class="button button--action" style={{ marginTop: '16px' }} onClick={this.export}>
+          Export
+        </button>
+      </div>
+    );
+  }
+
   getClipsView() {
     return (
       <div style={{ width: '100%', display: 'flex' }}>
@@ -107,21 +184,7 @@ export default class Highlighter extends TsxComponent {
             })}
           </draggable>
         </div>
-        <div
-          style={{
-            width: '300px',
-            flexShrink: 0,
-            background: 'var(--section)',
-            borderLeft: '1px solid var(--border)',
-            padding: '8px',
-          }}
-        >
-          Controls go here
-          <br />
-          <button class="button button--action" style={{ marginTop: '16px' }} onClick={this.export}>
-            Export
-          </button>
-        </div>
+        {this.getControls()}
       </div>
     );
   }

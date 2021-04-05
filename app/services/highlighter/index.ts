@@ -26,7 +26,7 @@ export const CLIP_1 = path.join(CLIP_DIR, '1.mp4');
 export const CLIP_2 = path.join(CLIP_DIR, '2.mp4');
 export const CLIP_3 = path.join(CLIP_DIR, '3.mp4');
 export const CLIP_4 = path.join(CLIP_DIR, 'Facebook Refactor.mov');
-const EXPORT_NAME = path.join(CLIP_DIR, 'output');
+// const EXPORT_NAME = path.join(CLIP_DIR, 'output');
 
 const WIDTH = 1280;
 const HEIGHT = 720;
@@ -647,6 +647,7 @@ export interface IExportInfo {
   totalFrames: number;
   step: EExportStep;
   cancelRequested: boolean;
+  file: string;
 }
 
 export interface ITransitionInfo {
@@ -690,6 +691,10 @@ class HighligherViews extends ViewHandler<IHighligherState> {
     return this.state.export;
   }
 
+  get transition() {
+    return this.state.transition;
+  }
+
   get transitionDuration() {
     return this.state.transition.duration;
   }
@@ -714,7 +719,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     clips: {},
     clipOrder: [],
     transition: {
-      type: 'cube',
+      type: 'fade',
       duration: 1,
     },
     export: {
@@ -723,6 +728,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       totalFrames: 0,
       step: EExportStep.AudioMix,
       cancelRequested: false,
+      file: path.join(electron.remote.app.getPath('videos'), 'Output.mp4'),
     },
   } as IHighligherState;
 
@@ -819,6 +825,14 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     this.SET_ORDER(order);
   }
 
+  setTransition(transition: Partial<ITransitionInfo>) {
+    this.SET_TRANSITION_INFO(transition);
+  }
+
+  setExportFile(file: string) {
+    this.SET_EXPORT_INFO({ file });
+  }
+
   async loadClips() {
     await this.ensureScrubDirectory();
 
@@ -884,7 +898,8 @@ export class HighlighterService extends StatefulService<IHighligherState> {
 
     // Mix audio first
     await Promise.all(clips.map(clip => clip.audioSource.extract()));
-    const audioMix = `${EXPORT_NAME}-audio.flac`;
+    const parsed = path.parse(this.views.exportInfo.file);
+    const audioMix = path.join(parsed.dir, `${parsed.name}-audio.flac`);
     const fader = new AudioCrossfader(audioMix, clips, this.views.transitionDuration);
     await fader.export();
     await Promise.all(clips.map(clip => clip.audioSource.cleanup()));
@@ -896,7 +911,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
 
     const transitioner = new Transitioner(this.state.transition.type);
 
-    const writer = new FrameWriter(`${EXPORT_NAME}.mp4`, audioMix);
+    const writer = new FrameWriter(this.views.exportInfo.file, audioMix);
 
     while (true) {
       if (this.views.exportInfo.cancelRequested) {
