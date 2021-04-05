@@ -14,6 +14,8 @@ const DEBUG = false;
  * Flux-like state manager for React.Context
  * Helps to track local and global (vuex) state and re-render components in optimized way
  * Use it when you have a complex state with computed fields that depends on Vuex
+ *
+ * We may want to replace this state manager with some library like Redux in the future
  */
 export function useStateManager<
   TState extends object, // state type
