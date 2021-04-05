@@ -86,6 +86,7 @@ export interface IYoutubeLiveBroadcast {
     lifeCycleStatus: TBroadcastLifecycleStatus;
     privacyStatus: 'private' | 'public' | 'unlisted';
     recordingStatus: 'notRecording' | 'recorded' | 'recording';
+    madeForKids: boolean;
     selfDeclaredMadeForKids: boolean;
   };
 }
@@ -529,8 +530,9 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     };
 
     const status: Partial<IYoutubeLiveBroadcast['status']> = {
-      privacyStatus: params.privacyStatus,
+      ...broadcast.status,
       selfDeclaredMadeForKids: params.selfDeclaredMadeForKids,
+      privacyStatus: params.privacyStatus,
     };
 
     const fields = ['snippet', 'status', 'contentDetails'];

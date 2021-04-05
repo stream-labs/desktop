@@ -21,6 +21,10 @@ export class HostsService extends Service {
     return 'media.streamlabs.com';
   }
 
+  get facemaskCDN() {
+    return 'facemasks-cdn.streamlabs.com/';
+  }
+
   get io() {
     if (Util.useLocalHost()) {
       return 'http://io.streamlabs.site:4567';
