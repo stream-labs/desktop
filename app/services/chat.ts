@@ -245,18 +245,17 @@ export class ChatService extends Service {
       if (this.userService.platform?.type === 'facebook') {
         Utils.sleep(2000).then(() => {
           if (!this.chatView) return;
-          this.chatView.webContents.executeJavaScript(
-            `
-            try {
+          this.chatView.webContents
+            .executeJavaScript(
+              `
                 document.querySelector('html').style.overflowY='hidden !important';
                 var chatContainer = document.querySelector('div[data-pagelet="page"] > div');
                 chatContainer.style.marginLeft = '0';
                 chatContainer.style.marginRight = '0';
-            } catch e {}
-            0;
-        `,
-            true,
-          );
+                `,
+              true,
+            )
+            .catch(e => {});
         });
       }
     });
