@@ -1,7 +1,7 @@
 import TsxComponent from 'components/tsx-component';
 import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
-import Display from 'components/shared/Display.vue';
+import { Display } from 'components/shared/ReactComponent';
 import StudioModeControls from 'components/StudioModeControls.vue';
 import { TransitionsService } from 'services/transitions';
 import { EditorService, IMouseEvent } from 'services/editor';

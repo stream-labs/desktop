@@ -293,6 +293,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       platform: 'youtube',
       key: streamKey,
       streamType: 'rtmp_common',
+      server: 'rtmp://a.rtmp.youtube.com/live2',
     });
 
     // update the local state
