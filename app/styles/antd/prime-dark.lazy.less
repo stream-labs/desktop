@@ -10,8 +10,8 @@
 @highlight-color: @prime-dark; // var(--accent)
 @warning-color: @prime-dark; // var(--info)
 @normal-color: @primedark-5; // var(--midtone)
-@disabled-color: @primelight-4; // var(--paragraph)
-@disabled-bg: @dark-5; // var(--button)
+@disabled-color: fade(@primelight-4, 50%); // var(--paragraph) + opacity: 0.5
+@disabled-bg: fade(@primedark-5, 50%); // var(--button) + opacity 0.5
 
 @primary-1: darken(@prime-dark, 4%); // var(--teal-hover)
 @primary-2: darken(@prime-dark, 4%); // var(--teal-hover)
@@ -53,6 +53,7 @@
 @btn-danger-color: @red-dark; // var(--warning)
 @btn-danger-bg: fade(@red-dark, 28%); // var(--warning-bg)
 @btn-text-hover-bg: transparent;
+@btn-default-bg: @primedark-5; // var(--button)
 
 @checkbox-check-color: @primelight-1; // var(--title)
 
@@ -129,6 +130,7 @@
 @image-color: transparent;
 
 @border-radius-base: 4px;
+@font-family: 'Roboto', sans-serif;
 
 // ADDITIONAL STYLES
 .ant-modal-footer {
@@ -140,6 +142,23 @@
 // justify all inputs of form to the right in the modal footer
 #mainWrapper .ant-modal-footer  .ant-form-inline {
   justify-content: flex-end;
+}
+
+.ant-input-group-addon {
+  border: 0;
+
+  .ant-btn {
+    margin: 0px -11px;
+    border-radius: 0 4px 4px 0;
+  }
+}
+
+.ant-btn {
+  border: 0;
+
+  &:hover {
+    color: @heading-color;
+  }
 }
 
 

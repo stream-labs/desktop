@@ -11,6 +11,7 @@ import { GameCaptureNode } from './nodes/overlays/game-capture';
 import { parse } from './parse';
 import { StreamlabelNode } from './nodes/overlays/streamlabel';
 import { WidgetNode } from './nodes/overlays/widget';
+import { IconLibraryNode } from './nodes/overlays/icon-library';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
@@ -35,6 +36,7 @@ const NODE_TYPES = {
   TransitionNode,
   SceneSourceNode,
   GameCaptureNode,
+  IconLibraryNode,
 };
 
 export class OverlaysPersistenceService extends Service {
