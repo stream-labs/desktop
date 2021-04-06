@@ -1,7 +1,7 @@
 import { useGoLiveSettings } from '../useGoLiveSettings';
 import CommonPlatformFields from '../CommonPlatformFields';
 import React from 'react';
-import { createBinding, TagsInput } from '../../../shared/inputs';
+import { createBinding } from '../../../shared/inputs';
 import { $t } from '../../../../services/i18n';
 import { TwitchTagsInput } from './TwitchTagsInput';
 import GameSelector from '../GameSelector';
