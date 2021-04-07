@@ -15,6 +15,7 @@ const ANT_SELECT_FEATURES = [
   'onDropdownVisibleChange',
   'onSearch',
   'onSelect',
+  'allowClear',
 ] as const;
 
 // define custom props
@@ -23,6 +24,7 @@ export interface ICustomListProps<TValue> {
   imageSize?: { width: number; height: number };
   optionRender?: (opt: IListOption<TValue>) => ReactNode;
   labelRender?: (opt: IListOption<TValue>) => ReactNode;
+  onBeforeSearch?: (searchStr: string) => unknown;
   options: IListOption<TValue>[];
 }
 
@@ -47,37 +49,39 @@ export interface IListOption<TValue> {
 export const ListInput = InputComponent(<T extends any>(p: TListInputProps<T>) => {
   const { inputAttrs, wrapperAttrs } = useInput('list', p, ANT_SELECT_FEATURES);
   const options = p.options;
+  const debouncedSearch = useDebounce(p.debounce, startSearch);
 
-  // create onSearch handler and it's debounced version
-  const onSearchHandlerDebounced = p.debounce
-    ? useDebounce(p.debounce, onSearchHandler)
-    : onSearchHandler;
-
-  const selectedOption = options.find(opt => opt.value === p.value);
-
-  function render() {
-    return (
-      <InputWrapper {...wrapperAttrs} extra={selectedOption?.description}>
-        <Select
-          {...omit(inputAttrs, 'onChange')}
-          // search by label instead value
-          value={inputAttrs.value as string}
-          optionFilterProp="label"
-          optionLabelProp="labelrender"
-          onSearch={p.showSearch ? onSearchHandlerDebounced : undefined}
-          onSelect={val => p.onChange && p.onChange(val as T)}
-        >
-          {options && options.map((opt, ind) => renderOption(opt, ind, p))}
-        </Select>
-      </InputWrapper>
-    );
-  }
-
-  function onSearchHandler(searchStr: string) {
+  function startSearch(searchStr: string) {
     p.onSearch && p.onSearch(searchStr);
   }
 
-  return render();
+  function onSearchHandler(searchStr: string) {
+    p.onBeforeSearch && p.onBeforeSearch(searchStr);
+    if (!p.onSearch) return;
+    if (p.debounce) {
+      debouncedSearch(searchStr);
+    } else {
+      startSearch(searchStr);
+    }
+  }
+
+  const selectedOption = options.find(opt => opt.value === p.value);
+
+  return (
+    <InputWrapper {...wrapperAttrs} extra={selectedOption?.description}>
+      <Select
+        {...omit(inputAttrs, 'onChange')}
+        // search by label instead value
+        value={inputAttrs.value as string}
+        optionFilterProp="label"
+        optionLabelProp="labelrender"
+        onSearch={p.showSearch ? onSearchHandler : undefined}
+        onSelect={val => p.onChange && p.onChange(val as T)}
+      >
+        {options && options.map((opt, ind) => renderOption(opt, ind, p))}
+      </Select>
+    </InputWrapper>
+  );
 });
 
 export function renderOption<T>(opt: IListOption<T>, ind: number, inputProps: ICustomListProps<T>) {

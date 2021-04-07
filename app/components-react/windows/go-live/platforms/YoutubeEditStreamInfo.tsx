@@ -1,4 +1,3 @@
-import { IGoLiveSettings } from '../../../../services/streaming';
 import CommonPlatformFields from '../CommonPlatformFields';
 import { CheckboxInput, ImageInput, ListInput } from '../../../shared/inputs';
 import React, { useEffect } from 'react';
@@ -25,6 +24,7 @@ export function YoutubeEditStreamInfo() {
     isScheduleMode,
     renderPlatformSettings,
     isMidStreamMode,
+    getSettings,
   } = useGoLiveSettings(view => ({
     ytSettings: view.platforms.youtube,
   }));
@@ -32,7 +32,7 @@ export function YoutubeEditStreamInfo() {
   const shouldShowSafeForKidsWarn = ytSettings.selfDeclaredMadeForKids;
   const broadcastId = ytSettings.broadcastId;
   const bind = createBinding(
-    ytSettings,
+    () => getSettings().platforms.youtube,
     newYtSettings => updatePlatform('youtube', newYtSettings),
     fieldName => ({ disabled: fieldIsDisabled(fieldName as keyof IYoutubeStartStreamOptions) }),
   );
@@ -80,9 +80,9 @@ export function YoutubeEditStreamInfo() {
     return <CommonPlatformFields key="common" platform="youtube" />;
   }
 
-  function renderOptionalFields() {
+  function renderBroadcastInput() {
     return (
-      <div key="optional">
+      <div key={'broadcast'}>
         {!isScheduleMode && (
           <BroadcastInput
             value=""
@@ -93,6 +93,13 @@ export function YoutubeEditStreamInfo() {
             {...bind.broadcastId}
           />
         )}
+      </div>
+    );
+  }
+
+  function renderOptionalFields() {
+    return (
+      <div key="optional">
         <ListInput
           {...bind.privacyStatus}
           label={$t('Privacy')}
@@ -126,7 +133,6 @@ export function YoutubeEditStreamInfo() {
           {...bind.thumbnail}
         />
 
-        {/* TODO: add description */}
         <ListInput
           label={$t('Stream Latency')}
           tooltip={$t('latencyTooltip')}
@@ -188,7 +194,12 @@ export function YoutubeEditStreamInfo() {
 
   return (
     <Form name="youtube-settings">
-      {renderPlatformSettings(renderCommonFields(), <div key={'empty'} />, renderOptionalFields())}
+      {renderPlatformSettings(
+        renderCommonFields(),
+        <div key={'empty'} />,
+        renderOptionalFields(),
+        renderBroadcastInput(),
+      )}
     </Form>
   );
 }

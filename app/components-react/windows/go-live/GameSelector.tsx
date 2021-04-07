@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TPlatform } from '../../../services/platforms';
 import { ListInput, TSlobsInputProps } from '../../shared/inputs';
 import { $t } from '../../../services/i18n';
@@ -24,6 +24,8 @@ export default function GameSelector(p: TProps) {
     };
   });
 
+  const [isSearching, setIsSearching] = useState(false);
+
   useEffect(() => {
     loadImageForSelectedGame();
   }, []);
@@ -44,6 +46,12 @@ export default function GameSelector(p: TProps) {
       : await FacebookService.actions.return.searchGames(searchString)
     ).map(g => ({ value: g.name, label: g.name, image: g.image }));
     updateState({ games });
+    setIsSearching(false);
+  }
+
+  function onBeforeSearchHandler(searchString: string) {
+    if (searchString.length < 2) return;
+    setIsSearching(true);
   }
 
   const isTwitch = platform === 'twitch';
@@ -62,8 +70,10 @@ export default function GameSelector(p: TProps) {
       debounce={500}
       required={isTwitch}
       hasImage={isTwitch}
+      onBeforeSearch={onBeforeSearchHandler}
       imageSize={TwitchService.gameImageSize}
-      notFoundContent={$t('No matching game(s) found.')}
+      loading={isSearching}
+      notFoundContent={isSearching ? $t('Searching...') : $t('No matching game(s) found.')}
     />
   );
 }

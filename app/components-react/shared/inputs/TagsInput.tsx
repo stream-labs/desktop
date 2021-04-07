@@ -3,9 +3,16 @@ import React, { useMemo, ReactElement } from 'react';
 import { InputComponent, SingleType, TSlobsInputProps, useInput, ValuesOf } from './inputs';
 import InputWrapper from './InputWrapper';
 import { SelectProps } from 'antd/lib/select';
-import { ICustomListProps, IListOption, renderOption, TListInputProps } from './ListInput';
+import {
+  ICustomListProps,
+  IListOption,
+  ListInput,
+  renderOption,
+  TListInputProps
+} from './ListInput';
 import { TagProps } from 'antd/lib/tag';
 import { keyBy } from 'lodash';
+import { $t } from "../../../services/i18n";
 
 // select which features from the antd lib we are going to use
 const ANT_SELECT_FEATURES = ['showSearch', 'loading'] as const;
@@ -48,6 +55,7 @@ export const TagsInput = InputComponent(<T extends any>(p: TTagsInputProps<T>) =
         value={p.value as string | number}
         onChange={val => inputAttrs.onChange(val as T)}
         tagRender={renderTag}
+        placeholder={$t('Start typing to search')}
       >
         {options && options.map((opt, ind) => renderOption(opt, ind, p))}
       </Select>

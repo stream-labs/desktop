@@ -8,7 +8,6 @@ import { Section } from './Section';
 import { YoutubeEditStreamInfo } from './platforms/YoutubeEditStreamInfo';
 import FacebookEditStreamInfo from './platforms/FacebookEditStreamInfo';
 import GoLiveError from './GoLiveError';
-import Spinner from '../../shared/Spinner';
 
 export default function PlatformSettings() {
   const {
@@ -25,8 +24,6 @@ export default function PlatformSettings() {
     // minHeight is required for the loading spinner
     <div style={{ minHeight: '150px' }}>
       <GoLiveError />
-
-      <Spinner visible={!error && isLoading} />
 
       {shouldShowSettings && (
         <div style={{ width: '100%' }}>

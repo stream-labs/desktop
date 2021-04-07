@@ -28,6 +28,7 @@ export function confirm(
       onOk: () => resolve(true),
       onCancel: () => resolve(false),
     });
+    fixBodyWidth();
   });
 }
 
@@ -48,10 +49,23 @@ export function alertAsync(p: Omit<ModalFuncProps, 'afterClose'> | string): Prom
       cancelButtonProps: { style: { display: 'none' } },
       okButtonProps: { type: 'default' },
       okText: $t('Close'),
+      bodyStyle: { width: '100%', textAlign: 'right' },
       afterClose: () => {
         WindowsService.updateStyleBlockers(Utils.getWindowId(), false);
         resolve();
       },
     });
+    fixBodyWidth();
+  });
+}
+
+/**
+ * The Antd lib adds additional styles to body most likely to handle scrollbars
+ * these styles add additional width that makes the window looks junkie
+ * Just remove these styles with this function after each modal show
+ */
+function fixBodyWidth() {
+  setTimeout(() => {
+    document.querySelector('body')!.setAttribute('style', '');
   });
 }

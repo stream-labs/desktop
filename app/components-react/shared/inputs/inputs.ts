@@ -35,6 +35,7 @@ export interface IInputCommonProps<TValue> {
   placeholder?: string;
   disabled?: boolean;
   debounce?: number;
+  emptyVal?: string;
   /**
    * true if the input is in the uncontrolled mode
    * all input components except text inputs are controlled by default
@@ -133,9 +134,12 @@ export function useInput<
   }
 
   useEffect(() => {
+    // set empty string as a default empty value
+    const emptyVal = typeof inputProps.emptyVal === 'undefined' ? '' : inputProps.emptyVal;
+
     // if the input is inside the form
     // then we need to setup it's value via Form API
-    if (form) form.setFieldsValue({ [inputId]: value });
+    if (form && value !== emptyVal) form.setFieldsValue({ [inputId]: value });
   }, [value]);
 
   const forceUpdate = useForceUpdate();
@@ -291,10 +295,16 @@ export function createBinding<
   TFieldName extends keyof TState,
   TExtraProps extends object = {}
 >(
-  state: TState,
+  stateGetter: TState | (() => TState),
   setter: (newTarget: Partial<TState>) => unknown,
   extraPropsGenerator?: (fieldName: keyof TState) => TExtraProps,
 ): TBindings<TState, TFieldName, TExtraProps> {
+  function getState(): TState {
+    return typeof stateGetter === 'function'
+      ? (stateGetter as Function)()
+      : (stateGetter as TState);
+  }
+
   return new Proxy(
     {},
     {
@@ -304,9 +314,9 @@ export function createBinding<
           : {};
         return {
           name: fieldName,
-          value: state[fieldName],
+          value: getState()[fieldName],
           onChange(newVal: unknown) {
-            setter({ ...state, [fieldName]: newVal });
+            setter({ ...getState(), [fieldName]: newVal });
           },
           ...extraProps,
         };
@@ -342,6 +352,17 @@ function createValidationRules(inputProps: IInputCommonProps<unknown>) {
   }
   return rules;
 }
+
+// let bindingId = 0;
+// export function useBinding(target: Object) {
+//   const bindingIdRef = useRef(0);
+//   const targetRef = useRef(target);
+//   const inputProps = useRef({});
+//   if (!bindingIdRef.current) {
+//     bindingIdRef.current = bindingId++;
+//     inputProps = createBinding()
+//   }
+// }
 
 /**
  * Function for creating new input components

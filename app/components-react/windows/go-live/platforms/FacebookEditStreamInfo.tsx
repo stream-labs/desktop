@@ -236,9 +236,10 @@ export default function FacebookEditStreamInfo() {
             {...bind.liveVideoId}
             label={$t('Scheduled Video')}
             loading={!s.scheduledVideosLoaded}
+            allowClear
             placeholder={$t('Not selected')}
             options={[
-              { value: '', label: $t('Not selected') },
+              // { value: '', label: $t('Not selected') },
               ...s.scheduledVideos.map(v => ({
                 label: `${v.title} ${v.planned_start_time &&
                   moment(new Date(v.planned_start_time)).calendar()}`,

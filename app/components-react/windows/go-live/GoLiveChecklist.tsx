@@ -1,6 +1,6 @@
 import { useGoLiveSettings } from './useGoLiveSettings';
 import css from './GoLiveChecklist.m.less';
-import React, { HTMLAttributes } from 'react';
+import React, { HTMLAttributes, useEffect } from 'react';
 import { Services } from '../../service-provider';
 import { $t } from '../../../services/i18n';
 import { TGoLiveChecklistItemState } from '../../../services/streaming';
@@ -9,12 +9,18 @@ import GoLiveError from './GoLiveError';
 import MessageLayout from './MessageLayout';
 import { Timeline } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined, LoadingOutlined } from '@ant-design/icons';
+import Utils from '../../../services/utils';
 
 /**
  * Shows transition to live progress and helps troubleshoot related problems
  */
 export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
-  const { StreamingService, VideoEncodingOptimizationService, TwitterService } = Services;
+  const {
+    StreamingService,
+    VideoEncodingOptimizationService,
+    TwitterService,
+    WindowsService,
+  } = Services;
   const {
     error,
     enabledPlatforms,
@@ -23,7 +29,6 @@ export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
     shouldShowOptimizedProfile,
     shouldPostTweet,
     checklist,
-    delayEnabled,
     warning,
     getPlatformDisplayName,
     isUpdateMode,
@@ -35,6 +40,17 @@ export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
   }));
 
   const success = lifecycle === 'live';
+
+  // close this window in 1s after start streaming
+  useEffect(() => {
+    if (lifecycle === 'live' && !warning) {
+      Utils.sleep(1000).then(() => {
+        if (WindowsService.state.child.componentName === 'GoLiveWindow') {
+          WindowsService.actions.closeChildWindow();
+        }
+      });
+    }
+  }, [lifecycle]);
 
   function render() {
     return (
@@ -63,9 +79,7 @@ export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
 
           {/* START TRANSMISSION */}
           {!isUpdateMode &&
-            renderCheck($t('Start video transmission'), checklist.startVideoTransmission, {
-              renderStreamDelay: delayEnabled,
-            })}
+            renderCheck($t('Start video transmission'), checklist.startVideoTransmission)}
 
           {/* POST A TWEET */}
           {shouldPostTweet && renderCheck($t('Post a tweet'), checklist.postTweet)}
@@ -97,11 +111,7 @@ export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
   /**
    * Renders a Timeline item in one of 4 states - 'not-started', 'pending', 'done', 'error'
    */
-  function renderCheck(
-    title: string,
-    state: TGoLiveChecklistItemState,
-    modificators?: { renderStreamDelay?: boolean },
-  ) {
+  function renderCheck(title: string, state: TGoLiveChecklistItemState) {
     let dot;
     let color;
     switch (state) {

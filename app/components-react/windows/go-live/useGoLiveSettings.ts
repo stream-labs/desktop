@@ -14,7 +14,6 @@ type TCustomFieldName = 'title' | 'description';
 type TModificators = { isUpdateMode?: boolean; isScheduleMode?: boolean };
 type IGoLiveSettingsState = IGoLiveSettings & TModificators & { needPrepopulate: boolean };
 
-
 /**
  * Shared state and utils for for GoLiveWindow and EditStreamWindow
  */
@@ -80,10 +79,15 @@ function initializeGoLiveSettings(
       return form;
     },
 
+    getSettings() {
+      return getView(getState()).settings;
+    },
+
     renderPlatformSettings(
       commonFields: JSX.Element,
       requiredFields: JSX.Element,
-      ptionalFields: JSX.Element,
+      optionalFields: JSX.Element,
+      essentialOptionalFields?: JSX.Element,
     ) {
       let settingsMode: 'singlePlatform' | 'multiplatformAdvanced' | 'multiplatformSimple';
       if (view.isMultiplatformMode) {
@@ -91,13 +95,14 @@ function initializeGoLiveSettings(
       } else {
         settingsMode = 'singlePlatform';
       }
+
       switch (settingsMode) {
         case 'singlePlatform':
-          return [commonFields, requiredFields, ptionalFields];
+          return [essentialOptionalFields, commonFields, requiredFields, optionalFields];
         case 'multiplatformSimple':
           return requiredFields;
         case 'multiplatformAdvanced':
-          return [requiredFields, ptionalFields, commonFields];
+          return [essentialOptionalFields, requiredFields, optionalFields, commonFields];
       }
     },
   };

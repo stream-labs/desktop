@@ -15,7 +15,7 @@ body {
   background-color: var(--background);
 }
 
-#mainWrapper {
+#mainWrapper .react {
   // justify all inputs of form to the right in the modal footer
   .ant-modal-footer  .ant-form-inline {
     justify-content: flex-end;
@@ -27,5 +27,26 @@ body {
     font-size: 11px;
     font-style: italic;
   }
+
+  // Use primary color for required marks
+  label.ant-form-item-required::before {
+    color: var(--primary);
+  }
+
+  // remove transitions from hover states of inputs
+  .ant-select-selector:hover,
+  .ant-input:hover {
+    transition: none;
+  }
+
+  // override foundation inputs
+  [type=color]:focus, [type=date]:focus, [type=datetime-local]:focus, [type=datetime]:focus, [type=email]:focus, [type=month]:focus, [type=number]:focus, [type=password]:focus, [type=search]:focus, [type=tel]:focus, [type=text]:focus, [type=time]:focus, [type=url]:focus, [type=week]:focus, textarea:focus {
+    box-shadow: none;
+  }
+
+
+  //::-webkit-resizer {
+  //  display: none;
+  //}
 }
 

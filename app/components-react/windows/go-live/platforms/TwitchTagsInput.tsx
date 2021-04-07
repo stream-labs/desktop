@@ -41,7 +41,7 @@ export function TwitchTagsInput(p: TTwitchTagsInputProps) {
         optionRender={opt => (
           <Row gutter={8}>
             <Col span={10}>{opt.label}</Col>
-            <Col span={14} style={{ whiteSpace: 'normal' }}>
+            <Col span={14} style={{ whiteSpace: 'normal', fontSize: '12px' }}>
               {opt.description}
             </Col>
           </Row>

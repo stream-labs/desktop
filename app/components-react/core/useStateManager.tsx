@@ -8,7 +8,7 @@ const GenericStateManagerContext = React.createContext(null);
 // React devtools are broken for Electron 9 and 10
 // as an alternative set DEBUG=true
 // to track components re-renders and timings in the console
-const DEBUG = false;
+const DEBUG = true;
 
 /**
  * Flux-like state manager for React.Context
@@ -534,6 +534,7 @@ type TDispatcher<TState, TActions> = {
 
 /**
  * Merge 2 object without reading their props
+ * Ensures the result object is read-only
  */
 export function merge<TObj1 extends object, TObj2 extends object>(
   obj1: TObj1,
@@ -585,8 +586,12 @@ export function merge<TObj1 extends object, TObj2 extends object>(
       return getTargetValue(target, propName);
     },
     set: (target, propName: string, val) => {
-      metadata[propName] = val;
-      return true;
+      if (propName.startsWith('_')) {
+        metadata[propName] = val;
+        return true;
+      } else {
+        throw new Error('Can not change property on readonly object');
+      }
     },
   }) as unknown) as TMerge<TObj1, TObj2>;
 }
