@@ -82,6 +82,49 @@ export default class SideNav extends Vue {
     return this.appService.state.loading;
   }
 
+  get pageData() {
+    const pageData: IPageData[] = [];
+
+    if (this.userService.isLoggedIn) {
+      pageData.push({
+        target: 'AlertboxLibrary',
+        icon: 'icon-alert-box',
+        title: $t('Alertbox Library'),
+        trackingTarget: 'alertbox-library',
+        newBadge: true,
+      });
+    }
+
+    if (this.userService.isLoggedIn) {
+      pageData.push({
+        target: 'BrowseOverlays',
+        icon: 'icon-themes',
+        title: $t('Themes'),
+        trackingTarget: 'themes',
+      });
+    }
+
+    if (this.appStoreVisible) {
+      pageData.push({
+        target: 'PlatformAppStore',
+        icon: 'icon-store',
+        title: $t('App Store'),
+        trackingTarget: 'app-store',
+      });
+    }
+
+    if (this.userService.isLoggedIn) {
+      pageData.push({
+        target: 'Grow',
+        icon: 'icon-graph',
+        title: $t('Grow'),
+        trackingTarget: 'grow-tab',
+      });
+    }
+
+    return pageData;
+  }
+
   get primaryStudioTab() {
     return (
       <div
@@ -137,40 +180,10 @@ export default class SideNav extends Vue {
   }
 
   render() {
-    const pageData: IPageData[] = [];
-
-    if (this.userService.isLoggedIn) {
-      pageData.push({
-        target: 'AlertboxLibrary',
-        icon: 'icon-alert-box',
-        title: $t('Alertbox Library'),
-        trackingTarget: 'alertbox-library',
-        newBadge: true,
-      });
-    }
-
-    if (this.userService.isLoggedIn) {
-      pageData.push({
-        target: 'BrowseOverlays',
-        icon: 'icon-themes',
-        title: $t('Themes'),
-        trackingTarget: 'themes',
-      });
-    }
-
-    if (this.appStoreVisible) {
-      pageData.push({
-        target: 'PlatformAppStore',
-        icon: 'icon-store',
-        title: $t('App Store'),
-        trackingTarget: 'app-store',
-      });
-    }
-
     return (
       <div class={cx('side-nav', styles.container, { [styles.leftDock]: this.leftDock })}>
         {this.primaryStudioTab}
-        {pageData.map(page => (
+        {this.pageData.map(page => (
           <div
             class={cx(styles.mainCell, {
               [styles.active]: this.page === page.target,
