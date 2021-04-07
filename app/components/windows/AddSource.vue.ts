@@ -69,6 +69,8 @@ export default class AddSource extends Vue {
       this.name = $t('Instant Replay');
     } else if (this.sourceAddOptions.propertiesManager === 'streamlabels') {
       this.name = $t('Stream Label');
+    } else if (this.sourceAddOptions.propertiesManager === 'iconLibrary') {
+      this.name = $t('Custom Icon');
     } else if (this.sourceAddOptions.propertiesManager === 'widget') {
       this.name = this.sourcesService.suggestName(
         WidgetDisplayData(this.platform)[this.widgetType].name,

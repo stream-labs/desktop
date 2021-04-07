@@ -13,6 +13,7 @@ import { GameOverlayService } from './game-overlay';
 import { CustomizationService } from './customization';
 import { RecentEventsService } from './recent-events';
 import { UsageStatisticsService } from './usage-statistics';
+import { getOS, OS } from 'util/operating-systems';
 
 function getScenesService(): ScenesService {
   return ScenesService.instance;
@@ -163,11 +164,13 @@ const GENERAL_ACTIONS: HotkeyGroup = {
     name: 'TOGGLE_OVERLAY',
     description: () => $t('Toggle in-game overlay'),
     down: () => getGameOverlayService().toggleOverlay(),
+    shouldApply: () => getOS() === OS.Windows,
   },
   TOGGLE_OVERLAY_POSITIONING: {
     name: 'TOGGLE_OVERLAY_POSITIONING',
     description: () => $t('Toggle overlay positioning mode'),
     down: () => getGameOverlayService().setPreviewMode(!getGameOverlayService().state.previewMode),
+    shouldApply: () => getOS() === OS.Windows,
   },
   TOGGLE_PERFORMANCE_MODE: {
     name: 'TOGGLE_PERFORMANCE_MODE',
