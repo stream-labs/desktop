@@ -134,7 +134,7 @@ export default class Highlighter extends TsxComponent {
   get exportFileMetadata() {
     return metadata.file({
       title: 'Export File',
-      create: true,
+      save: true,
       filters: [{ name: 'MP4 Video File', extensions: ['mp4'] }],
     });
   }
