@@ -42,6 +42,7 @@ interface ITrains {
   donation: IDonationTrainInfo;
   subscription: ITrainInfo;
   follow: ITrainInfo;
+  support: ITrainInfo;
 }
 
 export interface IStreamlabelSet {
@@ -68,7 +69,7 @@ export interface IStreamlabelSettingsDefinition {
   settingsWhitelist?: string[];
 }
 
-type TTrainType = 'donation' | 'follow' | 'subscription';
+type TTrainType = 'donation' | 'follow' | 'subscription' | 'support';
 
 interface IStreamlabelsServiceState {
   definitions: IStreamlabelSet;
@@ -141,6 +142,12 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
       counter: 0,
       setting: 'train_twitch_follows',
     },
+    support: {
+      mostRecentEventAt: null,
+      mostRecentName: null,
+      counter: 0,
+      setting: 'train_facebook_supports',
+    }
   };
 
   @mutation()
@@ -184,7 +191,7 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
     };
 
     // Because trains are client-side, we can force a fast update
-    if (['train_tips', 'train_twitch_follows', 'train_twitch_subscriptions'].includes(statname)) {
+    if (['train_tips', 'train_twitch_follows', 'train_twitch_subscriptions', 'train_facebook_supports'].includes(statname)) {
       this.outputAllTrains();
     }
 
@@ -423,6 +430,13 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
       this.trains.subscription.mostRecentName = latest.name;
 
       this.outputTrainInfo('subscription');
+    } else if (event.type === 'support') {
+      this.trains.subscription.mostRecentEventAt = Date.now();
+      this.trains.subscription.counter += event.message.length;
+
+      const latest = event.message[event.message.length - 1];
+      this.trains.subscription.mostRecentName = latest.name;
+      this.outputTrainInfo('support');
     }
   }
 
