@@ -58,6 +58,15 @@ body {
     border: 0;
   }
 
+  // disable unnecessary animation in checkboxes
+  .ant-checkbox-inner,
+  .ant-checkbox-inner::after, {
+    transition: none;
+  }
+  .ant-checkbox-checked::after {
+    animation: none;
+  }
+
 
   //::-webkit-resizer {
   //  display: none;
