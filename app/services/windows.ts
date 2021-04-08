@@ -22,6 +22,7 @@ import {
   GoLiveWindow,
   Playground,
   EditStreamWindow,
+  IconLibraryProperties,
 } from 'components/shared/ReactComponent';
 
 import GoLiveWindowDeprecated from 'components/windows/go-live/GoLiveWindow';
@@ -138,6 +139,7 @@ export function getComponents() {
     EditStreamWindowDeprecated,
     ScheduleStreamWindow,
     Playground,
+    IconLibraryProperties,
   };
 }
 

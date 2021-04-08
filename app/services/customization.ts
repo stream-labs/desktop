@@ -66,6 +66,7 @@ export interface ICustomizationServiceState {
     legacyGoLive?: boolean;
     volmetersFPSLimit?: number;
   };
+  designerMode: boolean;
   legacyEvents: boolean;
   pinnedStatistics: IPinnedStatistics;
 }
@@ -160,6 +161,10 @@ class CustomizationViews extends ViewHandler<ICustomizationServiceState> {
   get currentTheme() {
     return this.state.theme;
   }
+
+  get designerMode() {
+    return this.state.designerMode;
+  }
 }
 
 /**
@@ -198,6 +203,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     folderSelection: false,
     navigateToLiveOnStreamStart: true,
     legacyEvents: false,
+    designerMode: false,
     pinnedStatistics: {
       cpu: false,
       fps: false,

@@ -11,8 +11,8 @@
 @highlight-color: @purple-light; // var(--accent)
 @warning-color: @yellow-light; // var(--info)
 @normal-color: @light-5; // var(--midtone)
-@disabled-color: @dark-4; // var(--paragraph)
-@disabled-bg: @dark-5; // var(--button)
+@disabled-color: fade(@dark-4, 50%); // var(--paragraph)
+@disabled-bg: fade(@dark-5, 50%); // var(--button)
 
 @primary-1: lighten(@teal-light, 4%); // var(--teal-hover)
 @primary-2: lighten(@teal-light, 4%); // var(--teal-hover)
@@ -34,7 +34,7 @@
 @background-color-base: @light-2; // var(--background)
 @border-color-split: @light-4; // var(--border)
 
-@item-active-bg: darken(@dark-4, 4%); // var(--dropdown-alt-bg)
+@item-active-bg: darken(@light-1, 4%); // var(--dropdown-alt-bg)
 @item-hover-bg: darken(@light-1, 4%); // var(--dropdown-alt-bg)
 
 @link-color: @dark-2; // var(--title)
@@ -54,6 +54,7 @@
 @btn-danger-color: @red-light; // var(--warning)
 @btn-danger-bg: fade(@red-light, 28%); // var(--warning-bg)
 @btn-text-hover-bg: transparent;
+@btn-default-bg: @dark-5; // var(--button)
 
 @checkbox-check-color: @dark-2; // var(--title)
 
@@ -131,15 +132,16 @@
 @image-color: transparent;
 
 @border-radius-base: 4px;
+@font-family: 'Roboto', sans-serif;
 
 // ADDITIONAL STYLES
 .ant-modal-footer {
   background-color: @light-3; // var(--section)
 }
 
-// Use primary color for required marks
-#mainWrapper label.ant-form-item-required::before {
-  color: @primary-color;
+// make button text not disappear on hover
+#mainWrapper .ant-btn:hover {
+  color: @heading-color;
 }
 
 // change color for the search box

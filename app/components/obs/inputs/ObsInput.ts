@@ -65,6 +65,7 @@ export interface IObsListOption<TValue> {
 
 export interface IObsPathInputValue extends IObsInput<string> {
   filters: IElectronOpenDialogFilter[];
+  defaultPath: string;
 }
 
 export interface IObsNumberInputValue extends IObsInput<number> {

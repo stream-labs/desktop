@@ -116,7 +116,13 @@ export type TSourceType =
   | 'soundtrack_source';
 
 // Register new properties managers here
-export type TPropertiesManager = 'default' | 'widget' | 'streamlabels' | 'platformApp' | 'replay';
+export type TPropertiesManager =
+  | 'default'
+  | 'widget'
+  | 'streamlabels'
+  | 'platformApp'
+  | 'replay'
+  | 'iconLibrary';
 
 export interface ISourcesState {
   sources: Dictionary<ISource>;

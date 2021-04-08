@@ -11,8 +11,8 @@
 @highlight-color: @purple-dark; // var(--accent)
 @warning-color: @yellow-dark; // var(--info)
 @normal-color: @dark-5; // var(--midtone)
-@disabled-color: @light-4; // var(--paragraph)
-@disabled-bg: @dark-5; // var(--button)
+@disabled-color: fade(@light-4, 50%); // var(--paragraph)
+@disabled-bg: fade(@dark-5, 50%); // var(--button)
 
 @primary-1: darken(@teal-dark, 4%); // var(--teal-hover)
 @primary-2: darken(@teal-dark, 4%); // var(--teal-hover)
@@ -54,6 +54,7 @@
 @btn-danger-color: @red-dark; // var(--warning)
 @btn-danger-bg: fade(@red-dark, 28%); // var(--warning-bg)
 @btn-text-hover-bg: transparent;
+@btn-default-bg: @dark-5; // var(--button)
 
 @checkbox-check-color: @light-1; // var(--title)
 
@@ -133,10 +134,16 @@
 @image-color: transparent;
 
 @border-radius-base: 4px;
+@font-family: 'Roboto', sans-serif;
 
 // ADDITIONAL STYLES
 .ant-modal-footer {
   background-color: @dark-2; // var(--section)
+}
+
+// make button text not disappear on hover
+#mainWrapper .ant-btn:hover {
+  color: @heading-color;
 }
 
 // change color for the search box

@@ -75,6 +75,13 @@ export class NewsBanner extends ReactComponent {}
 export class PatchNotes extends ReactComponent {}
 @Component({
   props: {
+    name: { default: 'IconLibraryProperties' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class IconLibraryProperties extends ReactComponent {}
+@Component({
+  props: {
     name: { default: 'Display' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
     componentProps: {
