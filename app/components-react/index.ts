@@ -3,6 +3,7 @@ import NameFolder from './windows/NameFolder';
 import GoLiveWindow from './windows/go-live/GoLiveWindow';
 import EditStreamWindow from './windows/go-live/EditStreamWindow';
 import Playground from './windows/Playground';
+import IconLibraryProperties from './windows/IconLibraryProperties';
 import NewsBanner from './root/NewsBanner';
 import PatchNotes from './pages/PatchNotes';
 import Display from './shared/Display';
@@ -15,6 +16,7 @@ export const components = {
   GoLiveWindow,
   EditStreamWindow,
   Playground,
+  IconLibraryProperties,
   NewsBanner,
   PatchNotes,
   Display,
