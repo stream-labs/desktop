@@ -259,7 +259,7 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
       // Facebook
       like: $t('has liked'),
       stars: $t('has used'),
-      support: $t('has supported for %{mounths} months', { months: event.months }),
+      support: this.getSubString(event),
       share: $t('has shared'),
       // Youtube
       superchat: $t('has superchatted'),
@@ -273,10 +273,18 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
     }[event.type];
   }
 
+  // $t('has supported for %{months} months', { months: event.months }),
+
   getSubString(event: IRecentEvent) {
+    if (event.platform === 'facebook_account') {
+      if (event.months > 1) {
+        return $t('has been a supporter for %{months} months', { months: event.months });
+      }
+      return $t('has become a supporter');
+    }
     if (event.platform === 'youtube_account') {
       if (event.months > 1) {
-        return $t('has been a member for %{date} months', { date: event.months });
+        return $t('has been a member for %{months} months', { months: event.months });
       }
       return $t('has become a member');
     }
