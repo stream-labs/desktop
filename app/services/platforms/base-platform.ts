@@ -84,9 +84,6 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
 
   @mutation()
   protected SET_STREAM_KEY(key: string) {
-    if (Utils.isTestMode()) {
-      if (!key.endsWith('?bandwidthtest=true')) key = `${key}?bandwidthtest=true`;
-    }
     this.state.streamKey = key;
   }
 

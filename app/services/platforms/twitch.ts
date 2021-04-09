@@ -21,6 +21,7 @@ import { InheritMutations, mutation } from 'services/core';
 import { throwStreamError, TStreamErrorType } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import GameSelector from '../../components/windows/go-live/GameSelector';
+import Utils from "../utils";
 
 export interface ITwitchStartStreamOptions {
   title: string;
@@ -371,5 +372,17 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
 
   get liveDockEnabled(): boolean {
     return true;
+  }
+
+  /**
+   * @override
+   */
+  @mutation()
+  protected SET_STREAM_KEY(key: string) {
+    // do not start actual stream when testing
+    if (Utils.isTestMode()) {
+      if (!key.endsWith('?bandwidthtest=true')) key = `${key}?bandwidthtest=true`;
+    }
+    this.state.streamKey = key;
   }
 }
