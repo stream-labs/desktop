@@ -151,7 +151,7 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
       let key = await this.fetchStreamKey();
       // do not start actual stream when testing
       if (Utils.isTestMode()) {
-        if (!key.endsWith('?bandwidthtest=true')) key = `${key}?bandwidthtest=true`;
+        key = key.split('?')[0] + `?bandwidthtest=true&rnd=${Math.random()}`;
       }
       this.SET_STREAM_KEY(key);
       this.streamSettingsService.setSettings({
