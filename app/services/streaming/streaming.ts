@@ -404,7 +404,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist' });
 
     // call putChannelInfo for each platform
-    const platforms = this.views.enabledPlatforms;
+    const platforms = this.views.getEnabledPlatforms(settings.platforms);
 
     platforms.forEach(platform => {
       this.UPDATE_STREAM_INFO({
@@ -413,14 +413,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     });
 
     for (const platform of platforms) {
-      // don't update settings for a non-primary platform if we're not live
-      if (
-        this.state.info.checklist.startVideoTransmission !== 'done' &&
-        !this.views.checkPrimaryPlatform(platform)
-      ) {
-        continue;
-      }
-
       const service = getPlatformService(platform);
       const newSettings = settings.platforms[platform];
       try {
