@@ -624,8 +624,20 @@ export class SourcesService extends StatefulService<ISourcesState> {
         // If we navigated, we don't want to open source properties,
         // and should close any open child windows instead
         this.windowsService.closeChildWindow();
+        return;
       }
     }
+    this.windowsService.showWindow({
+      componentName: 'SourceProperties',
+      title: $t('Settings for %{sourceName}', {
+        sourceName: SourceDisplayData()[source.type].name,
+      }),
+      queryParams: { sourceId: source.sourceId },
+      size: {
+        width: 600,
+        height: 800,
+      },
+    });
   }
 
   showIconLibrarySettings(source: Source) {
