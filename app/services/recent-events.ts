@@ -744,12 +744,10 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
 
   transformFilterForFB() {
     const filterMap = cloneDeep(this.state.filterConfig);
-    if (this.userService.platform.type === 'facebook') {
-      filterMap['support'] = filterMap['facebook_support'];
-      filterMap['like'] = filterMap['facebook_like'];
-      filterMap['share'] = filterMap['facebook_share'];
-      filterMap['stars'] = filterMap['facebook_stars'];
-    }
+    filterMap['support'] = filterMap['facebook_support'];
+    filterMap['like'] = filterMap['facebook_like'];
+    filterMap['share'] = filterMap['facebook_share'];
+    filterMap['stars'] = filterMap['facebook_stars'];
     return filterMap;
   }
 
