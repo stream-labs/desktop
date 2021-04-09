@@ -38,8 +38,6 @@ export const ImageInput = InputComponent((p: TImageInputProps) => {
     type: '',
   };
 
-  // const imageMetadataRef = useRef({ ...defaultImageMetadata, url: value });
-
   const [fileInfo, setFileInfo] = useState({ ...defaultImageMetadata, url: value });
 
   // update metadata if the value has been changed

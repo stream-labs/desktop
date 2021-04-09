@@ -105,7 +105,7 @@ function initializeGoLiveSettings(
       return getState();
     },
 
-    // render platform inputs based in specific layout based on the current mode
+    // select eligible layout and renders settings
     renderPlatformSettings(
       commonFields: JSX.Element,
       requiredFields: JSX.Element,
@@ -291,7 +291,7 @@ function initializeGoLiveSettings(
   };
 
   // merge everything we are going to have accessible in components into one object
-  // StateManager will take care about optimal components re-rendering
+  // StateManager will take care about optimal re-rendering order
   // depending on what prop from this object will particular component use
   return merge(getView(), getters, { ...mutations, ...actions });
 }

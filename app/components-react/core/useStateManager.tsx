@@ -585,7 +585,7 @@ export function merge<
   T3 extends object,
   TReturnType = T3 extends undefined ? TMerge<T1, T2> : TMerge3<T1, T2, T3>
 >(...objects: [T1, T2, T3?]): TReturnType {
-  const mergedObjects = flatten(objects.map(obj => getMergedObjects(obj)));
+  const mergedObjects = flatten(objects.map(getMergedObjects));
 
   const metadata = {
     _proxyName: 'MergeResult',
