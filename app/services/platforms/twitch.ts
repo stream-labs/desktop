@@ -20,8 +20,7 @@ import { IGoLiveSettings } from 'services/streaming';
 import { InheritMutations, mutation } from 'services/core';
 import { throwStreamError, TStreamErrorType } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
-import GameSelector from '../../components/windows/go-live/GameSelector';
-import Utils from "../utils";
+import Utils from '../utils';
 
 export interface ITwitchStartStreamOptions {
   title: string;
@@ -149,8 +148,9 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
       this.streamSettingsService.protectedModeEnabled &&
       this.streamSettingsService.isSafeToModifyStreamKey()
     ) {
-      const key = await this.fetchStreamKey();
+      let key = await this.fetchStreamKey();
       this.SET_STREAM_KEY(key);
+      key = this.state.streamKey;
       this.streamSettingsService.setSettings({
         key,
         platform: 'twitch',

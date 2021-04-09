@@ -5,7 +5,6 @@ import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
 import electron from 'electron';
 import { IFacebookStartStreamOptions } from './facebook';
-import Utils from "../utils";
 
 const VIEWER_COUNT_UPDATE_INTERVAL = 60 * 1000;
 
