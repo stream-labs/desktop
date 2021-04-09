@@ -149,8 +149,11 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
       this.streamSettingsService.isSafeToModifyStreamKey()
     ) {
       let key = await this.fetchStreamKey();
+      // do not start actual stream when testing
+      if (Utils.isTestMode()) {
+        if (!key.endsWith('?bandwidthtest=true')) key = `${key}?bandwidthtest=true`;
+      }
       this.SET_STREAM_KEY(key);
-      key = this.state.streamKey;
       this.streamSettingsService.setSettings({
         key,
         platform: 'twitch',
@@ -372,17 +375,5 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
 
   get liveDockEnabled(): boolean {
     return true;
-  }
-
-  /**
-   * @override
-   */
-  @mutation()
-  protected SET_STREAM_KEY(key: string) {
-    // do not start actual stream when testing
-    if (Utils.isTestMode()) {
-      if (!key.endsWith('?bandwidthtest=true')) key = `${key}?bandwidthtest=true`;
-    }
-    this.state.streamKey = key;
   }
 }
