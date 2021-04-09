@@ -216,21 +216,3 @@ function initializeGoLiveSettings(
   const mergedActionsAndGetters = merge(getters, { ...mutations, ...actions });
   return merge(view.exposeProps(), mergedActionsAndGetters);
 }
-
-function exposeView<
-  TState extends object,
-  TView extends object,
-  TPropName extends keyof TView,
-  TResult extends { [K in TPropName]: TView[K] }
->(view: TView): { [K in TPropName]: TView[K] } {
-  const result: any = {};
-  Object.getOwnPropertyNames(view.constructor.prototype).forEach(
-    propName => (result[propName] = view[propName]),
-  );
-
-  for (const propName in view) {
-    result[propName] = view[propName];
-  }
-  console.log('exposed props', result);
-  return result as TResult;
-}

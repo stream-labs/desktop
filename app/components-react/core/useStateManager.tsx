@@ -550,12 +550,25 @@ export function merge<TObj1 extends object, TObj2 extends object>(
   };
 
   function getMergedObjects(obj: any) {
+    // if the object already merged then take its sub-objects
     if (obj._proxyName === 'MergeResult') return obj._mergedObjects;
+
+    // if the object is a class instance like ViewHandler
+    // then re-bind `this` for its methods
+    // if (typeof obj !== 'function' && !isPlainObject(obj)) {
+    //   return [bindThis(obj)];
+    // }
     return [obj];
   }
 
   function getTargetValue(target: object | Function, propName: string) {
-    return typeof target === 'function' ? target()[propName] : target[propName];
+    if (typeof target === 'function') {
+      return target()[propName];
+    // } else if (!isPlainObject(target) && typeof target[propName] === 'function') {
+    //   return (...args: unknown[]) => target[propName](args);
+    } else {
+      return target[propName];
+    }
   }
 
   function findTarget(propName: string) {
@@ -603,6 +616,36 @@ export type TMerge<
   TObj2 = T2 extends (...args: any[]) => infer R2 ? R2 : T2,
   R extends object = Omit<TObj1, keyof TObj2> & TObj2
 > = R;
+
+
+/**
+ * Bind all methods from the class instance with `this`
+ * We need that when we use merge() method with services views to save the `this` context
+ */
+function bindThis<T extends object>(instance: T): T {
+  function exposeObjectProps(fromObject: object, toObject: object) {
+    Object.getOwnPropertyNames(fromObject).forEach(propName => {
+      const descriptor = Object.getOwnPropertyDescriptor(fromObject, propName);
+      if (descriptor.get) {
+        Object.defineProperty(toObject, propName, {
+          enumerable: descriptor.enumerable,
+          get() {
+            return instance[propName];
+          },
+        });
+      } else if (typeof descriptor.value === 'function') {
+        toObject[propName] = instance[propName].bind(instance);
+      } else {
+        toObject[propName] = instance[propName];
+      }
+    });
+  }
+
+  const exposedProps = {};
+  exposeObjectProps(instance.constructor.prototype, exposedProps);
+  exposeObjectProps(instance, exposedProps);
+  return exposedProps as T;
+}
 
 /**
  * Create mutations from reducers
