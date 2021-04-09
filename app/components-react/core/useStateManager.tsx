@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef } from 'react';
 import { StatefulService } from '../../services';
-import { cloneDeep, isPlainObject, mapKeys } from 'lodash';
+import { cloneDeep, flatten, isPlainObject, mapKeys } from 'lodash';
 import { keys } from '../../services/utils';
 import { useForceUpdate, useOnCreate, useOnDestroy } from '../hooks';
 const GenericStateManagerContext = React.createContext(null);
@@ -8,7 +8,7 @@ const GenericStateManagerContext = React.createContext(null);
 // React devtools are broken for Electron 9 and 10
 // as an alternative set DEBUG=true
 // to track components re-renders and timings in the console
-const DEBUG = true;
+const DEBUG = false;
 
 /**
  * Flux-like state manager for React.Context
@@ -179,7 +179,7 @@ export function useStateManager<
     prevComponentState.current = pick(componentView, ...dependencyWatcher.getDependentFields());
 
     // start watching for changes
-    stateWatcher.startWatching(componentId);
+    stateWatcher.markAsReadyToWatch(componentId);
   });
 
   useOnDestroy(() => {
@@ -313,10 +313,22 @@ function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
     selector: Function;
     onChange: (change: TStateChange) => unknown;
   };
+
+  // keep registered components here
   const components: Record<TComponentId, TSubscription> = {};
+
+  // take vuex store
   const vuexStore = StatefulService.store;
+
+  // list of components that currently watching the global and local state
   let watchedComponentsIds: string[] = [];
+
+  // the revision number for current vuex state
+  // each mutation increase this number
+  // each component sync with this number after each update
   let stateRevision = 0;
+
+  // true if we currently watch vuex
   let isWatching = false;
   let unsubscribeVuex: Function | null = null;
 
@@ -356,12 +368,17 @@ function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
         isReady: false,
       };
     } else {
-      // if component is already registered then stop listen changes until mount
+      // if component is already registered then stop listen changes until its mount
       components[componentId].isReady = false;
     }
   }
 
-  function startWatching(componentId: string) {
+  /**
+   * Switch component into a state-watching mode
+   * We should do it after component has been mounted
+   * However we actually start watching state changes only when all components are mounted
+   */
+  function markAsReadyToWatch(componentId: string) {
     // mark component as ready to receiving state updates
     components[componentId].isReady = true;
 
@@ -373,8 +390,8 @@ function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
     // check if we should restart vuex watcher now
     const registeredComponentIds = getComponents().map(c => c.componentId);
     if (!isArrayEqual(watchedComponentsIds, registeredComponentIds)) {
-      stopWatchingVuex();
-      watchVuex(createVuexGetter());
+      stopWatching();
+      startWatching();
     }
   }
 
@@ -384,9 +401,10 @@ function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
 
   /**
    * Create a single Vuex watcher for all components in the context
+   * It gives us better control on rendering and better performance
+   * since we subscribe vuex only once for all component in the context
    */
   function createVuexGetter() {
-    watchedComponentsIds = getComponents().map(comp => comp.componentId);
     return () => {
       // create one cb for all subscribed components
       const mixedState: Record<string, any> = {};
@@ -399,10 +417,11 @@ function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
     };
   }
   /**
-   * Start watching Vuex
+   * Start watching Vuex and local state
    */
-  function watchVuex(vuexGetter: () => Object) {
-    unsubscribeVuex = vuexStore.watch(vuexGetter, (newState, prevState) => {
+  function startWatching() {
+    watchedComponentsIds = getComponents().map(comp => comp.componentId);
+    unsubscribeVuex = vuexStore.watch(createVuexGetter(), (newState, prevState) => {
       stateRevision++;
       if (DEBUG) logMutation(stateRevision, prevState, newState, true);
       // walk through newState and generate a `changes` object with newState and prevState
@@ -433,7 +452,7 @@ function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
     log('subscribed to vuex');
   }
 
-  function stopWatchingVuex() {
+  function stopWatching() {
     unsubscribeVuex && unsubscribeVuex();
     unsubscribeVuex = null;
     watchedComponentsIds = [];
@@ -468,7 +487,7 @@ function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
   return {
     registerComponent,
     unregisterComponent,
-    startWatching,
+    markAsReadyToWatch,
     getRevision,
   };
 }
@@ -533,16 +552,41 @@ type TDispatcher<TState, TActions> = {
 };
 
 /**
- * Merge 2 object without reading their props
+ * Merge multiple objects in one without reading their props
  * Ensures the result object is read-only
+ *
+ * @example merge 2 objects and a function
+ *
+ * const obj1 = { propOne: 1 };
+ * const obj2 = { propTwo: 2 };
+ * let propThree = 3;
+ * const fn = () => ({ propThree })
+ *
+ * const result = merge(obj1, obj2, fn);
+ * result.propOne; // returns 1
+ * result.propTwo; // returns 2
+ * result.propThree; // returns 3
+ *
+ * propThree = 99
+ *
+ * result.propThree; // returns 99
+ *
+ *
+ * @example merge an object and a class instance
+ * const date = new Date();
+ * const { message: 'Today is'}
+ * const result = merge(message, date);
+ * console.log(result.message, result.toDateString()); // prints Today is %date%
+ *
  */
-export function merge<TObj1 extends object, TObj2 extends object>(
-  obj1: TObj1,
-  obj2: TObj2,
-): TMerge<TObj1, TObj2> {
-  const obj1MergedObjects = getMergedObjects(obj1);
-  const obj2MergedObjects = getMergedObjects(obj2);
-  const mergedObjects = [...obj1MergedObjects, ...obj2MergedObjects];
+export function merge<
+  T1 extends object,
+  T2 extends object,
+  T3 extends object,
+  TReturnType = T3 extends undefined ? TMerge<T1, T2> : TMerge3<T1, T2, T3>
+>(...objects: [T1, T2, T3?]): TReturnType {
+  const mergedObjects = flatten(objects.map(obj => getMergedObjects(obj)));
+
   const metadata = {
     _proxyName: 'MergeResult',
     _cache: {},
@@ -552,20 +596,17 @@ export function merge<TObj1 extends object, TObj2 extends object>(
   function getMergedObjects(obj: any) {
     // if the object already merged then take its sub-objects
     if (obj._proxyName === 'MergeResult') return obj._mergedObjects;
-
-    // if the object is a class instance like ViewHandler
-    // then re-bind `this` for its methods
-    // if (typeof obj !== 'function' && !isPlainObject(obj)) {
-    //   return [bindThis(obj)];
-    // }
     return [obj];
   }
 
   function getTargetValue(target: object | Function, propName: string) {
     if (typeof target === 'function') {
+      // if target is a function then call the function and take the value
       return target()[propName];
-    // } else if (!isPlainObject(target) && typeof target[propName] === 'function') {
-    //   return (...args: unknown[]) => target[propName](args);
+    } else if (!isPlainObject(target) && typeof target[propName] === 'function') {
+      // if target is a class instance like ViewHandler and we call its method
+      // then ensure we don't loose `this`
+      return (...args: unknown[]) => target[propName](...args);
     } else {
       return target[propName];
     }
@@ -606,7 +647,7 @@ export function merge<TObj1 extends object, TObj2 extends object>(
         throw new Error('Can not change property on readonly object');
       }
     },
-  }) as unknown) as TMerge<TObj1, TObj2>;
+  }) as unknown) as TReturnType;
 }
 
 export type TMerge<
@@ -617,35 +658,7 @@ export type TMerge<
   R extends object = Omit<TObj1, keyof TObj2> & TObj2
 > = R;
 
-
-/**
- * Bind all methods from the class instance with `this`
- * We need that when we use merge() method with services views to save the `this` context
- */
-function bindThis<T extends object>(instance: T): T {
-  function exposeObjectProps(fromObject: object, toObject: object) {
-    Object.getOwnPropertyNames(fromObject).forEach(propName => {
-      const descriptor = Object.getOwnPropertyDescriptor(fromObject, propName);
-      if (descriptor.get) {
-        Object.defineProperty(toObject, propName, {
-          enumerable: descriptor.enumerable,
-          get() {
-            return instance[propName];
-          },
-        });
-      } else if (typeof descriptor.value === 'function') {
-        toObject[propName] = instance[propName].bind(instance);
-      } else {
-        toObject[propName] = instance[propName];
-      }
-    });
-  }
-
-  const exposedProps = {};
-  exposeObjectProps(instance.constructor.prototype, exposedProps);
-  exposeObjectProps(instance, exposedProps);
-  return exposedProps as T;
-}
+export type TMerge3<T1, T2, T3> = TMerge<TMerge<T1, T2>, T3>;
 
 /**
  * Create mutations from reducers
