@@ -275,7 +275,10 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
 
   getSubString(event: IRecentEvent) {
     if (event.platform === 'youtube_account') {
-      return $t('has sponsored since %{date}', { date: event.since });
+      if (event.months > 1) {
+        return $t('has been a member for %{date} months', { date: event.months });
+      }
+      return $t('has become a member');
     }
     if (event.gifter) {
       return $t('has gifted a sub (%{tier}) to', {
