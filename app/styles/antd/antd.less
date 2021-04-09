@@ -33,6 +33,13 @@ body {
     color: var(--primary);
   }
 
+  // Use lighter color for input borders
+  .ant-input,
+  .ant-select-selector,
+  .ant-checkbox-inner {
+    border: 1px solid var(--button);
+  }
+
   // remove transitions from hover states of inputs
   .ant-select-selector:hover,
   .ant-input:hover {
@@ -67,9 +74,10 @@ body {
     animation: none;
   }
 
-
-  //::-webkit-resizer {
-  //  display: none;
-  //}
+  // get rid of weird white box in text area
+  .os-scrollbar-corner,
+  ::-webkit-scrollbar-corner,
+  ::-webkit-resizer {
+    background: transparent !important;
+  }
 }
-
