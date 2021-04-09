@@ -36,6 +36,16 @@ export default function Playground() {
     debouncedTextValue: '',
   });
 
+  // const data = use{
+  //   displayValue: 0,
+  //   actualValue: 0,
+  //   switched: false,
+  //   numberValue: 0,
+  //   uncontrolledTextValue: '',
+  //   controlledTextValue: '',
+  //   debouncedTextValue: '',
+  // }
+
   return (
     <ModalLayout>
       <Form>
