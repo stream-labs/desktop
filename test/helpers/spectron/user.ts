@@ -193,7 +193,6 @@ export async function reserveUserFromPool(
 
       if (getParams.length) urlPath = `${urlPath}?${getParams.join('&')}`;
       reservedUser = await requestUserPool(urlPath);
-      console.log('Reserved user', reservedUser);
       break;
     } catch (e) {
       t.log(e);
