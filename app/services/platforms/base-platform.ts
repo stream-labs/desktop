@@ -5,6 +5,7 @@ import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
 import electron from 'electron';
 import { IFacebookStartStreamOptions } from './facebook';
+import Utils from "../utils";
 
 const VIEWER_COUNT_UPDATE_INTERVAL = 60 * 1000;
 
@@ -83,6 +84,9 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
 
   @mutation()
   protected SET_STREAM_KEY(key: string) {
+    if (Utils.isTestMode()) {
+      if (!key.endsWith('?bandwidthtest=true')) key = `${key}?bandwidthtest=true`;
+    }
     this.state.streamKey = key;
   }
 
