@@ -1,9 +1,8 @@
 import styles from './GoLive.m.less';
 import { ModalLayout } from '../../shared/ModalLayout';
 import { Button } from 'antd';
-import { useOnCreate, useOnDestroy } from '../../hooks';
+import { useOnCreate } from '../../hooks';
 import { Services } from '../../service-provider';
-import GoLiveSettings from './GoLiveSettings';
 import React from 'react';
 import { $t } from '../../../services/i18n';
 import GoLiveChecklist from './GoLiveChecklist';
@@ -13,6 +12,7 @@ import { SwitchInput } from '../../shared/inputs';
 import { useGoLiveSettings } from './useGoLiveSettings';
 import PlatformSettings from './PlatformSettings';
 import Scrollable from '../../shared/Scrollable';
+import Spinner from '../../shared/Spinner';
 
 export default function EditStreamWindow() {
   const { StreamingService, WindowsService } = Services;
@@ -92,6 +92,7 @@ export default function EditStreamWindow() {
           layout="horizontal"
           name="editStreamForm"
         >
+          <Spinner visible={isLoading} />
           <Animation transitionName="fade">
             {/* STEP 1 - FILL OUT THE SETTINGS FORM */}
             {shouldShowSettings && (

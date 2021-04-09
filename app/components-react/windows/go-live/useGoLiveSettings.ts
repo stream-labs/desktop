@@ -192,7 +192,8 @@ function initializeGoLiveSettings(
 
     async updateStream() {
       if (await actions.validate()) {
-        StreamingService.actions.return.updateStreamSettings(getState());
+        await StreamingService.actions.return.updateStreamSettings(getState());
+        message.success($t('Successfully updated'));
       }
     },
 
