@@ -54,7 +54,6 @@ export async function tryToGoLive(t: TExecutionContext, prefillData?: TFormMonke
 
   if (await $goLive.isExisting()) await click(t, 'button=Go Live');
 
-  await sleep(99999999);
   if (prefillData) {
     await fillForm(t, 'form[name=editStreamForm]', prefillData);
   }
