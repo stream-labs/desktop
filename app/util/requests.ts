@@ -137,17 +137,27 @@ export function jfetch<TResponse = unknown>(
   options: IJfetchOptions = {},
 ): Promise<TResponse> {
   return fetch(request, init).then(response => {
+    const contentType = response.headers.get('content-type');
+    const isJson = contentType && contentType.includes('application/json');
     if (response.ok) {
-      const contentType = response.headers.get('content-type');
-      const isJson = contentType && contentType.includes('application/json');
       if (isJson || options.forceJson) {
         return response.json() as Promise<TResponse>;
       } else {
         console.warn('jfetch: Got non-JSON response');
         throw response;
       }
+    } else if (isJson) {
+      return throwJsonError(response);
     } else {
       throw response;
     }
+  });
+}
+
+function throwJsonError(response: Response): Promise<never> {
+  return new Promise((res, rej) => {
+    response.json().then((json: unknown) => {
+      rej({ status: response.status, json });
+    });
   });
 }

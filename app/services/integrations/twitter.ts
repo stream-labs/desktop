@@ -120,7 +120,7 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
       body: JSON.stringify({ tweet }),
     });
     return jfetch(request).catch(e =>
-      throwStreamError('TWEET_FAILED', e.error || $t('Could not connect to Twitter')),
+      throwStreamError('TWEET_FAILED', e.json?.error || $t('Could not connect to Twitter')),
     );
   }
 

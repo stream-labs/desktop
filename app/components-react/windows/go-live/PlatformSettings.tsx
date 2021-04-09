@@ -7,7 +7,6 @@ import { TwitchEditStreamInfo } from './platforms/TwitchEditStreamInfo';
 import { Section } from './Section';
 import { YoutubeEditStreamInfo } from './platforms/YoutubeEditStreamInfo';
 import FacebookEditStreamInfo from './platforms/FacebookEditStreamInfo';
-import GoLiveError from './GoLiveError';
 
 export default function PlatformSettings() {
   const {
@@ -23,8 +22,6 @@ export default function PlatformSettings() {
   return (
     // minHeight is required for the loading spinner
     <div style={{ minHeight: '150px' }}>
-      <GoLiveError />
-
       {shouldShowSettings && (
         <div style={{ width: '100%' }}>
           {/*COMMON FIELDS*/}

@@ -12,6 +12,7 @@ import PlatformSettings from './PlatformSettings';
 import TwitterInput from './Twitter';
 import OptimizedProfileSwitcher from './OptimizedProfileSwitcher';
 import Spinner from '../../shared/Spinner';
+import GoLiveError from "./GoLiveError";
 
 const PlusIcon = PlusOutlined as Function;
 
@@ -73,6 +74,7 @@ export default function GoLiveSettings() {
       {/*RIGHT COLUMN*/}
       <Col span={shouldShowLeftCol ? 16 : 24} style={{ height: '100%' }}>
         <Spinner visible={isLoading} />
+        <GoLiveError />
         {shouldShowSettings && (
           <Scrollable style={{ maxHeight: '100%' }} snapToWindowEdge>
             {/*PLATFORM SETTINGS*/}
