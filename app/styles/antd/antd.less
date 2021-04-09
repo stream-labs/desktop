@@ -67,9 +67,10 @@ body {
     animation: none;
   }
 
-
-  //::-webkit-resizer {
-  //  display: none;
-  //}
+  // get rid of weird white box in text area
+  .os-scrollbar-corner,
+  ::-webkit-scrollbar-corner,
+  ::-webkit-resizer {
+    background: transparent !important;
+  }
 }
-
