@@ -39,6 +39,16 @@ body {
   .ant-checkbox-inner {
     border: 1px solid var(--button);
   }
+  .ant-input:hover,
+  .ant-select-selector:hover,
+  .ant-checkbox-inner:hover {
+    border: 1px solid var(--paragraph);
+  }
+  .ant-input:focus,
+  .ant-select-focused .ant-select-selector,
+  .ant-checkbox-inner:focus {
+    border: 1px solid var(--teal-hover);
+  }
 
   // remove transitions from hover states of inputs
   .ant-select-selector:hover,
