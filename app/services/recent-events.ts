@@ -273,8 +273,6 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
     }[event.type];
   }
 
-  // $t('has supported for %{months} months', { months: event.months }),
-
   getSubString(event: IRecentEvent) {
     if (event.platform === 'facebook_account') {
       if (event.months > 1) {
