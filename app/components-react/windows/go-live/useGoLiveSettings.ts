@@ -2,9 +2,8 @@ import { IGoLiveSettings, StreamInfoView } from '../../../services/streaming';
 import { TPlatform } from '../../../services/platforms';
 import { Services } from '../../service-provider';
 import { createMutations, merge, useStateManager } from '../../core/useStateManager';
-import { cloneDeep, debounce, mapValues, omit, pick } from 'lodash';
+import { cloneDeep, pick } from 'lodash';
 import Form, { useForm } from '../../shared/inputs/Form';
-import { useOnCreate } from '../../hooks';
 import { FormInstance } from 'antd/lib/form';
 import { message } from 'antd';
 import { $t } from '../../../services/i18n';
@@ -38,7 +37,7 @@ export function useGoLiveSettings<
 }
 
 function getInitialStreamSettings(modificators: TModificators): IGoLiveSettingsState {
-  const { StreamingService, TwitterService } = Services;
+  const { StreamingService } = Services;
   modificators = { isUpdateMode: false, isScheduleMode: false, ...modificators };
   const view = StreamingService.views;
   const settings = {
@@ -191,8 +190,7 @@ function initializeGoLiveSettings(
     },
 
     async updateStream() {
-      if (await actions.validate()) {
-        await StreamingService.actions.return.updateStreamSettings(getState());
+      if (await actions.validate() && await StreamingService.actions.return.updateStreamSettings(getState())) {
         message.success($t('Successfully updated'));
       }
     },

@@ -13,6 +13,7 @@ import { useGoLiveSettings } from './useGoLiveSettings';
 import PlatformSettings from './PlatformSettings';
 import Scrollable from '../../shared/Scrollable';
 import Spinner from '../../shared/Spinner';
+import GoLiveError from './GoLiveError';
 
 export default function EditStreamWindow() {
   const { StreamingService, WindowsService } = Services;
@@ -97,6 +98,7 @@ export default function EditStreamWindow() {
             {/* STEP 1 - FILL OUT THE SETTINGS FORM */}
             {shouldShowSettings && (
               <Scrollable key={'settings'} style={{ maxHeight: '100%' }} snapToWindowEdge>
+                <GoLiveError />
                 <PlatformSettings />
               </Scrollable>
             )}

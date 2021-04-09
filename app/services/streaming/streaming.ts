@@ -394,7 +394,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   /**
    * Update stream stetting while being live
    */
-  async updateStreamSettings(settings: IGoLiveSettings) {
+  async updateStreamSettings(settings: IGoLiveSettings): Promise<boolean> {
     const lifecycle = this.state.info.lifecycle;
 
     // save current settings in store so we can re-use them if something will go wrong
@@ -433,7 +433,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
             ? 'SETTINGS_UPDATE_FAILED'
             : e.type || 'UNKNOWN_ERROR';
         this.setError(errorType, e.details, platform);
-        return;
+        return false;
       }
     }
 
@@ -441,6 +441,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.streamSettingsService.setSettings({ goLiveSettings: settings });
     // finish the 'runChecklist' step
     this.UPDATE_STREAM_INFO({ lifecycle });
+    return true;
   }
 
   /**
