@@ -90,7 +90,6 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
 
   readonly capabilities = new Set<TPlatformCapability>([
     'title',
-    'description',
     'chat',
     'scope-validation',
     'tags',
