@@ -8,7 +8,7 @@ const GenericStateManagerContext = React.createContext(null);
 // React devtools are broken for Electron 9 and 10
 // as an alternative set DEBUG=true
 // to track components re-renders and timings in the console
-const DEBUG = false;
+const DEBUG = true;
 
 /**
  * Flux-like state manager for React.Context
@@ -81,12 +81,11 @@ export function useStateManager<
   const forceUpdate = useForceUpdate();
 
   // handle component creation
-  const { dependencyWatcher, onChange, vuexSelector, componentView } = useOnCreate(() => {
+  const { dependencyWatcher, onChange, vuexSelector, componentView, calculateComputedProps } = useOnCreate(() => {
     const { contextView } = contextValue;
 
     // computed props are unique for each component
     // calculate them and merge with ContextView
-    calculateComputedProps();
     const viewWithComputedProps = merge(contextView, () => computedPropsRef.current);
 
     // prepare Context and contextValue for the component
@@ -160,8 +159,12 @@ export function useStateManager<
   });
 
   // sync revisions for the each component update cycle
+  const prevLocalRev = localStateRevisionRef.current;
   localStateRevisionRef.current = contextValue.dispatcher.getRevision();
   globalStateRevisionRef.current = contextValue.stateWatcher.getRevision();
+  if (prevLocalRev !== localStateRevisionRef.current) {
+    calculateComputedProps();
+  }
 
   // register the component in the stateWatcher
   const { stateWatcher } = contextValue;

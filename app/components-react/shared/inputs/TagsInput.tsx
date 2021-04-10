@@ -6,13 +6,11 @@ import { SelectProps } from 'antd/lib/select';
 import {
   ICustomListProps,
   IListOption,
-  ListInput,
   renderOption,
-  TListInputProps
 } from './ListInput';
 import { TagProps } from 'antd/lib/tag';
 import { keyBy } from 'lodash';
-import { $t } from "../../../services/i18n";
+import { $t } from '../../../services/i18n';
 
 // select which features from the antd lib we are going to use
 const ANT_SELECT_FEATURES = ['showSearch', 'loading'] as const;
