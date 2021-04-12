@@ -138,11 +138,6 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
     const fields = isSinglePlatformMode
       ? this.settings.platforms[this.props.platform as TPlatform]
       : this.commonFields;
-    const platform = this.props.platform;
-    const fbSettings = this.settings.platforms.facebook;
-    // description is required for facebook
-    const descriptionIsRequired =
-      platform === 'facebook' || (!platform && fbSettings.enabled && !fbSettings.useCustomFields);
 
     // find out the best title for common fields
     let title = '';
@@ -196,7 +191,6 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
                     title: $t('Description'),
                     name: 'description',
                     fullWidth: true,
-                    required: descriptionIsRequired,
                     disabled,
                   })}
                 />
