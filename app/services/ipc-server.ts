@@ -1,4 +1,4 @@
-import { Service } from './service';
+import { Service } from './core/service';
 import { ServicesManager } from '../services-manager';
 import electron from 'electron';
 import { Subscription } from 'rxjs';

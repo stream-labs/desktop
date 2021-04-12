@@ -1,4 +1,4 @@
-import { Service } from 'services/service';
+import { Service } from 'services/core/service';
 import { Inject } from 'services/core/injector';
 import { RootNode } from './nodes/root';
 import { SourcesNode, ISourceInfo } from './nodes/sources';

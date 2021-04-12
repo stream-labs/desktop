@@ -1,4 +1,4 @@
-import { Service } from 'services/service';
+import { Service } from 'services/core/service';
 import { Inject } from 'services/core/injector';
 import { WindowsService } from 'services/windows';
 import { $t } from './i18n';

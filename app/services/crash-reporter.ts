@@ -1,4 +1,4 @@
-import { Service } from 'services/service';
+import { Service } from 'services/core/service';
 import electron from 'electron';
 import { StreamingService, EStreamingState } from 'services/streaming';
 import { Inject } from 'services/core/injector';

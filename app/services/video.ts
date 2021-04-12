@@ -1,4 +1,4 @@
-import { Service } from './service';
+import { Service } from './core/service';
 import { SettingsService } from './settings';
 import * as obs from '../../obs-api';
 import electron from 'electron';

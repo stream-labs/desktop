@@ -1,4 +1,4 @@
-import { Service } from './service';
+import { Service } from './core/service';
 import { Inject } from './core/injector';
 import { UserService } from './user';
 import { HostsService } from './hosts';

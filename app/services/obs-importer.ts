@@ -1,5 +1,5 @@
 import electron from 'electron';
-import { Service } from 'services/service';
+import { Service } from 'services/core/service';
 import fs from 'fs';
 import path from 'path';
 import { ScenesService } from 'services/scenes';

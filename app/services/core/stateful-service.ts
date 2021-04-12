@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import { Store, Module } from 'vuex';
-import { Service } from '../service';
+import { Service } from './service';
 
-export * from '../service';
+export * from './service';
 
 export function mutation(options = { vuexSyncIgnore: false }) {
   return function (target: any, methodName: string, descriptor: PropertyDescriptor) {

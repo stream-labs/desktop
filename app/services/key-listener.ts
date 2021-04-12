@@ -4,7 +4,7 @@
 // the module is required properly and to define
 // a typed interface around it.
 
-import { Service } from './service';
+import { Service } from './core/service';
 import electron from 'electron';
 
 export type TKeyEventType = 'registerKeydown' | 'registerKeyup';

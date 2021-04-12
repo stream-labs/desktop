@@ -1,4 +1,4 @@
-import { Service } from '../service';
+import { Service } from '../core/service';
 import { RootNode } from './nodes/overlays/root';
 import { ScenesNode } from './nodes/overlays/scenes';
 import { SlotsNode } from './nodes/overlays/slots';

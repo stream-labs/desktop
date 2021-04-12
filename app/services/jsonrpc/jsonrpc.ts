@@ -1,5 +1,5 @@
 import electron from 'electron';
-import { Service } from 'services/service';
+import { Service } from 'services/core/service';
 import {
   E_JSON_RPC_ERROR,
   IJsonRpcResponse,

@@ -1,4 +1,4 @@
-import { Service } from './service';
+import { Service } from './core/service';
 import Utils from './utils';
 
 

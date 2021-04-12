@@ -1,4 +1,4 @@
-import { Service } from './service';
+import { Service } from './core/service';
 import Util from 'services/utils';
 
 // Hands out hostnames to the rest of the app. Eventually
