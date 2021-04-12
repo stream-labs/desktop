@@ -167,7 +167,6 @@ export default class Main extends Vue {
     return this.customizationService.state.livedockSize;
   }
 
-
   get isDockCollapsed() {
     return this.customizationService.state.livedockCollapsed;
   }
