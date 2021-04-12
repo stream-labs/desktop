@@ -50,13 +50,19 @@ export class HardwareService extends StatefulService<IHardwareServiceState> {
   /**
    * Forces re-enumeration of hardware devices and refreshes the store
    */
-  refreshDevices() {
-    this.SET_DEVICES(this.fetchDevices());
+  refreshDevices(audioOnly = false) {
+    this.SET_DEVICES(this.fetchDevices(audioOnly));
   }
 
-  private fetchDevices(): IHardwareServiceState {
+  /**
+   * Fetches hardware devices from OBS
+   * @param audioOnly Only refresh audio devices. This is a fast operation,
+   * whereas fetching video as well can be a very slow operation.
+   * @returns all devices
+   */
+  private fetchDevices(audioOnly: boolean): IHardwareServiceState {
     const devices: IDevice[] = [];
-    const dshowDevices: IDevice[] = [];
+    let dshowDevices: IDevice[] = [];
 
     (obs.NodeObs.OBS_settings_getInputAudioDevices() as IOBSDevice[]).forEach(device => {
       if (device.description === 'NVIDIA Broadcast') {
@@ -78,23 +84,27 @@ export class HardwareService extends StatefulService<IHardwareServiceState> {
       });
     });
 
-    (obs.NodeObs.OBS_settings_getVideoDevices() as IOBSDevice[]).forEach(device => {
-      if (device.description === 'NVIDIA Broadcast') {
-        this.usageStatisticsService.recordFeatureUsage('NvidiaVirtualCam');
-      }
+    if (audioOnly) {
+      dshowDevices = this.state.dshowDevices;
+    } else {
+      (obs.NodeObs.OBS_settings_getVideoDevices() as IOBSDevice[]).forEach(device => {
+        if (device.description === 'NVIDIA Broadcast') {
+          this.usageStatisticsService.recordFeatureUsage('NvidiaVirtualCam');
+        }
 
-      dshowDevices.push({
-        id: device.id,
-        description: device.description,
-        type: EDeviceType.videoInput,
+        dshowDevices.push({
+          id: device.id,
+          description: device.description,
+          type: EDeviceType.videoInput,
+        });
       });
-    });
+    }
 
     return { devices, dshowDevices };
   }
 
   @mutation()
-  private SET_DEVICES(devices: IHardwareServiceState) {
+  private SET_DEVICES(devices: Partial<IHardwareServiceState>) {
     this.state.devices = devices.devices;
     this.state.dshowDevices = devices.dshowDevices;
   }

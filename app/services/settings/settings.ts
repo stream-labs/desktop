@@ -328,7 +328,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
 
   private getAudioSettingsFormData(OBSsettings: ISettingsSubCategory): ISettingsSubCategory[] {
     // Make sure we are working with the latest devices plugged into the system
-    this.hardwareService.refreshDevices();
+    this.hardwareService.refreshDevices(true);
     const audioDevices = this.audioService.getDevices();
     const sourcesInChannels = this.sourcesService.views
       .getSources()
