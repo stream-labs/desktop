@@ -1,6 +1,6 @@
 import { Inject } from '../core/injector';
 import { mutation } from '../core/stateful-service';
-import { PersistentStatefulService } from 'services/persistent-stateful-service';
+import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { Subject } from 'rxjs';
 import { WindowsService } from 'services/windows';
 import { ServicesManager } from '../../services-manager';

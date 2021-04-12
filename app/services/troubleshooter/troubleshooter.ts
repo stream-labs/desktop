@@ -1,5 +1,5 @@
 import { mutation } from '../core/stateful-service';
-import { PersistentStatefulService } from 'services/persistent-stateful-service';
+import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { IObsInput, IObsNumberInputValue, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { ITroubleshooterServiceApi, ITroubleshooterSettings, TIssueCode } from './troubleshooter-api';
 import { WindowsService } from 'services/windows';

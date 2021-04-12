@@ -15,7 +15,7 @@ import { NotificationsService } from './services/notifications';
 import { OnboardingService } from './services/onboarding';
 import { PerformanceService } from './services/performance';
 import { PerformanceMonitorService } from './services/performance-monitor';
-import { PersistentStatefulService } from './services/persistent-stateful-service';
+import { PersistentStatefulService } from './services/core/persistent-stateful-service';
 import { SettingsService } from './services/settings';
 import { SourcesService, Source } from './services/sources';
 import { UserService } from './services/user';

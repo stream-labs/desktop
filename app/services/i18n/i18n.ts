@@ -1,6 +1,6 @@
 import * as electron from 'electron';
 import VueI18n from 'vue-i18n';
-import { PersistentStatefulService } from 'services/persistent-stateful-service';
+import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { mutation } from 'services/core/stateful-service';
 import { Inject } from 'services/core/injector';
 import { FileManagerService } from 'services/file-manager';

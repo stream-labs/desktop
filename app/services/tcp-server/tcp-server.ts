@@ -2,7 +2,7 @@ import WritableStream = NodeJS.WritableStream;
 import os from 'os';
 import crypto from 'crypto';
 import { ServicesManager } from '../../services-manager';
-import { PersistentStatefulService } from 'services/persistent-stateful-service';
+import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { IObsInput } from 'components/obs/inputs/ObsInput';
 import { ISettingsSubCategory } from 'services/settings';
 import { mutation } from 'services/core/stateful-service';
