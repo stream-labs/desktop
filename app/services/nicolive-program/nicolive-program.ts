@@ -1,4 +1,4 @@
-import { StatefulService, mutation } from 'services/stateful-service';
+import { StatefulService, mutation } from 'services/core/stateful-service';
 import { NicoliveClient, CreateResult, EditResult, isOk } from './NicoliveClient';
 import { ProgramSchedules } from './ResponseTypes';
 import { Inject } from 'services/core/injector';

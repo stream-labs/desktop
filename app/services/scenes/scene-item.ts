@@ -1,5 +1,5 @@
 import { merge } from 'lodash';
-import { mutation, ServiceHelper } from '../stateful-service';
+import { mutation, ServiceHelper } from '../core/stateful-service';
 import Utils from '../utils';
 import { SourcesService, TSourceType, ISource } from 'services/sources';
 import { VideoService } from 'services/video';

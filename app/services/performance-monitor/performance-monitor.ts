@@ -1,4 +1,4 @@
-import { StatefulService, mutation, Service } from '../stateful-service';
+import { StatefulService, mutation, Service } from '../core/stateful-service';
 import * as obs from '../../../obs-api';
 import { Inject } from '../core/injector';
 import { NotificationsService, ENotificationType } from 'services/notifications';

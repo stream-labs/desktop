@@ -117,7 +117,7 @@ jest.mock('services/i18n', () => ({
 jest.mock('util/menus/Menu', () => ({}));
 
 beforeEach(() => {
-  jest.doMock('services/stateful-service');
+  jest.doMock('services/core/stateful-service');
   jest.doMock('services/core/injector');
 });
 

@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { without } from 'lodash';
-import { StatefulService, mutation } from 'services/stateful-service';
+import { StatefulService, mutation } from 'services/core/stateful-service';
 import { TransitionsService } from 'services/transitions';
 import { WindowsService } from 'services/windows';
 import {

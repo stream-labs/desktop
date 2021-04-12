@@ -23,7 +23,7 @@ import OptimizeForNiconico from 'components/windows/OptimizeForNiconico.vue';
 import CroppingOverlay from 'components/windows/CroppingOverlay.vue';
 import NicoliveProgramSelector from 'components/windows/NicoliveProgramSelector.vue';
 import Informations from 'components/windows/Informations.vue';
-import { mutation, StatefulService } from 'services/stateful-service';
+import { mutation, StatefulService } from 'services/core/stateful-service';
 import electron from 'electron';
 import Vue from 'vue';
 import Util from 'services/utils';

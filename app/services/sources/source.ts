@@ -8,7 +8,7 @@ import {
   ISourceComparison,
   PROPERTIES_MANAGER_TYPES
 } from './index';
-import { mutation, ServiceHelper } from 'services/stateful-service';
+import { mutation, ServiceHelper } from 'services/core/stateful-service';
 import { Inject } from 'services/core/injector';
 import { ScenesService } from 'services/scenes';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';

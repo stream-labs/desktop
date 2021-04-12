@@ -1,6 +1,6 @@
 import electron from 'electron';
 import { execSync } from 'child_process';
-import { mutation, StatefulService } from 'services/stateful-service';
+import { mutation, StatefulService } from 'services/core/stateful-service';
 import {
   ScenesService,
   ISceneItem,

@@ -23,7 +23,7 @@ jest.mock('services/nicolive-program/nicolive-comment-local-filter', () => ({ Ni
 jest.mock('services/nicolive-program/nicolive-comment-synthesizer', () => ({ NicoliveCommentSynthesizerService: {} }));
 
 beforeEach(() => {
-  jest.doMock('services/stateful-service');
+  jest.doMock('services/core/stateful-service');
   jest.doMock('services/core/injector');
 });
 

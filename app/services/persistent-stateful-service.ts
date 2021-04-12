@@ -1,5 +1,5 @@
 import { merge } from 'lodash';
-import { StatefulService } from './stateful-service';
+import { StatefulService } from './core/stateful-service';
 import Utils from './utils';
 
 // Extends StatefulService with code that will persist the

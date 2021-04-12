@@ -1,4 +1,4 @@
-import { mutation } from '../stateful-service';
+import { mutation } from '../core/stateful-service';
 import { PersistentStatefulService } from 'services/persistent-stateful-service';
 
 interface IInformationsLastOpen {

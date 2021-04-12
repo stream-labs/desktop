@@ -5,7 +5,7 @@ import { ServicesManager } from '../../services-manager';
 import { PersistentStatefulService } from 'services/persistent-stateful-service';
 import { IObsInput } from 'components/obs/inputs/ObsInput';
 import { ISettingsSubCategory } from 'services/settings';
-import { mutation } from 'services/stateful-service';
+import { mutation } from 'services/core/stateful-service';
 import { Inject } from '../core/injector';
 import {
   JsonrpcService,

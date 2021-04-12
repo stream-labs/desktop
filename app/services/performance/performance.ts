@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Subject } from 'rxjs';
 
-import { StatefulService, mutation } from 'services/stateful-service';
+import { StatefulService, mutation } from 'services/core/stateful-service';
 import { CustomizationService } from 'services/customization';
 import { Inject } from 'services/core/injector';
 import electron from 'electron';

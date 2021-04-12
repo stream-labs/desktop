@@ -21,7 +21,7 @@ import { SourcesService, Source } from './services/sources';
 import { UserService } from './services/user';
 import { VideoService } from './services/video';
 import { WindowsService } from './services/windows';
-import { StatefulService } from './services/stateful-service';
+import { StatefulService } from './services/core/stateful-service';
 import { TransitionsService } from 'services/transitions';
 import { FontLibraryService } from './services/font-library';
 import { SourceFiltersService } from './services/source-filters';

@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import Vue from 'vue';
 import { Subject } from 'rxjs';
 import { IObsListOption, setupConfigurableDefaults, TObsValue } from 'components/obs/inputs/ObsInput';
-import { StatefulService, mutation } from 'services/stateful-service';
+import { StatefulService, mutation } from 'services/core/stateful-service';
 import * as obs from '../../../obs-api';
 import electron from 'electron';
 import { Inject } from 'services/core/injector';

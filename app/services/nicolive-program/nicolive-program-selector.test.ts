@@ -48,7 +48,7 @@ function createInstance() {
 }
 
 beforeEach(() => {
-  jest.doMock('services/stateful-service');
+  jest.doMock('services/core/stateful-service');
   jest.doMock('services/core/injector');
   jest.mock('util/menus/Menu', () => ({}));
   jest.mock('services/sources');

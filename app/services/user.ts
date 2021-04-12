@@ -2,7 +2,7 @@ import Vue from 'vue';
 import URI from 'urijs';
 import { PersistentStatefulService } from 'services/persistent-stateful-service';
 import { Inject } from 'services/core/injector';
-import { mutation } from 'services/stateful-service';
+import { mutation } from 'services/core/stateful-service';
 import electron from 'electron';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
 import { HostsService } from './hosts';

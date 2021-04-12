@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Subject, Subscription, Observable } from 'rxjs';
-import { mutation, StatefulService, ServiceHelper } from 'services/stateful-service';
+import { mutation, StatefulService, ServiceHelper } from 'services/core/stateful-service';
 import { SourcesService, ISource, Source } from 'services/sources';
 import { ScenesService } from 'services/scenes';
 import * as obs from '../../../obs-api';

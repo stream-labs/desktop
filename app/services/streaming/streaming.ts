@@ -1,4 +1,4 @@
-import { StatefulService, mutation } from 'services/stateful-service';
+import { StatefulService, mutation } from 'services/core/stateful-service';
 import * as obs from '../../../obs-api';
 import { Inject } from 'services/core/injector';
 import moment from 'moment';

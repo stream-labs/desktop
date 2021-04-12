@@ -19,10 +19,10 @@ function makeWrapper(value: object, type: 'normal' | 'system' = 'normal') {
 }
 
 beforeEach(() => {
-  jest.doMock('services/stateful-service');
+  jest.doMock('services/core/stateful-service');
   jest.doMock('services/core/injector');
   jest.doMock('services/persistent-stateful-service', () => ({
-    PersistentStatefulService: require('services/stateful-service').StatefulService,
+    PersistentStatefulService: require('services/core/stateful-service').StatefulService,
   }));
 });
 

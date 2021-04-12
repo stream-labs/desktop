@@ -1,4 +1,4 @@
-import { mutation, StatefulService } from 'services/stateful-service';
+import { mutation, StatefulService } from 'services/core/stateful-service';
 import { Inject } from 'services/core/injector';
 import { NicoliveProgramStateService } from './state';
 import { ParaphraseDictionary } from './ParaphraseDictionary';

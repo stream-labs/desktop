@@ -1,4 +1,4 @@
-import { StatefulService, mutation } from 'services/stateful-service';
+import { StatefulService, mutation } from 'services/core/stateful-service';
 import { ISceneCollectionsManifestEntry } from '.';
 import Vue from 'vue';
 import fs from 'fs';
