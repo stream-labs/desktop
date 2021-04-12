@@ -104,7 +104,7 @@ export class HardwareService extends StatefulService<IHardwareServiceState> {
   }
 
   @mutation()
-  private SET_DEVICES(devices: Partial<IHardwareServiceState>) {
+  private SET_DEVICES(devices: IHardwareServiceState) {
     this.state.devices = devices.devices;
     this.state.dshowDevices = devices.dshowDevices;
   }
