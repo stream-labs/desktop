@@ -268,7 +268,6 @@ export default class Main extends Vue {
     const appRect = this.$root.$el.getBoundingClientRect();
     this.maxDockWidth = Math.min(appRect.width - this.minEditorWidth, appRect.width / 2);
     this.minDockWidth = Math.min(290, this.maxDockWidth);
-    console.log('UPDATE', this.minDockWidth, this.maxDockWidth);
   }
 
   windowSizeHandler() {
