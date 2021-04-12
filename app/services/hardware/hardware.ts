@@ -49,6 +49,8 @@ export class HardwareService extends StatefulService<IHardwareServiceState> {
 
   /**
    * Forces re-enumeration of hardware devices and refreshes the store
+   * @param audioOnly Only refresh audio devices. This is a fast operation,
+   * whereas fetching video as well can be a very slow operation.
    */
   refreshDevices(audioOnly = false) {
     this.SET_DEVICES(this.fetchDevices(audioOnly));
