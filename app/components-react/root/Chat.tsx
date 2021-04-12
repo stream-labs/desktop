@@ -56,7 +56,7 @@ export default function Chat(props: { restream: boolean }) {
   function changeChat() {
     const windowId = remote.getCurrentWindow().id;
 
-    ChatService.actions.unmountChat();
+    ChatService.unmountChat();
     RestreamService.unmountChat(windowId);
 
     service.mountChat(windowId);
