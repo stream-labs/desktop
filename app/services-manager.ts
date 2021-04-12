@@ -34,7 +34,7 @@ import { StreamingService } from './services/streaming';
 import Utils from './services/utils';
 import { commitMutation } from './store';
 import traverse from 'traverse';
-import { ObserveList } from './util/service-observer';
+import { ObserveList } from './services/core/service-initialization-observer';
 import { Subject, Subscription, Observable } from 'rxjs';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import { DismissablesService } from 'services/dismissables';

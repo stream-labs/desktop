@@ -6,7 +6,7 @@ import { ScenesService } from 'services/scenes';
 import * as obs from '../../../obs-api';
 import Utils from 'services/utils';
 import { Inject } from 'services/core/injector';
-import { InitAfter } from 'util/service-observer';
+import { InitAfter } from 'services/core/service-initialization-observer';
 import { WindowsService } from 'services/windows';
 import {
   IObsBitmaskInput, IObsInput, IObsListInput, IObsNumberInputValue, TObsFormData,
