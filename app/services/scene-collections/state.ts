@@ -5,7 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import electron from 'electron';
 import { FileManagerService } from 'services/file-manager';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 
 interface ISceneCollectionsManifest {
   activeId: string;

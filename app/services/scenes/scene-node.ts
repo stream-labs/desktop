@@ -3,7 +3,7 @@
  */
 import { ServiceHelper, mutation } from '../stateful-service';
 import { TSceneNodeType } from './scenes-api';
-import { Inject } from '../../util/injector';
+import { Inject } from '../core/injector';
 import { ScenesService, Scene, ISceneItemNode, SceneItemFolder, SceneItem, TSceneNode } from './index';
 import { SelectionService } from 'services/selection';
 

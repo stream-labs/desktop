@@ -3,7 +3,7 @@ import { ScenesService } from 'services/scenes';
 import { SourcesService } from 'services/sources';
 import { TransitionsService } from 'services/transitions';
 import { KeyListenerService } from 'services/key-listener';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { StatefulService, mutation, ServiceHelper } from 'services/stateful-service';
 import { defer } from 'lodash';
 import { $t } from 'services/i18n';

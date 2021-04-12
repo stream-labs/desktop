@@ -1,4 +1,4 @@
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
 import { StatefulService, mutation } from 'services/stateful-service';
 import { Subscription, EMPTY, Observable, of } from 'rxjs';

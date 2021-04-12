@@ -5,7 +5,7 @@ import {
   IObsListOption, setPropertiesFormData,
   TObsFormData, TObsValue
 } from 'components/obs/inputs/ObsInput';
-import { Inject } from '../util/injector';
+import { Inject } from './core/injector';
 import { WindowsService } from './windows';
 import { $t } from 'services/i18n';
 

@@ -11,7 +11,7 @@ import {
 } from 'services/scenes';
 import { ISource, Source, SourcesService, TPropertiesManager } from 'services/sources';
 import { shortcut } from 'services/shortcuts';
-import { Inject } from '../../util/injector';
+import { Inject } from '../core/injector';
 import { ISourceFilter, SourceFiltersService } from 'services/source-filters';
 import { SelectionService } from 'services/selection';
 import { SceneCollectionsService } from 'services/scene-collections';

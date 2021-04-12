@@ -1,5 +1,5 @@
 import { PropertiesManager } from './properties-manager';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { TObsFormData, IObsListInput, TObsValue } from 'components/obs/inputs/ObsInput';
 import * as fi from 'node-fontinfo';
 import { FontLibraryService } from 'services/font-library';

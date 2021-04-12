@@ -8,7 +8,7 @@ import {
 } from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../obs-api';
 import { SourcesService } from 'services/sources';
-import { Inject } from '../../util/injector';
+import { Inject } from '../core/injector';
 import { AudioService, E_AUDIO_CHANNELS } from 'services/audio';
 import { WindowsService } from 'services/windows';
 import { UserService } from 'services/user';

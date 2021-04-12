@@ -4,7 +4,7 @@ import {
   TObsValue, IObsListInput
 } from 'components/obs/inputs/ObsInput';
 
-import { Inject } from '../util/injector';
+import { Inject } from './core/injector';
 import { SourcesService } from './sources';
 import { WindowsService } from './windows';
 import * as obs from '../../obs-api';

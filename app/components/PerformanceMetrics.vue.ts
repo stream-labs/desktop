@@ -3,7 +3,7 @@ import { StreamingService } from '../services/streaming';
 import { PerformanceService } from '../services/performance';
 import { UserService } from '../services/user';
 import { SettingsService } from '../services/settings';
-import { Inject } from '../util/injector';
+import { Inject } from '../services/core/injector';
 import { $t } from 'services/i18n';
 import { Component } from 'vue-property-decorator';
 import { CustomizationService } from 'services/customization';

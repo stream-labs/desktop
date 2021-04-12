@@ -6,7 +6,7 @@ import { createSetupFunction } from 'util/test-setup';
 function noop(..._args: any[]) { }
 
 jest.mock('services/stateful-service');
-jest.mock('util/injector');
+jest.mock('services/core/injector');
 jest.mock('../../../obs-api', () => ({
   NodeObs: {
     OBS_service_startStreaming: noop,

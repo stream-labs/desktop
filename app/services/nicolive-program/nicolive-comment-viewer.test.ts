@@ -24,7 +24,7 @@ jest.mock('services/nicolive-program/nicolive-comment-synthesizer', () => ({ Nic
 
 beforeEach(() => {
   jest.doMock('services/stateful-service');
-  jest.doMock('util/injector');
+  jest.doMock('services/core/injector');
 });
 
 afterEach(() => {

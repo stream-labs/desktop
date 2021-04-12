@@ -9,7 +9,7 @@ import {
   PROPERTIES_MANAGER_TYPES
 } from './index';
 import { mutation, ServiceHelper } from 'services/stateful-service';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { ScenesService } from 'services/scenes';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import Utils from 'services/utils';

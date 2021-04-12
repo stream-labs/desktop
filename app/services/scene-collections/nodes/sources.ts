@@ -7,7 +7,7 @@ import {
 } from 'services/sources';
 import { FontLibraryService } from 'services/font-library';
 import { AudioService } from 'services/audio';
-import { Inject } from '../../../util/injector';
+import { Inject } from '../../core/injector';
 import * as obs from '../../../../obs-api';
 import * as fi from 'node-fontinfo';
 import { $t } from 'services/i18n';

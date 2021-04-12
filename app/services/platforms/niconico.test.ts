@@ -15,7 +15,7 @@ const setup = createSetupFunction({
 });
 
 jest.mock('services/stateful-service');
-jest.mock('util/injector');
+jest.mock('services/core/injector');
 jest.mock('services/streaming', () => ({}));
 jest.mock('services/user', () => ({}));
 jest.mock('services/settings', () => ({}));

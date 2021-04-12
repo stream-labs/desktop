@@ -3,7 +3,7 @@ import { Subject } from 'rxjs';
 
 import { StatefulService, mutation } from 'services/stateful-service';
 import { CustomizationService } from 'services/customization';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import electron from 'electron';
 import * as obs from '../../../obs-api';
 

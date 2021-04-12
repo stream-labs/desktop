@@ -11,7 +11,7 @@ import {
   TSceneNode, ISceneItemNode, SceneItemFolder, TSceneNodeModel
 } from 'services/scenes';
 import { $t } from 'services/i18n';
-import { Inject } from '../../util/injector';
+import { Inject } from '../core/injector';
 import { shortcut } from '../shortcuts';
 import { ISelection, ISelectionServiceApi, ISelectionState, TNodesList } from './selection-api';
 import { Subject } from 'rxjs';

@@ -1,4 +1,4 @@
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import { mutation, StatefulService } from 'services/stateful-service';
 import { UserService } from 'services/user';

@@ -14,7 +14,7 @@ import {
 } from './index';
 import Utils from 'services/utils';
 import * as obs from '../../../obs-api';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { SelectionService, Selection, TNodesList } from 'services/selection';
 import { uniqBy } from 'lodash';
 import { TSceneNodeInfo } from 'services/scene-collections/nodes/scene-items';

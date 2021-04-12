@@ -2,7 +2,7 @@ import { Service } from './service';
 import { SettingsService } from './settings';
 import * as obs from '../../obs-api';
 import electron from 'electron';
-import { Inject } from '../util/injector';
+import { Inject } from './core/injector';
 import Utils from './utils';
 import { WindowsService } from './windows';
 import { ScalableRectangle } from '../util/ScalableRectangle';

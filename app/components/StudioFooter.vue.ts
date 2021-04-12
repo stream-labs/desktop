@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
-import { Inject } from '../util/injector';
+import { Inject } from '../services/core/injector';
 import { StreamingService, EStreamingState } from '../services/streaming';
 import StartStreamingButton from './StartStreamingButton.vue';
 import PerformanceMetrics from './PerformanceMetrics.vue';

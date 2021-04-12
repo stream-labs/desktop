@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import * as moment from 'moment';
 import { $t } from 'services/i18n';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
 import { remote } from 'electron';
 import Popper from 'vue-popperjs';

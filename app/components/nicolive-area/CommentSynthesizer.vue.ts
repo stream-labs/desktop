@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import VueSlider from 'vue-slider-component';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import {
   NicoliveCommentSynthesizerService,
 } from 'services/nicolive-program/nicolive-comment-synthesizer';

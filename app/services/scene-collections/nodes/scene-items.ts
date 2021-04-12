@@ -3,7 +3,7 @@ import { Scene } from '../../scenes/scene';
 import { HotkeysNode } from './hotkeys';
 import { SourcesService } from '../../sources';
 import { ISceneItemFolder, ScenesService, TSceneNodeType } from '../../scenes';
-import { Inject } from '../../../util/injector';
+import { Inject } from '../../core/injector';
 
 interface ISchema {
   items: TSceneNodeInfo[];

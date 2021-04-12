@@ -3,7 +3,7 @@ import { throttle } from 'lodash-decorators';
 import { Component, Prop } from 'vue-property-decorator';
 import { BaseInput } from './BaseInput';
 import { CustomizationService } from '../../../services/customization';
-import { Inject } from '../../../util/injector';
+import { Inject } from '../../../services/core/injector';
 import { ISliderMetadata } from './index';
 
 @Component({

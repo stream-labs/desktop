@@ -8,7 +8,7 @@ import { TSourceType } from 'services/sources/sources-api';
 import { SourceFiltersService, TSourceFilterType } from 'services/source-filters';
 import { TransitionsService, ETransitionType } from 'services/transitions';
 import { AudioService } from 'services/audio';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { SceneCollectionsService } from 'services/scene-collections';
 import * as obs from '../../obs-api';
 import { SettingsService } from 'services/settings';

@@ -4,7 +4,7 @@ import electron from 'electron';
 import Util from 'services/utils';
 import { notes } from './notes';
 import { NavigationService } from 'services/navigation';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 
 interface IPatchNotesState {
   lastVersionSeen: string;

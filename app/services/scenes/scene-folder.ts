@@ -2,7 +2,7 @@ import { ScenesService, Scene } from './index';
 import { merge, uniq } from 'lodash';
 import { mutation, ServiceHelper } from '../stateful-service';
 import Utils from '../utils';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { Selection, SelectionService } from 'services/selection';
 import {
   ISceneItemFolderApi,

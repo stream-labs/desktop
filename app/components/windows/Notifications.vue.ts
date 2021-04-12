@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import moment from 'moment';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../../util/injector';
+import { Inject } from '../../services/core/injector';
 import ModalLayout from '../ModalLayout.vue';
 import { INotification, INotificationsServiceApi } from 'services/notifications';
 

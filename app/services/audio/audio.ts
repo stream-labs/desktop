@@ -5,7 +5,7 @@ import { SourcesService, ISource, Source } from 'services/sources';
 import { ScenesService } from 'services/scenes';
 import * as obs from '../../../obs-api';
 import Utils from 'services/utils';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { InitAfter } from 'util/service-observer';
 import { WindowsService } from 'services/windows';
 import {

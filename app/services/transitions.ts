@@ -1,6 +1,6 @@
 import { mutation, StatefulService } from 'services/stateful-service';
 import * as obs from '../../obs-api';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import {
   IObsListOption,
   TObsValue,

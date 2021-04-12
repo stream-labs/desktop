@@ -1,5 +1,5 @@
 import { Service } from 'services/service';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { RootNode } from './nodes/root';
 import { SourcesNode, ISourceInfo } from './nodes/sources';
 import { ScenesNode, ISceneSchema } from './nodes/scenes';

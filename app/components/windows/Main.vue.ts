@@ -7,7 +7,7 @@ import { ScenesService } from 'services/scenes';
 import Studio from '../pages/Studio.vue';
 import Onboarding from '../pages/Onboarding.vue';
 import TitleBar from '../TitleBar.vue';
-import { Inject } from '../../util/injector';
+import { Inject } from '../../services/core/injector';
 import { CustomizationService } from 'services/customization';
 import { NavigationService } from 'services/navigation';
 import { AppService } from 'services/app';

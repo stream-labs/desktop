@@ -4,7 +4,7 @@ import Utils from '../utils';
 import { SourcesService, TSourceType, ISource } from 'services/sources';
 import { VideoService } from 'services/video';
 import { ScalableRectangle, CenteringAxis } from 'util/ScalableRectangle';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../obs-api';
 

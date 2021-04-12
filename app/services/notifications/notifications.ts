@@ -1,4 +1,4 @@
-import { Inject } from '../../util/injector';
+import { Inject } from '../core/injector';
 import { mutation } from '../stateful-service';
 import { PersistentStatefulService } from 'services/persistent-stateful-service';
 import { Subject } from 'rxjs';

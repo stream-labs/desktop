@@ -1,4 +1,4 @@
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { StatefulService, mutation } from 'services/stateful-service';
 import { HostsService } from 'services/hosts';
 import { parseString } from 'xml2js';

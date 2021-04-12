@@ -1,5 +1,5 @@
 import { Service } from './service';
-import { Inject } from '../util/injector';
+import { Inject } from './core/injector';
 import { UserService } from './user';
 import { HostsService } from './hosts';
 import fs from 'fs';

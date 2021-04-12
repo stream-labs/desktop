@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import { StreamingService, EStreamingState } from 'services/streaming';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import { NavigationService } from 'services/navigation';
 import { SettingsService } from 'services/settings';
 import { WindowsService } from '../services/windows';

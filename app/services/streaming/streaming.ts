@@ -1,6 +1,6 @@
 import { StatefulService, mutation } from 'services/stateful-service';
 import * as obs from '../../../obs-api';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import moment from 'moment';
 import { SettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';

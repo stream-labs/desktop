@@ -4,7 +4,7 @@ import { CustomizationService } from 'services/customization';
 import SceneSelector from './SceneSelector.vue';
 import SourceSelector from './SourceSelector.vue';
 import Mixer from './Mixer.vue';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import ControlsArrow from '../../media/images/controls-arrow.svg';
 
 @Component({

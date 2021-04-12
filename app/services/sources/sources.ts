@@ -5,7 +5,7 @@ import { IObsListOption, setupConfigurableDefaults, TObsValue } from 'components
 import { StatefulService, mutation } from 'services/stateful-service';
 import * as obs from '../../../obs-api';
 import electron from 'electron';
-import { Inject } from 'util/injector';
+import { Inject } from 'services/core/injector';
 import namingHelpers from 'util/NamingHelpers';
 import { WindowsService } from 'services/windows';
 import { DefaultManager } from './properties-managers/default-manager';
