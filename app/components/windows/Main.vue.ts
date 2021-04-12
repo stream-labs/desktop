@@ -88,6 +88,7 @@ export default class Main extends Vue {
     WindowsService.modalChanged.subscribe(modalOptions => {
       this.modalOptions = { ...this.modalOptions, ...modalOptions };
     });
+    this.updateLiveDockContraints();
   }
 
   get uiReady() {
@@ -161,6 +162,11 @@ export default class Main extends Vue {
       !this.showLoadingSpinner
     );
   }
+
+  get liveDockSize() {
+    return this.customizationService.state.livedockSize;
+  }
+
 
   get isDockCollapsed() {
     return this.customizationService.state.livedockCollapsed;
@@ -255,6 +261,16 @@ export default class Main extends Vue {
 
   windowResizeTimeout: number;
 
+  minDockWidth = 290;
+  maxDockWidth = this.minDockWidth;
+
+  updateLiveDockContraints() {
+    const appRect = this.$root.$el.getBoundingClientRect();
+    this.maxDockWidth = Math.min(appRect.width - this.minEditorWidth, appRect.width / 2);
+    this.minDockWidth = Math.min(290, this.maxDockWidth);
+    console.log('UPDATE', this.minDockWidth, this.maxDockWidth);
+  }
+
   windowSizeHandler() {
     if (!this.windowsService.state.main.hideStyleBlockers) {
       this.onResizeStartHandler();
@@ -267,10 +283,11 @@ export default class Main extends Vue {
     if (this.page === 'Studio') {
       this.hasLiveDock = this.windowWidth >= this.minEditorWidth + 100;
     }
-    this.windowResizeTimeout = window.setTimeout(
-      () => this.windowsService.actions.updateStyleBlockers('main', false),
-      200,
-    );
+    this.windowResizeTimeout = window.setTimeout(() => {
+      this.windowsService.actions.updateStyleBlockers('main', false);
+      this.updateLiveDockContraints();
+      this.updateWidth();
+    }, 200);
   }
 
   handleResize() {
@@ -286,8 +303,7 @@ export default class Main extends Vue {
   }
 
   onResizeStopHandler(offset: number) {
-    const adjustedOffset = this.leftDock ? offset : -offset;
-    this.setWidth(this.customizationService.state.livedockSize + adjustedOffset);
+    this.setWidth(this.customizationService.state.livedockSize + offset);
     this.windowsService.actions.updateStyleBlockers('main', false);
   }
 
@@ -298,11 +314,8 @@ export default class Main extends Vue {
   }
 
   validateWidth(width: number): number {
-    const appRect = this.$root.$el.getBoundingClientRect();
-    const minWidth = 290;
-    const maxWidth = Math.min(appRect.width - this.minEditorWidth, appRect.width / 2);
-    let constrainedWidth = Math.max(minWidth, width);
-    constrainedWidth = Math.min(maxWidth, width);
+    let constrainedWidth = Math.max(this.minDockWidth, width);
+    constrainedWidth = Math.min(this.maxDockWidth, width);
     return constrainedWidth;
   }
 
