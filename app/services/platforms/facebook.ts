@@ -468,7 +468,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     } catch (e) {
       console.error(e);
       this.SET_OUTAGE_WARN(
-        'We have issues with streaming to Facebook groups at the moment. Please try again later',
+        'Streaming to Facebook groups is currently unavailable.  Please try again later.',
       );
       return [];
     }
