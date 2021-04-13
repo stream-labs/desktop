@@ -85,7 +85,7 @@ export default class ResizeBar extends TsxComponent<ResizeBarProps> {
       if (value > this.props.max) {
         this.barOffset = this.props.reverse
           ? this.props.value - this.props.max
-          : this.props.max - this.value;
+          : this.props.max - this.props.value;
       } else if (value < this.props.min) {
         this.barOffset = this.props.reverse
           ? this.props.value - this.props.min

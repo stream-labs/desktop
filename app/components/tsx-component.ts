@@ -27,9 +27,7 @@ export function required<TPropType>() {
   return (null as unknown) as TPropType;
 }
 
-export default abstract class TsxComponent<
-  TProps extends { value?: unknown } | Dictionary<any> = {}
-> extends Vue {
+export default abstract class TsxComponent<TProps extends Dictionary<any> = {}> extends Vue {
   private vueTsxProps: Readonly<{
     slot?: string;
     ref?: string;
@@ -41,8 +39,6 @@ export default abstract class TsxComponent<
     name?: string;
   }> &
     Readonly<TProps>;
-
-  value: any;
 
   get props(): TProps {
     return this.$props as Readonly<TProps>;

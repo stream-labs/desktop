@@ -19,9 +19,9 @@ import { UserService } from 'services/user';
   components: { ModalLayout, Selector, Display, HFormGroup },
 })
 export default class AddSource extends Vue {
-  @Inject() sourcesService: SourcesService;
+  @Inject() sourcesService!: SourcesService;
   @Inject() scenesService: ScenesService;
-  @Inject() windowsService: WindowsService;
+  @Inject() windowsService!: WindowsService;
   @Inject() widgetsService: WidgetsService;
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() private editorCommandsService: EditorCommandsService;
@@ -29,8 +29,8 @@ export default class AddSource extends Vue {
 
   name = '';
   error = '';
-  sourceType = this!.windowsService.getChildWindowQueryParams().sourceType as TSourceType;
-  sourceAddOptions = (this!.windowsService.getChildWindowQueryParams().sourceAddOptions || {
+  sourceType = this.windowsService.getChildWindowQueryParams().sourceType as TSourceType;
+  sourceAddOptions = (this.windowsService.getChildWindowQueryParams().sourceAddOptions || {
     propertiesManagerSettings: {},
   }) as ISourceAddOptions;
 
@@ -38,7 +38,7 @@ export default class AddSource extends Vue {
     return this.sourceAddOptions.propertiesManagerSettings.widgetType;
   }
 
-  sources = this!.sourcesService.views.getSources().filter(source => {
+  sources = this.sourcesService.views.getSources().filter(source => {
     const comparison = {
       type: this.sourceType,
       propertiesManager: this.sourceAddOptions.propertiesManager,

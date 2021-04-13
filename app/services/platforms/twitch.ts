@@ -20,6 +20,7 @@ import { IGoLiveSettings } from 'services/streaming';
 import { InheritMutations, mutation } from 'services/core';
 import { throwStreamError, TStreamErrorType } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
+import Utils from '../utils';
 
 export interface ITwitchStartStreamOptions {
   title: string;
@@ -148,7 +149,11 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
       this.streamSettingsService.protectedModeEnabled &&
       this.streamSettingsService.isSafeToModifyStreamKey()
     ) {
-      const key = await this.fetchStreamKey();
+      let key = await this.fetchStreamKey();
+      // do not start actual stream when testing
+      if (Utils.isTestMode()) {
+        key = key.split('?')[0] + `?bandwidthtest=true&rnd=${Math.random()}`;
+      }
       this.SET_STREAM_KEY(key);
       if (!this.streamingService.views.isMultiplatformMode) {
         this.streamSettingsService.setSettings({

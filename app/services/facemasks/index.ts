@@ -32,7 +32,7 @@ import { UsageStatisticsService } from 'services/usage-statistics';
 @InitAfter('UserService')
 export class FacemasksService extends PersistentStatefulService<Interfaces.IFacemasksServiceState> {
   @Inject() userService: UserService;
-  @Inject() hostsService: HostsService;
+  @Inject() hostsService!: HostsService;
   @Inject() websocketService: WebsocketService;
   @Inject() sourcesService: SourcesService;
   @Inject() sourceFiltersService: SourceFiltersService;
@@ -42,7 +42,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   @Inject() appService: AppService;
   @Inject() usageStatisticsService: UsageStatisticsService;
 
-  cdn = `https://${this!.hostsService.facemaskCDN}`;
+  cdn = `https://${this.hostsService.facemaskCDN}`;
   facemaskFilter: obs.IFilter = null;
   socketConnectionActive = false;
   downloadProgress = {};

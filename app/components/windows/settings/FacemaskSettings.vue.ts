@@ -49,25 +49,25 @@ interface IFormSettings {
   },
 })
 export default class FacemaskSettings extends Vue {
-  @Inject() facemasksService: FacemasksService;
+  @Inject() facemasksService!: FacemasksService;
   updatingInfo = false;
-  enabledModel = this!.facemasksService.state.settings.enabled;
-  donationsEnabledModel = this!.facemasksService.state.settings.donations_enabled;
-  subsEnabledModel = this!.facemasksService.state.settings.subs_enabled;
-  bitsEnabledModel = this!.facemasksService.state.settings.bits_enabled;
-  bitsPriceModel = this!.facemasksService.state.settings.bits_price;
-  durationModel = this!.facemasksService.state.settings.duration;
-  videoInputModel = this!.facemasksService.state.settings.device.value;
-  availableMasks = this!.facemasksService.state.settings.facemasks as IFacemaskSelection[];
+  enabledModel = this.facemasksService.state.settings.enabled;
+  donationsEnabledModel = this.facemasksService.state.settings.donations_enabled;
+  subsEnabledModel = this.facemasksService.state.settings.subs_enabled;
+  bitsEnabledModel = this.facemasksService.state.settings.bits_enabled;
+  bitsPriceModel = this.facemasksService.state.settings.bits_price;
+  durationModel = this.facemasksService.state.settings.duration;
+  videoInputModel = this.facemasksService.state.settings.device.value;
+  availableMasks = this.facemasksService.state.settings.facemasks as IFacemaskSelection[];
 
-  inputDevices = this!.facemasksService.getInputDevicesList().map(device => {
+  inputDevices = this.facemasksService.getInputDevicesList().map(device => {
     return {
       title: device.name,
       value: device.value,
     };
   });
 
-  pricingOptions = this!.facemasksService.state.settings.pricing_options.map(option => {
+  pricingOptions = this.facemasksService.state.settings.pricing_options.map(option => {
     return {
       title: option,
       value: option,

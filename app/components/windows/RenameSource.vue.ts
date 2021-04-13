@@ -16,12 +16,12 @@ export default class RenameSource extends Vue {
   @Inject() sourcesService: SourcesService;
   @Inject() scenesService: ScenesService;
   @Inject() widgetsService: WidgetsService;
-  @Inject() windowsService: WindowsService;
+  @Inject() windowsService!: WindowsService;
   @Inject() private editorCommandsService: EditorCommandsService;
 
   options: {
     sourceId?: string;
-  } = this!.windowsService.getChildWindowQueryParams();
+  } = this.windowsService.getChildWindowQueryParams();
 
   name = '';
   error = '';

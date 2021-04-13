@@ -22,11 +22,11 @@ const dirMap = (dir: string) =>
 
 @Component({})
 export default class EditTransform extends TsxComponent<{}> {
-  @Inject() selectionService: SelectionService;
+  @Inject() selectionService!: SelectionService;
   @Inject() windowsService: WindowsService;
   @Inject() private editorCommandsService: EditorCommandsService;
 
-  selection = this!.selectionService.views.globalSelection;
+  selection = this.selectionService.views.globalSelection;
 
   // We only care about the attributes of the rectangle not the functionality
   rect = { ...this.selection.getBoundingRect() };
