@@ -25,12 +25,12 @@ class Props {
  */
 @Component({ props: createProps(Props) })
 export default class GoLiveChecklist extends TsxComponent<Props> {
-  @Inject() private streamingService: StreamingService;
+  @Inject() private streamingService!: StreamingService;
   @Inject() private windowsService: WindowsService;
   @Inject() private youtubeService: YoutubeService;
   @Inject() private twitterService: TwitterService;
   @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
-  private delayEnabled = this!.streamingService.delayEnabled;
+  private delayEnabled = this.streamingService.delayEnabled;
   private delaySecondsRemaining = 0;
 
   created() {

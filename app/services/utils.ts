@@ -9,7 +9,7 @@ export const enum EBit {
 }
 
 export interface IEnv {
-  NODE_ENV: 'production' | 'development';
+  NODE_ENV: 'production' | 'development' | 'test';
   SLOBS_PREVIEW: boolean;
   SLOBS_IPC: boolean;
   SLOBS_USE_LOCAL_HOST: boolean;
@@ -87,6 +87,10 @@ export default class Utils {
 
   static isDevMode() {
     return Utils.env.NODE_ENV !== 'production';
+  }
+
+  static isTestMode() {
+    return Utils.env.NODE_ENV === 'test';
   }
 
   static isPreview(): boolean {

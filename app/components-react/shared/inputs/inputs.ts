@@ -304,7 +304,6 @@ export function createBinding<
       ? (stateGetter as Function)()
       : (stateGetter as TState);
   }
-
   return new Proxy(
     {},
     {

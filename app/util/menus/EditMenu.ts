@@ -26,7 +26,7 @@ interface IEditMenuOptions {
 
 export class EditMenu extends Menu {
   @Inject() private sourcesService: SourcesService;
-  @Inject() private scenesService: ScenesService;
+  @Inject() private scenesService!: ScenesService;
   @Inject() private sourceFiltersService: SourceFiltersService;
   @Inject() private clipboardService: ClipboardService;
   @Inject() private widgetsService: WidgetsService;
@@ -36,7 +36,7 @@ export class EditMenu extends Menu {
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() private streamingService: StreamingService;
 
-  private scene = this!.scenesService.views.getScene(this.options.selectedSceneId);
+  private scene = this.scenesService.views.getScene(this.options.selectedSceneId);
 
   private readonly source: Source;
 

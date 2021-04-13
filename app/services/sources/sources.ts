@@ -423,28 +423,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
     this.removeSource(source.sourceId);
   }
 
-  getObsSourceSettings(type: TSourceType, settings: Dictionary<any>): Dictionary<any> {
-    const resolvedSettings = cloneDeep(settings);
-
-    Object.keys(resolvedSettings).forEach(propName => {
-      // device_id is unique for each PC
-      // so we allow to provide a device name instead device id
-      // resolve the device id by the device name here
-      if (!['device_id', 'video_device_id', 'audio_device_id'].includes(propName)) return;
-
-      const device =
-        type === 'dshow_input'
-          ? this.hardwareService.getDshowDeviceByName(settings[propName])
-          : this.hardwareService.getDeviceByName(settings[propName]);
-
-      if (!device) return;
-      resolvedSettings[propName] = device.id;
-    });
-    return resolvedSettings;
-  }
-
   private getObsSourceCreateSettings(type: TSourceType, settings: Dictionary<any>) {
-    const resolvedSettings = this.getObsSourceSettings(type, settings);
+    const resolvedSettings = cloneDeep(settings);
 
     // setup default settings
     if (type === 'browser_source') {
@@ -624,8 +604,20 @@ export class SourcesService extends StatefulService<ISourcesState> {
         // If we navigated, we don't want to open source properties,
         // and should close any open child windows instead
         this.windowsService.closeChildWindow();
+        return;
       }
     }
+    this.windowsService.showWindow({
+      componentName: 'SourceProperties',
+      title: $t('Settings for %{sourceName}', {
+        sourceName: SourceDisplayData()[source.type].name,
+      }),
+      queryParams: { sourceId: source.sourceId },
+      size: {
+        width: 600,
+        height: 800,
+      },
+    });
   }
 
   showIconLibrarySettings(source: Source) {

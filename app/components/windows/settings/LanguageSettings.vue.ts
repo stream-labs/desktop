@@ -10,9 +10,9 @@ import electron from 'electron';
   components: { GenericForm },
 })
 export default class LanguageSettings extends Vue {
-  @Inject() private i18nService: I18nServiceApi;
+  @Inject() private i18nService!: I18nServiceApi;
 
-  settings = this!.i18nService.getLocaleFormData();
+  settings = this.i18nService.getLocaleFormData();
 
   private async save(data: TObsFormData) {
     const { response } = await electron.remote.dialog.showMessageBox(

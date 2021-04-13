@@ -22,13 +22,13 @@ export default class WidgetSettings<
   TData extends IWidgetData,
   TService extends WidgetSettingsService<TData>
 > extends TsxComponent<WidgetSettingsProps> {
-  @Inject() private windowsService: WindowsService;
-  @Inject() private widgetsService: IWidgetsServiceApi;
+  @Inject() private windowsService!: WindowsService;
+  @Inject() private widgetsService!: IWidgetsServiceApi;
   @Inject() private sourcesService: SourcesService;
 
   service: TService;
-  sourceId = this!.windowsService.getChildWindowOptions().queryParams.sourceId;
-  widget = this!.widgetsService.getWidgetSource(this.sourceId);
+  sourceId = this.windowsService.getChildWindowOptions().queryParams.sourceId;
+  widget = this.widgetsService.getWidgetSource(this.sourceId);
   wData: TData = null;
   tab = 'settings';
   requestState: 'success' | 'pending' | 'fail' = 'pending';

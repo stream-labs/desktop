@@ -22,7 +22,7 @@ import { SelectionService } from 'services/selection';
 export class ScenesService {
   @Fallback()
   @Inject()
-  private scenesService: InternalScenesService;
+  private scenesService!: InternalScenesService;
 
   @Inject() editorService: EditorService;
   @Inject() selectionService: SelectionService;
@@ -51,17 +51,17 @@ export class ScenesService {
   }
 
   // convert internal models from events to external models
-  sceneAdded = this!.scenesService.sceneAdded.pipe(map(m => this.convertToExternalSceneModel(m)));
-  sceneRemoved = this!.scenesService.sceneRemoved.pipe(
+  sceneAdded = this.scenesService.sceneAdded.pipe(map(m => this.convertToExternalSceneModel(m)));
+  sceneRemoved = this.scenesService.sceneRemoved.pipe(
     map(m => this.convertToExternalSceneModel(m)),
   );
-  sceneSwitched = this!.scenesService.sceneSwitched.pipe(
+  sceneSwitched = this.scenesService.sceneSwitched.pipe(
     map(m => this.convertToExternalSceneModel(m)),
   );
-  itemRemoved = this!.scenesService.itemRemoved.pipe(
+  itemRemoved = this.scenesService.itemRemoved.pipe(
     map(m => this.convertToExternalSceneItemModel(m)),
   );
-  itemAdded = this!.scenesService.itemAdded.pipe(map(m => this.convertToExternalSceneItemModel(m)));
+  itemAdded = this.scenesService.itemAdded.pipe(map(m => this.convertToExternalSceneItemModel(m)));
 
   itemUpdated = (() => {
     const itemUpdated = new Subject<ISceneItemModel>();

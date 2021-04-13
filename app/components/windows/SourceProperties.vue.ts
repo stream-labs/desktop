@@ -29,14 +29,14 @@ import { UsageStatisticsService } from 'services/usage-statistics';
   },
 })
 export default class SourceProperties extends Vue {
-  @Inject() sourcesService: SourcesService;
-  @Inject() windowsService: WindowsService;
+  @Inject() sourcesService!: SourcesService;
+  @Inject() windowsService!: WindowsService;
   @Inject() customizationService: CustomizationService;
   @Inject() private editorCommandsService: EditorCommandsService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
 
-  sourceId = this!.windowsService.getChildWindowQueryParams().sourceId;
-  source = this!.sourcesService.views.getSource(this.sourceId);
+  sourceId = this.windowsService.getChildWindowQueryParams().sourceId;
+  source = this.sourcesService.views.getSource(this.sourceId);
   properties: TObsFormData = [];
   hasErrors = false;
 

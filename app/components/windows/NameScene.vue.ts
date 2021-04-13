@@ -19,7 +19,7 @@ export default class NameScene extends Vue {
 
   @Inject() private scenesService: ScenesService;
   @Inject() private sourcesService: SourcesService;
-  @Inject() private windowsService: WindowsService;
+  @Inject() private windowsService!: WindowsService;
   @Inject() private selectionService: SelectionService;
   @Inject() private editorCommandsService: EditorCommandsService;
 
@@ -27,7 +27,7 @@ export default class NameScene extends Vue {
     sceneToDuplicate?: string; // id of scene
     rename?: string; // id of scene
     itemsToGroup?: string[];
-  } = this!.windowsService.getChildWindowQueryParams();
+  } = this.windowsService.getChildWindowQueryParams();
 
   mounted() {
     let name = '';

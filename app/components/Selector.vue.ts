@@ -19,9 +19,9 @@ export default class Selector extends Vue {
   activeItems: string[];
 
   @Prop({ default: true })
-  draggable: boolean;
+  draggable!: boolean;
 
-  draggableSelector: string = this!.draggable ? '.selector-item' : 'none';
+  draggableSelector: string = this.draggable ? '.selector-item' : 'none';
 
   handleChange(change: any) {
     const order = this.normalizedItems.map(item => item.value);

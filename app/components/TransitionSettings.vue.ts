@@ -19,10 +19,10 @@ import isEqual from 'lodash/isEqual';
   },
 })
 export default class SceneTransitions extends Vue {
-  @Inject() transitionsService: TransitionsService;
+  @Inject() transitionsService!: TransitionsService;
   @Inject() private editorCommandsService: EditorCommandsService;
 
-  @Prop() transitionId: string;
+  @Prop() transitionId!: string;
 
   propertiesChanged: Subscription;
 
@@ -75,7 +75,7 @@ export default class SceneTransitions extends Vue {
     return this.transitionsService.getTransition(this.transitionId);
   }
 
-  properties = this!.transitionsService.getPropertiesFormData(this!.transitionId);
+  properties = this.transitionsService.getPropertiesFormData(this.transitionId);
 
   saveProperties(props: TObsFormData) {
     if (isEqual(this.properties, props)) return;
