@@ -148,11 +148,11 @@ async function collectPullRequestMerges({ octokit, owner, repo }, previousVersio
     for (const result of results) {
       const { data } = result;
       if ('title' in data) {
-        const lines = [`${data.title} (#${data.number})`];
+        const elements = [data.title, `(#${data.number})`];
         if (addAuthor) {
-          lines.push(`by ${data.user.login}\n`);
+          elements.push(`by ${data.user.login}`);
         }
-        summary.push(lines.join(' '));
+        summary.push(elements.join(' ') + '\n');
       }
     }
 
