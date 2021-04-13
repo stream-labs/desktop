@@ -9,6 +9,7 @@ import { TextNode } from './text';
 import { WebcamNode } from './webcam';
 import { VideoNode } from './video';
 import { StreamlabelNode } from './streamlabel';
+import { IconLibraryNode } from './icon-library';
 import { WidgetNode } from './widget';
 import { SceneSourceNode } from './scene';
 import { AudioService } from 'services/audio';
@@ -26,7 +27,8 @@ type TContent =
   | StreamlabelNode
   | WidgetNode
   | SceneSourceNode
-  | GameCaptureNode;
+  | GameCaptureNode
+  | IconLibraryNode;
 
 interface IFilterInfo {
   name: string;
@@ -130,6 +132,12 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
 
     if (manager === 'widget') {
       const content = new WidgetNode();
+      await content.save({ sceneItem: sceneNode, assetsPath: context.assetsPath });
+      return { ...details, content } as IItemSchema;
+    }
+
+    if (manager === 'iconLibrary') {
+      const content = new IconLibraryNode();
       await content.save({ sceneItem: sceneNode, assetsPath: context.assetsPath });
       return { ...details, content } as IItemSchema;
     }
@@ -253,6 +261,13 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
         'ffmpeg_source',
         {},
         { id, select: false },
+      );
+    } else if (obj.content instanceof IconLibraryNode) {
+      sceneItem = context.scene.createAndAddSource(
+        obj.name,
+        'image_source',
+        {},
+        { id, select: false, sourceAddOptions: { propertiesManager: 'iconLibrary' } },
       );
     } else if (obj.content instanceof StreamlabelNode) {
       sceneItem = context.scene.createAndAddSource(

@@ -93,7 +93,7 @@ export class NotificationsService extends PersistentStatefulService<INotificatio
     return new NotificationsViews(this.state);
   }
 
-  filter(state: INotificationsState) {
+  static filter(state: INotificationsState) {
     return { ...state, notifications: [] as INotification[] };
   }
 
