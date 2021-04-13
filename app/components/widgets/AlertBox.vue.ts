@@ -72,7 +72,7 @@ const HAS_DONOR_MESSAGE = [
   },
 })
 export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxService> {
-  @Inject() alertBoxService: AlertBoxService;
+  @Inject() alertBoxService!: AlertBoxService;
 
   $refs: { [key: string]: HTMLElement };
 

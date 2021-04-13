@@ -134,11 +134,7 @@ export class EventListService extends WidgetSettingsService<IEventListData> {
           ),
         },
       ],
-      mixer: [
-        { key: 'sparks_minimum', title: $t('Min. Sparks') },
-        { key: 'embers_minimum', title: $t('Min. Embers') },
-      ],
-    }[platform];
+    }[platform as 'twitch'];
   }
 
   protected patchBeforeSend(data: IEventListSettings): any {

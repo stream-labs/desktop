@@ -58,7 +58,7 @@ export class ObsUserPluginsService extends Service {
   }
 
   private async ensureDirectory(dirPath: string) {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       fs.exists(dirPath, exists => {
         if (exists) {
           resolve();

@@ -292,7 +292,7 @@ async function waitForResponse(
   expectedMessages: IJsonRpcResponse<any>[],
 ) {
   expectedMessages = cloneDeep(expectedMessages);
-  await new Promise((resolve, reject) => {
+  await new Promise<void>((resolve, reject) => {
     api.messageReceived.subscribe(message => {
       const messageInd = expectedMessages.findIndex(mess => mess.id === message.id);
       if (messageInd === -1) return;

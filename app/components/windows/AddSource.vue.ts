@@ -19,9 +19,9 @@ import { UserService } from 'services/user';
   components: { ModalLayout, Selector, Display, HFormGroup },
 })
 export default class AddSource extends Vue {
-  @Inject() sourcesService: SourcesService;
+  @Inject() sourcesService!: SourcesService;
   @Inject() scenesService: ScenesService;
-  @Inject() windowsService: WindowsService;
+  @Inject() windowsService!: WindowsService;
   @Inject() widgetsService: WidgetsService;
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() private editorCommandsService: EditorCommandsService;

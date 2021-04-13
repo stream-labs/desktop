@@ -154,7 +154,7 @@ export class SceneCollectionsStateService extends StatefulService<ISceneCollecti
     });
 
     if (!exists) {
-      await new Promise((resolve, reject) => {
+      await new Promise<void>((resolve, reject) => {
         fs.mkdir(this.collectionsDirectory, err => {
           if (err) {
             reject(err);

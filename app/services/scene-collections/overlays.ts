@@ -62,7 +62,7 @@ export class OverlaysPersistenceService extends Service {
 
     this.ensureOverlaysDirectory();
 
-    await new Promise(async (resolve, reject) => {
+    await new Promise<void>(async (resolve, reject) => {
       // import of extractZip takes to much time on startup, so import it dynamically
       const extractZip = (await importExtractZip()).default;
       extractZip(overlayFilePath, { dir: assetsPath }, err => {
@@ -97,7 +97,7 @@ export class OverlaysPersistenceService extends Service {
     const archiver = (await import('archiver')).default;
     const archive = archiver('zip', { zlib: { level: 9 } });
 
-    await new Promise(resolve => {
+    await new Promise<void>(resolve => {
       output.on('close', (err: any) => {
         resolve();
       });

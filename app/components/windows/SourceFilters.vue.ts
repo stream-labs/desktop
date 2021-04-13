@@ -35,9 +35,9 @@ interface IFilterNodeData {
   },
 })
 export default class SourceFilters extends Vue {
-  @Inject() sourceFiltersService: SourceFiltersService;
+  @Inject() sourceFiltersService!: SourceFiltersService;
   @Inject() sourcesService: SourcesService;
-  @Inject() windowsService: WindowsService;
+  @Inject() windowsService!: WindowsService;
   @Inject() private editorCommandsService: EditorCommandsService;
 
   windowOptions = this.windowsService.getChildWindowQueryParams() as {

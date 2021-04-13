@@ -128,7 +128,7 @@ export class FileManagerService extends Service {
     const promises = Object.values(this.files)
       .filter(file => file.dirty)
       .map(file => {
-        return new Promise(resolve => {
+        return new Promise<void>(resolve => {
           file.flushFinished = resolve;
         });
       });

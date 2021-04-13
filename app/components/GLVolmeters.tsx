@@ -72,7 +72,7 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
     canvas: HTMLCanvasElement;
   };
 
-  @Inject() customizationService: CustomizationService;
+  @Inject() customizationService!: CustomizationService;
   @Inject() audioService: AudioService;
 
   subscriptions: Dictionary<IVolmeterSubscription> = {};
