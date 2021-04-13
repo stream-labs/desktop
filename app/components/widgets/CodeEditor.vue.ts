@@ -26,10 +26,10 @@ export default class CodeEditor extends Vue {
   @Inject() private widgetsService: WidgetsService;
 
   @Prop()
-  metadata: ICodeEditorMetadata;
+  metadata!: ICodeEditorMetadata;
 
   @Prop()
-  value: IWidgetData;
+  value!: IWidgetData;
 
   editorInputValue =
     this.value.settings[`custom_${this.metadata.type}`] ||

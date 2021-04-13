@@ -19,7 +19,7 @@ export default class TwitchTagsInput extends TsxComponent<{
 
   @Prop() name: string;
 
-  @Prop() value: TTwitchTagWithLabel[];
+  @Prop() value!: TTwitchTagWithLabel[];
 
   @Prop() tags: TTwitchTag[];
 

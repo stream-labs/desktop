@@ -54,8 +54,8 @@ class WidgetEditorProps {
   props: createProps(WidgetEditorProps),
 })
 export default class WidgetEditor extends TsxComponent<WidgetEditorProps> {
-  @Inject() private widgetsService: IWidgetsServiceApi;
-  @Inject() private windowsService: WindowsService;
+  @Inject() private widgetsService!: IWidgetsServiceApi;
+  @Inject() private windowsService!: WindowsService;
   @Inject() private projectorService: ProjectorService;
 
   $refs: { content: HTMLElement; sidebar: HTMLElement; code: HTMLElement };

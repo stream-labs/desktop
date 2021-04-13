@@ -21,12 +21,14 @@ import { UserService } from 'services/user';
 export default class ChatBox extends WidgetSettings<IChatBoxData, ChatBoxService> {
   @Inject() userService: UserService;
 
-  navItems = [
-    { value: 'visual', label: $t('Visual Settings') },
-    { value: 'font', label: $t('Font Settings') },
-    { value: 'chatter', label: $t('Chatter') },
-    { value: 'source', label: $t('Source') },
-  ];
+  get navItems() {
+    return [
+      { value: 'visual', label: $t('Visual Settings') },
+      { value: 'font', label: $t('Font Settings') },
+      { value: 'chatter', label: $t('Chatter') },
+      { value: 'source', label: $t('Source') },
+    ];
+  }
 
   get isTwitch() {
     return this.userService.platform.type === 'twitch';

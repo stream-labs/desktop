@@ -20,7 +20,7 @@ import StartStreamingButton from '../StartStreamingButton.vue';
 export default class Troubleshooter extends Vue {
   @Inject() private notificationsService: INotificationsServiceApi;
   @Inject() private settingsService: SettingsService;
-  @Inject() private windowsService: WindowsService;
+  @Inject() private windowsService!: WindowsService;
   @Inject() streamingService: StreamingService;
 
   issueCode = this.windowsService.getChildWindowQueryParams().issueCode as TIssueCode;

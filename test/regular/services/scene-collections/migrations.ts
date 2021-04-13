@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 
 function copyFile(src: string, dest: string) {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     const read = fs.createReadStream(src);
     const write = fs.createWriteStream(dest);
 

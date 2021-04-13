@@ -33,13 +33,21 @@ export class Selection {
    */
   isFrozen = false;
 
-  protected state: ISelectionState = {
+  private _state: ISelectionState = {
     selectedIds: [],
     lastSelectedId: '',
   };
 
-  constructor(public sceneId: string, itemsList: TNodesList = []) {
-    if (sceneId && itemsList) this.select(itemsList);
+  protected get state() {
+    return this._state;
+  }
+
+  public get sceneId() {
+    return this._sceneId;
+  }
+
+  constructor(protected _sceneId: string, itemsList: TNodesList = []) {
+    if (_sceneId && itemsList) this.select(itemsList);
   }
 
   isDestroyed(): boolean {

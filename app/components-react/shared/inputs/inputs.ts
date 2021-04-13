@@ -158,10 +158,13 @@ export function useInput<
 /**
  * Hook for text fields: input, textarea, password, number
  */
-export function useTextInput<T = string>(
-  p: Parameters<typeof useInput>[1] & TSlobsInputProps<InputProps, T> & { uncontrolled?: boolean },
-  antFeatures?: Parameters<typeof useInput>[2],
-) {
+export function useTextInput<
+  TProps extends TSlobsInputProps<
+    { uncontrolled?: boolean; onBlur?: (ev: FocusEvent<any>) => unknown },
+    TValue
+  >,
+  TValue extends string | number = string
+>(p: TProps, antFeatures?: Parameters<typeof useInput>[2]) {
   const { inputAttrs, wrapperAttrs, stateRef } = useInput('text', p, antFeatures);
 
   // Text inputs are uncontrolled by default for better performance
@@ -198,15 +201,6 @@ export function useTextInput<T = string>(
   };
 }
 
-export type TBindings<TState, TExtraProps = {}> = Record<
-  keyof TState,
-  {
-    name: keyof TState;
-    value: TState[keyof TState];
-    onChange: (newVal: TState[keyof TState]) => unknown;
-  } & TExtraProps
->;
-
 /**
  * 2-way binding util for inputs
  *
@@ -222,16 +216,22 @@ export type TBindings<TState, TExtraProps = {}> = Record<
  *  }
  * </pre>
  */
-export function createBinding<TState extends object, TExtraProps extends object = {}>(
+export function createBinding<
+  TState extends object,
+  TFieldName extends keyof TState,
+  TExtraProps extends object = {}
+>(
   target: TState,
   setter: (newTarget: TState) => unknown,
   extraPropsGenerator?: (fieldName: keyof TState) => TExtraProps,
-): TBindings<TState, TExtraProps> {
+): TBindings<TState, TFieldName, TExtraProps> {
   return new Proxy(
     {},
     {
-      get(t, fieldName: keyof TState) {
-        const extraProps = extraPropsGenerator ? extraPropsGenerator(fieldName) : {};
+      get(t, fieldName: string) {
+        const extraProps = extraPropsGenerator
+          ? extraPropsGenerator(fieldName as keyof TState)
+          : {};
         return {
           name: fieldName,
           value: target[fieldName],
@@ -242,9 +242,20 @@ export function createBinding<TState extends object, TExtraProps extends object 
         };
       },
     },
-  ) as TBindings<TState, TExtraProps>;
+  ) as TBindings<TState, TFieldName, TExtraProps>;
 }
 
+export type TBindings<
+  TState extends object,
+  TFieldName extends keyof TState,
+  TExtraProps extends object = {}
+> = {
+  [K in TFieldName]: {
+    name: K;
+    value: TState[K];
+    onChange: (newVal: TState[K]) => unknown;
+  } & TExtraProps;
+};
 /**
  * Function for creating new input components
  * For performance optimization ignores changing of all function props like onChange and onInput
