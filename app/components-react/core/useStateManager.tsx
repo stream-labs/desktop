@@ -81,7 +81,13 @@ export function useStateManager<
   const forceUpdate = useForceUpdate();
 
   // handle component creation
-  const { dependencyWatcher, onChange, vuexSelector, componentView, calculateComputedProps } = useOnCreate(() => {
+  const {
+    dependencyWatcher,
+    onChange,
+    vuexSelector,
+    componentView,
+    calculateComputedProps,
+  } = useOnCreate(() => {
     const { contextView } = contextValue;
 
     // computed props are unique for each component
@@ -599,22 +605,18 @@ export function merge<
   function getMergedObjects(obj: any) {
     // if the object already merged then take its sub-objects
     if (obj._proxyName === 'MergeResult') return obj._mergedObjects;
+
+    // if the object is class instance like ServiceView then rebind `this` for its methods
+    if (typeof obj !== 'function' && !isPlainObject(obj)) {
+      return [rebindThis(obj)];
+    }
     return [obj];
   }
 
-  function getTargetValue(target: object | Function, propName: string) {
-    if (typeof target === 'function') {
-      // if target is a function then call the function and take the value
-      return target()[propName];
-    } else if (!isPlainObject(target) && typeof target[propName] === 'function') {
-      // if target is a class instance like ViewHandler and we call its method
-      // then ensure we don't loose `this`
-      return (...args: unknown[]) => target[propName](...args);
-    } else {
-      return target[propName];
-    }
-  }
-
+  /**
+   * find eligible object from the list of merged objects
+   * and save it in the cache for the future usage
+   */
   function findTarget(propName: string) {
     if (propName in metadata._cache) {
       const target = metadata._cache[propName];
@@ -632,6 +634,47 @@ export function merge<
       });
     metadata._cache[propName] = target;
     return target;
+  }
+
+  function getTargetValue(target: object | Function, propName: string) {
+    if (typeof target === 'function') {
+      // if target is a function then call the function and take the value
+      return target()[propName];
+      // } else if (!isPlainObject(target) && typeof target[propName] === 'function') {
+      //   // if target is a class instance like ViewHandler and we call its method
+      //   // then ensure we don't loose `this`
+      //   return (...args: unknown[]) => target[propName](...args);
+    } else {
+      return target[propName];
+    }
+  }
+
+  /**
+   * Re-bind this for all object's methods
+   */
+  function rebindThis(instance: object) {
+    function copyMethods(fromObject: object, toObject: object) {
+      Object.getOwnPropertyNames(fromObject).forEach(propName => {
+        const descriptor = Object.getOwnPropertyDescriptor(fromObject, propName);
+        if (!descriptor) return;
+        if (descriptor.get) {
+          Object.defineProperty(toObject, propName, {
+            enumerable: true,
+            get() {
+              return instance[propName];
+            },
+          });
+        } else if (typeof descriptor.value === 'function') {
+          toObject[propName] = instance[propName].bind(instance);
+        } else {
+          toObject[propName] = instance[propName];
+        }
+      });
+    }
+    const props = {};
+    copyMethods(instance.constructor.prototype, props);
+    copyMethods(instance, props);
+    return props;
   }
 
   return (new Proxy(metadata, {

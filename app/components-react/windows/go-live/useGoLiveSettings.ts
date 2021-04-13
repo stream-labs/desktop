@@ -241,11 +241,7 @@ function initializeGoLiveSettings(
         });
       });
       save(newSettings);
-      if (platformHasBeenEnabled) {
-        actions.prepopulate();
-      } else {
-        mutations.updateSettings(newSettings);
-      }
+      actions.prepopulate();
     },
 
     /**
