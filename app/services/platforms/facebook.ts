@@ -34,6 +34,7 @@ interface IFacebookGroup {
   id: string;
   name: string;
   privacy: 'CLOSED' | 'OPEN' | 'SECRET';
+  administrator: boolean;
 }
 
 export interface IFacebookLiveVideo {
@@ -473,13 +474,13 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     });
   }
 
-  async fetchGroups(): Promise<IFacebookPage[]> {
+  async fetchGroups(): Promise<IFacebookGroup[]> {
     try {
       return (
-        await this.requestFacebook<{ data: IFacebookPage[] }>(
-          `${this.apiBase}/me/groups?admin_only=true&fields=id,name,icon,privacy&limit=100`,
+        await this.requestFacebook<{ data: IFacebookGroup[] }>(
+          `${this.apiBase}/me/groups?fields=administrator,id,name,icon,privacy&limit=100`,
         )
-      ).data;
+      ).data.filter(group => group.administrator);
     } catch (e) {
       console.error(e);
       this.SET_OUTAGE_WARN(
