@@ -19,7 +19,7 @@ class ObsImportProps {
 
 @Component({ props: createProps(ObsImportProps) })
 export default class ObsImport extends TsxComponent<ObsImportProps> {
-  @Inject() obsImporterService: ObsImporterService;
+  @Inject() obsImporterService!: ObsImporterService;
   @Inject() scenesService: ScenesService;
 
   progress = 0;

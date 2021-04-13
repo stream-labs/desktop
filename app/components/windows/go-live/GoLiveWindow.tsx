@@ -23,7 +23,7 @@ import GoLiveChecklist from './GoLiveChecklist';
 export default class GoLiveWindow extends TsxComponent<{}> {
   @Inject() private userService: UserService;
   @Inject() private settingsService: SettingsService;
-  @Inject() private streamingService: StreamingService;
+  @Inject() private streamingService!: StreamingService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private windowsService: WindowsService;
 
