@@ -259,7 +259,7 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
       // Facebook
       like: $t('has liked'),
       stars: $t('has used'),
-      support: $t('has supported for %{mounths} months', { months: event.months }),
+      support: this.getSubString(event),
       share: $t('has shared'),
       // Youtube
       superchat: $t('has superchatted'),
@@ -274,8 +274,17 @@ class RecentEventsViews extends ViewHandler<IRecentEventsState> {
   }
 
   getSubString(event: IRecentEvent) {
+    if (event.platform === 'facebook_account') {
+      if (event.months > 1) {
+        return $t('has been a supporter for %{months} months', { months: event.months });
+      }
+      return $t('has become a supporter');
+    }
     if (event.platform === 'youtube_account') {
-      return $t('has sponsored since %{date}', { date: event.since });
+      if (event.months > 1) {
+        return $t('has been a member for %{months} months', { months: event.months });
+      }
+      return $t('has become a member');
     }
     if (event.gifter) {
       return $t('has gifted a sub (%{tier}) to', {
@@ -744,12 +753,10 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
 
   transformFilterForFB() {
     const filterMap = cloneDeep(this.state.filterConfig);
-    if (this.userService.platform.type === 'facebook') {
-      filterMap['support'] = filterMap['facebook_support'];
-      filterMap['like'] = filterMap['facebook_like'];
-      filterMap['share'] = filterMap['facebook_share'];
-      filterMap['stars'] = filterMap['facebook_stars'];
-    }
+    filterMap['support'] = filterMap['facebook_support'];
+    filterMap['like'] = filterMap['facebook_like'];
+    filterMap['share'] = filterMap['facebook_share'];
+    filterMap['stars'] = filterMap['facebook_stars'];
     return filterMap;
   }
 
