@@ -144,7 +144,6 @@ type TUseFormStateResult<TState extends object> = {
   form: FormInstance<TState>;
 };
 
-
 /**
  * Returns a function for force updating of the component
  * Use it only for frequently used components for optimization purposes
