@@ -54,6 +54,7 @@ interface IFacebookServiceState extends IPlatformState {
   grantedPermissions: TFacebookPermissionName[];
   streamPageUrl: string;
   userAvatar: string;
+  outageWarning: string;
 }
 
 export type TFacebookStreamPrivacy = 'SELF' | 'ALL_FRIENDS' | 'EVERYONE' | '';
@@ -80,6 +81,7 @@ const initialState: IFacebookServiceState = {
   facebookPages: [],
   facebookGroups: [],
   grantedPermissions: [],
+  outageWarning: '',
   streamPageUrl: '',
   userAvatar: '',
   settings: {
@@ -149,6 +151,11 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   @mutation()
   protected SET_AVATAR(avatar: string) {
     this.state.userAvatar = avatar;
+  }
+
+  @mutation()
+  private SET_OUTAGE_WARN(msg: string) {
+    this.state.outageWarning = msg;
   }
 
   apiBase = 'https://graph.facebook.com';
@@ -452,11 +459,19 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   }
 
   async fetchGroups(): Promise<IFacebookPage[]> {
-    return (
-      await this.requestFacebook<{ data: IFacebookPage[] }>(
-        `${this.apiBase}/me/groups?admin_only=true&fields=id,name,icon,privacy&limit=100`,
-      )
-    ).data;
+    try {
+      return (
+        await this.requestFacebook<{ data: IFacebookPage[] }>(
+          `${this.apiBase}/me/groups?admin_only=true&fields=id,name,icon,privacy&limit=100`,
+        )
+      ).data;
+    } catch (e) {
+      console.error(e);
+      this.SET_OUTAGE_WARN(
+        'We have issues with streaming to Facebook groups at the moment. Please try again later',
+      );
+      return [];
+    }
   }
 
   fetchViewerCount(): Promise<number> {
