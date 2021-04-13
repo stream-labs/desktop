@@ -72,7 +72,7 @@ const HAS_DONOR_MESSAGE = [
   },
 })
 export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxService> {
-  @Inject() alertBoxService: AlertBoxService;
+  @Inject() alertBoxService!: AlertBoxService;
 
   $refs: { [key: string]: HTMLElement };
 
@@ -94,7 +94,7 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
     return alertNameMap()[alertType];
   }
 
-  alertTypes = this!.alertBoxService.apiNames();
+  alertTypes = this.alertBoxService.apiNames();
 
   addAlertMenuOpen = false;
   selectedAlert = 'general';

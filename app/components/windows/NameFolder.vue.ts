@@ -12,7 +12,7 @@ import { EditorCommandsService } from 'services/editor-commands';
 })
 export default class NameFolder extends Vue {
   @Inject() scenesService: ScenesService;
-  @Inject() windowsService: WindowsService;
+  @Inject() windowsService!: WindowsService;
   @Inject() private editorCommandsService: EditorCommandsService;
 
   options: {
@@ -20,7 +20,7 @@ export default class NameFolder extends Vue {
     itemsToGroup?: string[];
     parentId?: string;
     sceneId?: string;
-  } = this!.windowsService.getChildWindowQueryParams();
+  } = this.windowsService.getChildWindowQueryParams();
 
   name = '';
   error = '';

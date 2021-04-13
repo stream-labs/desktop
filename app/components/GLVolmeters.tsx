@@ -72,7 +72,7 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
     canvas: HTMLCanvasElement;
   };
 
-  @Inject() customizationService: CustomizationService;
+  @Inject() customizationService!: CustomizationService;
   @Inject() audioService: AudioService;
 
   subscriptions: Dictionary<IVolmeterSubscription> = {};
@@ -108,7 +108,7 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
   private sourcesOrder: string[];
   private workerId: number;
   private requestedFrameId: number;
-  private bgMultiplier = this!.customizationService.isDarkTheme ? 0.2 : 0.5;
+  private bgMultiplier = this.customizationService.isDarkTheme ? 0.2 : 0.5;
   private customizationServiceSubscription: Subscription = null;
 
   mounted() {

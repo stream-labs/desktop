@@ -19,15 +19,15 @@ class ObsImportProps {
 
 @Component({ props: createProps(ObsImportProps) })
 export default class ObsImport extends TsxComponent<ObsImportProps> {
-  @Inject() obsImporterService: ObsImporterService;
+  @Inject() obsImporterService!: ObsImporterService;
   @Inject() scenesService: ScenesService;
 
   progress = 0;
   importing = false;
   pathChosen = false;
 
-  sceneCollections = this!.obsImporterService.getSceneCollections();
-  profiles = this!.obsImporterService.getProfiles();
+  sceneCollections = this.obsImporterService.getSceneCollections();
+  profiles = this.obsImporterService.getProfiles();
   selectedProfile = this.profiles[0] || null;
 
   startImport(forceStart?: boolean) {

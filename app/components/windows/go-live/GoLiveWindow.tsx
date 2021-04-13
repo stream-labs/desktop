@@ -23,7 +23,7 @@ import GoLiveChecklist from './GoLiveChecklist';
 export default class GoLiveWindow extends TsxComponent<{}> {
   @Inject() private userService: UserService;
   @Inject() private settingsService: SettingsService;
-  @Inject() private streamingService: StreamingService;
+  @Inject() private streamingService!: StreamingService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private windowsService: WindowsService;
 
@@ -31,7 +31,7 @@ export default class GoLiveWindow extends TsxComponent<{}> {
     form: ValidatedForm;
   };
 
-  private settings: IGoLiveSettings = cloneDeep(this!.streamingService.views.goLiveSettings);
+  private settings: IGoLiveSettings = cloneDeep(this.streamingService.views.goLiveSettings);
 
   private get view() {
     return this.streamingService.views;

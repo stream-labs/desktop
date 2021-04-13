@@ -8,10 +8,10 @@ import { $t } from 'services/i18n/index';
 
 @Component({})
 export default class GameOverlaySettings extends TsxComponent<{}> {
-  @Inject() gameOverlayService: GameOverlayService;
+  @Inject() gameOverlayService!: GameOverlayService;
 
   enabling = false;
-  overlayOpacity = this!.gameOverlayService.state.opacity / 100;
+  overlayOpacity = this.gameOverlayService.state.opacity / 100;
 
   get enableGameOverlay() {
     return this.gameOverlayService.state.isEnabled;
