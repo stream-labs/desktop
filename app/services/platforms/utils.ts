@@ -1,5 +1,5 @@
 import { IPlatformRequest, TPlatform, getPlatformService } from './index';
-import {jfetch} from "../../util/requests";
+import { jfetch } from '../../util/requests';
 
 export interface IPlatformResponse<TResult = unknown> {
   ok: boolean;

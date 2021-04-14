@@ -161,8 +161,7 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
   }
 
   render() {
-    const shouldShowLoading =
-      this.isLoading || !this.view.isPrepopulated;
+    const shouldShowLoading = this.isLoading || !this.view.isPrepopulated;
     const shouldShowWarn = !shouldShowLoading && this.selectedDestinations.length === 0;
     const shouldShowSettings = !shouldShowWarn && !shouldShowLoading;
 

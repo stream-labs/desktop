@@ -12,7 +12,7 @@ import PlatformSettings from './PlatformSettings';
 import TwitterInput from './Twitter';
 import OptimizedProfileSwitcher from './OptimizedProfileSwitcher';
 import Spinner from '../../shared/Spinner';
-import GoLiveError from "./GoLiveError";
+import GoLiveError from './GoLiveError';
 
 const PlusIcon = PlusOutlined as Function;
 

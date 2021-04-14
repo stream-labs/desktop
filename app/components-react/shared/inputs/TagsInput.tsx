@@ -3,11 +3,7 @@ import React, { useMemo, ReactElement } from 'react';
 import { InputComponent, SingleType, TSlobsInputProps, useInput, ValuesOf } from './inputs';
 import InputWrapper from './InputWrapper';
 import { SelectProps } from 'antd/lib/select';
-import {
-  ICustomListProps,
-  IListOption,
-  renderOption,
-} from './ListInput';
+import { ICustomListProps, IListOption, renderOption } from './ListInput';
 import { TagProps } from 'antd/lib/tag';
 import { keyBy } from 'lodash';
 import { $t } from '../../../services/i18n';

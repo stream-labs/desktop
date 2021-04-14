@@ -8,7 +8,11 @@ import { $t } from '../../../services/i18n';
 import { alertAsync } from '../../modals';
 import Utils from '../../../services/utils';
 
-export type TImageInputProps = TSlobsInputProps<{ maxFileSize: number, onRemoveHandler?: Function }, string, UploadProps>;
+export type TImageInputProps = TSlobsInputProps<
+  { maxFileSize: number; onRemoveHandler?: Function },
+  string,
+  UploadProps
+>;
 
 /**
  * Allows to select an image file from FS
