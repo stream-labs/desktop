@@ -75,7 +75,7 @@ export default function GoLiveWindow() {
 
         {/* GO LIVE BUTTON */}
         {shouldShowConfirm && (
-          <Button type="primary" onClick={goLive} disabled={isLoading || error}>
+          <Button type="primary" onClick={goLive} disabled={isLoading || !!error}>
             {$t('Confirm & Go Live')}
           </Button>
         )}
