@@ -20,7 +20,6 @@ import NameScene from 'components/windows/NameScene.vue';
 import {
   NameFolder,
   GoLiveWindow,
-  Playground,
   EditStreamWindow,
   IconLibraryProperties,
 } from 'components/shared/ReactComponent';
@@ -138,7 +137,6 @@ export function getComponents() {
     GoLiveWindowDeprecated,
     EditStreamWindowDeprecated,
     ScheduleStreamWindow,
-    Playground,
     IconLibraryProperties,
   };
 }

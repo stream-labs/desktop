@@ -667,7 +667,10 @@ export function merge<
   }
 
   /**
-   * Re-bind this for all object's methods
+   * Re-bind this for all object's methods to ensure `this` is always defined
+   * if we extract methods from an objet this way:
+   *
+   * const { action1, action2 } = actions;
    */
   function rebindThis(instance: object) {
     function copyMethods(fromObject: object, toObject: object) {
@@ -823,6 +826,9 @@ function useLogLifecycle(componentId: string) {
   }, []);
 }
 
+/**
+ * Log state change for a component
+ */
 function logChange(
   prevState: any,
   newState: any,
@@ -836,6 +842,9 @@ function logChange(
   log('Should update component', componentId, triggeredByMsg, '. Diff:', diff);
 }
 
+/**
+ * Log mutation
+ */
 function logMutation(revision: number, prevState: any, newState: any, isGlobal: boolean) {
   const mutationType = isGlobal ? 'GLOBAL' : 'LOCAL';
   const diff = prevState ? getDiff(prevState, newState) : 'unavailable';
@@ -845,6 +854,9 @@ function logMutation(revision: number, prevState: any, newState: any, isGlobal: 
   log(`${mutationType} MUTATION #${revision}. Diff:`, diffMessage);
 }
 
+/**
+ * Take difference between 2 objects
+ */
 function getDiff(prevState: any, newState: any) {
   const changedFields = Object.keys(newState).filter(
     key => !isSimilar(newState[key], prevState[key]),
@@ -861,7 +873,7 @@ let lastLogTime = 0;
 let taskStartTime = 0;
 
 /**
- * log and track elapsed time between logs
+ * log message and track elapsed time between logs
  */
 function log(msg: string, ...args: any[]) {
   if (!DEBUG) return;

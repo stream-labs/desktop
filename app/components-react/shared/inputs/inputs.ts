@@ -352,17 +352,6 @@ function createValidationRules(inputProps: IInputCommonProps<unknown>) {
   return rules;
 }
 
-// let bindingId = 0;
-// export function useBinding(target: Object) {
-//   const bindingIdRef = useRef(0);
-//   const targetRef = useRef(target);
-//   const inputProps = useRef({});
-//   if (!bindingIdRef.current) {
-//     bindingIdRef.current = bindingId++;
-//     inputProps = createBinding()
-//   }
-// }
-
 /**
  * Function for creating new input components
  * For performance optimization ignores changing of all function props like onChange and onInput

@@ -1,7 +1,7 @@
 import { IGoLiveSettings, StreamInfoView } from '../../../services/streaming';
 import { TPlatform } from '../../../services/platforms';
 import { Services } from '../../service-provider';
-import { createMutations, merge, useStateManager } from '../../core/useStateManager';
+import { createMutations, merge, useStateManager } from '../../hooks/useStateManager';
 import { cloneDeep, pick } from 'lodash';
 import Form, { useForm } from '../../shared/inputs/Form';
 import { FormInstance } from 'antd/lib/form';

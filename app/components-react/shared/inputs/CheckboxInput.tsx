@@ -8,8 +8,6 @@ export type TCheckboxInputProps = TSlobsInputProps<{}, boolean, CheckboxProps>;
 
 export const CheckboxInput = InputComponent((p: TCheckboxInputProps) => {
   const { inputAttrs } = useInput('checkbox', p);
-  console.log('Update checkbox', inputAttrs.name, inputAttrs.value);
-  // console.trace();
   return (
     <div>
       <Checkbox
