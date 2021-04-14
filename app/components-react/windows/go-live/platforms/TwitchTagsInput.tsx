@@ -3,9 +3,10 @@ import { useOnCreate, useVuex } from '../../../hooks';
 import { Services } from '../../../service-provider';
 import { prepareOptions, TTwitchTag } from '../../../../services/platforms/twitch/tags';
 import React from 'react';
-import { keyBy, omit } from 'lodash';
+import { keyBy } from 'lodash';
 import { IListOption } from '../../../shared/inputs/ListInput';
 import { Row, Col, Tag } from 'antd';
+import { I18nService } from '../../../../services/i18n';
 
 type TTwitchTagsInputProps = TSlobsInputProps<{}, TTwitchTag[]>;
 
@@ -14,8 +15,8 @@ export function TwitchTagsInput(p: TTwitchTagsInputProps) {
     const state = Services.TwitchService.state;
     const avalableTags = state.availableTags;
     const disabled = !state.hasUpdateTagsPermission;
-    // TODO setup a real locale
-    const translatedTags = prepareOptions('en-US', avalableTags);
+    const locale = I18nService.instance.state.locale;
+    const translatedTags = prepareOptions(locale, avalableTags);
     const tagsMap = keyBy(translatedTags, 'tag_id');
     return { disabled, translatedTags, tagsMap };
   });
