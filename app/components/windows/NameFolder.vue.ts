@@ -12,7 +12,7 @@ import { EditorCommandsService } from 'services/editor-commands';
 })
 export default class NameFolder extends Vue {
   @Inject() scenesService: ScenesService;
-  @Inject() windowsService: WindowsService;
+  @Inject() windowsService!: WindowsService;
   @Inject() private editorCommandsService: EditorCommandsService;
 
   options: {

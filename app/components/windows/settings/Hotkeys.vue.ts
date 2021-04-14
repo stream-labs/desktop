@@ -32,14 +32,14 @@ export default class Hotkeys extends Vue {
 
   // sync global search and local search
   @Prop()
-  globalSearchStr: string;
+  globalSearchStr!: string;
   @Watch('globalSearchStr')
   onGlobalSearchChange(val: string) {
     this.searchString = val;
   }
 
   @Prop()
-  highlightSearch: (searchStr: string) => any;
+  highlightSearch!: (searchStr: string) => any;
   searchString = this.globalSearchStr || '';
   @Watch('searchString')
   onSearchStringChangedHandler(val: string) {

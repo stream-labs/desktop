@@ -48,7 +48,7 @@ const mediaGalleryInputs = {
 })
 export default class TipJar extends WidgetSettings<ITipJarData, TipJarService> {
   @Inject() userService: UserService;
-  @Inject() hostsService: HostsService;
+  @Inject() hostsService!: HostsService;
 
   textColorTooltip = $t('A hex code for the base text color.');
 
@@ -58,12 +58,14 @@ export default class TipJar extends WidgetSettings<ITipJarData, TipJarService> {
 
   jarSrc = `https://${this.hostsService.cdn}/static/tip-jar/jars/glass-`;
   inputOptions: { description: string; value: string }[] = [];
-  navItems = [
-    { value: 'manage-jar', label: $t('Manage Jar') },
-    { value: 'font', label: $t('Font Settings') },
-    { value: 'images', label: $t('Images') },
-    { value: 'source', label: $t('Source') },
-  ];
+  get navItems() {
+    return [
+      { value: 'manage-jar', label: $t('Manage Jar') },
+      { value: 'font', label: $t('Font Settings') },
+      { value: 'images', label: $t('Images') },
+      { value: 'source', label: $t('Source') },
+    ];
+  }
 
   titleFromKey(key: string) {
     return nameMap()[key];

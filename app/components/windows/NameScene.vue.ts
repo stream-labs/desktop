@@ -19,7 +19,7 @@ export default class NameScene extends Vue {
 
   @Inject() private scenesService: ScenesService;
   @Inject() private sourcesService: SourcesService;
-  @Inject() private windowsService: WindowsService;
+  @Inject() private windowsService!: WindowsService;
   @Inject() private selectionService: SelectionService;
   @Inject() private editorCommandsService: EditorCommandsService;
 

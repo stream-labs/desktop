@@ -77,11 +77,11 @@ export function useAsyncState<TStateType>(
   return [state, setState, promise];
 }
 
-type TUseFormStateResult<TState> = {
+type TUseFormStateResult<TState extends object> = {
   s: TState;
   setState: (p: TState) => unknown;
   updateState: (p: Partial<TState>) => unknown;
-  bind: TBindings<TState>;
+  bind: TBindings<TState, keyof TState>;
   stateRef: { current: TState };
   form: FormInstance<TState>;
 };

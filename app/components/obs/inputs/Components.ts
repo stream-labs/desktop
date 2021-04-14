@@ -13,5 +13,5 @@ export function propertyComponentForType(type: TObsType): typeof TsxComponent {
       : componentObsType === type;
   });
   if (!componentName) console.warn('Component not found. Type:', type);
-  return inputComponents[componentName];
+  return inputComponents[componentName] as typeof TsxComponent;
 }
