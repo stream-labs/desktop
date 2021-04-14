@@ -89,11 +89,11 @@ export interface IStreamError extends IRejectedRequest {
 
 export class StreamError extends Error implements IRejectedRequest {
   public type: TStreamErrorType;
-  public details: string;
-  public url: string;
-  public status: number;
-  public statusText: string;
-  public platform: TPlatform | null;
+  public details?: string;
+  public url?: string;
+  public status?: number;
+  public statusText?: string;
+  public platform?: TPlatform;
 
   /**
    * returns serializable representation of the error
@@ -120,7 +120,7 @@ export class StreamError extends Error implements IRejectedRequest {
     this.url = rejectedRequest?.url;
     this.status = rejectedRequest?.status;
     this.statusText = rejectedRequest?.statusText;
-    this.platform = this.url ? getPlatform(this.url) : null;
+    this.platform = this.url ? getPlatform(this.url) : undefined;
     // don't allow to call 'new' outside this file
     if (protector !== newCallProtector) {
       throw new Error('Use createStreamError() instead "new StreamError()"');
@@ -128,7 +128,7 @@ export class StreamError extends Error implements IRejectedRequest {
   }
 }
 
-function getPlatform(url: string): TPlatform {
+function getPlatform(url: string): TPlatform | undefined {
   const platforms = Services.StreamingService.views.linkedPlatforms;
   return platforms.find(platform => url.startsWith(getPlatformService(platform).apiBase));
 }

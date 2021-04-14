@@ -355,7 +355,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       this.twitterService.state.tweetWhenGoingLive
     ) {
       try {
-        await this.runCheck('postTweet', () => this.twitterService.postTweet(settings.tweetText));
+        await this.runCheck('postTweet', () => this.twitterService.postTweet(settings.tweetText!));
       } catch (e) {
         console.error('unable to post a tweet', e);
         this.setError(e);
@@ -734,7 +734,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const height = this.views.linkedPlatforms.length > 1 ? 750 : 650;
     const width = 900;
 
-    const componentName = this.customizationService.state.experimental.legacyGoLive
+    const componentName = this.customizationService.state.experimental?.legacyGoLive
       ? 'GoLiveWindowDeprecated'
       : 'GoLiveWindow';
 
@@ -751,7 +751,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   showEditStream() {
     const height = 750;
     const width = 900;
-    const componentName = this.customizationService.state.experimental.legacyGoLive
+    const componentName = this.customizationService.state.experimental?.legacyGoLive
       ? 'EditStreamWindowDeprecated'
       : 'EditStreamWindow';
 
