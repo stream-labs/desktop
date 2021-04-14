@@ -92,6 +92,7 @@ export default function BroadcastInput(
       {...p}
       onChange={p.onChange}
       options={options}
+      placeholder={$t('Create New Event')}
       optionRender={optionRender}
       labelRender={labelRender}
       showSearch

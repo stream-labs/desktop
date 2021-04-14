@@ -103,7 +103,10 @@ export default function FacebookEditStreamInfo() {
     if (destinationType === 'me') destinationId = 'me';
 
     updateState({
-      scheduledVideos: await FacebookService.actions.return.fetchScheduledVideos(destinationType, destinationId),
+      scheduledVideos: await FacebookService.actions.return.fetchScheduledVideos(
+        destinationType,
+        destinationId,
+      ),
       scheduledVideosLoaded: true,
     });
   }
@@ -239,10 +242,10 @@ export default function FacebookEditStreamInfo() {
             allowClear
             placeholder={$t('Not selected')}
             options={[
-              // { value: '', label: $t('Not selected') },
               ...s.scheduledVideos.map(v => ({
-                label: `${v.title} ${v.planned_start_time &&
-                  moment(new Date(v.planned_start_time)).calendar()}`,
+                label: `${v.title} ${
+                  v.planned_start_time ? moment(new Date(v.planned_start_time)).calendar() : ''
+                }`,
                 value: v.id,
               })),
             ]}
