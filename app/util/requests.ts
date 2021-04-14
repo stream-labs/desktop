@@ -144,7 +144,7 @@ export function jfetch<TResponse = unknown>(
         return response.json() as Promise<TResponse>;
       } else {
         console.warn('jfetch: Got non-JSON response');
-        throw response;
+        return (response.text() as unknown) as Promise<TResponse>;
       }
     } else if (isJson) {
       return throwJsonError(response);
