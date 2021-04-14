@@ -32,19 +32,13 @@ import {
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
-import { IncrementalRolloutService } from 'services/incremental-rollout';
+import { EAvailableFeatures, IncrementalRolloutService } from 'services/incremental-rollout';
 import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService } from 'services/restream';
 import { FacebookService } from 'services/platforms/facebook';
 import Utils from 'services/utils';
 import { cloneDeep, isEqual } from 'lodash';
-import {
-  createStreamError,
-  IRejectedRequest,
-  IStreamError,
-  StreamError,
-  TStreamErrorType,
-} from './stream-error';
+import { createStreamError, IStreamError, StreamError, TStreamErrorType } from './stream-error';
 import { authorizedHeaders } from 'util/requests';
 import { HostsService } from '../hosts';
 import { TwitterService } from '../integrations/twitter';
@@ -734,9 +728,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const height = this.views.linkedPlatforms.length > 1 ? 750 : 650;
     const width = 900;
 
-    const componentName = this.customizationService.state.experimental?.legacyGoLive
-      ? 'GoLiveWindowDeprecated'
-      : 'GoLiveWindow';
+    const isLegacy =
+      !this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
+      this.customizationService.state.experimental?.legacyGoLive;
+
+    const componentName = isLegacy ? 'GoLiveWindowDeprecated' : 'GoLiveWindow';
 
     this.windowsService.showWindow({
       componentName,
@@ -751,9 +747,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   showEditStream() {
     const height = 750;
     const width = 900;
-    const componentName = this.customizationService.state.experimental?.legacyGoLive
-      ? 'EditStreamWindowDeprecated'
-      : 'EditStreamWindow';
+
+    const isLegacy =
+      !this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
+      this.customizationService.state.experimental?.legacyGoLive;
+
+    const componentName = isLegacy ? 'EditStreamWindowDeprecated' : 'EditStreamWindow';
 
     this.windowsService.showWindow({
       componentName,
