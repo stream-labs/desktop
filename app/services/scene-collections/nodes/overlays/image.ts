@@ -11,6 +11,7 @@ interface ISchema {
 interface IContext {
   assetsPath: string;
   sceneItem: SceneItem;
+  uploadedAssets: Dictionary<string>;
 }
 
 export class ImageNode extends Node<ISchema, IContext> {
@@ -19,6 +20,13 @@ export class ImageNode extends Node<ISchema, IContext> {
   async save(context: IContext) {
     const filePath = (context.sceneItem.getObsInput().settings as any).file;
     const newFileName = `${uniqueId()}${path.parse(filePath).ext}`;
+
+    // Do not duplicate file if it has already been copied
+    if (context.uploadedAssets[filePath]) {
+      this.data = { filename: context.uploadedAssets[filePath] };
+      return;
+    }
+    context.uploadedAssets[filePath] = newFileName;
 
     // Copy the image file
     const destination = path.join(context.assetsPath, newFileName);
