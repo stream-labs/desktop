@@ -11,7 +11,7 @@ interface ISchema {
 interface IContext {
   assetsPath: string;
   sceneItem: SceneItem;
-  uploadedAssets: Dictionary<string>;
+  savedAssets: Dictionary<string>;
 }
 
 export class IconLibraryNode extends Node<ISchema, IContext> {
@@ -22,11 +22,11 @@ export class IconLibraryNode extends Node<ISchema, IContext> {
     const newFolderName = uniqueId();
 
     // Do not duplicate file if it has already been copied
-    if (context.uploadedAssets[folder]) {
-      this.data = { folder: context.uploadedAssets[folder] };
+    if (context.savedAssets[folder]) {
+      this.data = { folder: context.savedAssets[folder] };
       return;
     }
-    context.uploadedAssets[folder] = newFolderName;
+    context.savedAssets[folder] = newFolderName;
 
     // Copy the image file
     const destination = path.join(context.assetsPath, newFolderName);

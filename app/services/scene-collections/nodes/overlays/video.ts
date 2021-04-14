@@ -12,7 +12,7 @@ interface ISchema {
 interface IContext {
   assetsPath: string;
   sceneItem: SceneItem;
-  uploadedAssets: Dictionary<string>;
+  savedAssets: Dictionary<string>;
 }
 
 export class VideoNode extends Node<ISchema, IContext> {
@@ -30,11 +30,11 @@ export class VideoNode extends Node<ISchema, IContext> {
     settings['local_file'] = '';
 
     // Do not duplicate file if it has already been copied
-    if (context.uploadedAssets[filePath]) {
-      this.data = { settings, filename: context.uploadedAssets[filePath] };
+    if (context.savedAssets[filePath]) {
+      this.data = { settings, filename: context.savedAssets[filePath] };
       return;
     }
-    context.uploadedAssets[filePath] = newFileName;
+    context.savedAssets[filePath] = newFileName;
 
     // Copy the video file
     const destination = path.join(context.assetsPath, newFileName);

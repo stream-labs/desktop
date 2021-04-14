@@ -11,7 +11,7 @@ interface ISchema {
 
 interface IContext {
   assetsPath: string;
-  uploadedAssets: Dictionary<string>;
+  savedAssets: Dictionary<string>;
 }
 
 export class ScenesNode extends ArrayNode<ISchema, IContext, Scene> {
@@ -28,7 +28,7 @@ export class ScenesNode extends ArrayNode<ISchema, IContext, Scene> {
     await slots.save({
       scene,
       assetsPath: context.assetsPath,
-      uploadedAssets: context.uploadedAssets,
+      savedAssets: context.savedAssets,
     });
 
     return {
@@ -49,7 +49,7 @@ export class ScenesNode extends ArrayNode<ISchema, IContext, Scene> {
       await obj.slots.load({
         scene,
         assetsPath: context.assetsPath,
-        uploadedAssets: context.uploadedAssets,
+        savedAssets: context.savedAssets,
       });
 
       // append children to folders

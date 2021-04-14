@@ -69,7 +69,7 @@ export type TSlotSchema = IItemSchema | IFolderSchema;
 interface IContext {
   assetsPath: string;
   scene: Scene;
-  uploadedAssets: Dictionary<string>;
+  savedAssets: Dictionary<string>;
 }
 
 export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
@@ -142,7 +142,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       await content.save({
         sceneItem: sceneNode,
         assetsPath: context.assetsPath,
-        uploadedAssets: context.uploadedAssets,
+        savedAssets: context.savedAssets,
       });
       return { ...details, content } as IItemSchema;
     }
@@ -152,7 +152,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       await content.save({
         sceneItem: sceneNode,
         assetsPath: context.assetsPath,
-        uploadedAssets: context.uploadedAssets,
+        savedAssets: context.savedAssets,
       });
       return { ...details, content } as IItemSchema;
     }
@@ -174,7 +174,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       await content.save({
         sceneItem: sceneNode,
         assetsPath: context.assetsPath,
-        uploadedAssets: context.uploadedAssets,
+        savedAssets: context.savedAssets,
       });
       return { ...details, content } as IItemSchema;
     }
@@ -322,7 +322,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       await obj.content.load({
         sceneItem,
         assetsPath: context.assetsPath,
-        uploadedAssets: context.uploadedAssets,
+        savedAssets: context.savedAssets,
       });
     }
 

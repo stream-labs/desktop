@@ -14,11 +14,11 @@ interface IContext {
 export class RootNode extends Node<ISchema, IContext> {
   schemaVersion = 1;
 
-  uploadedAssets: Dictionary<string> = {};
+  savedAssets: Dictionary<string> = {};
 
   async save(context: IContext): Promise<void> {
     const scenes = new ScenesNode();
-    await scenes.save({ ...context, uploadedAssets: this.uploadedAssets });
+    await scenes.save({ ...context, savedAssets: this.savedAssets });
 
     const transition = new TransitionNode();
     await transition.save(context);
@@ -28,6 +28,6 @@ export class RootNode extends Node<ISchema, IContext> {
 
   async load(context: IContext): Promise<void> {
     if (this.data.transition) await this.data.transition.load(context);
-    await this.data.scenes.load({ ...context, uploadedAssets: this.uploadedAssets });
+    await this.data.scenes.load({ ...context, savedAssets: this.savedAssets });
   }
 }
