@@ -42,7 +42,7 @@ export default function Chat(props: { restream: boolean }) {
         remote.getCurrentWindow().removeListener('leave-full-screen', leaveFullScreenTrigger);
       }
     };
-  });
+  }, []);
 
   // Mount/switch chat
   useEffect(() => {
