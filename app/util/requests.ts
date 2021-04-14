@@ -157,7 +157,7 @@ export function jfetch<TResponse = unknown>(
 function throwJsonError(response: Response): Promise<never> {
   return new Promise((res, rej) => {
     response.json().then((json: unknown) => {
-      rej({ status: response.status, json });
+      rej({ status: response.status, statusText: response.statusText, url: response.url, json });
     });
   });
 }

@@ -211,7 +211,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     height: 600,
   };
 
-  private apiBase = 'https://www.googleapis.com/youtube/v3';
+  readonly apiBase = 'https://www.googleapis.com/youtube/v3';
 
   protected init() {
     this.syncSettingsWithLocalStorage();
@@ -252,7 +252,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
         details === 'The user is not enabled for live streaming.'
           ? 'YOUTUBE_STREAMING_DISABLED'
           : 'PLATFORM_REQUEST_FAILED';
-      throw throwStreamError(errorType, details, 'youtube');
+      throw throwStreamError(errorType, e, details);
     }
   }
 
@@ -406,7 +406,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
    */
   async prepopulateInfo(): Promise<void> {
     if (!this.state.liveStreamingEnabled) {
-      throw throwStreamError('YOUTUBE_STREAMING_DISABLED', '', 'youtube');
+      throw throwStreamError('YOUTUBE_STREAMING_DISABLED');
     }
     const settings = this.state.settings;
     this.UPDATE_STREAM_SETTINGS({
@@ -731,7 +731,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       let details = error.result?.error?.message;
       if (!details) details = 'connection failed';
       const errorType = 'YOUTUBE_THUMBNAIL_UPLOAD_FAILED';
-      throw throwStreamError(errorType, details, 'youtube');
+      throw throwStreamError(errorType, e, details);
     }
   }
 

@@ -1,4 +1,5 @@
 import { IPlatformRequest, TPlatform, getPlatformService } from './index';
+import {jfetch} from "../../util/requests";
 
 export interface IPlatformResponse<TResult = unknown> {
   ok: boolean;
@@ -42,7 +43,7 @@ export async function platformRequest<T = unknown>(
     const headers = new Headers(
       platformService.getHeaders(req, useToken) as Record<string, string>,
     );
-    return fetch(new Request(req.url, { ...req, headers })).then(handlePlatformResponse);
+    return jfetch(new Request(req.url, { ...req, headers })) as Promise<T>;
   };
 
   // try to fetch and retry fetching with a new token if the API responds with 401 (unauthorized)

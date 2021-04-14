@@ -1,5 +1,4 @@
 import styles from './GoLiveError.m.less';
-import cx from 'classnames';
 import React, { useState, HTMLAttributes } from 'react';
 import { IStreamError } from '../../../services/streaming/stream-error';
 import { $t } from '../../../services/i18n';
@@ -43,7 +42,14 @@ export default function MessageLayout(p: IMessageLayoutProps & HTMLAttributes<un
             </a>
           </p>
         )}
-        {details && isErrorDetailsShown && <p className={styles.details}>{details}</p>}
+        {details && isErrorDetailsShown && (
+          <p className={styles.details}>
+            {details}
+            <br />
+            <br />
+            {error?.status} {error?.statusText} {error?.url}
+          </p>
+        )}
       </div>
     );
   }

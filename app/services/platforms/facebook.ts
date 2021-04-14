@@ -216,7 +216,11 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     const streamUrl = liveVideo.stream_url;
     const streamKey = streamUrl.substr(streamUrl.lastIndexOf('/') + 1);
     if (!this.streamingService.views.isMultiplatformMode) {
-      this.streamSettingsService.setSettings({ key: streamKey, platform: 'facebook', streamType: 'rtmp_common'});
+      this.streamSettingsService.setSettings({
+        key: streamKey,
+        platform: 'facebook',
+        streamType: 'rtmp_common',
+      });
     }
     this.SET_STREAM_KEY(streamKey);
     this.SET_STREAM_PAGE_URL(`https://facebook.com/${liveVideo.permalink_url}`);
@@ -312,7 +316,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
       const details = e.result?.error
         ? `${e.result.error.type} ${e.result.error.message}`
         : 'Connection failed';
-      throwStreamError('PLATFORM_REQUEST_FAILED', details, 'facebook');
+      throwStreamError('PLATFORM_REQUEST_FAILED', e, details);
     }
   }
 

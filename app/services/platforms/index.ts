@@ -163,6 +163,7 @@ export interface IPlatformService {
 
   liveDockEnabled: boolean;
 
+  readonly apiBase: string;
   readonly platform: TPlatform;
   readonly displayName: string;
   readonly mergeUrl: string;

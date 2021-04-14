@@ -38,7 +38,13 @@ import { RestreamService } from 'services/restream';
 import { FacebookService } from 'services/platforms/facebook';
 import Utils from 'services/utils';
 import { cloneDeep, isEqual } from 'lodash';
-import { createStreamError, StreamError, TStreamErrorType } from './stream-error';
+import {
+  createStreamError,
+  IRejectedRequest,
+  IStreamError,
+  StreamError,
+  TStreamErrorType,
+} from './stream-error';
 import { authorizedHeaders } from 'util/requests';
 import { HostsService } from '../hosts';
 import { TwitterService } from '../integrations/twitter';
@@ -190,7 +196,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
             primeRequired = true;
           }
           if (primeRequired) {
-            this.SET_ERROR('PRIME_REQUIRED', undefined, platform);
+            this.setError('PRIME_REQUIRED');
             this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
             return;
           }
@@ -200,11 +206,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           await service.prepopulateInfo();
         } catch (e) {
           // cast all PLATFORM_REQUEST_FAILED errors to PREPOPULATE_FAILED
-          const errorType =
+          e.type =
             (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
               ? 'PREPOPULATE_FAILED'
               : e.type || 'UNKNOWN_ERROR';
-          this.SET_ERROR(errorType, e.details, platform);
+          this.setError(e);
           this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
           return;
         }
@@ -266,15 +272,14 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         // don't update settings for twitch in unattendedMode
         const settingsForPlatform = platform === 'twitch' && unattendedMode ? undefined : settings;
         await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform));
-        console.log('Check finished', platform);
       } catch (e) {
         console.error(e);
         // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
-        const errorType =
+        e.type =
           (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
             ? 'SETTINGS_UPDATE_FAILED'
             : e.type || 'UNKNOWN_ERROR';
-        this.setError(errorType, e.details, platform);
+        this.setError(e);
         return;
       }
     }
@@ -420,11 +425,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       } catch (e) {
         console.error(e);
         // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
-        const errorType =
+        e.type =
           (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
             ? 'SETTINGS_UPDATE_FAILED'
             : e.type || 'UNKNOWN_ERROR';
-        this.setError(errorType, e.details, platform);
+        this.setError(e);
         return false;
       }
     }
@@ -476,21 +481,15 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   /**
    * Set the error state for the GoLive window
    */
-  private setError(
-    errorTypeOrError?: TStreamErrorType | StreamError,
-    errorDetails?: string,
-    platform?: TPlatform,
-  ) {
+  private setError(errorTypeOrError?: TStreamErrorType | StreamError) {
     if (typeof errorTypeOrError === 'object') {
       // an error object has been passed as a first arg
-      const error = errorTypeOrError['getModel']
-        ? (errorTypeOrError as StreamError).getModel()
-        : errorTypeOrError;
-      this.SET_ERROR(error.type, error.details, error.platform);
+      this.SET_ERROR(errorTypeOrError);
     } else {
       // an error type has been passed as a first arg
       const errorType = errorTypeOrError as TStreamErrorType;
-      this.SET_ERROR(errorType, errorDetails, platform);
+      const error = createStreamError(errorType);
+      this.SET_ERROR(error);
     }
     const error = this.state.info.error;
     assertIsDefined(error);
@@ -513,9 +512,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   @mutation()
-  private SET_ERROR(type: TStreamErrorType, details?: string, platform?: TPlatform) {
-    if (!type) type = 'UNKNOWN_ERROR';
-    const error = createStreamError(type, details, platform).getModel();
+  private SET_ERROR(error: IStreamError) {
     this.state.info.error = error;
   }
 

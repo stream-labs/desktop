@@ -49,7 +49,6 @@ export function alertAsync(p: Omit<ModalFuncProps, 'afterClose'> | string): Prom
       cancelButtonProps: { style: { display: 'none' } },
       okButtonProps: { type: 'default' },
       okText: $t('Close'),
-      bodyStyle: { width: '100%', textAlign: 'right' },
       afterClose: () => {
         WindowsService.updateStyleBlockers(Utils.getWindowId(), false);
         resolve();
