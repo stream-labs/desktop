@@ -16,6 +16,27 @@ const DEBUG = true;
  * Use it when you have a complex state with computed fields that depends on Vuex
  *
  * We may want to replace this state manager with some library like Redux in the future
+ *
+ * @example
+ * // in the hook file
+ * function useAuth() {
+ *    return useStateManager({ name: '', email: '' }, (getState, setState) => {
+ *
+ *      function setName(name: string) {
+ *        setState({ ...getState(), name });
+ *      }
+ *
+ *      function setEmail(email: string) {
+ *        setState({ ...getState(), email });
+ *      }
+ *
+ *      return { setName, setEmail };
+ *    }).dependencyWatcher;
+ * }
+ *
+ * // in the component file
+ * // select fields we need to this components
+ * const { name, setName } = useAuth(); // component will be updated only if selected fields have been changed
  */
 export function useStateManager<
   TState extends object, // state type
@@ -640,10 +661,6 @@ export function merge<
     if (typeof target === 'function') {
       // if target is a function then call the function and take the value
       return target()[propName];
-      // } else if (!isPlainObject(target) && typeof target[propName] === 'function') {
-      //   // if target is a class instance like ViewHandler and we call its method
-      //   // then ensure we don't loose `this`
-      //   return (...args: unknown[]) => target[propName](...args);
     } else {
       return target[propName];
     }
@@ -846,7 +863,7 @@ let taskStartTime = 0;
 /**
  * log and track elapsed time between logs
  */
-function log(msg: string, ...args: any) {
+function log(msg: string, ...args: any[]) {
   if (!DEBUG) return;
   const now = Date.now();
   if (!lastLogTime) taskStartTime = now;
