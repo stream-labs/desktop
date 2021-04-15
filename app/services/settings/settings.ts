@@ -35,6 +35,7 @@ import {
   OptimizationKey
 } from './optimizer';
 import { getBestSettingsForNiconico } from './niconico-optimization';
+import { TcpServerService } from 'services/api/tcp-server';
 
 
 export interface ISettingsState {
@@ -130,6 +131,7 @@ export class SettingsService extends StatefulService<ISettingsState>
   @Inject() private audioService: AudioService;
   @Inject() private windowsService: WindowsService;
   @Inject() private appService: AppService;
+  @Inject() private tcpServerService: TcpServerService;
 
   @Inject() private userService: UserService;
 
@@ -182,8 +184,11 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   getCategories(): string[] {
-    const categories: string[] = obs.NodeObs.OBS_settings_getListCategories();
+    let categories: string[] = obs.NodeObs.OBS_settings_getListCategories();
 
+    if (Utils.isDevMode()) {
+      categories = categories.concat('Developer');
+    }
     // if (this.advancedSettingEnabled()) categories = categories.concat(['Experimental']);
 
     return categories;
@@ -216,6 +221,8 @@ export class SettingsService extends StatefulService<ISettingsState>
         }
       );
     }
+
+    if (categoryName === 'Developer') return this.tcpServerService.getApiSettingsFormData();
 
     if (categoryName === 'Audio') return this.getAudioSettingsFormData(settings[0]);
 
