@@ -2,8 +2,9 @@ import { useVuex } from 'components-react/hooks';
 import React, { useEffect } from 'react';
 import { Services } from 'components-react/service-provider';
 import styles from './Highlighter.m.less';
-import { EExportStep } from 'services/highlighter';
+import { EExportStep, IClip } from 'services/highlighter';
 import ClipPreview from 'components-react/highlighter/ClipPreview';
+import { ReactSortable } from 'react-sortablejs';
 
 export default function Highlighter() {
   const { HighlighterService } = Services;
@@ -65,7 +66,7 @@ export default function Highlighter() {
           padding: '20px',
         }}
       >
-        {/* TODO */}
+        {/* TODO: Port other inputs */}
         <button
           className="button button--action"
           style={{ marginTop: '16px' }}
@@ -77,17 +78,24 @@ export default function Highlighter() {
     );
   }
 
+  function setClipOrder(clips: IClip[]) {
+    // Intentionally synchronous to avoid visual jank on drop
+    HighlighterService.setOrder(clips.map(c => c.path));
+  }
+
   function getClipsView() {
     return (
       <div style={{ width: '100%', display: 'flex' }}>
         <div style={{ overflowY: 'auto' }}>
-          {v.clips.map(clip => {
-            return (
-              <div key={clip.path} style={{ margin: '10px', display: 'inline-block' }}>
-                <ClipPreview clip={clip} />
-              </div>
-            );
-          })}
+          <ReactSortable list={v.clips} setList={setClipOrder} animation={200}>
+            {v.clips.map(clip => {
+              return (
+                <div key={clip.path} style={{ margin: '10px', display: 'inline-block' }}>
+                  <ClipPreview clip={clip} />
+                </div>
+              );
+            })}
+          </ReactSortable>
         </div>
         {getControls()}
       </div>

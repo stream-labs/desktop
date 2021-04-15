@@ -105,14 +105,6 @@ export class Chat extends ReactComponent {}
 
 @Component({
   props: {
-    name: { default: 'ClipPreview' },
-    componentProps: { default: () => ({ clip: '' }) },
-  },
-})
-export class ClipPreview extends ReactComponent {}
-
-@Component({
-  props: {
     name: { default: 'Highlighter' },
     componentProps: { default: () => ({}) },
   },
