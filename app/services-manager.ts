@@ -27,8 +27,8 @@ import { FontLibraryService } from './services/font-library';
 import { SourceFiltersService } from './services/source-filters';
 import { AppService } from './services/app';
 import { ShortcutsService } from './services/shortcuts';
-import { TcpServerService } from './services/tcp-server';
-import { IpcServerService } from './services/ipc-server';
+import { TcpServerService } from './services/api/tcp-server';
+import { IpcServerService } from './services/api/ipc-server/ipc-server';
 import { UsageStatisticsService } from './services/usage-statistics';
 import { StreamingService } from './services/streaming';
 import Utils from './services/utils';
@@ -50,7 +50,7 @@ import {
   E_JSON_RPC_ERROR,
   IMutation,
   JsonrpcService
-} from 'services/jsonrpc';
+} from 'services/api/jsonrpc';
 import { FileManagerService } from 'services/file-manager';
 import { CrashReporterService } from 'services/crash-reporter';
 import { PatchNotesService } from 'services/patch-notes';

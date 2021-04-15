@@ -1,4 +1,4 @@
-import { ISettingsSubCategory } from '../settings';
+import { ISettingsSubCategory } from 'services/settings';
 
 
 export interface ITcpServersSettings {

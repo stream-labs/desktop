@@ -1,4 +1,4 @@
-import { IJsonRpcRequest } from '../../app/services/jsonrpc';
+import { IJsonRpcRequest } from '../../app/services/api/jsonrpc';
 import { Subject } from 'rxjs';
 import { first } from 'rxjs/operators';
 

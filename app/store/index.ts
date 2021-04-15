@@ -4,7 +4,7 @@ import _ from 'lodash';
 import electron from 'electron';
 import { getModule, StatefulService } from '../services/core/stateful-service';
 import { ServicesManager } from '../services-manager';
-import { IMutation } from 'services/jsonrpc';
+import { IMutation } from 'services/api/jsonrpc';
 import Util from 'services/utils';
 
 Vue.use(Vuex);

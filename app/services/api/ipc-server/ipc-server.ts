@@ -1,12 +1,12 @@
-import { Service } from './core/service';
-import { ServicesManager } from '../services-manager';
+import { Service } from 'services/core/service';
+import { ServicesManager } from 'services-manager';
 import electron from 'electron';
 import { Subscription } from 'rxjs';
 import {
   IJsonRpcRequest,
   IJsonRpcResponse,
   IJsonRpcEvent
-} from 'services/jsonrpc';
+} from 'services/api/jsonrpc';
 
 const { ipcRenderer } = electron;
 

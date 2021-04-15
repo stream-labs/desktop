@@ -1,19 +1,19 @@
 import WritableStream = NodeJS.WritableStream;
 import os from 'os';
 import crypto from 'crypto';
-import { ServicesManager } from '../../services-manager';
+import { ServicesManager } from 'services-manager';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { IObsInput } from 'components/obs/inputs/ObsInput';
 import { ISettingsSubCategory } from 'services/settings';
 import { mutation } from 'services/core/stateful-service';
-import { Inject } from '../core/injector';
+import { Inject } from 'services/core/injector';
 import {
   JsonrpcService,
   E_JSON_RPC_ERROR,
   IJsonRpcEvent,
   IJsonRpcRequest,
   IJsonRpcResponse
-} from 'services/jsonrpc';
+} from 'services/api/jsonrpc';
 import { IIPAddressDescription, ITcpServerServiceApi, ITcpServersSettings } from './tcp-server-api';
 
 const net = require('net');
