@@ -6,6 +6,7 @@ import { RestreamService } from '../restream';
 import { getPlatformService, TPlatform, TPlatformCapability } from '../platforms';
 import { cloneDeep, difference } from 'lodash';
 import { Services } from '../../components-react/service-provider';
+import { TwitterService } from '../../app-services';
 
 /**
  * The stream info view is responsible for keeping
@@ -32,6 +33,10 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
 
   private get streamSettingsView() {
     return this.getServiceViews(StreamSettingsService);
+  }
+
+  private get twitterView() {
+    return this.getServiceViews(TwitterService);
   }
 
   get info() {
@@ -152,7 +157,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   }
 
   getTweetText(streamTitle: string) {
-    return `${streamTitle} ${Services.TwitterService.url}`;
+    return `${streamTitle} ${this.twitterView.url}`;
   }
 
   /**

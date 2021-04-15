@@ -2,13 +2,13 @@ import URI from 'urijs';
 import { PersistentStatefulService } from 'services/core/persistent-stateful-service';
 import { Inject } from 'services/core/injector';
 import { authorizedHeaders, jfetch } from 'util/requests';
-import { mutation } from 'services/core/stateful-service';
+import { mutation, ViewHandler } from 'services/core/stateful-service';
 import electron from 'electron';
 import { HostsService } from 'services/hosts';
 import { UserService } from 'services/user';
 import { $t, I18nService } from 'services/i18n';
 import uuid from 'uuid/v4';
-import { createStreamError, throwStreamError } from '../streaming/stream-error';
+import { throwStreamError } from '../streaming/stream-error';
 
 interface ITwitterServiceState {
   linked: boolean;
@@ -46,6 +46,10 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
   init() {
     super.init();
     this.userService.userLogout.subscribe(() => this.RESET_TWITTER_STATUS());
+  }
+
+  get views() {
+    return new TwitterView(this.state);
   }
 
   @mutation()
@@ -124,14 +128,6 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
     );
   }
 
-  get url() {
-    let url = `${this.state.creatorSiteUrl}/home`;
-    if (!this.state.creatorSiteOnboardingComplete && this.userService.platform?.type === 'twitch') {
-      url = `https://twitch.tv/${this.userService.platform.username}`;
-    }
-    return url;
-  }
-
   openLinkTwitterDialog() {
     if (this.authWindowOpen) return;
 
@@ -182,5 +178,19 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
     }
 
     return false;
+  }
+}
+
+export class TwitterView extends ViewHandler<ITwitterServiceState> {
+  get userView() {
+    return this.getServiceViews(UserService);
+  }
+
+  get url() {
+    let url = `${this.state.creatorSiteUrl}/home`;
+    if (!this.state.creatorSiteOnboardingComplete && this.userView.platform.type === 'twitch') {
+      url = `https://twitch.tv/${this.userView.platform.username}`;
+    }
+    return url;
   }
 }
