@@ -236,3 +236,12 @@ export default class Utils {
     return Math.max(fileSizeInBytes, 0.1).toFixed(1) + byteUnits[i];
   }
 }
+
+/**
+ * A typed version of Object.keys()
+ * Original Object.keys always returns a string[] type
+ * @see discussion here https://github.com/microsoft/TypeScript/pull/12253
+ */
+export function keys<T>(target: T) {
+  return Object.keys(target) as (keyof T)[];
+}

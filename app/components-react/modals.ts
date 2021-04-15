@@ -28,17 +28,18 @@ export function confirm(
       onOk: () => resolve(true),
       onCancel: () => resolve(false),
     });
+    fixBodyWidth();
   });
 }
 
 /**
- * The asynchronous version of Windows.alert
+ * The asynchronous alternative for Windows.alert
  * Uses Modal.info under the hood
  * @example
  * alert('This is Alert').then(() => console.log('Alert closed'))
  *
  */
-export function alert(p: Omit<ModalFuncProps, 'afterClose'> | string): Promise<void> {
+export function alertAsync(p: Omit<ModalFuncProps, 'afterClose'> | string): Promise<void> {
   const modalProps = typeof p === 'string' ? { title: p } : p;
   const { WindowsService } = Services;
   WindowsService.updateStyleBlockers(Utils.getWindowId(), true);
@@ -53,5 +54,17 @@ export function alert(p: Omit<ModalFuncProps, 'afterClose'> | string): Promise<v
         resolve();
       },
     });
+    fixBodyWidth();
+  });
+}
+
+/**
+ * The Antd lib adds additional styles to body most likely to handle scrollbars
+ * these styles add additional width that makes the window looks junkie
+ * Just remove these styles with this function after each modal show
+ */
+function fixBodyWidth() {
+  setTimeout(() => {
+    document.querySelector('body')!.setAttribute('style', '');
   });
 }

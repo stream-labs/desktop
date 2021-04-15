@@ -1,0 +1,97 @@
+// THEME INDEPENDENT STYLES
+
+html {
+  height: 100%;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: var(--background);
+}
+
+#mainWrapper .react {
+  // justify all inputs of form to the right in the modal footer
+  .ant-modal-footer  .ant-form-inline {
+    justify-content: flex-end;
+  }
+
+  // set smaller text for the FormItem.extra text
+  .ant-form-item-extra {
+    margin-top: 6px;
+    font-size: 11px;
+    font-style: italic;
+  }
+
+  // Use primary color for required marks
+  label.ant-form-item-required::before {
+    color: var(--primary);
+  }
+
+  // Use lighter color for input borders
+  .ant-input,
+  .ant-select-selector,
+  .ant-checkbox-inner {
+    border: 1px solid var(--button);
+  }
+  .ant-input:hover,
+  .ant-select-selector:hover {
+    border: 1px solid var(--paragraph);
+  }
+  .ant-checkbox:hover {
+    .ant-checkbox-inner {
+      border: 1px solid var(--paragraph);
+    }
+  }
+  .ant-input:focus,
+  .ant-select-focused .ant-select-selector,
+  .ant-checkbox-inner:focus {
+    border: 1px solid var(--teal-hover);
+  }
+
+  // remove transitions from hover states of inputs
+  .ant-select-selector:hover,
+  .ant-input:hover {
+    transition: none;
+  }
+
+  // override foundation inputs
+  [type=color]:focus, [type=date]:focus, [type=datetime-local]:focus, [type=datetime]:focus, [type=email]:focus, [type=month]:focus, [type=number]:focus, [type=password]:focus, [type=search]:focus, [type=tel]:focus, [type=text]:focus, [type=time]:focus, [type=url]:focus, [type=week]:focus, textarea:focus {
+    box-shadow: none;
+  }
+
+  // allow buttons to be placed after inputs without jank
+  .ant-input-group-addon {
+    border: 0;
+
+    .ant-btn {
+      margin: 0px -11px;
+      border-radius: 0 4px 4px 0;
+    }
+  }
+
+  // disable unnecessary animation in checkboxes
+  .ant-checkbox-inner,
+  .ant-checkbox-inner::after, {
+    transition: none;
+  }
+  .ant-checkbox-checked::after {
+    animation: none;
+  }
+
+  // get rid of weird white box in text area
+  .os-scrollbar-corner,
+  ::-webkit-scrollbar-corner,
+  ::-webkit-resizer {
+    background: transparent !important;
+  }
+}
+
+.ant-btn {
+  border: 0;
+}

@@ -406,7 +406,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
   }
 
   private renderMissedPermissionsWarning() {
-    const isPrimary = this.view.isPrimaryPlatform('facebook');
+    const isPrimary = this.view.checkPrimaryPlatform('facebook');
     return (
       <MessageLayout
         message={$t('You can stream to your timeline and groups now')}
