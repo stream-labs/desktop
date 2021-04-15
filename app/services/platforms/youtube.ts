@@ -163,7 +163,12 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   @Inject() private windowsService: WindowsService;
   @Inject() private i18nService: I18nService;
 
-  readonly capabilities = new Set<TPlatformCapability>(['chat', 'description', 'stream-schedule']);
+  readonly capabilities = new Set<TPlatformCapability>([
+    'title',
+    'description',
+    'chat',
+    'stream-schedule',
+  ]);
 
   static initialState: IYoutubeServiceState = {
     ...BasePlatformService.initialState,
@@ -206,7 +211,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     height: 600,
   };
 
-  private apiBase = 'https://www.googleapis.com/youtube/v3';
+  readonly apiBase = 'https://www.googleapis.com/youtube/v3';
 
   protected init() {
     this.syncSettingsWithLocalStorage();
@@ -247,7 +252,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
         details === 'The user is not enabled for live streaming.'
           ? 'YOUTUBE_STREAMING_DISABLED'
           : 'PLATFORM_REQUEST_FAILED';
-      throw throwStreamError(errorType, details, 'youtube');
+      throw throwStreamError(errorType, e, details);
     }
   }
 
@@ -289,12 +294,15 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
 
     // setup key and platform type in the OBS settings
     const streamKey = stream.cdn.ingestionInfo.streamName;
-    this.streamSettingsService.setSettings({
-      platform: 'youtube',
-      key: streamKey,
-      streamType: 'rtmp_common',
-      server: 'rtmp://a.rtmp.youtube.com/live2',
-    });
+
+    if (!this.streamingService.views.isMultiplatformMode) {
+      this.streamSettingsService.setSettings({
+        platform: 'youtube',
+        key: streamKey,
+        streamType: 'rtmp_common',
+        server: 'rtmp://a.rtmp.youtube.com/live2',
+      });
+    }
 
     // update the local state
     this.UPDATE_STREAM_SETTINGS({ ...ytSettings, broadcastId: broadcast.id });
@@ -399,7 +407,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
    */
   async prepopulateInfo(): Promise<void> {
     if (!this.state.liveStreamingEnabled) {
-      throw throwStreamError('YOUTUBE_STREAMING_DISABLED', '', 'youtube');
+      throw throwStreamError('YOUTUBE_STREAMING_DISABLED');
     }
     const settings = this.state.settings;
     this.UPDATE_STREAM_SETTINGS({
@@ -653,6 +661,33 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     ).items[0];
   }
 
+  /**
+   * Returns an IYoutubeStartStreamOptions object for a given broadcastId
+   */
+  async fetchStartStreamOptionsForBroadcast(
+    broadcastId: string,
+  ): Promise<IYoutubeStartStreamOptions> {
+    const [broadcast, video] = await Promise.all([
+      this.fetchBroadcast(broadcastId),
+      this.fetchVideo(broadcastId),
+    ]);
+    const { title, description } = broadcast.snippet;
+    const { privacyStatus, selfDeclaredMadeForKids } = broadcast.status;
+    const { enableDvr, projection, latencyPreference } = broadcast.contentDetails;
+    return {
+      broadcastId: broadcast.id,
+      title,
+      description,
+      privacyStatus,
+      selfDeclaredMadeForKids,
+      enableDvr,
+      projection,
+      latencyPreference,
+      categoryId: video.snippet.categoryId,
+      thumbnail: broadcast.snippet.thumbnails.default.url,
+    };
+  }
+
   get chatUrl() {
     const broadcastId = this.state.settings.broadcastId;
     if (!broadcastId) return '';
@@ -697,7 +732,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       let details = error.result?.error?.message;
       if (!details) details = 'connection failed';
       const errorType = 'YOUTUBE_THUMBNAIL_UPLOAD_FAILED';
-      throw throwStreamError(errorType, details, 'youtube');
+      throw throwStreamError(errorType, e, details);
     }
   }
 

@@ -1,5 +1,6 @@
 @import '~antd/dist/antd.dark.less';
 @import '../colors';
+@import './antd.less';
 
 // ANTD COLOR MAPPING
 @primary-color: @teal-dark; // var(--teal)
@@ -61,6 +62,7 @@
 @radio-disabled-button-checked-bg: @dark-3; // var(--background)
 
 @select-multiple-item-disabled-color: @light-4; // var(--paragraph)
+@select-item-selected-color: @white;
 
 @slider-rail-background-color: @dark-5; // var(--slider-bg)
 @slider-rail-background-color-hover: @dark-5; // var(--slider-bg)
@@ -75,6 +77,8 @@
 @slider-dot-border-color-active: @dark-4; // var(--border)
 
 
+// FORM
+@label-color: @primelight-4; // var(--paragraph)
 @input-placeholder-color: @light-4; // var(--paragraph)
 @input-number-handler-active-bg: @light-4; // var(--paragraph)
 @input-icon-hover-color: @light-5; // var(--icon)
@@ -137,34 +141,10 @@
   background-color: @dark-2; // var(--section)
 }
 
-.ant-input-group-addon {
-  border: 0;
-
-  .ant-btn {
-    margin: 0px -11px;
-    border-radius: 0 4px 4px 0;
-  }
-}
-
-.ant-btn {
-  border: 0;
-
-  &:hover {
-    color: @heading-color;
-  }
-}
-
-// THEME INDEPENDENT STYLES
-
-// justify all inputs of form to the right in the modal footer
-#mainWrapper .ant-modal-footer  .ant-form-inline {
-  justify-content: flex-end;
-}
-
-
-// Use primary color for required marks
-#mainWrapper label.ant-form-item-required::before {
-  color: @primary-color;
+// make button text not disappear on hover
+.ant-btn:hover,
+.ant-btn:focus {
+  color: @heading-color;
 }
 
 // change color for the search box

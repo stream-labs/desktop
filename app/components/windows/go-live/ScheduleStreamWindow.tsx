@@ -51,7 +51,7 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
 
   created() {
     // use goLive settings for schedule
-    this.settings = cloneDeep(this.view.goLiveSettings);
+    this.settings = cloneDeep(this.view.savedSettings);
 
     // always show a simple mode only
     this.settings.advancedMode = false;
@@ -161,8 +161,7 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
   }
 
   render() {
-    const shouldShowLoading =
-      this.isLoading || !this.view.isPrepopulated(this.selectedDestinations);
+    const shouldShowLoading = this.isLoading || !this.view.isPrepopulated;
     const shouldShowWarn = !shouldShowLoading && this.selectedDestinations.length === 0;
     const shouldShowSettings = !shouldShowWarn && !shouldShowLoading;
 

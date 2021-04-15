@@ -121,8 +121,9 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   readonly displayName = 'Facebook';
 
   readonly capabilities = new Set<TPlatformCapability>([
-    'chat',
+    'title',
     'description',
+    'chat',
     'game',
     'user-info',
     'stream-schedule',
@@ -214,12 +215,14 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     // setup stream key and new settings
     const streamUrl = liveVideo.stream_url;
     const streamKey = streamUrl.substr(streamUrl.lastIndexOf('/') + 1);
-    this.streamSettingsService.setSettings({
-      key: streamKey,
-      platform: 'facebook',
-      streamType: 'rtmp_common',
-      server: 'rtmps://rtmp-api.facebook.com:443/rtmp/',
-    });
+    if (!this.streamingService.views.isMultiplatformMode) {
+      this.streamSettingsService.setSettings({
+        key: streamKey,
+        platform: 'facebook',
+        streamType: 'rtmp_common',
+        server: 'rtmps://rtmp-api.facebook.com:443/rtmp/',
+      });
+    }
     this.SET_STREAM_KEY(streamKey);
     this.SET_STREAM_PAGE_URL(`https://facebook.com/${liveVideo.permalink_url}`);
     this.UPDATE_STREAM_SETTINGS({ ...fbOptions, liveVideoId: liveVideo.id });
@@ -314,7 +317,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
       const details = e.result?.error
         ? `${e.result.error.type} ${e.result.error.message}`
         : 'Connection failed';
-      throwStreamError('PLATFORM_REQUEST_FAILED', details, 'facebook');
+      throwStreamError('PLATFORM_REQUEST_FAILED', e, details);
     }
   }
 
