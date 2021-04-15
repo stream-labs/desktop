@@ -6,7 +6,7 @@ import { $t } from 'services/i18n';
 import { Debounce } from 'lodash-decorators';
 import TsxComponent, { createProps } from '../../tsx-component';
 import { SyncWithValue } from 'services/app/app-decorators';
-import { IStreamSettings, StreamingService } from 'services/streaming';
+import { IGoLiveSettings, IStreamSettings, StreamingService } from 'services/streaming';
 import { Inject } from 'services/core';
 import { TwitchService } from 'services/platforms/twitch';
 

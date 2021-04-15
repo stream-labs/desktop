@@ -1,0 +1,84 @@
+@import "../../../styles/index.less";
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+
+// make timeline icons and text bigger
+.container :global(.ant-timeline-item-tail) {
+    top: 15px;
+    height: calc(100% - 20px);
+}
+.container :global(.ant-timeline-item) {
+  padding-bottom: 30px;
+}
+
+.container :global(.ant-timeline .anticon) {
+  font-size: 25px;
+  margin-top: 8px;
+
+  &:not(:global(.anticon-loading)){
+    color: var(--primary);
+    // add a bounce animation
+    :global {
+      animation: 0.8s ease-out bounce;
+    }
+    // add a fade animation
+    &:after {
+      content: ' ';
+      display: block;
+      width: 10px;
+      height: 10px;
+      background-color: var(--primary);
+      border-radius: 50%;
+      opacity: 0;
+      position: relative;
+      top: -18px;
+      left: 7px;
+      :global{
+        animation: 0.8s ease-out scaleAndFadeOut
+      }
+    }
+  }
+}
+.container :global(.ant-timeline .anticon-close-circle) {
+  color: var(--red);
+}
+
+.container :global(.ant-timeline .anticon-loading) {
+  color: orange;
+  margin-top: -2px;
+}
+
+.container :global(.ant-timeline-item-content) {
+  font-size: 16px;
+  padding-left: 20px;
+}
+
+// set color off done and not-done checklist item
+.container :global(.ant-timeline-item) {
+  :global(.ant-timeline-item-content) {
+    color: var(--midtone);
+  }
+  &.done :global(.ant-timeline-item-content) {
+    color: var(--paragraph);
+  }
+}
+
+.container {
+  h1 {
+    margin-bottom: 50px;
+  }
+}
+
+// add animation to the success message
+.success h1 {
+  :global{
+    animation: 0.8s ease-out bounce;
+  }
+}

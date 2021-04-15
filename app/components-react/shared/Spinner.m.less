@@ -1,0 +1,24 @@
+@import '../../styles/index';
+
+.container {
+  background-color: var(--background);
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  z-index: 1;
+
+  .spinner {
+    opacity: 0;
+    visibility: hidden;
+    display: inline-block;
+  }
+
+  &.hasVisibleSpinner .spinner {
+   transition: opacity 300ms;
+   visibility: visible;
+   opacity: 1;
+  }
+}

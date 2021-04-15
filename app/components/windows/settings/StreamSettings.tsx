@@ -88,7 +88,7 @@ export default class StreamSettings extends TsxComponent {
   }
 
   get customDestinations() {
-    return this.streamingService.views.goLiveSettings.customDestinations;
+    return this.streamingService.views.savedSettings.customDestinations;
   }
 
   private platformMerge(platform: TPlatform) {
@@ -211,7 +211,7 @@ export default class StreamSettings extends TsxComponent {
   }
 
   private renderPlatform(platform: TPlatform) {
-    const isMerged = this.streamingView.isPlatformLinked(platform);
+    const isMerged = this.streamingView.checkPlatformLinked(platform);
     const username = this.userService.state.auth.platforms[platform]?.username;
     const platformName = getPlatformService(platform).displayName;
     const buttonClass = {
@@ -219,7 +219,7 @@ export default class StreamSettings extends TsxComponent {
       youtube: 'button--youtube',
       twitch: 'button--twitch',
     }[platform];
-    const isPrimary = this.streamingView.isPrimaryPlatform(platform);
+    const isPrimary = this.streamingView.checkPrimaryPlatform(platform);
     const shouldShowPrimaryBtn = isPrimary;
     const shouldShowConnectBtn = !isMerged && this.canEditSettings;
     const shouldShowUnlinkBtn = !isPrimary && isMerged && this.canEditSettings;
