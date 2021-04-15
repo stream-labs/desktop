@@ -17,6 +17,8 @@ type TOAuthScope = TTwitchOAuthScope;
 
 /** Supported capabilities of the streaming platform **/
 export type TPlatformCapabilityMap = {
+  /** Display and interact with stream title **/
+  title: IPlatformCapabilityTitle;
   /** Display and interact with chat **/
   chat: IPlatformCapabilityChat;
   /** Ability to set the stream description **/
@@ -44,6 +46,10 @@ interface IPlatformCapabilityChat {
 export interface IPlatformCapabilityGame {
   searchGames: (searchString: string) => Promise<IGame[]>;
   state: { settings: { game: string } };
+}
+
+interface IPlatformCapabilityTitle {
+  state: { settings: { title: string } };
 }
 
 interface IPlatformCapabilityDescription {
@@ -157,6 +163,7 @@ export interface IPlatformService {
 
   liveDockEnabled: boolean;
 
+  readonly apiBase: string;
   readonly platform: TPlatform;
   readonly displayName: string;
   readonly mergeUrl: string;

@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import * as obs from '../../../obs-api';
 import { Inject } from 'services/core/injector';
@@ -31,13 +32,13 @@ import {
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
-import { IncrementalRolloutService } from 'services/incremental-rollout';
+import { EAvailableFeatures, IncrementalRolloutService } from 'services/incremental-rollout';
 import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService } from 'services/restream';
 import { FacebookService } from 'services/platforms/facebook';
 import Utils from 'services/utils';
 import { cloneDeep, isEqual } from 'lodash';
-import { createStreamError, StreamError, TStreamErrorType } from './stream-error';
+import { createStreamError, IStreamError, StreamError, TStreamErrorType } from './stream-error';
 import { authorizedHeaders } from 'util/requests';
 import { HostsService } from '../hosts';
 import { TwitterService } from '../integrations/twitter';
@@ -164,47 +165,62 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   async prepopulateInfo(platforms?: TPlatform[]) {
     platforms = platforms || this.views.enabledPlatforms;
     this.UPDATE_STREAM_INFO({ lifecycle: 'prepopulate', error: null });
-    for (const platform of platforms) {
-      const service = getPlatformService(platform);
 
-      // check eligibility for restream
-      // primary platform is always available to stream into
-      // prime users are eligeble for streaming to any platform
-      let primeRequired = false;
-      if (!this.views.isPrimaryPlatform(platform) && !this.userService.isPrime) {
-        const primaryPlatform = this.userService.state.auth?.primaryPlatform;
+    // prepopulate settings for all platforms in parallel mode
+    await Promise.all(
+      platforms.map(async platform => {
+        const service = getPlatformService(platform);
 
-        // grandfathared users allowed to stream primary + FB
-        if (!this.restreamService.state.grandfathered) {
-          primeRequired = true;
-        } else if (
-          isEqual([primaryPlatform, platform], ['twitch', 'facebook']) ||
-          isEqual([primaryPlatform, platform], ['youtube', 'facebook'])
-        ) {
-          primeRequired = false;
-        } else {
-          primeRequired = true;
+        // check eligibility for restream
+        // primary platform is always available to stream into
+        // prime users are eligeble for streaming to any platform
+        let primeRequired = false;
+        if (!this.views.checkPrimaryPlatform(platform) && !this.userService.isPrime) {
+          const primaryPlatform = this.userService.state.auth?.primaryPlatform;
+
+          // grandfathared users allowed to stream primary + FB
+          if (!this.restreamService.state.grandfathered) {
+            primeRequired = true;
+          } else if (
+            isEqual([primaryPlatform, platform], ['twitch', 'facebook']) ||
+            isEqual([primaryPlatform, platform], ['youtube', 'facebook'])
+          ) {
+            primeRequired = false;
+          } else {
+            primeRequired = true;
+          }
+          if (primeRequired) {
+            this.setError('PRIME_REQUIRED');
+            this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
+            return;
+          }
         }
-        if (primeRequired) {
-          this.SET_ERROR('PRIME_REQUIRED', undefined, platform);
+
+        try {
+          await service.prepopulateInfo();
+        } catch (e) {
+          // cast all PLATFORM_REQUEST_FAILED errors to PREPOPULATE_FAILED
+          e.type =
+            (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
+              ? 'PREPOPULATE_FAILED'
+              : e.type || 'UNKNOWN_ERROR';
+          this.setError(e);
           this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
           return;
         }
-      }
+      }),
+    );
 
-      try {
-        await service.prepopulateInfo();
-      } catch (e) {
-        // cast all PLATFORM_REQUEST_FAILED errors to PREPOPULATE_FAILED
-        const errorType =
-          (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
-            ? 'PREPOPULATE_FAILED'
-            : e.type || 'UNKNOWN_ERROR';
-        this.SET_ERROR(errorType, e.details, platform);
-        this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
-        return;
+    // prepopulate Twitter
+    try {
+      if (this.twitterService.state.linked && this.twitterService.state.tweetWhenGoingLive) {
+        await this.twitterService.getTwitterStatus();
       }
+    } catch (e) {
+      // do not block streaming if something is wrong on the Twitter side
+      console.error(e);
     }
+
     // successfully prepopulated
     this.UPDATE_STREAM_INFO({ lifecycle: 'waitForNewSettings' });
   }
@@ -231,7 +247,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const unattendedMode = !newSettings;
 
     // use default settings if no new settings provided
-    const settings = newSettings || cloneDeep(this.views.goLiveSettings);
+    const settings = newSettings || cloneDeep(this.views.savedSettings);
 
     // save enabled platforms to reuse setting with the next app start
     this.streamSettingsService.setSettings({ goLiveSettings: settings });
@@ -253,11 +269,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       } catch (e) {
         console.error(e);
         // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
-        const errorType =
+        e.type =
           (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
             ? 'SETTINGS_UPDATE_FAILED'
             : e.type || 'UNKNOWN_ERROR';
-        this.setError(errorType, e.details, platform);
+        this.setError(e);
         return;
       }
     }
@@ -333,7 +349,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       this.twitterService.state.tweetWhenGoingLive
     ) {
       try {
-        await this.runCheck('postTweet', () => this.twitterService.postTweet(settings.tweetText));
+        await this.runCheck('postTweet', () => this.twitterService.postTweet(settings.tweetText!));
       } catch (e) {
         console.error('unable to post a tweet', e);
         this.setError(e);
@@ -377,7 +393,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   /**
    * Update stream stetting while being live
    */
-  async updateStreamSettings(settings: IGoLiveSettings) {
+  async updateStreamSettings(settings: IGoLiveSettings): Promise<boolean> {
     const lifecycle = this.state.info.lifecycle;
 
     // save current settings in store so we can re-use them if something will go wrong
@@ -387,7 +403,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist' });
 
     // call putChannelInfo for each platform
-    const platforms = this.views.enabledPlatforms;
+    const platforms = this.views.getEnabledPlatforms(settings.platforms);
 
     platforms.forEach(platform => {
       this.UPDATE_STREAM_INFO({
@@ -396,14 +412,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     });
 
     for (const platform of platforms) {
-      // don't update settings for a non-primary platform if we're not live
-      if (
-        this.state.info.checklist.startVideoTransmission !== 'done' &&
-        !this.views.isPrimaryPlatform(platform)
-      ) {
-        continue;
-      }
-
       const service = getPlatformService(platform);
       const newSettings = settings.platforms[platform];
       try {
@@ -411,12 +419,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       } catch (e) {
         console.error(e);
         // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
-        const errorType =
+        e.type =
           (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
             ? 'SETTINGS_UPDATE_FAILED'
             : e.type || 'UNKNOWN_ERROR';
-        this.setError(errorType, e.details, platform);
-        return;
+        this.setError(e);
+        return false;
       }
     }
 
@@ -424,6 +432,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.streamSettingsService.setSettings({ goLiveSettings: settings });
     // finish the 'runChecklist' step
     this.UPDATE_STREAM_INFO({ lifecycle });
+    return true;
   }
 
   /**
@@ -466,21 +475,15 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   /**
    * Set the error state for the GoLive window
    */
-  private setError(
-    errorTypeOrError?: TStreamErrorType | StreamError,
-    errorDetails?: string,
-    platform?: TPlatform,
-  ) {
+  private setError(errorTypeOrError?: TStreamErrorType | StreamError) {
     if (typeof errorTypeOrError === 'object') {
       // an error object has been passed as a first arg
-      const error = errorTypeOrError['getModel']
-        ? (errorTypeOrError as StreamError).getModel()
-        : errorTypeOrError;
-      this.SET_ERROR(error.type, error.details, error.platform);
+      this.SET_ERROR(errorTypeOrError);
     } else {
       // an error type has been passed as a first arg
       const errorType = errorTypeOrError as TStreamErrorType;
-      this.SET_ERROR(errorType, errorDetails, platform);
+      const error = createStreamError(errorType);
+      this.SET_ERROR(error);
     }
     const error = this.state.info.error;
     assertIsDefined(error);
@@ -503,9 +506,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   @mutation()
-  private SET_ERROR(type: TStreamErrorType, details?: string, platform?: TPlatform) {
-    if (!type) type = 'UNKNOWN_ERROR';
-    this.state.info.error = createStreamError(type, details, platform).getModel();
+  private SET_ERROR(error: IStreamError) {
+    this.state.info.error = error;
   }
 
   @mutation()
@@ -518,7 +520,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     itemName: keyof IStreamInfo['checklist'],
     state: TGoLiveChecklistItemState,
   ) {
-    this.state.info.checklist[itemName] = state;
+    Vue.set(this.state.info, 'checklist', { ...this.state.info.checklist, [itemName]: state });
   }
 
   @mutation()
@@ -726,8 +728,14 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const height = this.views.linkedPlatforms.length > 1 ? 750 : 650;
     const width = 900;
 
+    const isLegacy =
+      !this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
+      this.customizationService.state.experimental?.legacyGoLive;
+
+    const componentName = isLegacy ? 'GoLiveWindowDeprecated' : 'GoLiveWindow';
+
     this.windowsService.showWindow({
-      componentName: 'GoLiveWindow',
+      componentName,
       title: $t('Go Live'),
       size: {
         height,
@@ -740,8 +748,14 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const height = 750;
     const width = 900;
 
+    const isLegacy =
+      !this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
+      this.customizationService.state.experimental?.legacyGoLive;
+
+    const componentName = isLegacy ? 'EditStreamWindowDeprecated' : 'EditStreamWindow';
+
     this.windowsService.showWindow({
-      componentName: 'EditStreamWindow',
+      componentName,
       title: $t('Update Stream Info'),
       size: {
         height,
