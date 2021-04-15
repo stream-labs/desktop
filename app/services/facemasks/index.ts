@@ -32,7 +32,7 @@ import { UsageStatisticsService } from 'services/usage-statistics';
 @InitAfter('UserService')
 export class FacemasksService extends PersistentStatefulService<Interfaces.IFacemasksServiceState> {
   @Inject() userService: UserService;
-  @Inject() hostsService: HostsService;
+  @Inject() hostsService!: HostsService;
   @Inject() websocketService: WebsocketService;
   @Inject() sourcesService: SourcesService;
   @Inject() sourceFiltersService: SourceFiltersService;
@@ -452,7 +452,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
   }
 
   getMissingModtimes(missing: string[]) {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       const asyncReads = missing.map(uuid => this.readFile(uuid));
       Promise.all(asyncReads)
         .then(results => resolve())
@@ -487,7 +487,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
 
   readFile(uuid: string) {
     const maskPath = this.libraryPath(uuid);
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       fs.readFile(maskPath, 'utf8', (readError, data) => {
         if (readError) reject(readError);
         try {
@@ -515,7 +515,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
 
   // Try to download a mask, resolve whether operation was successful or not
   downloadAndSaveModtime(uuid: string, intro: boolean, update = false): Promise<any> {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       this.downloadMask(uuid, update)
         .then(modtime => {
           if (modtime) {

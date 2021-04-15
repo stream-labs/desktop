@@ -61,9 +61,11 @@ export default class DonationTicker extends WidgetSettings<
   // tslint:disable-next-line:prefer-template
   amountColorTooltip = $t('A hex color for the text of the') + ' {amount} ' + $t('token');
 
-  navItems = [
-    { value: 'manage-list', label: $t('Manage List') },
-    { value: 'font', label: $t('Font Settings') },
-    { value: 'source', label: $t('Source') },
-  ];
+  get navItems() {
+    return [
+      { value: 'manage-list', label: $t('Manage List') },
+      { value: 'font', label: $t('Font Settings') },
+      { value: 'source', label: $t('Source') },
+    ];
+  }
 }

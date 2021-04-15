@@ -19,9 +19,9 @@ import { UserService } from 'services/user';
   components: { ModalLayout, Selector, Display, HFormGroup },
 })
 export default class AddSource extends Vue {
-  @Inject() sourcesService: SourcesService;
+  @Inject() sourcesService!: SourcesService;
   @Inject() scenesService: ScenesService;
-  @Inject() windowsService: WindowsService;
+  @Inject() windowsService!: WindowsService;
   @Inject() widgetsService: WidgetsService;
   @Inject() platformAppsService: PlatformAppsService;
   @Inject() private editorCommandsService: EditorCommandsService;
@@ -69,6 +69,8 @@ export default class AddSource extends Vue {
       this.name = $t('Instant Replay');
     } else if (this.sourceAddOptions.propertiesManager === 'streamlabels') {
       this.name = $t('Stream Label');
+    } else if (this.sourceAddOptions.propertiesManager === 'iconLibrary') {
+      this.name = $t('Custom Icon');
     } else if (this.sourceAddOptions.propertiesManager === 'widget') {
       this.name = this.sourcesService.suggestName(
         WidgetDisplayData(this.platform)[this.widgetType].name,
