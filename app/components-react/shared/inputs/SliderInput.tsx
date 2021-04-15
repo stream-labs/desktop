@@ -5,7 +5,7 @@ import { SliderSingleProps } from 'antd/lib/slider';
 import InputWrapper from './InputWrapper';
 
 // select which features from the antd lib we are going to use
-const ANT_SLIDER_FEATURES = ['min', 'max'] as const;
+const ANT_SLIDER_FEATURES = ['min', 'max', 'step', 'tooltipPlacement', 'tipFormatter'] as const;
 
 export type TSliderInputProps = TSlobsInputProps<
   { hasNumberInput?: boolean },

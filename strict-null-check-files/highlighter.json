@@ -1,0 +1,8 @@
+{
+  "ts": [
+    "app/services/highlighter/*.ts"
+  ],
+  "tsx": [
+
+  ]
+}

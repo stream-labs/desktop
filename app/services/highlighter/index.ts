@@ -82,6 +82,7 @@ export function pmap<TVal, TRet>(
 
     function executeNext() {
       const item = toExecute.shift();
+      if (item == null) return;
 
       executor(item[0])
         .then(ret => {
@@ -92,7 +93,7 @@ export function pmap<TVal, TRet>(
 
           // Update progress callback
           if (opts.onProgress) {
-            options.onProgress(item[0], ret, returns.length);
+            opts.onProgress(item[0], ret, returns.length);
           }
 
           if (toExecute.length > 0) {
@@ -114,7 +115,7 @@ export function pmap<TVal, TRet>(
     }
 
     // Fire off the initial set of requests
-    Array(Math.min(items.length, opts.concurrency))
+    Array(Math.min(items.length, opts.concurrency ?? Infinity))
       .fill(0)
       .forEach(() => executeNext());
   });
@@ -172,9 +173,9 @@ export class FrameSource {
   readonly width = WIDTH;
   readonly height = HEIGHT;
 
-  private ffmpeg: execa.ExecaChildProcess<string>;
+  private ffmpeg: execa.ExecaChildProcess<Buffer | string>;
 
-  private onFrameComplete: (frameRead: boolean) => void;
+  private onFrameComplete: ((frameRead: boolean) => void) | null;
 
   private finished = false;
 
@@ -225,7 +226,7 @@ export class FrameSource {
       stderr: process.stderr,
     });
 
-    this.ffmpeg.stdout.once('end', () => {
+    this.ffmpeg.stdout?.once('end', () => {
       console.log('STREAM HAS ENDED');
       console.log(`FRAME COUNT: Expected: ${this.nFrames} Actual: ${this.currentFrame}`);
       this.finished = true;
@@ -234,13 +235,13 @@ export class FrameSource {
       if (this.onFrameComplete) this.onFrameComplete(false);
     });
 
-    this.ffmpeg.stdout.on('data', (chunk: Buffer) => {
+    this.ffmpeg.stdout?.on('data', (chunk: Buffer) => {
       // console.log('GOT CHUNK LENGTH', chunk.length);
 
       this.handleChunk(chunk);
     });
 
-    this.ffmpeg.stdout.on('error', e => {
+    this.ffmpeg.stdout?.on('error', e => {
       console.log('error', e);
     });
   }
@@ -267,7 +268,7 @@ export class FrameSource {
 
       this.onFrameComplete = resolve;
 
-      this.ffmpeg.stdout.resume();
+      this.ffmpeg.stdout?.resume();
     });
   }
 
@@ -287,12 +288,12 @@ export class FrameSource {
     this.byteIndex += bytesToCopy;
 
     if (this.byteIndex >= FRAME_BYTE_SIZE) {
-      this.ffmpeg.stdout.pause();
+      this.ffmpeg.stdout?.pause();
 
       this.swapBuffers();
 
       this.currentFrame++;
-      this.onFrameComplete(true);
+      if (this.onFrameComplete) this.onFrameComplete(true);
       this.onFrameComplete = null;
 
       const remainingBytes = chunk.length - bytesToCopy;
@@ -443,7 +444,7 @@ export class FrameWriter {
   readonly width = WIDTH;
   readonly height = HEIGHT;
 
-  private ffmpeg: execa.ExecaChildProcess<string>;
+  private ffmpeg: execa.ExecaChildProcess<Buffer | string>;
 
   exitPromise: Promise<void>;
 
@@ -502,7 +503,7 @@ export class FrameWriter {
       console.log('CAUGHT ERROR', e);
     });
 
-    this.ffmpeg.stderr.on('data', (data: Buffer) => {
+    this.ffmpeg.stderr?.on('data', (data: Buffer) => {
       console.log('ffmpeg:', data.toString());
     });
   }
@@ -511,7 +512,7 @@ export class FrameWriter {
     if (!this.ffmpeg) this.startFfmpeg();
 
     await new Promise<void>((resolve, reject) => {
-      this.ffmpeg.stdin.write(frameBuffer, e => {
+      this.ffmpeg.stdin?.write(frameBuffer, e => {
         if (e) {
           console.log(e);
           reject();
@@ -523,14 +524,14 @@ export class FrameWriter {
   }
 
   end() {
-    this.ffmpeg.stdin.end();
+    this.ffmpeg.stdin?.end();
     return this.exitPromise;
   }
 }
 
 export class Compositor2D {
   private canvas = document.createElement('canvas');
-  private ctx = this.canvas.getContext('2d');
+  private ctx = this.canvas.getContext('2d')!;
 
   readonly width = WIDTH;
   readonly height = HEIGHT;
@@ -557,7 +558,7 @@ export class Compositor2D {
 
 export class Transitioner {
   private canvas = document.createElement('canvas');
-  private gl = this.canvas.getContext('webgl');
+  private gl = this.canvas.getContext('webgl')!;
 
   readonly width = WIDTH;
   readonly height = HEIGHT;
@@ -873,10 +874,16 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     }
 
     if (this.views.exportInfo.exporting) {
-      console.log('Highlighter: Cannot export until current export operation is finished');
+      console.error('Highlighter: Cannot export until current export operation is finished');
+      return;
     }
 
     const clips = this.views.clips.filter(c => c.enabled).map(c => this.clips[c.path]);
+
+    if (!clips.length) {
+      console.error('Highlighter: Export called without any clips!');
+      return;
+    }
 
     // Reset all clips
     clips.forEach(c => c.reset());
@@ -906,7 +913,8 @@ export class HighlighterService extends StatefulService<IHighligherState> {
 
     this.SET_EXPORT_INFO({ step: EExportStep.FrameRender });
 
-    let fromClip = clips.shift();
+    // Cannot be null because we already checked there is at least 1 element in the array
+    let fromClip = clips.shift()!;
     let toClip = clips.shift();
 
     const transitioner = new Transitioner(this.state.transition.type);
