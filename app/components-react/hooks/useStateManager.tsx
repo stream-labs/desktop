@@ -8,7 +8,7 @@ const GenericStateManagerContext = React.createContext(null);
 // React devtools are broken for Electron 9 and 10
 // as an alternative set DEBUG=true
 // to track components re-renders and timings in the console
-const DEBUG = true;
+const DEBUG = false;
 
 /**
  * Flux-like state manager for React.Context
@@ -892,13 +892,13 @@ function log(msg: string, ...args: any[]) {
   }
 
   lastLogTime = now;
-  console.log('%c%s', `color: ${msColor}`, `+${ms}ms`, `${msg}`, ...args);
+  console.debug('%c%s', `color: ${msColor}`, `+${ms}ms`, `${msg}`, ...args);
   if (logResetTimeout) return;
   logResetTimeout = setTimeout(() => {
     const taskTime = Date.now() - taskStartTime;
     logResetTimeout = 0;
     lastLogTime = 0;
     taskStartTime = 0;
-    console.log('%c%s', 'color: teal', `end task for ${taskTime}ms`);
+    console.debug('%c%s', 'color: teal', `end task for ${taskTime}ms`);
   });
 }
