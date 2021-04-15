@@ -1,7 +1,7 @@
 import TsxComponent from 'components/tsx-component';
 import { EExportStep, HighlighterService, IClip } from 'services/highlighter';
 import { Component, Watch } from 'vue-property-decorator';
-import ClipPreview from 'components/highlighter/ClipPreview';
+import { ClipPreview } from 'components/shared/ReactComponent';
 import { Inject } from 'services';
 import draggable from 'vuedraggable';
 import styles from './Highlighter.m.less';
@@ -176,7 +176,7 @@ export default class Highlighter extends TsxComponent {
             {this.views.clips.map(clip => {
               return (
                 <ClipPreview
-                  clip={clip}
+                  componentProps={{ clip }}
                   style={{ margin: '10px', display: 'inline-block' }}
                   key={clip.path}
                 />

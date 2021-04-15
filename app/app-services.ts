@@ -129,6 +129,7 @@ import { AnnouncementsService } from './services/announcements';
 import { PatchNotesService } from './services/patch-notes';
 import { VideoService } from './services/video';
 import { ChatService } from './services/chat';
+import { HighlighterService } from './services/highlighter';
 
 export const AppServices = {
   WindowsService,
@@ -153,4 +154,5 @@ export const AppServices = {
   UserService,
   TwitchService,
   DismissablesService,
+  HighlighterService,
 };
