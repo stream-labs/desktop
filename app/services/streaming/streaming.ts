@@ -218,7 +218,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       }
     } catch (e) {
       // do not block streaming if something is wrong on the Twitter side
-      console.error(e);
+      console.error('Error fetching Twitter status', e);
     }
 
     // successfully prepopulated
@@ -267,7 +267,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         const settingsForPlatform = platform === 'twitch' && unattendedMode ? undefined : settings;
         await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform));
       } catch (e) {
-        console.error(e);
+        console.error('Error running beforeGoLive for plarform', e);
         // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
         e.type =
           (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
@@ -339,7 +339,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         getPlatformService(platform).afterGoLive();
       });
     } catch (e) {
-      console.error(e);
+      console.error('Error running afterGoLive for platform', e);
     }
 
     // tweet
@@ -417,7 +417,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       try {
         await this.runCheck(platform, () => service.putChannelInfo(newSettings));
       } catch (e) {
-        console.error(e);
+        console.error('Error running putChannelInfo for platform', e);
         // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
         e.type =
           (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
@@ -487,7 +487,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
     const error = this.state.info.error;
     assertIsDefined(error);
-    console.error(error.message, error);
+    console.error(`Streaming Error: ${error.message}`, error);
   }
 
   resetInfo() {
