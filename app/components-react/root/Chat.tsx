@@ -17,25 +17,8 @@ export default function Chat(props: { restream: boolean }) {
 
   let leaveFullScreenTrigger: Function;
 
-  useEffect(lifecycle, []);
-  useEffect(changeChat, [props.restream]);
-
-  function lifecycle() {
-    mounted();
-
-    return function cleanup() {
-      service.actions.unmountChat(remote.getCurrentWindow().id);
-      clearInterval(resizeInterval);
-
-      if (getOS() === OS.Mac) {
-        remote.getCurrentWindow().removeListener('leave-full-screen', leaveFullScreenTrigger);
-      }
-    };
-  }
-
-  function mounted() {
-    service.actions.mountChat(remote.getCurrentWindow().id);
-
+  // Setup resize/fullscreen listeners
+  useEffect(() => {
     resizeInterval = window.setInterval(() => {
       checkResize();
     }, 100);
@@ -45,21 +28,38 @@ export default function Chat(props: { restream: boolean }) {
     if (getOS() === OS.Mac) {
       leaveFullScreenTrigger = () => {
         setTimeout(() => {
-          changeChat();
+          setupChat();
         }, 1000);
       };
 
       remote.getCurrentWindow().on('leave-full-screen', leaveFullScreenTrigger);
     }
-  }
 
-  function changeChat() {
+    return () => {
+      clearInterval(resizeInterval);
+
+      if (getOS() === OS.Mac) {
+        remote.getCurrentWindow().removeListener('leave-full-screen', leaveFullScreenTrigger);
+      }
+    };
+  }, []);
+
+  // Mount/switch chat
+  useEffect(() => {
+    setupChat();
+
+    return () => {
+      service.actions.unmountChat(remote.getCurrentWindow().id);
+    };
+  }, [props.restream]);
+
+  function setupChat() {
     const windowId = remote.getCurrentWindow().id;
 
-    ChatService.unmountChat();
-    RestreamService.unmountChat(windowId);
+    ChatService.actions.unmountChat();
+    RestreamService.actions.unmountChat(windowId);
 
-    service.mountChat(windowId);
+    service.actions.mountChat(windowId);
     currentPosition = null;
     currentSize = null;
     checkResize();
