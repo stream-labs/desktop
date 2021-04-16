@@ -118,3 +118,9 @@ export class GoLiveWindow extends ReactComponent {}
   },
 })
 export class EditStreamWindow extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'Grow' },
+  },
+})
+export class Grow extends ReactComponent {}
