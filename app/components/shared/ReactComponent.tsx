@@ -118,3 +118,11 @@ export class GoLiveWindow extends ReactComponent {}
   },
 })
 export class EditStreamWindow extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'SharedComponentsDemo' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class SharedComponentsDemo extends ReactComponent {}

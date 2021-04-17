@@ -7,6 +7,9 @@
           Repair Scene Collection
         </button>
         <br />
+        <button class="button button--action" @click="showDemoComponents()">
+          Show Demo Components
+        </button>
         <br />
       </div>
     </div>

@@ -8,7 +8,7 @@ const GenericStateManagerContext = React.createContext(null);
 // React devtools are broken for Electron 9 and 10
 // as an alternative set DEBUG=true
 // to track components re-renders and timings in the console
-const DEBUG = false;
+const DEBUG = true;
 
 /**
  * Flux-like state manager for React.Context
