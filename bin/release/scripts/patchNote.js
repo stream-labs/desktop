@@ -108,8 +108,12 @@ function writePatchNoteFile(patchNoteFileName, version, contents) {
   fs.writeFileSync(patchNoteFileName, body);
 }
 
-async function collectPullRequestMerges({ octokit, owner, repo }, previousVersion) {
-  const merges = executeCmd(`git log --oneline --merges v${previousVersion}..`, { silent: true }).stdout;
+function gitLog(previousVersion) {
+  return executeCmd(`git log --oneline --merges v${previousVersion}..`, { silent: true }).stdout;
+}
+
+async function collectPullRequestMerges({ octokit, owner, repo }, previousVersion, { addAuthor } ) {
+  const merges = gitLog(previousVersion);
 
   const promises = [];
   for (const line of merges.split(/\r?\n/)) {
@@ -144,7 +148,11 @@ async function collectPullRequestMerges({ octokit, owner, repo }, previousVersio
     for (const result of results) {
       const { data } = result;
       if ('title' in data) {
-        summary.push(`${data.title} (#${data.number}) by ${data.user.login}\n`);
+        const elements = [data.title, `(#${data.number})`];
+        if (addAuthor) {
+          elements.push(`by ${data.user.login}`);
+        }
+        summary.push(elements.join(' ') + '\n');
       }
     }
 
@@ -174,10 +182,10 @@ export const notes: IPatchNotes = {
   title: '${title}',
   notes: [
 ${notes
-    .trim()
-    .split('\n')
-    .map(s => `    '${s}'`)
-    .join(',\n')}
+      .trim()
+      .split('\n')
+      .map(s => `    '${s}'`)
+      .join(',\n')}
   ]
 };
 `;
