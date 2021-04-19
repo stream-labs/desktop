@@ -4,8 +4,7 @@ import { Inject } from 'util/injector';
 import { NicoliveCommentViewerService, WrappedChat } from 'services/nicolive-program/nicolive-comment-viewer';
 import CommentForm from './CommentForm.vue';
 import CommentFilter from './CommentFilter.vue';
-import CommentLocalFilter from './CommentLocalFilter.vue';
-import CommentSynthesizer from './CommentSynthesizer.vue';
+import CommentSettings from './CommentSettings.vue';
 import { NicoliveCommentLocalFilterService } from 'services/nicolive-program/nicolive-comment-local-filter';
 import { ChatMessage } from 'services/nicolive-program/MessageServerClient';
 import { Menu } from 'util/menus/Menu';
@@ -37,8 +36,7 @@ const componentMap: { [type in ChatMessageType]: Vue.Component } = {
   components: {
     CommentForm,
     CommentFilter,
-    CommentLocalFilter,
-    CommentSynthesizer,
+    CommentSettings,
     CommonComment,
     NicoadComment,
     GiftComment,
@@ -60,14 +58,13 @@ export default class CommentViewer extends Vue {
 
   // TODO: 後で言語ファイルに移動する
   commentReloadTooltip = 'コメント再取得';
+  commentSynthesizerTooltip = 'コメント読み上げ';
   filterTooltip = 'NG設定';
-  localFilterTooltip = 'フィルター設定';
-  commentSynthesizerTooltip = 'コメント読み上げ設定';
+  settingsTooltip = 'コメント設定';
 
   isFilterOpened = false;
 
-  isLocalFilterOpened = false;
-  isCommentSynthesizerOpened = false;
+  isSettingsOpened = false;
   isLatestVisible = true;
 
   get pinnedComment(): WrappedChat | null {
@@ -105,6 +102,9 @@ export default class CommentViewer extends Vue {
 
   get speakingEnabled(): boolean {
     return this.nicoliveCommentViewerService.speakingEnabled;
+  }
+  set speakingEnabled(e: boolean) {
+    this.nicoliveCommentViewerService.speakingEnabled = e;
   }
 
   get speakingSeqId() {

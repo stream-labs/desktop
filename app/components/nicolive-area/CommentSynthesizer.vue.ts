@@ -87,4 +87,10 @@ export default class CommentSynthesizer extends Vue {
   resetVolume() {
     this.volume = 1.0;
   }
+
+  reset() {
+    this.resetPitch();
+    this.resetRate();
+    this.resetVolume();
+  }
 }

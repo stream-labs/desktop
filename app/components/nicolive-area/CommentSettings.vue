@@ -1,18 +1,17 @@
 <template>
   <div class="container">
     <div class="header">
-      <div class="header-item-center">フィルター設定</div>
+      <div class="header-item-center">コメント設定</div>
+      <div class="header-item-right"><i class="icon-close icon-btn" @click="close"></i></div>
     </div>
     <div class="content">
-      <div class="row">
-        <div class="name">匿名(184)のコメントを表示</div>
-        <div class="value"><input type="checkbox" v-model="showAnonymous" class="toggle-button" /></div>
-      </div>
+      <comment-local-filter />
+      <comment-synthesizer />
     </div>
   </div>
 </template>
 
-<script lang="ts" src="./CommentLocalFilter.vue.ts"></script>
+<script lang="ts" src="./CommentSettings.vue.ts"></script>
 <style lang="less" scoped>
 @import "../../styles/_colors";
 @import "../../styles/mixins";
