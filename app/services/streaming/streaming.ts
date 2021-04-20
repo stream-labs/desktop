@@ -204,7 +204,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
             (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
               ? 'PREPOPULATE_FAILED'
               : e.type || 'UNKNOWN_ERROR';
-          this.setError(e);
+          this.setError(e, platform);
           this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
           return;
         }
@@ -475,7 +475,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   /**
    * Set the error state for the GoLive window
    */
-  private setError(errorTypeOrError?: TStreamErrorType | StreamError) {
+  private setError(errorTypeOrError?: TStreamErrorType | StreamError, platform?: TPlatform) {
     if (typeof errorTypeOrError === 'object') {
       // an error object has been passed as a first arg
       this.SET_ERROR(errorTypeOrError);
@@ -483,6 +483,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       // an error type has been passed as a first arg
       const errorType = errorTypeOrError as TStreamErrorType;
       const error = createStreamError(errorType);
+      if (platform) error.platform = platform;
       this.SET_ERROR(error);
     }
     const error = this.state.info.error;
