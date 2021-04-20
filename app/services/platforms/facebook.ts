@@ -486,7 +486,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
         )
       ).data.filter(group => group.administrator);
     } catch (e) {
-      console.error(e);
+      console.error('Error fetching Facebook groups', e);
       this.SET_OUTAGE_WARN(
         'Streaming to Facebook groups is currently unavailable.  Please try again later.',
       );
