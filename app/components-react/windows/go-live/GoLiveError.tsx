@@ -50,14 +50,14 @@ export default function GoLiveError() {
   }
 
   function renderPrepopulateError(error: IStreamError) {
-    assertIsDefined(error.platform);
-    const platformName = getPlatformService(error.platform).displayName;
+    const platformName = error.platform ? getPlatformService(error.platform).displayName : null;
+    const message = platformName
+      ? $t('Failed to fetch settings from %{platformName}', { platformName })
+      : $t('Failed to fetch settings');
+
     const actions = StreamingService.actions;
     return (
-      <MessageLayout
-        error={error}
-        message={$t('Failed to fetch settings from %{platformName}', { platformName })}
-      >
+      <MessageLayout error={error} message={message}>
         <Translate message={$t('prepopulateStreamSettingsError')}>
           <a slot="fetchAgainLink" className={css.link} onClick={() => actions.prepopulateInfo()} />
           <a slot="justGoLiveLink" className={css.link} onClick={() => actions.goLive()} />
@@ -112,9 +112,6 @@ export default function GoLiveError() {
   }
 
   function renderSettingsUpdateError(error: IStreamError) {
-    assertIsDefined(error.platform);
-    const platformName = getPlatformService(error.platform).displayName;
-
     function tryAgain() {
       const actions = StreamingService.actions;
       const settings = StreamingService.views.info.settings;
@@ -131,11 +128,13 @@ export default function GoLiveError() {
       WindowsService.actions.closeChildWindow();
     }
 
+    const platformName = error.platform ? getPlatformService(error.platform).displayName : null;
+    const message = platformName
+      ? $t('Failed to update settings for %{platformName}', { platformName })
+      : $t('Failed to update settings');
+
     return (
-      <MessageLayout
-        error={error}
-        message={$t('Failed to update settings for %{platformName}', { platformName })}
-      >
+      <MessageLayout error={error} message={message}>
         <Translate message={$t('updateStreamSettingsError')}>
           <a slot="tryAgainLink" className={css.link} onClick={tryAgain} />
           <a slot="justGoLiveLink" className={css.link} onClick={skipSettingsUpdateAndGoLive} />
