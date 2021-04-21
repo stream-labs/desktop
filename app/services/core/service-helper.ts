@@ -15,7 +15,7 @@ import { inheritMutations } from './stateful-service';
 import Utils from 'services/utils';
 
 export function ServiceHelper() {
-  return function<T extends { new (...args: any[]): {} }>(constr: T) {
+  return function <T extends { new (...args: any[]): {} }>(constr: T) {
     const klass = class extends constr {
       constructor(...args: any[]) {
         super(...args);
@@ -52,7 +52,7 @@ export function ServiceHelper() {
 }
 
 export function ExecuteInWorkerProcess(): MethodDecorator {
-  return function(target: any, property: string, descriptor: PropertyDescriptor) {
+  return function (target: any, property: string, descriptor: PropertyDescriptor) {
     return Object.assign({}, descriptor, {
       value(...args: any[]) {
         if (Utils.isWorkerWindow()) {

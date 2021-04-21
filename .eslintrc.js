@@ -27,6 +27,7 @@ module.exports = {
   ],
   rules: {
     "prettier/prettier": ERROR,
+    // "@typescript-eslint/no-implicit-any-catch": ERROR,
 
     // "variable-name": [ERROR, "ban-keywords", "check-format", "allow-leading-underscore", "allow-pascal-case"],
     // We do imports where our files are suffixed .vue and this rule would expect we import as e.g. MainVue

@@ -41,9 +41,7 @@ interface IVideoEncodingOptimizationServiceState {
   lastSelectedProfile: IEncoderProfile;
 }
 
-export class VideoEncodingOptimizationService extends PersistentStatefulService<
-  IVideoEncodingOptimizationServiceState
-> {
+export class VideoEncodingOptimizationService extends PersistentStatefulService<IVideoEncodingOptimizationServiceState> {
   static defaultState: IVideoEncodingOptimizationServiceState = {
     useOptimizedProfile: false,
     lastLoadedGame: '',

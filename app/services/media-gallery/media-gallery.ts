@@ -91,10 +91,7 @@ export class MediaGalleryService extends Service {
     filePaths.forEach((path: string) => {
       const contents = fs.readFileSync(path);
       const name = path.split('\\').pop();
-      const ext = name
-        .toLowerCase()
-        .split('.')
-        .pop();
+      const ext = name.toLowerCase().split('.').pop();
       const file = new File([contents], name, { type: `${fileTypeMap[ext]}/${ext}` });
       formData.append('uploads[]', file);
     });
@@ -156,10 +153,7 @@ export class MediaGalleryService extends Service {
 
     const uploads = files.map(item => {
       const filename = decodeURIComponent(item.href.split(/[\\/]/).pop());
-      const ext = filename
-        .toLowerCase()
-        .split('.')
-        .pop();
+      const ext = filename.toLowerCase().split('.').pop();
       const type = fileTypeMap[ext];
       const size = item.size || 0;
 

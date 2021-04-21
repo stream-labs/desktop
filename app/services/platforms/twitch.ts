@@ -67,7 +67,8 @@ interface ITwitchServiceState extends IPlatformState {
 }
 
 @InheritMutations()
-export class TwitchService extends BasePlatformService<ITwitchServiceState>
+export class TwitchService
+  extends BasePlatformService<ITwitchServiceState>
   implements IPlatformService {
   @Inject() hostsService: HostsService;
   @Inject() streamSettingsService: StreamSettingsService;

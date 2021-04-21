@@ -9,9 +9,9 @@ import Vue from 'vue';
  * Set application to the loading mode while running the async method
  */
 export function RunInLoadingMode(options: IRunInLoadingModeOptions = {}): any {
-  return function(target: any, methodName: string, descriptor: PropertyDescriptor) {
+  return function (target: any, methodName: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
-    descriptor.value = function(...args: any[]) {
+    descriptor.value = function (...args: any[]) {
       const appService = getResource<AppService>('AppService');
       return appService.runInLoadingMode(() => {
         return originalMethod.call(this, ...args);

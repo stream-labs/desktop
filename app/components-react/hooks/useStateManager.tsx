@@ -281,11 +281,7 @@ function useComponentId() {
     try {
       throw new Error();
     } catch (e) {
-      return e.stack
-        .split('\n')[10]
-        .split('at ')[1]
-        .split('(')[0]
-        .trim();
+      return e.stack.split('\n')[10].split('at ')[1].split('(')[0].trim();
     }
   }
 

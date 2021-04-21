@@ -5,7 +5,7 @@ import { Service } from './service';
  */
 // tslint:disable-next-line:function-name
 export function InitAfter(observableServiceName: string) {
-  return function(target: typeof Service) {
+  return function (target: typeof Service) {
     const observeList = ObserveList.instance;
     observeList.add({ observableServiceName, observerServiceName: target.name });
   };

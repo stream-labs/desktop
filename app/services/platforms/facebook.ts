@@ -110,7 +110,8 @@ type TFacebookPermissionName = 'publish_video' | 'publish_to_groups';
 type TFacebookPermission = { permission: TFacebookPermissionName; status: 'granted' | string };
 
 @InheritMutations()
-export class FacebookService extends BasePlatformService<IFacebookServiceState>
+export class FacebookService
+  extends BasePlatformService<IFacebookServiceState>
   implements IPlatformService {
   @Inject() protected hostsService: HostsService;
   @Inject() protected userService: UserService;
