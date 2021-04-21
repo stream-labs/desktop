@@ -175,7 +175,7 @@
     "shelljs": "0.8.4",
     "signtool": "1.0.0",
     "sl-vue-tree": "https://github.com/stream-labs/sl-vue-tree.git",
-    "sockjs": "0.3.19",
+    "sockjs": "0.3.20",
     "sockjs-client": "1.1.5",
     "spectron": "12.0.0",
     "streamlabs-beaker": "0.9.4",
