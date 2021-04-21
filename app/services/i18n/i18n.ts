@@ -60,7 +60,7 @@ const LANG_CODE_MAP: Dictionary<{ lang: string; locale: string }> = {
   'zh-CN': { lang: 'Chinese (Simplified)', locale: 'zh-CN' },
 };
 
-const WHITE_LIST = [
+export const WHITE_LIST = [
   'en-US',
   'ru-RU',
   'zh-TW',
@@ -132,8 +132,8 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
 
   @Inject() fileManagerService: FileManagerService;
 
-  load() {
-    if (this.isLoaded) return;
+  load(force = false) {
+    if (!force && this.isLoaded) return;
     const i18nPath = this.getI18nPath();
 
     // load available locales
@@ -185,10 +185,14 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
     return this.loadedDictionaries;
   }
 
-  setLocale(locale: string) {
+  setLocale(locale: string, reload = true) {
     this.SET_LOCALE(locale);
-    electron.remote.app.relaunch({ args: [] });
-    electron.remote.app.quit();
+    if (reload) {
+      electron.remote.app.relaunch({ args: [] });
+      electron.remote.app.quit();
+    } else {
+      this.load();
+    }
   }
 
   getLocaleFormData(): TObsFormData {

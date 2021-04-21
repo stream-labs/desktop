@@ -16,7 +16,7 @@ import {
   TextInput,
   TInputLayout,
 } from '../shared/inputs';
-import { Button, Card, Col, Row, Space, Tag, Timeline } from 'antd';
+import { Alert, Button, Card, Col, Row, Space, Tag, Timeline } from 'antd';
 import { Services } from '../service-provider';
 import { merge, useStateManager } from '../hooks/useStateManager';
 import InputWrapper from '../shared/inputs/InputWrapper';
@@ -24,6 +24,7 @@ import Scrollable from '../shared/Scrollable';
 import PlatformLogo from '../shared/PlatformLogo';
 import { DownloadOutlined } from '@ant-design/icons';
 import { alertAsync, confirmAsync } from '../modals';
+import { I18nService, WHITE_LIST } from '../../services/i18n';
 
 export default function SharedComponentsLibrary() {
   const { Context, contextValue } = useGlobalSettings();
@@ -97,7 +98,6 @@ function Examples() {
           {...globalProps}
           {...bind.textVal}
         />
-        Value: {s.textVal}
       </Example>
 
       <Example title="Number Input">
@@ -109,7 +109,6 @@ function Examples() {
           {...globalProps}
           {...bind.numberVal}
         />
-        Value: {s.numberVal}
       </Example>
 
       <Example title="Textarea Input">
@@ -122,7 +121,6 @@ function Examples() {
           maxLength={50}
         />
         <TextAreaInput label="Auto Size" {...globalProps} {...bind.textAreaVal} autoSize />
-        Value: {s.textAreaVal}
       </Example>
 
       <Example title="List Input">
@@ -141,7 +139,6 @@ function Examples() {
           options={s.listOptions}
           allowClear
         />
-        Value: {s.listVal}
       </Example>
 
       <Example title="Tags Input">
@@ -169,7 +166,6 @@ function Examples() {
             </Row>
           )}
         />
-        Value: {s.tagsVal}
       </Example>
 
       <Example title="SwitchInput">
@@ -183,7 +179,6 @@ function Examples() {
           checkedChildren="Enabled"
           unCheckedChildren="Disabled"
         />
-        Value: {String(s.switcherVal)}
       </Example>
 
       <Example title="Checkbox Input">
@@ -191,7 +186,6 @@ function Examples() {
           <CheckboxInput label="Default" {...globalProps} {...bind.checkboxVal} />
           <CheckboxInput label="Debounced" debounce={500} {...globalProps} {...bind.checkboxVal} />
         </InputWrapper>
-        Value: {String(s.checkboxVal)}
       </Example>
 
       <Example title="Slider Input">
@@ -211,7 +205,6 @@ function Examples() {
           {...globalProps}
           {...bind.sliderVal}
         />
-        Value: {s.sliderVal}
       </Example>
 
       <Example title="Date Input">
@@ -310,18 +303,42 @@ function Examples() {
 }
 
 function Example(p: { title: string } & HTMLAttributes<unknown>) {
+  const { background } = useGlobalSettings();
+
+  // const background = 'section';
+
+  return (
+    <Container background={background} title={p.title}>
+      {background !== 'error' && (
+        <InputWrapper>
+          <h2>{p.title}</h2>
+        </InputWrapper>
+      )}
+
+      {p.children}
+    </Container>
+  );
+}
+
+function Container(p: { title: string; background: string } & HTMLAttributes<unknown>) {
   return (
     <div>
-      <InputWrapper>
-        <h2>{p.title}</h2>
-      </InputWrapper>
-      {p.children}
+      {p.background === 'none' && <div>{p.children}</div>}
+      {p.background === 'section' && <div className="section">{p.children}</div>}
+      {p.background === 'error' && (
+        <Alert
+          type="error"
+          message={p.title}
+          description={p.children}
+          style={{ marginBottom: '24px' }}
+        />
+      )}
     </div>
   );
 }
 
 function GlobalSettings() {
-  const { bind } = useGlobalSettings();
+  const { bind, locales } = useGlobalSettings();
 
   function createOptions(opts: string[]) {
     return opts.map(opt => ({
@@ -364,6 +381,7 @@ function GlobalSettings() {
         options={createOptions(['default', 'large', 'small'])}
         {...bind.size}
       />
+      <ListInput label="Language" options={createOptions(locales)} {...bind.locale} />
       <TextInput label="Placeholder" {...bind.placeholder} />
       <InputWrapper label="Miscellaneous">
         <CheckboxInput label={'Has tooltips'} {...bind.hasTooltips} />
@@ -382,19 +400,25 @@ interface IGlobalSettingsState {
   disabled: boolean;
   size: 'middle' | 'large' | 'small';
   background: 'none' | 'section' | 'error';
+  locales: string[];
 }
 
 function useGlobalSettings() {
+  const i18nService = I18nService.instance;
+
+  const initialState: IGlobalSettingsState = {
+    layout: 'horizontal',
+    hasTooltips: false,
+    required: false,
+    placeholder: 'Start typing',
+    disabled: false,
+    size: 'middle',
+    background: 'section',
+    locales: WHITE_LIST,
+  };
+
   return useStateManager(
-    {
-      layout: 'horizontal',
-      hasTooltips: false,
-      required: false,
-      placeholder: 'Start typing',
-      disabled: false,
-      size: 'middle',
-      background: 'section',
-    } as IGlobalSettingsState,
+    initialState,
     (getState, setState) => {
       const { CustomizationService } = Services;
 
@@ -404,6 +428,12 @@ function useGlobalSettings() {
         },
         set theme(theme: string) {
           CustomizationService.actions.setTheme(theme);
+        },
+        get locale() {
+          return i18nService.state.locale;
+        },
+        set locale(locale: string) {
+          i18nService.actions.setLocale(locale, false);
         },
       };
 

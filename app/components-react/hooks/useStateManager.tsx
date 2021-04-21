@@ -3,14 +3,12 @@ import { StatefulService } from '../../services';
 import { cloneDeep, flatten, isPlainObject, mapKeys } from 'lodash';
 import { keys } from '../../services/utils';
 import { useForceUpdate, useOnCreate, useOnDestroy } from '../hooks';
-import uuid from 'uuid/v4';
-import { createBinding, TBindings } from '../shared/inputs';
 const GenericStateManagerContext = React.createContext(null);
 
 // React devtools are broken for Electron 9 and 10
 // as an alternative set DEBUG=true
 // to track components re-renders and timings in the console
-const DEBUG = true;
+const DEBUG = false;
 
 /**
  * Flux-like state manager for React.Context
