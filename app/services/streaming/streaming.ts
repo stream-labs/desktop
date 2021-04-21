@@ -478,6 +478,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   private setError(errorTypeOrError?: TStreamErrorType | StreamError, platform?: TPlatform) {
     if (typeof errorTypeOrError === 'object') {
       // an error object has been passed as a first arg
+      if (platform) errorTypeOrError.platform = platform;
       this.SET_ERROR(errorTypeOrError);
     } else {
       // an error type has been passed as a first arg
