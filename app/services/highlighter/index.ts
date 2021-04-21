@@ -127,7 +127,12 @@ export function pmap<TVal, TRet>(
 export class AudioSource {
   readonly outPath: string;
 
-  constructor(public readonly sourcePath: string) {
+  constructor(
+    public readonly sourcePath: string,
+    public readonly duration: number,
+    public readonly startTrim: number,
+    public readonly endTrim: number,
+  ) {
     const parsed = path.parse(this.sourcePath);
     this.outPath = path.join(parsed.dir, `${parsed.name}-audio.flac`);
   }
@@ -135,7 +140,9 @@ export class AudioSource {
   async extract() {
     /* eslint-disable */
     const args = [
+      '-ss', this.startTrim.toString(),
       '-i', this.sourcePath,
+      '-t', (this.duration - this.startTrim - this.endTrim).toString(),
       '-sample_fmt', 's32',
       '-ar', '48000',
       '-map', 'a:0',
@@ -182,11 +189,19 @@ export class FrameSource {
   currentFrame = 0;
 
   get nFrames() {
-    // Not sure why last frame is sometimes missing
-    return Math.round(this.duration * FPS);
+    return Math.round(this.trimmedDuration * FPS);
   }
 
-  constructor(public readonly sourcePath: string, public readonly duration: number) {}
+  get trimmedDuration() {
+    return this.duration - this.startTrim - this.endTrim;
+  }
+
+  constructor(
+    public readonly sourcePath: string,
+    public readonly duration: number,
+    public readonly startTrim: number,
+    public readonly endTrim: number,
+  ) {}
 
   async exportScrubbingSprite() {
     const parsed = path.parse(this.sourcePath);
@@ -208,7 +223,9 @@ export class FrameSource {
   private startFfmpeg() {
     /* eslint-disable */
     const args = [
+      '-ss', this.startTrim.toString(),
       '-i', this.sourcePath,
+      '-t', (this.duration - this.startTrim - this.endTrim).toString(),
       '-vf', `fps=${FPS},scale=${this.width}:${this.height}`,
       '-map', 'v:0',
       '-vcodec', 'rawvideo',
@@ -217,6 +234,8 @@ export class FrameSource {
       '-'
     ];
     /* eslint-enable */
+
+    console.log('FRAME SOURCE ARGS', args);
 
     this.ffmpeg = execa(FFMPEG_EXE, args, {
       encoding: null,
@@ -322,6 +341,10 @@ export class Clip {
 
   duration: number;
 
+  // TODO: Trim validation
+  startTrim: number;
+  endTrim: number;
+
   initPromise: Promise<void>;
 
   constructor(public readonly sourcePath: string) {}
@@ -349,8 +372,18 @@ export class Clip {
    * to start reading from the file again.
    */
   reset() {
-    this.frameSource = new FrameSource(this.sourcePath, this.duration);
-    this.audioSource = new AudioSource(this.sourcePath);
+    this.frameSource = new FrameSource(
+      this.sourcePath,
+      this.duration,
+      this.startTrim,
+      this.endTrim,
+    );
+    this.audioSource = new AudioSource(
+      this.sourcePath,
+      this.duration,
+      this.startTrim,
+      this.endTrim,
+    );
   }
 
   private async doInit() {
@@ -396,8 +429,6 @@ export class AudioCrossfader {
     }
 
     args.push('-c:a', 'flac', '-y', this.outputPath);
-
-    console.log(args);
 
     await execa(FFMPEG_EXE, args);
   }
@@ -635,6 +666,8 @@ export interface IClip {
   loaded: boolean;
   enabled: boolean;
   scrubSprite?: string;
+  startTrim: number;
+  endTrim: number;
 }
 
 export enum EExportStep {
@@ -787,14 +820,14 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       const clipsToLoad = [
         path.join(CLIP_DIR, 'Replay 2021-03-30 14-08-13.mp4'),
         path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-20.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-29.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-41.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-49.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-58.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-03.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-06.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-30-53.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-32-34.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-29.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-41.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-49.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-58.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-03.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-06.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-30-53.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-32-34.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-33.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-48.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-03.mp4'),
@@ -806,11 +839,11 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       ];
 
       clipsToLoad.forEach(c => {
-        this.ADD_CLIP({ path: c, loaded: false, enabled: true });
+        this.ADD_CLIP({ path: c, loaded: false, enabled: true, startTrim: 3, endTrim: 2 });
       });
     } else {
       this.streamingService.replayBufferFileWrite.subscribe(clipPath => {
-        this.ADD_CLIP({ path: clipPath, loaded: false, enabled: true });
+        this.ADD_CLIP({ path: clipPath, loaded: false, enabled: true, startTrim: 0, endTrim: 0 });
       });
     }
   }
@@ -878,7 +911,17 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       return;
     }
 
-    const clips = this.views.clips.filter(c => c.enabled).map(c => this.clips[c.path]);
+    const clips = this.views.clips
+      .filter(c => c.enabled)
+      .map(c => {
+        const clip = this.clips[c.path];
+
+        // Set trims on the frame source
+        clip.startTrim = c.startTrim;
+        clip.endTrim = c.endTrim;
+
+        return clip;
+      });
 
     if (!clips.length) {
       console.error('Highlighter: Export called without any clips!');
