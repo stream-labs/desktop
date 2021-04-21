@@ -728,11 +728,11 @@ export class YoutubeService
         { method: 'POST', body, headers: { Authorization: `Bearer ${this.oauthToken}` } },
       );
     } catch (e: unknown) {
-      const error = await e['json']();
+      const error = await (e as any).json();
       let details = error.result?.error?.message;
       if (!details) details = 'connection failed';
       const errorType = 'YOUTUBE_THUMBNAIL_UPLOAD_FAILED';
-      throw throwStreamError(errorType, e, details);
+      throw throwStreamError(errorType, e as any, details);
     }
   }
 

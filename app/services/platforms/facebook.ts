@@ -314,10 +314,10 @@ export class FacebookService
         ? await platformRequest<T>('facebook', reqInfo, token)
         : await platformAuthorizedRequest<T>('facebook', reqInfo);
     } catch (e: unknown) {
-      const details = e['result']?.error
-        ? `${e['result'].error.type} ${e['result'].error.message}`
+      const details = (e as any).result?.error
+        ? `${(e as any).result.error.type} ${(e as any).result.error.message}`
         : 'Connection failed';
-      throwStreamError('PLATFORM_REQUEST_FAILED', e, details);
+      throwStreamError('PLATFORM_REQUEST_FAILED', e as any, details);
     }
   }
 
@@ -433,7 +433,7 @@ export class FacebookService
     try {
       return await platformRequest('facebook', { url, body, method: 'POST' }, token);
     } catch (e: unknown) {
-      if (e && e['result']?.error?.code === 100) {
+      if (e && (e as any).result?.error?.code === 100) {
         throw new Error(
           $t(
             'Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.',
