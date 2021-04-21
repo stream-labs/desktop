@@ -9,7 +9,7 @@ import { Component, Watch } from 'vue-property-decorator';
 
 class WrapperProps<TComponentProps> {
   name?: string = null;
-  componentProps: TComponentProps = null;
+  componentProps?: TComponentProps = null;
   wrapperStyles?: Dictionary<string> = null;
 }
 
@@ -65,6 +65,13 @@ export class NameFolder extends ReactComponent {}
 export class NewsBanner extends ReactComponent {}
 @Component({ props: { name: { default: 'PatchNotes' } } })
 export class PatchNotes extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'NavTools' },
+    wrapperStyles: { default: () => ({ marginTop: 'auto', marginBottom: '12px', flexShrink: 0 }) },
+  },
+})
+export class NavTools extends ReactComponent {}
 @Component({
   props: {
     name: { default: 'IconLibraryProperties' },
