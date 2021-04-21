@@ -141,7 +141,9 @@ function GrowthTips(p: { tips: any[] }) {
       {p.tips.map(tip => (
         <div className={styles.card}>
           <i className={tip.icon} />
-          <span>{tip.title}</span>
+          <span>
+            <strong>{tip.title}</strong>
+          </span>
           <p>{tip.description}</p>
           <Button>{tip.cta}</Button>
         </div>
