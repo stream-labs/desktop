@@ -5,24 +5,35 @@ import Form from '../shared/inputs/Form';
 import {
   CheckboxInput,
   createBinding,
+  DateInput,
+  ImageInput,
   ListInput,
+  NumberInput,
+  SliderInput,
   SwitchInput,
+  TagsInput,
+  TextAreaInput,
   TextInput,
   TInputLayout,
 } from '../shared/inputs';
-import { Card, Col, Row } from 'antd';
+import {Button, Card, Col, Row, Space, Tag, Timeline} from 'antd';
 import { Services } from '../service-provider';
 import { merge, useStateManager } from '../hooks/useStateManager';
 import InputWrapper from '../shared/inputs/InputWrapper';
+import Scrollable from '../shared/Scrollable';
+import PlatformLogo from '../shared/PlatformLogo';
+import { DownloadOutlined } from '@ant-design/icons';
 
 export default function SharedComponentsDemo() {
   const { Context, contextValue } = useGlobalSettings();
   return (
     <Context.Provider value={contextValue}>
       <ModalLayout>
-        <Row gutter={16}>
-          <Col flex="auto">
-            <Examples />
+        <Row gutter={16} style={{ height: 'calc(100% + 24px)' }}>
+          <Col flex="auto" style={{ height: '100%' }}>
+            <Scrollable style={{ maxHeight: '100%' }}>
+              <Examples />
+            </Scrollable>
           </Col>
           <Col flex={'300px'}>
             <GlobalSettings />
@@ -34,20 +45,38 @@ export default function SharedComponentsDemo() {
 }
 
 function Examples() {
-  const { layout, hasTooltips, required, placeholder } = useGlobalSettings();
+  const { layout, required, placeholder, hasTooltips, disabled, size } = useGlobalSettings();
   const { s, bind } = useFormState({
     textVal: '',
+    textAreaVal: '',
     switcherVal: false,
     numberVal: 0,
     sliderVal: 5,
     imageVal: '',
-    checkboxesVal: [true, true, false, false],
+    checkboxVal: false,
+    dateVal: undefined as Date | undefined,
+    listVal: 1,
+    listOptions: [
+      { value: 1, label: 'Red' },
+      { value: 2, label: 'Green' },
+      { value: 3, label: 'Blue' },
+      { value: 4, label: 'Orange' },
+    ],
+    tagsVal: [1, 2, 3],
+    tagsOptions: [
+      { value: 1, label: 'Red' },
+      { value: 2, label: 'Green' },
+      { value: 3, label: 'Blue' },
+      { value: 4, label: 'Orange' },
+    ],
   });
 
   const globalProps: Record<string, any> = {};
   if (hasTooltips) globalProps.tooltip = 'This is tooltip';
   if (required) globalProps.required = true;
   if (placeholder) globalProps.placeholder = placeholder;
+  if (disabled) globalProps.disabled = true;
+  if (size) globalProps.size = size;
 
   return (
     <Form layout={layout}>
@@ -60,7 +89,6 @@ function Examples() {
           {...bind.textVal}
         />
         <TextInput label="Debounced" debounce={500} {...globalProps} {...bind.textVal} />
-        <TextInput label="Disabled" disabled {...globalProps} {...bind.textVal} />
         <TextInput
           label="With addons"
           addonBefore="http://"
@@ -69,6 +97,78 @@ function Examples() {
           {...bind.textVal}
         />
         Value: {s.textVal}
+      </Example>
+
+      <Example title="Number Input">
+        <NumberInput label="Basic" {...globalProps} {...bind.numberVal} />
+        <NumberInput
+          label="Min = 0, Max = 10"
+          min={0}
+          max={10}
+          {...globalProps}
+          {...bind.numberVal}
+        />
+        Value: {s.numberVal}
+      </Example>
+
+      <Example title="Textarea Input">
+        <TextAreaInput label="Basic" {...globalProps} {...bind.textAreaVal} />
+        <TextAreaInput
+          label="Show Count"
+          {...globalProps}
+          {...bind.textAreaVal}
+          showCount
+          maxLength={50}
+        />
+        <TextAreaInput label="Auto Size" {...globalProps} {...bind.textAreaVal} autoSize />
+        Value: {s.textAreaVal}
+      </Example>
+
+      <Example title="List Input">
+        <ListInput label="Basic" {...globalProps} {...bind.listVal} options={s.listOptions} />
+        <ListInput
+          label="With search"
+          {...globalProps}
+          {...bind.listVal}
+          options={s.listOptions}
+          showSearch
+        />
+        <ListInput
+          label="Allow Clear"
+          {...globalProps}
+          {...bind.listVal}
+          options={s.listOptions}
+          allowClear
+        />
+        Value: {s.listVal}
+      </Example>
+
+      <Example title="Tags Input">
+        <TagsInput label="Basic" {...globalProps} {...bind.tagsVal} options={s.tagsOptions} />
+        <TagsInput
+          label="Custom Tag Render"
+          {...globalProps}
+          {...bind.tagsVal}
+          options={s.tagsOptions}
+          tagRender={(tagProps, tag) => (
+            <Tag {...tagProps} color={tag.label.toLowerCase()}>
+              {tag.label}
+            </Tag>
+          )}
+        />
+        <TagsInput
+          label="Custom Option Render"
+          {...globalProps}
+          {...bind.tagsVal}
+          options={s.tagsOptions}
+          optionRender={opt => (
+            <Row gutter={16} style={{ color: opt.label.toLowerCase() }}>
+              <Col>{opt.value}</Col>
+              <Col>{opt.label}</Col>
+            </Row>
+          )}
+        />
+        Value: {s.tagsVal}
       </Example>
 
       <Example title="SwitchInput">
@@ -84,6 +184,105 @@ function Examples() {
         />
         Value: {String(s.switcherVal)}
       </Example>
+
+      <Example title="Checkbox Input">
+        <InputWrapper label="Checkbox Group">
+          <CheckboxInput label="Default" {...globalProps} {...bind.checkboxVal} />
+          <CheckboxInput label="Debounced" debounce={500} {...globalProps} {...bind.checkboxVal} />
+        </InputWrapper>
+        Value: {String(s.checkboxVal)}
+      </Example>
+
+      <Example title="Slider Input">
+        <SliderInput label="Basic" min={0} max={10} {...globalProps} {...bind.sliderVal} />
+        <SliderInput label="Uncontrolled" min={0} max={10} uncontrolled {...bind.sliderVal} />
+        <SliderInput
+          label="Debounced"
+          min={0}
+          max={10}
+          debounce={300}
+          {...globalProps}
+          {...bind.sliderVal}
+        />
+        Value: {s.sliderVal}
+      </Example>
+
+      <Example title="Date Input">
+        <DateInput label="Default" {...globalProps} {...bind.dateVal} />
+      </Example>
+
+      <Example title="Image Input">
+        <ImageInput label="Basic" maxFileSize={3000000} {...globalProps} {...bind.imageVal} />
+      </Example>
+
+      <Example title="Buttons">
+        <Space wrap>
+          <Button type="primary" size={size}>
+            Primary
+          </Button>
+          <Button size={size}>Default</Button>
+          <Button type="dashed" size={size}>
+            Dashed
+          </Button>
+          <br />
+          <Button type="link" size={size}>
+            Link
+          </Button>
+          <br />
+          <Button type="primary" icon={<DownloadOutlined />} size={size} />
+          <Button type="primary" shape="circle" icon={<DownloadOutlined />} size={size} />
+          <Button type="primary" shape="round" icon={<DownloadOutlined />} size={size} />
+          <Button type="primary" shape="round" icon={<DownloadOutlined />} size={size}>
+            Download
+          </Button>
+          <Button type="primary" icon={<DownloadOutlined />} size={size}>
+            Download
+          </Button>
+
+          <Button type="primary" loading>
+            Loading
+          </Button>
+
+          <Button type="primary" ghost>
+            Primary Ghost
+          </Button>
+          <Button ghost>Default Ghost</Button>
+          <Button type="dashed" ghost>
+            Dashed Ghost
+          </Button>
+
+          <Button type="primary" danger>
+            Primary Danger
+          </Button>
+          <Button danger>Default Danger</Button>
+          <Button type="dashed" danger>
+            Dashed Danger
+          </Button>
+          <Button type="text" danger>
+            Text Danger
+          </Button>
+          <Button type="link" danger>
+            Link Danger
+          </Button>
+        </Space>
+      </Example>
+
+      <Example title="Platform Logo">
+        <PlatformLogo platform="twitch" />
+        <PlatformLogo platform="youtube" />
+        <PlatformLogo platform="facebook" />
+        <PlatformLogo platform="streamlabs" />
+        <PlatformLogo platform="dlive" />
+        <PlatformLogo platform="nimotv" />
+      </Example>
+
+      <Example title="Timeline">
+        <Timeline pending="Recording...">
+          <Timeline.Item>Create a services site 2015-09-01</Timeline.Item>
+          <Timeline.Item>Solve initial network problems 2015-09-01</Timeline.Item>
+          <Timeline.Item>Technical testing 2015-09-01</Timeline.Item>
+        </Timeline>
+      </Example>
     </Form>
   );
 }
@@ -97,7 +296,7 @@ function Example(p: { title: string } & HTMLAttributes<unknown>) {
 }
 
 function GlobalSettings() {
-  const { theme, switchTheme, bind } = useGlobalSettings();
+  const { bind } = useGlobalSettings();
 
   function createOptions(opts: string[]) {
     return opts.map(opt => ({
@@ -123,18 +322,23 @@ function GlobalSettings() {
       <ListInput
         label="Theme"
         options={createOptions(['night-theme', 'day-theme', 'prime-dark', 'prime-light'])}
-        value={theme}
-        onChange={switchTheme}
+        {...bind.theme}
       />
       <ListInput
         label="Layout"
         options={createOptions(['horizontal', 'vertical', 'inline'])}
         {...bind.layout}
       />
+      <ListInput
+        label="Size"
+        options={createOptions(['default', 'large', 'small'])}
+        {...bind.size}
+      />
       <TextInput label="Placeholder" {...bind.placeholder} />
-      <InputWrapper>
+      <InputWrapper label="Miscellaneous">
         <CheckboxInput label={'Has tooltips'} {...bind.hasTooltips} />
         <CheckboxInput label={'Required'} {...bind.required} />
+        <CheckboxInput label={'Disabled'} {...bind.disabled} />
       </InputWrapper>
     </Form>
   );
@@ -145,6 +349,8 @@ interface IGlobalSettingsState {
   placeholder: string;
   hasTooltips: boolean;
   required: boolean;
+  disabled: boolean;
+  size: 'middle' | 'large' | 'small';
 }
 
 function useGlobalSettings() {
@@ -154,36 +360,24 @@ function useGlobalSettings() {
       hasTooltips: false,
       required: false,
       placeholder: 'Start typing',
+      disabled: false,
+      size: 'middle',
     } as IGlobalSettingsState,
     (getState, setState) => {
       const { CustomizationService } = Services;
 
-      // function updateSettings(patch: Partial<IGlobalSettingsState>) {
-      //   setState({ ...getState(), ...patch });
-      // }
-      //
-      const bind = createBinding(getState, setState);
-
-      const getters = {
+      const computedState = {
         get theme() {
           return CustomizationService.currentTheme;
         },
-      };
-
-      // const mutations = {
-      //   updateSettings,
-      //   setLayout(layout: TInputLayout) {
-      //     updateSettings({ layout });
-      //   },
-      // };
-
-      const actions = {
-        switchTheme(theme: string) {
+        set theme(theme: string) {
           CustomizationService.actions.setTheme(theme);
         },
       };
 
-      return merge(getters, { bind }, actions);
+      const state = merge(getState, computedState);
+      const bind = createBinding(() => state, setState);
+      return { bind };
     },
     null,
   ).dependencyWatcher;

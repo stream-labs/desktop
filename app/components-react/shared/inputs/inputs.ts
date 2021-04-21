@@ -19,7 +19,8 @@ type TInputType =
   | 'tags'
   | 'switch'
   | 'slider'
-  | 'image';
+  | 'image'
+  | 'date';
 
 export type TInputLayout = 'horizontal' | 'vertical' | 'inline';
 
@@ -196,6 +197,7 @@ export function useInput<
       'disabled',
       'nowrap',
       'layout',
+      'tooltip',
     ]),
     rules,
     'data-role': 'input-wrapper',
@@ -204,7 +206,7 @@ export function useInput<
 
   // pick props for the input element
   const inputAttrs = {
-    ...(pick(inputProps, 'disabled', 'placeholder', antFeatures || []) as {}),
+    ...(pick(inputProps, 'disabled', 'placeholder', 'size', antFeatures || []) as {}),
     ...dataAttrs,
     'data-role': 'input',
     name: inputId,
@@ -296,7 +298,7 @@ export function createBinding<
   TExtraProps extends object = {}
 >(
   stateGetter: TState | (() => TState),
-  setter: (newTarget: Partial<TState>) => unknown,
+  stateSetter: (newTarget: Partial<TState>) => unknown,
   extraPropsGenerator?: (fieldName: keyof TState) => TExtraProps,
 ): TBindings<TState, TFieldName, TExtraProps> {
   function getState(): TState {
@@ -304,24 +306,39 @@ export function createBinding<
       ? (stateGetter as Function)()
       : (stateGetter as TState);
   }
-  return new Proxy(
-    {},
-    {
-      get(t, fieldName: string) {
-        const extraProps = extraPropsGenerator
-          ? extraPropsGenerator(fieldName as keyof TState)
-          : {};
-        return {
-          name: fieldName,
-          value: getState()[fieldName],
-          onChange(newVal: unknown) {
-            setter({ ...getState(), [fieldName]: newVal });
-          },
-          ...extraProps,
-        };
+
+  const metadata = {
+    _proxyName: 'Binding',
+    _binding: {
+      id: uuid(),
+      dependencies: {} as Record<string, unknown>,
+      clone() {
+        return createBinding(stateGetter, stateSetter);
       },
     },
-  ) as TBindings<TState, TFieldName, TExtraProps>;
+  };
+
+  return (new Proxy(metadata, {
+    get(t, fieldName: string) {
+      if (fieldName in metadata) return metadata[fieldName];
+      const fieldValue = getState()[fieldName];
+      metadata._binding.dependencies[fieldName] = fieldValue;
+      const extraProps = extraPropsGenerator ? extraPropsGenerator(fieldName as keyof TState) : {};
+      return {
+        name: fieldName,
+        value: fieldValue,
+        onChange(newVal: unknown) {
+          const state = getState();
+          if (Object.getOwnPropertyDescriptor(state, fieldName)?.set) {
+            state[fieldName] = newVal;
+          } else {
+            stateSetter({ ...state, [fieldName]: newVal });
+          }
+        },
+        ...extraProps,
+      };
+    },
+  }) as unknown) as TBindings<TState, TFieldName, TExtraProps>;
 }
 
 export type TBindings<
@@ -333,7 +350,14 @@ export type TBindings<
     name: K;
     value: TState[K];
     onChange: (newVal: TState[K]) => unknown;
-  } & TExtraProps;
+  } & TExtraProps & {
+      _proxyName: 'Binding';
+      _binding: {
+        id: string;
+        dependencies: Record<TFieldName, unknown>;
+        clone: () => TBindings<TState, TFieldName, TExtraProps>;
+      };
+    };
 };
 
 function createValidationRules(inputProps: IInputCommonProps<unknown>) {

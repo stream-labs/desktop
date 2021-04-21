@@ -3,6 +3,8 @@ import { StatefulService } from '../../services';
 import { cloneDeep, flatten, isPlainObject, mapKeys } from 'lodash';
 import { keys } from '../../services/utils';
 import { useForceUpdate, useOnCreate, useOnDestroy } from '../hooks';
+import uuid from 'uuid/v4';
+import { createBinding, TBindings } from '../shared/inputs';
 const GenericStateManagerContext = React.createContext(null);
 
 // React devtools are broken for Electron 9 and 10
@@ -147,7 +149,7 @@ export function useStateManager<
       } else if (localStateRevision) {
         calculateComputedProps();
         const prevState = prevComponentState.current;
-        const newState = pick(componentView, ...dependencyWatcher.getDependentFields());
+        const newState = dependencyWatcher.getDependentValues();
         if (isSimilar(prevState, newState)) {
           // prevState and newState are equal, no action needed
           return;
@@ -169,11 +171,7 @@ export function useStateManager<
     // create a state selector for watching state from vuex
     function vuexSelector() {
       // we should watch only component's dependencies
-      const dependentFields = dependencyWatcher.getDependentFields();
-      return {
-        ...pick(contextView, ...dependentFields),
-        ...pick(calculateComputedProps(), ...dependentFields),
-      };
+      return dependencyWatcher.getDependentValues();
     }
 
     return {
@@ -206,7 +204,7 @@ export function useStateManager<
   // component mounted/updated
   useEffect(() => {
     // save the prev state
-    prevComponentState.current = pick(componentView, ...dependencyWatcher.getDependentFields());
+    prevComponentState.current = dependencyWatcher.getDependentValues();
 
     // start watching for changes
     stateWatcher.markAsReadyToWatch(componentId);
@@ -313,8 +311,17 @@ function createDependencyWatcher<T extends object>(watchedObject: T) {
       get: (target, propName: string) => {
         if (propName in target) return target[propName];
         const value = watchedObject[propName];
-        dependencies[propName] = value;
-        return value;
+        if (value && value._proxyName === 'Binding') {
+          if (propName in dependencies) {
+            return dependencies[propName];
+          } else {
+            dependencies[propName] = value._binding.clone();
+            return dependencies[propName];
+          }
+        } else {
+          dependencies[propName] = value;
+          return value;
+        }
       },
     },
   ) as T;
@@ -323,7 +330,24 @@ function createDependencyWatcher<T extends object>(watchedObject: T) {
     return Object.keys(dependencies);
   }
 
-  return { watcherProxy, getDependentFields };
+  function getDependentValues(): Partial<T> {
+    const values: Partial<T> = {};
+    Object.keys(dependencies).forEach(propName => {
+      const value = dependencies[propName];
+      if (value && value._proxyName === 'Binding') {
+        const bindingMetadata = value._binding;
+        Object.keys(bindingMetadata.dependencies).forEach(bindingPropName => {
+          values[`${bindingPropName}__binding-${bindingMetadata.id}`] =
+            watchedObject[propName][bindingPropName].value;
+        });
+        return;
+      }
+      values[propName] = watchedObject[propName];
+    });
+    return values;
+  }
+
+  return { watcherProxy, getDependentFields, getDependentValues };
 }
 
 /**
@@ -657,6 +681,11 @@ export function merge<
     return target;
   }
 
+  function findTargetObject(propName: string) {
+    const target = findTarget(propName);
+    return typeof target === 'function' ? target() : target;
+  }
+
   function getTargetValue(target: object | Function, propName: string) {
     if (typeof target === 'function') {
       // if target is a function then call the function and take the value
@@ -697,6 +726,14 @@ export function merge<
     return props;
   }
 
+  function getKeys() {
+    const value = Object.assign(
+      {},
+      ...mergedObjects.map(obj => (typeof obj === 'function' ? obj() : obj)),
+    );
+    return Object.keys(value);
+  }
+
   return (new Proxy(metadata, {
     get(t, propName: string) {
       if (propName === 'hasOwnProperty') return (propName: string) => !!findTarget(propName);
@@ -709,9 +746,22 @@ export function merge<
       if (propName.startsWith('_')) {
         metadata[propName] = val;
         return true;
-      } else {
-        throw new Error('Can not change property on readonly object');
       }
+      const targetObj = findTargetObject(propName);
+
+      if (Object.getOwnPropertyDescriptor(targetObj, propName)?.set) {
+        targetObj[propName] = val;
+        return true;
+      }
+
+      throw new Error('Can not change property on readonly object');
+    },
+    ownKeys() {
+      return getKeys();
+    },
+    getOwnPropertyDescriptor(target, key) {
+      const t = findTargetObject(key as string);
+      return Object.getOwnPropertyDescriptor(t, key);
     },
   }) as unknown) as TReturnType;
 }
