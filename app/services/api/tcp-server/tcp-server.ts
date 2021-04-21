@@ -395,7 +395,7 @@ export class TcpServerService
         }
 
         this.sendResponse(client, response);
-      } catch (e) {
+      } catch (e: unknown) {
         this.sendResponse(
           client,
           this.jsonrpcService.createError(null, {
@@ -532,7 +532,7 @@ export class TcpServerService
     // unhandled exceptions completely destroy Rx.Observable subscription
     try {
       client.socket.write(`${JSON.stringify(response)}\n`);
-    } catch (e) {
+    } catch (e: unknown) {
       // probably the client has been silently disconnected
       console.info('unable to send response', response, e);
     }

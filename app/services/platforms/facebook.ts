@@ -313,9 +313,9 @@ export class FacebookService
       return token
         ? await platformRequest<T>('facebook', reqInfo, token)
         : await platformAuthorizedRequest<T>('facebook', reqInfo);
-    } catch (e) {
-      const details = e.result?.error
-        ? `${e.result.error.type} ${e.result.error.message}`
+    } catch (e: unknown) {
+      const details = e['result']?.error
+        ? `${e['result'].error.type} ${e['result'].error.message}`
         : 'Connection failed';
       throwStreamError('PLATFORM_REQUEST_FAILED', e, details);
     }
@@ -337,7 +337,7 @@ export class FacebookService
         .then(blob => {
           url = window.URL.createObjectURL(blob);
         });
-    } catch (e) {
+    } catch (e: unknown) {
       // just don't care is something is wrong here
     }
     return url;
@@ -432,8 +432,8 @@ export class FacebookService
 
     try {
       return await platformRequest('facebook', { url, body, method: 'POST' }, token);
-    } catch (e) {
-      if (e?.result?.error?.code === 100) {
+    } catch (e: unknown) {
+      if (e && e['result']?.error?.code === 100) {
         throw new Error(
           $t(
             'Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.',
@@ -485,7 +485,7 @@ export class FacebookService
           `${this.apiBase}/me/groups?fields=administrator,id,name,icon,privacy&limit=100`,
         )
       ).data.filter(group => group.administrator);
-    } catch (e) {
+    } catch (e: unknown) {
       console.error('Error fetching Facebook groups', e);
       this.SET_OUTAGE_WARN(
         'Streaming to Facebook groups is currently unavailable.  Please try again later.',

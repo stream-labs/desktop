@@ -239,8 +239,8 @@ export class YoutubeService
   ): Promise<T> {
     try {
       return await platformAuthorizedRequest<T>('youtube', reqInfo);
-    } catch (e) {
-      let details = e.result?.error?.message;
+    } catch (e: unknown) {
+      let details = e['result']?.error?.message;
       if (!details) details = 'connection failed';
 
       // if the rate limit exceeded then repeat request after 3s delay
@@ -320,12 +320,12 @@ export class YoutubeService
       await platformAuthorizedRequest('youtube', url);
       this.SET_ENABLED_STATUS(true);
       return EPlatformCallResult.Success;
-    } catch (resp) {
-      if (resp.status !== 403) {
+    } catch (resp: unknown) {
+      if (resp['status'] !== 403) {
         console.error('Got 403 checking if YT is enabled for live streaming', resp);
         return EPlatformCallResult.Error;
       }
-      const json = resp.result;
+      const json = resp['result'];
       if (
         json.error &&
         json.error.errors &&
@@ -727,8 +727,8 @@ export class YoutubeService
         `https://www.googleapis.com/upload/youtube/v3/thumbnails/set?videoId=${videoId}`,
         { method: 'POST', body, headers: { Authorization: `Bearer ${this.oauthToken}` } },
       );
-    } catch (e) {
-      const error = await e.json();
+    } catch (e: unknown) {
+      const error = await e['json']();
       let details = error.result?.error?.message;
       if (!details) details = 'connection failed';
       const errorType = 'YOUTUBE_THUMBNAIL_UPLOAD_FAILED';

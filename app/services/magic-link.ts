@@ -36,7 +36,7 @@ export class MagicLinkService extends Service {
     try {
       const link = await this.getDashboardMagicLink('widgetthemes');
       electron.remote.shell.openExternal(link);
-    } catch (e) {
+    } catch (e: unknown) {
       console.error('Error generating dashboard magic link', e);
     }
   }

@@ -173,7 +173,7 @@ export class MediaGalleryService extends Service {
           maxFileSize: resp.body.max_allowed_upload_fize_size,
         };
       });
-    } catch (e) {
+    } catch (e: unknown) {
       return {
         maxUsage: DEFAULT_MAX_USAGE,
         maxFileSize: DEFAULT_MAX_FILE_SIZE,

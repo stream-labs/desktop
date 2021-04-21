@@ -103,11 +103,11 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
           },
         },
       );
-    } catch (e) {
-      this.$toasted.show(e.message, {
+    } catch (e: unknown) {
+      this.$toasted.show(e['message'], {
         position: 'bottom-center',
         className: 'toast-alert',
-        duration: 50 * e.message.length,
+        duration: 50 * e['message'].length,
         singleton: true,
       });
     } finally {

@@ -220,12 +220,12 @@ export class TwitchService
   async requestTwitch<T = unknown>(reqInfo: IPlatformRequest | string): Promise<T> {
     try {
       return await platformAuthorizedRequest<T>('twitch', reqInfo);
-    } catch (e) {
-      const details = e.result
-        ? `${e.result.status} ${e.result.error} ${e.result.message}`
+    } catch (e: unknown) {
+      const details = e['result']
+        ? `${e['result'].status} ${e['result'].error} ${e['result'].message}`
         : 'Connection failed';
       let errorType: TStreamErrorType;
-      switch (e.result?.message) {
+      switch (e['result']?.message) {
         case 'missing required oauth scope':
           errorType = 'TWITCH_MISSED_OAUTH_SCOPE';
           break;

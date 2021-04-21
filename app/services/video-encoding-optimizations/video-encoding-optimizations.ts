@@ -125,7 +125,7 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
         )
           .then(handleErrors)
           .then(camelize);
-      } catch (e) {
+      } catch (e: unknown) {
         // probably some network error
         // don't stop here
       }
@@ -137,7 +137,7 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
         profiles = await fetch(this.urlService.getStreamlabsApi('gamepresets/DEFAULT'))
           .then(handleErrors)
           .then(camelize);
-      } catch (e) {
+      } catch (e: unknown) {
         // probably some network error
         // don't stop here
         console.error('Error fetching game presets', e);
