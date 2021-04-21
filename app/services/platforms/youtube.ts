@@ -240,7 +240,7 @@ export class YoutubeService
     try {
       return await platformAuthorizedRequest<T>('youtube', reqInfo);
     } catch (e: unknown) {
-      let details = e['result']?.error?.message;
+      let details = (e as any).result?.error?.message;
       if (!details) details = 'connection failed';
 
       // if the rate limit exceeded then repeat request after 3s delay
@@ -253,7 +253,7 @@ export class YoutubeService
         details === 'The user is not enabled for live streaming.'
           ? 'YOUTUBE_STREAMING_DISABLED'
           : 'PLATFORM_REQUEST_FAILED';
-      throw throwStreamError(errorType, e, details);
+      throw throwStreamError(errorType, e as any, details);
     }
   }
 
@@ -321,11 +321,11 @@ export class YoutubeService
       this.SET_ENABLED_STATUS(true);
       return EPlatformCallResult.Success;
     } catch (resp: unknown) {
-      if (resp['status'] !== 403) {
+      if ((resp as any).status !== 403) {
         console.error('Got 403 checking if YT is enabled for live streaming', resp);
         return EPlatformCallResult.Error;
       }
-      const json = resp['result'];
+      const json = (resp as any).result;
       if (
         json.error &&
         json.error.errors &&
