@@ -103,6 +103,7 @@ export class StreamError extends Error implements IRejectedRequest {
       type: this.type,
       message: this.message,
       details: this.details,
+      platform: this.platform,
     };
   };
 
