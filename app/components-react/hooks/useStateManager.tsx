@@ -126,7 +126,7 @@ export function useStateManager<
     // and update the component only if it's dependencies have been changed
     const dependencyWatcher = createDependencyWatcher(componentView);
 
-    // define a onChange handler
+    // define an onChange handler
     // when StateWatcher detects changes in store or local state this function will be called
     function onChange(change: TStateChange) {
       const { globalStateRevision, localStateRevision } = change;
