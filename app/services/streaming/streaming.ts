@@ -200,11 +200,17 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           await service.prepopulateInfo();
         } catch (e) {
           // cast all PLATFORM_REQUEST_FAILED errors to PREPOPULATE_FAILED
-          e.type =
-            (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
-              ? 'PREPOPULATE_FAILED'
-              : e.type || 'UNKNOWN_ERROR';
-          this.setError(e, platform);
+          if (e instanceof StreamError) {
+            e.type =
+              (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
+                ? 'PREPOPULATE_FAILED'
+                : e.type || 'UNKNOWN_ERROR';
+
+            this.setError(e, platform);
+          } else {
+            this.setError('PREPOPULATE_FAILED', platform);
+          }
+
           this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
           return;
         }
