@@ -66,9 +66,8 @@ export default function PerformanceMetrics(props: { mode: TPerformanceMetricsMod
       {shownCells.map(attribute => {
         const data = metadata[attribute];
         return (
-          <Tooltip placement="bottom" title={pinTooltip(data.label)}>
+          <Tooltip placement="bottom" title={pinTooltip(data.label)} key={attribute}>
             <span
-              key={attribute}
               className={cx(
                 styles.performanceMetricWrapper,
                 classForStat(attribute),
