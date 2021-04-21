@@ -15,7 +15,7 @@ import Scrollable from 'components/shared/Scrollable';
 
 @Component({})
 export default class LayoutEditor extends TsxComponent {
-  @Inject() private layoutService: LayoutService;
+  @Inject() private layoutService!: LayoutService;
   @Inject() private navigationService: NavigationService;
   @Inject() private customizationService: CustomizationService;
 

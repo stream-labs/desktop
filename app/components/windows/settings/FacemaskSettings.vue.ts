@@ -49,7 +49,7 @@ interface IFormSettings {
   },
 })
 export default class FacemaskSettings extends Vue {
-  @Inject() facemasksService: FacemasksService;
+  @Inject() facemasksService!: FacemasksService;
   updatingInfo = false;
   enabledModel = this.facemasksService.state.settings.enabled;
   donationsEnabledModel = this.facemasksService.state.settings.donations_enabled;

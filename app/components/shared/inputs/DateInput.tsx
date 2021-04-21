@@ -9,7 +9,7 @@ import styles from './DateInput.m.less';
 
 @Component({ components: { Datepicker } })
 export default class DateInput extends BaseInput<number, IDateMetadata> {
-  @Inject() i18nService: I18nService;
+  @Inject() i18nService!: I18nService;
   @Prop() readonly value: number;
 
   @Prop({ default: () => ({}) })

@@ -7,10 +7,10 @@ import { SwitchProps } from 'antd/lib/switch';
 export type TSwitchInputProps = TSlobsInputProps<{}, boolean, SwitchProps>;
 
 export const SwitchInput = InputComponent((p: TSwitchInputProps) => {
-  const { wrapperAttrs, inputAttrs, stateRef } = useInput('switch', p);
+  const { wrapperAttrs, inputAttrs } = useInput('switch', p);
   return (
     <InputWrapper {...wrapperAttrs}>
-      <Switch checked={stateRef.current.value} size="small" {...inputAttrs} />
+      <Switch checked={inputAttrs.value} size="small" {...inputAttrs} />
     </InputWrapper>
   );
 });

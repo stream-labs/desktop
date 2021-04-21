@@ -45,7 +45,7 @@ export default class PlatformSettings extends TsxComponent<Props> {
     ) as TPlatform[];
 
     // don't render platform settings if platform has not prepopulated the channel data
-    if (!this.view.isPrepopulated(enabledPlatforms)) {
+    if (!this.view.isPrepopulated) {
       return '';
     }
     const hasPlatforms = enabledPlatforms.length > 0;
@@ -80,7 +80,7 @@ export default class PlatformSettings extends TsxComponent<Props> {
    * Renders settings for one platform
    */
   private renderPlatformSettings(platform: TPlatform) {
-    const isAdvancedMode = this.view.goLiveSettings.advancedMode && this.view.isMultiplatformMode;
+    const isAdvancedMode = this.view.savedSettings.advancedMode && this.view.isMultiplatformMode;
     const title = $t('%{platform} Settings', { platform: this.getPlatformName(platform) });
     const isLive = this.view.isMidStreamMode;
     return (
