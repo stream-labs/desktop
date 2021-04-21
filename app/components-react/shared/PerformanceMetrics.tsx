@@ -26,9 +26,7 @@ export default function PerformanceMetrics(props: { mode: TPerformanceMetricsMod
   }
 
   function pinTooltip(stat: string) {
-    return props.mode === 'full'
-      ? $t('Click to add %{stat} info to your footer', { stat: $t(`${stat}`) })
-      : '';
+    return props.mode === 'full' ? $t('Click to add %{stat} info to your footer', { stat }) : '';
   }
 
   function classForStat(stat: string) {
