@@ -5,7 +5,6 @@ import GenericForm from 'components/obs/inputs/GenericForm';
 import { TObsFormData, TObsValue } from 'components/obs/inputs/ObsInput';
 import { CustomizationService } from 'services/customization';
 import { ScenesService } from 'services/scenes';
-import { $t } from '../../../services/i18n';
 import electron from 'electron';
 import { WindowsService } from '../../../services/windows';
 
@@ -42,8 +41,8 @@ export default class ExperimentalSettings extends Vue {
   showDemoComponents() {
     this.windowsService.showWindow({
       title: 'Shared React Components',
-      componentName: 'SharedComponentsDemo',
-      size: { width: 500, height: 1000 },
+      componentName: 'SharedComponentsLibrary',
+      size: { width: 1000, height: 1000 },
     });
   }
 }

@@ -16,15 +16,16 @@ import {
   TextInput,
   TInputLayout,
 } from '../shared/inputs';
-import {Button, Card, Col, Row, Space, Tag, Timeline} from 'antd';
+import { Button, Card, Col, Row, Space, Tag, Timeline } from 'antd';
 import { Services } from '../service-provider';
 import { merge, useStateManager } from '../hooks/useStateManager';
 import InputWrapper from '../shared/inputs/InputWrapper';
 import Scrollable from '../shared/Scrollable';
 import PlatformLogo from '../shared/PlatformLogo';
 import { DownloadOutlined } from '@ant-design/icons';
+import { alertAsync, confirmAsync } from '../modals';
 
-export default function SharedComponentsDemo() {
+export default function SharedComponentsLibrary() {
   const { Context, contextValue } = useGlobalSettings();
   return (
     <Context.Provider value={contextValue}>
@@ -195,7 +196,13 @@ function Examples() {
 
       <Example title="Slider Input">
         <SliderInput label="Basic" min={0} max={10} {...globalProps} {...bind.sliderVal} />
-        <SliderInput label="Uncontrolled" min={0} max={10} uncontrolled {...bind.sliderVal} />
+        <SliderInput
+          label="Without Number Input"
+          min={0}
+          max={10}
+          hasNumberInput={false}
+          {...bind.sliderVal}
+        />
         <SliderInput
           label="Debounced"
           min={0}
@@ -216,7 +223,7 @@ function Examples() {
       </Example>
 
       <Example title="Buttons">
-        <Space wrap>
+        <Space direction="vertical">
           <Button type="primary" size={size}>
             Primary
           </Button>
@@ -267,6 +274,21 @@ function Examples() {
         </Space>
       </Example>
 
+      <Example title="Modals">
+        <Space>
+          <Button onClick={() => alertAsync('This is Alert')}>Show Alert</Button>
+          <Button
+            onClick={() =>
+              confirmAsync('This is Alert').then(confirmed =>
+                alertAsync(confirmed ? 'Confirmed' : 'Not confirmed'),
+              )
+            }
+          >
+            Show Confirm
+          </Button>
+        </Space>
+      </Example>
+
       <Example title="Platform Logo">
         <PlatformLogo platform="twitch" />
         <PlatformLogo platform="youtube" />
@@ -289,9 +311,12 @@ function Examples() {
 
 function Example(p: { title: string } & HTMLAttributes<unknown>) {
   return (
-    <Card title={p.title} style={{ width: '100%', marginBottom: '24px' }}>
+    <div>
+      <InputWrapper>
+        <h2>{p.title}</h2>
+      </InputWrapper>
       {p.children}
-    </Card>
+    </div>
   );
 }
 
@@ -330,6 +355,11 @@ function GlobalSettings() {
         {...bind.layout}
       />
       <ListInput
+        label="Background"
+        options={createOptions(['none', 'section', 'error'])}
+        {...bind.background}
+      />
+      <ListInput
         label="Size"
         options={createOptions(['default', 'large', 'small'])}
         {...bind.size}
@@ -351,6 +381,7 @@ interface IGlobalSettingsState {
   required: boolean;
   disabled: boolean;
   size: 'middle' | 'large' | 'small';
+  background: 'none' | 'section' | 'error';
 }
 
 function useGlobalSettings() {
@@ -362,6 +393,7 @@ function useGlobalSettings() {
       placeholder: 'Start typing',
       disabled: false,
       size: 'middle',
+      background: 'section',
     } as IGlobalSettingsState,
     (getState, setState) => {
       const { CustomizationService } = Services;

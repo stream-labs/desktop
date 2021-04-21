@@ -121,8 +121,8 @@ export class EditStreamWindow extends ReactComponent {}
 
 @Component({
   props: {
-    name: { default: 'SharedComponentsDemo' },
+    name: { default: 'SharedComponentsLibrary' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },
 })
-export class SharedComponentsDemo extends ReactComponent {}
+export class SharedComponentsLibrary extends ReactComponent {}

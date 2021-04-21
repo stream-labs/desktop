@@ -311,14 +311,22 @@ function createDependencyWatcher<T extends object>(watchedObject: T) {
       get: (target, propName: string) => {
         if (propName in target) return target[propName];
         const value = watchedObject[propName];
+
+        // Input bindings that have been created via createBinding() are source of
+        // component's dependencies. We should handle them differently
         if (value && value._proxyName === 'Binding') {
+          // if we already have the binding in the deps, just return it
           if (propName in dependencies) {
             return dependencies[propName];
           } else {
+            // if it's the first time we access binding then clone it to dependencies
+            // the binding object keep its own dependencies and cloning will reset them
+            // that each ensures each component will have it's own dependency list for the each binding
             dependencies[propName] = value._binding.clone();
             return dependencies[propName];
           }
         } else {
+          // for non-binding objects just save their value in the dependencies
           dependencies[propName] = value;
           return value;
         }
@@ -334,6 +342,7 @@ function createDependencyWatcher<T extends object>(watchedObject: T) {
     const values: Partial<T> = {};
     Object.keys(dependencies).forEach(propName => {
       const value = dependencies[propName];
+      // if one of dependencies is a binding then expose its internal dependencies
       if (value && value._proxyName === 'Binding') {
         const bindingMetadata = value._binding;
         Object.keys(bindingMetadata.dependencies).forEach(bindingPropName => {
@@ -342,6 +351,7 @@ function createDependencyWatcher<T extends object>(watchedObject: T) {
         });
         return;
       }
+      // if it's not a binding then just take the value from the watchedObject
       values[propName] = watchedObject[propName];
     });
     return values;
