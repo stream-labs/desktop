@@ -142,7 +142,8 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
     const fbSettings = this.settings.platforms.facebook;
     // description is required for facebook
     const descriptionIsRequired =
-      platform === 'facebook' || (!platform && fbSettings.enabled && !fbSettings.useCustomFields);
+      platform === 'facebook' ||
+      (!platform && fbSettings && fbSettings.enabled && !fbSettings.useCustomFields);
 
     // find out the best title for common fields
     let title = '';
