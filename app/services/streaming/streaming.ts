@@ -275,11 +275,15 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       } catch (e) {
         console.error('Error running beforeGoLive for plarform', e);
         // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
-        e.type =
-          (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
-            ? 'SETTINGS_UPDATE_FAILED'
-            : e.type || 'UNKNOWN_ERROR';
-        this.setError(e);
+        if (e instanceof StreamError) {
+          e.type =
+            (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
+              ? 'SETTINGS_UPDATE_FAILED'
+              : e.type || 'UNKNOWN_ERROR';
+          this.setError(e, platform);
+        } else {
+          this.setError('SETTINGS_UPDATE_FAILED', platform);
+        }
         return;
       }
     }
@@ -425,11 +429,15 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       } catch (e) {
         console.error('Error running putChannelInfo for platform', e);
         // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
-        e.type =
-          (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
-            ? 'SETTINGS_UPDATE_FAILED'
-            : e.type || 'UNKNOWN_ERROR';
-        this.setError(e);
+        if (e instanceof StreamError) {
+          e.type =
+            (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
+              ? 'SETTINGS_UPDATE_FAILED'
+              : e.type || 'UNKNOWN_ERROR';
+          this.setError(e, platform);
+        } else {
+          this.setError('SETTINGS_UPDATE_FAILED', platform);
+        }
         return false;
       }
     }
