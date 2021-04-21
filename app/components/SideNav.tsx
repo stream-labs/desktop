@@ -45,7 +45,7 @@ export default class SideNav extends Vue {
   navigate(page: TAppPage) {
     if (!this.userService.isLoggedIn && page !== 'Studio') return;
 
-    this.navigationService.navigate(page);
+    this.navigationService.actions.navigate(page);
   }
 
   navigateToStudioTab(tabId: string) {

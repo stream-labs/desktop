@@ -16,13 +16,17 @@ export default function Grow() {
   const v = useVuex(() => ({
     goals: GrowService.views.goals,
     platforms: GrowService.views.platforms,
+    tips: GrowService.views.tips,
   }));
 
   return (
-    <div style={{ background: 'var(--background)' }}>
-      <MyGoals goals={v.goals} />
-      <MyCommunity platforms={v.platforms} />
-      <ResourceFooter />
+    <div className={styles.goalTabContainer}>
+      <div className={styles.goalTabContent}>
+        <MyGoals goals={v.goals} />
+        <MyCommunity platforms={v.platforms} />
+        <ResourceFooter />
+      </div>
+      <GrowthTips tips={v.tips} />
     </div>
   );
 }
@@ -38,14 +42,14 @@ function MyGoals(p: { goals: IGoal[] }) {
 
       <div className={styles.goalsContainer}>
         {goalsToMap.map(goal => (
-          <GoalCard goal={goal} />
+          <GoalCard goal={goal} key={goal.title} />
         ))}
       </div>
     </div>
   );
 }
 
-function MyCommunity(p: { platforms: { followers?: number }[] }) {
+function MyCommunity(p: { platforms: { icon: string; followers?: number }[] }) {
   const totalFollowing = p.platforms
     .filter(Util.propertyExists('followers'))
     .reduce((count, current) => count + current.followers, 0);
@@ -57,7 +61,7 @@ function MyCommunity(p: { platforms: { followers?: number }[] }) {
 
       <div className={styles.communityContainer}>
         {p.platforms.map(platform => (
-          <PlatformCard platform={platform} />
+          <PlatformCard platform={platform} key={platform.icon} />
         ))}
       </div>
     </div>
@@ -79,6 +83,7 @@ function ResourceFooter() {
                 'Professional streamers are now able to earn large amounts of money while entertaining people and creating their own brand. But how does one become a professional streamer? Streamlabs University is our answer to this question. In this course, we’ll walk you through everything you need to know to become a successful streamer and turn your passion into a profession.',
               )}
             </span>
+            <Button>{$t('Open Streamlabs University')}</Button>
           </div>
         </div>
         <div className={styles.card}>
@@ -89,6 +94,10 @@ function ResourceFooter() {
                 'The Ultimate Resource For Live Streaming. Years of blog posts, guides, and support articles are now in one place. Content Hub is your one-stop-shop for everything related to live streaming. There are dozens of different categories to choose from. Learn how to set up your live stream, find new features, and stay up-to-date on all of the tools you can use to enhance your stream.',
               )}
             </span>
+            <footer>
+              <Button>{$t('Open Content Hub')}</Button>
+              <Button>{$t('Streamlabs on YouTube')}</Button>
+            </footer>
           </div>
         </div>
       </div>
@@ -112,7 +121,7 @@ function PlatformCard(p: { platform: any }) {
   const { followers, icon, name } = p.platform;
   return (
     <div className={styles.card}>
-      <div style={{ display: 'flex' }}>
+      <div className={styles.cardHeader}>
         <PlatformLogo platform={icon} />
         <span className={cx(styles.title, styles[icon])}>{name}</span>
       </div>
@@ -121,6 +130,22 @@ function PlatformCard(p: { platform: any }) {
       ) : (
         <Button>{$t('Connect')}</Button>
       )}
+    </div>
+  );
+}
+
+function GrowthTips(p: { tips: any[] }) {
+  return (
+    <div className={styles.growthTipsContainer}>
+      <h2>{$t('Growth Tips')}</h2>
+      {p.tips.map(tip => (
+        <div className={styles.card}>
+          <i className={tip.icon} />
+          <span>{tip.title}</span>
+          <p>{tip.description}</p>
+          <Button>{tip.cta}</Button>
+        </div>
+      ))}
     </div>
   );
 }

@@ -1,13 +1,49 @@
+.goal-tab-container {
+  display: flex;
+  flex-grow: 1;
+  width: 100%;
+}
+
+.goal-tab-content {
+  padding: 24px;
+  width: calc(100% - 320px);
+}
 
 .card {
   background: var(--section-alt);
   border-radius: 4px;
   padding: 16px;
   margin: 24px;
+  margin-left: 0;
+}
+
+.card-header {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.card-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+
+  footer {
+    display: flex;
+  }
+
+  button {
+    margin-right: 16px;
+    max-width: 200px;
+  }
 }
 
 .my-goals {
   .card {
+    display: flex;
+    flex-direction: column;
     width: 320px;
     height: 240px;
   }
@@ -17,6 +53,22 @@
   .card {
     width: 180px;
     height: 100px;
+
+    button {
+      width: 100%;
+    }
+  }
+  .title {
+    margin-left: 8px;
+  }
+  .twitch {
+    color: var(--twitch);
+  }
+  .youtube {
+    color: var(--youtube);
+  }
+  .facebook {
+    color: var(--facebook);
   }
 }
 
@@ -31,5 +83,29 @@
 .goals-container,
 .community-container {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
+}
+
+.growth-tips-container {
+  width: 320px;
+  height: 100%;
+  background: var(--section-alt);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 16px;
+
+  i {
+    margin-right: 8px;
+  }
+
+  button {
+    margin: 0 auto;
+  }
+
+  .card {
+    background: var(--background);
+    width: 100%;
+    margin: 8px 0 8px 0;
+  }
 }
