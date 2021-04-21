@@ -92,6 +92,19 @@
       </add-source-info>
 
       <add-source-info
+        v-if="inspectedSource === 'icon_library'"
+        :name="$t('Custom Icon')"
+        :description="$t('Displays an icon from one of many selections')"
+        key="icon-library-info"
+      >
+        <img
+          class="source__demo"
+          slot="media"
+          :src="require(`../../../media/source-demos/${demoMode}/image.png`)"
+        />
+      </add-source-info>
+
+      <add-source-info
         v-for="appSource in availableAppSources"
         :key="`${appSource.appId}-${appSource.source.id}`"
         v-if="
@@ -148,17 +161,27 @@
             >
               {{ $t(source.name) }}
             </li>
+
+            <li
+              v-if="designerMode"
+              class="source source--standard"
+              :class="{ 'source--active': inspectedSource === 'icon_library' }"
+              @click="inspectSource('icon_library')"
+              @dblclick="selectSource('image_source', { propertiesManager: 'iconLibrary' })"
+            >
+              {{ $t('Custom Icon') }}
+            </li>
           </scrollable>
         </div>
 
         <div class="source-group" v-if="!loggedIn">
           <h3>{{ $t('You must be logged in for Widgets') }}</h3>
           <button @click="handleAuth()" class="source--login">
-              <h3>{{ $t('Click here to log in') }}</h3>
-              <img :src="getLoginSrc()" />
+            <h3>{{ $t('Click here to log in') }}</h3>
+            <img :src="getLoginSrc()" />
           </button>
         </div>
-        
+
         <div class="source-group" v-if="loggedIn">
           <h3>{{ $t('Widgets') }}</h3>
           <scrollable className="source-list">

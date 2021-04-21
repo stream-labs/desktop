@@ -13,6 +13,7 @@ export enum EAvailableFeatures {
   facebookOnboarding = 'slobs--facebook-onboarding',
   twitter = 'slobs--twitter',
   restream = 'slobs--restream',
+  reactGoLive = 'slobs--react-golive',
 }
 
 interface IIncrementalRolloutServiceState {

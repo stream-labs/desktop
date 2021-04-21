@@ -32,19 +32,8 @@ export default function Display(props: DisplayProps) {
   const obsDisplay = useRef<OBSDisplay>();
   const displayEl = useRef<HTMLDivElement>(null);
 
-  useEffect(lifecycle, []);
   useEffect(updateDisplay, [p.sourceId, v.paddingColor]);
   useEffect(refreshOutputRegion, [v.baseResolution]);
-
-  function lifecycle() {
-    // componentDidMount
-    createDisplay();
-
-    // componentWillUnmount
-    return function cleanup() {
-      destroyDisplay();
-    };
-  }
 
   function refreshOutputRegion() {
     if (!obsDisplay.current) return;
@@ -75,6 +64,10 @@ export default function Display(props: DisplayProps) {
   function updateDisplay() {
     destroyDisplay();
     createDisplay();
+
+    return function cleanup() {
+      destroyDisplay();
+    };
   }
 
   return (

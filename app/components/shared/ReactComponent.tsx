@@ -50,7 +50,7 @@ class ReactComponent<TComponentProps = {}> extends TsxComponent<WrapperProps<TCo
   }
 
   render() {
-    return <div ref="container" style={this.props.wrapperStyles}></div>;
+    return <div class="react" ref="container" style={this.props.wrapperStyles}></div>;
   }
 }
 
@@ -65,6 +65,13 @@ export class NameFolder extends ReactComponent {}
 export class NewsBanner extends ReactComponent {}
 @Component({ props: { name: { default: 'PatchNotes' } } })
 export class PatchNotes extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'IconLibraryProperties' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class IconLibraryProperties extends ReactComponent {}
 @Component({
   props: {
     name: { default: 'Display' },
@@ -103,3 +110,19 @@ export class TitleBar extends ReactComponent {}
   },
 })
 export class Chat extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'GoLiveWindow' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class GoLiveWindow extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'EditStreamWindow' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class EditStreamWindow extends ReactComponent {}

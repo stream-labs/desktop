@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import cloneDeep from 'lodash/cloneDeep';
 import { Inject } from '../../services/core/injector';
 import { WindowsService } from 'services/windows';
@@ -23,8 +22,8 @@ export default class WidgetSettings<
   TData extends IWidgetData,
   TService extends WidgetSettingsService<TData>
 > extends TsxComponent<WidgetSettingsProps> {
-  @Inject() private windowsService: WindowsService;
-  @Inject() private widgetsService: IWidgetsServiceApi;
+  @Inject() private windowsService!: WindowsService;
+  @Inject() private widgetsService!: IWidgetsServiceApi;
   @Inject() private sourcesService: SourcesService;
 
   service: TService;
@@ -39,7 +38,9 @@ export default class WidgetSettings<
       ' Open Sans, Roboto, Oswald, Lato, and Droid Sans.',
   );
 
-  navItems: IWidgetNavItem[];
+  get navItems(): IWidgetNavItem[] {
+    return [];
+  }
 
   private lastSuccessfullySavedWData: TData = null;
   private dataUpdatedSubscr: Subscription;

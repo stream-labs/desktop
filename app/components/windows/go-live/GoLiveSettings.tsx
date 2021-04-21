@@ -78,12 +78,12 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
     const isErrorMode = view.info.error;
     const isLoadingMode = !isErrorMode && ['empty', 'prepopulate'].includes(view.info.lifecycle);
     const shouldShowSettings = !isErrorMode && !isLoadingMode && hasPlatforms;
-    const isAdvancedMode = view.goLiveSettings.advancedMode && view.isMultiplatformMode;
+    const isAdvancedMode = view.savedSettings.advancedMode && view.isMultiplatformMode;
     const shouldShowPrimeLabel = !this.restreamService.state.grandfathered;
     const shouldShowLeftCol = this.streamSettingsService.state.protectedModeEnabled;
     const onlyOnePlatformIsLinked = view.linkedPlatforms.length === 1;
     const shouldShowAddDestButton =
-      view.linkedPlatforms.length + view.goLiveSettings.customDestinations.length < 5;
+      view.linkedPlatforms.length + view.savedSettings.customDestinations.length < 5;
     return (
       <ValidatedForm class={cx('flex', styles.goLiveSettings)}>
         {/*LEFT COLUMN*/}
@@ -131,7 +131,7 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
               <Section title={isAdvancedMode ? $t('Extras') : ''}>
                 <Twitter
                   vModel={this.settings.tweetText}
-                  streamTitle={this.view.getCommonFields(this.settings).title}
+                  streamTitle={this.view.getCommonFields(this.settings.platforms).title}
                 />
                 <OptimizedProfileSwitcher
                   vModel={this.settings.optimizedProfile}

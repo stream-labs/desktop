@@ -42,7 +42,7 @@ export class DestinationSwitchers extends TsxComponent<Props> {
   }
 
   private onSwitchPlatformHandler(platform: TPlatform, enabled: boolean) {
-    const isPrimary = this.view.isPrimaryPlatform(platform);
+    const isPrimary = this.view.checkPrimaryPlatform(platform);
     if (isPrimary && !this.props.canDisablePrimary) {
       this.showDisablePrimaryPopup();
       return;
@@ -95,7 +95,7 @@ export class DestinationSwitchers extends TsxComponent<Props> {
   private renderPlatform(platform: TPlatform) {
     const destination = this.props.platforms[platform];
     const enabled = destination.enabled;
-    const isPrimary = this.view.isPrimaryPlatform(platform);
+    const isPrimary = this.view.checkPrimaryPlatform(platform);
     const platformService = getPlatformService(platform);
     const platformName = platformService.displayName;
     const username = this.userService.state.auth?.platforms[platform]!.username;

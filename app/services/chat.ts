@@ -240,19 +240,22 @@ export class ChatService extends Service {
         );
       }
 
-      // the facebook chat does not properly fit in our sidebar and shows ugly scrollbars
-      // inject a script that removing the scrollbars
+      // facebook chat doesn't fit our layout by default
+      // inject a script that removes scrollbars and sets auto width for the chat
       if (this.userService.platform?.type === 'facebook') {
         Utils.sleep(2000).then(() => {
           if (!this.chatView) return;
-          this.chatView.webContents.executeJavaScript(
-            `
-                var chatIframe = document.querySelector('iframe');
-                if (chatIframe) chatIframe.setAttribute('scrolling','no');
-                0;
-        `,
-            true,
-          );
+          this.chatView.webContents
+            .executeJavaScript(
+              `
+                document.querySelector('html').style.overflowY='hidden !important';
+                var chatContainer = document.querySelector('div[data-pagelet="page"] > div');
+                chatContainer.style.marginLeft = '0';
+                chatContainer.style.marginRight = '0';
+                `,
+              true,
+            )
+            .catch(e => {});
         });
       }
     });
