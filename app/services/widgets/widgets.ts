@@ -28,7 +28,8 @@ export interface IWidgetSourcesState {
 }
 
 @InitAfter('SourcesService')
-export class WidgetsService extends StatefulService<IWidgetSourcesState>
+export class WidgetsService
+  extends StatefulService<IWidgetSourcesState>
   implements IWidgetsServiceApi {
   static initialState: IWidgetSourcesState = {
     widgetSources: {},

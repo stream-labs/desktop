@@ -67,7 +67,8 @@ interface ITwitchServiceState extends IPlatformState {
 }
 
 @InheritMutations()
-export class TwitchService extends BasePlatformService<ITwitchServiceState>
+export class TwitchService
+  extends BasePlatformService<ITwitchServiceState>
   implements IPlatformService {
   @Inject() hostsService: HostsService;
   @Inject() streamSettingsService: StreamSettingsService;
@@ -219,12 +220,12 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
   async requestTwitch<T = unknown>(reqInfo: IPlatformRequest | string): Promise<T> {
     try {
       return await platformAuthorizedRequest<T>('twitch', reqInfo);
-    } catch (e) {
-      const details = e.result
-        ? `${e.result.status} ${e.result.error} ${e.result.message}`
+    } catch (e: unknown) {
+      const details = (e as any).result
+        ? `${(e as any).result.status} ${(e as any).result.error} ${(e as any).result.message}`
         : 'Connection failed';
       let errorType: TStreamErrorType;
-      switch (e.result?.message) {
+      switch ((e as any).result?.message) {
         case 'missing required oauth scope':
           errorType = 'TWITCH_MISSED_OAUTH_SCOPE';
           break;
@@ -234,7 +235,7 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
         default:
           errorType = 'PLATFORM_REQUEST_FAILED';
       }
-      throwStreamError(errorType, e, details);
+      throwStreamError(errorType, e as any, details);
     }
   }
 
