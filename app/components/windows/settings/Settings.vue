@@ -192,6 +192,7 @@
 
   i {
     margin-right: 8px;
+    margin-top: 3px;
   }
   strong {
     margin-right: 16px;
