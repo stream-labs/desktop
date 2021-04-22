@@ -234,12 +234,12 @@ export class AppService extends StatefulService<IAppState> {
       await this.sceneCollectionsService.disableAutoSave();
     }
 
-    let error: Error = null;
+    let error: any = null;
     let result: any = null;
 
     try {
       result = fn();
-    } catch (e) {
+    } catch (e: unknown) {
       error = null;
     }
 
@@ -249,7 +249,7 @@ export class AppService extends StatefulService<IAppState> {
       this.loadingPromises[promiseId] = result;
       try {
         returningValue = await result;
-      } catch (e) {
+      } catch (e: unknown) {
         error = e;
       }
       delete this.loadingPromises[promiseId];

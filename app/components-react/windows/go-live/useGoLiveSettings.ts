@@ -251,7 +251,7 @@ function initializeGoLiveSettings(
       try {
         await form.validateFields();
         return true;
-      } catch (e) {
+      } catch (e: unknown) {
         message.error($t('Invalid settings. Please check the form'));
         return false;
       }

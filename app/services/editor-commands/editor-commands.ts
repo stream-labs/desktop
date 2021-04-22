@@ -134,7 +134,7 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
 
       try {
         ret = command.rollback();
-      } catch (e) {
+      } catch (e: unknown) {
         this.handleUndoRedoError(true, e);
         return;
       }
@@ -168,7 +168,7 @@ export class EditorCommandsService extends StatefulService<IEditorCommandsServic
 
       try {
         ret = command.execute();
-      } catch (e) {
+      } catch (e: unknown) {
         this.handleUndoRedoError(false, e);
         return;
       }

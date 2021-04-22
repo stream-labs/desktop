@@ -69,6 +69,7 @@ export type TSlotSchema = IItemSchema | IFolderSchema;
 interface IContext {
   assetsPath: string;
   scene: Scene;
+  savedAssets: Dictionary<string>;
 }
 
 export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
@@ -81,10 +82,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
   @Inject() audioService: AudioService;
 
   getItems(context: IContext) {
-    return context.scene
-      .getNodes()
-      .slice()
-      .reverse();
+    return context.scene.getNodes().slice().reverse();
   }
 
   async saveItem(sceneNode: TSceneNode, context: IContext): Promise<TSlotSchema> {
@@ -138,13 +136,21 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
 
     if (manager === 'iconLibrary') {
       const content = new IconLibraryNode();
-      await content.save({ sceneItem: sceneNode, assetsPath: context.assetsPath });
+      await content.save({
+        sceneItem: sceneNode,
+        assetsPath: context.assetsPath,
+        savedAssets: context.savedAssets,
+      });
       return { ...details, content } as IItemSchema;
     }
 
     if (sceneNode.type === 'image_source') {
       const content = new ImageNode();
-      await content.save({ sceneItem: sceneNode, assetsPath: context.assetsPath });
+      await content.save({
+        sceneItem: sceneNode,
+        assetsPath: context.assetsPath,
+        savedAssets: context.savedAssets,
+      });
       return { ...details, content } as IItemSchema;
     }
 
@@ -162,7 +168,11 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
 
     if (sceneNode.type === 'ffmpeg_source') {
       const content = new VideoNode();
-      await content.save({ sceneItem: sceneNode, assetsPath: context.assetsPath });
+      await content.save({
+        sceneItem: sceneNode,
+        assetsPath: context.assetsPath,
+        savedAssets: context.savedAssets,
+      });
       return { ...details, content } as IItemSchema;
     }
 
@@ -305,7 +315,13 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
     }
 
     this.adjustTransform(sceneItem, obj);
-    if (!existing) await obj.content.load({ sceneItem, assetsPath: context.assetsPath });
+    if (!existing) {
+      await obj.content.load({
+        sceneItem,
+        assetsPath: context.assetsPath,
+        savedAssets: context.savedAssets,
+      });
+    }
 
     if (sceneItem.getObsInput().audioMixers) {
       this.audioService.views.getSource(sceneItem.sourceId).setHidden(obj.mixerHidden);

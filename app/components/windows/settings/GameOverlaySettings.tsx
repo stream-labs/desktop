@@ -21,7 +21,7 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
     this.enabling = true;
     try {
       await this.gameOverlayService.setEnabled(val);
-    } catch (e) {
+    } catch (e: unknown) {
       if (typeof e === 'string') {
         this.$toasted.show(e, {
           position: 'bottom-center',

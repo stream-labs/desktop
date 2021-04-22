@@ -26,7 +26,7 @@ export class ExternalApiLimitsService extends Service {
  */
 export function Expensive(costPerSecond = 1, comment = ''): PropertyDecorator {
   const externalApiLimitsService: ExternalApiLimitsService = ExternalApiLimitsService.instance;
-  return function(target: Object, method: string) {
+  return function (target: Object, method: string) {
     const resourceName = target.constructor.name;
     externalApiLimitsService.markMethodAsExpensive(resourceName, method, costPerSecond, comment);
   };
