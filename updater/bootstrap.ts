@@ -97,7 +97,7 @@ async function getUpdateId(info: IUpdateInfo): Promise<string> {
 
   try {
     updateId = (await readFile(updateIdPath)).toString();
-  } catch (e) {
+  } catch (e: unknown) {
     console.log('Error reading update id. Assigning a new random update id.');
 
     updateId = crypto.randomBytes(8).toString('hex');
@@ -137,7 +137,7 @@ async function isRestrictedRolloutEligible(info: IUpdateInfo): Promise<boolean> 
     }
 
     return json.isEligible;
-  } catch (e) {
+  } catch (e: unknown) {
     console.log('Error checking rollout eligibility. Defaulting to true', e);
     return true;
   }
@@ -198,7 +198,7 @@ async function isUpdaterRunning(updaterPath: string, updaterName: string) {
 
       try {
         fs.unlinkSync(updaterPath);
-      } catch (e) {
+      } catch (e: unknown) {
         updaterRunning = true;
       }
     }

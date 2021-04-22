@@ -59,7 +59,7 @@ export default function SideNav() {
     try {
       const link = await MagicLinkService.getDashboardMagicLink(page);
       electron.remote.shell.openExternal(link);
-    } catch (e) {
+    } catch (e: unknown) {
       console.error('Error generating dashboard magic link', e);
     }
 
@@ -81,7 +81,7 @@ export default function SideNav() {
         'slobs-side-nav',
       );
       electron.remote.shell.openExternal(link);
-    } catch (e) {
+    } catch (e: unknown) {
       console.error('Error generating dashboard magic link', e);
     }
   }

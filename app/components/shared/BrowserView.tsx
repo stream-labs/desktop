@@ -118,11 +118,13 @@ export default class BrowserView extends TsxComponent<BrowserViewProps> {
   async loadUrl() {
     try {
       await this.browserView.webContents.loadURL(this.props.src);
-    } catch (e) {
+    } catch (e: unknown) {
       // ignore some common errors
       // that happen when the window has been closed before BrowserView accomplished the request
-      if (e.code === 'ERR_ABORTED') return;
-      if (e.message.match(/\(\-3\) loading/)) return;
+      if (typeof e === 'object') {
+        if (e['code'] === 'ERR_ABORTED') return;
+        if (e['message'] && e['message'].match(/\(\-3\) loading/)) return;
+      }
       throw e;
     }
   }

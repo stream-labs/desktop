@@ -12,9 +12,9 @@ interface IMigration {
   transform: Function;
 }
 
-export abstract class PersistentStatefulService<TState extends object> extends StatefulService<
-  TState
-> {
+export abstract class PersistentStatefulService<
+  TState extends object
+> extends StatefulService<TState> {
   // This is the default state if the state is not found
   // in local storage.
   static defaultState = {};

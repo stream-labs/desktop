@@ -52,7 +52,7 @@ export interface IRequestHandler {
   };
 
   // eslint-disable-next-line no-eval
-  global.eval = function() {
+  global.eval = function () {
     throw new Error('Eval is disabled for security');
   };
 
@@ -123,7 +123,7 @@ export interface IRequestHandler {
       if (typeof schema[key] === 'object') {
         newApi[key] = getApi(schema[key] as IRequestHandlerSchema, path.concat([key]));
       } else {
-        newApi[key] = function(...args) {
+        newApi[key] = function (...args) {
           console.log(`You called ${path.join('.')}.${key}`);
 
           const requestId = uuid();

@@ -153,7 +153,7 @@ module.exports = async (basePath: string) => {
 
         serverManifest = parsed;
       }
-    } catch (e) {
+    } catch (e: unknown) {
       console.log('Bundle manifest fetch error', e);
       useLocalBundles = true;
     }
@@ -182,7 +182,7 @@ module.exports = async (basePath: string) => {
 
       clearTimeout(timeout);
       closeUpdaterWindow();
-    } catch (e) {
+    } catch (e: unknown) {
       if (timeout) clearTimeout(timeout);
       closeUpdaterWindow();
       console.log('Failed to download 1 or more bundles', e);
@@ -258,7 +258,7 @@ module.exports = async (basePath: string) => {
       if (fs.existsSync(bundlesBaseDirectory)) {
         fs.emptyDirSync(bundlesBaseDirectory);
       }
-    } catch (e) {
+    } catch (e: unknown) {
       console.log('Error clearing bundle directory', e);
     }
 

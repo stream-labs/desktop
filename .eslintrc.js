@@ -28,6 +28,7 @@ module.exports = {
   ],
   rules: {
     "prettier/prettier": ERROR,
+    "@typescript-eslint/no-implicit-any-catch": ERROR,
 
     // We should consider setting this back to WARN
     "react-hooks/exhaustive-deps": OFF,
@@ -118,4 +119,12 @@ module.exports = {
     "no-script-url": OFF,
     "import/no-named-default": OFF,
   },
+  overrides: [
+    {
+      files: ['main.js'],
+      rules: {
+        "@typescript-eslint/no-implicit-any-catch": OFF,
+      }
+    }
+  ]
 };

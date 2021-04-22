@@ -18,7 +18,7 @@ export class ObsUserPluginsService extends Service {
       await this.ensureDirectory(this.pluginsDir);
       await this.ensureDirectory(this.dataBaseDir);
       await this.ensureDirectory(this.dataDir);
-    } catch (e) {
+    } catch (e: unknown) {
       console.error('Error creating plugin directories', e);
     }
   }

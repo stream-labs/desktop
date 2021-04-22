@@ -116,9 +116,7 @@ export class SceneItem extends SceneItemNode {
   }
 
   getObsSceneItem(): obs.ISceneItem {
-    return this.getScene()
-      .getObsScene()
-      .findItem(this.obsSceneItemId);
+    return this.getScene().getObsScene().findItem(this.obsSceneItemId);
   }
 
   getSettings(): ISceneItemSettings {
@@ -383,10 +381,7 @@ export class SceneItem extends SceneItemNode {
     const source = this.getSource();
     if (source.type !== 'scene') return;
     const scene = this.getScene();
-    const rect = scene
-      .getSelection()
-      .selectAll()
-      .getBoundingRect();
+    const rect = scene.getSelection().selectAll().getBoundingRect();
     const { width, height } = this.source.getObsInput();
     this.setTransform({
       position: {
