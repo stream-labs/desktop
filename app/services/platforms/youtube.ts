@@ -385,9 +385,13 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     description: string,
     categoryId: string,
   ) {
+    const video = await this.fetchVideo(broadcastId);
     const endpoint = 'videos?part=snippet';
     await this.requestYoutube({
-      body: JSON.stringify({ id: broadcastId, snippet: { categoryId, title, description } }),
+      body: JSON.stringify({
+        id: broadcastId,
+        snippet: { ...video.snippet, categoryId, title, description },
+      }),
       method: 'PUT',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
     });
