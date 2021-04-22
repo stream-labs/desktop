@@ -142,7 +142,7 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
       } catch (e) {
         // probably some network error
         // don't stop here
-        console.error(e);
+        console.error('Error fetching game presets', e);
       }
     }
 

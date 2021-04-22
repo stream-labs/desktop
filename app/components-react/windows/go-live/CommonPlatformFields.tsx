@@ -31,7 +31,15 @@ export default function CommonPlatformFields(p: IProps) {
     toggleCustomFields,
     isMultiplatformMode,
     supports,
-  } = useGoLiveSettings();
+    descriptionIsRequired,
+  } = useGoLiveSettings(ctx => {
+    // description is required for Facebook
+    const fbSettings = ctx.platforms.facebook;
+    const descriptionIsRequired =
+      p.platform === 'facebook' ||
+      (!p.platform && fbSettings && fbSettings.enabled && !fbSettings.useCustomFields);
+    return { descriptionIsRequired };
+  });
   const shouldShowPropsForSinglePlatform = !!p.platform;
   const platformSettings = shouldShowPropsForSinglePlatform
     ? getPlatformSettings(p.platform!)
@@ -103,6 +111,7 @@ export default function CommonPlatformFields(p: IProps) {
                 onChange={val => updateCommonField('description', val)}
                 name="description"
                 label={$t('Description')}
+                required={descriptionIsRequired}
               />
             )}
           </div>
