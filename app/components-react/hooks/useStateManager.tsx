@@ -319,7 +319,7 @@ function createDependencyWatcher<T extends object>(watchedObject: T) {
           } else {
             // if it's the first time we access binding then clone it to dependencies
             // the binding object keep its own dependencies and cloning will reset them
-            // that each ensures each component will have it's own dependency list for the each binding
+            // that ensures each component will have it's own dependency list for the each binding
             dependencies[propName] = value._binding.clone();
             return dependencies[propName];
           }
