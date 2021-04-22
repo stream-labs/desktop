@@ -4,7 +4,7 @@ import path from 'path';
 import { Services } from 'components-react/service-provider';
 import { BoolButtonInput } from 'components-react/shared/inputs/BoolButtonInput';
 
-export default function ClipPreview(props: { clip: IClip }) {
+export default function ClipPreview(props: { clip: IClip; onClick: () => void }) {
   const { HighlighterService } = Services;
   const [scrubFrame, setScrubFrame] = useState(0);
   const filename = useMemo(() => {
@@ -36,6 +36,7 @@ export default function ClipPreview(props: { clip: IClip }) {
           opacity: props.clip.enabled ? 1.0 : 0.3,
         }}
         onMouseMove={mouseMove}
+        onClick={props.onClick}
       ></img>
       <span style={{ position: 'absolute', top: '10px', left: '10px' }}>
         <BoolButtonInput

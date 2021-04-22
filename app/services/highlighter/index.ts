@@ -668,6 +668,7 @@ export interface IClip {
   scrubSprite?: string;
   startTrim: number;
   endTrim: number;
+  duration?: number;
 }
 
 export enum EExportStep {
@@ -882,6 +883,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
           path: completed.path,
           loaded: true,
           scrubSprite: this.clips[completed.path].frameSource.scrubJpg,
+          duration: this.clips[completed.path].duration,
         });
       },
     });

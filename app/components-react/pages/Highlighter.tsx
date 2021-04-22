@@ -1,14 +1,16 @@
 import { useVuex } from 'components-react/hooks';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Services } from 'components-react/service-provider';
 import styles from './Highlighter.m.less';
 import { EExportStep, IClip } from 'services/highlighter';
 import ClipPreview from 'components-react/highlighter/ClipPreview';
+import ClipTrimmer from 'components-react/highlighter/ClipTrimmer';
 import { ReactSortable } from 'react-sortablejs';
 import { ListInput } from 'components-react/shared/inputs/ListInput';
 import Form from 'components-react/shared/inputs/Form';
 import isEqual from 'lodash/isEqual';
 import { FileInput, SliderInput } from 'components-react/shared/inputs';
+import { Modal } from 'antd';
 
 export default function Highlighter() {
   const { HighlighterService } = Services;
@@ -142,23 +144,42 @@ export default function Highlighter() {
     }
   }
 
+  const [inspectedClipPath, setInspectedClipPath] = useState<string | null>(null);
+  let inspectedClip: IClip | null;
+
+  if (inspectedClipPath) {
+    inspectedClip = v.clips.find(c => c.path === inspectedClipPath) ?? null;
+  }
+
   function getClipsView() {
     const clipList = v.clips.map(c => ({ id: c.path }));
 
     return (
-      <div style={{ width: '100%', display: 'flex' }}>
-        <div style={{ overflowY: 'auto' }}>
+      <div style={{ width: '100%', display: 'flex' }} className={styles.clipsViewRoot}>
+        <div style={{ overflowY: 'auto', flexGrow: 1 }}>
           <ReactSortable list={clipList} setList={setClipOrder} animation={200}>
             {v.clips.map(clip => {
               return (
                 <div key={clip.path} style={{ margin: '10px', display: 'inline-block' }}>
-                  <ClipPreview clip={clip} />
+                  <ClipPreview clip={clip} onClick={() => setInspectedClipPath(clip.path)} />
                 </div>
               );
             })}
           </ReactSortable>
         </div>
         {getControls()}
+        {inspectedClip && (
+          <Modal
+            getContainer={`.${styles.clipsViewRoot}`}
+            onCancel={() => setInspectedClipPath(null)}
+            footer={null}
+            visible={true}
+            width="70%"
+            closable={false}
+          >
+            {inspectedClip && <ClipTrimmer clip={inspectedClip} />}
+          </Modal>
+        )}
       </div>
     );
   }
