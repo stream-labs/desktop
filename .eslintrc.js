@@ -10,6 +10,7 @@ module.exports = {
   extends: [
     'plugin:vue/essential',
     'airbnb-base',
+    'plugin:react-hooks/recommended',
   ],
   globals: {
     Atomics: 'readonly',
@@ -27,6 +28,9 @@ module.exports = {
   ],
   rules: {
     "prettier/prettier": ERROR,
+
+    // We should consider setting this back to WARN
+    "react-hooks/exhaustive-deps": OFF,
 
     // "variable-name": [ERROR, "ban-keywords", "check-format", "allow-leading-underscore", "allow-pascal-case"],
     // We do imports where our files are suffixed .vue and this rule would expect we import as e.g. MainVue
