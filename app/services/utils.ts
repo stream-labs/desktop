@@ -101,7 +101,7 @@ export default class Utils {
     return Utils.env.SLOBS_IPC as boolean;
   }
 
-  static useLocalHost(): boolean {
+  static shouldUseLocalHost(): boolean {
     return Utils.env.SLOBS_USE_LOCAL_HOST as boolean;
   }
 
