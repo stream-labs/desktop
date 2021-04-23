@@ -28,5 +28,9 @@
 .comment-body {
   .common__comment-body();
   color: @light-grey;
+
+  [speaking=true] & {
+    color: @text-primary;
+  }
 }
 </style>

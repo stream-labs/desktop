@@ -189,9 +189,19 @@ button,
 }
 
 .button--default {
-  background: rgba(255, 255, 255, .1);
-  border-color: transparent;
-  color: @white;
+  background: rgba(255, 255, 255, .1) !important;
+  border-color: transparent !important;
+  color: @white !important;
+
+  &:hover {
+    background: rgba(255, 255, 255, .2) !important;
+ }
+
+ &:disabled {
+   &:hover {
+    background: rgba(255, 255, 255, .1) !important;
+   }
+ }
 }
 
 .button--create-program {
@@ -229,4 +239,24 @@ button,
       background-color: transparent;
     }
   }
+}
+
+.button-nicolive--action {
+  color: @white;
+  background-color: @nicolive-button;
+
+  &:hover {
+    background-color: @nicolive-button-hover;
+ }
+
+ &:disabled {
+   &:hover {
+     background-color: @nicolive-button;
+   }
+ }
+}
+
+.button-nicolive--default {
+  color: @white;
+  background-color: @grey;
 }

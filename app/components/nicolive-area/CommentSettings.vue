@@ -50,7 +50,7 @@
 
 .content {
   flex-grow: 1;
-  padding-top: 8px;
+  overflow: auto;
   background-color: rgba(@black,.5);
 }
 

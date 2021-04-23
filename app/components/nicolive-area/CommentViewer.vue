@@ -3,6 +3,7 @@
     <div class="header">
       <i class="icon-reload icon-btn" v-tooltip.bottom="commentReloadTooltip" @click="refreshConnection"></i>
       <i :class="['icon-btn', speakingEnabled ? 'icon-speaker' : 'icon-mute']" v-tooltip.bottom="commentSynthesizerTooltip" @click="speakingEnabled = !speakingEnabled"></i>
+      <div class="icon-border"></div>
       <i class="icon-ng icon-btn" v-tooltip.bottom="filterTooltip" @click="isFilterOpened = true"></i>
       <i class="icon-settings icon-btn" v-tooltip.bottom="settingsTooltip" @click="isSettingsOpened = true"></i>
     </div>
@@ -167,5 +168,12 @@
   height: 100%;
   width: 100%;
   background-color: @bg-primary;
+}
+
+.icon-border {
+  width: 1px;
+  height: 60%;
+  background-color: @bg-primary;
+  margin-left: 16px;
 }
 </style>
