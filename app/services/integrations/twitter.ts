@@ -40,7 +40,7 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
     creatorSiteOnboardingComplete: false,
     creatorSiteUrl: '',
     screenName: '',
-    tweetWhenGoingLive: true,
+    tweetWhenGoingLive: false,
   };
 
   init() {
