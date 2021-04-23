@@ -170,7 +170,7 @@ export default class ExtraSettings extends Vue {
         rimraf.sync(this.enableCUFilePath);
         this.enableCU = false;
       }
-    } catch (e) {
+    } catch (e: unknown) {
       console.error('Error setting crash upload option', e);
     }
   }
