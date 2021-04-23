@@ -16,7 +16,7 @@ const MAX_POINTS_PER_SECOND = 2;
  * A decorator to mark class as a singleton
  */
 export function Singleton(): ClassDecorator {
-  return function(Klass: any) {
+  return function (Klass: any) {
     Klass.isSingleton = true;
   };
 }
@@ -27,7 +27,7 @@ export function Singleton(): ClassDecorator {
  */
 
 export function InjectFromExternalApi(serviceName?: string): PropertyDecorator {
-  return function(target: Object, key: string) {
+  return function (target: Object, key: string) {
     Object.defineProperty(target, key, {
       get() {
         const name = serviceName || key.charAt(0).toUpperCase() + key.slice(1);
@@ -46,7 +46,7 @@ export function InjectFromExternalApi(serviceName?: string): PropertyDecorator {
  * This method will be called from the Fallback object
  */
 export function Fallback(): PropertyDecorator {
-  return function(target: Object, key: string) {
+  return function (target: Object, key: string) {
     Object.defineProperty(target, '_fallback', {
       get() {
         return this[key];

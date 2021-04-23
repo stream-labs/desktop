@@ -274,7 +274,7 @@ export default class MediaGallery extends Vue {
         position: 'top-right',
         className: 'toast-success',
       });
-    } catch (e) {
+    } catch (e: unknown) {
       this.$toasted.show($t('Failed to copy URL'), {
         duration: 1000,
         position: 'top-right',

@@ -120,7 +120,7 @@ export class InternalApiClient {
 
         try {
           ipcRenderer.send('services-request-async', request);
-        } catch (e) {
+        } catch (e: unknown) {
           console.error('Failed to send async services request', e, {
             request,
           });

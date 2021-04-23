@@ -141,7 +141,7 @@ export default class ExtraSettings extends Vue {
         fs.unlinkSync(this.disableHAFilePath);
         this.disableHA = false;
       }
-    } catch (e) {
+    } catch (e: unknown) {
       console.error('Error setting hardware acceleration', e);
     }
   }

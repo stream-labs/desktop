@@ -333,7 +333,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       if (userInfo.username) {
         this.SET_USERNAME(this.platform.type, userInfo.username);
       }
-    } catch (e) {
+    } catch (e: unknown) {
       console.error('Error fetching user info', e);
     }
   }
@@ -461,7 +461,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     try {
       const link = await this.magicLinkService.getDashboardMagicLink('expiring_cc');
       electron.shell.openExternal(link);
-    } catch (e) {}
+    } catch (e: unknown) {}
   }
 
   /**
