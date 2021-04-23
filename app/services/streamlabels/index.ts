@@ -7,6 +7,7 @@ import { TSocketEvent, WebsocketService } from 'services/websocket';
 import { AppService } from 'services/app';
 import { InitAfter } from '../core';
 import { BehaviorSubject } from 'rxjs';
+import {getPlatformService} from "../platforms";
 
 interface IStreamlabelActiveSubscriptions {
   filename: string;
@@ -208,6 +209,7 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
   }
 
   async init() {
+
     this.initSocketConnection();
     this.initTrainClockInterval();
 
@@ -217,6 +219,8 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
   }
 
   onUserLogin() {
+    const primaryPlatform = getPlatformService(this.userService.platform.type);
+    if (!primaryPlatform.capabilities.has('streamlabels')) return;
     this.fetchInitialData();
     this.fetchSettings();
     this.fetchDefinitions();

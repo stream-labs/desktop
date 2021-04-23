@@ -5,7 +5,6 @@ import { UserService } from '../user';
 import { RestreamService } from '../restream';
 import { getPlatformService, TPlatform, TPlatformCapability } from '../platforms';
 import { cloneDeep, difference } from 'lodash';
-import { Services } from '../../components-react/service-provider';
 import { TwitterService } from '../../app-services';
 
 /**
@@ -80,7 +79,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
    * Returns a sorted list of all platforms (linked and unlinked)
    */
   get allPlatforms(): TPlatform[] {
-    return this.sortPlatforms(['twitch', 'facebook', 'youtube']);
+    return this.sortPlatforms(['twitch', 'facebook', 'youtube', 'tiktok']);
   }
 
   /**

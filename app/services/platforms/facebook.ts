@@ -114,8 +114,6 @@ export class FacebookService
   extends BasePlatformService<IFacebookServiceState>
   implements IPlatformService {
   @Inject() protected hostsService: HostsService;
-  @Inject() protected userService: UserService;
-  @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private windowsService: WindowsService;
 
   readonly platform = 'facebook';
@@ -129,6 +127,7 @@ export class FacebookService
     'user-info',
     'stream-schedule',
     'account-merging',
+    'streamlabels',
   ]);
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = { width: 800, height: 800 };
@@ -273,10 +272,6 @@ export class FacebookService
     );
   }
 
-  async validatePlatform() {
-    return EPlatformCallResult.Success;
-  }
-
   getHeaders(req: IPlatformRequest, useToken: boolean | string) {
     const token = typeof useToken === 'string' ? useToken : useToken && this.oauthToken;
     return {
@@ -288,10 +283,6 @@ export class FacebookService
   fetchNewToken(): Promise<void> {
     // FB Doesn't have token refresh, user must login again to update token
     return Promise.resolve();
-  }
-
-  fetchUserInfo() {
-    return Promise.resolve({});
   }
 
   private async fetchPermissions(): Promise<TFacebookPermission[]> {

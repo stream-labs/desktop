@@ -196,6 +196,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   @mutation()
   private VALIDATE_LOGIN(validated: boolean) {
+    console.log('validated', validated);
     Vue.set(this.state, 'loginValidated', validated);
   }
 
@@ -652,6 +653,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   @RunInLoadingMode()
   private async login(service: IPlatformService, auth?: IUserAuth) {
+    console.log('satrt login');
     if (!auth) auth = this.state.auth;
     this.LOGIN(auth);
     this.VALIDATE_LOGIN(true);

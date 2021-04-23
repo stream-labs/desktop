@@ -176,7 +176,7 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
             <div>
               {/*TITLE*/}
               <HFormGroup
-                value={fields.title}
+                value={fields['title']}
                 onInput={(val: string) => this.updateCommonField('title', val)}
                 metadata={metadata.text({
                   title: $t('Title'),
