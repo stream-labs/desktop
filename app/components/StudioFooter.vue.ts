@@ -4,7 +4,7 @@ import { Inject } from '../services/core/injector';
 import { StreamingService, EReplayBufferState, EStreamingState } from '../services/streaming';
 import StartStreamingButton from './StartStreamingButton.vue';
 import TestWidgets from './TestWidgets.vue';
-import PerformanceMetrics from './PerformanceMetrics.vue';
+import { PerformanceMetrics } from 'components/shared/ReactComponent';
 import NotificationsArea from './NotificationsArea.vue';
 import { UserService } from '../services/user';
 import { getPlatformService } from 'services/platforms';
