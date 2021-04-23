@@ -130,7 +130,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
       if (fs.existsSync(path.join(this.appService.appDataDirectory, 'HADisable'))) {
         this.usageStatisticsService.recordFeatureUsage('HardwareAccelDisabled');
       }
-    } catch (e) {
+    } catch (e: unknown) {
       console.error('Error fetching hardware acceleration state', e);
     }
 

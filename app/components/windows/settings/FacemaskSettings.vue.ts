@@ -118,7 +118,7 @@ export default class FacemaskSettings extends Vue {
       await this.facemasksService.updateFacemaskSettings(newSettings);
       this.updatingInfo = false;
       this.onSuccessHandler('Settings Updated');
-    } catch (e) {
+    } catch (e: unknown) {
       this.onFailHandler('Request Failed');
       this.updatingInfo = false;
     }

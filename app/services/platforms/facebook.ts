@@ -110,7 +110,8 @@ type TFacebookPermissionName = 'publish_video' | 'publish_to_groups';
 type TFacebookPermission = { permission: TFacebookPermissionName; status: 'granted' | string };
 
 @InheritMutations()
-export class FacebookService extends BasePlatformService<IFacebookServiceState>
+export class FacebookService
+  extends BasePlatformService<IFacebookServiceState>
   implements IPlatformService {
   @Inject() protected hostsService: HostsService;
   @Inject() protected userService: UserService;
@@ -313,11 +314,11 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
       return token
         ? await platformRequest<T>('facebook', reqInfo, token)
         : await platformAuthorizedRequest<T>('facebook', reqInfo);
-    } catch (e) {
-      const details = e.result?.error
-        ? `${e.result.error.type} ${e.result.error.message}`
+    } catch (e: unknown) {
+      const details = (e as any).result?.error
+        ? `${(e as any).result.error.type} ${(e as any).result.error.message}`
         : 'Connection failed';
-      throwStreamError('PLATFORM_REQUEST_FAILED', e, details);
+      throwStreamError('PLATFORM_REQUEST_FAILED', e as any, details);
     }
   }
 
@@ -337,7 +338,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
         .then(blob => {
           url = window.URL.createObjectURL(blob);
         });
-    } catch (e) {
+    } catch (e: unknown) {
       // just don't care is something is wrong here
     }
     return url;
@@ -432,8 +433,8 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
 
     try {
       return await platformRequest('facebook', { url, body, method: 'POST' }, token);
-    } catch (e) {
-      if (e?.result?.error?.code === 100) {
+    } catch (e: unknown) {
+      if (e && (e as any).result?.error?.code === 100) {
         throw new Error(
           $t(
             'Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.',
@@ -485,7 +486,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
           `${this.apiBase}/me/groups?fields=administrator,id,name,icon,privacy&limit=100`,
         )
       ).data.filter(group => group.administrator);
-    } catch (e) {
+    } catch (e: unknown) {
       console.error('Error fetching Facebook groups', e);
       this.SET_OUTAGE_WARN(
         'Streaming to Facebook groups is currently unavailable.  Please try again later.',

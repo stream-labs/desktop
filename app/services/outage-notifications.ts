@@ -126,7 +126,7 @@ export class OutageNotificationsService extends Service {
 
     try {
       return await jfetch(req, { headers });
-    } catch (e) {
+    } catch (e: unknown) {
       return;
     }
   }

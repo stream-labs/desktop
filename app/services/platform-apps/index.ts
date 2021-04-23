@@ -281,8 +281,8 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
 
     try {
       await this.validateManifest(manifest, appPath);
-    } catch (e) {
-      return e.message;
+    } catch (e: unknown) {
+      return e['message'];
     }
 
     // Make sure there isn't already a dev server

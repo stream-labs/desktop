@@ -82,10 +82,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
   @Inject() audioService: AudioService;
 
   getItems(context: IContext) {
-    return context.scene
-      .getNodes()
-      .slice()
-      .reverse();
+    return context.scene.getNodes().slice().reverse();
   }
 
   async saveItem(sceneNode: TSceneNode, context: IContext): Promise<TSlotSchema> {
