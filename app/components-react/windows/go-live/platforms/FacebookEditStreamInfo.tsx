@@ -92,11 +92,6 @@ export default function FacebookEditStreamInfo() {
     updatePlatform('facebook', { privacy: { value: privacy } });
   }
 
-  function setPageId(page: string) {
-    fbSettings.pageId = page;
-    console.log(page);
-  }
-
   async function loadScheduledBroadcasts() {
     let destinationId = FacebookService.views.getDestinationId(fbSettings);
     if (!destinationId) return;
@@ -196,7 +191,6 @@ export default function FacebookEditStreamInfo() {
               <ListInput
                 {...bind.pageId}
                 label={$t('Facebook Page')}
-                onChange={val => setPageId(val)}
                 hasImage
                 imageSize={{ width: 44, height: 44 }}
                 onDropdownVisibleChange={shown => shown && loadPictures('page')}
