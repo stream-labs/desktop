@@ -11,7 +11,7 @@ import { PlatformAppsService } from 'services/platform-apps';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { AppService } from '../services/app';
 import { $t } from 'services/i18n';
-import { NavTools } from 'components/shared/ReactComponent';
+import NavTools from './NavTools';
 import styles from './SideNav.m.less';
 import { LayoutService } from 'services/layout';
 

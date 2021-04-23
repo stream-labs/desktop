@@ -90,10 +90,6 @@ class TransitionsViews extends ViewHandler<ITransitionsState> {
   getConnection(id: string) {
     return this.state.connections.find(conn => conn.id === id);
   }
-
-  get studioMode() {
-    return this.state.studioMode;
-  }
 }
 
 export class TransitionsService extends StatefulService<ITransitionsState> {

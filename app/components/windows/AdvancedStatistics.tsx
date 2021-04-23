@@ -5,7 +5,7 @@ import { $t } from 'services/i18n';
 import cx from 'classnames';
 import styles from './AdvancedStatistics.m.less';
 import ModalLayout from 'components/ModalLayout.vue';
-import { PerformanceMetrics } from 'components/shared/ReactComponent';
+import PerformanceMetrics from '../PerformanceMetrics.vue';
 import { StreamingService, EStreamingState } from 'services/streaming';
 import GlobalSyncStatus from 'components/GlobalSyncStatus.vue';
 import moment from 'moment';
@@ -198,10 +198,7 @@ export default class AdvancedStatistics extends TsxComponent<{}> {
             <h2>{$t('Live Stats')}</h2>
             <p>{$t('Click on a stat to add it to your footer')}</p>
             <div class={styles.statsRow}>
-              <PerformanceMetrics
-                componentProps={{ mode: 'full' }}
-                wrapperStyles={{ flexGrow: '1' }}
-              />
+              <PerformanceMetrics mode="full" />
               <GlobalSyncStatus />
             </div>
           </div>
