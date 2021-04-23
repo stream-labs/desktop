@@ -128,9 +128,6 @@ import { AnnouncementsService } from './services/announcements';
 import { PatchNotesService } from './services/patch-notes';
 import { VideoService } from './services/video';
 import { ChatService } from './services/chat';
-import { TransitionsService } from './services/transitions';
-import { MagicLinkService } from './services/magic-link';
-import { UsageStatisticsService } from './services/usage-statistics';
 
 export const AppServices = {
   WindowsService,
@@ -155,7 +152,4 @@ export const AppServices = {
   UserService,
   TwitchService,
   DismissablesService,
-  TransitionsService,
-  MagicLinkService,
-  UsageStatisticsService,
 };
