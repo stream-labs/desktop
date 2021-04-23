@@ -1,12 +1,15 @@
 .goal-tab-container {
-  display: flex;
-  flex-grow: 1;
   width: 100%;
+  flex-grow: 1;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  grid-template-rows: minmax(0, 1fr);
 }
 
 .goal-tab-content {
   padding: 24px;
-  width: calc(100% - 320px);
+  grid-column: 1 / span 1;
+  min-width: 0;
 }
 
 .card {
@@ -44,8 +47,14 @@
   .card {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     width: 320px;
-    height: 240px;
+    height: 200px;
+
+    strong {
+      margin: 0 auto;
+      display: block;
+    }
   }
 }
 
@@ -76,6 +85,7 @@
   .card {
     width: 45%;
     height: 280px;
+    display: flex;
   }
 }
 
@@ -87,10 +97,12 @@
 }
 
 .growth-tips-container {
-  width: 320px;
-  height: 100%;
+  grid-column: 2 / span 1;
+  grid-row: 1 / span 1;
   background: var(--section-alt);
   display: flex;
+  height: 100%;
+  min-height: 1px;
   flex-direction: column;
   overflow: hidden;
   padding: 16px;
@@ -101,7 +113,7 @@
 
   button {
     margin: 0 auto;
-    width: 200px;
+    min-width: 200px;
     display: block;
   }
 

@@ -98,8 +98,24 @@ export const tips = () => [
 ];
 
 export const GOAL_OPTIONS = () => [
-  { title: 'Stream 28 hours in 1 month', image: '', total: 28 },
-  { title: 'Multistream 5 times in 1 week', image: '', total: 5 },
-  { title: 'Add 3 panels', image: '', total: 3 },
-  { title: 'Stream every day for 1 week', image: '', total: 7 },
+  {
+    title: 'Stream 28 hours in 1 month',
+    image: 'https://slobs-cdn.streamlabs.com/media/grow/goal_stream_time.png',
+    total: 28,
+  },
+  {
+    title: 'Multistream 3 times in 1 week',
+    image: 'https://slobs-cdn.streamlabs.com/media/grow/goal_multistream.png',
+    total: 5,
+  },
+  {
+    title: 'Add 3 panels',
+    image: 'https://slobs-cdn.streamlabs.com/media/grow/goal_panels.png',
+    total: 3,
+  },
+  {
+    title: 'Stream 4 for 1 week',
+    image: 'https://slobs-cdn.streamlabs.com/media/grow/goal_stream_days.png',
+    total: 4,
+  },
 ];

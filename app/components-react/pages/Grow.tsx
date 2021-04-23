@@ -9,6 +9,7 @@ import { Services } from '../service-provider';
 import { IGoal } from '../../services/grow/grow';
 import Util from '../../services/utils';
 import PlatformLogo from 'components-react/shared/PlatformLogo';
+import Scrollable from 'components-react/shared/Scrollable';
 
 export default function Grow() {
   const { GrowService } = Services;
@@ -85,6 +86,7 @@ function ResourceFooter() {
             </span>
             <Button>{$t('Open Streamlabs University')}</Button>
           </div>
+          <img src="https://slobs-cdn.streamlabs.com/media/grow/streamlabs_university.png" />
         </div>
         <div className={styles.card}>
           <div className={styles.cardInner}>
@@ -99,6 +101,7 @@ function ResourceFooter() {
               <Button>{$t('Streamlabs on YouTube')}</Button>
             </footer>
           </div>
+          <img src="https://slobs-cdn.streamlabs.com/media/grow/content_hub.png" />
         </div>
       </div>
     </div>
@@ -109,7 +112,7 @@ function GoalCard(p: { goal: IGoal }) {
   const { title, image, total, progress } = p.goal;
   return (
     <div className={styles.card}>
-      <span>{title}</span>
+      <strong>{title}</strong>
       {progress && <Progress percent={Math.floor((progress / total) * 100)} />}
       <img src={image} />
       {!progress && <Button>{$t('Add Goal')}</Button>}
@@ -138,16 +141,18 @@ function GrowthTips(p: { tips: any[] }) {
   return (
     <div className={styles.growthTipsContainer}>
       <h2>{$t('Growth Tips')}</h2>
-      {p.tips.map(tip => (
-        <div className={styles.card}>
-          <i className={tip.icon} />
-          <span>
-            <strong>{tip.title}</strong>
-          </span>
-          <p>{tip.description}</p>
-          <Button>{tip.cta}</Button>
-        </div>
-      ))}
+      <Scrollable isResizable={false} style={{ height: '100%' }}>
+        {p.tips.map(tip => (
+          <div className={styles.card}>
+            <i className={tip.icon} />
+            <span>
+              <strong>{tip.title}</strong>
+            </span>
+            <p>{tip.description}</p>
+            <Button>{tip.cta}</Button>
+          </div>
+        ))}
+      </Scrollable>
     </div>
   );
 }

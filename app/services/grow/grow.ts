@@ -6,6 +6,7 @@ export interface IGoal {
   image: string;
   total: number;
   progress?: number;
+  startDate?: Date;
 }
 
 interface IGrowServiceState {
