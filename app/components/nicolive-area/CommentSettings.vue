@@ -29,6 +29,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   height: 48px;
   padding: 4px 16px;
   background-color: rgba(@black,.5);
@@ -50,7 +51,8 @@
 
 .content {
   flex-grow: 1;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   background-color: rgba(@black,.5);
 }
 
