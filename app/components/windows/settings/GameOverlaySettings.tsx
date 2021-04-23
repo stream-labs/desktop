@@ -21,7 +21,7 @@ export default class GameOverlaySettings extends TsxComponent<{}> {
     this.enabling = true;
     try {
       await this.gameOverlayService.setEnabled(val);
-    } catch (e) {
+    } catch (e: unknown) {
       this.$toasted.show($t('Please log in to use the in-game overlay.'), {
         position: 'bottom-center',
         className: 'toast-alert',
