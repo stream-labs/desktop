@@ -66,7 +66,7 @@ export default class Projector extends Vue {
     this.windowsService.setOneOffFullscreen(this.windowId, true);
     this.oldBounds = currentWindow.getBounds();
     currentWindow.setPosition(display.bounds.x, display.bounds.y);
-    currentWindow.setFullScreen(true);
+    currentWindow.setSimpleFullScreen(true);
     document.addEventListener('keydown', this.exitFullscreen);
   }
 
@@ -75,7 +75,7 @@ export default class Projector extends Vue {
     document.removeEventListener('keydown', this.exitFullscreen);
     this.windowsService.setOneOffFullscreen(this.windowId, false);
     const currentWindow = electron.remote.getCurrentWindow();
-    currentWindow.setFullScreen(false);
+    currentWindow.setSimpleFullScreen(false);
     currentWindow.setBounds(this.oldBounds);
   }
 }
