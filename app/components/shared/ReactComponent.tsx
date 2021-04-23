@@ -87,14 +87,6 @@ export class IconLibraryProperties extends ReactComponent {}
 export class Display extends ReactComponent {}
 @Component({
   props: {
-    name: { default: 'PerformanceMetrics' },
-    componentProps: { default: () => ({ mode: 'limited' }) },
-  },
-})
-export class PerformanceMetrics extends ReactComponent<{ mode: 'full' | 'limited' }> {}
-
-@Component({
-  props: {
     name: { default: 'TitleBar' },
     componentProps: { default: () => ({ windowId: '' }) },
   },
