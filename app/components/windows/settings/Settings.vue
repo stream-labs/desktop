@@ -174,7 +174,7 @@
   padding-left: 24px;
   font-size: 14px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: flex-start;
   position: fixed;
   bottom: 40px;
