@@ -109,7 +109,7 @@ function initializeGoLiveSettings(
     renderPlatformSettings(
       commonFields: JSX.Element,
       requiredFields: JSX.Element,
-      optionalFields: JSX.Element,
+      optionalFields?: JSX.Element,
       essentialOptionalFields?: JSX.Element,
     ) {
       let settingsMode: 'singlePlatform' | 'multiplatformAdvanced' | 'multiplatformSimple';
