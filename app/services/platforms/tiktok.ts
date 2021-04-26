@@ -2,6 +2,7 @@ import { InheritMutations } from '../core';
 import { BasePlatformService } from './base-platform';
 import { IPlatformState, TPlatformCapability } from './index';
 import { IGoLiveSettings } from '../streaming';
+import { WidgetType } from '../widgets';
 
 export interface ITiktokStartStreamOptions {
   serverUrl: string;
@@ -18,6 +19,14 @@ export class TiktokService extends BasePlatformService<ITiktokServiceState> {
   readonly platform = 'tiktok';
   readonly displayName = 'TikTok';
   readonly capabilities = new Set<TPlatformCapability>([]);
+
+  // support only donation widgets for now
+  readonly widgetsWhitelist = [
+    WidgetType.AlertBox,
+    WidgetType.DonationGoal,
+    WidgetType.DonationTicker,
+    WidgetType.TipJar,
+  ];
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 600,
@@ -36,11 +45,13 @@ export class TiktokService extends BasePlatformService<ITiktokServiceState> {
 
   async beforeGoLive(goLiveSettings?: IGoLiveSettings) {
     const ttSettings = goLiveSettings.platforms.tiktok;
-    this.streamSettingsService.setSettings({
-      streamType: 'rtmp_custom',
-      key: ttSettings.streamKey,
-      server: ttSettings.serverUrl,
-    });
+    if (!this.streamingService.views.isMultiplatformMode) {
+      this.streamSettingsService.setSettings({
+        streamType: 'rtmp_custom',
+        key: ttSettings.streamKey,
+        server: ttSettings.serverUrl,
+      });
+    }
     this.UPDATE_STREAM_SETTINGS(ttSettings);
   }
 

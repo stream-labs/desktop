@@ -54,7 +54,7 @@ export default class SideNav extends Vue {
   }
 
   featureIsEnabled(feature: EAvailableFeatures) {
-    return this.incrementalRolloutService.featureIsEnabled(feature);
+    return this.incrementalRolloutService.views.featureIsEnabled(feature);
   }
 
   get page() {

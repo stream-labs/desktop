@@ -13,6 +13,7 @@ import ListInput from 'components/shared/inputs/ListInput.vue';
 import ExtraPlatformConnect, { TExtraPlatform } from './ExtraPlatformConnect';
 import { IListOption } from '../../shared/inputs';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import {StreamingService} from "../../../services/streaming";
 
 class ConnectProps {
   continue: () => void = () => {};
@@ -23,6 +24,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
   @Inject() userService: UserService;
   @Inject() onboardingService: OnboardingService;
   @Inject() usageStatisticsService: UsageStatisticsService;
+  @Inject() streamingService: StreamingService;
 
   selectedExtraPlatform: TExtraPlatform | '' = '';
 
@@ -114,6 +116,8 @@ export default class Connect extends TsxComponent<ConnectProps> {
       );
     }
 
+    const platforms = this.streamingService.views.allPlatforms;
+
     return (
       <div class={styles.pageContainer}>
         <div class={styles.container}>
@@ -133,7 +137,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
             </h3>
           )}
           <div class={styles.signupButtons}>
-            {['twitch', 'youtube', 'facebook', 'tiktok'].map((platform: TPlatform) => (
+            {platforms.map((platform: TPlatform) => (
               <button
                 class={cx(`button button--${platform}`, styles.loginButton)}
                 disabled={this.loading}

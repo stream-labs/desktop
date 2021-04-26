@@ -1,11 +1,12 @@
-import { ViewHandler } from '../core';
-import { IGoLiveSettings, IStreamingServiceState, IStreamSettings } from './streaming-api';
-import { StreamSettingsService } from '../settings/streaming';
-import { UserService } from '../user';
-import { RestreamService } from '../restream';
-import { getPlatformService, TPlatform, TPlatformCapability } from '../platforms';
-import { cloneDeep, difference } from 'lodash';
-import { TwitterService } from '../../app-services';
+import {ViewHandler} from '../core';
+import {IGoLiveSettings, IStreamingServiceState, IStreamSettings} from './streaming-api';
+import {StreamSettingsService} from '../settings/streaming';
+import {UserService} from '../user';
+import {RestreamService} from '../restream';
+import {getPlatformService, TPlatform, TPlatformCapability} from '../platforms';
+import {cloneDeep, difference} from 'lodash';
+import {IncrementalRolloutService, TwitterService} from '../../app-services';
+import {EAvailableFeatures} from "../incremental-rollout";
 
 /**
  * The stream info view is responsible for keeping
@@ -36,6 +37,10 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
 
   private get twitterView() {
     return this.getServiceViews(TwitterService);
+  }
+
+  private get incrementalRolloutView() {
+    return this.getServiceViews(IncrementalRolloutService);
   }
 
   get info() {
@@ -79,7 +84,11 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
    * Returns a sorted list of all platforms (linked and unlinked)
    */
   get allPlatforms(): TPlatform[] {
-    return this.sortPlatforms(['twitch', 'facebook', 'youtube', 'tiktok']);
+    const allPlatforms: TPlatform[] = ['twitch', 'facebook', 'youtube'];
+    if (this.incrementalRolloutView.featureIsEnabled(EAvailableFeatures.tiktok)) {
+      allPlatforms.push('tiktok');
+    }
+    return this.sortPlatforms(allPlatforms);
   }
 
   /**

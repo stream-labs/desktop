@@ -5,6 +5,7 @@ import {ITiktokStartStreamOptions, TiktokService} from './tiktok';
 import { TTwitchTag } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
 import { IGoLiveSettings } from 'services/streaming';
+import {WidgetType} from "../widgets";
 
 export type Tag = TTwitchTag;
 export interface IGame {
@@ -173,6 +174,12 @@ export interface IPlatformService {
   readonly mergeUrl: string;
   readonly streamPageUrl: string;
   readonly chatUrl: string;
+
+  /**
+   * the list of widgets supported by the platform
+   * if not provided then support all widgets
+   */
+  readonly widgetsWhitelist?: WidgetType[];
   unlink: () => void;
 
   state: IPlatformState;

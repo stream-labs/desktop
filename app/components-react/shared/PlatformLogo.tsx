@@ -14,6 +14,7 @@ export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
       twitch: 'fab fa-twitch',
       youtube: 'fab fa-youtube',
       facebook: 'fab fa-facebook',
+      tiktok: 'fab fa-tiktok',
       dlive: 'dlive',
       nimotv: 'nimotv',
       streamlabs: 'icon-kevin-day',

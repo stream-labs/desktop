@@ -18,9 +18,9 @@ export function TiktokEditStreamInfo() {
 
   return (
     <Form name="tiktok-settings">
-      <TextInput label={$t('Server URL')} required {...bind.serverUrl} />
+      <TextInput label={$t('TikTok Server URL')} required {...bind.serverUrl} />
       <TextInput
-        label={$t('Stream Key')}
+        label={$t('TikTok Stream Key')}
         required
         {...bind.streamKey}
         extra={<a onClick={openStreamPage}>{$t('Locate my Stream Key')}</a>}

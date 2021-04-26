@@ -56,6 +56,7 @@ const fallbackDictionary = {
   ...require('./en-US/widget-viewer-count.json'),
   ...require('./en-US/widgets.json'),
   ...require('./en-US/youtube.json'),
+  ...require('./en-US/tiktok.json'),
 };
 
 export default fallbackDictionary;

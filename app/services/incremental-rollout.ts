@@ -1,6 +1,6 @@
 import { Inject } from 'services/core/injector';
 import { authorizedHeaders, jfetch } from 'util/requests';
-import { mutation, StatefulService } from 'services/core/stateful-service';
+import { mutation, StatefulService, ViewHandler } from 'services/core/stateful-service';
 import { UserService } from 'services/user';
 import { HostsService } from './hosts';
 import Utils from 'services/utils';
@@ -14,6 +14,7 @@ export enum EAvailableFeatures {
   twitter = 'slobs--twitter',
   restream = 'slobs--restream',
   reactGoLive = 'slobs--react-golive',
+  tiktok = 'slobs--tiktok',
 }
 
 interface IIncrementalRolloutServiceState {
@@ -34,19 +35,13 @@ export class IncrementalRolloutService extends StatefulService<IIncrementalRollo
     this.userService.userLogout.subscribe(() => this.resetAvailableFeatures());
   }
 
+  get views() {
+    return new IncrementalRolloutView(this.state);
+  }
+
   @mutation()
   private SET_AVAILABLE_FEATURES(features: string[]) {
     this.state.availableFeatures = features;
-  }
-
-  get availableFeatures() {
-    return this.state.availableFeatures || [];
-  }
-
-  featureIsEnabled(feature: EAvailableFeatures): boolean {
-    if (Utils.isDevMode()) return true; // always show for dev mode
-
-    return this.availableFeatures.indexOf(feature) > -1;
   }
 
   fetchAvailableFeatures() {
@@ -64,5 +59,17 @@ export class IncrementalRolloutService extends StatefulService<IIncrementalRollo
 
   resetAvailableFeatures() {
     this.SET_AVAILABLE_FEATURES([]);
+  }
+}
+
+class IncrementalRolloutView extends ViewHandler<IIncrementalRolloutServiceState> {
+  get availableFeatures() {
+    return this.state.availableFeatures || [];
+  }
+
+  featureIsEnabled(feature: EAvailableFeatures): boolean {
+    if (Utils.isDevMode()) return true; // always show for dev mode
+
+    return this.availableFeatures.indexOf(feature) > -1;
   }
 }
