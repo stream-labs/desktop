@@ -2,18 +2,18 @@ import { useGoLiveSettings } from '../useGoLiveSettings';
 import React from 'react';
 import { createBinding, TextInput } from '../../../shared/inputs';
 import Form from '../../../shared/inputs/Form';
-import InputWrapper from '../../../shared/inputs/InputWrapper';
 import electron from 'electron';
 import { $t } from '../../../../services/i18n';
 import { Services } from '../../../service-provider';
 
 export function TiktokEditStreamInfo() {
-  const { updatePlatform, ttSettings } = useGoLiveSettings(state => ({
+  const { updatePlatform, ttSettings, getSettings } = useGoLiveSettings(state => ({
     ttSettings: state.platforms.tiktok,
   }));
 
-  const bind = createBinding(ttSettings, updatedSettings =>
-    updatePlatform('tiktok', updatedSettings),
+  const bind = createBinding(
+    () => getSettings().platforms.tiktok,
+    updatedSettings => updatePlatform('tiktok', updatedSettings),
   );
 
   return (

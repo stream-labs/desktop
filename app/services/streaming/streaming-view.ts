@@ -1,12 +1,12 @@
-import {ViewHandler} from '../core';
-import {IGoLiveSettings, IStreamingServiceState, IStreamSettings} from './streaming-api';
-import {StreamSettingsService} from '../settings/streaming';
-import {UserService} from '../user';
-import {RestreamService} from '../restream';
-import {getPlatformService, TPlatform, TPlatformCapability} from '../platforms';
-import {cloneDeep, difference} from 'lodash';
-import {IncrementalRolloutService, TwitterService} from '../../app-services';
-import {EAvailableFeatures} from "../incremental-rollout";
+import { ViewHandler } from '../core';
+import { IGoLiveSettings, IStreamingServiceState, IStreamSettings } from './streaming-api';
+import { StreamSettingsService } from '../settings/streaming';
+import { UserService } from '../user';
+import { RestreamService } from '../restream';
+import { getPlatformService, TPlatform, TPlatformCapability } from '../platforms';
+import { cloneDeep, difference } from 'lodash';
+import { IncrementalRolloutService, TwitterService } from '../../app-services';
+import { EAvailableFeatures } from '../incremental-rollout';
 
 /**
  * The stream info view is responsible for keeping
