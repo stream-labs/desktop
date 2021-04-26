@@ -243,7 +243,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
     if (this.facemaskFilter) {
       try {
         this.facemaskFilter.update(settings);
-      } catch (e) {
+      } catch (e: unknown) {
         this.facemaskFilter = null;
         this.setupFilter();
       }
@@ -494,7 +494,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
           const maskData = JSON.parse(data);
           this.ADD_MODTIME(uuid, maskData.modtime, maskData.is_intro);
           resolve();
-        } catch (parseError) {
+        } catch (parseError: unknown) {
           fs.unlinkSync(maskPath);
           reject(parseError);
         }
@@ -562,7 +562,7 @@ export class FacemasksService extends PersistentStatefulService<Interfaces.IFace
             this.downloadProgress[uuid] = 1;
             this.updateDownloadProgress();
             resolve(data.modtime);
-          } catch (err) {
+          } catch (err: unknown) {
             reject(err);
           }
         });

@@ -211,7 +211,7 @@ export default class Main extends Vue {
     while (fi--) files.push(fileList.item(fi).path);
 
     const isDirectory = await this.isDirectory(files[0]).catch(err => {
-      console.error(err);
+      console.error('Error checking if drop is directory', err);
       return false;
     });
 

@@ -156,7 +156,8 @@ type TBroadcastLifecycleStatus =
   | 'testing';
 
 @InheritMutations()
-export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
+export class YoutubeService
+  extends BasePlatformService<IYoutubeServiceState>
   implements IPlatformService {
   @Inject() private customizationService: CustomizationService;
   @Inject() private streamSettingsService: StreamSettingsService;
@@ -238,8 +239,8 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   ): Promise<T> {
     try {
       return await platformAuthorizedRequest<T>('youtube', reqInfo);
-    } catch (e) {
-      let details = e.result?.error?.message;
+    } catch (e: unknown) {
+      let details = (e as any).result?.error?.message;
       if (!details) details = 'connection failed';
 
       // if the rate limit exceeded then repeat request after 3s delay
@@ -252,7 +253,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
         details === 'The user is not enabled for live streaming.'
           ? 'YOUTUBE_STREAMING_DISABLED'
           : 'PLATFORM_REQUEST_FAILED';
-      throw throwStreamError(errorType, e, details);
+      throw throwStreamError(errorType, e as any, details);
     }
   }
 
@@ -319,12 +320,12 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       await platformAuthorizedRequest('youtube', url);
       this.SET_ENABLED_STATUS(true);
       return EPlatformCallResult.Success;
-    } catch (resp) {
-      if (resp.status !== 403) {
+    } catch (resp: unknown) {
+      if ((resp as any).status !== 403) {
         console.error('Got 403 checking if YT is enabled for live streaming', resp);
         return EPlatformCallResult.Error;
       }
-      const json = resp.result;
+      const json = (resp as any).result;
       if (
         json.error &&
         json.error.errors &&
@@ -385,9 +386,13 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     description: string,
     categoryId: string,
   ) {
+    const video = await this.fetchVideo(broadcastId);
     const endpoint = 'videos?part=snippet';
     await this.requestYoutube({
-      body: JSON.stringify({ id: broadcastId, snippet: { categoryId, title, description } }),
+      body: JSON.stringify({
+        id: broadcastId,
+        snippet: { ...video.snippet, categoryId, title, description },
+      }),
       method: 'PUT',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
     });
@@ -726,12 +731,12 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
         `https://www.googleapis.com/upload/youtube/v3/thumbnails/set?videoId=${videoId}`,
         { method: 'POST', body, headers: { Authorization: `Bearer ${this.oauthToken}` } },
       );
-    } catch (e) {
-      const error = await e.json();
+    } catch (e: unknown) {
+      const error = await (e as any).json();
       let details = error.result?.error?.message;
       if (!details) details = 'connection failed';
       const errorType = 'YOUTUBE_THUMBNAIL_UPLOAD_FAILED';
-      throw throwStreamError(errorType, e, details);
+      throw throwStreamError(errorType, e as any, details);
     }
   }
 

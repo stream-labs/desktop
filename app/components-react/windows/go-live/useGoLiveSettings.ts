@@ -109,7 +109,7 @@ function initializeGoLiveSettings(
     renderPlatformSettings(
       commonFields: JSX.Element,
       requiredFields: JSX.Element,
-      optionalFields: JSX.Element,
+      optionalFields?: JSX.Element,
       essentialOptionalFields?: JSX.Element,
     ) {
       let settingsMode: 'singlePlatform' | 'multiplatformAdvanced' | 'multiplatformSimple';
@@ -251,7 +251,7 @@ function initializeGoLiveSettings(
       try {
         await form.validateFields();
         return true;
-      } catch (e) {
+      } catch (e: unknown) {
         message.error($t('Invalid settings. Please check the form'));
         return false;
       }

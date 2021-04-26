@@ -9,7 +9,7 @@ type TShortcutHandler = () => void;
 
 // Only works on singletons
 export function shortcut(key: string) {
-  return function(target: any, methodName: string, descriptor: PropertyDescriptor) {
+  return function (target: any, methodName: string, descriptor: PropertyDescriptor) {
     const shortcutsService: ShortcutsService = ShortcutsService.instance;
 
     shortcutsService.registerShortcut(key, () => target.constructor.instance[methodName]());
@@ -45,13 +45,7 @@ export class ShortcutsService extends Service {
     // We only register shortcuts in the main window for now
     if (Utils.isChildWindow()) return;
 
-    this.shortcuts.set(
-      key
-        .split(' ')
-        .join('')
-        .toUpperCase(),
-      handler,
-    );
+    this.shortcuts.set(key.split(' ').join('').toUpperCase(), handler);
   }
 
   private static getShortcutName(event: KeyboardEvent): string {

@@ -44,7 +44,7 @@ export default function NameFolder() {
   async function submit() {
     try {
       await form.validateFields();
-    } catch (e) {
+    } catch (e: unknown) {
       return;
     }
 

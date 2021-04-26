@@ -17,9 +17,9 @@ export class MagicLinkService extends Service {
   async getDashboardMagicLink(subPage = '', source?: string) {
     const token = (await this.fetchNewToken()).login_token;
     const sourceString = source ? `&refl=${source}` : '';
-    return `https://${
-      this.hostsService.streamlabs
-    }/slobs/magic/dashboard?login_token=${token}&r=${subPage ?? ''}${sourceString}`;
+    return `https://${this.hostsService.streamlabs}/slobs/magic/dashboard?login_token=${token}&r=${
+      subPage ?? ''
+    }${sourceString}`;
   }
 
   private fetchNewToken(): Promise<ILoginTokenResponse> {
@@ -36,7 +36,7 @@ export class MagicLinkService extends Service {
     try {
       const link = await this.getDashboardMagicLink('widgetthemes');
       electron.remote.shell.openExternal(link);
-    } catch (e) {
+    } catch (e: unknown) {
       console.error('Error generating dashboard magic link', e);
     }
   }

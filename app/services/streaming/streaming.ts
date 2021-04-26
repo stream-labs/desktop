@@ -70,7 +70,8 @@ interface IOBSOutputSignalInfo {
   error: string;
 }
 
-export class StreamingService extends StatefulService<IStreamingServiceState>
+export class StreamingService
+  extends StatefulService<IStreamingServiceState>
   implements IStreamingServiceApi {
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private outputSettingsService: OutputSettingsService;
@@ -198,13 +199,19 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
         try {
           await service.prepopulateInfo();
-        } catch (e) {
+        } catch (e: unknown) {
           // cast all PLATFORM_REQUEST_FAILED errors to PREPOPULATE_FAILED
-          e.type =
-            (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
-              ? 'PREPOPULATE_FAILED'
-              : e.type || 'UNKNOWN_ERROR';
-          this.setError(e);
+          if (e instanceof StreamError) {
+            e.type =
+              (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
+                ? 'PREPOPULATE_FAILED'
+                : e.type || 'UNKNOWN_ERROR';
+
+            this.setError(e, platform);
+          } else {
+            this.setError('PREPOPULATE_FAILED', platform);
+          }
+
           this.UPDATE_STREAM_INFO({ lifecycle: 'empty' });
           return;
         }
@@ -216,9 +223,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       if (this.twitterService.state.linked && this.twitterService.state.tweetWhenGoingLive) {
         await this.twitterService.getTwitterStatus();
       }
-    } catch (e) {
+    } catch (e: unknown) {
       // do not block streaming if something is wrong on the Twitter side
-      console.error(e);
+      console.error('Error fetching Twitter status', e);
     }
 
     // successfully prepopulated
@@ -266,14 +273,18 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         // don't update settings for twitch in unattendedMode
         const settingsForPlatform = platform === 'twitch' && unattendedMode ? undefined : settings;
         await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform));
-      } catch (e) {
-        console.error(e);
+      } catch (e: unknown) {
+        console.error('Error running beforeGoLive for plarform', e);
         // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
-        e.type =
-          (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
-            ? 'SETTINGS_UPDATE_FAILED'
-            : e.type || 'UNKNOWN_ERROR';
-        this.setError(e);
+        if (e instanceof StreamError) {
+          e.type =
+            (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
+              ? 'SETTINGS_UPDATE_FAILED'
+              : e.type || 'UNKNOWN_ERROR';
+          this.setError(e, platform);
+        } else {
+          this.setError('SETTINGS_UPDATE_FAILED', platform);
+        }
         return;
       }
     }
@@ -287,7 +298,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           'setupMultistream',
           async () => (ready = await this.restreamService.checkStatus()),
         );
-      } catch (e) {
+      } catch (e: unknown) {
         console.error('Error fetching restreaming service', e);
       }
       // Assume restream is down
@@ -303,7 +314,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
           await this.restreamService.beforeGoLive();
         });
-      } catch (e) {
+      } catch (e: unknown) {
         console.error('Failed to setup restream', e);
         this.setError('RESTREAM_SETUP_FAILED');
         return;
@@ -324,7 +335,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     // start video transmission
     try {
       await this.runCheck('startVideoTransmission', () => this.finishStartStreaming());
-    } catch (e) {
+    } catch (e: unknown) {
       return;
     }
 
@@ -338,8 +349,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       this.views.enabledPlatforms.forEach(platform => {
         getPlatformService(platform).afterGoLive();
       });
-    } catch (e) {
-      console.error(e);
+    } catch (e: unknown) {
+      console.error('Error running afterGoLive for platform', e);
     }
 
     // tweet
@@ -350,9 +361,13 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     ) {
       try {
         await this.runCheck('postTweet', () => this.twitterService.postTweet(settings.tweetText!));
-      } catch (e) {
+      } catch (e: unknown) {
         console.error('unable to post a tweet', e);
-        this.setError(e);
+        if (e instanceof StreamError) {
+          this.setError(e);
+        } else {
+          this.setError('TWEET_FAILED');
+        }
         return;
       }
     }
@@ -416,14 +431,18 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       const newSettings = settings.platforms[platform];
       try {
         await this.runCheck(platform, () => service.putChannelInfo(newSettings));
-      } catch (e) {
-        console.error(e);
+      } catch (e: unknown) {
+        console.error('Error running putChannelInfo for platform', e);
         // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
-        e.type =
-          (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
-            ? 'SETTINGS_UPDATE_FAILED'
-            : e.type || 'UNKNOWN_ERROR';
-        this.setError(e);
+        if (e instanceof StreamError) {
+          e.type =
+            (e.type as TStreamErrorType) === 'PLATFORM_REQUEST_FAILED'
+              ? 'SETTINGS_UPDATE_FAILED'
+              : e.type || 'UNKNOWN_ERROR';
+          this.setError(e, platform);
+        } else {
+          this.setError('SETTINGS_UPDATE_FAILED', platform);
+        }
         return false;
       }
     }
@@ -461,7 +480,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     try {
       if (cb) await cb();
       this.SET_CHECKLIST_ITEM(checkName, 'done');
-    } catch (e) {
+    } catch (e: unknown) {
       this.SET_CHECKLIST_ITEM(checkName, 'failed');
       throw e;
     }
@@ -475,19 +494,21 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   /**
    * Set the error state for the GoLive window
    */
-  private setError(errorTypeOrError?: TStreamErrorType | StreamError) {
+  private setError(errorTypeOrError?: TStreamErrorType | StreamError, platform?: TPlatform) {
     if (typeof errorTypeOrError === 'object') {
       // an error object has been passed as a first arg
+      if (platform) errorTypeOrError.platform = platform;
       this.SET_ERROR(errorTypeOrError);
     } else {
       // an error type has been passed as a first arg
       const errorType = errorTypeOrError as TStreamErrorType;
       const error = createStreamError(errorType);
+      if (platform) error.platform = platform;
       this.SET_ERROR(error);
     }
     const error = this.state.info.error;
     assertIsDefined(error);
-    console.error(error.message, error);
+    console.error(`Streaming Error: ${error.message}`, error);
   }
 
   resetInfo() {
@@ -622,7 +643,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       try {
         await this.goLive();
         return Promise.resolve();
-      } catch (e) {
+      } catch (e: unknown) {
         return Promise.reject(e);
       }
     }
@@ -871,7 +892,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         try {
           streamEncoderInfo = this.outputSettingsService.getSettings();
           game = this.views.commonFields.game;
-        } catch (e) {
+        } catch (e: unknown) {
           console.error('Error fetching stream encoder info: ', e);
         }
 

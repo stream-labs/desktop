@@ -191,7 +191,6 @@ export default function FacebookEditStreamInfo() {
               <ListInput
                 {...bind.pageId}
                 label={$t('Facebook Page')}
-                onChange={val => console.log(val)}
                 hasImage
                 imageSize={{ width: 44, height: 44 }}
                 onDropdownVisibleChange={shown => shown && loadPictures('page')}
@@ -254,6 +253,7 @@ export default function FacebookEditStreamInfo() {
 
         {shouldShowPrivacy && (
           <ListInput
+            label={$t('Privacy')}
             value={fbSettings.privacy?.value}
             onChange={setPrivacy}
             hasImage={true}

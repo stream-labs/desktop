@@ -62,7 +62,7 @@ function getActionProxy<T extends Service>(
           try {
             const result: unknown = (target[key] as Function).apply(target, args);
             isReturn ? resolve(result) : resolve(undefined);
-          } catch (e) {
+          } catch (e: unknown) {
             reject(e);
           }
         });
