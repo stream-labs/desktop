@@ -525,12 +525,9 @@ export class FacebookService
       this.state.facebookPages.find(p => p.id === this.state.settings.pageId);
 
     // determine the chat url
-    if (page && page.category === 'Gaming Video Creator') {
-      // GVC pages have a specific chat url
+    if (page) {
+      // pages have a specific chat url
       return `https://www.facebook.com/live/producer/dashboard/${this.state.videoId}/COMMENTS/`;
-    } else if (page && this.state.settings.game) {
-      // if it's not a GVC page but the game is selected then use a legacy chatUrl
-      return 'https://www.facebook.com/gaming/streamer/chat/';
     } else {
       // in other cases we can use only read-only chat
       const token = this.views.getDestinationToken(
