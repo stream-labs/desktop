@@ -74,6 +74,7 @@ export default function GameSelector(p: TProps) {
       imageSize={TwitchService.gameImageSize}
       loading={isSearching}
       notFoundContent={isSearching ? $t('Searching...') : $t('No matching game(s) found.')}
+      allowClear
     />
   );
 }
