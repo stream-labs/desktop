@@ -24,7 +24,7 @@ export function TwitchEditStreamInfo() {
         <div key="required">
           <TwitchTagsInput label={$t('Twitch Tags')} {...bind.tags} />
           <GameSelector platform={'twitch'} {...bind.game} />
-        </div>
+        </div>,
       )}
     </Form>
   );
