@@ -22,7 +22,7 @@ export function TwitchEditStreamInfo() {
       {renderPlatformSettings(
         <CommonPlatformFields key="common" platform="twitch" />,
         <div key="required">
-          <TwitchTagsInput label={$t('Twitch Tags')} {...bind.tags} />,
+          <TwitchTagsInput label={$t('Twitch Tags')} {...bind.tags} />
           <GameSelector platform={'twitch'} {...bind.game} />
         </div>,
       )}
