@@ -7,7 +7,7 @@ import { TSocketEvent, WebsocketService } from 'services/websocket';
 import { AppService } from 'services/app';
 import { InitAfter } from '../core';
 import { BehaviorSubject } from 'rxjs';
-import {getPlatformService} from "../platforms";
+import { getPlatformService } from '../platforms';
 
 interface IStreamlabelActiveSubscriptions {
   filename: string;
@@ -209,7 +209,6 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
   }
 
   async init() {
-
     this.initSocketConnection();
     this.initTrainClockInterval();
 

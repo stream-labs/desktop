@@ -1,11 +1,11 @@
 import { Inject, mutation, StatefulService } from 'services/core';
-import {EPlatformCallResult, IPlatformState, TPlatform, TStartStreamOptions} from './index';
+import { EPlatformCallResult, IPlatformState, TPlatform, TStartStreamOptions } from './index';
 import { StreamingService } from 'services/streaming';
 import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
 import electron from 'electron';
 import { IFacebookStartStreamOptions } from './facebook';
-import {StreamSettingsService} from "../settings/streaming";
+import { StreamSettingsService } from '../settings/streaming';
 
 const VIEWER_COUNT_UPDATE_INTERVAL = 60 * 1000;
 

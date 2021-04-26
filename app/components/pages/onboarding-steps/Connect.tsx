@@ -13,7 +13,7 @@ import ListInput from 'components/shared/inputs/ListInput.vue';
 import ExtraPlatformConnect, { TExtraPlatform } from './ExtraPlatformConnect';
 import { IListOption } from '../../shared/inputs';
 import { UsageStatisticsService } from 'services/usage-statistics';
-import {StreamingService} from "../../../services/streaming";
+import { StreamingService } from '../../../services/streaming';
 
 class ConnectProps {
   continue: () => void = () => {};

@@ -1,11 +1,11 @@
 import { ITwitchStartStreamOptions, TwitchService } from './twitch';
 import { IYoutubeStartStreamOptions, YoutubeService } from './youtube';
 import { FacebookService, IFacebookStartStreamOptions } from './facebook';
-import {ITiktokStartStreamOptions, TiktokService} from './tiktok';
+import { ITiktokStartStreamOptions, TiktokService } from './tiktok';
 import { TTwitchTag } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
 import { IGoLiveSettings } from 'services/streaming';
-import {WidgetType} from "../widgets";
+import { WidgetType } from '../widgets';
 
 export type Tag = TTwitchTag;
 export interface IGame {
