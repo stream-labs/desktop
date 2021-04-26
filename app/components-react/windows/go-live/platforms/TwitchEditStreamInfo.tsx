@@ -8,20 +8,23 @@ import GameSelector from '../GameSelector';
 import Form from '../../../shared/inputs/Form';
 
 export function TwitchEditStreamInfo() {
-  const { updatePlatform, twSettings, renderPlatformSettings } = useGoLiveSettings(state => ({
+  const { updatePlatform, renderPlatformSettings, getSettings } = useGoLiveSettings(state => ({
     twSettings: state.platforms.twitch,
   }));
 
-  const bind = createBinding(twSettings, updatedSettings =>
-    updatePlatform('twitch', updatedSettings),
+  const bind = createBinding(
+    () => getSettings().platforms.twitch,
+    updatedSettings => updatePlatform('twitch', updatedSettings),
   );
 
   return (
     <Form name="twitch-settings">
       {renderPlatformSettings(
         <CommonPlatformFields key="common" platform="twitch" />,
-        <TwitchTagsInput key="required" label={$t('Twitch Tags')} {...bind.tags} />,
-        <GameSelector key="optional" platform={'twitch'} {...bind.game} />,
+        <div key="required">
+          <TwitchTagsInput label={$t('Twitch Tags')} {...bind.tags} />,
+          <GameSelector platform={'twitch'} {...bind.game} />
+        </div>,
       )}
     </Form>
   );
