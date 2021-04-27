@@ -25,6 +25,7 @@
   "Configure Default Devices": "Configure Default Devices",
   "OBS Import": "OBS Import",
   "Confirm stream title and game before going live": "A stream címének és a játék megerősítése élő adás kezdése előtt",
+  "Enable reporting additional information on a crash (requires restart)": "Enable reporting additional information on a crash (requires restart)",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "FIGYELEM! Az összes jelenet, forrás és beállítás elveszik. Nem visszavonható!",
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "A gyorsítótár könyvtár sikeresen feltöltődött. A %{file} fájlnevet másolták a vágólapra.",
   "Stream Labels session has been successfully restarted!": "Stream Labels session has been successfully restarted!",
