@@ -13,7 +13,7 @@
           class="row"
           v-for="item of items"
           :key="item.seqId"
-          :is="componentMap[item.type]"
+          :is="componentMap[item.component]"
           :chat="item"
           :getFormattedLiveTime="getFormattedLiveTime"
           :commentMenuOpened="commentMenuTarget === item"

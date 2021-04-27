@@ -1,7 +1,11 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
-import { NicoliveCommentViewerService, WrappedChat } from 'services/nicolive-program/nicolive-comment-viewer';
+import {
+  NicoliveCommentViewerService,
+  WrappedChat,
+  WrappedChatWithComponent,
+} from 'services/nicolive-program/nicolive-comment-viewer';
 import CommentForm from './CommentForm.vue';
 import CommentFilter from './CommentFilter.vue';
 import CommentSettings from './CommentSettings.vue';
@@ -9,27 +13,22 @@ import { NicoliveCommentLocalFilterService } from 'services/nicolive-program/nic
 import { ChatMessage } from 'services/nicolive-program/MessageServerClient';
 import { Menu } from 'util/menus/Menu';
 import { clipboard } from 'electron';
-import { NicoliveCommentFilterService, getContentWithFilter } from 'services/nicolive-program/nicolive-comment-filter';
+import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
+import { getContentWithFilter } from 'services/nicolive-program/getContentWithFilter';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
-import { ChatMessageType } from 'services/nicolive-program/ChatMessage/classifier';
 import CommonComment from './comment/CommonComment.vue';
 import SystemMessage from './comment/SystemMessage.vue';
 import GiftComment from './comment/GiftComment.vue';
 import NicoadComment from './comment/NicoadComment.vue';
 import EmotionComment from './comment/EmotionComment.vue';
+import { ChatComponentType } from 'services/nicolive-program/ChatMessage/ChatComponentType';
 
-const componentMap: { [type in ChatMessageType]: Vue.Component } = {
-  normal: CommonComment,
-  operator: CommonComment,
+const componentMap: { [type in ChatComponentType]: Vue.Component } = {
+  common: CommonComment,
   nicoad: NicoadComment,
   gift: GiftComment,
   emotion: EmotionComment,
   system: SystemMessage,
-  info: SystemMessage,
-  unknown: SystemMessage,
-  'n-air-emulated': SystemMessage,
-  // コンポーネントに届く前にフィルタされて表示されないが念のため対応させておく
-  invisible: SystemMessage,
 };
 
 @Component({
@@ -40,6 +39,7 @@ const componentMap: { [type in ChatMessageType]: Vue.Component } = {
     CommonComment,
     NicoadComment,
     GiftComment,
+    EmotionComment,
     SystemMessage,
   }
 })
@@ -84,7 +84,7 @@ export default class CommentViewer extends Vue {
     scrollEl.scrollTop = scrollEl.scrollHeight;
   }
 
-  pin(item: WrappedChat | null): void {
+  pin(item: WrappedChatWithComponent | null): void {
     if (!item || item.type === 'normal') {
       this.nicoliveCommentViewerService.pinComment(item);
     }
@@ -124,8 +124,8 @@ export default class CommentViewer extends Vue {
     };
   }
 
-  commentMenuTarget: WrappedChat | null = null;
-  showCommentMenu(item: WrappedChat) {
+  commentMenuTarget: WrappedChatWithComponent | null = null;
+  showCommentMenu(item: WrappedChatWithComponent) {
     if (!(item.type === 'normal' || item.type === 'operator')) {
       return;
     }

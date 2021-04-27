@@ -3,6 +3,8 @@ import { Inject } from 'util/injector';
 import { NicoliveProgramStateService } from './state';
 import { ParaphraseDictionary } from './ParaphraseDictionary';
 import { WrappedChat } from './nicolive-comment-viewer';
+import { getDisplayText } from './ChatMessage/displaytext';
+import { AddComponent } from './ChatMessage/ChatComponentType';
 
 export type Speech = {
   text: string;
@@ -144,12 +146,13 @@ export class NicoliveCommentSynthesizer {
     if (!chat.value || !chat.value.content) {
       return '';
     }
+    const text = getDisplayText(AddComponent(chat));
 
-    const converted = this.dictionary.process(chat.value.content);
-    if (converted === chat.value.content) {
-      console.log(`makeSpeech: ${chat.value.content}`);
+    const converted = this.dictionary.process(text);
+    if (converted === text) {
+      console.log(`makeSpeech: ${text}`);
     } else {
-      console.log(`makeSpeech: ${chat.value.content} -> ${converted}`);
+      console.log(`makeSpeech: ${text} -> ${converted}`);
     }
 
     return converted;

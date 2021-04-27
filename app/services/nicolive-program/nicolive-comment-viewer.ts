@@ -25,6 +25,7 @@ import { ChatMessageType, classify } from './ChatMessage/classifier';
 import { isOperatorCommand } from './ChatMessage/util';
 import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
 import { NicoliveCommentSynthesizerService } from './nicolive-comment-synthesizer';
+import { AddComponent, ChatComponentType } from './ChatMessage/ChatComponentType';
 
 export type WrappedChat = {
   type: ChatMessageType;
@@ -33,6 +34,8 @@ export type WrappedChat = {
   /** NG追加したときに手元でフィルタをかけた結果 */
   filtered?: boolean;
 };
+
+export type WrappedChatWithComponent = WrappedChat & { component: ChatComponentType };
 
 function makeEmulatedChat(
   content: string,
@@ -49,13 +52,13 @@ function makeEmulatedChat(
 
 interface INicoliveCommentViewerState {
   /** 表示対象のコメント */
-  messages: WrappedChat[];
+  messages: WrappedChatWithComponent[];
   /**
    * 直前の更新で表示対象から押し出されたコメント
    * ローカルフィルターとスクロール位置維持のために実体を持っている
    */
-  popoutMessages: WrappedChat[];
-  pinnedMessage: WrappedChat | null;
+  popoutMessages: WrappedChatWithComponent[];
+  pinnedMessage: WrappedChatWithComponent | null;
   speakingSeqId: number | null;
 }
 
@@ -153,7 +156,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
               return group$
                 .pipe(
                   filter(isChatMessage),
-                  map(({ chat }) => ({
+                  map(({ chat }) => AddComponent({
                     type: classify(chat),
                     value: chat,
                   })),
@@ -218,7 +221,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
     }
   }
 
-  private onMessage(values: WrappedChat[]) {
+  private onMessage(values: WrappedChatWithComponent[]) {
     const maxQueueToSpeak = 3; // 直近3件つづ読み上げ対象にする...?
     // TODO 開いたときは直近1分ぐらい読みたいが、コメントリロードボタンでは1秒ぐらいにしたい
     const recentSeconds = 60;
@@ -253,7 +256,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
     this.SET_STATE({ messages: [], popoutMessages: [] });
   }
 
-  pinComment(pinnedMessage: WrappedChat | null) {
+  pinComment(pinnedMessage: WrappedChatWithComponent | null) {
     this.SET_STATE({ pinnedMessage });
   }
 
