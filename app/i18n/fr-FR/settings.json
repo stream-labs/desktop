@@ -25,6 +25,7 @@
   "Configure Default Devices": "Configurer des dispositifs par défaut",
   "OBS Import": "Importation OBS",
   "Confirm stream title and game before going live": "Confirmer le titre du stream et le jeu avant de lancer la diffusion en direct",
+  "Enable reporting additional information on a crash (requires restart)": "Enable reporting additional information on a crash (requires restart)",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "ATTENTION! Vous allez perdre toutes vos scènes, sources et paramètres. Cette action est irréversible.",
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Votre répertoire cache a été transféré. Le nom du fichier %{file} a été copié dans votre presse-papiers.",
   "Stream Labels session has been successfully restarted!": "Stream Labels session has been successfully restarted!",
