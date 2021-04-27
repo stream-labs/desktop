@@ -25,6 +25,7 @@
   "Configure Default Devices": "Configure Default Devices",
   "OBS Import": "OBS Import",
   "Confirm stream title and game before going live": "Confirm stream title and game before going live",
+  "Enable reporting additional information on a crash (requires restart)": "Enable reporting additional information on a crash (requires restart)",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!",
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.",
   "Stream Labels session has been successfully restarted!": "Stream Labels session has been successfully restarted!",
