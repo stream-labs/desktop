@@ -3,7 +3,7 @@ import ExclamationCircleOutlined from '@ant-design/icons';
 
 // TODO: add more types
 
-export default function Message(p: { type: 'warning' & HTMLAttributes<unknown> }) {
+export default function Message(p: { type: 'warning' } & HTMLAttributes<unknown>) {
   const type = p.type;
   const classProp = `ant-message-custom-content ant-message-${type}`;
   return (

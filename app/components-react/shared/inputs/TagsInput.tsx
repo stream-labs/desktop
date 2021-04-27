@@ -7,7 +7,7 @@ import { ICustomListProps, IListOption, renderOption } from './ListInput';
 import { TagProps } from 'antd/lib/tag';
 import { keyBy } from 'lodash';
 import { $t } from '../../../services/i18n';
-import Message from "../Message";
+import Message from '../Message';
 
 // select which features from the antd lib we are going to use
 const ANT_SELECT_FEATURES = ['showSearch', 'loading'] as const;
@@ -44,7 +44,11 @@ export const TagsInput = InputComponent(<T extends any[]>(p: TTagsInputProps<T>)
     const maxTagsReached = p.max && inputAttrs.value?.length >= p.max;
     return (
       <div>
-        {maxTagsReached && <Message type="warning">{$t('You can only select up to %{max} items', { count: p.max })}</Message>}
+        {maxTagsReached && (
+          <Message type="warning">
+            {$t('You can only select up to %{max} items', { max: p.max })}
+          </Message>
+        )}
         {menu}
       </div>
     );
