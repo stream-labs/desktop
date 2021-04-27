@@ -25,6 +25,7 @@
   "Configure Default Devices": "デフォルト デバイスを構成",
   "OBS Import": "OBS インポート",
   "Confirm stream title and game before going live": "ライブ配信を開始する前に、ストリーム タイトルとゲームを確認",
+  "Enable reporting additional information on a crash (requires restart)": "Enable reporting additional information on a crash (requires restart)",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "警告！すべてのシーン、ソース、および設定が失われます。これは取り消すことはできません！",
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "キャッシュディレクトリが正常にアップロードされました。ファイル名 %{file} がクリップボードにコピーされました。",
   "Stream Labels session has been successfully restarted!": "Stream Labels session has been successfully restarted!",
