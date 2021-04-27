@@ -219,6 +219,9 @@ export class TwitchService
    */
   async requestTwitch<T = unknown>(reqInfo: IPlatformRequest | string): Promise<T> {
     try {
+      if (!this.userService.state.auth.platforms.twitch) {
+        throw new Error('Cannot request Twitch without linked Twitch account');
+      }
       return await platformAuthorizedRequest<T>('twitch', reqInfo);
     } catch (e: unknown) {
       const details = (e as any).result
