@@ -147,13 +147,7 @@ export default function GoLiveError() {
   }
 
   function renderTweetFailedError(error: IStreamError) {
-    return (
-      <MessageLayout
-        error={error}
-        message={$t('Failed to post the Tweet')}
-      >
-      </MessageLayout>
-    );
+    return <MessageLayout error={error} message={$t('Failed to post the Tweet')}></MessageLayout>;
   }
 
   function renderRestreamError(error: IStreamError) {
