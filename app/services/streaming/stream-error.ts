@@ -123,7 +123,7 @@ export class StreamError extends Error implements IRejectedRequest {
     this.platform = this.url ? getPlatform(this.url) : undefined;
 
     // TODO: remove sensitive data from YT requests
-    if (platform === 'youtube') {
+    if (this.platform === 'youtube') {
       this.url = '';
     }
 
