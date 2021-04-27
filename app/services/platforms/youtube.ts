@@ -442,7 +442,8 @@ export class YoutubeService
     assertIsDefined(broadcastId);
 
     if (this.state.settings.categoryId !== options.categoryId) {
-      await this.updateCategory(broadcastId, options.categoryId!);
+      assertIsDefined(options.categoryId);
+      await this.updateCategory(broadcastId, options.categoryId);
     }
 
     await this.updateBroadcast(broadcastId, options, true);
