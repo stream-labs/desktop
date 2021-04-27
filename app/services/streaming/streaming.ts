@@ -344,15 +344,6 @@ export class StreamingService
       this.SET_WARNING('YT_AUTO_START_IS_DISABLED');
     }
 
-    // run afterGoLive hooks
-    try {
-      this.views.enabledPlatforms.forEach(platform => {
-        getPlatformService(platform).afterGoLive();
-      });
-    } catch (e: unknown) {
-      console.error('Error running afterGoLive for platform', e);
-    }
-
     // tweet
     if (
       settings.tweetText &&
@@ -630,6 +621,16 @@ export class StreamingService
     if (replayWhenStreaming && this.state.replayBufferStatus === EReplayBufferState.Offline) {
       this.startReplayBuffer();
     }
+
+    // run afterGoLive hooks
+    try {
+      this.views.enabledPlatforms.forEach(platform => {
+        getPlatformService(platform).afterGoLive();
+      });
+    } catch (e: unknown) {
+      console.error('Error running afterGoLive for platform', e);
+    }
+
     return startStreamingPromise;
   }
 
