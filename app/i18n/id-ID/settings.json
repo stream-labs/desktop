@@ -25,6 +25,7 @@
   "Configure Default Devices": "Konfigurasi Perangkat Default",
   "OBS Import": "OBS Impor",
   "Confirm stream title and game before going live": "Konfirmasikan judul streaming dan game sebelum live",
+  "Enable reporting additional information on a crash (requires restart)": "Enable reporting additional information on a crash (requires restart)",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "PERINGATAN! Anda akan kehilangan semua scene, sumber, dan pengaturan. Hal ini tidak bisa diurungkan!",
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Direktori cache Anda berhasil di-upload. Nama file %{file} telah disalin ke clipboard Anda.",
   "Stream Labels session has been successfully restarted!": "Stream Labels session has been successfully restarted!",
