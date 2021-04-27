@@ -44,6 +44,8 @@ export default function GoLiveError() {
         return renderYoutubeStreamingDisabled(error);
       case 'MACHINE_LOCKED':
         return renderMachineLockedError(error);
+      case 'TWEET_FAILED':
+        return renderTweetFailedError(error);
       default:
         return <MessageLayout error={error} />;
     }
@@ -140,6 +142,16 @@ export default function GoLiveError() {
           <a slot="tryAgainLink" className={css.link} onClick={tryAgain} />
           <a slot="justGoLiveLink" className={css.link} onClick={skipSettingsUpdateAndGoLive} />
         </Translate>
+      </MessageLayout>
+    );
+  }
+
+  function renderTweetFailedError(error: IStreamError) {
+    return (
+      <MessageLayout
+        error={error}
+        message={$t('Failed to post the Tweet')}
+      >
       </MessageLayout>
     );
   }
