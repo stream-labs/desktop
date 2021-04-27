@@ -38,6 +38,15 @@ export const TagsInput = InputComponent(<T extends any>(p: TTagsInputProps<T>) =
     return <Tag {...tagProps}>{tag.label}</Tag>;
   }
 
+  function dropdownRender(menu: JSX.Element) {
+    return (
+      <div>
+        I am the message
+        {menu}
+      </div>
+    );
+  }
+
   return (
     <InputWrapper {...wrapperAttrs}>
       <Select
@@ -50,6 +59,7 @@ export const TagsInput = InputComponent(<T extends any>(p: TTagsInputProps<T>) =
         onChange={val => inputAttrs.onChange(val as T)}
         tagRender={renderTag}
         placeholder={$t('Start typing to search')}
+        dropdownRender={dropdownRender}
       >
         {options && options.map((opt, ind) => renderOption(opt, ind, p))}
       </Select>
