@@ -73,7 +73,7 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
     this.state.creatorSiteOnboardingComplete = false;
     this.state.creatorSiteUrl = '';
     this.state.screenName = '';
-    this.state.tweetWhenGoingLive = true;
+    this.state.tweetWhenGoingLive = false;
   }
 
   setTweetPreference(preference: boolean) {
@@ -93,7 +93,7 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
   }
 
   async unlinkTwitter() {
-    this.SET_TWEET_PREFERENCE(false);
+    this.RESET_TWITTER_STATUS();
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/twitter/unlink`;
     const headers = authorizedHeaders(this.userService.apiToken);
@@ -124,7 +124,7 @@ export class TwitterService extends PersistentStatefulService<ITwitterServiceSta
       body: JSON.stringify({ tweet }),
     });
     return jfetch(request).catch(e =>
-      throwStreamError('TWEET_FAILED', e.result?.error || $t('Could not connect to Twitter')),
+      throwStreamError('TWEET_FAILED', e, e.result?.error || $t('Could not connect to Twitter')),
     );
   }
 

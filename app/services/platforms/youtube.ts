@@ -132,6 +132,7 @@ export interface IYoutubeVideo {
     title: string;
     description: string;
     categoryId: string;
+    tags: string[];
   };
 }
 
@@ -286,12 +287,7 @@ export class YoutubeService
     }
 
     // set the category
-    await this.updateCategory(
-      broadcast.id,
-      broadcast.snippet.title,
-      broadcast.snippet.description,
-      ytSettings.categoryId!,
-    );
+    await this.updateCategory(broadcast.id, ytSettings.categoryId!);
 
     // setup key and platform type in the OBS settings
     const streamKey = stream.cdn.ingestionInfo.streamName;
@@ -381,18 +377,14 @@ export class YoutubeService
     return collection.items.filter(category => category.snippet.assignable);
   }
 
-  private async updateCategory(
-    broadcastId: string,
-    title: string,
-    description: string,
-    categoryId: string,
-  ) {
+  private async updateCategory(broadcastId: string, categoryId: string) {
     const video = await this.fetchVideo(broadcastId);
     const endpoint = 'videos?part=snippet';
+    const { title, description, tags } = video.snippet;
     await this.requestYoutube({
       body: JSON.stringify({
         id: broadcastId,
-        snippet: { ...video.snippet, categoryId, title, description },
+        snippet: { categoryId, title, description, tags },
       }),
       method: 'PUT',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
@@ -451,12 +443,8 @@ export class YoutubeService
     assertIsDefined(broadcastId);
 
     if (this.state.settings.categoryId !== options.categoryId) {
-      await this.updateCategory(
-        broadcastId,
-        options.title,
-        options.description,
-        options.categoryId!,
-      );
+      assertIsDefined(options.categoryId);
+      await this.updateCategory(broadcastId, options.categoryId);
     }
 
     await this.updateBroadcast(broadcastId, options, true);
