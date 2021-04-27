@@ -132,6 +132,7 @@ export interface IYoutubeVideo {
     title: string;
     description: string;
     categoryId: string;
+    tags: string[];
   };
 }
 
@@ -286,12 +287,7 @@ export class YoutubeService
     }
 
     // set the category
-    await this.updateCategory(
-      broadcast.id,
-      broadcast.snippet.title,
-      broadcast.snippet.description,
-      ytSettings.categoryId!,
-    );
+    await this.updateCategory(broadcast.id, ytSettings.categoryId!);
 
     // setup key and platform type in the OBS settings
     const streamKey = stream.cdn.ingestionInfo.streamName;
@@ -446,12 +442,7 @@ export class YoutubeService
     assertIsDefined(broadcastId);
 
     if (this.state.settings.categoryId !== options.categoryId) {
-      await this.updateCategory(
-        broadcastId,
-        options.title,
-        options.description,
-        options.categoryId!,
-      );
+      await this.updateCategory(broadcastId, options.categoryId!);
     }
 
     await this.updateBroadcast(broadcastId, options, true);
