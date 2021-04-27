@@ -1,7 +1,7 @@
 import { PersistentStatefulService } from 'services/persistent-stateful-service';
 import { mutation } from 'services/stateful-service';
 import { isAnonymous, getScore } from './ChatMessage/util';
-type WrappedChat = import('./nicolive-comment-viewer').WrappedChat;
+import { WrappedChat } from './WrappedChat';
 
 export type NGSharingLevel = 'none' | 'low' | 'mid' | 'high';
 

@@ -1,4 +1,4 @@
-import { ChatMessage } from '../MessageServerClient';
+import { ChatMessage } from '../ChatMessage';
 import {
   isPremium,
   isOperator,

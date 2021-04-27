@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import { WrappedChatWithComponent } from 'services/nicolive-program/nicolive-comment-viewer';
-import { ChatMessage } from 'services/nicolive-program/MessageServerClient';
+import { WrappedChatWithComponent } from 'services/nicolive-program/WrappedChat';
+import { ChatMessage } from 'services/nicolive-program/ChatMessage';
 import { getDisplayText } from 'services/nicolive-program/ChatMessage/displaytext';
 
 @Component({})

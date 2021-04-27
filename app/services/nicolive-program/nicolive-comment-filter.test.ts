@@ -1,6 +1,6 @@
 import { createSetupFunction } from 'util/test-setup';
 import { Subject } from 'rxjs';
-import { WrappedChat } from './nicolive-comment-viewer';
+import { WrappedChat } from './WrappedChat';
 type NicoliveCommentFilterService = import('./nicolive-comment-filter').NicoliveCommentFilterService;
 
 const setup = createSetupFunction({

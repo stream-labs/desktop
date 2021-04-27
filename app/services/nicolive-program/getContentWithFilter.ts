@@ -1,4 +1,4 @@
-import { WrappedChat } from './nicolive-comment-filter';
+import { WrappedChat } from './WrappedChat';
 
 export function getContentWithFilter(wrapped: WrappedChat): string {
   if (wrapped.filtered) {

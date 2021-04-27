@@ -5,7 +5,7 @@ import { Inject } from 'util/injector';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
 import { map, distinctUntilChanged } from 'rxjs/operators';
 import { NicoliveFailure } from './NicoliveFailure';
-export type WrappedChat = import('./nicolive-comment-viewer').WrappedChat;
+import { WrappedChat } from './WrappedChat';
 import { Subject } from 'rxjs';
 
 interface INicoliveCommentFilterState {

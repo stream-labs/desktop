@@ -1,23 +1,9 @@
 import { WebSocketSubject, webSocket } from 'rxjs/webSocket';
 import { Observable } from 'rxjs';
+import { ChatMessage } from './ChatMessage';
 
 export type MessageResponse = { chat: ChatMessage } | { leave_thread: LeaveThreadMessage } | { thread: ThreadMessage };
 export type Message = ChatMessage | LeaveThreadMessage | ThreadMessage;
-
-/** chatメッセージ（取得形のみ） */
-export type ChatMessage = {
-  content?: string;
-  date?: number;
-  date_usec?: number;
-  no?: number;
-  premium?: number;
-  thread?: number;
-  user_id?: string;
-  vpos?: number;
-  anonymity?: number;
-  mail?: string;
-  score?: number;
-};
 
 export function isChatMessage(msg: MessageResponse): msg is { chat: ChatMessage } {
   return msg.hasOwnProperty('chat');

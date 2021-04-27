@@ -1,5 +1,5 @@
 import { createSetupFunction } from 'util/test-setup';
-import { WrappedChat } from './nicolive-comment-viewer';
+import { WrappedChat } from './WrappedChat';
 
 type NicoliveCommentSynthesizerService = import('./nicolive-comment-synthesizer').NicoliveCommentSynthesizerService;
 

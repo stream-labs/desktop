@@ -18,24 +18,14 @@ import {
   MessageServerClient,
   MessageServerConfig,
   isChatMessage,
-  ChatMessage,
   isThreadMessage,
 } from './MessageServerClient';
-import { ChatMessageType, classify } from './ChatMessage/classifier';
+import { classify } from './ChatMessage/classifier';
 import { isOperatorCommand } from './ChatMessage/util';
 import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
 import { NicoliveCommentSynthesizerService } from './nicolive-comment-synthesizer';
-import { AddComponent, ChatComponentType } from './ChatMessage/ChatComponentType';
-
-export type WrappedChat = {
-  type: ChatMessageType;
-  value: ChatMessage;
-  seqId: number;
-  /** NG追加したときに手元でフィルタをかけた結果 */
-  filtered?: boolean;
-};
-
-export type WrappedChatWithComponent = WrappedChat & { component: ChatComponentType };
+import { AddComponent } from './ChatMessage/ChatComponentType';
+import { WrappedChat, WrappedChatWithComponent } from './WrappedChat';
 
 function makeEmulatedChat(
   content: string,

@@ -1,4 +1,4 @@
-import { ChatMessage } from '../MessageServerClient';
+import { ChatMessage } from '../ChatMessage';
 
 function checkPremiumBit(premiumBit: number | undefined, checkBit: number): boolean {
   return premiumBit !== undefined && Boolean(premiumBit & checkBit);

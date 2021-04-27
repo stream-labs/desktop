@@ -2,7 +2,7 @@ import { mutation, StatefulService } from 'services/stateful-service';
 import { Inject } from 'util/injector';
 import { NicoliveProgramStateService } from './state';
 import { ParaphraseDictionary } from './ParaphraseDictionary';
-import { WrappedChat } from './nicolive-comment-viewer';
+import { WrappedChat } from './WrappedChat';
 import { getDisplayText } from './ChatMessage/displaytext';
 import { AddComponent } from './ChatMessage/ChatComponentType';
 

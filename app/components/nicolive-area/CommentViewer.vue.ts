@@ -3,14 +3,16 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import {
   NicoliveCommentViewerService,
-  WrappedChat,
-  WrappedChatWithComponent,
 } from 'services/nicolive-program/nicolive-comment-viewer';
+import {
+  WrappedChat,
+  WrappedChatWithComponent
+} from 'services/nicolive-program/WrappedChat';
 import CommentForm from './CommentForm.vue';
 import CommentFilter from './CommentFilter.vue';
 import CommentSettings from './CommentSettings.vue';
 import { NicoliveCommentLocalFilterService } from 'services/nicolive-program/nicolive-comment-local-filter';
-import { ChatMessage } from 'services/nicolive-program/MessageServerClient';
+import { ChatMessage } from 'services/nicolive-program/ChatMessage';
 import { Menu } from 'util/menus/Menu';
 import { clipboard } from 'electron';
 import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';

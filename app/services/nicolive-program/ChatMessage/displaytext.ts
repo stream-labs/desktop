@@ -1,5 +1,5 @@
 import { getContentWithFilter } from '../getContentWithFilter';
-import { WrappedChat, WrappedChatWithComponent } from '../nicolive-comment-viewer';
+import { WrappedChat, WrappedChatWithComponent } from '../WrappedChat';
 import { ChatComponentType } from './ChatComponentType';
 import { parseCommandArgument, parseContent, parseJsonContent } from './util';
 
