@@ -121,6 +121,12 @@ export class StreamError extends Error implements IRejectedRequest {
     this.status = rejectedRequest?.status;
     this.statusText = rejectedRequest?.statusText;
     this.platform = this.url ? getPlatform(this.url) : undefined;
+
+    // TODO: remove sensitive data from YT requests
+    if (platform === 'youtube') {
+      this.url = '';
+    }
+
     // don't allow to call 'new' outside this file
     if (protector !== newCallProtector) {
       throw new Error('Use createStreamError() instead "new StreamError()"');
