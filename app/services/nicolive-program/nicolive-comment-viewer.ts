@@ -216,13 +216,6 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
     // TODO 開いたときは直近1分ぐらい読みたいが、コメントリロードボタンでは1秒ぐらいにしたい
     const recentSeconds = 60;
 
-    // TODO リロードするときは再生も中断したい
-    // TODO コメントごとに読み上げボタンを付けて任意で再生させたい
-    // TODO コメントアートを除外したい
-    // TODO 変換辞書を用意して /w+/ を ワラ, /8+/ をパチパチ とかにしたい
-    // TODO 読み上げ全体のスイッチを用意して、offにすると即座に止めたい
-    // TODO システムメッセージはon/offできるようにする(設定保存)
-
     const now = Date.now() / 1000;
     this.queueToSpeech(values.slice(-maxQueueToSpeak).filter(c => {
       if (!c.value || !c.value.date) {
