@@ -25,6 +25,7 @@
   "Configure Default Devices": "Настроить устройства по умолчанию",
   "OBS Import": "Импорт OBS",
   "Confirm stream title and game before going live": "Подтвердите название трансляции и игры, прежде чем выходить в прямой эфир",
+  "Enable reporting additional information on a crash (requires restart)": "Enable reporting additional information on a crash (requires restart)",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "ВНИМАНИЕ! Вы потеряете все сцены, источники и настройки. Это действие нельзя отменить!",
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Каталог кэша успешно загружен. В буфер обмена скопировано имя файла %{file}.",
   "Stream Labels session has been successfully restarted!": "Stream Labels session has been successfully restarted!",
