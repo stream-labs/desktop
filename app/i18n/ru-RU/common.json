@@ -130,5 +130,6 @@
   "Height": "Высота",
   "Use Custom": "Use Custom",
   "Apply": "Применить",
-  "Do not show this message again": "Do not show this message again"
+  "Do not show this message again": "Do not show this message again",
+  "You can only select up to %{max} items": "You can only select up to %{max} items"
 }
