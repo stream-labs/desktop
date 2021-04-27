@@ -25,6 +25,7 @@
   "Configure Default Devices": "Varsayılan Cihazları Yapılandır",
   "OBS Import": "OBS İçe Aktarma",
   "Confirm stream title and game before going live": "Yayın başlığını ve oyunu yayına başlamadan önce onaylayın",
+  "Enable reporting additional information on a crash (requires restart)": "Enable reporting additional information on a crash (requires restart)",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "DİKKAT! Bütün sahneleri, kaynakları ve ayarları kaybedeceksiniz. Bu işlem geri alınamaz!",
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Önbellek dizini başarıyla yüklendi. %{file} isimli dosya panonuza kopyalandı.",
   "Stream Labels session has been successfully restarted!": "Stream Labels session has been successfully restarted!",
