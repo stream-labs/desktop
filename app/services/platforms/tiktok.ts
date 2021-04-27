@@ -3,6 +3,7 @@ import { BasePlatformService } from './base-platform';
 import { IPlatformState, TPlatformCapability } from './index';
 import { IGoLiveSettings } from '../streaming';
 import { WidgetType } from '../widgets';
+import {assertIsDefined} from "../../util/properties-type-guards";
 
 export interface ITiktokStartStreamOptions {
   serverUrl: string;
@@ -43,7 +44,7 @@ export class TiktokService extends BasePlatformService<ITiktokServiceState> {
     return this.userService.views.state.auth?.platforms?.facebook?.token;
   }
 
-  async beforeGoLive(goLiveSettings?: IGoLiveSettings) {
+  async beforeGoLive(goLiveSettings: IGoLiveSettings) {
     const ttSettings = goLiveSettings.platforms.tiktok;
     if (!this.streamingService.views.isMultiplatformMode) {
       this.streamSettingsService.setSettings({
@@ -52,7 +53,7 @@ export class TiktokService extends BasePlatformService<ITiktokServiceState> {
         server: ttSettings.serverUrl,
       });
     }
-    this.UPDATE_STREAM_SETTINGS(ttSettings);
+    this.SET_STREAM_SETTINGS(ttSettings);
   }
 
   /**

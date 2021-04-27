@@ -117,7 +117,7 @@ export type TStartStreamOptions =
   | ITwitchStartStreamOptions
   | IYoutubeStartStreamOptions
   | Partial<IFacebookStartStreamOptions>
-  | ITiktokStartStreamOptions;
+  | Partial<ITiktokStartStreamOptions>;
 
 // state applicable for all platforms
 export interface IPlatformState {

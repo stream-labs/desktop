@@ -14,6 +14,7 @@ import ExtraPlatformConnect, { TExtraPlatform } from './ExtraPlatformConnect';
 import { IListOption } from '../../shared/inputs';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { StreamingService } from '../../../services/streaming';
+import { PlatformLogo } from '../../shared/ReactComponent';
 
 class ConnectProps {
   continue: () => void = () => {};
@@ -63,17 +64,6 @@ export default class Connect extends TsxComponent<ConnectProps> {
       // Currently we do not have special handling for generic errors
       this.props.continue();
     }
-  }
-
-  iconForPlatform(platform: TPlatform) {
-    if (this.loading) return 'fas fa-spinner fa-spin';
-
-    return {
-      twitch: 'fab fa-twitch',
-      youtube: 'fab fa-youtube',
-      facebook: 'fab fa-facebook',
-      tiktok: 'fab fa-tiktok',
-    }[platform];
   }
 
   get isSecurityUpgrade() {
@@ -143,7 +133,8 @@ export default class Connect extends TsxComponent<ConnectProps> {
                 disabled={this.loading}
                 onClick={() => this.authPlatform(platform)}
               >
-                <i class={this.iconForPlatform(platform)} />
+                {this.loading && <i class="fas fa-spinner fa-spin" />}
+                {!this.loading && <PlatformLogo componentProps={{ platform, size: 'medium', color: 'white' }} />}
               </button>
             ))}
           </div>

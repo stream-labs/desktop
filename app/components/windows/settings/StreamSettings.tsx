@@ -10,7 +10,6 @@ import {
 import GenericFormGroups from '../../obs/inputs/GenericFormGroups.vue';
 import { UserService } from 'services/user';
 import styles from './StreamSettings.m.less';
-import PlatformLogo from 'components/shared/PlatformLogo';
 import { RestreamService } from 'services/restream';
 import { NavigationService } from 'services/navigation';
 import { WindowsService } from 'services/windows';
@@ -23,6 +22,7 @@ import { formMetadata, metadata } from 'components/shared/inputs';
 import VFormGroup from '../../shared/inputs/VFormGroup.vue';
 import cloneDeep from 'lodash/cloneDeep';
 import namingHelpers from '../../../util/NamingHelpers';
+import { PlatformLogo } from '../../shared/ReactComponent';
 
 @Component({ components: { GenericFormGroups, PlatformLogo, BrowserView } })
 export default class StreamSettings extends TsxComponent {
@@ -229,7 +229,7 @@ export default class StreamSettings extends TsxComponent {
     return (
       <div class="section flex">
         <div class="margin-right--20" style={{ width: '50px' }}>
-          <PlatformLogo platform={platform} class={styles.platformLogo} />
+          <PlatformLogo componentProps={{ platform, size: 'medium' }} class={styles.platformLogo} />
         </div>
         <div>
           {platformName} <br />
