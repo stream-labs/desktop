@@ -380,18 +380,14 @@ export class YoutubeService
     return collection.items.filter(category => category.snippet.assignable);
   }
 
-  private async updateCategory(
-    broadcastId: string,
-    title: string,
-    description: string,
-    categoryId: string,
-  ) {
+  private async updateCategory(broadcastId: string, categoryId: string) {
     const video = await this.fetchVideo(broadcastId);
     const endpoint = 'videos?part=snippet';
+    const { title, description, tags } = video.snippet;
     await this.requestYoutube({
       body: JSON.stringify({
         id: broadcastId,
-        snippet: { ...video.snippet, categoryId, title, description },
+        snippet: { categoryId, title, description, tags },
       }),
       method: 'PUT',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
