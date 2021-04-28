@@ -70,7 +70,6 @@
     "electron-updater": "^4.2.0",
     "electron-window-state": "5.0.3",
     "extract-zip": "^1.6.7",
-    "facemask-plugin": "https://s3-us-west-2.amazonaws.com/faces-internal.streamlabs.com/facemask-plugin-deployment/facemask-plugin-0.9.1.tar.gz",
     "font-manager": "https://slobs-font-manager.s3-us-west-2.amazonaws.com/font-manager-0.0.0.tar.gz",
     "fs-extra": "^9.0.0",
     "game-overlay": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/game-overlay-v0.0.0.tar.gz",
