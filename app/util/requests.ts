@@ -147,8 +147,10 @@ export function jfetch<TResponse = unknown>(
         return (response.text() as unknown) as Promise<TResponse>;
       }
     } else if (isJson) {
+      console.log('JFETCH ERROR', request, response);
       return throwJsonError(response);
     } else {
+      console.log('JFETCH ERROR', request, response);
       throw response;
     }
   });
