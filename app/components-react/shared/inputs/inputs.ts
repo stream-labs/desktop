@@ -8,7 +8,7 @@ import uuid from 'uuid';
 import { FormItemProps } from 'antd/lib/form';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import { $t } from '../../../services/i18n';
-import { pick } from 'lodash';
+import pick from 'lodash/pick';
 
 type TInputType =
   | 'text'

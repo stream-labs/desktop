@@ -5,7 +5,7 @@ import cx from 'classnames';
 import { $t } from '../../../services/i18n';
 import css from './Twitter.m.less';
 import { SwitchInput, TextAreaInput, TextInput } from '../../shared/inputs';
-import { pick } from 'lodash';
+import pick from 'lodash/pick';
 import { Row, Col, Button } from 'antd';
 import { useGoLiveSettings } from './useGoLiveSettings';
 
