@@ -7,7 +7,6 @@ import Utils from 'services/utils';
 import { InitAfter } from './core';
 
 export enum EAvailableFeatures {
-  chatbot = 'slobs--chatbot',
   platform = 'slobs--platform',
   creatorSites = 'slobs--creator-sites',
   facebookOnboarding = 'slobs--facebook-onboarding',
