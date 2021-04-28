@@ -62,7 +62,7 @@ export default class SourcesShowcase extends Vue {
     .filter((type: string) => isNaN(Number(type)))
     .filter(type => {
       // show only supported widgets
-      const whitelist = this.primaryPlatformService.widgetsWhitelist;
+      const whitelist = this.primaryPlatformService?.widgetsWhitelist;
       if (!whitelist) return true;
       return whitelist.includes(WidgetType[type]);
     })
