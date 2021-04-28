@@ -36,8 +36,8 @@ test('Go through the onboarding and autoconfig', async t => {
   }
 
   // Don't Import from OBS
-  if (await (await t.context.app.client.$('h2=Start Fresh')).isExisting()) {
-    await (await t.context.app.client.$('h2=Start Fresh')).click();
+  if (await (await t.context.app.client.$('div=Start Fresh')).isExisting()) {
+    await (await t.context.app.client.$('div=Start Fresh')).click();
     await sleep(1000);
   }
 
@@ -95,9 +95,9 @@ test('OBS Importer', async t => {
   }
 
   // import from OBS
-  if (await (await t.context.app.client.$('h2=Import from OBS')).isExisting()) {
-    await (await t.context.app.client.$('h2=Import from OBS')).click();
-    await (await t.context.app.client.$('h2=Start')).click();
+  if (await (await t.context.app.client.$('div=Import from OBS')).isExisting()) {
+    await (await t.context.app.client.$('div=Import from OBS')).click();
+    await (await t.context.app.client.$('div=Start')).click();
     await sleep(10000);
   }
 
