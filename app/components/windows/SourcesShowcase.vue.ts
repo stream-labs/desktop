@@ -54,7 +54,9 @@ export default class SourcesShowcase extends Vue {
 
   widgetTypes = WidgetType;
   essentialWidgetTypes = new Set([this.widgetTypes.AlertBox]);
-  private primaryPlatformService = getPlatformService(this.userService.state.auth.primaryPlatform);
+  private primaryPlatformService = this.userService.state.auth
+    ? getPlatformService(this.userService.state.auth.primaryPlatform)
+    : null;
 
   iterableWidgetTypes = Object.keys(this.widgetTypes)
     .filter((type: string) => isNaN(Number(type)))
