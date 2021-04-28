@@ -800,7 +800,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   async toggleQueue() {
     try {
       this.state.queuePaused ? await this.unpauseAlertQueue() : await this.pauseAlertQueue();
-    } catch (e) {}
+    } catch (e: unknown) {}
   }
 
   openRecentEventsWindow(isMediaShare?: boolean) {

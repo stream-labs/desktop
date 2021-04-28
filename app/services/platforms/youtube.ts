@@ -154,7 +154,8 @@ type TBroadcastLifecycleStatus =
   | 'testing';
 
 @InheritMutations()
-export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
+export class YoutubeService
+  extends BasePlatformService<IYoutubeServiceState>
   implements IPlatformService {
   @Inject() private customizationService: CustomizationService;
   @Inject() private streamSettingsService: StreamSettingsService;
@@ -236,7 +237,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   ): Promise<T> {
     try {
       return await platformAuthorizedRequest<T>('youtube', reqInfo);
-    } catch (e) {
+    } catch (e: unknown) {
       let details = (e as any).result?.error?.message;
       if (!details) details = 'connection failed';
 
@@ -312,7 +313,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       await platformAuthorizedRequest('youtube', url);
       this.SET_ENABLED_STATUS(true);
       return EPlatformCallResult.Success;
-    } catch (resp) {
+    } catch (resp: unknown) {
       if ((resp as any).status !== 403) {
         console.error('Got 403 checking if YT is enabled for live streaming', resp);
         return EPlatformCallResult.Error;
@@ -715,7 +716,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
         `https://www.googleapis.com/upload/youtube/v3/thumbnails/set?videoId=${videoId}`,
         { method: 'POST', body, headers: { Authorization: `Bearer ${this.oauthToken}` } },
       );
-    } catch (e) {
+    } catch (e: unknown) {
       const error = await (e as any).json();
       let details = error.result?.error?.message;
       if (!details) details = 'connection failed';
