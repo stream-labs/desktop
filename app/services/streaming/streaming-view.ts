@@ -4,8 +4,8 @@ import { StreamSettingsService } from '../settings/streaming';
 import { UserService } from '../user';
 import { RestreamService } from '../restream';
 import { getPlatformService, TPlatform, TPlatformCapability } from '../platforms';
-import { cloneDeep, difference } from 'lodash';
-import { Services } from '../../components-react/service-provider';
+import cloneDeep from 'lodash/cloneDeep';
+import difference from 'lodash/difference';
 import { TwitterService } from '../../app-services';
 
 /**

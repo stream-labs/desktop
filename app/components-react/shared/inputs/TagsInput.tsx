@@ -5,7 +5,7 @@ import InputWrapper from './InputWrapper';
 import { SelectProps } from 'antd/lib/select';
 import { ICustomListProps, IListOption, renderOption } from './ListInput';
 import { TagProps } from 'antd/lib/tag';
-import { keyBy } from 'lodash';
+import keyBy from 'lodash/keyBy';
 import { $t } from '../../../services/i18n';
 import Message from '../Message';
 
