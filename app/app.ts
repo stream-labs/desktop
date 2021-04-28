@@ -107,7 +107,7 @@ window.addEventListener('error', e => {
 });
 
 window.addEventListener('unhandledrejection', e => {
-  sendLogMsg('error', e.reason);
+  sendLogMsg('error', 'Unhandled promise rejection', e);
 });
 
 // Remove the startup event listener that catches bundle parse errors and other
