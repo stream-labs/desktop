@@ -1,7 +1,7 @@
 import { test, TExecutionContext, useSpectron } from '../helpers/spectron';
 import { ApiClient, getClient } from '../helpers/api-client';
 import { IJsonRpcResponse } from '../../app/services/api/jsonrpc';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 useSpectron({ pauseIfFailed: true });
 

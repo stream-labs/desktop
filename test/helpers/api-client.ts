@@ -1,7 +1,7 @@
 import { IJsonRpcEvent, IJsonRpcRequest, IJsonRpcResponse } from '../../app/services/api/jsonrpc';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { first } from 'rxjs/operators';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 
 const net = require('net');
 const { spawnSync } = require('child_process');
@@ -122,7 +122,7 @@ export class ApiClient {
 
     const response = this.sendMessageSync(requestBody);
     const parsedResponse = JSON.parse(response.toString());
-    this.log(`Response Sync:`, parsedResponse);
+    this.log('Response Sync:', parsedResponse);
 
     if (parsedResponse.error) {
       throw parsedResponse.error;

@@ -1,6 +1,7 @@
 // The stress test will not be run when normally running tests.
 
-import { uniqueId, sample } from 'lodash';
+import uniqueId from 'lodash/uniqueId';
+import sample from 'lodash/sample';
 import {
   useSpectron,
   focusMain,

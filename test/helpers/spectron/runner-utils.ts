@@ -5,7 +5,7 @@
 
 import avaTest, { ExecutionContext, TestInterface } from 'ava';
 import { ITestContext, test } from './index';
-import { uniq } from 'lodash';
+import uniq from 'lodash/uniq';
 const fs = require('fs');
 const fetch = require('node-fetch');
 const request = require('request');

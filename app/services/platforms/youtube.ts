@@ -1,4 +1,4 @@
-import { mutation, InheritMutations, ViewHandler } from '../core/stateful-service';
+import { mutation, InheritMutations } from '../core/stateful-service';
 import {
   IPlatformService,
   TPlatformCapability,
@@ -7,20 +7,17 @@ import {
   IPlatformState,
 } from '.';
 import { Inject } from 'services/core/injector';
-import { authorizedHeaders, handleResponse, jfetch } from 'util/requests';
+import { authorizedHeaders, jfetch } from 'util/requests';
 import { platformAuthorizedRequest } from './utils';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { CustomizationService } from 'services/customization';
 import { IGoLiveSettings } from 'services/streaming';
 import { WindowsService } from 'services/windows';
-import { $t, I18nService } from 'services/i18n';
+import { I18nService } from 'services/i18n';
 import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import { assertIsDefined } from 'util/properties-type-guards';
 import electron from 'electron';
-import { omitBy } from 'lodash';
-import { UserService } from '../user';
-import { IFacebookStartStreamOptions, TDestinationType } from './facebook';
 import Utils from '../utils';
 
 interface IYoutubeServiceState extends IPlatformState {
@@ -157,8 +154,7 @@ type TBroadcastLifecycleStatus =
   | 'testing';
 
 @InheritMutations()
-export class YoutubeService
-  extends BasePlatformService<IYoutubeServiceState>
+export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   implements IPlatformService {
   @Inject() private customizationService: CustomizationService;
   @Inject() private streamSettingsService: StreamSettingsService;
@@ -240,7 +236,7 @@ export class YoutubeService
   ): Promise<T> {
     try {
       return await platformAuthorizedRequest<T>('youtube', reqInfo);
-    } catch (e: unknown) {
+    } catch (e) {
       let details = (e as any).result?.error?.message;
       if (!details) details = 'connection failed';
 
@@ -316,7 +312,7 @@ export class YoutubeService
       await platformAuthorizedRequest('youtube', url);
       this.SET_ENABLED_STATUS(true);
       return EPlatformCallResult.Success;
-    } catch (resp: unknown) {
+    } catch (resp) {
       if ((resp as any).status !== 403) {
         console.error('Got 403 checking if YT is enabled for live streaming', resp);
         return EPlatformCallResult.Error;
@@ -719,7 +715,7 @@ export class YoutubeService
         `https://www.googleapis.com/upload/youtube/v3/thumbnails/set?videoId=${videoId}`,
         { method: 'POST', body, headers: { Authorization: `Bearer ${this.oauthToken}` } },
       );
-    } catch (e: unknown) {
+    } catch (e) {
       const error = await (e as any).json();
       let details = error.result?.error?.message;
       if (!details) details = 'connection failed';
