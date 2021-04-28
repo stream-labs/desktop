@@ -37,7 +37,8 @@ import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService } from 'services/restream';
 import { FacebookService } from 'services/platforms/facebook';
 import Utils from 'services/utils';
-import { cloneDeep, isEqual } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import isEqual from 'lodash/isEqual';
 import { createStreamError, IStreamError, StreamError, TStreamErrorType } from './stream-error';
 import { authorizedHeaders } from 'util/requests';
 import { HostsService } from '../hosts';
@@ -345,15 +346,6 @@ export class StreamingService
       this.SET_WARNING('YT_AUTO_START_IS_DISABLED');
     }
 
-    // run afterGoLive hooks
-    try {
-      this.views.enabledPlatforms.forEach(platform => {
-        getPlatformService(platform).afterGoLive();
-      });
-    } catch (e: unknown) {
-      console.error('Error running afterGoLive for platform', e);
-    }
-
     // tweet
     if (
       settings.tweetText &&
@@ -631,6 +623,18 @@ export class StreamingService
     if (replayWhenStreaming && this.state.replayBufferStatus === EReplayBufferState.Offline) {
       this.startReplayBuffer();
     }
+
+    startStreamingPromise.then(() => {
+      // run afterGoLive hooks
+      try {
+        this.views.enabledPlatforms.forEach(platform => {
+          getPlatformService(platform).afterGoLive();
+        });
+      } catch (e: unknown) {
+        console.error('Error running afterGoLive for platform', e);
+      }
+    });
+
     return startStreamingPromise;
   }
 

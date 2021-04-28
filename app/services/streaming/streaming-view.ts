@@ -4,9 +4,10 @@ import { StreamSettingsService } from '../settings/streaming';
 import { UserService } from '../user';
 import { RestreamService } from '../restream';
 import { getPlatformService, TPlatform, TPlatformCapability } from '../platforms';
-import { cloneDeep, difference } from 'lodash';
 import { IncrementalRolloutService, TwitterService } from '../../app-services';
 import { EAvailableFeatures } from '../incremental-rollout';
+import cloneDeep from 'lodash/cloneDeep';
+import difference from 'lodash/difference';
 
 /**
  * The stream info view is responsible for keeping
