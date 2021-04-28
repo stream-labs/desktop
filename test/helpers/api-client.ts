@@ -1,7 +1,7 @@
 import { IJsonRpcEvent, IJsonRpcRequest, IJsonRpcResponse } from '../../app/services/api/jsonrpc';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { first } from 'rxjs/operators';
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash';
 
 const net = require('net');
 const { spawnSync } = require('child_process');
