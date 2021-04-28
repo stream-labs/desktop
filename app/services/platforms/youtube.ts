@@ -1,4 +1,4 @@
-import { mutation, InheritMutations, ViewHandler } from '../core/stateful-service';
+import { mutation, InheritMutations } from '../core/stateful-service';
 import {
   IPlatformService,
   TPlatformCapability,
@@ -7,20 +7,17 @@ import {
   IPlatformState,
 } from '.';
 import { Inject } from 'services/core/injector';
-import { authorizedHeaders, handleResponse, jfetch } from 'util/requests';
+import { authorizedHeaders, jfetch } from 'util/requests';
 import { platformAuthorizedRequest } from './utils';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { CustomizationService } from 'services/customization';
 import { IGoLiveSettings } from 'services/streaming';
 import { WindowsService } from 'services/windows';
-import { $t, I18nService } from 'services/i18n';
+import { I18nService } from 'services/i18n';
 import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import { assertIsDefined } from 'util/properties-type-guards';
 import electron from 'electron';
-import { omitBy } from 'lodash';
-import { UserService } from '../user';
-import { IFacebookStartStreamOptions, TDestinationType } from './facebook';
 import Utils from '../utils';
 
 interface IYoutubeServiceState extends IPlatformState {

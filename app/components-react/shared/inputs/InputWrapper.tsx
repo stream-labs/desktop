@@ -1,7 +1,7 @@
 import { Form } from 'antd';
 import React, { useContext } from 'react';
 import { FormItemProps } from 'antd/lib/form/FormItem';
-import { omit, pick } from 'lodash';
+import omit from 'lodash/omit';
 import { FormContext } from './Form';
 import { InputComponent, layoutPresets, TInputLayout } from './inputs';
 
