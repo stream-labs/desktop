@@ -189,6 +189,10 @@ export default class SourcesShowcase extends Vue {
     return sourcesList;
   }
 
+  get hasStreamlabel() {
+    return this.primaryPlatformService?.capabilities.has('streamlabels');
+  }
+
   get inspectedSourceDefinition() {
     return this.availableSources.find(source => source.id === this.inspectedSource);
   }
