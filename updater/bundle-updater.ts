@@ -264,7 +264,7 @@ module.exports = async (basePath: string) => {
     electron.app.on('window-all-closed', (e: Electron.Event) => {
       e.preventDefault();
 
-      // Wait a second for files to no longer be of use
+      // Wait a second for files to no longer be in use
       setTimeout(() => {
         console.log('Attempting to empty bundles directory');
         try {
