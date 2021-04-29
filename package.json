@@ -62,7 +62,6 @@
     "serial": true
   },
   "dependencies": {
-    "animate.css": "^4.1.1",
     "archiver": "2.1.1",
     "aws-sdk": "^2.344.0",
     "color-picker": "https://obs-studio-deployment.s3-us-west-2.amazonaws.com/color-picker-0.0.0.tar.gz",

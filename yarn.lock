@@ -2418,11 +2418,6 @@ amazon-s3-uri@0.0.3:
   resolved "https://registry.yarnpkg.com/amazon-s3-uri/-/amazon-s3-uri-0.0.3.tgz#dc189800d25f290eb1342a85741b9d2c917572c1"
   integrity sha1-3BiYANJfKQ6xNCqFdBudLJF1csE=
 
-animate.css@^4.1.1:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/animate.css/-/animate.css-4.1.1.tgz#614ec5a81131d7e4dc362a58143f7406abd68075"
-  integrity sha512-+mRmCTv6SbCmtYJCN4faJMNFVNN5EuCTTprDTAo7YzIGji2KADmakjVA3+8mVDkZ2Bf09vayB35lSQIex2+QaQ==
-
 ansi-align@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/ansi-align/-/ansi-align-3.0.0.tgz#b536b371cf687caaef236c18d3e21fe3797467cb"
