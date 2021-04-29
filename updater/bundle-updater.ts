@@ -253,21 +253,45 @@ module.exports = async (basePath: string) => {
   electron.ipcMain.on('startupError', (e, msg) => {
     console.log('Received startup error from worker window', msg);
 
+    // Unregister the main process from the crash handler
     try {
-      // Try clearing the bundles directory in case it got corrupted
-      if (fs.existsSync(bundlesBaseDirectory)) {
-        fs.emptyDirSync(bundlesBaseDirectory);
-      }
+      const crashHandler = require('crash-handler');
+      crashHandler.unregisterProcess(process.pid);
     } catch (e: unknown) {
-      console.log('Error clearing bundle directory', e);
+      console.log('Error unregistering main process from crash handler');
     }
+
+    electron.app.on('window-all-closed', (e: Electron.Event) => {
+      e.preventDefault();
+
+      // Wait a second for files to no longer be of use
+      setTimeout(() => {
+        console.log('Attempting to empty bundles directory');
+        try {
+          // Try clearing the bundles directory in case it got corrupted
+          if (fs.existsSync(bundlesBaseDirectory)) {
+            fs.emptyDirSync(bundlesBaseDirectory);
+          }
+        } catch (e: unknown) {
+          console.log('Error clearing bundle directory', e);
+        }
+
+        console.log('The app will now shut down');
+        electron.app.exit();
+      }, 1000);
+    });
+
+    // Force close all windows
+    electron.BrowserWindow.getAllWindows().forEach(w => {
+      if (!w.isDestroyed()) {
+        console.log('Force closing window', w.id);
+        w.destroy();
+      }
+    });
 
     electron.dialog.showErrorBox(
       'Streamlabs OBS',
       'Streamlabs OBS failed to start. Please try launching Streamlabs OBS again. If this issue persists, please visit support.streamlabs.com for help.',
     );
-
-    console.log('The app will now shut down');
-    electron.app.quit();
   });
 };
