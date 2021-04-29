@@ -140,4 +140,8 @@ export class EditStreamWindow extends ReactComponent {}
     wrapperStyles: { default: () => ({}) },
   },
 })
-export class PlatformLogo extends ReactComponent<{ platform: string; size?: 'medium' | number, color?: string }> {}
+export class PlatformLogo extends ReactComponent<{
+  platform: string;
+  size?: 'medium' | number;
+  color?: string;
+}> {}

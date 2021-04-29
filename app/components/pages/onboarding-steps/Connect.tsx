@@ -134,7 +134,9 @@ export default class Connect extends TsxComponent<ConnectProps> {
                 onClick={() => this.authPlatform(platform)}
               >
                 {this.loading && <i class="fas fa-spinner fa-spin" />}
-                {!this.loading && <PlatformLogo componentProps={{ platform, size: 'medium', color: 'white' }} />}
+                {!this.loading && (
+                  <PlatformLogo componentProps={{ platform, size: 'medium', color: 'white' }} />
+                )}
               </button>
             ))}
           </div>
