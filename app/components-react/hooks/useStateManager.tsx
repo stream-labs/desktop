@@ -6,6 +6,8 @@ import isPlainObject from 'lodash/isPlainObject';
 import mapKeys from 'lodash/mapKeys';
 import { keys } from '../../services/utils';
 import { useForceUpdate, useOnCreate, useOnDestroy } from '../hooks';
+import { createBinding, TBindings } from '../shared/inputs';
+import { assertIsDefined } from '../../util/properties-type-guards';
 const GenericStateManagerContext = React.createContext(null);
 
 // React devtools are broken for Electron 9 and 10
@@ -53,6 +55,11 @@ export function useStateManager<
     {
       Context: React.Context<TStateManagerContext<TContextView>>;
       contextValue: TStateManagerContext<TContextView>;
+      useBinding<TBindingState extends object, TExtraProps extends object = {}>(
+        stateGetter: () => TBindingState,
+        stateSetter: (patch: TBindingState) => unknown,
+        extraPropsGenerator?: (prop: keyof TBindingState) => TExtraProps,
+      ): TBindings<TBindingState, keyof TBindingState, TExtraProps>;
     }
   >
 >(
@@ -307,7 +314,10 @@ function useComponentId() {
 function createDependencyWatcher<T extends object>(watchedObject: T) {
   const dependencies: Record<string, any> = {};
   const watcherProxy = new Proxy(
-    { _proxyName: 'DependencyWatcher' },
+    {
+      _proxyName: 'DependencyWatcher',
+      useBinding,
+    },
     {
       get: (target, propName: string) => {
         if (propName in target) return target[propName];
@@ -348,7 +358,7 @@ function createDependencyWatcher<T extends object>(watchedObject: T) {
         const bindingMetadata = value._binding;
         Object.keys(bindingMetadata.dependencies).forEach(bindingPropName => {
           values[`${bindingPropName}__binding-${bindingMetadata.id}`] =
-            watchedObject[propName][bindingPropName].value;
+            dependencies[propName][bindingPropName].value;
         });
         return;
       }
@@ -356,6 +366,20 @@ function createDependencyWatcher<T extends object>(watchedObject: T) {
       values[propName] = watchedObject[propName];
     });
     return values;
+  }
+
+  function useBinding<TState extends object>(
+    stateGetter: () => TState,
+    stateSetter: (patch: TState) => unknown,
+  ): TBindings<TState, keyof TState> {
+    const bindingRef = useRef<TBindings<TState, keyof TState>>();
+    if (!bindingRef.current) {
+      const binding = createBinding(stateGetter, stateSetter);
+      dependencies[binding._binding.id] = binding;
+      bindingRef.current = binding;
+    }
+    assertIsDefined(bindingRef.current);
+    return bindingRef.current;
   }
 
   return { watcherProxy, getDependentFields, getDependentValues };

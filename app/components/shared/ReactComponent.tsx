@@ -133,11 +133,3 @@ export class GoLiveWindow extends ReactComponent {}
   },
 })
 export class EditStreamWindow extends ReactComponent {}
-
-@Component({
-  props: {
-    name: { default: 'SharedComponentsLibrary' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
-export class SharedComponentsLibrary extends ReactComponent {}

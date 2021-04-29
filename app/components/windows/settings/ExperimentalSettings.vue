@@ -8,11 +8,6 @@
         </button>
         <br />
         <br />
-        <br />
-        <button class="button button--action" @click="showDemoComponents()">
-          Show Shared Components Library
-        </button>
-        <br />
       </div>
     </div>
   </div>
