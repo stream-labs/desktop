@@ -120,7 +120,7 @@ export function useFormState<T extends object>(initializer: T | (() => T)): TUse
   }
 
   return {
-    s,
+    s: stateRef.current,
     setState,
     updateState,
     setItem,

@@ -368,6 +368,9 @@ function createDependencyWatcher<T extends object>(watchedObject: T) {
     return values;
   }
 
+  /**
+   * Hook for creating an reactive input binding
+   */
   function useBinding<TState extends object>(
     stateGetter: () => TState,
     stateSetter: (patch: TState) => unknown,
