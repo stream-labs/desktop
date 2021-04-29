@@ -37,6 +37,8 @@ export default class Connect extends TsxComponent<ConnectProps> {
     return this.userService.state.isRelog;
   }
 
+  private platforms = this.streamingService.views.allPlatforms;
+
   async authPlatform(platform: TPlatform) {
     this.usageStatisticsService.recordAnalyticsEvent('PlatformLogin', platform);
     const result = await this.userService.startAuth(
@@ -106,8 +108,6 @@ export default class Connect extends TsxComponent<ConnectProps> {
       );
     }
 
-    const platforms = this.streamingService.views.allPlatforms;
-
     return (
       <div class={styles.pageContainer}>
         <div class={styles.container}>
@@ -127,7 +127,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
             </h3>
           )}
           <div class={styles.signupButtons}>
-            {platforms.map((platform: TPlatform) => (
+            {this.platforms.map((platform: TPlatform) => (
               <button
                 class={cx(`button button--${platform}`, styles.loginButton)}
                 disabled={this.loading}
