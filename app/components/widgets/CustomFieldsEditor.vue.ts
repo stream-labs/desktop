@@ -206,7 +206,7 @@ export default class CustomFieldsEditor extends Vue {
     newData = this.setCustomJson(newData);
     try {
       await this.settingsService.saveSettings(newData.settings);
-    } catch (e) {
+    } catch (e: unknown) {
       this.onFailHandler($t('Save failed, something went wrong.'));
       this.isLoading = false;
       return;
@@ -229,7 +229,7 @@ export default class CustomFieldsEditor extends Vue {
     let newCustomFields: Dictionary<ICustomField>;
     try {
       newCustomFields = JSON.parse(this.editorInputValue);
-    } catch (e) {
+    } catch (e: unknown) {
       electron.remote.dialog.showErrorBox($t('Error'), $t('Invalid JSON'));
       return;
     }

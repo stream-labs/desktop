@@ -5,7 +5,8 @@ import { authorizedHeaders, handleResponse, jfetch } from 'util/requests';
 import { $t } from 'services/i18n';
 import { WindowsService } from 'services/windows';
 import { WebsocketService, TSocketEvent, IEventSocketEvent } from 'services/websocket';
-import { pick, cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import pick from 'lodash/pick';
 import uuid from 'uuid/v4';
 import { Subscription } from 'rxjs';
 import mapValues from 'lodash/mapValues';
@@ -799,7 +800,7 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   async toggleQueue() {
     try {
       this.state.queuePaused ? await this.unpauseAlertQueue() : await this.pauseAlertQueue();
-    } catch (e) {}
+    } catch (e: unknown) {}
   }
 
   openRecentEventsWindow(isMediaShare?: boolean) {

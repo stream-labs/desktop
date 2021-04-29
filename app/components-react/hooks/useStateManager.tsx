@@ -1,6 +1,9 @@
 import React, { useContext, useEffect, useRef } from 'react';
 import { StatefulService } from '../../services';
-import { cloneDeep, flatten, isPlainObject, mapKeys } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import flatten from 'lodash/flatten';
+import isPlainObject from 'lodash/isPlainObject';
+import mapKeys from 'lodash/mapKeys';
 import { keys } from '../../services/utils';
 import { useForceUpdate, useOnCreate, useOnDestroy } from '../hooks';
 const GenericStateManagerContext = React.createContext(null);
@@ -276,12 +279,12 @@ function useComponentId() {
   function getComponentName(): string {
     try {
       throw new Error();
-    } catch (e) {
-      return e.stack
-        .split('\n')[10]
-        .split('at ')[1]
-        .split('(')[0]
-        .trim();
+    } catch (e: unknown) {
+      if (e instanceof Error && e.stack) {
+        return e.stack.split('\n')[10].split('at ')[1].split('(')[0].trim();
+      } else {
+        return '';
+      }
     }
   }
 
