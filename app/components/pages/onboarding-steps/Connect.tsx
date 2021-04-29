@@ -25,7 +25,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
   @Inject() userService: UserService;
   @Inject() onboardingService: OnboardingService;
   @Inject() usageStatisticsService: UsageStatisticsService;
-  @Inject() streamingService: StreamingService;
+  @Inject() streamingService!: StreamingService;
 
   selectedExtraPlatform: TExtraPlatform | '' = '';
 
