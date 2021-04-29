@@ -143,14 +143,14 @@ export function jfetch<TResponse = unknown>(
       if (isJson || options.forceJson) {
         return response.json() as Promise<TResponse>;
       } else {
-        console.warn('jfetch: Got non-JSON response', JSON.stringify(response));
+        console.warn('jfetch: Got non-JSON response', response.url, response.status);
         return (response.text() as unknown) as Promise<TResponse>;
       }
     } else if (isJson) {
-      console.log('JFETCH ERROR', request, response);
+      console.log('Jfetch Non-OK Response', response.url, response.status);
       return throwJsonError(response);
     } else {
-      console.log('JFETCH ERROR', request, response);
+      console.log('Jfetch Non-OK Response', response.url, response.status);
       throw response;
     }
   });
