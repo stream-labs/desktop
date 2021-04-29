@@ -37,4 +37,12 @@ export default class ExperimentalSettings extends Vue {
       message: 'Repair finished. See details in the log file',
     });
   }
+
+  showDemoComponents() {
+    this.windowsService.showWindow({
+      title: 'Shared React Components',
+      componentName: 'SharedComponentsLibrary',
+      size: { width: 1000, height: 1000 },
+    });
+  }
 }
