@@ -44,6 +44,8 @@ export default function GoLiveError() {
         return renderYoutubeStreamingDisabled(error);
       case 'MACHINE_LOCKED':
         return renderMachineLockedError(error);
+      case 'TWEET_FAILED':
+        return renderTweetFailedError(error);
       default:
         return <MessageLayout error={error} />;
     }
@@ -142,6 +144,10 @@ export default function GoLiveError() {
         </Translate>
       </MessageLayout>
     );
+  }
+
+  function renderTweetFailedError(error: IStreamError) {
+    return <MessageLayout error={error} message={$t('Failed to post the Tweet')}></MessageLayout>;
   }
 
   function renderRestreamError(error: IStreamError) {

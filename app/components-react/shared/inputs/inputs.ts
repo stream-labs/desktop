@@ -8,7 +8,7 @@ import uuid from 'uuid';
 import { FormItemProps } from 'antd/lib/form';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import { $t } from '../../../services/i18n';
-import { pick } from 'lodash';
+import pick from 'lodash/pick';
 
 type TInputType =
   | 'text'
@@ -181,7 +181,7 @@ export function useInput<
   };
 
   // Create validation rules
-  const rules = createValidationRules(inputProps);
+  const rules = createValidationRules(type, inputProps);
 
   // pick props for the input wrapper
   const wrapperAttrs = {
@@ -336,12 +336,12 @@ export type TBindings<
   } & TExtraProps;
 };
 
-function createValidationRules(inputProps: IInputCommonProps<unknown>) {
+function createValidationRules(type: TInputType, inputProps: IInputCommonProps<unknown>) {
   const rules = inputProps.rules ? [...inputProps.rules] : [];
   if (inputProps.required) {
     rules.push({ required: true, message: $t('The field is required') });
   }
-  if (inputProps.max) {
+  if (type === 'text' && inputProps.max) {
     rules.push({
       max: inputProps.max,
       message: $t('This field may not be greater than %{value} characters.', {

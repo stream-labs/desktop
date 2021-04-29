@@ -3,8 +3,8 @@
  * Also it skips the tests that should be run on an different CI agent in a parallel execution mode
  */
 
-import avaTest, { ExecutionContext, TestInterface } from 'ava';
-import { ITestContext, test } from './index';
+import avaTest, { TestInterface } from 'ava';
+import { ITestContext } from './index';
 import { uniq } from 'lodash';
 const fs = require('fs');
 const fetch = require('node-fetch');
