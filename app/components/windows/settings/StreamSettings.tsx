@@ -51,6 +51,8 @@ export default class StreamSettings extends TsxComponent {
 
   private editCustomDestMode: boolean | number = false;
 
+  private platforms = this.streamingView.allPlatforms;
+
   saveObsSettings(obsSettings: ISettingsSubCategory[]) {
     this.streamSettingsService.setObsStreamSettings(obsSettings);
   }
@@ -160,14 +162,13 @@ export default class StreamSettings extends TsxComponent {
   }
 
   render() {
-    const platforms = this.streamingView.allPlatforms;
     return (
       <div>
         {/* account info */}
         {this.protectedModeEnabled && (
           <div>
             <h2>{$t('Stream Destinations')}</h2>
-            {platforms.map(platform => this.renderPlatform(platform))}
+            {this.platforms.map(platform => this.renderPlatform(platform))}
 
             {<div>{this.renderCustomDestinations()}</div>}
 
