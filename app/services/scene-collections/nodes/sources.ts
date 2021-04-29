@@ -197,18 +197,22 @@ export class SourcesNode extends Node<ISchema, {}> {
         settings: source.settings,
         volume: source.volume,
         syncOffset: source.syncOffset,
-        filters: source.filters.items.map(filter => {
-          if (filter.type === 'vst_filter') {
-            this.usageStatisticsService.recordFeatureUsage('VST');
-          }
+        filters: source.filters.items
+          .filter(filter => {
+            return filter.type !== 'face_mask_filter';
+          })
+          .map(filter => {
+            if (filter.type === 'vst_filter') {
+              this.usageStatisticsService.recordFeatureUsage('VST');
+            }
 
-          return {
-            name: filter.name,
-            type: filter.type,
-            settings: filter.settings,
-            enabled: filter.enabled === void 0 ? true : filter.enabled,
-          };
-        }),
+            return {
+              name: filter.name,
+              type: filter.type,
+              settings: filter.settings,
+              enabled: filter.enabled === void 0 ? true : filter.enabled,
+            };
+          }),
       };
     });
 
