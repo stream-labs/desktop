@@ -623,16 +623,20 @@ export class StreamingService
       this.startReplayBuffer();
     }
 
-    startStreamingPromise.then(() => {
-      // run afterGoLive hooks
-      try {
-        this.views.enabledPlatforms.forEach(platform => {
-          getPlatformService(platform).afterGoLive();
-        });
-      } catch (e: unknown) {
-        console.error('Error running afterGoLive for platform', e);
-      }
-    });
+    startStreamingPromise
+      .then(() => {
+        // run afterGoLive hooks
+        try {
+          this.views.enabledPlatforms.forEach(platform => {
+            getPlatformService(platform).afterGoLive();
+          });
+        } catch (e: unknown) {
+          console.error('Error running afterGoLive for platform', e);
+        }
+      })
+      .catch(() => {
+        console.warn('startStreamingPromise was rejected');
+      });
 
     return startStreamingPromise;
   }
