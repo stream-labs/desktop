@@ -28,6 +28,7 @@ export class SceneFiltersNode extends ArrayNode<ISourceFilterSchema, IContext, I
   }
 
   loadItem(filter: ISourceFilterSchema, context: IContext): Promise<void> {
+    if (filter.type === 'face_mask_filter') return Promise.resolve();
     this.sourceFiltersService.add(context.sceneId, filter.type, filter.name, filter.settings);
     this.sourceFiltersService.setVisibility(context.sceneId, filter.name, filter.visible);
     return Promise.resolve();
