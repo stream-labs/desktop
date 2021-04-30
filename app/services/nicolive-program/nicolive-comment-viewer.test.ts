@@ -7,6 +7,9 @@ const setup = createSetupFunction({
     NicoliveCommentFilterService: {
       stateChange: new Subject(),
     },
+    NicoliveCommentLocalFilterService: {
+      filterFn: () => true,
+    },
     NicoliveCommentSynthesizerService: {
       stateChange: new Subject(),
       available: false,
@@ -16,6 +19,7 @@ const setup = createSetupFunction({
 
 jest.mock('services/nicolive-program/nicolive-program', () => ({ NicoliveProgramService: {} }));
 jest.mock('services/nicolive-program/nicolive-comment-filter', () => ({ NicoliveCommentFilterService: {} }));
+jest.mock('services/nicolive-program/nicolive-comment-local-filter', () => ({ NicoliveCommentLocalFilterService: {} }));
 jest.mock('services/nicolive-program/nicolive-comment-synthesizer', () => ({ NicoliveCommentSynthesizerService: {} }));
 
 beforeEach(() => {

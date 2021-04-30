@@ -26,6 +26,7 @@ import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive
 import { NicoliveCommentSynthesizerService } from './nicolive-comment-synthesizer';
 import { AddComponent } from './ChatMessage/ChatComponentType';
 import { WrappedChat, WrappedChatWithComponent } from './WrappedChat';
+import { NicoliveCommentLocalFilterService } from './nicolive-comment-local-filter';
 
 function makeEmulatedChat(
   content: string,
@@ -57,6 +58,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
 
   @Inject() private nicoliveProgramService: NicoliveProgramService;
   @Inject() private nicoliveCommentFilterService: NicoliveCommentFilterService;
+  @Inject() private nicoliveCommentLocalFilterService: NicoliveCommentLocalFilterService;
   @Inject() private nicoliveCommentSynthesizerService: NicoliveCommentSynthesizerService;
 
   static initialState: INicoliveCommentViewerState = {
@@ -80,8 +82,15 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
     return this.state.speakingSeqId;
   }
 
-  get recentPopouts() {
-    return this.state.popoutMessages;
+  get filterFn() {
+    return (chat: WrappedChatWithComponent) =>
+      chat.type !== 'invisible' && this.nicoliveCommentLocalFilterService.filterFn(chat);
+  }
+  get itemsLocalFiltered() {
+    return this.items.filter(this.filterFn);
+  }
+  get recentPopoutsLocalFiltered() {
+    return this.state.popoutMessages.filter(this.filterFn);
   }
 
   init() {
@@ -185,7 +194,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
     this.client.requestLatestMessages();
   }
 
-  private queueToSpeech(values: WrappedChat[]) {
+  private queueToSpeech(values: WrappedChatWithComponent[]) {
     if (!this.nicoliveCommentSynthesizerService.enabled) {
       return;
     }
@@ -217,7 +226,10 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
     const recentSeconds = 60;
 
     const now = Date.now() / 1000;
-    this.queueToSpeech(values.slice(-maxQueueToSpeak).filter(c => {
+    this.queueToSpeech(values.filter(c => {
+      if (!this.filterFn(c)) {
+        return false;
+      }
       if (!c.value || !c.value.date) {
         return false;
       }
@@ -225,12 +237,13 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
         return false;
       }
       return true;
-    }));
+    }).slice(-maxQueueToSpeak));
 
+    const maxRetain = 100; // 最新からこの件数を一覧に保持する
     const concatMessages = this.state.messages.concat(values);
-    const popoutMessages = concatMessages.slice(0, -100);
+    const popoutMessages = concatMessages.slice(0, -maxRetain);
     this.SET_STATE({
-      messages: concatMessages.slice(-100),
+      messages: concatMessages.slice(-maxRetain),
       popoutMessages,
     });
   }

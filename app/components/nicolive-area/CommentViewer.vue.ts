@@ -11,7 +11,6 @@ import {
 import CommentForm from './CommentForm.vue';
 import CommentFilter from './CommentFilter.vue';
 import CommentSettings from './CommentSettings.vue';
-import { NicoliveCommentLocalFilterService } from 'services/nicolive-program/nicolive-comment-local-filter';
 import { ChatMessage } from 'services/nicolive-program/ChatMessage';
 import { Menu } from 'util/menus/Menu';
 import { clipboard } from 'electron';
@@ -53,9 +52,6 @@ export default class CommentViewer extends Vue {
   private nicoliveCommentViewerService: NicoliveCommentViewerService;
 
   @Inject()
-  private nicoliveCommentLocalFilterService: NicoliveCommentLocalFilterService;
-
-  @Inject()
   private nicoliveCommentFilterService: NicoliveCommentFilterService;
 
   // TODO: 後で言語ファイルに移動する
@@ -71,14 +67,6 @@ export default class CommentViewer extends Vue {
 
   get pinnedComment(): WrappedChat | null {
     return this.nicoliveCommentViewerService.state.pinnedMessage;
-  }
-
-  private get filterFn() {
-    // getterなので関数内に入れない
-    const { filterFn } = this.nicoliveCommentLocalFilterService;
-    return (item: WrappedChat) => {
-      return item.type !== 'invisible' && filterFn(item);
-    };
   }
 
   scrollToLatest() {
@@ -99,7 +87,7 @@ export default class CommentViewer extends Vue {
   componentMap = componentMap;
 
   get items() {
-    return this.nicoliveCommentViewerService.items.filter(this.filterFn);
+    return this.nicoliveCommentViewerService.itemsLocalFiltered;
   }
 
   get speakingEnabled(): boolean {
@@ -205,7 +193,7 @@ export default class CommentViewer extends Vue {
     if (this.isLatestVisible) {
       this.scrollToLatest();
     } else {
-      const popouts = this.nicoliveCommentViewerService.recentPopouts.filter(this.filterFn);
+      const popouts = this.nicoliveCommentViewerService.recentPopoutsLocalFiltered;
       const opt = {
         top: -popouts.length * 32 /* item's height */
       };
