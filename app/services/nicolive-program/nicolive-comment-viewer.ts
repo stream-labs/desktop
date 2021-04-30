@@ -146,7 +146,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
               return group$
                 .pipe(
                   filter(isChatMessage),
-                  map(({ chat }) => AddComponent({
+                  map(({ chat }) => ({
                     type: classify(chat),
                     value: chat,
                   })),
@@ -181,7 +181,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
         map(({ type, value }, seqId) => ({ type, value, seqId })),
         bufferTime(1000),
         filter(arr => arr.length > 0),
-      ).subscribe(values => this.onMessage(values as any));
+      ).subscribe(values => this.onMessage(values.map(c => AddComponent(c))));
     this.client.requestLatestMessages();
   }
 
