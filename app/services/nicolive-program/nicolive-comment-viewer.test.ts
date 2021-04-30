@@ -156,6 +156,7 @@ test('chatメッセージはstateに保持する', () => {
   expect(instance.state.messages).toMatchInlineSnapshot(`
     Array [
       Object {
+        "component": "common",
         "seqId": 0,
         "type": "normal",
         "value": Object {
@@ -163,6 +164,7 @@ test('chatメッセージはstateに保持する', () => {
         },
       },
       Object {
+        "component": "common",
         "seqId": 1,
         "type": "normal",
         "value": Object {
@@ -170,6 +172,7 @@ test('chatメッセージはstateに保持する', () => {
         },
       },
       Object {
+        "component": "system",
         "seqId": 2,
         "type": "n-air-emulated",
         "value": Object {
@@ -226,6 +229,7 @@ test('接続エラー時にメッセージを表示する', () => {
   expect(instance.state.messages).toMatchInlineSnapshot(`
                           Array [
                             Object {
+                              "component": "system",
                               "seqId": 0,
                               "type": "n-air-emulated",
                               "value": Object {
@@ -234,6 +238,7 @@ test('接続エラー時にメッセージを表示する', () => {
                               },
                             },
                             Object {
+                              "component": "system",
                               "seqId": 1,
                               "type": "n-air-emulated",
                               "value": Object {
@@ -261,6 +266,7 @@ test('スレッドの参加失敗時にメッセージを表示する', () => {
   expect(instance.state.messages).toMatchInlineSnapshot(`
         Array [
           Object {
+            "component": "system",
             "seqId": 0,
             "type": "n-air-emulated",
             "value": Object {
@@ -269,6 +275,7 @@ test('スレッドの参加失敗時にメッセージを表示する', () => {
             },
           },
           Object {
+            "component": "system",
             "seqId": 1,
             "type": "n-air-emulated",
             "value": Object {
@@ -294,6 +301,7 @@ test('スレッドからの追い出し発生時にメッセージを表示す�
   expect(instance.state.messages).toMatchInlineSnapshot(`
         Array [
           Object {
+            "component": "system",
             "seqId": 0,
             "type": "n-air-emulated",
             "value": Object {
@@ -302,6 +310,7 @@ test('スレッドからの追い出し発生時にメッセージを表示す�
             },
           },
           Object {
+            "component": "system",
             "seqId": 1,
             "type": "n-air-emulated",
             "value": Object {
