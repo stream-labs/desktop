@@ -72,6 +72,8 @@ app.commandLine.appendSwitch(
   'streamlabs.com,youtube.com,twitch.tv,facebook.com,mixer.com',
 );
 
+process.env.IPC_UUID = `slobs-${uuid()}`;
+
 // Remove this when all backend module are on NAPI
 app.allowRendererProcessReuse = false;
 
@@ -267,6 +269,7 @@ async function startApp() {
     process.env.SLOBS_VERSION,
     isDevMode.toString(),
     crashHandlerLogPath,
+    process.env.IPC_UUID,
   );
   crashHandler.registerProcess(pid, false);
 
@@ -760,6 +763,14 @@ ipcMain.on('getAppStartTime', e => {
 
 ipcMain.on('measure-time', (e, msg, time) => {
   measure(msg, time);
+});
+
+ipcMain.on('register-in-crash-handler', (event, arg) => {
+  crashHandler.registerProcess(arg.pid, arg.critical);
+});
+
+ipcMain.on('unregister-in-crash-handler', (event, arg) => {
+  crashHandler.unregisterProcess(arg.pid);
 });
 
 // Measure time between events
