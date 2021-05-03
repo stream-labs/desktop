@@ -35,6 +35,7 @@ export interface IYoutubeStartStreamOptions extends IExtraBroadcastSettings {
   broadcastId?: string;
   description: string;
   privacyStatus?: 'private' | 'public' | 'unlisted';
+  tags?: string[];
 }
 
 /**

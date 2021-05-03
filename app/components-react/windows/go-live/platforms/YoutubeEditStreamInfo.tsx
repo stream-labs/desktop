@@ -1,5 +1,5 @@
 import CommonPlatformFields from '../CommonPlatformFields';
-import { CheckboxInput, ImageInput, ListInput } from '../../../shared/inputs';
+import { CheckboxInput, ImageInput, ListInput, TagsInput } from '../../../shared/inputs';
 import React, { useEffect } from 'react';
 import { Services } from '../../../service-provider';
 import { $t } from '../../../../services/i18n';
@@ -147,6 +147,8 @@ export function YoutubeEditStreamInfo() {
           ]}
           {...bind.latencyPreference}
         />
+
+        <TagsInput label="Tags" mode="tags" options={[]} uncontrolled tokenSeparators={[',']} />
 
         <InputWrapper label={$t('Additional Settings')}>
           {!isScheduleMode && (

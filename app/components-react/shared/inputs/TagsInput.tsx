@@ -13,7 +13,7 @@ import Utils from '../../../services/utils';
 import cx from 'classnames';
 
 // select which features from the antd lib we are going to use
-const ANT_SELECT_FEATURES = ['showSearch', 'loading'] as const;
+const ANT_SELECT_FEATURES = ['showSearch', 'loading', 'mode', 'tokenSeparators'] as const;
 
 interface ICustomTagsProps<TValue> extends ICustomListProps<SingleType<TValue>> {
   max?: number;
@@ -30,8 +30,10 @@ export type TTagsInputProps<TValue> = TSlobsInputProps<
   ValuesOf<typeof ANT_SELECT_FEATURES>
 >;
 
-export const TagsInput = InputComponent(<T extends any[]>(p: TTagsInputProps<T>) => {
-  const { inputAttrs, wrapperAttrs } = useInput('tags', p);
+export const TagsInput = InputComponent(<T extends any[]>(props: TTagsInputProps<T>) => {
+  const defaultProps = { mode: 'multiple' };
+  const p = { ...defaultProps, ...props };
+  const { inputAttrs, wrapperAttrs } = useInput('tags', p, ANT_SELECT_FEATURES);
   const options = p.options;
   const tagsMap = useMemo(() => keyBy(options, 'value'), [options]);
   const { s, updateState } = useFormState({ isAnimating: false });
@@ -44,7 +46,10 @@ export const TagsInput = InputComponent(<T extends any[]>(p: TTagsInputProps<T>)
   }
 
   function renderTag(tagProps: TagProps) {
-    const tag = tagsMap[tagProps['value']];
+    const tag = tagsMap[tagProps['value']] || {
+      value: tagProps['value'],
+      label: tagProps['value'],
+    };
     if (p.tagRender) {
       return p.tagRender(tagProps, tag);
     }
@@ -85,7 +90,6 @@ export const TagsInput = InputComponent(<T extends any[]>(p: TTagsInputProps<T>)
         {...inputAttrs}
         // search by label instead value
         optionFilterProp={'label'}
-        mode={'multiple'}
         allowClear
         onChange={val => onChangeHandler((val as unknown) as T)}
         tagRender={renderTag}
