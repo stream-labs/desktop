@@ -29,6 +29,8 @@ export class TiktokService extends BasePlatformService<ITiktokServiceState> {
     WidgetType.TipJar,
   ];
 
+  readonly inputResolution = '720x1280';
+
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 600,
     height: 800,

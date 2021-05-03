@@ -39,6 +39,10 @@ export type TPlatformCapabilityMap = {
   'account-merging': IPlatformCapabilityAccountMerging;
   /** This service supports streamlabels **/
   streamlabels: true;
+  /** This service supports themes **/
+  themes: true;
+  /** This service should preset a custom resolution for every new scene-collection **/
+  resolutionPreset: IPlatformCapabilityResolutionPreset;
 };
 
 export type TPlatformCapability = keyof TPlatformCapabilityMap;
@@ -80,6 +84,10 @@ interface IPlatformCapabilityScopeValidation {
 
 interface IPlatformCapabilityAccountMerging {
   mergeUrl: string;
+}
+
+export interface IPlatformCapabilityResolutionPreset {
+  inputResolution: string;
 }
 
 /**

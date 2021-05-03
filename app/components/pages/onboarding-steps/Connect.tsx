@@ -1,8 +1,8 @@
 import cx from 'classnames';
 import { Component } from 'vue-property-decorator';
 import electron from 'electron';
-import { UserService, EAuthProcessState } from 'services/user';
-import { TPlatform, EPlatformCallResult } from 'services/platforms';
+import { EAuthProcessState, UserService } from 'services/user';
+import { EPlatformCallResult, TPlatform } from 'services/platforms';
 import { Inject } from 'services/core/injector';
 import { OnboardingService } from 'services/onboarding';
 import TsxComponent, { createProps } from 'components/tsx-component';
@@ -15,6 +15,10 @@ import { IListOption } from '../../shared/inputs';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { StreamingService } from '../../../services/streaming';
 import { PlatformLogo } from '../../shared/ReactComponent';
+import {
+  EAvailableFeatures,
+  IncrementalRolloutService,
+} from '../../../services/incremental-rollout';
 
 class ConnectProps {
   continue: () => void = () => {};
@@ -26,6 +30,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
   @Inject() onboardingService: OnboardingService;
   @Inject() usageStatisticsService: UsageStatisticsService;
   @Inject() streamingService!: StreamingService;
+  @Inject() incrementalRolloutService: IncrementalRolloutService;
 
   selectedExtraPlatform: TExtraPlatform | '' = '';
 
@@ -36,8 +41,6 @@ export default class Connect extends TsxComponent<ConnectProps> {
   get isRelog() {
     return this.userService.state.isRelog;
   }
-
-  private platforms = this.streamingService.views.allPlatforms;
 
   async authPlatform(platform: TPlatform) {
     this.usageStatisticsService.recordAnalyticsEvent('PlatformLogin', platform);
@@ -108,6 +111,12 @@ export default class Connect extends TsxComponent<ConnectProps> {
       );
     }
 
+    const platforms = ['twitch', 'youtube', 'facebook'];
+
+    if (this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.tiktok)) {
+      platforms.push('tiktok');
+    }
+
     return (
       <div class={styles.pageContainer}>
         <div class={styles.container}>
@@ -127,7 +136,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
             </h3>
           )}
           <div class={styles.signupButtons}>
-            {this.platforms.map((platform: TPlatform) => (
+            {platforms.map((platform: TPlatform) => (
               <button
                 class={cx(`button button--${platform}`, styles.loginButton)}
                 disabled={this.loading}

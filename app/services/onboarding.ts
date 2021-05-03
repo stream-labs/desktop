@@ -8,6 +8,7 @@ import TsxComponent from 'components/tsx-component';
 import { OS } from 'util/operating-systems';
 import { $t } from './i18n';
 import { handleResponse } from 'util/requests';
+import { getPlatformService } from './platforms';
 
 enum EOnboardingSteps {
   MacPermissions = 'MacPermissions',
@@ -154,7 +155,11 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.HardwareSetup]);
     }
 
-    if (!this.state.existingSceneCollections && !this.state.importedFromObs) {
+    if (
+      !this.state.existingSceneCollections &&
+      !this.state.importedFromObs &&
+      getPlatformService(userViews.platform.type).capabilities.has('themes')
+    ) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ThemeSelector]);
     }
 

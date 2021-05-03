@@ -5,6 +5,8 @@ import Form from '../../../shared/inputs/Form';
 import electron from 'electron';
 import { $t } from '../../../../services/i18n';
 import { Services } from '../../../service-provider';
+import { Button } from 'antd';
+import InputWrapper from '../../../shared/inputs/InputWrapper';
 
 export function TiktokEditStreamInfo() {
   const { updatePlatform, ttSettings, getSettings } = useGoLiveSettings(state => ({
@@ -19,12 +21,10 @@ export function TiktokEditStreamInfo() {
   return (
     <Form name="tiktok-settings">
       <TextInput label={$t('TikTok Server URL')} required {...bind.serverUrl} />
-      <TextInput
-        label={$t('TikTok Stream Key')}
-        required
-        {...bind.streamKey}
-        extra={<a onClick={openStreamPage}>{$t('Locate my Stream Key')}</a>}
-      />
+      <TextInput label={$t('TikTok Stream Key')} required {...bind.streamKey} />
+      <InputWrapper>
+        <Button onClick={openStreamPage}>{$t('Locate my Stream Key')}</Button>
+      </InputWrapper>
     </Form>
   );
 }

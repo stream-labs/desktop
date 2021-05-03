@@ -396,6 +396,11 @@ export class StreamingService
         this.usageStatisticsService.recordFeatureUsage('StreamToFacebookPage');
       }
     }
+
+    // send analytics for TikTok
+    if (settings.platforms.tiktok?.enabled) {
+      this.usageStatisticsService.recordFeatureUsage('StreamToTikTok');
+    }
   }
 
   /**
