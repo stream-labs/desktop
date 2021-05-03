@@ -1,6 +1,6 @@
 import { $t } from 'services/i18n';
 
-export const tips = () => [
+export const GROWTH_TIPS = () => [
   {
     title: 'Set Up Tips',
     icon: 'icon-balance',
@@ -51,7 +51,7 @@ export const tips = () => [
     link: 'https://streamlabs.com/dashboard#/prime/logo',
     cta: 'Make a Logo Now',
     description:
-      "Go to Donation Settings and enter your personal information to get started. If you're a new streamer, we recommend starting with PayPal.",
+      'A strong logo to use across your stream and social media will help display a professional and unified brand.',
   },
   {
     title: 'Stream on the Go',
@@ -114,8 +114,22 @@ export const GOAL_OPTIONS = () => [
     total: 3,
   },
   {
-    title: 'Stream 4 for 1 week',
+    title: 'Stream 4 times in 1 week',
     image: 'https://slobs-cdn.streamlabs.com/media/grow/goal_stream_days.png',
     total: 4,
+  },
+  {
+    title: 'Stream on mobile 3 times',
+    image: 'https://slobs-cdn.streamlabs.com/media/grow/goal_stream_days.png',
+    total: 3,
+  },
+  {
+    title: 'Try streaming 5 different categories',
+    image: 'https://slobs-cdn.streamlabs.com/media/grow/goal_stream_days.png',
+    total: 5,
+  },
+  {
+    title: 'Custom',
+    image: '',
   },
 ];

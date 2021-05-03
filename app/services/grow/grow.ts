@@ -1,10 +1,10 @@
 import { PersistentStatefulService, mutation, ViewHandler } from 'services/core';
-import { GOAL_OPTIONS, tips } from './grow-data';
+import { GOAL_OPTIONS, GROWTH_TIPS } from './grow-data';
 
 export interface IGoal {
   title: string;
   image: string;
-  total: number;
+  total?: number;
   progress?: number;
   startDate?: Date;
 }
@@ -35,7 +35,7 @@ class GrowServiceViews extends ViewHandler<IGrowServiceState> {
   }
 
   get tips() {
-    return tips();
+    return GROWTH_TIPS();
   }
 }
 
