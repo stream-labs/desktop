@@ -251,7 +251,7 @@ export class PlatformContainerManager {
     // Unmount from all windows first (prevents crashes)
     info.mountedWindows.forEach(winId => {
       const win = electron.remote.BrowserWindow.fromId(winId);
-      if (!win.isDestroyed()) win.removeBrowserView(info.container);
+      if (win && !win.isDestroyed()) win.removeBrowserView(info.container);
     });
 
     // Electron types are incorrect here.  This method exists and is documented, but
