@@ -11,6 +11,7 @@ interface ISchema {
 
 interface IContext {
   assetsPath: string;
+  savedAssets: Dictionary<string>;
 }
 
 export class ScenesNode extends ArrayNode<ISchema, IContext, Scene> {
@@ -24,7 +25,11 @@ export class ScenesNode extends ArrayNode<ISchema, IContext, Scene> {
 
   async saveItem(scene: Scene, context: IContext): Promise<ISchema> {
     const slots = new SlotsNode();
-    await slots.save({ scene, assetsPath: context.assetsPath });
+    await slots.save({
+      scene,
+      assetsPath: context.assetsPath,
+      savedAssets: context.savedAssets,
+    });
 
     return {
       slots,
@@ -41,7 +46,11 @@ export class ScenesNode extends ArrayNode<ISchema, IContext, Scene> {
     // Load items into the scene after all scenes have been created
     // to handle scene-in-scene situations
     return async () => {
-      await obj.slots.load({ scene, assetsPath: context.assetsPath });
+      await obj.slots.load({
+        scene,
+        assetsPath: context.assetsPath,
+        savedAssets: context.savedAssets,
+      });
 
       // append children to folders
       const foldersSchemas = (obj.slots.data.items as TSlotSchema[])

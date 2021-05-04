@@ -7,3 +7,5 @@ export { CheckboxInput } from './CheckboxInput';
 export { ListInput } from './ListInput';
 export { TagsInput } from './TagsInput';
 export { SliderInput } from './SliderInput';
+export { ImageInput } from './ImageInput';
+export { FileInput } from './FileInput';

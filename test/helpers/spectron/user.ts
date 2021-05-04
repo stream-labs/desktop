@@ -1,10 +1,9 @@
 import { focusMain, TExecutionContext, focusWorker, focusChild, closeWindow } from './index';
-import { IUserAuth, IPlatformAuth, TPlatform } from '../../../app/services/platforms';
+import { TPlatform } from '../../../app/services/platforms';
 import { sleep } from '../sleep';
 import { dialogDismiss } from './dialog';
 import { ExecutionContext } from 'ava';
 import { requestUtilsServer, USER_POOL_TOKEN } from './runner-utils';
-const request = require('request');
 
 let user: ITestUser; // keep user's name if SLOBS is logged-in
 

@@ -19,7 +19,7 @@ class ObsImportProps {
 
 @Component({ props: createProps(ObsImportProps) })
 export default class ObsImport extends TsxComponent<ObsImportProps> {
-  @Inject() obsImporterService: ObsImporterService;
+  @Inject() obsImporterService!: ObsImporterService;
   @Inject() scenesService: ScenesService;
 
   progress = 0;
@@ -44,7 +44,7 @@ export default class ObsImport extends TsxComponent<ObsImportProps> {
         this.progress = 1;
         this.props.setProcessing(false);
         this.props.continue(true);
-      } catch (e) {
+      } catch (e: unknown) {
         this.$toasted.show($t('Something went wrong.'), {
           position: 'bottom-center',
           className: 'toast-alert',

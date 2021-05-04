@@ -23,7 +23,7 @@ export class IpcServerService extends Service {
       if (!request.params.noReturn) {
         try {
           ipcRenderer.send('services-response', response);
-        } catch (e) {
+        } catch (e: unknown) {
           console.error('Failed to send services response', e, {
             request,
             response,
@@ -38,7 +38,7 @@ export class IpcServerService extends Service {
       // wrap in try/catch to prevent un-subscribing in the case of failure
       try {
         this.sendEvent(event);
-      } catch (e) {
+      } catch (e: unknown) {
         console.error(
           'Failed to send event to an IPC client. Make sure the object is serializable',
           e,

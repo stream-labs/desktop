@@ -20,7 +20,7 @@ import { IGoLiveSettings } from 'services/streaming';
 import { InheritMutations, mutation } from 'services/core';
 import { throwStreamError, TStreamErrorType } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
-import GameSelector from '../../components/windows/go-live/GameSelector';
+import Utils from '../utils';
 
 export interface ITwitchStartStreamOptions {
   title: string;
@@ -67,7 +67,8 @@ interface ITwitchServiceState extends IPlatformState {
 }
 
 @InheritMutations()
-export class TwitchService extends BasePlatformService<ITwitchServiceState>
+export class TwitchService
+  extends BasePlatformService<ITwitchServiceState>
   implements IPlatformService {
   @Inject() hostsService: HostsService;
   @Inject() streamSettingsService: StreamSettingsService;
@@ -85,11 +86,13 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
     },
   };
 
+  readonly apiBase = 'https://api.twitch.tv';
   readonly platform = 'twitch';
   readonly displayName = 'Twitch';
   readonly gameImageSize = { width: 30, height: 40 };
 
   readonly capabilities = new Set<TPlatformCapability>([
+    'title',
     'chat',
     'scope-validation',
     'tags',
@@ -148,13 +151,19 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
       this.streamSettingsService.protectedModeEnabled &&
       this.streamSettingsService.isSafeToModifyStreamKey()
     ) {
-      const key = await this.fetchStreamKey();
+      let key = await this.fetchStreamKey();
+      // do not start actual stream when testing
+      if (Utils.isTestMode()) {
+        key = key.split('?')[0] + `?bandwidthtest=true&rnd=${Math.random()}`;
+      }
       this.SET_STREAM_KEY(key);
-      this.streamSettingsService.setSettings({
-        key,
-        platform: 'twitch',
-        streamType: 'rtmp_common',
-      });
+      if (!this.streamingService.views.isMultiplatformMode) {
+        this.streamSettingsService.setSettings({
+          key,
+          platform: 'twitch',
+          streamType: 'rtmp_common',
+        });
+      }
     }
 
     if (goLiveSettings) {
@@ -211,12 +220,12 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
   async requestTwitch<T = unknown>(reqInfo: IPlatformRequest | string): Promise<T> {
     try {
       return await platformAuthorizedRequest<T>('twitch', reqInfo);
-    } catch (e) {
-      const details = e.result
-        ? `${e.result.status} ${e.result.error} ${e.result.message}`
+    } catch (e: unknown) {
+      const details = (e as any).result
+        ? `${(e as any).result.status} ${(e as any).result.error} ${(e as any).result.message}`
         : 'Connection failed';
       let errorType: TStreamErrorType;
-      switch (e.result?.message) {
+      switch ((e as any).result?.message) {
         case 'missing required oauth scope':
           errorType = 'TWITCH_MISSED_OAUTH_SCOPE';
           break;
@@ -226,12 +235,12 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
         default:
           errorType = 'PLATFORM_REQUEST_FAILED';
       }
-      throwStreamError(errorType, details, 'twitch');
+      throwStreamError(errorType, e as any, details);
     }
   }
 
   private fetchRawChannelInfo(): Promise<ITWitchChannelResponse> {
-    return this.requestTwitch<ITWitchChannelResponse>('https://api.twitch.tv/kraken/channel');
+    return this.requestTwitch<ITWitchChannelResponse>(`${this.apiBase}/kraken/channel`);
   }
 
   fetchStreamKey(): Promise<string> {
@@ -267,21 +276,21 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
   fetchUserInfo() {
     return platformAuthorizedRequest<{ login: string }[]>(
       'twitch',
-      `https://api.twitch.tv/helix/users?id=${this.twitchId}`,
+      `${this.apiBase}/helix/users?id=${this.twitchId}`,
     ).then(json => (json[0] && json[0].login ? { username: json[0].login! } : {}));
   }
 
   fetchViewerCount(): Promise<number> {
     return platformRequest<{ stream?: { viewers: number } }>(
       'twitch',
-      `https://api.twitch.tv/kraken/streams/${this.twitchId}`,
+      `${this.apiBase}/kraken/streams/${this.twitchId}`,
     ).then(json => (json.stream ? json.stream.viewers : 0));
   }
 
   async putChannelInfo({ title, game, tags = [] }: ITwitchStartStreamOptions): Promise<void> {
     await Promise.all([
       this.requestTwitch({
-        url: `https://api.twitch.tv/kraken/channels/${this.twitchId}`,
+        url: `${this.apiBase}/kraken/channels/${this.twitchId}`,
         method: 'PUT',
         body: JSON.stringify({ channel: { game, status: title } }),
       }),
@@ -293,7 +302,7 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
   async searchGames(searchString: string): Promise<IGame[]> {
     const gamesResponse = await platformAuthorizedRequest<{
       data: { id: string; name: string; box_art_url: string }[];
-    }>('twitch', `https://api.twitch.tv/helix/search/categories?query=${searchString}`);
+    }>('twitch', `${this.apiBase}/helix/search/categories?query=${searchString}`);
     if (!gamesResponse.data) return [];
     return gamesResponse.data.map(g => ({ id: g.id, name: g.name, image: g.box_art_url }));
   }
@@ -301,7 +310,7 @@ export class TwitchService extends BasePlatformService<ITwitchServiceState>
   async fetchGame(name: string): Promise<IGame> {
     const gamesResponse = await platformAuthorizedRequest<{
       data: { id: string; name: string; box_art_url: string }[];
-    }>('twitch', `https://api.twitch.tv/helix/games?name=${name}`);
+    }>('twitch', `${this.apiBase}/helix/games?name=${name}`);
     return gamesResponse.data.map(g => {
       const imageTemplate = g.box_art_url;
       const imageSize = this.gameImageSize;

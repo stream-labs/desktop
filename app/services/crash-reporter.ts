@@ -105,7 +105,7 @@ export class CrashReporterService extends Service {
     if (process.env.NODE_ENV !== 'production') return;
     try {
       fs.writeFileSync(this.appStateFile, JSON.stringify(this.appState));
-    } catch (e) {
+    } catch (e: unknown) {
       console.error('Error writing app state file', e);
     }
   }
@@ -121,11 +121,11 @@ export class CrashReporterService extends Service {
       const stateString = fs.readFileSync(this.appStateFile).toString() as EAppState;
       try {
         return JSON.parse(stateString);
-      } catch (e) {
+      } catch (e: unknown) {
         // the old version of crash-reporter file contained only a code string
         return { code: stateString, version: this.version, detected: '' };
       }
-    } catch (e) {
+    } catch (e: unknown) {
       console.error('Error loading app state file', e);
       return clearState;
     }

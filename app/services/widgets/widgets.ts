@@ -28,7 +28,8 @@ export interface IWidgetSourcesState {
 }
 
 @InitAfter('SourcesService')
-export class WidgetsService extends StatefulService<IWidgetSourcesState>
+export class WidgetsService
+  extends StatefulService<IWidgetSourcesState>
   implements IWidgetsServiceApi {
   static initialState: IWidgetSourcesState = {
     widgetSources: {},
@@ -200,7 +201,7 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState>
     const data = this.exportWidgetJSON(widgetItem);
     const json = JSON.stringify(data, null, 2);
 
-    await new Promise((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       fs.writeFile(path, json, err => {
         if (err) {
           reject(err);

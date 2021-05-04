@@ -296,6 +296,8 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
     const shouldShowPermissionWarn =
       (!this.canStreamToTimeline || !this.canStreamToGroup) &&
       this.dismissablesService.views.shouldShow(EDismissable.FacebookNeedPermissionsTip);
+    const outageWarn = this.facebookService.state.outageWarning;
+    const shouldShowOutageWarn = outageWarn && fbSettings.destinationType === 'group';
 
     return (
       <ValidatedForm name="facebook-settings">
@@ -312,6 +314,8 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
             </HFormGroup>
           </div>
         )}
+
+        {shouldShowOutageWarn && <MessageLayout type="error" message={outageWarn} />}
 
         {shouldShowPages && (
           <HFormGroup title={this.formMetadata.page.title}>
@@ -402,7 +406,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
   }
 
   private renderMissedPermissionsWarning() {
-    const isPrimary = this.view.isPrimaryPlatform('facebook');
+    const isPrimary = this.view.checkPrimaryPlatform('facebook');
     return (
       <MessageLayout
         message={$t('You can stream to your timeline and groups now')}

@@ -7,8 +7,7 @@ import vShaderSrc from 'util/webgl/shaders/volmeter.vert';
 import fShaderSrc from 'util/webgl/shaders/volmeter.frag';
 import electron from 'electron';
 import TsxComponent, { createProps } from 'components/tsx-component';
-import { v2 } from 'util/vec2';
-import { difference } from 'lodash';
+import difference from 'lodash/difference';
 import { Subscription } from 'rxjs';
 
 // Configuration
@@ -72,7 +71,7 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
     canvas: HTMLCanvasElement;
   };
 
-  @Inject() customizationService: CustomizationService;
+  @Inject() customizationService!: CustomizationService;
   @Inject() audioService: AudioService;
 
   subscriptions: Dictionary<IVolmeterSubscription> = {};

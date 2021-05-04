@@ -9,7 +9,7 @@ import {
 } from '.';
 import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
-import { authorizedHeaders, handleResponse, jfetch } from 'util/requests';
+import { authorizedHeaders } from 'util/requests';
 import { UserService } from 'services/user';
 import { platformAuthorizedRequest, platformRequest } from './utils';
 import { $t } from 'services/i18n';
@@ -34,6 +34,7 @@ interface IFacebookGroup {
   id: string;
   name: string;
   privacy: 'CLOSED' | 'OPEN' | 'SECRET';
+  administrator: boolean;
 }
 
 export interface IFacebookLiveVideo {
@@ -45,6 +46,9 @@ export interface IFacebookLiveVideo {
   description: string;
   permalink_url: string;
   planned_start_time: string;
+  video: {
+    id: string;
+  };
 }
 
 interface IFacebookServiceState extends IPlatformState {
@@ -52,8 +56,14 @@ interface IFacebookServiceState extends IPlatformState {
   facebookGroups: IFacebookGroup[];
   settings: IFacebookStartStreamOptions;
   grantedPermissions: TFacebookPermissionName[];
+  /**
+   * use videoId for facebook urls,
+   * for the Facebook Graphql API use liveVideoId
+   */
+  videoId: string;
   streamPageUrl: string;
   userAvatar: string;
+  outageWarning: string;
 }
 
 export type TFacebookStreamPrivacy = 'SELF' | 'ALL_FRIENDS' | 'EVERYONE' | '';
@@ -80,8 +90,10 @@ const initialState: IFacebookServiceState = {
   facebookPages: [],
   facebookGroups: [],
   grantedPermissions: [],
+  outageWarning: '',
   streamPageUrl: '',
   userAvatar: '',
+  videoId: '',
   settings: {
     destinationType: 'page',
     pageId: '',
@@ -98,7 +110,8 @@ type TFacebookPermissionName = 'publish_video' | 'publish_to_groups';
 type TFacebookPermission = { permission: TFacebookPermissionName; status: 'granted' | string };
 
 @InheritMutations()
-export class FacebookService extends BasePlatformService<IFacebookServiceState>
+export class FacebookService
+  extends BasePlatformService<IFacebookServiceState>
   implements IPlatformService {
   @Inject() protected hostsService: HostsService;
   @Inject() protected userService: UserService;
@@ -109,8 +122,9 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   readonly displayName = 'Facebook';
 
   readonly capabilities = new Set<TPlatformCapability>([
-    'chat',
+    'title',
     'description',
+    'chat',
     'game',
     'user-info',
     'stream-schedule',
@@ -149,6 +163,16 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   @mutation()
   protected SET_AVATAR(avatar: string) {
     this.state.userAvatar = avatar;
+  }
+
+  @mutation()
+  private SET_OUTAGE_WARN(msg: string) {
+    this.state.outageWarning = msg;
+  }
+
+  @mutation()
+  protected SET_VIDEO_ID(id: string) {
+    this.state.videoId = id;
   }
 
   apiBase = 'https://graph.facebook.com';
@@ -192,14 +216,17 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     // setup stream key and new settings
     const streamUrl = liveVideo.stream_url;
     const streamKey = streamUrl.substr(streamUrl.lastIndexOf('/') + 1);
-    this.streamSettingsService.setSettings({
-      key: streamKey,
-      platform: 'facebook',
-      streamType: 'rtmp_common',
-    });
+    if (!this.streamingService.views.isMultiplatformMode) {
+      this.streamSettingsService.setSettings({
+        key: streamKey,
+        platform: 'facebook',
+        streamType: 'rtmp_common',
+      });
+    }
     this.SET_STREAM_KEY(streamKey);
     this.SET_STREAM_PAGE_URL(`https://facebook.com/${liveVideo.permalink_url}`);
     this.UPDATE_STREAM_SETTINGS({ ...fbOptions, liveVideoId: liveVideo.id });
+    this.SET_VIDEO_ID(liveVideo.video.id);
 
     // send selected pageId to streamlabs.com
     if (fbOptions.destinationType === 'page') {
@@ -238,7 +265,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
 
     return await this.requestFacebook(
       {
-        url: `${this.apiBase}/${liveVideoId}?fields=title,description,stream_url,planned_start_time,permalink_url`,
+        url: `${this.apiBase}/${liveVideoId}?fields=title,description,stream_url,planned_start_time,permalink_url,video`,
         method: 'POST',
         body: JSON.stringify(data),
       },
@@ -286,11 +313,11 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
       return token
         ? await platformRequest<T>('facebook', reqInfo, token)
         : await platformAuthorizedRequest<T>('facebook', reqInfo);
-    } catch (e) {
-      const details = e.result?.error
-        ? `${e.result.error.type} ${e.result.error.message}`
+    } catch (e: unknown) {
+      const details = (e as any).result?.error
+        ? `${(e as any).result.error.type} ${(e as any).result.error.message}`
         : 'Connection failed';
-      throwStreamError('PLATFORM_REQUEST_FAILED', details, 'facebook');
+      throwStreamError('PLATFORM_REQUEST_FAILED', e as any, details);
     }
   }
 
@@ -310,7 +337,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
         .then(blob => {
           url = window.URL.createObjectURL(blob);
         });
-    } catch (e) {
+    } catch (e: unknown) {
       // just don't care is something is wrong here
     }
     return url;
@@ -326,7 +353,7 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
 
     return this.requestFacebook<IFacebookLiveVideo>(
       {
-        url: `${this.apiBase}/${destinationId}/live_videos?&fields=title,description,planned_start_time,permalink_url,stream_url,dash_preview_url`,
+        url: `${this.apiBase}/${destinationId}/live_videos?&fields=title,description,planned_start_time,permalink_url,stream_url,dash_preview_url,video`,
         method: 'POST',
         body: JSON.stringify(body),
       },
@@ -405,8 +432,8 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
 
     try {
       return await platformRequest('facebook', { url, body, method: 'POST' }, token);
-    } catch (e) {
-      if (e?.result?.error?.code === 100) {
+    } catch (e: unknown) {
+      if (e && (e as any).result?.error?.code === 100) {
         throw new Error(
           $t(
             'Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.',
@@ -451,12 +478,20 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
     });
   }
 
-  async fetchGroups(): Promise<IFacebookPage[]> {
-    return (
-      await this.requestFacebook<{ data: IFacebookPage[] }>(
-        `${this.apiBase}/me/groups?admin_only=true&fields=id,name,icon,privacy&limit=100`,
-      )
-    ).data;
+  async fetchGroups(): Promise<IFacebookGroup[]> {
+    try {
+      return (
+        await this.requestFacebook<{ data: IFacebookGroup[] }>(
+          `${this.apiBase}/me/groups?fields=administrator,id,name,icon,privacy&limit=100`,
+        )
+      ).data.filter(group => group.administrator);
+    } catch (e: unknown) {
+      console.error('Error fetching Facebook groups', e);
+      this.SET_OUTAGE_WARN(
+        'Streaming to Facebook groups is currently unavailable.  Please try again later.',
+      );
+      return [];
+    }
   }
 
   fetchViewerCount(): Promise<number> {
@@ -480,9 +515,23 @@ export class FacebookService extends BasePlatformService<IFacebookServiceState>
   }
 
   get chatUrl(): string {
-    if (this.state.settings.destinationType === 'page' && this.state.settings.game) {
+    // don't show chat if the stream has not been started
+    if (!this.state.videoId) return '';
+
+    // take a selected page if exists
+    const page =
+      this.state.settings.destinationType === 'page' &&
+      this.state.facebookPages.find(p => p.id === this.state.settings.pageId);
+
+    // determine the chat url
+    if (page && page.category === 'Gaming Video Creator') {
+      // GVC pages have a specific chat url
+      return `https://www.facebook.com/live/producer/dashboard/${this.state.videoId}/COMMENTS/`;
+    } else if (page && this.state.settings.game) {
+      // if it's not a GVC page but the game is selected then use a legacy chatUrl
       return 'https://www.facebook.com/gaming/streamer/chat/';
     } else {
+      // in other cases we can use only read-only chat
       const token = this.views.getDestinationToken(
         this.state.settings.destinationType,
         this.state.settings.pageId,

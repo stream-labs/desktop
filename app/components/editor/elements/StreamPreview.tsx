@@ -1,4 +1,4 @@
-import Display from 'components/shared/Display.vue';
+import { Display } from 'components/shared/ReactComponent';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
 import Util from 'services/utils';
@@ -37,7 +37,7 @@ export default class StreamPreview extends BaseElement {
   get element() {
     if (!this.streamingService.state.selectiveRecording) return this.selectiveRecordingMessage;
     if (this.hideStyleBlockers) return <div />;
-    return <Display rendering-mode={ERenderingMode.OBS_STREAMING_RENDERING} />;
+    return <Display componentProps={{ renderingMode: ERenderingMode.OBS_STREAMING_RENDERING }} />;
   }
 
   render() {

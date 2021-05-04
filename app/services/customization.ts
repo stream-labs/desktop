@@ -62,7 +62,11 @@ export interface ICustomizationServiceState {
   enableFFZEmotes: boolean;
   mediaBackupOptOut: boolean;
   navigateToLiveOnStreamStart: boolean;
-  experimental: any;
+  experimental?: {
+    legacyGoLive?: boolean;
+    volmetersFPSLimit?: number;
+  };
+  designerMode: boolean;
   legacyEvents: boolean;
   pinnedStatistics: IPinnedStatistics;
 }
@@ -138,11 +142,32 @@ class CustomizationViews extends ViewHandler<ICustomizationServiceState> {
   }
 
   get experimentalSettingsFormData(): TObsFormData {
-    return [];
+    return [
+      <IObsInput<boolean>>{
+        value: this.state.experimental.legacyGoLive,
+        name: 'legacyGoLive',
+        description: 'Use legacy GoLive window',
+        type: 'OBS_PROPERTY_BOOL',
+        visible: true,
+        enabled: true,
+      },
+    ];
+  }
+
+  get pinnedStatistics() {
+    return this.state.pinnedStatistics;
+  }
+
+  get displayBackground() {
+    return DISPLAY_BACKGROUNDS[this.state.theme];
   }
 
   get currentTheme() {
     return this.state.theme;
+  }
+
+  get designerMode() {
+    return this.state.designerMode;
   }
 }
 
@@ -182,6 +207,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     folderSelection: false,
     navigateToLiveOnStreamStart: true,
     legacyEvents: false,
+    designerMode: false,
     pinnedStatistics: {
       cpu: false,
       fps: false,
@@ -234,10 +260,6 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
 
   get sectionBackground() {
     return SECTION_BACKGROUNDS[this.currentTheme];
-  }
-
-  get displayBackground() {
-    return DISPLAY_BACKGROUNDS[this.currentTheme];
   }
 
   get isDarkTheme() {
