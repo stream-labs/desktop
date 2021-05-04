@@ -12,7 +12,6 @@ Vue.use(VueResize);
 
 // Pages
 import Studio from '../pages/Studio';
-import Chatbot from '../pages/Chatbot.vue';
 import PlatformAppStore from '../pages/PlatformAppStore.vue';
 import BrowseOverlays from 'components/pages/BrowseOverlays.vue';
 import AlertboxLibrary from 'components/pages/AlertboxLibrary';
@@ -55,7 +54,6 @@ const loadedTheme = () => {
     CustomLoader,
     PatchNotes,
     NewsBanner,
-    Chatbot,
     PlatformAppMainPage,
     PlatformAppStore,
     ResizeBar,

@@ -25,6 +25,10 @@
             <i class="fa fa-spinner fa-spin" v-if="cacheUploading" />
           </a>
         </div>
+        <bool-input
+          v-model="enableCrashDumpUpload"
+          :metadata="{ title: $t('Enable reporting additional information on a crash (requires restart)'), name: 'enable_dump_upload'  }"
+        />
       </div>
     </div>
     <div class="section">

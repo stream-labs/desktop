@@ -37,7 +37,8 @@ import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService } from 'services/restream';
 import { FacebookService } from 'services/platforms/facebook';
 import Utils from 'services/utils';
-import { cloneDeep, isEqual } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import isEqual from 'lodash/isEqual';
 import { createStreamError, IStreamError, StreamError, TStreamErrorType } from './stream-error';
 import { authorizedHeaders } from 'util/requests';
 import { HostsService } from '../hosts';
@@ -121,6 +122,7 @@ export class StreamingService
         twitch: 'not-started',
         youtube: 'not-started',
         facebook: 'not-started',
+        tiktok: 'not-started',
         setupMultistream: 'not-started',
         startVideoTransmission: 'not-started',
         postTweet: 'not-started',
@@ -344,15 +346,6 @@ export class StreamingService
       this.SET_WARNING('YT_AUTO_START_IS_DISABLED');
     }
 
-    // run afterGoLive hooks
-    try {
-      this.views.enabledPlatforms.forEach(platform => {
-        getPlatformService(platform).afterGoLive();
-      });
-    } catch (e: unknown) {
-      console.error('Error running afterGoLive for platform', e);
-    }
-
     // tweet
     if (
       settings.tweetText &&
@@ -402,6 +395,11 @@ export class StreamingService
       } else {
         this.usageStatisticsService.recordFeatureUsage('StreamToFacebookPage');
       }
+    }
+
+    // send analytics for TikTok
+    if (settings.platforms.tiktok?.enabled) {
+      this.usageStatisticsService.recordFeatureUsage('StreamToTikTok');
     }
   }
 
@@ -461,7 +459,7 @@ export class StreamingService
     const destinations = settings.platforms;
     const platforms = (Object.keys(destinations) as TPlatform[]).filter(
       dest => destinations[dest].enabled && this.views.supports('stream-schedule', [dest]),
-    );
+    ) as ('facebook' | 'youtube')[];
     for (const platform of platforms) {
       const service = getPlatformService(platform);
       assertIsDefined(service.scheduleStream);
@@ -630,6 +628,22 @@ export class StreamingService
     if (replayWhenStreaming && this.state.replayBufferStatus === EReplayBufferState.Offline) {
       this.startReplayBuffer();
     }
+
+    startStreamingPromise
+      .then(() => {
+        // run afterGoLive hooks
+        try {
+          this.views.enabledPlatforms.forEach(platform => {
+            getPlatformService(platform).afterGoLive();
+          });
+        } catch (e: unknown) {
+          console.error('Error running afterGoLive for platform', e);
+        }
+      })
+      .catch(() => {
+        console.warn('startStreamingPromise was rejected');
+      });
+
     return startStreamingPromise;
   }
 
@@ -750,7 +764,7 @@ export class StreamingService
     const width = 900;
 
     const isLegacy =
-      !this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
+      !this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
       this.customizationService.state.experimental?.legacyGoLive;
 
     const componentName = isLegacy ? 'GoLiveWindowDeprecated' : 'GoLiveWindow';
@@ -770,7 +784,7 @@ export class StreamingService
     const width = 900;
 
     const isLegacy =
-      !this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
+      !this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
       this.customizationService.state.experimental?.legacyGoLive;
 
     const componentName = isLegacy ? 'EditStreamWindowDeprecated' : 'EditStreamWindow';

@@ -253,6 +253,7 @@ export default function FacebookEditStreamInfo() {
 
         {shouldShowPrivacy && (
           <ListInput
+            label={$t('Privacy')}
             value={fbSettings.privacy?.value}
             onChange={setPrivacy}
             hasImage={true}

@@ -1,4 +1,4 @@
-import { mutation, InheritMutations, ViewHandler } from '../core/stateful-service';
+import { mutation, InheritMutations } from '../core/stateful-service';
 import {
   IPlatformService,
   TPlatformCapability,
@@ -7,20 +7,17 @@ import {
   IPlatformState,
 } from '.';
 import { Inject } from 'services/core/injector';
-import { authorizedHeaders, handleResponse, jfetch } from 'util/requests';
+import { authorizedHeaders, jfetch } from 'util/requests';
 import { platformAuthorizedRequest } from './utils';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { CustomizationService } from 'services/customization';
 import { IGoLiveSettings } from 'services/streaming';
 import { WindowsService } from 'services/windows';
-import { $t, I18nService } from 'services/i18n';
+import { I18nService } from 'services/i18n';
 import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import { assertIsDefined } from 'util/properties-type-guards';
 import electron from 'electron';
-import { omitBy } from 'lodash';
-import { UserService } from '../user';
-import { IFacebookStartStreamOptions, TDestinationType } from './facebook';
 import Utils from '../utils';
 
 interface IYoutubeServiceState extends IPlatformState {
@@ -132,6 +129,7 @@ export interface IYoutubeVideo {
     title: string;
     description: string;
     categoryId: string;
+    tags: string[];
   };
 }
 
@@ -160,7 +158,6 @@ export class YoutubeService
   extends BasePlatformService<IYoutubeServiceState>
   implements IPlatformService {
   @Inject() private customizationService: CustomizationService;
-  @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private windowsService: WindowsService;
   @Inject() private i18nService: I18nService;
 
@@ -169,6 +166,8 @@ export class YoutubeService
     'description',
     'chat',
     'stream-schedule',
+    'streamlabels',
+    'themes',
   ]);
 
   static initialState: IYoutubeServiceState = {
@@ -286,12 +285,7 @@ export class YoutubeService
     }
 
     // set the category
-    await this.updateCategory(
-      broadcast.id,
-      broadcast.snippet.title,
-      broadcast.snippet.description,
-      ytSettings.categoryId!,
-    );
+    await this.updateCategory(broadcast.id, ytSettings.categoryId!);
 
     // setup key and platform type in the OBS settings
     const streamKey = stream.cdn.ingestionInfo.streamName;
@@ -305,7 +299,6 @@ export class YoutubeService
       });
     }
 
-    // update the local state
     this.UPDATE_STREAM_SETTINGS({ ...ytSettings, broadcastId: broadcast.id });
     this.SET_STREAM_ID(stream.id);
     this.SET_STREAM_KEY(streamKey);
@@ -353,10 +346,6 @@ export class YoutubeService
       );
   }
 
-  fetchUserInfo() {
-    return Promise.resolve({});
-  }
-
   protected async fetchViewerCount(): Promise<number> {
     if (!this.state.settings.broadcastId) return 0; // activeChannel is not available when streaming to custom ingest
     const endpoint = 'videos?part=snippet,liveStreamingDetails';
@@ -381,15 +370,15 @@ export class YoutubeService
     return collection.items.filter(category => category.snippet.assignable);
   }
 
-  private async updateCategory(
-    broadcastId: string,
-    title: string,
-    description: string,
-    categoryId: string,
-  ) {
+  private async updateCategory(broadcastId: string, categoryId: string) {
+    const video = await this.fetchVideo(broadcastId);
     const endpoint = 'videos?part=snippet';
+    const { title, description, tags } = video.snippet;
     await this.requestYoutube({
-      body: JSON.stringify({ id: broadcastId, snippet: { categoryId, title, description } }),
+      body: JSON.stringify({
+        id: broadcastId,
+        snippet: { categoryId, title, description, tags },
+      }),
       method: 'PUT',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
     });
@@ -447,12 +436,8 @@ export class YoutubeService
     assertIsDefined(broadcastId);
 
     if (this.state.settings.categoryId !== options.categoryId) {
-      await this.updateCategory(
-        broadcastId,
-        options.title,
-        options.description,
-        options.categoryId!,
-      );
+      assertIsDefined(options.categoryId);
+      await this.updateCategory(broadcastId, options.categoryId);
     }
 
     await this.updateBroadcast(broadcastId, options, true);

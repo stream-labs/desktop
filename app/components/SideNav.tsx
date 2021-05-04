@@ -11,9 +11,10 @@ import { PlatformAppsService } from 'services/platform-apps';
 import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 import { AppService } from '../services/app';
 import { $t } from 'services/i18n';
-import NavTools from './NavTools';
+import { NavTools } from 'components/shared/ReactComponent';
 import styles from './SideNav.m.less';
 import { LayoutService } from 'services/layout';
+import { getPlatformService } from '../services/platforms';
 
 interface IPageData {
   target: TAppPage;
@@ -54,7 +55,7 @@ export default class SideNav extends Vue {
   }
 
   featureIsEnabled(feature: EAvailableFeatures) {
-    return this.incrementalRolloutService.featureIsEnabled(feature);
+    return this.incrementalRolloutService.views.featureIsEnabled(feature);
   }
 
   get page() {
@@ -138,6 +139,9 @@ export default class SideNav extends Vue {
 
   render() {
     const pageData: IPageData[] = [];
+    const hasThemes =
+      this.userService.isLoggedIn &&
+      getPlatformService(this.userService.platform.type).capabilities.has('themes');
 
     if (this.userService.isLoggedIn) {
       pageData.push({
@@ -149,7 +153,7 @@ export default class SideNav extends Vue {
       });
     }
 
-    if (this.userService.isLoggedIn) {
+    if (hasThemes) {
       pageData.push({
         target: 'BrowseOverlays',
         icon: 'icon-themes',
