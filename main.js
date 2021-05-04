@@ -380,6 +380,7 @@ async function startApp() {
 
   // This needs to be explicitly handled on Mac
   app.on('before-quit', e => {
+    crashHandler.unregisterProcess(pid);
     if (!shutdownStarted) {
       e.preventDefault();
       mainWindow.close();
