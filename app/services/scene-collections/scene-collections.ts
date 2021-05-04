@@ -627,14 +627,6 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   private setupEmptyCollection() {
     this.scenesService.createScene('Scene', { makeActive: true });
     this.setupDefaultAudio();
-
-    const platformService = getPlatformService(this.userService.views.platform?.type);
-    if (platformService && platformService.capabilities.has('resolutionPreset')) {
-      const inputResolution = ((platformService as unknown) as IPlatformCapabilityResolutionPreset)
-        .inputResolution;
-      this.outputSettingsService.setSettings({ inputResolution });
-    }
-
     this.transitionsService.ensureTransition();
   }
 

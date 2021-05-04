@@ -1,9 +1,8 @@
 import { InheritMutations } from '../core';
 import { BasePlatformService } from './base-platform';
-import { IPlatformState, TPlatformCapability } from './index';
+import { IPlatformCapabilityResolutionPreset, IPlatformState, TPlatformCapability } from './index';
 import { IGoLiveSettings } from '../streaming';
 import { WidgetType } from '../widgets';
-import { assertIsDefined } from '../../util/properties-type-guards';
 
 export interface ITiktokStartStreamOptions {
   serverUrl: string;
@@ -15,11 +14,13 @@ interface ITiktokServiceState extends IPlatformState {
 }
 
 @InheritMutations()
-export class TiktokService extends BasePlatformService<ITiktokServiceState> {
+export class TiktokService
+  extends BasePlatformService<ITiktokServiceState>
+  implements IPlatformCapabilityResolutionPreset {
   readonly apiBase = '';
   readonly platform = 'tiktok';
   readonly displayName = 'TikTok';
-  readonly capabilities = new Set<TPlatformCapability>([]);
+  readonly capabilities = new Set<TPlatformCapability>(['resolutionPreset']);
 
   // support only donation widgets for now
   readonly widgetsWhitelist = [
@@ -30,6 +31,7 @@ export class TiktokService extends BasePlatformService<ITiktokServiceState> {
   ];
 
   readonly inputResolution = '720x1280';
+  readonly outputResolution = '720x1280';
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 600,

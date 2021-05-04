@@ -88,6 +88,7 @@ interface IPlatformCapabilityAccountMerging {
 
 export interface IPlatformCapabilityResolutionPreset {
   inputResolution: string;
+  outputResolution: string;
 }
 
 /**
