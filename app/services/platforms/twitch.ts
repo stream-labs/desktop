@@ -71,7 +71,6 @@ export class TwitchService
   extends BasePlatformService<ITwitchServiceState>
   implements IPlatformService {
   @Inject() hostsService: HostsService;
-  @Inject() streamSettingsService: StreamSettingsService;
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
 
@@ -98,6 +97,8 @@ export class TwitchService
     'tags',
     'game',
     'user-info',
+    'streamlabels',
+    'themes',
   ]);
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {

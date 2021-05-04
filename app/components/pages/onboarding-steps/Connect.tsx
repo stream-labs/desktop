@@ -1,8 +1,8 @@
 import cx from 'classnames';
 import { Component } from 'vue-property-decorator';
 import electron from 'electron';
-import { UserService, EAuthProcessState } from 'services/user';
-import { TPlatform, EPlatformCallResult } from 'services/platforms';
+import { EAuthProcessState, UserService } from 'services/user';
+import { EPlatformCallResult, TPlatform } from 'services/platforms';
 import { Inject } from 'services/core/injector';
 import { OnboardingService } from 'services/onboarding';
 import TsxComponent, { createProps } from 'components/tsx-component';
@@ -13,6 +13,12 @@ import ListInput from 'components/shared/inputs/ListInput.vue';
 import ExtraPlatformConnect, { TExtraPlatform } from './ExtraPlatformConnect';
 import { IListOption } from '../../shared/inputs';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import { StreamingService } from '../../../services/streaming';
+import { PlatformLogo } from '../../shared/ReactComponent';
+import {
+  EAvailableFeatures,
+  IncrementalRolloutService,
+} from '../../../services/incremental-rollout';
 
 class ConnectProps {
   continue: () => void = () => {};
@@ -23,6 +29,8 @@ export default class Connect extends TsxComponent<ConnectProps> {
   @Inject() userService: UserService;
   @Inject() onboardingService: OnboardingService;
   @Inject() usageStatisticsService: UsageStatisticsService;
+  @Inject() streamingService!: StreamingService;
+  @Inject() incrementalRolloutService: IncrementalRolloutService;
 
   selectedExtraPlatform: TExtraPlatform | '' = '';
 
@@ -61,16 +69,6 @@ export default class Connect extends TsxComponent<ConnectProps> {
       // Currently we do not have special handling for generic errors
       this.props.continue();
     }
-  }
-
-  iconForPlatform(platform: TPlatform) {
-    if (this.loading) return 'fas fa-spinner fa-spin';
-
-    return {
-      twitch: 'fab fa-twitch',
-      youtube: 'fab fa-youtube',
-      facebook: 'fab fa-facebook',
-    }[platform];
   }
 
   get isSecurityUpgrade() {
@@ -113,6 +111,12 @@ export default class Connect extends TsxComponent<ConnectProps> {
       );
     }
 
+    const platforms = ['twitch', 'youtube', 'facebook'];
+
+    if (this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.tiktok)) {
+      platforms.push('tiktok');
+    }
+
     return (
       <div class={styles.pageContainer}>
         <div class={styles.container}>
@@ -132,13 +136,18 @@ export default class Connect extends TsxComponent<ConnectProps> {
             </h3>
           )}
           <div class={styles.signupButtons}>
-            {['twitch', 'youtube', 'facebook'].map((platform: TPlatform) => (
+            {platforms.map((platform: TPlatform) => (
               <button
                 class={cx(`button button--${platform}`, styles.loginButton)}
                 disabled={this.loading}
                 onClick={() => this.authPlatform(platform)}
               >
-                <i class={this.iconForPlatform(platform)} />
+                {this.loading && <i class="fas fa-spinner fa-spin" />}
+                {!this.loading && (
+                  <PlatformLogo
+                    componentProps={{ platform, size: 'medium', color: 'white', unwrapped: true }}
+                  />
+                )}
               </button>
             ))}
           </div>

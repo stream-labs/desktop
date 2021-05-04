@@ -158,7 +158,6 @@ export class YoutubeService
   extends BasePlatformService<IYoutubeServiceState>
   implements IPlatformService {
   @Inject() private customizationService: CustomizationService;
-  @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private windowsService: WindowsService;
   @Inject() private i18nService: I18nService;
 
@@ -167,6 +166,8 @@ export class YoutubeService
     'description',
     'chat',
     'stream-schedule',
+    'streamlabels',
+    'themes',
   ]);
 
   static initialState: IYoutubeServiceState = {
@@ -297,7 +298,6 @@ export class YoutubeService
       });
     }
 
-    // update the local state
     this.UPDATE_STREAM_SETTINGS({ ...ytSettings, broadcastId: broadcast.id });
     this.SET_STREAM_ID(stream.id);
     this.SET_STREAM_KEY(streamKey);
@@ -343,10 +343,6 @@ export class YoutubeService
       .then(json =>
         json.settings.autopublish ? `Support the stream: ${json.donation_url} \n` : '',
       );
-  }
-
-  fetchUserInfo() {
-    return Promise.resolve({});
   }
 
   protected async fetchViewerCount(): Promise<number> {
