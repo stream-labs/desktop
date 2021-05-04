@@ -96,7 +96,7 @@ export default function CommonPlatformFields(p: IProps) {
           <div>
             {/*TITLE*/}
             <TextInput
-              value={fields.title}
+              value={fields['title']}
               name="title"
               onChange={val => updateCommonField('title', val)}
               label={$t('Title')}

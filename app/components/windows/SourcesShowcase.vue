@@ -201,6 +201,7 @@
             </div>
 
             <div
+              v-if="hasStreamlabel"
               class="source source--widget"
               :class="{ 'source--active': inspectedSource === 'streamlabel' }"
               @click="inspectSource('streamlabel')"
