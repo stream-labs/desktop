@@ -5,6 +5,7 @@ import { UserService } from 'services/user';
 import { HostsService } from './hosts';
 import Utils from 'services/utils';
 import { InitAfter } from './core';
+import { AppService } from './app';
 
 export enum EAvailableFeatures {
   chatbot = 'slobs--chatbot',
@@ -25,12 +26,15 @@ interface IIncrementalRolloutServiceState {
 export class IncrementalRolloutService extends StatefulService<IIncrementalRolloutServiceState> {
   @Inject() private userService: UserService;
   @Inject() private hostsService: HostsService;
+  @Inject() private appService: AppService;
 
   static initialState: IIncrementalRolloutServiceState = {
     availableFeatures: [],
   };
 
   init() {
+    this.setCommandLineFeatures();
+
     this.userService.userLogin.subscribe(() => this.fetchAvailableFeatures());
     this.userService.userLogout.subscribe(() => this.resetAvailableFeatures());
   }
@@ -52,13 +56,26 @@ export class IncrementalRolloutService extends StatefulService<IIncrementalRollo
       const request = new Request(url, { headers });
 
       return jfetch<{ features: string[] }>(request).then(response => {
-        this.SET_AVAILABLE_FEATURES(response.features);
+        this.SET_AVAILABLE_FEATURES([...this.state.availableFeatures, ...response.features]);
       });
     }
   }
 
+  setCommandLineFeatures() {
+    this.appService.state.argv.forEach(arg => {
+      const match = arg.match(/^\-\-feature-enable\-([a-zA-Z\-]*)$/);
+
+      if (match) {
+        this.SET_AVAILABLE_FEATURES([...this.state.availableFeatures, match[1]]);
+      }
+    });
+  }
+
   resetAvailableFeatures() {
     this.SET_AVAILABLE_FEATURES([]);
+
+    // Command line features are always available
+    this.setCommandLineFeatures();
   }
 }
 

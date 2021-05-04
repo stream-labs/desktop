@@ -59,7 +59,7 @@ function TikTokLogo(p: IProps) {
     <div style={wrapperStyles}>
       <i
         className="fab tiktok"
-        style={{ width: `${size / 2}px` }}
+        style={{ width: '30px' }}
         dangerouslySetInnerHTML={{ __html: getTikTokSvg(color) }}
       />
     </div>
