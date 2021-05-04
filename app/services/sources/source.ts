@@ -14,7 +14,7 @@ import Utils from 'services/utils';
 import * as obs from '../../../obs-api';
 import isEqual from 'lodash/isEqual';
 import omitBy from 'lodash/omitBy';
-import { cloneDeep, omit } from 'lodash';
+import omit from 'lodash/omit';
 import { assertIsDefined } from '../../util/properties-type-guards';
 import { SourceFiltersService } from '../source-filters';
 
@@ -55,11 +55,8 @@ export class Source implements ISourceApi {
   // TODO: propertiesMangers should be private
   @ExecuteInWorkerProcess()
   updateSettings(settings: Dictionary<any>) {
-    const obsInputSettings = this.sourcesService.getObsSourceSettings(this.type, settings);
-    this.getObsInput().update(obsInputSettings);
-    this.sourcesService.propertiesManagers[this.sourceId].manager.handleSettingsChange(
-      obsInputSettings,
-    );
+    this.getObsInput().update(settings);
+    this.sourcesService.propertiesManagers[this.sourceId].manager.handleSettingsChange(settings);
     this.sourcesService.sourceUpdated.next(this.state);
   }
 

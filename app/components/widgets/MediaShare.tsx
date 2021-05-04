@@ -19,10 +19,12 @@ export default class MediaShare extends WidgetSettings<IMediaShareData, MediaSha
     return this.service.getMetadata();
   }
 
-  navItems = [
-    { value: 'media', label: $t('Manage Media Settings') },
-    { value: 'source', label: $t('Source') },
-  ];
+  get navItems() {
+    return [
+      { value: 'media', label: $t('Manage Media Settings') },
+      { value: 'source', label: $t('Source') },
+    ];
+  }
 
   async unbanMedia(media: string) {
     await this.service.unbanMedia(media);

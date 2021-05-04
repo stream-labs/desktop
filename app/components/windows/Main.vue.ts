@@ -12,7 +12,6 @@ Vue.use(VueResize);
 
 // Pages
 import Studio from '../pages/Studio';
-import Chatbot from '../pages/Chatbot.vue';
 import PlatformAppStore from '../pages/PlatformAppStore.vue';
 import BrowseOverlays from 'components/pages/BrowseOverlays.vue';
 import AlertboxLibrary from 'components/pages/AlertboxLibrary';
@@ -55,7 +54,6 @@ const loadedTheme = () => {
     CustomLoader,
     PatchNotes,
     NewsBanner,
-    Chatbot,
     PlatformAppMainPage,
     PlatformAppStore,
     ResizeBar,
@@ -84,21 +82,22 @@ export default class Main extends Vue {
   }
 
   mounted() {
-    // antdThemes[this.theme].use();
+    antdThemes[this.theme].use();
     WindowsService.modalChanged.subscribe(modalOptions => {
       this.modalOptions = { ...this.modalOptions, ...modalOptions };
     });
+    this.updateLiveDockContraints();
   }
 
   get uiReady() {
     return this.$store.state.bulkLoadFinished && this.$store.state.i18nReady;
   }
 
-  // @Watch('theme')
-  // updateAntd(newTheme: string, oldTheme: string) {
-  //   antdThemes[oldTheme].unuse();
-  //   antdThemes[newTheme].use();
-  // }
+  @Watch('theme')
+  updateAntd(newTheme: string, oldTheme: string) {
+    antdThemes[oldTheme].unuse();
+    antdThemes[newTheme].use();
+  }
 
   @Watch('uiReady')
   initializeResize() {
@@ -162,6 +161,10 @@ export default class Main extends Vue {
     );
   }
 
+  get liveDockSize() {
+    return this.customizationService.state.livedockSize;
+  }
+
   get isDockCollapsed() {
     return this.customizationService.state.livedockCollapsed;
   }
@@ -205,7 +208,7 @@ export default class Main extends Vue {
     while (fi--) files.push(fileList.item(fi).path);
 
     const isDirectory = await this.isDirectory(files[0]).catch(err => {
-      console.error(err);
+      console.error('Error checking if drop is directory', err);
       return false;
     });
 
@@ -255,6 +258,15 @@ export default class Main extends Vue {
 
   windowResizeTimeout: number;
 
+  minDockWidth = 290;
+  maxDockWidth = this.minDockWidth;
+
+  updateLiveDockContraints() {
+    const appRect = this.$root.$el.getBoundingClientRect();
+    this.maxDockWidth = Math.min(appRect.width - this.minEditorWidth, appRect.width / 2);
+    this.minDockWidth = Math.min(290, this.maxDockWidth);
+  }
+
   windowSizeHandler() {
     if (!this.windowsService.state.main.hideStyleBlockers) {
       this.onResizeStartHandler();
@@ -267,10 +279,11 @@ export default class Main extends Vue {
     if (this.page === 'Studio') {
       this.hasLiveDock = this.windowWidth >= this.minEditorWidth + 100;
     }
-    this.windowResizeTimeout = window.setTimeout(
-      () => this.windowsService.actions.updateStyleBlockers('main', false),
-      200,
-    );
+    this.windowResizeTimeout = window.setTimeout(() => {
+      this.windowsService.actions.updateStyleBlockers('main', false);
+      this.updateLiveDockContraints();
+      this.updateWidth();
+    }, 200);
   }
 
   handleResize() {
@@ -286,8 +299,7 @@ export default class Main extends Vue {
   }
 
   onResizeStopHandler(offset: number) {
-    const adjustedOffset = this.leftDock ? offset : -offset;
-    this.setWidth(this.customizationService.state.livedockSize + adjustedOffset);
+    this.setWidth(this.customizationService.state.livedockSize + offset);
     this.windowsService.actions.updateStyleBlockers('main', false);
   }
 
@@ -298,11 +310,8 @@ export default class Main extends Vue {
   }
 
   validateWidth(width: number): number {
-    const appRect = this.$root.$el.getBoundingClientRect();
-    const minWidth = 290;
-    const maxWidth = Math.min(appRect.width - this.minEditorWidth, appRect.width / 2);
-    let constrainedWidth = Math.max(minWidth, width);
-    constrainedWidth = Math.min(maxWidth, width);
+    let constrainedWidth = Math.max(this.minDockWidth, width);
+    constrainedWidth = Math.min(this.maxDockWidth, width);
     return constrainedWidth;
   }
 

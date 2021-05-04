@@ -17,7 +17,16 @@ import SceneTransitions from 'components/windows/SceneTransitions.vue';
 import AddSource from 'components/windows/AddSource.vue';
 import RenameSource from 'components/windows/RenameSource.vue';
 import NameScene from 'components/windows/NameScene.vue';
-import NameFolder from 'components/windows/NameFolder.vue';
+import {
+  NameFolder,
+  GoLiveWindow,
+  EditStreamWindow,
+  IconLibraryProperties,
+  PerformanceMetrics,
+} from 'components/shared/ReactComponent';
+
+import GoLiveWindowDeprecated from 'components/windows/go-live/GoLiveWindow';
+import EditStreamWindowDeprecated from 'components/windows/go-live/EditStreamWindow';
 import SourceProperties from 'components/windows/SourceProperties.vue';
 import SourceFilters from 'components/windows/SourceFilters.vue';
 import AddSourceFilter from 'components/windows/AddSourceFilter';
@@ -38,8 +47,6 @@ import OverlayWindow from 'components/windows/OverlayWindow.vue';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
 import WelcomeToPrime from 'components/windows/WelcomeToPrime';
-import GoLiveWindow from 'components/windows/go-live/GoLiveWindow';
-import EditStreamWindow from 'components/windows/go-live/EditStreamWindow';
 import ScheduleStreamWindow from 'components/windows/go-live/ScheduleStreamWindow';
 
 import BitGoal from 'components/widgets/goal/BitGoal';
@@ -62,7 +69,6 @@ import MediaShare from 'components/widgets/MediaShare';
 import AlertBox from 'components/widgets/AlertBox.vue';
 import SpinWheel from 'components/widgets/SpinWheel.vue';
 
-import PerformanceMetrics from 'components/PerformanceMetrics.vue';
 import { byOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from './usage-statistics';
 import { Inject } from 'services/core';
@@ -128,7 +134,10 @@ export function getComponents() {
     WelcomeToPrime,
     GoLiveWindow,
     EditStreamWindow,
+    GoLiveWindowDeprecated,
+    EditStreamWindowDeprecated,
     ScheduleStreamWindow,
+    IconLibraryProperties,
   };
 }
 
@@ -323,7 +332,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
           height: options.size.height,
         });
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Recovering from error:', err);
 
       childWindow.setMinimumSize(options.size.width, options.size.height);

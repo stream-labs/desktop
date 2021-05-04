@@ -9,7 +9,7 @@ import { TPlatform } from 'services/platforms';
 import { IStreamSettings, StreamingService } from 'services/streaming';
 import { SyncWithValue } from 'services/app/app-decorators';
 import { Inject } from 'services/core';
-import { pick } from 'lodash';
+import pick from 'lodash/pick';
 import { assertIsDefined } from 'util/properties-type-guards';
 
 class Props {
@@ -41,7 +41,7 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
     this.commonFields = pick(
       this.props.platform
         ? this.settings.platforms[this.props.platform]
-        : this.view.getCommonFields(this.settings),
+        : this.view.getCommonFields(this.settings.platforms),
       ['title', 'description'],
     ) as { title: string; description: string };
   }
@@ -108,7 +108,7 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
     // if we disabled customFields for a platform
     // than we should return common fields values for this platform
     if (!useCustomFields) {
-      const commonFields = this.view.getCommonFields(this.settings);
+      const commonFields = this.view.getCommonFields(this.settings.platforms);
       // TODO: figure out how to resolve types
       // @ts-ignore
       this.settings.platforms[platform] = {
@@ -138,6 +138,12 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
     const fields = isSinglePlatformMode
       ? this.settings.platforms[this.props.platform as TPlatform]
       : this.commonFields;
+    const platform = this.props.platform;
+    const fbSettings = this.settings.platforms.facebook;
+    // description is required for facebook
+    const descriptionIsRequired =
+      platform === 'facebook' ||
+      (!platform && fbSettings && fbSettings.enabled && !fbSettings.useCustomFields);
 
     // find out the best title for common fields
     let title = '';
@@ -191,6 +197,7 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
                     title: $t('Description'),
                     name: 'description',
                     fullWidth: true,
+                    required: descriptionIsRequired,
                     disabled,
                   })}
                 />

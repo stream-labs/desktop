@@ -24,6 +24,9 @@
           position="right"
           @resizestart="onResizeStartHandler"
           @resizestop="onResizeStopHandler"
+          :max="maxDockWidth"
+          :min="minDockWidth"
+          :value="liveDockSize"
         />
       </div>
 
@@ -46,6 +49,10 @@
           position="left"
           @resizestart="onResizeStartHandler"
           @resizestop="onResizeStopHandler"
+          :max="maxDockWidth"
+          :min="minDockWidth"
+          :value="liveDockSize"
+          :reverse="true"
         />
         <live-dock class="live-dock" />
       </div>

@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { debounce } from 'lodash';
+import React, { useState, useEffect, useCallback, useRef, useContext } from 'react';
+import debounce from 'lodash/debounce';
 import { StatefulService } from '../services/core';
 import { createBinding, TBindings } from './shared/inputs';
 import { useForm } from './shared/inputs/Form';
@@ -47,7 +47,15 @@ export function useOnDestroy(cb: () => void) {
 }
 
 /**
+ * Create a debounced version of the function
+ */
+export function useDebounce<T extends (...args: any[]) => any>(ms = 0, cb: T) {
+  return useCallback(debounce(cb, ms), []);
+}
+
+/**
  * Init state with an async callback
+ * TODO investigate if we can just use a library for the async code https://github.com/slorber/react-async-hook
  */
 export function useAsyncState<TStateType>(
   defaultState: TStateType | (() => TStateType),
@@ -77,15 +85,6 @@ export function useAsyncState<TStateType>(
   return [state, setState, promise];
 }
 
-type TUseFormStateResult<TState> = {
-  s: TState;
-  setState: (p: TState) => unknown;
-  updateState: (p: Partial<TState>) => unknown;
-  bind: TBindings<TState>;
-  stateRef: { current: TState };
-  form: FormInstance<TState>;
-};
-
 /**
  * Create the state object and return helper methods
  */
@@ -109,19 +108,50 @@ export function useFormState<T extends object>(initializer: T | (() => T)): TUse
     setState({ ...stateRef.current, ...patch });
   }
 
+  function setItem<TDict extends keyof T, TKey extends keyof T[TDict]>(
+    dictionaryName: TDict,
+    key: TKey,
+    value: T[TDict][TKey],
+  ): void {
+    setState({
+      ...stateRef.current,
+      [dictionaryName]: { ...stateRef.current[dictionaryName], [key]: value },
+    });
+  }
+
   return {
     s,
     setState,
     updateState,
+    setItem,
     bind: createBinding(s, setState),
     stateRef,
     form,
   };
 }
 
+type TUseFormStateResult<TState extends object> = {
+  s: TState;
+  setState: (p: TState) => unknown;
+  updateState: (p: Partial<TState>) => unknown;
+  setItem: <TDict extends keyof TState, TKey extends keyof TState[TDict]>(
+    dictionaryName: TDict,
+    key: TKey,
+    value: TState[TDict][TKey],
+  ) => unknown;
+  bind: TBindings<TState, keyof TState>;
+  stateRef: { current: TState };
+  form: FormInstance<TState>;
+};
+
 /**
- * Create a debounced version of the function
+ * Returns a function for force updating of the component
+ * Use it only for frequently used components for optimization purposes
+ *
+ * Current implementation from
+ * https://github.com/ant-design/ant-design/blob/master/components/_util/hooks/useForceUpdate.ts
  */
-export function useDebounce<T extends (...args: any[]) => any>(ms = 0, cb: T) {
-  return useCallback(debounce(cb, ms), []);
+export function useForceUpdate() {
+  const [, forceUpdate] = React.useReducer(x => x + 1, 0);
+  return forceUpdate;
 }

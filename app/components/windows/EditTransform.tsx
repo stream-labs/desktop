@@ -22,7 +22,7 @@ const dirMap = (dir: string) =>
 
 @Component({})
 export default class EditTransform extends TsxComponent<{}> {
-  @Inject() selectionService: SelectionService;
+  @Inject() selectionService!: SelectionService;
   @Inject() windowsService: WindowsService;
   @Inject() private editorCommandsService: EditorCommandsService;
 

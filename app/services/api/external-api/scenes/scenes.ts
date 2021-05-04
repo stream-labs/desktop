@@ -22,7 +22,7 @@ import { SelectionService } from 'services/selection';
 export class ScenesService {
   @Fallback()
   @Inject()
-  private scenesService: InternalScenesService;
+  private scenesService!: InternalScenesService;
 
   @Inject() editorService: EditorService;
   @Inject() selectionService: SelectionService;

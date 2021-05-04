@@ -13,6 +13,7 @@ import { GameOverlayService } from './game-overlay';
 import { CustomizationService } from './customization';
 import { RecentEventsService } from './recent-events';
 import { UsageStatisticsService } from './usage-statistics';
+import { getOS, OS } from 'util/operating-systems';
 
 function getScenesService(): ScenesService {
   return ScenesService.instance;
@@ -55,8 +56,9 @@ const isSourceType = (type: TSourceType) => (sourceId: string) => {
 };
 
 function getHotkeyHash(hotkey: IHotkey): string {
-  return `${hotkey.actionName}/${hotkey.sceneId || ''}${hotkey.sourceId ||
-    ''}/${hotkey.sceneItemId || ''}`;
+  return `${hotkey.actionName}/${hotkey.sceneId || ''}${hotkey.sourceId || ''}/${
+    hotkey.sceneItemId || ''
+  }`;
 }
 
 /**
@@ -163,11 +165,13 @@ const GENERAL_ACTIONS: HotkeyGroup = {
     name: 'TOGGLE_OVERLAY',
     description: () => $t('Toggle in-game overlay'),
     down: () => getGameOverlayService().toggleOverlay(),
+    shouldApply: () => getOS() === OS.Windows,
   },
   TOGGLE_OVERLAY_POSITIONING: {
     name: 'TOGGLE_OVERLAY_POSITIONING',
     description: () => $t('Toggle overlay positioning mode'),
     down: () => getGameOverlayService().setPreviewMode(!getGameOverlayService().state.previewMode),
+    shouldApply: () => getOS() === OS.Windows,
   },
   TOGGLE_PERFORMANCE_MODE: {
     name: 'TOGGLE_PERFORMANCE_MODE',
@@ -285,10 +289,7 @@ const SCENE_ITEM_ACTIONS: HotkeyGroup = {
     },
     shouldApply: sceneItemId => !!getScenesService().views.getSceneItem(sceneItemId)?.video,
     isActive: sceneItemId => !!getScenesService().views.getSceneItem(sceneItemId)?.visible,
-    down: sceneItemId =>
-      getScenesService()
-        .views.getSceneItem(sceneItemId)
-        ?.setVisibility(true),
+    down: sceneItemId => getScenesService().views.getSceneItem(sceneItemId)?.setVisibility(true),
   },
   TOGGLE_SOURCE_VISIBILITY_HIDE: {
     name: 'TOGGLE_SOURCE_VISIBILITY_HIDE',
@@ -298,10 +299,7 @@ const SCENE_ITEM_ACTIONS: HotkeyGroup = {
     },
     shouldApply: sceneItemId => !!getScenesService().views.getSceneItem(sceneItemId)?.video,
     isActive: sceneItemId => getScenesService().views.getSceneItem(sceneItemId)?.visible === false,
-    down: sceneItemId =>
-      getScenesService()
-        .views.getSceneItem(sceneItemId)
-        ?.setVisibility(false),
+    down: sceneItemId => getScenesService().views.getSceneItem(sceneItemId)?.setVisibility(false),
   },
   PUSH_TO_SOURCE_SHOW: {
     name: 'PUSH_TO_SOURCE_SHOW',
@@ -310,14 +308,8 @@ const SCENE_ITEM_ACTIONS: HotkeyGroup = {
       return $t('Push to Show %{sourcename}', { sourcename: sceneItem?.source.name });
     },
     shouldApply: sceneItemId => !!getScenesService().views.getSceneItem(sceneItemId)?.video,
-    up: sceneItemId =>
-      getScenesService()
-        .views.getSceneItem(sceneItemId)
-        ?.setVisibility(false),
-    down: sceneItemId =>
-      getScenesService()
-        .views.getSceneItem(sceneItemId)
-        ?.setVisibility(true),
+    up: sceneItemId => getScenesService().views.getSceneItem(sceneItemId)?.setVisibility(false),
+    down: sceneItemId => getScenesService().views.getSceneItem(sceneItemId)?.setVisibility(true),
   },
   PUSH_TO_SOURCE_HIDE: {
     name: 'PUSH_TO_SOURCE_HIDE',
@@ -326,14 +318,8 @@ const SCENE_ITEM_ACTIONS: HotkeyGroup = {
       return $t('Push to Hide %{sourcename}', { sourcename: sceneItem?.source.name });
     },
     shouldApply: sceneItemId => !!getScenesService().views.getSceneItem(sceneItemId)?.video,
-    up: sceneItemId =>
-      getScenesService()
-        .views.getSceneItem(sceneItemId)
-        ?.setVisibility(true),
-    down: sceneItemId =>
-      getScenesService()
-        .views.getSceneItem(sceneItemId)
-        ?.setVisibility(false),
+    up: sceneItemId => getScenesService().views.getSceneItem(sceneItemId)?.setVisibility(true),
+    down: sceneItemId => getScenesService().views.getSceneItem(sceneItemId)?.setVisibility(false),
   },
 };
 

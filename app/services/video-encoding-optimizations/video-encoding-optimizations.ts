@@ -41,9 +41,7 @@ interface IVideoEncodingOptimizationServiceState {
   lastSelectedProfile: IEncoderProfile;
 }
 
-export class VideoEncodingOptimizationService extends PersistentStatefulService<
-  IVideoEncodingOptimizationServiceState
-> {
+export class VideoEncodingOptimizationService extends PersistentStatefulService<IVideoEncodingOptimizationServiceState> {
   static defaultState: IVideoEncodingOptimizationServiceState = {
     useOptimizedProfile: false,
     lastLoadedGame: '',
@@ -127,7 +125,7 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
         )
           .then(handleErrors)
           .then(camelize);
-      } catch (e) {
+      } catch (e: unknown) {
         // probably some network error
         // don't stop here
       }
@@ -139,10 +137,10 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
         profiles = await fetch(this.urlService.getStreamlabsApi('gamepresets/DEFAULT'))
           .then(handleErrors)
           .then(camelize);
-      } catch (e) {
+      } catch (e: unknown) {
         // probably some network error
         // don't stop here
-        console.error(e);
+        console.error('Error fetching game presets', e);
       }
     }
 

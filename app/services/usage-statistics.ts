@@ -112,7 +112,7 @@ export class UsageStatisticsService extends Service {
               localStorage.setItem('installerId', installerId);
             }
           }
-        } catch (e) {
+        } catch (e: unknown) {
           console.error('Error loading installer id', e);
         }
       }

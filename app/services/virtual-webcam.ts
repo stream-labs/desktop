@@ -46,7 +46,7 @@ export class VirtualWebcamService extends StatefulService<IVirtualWebcamServiceS
                 }
 
                 return EVirtualWebcamPluginInstallStatus.Outdated;
-              } catch (e) {
+              } catch (e: unknown) {
                 console.error('Error comparing checksums on virtual webcam', e);
                 // Assume outdated
                 return EVirtualWebcamPluginInstallStatus.Outdated;

@@ -9,7 +9,7 @@ import { Component, Watch } from 'vue-property-decorator';
 
 class WrapperProps<TComponentProps> {
   name?: string = null;
-  componentProps: TComponentProps = null;
+  componentProps?: TComponentProps = null;
   wrapperStyles?: Dictionary<string> = null;
 }
 
@@ -50,7 +50,7 @@ class ReactComponent<TComponentProps = {}> extends TsxComponent<WrapperProps<TCo
   }
 
   render() {
-    return <div ref="container" style={this.props.wrapperStyles}></div>;
+    return <div class="react" ref="container" style={this.props.wrapperStyles}></div>;
   }
 }
 
@@ -67,6 +67,20 @@ export class NewsBanner extends ReactComponent {}
 export class PatchNotes extends ReactComponent {}
 @Component({
   props: {
+    name: { default: 'NavTools' },
+    wrapperStyles: { default: () => ({ marginTop: 'auto', flexShrink: 0 }) },
+  },
+})
+export class NavTools extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'IconLibraryProperties' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class IconLibraryProperties extends ReactComponent {}
+@Component({
+  props: {
     name: { default: 'Display' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
     componentProps: {
@@ -78,6 +92,14 @@ export class PatchNotes extends ReactComponent {}
   },
 })
 export class Display extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'PerformanceMetrics' },
+    componentProps: { default: () => ({ mode: 'limited' }) },
+  },
+})
+export class PerformanceMetrics extends ReactComponent<{ mode: 'full' | 'limited' }> {}
+
 @Component({
   props: {
     name: { default: 'TitleBar' },
@@ -95,3 +117,19 @@ export class TitleBar extends ReactComponent {}
   },
 })
 export class Chat extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'GoLiveWindow' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class GoLiveWindow extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'EditStreamWindow' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class EditStreamWindow extends ReactComponent {}

@@ -7,7 +7,7 @@ import { Inject } from './core/injector';
 // are just keeping the value in one place.
 export class HostsService extends Service {
   get streamlabs() {
-    if (Util.useLocalHost()) {
+    if (Util.shouldUseLocalHost()) {
       return 'streamlabs.site';
     }
     return 'streamlabs.com';
@@ -26,7 +26,7 @@ export class HostsService extends Service {
   }
 
   get io() {
-    if (Util.useLocalHost()) {
+    if (Util.shouldUseLocalHost()) {
       return 'http://io.streamlabs.site:4567';
     }
     return 'https://aws-io.streamlabs.com';
@@ -49,7 +49,7 @@ export class UrlService extends Service {
   @Inject('HostsService') private hosts: HostsService;
 
   get protocol() {
-    return Util.useLocalHost() ? 'http://' : 'https://';
+    return Util.shouldUseLocalHost() ? 'http://' : 'https://';
   }
 
   getStreamlabsApi(endpoint: string) {

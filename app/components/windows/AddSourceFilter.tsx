@@ -12,11 +12,11 @@ import { metadata } from 'components/shared/inputs';
 
 @Component({})
 export default class AddSourceFilter extends Vue {
-  @Inject() private windowsService: WindowsService;
+  @Inject() private windowsService!: WindowsService;
   @Inject() private editorCommandsService: EditorCommandsService;
 
   @Inject('SourceFiltersService')
-  filtersService: SourceFiltersService;
+  filtersService!: SourceFiltersService;
 
   sourceId: string = this.windowsService.getChildWindowQueryParams().sourceId;
   form = this.filtersService.getAddNewFormData(this.sourceId);

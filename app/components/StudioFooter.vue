@@ -16,7 +16,7 @@
         @click="openMetricsWindow"
         v-tooltip.left="$t('Open Performance Window')"
       />
-      <performance-metrics mode="limited" class="performance-metrics" />
+      <performance-metrics :componentProps="{ mode: 'limited' }" class="performance-metrics" />
       <notifications-area class="notifications-area flex--grow" />
     </div>
 
