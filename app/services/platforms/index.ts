@@ -43,6 +43,8 @@ export type TPlatformCapabilityMap = {
   themes: true;
   /** This service should preset a custom resolution for every new scene-collection **/
   resolutionPreset: IPlatformCapabilityResolutionPreset;
+  /** This service supports fetching viewersCount **/
+  viewerCount: IPlatformCapabilityViewerCount;
 };
 
 export type TPlatformCapability = keyof TPlatformCapabilityMap;
@@ -54,6 +56,10 @@ interface IPlatformCapabilityChat {
 export interface IPlatformCapabilityGame {
   searchGames: (searchString: string) => Promise<IGame[]>;
   state: { settings: { game: string } };
+}
+
+export interface IPlatformCapabilityViewerCount {
+  fetchViewerCount(): Promise<number>;
 }
 
 interface IPlatformCapabilityTitle {
