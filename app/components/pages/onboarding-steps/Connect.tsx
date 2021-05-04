@@ -144,7 +144,9 @@ export default class Connect extends TsxComponent<ConnectProps> {
               >
                 {this.loading && <i class="fas fa-spinner fa-spin" />}
                 {!this.loading && (
-                  <PlatformLogo componentProps={{ platform, size: 'medium', color: 'white' }} />
+                  <PlatformLogo
+                    componentProps={{ platform, size: 'medium', color: 'white', unwrapped: true }}
+                  />
                 )}
               </button>
             ))}

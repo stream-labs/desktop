@@ -144,4 +144,5 @@ export class PlatformLogo extends ReactComponent<{
   platform: string;
   size?: 'medium' | number;
   color?: string;
+  unwrapped?: boolean;
 }> {}
