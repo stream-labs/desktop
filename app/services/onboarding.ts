@@ -158,7 +158,9 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
     if (
       !this.state.existingSceneCollections &&
       !this.state.importedFromObs &&
-      getPlatformService(userViews.platform.type).capabilities.has('themes')
+      ((userViews.isLoggedIn &&
+        getPlatformService(userViews.platform.type).capabilities.has('themes')) ||
+        !userViews.isLoggedIn)
     ) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ThemeSelector]);
     }
