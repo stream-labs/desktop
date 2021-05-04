@@ -351,7 +351,7 @@ export class OutputSettingsService extends Service {
     const currentSettings = this.getSettings();
 
     if (settingsPatch.inputResolution) {
-      this.settingsService.setSettingValue('Output', 'Base', settingsPatch.inputResolution);
+      this.settingsService.setSettingValue('Video', 'Base', settingsPatch.inputResolution);
     }
 
     if (settingsPatch.streaming) {

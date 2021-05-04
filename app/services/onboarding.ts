@@ -8,7 +8,8 @@ import TsxComponent from 'components/tsx-component';
 import { OS } from 'util/operating-systems';
 import { $t } from './i18n';
 import { handleResponse } from 'util/requests';
-import { getPlatformService } from './platforms';
+import { getPlatformService, IPlatformCapabilityResolutionPreset } from './platforms';
+import { OutputSettingsService } from './settings';
 
 enum EOnboardingSteps {
   MacPermissions = 'MacPermissions',
@@ -192,6 +193,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   @Inject() navigationService: NavigationService;
   @Inject() userService: UserService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
+  @Inject() outputSettingsService: OutputSettingsService;
 
   @mutation()
   SET_OPTIONS(options: Partial<IOnboardingOptions>) {
@@ -264,6 +266,21 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   // Ends the onboarding process
   finish() {
     localStorage.setItem(this.localStorageKey, 'true');
+
+    // setup a custom resolution if the platform requires that
+    const platformService = getPlatformService(this.userService.views.platform?.type);
+    if (platformService && platformService.capabilities.has('resolutionPreset')) {
+      const {
+        inputResolution,
+        outputResolution,
+      } = (platformService as unknown) as IPlatformCapabilityResolutionPreset;
+      this.outputSettingsService.setSettings({
+        mode: 'Advanced',
+        inputResolution,
+        streaming: { outputResolution },
+      });
+    }
+
     this.navigationService.navigate('Studio');
   }
 
