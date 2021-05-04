@@ -23,7 +23,9 @@ export function TiktokEditStreamInfo() {
       <TextInput label={$t('TikTok Server URL')} required {...bind.serverUrl} />
       <TextInput label={$t('TikTok Stream Key')} required {...bind.streamKey} />
       <InputWrapper>
-        <Button onClick={openStreamPage}>{$t('Locate my Stream Key')}</Button>
+        <Button onClick={openStreamPage} style={{ marginBottom: '10px' }}>
+          {$t('Locate my Stream Key')}
+        </Button>
       </InputWrapper>
     </Form>
   );
