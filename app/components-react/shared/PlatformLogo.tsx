@@ -44,7 +44,7 @@ function getTikTokSvg(color: string) {
 
 function TikTokLogo(p: IProps) {
   const color = 'black';
-  const size = 40;
+  const size = (p.size && (sizeMap[p.size] || p.size)) || 40;
 
   const wrapperStyles = {
     backgroundColor: 'white',
