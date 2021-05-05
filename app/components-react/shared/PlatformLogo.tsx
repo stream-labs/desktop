@@ -31,7 +31,7 @@ function GenericLogo(p: IProps & HTMLAttributes<unknown>) {
       streamlabs: 'icon-kevin-day',
     }[p.platform];
   }
-  const size = p.size && (sizeMap[p.size] || p.size);
+  const size = p.size && (sizeMap[p.size] ?? p.size);
   const sizeStyle = size ? { fontSize: `${size}px` } : undefined;
   const colorStyle = p.color ? { color: p.color } : undefined;
   const style = { ...sizeStyle, ...colorStyle };
@@ -44,7 +44,7 @@ function getTikTokSvg(color: string) {
 
 function TikTokLogo(p: IProps) {
   const color = 'black';
-  const size = 40;
+  const size = (p.size && (sizeMap[p.size] ?? p.size)) ?? 40;
 
   const wrapperStyles = {
     backgroundColor: 'white',
