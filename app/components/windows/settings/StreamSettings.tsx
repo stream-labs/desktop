@@ -52,7 +52,10 @@ export default class StreamSettings extends TsxComponent {
   private editCustomDestMode: boolean | number = false;
 
   // TODO: fix TikTok merging on the Back End
-  private platforms = this.streamingView.allPlatforms.filter(platform => platform !== 'tiktok');
+  private platforms = this.streamingView.allPlatforms.filter(
+    // show tiktok only if it's a primary platform
+    (platform, ind) => ind === 0 || platform !== 'tiktok',
+  );
 
   saveObsSettings(obsSettings: ISettingsSubCategory[]) {
     this.streamSettingsService.setObsStreamSettings(obsSettings);
