@@ -1,9 +1,11 @@
 import { ITwitchStartStreamOptions, TwitchService } from './twitch';
 import { IYoutubeStartStreamOptions, YoutubeService } from './youtube';
 import { FacebookService, IFacebookStartStreamOptions } from './facebook';
+import { ITiktokStartStreamOptions, TiktokService } from './tiktok';
 import { TTwitchTag } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
 import { IGoLiveSettings } from 'services/streaming';
+import { WidgetType } from '../widgets';
 
 export type Tag = TTwitchTag;
 export interface IGame {
@@ -35,6 +37,14 @@ export type TPlatformCapabilityMap = {
   'scope-validation': IPlatformCapabilityScopeValidation;
   /** This service supports Streamlabs account merging within SLOBS **/
   'account-merging': IPlatformCapabilityAccountMerging;
+  /** This service supports streamlabels **/
+  streamlabels: true;
+  /** This service supports themes **/
+  themes: true;
+  /** This service should preset a custom resolution for every new scene-collection **/
+  resolutionPreset: IPlatformCapabilityResolutionPreset;
+  /** This service supports fetching viewersCount **/
+  viewerCount: IPlatformCapabilityViewerCount;
 };
 
 export type TPlatformCapability = keyof TPlatformCapabilityMap;
@@ -46,6 +56,10 @@ interface IPlatformCapabilityChat {
 export interface IPlatformCapabilityGame {
   searchGames: (searchString: string) => Promise<IGame[]>;
   state: { settings: { game: string } };
+}
+
+export interface IPlatformCapabilityViewerCount {
+  fetchViewerCount(): Promise<number>;
 }
 
 interface IPlatformCapabilityTitle {
@@ -76,6 +90,11 @@ interface IPlatformCapabilityScopeValidation {
 
 interface IPlatformCapabilityAccountMerging {
   mergeUrl: string;
+}
+
+export interface IPlatformCapabilityResolutionPreset {
+  inputResolution: string;
+  outputResolution: string;
 }
 
 /**
@@ -112,7 +131,8 @@ export enum EPlatformCallResult {
 export type TStartStreamOptions =
   | ITwitchStartStreamOptions
   | IYoutubeStartStreamOptions
-  | Partial<IFacebookStartStreamOptions>;
+  | Partial<IFacebookStartStreamOptions>
+  | Partial<ITiktokStartStreamOptions>;
 
 // state applicable for all platforms
 export interface IPlatformState {
@@ -169,6 +189,12 @@ export interface IPlatformService {
   readonly mergeUrl: string;
   readonly streamPageUrl: string;
   readonly chatUrl: string;
+
+  /**
+   * the list of widgets supported by the platform
+   * if not provided then support all widgets
+   */
+  readonly widgetsWhitelist?: WidgetType[];
   unlink: () => void;
 
   state: IPlatformState;
@@ -218,13 +244,14 @@ export interface IUserInfo {
   username?: string;
 }
 
-export type TPlatform = 'twitch' | 'youtube' | 'facebook';
+export type TPlatform = 'twitch' | 'youtube' | 'facebook' | 'tiktok';
 
 export function getPlatformService(platform: TPlatform): IPlatformService {
   return {
     twitch: TwitchService.instance,
     youtube: YoutubeService.instance,
     facebook: FacebookService.instance,
+    tiktok: TiktokService.instance,
   }[platform];
 }
 
