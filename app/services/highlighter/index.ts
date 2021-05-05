@@ -856,6 +856,20 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     });
   }
 
+  setStartTrim(path: string, trim: number) {
+    this.UPDATE_CLIP({
+      path,
+      startTrim: trim,
+    });
+  }
+
+  setEndTrim(path: string, trim: number) {
+    this.UPDATE_CLIP({
+      path,
+      endTrim: trim,
+    });
+  }
+
   setOrder(order: string[]) {
     this.SET_ORDER(order);
   }

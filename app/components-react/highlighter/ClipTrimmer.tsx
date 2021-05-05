@@ -1,32 +1,49 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, RefObject } from 'react';
 import { IClip, SCRUB_FRAMES, SCRUB_HEIGHT, SCRUB_WIDTH } from 'services/highlighter';
+import { Services } from 'components-react/service-provider';
 import times from 'lodash/times';
 import styles from './ClipTrimmer.m.less';
 import cx from 'classnames';
 
 type TDragType = 'start' | 'end';
 
+/**
+ * When you need a mix of state and ref semantics, this can help
+ * keep them both in sync
+ * @param initialValue The initial value
+ */
+function useStateRef<T>(initialValue: T): [RefObject<T>, (newValue: T) => void] {
+  const [state, setState] = useState(initialValue);
+  const ref = useRef(initialValue);
+
+  return [
+    ref,
+    val => {
+      setState(val);
+      ref.current = val;
+    },
+  ];
+}
+
 export default function ClipTrimmer(props: { clip: IClip }) {
+  const { HighlighterService } = Services;
   const videoRef = useRef<HTMLVideoElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
   const [currentTime, setCurrentTime] = useState(props.clip.startTrim);
   const [scrubFrames, setScrubFrames] = useState<number[]>([]);
   const [localStartTrim, setLocalStartTrim] = useState(props.clip.startTrim);
   const [localEndTrim, setLocalEndTrim] = useState(props.clip.endTrim);
-  const isPlaying = useRef(false);
   const playPastEnd = useRef(false);
   const isDragging = useRef<TDragType | null>(null);
   const isScrubbing = useRef(false);
-
-  const [isPlayingState, setIsPlayingState] = useState(false);
+  const [isPlaying, setIsPlaying] = useStateRef(false);
 
   const endTime = props.clip.duration! - localEndTrim;
 
   function playAt(t: number) {
     if (!videoRef.current) return;
 
-    isPlaying.current = true;
-    setIsPlayingState(true);
+    setIsPlaying(true);
     videoRef.current.currentTime = t;
     videoRef.current.play();
 
@@ -50,8 +67,7 @@ export default function ClipTrimmer(props: { clip: IClip }) {
   function stopPlaying() {
     if (!videoRef.current) return;
 
-    isPlaying.current = false;
-    setIsPlayingState(false);
+    setIsPlaying(false);
     videoRef.current.pause();
   }
 
@@ -80,10 +96,14 @@ export default function ClipTrimmer(props: { clip: IClip }) {
   }
 
   function onMouseUp(e: React.MouseEvent) {
-    isScrubbing.current = false;
-    const timelineWidth = timelineRef.current!.offsetWidth;
-    const timelineOffset = timelineRef.current!.getBoundingClientRect().left;
-    playAt(((e.clientX - timelineOffset) / timelineWidth) * props.clip.duration!);
+    if (isDragging.current) {
+      stopDragging();
+    } else {
+      isScrubbing.current = false;
+      const timelineWidth = timelineRef.current!.offsetWidth;
+      const timelineOffset = timelineRef.current!.getBoundingClientRect().left;
+      playAt(((e.clientX - timelineOffset) / timelineWidth) * props.clip.duration!);
+    }
   }
 
   function onMouseMove(e: React.MouseEvent) {
@@ -93,11 +113,11 @@ export default function ClipTrimmer(props: { clip: IClip }) {
       if (isDragging.current === 'start') {
         const timelineOffset = timelineRef.current!.getBoundingClientRect().left;
         const time = ((e.clientX - timelineOffset) / timelineWidth) * props.clip.duration!;
-        setLocalStartTrim(time);
+        setLocalStartTrim(Math.min(time, endTime));
       } else {
         const timelineOffset = timelineRef.current!.getBoundingClientRect().right;
         const time = ((timelineOffset - e.clientX) / timelineWidth) * props.clip.duration!;
-        setLocalEndTrim(time);
+        setLocalEndTrim(Math.min(time, props.clip.duration! - localStartTrim));
       }
     } else if (isScrubbing.current) {
       if (!videoRef.current) return;
@@ -114,10 +134,15 @@ export default function ClipTrimmer(props: { clip: IClip }) {
     isScrubbing.current = false;
   }
 
-  function stopDragging(e: React.MouseEvent) {
+  function stopDragging() {
+    if (isDragging.current === 'start') {
+      HighlighterService.actions.setStartTrim(props.clip.path, localStartTrim);
+    } else if (isDragging.current === 'end') {
+      HighlighterService.actions.setEndTrim(props.clip.path, localEndTrim);
+    }
+
     isDragging.current = null;
     playAt(localStartTrim);
-    e.stopPropagation();
     // TODO - dispatch action to highlighter service
   }
 
@@ -143,8 +168,7 @@ export default function ClipTrimmer(props: { clip: IClip }) {
         src={props.clip.path}
         width="100%"
         onEnded={() => {
-          isPlaying.current = false;
-          setIsPlayingState(false);
+          setIsPlaying(false);
         }}
         onClick={togglePlayPause}
       />
@@ -188,7 +212,7 @@ export default function ClipTrimmer(props: { clip: IClip }) {
           style={{
             left: `${(currentTime / props.clip.duration!) * 100}%`,
           }}
-          className={cx(styles.clipPlayhead, { [styles.clipPlayheadPlaying]: isPlayingState })}
+          className={cx(styles.clipPlayhead, { [styles.clipPlayheadPlaying]: isPlaying.current })}
         ></div>
         <div
           style={{
@@ -204,7 +228,6 @@ export default function ClipTrimmer(props: { clip: IClip }) {
           <div
             className={styles.clipResizeHandle}
             onMouseDown={e => startDragging(e, 'start')}
-            onMouseUp={stopDragging}
           ></div>
         </div>
         <div
@@ -221,7 +244,6 @@ export default function ClipTrimmer(props: { clip: IClip }) {
           <div
             className={cx(styles.clipResizeHandle, styles.clipResizeHandleRight)}
             onMouseDown={e => startDragging(e, 'end')}
-            onMouseUp={stopDragging}
           ></div>
         </div>
       </div>
