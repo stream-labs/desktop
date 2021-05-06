@@ -284,8 +284,11 @@ export class YoutubeService
       stream = await this.fetchLiveStream(broadcast.contentDetails.boundStreamId);
     }
 
-    // set the category
-    await this.updateCategory(broadcast.id, ytSettings.categoryId!);
+    // set the category and tags
+    await this.updateVideo(broadcast.id, {
+      categoryId: ytSettings.categoryId!,
+      tags: ytSettings.tags,
+    });
 
     // setup key and platform type in the OBS settings
     const streamKey = stream.cdn.ingestionInfo.streamName;
@@ -374,14 +377,15 @@ export class YoutubeService
     return collection.items.filter(category => category.snippet.assignable);
   }
 
-  private async updateCategory(broadcastId: string, categoryId: string) {
+  private async updateVideo(broadcastId: string, patch: { categoryId: string; tags?: string[] }) {
     const video = await this.fetchVideo(broadcastId);
     const endpoint = 'videos?part=snippet';
-    const { title, description, tags } = video.snippet;
+    const { title, description } = video.snippet;
+    const tags = video.snippet.tags || patch.tags;
     await this.requestYoutube({
       body: JSON.stringify({
         id: broadcastId,
-        snippet: { categoryId, title, description, tags },
+        snippet: { categoryId: patch.categoryId, title, description, tags },
       }),
       method: 'PUT',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
@@ -441,7 +445,7 @@ export class YoutubeService
 
     if (this.state.settings.categoryId !== options.categoryId) {
       assertIsDefined(options.categoryId);
-      await this.updateCategory(broadcastId, options.categoryId);
+      await this.updateVideo(broadcastId, { categoryId: options.categoryId, tags: options.tags });
     }
 
     await this.updateBroadcast(broadcastId, options, true);
@@ -674,6 +678,7 @@ export class YoutubeService
       projection,
       latencyPreference,
       categoryId: video.snippet.categoryId,
+      tags: video.snippet.tags,
       thumbnail: broadcast.snippet.thumbnails.default.url,
     };
   }

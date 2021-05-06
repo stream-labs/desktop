@@ -10,6 +10,7 @@ import Form from '../../../shared/inputs/Form';
 import { useGoLiveSettings } from '../useGoLiveSettings';
 import electron from 'electron';
 import { IYoutubeStartStreamOptions } from '../../../../services/platforms/youtube';
+import { Tag } from 'antd';
 
 /***
  * Stream Settings for YT
@@ -148,7 +149,21 @@ export function YoutubeEditStreamInfo() {
           {...bind.latencyPreference}
         />
 
-        <TagsInput label="Tags" mode="tags" options={[]} uncontrolled tokenSeparators={[',']} />
+        <TagsInput
+          label="Tags"
+          mode="tags"
+          options={[]}
+          tokenSeparators={[',']}
+          tooltip={$t(
+            'Tags can be useful if content in your video is commonly misspelled. Otherwise, tags play a minimal role in helping viewers find your video',
+          )}
+          {...bind.tags}
+          tagRender={(tagProps, tag) => (
+            <Tag {...tagProps} color="#D22222">
+              {tag.label}
+            </Tag>
+          )}
+        />
 
         <InputWrapper label={$t('Additional Settings')}>
           {!isScheduleMode && (
