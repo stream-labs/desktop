@@ -85,10 +85,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
    * Returns a sorted list of all platforms (linked and unlinked)
    */
   get allPlatforms(): TPlatform[] {
-    const allPlatforms: TPlatform[] = ['twitch', 'facebook', 'youtube'];
-    if (this.incrementalRolloutView.featureIsEnabled(EAvailableFeatures.tiktok)) {
-      allPlatforms.push('tiktok');
-    }
+    const allPlatforms: TPlatform[] = ['twitch', 'facebook', 'youtube', 'tiktok'];
     return this.sortPlatforms(allPlatforms);
   }
 
