@@ -111,11 +111,7 @@ export default class Connect extends TsxComponent<ConnectProps> {
       );
     }
 
-    const platforms = ['twitch', 'youtube', 'facebook'];
-
-    if (this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.tiktok)) {
-      platforms.push('tiktok');
-    }
+    const platforms = ['twitch', 'youtube', 'facebook', 'tiktok'];
 
     return (
       <div class={styles.pageContainer}>
