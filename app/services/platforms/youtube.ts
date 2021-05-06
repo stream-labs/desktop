@@ -706,6 +706,13 @@ export class YoutubeService
     // otherwise convert the passed base64url to blob
     const url =
       base64url !== 'default' ? base64url : `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+
+    if (base64url.startsWith('http')) {
+      // if non-base64 url passed then image is already uploaded
+      // skip uploading
+      return;
+    }
+
     const body = await fetch(url).then(res => res.blob());
 
     try {
