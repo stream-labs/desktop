@@ -7,6 +7,7 @@ import { TwitchEditStreamInfo } from './platforms/TwitchEditStreamInfo';
 import { Section } from './Section';
 import { YoutubeEditStreamInfo } from './platforms/YoutubeEditStreamInfo';
 import FacebookEditStreamInfo from './platforms/FacebookEditStreamInfo';
+import { TiktokEditStreamInfo } from './platforms/TiktokEditStreamInfo';
 
 export default function PlatformSettings() {
   const {
@@ -41,6 +42,7 @@ export default function PlatformSettings() {
               {platform === 'twitch' && <TwitchEditStreamInfo />}
               {platform === 'facebook' && <FacebookEditStreamInfo />}
               {platform === 'youtube' && <YoutubeEditStreamInfo />}
+              {platform === 'tiktok' && <TiktokEditStreamInfo />}
             </Section>
           ))}
         </div>

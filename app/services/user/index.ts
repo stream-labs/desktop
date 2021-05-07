@@ -65,6 +65,7 @@ interface ILinkedPlatformsResponse {
   twitch_account?: ILinkedPlatform;
   facebook_account?: ILinkedPlatform;
   youtube_account?: ILinkedPlatform;
+  tiktok_account?: ILinkedPlatform;
   user_id: number;
 }
 
@@ -395,6 +396,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       });
     } else if (this.state.auth.primaryPlatform !== 'youtube') {
       this.UNLINK_PLATFORM('youtube');
+    }
+
+    if (linkedPlatforms.tiktok_account) {
+      this.UPDATE_PLATFORM({
+        type: 'tiktok',
+        username: linkedPlatforms.tiktok_account.platform_name,
+        id: linkedPlatforms.tiktok_account.platform_id,
+        token: linkedPlatforms.tiktok_account.access_token,
+      });
+    } else if (this.state.auth.primaryPlatform !== 'tiktok') {
+      this.UNLINK_PLATFORM('tiktok');
     }
   }
 

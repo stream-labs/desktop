@@ -122,6 +122,7 @@ export class StreamingService
         twitch: 'not-started',
         youtube: 'not-started',
         facebook: 'not-started',
+        tiktok: 'not-started',
         setupMultistream: 'not-started',
         startVideoTransmission: 'not-started',
         postTweet: 'not-started',
@@ -395,6 +396,11 @@ export class StreamingService
         this.usageStatisticsService.recordFeatureUsage('StreamToFacebookPage');
       }
     }
+
+    // send analytics for TikTok
+    if (settings.platforms.tiktok?.enabled) {
+      this.usageStatisticsService.recordFeatureUsage('StreamToTikTok');
+    }
   }
 
   /**
@@ -453,7 +459,7 @@ export class StreamingService
     const destinations = settings.platforms;
     const platforms = (Object.keys(destinations) as TPlatform[]).filter(
       dest => destinations[dest].enabled && this.views.supports('stream-schedule', [dest]),
-    );
+    ) as ('facebook' | 'youtube')[];
     for (const platform of platforms) {
       const service = getPlatformService(platform);
       assertIsDefined(service.scheduleStream);
@@ -758,7 +764,7 @@ export class StreamingService
     const width = 900;
 
     const isLegacy =
-      !this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
+      !this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
       this.customizationService.state.experimental?.legacyGoLive;
 
     const componentName = isLegacy ? 'GoLiveWindowDeprecated' : 'GoLiveWindow';
@@ -778,7 +784,7 @@ export class StreamingService
     const width = 900;
 
     const isLegacy =
-      !this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
+      !this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
       this.customizationService.state.experimental?.legacyGoLive;
 
     const componentName = isLegacy ? 'EditStreamWindowDeprecated' : 'EditStreamWindow';

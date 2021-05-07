@@ -11,6 +11,7 @@ import TitleBar from './shared/TitleBar';
 import Chat from './root/Chat';
 import Loader from './pages/Loader';
 import NavTools from './sidebar/NavTools';
+import PlatformLogo from './shared/PlatformLogo';
 
 // list of React components for usage inside Vue components
 export const components = {
@@ -26,4 +27,5 @@ export const components = {
   Chat,
   Loader,
   NavTools,
+  PlatformLogo,
 };
