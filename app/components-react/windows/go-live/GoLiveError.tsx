@@ -91,7 +91,7 @@ export default function GoLiveError() {
     }
 
     function navigatePlatformMerge() {
-      NavigationService.actions.navigate('PlatformMerge', 'twitch');
+      NavigationService.actions.navigate('PlatformMerge', { platform: 'twitch' });
       WindowsService.actions.closeChildWindow();
     }
 
