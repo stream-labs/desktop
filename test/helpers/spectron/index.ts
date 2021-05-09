@@ -1,4 +1,5 @@
 /// <reference path="../../../app/index.d.ts" />
+/// <reference path="../../../app/jsx.d.ts" />
 import avaTest, { ExecutionContext, TestInterface } from 'ava';
 import { Application } from 'spectron';
 import { getClient } from '../api-client';
