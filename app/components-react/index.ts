@@ -1,4 +1,3 @@
-/// <reference path="./index.d.ts" />
 import NameFolder from './windows/NameFolder';
 import GoLiveWindow from './windows/go-live/GoLiveWindow';
 import EditStreamWindow from './windows/go-live/EditStreamWindow';
