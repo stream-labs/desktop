@@ -82,7 +82,7 @@ export default class CommentSynthesizer extends Vue {
     this.nicoliveCommentSynthesizerService.volume = v;
   }
   get volumeCandidates(): number[] {
-    return [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
+    return [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
   }
   resetVolume() {
     this.volume = 1.0;
