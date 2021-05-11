@@ -264,6 +264,12 @@ export class SourcesService extends StatefulService<ISourcesState> {
   ): Source {
     const id: string = options.sourceId || `${type}_${uuid()}`;
     const obsInputSettings = this.getObsSourceCreateSettings(type, settings);
+
+    // Universally disabled for security reasons
+    if (obsInputSettings.is_media_flag) {
+      obsInputSettings.is_media_flag = false;
+    }
+
     const obsInput = obs.InputFactory.create(type, id, obsInputSettings);
 
     this.addSource(obsInput, name, options);
