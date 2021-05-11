@@ -54,7 +54,7 @@ function MyGoals(p: { goals: IGoal[] }) {
 
       <div className={styles.goalsContainer}>
         {goalsToMap.map(goal => (
-          <div className={styles.card}>
+          <div className={styles.card} key={goal.title}>
             <strong>{goal.title}</strong>
             {goal.progress && <Progress percent={Math.floor((goal.progress / goal.total) * 100)} />}
             <img src={goal.image} />
@@ -93,12 +93,12 @@ function ResourceFooter(p: { universityProgress: IUniversityProgress }) {
 
       <div className={styles.resourcesContainer}>
         <UniversityCard progress={p.universityProgress} />
-        <div className={styles.card}>
+        <div className={styles.card} style={{ minWidth: '580px' }}>
           <div className={styles.cardInner}>
             <h3>{$t('Content Hub')}</h3>
             <span>
               {$t(
-                'The Ultimate Resource For Live Streaming. Years of blog posts, guides, and support articles are now in one place. Content Hub is your one-stop-shop for everything related to live streaming. There are dozens of different categories to choose from. Learn how to set up your live stream, find new features, and stay up-to-date on all of the tools you can use to enhance your stream.',
+                'The Ultimate Resource For Live Streamers; The Content Hub is your one-stop-shop for everything related to live streaming. There are dozens of different categories to choose from. Learn how to set up your live stream, find new features, and stay up-to-date on all of the tools you can use to enhance your stream.',
               )}
             </span>
             <footer>
@@ -120,7 +120,7 @@ function UniversityCard(p: { progress: IUniversityProgress }) {
   let buttonText = $t('Open Streamlabs University');
   let imageUrl = 'https://slobs-cdn.streamlabs.com/media/grow/streamlabs_university.png';
 
-  if (p.progress?.total_progress < 100 && p.progress.stopped_at) {
+  if (p.progress.enrolled && p.progress?.total_progress < 100 && p.progress.stopped_at) {
     content = <UniversityProgress progress={p.progress} />;
     buttonText = $t('Continue Learning');
     imageUrl = p.progress.stopped_at.image;
@@ -128,7 +128,7 @@ function UniversityCard(p: { progress: IUniversityProgress }) {
     content = $t('You have completed Streamlabs University!');
   }
   return (
-    <div className={styles.card}>
+    <div className={styles.card} style={{ minWidth: '580px' }}>
       <div className={styles.cardInner}>
         <h3>{$t('Streamlabs University')}</h3>
         <span>{content}</span>
@@ -146,7 +146,11 @@ function UniversityProgress(p: { progress: IUniversityProgress }) {
         {$t('You cleared %{totalProgress}% of all material. Keep it up!', {
           totalProgress: p.progress.total_progress,
         })}
-        <Progress percent={p.progress.total_progress} />
+        <Progress
+          percent={p.progress.total_progress}
+          showInfo={false}
+          style={{ marginRight: '16px' }}
+        />
         <h3>{p.progress.stopped_at?.title}</h3>
         <span>{p.progress.stopped_at?.description}</span>
       </span>
@@ -177,7 +181,7 @@ function GrowthTips(p: { tips: any[] }) {
       <h2>{$t('Growth Tips')}</h2>
       <Scrollable isResizable={false} style={{ height: '100%' }}>
         {p.tips.map(tip => (
-          <div className={styles.card}>
+          <div className={styles.card} key={tip.title}>
             <i className={tip.icon} />
             <strong>{tip.title}</strong>
             <p>{tip.description}</p>

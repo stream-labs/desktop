@@ -71,7 +71,7 @@ export class GrowService extends PersistentStatefulService<IGrowServiceState> {
 
   async fetchUniversityProgress() {
     if (!this.userService.isLoggedIn) return;
-    const url = `${this.hostsService.streamlabs}/university/api/user/info/${this.userService.widgetToken}`;
+    const url = `https://${this.hostsService.streamlabs}/university/api/user/info/${this.userService.widgetToken}`;
     const req = new Request(url);
     const json = (await jfetch(req)) as { user: IUniversityProgress };
     return json.user;
