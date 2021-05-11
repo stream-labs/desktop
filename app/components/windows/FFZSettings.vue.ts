@@ -4,6 +4,7 @@ import { Inject } from '../../services/core/injector';
 import ModalLayout from '../ModalLayout.vue';
 import { CustomizationService } from 'services/customization';
 import { WindowsService } from 'services/windows';
+import { UserService } from 'services/user';
 
 @Component({
   components: {
@@ -13,6 +14,7 @@ import { WindowsService } from 'services/windows';
 export default class FFZSettings extends Vue {
   @Inject() customizationService: CustomizationService;
   @Inject() windowsService: WindowsService;
+  @Inject() userService: UserService;
 
   $refs: {
     ffzSettings: Electron.WebviewTag;
@@ -39,6 +41,10 @@ export default class FFZSettings extends Vue {
         true,
       );
     });
+  }
+
+  get partition() {
+    return this.userService.isLoggedIn ? this.userService.views.auth.partition : undefined;
   }
 
   get popoutURL() {

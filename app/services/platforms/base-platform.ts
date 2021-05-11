@@ -1,10 +1,11 @@
 import { Inject, mutation, StatefulService } from 'services/core';
-import { IPlatformState, TPlatform, TStartStreamOptions } from './index';
+import { EPlatformCallResult, IPlatformState, TPlatform, TStartStreamOptions } from './index';
 import { StreamingService } from 'services/streaming';
 import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
 import electron from 'electron';
 import { IFacebookStartStreamOptions } from './facebook';
+import { StreamSettingsService } from '../settings/streaming';
 
 const VIEWER_COUNT_UPDATE_INTERVAL = 60 * 1000;
 
@@ -23,6 +24,7 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
   @Inject() protected streamingService: StreamingService;
   @Inject() protected userService: UserService;
   @Inject() protected hostsService: HostsService;
+  @Inject() protected streamSettingsService: StreamSettingsService;
   abstract readonly platform: TPlatform;
 
   protected fetchViewerCount(): Promise<number> {
@@ -74,6 +76,14 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
       },
       { deep: true },
     );
+  }
+
+  async validatePlatform() {
+    return EPlatformCallResult.Success;
+  }
+
+  fetchUserInfo() {
+    return Promise.resolve({});
   }
 
   @mutation()
