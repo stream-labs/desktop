@@ -1,12 +1,29 @@
-import { PersistentStatefulService, mutation, ViewHandler } from 'services/core';
+import { PersistentStatefulService, mutation, ViewHandler, Inject } from 'services/core';
+import { HostsService } from 'services/hosts';
+import { UserService } from 'services/user';
+import { jfetch } from 'util/requests';
 import { GOAL_OPTIONS, GROWTH_TIPS } from './grow-data';
 
 export interface IGoal {
   title: string;
   image: string;
-  total?: number;
+  total: number;
   progress?: number;
   startDate?: Date;
+}
+
+export interface IUniversityProgress {
+  name: string;
+  avatar: string;
+  finished_course_date?: string;
+  total_progress: number;
+  enrolled: boolean;
+  stopped_at?: {
+    title: string;
+    description: string;
+    image: string;
+    url: string;
+  };
 }
 
 interface IGrowServiceState {
@@ -40,6 +57,9 @@ class GrowServiceViews extends ViewHandler<IGrowServiceState> {
 }
 
 export class GrowService extends PersistentStatefulService<IGrowServiceState> {
+  @Inject() userService: UserService;
+  @Inject() hostsService: HostsService;
+
   static defaultState: IGrowServiceState = {
     goals: [],
   };
@@ -47,6 +67,14 @@ export class GrowService extends PersistentStatefulService<IGrowServiceState> {
   @mutation()
   SET_GOALS(goals: IGoal[]) {
     this.state.goals = goals;
+  }
+
+  async fetchUniversityProgress() {
+    if (!this.userService.isLoggedIn) return;
+    const url = `${this.hostsService.streamlabs}/university/api/user/info/${this.userService.widgetToken}`;
+    const req = new Request(url);
+    const json = (await jfetch(req)) as { user: IUniversityProgress };
+    return json.user;
   }
 
   get views() {

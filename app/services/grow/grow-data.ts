@@ -131,5 +131,6 @@ export const GOAL_OPTIONS = () => [
   {
     title: 'Custom',
     image: '',
+    total: 10,
   },
 ];
