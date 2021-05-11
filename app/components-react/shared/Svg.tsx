@@ -1,5 +1,7 @@
 import React from 'react';
 
+const SVG_ATTRS_REGEX = /(\S+)=["']?((?:.(?!["']?\s+(?:\S+)=|[>"']))+.)["']?/gm;
+
 export default function Svg(p: {
   src: string;
   className?: string;
@@ -10,21 +12,14 @@ export default function Svg(p: {
     const svgTag = (svgMatch && svgMatch[0]) || '';
     const attrs = {};
     let attrMatch;
-    console.log(p.src);
-    console.log(svgMatch, svgTag);
-    console.log(/(\S+)=["']?((?:.(?!["']?\s+(?:\S+)=|[>"']))+.)["']?/gm.exec(svgTag));
-    while (
-      (attrMatch = /(\S+)=["']?((?:.(?!["']?\s+(?:\S+)=|[>"']))+.)["']?/gm.exec(svgTag)) !== null
-    ) {
-      attrs[attrMatch[1]] = attrs[attrMatch[2]];
+    while ((attrMatch = SVG_ATTRS_REGEX.exec(svgTag)) !== null) {
+      attrs[attrMatch[1]] = attrMatch[2];
     }
-    console.log('attrs');
-    console.log(attrs);
     return attrs;
   }
 
   function derivePaths() {
-    const pathsMatch = p.src.match(/[^svg](<.*>)[^svg]/m);
+    const pathsMatch = p.src.match(/>\s*(<.*>)\s*</s);
 
     return (pathsMatch && pathsMatch[1]) || '';
   }
