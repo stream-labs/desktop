@@ -822,7 +822,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   init() {
     if (TEST_MODE) {
       const clipsToLoad = [
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-08-13.mp4'),
+        path.join(CLIP_DIR, '2021-05-12 12-59-28.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-20.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-29.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-41.mp4'),

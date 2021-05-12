@@ -19,6 +19,9 @@ import { BasePlatformService } from './base-platform';
 import { assertIsDefined } from 'util/properties-type-guards';
 import electron from 'electron';
 import Utils from '../utils';
+import fs from 'fs';
+import path from 'path';
+import mime from 'mime';
 
 interface IYoutubeServiceState extends IPlatformState {
   liveStreamingEnabled: boolean;
@@ -726,6 +729,93 @@ export class YoutubeService
       if (!details) details = 'connection failed';
       const errorType = 'YOUTUBE_THUMBNAIL_UPLOAD_FAILED';
       throw throwStreamError(errorType, e as any, details);
+    }
+  }
+
+  async uploadVideo(filePath: string) {
+    const parsed = path.parse(filePath);
+    const type = mime.getType(parsed.ext);
+    const stats = fs.lstatSync(filePath);
+
+    const headers = new Headers();
+
+    headers.append('Authorization', `Bearer ${this.oauthToken}`);
+    headers.append('Content-Type', 'application/json');
+    headers.append('X-Upload-Content-Length', stats.size.toString());
+    headers.append('X-Upload-Content-Type', type);
+
+    const result = await fetch(
+      new Request(
+        'https://www.googleapis.com/upload/youtube/v3/videos?part=snippet&mine=true&uploadType=resumable',
+        {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            snippet: {
+              title: 'This is a test',
+              description: 'This is a test description',
+            },
+          }),
+        },
+      ),
+    );
+
+    const uploadLocation = result.headers.get('Location');
+    let currentByteIndex = 0;
+
+    // YT wants us to upload in chunks of 262144 bytes
+    const CHUNK_SIZE = 262144;
+    const file = await new Promise<number>((resolve, reject) => {
+      fs.open(filePath, 'r', (err, fd) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(fd);
+        }
+      });
+    });
+
+    async function uploadNextChunk() {
+      const nextChunkSize = Math.min(stats.size - currentByteIndex, CHUNK_SIZE);
+      const readBuffer = Buffer.alloc(nextChunkSize);
+      const bytesRead = await new Promise<number>((resolve, reject) => {
+        fs.read(file, readBuffer, 0, nextChunkSize, null, (err, bytesRead) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(bytesRead);
+          }
+        });
+      });
+
+      if (bytesRead === 0) {
+        console.log('FINISHED READING FROM FILE');
+        return true;
+      }
+
+      const headers = new Headers();
+      headers.append('Content-Type', type);
+      headers.append(
+        'Content-Range',
+        `bytes ${currentByteIndex}-${currentByteIndex + nextChunkSize - 1}/${stats.size}`,
+      );
+      headers.append('X-Upload-Content-Type', type);
+
+      currentByteIndex += nextChunkSize;
+
+      const result = await fetch(
+        new Request(uploadLocation, {
+          method: 'PUT',
+          headers,
+          body: new Blob([readBuffer]),
+        }),
+      );
+
+      return false;
+    }
+
+    while (true) {
+      if (await uploadNextChunk()) break;
     }
   }
 
