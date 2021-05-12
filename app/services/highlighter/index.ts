@@ -358,9 +358,7 @@ export class Clip {
   init() {
     if (!this.initPromise) {
       this.initPromise = new Promise<void>((resolve, reject) => {
-        this.doInit()
-          .then(resolve)
-          .catch(reject);
+        this.doInit().then(resolve).catch(reject);
       });
     }
 
@@ -441,7 +439,12 @@ export class AudioCrossfader {
       .map((clip, i) => {
         const outStream = `[concat${i}]`;
 
-        let ret = `${inStream}[${i + 1}:a]acrossfade=d=${this.transitionDuration}:c1=tri:c2=tri`;
+        const overlap = Math.min(
+          this.transitionDuration,
+          clip.frameSource.trimmedDuration,
+          this.clips[i + 1] ? this.clips[i + 1].frameSource.trimmedDuration : Infinity,
+        );
+        let ret = `${inStream}[${i + 1}:a]acrossfade=d=${overlap}:c1=tri:c2=tri`;
 
         inStream = outStream;
 
@@ -820,14 +823,14 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     if (TEST_MODE) {
       const clipsToLoad = [
         path.join(CLIP_DIR, 'Replay 2021-03-30 14-08-13.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-20.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-20.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-29.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-41.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-49.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-58.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-03.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-06.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-30-53.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-30-53.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-32-34.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-33.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-48.mp4'),
@@ -835,12 +838,12 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-23.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-51.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-18.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-30.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-30.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-44.mp4'),
       ];
 
       clipsToLoad.forEach(c => {
-        this.ADD_CLIP({ path: c, loaded: false, enabled: true, startTrim: 3, endTrim: 2 });
+        this.ADD_CLIP({ path: c, loaded: false, enabled: true, startTrim: 0, endTrim: 0 });
       });
     } else {
       this.streamingService.replayBufferFileWrite.subscribe(clipPath => {
@@ -989,9 +992,15 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       }
 
       const fromFrameRead = await fromClip.frameSource.readNextFrame();
+
+      const transitionFrames = Math.min(
+        this.views.transitionFrames,
+        (fromClip.frameSource.trimmedDuration / 2) * FPS,
+        toClip ? (toClip.frameSource.trimmedDuration / 2) * FPS : Infinity,
+      );
+
       const inTransition =
-        fromClip.frameSource.currentFrame >=
-        fromClip.frameSource.nFrames - this.views.transitionFrames;
+        fromClip.frameSource.currentFrame >= fromClip.frameSource.nFrames - transitionFrames;
       let frameToRender = fromClip.frameSource.readBuffer;
 
       if (inTransition && toClip) {
