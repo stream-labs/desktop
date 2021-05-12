@@ -629,8 +629,8 @@ export class Transitioner {
 
     const toArray = this.convertFrame(toFrame);
     const toTexture = createTexture(this.gl, toArray);
-    fromTexture.minFilter = this.gl.LINEAR;
-    fromTexture.magFilter = this.gl.LINEAR;
+    toTexture.minFilter = this.gl.LINEAR;
+    toTexture.magFilter = this.gl.LINEAR;
 
     buffer.bind();
     transition.draw(
