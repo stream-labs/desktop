@@ -127,6 +127,7 @@ export class GrowService extends PersistentStatefulService<IGrowServiceState> {
   }
 
   timeLeft(goal: IGoal) {
+    if (!goal.startDate) return Infinity;
     if (/week/.test(goal.id)) return goal.startDate + ONE_WEEK - Date.now();
     if (/month/.test(goal.id)) return goal.startDate + ONE_WEEK * 4 - Date.now();
     return Infinity;

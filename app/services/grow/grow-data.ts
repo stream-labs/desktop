@@ -136,7 +136,7 @@ export const GOAL_OPTIONS = () => [
   },
   {
     title: 'Custom',
-    image: 'custom',
+    image: '',
     total: 10,
     id: 'custom',
   },

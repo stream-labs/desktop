@@ -14,6 +14,7 @@
 
 .card {
   background: var(--section-alt);
+  position: relative;
   border-radius: 4px;
   padding: 16px;
   margin: 24px;
@@ -47,7 +48,7 @@
   font-size: 12px;
   width: 100%;
   text-align: center;
-  color: var(--paragraph);
+  color: var(--button);
 }
 
 .close-icon {
@@ -55,6 +56,10 @@
   top: 8px;
   right: 8px;
   color: var(--paragraph);
+
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 .my-goals {
@@ -69,6 +74,10 @@
       margin: 0 auto;
       display: block;
     }
+  }
+
+  :global(.ant-progress-steps-item) {
+    flex-shrink: 1;
   }
 }
 

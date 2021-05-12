@@ -195,7 +195,7 @@ function GoalCard(p: { goal: IGoal }) {
   const { GrowService } = Services;
   const { title, progress, total, image, id } = p.goal;
 
-  const daysLeft = GrowService.timeLeft(p.goal) / ONE_DAY;
+  const daysLeft = Math.round(GrowService.timeLeft(p.goal) / ONE_DAY);
 
   function incrementCustomGoal() {
     GrowService.incrementGoal(p.goal, 1);
@@ -215,8 +215,15 @@ function GoalCard(p: { goal: IGoal }) {
       {daysLeft !== Infinity && (
         <span className={styles.whisper}>{$t('%{daysLeft} days left', { daysLeft })}</span>
       )}
-      {progress != null && <Progress percent={Math.floor((progress / total) * 100)} />}
-      {progress != null && image === 'custom' ? (
+      {progress != null && (
+        <Progress
+          percent={Math.floor((progress / total) * 100)}
+          showInfo={false}
+          steps={p.goal.total}
+          strokeWidth={16}
+        />
+      )}
+      {progress != null && image === '' ? (
         <Button onClick={incrementCustomGoal}>{$t('Progress')}</Button>
       ) : (
         <img src={image} />
