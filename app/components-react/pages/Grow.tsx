@@ -43,10 +43,11 @@ export default function Grow() {
   );
 }
 
-function MyGoals(p: { goals: IGoal[] }) {
+function MyGoals(p: { goals: Dictionary<IGoal> }) {
   const { GrowService } = Services;
-  const appendedOptions = sampleSize(GrowService.views.goalOptions, 4 - p.goals.length);
-  const goalsToMap = p.goals.length < 4 ? [...p.goals, ...appendedOptions] : p.goals;
+  const mappedGoals = Object.values(p.goals);
+  const appendedOptions = sampleSize(GrowService.views.goalOptions, 4 - mappedGoals.length);
+  const goalsToMap = mappedGoals.length < 4 ? [...mappedGoals, ...appendedOptions] : mappedGoals;
 
   return (
     <div className={styles.myGoals}>
@@ -54,12 +55,7 @@ function MyGoals(p: { goals: IGoal[] }) {
 
       <div className={styles.goalsContainer}>
         {goalsToMap.map(goal => (
-          <div className={styles.card} key={goal.title}>
-            <strong>{goal.title}</strong>
-            {goal.progress && <Progress percent={Math.floor((goal.progress / goal.total) * 100)} />}
-            <img src={goal.image} />
-            {!goal.progress && <Button>{$t('Add Goal')}</Button>}
-          </div>
+          <GoalCard goal={goal} />
         ))}
       </div>
     </div>
@@ -189,6 +185,46 @@ function GrowthTips(p: { tips: any[] }) {
           </div>
         ))}
       </Scrollable>
+    </div>
+  );
+}
+
+const ONE_DAY = 1000 * 60 * 60 * 24;
+
+function GoalCard(p: { goal: IGoal }) {
+  const { GrowService } = Services;
+  const { title, progress, total, image, id } = p.goal;
+
+  const daysLeft = GrowService.timeLeft(p.goal) / ONE_DAY;
+
+  function incrementCustomGoal() {
+    GrowService.incrementGoal(p.goal, 1);
+  }
+
+  function addGoal() {
+    GrowService.addGoal(p.goal);
+  }
+
+  function removeGoal() {
+    GrowService.removeGoal(p.goal);
+  }
+
+  return (
+    <div className={styles.card} key={id}>
+      <strong>{title}</strong>
+      {daysLeft !== Infinity && (
+        <span className={styles.whisper}>{$t('%{daysLeft} days left', { daysLeft })}</span>
+      )}
+      {progress != null && <Progress percent={Math.floor((progress / total) * 100)} />}
+      {progress != null && image === 'custom' ? (
+        <Button onClick={incrementCustomGoal}>{$t('Progress')}</Button>
+      ) : (
+        <img src={image} />
+      )}
+      {progress == null && <Button onClick={addGoal}>{$t('Add Goal')}</Button>}
+      {progress != null && (
+        <i onClick={removeGoal} className={cx('icon-close', styles.closeIcon)} />
+      )}
     </div>
   );
 }

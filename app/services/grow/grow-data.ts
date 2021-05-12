@@ -102,35 +102,42 @@ export const GOAL_OPTIONS = () => [
     title: 'Stream 28 hours in 1 month',
     image: 'https://slobs-cdn.streamlabs.com/media/grow/goal_stream_time.png',
     total: 28,
+    id: 'stream_hours_per_month',
   },
   {
     title: 'Multistream 3 times in 1 week',
     image: 'https://slobs-cdn.streamlabs.com/media/grow/goal_multistream.png',
     total: 5,
+    id: 'multistream_per_week',
   },
   {
     title: 'Add 3 panels',
     image: 'https://slobs-cdn.streamlabs.com/media/grow/goal_panels.png',
     total: 3,
+    id: 'panels',
   },
   {
     title: 'Stream 4 times in 1 week',
     image: 'https://slobs-cdn.streamlabs.com/media/grow/goal_stream_days.png',
     total: 4,
+    id: 'stream_times_per_week',
   },
   {
     title: 'Stream on mobile 3 times',
     image: 'https://slobs-cdn.streamlabs.com/media/grow/goal_stream_days.png',
     total: 3,
+    id: 'stream_mobile_per_week',
   },
   {
     title: 'Try streaming 5 different categories',
     image: 'https://slobs-cdn.streamlabs.com/media/grow/goal_stream_days.png',
     total: 5,
+    id: 'streaming_categories',
   },
   {
     title: 'Custom',
-    image: '',
+    image: 'custom',
     total: 10,
+    id: 'custom',
   },
 ];

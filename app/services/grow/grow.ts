@@ -1,3 +1,5 @@
+import Vue from 'vue';
+import uuid from 'uuid/v4';
 import { PersistentStatefulService, mutation, ViewHandler, Inject } from 'services/core';
 import { HostsService } from 'services/hosts';
 import { UserService } from 'services/user';
@@ -5,11 +7,12 @@ import { jfetch } from 'util/requests';
 import { GOAL_OPTIONS, GROWTH_TIPS } from './grow-data';
 
 export interface IGoal {
+  id: string;
   title: string;
   image: string;
   total: number;
   progress?: number;
-  startDate?: Date;
+  startDate?: number;
 }
 
 export interface IUniversityProgress {
@@ -27,8 +30,10 @@ export interface IUniversityProgress {
 }
 
 interface IGrowServiceState {
-  goals: IGoal[];
+  goals: Dictionary<IGoal>;
 }
+
+const ONE_WEEK = 6.048e8;
 
 class GrowServiceViews extends ViewHandler<IGrowServiceState> {
   get platforms() {
@@ -61,12 +66,25 @@ export class GrowService extends PersistentStatefulService<IGrowServiceState> {
   @Inject() hostsService: HostsService;
 
   static defaultState: IGrowServiceState = {
-    goals: [],
+    goals: {},
   };
 
   @mutation()
-  SET_GOALS(goals: IGoal[]) {
-    this.state.goals = goals;
+  ADD_GOAL(goal: IGoal) {
+    Vue.set(this.state.goals, goal.id, goal);
+  }
+
+  @mutation()
+  REMOVE_GOAL(goal: IGoal) {
+    Vue.delete(this.state.goals, goal.id);
+  }
+
+  @mutation()
+  INCREMENT_GOAL(goal: IGoal, amountToIncrement: number) {
+    Vue.set(this.state.goals, goal.id, {
+      ...goal,
+      progress: goal.progress + amountToIncrement,
+    });
   }
 
   async fetchUniversityProgress() {
@@ -79,5 +97,38 @@ export class GrowService extends PersistentStatefulService<IGrowServiceState> {
 
   get views() {
     return new GrowServiceViews(this.state);
+  }
+
+  addGoal(goal: IGoal) {
+    const goalWithId = {
+      ...goal,
+      progress: 0,
+      startDate: Date.now(),
+      id: goal.id === 'custom' ? uuid() : goal.id,
+    };
+
+    this.ADD_GOAL(goalWithId);
+  }
+
+  incrementGoal(goal: IGoal, amount: number) {
+    this.INCREMENT_GOAL(goal, amount);
+  }
+
+  removeGoal(goal: IGoal) {
+    this.REMOVE_GOAL(goal);
+  }
+
+  clearCompletedGoals() {
+    Object.values(this.state.goals).forEach(goal => {
+      if (goal.progress === goal.total) {
+        this.removeGoal(goal);
+      }
+    });
+  }
+
+  timeLeft(goal: IGoal) {
+    if (/week/.test(goal.id)) return goal.startDate + ONE_WEEK - Date.now();
+    if (/month/.test(goal.id)) return goal.startDate + ONE_WEEK * 4 - Date.now();
+    return Infinity;
   }
 }
