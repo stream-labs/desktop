@@ -1,6 +1,5 @@
 /// <reference path="../vendor/toasted.d.ts" />
 /// <reference path="../vendor/urijs.d.ts" />
-///<reference path="./jsx.d.ts"/>
 
 // all global interfaces here
 
@@ -90,6 +89,10 @@ declare module 'gl-buffer';
 declare module 'gl-transitions';
 declare module 'gl-texture2d';
 declare module 'gl-shader';
+
+// React modules
+declare module 'rc-animate';
+declare module 'react-dom';
 
 // uncomment to allow TS to import components without type definitions
 // webpack still checks the module existence
