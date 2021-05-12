@@ -165,14 +165,9 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
       bitrate: currentSettings.streaming.bitrate,
     };
 
-    // change the resolution only if user didn't set a custom one
-    if (!currentSettings.streaming.hasCustomResolution) {
-      // skip this output res step for tiktok since they stream in portrait
-      if (this.userService.platformType === 'tiktok') {
-        return;
-      } else {
-        newStreamingSettings.outputResolution = encoderProfile.resolutionOut;
-      }
+    // change the resolution only if user didn't set a custom one or if not using tiktok
+    if (!currentSettings.streaming.hasCustomResolution && this.userService.platformType !== 'tiktok') {
+      newStreamingSettings.outputResolution = encoderProfile.resolutionOut;
     }
 
     console.log('Apply encoder settings', newStreamingSettings);
