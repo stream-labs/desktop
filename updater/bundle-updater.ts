@@ -4,6 +4,17 @@ import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as stream from 'stream';
 import * as http from 'http';
+import * as crypto from 'crypto';
+
+type TBundleName = 'renderer.js' | 'vendors~renderer.js';
+
+interface IManifest {
+  'renderer.js': string;
+  'vendors~renderer.js': string;
+  checksums?: {
+    [bundle: string]: string;
+  };
+}
 
 module.exports = async (basePath: string) => {
   const cdnBase = `https://slobs-cdn.streamlabs.com/${process.env.SLOBS_VERSION}${
@@ -82,6 +93,62 @@ module.exports = async (basePath: string) => {
     });
   }
 
+  function getChecksum(filePath: string) {
+    return new Promise<string>((resolve, reject) => {
+      const file = fs.createReadStream(filePath);
+      const hash = crypto.createHash('md5');
+
+      stream.pipeline(file, hash, e => {
+        if (e) {
+          console.log(`Error reading checksum of ${filePath}`, e);
+          reject(e);
+        } else {
+          try {
+            const checksum = hash.read().toString('hex');
+            console.log(`Got checksum: ${filePath} => ${checksum}`);
+            resolve(checksum);
+          } catch (e: unknown) {
+            console.log(`Error reading checksum of ${filePath}`, e);
+            reject(e);
+          }
+        }
+      });
+    });
+  }
+
+  async function validateFile(
+    bundle: string,
+    filePath: string,
+    manifest: IManifest,
+  ): Promise<boolean> {
+    if (!manifest.checksums || !manifest.checksums[bundle]) {
+      console.log(`Checksums not found in manifest, assuming ${bundle} is valid`);
+      return true;
+    }
+
+    try {
+      const expectedChecksum = manifest.checksums[bundle];
+      const actualChecksum = await getChecksum(filePath);
+
+      if (expectedChecksum === actualChecksum) {
+        console.log(`${bundle} passed checksum validation`);
+        return true;
+      } else {
+        console.log(
+          `Got checksum mismatch on ${bundle}: ${expectedChecksum} =/= ${actualChecksum}`,
+        );
+
+        // Attempt to remove the file so it will re-download next time
+        fs.unlinkSync(filePath);
+
+        return false;
+      }
+    } catch (e: unknown) {
+      console.log(`Error determining checksum for ${bundle}`);
+      return false;
+    }
+  }
+
   /**
    * This ensures that if there isn't a directory for this specific container version,
    * we empty the bundles directory (to preserve HD space over time) and create a new
@@ -94,7 +161,7 @@ module.exports = async (basePath: string) => {
     }
   }
 
-  async function getBundleFilePath(bundle: string) {
+  async function getBundleFilePath(bundle: string, manifest: IManifest): Promise<string> {
     console.log(`Looking for bundle: ${bundle}`);
 
     // Check for bundle in this app package
@@ -108,7 +175,10 @@ module.exports = async (basePath: string) => {
     const downloadPath = path.join(bundleDirectory, bundle);
     if (fs.existsSync(downloadPath)) {
       console.log(`Found existing downloaded bundle ${bundle}`);
-      return downloadPath;
+
+      if (await validateFile(bundle, downloadPath, manifest)) {
+        return downloadPath;
+      }
     }
 
     // Finally check the server
@@ -116,6 +186,11 @@ module.exports = async (basePath: string) => {
     console.log(`Attempting to download bundle ${bundle}`);
     ensureBundlesDirectory();
     await downloadFile(serverPath, downloadPath);
+
+    if (!(await validateFile(bundle, downloadPath, manifest))) {
+      return Promise.reject('File failed to validate');
+    }
+
     return downloadPath;
   }
 
@@ -129,13 +204,13 @@ module.exports = async (basePath: string) => {
     useLocalBundles = true;
   }
 
-  const localManifest = require(path.join(`${basePath}/bundles/manifest.json`));
+  const localManifest: IManifest = require(path.join(`${basePath}/bundles/manifest.json`));
 
   console.log('Local bundle info:', localManifest);
 
   // Check if bundle updates are available
   // TODO: Cache the latest manifest for offline use?
-  let serverManifest: { [bundle: string]: string } | undefined;
+  let serverManifest: IManifest | undefined;
 
   if (!useLocalBundles) {
     try {
@@ -162,8 +237,9 @@ module.exports = async (basePath: string) => {
   const bundlePathsMap: { [bundle: string]: string } = {};
 
   if (!useLocalBundles && serverManifest) {
-    const promises = ['renderer.js', 'vendors~renderer.js'].map(bundleName => {
-      return getBundleFilePath(serverManifest![bundleName]).then(bundlePath => {
+    const bundles = ['renderer.js', 'vendors~renderer.js'] as const;
+    const promises = bundles.map(bundleName => {
+      return getBundleFilePath(serverManifest![bundleName], serverManifest!).then(bundlePath => {
         bundlePathsMap[bundleName] = bundlePath;
       });
     });
@@ -191,7 +267,7 @@ module.exports = async (basePath: string) => {
   }
 
   // Used for sending accurate stack traces to sentry
-  electron.ipcMain.on('getBundleNames', (e: Electron.Event, bundles: string[]) => {
+  electron.ipcMain.on('getBundleNames', (e: Electron.Event, bundles: TBundleName[]) => {
     const bundleNames: { [bundle: string]: string } = {};
 
     bundles.forEach(bundle => {
@@ -209,7 +285,7 @@ module.exports = async (basePath: string) => {
   electron.session.defaultSession?.webRequest.onBeforeRequest(
     { urls: ['https://slobs-cdn.streamlabs.com/bundles/*.js'] },
     (request, cb) => {
-      const bundleName = request.url.split('/')[4];
+      const bundleName = request.url.split('/')[4] as TBundleName;
 
       if (!useLocalBundles && bundlePathsMap[bundleName]) {
         // Work around an extreme edge case where people have # in home directory path
