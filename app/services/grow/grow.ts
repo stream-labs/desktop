@@ -110,7 +110,9 @@ export class GrowService extends PersistentStatefulService<IGrowServiceState> {
     this.ADD_GOAL(goalWithId);
   }
 
-  incrementGoal(goal: IGoal, amount: number) {
+  incrementGoal(goalId: string, amount: number) {
+    const goal = this.state.goals[goalId];
+    if (!goal) return;
     this.INCREMENT_GOAL(goal, amount);
   }
 

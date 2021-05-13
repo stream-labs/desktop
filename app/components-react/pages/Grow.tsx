@@ -198,7 +198,7 @@ function GoalCard(p: { goal: IGoal }) {
   const daysLeft = Math.round(GrowService.timeLeft(p.goal) / ONE_DAY);
 
   function incrementCustomGoal() {
-    GrowService.incrementGoal(p.goal, 1);
+    GrowService.incrementGoal(p.goal.id, 1);
   }
 
   function addGoal() {
@@ -208,6 +208,12 @@ function GoalCard(p: { goal: IGoal }) {
   function removeGoal() {
     GrowService.removeGoal(p.goal);
   }
+
+  const manuallyProgressedGoal =
+    image === '' ||
+    !['stream_times_per_week', 'stream_hours_per_month', 'multistream_per_week'].includes(
+      p.goal.id,
+    );
 
   return (
     <div className={styles.card} key={id}>
@@ -223,8 +229,10 @@ function GoalCard(p: { goal: IGoal }) {
           strokeWidth={16}
         />
       )}
-      {progress != null && image === '' ? (
-        <Button onClick={incrementCustomGoal}>{$t('Progress')}</Button>
+      {progress != null && manuallyProgressedGoal ? (
+        <Button onClick={incrementCustomGoal} type="primary">
+          {$t('Progress')}
+        </Button>
       ) : (
         <img src={image} />
       )}
