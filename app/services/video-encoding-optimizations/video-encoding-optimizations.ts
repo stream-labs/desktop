@@ -166,7 +166,10 @@ export class VideoEncodingOptimizationService extends PersistentStatefulService<
     };
 
     // change the resolution only if user didn't set a custom one or if not using tiktok
-    if (!currentSettings.streaming.hasCustomResolution && this.userService.platformType !== 'tiktok') {
+    if (
+      !currentSettings.streaming.hasCustomResolution &&
+      this.userService.platformType !== 'tiktok'
+    ) {
       newStreamingSettings.outputResolution = encoderProfile.resolutionOut;
     }
 
