@@ -8,7 +8,7 @@ import PatchNotes from './pages/PatchNotes';
 import Display from './shared/Display';
 import TitleBar from './shared/TitleBar';
 import Chat from './root/Chat';
-import Grow from './pages/Grow';
+import Grow from './pages/Grow/Grow';
 import NavTools from './sidebar/NavTools';
 import PlatformLogo from './shared/PlatformLogo';
 
