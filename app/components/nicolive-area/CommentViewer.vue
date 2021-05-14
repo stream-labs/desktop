@@ -80,6 +80,7 @@
 .list {
   flex-grow: 1;
   overflow-y: auto;
+  height: 100%;
   padding-top: 8px;
 }
 
