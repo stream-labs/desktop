@@ -11,20 +11,20 @@ const ONE_DAY = 1000 * 60 * 60 * 24;
 
 export function GoalCard(p: { goal: IGoal }) {
   const { GrowService } = Services;
-  const { title, progress, total, image, id } = p.goal;
+  const { title, image, id } = p.goal;
 
-  const daysLeft = Math.round(GrowService.timeLeft(p.goal) / ONE_DAY);
+  const daysLeft = Math.round(GrowService.views.timeLeft(p.goal) / ONE_DAY);
 
   function incrementCustomGoal() {
-    GrowService.incrementGoal(p.goal.id, 1);
+    GrowService.actions.incrementGoal(p.goal.id, 1);
   }
 
   function addGoal() {
-    GrowService.addGoal(p.goal);
+    GrowService.actions.addGoal(p.goal);
   }
 
   function removeGoal() {
-    GrowService.removeGoal(p.goal);
+    GrowService.actions.removeGoal(p.goal);
   }
 
   const manuallyProgressedGoal =
@@ -39,23 +39,23 @@ export function GoalCard(p: { goal: IGoal }) {
       {daysLeft !== Infinity && (
         <span className={styles.whisper}>{$t('%{daysLeft} days left', { daysLeft })}</span>
       )}
-      {progress != null && (
+      {p.goal.progress != null && (
         <Progress
-          percent={Math.floor((progress / total) * 100)}
+          percent={Math.floor((p.goal.progress / p.goal.total) * 100)}
           showInfo={false}
           steps={p.goal.total}
           strokeWidth={16}
         />
       )}
-      {progress != null && manuallyProgressedGoal ? (
+      {p.goal.progress != null && manuallyProgressedGoal ? (
         <Button onClick={incrementCustomGoal} type="primary">
           {$t('Progress')}
         </Button>
       ) : (
         <img src={image} />
       )}
-      {progress == null && <Button onClick={addGoal}>{$t('Add Goal')}</Button>}
-      {progress != null && (
+      {p.goal.progress == null && <Button onClick={addGoal}>{$t('Add Goal')}</Button>}
+      {p.goal.progress != null && (
         <i onClick={removeGoal} className={cx('icon-close', styles.closeIcon)} />
       )}
     </div>

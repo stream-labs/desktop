@@ -59,6 +59,13 @@ class GrowServiceViews extends ViewHandler<IGrowServiceState> {
   get tips() {
     return GROWTH_TIPS();
   }
+
+  timeLeft(goal: IGoal) {
+    if (!goal.startDate) return Infinity;
+    if (/week/.test(goal.id)) return goal.startDate + ONE_WEEK - Date.now();
+    if (/month/.test(goal.id)) return goal.startDate + ONE_WEEK * 4 - Date.now();
+    return Infinity;
+  }
 }
 
 export class GrowService extends PersistentStatefulService<IGrowServiceState> {
@@ -126,12 +133,5 @@ export class GrowService extends PersistentStatefulService<IGrowServiceState> {
         this.removeGoal(goal);
       }
     });
-  }
-
-  timeLeft(goal: IGoal) {
-    if (!goal.startDate) return Infinity;
-    if (/week/.test(goal.id)) return goal.startDate + ONE_WEEK - Date.now();
-    if (/month/.test(goal.id)) return goal.startDate + ONE_WEEK * 4 - Date.now();
-    return Infinity;
   }
 }

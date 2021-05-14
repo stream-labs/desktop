@@ -24,7 +24,7 @@ export default function Grow() {
   useEffect(getUniversityProgress, []);
 
   function getUniversityProgress() {
-    GrowService.fetchUniversityProgress().then(progress => {
+    GrowService.actions.return.fetchUniversityProgress().then(progress => {
       if (!progress) return;
       setUniversityProgress(progress);
     });
@@ -45,16 +45,21 @@ export default function Grow() {
 function MyGoals(p: { goals: Dictionary<IGoal> }) {
   const { GrowService } = Services;
   const mappedGoals = Object.values(p.goals);
-  const appendedOptions = sampleSize(GrowService.views.goalOptions, 4 - mappedGoals.length);
-  const goalsToMap = mappedGoals.length < 4 ? [...mappedGoals, ...appendedOptions] : mappedGoals;
+  const appendedOptions = sampleSize(
+    GrowService.views.goalOptions.filter(goal => !p.goals[goal.id]),
+    4 - mappedGoals.length,
+  );
 
   return (
     <div className={styles.myGoals}>
       <h2>{$t('My Goals')}</h2>
 
       <div className={styles.goalsContainer}>
-        {goalsToMap.map(goal => (
-          <GoalCard goal={goal} />
+        {mappedGoals.map(goal => (
+          <GoalCard goal={goal} key={goal.id} />
+        ))}
+        {appendedOptions.map(goal => (
+          <GoalCard goal={goal} key={goal.id} />
         ))}
       </div>
     </div>
