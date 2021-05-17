@@ -8,7 +8,7 @@ import {
 } from '.';
 import { Inject } from 'services/core/injector';
 import { authorizedHeaders, jfetch } from 'util/requests';
-import { platformAuthorizedRequest } from './utils';
+import { platformAuthorizedRequest, platformRequest } from './utils';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { CustomizationService } from 'services/customization';
 import { IGoLiveSettings } from 'services/streaming';
@@ -744,20 +744,22 @@ export class YoutubeService
     headers.append('X-Upload-Content-Length', stats.size.toString());
     headers.append('X-Upload-Content-Type', type);
 
-    const result = await fetch(
-      new Request(
-        'https://www.googleapis.com/upload/youtube/v3/videos?part=snippet&mine=true&uploadType=resumable',
-        {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({
-            snippet: {
-              title: 'This is a test',
-              description: 'This is a test description',
-            },
-          }),
-        },
-      ),
+    const result = await platformRequest(
+      'youtube',
+      {
+        url:
+          'https://www.googleapis.com/upload/youtube/v3/videos?part=snippet&mine=true&uploadType=resumable',
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          snippet: {
+            title: 'This is a test',
+            description: 'This is a test description',
+          },
+        }),
+      },
+      true,
+      false,
     );
 
     const uploadLocation = result.headers.get('Location');
@@ -775,7 +777,10 @@ export class YoutubeService
       });
     });
 
-    async function uploadNextChunk() {
+    // Uploads the next chunk of the video.
+    // Resolves to video creation response if done, or false if not done
+    // Rejects if the chunk upload fails
+    async function uploadNextChunk(): Promise<{ id: string } | false> {
       const nextChunkSize = Math.min(stats.size - currentByteIndex, CHUNK_SIZE);
       const readBuffer = Buffer.alloc(nextChunkSize);
       const bytesRead = await new Promise<number>((resolve, reject) => {
@@ -788,9 +793,11 @@ export class YoutubeService
         });
       });
 
-      if (bytesRead === 0) {
-        console.log('FINISHED READING FROM FILE');
-        return true;
+      if (bytesRead !== nextChunkSize) {
+        // Something went wrong, we didn't read as many bytes as expected
+        throw new Error(
+          `Did not read expected number of bytes from video, Expected: ${nextChunkSize} Actual: ${bytesRead}`,
+        );
       }
 
       const headers = new Headers();
@@ -803,6 +810,8 @@ export class YoutubeService
 
       currentByteIndex += nextChunkSize;
 
+      // Doesn't need to use platformRequest as this is not
+      // an authenticated call. Is a unique secure upload URL.
       const result = await fetch(
         new Request(uploadLocation, {
           method: 'PUT',
@@ -811,11 +820,24 @@ export class YoutubeService
         }),
       );
 
-      return false;
+      // 308 means we need to keep uploading
+      if (result.status === 308) {
+        return false;
+      } else if ([200, 201].includes(result.status)) {
+        // Final upload call contains info about the created video
+        return (await result.json()) as { id: string };
+      } else {
+        throw new Error(`Got unexpected video chunk upload status ${result.status}`);
+      }
     }
 
     while (true) {
-      if (await uploadNextChunk()) break;
+      const chunkResult = await uploadNextChunk();
+
+      if (chunkResult) {
+        console.log(chunkResult);
+        break;
+      }
     }
   }
 
