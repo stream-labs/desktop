@@ -299,7 +299,11 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
   }
 
   private removeAudioSource(sourceId: string) {
+    this.sourceData[sourceId].fader.detach();
+    this.sourceData[sourceId].fader.destroy();
     this.sourceData[sourceId].volmeter.removeCallback(this.sourceData[sourceId].callbackInfo);
+    this.sourceData[sourceId].volmeter.detach();
+    this.sourceData[sourceId].volmeter.destroy();
     if (this.sourceData[sourceId].timeoutId) clearTimeout(this.sourceData[sourceId].timeoutId);
     delete this.sourceData[sourceId];
     this.REMOVE_AUDIO_SOURCE(sourceId);

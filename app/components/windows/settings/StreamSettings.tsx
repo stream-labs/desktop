@@ -51,7 +51,16 @@ export default class StreamSettings extends TsxComponent {
 
   private editCustomDestMode: boolean | number = false;
 
-  private platforms = this.streamingView.allPlatforms;
+  get platforms() {
+    return this.streamingView.allPlatforms.filter(platform => {
+      // Only show tiktok if it's already linked
+      if (platform === 'tiktok') {
+        return !!this.userService.views.auth?.platforms?.tiktok;
+      }
+
+      return true;
+    });
+  }
 
   saveObsSettings(obsSettings: ISettingsSubCategory[]) {
     this.streamSettingsService.setObsStreamSettings(obsSettings);

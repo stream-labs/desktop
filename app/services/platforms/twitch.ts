@@ -163,6 +163,7 @@ export class TwitchService
           key,
           platform: 'twitch',
           streamType: 'rtmp_common',
+          server: 'auto',
         });
       }
     }

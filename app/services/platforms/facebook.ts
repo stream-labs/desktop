@@ -221,6 +221,7 @@ export class FacebookService
         key: streamKey,
         platform: 'facebook',
         streamType: 'rtmp_common',
+        server: 'rtmps://rtmp-api.facebook.com:443/rtmp/',
       });
     }
     this.SET_STREAM_KEY(streamKey);
