@@ -18,9 +18,9 @@ export function useVuex(...args: any[]) {
   const [state, setState] = useState(selector);
   useEffect(() => {
     const unsubscribe = StatefulService.store.watch(
-      () => selector(),
+      () => JSON.stringify(selector()),
       newState => {
-        setState(newState);
+        setState(JSON.parse(newState));
       },
     );
     return () => {
