@@ -99,6 +99,7 @@ export class TwitchService
     'user-info',
     'streamlabels',
     'themes',
+    'viewerCount',
   ]);
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
