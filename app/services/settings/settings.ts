@@ -339,6 +339,23 @@ export class SettingsService extends StatefulService<ISettingsState>
       }
     }
 
+    if (categoryName === 'Output') {
+      const replayBuffer = settings.find((category: any) => {
+        return category.nameSubCategory === 'Replay Buffer';
+      });
+      if (replayBuffer) {
+        const parameters = replayBuffer.parameters;
+
+        // 最大リプレイ時間を1秒以上に制限する(0秒に設定するとフリーズするため)
+        const recRBTime = parameters.find((parameter: any) => {
+          return parameter.name === 'RecRBTime';
+        }) as any;
+        if (recRBTime && recRBTime.minVal === 0) {
+          recRBTime.minVal = 1; // 0秒を除外する
+        }
+      }
+    }
+
     // これ以上消すものが増えるなら、フィルタリング機構は整備したほうがよいかもしれない
 
     return settings;
