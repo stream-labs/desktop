@@ -17,7 +17,7 @@ export default function TitleBar(props: { windowId: string }) {
   const v = useVuex(() => ({
     theme: CustomizationService.views.currentTheme,
     title: WindowsService.state[props.windowId]?.title,
-  }));
+  }), false);
 
   const primeTheme = /prime/.test(v.theme);
   let errorState = false;
