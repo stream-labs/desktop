@@ -380,7 +380,7 @@ async function startApp() {
 
   // This needs to be explicitly handled on Mac
   app.on('before-quit', e => {
-	crashHandler.terminateCrashHandler(pid);
+    crashHandler.terminateCrashHandler(pid);
     if (!shutdownStarted) {
       e.preventDefault();
       mainWindow.close();
