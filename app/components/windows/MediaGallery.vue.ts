@@ -163,6 +163,7 @@ export default class MediaGallery extends Vue {
   handleFileDrop(e: DragEvent) {
     const mappedFiles = Array.from(e.dataTransfer.files).map(file => file.path);
     this.upload(mappedFiles);
+    this.dragOver = false;
   }
 
   handleTypeFilter(type: 'audio' | 'image', category: 'stock' | 'uploads') {
@@ -273,7 +274,7 @@ export default class MediaGallery extends Vue {
         position: 'top-right',
         className: 'toast-success',
       });
-    } catch (e) {
+    } catch (e: unknown) {
       this.$toasted.show($t('Failed to copy URL'), {
         duration: 1000,
         position: 'top-right',

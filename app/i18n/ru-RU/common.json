@@ -117,5 +117,17 @@
   "Apps": "Приложения",
   "Finish": "Готово",
   "Get Prime": "Приобрести подписку Prime",
-  "System error message:": "Сообщение о системной ошибке:"
+  "System error message:": "Сообщение о системной ошибке:",
+  "List is empty": "List is empty",
+  "Not selected": "Not selected",
+  "Friends": "Friends",
+  "Thumbnail": "Thumbnail",
+  "Maximum file size reached ": "Maximum file size reached ",
+  "Select image": "Select image",
+  "Clear": "Очистить",
+  "Width": "Ширина",
+  "Height": "Высота",
+  "Use Custom": "Use Custom",
+  "Apply": "Применить",
+  "Do not show this message again": "Do not show this message again"
 }

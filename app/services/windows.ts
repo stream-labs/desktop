@@ -4,7 +4,7 @@
 import cloneDeep from 'lodash/cloneDeep';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import electron from 'electron';
-import Vue from 'vue';
+import Vue, { Component } from 'vue';
 import Utils from 'services/utils';
 import { Subject } from 'rxjs';
 import { throttle } from 'lodash-decorators';
@@ -17,7 +17,16 @@ import SceneTransitions from 'components/windows/SceneTransitions.vue';
 import AddSource from 'components/windows/AddSource.vue';
 import RenameSource from 'components/windows/RenameSource.vue';
 import NameScene from 'components/windows/NameScene.vue';
-import NameFolder from 'components/windows/NameFolder.vue';
+import {
+  NameFolder,
+  GoLiveWindow,
+  EditStreamWindow,
+  IconLibraryProperties,
+  PerformanceMetrics,
+} from 'components/shared/ReactComponent';
+
+import GoLiveWindowDeprecated from 'components/windows/go-live/GoLiveWindow';
+import EditStreamWindowDeprecated from 'components/windows/go-live/EditStreamWindow';
 import SourceProperties from 'components/windows/SourceProperties.vue';
 import SourceFilters from 'components/windows/SourceFilters.vue';
 import AddSourceFilter from 'components/windows/AddSourceFilter';
@@ -38,8 +47,6 @@ import OverlayWindow from 'components/windows/OverlayWindow.vue';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
 import WelcomeToPrime from 'components/windows/WelcomeToPrime';
-import GoLiveWindow from 'components/windows/go-live/GoLiveWindow';
-import EditStreamWindow from 'components/windows/go-live/EditStreamWindow';
 import ScheduleStreamWindow from 'components/windows/go-live/ScheduleStreamWindow';
 
 import BitGoal from 'components/widgets/goal/BitGoal';
@@ -62,10 +69,11 @@ import MediaShare from 'components/widgets/MediaShare';
 import AlertBox from 'components/widgets/AlertBox.vue';
 import SpinWheel from 'components/widgets/SpinWheel.vue';
 
-import PerformanceMetrics from 'components/PerformanceMetrics.vue';
 import { byOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from './usage-statistics';
 import { Inject } from 'services/core';
+import MessageBoxModal from 'components/shared/modals/MessageBoxModal';
+import Modal from 'components/shared/modals/modal';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -126,7 +134,10 @@ export function getComponents() {
     WelcomeToPrime,
     GoLiveWindow,
     EditStreamWindow,
+    GoLiveWindowDeprecated,
+    EditStreamWindowDeprecated,
     ScheduleStreamWindow,
+    IconLibraryProperties,
   };
 }
 
@@ -160,6 +171,10 @@ interface IWindowsState {
   [windowId: string]: IWindowOptions;
 }
 
+export interface IModalOptions {
+  renderFn: Function | null;
+}
+
 const DEFAULT_WINDOW_OPTIONS: IWindowOptions = {
   componentName: '',
   scaleFactor: 1,
@@ -191,6 +206,34 @@ export class WindowsService extends StatefulService<IWindowsState> {
     },
   };
 
+  static modalOptions: IModalOptions = {
+    renderFn: null,
+  };
+
+  /**
+   * This event is happening when the modal has been shown or hidden
+   */
+  static modalChanged = new Subject<Partial<IModalOptions>>();
+
+  /**
+   * Show modal in the current window
+   * Use a static method instead actions so we can pass an non-serializable renderer method and support reactivity
+   */
+  static showModal(vm: Vue, renderFn: IModalOptions['renderFn']) {
+    // use `vm` to keep reactivity in the renderer function
+    const renderer = () => vm.$createElement(Modal, [renderFn()]);
+    this.modalChanged.next({ renderFn: renderer });
+  }
+
+  static hideModal() {
+    this.modalChanged.next({ renderFn: null });
+  }
+
+  static showMessageBox(vm: Vue, renderFn: Function) {
+    const renderer = () => vm.$createElement(MessageBoxModal, [renderFn()]);
+    this.showModal(vm, renderer);
+  }
+
   // This is a list of components that are registered to be
   // top level components in new child windows.
   components = getComponents();
@@ -221,7 +264,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
   private updateScaleFactor(windowId: string) {
     const window = this.windows[windowId];
     if (window && !window.isDestroyed()) {
-      const bounds = window.getBounds();
+      const bounds = byOS({
+        [OS.Windows]: () => electron.remote.screen.dipToScreenRect(window, window.getBounds()),
+        [OS.Mac]: () => window.getBounds(),
+      });
       const currentDisplay = electron.remote.screen.getDisplayMatching(bounds);
       this.UPDATE_SCALE_FACTOR(windowId, currentDisplay.scaleFactor);
     }
@@ -286,7 +332,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
           height: options.size.height,
         });
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Recovering from error:', err);
 
       childWindow.setMinimumSize(options.size.width, options.size.height);
@@ -366,7 +412,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       height: 400,
       title: 'New Window',
       backgroundColor: '#17242D',
-      webPreferences: { nodeIntegration: true, webviewTag: true },
+      webPreferences: { nodeIntegration: true, webviewTag: true, enableRemoteModule: true },
       ...options,
       ...options.size,
     }));

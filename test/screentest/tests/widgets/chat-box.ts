@@ -12,7 +12,7 @@ afterAppStart(async t => {
 });
 
 test('Chatbox Visual Settings', async t => {
-  await t.context.app.client.click('li=Visual Settings');
+  await (await t.context.app.client.$('li=Visual Settings')).click();
   await fillForm(t, 'form[name=visual-properties-form]', {
     theme: 'twitch',
     show_moderator_icons: true,
@@ -31,7 +31,7 @@ test('Chatbox Visual Settings', async t => {
 });
 
 test('Chatbox Font Settings', async t => {
-  await t.context.app.client.click('li=Font Settings');
+  await (await t.context.app.client.$('li=Font Settings')).click();
   await fillForm(t, 'form[name=font-properties-form]', {
     text_color: '#FF0000',
     text_size: 20,
@@ -41,7 +41,7 @@ test('Chatbox Font Settings', async t => {
 });
 
 test('Chatbox Font Chatter', async t => {
-  await t.context.app.client.click('li=Chatter');
+  await (await t.context.app.client.$('li=Chatter')).click();
   await waitForWidgetSettingsSync(t);
   t.pass();
 });

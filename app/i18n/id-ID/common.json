@@ -117,5 +117,17 @@
   "Apps": "Aplikasi",
   "Finish": "Selesai",
   "Get Prime": "Dapatkan Prime",
-  "System error message:": "Pesan kesalahan sistem:"
+  "System error message:": "Pesan kesalahan sistem:",
+  "List is empty": "List is empty",
+  "Not selected": "Not selected",
+  "Friends": "Friends",
+  "Thumbnail": "Thumbnail",
+  "Maximum file size reached ": "Maximum file size reached ",
+  "Select image": "Select image",
+  "Clear": "Bersihkan",
+  "Width": "Lebar",
+  "Height": "Tinggi",
+  "Use Custom": "Use Custom",
+  "Apply": "Daftar",
+  "Do not show this message again": "Do not show this message again"
 }

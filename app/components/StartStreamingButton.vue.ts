@@ -158,14 +158,6 @@ export default class StartStreamingButton extends Vue {
       return this.streamingService.views.isMultiplatformMode || updateStreamInfoOnLive;
     }
 
-    if (primaryPlatform === 'mixer') {
-      return (
-        this.streamSettingsService.state.protectedModeEnabled &&
-        updateStreamInfoOnLive &&
-        this.streamSettingsService.isSafeToModifyStreamKey()
-      );
-    }
-
     if (primaryPlatform === 'facebook') {
       return (
         this.streamSettingsService.state.protectedModeEnabled &&
@@ -174,6 +166,13 @@ export default class StartStreamingButton extends Vue {
     }
 
     if (primaryPlatform === 'youtube') {
+      return (
+        this.streamSettingsService.state.protectedModeEnabled &&
+        this.streamSettingsService.isSafeToModifyStreamKey()
+      );
+    }
+
+    if (primaryPlatform === 'tiktok') {
       return (
         this.streamSettingsService.state.protectedModeEnabled &&
         this.streamSettingsService.isSafeToModifyStreamKey()

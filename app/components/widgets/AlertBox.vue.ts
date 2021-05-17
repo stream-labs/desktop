@@ -32,6 +32,7 @@ const alertNameMap = () => ({
   subscribers: $t('Subscribers'), // YouTube
   stars: $t('Stars'),
   support: $t('Support'),
+  giftSupport: $t('Gifted Support'),
   likes: $t('Likes'),
   shares: $t('Shares'),
   fbfollows: $t('Follows'),
@@ -71,7 +72,7 @@ const HAS_DONOR_MESSAGE = [
   },
 })
 export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxService> {
-  @Inject() alertBoxService: AlertBoxService;
+  @Inject() alertBoxService!: AlertBoxService;
 
   $refs: { [key: string]: HTMLElement };
 

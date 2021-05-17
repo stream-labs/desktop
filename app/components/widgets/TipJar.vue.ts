@@ -18,10 +18,6 @@ const nameMap = () => ({
   twitch_bits: $t('Twitch Bits'),
   twitch_subs: $t('Twitch Subs'),
   twitch_resubs: $t('Twitch Resubs'),
-  mixer_follows: $t('Mixer Follows'),
-  mixer_subscriptions: $t('Mixer Subscriptions'),
-  mixer_effects: $t('Mixer Effects'),
-  mixer_stickers: $t('Mixer Stickers'),
   youtube_subscribers: $t('YouTube Subscriptions'),
   youtube_sponsors: $t('YouTube Memberships'),
   youtube_superchats: $t('YouTube Super Chats'),
@@ -33,12 +29,12 @@ const nameMap = () => ({
   facebook_shares: $t('Facebook Shares'),
   facebook_stars: $t('Facebook Stars'),
   facebook_supports: $t('Facebook Supports'),
+  facebook_support_gifters: $t('Facebook Support Gifters'),
 });
 
 const mediaGalleryInputs = {
   twitch: ['twitch_follows'],
   youtube: ['youtube_subscribers', 'youtube_sponsors'],
-  mixer: ['mixer_subscriptions', 'mixer_follows'],
 };
 
 @Component({
@@ -52,7 +48,7 @@ const mediaGalleryInputs = {
 })
 export default class TipJar extends WidgetSettings<ITipJarData, TipJarService> {
   @Inject() userService: UserService;
-  @Inject() hostsService: HostsService;
+  @Inject() hostsService!: HostsService;
 
   textColorTooltip = $t('A hex code for the base text color.');
 
@@ -62,19 +58,23 @@ export default class TipJar extends WidgetSettings<ITipJarData, TipJarService> {
 
   jarSrc = `https://${this.hostsService.cdn}/static/tip-jar/jars/glass-`;
   inputOptions: { description: string; value: string }[] = [];
-  navItems = [
-    { value: 'manage-jar', label: $t('Manage Jar') },
-    { value: 'font', label: $t('Font Settings') },
-    { value: 'images', label: $t('Images') },
-    { value: 'source', label: $t('Source') },
-  ];
+  get navItems() {
+    return [
+      { value: 'manage-jar', label: $t('Manage Jar') },
+      { value: 'font', label: $t('Font Settings') },
+      { value: 'images', label: $t('Images') },
+      { value: 'source', label: $t('Source') },
+    ];
+  }
 
   titleFromKey(key: string) {
     return nameMap()[key];
   }
 
   get iterableTypes() {
-    return Object.keys(this.wData.settings.types).filter(key => key !== '_id');
+    return Object.keys(this.wData.settings.types).filter(
+      key => key !== '_id' && key !== 'priority',
+    );
   }
 
   get platform() {

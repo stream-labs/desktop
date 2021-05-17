@@ -109,7 +109,10 @@ module.exports = {
       },
       {
         test: /\.ts$/,
-        exclude: /node_modules/,
+        exclude: [
+          path.resolve(__dirname, 'node_modules'),
+          path.resolve(__dirname, 'app', 'components-react'),
+        ],
         use: {
           loader: 'ts-loader',
           options: {
@@ -121,7 +124,10 @@ module.exports = {
         },
       },
       {
-        test: /\.tsx$/,
+        test: path => {
+          const match = !!path.match(/components[\\/].+\.tsx$/);
+          return match;
+        },
         include: path.resolve(__dirname, 'app/components'),
         use: [
           'babel-loader',
@@ -137,20 +143,60 @@ module.exports = {
         ],
       },
       {
+        test: path => {
+          const match = !!path.match(/react[\\/].+\.tsx?$/);
+          return match;
+        },
+        include: path.resolve(__dirname, 'app/components-react'),
+        exclude: /node_modules/,
+        use: [
+          'babel-loader',
+          {
+            loader: 'ts-loader',
+            options: {
+              reportFiles: ['app/components-react/**/*'],
+              configFile: 'app/components-react/tsconfig.json',
+              instance: 'react-tsx',
+              compilerOptions: {
+                jsx: 'react',
+              },
+            },
+          },
+        ],
+      },
+      {
         test: /\.js$/,
         loader: 'babel-loader',
         exclude: /node_modules/,
       },
       {
         test: /(?<!\.[mg])\.less$/, // Vue style tags
-        include: [path.resolve(__dirname, 'app/components'), path.resolve(__dirname, 'updater')],
-        use: ['vue-style-loader', 'css-loader', 'less-loader'],
+        include: [
+          path.resolve(__dirname, 'app/components'),
+          path.resolve(__dirname, 'app/components-react'),
+          path.resolve(__dirname, 'updater'),
+        ],
+        use: [
+          'vue-style-loader',
+          'css-loader',
+          {
+            loader: 'less-loader',
+            options: {
+              lessOptions: {
+                javascriptEnabled: true,
+              },
+            },
+          },
+        ],
       },
       {
         test: /\.m.less$/, // Local style modules
-        include: path.resolve(__dirname, 'app/components'),
+        include: [
+          path.resolve(__dirname, 'app/components'),
+          path.resolve(__dirname, 'app/components-react'),
+        ],
         use: [
-          { loader: 'style-loader' },
+          { loader: 'style-loader', options: { attributes: { name: 'local' } } },
           {
             loader: 'css-loader',
             options: {
@@ -160,7 +206,38 @@ module.exports = {
               importLoaders: 1,
             },
           },
-          { loader: 'less-loader' },
+          {
+            loader: 'less-loader',
+            options: {
+              lessOptions: {
+                javascriptEnabled: true,
+              },
+            },
+          },
+        ],
+      },
+      {
+        test: /\.lazy.less$/, // antd themes
+        include: [path.resolve(__dirname, 'app/styles/antd')],
+        use: [
+          {
+            loader: 'style-loader',
+            options: { injectType: 'lazyStyleTag', attributes: { name: 'antd' } },
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1,
+            },
+          },
+          {
+            loader: 'less-loader',
+            options: {
+              lessOptions: {
+                javascriptEnabled: true,
+              },
+            },
+          },
         ],
       },
       {
@@ -170,6 +247,34 @@ module.exports = {
           path.resolve(__dirname, 'app/themes.g.less'),
         ],
         use: [
+          { loader: 'style-loader', options: { attributes: { name: 'global' } } },
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1,
+            },
+          },
+          {
+            loader: 'less-loader',
+            options: {
+              lessOptions: {
+                javascriptEnabled: true,
+              },
+            },
+          },
+        ],
+      },
+      {
+        test: /\.less$/, // Local style modules
+        exclude: [
+          path.resolve(__dirname, 'updater'),
+          path.resolve(__dirname, 'app/components'),
+          path.resolve(__dirname, 'app/components-react'),
+          path.resolve(__dirname, 'app/app.g.less'),
+          path.resolve(__dirname, 'app/themes.g.less'),
+          path.resolve(__dirname, 'app/styles/antd'),
+        ],
+        use: [
           'style-loader',
           {
             loader: 'css-loader',
@@ -177,7 +282,14 @@ module.exports = {
               importLoaders: 1,
             },
           },
-          'less-loader',
+          {
+            loader: 'less-loader',
+            options: {
+              lessOptions: {
+                javascriptEnabled: true,
+              },
+            },
+          },
         ],
       },
       {

@@ -1,5 +1,5 @@
 export function lazyModule(module: any) {
-  return function(target: Object, key: string) {
+  return function (target: Object, key: string) {
     const objectKey = `_${key}`;
 
     Object.defineProperty(target, key, {

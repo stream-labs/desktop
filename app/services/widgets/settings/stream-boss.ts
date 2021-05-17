@@ -49,10 +49,7 @@ export interface IStreamBossCreateOptions {
 }
 
 @InheritMutations()
-export abstract class StreamBossService extends BaseGoalService<
-  IStreamBossData,
-  IStreamBossCreateOptions
-> {
+export class StreamBossService extends BaseGoalService<IStreamBossData, IStreamBossCreateOptions> {
   static initialState = WIDGET_INITIAL_STATE;
 
   getApiSettings() {
@@ -184,10 +181,6 @@ export abstract class StreamBossService extends BaseGoalService<
         { key: 'sub_multiplier', title: $t('Damage Per Membership'), isInteger: true },
         { key: 'superchat_multiplier', title: $t('Damage Per Superchat Dollar'), isInteger: true },
         { key: 'follow_multiplier', title: $t('Damage Per Subscriber'), isInteger: true },
-      ],
-      mixer: [
-        { key: 'follow_multiplier', title: $t('Damage Per Follower'), isInteger: true },
-        { key: 'sub_multiplier', title: $t('Damage Per Subscriber'), isInteger: true },
       ],
     }[platform];
   }

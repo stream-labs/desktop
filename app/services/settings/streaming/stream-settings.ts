@@ -3,10 +3,12 @@ import { Inject } from 'services/core/injector';
 import { InitAfter, mutation, PersistentStatefulService, ViewHandler } from '../../core';
 import { UserService } from 'services/user';
 import { TPlatform, getPlatformService } from 'services/platforms';
-import { invert, pick } from 'lodash';
-import { MixerService, TwitchService } from '../../../app-services';
+import pick from 'lodash/pick';
+import invert from 'lodash/invert';
+import cloneDeep from 'lodash/cloneDeep';
+import { TwitchService } from 'services/platforms/twitch';
 import { PlatformAppsService } from 'services/platform-apps';
-import { IGoLiveSettings, IPlatformFlags } from '../../streaming';
+import { IGoLiveSettings, IPlatformFlags } from 'services/streaming';
 import Vue from 'vue';
 
 interface ISavedGoLiveSettings {
@@ -14,7 +16,6 @@ interface ISavedGoLiveSettings {
     twitch: IPlatformFlags;
     facebook: IPlatformFlags;
     youtube: IPlatformFlags;
-    mixer: IPlatformFlags;
   };
   customDestinations?: ICustomStreamDestination[];
   advancedMode: boolean;
@@ -80,8 +81,8 @@ interface IStreamSettings extends IStreamSettingsState {
 const platformToServiceNameMap: { [key in TPlatform]: string } = {
   twitch: 'Twitch',
   youtube: 'YouTube / YouTube Gaming',
-  mixer: 'Mixer.com - FTL',
   facebook: 'Facebook Live',
+  tiktok: 'Custom',
 };
 
 /**
@@ -137,7 +138,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     });
 
     // save settings related to "Settings->Stream" window
-    let streamFormData = this.views.obsStreamSettings;
+    let streamFormData = cloneDeep(this.views.obsStreamSettings);
 
     streamFormData.forEach(subCategory => {
       subCategory.parameters.forEach(parameter => {
@@ -155,7 +156,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       ['platform', 'key', 'server'].includes(key),
     );
     if (!mustUpdateObsSettings) return;
-    streamFormData = this.views.obsStreamSettings;
+    streamFormData = cloneDeep(this.views.obsStreamSettings);
 
     streamFormData.forEach(subCategory => {
       subCategory.parameters.forEach(parameter => {
@@ -186,6 +187,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       );
       patch.platforms = platforms as ISavedGoLiveSettings['platforms'];
     }
+    console.log('update settings', settingsPatch);
     this.setSettings({
       goLiveSettings: { ...this.state.goLiveSettings, ...settingsPatch } as IGoLiveSettings,
     });
@@ -303,9 +305,9 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
     if (!currentStreamSettings.key) return;
 
     // disable protected mod if fetched streamkey doesn't match streamkey in settings
-    const platform = (getPlatformService(this.userService.platformType) as unknown) as
-      | TwitchService
-      | MixerService;
+    const platform = (getPlatformService(
+      this.userService.platformType,
+    ) as unknown) as TwitchService;
     if ((await platform.fetchStreamKey()) !== currentStreamSettings.key) {
       this.setSettings({ protectedModeEnabled: false });
       return;

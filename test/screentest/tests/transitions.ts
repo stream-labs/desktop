@@ -17,12 +17,12 @@ test('Transitions', async (t: TExecutionContext) => {
   await makeScreenshots(t, 'No scenes');
   scenesService.createScene('New Scene');
   await makeScreenshots(t, '1 scene');
-  await t.context.app.client.click('button=Add Transition');
+  await (await t.context.app.client.$('button=Add Transition')).click();
   await makeScreenshots(t, 'Add new');
-  await t.context.app.client.click('button=Done');
-  await t.context.app.client.click('button=Connections');
+  await (await t.context.app.client.$('button=Done')).click();
+  await (await t.context.app.client.$('button=Connections')).click();
   await makeScreenshots(t, 'Connections');
-  await t.context.app.client.click('button=Add Connection');
+  await (await t.context.app.client.$('button=Add Connection')).click();
   await makeScreenshots(t, 'Add connection');
   t.pass();
 });

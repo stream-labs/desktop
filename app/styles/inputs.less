@@ -96,10 +96,9 @@ textarea[type=text] {
   &:focus {
     box-shadow: none;
     background: var(--input-bg);
-    border-color: var(--focus-border);
   }
 
-  &:disabled,
+  &:disabled:not('.ant-input'),
   .is-disabled {
     background-color: var(--button);
     border-color: var(--button);

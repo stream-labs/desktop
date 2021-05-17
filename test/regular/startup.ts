@@ -18,5 +18,5 @@ test.skip('Twitch 2FA is disabled', async t => {
   await sleep(5000); // TODO wait for MsgBox instead sleep;
 
   // Login did not work, we should still be logged out
-  t.true(await t.context.app.client.isVisible('h1=Connect'));
+  t.true(await (await t.context.app.client.$('h1=Connect')).isDisplayed());
 });

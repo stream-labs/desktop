@@ -1,7 +1,7 @@
 import TsxComponent from 'components/tsx-component';
 import { Component } from 'vue-property-decorator';
 import ModalLayout from '../ModalLayout.vue';
-import Display from 'components/shared/Display.vue';
+import { Display } from 'components/shared/ReactComponent';
 import { WindowsService } from 'services/windows';
 import { Inject } from 'services';
 import Utils from 'services/utils';
@@ -117,7 +117,12 @@ export default class BrowserSourceInteraction extends TsxComponent<{}> {
           style={{ outline: 'none', height: '100%' }}
           ref="eventDiv"
         >
-          <Display sourceId={this.sourceId} onOutputResize={this.onOutputResize} />
+          <Display
+            componentProps={{
+              sourceId: this.sourceId,
+              onOutputResize: (rect: IRectangle) => this.onOutputResize(rect),
+            }}
+          />
         </div>
       </ModalLayout>
     );

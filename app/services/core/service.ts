@@ -58,11 +58,11 @@ function getActionProxy<T extends Service>(
       }
 
       return (...args: unknown[]) => {
-        return new Promise((resolve, reject) => {
+        return new Promise<unknown>((resolve, reject) => {
           try {
             const result: unknown = (target[key] as Function).apply(target, args);
-            isReturn ? resolve(result) : resolve();
-          } catch (e) {
+            isReturn ? resolve(result) : resolve(undefined);
+          } catch (e: unknown) {
             reject(e);
           }
         });

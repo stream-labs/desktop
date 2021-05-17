@@ -14,10 +14,9 @@ import { sleep } from '../../helpers/sleep';
 useSpectron();
 
 async function clickAdvancedAudio(t: TExecutionContext) {
-  await t.context.app.client
-    .$('h2=Mixer')
-    .$('..')
-    .click('.icon-settings');
+  const $mixer = await t.context.app.client.$('h2=Mixer');
+  const $settings = await (await $mixer.$('..')).$('.icon-settings');
+  await $settings.click();
 }
 
 const DEFAULT_SOURCE_SETTINGS = {

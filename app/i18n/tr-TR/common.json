@@ -117,5 +117,17 @@
   "Apps": "Uygulamalar",
   "Finish": "Bitir",
   "Get Prime": "Prime Üyeliği Al",
-  "System error message:": "Sistem hata mesajı:"
+  "System error message:": "Sistem hata mesajı:",
+  "List is empty": "List is empty",
+  "Not selected": "Not selected",
+  "Friends": "Friends",
+  "Thumbnail": "Thumbnail",
+  "Maximum file size reached ": "Maximum file size reached ",
+  "Select image": "Select image",
+  "Clear": "Temizle",
+  "Width": "Genişlik",
+  "Height": "Yükseklik",
+  "Use Custom": "Use Custom",
+  "Apply": "Uygula",
+  "Do not show this message again": "Do not show this message again"
 }

@@ -1,8 +1,14 @@
 import Vue from 'vue';
 import moment from 'moment';
 import { Component } from 'vue-property-decorator';
+import cloneDeep from 'lodash/cloneDeep';
 import { Inject } from 'services/core/injector';
-import { ENotificationType, NotificationsService, INotification } from 'services/notifications';
+import {
+  ENotificationType,
+  NotificationsService,
+  INotification,
+  ENotificationSubType,
+} from 'services/notifications';
 import { $t } from 'services/i18n';
 const notificationAudio = require('../../media/sound/ding.wav');
 const QUEUE_TIME = 5000;
@@ -34,6 +40,11 @@ export default class NotificationsArea extends Vue {
 
   mounted() {
     this.notifyAudio = new Audio(notificationAudio);
+
+    if (this.notificationsService.state.notifications) {
+      this.notificationQueue = cloneDeep(this.notificationsService.state.notifications);
+      this.checkQueue();
+    }
 
     this.notificationsService.notificationPushed.subscribe(notify => {
       this.onNotificationHandler(notify);
@@ -117,6 +128,15 @@ export default class NotificationsArea extends Vue {
   }
 
   private onNotificationHandler(notify: INotification) {
+    if (
+      [
+        ENotificationSubType.DROPPED,
+        ENotificationSubType.LAGGED,
+        ENotificationSubType.SKIPPED,
+      ].includes(notify.subType)
+    ) {
+      return;
+    }
     this.notificationQueue.push(notify);
     if (this.canShowNextNotify) this.checkQueue();
   }

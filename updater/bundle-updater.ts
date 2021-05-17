@@ -153,7 +153,7 @@ module.exports = async (basePath: string) => {
 
         serverManifest = parsed;
       }
-    } catch (e) {
+    } catch (e: unknown) {
       console.log('Bundle manifest fetch error', e);
       useLocalBundles = true;
     }
@@ -182,13 +182,29 @@ module.exports = async (basePath: string) => {
 
       clearTimeout(timeout);
       closeUpdaterWindow();
-    } catch (e) {
+    } catch (e: unknown) {
       if (timeout) clearTimeout(timeout);
       closeUpdaterWindow();
       console.log('Failed to download 1 or more bundles', e);
       useLocalBundles = true;
     }
   }
+
+  // Used for sending accurate stack traces to sentry
+  electron.ipcMain.on('getBundleNames', (e: Electron.Event, bundles: string[]) => {
+    const bundleNames: { [bundle: string]: string } = {};
+
+    bundles.forEach(bundle => {
+      if (!useLocalBundles && serverManifest && serverManifest[bundle]) {
+        bundleNames[bundle] = serverManifest[bundle];
+      } else {
+        bundleNames[bundle] = localManifest[bundle];
+      }
+    });
+
+    // @ts-ignore Electron types are wrong here
+    e.returnValue = bundleNames;
+  });
 
   electron.session.defaultSession?.webRequest.onBeforeRequest(
     { urls: ['https://slobs-cdn.streamlabs.com/bundles/*.js'] },
@@ -237,21 +253,45 @@ module.exports = async (basePath: string) => {
   electron.ipcMain.on('startupError', (e, msg) => {
     console.log('Received startup error from worker window', msg);
 
+    // Unregister the main process from the crash handler
     try {
-      // Try clearing the bundles directory in case it got corrupted
-      if (fs.existsSync(bundlesBaseDirectory)) {
-        fs.emptyDirSync(bundlesBaseDirectory);
-      }
-    } catch (e) {
-      console.log('Error clearing bundle directory', e);
+      const crashHandler = require('crash-handler');
+      crashHandler.unregisterProcess(process.pid);
+    } catch (e: unknown) {
+      console.log('Error unregistering main process from crash handler');
     }
+
+    electron.app.on('window-all-closed', (e: Electron.Event) => {
+      e.preventDefault();
+
+      // Wait a second for files to no longer be in use
+      setTimeout(() => {
+        console.log('Attempting to empty bundles directory');
+        try {
+          // Try clearing the bundles directory in case it got corrupted
+          if (fs.existsSync(bundlesBaseDirectory)) {
+            fs.emptyDirSync(bundlesBaseDirectory);
+          }
+        } catch (e: unknown) {
+          console.log('Error clearing bundle directory', e);
+        }
+
+        console.log('The app will now shut down');
+        electron.app.exit();
+      }, 1000);
+    });
+
+    // Force close all windows
+    electron.BrowserWindow.getAllWindows().forEach(w => {
+      if (!w.isDestroyed()) {
+        console.log('Force closing window', w.id);
+        w.destroy();
+      }
+    });
 
     electron.dialog.showErrorBox(
       'Streamlabs OBS',
       'Streamlabs OBS failed to start. Please try launching Streamlabs OBS again. If this issue persists, please visit support.streamlabs.com for help.',
     );
-
-    console.log('The app will now shut down');
-    electron.app.quit();
   });
 };

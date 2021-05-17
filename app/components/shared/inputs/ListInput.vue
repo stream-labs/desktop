@@ -25,6 +25,8 @@
       :disabled="options.disabled"
       :allow-custom="options.allowCustom"
       :taggable="options.taggable"
+      :open-direction="options.openDirection || ''"
+      :max-height="options.optionsHeight"
       @input="onInputHandler"
       @search-change="onSearchChangeHandler"
       @open="handleOpen && handleOpen()"

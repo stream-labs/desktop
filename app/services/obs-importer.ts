@@ -128,6 +128,9 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
 
   private async importCollection(collection: ISceneCollection) {
     const sceneCollectionPath = path.join(this.sceneCollectionsDirectory, collection.filename);
+    if (sceneCollectionPath.indexOf('.json') === -1) {
+      return true;
+    }
     const configJSON: IOBSConfigJSON = JSON.parse(fs.readFileSync(sceneCollectionPath).toString());
 
     await this.sceneCollectionsService.create({
@@ -357,6 +360,12 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
     channelNames.forEach((channelName, i) => {
       const obsAudioSource = configJSON[channelName];
       if (obsAudioSource) {
+        const isSourceAvailable = this.sourcesService
+          .getAvailableSourcesTypes()
+          .includes(obsAudioSource.id);
+
+        if (!isSourceAvailable) return;
+
         const newSource = this.sourcesService.createSource(
           obsAudioSource.name,
           obsAudioSource.id,

@@ -50,17 +50,6 @@ export interface IEventListSettings extends IWidgetSettings {
   text_size: number;
   theme: string;
   theme_color: string;
-  mixer_account?: {
-    embers_minimum: number;
-    host_show_auto_hosts: boolean;
-    host_viewer_minimum: number;
-    show_effects: boolean;
-    show_follows: boolean;
-    show_hosts: boolean;
-    show_stickers: boolean;
-    show_subscriptions: boolean;
-    sparks_minimum: number;
-  };
 }
 
 export interface IEventListData extends IWidgetData {
@@ -104,7 +93,7 @@ export class EventListService extends WidgetSettingsService<IEventListData> {
     };
   }
 
-  eventsByPlatform(): { key: string; title: string; isMixer?: boolean }[] {
+  eventsByPlatform(): { key: string; title: string }[] {
     const platform = this.userService.platform.type;
     return {
       twitch: [
@@ -128,18 +117,10 @@ export class EventListService extends WidgetSettingsService<IEventListData> {
         { key: 'show_sponsors', title: $t('Members') },
         { key: 'show_fanfundings', title: $t('Super Chats') },
       ],
-      mixer: [
-        { key: 'show_follows', title: $t('Follows'), isMixer: true },
-        { key: 'show_hosts', title: $t('Hosts'), isMixer: true },
-        { key: 'show_subscriptions', title: $t('Subscriptions'), isMixer: true },
-        { key: 'show_stickers', title: $t('Stickers'), isMixer: true },
-        { key: 'show_effects', title: $t('Effects'), isMixer: true },
-        { key: 'show_resubs', title: $t('Show Resubs') },
-      ],
     }[platform];
   }
 
-  minsByPlatform(): { key: string; title: string; isMixer?: boolean; tooltip?: string }[] {
+  minsByPlatform(): { key: string; title: string; tooltip?: string }[] {
     const platform = this.userService.platform.type;
     return {
       twitch: [
@@ -153,14 +134,10 @@ export class EventListService extends WidgetSettingsService<IEventListData> {
           ),
         },
       ],
-      mixer: [
-        { key: 'sparks_minimum', title: $t('Min. Sparks'), isMixer: true },
-        { key: 'embers_minimum', title: $t('Min. Embers'), isMixer: true },
-      ],
-    }[platform];
+    }[platform as 'twitch'];
   }
 
   protected patchBeforeSend(data: IEventListSettings): any {
-    return { ...data, ...data.mixer_account };
+    return { ...data };
   }
 }

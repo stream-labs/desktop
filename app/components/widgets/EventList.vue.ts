@@ -42,18 +42,12 @@ export default class EventList extends WidgetSettings<IEventListData, EventListS
     return this.service.minsByPlatform();
   }
 
-  valueForEvent(event: { key: string; title: string; isMixer?: boolean }) {
-    return event.isMixer
-      ? this.wData.settings.mixer_account[event.key]
-      : this.wData.settings[event.key];
+  valueForEvent(event: { key: string; title: string }) {
+    return this.wData.settings[event.key];
   }
 
-  setEvent(event: { key: string; title: string; isMixer?: boolean }, value: boolean) {
-    if (event.isMixer) {
-      this.wData.settings.mixer_account[event.key] = value;
-    } else {
-      this.wData.settings[event.key] = value;
-    }
+  setEvent(event: { key: string; title: string }, value: boolean) {
+    this.wData.settings[event.key] = value;
   }
 
   textColorTooltip = $t('A hex code for the base text color.');
@@ -66,10 +60,12 @@ export default class EventList extends WidgetSettings<IEventListData, EventListS
     'The font size in pixels. Reasonable size typically ranges between 24px and 48px.',
   );
 
-  navItems = [
-    { value: 'manage-list', label: $t('Manage List') },
-    { value: 'font', label: $t('Font Settings') },
-    { value: 'visual', label: $t('Visual Settings') },
-    { value: 'source', label: $t('Source') },
-  ];
+  get navItems() {
+    return [
+      { value: 'manage-list', label: $t('Manage List') },
+      { value: 'font', label: $t('Font Settings') },
+      { value: 'visual', label: $t('Visual Settings') },
+      { value: 'source', label: $t('Source') },
+    ];
+  }
 }

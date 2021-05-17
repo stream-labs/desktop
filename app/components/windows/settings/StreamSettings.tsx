@@ -10,7 +10,6 @@ import {
 import GenericFormGroups from '../../obs/inputs/GenericFormGroups.vue';
 import { UserService } from 'services/user';
 import styles from './StreamSettings.m.less';
-import PlatformLogo from 'components/shared/PlatformLogo';
 import { RestreamService } from 'services/restream';
 import { NavigationService } from 'services/navigation';
 import { WindowsService } from 'services/windows';
@@ -23,6 +22,7 @@ import { formMetadata, metadata } from 'components/shared/inputs';
 import VFormGroup from '../../shared/inputs/VFormGroup.vue';
 import cloneDeep from 'lodash/cloneDeep';
 import namingHelpers from '../../../util/NamingHelpers';
+import { PlatformLogo } from '../../shared/ReactComponent';
 
 @Component({ components: { GenericFormGroups, PlatformLogo, BrowserView } })
 export default class StreamSettings extends TsxComponent {
@@ -37,7 +37,6 @@ export default class StreamSettings extends TsxComponent {
     customDestForm: ValidatedForm;
   };
 
-  private obsSettings = this.streamSettingsService.views.obsStreamSettings;
   private customDestModel: ICustomStreamDestination = {
     name: '',
     url: '',
@@ -52,13 +51,27 @@ export default class StreamSettings extends TsxComponent {
 
   private editCustomDestMode: boolean | number = false;
 
+  get platforms() {
+    return this.streamingView.allPlatforms.filter(platform => {
+      // Only show tiktok if it's already linked
+      if (platform === 'tiktok') {
+        return !!this.userService.views.auth?.platforms?.tiktok;
+      }
+
+      return true;
+    });
+  }
+
   saveObsSettings(obsSettings: ISettingsSubCategory[]) {
     this.streamSettingsService.setObsStreamSettings(obsSettings);
-    this.obsSettings = this.streamSettingsService.views.obsStreamSettings;
+  }
+
+  get obsSettings() {
+    return this.streamSettingsService.views.obsStreamSettings;
   }
 
   disableProtectedMode() {
-    this.streamSettingsService.setSettings({ protectedModeEnabled: false });
+    this.streamSettingsService.actions.setSettings({ protectedModeEnabled: false });
   }
 
   private enableProtectedMode() {
@@ -86,7 +99,7 @@ export default class StreamSettings extends TsxComponent {
   }
 
   get customDestinations() {
-    return this.streamingService.views.goLiveSettings.customDestinations;
+    return this.streamingService.views.savedSettings.customDestinations;
   }
 
   private platformMerge(platform: TPlatform) {
@@ -158,14 +171,13 @@ export default class StreamSettings extends TsxComponent {
   }
 
   render() {
-    const platforms = this.streamingView.allPlatforms;
     return (
       <div>
         {/* account info */}
         {this.protectedModeEnabled && (
           <div>
             <h2>{$t('Stream Destinations')}</h2>
-            {platforms.map(platform => this.renderPlatform(platform))}
+            {this.platforms.map(platform => this.renderPlatform(platform))}
 
             {<div>{this.renderCustomDestinations()}</div>}
 
@@ -209,29 +221,26 @@ export default class StreamSettings extends TsxComponent {
   }
 
   private renderPlatform(platform: TPlatform) {
-    const isMerged = this.streamingView.isPlatformLinked(platform);
+    const isMerged = this.streamingView.checkPlatformLinked(platform);
     const username = this.userService.state.auth.platforms[platform]?.username;
     const platformName = getPlatformService(platform).displayName;
     const buttonClass = {
       facebook: 'button--facebook',
-      mixer: 'button--mixer',
       youtube: 'button--youtube',
       twitch: 'button--twitch',
+      tiktok: 'button--tiktok',
     }[platform];
-    const isPrimary = this.streamingView.isPrimaryPlatform(platform);
+    const isPrimary = this.streamingView.checkPrimaryPlatform(platform);
     const shouldShowPrimaryBtn = isPrimary;
     const shouldShowConnectBtn = !isMerged && this.canEditSettings;
     const shouldShowUnlinkBtn = !isPrimary && isMerged && this.canEditSettings;
     const shouldShowPrimeLabel =
       !this.userService.state.isPrime && !this.restreamService.state.grandfathered;
 
-    // RIP Mixer
-    if (platform === 'mixer' && !isPrimary) return;
-
     return (
       <div class="section flex">
         <div class="margin-right--20" style={{ width: '50px' }}>
-          <PlatformLogo platform={platform} class={styles.platformLogo} />
+          <PlatformLogo componentProps={{ platform, size: 'medium' }} class={styles.platformLogo} />
         </div>
         <div>
           {platformName} <br />

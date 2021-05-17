@@ -2,12 +2,13 @@ import Vue from 'vue';
 import electron from 'electron';
 import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'services/core/injector';
-import { getComponents, IWindowOptions, WindowsService } from 'services/windows';
+import { getComponents, IModalOptions, IWindowOptions, WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
-import TitleBar from '../TitleBar';
+import { TitleBar } from 'components/shared/ReactComponent';
 import { AppService } from 'services/app';
-import Utils from 'services/utils';
 import styles from './ChildWindow.m.less';
+import ModalWrapper from '../shared/modals/ModalWrapper';
+import antdThemes from 'styles/antd/index';
 
 @Component({})
 export default class ChildWindow extends Vue {
@@ -17,8 +18,13 @@ export default class ChildWindow extends Vue {
 
   components: IWindowOptions[] = [];
   private refreshingTimeout: number;
+  private modalOptions: IModalOptions = { renderFn: null };
 
   mounted() {
+    antdThemes[this.theme].use();
+    WindowsService.modalChanged.subscribe(modalOptions => {
+      this.modalOptions = { ...this.modalOptions, ...modalOptions };
+    });
     this.onWindowUpdatedHandler(this.options);
     this.windowsService.windowUpdated.subscribe(windowInfo => {
       if (windowInfo.windowId !== 'child') return;
@@ -44,6 +50,12 @@ export default class ChildWindow extends Vue {
 
   get appLoading() {
     return this.appService.state.loading;
+  }
+
+  @Watch('theme')
+  updateAntd(newTheme: string, oldTheme: string) {
+    antdThemes[oldTheme].unuse();
+    antdThemes[newTheme].use();
   }
 
   clearComponentStack() {
@@ -73,6 +85,7 @@ export default class ChildWindow extends Vue {
     // If the window was closed, just clear the stack
     if (!options.isShown) {
       this.clearComponentStack();
+      WindowsService.hideModal();
       return;
     }
 
@@ -122,12 +135,14 @@ export default class ChildWindow extends Vue {
   render() {
     return (
       <div style="height: 100%;" class={this.theme} id="mainWrapper">
-        <TitleBar title={this.options.title} class={styles.childWindowTitlebar} />
+        <TitleBar componentProps={{ windowId: 'child' }} class={styles.childWindowTitlebar} />
         <div class={styles.blankSlate}>
           <div class={styles.spinnerSpacer} />
           <i class="fa fa-spinner fa-pulse" />
           <div class={styles.spinnerSpacer} />
         </div>
+        <ModalWrapper renderFn={this.modalOptions?.renderFn} />
+
         {this.componentsToRender.map((comp, index) => {
           const ChildWindowComponent = getComponents()[comp.componentName];
           return (

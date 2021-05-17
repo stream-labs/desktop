@@ -32,6 +32,14 @@ export default class OverlaySettings extends Vue {
     this.customizationService.setMediaBackupOptOut(value);
   }
 
+  get designerMode() {
+    return this.customizationService.views.designerMode;
+  }
+
+  set designerMode(value: boolean) {
+    this.customizationService.setSettings({ designerMode: value });
+  }
+
   async saveOverlay() {
     const { filePath } = await electron.remote.dialog.showSaveDialog({
       filters: [{ name: 'Overlay File', extensions: ['overlay'] }],
@@ -58,7 +66,7 @@ export default class OverlaySettings extends Vue {
       })
     ).filePaths;
 
-    if (!chosenPath) return;
+    if (!chosenPath[0]) return;
 
     this.busy = true;
     this.message = '';
@@ -72,14 +80,17 @@ export default class OverlaySettings extends Vue {
     });
   }
 
-  loadWidget() {
-    const chosenPath = electron.remote.dialog.showOpenDialog({
-      filters: [{ name: 'Widget File', extensions: ['widget'] }],
-    });
+  async loadWidget() {
+    const chosenPath = (
+      await electron.remote.dialog.showOpenDialog({
+        filters: [{ name: 'Widget File', extensions: ['widget'] }],
+      })
+    ).filePaths;
 
-    if (!chosenPath) return;
+    if (!chosenPath[0]) return;
 
     this.busy = true;
+    this.message = '';
 
     this.widgetsService
       .loadWidgetFile(chosenPath[0], this.scenesService.views.activeSceneId)
@@ -108,6 +119,12 @@ export default class OverlaySettings extends Vue {
           </p>
           {this.button($t('Export Overlay File'), () => this.saveOverlay())}
           {this.button($t('Import Overlay File'), () => this.loadOverlay())}
+          <BoolInput
+            style="margin-top: 8px;"
+            vModel={this.designerMode}
+            title={$t('Enable Designer Mode')}
+            name="designer_mode"
+          />
           <br />
           {this.message}
         </div>

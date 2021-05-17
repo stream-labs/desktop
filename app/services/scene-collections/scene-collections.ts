@@ -38,6 +38,8 @@ import { StreamingService, EStreamingState } from 'services/streaming';
 import { DefaultHardwareService } from 'services/hardware';
 import { byOS, OS, getOS } from 'util/operating-systems';
 import Utils from 'services/utils';
+import { getPlatformService, IPlatformCapabilityResolutionPreset } from '../platforms';
+import { OutputSettingsService } from '../settings';
 
 const uuid = window['require']('uuid/v4');
 
@@ -84,6 +86,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
   @Inject() transitionsService: TransitionsService;
   @Inject() streamingService: StreamingService;
   @Inject() private defaultHardwareService: DefaultHardwareService;
+  @Inject() private outputSettingsService: OutputSettingsService;
 
   collectionAdded = new Subject<ISceneCollectionsManifestEntry>();
   collectionRemoved = new Subject<ISceneCollectionsManifestEntry>();
@@ -179,7 +182,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
 
       await this.readCollectionDataAndLoadIntoApplicationState(id);
       this.collectionSwitched.next(this.getCollection(id)!);
-    } catch (e) {
+    } catch (e: unknown) {
       console.error('Error loading collection!', e);
 
       if (shouldAttemptRecovery) {
@@ -286,7 +289,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     try {
       await this.sync();
       this.syncPending = false;
-    } catch (e) {
+    } catch (e: unknown) {
       this.syncPending = false;
 
       console.error(`Scene collection sync failed (Attempt ${3 - retries}/3)`, e);
@@ -353,7 +356,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
     try {
       await this.overlaysPersistenceService.loadOverlay(filePath);
       this.setupDefaultAudio();
-    } catch (e) {
+    } catch (e: unknown) {
       // We tried really really hard :(
       console.error('Overlay installation failed', e);
     }
@@ -480,7 +483,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
         data = this.stateService.readCollectionFile(id);
         if (data == null) throw new Error('Got blank data from collection file');
         await this.loadDataIntoApplicationState(data);
-      } catch (e) {
+      } catch (e: unknown) {
         /*
          * FIXME: we invoke `loadDataIntoApplicationState` a second time below,
          *  which can cause partial state from the call above to still
@@ -609,7 +612,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       this.transitionsService.deleteAllConnections();
 
       this.streamingService.setSelectiveRecording(false);
-    } catch (e) {
+    } catch (e: unknown) {
       console.error('Error deloading application state', e);
     }
 
@@ -895,7 +898,7 @@ export class SceneCollectionsService extends Service implements ISceneCollection
       await stepRunner();
       console.debug(`Sync step succeeded: ${name}`);
       return true;
-    } catch (e) {
+    } catch (e: unknown) {
       console.error(`Sync step failed: ${name}`, e);
       return false;
     }

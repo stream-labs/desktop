@@ -162,9 +162,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     custom: { js: string; html: string; css: string };
   }): IAlertBoxData {
     const { settings, ...rest } = data;
-    const newSettings = settings.mixer_account
-      ? this.transformSettings({ ...settings, ...settings.mixer_account })
-      : this.transformSettings(settings);
+    const newSettings = this.transformSettings(settings);
     return { ...rest, settings: newSettings, custom_defaults: rest.custom };
   }
 

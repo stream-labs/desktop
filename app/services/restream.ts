@@ -4,11 +4,13 @@ import { HostsService } from 'services/hosts';
 import { getPlatformService, TPlatform } from 'services/platforms';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { UserService } from 'services/user';
+import { CustomizationService, ICustomizationServiceState } from 'services/customization';
 import { authorizedHeaders, jfetch } from 'util/requests';
 import { IncrementalRolloutService } from './incremental-rollout';
 import electron from 'electron';
 import { StreamingService } from './streaming';
 import { FacebookService } from './platforms/facebook';
+import { TiktokService } from './platforms/tiktok';
 
 interface IRestreamTarget {
   id: number;
@@ -37,10 +39,12 @@ interface IUserSettingsResponse extends IRestreamState {
 export class RestreamService extends StatefulService<IRestreamState> {
   @Inject() hostsService: HostsService;
   @Inject() userService: UserService;
+  @Inject() customizationService: CustomizationService;
   @Inject() streamSettingsService: StreamSettingsService;
   @Inject() streamingService: StreamingService;
   @Inject() incrementalRolloutService: IncrementalRolloutService;
   @Inject() facebookService: FacebookService;
+  @Inject() tiktokService: TiktokService;
 
   settings: IUserSettingsResponse;
 
@@ -89,9 +93,14 @@ export class RestreamService extends StatefulService<IRestreamState> {
     const hasFBTarget = this.streamInfo.enabledPlatforms.includes('facebook');
     let fbParams = '';
     if (hasFBTarget) {
-      const videoId = this.facebookService.state.settings.liveVideoId;
-      const token = this.facebookService.views.getDestinationToken();
-      fbParams = `&fbVideoId=${videoId}&fbToken=${token}`;
+      const fbView = this.facebookService.views;
+      const videoId = fbView.state.settings.liveVideoId;
+      const token = fbView.getDestinationToken();
+      fbParams = `&fbVideoId=${videoId}`;
+      // all destinations except "page" require a token
+      if (fbView.state.settings.destinationType !== 'page') {
+        fbParams += `&fbToken=${token}`;
+      }
     }
     return `https://streamlabs.com/embed/chat?oauth_token=${this.userService.apiToken}${fbParams}`;
   }
@@ -161,22 +170,33 @@ export class RestreamService extends StatefulService<IRestreamState> {
   }
 
   async setupTargets() {
+    // delete existing targets
     const targets = await this.fetchTargets();
     const promises = targets.map(t => this.deleteTarget(t.id));
-
     await Promise.all(promises);
 
-    await this.createTargets([
+    // setup new targets
+    const newTargets = [
       ...this.streamInfo.enabledPlatforms.map(platform => {
         return {
           platform: platform as TPlatform,
           streamKey: getPlatformService(platform).state.streamKey,
         };
       }),
-      ...this.streamInfo.goLiveSettings.customDestinations
+      ...this.streamInfo.savedSettings.customDestinations
         .filter(dest => dest.enabled)
         .map(dest => ({ platform: 'relay' as 'relay', streamKey: `${dest.url}${dest.streamKey}` })),
-    ]);
+    ];
+
+    // treat tiktok as a custom destination
+    const tikTokTarget = newTargets.find(t => t.platform === 'tiktok');
+    if (tikTokTarget) {
+      const ttSettings = this.tiktokService.state.settings;
+      tikTokTarget.platform = 'relay';
+      tikTokTarget.streamKey = `${ttSettings.serverUrl}/${ttSettings.streamKey}`;
+    }
+
+    await this.createTargets(newTargets);
   }
 
   checkStatus(): Promise<boolean> {
@@ -291,6 +311,10 @@ export class RestreamService extends StatefulService<IRestreamState> {
       },
     });
 
+    this.customizationService.settingsChanged.subscribe(changed => {
+      this.handleSettingsChanged(changed);
+    });
+
     this.chatView.webContents.loadURL(this.chatUrl);
 
     electron.ipcRenderer.send('webContents-preventPopup', this.chatView.webContents.id);
@@ -302,6 +326,13 @@ export class RestreamService extends StatefulService<IRestreamState> {
     // @ts-ignore: typings are incorrect
     this.chatView.destroy();
     this.chatView = null;
+  }
+
+  private handleSettingsChanged(changed: Partial<ICustomizationServiceState>) {
+    if (!this.chatView) return;
+    if (changed.chatZoomFactor) {
+      this.chatView.webContents.setZoomFactor(changed.chatZoomFactor);
+    }
   }
 }
 

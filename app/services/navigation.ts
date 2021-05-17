@@ -6,7 +6,6 @@ export type TAppPage =
   | 'Onboarding'
   | 'BrowseOverlays'
   | 'PatchNotes'
-  | 'Chatbot'
   | 'PlatformAppMainPage'
   | 'PlatformAppStore'
   | 'PlatformMerge'

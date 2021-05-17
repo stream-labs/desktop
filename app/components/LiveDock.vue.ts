@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
-import Chat from './Chat.vue';
+import { Chat } from 'components/shared/ReactComponent';
 import { StreamingService, EStreamingState } from '../services/streaming';
 import { Inject } from 'services/core/injector';
 import { UserService } from '../services/user';
@@ -160,10 +160,6 @@ export default class LiveDock extends Vue {
 
   get isTwitch() {
     return this.userService.platform.type === 'twitch';
-  }
-
-  get isMixer() {
-    return this.userService.platform.type === 'mixer';
   }
 
   get isYoutube() {

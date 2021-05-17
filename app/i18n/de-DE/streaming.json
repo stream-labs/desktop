@@ -33,7 +33,7 @@
   "Stop": "Anhalten",
   "Save Replay": "Wiederholung speichern",
   "Schedule Stream": "Stream planen",
-  "Go to YouTube to view your live stream": "Zu YouTube wechseln, um den Live-Stream zu sehen",
+  "View your live stream in a web browser": "View your live stream in a web browser",
   "Edit your stream title and description": "Stream-Titel und Beschreibung bearbeiten",
   "Go to YouTube Live Dashboard to control your stream": "Zum YouTube-Dashboard wechseln, um den Stream zu steuern",
   "Are you sure you want to exit while live?": "Möchten Sie das Programm wirklich beenden, während Sie live sind?",
@@ -43,6 +43,7 @@
   "Refresh Chat": "Chat aktualisieren",
   "Your chat is currently offline": "Ihr Chat ist derzeit offline",
   "Set path in Settings > Output.": "Legen Sie den Pfad in Einstellungen > Ausgabe fest.",
+  "Open Performance Window": "Open Performance Window",
   "Start Replay Buffer": "Replay-Puffer starten",
   "Stop Replay Buffer": "Replay-Puffer anhalten",
   "Stopping...": "Wird angehalten...",
@@ -151,5 +152,8 @@
   "Please enable your account for live streaming, and wait 24 hours before attempting to stream.": "Please enable your account for live streaming, and wait 24 hours before attempting to stream.",
   "Please try again. If the issue persists, you can stream directly to a single platform instead.": "Please try again. If the issue persists, you can stream directly to a single platform instead.",
   "Enable Live Streaming": "Enable Live Streaming",
-  "Destination": "Destination"
+  "Destination": "Destination",
+  "You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destinationType.": "You cannot disable the platform you used to sign in to Streamlabs OBS. Please sign in with a different platform to disable streaming to this destinationType.",
+  "canNotDisablePrimaryPlatform": "You cannot disable the platform you logged in with.<br/> Do you want to <switch-account-link>log in to another account</switch-account-link> instead?",
+  "Your stream title or description contain banned words": "Your stream title or description contain banned words"
 }

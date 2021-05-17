@@ -1,16 +1,17 @@
 import { IPatchNotes } from '.';
 
 export const notes: IPatchNotes = {
-  version: '0.26.0',
-  title: 'User Experience Improvements',
+  version: '1.1.0',
+  title: 'A New Look',
   showChest: false,
   notes: [
-    'Revamped the Go Live flow for Facebook users and multistreamers',
-    'Moved Login/Logout to the Settings Window',
-    'Added Follower Goals for Facebook users',
-    'Updated the Custom Resolution input for easier use',
-    'Fixed a bug related to keyboard shortcuts in the Edit Transform Window',
-    'Fixed a bug where the Scenes list appeared empty in some layouts',
-    'Fixed a bug loading Alert Box settings with a merged account',
+    'Updated logo and favicon to match new Streamlabs branding',
+    'Added Twitch VOD audio track',
+    'Added ability to login with TikTok',
+    'Added increased reactivity and other UX improvements to the Go Live window',
+    'Fixed several bugs relating to the MiniFeed',
+    'Fixed YouTube thumbnails being re-uploaded in a small resolution',
+    'Fixed FFZ settings not correctly applying',
+    'Minor bugfixes and stability improvements',
   ],
 };

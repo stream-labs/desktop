@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "strictNullChecks": true,
+    "jsx": "react",
+    "types": [
+      "react"
+    ]
+  },
+  "include": ["./**/*", "../index.d.ts"],
+  "exclude": []
+}
