@@ -59,6 +59,8 @@ export interface IPlatformCapabilityGame {
 }
 
 export interface IPlatformCapabilityViewerCount {
+  averageViewers: number;
+  peakViewers: number;
   fetchViewerCount(): Promise<number>;
 }
 
@@ -144,7 +146,7 @@ export interface IPlatformState {
 
 // All platform services should implement this interface.
 export interface IPlatformService {
-  capabilities: Set<TPlatformCapability>;
+  hasCapability<T extends TPlatformCapability>(capability: T): this is TPlatformCapabilityMap[T];
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions;
 
