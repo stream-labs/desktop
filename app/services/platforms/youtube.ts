@@ -730,6 +730,13 @@ export class YoutubeService
     }
   }
 
+  fetchFollowers() {
+    return platformAuthorizedRequest<{ items: { statistics: { subscriberCount: number } }[] }>(
+      'youtube',
+      `${this.apiBase}/channels?part=snippet&mine=true`,
+    ).then(json => json.items[0].statistics.subscriberCount);
+  }
+
   @mutation()
   private SET_STREAM_ID(streamId: string) {
     this.state.streamId = streamId;

@@ -500,6 +500,14 @@ export class FacebookService
       .catch(() => 0);
   }
 
+  fetchFollowers(): Promise<number> | undefined {
+    const pageId = this.state.settings.pageId;
+    if (!pageId) return;
+    return this.requestFacebook<{ followers_count: number }>(`${this.apiBase}/${pageId}`)
+      .then(json => json.followers_count)
+      .catch();
+  }
+
   async searchGames(searchString: string): Promise<IGame[]> {
     if (searchString.length < 2) return [];
     const gamesResponse = await this.requestFacebook<{ data: { name: string; id: string }[] }>(
