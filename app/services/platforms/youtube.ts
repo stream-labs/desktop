@@ -171,6 +171,7 @@ export class YoutubeService
     'stream-schedule',
     'streamlabels',
     'themes',
+    'viewerCount',
   ]);
 
   static initialState: IYoutubeServiceState = {

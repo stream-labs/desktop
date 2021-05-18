@@ -141,7 +141,7 @@ export default class SideNav extends Vue {
     const pageData: IPageData[] = [];
     const hasThemes =
       this.userService.isLoggedIn &&
-      getPlatformService(this.userService.platform.type).capabilities.has('themes');
+      getPlatformService(this.userService.platform.type).hasCapability('themes');
 
     if (this.userService.isLoggedIn) {
       pageData.push({
