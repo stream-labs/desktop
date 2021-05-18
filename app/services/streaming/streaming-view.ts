@@ -279,7 +279,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   supports(capability: TPlatformCapability, targetPlatforms?: TPlatform[]): boolean {
     const platforms = targetPlatforms || this.enabledPlatforms;
     for (const platform of platforms) {
-      if (getPlatformService(platform).capabilities.has(capability)) return true;
+      if (getPlatformService(platform).hasCapability(capability)) return true;
     }
     return false;
   }
