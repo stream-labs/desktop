@@ -883,20 +883,6 @@ export class StreamingService
     return `${hours}:${minutes}:${seconds}`;
   }
 
-  goOfflineSideEffects(info: IOBSOutputSignalInfo, goLiveTime: string) {
-    this.usageStatisticsService.recordAnalyticsEvent('StreamingStatus', {
-      code: info.code,
-      status: EStreamingState.Offline,
-    });
-    const hoursStreamed =
-      new Date(this.state.streamingStatusTime).getHours() - new Date(goLiveTime).getHours();
-    this.growService.incrementGoal('stream_hours_per_month', hoursStreamed);
-    this.growService.incrementGoal('stream_times_per_week', 1);
-    if (this.restreamService.settings.enabled) {
-      this.growService.incrementGoal('multistream_per_week', 1);
-    }
-  }
-
   private outputErrorOpen = false;
 
   private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
@@ -945,12 +931,14 @@ export class StreamingService
         this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
         this.streamingStatusChange.next(EStreamingState.Starting);
       } else if (info.signal === EOBSOutputSignal.Stop) {
-        const liveTime = this.state.streamingStatusTime;
         this.SET_STREAMING_STATUS(EStreamingState.Offline, time);
         this.RESET_STREAM_INFO();
         this.rejectStartStreaming();
         this.streamingStatusChange.next(EStreamingState.Offline);
-        this.goOfflineSideEffects(info, liveTime);
+        this.usageStatisticsService.recordAnalyticsEvent('StreamingStatus', {
+          code: info.code,
+          status: EStreamingState.Offline,
+        });
       } else if (info.signal === EOBSOutputSignal.Stopping) {
         this.sendStreamEndEvent();
         this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
@@ -1139,7 +1127,17 @@ export class StreamingService
       data.platforms = ['custom_rtmp'];
     }
 
+    this.recordGoals(data.duration);
     this.usageStatisticsService.recordEvent('stream_end', data);
+  }
+
+  private recordGoals(duration: number) {
+    const hoursStreamed = Math.floor(duration / 60 / 60);
+    this.growService.incrementGoal('stream_hours_per_month', hoursStreamed);
+    this.growService.incrementGoal('stream_times_per_week', 1);
+    if (this.restreamService.settings.enabled) {
+      this.growService.incrementGoal('multistream_per_week', 1);
+    }
   }
 
   /**
