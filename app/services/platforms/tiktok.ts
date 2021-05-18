@@ -67,11 +67,6 @@ export class TiktokService
     this.SET_PREPOPULATED(true);
   }
 
-  async fetchViewerCount(): Promise<number> {
-    // no API
-    return 0;
-  }
-
   async putChannelInfo(): Promise<void> {
     // no API
   }

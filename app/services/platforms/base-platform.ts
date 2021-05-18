@@ -1,5 +1,12 @@
 import { Inject, mutation, StatefulService } from 'services/core';
-import { EPlatformCallResult, IPlatformState, TPlatform, TStartStreamOptions } from './index';
+import {
+  EPlatformCallResult,
+  IPlatformState,
+  TPlatform,
+  TPlatformCapability,
+  TStartStreamOptions,
+  TPlatformCapabilityMap,
+} from './index';
 import { StreamingService } from 'services/streaming';
 import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
@@ -27,8 +34,10 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
   @Inject() protected streamSettingsService: StreamSettingsService;
   abstract readonly platform: TPlatform;
 
-  protected fetchViewerCount(): Promise<number> {
-    return Promise.reject('not implemented');
+  protected abstract capabilities: Set<TPlatformCapability>;
+
+  hasCapability<T extends TPlatformCapability>(capability: T): this is TPlatformCapabilityMap[T] {
+    return this.capabilities.has(capability);
   }
 
   get mergeUrl() {
@@ -37,16 +46,34 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
     return `https://${host}/slobs/merge/${token}/${this.platform}_account`;
   }
 
+  averageViewers: number;
+  peakViewers: number;
+  private nViewerSamples: number;
+
   async afterGoLive(): Promise<void> {
+    this.averageViewers = 0;
+    this.peakViewers = 0;
+    this.nViewerSamples = 0;
+
     // update viewers count
     const runInterval = async () => {
-      this.SET_VIEWERS_COUNT(await this.fetchViewerCount());
+      if (this.hasCapability('viewerCount')) {
+        const count = await this.fetchViewerCount();
+
+        this.nViewerSamples += 1;
+        this.averageViewers =
+          (this.averageViewers * (this.nViewerSamples - 1) + count) / this.nViewerSamples;
+        this.peakViewers = Math.max(this.peakViewers, count);
+
+        this.SET_VIEWERS_COUNT(count);
+      }
+
       // stop updating if streaming has stopped
       if (this.streamingService.views.isMidStreamMode) {
         setTimeout(runInterval, VIEWER_COUNT_UPDATE_INTERVAL);
       }
     };
-    await runInterval();
+    if (this.hasCapability('viewerCount')) await runInterval();
   }
 
   unlink() {
