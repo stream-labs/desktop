@@ -12,14 +12,17 @@ type TPerformanceMetricsMode = 'full' | 'limited';
 export default function PerformanceMetrics(props: { mode: TPerformanceMetricsMode }) {
   const { CustomizationService, PerformanceService } = Services;
 
-  const v = useVuex(() => ({
-    pinnedStats: CustomizationService.views.pinnedStatistics,
-    cpuPercent: PerformanceService.views.cpuPercent,
-    frameRate: PerformanceService.views.frameRate,
-    droppedFrames: PerformanceService.views.droppedFrames,
-    percentDropped: PerformanceService.views.percentDropped,
-    bandwidth: PerformanceService.views.bandwidth,
-  }));
+  const v = useVuex(
+    () => ({
+      pinnedStats: CustomizationService.views.pinnedStatistics,
+      cpuPercent: PerformanceService.views.cpuPercent,
+      frameRate: PerformanceService.views.frameRate,
+      droppedFrames: PerformanceService.views.droppedFrames,
+      percentDropped: PerformanceService.views.percentDropped,
+      bandwidth: PerformanceService.views.bandwidth,
+    }),
+    false,
+  );
 
   function showAttribute(attribute: string) {
     return props.mode === 'full' || v.pinnedStats[attribute];

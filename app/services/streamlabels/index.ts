@@ -219,7 +219,7 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
 
   onUserLogin() {
     const primaryPlatform = getPlatformService(this.userService.platform.type);
-    if (!primaryPlatform.capabilities.has('streamlabels')) return;
+    if (!primaryPlatform.hasCapability('streamlabels')) return;
     this.fetchInitialData();
     this.fetchSettings();
     this.fetchDefinitions();

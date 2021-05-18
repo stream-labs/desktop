@@ -129,6 +129,7 @@ export class FacebookService
     'account-merging',
     'streamlabels',
     'themes',
+    'viewerCount',
   ]);
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = { width: 800, height: 800 };
