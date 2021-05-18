@@ -5,23 +5,23 @@ import { $t } from '../../../services/i18n';
 import styles from './Grow.m.less';
 import { useVuex } from '../../hooks';
 import { Services } from '../../service-provider';
-import { IGoal, IUniversityProgress } from '../../../services/grow/grow';
+import { IGoal, IUniversityProgress, ICommunityReach } from '../../../services/grow/grow';
 import Util from '../../../services/utils';
 import Scrollable from 'components-react/shared/Scrollable';
-import { GoalCard, PlatformCard, UniversityCard, ContentHubCard } from './Cards';
+import { GoalCard, PlatformCard, UniversityCard, ContentHubCard, MultistreamCard } from './Cards';
 
 export default function Grow() {
   const { GrowService } = Services;
 
   const [universityProgress, setUniversityProgress] = useState({} as IUniversityProgress);
+  const [platforms, setPlatforms] = useState([] as ICommunityReach[]);
 
   const v = useVuex(() => ({
     goals: GrowService.views.goals,
-    platforms: GrowService.views.platforms,
-    tips: GrowService.views.tips,
   }));
 
   useEffect(getUniversityProgress, []);
+  useEffect(getPlatformFollowers, []);
 
   function getUniversityProgress() {
     GrowService.actions.return.fetchUniversityProgress().then(progress => {
@@ -30,14 +30,24 @@ export default function Grow() {
     });
   }
 
+  function getPlatformFollowers() {
+    GrowService.actions.return.fetchPlatformFollowers().then(communityReach => {
+      const platformsToMap = communityReach.concat(
+        GrowService.views.platformOptions.filter(p => !communityReach.find(r => r.icon === p.icon)),
+      );
+
+      setPlatforms(platformsToMap);
+    });
+  }
+
   return (
     <div className={styles.goalTabContainer}>
       <div className={styles.goalTabContent}>
         <MyGoals goals={v.goals} />
-        <MyCommunity platforms={v.platforms} />
+        <MyCommunity platforms={platforms} />
         <ResourceFooter universityProgress={universityProgress} />
       </div>
-      <GrowthTips tips={v.tips} />
+      <GrowthTips tips={GrowService.views.tips} />
     </div>
   );
 }
@@ -66,20 +76,35 @@ function MyGoals(p: { goals: Dictionary<IGoal> }) {
   );
 }
 
-function MyCommunity(p: { platforms: { icon: string; followers?: number }[] }) {
+function MyCommunity(p: { platforms: ICommunityReach[] }) {
+  const { UserService } = Services;
   const totalFollowing = p.platforms
     .filter(Util.propertyExists('followers'))
     .reduce((count, current) => count + current.followers, 0);
 
+  const reachableFollowing = UserService.views.isPrime
+    ? totalFollowing
+    : p.platforms.filter(Util.propertyExists('followers'))[0].followers;
+
   return (
     <div className={styles.myCommunity}>
-      <h2>{$t('My Community: %{totalFollowing} followers', { totalFollowing })}</h2>
-      <span>{$t('Connect social accounts to track your progress from one place')}</span>
+      <h2>
+        {$t('Community Reach: %{reachableFollowing}/%{totalFollowing} followers', {
+          reachableFollowing,
+          totalFollowing,
+        })}
+      </h2>
+      <span>
+        {$t('You can reach %{percentage}% of your community across all platforms', {
+          percentage: Math.floor((reachableFollowing / totalFollowing) * 100),
+        })}
+      </span>
 
       <div className={styles.communityContainer}>
         {p.platforms.map(platform => (
           <PlatformCard platform={platform} key={platform.icon} />
         ))}
+        {(!UserService.views.isPrime || true) && <MultistreamCard />}
       </div>
     </div>
   );

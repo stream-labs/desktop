@@ -5,6 +5,10 @@ import { HostsService } from 'services/hosts';
 import { UserService } from 'services/user';
 import { jfetch } from 'util/requests';
 import { GOAL_OPTIONS, GROWTH_TIPS } from './grow-data';
+import { TwitchService } from 'services/platforms/twitch';
+import { YoutubeService } from 'services/platforms/youtube';
+import { FacebookService } from 'services/platforms/facebook';
+import { TPlatform } from 'services/platforms';
 
 export interface IGoal {
   id: string;
@@ -29,6 +33,11 @@ export interface IUniversityProgress {
   };
 }
 
+export interface ICommunityReach {
+  icon: TPlatform;
+  followers?: number;
+}
+
 interface IGrowServiceState {
   goals: Dictionary<IGoal>;
 }
@@ -36,16 +45,8 @@ interface IGrowServiceState {
 const ONE_WEEK = 6.048e8;
 
 class GrowServiceViews extends ViewHandler<IGrowServiceState> {
-  get platforms() {
-    return [
-      { name: 'Twitch', icon: 'twitch', followers: 1834 },
-      { name: 'YouTube', icon: 'youtube', followers: 1112 },
-      { name: 'Facebook', icon: 'facebook', followers: 1092 },
-      { name: 'Twitter', icon: 'twitter' },
-      { name: 'Instagram', icon: 'instagram' },
-      { name: 'TikTok', icon: 'tiktok' },
-      { name: 'Snapchat', icon: 'snapchat' },
-    ];
+  get platformOptions(): ICommunityReach[] {
+    return [{ icon: 'twitch' }, { icon: 'youtube' }, { icon: 'facebook' }];
   }
 
   get goals() {
@@ -71,6 +72,9 @@ class GrowServiceViews extends ViewHandler<IGrowServiceState> {
 export class GrowService extends PersistentStatefulService<IGrowServiceState> {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
+  @Inject() twitchService: TwitchService;
+  @Inject() youtubeService: YoutubeService;
+  @Inject() facebookService: FacebookService;
 
   static defaultState: IGrowServiceState = {
     goals: {},
@@ -92,6 +96,27 @@ export class GrowService extends PersistentStatefulService<IGrowServiceState> {
       ...goal,
       progress: goal.progress + amountToIncrement,
     });
+  }
+
+  async fetchPlatformFollowers() {
+    const platforms = this.userService.views.platforms;
+
+    const platformService = {
+      twitch: this.twitchService,
+      facebook: this.facebookService,
+      youtube: this.youtubeService,
+    };
+
+    const communityReach: ICommunityReach[] = [];
+
+    await Promise.all(
+      Object.keys(platforms).map(async platform => {
+        const followers = await platformService[platform].fetchFollowers();
+        communityReach.push({ icon: platform as TPlatform, followers });
+      }),
+    );
+
+    return communityReach;
   }
 
   async fetchUniversityProgress() {

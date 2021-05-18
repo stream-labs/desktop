@@ -1,9 +1,9 @@
 {
   "Grow": "Grow",
   "My Goals": "My Goals",
-  "My Community: %{totalFollowing} followers": "My Community: %{totalFollowing} followers",
+  "Community Reach: %{reachableFollowing}/%{totalFollowing} followers": "Community Reach: %{reachableFollowing}/%{totalFollowing} followers",
   "Streamer Resources": "Streamer Resources",
-  "Connect social accounts to track your progress from one place": "Connect social accounts to track your progress from one place",
+  "You can reach %{percentage}% of your community across all platforms": "You can reach %{percentage}% of your community across all platforms",
   "Streamlabs University": "Streamlabs University",
   "Professional streamers are now able to earn large amounts of money while entertaining people and creating their own brand. But how does one become a professional streamer? Streamlabs University is our answer to this question. In this course, we’ll walk you through everything you need to know to become a successful streamer and turn your passion into a profession.": "Professional streamers are now able to earn large amounts of money while entertaining people and creating their own brand. But how does one become a professional streamer? Streamlabs University is our answer to this question. In this course, we’ll walk you through everything you need to know to become a successful streamer and turn your passion into a profession.",
   "Content Hub": "Content Hub",
@@ -18,5 +18,8 @@
   "Streamlabs on YouTube": "Streamlabs on YouTube",
   "Open Streamlabs University": "Open Streamlabs University",
   "%{daysLeft} days left": "%{daysLeft} days left",
-  "Progress": "Progress"
+  "Progress": "Progress",
+  "Reach more of your community with Streamlabs Multistreaming": "Reach more of your community with Streamlabs Multistreaming",
+  "One of the best ways to reach a larger audience is to stream to multiple platforms": "One of the best ways to reach a larger audience is to stream to multiple platforms",
+  "Start Multistreaming with Prime": "Start Multistreaming with Prime"
 }

@@ -110,6 +110,12 @@ class UserViews extends ViewHandler<IUserServiceState> {
     }
   }
 
+  get platforms() {
+    if (this.isLoggedIn) {
+      return this.state.auth.platforms;
+    }
+  }
+
   get isTwitchAuthed() {
     return this.isLoggedIn && this.platform.type === 'twitch';
   }

@@ -291,10 +291,9 @@ export class TwitchService
   }
 
   fetchFollowers(): Promise<number> {
-    return platformRequest<{ total: number }>(
-      'twitch',
-      `${this.apiBase}/helix/users/follows?to_id=${this.twitchId}`,
-    ).then(json => json.total);
+    return this.requestTwitch<{ total: number }>({
+      url: `${this.apiBase}/helix/users/follows?to_id=${this.twitchId}`,
+    }).then(json => json.total);
   }
 
   async putChannelInfo({ title, game, tags = [] }: ITwitchStartStreamOptions): Promise<void> {

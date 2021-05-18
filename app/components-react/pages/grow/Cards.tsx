@@ -4,7 +4,7 @@ import { Progress, Button } from 'antd';
 import PlatformLogo from '../../shared/PlatformLogo';
 import styles from './Grow.m.less';
 import { Services } from '../../service-provider';
-import { IGoal, IUniversityProgress } from '../../../services/grow/grow';
+import { ICommunityReach, IGoal, IUniversityProgress } from '../../../services/grow/grow';
 import { $t } from '../../../services/i18n';
 
 const ONE_DAY = 1000 * 60 * 60 * 24;
@@ -127,19 +127,38 @@ export function ContentHubCard() {
   );
 }
 
-export function PlatformCard(p: { platform: any }) {
-  const { followers, icon, name } = p.platform;
+export function PlatformCard(p: { platform: ICommunityReach }) {
+  const { followers, icon } = p.platform;
+  const nameMap = {
+    twitch: 'Twitch',
+    facebook: 'Facebook',
+    youtube: 'YouTube',
+  };
   return (
     <div className={styles.card}>
       <div className={styles.cardHeader}>
         <PlatformLogo platform={icon} />
-        <span className={cx(styles.title, styles[icon])}>{name}</span>
+        <span className={cx(styles.title, styles[icon])}>{nameMap[icon]}</span>
       </div>
       {followers ? (
         <span>{$t('%{followers} followers', { followers })}</span>
       ) : (
         <Button>{$t('Connect')}</Button>
       )}
+    </div>
+  );
+}
+
+export function MultistreamCard() {
+  return (
+    <div className={cx(styles.card, styles.primeCard)}>
+      <div className={styles.cardHeader}>
+        <strong>{$t('Reach more of your community with Streamlabs Multistreaming')}</strong>
+      </div>
+      <span>
+        {$t('One of the best ways to reach a larger audience is to stream to multiple platforms')}
+      </span>
+      <Button type="primary">{$t('Start Multistreaming with Prime')}</Button>
     </div>
   );
 }

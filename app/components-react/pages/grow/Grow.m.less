@@ -86,6 +86,7 @@
   .card {
     width: 180px;
     height: 100px;
+    margin-right: 16px;
 
     button {
       width: 100%;
@@ -103,6 +104,20 @@
   .facebook {
     color: var(--facebook);
   }
+
+  .card.prime-card {
+    flex-grow: 1;
+    background: var(--prime-semi);
+
+    .card-header {
+      margin-bottom: 0;
+      color: var(--title);
+    }
+
+    button {
+      background: var(--prime);
+    }
+  }
 }
 
 .streamer-resources {
@@ -118,6 +133,10 @@
 .community-container {
   display: flex;
   justify-content: space-between;
+}
+
+.community-container {
+  justify-content: flex-start;
 }
 
 .growth-tips-container {
