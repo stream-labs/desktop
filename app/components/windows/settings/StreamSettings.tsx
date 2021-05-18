@@ -23,6 +23,7 @@ import VFormGroup from '../../shared/inputs/VFormGroup.vue';
 import cloneDeep from 'lodash/cloneDeep';
 import namingHelpers from '../../../util/NamingHelpers';
 import { PlatformLogo } from '../../shared/ReactComponent';
+import { MagicLinkService } from 'services/magic-link';
 
 @Component({ components: { GenericFormGroups, PlatformLogo, BrowserView } })
 export default class StreamSettings extends TsxComponent {
@@ -32,6 +33,7 @@ export default class StreamSettings extends TsxComponent {
   @Inject() private navigationService: NavigationService;
   @Inject() private windowsService: WindowsService;
   @Inject() private streamingService: StreamingService;
+  @Inject() private magicLinkService: MagicLinkService;
 
   $refs: {
     customDestForm: ValidatedForm;
@@ -103,12 +105,8 @@ export default class StreamSettings extends TsxComponent {
   }
 
   private platformMerge(platform: TPlatform) {
-    if (this.restreamService.views.canEnableRestream) {
-      this.navigationService.navigate('PlatformMerge', { platform });
-      this.windowsService.actions.closeChildWindow();
-    } else {
-      this.userService.openPrimeUrl('slobs-multistream');
-    }
+    this.navigationService.navigate('PlatformMerge', { platform });
+    this.windowsService.actions.closeChildWindow();
   }
 
   private platformUnlink(platform: TPlatform) {
@@ -122,7 +120,7 @@ export default class StreamSettings extends TsxComponent {
 
   private addCustomDest() {
     if (!this.userService.isPrime) {
-      this.userService.openPrimeUrl('slobs-multistream');
+      this.magicLinkService.actions.linkToPrime('slobs-multistream');
       return;
     }
     this.customDestModel = {

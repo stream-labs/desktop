@@ -129,6 +129,12 @@ export function ContentHubCard() {
 
 export function PlatformCard(p: { platform: ICommunityReach }) {
   const { followers, icon } = p.platform;
+  const { NavigationService } = Services;
+
+  function platformMerge() {
+    NavigationService.actions.navigate('PlatformMerge', { platform: icon });
+  }
+
   const nameMap = {
     twitch: 'Twitch',
     facebook: 'Facebook',
@@ -143,7 +149,7 @@ export function PlatformCard(p: { platform: ICommunityReach }) {
       {followers ? (
         <span>{$t('%{followers} followers', { followers })}</span>
       ) : (
-        <Button>{$t('Connect')}</Button>
+        <Button onClick={platformMerge}>{$t('Connect')}</Button>
       )}
     </div>
   );
@@ -153,7 +159,7 @@ export function MultistreamCard() {
   const { MagicLinkService } = Services;
 
   function getPrime() {
-    MagicLinkService.linkToPrime('grow-community');
+    MagicLinkService.actions.linkToPrime('grow-community');
   }
 
   return (

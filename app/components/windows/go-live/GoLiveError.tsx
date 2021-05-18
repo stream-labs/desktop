@@ -7,13 +7,13 @@ import { Component } from 'vue-property-decorator';
 import styles from './GoLiveError.m.less';
 import { YoutubeService } from 'services/platforms/youtube';
 import { getPlatformService, TPlatform } from 'services/platforms';
-import { TwitterService } from 'services/integrations/twitter';
 import { IStreamError } from 'services/streaming/stream-error';
 import Translate from 'components/shared/translate';
 import { UserService } from 'services/user';
 import { NavigationService } from 'services/navigation';
 import { assertIsDefined } from 'util/properties-type-guards';
 import MessageLayout from './MessageLayout';
+import { MagicLinkService } from 'services/magic-link';
 
 /**
  * Shows error and troubleshooting suggestions
@@ -23,9 +23,9 @@ export default class GoLiveError extends TsxComponent<{}> {
   @Inject() private streamingService: StreamingService;
   @Inject() private windowsService: WindowsService;
   @Inject() private youtubeService: YoutubeService;
-  @Inject() private twitterService: TwitterService;
   @Inject() private userService: UserService;
   @Inject() private navigationService: NavigationService;
+  @Inject() private magicLinkService: MagicLinkService;
 
   private get view() {
     return this.streamingService.views;
@@ -54,7 +54,7 @@ export default class GoLiveError extends TsxComponent<{}> {
   }
 
   private enablePrime() {
-    this.userService.actions.openPrimeUrl('slobs-multistream');
+    this.magicLinkService.actions.linkToPrime('slobs-multistream');
   }
 
   private tryAgain() {
