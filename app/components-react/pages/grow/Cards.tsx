@@ -150,8 +150,14 @@ export function PlatformCard(p: { platform: ICommunityReach }) {
 }
 
 export function MultistreamCard() {
+  const { MagicLinkService } = Services;
+
+  function getPrime() {
+    MagicLinkService.linkToPrime('grow-community');
+  }
+
   return (
-    <div className={cx(styles.card, styles.primeCard)}>
+    <div className={cx(styles.card, styles.primeCard)} onClick={getPrime}>
       <div className={styles.cardHeader}>
         <strong>{$t('Reach more of your community with Streamlabs Multistreaming')}</strong>
       </div>
