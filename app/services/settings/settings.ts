@@ -614,6 +614,18 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   private getAudioSettingsFormData(OBSsettings: ISettingsSubCategory): ISettingsSubCategory[] {
+    {
+      // filter unsupported values of niconico
+      const channelSetup = OBSsettings.parameters.find(i => i.name == 'ChannelSetup');
+      if (channelSetup) {
+        type withOptions = {
+          options: {value:string, description: string}[];
+        };
+        (channelSetup as withOptions).options = 
+        (channelSetup as withOptions).options.filter(o => ['Mono', 'Stereo'].includes(o.value));
+      }
+    }
+
     const audioDevices = this.audioService.getDevices();
     const sourcesInChannels = this.sourcesService
       .getSources()
