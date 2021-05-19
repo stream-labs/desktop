@@ -1,16 +1,19 @@
 import { useVuex } from 'components-react/hooks';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Services } from 'components-react/service-provider';
 import styles from './Highlighter.m.less';
-import { EExportStep, IClip } from 'services/highlighter';
+import { IClip } from 'services/highlighter';
 import ClipPreview from 'components-react/highlighter/ClipPreview';
 import ClipTrimmer from 'components-react/highlighter/ClipTrimmer';
 import { ReactSortable } from 'react-sortablejs';
 import { ListInput } from 'components-react/shared/inputs/ListInput';
 import Form from 'components-react/shared/inputs/Form';
 import isEqual from 'lodash/isEqual';
-import { FileInput, SliderInput } from 'components-react/shared/inputs';
-import { Modal } from 'antd';
+import { SliderInput } from 'components-react/shared/inputs';
+import { Modal, Button } from 'antd';
+import ExportModal from 'components-react/highlighter/ExportModal';
+
+type TModal = 'trim' | 'export' | 'preview';
 
 export default function Highlighter() {
   const { HighlighterService } = Services;
@@ -24,34 +27,7 @@ export default function Highlighter() {
 
   useEffect(() => HighlighterService.actions.loadClips(), [v.clips.length]);
 
-  function getExportView() {
-    return (
-      <div className={styles.clipLoader}>
-        <h2>Export Progress</h2>
-        {!v.exportInfo.cancelRequested && v.exportInfo.step === EExportStep.FrameRender && (
-          <span>
-            Rendering Frames: {v.exportInfo.currentFrame}/{v.exportInfo.totalFrames}
-          </span>
-        )}
-        {!v.exportInfo.cancelRequested && v.exportInfo.step === EExportStep.AudioMix && (
-          <span>
-            Mixing Audio:
-            <i className="fa fa-pulse fa-spinner" style={{ marginLeft: '12px' }} />
-          </span>
-        )}
-        {v.exportInfo.cancelRequested && <span>Canceling...</span>}
-        <br />
-        <button
-          className="button button--soft-warning"
-          onClick={() => HighlighterService.actions.cancelExport()}
-          style={{ marginTop: '16px' }}
-          disabled={v.exportInfo.cancelRequested}
-        >
-          Cancel
-        </button>
-      </div>
-    );
-  }
+  const [showModal, setShowModal] = useState<TModal | null>(null);
 
   function getLoadingView() {
     return (
@@ -78,10 +54,6 @@ export default function Highlighter() {
 
     function setTransitionDuration(duration: number) {
       HighlighterService.actions.setTransition({ duration });
-    }
-
-    function setExportFile(file: string) {
-      HighlighterService.actions.setExportFile(file);
     }
 
     return (
@@ -113,21 +85,16 @@ export default function Highlighter() {
             tooltipPlacement="bottom"
             tipFormatter={v => `${v}s`}
           />
-          <FileInput
-            label="Export File"
-            save={true}
-            filters={[{ name: 'MP4 Video File', extensions: ['mp4'] }]}
-            value={v.exportInfo.file}
-            onChange={setExportFile}
-          />
         </Form>
-        <button
-          className="button button--action"
-          style={{ marginTop: '16px' }}
-          onClick={() => HighlighterService.actions.export()}
+        <Button
+          style={{ marginTop: '16px', marginRight: '8px' }}
+          onClick={() => setShowModal('preview')}
         >
+          Preview
+        </Button>
+        <Button type="primary" style={{ marginTop: '16px' }} onClick={() => setShowModal('export')}>
           Export
-        </button>
+        </Button>
       </div>
     );
   }
@@ -161,25 +128,37 @@ export default function Highlighter() {
             {v.clips.map(clip => {
               return (
                 <div key={clip.path} style={{ margin: '10px', display: 'inline-block' }}>
-                  <ClipPreview clip={clip} onClick={() => setInspectedClipPath(clip.path)} />
+                  <ClipPreview
+                    clip={clip}
+                    onClick={() => {
+                      setInspectedClipPath(clip.path);
+                      setShowModal('trim');
+                    }}
+                  />
                 </div>
               );
             })}
           </ReactSortable>
         </div>
         {getControls()}
-        {inspectedClip && (
-          <Modal
-            getContainer={`.${styles.clipsViewRoot}`}
-            onCancel={() => setInspectedClipPath(null)}
-            footer={null}
-            visible={true}
-            width="70%"
-            closable={false}
-          >
-            {inspectedClip && <ClipTrimmer clip={inspectedClip} />}
-          </Modal>
-        )}
+        <Modal
+          getContainer={`.${styles.clipsViewRoot}`}
+          onCancel={() => {
+            // Do not allow closing export modal while export operation is progress
+            if (v.exportInfo.exporting) return;
+
+            setInspectedClipPath(null);
+            setShowModal(null);
+          }}
+          footer={null}
+          width={showModal === 'trim' ? '60%' : '700px'}
+          closable={false}
+          visible={!!showModal}
+          destroyOnClose={true}
+        >
+          {inspectedClip && showModal === 'trim' && <ClipTrimmer clip={inspectedClip} />}
+          {showModal === 'export' && <ExportModal />}
+        </Modal>
       </div>
     );
   }
@@ -192,7 +171,6 @@ export default function Highlighter() {
     );
   }
 
-  if (v.exportInfo.exporting) return getExportView();
   if (!v.clips.length) return getBlankSlate();
   if (!v.loaded) return getLoadingView();
 
