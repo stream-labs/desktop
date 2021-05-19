@@ -146,3 +146,6 @@ export class PlatformLogo extends ReactComponent<{
   color?: string;
   unwrapped?: boolean;
 }> {}
+
+@Component({ props: { name: { default: 'StreamScheduler' } } })
+export class StreamScheduler extends ReactComponent {}

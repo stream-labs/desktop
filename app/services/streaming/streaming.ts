@@ -36,8 +36,6 @@ import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService } from 'services/restream';
 import {
   FacebookService,
-  IFacebookLiveVideo,
-  IFacebookLiveVideoExtended,
   TDestinationType,
 } from 'services/platforms/facebook';
 import Utils from 'services/utils';
@@ -48,7 +46,7 @@ import { authorizedHeaders } from 'util/requests';
 import { HostsService } from '../hosts';
 import { TwitterService } from '../integrations/twitter';
 import { assertIsDefined } from 'util/properties-type-guards';
-import { IYoutubeLiveBroadcast, YoutubeService } from '../platforms/youtube';
+import { YoutubeService } from '../platforms/youtube';
 import { StreamInfoView } from './streaming-view';
 import Vue from 'vue';
 
@@ -180,29 +178,29 @@ export class StreamingService
       },
     );
 
-    // sync scheduled streams with store
-    this.youtubeService.streamScheduled.subscribe(scheduledLiveStream =>
-      this.onStreamScheduledHandler('youtube', scheduledLiveStream),
-    );
-    this.facebookService.streamScheduled.subscribe(scheduledLiveStream =>
-      this.onStreamScheduledHandler('facebook', scheduledLiveStream),
-    );
-    this.youtubeService.streamRemoved.subscribe(id => this.REMOVE_STREAM_EVENT(id));
-    this.facebookService.streamRemoved.subscribe(id => this.REMOVE_STREAM_EVENT(id));
+    // // sync scheduled streams with store
+    // this.youtubeService.streamScheduled.subscribe(scheduledLiveStream =>
+    //   this.onStreamScheduledHandler('youtube', scheduledLiveStream),
+    // );
+    // this.facebookService.streamScheduled.subscribe(scheduledLiveStream =>
+    //   this.onStreamScheduledHandler('facebook', scheduledLiveStream),
+    // );
+    // this.youtubeService.streamRemoved.subscribe(id => this.REMOVE_STREAM_EVENT(id));
+    // this.facebookService.streamRemoved.subscribe(id => this.REMOVE_STREAM_EVENT(id));
   }
 
-  private onStreamScheduledHandler(
-    platform: TPlatform,
-    scheduledLiveStream: IYoutubeLiveBroadcast | IFacebookLiveVideo,
-  ) {
-    const event =
-      platform === 'youtube'
-        ? this.convertYTBroadcastToEvent(scheduledLiveStream as IYoutubeLiveBroadcast)
-        : this.convertFBLiveVideoToEvent(scheduledLiveStream as IFacebookLiveVideoExtended);
-
-    this.REMOVE_STREAM_EVENT(event.id);
-    this.SET_STREAM_EVENTS(true, [...this.state.streamEvents, event]);
-  }
+  // private onStreamScheduledHandler(
+  //   platform: TPlatform,
+  //   scheduledLiveStream: IYoutubeLiveBroadcast | IFacebookLiveVideo,
+  // ) {
+  //   const event =
+  //     platform === 'youtube'
+  //       ? this.convertYTBroadcastToEvent(scheduledLiveStream as IYoutubeLiveBroadcast)
+  //       : this.convertFBLiveVideoToEvent(scheduledLiveStream as IFacebookLiveVideoExtended);
+  //
+  //   this.REMOVE_STREAM_EVENT(event.id);
+  //   this.SET_STREAM_EVENTS(true, [...this.state.streamEvents, event]);
+  // }
 
   get views(): StreamInfoView {
     return new StreamInfoView(this.state);
@@ -1149,61 +1147,6 @@ export class StreamingService
         });
       this.windowsService.actions.closeChildWindow();
     }
-  }
-
-  async loadStreamEvents() {
-    // load fb and yt events simultaneously
-    this.SET_STREAM_EVENTS(false);
-    await this.prepopulateInfo();
-    const events: IStreamEvent[] = [];
-    const [fbEvents, ytEvents] = await Promise.all([this.loadFbEvents(), this.loadYTBEvents()]);
-
-    // convert fb and yt events to the unified IStreamEvent format
-    ytEvents.forEach(ytEvent => {
-      events.push(this.convertYTBroadcastToEvent(ytEvent));
-    });
-
-    fbEvents.forEach(fbEvent => {
-      events.push(this.convertFBLiveVideoToEvent(fbEvent));
-    });
-
-    this.SET_STREAM_EVENTS(true, events);
-  }
-
-  private convertYTBroadcastToEvent(ytBroadcast: IYoutubeLiveBroadcast): IStreamEvent {
-    return {
-      platform: 'youtube',
-      id: ytBroadcast.id,
-      date: new Date(
-        ytBroadcast.snippet.scheduledStartTime || ytBroadcast.snippet.actualStartTime,
-      ).valueOf(),
-      title: ytBroadcast.snippet.title,
-      status: ytBroadcast.status.lifeCycleStatus === 'complete' ? 'completed' : 'scheduled',
-    };
-  }
-
-  private convertFBLiveVideoToEvent(fbLiveVideo: IFacebookLiveVideoExtended): IStreamEvent {
-    return {
-      platform: 'facebook',
-      id: fbLiveVideo.id,
-      date: new Date(fbLiveVideo.planned_start_time || fbLiveVideo.broadcast_start_time).valueOf(),
-      title: fbLiveVideo.title,
-      status: 'scheduled',
-      facebook: {
-        destinationType: fbLiveVideo.destinationType,
-        destinationId: fbLiveVideo.destinationId,
-      },
-    };
-  }
-
-  private async loadYTBEvents() {
-    if (!this.views.isPlatformLinked('youtube')) return [];
-    return await this.youtubeService.fetchBroadcasts();
-  }
-
-  private async loadFbEvents() {
-    if (!this.views.isPlatformLinked('facebook')) return [];
-    return await this.facebookService.fetchAllVideos();
   }
 
   private sendStreamEndEvent() {

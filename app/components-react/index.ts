@@ -10,6 +10,7 @@ import TitleBar from './shared/TitleBar';
 import Chat from './root/Chat';
 import NavTools from './sidebar/NavTools';
 import PlatformLogo from './shared/PlatformLogo';
+import StreamScheduler from './pages/stream-scheduler/StreamScheduler';
 
 // list of React components for usage inside Vue components
 export const components = {
@@ -25,4 +26,5 @@ export const components = {
   Chat,
   NavTools,
   PlatformLogo,
+  StreamScheduler,
 };

@@ -621,7 +621,7 @@ export class YoutubeService
   /**
    * Fetch the list of upcoming and active broadcasts
    */
-  async fetchEligibleBroadcasts(): Promise<IYoutubeLiveBroadcast[]> {
+  async fetchEligibleBroadcasts(apply24hFilter = true): Promise<IYoutubeLiveBroadcast[]> {
     const fields = ['snippet', 'contentDetails', 'status'];
     const query = `part=${fields.join(',')}&maxResults=50&access_token=${this.oauthToken}`;
 
@@ -649,13 +649,15 @@ export class YoutubeService
 
     // cap the upcoming broadcasts list depending on the current date
     // unfortunately YT API doesn't provide a way to filter broadcasts by date
-    upcomingBroadcasts = upcomingBroadcasts.filter(broadcast => {
-      const timeRange = 1000 * 60 * 60 * 24;
-      const maxDate = Date.now() + timeRange;
-      const minDate = Date.now() - timeRange;
-      const broadcastDate = new Date(broadcast.snippet.scheduledStartTime).valueOf();
-      return broadcastDate > minDate && broadcastDate < maxDate;
-    });
+    if (apply24hFilter) {
+      upcomingBroadcasts = upcomingBroadcasts.filter(broadcast => {
+        const timeRange = 1000 * 60 * 60 * 24;
+        const maxDate = Date.now() + timeRange;
+        const minDate = Date.now() - timeRange;
+        const broadcastDate = new Date(broadcast.snippet.scheduledStartTime).valueOf();
+        return broadcastDate > minDate && broadcastDate < maxDate;
+      });
+    }
 
     return [...activeBroadcasts, ...upcomingBroadcasts];
   }

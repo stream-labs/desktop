@@ -71,48 +71,48 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
    * validate settings and schedule stream
    */
   private async submit() {
-    // validate
-    if (!(await this.$refs.form.validate())) return;
-
-    // take the date without hours and minutes
-    const startDate = new Date(this.startTimeModel.date).setHours(0, 0, 0, 0);
-
-    // convert date to ISO string format
-    const scheduledStartTime = new Date(startDate + this.startTimeModel.time * 1000).toISOString();
-
-    // schedule
-    try {
-      this.isLoading = true;
-      await this.streamingService.actions.return.scheduleStream(this.settings, scheduledStartTime);
-      this.startTimeModel = { time: 0, date: 0 };
-      this.$toasted.show(
-        $t(
-          'Your stream has been scheduled for %{time} from now.' +
-            " If you'd like to make another schedule please enter a different time",
-          { time: moment().to(scheduledStartTime, true) },
-        ),
-        {
-          position: 'bottom-center',
-          fullWidth: true,
-          className: 'toast-success toast-success__schedule',
-          duration: 0,
-          action: {
-            text: $t('Close'),
-            class: 'toast-action',
-            onClick: (_e, toastedObject) => toastedObject.goAway(),
-          },
-        },
-      );
-    } catch (e: unknown) {
-      this.$toasted.show(e['message'], {
-        position: 'bottom-center',
-        className: 'toast-alert',
-        duration: 50 * e['message'].length,
-        singleton: true,
-      });
-    } finally {
-      this.isLoading = false;
-    }
+    // // validate
+    // if (!(await this.$refs.form.validate())) return;
+    //
+    // // take the date without hours and minutes
+    // const startDate = new Date(this.startTimeModel.date).setHours(0, 0, 0, 0);
+    //
+    // // convert date to ISO string format
+    // const scheduledStartTime = new Date(startDate + this.startTimeModel.time * 1000).toISOString();
+    //
+    // // schedule
+    // try {
+    //   this.isLoading = true;
+    //   await this.streamingService.actions.return.scheduleStream(this.settings, scheduledStartTime);
+    //   this.startTimeModel = { time: 0, date: 0 };
+    //   this.$toasted.show(
+    //     $t(
+    //       'Your stream has been scheduled for %{time} from now.' +
+    //         " If you'd like to make another schedule please enter a different time",
+    //       { time: moment().to(scheduledStartTime, true) },
+    //     ),
+    //     {
+    //       position: 'bottom-center',
+    //       fullWidth: true,
+    //       className: 'toast-success toast-success__schedule',
+    //       duration: 0,
+    //       action: {
+    //         text: $t('Close'),
+    //         class: 'toast-action',
+    //         onClick: (_e, toastedObject) => toastedObject.goAway(),
+    //       },
+    //     },
+    //   );
+    // } catch (e: unknown) {
+    //   this.$toasted.show(e['message'], {
+    //     position: 'bottom-center',
+    //     className: 'toast-alert',
+    //     duration: 50 * e['message'].length,
+    //     singleton: true,
+    //   });
+    // } finally {
+    //   this.isLoading = false;
+    // }
   }
 
   /**

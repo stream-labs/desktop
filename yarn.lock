@@ -4201,22 +4201,10 @@ dashdash@^1.12.0:
   dependencies:
     assert-plus "^1.0.0"
 
-<<<<<<< HEAD
-date-fns-tz@^1.0.12:
-  version "1.0.12"
-  resolved "https://registry.yarnpkg.com/date-fns-tz/-/date-fns-tz-1.0.12.tgz#2d680e1099767775cff7a30eac34362d52639fed"
-  integrity sha512-Ca+9pjGkU90XDHnclfSjz9o7g/ZqyYyYI0aCYmbf65P75oy8gktuaRslO3UPXl3ADgAnF9/KCykQkpU3/xvtWQ==
-
-date-fns@^2.8.1:
-  version "2.16.1"
-  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.16.1.tgz#05775792c3f3331da812af253e1a935851d3834b"
-  integrity sha512-sAJVKx/FqrLYHAQeN7VpJrPhagZc9R4ImZIWYRFZaaohR3KzmuK88touwsSwSVT8Qcbd4zoDsnGfX4GFB4imyQ==
-=======
 date-fns@^2.15.0:
   version "2.18.0"
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.18.0.tgz#08e50aee300ad0d2c5e054e3f0d10d8f9cdfe09e"
   integrity sha512-NYyAg4wRmGVU4miKq5ivRACOODdZRY3q5WLmOJSq8djyzftYphU7dTHLcEtLqEvfqMKQ0jVv91P4BAwIjsXIcw==
->>>>>>> react_bugfixes
 
 date-time@^3.1.0:
   version "3.1.0"
@@ -7899,11 +7887,6 @@ mkdirp@^0.5.3:
   integrity sha512-NKmAlESf6jMGym1++R0Ra7wvhV+wFW63FaSOFPwRahvea0gMUcGUhVeAg/0BC0wiv9ih5NYPB1Wn1UEI1/L+xQ==
   dependencies:
     minimist "^1.2.5"
-
-moment@2.22.2:
-  version "2.22.2"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.22.2.tgz#3c257f9839fc0e93ff53149632239eb90783ff66"
-  integrity sha1-PCV/mDn8DpP/UxSWMiOeuQeD/2Y=
 
 moment@^2.24.0, moment@^2.25.3:
   version "2.29.1"
@@ -11592,22 +11575,10 @@ uuid@^3.0.1:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.0.1.tgz#6544bba2dfda8c1cf17e629a3a305e2bb1fee6c1"
   integrity sha1-ZUS7ot/ajBzxfmKaOjBeK7H+5sE=
 
-<<<<<<< HEAD
-v-calendar@^2.0.2:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/v-calendar/-/v-calendar-2.1.1.tgz#797cea240b79eb4b49bd1f3e250f15b1fd613baa"
-  integrity sha512-9JyObLeA85OEy0HfSUcjnsJLEv1UFpB0oiRDWXiCSIpPWrkTJ4U8XexIdBPwGsiObvzyMEssHpwsSL7v4QfXNw==
-  dependencies:
-    core-js "^3.6.5"
-    date-fns "^2.8.1"
-    date-fns-tz "^1.0.12"
-    lodash "^4.17.15"
-=======
 uuid@^8.0.0:
   version "8.3.2"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.2.tgz#80d5b5ced271bb9af6c445f21a1a04c606cefbe2"
   integrity sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==
->>>>>>> react_bugfixes
 
 v-dropdown@^1.0.7:
   version "1.0.7"
