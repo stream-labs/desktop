@@ -160,7 +160,7 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
       !this.state.existingSceneCollections &&
       !this.state.importedFromObs &&
       ((userViews.isLoggedIn &&
-        getPlatformService(userViews.platform.type).capabilities.has('themes')) ||
+        getPlatformService(userViews.platform.type).hasCapability('themes')) ||
         !userViews.isLoggedIn)
     ) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ThemeSelector]);
@@ -269,11 +269,8 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
 
     // setup a custom resolution if the platform requires that
     const platformService = getPlatformService(this.userService.views.platform?.type);
-    if (platformService && platformService.capabilities.has('resolutionPreset')) {
-      const {
-        inputResolution,
-        outputResolution,
-      } = (platformService as unknown) as IPlatformCapabilityResolutionPreset;
+    if (platformService && platformService.hasCapability('resolutionPreset')) {
+      const { inputResolution, outputResolution } = platformService;
       this.outputSettingsService.setSettings({
         mode: 'Advanced',
         inputResolution,

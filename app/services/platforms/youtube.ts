@@ -168,6 +168,7 @@ export class YoutubeService
     'stream-schedule',
     'streamlabels',
     'themes',
+    'viewerCount',
   ]);
 
   static initialState: IYoutubeServiceState = {
@@ -295,6 +296,7 @@ export class YoutubeService
         platform: 'youtube',
         key: streamKey,
         streamType: 'rtmp_common',
+        server: 'rtmp://a.rtmp.youtube.com/live2',
       });
     }
 

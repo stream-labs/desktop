@@ -60,7 +60,20 @@ const base = {
     },
   },
   mac: {
-    extraFiles: ['shared-resources/**/*', '!shared-resources/README'],
+    extraFiles: [
+      'shared-resources/**/*',
+      '!shared-resources/README',
+      // {
+      //   "from": "node_modulesdwadawd/obs-studio-node/Frameworks/*",
+      //   "to": "Frameworks/",
+      //   "filter": ["**/*"]
+      // },
+      // {
+      //   "from": "node_modules/obs-studio-node/Frameworks/*",
+      //   "to": "Resources/app.asar.unpacked/node_modules/",
+      //   "filter": ["**/*"]
+      // }
+    ],
     icon: 'media/images/icon-mac.icns',
     hardenedRuntime: true,
     entitlements: 'electron-builder/entitlements.plist',

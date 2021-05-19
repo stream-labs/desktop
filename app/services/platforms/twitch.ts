@@ -99,6 +99,7 @@ export class TwitchService
     'user-info',
     'streamlabels',
     'themes',
+    'viewerCount',
   ]);
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
@@ -163,6 +164,7 @@ export class TwitchService
           key,
           platform: 'twitch',
           streamType: 'rtmp_common',
+          server: 'auto',
         });
       }
     }
