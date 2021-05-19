@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Svg from 'components-react/shared/Svg';
+import SvgContainer from 'components-react/shared/SvgContainer';
 
 const loadingStrings = [
   'Initiating doggo petting engine...',
@@ -56,7 +56,7 @@ function Spinner() {
   return (
     <div className="s-spinner s-spinner__overlay">
       <div className="s-bars">
-        <Svg src={spinnerSrc} className="s-spinner--large" />
+        <SvgContainer src={spinnerSrc} className="s-spinner--large" />
       </div>
     </div>
   );

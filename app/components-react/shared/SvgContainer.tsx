@@ -2,7 +2,7 @@ import React from 'react';
 
 const SVG_ATTRS_REGEX = /(\S+)=["']?((?:.(?!["']?\s+(?:\S+)=|[>"']))+.)["']?/gm;
 
-export default function Svg(p: {
+export default function SvgContainer(p: {
   src: string;
   className?: string;
   style?: Dictionary<string | number>;
