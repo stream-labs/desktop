@@ -733,8 +733,10 @@ export class YoutubeService
   fetchFollowers() {
     return platformAuthorizedRequest<{ items: { statistics: { subscriberCount: number } }[] }>(
       'youtube',
-      `${this.apiBase}/channels?part=snippet&mine=true`,
-    ).then(json => json.items[0].statistics.subscriberCount);
+      `${this.apiBase}/channels?part=statistics&mine=true`,
+    )
+      .then(json => Number(json.items[0].statistics.subscriberCount))
+      .catch(() => 0);
   }
 
   @mutation()

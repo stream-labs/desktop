@@ -146,7 +146,7 @@ export function PlatformCard(p: { platform: ICommunityReach }) {
         <PlatformLogo platform={icon} />
         <span className={cx(styles.title, styles[icon])}>{nameMap[icon]}</span>
       </div>
-      {followers ? (
+      {followers != null ? (
         <span>{$t('%{followers} followers', { followers })}</span>
       ) : (
         <Button onClick={platformMerge}>{$t('Connect')}</Button>
