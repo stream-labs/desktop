@@ -4,7 +4,10 @@ import { StreamSettingsService } from '../settings/streaming';
 import { UserService } from '../user';
 import { RestreamService } from '../restream';
 import { getPlatformService, TPlatform, TPlatformCapability } from '../platforms';
-import { cloneDeep, difference } from 'lodash';
+import { IncrementalRolloutService, TwitterService } from '../../app-services';
+import { EAvailableFeatures } from '../incremental-rollout';
+import cloneDeep from 'lodash/cloneDeep';
+import difference from 'lodash/difference';
 
 /**
  * The stream info view is responsible for keeping
@@ -13,6 +16,14 @@ import { cloneDeep, difference } from 'lodash';
  * components to make use of.
  */
 export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
+  constructor(state: IStreamingServiceState, private getGoLiveSettings?: () => IGoLiveSettings) {
+    super(state);
+  }
+
+  get settings(): IGoLiveSettings {
+    return this.getGoLiveSettings ? this.getGoLiveSettings() : this.savedSettings;
+  }
+
   private get userView() {
     return this.getServiceViews(UserService);
   }
@@ -25,15 +36,57 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     return this.getServiceViews(StreamSettingsService);
   }
 
+  private get twitterView() {
+    return this.getServiceViews(TwitterService);
+  }
+
+  private get incrementalRolloutView() {
+    return this.getServiceViews(IncrementalRolloutService);
+  }
+
   get info() {
     return this.state.info;
+  }
+
+  get error() {
+    return this.info.error;
+  }
+
+  get lifecycle() {
+    return this.info.lifecycle;
+  }
+
+  get customDestinations() {
+    return this.settings.customDestinations || [];
+  }
+
+  get platforms() {
+    return this.settings.platforms;
+  }
+
+  get checklist() {
+    return this.info.checklist;
+  }
+
+  get game() {
+    return this.commonFields.game;
+  }
+
+  getPlatformDisplayName(platform: TPlatform): string {
+    return getPlatformService(platform).displayName;
+  }
+
+  // REMOVE
+  get warning(): string {
+    return this.state.info.warning;
   }
 
   /**
    * Returns a sorted list of all platforms (linked and unlinked)
    */
   get allPlatforms(): TPlatform[] {
-    return this.sortPlatforms(['twitch', 'facebook', 'youtube']);
+    const allPlatforms: TPlatform[] = ['twitch', 'facebook', 'youtube', 'tiktok'];
+    return this.sortPlatforms(allPlatforms);
   }
 
   /**
@@ -41,37 +94,49 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
    */
   get linkedPlatforms(): TPlatform[] {
     if (!this.userView.state.auth) return [];
-    if (
-      !this.restreamView.canEnableRestream ||
-      !this.streamSettingsView.state.protectedModeEnabled
-    ) {
+    if (!this.restreamView.canEnableRestream || !this.protectedModeEnabled) {
       return [this.userView.auth!.primaryPlatform];
     }
-    return this.allPlatforms.filter(p => this.isPlatformLinked(p));
+    return this.allPlatforms.filter(p => this.checkPlatformLinked(p));
+  }
+
+  get protectedModeEnabled() {
+    return this.streamSettingsView.state.protectedModeEnabled;
   }
 
   /**
    * Returns a list of enabled for streaming platforms
    */
   get enabledPlatforms(): TPlatform[] {
-    return this.getEnabledPlatforms(this.goLiveSettings);
+    return this.getEnabledPlatforms(this.settings.platforms);
+  }
+
+  /**
+   * Returns a list of enabled platforms with useCustomFields==false
+   */
+  get platformsWithoutCustomFields(): TPlatform[] {
+    return this.enabledPlatforms.filter(platform => !this.platforms[platform].useCustomFields);
+  }
+
+  checkEnabled(platform: TPlatform) {
+    return this.enabledPlatforms.includes(platform);
   }
 
   /**
    * Returns a list of enabled for streaming platforms from the given settings object
    */
-  getEnabledPlatforms(settings: IStreamSettings): TPlatform[] {
-    return Object.keys(settings.platforms).filter(
+  getEnabledPlatforms(platforms: IStreamSettings['platforms']): TPlatform[] {
+    return Object.keys(platforms).filter(
       (platform: TPlatform) =>
-        this.linkedPlatforms.includes(platform) && settings.platforms[platform].enabled,
+        this.linkedPlatforms.includes(platform) && platforms[platform].enabled,
     ) as TPlatform[];
   }
 
   get isMultiplatformMode(): boolean {
     return (
-      this.streamSettingsView.state.protectedModeEnabled &&
+      this.protectedModeEnabled &&
       (this.enabledPlatforms.length > 1 ||
-        this.goLiveSettings.customDestinations.filter(dest => dest.enabled).length > 0)
+        this.settings.customDestinations.filter(dest => dest.enabled).length > 0)
     );
   }
 
@@ -97,39 +162,50 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     return getPlatformService(this.userView.auth.primaryPlatform).chatUrl;
   }
 
+  getTweetText(streamTitle: string) {
+    return `${streamTitle} ${this.twitterView.url}`;
+  }
+
   /**
    * Prepares and returns the initial settings for the GoLive window
    */
-  get goLiveSettings(): IGoLiveSettings {
-    const destinations = {};
+  get savedSettings(): IGoLiveSettings {
+    const destinations = {} as IGoLiveSettings['platforms'];
     this.linkedPlatforms.forEach(platform => {
-      destinations[platform] = this.getPlatformSettings(platform);
+      destinations[platform as string] = this.getSavedPlatformSettings(platform);
     });
+
+    // if user recently added a new platform then it doesn't have default title and description
+    // so set the title and description from other platforms
+    const platforms = this.applyCommonFields(destinations);
 
     const savedGoLiveSettings = this.streamSettingsView.state.goLiveSettings;
 
     return {
-      platforms: destinations as IGoLiveSettings['platforms'],
+      platforms,
       advancedMode: !!this.streamSettingsView.state.goLiveSettings?.advancedMode,
       optimizedProfile: undefined,
       customDestinations: savedGoLiveSettings?.customDestinations || [],
-      tweetText: '',
     };
+  }
+
+  get isAdvancedMode(): boolean {
+    return this.enabledPlatforms.length > 1 && this.settings.advancedMode;
   }
 
   /**
    * Returns common fields for the stream such as title, description, game
    */
-  getCommonFields(settings: IStreamSettings) {
+  getCommonFields(platforms: IGoLiveSettings['platforms']) {
     const commonFields = {
       title: '',
       description: '',
       game: '',
     };
-    const destinations = Object.keys(settings.platforms) as TPlatform[];
-    const enabledDestinations = destinations.filter(dest => settings.platforms[dest].enabled);
+    const destinations = Object.keys(platforms) as TPlatform[];
+    const enabledDestinations = destinations.filter(dest => platforms[dest].enabled);
     const destinationsWithCommonSettings = enabledDestinations.filter(
-      dest => !settings.platforms[dest].useCustomFields,
+      dest => !platforms[dest].useCustomFields,
     );
     const destinationWithCustomSettings = difference(
       enabledDestinations,
@@ -138,7 +214,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
 
     // search fields in platforms that don't use custom settings first
     destinationsWithCommonSettings.forEach(platform => {
-      const destSettings = settings.platforms[platform];
+      const destSettings = platforms[platform];
       Object.keys(commonFields).forEach(fieldName => {
         if (commonFields[fieldName] || !destSettings[fieldName]) return;
         commonFields[fieldName] = destSettings[fieldName];
@@ -147,7 +223,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
 
     // search fields in platforms that have custom fields
     destinationWithCustomSettings.forEach(platform => {
-      const destSettings = settings.platforms[platform];
+      const destSettings = platforms[platform];
       Object.keys(commonFields).forEach(fieldName => {
         if (commonFields[fieldName] || !destSettings[fieldName]) return;
         commonFields[fieldName] = destSettings[fieldName];
@@ -157,11 +233,22 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     return commonFields;
   }
 
+  applyCommonFields(platforms: IGoLiveSettings['platforms']): IGoLiveSettings['platforms'] {
+    const commonFields = this.getCommonFields(platforms);
+    const result = {} as IGoLiveSettings['platforms'];
+    Object.keys(platforms).forEach(platform => {
+      result[platform] = platforms[platform];
+      result[platform].title = platforms[platform].title || commonFields.title;
+      result[platform].description = platforms[platform].description || commonFields.description;
+    });
+    return result;
+  }
+
   /**
    * return common fields for the stream such title, description, game
    */
   get commonFields(): { title: string; description: string; game: string } {
-    return this.getCommonFields(this.goLiveSettings);
+    return this.getCommonFields(this.settings.platforms);
   }
 
   /**
@@ -173,20 +260,17 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   sortPlatforms(platforms: TPlatform[]): TPlatform[] {
     platforms = platforms.sort();
     return [
-      ...platforms.filter(p => this.isPrimaryPlatform(p)),
-      ...platforms.filter(p => !this.isPrimaryPlatform(p) && this.isPlatformLinked(p)),
-      ...platforms.filter(p => !this.isPlatformLinked(p)),
+      ...platforms.filter(p => this.checkPrimaryPlatform(p)),
+      ...platforms.filter(p => !this.checkPrimaryPlatform(p) && this.checkPlatformLinked(p)),
+      ...platforms.filter(p => !this.checkPlatformLinked(p)),
     ];
   }
 
   /**
    * returns `true` if all target platforms have prepopulated their settings
    */
-  isPrepopulated(platforms: TPlatform[]): boolean {
-    for (const platform of platforms) {
-      if (!getPlatformService(platform).state.isPrepopulated) return false;
-    }
-    return true;
+  isPrepopulated(): boolean {
+    return this.enabledPlatforms.map(getPlatformService).every(p => p.state.isPrepopulated);
   }
 
   /**
@@ -195,18 +279,23 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   supports(capability: TPlatformCapability, targetPlatforms?: TPlatform[]): boolean {
     const platforms = targetPlatforms || this.enabledPlatforms;
     for (const platform of platforms) {
-      if (getPlatformService(platform).capabilities.has(capability)) return true;
+      if (getPlatformService(platform).hasCapability(capability)) return true;
     }
     return false;
   }
 
-  isPlatformLinked(platform: TPlatform): boolean {
+  checkPlatformLinked(platform: TPlatform): boolean {
     if (!this.userView.auth?.platforms) return false;
     return !!this.userView.auth?.platforms[platform];
   }
 
-  isPrimaryPlatform(platform: TPlatform) {
+  checkPrimaryPlatform(platform: TPlatform) {
     return platform === this.userView.auth?.primaryPlatform;
+  }
+
+  get isLoading() {
+    const { error, lifecycle } = this.info;
+    return !error && ['empty', 'prepopulate'].includes(lifecycle);
   }
 
   /**
@@ -235,9 +324,16 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   }
 
   /**
+   * Return settings for a single platform
+   */
+  getPlatformSettings<T extends TPlatform>(platform: T): IGoLiveSettings['platforms'][T] {
+    return this.settings.platforms[platform];
+  }
+
+  /**
    * Returns Go-Live settings for a given platform
    */
-  private getPlatformSettings(platform: TPlatform) {
+  private getSavedPlatformSettings(platform: TPlatform) {
     const service = getPlatformService(platform);
     const savedDestinations = this.streamSettingsView.state.goLiveSettings?.platforms;
     const { enabled, useCustomFields } = (savedDestinations && savedDestinations[platform]) || {
@@ -258,7 +354,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     return {
       ...settings,
       useCustomFields,
-      enabled: enabled || this.isPrimaryPlatform(platform),
+      enabled: enabled || this.checkPrimaryPlatform(platform),
     };
   }
 }

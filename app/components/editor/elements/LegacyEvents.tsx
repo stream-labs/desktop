@@ -42,7 +42,7 @@ export default class LegacyEvents extends BaseElement {
         try {
           const link = await this.magicLinkService.getDashboardMagicLink(match[1]);
           electron.remote.shell.openExternal(link);
-        } catch (e) {
+        } catch (e: unknown) {
           console.error('Error generating dashboard magic link', e);
         }
 

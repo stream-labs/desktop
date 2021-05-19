@@ -62,6 +62,23 @@ export default class StreamlabelProperties extends Vue {
         }
       });
     });
+
+    // Default to first selectable label if none matching settings are found
+    if (!this.labelSettings) this.defaultToFirstLabel();
+  }
+
+  defaultToFirstLabel() {
+    const file = this.statOptions[0]?.files[0];
+    this.currentlySelected = file;
+    let settingsStat = file.name;
+    if (file?.settings?.settingsStat) settingsStat = file.settings.settingsStat;
+    this.labelSettings = this.streamlabelsService.getSettingsForStat(settingsStat);
+    if (file?.settings?.settingsWhitelist) {
+      this.labelSettings = pick(
+        this.labelSettings,
+        file.settings.settingsWhitelist,
+      ) as IStreamlabelSettings;
+    }
   }
 
   handleInput(value: string) {
@@ -102,6 +119,7 @@ export default class StreamlabelProperties extends Vue {
 
   get preview() {
     if (this.labelSettings.format == null) return '';
+    const isBits = /cheer/.test(this.currentlySelected.name);
 
     let replaced = this.labelSettings.format
       .replace(/{name}/gi, 'Fishstickslol')
@@ -109,7 +127,7 @@ export default class StreamlabelProperties extends Vue {
       .replace(/{currentAmount}/gi, '$12')
       .replace(/{count}/gi, '123')
       .replace(/{goalAmount}/gi, '$47')
-      .replace(/{amount}/gi, '$4.99')
+      .replace(/{amount}/gi, isBits ? '499 Bits' : '$4.99')
       .replace(/{months}/gi, '3')
       .replace(/{either_amount}/gi, ['$4.99', '499 Bits'][Math.floor(Math.random() * 2)]);
 

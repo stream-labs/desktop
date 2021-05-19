@@ -92,6 +92,19 @@
       </add-source-info>
 
       <add-source-info
+        v-if="inspectedSource === 'icon_library'"
+        :name="$t('Custom Icon')"
+        :description="$t('Displays an icon from one of many selections')"
+        key="icon-library-info"
+      >
+        <img
+          class="source__demo"
+          slot="media"
+          :src="require(`../../../media/source-demos/${demoMode}/image.png`)"
+        />
+      </add-source-info>
+
+      <add-source-info
         v-for="appSource in availableAppSources"
         :key="`${appSource.appId}-${appSource.source.id}`"
         v-if="
@@ -148,7 +161,25 @@
             >
               {{ $t(source.name) }}
             </li>
+
+            <li
+              v-if="designerMode"
+              class="source source--standard"
+              :class="{ 'source--active': inspectedSource === 'icon_library' }"
+              @click="inspectSource('icon_library')"
+              @dblclick="selectSource('image_source', { propertiesManager: 'iconLibrary' })"
+            >
+              {{ $t('Custom Icon') }}
+            </li>
           </scrollable>
+        </div>
+
+        <div class="source-group" v-if="!loggedIn">
+          <h3>{{ $t('You must be logged in for Widgets') }}</h3>
+          <button @click="handleAuth()" class="source--login">
+            <h3>{{ $t('Click here to log in') }}</h3>
+            <img :src="getLoginSrc()" />
+          </button>
         </div>
 
         <div class="source-group" v-if="loggedIn">
@@ -170,6 +201,7 @@
             </div>
 
             <div
+              v-if="hasStreamlabel"
               class="source source--widget"
               :class="{ 'source--active': inspectedSource === 'streamlabel' }"
               @click="inspectSource('streamlabel')"
@@ -362,5 +394,40 @@ h2 {
 .source__icon {
   margin-right: 10px;
   width: 30px;
+}
+
+.source--login {
+  .radius();
+
+  cursor: pointer;
+  padding: 4px 8px;
+  background-color: var(--section);
+  width: 100%;
+  height: 90%;
+  margin-right: 4px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: inline-block;
+  overflow: hidden;
+
+  &:hover {
+    .weight(@medium);
+    color: var(--title);
+    background-color: var(--button);
+  }
+
+  > div {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: inline-block;
+    overflow: hidden;
+  }
+
+  img {
+    width: 50%;
+    height: 50%;
+  }
 }
 </style>

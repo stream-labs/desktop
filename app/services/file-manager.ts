@@ -84,7 +84,7 @@ export class FileManagerService extends Service {
         if (opts.validateJSON) {
           JSON.parse(data);
         }
-      } catch (e) {
+      } catch (e: unknown) {
         if (opts.retries > 0) {
           this.read(filePath, {
             ...opts,
@@ -128,7 +128,7 @@ export class FileManagerService extends Service {
     const promises = Object.values(this.files)
       .filter(file => file.dirty)
       .map(file => {
-        return new Promise(resolve => {
+        return new Promise<void>(resolve => {
           file.flushFinished = resolve;
         });
       });
@@ -157,7 +157,7 @@ export class FileManagerService extends Service {
       file.dirty = false;
       if (file.flushFinished) file.flushFinished();
       console.debug(`Wrote file ${filePath} version ${version}`);
-    } catch (e) {
+    } catch (e: unknown) {
       if (tries > 0) {
         file.locked = false;
         await this.flush(filePath, tries - 1);

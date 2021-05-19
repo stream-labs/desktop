@@ -65,7 +65,6 @@ const uuid = require('uuid/v4');
 const semver = require('semver');
 const windowStateKeeper = require('electron-window-state');
 const pid = require('process').pid;
-const crashHandler = require('crash-handler');
 
 app.commandLine.appendSwitch('force-ui-direction', 'ltr');
 app.commandLine.appendSwitch(
@@ -257,6 +256,7 @@ const waitingVuexStores = [];
 let workerInitFinished = false;
 
 async function startApp() {
+  const crashHandler = require('crash-handler');
   const isDevMode = process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test';
   const crashHandlerLogPath = app.getPath('userData');
 
@@ -523,12 +523,15 @@ app.on('second-instance', (event, argv, cwd) => {
   });
 
   // Someone tried to run a second instance, we should focus our window.
-  if (mainWindow) {
+  if (mainWindow && !mainWindow.isDestroyed()) {
     if (mainWindow.isMinimized()) {
       mainWindow.restore();
     }
 
     mainWindow.focus();
+  } else if (!shutdownStarted) {
+    // This instance is a zombie and we should shut down.
+    app.exit();
   }
 });
 
@@ -652,6 +655,20 @@ ipcMain.on('streamlabels-writeFile', (e, info) => {
       console.log('Streamlabels: Error writing file', err);
     }
   });
+});
+
+const guestApiInfo = {};
+
+ipcMain.on('guestApi-setInfo', (e, info) => {
+  guestApiInfo[info.webContentsId] = {
+    schema: info.schema,
+    hostWebContentsId: info.hostWebContentsId,
+    ipcChannel: info.ipcChannel,
+  };
+});
+
+ipcMain.on('guestApi-getInfo', e => {
+  e.returnValue = guestApiInfo[e.sender.id];
 });
 
 /* The following 3 methods need to live in the main process

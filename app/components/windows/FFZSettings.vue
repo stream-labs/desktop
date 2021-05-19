@@ -5,6 +5,7 @@
         class="ffz-settings-container"
         id="ffz-settings"
         ref="ffzSettings"
+        :partition="partition"
         :src="popoutURL"
       />
     </div>

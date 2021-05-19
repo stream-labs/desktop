@@ -1,6 +1,10 @@
 <template>
   <div class="main" :class="theme" id="mainWrapper" @drop="onDropHandler">
-    <title-bar :title="title" :class="{ 'titlebar--error': errorAlert }" v-if="uiReady" />
+    <title-bar
+      :componentProps="{ windowId: 'main' }"
+      :class="{ 'titlebar--error': errorAlert }"
+      v-if="uiReady"
+    />
     <news-banner v-if="uiReady" />
     <div
       class="main-contents"
@@ -20,6 +24,9 @@
           position="right"
           @resizestart="onResizeStartHandler"
           @resizestop="onResizeStopHandler"
+          :max="maxDockWidth"
+          :min="minDockWidth"
+          :value="liveDockSize"
         />
       </div>
 
@@ -42,6 +49,10 @@
           position="left"
           @resizestart="onResizeStartHandler"
           @resizestop="onResizeStopHandler"
+          :max="maxDockWidth"
+          :min="minDockWidth"
+          :value="liveDockSize"
+          :reverse="true"
         />
         <live-dock class="live-dock" />
       </div>

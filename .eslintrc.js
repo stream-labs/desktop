@@ -10,6 +10,7 @@ module.exports = {
   extends: [
     'plugin:vue/essential',
     'airbnb-base',
+    'plugin:react-hooks/recommended',
   ],
   globals: {
     Atomics: 'readonly',
@@ -27,6 +28,10 @@ module.exports = {
   ],
   rules: {
     "prettier/prettier": ERROR,
+    "@typescript-eslint/no-implicit-any-catch": ERROR,
+
+    // We should consider setting this back to WARN
+    "react-hooks/exhaustive-deps": OFF,
 
     // "variable-name": [ERROR, "ban-keywords", "check-format", "allow-leading-underscore", "allow-pascal-case"],
     // We do imports where our files are suffixed .vue and this rule would expect we import as e.g. MainVue
@@ -36,6 +41,9 @@ module.exports = {
     // This is no longer required on refactor/mutation-names branch TODO: remove
     "function-name": OFF,
     "no-boolean-literal-compare": OFF,
+
+    // this rule preventing us using React.memo syntax described here https://reactjs.org/docs/react-api.html#reactmemo
+    "prefer-arrow-callback": OFF,
 
     // these rules have been disable after the migration from tslint
     // TODO: make decision about what rules we should enable
@@ -111,4 +119,12 @@ module.exports = {
     "no-script-url": OFF,
     "import/no-named-default": OFF,
   },
+  overrides: [
+    {
+      files: ['main.js'],
+      rules: {
+        "@typescript-eslint/no-implicit-any-catch": OFF,
+      }
+    }
+  ]
 };

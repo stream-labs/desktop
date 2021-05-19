@@ -26,16 +26,18 @@ export default class SpinWheel extends WidgetSettings<ISpinWheelData, SpinWheelS
     return this.service.getMetadata(this.sectionOptions);
   }
 
-  navItems = [
-    { value: 'manage-wheel', label: $t('Manage Spin Wheel') },
-    { value: 'categories', label: $t('Categories') },
-    { value: 'section', label: $t('Section Weights') },
-    { value: 'font', label: $t('Font Settings') },
-    { value: 'border', label: $t('Border') },
-    { value: 'ticker', label: $t('Ticker') },
-    { value: 'image', label: $t('Center Image') },
-    { value: 'source', label: $t('Source') },
-  ];
+  get navItems() {
+    return [
+      { value: 'manage-wheel', label: $t('Manage Spin Wheel') },
+      { value: 'categories', label: $t('Categories') },
+      { value: 'section', label: $t('Section Weights') },
+      { value: 'font', label: $t('Font Settings') },
+      { value: 'border', label: $t('Border') },
+      { value: 'ticker', label: $t('Ticker') },
+      { value: 'image', label: $t('Center Image') },
+      { value: 'source', label: $t('Source') },
+    ];
+  }
 
   clearCategories() {
     this.wData.settings.categories = [];

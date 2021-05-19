@@ -67,7 +67,8 @@ class NotificationsViews extends ViewHandler<INotificationsState> {
   }
 }
 
-export class NotificationsService extends PersistentStatefulService<INotificationsState>
+export class NotificationsService
+  extends PersistentStatefulService<INotificationsState>
   implements INotificationsServiceApi {
   static defaultState: INotificationsState = {
     notifications: [],
@@ -87,11 +88,14 @@ export class NotificationsService extends PersistentStatefulService<INotificatio
 
   init() {
     super.init();
-    this.CLEAR();
   }
 
   get views() {
     return new NotificationsViews(this.state);
+  }
+
+  static filter(state: INotificationsState) {
+    return { ...state, notifications: [] as INotification[] };
   }
 
   push(notifyInfo: INotificationOptions): INotification {

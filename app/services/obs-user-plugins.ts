@@ -18,7 +18,7 @@ export class ObsUserPluginsService extends Service {
       await this.ensureDirectory(this.pluginsDir);
       await this.ensureDirectory(this.dataBaseDir);
       await this.ensureDirectory(this.dataDir);
-    } catch (e) {
+    } catch (e: unknown) {
       console.error('Error creating plugin directories', e);
     }
   }
@@ -58,7 +58,7 @@ export class ObsUserPluginsService extends Service {
   }
 
   private async ensureDirectory(dirPath: string) {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       fs.exists(dirPath, exists => {
         if (exists) {
           resolve();

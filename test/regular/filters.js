@@ -1,4 +1,4 @@
-import { useSpectron, focusChild, test } from '../helpers/spectron';
+import { useSpectron, focusChild, test, closeWindow } from '../helpers/spectron';
 import { addFilter, openFiltersWindow, removeFilter } from '../helpers/spectron/filters';
 import { addSource } from '../helpers/spectron/sources';
 
@@ -123,7 +123,6 @@ test('Adding and removing a Scroll filter', async t => {
   t.false(await app.client.isExisting('label=Vertical Speed'));
   t.false(await app.client.isExisting('label=Limit Width'));
   t.false(await app.client.isExisting('label=Limit Height'));
-
 });
 
 test('Adding and removing a Render Delay filter', async t => {
@@ -253,4 +252,5 @@ test('Adding and removing a Invert Polarity filter', async t => {
   // this filter does't have settings. Just check we have no errors
   await openFiltersWindow(t, sourceName);
   t.pass();
+
 });

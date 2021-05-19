@@ -5,19 +5,20 @@ import ModalLayout from 'components/ModalLayout.vue';
 import { WindowsService } from 'services/windows';
 import AddSourceInfo from './AddSourceInfo.vue';
 import {
-  SourcesService,
-  TSourceType,
-  TPropertiesManager,
   SourceDisplayData,
+  SourcesService,
+  TPropertiesManager,
+  TSourceType,
 } from 'services/sources';
 import { ScenesService } from 'services/scenes';
 import { UserService } from 'services/user';
-import { WidgetsService, WidgetType, WidgetDisplayData } from 'services/widgets';
-import { PlatformAppsService, IAppSource } from 'services/platform-apps';
+import { WidgetDisplayData, WidgetsService, WidgetType } from 'services/widgets';
+import { IAppSource, PlatformAppsService } from 'services/platform-apps';
 import omit from 'lodash/omit';
 import { CustomizationService } from 'services/customization';
 import { byOS, OS } from 'util/operating-systems';
 import Scrollable from 'components/shared/Scrollable';
+import { getPlatformService } from '../../services/platforms';
 
 type TInspectableSource = TSourceType | WidgetType | 'streamlabel' | 'app_source' | string;
 
@@ -44,7 +45,7 @@ interface ISourceDefinition {
 })
 export default class SourcesShowcase extends Vue {
   @Inject() sourcesService: SourcesService;
-  @Inject() userService: UserService;
+  @Inject() userService!: UserService;
   @Inject() widgetsService: WidgetsService;
   @Inject() scenesService: ScenesService;
   @Inject() windowsService: WindowsService;
@@ -53,9 +54,18 @@ export default class SourcesShowcase extends Vue {
 
   widgetTypes = WidgetType;
   essentialWidgetTypes = new Set([this.widgetTypes.AlertBox]);
+  private primaryPlatformService = this.userService.state.auth
+    ? getPlatformService(this.userService.state.auth.primaryPlatform)
+    : null;
 
   iterableWidgetTypes = Object.keys(this.widgetTypes)
     .filter((type: string) => isNaN(Number(type)))
+    .filter(type => {
+      // show only supported widgets
+      const whitelist = this.primaryPlatformService?.widgetsWhitelist;
+      if (!whitelist) return true;
+      return whitelist.includes(WidgetType[type]);
+    })
     .sort((a: string, b: string) => {
       return this.essentialWidgetTypes.has(this.widgetTypes[a]) ? -1 : 1;
     });
@@ -74,6 +84,11 @@ export default class SourcesShowcase extends Vue {
     const theme = this.demoMode;
     const dataSource = this.widgetData(type) ? this.widgetData : this.sourceData;
     return require(`../../../media/source-demos/${theme}/${dataSource(type).demoFilename}`);
+  }
+
+  getLoginSrc() {
+    const theme = this.demoMode;
+    return require(`../../../media/images/sleeping-kevin-${theme}.png`);
   }
 
   selectWidget(type: WidgetType) {
@@ -129,6 +144,8 @@ export default class SourcesShowcase extends Vue {
       this.selectStreamlabel();
     } else if (this.inspectedSource === 'replay') {
       this.selectSource('ffmpeg_source', { propertiesManager: 'replay' });
+    } else if (this.inspectedSource === 'icon_library') {
+      this.selectSource('image_source', { propertiesManager: 'iconLibrary' });
     } else if (this.inspectedSource === 'app_source') {
       this.selectAppSource(this.inspectedAppId, this.inspectedAppSourceId);
     } else {
@@ -144,6 +161,10 @@ export default class SourcesShowcase extends Vue {
 
   get demoMode() {
     return this.customizationService.isDarkTheme ? 'night' : 'day';
+  }
+
+  get designerMode() {
+    return this.customizationService.views.designerMode;
   }
 
   get availableSources(): ISourceDefinition[] {
@@ -166,6 +187,10 @@ export default class SourcesShowcase extends Vue {
       });
 
     return sourcesList;
+  }
+
+  get hasStreamlabel() {
+    return this.primaryPlatformService?.hasCapability('streamlabels');
   }
 
   get inspectedSourceDefinition() {
@@ -196,5 +221,10 @@ export default class SourcesShowcase extends Vue {
 
   getAppAssetUrl(appId: string, asset: string) {
     return this.platformAppsService.views.getAssetUrl(appId, asset);
+  }
+
+  handleAuth() {
+    this.windowsService.closeChildWindow();
+    this.userService.showLogin();
   }
 }

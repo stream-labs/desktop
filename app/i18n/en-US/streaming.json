@@ -43,6 +43,7 @@
   "Refresh Chat": "Refresh Chat",
   "Your chat is currently offline": "Your chat is currently offline",
   "Set path in Settings > Output.": "Set path in Settings > Output.",
+  "Open Performance Window": "Open Performance Window",
   "Start Replay Buffer": "Start Replay Buffer",
   "Stop Replay Buffer": "Stop Replay Buffer",
   "Stopping...": "Stopping...",
@@ -127,7 +128,6 @@
   "Post a tweet": "Post a tweet",
   "You could try reducing the number of your destinations to one for direct streaming.": "You could try reducing the number of your destinations to one for direct streaming.",
   "Add Destination": "Add Destination",
-  "Enable at least one destination to start streaming": "Enable at least one destination to start streaming",
   "Extras": "Extras",
   "Go back to settings": "Go back to settings",
   "Select at least one destination": "Select at least one destination",
@@ -158,5 +158,7 @@
   "Platform": "Platform",
   "Update scheduled event": "Update scheduled event",
   "Schedule new stream": "Schedule new stream",
-  "Stream scheduled": "Stream scheduled"
+  "Stream scheduled": "Stream scheduled",
+  "Invalid settings. Please check the form": "Invalid settings. Please check the form",
+  "Common Stream Settings": "Common Stream Settings",
 }

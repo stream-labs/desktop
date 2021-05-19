@@ -1,0 +1,156 @@
+@import '../../styles/index';
+
+.patch-notes-chest,
+.patch-notes-chest-deco {
+  width: 100%;
+}
+
+.patch-notes-chest-deco {
+  position: absolute;
+}
+
+.patch-notes-chest {
+  animation: floatingChest ease-in-out 1.5s infinite alternate;
+}
+
+.patch-notes-container--opened {
+  opacity: 0;
+  display: none;
+
+  &.patch-notes-container--opening {
+    display: flex;
+    animation: fadeIn 1s ease-in-out 1.5s 1 forwards;
+  }
+}
+
+.patch-notes-container--closed {
+  z-index: 10;
+  display: flex;
+
+  &.patch-notes-container--closing {
+    overflow: visible;
+    animation: fadeOut 1s ease-in 0.75s forwards;
+
+    .patch-notes-chest {
+      animation: expandChest 0.5s ease-in 0.25s 1 forwards;
+    }
+
+    .patch-notes-button {
+      animation: hideButton 0.25s ease-in 1 forwards;
+    }
+  }
+
+  .patch-notes-header {
+    align-items: center;
+    position: relative;
+  }
+
+  .patch-notes-content {
+    height: 280px;
+  }
+
+  .patch-notes-button {
+    position: absolute;
+    bottom: 0;
+  }
+}
+
+@keyframes floatingChest {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes hideButton {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    display: none;
+  }
+}
+
+@keyframes expandChest {
+  0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1.2);
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    display: none;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.patch-notes-page {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.patch-notes-container {
+  width: 400px;
+  height: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.patch-notes-content {
+  position: relative;
+}
+
+.patch-notes-header {
+  display: flex;
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+
+.patch-notes-title {
+  flex-grow: 1;
+  color: var(--title);
+}
+
+.patch-notes-version {
+  color: var(--icon);
+}
+
+.patch-notes-list {
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+.patch-notes-button {
+  width: 100%;
+}

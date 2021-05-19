@@ -281,8 +281,8 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
 
     try {
       await this.validateManifest(manifest, appPath);
-    } catch (e) {
-      return e.message;
+    } catch (e: unknown) {
+      return e['message'];
     }
 
     // Make sure there isn't already a dev server
@@ -518,6 +518,10 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     if (!app) return null;
 
     const source = app.manifest.sources.find(source => source.id === appSourceId);
+
+    // The app no longer supports this source type
+    if (!source) return null;
+
     let url = getPageUrl(app, source.file);
 
     if (settings) {

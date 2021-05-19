@@ -15,7 +15,7 @@ import Scrollable from 'components/shared/Scrollable';
 
 @Component({})
 export default class LayoutEditor extends TsxComponent {
-  @Inject() private layoutService: LayoutService;
+  @Inject() private layoutService!: LayoutService;
   @Inject() private navigationService: NavigationService;
   @Inject() private customizationService: CustomizationService;
 
@@ -140,7 +140,7 @@ export default class LayoutEditor extends TsxComponent {
           {$t('Add Tab')}
         </button>
         <ListInput
-          style="z-index: 1;"
+          style="z-index: 1; margin: 8px 16px 0 0"
           value={this.layoutService.state.currentTab}
           onInput={(tab: string) => this.setTab(tab)}
           metadata={{ options: this.tabOptions }}

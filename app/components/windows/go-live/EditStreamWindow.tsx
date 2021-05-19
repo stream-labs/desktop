@@ -33,12 +33,12 @@ export default class EditStreamWindow extends TsxComponent<{}> {
   };
 
   private settings: IGoLiveSettings = (() => {
-    const settings = cloneDeep(this.streamingService.views.goLiveSettings);
+    const settings = cloneDeep(this.streamingService.views.savedSettings);
     // if stream has not been started than we allow to change settings only for a primary platform
     // so delete other platforms from the settings object
     if (this.streamingService.state.info.checklist.startVideoTransmission !== 'done') {
       Object.keys(settings.platforms).forEach((platform: TPlatform) => {
-        if (!this.view.isPrimaryPlatform(platform)) delete settings.platforms[platform];
+        if (!this.view.checkPrimaryPlatform(platform)) delete settings.platforms[platform];
       });
     }
     return settings;
@@ -100,7 +100,7 @@ export default class EditStreamWindow extends TsxComponent<{}> {
     const shouldShowUpdateButton = lifecycle !== 'runChecklist';
     const shouldShowGoBackButton = !shouldShowUpdateButton && this.view.info.error;
     const shouldShowAdvancedSwitch =
-      shouldShowUpdateButton && this.view.getEnabledPlatforms(this.settings).length > 1;
+      shouldShowUpdateButton && this.view.getEnabledPlatforms(this.settings.platforms).length > 1;
 
     return (
       <div class="controls" style={{ display: 'flex', 'flex-direction': 'row-reverse' }}>

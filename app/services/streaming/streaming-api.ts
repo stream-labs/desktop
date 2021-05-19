@@ -1,5 +1,4 @@
 import { Observable } from 'rxjs';
-import { TPlatform } from '../platforms';
 import { IEncoderProfile } from '../video-encoding-optimizations';
 import { ITwitchStartStreamOptions } from '../platforms/twitch';
 import { IYoutubeStartStreamOptions } from '../platforms/youtube';
@@ -7,6 +6,7 @@ import { IFacebookStartStreamOptions } from '../platforms/facebook';
 import { IStreamError } from './stream-error';
 import { ICustomStreamDestination } from '../settings/streaming';
 import { IStreamEvent } from './streaming';
+import { ITiktokStartStreamOptions } from '../platforms/tiktok';
 
 export enum EStreamingState {
   Offline = 'offline',
@@ -45,6 +45,7 @@ export interface IStreamInfo {
     twitch: TGoLiveChecklistItemState;
     youtube: TGoLiveChecklistItemState;
     facebook: TGoLiveChecklistItemState;
+    tiktok: TGoLiveChecklistItemState;
     setupMultistream: TGoLiveChecklistItemState;
     startVideoTransmission: TGoLiveChecklistItemState;
     postTweet: TGoLiveChecklistItemState;
@@ -58,6 +59,7 @@ export interface IStreamSettings {
     twitch: IPlatformFlags & ITwitchStartStreamOptions;
     youtube: IPlatformFlags & IYoutubeStartStreamOptions;
     facebook: IPlatformFlags & IFacebookStartStreamOptions;
+    tiktok: IPlatformFlags & ITiktokStartStreamOptions;
   };
   customDestinations: ICustomStreamDestination[];
   advancedMode: boolean;
@@ -65,13 +67,7 @@ export interface IStreamSettings {
 
 export interface IGoLiveSettings extends IStreamSettings {
   optimizedProfile?: IEncoderProfile;
-  tweetText: string;
-}
-
-export interface IPlatformCommonFields {
-  title: string;
-  description?: string;
-  game?: string;
+  tweetText?: string;
 }
 
 export interface IPlatformFlags {

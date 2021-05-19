@@ -1,0 +1,58 @@
+@import '../../styles/index';
+
+.titlebar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 30px;
+  flex: 0 0 30px;
+  background: var(--titlebar);
+}
+
+.titlebar-mac {
+  height: 22px;
+  flex: 0 0 22px;
+  .titlebar-title {
+    text-align: center;
+    font-size: 13px;
+  }
+}
+
+.titlebar-error {
+  background-color: var(--red);
+}
+
+.titlebar-icon {
+  padding-left: 16px;
+  width: 32px;
+}
+
+.titlebar svg {
+  width: auto;
+  height: 14px;
+  overflow: visible !important;
+
+  path {
+    opacity: 1;
+    fill: var(--prime);
+  }
+}
+
+.titlebar-title {
+  flex-grow: 1;
+  padding-left: 10px;
+  color: var(--icon);
+  -webkit-app-region: drag;
+}
+
+.titlebar-actions {
+  -webkit-app-region: no-drag;
+}
+
+.titlebar-action {
+  .icon-hover();
+
+  color: var(--icon);
+  cursor: pointer;
+  margin-right: 16px;
+}

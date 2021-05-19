@@ -171,5 +171,12 @@ export default class StartStreamingButton extends Vue {
         this.streamSettingsService.isSafeToModifyStreamKey()
       );
     }
+
+    if (primaryPlatform === 'tiktok') {
+      return (
+        this.streamSettingsService.state.protectedModeEnabled &&
+        this.streamSettingsService.isSafeToModifyStreamKey()
+      );
+    }
   }
 }

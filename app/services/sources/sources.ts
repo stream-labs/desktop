@@ -32,9 +32,12 @@ import { PlatformAppsService } from 'services/platform-apps';
 import { HardwareService, DefaultHardwareService } from 'services/hardware';
 import { AudioService, E_AUDIO_CHANNELS } from '../audio';
 import { ReplayManager } from './properties-managers/replay-manager';
+import { IconLibraryManager } from './properties-managers/icon-library-manager';
 import { assertIsDefined } from 'util/properties-type-guards';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { SourceFiltersService } from 'services/source-filters';
+import { FileReturnWrapper } from 'util/guest-api-handler';
+import { VideoService } from 'services/video';
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
@@ -47,6 +50,7 @@ export const PROPERTIES_MANAGER_TYPES = {
   streamlabels: StreamlabelsManager,
   platformApp: PlatformAppManager,
   replay: ReplayManager,
+  iconLibrary: IconLibraryManager,
 };
 
 interface IObsSourceCallbackInfo {
@@ -163,6 +167,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
   @Inject() private defaultHardwareService: DefaultHardwareService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private sourceFiltersService: SourceFiltersService;
+  @Inject() private videoService: VideoService;
 
   get views() {
     return new SourcesViews(this.state);
@@ -259,6 +264,12 @@ export class SourcesService extends StatefulService<ISourcesState> {
   ): Source {
     const id: string = options.sourceId || `${type}_${uuid()}`;
     const obsInputSettings = this.getObsSourceCreateSettings(type, settings);
+
+    // Universally disabled for security reasons
+    if (obsInputSettings.is_media_flag) {
+      obsInputSettings.is_media_flag = false;
+    }
+
     const obsInput = obs.InputFactory.create(type, id, obsInputSettings);
 
     this.addSource(obsInput, name, options);
@@ -420,28 +431,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
     this.removeSource(source.sourceId);
   }
 
-  getObsSourceSettings(type: TSourceType, settings: Dictionary<any>): Dictionary<any> {
-    const resolvedSettings = cloneDeep(settings);
-
-    Object.keys(resolvedSettings).forEach(propName => {
-      // device_id is unique for each PC
-      // so we allow to provide a device name instead device id
-      // resolve the device id by the device name here
-      if (!['device_id', 'video_device_id', 'audio_device_id'].includes(propName)) return;
-
-      const device =
-        type === 'dshow_input'
-          ? this.hardwareService.getDshowDeviceByName(settings[propName])
-          : this.hardwareService.getDeviceByName(settings[propName]);
-
-      if (!device) return;
-      resolvedSettings[propName] = device.id;
-    });
-    return resolvedSettings;
-  }
-
   private getObsSourceCreateSettings(type: TSourceType, settings: Dictionary<any>) {
-    const resolvedSettings = this.getObsSourceSettings(type, settings);
+    const resolvedSettings = cloneDeep(settings);
 
     // setup default settings
     if (type === 'browser_source') {
@@ -461,6 +452,14 @@ export class SourcesService extends StatefulService<ISourcesState> {
       this.defaultHardwareService.state.defaultVideoDevice
     ) {
       resolvedSettings.video_device_id = this.defaultHardwareService.state.defaultVideoDevice;
+    }
+
+    // TODO: Specifically for TikTok, we don't use auto mode on game capture
+    // for portrait resolutions, because auto mode will distort the game.
+    // We should remove this change when the backend team makes a change on their
+    // end to better scale the game capture in auto mode.
+    if (type === 'game_capture' && this.videoService.baseHeight > this.videoService.baseWidth) {
+      resolvedSettings.capture_mode = 'any_fullscreen';
     }
 
     return resolvedSettings;
@@ -562,53 +561,10 @@ export class SourcesService extends StatefulService<ISourcesState> {
     const source = this.views.getSource(sourceId);
     if (!source) return;
     const propertiesManagerType = source.getPropertiesManagerType();
-    const isWidget = propertiesManagerType === 'widget';
 
-    if (isWidget && this.userService.isLoggedIn) {
-      const platform = this.userService.views.platform;
-      assertIsDefined(platform);
-      const widgetType = source.getPropertiesManagerSettings().widgetType;
-      const componentName = this.widgetsService.getWidgetComponent(widgetType);
-      if (componentName) {
-        this.windowsService.showWindow({
-          componentName,
-          title: $t('Settings for %{sourceName}', {
-            sourceName: WidgetDisplayData(platform.type)[widgetType].name,
-          }),
-          queryParams: { sourceId },
-          size: {
-            width: 920,
-            height: 1024,
-          },
-        });
-
-        return;
-      }
-    }
-
-    // Figure out if we should redirect to settings
-    if (propertiesManagerType === 'platformApp') {
-      const settings = source.getPropertiesManagerSettings();
-      const app = this.platformAppsService.views.getApp(settings.appId);
-
-      if (app) {
-        const page = app.manifest.sources.find(appSource => {
-          return appSource.id === settings.appSourceId;
-        });
-
-        if (page && page.redirectPropertiesToTopNavSlot) {
-          this.navigationService.navigate('PlatformAppMainPage', {
-            appId: app.id,
-            sourceId: source.sourceId,
-          });
-
-          // If we navigated, we don't want to open source properties,
-          // and should close any open child windows instead
-          this.windowsService.closeChildWindow();
-          return;
-        }
-      }
-    }
+    if (propertiesManagerType === 'widget') return this.showWidgetProperties(source);
+    if (propertiesManagerType === 'platformApp') return this.showPlatformAppPage(source);
+    if (propertiesManagerType === 'iconLibrary') return this.showIconLibrarySettings(source);
 
     let propertiesName = SourceDisplayData()[source.type].name;
     if (propertiesManagerType === 'replay') propertiesName = $t('Instant Replay');
@@ -621,6 +577,74 @@ export class SourcesService extends StatefulService<ISourcesState> {
       size: {
         width: 600,
         height: 800,
+      },
+    });
+  }
+
+  showWidgetProperties(source: Source) {
+    if (!this.userService.isLoggedIn) return;
+    const platform = this.userService.views.platform;
+    assertIsDefined(platform);
+    const widgetType = source.getPropertiesManagerSettings().widgetType;
+    const componentName = this.widgetsService.getWidgetComponent(widgetType);
+    if (componentName) {
+      this.windowsService.showWindow({
+        componentName,
+        title: $t('Settings for %{sourceName}', {
+          sourceName: WidgetDisplayData(platform.type)[widgetType].name,
+        }),
+        queryParams: { sourceId: source.sourceId },
+        size: {
+          width: 920,
+          height: 1024,
+        },
+      });
+    }
+  }
+
+  showPlatformAppPage(source: Source) {
+    const settings = source.getPropertiesManagerSettings();
+    const app = this.platformAppsService.views.getApp(settings.appId);
+
+    if (app) {
+      const page = app.manifest.sources.find(appSource => {
+        return appSource.id === settings.appSourceId;
+      });
+
+      if (page && page.redirectPropertiesToTopNavSlot) {
+        this.navigationService.navigate('PlatformAppMainPage', {
+          appId: app.id,
+          sourceId: source.sourceId,
+        });
+
+        // If we navigated, we don't want to open source properties,
+        // and should close any open child windows instead
+        this.windowsService.closeChildWindow();
+        return;
+      }
+    }
+    this.windowsService.showWindow({
+      componentName: 'SourceProperties',
+      title: $t('Settings for %{sourceName}', {
+        sourceName: SourceDisplayData()[source.type].name,
+      }),
+      queryParams: { sourceId: source.sourceId },
+      size: {
+        width: 600,
+        height: 800,
+      },
+    });
+  }
+
+  showIconLibrarySettings(source: Source) {
+    const propertiesName = SourceDisplayData()[source.type].name;
+    this.windowsService.showWindow({
+      componentName: 'IconLibraryProperties',
+      title: $t('Settings for %{sourceName}', { sourceName: propertiesName }),
+      queryParams: { sourceId: source.sourceId },
+      size: {
+        width: 400,
+        height: 600,
       },
     });
   }

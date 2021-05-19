@@ -9,7 +9,7 @@ export const enum EBit {
 }
 
 export interface IEnv {
-  NODE_ENV: 'production' | 'development';
+  NODE_ENV: 'production' | 'development' | 'test';
   SLOBS_PREVIEW: boolean;
   SLOBS_IPC: boolean;
   SLOBS_USE_LOCAL_HOST: boolean;
@@ -89,6 +89,10 @@ export default class Utils {
     return Utils.env.NODE_ENV !== 'production';
   }
 
+  static isTestMode() {
+    return Utils.env.NODE_ENV === 'test';
+  }
+
   static isPreview(): boolean {
     return Utils.env.SLOBS_PREVIEW as boolean;
   }
@@ -97,7 +101,7 @@ export default class Utils {
     return Utils.env.SLOBS_IPC as boolean;
   }
 
-  static useLocalHost(): boolean {
+  static shouldUseLocalHost(): boolean {
     return Utils.env.SLOBS_USE_LOCAL_HOST as boolean;
   }
 
@@ -231,4 +235,13 @@ export default class Utils {
     } while (fileSizeInBytes > 1024);
     return Math.max(fileSizeInBytes, 0.1).toFixed(1) + byteUnits[i];
   }
+}
+
+/**
+ * A typed version of Object.keys()
+ * Original Object.keys always returns a string[] type
+ * @see discussion here https://github.com/microsoft/TypeScript/pull/12253
+ */
+export function keys<T>(target: T) {
+  return Object.keys(target) as (keyof T)[];
 }

@@ -7,6 +7,7 @@ import { TSocketEvent, WebsocketService } from 'services/websocket';
 import { AppService } from 'services/app';
 import { InitAfter } from '../core';
 import { BehaviorSubject } from 'rxjs';
+import { getPlatformService } from '../platforms';
 
 interface IStreamlabelActiveSubscriptions {
   filename: string;
@@ -42,6 +43,13 @@ interface ITrains {
   donation: IDonationTrainInfo;
   subscription: ITrainInfo;
   follow: ITrainInfo;
+  support: ITrainInfo;
+  bits: ITrainInfo;
+  stars: ITrainInfo;
+  sponsor: ITrainInfo;
+  superchat: ITrainInfo;
+  youtube_subscriber: ITrainInfo;
+  facebook_follow: ITrainInfo;
 }
 
 export interface IStreamlabelSet {
@@ -68,7 +76,17 @@ export interface IStreamlabelSettingsDefinition {
   settingsWhitelist?: string[];
 }
 
-type TTrainType = 'donation' | 'follow' | 'subscription';
+type TTrainType =
+  | 'donation'
+  | 'follow'
+  | 'subscription'
+  | 'support'
+  | 'bits'
+  | 'stars'
+  | 'sponsor'
+  | 'superchat'
+  | 'youtube_subscriber'
+  | 'facebook_follow';
 
 interface IStreamlabelsServiceState {
   definitions: IStreamlabelSet;
@@ -135,11 +153,53 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
       counter: 0,
       setting: 'train_twitch_subscriptions',
     },
+    youtube_subscriber: {
+      mostRecentEventAt: null,
+      mostRecentName: null,
+      counter: 0,
+      setting: 'train_youtube_subscribers',
+    },
     follow: {
       mostRecentEventAt: null,
       mostRecentName: null,
       counter: 0,
       setting: 'train_twitch_follows',
+    },
+    facebook_follow: {
+      mostRecentEventAt: null,
+      mostRecentName: null,
+      counter: 0,
+      setting: 'train_facebook_follows',
+    },
+    support: {
+      mostRecentEventAt: null,
+      mostRecentName: null,
+      counter: 0,
+      setting: 'train_facebook_supports',
+    },
+    bits: {
+      mostRecentEventAt: null,
+      mostRecentName: null,
+      counter: 0,
+      setting: 'train_twitch_bits',
+    },
+    stars: {
+      mostRecentEventAt: null,
+      mostRecentName: null,
+      counter: 0,
+      setting: 'train_facebook_stars',
+    },
+    sponsor: {
+      mostRecentEventAt: null,
+      mostRecentName: null,
+      counter: 0,
+      setting: 'train_youtube_sponsors',
+    },
+    superchat: {
+      mostRecentEventAt: null,
+      mostRecentName: null,
+      counter: 0,
+      setting: 'train_youtube_superchats',
     },
   };
 
@@ -158,6 +218,8 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
   }
 
   onUserLogin() {
+    const primaryPlatform = getPlatformService(this.userService.platform.type);
+    if (!primaryPlatform.hasCapability('streamlabels')) return;
     this.fetchInitialData();
     this.fetchSettings();
     this.fetchDefinitions();
@@ -184,7 +246,20 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
     };
 
     // Because trains are client-side, we can force a fast update
-    if (['train_tips', 'train_twitch_follows', 'train_twitch_subscriptions'].includes(statname)) {
+    if (
+      [
+        'train_tips',
+        'train_twitch_follows',
+        'train_twitch_subscriptions',
+        'train_facebook_supports',
+        'train_twitch_bits',
+        'train_facebook_stars',
+        'train_youtube_sponsors',
+        'train_youtube_superchats',
+        'train_youtube_subscribers',
+        'train_facebook_follows',
+      ].includes(statname)
+    ) {
       this.outputAllTrains();
     }
 
@@ -408,21 +483,80 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
 
       this.outputTrainInfo('donation');
     } else if (event.type === 'follow') {
-      this.trains.follow.mostRecentEventAt = Date.now();
-      this.trains.follow.counter += event.message.length;
+      if (event.for === 'twitch_account') {
+        this.trains.follow.mostRecentEventAt = Date.now();
+        this.trains.follow.counter += event.message.length;
 
-      const latest = event.message[event.message.length - 1];
-      this.trains.follow.mostRecentName = latest.name;
+        const latest = event.message[event.message.length - 1];
+        this.trains.follow.mostRecentName = latest.name;
 
-      this.outputTrainInfo('follow');
+        this.outputTrainInfo('follow');
+      } else if (event.for === 'facebook_account') {
+        this.trains.facebook_follow.mostRecentEventAt = Date.now();
+        this.trains.facebook_follow.counter += event.message.length;
+
+        const latest = event.message[event.message.length - 1];
+        this.trains.facebook_follow.mostRecentName = latest.name;
+
+        this.outputTrainInfo('facebook_follow');
+      } else if (event.for === 'youtube_account') {
+        this.trains.youtube_subscriber.mostRecentEventAt = Date.now();
+        this.trains.youtube_subscriber.counter += event.message.length;
+
+        const latest = event.message[event.message.length - 1];
+        this.trains.youtube_subscriber.mostRecentName = latest.name;
+
+        this.outputTrainInfo('youtube_subscriber');
+      }
     } else if (event.type === 'subscription') {
-      this.trains.subscription.mostRecentEventAt = Date.now();
-      this.trains.subscription.counter += event.message.length;
+      if (event.for === 'twitch_account') {
+        this.trains.subscription.mostRecentEventAt = Date.now();
+        this.trains.subscription.counter += event.message.length;
+
+        const latest = event.message[event.message.length - 1];
+        this.trains.subscription.mostRecentName = latest.name;
+
+        this.outputTrainInfo('subscription');
+      } else if (event.for === 'youtube_account') {
+        this.trains.sponsor.mostRecentEventAt = Date.now();
+        this.trains.sponsor.counter += event.message.length;
+
+        const latest = event.message[event.message.length - 1];
+        this.trains.sponsor.mostRecentName = latest.name;
+
+        this.outputTrainInfo('sponsor');
+      }
+    } else if (event.type === 'support') {
+      this.trains.support.mostRecentEventAt = Date.now();
+      this.trains.support.counter += event.message.length;
 
       const latest = event.message[event.message.length - 1];
-      this.trains.subscription.mostRecentName = latest.name;
+      this.trains.support.mostRecentName = latest.name;
+      this.outputTrainInfo('support');
+    } else if (event.type === 'bits') {
+      this.trains.bits.mostRecentEventAt = Date.now();
+      this.trains.bits.counter += event.message.length;
 
-      this.outputTrainInfo('subscription');
+      const latest = event.message[event.message.length - 1];
+      this.trains.bits.mostRecentName = latest.name;
+
+      this.outputTrainInfo('bits');
+    } else if (event.type === 'superchat') {
+      this.trains.superchat.mostRecentEventAt = Date.now();
+      this.trains.superchat.counter += event.message.length;
+
+      const latest = event.message[event.message.length - 1];
+      this.trains.superchat.mostRecentName = latest.name;
+
+      this.outputTrainInfo('superchat');
+    } else if (event.type === 'stars') {
+      this.trains.stars.mostRecentEventAt = Date.now();
+      this.trains.stars.counter += event.message.length;
+
+      const latest = event.message[event.message.length - 1];
+      this.trains.stars.mostRecentName = latest.name;
+
+      this.outputTrainInfo('stars');
     }
   }
 

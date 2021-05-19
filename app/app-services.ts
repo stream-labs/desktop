@@ -59,6 +59,7 @@ export { UserService } from './services/user';
 export { YoutubeService } from 'services/platforms/youtube';
 export { TwitchService } from 'services/platforms/twitch';
 export { FacebookService } from 'services/platforms/facebook';
+export { TiktokService } from 'services/platforms/tiktok';
 export { RestreamService } from 'services/restream';
 export { TwitterService } from 'services/integrations/twitter';
 export { UsageStatisticsService } from './services/usage-statistics';
@@ -76,7 +77,6 @@ export { VideoEncodingOptimizationService } from 'services/video-encoding-optimi
 export { StreamingService } from 'services/streaming';
 export { StreamlabelsService } from 'services/streamlabels';
 export { AutoConfigService } from 'services/auto-config';
-export { FacemasksService } from 'services/facemasks';
 export { PlatformAppsService } from 'services/platform-apps';
 export { PlatformAppStoreService } from 'services/platform-app-store';
 export { PlatformAppAssetsService } from 'services/platform-apps/platform-app-assets-service';
@@ -111,10 +111,51 @@ import { CustomizationService } from './services/customization';
 import { ScenesService } from './services/scenes';
 import { EditorCommandsService } from './services/editor-commands';
 import { PerformanceService } from './services/performance';
+import { SourcesService } from './services/sources';
+import { StreamingService } from './services/streaming';
+import { StreamSettingsService } from './services/settings/streaming';
+import { RestreamService } from './services/restream';
+import { VideoEncodingOptimizationService } from './services/video-encoding-optimizations';
+import { TwitterService } from './services/integrations/twitter';
+import { SettingsService } from './services/settings';
+import { UserService } from './services/user';
+import { TwitchService } from './services/platforms/twitch';
+import { YoutubeService } from './services/platforms/youtube';
+import { FacebookService } from './services/platforms/facebook';
+import { DismissablesService } from './services/dismissables';
+import { NavigationService } from './services/navigation';
+import { AnnouncementsService } from './services/announcements';
+import { PatchNotesService } from './services/patch-notes';
+import { VideoService } from './services/video';
+import { ChatService } from './services/chat';
+import { TransitionsService } from './services/transitions';
+import { MagicLinkService } from './services/magic-link';
+import { UsageStatisticsService } from './services/usage-statistics';
+
 export const AppServices = {
   WindowsService,
   ScenesService,
+  NavigationService,
+  AnnouncementsService,
+  SettingsService,
   CustomizationService,
   EditorCommandsService,
   PerformanceService,
+  SourcesService,
+  PatchNotesService,
+  VideoService,
+  ChatService,
+  StreamingService,
+  StreamSettingsService,
+  RestreamService,
+  VideoEncodingOptimizationService,
+  TwitterService,
+  YoutubeService,
+  FacebookService,
+  UserService,
+  TwitchService,
+  DismissablesService,
+  TransitionsService,
+  MagicLinkService,
+  UsageStatisticsService,
 };

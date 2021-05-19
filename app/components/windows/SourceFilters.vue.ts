@@ -10,7 +10,7 @@ import { EditorCommandsService } from 'services/editor-commands';
 import ModalLayout from 'components/ModalLayout.vue';
 import NavMenu from 'components/shared/NavMenu.vue';
 import NavItem from 'components/shared/NavItem.vue';
-import Display from 'components/shared/Display.vue';
+import { Display } from 'components/shared/ReactComponent';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import GenericForm from 'components/obs/inputs/GenericForm';
 import { Subscription } from 'rxjs';
@@ -35,9 +35,9 @@ interface IFilterNodeData {
   },
 })
 export default class SourceFilters extends Vue {
-  @Inject() sourceFiltersService: SourceFiltersService;
+  @Inject() sourceFiltersService!: SourceFiltersService;
   @Inject() sourcesService: SourcesService;
-  @Inject() windowsService: WindowsService;
+  @Inject() windowsService!: WindowsService;
   @Inject() private editorCommandsService: EditorCommandsService;
 
   windowOptions = this.windowsService.getChildWindowQueryParams() as {
@@ -92,6 +92,12 @@ export default class SourceFilters extends Vue {
     this.removeFilterSub.unsubscribe();
     this.updateFilterSub.unsubscribe();
     this.reorderFilterSub.unsubscribe();
+  }
+
+  get isVisualSource() {
+    const source = this.sourcesService.views.getSource(this.sourceId);
+    if (!source) return false;
+    return source.video;
   }
 
   get presetFilterOptions() {

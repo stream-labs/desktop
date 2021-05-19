@@ -122,7 +122,7 @@ export class ApiClient {
 
     const response = this.sendMessageSync(requestBody);
     const parsedResponse = JSON.parse(response.toString());
-    this.log(`Response Sync:`, parsedResponse);
+    this.log('Response Sync:', parsedResponse);
 
     if (parsedResponse.error) {
       throw parsedResponse.error;

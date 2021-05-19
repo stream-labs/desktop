@@ -12,9 +12,9 @@ interface IMigration {
   transform: Function;
 }
 
-export abstract class PersistentStatefulService<TState extends object> extends StatefulService<
-  TState
-> {
+export abstract class PersistentStatefulService<
+  TState extends object
+> extends StatefulService<TState> {
   // This is the default state if the state is not found
   // in local storage.
   static defaultState = {};
@@ -22,7 +22,7 @@ export abstract class PersistentStatefulService<TState extends object> extends S
   static get initialState() {
     const persisted = JSON.parse(localStorage.getItem(this.localStorageKey) as string) || {};
 
-    return merge({}, this.defaultState, persisted);
+    return this.filter(merge({}, this.defaultState, persisted));
   }
 
   static get localStorageKey() {
@@ -32,7 +32,9 @@ export abstract class PersistentStatefulService<TState extends object> extends S
   init() {
     this.store.watch(
       () => {
-        return JSON.stringify(this.state);
+        return JSON.stringify(
+          (this.constructor as typeof PersistentStatefulService).filter(this.state),
+        );
       },
       val => {
         // save only non-default values to the localStorage
@@ -44,6 +46,11 @@ export abstract class PersistentStatefulService<TState extends object> extends S
         localStorage.setItem(PersistentService.localStorageKey, JSON.stringify(valueToSave));
       },
     );
+  }
+
+  // Overwrite to exclude persisting portions of state to local storage
+  static filter(state: any) {
+    return state;
   }
 
   runMigrations(persistedState: any, migrations: IMigration[]) {
