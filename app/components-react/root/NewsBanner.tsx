@@ -12,10 +12,13 @@ export default function NewsBanner() {
 
   const [processingClose, setProcessingClose] = useState(false);
 
-  const v = useVuex(() => ({
-    currentBanner: AnnouncementsService.state,
-    bannerExists: AnnouncementsService.bannerExists,
-  }));
+  const v = useVuex(
+    () => ({
+      currentBanner: AnnouncementsService.state,
+      bannerExists: AnnouncementsService.bannerExists,
+    }),
+    false,
+  );
 
   const oldBannerState = useRef(v.bannerExists);
 

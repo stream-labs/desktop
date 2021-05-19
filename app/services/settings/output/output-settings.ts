@@ -89,6 +89,7 @@ export interface IOutputSettings {
 
 interface IOutputSettingsPatch {
   mode?: TOutputSettingsMode;
+  inputResolution?: string;
   streaming?: Partial<IStreamingEncoderSettings>;
   recording?: Partial<IRecordingEncoderSettings>;
   replayBuffer?: Partial<IReplayBufferSettings>;
@@ -348,6 +349,10 @@ export class OutputSettingsService extends Service {
       this.settingsService.setSettingValue('Output', 'Mode', settingsPatch.mode);
     }
     const currentSettings = this.getSettings();
+
+    if (settingsPatch.inputResolution) {
+      this.settingsService.setSettingValue('Video', 'Base', settingsPatch.inputResolution);
+    }
 
     if (settingsPatch.streaming) {
       this.setStreamingEncoderSettings(currentSettings, settingsPatch.streaming);

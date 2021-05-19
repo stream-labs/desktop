@@ -158,7 +158,6 @@ export class YoutubeService
   extends BasePlatformService<IYoutubeServiceState>
   implements IPlatformService {
   @Inject() private customizationService: CustomizationService;
-  @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private windowsService: WindowsService;
   @Inject() private i18nService: I18nService;
 
@@ -167,6 +166,9 @@ export class YoutubeService
     'description',
     'chat',
     'stream-schedule',
+    'streamlabels',
+    'themes',
+    'viewerCount',
   ]);
 
   static initialState: IYoutubeServiceState = {
@@ -294,10 +296,10 @@ export class YoutubeService
         platform: 'youtube',
         key: streamKey,
         streamType: 'rtmp_common',
+        server: 'rtmp://a.rtmp.youtube.com/live2',
       });
     }
 
-    // update the local state
     this.UPDATE_STREAM_SETTINGS({ ...ytSettings, broadcastId: broadcast.id });
     this.SET_STREAM_ID(stream.id);
     this.SET_STREAM_KEY(streamKey);
@@ -343,10 +345,6 @@ export class YoutubeService
       .then(json =>
         json.settings.autopublish ? `Support the stream: ${json.donation_url} \n` : '',
       );
-  }
-
-  fetchUserInfo() {
-    return Promise.resolve({});
   }
 
   protected async fetchViewerCount(): Promise<number> {
@@ -709,6 +707,13 @@ export class YoutubeService
     // otherwise convert the passed base64url to blob
     const url =
       base64url !== 'default' ? base64url : `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+
+    if (base64url.startsWith('http')) {
+      // if non-base64 url passed then image is already uploaded
+      // skip uploading
+      return;
+    }
+
     const body = await fetch(url).then(res => res.blob());
 
     try {

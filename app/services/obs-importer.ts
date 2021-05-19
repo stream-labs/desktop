@@ -360,6 +360,12 @@ export class ObsImporterService extends StatefulService<{ progress: number; tota
     channelNames.forEach((channelName, i) => {
       const obsAudioSource = configJSON[channelName];
       if (obsAudioSource) {
+        const isSourceAvailable = this.sourcesService
+          .getAvailableSourcesTypes()
+          .includes(obsAudioSource.id);
+
+        if (!isSourceAvailable) return;
+
         const newSource = this.sourcesService.createSource(
           obsAudioSource.name,
           obsAudioSource.id,

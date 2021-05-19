@@ -122,6 +122,7 @@ export class StreamingService
         twitch: 'not-started',
         youtube: 'not-started',
         facebook: 'not-started',
+        tiktok: 'not-started',
         setupMultistream: 'not-started',
         startVideoTransmission: 'not-started',
         postTweet: 'not-started',
@@ -395,6 +396,11 @@ export class StreamingService
         this.usageStatisticsService.recordFeatureUsage('StreamToFacebookPage');
       }
     }
+
+    // send analytics for TikTok
+    if (settings.platforms.tiktok?.enabled) {
+      this.usageStatisticsService.recordFeatureUsage('StreamToTikTok');
+    }
   }
 
   /**
@@ -453,7 +459,7 @@ export class StreamingService
     const destinations = settings.platforms;
     const platforms = (Object.keys(destinations) as TPlatform[]).filter(
       dest => destinations[dest].enabled && this.views.supports('stream-schedule', [dest]),
-    );
+    ) as ('facebook' | 'youtube')[];
     for (const platform of platforms) {
       const service = getPlatformService(platform);
       assertIsDefined(service.scheduleStream);
@@ -623,16 +629,20 @@ export class StreamingService
       this.startReplayBuffer();
     }
 
-    startStreamingPromise.then(() => {
-      // run afterGoLive hooks
-      try {
-        this.views.enabledPlatforms.forEach(platform => {
-          getPlatformService(platform).afterGoLive();
-        });
-      } catch (e: unknown) {
-        console.error('Error running afterGoLive for platform', e);
-      }
-    });
+    startStreamingPromise
+      .then(() => {
+        // run afterGoLive hooks
+        try {
+          this.views.enabledPlatforms.forEach(platform => {
+            getPlatformService(platform).afterGoLive();
+          });
+        } catch (e: unknown) {
+          console.error('Error running afterGoLive for platform', e);
+        }
+      })
+      .catch(() => {
+        console.warn('startStreamingPromise was rejected');
+      });
 
     return startStreamingPromise;
   }
@@ -754,7 +764,7 @@ export class StreamingService
     const width = 900;
 
     const isLegacy =
-      !this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
+      !this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
       this.customizationService.state.experimental?.legacyGoLive;
 
     const componentName = isLegacy ? 'GoLiveWindowDeprecated' : 'GoLiveWindow';
@@ -774,7 +784,7 @@ export class StreamingService
     const width = 900;
 
     const isLegacy =
-      !this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
+      !this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
       this.customizationService.state.experimental?.legacyGoLive;
 
     const componentName = isLegacy ? 'EditStreamWindowDeprecated' : 'EditStreamWindow';
@@ -934,9 +944,9 @@ export class StreamingService
           status: EStreamingState.Offline,
         });
       } else if (info.signal === EOBSOutputSignal.Stopping) {
+        this.sendStreamEndEvent();
         this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
         this.streamingStatusChange.next(EStreamingState.Ending);
-        this.usageStatisticsService.recordEvent('stream_end');
       } else if (info.signal === EOBSOutputSignal.Reconnect) {
         this.SET_STREAMING_STATUS(EStreamingState.Reconnecting);
         this.streamingStatusChange.next(EStreamingState.Reconnecting);
@@ -1093,6 +1103,35 @@ export class StreamingService
         });
       this.windowsService.actions.closeChildWindow();
     }
+  }
+
+  private sendStreamEndEvent() {
+    const data: Dictionary<any> = {};
+    data.viewerCounts = {};
+    data.duration = Math.round(moment().diff(moment(this.state.streamingStatusTime)) / 1000);
+
+    if (this.views.protectedModeEnabled) {
+      data.platforms = this.views.enabledPlatforms;
+
+      this.views.customDestinations.forEach(() => {
+        data.platforms.push('custom_rtmp');
+      });
+
+      this.views.enabledPlatforms.forEach(platform => {
+        const service = getPlatformService(platform);
+
+        if (service.hasCapability('viewerCount')) {
+          data.viewerCounts[platform] = {
+            average: service.averageViewers,
+            peak: service.peakViewers,
+          };
+        }
+      });
+    } else {
+      data.platforms = ['custom_rtmp'];
+    }
+
+    this.usageStatisticsService.recordEvent('stream_end', data);
   }
 
   /**

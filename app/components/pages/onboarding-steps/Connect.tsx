@@ -1,8 +1,8 @@
 import cx from 'classnames';
 import { Component } from 'vue-property-decorator';
 import electron from 'electron';
-import { UserService, EAuthProcessState } from 'services/user';
-import { TPlatform, EPlatformCallResult } from 'services/platforms';
+import { EAuthProcessState, UserService } from 'services/user';
+import { EPlatformCallResult, TPlatform } from 'services/platforms';
 import { Inject } from 'services/core/injector';
 import { OnboardingService } from 'services/onboarding';
 import TsxComponent, { createProps } from 'components/tsx-component';
@@ -13,6 +13,12 @@ import ListInput from 'components/shared/inputs/ListInput.vue';
 import ExtraPlatformConnect, { TExtraPlatform } from './ExtraPlatformConnect';
 import { IListOption } from '../../shared/inputs';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import { StreamingService } from '../../../services/streaming';
+import { PlatformLogo } from '../../shared/ReactComponent';
+import {
+  EAvailableFeatures,
+  IncrementalRolloutService,
+} from '../../../services/incremental-rollout';
 
 class ConnectProps {
   continue: () => void = () => {};
@@ -23,6 +29,8 @@ export default class Connect extends TsxComponent<ConnectProps> {
   @Inject() userService: UserService;
   @Inject() onboardingService: OnboardingService;
   @Inject() usageStatisticsService: UsageStatisticsService;
+  @Inject() streamingService!: StreamingService;
+  @Inject() incrementalRolloutService: IncrementalRolloutService;
 
   selectedExtraPlatform: TExtraPlatform | '' = '';
 
@@ -63,16 +71,6 @@ export default class Connect extends TsxComponent<ConnectProps> {
     }
   }
 
-  iconForPlatform(platform: TPlatform) {
-    if (this.loading) return 'fas fa-spinner fa-spin';
-
-    return {
-      twitch: 'fab fa-twitch',
-      youtube: 'fab fa-youtube',
-      facebook: 'fab fa-facebook',
-    }[platform];
-  }
-
   get isSecurityUpgrade() {
     return this.onboardingService.options.isSecurityUpgrade;
   }
@@ -97,7 +95,12 @@ export default class Connect extends TsxComponent<ConnectProps> {
     this.props.continue();
   }
 
-  selectOtherPlatform(platform: TExtraPlatform) {
+  selectOtherPlatform(platform: TExtraPlatform | 'tiktok') {
+    if (platform === 'tiktok') {
+      this.authPlatform('tiktok');
+      return;
+    }
+
     this.usageStatisticsService.recordAnalyticsEvent('PlatformLogin', platform);
     this.selectedExtraPlatform = platform;
   }
@@ -112,6 +115,8 @@ export default class Connect extends TsxComponent<ConnectProps> {
         />
       );
     }
+
+    const platforms = ['twitch', 'youtube', 'facebook'];
 
     return (
       <div class={styles.pageContainer}>
@@ -132,13 +137,22 @@ export default class Connect extends TsxComponent<ConnectProps> {
             </h3>
           )}
           <div class={styles.signupButtons}>
-            {['twitch', 'youtube', 'facebook'].map((platform: TPlatform) => (
+            {platforms.map((platform: TPlatform) => (
               <button
                 class={cx(`button button--${platform}`, styles.loginButton)}
                 disabled={this.loading}
                 onClick={() => this.authPlatform(platform)}
               >
-                <i class={this.iconForPlatform(platform)} />
+                {this.loading && <i class="fas fa-spinner fa-spin" />}
+                {!this.loading && (
+                  <PlatformLogo
+                    componentProps={{
+                      platform,
+                      size: 'medium',
+                      color: platform === 'tiktok' ? 'var(--tiktok-inverse)' : 'white',
+                    }}
+                  />
+                )}
               </button>
             ))}
           </div>
@@ -150,6 +164,14 @@ export default class Connect extends TsxComponent<ConnectProps> {
               name: 'otherPlatform',
               placeholder: $t('Select platform'),
               options: [
+                {
+                  value: 'tiktok',
+                  title: 'TikTok',
+                  data: {
+                    image:
+                      'data:image/png;base64,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',
+                  },
+                },
                 {
                   value: 'dlive',
                   title: 'Dlive',

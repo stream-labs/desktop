@@ -19,6 +19,7 @@ interface IContainerInfo {
   persistent: boolean;
   container: electron.BrowserView;
   transform: BehaviorSubject<IBrowserViewTransform>;
+  mountedWindows: number[];
 }
 
 /**
@@ -105,8 +106,9 @@ export class PlatformContainerManager {
     const containerInfo = this.getContainerInfoForSlot(app, slot);
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
 
-    // This method was added in our fork
-    (win as any).addBrowserView(containerInfo.container);
+    win.addBrowserView(containerInfo.container);
+
+    containerInfo.mountedWindows.push(electronWindowId);
 
     containerInfo.transform.next({
       ...containerInfo.transform.getValue(),
@@ -145,8 +147,9 @@ export class PlatformContainerManager {
     const transform = info.transform.getValue();
 
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
-    // This method was added in our fork
-    (win as any).removeBrowserView(info.container);
+    win.removeBrowserView(info.container);
+
+    info.mountedWindows = info.mountedWindows.filter(id => id !== electronWindowId);
 
     /* If these are different, it means that another window (likely the main)
      * already mounted this view first, so we don't need to do the following
@@ -208,6 +211,7 @@ export class PlatformContainerManager {
         electronWindowId: null,
         slobsWindowId: null,
       }),
+      mountedWindows: [],
     };
 
     if (app.unpacked) view.webContents.openDevTools();
@@ -244,9 +248,15 @@ export class PlatformContainerManager {
     // Remove the container from the list of containers
     this.containers = this.containers.filter(c => c.container.id !== containerId);
 
+    // Unmount from all windows first (prevents crashes)
+    info.mountedWindows.forEach(winId => {
+      const win = electron.remote.BrowserWindow.fromId(winId);
+      if (win && !win.isDestroyed()) win.removeBrowserView(info.container);
+    });
+
     // Electron types are incorrect here.  This method exists and is documented, but
     // does not appear in the type definitions.
-    (info.container as any).destroy();
+    info.container.destroy();
   }
 
   private getPageUrlForSlot(app: ILoadedApp, slot: EAppPageSlot) {

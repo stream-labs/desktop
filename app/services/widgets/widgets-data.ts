@@ -67,7 +67,7 @@ export const WidgetTesters: IWidgetTester[] = [
     url(host) {
       return `https://${host}/api/v5/slobs/test/streamlabs/donation`;
     },
-    platforms: ['twitch', 'youtube', 'facebook'],
+    platforms: ['twitch', 'youtube', 'facebook', 'tiktok'],
   },
   {
     name: 'Bits',
