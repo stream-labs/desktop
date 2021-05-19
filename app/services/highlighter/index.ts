@@ -686,6 +686,13 @@ export interface IExportInfo {
   step: EExportStep;
   cancelRequested: boolean;
   file: string;
+
+  /**
+   * Whether the export finished successfully.
+   * Will be set to false whenever something changes
+   * that requires a new export.
+   */
+  exported: boolean;
 }
 
 export interface ITransitionInfo {
@@ -767,6 +774,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       step: EExportStep.AudioMix,
       cancelRequested: false,
       file: path.join(electron.remote.app.getPath('videos'), 'Output.mp4'),
+      exported: false,
     },
   } as IHighligherState;
 
@@ -784,6 +792,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   ADD_CLIP(clip: IClip) {
     Vue.set(this.state.clips, clip.path, clip);
     this.state.clipOrder.push(clip.path);
+    this.state.export.exported = false;
   }
 
   @mutation()
@@ -792,17 +801,20 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       ...this.state.clips[clip.path],
       ...clip,
     });
+    this.state.export.exported = false;
   }
 
   @mutation()
   SET_ORDER(order: string[]) {
     this.state.clipOrder = order;
+    this.state.export.exported = false;
   }
 
   @mutation()
   SET_EXPORT_INFO(exportInfo: Partial<IExportInfo>) {
     this.state.export = {
       ...this.state.export,
+      exported: false,
       ...exportInfo,
     };
   }
@@ -813,6 +825,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       ...this.state.transition,
       ...transitionInfo,
     };
+    this.state.export.exported = false;
   }
 
   get views() {
@@ -919,6 +932,10 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     this.SET_EXPORT_INFO({ cancelRequested: true });
   }
 
+  /**
+   * Exports the video using the currently configured settings
+   * Return true if the video was exported, or false if not.
+   */
   async export() {
     if (!this.views.loaded) {
       console.error('Highlighter: Export called while clips are not fully loaded!');
@@ -1036,6 +1053,6 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     }
 
     await fader.cleanup();
-    this.SET_EXPORT_INFO({ exporting: false });
+    this.SET_EXPORT_INFO({ exporting: false, exported: true });
   }
 }

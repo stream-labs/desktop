@@ -24,7 +24,7 @@ interface IYoutubeUploadResponse {
   id: string;
 }
 
-type TPrivacyStatus = 'private' | 'public' | 'unlisted';
+export type TPrivacyStatus = 'private' | 'public' | 'unlisted';
 type TProgressCallback = (progress: IUploadProgress) => void;
 
 export class YoutubeUploader {
