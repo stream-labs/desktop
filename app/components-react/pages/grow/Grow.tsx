@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import sampleSize from 'lodash/sampleSize';
-import { Button } from 'antd';
+import { Button, Modal, Form } from 'antd';
 import { $t } from '../../../services/i18n';
 import styles from './Grow.m.less';
 import { useVuex } from '../../hooks';
@@ -9,6 +9,7 @@ import { IGoal, IUniversityProgress, ICommunityReach } from '../../../services/g
 import Util from '../../../services/utils';
 import Scrollable from 'components-react/shared/Scrollable';
 import { GoalCard, PlatformCard, UniversityCard, ContentHubCard, MultistreamCard } from './Cards';
+import { TextInput, NumberInput } from 'components-react/shared/inputs';
 
 export default function Grow() {
   const { GrowService } = Services;
@@ -54,11 +55,37 @@ export default function Grow() {
 
 function MyGoals(p: { goals: Dictionary<IGoal> }) {
   const { GrowService } = Services;
+  const [s, setState] = useState({
+    showGoalModal: false,
+    goalTitle: '',
+    goalTotal: 10,
+  });
   const mappedGoals = Object.values(p.goals);
   const appendedOptions = sampleSize(
     GrowService.views.goalOptions.filter(goal => !p.goals[goal.id]),
     4 - mappedGoals.length,
   );
+
+  function showGoalModal() {
+    setState({ ...s, showGoalModal: true });
+  }
+
+  function hideGoalModal() {
+    setState({ ...s, showGoalModal: false });
+  }
+
+  function setGoalTitle(val: string) {
+    setState({ ...s, goalTitle: val });
+  }
+
+  function setGoalTotal(val: number) {
+    setState({ ...s, goalTotal: val });
+  }
+
+  function addGoal() {
+    GrowService.actions.addGoal({ title: s.goalTitle, total: s.goalTotal, id: '', image: '' });
+    setState({ ...s, showGoalModal: false, goalTitle: '', goalTotal: 10 });
+  }
 
   return (
     <div className={styles.myGoals}>
@@ -69,9 +96,31 @@ function MyGoals(p: { goals: Dictionary<IGoal> }) {
           <GoalCard goal={goal} key={goal.id} />
         ))}
         {appendedOptions.map(goal => (
-          <GoalCard goal={goal} key={goal.id} />
+          <GoalCard goal={goal} key={goal.id} showGoalModal={showGoalModal} />
         ))}
       </div>
+      <Modal
+        visible={s.showGoalModal}
+        getContainer={`.${styles.goalTabContainer}`}
+        onOk={addGoal}
+        onCancel={hideGoalModal}
+        title={$t('Add Goal')}
+      >
+        <Form>
+          <TextInput
+            label={$t('Goal Title')}
+            value={s.goalTitle}
+            onChange={setGoalTitle}
+            uncontrolled={false}
+          />
+          <NumberInput
+            label={$t('Goal Total')}
+            value={s.goalTotal}
+            min={0}
+            onChange={setGoalTotal}
+          />
+        </Form>
+      </Modal>
     </div>
   );
 }

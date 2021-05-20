@@ -136,7 +136,7 @@ export class GrowService extends PersistentStatefulService<IGrowServiceState> {
       ...goal,
       progress: 0,
       startDate: Date.now(),
-      id: goal.id === 'custom' ? uuid() : goal.id,
+      id: goal.id === '' ? uuid() : goal.id,
     };
 
     this.ADD_GOAL(goalWithId);

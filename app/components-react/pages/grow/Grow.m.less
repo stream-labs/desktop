@@ -4,6 +4,11 @@
   display: grid;
   grid-template-columns: 1fr 320px;
   grid-template-rows: minmax(0, 1fr);
+  position: relative;
+
+  :global(.ant-modal-wrap), :global(.ant-modal-mask) {
+    position: absolute;
+  }
 }
 
 .goal-tab-content {

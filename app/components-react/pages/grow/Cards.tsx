@@ -9,7 +9,7 @@ import { $t } from '../../../services/i18n';
 
 const ONE_DAY = 1000 * 60 * 60 * 24;
 
-export function GoalCard(p: { goal: IGoal }) {
+export function GoalCard(p: { goal: IGoal; showGoalModal?: Function }) {
   const { GrowService } = Services;
   const { title, image, id } = p.goal;
 
@@ -20,7 +20,11 @@ export function GoalCard(p: { goal: IGoal }) {
   }
 
   function addGoal() {
-    GrowService.actions.addGoal(p.goal);
+    if (id === 'custom' && p.showGoalModal) {
+      p.showGoalModal();
+    } else {
+      GrowService.actions.addGoal(p.goal);
+    }
   }
 
   function removeGoal() {
