@@ -8,10 +8,13 @@ import createTexture from 'gl-texture2d';
 import createTransition from './create-transition';
 import Vue from 'vue';
 import fs from 'fs-extra';
-
 import { StreamingService } from 'services/streaming';
 import electron from 'electron';
 import Utils from 'services/utils';
+import { getPlatformService } from 'services/platforms';
+import { UserService } from 'services/user';
+import { IYoutubeVideoUploadOptions } from 'services/platforms/youtube/uploader';
+import { YoutubeService } from 'services/platforms/youtube';
 
 // const FFMPEG_DIR = path.resolve('../../', 'Downloads', 'ffmpeg', 'bin');
 const FFMPEG_DIR = Utils.isDevMode()
@@ -695,6 +698,12 @@ export interface IExportInfo {
   exported: boolean;
 }
 
+export interface IUploadInfo {
+  uploading: boolean;
+  uploadedBytes: number;
+  totalBytes: number;
+}
+
 export interface ITransitionInfo {
   type: string;
   duration: number;
@@ -705,6 +714,7 @@ interface IHighligherState {
   clipOrder: string[];
   transition: ITransitionInfo;
   export: IExportInfo;
+  upload: IUploadInfo;
 }
 
 class HighligherViews extends ViewHandler<IHighligherState> {
@@ -734,6 +744,10 @@ class HighligherViews extends ViewHandler<IHighligherState> {
 
   get exportInfo() {
     return this.state.export;
+  }
+
+  get uploadInfo() {
+    return this.state.upload;
   }
 
   get transition() {
@@ -776,9 +790,15 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       file: path.join(electron.remote.app.getPath('videos'), 'Output.mp4'),
       exported: false,
     },
+    upload: {
+      uploading: false,
+      uploadedBytes: 0,
+      totalBytes: 0,
+    },
   } as IHighligherState;
 
   @Inject() streamingService: StreamingService;
+  @Inject() userService: UserService;
 
   /**
    * A dictionary of actual clip classes.
@@ -816,6 +836,14 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       ...this.state.export,
       exported: false,
       ...exportInfo,
+    };
+  }
+
+  @mutation()
+  SET_UPLOAD_INFO(uploadInfo: Partial<IUploadInfo>) {
+    this.state.upload = {
+      ...this.state.upload,
+      ...uploadInfo,
     };
   }
 
@@ -1053,6 +1081,33 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     }
 
     await fader.cleanup();
-    this.SET_EXPORT_INFO({ exporting: false, exported: true });
+    this.SET_EXPORT_INFO({ exporting: false, exported: !this.views.exportInfo.cancelRequested });
+  }
+
+  async upload(options: IYoutubeVideoUploadOptions) {
+    if (!this.userService.state.auth?.platforms.youtube) {
+      throw new Error('Cannot upload without YT linked');
+    }
+
+    if (!this.views.exportInfo.exported) {
+      throw new Error('Cannot upload when export is not complete');
+    }
+
+    this.SET_UPLOAD_INFO({ uploading: true });
+
+    const yt = getPlatformService('youtube') as YoutubeService;
+
+    try {
+      await yt.uploader.uploadVideo(this.views.exportInfo.file, options, progress => {
+        this.SET_UPLOAD_INFO({
+          uploadedBytes: progress.uploadedBytes,
+          totalBytes: progress.totalBytes,
+        });
+      });
+    } catch (e: unknown) {
+      console.error('Got error uploading YT video', e);
+    }
+
+    this.SET_UPLOAD_INFO({ uploading: false });
   }
 }

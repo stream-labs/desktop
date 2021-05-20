@@ -8,15 +8,37 @@ import Form from 'components-react/shared/inputs/Form';
 import path from 'path';
 import { Button, Progress } from 'antd';
 import { RadioInput } from 'components-react/shared/inputs/RadioInput';
+import { TPrivacyStatus } from 'services/platforms/youtube/uploader';
+
+// Source: https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string/10420404
+function humanFileSize(bytes: number, si: boolean) {
+  const thresh = si ? 1000 : 1024;
+  if (Math.abs(bytes) < thresh) {
+    return bytes + ' B';
+  }
+  const units = si
+    ? ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+    : ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+  let u = -1;
+  do {
+    bytes /= thresh;
+    ++u;
+  } while (Math.abs(bytes) >= thresh && u < units.length - 1);
+  return bytes.toFixed(1) + ' ' + units[u];
+}
 
 function YoutubeUpload(props: { defaultTitle: string }) {
   const [title, setTitle] = useState(props.defaultTitle);
   const [description, setDescription] = useState('');
   const [privacy, setPrivacy] = useState('private');
+  const { UserService, HighlighterService } = Services;
+  const v = useVuex(() => ({
+    youtubeLinked: !!UserService.state.auth?.platforms.youtube,
+    uploadInfo: HighlighterService.views.uploadInfo,
+  }));
 
-  return (
-    <div>
-      <h2>Upload to YouTube</h2>
+  function getYoutubeForm() {
+    return (
       <Form>
         <TextInput label="Title" value={title} onChange={setTitle} />
         <TextAreaInput label="Description" value={description} onChange={setDescription} />
@@ -39,9 +61,54 @@ function YoutubeUpload(props: { defaultTitle: string }) {
           onChange={setPrivacy}
         />
         <div style={{ textAlign: 'right' }}>
-          <Button type="primary">Publish</Button>
+          <Button
+            type="primary"
+            onClick={() => {
+              HighlighterService.actions.upload({
+                title,
+                description,
+                privacyStatus: privacy as TPrivacyStatus,
+              });
+            }}
+          >
+            Publish
+          </Button>
         </div>
       </Form>
+    );
+  }
+
+  function getUploadProgress() {
+    return (
+      <div>
+        <h2>Upload Progress</h2>
+        <Progress
+          percent={Math.round((v.uploadInfo.uploadedBytes / v.uploadInfo.totalBytes) * 100)}
+          trailColor="var(--section)"
+        />
+        <div>
+          Uploading: {humanFileSize(v.uploadInfo.uploadedBytes, false)}/
+          {humanFileSize(v.uploadInfo.totalBytes, false)}
+        </div>
+        {/* <br />
+        <button
+          className="button button--soft-warning"
+          onClick={() => HighlighterService.actions.cancelExport()}
+          style={{ marginTop: '16px' }}
+          disabled={v.exportInfo.cancelRequested}
+        >
+          Cancel
+        </button> */}
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <h2>Upload to YouTube</h2>
+      {v.youtubeLinked && !v.uploadInfo.uploading && getYoutubeForm()}
+      {v.youtubeLinked && v.uploadInfo.uploading && getUploadProgress()}
+      {!v.youtubeLinked && <div>TODO: Youtube is not linked</div>}
     </div>
   );
 }

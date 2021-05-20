@@ -5,7 +5,7 @@ import { platformRequest } from '../utils';
 import { Inject } from 'services/core';
 import { UserService } from 'services/user';
 
-interface IYoutubeVideoUploadOptions {
+export interface IYoutubeVideoUploadOptions {
   title: string;
   description: string;
   privacyStatus: TPrivacyStatus;
@@ -42,6 +42,11 @@ export class YoutubeUploader {
     const parsed = path.parse(filePath);
     const type = mime.getType(parsed.ext);
     const stats = fs.lstatSync(filePath);
+
+    onProgress({
+      totalBytes: stats.size,
+      uploadedBytes: 0,
+    });
 
     const headers = new Headers();
 
