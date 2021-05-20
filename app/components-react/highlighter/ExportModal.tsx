@@ -35,31 +35,72 @@ function YoutubeUpload(props: { defaultTitle: string }) {
   const v = useVuex(() => ({
     youtubeLinked: !!UserService.state.auth?.platforms.youtube,
     uploadInfo: HighlighterService.views.uploadInfo,
+    exportInfo: HighlighterService.views.exportInfo,
   }));
 
   function getYoutubeForm() {
     return (
-      <Form>
-        <TextInput label="Title" value={title} onChange={setTitle} />
-        <TextAreaInput label="Description" value={description} onChange={setDescription} />
-        <RadioInput
-          label="Privacy Status"
-          options={[
-            {
-              label: 'Private',
-              value: 'private',
-              description: 'Only you and people you choose can watch your video',
-            },
-            {
-              label: 'Unlisted',
-              value: 'unlisted',
-              description: 'Anyone with the video link can watch your video',
-            },
-            { label: 'Public', value: 'public', description: 'Everyone can watch your video' },
-          ]}
-          value={privacy}
-          onChange={setPrivacy}
-        />
+      <div>
+        <div style={{ display: 'flex', flexDirection: 'row' }}>
+          <div style={{ flexGrow: 1 }}>
+            <Form layout="vertical">
+              <TextInput label="Title" value={title} onInput={setTitle} uncontrolled={false} />
+              <TextAreaInput label="Description" value={description} onChange={setDescription} />
+              <RadioInput
+                label="Privacy Status"
+                options={[
+                  {
+                    label: 'Private',
+                    value: 'private',
+                    description: 'Only you and people you choose can watch your video',
+                  },
+                  {
+                    label: 'Unlisted',
+                    value: 'unlisted',
+                    description: 'Anyone with the video link can watch your video',
+                  },
+                  {
+                    label: 'Public',
+                    value: 'public',
+                    description: 'Everyone can watch your video',
+                  },
+                ]}
+                value={privacy}
+                onChange={setPrivacy}
+              />
+            </Form>
+          </div>
+          <div
+            style={{
+              width: 300,
+              marginLeft: 24,
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <video
+              src={v.exportInfo.file}
+              controls
+              style={{
+                width: '100%',
+                borderTopRightRadius: 8,
+                borderTopLeftRadius: 8,
+                outline: 'none',
+              }}
+            />
+            <div
+              style={{
+                borderBottomLeftRadius: 8,
+                borderBottomRightRadius: 8,
+                background: 'var(--section)',
+                fontWeight: 800,
+                padding: 12,
+              }}
+            >
+              {title}
+            </div>
+          </div>
+        </div>
         <div style={{ textAlign: 'right' }}>
           <Button
             type="primary"
@@ -74,7 +115,7 @@ function YoutubeUpload(props: { defaultTitle: string }) {
             Publish
           </Button>
         </div>
-      </Form>
+      </div>
     );
   }
 
@@ -122,9 +163,6 @@ export default function ExportModal() {
   const v = useVuex(() => ({
     exportInfo: HighlighterService.views.exportInfo,
   }));
-  // Video name and export file are kept in sync
-  const [videoName, setVideoName] = useState('My Video');
-  const [exportFile, setExportFile] = useState<string>(getExportFileFromVideoName(videoName));
 
   function getExportFileFromVideoName(videoName: string) {
     const parsed = path.parse(v.exportInfo.file);
@@ -134,6 +172,10 @@ export default function ExportModal() {
   function getVideoNameFromExportFile(exportFile: string) {
     return path.parse(exportFile).name;
   }
+
+  // Video name and export file are kept in sync
+  const [videoName, setVideoName] = useState('My Video');
+  const [exportFile, setExportFile] = useState<string>(getExportFileFromVideoName(videoName));
 
   // TODO: Give warning overwriting
   // TODO: Show confirm when closing modal after export
