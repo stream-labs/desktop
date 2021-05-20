@@ -55,7 +55,7 @@ export class ChatService extends Service {
     if (!this.chatView) this.initChat();
     this.electronWindowId = electronWindowId;
     const win = electron.remote.BrowserWindow.fromId(electronWindowId);
-    if (this.chatView) win.addBrowserView(this.chatView);
+    if (this.chatView && win) win.addBrowserView(this.chatView);
   }
 
   setChatBounds(position: IVec2, size: IVec2) {
@@ -72,7 +72,7 @@ export class ChatService extends Service {
   unmountChat() {
     if (!this.electronWindowId) return; // already unmounted
     const win = electron.remote.BrowserWindow.fromId(this.electronWindowId);
-    if (this.chatView) win.removeBrowserView(this.chatView);
+    if (this.chatView && win) win.removeBrowserView(this.chatView);
     this.electronWindowId = null;
   }
 
