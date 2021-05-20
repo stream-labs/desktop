@@ -20,6 +20,7 @@ export default function Highlighter() {
   const v = useVuex(() => ({
     clips: HighlighterService.views.clips as IClip[],
     exportInfo: HighlighterService.views.exportInfo,
+    uploadInfo: HighlighterService.views.uploadInfo,
     loadedCount: HighlighterService.views.loadedCount,
     loaded: HighlighterService.views.loaded,
     transition: HighlighterService.views.transition,
@@ -144,8 +145,9 @@ export default function Highlighter() {
         <Modal
           getContainer={`.${styles.clipsViewRoot}`}
           onCancel={() => {
-            // Do not allow closing export modal while export operation is progress
+            // Do not allow closing export modal while export/upload operations are in progress
             if (v.exportInfo.exporting) return;
+            if (v.uploadInfo.uploading) return;
 
             setInspectedClipPath(null);
             setShowModal(null);

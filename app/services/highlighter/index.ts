@@ -702,6 +702,7 @@ export interface IUploadInfo {
   uploading: boolean;
   uploadedBytes: number;
   totalBytes: number;
+  cancelRequested: boolean;
 }
 
 export interface ITransitionInfo {
@@ -794,6 +795,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       uploading: false,
       uploadedBytes: 0,
       totalBytes: 0,
+      cancelRequested: false,
     },
   } as IHighligherState;
 
@@ -1084,6 +1086,8 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     this.SET_EXPORT_INFO({ exporting: false, exported: !this.views.exportInfo.cancelRequested });
   }
 
+  cancelFunction: () => void = null;
+
   async upload(options: IYoutubeVideoUploadOptions) {
     if (!this.userService.state.auth?.platforms.youtube) {
       throw new Error('Cannot upload without YT linked');
@@ -1093,21 +1097,48 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       throw new Error('Cannot upload when export is not complete');
     }
 
-    this.SET_UPLOAD_INFO({ uploading: true });
+    if (this.views.uploadInfo.uploading) {
+      throw new Error('Cannot start a new upload when uploading is in progress');
+    }
+
+    this.SET_UPLOAD_INFO({ uploading: true, cancelRequested: false });
 
     const yt = getPlatformService('youtube') as YoutubeService;
 
-    try {
-      await yt.uploader.uploadVideo(this.views.exportInfo.file, options, progress => {
+    const { cancel, complete } = yt.uploader.uploadVideo(
+      this.views.exportInfo.file,
+      options,
+      progress => {
         this.SET_UPLOAD_INFO({
           uploadedBytes: progress.uploadedBytes,
           totalBytes: progress.totalBytes,
         });
-      });
+      },
+    );
+
+    this.cancelFunction = cancel;
+
+    try {
+      await complete;
     } catch (e: unknown) {
-      console.error('Got error uploading YT video', e);
+      if (this.views.uploadInfo.cancelRequested) {
+        console.log('The upload was canceled');
+      } else {
+        console.error('Got error uploading YT video', e);
+      }
     }
 
-    this.SET_UPLOAD_INFO({ uploading: false });
+    this.cancelFunction = null;
+    this.SET_UPLOAD_INFO({ uploading: false, cancelRequested: false });
+  }
+
+  /**
+   * Will cancel the currently in progress upload
+   */
+  cancelUpload() {
+    if (this.cancelFunction && this.views.uploadInfo.uploading) {
+      this.SET_UPLOAD_INFO({ cancelRequested: true });
+      this.cancelFunction();
+    }
   }
 }

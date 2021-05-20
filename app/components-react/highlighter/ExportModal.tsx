@@ -85,20 +85,24 @@ function YoutubeUpload(props: { defaultTitle: string }) {
         <Progress
           percent={Math.round((v.uploadInfo.uploadedBytes / v.uploadInfo.totalBytes) * 100)}
           trailColor="var(--section)"
+          status={v.uploadInfo.cancelRequested ? 'exception' : 'normal'}
         />
-        <div>
-          Uploading: {humanFileSize(v.uploadInfo.uploadedBytes, false)}/
-          {humanFileSize(v.uploadInfo.totalBytes, false)}
-        </div>
-        {/* <br />
+        {!v.uploadInfo.cancelRequested && (
+          <div>
+            Uploading: {humanFileSize(v.uploadInfo.uploadedBytes, false)}/
+            {humanFileSize(v.uploadInfo.totalBytes, false)}
+          </div>
+        )}
+        {v.uploadInfo.cancelRequested && <span>Canceling...</span>}
+        <br />
         <button
           className="button button--soft-warning"
-          onClick={() => HighlighterService.actions.cancelExport()}
+          onClick={() => HighlighterService.actions.cancelUpload()}
           style={{ marginTop: '16px' }}
-          disabled={v.exportInfo.cancelRequested}
+          disabled={v.uploadInfo.cancelRequested}
         >
           Cancel
-        </button> */}
+        </button>
       </div>
     );
   }
