@@ -25,10 +25,7 @@ export function TiktokEditStreamInfo() {
       <InputWrapper
         extra={
           <p>
-            <a onClick={openInfoPage}>
-              {' '}
-              {$t('Click here to learn more about streaming on TikTok')}
-            </a>
+            <a onClick={openInfoPage}>{$t('Click here to learn more about streaming on TikTok')}</a>
           </p>
         }
       >
