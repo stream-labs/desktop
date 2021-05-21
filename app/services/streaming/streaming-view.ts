@@ -8,6 +8,7 @@ import { IncrementalRolloutService, TwitterService } from '../../app-services';
 import { EAvailableFeatures } from '../incremental-rollout';
 import cloneDeep from 'lodash/cloneDeep';
 import difference from 'lodash/difference';
+import { assertIsDefined } from '../../util/properties-type-guards';
 
 /**
  * The stream info view is responsible for keeping
@@ -279,7 +280,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   supports(capability: TPlatformCapability, targetPlatforms?: TPlatform[]): boolean {
     const platforms = targetPlatforms || this.enabledPlatforms;
     for (const platform of platforms) {
-      if (getPlatformService(platform).hasCapability(capability)) return true;
+      if (getPlatformService(platform).capabilities.has(capability)) return true;
     }
     return false;
   }
@@ -326,7 +327,9 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   /**
    * Return settings for a single platform
    */
-  getPlatformSettings<T extends TPlatform>(platform: T): IGoLiveSettings['platforms'][T] {
+  getPlatformSettings<T extends TPlatform>(
+    platform: T,
+  ): IGoLiveSettings['platforms'][T] | undefined {
     return this.settings.platforms[platform];
   }
 

@@ -34,7 +34,7 @@ export default function CommonPlatformFields(p: IProps) {
     descriptionIsRequired,
   } = useGoLiveSettings(ctx => {
     // description is required for Facebook
-    const fbSettings = ctx.platforms.facebook;
+    const fbSettings = ctx.platforms.facebook!;
     const descriptionIsRequired =
       p.platform === 'facebook' ||
       (!p.platform && fbSettings && fbSettings.enabled && !fbSettings.useCustomFields);
@@ -69,7 +69,7 @@ export default function CommonPlatformFields(p: IProps) {
     ? supports('description', [p.platform as TPlatform])
     : supports('description');
   const fields = shouldShowPropsForSinglePlatform
-    ? getPlatformSettings(p.platform as TPlatform)
+    ? getPlatformSettings(p.platform as TPlatform)!
     : commonFields;
 
   // find out the best title for common fields

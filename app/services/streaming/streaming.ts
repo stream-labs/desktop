@@ -35,7 +35,7 @@ import { EAvailableFeatures, IncrementalRolloutService } from 'services/incremen
 import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService } from 'services/restream';
 import {
-  FacebookService,
+  FacebookService, IFacebookLiveVideoExtended, IFacebookStartStreamOptions,
   TDestinationType,
 } from 'services/platforms/facebook';
 import Utils from 'services/utils';
@@ -46,7 +46,7 @@ import { authorizedHeaders } from 'util/requests';
 import { HostsService } from '../hosts';
 import { TwitterService } from '../integrations/twitter';
 import { assertIsDefined } from 'util/properties-type-guards';
-import { YoutubeService } from '../platforms/youtube';
+import {IYoutubeStartStreamOptions, YoutubeService} from '../platforms/youtube';
 import { StreamInfoView } from './streaming-view';
 import Vue from 'vue';
 

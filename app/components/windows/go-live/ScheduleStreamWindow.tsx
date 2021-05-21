@@ -176,7 +176,7 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
         >
           <div style={{ width: '400px', marginRight: '42px' }}>
             <DestinationSwitchers
-              platforms={this.settings.platforms}
+              platforms={this.settings.platforms as any}
               handleOnPlatformSwitch={(...args) => this.switchPlatform(...args)}
               canDisablePrimary={true}
             />

@@ -14,7 +14,7 @@ export function TiktokEditStreamInfo() {
   }));
 
   const bind = createBinding(
-    () => getSettings().platforms.tiktok,
+    () => getSettings().platforms.tiktok!,
     updatedSettings => updatePlatform('tiktok', updatedSettings),
   );
 

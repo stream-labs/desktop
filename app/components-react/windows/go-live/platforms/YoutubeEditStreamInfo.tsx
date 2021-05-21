@@ -26,13 +26,13 @@ export function YoutubeEditStreamInfo() {
     getSettings,
     useBinding,
   } = useGoLiveSettings(view => ({
-    ytSettings: view.platforms.youtube,
+    ytSettings: view.platforms.youtube!,
   }));
   const is360video = ytSettings.projection === '360';
   const shouldShowSafeForKidsWarn = ytSettings.selfDeclaredMadeForKids;
   const broadcastId = ytSettings.broadcastId;
   const bind = useBinding(
-    () => getSettings().platforms.youtube,
+    () => getSettings().platforms.youtube!,
     newYtSettings => updatePlatform('youtube', newYtSettings),
     fieldName => ({ disabled: fieldIsDisabled(fieldName as keyof IYoutubeStartStreamOptions) }),
   );

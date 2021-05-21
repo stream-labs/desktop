@@ -20,6 +20,7 @@ import moment from 'moment';
 import Translate from '../../../shared/Translate';
 import { IListOption } from '../../../shared/inputs/ListInput';
 import MessageLayout from '../MessageLayout';
+import {assertIsDefined} from "../../../../util/properties-type-guards";
 
 export default function FacebookEditStreamInfo() {
   // inject services
@@ -52,6 +53,7 @@ export default function FacebookEditStreamInfo() {
     const canStreamToTimeline = fbState.grantedPermissions.includes('publish_video');
     const canStreamToGroup = fbState.grantedPermissions.includes('publish_to_groups');
     const fbSettings = view.platforms.facebook;
+    assertIsDefined(fbSettings);
     return {
       canStreamToTimeline,
       canStreamToGroup,
@@ -74,7 +76,7 @@ export default function FacebookEditStreamInfo() {
     (!fbSettings.liveVideoId && fbSettings.privacy?.value !== 'SELF') ||
     (fbSettings.liveVideoId && fbSettings.privacy?.value);
   const bind = useBinding(
-    () => getSettings().platforms.facebook,
+    () => getSettings().platforms.facebook!,
     newFbSettings => updatePlatform('facebook', newFbSettings),
   );
 

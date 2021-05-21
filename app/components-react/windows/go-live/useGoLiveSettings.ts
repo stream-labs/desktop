@@ -1,5 +1,5 @@
 import { IGoLiveSettings, IStreamEvent, StreamInfoView } from '../../../services/streaming';
-import { TPlatform } from '../../../services/platforms';
+import { getPlatformService, TPlatform } from '../../../services/platforms';
 import { Services } from '../../service-provider';
 import { createMutations, merge, useStateManager } from '../../hooks/useStateManager';
 import cloneDeep from 'lodash/cloneDeep';
@@ -9,13 +9,23 @@ import { FormInstance } from 'antd/lib/form';
 import { message } from 'antd';
 import { $t } from '../../../services/i18n';
 import { useEffect } from 'react';
-import { IYoutubeLiveBroadcast } from '../../../services/platforms/youtube';
+import {
+  IYoutubeLiveBroadcast,
+  IYoutubeStartStreamOptions,
+} from '../../../services/platforms/youtube';
 import { IFacebookLiveVideoExtended } from '../../../services/platforms/facebook';
+import { assertIsDefined } from '../../../util/properties-type-guards';
+import { settings } from 'cluster';
 
 type TCustomFieldName = 'title' | 'description';
 type TModificators = { isUpdateMode?: boolean; isScheduleMode?: boolean };
 type IGoLiveSettingsState = IGoLiveSettings &
-  TModificators & { needPrepopulate: boolean; streamEvents: IStreamEvent[] };
+  TModificators & {
+    needPrepopulate: boolean;
+    streamEvents: IStreamEvent[];
+    isStreamEventModalVisible: boolean;
+    selectedStreamEventId: string;
+  };
 
 /**
  * Shared state and utils for for GoLiveWindow and EditStreamWindow
@@ -57,6 +67,8 @@ function getInitialStreamSettings(modificators: TModificators): IGoLiveSettingsS
     needPrepopulate: true, // we need to sync platform settings after context create
     tweetText: view.getTweetText(view.commonFields.title), // generate a default tweet text
     streamEvents: [],
+    isStreamEventModalVisible: false,
+    selectedStreamEventId: '',
     ...modificators,
   };
   // if stream has not been started than we allow to change settings only for a primary platform
@@ -193,7 +205,9 @@ function initializeGoLiveSettings(
      * Enable/disable custom common fields for a platform
      **/
     toggleCustomFields(state: TState, platform: TPlatform) {
-      const enabled = state.platforms[platform].useCustomFields;
+      const platformSettings = state.platforms[platform];
+      assertIsDefined(platformSettings);
+      const enabled = platformSettings.useCustomFields;
       return this.updatePlatform(state, platform, { useCustomFields: !enabled });
     },
   };
@@ -238,7 +252,7 @@ function initializeGoLiveSettings(
       let platformHasBeenEnabled = false;
       let newSettings = getState();
       view.linkedPlatforms.forEach(platform => {
-        const enabled = view.getPlatformSettings(platform).enabled;
+        const enabled = view.getPlatformSettings(platform)!.enabled;
         const shouldEnable = !enabled && enabledPlatforms.includes(platform);
         if (shouldEnable) platformHasBeenEnabled = true;
         newSettings = reducers.updatePlatform(newSettings, platform, {
@@ -296,10 +310,10 @@ function initializeGoLiveSettings(
   // merge everything we are going to have accessible in components into one object
   // StateManager will take care about optimal re-rendering order
   // depending on what prop from this object will particular component use
-  return merge(getView(), getters, { ...mutations, ...actions, ...schedulerActions });
+  return merge(getView(), getters, { ...mutations, ...actions }, schedulerActions);
 }
 
-export function useScheduler() {
+export function useStreamScheduler() {
   return useGoLiveSettings(undefined, { isScheduleMode: true });
 }
 
@@ -310,21 +324,92 @@ function createSchedulerActions(
   const { StreamingService, YoutubeService, FacebookService } = Services;
   const view = StreamingService.views;
 
-  async function loadStreamEvents() {
-    // load fb and yt events simultaneously
-    const streamEvents: IStreamEvent[] = [];
-    const [fbEvents, ytEvents] = await Promise.all([loadFbEvents(), loadYTBEvents()]);
-
-    // convert fb and yt events to the unified IStreamEvent format
-    ytEvents.forEach(ytEvent => {
-      streamEvents.push(convertYTBroadcastToEvent(ytEvent));
-    });
-
-    fbEvents.forEach(fbEvent => {
-      streamEvents.push(convertFBLiveVideoToEvent(fbEvent));
-    });
-    setState({ ...getState(), streamEvents });
+  function updateState(statePatch: Partial<IGoLiveSettingsState>) {
+    setState({ ...getState(), ...statePatch });
   }
+
+  const getters = {
+    get selectedPlatform(): TPlatform | null {
+      const platforms = getState().platforms;
+      return (Object.keys(platforms)[0] as TPlatform) || null;
+    },
+
+    /**
+     * Returns a list of linked platforms that support stream schedule
+     */
+    get platformsWithScheduler(): TPlatform[] {
+      return view.linkedPlatforms.filter(platform => view.supports('stream-schedule', [platform]));
+    },
+  };
+
+  const actions = {
+    async loadStreamEvents() {
+      // load fb and yt events simultaneously
+      const streamEvents: IStreamEvent[] = [];
+      const [fbEvents, ytEvents] = await Promise.all([loadFbEvents(), loadYTBEvents()]);
+
+      // convert fb and yt events to the unified IStreamEvent format
+      ytEvents.forEach(ytEvent => {
+        streamEvents.push(convertYTBroadcastToEvent(ytEvent));
+      });
+
+      fbEvents.forEach(fbEvent => {
+        streamEvents.push(convertFBLiveVideoToEvent(fbEvent));
+      });
+      setState({ ...getState(), streamEvents });
+    },
+
+    submitEvent() {
+      alert('TODO: create');
+    },
+
+    showNewEventModal(platform?: TPlatform) {
+      platform = platform || getters.platformsWithScheduler[0];
+      const platformService = getPlatformService(platform);
+      updateState({
+        isStreamEventModalVisible: true,
+        platforms: { [platform]: cloneDeep(platformService.state.settings) },
+      });
+    },
+
+    async showEditEventModal(eventId: string) {
+      const event = getState().streamEvents.find(ev => ev.id === eventId);
+      if (!event) return;
+      const platform = event.platform;
+      updateState({
+        isStreamEventModalVisible: true,
+        selectedStreamEventId: eventId,
+        platforms: {},
+      });
+      const flags = { useCustomFields: false, enabled: true };
+      if (platform === 'youtube') {
+        const settings = await YoutubeService.actions.return.fetchStartStreamOptionsForBroadcast(
+          eventId,
+        );
+        updateState({
+          platforms: {
+            [platform]: { ...settings, ...flags },
+          },
+        });
+      }
+      if (platform === 'facebook') {
+        const fbDestination = event.facebook;
+        assertIsDefined(fbDestination);
+        const settings = await FacebookService.actions.return.fetchStartStreamOptionsForVideo(
+          eventId,
+          fbDestination.destinationType,
+          fbDestination.destinationId,
+        );
+        updateState({
+          platforms: { [platform]: { ...settings, ...flags } },
+        });
+      }
+    },
+
+    closeEventModal() {
+      updateState({ isStreamEventModalVisible: false, selectedStreamEventId: '', platforms: {} });
+    },
+  };
 
   async function loadYTBEvents() {
     if (!view.linkedPlatforms.includes('youtube')) return [];
@@ -336,7 +421,7 @@ function createSchedulerActions(
     return await FacebookService.actions.return.fetchAllVideos();
   }
 
-  return { loadStreamEvents };
+  return merge(getters, actions);
 }
 
 function convertYTBroadcastToEvent(ytBroadcast: IYoutubeLiveBroadcast): IStreamEvent {
