@@ -55,36 +55,20 @@ export default function Grow() {
 
 function MyGoals(p: { goals: Dictionary<IGoal> }) {
   const { GrowService } = Services;
-  const [s, setState] = useState({
-    showGoalModal: false,
-    goalTitle: '',
-    goalTotal: 10,
-  });
+  const [goalTitle, setGoalTitle] = useState('');
+  const [showGoalModal, setShowGoalModal] = useState(false);
+  const [goalTotal, setGoalTotal] = useState(10);
   const mappedGoals = Object.values(p.goals);
   const appendedOptions = sampleSize(
     GrowService.views.goalOptions.filter(goal => !p.goals[goal.id]),
     4 - mappedGoals.length,
   );
 
-  function showGoalModal() {
-    setState({ ...s, showGoalModal: true });
-  }
-
-  function hideGoalModal() {
-    setState({ ...s, showGoalModal: false });
-  }
-
-  function setGoalTitle(val: string) {
-    setState({ ...s, goalTitle: val });
-  }
-
-  function setGoalTotal(val: number) {
-    setState({ ...s, goalTotal: val });
-  }
-
   function addGoal() {
-    GrowService.actions.addGoal({ title: s.goalTitle, total: s.goalTotal, id: '', image: '' });
-    setState({ ...s, showGoalModal: false, goalTitle: '', goalTotal: 10 });
+    GrowService.actions.addGoal({ title: goalTitle, total: goalTotal, id: '', image: '' });
+    setGoalTitle('');
+    setGoalTotal(10);
+    setShowGoalModal(false);
   }
 
   return (
@@ -96,29 +80,24 @@ function MyGoals(p: { goals: Dictionary<IGoal> }) {
           <GoalCard goal={goal} key={goal.id} />
         ))}
         {appendedOptions.map(goal => (
-          <GoalCard goal={goal} key={goal.id} showGoalModal={showGoalModal} />
+          <GoalCard goal={goal} key={goal.id} showGoalModal={() => setShowGoalModal(true)} />
         ))}
       </div>
       <Modal
-        visible={s.showGoalModal}
+        visible={showGoalModal}
         getContainer={`.${styles.goalTabContainer}`}
         onOk={addGoal}
-        onCancel={hideGoalModal}
+        onCancel={() => setShowGoalModal(false)}
         title={$t('Add Goal')}
       >
         <Form>
           <TextInput
             label={$t('Goal Title')}
-            value={s.goalTitle}
+            value={goalTitle}
             onChange={setGoalTitle}
             uncontrolled={false}
           />
-          <NumberInput
-            label={$t('Goal Total')}
-            value={s.goalTotal}
-            min={0}
-            onChange={setGoalTotal}
-          />
+          <NumberInput label={$t('Goal Total')} value={goalTotal} min={0} onChange={setGoalTotal} />
         </Form>
       </Modal>
     </div>
