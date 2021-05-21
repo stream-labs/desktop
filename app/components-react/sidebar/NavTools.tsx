@@ -20,11 +20,14 @@ export default function SideNav() {
 
   const isDevMode = Utils.isDevMode();
 
-  const v = useVuex(() => ({
-    studioMode: TransitionsService.views.studioMode,
-    isLoggedIn: UserService.views.isLoggedIn,
-    isPrime: UserService.views.isPrime,
-  }));
+  const v = useVuex(
+    () => ({
+      studioMode: TransitionsService.views.studioMode,
+      isLoggedIn: UserService.views.isLoggedIn,
+      isPrime: UserService.views.isPrime,
+    }),
+    false,
+  );
 
   const [s, setState] = useState({ dashboardOpening: false });
 
@@ -59,7 +62,7 @@ export default function SideNav() {
     try {
       const link = await MagicLinkService.getDashboardMagicLink(page);
       electron.remote.shell.openExternal(link);
-    } catch (e) {
+    } catch (e: unknown) {
       console.error('Error generating dashboard magic link', e);
     }
 
@@ -81,7 +84,7 @@ export default function SideNav() {
         'slobs-side-nav',
       );
       electron.remote.shell.openExternal(link);
-    } catch (e) {
+    } catch (e: unknown) {
       console.error('Error generating dashboard magic link', e);
     }
   }

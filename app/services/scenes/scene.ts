@@ -234,9 +234,7 @@ export class Scene {
   }
 
   clear() {
-    this.getSelection()
-      .selectAll()
-      .remove();
+    this.getSelection().selectAll().remove();
   }
 
   setLockOnAllItems(locked: boolean) {

@@ -338,9 +338,6 @@ export class SourceFiltersService extends Service {
   }
 
   private getObsFilter(sourceId: string, filterName: string): obs.IFilter {
-    return this.sourcesService.views
-      .getSource(sourceId)
-      .getObsInput()
-      .findFilter(filterName);
+    return this.sourcesService.views.getSource(sourceId).getObsInput().findFilter(filterName);
   }
 }

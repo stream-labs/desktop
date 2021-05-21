@@ -2,8 +2,9 @@ import { IGoLiveSettings, StreamInfoView } from '../../../services/streaming';
 import { TPlatform } from '../../../services/platforms';
 import { Services } from '../../service-provider';
 import { createMutations, merge, useStateManager } from '../../hooks/useStateManager';
-import { cloneDeep, pick } from 'lodash';
-import Form, { useForm } from '../../shared/inputs/Form';
+import cloneDeep from 'lodash/cloneDeep';
+import pick from 'lodash/pick';
+import { useForm } from '../../shared/inputs/Form';
 import { FormInstance } from 'antd/lib/form';
 import { message } from 'antd';
 import { $t } from '../../../services/i18n';
@@ -109,7 +110,7 @@ function initializeGoLiveSettings(
     renderPlatformSettings(
       commonFields: JSX.Element,
       requiredFields: JSX.Element,
-      optionalFields: JSX.Element,
+      optionalFields?: JSX.Element,
       essentialOptionalFields?: JSX.Element,
     ) {
       let settingsMode: 'singlePlatform' | 'multiplatformAdvanced' | 'multiplatformSimple';
@@ -251,7 +252,7 @@ function initializeGoLiveSettings(
       try {
         await form.validateFields();
         return true;
-      } catch (e) {
+      } catch (e: unknown) {
         message.error($t('Invalid settings. Please check the form'));
         return false;
       }

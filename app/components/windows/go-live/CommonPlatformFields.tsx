@@ -9,7 +9,7 @@ import { TPlatform } from 'services/platforms';
 import { IStreamSettings, StreamingService } from 'services/streaming';
 import { SyncWithValue } from 'services/app/app-decorators';
 import { Inject } from 'services/core';
-import { pick } from 'lodash';
+import pick from 'lodash/pick';
 import { assertIsDefined } from 'util/properties-type-guards';
 
 class Props {
@@ -176,7 +176,7 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
             <div>
               {/*TITLE*/}
               <HFormGroup
-                value={fields.title}
+                value={fields['title']}
                 onInput={(val: string) => this.updateCommonField('title', val)}
                 metadata={metadata.text({
                   title: $t('Title'),

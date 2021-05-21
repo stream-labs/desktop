@@ -1,9 +1,9 @@
 import { TagsInput, TSlobsInputProps } from '../../../shared/inputs';
-import { useOnCreate, useVuex } from '../../../hooks';
+import { useOnCreate } from '../../../hooks';
 import { Services } from '../../../service-provider';
 import { prepareOptions, TTwitchTag } from '../../../../services/platforms/twitch/tags';
 import React from 'react';
-import { keyBy } from 'lodash';
+import keyBy from 'lodash/keyBy';
 import { IListOption } from '../../../shared/inputs/ListInput';
 import { Row, Col, Tag } from 'antd';
 import { I18nService } from '../../../../services/i18n';
@@ -32,6 +32,7 @@ export function TwitchTagsInput(p: TTwitchTagsInputProps) {
       <TagsInput
         label={p.label}
         value={p.value && p.value.map(tag => tag.tag_id)}
+        max={5}
         onChange={values => p.onChange && p.onChange(values.map(tagName => s.tagsMap[tagName]))}
         options={options}
         tagRender={(tagProps, tag) => (

@@ -4,9 +4,10 @@ import { StreamSettingsService } from '../settings/streaming';
 import { UserService } from '../user';
 import { RestreamService } from '../restream';
 import { getPlatformService, TPlatform, TPlatformCapability } from '../platforms';
-import { cloneDeep, difference } from 'lodash';
-import { Services } from '../../components-react/service-provider';
-import { TwitterService } from '../../app-services';
+import { IncrementalRolloutService, TwitterService } from '../../app-services';
+import { EAvailableFeatures } from '../incremental-rollout';
+import cloneDeep from 'lodash/cloneDeep';
+import difference from 'lodash/difference';
 
 /**
  * The stream info view is responsible for keeping
@@ -37,6 +38,10 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
 
   private get twitterView() {
     return this.getServiceViews(TwitterService);
+  }
+
+  private get incrementalRolloutView() {
+    return this.getServiceViews(IncrementalRolloutService);
   }
 
   get info() {
@@ -80,7 +85,8 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
    * Returns a sorted list of all platforms (linked and unlinked)
    */
   get allPlatforms(): TPlatform[] {
-    return this.sortPlatforms(['twitch', 'facebook', 'youtube']);
+    const allPlatforms: TPlatform[] = ['twitch', 'facebook', 'youtube', 'tiktok'];
+    return this.sortPlatforms(allPlatforms);
   }
 
   /**
@@ -273,7 +279,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   supports(capability: TPlatformCapability, targetPlatforms?: TPlatform[]): boolean {
     const platforms = targetPlatforms || this.enabledPlatforms;
     for (const platform of platforms) {
-      if (getPlatformService(platform).capabilities.has(capability)) return true;
+      if (getPlatformService(platform).hasCapability(capability)) return true;
     }
     return false;
   }

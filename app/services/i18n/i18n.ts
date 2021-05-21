@@ -238,7 +238,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
       let json: Dictionary<string>;
       try {
         json = JSON.parse(this.fileManagerService.read(filePath));
-      } catch (e) {
+      } catch (e: unknown) {
         throw new Error(`Invalid JSON in ${filePath}`);
       }
       Object.assign(dictionary, json);

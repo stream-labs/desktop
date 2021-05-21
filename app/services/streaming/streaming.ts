@@ -37,7 +37,8 @@ import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService } from 'services/restream';
 import { FacebookService } from 'services/platforms/facebook';
 import Utils from 'services/utils';
-import { cloneDeep, isEqual } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import isEqual from 'lodash/isEqual';
 import { createStreamError, IStreamError, StreamError, TStreamErrorType } from './stream-error';
 import { authorizedHeaders } from 'util/requests';
 import { HostsService } from '../hosts';
@@ -70,7 +71,8 @@ interface IOBSOutputSignalInfo {
   error: string;
 }
 
-export class StreamingService extends StatefulService<IStreamingServiceState>
+export class StreamingService
+  extends StatefulService<IStreamingServiceState>
   implements IStreamingServiceApi {
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private outputSettingsService: OutputSettingsService;
@@ -120,6 +122,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         twitch: 'not-started',
         youtube: 'not-started',
         facebook: 'not-started',
+        tiktok: 'not-started',
         setupMultistream: 'not-started',
         startVideoTransmission: 'not-started',
         postTweet: 'not-started',
@@ -198,7 +201,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
         try {
           await service.prepopulateInfo();
-        } catch (e) {
+        } catch (e: unknown) {
           // cast all PLATFORM_REQUEST_FAILED errors to PREPOPULATE_FAILED
           if (e instanceof StreamError) {
             e.type =
@@ -222,7 +225,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       if (this.twitterService.state.linked && this.twitterService.state.tweetWhenGoingLive) {
         await this.twitterService.getTwitterStatus();
       }
-    } catch (e) {
+    } catch (e: unknown) {
       // do not block streaming if something is wrong on the Twitter side
       console.error('Error fetching Twitter status', e);
     }
@@ -272,7 +275,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         // don't update settings for twitch in unattendedMode
         const settingsForPlatform = platform === 'twitch' && unattendedMode ? undefined : settings;
         await this.runCheck(platform, () => service.beforeGoLive(settingsForPlatform));
-      } catch (e) {
+      } catch (e: unknown) {
         console.error('Error running beforeGoLive for plarform', e);
         // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
         if (e instanceof StreamError) {
@@ -297,7 +300,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           'setupMultistream',
           async () => (ready = await this.restreamService.checkStatus()),
         );
-      } catch (e) {
+      } catch (e: unknown) {
         console.error('Error fetching restreaming service', e);
       }
       // Assume restream is down
@@ -313,7 +316,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           if (!this.restreamService.state.enabled) await this.restreamService.setEnabled(true);
           await this.restreamService.beforeGoLive();
         });
-      } catch (e) {
+      } catch (e: unknown) {
         console.error('Failed to setup restream', e);
         this.setError('RESTREAM_SETUP_FAILED');
         return;
@@ -334,22 +337,13 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     // start video transmission
     try {
       await this.runCheck('startVideoTransmission', () => this.finishStartStreaming());
-    } catch (e) {
+    } catch (e: unknown) {
       return;
     }
 
     // check if we should show the waring about the disabled Auto-start
     if (settings.platforms.youtube?.enabled && !settings.platforms.youtube.enableAutoStart) {
       this.SET_WARNING('YT_AUTO_START_IS_DISABLED');
-    }
-
-    // run afterGoLive hooks
-    try {
-      this.views.enabledPlatforms.forEach(platform => {
-        getPlatformService(platform).afterGoLive();
-      });
-    } catch (e) {
-      console.error('Error running afterGoLive for platform', e);
     }
 
     // tweet
@@ -360,9 +354,13 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     ) {
       try {
         await this.runCheck('postTweet', () => this.twitterService.postTweet(settings.tweetText!));
-      } catch (e) {
+      } catch (e: unknown) {
         console.error('unable to post a tweet', e);
-        this.setError(e);
+        if (e instanceof StreamError) {
+          this.setError(e);
+        } else {
+          this.setError('TWEET_FAILED');
+        }
         return;
       }
     }
@@ -398,6 +396,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         this.usageStatisticsService.recordFeatureUsage('StreamToFacebookPage');
       }
     }
+
+    // send analytics for TikTok
+    if (settings.platforms.tiktok?.enabled) {
+      this.usageStatisticsService.recordFeatureUsage('StreamToTikTok');
+    }
   }
 
   /**
@@ -426,7 +429,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       const newSettings = settings.platforms[platform];
       try {
         await this.runCheck(platform, () => service.putChannelInfo(newSettings));
-      } catch (e) {
+      } catch (e: unknown) {
         console.error('Error running putChannelInfo for platform', e);
         // cast all PLATFORM_REQUEST_FAILED errors to SETTINGS_UPDATE_FAILED
         if (e instanceof StreamError) {
@@ -456,7 +459,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const destinations = settings.platforms;
     const platforms = (Object.keys(destinations) as TPlatform[]).filter(
       dest => destinations[dest].enabled && this.views.supports('stream-schedule', [dest]),
-    );
+    ) as ('facebook' | 'youtube')[];
     for (const platform of platforms) {
       const service = getPlatformService(platform);
       assertIsDefined(service.scheduleStream);
@@ -475,7 +478,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     try {
       if (cb) await cb();
       this.SET_CHECKLIST_ITEM(checkName, 'done');
-    } catch (e) {
+    } catch (e: unknown) {
       this.SET_CHECKLIST_ITEM(checkName, 'failed');
       throw e;
     }
@@ -625,6 +628,22 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     if (replayWhenStreaming && this.state.replayBufferStatus === EReplayBufferState.Offline) {
       this.startReplayBuffer();
     }
+
+    startStreamingPromise
+      .then(() => {
+        // run afterGoLive hooks
+        try {
+          this.views.enabledPlatforms.forEach(platform => {
+            getPlatformService(platform).afterGoLive();
+          });
+        } catch (e: unknown) {
+          console.error('Error running afterGoLive for platform', e);
+        }
+      })
+      .catch(() => {
+        console.warn('startStreamingPromise was rejected');
+      });
+
     return startStreamingPromise;
   }
 
@@ -638,7 +657,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       try {
         await this.goLive();
         return Promise.resolve();
-      } catch (e) {
+      } catch (e: unknown) {
         return Promise.reject(e);
       }
     }
@@ -745,7 +764,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const width = 900;
 
     const isLegacy =
-      !this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
+      !this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
       this.customizationService.state.experimental?.legacyGoLive;
 
     const componentName = isLegacy ? 'GoLiveWindowDeprecated' : 'GoLiveWindow';
@@ -765,7 +784,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const width = 900;
 
     const isLegacy =
-      !this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
+      !this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
       this.customizationService.state.experimental?.legacyGoLive;
 
     const componentName = isLegacy ? 'EditStreamWindowDeprecated' : 'EditStreamWindow';
@@ -887,7 +906,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         try {
           streamEncoderInfo = this.outputSettingsService.getSettings();
           game = this.views.commonFields.game;
-        } catch (e) {
+        } catch (e: unknown) {
           console.error('Error fetching stream encoder info: ', e);
         }
 
@@ -925,9 +944,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           status: EStreamingState.Offline,
         });
       } else if (info.signal === EOBSOutputSignal.Stopping) {
+        this.sendStreamEndEvent();
         this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
         this.streamingStatusChange.next(EStreamingState.Ending);
-        this.usageStatisticsService.recordEvent('stream_end');
       } else if (info.signal === EOBSOutputSignal.Reconnect) {
         this.SET_STREAMING_STATUS(EStreamingState.Reconnecting);
         this.streamingStatusChange.next(EStreamingState.Reconnecting);
@@ -1084,6 +1103,35 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         });
       this.windowsService.actions.closeChildWindow();
     }
+  }
+
+  private sendStreamEndEvent() {
+    const data: Dictionary<any> = {};
+    data.viewerCounts = {};
+    data.duration = Math.round(moment().diff(moment(this.state.streamingStatusTime)) / 1000);
+
+    if (this.views.protectedModeEnabled) {
+      data.platforms = this.views.enabledPlatforms;
+
+      this.views.customDestinations.forEach(() => {
+        data.platforms.push('custom_rtmp');
+      });
+
+      this.views.enabledPlatforms.forEach(platform => {
+        const service = getPlatformService(platform);
+
+        if (service.hasCapability('viewerCount')) {
+          data.viewerCounts[platform] = {
+            average: service.averageViewers,
+            peak: service.peakViewers,
+          };
+        }
+      });
+    } else {
+      data.platforms = ['custom_rtmp'];
+    }
+
+    this.usageStatisticsService.recordEvent('stream_end', data);
   }
 
   /**

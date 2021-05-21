@@ -101,7 +101,7 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
         url: apiSettings.dataFetchUrl,
         method: 'GET',
       });
-    } catch (e) {
+    } catch (e: unknown) {
       if (isFirstLoading) this.SET_LOADING_STATE('fail');
       throw e;
     }

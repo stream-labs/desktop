@@ -22,7 +22,6 @@ import { PlatformAppsService } from 'services/platform-apps';
 import { EDeviceType, HardwareService } from 'services/hardware';
 import { StreamingService } from 'services/streaming';
 import { byOS, OS } from 'util/operating-systems';
-import { FacemasksService } from 'services/facemasks';
 import path from 'path';
 import fs from 'fs';
 import { UsageStatisticsService } from 'services/usage-statistics';
@@ -110,7 +109,6 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
   @Inject() private appService: AppService;
   @Inject() private platformAppsService: PlatformAppsService;
   @Inject() private streamingService: StreamingService;
-  @Inject() private facemasksService: FacemasksService;
   @Inject() private usageStatisticsService: UsageStatisticsService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private hardwareService: HardwareService;
@@ -130,7 +128,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
       if (fs.existsSync(path.join(this.appService.appDataDirectory, 'HADisable'))) {
         this.usageStatisticsService.recordFeatureUsage('HardwareAccelDisabled');
       }
-    } catch (e) {
+    } catch (e: unknown) {
       console.error('Error fetching hardware acceleration state', e);
     }
 
@@ -250,10 +248,6 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
       [OS.Mac]: () => {},
       [OS.Windows]: () => {
         categories = categories.concat(['Game Overlay']);
-
-        if (this.facemasksService.state.active) {
-          categories = categories.concat(['Face Masks']);
-        }
       },
     });
 

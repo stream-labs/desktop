@@ -1,4 +1,4 @@
-import { mutation, InheritMutations, ViewHandler } from '../core/stateful-service';
+import { mutation, InheritMutations } from '../core/stateful-service';
 import {
   IPlatformService,
   TPlatformCapability,
@@ -7,20 +7,17 @@ import {
   IPlatformState,
 } from '.';
 import { Inject } from 'services/core/injector';
-import { authorizedHeaders, handleResponse, jfetch } from 'util/requests';
+import { authorizedHeaders, jfetch } from 'util/requests';
 import { platformAuthorizedRequest } from './utils';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { CustomizationService } from 'services/customization';
 import { IGoLiveSettings } from 'services/streaming';
 import { WindowsService } from 'services/windows';
-import { $t, I18nService } from 'services/i18n';
+import { I18nService } from 'services/i18n';
 import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import { assertIsDefined } from 'util/properties-type-guards';
 import electron from 'electron';
-import { omitBy } from 'lodash';
-import { UserService } from '../user';
-import { IFacebookStartStreamOptions, TDestinationType } from './facebook';
 import Utils from '../utils';
 
 interface IYoutubeServiceState extends IPlatformState {
@@ -132,6 +129,7 @@ export interface IYoutubeVideo {
     title: string;
     description: string;
     categoryId: string;
+    tags: string[];
   };
 }
 
@@ -156,10 +154,10 @@ type TBroadcastLifecycleStatus =
   | 'testing';
 
 @InheritMutations()
-export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
+export class YoutubeService
+  extends BasePlatformService<IYoutubeServiceState>
   implements IPlatformService {
   @Inject() private customizationService: CustomizationService;
-  @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private windowsService: WindowsService;
   @Inject() private i18nService: I18nService;
 
@@ -168,6 +166,9 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     'description',
     'chat',
     'stream-schedule',
+    'streamlabels',
+    'themes',
+    'viewerCount',
   ]);
 
   static initialState: IYoutubeServiceState = {
@@ -238,8 +239,8 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
   ): Promise<T> {
     try {
       return await platformAuthorizedRequest<T>('youtube', reqInfo);
-    } catch (e) {
-      let details = e.result?.error?.message;
+    } catch (e: unknown) {
+      let details = (e as any).result?.error?.message;
       if (!details) details = 'connection failed';
 
       // if the rate limit exceeded then repeat request after 3s delay
@@ -252,7 +253,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
         details === 'The user is not enabled for live streaming.'
           ? 'YOUTUBE_STREAMING_DISABLED'
           : 'PLATFORM_REQUEST_FAILED';
-      throw throwStreamError(errorType, e, details);
+      throw throwStreamError(errorType, e as any, details);
     }
   }
 
@@ -285,12 +286,7 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     }
 
     // set the category
-    await this.updateCategory(
-      broadcast.id,
-      broadcast.snippet.title,
-      broadcast.snippet.description,
-      ytSettings.categoryId!,
-    );
+    await this.updateCategory(broadcast.id, ytSettings.categoryId!);
 
     // setup key and platform type in the OBS settings
     const streamKey = stream.cdn.ingestionInfo.streamName;
@@ -300,10 +296,10 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
         platform: 'youtube',
         key: streamKey,
         streamType: 'rtmp_common',
+        server: 'rtmp://a.rtmp.youtube.com/live2',
       });
     }
 
-    // update the local state
     this.UPDATE_STREAM_SETTINGS({ ...ytSettings, broadcastId: broadcast.id });
     this.SET_STREAM_ID(stream.id);
     this.SET_STREAM_KEY(streamKey);
@@ -319,12 +315,12 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       await platformAuthorizedRequest('youtube', url);
       this.SET_ENABLED_STATUS(true);
       return EPlatformCallResult.Success;
-    } catch (resp) {
-      if (resp.status !== 403) {
+    } catch (resp: unknown) {
+      if ((resp as any).status !== 403) {
         console.error('Got 403 checking if YT is enabled for live streaming', resp);
         return EPlatformCallResult.Error;
       }
-      const json = resp.result;
+      const json = (resp as any).result;
       if (
         json.error &&
         json.error.errors &&
@@ -351,10 +347,6 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
       );
   }
 
-  fetchUserInfo() {
-    return Promise.resolve({});
-  }
-
   protected async fetchViewerCount(): Promise<number> {
     if (!this.state.settings.broadcastId) return 0; // activeChannel is not available when streaming to custom ingest
     const endpoint = 'videos?part=snippet,liveStreamingDetails';
@@ -379,15 +371,15 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     return collection.items.filter(category => category.snippet.assignable);
   }
 
-  private async updateCategory(
-    broadcastId: string,
-    title: string,
-    description: string,
-    categoryId: string,
-  ) {
+  private async updateCategory(broadcastId: string, categoryId: string) {
+    const video = await this.fetchVideo(broadcastId);
     const endpoint = 'videos?part=snippet';
+    const { title, description, tags } = video.snippet;
     await this.requestYoutube({
-      body: JSON.stringify({ id: broadcastId, snippet: { categoryId, title, description } }),
+      body: JSON.stringify({
+        id: broadcastId,
+        snippet: { categoryId, title, description, tags },
+      }),
       method: 'PUT',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
     });
@@ -445,12 +437,8 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     assertIsDefined(broadcastId);
 
     if (this.state.settings.categoryId !== options.categoryId) {
-      await this.updateCategory(
-        broadcastId,
-        options.title,
-        options.description,
-        options.categoryId!,
-      );
+      assertIsDefined(options.categoryId);
+      await this.updateCategory(broadcastId, options.categoryId);
     }
 
     await this.updateBroadcast(broadcastId, options, true);
@@ -719,6 +707,13 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
     // otherwise convert the passed base64url to blob
     const url =
       base64url !== 'default' ? base64url : `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+
+    if (base64url.startsWith('http')) {
+      // if non-base64 url passed then image is already uploaded
+      // skip uploading
+      return;
+    }
+
     const body = await fetch(url).then(res => res.blob());
 
     try {
@@ -726,12 +721,12 @@ export class YoutubeService extends BasePlatformService<IYoutubeServiceState>
         `https://www.googleapis.com/upload/youtube/v3/thumbnails/set?videoId=${videoId}`,
         { method: 'POST', body, headers: { Authorization: `Bearer ${this.oauthToken}` } },
       );
-    } catch (e) {
-      const error = await e.json();
+    } catch (e: unknown) {
+      const error = await (e as any).json();
       let details = error.result?.error?.message;
       if (!details) details = 'connection failed';
       const errorType = 'YOUTUBE_THUMBNAIL_UPLOAD_FAILED';
-      throw throwStreamError(errorType, e, details);
+      throw throwStreamError(errorType, e as any, details);
     }
   }
 
