@@ -1,13 +1,12 @@
 <template>
-  <div class="container">
-    <div class="header">
-      <div class="header-item-center">フィルター設定</div>
-      <div class="header-item-right"><i class="icon-close icon-btn" @click="close"></i></div>
-    </div>
-    <div class="content">
-      <div class="row">
-        <div class="name">匿名(184)のコメントを表示</div>
-        <div class="value"><input type="checkbox" v-model="showAnonymous" class="toggle-button" /></div>
+  <div class="setting-section">
+    <div class="section-heading">フィルター設定</div>
+    <div class="section-content">
+      <div class="section-item">
+        <div class="row">
+          <div class="name">匿名(184)のコメントを表示</div>
+          <div class="value"><input type="checkbox" v-model="showAnonymous" class="toggle-button" /></div>
+        </div>
       </div>
     </div>
   </div>
@@ -18,48 +17,21 @@
 @import "../../styles/_colors";
 @import "../../styles/mixins";
 
-.container {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  flex-grow: 1;
-  flex-basis: 0;
-  overflow-y: auto;
+.setting-section {
+  border-bottom: 1px solid @bg-quinary;
 }
 
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 48px;
-  padding: 4px 16px;
-  background-color: rgba(@black,.5);
-  border-bottom: 1px solid rgba(@black,.5);
-
-  > .header-item-center {
-    font-size: 12px;
-    color: @white;
-    text-align: center;
-  }
-
-  > .header-item-right {
-    display: flex;
-    align-items: center;
-    position: absolute;
-    right: 16px;
-  }
+.section-heading {
+  color: @grey;
+  padding: 16px 16px 8px;
 }
 
-.content {
-  flex-grow: 1;
-  padding-top: 8px;
-  background-color: rgba(@black,.5);
+.section-item {
+  padding: 16px;
 }
 
 .row {
   width: 100%;
-  padding: 16px;
-
   display: flex;
   flex-direction: row;
   align-items: center;

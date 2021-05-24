@@ -54,12 +54,6 @@
   margin: 0;
   flex-grow: 1;
   height: auto;
-
-  &:hover {
-    .vue-slider-tooltip {
-      color: @navy !important;
-    }
-  }
 }
 
 .vue-slider {
@@ -93,7 +87,8 @@
 }
 
 .vue-slider-tooltip {
-  background-color: transparent !important;
+  background-color: @input-bg !important;
+  border-radius: 2px !important;
   border: none !important;
   color: @white !important;
   font-size: 13px !important;
@@ -102,6 +97,14 @@
 
   &:before {
     display: none;
+  }
+}
+
+.vue-slider-disabled {
+  opacity: 0.26 !important;
+
+  .vue-slider-tooltip-wrap {
+    display: none !important;
   }
 }
 

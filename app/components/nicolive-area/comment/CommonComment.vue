@@ -1,5 +1,5 @@
 <template>
-  <div class="root" :class="[chat.type, { pseudoHover: commentMenuOpened }]" :title="computedTitle" @dblclick="$emit('pinned')">
+  <div class="root" :class="[chat.type, { pseudoHover: commentMenuOpened }]" :title="computedTitle" :speaking="speaking" @dblclick="$emit('pinned')">
     <div class="comment-number">{{ chat.value.no }}</div>
     <div class="comment-body">{{ computedContent }}</div>
     <div class="comment-misc" @click.stop="$emit('commentMenu')"><i class="icon-btn icon-ellipsis-vertical"></i></div>
@@ -22,20 +22,28 @@
       display: block;
     }
   }
-
-  &.operator > .comment-body {
-    color: @accent;
-  }
 }
 
 .comment-number {
   .common__comment-number();
   color: @grey;
+
+  [speaking=true] & {
+    color: @text-primary;
+  }
 }
 
 .comment-body {
   .common__comment-body();
   color: @white;
+
+  .operator & {
+    color: @accent;
+  }
+
+  [speaking=true] & {
+    color: @text-primary;
+  }
 }
 
 .comment-misc {

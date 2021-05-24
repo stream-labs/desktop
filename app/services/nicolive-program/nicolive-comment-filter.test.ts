@@ -1,5 +1,6 @@
 import { createSetupFunction } from 'util/test-setup';
 import { Subject } from 'rxjs';
+import { WrappedChat } from './WrappedChat';
 type NicoliveCommentFilterService = import('./nicolive-comment-filter').NicoliveCommentFilterService;
 
 const setup = createSetupFunction({
@@ -198,7 +199,7 @@ test('applyFilter', async () => {
     { seqId: 4, type: 'operator', value: { user_id: 'user needle' } },
   ] as const;
 
-  const after = chats.map(c => instance.applyFilter(c));
+  const after = chats.map(c => instance.applyFilter<WrappedChat>(c));
 
   expect(after[0].filtered).toBe(true);
   expect(after[1].filtered).toBe(true);

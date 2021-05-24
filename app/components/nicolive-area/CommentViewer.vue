@@ -2,8 +2,10 @@
   <div class="container">
     <div class="header">
       <i class="icon-reload icon-btn" v-tooltip.bottom="commentReloadTooltip" @click="refreshConnection"></i>
+      <i :class="['icon-btn', speakingEnabled ? 'icon-speaker' : 'icon-mute']" v-tooltip.bottom="commentSynthesizerTooltip" @click="speakingEnabled = !speakingEnabled"></i>
+      <div class="icon-border"></div>
       <i class="icon-ng icon-btn" v-tooltip.bottom="filterTooltip" @click="isFilterOpened = true"></i>
-      <i class="icon-settings icon-btn" v-tooltip.bottom="localFilterTooltip" @click="isLocalFilterOpened = true"></i>
+      <i class="icon-settings icon-btn" v-tooltip.bottom="settingsTooltip" @click="isSettingsOpened = true"></i>
     </div>
     <div class="content">
       <div class="list" ref="scroll">
@@ -11,10 +13,11 @@
           class="row"
           v-for="item of items"
           :key="item.seqId"
-          :is="componentMap[item.type]"
+          :is="componentMap[item.component]"
           :chat="item"
           :getFormattedLiveTime="getFormattedLiveTime"
           :commentMenuOpened="commentMenuTarget === item"
+          :speaking="speakingSeqId === item.seqId"
           @pinned="pin(item)"
           @commentMenu="showCommentMenu(item)"
         />
@@ -31,7 +34,7 @@
     </div>
     <comment-form class="comment-form" />
     <comment-filter class="overlay" @close="isFilterOpened = false" v-if="isFilterOpened"/>
-    <comment-local-filter class="overlay" @close="isLocalFilterOpened = false" v-if="isLocalFilterOpened" />
+    <comment-settings class="overlay" @close="isSettingsOpened = false" v-if="isSettingsOpened" />
   </div>
 </template>
 
@@ -163,6 +166,14 @@
   z-index: 2; // AreaSwitcherのheaderより大きく
   position: absolute;
   height: 100%;
+  width: 100%;
   background-color: @bg-primary;
+}
+
+.icon-border {
+  width: 1px;
+  height: 60%;
+  background-color: @bg-primary;
+  margin-left: 16px;
 }
 </style>

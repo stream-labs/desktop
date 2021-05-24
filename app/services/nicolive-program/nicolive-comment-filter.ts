@@ -5,13 +5,8 @@ import { Inject } from 'util/injector';
 import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
 import { map, distinctUntilChanged } from 'rxjs/operators';
 import { NicoliveFailure } from './NicoliveFailure';
-type WrappedChat = import('./nicolive-comment-viewer').WrappedChat;
+import { WrappedChat } from './WrappedChat';
 import { Subject } from 'rxjs';
-
-export function getContentWithFilter(wrapped: WrappedChat): string {
-  if (wrapped.filtered) return '##このコメントは表示されません##';
-  return wrapped.value.content ?? '';
-}
 
 interface INicoliveCommentFilterState {
   filters: FilterRecord[];
@@ -28,7 +23,7 @@ export class NicoliveCommentFilterService extends StatefulService<INicoliveComme
   private stateChangeSubject = new Subject<INicoliveCommentFilterState>();
   stateChange = this.stateChangeSubject.asObservable();
 
-  applyFilter(wrapped: WrappedChat) {
+  applyFilter<T extends WrappedChat>(wrapped: T) {
     if (wrapped.type === 'normal') {
       for (const record of this.state.filters) {
         if (

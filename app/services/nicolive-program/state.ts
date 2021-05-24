@@ -2,9 +2,17 @@ import { PersistentStatefulService } from 'services/persistent-stateful-service'
 import { mutation } from '../stateful-service';
 import { Subject, BehaviorSubject, Observable } from 'rxjs';
 
+type SpeechSynthesizerSettingsState = {
+  enabled: boolean;
+  pitch: number;
+  rate: number;
+  volume: number;
+}
+
 interface IState {
   autoExtensionEnabled: boolean;
   panelOpened: boolean;
+  speechSynthesizerSettings?: SpeechSynthesizerSettingsState; 
 }
 
 /**
@@ -25,6 +33,10 @@ export class NicoliveProgramStateService extends PersistentStatefulService<IStat
 
   togglePanelOpened(): void {
     this.setState({ panelOpened: !this.state.panelOpened });
+  }
+
+  updateSpeechSynthesizerSettings(newState: SpeechSynthesizerSettingsState): void {
+    this.setState({ speechSynthesizerSettings: newState });
   }
 
   private setState(nextState: Partial<IState>): void {
