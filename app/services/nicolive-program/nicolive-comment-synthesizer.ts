@@ -15,9 +15,9 @@ export type Speech = {
 
 interface ICommentSynthesizerState {
   enabled: boolean;
-  pitch: number; // SpeechSynthesisUtterance.pitch; 0(lowest) to 2(highest) (default: 1)
+  pitch: number; // SpeechSynthesisUtterance.pitch; 0.1(lowest) to 2(highest) (default: 1)
   rate: number; // SpeechSynthesisUtterence.rate; 0.1(lowest) to 10(highest); default:1
-  volume: number; // SpeechSynthesisUtterance.volume; 0(lowest) to 1(highest)
+  volume: number; // SpeechSynthesisUtterance.volume; 0.1(lowest) to 1(highest)
 };
 
 export class NicoliveCommentSynthesizerService extends StatefulService<ICommentSynthesizerState> {
@@ -49,7 +49,7 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     this.setEnabled(e);
   }
 
-  setPitch(pitch: number) {
+  private setPitch(pitch: number) {
     this.setState({ pitch });
   }
   get pitch(): number {
@@ -59,7 +59,7 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     this.setPitch(p);
   }
 
-  setRate(rate: number) {
+  private setRate(rate: number) {
     this.setState({ rate });
   }
   get rate(): number {
@@ -69,7 +69,7 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     this.setRate(r);
   }
 
-  setVolume(volume: number) {
+  private setVolume(volume: number) {
     this.setState({ volume });
   }
   get volume(): number {
@@ -116,8 +116,8 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
   }
 
   speakText(speech: Speech,
-    onstart: (this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => any,
-    onend: (this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => any
+    onstart: (this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => void,
+    onend: (this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => void
   ) {
     if (!this.enabled) {
       return;

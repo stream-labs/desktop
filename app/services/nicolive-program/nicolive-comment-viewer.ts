@@ -219,8 +219,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
   }
 
   private onMessage(values: WrappedChatWithComponent[]) {
-    const maxQueueToSpeak = 3; // 直近3件つづ読み上げ対象にする...?
-    // TODO 開いたときは直近1分ぐらい読みたいが、コメントリロードボタンでは1秒ぐらいにしたい
+    const maxQueueToSpeak = 3; // 直近3件つづ読み上げ対象にする
     const recentSeconds = 60;
 
     const nowSeconds = Date.now() / 1000;
