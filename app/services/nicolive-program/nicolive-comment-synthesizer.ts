@@ -39,7 +39,7 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
     });
   }
 
-  setEnabled(enabled: boolean) {
+  private setEnabled(enabled: boolean) {
     this.setState({ enabled });
   }
   get enabled(): boolean {
@@ -93,7 +93,6 @@ export class NicoliveCommentSynthesizerService extends StatefulService<ICommentS
   synth = new NicoliveCommentSynthesizer();
 
   makeSpeech(chat: WrappedChat): Speech | null {
-    console.log(`makeSpeech proxy: ${chat}`);
     const r = this.synth.makeSpeechText(chat);
     if (r === '') {
       return null;
@@ -149,23 +148,17 @@ export class NicoliveCommentSynthesizer {
     const text = getDisplayText(AddComponent(chat));
 
     const converted = this.dictionary.process(text);
-    if (converted === text) {
-      console.log(`makeSpeech: ${text}`);
-    } else {
-      console.log(`makeSpeech: ${text} -> ${converted}`);
-    }
 
     return converted;
   }
 
   speakText(speech: Speech,
-    onstart: (this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => any,
-    onend: (this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => any
+    onstart: (this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => void,
+    onend: (this: SpeechSynthesisUtterance, ev: SpeechSynthesisEvent) => void
   ) {
     if (!speech || speech.text == '' || !this.available) {
       return;
     }
-    console.log(`speechText: ${speech.text}`);
 
     const uttr = new SpeechSynthesisUtterance(speech.text);
     uttr.pitch = speech.pitch || 1;

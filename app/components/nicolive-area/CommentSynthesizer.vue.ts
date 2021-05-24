@@ -20,25 +20,17 @@ export default class CommentSynthesizer extends Vue {
     this.$emit('close');
   }
 
-  private index: number = 0;
-
-  async play() {
+  async testSpeechPlay() {
     const service = this.nicoliveCommentSynthesizerService;
 
     const speech = service.makeSimpleTextSpeech('これは読み上げ設定のテスト音声です');
     if (speech) {
-      this.index++;
       if (service.speaking) {
         service.cancelSpeak();
         await sleep(200);
       }
 
-      service.speakText(speech,
-        (e) => {
-          console.log(`#${this.index}: onstart`, e);
-        }, (e) => {
-          console.log(`#${this.index}: onend`, e);
-        });
+      service.speakText(speech, () => {}, () => {});
     }
   }
 

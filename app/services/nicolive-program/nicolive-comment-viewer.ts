@@ -203,13 +203,11 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
       if (speech) {
         this.nicoliveCommentSynthesizerService.speakText(speech,
           () => {
-            console.log(`#${chat.seqId}: ${chat.value.content}: onstart`);
             this.SET_STATE({
               speakingSeqId: chat.seqId
             });
           },
           () => {
-            console.log(`#${chat.seqId}: ${chat.value.content}: onend`);
             if (this.state.speakingSeqId == chat.seqId) {
               this.SET_STATE({
                 speakingSeqId: null
@@ -225,7 +223,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
     // TODO 開いたときは直近1分ぐらい読みたいが、コメントリロードボタンでは1秒ぐらいにしたい
     const recentSeconds = 60;
 
-    const now = Date.now() / 1000;
+    const nowSeconds = Date.now() / 1000;
     this.queueToSpeech(values.filter(c => {
       if (!this.filterFn(c)) {
         return false;
@@ -233,7 +231,7 @@ export class NicoliveCommentViewerService extends StatefulService<INicoliveComme
       if (!c.value || !c.value.date) {
         return false;
       }
-      if (c.value.date < (now - recentSeconds)) {
+      if (c.value.date < (nowSeconds - recentSeconds)) {
         return false;
       }
       return true;

@@ -31,7 +31,7 @@
       </div>
       <div class="section-item">
         <div class="row">
-          <button class="button button-nicolive--action" :disabled="!enabled" @click="play">読み上げテスト</button>
+          <button class="button button-nicolive--action" :disabled="!enabled" @click="testSpeechPlay">読み上げテスト</button>
           <button class="button button--default" :disabled="!enabled" @click="reset">リセット</button>
         </div>
       </div>
