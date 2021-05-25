@@ -19,7 +19,6 @@ interface IMessageLayoutProps {
 export default function MessageLayout(p: IMessageLayoutProps & HTMLAttributes<unknown>) {
   const [isErrorDetailsShown, setDetailsShown] = useState(false);
   const error = p.error;
-  const message = p.message || error?.message;
   const details = error?.details;
   const type = error ? 'error' : p.type;
 
