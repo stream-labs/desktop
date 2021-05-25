@@ -1,3 +1,4 @@
+import { remote } from 'electron';
 import React, { useEffect, useState } from 'react';
 import sampleSize from 'lodash/sampleSize';
 import { Button, Modal, Form } from 'antd';
@@ -153,6 +154,22 @@ function ResourceFooter(p: { universityProgress: IUniversityProgress }) {
 }
 
 function GrowthTips(p: { tips: any[] }) {
+  const { MagicLinkService, NavigationService } = Services;
+
+  async function followLink(url: string) {
+    if (url === 'theme-library') return NavigationService.navigate('BrowseOverlays');
+    if (/https/.test(url)) {
+      remote.shell.openExternal(url);
+    } else {
+      try {
+        const link = await MagicLinkService.getDashboardMagicLink(url);
+        remote.shell.openExternal(link);
+      } catch (e: unknown) {
+        console.error('Error generating dashboard magic link', e);
+      }
+    }
+  }
+
   return (
     <div className={styles.growthTipsContainer}>
       <h2>{$t('Growth Tips')}</h2>
@@ -162,7 +179,7 @@ function GrowthTips(p: { tips: any[] }) {
             <i className={tip.icon} />
             <strong>{tip.title}</strong>
             <p>{tip.description}</p>
-            <Button>{tip.cta}</Button>
+            <Button onClick={() => followLink(tip.link)}>{tip.cta}</Button>
           </div>
         ))}
       </Scrollable>

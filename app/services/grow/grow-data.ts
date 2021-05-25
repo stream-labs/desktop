@@ -72,7 +72,7 @@ export const GROWTH_TIPS = () => [
   {
     title: 'Engage Your Viewers',
     icon: 'icon-cloudbot',
-    link: 'https://streamlabs.com/dashboard#/cloudbot/mod-tools',
+    link: 'cloudbot',
     cta: 'Check out Streamlabs Cloudbot',
     description:
       'Chatbots allow you to engage with your viewers automatically. Streamlabs Cloudbot offers moderation tools, mini-games, and other engagement tools to keep your chat active.',

@@ -1,3 +1,4 @@
+import { remote } from 'electron';
 import React from 'react';
 import cx from 'classnames';
 import { Progress, Button } from 'antd';
@@ -73,6 +74,11 @@ export function UniversityCard(p: { progress: IUniversityProgress }) {
   let buttonText = $t('Open Streamlabs University');
   let imageUrl = 'https://slobs-cdn.streamlabs.com/media/grow/streamlabs_university.png';
 
+  function openLink() {
+    const url = p.progress.stopped_at?.url || 'https://streamlabs.com/university';
+    remote.shell.openExternal(url);
+  }
+
   if (p.progress.enrolled && p.progress?.total_progress < 100 && p.progress.stopped_at) {
     content = <UniversityProgress progress={p.progress} />;
     buttonText = $t('Continue Learning');
@@ -85,7 +91,7 @@ export function UniversityCard(p: { progress: IUniversityProgress }) {
       <div className={styles.cardInner}>
         <h3>{$t('Streamlabs University')}</h3>
         <span>{content}</span>
-        <Button>{buttonText}</Button>
+        <Button onClick={openLink}>{buttonText}</Button>
       </div>
       <img src={imageUrl} />
     </div>
@@ -112,6 +118,16 @@ function UniversityProgress(p: { progress: IUniversityProgress }) {
 }
 
 export function ContentHubCard() {
+  function openLink(youtube?: boolean) {
+    if (youtube) {
+      return remote.shell.openExternal(
+        'https://www.youtube.com/playlist?list=PLNqq3_wAj1iBLgWoGw9MrM9_Ts0KewtMK',
+      );
+    }
+
+    remote.shell.openExternal('https://streamlabs.com/content-hub');
+  }
+
   return (
     <div className={styles.card} style={{ minWidth: '580px' }}>
       <div className={styles.cardInner}>
@@ -122,8 +138,8 @@ export function ContentHubCard() {
           )}
         </span>
         <footer>
-          <Button>{$t('Open Content Hub')}</Button>
-          <Button>{$t('Streamlabs on YouTube')}</Button>
+          <Button onClick={() => openLink()}>{$t('Open Content Hub')}</Button>
+          <Button onClick={() => openLink(true)}>{$t('Streamlabs on YouTube')}</Button>
         </footer>
       </div>
       <img src="https://slobs-cdn.streamlabs.com/media/grow/content_hub.png" />
