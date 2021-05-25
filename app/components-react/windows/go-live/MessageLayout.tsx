@@ -25,7 +25,7 @@ export default function MessageLayout(p: IMessageLayoutProps & HTMLAttributes<un
 
   function render() {
     return (
-      <div>
+      <div className={styles.container}>
         <Alert type={type} message={message} showIcon description={renderDescription()} />
       </div>
     );
