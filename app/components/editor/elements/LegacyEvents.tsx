@@ -25,8 +25,6 @@ export default class LegacyEvents extends BaseElement {
   }
 
   handleBrowserViewReady(view: Electron.BrowserView) {
-    if (view.isDestroyed()) return;
-
     electron.ipcRenderer.send('webContents-preventPopup', view.webContents.id);
 
     view.webContents.on('new-window', async (e, url) => {

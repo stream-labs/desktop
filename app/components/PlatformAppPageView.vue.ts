@@ -19,7 +19,7 @@ export default class PlatformAppPageView extends Vue {
   };
 
   resizeInterval: number;
-  containerId: number;
+  containerId: string;
   loadSub: Subscription;
   currentPosition: IVec2;
   currentSize: IVec2;
