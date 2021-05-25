@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { Services } from '../../../service-provider';
 import { $t } from '../../../../services/i18n';
 import BroadcastInput from './BroadcastInput';
-import { useAsyncState, useOnCreate } from '../../../hooks';
+import { useAsyncState } from '../../../hooks';
 import InputWrapper from '../../../shared/inputs/InputWrapper';
 import Form from '../../../shared/inputs/Form';
 import { useGoLiveSettings } from '../useGoLiveSettings';
