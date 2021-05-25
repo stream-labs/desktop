@@ -1,5 +1,3 @@
-import { $t } from 'services/i18n';
-
 export const GROWTH_TIPS = () => [
   {
     title: 'Set Up Tips',
@@ -18,7 +16,7 @@ export const GROWTH_TIPS = () => [
   {
     title: 'Create Panels',
     icon: 'icon-one-column',
-    link: 'https://streamlabs.com/dashboard#/prime/panels',
+    link: encodeURIComponent('prime/panels'),
     cta: 'Create Panels',
     description:
       'Striving to create a professional-looking stream is a great way to communicate to viewers that you care about your craft. A beautiful looking stream (in addition to entertaining content), can encourage new viewers to stick around and drop a follow.',
@@ -48,7 +46,7 @@ export const GROWTH_TIPS = () => [
   {
     title: 'Get a Sweet Logo',
     icon: 'icon-diamond',
-    link: 'https://streamlabs.com/dashboard#/prime/logo',
+    link: encodeURIComponent('prime/logo'),
     cta: 'Make a Logo Now',
     description:
       'A strong logo to use across your stream and social media will help display a professional and unified brand.',
