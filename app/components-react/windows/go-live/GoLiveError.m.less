@@ -1,15 +1,10 @@
 @import "../../../styles/index.less";
 
 .container {
-  color: var(--paragraph);
-}
-
-.container_error {
-  background-color: var(--warning-bg) !important;
-}
-
-.container_success {
-  background-color: var(--teal-semi) !important;
+  // allow to select errors text
+  * {
+    user-select: text;
+  }
 }
 
 .title {
