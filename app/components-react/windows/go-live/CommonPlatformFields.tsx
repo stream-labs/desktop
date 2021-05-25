@@ -32,18 +32,20 @@ export default function CommonPlatformFields(p: IProps) {
     isMultiplatformMode,
     supports,
     descriptionIsRequired,
+    shouldShowPropsForSinglePlatform,
+    platformSettings,
   } = useGoLiveSettings(ctx => {
     // description is required for Facebook
     const fbSettings = ctx.platforms.facebook!;
     const descriptionIsRequired =
       p.platform === 'facebook' ||
       (!p.platform && fbSettings && fbSettings.enabled && !fbSettings.useCustomFields);
-    return { descriptionIsRequired };
+    const shouldShowPropsForSinglePlatform = !!p.platform;
+    const platformSettings = shouldShowPropsForSinglePlatform
+      ? ctx.getPlatformSettings(p.platform!)
+      : null;
+    return { descriptionIsRequired, shouldShowPropsForSinglePlatform, platformSettings };
   });
-  const shouldShowPropsForSinglePlatform = !!p.platform;
-  const platformSettings = shouldShowPropsForSinglePlatform
-    ? getPlatformSettings(p.platform!)
-    : null;
 
   /**
    * Toggle the "Use different title and description " checkbox

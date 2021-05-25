@@ -22,7 +22,13 @@ export function TiktokEditStreamInfo() {
     <Form name="tiktok-settings">
       <TextInput label={$t('TikTok Server URL')} required {...bind.serverUrl} />
       <TextInput label={$t('TikTok Stream Key')} required {...bind.streamKey} />
-      <InputWrapper>
+      <InputWrapper
+        extra={
+          <p>
+            <a onClick={openInfoPage}>{$t('Click here to learn more about streaming on TikTok')}</a>
+          </p>
+        }
+      >
         <Button onClick={openStreamPage} style={{ marginBottom: '10px' }}>
           {$t('Locate my Stream Key')}
         </Button>
@@ -34,4 +40,10 @@ export function TiktokEditStreamInfo() {
 function openStreamPage() {
   const username = Services.UserService.state.auth?.platforms.tiktok?.username;
   electron.remote.shell.openExternal(`https://www.tiktok.com/@${username}/live`);
+}
+
+function openInfoPage() {
+  electron.remote.shell.openExternal(
+    'https://streamlabs.com/content-hub/post/how-to-live-stream-on-tiktok-from-a-pc',
+  );
 }

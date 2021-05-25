@@ -2,6 +2,7 @@ import React, { HTMLAttributes } from 'react';
 import { TPlatform } from '../../services/platforms';
 import cx from 'classnames';
 import css from './PlatformLogo.m.less';
+import KevinSvg from './KevinSvg';
 
 const sizeMap = {
   medium: 40,
@@ -30,5 +31,12 @@ export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
   const sizeStyle = size ? { fontSize: `${size}px` } : undefined;
   const colorStyle = p.color ? { color: p.color } : undefined;
   const style = { ...sizeStyle, ...colorStyle };
+  if (p.platform === 'streamlabs') {
+    return (
+      <KevinSvg
+        style={{ ...style, height: `${size}px`, width: `${size}px`, fill: 'var(--teal)' }}
+      />
+    );
+  }
   return <i className={cx(iconForPlatform(), css[p.platform], p.className)} style={style} />;
 }
