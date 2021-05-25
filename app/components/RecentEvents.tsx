@@ -7,7 +7,7 @@ import { Component } from 'vue-property-decorator';
 import styles from './RecentEvents.m.less';
 import TsxComponent, { createProps } from './tsx-component';
 import Scrollable from 'components/shared/Scrollable';
-import PlatformLogo from 'components/shared/PlatformLogo';
+import { PlatformLogo } from 'components/shared/ReactComponent';
 import { UserService } from 'services/user';
 import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
@@ -254,11 +254,11 @@ class EventCell extends TsxComponent<EventCellProps> {
   get platformIcon() {
     const platform = this.props.event.platform;
     return {
-      twitch_account: <PlatformLogo platform="twitch" />,
-      youtube_account: <PlatformLogo platform="youtube" />,
-      facebook_account: <PlatformLogo platform="facebook" />,
-      streamlabs: <PlatformLogo platform="streamlabs" />,
-      streamlabscharity: <PlatformLogo platform="streamlabs" />,
+      twitch_account: <PlatformLogo componentProps={{ platform: 'twitch' }} />,
+      youtube_account: <PlatformLogo componentProps={{ platform: 'youtube' }} />,
+      facebook_account: <PlatformLogo componentProps={{ platform: 'facebook' }} />,
+      streamlabs: <PlatformLogo componentProps={{ platform: 'streamlabs', size: 16 }} />,
+      streamlabscharity: <PlatformLogo componentProps={{ platform: 'streamlabs', size: 16 }} />,
     }[platform];
   }
 
