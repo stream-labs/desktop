@@ -397,6 +397,8 @@ function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
   type TComponentId = string;
   type TSubscription = {
     componentId: TComponentId;
+    parentId: TComponentId;
+    isDestroyed: boolean;
     sequence: number;
     checkIsDestroyed(): boolean;
     getGlobalStateRevision(): number;
@@ -423,6 +425,9 @@ function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
   // true if we currently watch vuex
   let isWatching = false;
   let unsubscribeVuex: Function | null = null;
+
+  // a stack for remembering parent/child relationship
+  const componentIdStack: TComponentId[] = [];
 
   // subscribe on changes from the local state
   dispatcher.subscribe((newState, revision) => {
@@ -456,13 +461,18 @@ function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
         onChange,
         getGlobalStateRevision,
         getLocalStateRevision,
-        checkIsDestroyed,
+        checkIsDestroyed() {
+          return this.isDestroyed || checkIsDestroyed();
+        },
+        parentId: componentIdStack[componentIdStack.length - 1] || '',
         isReady: false,
+        isDestroyed: false,
       };
     } else {
       // if component is already registered then stop listen changes until its mount
       components[componentId].isReady = false;
     }
+    componentIdStack.push(componentId);
   }
 
   /**
@@ -473,6 +483,23 @@ function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
   function markAsReadyToWatch(componentId: string) {
     // mark component as ready to receiving state updates
     components[componentId].isReady = true;
+    componentIdStack.pop();
+
+    // mark as destroyed unmounted children
+    const unmountedChildren = getComponents().filter(child => {
+      if (child.parentId !== componentId) return false;
+      const parent = components[componentId];
+      // if the child revision is lower than parent revision
+      // then the child component has not been re-rendered after parent component render
+      // consider the child is deleted
+      if (
+        parent.getLocalStateRevision() > child.getGlobalStateRevision() ||
+        parent.getGlobalStateRevision() > child.getLocalStateRevision()
+      ) {
+        return true;
+      }
+    });
+    unmountedChildren.forEach(comp => (comp.isDestroyed = true));
 
     // if some component is not in the ready state, then just exit
     const hasPendingComponents = Object.keys(components).find(id => !components[id].isReady);
@@ -675,8 +702,13 @@ export function merge<
   T1 extends object,
   T2 extends object,
   T3 extends object,
-  TReturnType = T3 extends undefined ? TMerge<T1, T2> : TMerge3<T1, T2, T3>
->(...objects: [T1, T2, T3?]): TReturnType {
+  T4 extends object,
+  TReturnType = T3 extends undefined
+    ? TMerge<T1, T2>
+    : T4 extends undefined
+    ? TMerge3<T1, T2, T3>
+    : TMerge4<T1, T2, T3, T4>
+>(...objects: [T1, T2, T3?, T4?]): TReturnType {
   const mergedObjects = flatten(objects.map(getMergedObjects));
 
   const metadata = {
@@ -813,6 +845,7 @@ export type TMerge<
 > = R;
 
 export type TMerge3<T1, T2, T3> = TMerge<TMerge<T1, T2>, T3>;
+export type TMerge4<T1, T2, T3, T4> = TMerge<TMerge3<T1, T2, T3>, T4>;
 
 /**
  * Create mutations from reducers
