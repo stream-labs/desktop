@@ -13,7 +13,10 @@ import electron from 'electron';
 import Utils from 'services/utils';
 import { getPlatformService } from 'services/platforms';
 import { UserService } from 'services/user';
-import { IYoutubeVideoUploadOptions } from 'services/platforms/youtube/uploader';
+import {
+  IYoutubeVideoUploadOptions,
+  IYoutubeUploadResponse,
+} from 'services/platforms/youtube/uploader';
 import { YoutubeService } from 'services/platforms/youtube';
 
 // const FFMPEG_DIR = path.resolve('../../', 'Downloads', 'ffmpeg', 'bin');
@@ -703,6 +706,7 @@ export interface IUploadInfo {
   uploadedBytes: number;
   totalBytes: number;
   cancelRequested: boolean;
+  videoId: string;
 }
 
 export interface ITransitionInfo {
@@ -796,6 +800,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       uploadedBytes: 0,
       totalBytes: 0,
       cancelRequested: false,
+      videoId: null,
     },
   } as IHighligherState;
 
@@ -865,7 +870,8 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   init() {
     if (TEST_MODE) {
       const clipsToLoad = [
-        path.join(CLIP_DIR, '2021-05-12 12-59-28.mp4'),
+        // Aero 15 test clips
+        // path.join(CLIP_DIR, '2021-05-12 12-59-28.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-20.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-29.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-41.mp4'),
@@ -873,7 +879,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-58.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-03.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-06.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-30-53.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-30-53.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-32-34.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-33.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-48.mp4'),
@@ -881,8 +887,12 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-23.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-51.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-18.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-30.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-30.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-44.mp4'),
+        // Razer blade test clips
+        path.join(CLIP_DIR, '2021-05-25 08-55-13.mp4'),
+        path.join(CLIP_DIR, '2021-05-25 08-55-34.mp4'),
+        path.join(CLIP_DIR, '2021-05-25 08-56-03.mp4'),
       ];
 
       clipsToLoad.forEach(c => {
@@ -1084,6 +1094,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
 
     await fader.cleanup();
     this.SET_EXPORT_INFO({ exporting: false, exported: !this.views.exportInfo.cancelRequested });
+    this.SET_UPLOAD_INFO({ videoId: null });
   }
 
   cancelFunction: () => void = null;
@@ -1117,9 +1128,10 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     );
 
     this.cancelFunction = cancel;
+    let result: IYoutubeUploadResponse;
 
     try {
-      await complete;
+      result = await complete;
     } catch (e: unknown) {
       if (this.views.uploadInfo.cancelRequested) {
         console.log('The upload was canceled');
@@ -1129,7 +1141,11 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     }
 
     this.cancelFunction = null;
-    this.SET_UPLOAD_INFO({ uploading: false, cancelRequested: false });
+    this.SET_UPLOAD_INFO({
+      uploading: false,
+      cancelRequested: false,
+      videoId: result ? result.id : null,
+    });
   }
 
   /**

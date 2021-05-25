@@ -119,6 +119,15 @@ export default function Highlighter() {
     inspectedClip = v.clips.find(c => c.path === inspectedClipPath) ?? null;
   }
 
+  function closeModal() {
+    // Do not allow closing export modal while export/upload operations are in progress
+    if (v.exportInfo.exporting) return;
+    if (v.uploadInfo.uploading) return;
+
+    setInspectedClipPath(null);
+    setShowModal(null);
+  }
+
   function getClipsView() {
     const clipList = v.clips.map(c => ({ id: c.path }));
 
@@ -144,14 +153,7 @@ export default function Highlighter() {
         {getControls()}
         <Modal
           getContainer={`.${styles.clipsViewRoot}`}
-          onCancel={() => {
-            // Do not allow closing export modal while export/upload operations are in progress
-            if (v.exportInfo.exporting) return;
-            if (v.uploadInfo.uploading) return;
-
-            setInspectedClipPath(null);
-            setShowModal(null);
-          }}
+          onCancel={closeModal}
           footer={null}
           width={showModal === 'trim' ? '60%' : '700px'}
           closable={false}
@@ -159,7 +161,7 @@ export default function Highlighter() {
           destroyOnClose={true}
         >
           {inspectedClip && showModal === 'trim' && <ClipTrimmer clip={inspectedClip} />}
-          {showModal === 'export' && <ExportModal />}
+          {showModal === 'export' && <ExportModal close={closeModal} />}
         </Modal>
       </div>
     );

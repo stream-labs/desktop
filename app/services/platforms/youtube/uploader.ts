@@ -20,7 +20,7 @@ interface IUploadProgress {
  * This object is extremely extensive, but for right now we
  * are just defining typings for what we use.
  */
-interface IYoutubeUploadResponse {
+export interface IYoutubeUploadResponse {
   id: string;
 }
 

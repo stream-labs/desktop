@@ -9,6 +9,7 @@ import path from 'path';
 import { Button, Progress } from 'antd';
 import { RadioInput } from 'components-react/shared/inputs/RadioInput';
 import { TPrivacyStatus } from 'services/platforms/youtube/uploader';
+import electron from 'electron';
 
 // Source: https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string/10420404
 function humanFileSize(bytes: number, si: boolean) {
@@ -27,7 +28,7 @@ function humanFileSize(bytes: number, si: boolean) {
   return bytes.toFixed(1) + ' ' + units[u];
 }
 
-function YoutubeUpload(props: { defaultTitle: string }) {
+function YoutubeUpload(props: { defaultTitle: string; close: () => void }) {
   const [title, setTitle] = useState(props.defaultTitle);
   const [description, setDescription] = useState('');
   const [privacy, setPrivacy] = useState('private');
@@ -37,6 +38,7 @@ function YoutubeUpload(props: { defaultTitle: string }) {
     uploadInfo: HighlighterService.views.uploadInfo,
     exportInfo: HighlighterService.views.exportInfo,
   }));
+  const filename = path.parse(v.exportInfo.file).base;
 
   function getYoutubeForm() {
     return (
@@ -44,7 +46,7 @@ function YoutubeUpload(props: { defaultTitle: string }) {
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <div style={{ flexGrow: 1 }}>
             <Form layout="vertical">
-              <TextInput label="Title" value={title} onInput={setTitle} uncontrolled={false} />
+              <TextInput label="Title" value={title} onChange={setTitle} />
               <TextAreaInput label="Description" value={description} onChange={setDescription} />
               <RadioInput
                 label="Privacy Status"
@@ -97,11 +99,22 @@ function YoutubeUpload(props: { defaultTitle: string }) {
                 padding: 12,
               }}
             >
-              {title}
+              {filename}
+              <br />
+              <a
+                onClick={() => {
+                  electron.remote.shell.showItemInFolder(v.exportInfo.file);
+                }}
+              >
+                Open file location
+              </a>
             </div>
           </div>
         </div>
         <div style={{ textAlign: 'right' }}>
+          <Button style={{ marginRight: 8 }} onClick={props.close}>
+            Close
+          </Button>
           <Button
             type="primary"
             onClick={() => {
@@ -148,17 +161,30 @@ function YoutubeUpload(props: { defaultTitle: string }) {
     );
   }
 
+  function getUploadDone() {
+    const url = `https://youtube.com/watch?v=${v.uploadInfo.videoId}`;
+
+    return (
+      <div>
+        TODO
+        <br />
+        <a onClick={() => electron.remote.shell.openExternal(url)}>{url}</a>
+      </div>
+    );
+  }
+
   return (
     <div>
       <h2>Upload to YouTube</h2>
-      {v.youtubeLinked && !v.uploadInfo.uploading && getYoutubeForm()}
+      {v.youtubeLinked && !v.uploadInfo.uploading && !v.uploadInfo.videoId && getYoutubeForm()}
       {v.youtubeLinked && v.uploadInfo.uploading && getUploadProgress()}
+      {v.youtubeLinked && v.uploadInfo.videoId && getUploadDone()}
       {!v.youtubeLinked && <div>TODO: Youtube is not linked</div>}
     </div>
   );
 }
 
-export default function ExportModal() {
+export default function ExportModal(p: { close: () => void }) {
   const { HighlighterService } = Services;
   const v = useVuex(() => ({
     exportInfo: HighlighterService.views.exportInfo,
@@ -205,6 +231,9 @@ export default function ExportModal() {
             }}
           />
           <div style={{ textAlign: 'right' }}>
+            <Button style={{ marginRight: 8 }} onClick={p.close}>
+              Close
+            </Button>
             <Button
               type="primary"
               onClick={() => {
@@ -256,5 +285,5 @@ export default function ExportModal() {
 
   if (v.exportInfo.exporting) return getExportProgress();
   if (!v.exportInfo.exported) return getFileExportStep();
-  return <YoutubeUpload defaultTitle={videoName} />;
+  return <YoutubeUpload defaultTitle={videoName} close={p.close} />;
 }
