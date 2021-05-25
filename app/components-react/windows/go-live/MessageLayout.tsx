@@ -1,6 +1,6 @@
 import styles from './GoLiveError.m.less';
 import React, { useState, HTMLAttributes } from 'react';
-import {errorTypes, IStreamError} from '../../../services/streaming/stream-error';
+import { errorTypes, IStreamError } from '../../../services/streaming/stream-error';
 import { $t } from '../../../services/i18n';
 import { Alert } from 'antd';
 
