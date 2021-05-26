@@ -11,6 +11,7 @@ import Form, { useForm } from '../../shared/inputs/Form';
 import Animation from 'rc-animate';
 import { SwitchInput } from '../../shared/inputs';
 import { useGoLiveSettings } from './useGoLiveSettings';
+import { ReduxTodo } from './ReduxTodo';
 
 export default function GoLiveWindow() {
   const { StreamingService, WindowsService } = Services;
@@ -92,6 +93,7 @@ export default function GoLiveWindow() {
           layout="horizontal"
           name="editStreamForm"
         >
+          <ReduxTodo />
           <Animation transitionName={shouldShowChecklist ? 'slideright' : ''}>
             {/* STEP 1 - FILL OUT THE SETTINGS FORM */}
             {shouldShowSettings && <GoLiveSettings key={'settings'} />}
