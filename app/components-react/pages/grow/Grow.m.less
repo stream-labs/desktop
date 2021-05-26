@@ -68,6 +68,8 @@
 }
 
 .my-goals {
+  position: relative;
+
   .card {
     display: flex;
     flex-direction: column;
@@ -79,6 +81,13 @@
       margin: 0 auto;
       display: block;
     }
+  }
+
+  .add-goal-button {
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 0;
   }
 
   :global(.ant-progress-steps-item) {

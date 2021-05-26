@@ -1,6 +1,5 @@
 import { remote } from 'electron';
 import React, { useEffect, useState, useRef } from 'react';
-import sampleSize from 'lodash/sampleSize';
 import shuffle from 'lodash/shuffle';
 import { Button, Modal, Form } from 'antd';
 import { $t } from '../../../services/i18n';
@@ -11,7 +10,7 @@ import { IGoal, IUniversityProgress, ICommunityReach } from '../../../services/g
 import Util from '../../../services/utils';
 import Scrollable from 'components-react/shared/Scrollable';
 import { GoalCard, PlatformCard, UniversityCard, ContentHubCard, MultistreamCard } from './Cards';
-import { TextInput, NumberInput } from 'components-react/shared/inputs';
+import { TextInput, NumberInput, ListInput } from 'components-react/shared/inputs';
 
 export default function Grow() {
   const { GrowService } = Services;
@@ -57,26 +56,20 @@ export default function Grow() {
 
 function MyGoals(p: { goals: Dictionary<IGoal> }) {
   const { GrowService } = Services;
-  const [goalTitle, setGoalTitle] = useState('');
   const [showGoalModal, setShowGoalModal] = useState(false);
-  const [goalTotal, setGoalTotal] = useState(10);
+
   const mappedGoals = Object.values(p.goals);
 
   const shuffledGoalOptions = useRef(shuffle(GrowService.views.goalOptions));
   const appendedOptions = shuffledGoalOptions.current
     .filter(goal => !p.goals[goal.id])
     .slice(0, 4 - mappedGoals.length);
-
-  function addGoal() {
-    GrowService.actions.addGoal({ title: goalTitle, total: goalTotal, id: '', image: '' });
-    setGoalTitle('');
-    setGoalTotal(10);
-    setShowGoalModal(false);
-  }
-
   return (
     <div className={styles.myGoals}>
       <h2>{$t('My Goals')}</h2>
+      <Button onClick={() => setShowGoalModal(true)} className={styles.addGoalButton}>
+        {$t('Add Goal')}
+      </Button>
 
       <div className={styles.goalsContainer}>
         {mappedGoals.map(goal => (
@@ -86,24 +79,58 @@ function MyGoals(p: { goals: Dictionary<IGoal> }) {
           <GoalCard goal={goal} key={goal.id} showGoalModal={() => setShowGoalModal(true)} />
         ))}
       </div>
-      <Modal
-        visible={showGoalModal}
-        getContainer={`.${styles.goalTabContainer}`}
-        onOk={addGoal}
-        onCancel={() => setShowGoalModal(false)}
-        title={$t('Add Goal')}
-      >
-        <Form>
+      <AddGoalModal visible={showGoalModal} setShowGoalModal={setShowGoalModal} />
+    </div>
+  );
+}
+
+function AddGoalModal(p: { visible: boolean; setShowGoalModal: Function }) {
+  const { GrowService } = Services;
+  const [goalTotal, setGoalTotal] = useState(10);
+  const [goalTitle, setGoalTitle] = useState('');
+  const [goalId, setGoalId] = useState('custom');
+
+  function addGoal() {
+    const image = GrowService.views.goalOptions.find(goal => goalId)?.image || '';
+    GrowService.actions.addGoal({ title: goalTitle, total: goalTotal, id: goalId, image });
+    setGoalTitle('');
+    setGoalTotal(10);
+    p.setShowGoalModal(false);
+  }
+
+  const goalTypes = GrowService.views.goalOptions.map(option => ({
+    value: option.id,
+    label: option.title,
+  }));
+
+  return (
+    <Modal
+      visible={p.visible}
+      getContainer={`.${styles.goalTabContainer}`}
+      onOk={addGoal}
+      onCancel={() => p.setShowGoalModal(false)}
+      title={$t('Add Goal')}
+    >
+      <Form>
+        <ListInput
+          label={$t('Goal Type')}
+          options={goalTypes}
+          value={goalId}
+          onChange={setGoalId}
+        />
+        {goalId === 'custom' && (
           <TextInput
             label={$t('Goal Title')}
             value={goalTitle}
             onChange={setGoalTitle}
             uncontrolled={false}
           />
+        )}
+        {goalId === 'custom' && (
           <NumberInput label={$t('Goal Total')} value={goalTotal} min={0} onChange={setGoalTotal} />
-        </Form>
-      </Modal>
-    </div>
+        )}
+      </Form>
+    </Modal>
   );
 }
 
