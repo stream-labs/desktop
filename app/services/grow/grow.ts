@@ -116,10 +116,12 @@ export class GrowService extends PersistentStatefulService<IGrowServiceState> {
     const communityReach: ICommunityReach[] = [];
 
     await Promise.all(
-      Object.keys(platforms).map(async platform => {
-        const followers = await platformService[platform].fetchFollowers();
-        communityReach.push({ icon: platform as TPlatform, followers });
-      }),
+      Object.keys(platforms)
+        .filter(platform => platform !== 'tiktok')
+        .map(async platform => {
+          const followers = await platformService[platform].fetchFollowers();
+          communityReach.push({ icon: platform as TPlatform, followers });
+        }),
     );
 
     return communityReach;
