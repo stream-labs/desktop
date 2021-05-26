@@ -1,6 +1,7 @@
 import { remote } from 'electron';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import sampleSize from 'lodash/sampleSize';
+import shuffle from 'lodash/shuffle';
 import { Button, Modal, Form } from 'antd';
 import { $t } from '../../../services/i18n';
 import styles from './Grow.m.less';
@@ -49,7 +50,7 @@ export default function Grow() {
         <MyCommunity platforms={platforms} />
         <ResourceFooter universityProgress={universityProgress} />
       </div>
-      <GrowthTips tips={GrowService.views.tips} />
+      <GrowthTips />
     </div>
   );
 }
@@ -60,10 +61,11 @@ function MyGoals(p: { goals: Dictionary<IGoal> }) {
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [goalTotal, setGoalTotal] = useState(10);
   const mappedGoals = Object.values(p.goals);
-  const appendedOptions = sampleSize(
-    GrowService.views.goalOptions.filter(goal => !p.goals[goal.id]),
-    4 - mappedGoals.length,
-  );
+
+  const shuffledGoalOptions = useRef(shuffle(GrowService.views.goalOptions));
+  const appendedOptions = shuffledGoalOptions.current
+    .filter(goal => !p.goals[goal.id])
+    .slice(0, 4 - mappedGoals.length);
 
   function addGoal() {
     GrowService.actions.addGoal({ title: goalTitle, total: goalTotal, id: '', image: '' });
@@ -153,8 +155,10 @@ function ResourceFooter(p: { universityProgress: IUniversityProgress }) {
   );
 }
 
-function GrowthTips(p: { tips: any[] }) {
-  const { MagicLinkService, NavigationService } = Services;
+function GrowthTips() {
+  const { MagicLinkService, NavigationService, GrowService } = Services;
+
+  const tips = useRef(shuffle(GrowService.views.tips));
 
   async function followLink(url: string) {
     if (url === 'theme-library') return NavigationService.navigate('BrowseOverlays');
@@ -174,12 +178,12 @@ function GrowthTips(p: { tips: any[] }) {
     <div className={styles.growthTipsContainer}>
       <h2>{$t('Growth Tips')}</h2>
       <Scrollable isResizable={false} style={{ height: '100%' }}>
-        {p.tips.map(tip => (
+        {tips.current.map(tip => (
           <div className={styles.card} key={tip.title}>
             <i className={tip.icon} />
             <strong>{tip.title}</strong>
             <p>{tip.description}</p>
-            <Button onClick={() => followLink(tip.link)}>{tip.cta}</Button>
+            {tip.link && <Button onClick={() => followLink(tip.link)}>{tip.cta}</Button>}
           </div>
         ))}
       </Scrollable>
