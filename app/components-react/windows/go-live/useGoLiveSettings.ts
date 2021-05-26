@@ -305,7 +305,7 @@ function initializeGoLiveSettings(
     },
   };
 
-  const schedulerActions = createSchedulerActions(getState, setState);
+  const schedulerActions = createSchedulerActions(getState, setState, form);
 
   // merge everything we are going to have accessible in components into one object
   // StateManager will take care about optimal re-rendering order
@@ -320,6 +320,7 @@ export function useStreamScheduler() {
 function createSchedulerActions(
   getState: () => IGoLiveSettingsState,
   setState: (newState: IGoLiveSettingsState) => void,
+  form: FormInstance,
 ) {
   const { StreamingService, YoutubeService, FacebookService } = Services;
   const view = StreamingService.views;
@@ -359,8 +360,15 @@ function createSchedulerActions(
       setState({ ...getState(), streamEvents });
     },
 
-    submitEvent() {
-      alert('TODO: create');
+    async submitEvent() {
+      try {
+        await form.validateFields();
+        const settings = getState();
+        await StreamingService.actions.return.scheduleStream(settings);
+      } catch (e: unknown) {
+        message.error($t('Invalid settings. Please check the form'));
+        return false;
+      }
     },
 
     showNewEventModal(platform?: TPlatform) {
