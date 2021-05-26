@@ -15,6 +15,11 @@ export function GoalCard(p: { goal: IGoal; showGoalModal?: Function }) {
   const { title, image, id } = p.goal;
 
   const daysLeft = Math.round(GrowService.views.timeLeft(p.goal) / ONE_DAY);
+  const goalFinished = GrowService.views.goalExpiredOrComplete(p.goal);
+  const goalFinishedText =
+    p.goal.progress === p.goal.total
+      ? $t('This goal has been completed!')
+      : $t('Time ran out for this goal. Try again or pick a new one!');
 
   function incrementCustomGoal() {
     GrowService.actions.incrementGoal(p.goal.id, 1);
@@ -41,7 +46,7 @@ export function GoalCard(p: { goal: IGoal; showGoalModal?: Function }) {
   return (
     <div className={styles.card} key={id}>
       <strong>{title}</strong>
-      {daysLeft !== Infinity && (
+      {daysLeft !== Infinity && !goalFinished && (
         <span className={styles.whisper}>{$t('%{daysLeft} days left', { daysLeft })}</span>
       )}
       {p.goal.progress != null && (
@@ -52,13 +57,14 @@ export function GoalCard(p: { goal: IGoal; showGoalModal?: Function }) {
           strokeWidth={16}
         />
       )}
-      {p.goal.progress != null && manuallyProgressedGoal ? (
+      {p.goal.progress != null && manuallyProgressedGoal && !goalFinished ? (
         <Button onClick={incrementCustomGoal} type="primary">
           {$t('Progress')}
         </Button>
       ) : (
         <img src={image} />
       )}
+      {goalFinished && <span>{goalFinishedText}</span>}
       {p.goal.progress == null && <Button onClick={addGoal}>{$t('Add Goal')}</Button>}
       {p.goal.progress != null && (
         <i onClick={removeGoal} className={cx('icon-close', styles.closeIcon)} />

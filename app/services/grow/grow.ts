@@ -61,6 +61,12 @@ class GrowServiceViews extends ViewHandler<IGrowServiceState> {
     return GROWTH_TIPS();
   }
 
+  goalExpiredOrComplete(goal: IGoal) {
+    if (goal.progress === goal.total) return true;
+    if (this.timeLeft(goal) <= 0) return true;
+    return false;
+  }
+
   timeLeft(goal: IGoal) {
     if (!goal.startDate) return Infinity;
     if (/week/.test(goal.id)) return goal.startDate + ONE_WEEK - Date.now();
@@ -144,7 +150,7 @@ export class GrowService extends PersistentStatefulService<IGrowServiceState> {
 
   incrementGoal(goalId: string, amount: number) {
     const goal = this.state.goals[goalId];
-    if (!goal) return;
+    if (!goal || this.views.goalExpiredOrComplete(goal)) return;
     this.INCREMENT_GOAL(goal, amount);
   }
 
