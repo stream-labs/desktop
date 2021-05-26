@@ -1,16 +1,18 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { Button } from 'antd';
-import { useReduxTodo } from './useReduxTodo';
+import { store, useReduxTodo } from './useReduxTodo';
 
 export function ReduxTodo() {
   console.log('render root');
   return (
     <React.StrictMode>
-      <div>This is redux comp</div>
-      <ReduxTodoHeader />
-      <ReduxTodoList />
-      <ReduxTodoButtons />
+      <Provider store={store}>
+        <div>This is redux comp</div>
+        <ReduxTodoHeader />
+        <ReduxTodoList />
+        <ReduxTodoButtons />
+      </Provider>
     </React.StrictMode>
   );
 }
@@ -21,13 +23,13 @@ export function ReduxTodoHeader() {
 }
 
 export function ReduxTodoList() {
-  const items = useReduxTodo();
+  const { items } = useReduxTodo();
   console.log('render list');
   return (
     <ul>
       {items.map((item, ind) => (
         <li key={ind}>
-          {item.title} done: {item.done}
+          {item.title} done: {String(item.done)}
         </li>
       ))}
     </ul>

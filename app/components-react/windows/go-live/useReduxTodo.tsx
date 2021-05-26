@@ -1,6 +1,5 @@
 import { configureStore, createSlice } from '@reduxjs/toolkit';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
-import type { RootState, AppDispatch } from './store';
 
 export type AppDispatch = typeof store.dispatch;
 export type RootState = ReturnType<typeof store.getState>;
@@ -35,6 +34,9 @@ export const todoSlice = createSlice({
     markAllDone(state) {
       state.items.forEach(item => (item.done = true));
     },
+    markAllUndone(state) {
+      state.items.forEach(item => (item.done = true));
+    },
   },
 });
 
@@ -46,5 +48,9 @@ export const store = configureStore({
 
 export function useReduxTodo() {
   const items = useAppSelector((state: RootState) => state.todo.items);
-  return { items, markAllDone: todoSlice.actions.markAllDone };
+  return {
+    items,
+    markAllDone: todoSlice.actions.markAllDone,
+    markAllUndone: todoSlice.actions.markAllUndone,
+  };
 }

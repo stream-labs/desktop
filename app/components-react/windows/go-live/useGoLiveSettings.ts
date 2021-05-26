@@ -35,7 +35,7 @@ export function useGoLiveSettings<
   useEffect(() => {
     // if it's a root component than sync platform settings
     if (isRoot && contextView.needPrepopulate) {
-      contextView.prepopulate();
+      // contextView.prepopulate();
     }
   }, []);
 
