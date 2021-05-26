@@ -18,8 +18,8 @@ import {
   IYoutubeUploadResponse,
 } from 'services/platforms/youtube/uploader';
 import { YoutubeService } from 'services/platforms/youtube';
+import os from 'os';
 
-// const FFMPEG_DIR = path.resolve('../../', 'Downloads', 'ffmpeg', 'bin');
 const FFMPEG_DIR = Utils.isDevMode()
   ? path.resolve('node_modules', 'ffmpeg-ffprobe-static')
   : path.resolve(process.resourcesPath, 'node_modules', 'ffmpeg-ffprobe-static');
@@ -32,7 +32,6 @@ export const CLIP_1 = path.join(CLIP_DIR, '1.mp4');
 export const CLIP_2 = path.join(CLIP_DIR, '2.mp4');
 export const CLIP_3 = path.join(CLIP_DIR, '3.mp4');
 export const CLIP_4 = path.join(CLIP_DIR, 'Facebook Refactor.mov');
-// const EXPORT_NAME = path.join(CLIP_DIR, 'output');
 
 const WIDTH = 1280;
 const HEIGHT = 720;
@@ -40,6 +39,10 @@ const FPS = 30;
 
 // Frames are RGBA, 4 bytes per pixel
 const FRAME_BYTE_SIZE = WIDTH * HEIGHT * 4;
+
+const PREVIEW_WIDTH = 1280 / 4;
+const PREVIEW_HEIGHT = 720 / 4;
+const PREVIEW_FRAME_BYTE_SIZE = PREVIEW_HEIGHT * PREVIEW_HEIGHT * 4;
 
 export const SCRUB_WIDTH = 320;
 export const SCRUB_HEIGHT = 180;
@@ -177,14 +180,14 @@ export class AudioSource {
 }
 
 export class FrameSource {
-  writeBuffer = Buffer.allocUnsafe(FRAME_BYTE_SIZE);
-  readBuffer = Buffer.allocUnsafe(FRAME_BYTE_SIZE);
+  writeBuffer = Buffer.allocUnsafe(this.preview ? PREVIEW_FRAME_BYTE_SIZE : FRAME_BYTE_SIZE);
+  readBuffer = Buffer.allocUnsafe(this.preview ? PREVIEW_FRAME_BYTE_SIZE : FRAME_BYTE_SIZE);
   private byteIndex = 0;
 
   scrubJpg: string;
 
-  readonly width = WIDTH;
-  readonly height = HEIGHT;
+  readonly width = this.preview ? PREVIEW_WIDTH : WIDTH;
+  readonly height = this.preview ? PREVIEW_HEIGHT : HEIGHT;
 
   private ffmpeg: execa.ExecaChildProcess<Buffer | string>;
 
@@ -207,6 +210,7 @@ export class FrameSource {
     public readonly duration: number,
     public readonly startTrim: number,
     public readonly endTrim: number,
+    public readonly preview: boolean,
   ) {}
 
   async exportScrubbingSprite() {
@@ -302,17 +306,17 @@ export class FrameSource {
   }
 
   private handleChunk(chunk: Buffer) {
+    const frameByteSize = this.preview ? PREVIEW_FRAME_BYTE_SIZE : FRAME_BYTE_SIZE;
+
     // If the chunk is larger than what's needed to fill the rest of the frame buffer,
     // only copy enough to fill the buffer.
     const bytesToCopy =
-      this.byteIndex + chunk.length > FRAME_BYTE_SIZE
-        ? FRAME_BYTE_SIZE - this.byteIndex
-        : chunk.length;
+      this.byteIndex + chunk.length > frameByteSize ? frameByteSize - this.byteIndex : chunk.length;
 
     chunk.copy(this.writeBuffer, this.byteIndex, 0, bytesToCopy);
     this.byteIndex += bytesToCopy;
 
-    if (this.byteIndex >= FRAME_BYTE_SIZE) {
+    if (this.byteIndex >= frameByteSize) {
       this.ffmpeg.stdout?.pause();
 
       this.swapBuffers();
@@ -375,12 +379,13 @@ export class Clip {
    * FrameSource and AudioSource are disposable. Call this to reset them
    * to start reading from the file again.
    */
-  reset() {
+  reset(preview: boolean) {
     this.frameSource = new FrameSource(
       this.sourcePath,
       this.duration,
       this.startTrim,
       this.endTrim,
+      preview,
     );
     this.audioSource = new AudioSource(
       this.sourcePath,
@@ -392,7 +397,7 @@ export class Clip {
 
   private async doInit() {
     await this.readDuration();
-    this.reset();
+    this.reset(false);
     await this.frameSource.exportScrubbingSprite();
   }
 
@@ -479,10 +484,14 @@ export class AudioCrossfader {
 }
 
 export class FrameWriter {
-  constructor(public readonly outputPath: string, public readonly audioInput: string) {}
+  constructor(
+    public readonly outputPath: string,
+    public readonly audioInput: string,
+    public readonly preview: boolean,
+  ) {}
 
-  readonly width = WIDTH;
-  readonly height = HEIGHT;
+  readonly width = this.preview ? PREVIEW_WIDTH : WIDTH;
+  readonly height = this.preview ? PREVIEW_HEIGHT : HEIGHT;
 
   private ffmpeg: execa.ExecaChildProcess<Buffer | string>;
 
@@ -600,14 +609,14 @@ export class Transitioner {
   private canvas = document.createElement('canvas');
   private gl = this.canvas.getContext('webgl')!;
 
-  readonly width = WIDTH;
-  readonly height = HEIGHT;
+  readonly width = this.preview ? PREVIEW_WIDTH : WIDTH;
+  readonly height = this.preview ? PREVIEW_HEIGHT : HEIGHT;
 
-  private readBuffer = Buffer.allocUnsafe(FRAME_BYTE_SIZE);
+  private readBuffer = Buffer.allocUnsafe(this.preview ? PREVIEW_FRAME_BYTE_SIZE : FRAME_BYTE_SIZE);
 
   private transitionSrc: any;
 
-  constructor(public readonly transitionType: string) {
+  constructor(public readonly transitionType: string, public readonly preview: boolean) {
     this.canvas.width = this.width;
     this.canvas.height = this.height;
     this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
@@ -692,6 +701,7 @@ export interface IExportInfo {
   step: EExportStep;
   cancelRequested: boolean;
   file: string;
+  previewFile: string;
 
   /**
    * Whether the export finished successfully.
@@ -793,6 +803,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       step: EExportStep.AudioMix,
       cancelRequested: false,
       file: path.join(electron.remote.app.getPath('videos'), 'Output.mp4'),
+      previewFile: path.join(os.tmpdir(), 'highlighter-preview.mp4'),
       exported: false,
     },
     upload: {
@@ -976,7 +987,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
    * Exports the video using the currently configured settings
    * Return true if the video was exported, or false if not.
    */
-  async export() {
+  async export(preview = false) {
     if (!this.views.loaded) {
       console.error('Highlighter: Export called while clips are not fully loaded!');
       return;
@@ -1005,7 +1016,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     }
 
     // Reset all clips
-    clips.forEach(c => c.reset());
+    clips.forEach(c => c.reset(preview));
 
     // Estimate the total number of frames to set up export info
     const totalFrames = clips.reduce((count: number, clip) => {
@@ -1036,9 +1047,9 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     let fromClip = clips.shift()!;
     let toClip = clips.shift();
 
-    const transitioner = new Transitioner(this.state.transition.type);
-
-    const writer = new FrameWriter(this.views.exportInfo.file, audioMix);
+    const transitioner = new Transitioner(this.state.transition.type, preview);
+    const exportPath = preview ? this.views.exportInfo.previewFile : this.views.exportInfo.file;
+    const writer = new FrameWriter(exportPath, audioMix, preview);
 
     while (true) {
       if (this.views.exportInfo.cancelRequested) {
@@ -1093,7 +1104,10 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     }
 
     await fader.cleanup();
-    this.SET_EXPORT_INFO({ exporting: false, exported: !this.views.exportInfo.cancelRequested });
+    this.SET_EXPORT_INFO({
+      exporting: false,
+      exported: !this.views.exportInfo.cancelRequested && !preview,
+    });
     this.SET_UPLOAD_INFO({ videoId: null });
   }
 

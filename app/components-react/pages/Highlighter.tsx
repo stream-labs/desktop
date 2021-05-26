@@ -12,6 +12,7 @@ import isEqual from 'lodash/isEqual';
 import { SliderInput } from 'components-react/shared/inputs';
 import { Modal, Button } from 'antd';
 import ExportModal from 'components-react/highlighter/ExportModal';
+import PreviewModal from 'components-react/highlighter/PreviewModal';
 
 type TModal = 'trim' | 'export' | 'preview';
 
@@ -162,6 +163,7 @@ export default function Highlighter() {
         >
           {inspectedClip && showModal === 'trim' && <ClipTrimmer clip={inspectedClip} />}
           {showModal === 'export' && <ExportModal close={closeModal} />}
+          {showModal === 'preview' && <PreviewModal />}
         </Modal>
       </div>
     );
