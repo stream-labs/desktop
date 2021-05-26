@@ -944,9 +944,9 @@ export class StreamingService
           status: EStreamingState.Offline,
         });
       } else if (info.signal === EOBSOutputSignal.Stopping) {
+        this.sendStreamEndEvent();
         this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
         this.streamingStatusChange.next(EStreamingState.Ending);
-        this.usageStatisticsService.recordEvent('stream_end');
       } else if (info.signal === EOBSOutputSignal.Reconnect) {
         this.SET_STREAMING_STATUS(EStreamingState.Reconnecting);
         this.streamingStatusChange.next(EStreamingState.Reconnecting);
@@ -1103,6 +1103,35 @@ export class StreamingService
         });
       this.windowsService.actions.closeChildWindow();
     }
+  }
+
+  private sendStreamEndEvent() {
+    const data: Dictionary<any> = {};
+    data.viewerCounts = {};
+    data.duration = Math.round(moment().diff(moment(this.state.streamingStatusTime)) / 1000);
+
+    if (this.views.protectedModeEnabled) {
+      data.platforms = this.views.enabledPlatforms;
+
+      this.views.customDestinations.forEach(() => {
+        data.platforms.push('custom_rtmp');
+      });
+
+      this.views.enabledPlatforms.forEach(platform => {
+        const service = getPlatformService(platform);
+
+        if (service.hasCapability('viewerCount')) {
+          data.viewerCounts[platform] = {
+            average: service.averageViewers,
+            peak: service.peakViewers,
+          };
+        }
+      });
+    } else {
+      data.platforms = ['custom_rtmp'];
+    }
+
+    this.usageStatisticsService.recordEvent('stream_end', data);
   }
 
   /**

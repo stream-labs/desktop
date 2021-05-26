@@ -11,6 +11,7 @@
   "Settings": "Inställningar",
   "That name is already taken": "Namnet är upptaget",
   "Search": "Sök",
+  "Searching...": "Searching...",
   "Create New": "Skapa ny",
   "Language": "Språk",
   "Name is required": "Namn är obligatoriskt",
@@ -129,5 +130,6 @@
   "Height": "Höjd",
   "Use Custom": "Use Custom",
   "Apply": "Apply",
-  "Do not show this message again": "Do not show this message again"
+  "Do not show this message again": "Do not show this message again",
+  "You can only select up to %{max} items": "You can only select up to %{max} items"
 }

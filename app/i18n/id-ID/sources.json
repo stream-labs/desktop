@@ -44,7 +44,6 @@
   "Follower Goal": "Tujuan Pengikut",
   "Twitch Follows": "Twitch Mengikuti",
   "YouTube Follows": "YouTube Mengikuti",
-  "Mixer Follows": "Mixer Mengikuti",
   "Bit Goal": "Tujuan Bit",
   "Twitch Bits": "Twitch Bit",
   "Subscription Goal": "Tujuan Langganan",
@@ -145,7 +144,6 @@
   "Cloud Backup: All media and sources are backed up in the cloud": "Cadangan Cloud: Semua media dan sumber dicadangkan di cloud",
   "Cloud Backup: Your media and sources are being synced with the cloud": "Cadangan Cloud: Media dan sumber Anda sedang disinkronkan dengan cloud",
   "The streamer manually adds images of sponsors.": "Streamer secara manual menambahkan gambar sponsor.",
-  "Mixer chat": "Obrolan Mixer",
   "Edit Transform": "Edit Transformasi",
   "There are no existing sources of this type.": "Tidak ada sumber yang sekarang untuk jenis ini.",
   "Instant Replay": "Replay Instan",
@@ -185,5 +183,8 @@
   "JACK Input Client": "JACK Input Client",
   "Motion": "Motion",
   "Twitch Soundtrack": "Twitch Soundtrack",
-  "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.": "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs."
+  "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.": "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.",
+  "Custom Icon": "Custom Icon",
+  "Displays an icon from one of many selections": "Displays an icon from one of many selections",
+  "An error has occured, please try re-opening this window": "An error has occured, please try re-opening this window"
 }

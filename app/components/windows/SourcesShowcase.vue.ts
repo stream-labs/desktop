@@ -190,7 +190,7 @@ export default class SourcesShowcase extends Vue {
   }
 
   get hasStreamlabel() {
-    return this.primaryPlatformService?.capabilities.has('streamlabels');
+    return this.primaryPlatformService?.hasCapability('streamlabels');
   }
 
   get inspectedSourceDefinition() {
