@@ -56,7 +56,7 @@ export function useStateManager<
       Context: React.Context<TStateManagerContext<TContextView>>;
       contextValue: TStateManagerContext<TContextView>;
       useBinding<TBindingState extends object, TExtraProps extends object = {}>(
-        stateGetter: () => TBindingState,
+        stateGetter: (view: TContextView) => TBindingState,
         stateSetter: (patch: TBindingState) => unknown,
         extraPropsGenerator?: (prop: keyof TBindingState) => TExtraProps,
       ): TBindings<TBindingState, keyof TBindingState, TExtraProps>;
@@ -311,7 +311,7 @@ function useComponentId() {
  * getDependentFields(); // returns ['foo', 'bar'];
  *
  */
-function createDependencyWatcher<T extends object>(watchedObject: T) {
+export function createDependencyWatcher<T extends object>(watchedObject: T) {
   const dependencies: Record<string, any> = {};
   const watcherProxy = new Proxy(
     {
@@ -372,12 +372,12 @@ function createDependencyWatcher<T extends object>(watchedObject: T) {
    * Hook for creating an reactive input binding
    */
   function useBinding<TState extends object>(
-    stateGetter: () => TState,
+    stateGetter: (view: T) => TState,
     stateSetter: (patch: TState) => unknown,
   ): TBindings<TState, keyof TState> {
     const bindingRef = useRef<TBindings<TState, keyof TState>>();
     if (!bindingRef.current) {
-      const binding = createBinding(stateGetter, stateSetter);
+      const binding = createBinding(() => stateGetter(watchedObject), stateSetter);
       dependencies[binding._binding.id] = binding;
       bindingRef.current = binding;
     }
@@ -387,6 +387,11 @@ function createDependencyWatcher<T extends object>(watchedObject: T) {
 
   return { watcherProxy, getDependentFields, getDependentValues };
 }
+
+export type TUseBinding<TView extends object, TState extends object> = (
+  stateGetter: (view: TView) => TState,
+  stateSetter: (patch: TState) => unknown,
+) => TBindings<TState, keyof TState>;
 
 /**
  * State watcher detects changes from Vuex store and local context state
