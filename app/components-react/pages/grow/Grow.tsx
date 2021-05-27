@@ -136,14 +136,15 @@ function AddGoalModal(p: { visible: boolean; setShowGoalModal: Function }) {
 }
 
 function MyCommunity(p: { platforms: ICommunityReach[] }) {
-  const { UserService } = Services;
+  const { UserService, StreamingService } = Services;
   const totalFollowing = p.platforms
     .filter(Util.propertyExists('followers'))
     .reduce((count, current) => count + current.followers, 0);
 
-  const reachableFollowing = UserService.views.isPrime
-    ? totalFollowing
-    : p.platforms.filter(Util.propertyExists('followers'))[0].followers;
+  const reachableFollowing = p.platforms
+    .filter(Util.propertyExists('followers'))
+    .filter(platform => StreamingService.views.checkEnabled(platform.icon))
+    .reduce((count, current) => count + current.followers, 0);
 
   return (
     <div className={styles.myCommunity}>
@@ -154,9 +155,12 @@ function MyCommunity(p: { platforms: ICommunityReach[] }) {
         })}
       </h2>
       <span>
-        {$t('You can reach %{percentage}% of your community across all platforms', {
-          percentage: Math.floor((reachableFollowing / totalFollowing) * 100),
-        })}
+        {$t(
+          'You can reach %{percentage}% of your community across all platforms. Multistream to more platforms to increase this number',
+          {
+            percentage: Math.floor((reachableFollowing / totalFollowing) * 100),
+          },
+        )}
       </span>
 
       <div className={styles.communityContainer}>
