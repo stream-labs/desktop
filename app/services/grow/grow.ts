@@ -34,6 +34,28 @@ export interface IUniversityProgress {
   };
 }
 
+export interface IDashboardAnalytics {
+  stats: {
+    follows?: string;
+    subscriptions?: string;
+    hosts?: string;
+    bits?: string;
+    raids?: string;
+    viewers?: string;
+    chatters?: string;
+    chats?: string;
+    avg_view_times?: string;
+    subscribers?: string;
+    sponsors?: string;
+    super_chats?: string;
+  };
+  platforms: {
+    twitch_account?: string;
+    youtube_account?: string;
+    facebook_account?: string;
+  };
+}
+
 export interface ICommunityReach {
   icon: TPlatform;
   followers?: number;
@@ -41,6 +63,9 @@ export interface ICommunityReach {
 
 interface IGrowServiceState {
   goals: Dictionary<IGoal>;
+  analytics: IDashboardAnalytics;
+  universityProgress: IUniversityProgress;
+  communityReach: ICommunityReach[];
 }
 
 const ONE_WEEK = 6.048e8;
@@ -52,6 +77,20 @@ class GrowServiceViews extends ViewHandler<IGrowServiceState> {
 
   get goals() {
     return this.state.goals;
+  }
+
+  get platformsToMap() {
+    return this.state.communityReach.concat(
+      this.platformOptions.filter(p => !this.state.communityReach.find(r => r.icon === p.icon)),
+    );
+  }
+
+  get analytics() {
+    return this.state.analytics;
+  }
+
+  get universityProgress() {
+    return this.state.universityProgress;
   }
 
   get goalOptions(): IGoal[] {
@@ -85,7 +124,25 @@ export class GrowService extends StatefulService<IGrowServiceState> {
 
   static defaultState: IGrowServiceState = {
     goals: {},
+    analytics: {} as IDashboardAnalytics,
+    universityProgress: {} as IUniversityProgress,
+    communityReach: [] as ICommunityReach[],
   };
+
+  @mutation()
+  SET_ANALYTICS(analytics: IDashboardAnalytics) {
+    this.state.analytics = analytics;
+  }
+
+  @mutation()
+  SET_UNIVERSITY_PROGRESS(progress: IUniversityProgress) {
+    this.state.universityProgress = progress;
+  }
+
+  @mutation()
+  SET_COMMUNITY_REACH(communityReach: ICommunityReach[]) {
+    this.state.communityReach = communityReach;
+  }
 
   @mutation()
   ADD_GOAL(goal: IGoal) {
@@ -119,6 +176,16 @@ export class GrowService extends StatefulService<IGrowServiceState> {
     );
   }
 
+  fetchAnalytics() {
+    const url = `${this.hostsService.streamlabs}/api/v5/slobs/dashboard-analytics`;
+    const headers = authorizedHeaders(
+      this.userService.apiToken,
+      new Headers({ 'Content-Type': 'application/json' }),
+    );
+    const request = new Request(url, { headers });
+    jfetch<IDashboardAnalytics>(request).then(json => this.SET_ANALYTICS(json));
+  }
+
   async fetchPlatformFollowers() {
     const platforms = this.userService.views.platforms;
 
@@ -139,15 +206,16 @@ export class GrowService extends StatefulService<IGrowServiceState> {
         }),
     );
 
-    return communityReach;
+    this.SET_COMMUNITY_REACH(communityReach);
   }
 
-  async fetchUniversityProgress() {
+  fetchUniversityProgress() {
     if (!this.userService.isLoggedIn) return;
     const url = `https://${this.hostsService.streamlabs}/university/api/user/info/${this.userService.widgetToken}`;
     const req = new Request(url);
-    const json = (await jfetch(req)) as { user: IUniversityProgress };
-    return json.user;
+    jfetch<{ user: IUniversityProgress }>(req).then(json =>
+      this.SET_UNIVERSITY_PROGRESS(json.user),
+    );
   }
 
   get views() {

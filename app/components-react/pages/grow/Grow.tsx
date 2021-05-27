@@ -14,41 +14,27 @@ import { TextInput, NumberInput, ListInput } from 'components-react/shared/input
 
 export default function Grow() {
   const { GrowService } = Services;
-
-  const [universityProgress, setUniversityProgress] = useState({} as IUniversityProgress);
-  const [platforms, setPlatforms] = useState([] as ICommunityReach[]);
-
   const v = useVuex(() => ({
     goals: GrowService.views.goals,
+    platformsToMap: GrowService.views.platformsToMap,
+    progress: GrowService.views.universityProgress,
   }));
 
-  useEffect(getUniversityProgress, []);
-  useEffect(getPlatformFollowers, []);
-  useEffect(GrowService.actions.fetchGoals, []);
+  useEffect(fetchApiData, []);
 
-  function getUniversityProgress() {
-    GrowService.actions.return.fetchUniversityProgress().then(progress => {
-      if (!progress) return;
-      setUniversityProgress(progress);
-    });
-  }
-
-  function getPlatformFollowers() {
-    GrowService.actions.return.fetchPlatformFollowers().then(communityReach => {
-      const platformsToMap = communityReach.concat(
-        GrowService.views.platformOptions.filter(p => !communityReach.find(r => r.icon === p.icon)),
-      );
-
-      setPlatforms(platformsToMap);
-    });
+  function fetchApiData() {
+    GrowService.actions.fetchGoals();
+    GrowService.actions.fetchAnalytics();
+    GrowService.actions.fetchUniversityProgress();
+    GrowService.actions.fetchPlatformFollowers();
   }
 
   return (
     <div className={styles.goalTabContainer}>
       <div className={styles.goalTabContent}>
         <MyGoals goals={v.goals} />
-        <MyCommunity platforms={platforms} />
-        <ResourceFooter universityProgress={universityProgress} />
+        <MyCommunity platforms={v.platformsToMap} />
+        <ResourceFooter universityProgress={v.progress} />
       </div>
       <GrowthTips />
     </div>
