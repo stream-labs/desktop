@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import uuid from 'uuid/v4';
-import { PersistentStatefulService, mutation, ViewHandler, Inject } from 'services/core';
+import { StatefulService, mutation, ViewHandler, Inject } from 'services/core';
 import { HostsService } from 'services/hosts';
 import { UserService } from 'services/user';
 import { jfetch, authorizedHeaders } from 'util/requests';
@@ -76,7 +76,7 @@ class GrowServiceViews extends ViewHandler<IGrowServiceState> {
   }
 }
 
-export class GrowService extends PersistentStatefulService<IGrowServiceState> {
+export class GrowService extends StatefulService<IGrowServiceState> {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
   @Inject() twitchService: TwitchService;
