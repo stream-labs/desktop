@@ -19,7 +19,7 @@ export default class PlatformLogo extends TsxComponent<LogoProps> {
       tiktok: 'fab fa-tiktok',
       dlive: 'dlive',
       nimotv: 'nimotv',
-      streamlabs: 'icon-kevin-day',
+      streamlabs: 'icon-streamlabs',
     }[this.props.platform];
   }
 
