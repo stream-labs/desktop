@@ -87,6 +87,9 @@ export class SourcesNode extends Node<ISchema, {}> {
           const audioSource = this.audioService.getSource(source.sourceId);
 
           const obsInput = source.getObsInput();
+          if (!obsInput) {
+            throw `source '${source.sourceId}': getObsInput() not found`;
+          }
 
           /* Signal to the source that it needs to save settings as
            * we're about to cache them to disk. */

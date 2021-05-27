@@ -34,6 +34,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
 
   droppedFramesDetected = new Subject<number>();
   private intervalId: number;
+  private statsFailed: boolean = false;
 
   @mutation()
   SET_PERFORMANCE_STATS(stats: Partial<IPerformanceState>) {
@@ -50,6 +51,14 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     const stats: IPerformanceState = this.customizationService.pollingPerformanceStatistics
       ? obs.NodeObs.OBS_API_getPerformanceStatistics()
       : { CPU: 0 };
+
+    if (!stats) {
+      if (this.statsFailed) {
+        // sentry送信削減
+        return;
+      }
+      this.statsFailed = true;
+    }
 
     if (stats.percentageDroppedFrames) {
       this.droppedFramesDetected.next(stats.percentageDroppedFrames / 100);
