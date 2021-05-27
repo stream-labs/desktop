@@ -24,6 +24,7 @@ export default function Grow() {
 
   useEffect(getUniversityProgress, []);
   useEffect(getPlatformFollowers, []);
+  useEffect(GrowService.actions.fetchGoals, []);
 
   function getUniversityProgress() {
     GrowService.actions.return.fetchUniversityProgress().then(progress => {
@@ -62,7 +63,7 @@ function MyGoals(p: { goals: Dictionary<IGoal> }) {
 
   const shuffledGoalOptions = useRef(shuffle(GrowService.views.goalOptions));
   const appendedOptions = shuffledGoalOptions.current
-    .filter(goal => !p.goals[goal.id])
+    .filter(goal => !p.goals[goal.type])
     .slice(0, 4 - mappedGoals.length);
   return (
     <div className={styles.myGoals}>
@@ -73,10 +74,10 @@ function MyGoals(p: { goals: Dictionary<IGoal> }) {
 
       <div className={styles.goalsContainer}>
         {mappedGoals.map(goal => (
-          <GoalCard goal={goal} key={goal.id} />
+          <GoalCard goal={goal} key={goal.type} />
         ))}
         {appendedOptions.map(goal => (
-          <GoalCard goal={goal} key={goal.id} showGoalModal={() => setShowGoalModal(true)} />
+          <GoalCard goal={goal} key={goal.type} showGoalModal={() => setShowGoalModal(true)} />
         ))}
       </div>
       <AddGoalModal visible={showGoalModal} setShowGoalModal={setShowGoalModal} />
@@ -88,18 +89,18 @@ function AddGoalModal(p: { visible: boolean; setShowGoalModal: Function }) {
   const { GrowService } = Services;
   const [goalTotal, setGoalTotal] = useState(10);
   const [goalTitle, setGoalTitle] = useState('');
-  const [goalId, setGoalId] = useState('custom');
+  const [goalType, setGoalType] = useState('custom');
 
   function addGoal() {
-    const image = GrowService.views.goalOptions.find(goal => goalId)?.image || '';
-    GrowService.actions.addGoal({ title: goalTitle, total: goalTotal, id: goalId, image });
+    const image = GrowService.views.goalOptions.find(goal => goalType)?.image || '';
+    GrowService.actions.addGoal({ title: goalTitle, total: goalTotal, type: goalType, image });
     setGoalTitle('');
     setGoalTotal(10);
     p.setShowGoalModal(false);
   }
 
   const goalTypes = GrowService.views.goalOptions.map(option => ({
-    value: option.id,
+    value: option.type,
     label: option.title,
   }));
 
@@ -115,10 +116,10 @@ function AddGoalModal(p: { visible: boolean; setShowGoalModal: Function }) {
         <ListInput
           label={$t('Goal Type')}
           options={goalTypes}
-          value={goalId}
-          onChange={setGoalId}
+          value={goalType}
+          onChange={setGoalType}
         />
-        {goalId === 'custom' && (
+        {goalType === 'custom' && (
           <TextInput
             label={$t('Goal Title')}
             value={goalTitle}
@@ -126,7 +127,7 @@ function AddGoalModal(p: { visible: boolean; setShowGoalModal: Function }) {
             uncontrolled={false}
           />
         )}
-        {goalId === 'custom' && (
+        {goalType === 'custom' && (
           <NumberInput label={$t('Goal Total')} value={goalTotal} min={0} onChange={setGoalTotal} />
         )}
       </Form>

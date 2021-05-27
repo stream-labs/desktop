@@ -3,7 +3,7 @@ import uuid from 'uuid/v4';
 import { PersistentStatefulService, mutation, ViewHandler, Inject } from 'services/core';
 import { HostsService } from 'services/hosts';
 import { UserService } from 'services/user';
-import { jfetch } from 'util/requests';
+import { jfetch, authorizedHeaders } from 'util/requests';
 import { GOAL_OPTIONS, GROWTH_TIPS } from './grow-data';
 import { TwitchService } from 'services/platforms/twitch';
 import { YoutubeService } from 'services/platforms/youtube';
@@ -11,12 +11,13 @@ import { FacebookService } from 'services/platforms/facebook';
 import { TPlatform } from 'services/platforms';
 
 export interface IGoal {
-  id: string;
+  id?: number;
+  type: string;
   title: string;
   image: string;
   total: number;
   progress?: number;
-  startDate?: number;
+  startDate?: string;
 }
 
 export interface IUniversityProgress {
@@ -69,8 +70,8 @@ class GrowServiceViews extends ViewHandler<IGrowServiceState> {
 
   timeLeft(goal: IGoal) {
     if (!goal.startDate) return Infinity;
-    if (/week/.test(goal.id)) return goal.startDate + ONE_WEEK - Date.now();
-    if (/month/.test(goal.id)) return goal.startDate + ONE_WEEK * 4 - Date.now();
+    if (/week/.test(goal.type)) return Date.parse(goal.startDate) + ONE_WEEK - Date.now();
+    if (/month/.test(goal.type)) return Date.parse(goal.startDate) + ONE_WEEK * 4 - Date.now();
     return Infinity;
   }
 }
@@ -88,20 +89,34 @@ export class GrowService extends PersistentStatefulService<IGrowServiceState> {
 
   @mutation()
   ADD_GOAL(goal: IGoal) {
-    Vue.set(this.state.goals, goal.id, goal);
+    Vue.set(this.state.goals, goal.type, goal);
   }
 
   @mutation()
   REMOVE_GOAL(goal: IGoal) {
-    Vue.delete(this.state.goals, goal.id);
+    Vue.delete(this.state.goals, goal.type);
   }
 
   @mutation()
-  INCREMENT_GOAL(goal: IGoal, amountToIncrement: number) {
-    Vue.set(this.state.goals, goal.id, {
-      ...goal,
-      progress: goal.progress + amountToIncrement,
-    });
+  SET_GOAL(goal: IGoal) {
+    Vue.set(this.state.goals, goal.type, goal);
+  }
+
+  formGoalRequest(method = 'GET', body?: any) {
+    const url = `${this.hostsService.streamlabs}/api/v5/slobs/growth/goal`;
+    const headers = authorizedHeaders(
+      this.userService.apiToken,
+      new Headers({ 'Content-Type': 'application/json' }),
+    );
+    return new Request(url, { headers, method, body });
+  }
+
+  fetchGoals() {
+    jfetch<IGoal[]>(this.formGoalRequest()).then(json =>
+      json.forEach(goal => {
+        this.ADD_GOAL(goal);
+      }),
+    );
   }
 
   async fetchPlatformFollowers() {
@@ -143,20 +158,25 @@ export class GrowService extends PersistentStatefulService<IGrowServiceState> {
     const goalWithId = {
       ...goal,
       progress: 0,
-      startDate: Date.now(),
-      id: goal.id === '' ? uuid() : goal.id,
+      startDate: new Date().toISOString(),
+      type: goal.type === '' ? uuid() : goal.type,
     };
 
+    jfetch(this.formGoalRequest('POST', goalWithId));
     this.ADD_GOAL(goalWithId);
   }
 
   incrementGoal(goalId: string, amount: number) {
     const goal = this.state.goals[goalId];
     if (!goal || this.views.goalExpiredOrComplete(goal)) return;
-    this.INCREMENT_GOAL(goal, amount);
+    const newProgress = amount + goal.progress;
+
+    jfetch(this.formGoalRequest('PUT', { ...goal, progress: newProgress }));
+    this.SET_GOAL({ ...goal, progress: newProgress });
   }
 
   removeGoal(goal: IGoal) {
+    jfetch(this.formGoalRequest('DELETE', { id: goal.id }));
     this.REMOVE_GOAL(goal);
   }
 

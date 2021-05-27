@@ -12,7 +12,7 @@ const ONE_DAY = 1000 * 60 * 60 * 24;
 
 export function GoalCard(p: { goal: IGoal; showGoalModal?: Function }) {
   const { GrowService } = Services;
-  const { title, image, id } = p.goal;
+  const { title, image, type } = p.goal;
 
   const daysLeft = Math.round(GrowService.views.timeLeft(p.goal) / ONE_DAY);
   const goalFinished = GrowService.views.goalExpiredOrComplete(p.goal);
@@ -22,11 +22,11 @@ export function GoalCard(p: { goal: IGoal; showGoalModal?: Function }) {
       : $t('Time ran out for this goal. Try again or pick a new one!');
 
   function incrementCustomGoal() {
-    GrowService.actions.incrementGoal(p.goal.id, 1);
+    GrowService.actions.incrementGoal(p.goal.type, 1);
   }
 
   function addGoal() {
-    if (id === 'custom' && p.showGoalModal) {
+    if (type === 'custom' && p.showGoalModal) {
       p.showGoalModal();
     } else {
       GrowService.actions.addGoal(p.goal);
@@ -40,11 +40,11 @@ export function GoalCard(p: { goal: IGoal; showGoalModal?: Function }) {
   const manuallyProgressedGoal =
     image === '' ||
     !['stream_times_per_week', 'stream_hours_per_month', 'multistream_per_week'].includes(
-      p.goal.id,
+      p.goal.type,
     );
 
   return (
-    <div className={styles.card} key={id}>
+    <div className={styles.card} key={type}>
       <strong>{title}</strong>
       {daysLeft !== Infinity && !goalFinished && (
         <span className={styles.whisper}>{$t('%{daysLeft} days left', { daysLeft })}</span>
