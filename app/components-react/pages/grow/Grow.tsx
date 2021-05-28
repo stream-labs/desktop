@@ -178,7 +178,7 @@ function StreamPulse(p: { analytics: IDashboardAnalytics }) {
   return (
     <div className={styles.streamPulse}>
       <h2>{$t('Stream Pulse')}</h2>
-      <div className={styles.communityContainer}>
+      <div className={styles.streamPulseContainer}>
         {STATS_TO_MAP().map(stat => (
           <div className={styles.card}>
             <span className={styles.title}>{stat.title}</span>

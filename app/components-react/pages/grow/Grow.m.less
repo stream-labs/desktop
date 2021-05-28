@@ -69,6 +69,7 @@
 
 .my-goals {
   position: relative;
+  flex-wrap: wrap;
 
   .card {
     display: flex;
@@ -97,10 +98,17 @@
 }
 
 .stream-pulse {
-  .card {}
+  flex-wrap: wrap;
+
+  .card {
+    height: 100px;
+    width: 25%;
+  }
 }
 
 .my-community {
+  flex-wrap: wrap;
+
   .card {
     width: 180px;
     height: 100px;
@@ -143,6 +151,8 @@
 }
 
 .streamer-resources {
+  flex-wrap: wrap;
+
   .card {
     width: 50%;
     height: 280px;
@@ -152,7 +162,8 @@
 
 .resources-container,
 .goals-container,
-.community-container {
+.community-container,
+.stream-pulse-container {
   display: flex;
   justify-content: space-between;
 }
