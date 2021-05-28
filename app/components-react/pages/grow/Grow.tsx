@@ -168,10 +168,10 @@ function MyCommunity(p: { platforms: ICommunityReach[] }) {
 }
 
 const STATS_TO_MAP = () => [
-  { title: $t('Average View Time'), value: 'avg_view_times' },
-  { title: $t('Unique Viewers'), value: 'viewers' },
-  { title: $t('Chatters'), value: 'chatters' },
-  { title: $t('Chats'), value: 'chats' },
+  { title: $t('Average View Time'), value: 'avg_view_times', icon: 'icon-time' },
+  { title: $t('Unique Viewers'), value: 'viewers', icon: 'icon-team-2' },
+  { title: $t('Chatters'), value: 'chatters', icon: 'icon-user' },
+  { title: $t('Chats'), value: 'chats', icon: 'icon-chat-box' },
 ];
 
 function StreamPulse(p: { analytics: IDashboardAnalytics }) {
@@ -180,9 +180,10 @@ function StreamPulse(p: { analytics: IDashboardAnalytics }) {
       <h2>{$t('Stream Pulse')}</h2>
       <div className={styles.streamPulseContainer}>
         {STATS_TO_MAP().map(stat => (
-          <div className={styles.card}>
+          <div className={styles.card} key={stat.value}>
+            <i className={stat.icon} />
             <span className={styles.title}>{stat.title}</span>
-            <span>{p.analytics[stat.value]}</span>
+            <span className={styles.stat}>{p.analytics[stat.value]}</span>
           </div>
         ))}
       </div>

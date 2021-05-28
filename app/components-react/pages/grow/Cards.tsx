@@ -190,6 +190,7 @@ export function MultistreamCard() {
 
   return (
     <div className={cx(styles.card, styles.primeCard)} onClick={getPrime}>
+      <i className="icon-prime" />
       <div className={styles.cardHeader}>
         <strong>{$t('Reach more of your community with Streamlabs Multistreaming')}</strong>
       </div>

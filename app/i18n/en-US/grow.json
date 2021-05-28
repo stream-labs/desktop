@@ -26,5 +26,10 @@
   "Goal Total": "Goal Total",
   "Goal Type": "Goal Type",
   "This goal has been completed!": "This goal has been completed!",
-  "Time ran out for this goal. Try again or pick a new one!": "Time ran out for this goal. Try again or pick a new one!"
+  "Time ran out for this goal. Try again or pick a new one!": "Time ran out for this goal. Try again or pick a new one!",
+  "Stream Pulse": "Stream Pulse",
+  "Average View Time": "Average View Time",
+  "Unique Viewers": "Unique Viewers",
+  "Chatters": "Chatters",
+  "Chats": "Chats"
 }
