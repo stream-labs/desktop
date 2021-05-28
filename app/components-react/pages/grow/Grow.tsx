@@ -6,18 +6,25 @@ import { $t } from '../../../services/i18n';
 import styles from './Grow.m.less';
 import { useVuex } from '../../hooks';
 import { Services } from '../../service-provider';
-import { IGoal, IUniversityProgress, ICommunityReach } from '../../../services/grow/grow';
+import {
+  IGoal,
+  IUniversityProgress,
+  ICommunityReach,
+  IDashboardAnalytics,
+} from '../../../services/grow/grow';
 import Util from '../../../services/utils';
 import Scrollable from 'components-react/shared/Scrollable';
 import { GoalCard, PlatformCard, UniversityCard, ContentHubCard, MultistreamCard } from './Cards';
 import { TextInput, NumberInput, ListInput } from 'components-react/shared/inputs';
 
 export default function Grow() {
-  const { GrowService } = Services;
+  const { GrowService, UserService } = Services;
   const v = useVuex(() => ({
     goals: GrowService.views.goals,
     platformsToMap: GrowService.views.platformsToMap,
     progress: GrowService.views.universityProgress,
+    analytics: GrowService.views.analytics,
+    isTwitchAuthed: UserService.views.isTwitchAuthed,
   }));
 
   useEffect(fetchApiData, []);
@@ -31,11 +38,12 @@ export default function Grow() {
 
   return (
     <div className={styles.goalTabContainer}>
-      <div className={styles.goalTabContent}>
+      <Scrollable className={styles.goalTabContent}>
         <MyGoals goals={v.goals} />
         <MyCommunity platforms={v.platformsToMap} />
+        {v.isTwitchAuthed && <StreamPulse analytics={v.analytics} />}
         <ResourceFooter universityProgress={v.progress} />
-      </div>
+      </Scrollable>
       <GrowthTips />
     </div>
   );
@@ -154,6 +162,29 @@ function MyCommunity(p: { platforms: ICommunityReach[] }) {
           <PlatformCard platform={platform} key={platform.icon} />
         ))}
         {(!UserService.views.isPrime || true) && <MultistreamCard />}
+      </div>
+    </div>
+  );
+}
+
+const STATS_TO_MAP = () => [
+  { title: $t('Average View Time'), value: 'avg_view_times' },
+  { title: $t('Unique Viewers'), value: 'viewers' },
+  { title: $t('Chatters'), value: 'chatters' },
+  { title: $t('Chats'), value: 'chats' },
+];
+
+function StreamPulse(p: { analytics: IDashboardAnalytics }) {
+  return (
+    <div className={styles.streamPulse}>
+      <h2>{$t('Stream Pulse')}</h2>
+      <div className={styles.communityContainer}>
+        {STATS_TO_MAP().map(stat => (
+          <div className={styles.card}>
+            <span className={styles.title}>{stat.title}</span>
+            <span>{p.analytics[stat.value]}</span>
+          </div>
+        ))}
       </div>
     </div>
   );

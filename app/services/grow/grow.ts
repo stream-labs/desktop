@@ -122,7 +122,7 @@ export class GrowService extends StatefulService<IGrowServiceState> {
   @Inject() youtubeService: YoutubeService;
   @Inject() facebookService: FacebookService;
 
-  static defaultState: IGrowServiceState = {
+  static initialState: IGrowServiceState = {
     goals: {},
     analytics: {} as IDashboardAnalytics,
     universityProgress: {} as IUniversityProgress,
@@ -157,6 +157,16 @@ export class GrowService extends StatefulService<IGrowServiceState> {
   @mutation()
   SET_GOAL(goal: IGoal) {
     Vue.set(this.state.goals, goal.type, goal);
+  }
+
+  init() {
+    super.init();
+    this.userService.userLogin.subscribe(() => {
+      this.fetchGoals();
+      this.fetchAnalytics();
+      this.fetchUniversityProgress();
+      this.fetchPlatformFollowers();
+    });
   }
 
   formGoalRequest(method = 'GET', body?: any) {
