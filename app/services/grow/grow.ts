@@ -170,7 +170,7 @@ export class GrowService extends StatefulService<IGrowServiceState> {
   }
 
   formGoalRequest(method = 'GET', body?: any) {
-    const url = `${this.hostsService.streamlabs}/api/v5/slobs/growth/goal`;
+    const url = `https://beta.${this.hostsService.streamlabs}/api/v5/slobs/growth/goal`;
     const headers = authorizedHeaders(
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
@@ -187,7 +187,7 @@ export class GrowService extends StatefulService<IGrowServiceState> {
   }
 
   fetchAnalytics() {
-    const url = `${this.hostsService.streamlabs}/api/v5/slobs/dashboard-analytics`;
+    const url = `https://beta.${this.hostsService.streamlabs}/api/v5/slobs/dashboard-analytics`;
     const headers = authorizedHeaders(
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),

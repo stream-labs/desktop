@@ -161,7 +161,7 @@ function MyCommunity(p: { platforms: ICommunityReach[] }) {
         {p.platforms.map(platform => (
           <PlatformCard platform={platform} key={platform.icon} />
         ))}
-        {(!UserService.views.isPrime || true) && <MultistreamCard />}
+        {!UserService.views.isPrime && <MultistreamCard />}
       </div>
     </div>
   );
@@ -175,15 +175,21 @@ const STATS_TO_MAP = () => [
 ];
 
 function StreamPulse(p: { analytics: IDashboardAnalytics }) {
+  const stats = p.analytics.stats || {};
   return (
     <div className={styles.streamPulse}>
       <h2>{$t('Stream Pulse')}</h2>
+      <span>
+        {$t(
+          'Track your growth by taking a look at the past month of your stream (data provided from Twitch)',
+        )}
+      </span>
       <div className={styles.streamPulseContainer}>
         {STATS_TO_MAP().map(stat => (
           <div className={styles.card} key={stat.value}>
             <i className={stat.icon} />
             <span className={styles.title}>{stat.title}</span>
-            <span className={styles.stat}>{p.analytics[stat.value]}</span>
+            <span className={styles.stat}>{stats[stat.value]}</span>
           </div>
         ))}
       </div>
