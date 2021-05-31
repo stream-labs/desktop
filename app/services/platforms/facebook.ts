@@ -62,6 +62,7 @@ interface IFacebookServiceState extends IPlatformState {
    */
   videoId: string;
   streamPageUrl: string;
+  streamDashboardUrl: string;
   userAvatar: string;
   outageWarning: string;
 }
@@ -92,6 +93,7 @@ const initialState: IFacebookServiceState = {
   grantedPermissions: [],
   outageWarning: '',
   streamPageUrl: '',
+  streamDashboardUrl: '',
   userAvatar: '',
   videoId: '',
   settings: {
@@ -160,6 +162,11 @@ export class FacebookService
   private SET_STREAM_PAGE_URL(url: string) {
     this.state.streamPageUrl = url;
   }
+  
+  @mutation()
+  private SET_STREAM_DASHBOARD_URL(url: string) {
+    this.state.streamDashboardUrl = url;
+  }
 
   @mutation()
   protected SET_AVATAR(avatar: string) {
@@ -198,6 +205,10 @@ export class FacebookService
     return this.state.streamPageUrl;
   }
 
+  get streamDashboardUrl() : string {
+    return this.state.streamDashboardUrl;
+  }
+
   async beforeGoLive(options: IGoLiveSettings) {
     const fbOptions = options.platforms.facebook;
 
@@ -227,6 +238,7 @@ export class FacebookService
     }
     this.SET_STREAM_KEY(streamKey);
     this.SET_STREAM_PAGE_URL(`https://facebook.com/${liveVideo.permalink_url}`);
+    this.SET_STREAM_DASHBOARD_URL(`https://facebook.com/live/producer/${liveVideo.video.id}`)
     this.UPDATE_STREAM_SETTINGS({ ...fbOptions, liveVideoId: liveVideo.id });
     this.SET_VIDEO_ID(liveVideo.video.id);
 
