@@ -6,6 +6,8 @@ import isPlainObject from 'lodash/isPlainObject';
 import mapKeys from 'lodash/mapKeys';
 import { keys } from '../../services/utils';
 import { useForceUpdate, useOnCreate, useOnDestroy } from '../hooks';
+import { createBinding, TBindings } from '../shared/inputs';
+import { assertIsDefined } from '../../util/properties-type-guards';
 const GenericStateManagerContext = React.createContext(null);
 
 // React devtools are broken for Electron 9 and 10
@@ -53,6 +55,11 @@ export function useStateManager<
     {
       Context: React.Context<TStateManagerContext<TContextView>>;
       contextValue: TStateManagerContext<TContextView>;
+      useBinding<TBindingState extends object, TExtraProps extends object = {}>(
+        stateGetter: () => TBindingState,
+        stateSetter: (patch: TBindingState) => unknown,
+        extraPropsGenerator?: (prop: keyof TBindingState) => TExtraProps,
+      ): TBindings<TBindingState, keyof TBindingState, TExtraProps>;
     }
   >
 >(
@@ -129,7 +136,7 @@ export function useStateManager<
     // and update the component only if it's dependencies have been changed
     const dependencyWatcher = createDependencyWatcher(componentView);
 
-    // define a onChange handler
+    // define an onChange handler
     // when StateWatcher detects changes in store or local state this function will be called
     function onChange(change: TStateChange) {
       const { globalStateRevision, localStateRevision } = change;
@@ -150,7 +157,7 @@ export function useStateManager<
       } else if (localStateRevision) {
         calculateComputedProps();
         const prevState = prevComponentState.current;
-        const newState = pick(componentView, ...dependencyWatcher.getDependentFields());
+        const newState = dependencyWatcher.getDependentValues();
         if (isSimilar(prevState, newState)) {
           // prevState and newState are equal, no action needed
           return;
@@ -172,11 +179,7 @@ export function useStateManager<
     // create a state selector for watching state from vuex
     function vuexSelector() {
       // we should watch only component's dependencies
-      const dependentFields = dependencyWatcher.getDependentFields();
-      return {
-        ...pick(contextView, ...dependentFields),
-        ...pick(calculateComputedProps(), ...dependentFields),
-      };
+      return dependencyWatcher.getDependentValues();
     }
 
     return {
@@ -209,7 +212,7 @@ export function useStateManager<
   // component mounted/updated
   useEffect(() => {
     // save the prev state
-    prevComponentState.current = pick(componentView, ...dependencyWatcher.getDependentFields());
+    prevComponentState.current = dependencyWatcher.getDependentValues();
 
     // start watching for changes
     stateWatcher.markAsReadyToWatch(componentId);
@@ -311,13 +314,33 @@ function useComponentId() {
 function createDependencyWatcher<T extends object>(watchedObject: T) {
   const dependencies: Record<string, any> = {};
   const watcherProxy = new Proxy(
-    { _proxyName: 'DependencyWatcher' },
+    {
+      _proxyName: 'DependencyWatcher',
+      useBinding,
+    },
     {
       get: (target, propName: string) => {
         if (propName in target) return target[propName];
         const value = watchedObject[propName];
-        dependencies[propName] = value;
-        return value;
+
+        // Input bindings that have been created via createBinding() are source of
+        // component's dependencies. We should handle them differently
+        if (value && value._proxyName === 'Binding') {
+          // if we already have the binding in the deps, just return it
+          if (propName in dependencies) {
+            return dependencies[propName];
+          } else {
+            // if it's the first time we access binding then clone it to dependencies
+            // the binding object keep its own dependencies and cloning will reset them
+            // that ensures each component will have it's own dependency list for the each binding
+            dependencies[propName] = value._binding.clone();
+            return dependencies[propName];
+          }
+        } else {
+          // for non-binding objects just save their value in the dependencies
+          dependencies[propName] = value;
+          return value;
+        }
       },
     },
   ) as T;
@@ -326,7 +349,43 @@ function createDependencyWatcher<T extends object>(watchedObject: T) {
     return Object.keys(dependencies);
   }
 
-  return { watcherProxy, getDependentFields };
+  function getDependentValues(): Partial<T> {
+    const values: Partial<T> = {};
+    Object.keys(dependencies).forEach(propName => {
+      const value = dependencies[propName];
+      // if one of dependencies is a binding then expose its internal dependencies
+      if (value && value._proxyName === 'Binding') {
+        const bindingMetadata = value._binding;
+        Object.keys(bindingMetadata.dependencies).forEach(bindingPropName => {
+          values[`${bindingPropName}__binding-${bindingMetadata.id}`] =
+            dependencies[propName][bindingPropName].value;
+        });
+        return;
+      }
+      // if it's not a binding then just take the value from the watchedObject
+      values[propName] = watchedObject[propName];
+    });
+    return values;
+  }
+
+  /**
+   * Hook for creating an reactive input binding
+   */
+  function useBinding<TState extends object>(
+    stateGetter: () => TState,
+    stateSetter: (patch: TState) => unknown,
+  ): TBindings<TState, keyof TState> {
+    const bindingRef = useRef<TBindings<TState, keyof TState>>();
+    if (!bindingRef.current) {
+      const binding = createBinding(stateGetter, stateSetter);
+      dependencies[binding._binding.id] = binding;
+      bindingRef.current = binding;
+    }
+    assertIsDefined(bindingRef.current);
+    return bindingRef.current;
+  }
+
+  return { watcherProxy, getDependentFields, getDependentValues };
 }
 
 /**
@@ -338,6 +397,8 @@ function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
   type TComponentId = string;
   type TSubscription = {
     componentId: TComponentId;
+    parentId: TComponentId;
+    isDestroyed: boolean;
     sequence: number;
     checkIsDestroyed(): boolean;
     getGlobalStateRevision(): number;
@@ -364,6 +425,9 @@ function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
   // true if we currently watch vuex
   let isWatching = false;
   let unsubscribeVuex: Function | null = null;
+
+  // a stack for remembering parent/child relationship
+  const componentIdStack: TComponentId[] = [];
 
   // subscribe on changes from the local state
   dispatcher.subscribe((newState, revision) => {
@@ -397,13 +461,18 @@ function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
         onChange,
         getGlobalStateRevision,
         getLocalStateRevision,
-        checkIsDestroyed,
+        checkIsDestroyed() {
+          return this.isDestroyed || checkIsDestroyed();
+        },
+        parentId: componentIdStack[componentIdStack.length - 1] || '',
         isReady: false,
+        isDestroyed: false,
       };
     } else {
       // if component is already registered then stop listen changes until its mount
       components[componentId].isReady = false;
     }
+    componentIdStack.push(componentId);
   }
 
   /**
@@ -414,6 +483,23 @@ function createStateWatcher(dispatcher: TDispatcher<unknown, unknown>) {
   function markAsReadyToWatch(componentId: string) {
     // mark component as ready to receiving state updates
     components[componentId].isReady = true;
+    componentIdStack.pop();
+
+    // mark as destroyed unmounted children
+    const unmountedChildren = getComponents().filter(child => {
+      if (child.parentId !== componentId) return false;
+      const parent = components[componentId];
+      // if the child revision is lower than parent revision
+      // then the child component has not been re-rendered after parent component render
+      // consider the child is deleted
+      if (
+        parent.getLocalStateRevision() > child.getGlobalStateRevision() ||
+        parent.getGlobalStateRevision() > child.getLocalStateRevision()
+      ) {
+        return true;
+      }
+    });
+    unmountedChildren.forEach(comp => (comp.isDestroyed = true));
 
     // if some component is not in the ready state, then just exit
     const hasPendingComponents = Object.keys(components).find(id => !components[id].isReady);
@@ -616,8 +702,13 @@ export function merge<
   T1 extends object,
   T2 extends object,
   T3 extends object,
-  TReturnType = T3 extends undefined ? TMerge<T1, T2> : TMerge3<T1, T2, T3>
->(...objects: [T1, T2, T3?]): TReturnType {
+  T4 extends object,
+  TReturnType = T3 extends undefined
+    ? TMerge<T1, T2>
+    : T4 extends undefined
+    ? TMerge3<T1, T2, T3>
+    : TMerge4<T1, T2, T3, T4>
+>(...objects: [T1, T2, T3?, T4?]): TReturnType {
   const mergedObjects = flatten(objects.map(getMergedObjects));
 
   const metadata = {
@@ -660,6 +751,11 @@ export function merge<
     return target;
   }
 
+  function findTargetObject(propName: string) {
+    const target = findTarget(propName);
+    return typeof target === 'function' ? target() : target;
+  }
+
   function getTargetValue(target: object | Function, propName: string) {
     if (typeof target === 'function') {
       // if target is a function then call the function and take the value
@@ -700,6 +796,14 @@ export function merge<
     return props;
   }
 
+  function getKeys() {
+    const value = Object.assign(
+      {},
+      ...mergedObjects.map(obj => (typeof obj === 'function' ? obj() : obj)),
+    );
+    return Object.keys(value);
+  }
+
   return (new Proxy(metadata, {
     get(t, propName: string) {
       if (propName === 'hasOwnProperty') return (propName: string) => !!findTarget(propName);
@@ -712,9 +816,22 @@ export function merge<
       if (propName.startsWith('_')) {
         metadata[propName] = val;
         return true;
-      } else {
-        throw new Error('Can not change property on readonly object');
       }
+      const targetObj = findTargetObject(propName);
+
+      if (Object.getOwnPropertyDescriptor(targetObj, propName)?.set) {
+        targetObj[propName] = val;
+        return true;
+      }
+
+      throw new Error('Can not change property on readonly object');
+    },
+    ownKeys() {
+      return getKeys();
+    },
+    getOwnPropertyDescriptor(target, key) {
+      const t = findTargetObject(key as string);
+      return Object.getOwnPropertyDescriptor(t, key);
     },
   }) as unknown) as TReturnType;
 }
@@ -728,6 +845,7 @@ export type TMerge<
 > = R;
 
 export type TMerge3<T1, T2, T3> = TMerge<TMerge<T1, T2>, T3>;
+export type TMerge4<T1, T2, T3, T4> = TMerge<TMerge3<T1, T2, T3>, T4>;
 
 /**
  * Create mutations from reducers
