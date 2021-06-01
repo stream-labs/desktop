@@ -117,7 +117,7 @@ export default class SideNav extends Vue {
       });
     }
 
-    if (this.userService.isLoggedIn) {
+    if (this.userService.isLoggedIn && this.featureIsEnabled(EAvailableFeatures.growTab)) {
       pageData.push({
         target: 'Grow',
         icon: 'icon-graph',
