@@ -159,7 +159,7 @@ export class SceneItem extends SceneNode implements ISceneItemActions, ISceneIte
    * only for scene sources
    */
   setContentCrop(): void {
-    return this.setContentCrop();
+    return this.sceneItem.setContentCrop();
   }
 }
 

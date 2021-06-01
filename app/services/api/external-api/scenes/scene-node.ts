@@ -127,7 +127,7 @@ export abstract class SceneNode {
    * A shortcut for `SelectionService.isSelected(id)`
    */
   isSelected(): boolean {
-    return this.isSelected();
+    return this.sceneNode.isSelected();
   }
 
   /**
@@ -179,7 +179,7 @@ export abstract class SceneNode {
    *  </pre>
    */
   getItemIndex(): number {
-    return this.getItemIndex();
+    return this.sceneNode.getNodeIndex();
   }
 
   /**
