@@ -5,6 +5,7 @@ import * as fs from 'fs-extra';
 import * as stream from 'stream';
 import * as http from 'http';
 import * as crypto from 'crypto';
+import AbortController from 'abort-controller';
 
 type TBundleName = 'renderer.js' | 'vendors~renderer.js';
 
@@ -15,6 +16,10 @@ interface IManifest {
     [bundle: string]: string;
   };
 }
+
+type TExecutor = () => [Promise<unknown>, () => void];
+
+const BUNDLE_NAMES = ['renderer.js', 'vendors~renderer.js'] as const;
 
 module.exports = async (basePath: string) => {
   const cdnBase = `https://slobs-cdn.streamlabs.com/${process.env.SLOBS_VERSION}${
@@ -58,11 +63,47 @@ module.exports = async (basePath: string) => {
     }
   }
 
-  function downloadFile(srcUrl: string, dstPath: string): Promise<void> {
+  async function retryWithTimeout(executor: TExecutor, retries = 2) {
+    const [done, abort] = executor();
+    const timeout = setTimeout(() => {
+      console.log('Operation timed out...');
+      abort();
+    }, 60 * 1000);
+
+    try {
+      await done;
+      if (timeout) clearTimeout(timeout);
+    } catch (e: unknown) {
+      if (timeout) clearTimeout(timeout);
+
+      let timedOut = false;
+
+      if (e instanceof Error) {
+        timedOut = e.name === 'AbortError';
+      }
+
+      // We don't retry timed out requests because it's already taken 60 seconds
+      if (retries && !timedOut) {
+        console.log('Operation failed but will be retried in 3 seconds...');
+        await new Promise((resolve, reject) => {
+          setTimeout(() => {
+            retryWithTimeout(executor, retries - 1)
+              .then(resolve)
+              .catch(reject);
+          }, 3 * 1000);
+        });
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  function downloadFile(srcUrl: string, dstPath: string): [Promise<void>, () => void] {
+    const abortController = new AbortController();
     const tmpPath = `${dstPath}.tmp`;
 
-    return new Promise<void>((resolve, reject) => {
-      fetch(srcUrl)
+    const result = new Promise<void>((resolve, reject) => {
+      fetch(srcUrl, { signal: abortController.signal })
         .then(response => {
           if (response.ok) return response;
 
@@ -91,6 +132,8 @@ module.exports = async (basePath: string) => {
         })
         .catch(e => reject(e));
     });
+
+    return [result, abortController.abort.bind(abortController)];
   }
 
   function getChecksum(filePath: string) {
@@ -154,14 +197,56 @@ module.exports = async (basePath: string) => {
    * we empty the bundles directory (to preserve HD space over time) and create a new
    * directory for this specific version.
    */
-  async function ensureBundlesDirectory() {
+  function ensureBundlesDirectory() {
     if (!fs.existsSync(bundleDirectory)) {
       fs.emptyDirSync(bundlesBaseDirectory);
       fs.mkdirSync(bundleDirectory);
     }
   }
 
-  async function getBundleFilePath(bundle: string, manifest: IManifest): Promise<string> {
+  /**
+   * Stores a manifest on disk for future use.
+   * Will fail silently, just makes a best attempt
+   */
+  function cacheManifest(manifest: IManifest) {
+    try {
+      ensureBundlesDirectory();
+      fs.writeFileSync(path.join(bundleDirectory, 'manifest.json'), JSON.stringify(manifest));
+    } catch (e: unknown) {
+      console.log('Error caching manifest for offline use', e);
+    }
+  }
+
+  /**
+   * Attempts to load a cached manifest from disk. Will return undefined
+   * if there are any errors while loading.
+   */
+  function loadCachedManifest(): IManifest | undefined {
+    const manifestPath = path.join(bundleDirectory, 'manifest.json');
+
+    try {
+      if (!fs.existsSync(manifestPath)) {
+        console.log('Cached manifest was not found');
+        return;
+      }
+      const fromDisk = fs.readFileSync(manifestPath);
+      const parsed = JSON.parse(fromDisk.toString());
+
+      if (parsed['renderer.js'] && parsed['vendors~renderer.js']) {
+        console.log('Found cached manifest:', parsed);
+        return parsed;
+      } else {
+        console.log('Got malformed cached manifest.json', parsed);
+      }
+    } catch (e: unknown) {
+      console.log('Error reading cached manifest from disk', e);
+    }
+  }
+
+  async function getLocalOrCachedBundleFilePath(
+    bundle: string,
+    manifest: IManifest,
+  ): Promise<string> {
     console.log(`Looking for bundle: ${bundle}`);
 
     // Check for bundle in this app package
@@ -181,11 +266,21 @@ module.exports = async (basePath: string) => {
       }
     }
 
-    // Finally check the server
+    return Promise.reject('Did not find local or cached bundle');
+  }
+
+  async function getBundleFilePath(bundle: string, manifest: IManifest): Promise<string> {
+    const localOrCached = await getLocalOrCachedBundleFilePath(bundle, manifest).catch(
+      () => undefined,
+    );
+    if (localOrCached) return localOrCached;
+
+    // Check the server
     const serverPath = `${cdnBase}${bundle}`;
+    const downloadPath = path.join(bundleDirectory, bundle);
     console.log(`Attempting to download bundle ${bundle}`);
     ensureBundlesDirectory();
-    await downloadFile(serverPath, downloadPath);
+    await retryWithTimeout(() => downloadFile(serverPath, downloadPath));
 
     if (!(await validateFile(bundle, downloadPath, manifest))) {
       return Promise.reject('File failed to validate');
@@ -209,7 +304,6 @@ module.exports = async (basePath: string) => {
   console.log('Local bundle info:', localManifest);
 
   // Check if bundle updates are available
-  // TODO: Cache the latest manifest for offline use?
   let serverManifest: IManifest | undefined;
 
   if (!useLocalBundles) {
@@ -220,8 +314,7 @@ module.exports = async (basePath: string) => {
       const response = await fetch(`${cdnBase}${remoteManifestName}`);
 
       if (response.status / 100 >= 4) {
-        console.log('Bundle manifest not available, using local bundles');
-        useLocalBundles = true;
+        console.log(`Bundle manifest not available, got status: ${response.status}`);
       } else {
         const parsed = await response.json();
         console.log('Latest bundle info:', parsed);
@@ -230,15 +323,21 @@ module.exports = async (basePath: string) => {
       }
     } catch (e: unknown) {
       console.log('Bundle manifest fetch error', e);
-      useLocalBundles = true;
     }
   }
 
   const bundlePathsMap: { [bundle: string]: string } = {};
 
+  /**
+   * Checks if we found every bundle
+   * @returns Whether we found every bundle
+   */
+  function bundlesFound() {
+    return BUNDLE_NAMES.every(b => bundlePathsMap[b]);
+  }
+
   if (!useLocalBundles && serverManifest) {
-    const bundles = ['renderer.js', 'vendors~renderer.js'] as const;
-    const promises = bundles.map(bundleName => {
+    const promises = BUNDLE_NAMES.map(bundleName => {
       return getBundleFilePath(serverManifest![bundleName], serverManifest!).then(bundlePath => {
         bundlePathsMap[bundleName] = bundlePath;
       });
@@ -256,15 +355,39 @@ module.exports = async (basePath: string) => {
 
       await Promise.all(promises);
 
+      // Everything was successful, so cache the manifest for next time
+      cacheManifest(serverManifest);
+
       clearTimeout(timeout);
       closeUpdaterWindow();
     } catch (e: unknown) {
       if (timeout) clearTimeout(timeout);
       closeUpdaterWindow();
       console.log('Failed to download 1 or more bundles', e);
-      useLocalBundles = true;
     }
   }
+
+  // Fall back to checking for cached bundles
+  if (!useLocalBundles && !bundlesFound()) {
+    const cached = loadCachedManifest();
+    if (cached) {
+      const promises = BUNDLE_NAMES.map(bundleName => {
+        // We don't try to download when looking for these bundles
+        return getLocalOrCachedBundleFilePath(cached[bundleName], cached).then(bundlePath => {
+          bundlePathsMap[bundleName] = bundlePath;
+        });
+      });
+
+      try {
+        await Promise.all(promises);
+      } catch (e: unknown) {
+        console.log('Failed to load cached bundles', e);
+      }
+    }
+  }
+
+  // If everything failed, use local bundles
+  if (!bundlesFound()) useLocalBundles = true;
 
   // Used for sending accurate stack traces to sentry
   electron.ipcMain.on('getBundleNames', (e: Electron.Event, bundles: TBundleName[]) => {
