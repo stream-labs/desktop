@@ -24,19 +24,12 @@ export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
       tiktok: 'fab fa-tiktok',
       dlive: 'dlive',
       nimotv: 'nimotv',
-      streamlabs: 'icon-kevin-day',
+      streamlabs: 'icon-streamlabs',
     }[p.platform];
   }
   const size = p.size && (sizeMap[p.size] ?? p.size);
   const sizeStyle = size ? { fontSize: `${size}px` } : undefined;
   const colorStyle = p.color ? { color: p.color } : undefined;
   const style = { ...sizeStyle, ...colorStyle };
-  if (p.platform === 'streamlabs') {
-    return (
-      <KevinSvg
-        style={{ ...style, height: `${size}px`, width: `${size}px`, fill: 'var(--teal)' }}
-      />
-    );
-  }
   return <i className={cx(iconForPlatform(), css[p.platform], p.className)} style={style} />;
 }

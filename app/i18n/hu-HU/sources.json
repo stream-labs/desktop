@@ -44,7 +44,6 @@
   "Follower Goal": "Követő Cél",
   "Twitch Follows": "Twitch Követések",
   "YouTube Follows": "YouTube Követések",
-  "Mixer Follows": "Mixer Követések",
   "Bit Goal": "Bit Cél",
   "Twitch Bits": "Twitch Bitek",
   "Subscription Goal": "Feliratkozói Cél",
@@ -145,7 +144,6 @@
   "Cloud Backup: All media and sources are backed up in the cloud": "Biztonsági mentés felhőbe: Minden média fájl és forrás el lett mentve a felhőbe",
   "Cloud Backup: Your media and sources are being synced with the cloud": "Biztonsági mentés felhőbe: A média fájljaid és forrásaid szinkronizálás alatt vannak a felhővel",
   "The streamer manually adds images of sponsors.": "The streamer manually adds images of sponsors.",
-  "Mixer chat": "Mixer chat",
   "Edit Transform": "Edit Transform",
   "There are no existing sources of this type.": "There are no existing sources of this type.",
   "Instant Replay": "Instant Replay",
@@ -185,5 +183,8 @@
   "JACK Input Client": "JACK Input Client",
   "Motion": "Motion",
   "Twitch Soundtrack": "Twitch Soundtrack",
-  "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.": "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs."
+  "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.": "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.",
+  "Custom Icon": "Custom Icon",
+  "Displays an icon from one of many selections": "Displays an icon from one of many selections",
+  "An error has occured, please try re-opening this window": "An error has occured, please try re-opening this window"
 }
