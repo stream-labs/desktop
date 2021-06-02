@@ -64,6 +64,13 @@ export class InternalApiClient {
           return target[property];
         }
 
+        if (
+          typeof target[property] === 'function' &&
+          target[property]['__executeInCurrentWindow']
+        ) {
+          return target[property];
+        }
+
         const methodName = property.toString();
         const isHelper = target['_isHelper'];
 
