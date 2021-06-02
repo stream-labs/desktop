@@ -190,7 +190,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   }
 
   get isAdvancedMode(): boolean {
-    return this.enabledPlatforms.length > 1 && this.settings.advancedMode;
+    return this.isMultiplatformMode && this.settings.advancedMode;
   }
 
   /**
