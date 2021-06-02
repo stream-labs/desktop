@@ -9,6 +9,7 @@ import { WidgetsService } from '../../app/services/widgets';
 import { EWidgetType } from '../helpers/widget-helpers';
 import { FormMonkey } from '../helpers/form-monkey';
 import { importExtractZip } from '../../app/util/slow-imports';
+import fs from 'fs';
 
 const path = require('path');
 
@@ -70,6 +71,12 @@ test('OBS Importer', async t => {
   const cacheDir = path.resolve(await t.context.app.electron.remote.app.getPath('userData'), '..');
   const dataDir = path.resolve(__dirname, '..', '..', '..', 'test', 'data');
   const obsCacheZipPath = path.resolve(dataDir, 'obs-studio.zip');
+  const obsStudioPath = path.resolve(
+    // @ts-ignore Spectron typings are wrong - app is actually under remote
+    await t.context.app.electron.remote.app.getPath('appData'),
+    'obs-studio',
+  );
+  fs.mkdirSync(obsStudioPath);
 
   const extractZip = require('extract-zip');
   await new Promise<void>(async (resolve, reject) => {
