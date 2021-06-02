@@ -4,22 +4,16 @@ import { Services } from '../../service-provider';
 import cx from 'classnames';
 import { $t } from '../../../services/i18n';
 import css from './Twitter.m.less';
-import { SwitchInput, TextAreaInput, TextInput } from '../../shared/inputs';
+import { SwitchInput, TextAreaInput } from '../../shared/inputs';
 import pick from 'lodash/pick';
 import { Row, Col, Button } from 'antd';
 import { useGoLiveSettings } from './useGoLiveSettings';
 
 export default function TwitterInput() {
   const { TwitterService } = Services;
-  const {
-    tweetText,
-    updateSettings,
-    tweetWhenGoingLive,
-    linked,
-    screenName,
-    streamTitle,
-    getTweetText,
-  } = useGoLiveSettings(view => ({
+  const { useSelector, tweetText, updateSettings, getTweetText } = useGoLiveSettings();
+
+  const { tweetWhenGoingLive, linked, screenName, streamTitle } = useSelector(view => ({
     ...pick(TwitterService.state, 'tweetWhenGoingLive', 'linked', 'screenName'),
     streamTitle: view.commonFields.title,
   }));

@@ -17,22 +17,24 @@ import { IYoutubeStartStreamOptions } from '../../../../services/platforms/youtu
 export function YoutubeEditStreamInfo() {
   const { YoutubeService } = Services;
   const {
+    useSelector,
     updatePlatform,
-    ytSettings,
     isUpdateMode,
     isScheduleMode,
     renderPlatformSettings,
     isMidStreamMode,
-    getSettings,
     useBinding,
-  } = useGoLiveSettings(view => ({
+  } = useGoLiveSettings();
+
+  const { ytSettings } = useSelector(view => ({
     ytSettings: view.platforms.youtube,
   }));
+
   const is360video = ytSettings.projection === '360';
   const shouldShowSafeForKidsWarn = ytSettings.selfDeclaredMadeForKids;
   const broadcastId = ytSettings.broadcastId;
   const bind = useBinding(
-    () => getSettings().platforms.youtube,
+    view => view.state.platforms.youtube,
     newYtSettings => updatePlatform('youtube', newYtSettings),
     fieldName => ({ disabled: fieldIsDisabled(fieldName as keyof IYoutubeStartStreamOptions) }),
   );

@@ -138,8 +138,8 @@ export class StreamingService
     // watch for StreamInfoView at emit `streamInfoChanged` event if something has been hanged there
     this.store.watch(
       () => {
-        this.views.chatUrl; // read `chatUrl` to tell vuex that this computed property is reactive
-        return this.views;
+        this.view.chatUrl; // read `chatUrl` to tell vuex that this computed property is reactive
+        return this.view;
       },
       val => {
         // show the error if child window is closed
@@ -158,15 +158,15 @@ export class StreamingService
     );
   }
 
-  get views() {
-    return new StreamInfoView(this.state);
+  get view() {
+    return new StreamInfoView({});
   }
 
   /**
    * sync the settings from platforms with the local state
    */
   async prepopulateInfo(platforms?: TPlatform[]) {
-    platforms = platforms || this.views.enabledPlatforms;
+    platforms = platforms || this.view.enabledPlatforms;
     this.UPDATE_STREAM_INFO({ lifecycle: 'prepopulate', error: null });
 
     // prepopulate settings for all platforms in parallel mode
@@ -178,7 +178,7 @@ export class StreamingService
         // primary platform is always available to stream into
         // prime users are eligeble for streaming to any platform
         let primeRequired = false;
-        if (!this.views.checkPrimaryPlatform(platform) && !this.userService.isPrime) {
+        if (!this.view.checkPrimaryPlatform(platform) && !this.userService.isPrime) {
           const primaryPlatform = this.userService.state.auth?.primaryPlatform;
 
           // grandfathared users allowed to stream primary + FB
@@ -256,7 +256,7 @@ export class StreamingService
     const unattendedMode = !newSettings;
 
     // use default settings if no new settings provided
-    const settings = newSettings || cloneDeep(this.views.savedSettings);
+    const settings = newSettings || cloneDeep(this.view.savedSettings);
 
     // save enabled platforms to reuse setting with the next app start
     this.streamSettingsService.setSettings({ goLiveSettings: settings });
@@ -268,7 +268,7 @@ export class StreamingService
     this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist' });
 
     // update channel settings for each platform
-    const platforms = this.views.enabledPlatforms;
+    const platforms = this.view.enabledPlatforms;
     for (const platform of platforms) {
       const service = getPlatformService(platform);
       try {
@@ -292,7 +292,7 @@ export class StreamingService
     }
 
     // setup restream
-    if (this.views.isMultiplatformMode) {
+    if (this.view.isMultiplatformMode) {
       // check the Restream service is available
       let ready = false;
       try {
@@ -368,7 +368,7 @@ export class StreamingService
     // all done
     if (this.state.streamingStatus === EStreamingState.Live) {
       this.UPDATE_STREAM_INFO({ lifecycle: 'live' });
-      this.createGameAssociation(this.views.commonFields.game);
+      this.createGameAssociation(this.view.commonFields.game);
       this.recordAfterStreamStartAnalytics(settings);
     }
   }
@@ -416,7 +416,7 @@ export class StreamingService
     this.UPDATE_STREAM_INFO({ lifecycle: 'runChecklist' });
 
     // call putChannelInfo for each platform
-    const platforms = this.views.getEnabledPlatforms(settings.platforms);
+    const platforms = this.view.getEnabledPlatforms(settings.platforms);
 
     platforms.forEach(platform => {
       this.UPDATE_STREAM_INFO({
@@ -458,7 +458,7 @@ export class StreamingService
   async scheduleStream(settings: IStreamSettings, time: string) {
     const destinations = settings.platforms;
     const platforms = (Object.keys(destinations) as TPlatform[]).filter(
-      dest => destinations[dest].enabled && this.views.supports('stream-schedule', [dest]),
+      dest => destinations[dest].enabled && this.view.supports('stream-schedule', [dest]),
     ) as ('facebook' | 'youtube')[];
     for (const platform of platforms) {
       const service = getPlatformService(platform);
@@ -633,7 +633,7 @@ export class StreamingService
       .then(() => {
         // run afterGoLive hooks
         try {
-          this.views.enabledPlatforms.forEach(platform => {
+          this.view.enabledPlatforms.forEach(platform => {
             getPlatformService(platform).afterGoLive();
           });
         } catch (e: unknown) {
@@ -697,7 +697,7 @@ export class StreamingService
       }
 
       this.windowsService.closeChildWindow();
-      this.views.enabledPlatforms.forEach(platform => {
+      this.view.enabledPlatforms.forEach(platform => {
         const service = getPlatformService(platform);
         if (service.afterStopStream) service.afterStopStream();
       });
@@ -760,7 +760,7 @@ export class StreamingService
   }
 
   showGoLiveWindow() {
-    const height = this.views.linkedPlatforms.length > 1 ? 750 : 650;
+    const height = this.view.linkedPlatforms.length > 1 ? 750 : 650;
     const width = 900;
 
     const isLegacy =
@@ -905,7 +905,7 @@ export class StreamingService
 
         try {
           streamEncoderInfo = this.outputSettingsService.getSettings();
-          game = this.views.commonFields.game;
+          game = this.view.commonFields.game;
         } catch (e: unknown) {
           console.error('Error fetching stream encoder info: ', e);
         }
@@ -1110,14 +1110,14 @@ export class StreamingService
     data.viewerCounts = {};
     data.duration = Math.round(moment().diff(moment(this.state.streamingStatusTime)) / 1000);
 
-    if (this.views.protectedModeEnabled) {
-      data.platforms = this.views.enabledPlatforms;
+    if (this.view.protectedModeEnabled) {
+      data.platforms = this.view.enabledPlatforms;
 
-      this.views.customDestinations.forEach(() => {
+      this.view.customDestinations.forEach(() => {
         data.platforms.push('custom_rtmp');
       });
 
-      this.views.enabledPlatforms.forEach(platform => {
+      this.view.enabledPlatforms.forEach(platform => {
         const service = getPlatformService(platform);
 
         if (service.hasCapability('viewerCount')) {

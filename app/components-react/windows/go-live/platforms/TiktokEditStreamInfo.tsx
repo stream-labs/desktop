@@ -9,12 +9,10 @@ import { Button } from 'antd';
 import InputWrapper from '../../../shared/inputs/InputWrapper';
 
 export function TiktokEditStreamInfo() {
-  const { updatePlatform, ttSettings, getSettings } = useGoLiveSettings(state => ({
-    ttSettings: state.platforms.tiktok,
-  }));
+  const { updatePlatform } = useGoLiveSettings();
 
   const bind = createBinding(
-    () => getSettings().platforms.tiktok,
+    view => view.state.platforms.tiktok,
     updatedSettings => updatePlatform('tiktok', updatedSettings),
   );
 

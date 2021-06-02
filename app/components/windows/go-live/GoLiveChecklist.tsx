@@ -45,7 +45,7 @@ export default class GoLiveChecklist extends TsxComponent<Props> {
   }
 
   private get view() {
-    return this.streamingService.views;
+    return this.streamingService.view;
   }
 
   private get lifecycle() {

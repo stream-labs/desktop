@@ -14,13 +14,13 @@ import PlatformSettings from './PlatformSettings';
 import Scrollable from '../../shared/Scrollable';
 import Spinner from '../../shared/Spinner';
 import GoLiveError from './GoLiveError';
+import { Provider } from 'react-redux';
+import { store } from '../../store';
 
 export default function EditStreamWindow() {
   const { StreamingService, WindowsService } = Services;
   const form = useForm();
   const {
-    contextValue,
-    Context: GoLiveSettingsContext,
     error,
     lifecycle,
     isMultiplatformMode,
@@ -85,7 +85,7 @@ export default function EditStreamWindow() {
   }
 
   return (
-    <GoLiveSettingsContext.Provider value={contextValue}>
+    <Provider store={store}>
       <ModalLayout footer={renderFooter()}>
         <Form
           form={form}
@@ -108,6 +108,6 @@ export default function EditStreamWindow() {
           </Animation>
         </Form>
       </ModalLayout>
-    </GoLiveSettingsContext.Provider>
+    </Provider>
   );
 }

@@ -12,12 +12,12 @@ import Animation from 'rc-animate';
 import { SwitchInput } from '../../shared/inputs';
 import { useGoLiveSettings } from './useGoLiveSettings';
 import { ReduxTodo } from './ReduxTodo';
+import { store } from '../../store';
+import { Provider } from 'react-redux';
 
 export default function GoLiveWindow() {
   const { StreamingService, WindowsService } = Services;
   const {
-    contextValue,
-    Context: GoLiveSettingsContext,
     error,
     lifecycle,
     checklist,
@@ -85,7 +85,7 @@ export default function GoLiveWindow() {
   }
 
   return (
-    <GoLiveSettingsContext.Provider value={contextValue}>
+    <Provider store={store}>
       <ModalLayout footer={renderFooter()}>
         <Form
           form={form}
@@ -103,6 +103,6 @@ export default function GoLiveWindow() {
           </Animation>
         </Form>
       </ModalLayout>
-    </GoLiveSettingsContext.Provider>
+    </Provider>
   );
 }

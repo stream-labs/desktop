@@ -52,7 +52,7 @@ export default class EditStreamWindow extends TsxComponent<{}> {
   }
 
   private get view() {
-    return this.streamingService.views;
+    return this.streamingService.view;
   }
 
   private async submit() {

@@ -23,6 +23,7 @@ type TCustomFieldName = 'title' | 'description';
  */
 export default function CommonPlatformFields(p: IProps) {
   const {
+    useSelector,
     updatePlatform,
     isAdvancedMode,
     getPlatformSettings,
@@ -31,21 +32,22 @@ export default function CommonPlatformFields(p: IProps) {
     toggleCustomFields,
     isMultiplatformMode,
     supports,
-    descriptionIsRequired,
-    shouldShowPropsForSinglePlatform,
-    platformSettings,
-  } = useGoLiveSettings(ctx => {
-    // description is required for Facebook
-    const fbSettings = ctx.platforms.facebook;
-    const descriptionIsRequired =
-      p.platform === 'facebook' ||
-      (!p.platform && fbSettings && fbSettings.enabled && !fbSettings.useCustomFields);
-    const shouldShowPropsForSinglePlatform = !!p.platform;
-    const platformSettings = shouldShowPropsForSinglePlatform
-      ? ctx.getPlatformSettings(p.platform!)
-      : null;
-    return { descriptionIsRequired, shouldShowPropsForSinglePlatform, platformSettings };
-  });
+  } = useGoLiveSettings();
+
+  const { descriptionIsRequired, shouldShowPropsForSinglePlatform, platformSettings } = useSelector(
+    ctx => {
+      // description is required for Facebook
+      const fbSettings = ctx.platforms.facebook;
+      const descriptionIsRequired =
+        p.platform === 'facebook' ||
+        (!p.platform && fbSettings && fbSettings.enabled && !fbSettings.useCustomFields);
+      const shouldShowPropsForSinglePlatform = !!p.platform;
+      const platformSettings = shouldShowPropsForSinglePlatform
+        ? ctx.getPlatformSettings(p.platform!)
+        : null;
+      return { descriptionIsRequired, shouldShowPropsForSinglePlatform, platformSettings };
+    },
+  );
 
   /**
    * Toggle the "Use different title and description " checkbox

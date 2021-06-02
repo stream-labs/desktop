@@ -25,13 +25,9 @@ const PlusIcon = PlusOutlined as Function;
 export default function GoLiveSettings() {
   const { RestreamService, SettingsService, UserService } = Services;
 
-  const {
-    isAdvancedMode,
-    protectedModeEnabled,
-    error,
-    canAddDestinations,
-    isLoading,
-  } = useGoLiveSettings(view => {
+  const { useSelect, isAdvancedMode, protectedModeEnabled, error, isLoading } = useGoLiveSettings();
+
+  const { canAddDestinations } = useSelect(view => {
     const linkedPlatforms = view.linkedPlatforms;
     const customDestinations = view.customDestinations;
     return {

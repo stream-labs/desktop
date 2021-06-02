@@ -8,7 +8,7 @@ import Form from '../../../shared/inputs/Form';
 import { useOnCreate, useFormState } from '../../../hooks';
 import { EDismissable } from '../../../../services/dismissables';
 import { $t } from '../../../../services/i18n';
-import { createBinding, ListInput } from '../../../shared/inputs';
+import { ListInput } from '../../../shared/inputs';
 import GameSelector from '../GameSelector';
 import {
   IFacebookLiveVideo,
@@ -33,8 +33,14 @@ export default function FacebookEditStreamInfo() {
   } = Services;
 
   const {
+    useSelector,
     updatePlatform,
     isUpdateMode,
+    useBinding,
+    renderPlatformSettings,
+  } = useGoLiveSettings();
+
+  const {
     fbSettings,
     pages,
     groups,
@@ -42,11 +48,8 @@ export default function FacebookEditStreamInfo() {
     canStreamToGroup,
     isPrimary,
     shouldShowGamingWarning,
-    renderPlatformSettings,
     shouldShowPermissionWarn,
-    useBinding,
-    getSettings,
-  } = useGoLiveSettings(view => {
+  } = useSelector(view => {
     const fbState = FacebookService.state;
     const hasPages = !!fbState.facebookPages.length;
     const canStreamToTimeline = fbState.grantedPermissions.includes('publish_video');
@@ -66,6 +69,7 @@ export default function FacebookEditStreamInfo() {
       isPrimary: view.checkPrimaryPlatform('facebook'),
     };
   });
+
   const shouldShowGroups = fbSettings.destinationType === 'group' && !isUpdateMode;
   const shouldShowPages = fbSettings.destinationType === 'page' && !isUpdateMode;
   const shouldShowEvents = !isUpdateMode;
@@ -74,7 +78,7 @@ export default function FacebookEditStreamInfo() {
     (!fbSettings.liveVideoId && fbSettings.privacy?.value !== 'SELF') ||
     (fbSettings.liveVideoId && fbSettings.privacy?.value);
   const bind = useBinding(
-    () => getSettings().platforms.facebook,
+    view => view.state.platforms.facebook,
     newFbSettings => updatePlatform('facebook', newFbSettings),
   );
 

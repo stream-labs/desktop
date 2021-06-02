@@ -1,17 +1,16 @@
 import { useGoLiveSettings } from '../useGoLiveSettings';
 import CommonPlatformFields from '../CommonPlatformFields';
 import React from 'react';
-import { createBinding } from '../../../shared/inputs';
 import { $t } from '../../../../services/i18n';
 import { TwitchTagsInput } from './TwitchTagsInput';
 import GameSelector from '../GameSelector';
 import Form from '../../../shared/inputs/Form';
 
 export function TwitchEditStreamInfo() {
-  const { updatePlatform, renderPlatformSettings, getSettings, useBinding } = useGoLiveSettings();
+  const { updatePlatform, renderPlatformSettings, useBinding } = useGoLiveSettings();
 
   const bind = useBinding(
-    () => getSettings().platforms.twitch,
+    view => view.state.platforms.twitch,
     updatedSettings => updatePlatform('twitch', updatedSettings),
   );
 
