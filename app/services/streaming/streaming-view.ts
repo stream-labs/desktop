@@ -20,7 +20,7 @@ export type IGoLiveSettingsState = IGoLiveSettings & TModificators & { needPrepo
  * channel and current stream in the Vuex store for
  * components to make use of.
  */
-export class StreamInfoView<T> extends ViewHandler<T> {
+export class StreamInfoView<T extends Object> extends ViewHandler<T> {
   get settings(): IGoLiveSettings {
     return this.savedSettings;
   }

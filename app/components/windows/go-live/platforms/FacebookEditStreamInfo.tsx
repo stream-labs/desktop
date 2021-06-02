@@ -57,7 +57,7 @@ export default class FacebookEditStreamInfo extends BaseEditSteamInfo<Props> {
   private pictures: Dictionary<string> = {};
 
   private get view() {
-    return this.streamingService.views;
+    return this.streamingService.view;
   }
 
   private get fbSettings(): IFacebookStartStreamOptions {

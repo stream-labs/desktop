@@ -31,7 +31,7 @@ export default class ScheduleStreamWindow extends TsxComponent<{}> {
   };
 
   private get view() {
-    return this.streamingService.views;
+    return this.streamingService.view;
   }
 
   private settings: IStreamSettings = required();

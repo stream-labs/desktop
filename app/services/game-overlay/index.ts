@@ -185,7 +185,7 @@ export class GameOverlayService extends PersistentStatefulService<GameOverlaySta
 
     this.createWindowOverlays();
 
-    const chatUrl = this.streamingService.views.chatUrl;
+    const chatUrl = this.streamingService.view.chatUrl;
     if (chatUrl) {
       this.windows.chat.loadURL(chatUrl).catch(this.handleRedirectError);
     }

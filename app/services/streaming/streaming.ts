@@ -94,7 +94,7 @@ export class StreamingService
   recordingStatusChange = new Subject<ERecordingState>();
   replayBufferStatusChange = new Subject<EReplayBufferState>();
   replayBufferFileWrite = new Subject<string>();
-  streamInfoChanged = new Subject<StreamInfoView>();
+  streamInfoChanged = new Subject<StreamInfoView<any>>();
 
   // Dummy subscription for stream deck
   streamingStateChange = new Subject<void>();

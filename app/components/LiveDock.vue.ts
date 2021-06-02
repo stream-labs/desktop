@@ -134,7 +134,7 @@ export default class LiveDock extends Vue {
       return 'viewers hidden';
     }
 
-    return this.streamingService.views.viewerCount.toString();
+    return this.streamingService.view.viewerCount.toString();
   }
 
   get offlineImageSrc() {

@@ -38,7 +38,7 @@ export class DestinationSwitchers extends TsxComponent<Props> {
   @Inject() private userService: UserService;
 
   private get view() {
-    return this.streamingService.views;
+    return this.streamingService.view;
   }
 
   private onSwitchPlatformHandler(platform: TPlatform, enabled: boolean) {

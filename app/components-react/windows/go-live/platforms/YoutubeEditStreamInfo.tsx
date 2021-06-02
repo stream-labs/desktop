@@ -27,7 +27,7 @@ export function YoutubeEditStreamInfo() {
   } = useGoLiveSettings();
 
   const { ytSettings } = useSelector(view => ({
-    ytSettings: view.platforms.youtube,
+    ytSettings: view.state.platforms.youtube,
   }));
 
   const is360video = ytSettings.projection === '360';
@@ -87,7 +87,6 @@ export function YoutubeEditStreamInfo() {
       <div key={'broadcast'}>
         {!isScheduleMode && (
           <BroadcastInput
-            value=""
             label={$t('Event')}
             loading={broadcastLoading}
             broadcasts={broadcasts}

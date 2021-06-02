@@ -28,7 +28,7 @@ export default class GoLiveError extends TsxComponent<{}> {
   @Inject() private navigationService: NavigationService;
 
   private get view() {
-    return this.streamingService.views;
+    return this.streamingService.view;
   }
 
   private goToYoutubeDashboard() {

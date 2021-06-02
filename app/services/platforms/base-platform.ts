@@ -69,7 +69,7 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
       }
 
       // stop updating if streaming has stopped
-      if (this.streamingService.views.isMidStreamMode) {
+      if (this.streamingService.view.isMidStreamMode) {
         setTimeout(runInterval, VIEWER_COUNT_UPDATE_INTERVAL);
       }
     };

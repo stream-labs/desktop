@@ -32,7 +32,7 @@ export default class PlatformSettings extends TsxComponent<Props> {
   private settings: IGoLiveSettings = null;
 
   private get view() {
-    return this.streamingService.views;
+    return this.streamingService.view;
   }
 
   private getPlatformName(platform: TPlatform): string {

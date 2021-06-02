@@ -1,6 +1,6 @@
 import { useGoLiveSettings } from '../useGoLiveSettings';
 import React from 'react';
-import { createBinding, TextInput } from '../../../shared/inputs';
+import { TextInput } from '../../../shared/inputs';
 import Form from '../../../shared/inputs/Form';
 import electron from 'electron';
 import { $t } from '../../../../services/i18n';
@@ -9,9 +9,9 @@ import { Button } from 'antd';
 import InputWrapper from '../../../shared/inputs/InputWrapper';
 
 export function TiktokEditStreamInfo() {
-  const { updatePlatform } = useGoLiveSettings();
+  const { updatePlatform, useBinding } = useGoLiveSettings();
 
-  const bind = createBinding(
+  const bind = useBinding(
     view => view.state.platforms.tiktok,
     updatedSettings => updatePlatform('tiktok', updatedSettings),
   );

@@ -49,7 +49,7 @@ export default class YoutubeEditStreamInfo extends BaseEditStreamInfo<Props> {
   }
 
   private get view() {
-    return this.streamingService.views;
+    return this.streamingService.view;
   }
 
   private get selectedBroadcast() {

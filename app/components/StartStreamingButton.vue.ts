@@ -28,7 +28,7 @@ export default class StartStreamingButton extends Vue {
   @Prop() disabled: boolean;
 
   get isMidStream() {
-    return this.streamingService.views.isMidStreamMode;
+    return this.streamingService.view.isMidStreamMode;
   }
 
   async toggleStreaming() {
@@ -78,7 +78,7 @@ export default class StartStreamingButton extends Vue {
       }
 
       if (this.shouldShowGoLiveWindow()) {
-        if (!this.streamingService.views.hasPendingChecks()) {
+        if (!this.streamingService.view.hasPendingChecks()) {
           this.streamingService.actions.resetInfo();
         }
         this.streamingService.actions.showGoLiveWindow();
@@ -155,7 +155,7 @@ export default class StartStreamingButton extends Vue {
     if (primaryPlatform === 'twitch') {
       // For Twitch, we can show the Go Live window even with protected mode off
       // This is mainly for legacy reasons.
-      return this.streamingService.views.isMultiplatformMode || updateStreamInfoOnLive;
+      return this.streamingService.view.isMultiplatformMode || updateStreamInfoOnLive;
     }
 
     if (primaryPlatform === 'facebook') {
