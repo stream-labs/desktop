@@ -444,6 +444,14 @@ export class AudioSource implements IAudioSourceApi {
     return this.sourcesService.views.getSource(this.sourceId);
   }
 
+  get isControlledViaObs() {
+    const formData = this.source
+      .getPropertiesFormData()
+      .find(data => data.name === 'reroute_audio');
+    if (!formData) return true;
+    return formData.value;
+  }
+
   setSettings(patch: Partial<IAudioSource>) {
     this.audioService.setSettings(this.sourceId, patch);
   }
