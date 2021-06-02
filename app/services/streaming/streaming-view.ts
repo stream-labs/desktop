@@ -15,7 +15,7 @@ import difference from 'lodash/difference';
  * channel and current stream in the Vuex store for
  * components to make use of.
  */
-export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
+export class StreamInfoView extends ViewHandler<IGoLiveSettings> {
   constructor(state: IStreamingServiceState, private getGoLiveSettings?: () => IGoLiveSettings) {
     super(state);
   }

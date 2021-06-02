@@ -14,6 +14,14 @@ type TCustomFieldName = 'title' | 'description';
 type TModificators = { isUpdateMode?: boolean; isScheduleMode?: boolean };
 type IGoLiveSettingsState = IGoLiveSettings & TModificators & { needPrepopulate: boolean };
 
+
+class GoLiveSettingsFeature extends StreamInfoView {
+
+
+
+}
+
+
 /**
  * Shared state and utils for for GoLiveWindow and EditStreamWindow
  */
