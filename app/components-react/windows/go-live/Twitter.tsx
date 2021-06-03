@@ -5,24 +5,24 @@ import cx from 'classnames';
 import { $t } from '../../../services/i18n';
 import css from './Twitter.m.less';
 import { SwitchInput, TextAreaInput, TextInput } from '../../shared/inputs';
-import pick from 'lodash/pick';
 import { Row, Col, Button } from 'antd';
 import { useGoLiveSettings } from './useGoLiveSettings';
+import { useVuex } from '../../hooks';
 
 export default function TwitterInput() {
   const { TwitterService } = Services;
-  const {
-    tweetText,
-    updateSettings,
-    tweetWhenGoingLive,
-    linked,
-    screenName,
-    streamTitle,
-    getTweetText,
-  } = useGoLiveSettings(view => ({
-    ...pick(TwitterService.state, 'tweetWhenGoingLive', 'linked', 'screenName'),
+  const { tweetText, updateSettings, getTweetText, streamTitle } = useGoLiveSettings(view => ({
     streamTitle: view.commonFields.title,
   }));
+
+  const { tweetWhenGoingLive, linked, screenName } = useVuex(() => {
+    const state = TwitterService.state;
+    return {
+      tweetWhenGoingLive: state.tweetWhenGoingLive,
+      linked: state.linked,
+      screenName: state.screenName,
+    };
+  });
 
   useEffect(() => {
     const tweetText = getTweetText(streamTitle);

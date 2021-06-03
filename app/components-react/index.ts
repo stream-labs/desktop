@@ -8,6 +8,7 @@ import PatchNotes from './pages/PatchNotes';
 import Display from './shared/Display';
 import TitleBar from './shared/TitleBar';
 import Chat from './root/Chat';
+import Loader from './pages/Loader';
 import NavTools from './sidebar/NavTools';
 import PlatformLogo from './shared/PlatformLogo';
 
@@ -23,6 +24,7 @@ export const components = {
   Display,
   TitleBar,
   Chat,
+  Loader,
   NavTools,
   PlatformLogo,
 };
