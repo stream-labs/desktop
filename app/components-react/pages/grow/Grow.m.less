@@ -1,20 +1,23 @@
 .goal-tab-container {
+  height: 100%;
   width: 100%;
   flex-grow: 1;
-  display: grid;
-  grid-template-columns: 1fr 320px;
-  grid-template-rows: minmax(0, 1fr);
+  display: flex;
   position: relative;
 
   :global(.ant-modal-wrap), :global(.ant-modal-mask) {
     position: absolute;
   }
+
+  :global(.os-content-glue) {
+    width: 100% !important;
+  }
 }
 
 .goal-tab-content {
   padding: 24px;
-  grid-column: 1 / span 1;
-  min-width: 0;
+  flex-grow: 1;
+  position: relative;
 }
 
 .card {
@@ -205,9 +208,9 @@
 }
 
 .growth-tips-container {
-  grid-column: 2 / span 1;
-  grid-row: 1 / span 1;
+  width: 320px;
   background: var(--section-alt);
+  flex-shrink: 0;
   display: flex;
   height: 100%;
   min-height: 1px;

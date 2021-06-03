@@ -45,7 +45,7 @@ export const GROWTH_TIPS = () => [
   },
   {
     title: 'Get a Sweet Logo',
-    icon: 'icon-diamond',
+    icon: 'icon-image',
     link: encodeURIComponent('prime/logo'),
     cta: 'Make a Logo Now',
     description:

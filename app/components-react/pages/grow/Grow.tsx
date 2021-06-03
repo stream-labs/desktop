@@ -38,7 +38,7 @@ export default function Grow() {
 
   return (
     <div className={styles.goalTabContainer}>
-      <Scrollable className={styles.goalTabContent}>
+      <Scrollable className={styles.goalTabContent} isResizable={false} style={{ width: '100%' }}>
         <MyGoals goals={v.goals} />
         <MyCommunity platforms={v.platformsToMap} />
         {v.isTwitchAuthed && <StreamPulse analytics={v.analytics} />}
