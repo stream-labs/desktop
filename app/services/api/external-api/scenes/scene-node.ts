@@ -11,6 +11,7 @@ import { Scene } from './scene';
 import { SceneItemFolder } from './scene-item-folder';
 import { SceneItem } from './scene-item';
 import { ServiceHelper } from 'services';
+import { ISerializable } from '../../rpc-api';
 
 export declare type TSceneNodeType = 'folder' | 'item';
 
@@ -25,7 +26,7 @@ export interface ISceneNodeModel {
 /**
  * A base API for Items and Folders
  */
-export abstract class SceneNode {
+export abstract class SceneNode implements ISerializable {
   @Inject('ScenesService') protected internalScenesService: InternalScenesService;
   @InjectFromExternalApi() protected scenesService: ScenesService;
   @Fallback() protected sceneNode: InternalSceneNode;

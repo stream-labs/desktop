@@ -9,6 +9,7 @@ import { ISceneNodeModel, SceneNode } from './scene-node';
 import { getExternalSceneItemModel, SceneItem } from './scene-item';
 import { SceneItemFolder } from './scene-item-folder';
 import Utils from '../../../utils';
+import { ISerializable } from '../../rpc-api';
 
 export interface ISceneModel {
   id: string;
@@ -17,7 +18,7 @@ export interface ISceneModel {
 }
 
 @ServiceHelper()
-export class Scene implements ISceneModel {
+export class Scene implements ISceneModel, ISerializable {
   @InjectFromExternalApi() private scenesService: ScenesService;
   @InjectFromExternalApi() private sourcesService: SourcesService;
   @Inject('ScenesService')

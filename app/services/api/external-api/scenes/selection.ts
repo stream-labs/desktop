@@ -12,6 +12,7 @@ import { Scene } from './scene';
 import { SceneItem } from './scene-item';
 import { SceneItemFolder } from './scene-item-folder';
 import { SceneNode } from './scene-node';
+import { ISerializable } from '../../rpc-api';
 
 export interface ISelectionModel {
   selectedIds: string[];
@@ -25,7 +26,7 @@ export interface ISelectionModel {
  * @see SelectionService to make items active
  */
 @ServiceHelper()
-export class Selection implements ISceneItemActions {
+export class Selection implements ISceneItemActions, ISerializable {
   @InjectFromExternalApi() private sourcesService: SourcesService;
   @InjectFromExternalApi() private scenesService: ScenesService;
   @Fallback() private internalSelection: InternalSelection;
