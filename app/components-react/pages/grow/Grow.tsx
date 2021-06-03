@@ -85,8 +85,16 @@ function AddGoalModal(p: { visible: boolean; setShowGoalModal: Function }) {
   const [goalTitle, setGoalTitle] = useState('');
   const [goalType, setGoalType] = useState('custom');
 
+  useEffect(() => {
+    const goalOption = GrowService.views.goalOptions.find(goal => goal.type === goalType);
+    if (goalOption && goalOption.type !== 'custom') {
+      setGoalTitle(goalOption.title);
+      setGoalTotal(goalOption.total);
+    }
+  }, [goalType]);
+
   function addGoal() {
-    const image = GrowService.views.goalOptions.find(goal => goalType)?.image || '';
+    const image = GrowService.views.goalOptions.find(goal => goal.type === goalType)?.image || '';
     GrowService.actions.addGoal({ title: goalTitle, total: goalTotal, type: goalType, image });
     setGoalTitle('');
     setGoalTotal(10);
@@ -152,7 +160,8 @@ function MyCommunity(p: { platforms: ICommunityReach[] }) {
         {$t(
           'You can reach %{percentage}% of your community across all platforms. Multistream to more platforms to increase this number',
           {
-            percentage: Math.floor((reachableFollowing / totalFollowing) * 100),
+            percentage:
+              totalFollowing === 0 ? 0 : Math.floor((reachableFollowing / totalFollowing) * 100),
           },
         )}
       </span>
