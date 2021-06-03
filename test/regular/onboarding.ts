@@ -1,6 +1,5 @@
 import { focusChild, focusMain, test, useSpectron } from '../helpers/spectron';
 import { logIn } from '../helpers/spectron/user';
-import { spawnSync } from 'child_process';
 import { sleep } from '../helpers/sleep';
 import { sceneExisting, switchCollection } from '../helpers/spectron/scenes';
 import { sourceIsExisting } from '../helpers/spectron/sources';
@@ -8,8 +7,6 @@ import { getClient } from '../helpers/api-client';
 import { WidgetsService } from '../../app/services/widgets';
 import { EWidgetType } from '../helpers/widget-helpers';
 import { FormMonkey } from '../helpers/form-monkey';
-import { importExtractZip } from '../../app/util/slow-imports';
-import fs from 'fs';
 
 const path = require('path');
 
@@ -76,6 +73,8 @@ test('OBS Importer', async t => {
     await t.context.app.electron.remote.app.getPath('appData'),
     'obs-studio',
   );
+
+  const fs = require('fs');
   fs.mkdirSync(obsStudioPath);
 
   const extractZip = require('extract-zip');
