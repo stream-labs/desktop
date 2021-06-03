@@ -9,6 +9,7 @@ import { TwitchService } from 'services/platforms/twitch';
 import { YoutubeService } from 'services/platforms/youtube';
 import { FacebookService } from 'services/platforms/facebook';
 import { TPlatform } from 'services/platforms';
+import moment from 'moment';
 
 export interface IGoal {
   id?: number;
@@ -18,6 +19,7 @@ export interface IGoal {
   total: number;
   progress?: number;
   startDate?: string;
+  start_date?: string;
 }
 
 export interface IUniversityProgress {
@@ -109,8 +111,10 @@ class GrowServiceViews extends ViewHandler<IGrowServiceState> {
 
   timeLeft(goal: IGoal) {
     if (!goal.startDate) return Infinity;
-    if (/week/.test(goal.type)) return Date.parse(goal.startDate) + ONE_WEEK - Date.now();
-    if (/month/.test(goal.type)) return Date.parse(goal.startDate) + ONE_WEEK * 4 - Date.now();
+    if (/week/.test(goal.type)) return moment(goal.startDate).valueOf() + ONE_WEEK - Date.now();
+    if (/month/.test(goal.type)) {
+      return moment(goal.startDate).valueOf() + ONE_WEEK * 4 - Date.now();
+    }
     return Infinity;
   }
 }
@@ -175,13 +179,13 @@ export class GrowService extends StatefulService<IGrowServiceState> {
       this.userService.apiToken,
       new Headers({ 'Content-Type': 'application/json' }),
     );
-    return new Request(url, { headers, method, body });
+    return new Request(url, { headers, method, body: body ? JSON.stringify(body) : undefined });
   }
 
   fetchGoals() {
     jfetch<IGoal[]>(this.formGoalRequest()).then(json =>
       json.forEach(goal => {
-        this.ADD_GOAL(goal);
+        this.ADD_GOAL({ startDate: goal.start_date, ...goal });
       }),
     );
   }
@@ -233,15 +237,16 @@ export class GrowService extends StatefulService<IGrowServiceState> {
   }
 
   addGoal(goal: IGoal) {
-    const goalWithId = {
+    const goalWithType = {
       ...goal,
       progress: 0,
-      startDate: new Date().toISOString(),
+      startDate: moment().format('YYYY-MM-DD HH:mm:ss'),
       type: goal.type === '' ? uuid() : goal.type,
     };
 
-    jfetch(this.formGoalRequest('POST', goalWithId));
-    this.ADD_GOAL(goalWithId);
+    jfetch<IGoal>(this.formGoalRequest('POST', goalWithType)).then(goalResponse => {
+      this.ADD_GOAL(goalResponse);
+    });
   }
 
   incrementGoal(goalId: string, amount: number) {
