@@ -68,7 +68,7 @@ test('OBS Importer', async t => {
   const cacheDir = path.resolve(await t.context.app.electron.remote.app.getPath('userData'), '..');
   const dataDir = path.resolve(__dirname, '..', '..', '..', 'test', 'data');
   const obsCacheZipPath = path.resolve(dataDir, 'obs-studio.zip');
-  const obsStudioPath = path.resolve(
+  const obsStudioPath = path.join(
     // @ts-ignore Spectron typings are wrong - app is actually under remote
     await t.context.app.electron.remote.app.getPath('appData'),
     'obs-studio',
