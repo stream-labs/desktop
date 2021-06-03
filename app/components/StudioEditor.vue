@@ -25,7 +25,7 @@
           />
         </div>
         <div v-if="studioMode" class="studio-mode-display-container">
-          <display class="studio-mode-display" :paddingSize="10" />
+          <display class="studio-mode-display" :componentProps="{ paddingSize: 10 }" />
         </div>
       </div>
     </div>
