@@ -44,6 +44,6 @@ function openStreamPage() {
 
 function openInfoPage() {
   electron.remote.shell.openExternal(
-    'https://streamlabs.com/content-hub/post/how-to-live-stream-on-tiktok-from-a-pc',
+    'https://streamlabs.com/content-hub/post/how-to-livestream-from-your-tiktok-account-using-streamlabs-from-web',
   );
 }
