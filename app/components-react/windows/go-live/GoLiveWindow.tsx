@@ -11,7 +11,6 @@ import Form, { useForm } from '../../shared/inputs/Form';
 import Animation from 'rc-animate';
 import { SwitchInput } from '../../shared/inputs';
 import { useGoLiveSettings } from './useGoLiveSettings';
-import { ReduxTodo } from './ReduxTodo';
 import { store } from '../../store';
 import { Provider } from 'react-redux';
 
@@ -85,15 +84,15 @@ export default function GoLiveWindow() {
   }
 
   return (
-    <Provider store={store}>
-      <ModalLayout footer={renderFooter()}>
+    <ModalLayout footer={renderFooter()}>
+      <Provider store={store}>
         <Form
           form={form}
           style={{ position: 'relative', height: '100%' }}
           layout="horizontal"
           name="editStreamForm"
         >
-          <ReduxTodo />
+          {/*<ReduxTodo />*/}
           <Animation transitionName={shouldShowChecklist ? 'slideright' : ''}>
             {/* STEP 1 - FILL OUT THE SETTINGS FORM */}
             {shouldShowSettings && <GoLiveSettings key={'settings'} />}
@@ -102,7 +101,7 @@ export default function GoLiveWindow() {
             {shouldShowChecklist && <GoLiveChecklist className={styles.page} key={'checklist'} />}
           </Animation>
         </Form>
-      </ModalLayout>
-    </Provider>
+      </Provider>
+    </ModalLayout>
   );
 }

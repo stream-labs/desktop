@@ -20,6 +20,7 @@ export default function PlatformSettings() {
   } = useGoLiveSettings();
   const shouldShowSettings = !error && !isLoading;
 
+  console.log('re-render platforms');
   return (
     // minHeight is required for the loading spinner
     <div style={{ minHeight: '150px' }}>

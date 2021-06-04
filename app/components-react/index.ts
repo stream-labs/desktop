@@ -10,11 +10,12 @@ import TitleBar from './shared/TitleBar';
 import Chat from './root/Chat';
 import NavTools from './sidebar/NavTools';
 import PlatformLogo from './shared/PlatformLogo';
+import { createRoot } from './root/ReactRoot';
 
 // list of React components for usage inside Vue components
 export const components = {
   NameFolder,
-  GoLiveWindow,
+  GoLiveWindow: createRoot(GoLiveWindow),
   EditStreamWindow,
   IconLibraryProperties,
   NewsBanner,

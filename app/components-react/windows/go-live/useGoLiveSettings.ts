@@ -17,26 +17,24 @@ type TCustomFieldName = 'title' | 'description';
 // type TModificators = { isUpdateMode?: boolean; isScheduleMode?: boolean };
 // type IGoLiveSettingsState = IGoLiveSettings & TModificators & { needPrepopulate: boolean };
 
-export class GoLiveSettingsFeature extends StreamInfoView {
-  private modificators: TModificators;
-
+export class GoLiveSettingsFeature extends StreamInfoView<IGoLiveSettingsState> {
   // antd form instance
-  private form: FormInstance;
+  public form: FormInstance;
 
   constructor(initialState: IGoLiveSettingsState, modificators: TModificators) {
     super(initialState);
-    this.modificators = modificators;
   }
 
   state = this.getInitialStreamSettings();
 
   // creates an initial state
   getInitialStreamSettings() {
-    const modificators = { isUpdateMode: false, isScheduleMode: false, ...this.modificators };
+    const modificators = { isUpdateMode: false, isScheduleMode: false };
+    const view = new StreamInfoView({});
     const settings = {
-      ...this.savedSettings, // copy saved stream settings
+      ...view.savedSettings, // copy saved stream settings
       needPrepopulate: true, // we need to sync platform settings after context create
-      tweetText: this.getTweetText(this.commonFields.title), // generate a default tweet text
+      tweetText: view.getTweetText(view.commonFields.title), // generate a default tweet text
       ...modificators,
     };
     // if stream has not been started than we allow to change settings only for a primary platform
@@ -51,6 +49,9 @@ export class GoLiveSettingsFeature extends StreamInfoView {
 
   getView(state: IGoLiveSettingsState) {
     return new StreamInfoView(state);
+  }
+  get settings() {
+    return this.state;
   }
 
   get isLoading() {
@@ -71,7 +72,11 @@ export class GoLiveSettingsFeature extends StreamInfoView {
   }
 
   get isUpdateMode() {
-    return this.modificators.isUpdateMode;
+    return this.state.isUpdateMode;
+  }
+
+  get isScheduleMode() {
+    return this.state.isScheduleMode;
   }
 
   // select eligible layout and renders settings
@@ -113,12 +118,13 @@ export class GoLiveSettingsFeature extends StreamInfoView {
    */
   @mutation()
   updatePlatform(platform: TPlatform, patch: Partial<IGoLiveSettings['platforms'][TPlatform]>) {
-    this.updateSettings({
+    const updated = {
       platforms: {
         ...this.state.platforms,
         [platform]: { ...this.state.platforms[platform], ...patch },
       },
-    });
+    };
+    this.updateSettings(updated);
   }
   /**
    * Enable/disable a custom ingest destinations
@@ -180,8 +186,9 @@ export class GoLiveSettingsFeature extends StreamInfoView {
    */
   switchPlatforms(enabledPlatforms: TPlatform[]) {
     this.linkedPlatforms.forEach(platform => {
-      this.state[platform].enabled = enabledPlatforms.includes(platform);
+      this.updatePlatform(platform, { enabled: enabledPlatforms.includes(platform) });
     });
+    this.save(this.settings);
     this.prepopulate();
   }
 

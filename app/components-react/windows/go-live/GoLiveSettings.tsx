@@ -25,9 +25,9 @@ const PlusIcon = PlusOutlined as Function;
 export default function GoLiveSettings() {
   const { RestreamService, SettingsService, UserService } = Services;
 
-  const { useSelect, isAdvancedMode, protectedModeEnabled, error, isLoading } = useGoLiveSettings();
+  const { useSelector, isAdvancedMode, protectedModeEnabled, error, isLoading } = useGoLiveSettings();
 
-  const { canAddDestinations } = useSelect(view => {
+  const { canAddDestinations } = useSelector(view => {
     const linkedPlatforms = view.linkedPlatforms;
     const customDestinations = view.customDestinations;
     return {
@@ -48,6 +48,8 @@ export default function GoLiveSettings() {
       UserService.openPrimeUrl('slobs-multistream');
     }
   }
+
+  console.log('re-render settings');
 
   return (
     <Row gutter={16} style={{ height: 'calc(100% + 24px)' }}>

@@ -29,7 +29,7 @@ export default function EditStreamWindow() {
     switchAdvancedMode,
     prepopulate,
     isLoading,
-  } = useGoLiveSettings(undefined, { isUpdateMode: true });
+  } = useGoLiveSettings();
 
   const shouldShowChecklist = lifecycle === 'runChecklist';
   const shouldShowSettings = !shouldShowChecklist;

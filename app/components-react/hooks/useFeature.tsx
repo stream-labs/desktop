@@ -5,15 +5,18 @@ import { createBinding, TBindings } from '../shared/inputs';
 import { assertIsDefined } from '../../util/properties-type-guards';
 import { useOnCreate, useOnDestroy } from '../hooks';
 import { StateManager } from '../store';
+import isPlainObject from 'lodash/isPlainObject';
 
 export function useFeature<
   TControllerClass extends new (...args: any[]) => { state: any },
-  TState extends Object = InstanceType<TControllerClass>['state'],
-  TReturnType = InstanceType<TControllerClass> & {
+  // TState extends Object = InstanceType<TControllerClass>['state'],
+  TBindingState,
+  TBindingExtraProps,
+  TReturnType extends InstanceType<TControllerClass> & {
     useSelector<TComputed extends Object>(
       fn: (context: InstanceType<TControllerClass>) => TComputed,
     ): TComputed;
-    useBinding: TUseBinding<InstanceType<TControllerClass>, TState>;
+    useBinding: BindingCreator<InstanceType<TControllerClass>>['createBinding']; // TUseBinding<InstanceType<TControllerClass>, TBindingState, TBindingExtraProps>;
   }
 >(ControllerClass: TControllerClass): TReturnType {
   const isRootRef = useRef(false);
@@ -88,14 +91,15 @@ export function useFeature<
   });
 
   useSelector(dataSelector, () => {
+    if (stateManager.isRenderingDisabled) return true;
     if (Object.keys(prevComponentState.current).length === 0) return true;
     calculateComputedProps();
-    const isEqual = shallowEqual(
+    const doNotRender = isSimilar(
       prevComponentState.current,
       dependencyWatcher.getDependentValues(),
     );
 
-    return isEqual;
+    return doNotRender;
   });
 
   useEffect(() => {
@@ -206,7 +210,84 @@ export function createDependencyWatcher<T extends object>(watchedObject: T) {
   return { watcherProxy, getDependentFields, getDependentValues };
 }
 
-export type TUseBinding<TView extends object, TState extends object> = (
+export type TUseBinding<TView extends Object, TState extends Object, TExtraProps = {}> = (
   stateGetter: (view: TView) => TState,
   stateSetter: (patch: TState) => unknown,
-) => TBindings<TState, keyof TState>;
+) => TBindings<TState, keyof TState, TExtraProps>;
+
+// export type TUseBindingView<TView> = TUseBinding<TView, >
+//
+// export type TUseBinding<TView extends Object, TState extends Object, TExtraProps = {}> = (
+//   stateGetter: (view: TView) => TState,
+//   stateSetter: (patch: TState) => unknown,
+// ) => TBindings<TState, keyof TState, TExtraProps>;
+
+// function useBindingView<TView>(view: TView) {
+//   return createStateGetter(view);
+// }
+//
+// function createStateGetter<TView, TState>(view: TView, getter: (view: TView) => TState) {
+//   return {
+//     getter,
+//   };
+// }
+//
+// const view = { foo: 1 };
+// const binding = createStateGetter(view, view => ({ bar: 1, view }));
+//
+//
+// type MyView = {
+//   foo: 1;
+// }
+//
+// let barGetter: ReturnType<useBindingView<MyView>>;
+// const bar = barGetter.getter().bar;
+
+/**
+ * consider isSimilar as isDeepEqual with depth 2
+ */
+function isSimilar(obj1: any, obj2: any) {
+  return isDeepEqual(obj1, obj2, 0, 2);
+}
+
+/**
+ * Compare 2 object with limited depth
+ */
+function isDeepEqual(obj1: any, obj2: any, currentDepth: number, maxDepth: number): boolean {
+  if (obj1 === obj2) return true;
+  if (currentDepth === maxDepth) return false;
+  if (Array.isArray(obj1) && Array.isArray(obj2)) return isArrayEqual(obj1, obj2);
+  if (isPlainObject(obj1) && isPlainObject(obj2)) {
+    const [keys1, keys2] = [Object.keys(obj1), Object.keys(obj2)];
+    if (keys1.length !== keys2.length) return false;
+    for (const key of keys1) {
+      if (!isDeepEqual(obj1[key], obj2[key], currentDepth + 1, maxDepth)) return false;
+    }
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Shallow compare 2 arrays
+ */
+function isArrayEqual(a: any[], b: any[]) {
+  if (a === b) return true;
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+}
+
+class BindingCreator<TView> {
+  createBinding<TState extends Object, TExtraProps extends Object = {}>(
+    getter: (view: TView) => TState,
+    setter: (newState: TState) => unknown,
+    extraPropsGenerator?: (fieldName: keyof TState) => TExtraProps,
+  ) {
+    let view: TView;
+
+    return createBinding(() => getter(view), setter, extraPropsGenerator);
+  }
+}

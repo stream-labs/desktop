@@ -358,9 +358,9 @@ export function createBinding<
 }
 
 export type TBindings<
-  TState extends object,
+  TState extends Object,
   TFieldName extends keyof TState,
-  TExtraProps extends object = {}
+  TExtraProps extends Object = {}
 > = {
   [K in TFieldName]: {
     name: K;

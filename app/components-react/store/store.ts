@@ -1,4 +1,7 @@
 import { combineReducers, createSlice, createStore, Store } from '@reduxjs/toolkit';
+import { batch } from 'react-redux';
+import Utils from '../../services/utils';
+import {merge} from "../hooks/useStateManager";
 
 const appSlice = createSlice({
   name: 'app',
@@ -65,11 +68,18 @@ export class StateManager<TControllerClass extends new (...args: any[]) => { sta
       initialState: {
         ...controller.state,
         _vuexRevision: 1,
+        _renderingDisabled: false,
       },
       reducers: {
         ...ControllerClass.prototype['mutations'],
         incVuexRevision(state: any) {
           state['_vuexRevision']++;
+        },
+        forbidRendering(state: any) {
+          state['_isRenderingDisabled'] = true;
+        },
+        allowRendering(state: any) {
+          state['_isRenderingDisabled'] = false;
         },
       },
     });
@@ -87,22 +97,52 @@ export class StateManager<TControllerClass extends new (...args: any[]) => { sta
       entity = Object.getPrototypeOf(entity);
     }
 
-    prototypes.forEach(proto => {
-      Object.getOwnPropertyNames(proto).forEach(propName => {
-        if (propName in this.actionsAndGetters) return;
-        const descriptor = Object.getOwnPropertyDescriptor(entity, propName);
-        if (!descriptor) return;
-        if (descriptor.get || typeof descriptor.value === 'function') {
-          this.actionsAndGetters[propName] = controller[propName].bind(controller);
-        }
+    try {
+      prototypes.forEach(proto => {
+        Object.getOwnPropertyNames(proto).forEach(propName => {
+          if (propName in this.actionsAndGetters) return;
+          const descriptor = Object.getOwnPropertyDescriptor(proto, propName);
+          if (!descriptor) return;
+          if (descriptor.get) {
+            Object.defineProperty(this.actionsAndGetters, propName, {
+              get: () => {
+                return controller[propName];
+              },
+            });
+          } else if (typeof controller[propName] === 'function') {
+            this.actionsAndGetters[propName] = controller[propName].bind(controller);
+          }
+        });
       });
-    });
+    } catch (e) {
+      console.log('constructor error', e);
+    }
 
     this.controller = controller as InstanceType<TControllerClass>;
   }
 
-  incVuexRevision() {
-    store.dispatch({ type: `${this.name}/incVuexRevision` });
+  async incVuexRevision() {
+    if (this.isRenderingDisabled) return;
+
+    batch(() => {
+      store.dispatch({ type: `${this.name}/forbidRendering` });
+      store.dispatch({ type: `${this.name}/incVuexRevision` });
+    });
+
+    await Utils.sleep(0);
+    if (this.isRenderingDisabled) store.dispatch({ type: `${this.name}/allowRendering` });
+  }
+
+  forbidRendering() {
+    store.dispatch({ type: `${this.name}/forbidRendering` });
+  }
+
+  allowRendering() {
+    store.dispatch({ type: `${this.name}/allowRendering` });
+  }
+
+  get isRenderingDisabled() {
+    return this.getState()['_isRenderingDisabled'];
   }
 
   destroy() {
@@ -120,17 +160,54 @@ export function mutation() {
     const className = target.constructor.name;
 
     target.mutations = target.mutations || {};
+    target.originalMethods = target.originalMethods || {};
+    target.originalMethods[methodName] = target[methodName];
     const originalMethod = target[methodName];
+
+    // function createStateContext(state: unknown) {
+    //   return new Proxy(
+    //     { _proxyName: 'StateContext' },
+    //     {
+    //       get(t, propName) {
+    //         if (propName === 'state') return state;
+    //         if (target.originalMethods[propName]) return target.originalMethods[propName];
+    //         return controller[propName];
+    //       },
+    //     },
+    //   );
+    // }
+
+    function createMutationContext(state: unknown) {
+      const controller = StateManager.instances[className].controller;
+
+      return new Proxy(
+        { _proxyName: 'MutationContext', controller, state },
+        {
+          get(t, propName) {
+            if (propName === 'state') return state;
+            if (target.originalMethods[propName]) return target.originalMethods[propName];
+            return controller[propName];
+          },
+        },
+      );
+    }
+
     target.mutations[methodName] = (state: unknown, action: { payload: unknown[] }) => {
-      originalMethod.apply({ state }, action.payload);
+      console.log('call mutation', methodName);
+      const context = createMutationContext(state);
+      originalMethod.apply(context, action.payload);
     };
 
     Object.defineProperty(target, methodName, {
       ...descriptor,
 
       value(...args: any[]) {
-        const action = { type: `${className}/${methodName}`, payload: args };
-        store.dispatch(action);
+        console.log('dispatch action', methodName);
+        batch(() => {
+          store.dispatch({ type: `${className}/forbidRendering` });
+          store.dispatch({ type: `${className}/${methodName}`, payload: args });
+          store.dispatch({ type: `${className}/allowRendering` });
+        });
       },
     });
 
