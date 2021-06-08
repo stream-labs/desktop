@@ -95,7 +95,6 @@ export default class SideNav extends Vue {
         icon: 'icon-alert-box',
         title: $t('Alertbox Library'),
         trackingTarget: 'alertbox-library',
-        newBadge: true,
       });
     }
 
@@ -123,6 +122,7 @@ export default class SideNav extends Vue {
         icon: 'icon-graph',
         title: $t('Grow'),
         trackingTarget: 'grow-tab',
+        newBadge: true,
       });
     }
 

@@ -2,7 +2,7 @@ export const GROWTH_TIPS = () => [
   {
     title: 'Set Up Tips',
     icon: 'icon-balance',
-    link: 'http://www.streamlabs.com',
+    link: '/',
     cta: 'Set Up Tips',
     description:
       "Go to Donation Settings and enter your personal information to get started. If you're a new streamer, we recommend starting with PayPal.",
@@ -38,7 +38,7 @@ export const GROWTH_TIPS = () => [
   {
     title: 'Create a Consistent Brand',
     icon: 'icon-themes',
-    link: 'theme-ibrary',
+    link: 'theme-library',
     cta: 'Get a theme',
     description:
       'Streamlabs provides tools to give your stream a consistent look from overlays to widgets to panels to alerts.',
