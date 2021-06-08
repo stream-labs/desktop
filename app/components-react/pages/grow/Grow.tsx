@@ -119,6 +119,7 @@ function AddGoalModal(p: { visible: boolean; setShowGoalModal: Function }) {
           label={$t('Goal Type')}
           options={goalTypes}
           value={goalType}
+          defaultValue="custom"
           onChange={setGoalType}
         />
         {goalType === 'custom' && (
