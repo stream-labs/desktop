@@ -72,7 +72,7 @@ test('Media backup', async t => {
     // wait for the sync-succeed icon
     await (await t.context.app.client.$('.metrics-icon')).click();
     await focusChild(t);
-    await (await t.context.app.client.$('.icon-cloud-backup-2')).waitForDisplayed();
+    await (await t.context.app.client.$('div[data-sync-status=1]')).waitForDisplayed();
 
     // restart app and delete local images
     await stopApp(t, false);
@@ -94,7 +94,7 @@ test('Media backup', async t => {
     // Make sure the filenames contain the original filename
     t.not(image1DownloadedPath.indexOf(image1Filename), -1);
     t.not(image2DownloadedPath.indexOf(image2Filename), -1);
-  } catch (e) {
+  } catch (e: unknown) {
     await collectionsService.delete(collection.id);
     throw e;
   }

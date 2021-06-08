@@ -44,6 +44,10 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     return this.getServiceViews(IncrementalRolloutService);
   }
 
+  get streamingStatus() {
+    return this.state.streamingStatus;
+  }
+
   get info() {
     return this.state.info;
   }

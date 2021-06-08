@@ -131,6 +131,8 @@ import { ChatService } from './services/chat';
 import { TransitionsService } from './services/transitions';
 import { MagicLinkService } from './services/magic-link';
 import { UsageStatisticsService } from './services/usage-statistics';
+import { NotificationsService } from './services/notifications';
+import { MediaBackupService } from './services/media-backup';
 
 export const AppServices = {
   WindowsService,
@@ -158,4 +160,6 @@ export const AppServices = {
   TransitionsService,
   MagicLinkService,
   UsageStatisticsService,
+  NotificationsService,
+  MediaBackupService,
 };
