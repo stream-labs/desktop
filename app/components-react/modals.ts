@@ -9,11 +9,11 @@ import { $t } from '../services/i18n';
  * Uses Modal.confirm under the hood
  *
  * @example
- * confirmAsync('Confirm me')
+ * confirm('Confirm me')
  * .then(confirmed => console.log(confirmed ? 'Confirmed' : 'Canceled'))
  *
  */
-export function confirmAsync(
+export function confirm(
   p: Omit<ModalFuncProps, 'afterClose' | 'onOk' | 'onCancel'> | string,
 ): Promise<boolean> {
   const { WindowsService } = Services;
