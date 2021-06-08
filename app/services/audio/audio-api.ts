@@ -17,7 +17,6 @@ export interface IAudioSource {
   syncOffset: number;
   muted: boolean;
   mixerHidden: boolean;
-  isControlledViaObs: boolean;
 }
 
 export interface IAudioSourceApi extends IAudioSource {

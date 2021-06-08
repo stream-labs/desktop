@@ -42,7 +42,6 @@ interface IAudioSourceData {
   callbackInfo?: obs.ICallbackData;
   stream?: Observable<IVolmeter>;
   timeoutId?: number;
-  isControlledViaObs?: boolean;
 }
 
 class AudioViews extends ViewHandler<IAudioSourcesState> {
@@ -104,15 +103,6 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
 
     this.sourcesService.sourceUpdated.subscribe(source => {
       const audioSource = this.views.getSource(source.sourceId);
-      const obsSource = this.sourcesService.views.getSource(source.sourceId);
-      const formData = obsSource
-        .getPropertiesFormData()
-        .find(data => data.name === 'reroute_audio');
-      if (formData) {
-        this.UPDATE_AUDIO_SOURCE(source.sourceId, {
-          isControlledViaObs: !!formData.value,
-        });
-      }
 
       if (!audioSource && source.audio) {
         this.createAudioSource(this.sourcesService.views.getSource(source.sourceId));
@@ -178,12 +168,9 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
     const obsSource = source.getObsInput();
 
     const fader = this.fetchFaderDetails(sourceId);
-    const isControlledViaObs =
-      obsSource.settings?.reroute_audio == null ? true : obsSource.settings?.reroute_audio;
 
     return {
       fader,
-      isControlledViaObs,
       sourceId: source.sourceId,
       audioMixers: obsSource.audioMixers,
       monitoringType: obsSource.monitoringType,
@@ -350,7 +337,6 @@ export class AudioSource implements IAudioSourceApi {
   syncOffset: number;
   resourceId: string;
   mixerHidden: boolean;
-  isControlledViaObs: boolean;
 
   @Inject()
   private audioService: AudioService;
