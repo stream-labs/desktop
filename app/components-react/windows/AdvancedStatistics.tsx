@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import cx from 'classnames';
 import { Services } from '../service-provider';
 import { useVuex } from '../hooks';
@@ -20,6 +20,8 @@ export default function AdvancedStatistics() {
     MediaBackupService,
   } = Services;
 
+  const [minuteCounter, setMinuteCounter] = useState(0);
+
   const { notifications, streamQuality, streamingStatus, syncStatus } = useVuex(() => ({
     notifications: NotificationsService.views
       .getAll()
@@ -35,7 +37,8 @@ export default function AdvancedStatistics() {
     });
 
     const timeLabelInterval = window.setInterval(() => {
-      // this.$forceUpdate();
+      // Forces a refresh on notification labels every minute
+      setMinuteCounter(minuteCounter + 1);
     }, 60 * 1000);
 
     return () => {
