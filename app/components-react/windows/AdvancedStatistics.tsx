@@ -146,6 +146,7 @@ function NotificationsArea(p: {
           <div
             className={cx(styles.notification, styles.hasAction)}
             data-name="notification"
+            key={notification.id}
             onClick={() => {
               p.onNotificationClickHandler(notification.id);
             }}
