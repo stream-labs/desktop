@@ -545,11 +545,11 @@ export class PlatformAppsService extends StatefulService<IPlatformAppServiceStat
     return this.containerManager.mountContainer(app, slot, electronWindowId, slobsWindowId);
   }
 
-  setContainerBounds(containerId: number, pos: IVec2, size: IVec2) {
+  setContainerBounds(containerId: string, pos: IVec2, size: IVec2) {
     return this.containerManager.setContainerBounds(containerId, pos, size);
   }
 
-  unmountContainer(containerId: number, electronWindowId: number) {
+  unmountContainer(containerId: string, electronWindowId: number) {
     this.containerManager.unmountContainer(containerId, electronWindowId);
   }
 

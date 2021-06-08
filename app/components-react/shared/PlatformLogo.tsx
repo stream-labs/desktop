@@ -2,6 +2,7 @@ import React, { HTMLAttributes } from 'react';
 import { TPlatform } from '../../services/platforms';
 import cx from 'classnames';
 import css from './PlatformLogo.m.less';
+import KevinSvg from './KevinSvg';
 
 const sizeMap = {
   medium: 40,
@@ -23,7 +24,7 @@ export default function PlatformLogo(p: IProps & HTMLAttributes<unknown>) {
       tiktok: 'fab fa-tiktok',
       dlive: 'dlive',
       nimotv: 'nimotv',
-      streamlabs: 'icon-kevin-day',
+      streamlabs: 'icon-streamlabs',
     }[p.platform];
   }
   const size = p.size && (sizeMap[p.size] ?? p.size);

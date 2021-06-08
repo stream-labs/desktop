@@ -117,7 +117,12 @@ export class TitleBar extends ReactComponent {}
   },
 })
 export class Chat extends ReactComponent {}
-
+@Component({
+  props: {
+    name: { default: 'Loader' },
+  },
+})
+export class Loader extends ReactComponent {}
 @Component({
   props: {
     name: { default: 'Highlighter' },
@@ -133,7 +138,6 @@ export class Highlighter extends ReactComponent {}
   },
 })
 export class GoLiveWindow extends ReactComponent {}
-
 @Component({
   props: {
     name: { default: 'EditStreamWindow' },

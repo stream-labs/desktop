@@ -32,7 +32,7 @@ import util from 'util';
 import uuid from 'uuid/v4';
 import Blank from 'components/windows/Blank.vue';
 import Main from 'components/windows/Main.vue';
-import CustomLoader from 'components/CustomLoader';
+import { Loader } from 'components/shared/ReactComponent';
 import process from 'process';
 import { MetricsService } from 'services/metrics';
 import { UsageStatisticsService } from 'services/usage-statistics';
@@ -339,7 +339,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           return h(ChildWindow);
         }
 
-        return h(CustomLoader);
+        return h(Loader);
       }
       if (windowId === 'main') return h(Main);
       return h(OneOffWindow);

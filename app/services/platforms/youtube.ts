@@ -514,7 +514,6 @@ export class YoutubeService
       enableDvr: params.enableDvr,
       enableEmbed: broadcast.contentDetails.enableEmbed,
       projection: isMidStreamMode ? broadcast.contentDetails.projection : params.projection,
-      enableLowLatency: params.latencyPreference === 'low',
       latencyPreference: isMidStreamMode
         ? broadcast.contentDetails.latencyPreference
         : params.latencyPreference,

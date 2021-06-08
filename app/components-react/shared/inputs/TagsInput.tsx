@@ -1,5 +1,5 @@
 import { Select, Tag } from 'antd';
-import React, { useMemo, ReactElement } from 'react';
+import React, { useMemo, ReactElement, useState } from 'react';
 import { InputComponent, SingleType, TSlobsInputProps, useInput, ValuesOf } from './inputs';
 import InputWrapper from './InputWrapper';
 import { SelectProps } from 'antd/lib/select';
@@ -8,6 +8,9 @@ import { TagProps } from 'antd/lib/tag';
 import keyBy from 'lodash/keyBy';
 import { $t } from '../../../services/i18n';
 import Message from '../Message';
+import { useFormState } from '../../hooks';
+import Utils from '../../../services/utils';
+import cx from 'classnames';
 
 // select which features from the antd lib we are going to use
 const ANT_SELECT_FEATURES = ['showSearch', 'loading'] as const;
@@ -28,9 +31,17 @@ export type TTagsInputProps<TValue> = TSlobsInputProps<
 >;
 
 export const TagsInput = InputComponent(<T extends any[]>(p: TTagsInputProps<T>) => {
-  const { inputAttrs, wrapperAttrs, forceUpdate } = useInput('tags', p);
+  const { inputAttrs, wrapperAttrs } = useInput('tags', p);
   const options = p.options;
   const tagsMap = useMemo(() => keyBy(options, 'value'), [options]);
+  const { s, updateState } = useFormState({ isAnimating: false });
+
+  async function animateWarning() {
+    if (s.isAnimating) return;
+    updateState({ isAnimating: true });
+    await Utils.sleep(1000);
+    updateState({ isAnimating: false });
+  }
 
   function renderTag(tagProps: TagProps) {
     const tag = tagsMap[tagProps['value']];
@@ -45,7 +56,11 @@ export const TagsInput = InputComponent(<T extends any[]>(p: TTagsInputProps<T>)
     return (
       <div>
         {maxTagsReached && (
-          <Message type="warning">
+          <Message
+            type="warning"
+            className={cx({ animate__shakeX: s.isAnimating })}
+            style={{ textAlign: 'center', fontSize: '16px', padding: '7px' }}
+          >
             {$t('You can only select up to %{max} items', { max: p.max })}
           </Message>
         )}
@@ -57,7 +72,10 @@ export const TagsInput = InputComponent(<T extends any[]>(p: TTagsInputProps<T>)
   function onChangeHandler(values: T) {
     const max = p.max;
     const count = values.length;
-    if (max && count > max) values.pop();
+    if (max && count > max) {
+      values.pop();
+      animateWarning();
+    }
     inputAttrs.onChange(values);
   }
 

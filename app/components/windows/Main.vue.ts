@@ -25,8 +25,7 @@ import { UserService } from 'services/user';
 import { IModalOptions, WindowsService } from 'services/windows';
 import LiveDock from '../LiveDock.vue';
 import StudioFooter from '../StudioFooter.vue';
-import CustomLoader from '../CustomLoader';
-import { PatchNotes, Highlighter } from '../shared/ReactComponent';
+import { PatchNotes, Loader, Highlighter } from '../shared/ReactComponent';
 import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
 import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
@@ -51,7 +50,7 @@ const loadedTheme = () => {
     Onboarding,
     LiveDock,
     StudioFooter,
-    CustomLoader,
+    CustomLoader: Loader,
     PatchNotes,
     NewsBanner,
     PlatformAppMainPage,
