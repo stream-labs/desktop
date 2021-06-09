@@ -6,7 +6,7 @@ import { useVuex } from 'components-react/hooks';
 import { FileInput, TextInput, TextAreaInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
 import path from 'path';
-import { Button, Progress } from 'antd';
+import { Button, Progress, Tooltip } from 'antd';
 import { RadioInput } from 'components-react/shared/inputs/RadioInput';
 import { TPrivacyStatus } from 'services/platforms/youtube/uploader';
 import electron from 'electron';
@@ -32,6 +32,7 @@ function YoutubeUpload(props: { defaultTitle: string; close: () => void }) {
   const [title, setTitle] = useState(props.defaultTitle);
   const [description, setDescription] = useState('');
   const [privacy, setPrivacy] = useState('private');
+  const [urlCopied, setUrlCopied] = useState(false);
   const { UserService, HighlighterService } = Services;
   const v = useVuex(() => ({
     youtubeLinked: !!UserService.state.auth?.platforms.youtube,
@@ -166,9 +167,22 @@ function YoutubeUpload(props: { defaultTitle: string; close: () => void }) {
 
     return (
       <div>
-        TODO
+        <p>
+          Your video was successfully uploaded! Click the link below to access your video. Please
+          note that YouTube will take some time to process your video.
+        </p>
         <br />
         <a onClick={() => electron.remote.shell.openExternal(url)}>{url}</a>
+        <Tooltip placement="right" title={urlCopied ? 'Copied!' : 'Copy URL'}>
+          <i
+            className="icon-copy link"
+            style={{ marginLeft: 8, display: 'inline', cursor: 'pointer' }}
+            onClick={() => {
+              setUrlCopied(true);
+              electron.clipboard.writeText(url);
+            }}
+          />
+        </Tooltip>
       </div>
     );
   }
