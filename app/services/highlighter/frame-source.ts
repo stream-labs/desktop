@@ -81,8 +81,6 @@ export class FrameSource {
     ];
     /* eslint-enable */
 
-    console.log('FRAME SOURCE ARGS', args);
-
     this.ffmpeg = execa(FFMPEG_EXE, args, {
       encoding: null,
       buffer: false,

@@ -163,7 +163,7 @@ export default function Highlighter() {
         >
           {inspectedClip && showModal === 'trim' && <ClipTrimmer clip={inspectedClip} />}
           {showModal === 'export' && <ExportModal close={closeModal} />}
-          {showModal === 'preview' && <PreviewModal />}
+          {showModal === 'preview' && <PreviewModal close={closeModal} />}
         </Modal>
       </div>
     );
