@@ -15,6 +15,7 @@ import { NavTools } from 'components/shared/ReactComponent';
 import styles from './SideNav.m.less';
 import { LayoutService } from 'services/layout';
 import { getPlatformService } from '../services/platforms';
+import { getOS, OS } from 'util/operating-systems';
 
 interface IPageData {
   target: TAppPage;
@@ -171,12 +172,18 @@ export default class SideNav extends Vue {
       });
     }
 
-    pageData.push({
-      target: 'Highlighter',
-      icon: 'fab fa-youtube',
-      title: 'Highlighter',
-      trackingTarget: 'highlighter',
-    });
+    if (
+      getOS() === OS.Windows &&
+      this.userService.isLoggedIn &&
+      this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.highlighter)
+    ) {
+      pageData.push({
+        target: 'Highlighter',
+        icon: 'fab fa-youtube',
+        title: 'Highlighter',
+        trackingTarget: 'highlighter',
+      });
+    }
 
     return (
       <div class={cx('side-nav', styles.container, { [styles.leftDock]: this.leftDock })}>

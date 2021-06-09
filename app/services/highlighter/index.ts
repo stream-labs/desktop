@@ -816,7 +816,7 @@ class HighligherViews extends ViewHandler<IHighligherState> {
  * Enable to use predefined clips instead of pulling from
  * the replay buffer.
  */
-const TEST_MODE = true;
+const TEST_MODE = false;
 
 export class HighlighterService extends StatefulService<IHighligherState> {
   static initialState = {

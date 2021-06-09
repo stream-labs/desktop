@@ -15,6 +15,7 @@ export enum EAvailableFeatures {
   restream = 'slobs--restream',
   reactGoLive = 'slobs--react-golive',
   tiktok = 'slobs--tiktok',
+  highlighter = 'slobs--highlighter',
 }
 
 interface IIncrementalRolloutServiceState {

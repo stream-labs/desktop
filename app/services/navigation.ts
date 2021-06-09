@@ -21,7 +21,7 @@ interface INavigationState {
 
 export class NavigationService extends StatefulService<INavigationState> {
   static initialState: INavigationState = {
-    currentPage: 'Highlighter',
+    currentPage: 'Studio',
     params: {},
   };
 
