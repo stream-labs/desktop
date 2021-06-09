@@ -47,7 +47,7 @@ export class YoutubeUploader {
     // that can be used to cancel the upload
     async function doUpload(): Promise<IYoutubeUploadResponse> {
       const parsed = path.parse(filePath);
-      const type = mime.getType(parsed.ext);
+      const type = mime.getType(parsed.ext) ?? 'application/octet-stream';
       const stats = fs.lstatSync(filePath);
 
       onProgress({
@@ -83,7 +83,10 @@ export class YoutubeUploader {
         false,
       );
 
-      const uploadLocation = result.headers.get('Location');
+      const locationHeader = result.headers.get('Location');
+      if (!locationHeader) throw new Error('Did not receive upload location header!');
+      const uploadLocation = locationHeader;
+
       let currentByteIndex = 0;
 
       // YT wants us to upload in chunks of 262144 bytes

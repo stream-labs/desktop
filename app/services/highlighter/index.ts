@@ -57,7 +57,7 @@ export interface IUploadInfo {
   uploadedBytes: number;
   totalBytes: number;
   cancelRequested: boolean;
-  videoId: string;
+  videoId: string | null;
 }
 
 export interface ITransitionInfo {
@@ -446,7 +446,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     this.SET_UPLOAD_INFO({ videoId: null });
   }
 
-  cancelFunction: () => void = null;
+  cancelFunction: (() => void) | null = null;
 
   async upload(options: IYoutubeVideoUploadOptions) {
     if (!this.userService.state.auth?.platforms.youtube) {
@@ -477,7 +477,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     );
 
     this.cancelFunction = cancel;
-    let result: IYoutubeUploadResponse;
+    let result: IYoutubeUploadResponse | null = null;
 
     try {
       result = await complete;

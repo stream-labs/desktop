@@ -11,7 +11,10 @@ export class Texture2D {
     private height: number,
     data: Buffer,
   ) {
-    this.texture = this.gl.createTexture();
+    const texture = this.gl.createTexture();
+    if (!texture) throw new Error('Failed to initialize WebGL texture!');
+    this.texture = texture;
+
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);

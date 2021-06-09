@@ -56,7 +56,12 @@ export default function createTransition(
   const { resizeMode } = { resizeMode: 'cover', ...options };
   const vShader = compileShader(gl, VERT, gl.VERTEX_SHADER);
   const fShader = compileShader(gl, makeFrag(transition.glsl, resizeMode), gl.FRAGMENT_SHADER);
+
+  if (!vShader || !fShader) throw new Error('Failed to create WebGL shaders!');
+
   const program = createProgram(gl, vShader, fShader);
+
+  if (!program) throw new Error('Failed to create WebGL program!');
 
   gl.useProgram(program);
   const positionLocation = gl.getAttribLocation(program, '_p');
