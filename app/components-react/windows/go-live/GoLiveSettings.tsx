@@ -23,7 +23,7 @@ const PlusIcon = PlusOutlined as Function;
  * - Extras settings
  **/
 export default function GoLiveSettings() {
-  const { RestreamService, SettingsService, UserService } = Services;
+  const { RestreamService, SettingsService, UserService, MagicLinkService } = Services;
 
   const {
     isAdvancedMode,
@@ -45,12 +45,7 @@ export default function GoLiveSettings() {
   const shouldShowAddDestButton = canAddDestinations;
 
   function addDestination() {
-    // open the stream settings or prime page
-    if (RestreamService.views.canEnableRestream) {
-      SettingsService.actions.showSettings('Stream');
-    } else {
-      UserService.openPrimeUrl('slobs-multistream');
-    }
+    SettingsService.actions.showSettings('Stream');
   }
 
   return (
