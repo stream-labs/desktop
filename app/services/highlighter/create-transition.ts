@@ -1,9 +1,10 @@
 // This code is taken from https://github.com/gre/gl-transition-libs/blob/master/packages/gl-transition/src/index.js
 // The original code is MIT licensed.
 // Modifications were made to support rendering upside down.
+// Modifications were also made to move off stack-gl/gl-shader.
 // It was also ported from flow to Typescript
 
-import createShader from 'gl-shader';
+import { compileShader, createProgram } from 'util/webgl/utils';
 
 interface TransitionObjectLike {
   glsl: string;
@@ -53,10 +54,14 @@ export default function createTransition(
   options: Options = {},
 ) {
   const { resizeMode } = { resizeMode: 'cover', ...options };
-  const shader = createShader(gl, VERT, makeFrag(transition.glsl, resizeMode));
-  // @ts-ignore
-  shader.bind();
-  shader.attributes._p.pointer();
+  const vShader = compileShader(gl, VERT, gl.VERTEX_SHADER);
+  const fShader = compileShader(gl, makeFrag(transition.glsl, resizeMode), gl.FRAGMENT_SHADER);
+  const program = createProgram(gl, vShader, fShader);
+
+  gl.useProgram(program);
+  const positionLocation = gl.getAttribLocation(program, '_p');
+  gl.enableVertexAttribArray(positionLocation);
+  gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
 
   return {
     draw(
@@ -67,14 +72,14 @@ export default function createTransition(
       height: number = gl.drawingBufferHeight,
       params: { [key: string]: any } = {},
     ) {
-      // @ts-ignore
-      shader.bind();
-      shader.uniforms.ratio = width / height;
-      shader.uniforms.progress = progress;
-      shader.uniforms.from = from.bind(0);
-      shader.uniforms.to = to.bind(1);
-      shader.uniforms._fromR = from.shape[0] / from.shape[1];
-      shader.uniforms._toR = to.shape[0] / to.shape[1];
+      gl.useProgram(program);
+      gl.uniform1f(gl.getUniformLocation(program, 'ratio'), width / height);
+      gl.uniform1f(gl.getUniformLocation(program, 'progress'), progress);
+      gl.uniform1i(gl.getUniformLocation(program, 'from'), from.bind(0));
+      gl.uniform1i(gl.getUniformLocation(program, 'to'), to.bind(1));
+      gl.uniform1f(gl.getUniformLocation(program, '_fromR'), from.shape[0] / from.shape[1]);
+      gl.uniform1f(gl.getUniformLocation(program, '_toR'), to.shape[0] / to.shape[1]);
+
       let unit = 2;
       for (const key in transition.paramsTypes) {
         const value = key in params ? params[key] : transition.defaultParams[key];
@@ -86,17 +91,14 @@ export default function createTransition(
           } else if (typeof value.bind !== 'function') {
             throw new Error('uniform[' + key + ']: A gl-texture2d API-like object was expected');
           } else {
-            shader.uniforms[key] = value.bind(unit++);
+            gl.uniform1i(gl.getUniformLocation(program, key), value.bind(unit++));
           }
         } else {
-          shader.uniforms[key] = value;
+          gl.uniform1f(gl.getUniformLocation(program, key), value);
         }
       }
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     },
-    dispose() {
-      // @ts-ignore
-      shader.dispose();
-    },
+    dispose() {},
   };
 }

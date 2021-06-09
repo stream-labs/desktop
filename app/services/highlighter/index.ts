@@ -1,10 +1,7 @@
 import { mutation, StatefulService, ViewHandler, Inject } from 'services/core';
 import path from 'path';
 import execa from 'execa';
-import ndarray from 'ndarray';
-import createBuffer from 'gl-buffer';
 import transitions from 'gl-transitions';
-import createTexture from 'gl-texture2d';
 import createTransition from './create-transition';
 import Vue from 'vue';
 import fs from 'fs-extra';
@@ -605,6 +602,53 @@ export class Compositor2D {
   }
 }
 
+/**
+ * Meant to look like a subset of https://github.com/stackgl/gl-texture2d
+ * but doesn't require ndarray library that requires unsafe-eval to run.
+ */
+class Texture2D {
+  private texture: WebGLTexture;
+
+  constructor(
+    private gl: WebGLRenderingContext,
+    private width: number,
+    private height: number,
+    data: Buffer,
+  ) {
+    this.texture = this.gl.createTexture();
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+    this.gl.texImage2D(
+      this.gl.TEXTURE_2D,
+      0,
+      this.gl.RGBA,
+      this.width,
+      this.height,
+      0,
+      this.gl.RGBA,
+      this.gl.UNSIGNED_BYTE,
+      data,
+    );
+  }
+
+  get shape(): [number, number] {
+    return [this.width, this.height];
+  }
+
+  bind(texUnit: number) {
+    this.gl.activeTexture(this.gl.TEXTURE0 + texUnit);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
+    return this.gl.getParameter(this.gl.ACTIVE_TEXTURE) - this.gl.TEXTURE0;
+  }
+
+  dispose() {
+    this.gl.deleteTexture(this.texture);
+  }
+}
+
 export class Transitioner {
   private canvas = document.createElement('canvas');
   private gl = this.canvas.getContext('webgl')!;
@@ -626,28 +670,18 @@ export class Transitioner {
   }
 
   renderTransition(fromFrame: Buffer, toFrame: Buffer, progress: number) {
-    const buffer = createBuffer(
-      this.gl,
-      [-1, -1, -1, 4, 4, -1],
+    const transition = createTransition(this.gl, this.transitionSrc);
+    const fromTexture = new Texture2D(this.gl, this.width, this.height, fromFrame);
+    const toTexture = new Texture2D(this.gl, this.width, this.height, toFrame);
+    const buffer = this.gl.createBuffer();
+
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+    this.gl.bufferData(
       this.gl.ARRAY_BUFFER,
+      new Float32Array([-1, -1, -1, 4, 4, -1]),
       this.gl.STATIC_DRAW,
     );
-
-    const transition = createTransition(this.gl, this.transitionSrc);
-
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-
-    const fromArray = this.convertFrame(fromFrame);
-    const fromTexture = createTexture(this.gl, fromArray);
-    fromTexture.minFilter = this.gl.LINEAR;
-    fromTexture.magFilter = this.gl.LINEAR;
-
-    const toArray = this.convertFrame(toFrame);
-    const toTexture = createTexture(this.gl, toArray);
-    toTexture.minFilter = this.gl.LINEAR;
-    toTexture.magFilter = this.gl.LINEAR;
-
-    buffer.bind();
     transition.draw(
       progress,
       fromTexture,
@@ -672,10 +706,6 @@ export class Transitioner {
     );
 
     return this.readBuffer;
-  }
-
-  private convertFrame(frame: Buffer) {
-    return ndarray(frame, [this.width, this.height, 4], [4, this.width * 4, 1]);
   }
 }
 
@@ -902,7 +932,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-44.mp4'),
         // Razer blade test clips
         path.join(CLIP_DIR, '2021-05-25 08-55-13.mp4'),
-        path.join(CLIP_DIR, '2021-05-25 08-55-34.mp4'),
+        path.join(CLIP_DIR, '2021-06-08 16-40-14.mp4'),
         path.join(CLIP_DIR, '2021-05-25 08-56-03.mp4'),
       ];
 
