@@ -3,6 +3,7 @@ import { CheckboxInput, ImageInput, ListInput } from '../../../shared/inputs';
 import React, { useEffect } from 'react';
 import { Services } from '../../../service-provider';
 import { $t } from '../../../../services/i18n';
+import { createBinding } from '../../../shared/inputs/inputs';
 import BroadcastInput from './BroadcastInput';
 import { useAsyncState, useOnCreate } from '../../../hooks';
 import InputWrapper from '../../../shared/inputs/InputWrapper';
@@ -24,14 +25,13 @@ export function YoutubeEditStreamInfo() {
     renderPlatformSettings,
     isMidStreamMode,
     getSettings,
-    useBinding,
   } = useGoLiveSettings(view => ({
     ytSettings: view.platforms.youtube,
   }));
   const is360video = ytSettings.projection === '360';
   const shouldShowSafeForKidsWarn = ytSettings.selfDeclaredMadeForKids;
   const broadcastId = ytSettings.broadcastId;
-  const bind = useBinding(
+  const bind = createBinding(
     () => getSettings().platforms.youtube,
     newYtSettings => updatePlatform('youtube', newYtSettings),
     fieldName => ({ disabled: fieldIsDisabled(fieldName as keyof IYoutubeStartStreamOptions) }),

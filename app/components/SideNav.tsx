@@ -46,7 +46,7 @@ export default class SideNav extends Vue {
   navigate(page: TAppPage) {
     if (!this.userService.isLoggedIn && page !== 'Studio') return;
 
-    this.navigationService.navigate(page);
+    this.navigationService.actions.navigate(page);
   }
 
   navigateToStudioTab(tabId: string) {
@@ -81,6 +81,52 @@ export default class SideNav extends Vue {
 
   get loading() {
     return this.appService.state.loading;
+  }
+
+  get pageData() {
+    const pageData: IPageData[] = [];
+    const hasThemes =
+      this.userService.isLoggedIn &&
+      getPlatformService(this.userService.platform.type).hasCapability('themes');
+
+    if (this.userService.isLoggedIn) {
+      pageData.push({
+        target: 'AlertboxLibrary',
+        icon: 'icon-alert-box',
+        title: $t('Alertbox Library'),
+        trackingTarget: 'alertbox-library',
+      });
+    }
+
+    if (hasThemes) {
+      pageData.push({
+        target: 'BrowseOverlays',
+        icon: 'icon-themes',
+        title: $t('Themes'),
+        trackingTarget: 'themes',
+      });
+    }
+
+    if (this.appStoreVisible) {
+      pageData.push({
+        target: 'PlatformAppStore',
+        icon: 'icon-store',
+        title: $t('App Store'),
+        trackingTarget: 'app-store',
+      });
+    }
+
+    if (this.userService.isLoggedIn && this.featureIsEnabled(EAvailableFeatures.growTab)) {
+      pageData.push({
+        target: 'Grow',
+        icon: 'icon-graph',
+        title: $t('Grow'),
+        trackingTarget: 'grow-tab',
+        newBadge: true,
+      });
+    }
+
+    return pageData;
   }
 
   get primaryStudioTab() {
@@ -138,43 +184,10 @@ export default class SideNav extends Vue {
   }
 
   render() {
-    const pageData: IPageData[] = [];
-    const hasThemes =
-      this.userService.isLoggedIn &&
-      getPlatformService(this.userService.platform.type).hasCapability('themes');
-
-    if (this.userService.isLoggedIn) {
-      pageData.push({
-        target: 'AlertboxLibrary',
-        icon: 'icon-alert-box',
-        title: $t('Alertbox Library'),
-        trackingTarget: 'alertbox-library',
-        newBadge: true,
-      });
-    }
-
-    if (hasThemes) {
-      pageData.push({
-        target: 'BrowseOverlays',
-        icon: 'icon-themes',
-        title: $t('Themes'),
-        trackingTarget: 'themes',
-      });
-    }
-
-    if (this.appStoreVisible) {
-      pageData.push({
-        target: 'PlatformAppStore',
-        icon: 'icon-store',
-        title: $t('App Store'),
-        trackingTarget: 'app-store',
-      });
-    }
-
     return (
       <div class={cx('side-nav', styles.container, { [styles.leftDock]: this.leftDock })}>
         {this.primaryStudioTab}
-        {pageData.map(page => (
+        {this.pageData.map(page => (
           <div
             class={cx(styles.mainCell, {
               [styles.active]: this.page === page.target,

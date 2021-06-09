@@ -30,12 +30,10 @@ import {
   NotificationsService,
 } from 'services/notifications';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
-import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
 import { EAvailableFeatures, IncrementalRolloutService } from 'services/incremental-rollout';
 import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService } from 'services/restream';
-import { FacebookService } from 'services/platforms/facebook';
 import Utils from 'services/utils';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
@@ -44,8 +42,8 @@ import { authorizedHeaders } from 'util/requests';
 import { HostsService } from '../hosts';
 import { TwitterService } from '../integrations/twitter';
 import { assertIsDefined } from 'util/properties-type-guards';
-import { YoutubeService } from '../platforms/youtube';
 import { StreamInfoView } from './streaming-view';
+import { GrowService } from 'services/grow/grow';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -82,13 +80,11 @@ export class StreamingService
   @Inject() private userService: UserService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
-  @Inject() private navigationService: NavigationService;
   @Inject() private customizationService: CustomizationService;
   @Inject() private restreamService: RestreamService;
   @Inject() private hostsService: HostsService;
-  @Inject() private facebookService: FacebookService;
-  @Inject() private youtubeService: YoutubeService;
   @Inject() private twitterService: TwitterService;
+  @Inject() private growService: GrowService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -1131,7 +1127,18 @@ export class StreamingService
       data.platforms = ['custom_rtmp'];
     }
 
+    this.recordGoals(data.duration);
     this.usageStatisticsService.recordEvent('stream_end', data);
+  }
+
+  private recordGoals(duration: number) {
+    if (!this.userService.isLoggedIn) return;
+    const hoursStreamed = Math.floor(duration / 60 / 60);
+    this.growService.incrementGoal('stream_hours_per_month', hoursStreamed);
+    this.growService.incrementGoal('stream_times_per_week', 1);
+    if (this.restreamService.settings.enabled) {
+      this.growService.incrementGoal('multistream_per_week', 1);
+    }
   }
 
   /**
