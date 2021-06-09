@@ -110,6 +110,12 @@ class UserViews extends ViewHandler<IUserServiceState> {
     }
   }
 
+  get platforms() {
+    if (this.isLoggedIn) {
+      return this.state.auth.platforms;
+    }
+  }
+
   get isTwitchAuthed() {
     return this.isLoggedIn && this.platform.type === 'twitch';
   }
@@ -568,16 +574,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const theme = this.customizationService.isDarkTheme ? 'prime-dark' : 'prime-light';
     this.customizationService.setTheme(theme);
     this.showPrimeWindow();
-  }
-
-  /**
-   * open the prime onboarding in the browser
-   * @param refl a referral tag for analytics
-   */
-  openPrimeUrl(refl: 'slobs-multistream' | 'slobs-settings') {
-    this.magicLinkService.getDashboardMagicLink('prime-marketing', refl).then(link => {
-      electron.remote.shell.openExternal(link);
-    });
   }
 
   recentEventsUrl() {

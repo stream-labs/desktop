@@ -19,6 +19,7 @@ export default function GoLiveError() {
     UserService,
     NavigationService,
     WindowsService,
+    MagicLinkService,
   } = Services;
 
   // take an error from the global state
@@ -76,7 +77,7 @@ export default function GoLiveError() {
       >
         <button
           className="button button--prime"
-          onClick={() => UserService.actions.openPrimeUrl('slobs-multistream')}
+          onClick={() => MagicLinkService.actions.linkToPrime('slobs-multistream')}
         >
           {$t('Become a Prime member')}
         </button>
