@@ -1,4 +1,5 @@
-import { IClip, SCRUB_HEIGHT, SCRUB_WIDTH, SCRUB_FRAMES } from 'services/highlighter';
+import { IClip } from 'services/highlighter';
+import { SCRUB_HEIGHT, SCRUB_WIDTH, SCRUB_FRAMES } from 'services/highlighter/constants';
 import React, { useMemo, useState } from 'react';
 import path from 'path';
 import { Services } from 'components-react/service-provider';
