@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 import SideNav from '../SideNav';
-import { NewsBanner, TitleBar } from 'components/shared/ReactComponent';
+import { NewsBanner, TitleBar, Grow } from 'components/shared/ReactComponent';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService } from 'services/platform-apps';
 import { EditorCommandsService } from '../../app-services';
@@ -60,6 +60,7 @@ const loadedTheme = () => {
     LayoutEditor,
     AlertboxLibrary,
     ModalWrapper,
+    Grow,
   },
 })
 export default class Main extends Vue {
