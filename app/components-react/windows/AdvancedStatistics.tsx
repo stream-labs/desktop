@@ -93,7 +93,7 @@ export default function AdvancedStatistics() {
 
   return (
     <ModalLayout hideFooter>
-      <div slot="content" className={styles.container} data-sync-status={syncStatus}>
+      <div slot="content" className={styles.container} data-syncStatus={syncStatus}>
         <StatusBar status={status()} />
         <div>
           <h2>{$t('Live Stats')}</h2>
