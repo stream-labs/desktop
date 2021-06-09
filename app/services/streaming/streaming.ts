@@ -1132,6 +1132,7 @@ export class StreamingService
   }
 
   private recordGoals(duration: number) {
+    if (!this.userService.isLoggedIn) return;
     const hoursStreamed = Math.floor(duration / 60 / 60);
     this.growService.incrementGoal('stream_hours_per_month', hoursStreamed);
     this.growService.incrementGoal('stream_times_per_week', 1);
