@@ -94,6 +94,7 @@ function AddGoalModal(p: { visible: boolean; setShowGoalModal: Function }) {
   }, [goalType]);
 
   function addGoal() {
+    if (GrowService.views.goals[goalType] && goalType !== 'custom') return;
     const image = GrowService.views.goalOptions.find(goal => goal.type === goalType)?.image || '';
     GrowService.actions.addGoal({ title: goalTitle, total: goalTotal, type: goalType, image });
     setGoalTitle('');
