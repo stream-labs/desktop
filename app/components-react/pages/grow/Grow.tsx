@@ -214,7 +214,7 @@ function ResourceFooter(p: { universityProgress: IUniversityProgress }) {
       <span>{$t('')}</span>
 
       <div className={styles.resourcesContainer}>
-        <UniversityCard progress={p.universityProgress} />
+        {/* <UniversityCard progress={p.universityProgress} /> */}
         <ContentHubCard />
       </div>
     </div>
