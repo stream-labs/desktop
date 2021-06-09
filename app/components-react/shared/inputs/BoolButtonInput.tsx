@@ -40,13 +40,6 @@ export const BoolButtonInput = InputComponent((p: TBoolButtonInputProps) => {
       >
         {p.value && <i className="fa fa-check"></i>}
       </div>
-      {/* {this.options.tooltip && (
-        <i
-          style="margin-left: 8px"
-          class="icon-question icon-btn"
-          v-tooltip={this.options.tooltip}
-        />
-      )} */}
     </div>
   );
 });
