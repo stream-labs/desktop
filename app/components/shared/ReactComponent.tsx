@@ -145,6 +145,13 @@ export class GoLiveWindow extends ReactComponent {}
   },
 })
 export class EditStreamWindow extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'Grow' },
+    wrapperStyles: { default: () => ({ gridRow: '1 / span 1' }) },
+  },
+})
+export class Grow extends ReactComponent {}
 
 @Component({
   props: {

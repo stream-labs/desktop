@@ -12,7 +12,8 @@ export type TAppPage =
   | 'LayoutEditor'
   | 'PrimeExpiration'
   | 'AlertboxLibrary'
-  | 'Highlighter';
+  | 'Highlighter'
+  | 'Grow';
 
 interface INavigationState {
   currentPage: TAppPage;

@@ -9,6 +9,7 @@ import Display from './shared/Display';
 import TitleBar from './shared/TitleBar';
 import Chat from './root/Chat';
 import Highlighter from './pages/Highlighter';
+import Grow from './pages/Grow/Grow';
 import Loader from './pages/Loader';
 import NavTools from './sidebar/NavTools';
 import PlatformLogo from './shared/PlatformLogo';
@@ -26,6 +27,7 @@ export const components = {
   TitleBar,
   Chat,
   Highlighter,
+  Grow,
   Loader,
   NavTools,
   PlatformLogo,

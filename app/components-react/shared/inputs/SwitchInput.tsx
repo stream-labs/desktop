@@ -1,21 +1,13 @@
 import { Switch } from 'antd';
 import React from 'react';
-import { InputComponent, TSlobsInputProps, useInput, ValuesOf } from './inputs';
+import { InputComponent, TSlobsInputProps, useInput } from './inputs';
 import InputWrapper from './InputWrapper';
 import { SwitchProps } from 'antd/lib/switch';
 
-// select which features from the antd lib we are going to use
-const ANT_SWITCH_FEATURES = ['checkedChildren', 'unCheckedChildren'] as const;
-
-export type TSwitchInputProps = TSlobsInputProps<
-  {},
-  boolean,
-  SwitchProps,
-  ValuesOf<typeof ANT_SWITCH_FEATURES>
->;
+export type TSwitchInputProps = TSlobsInputProps<{}, boolean, SwitchProps>;
 
 export const SwitchInput = InputComponent((p: TSwitchInputProps) => {
-  const { wrapperAttrs, inputAttrs } = useInput('switch', p, ANT_SWITCH_FEATURES);
+  const { wrapperAttrs, inputAttrs } = useInput('switch', p);
   return (
     <InputWrapper {...wrapperAttrs}>
       <Switch checked={inputAttrs.value} size="small" {...inputAttrs} />
