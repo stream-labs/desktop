@@ -241,7 +241,7 @@ export class GrowService extends StatefulService<IGrowServiceState> {
       ...goal,
       progress: 0,
       startDate: moment().format('YYYY-MM-DD HH:mm:ss'),
-      type: goal.type === '' ? uuid() : goal.type,
+      type: goal.type === 'custom' ? uuid() : goal.type,
     };
 
     jfetch<IGoal>(this.formGoalRequest('POST', goalWithType)).then(goalResponse => {
