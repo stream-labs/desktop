@@ -2,6 +2,7 @@ import { useVuex } from 'components-react/hooks';
 import React, { useEffect, useRef } from 'react';
 import { Services } from 'components-react/service-provider';
 import { Progress } from 'antd';
+import url from 'url';
 
 export default function PreviewModal(p: { close: () => void }) {
   const { HighlighterService } = Services;
@@ -57,7 +58,7 @@ export default function PreviewModal(p: { close: () => void }) {
       {!v.exportInfo.exporting && !v.exportInfo.cancelRequested && didStartExport.current && (
         <video
           style={{ outline: 'none', width: '100%' }}
-          src={v.exportInfo.previewFile}
+          src={HighlighterService.views.getCacheBustingUrl(v.exportInfo.previewFile)}
           controls
           autoPlay
         />

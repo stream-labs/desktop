@@ -3,6 +3,7 @@ import path from 'path';
 import transitions from 'gl-transitions';
 import Vue from 'vue';
 import fs from 'fs-extra';
+import url from 'url';
 import { StreamingService } from 'services/streaming';
 import electron from 'electron';
 import { getPlatformService } from 'services/platforms';
@@ -121,6 +122,15 @@ class HighligherViews extends ViewHandler<IHighligherState> {
 
   get transitions() {
     return transitions;
+  }
+
+  /**
+   * Takes a filepath to a video and returns a file:// url with a random
+   * component to prevent the browser from caching it and missing changes.
+   * @param filePath The path to the video
+   */
+  getCacheBustingUrl(filePath: string) {
+    return `${url.pathToFileURL(filePath).toString()}?time=${Date.now()}`;
   }
 }
 

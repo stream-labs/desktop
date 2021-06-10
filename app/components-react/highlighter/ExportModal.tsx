@@ -82,7 +82,7 @@ function YoutubeUpload(props: { defaultTitle: string; close: () => void }) {
             }}
           >
             <video
-              src={v.exportInfo.file}
+              src={HighlighterService.views.getCacheBustingUrl(v.exportInfo.file)}
               controls
               style={{
                 width: '100%',
