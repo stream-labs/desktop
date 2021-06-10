@@ -13,6 +13,7 @@ import { SliderInput } from 'components-react/shared/inputs';
 import { Modal, Button } from 'antd';
 import ExportModal from 'components-react/highlighter/ExportModal';
 import PreviewModal from 'components-react/highlighter/PreviewModal';
+import BlankSlate from 'components-react/highlighter/BlankSlate';
 
 type TModal = 'trim' | 'export' | 'preview';
 
@@ -169,15 +170,7 @@ export default function Highlighter() {
     );
   }
 
-  function getBlankSlate() {
-    return (
-      <div style={{ fontSize: '16px', margin: 'auto' }}>
-        Start the replay buffer and record some clips to get started!
-      </div>
-    );
-  }
-
-  if (!v.clips.length) return getBlankSlate();
+  if (!v.clips.length) return <BlankSlate />;
   if (!v.loaded) return getLoadingView();
 
   return getClipsView();
