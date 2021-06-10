@@ -36,6 +36,10 @@ const base = {
   },
   win: {
     extraFiles: ['LICENSE', 'AGREEMENT', 'shared-resources/**/*', '!shared-resources/README'],
+    extraResources: [
+      'node_modules/ffmpeg-ffprobe-static/ffmpeg.exe',
+      'node_modules/ffmpeg-ffprobe-static/ffprobe.exe',
+    ],
     rfc3161TimeStampServer: 'http://timestamp.digicert.com',
     timeStampServer: 'http://timestamp.digicert.com',
     async sign(config) {

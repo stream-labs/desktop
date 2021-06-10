@@ -8,7 +8,7 @@ import {
 } from '.';
 import { Inject } from 'services/core/injector';
 import { authorizedHeaders, jfetch } from 'util/requests';
-import { platformAuthorizedRequest } from './utils';
+import { platformAuthorizedRequest, platformRequest } from './utils';
 import { StreamSettingsService } from 'services/settings/streaming';
 import { CustomizationService } from 'services/customization';
 import { IGoLiveSettings } from 'services/streaming';
@@ -19,6 +19,8 @@ import { BasePlatformService } from './base-platform';
 import { assertIsDefined } from 'util/properties-type-guards';
 import electron from 'electron';
 import Utils from '../utils';
+import { YoutubeUploader } from './youtube/uploader';
+import { lazyModule } from 'util/lazy-module';
 
 interface IYoutubeServiceState extends IPlatformState {
   liveStreamingEnabled: boolean;
@@ -160,6 +162,8 @@ export class YoutubeService
   @Inject() private customizationService: CustomizationService;
   @Inject() private windowsService: WindowsService;
   @Inject() private i18nService: I18nService;
+
+  @lazyModule(YoutubeUploader) uploader: YoutubeUploader;
 
   readonly capabilities = new Set<TPlatformCapability>([
     'title',

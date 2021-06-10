@@ -8,6 +8,7 @@ import PatchNotes from './pages/PatchNotes';
 import Display from './shared/Display';
 import TitleBar from './shared/TitleBar';
 import Chat from './root/Chat';
+import Highlighter from './pages/Highlighter';
 import Grow from './pages/Grow/Grow';
 import Loader from './pages/Loader';
 import NavTools from './sidebar/NavTools';
@@ -25,6 +26,7 @@ export const components = {
   Display,
   TitleBar,
   Chat,
+  Highlighter,
   Grow,
   Loader,
   NavTools,

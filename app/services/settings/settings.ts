@@ -401,7 +401,7 @@ export class SettingsService extends StatefulService<ISettingsServiceState> {
     this.loadSettingsIntoStore();
   }
 
-  setSettingsPatch(patch: Partial<ISettingsValues>) {
+  setSettingsPatch(patch: DeepPartial<ISettingsValues>) {
     // Tech Debt: This is a product of the node-obs settings API.
     // This function represents a cleaner API we would like to have
     // in the future.

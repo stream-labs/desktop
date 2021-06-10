@@ -4,13 +4,29 @@ import { InputComponent, TSlobsInputProps, useTextInput } from './inputs';
 import InputWrapper from './InputWrapper';
 import { InputProps } from 'antd/lib/input';
 
-export type TTextInputProps = TSlobsInputProps<{ uncontrolled?: boolean }, string, InputProps>;
+export type TTextInputProps = TSlobsInputProps<
+  {
+    uncontrolled?: boolean;
+    onFocus?: React.FocusEventHandler<HTMLInputElement>;
+    onBlur?: React.FocusEventHandler<HTMLInputElement>;
+    onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
+    inputRef?: React.Ref<Input>;
+  },
+  string,
+  InputProps
+>;
 
 export const TextInput = InputComponent((p: TTextInputProps) => {
   const { inputAttrs, wrapperAttrs } = useTextInput(p);
   return (
     <InputWrapper {...wrapperAttrs}>
-      <Input {...inputAttrs} />
+      <Input
+        {...inputAttrs}
+        onFocus={p.onFocus}
+        onBlur={p.onBlur}
+        onKeyDown={p.onKeyDown}
+        ref={p.inputRef}
+      />
     </InputWrapper>
   );
 });
