@@ -23,9 +23,11 @@ export const NumberInput = React.memo((p: TProps) => {
     originalOnChange(val);
   }
 
+  const rules = p.rules ? p.rules : [];
+
   return (
-    <InputWrapper {...wrapperAttrs}>
-      <InputNumber {...inputAttrs} onChange={onChangeHandler} />
+    <InputWrapper {...wrapperAttrs} rules={rules.concat([{ type: 'number' }])}>
+      <InputNumber {...inputAttrs} onChange={onChangeHandler} defaultValue={p.defaultValue} />
     </InputWrapper>
   );
 });

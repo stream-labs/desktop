@@ -2,7 +2,7 @@ export const GROWTH_TIPS = () => [
   {
     title: 'Set Up Tips',
     icon: 'icon-balance',
-    link: '/',
+    link: encodeURIComponent('settings/donation-settings'),
     cta: 'Set Up Tips',
     description:
       "Go to Donation Settings and enter your personal information to get started. If you're a new streamer, we recommend starting with PayPal.",

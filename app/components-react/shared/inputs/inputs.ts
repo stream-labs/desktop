@@ -196,6 +196,7 @@ export function useInput<
       'disabled',
       'nowrap',
       'layout',
+      'rules',
     ]),
     rules,
     'data-role': 'input-wrapper',
