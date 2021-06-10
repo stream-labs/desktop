@@ -1,7 +1,5 @@
 import { combineReducers, createSlice, createStore, Store } from '@reduxjs/toolkit';
 import { batch } from 'react-redux';
-import Utils from '../../services/utils';
-import {merge} from "../hooks/useStateManager";
 
 const appSlice = createSlice({
   name: 'app',
@@ -49,18 +47,27 @@ function createReducer(asyncReducers?: Object) {
 
 export const store = configureStore({});
 
-export class StateManager<TControllerClass extends new (...args: any[]) => { state: any }> {
-  static instances: Record<string, StateManager<any>> = {};
-  private name: string;
-  public controller: InstanceType<TControllerClass>;
-  public actionsAndGetters: Record<string, Function> = {};
+export interface IStateController<TInitParams> {
+  state: any;
+  init?: (initParams: TInitParams) => unknown;
+}
 
-  constructor(
-    ControllerClass: TControllerClass,
-    initialState: InstanceType<TControllerClass>['state'],
-  ) {
-    const name = (this.name = ControllerClass.name);
-    const controller = new ControllerClass(initialState);
+export class StateManager<TInitParams, TController extends IStateController<TInitParams>> {
+  static instances: Record<string, StateManager<any, any>> = {};
+  private name: string;
+  public controller: TController;
+  public actionsAndGetters: Record<string, Function> = {};
+  public mutationState: unknown;
+
+  constructor(controller: TController, initParams?: TInitParams) {
+    const name = (this.name = controller.constructor.name);
+    controller.init && controller.init(initParams as TInitParams);
+    const controllerProto = Object.getPrototypeOf(controller);
+
+    registerMutation(controllerProto, 'incVuexRevision', () => {
+      this.getState()['_vuexRevision']++;
+    });
+
     StateManager.instances[name] = this;
 
     const slice = createSlice({
@@ -71,10 +78,7 @@ export class StateManager<TControllerClass extends new (...args: any[]) => { sta
         _renderingDisabled: false,
       },
       reducers: {
-        ...ControllerClass.prototype['mutations'],
-        incVuexRevision(state: any) {
-          state['_vuexRevision']++;
-        },
+        ...controllerProto['mutations'],
         forbidRendering(state: any) {
           state['_isRenderingDisabled'] = true;
         },
@@ -118,19 +122,11 @@ export class StateManager<TControllerClass extends new (...args: any[]) => { sta
       console.log('constructor error', e);
     }
 
-    this.controller = controller as InstanceType<TControllerClass>;
+    this.controller = controller as TController;
   }
 
-  async incVuexRevision() {
-    if (this.isRenderingDisabled) return;
-
-    batch(() => {
-      store.dispatch({ type: `${this.name}/forbidRendering` });
-      store.dispatch({ type: `${this.name}/incVuexRevision` });
-    });
-
-    await Utils.sleep(0);
-    if (this.isRenderingDisabled) store.dispatch({ type: `${this.name}/allowRendering` });
+  incVuexRevision() {
+    this.controller['incVuexRevision']();
   }
 
   forbidRendering() {
@@ -150,67 +146,67 @@ export class StateManager<TControllerClass extends new (...args: any[]) => { sta
   }
 
   getState() {
+    if (this.mutationState) return this.mutationState;
     const globalState = store.getState() as any;
     return globalState[this.name];
+  }
+
+  setMutationState(mutationState: unknown) {
+    this.mutationState = mutationState;
+  }
+
+  temporaryDisableRendering() {
+    if (this.isRenderingDisabled) return;
+
+    console.log('DISABLE rendering');
+    store.dispatch({ type: `${this.name}/forbidRendering` });
+
+    setTimeout(() => {
+      console.log('ENABLE rendering');
+      store.dispatch({ type: `${this.name}/allowRendering` });
+    });
   }
 }
 
 export function mutation() {
   return function (target: any, methodName: string, descriptor: PropertyDescriptor) {
-    const className = target.constructor.name;
-
-    target.mutations = target.mutations || {};
-    target.originalMethods = target.originalMethods || {};
-    target.originalMethods[methodName] = target[methodName];
-    const originalMethod = target[methodName];
-
-    // function createStateContext(state: unknown) {
-    //   return new Proxy(
-    //     { _proxyName: 'StateContext' },
-    //     {
-    //       get(t, propName) {
-    //         if (propName === 'state') return state;
-    //         if (target.originalMethods[propName]) return target.originalMethods[propName];
-    //         return controller[propName];
-    //       },
-    //     },
-    //   );
-    // }
-
-    function createMutationContext(state: unknown) {
-      const controller = StateManager.instances[className].controller;
-
-      return new Proxy(
-        { _proxyName: 'MutationContext', controller, state },
-        {
-          get(t, propName) {
-            if (propName === 'state') return state;
-            if (target.originalMethods[propName]) return target.originalMethods[propName];
-            return controller[propName];
-          },
-        },
-      );
-    }
-
-    target.mutations[methodName] = (state: unknown, action: { payload: unknown[] }) => {
-      console.log('call mutation', methodName);
-      const context = createMutationContext(state);
-      originalMethod.apply(context, action.payload);
-    };
-
-    Object.defineProperty(target, methodName, {
-      ...descriptor,
-
-      value(...args: any[]) {
-        console.log('dispatch action', methodName);
-        batch(() => {
-          store.dispatch({ type: `${className}/forbidRendering` });
-          store.dispatch({ type: `${className}/${methodName}`, payload: args });
-          store.dispatch({ type: `${className}/allowRendering` });
-        });
-      },
-    });
-
-    return Object.getOwnPropertyDescriptor(target, methodName);
+    return registerMutation(target, methodName, descriptor.value);
   };
+}
+
+function registerMutation(target: any, mutationName: string, fn: Function) {
+  const className = target.constructor.name;
+
+  target.mutations = target.mutations || {};
+  target.originalMethods = target.originalMethods || {};
+  target.originalMethods[mutationName] = fn;
+  const originalMethod = fn;
+
+  target.mutations[mutationName] = (state: unknown, action: { payload: unknown[] }) => {
+    console.log('call mutation', mutationName);
+    const stateManager = StateManager.instances[className];
+    const controller = stateManager.controller;
+    stateManager.setMutationState(state);
+    originalMethod.apply(controller, action.payload);
+    stateManager.setMutationState(null);
+  };
+
+  Object.defineProperty(target, mutationName, {
+    configurable: true,
+    value(...args: any[]) {
+      console.log('dispatch action', mutationName);
+
+      const stateManager = StateManager.instances[className];
+      const controller = stateManager.controller;
+      const mutationIsRunning = !!stateManager.mutationState;
+      if (mutationIsRunning) return originalMethod.apply(controller, args);
+
+      batch(() => {
+        stateManager.temporaryDisableRendering();
+        store.dispatch({ type: `${className}/${mutationName}`, payload: args });
+      });
+    },
+  });
+
+  return Object.getOwnPropertyDescriptor(target, mutationName);
 }

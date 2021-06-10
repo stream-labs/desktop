@@ -11,7 +11,7 @@ import { Services } from '../../components-react/service-provider';
 
 
 export type TModificators = { isUpdateMode?: boolean; isScheduleMode?: boolean };
-export type IGoLiveSettingsState = IGoLiveSettings & TModificators & { needPrepopulate: boolean };
+export type IGoLiveSettingsState = IGoLiveSettings & TModificators;
 
 
 /**

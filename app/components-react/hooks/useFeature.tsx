@@ -4,11 +4,12 @@ import { StatefulService } from '../../services';
 import { createBinding, TBindings } from '../shared/inputs';
 import { assertIsDefined } from '../../util/properties-type-guards';
 import { useOnCreate, useOnDestroy } from '../hooks';
-import { StateManager } from '../store';
+import { IStateController, StateManager } from '../store';
 import isPlainObject from 'lodash/isPlainObject';
 
 export function useFeature<
-  TControllerClass extends new (...args: any[]) => { state: any },
+  TInitParams,
+  TControllerClass extends new (...args: any[]) => IStateController<TInitParams>,
   // TState extends Object = InstanceType<TControllerClass>['state'],
   TBindingState,
   TBindingExtraProps,
@@ -18,19 +19,19 @@ export function useFeature<
     ): TComputed;
     useBinding: BindingCreator<InstanceType<TControllerClass>>['createBinding']; // TUseBinding<InstanceType<TControllerClass>, TBindingState, TBindingExtraProps>;
   }
->(ControllerClass: TControllerClass): TReturnType {
+>(ControllerClass: TControllerClass, initParams?: TInitParams): TReturnType {
   const isRootRef = useRef(false);
   const prevComponentState = useRef<Partial<any>>({});
   const computedPropsFnRef = useRef<null | Function>(null);
   const computedPropsRef = useRef<any>({});
+  const compId = useComponentId();
 
   const { stateManager, dependencyWatcher, dataSelector, calculateComputedProps } = useOnCreate(
     () => {
       let stateManager = StateManager.instances[ControllerClass.name];
       if (!stateManager) {
         isRootRef.current = true;
-        const controller = new ControllerClass();
-        stateManager = new StateManager(ControllerClass, controller.state);
+        stateManager = new StateManager(new ControllerClass(), initParams);
       }
 
       function useSelector<T extends Object>(
@@ -103,10 +104,13 @@ export function useFeature<
   });
 
   useEffect(() => {
-    const unsubscribe = StatefulService.store.watch(
-      () => dependencyWatcher.getDependentValues(),
-      newState => stateManager.incVuexRevision(),
-    );
+    if (!isRootRef.current) return;
+
+    const unsubscribe = StatefulService.store.subscribe(mutation => {
+      console.log('Vuex mutation', mutation.type);
+      stateManager.incVuexRevision();
+    });
+
     return () => {
       unsubscribe();
     };
@@ -215,34 +219,6 @@ export type TUseBinding<TView extends Object, TState extends Object, TExtraProps
   stateSetter: (patch: TState) => unknown,
 ) => TBindings<TState, keyof TState, TExtraProps>;
 
-// export type TUseBindingView<TView> = TUseBinding<TView, >
-//
-// export type TUseBinding<TView extends Object, TState extends Object, TExtraProps = {}> = (
-//   stateGetter: (view: TView) => TState,
-//   stateSetter: (patch: TState) => unknown,
-// ) => TBindings<TState, keyof TState, TExtraProps>;
-
-// function useBindingView<TView>(view: TView) {
-//   return createStateGetter(view);
-// }
-//
-// function createStateGetter<TView, TState>(view: TView, getter: (view: TView) => TState) {
-//   return {
-//     getter,
-//   };
-// }
-//
-// const view = { foo: 1 };
-// const binding = createStateGetter(view, view => ({ bar: 1, view }));
-//
-//
-// type MyView = {
-//   foo: 1;
-// }
-//
-// let barGetter: ReturnType<useBindingView<MyView>>;
-// const bar = barGetter.getter().bar;
-
 /**
  * consider isSimilar as isDeepEqual with depth 2
  */
@@ -290,4 +266,33 @@ class BindingCreator<TView> {
 
     return createBinding(() => getter(view), setter, extraPropsGenerator);
   }
+}
+
+let nextComponentId = 1;
+
+/**
+ * Returns an unique component id
+ * If DEBUG=true then the componentId includes a component name
+ */
+function useComponentId() {
+  /**
+   * Get component name from the callstack
+   * Use for debugging only
+   */
+  function getComponentName(): string {
+    try {
+      throw new Error();
+    } catch (e: unknown) {
+      if (e instanceof Error && e.stack) {
+        return e.stack.split('\n')[10].split('at ')[1].split('(')[0].trim();
+      } else {
+        return '';
+      }
+    }
+  }
+
+  return useOnCreate(() => {
+    const DEBUG = true;
+    return DEBUG ? `${nextComponentId++}_${getComponentName()}` : `${nextComponentId++}`;
+  });
 }

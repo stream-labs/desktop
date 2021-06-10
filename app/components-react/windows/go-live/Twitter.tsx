@@ -11,7 +11,7 @@ import { useGoLiveSettings } from './useGoLiveSettings';
 
 export default function TwitterInput() {
   const { TwitterService } = Services;
-  const { useSelector, tweetText, updateSettings, getTweetText } = useGoLiveSettings();
+  const { useSelector, tweetText, updateSettings, getTweetText, getSettings } = useGoLiveSettings();
 
   const { tweetWhenGoingLive, linked, screenName, streamTitle } = useSelector(view => ({
     ...pick(TwitterService.state, 'tweetWhenGoingLive', 'linked', 'screenName'),
@@ -20,7 +20,7 @@ export default function TwitterInput() {
 
   useEffect(() => {
     const tweetText = getTweetText(streamTitle);
-    updateSettings({ tweetText });
+    if (getSettings().tweetText !== tweetText) updateSettings({ tweetText });
   }, [streamTitle]);
 
   function unlink() {
