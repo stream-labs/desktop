@@ -232,8 +232,6 @@ export default class StreamSettings extends TsxComponent {
     const shouldShowPrimaryBtn = isPrimary;
     const shouldShowConnectBtn = !isMerged && this.canEditSettings;
     const shouldShowUnlinkBtn = !isPrimary && isMerged && this.canEditSettings;
-    const shouldShowPrimeLabel =
-      !this.userService.state.isPrime && !this.restreamService.state.grandfathered;
 
     return (
       <div class="section flex">
@@ -248,7 +246,6 @@ export default class StreamSettings extends TsxComponent {
         <div style={{ marginLeft: 'auto' }}>
           {shouldShowConnectBtn && (
             <span>
-              {shouldShowPrimeLabel && <b class={styles.prime}>prime</b>}
               <button
                 onclick={() => this.platformMerge(platform)}
                 class={cx(`button ${buttonClass}`, styles.platformButton)}
