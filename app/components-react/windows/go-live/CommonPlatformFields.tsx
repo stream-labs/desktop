@@ -73,7 +73,7 @@ export default function CommonPlatformFields(p: IProps) {
     ? supports('description', [p.platform as TPlatform])
     : supports('description');
   const fields = shouldShowPropsForSinglePlatform
-    ? getPlatformSettings(p.platform as TPlatform)
+    ? (getPlatformSettings(p.platform as TPlatform) as { title: string; description: string })
     : commonFields;
 
   // find out the best title for common fields

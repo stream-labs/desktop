@@ -29,6 +29,8 @@ export default function GoLiveWindow() {
     form,
   } = useGoLiveSettings();
 
+  console.log('re-render golivewindow');
+
   const shouldShowConfirm = ['prepopulate', 'waitForNewSettings'].includes(lifecycle);
   const shouldShowSettings = ['empty', 'prepopulate', 'waitForNewSettings'].includes(lifecycle);
   const shouldShowChecklist = ['runChecklist', 'live'].includes(lifecycle);

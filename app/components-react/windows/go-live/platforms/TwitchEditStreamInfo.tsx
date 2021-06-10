@@ -10,7 +10,7 @@ export function TwitchEditStreamInfo() {
   const { updatePlatform, renderPlatformSettings, useBinding } = useGoLiveSettings();
 
   const bind = useBinding(
-    view => view.state.platforms.twitch,
+    view => view.state.platforms.twitch!,
     updatedSettings => updatePlatform('twitch', updatedSettings),
   );
 

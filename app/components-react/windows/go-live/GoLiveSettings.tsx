@@ -23,6 +23,8 @@ const PlusIcon = PlusOutlined as Function;
  * - Extras settings
  **/
 export default function GoLiveSettings() {
+
+  console.log('re-render settings');
   const { RestreamService, SettingsService, UserService } = Services;
 
   const { useSelector, isAdvancedMode, protectedModeEnabled, error, isLoading } = useGoLiveSettings();
@@ -49,7 +51,6 @@ export default function GoLiveSettings() {
     }
   }
 
-  console.log('re-render settings');
 
   return (
     <Row gutter={16} style={{ height: 'calc(100% + 24px)' }}>

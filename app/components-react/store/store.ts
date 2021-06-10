@@ -1,56 +1,97 @@
-import { combineReducers, createSlice, createStore, Store } from '@reduxjs/toolkit';
+import { combineReducers, createAction, createReducer, createStore, Store } from '@reduxjs/toolkit';
 import { batch } from 'react-redux';
-
-const appSlice = createSlice({
-  name: 'app',
-  initialState: {},
-  reducers: {},
-});
-
-// Define the Reducers that will always be present in the application
-const staticReducers = {
-  app: appSlice.reducer,
-};
-
-type TStore = Store & {
-  injectReducer: (key: string, asyncReducer: any) => unknown;
-  asyncReducers: Record<string, any>;
-};
-
-// Configure the store
-export default function configureStore(initialState: Object): TStore {
-  const store = createStore(createReducer(), initialState) as TStore;
-
-  // Add a dictionary to keep track of the registered async reducers
-  store.asyncReducers = {};
-
-  // Create an inject reducer function
-  // This function adds the async reducer, and creates a new combined reducer
-  store.injectReducer = (key, asyncReducer) => {
-    store.asyncReducers[key] = asyncReducer;
-    store.replaceReducer(createReducer(store.asyncReducers));
-  };
-
-  // Return the modified store
-  return store;
-}
-
-function createReducer(asyncReducers?: Object) {
-  let newReducers = {
-    ...staticReducers,
-  };
-  if (asyncReducers) {
-    newReducers = { ...newReducers, ...asyncReducers };
-  }
-  return combineReducers(newReducers);
-}
-
-export const store = configureStore({});
 
 export interface IStateController<TInitParams> {
   state: any;
   init?: (initParams: TInitParams) => unknown;
 }
+
+type TStore = Store & {
+  reducerManager: {
+    add: (key: string, reducer: any) => unknown;
+    remove: (key: string) => unknown;
+  };
+};
+
+export function createReducerManager() {
+  // Create an object which maps keys to reducers
+  const reducers = {
+    global: createReducer({}, {}),
+  };
+
+  // Create the initial combinedReducer
+  // let combinedReducer = combineReducers(reducers);
+  let combinedReducer = combineReducers(reducers);
+
+  // An array which is used to delete state keys when reducers are removed
+  let keysToRemove: string[] = [];
+
+  return {
+    getReducerMap: () => reducers,
+
+    // The root reducer function exposed by this object
+    // This will be passed to the store
+    reduce: (state: any, action: any) => {
+      // If any reducers have been removed, clean up their state first
+      if (keysToRemove.length > 0) {
+        state = { ...state };
+        for (const key of keysToRemove) {
+          delete state[key];
+        }
+        keysToRemove = [];
+      }
+
+      if (action.type === 'initState') {
+        state[action.payload.name] = action.payload.initialState;
+      }
+
+      // Delegate to the combined reducer
+      return combinedReducer(state, action);
+    },
+
+    // Adds a new reducer with the specified key
+    add: (key: string, reducer: any) => {
+      if (!key || reducers[key]) {
+        return;
+      }
+
+      // Add the reducer to the reducer mapping
+      reducers[key] = reducer;
+
+      // Generate a new combined reducer
+      combinedReducer = combineReducers(reducers);
+    },
+
+    // Removes a reducer with the specified key
+    remove: (key: string) => {
+      if (!key || !reducers[key]) {
+        return;
+      }
+
+      // Remove it from the reducer mapping
+      delete reducers[key];
+
+      // Add the key to the list of keys to clean up
+      keysToRemove.push(key);
+
+      // Generate a new combined reducer
+      combinedReducer = combineReducers(reducers);
+    },
+  };
+}
+
+function configureStore() {
+  const reducerManager = createReducerManager();
+
+  // Create a store with the root reducer function being the one exposed by the manager.
+  const store = createStore(reducerManager.reduce, {}) as TStore;
+
+  // Optional: Put the reducer manager on the store so it is easily accessible
+  store.reducerManager = reducerManager;
+  return store;
+}
+
+export const store = configureStore();
 
 export class StateManager<TInitParams, TController extends IStateController<TInitParams>> {
   static instances: Record<string, StateManager<any, any>> = {};
@@ -70,29 +111,35 @@ export class StateManager<TInitParams, TController extends IStateController<TIni
 
     StateManager.instances[name] = this;
 
-    const slice = createSlice({
-      name: this.name,
-      initialState: {
-        ...controller.state,
-        _vuexRevision: 1,
-        _renderingDisabled: false,
+    const initialState = {
+      ...controller.state,
+      _vuexRevision: 1,
+      _isRenderingDisabled: false,
+    };
+
+    const mutations = {
+      ...controllerProto['mutations'],
+      forbidRendering(state: any) {
+        state['_isRenderingDisabled'] = true;
       },
-      reducers: {
-        ...controllerProto['mutations'],
-        forbidRendering(state: any) {
-          state['_isRenderingDisabled'] = true;
-        },
-        allowRendering(state: any) {
-          state['_isRenderingDisabled'] = false;
-        },
+      allowRendering(state: any) {
+        state['_isRenderingDisabled'] = false;
       },
+    };
+
+    const reducer = createReducer(initialState, builder => {
+      Object.keys(mutations).forEach(mutationName => {
+        const action = createAction(`${name}/${mutationName}`);
+        builder.addCase(action, mutations[mutationName]);
+      });
     });
 
     Object.defineProperty(controller, 'state', {
       get: () => this.getState(),
     });
 
-    store.injectReducer(slice.name, slice.reducer);
+    store.reducerManager.add(name, reducer);
+    store.dispatch({ type: 'initState', payload: { name, initialState } });
 
     let entity = controller;
     const prototypes = [];
@@ -142,6 +189,7 @@ export class StateManager<TInitParams, TController extends IStateController<TIni
   }
 
   destroy() {
+    store.reducerManager.remove(this.name);
     delete StateManager.instances[this.name];
   }
 

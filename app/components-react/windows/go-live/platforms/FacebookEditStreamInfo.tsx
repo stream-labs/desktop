@@ -54,7 +54,7 @@ export default function FacebookEditStreamInfo() {
     const hasPages = !!fbState.facebookPages.length;
     const canStreamToTimeline = fbState.grantedPermissions.includes('publish_video');
     const canStreamToGroup = fbState.grantedPermissions.includes('publish_to_groups');
-    const fbSettings = view.state.platforms.facebook;
+    const fbSettings = view.state.platforms.facebook!;
     return {
       canStreamToTimeline,
       canStreamToGroup,
@@ -78,7 +78,7 @@ export default function FacebookEditStreamInfo() {
     (!fbSettings.liveVideoId && fbSettings.privacy?.value !== 'SELF') ||
     (fbSettings.liveVideoId && fbSettings.privacy?.value);
   const bind = useBinding(
-    view => view.state.platforms.facebook,
+    view => view.state.platforms.facebook!,
     newFbSettings => updatePlatform('facebook', newFbSettings),
   );
 

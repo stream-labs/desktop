@@ -1,4 +1,4 @@
-import React, { useRef, MouseEvent } from 'react';
+import React, { useRef, MouseEvent, useEffect } from 'react';
 import { getPlatformService, TPlatform } from '../../../services/platforms';
 import cx from 'classnames';
 import { $t } from '../../../services/i18n';
@@ -24,8 +24,11 @@ export function DestinationSwitchers() {
     switchCustomDestination,
     checkPrimaryPlatform,
   } = useGoLiveSettings();
-
   const enabledPlatformsRef = useRef(enabledPlatforms);
+
+  useEffect(() => {
+    enabledPlatformsRef.current = enabledPlatforms;
+  }, [enabledPlatforms]);
 
   const emitSwitch = useDebounce(500, () => {
     switchPlatforms(enabledPlatformsRef.current);
@@ -78,6 +81,8 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
   const switchInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
+
+  console.log('Render switcher', platform, p.enabled);
 
   function onClickHandler(ev: MouseEvent) {
     if (p.isPrimary) {

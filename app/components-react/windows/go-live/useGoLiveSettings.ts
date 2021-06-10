@@ -13,6 +13,8 @@ import { $t } from '../../../services/i18n';
 import { mutation } from '../../store';
 import { useFeature } from '../../hooks/useFeature';
 import { useForm } from '../../shared/inputs/Form';
+import {ICustomStreamDestination} from "../../../services/settings/streaming";
+import {assertIsDefined, getDefined} from "../../../util/properties-type-guards";
 
 type TCustomFieldName = 'title' | 'description';
 // type TModificators = { isUpdateMode?: boolean; isScheduleMode?: boolean };
@@ -26,36 +28,41 @@ export class GoLiveSettingsFeature extends StreamInfoView<IGoLiveSettingsState> 
     super(initialState);
   }
 
-  state = {
+  state: IGoLiveSettingsState = {
     isUpdateMode: false,
-    twee
-  }
+    platforms: {},
+    customDestinations: [],
+    tweetText: '',
+    optimizedProfile: undefined,
+    advancedMode: false,
+    needPrepopulate: true,
+  };
 
-  init(params: { isUpdateMode: boolean; isScheduleMode: boolean; form: FormInstance }) {
+  init(params: { isUpdateMode: boolean; form: FormInstance }) {
     this.form = params.form;
-    this.state.isScheduleMode = params.isScheduleMode;
     this.state.isUpdateMode = params.isUpdateMode;
     this.prepopulate();
   }
 
-  // creates an initial state
-  getInitialStreamSettings() {
-    const modificators = { isUpdateMode: false, isScheduleMode: false };
+  /**
+   * Fetch settings for each platform
+   */
+  async prepopulate() {
+    await Services.StreamingService.actions.return.prepopulateInfo();
     const view = new StreamInfoView({});
     const settings = {
       ...view.savedSettings, // copy saved stream settings
-      needPrepopulate: true, // we need to sync platform settings after context create
       tweetText: view.getTweetText(view.commonFields.title), // generate a default tweet text
-      ...modificators,
+      needPrepopulate: false,
     };
     // if stream has not been started than we allow to change settings only for a primary platform
     // so delete other platforms from the settings object
-    if (modificators.isUpdateMode && !view.isMidStreamMode) {
+    if (this.isUpdateMode && !view.isMidStreamMode) {
       Object.keys(settings.platforms).forEach((platform: TPlatform) => {
         if (!this.checkPrimaryPlatform(platform)) delete settings.platforms[platform];
       });
     }
-    return settings;
+    this.updateSettings(settings);
   }
 
   getView(state: IGoLiveSettingsState) {
@@ -167,7 +174,8 @@ export class GoLiveSettingsFeature extends StreamInfoView<IGoLiveSettingsState> 
   updateCommonFields(fieldName: TCustomFieldName, value: string) {
     this.platformsWithoutCustomFields.forEach(platform => {
       if (!this.supports(fieldName, [platform])) return;
-      this.state.platforms[platform][fieldName] = value;
+      const platformSettings = getDefined(this.state.platforms[platform]);
+      platformSettings[fieldName] = value;
     });
   }
   /**
@@ -176,7 +184,8 @@ export class GoLiveSettingsFeature extends StreamInfoView<IGoLiveSettingsState> 
 
   @mutation()
   toggleCustomFields(platform: TPlatform) {
-    const enabled = this.state.platforms[platform].useCustomFields;
+    const platformSettings = getDefined(this.state.platforms[platform]);
+    const enabled = platformSettings.useCustomFields;
     return this.updatePlatform(platform, { useCustomFields: !enabled });
   }
 
@@ -235,17 +244,6 @@ export class GoLiveSettingsFeature extends StreamInfoView<IGoLiveSettingsState> 
     ) {
       message.success($t('Successfully updated'));
     }
-  }
-
-  /**
-   * Fetch settings for each platform
-   */
-  async prepopulate() {
-    await Services.StreamingService.actions.return.prepopulateInfo();
-
-    // Take saved settings and load them into the current context state
-    this.updateSettings(this.getInitialStreamSettings());
-    this.updateSettings({ needPrepopulate: false });
   }
 }
 

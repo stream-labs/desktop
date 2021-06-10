@@ -12,7 +12,7 @@ export function TiktokEditStreamInfo() {
   const { updatePlatform, useBinding } = useGoLiveSettings();
 
   const bind = useBinding(
-    view => view.state.platforms.tiktok,
+    view => view.state.platforms.tiktok!,
     updatedSettings => updatePlatform('tiktok', updatedSettings),
   );
 
