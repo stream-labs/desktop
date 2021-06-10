@@ -125,6 +125,14 @@ export class Chat extends ReactComponent {}
 export class Loader extends ReactComponent {}
 @Component({
   props: {
+    name: { default: 'Highlighter' },
+    componentProps: { default: () => ({}) },
+  },
+})
+export class Highlighter extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'GoLiveWindow' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },

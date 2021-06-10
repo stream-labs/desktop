@@ -84,6 +84,7 @@ declare module 'vuejs-datepicker';
 declare module 'vuejs-datepicker/dist/locale';
 declare module 'color-picker';
 declare module 'overlayscrollbars-vue';
+declare module 'gl-transitions';
 
 // React modules
 declare module 'rc-animate';
