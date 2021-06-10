@@ -4,8 +4,8 @@ import { InputComponent, TSlobsInputProps, useInput } from './inputs';
 import styles from 'components/shared/inputs/BoolButtonInput.m.less';
 
 interface IBoolButtonInputCustomProps {
-  checkboxStyles: { [key: string]: React.CSSProperties };
-  checkboxActiveStyles: { [key: string]: React.CSSProperties };
+  checkboxStyles: React.CSSProperties;
+  checkboxActiveStyles: React.CSSProperties;
 }
 
 export type TBoolButtonInputProps = TSlobsInputProps<IBoolButtonInputCustomProps, boolean>;
