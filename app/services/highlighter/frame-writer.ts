@@ -89,7 +89,7 @@ export class FrameWriter {
   }
 
   end() {
-    this.ffmpeg.stdin?.end();
+    this.ffmpeg?.stdin?.end();
     return this.exitPromise;
   }
 }

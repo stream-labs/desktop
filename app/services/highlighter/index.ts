@@ -3,6 +3,7 @@ import path from 'path';
 import transitions from 'gl-transitions';
 import Vue from 'vue';
 import fs from 'fs-extra';
+import url from 'url';
 import { StreamingService } from 'services/streaming';
 import electron from 'electron';
 import { getPlatformService } from 'services/platforms';
@@ -19,6 +20,7 @@ import { Clip } from './clip';
 import { AudioCrossfader } from './audio-crossfader';
 import { FrameWriter } from './frame-writer';
 import { Transitioner } from './transitioner';
+import { throttle } from 'lodash-decorators';
 
 export interface IClip {
   path: string;
@@ -120,6 +122,15 @@ class HighligherViews extends ViewHandler<IHighligherState> {
 
   get transitions() {
     return transitions;
+  }
+
+  /**
+   * Takes a filepath to a video and returns a file:// url with a random
+   * component to prevent the browser from caching it and missing changes.
+   * @param filePath The path to the video
+   */
+  getCacheBustingUrl(filePath: string) {
+    return `${url.pathToFileURL(filePath).toString()}?time=${Date.now()}`;
   }
 }
 
@@ -368,6 +379,8 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       cancelRequested: false,
     });
 
+    let currentFrame = 0;
+
     // Mix audio first
     await Promise.all(clips.map(clip => clip.audioSource.extract()));
     const parsed = path.parse(this.views.exportInfo.file);
@@ -430,7 +443,9 @@ export class HighlighterService extends StatefulService<IHighligherState> {
 
       if (fromFrameRead) {
         await writer.writeNextFrame(frameToRender);
-        this.SET_EXPORT_INFO({ currentFrame: this.state.export.currentFrame + 1 });
+        // this.SET_EXPORT_INFO({ currentFrame: this.state.export.currentFrame + 1 });
+        currentFrame++;
+        this.setCurrentFrame(currentFrame);
       } else {
         console.log('Out of sources, closing file');
         await writer.end();
@@ -444,6 +459,12 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       exported: !this.views.exportInfo.cancelRequested && !preview,
     });
     this.SET_UPLOAD_INFO({ videoId: null });
+  }
+
+  // We throttle because this can go extremely fast, especially on previews
+  @throttle(100)
+  private setCurrentFrame(frame: number) {
+    this.SET_EXPORT_INFO({ currentFrame: frame });
   }
 
   cancelFunction: (() => void) | null = null;

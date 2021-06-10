@@ -43,6 +43,8 @@ interface IRGBColor {
   b: number;
 }
 
+type DeepPartial<T> = Partial<{ [P in keyof T]: DeepPartial<T[P]> }>;
+
 /**
  * This is a much more typesafe type for json to return,
  * as it requires declaring its type before use.

@@ -6,7 +6,7 @@ import { useVuex } from 'components-react/hooks';
 import { FileInput, TextInput, TextAreaInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
 import path from 'path';
-import { Button, Progress } from 'antd';
+import { Button, Progress, Tooltip } from 'antd';
 import { RadioInput } from 'components-react/shared/inputs/RadioInput';
 import { TPrivacyStatus } from 'services/platforms/youtube/uploader';
 import electron from 'electron';
@@ -32,6 +32,7 @@ function YoutubeUpload(props: { defaultTitle: string; close: () => void }) {
   const [title, setTitle] = useState(props.defaultTitle);
   const [description, setDescription] = useState('');
   const [privacy, setPrivacy] = useState('private');
+  const [urlCopied, setUrlCopied] = useState(false);
   const { UserService, HighlighterService } = Services;
   const v = useVuex(() => ({
     youtubeLinked: !!UserService.state.auth?.platforms.youtube,
@@ -44,44 +45,52 @@ function YoutubeUpload(props: { defaultTitle: string; close: () => void }) {
     return (
       <div>
         <div style={{ display: 'flex', flexDirection: 'row' }}>
-          <div style={{ flexGrow: 1 }}>
-            <Form layout="vertical">
-              <TextInput label="Title" value={title} onChange={setTitle} />
-              <TextAreaInput label="Description" value={description} onChange={setDescription} />
-              <RadioInput
-                label="Privacy Status"
-                options={[
-                  {
-                    label: 'Private',
-                    value: 'private',
-                    description: 'Only you and people you choose can watch your video',
-                  },
-                  {
-                    label: 'Unlisted',
-                    value: 'unlisted',
-                    description: 'Anyone with the video link can watch your video',
-                  },
-                  {
-                    label: 'Public',
-                    value: 'public',
-                    description: 'Everyone can watch your video',
-                  },
-                ]}
-                value={privacy}
-                onChange={setPrivacy}
-              />
-            </Form>
-          </div>
+          {v.youtubeLinked && (
+            <div style={{ flexGrow: 1 }}>
+              <Form layout="vertical">
+                <TextInput label="Title" value={title} onChange={setTitle} />
+                <TextAreaInput label="Description" value={description} onChange={setDescription} />
+                <RadioInput
+                  label="Privacy Status"
+                  options={[
+                    {
+                      label: 'Private',
+                      value: 'private',
+                      description: 'Only you and people you choose can watch your video',
+                    },
+                    {
+                      label: 'Unlisted',
+                      value: 'unlisted',
+                      description: 'Anyone with the video link can watch your video',
+                    },
+                    {
+                      label: 'Public',
+                      value: 'public',
+                      description: 'Everyone can watch your video',
+                    },
+                  ]}
+                  value={privacy}
+                  onChange={setPrivacy}
+                />
+              </Form>
+            </div>
+          )}
+          {!v.youtubeLinked && (
+            <div style={{ flexGrow: 1 }}>
+              Please connect your YouTube account to upload your video to YouTube.
+            </div>
+          )}
           <div
             style={{
               width: 300,
               marginLeft: 24,
+              marginBottom: 24,
               display: 'flex',
               flexDirection: 'column',
             }}
           >
             <video
-              src={v.exportInfo.file}
+              src={HighlighterService.views.getCacheBustingUrl(v.exportInfo.file)}
               controls
               style={{
                 width: '100%',
@@ -115,18 +124,20 @@ function YoutubeUpload(props: { defaultTitle: string; close: () => void }) {
           <Button style={{ marginRight: 8 }} onClick={props.close}>
             Close
           </Button>
-          <Button
-            type="primary"
-            onClick={() => {
-              HighlighterService.actions.upload({
-                title,
-                description,
-                privacyStatus: privacy as TPrivacyStatus,
-              });
-            }}
-          >
-            Publish
-          </Button>
+          {v.youtubeLinked && (
+            <Button
+              type="primary"
+              onClick={() => {
+                HighlighterService.actions.upload({
+                  title,
+                  description,
+                  privacyStatus: privacy as TPrivacyStatus,
+                });
+              }}
+            >
+              Publish
+            </Button>
+          )}
         </div>
       </div>
     );
@@ -166,9 +177,22 @@ function YoutubeUpload(props: { defaultTitle: string; close: () => void }) {
 
     return (
       <div>
-        TODO
+        <p>
+          Your video was successfully uploaded! Click the link below to access your video. Please
+          note that YouTube will take some time to process your video.
+        </p>
         <br />
         <a onClick={() => electron.remote.shell.openExternal(url)}>{url}</a>
+        <Tooltip placement="right" title={urlCopied ? 'Copied!' : 'Copy URL'}>
+          <i
+            className="icon-copy link"
+            style={{ marginLeft: 8, display: 'inline', cursor: 'pointer' }}
+            onClick={() => {
+              setUrlCopied(true);
+              electron.clipboard.writeText(url);
+            }}
+          />
+        </Tooltip>
       </div>
     );
   }
@@ -176,10 +200,9 @@ function YoutubeUpload(props: { defaultTitle: string; close: () => void }) {
   return (
     <div>
       <h2>Upload to YouTube</h2>
-      {v.youtubeLinked && !v.uploadInfo.uploading && !v.uploadInfo.videoId && getYoutubeForm()}
+      {!v.uploadInfo.uploading && !v.uploadInfo.videoId && getYoutubeForm()}
       {v.youtubeLinked && v.uploadInfo.uploading && getUploadProgress()}
       {v.youtubeLinked && v.uploadInfo.videoId && getUploadDone()}
-      {!v.youtubeLinked && <div>TODO: Youtube is not linked</div>}
     </div>
   );
 }
