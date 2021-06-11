@@ -1,7 +1,8 @@
 import { remote } from 'electron';
 import React, { useEffect, useState, useRef } from 'react';
 import shuffle from 'lodash/shuffle';
-import { Button, Modal, Form } from 'antd';
+import { Button, Modal } from 'antd';
+import Form, { useForm } from '../../shared/inputs/Form';
 import { $t } from '../../../services/i18n';
 import styles from './Grow.m.less';
 import { useVuex } from '../../hooks';
@@ -80,10 +81,12 @@ function MyGoals(p: { goals: Dictionary<IGoal> }) {
 }
 
 function AddGoalModal(p: { visible: boolean; setShowGoalModal: Function }) {
-  const { GrowService } = Services;
+  const { GrowService, UsageStatisticsService } = Services;
   const [goalTotal, setGoalTotal] = useState(10);
   const [goalTitle, setGoalTitle] = useState('');
   const [goalType, setGoalType] = useState('custom');
+
+  const form = useForm();
 
   useEffect(() => {
     const goalOption = GrowService.views.goalOptions.find(goal => goal.type === goalType);
@@ -95,6 +98,7 @@ function AddGoalModal(p: { visible: boolean; setShowGoalModal: Function }) {
 
   function addGoal() {
     if (GrowService.views.goals[goalType] && goalType !== 'custom') return;
+    UsageStatisticsService.recordFeatureUsage('GrowTabGoal');
     const image = GrowService.views.goalOptions.find(goal => goal.type === goalType)?.image || '';
     GrowService.actions.addGoal({ title: goalTitle, total: goalTotal, type: goalType, image });
     setGoalTitle('');
@@ -115,7 +119,7 @@ function AddGoalModal(p: { visible: boolean; setShowGoalModal: Function }) {
       onCancel={() => p.setShowGoalModal(false)}
       title={$t('Add Goal')}
     >
-      <Form>
+      <Form form={form}>
         <ListInput
           label={$t('Goal Type')}
           options={goalTypes}
@@ -129,10 +133,21 @@ function AddGoalModal(p: { visible: boolean; setShowGoalModal: Function }) {
             value={goalTitle}
             onChange={setGoalTitle}
             uncontrolled={false}
+            placeholder={'My Goal'}
+            rules={[{ max: 32 }]}
+            required
           />
         )}
         {goalType === 'custom' && (
-          <NumberInput label={$t('Goal Total')} value={goalTotal} min={0} onChange={setGoalTotal} />
+          <NumberInput
+            label={$t('Goal Total')}
+            value={goalTotal}
+            onChange={setGoalTotal}
+            defaultValue={10}
+            uncontrolled={false}
+            rules={[{ min: 1, max: 50 }]}
+            required
+          />
         )}
       </Form>
     </Modal>
