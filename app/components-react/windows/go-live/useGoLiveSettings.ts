@@ -12,10 +12,15 @@ import { getDefined } from '../../../util/properties-type-guards';
 
 type TCustomFieldName = 'title' | 'description';
 
+/**
+ * Extend GoLiveSettingsFeature from StreamInfoView
+ * So all getters from StreamInfoView will be available in GoLiveSettingsFeature
+ */
 export class GoLiveSettingsFeature extends StreamInfoView<IGoLiveSettingsState> {
   // antd form instance
   public form: FormInstance;
 
+  // define initial state
   state: IGoLiveSettingsState = {
     isUpdateMode: false,
     platforms: {},
@@ -26,6 +31,7 @@ export class GoLiveSettingsFeature extends StreamInfoView<IGoLiveSettingsState> 
     needPrepopulate: true,
   };
 
+  // initial setup
   init(params: { isUpdateMode: boolean; form: FormInstance }) {
     this.form = params.form;
     this.state.isUpdateMode = params.isUpdateMode;
@@ -83,10 +89,6 @@ export class GoLiveSettingsFeature extends StreamInfoView<IGoLiveSettingsState> 
 
   get isUpdateMode() {
     return this.state.isUpdateMode;
-  }
-
-  get isScheduleMode() {
-    return this.state.isScheduleMode;
   }
 
   // select eligible layout and renders settings
