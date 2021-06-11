@@ -5,21 +5,9 @@ import { store } from '../store';
 export function createRoot(ChildComponent: (props: any) => JSX.Element) {
   return function ReactRoot(childProps: Object) {
     return (
-      // <React.StrictMode>
       <Provider store={store}>
         <ChildComponent {...childProps} />
       </Provider>
-      // </React.StrictMode>
     );
   };
 }
-
-// export function ReactRoot(props: { ChildComponent: React.Component, childProps: Object) {
-//   return (
-//     <React.StrictMode>
-//       <Provider store={store}>
-//         <ChildComponent {...childProps} />
-//       </Provider>
-//     </React.StrictMode>
-//   );
-// }

@@ -95,10 +95,10 @@ export function useFeature<
     if (stateManager.isRenderingDisabled) return true;
     if (Object.keys(prevComponentState.current).length === 0) return true;
     calculateComputedProps();
-    const doNotRender = isSimilar(
-      prevComponentState.current,
-      dependencyWatcher.getDependentValues(),
-    );
+
+    const prevState = removeFunctions(prevComponentState.current);
+    const newState = removeFunctions(dependencyWatcher.getDependentValues());
+    const doNotRender = isSimilar(prevState, newState);
 
     return doNotRender;
   });
@@ -254,6 +254,18 @@ function isArrayEqual(a: any[], b: any[]) {
     if (a[i] !== b[i]) return false;
   }
   return true;
+}
+
+/**
+ * Returns a new object without function props
+ * @param obj
+ */
+function removeFunctions(obj: Record<string, any>): Record<string, any> {
+  const result = {};
+  Object.keys(obj).forEach(key => {
+    if (typeof obj[key] !== 'function') result[key] = obj[key];
+  });
+  return result;
 }
 
 class BindingCreator<TView> {

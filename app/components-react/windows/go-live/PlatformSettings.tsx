@@ -8,6 +8,8 @@ import { Section } from './Section';
 import { YoutubeEditStreamInfo } from './platforms/YoutubeEditStreamInfo';
 import FacebookEditStreamInfo from './platforms/FacebookEditStreamInfo';
 import { TiktokEditStreamInfo } from './platforms/TiktokEditStreamInfo';
+import { IPlatformComponentParams, TLayoutMode } from './platforms/PlatformSettingsLayout';
+import { getDefined } from '../../../util/properties-type-guards';
 
 export default function PlatformSettings() {
   const {
@@ -17,8 +19,28 @@ export default function PlatformSettings() {
     enabledPlatforms,
     getPlatformDisplayName,
     isLoading,
+    updatePlatform,
+    platforms,
   } = useGoLiveSettings();
+
   const shouldShowSettings = !error && !isLoading;
+
+  let layoutMode: TLayoutMode;
+  if (isMultiplatformMode) {
+    layoutMode = isAdvancedMode ? 'multiplatformAdvanced' : 'multiplatformSimple';
+  } else {
+    layoutMode = 'singlePlatform';
+  }
+
+  function createPlatformBinding<T extends TPlatform>(platform: T): IPlatformComponentParams<T> {
+    return {
+      layoutMode,
+      value: getDefined(platforms[platform]),
+      onChange(newSettings) {
+        updatePlatform(platform, newSettings);
+      },
+    };
+  }
 
   console.log('re-render platforms');
   return (
@@ -40,10 +62,18 @@ export default function PlatformSettings() {
               isSimpleMode={!isAdvancedMode}
               key={platform}
             >
-              {platform === 'twitch' && <TwitchEditStreamInfo />}
-              {platform === 'facebook' && <FacebookEditStreamInfo />}
-              {platform === 'youtube' && <YoutubeEditStreamInfo />}
-              {platform === 'tiktok' && <TiktokEditStreamInfo />}
+              {platform === 'twitch' && (
+                <TwitchEditStreamInfo {...createPlatformBinding('twitch')} />
+              )}
+              {platform === 'facebook' && (
+                <FacebookEditStreamInfo {...createPlatformBinding('facebook')} />
+              )}
+              {platform === 'youtube' && (
+                <YoutubeEditStreamInfo {...createPlatformBinding('youtube')} />
+              )}
+              {platform === 'tiktok' && (
+                <TiktokEditStreamInfo {...createPlatformBinding('tiktok')} />
+              )}
             </Section>
           ))}
         </div>

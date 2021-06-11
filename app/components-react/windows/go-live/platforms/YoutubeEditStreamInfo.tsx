@@ -1,41 +1,35 @@
 import CommonPlatformFields from '../CommonPlatformFields';
-import { CheckboxInput, ImageInput, ListInput } from '../../../shared/inputs';
+import { CheckboxInput, createBinding, ImageInput, ListInput } from '../../../shared/inputs';
 import React, { useEffect } from 'react';
 import { Services } from '../../../service-provider';
 import { $t } from '../../../../services/i18n';
 import BroadcastInput from './BroadcastInput';
-import { useAsyncState, useOnCreate } from '../../../hooks';
+import { useAsyncState } from '../../../hooks';
 import InputWrapper from '../../../shared/inputs/InputWrapper';
 import Form from '../../../shared/inputs/Form';
-import { useGoLiveSettings } from '../useGoLiveSettings';
 import electron from 'electron';
 import { IYoutubeStartStreamOptions } from '../../../../services/platforms/youtube';
+import PlatformSettingsLayout, { IPlatformComponentParams } from './PlatformSettingsLayout';
 
 /***
  * Stream Settings for YT
  */
-export function YoutubeEditStreamInfo() {
-  const { YoutubeService } = Services;
-  const {
-    useSelector,
-    updatePlatform,
-    isUpdateMode,
-    isScheduleMode,
-    renderPlatformSettings,
-    isMidStreamMode,
-    useBinding,
-  } = useGoLiveSettings();
+export function YoutubeEditStreamInfo(p: IPlatformComponentParams<'youtube'>) {
+  const { YoutubeService, StreamingService } = Services;
+  const { isScheduleMode, isUpdateMode } = p;
+  const isMidStreamMode = StreamingService.views.isMidStreamMode;
 
-  const { ytSettings } = useSelector(view => ({
-    ytSettings: view.state.platforms.youtube!,
-  }));
+  function updateSettings(patch: Partial<IYoutubeStartStreamOptions>) {
+    p.onChange({ ...ytSettings, ...patch });
+  }
 
+  const ytSettings = p.value;
   const is360video = ytSettings.projection === '360';
   const shouldShowSafeForKidsWarn = ytSettings.selfDeclaredMadeForKids;
   const broadcastId = ytSettings.broadcastId;
-  const bind = useBinding(
-    view => view.state.platforms.youtube!,
-    newYtSettings => updatePlatform('youtube', newYtSettings),
+  const bind = createBinding(
+    ytSettings,
+    newYtSettings => updateSettings(newYtSettings),
     fieldName => ({ disabled: fieldIsDisabled(fieldName as keyof IYoutubeStartStreamOptions) }),
   );
 
@@ -54,7 +48,7 @@ export function YoutubeEditStreamInfo() {
     YoutubeService.actions.return
       .fetchStartStreamOptionsForBroadcast(broadcastId)
       .then(newYtSettings => {
-        updatePlatform('youtube', newYtSettings);
+        updateSettings(newYtSettings);
       });
   }, [broadcastId]);
 
@@ -75,7 +69,7 @@ export function YoutubeEditStreamInfo() {
   }
 
   function projectionChangeHandler(enable360: boolean) {
-    updatePlatform('youtube', { projection: enable360 ? '360' : 'rectangular' });
+    updateSettings({ projection: enable360 ? '360' : 'rectangular' });
   }
 
   function renderCommonFields() {
@@ -195,12 +189,13 @@ export function YoutubeEditStreamInfo() {
 
   return (
     <Form name="youtube-settings">
-      {renderPlatformSettings(
-        renderCommonFields(),
-        <div key={'empty'} />,
-        renderOptionalFields(),
-        renderBroadcastInput(),
-      )}
+      <PlatformSettingsLayout
+        layoutMode={p.layoutMode}
+        commonFields={renderCommonFields()}
+        requiredFields={<div key={'empty'} />}
+        optionalFields={renderOptionalFields()}
+        essentialOptionalFields={renderBroadcastInput()}
+      />
     </Form>
   );
 }

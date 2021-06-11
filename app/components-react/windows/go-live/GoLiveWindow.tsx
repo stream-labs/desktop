@@ -4,15 +4,13 @@ import { Button } from 'antd';
 import { useOnDestroy } from '../../hooks';
 import { Services } from '../../service-provider';
 import GoLiveSettings from './GoLiveSettings';
-import React, { Profiler } from 'react';
+import React from 'react';
 import { $t } from '../../../services/i18n';
 import GoLiveChecklist from './GoLiveChecklist';
-import Form, { useForm } from '../../shared/inputs/Form';
+import Form from '../../shared/inputs/Form';
 import Animation from 'rc-animate';
 import { SwitchInput } from '../../shared/inputs';
 import { useGoLiveSettings } from './useGoLiveSettings';
-import { store } from '../../store';
-import { Provider } from 'react-redux';
 
 export default function GoLiveWindow() {
   const { StreamingService, WindowsService } = Services;
@@ -87,23 +85,20 @@ export default function GoLiveWindow() {
 
   return (
     <ModalLayout footer={renderFooter()}>
-      <Provider store={store}>
-        <Form
-          form={form}
-          style={{ position: 'relative', height: '100%' }}
-          layout="horizontal"
-          name="editStreamForm"
-        >
-          {/*<ReduxTodo />*/}
-          <Animation transitionName={shouldShowChecklist ? 'slideright' : ''}>
-            {/* STEP 1 - FILL OUT THE SETTINGS FORM */}
-            {shouldShowSettings && <GoLiveSettings key={'settings'} />}
+      <Form
+        form={form}
+        style={{ position: 'relative', height: '100%' }}
+        layout="horizontal"
+        name="editStreamForm"
+      >
+        <Animation transitionName={shouldShowChecklist ? 'slideright' : ''}>
+          {/* STEP 1 - FILL OUT THE SETTINGS FORM */}
+          {shouldShowSettings && <GoLiveSettings key={'settings'} />}
 
-            {/* STEP 2 - RUN THE CHECKLIST */}
-            {shouldShowChecklist && <GoLiveChecklist className={styles.page} key={'checklist'} />}
-          </Animation>
-        </Form>
-      </Provider>
+          {/* STEP 2 - RUN THE CHECKLIST */}
+          {shouldShowChecklist && <GoLiveChecklist className={styles.page} key={'checklist'} />}
+        </Animation>
+      </Form>
     </ModalLayout>
   );
 }

@@ -31,10 +31,10 @@ export default class GoLiveWindow extends TsxComponent<{}> {
     form: ValidatedForm;
   };
 
-  private settings: IGoLiveSettings = cloneDeep(this!.streamingService.view.savedSettings);
+  private settings: IGoLiveSettings = cloneDeep(this!.streamingService.views.savedSettings);
 
   private get view() {
-    return this.streamingService.view;
+    return this.streamingService.views;
   }
 
   private get lifecycle() {
@@ -57,7 +57,7 @@ export default class GoLiveWindow extends TsxComponent<{}> {
   @Watch('view.savedSettings')
   private onGoLiveSettingUpdateHandler() {
     // update local settings after settings for platforms have been prepopulated
-    this.settings.platforms = cloneDeep(this.streamingService.view.savedSettings.platforms);
+    this.settings.platforms = cloneDeep(this.streamingService.views.savedSettings.platforms);
   }
 
   private async switchAdvancedMode(enabled: boolean) {

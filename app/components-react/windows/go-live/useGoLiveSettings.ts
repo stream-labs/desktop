@@ -1,9 +1,4 @@
-import {
-  IGoLiveSettings,
-  IGoLiveSettingsState,
-  StreamInfoView,
-  TModificators,
-} from '../../../services/streaming';
+import { IGoLiveSettings, IGoLiveSettingsState, StreamInfoView } from '../../../services/streaming';
 import { TPlatform } from '../../../services/platforms';
 import { Services } from '../../service-provider';
 import cloneDeep from 'lodash/cloneDeep';
@@ -13,20 +8,13 @@ import { $t } from '../../../services/i18n';
 import { mutation } from '../../store';
 import { useFeature } from '../../hooks/useFeature';
 import { useForm } from '../../shared/inputs/Form';
-import {ICustomStreamDestination} from "../../../services/settings/streaming";
-import {assertIsDefined, getDefined} from "../../../util/properties-type-guards";
+import { getDefined } from '../../../util/properties-type-guards';
 
 type TCustomFieldName = 'title' | 'description';
-// type TModificators = { isUpdateMode?: boolean; isScheduleMode?: boolean };
-// type IGoLiveSettingsState = IGoLiveSettings & TModificators & { needPrepopulate: boolean };
 
 export class GoLiveSettingsFeature extends StreamInfoView<IGoLiveSettingsState> {
   // antd form instance
   public form: FormInstance;
-
-  constructor(initialState: IGoLiveSettingsState) {
-    super(initialState);
-  }
 
   state: IGoLiveSettingsState = {
     isUpdateMode: false,
@@ -130,7 +118,6 @@ export class GoLiveSettingsFeature extends StreamInfoView<IGoLiveSettingsState> 
    */
   @mutation()
   updateSettings(patch: Partial<IGoLiveSettingsState>) {
-    console.log('Update settings', patch);
     const newSettings = { ...this.state, ...patch };
     // we should re-calculate common fields before applying new settings
     const platforms = this.getView(newSettings).applyCommonFields(newSettings.platforms);
@@ -201,15 +188,10 @@ export class GoLiveSettingsFeature extends StreamInfoView<IGoLiveSettingsState> 
    * If platform is enabled then prepopulate its settings
    */
   switchPlatforms(enabledPlatforms: TPlatform[]) {
-    console.log('SWITCH PLATFORMS');
     this.linkedPlatforms.forEach(platform => {
       this.updatePlatform(platform, { enabled: enabledPlatforms.includes(platform) });
     });
-
-    console.log('SAVE SETTINGS');
     this.save(this.settings);
-
-    console.log('PREPOPULATE');
     this.prepopulate();
   }
 
@@ -247,12 +229,11 @@ export class GoLiveSettingsFeature extends StreamInfoView<IGoLiveSettingsState> 
   }
 }
 
-export function useGoLiveSettings() {
+export function useGoLiveSettings(params?: { isUpdateMode: boolean }) {
   const form = useForm();
 
   return useFeature(GoLiveSettingsFeature, {
     form,
-    isUpdateMode: false,
-    isScheduleMode: false,
+    isUpdateMode: params?.isUpdateMode,
   });
 }

@@ -134,7 +134,7 @@ export default class LiveDock extends Vue {
       return 'viewers hidden';
     }
 
-    return this.streamingService.view.viewerCount.toString();
+    return this.streamingService.views.viewerCount.toString();
   }
 
   get offlineImageSrc() {
@@ -269,7 +269,7 @@ export default class LiveDock extends Vue {
 
   get canEditChannelInfo(): boolean {
     return (
-      this.streamingService.state.info.checklist.startVideoTransmission === 'done' ||
+      this.streamingService.views.isMidStreamMode ||
       this.userService.state.auth?.primaryPlatform === 'twitch'
     );
   }

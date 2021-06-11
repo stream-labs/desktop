@@ -279,7 +279,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       this.showLogin();
     } else {
       // don't allow to login via deleted Mixer platform
-      const allPlatforms = this.streamingService.view.allPlatforms;
+      const allPlatforms = this.streamingService.views.allPlatforms;
       if (!allPlatforms.includes(this.state.auth.primaryPlatform)) return;
 
       const service = getPlatformService(this.state.auth.primaryPlatform);

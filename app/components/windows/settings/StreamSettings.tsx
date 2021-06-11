@@ -87,7 +87,7 @@ export default class StreamSettings extends TsxComponent {
   }
 
   get streamingView() {
-    return this.streamingService.view;
+    return this.streamingService.views;
   }
 
   get needToShowWarning() {

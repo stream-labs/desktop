@@ -16,7 +16,7 @@ import { createRoot } from './root/ReactRoot';
 export const components = {
   NameFolder,
   GoLiveWindow: createRoot(GoLiveWindow),
-  EditStreamWindow,
+  EditStreamWindow: createRoot(EditStreamWindow),
   IconLibraryProperties,
   NewsBanner,
   PerformanceMetrics,

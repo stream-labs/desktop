@@ -41,7 +41,7 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
   @SyncWithValue() private settings: IGoLiveSettings;
 
   private get view() {
-    return this.streamingService.view;
+    return this.streamingService.views;
   }
 
   private switchPlatform(platform: TPlatform, enabled: boolean) {

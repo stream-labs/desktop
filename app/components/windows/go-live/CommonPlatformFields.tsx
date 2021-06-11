@@ -33,7 +33,7 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
   @SyncWithValue()
   private settings: IStreamSettings;
   private get view() {
-    return this.streamingService.view;
+    return this.streamingService.views;
   }
   private commonFields: { title: string; description: string } = required();
 
@@ -130,7 +130,7 @@ export default class CommonPlatformFields extends TsxComponent<Props> {
     const hasCustomCheckbox =
       isSinglePlatformMode && this.settings.advancedMode && this.enabledPlatforms.length > 1;
     const fieldsAreVisible = !hasCustomCheckbox || this.platformSettings?.useCustomFields;
-    const view = this.streamingService.view;
+    const view = this.streamingService.views;
     const hasDescription = isSinglePlatformMode
       ? view.supports('description', [this.props.platform as TPlatform])
       : view.supports('description');

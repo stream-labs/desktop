@@ -135,7 +135,7 @@ export class StreamError extends Error implements IRejectedRequest {
 }
 
 function getPlatform(url: string): TPlatform | undefined {
-  const platforms = Services.StreamingService.view.linkedPlatforms;
+  const platforms = Services.StreamingService.views.linkedPlatforms;
   return platforms.find(platform => url.startsWith(getPlatformService(platform).apiBase));
 }
 

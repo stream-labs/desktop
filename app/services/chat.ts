@@ -22,7 +22,7 @@ export class ChatService extends Service {
   private electronWindowId: number | null;
 
   init() {
-    this.chatUrl = this.streamingService.view.chatUrl;
+    this.chatUrl = this.streamingService.views.chatUrl;
 
     // listen `streamInfoChanged` to init or deinit the chat
     this.streamingService.streamInfoChanged.subscribe(streamInfo => {

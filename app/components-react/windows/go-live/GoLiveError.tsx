@@ -119,7 +119,7 @@ export default function GoLiveError() {
 
     function tryAgain() {
       const actions = StreamingService.actions;
-      const settings = StreamingService.view.info.settings;
+      const settings = StreamingService.views.info.settings;
       assertIsDefined(settings);
       if (WindowsService.state.child.componentName === 'EditStreamWindow') {
         actions.updateStreamSettings(settings);

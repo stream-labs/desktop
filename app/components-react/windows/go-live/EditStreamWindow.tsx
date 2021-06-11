@@ -14,12 +14,9 @@ import PlatformSettings from './PlatformSettings';
 import Scrollable from '../../shared/Scrollable';
 import Spinner from '../../shared/Spinner';
 import GoLiveError from './GoLiveError';
-import { Provider } from 'react-redux';
-import { store } from '../../store';
 
 export default function EditStreamWindow() {
   const { StreamingService, WindowsService } = Services;
-  const form = useForm();
   const {
     error,
     lifecycle,
@@ -29,7 +26,8 @@ export default function EditStreamWindow() {
     switchAdvancedMode,
     prepopulate,
     isLoading,
-  } = useGoLiveSettings();
+    form,
+  } = useGoLiveSettings({ isUpdateMode: true });
 
   const shouldShowChecklist = lifecycle === 'runChecklist';
   const shouldShowSettings = !shouldShowChecklist;
@@ -85,29 +83,27 @@ export default function EditStreamWindow() {
   }
 
   return (
-    <Provider store={store}>
-      <ModalLayout footer={renderFooter()}>
-        <Form
-          form={form}
-          style={{ position: 'relative', height: '100%' }}
-          layout="horizontal"
-          name="editStreamForm"
-        >
-          <Spinner visible={isLoading} />
-          <Animation transitionName="fade">
-            {/* STEP 1 - FILL OUT THE SETTINGS FORM */}
-            {shouldShowSettings && (
-              <Scrollable key={'settings'} style={{ maxHeight: '100%' }} snapToWindowEdge>
-                <GoLiveError />
-                <PlatformSettings />
-              </Scrollable>
-            )}
+    <ModalLayout footer={renderFooter()}>
+      <Form
+        form={form}
+        style={{ position: 'relative', height: '100%' }}
+        layout="horizontal"
+        name="editStreamForm"
+      >
+        <Spinner visible={isLoading} />
+        <Animation transitionName="fade">
+          {/* STEP 1 - FILL OUT THE SETTINGS FORM */}
+          {shouldShowSettings && (
+            <Scrollable key={'settings'} style={{ maxHeight: '100%' }} snapToWindowEdge>
+              <GoLiveError />
+              <PlatformSettings />
+            </Scrollable>
+          )}
 
-            {/* STEP 2 - RUN THE CHECKLIST */}
-            {shouldShowChecklist && <GoLiveChecklist className={styles.page} key={'checklist'} />}
-          </Animation>
-        </Form>
-      </ModalLayout>
-    </Provider>
+          {/* STEP 2 - RUN THE CHECKLIST */}
+          {shouldShowChecklist && <GoLiveChecklist className={styles.page} key={'checklist'} />}
+        </Animation>
+      </Form>
+    </ModalLayout>
   );
 }

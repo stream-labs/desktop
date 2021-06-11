@@ -50,7 +50,7 @@ export class TiktokService
 
   async beforeGoLive(goLiveSettings: IGoLiveSettings) {
     const ttSettings = goLiveSettings.platforms.tiktok;
-    if (!this.streamingService.view.isMultiplatformMode) {
+    if (!this.streamingService.views.isMultiplatformMode) {
       this.streamSettingsService.setSettings({
         streamType: 'rtmp_custom',
         key: ttSettings.streamKey,

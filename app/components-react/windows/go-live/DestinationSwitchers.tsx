@@ -25,10 +25,7 @@ export function DestinationSwitchers() {
     checkPrimaryPlatform,
   } = useGoLiveSettings();
   const enabledPlatformsRef = useRef(enabledPlatforms);
-
-  useEffect(() => {
-    enabledPlatformsRef.current = enabledPlatforms;
-  }, [enabledPlatforms]);
+  enabledPlatformsRef.current = enabledPlatforms;
 
   const emitSwitch = useDebounce(500, () => {
     switchPlatforms(enabledPlatformsRef.current);

@@ -13,7 +13,7 @@ export default class OverlayWindow extends Vue {
   @Inject() private streamingService: StreamingService;
 
   get viewerCount() {
-    return this.streamingService.view.viewerCount.toString();
+    return this.streamingService.views.viewerCount.toString();
   }
 
   get isPreviewEnabled() {

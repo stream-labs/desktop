@@ -33,7 +33,7 @@ export default class EditStreamWindow extends TsxComponent<{}> {
   };
 
   private settings: IGoLiveSettings = (() => {
-    const settings = cloneDeep(this.streamingService.view.savedSettings);
+    const settings = cloneDeep(this.streamingService.views.savedSettings);
     // if stream has not been started than we allow to change settings only for a primary platform
     // so delete other platforms from the settings object
     if (this.streamingService.state.info.checklist.startVideoTransmission !== 'done') {
@@ -52,7 +52,7 @@ export default class EditStreamWindow extends TsxComponent<{}> {
   }
 
   private get view() {
-    return this.streamingService.view;
+    return this.streamingService.views;
   }
 
   private async submit() {

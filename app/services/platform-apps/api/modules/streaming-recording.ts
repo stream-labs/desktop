@@ -52,7 +52,7 @@ export class StreamingRecordingModule extends Module {
   }
 
   private serializeStreamInfo(): IStreamInfo {
-    const info = this.streamingService.view;
+    const info = this.streamingService.views;
     const commonFields = info.commonFields;
     return {
       title: commonFields.title,

@@ -54,7 +54,7 @@ export class RestreamService extends StatefulService<IRestreamState> {
   };
 
   get streamInfo() {
-    return this.streamingService.view;
+    return this.streamingService.views;
   }
 
   @mutation()
