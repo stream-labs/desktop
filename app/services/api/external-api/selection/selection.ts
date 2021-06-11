@@ -17,7 +17,7 @@ export class SelectionService extends Selection {
     return this.selection.sceneId;
   }
 
-  protected get selection(): Selection {
+  protected get selection() {
     return this.internalSelectionService.views.globalSelection;
   }
 }
