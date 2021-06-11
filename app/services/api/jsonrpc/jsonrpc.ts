@@ -107,6 +107,6 @@ export class JsonrpcService extends Service implements IJsonrpcServiceApi {
     data: any;
     isRejected?: boolean;
   }): IJsonRpcResponse<IJsonRpcEvent> {
-    return JsonrpcService.createResponse.apply(this, options);
+    return JsonrpcService.createEvent.apply(this, options);
   }
 }
