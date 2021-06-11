@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { shallowEqual, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { StatefulService } from '../../services';
 import { createBinding, TBindings } from '../shared/inputs';
 import { assertIsDefined } from '../../util/properties-type-guards';
@@ -10,21 +10,19 @@ import isPlainObject from 'lodash/isPlainObject';
 export function useFeature<
   TInitParams,
   TControllerClass extends new (...args: any[]) => IStateController<TInitParams>,
-  // TState extends Object = InstanceType<TControllerClass>['state'],
   TBindingState,
   TBindingExtraProps,
   TReturnType extends InstanceType<TControllerClass> & {
     useSelector<TComputed extends Object>(
       fn: (context: InstanceType<TControllerClass>) => TComputed,
     ): TComputed;
-    useBinding: BindingCreator<InstanceType<TControllerClass>>['createBinding']; // TUseBinding<InstanceType<TControllerClass>, TBindingState, TBindingExtraProps>;
+    useBinding: BindingCreator<InstanceType<TControllerClass>>['createBinding'];
   }
 >(ControllerClass: TControllerClass, initParams?: TInitParams): TReturnType {
   const isRootRef = useRef(false);
   const prevComponentState = useRef<Partial<any>>({});
   const computedPropsFnRef = useRef<null | Function>(null);
   const computedPropsRef = useRef<any>({});
-  const compId = useComponentId();
 
   const { stateManager, dependencyWatcher, dataSelector, calculateComputedProps } = useOnCreate(
     () => {
@@ -107,7 +105,6 @@ export function useFeature<
     if (!isRootRef.current) return;
 
     const unsubscribe = StatefulService.store.subscribe(mutation => {
-      console.log('Vuex mutation', mutation.type);
       stateManager.incVuexRevision();
     });
 

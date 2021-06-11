@@ -1,19 +1,12 @@
 import { combineReducers, createAction, createReducer, createStore, Store } from '@reduxjs/toolkit';
 import { batch } from 'react-redux';
 
-export interface IStateController<TInitParams> {
-  state: any;
-  init?: (initParams: TInitParams) => unknown;
-}
 
-type TStore = Store & {
-  reducerManager: {
-    add: (key: string, reducer: any) => unknown;
-    remove: (key: string) => unknown;
-  };
-};
-
-export function createReducerManager() {
+/**
+ * Creates reducer manager that allows using dynamic reducers
+ * Code example from https://redux.js.org/recipes/code-splitting#using-a-reducer-manager
+ */
+function createReducerManager() {
   // Create an object which maps keys to reducers
   const reducers = {
     global: createReducer({}, {}),
@@ -39,10 +32,6 @@ export function createReducerManager() {
           delete state[key];
         }
         keysToRemove = [];
-      }
-
-      if (action.type === 'initState') {
-        state[action.payload.name] = action.payload.initialState;
       }
 
       // Delegate to the combined reducer
@@ -93,14 +82,19 @@ function configureStore() {
 
 export const store = configureStore();
 
-export class StateManager<TInitParams, TController extends IStateController<TInitParams>> {
+
+/**
+ * StateManager allows to access parts of store via StateController
+ * StateController are objects that contain initialState, actions, mutations and getters
+ */
+export class StateManager<TInitParams, TStateController extends IStateController<TInitParams>> {
   static instances: Record<string, StateManager<any, any>> = {};
   private name: string;
-  public controller: TController;
+  public controller: TStateController;
   public actionsAndGetters: Record<string, Function> = {};
   public mutationState: unknown;
 
-  constructor(controller: TController, initParams?: TInitParams) {
+  constructor(controller: TStateController, initParams?: TInitParams) {
     const name = (this.name = controller.constructor.name);
     controller.init && controller.init(initParams as TInitParams);
     const controllerProto = Object.getPrototypeOf(controller);
@@ -169,19 +163,11 @@ export class StateManager<TInitParams, TController extends IStateController<TIni
       console.log('constructor error', e);
     }
 
-    this.controller = controller as TController;
+    this.controller = controller as TStateController;
   }
 
   incVuexRevision() {
     this.controller['incVuexRevision']();
-  }
-
-  forbidRendering() {
-    store.dispatch({ type: `${this.name}/forbidRendering` });
-  }
-
-  allowRendering() {
-    store.dispatch({ type: `${this.name}/allowRendering` });
   }
 
   get isRenderingDisabled() {
@@ -216,12 +202,18 @@ export class StateManager<TInitParams, TController extends IStateController<TIni
   }
 }
 
+/**
+ * A decorator that register the object method as an mutation
+ */
 export function mutation() {
   return function (target: any, methodName: string, descriptor: PropertyDescriptor) {
     return registerMutation(target, methodName, descriptor.value);
   };
 }
 
+/**
+ * Register function as an mutation
+ */
 function registerMutation(target: any, mutationName: string, fn: Function) {
   const className = target.constructor.name;
 
@@ -258,3 +250,15 @@ function registerMutation(target: any, mutationName: string, fn: Function) {
 
   return Object.getOwnPropertyDescriptor(target, mutationName);
 }
+
+export interface IStateController<TInitParams> {
+  state: any;
+  init?: (initParams: TInitParams) => unknown;
+}
+
+type TStore = Store & {
+  reducerManager: {
+    add: (key: string, reducer: any) => unknown;
+    remove: (key: string) => unknown;
+  };
+};
