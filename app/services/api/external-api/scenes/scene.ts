@@ -147,7 +147,7 @@ export class Scene implements ISceneModel {
   }
 
   removeFolder(folderId: string): void {
-    return this.removeFolder(folderId);
+    return this.scene.removeFolder(folderId);
   }
 
   removeItem(sceneItemId: string): void {
