@@ -5,11 +5,14 @@ const pjson = require('./package.json');
 if (pjson.env === 'production') {
   process.env.NODE_ENV = 'production';
 }
-if (pjson.name === 'n-air-app-unstable') {
+if (pjson.name === 'n-air-app-unstable' || pjson.name === 'n-air-app-upstream') {
   process.env.NAIR_UNSTABLE = true;
 }
 if (process.env.NODE_ENV !== 'production' && process.env.NAIR_UNSTABLE) {
-  pjson.name = 'n-air-app-unstable';
+  if (pjson.name !== 'n-air-app-upstream') {
+    // DEBUG
+    pjson.name = 'n-air-app-unstable';
+  }
 }
 if (pjson.name === 'n-air-app-preview') {
   process.env.NAIR_PREVIEW = true;
@@ -23,6 +26,7 @@ process.env.NAIR_PRODUCT_NAME = pjson.buildProductName;
 if (!process.env.NAIR_LICENSE_API_KEY && pjson.getlicensenair_key) {
   process.env.NAIR_LICENSE_API_KEY = pjson.getlicensenair_key;
 }
+console.log(`pjson.name = ${pjson.name}`); // DEBUG
 
 ////////////////////////////////////////////////////////////////////////////////
 // Modules and other Requires
