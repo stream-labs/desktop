@@ -33,7 +33,7 @@ export default function Grow() {
   function fetchApiData() {
     GrowService.actions.fetchGoals();
     GrowService.actions.fetchAnalytics();
-    GrowService.actions.fetchUniversityProgress();
+    // GrowService.actions.fetchUniversityProgress();
     GrowService.actions.fetchPlatformFollowers();
   }
 
@@ -75,12 +75,16 @@ function MyGoals(p: { goals: Dictionary<IGoal> }) {
           <GoalCard goal={goal} key={goal.type} showGoalModal={() => setShowGoalModal(true)} />
         ))}
       </div>
-      <AddGoalModal visible={showGoalModal} setShowGoalModal={setShowGoalModal} />
+      <AddGoalModal visible={showGoalModal} setShowGoalModal={setShowGoalModal} goals={p.goals} />
     </div>
   );
 }
 
-function AddGoalModal(p: { visible: boolean; setShowGoalModal: Function }) {
+function AddGoalModal(p: {
+  visible: boolean;
+  setShowGoalModal: Function;
+  goals: Dictionary<IGoal>;
+}) {
   const { GrowService, UsageStatisticsService } = Services;
   const [goalTotal, setGoalTotal] = useState(10);
   const [goalTitle, setGoalTitle] = useState('');
@@ -106,6 +110,14 @@ function AddGoalModal(p: { visible: boolean; setShowGoalModal: Function }) {
     p.setShowGoalModal(false);
   }
 
+  function uniqueGoalValidator(rule: unknown, value: string, callback: Function) {
+    if (value !== 'custom' && p.goals[value]) {
+      callback($t('There is already a goal of this type'));
+    } else {
+      callback();
+    }
+  }
+
   const goalTypes = GrowService.views.goalOptions.map(option => ({
     value: option.type,
     label: option.title,
@@ -126,6 +138,7 @@ function AddGoalModal(p: { visible: boolean; setShowGoalModal: Function }) {
           value={goalType}
           defaultValue="custom"
           onChange={setGoalType}
+          rules={[{ validator: uniqueGoalValidator }]}
         />
         {goalType === 'custom' && (
           <TextInput
