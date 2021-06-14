@@ -127,6 +127,9 @@ export class SceneCollectionsService extends Service
       await this.installPresetSceneCollection();
     }
 
+    // 読み込んだソース情報を環境に合わせて更新する
+    this.sourcesService.fixSourceSettings();
+
     this.initialized = true;
   }
 

@@ -266,6 +266,13 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     return resolvedSettings;
   }
 
+  fixSourceSettings() {
+    // fix webcam sources's video_device_id
+    this.getSourcesByType('dshow_input').forEach(webcam => {
+      webcam.getPropertiesFormData();
+    });
+  }
+
   private getObsSourceCreateSettings(type: TSourceType, settings: Dictionary<any>) {
     const resolvedSettings = this.getObsSourceSettings(type, settings);
 
@@ -400,6 +407,13 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   getSourcesByName(name: string): Source[] {
     const sourceModels = Object.values(this.state.sources).filter(source => {
       return source.name === name;
+    });
+    return sourceModels.map(sourceModel => this.getSource(sourceModel.sourceId));
+  }
+
+  getSourcesByType(type: TSourceType): Source[] {
+    const sourceModels = Object.values(this.state.sources).filter(source => {
+      return source.type === type;
     });
     return sourceModels.map(sourceModel => this.getSource(sourceModel.sourceId));
   }
