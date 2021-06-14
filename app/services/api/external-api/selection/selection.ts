@@ -4,8 +4,8 @@ import { Selection } from 'services/api/external-api/scenes/selection';
 import { Inject } from 'services';
 
 /**
- * Allows select/deselect items and call bulk actions on Scene Items.
- * Works only with the currently active scene.
+ * API for selection management. Allows selecting/deselecting items and bulk
+ * action calls on scene nodes. Works only with the currently active scene.
  */
 @Singleton()
 export class SelectionService extends Selection {
@@ -13,7 +13,7 @@ export class SelectionService extends Selection {
   @Inject('SelectionService')
   private internalSelectionService: InternalSelectionService;
 
-  get sceneId() {
+  get sceneId(): string {
     return this.selection.sceneId;
   }
 
