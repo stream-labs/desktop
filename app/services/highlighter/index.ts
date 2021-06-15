@@ -30,6 +30,7 @@ export interface IClip {
   startTrim: number;
   endTrim: number;
   duration?: number;
+  deleted: boolean;
 }
 
 export enum EExportStep {
@@ -230,14 +231,14 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         // Aero 15 test clips
         // path.join(CLIP_DIR, '2021-05-12 12-59-28.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-20.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-29.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-29.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-41.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-49.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-58.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-03.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-06.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-30-53.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-32-34.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-32-34.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-33.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-48.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-03.mp4'),
@@ -245,19 +246,33 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-51.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-18.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-30.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-44.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-44.mp4'),
         // Razer blade test clips
-        path.join(CLIP_DIR, '2021-05-25 08-55-13.mp4'),
-        path.join(CLIP_DIR, '2021-06-08 16-40-14.mp4'),
-        path.join(CLIP_DIR, '2021-05-25 08-56-03.mp4'),
+        // path.join(CLIP_DIR, '2021-05-25 08-55-13.mp4'),
+        // path.join(CLIP_DIR, '2021-06-08 16-40-14.mp4'),
+        // path.join(CLIP_DIR, '2021-05-25 08-56-03.mp4'),
       ];
 
       clipsToLoad.forEach(c => {
-        this.ADD_CLIP({ path: c, loaded: false, enabled: true, startTrim: 0, endTrim: 0 });
+        this.ADD_CLIP({
+          path: c,
+          loaded: false,
+          enabled: true,
+          startTrim: 0,
+          endTrim: 0,
+          deleted: false,
+        });
       });
     } else {
       this.streamingService.replayBufferFileWrite.subscribe(clipPath => {
-        this.ADD_CLIP({ path: clipPath, loaded: false, enabled: true, startTrim: 0, endTrim: 0 });
+        this.ADD_CLIP({
+          path: clipPath,
+          loaded: false,
+          enabled: true,
+          startTrim: 0,
+          endTrim: 0,
+          deleted: false,
+        });
       });
     }
   }
@@ -309,8 +324,9 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         this.UPDATE_CLIP({
           path: completed.path,
           loaded: true,
-          scrubSprite: this.clips[completed.path].frameSource.scrubJpg,
+          scrubSprite: this.clips[completed.path].frameSource?.scrubJpg,
           duration: this.clips[completed.path].duration,
+          deleted: this.clips[completed.path].deleted,
         });
       },
     });
@@ -344,7 +360,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       return;
     }
 
-    const clips = this.views.clips
+    let clips = this.views.clips
       .filter(c => c.enabled)
       .map(c => {
         const clip = this.clips[c.path];
@@ -356,13 +372,23 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         return clip;
       });
 
+    // Reset all clips
+    await pmap(clips, c => c.reset(preview), {
+      onProgress: c => {
+        if (c.deleted) {
+          this.UPDATE_CLIP({ path: c.sourcePath, deleted: true });
+        }
+      },
+    });
+
+    // TODO: For now, just remove deleted clips from the video
+    // In the future, abort export and surface error to the user.
+    clips = clips.filter(c => !c.deleted);
+
     if (!clips.length) {
       console.error('Highlighter: Export called without any clips!');
       return;
     }
-
-    // Reset all clips
-    clips.forEach(c => c.reset(preview));
 
     // Estimate the total number of frames to set up export info
     const totalFrames = clips.reduce((count: number, clip) => {
