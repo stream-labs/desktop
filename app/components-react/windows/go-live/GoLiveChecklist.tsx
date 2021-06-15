@@ -10,6 +10,7 @@ import MessageLayout from './MessageLayout';
 import { Timeline } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import Utils from '../../../services/utils';
+import {useSelector} from "../../store";
 
 /**
  * Shows transition to live progress and helps troubleshoot related problems
@@ -17,7 +18,6 @@ import Utils from '../../../services/utils';
 export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
   const { VideoEncodingOptimizationService, TwitterService, WindowsService } = Services;
   const {
-    useSelector,
     error,
     enabledPlatforms,
     lifecycle,
@@ -26,12 +26,13 @@ export default function GoLiveChecklist(p: HTMLAttributes<unknown>) {
     warning,
     getPlatformDisplayName,
     isUpdateMode,
+    controller,
   } = useGoLiveSettings();
 
-  const { shouldShowOptimizedProfile, shouldPostTweet } = useSelector(view => ({
+  const { shouldShowOptimizedProfile, shouldPostTweet } = useSelector(() => ({
     shouldShowOptimizedProfile:
-      VideoEncodingOptimizationService.state.useOptimizedProfile && !view.isUpdateMode,
-    shouldPostTweet: !view.isUpdateMode && TwitterService.state.tweetWhenGoingLive,
+      VideoEncodingOptimizationService.state.useOptimizedProfile && !controller.isUpdateMode,
+    shouldPostTweet: !controller.isUpdateMode && TwitterService.state.tweetWhenGoingLive,
   }));
 
   const success = lifecycle === 'live';

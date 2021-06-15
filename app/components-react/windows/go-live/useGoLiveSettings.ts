@@ -91,30 +91,6 @@ export class GoLiveSettingsFeature extends StreamInfoView<IGoLiveSettingsState> 
     return this.state.isUpdateMode;
   }
 
-  // select eligible layout and renders settings
-  renderPlatformSettings(
-    commonFields: JSX.Element,
-    requiredFields: JSX.Element,
-    optionalFields?: JSX.Element,
-    essentialOptionalFields?: JSX.Element,
-  ) {
-    let settingsMode: 'singlePlatform' | 'multiplatformAdvanced' | 'multiplatformSimple';
-    if (this.isMultiplatformMode) {
-      settingsMode = this.isAdvancedMode ? 'multiplatformAdvanced' : 'multiplatformSimple';
-    } else {
-      settingsMode = 'singlePlatform';
-    }
-
-    switch (settingsMode) {
-      case 'singlePlatform':
-        return [essentialOptionalFields, commonFields, requiredFields, optionalFields];
-      case 'multiplatformSimple':
-        return requiredFields;
-      case 'multiplatformAdvanced':
-        return [essentialOptionalFields, requiredFields, optionalFields, commonFields];
-    }
-  }
-
   /**
    * Update top level settings
    */

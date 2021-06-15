@@ -13,6 +13,7 @@ import TwitterInput from './Twitter';
 import OptimizedProfileSwitcher from './OptimizedProfileSwitcher';
 import Spinner from '../../shared/Spinner';
 import GoLiveError from './GoLiveError';
+import {useSelector} from "../../store";
 
 const PlusIcon = PlusOutlined as Function;
 
@@ -23,15 +24,20 @@ const PlusIcon = PlusOutlined as Function;
  * - Extras settings
  **/
 export default function GoLiveSettings() {
-
   console.log('re-render settings');
   const { RestreamService, SettingsService, UserService } = Services;
 
-  const { useSelector, isAdvancedMode, protectedModeEnabled, error, isLoading } = useGoLiveSettings();
+  const {
+    isAdvancedMode,
+    protectedModeEnabled,
+    error,
+    isLoading,
+    controller,
+  } = useGoLiveSettings();
 
-  const { canAddDestinations } = useSelector(view => {
-    const linkedPlatforms = view.linkedPlatforms;
-    const customDestinations = view.customDestinations;
+  const { canAddDestinations } = useSelector(() => {
+    const linkedPlatforms = controller.linkedPlatforms;
+    const customDestinations = controller.customDestinations;
     return {
       canAddDestinations: linkedPlatforms.length + customDestinations.length < 5,
     };
@@ -50,7 +56,6 @@ export default function GoLiveSettings() {
       UserService.openPrimeUrl('slobs-multistream');
     }
   }
-
 
   return (
     <Row gutter={16} style={{ height: 'calc(100% + 24px)' }}>

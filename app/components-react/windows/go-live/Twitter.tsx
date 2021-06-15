@@ -8,14 +8,15 @@ import { SwitchInput, TextAreaInput } from '../../shared/inputs';
 import pick from 'lodash/pick';
 import { Row, Col, Button } from 'antd';
 import { useGoLiveSettings } from './useGoLiveSettings';
+import { useSelector } from '../../store';
 
 export default function TwitterInput() {
   const { TwitterService } = Services;
-  const { useSelector, tweetText, updateSettings, getTweetText, getSettings } = useGoLiveSettings();
+  const { tweetText, updateSettings, getTweetText, getSettings, controller } = useGoLiveSettings();
 
-  const { tweetWhenGoingLive, linked, screenName, streamTitle } = useSelector(view => ({
+  const { tweetWhenGoingLive, linked, screenName, streamTitle } = useSelector(_ => ({
     ...pick(TwitterService.state, 'tweetWhenGoingLive', 'linked', 'screenName'),
-    streamTitle: view.commonFields.title,
+    streamTitle: controller.commonFields.title,
   }));
 
   useEffect(() => {
