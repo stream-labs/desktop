@@ -70,9 +70,9 @@ export default function ClipPreview(props: { clip: IClip; onClick: () => void })
           value={props.clip.deleted ? false : props.clip.enabled}
           onChange={setEnabled}
           checkboxStyles={{
-            width: '16px',
-            height: '16px',
-            fontSize: '10px',
+            width: '24px',
+            height: '24px',
+            fontSize: '14px',
             background: 'white',
             borderColor: '#333',
           }}
