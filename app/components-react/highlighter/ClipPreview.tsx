@@ -11,6 +11,8 @@ export default function ClipPreview(props: { clip: IClip; onClick: () => void })
   const filename = useMemo(() => {
     return path.basename(props.clip.path);
   }, [props.clip.path]);
+  // Deleted clips always show as disabled
+  const enabled = props.clip.deleted ? false : props.clip.enabled;
 
   function mouseMove(e: React.MouseEvent) {
     const frameIdx = Math.floor((e.nativeEvent.offsetX / SCRUB_WIDTH) * SCRUB_FRAMES);
@@ -67,7 +69,9 @@ export default function ClipPreview(props: { clip: IClip; onClick: () => void })
       )}
       <span style={{ position: 'absolute', top: '10px', left: '10px' }}>
         <BoolButtonInput
-          value={props.clip.deleted ? false : props.clip.enabled}
+          tooltip={enabled ? 'Disable Clip' : 'Enable Clip'}
+          tooltipPlacement="right"
+          value={enabled}
           onChange={setEnabled}
           checkboxStyles={{
             width: '24px',
