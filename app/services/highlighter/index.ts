@@ -277,6 +277,22 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     }
   }
 
+  addClips(paths: string[]) {
+    paths.forEach(path => {
+      // Don't allow adding the same clip twice
+      if (this.state.clips[path]) return;
+
+      this.ADD_CLIP({
+        path,
+        loaded: false,
+        enabled: true,
+        startTrim: 0,
+        endTrim: 0,
+        deleted: false,
+      });
+    });
+  }
+
   enableClip(path: string, enabled: boolean) {
     this.UPDATE_CLIP({
       path,
