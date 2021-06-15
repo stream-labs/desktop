@@ -20,13 +20,7 @@ export const TextInput = InputComponent((p: TTextInputProps) => {
   const { inputAttrs, wrapperAttrs } = useTextInput(p);
   return (
     <InputWrapper {...wrapperAttrs}>
-      <Input
-        {...inputAttrs}
-        onFocus={p.onFocus}
-        onBlur={p.onBlur}
-        onKeyDown={p.onKeyDown}
-        ref={p.inputRef}
-      />
+      <Input {...inputAttrs} onFocus={p.onFocus} onKeyDown={p.onKeyDown} ref={p.inputRef} />
     </InputWrapper>
   );
 });
