@@ -125,6 +125,19 @@ export const conditions = () => ({
     { value: 'LOYALTY_STORE_REDEMPTION_ITEM_TYPE', title: $t('Item type is <type>') },
     { value: 'LOYALTY_STORE_REDEMPTION_ITEM_NAME', title: $t('Item name is <name>') },
   ],
+  support: [
+    { value: 'SUPPORT_GIFT_REDEEMED', title: $t('Viewer redeemed a gifted Support')},
+    { value: 'MIN_MONTHS_SUPPORTED', title: $t('Months supported is at least <months>')},
+    { value: 'EXACT_MONTHS_SUPPORTED', title: $t('Months supported is exactly <months>')},
+  ],
+  giftSupport: [
+    { value: 'MIN_SUPPORT_GIFTS', title: $t('Gifted at least <amount> Supports')},
+    { value: 'EXACT_SUPPORT_GIFTS', title: $t('Gifted exactly <amount> Supports')},
+  ],
+  stars: [
+    { value: 'MIN_STARS_USED', title: $t('Stars used is at least <amount>')},
+    { value: 'EXACT_STARS_USED', title: $t('Stars used is exactly <amount>')},
+  ],
 });
 
 export const conditionData = () => ({
@@ -134,6 +147,7 @@ export const conditionData = () => ({
   SUBTEMBER: metadata.frequency({ title: $t('Variation Frequency') }),
   ANON_SUBSCRIPTION_GIFT: metadata.frequency({ title: $t('Variation Frequency') }),
   SUB_EXTENDED: metadata.frequency({ title: $t('Variation Frequency') }),
+  SUPPORT_GIFT_REDEEMED: metadata.frequency({ title: $t('Variation Frequency') }),
   LARGEST_OF_STREAM: {},
   MERCH_PRODUCT: {},
   MERCH_PREORDER: {},
