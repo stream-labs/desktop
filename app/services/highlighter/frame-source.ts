@@ -14,6 +14,7 @@ import {
   SCRUB_WIDTH,
   WIDTH,
 } from './constants';
+import { FrameReadError } from './errors';
 
 export class FrameSource {
   writeBuffer = Buffer.allocUnsafe(this.preview ? PREVIEW_FRAME_BYTE_SIZE : FRAME_BYTE_SIZE);
@@ -30,6 +31,7 @@ export class FrameSource {
   private onFrameComplete: ((frameRead: boolean) => void) | null;
 
   private finished = false;
+  private error = false;
 
   currentFrame = 0;
 
@@ -89,23 +91,26 @@ export class FrameSource {
       stderr: process.stderr,
     });
 
-    this.ffmpeg.stdout?.once('end', () => {
-      console.log('STREAM HAS ENDED');
-      console.log(`FRAME COUNT: Expected: ${this.nFrames} Actual: ${this.currentFrame}`);
+    this.ffmpeg.on('exit', code => {
+      console.debug(
+        `Highlighter Frame Count: Expected: ${this.nFrames} Actual: ${this.currentFrame}`,
+      );
       this.finished = true;
+      if (code) this.error = true;
 
       // If a frame request is in progress, immediately resolve it
       if (this.onFrameComplete) this.onFrameComplete(false);
     });
 
     this.ffmpeg.stdout?.on('data', (chunk: Buffer) => {
-      // console.log('GOT CHUNK LENGTH', chunk.length);
-
       this.handleChunk(chunk);
     });
 
-    this.ffmpeg.stdout?.on('error', e => {
-      console.log('error', e);
+    this.ffmpeg.catch(e => {
+      // SIGTERM means we canceled, don't log an error
+      if (e.signal === 'SIGTERM') return;
+
+      console.error('ffmpeg:', e);
     });
   }
 
@@ -123,13 +128,19 @@ export class FrameSource {
         return;
       }
 
+      if (this.error) {
+        throw new FrameReadError(this.sourcePath);
+      }
+
       // The stream was closed, so resolve that a frame could not be read.
       if (this.finished) {
         resolve(false);
         return;
       }
 
-      this.onFrameComplete = resolve;
+      this.onFrameComplete = frameRead => {
+        this.error ? reject(new FrameReadError(this.sourcePath)) : resolve(frameRead);
+      };
 
       this.ffmpeg.stdout?.resume();
     });

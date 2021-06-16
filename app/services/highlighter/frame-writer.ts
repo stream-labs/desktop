@@ -1,5 +1,6 @@
 import execa from 'execa';
 import { FFMPEG_EXE, FPS, HEIGHT, PREVIEW_HEIGHT, PREVIEW_WIDTH, WIDTH } from './constants';
+import { FrameWriteError } from './errors';
 
 export class FrameWriter {
   constructor(
@@ -65,7 +66,7 @@ export class FrameWriter {
     });
 
     this.ffmpeg.catch(e => {
-      console.log('CAUGHT ERROR', e);
+      console.error('ffmpeg:', e);
     });
 
     this.ffmpeg.stderr?.on('data', (data: Buffer) => {
@@ -76,16 +77,19 @@ export class FrameWriter {
   async writeNextFrame(frameBuffer: Buffer) {
     if (!this.ffmpeg) this.startFfmpeg();
 
-    await new Promise<void>((resolve, reject) => {
-      this.ffmpeg.stdin?.write(frameBuffer, e => {
-        if (e) {
-          console.log(e);
-          reject();
-          return;
-        }
-        resolve();
+    try {
+      await new Promise<void>((resolve, reject) => {
+        this.ffmpeg.stdin?.write(frameBuffer, e => {
+          if (e) {
+            reject();
+            return;
+          }
+          resolve();
+        });
       });
-    });
+    } catch (e: unknown) {
+      throw new FrameWriteError();
+    }
   }
 
   end() {

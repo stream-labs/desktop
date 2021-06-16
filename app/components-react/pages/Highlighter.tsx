@@ -14,6 +14,9 @@ import { Modal, Button } from 'antd';
 import ExportModal from 'components-react/highlighter/ExportModal';
 import PreviewModal from 'components-react/highlighter/PreviewModal';
 import BlankSlate from 'components-react/highlighter/BlankSlate';
+import { SCRUB_HEIGHT, SCRUB_WIDTH } from 'services/highlighter/constants';
+import electron from 'electron';
+import path from 'path';
 
 type TModal = 'trim' | 'export' | 'preview';
 
@@ -106,7 +109,7 @@ export default function Highlighter() {
     // ReactDraggable fires setList on mount. To avoid sync IPC,
     // we only fire off a request if the order changed.
     const oldOrder = v.clips.map(c => c.path);
-    const newOrder = clips.map(c => c.id);
+    const newOrder = clips.filter(c => c.id !== 'add').map(c => c.id);
 
     if (!isEqual(oldOrder, newOrder)) {
       // Intentionally synchronous to avoid visual jank on drop
@@ -131,12 +134,53 @@ export default function Highlighter() {
   }
 
   function getClipsView() {
-    const clipList = v.clips.map(c => ({ id: c.path }));
+    const clipList = [{ id: 'add', filtered: true }, ...v.clips.map(c => ({ id: c.path }))];
+
+    function onDrop(e: React.DragEvent<HTMLDivElement>) {
+      // TODO: Figure out what extensions we support
+      const extensions = ['.mp4', '.webm', '.flv'];
+      const files: string[] = [];
+      let fi = e.dataTransfer.files.length;
+      while (fi--) {
+        const file = e.dataTransfer.files.item(fi)?.path;
+        if (file) files.push(file);
+      }
+      console.log(files);
+
+      const filtered = files.filter(f => extensions.includes(path.parse(f).ext));
+
+      console.log(filtered);
+
+      if (filtered.length) {
+        HighlighterService.actions.addClips(filtered);
+      }
+
+      e.stopPropagation();
+    }
 
     return (
-      <div style={{ width: '100%', display: 'flex' }} className={styles.clipsViewRoot}>
+      <div
+        style={{ width: '100%', display: 'flex' }}
+        className={styles.clipsViewRoot}
+        onDrop={onDrop}
+      >
         <div style={{ overflowY: 'auto', flexGrow: 1 }}>
-          <ReactSortable list={clipList} setList={setClipOrder} animation={200}>
+          <ReactSortable
+            list={clipList}
+            setList={setClipOrder}
+            animation={200}
+            filter=".sortable-ignore"
+            onMove={e => {
+              return e.related.className.indexOf('sortable-ignore') === -1;
+            }}
+          >
+            <div
+              key="add"
+              style={{ margin: '10px', display: 'inline-block' }}
+              className="sortable-ignore"
+            >
+              <AddClip />
+            </div>
             {v.clips.map(clip => {
               return (
                 <div key={clip.path} style={{ margin: '10px', display: 'inline-block' }}>
@@ -174,4 +218,39 @@ export default function Highlighter() {
   if (!v.loaded) return getLoadingView();
 
   return getClipsView();
+}
+
+function AddClip() {
+  const { HighlighterService } = Services;
+
+  async function openClips() {
+    const selections = await electron.remote.dialog.showOpenDialog(
+      electron.remote.getCurrentWindow(),
+      {
+        properties: ['openFile', 'multiSelections'],
+        filters: [{ name: 'Video Files', extensions: ['mp4', 'webm', 'flv'] }],
+      },
+    );
+
+    if (selections && selections.filePaths) {
+      HighlighterService.actions.addClips(selections.filePaths);
+    }
+  }
+
+  return (
+    <div
+      style={{
+        width: `${SCRUB_WIDTH}px`,
+        height: `${SCRUB_HEIGHT}px`,
+      }}
+      className={styles.addClip}
+      onClick={openClips}
+    >
+      <div style={{ fontSize: 24, textAlign: 'center', marginTop: 50 }}>
+        <i className="icon-add" style={{ marginRight: 8 }} />
+        Add Clip
+      </div>
+      <p style={{ textAlign: 'center' }}>{'Drag & drop or click to add clips'}</p>
+    </div>
+  );
 }

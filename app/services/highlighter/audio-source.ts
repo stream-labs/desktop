@@ -2,6 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import execa from 'execa';
 import { FFMPEG_EXE } from './constants';
+import { AudioReadError } from './errors';
 
 /**
  * Extracts an audio file from a video file
@@ -34,15 +35,20 @@ export class AudioSource {
     ];
     /* eslint-enable */
 
-    await execa(FFMPEG_EXE, args);
+    try {
+      await execa(FFMPEG_EXE, args);
+    } catch (e: unknown) {
+      console.error('Highlighter audio export error', e);
+      throw new AudioReadError(this.sourcePath);
+    }
   }
 
   async cleanup() {
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<void>(resolve => {
       fs.unlink(this.outPath, e => {
         if (e) {
           console.log(e);
-          reject();
+          resolve();
           return;
         }
 

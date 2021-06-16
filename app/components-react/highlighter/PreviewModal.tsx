@@ -1,8 +1,7 @@
 import { useVuex } from 'components-react/hooks';
 import React, { useEffect, useRef } from 'react';
 import { Services } from 'components-react/service-provider';
-import { Progress } from 'antd';
-import url from 'url';
+import { Progress, Alert } from 'antd';
 
 export default function PreviewModal(p: { close: () => void }) {
   const { HighlighterService } = Services;
@@ -13,7 +12,12 @@ export default function PreviewModal(p: { close: () => void }) {
   useEffect(() => {
     HighlighterService.actions.export(true);
 
-    return () => HighlighterService.cancelExport();
+    return () => HighlighterService.actions.cancelExport();
+  }, []);
+
+  // Clear all errors when this component unmounts
+  useEffect(() => {
+    return () => HighlighterService.actions.dismissError();
   }, []);
 
   // Kind of hacky but used to know if we ever were exporting at any point
@@ -55,14 +59,20 @@ export default function PreviewModal(p: { close: () => void }) {
           Cancel
         </button>
       )}
-      {!v.exportInfo.exporting && !v.exportInfo.cancelRequested && didStartExport.current && (
-        <video
-          style={{ outline: 'none', width: '100%' }}
-          src={HighlighterService.views.getCacheBustingUrl(v.exportInfo.previewFile)}
-          controls
-          autoPlay
-        />
+      {!v.exportInfo.exporting && v.exportInfo.error && (
+        <Alert style={{ marginBottom: 24 }} message={v.exportInfo.error} type="error" showIcon />
       )}
+      {!v.exportInfo.exporting &&
+        !v.exportInfo.cancelRequested &&
+        !v.exportInfo.error &&
+        didStartExport.current && (
+          <video
+            style={{ outline: 'none', width: '100%' }}
+            src={HighlighterService.views.getCacheBustingUrl(v.exportInfo.previewFile)}
+            controls
+            autoPlay
+          />
+        )}
     </div>
   );
 }
