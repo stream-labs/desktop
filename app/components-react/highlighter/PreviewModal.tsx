@@ -72,7 +72,7 @@ export default function PreviewModal(p: { close: () => void }) {
             controls
             autoPlay
           />
-      )}
+        )}
     </div>
   );
 }
