@@ -55,7 +55,6 @@ export const conditions = () => ({
     { value: 'MIN_DONATION_AMOUNT', title: $t('Donation amount is at least <amount>') },
     { value: 'EXACT_DONATION_AMOUNT', title: $t('Donation amount is exactly <amount>') },
     { value: 'LARGEST_OF_STREAM', title: $t('Donation is the largest this stream') },
-    { value: 'CRYPTO_CURRENCY_DONATION', title: $t('Donation is in Crypto currency') },
   ],
   subs: [
     { value: 'MIN_MONTHS_SUBSCRIBED', title: $t('Months subscribed is at least <months>') },
@@ -130,6 +129,14 @@ export const conditions = () => ({
 
 export const conditionData = () => ({
   RANDOM: metadata.frequency({ title: $t('Variation Frequency') }),
+  SUBSCRIPTION_GIFT: metadata.frequency({ title: $t('Variation Frequency') }),
+  SUBSCRIPTION_PRIME: metadata.frequency({ title: $t('Variation Frequency') }),
+  SUBTEMBER: metadata.frequency({ title: $t('Variation Frequency') }),
+  ANON_SUBSCRIPTION_GIFT: metadata.frequency({ title: $t('Variation Frequency') }),
+  SUB_EXTENDED: metadata.frequency({ title: $t('Variation Frequency') }),
+  LARGEST_OF_STREAM: {},
+  MERCH_PRODUCT: {},
+  MERCH_PREORDER: {},
   LOYALTY_STORE_REDEMPTION_ITEM_TYPE: metadata.list({
     title: $t('Item Type'),
     options: [
