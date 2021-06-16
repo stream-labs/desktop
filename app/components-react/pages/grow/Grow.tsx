@@ -261,7 +261,7 @@ function GrowthTips() {
       remote.shell.openExternal(url);
     } else {
       try {
-        const link = await MagicLinkService.getDashboardMagicLink(url);
+        const link = await MagicLinkService.getDashboardMagicLink(url, 'slobs-grow-tab');
         remote.shell.openExternal(link);
       } catch (e: unknown) {
         console.error('Error generating dashboard magic link', e);
