@@ -126,17 +126,17 @@ export const conditions = () => ({
     { value: 'LOYALTY_STORE_REDEMPTION_ITEM_NAME', title: $t('Item name is <name>') },
   ],
   support: [
-    { value: 'SUPPORT_GIFT_REDEEMED', title: $t('Viewer redeemed a gifted Support')},
-    { value: 'MIN_MONTHS_SUPPORTED', title: $t('Months supported is at least <months>')},
-    { value: 'EXACT_MONTHS_SUPPORTED', title: $t('Months supported is exactly <months>')},
+    { value: 'SUPPORT_GIFT_REDEEMED', title: $t('Viewer redeemed a gifted Support') },
+    { value: 'MIN_MONTHS_SUPPORTED', title: $t('Months supported is at least <months>') },
+    { value: 'EXACT_MONTHS_SUPPORTED', title: $t('Months supported is exactly <months>') },
   ],
   giftSupport: [
-    { value: 'MIN_SUPPORT_GIFTS', title: $t('Gifted at least <amount> Supports')},
-    { value: 'EXACT_SUPPORT_GIFTS', title: $t('Gifted exactly <amount> Supports')},
+    { value: 'MIN_SUPPORT_GIFTS', title: $t('Gifted at least <amount> Supports') },
+    { value: 'EXACT_SUPPORT_GIFTS', title: $t('Gifted exactly <amount> Supports') },
   ],
   stars: [
-    { value: 'MIN_STARS_USED', title: $t('Stars used is at least <amount>')},
-    { value: 'EXACT_STARS_USED', title: $t('Stars used is exactly <amount>')},
+    { value: 'MIN_STARS_USED', title: $t('Stars used is at least <amount>') },
+    { value: 'EXACT_STARS_USED', title: $t('Stars used is exactly <amount>') },
   ],
 });
 
