@@ -25,7 +25,7 @@ export default function BlankSlate() {
     SettingsService.actions.setSettingsPatch({
       General: {
         ReplayBufferWhileStreaming: true,
-        KeepRecordingWhenStreamStops: false,
+        KeepReplayBufferStreamStops: false,
       },
       Output: {
         RecRB: true,

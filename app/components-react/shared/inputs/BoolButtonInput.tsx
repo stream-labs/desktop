@@ -2,10 +2,14 @@ import React from 'react';
 import cx from 'classnames';
 import { InputComponent, TSlobsInputProps, useInput } from './inputs';
 import styles from 'components/shared/inputs/BoolButtonInput.m.less';
+import { Tooltip } from 'antd';
+import { TooltipPlacement } from 'antd/lib/tooltip';
 
 interface IBoolButtonInputCustomProps {
   checkboxStyles: React.CSSProperties;
   checkboxActiveStyles: React.CSSProperties;
+  tooltip: string;
+  tooltipPlacement: TooltipPlacement;
 }
 
 export type TBoolButtonInputProps = TSlobsInputProps<IBoolButtonInputCustomProps, boolean>;
@@ -26,20 +30,22 @@ export const BoolButtonInput = InputComponent((p: TBoolButtonInputProps) => {
   }
 
   return (
-    <div
-      className={cx('input-wrapper', { disabled: p.disabled })}
-      data-role="input"
-      data-type="toggle"
-      data-value={!!p.value}
-      data-name={p.name}
-    >
+    <Tooltip title={p.tooltip} placement={p.tooltipPlacement}>
       <div
-        className={cx(styles.boolButton, { [styles.active]: !!p.value })}
-        style={customStyles}
-        onClick={handleClick}
+        className={cx('input-wrapper', { disabled: p.disabled })}
+        data-role="input"
+        data-type="toggle"
+        data-value={!!p.value}
+        data-name={p.name}
       >
-        {p.value && <i className="fa fa-check"></i>}
+        <div
+          className={cx(styles.boolButton, { [styles.active]: !!p.value })}
+          style={customStyles}
+          onClick={handleClick}
+        >
+          {p.value && <i className="fa fa-check"></i>}
+        </div>
       </div>
-    </div>
+    </Tooltip>
   );
 });

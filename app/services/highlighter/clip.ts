@@ -2,6 +2,7 @@ import execa from 'execa';
 import { FrameSource } from './frame-source';
 import { AudioSource } from './audio-source';
 import { FFPROBE_EXE } from './constants';
+import fs from 'fs';
 
 export class Clip {
   frameSource: FrameSource;
@@ -14,6 +15,8 @@ export class Clip {
   endTrim: number;
 
   initPromise: Promise<void>;
+
+  deleted = false;
 
   constructor(public readonly sourcePath: string) {}
 
@@ -37,7 +40,12 @@ export class Clip {
    * FrameSource and AudioSource are disposable. Call this to reset them
    * to start reading from the file again.
    */
-  reset(preview: boolean) {
+  async reset(preview: boolean) {
+    this.deleted = !(await this.fileExists());
+    if (this.deleted) return;
+
+    if (!this.duration) await this.readDuration();
+
     this.frameSource = new FrameSource(
       this.sourcePath,
       this.duration,
@@ -53,9 +61,24 @@ export class Clip {
     );
   }
 
+  /**
+   * Checks if the underlying file exists and is readable
+   */
+  private async fileExists() {
+    return new Promise(resolve => {
+      fs.access(this.sourcePath, fs.constants.R_OK, e => {
+        if (e) {
+          resolve(false);
+        } else {
+          resolve(true);
+        }
+      });
+    });
+  }
+
   private async doInit() {
-    await this.readDuration();
-    this.reset(false);
+    await this.reset(false);
+    if (this.deleted) return;
     await this.frameSource.exportScrubbingSprite();
   }
 
