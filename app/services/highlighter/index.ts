@@ -64,6 +64,7 @@ export interface IUploadInfo {
   totalBytes: number;
   cancelRequested: boolean;
   videoId: string | null;
+  error: boolean;
 }
 
 export interface ITransitionInfo {
@@ -163,6 +164,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       totalBytes: 0,
       cancelRequested: false,
       videoId: null,
+      error: false,
     },
   } as IHighligherState;
 
@@ -331,7 +333,8 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   }
 
   dismissError() {
-    this.SET_EXPORT_INFO({ error: null });
+    if (this.state.export.error) this.SET_EXPORT_INFO({ error: null });
+    if (this.state.upload.error) this.SET_UPLOAD_INFO({ error: false });
   }
 
   async loadClips() {
@@ -544,7 +547,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       throw new Error('Cannot start a new upload when uploading is in progress');
     }
 
-    this.SET_UPLOAD_INFO({ uploading: true, cancelRequested: false });
+    this.SET_UPLOAD_INFO({ uploading: true, cancelRequested: false, error: false });
 
     const yt = getPlatformService('youtube') as YoutubeService;
 
@@ -569,6 +572,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         console.log('The upload was canceled');
       } else {
         console.error('Got error uploading YT video', e);
+        this.SET_UPLOAD_INFO({ error: true });
       }
     }
 

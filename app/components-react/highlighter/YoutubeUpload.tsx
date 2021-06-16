@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import { TextInput, TextAreaInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
 import path from 'path';
-import { Button, Progress, Tooltip } from 'antd';
+import { Button, Progress, Tooltip, Alert } from 'antd';
 import { RadioInput } from 'components-react/shared/inputs/RadioInput';
 import { TPrivacyStatus } from 'services/platforms/youtube/uploader';
 import electron from 'electron';
@@ -38,6 +38,11 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
     exportInfo: HighlighterService.views.exportInfo,
   }));
   const filename = path.parse(v.exportInfo.file).base;
+
+  // Clear all errors when this component unmounts
+  useEffect(() => {
+    return () => HighlighterService.actions.dismissError();
+  }, []);
 
   function getYoutubeForm() {
     return (
@@ -118,6 +123,16 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
             </div>
           </div>
         </div>
+        {v.uploadInfo.error && (
+          <Alert
+            style={{ marginBottom: 24 }}
+            message="An error occurred while uploading to YouTube"
+            type="error"
+            closable
+            showIcon
+            afterClose={() => HighlighterService.actions.dismissError()}
+          />
+        )}
         <div style={{ textAlign: 'right' }}>
           <Button style={{ marginRight: 8 }} onClick={props.close}>
             Close
