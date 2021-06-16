@@ -2,6 +2,7 @@ import execa from 'execa';
 import fs from 'fs';
 import { FFMPEG_EXE } from './constants';
 import { Clip } from './clip';
+import { AudioMixError } from './errors';
 
 export class AudioCrossfader {
   constructor(
@@ -25,7 +26,12 @@ export class AudioCrossfader {
 
     args.push('-c:a', 'flac', '-y', this.outputPath);
 
-    await execa(FFMPEG_EXE, args);
+    try {
+      await execa(FFMPEG_EXE, args);
+    } catch (e: unknown) {
+      console.error('Highlighter audio crossfade error', e);
+      throw new AudioMixError();
+    }
   }
 
   getFilterGraph() {
@@ -55,11 +61,11 @@ export class AudioCrossfader {
   }
 
   async cleanup() {
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<void>(resolve => {
       fs.unlink(this.outputPath, e => {
         if (e) {
           console.log(e);
-          reject();
+          resolve();
           return;
         }
 

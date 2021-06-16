@@ -21,6 +21,7 @@ import { AudioCrossfader } from './audio-crossfader';
 import { FrameWriter } from './frame-writer';
 import { Transitioner } from './transitioner';
 import { throttle } from 'lodash-decorators';
+import { HighlighterError } from './errors';
 
 export interface IClip {
   path: string;
@@ -53,6 +54,8 @@ export interface IExportInfo {
    * that requires a new export.
    */
   exported: boolean;
+
+  error: string | null;
 }
 
 export interface IUploadInfo {
@@ -152,6 +155,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       file: path.join(electron.remote.app.getPath('videos'), 'Output.mp4'),
       previewFile: path.join(os.tmpdir(), 'highlighter-preview.mp4'),
       exported: false,
+      error: null,
     },
     upload: {
       uploading: false,
@@ -326,6 +330,10 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     this.SET_EXPORT_INFO({ file });
   }
 
+  dismissError() {
+    this.SET_EXPORT_INFO({ error: null });
+  }
+
   async loadClips() {
     await this.ensureScrubDirectory();
 
@@ -419,86 +427,98 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       totalFrames: totalFramesAfterTransitions,
       step: EExportStep.AudioMix,
       cancelRequested: false,
+      error: null,
     });
 
-    let currentFrame = 0;
+    let fader: AudioCrossfader | null = null;
 
-    // Mix audio first
-    await Promise.all(clips.map(clip => clip.audioSource.extract()));
-    const parsed = path.parse(this.views.exportInfo.file);
-    const audioMix = path.join(parsed.dir, `${parsed.name}-audio.flac`);
-    const fader = new AudioCrossfader(audioMix, clips, this.views.transitionDuration);
-    await fader.export();
-    await Promise.all(clips.map(clip => clip.audioSource.cleanup()));
+    try {
+      let currentFrame = 0;
 
-    this.SET_EXPORT_INFO({ step: EExportStep.FrameRender });
+      // Mix audio first
+      await Promise.all(clips.map(clip => clip.audioSource.extract()));
+      const parsed = path.parse(this.views.exportInfo.file);
+      const audioMix = path.join(parsed.dir, `${parsed.name}-audio.flac`);
+      fader = new AudioCrossfader(audioMix, clips, this.views.transitionDuration);
+      await fader.export();
+      await Promise.all(clips.map(clip => clip.audioSource.cleanup()));
 
-    // Cannot be null because we already checked there is at least 1 element in the array
-    let fromClip = clips.shift()!;
-    let toClip = clips.shift();
+      this.SET_EXPORT_INFO({ step: EExportStep.FrameRender });
 
-    const transitioner = new Transitioner(this.state.transition.type, preview);
-    const exportPath = preview ? this.views.exportInfo.previewFile : this.views.exportInfo.file;
-    const writer = new FrameWriter(exportPath, audioMix, preview);
+      // Cannot be null because we already checked there is at least 1 element in the array
+      let fromClip = clips.shift()!;
+      let toClip = clips.shift();
 
-    while (true) {
-      if (this.views.exportInfo.cancelRequested) {
-        if (fromClip) fromClip.frameSource.end();
-        if (toClip) toClip.frameSource.end();
-        await writer.end();
-        break;
-      }
+      const transitioner = new Transitioner(this.state.transition.type, preview);
+      const exportPath = preview ? this.views.exportInfo.previewFile : this.views.exportInfo.file;
+      const writer = new FrameWriter(exportPath, audioMix, preview);
 
-      const fromFrameRead = await fromClip.frameSource.readNextFrame();
+      while (true) {
+        if (this.views.exportInfo.cancelRequested) {
+          if (fromClip) fromClip.frameSource.end();
+          if (toClip) toClip.frameSource.end();
+          await writer.end();
+          break;
+        }
 
-      const transitionFrames = Math.min(
-        this.views.transitionFrames,
-        (fromClip.frameSource.trimmedDuration / 2) * FPS,
-        toClip ? (toClip.frameSource.trimmedDuration / 2) * FPS : Infinity,
-      );
+        const fromFrameRead = await fromClip.frameSource.readNextFrame();
 
-      const inTransition =
-        fromClip.frameSource.currentFrame >= fromClip.frameSource.nFrames - transitionFrames;
-      let frameToRender = fromClip.frameSource.readBuffer;
-
-      if (inTransition && toClip) {
-        await toClip.frameSource.readNextFrame();
-
-        transitioner.renderTransition(
-          fromClip.frameSource.readBuffer,
-          toClip.frameSource.readBuffer,
-
-          // Frame counter refers to next frame we will read
-          // Subtract 1 to get the frame we just read
-          (toClip.frameSource.currentFrame - 1) / this.views.transitionFrames,
+        const transitionFrames = Math.min(
+          this.views.transitionFrames,
+          (fromClip.frameSource.trimmedDuration / 2) * FPS,
+          toClip ? (toClip.frameSource.trimmedDuration / 2) * FPS : Infinity,
         );
-        frameToRender = transitioner.getFrame();
 
-        const transitionEnded = fromClip.frameSource.currentFrame === fromClip.frameSource.nFrames;
+        const inTransition =
+          fromClip.frameSource.currentFrame >= fromClip.frameSource.nFrames - transitionFrames;
+        let frameToRender = fromClip.frameSource.readBuffer;
 
-        if (transitionEnded) {
-          fromClip.frameSource.end();
-          fromClip = toClip;
-          toClip = clips.shift();
+        if (inTransition && toClip) {
+          await toClip.frameSource.readNextFrame();
+
+          transitioner.renderTransition(
+            fromClip.frameSource.readBuffer,
+            toClip.frameSource.readBuffer,
+
+            // Frame counter refers to next frame we will read
+            // Subtract 1 to get the frame we just read
+            (toClip.frameSource.currentFrame - 1) / this.views.transitionFrames,
+          );
+          frameToRender = transitioner.getFrame();
+
+          const transitionEnded =
+            fromClip.frameSource.currentFrame === fromClip.frameSource.nFrames;
+
+          if (transitionEnded) {
+            fromClip.frameSource.end();
+            fromClip = toClip;
+            toClip = clips.shift();
+          }
+        }
+
+        if (fromFrameRead) {
+          await writer.writeNextFrame(frameToRender);
+          currentFrame++;
+          this.setCurrentFrame(currentFrame);
+        } else {
+          console.log('Out of sources, closing file');
+          await writer.end();
+          break;
         }
       }
-
-      if (fromFrameRead) {
-        await writer.writeNextFrame(frameToRender);
-        // this.SET_EXPORT_INFO({ currentFrame: this.state.export.currentFrame + 1 });
-        currentFrame++;
-        this.setCurrentFrame(currentFrame);
+    } catch (e: unknown) {
+      if (e instanceof HighlighterError) {
+        this.SET_EXPORT_INFO({ error: e.userMessage });
       } else {
-        console.log('Out of sources, closing file');
-        await writer.end();
-        break;
+        console.error('Highlighter export error', e);
+        this.SET_EXPORT_INFO({ error: 'An error occurred while exporting the video' });
       }
     }
 
-    await fader.cleanup();
+    if (fader) await fader.cleanup();
     this.SET_EXPORT_INFO({
       exporting: false,
-      exported: !this.views.exportInfo.cancelRequested && !preview,
+      exported: !this.views.exportInfo.cancelRequested && !preview && !this.views.exportInfo.error,
     });
     this.SET_UPLOAD_INFO({ videoId: null });
   }
