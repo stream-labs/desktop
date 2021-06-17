@@ -1,4 +1,4 @@
-import { mutation, StatefulService, ViewHandler, Inject } from 'services/core';
+import { mutation, StatefulService, ViewHandler, Inject, InitAfter } from 'services/core';
 import path from 'path';
 import transitions from 'gl-transitions';
 import Vue from 'vue';
@@ -139,6 +139,7 @@ class HighligherViews extends ViewHandler<IHighligherState> {
   }
 }
 
+@InitAfter('StreamingService')
 export class HighlighterService extends StatefulService<IHighligherState> {
   static initialState = {
     clips: {},
