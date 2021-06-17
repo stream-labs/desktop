@@ -17,11 +17,14 @@ import BlankSlate from 'components-react/highlighter/BlankSlate';
 import { SCRUB_HEIGHT, SCRUB_WIDTH } from 'services/highlighter/constants';
 import electron from 'electron';
 import path from 'path';
+import Scrollable from 'components-react/shared/Scrollable';
+import { IHotkey } from 'services/hotkeys';
+import { getBindingString } from 'components-react/shared/HotkeyBinding';
 
 type TModal = 'trim' | 'export' | 'preview' | 'remove';
 
 export default function Highlighter() {
-  const { HighlighterService } = Services;
+  const { HighlighterService, HotkeysService } = Services;
   const v = useVuex(() => ({
     clips: HighlighterService.views.clips as IClip[],
     exportInfo: HighlighterService.views.exportInfo,
@@ -29,12 +32,26 @@ export default function Highlighter() {
     loadedCount: HighlighterService.views.loadedCount,
     loaded: HighlighterService.views.loaded,
     transition: HighlighterService.views.transition,
+    dismissedTutorial: HighlighterService.views.dismissedTutorial,
   }));
-
-  useEffect(() => HighlighterService.actions.loadClips(), [v.clips.length]);
 
   const [showModal, rawSetShowModal] = useState<TModal | null>(null);
   const [modalWidth, setModalWidth] = useState('700px');
+  const [hotkey, setHotkey] = useState<IHotkey | null>(null);
+  const [showTutorial, setShowTutorial] = useState(false);
+
+  useEffect(() => {
+    if (v.clips.length) {
+      HighlighterService.actions.loadClips();
+      setShowTutorial(false);
+    }
+  }, [v.clips.length]);
+
+  useEffect(() => {
+    HotkeysService.actions.return.getGeneralHotkeyByName('SAVE_REPLAY').then(hotkey => {
+      if (hotkey) setHotkey(hotkey);
+    });
+  }, []);
 
   // This is kind of weird, but ensures that modals stay the right
   // size while the closing animation is played. This is why modal
@@ -165,11 +182,8 @@ export default function Highlighter() {
         const file = e.dataTransfer.files.item(fi)?.path;
         if (file) files.push(file);
       }
-      console.log(files);
 
       const filtered = files.filter(f => extensions.includes(path.parse(f).ext));
-
-      console.log(filtered);
 
       if (filtered.length) {
         HighlighterService.actions.addClips(filtered);
@@ -184,7 +198,19 @@ export default function Highlighter() {
         className={styles.clipsViewRoot}
         onDrop={onDrop}
       >
-        <div style={{ overflowY: 'auto', flexGrow: 1 }}>
+        <Scrollable style={{ flexGrow: 1, padding: '20px 0 20px 20px' }}>
+          <div style={{ display: 'flex', paddingRight: 20 }}>
+            <div style={{ flexGrow: 1 }}>
+              <h1>Highlighter</h1>
+              <p>{'Drag & drop to reorder clips.'}</p>
+            </div>
+            <div>
+              {hotkey && hotkey.bindings[0] && (
+                <b style={{ marginRight: 20 }}>{getBindingString(hotkey.bindings[0])}</b>
+              )}
+              <Button onClick={() => setShowTutorial(true)}>View Tutorial</Button>
+            </div>
+          </div>
           <ReactSortable
             list={clipList}
             setList={setClipOrder}
@@ -196,14 +222,17 @@ export default function Highlighter() {
           >
             <div
               key="add"
-              style={{ margin: '10px', display: 'inline-block' }}
+              style={{ margin: '10px 20px 10px 0', display: 'inline-block' }}
               className="sortable-ignore"
             >
               <AddClip />
             </div>
             {v.clips.map(clip => {
               return (
-                <div key={clip.path} style={{ margin: '10px', display: 'inline-block' }}>
+                <div
+                  key={clip.path}
+                  style={{ margin: '10px 20px 10px 0', display: 'inline-block' }}
+                >
                   <ClipPreview
                     clip={clip}
                     showTrim={() => {
@@ -219,7 +248,7 @@ export default function Highlighter() {
               );
             })}
           </ReactSortable>
-        </div>
+        </Scrollable>
         {getControls()}
         <Modal
           getContainer={`.${styles.clipsViewRoot}`}
@@ -241,7 +270,16 @@ export default function Highlighter() {
     );
   }
 
-  if (!v.clips.length) return <BlankSlate />;
+  if ((!v.clips.length && !v.dismissedTutorial) || showTutorial) {
+    return (
+      <BlankSlate
+        close={() => {
+          setShowTutorial(false);
+          HighlighterService.actions.dismissTutorial();
+        }}
+      />
+    );
+  }
   if (!v.loaded) return getLoadingView();
 
   return getClipsView();
