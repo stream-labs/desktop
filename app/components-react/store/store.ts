@@ -84,122 +84,101 @@ function configureStore() {
 export const store = configureStore();
 
 /**
- * StateManager allows to access parts of store via StateController
+ * ModuleManager allows to access parts of store via StateController
  * StateController are objects that contain initialState, actions, mutations and getters
  */
-export class StateManager<TInitParams, TStateController extends IStateController<TInitParams>> {
-  static instances: Record<string, StateManager<any, any>> = {};
-  private name: string;
-  public controller: TStateController;
-  public actionsAndGetters: Record<string, Function> = {};
+class ModuleManager {
   public mutationState: unknown;
+  private registeredModules: Record<string, IModuleMetadata> = {};
 
-  constructor(controller: TStateController, initParams?: TInitParams) {
-    const name = (this.name = controller.constructor.name);
-    controller.init && controller.init(initParams as TInitParams);
-    const controllerProto = Object.getPrototypeOf(controller);
-
-    registerMutation(controllerProto, 'incVuexRevision', () => {
-      this.getState()['_vuexRevision']++;
-    });
-
-    StateManager.instances[name] = this;
-
-    const initialState = {
-      ...controller.state,
-      _vuexRevision: 1,
-      _isRenderingDisabled: false,
-    };
-
-    const mutations = {
-      ...controllerProto['mutations'],
-      forbidRendering(state: any) {
-        state['_isRenderingDisabled'] = true;
-      },
-      allowRendering(state: any) {
-        state['_isRenderingDisabled'] = false;
-      },
-    };
+  registerModule<TInitParams, TModule extends IStatefulModule<TInitParams>>(
+    module: TModule,
+    initParams?: TInitParams,
+  ): TModule {
+    const moduleName = module.constructor.name;
+    const mutations = Object.getPrototypeOf(module).mutations;
+    module.init && module.init(initParams as TInitParams);
+    const initialState = module.state;
 
     const reducer = createReducer(initialState, builder => {
       Object.keys(mutations).forEach(mutationName => {
-        const action = createAction(`${name}/${mutationName}`);
+        const action = createAction(`${moduleName}/${mutationName}`);
         builder.addCase(action, mutations[mutationName]);
       });
     });
 
-    Object.defineProperty(controller, 'state', {
-      get: () => this.getState(),
+    Object.defineProperty(module, 'state', {
+      get: () => {
+        if (this.mutationState) return this.mutationState;
+        const globalState = store.getState() as any;
+        return globalState[moduleName];
+      },
     });
 
-    store.reducerManager.add(name, reducer);
-    store.dispatch({ type: 'initState', payload: { name, initialState } });
-
-    let entity = controller;
-    const prototypes = [];
-    while (entity.constructor.name !== 'Object') {
-      prototypes.push(entity);
-      entity = Object.getPrototypeOf(entity);
-    }
-
-    try {
-      prototypes.forEach(proto => {
-        Object.getOwnPropertyNames(proto).forEach(propName => {
-          if (propName in this.actionsAndGetters) return;
-          const descriptor = Object.getOwnPropertyDescriptor(proto, propName);
-          if (!descriptor) return;
-          if (descriptor.get) {
-            Object.defineProperty(this.actionsAndGetters, propName, {
-              get: () => {
-                return controller[propName];
-              },
-            });
-          } else if (typeof controller[propName] === 'function') {
-            this.actionsAndGetters[propName] = controller[propName].bind(controller);
-          }
-        });
-      });
-    } catch (e) {
-      console.log('constructor error', e);
-    }
-
-    this.controller = controller as TStateController;
+    store.reducerManager.add(moduleName, reducer);
+    store.dispatch({ type: 'initState', payload: { moduleName, initialState } });
+    this.registeredModules[moduleName] = {
+      componentIds: [],
+      module,
+    };
+    return module;
   }
 
-  incVuexRevision() {
-    this.controller['incVuexRevision']();
+  unregisterModule(moduleName: string) {
+    store.reducerManager.remove(moduleName);
+    delete this.registeredModules[moduleName];
   }
 
-  get isRenderingDisabled() {
-    return this.getState()['_isRenderingDisabled'];
+  getModule(moduleName: string) {
+    return this.registeredModules[moduleName]?.module;
   }
 
-  destroy() {
-    store.reducerManager.remove(this.name);
-    delete StateManager.instances[this.name];
+  registerComponent(moduleName: string, componentId: string) {
+    this.registeredModules[moduleName].componentIds.push(componentId);
   }
 
-  getState() {
-    if (this.mutationState) return this.mutationState;
-    const globalState = store.getState() as any;
-    return globalState[this.name];
+  unRegisterComponent(moduleName: string, componentId: string) {
+    const moduleMetadata = this.registeredModules[moduleName];
+    moduleMetadata.componentIds = moduleMetadata.componentIds.filter(id => id !== componentId);
+    if (!moduleMetadata.componentIds.length) this.unregisterModule(moduleName);
   }
 
   setMutationState(mutationState: unknown) {
     this.mutationState = mutationState;
   }
+}
+
+class BatchedUpdatesModule {
+  state = {
+    isRenderingDisabled: false,
+  };
 
   temporaryDisableRendering() {
-    if (this.isRenderingDisabled) return;
+    if (this.state.isRenderingDisabled) return;
 
     console.log('DISABLE rendering');
-    store.dispatch({ type: `${this.name}/forbidRendering` });
+    this.setIsRenderingDisabled(true);
 
     setTimeout(() => {
       console.log('ENABLE rendering');
-      store.dispatch({ type: `${this.name}/allowRendering` });
+      this.setIsRenderingDisabled(false);
     });
   }
+
+  @mutation()
+  private setIsRenderingDisabled(disabled: boolean) {
+    this.state.isRenderingDisabled = disabled;
+  }
+}
+
+let moduleManager: ModuleManager;
+export function getModuleManager() {
+  if (!moduleManager) {
+    moduleManager = new ModuleManager();
+    moduleManager.registerModule(new BatchedUpdatesModule());
+    moduleManager.registerModule(new VuexModule());
+  }
+  return moduleManager;
 }
 
 /**
@@ -215,7 +194,7 @@ export function mutation() {
  * Register function as an mutation
  */
 function registerMutation(target: any, mutationName: string, fn: Function) {
-  const className = target.constructor.name;
+  const moduleName = target.constructor.name;
 
   target.mutations = target.mutations || {};
   target.originalMethods = target.originalMethods || {};
@@ -223,12 +202,12 @@ function registerMutation(target: any, mutationName: string, fn: Function) {
   const originalMethod = fn;
 
   target.mutations[mutationName] = (state: unknown, action: { payload: unknown[] }) => {
-    console.log('call mutation', mutationName);
-    const stateManager = StateManager.instances[className];
-    const controller = stateManager.controller;
-    stateManager.setMutationState(state);
-    originalMethod.apply(controller, action.payload);
-    stateManager.setMutationState(null);
+    console.log('call mutation', mutationName, action.payload);
+
+    const module = moduleManager.getModule(moduleName);
+    moduleManager.setMutationState(state);
+    originalMethod.apply(module, action.payload);
+    moduleManager.setMutationState(null);
   };
 
   Object.defineProperty(target, mutationName, {
@@ -236,14 +215,17 @@ function registerMutation(target: any, mutationName: string, fn: Function) {
     value(...args: any[]) {
       console.log('dispatch action', mutationName);
 
-      const stateManager = StateManager.instances[className];
-      const controller = stateManager.controller;
-      const mutationIsRunning = !!stateManager.mutationState;
-      if (mutationIsRunning) return originalMethod.apply(controller, args);
+      const module = moduleManager.getModule(moduleName);
+      const mutationIsRunning = !!moduleManager.mutationState;
+      if (mutationIsRunning) return originalMethod.apply(module, args);
+
+      const batchedUpdatesModule = moduleManager.getModule(
+        'BatchedUpdatesModule',
+      ) as BatchedUpdatesModule;
 
       batch(() => {
-        stateManager.temporaryDisableRendering();
-        store.dispatch({ type: `${className}/${mutationName}`, payload: args });
+        if (moduleName !== 'BatchedUpdatesModule') batchedUpdatesModule.temporaryDisableRendering();
+        store.dispatch({ type: `${moduleName}/${mutationName}`, payload: args });
       });
     },
   });
@@ -251,9 +233,14 @@ function registerMutation(target: any, mutationName: string, fn: Function) {
   return Object.getOwnPropertyDescriptor(target, mutationName);
 }
 
-export interface IStateController<TInitParams> {
+export interface IStatefulModule<TInitParams> {
   state: any;
   init?: (initParams: TInitParams) => unknown;
+}
+
+interface IModuleMetadata {
+  componentIds: string[];
+  module: IStatefulModule<any>;
 }
 
 type TStore = Store & {
@@ -263,7 +250,7 @@ type TStore = Store & {
   };
 };
 
-class Vuex {
+class VuexModule {
   state: Record<string, number> = {};
 
   init() {
@@ -283,10 +270,14 @@ class Vuex {
   }
 }
 
-const vuexController = new StateManager(Vuex).controller;
+export function useSelector<T extends Object>(fn: () => T): T {
+  let componentProps!: T;
 
-export function useSelector<T extends Object>(fn: () => T, comparisonFn?: () => boolean): T {
-  let componentProps: T = null;
+  const moduleManager = getModuleManager();
+  const vuexModule = moduleManager.getModule('VuexModule') as VuexModule;
+  const batchedUpdatesModule = moduleManager.getModule(
+    'BatchedUpdatesModule',
+  ) as BatchedUpdatesModule;
 
   useReduxSelector(
     () => {
@@ -296,19 +287,16 @@ export function useSelector<T extends Object>(fn: () => T, comparisonFn?: () => 
 
       const vuexRevisions = {};
       affectedVuexServices.forEach(serviceName => {
-        vuexRevisions[serviceName] = vuexController.state[serviceName];
+        vuexRevisions[serviceName] = vuexModule.state[serviceName];
       });
 
       return { componentProps, vuexRevisions };
     },
     (prevState, newState) => {
-      if (comparisonFn && comparisonFn() === true) {
+      if (batchedUpdatesModule.state.isRenderingDisabled) {
         return true;
       }
 
-      if (!shallowEqual(prevState.vuexRevisions, newState.vuexRevisions)) {
-        return false;
-      }
       if (!isSimilar(prevState.componentProps, newState.componentProps)) {
         return false;
       }

@@ -32,16 +32,22 @@ export default function GoLiveSettings() {
     protectedModeEnabled,
     error,
     isLoading,
-    controller,
-  } = useGoLiveSettings();
-
-  const { canAddDestinations } = useSelector(() => {
-    const linkedPlatforms = controller.linkedPlatforms;
-    const customDestinations = controller.customDestinations;
+    canAddDestinations,
+  } = useGoLiveSettings().selectExtra(module => {
+    const linkedPlatforms = module.linkedPlatforms;
+    const customDestinations = module.customDestinations;
     return {
       canAddDestinations: linkedPlatforms.length + customDestinations.length < 5,
     };
   });
+
+  // const { canAddDestinations } = useSelector(() => {
+  //   const linkedPlatforms = controller.linkedPlatforms;
+  //   const customDestinations = controller.customDestinations;
+  //   return {
+  //     canAddDestinations: linkedPlatforms.length + customDestinations.length < 5,
+  //   };
+  // });
 
   const shouldShowSettings = !error && !isLoading;
   const shouldShowPrimeLabel = !RestreamService.state.grandfathered;

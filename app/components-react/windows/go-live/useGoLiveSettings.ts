@@ -6,7 +6,7 @@ import { FormInstance } from 'antd/lib/form';
 import { message } from 'antd';
 import { $t } from '../../../services/i18n';
 import { mutation } from '../../store';
-import { useFeature } from '../../hooks/useFeature';
+import { useModule } from '../../hooks/useModule';
 import { useForm } from '../../shared/inputs/Form';
 import { getDefined } from '../../../util/properties-type-guards';
 
@@ -210,7 +210,7 @@ export class GoLiveSettingsFeature extends StreamInfoView<IGoLiveSettingsState> 
 export function useGoLiveSettings(params?: { isUpdateMode: boolean }) {
   const form = useForm();
 
-  return useFeature(GoLiveSettingsFeature, {
+  return useModule(GoLiveSettingsFeature, {
     form,
     isUpdateMode: params?.isUpdateMode,
   });

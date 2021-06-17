@@ -6,7 +6,7 @@ import { useGoLiveSettings } from './useGoLiveSettings';
 import { assertIsDefined } from '../../../util/properties-type-guards';
 import InputWrapper from '../../shared/inputs/InputWrapper';
 import Animate from 'rc-animate';
-import {useSelector} from "../../store";
+import { useSelector } from '../../store';
 
 interface IProps {
   /**
@@ -32,23 +32,21 @@ export default function CommonPlatformFields(p: IProps) {
     toggleCustomFields,
     isMultiplatformMode,
     supports,
-    controller,
-  } = useGoLiveSettings();
-
-  const { descriptionIsRequired, shouldShowPropsForSinglePlatform, platformSettings } = useSelector(
-    () => {
-      // description is required for Facebook
-      const fbSettings = controller.platforms.facebook;
-      const descriptionIsRequired =
-        p.platform === 'facebook' ||
-        (!p.platform && fbSettings && fbSettings.enabled && !fbSettings.useCustomFields);
-      const shouldShowPropsForSinglePlatform = !!p.platform;
-      const platformSettings = shouldShowPropsForSinglePlatform
-        ? controller.getPlatformSettings(p.platform!)
-        : null;
-      return { descriptionIsRequired, shouldShowPropsForSinglePlatform, platformSettings };
-    },
-  );
+    descriptionIsRequired,
+    shouldShowPropsForSinglePlatform,
+    platformSettings,
+  } = useGoLiveSettings().selectExtra(module => {
+    // description is required for Facebook
+    const fbSettings = module.platforms.facebook;
+    const descriptionIsRequired =
+      p.platform === 'facebook' ||
+      (!p.platform && fbSettings && fbSettings.enabled && !fbSettings.useCustomFields);
+    const shouldShowPropsForSinglePlatform = !!p.platform;
+    const platformSettings = shouldShowPropsForSinglePlatform
+      ? module.getPlatformSettings(p.platform!)
+      : null;
+    return { descriptionIsRequired, shouldShowPropsForSinglePlatform, platformSettings };
+  });
 
   /**
    * Toggle the "Use different title and description " checkbox

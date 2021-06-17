@@ -25,7 +25,7 @@ export default function GoLiveWindow() {
     prepopulate,
     isLoading,
     form,
-  } = useGoLiveSettings();
+  } = useGoLiveSettings().select();
 
   console.log('re-render golivewindow');
 

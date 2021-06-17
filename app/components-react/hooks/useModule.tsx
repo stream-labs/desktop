@@ -3,132 +3,88 @@ import { StatefulService } from '../../services';
 import { createBinding, TBindings } from '../shared/inputs';
 import { assertIsDefined } from '../../util/properties-type-guards';
 import { useOnCreate, useOnDestroy } from '../hooks';
-import { IStateController, StateManager, useSelector } from '../store';
+import { IStatefulModule, getModuleManager, useSelector } from '../store';
 import isPlainObject from 'lodash/isPlainObject';
+import { useComponentId } from './useComponentId';
+import { lockThis, merge, TMerge } from '../../util/merge';
 
-export function useFeature<
+export function useModule<
   TInitParams,
-  TControllerClass extends new (...args: any[]) => IStateController<TInitParams>,
+  TControllerClass extends new (...args: any[]) => IStatefulModule<TInitParams>,
   TBindingState,
   TBindingExtraProps,
   TReturnType extends InstanceType<TControllerClass> & {
-    // useSelector<TComputed extends Object>(
-    //   fn: (context: InstanceType<TControllerClass>) => TComputed,
-    // ): TComputed;
-    controller: InstanceType<TControllerClass>;
+
+
+    select: SelectCreator<InstanceType<TControllerClass>>['select']; // () => InstanceType<TControllerClass>;
+
+    selectExtra: <TComputedProps>(
+      fn: (module: InstanceType<TControllerClass>) => TComputedProps,
+    ) => InstanceType<TControllerClass> & TComputedProps;
+
+    // SelectCreator<InstanceType<TControllerClass>>['select'];
+    // select:
+    //   | (() => InstanceType<TControllerClass>)
+    //   | (<TComputedProps>(
+    //       fn: (module: InstanceType<TControllerClass>) => TComputedProps,
+    //     ) => InstanceType<TControllerClass> & TComputedProps);
+
     useBinding: BindingCreator<InstanceType<TControllerClass>>['createBinding'];
   }
->(ControllerClass: TControllerClass, initParams?: TInitParams): TReturnType {
-  const isRootRef = useRef(false);
-  const prevComponentState = useRef<Partial<any>>({});
-  // const computedPropsFnRef = useRef<null | Function>(null);
+>(ModuleClass: TControllerClass, initParams?: TInitParams): TReturnType {
+  const computedPropsFnRef = useRef<null | Function>(null);
   const computedPropsRef = useRef<any>({});
-  const dependencyWatcherRef = useRef<any>({});
+  const dependencyWatcherRef = useRef<any>(null);
+  const moduleName = ModuleClass.name;
+  const componentId = useComponentId();
 
-  const { stateManager, dependencyWatcher } = useOnCreate(() => {
-    let stateManager = StateManager.instances[ControllerClass.name];
-    if (!stateManager) {
-      isRootRef.current = true;
-      stateManager = new StateManager(new ControllerClass(), initParams);
+  const { module, select, selector } = useOnCreate(() => {
+    const moduleManager = getModuleManager();
+    let module = moduleManager.getModule(moduleName);
+    if (!module) {
+      module = moduleManager.registerModule(new ModuleClass(), initParams);
+    }
+    moduleManager.registerComponent(moduleName, componentId);
+
+    function calculateComputedProps() {
+      const compute = computedPropsFnRef.current;
+      if (!compute) return;
+      const computedProps = compute(module);
+      Object.assign(computedPropsRef.current, computedProps);
+      return computedPropsRef.current;
     }
 
-    // function useSelector<T extends Object>(
-    //   fn: (context: InstanceType<TControllerClass>) => T,
-    // ): T {
-    //   if (!computedPropsFnRef.current) {
-    //     computedPropsFnRef.current = fn;
-    //     const computedProps = calculateComputedProps();
-    //     Object.keys(computedProps).forEach(key => dependencyWatcher.watcherProxy[key]);
-    //   }
-    //   return (computedPropsRef.current as unknown) as T;
-    // }
-    //
-    // function calculateComputedProps() {
-    //   const compute = computedPropsFnRef.current;
-    //   if (!compute) return;
-    //   return (computedPropsRef.current = compute(stateManager.controller));
-    // }
-
-    // const hooks = {
-    //   useSelector,
-    // };
-
-    const { controller, actionsAndGetters } = stateManager;
-
-    function select(compute: <TComputedProps>(context: InstanceType<TControllerClass>) => TComputedProps) {
+    function select<TComputedProps>(
+      fn?: (module: InstanceType<TControllerClass>) => TComputedProps,
+    ): InstanceType<TControllerClass> & TComputedProps {
       if (!dependencyWatcherRef.current) {
-        dependencyWatcherRef.current = createDependencyWatcher(
-          new Proxy(
-            { __proxyName: 'StateManagerDependencyWatcher' },
-            {
-              get(target, propName: string) {
-                if (propName in actionsAndGetters) {
-                  return actionsAndGetters[propName];
-                } else if (propName in computedPropsRef.current) {
-                  return computedPropsRef.current[propName];
-                } else {
-                  return controller[propName];
-                }
-              },
-            },
-          ),
-        );
+        if (fn) computedPropsFnRef.current = fn;
+        const mergedModule = merge(module, computedPropsRef.current);
+        dependencyWatcherRef.current = createDependencyWatcher(mergedModule);
       }
-      return dependencyWatcherRef.current;
+      return dependencyWatcherRef.current.watcherProxy;
     }
 
-    // const dataSelector = () => stateManager.controller;
+    function selector() {
+      calculateComputedProps();
+      return dependencyWatcherRef.current?.getDependentValues();
+    }
 
     return {
-      stateManager,
-      dependencyWatcher,
-      // dataSelector,
-      // calculateComputedProps,
+      module,
+      selector,
+      select,
     };
   });
 
   useOnDestroy(() => {
-    if (isRootRef.current) stateManager.destroy();
+    getModuleManager().unRegisterComponent(moduleName, componentId);
   });
 
-  useSelector(
-    () => {
-      return removeFunctions(dependencyWatcher.getDependentValues());
-    },
-    () => stateManager.isRenderingDisabled,
-  );
+  useSelector(selector);
 
-  // useSelector(dataSelector, () => {
-  //   if (stateManager.isRenderingDisabled) return true;
-  //   if (Object.keys(prevComponentState.current).length === 0) return true;
-  //   calculateComputedProps();
-  //
-  //   const prevState = removeFunctions(prevComponentState.current);
-  //   const newState = removeFunctions(dependencyWatcher.getDependentValues());
-  //   const doNotRender = isSimilar(prevState, newState);
-  //
-  //   return doNotRender;
-  // });
-
-  // useEffect(() => {
-  //   if (!isRootRef.current) return;
-  //
-  //   const unsubscribe = StatefulService.store.subscribe(mutation => {
-  //     stateManager.incVuexRevision();
-  //   });
-  //
-  //   return () => {
-  //     unsubscribe();
-  //   };
-  // }, []);
-
-  // component mounted/updated
-  useEffect(() => {
-    // save the prev state
-    prevComponentState.current = dependencyWatcher.getDependentValues();
-  });
-
-  return (dependencyWatcher.watcherProxy as unknown) as TReturnType;
+  const mergeResult = merge(module, { select, selectExtra: select });
+  return (mergeResult as unknown) as TReturnType;
 }
 
 /**
@@ -237,6 +193,67 @@ class BindingCreator<TView> {
   }
 }
 
+class SelectCreator<TModule> {
+  select(): TModule;
+  select<TComputedFn extends (module: TModule) => any, TComputedProps = ReturnType<TComputedFn>>(
+    fn: TComputedFn,
+  ): TModule & TComputedProps;
+  select(...args: any[]): any {
+    let module!: TModule;
+    return {} as any;
+  }
+}
+// type fooType = {
+//   foo: string;
+// };
+//
+// let select!: SelectCreator<fooType>['select'];
+//
+// const foo = select();
+// foo.foo;
+//
+// const fooBar = select(foo => ({ bar: 1 }));
+// fooBar.bar;
+
+// function select<
+//   TModule,
+//   TComputedPropsCb,
+//   TComputedProps = TComputedPropsCb extends Function ? ReturnType<TComputedPropsCb> : {}
+//
+//   // TComputedPropsCb, // = ((module: TModule) => any) | null, // function for calculating the computed props
+//   // TComputedProps = TComputedPropsCb extends (...args: [TModule]) => infer R ? R : {} // computed props type
+// >(fn: TComputedPropsCb): TModule & TComputedProps {
+//   return ({} as unknown) as TModule & TComputedProps;
+// }
+
+// function select<TModule, TComputedProps>(
+//   cb: (module: TModule) => TComputedProps,
+// ): TModule & TComputedProps {
+//   return ({} as unknown) as TModule & TComputedProps;
+// }
+
+// function select<TModule>(cb?: (module: TModule) => any) {
+//   let module!: TModule;
+//   return Object.assign(cb() || {}, module);
+// }
+
+// function select<TModule, TComputed>(module: TModule): TModule;
+// function select<TModule, TComputed>(
+//   module: TModule,
+//   selector: (module: TModule) => TComputed,
+// ): TModule & TComputed {
+//   return Object.assign(selector(), module);
+// }
+//
+// // const st: typeof select;
+//
+// type fooType = {
+//   foo: string;
+// };
+//
+// // const fooObj = select<fooType>();
+// const fooAndBarObj = select({ foo: 'foo' }, module => ({ bar: 1 }));
+// fooAndBarObj.bar;
 /**
  * Returns a new object without function props
  * @param obj
