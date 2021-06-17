@@ -157,3 +157,5 @@ export class PlatformLogo extends ReactComponent<{
   color?: string;
   unwrapped?: boolean;
 }> {}
+@Component({ props: { name: { default: 'StartStreamingButton' } } })
+export class StartStreamingButton extends ReactComponent {}
