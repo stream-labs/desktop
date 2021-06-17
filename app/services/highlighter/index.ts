@@ -197,6 +197,13 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   }
 
   @mutation()
+  REMOVE_CLIP(clipPath: string) {
+    Vue.delete(this.state.clips, clipPath);
+    this.state.clipOrder = this.state.clipOrder.filter(c => c !== clipPath);
+    this.state.export.exported = false;
+  }
+
+  @mutation()
   SET_ORDER(order: string[]) {
     this.state.clipOrder = order;
     this.state.export.exported = false;
@@ -319,6 +326,10 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       path,
       endTrim: trim,
     });
+  }
+
+  removeClip(path: string) {
+    this.REMOVE_CLIP(path);
   }
 
   setOrder(order: string[]) {

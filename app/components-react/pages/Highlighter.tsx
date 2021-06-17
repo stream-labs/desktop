@@ -18,7 +18,7 @@ import { SCRUB_HEIGHT, SCRUB_WIDTH } from 'services/highlighter/constants';
 import electron from 'electron';
 import path from 'path';
 
-type TModal = 'trim' | 'export' | 'preview';
+type TModal = 'trim' | 'export' | 'preview' | 'remove';
 
 export default function Highlighter() {
   const { HighlighterService } = Services;
@@ -33,7 +33,27 @@ export default function Highlighter() {
 
   useEffect(() => HighlighterService.actions.loadClips(), [v.clips.length]);
 
-  const [showModal, setShowModal] = useState<TModal | null>(null);
+  const [showModal, rawSetShowModal] = useState<TModal | null>(null);
+  const [modalWidth, setModalWidth] = useState('700px');
+
+  // This is kind of weird, but ensures that modals stay the right
+  // size while the closing animation is played. This is why modal
+  // width has its own state. This makes sure we always set the right
+  // size whenever displaying a modal.
+  function setShowModal(modal: TModal | null) {
+    rawSetShowModal(modal);
+
+    if (modal) {
+      setModalWidth(
+        {
+          trim: '60%',
+          preview: '700px',
+          export: '700px',
+          remove: '400px',
+        }[modal],
+      );
+    }
+  }
 
   function getLoadingView() {
     return (
@@ -186,9 +206,13 @@ export default function Highlighter() {
                 <div key={clip.path} style={{ margin: '10px', display: 'inline-block' }}>
                   <ClipPreview
                     clip={clip}
-                    onClick={() => {
+                    showTrim={() => {
                       setInspectedClipPath(clip.path);
                       setShowModal('trim');
+                    }}
+                    showRemove={() => {
+                      setInspectedClipPath(clip.path);
+                      setShowModal('remove');
                     }}
                   />
                 </div>
@@ -201,7 +225,7 @@ export default function Highlighter() {
           getContainer={`.${styles.clipsViewRoot}`}
           onCancel={closeModal}
           footer={null}
-          width={showModal === 'trim' ? '60%' : '700px'}
+          width={modalWidth}
           closable={false}
           visible={!!showModal}
           destroyOnClose={true}
@@ -209,6 +233,9 @@ export default function Highlighter() {
           {inspectedClip && showModal === 'trim' && <ClipTrimmer clip={inspectedClip} />}
           {showModal === 'export' && <ExportModal close={closeModal} />}
           {showModal === 'preview' && <PreviewModal close={closeModal} />}
+          {inspectedClip && showModal === 'remove' && (
+            <RemoveClip close={closeModal} clip={inspectedClip} />
+          )}
         </Modal>
       </div>
     );
@@ -251,6 +278,33 @@ function AddClip() {
         Add Clip
       </div>
       <p style={{ textAlign: 'center' }}>{'Drag & drop or click to add clips'}</p>
+    </div>
+  );
+}
+
+function RemoveClip(p: { clip: IClip; close: () => void }) {
+  const { HighlighterService } = Services;
+
+  return (
+    <div style={{ textAlign: 'center' }}>
+      <h2>Remove the clip?</h2>
+      <p>
+        Are you sure you want to remove the clip? You will need to manually import it again to
+        reverse this action.
+      </p>
+      <Button style={{ marginRight: 8 }} onClick={p.close}>
+        Canncel
+      </Button>
+      <Button
+        type="primary"
+        danger
+        onClick={() => {
+          HighlighterService.actions.removeClip(p.clip.path);
+          p.close();
+        }}
+      >
+        Remove
+      </Button>
     </div>
   );
 }
