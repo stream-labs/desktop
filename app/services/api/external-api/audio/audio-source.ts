@@ -8,12 +8,18 @@ import { SourcesService as InternalSourcesService } from 'services/sources';
 import { Fallback } from 'services/api/external-api';
 import * as obs from '../../../../../obs-api';
 
+/**
+ * Fader variables.
+ */
 export interface IFader {
   db: number;
   deflection: number;
   mul: number;
 }
 
+/**
+ * Serialized representation of an audio source.
+ */
 export interface IAudioSourceModel {
   sourceId: string;
   name: string;
@@ -26,6 +32,10 @@ export interface IAudioSourceModel {
   mixerHidden: boolean;
 }
 
+/**
+ * API for audio source management. Provides operations related to a single
+ * audio source like set deflection and mute / unmute audio source.
+ */
 @ServiceHelper()
 export class AudioSource implements ISerializable {
   @Inject() private audioService: InternalAudioService;
@@ -40,6 +50,9 @@ export class AudioSource implements ISerializable {
     return this.audioSource.isDestroyed();
   }
 
+  /**
+   * @return A serialized representation of this {@link AudioSource}
+   */
   getModel(): IAudioSourceModel {
     const sourceModel = this.sourcesService.views.getSource(this.sourceId).getModel();
     return {
@@ -55,11 +68,22 @@ export class AudioSource implements ISerializable {
     };
   }
 
-  setDeflection(deflection: number) {
+  /**
+   * Sets the audio source's deflection.
+   *
+   * @param deflection the deflection number to set for this audio source
+   */
+  setDeflection(deflection: number): void {
     this.audioSource.setDeflection(deflection);
   }
 
-  setMuted(muted: boolean) {
+  /**
+   * Mutes /unmutes this audio source.
+   *
+   * @param muted Set to `true`if you want to mute the audio source, `false` to
+   * unmute
+   */
+  setMuted(muted: boolean): void {
     this.audioSource.setMuted(muted);
   }
 }

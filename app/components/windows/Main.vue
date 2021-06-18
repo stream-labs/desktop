@@ -38,8 +38,12 @@
           :is="page"
           :params="params"
           @totalWidth="width => handleEditorWidth(width)"
+          style="grid-row: 1 / span 1"
         />
-        <studio-footer v-if="!applicationLoading && page !== 'Onboarding'" />
+        <studio-footer
+          v-if="!applicationLoading && page !== 'Onboarding'"
+          style="grid-row: 2 / span 1"
+        />
       </div>
 
       <div class="live-dock-wrapper" v-if="renderDock && !leftDock">
@@ -111,8 +115,8 @@
 
 .main-middle {
   flex-grow: 1;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) 48px;
   overflow: hidden;
   position: relative;
   height: 100%;

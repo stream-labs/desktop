@@ -68,6 +68,13 @@
             >
               <i class="icon-studio" />
             </a>
+            <a
+              @click="openFBStreamDashboardUrl"
+              v-if="isFacebook && isStreaming"
+              v-tooltip="liveProducerTooltip"
+            >
+              <i class="icon-settings" />
+            </a>
           </div>
           <div class="flex">
             <a @click="refreshChat" v-if="isTwitch || (isYoutube && isStreaming) || isFacebook">

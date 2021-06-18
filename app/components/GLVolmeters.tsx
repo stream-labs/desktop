@@ -127,9 +127,10 @@ export default class GLVolmeters extends TsxComponent<VolmetersProps> {
     );
   }
 
+  // TODO: refactor into a single source of truth between Mixer and Volmeters
   get audioSources() {
     return this.audioService.views.sourcesForCurrentScene.filter(source => {
-      return !source.mixerHidden;
+      return !source.mixerHidden && source.isControlledViaObs;
     });
   }
 

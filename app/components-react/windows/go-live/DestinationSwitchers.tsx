@@ -78,6 +78,7 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
   const switchInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
+  const { RestreamService, MagicLinkService } = Services;
 
   console.log('Render switcher', platform, p.enabled);
 
@@ -90,16 +91,20 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
       );
       return;
     }
-    const enable = !p.enabled;
-    p.onChange(enable);
-    // always proxy the click to the SwitchInput
-    // so it can play a transition animation
-    switchInputRef.current?.click();
-    // switch the container class without re-rendering to not stop the animation
-    if (enable) {
-      containerRef.current?.classList.remove(styles.platformDisabled);
+    if (RestreamService.views.canEnableRestream) {
+      const enable = !p.enabled;
+      p.onChange(enable);
+      // always proxy the click to the SwitchInput
+      // so it can play a transition animation
+      switchInputRef.current?.click();
+      // switch the container class without re-rendering to not stop the animation
+      if (enable) {
+        containerRef.current?.classList.remove(styles.platformDisabled);
+      } else {
+        containerRef.current?.classList.add(styles.platformDisabled);
+      }
     } else {
-      containerRef.current?.classList.add(styles.platformDisabled);
+      MagicLinkService.actions.linkToPrime('slobs-multistream');
     }
   }
 
