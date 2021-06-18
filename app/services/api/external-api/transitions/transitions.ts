@@ -4,12 +4,17 @@ import { Fallback, Singleton } from 'services/api/external-api';
 import { Observable } from 'rxjs';
 import { ISerializable } from 'services/api/rpc-api';
 
+/**
+ * Serialized representation of {@link TransitionsService}.
+ */
 export interface ITransitionsServiceState {
   studioMode: boolean;
 }
 
 /**
- * Manage the studio mode transitions
+ * API for studio mode state and transitions management. Contains operations for
+ * toggling studio mode and provides observables for studio mode events
+ * registration.
  */
 @Singleton()
 export class TransitionsService implements ISerializable {
@@ -17,28 +22,41 @@ export class TransitionsService implements ISerializable {
   @Inject()
   protected transitionsService: InternalTransitionsService;
 
+  /**
+   * Observable event that is triggered whenever the studio mode is changed. The
+   * observed value determines if the studio mode is active or not.
+   */
   get studioModeChanged(): Observable<boolean> {
     return this.transitionsService.studioModeChanged;
   }
 
+  /**
+   * @returns A serialized representation of the studio mode state.
+   */
   getModel(): ITransitionsServiceState {
     return {
       studioMode: this.transitionsService.state.studioMode,
     };
   }
 
-  enableStudioMode() {
+  /**
+   * Enables the studio mode.
+   */
+  enableStudioMode(): void {
     this.transitionsService.enableStudioMode();
   }
 
-  disableStudioMode() {
+  /**
+   * Disables the studio mode.
+   */
+  disableStudioMode(): void {
     this.transitionsService.disableStudioMode();
   }
 
   /**
-   * While in studio mode, will execute a studio mode transition
+   * While in studio mode, will execute a studio mode transition.
    */
-  executeStudioModeTransition() {
+  executeStudioModeTransition(): void {
     this.transitionsService.executeStudioModeTransition();
   }
 }

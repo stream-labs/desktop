@@ -59,6 +59,7 @@ export { UserService } from './services/user';
 export { YoutubeService } from 'services/platforms/youtube';
 export { TwitchService } from 'services/platforms/twitch';
 export { FacebookService } from 'services/platforms/facebook';
+export { TiktokService } from 'services/platforms/tiktok';
 export { RestreamService } from 'services/restream';
 export { TwitterService } from 'services/integrations/twitter';
 export { UsageStatisticsService } from './services/usage-statistics';
@@ -76,13 +77,13 @@ export { VideoEncodingOptimizationService } from 'services/video-encoding-optimi
 export { StreamingService } from 'services/streaming';
 export { StreamlabelsService } from 'services/streamlabels';
 export { AutoConfigService } from 'services/auto-config';
-export { FacemasksService } from 'services/facemasks';
 export { PlatformAppsService } from 'services/platform-apps';
 export { PlatformAppStoreService } from 'services/platform-app-store';
 export { PlatformAppAssetsService } from 'services/platform-apps/platform-app-assets-service';
 export { ChatService } from 'services/chat';
 export { RecentEventsService } from 'services/recent-events';
 export { MagicLinkService } from 'services/magic-link';
+export { GrowService } from 'services/grow/grow';
 
 // WIDGETS
 export { WidgetSource, WidgetsService } from './services/widgets';
@@ -128,6 +129,7 @@ import { AnnouncementsService } from './services/announcements';
 import { PatchNotesService } from './services/patch-notes';
 import { VideoService } from './services/video';
 import { ChatService } from './services/chat';
+import { GrowService } from './services/grow/grow';
 import { TransitionsService } from './services/transitions';
 import { MagicLinkService } from './services/magic-link';
 import { UsageStatisticsService } from './services/usage-statistics';
@@ -155,6 +157,7 @@ export const AppServices = {
   UserService,
   TwitchService,
   DismissablesService,
+  GrowService,
   TransitionsService,
   MagicLinkService,
   UsageStatisticsService,

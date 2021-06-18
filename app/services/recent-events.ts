@@ -219,7 +219,6 @@ const SUPPORTED_EVENTS = [
   'merch',
   'donation',
   'streamlabscharitydonation',
-  'facemaskdonation',
   'follow',
   'subscription',
   'bits',
@@ -743,21 +742,25 @@ export class RecentEventsService extends StatefulService<IRecentEventsState> {
   }
 
   isAllowed(event: IRecentEvent) {
-    if (event.type === 'subscription') {
+    if (event.type === 'subscription' && this.userService.platform.type !== 'youtube') {
       if (event.months > 1) {
         return this.shouldFilterResub(event);
       }
       return this.shouldFilterSubscription(event);
     }
-    return this.transformFilterForFB()[event.type];
+    return this.transformFilterForPlatform()[event.type];
   }
 
-  transformFilterForFB() {
+  transformFilterForPlatform() {
     const filterMap = cloneDeep(this.state.filterConfig);
     filterMap['support'] = filterMap['facebook_support'];
     filterMap['like'] = filterMap['facebook_like'];
     filterMap['share'] = filterMap['facebook_share'];
     filterMap['stars'] = filterMap['facebook_stars'];
+    if (this.userService.platform.type === 'youtube') {
+      filterMap['subscription'] = filterMap['membership_level_1'];
+      filterMap['follow'] = filterMap['subscriber'];
+    }
     return filterMap;
   }
 

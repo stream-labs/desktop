@@ -69,6 +69,7 @@ export default class LiveDock extends Vue {
   viewStreamTooltip = $t('View your live stream in a web browser');
   editStreamInfoTooltip = $t('Edit your stream title and description');
   controlRoomTooltip = $t('Go to YouTube Live Dashboard');
+  liveProducerTooltip = $t('Go to the Facebook Live Producer Dashboard');
 
   mounted() {
     this.elapsedInterval = window.setInterval(() => {
@@ -156,6 +157,10 @@ export default class LiveDock extends Vue {
 
   openFBStreamUrl() {
     electron.remote.shell.openExternal(this.facebookService.streamPageUrl);
+  }
+
+  openFBStreamDashboardUrl() {
+    electron.remote.shell.openExternal(this.facebookService.streamDashboardUrl);
   }
 
   get isTwitch() {
@@ -269,7 +274,7 @@ export default class LiveDock extends Vue {
 
   get canEditChannelInfo(): boolean {
     return (
-      this.streamingService.state.info.checklist.startVideoTransmission === 'done' ||
+      this.streamingService.views.isMidStreamMode ||
       this.userService.state.auth?.primaryPlatform === 'twitch'
     );
   }

@@ -30,6 +30,10 @@ module.exports = {
     "prettier/prettier": ERROR,
     "@typescript-eslint/no-implicit-any-catch": ERROR,
 
+    // The indent rule is redundant when we are using prettier, and it
+    // sometimes conflicts with prettier's recommendation.
+    "indent": OFF,
+
     // We should consider setting this back to WARN
     "react-hooks/exhaustive-deps": OFF,
 

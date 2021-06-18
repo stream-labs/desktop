@@ -13,9 +13,9 @@ import Vue from 'vue';
 
 interface ISavedGoLiveSettings {
   platforms: {
-    twitch: IPlatformFlags;
-    facebook: IPlatformFlags;
-    youtube: IPlatformFlags;
+    twitch?: IPlatformFlags;
+    facebook?: IPlatformFlags;
+    youtube?: IPlatformFlags;
   };
   customDestinations?: ICustomStreamDestination[];
   advancedMode: boolean;
@@ -82,6 +82,7 @@ const platformToServiceNameMap: { [key in TPlatform]: string } = {
   twitch: 'Twitch',
   youtube: 'YouTube / YouTube Gaming',
   facebook: 'Facebook Live',
+  tiktok: 'Custom',
 };
 
 /**

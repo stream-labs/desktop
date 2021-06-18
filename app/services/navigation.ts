@@ -6,13 +6,13 @@ export type TAppPage =
   | 'Onboarding'
   | 'BrowseOverlays'
   | 'PatchNotes'
-  | 'Chatbot'
   | 'PlatformAppMainPage'
   | 'PlatformAppStore'
   | 'PlatformMerge'
   | 'LayoutEditor'
   | 'PrimeExpiration'
-  | 'AlertboxLibrary';
+  | 'AlertboxLibrary'
+  | 'Grow';
 
 interface INavigationState {
   currentPage: TAppPage;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, useContext } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import debounce from 'lodash/debounce';
 import { StatefulService } from '../services/core';
 import { createBinding, TBindings } from './shared/inputs';
@@ -8,13 +8,7 @@ import { FormInstance } from 'antd/lib/form/hooks/useForm';
 /**
  * Creates a reactive state for a React component based on Vuex store
  */
-export function useVuex<TReturnValue>(selector: () => TReturnValue): TReturnValue;
-export function useVuex<T, TReturnValue>(
-  target: T,
-  selector: (state: T) => TReturnValue,
-): TReturnValue;
-export function useVuex(...args: any[]) {
-  const selector = args.length === 1 ? args[0] : () => args[1](args[0]);
+export function useVuex<TReturnValue>(selector: () => TReturnValue, deep = true): TReturnValue {
   const [state, setState] = useState(selector);
   useEffect(() => {
     const unsubscribe = StatefulService.store.watch(
@@ -22,6 +16,7 @@ export function useVuex(...args: any[]) {
       newState => {
         setState(newState);
       },
+      { deep },
     );
     return () => {
       unsubscribe();

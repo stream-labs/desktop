@@ -1,11 +1,11 @@
 import electron from 'electron';
 import css from './FacebookEditStreamInfo.m.less';
 import { useGoLiveSettings } from '../useGoLiveSettings';
-import CommonPlatformFields from '../CommonPlatformFields';
+import { CommonPlatformFields } from '../CommonPlatformFields';
 import React from 'react';
 import { Services } from '../../../service-provider';
 import Form from '../../../shared/inputs/Form';
-import { useOnCreate, useFormState } from '../../../hooks';
+import { useOnCreate, useFormState, useVuex } from '../../../hooks';
 import { EDismissable } from '../../../../services/dismissables';
 import { $t } from '../../../../services/i18n';
 import { createBinding, ListInput } from '../../../shared/inputs';
@@ -20,8 +20,13 @@ import moment from 'moment';
 import Translate from '../../../shared/Translate';
 import { IListOption } from '../../../shared/inputs/ListInput';
 import MessageLayout from '../MessageLayout';
+import PlatformSettingsLayout, { IPlatformComponentParams } from './PlatformSettingsLayout';
+import { TwitchTagsInput } from './TwitchTagsInput';
 
-export default function FacebookEditStreamInfo() {
+export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'facebook'>) {
+  const fbSettings = p.value;
+  const isUpdateMode = p.isUpdateMode;
+
   // inject services
   const {
     FacebookService,
@@ -32,31 +37,32 @@ export default function FacebookEditStreamInfo() {
     WindowsService,
   } = Services;
 
+  // const {
+  //   useSelector,
+  //   updatePlatform,
+  //   isUpdateMode,
+  //   useBinding,
+  //   renderPlatformSettings,
+  // } = useGoLiveSettings();
+
   const {
-    updatePlatform,
-    isUpdateMode,
-    fbSettings,
     pages,
     groups,
     canStreamToTimeline,
     canStreamToGroup,
     isPrimary,
     shouldShowGamingWarning,
-    renderPlatformSettings,
     shouldShowPermissionWarn,
-    useBinding,
-    getSettings,
-  } = useGoLiveSettings(view => {
+  } = useVuex(() => {
     const fbState = FacebookService.state;
     const hasPages = !!fbState.facebookPages.length;
     const canStreamToTimeline = fbState.grantedPermissions.includes('publish_video');
     const canStreamToGroup = fbState.grantedPermissions.includes('publish_to_groups');
-    const fbSettings = view.platforms.facebook;
+    const view = StreamingService.views;
     return {
       canStreamToTimeline,
       canStreamToGroup,
       hasPages,
-      fbSettings,
       shouldShowGamingWarning: hasPages && fbSettings.game,
       shouldShowPermissionWarn:
         (!canStreamToTimeline || !canStreamToGroup) &&
@@ -66,6 +72,7 @@ export default function FacebookEditStreamInfo() {
       isPrimary: view.checkPrimaryPlatform('facebook'),
     };
   });
+
   const shouldShowGroups = fbSettings.destinationType === 'group' && !isUpdateMode;
   const shouldShowPages = fbSettings.destinationType === 'page' && !isUpdateMode;
   const shouldShowEvents = !isUpdateMode;
@@ -73,10 +80,12 @@ export default function FacebookEditStreamInfo() {
   const shouldShowPrivacyWarn =
     (!fbSettings.liveVideoId && fbSettings.privacy?.value !== 'SELF') ||
     (fbSettings.liveVideoId && fbSettings.privacy?.value);
-  const bind = useBinding(
-    () => getSettings().platforms.facebook,
-    newFbSettings => updatePlatform('facebook', newFbSettings),
-  );
+
+  function updateSettings(patch: Partial<IFacebookStartStreamOptions>) {
+    p.onChange({ ...fbSettings, ...patch });
+  }
+
+  const bind = createBinding(fbSettings, newFbSettings => updateSettings(newFbSettings));
 
   // define the local state
   const { s, setItem, updateState } = useFormState({
@@ -92,7 +101,7 @@ export default function FacebookEditStreamInfo() {
   });
 
   function setPrivacy(privacy: TFacebookStreamPrivacy) {
-    updatePlatform('facebook', { privacy: { value: privacy } });
+    updateSettings({ privacy: { value: privacy } });
   }
 
   async function loadScheduledBroadcasts() {
@@ -174,7 +183,15 @@ export default function FacebookEditStreamInfo() {
   }
 
   function renderCommonFields() {
-    return <CommonPlatformFields key="common" platform="facebook" />;
+    return (
+      <CommonPlatformFields
+        key="common"
+        platform="facebook"
+        layoutMode={p.layoutMode}
+        value={fbSettings}
+        onChange={updateSettings}
+      />
+    );
   }
 
   function renderRequiredFields() {
@@ -355,7 +372,13 @@ export default function FacebookEditStreamInfo() {
   return (
     <Form name="facebook-settings">
       {shouldShowPermissionWarn && renderMissedPermissionsWarning()}
-      {renderPlatformSettings(renderCommonFields(), renderRequiredFields(), renderOptionalFields())}
+
+      <PlatformSettingsLayout
+        layoutMode={p.layoutMode}
+        commonFields={renderCommonFields()}
+        requiredFields={renderRequiredFields()}
+        optionalFields={renderOptionalFields()}
+      />
     </Form>
   );
 }

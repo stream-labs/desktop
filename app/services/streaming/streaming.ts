@@ -30,12 +30,10 @@ import {
   NotificationsService,
 } from 'services/notifications';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
-import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
 import { EAvailableFeatures, IncrementalRolloutService } from 'services/incremental-rollout';
 import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService } from 'services/restream';
-import { FacebookService } from 'services/platforms/facebook';
 import Utils from 'services/utils';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
@@ -44,8 +42,8 @@ import { authorizedHeaders } from 'util/requests';
 import { HostsService } from '../hosts';
 import { TwitterService } from '../integrations/twitter';
 import { assertIsDefined } from 'util/properties-type-guards';
-import { YoutubeService } from '../platforms/youtube';
 import { StreamInfoView } from './streaming-view';
+import { GrowService } from 'services/grow/grow';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -82,19 +80,17 @@ export class StreamingService
   @Inject() private userService: UserService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
   @Inject() private videoEncodingOptimizationService: VideoEncodingOptimizationService;
-  @Inject() private navigationService: NavigationService;
   @Inject() private customizationService: CustomizationService;
   @Inject() private restreamService: RestreamService;
   @Inject() private hostsService: HostsService;
-  @Inject() private facebookService: FacebookService;
-  @Inject() private youtubeService: YoutubeService;
   @Inject() private twitterService: TwitterService;
+  @Inject() private growService: GrowService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
   replayBufferStatusChange = new Subject<EReplayBufferState>();
   replayBufferFileWrite = new Subject<string>();
-  streamInfoChanged = new Subject<StreamInfoView>();
+  streamInfoChanged = new Subject<StreamInfoView<any>>();
 
   // Dummy subscription for stream deck
   streamingStateChange = new Subject<void>();
@@ -122,6 +118,7 @@ export class StreamingService
         twitch: 'not-started',
         youtube: 'not-started',
         facebook: 'not-started',
+        tiktok: 'not-started',
         setupMultistream: 'not-started',
         startVideoTransmission: 'not-started',
         postTweet: 'not-started',
@@ -395,6 +392,11 @@ export class StreamingService
         this.usageStatisticsService.recordFeatureUsage('StreamToFacebookPage');
       }
     }
+
+    // send analytics for TikTok
+    if (settings.platforms.tiktok?.enabled) {
+      this.usageStatisticsService.recordFeatureUsage('StreamToTikTok');
+    }
   }
 
   /**
@@ -453,7 +455,7 @@ export class StreamingService
     const destinations = settings.platforms;
     const platforms = (Object.keys(destinations) as TPlatform[]).filter(
       dest => destinations[dest].enabled && this.views.supports('stream-schedule', [dest]),
-    );
+    ) as ('facebook' | 'youtube')[];
     for (const platform of platforms) {
       const service = getPlatformService(platform);
       assertIsDefined(service.scheduleStream);
@@ -623,16 +625,20 @@ export class StreamingService
       this.startReplayBuffer();
     }
 
-    startStreamingPromise.then(() => {
-      // run afterGoLive hooks
-      try {
-        this.views.enabledPlatforms.forEach(platform => {
-          getPlatformService(platform).afterGoLive();
-        });
-      } catch (e: unknown) {
-        console.error('Error running afterGoLive for platform', e);
-      }
-    });
+    startStreamingPromise
+      .then(() => {
+        // run afterGoLive hooks
+        try {
+          this.views.enabledPlatforms.forEach(platform => {
+            getPlatformService(platform).afterGoLive();
+          });
+        } catch (e: unknown) {
+          console.error('Error running afterGoLive for platform', e);
+        }
+      })
+      .catch(() => {
+        console.warn('startStreamingPromise was rejected');
+      });
 
     return startStreamingPromise;
   }
@@ -754,7 +760,7 @@ export class StreamingService
     const width = 900;
 
     const isLegacy =
-      !this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
+      !this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
       this.customizationService.state.experimental?.legacyGoLive;
 
     const componentName = isLegacy ? 'GoLiveWindowDeprecated' : 'GoLiveWindow';
@@ -774,7 +780,7 @@ export class StreamingService
     const width = 900;
 
     const isLegacy =
-      !this.incrementalRolloutService.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
+      !this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.reactGoLive) ||
       this.customizationService.state.experimental?.legacyGoLive;
 
     const componentName = isLegacy ? 'EditStreamWindowDeprecated' : 'EditStreamWindow';
@@ -934,9 +940,9 @@ export class StreamingService
           status: EStreamingState.Offline,
         });
       } else if (info.signal === EOBSOutputSignal.Stopping) {
+        this.sendStreamEndEvent();
         this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
         this.streamingStatusChange.next(EStreamingState.Ending);
-        this.usageStatisticsService.recordEvent('stream_end');
       } else if (info.signal === EOBSOutputSignal.Reconnect) {
         this.SET_STREAMING_STATUS(EStreamingState.Reconnecting);
         this.streamingStatusChange.next(EStreamingState.Reconnecting);
@@ -1092,6 +1098,46 @@ export class StreamingService
           this.outputErrorOpen = false;
         });
       this.windowsService.actions.closeChildWindow();
+    }
+  }
+
+  private sendStreamEndEvent() {
+    const data: Dictionary<any> = {};
+    data.viewerCounts = {};
+    data.duration = Math.round(moment().diff(moment(this.state.streamingStatusTime)) / 1000);
+
+    if (this.views.protectedModeEnabled) {
+      data.platforms = this.views.enabledPlatforms;
+
+      this.views.customDestinations.forEach(() => {
+        data.platforms.push('custom_rtmp');
+      });
+
+      this.views.enabledPlatforms.forEach(platform => {
+        const service = getPlatformService(platform);
+
+        if (service.hasCapability('viewerCount')) {
+          data.viewerCounts[platform] = {
+            average: service.averageViewers,
+            peak: service.peakViewers,
+          };
+        }
+      });
+    } else {
+      data.platforms = ['custom_rtmp'];
+    }
+
+    this.recordGoals(data.duration);
+    this.usageStatisticsService.recordEvent('stream_end', data);
+  }
+
+  private recordGoals(duration: number) {
+    if (!this.userService.isLoggedIn) return;
+    const hoursStreamed = Math.floor(duration / 60 / 60);
+    this.growService.incrementGoal('stream_hours_per_month', hoursStreamed);
+    this.growService.incrementGoal('stream_times_per_week', 1);
+    if (this.restreamService.settings.enabled) {
+      this.growService.incrementGoal('multistream_per_week', 1);
     }
   }
 

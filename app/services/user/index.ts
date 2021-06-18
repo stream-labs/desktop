@@ -65,6 +65,7 @@ interface ILinkedPlatformsResponse {
   twitch_account?: ILinkedPlatform;
   facebook_account?: ILinkedPlatform;
   youtube_account?: ILinkedPlatform;
+  tiktok_account?: ILinkedPlatform;
   user_id: number;
 }
 
@@ -106,6 +107,12 @@ class UserViews extends ViewHandler<IUserServiceState> {
   get platform() {
     if (this.isLoggedIn) {
       return this.state.auth.platforms[this.state.auth.primaryPlatform];
+    }
+  }
+
+  get platforms() {
+    if (this.isLoggedIn) {
+      return this.state.auth.platforms;
     }
   }
 
@@ -396,6 +403,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     } else if (this.state.auth.primaryPlatform !== 'youtube') {
       this.UNLINK_PLATFORM('youtube');
     }
+
+    if (linkedPlatforms.tiktok_account) {
+      this.UPDATE_PLATFORM({
+        type: 'tiktok',
+        username: linkedPlatforms.tiktok_account.platform_name,
+        id: linkedPlatforms.tiktok_account.platform_id,
+        token: linkedPlatforms.tiktok_account.access_token,
+      });
+    } else if (this.state.auth.primaryPlatform !== 'tiktok') {
+      this.UNLINK_PLATFORM('tiktok');
+    }
   }
 
   fetchLinkedPlatforms() {
@@ -556,16 +574,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const theme = this.customizationService.isDarkTheme ? 'prime-dark' : 'prime-light';
     this.customizationService.setTheme(theme);
     this.showPrimeWindow();
-  }
-
-  /**
-   * open the prime onboarding in the browser
-   * @param refl a referral tag for analytics
-   */
-  openPrimeUrl(refl: 'slobs-multistream' | 'slobs-settings') {
-    this.magicLinkService.getDashboardMagicLink('prime-marketing', refl).then(link => {
-      electron.remote.shell.openExternal(link);
-    });
   }
 
   recentEventsUrl() {

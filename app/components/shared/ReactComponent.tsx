@@ -68,7 +68,7 @@ export class PatchNotes extends ReactComponent {}
 @Component({
   props: {
     name: { default: 'NavTools' },
-    wrapperStyles: { default: () => ({ marginTop: 'auto', marginBottom: '12px', flexShrink: 0 }) },
+    wrapperStyles: { default: () => ({ marginTop: 'auto', flexShrink: 0 }) },
   },
 })
 export class NavTools extends ReactComponent {}
@@ -117,7 +117,12 @@ export class TitleBar extends ReactComponent {}
   },
 })
 export class Chat extends ReactComponent {}
-
+@Component({
+  props: {
+    name: { default: 'Loader' },
+  },
+})
+export class Loader extends ReactComponent {}
 @Component({
   props: {
     name: { default: 'GoLiveWindow' },
@@ -133,6 +138,26 @@ export class GoLiveWindow extends ReactComponent {}
   },
 })
 export class EditStreamWindow extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'Grow' },
+    wrapperStyles: { default: () => ({ gridRow: '1 / span 1' }) },
+  },
+})
+export class Grow extends ReactComponent {}
+
+@Component({
+  props: {
+    name: { default: 'PlatformLogo' },
+    wrapperStyles: { default: () => ({}) },
+  },
+})
+export class PlatformLogo extends ReactComponent<{
+  platform: string;
+  size?: 'medium' | number;
+  color?: string;
+  unwrapped?: boolean;
+}> {}
 
 @Component({
   props: {

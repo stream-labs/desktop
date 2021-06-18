@@ -43,7 +43,7 @@ export function ModalLayout(p: TProps) {
   const { WindowsService, CustomizationService } = Services;
 
   // define a vuex state
-  const v = useVuex(() => ({ currentTheme: CustomizationService.currentTheme }));
+  const v = useVuex(() => ({ currentTheme: CustomizationService.currentTheme }), false);
 
   // define a close method for the modal
   function close() {
