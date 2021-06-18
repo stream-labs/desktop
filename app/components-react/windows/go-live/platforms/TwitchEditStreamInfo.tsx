@@ -1,4 +1,4 @@
-import CommonPlatformFields from '../CommonPlatformFields';
+import { CommonPlatformFields } from '../CommonPlatformFields';
 import React from 'react';
 import { $t } from '../../../../services/i18n';
 import { TwitchTagsInput } from './TwitchTagsInput';
@@ -21,7 +21,15 @@ export function TwitchEditStreamInfo(p: IPlatformComponentParams<'twitch'>) {
     <Form name="twitch-settings">
       <PlatformSettingsLayout
         layoutMode={p.layoutMode}
-        commonFields={<CommonPlatformFields key="common" platform="twitch" />}
+        commonFields={
+          <CommonPlatformFields
+            key="common"
+            platform="twitch"
+            layoutMode={p.layoutMode}
+            value={twSettings}
+            onChange={updateSettings}
+          />
+        }
         requiredFields={<GameSelector key="required" platform={'twitch'} {...bind.game} />}
         optionalFields={<TwitchTagsInput key="optional" label={$t('Twitch Tags')} {...bind.tags} />}
       />

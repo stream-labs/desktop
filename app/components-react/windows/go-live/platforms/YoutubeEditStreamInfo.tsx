@@ -1,5 +1,11 @@
-import CommonPlatformFields from '../CommonPlatformFields';
-import { CheckboxInput, createBinding, ImageInput, ListInput } from '../../../shared/inputs';
+import { CommonPlatformFields } from '../CommonPlatformFields';
+import {
+  CheckboxInput,
+  createBinding,
+  ImageInput,
+  InputComponent,
+  ListInput
+} from '../../../shared/inputs';
 import React, { useEffect } from 'react';
 import { Services } from '../../../service-provider';
 import { $t } from '../../../../services/i18n';
@@ -14,7 +20,7 @@ import PlatformSettingsLayout, { IPlatformComponentParams } from './PlatformSett
 /***
  * Stream Settings for YT
  */
-export function YoutubeEditStreamInfo(p: IPlatformComponentParams<'youtube'>) {
+export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams<'youtube'>) => {
   const { YoutubeService, StreamingService } = Services;
   const { isScheduleMode, isUpdateMode } = p;
   const isMidStreamMode = StreamingService.views.isMidStreamMode;
@@ -73,7 +79,15 @@ export function YoutubeEditStreamInfo(p: IPlatformComponentParams<'youtube'>) {
   }
 
   function renderCommonFields() {
-    return <CommonPlatformFields key="common" platform="youtube" />;
+    return (
+      <CommonPlatformFields
+        key="common"
+        platform="youtube"
+        layoutMode={p.layoutMode}
+        value={ytSettings}
+        onChange={updateSettings}
+      />
+    );
   }
 
   function renderBroadcastInput() {
@@ -198,4 +212,4 @@ export function YoutubeEditStreamInfo(p: IPlatformComponentParams<'youtube'>) {
       />
     </Form>
   );
-}
+});

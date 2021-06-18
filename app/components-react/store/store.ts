@@ -2,6 +2,8 @@ import { combineReducers, createAction, createReducer, createStore, Store } from
 import { batch, shallowEqual, useSelector as useReduxSelector } from 'react-redux';
 import { StatefulService } from '../../services';
 import isPlainObject from 'lodash/isPlainObject';
+import { useOnCreate } from '../hooks';
+import { useRef } from 'react';
 
 /**
  * Creates reducer manager that allows using dynamic reducers
@@ -91,7 +93,7 @@ class ModuleManager {
   public mutationState: unknown;
   private registeredModules: Record<string, IModuleMetadata> = {};
 
-  registerModule<TInitParams, TModule extends IStatefulModule<TInitParams>>(
+  registerModule<TInitParams, TModule extends IStatefulModule<any>>(
     module: TModule,
     initParams?: TInitParams,
   ): TModule {
@@ -129,8 +131,8 @@ class ModuleManager {
     delete this.registeredModules[moduleName];
   }
 
-  getModule(moduleName: string) {
-    return this.registeredModules[moduleName]?.module;
+  getModule<TModule extends IStatefulModule<any>>(moduleName: string): TModule {
+    return this.registeredModules[moduleName]?.module as TModule;
   }
 
   registerComponent(moduleName: string, componentId: string) {
@@ -219,9 +221,9 @@ function registerMutation(target: any, mutationName: string, fn: Function) {
       const mutationIsRunning = !!moduleManager.mutationState;
       if (mutationIsRunning) return originalMethod.apply(module, args);
 
-      const batchedUpdatesModule = moduleManager.getModule(
+      const batchedUpdatesModule = moduleManager.getModule<BatchedUpdatesModule>(
         'BatchedUpdatesModule',
-      ) as BatchedUpdatesModule;
+      );
 
       batch(() => {
         if (moduleName !== 'BatchedUpdatesModule') batchedUpdatesModule.temporaryDisableRendering();
@@ -260,6 +262,10 @@ class VuexModule {
     });
   }
 
+  watchReadOperations(fn: Function) {
+    return StatefulService.watchReadOperations(fn);
+  }
+
   @mutation()
   incrementRevision(statefulServiceName: string) {
     if (!this.state[statefulServiceName]) {
@@ -275,34 +281,69 @@ export function useSelector<T extends Object>(fn: () => T): T {
 
   const moduleManager = getModuleManager();
   const vuexModule = moduleManager.getModule('VuexModule') as VuexModule;
-  const batchedUpdatesModule = moduleManager.getModule(
+  const batchedUpdatesModule = moduleManager.getModule<BatchedUpdatesModule>(
     'BatchedUpdatesModule',
-  ) as BatchedUpdatesModule;
-
-  useReduxSelector(
-    () => {
-      const affectedVuexServices = StatefulService.watchReadOperations(() => {
-        componentProps = fn();
-      });
-
-      const vuexRevisions = {};
-      affectedVuexServices.forEach(serviceName => {
-        vuexRevisions[serviceName] = vuexModule.state[serviceName];
-      });
-
-      return { componentProps, vuexRevisions };
-    },
-    (prevState, newState) => {
-      if (batchedUpdatesModule.state.isRenderingDisabled) {
-        return true;
-      }
-
-      if (!isSimilar(prevState.componentProps, newState.componentProps)) {
-        return false;
-      }
-      return true;
-    },
   );
+  const cachedSelectedResult = useRef<any>({});
+  const isMounted = useRef(false);
+
+  const selector = useOnCreate(() => {
+    return () => {
+      if (cachedSelectedResult.current?.commonFields) {
+        if (batchedUpdatesModule.state.isRenderingDisabled && isMounted.current) {
+          console.log('return cached', cachedSelectedResult.current.platforms.youtube);
+        } else {
+          console.log('return non-cached', cachedSelectedResult.current.platforms.youtube);
+        }
+      }
+
+      if (batchedUpdatesModule.state.isRenderingDisabled && isMounted.current) {
+        return cachedSelectedResult.current;
+      }
+      vuexModule.watchReadOperations(() => {
+        cachedSelectedResult.current = fn();
+      });
+
+      // cachedSelectedResult.current = fn();
+      return cachedSelectedResult.current;
+    };
+  });
+
+  return useReduxSelector(selector, (prevState, newState) => {
+    if (batchedUpdatesModule.state.isRenderingDisabled) {
+      return true;
+    }
+
+    if (!isSimilar(prevState, newState)) {
+      return false;
+    }
+    return true;
+  }) as T;
+
+  // useReduxSelector(
+  //   () => {
+  //     const affectedVuexServices = StatefulService.watchReadOperations(() => {
+  //       componentProps = fn();
+  //     });
+  //
+  //     const vuexRevisions = {};
+  //     affectedVuexServices.forEach(serviceName => {
+  //       vuexRevisions[serviceName] = vuexModule.state[serviceName];
+  //     });
+  //
+  //     return { componentProps, vuexRevisions };
+  //   },
+  //   (prevState, newState) => {
+  //     if (batchedUpdatesModule.state.isRenderingDisabled) {
+  //       return true;
+  //     }
+  //
+  //     if (!isSimilar(prevState.componentProps, newState.componentProps)) {
+  //       return false;
+  //     }
+  //     return true;
+  //   },
+  // );
 
   return componentProps;
 }

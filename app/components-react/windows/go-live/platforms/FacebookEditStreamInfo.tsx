@@ -1,7 +1,7 @@
 import electron from 'electron';
 import css from './FacebookEditStreamInfo.m.less';
 import { useGoLiveSettings } from '../useGoLiveSettings';
-import CommonPlatformFields from '../CommonPlatformFields';
+import { CommonPlatformFields } from '../CommonPlatformFields';
 import React from 'react';
 import { Services } from '../../../service-provider';
 import Form from '../../../shared/inputs/Form';
@@ -183,7 +183,15 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
   }
 
   function renderCommonFields() {
-    return <CommonPlatformFields key="common" platform="facebook" />;
+    return (
+      <CommonPlatformFields
+        key="common"
+        platform="facebook"
+        layoutMode={p.layoutMode}
+        value={fbSettings}
+        onChange={updateSettings}
+      />
+    );
   }
 
   function renderRequiredFields() {

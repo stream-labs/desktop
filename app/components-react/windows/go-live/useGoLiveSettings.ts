@@ -10,7 +10,7 @@ import { useModule } from '../../hooks/useModule';
 import { useForm } from '../../shared/inputs/Form';
 import { getDefined } from '../../../util/properties-type-guards';
 
-type TCustomFieldName = 'title' | 'description';
+type TCommonFieldName = 'title' | 'description';
 
 /**
  * Extend GoLiveSettingsFeature from StreamInfoView
@@ -136,23 +136,26 @@ export class GoLiveSettingsFeature extends StreamInfoView<IGoLiveSettingsState> 
    **/
 
   @mutation()
-  updateCommonFields(fieldName: TCustomFieldName, value: string) {
-    this.platformsWithoutCustomFields.forEach(platform => {
-      if (!this.supports(fieldName, [platform])) return;
-      const platformSettings = getDefined(this.state.platforms[platform]);
-      platformSettings[fieldName] = value;
+  updateCommonFields(fields: { title: string; description: string }) {
+    Object.keys(fields).forEach((fieldName: TCommonFieldName) => {
+      const value = fields[fieldName];
+      this.platformsWithoutCustomFields.forEach(platform => {
+        if (!this.supports(fieldName, [platform])) return;
+        const platformSettings = getDefined(this.state.platforms[platform]);
+        platformSettings[fieldName] = value;
+      });
     });
   }
-  /**
-   * Enable/disable custom common fields for a platform
-   **/
-
-  @mutation()
-  toggleCustomFields(platform: TPlatform) {
-    const platformSettings = getDefined(this.state.platforms[platform]);
-    const enabled = platformSettings.useCustomFields;
-    return this.updatePlatform(platform, { useCustomFields: !enabled });
-  }
+  // /**
+  //  * Enable/disable custom common fields for a platform
+  //  **/
+  //
+  // @mutation()
+  // toggleCustomFields(platform: TPlatform) {
+  //   const platformSettings = getDefined(this.state.platforms[platform]);
+  //   const enabled = platformSettings.useCustomFields;
+  //   return this.updatePlatform(platform, { useCustomFields: !enabled });
+  // }
 
   /**
    * Save current settings so we can use it next time we open the GoLiveWindow

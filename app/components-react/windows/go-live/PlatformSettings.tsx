@@ -1,4 +1,4 @@
-import CommonPlatformFields from './CommonPlatformFields';
+import { CommonPlatformFields } from './CommonPlatformFields';
 import { useGoLiveSettings } from './useGoLiveSettings';
 import { $t } from '../../../services/i18n';
 import React from 'react';
@@ -21,7 +21,14 @@ export default function PlatformSettings() {
     isLoading,
     updatePlatform,
     platforms,
-  } = useGoLiveSettings();
+    commonFields,
+    updateCommonFields,
+    descriptionIsRequired,
+  } = useGoLiveSettings().selectExtra(settings => {
+    const fbSettings = settings.platforms['facebook'];
+    const descriptionIsRequired = fbSettings && fbSettings.enabled && !fbSettings.useCustomFields;
+    return { descriptionIsRequired };
+  });
 
   const shouldShowSettings = !error && !isLoading;
 
@@ -51,7 +58,11 @@ export default function PlatformSettings() {
           {/*COMMON FIELDS*/}
           {isMultiplatformMode && (
             <Section isSimpleMode={!isAdvancedMode} title={$t('Common Stream Settings')}>
-              <CommonPlatformFields />
+              <CommonPlatformFields
+                descriptionIsRequired={descriptionIsRequired}
+                value={commonFields}
+                onChange={updateCommonFields}
+              />
             </Section>
           )}
 

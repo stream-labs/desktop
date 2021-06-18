@@ -13,7 +13,6 @@ import TwitterInput from './Twitter';
 import OptimizedProfileSwitcher from './OptimizedProfileSwitcher';
 import Spinner from '../../shared/Spinner';
 import GoLiveError from './GoLiveError';
-import {useSelector} from "../../store";
 
 const PlusIcon = PlusOutlined as Function;
 
