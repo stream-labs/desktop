@@ -100,6 +100,11 @@ export function useInput<
 >(type: TInputType, inputProps: TInputProps, antFeatures?: readonly string[]) {
   const { name, value, label } = inputProps;
 
+  // save input props to ref
+  // so it should always be updated in `useCallback` calls
+  const inputPropsRef = useRef(inputProps);
+  inputPropsRef.current = inputProps;
+
   const uncontrolled = (() => {
     // inputs with debounce are always uncontrolled
     if (inputProps.debounce) return true;
@@ -149,7 +154,7 @@ export function useInput<
   // create an `emitChange()` method and it's debounced version
   function emitChange(newVal: TValue) {
     if (uncontrolled) prevValueRef.current = newVal;
-    inputProps.onChange && inputProps.onChange(newVal);
+    inputPropsRef.current.onChange && inputPropsRef.current.onChange(newVal);
   }
   const emitChangeDebounced = useDebounce(inputProps.debounce, emitChange);
 
@@ -157,6 +162,7 @@ export function useInput<
   const onChange = useCallback((newVal: TValue) => {
     // if nothing changed then just ignore
     if (isEqual(newVal, localValueRef.current)) return;
+    const props = inputPropsRef.current;
 
     // call forceUpdate if component is uncontrolled
     // controlled components should be updated automatically via props changing
@@ -165,9 +171,9 @@ export function useInput<
       forceUpdate();
     }
 
-    inputProps.onInput && inputProps.onInput(newVal);
-    if (!inputProps.onChange) return;
-    if (inputProps.debounce) {
+    props.onInput && props.onInput(newVal);
+    if (!props.onChange) return;
+    if (props.debounce) {
       emitChangeDebounced(newVal);
     } else {
       emitChange(newVal);
@@ -395,7 +401,6 @@ function createValidationRules(type: TInputType, inputProps: IInputCommonProps<u
 
 /**
  * Function for creating new input components
- * For performance optimization ignores changing of all function props like onChange and onInput
  * Use the deep comparison algorithm for the `value` prop
  */
 export function InputComponent<T extends Function>(f: T): T {
@@ -403,9 +408,6 @@ export function InputComponent<T extends Function>(f: T): T {
     const keys = Object.keys(newProps);
     if (keys.length !== Object.keys(prevProps).length) return false;
     for (const key of keys) {
-      // skip functions comparison
-      if (typeof newProps[key] === 'function') continue;
-
       // use deep comparison for the `value` prop
       // because it could have an array type (For example TagsInput.value)
       if (key === 'value' && !isEqual(newProps[key], prevProps[key])) return false;

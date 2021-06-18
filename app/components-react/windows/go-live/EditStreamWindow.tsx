@@ -27,7 +27,7 @@ export default function EditStreamWindow() {
     prepopulate,
     isLoading,
     form,
-  } = useGoLiveSettings({ isUpdateMode: true });
+  } = useGoLiveSettings({ isUpdateMode: true }).select();
 
   const shouldShowChecklist = lifecycle === 'runChecklist';
   const shouldShowSettings = !shouldShowChecklist;

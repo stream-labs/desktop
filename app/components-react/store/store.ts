@@ -3,7 +3,7 @@ import { batch, shallowEqual, useSelector as useReduxSelector } from 'react-redu
 import { StatefulService } from '../../services';
 import isPlainObject from 'lodash/isPlainObject';
 import { useOnCreate } from '../hooks';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 /**
  * Creates reducer manager that allows using dynamic reducers
@@ -277,36 +277,26 @@ class VuexModule {
 }
 
 export function useSelector<T extends Object>(fn: () => T): T {
-  let componentProps!: T;
-
   const moduleManager = getModuleManager();
-  const vuexModule = moduleManager.getModule('VuexModule') as VuexModule;
   const batchedUpdatesModule = moduleManager.getModule<BatchedUpdatesModule>(
     'BatchedUpdatesModule',
   );
-  const cachedSelectedResult = useRef<any>({});
-  const isMounted = useRef(false);
+  const cachedSelectedResult = useRef<any>(null);
+  const isMountedRef = useRef(false);
 
   const selector = useOnCreate(() => {
     return () => {
-      if (cachedSelectedResult.current?.commonFields) {
-        if (batchedUpdatesModule.state.isRenderingDisabled && isMounted.current) {
-          console.log('return cached', cachedSelectedResult.current.platforms.youtube);
-        } else {
-          console.log('return non-cached', cachedSelectedResult.current.platforms.youtube);
-        }
-      }
-
-      if (batchedUpdatesModule.state.isRenderingDisabled && isMounted.current) {
+      if (batchedUpdatesModule.state.isRenderingDisabled && isMountedRef.current) {
         return cachedSelectedResult.current;
       }
-      vuexModule.watchReadOperations(() => {
-        cachedSelectedResult.current = fn();
-      });
 
-      // cachedSelectedResult.current = fn();
+      cachedSelectedResult.current = fn();
       return cachedSelectedResult.current;
     };
+  });
+
+  useEffect(() => {
+    isMountedRef.current = true;
   });
 
   return useReduxSelector(selector, (prevState, newState) => {
@@ -319,34 +309,98 @@ export function useSelector<T extends Object>(fn: () => T): T {
     }
     return true;
   }) as T;
-
-  // useReduxSelector(
-  //   () => {
-  //     const affectedVuexServices = StatefulService.watchReadOperations(() => {
-  //       componentProps = fn();
-  //     });
-  //
-  //     const vuexRevisions = {};
-  //     affectedVuexServices.forEach(serviceName => {
-  //       vuexRevisions[serviceName] = vuexModule.state[serviceName];
-  //     });
-  //
-  //     return { componentProps, vuexRevisions };
-  //   },
-  //   (prevState, newState) => {
-  //     if (batchedUpdatesModule.state.isRenderingDisabled) {
-  //       return true;
-  //     }
-  //
-  //     if (!isSimilar(prevState.componentProps, newState.componentProps)) {
-  //       return false;
-  //     }
-  //     return true;
-  //   },
-  // );
-
-  return componentProps;
 }
+
+
+/**
+ * Tracks read operations on the object
+ *
+ * @example
+ *
+ * const myObject = { foo: 1, bar: 2, qux: 3};
+ * const { watcherProxy, getDependentFields } = createDependencyWatcher(myObject);
+ * const { foo, bar } = watcherProxy;
+ * getDependentFields(); // returns ['foo', 'bar'];
+ *
+ */
+export function createDependencyWatcher<T extends object>(watchedObject: T) {
+  const dependencies: Record<string, any> = {};
+  const watcherProxy = new Proxy(
+    {
+      _proxyName: 'DependencyWatcher',
+      // useBinding,
+    },
+    {
+      get: (target, propName: string) => {
+        // if (propName === 'hasOwnProperty') return watchedObject.hasOwnProperty;
+        if (propName in target) return target[propName];
+        const value = watchedObject[propName];
+
+        // // Input bindings that have been created via createBinding() are source of
+        // // component's dependencies. We should handle them differently
+        // if (value && value._proxyName === 'Binding') {
+        //   // if we already have the binding in the deps, just return it
+        //   if (propName in dependencies) {
+        //     return dependencies[propName];
+        //   } else {
+        //     // if it's the first time we access binding then clone it to dependencies
+        //     // the binding object keep its own dependencies and cloning will reset them
+        //     // that ensures each component will have it's own dependency list for the each binding
+        //     dependencies[propName] = value._binding.clone();
+        //     return dependencies[propName];
+        //   }
+        // } else {
+        // for non-binding objects just save their value in the dependencies
+        dependencies[propName] = value;
+        return value;
+        // }
+      },
+    },
+  ) as T;
+
+  function getDependentFields() {
+    return Object.keys(dependencies);
+  }
+
+  function getDependentValues(): Partial<T> {
+    const values: Partial<T> = {};
+    Object.keys(dependencies).forEach(propName => {
+      const value = dependencies[propName];
+      // if one of dependencies is a binding then expose its internal dependencies
+      if (value && value._proxyName === 'Binding') {
+        const bindingMetadata = value._binding;
+        Object.keys(bindingMetadata.dependencies).forEach(bindingPropName => {
+          values[`${bindingPropName}__binding-${bindingMetadata.id}`] =
+            dependencies[propName][bindingPropName].value;
+        });
+        return;
+      }
+      // if it's not a binding then just take the value from the watchedObject
+      values[propName] = watchedObject[propName];
+    });
+    return values;
+  }
+
+  // /**
+  //  * Hook for creating an reactive input binding
+  //  */
+  // function useBinding<TState extends object>(
+  //   stateGetter: (view: T) => TState,
+  //   stateSetter: (patch: TState) => unknown,
+  // ): TBindings<TState, keyof TState> {
+  //   const bindingRef = useRef<TBindings<TState, keyof TState>>();
+  //   if (!bindingRef.current) {
+  //     const binding = createBinding(() => stateGetter(watchedObject), stateSetter);
+  //     dependencies[binding._binding.id] = binding;
+  //     bindingRef.current = binding;
+  //   }
+  //   assertIsDefined(bindingRef.current);
+  //   return bindingRef.current;
+  // }
+
+  return { watcherProxy, getDependentFields, getDependentValues };
+}
+
 
 /**
  * consider isSimilar as isDeepEqual with depth 2
