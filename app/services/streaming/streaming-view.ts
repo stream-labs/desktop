@@ -370,22 +370,4 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   get delaySeconds() {
     return this.streamSettingsView.settings.delaySec;
   }
-
-  get streamingStateChangeTime() {
-    return moment(this.state.streamingStatusTime);
-  }
-
-  get delaySecondsRemaining() {
-    if (!this.delayEnabled) return 0;
-
-    if (
-      this.state.streamingStatus === EStreamingState.Starting ||
-      this.state.streamingStatus === EStreamingState.Ending
-    ) {
-      const elapsedTime = moment().unix() - this.streamingStateChangeTime.unix();
-      return Math.max(this.delaySeconds - elapsedTime, 0);
-    }
-
-    return 0;
-  }
 }

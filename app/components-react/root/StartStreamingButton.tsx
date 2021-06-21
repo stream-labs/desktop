@@ -132,10 +132,31 @@ export default function StartStreamingButton(p: { disabled?: boolean }) {
 
 function StreamButtonLabel(p: { streamingStatus: EStreamingState }) {
   const { StreamingService } = Services;
-  const { delayEnabled, delaySecondsRemaining } = useVuex(() => ({
+  const { delayEnabled, delaySeconds } = useVuex(() => ({
     delayEnabled: StreamingService.views.delayEnabled,
-    delaySecondsRemaining: StreamingService.views.delaySecondsRemaining,
+    delaySeconds: StreamingService.views.delaySeconds,
   }));
+  const [delaySecondsRemaining, setDelayTick] = useState(delaySeconds);
+
+  useEffect(() => {
+    setDelayTick(delaySeconds);
+  }, [p.streamingStatus]);
+
+  useEffect(() => {
+    if (
+      delayEnabled &&
+      (p.streamingStatus === EStreamingState.Starting ||
+        p.streamingStatus === EStreamingState.Ending)
+    ) {
+      const interval = window.setTimeout(() => {
+        setDelayTick(delaySecondsRemaining - 1);
+        console.log(delaySecondsRemaining);
+      }, 1000);
+      return () => {
+        clearTimeout(interval);
+      };
+    }
+  }, [delaySecondsRemaining, p.streamingStatus, delayEnabled]);
 
   if (p.streamingStatus === EStreamingState.Live) {
     return <>{$t('End Stream')}</>;
