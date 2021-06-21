@@ -32,6 +32,7 @@ export default function StartStreamingButton(p: { disabled?: boolean }) {
   useEffect(() => {
     if (
       delayEnabled &&
+      delaySecondsRemaining > 0 &&
       (streamingStatus === EStreamingState.Starting || streamingStatus === EStreamingState.Ending)
     ) {
       const interval = window.setTimeout(() => {
@@ -160,8 +161,6 @@ function StreamButtonLabel(p: {
   delaySecondsRemaining: number;
   delayEnabled: boolean;
 }) {
-  const { StreamingService } = Services;
-
   if (p.streamingStatus === EStreamingState.Live) {
     return <>{$t('End Stream')}</>;
   }
