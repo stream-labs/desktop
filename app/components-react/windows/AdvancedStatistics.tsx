@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import cx from 'classnames';
 import { Services } from '../service-provider';
-import { useVuex } from '../hooks';
+import { useInterval, useVuex } from '../hooks';
 import { $t } from '../../services/i18n';
 import styles from './AdvancedStatistics.m.less';
 import { ModalLayout } from '../shared/ModalLayout';
@@ -20,8 +20,6 @@ export default function AdvancedStatistics() {
     MediaBackupService,
   } = Services;
 
-  const [minuteCounter, setMinuteCounter] = useState(0);
-
   const { notifications, streamQuality, streamingStatus, syncStatus } = useVuex(() => ({
     notifications: NotificationsService.views
       .getAll()
@@ -31,20 +29,17 @@ export default function AdvancedStatistics() {
     syncStatus: MediaBackupService.views.globalSyncStatus,
   }));
 
+  // Forces a refresh on notification labels every minute
+  useInterval(() => {}, 60 * 1000);
+
   useEffect(() => {
     const notificationPushedSub = NotificationsService.notificationPushed.subscribe(notify => {
       onNotificationHandler(notify);
     });
 
-    const timeLabelInterval = window.setInterval(() => {
-      // Forces a refresh on notification labels every minute
-      setMinuteCounter(minuteCounter + 1);
-    }, 60 * 1000);
-
     return () => {
       NotificationsService.markAllAsRead();
       notificationPushedSub.unsubscribe();
-      clearInterval(timeLabelInterval);
     };
   }, []);
 
