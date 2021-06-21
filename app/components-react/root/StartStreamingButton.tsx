@@ -17,10 +17,31 @@ export default function StartStreamingButton(p: { disabled?: boolean }) {
     SourcesService,
   } = Services;
 
-  const { streamingStatus, delaySecondsRemaining } = useVuex(() => ({
+  const { streamingStatus, delayEnabled, delaySeconds } = useVuex(() => ({
     streamingStatus: StreamingService.state.streamingStatus,
-    delaySecondsRemaining: StreamingService.views.delaySecondsRemaining,
+    delayEnabled: StreamingService.views.delayEnabled,
+    delaySeconds: StreamingService.views.delaySeconds,
   }));
+
+  const [delaySecondsRemaining, setDelayTick] = useState(delaySeconds);
+
+  useEffect(() => {
+    setDelayTick(delaySeconds);
+  }, [streamingStatus]);
+
+  useEffect(() => {
+    if (
+      delayEnabled &&
+      (streamingStatus === EStreamingState.Starting || streamingStatus === EStreamingState.Ending)
+    ) {
+      const interval = window.setTimeout(() => {
+        setDelayTick(delaySecondsRemaining - 1);
+      }, 1000);
+      return () => {
+        clearTimeout(interval);
+      };
+    }
+  }, [delaySecondsRemaining, streamingStatus, delayEnabled]);
 
   async function toggleStreaming() {
     if (StreamingService.isStreaming) {
@@ -125,53 +146,37 @@ export default function StartStreamingButton(p: { disabled?: boolean }) {
       disabled={isDisabled}
       onClick={toggleStreaming}
     >
-      <StreamButtonLabel streamingStatus={streamingStatus} />
+      <StreamButtonLabel
+        streamingStatus={streamingStatus}
+        delayEnabled={delayEnabled}
+        delaySecondsRemaining={delaySecondsRemaining}
+      />
     </button>
   );
 }
 
-function StreamButtonLabel(p: { streamingStatus: EStreamingState }) {
+function StreamButtonLabel(p: {
+  streamingStatus: EStreamingState;
+  delaySecondsRemaining: number;
+  delayEnabled: boolean;
+}) {
   const { StreamingService } = Services;
-  const { delayEnabled, delaySeconds } = useVuex(() => ({
-    delayEnabled: StreamingService.views.delayEnabled,
-    delaySeconds: StreamingService.views.delaySeconds,
-  }));
-  const [delaySecondsRemaining, setDelayTick] = useState(delaySeconds);
-
-  useEffect(() => {
-    setDelayTick(delaySeconds);
-  }, [p.streamingStatus]);
-
-  useEffect(() => {
-    if (
-      delayEnabled &&
-      (p.streamingStatus === EStreamingState.Starting ||
-        p.streamingStatus === EStreamingState.Ending)
-    ) {
-      const interval = window.setTimeout(() => {
-        setDelayTick(delaySecondsRemaining - 1);
-      }, 1000);
-      return () => {
-        clearTimeout(interval);
-      };
-    }
-  }, [delaySecondsRemaining, p.streamingStatus, delayEnabled]);
 
   if (p.streamingStatus === EStreamingState.Live) {
     return <>{$t('End Stream')}</>;
   }
 
   if (p.streamingStatus === EStreamingState.Starting) {
-    if (delayEnabled) {
-      return <>{`Starting ${delaySecondsRemaining}s`}</>;
+    if (p.delayEnabled) {
+      return <>{`Starting ${p.delaySecondsRemaining}s`}</>;
     }
 
     return <>{$t('Starting')}</>;
   }
 
   if (p.streamingStatus === EStreamingState.Ending) {
-    if (delayEnabled) {
-      return <>{`Discard ${delaySecondsRemaining}s`}</>;
+    if (p.delayEnabled) {
+      return <>{`Discard ${p.delaySecondsRemaining}s`}</>;
     }
 
     return <>{$t('Ending')}</>;
