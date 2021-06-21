@@ -150,7 +150,6 @@ function StreamButtonLabel(p: { streamingStatus: EStreamingState }) {
     ) {
       const interval = window.setTimeout(() => {
         setDelayTick(delaySecondsRemaining - 1);
-        console.log(delaySecondsRemaining);
       }, 1000);
       return () => {
         clearTimeout(interval);
