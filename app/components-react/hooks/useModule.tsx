@@ -10,11 +10,12 @@ import { lockThis, merge, TMerge } from '../../util/merge';
 
 export function useModule<
   TInitParams,
-  TControllerClass extends new (...args: any[]) => IStatefulModule<TInitParams>,
+  TState,
+  TControllerClass extends new (...args: any[]) => IStatefulModule<TInitParams, TState>,
   TBindingState,
   TBindingExtraProps,
   TReturnType extends InstanceType<TControllerClass> & {
-    select: SelectCreator<InstanceType<TControllerClass>>['select']; // () => InstanceType<TControllerClass>;
+    select: () => InstanceType<TControllerClass> & InstanceType<TControllerClass>['state']; // SelectCreator<InstanceType<TControllerClass>>['select'] & TState; // () => InstanceType<TControllerClass>;
 
     selectExtra: <TComputedProps>(
       fn: (module: InstanceType<TControllerClass>) => TComputedProps,
@@ -43,6 +44,7 @@ export function useModule<
       module = moduleManager.registerModule(new ModuleClass(), initParams);
     }
     moduleManager.registerComponent(moduleName, componentId);
+    const lockedModule = lockThis(module);
 
     function calculateComputedProps() {
       const compute = computedPropsFnRef.current;
@@ -57,7 +59,11 @@ export function useModule<
     ): InstanceType<TControllerClass> & TComputedProps {
       if (!dependencyWatcherRef.current) {
         if (fn) computedPropsFnRef.current = fn;
-        const mergedModule = merge(module, computedPropsRef.current);
+        const mergedModule = merge(
+          () => lockedModule,
+          () => module.state,
+          () => computedPropsRef.current,
+        );
         dependencyWatcherRef.current = createDependencyWatcher(mergedModule);
       }
       return dependencyWatcherRef.current.watcherProxy;
@@ -81,7 +87,10 @@ export function useModule<
 
   useSelector(selector);
 
-  const mergeResult = merge(module, { select, selectExtra: select });
+  const mergeResult = merge(
+    () => module,
+    () => ({ select, selectExtra: select }),
+  );
   return (mergeResult as unknown) as TReturnType;
 }
 

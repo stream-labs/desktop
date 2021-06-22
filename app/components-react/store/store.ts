@@ -93,7 +93,7 @@ class ModuleManager {
   public mutationState: unknown;
   private registeredModules: Record<string, IModuleMetadata> = {};
 
-  registerModule<TInitParams, TModule extends IStatefulModule<any>>(
+  registerModule<TInitParams, TModule extends IStatefulModule<any, any>>(
     module: TModule,
     initParams?: TInitParams,
   ): TModule {
@@ -131,7 +131,7 @@ class ModuleManager {
     delete this.registeredModules[moduleName];
   }
 
-  getModule<TModule extends IStatefulModule<any>>(moduleName: string): TModule {
+  getModule<TModule extends IStatefulModule<any, any>>(moduleName: string): TModule {
     return this.registeredModules[moduleName]?.module as TModule;
   }
 
@@ -235,14 +235,14 @@ function registerMutation(target: any, mutationName: string, fn: Function) {
   return Object.getOwnPropertyDescriptor(target, mutationName);
 }
 
-export interface IStatefulModule<TInitParams> {
-  state: any;
+export interface IStatefulModule<TInitParams, TState> {
+  state: TState;
   init?: (initParams: TInitParams) => unknown;
 }
 
 interface IModuleMetadata {
   componentIds: string[];
-  module: IStatefulModule<any>;
+  module: IStatefulModule<any, any>;
 }
 
 type TStore = Store & {
@@ -328,6 +328,8 @@ export function createDependencyWatcher<T extends object>(watchedObject: T) {
   const watcherProxy = new Proxy(
     {
       _proxyName: 'DependencyWatcher',
+      _watchedObject: watchedObject,
+      _dependencies: dependencies,
       // useBinding,
     },
     {
