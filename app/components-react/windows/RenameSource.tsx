@@ -32,7 +32,7 @@ export default function RenameSource() {
   }
 
   return (
-    <ModalLayout onOk={submit}>
+    <ModalLayout onOk={submit} okText={$t('Done')}>
       <Form slot="content" form={form}>
         <TextInput
           label={$t('Please enter the name of the source')}
