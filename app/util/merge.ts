@@ -29,90 +29,14 @@ import { isPlainObject, flatten } from 'lodash';
  *
  */
 export function merge<
-  T1 extends object,
-  T2 extends object,
-  T3 extends object,
-  TReturnType = T3 extends undefined ? TMerge<T1, T2> : TMerge3<T1, T2, T3>
->(...objects: [T1, T2, T3?]): TReturnType {
-  const result = objects.reduce((a, val) => mergeTwo(a, val));
+  T1 extends Object,
+  T2 extends Object,
+  T3 extends Object,
+  FN3 extends () => T3,
+  TReturnType = FN3 extends undefined ? TMerge<T1, T2> : TMerge3<T1, T2, T3>
+>(...functions: [() => T1, () => T2, FN3?]): TReturnType {
+  const result = functions.reduce((a, val) => mergeTwo(a as unknown, val as unknown));
   return (result as unknown) as TReturnType;
-  //
-  // const _mergedObjects = flatten(objects.map(getMergedObjects));
-  // const mergeResult = { _proxyName: 'MergeResult', _mergedObjects };
-  //
-  // function getMergedObjects(obj: any) {
-  //   // if the object already merged then take its sub-objects
-  //   if (obj._proxyName === 'MergeResult') return obj._mergedObjects;
-  //
-  //   // if the object is class instance like ServiceView then rebind `this` for its methods
-  //   if (typeof obj !== 'function' && !isPlainObject(obj)) {
-  //     return [lockThis(obj)];
-  //   }
-  //   return [obj];
-  // }
-  //
-  // // mergeResult._mergedObjects.forEach(obj => {
-  // //   const descriptors = Object.getOwnPropertyDescriptors(obj);
-  // //   Object.keys(descriptors).forEach(propName => {
-  // //     Object.defineProperty(mergeResult, propName, {
-  // //       enumerable: true,
-  // //       configurable: false,
-  // //       get() {
-  // //         return target ? target[propName] : undefined;
-  // //       },
-  // //     });
-  // //   });
-  // //   if (descriptors);
-  // //   descriptors.for
-  // // });
-  //
-  // function getValue(propName) {
-  //   const target = getTarget(propName);
-  //   if (!target) return undefined;
-  //
-  //   const isFirstRead = Object.getOwnPropertyDescriptor(target, propName).configurable;
-  //
-  //   if (isFirstRead) {
-  //     Object.defineProperty(mergeResult, propName, {
-  //       enumerable: true,
-  //       configurable: false,
-  //       get() {
-  //         return target ? target[propName] : undefined;
-  //       },
-  //     });
-  //   }
-  //   return mergeResult[propName];
-  // }
-  //
-  // function getTarget(propName) {
-  //   if (!mergeResult.hasOwnProperty(propName)) {
-  //     const targetObj = mergeResult._mergedObjects.findIndex(obj => obj.hasOwnProperty(propName));
-  //     if (!targetObj) return undefined;
-  //     Object.defineProperty(mergeResult, propName, {
-  //       enumerable: true,
-  //       configurable: true,
-  //       get() {
-  //         return targetObj;
-  //       },
-  //     });
-  //   }
-  //   return mergeResult;
-  // }
-  //
-  // return (new Proxy(mergeResult, {
-  //   get(t, propName: string) {
-  //     if (propName === 'hasOwnProperty') return getTarget;
-  //     return getValue(propName);
-  //   },
-  //   // set: (target, propName: string, val) => {
-  //   //   if (propName.startsWith('_')) {
-  //   //     metadata[propName] = val;
-  //   //     return true;
-  //   //   } else {
-  //   //     throw new Error('Can not change property on readonly object');
-  //   //   }
-  //   // },
-  // }) as unknown) as TReturnType;
 }
 
 export type TMerge<
@@ -124,24 +48,93 @@ export type TMerge<
 > = R;
 
 export type TMerge3<T1, T2, T3> = TMerge<TMerge<T1, T2>, T3>;
+//
+// export function mergeTwo<T1 extends object, T2 extends object, TReturnType = TMerge<T1, T2>>(
+//   obj1: T1,
+//   obj2: T2,
+// ): TReturnType {
+//   const proxyMetadata = { _proxyName: 'MergeResult', _mergedObjects: [obj1, obj2] };
+//
+//   // if the object is class instance like ServiceView then rebind `this` for its methods
+//   if (typeof obj1 !== 'function' && !isPlainObject(obj1)) {
+//     obj1 = lockThis(obj1);
+//   }
+//
+//   if (typeof obj2 !== 'function' && !isPlainObject(obj2)) {
+//     obj2 = lockThis(obj2);
+//   }
+//
+//   function hasOwnProperty(propName: string) {
+//     return propName in obj2 || propName in obj1;
+//   }
+//
+//   // // if the object is class instance like ServiceView then rebind `this` for its methods
+//   // if (typeof obj1 !== 'function' && !isPlainObject(obj1)) {
+//   //   obj1 = lockThis(obj1);
+//   // }
+//
+//   return (new Proxy(proxyMetadata, {
+//     get(t, propName: string) {
+//       if (propName === 'hasOwnProperty') return hasOwnProperty;
+//       if (propName in proxyMetadata) return proxyMetadata[propName];
+//       // if (propName === '_proxyName') return proxyMetadata._proxyName;
+//       if (propName in obj2) return obj2[propName];
+//       if (propName in obj1) return obj1[propName];
+//     },
+//
+//     has(oTarget, propName: string) {
+//       return hasOwnProperty(propName);
+//     },
+//     // set: (target, propName: string, val) => {
+//     //   if (propName.startsWith('_')) {
+//     //     metadata[propName] = val;
+//     //     return true;
+//     //   } else {
+//     //     throw new Error('Can not change property on readonly object');
+//     //   }
+//     // },
+//   }) as unknown) as TReturnType;
+// }
 
-export function mergeTwo<T1 extends object, T2 extends object, TReturnType = TMerge<T1, T2>>(
-  obj1: T1,
-  obj2: T2,
+export function mergeTwo<T1 extends Object, T2 extends Object, TReturnType = TMerge<T1, T2>>(
+  target1: (() => T1) | T1,
+  target2: (() => T2) | T2,
 ): TReturnType {
-  const proxyMetadata = { _proxyName: 'MergeResult', _mergedObjects: [obj1, obj2] };
+  const proxyMetadata = {
+    _proxyName: 'MergeResult',
+    get _mergedObjects() {
+      return [target1, target2];
+    },
+  };
 
-  // if the object is class instance like ServiceView then rebind `this` for its methods
-  if (typeof obj1 !== 'function' && !isPlainObject(obj1)) {
-    obj1 = lockThis(obj1);
-  }
-
-  if (typeof obj2 !== 'function' && !isPlainObject(obj2)) {
-    obj2 = lockThis(obj2);
-  }
+  // // if the object is class instance like ServiceView then rebind `this` for its methods
+  // if (typeof obj1 !== 'function' && !isPlainObject(obj1)) {
+  //   obj1 = lockThis(obj1);
+  // }
+  //
+  // if (typeof obj2 !== 'function' && !isPlainObject(obj2)) {
+  //   obj2 = lockThis(obj2);
+  // }
 
   function hasOwnProperty(propName: string) {
-    return propName in obj2 || propName in obj1;
+    const obj = getObject(propName);
+    return obj && propName in obj;
+  }
+
+  function getObject(propName: string) {
+    if (target2['_proxyName'] === 'MergeResult' && propName in target2) {
+      return target2;
+    } else if (typeof target2 === 'function') {
+      const obj2 = (target2 as Function)();
+      if (propName in obj2) return obj2;
+    }
+
+    if (target1['_proxyName'] === 'MergeResult' && propName in target1) {
+      return target1;
+    } else if (typeof target1 === 'function') {
+      const obj1 = (target1 as Function)();
+      if (propName in obj1) return obj1;
+    }
   }
 
   // // if the object is class instance like ServiceView then rebind `this` for its methods
@@ -152,9 +145,9 @@ export function mergeTwo<T1 extends object, T2 extends object, TReturnType = TMe
   return (new Proxy(proxyMetadata, {
     get(t, propName: string) {
       if (propName === 'hasOwnProperty') return hasOwnProperty;
-      if (propName === '_proxyName') return proxyMetadata._proxyName;
-      if (propName in obj2) return obj2[propName];
-      if (propName in obj1) return obj1[propName];
+      if (propName in proxyMetadata) return proxyMetadata[propName];
+      const obj = getObject(propName);
+      if (obj) return obj[propName];
     },
 
     has(oTarget, propName: string) {
@@ -192,13 +185,13 @@ export function lockThis<T extends object>(instance: T): T {
       if (propName in result) return;
       const descriptor = Object.getOwnPropertyDescriptor(proto, propName);
       if (!descriptor) return;
-      if (descriptor.get) {
+      if (descriptor.get || typeof instance[propName] !== 'function') {
         Object.defineProperty(result, propName, {
           get: () => {
             return instance[propName];
           },
         });
-      } else if (typeof instance[propName] === 'function') {
+      } else {
         result[propName] = instance[propName].bind(instance);
       }
     });

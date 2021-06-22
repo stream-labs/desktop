@@ -31,5 +31,5 @@ export const components = {
   Loader,
   NavTools,
   PlatformLogo,
-  SharedComponentsLibrary,
+  SharedComponentsLibrary: createRoot(SharedComponentsLibrary),
 };

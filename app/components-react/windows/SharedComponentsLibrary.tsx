@@ -18,36 +18,43 @@ import {
 } from '../shared/inputs';
 import { Alert, Button, Col, Row, Space, Tag, Timeline } from 'antd';
 import { Services } from '../service-provider';
-import { merge, useStateManager } from '../hooks/useStateManager';
 import InputWrapper from '../shared/inputs/InputWrapper';
 import Scrollable from '../shared/Scrollable';
 import PlatformLogo from '../shared/PlatformLogo';
 import { DownloadOutlined } from '@ant-design/icons';
 import { alertAsync, confirmAsync } from '../modals';
 import { I18nService, WHITE_LIST } from '../../services/i18n';
+import { mutation } from '../store';
+import { pick } from 'lodash';
+import { useModule } from '../hooks/useModule';
+import { merge } from '../../util/merge';
 
 export default function SharedComponentsLibrary() {
-  const { Context, contextValue } = useGlobalSettings();
   return (
-    <Context.Provider value={contextValue}>
-      <ModalLayout>
-        <Row gutter={16} style={{ height: 'calc(100% + 24px)' }}>
-          <Col flex="auto" style={{ height: '100%' }}>
-            <Scrollable style={{ maxHeight: '100%' }}>
-              <Examples />
-            </Scrollable>
-          </Col>
-          <Col flex={'300px'}>
-            <GlobalSettings />
-          </Col>
-        </Row>
-      </ModalLayout>
-    </Context.Provider>
+    <ModalLayout>
+      <Row gutter={16} style={{ height: 'calc(100% + 24px)' }}>
+        <Col flex="auto" style={{ height: '100%' }}>
+          <Scrollable style={{ maxHeight: '100%' }}>
+            <Examples />
+          </Scrollable>
+        </Col>
+        <Col flex={'300px'}>
+          <GlobalSettings />
+        </Col>
+      </Row>
+    </ModalLayout>
   );
 }
 
 function Examples() {
-  const { layout, required, placeholder, hasTooltips, disabled, size } = useGlobalSettings();
+  const {
+    layout,
+    required,
+    placeholder,
+    hasTooltips,
+    disabled,
+    size,
+  } = useSharedComponentsLibrary();
   const { s, bind } = useFormState({
     textVal: '',
     textAreaVal: '',
@@ -100,212 +107,210 @@ function Examples() {
         />
       </Example>
 
-      <Example title="Number Input">
-        <NumberInput label="Basic" {...globalProps} {...bind.numberVal} />
-        <NumberInput
-          label="Min = 0, Max = 10"
-          min={0}
-          max={10}
-          {...globalProps}
-          {...bind.numberVal}
-        />
-      </Example>
+      {/*<Example title="Number Input">*/}
+      {/*  <NumberInput label="Basic" {...globalProps} {...bind.numberVal} />*/}
+      {/*  <NumberInput*/}
+      {/*    label="Min = 0, Max = 10"*/}
+      {/*    min={0}*/}
+      {/*    max={10}*/}
+      {/*    {...globalProps}*/}
+      {/*    {...bind.numberVal}*/}
+      {/*  />*/}
+      {/*</Example>*/}
 
-      <Example title="Textarea Input">
-        <TextAreaInput label="Basic" {...globalProps} {...bind.textAreaVal} />
-        <TextAreaInput
-          label="Show Count"
-          {...globalProps}
-          {...bind.textAreaVal}
-          showCount
-          maxLength={50}
-        />
-        <TextAreaInput label="Auto Size" {...globalProps} {...bind.textAreaVal} autoSize />
-      </Example>
+      {/*<Example title="Textarea Input">*/}
+      {/*  <TextAreaInput label="Basic" {...globalProps} {...bind.textAreaVal} />*/}
+      {/*  <TextAreaInput*/}
+      {/*    label="Show Count"*/}
+      {/*    {...globalProps}*/}
+      {/*    {...bind.textAreaVal}*/}
+      {/*    showCount*/}
+      {/*    maxLength={50}*/}
+      {/*  />*/}
+      {/*  <TextAreaInput label="Auto Size" {...globalProps} {...bind.textAreaVal} autoSize />*/}
+      {/*</Example>*/}
 
-      <Example title="List Input">
-        <ListInput label="Basic" {...globalProps} {...bind.listVal} options={s.listOptions} />
-        <ListInput
-          label="With search"
-          {...globalProps}
-          {...bind.listVal}
-          options={s.listOptions}
-          showSearch
-        />
-        <ListInput
-          label="Allow Clear"
-          {...globalProps}
-          {...bind.listVal}
-          options={s.listOptions}
-          allowClear
-        />
-      </Example>
+      {/*<Example title="List Input">*/}
+      {/*  <ListInput label="Basic" {...globalProps} {...bind.listVal} options={s.listOptions} />*/}
+      {/*  <ListInput*/}
+      {/*    label="With search"*/}
+      {/*    {...globalProps}*/}
+      {/*    {...bind.listVal}*/}
+      {/*    options={s.listOptions}*/}
+      {/*    showSearch*/}
+      {/*  />*/}
+      {/*  <ListInput*/}
+      {/*    label="Allow Clear"*/}
+      {/*    {...globalProps}*/}
+      {/*    {...bind.listVal}*/}
+      {/*    options={s.listOptions}*/}
+      {/*    allowClear*/}
+      {/*  />*/}
+      {/*</Example>*/}
 
-      <Example title="Tags Input">
-        <TagsInput label="Basic" {...globalProps} {...bind.tagsVal} options={s.tagsOptions} />
-        <TagsInput
-          label="Custom Tag Render"
-          {...globalProps}
-          {...bind.tagsVal}
-          options={s.tagsOptions}
-          tagRender={(tagProps, tag) => (
-            <Tag {...tagProps} color={tag.label.toLowerCase()}>
-              {tag.label}
-            </Tag>
-          )}
-        />
-        <TagsInput
-          label="Custom Option Render"
-          {...globalProps}
-          {...bind.tagsVal}
-          options={s.tagsOptions}
-          optionRender={opt => (
-            <Row gutter={16} style={{ color: opt.label.toLowerCase() }}>
-              <Col>{opt.value}</Col>
-              <Col>{opt.label}</Col>
-            </Row>
-          )}
-        />
-      </Example>
+      {/*<Example title="Tags Input">*/}
+      {/*  <TagsInput label="Basic" {...globalProps} {...bind.tagsVal} options={s.tagsOptions} />*/}
+      {/*  <TagsInput*/}
+      {/*    label="Custom Tag Render"*/}
+      {/*    {...globalProps}*/}
+      {/*    {...bind.tagsVal}*/}
+      {/*    options={s.tagsOptions}*/}
+      {/*    tagRender={(tagProps, tag) => (*/}
+      {/*      <Tag {...tagProps} color={tag.label.toLowerCase()}>*/}
+      {/*        {tag.label}*/}
+      {/*      </Tag>*/}
+      {/*    )}*/}
+      {/*  />*/}
+      {/*  <TagsInput*/}
+      {/*    label="Custom Option Render"*/}
+      {/*    {...globalProps}*/}
+      {/*    {...bind.tagsVal}*/}
+      {/*    options={s.tagsOptions}*/}
+      {/*    optionRender={opt => (*/}
+      {/*      <Row gutter={16} style={{ color: opt.label.toLowerCase() }}>*/}
+      {/*        <Col>{opt.value}</Col>*/}
+      {/*        <Col>{opt.label}</Col>*/}
+      {/*      </Row>*/}
+      {/*    )}*/}
+      {/*  />*/}
+      {/*</Example>*/}
 
-      <Example title="SwitchInput">
-        <SwitchInput label="Default" {...globalProps} {...bind.switcherVal} />
-        <SwitchInput label="Debounced" debounce={500} {...globalProps} {...bind.switcherVal} />
-        <SwitchInput label="Disabled" disabled {...globalProps} {...bind.switcherVal} />
-        <SwitchInput
-          label="With text"
-          {...globalProps}
-          {...bind.switcherVal}
-          checkedChildren="Enabled"
-          unCheckedChildren="Disabled"
-        />
-      </Example>
+      {/*<Example title="SwitchInput">*/}
+      {/*  <SwitchInput label="Default" {...globalProps} {...bind.switcherVal} />*/}
+      {/*  <SwitchInput label="Debounced" debounce={500} {...globalProps} {...bind.switcherVal} />*/}
+      {/*  <SwitchInput label="Disabled" disabled {...globalProps} {...bind.switcherVal} />*/}
+      {/*  <SwitchInput*/}
+      {/*    label="With text"*/}
+      {/*    {...globalProps}*/}
+      {/*    {...bind.switcherVal}*/}
+      {/*    checkedChildren="Enabled"*/}
+      {/*    unCheckedChildren="Disabled"*/}
+      {/*  />*/}
+      {/*</Example>*/}
 
-      <Example title="Checkbox Input">
-        <InputWrapper label="Checkbox Group">
-          <CheckboxInput label="Default" {...globalProps} {...bind.checkboxVal} />
-          <CheckboxInput label="Debounced" debounce={500} {...globalProps} {...bind.checkboxVal} />
-        </InputWrapper>
-      </Example>
+      {/*<Example title="Checkbox Input">*/}
+      {/*  <InputWrapper label="Checkbox Group">*/}
+      {/*    <CheckboxInput label="Default" {...globalProps} {...bind.checkboxVal} />*/}
+      {/*    <CheckboxInput label="Debounced" debounce={500} {...globalProps} {...bind.checkboxVal} />*/}
+      {/*  </InputWrapper>*/}
+      {/*</Example>*/}
 
-      <Example title="Slider Input">
-        <SliderInput label="Basic" min={0} max={10} {...globalProps} {...bind.sliderVal} />
-        <SliderInput
-          label="Without Number Input"
-          min={0}
-          max={10}
-          hasNumberInput={false}
-          {...bind.sliderVal}
-        />
-        <SliderInput
-          label="Debounced"
-          min={0}
-          max={10}
-          debounce={300}
-          {...globalProps}
-          {...bind.sliderVal}
-        />
-      </Example>
+      {/*<Example title="Slider Input">*/}
+      {/*  <SliderInput label="Basic" min={0} max={10} {...globalProps} {...bind.sliderVal} />*/}
+      {/*  <SliderInput*/}
+      {/*    label="Without Number Input"*/}
+      {/*    min={0}*/}
+      {/*    max={10}*/}
+      {/*    hasNumberInput={false}*/}
+      {/*    {...bind.sliderVal}*/}
+      {/*  />*/}
+      {/*  <SliderInput*/}
+      {/*    label="Debounced"*/}
+      {/*    min={0}*/}
+      {/*    max={10}*/}
+      {/*    debounce={300}*/}
+      {/*    {...globalProps}*/}
+      {/*    {...bind.sliderVal}*/}
+      {/*  />*/}
+      {/*</Example>*/}
 
-      <Example title="Date Input">
-        <DateInput label="Default" {...globalProps} {...bind.dateVal} />
-      </Example>
+      {/*<Example title="Date Input">*/}
+      {/*  <DateInput label="Default" {...globalProps} {...bind.dateVal} />*/}
+      {/*</Example>*/}
 
-      <Example title="Image Input">
-        <ImageInput label="Basic" maxFileSize={3000000} {...globalProps} {...bind.imageVal} />
-      </Example>
+      {/*<Example title="Image Input">*/}
+      {/*  <ImageInput label="Basic" maxFileSize={3000000} {...globalProps} {...bind.imageVal} />*/}
+      {/*</Example>*/}
 
-      <Example title="Buttons">
-        <Space direction="vertical">
-          <Button type="primary" size={size}>
-            Primary
-          </Button>
-          <Button size={size}>Default</Button>
-          <Button type="dashed" size={size}>
-            Dashed
-          </Button>
-          <br />
-          <Button type="link" size={size}>
-            Link
-          </Button>
-          <br />
-          <Button type="primary" icon={<DownloadOutlined />} size={size} />
-          <Button type="primary" shape="circle" icon={<DownloadOutlined />} size={size} />
-          <Button type="primary" shape="round" icon={<DownloadOutlined />} size={size} />
-          <Button type="primary" shape="round" icon={<DownloadOutlined />} size={size}>
-            Download
-          </Button>
-          <Button type="primary" icon={<DownloadOutlined />} size={size}>
-            Download
-          </Button>
+      {/*<Example title="Buttons">*/}
+      {/*  <Space direction="vertical">*/}
+      {/*    <Button type="primary" size={size}>*/}
+      {/*      Primary*/}
+      {/*    </Button>*/}
+      {/*    <Button size={size}>Default</Button>*/}
+      {/*    <Button type="dashed" size={size}>*/}
+      {/*      Dashed*/}
+      {/*    </Button>*/}
+      {/*    <br />*/}
+      {/*    <Button type="link" size={size}>*/}
+      {/*      Link*/}
+      {/*    </Button>*/}
+      {/*    <br />*/}
+      {/*    <Button type="primary" icon={<DownloadOutlined />} size={size} />*/}
+      {/*    <Button type="primary" shape="circle" icon={<DownloadOutlined />} size={size} />*/}
+      {/*    <Button type="primary" shape="round" icon={<DownloadOutlined />} size={size} />*/}
+      {/*    <Button type="primary" shape="round" icon={<DownloadOutlined />} size={size}>*/}
+      {/*      Download*/}
+      {/*    </Button>*/}
+      {/*    <Button type="primary" icon={<DownloadOutlined />} size={size}>*/}
+      {/*      Download*/}
+      {/*    </Button>*/}
 
-          <Button type="primary" loading>
-            Loading
-          </Button>
+      {/*    <Button type="primary" loading>*/}
+      {/*      Loading*/}
+      {/*    </Button>*/}
 
-          <Button type="primary" ghost>
-            Primary Ghost
-          </Button>
-          <Button ghost>Default Ghost</Button>
-          <Button type="dashed" ghost>
-            Dashed Ghost
-          </Button>
+      {/*    <Button type="primary" ghost>*/}
+      {/*      Primary Ghost*/}
+      {/*    </Button>*/}
+      {/*    <Button ghost>Default Ghost</Button>*/}
+      {/*    <Button type="dashed" ghost>*/}
+      {/*      Dashed Ghost*/}
+      {/*    </Button>*/}
 
-          <Button type="primary" danger>
-            Primary Danger
-          </Button>
-          <Button danger>Default Danger</Button>
-          <Button type="dashed" danger>
-            Dashed Danger
-          </Button>
-          <Button type="text" danger>
-            Text Danger
-          </Button>
-          <Button type="link" danger>
-            Link Danger
-          </Button>
-        </Space>
-      </Example>
+      {/*    <Button type="primary" danger>*/}
+      {/*      Primary Danger*/}
+      {/*    </Button>*/}
+      {/*    <Button danger>Default Danger</Button>*/}
+      {/*    <Button type="dashed" danger>*/}
+      {/*      Dashed Danger*/}
+      {/*    </Button>*/}
+      {/*    <Button type="text" danger>*/}
+      {/*      Text Danger*/}
+      {/*    </Button>*/}
+      {/*    <Button type="link" danger>*/}
+      {/*      Link Danger*/}
+      {/*    </Button>*/}
+      {/*  </Space>*/}
+      {/*</Example>*/}
 
-      <Example title="Modals">
-        <Space>
-          <Button onClick={() => alertAsync('This is Alert')}>Show Alert</Button>
-          <Button
-            onClick={() =>
-              confirmAsync('This is Alert').then(confirmed =>
-                alertAsync(confirmed ? 'Confirmed' : 'Not confirmed'),
-              )
-            }
-          >
-            Show Confirm
-          </Button>
-        </Space>
-      </Example>
+      {/*<Example title="Modals">*/}
+      {/*  <Space>*/}
+      {/*    <Button onClick={() => alertAsync('This is Alert')}>Show Alert</Button>*/}
+      {/*    <Button*/}
+      {/*      onClick={() =>*/}
+      {/*        confirmAsync('This is Alert').then(confirmed =>*/}
+      {/*          alertAsync(confirmed ? 'Confirmed' : 'Not confirmed'),*/}
+      {/*        )*/}
+      {/*      }*/}
+      {/*    >*/}
+      {/*      Show Confirm*/}
+      {/*    </Button>*/}
+      {/*  </Space>*/}
+      {/*</Example>*/}
 
-      <Example title="Platform Logo">
-        <PlatformLogo platform="twitch" />
-        <PlatformLogo platform="youtube" />
-        <PlatformLogo platform="facebook" />
-        <PlatformLogo platform="streamlabs" />
-        <PlatformLogo platform="dlive" />
-        <PlatformLogo platform="nimotv" />
-      </Example>
+      {/*<Example title="Platform Logo">*/}
+      {/*  <PlatformLogo platform="twitch" />*/}
+      {/*  <PlatformLogo platform="youtube" />*/}
+      {/*  <PlatformLogo platform="facebook" />*/}
+      {/*  <PlatformLogo platform="streamlabs" />*/}
+      {/*  <PlatformLogo platform="dlive" />*/}
+      {/*  <PlatformLogo platform="nimotv" />*/}
+      {/*</Example>*/}
 
-      <Example title="Timeline">
-        <Timeline pending="Recording...">
-          <Timeline.Item>Create a services site 2015-09-01</Timeline.Item>
-          <Timeline.Item>Solve initial network problems 2015-09-01</Timeline.Item>
-          <Timeline.Item>Technical testing 2015-09-01</Timeline.Item>
-        </Timeline>
-      </Example>
+      {/*<Example title="Timeline">*/}
+      {/*  <Timeline pending="Recording...">*/}
+      {/*    <Timeline.Item>Create a services site 2015-09-01</Timeline.Item>*/}
+      {/*    <Timeline.Item>Solve initial network problems 2015-09-01</Timeline.Item>*/}
+      {/*    <Timeline.Item>Technical testing 2015-09-01</Timeline.Item>*/}
+      {/*  </Timeline>*/}
+      {/*</Example>*/}
     </Form>
   );
 }
 
 function Example(p: { title: string } & HTMLAttributes<unknown>) {
-  const { background } = useGlobalSettings();
-
-  // const background = 'section';
+  const { background } = useSharedComponentsLibrary();
 
   return (
     <Container background={background} title={p.title}>
@@ -338,7 +343,7 @@ function Container(p: { title: string; background: string } & HTMLAttributes<unk
 }
 
 function GlobalSettings() {
-  const { bind, locales } = useGlobalSettings();
+  const { bind, locales } = useSharedComponentsLibrary();
 
   function createOptions(opts: string[]) {
     return opts.map(opt => ({
@@ -392,21 +397,13 @@ function GlobalSettings() {
   );
 }
 
-interface IGlobalSettingsState {
-  layout: TInputLayout;
-  placeholder: string;
-  hasTooltips: boolean;
-  required: boolean;
-  disabled: boolean;
-  size: 'middle' | 'large' | 'small';
-  background: 'none' | 'section' | 'error';
-  locales: string[];
+export function useSharedComponentsLibrary() {
+  const selectResult = useModule(SharedComponentsModule).select();
+  return selectResult;
 }
 
-function useGlobalSettings() {
-  const i18nService = I18nService.instance;
-
-  const initialState: IGlobalSettingsState = {
+class SharedComponentsModule {
+  state: ISharedComponentsState = {
     layout: 'horizontal',
     hasTooltips: false,
     required: false,
@@ -417,30 +414,84 @@ function useGlobalSettings() {
     locales: WHITE_LIST,
   };
 
-  return useStateManager(
-    initialState,
-    (getState, setState) => {
-      const { CustomizationService } = Services;
-
-      const computedState = {
-        get theme() {
-          return CustomizationService.currentTheme;
-        },
-        set theme(theme: string) {
-          CustomizationService.actions.setTheme(theme);
-        },
-        get locale() {
-          return i18nService.state.locale;
-        },
-        set locale(locale: string) {
-          i18nService.actions.setLocale(locale, false);
-        },
-      };
-
-      const state = merge(getState, computedState);
-      const bind = createBinding(() => state, setState);
-      return { bind };
+  private globalState = {
+    get theme() {
+      return Services.CustomizationService.currentTheme;
     },
-    null,
-  ).dependencyWatcher;
+    set theme(theme: string) {
+      Services.CustomizationService.actions.setTheme(theme);
+    },
+    get locale() {
+      return I18nService.instance.state.locale;
+    },
+    set locale(locale: string) {
+      I18nService.instance.actions.setLocale(locale, false);
+    },
+  };
+
+  private mergedState = merge(
+    () => this.state,
+    () => this.globalState,
+  );
+
+  @mutation()
+  private updateState(statePatch: Partial<ISharedComponentsState>) {
+    Object.assign(this.state, statePatch);
+  }
+
+  bind = createBinding(
+    () => this.mergedState,
+    statePatch => {
+      const localStatePatch = pick(statePatch, Object.keys(this.state));
+      this.updateState(localStatePatch);
+      const globalStatePatch = pick(statePatch, Object.keys(this.globalState));
+      Object.assign(this.globalState, globalStatePatch);
+    },
+  );
+
+  init() {
+    const bind = this.bind;
+  }
+}
+
+// function useGlobalSettings() {
+//   const i18nService = I18nService.instance;
+//
+//   return useStateManager(
+//     initialState,
+//     (getState, setState) => {
+//       const { CustomizationService } = Services;
+//
+//       const computedState = {
+//         get theme() {
+//           return CustomizationService.currentTheme;
+//         },
+//         set theme(theme: string) {
+//           CustomizationService.actions.setTheme(theme);
+//         },
+//         get locale() {
+//           return i18nService.state.locale;
+//         },
+//         set locale(locale: string) {
+//           i18nService.actions.setLocale(locale, false);
+//         },
+//       };
+//
+//       const state = merge(getState, computedState);
+//       const bind = createBinding(() => state, setState);
+//       return { bind };
+//     },
+//     null,
+//   ).dependencyWatcher;
+// }
+
+interface ISharedComponentsState {
+  layout: TInputLayout;
+  placeholder: string;
+  hasTooltips: boolean;
+  required: boolean;
+  disabled: boolean;
+  size: 'middle' | 'large' | 'small';
+  background: 'none' | 'section' | 'error';
+  locales: string[];
 }
