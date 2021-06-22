@@ -15,6 +15,7 @@ import NavTools from './sidebar/NavTools';
 import PlatformLogo from './shared/PlatformLogo';
 import StartStreamingButton from './root/StartStreamingButton';
 import TestWidgets from './root/TestWidgets';
+import RenameSource from './windows/RenameSource';
 
 // list of React components for usage inside Vue components
 export const components = {
@@ -35,4 +36,5 @@ export const components = {
   PlatformLogo,
   StartStreamingButton,
   TestWidgets,
+  RenameSource,
 };

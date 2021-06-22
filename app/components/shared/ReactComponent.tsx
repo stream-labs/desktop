@@ -173,3 +173,5 @@ export class StartStreamingButton extends ReactComponent {}
   },
 })
 export class TestWidgets extends ReactComponent<{ testers: string[] }> {}
+@Component({ props: { name: { default: 'RenameSource' } } })
+export class RenameSource extends ReactComponent {}
