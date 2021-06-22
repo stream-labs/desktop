@@ -165,3 +165,5 @@ export class PlatformLogo extends ReactComponent<{
   color?: string;
   unwrapped?: boolean;
 }> {}
+@Component({ props: { name: { default: 'RenameSource' } } })
+export class RenameSource extends ReactComponent {}
