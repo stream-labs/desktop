@@ -133,6 +133,7 @@ import { GrowService } from './services/grow/grow';
 import { TransitionsService } from './services/transitions';
 import { MagicLinkService } from './services/magic-link';
 import { UsageStatisticsService } from './services/usage-statistics';
+import { MediaBackupService } from './services/media-backup';
 import { WidgetsService } from './services/widgets';
 
 export const AppServices = {
@@ -162,5 +163,6 @@ export const AppServices = {
   TransitionsService,
   MagicLinkService,
   UsageStatisticsService,
+  MediaBackupService,
   WidgetsService,
 };
