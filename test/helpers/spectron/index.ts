@@ -233,7 +233,9 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
           await $chooseStarter.click();
         }
 
-        await (await t.context.app.client.$('div=Start Fresh')).click();
+        if (await (await t.context.app.client.$('div=Start Fresh')).isExisting()) {
+          await (await t.context.app.client.$('div=Start Fresh')).click();
+        }
         await (await t.context.app.client.$('button=Skip')).click();
         await (await t.context.app.client.$('button=Skip')).click();
       } else {
