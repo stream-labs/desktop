@@ -22,6 +22,7 @@ import { FrameWriter } from './frame-writer';
 import { Transitioner } from './transitioner';
 import { throttle } from 'lodash-decorators';
 import { HighlighterError } from './errors';
+import { AudioMixer } from './audio-mixer';
 
 export interface IClip {
   path: string;
@@ -72,10 +73,17 @@ export interface ITransitionInfo {
   duration: number;
 }
 
+export interface IAudioInfo {
+  musicEnabled: boolean;
+  musicPath: string;
+  musicVolume: number;
+}
+
 interface IHighligherState {
   clips: Dictionary<IClip>;
   clipOrder: string[];
   transition: ITransitionInfo;
+  audio: IAudioInfo;
   export: IExportInfo;
   upload: IUploadInfo;
   dismissedTutorial: boolean;
@@ -118,6 +126,10 @@ class HighligherViews extends ViewHandler<IHighligherState> {
     return this.state.transition;
   }
 
+  get audio() {
+    return this.state.audio;
+  }
+
   get transitionDuration() {
     return this.state.transition.duration;
   }
@@ -146,12 +158,17 @@ class HighligherViews extends ViewHandler<IHighligherState> {
 
 @InitAfter('StreamingService')
 export class HighlighterService extends StatefulService<IHighligherState> {
-  static initialState = {
+  static initialState: IHighligherState = {
     clips: {},
     clipOrder: [],
     transition: {
       type: 'fade',
       duration: 1,
+    },
+    audio: {
+      musicEnabled: false,
+      musicPath: '',
+      musicVolume: 50,
     },
     export: {
       exporting: false,
@@ -173,7 +190,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       error: false,
     },
     dismissedTutorial: false,
-  } as IHighligherState;
+  };
 
   @Inject() streamingService: StreamingService;
   @Inject() userService: UserService;
@@ -242,6 +259,15 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   }
 
   @mutation()
+  SET_AUDIO_INFO(audioInfo: Partial<IAudioInfo>) {
+    this.state.audio = {
+      ...this.state.audio,
+      ...audioInfo,
+    };
+    this.state.export.exported = false;
+  }
+
+  @mutation()
   DISMISS_TUTORIAL() {
     this.state.dismissedTutorial = true;
   }
@@ -256,21 +282,21 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         // Aero 15 test clips
         // path.join(CLIP_DIR, '2021-05-12 12-59-28.mp4'),
         path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-20.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-29.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-41.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-49.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-58.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-03.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-06.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-30-53.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-29.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-41.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-49.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-58.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-03.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-06.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-30-53.mp4'),
         path.join(CLIP_DIR, 'Replay 2021-03-30 14-32-34.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-33.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-48.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-03.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-23.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-51.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-18.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-30.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-33.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-48.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-03.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-23.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-51.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-18.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-30.mp4'),
         path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-44.mp4'),
         // Razer blade test clips
         // path.join(CLIP_DIR, '2021-05-25 08-55-13.mp4'),
@@ -349,6 +375,10 @@ export class HighlighterService extends StatefulService<IHighligherState> {
 
   setTransition(transition: Partial<ITransitionInfo>) {
     this.SET_TRANSITION_INFO(transition);
+  }
+
+  setAudio(audio: Partial<IAudioInfo>) {
+    this.SET_AUDIO_INFO(audio);
   }
 
   setExportFile(file: string) {
@@ -461,6 +491,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     });
 
     let fader: AudioCrossfader | null = null;
+    let mixer: AudioMixer | null = null;
 
     try {
       let currentFrame = 0;
@@ -468,9 +499,28 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       // Mix audio first
       await Promise.all(clips.map(clip => clip.audioSource.extract()));
       const parsed = path.parse(this.views.exportInfo.file);
-      const audioMix = path.join(parsed.dir, `${parsed.name}-audio.flac`);
-      fader = new AudioCrossfader(audioMix, clips, this.views.transitionDuration);
+      const audioConcat = path.join(parsed.dir, `${parsed.name}-concat.flac`);
+      let audioMix = path.join(parsed.dir, `${parsed.name}-mix.flac`);
+      fader = new AudioCrossfader(audioConcat, clips, this.views.transitionDuration);
       await fader.export();
+
+      if (this.views.audio.musicEnabled && this.views.audio.musicPath) {
+        mixer = new AudioMixer(audioMix, [
+          { path: audioConcat, volume: 1, loop: false },
+          {
+            path: this.views.audio.musicPath,
+            volume: Math.pow(10, -1 + this.views.audio.musicVolume / 100),
+            loop: true,
+          },
+        ]);
+
+        await mixer.export();
+      } else {
+        // If there's no background music, we can skip mix entirely and just
+        // use the concatenated clip audio directly.
+        audioMix = audioConcat;
+      }
+
       await Promise.all(clips.map(clip => clip.audioSource.cleanup()));
 
       this.SET_EXPORT_INFO({ step: EExportStep.FrameRender });
@@ -546,6 +596,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     }
 
     if (fader) await fader.cleanup();
+    if (mixer) await mixer.cleanup();
     this.SET_EXPORT_INFO({
       exporting: false,
       exported: !this.views.exportInfo.cancelRequested && !preview && !this.views.exportInfo.error,

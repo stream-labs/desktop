@@ -9,7 +9,7 @@ import { ReactSortable } from 'react-sortablejs';
 import { ListInput } from 'components-react/shared/inputs/ListInput';
 import Form from 'components-react/shared/inputs/Form';
 import isEqual from 'lodash/isEqual';
-import { SliderInput } from 'components-react/shared/inputs';
+import { SliderInput, FileInput, SwitchInput } from 'components-react/shared/inputs';
 import { Modal, Button } from 'antd';
 import ExportModal from 'components-react/highlighter/ExportModal';
 import PreviewModal from 'components-react/highlighter/PreviewModal';
@@ -20,6 +20,7 @@ import path from 'path';
 import Scrollable from 'components-react/shared/Scrollable';
 import { IHotkey } from 'services/hotkeys';
 import { getBindingString } from 'components-react/shared/HotkeyBinding';
+import Animate from 'rc-animate';
 
 type TModal = 'trim' | 'export' | 'preview' | 'remove';
 
@@ -33,6 +34,7 @@ export default function Highlighter() {
     loaded: HighlighterService.views.loaded,
     transition: HighlighterService.views.transition,
     dismissedTutorial: HighlighterService.views.dismissedTutorial,
+    audio: HighlighterService.views.audio,
   }));
 
   const [showModal, rawSetShowModal] = useState<TModal | null>(null);
@@ -99,6 +101,20 @@ export default function Highlighter() {
       HighlighterService.actions.setTransition({ duration });
     }
 
+    function setMusicEnabled(enabled: boolean) {
+      HighlighterService.actions.setAudio({ musicEnabled: enabled });
+    }
+
+    const musicExtensions = ['mp3', 'wav', 'flac'];
+
+    function setMusicFile(file: string) {
+      HighlighterService.actions.setAudio({ musicPath: file });
+    }
+
+    function setMusicVolume(volume: number) {
+      HighlighterService.actions.setAudio({ musicVolume: volume });
+    }
+
     return (
       <div
         style={{
@@ -125,9 +141,38 @@ export default function Highlighter() {
             step={0.1}
             debounce={200}
             hasNumberInput={false}
-            tooltipPlacement="bottom"
+            tooltipPlacement="top"
             tipFormatter={v => `${v}s`}
           />
+          <SwitchInput
+            label="Background Music"
+            value={v.audio.musicEnabled}
+            onChange={setMusicEnabled}
+          />
+          <Animate transitionName="ant-slide-up">
+            {v.audio.musicEnabled && (
+              <div>
+                <FileInput
+                  label="Music File"
+                  value={v.audio.musicPath}
+                  filters={[{ name: 'Audio File', extensions: musicExtensions }]}
+                  onChange={setMusicFile}
+                />
+                <SliderInput
+                  label="Music Volume"
+                  value={v.audio.musicVolume}
+                  onChange={setMusicVolume}
+                  min={0}
+                  max={100}
+                  step={1}
+                  debounce={200}
+                  hasNumberInput={false}
+                  tooltipPlacement="top"
+                  tipFormatter={v => `${v}%`}
+                />
+              </div>
+            )}
+          </Animate>
         </Form>
         <Button
           style={{ marginTop: '16px', marginRight: '8px' }}
