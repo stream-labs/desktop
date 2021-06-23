@@ -3,7 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from '../services/core/injector';
 import { StreamingService, EReplayBufferState, EStreamingState } from '../services/streaming';
 import TestWidgets from './TestWidgets.vue';
-import { PerformanceMetrics, StartStreamingButton } from 'components/shared/ReactComponent';
+import { PerformanceMetrics, StartStreamingButton, TestWidgets } from 'components/shared/ReactComponent';
 import NotificationsArea from './NotificationsArea.vue';
 import { UserService } from '../services/user';
 import { getPlatformService } from 'services/platforms';
