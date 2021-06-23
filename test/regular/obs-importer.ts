@@ -15,7 +15,7 @@ useSpectron({ skipOnboarding: false, beforeAppStartCb: installOBSCache });
 async function installOBSCache(t: ExecutionContext) {
   // extract OBS config to the cache dir
   // @ts-ignore Spectron typings are wrong - app is actually under remote
-  const cacheDir = path.resolve(await t.context.app.electron.remote.app.getPath('userData'), '..');
+  const cacheDir = path.resolve(process.env.APPDATA, '..');
   const dataDir = path.resolve(__dirname, '..', '..', '..', 'test', 'data');
   const obsCacheZipPath = path.resolve(dataDir, 'obs-studio.zip');
 
