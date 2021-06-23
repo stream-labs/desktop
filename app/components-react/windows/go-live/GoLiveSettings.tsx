@@ -23,21 +23,30 @@ const PlusIcon = PlusOutlined as Function;
  * - Extras settings
  **/
 export default function GoLiveSettings() {
-  const { RestreamService, SettingsService, UserService } = Services;
+  console.log('re-render settings');
+  const { RestreamService, SettingsService, UserService, MagicLinkService } = Services;
 
   const {
     isAdvancedMode,
     protectedModeEnabled,
     error,
-    canAddDestinations,
     isLoading,
-  } = useGoLiveSettings(view => {
-    const linkedPlatforms = view.linkedPlatforms;
-    const customDestinations = view.customDestinations;
+    canAddDestinations,
+  } = useGoLiveSettings().selectExtra(module => {
+    const linkedPlatforms = module.linkedPlatforms;
+    const customDestinations = module.customDestinations;
     return {
       canAddDestinations: linkedPlatforms.length + customDestinations.length < 5,
     };
   });
+
+  // const { canAddDestinations } = useSelector(() => {
+  //   const linkedPlatforms = controller.linkedPlatforms;
+  //   const customDestinations = controller.customDestinations;
+  //   return {
+  //     canAddDestinations: linkedPlatforms.length + customDestinations.length < 5,
+  //   };
+  // });
 
   const shouldShowSettings = !error && !isLoading;
   const shouldShowPrimeLabel = !RestreamService.state.grandfathered;
@@ -46,10 +55,10 @@ export default function GoLiveSettings() {
 
   function addDestination() {
     // open the stream settings or prime page
-    if (RestreamService.views.canEnableRestream) {
+    if (UserService.views.isPrime) {
       SettingsService.actions.showSettings('Stream');
     } else {
-      UserService.openPrimeUrl('slobs-multistream');
+      MagicLinkService.linkToPrime('slobs-multistream');
     }
   }
 

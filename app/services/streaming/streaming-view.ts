@@ -5,10 +5,12 @@ import { UserService } from '../user';
 import { RestreamService } from '../restream';
 import { getPlatformService, TPlatform, TPlatformCapability } from '../platforms';
 import { IncrementalRolloutService, TwitterService } from '../../app-services';
-import { EAvailableFeatures } from '../incremental-rollout';
 import cloneDeep from 'lodash/cloneDeep';
 import difference from 'lodash/difference';
-import { assertIsDefined } from '../../util/properties-type-guards';
+import { Services } from '../../components-react/service-provider';
+export type TModificators = { isUpdateMode?: boolean; isScheduleMode?: boolean };
+export type IGoLiveSettingsState = IGoLiveSettings & TModificators & { needPrepopulate: boolean };
+
 
 /**
  * The stream info view is responsible for keeping
@@ -16,13 +18,9 @@ import { assertIsDefined } from '../../util/properties-type-guards';
  * channel and current stream in the Vuex store for
  * components to make use of.
  */
-export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
-  constructor(state: IStreamingServiceState, private getGoLiveSettings?: () => IGoLiveSettings) {
-    super(state);
-  }
-
+export class StreamInfoView<T extends Object> extends ViewHandler<T> {
   get settings(): IGoLiveSettings {
-    return this.getGoLiveSettings ? this.getGoLiveSettings() : this.savedSettings;
+    return this.savedSettings;
   }
 
   private get userView() {
@@ -45,8 +43,12 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
     return this.getServiceViews(IncrementalRolloutService);
   }
 
+  private get streamingState() {
+    return Services.StreamingService.state;
+  }
+
   get info() {
-    return this.state.info;
+    return this.streamingState.info;
   }
 
   get error() {
@@ -79,7 +81,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
 
   // REMOVE
   get warning(): string {
-    return this.state.info.warning;
+    return this.info.warning;
   }
 
   /**
@@ -142,7 +144,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   }
 
   get isMidStreamMode(): boolean {
-    return this.state.streamingStatus !== 'offline';
+    return this.streamingState.streamingStatus !== 'offline';
   }
 
   /**
@@ -191,7 +193,7 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
   }
 
   get isAdvancedMode(): boolean {
-    return this.enabledPlatforms.length > 1 && this.settings.advancedMode;
+    return this.isMultiplatformMode && this.settings.advancedMode;
   }
 
   /**
@@ -310,8 +312,8 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
    * Return true if one of the checks has been failed
    */
   hasFailedChecks(): boolean {
-    return !!Object.keys(this.state.info.checklist).find(
-      check => this.state.info.checklist[check] === 'failed',
+    return !!Object.keys(this.info.checklist).find(
+      check => this.info.checklist[check] === 'failed',
     );
   }
 
@@ -319,8 +321,8 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
    * Return true if one of the checks is in a pending state
    */
   hasPendingChecks(): boolean {
-    return !!Object.keys(this.state.info.checklist).find(
-      check => this.state.info.checklist[check] === 'pending',
+    return !!Object.keys(this.info.checklist).find(
+      check => this.info.checklist[check] === 'pending',
     );
   }
 

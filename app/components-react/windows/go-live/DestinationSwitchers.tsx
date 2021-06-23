@@ -1,4 +1,4 @@
-import React, { useRef, MouseEvent } from 'react';
+import React, { useRef, MouseEvent, useEffect } from 'react';
 import { getPlatformService, TPlatform } from '../../../services/platforms';
 import cx from 'classnames';
 import { $t } from '../../../services/i18n';
@@ -23,9 +23,9 @@ export function DestinationSwitchers() {
     switchPlatforms,
     switchCustomDestination,
     checkPrimaryPlatform,
-  } = useGoLiveSettings();
-
+  } = useGoLiveSettings().select();
   const enabledPlatformsRef = useRef(enabledPlatforms);
+  enabledPlatformsRef.current = enabledPlatforms;
 
   const emitSwitch = useDebounce(500, () => {
     switchPlatforms(enabledPlatformsRef.current);
@@ -78,6 +78,9 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
   const switchInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
+  const { RestreamService, MagicLinkService } = Services;
+
+  console.log('Render switcher', platform, p.enabled);
 
   function onClickHandler(ev: MouseEvent) {
     if (p.isPrimary) {
@@ -88,16 +91,20 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
       );
       return;
     }
-    const enable = !p.enabled;
-    p.onChange(enable);
-    // always proxy the click to the SwitchInput
-    // so it can play a transition animation
-    switchInputRef.current?.click();
-    // switch the container class without re-rendering to not stop the animation
-    if (enable) {
-      containerRef.current?.classList.remove(styles.platformDisabled);
+    if (RestreamService.views.canEnableRestream) {
+      const enable = !p.enabled;
+      p.onChange(enable);
+      // always proxy the click to the SwitchInput
+      // so it can play a transition animation
+      switchInputRef.current?.click();
+      // switch the container class without re-rendering to not stop the animation
+      if (enable) {
+        containerRef.current?.classList.remove(styles.platformDisabled);
+      } else {
+        containerRef.current?.classList.add(styles.platformDisabled);
+      }
     } else {
-      containerRef.current?.classList.add(styles.platformDisabled);
+      MagicLinkService.actions.linkToPrime('slobs-multistream');
     }
   }
 

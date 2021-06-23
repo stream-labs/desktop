@@ -1,4 +1,4 @@
-import { Inject, mutation, StatefulService } from 'services/core';
+import { ExecuteInCurrentWindow, Inject, mutation, StatefulService } from 'services/core';
 import {
   EPlatformCallResult,
   IPlatformState,
@@ -36,6 +36,7 @@ export abstract class BasePlatformService<T extends IPlatformState> extends Stat
 
   abstract capabilities: Set<TPlatformCapability>;
 
+  @ExecuteInCurrentWindow()
   hasCapability<T extends TPlatformCapability>(capability: T): this is TPlatformCapabilityMap[T] {
     return this.capabilities.has(capability);
   }

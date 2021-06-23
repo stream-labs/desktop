@@ -1,4 +1,4 @@
-import CommonPlatformFields from './CommonPlatformFields';
+import { CommonPlatformFields } from './CommonPlatformFields';
 import { useGoLiveSettings } from './useGoLiveSettings';
 import { $t } from '../../../services/i18n';
 import React from 'react';
@@ -8,6 +8,13 @@ import { Section } from './Section';
 import { YoutubeEditStreamInfo } from './platforms/YoutubeEditStreamInfo';
 import FacebookEditStreamInfo from './platforms/FacebookEditStreamInfo';
 import { TiktokEditStreamInfo } from './platforms/TiktokEditStreamInfo';
+import {
+  IPlatformComponentParams,
+  IPlatformSettings,
+  TLayoutMode
+} from './platforms/PlatformSettingsLayout';
+import {assertIsDefined, getDefined} from '../../../util/properties-type-guards';
+import {IGoLiveSettings} from "../../../services/streaming";
 
 export default function PlatformSettings() {
   const {
@@ -17,9 +24,40 @@ export default function PlatformSettings() {
     enabledPlatforms,
     getPlatformDisplayName,
     isLoading,
-  } = useGoLiveSettings();
+    updatePlatform,
+    platforms,
+    commonFields,
+    updateCommonFields,
+    descriptionIsRequired,
+    getPlatformSettings,
+  } = useGoLiveSettings().selectExtra(settings => {
+    const fbSettings = settings.platforms['facebook'];
+    const descriptionIsRequired = fbSettings && fbSettings.enabled && !fbSettings.useCustomFields;
+    return { descriptionIsRequired };
+  });
+
   const shouldShowSettings = !error && !isLoading;
 
+  let layoutMode: TLayoutMode;
+  if (isMultiplatformMode) {
+    layoutMode = isAdvancedMode ? 'multiplatformAdvanced' : 'multiplatformSimple';
+  } else {
+    layoutMode = 'singlePlatform';
+  }
+
+  function createPlatformBinding<T extends TPlatform>(platform: T): IPlatformComponentParams<T> {
+    return {
+      layoutMode,
+      get value() {
+        return getDefined(getPlatformSettings(platform));
+      },
+      onChange(newSettings) {
+        updatePlatform(platform, newSettings);
+      },
+    };
+  }
+
+  console.log('re-render platforms');
   return (
     // minHeight is required for the loading spinner
     <div style={{ minHeight: '150px' }}>
@@ -28,7 +66,11 @@ export default function PlatformSettings() {
           {/*COMMON FIELDS*/}
           {isMultiplatformMode && (
             <Section isSimpleMode={!isAdvancedMode} title={$t('Common Stream Settings')}>
-              <CommonPlatformFields />
+              <CommonPlatformFields
+                descriptionIsRequired={descriptionIsRequired}
+                value={commonFields}
+                onChange={updateCommonFields}
+              />
             </Section>
           )}
 
@@ -39,10 +81,18 @@ export default function PlatformSettings() {
               isSimpleMode={!isAdvancedMode}
               key={platform}
             >
-              {platform === 'twitch' && <TwitchEditStreamInfo />}
-              {platform === 'facebook' && <FacebookEditStreamInfo />}
-              {platform === 'youtube' && <YoutubeEditStreamInfo />}
-              {platform === 'tiktok' && <TiktokEditStreamInfo />}
+              {platform === 'twitch' && (
+                <TwitchEditStreamInfo {...createPlatformBinding('twitch')} />
+              )}
+              {platform === 'facebook' && (
+                <FacebookEditStreamInfo {...createPlatformBinding('facebook')} />
+              )}
+              {platform === 'youtube' && (
+                <YoutubeEditStreamInfo {...createPlatformBinding('youtube')} />
+              )}
+              {platform === 'tiktok' && (
+                <TiktokEditStreamInfo {...createPlatformBinding('tiktok')} />
+              )}
             </Section>
           ))}
         </div>

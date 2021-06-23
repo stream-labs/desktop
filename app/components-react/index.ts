@@ -8,15 +8,18 @@ import PatchNotes from './pages/PatchNotes';
 import Display from './shared/Display';
 import TitleBar from './shared/TitleBar';
 import Chat from './root/Chat';
+import Grow from './pages/Grow/Grow';
+import Loader from './pages/Loader';
 import NavTools from './sidebar/NavTools';
 import PlatformLogo from './shared/PlatformLogo';
 import StreamScheduler from './pages/stream-scheduler/StreamScheduler';
+import { createRoot } from './root/ReactRoot';
 
 // list of React components for usage inside Vue components
 export const components = {
   NameFolder,
-  GoLiveWindow,
-  EditStreamWindow,
+  GoLiveWindow: createRoot(GoLiveWindow),
+  EditStreamWindow: createRoot(EditStreamWindow),
   IconLibraryProperties,
   NewsBanner,
   PerformanceMetrics,
@@ -24,7 +27,9 @@ export const components = {
   Display,
   TitleBar,
   Chat,
+  Grow,
+  Loader,
   NavTools,
   PlatformLogo,
-  StreamScheduler,
+  StreamScheduler: createRoot(StreamScheduler),
 };

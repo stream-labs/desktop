@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 import SideNav from '../SideNav';
-import { NewsBanner, TitleBar } from 'components/shared/ReactComponent';
+import { NewsBanner, TitleBar, Grow } from 'components/shared/ReactComponent';
 import { ScenesService } from 'services/scenes';
 import { PlatformAppsService } from 'services/platform-apps';
 import { EditorCommandsService } from '../../app-services';
@@ -25,8 +25,7 @@ import { UserService } from 'services/user';
 import { IModalOptions, WindowsService } from 'services/windows';
 import LiveDock from '../LiveDock.vue';
 import StudioFooter from '../StudioFooter.vue';
-import CustomLoader from '../CustomLoader';
-import { PatchNotes, StreamScheduler } from '../shared/ReactComponent';
+import { PatchNotes, Loader, StreamScheduler } from '../shared/ReactComponent';
 import PlatformAppMainPage from '../pages/PlatformAppMainPage.vue';
 import electron from 'electron';
 import ResizeBar from 'components/shared/ResizeBar.vue';
@@ -51,7 +50,7 @@ const loadedTheme = () => {
     Onboarding,
     LiveDock,
     StudioFooter,
-    CustomLoader,
+    CustomLoader: Loader,
     PatchNotes,
     NewsBanner,
     PlatformAppMainPage,
@@ -62,6 +61,7 @@ const loadedTheme = () => {
     AlertboxLibrary,
     ModalWrapper,
     StreamScheduler,
+    Grow,
   },
 })
 export default class Main extends Vue {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, useContext } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import debounce from 'lodash/debounce';
 import { StatefulService } from '../services/core';
 import { createBinding, TBindings } from './shared/inputs';
@@ -115,11 +115,11 @@ export function useFormState<T extends object>(initializer: T | (() => T)): TUse
   }
 
   return {
-    s: stateRef.current,
+    s,
     setState,
     updateState,
     setItem,
-    bind: createBinding(() => stateRef.current, setState),
+    bind: createBinding(s, setState),
     stateRef,
     form,
   };

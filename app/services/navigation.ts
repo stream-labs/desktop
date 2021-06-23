@@ -12,7 +12,8 @@ export type TAppPage =
   | 'LayoutEditor'
   | 'PrimeExpiration'
   | 'AlertboxLibrary'
-  | 'StreamScheduler';
+  | 'StreamScheduler'
+  | 'Grow';
 
 interface INavigationState {
   currentPage: TAppPage;

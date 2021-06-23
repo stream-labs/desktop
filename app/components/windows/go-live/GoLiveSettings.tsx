@@ -4,7 +4,6 @@ import { $t } from 'services/i18n';
 import { Component } from 'vue-property-decorator';
 import styles from './GoLive.m.less';
 import { Inject } from 'services/core';
-import { UserService } from 'services/user';
 import { TPlatform } from 'services/platforms';
 import { SettingsService } from 'services/settings';
 import { IGoLiveSettings, StreamingService } from 'services/streaming';
@@ -20,6 +19,7 @@ import { Twitter } from 'components/Twitter';
 import { RestreamService } from 'services/restream';
 import Section from './Section';
 import Scrollable from 'components/shared/Scrollable';
+import { MagicLinkService } from 'services/magic-link';
 
 class GoLiveProps {
   value?: IGoLiveSettings = undefined;
@@ -36,7 +36,7 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
   @Inject() private streamingService: StreamingService;
   @Inject() private streamSettingsService: StreamSettingsService;
   @Inject() private settingsService: SettingsService;
-  @Inject() private userService: UserService;
+  @Inject() private magicLinkService: MagicLinkService;
   @Inject() private restreamService: RestreamService;
   @SyncWithValue() private settings: IGoLiveSettings;
 
@@ -67,7 +67,7 @@ export default class GoLiveSettings extends TsxComponent<GoLiveProps> {
     if (this.restreamService.views.canEnableRestream) {
       this.settingsService.actions.showSettings('Stream');
     } else {
-      this.userService.openPrimeUrl('slobs-multistream');
+      this.magicLinkService.linkToPrime('slobs-multistream');
     }
   }
 

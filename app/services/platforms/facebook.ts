@@ -71,6 +71,7 @@ interface IFacebookServiceState extends IPlatformState {
    */
   videoId: string;
   streamPageUrl: string;
+  streamDashboardUrl: string;
   userAvatar: string;
   outageWarning: string;
 }
@@ -101,6 +102,7 @@ const initialState: IFacebookServiceState = {
   grantedPermissions: [],
   outageWarning: '',
   streamPageUrl: '',
+  streamDashboardUrl: '',
   userAvatar: '',
   videoId: '',
   settings: {
@@ -183,6 +185,11 @@ export class FacebookService
   }
 
   @mutation()
+  private SET_STREAM_DASHBOARD_URL(url: string) {
+    this.state.streamDashboardUrl = url;
+  }
+
+  @mutation()
   protected SET_AVATAR(avatar: string) {
     this.state.userAvatar = avatar;
   }
@@ -219,6 +226,10 @@ export class FacebookService
     return this.state.streamPageUrl;
   }
 
+  get streamDashboardUrl(): string {
+    return this.state.streamDashboardUrl;
+  }
+
   async beforeGoLive(options: IGoLiveSettings) {
     const fbOptions = options.platforms.facebook;
 
@@ -248,6 +259,7 @@ export class FacebookService
     }
     this.SET_STREAM_KEY(streamKey);
     this.SET_STREAM_PAGE_URL(`https://facebook.com/${liveVideo.permalink_url}`);
+    this.SET_STREAM_DASHBOARD_URL(`https://facebook.com/live/producer/${liveVideo.video.id}`);
     this.UPDATE_STREAM_SETTINGS({ ...fbOptions, liveVideoId: liveVideo.id });
     this.SET_VIDEO_ID(liveVideo.video.id);
 
@@ -596,6 +608,16 @@ export class FacebookService
 
     return this.requestFacebook<{ live_views: number }>(url, token)
       .then(json => json.live_views)
+      .catch(() => 0);
+  }
+
+  fetchFollowers(): Promise<number> | undefined {
+    const pageId = this.state.settings.pageId;
+    if (!pageId) return;
+    return this.requestFacebook<{ followers_count: number }>(
+      `${this.apiBase}/${pageId}?fields=followers_count`,
+    )
+      .then(json => json.followers_count)
       .catch(() => 0);
   }
 
