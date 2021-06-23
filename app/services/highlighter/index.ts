@@ -1,4 +1,4 @@
-import { mutation, StatefulService, ViewHandler, Inject } from 'services/core';
+import { mutation, StatefulService, ViewHandler, Inject, InitAfter } from 'services/core';
 import path from 'path';
 import transitions from 'gl-transitions';
 import Vue from 'vue';
@@ -78,6 +78,7 @@ interface IHighligherState {
   transition: ITransitionInfo;
   export: IExportInfo;
   upload: IUploadInfo;
+  dismissedTutorial: boolean;
 }
 
 class HighligherViews extends ViewHandler<IHighligherState> {
@@ -129,6 +130,10 @@ class HighligherViews extends ViewHandler<IHighligherState> {
     return transitions;
   }
 
+  get dismissedTutorial() {
+    return this.state.dismissedTutorial;
+  }
+
   /**
    * Takes a filepath to a video and returns a file:// url with a random
    * component to prevent the browser from caching it and missing changes.
@@ -139,6 +144,7 @@ class HighligherViews extends ViewHandler<IHighligherState> {
   }
 }
 
+@InitAfter('StreamingService')
 export class HighlighterService extends StatefulService<IHighligherState> {
   static initialState = {
     clips: {},
@@ -166,6 +172,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       videoId: null,
       error: false,
     },
+    dismissedTutorial: false,
   } as IHighligherState;
 
   @Inject() streamingService: StreamingService;
@@ -192,6 +199,13 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       ...this.state.clips[clip.path],
       ...clip,
     });
+    this.state.export.exported = false;
+  }
+
+  @mutation()
+  REMOVE_CLIP(clipPath: string) {
+    Vue.delete(this.state.clips, clipPath);
+    this.state.clipOrder = this.state.clipOrder.filter(c => c !== clipPath);
     this.state.export.exported = false;
   }
 
@@ -227,6 +241,11 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     this.state.export.exported = false;
   }
 
+  @mutation()
+  DISMISS_TUTORIAL() {
+    this.state.dismissedTutorial = true;
+  }
+
   get views() {
     return new HighligherViews(this.state);
   }
@@ -236,22 +255,22 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       const clipsToLoad = [
         // Aero 15 test clips
         // path.join(CLIP_DIR, '2021-05-12 12-59-28.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-20.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-20.mp4'),
         path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-29.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-41.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-49.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-58.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-03.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-06.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-30-53.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-41.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-49.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-58.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-03.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-06.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-30-53.mp4'),
         path.join(CLIP_DIR, 'Replay 2021-03-30 14-32-34.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-33.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-48.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-03.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-23.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-51.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-18.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-30.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-33.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-48.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-03.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-23.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-51.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-18.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-30.mp4'),
         path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-44.mp4'),
         // Razer blade test clips
         // path.join(CLIP_DIR, '2021-05-25 08-55-13.mp4'),
@@ -320,6 +339,10 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     });
   }
 
+  removeClip(path: string) {
+    this.REMOVE_CLIP(path);
+  }
+
   setOrder(order: string[]) {
     this.SET_ORDER(order);
   }
@@ -335,6 +358,10 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   dismissError() {
     if (this.state.export.error) this.SET_EXPORT_INFO({ error: null });
     if (this.state.upload.error) this.SET_UPLOAD_INFO({ error: false });
+  }
+
+  dismissTutorial() {
+    this.DISMISS_TUTORIAL();
   }
 
   async loadClips() {

@@ -4,8 +4,15 @@ import React, { useMemo, useState } from 'react';
 import path from 'path';
 import { Services } from 'components-react/service-provider';
 import { BoolButtonInput } from 'components-react/shared/inputs/BoolButtonInput';
+import styles from '../pages/Highlighter.m.less';
+import cx from 'classnames';
+import { Tooltip } from 'antd';
 
-export default function ClipPreview(props: { clip: IClip; onClick: () => void }) {
+export default function ClipPreview(props: {
+  clip: IClip;
+  showTrim: () => void;
+  showRemove: () => void;
+}) {
   const { HighlighterService } = Services;
   const [scrubFrame, setScrubFrame] = useState(0);
   const filename = useMemo(() => {
@@ -40,7 +47,7 @@ export default function ClipPreview(props: { clip: IClip; onClick: () => void })
             opacity: props.clip.enabled ? 1.0 : 0.3,
           }}
           onMouseMove={mouseMove}
-          onClick={props.onClick}
+          onClick={props.showTrim}
         ></img>
       )}
       {props.clip.deleted && (
@@ -69,8 +76,8 @@ export default function ClipPreview(props: { clip: IClip; onClick: () => void })
       )}
       <span style={{ position: 'absolute', top: '10px', left: '10px' }}>
         <BoolButtonInput
-          tooltip={enabled ? 'Disable Clip' : 'Enable Clip'}
-          tooltipPlacement="right"
+          tooltip={enabled ? 'Disable clip' : 'Enable clip'}
+          tooltipPlacement="top"
           value={enabled}
           onChange={setEnabled}
           checkboxStyles={{
@@ -83,6 +90,29 @@ export default function ClipPreview(props: { clip: IClip; onClick: () => void })
           checkboxActiveStyles={{ background: 'var(--teal-hover)' }}
         />
       </span>
+      <div
+        style={{
+          position: 'absolute',
+          top: '6px',
+          right: '6px',
+          fontSize: 18,
+          padding: '2px 8px 0',
+          borderRadius: '5px',
+          background: 'rgba(0,0,0,0.5)',
+        }}
+      >
+        {/* TODO: Let's not use the same icon as studio mode */}
+        <Tooltip title="Trim clip" placement="top">
+          <i
+            className={cx('icon-studio-mode-3', styles.clipAction)}
+            style={{ marginRight: 12 }}
+            onClick={props.showTrim}
+          />
+        </Tooltip>
+        <Tooltip title="Remove clip" placement="top">
+          <i className={cx('icon-trash', styles.clipAction)} onClick={props.showRemove} />
+        </Tooltip>
+      </div>
       <div
         style={{
           position: 'absolute',

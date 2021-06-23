@@ -6,7 +6,7 @@ import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import { Button } from 'antd';
 
-export default function BlankSlate() {
+export default function BlankSlate(p: { close: () => void }) {
   const { HotkeysService, SettingsService, StreamingService } = Services;
   const [hotkey, setHotkey] = useState<IHotkey | null>(null);
   const hotkeyRef = useRef<IHotkey | null>(null);
@@ -124,6 +124,7 @@ export default function BlankSlate() {
           <div>Start streaming and capture a replay. Check back here after your stream.</div>
         )}
       </div>
+      <a onClick={p.close}>Or, import a clip from your computer</a>
     </div>
   );
 }
