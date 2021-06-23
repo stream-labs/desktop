@@ -65,8 +65,6 @@ export default function createTransition(
 
   gl.useProgram(program);
   const positionLocation = gl.getAttribLocation(program, '_p');
-  gl.enableVertexAttribArray(positionLocation);
-  gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
 
   return {
     draw(
@@ -102,6 +100,8 @@ export default function createTransition(
           gl.uniform1f(gl.getUniformLocation(program, key), value);
         }
       }
+      gl.enableVertexAttribArray(positionLocation);
+      gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     },
     dispose() {},
