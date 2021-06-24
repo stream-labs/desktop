@@ -1,3 +1,4 @@
+import { fillForm } from '../helpers/form-monkey';
 import { useSpectron, focusMain, focusChild, test } from '../helpers/spectron';
 import {
   addSource,
@@ -65,7 +66,7 @@ test('Rename source', async t => {
   await addSource(t, 'Color Source', sourceName);
 
   await openRenameWindow(t, sourceName);
-  await (await app.client.$('input')).setValue(newSourceName);
+  await fillForm(t, 'form[data-name=renameSourceForm]', { sourceName: newSourceName });
   await (await app.client.$('button=Done')).click();
 
   await focusMain(t);

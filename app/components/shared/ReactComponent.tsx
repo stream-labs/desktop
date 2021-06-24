@@ -164,7 +164,12 @@ export class PlatformLogo extends ReactComponent<{
   color?: string;
   unwrapped?: boolean;
 }> {}
-@Component({ props: { name: { default: 'RenameSource' } } })
+@Component({
+  props: {
+    name: { default: 'RenameSource' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
 export class RenameSource extends ReactComponent {}
 @Component({ props: { name: { default: 'StartStreamingButton' } } })
 export class StartStreamingButton extends ReactComponent {}
