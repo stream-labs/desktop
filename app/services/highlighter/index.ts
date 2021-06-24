@@ -1,4 +1,4 @@
-import { mutation, StatefulService, ViewHandler, Inject } from 'services/core';
+import { mutation, StatefulService, ViewHandler, Inject, InitAfter } from 'services/core';
 import path from 'path';
 import transitions from 'gl-transitions';
 import Vue from 'vue';
@@ -22,6 +22,7 @@ import { FrameWriter } from './frame-writer';
 import { Transitioner } from './transitioner';
 import { throttle } from 'lodash-decorators';
 import { HighlighterError } from './errors';
+import { AudioMixer } from './audio-mixer';
 
 export interface IClip {
   path: string;
@@ -72,12 +73,20 @@ export interface ITransitionInfo {
   duration: number;
 }
 
+export interface IAudioInfo {
+  musicEnabled: boolean;
+  musicPath: string;
+  musicVolume: number;
+}
+
 interface IHighligherState {
   clips: Dictionary<IClip>;
   clipOrder: string[];
   transition: ITransitionInfo;
+  audio: IAudioInfo;
   export: IExportInfo;
   upload: IUploadInfo;
+  dismissedTutorial: boolean;
 }
 
 class HighligherViews extends ViewHandler<IHighligherState> {
@@ -117,6 +126,10 @@ class HighligherViews extends ViewHandler<IHighligherState> {
     return this.state.transition;
   }
 
+  get audio() {
+    return this.state.audio;
+  }
+
   get transitionDuration() {
     return this.state.transition.duration;
   }
@@ -129,6 +142,10 @@ class HighligherViews extends ViewHandler<IHighligherState> {
     return transitions;
   }
 
+  get dismissedTutorial() {
+    return this.state.dismissedTutorial;
+  }
+
   /**
    * Takes a filepath to a video and returns a file:// url with a random
    * component to prevent the browser from caching it and missing changes.
@@ -139,13 +156,19 @@ class HighligherViews extends ViewHandler<IHighligherState> {
   }
 }
 
+@InitAfter('StreamingService')
 export class HighlighterService extends StatefulService<IHighligherState> {
-  static initialState = {
+  static initialState: IHighligherState = {
     clips: {},
     clipOrder: [],
     transition: {
       type: 'fade',
       duration: 1,
+    },
+    audio: {
+      musicEnabled: false,
+      musicPath: '',
+      musicVolume: 50,
     },
     export: {
       exporting: false,
@@ -166,7 +189,8 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       videoId: null,
       error: false,
     },
-  } as IHighligherState;
+    dismissedTutorial: false,
+  };
 
   @Inject() streamingService: StreamingService;
   @Inject() userService: UserService;
@@ -192,6 +216,13 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       ...this.state.clips[clip.path],
       ...clip,
     });
+    this.state.export.exported = false;
+  }
+
+  @mutation()
+  REMOVE_CLIP(clipPath: string) {
+    Vue.delete(this.state.clips, clipPath);
+    this.state.clipOrder = this.state.clipOrder.filter(c => c !== clipPath);
     this.state.export.exported = false;
   }
 
@@ -227,6 +258,20 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     this.state.export.exported = false;
   }
 
+  @mutation()
+  SET_AUDIO_INFO(audioInfo: Partial<IAudioInfo>) {
+    this.state.audio = {
+      ...this.state.audio,
+      ...audioInfo,
+    };
+    this.state.export.exported = false;
+  }
+
+  @mutation()
+  DISMISS_TUTORIAL() {
+    this.state.dismissedTutorial = true;
+  }
+
   get views() {
     return new HighligherViews(this.state);
   }
@@ -236,8 +281,8 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       const clipsToLoad = [
         // Aero 15 test clips
         // path.join(CLIP_DIR, '2021-05-12 12-59-28.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-20.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-29.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-20.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-29.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-41.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-49.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-58.mp4'),
@@ -320,12 +365,20 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     });
   }
 
+  removeClip(path: string) {
+    this.REMOVE_CLIP(path);
+  }
+
   setOrder(order: string[]) {
     this.SET_ORDER(order);
   }
 
   setTransition(transition: Partial<ITransitionInfo>) {
     this.SET_TRANSITION_INFO(transition);
+  }
+
+  setAudio(audio: Partial<IAudioInfo>) {
+    this.SET_AUDIO_INFO(audio);
   }
 
   setExportFile(file: string) {
@@ -335,6 +388,10 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   dismissError() {
     if (this.state.export.error) this.SET_EXPORT_INFO({ error: null });
     if (this.state.upload.error) this.SET_UPLOAD_INFO({ error: false });
+  }
+
+  dismissTutorial() {
+    this.DISMISS_TUTORIAL();
   }
 
   async loadClips() {
@@ -434,6 +491,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     });
 
     let fader: AudioCrossfader | null = null;
+    let mixer: AudioMixer | null = null;
 
     try {
       let currentFrame = 0;
@@ -441,9 +499,28 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       // Mix audio first
       await Promise.all(clips.map(clip => clip.audioSource.extract()));
       const parsed = path.parse(this.views.exportInfo.file);
-      const audioMix = path.join(parsed.dir, `${parsed.name}-audio.flac`);
-      fader = new AudioCrossfader(audioMix, clips, this.views.transitionDuration);
+      const audioConcat = path.join(parsed.dir, `${parsed.name}-concat.flac`);
+      let audioMix = path.join(parsed.dir, `${parsed.name}-mix.flac`);
+      fader = new AudioCrossfader(audioConcat, clips, this.views.transitionDuration);
       await fader.export();
+
+      if (this.views.audio.musicEnabled && this.views.audio.musicPath) {
+        mixer = new AudioMixer(audioMix, [
+          { path: audioConcat, volume: 1, loop: false },
+          {
+            path: this.views.audio.musicPath,
+            volume: Math.pow(10, -1 + this.views.audio.musicVolume / 100),
+            loop: true,
+          },
+        ]);
+
+        await mixer.export();
+      } else {
+        // If there's no background music, we can skip mix entirely and just
+        // use the concatenated clip audio directly.
+        audioMix = audioConcat;
+      }
+
       await Promise.all(clips.map(clip => clip.audioSource.cleanup()));
 
       this.SET_EXPORT_INFO({ step: EExportStep.FrameRender });
@@ -519,6 +596,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     }
 
     if (fader) await fader.cleanup();
+    if (mixer) await mixer.cleanup();
     this.SET_EXPORT_INFO({
       exporting: false,
       exported: !this.views.exportInfo.cancelRequested && !preview && !this.views.exportInfo.error,

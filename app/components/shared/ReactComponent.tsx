@@ -152,7 +152,6 @@ export class EditStreamWindow extends ReactComponent {}
   },
 })
 export class Grow extends ReactComponent {}
-
 @Component({
   props: {
     name: { default: 'PlatformLogo' },
@@ -167,3 +166,12 @@ export class PlatformLogo extends ReactComponent<{
 }> {}
 @Component({ props: { name: { default: 'RenameSource' } } })
 export class RenameSource extends ReactComponent {}
+@Component({ props: { name: { default: 'StartStreamingButton' } } })
+export class StartStreamingButton extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'TestWidgets' },
+    componentProps: { default: () => ({ testers: null as string[] }) },
+  },
+})
+export class TestWidgets extends ReactComponent<{ testers: string[] }> {}
