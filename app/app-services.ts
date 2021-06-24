@@ -135,6 +135,7 @@ import { MagicLinkService } from './services/magic-link';
 import { UsageStatisticsService } from './services/usage-statistics';
 import { MediaBackupService } from './services/media-backup';
 import { WidgetsService } from './services/widgets';
+import { NotificationsService } from './services/notifications';
 
 export const AppServices = {
   WindowsService,
@@ -165,4 +166,5 @@ export const AppServices = {
   UsageStatisticsService,
   MediaBackupService,
   WidgetsService,
+  NotificationsService,
 };
