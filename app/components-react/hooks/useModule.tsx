@@ -65,6 +65,7 @@ export function useModule<
           () => lockedModule,
           () => module.state,
           () => computedPropsRef.current,
+          () => ({ module }),
         );
         dependencyWatcherRef.current = createDependencyWatcher(mergedModule);
       }
@@ -91,7 +92,7 @@ export function useModule<
 
   const mergeResult = merge(
     () => module,
-    () => ({ select, module, selectExtra: select }),
+    () => ({ select, selectExtra: select }),
   );
   return (mergeResult as unknown) as TReturnType;
 }

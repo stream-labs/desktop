@@ -112,6 +112,7 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
         <ListInput
           {...bind.privacyStatus}
           label={$t('Privacy')}
+          defaultValue="public"
           options={[
             {
               value: 'public',
@@ -130,6 +131,7 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
           {...bind.categoryId}
           label={$t('Category')}
           showSearch
+          defaultValue="20" // Gaming
           options={YoutubeService.state.categories.map(category => ({
             value: category.id,
             label: category.snippet.title,
@@ -145,6 +147,7 @@ export const YoutubeEditStreamInfo = InputComponent((p: IPlatformComponentParams
         <ListInput
           label={$t('Stream Latency')}
           tooltip={$t('latencyTooltip')}
+          defaultValue="normal"
           options={[
             { value: 'normal', label: $t('Normal Latency') },
             { value: 'low', label: $t('Low-latency') },

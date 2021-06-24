@@ -13,20 +13,21 @@ import Form, { useForm } from '../../shared/inputs/Form';
 import { mutation } from '../../store';
 import { Services } from '../../service-provider';
 import { useModule } from '../../hooks/useModule';
-import {getPlatformService, TPlatform} from '../../../services/platforms';
+import { getPlatformService, TPlatform } from '../../../services/platforms';
 import {
   IYoutubeLiveBroadcast,
   IYoutubeStartStreamOptions,
+  YoutubeService,
 } from '../../../services/platforms/youtube';
 import {
   IFacebookLiveVideoExtended,
-  IFacebookStartStreamOptions,
+  IFacebookStartStreamOptions, IFacebookUpdateVideoOptions,
 } from '../../../services/platforms/facebook';
 import {
   IPlatformComponentParams,
   TLayoutMode,
 } from '../../windows/go-live/platforms/PlatformSettingsLayout';
-import {assertIsDefined, getDefined} from '../../../util/properties-type-guards';
+import { assertIsDefined, getDefined } from '../../../util/properties-type-guards';
 
 interface ISchedulerPlatformSettings extends Record<TPlatform, Object> {
   youtube: Partial<IYoutubeStartStreamOptions>;
@@ -39,6 +40,7 @@ class StreamSchedulerModule {
     events: [] as IStreamEvent[],
     isModalVisible: false,
     selectedEventId: '',
+    time: 0,
     selectedPlatform: this.platforms[0],
     platformSettings: {
       youtube: {},
@@ -80,9 +82,10 @@ class StreamSchedulerModule {
   }
 
   private async loadEvents() {
-    // load fb and yt events simultaneously
     this.reset();
     await Services.StreamingService.actions.return.prepopulateInfo();
+
+    // load fb and yt events simultaneously
     const events: IStreamEvent[] = [];
     const [fbEvents, ytEvents] = await Promise.all([this.loadFbEvents(), this.loadYTBEvents()]);
 
@@ -120,9 +123,10 @@ class StreamSchedulerModule {
   }
 
   @mutation()
-  showNewEventModal(platform: TPlatform) {
+  showNewEventModal(platform: TPlatform, time?: Moment) {
     this.state.selectedPlatform = platform;
     this.state.isModalVisible = true;
+    if (time) this.state.time = time.valueOf();
   }
 
   async showEditEventModal(eventId: string) {
@@ -158,6 +162,8 @@ class StreamSchedulerModule {
   closeModal() {
     this.state.selectedEventId = '';
     this.state.isModalVisible = false;
+    this.state.platformSettings.facebook = {};
+    this.state.platformSettings.youtube = {};
   }
 
   @mutation()
@@ -167,18 +173,14 @@ class StreamSchedulerModule {
 
   @mutation()
   private reset() {
-    Object.assign(this.state, {
-      isLoading: false,
-      events: [],
-    });
+    this.state.isLoading = true;
+    this.state.events = [];
   }
 
   @mutation()
   private setEvents(events: IStreamEvent[]) {
-    Object.assign(this.state, {
-      isLoading: true,
-      events,
-    });
+    this.state.isLoading = false;
+    this.state.events = events;
   }
 }
 
@@ -198,10 +200,13 @@ export default function StreamScheduler() {
     getPlatformDisplayName,
     platforms,
     bindPlatform,
+    time,
     module,
   } = useModule(StreamSchedulerModule).select();
 
   const form = useForm();
+
+  const { YoutubeService, FacebookService } = Services;
 
   // function showScheduleNewDialog(date: number) {
   //   const today = new Date().setHours(0, 0, 0, 0);
@@ -248,7 +253,7 @@ export default function StreamScheduler() {
   }
 
   function onDaySelectHandler(date: Moment) {
-    showNewEventModal(selectedPlatform);
+    showNewEventModal(selectedPlatform, date);
   }
 
   async function validate() {
@@ -264,10 +269,27 @@ export default function StreamScheduler() {
   async function submit() {
     const valid = await validate();
     if (!valid) return;
-    // const event = module.selectedEvent;
-    // const service = getPlatformService(event.platform);
-    // assertIsDefined(service.scheduleStream);
-    // await service.scheduleStream(time, destinations[platform]);
+    const platform = module.state.selectedPlatform;
+    const service = getPlatformService(platform);
+    const streamSettings = module.state.platformSettings[platform];
+
+    if (isUpdate) {
+      if (platform === 'youtube') {
+        await YoutubeService.actions.return.updateBroadcast(
+          selectedEventId,
+          streamSettings as IYoutubeStartStreamOptions,
+        );
+      } else {
+        await FacebookService.actions.return.updateLiveVideo(
+          selectedEventId,
+          streamSettings as IFacebookUpdateVideoOptions,
+        );
+      }
+    } else {
+      assertIsDefined(service.scheduleStream);
+      await service.scheduleStream(time, streamSettings);
+    }
+    closeModal();
   }
 
   function goLive() {}
@@ -275,7 +297,10 @@ export default function StreamScheduler() {
   function remove() {}
 
   function renderFooter() {
-    const canGoLive = true;
+    const shouldShowGoLive = true;
+    const shouldShowSave = !!selectedEventId;
+    const shouldShowSchedule = !selectedEventId;
+
     return (
       <div>
         {/*/!* CLOSE BUTTON *!/*/}
@@ -287,19 +312,34 @@ export default function StreamScheduler() {
         </Button>
 
         {/* GO LIVE BUTTON */}
-        {canGoLive && (
+        {shouldShowGoLive && (
           <Button type="primary" onClick={goLive}>
             {$t('Go Live')}
           </Button>
         )}
 
         {/* SAVE BUTTON */}
-        <Button onClick={submit}>{$t('Save')}</Button>
+        {shouldShowSave && (
+          <Button type="primary" onClick={submit}>
+            {$t('Save')}
+          </Button>
+        )}
+
+        {/* SCHEDULE BUTTON */}
+        {shouldShowSchedule && (
+          <Button type="primary" onClick={submit}>
+            {$t('Schedule')}
+          </Button>
+        )}
       </div>
     );
   }
 
-  const canChangePlatform = !selectedEventId;
+  const isUpdate = !!selectedEventId;
+  const canChangePlatform = !isUpdate;
+  const title = isUpdate
+    ? $t('Update Scheduled Stream')
+    : $t('Schedule Stream for %{date}', { date: moment(time).calendar() });
 
   return (
     <div className={cx(css.streamSchedulerPage)}>
@@ -308,10 +348,11 @@ export default function StreamScheduler() {
       {/*<Button onClick={() => showNewEventModal()}>Open modal</Button>*/}
       {/*<Button onClick={closeEventModal}>Close modal</Button>*/}
       <Modal
-        title={$t('Schedule Stream')}
+        title={title}
         visible={isModalVisible}
         onOk={submitEvent}
         onCancel={closeModal}
+        afterClose={closeModal}
         destroyOnClose={true}
         footer={renderFooter()}
         forceRender
@@ -325,7 +366,7 @@ export default function StreamScheduler() {
                 value: platform,
                 label: getPlatformDisplayName(platform),
               }))}
-              onChange={showNewEventModal}
+              onChange={platform => showNewEventModal(platform)}
             />
           )}
 

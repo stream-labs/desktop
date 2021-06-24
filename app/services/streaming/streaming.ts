@@ -493,20 +493,20 @@ export class StreamingService
     return true;
   }
 
-  /**
-   * Schedule stream for eligible platforms
-   */
-  async scheduleStream(settings: IStreamSettings, time: number) {
-    const destinations = settings.platforms;
-    const platforms = (Object.keys(destinations) as TPlatform[]).filter(
-      dest => destinations[dest].enabled && this.views.supports('stream-schedule', [dest]),
-    ) as ('facebook' | 'youtube')[];
-    for (const platform of platforms) {
-      const service = getPlatformService(platform);
-      assertIsDefined(service.scheduleStream);
-      await service.scheduleStream(time, destinations[platform]);
-    }
-  }
+  // /**
+  //  * Schedule stream for eligible platforms
+  //  */
+  // async scheduleStream(settings: IStreamSettings, time: number) {
+  //   const destinations = settings.platforms;
+  //   const platforms = (Object.keys(destinations) as TPlatform[]).filter(
+  //     dest => destinations[dest].enabled && this.views.supports('stream-schedule', [dest]),
+  //   ) as ('facebook' | 'youtube')[];
+  //   for (const platform of platforms) {
+  //     const service = getPlatformService(platform);
+  //     assertIsDefined(service.scheduleStream);
+  //     await service.scheduleStream(time, destinations[platform]);
+  //   }
+  // }
 
   /**
    * Run task and update the checklist item status based on task result

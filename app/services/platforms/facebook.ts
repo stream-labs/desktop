@@ -283,7 +283,7 @@ export class FacebookService
   /**
    * update live video
    */
-  private async updateLiveVideo(
+  async updateLiveVideo(
     liveVideoId: string,
     options: IFacebookUpdateVideoOptions,
     switchToLive = false,

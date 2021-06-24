@@ -508,7 +508,7 @@ export class YoutubeService
   /**
    * update the broadcast via API
    */
-  private async updateBroadcast(
+  async updateBroadcast(
     id: string,
     params: Partial<IYoutubeStartStreamOptions>,
     isMidStreamMode = false,
