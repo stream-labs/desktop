@@ -8,17 +8,13 @@ import { $t } from '../../services/i18n';
 export default function RenameSource() {
   const { SourcesService, WindowsService, EditorCommandsService } = Services;
 
-  const [name, setName] = useState('');
-
   const form = useForm();
 
   const options = useRef(WindowsService.getChildWindowQueryParams());
 
-  useEffect(() => {
-    const source = SourcesService.views.getSource(options.current.sourceId);
-    if (!source) return;
-    setName(source.name);
-  }, []);
+  const [name, setName] = useState(
+    SourcesService.views.getSource(options.current.sourceId)?.name || '',
+  );
 
   async function submit(e: React.MouseEvent<HTMLElement, MouseEvent>) {
     e.preventDefault();
