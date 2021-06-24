@@ -67,6 +67,7 @@ interface IStreamSettings extends IStreamSettingsState {
   platform: TPlatform;
   key: string;
   server: string;
+  service: string;
   streamType: 'rtmp_common' | 'rtmp_custom';
   warnBeforeStartingStream: boolean;
   recordWhenStreaming: boolean;
@@ -211,6 +212,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       platform: invert(platformToServiceNameMap)[obsStreamSettings.service] as TPlatform,
       key: obsStreamSettings.key,
       server: obsStreamSettings.server,
+      service: obsStreamSettings.service,
       streamType: obsStreamSettings.streamType as IStreamSettings['streamType'],
       warnBeforeStartingStream: obsGeneralSettings.WarnBeforeStartingStream,
       recordWhenStreaming: obsGeneralSettings.RecordWhenStreaming,
@@ -351,6 +353,7 @@ class StreamSettingsView extends ViewHandler<IStreamSettingsState> {
       platform: invert(platformToServiceNameMap)[obsStreamSettings.service] as TPlatform,
       key: obsStreamSettings.key,
       server: obsStreamSettings.server,
+      service: obsStreamSettings.service,
       streamType: obsStreamSettings.streamType as IStreamSettings['streamType'],
       warnBeforeStartingStream: obsGeneralSettings.WarnBeforeStartingStream,
       recordWhenStreaming: obsGeneralSettings.RecordWhenStreaming,
