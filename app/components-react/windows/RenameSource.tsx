@@ -13,7 +13,7 @@ export default function RenameSource() {
   const options = useRef(WindowsService.getChildWindowQueryParams());
 
   const [name, setName] = useState(
-    SourcesService.views.getSource(options.current.sourceId)?.name || '',
+    () => SourcesService.views.getSource(options.current.sourceId)?.name || '',
   );
 
   async function submit(e: React.MouseEvent<HTMLElement, MouseEvent>) {
@@ -29,9 +29,12 @@ export default function RenameSource() {
 
   return (
     <ModalLayout onOk={submit} okText={$t('Done')}>
-      <Form layout="vertical" form={form}>
+      <Form layout="vertical" form={form} name="renameSourceForm">
         <TextInput
           label={$t('Please enter the name of the source')}
+          name="sourceName"
+          data-role="input"
+          data-type="text"
           value={name}
           onInput={setName}
           uncontrolled={false}
