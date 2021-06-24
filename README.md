@@ -1,6 +1,4 @@
-# Streamlabs OBS
-
-[![Build Status](https://dev.azure.com/streamlabs/Streamlabs%20OBS/_apis/build/status/stream-labs.streamlabs-obs?branchName=staging)](https://dev.azure.com/streamlabs/Streamlabs%20OBS/_build/latest?definitionId=1&branchName=staging)
+# RevereStream
 
 Simple, powerful, and efficient live streaming software built on Electron and OBS.
 
