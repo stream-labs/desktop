@@ -535,7 +535,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       let fromClip = clips.shift()!;
       let toClip = clips.shift();
 
-      let transitioner: Transitioner;
+      let transitioner: Transitioner | null = null;
       const exportPath = preview ? this.views.exportInfo.previewFile : this.views.exportInfo.file;
       const writer = new FrameWriter(exportPath, audioMix, preview);
 
@@ -596,7 +596,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         // Check if the currently playing clip ended
         if (fromClip.frameSource.currentFrame === fromClip.frameSource.nFrames || !frameToRender) {
           fromClip.frameSource.end();
-          fromClip = toClip;
+          fromClip = toClip!;
           toClip = clips.shift();
         }
 
