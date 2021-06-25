@@ -71,9 +71,12 @@ export default class SideNav extends Vue {
   }
 
   get studioTabs() {
-    return Object.keys(this.layoutService.state.tabs).map(tab => ({
+    return Object.keys(this.layoutService.state.tabs).map((tab, i) => ({
       target: tab,
-      title: this.layoutService.state.tabs[tab].name || $t('Editor'),
+      title:
+        i === 0 || !this.layoutService.state.tabs[tab].name
+          ? $t('Editor')
+          : this.layoutService.state.tabs[tab].name,
       icon: this.layoutService.state.tabs[tab].icon,
       trackingTarget: tab === 'default' ? 'editor' : 'custom',
     }));
