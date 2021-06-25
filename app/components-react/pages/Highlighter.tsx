@@ -84,14 +84,12 @@ export default function Highlighter() {
   }
 
   function getControls() {
-    const transitionTypes = HighlighterService.views.transitions.map(
-      (transition: { name: string }) => {
-        return {
-          value: transition.name,
-          label: transition.name,
-        };
-      },
-    );
+    const transitionTypes = HighlighterService.views.transitionsTypes.map(t => {
+      return {
+        label: t,
+        value: t,
+      };
+    });
 
     function setTransitionType(type: string) {
       HighlighterService.actions.setTransition({ type });

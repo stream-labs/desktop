@@ -44,10 +44,20 @@ export class AudioCrossfader {
 
         const overlap = Math.min(
           this.transitionDuration,
-          clip.frameSource.trimmedDuration,
-          this.clips[i + 1] ? this.clips[i + 1].frameSource.trimmedDuration : Infinity,
+          clip.frameSource.trimmedDuration / 2,
+          this.clips[i + 1] ? this.clips[i + 1].frameSource.trimmedDuration / 2 : Infinity,
         );
-        let ret = `${inStream}[${i + 1}:a]acrossfade=d=${overlap}:c1=tri:c2=tri`;
+
+        let filter: string;
+
+        // Crossfade doesn't work with an overlap of 0, so use the concat filter instead
+        if (overlap === 0) {
+          filter = 'concat=v=0:a=1';
+        } else {
+          filter = `acrossfade=d=${overlap}:c1=tri:c2=tri`;
+        }
+
+        let ret = `${inStream}[${i + 1}:a]${filter}`;
 
         inStream = outStream;
 
