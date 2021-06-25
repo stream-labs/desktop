@@ -131,15 +131,15 @@ class HighligherViews extends ViewHandler<IHighligherState> {
   }
 
   get transitionDuration() {
-    return this.state.transition.duration;
+    return this.transition.type === 'None' ? 0 : this.state.transition.duration;
   }
 
   get transitionFrames() {
     return this.transitionDuration * FPS;
   }
 
-  get transitions() {
-    return transitions;
+  get transitionsTypes() {
+    return ['None', ...transitions.map((t: { name: string }) => t.name)];
   }
 
   get dismissedTutorial() {
@@ -282,22 +282,28 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         // Aero 15 test clips
         // path.join(CLIP_DIR, '2021-05-12 12-59-28.mp4'),
         path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-20.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-29.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-41.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-49.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-58.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-03.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-06.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-30-53.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-29.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-41.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-49.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-13-58.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-03.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-14-06.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-30-53.mp4'),
         path.join(CLIP_DIR, 'Replay 2021-03-30 14-32-34.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-33.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-48.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-03.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-23.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-51.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-18.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-30.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-33.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-34-48.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-03.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-23.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-51.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-18.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-30.mp4'),
         path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-44.mp4'),
+
+        // Spoken Audio
+        path.join(CLIP_DIR, '2021-06-24 13-59-58.mp4'),
+        path.join(CLIP_DIR, '2021-06-24 14-00-26.mp4'),
+        path.join(CLIP_DIR, '2021-06-24 14-00-52.mp4'),
+
         // Razer blade test clips
         // path.join(CLIP_DIR, '2021-05-25 08-55-13.mp4'),
         // path.join(CLIP_DIR, '2021-06-08 16-40-14.mp4'),
@@ -529,7 +535,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       let fromClip = clips.shift()!;
       let toClip = clips.shift();
 
-      const transitioner = new Transitioner(this.state.transition.type, preview);
+      let transitioner: Transitioner | null = null;
       const exportPath = preview ? this.views.exportInfo.previewFile : this.views.exportInfo.file;
       const writer = new FrameWriter(exportPath, audioMix, preview);
 
@@ -543,6 +549,15 @@ export class HighlighterService extends StatefulService<IHighligherState> {
 
         const fromFrameRead = await fromClip.frameSource.readNextFrame();
 
+        // Sometimes we get one less frame than we expect.
+        // When this happens, we just pad in an extra frame that is
+        // the same as the previous frame
+        if (!fromFrameRead && fromClip.frameSource.currentFrame < fromClip.frameSource.nFrames) {
+          // The read buffer should still be valid, so just increment the counter
+          console.debug('Padding with repeated frame');
+          fromClip.frameSource.currentFrame++;
+        }
+
         const transitionFrames = Math.min(
           this.views.transitionFrames,
           (fromClip.frameSource.trimmedDuration / 2) * FPS,
@@ -550,11 +565,13 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         );
 
         const inTransition =
-          fromClip.frameSource.currentFrame >= fromClip.frameSource.nFrames - transitionFrames;
-        let frameToRender = fromClip.frameSource.readBuffer;
+          fromClip.frameSource.currentFrame > fromClip.frameSource.nFrames - transitionFrames;
+        let frameToRender: Buffer | null;
 
-        if (inTransition && toClip) {
+        if (inTransition && toClip && transitionFrames !== 0) {
           await toClip.frameSource.readNextFrame();
+
+          if (!transitioner) transitioner = new Transitioner(this.state.transition.type, preview);
 
           transitioner.renderTransition(
             fromClip.frameSource.readBuffer,
@@ -565,24 +582,30 @@ export class HighlighterService extends StatefulService<IHighligherState> {
             (toClip.frameSource.currentFrame - 1) / this.views.transitionFrames,
           );
           frameToRender = transitioner.getFrame();
-
-          const transitionEnded =
-            fromClip.frameSource.currentFrame === fromClip.frameSource.nFrames;
-
-          if (transitionEnded) {
-            fromClip.frameSource.end();
-            fromClip = toClip;
-            toClip = clips.shift();
-          }
+        } else {
+          frameToRender = fromClip.frameSource.readBuffer;
         }
 
-        if (fromFrameRead) {
+        // Write the next frame
+        if (frameToRender) {
           await writer.writeNextFrame(frameToRender);
           currentFrame++;
           this.setCurrentFrame(currentFrame);
-        } else {
+        }
+
+        // Check if the currently playing clip ended
+        if (fromClip.frameSource.currentFrame === fromClip.frameSource.nFrames || !frameToRender) {
+          fromClip.frameSource.end();
+          fromClip = toClip!;
+          toClip = clips.shift();
+        }
+
+        if (!fromClip) {
           console.log('Out of sources, closing file');
           await writer.end();
+          console.debug(
+            `Export complete - Expected Frames: ${this.views.exportInfo.totalFrames} Actual Frames: ${currentFrame}`,
+          );
           break;
         }
       }
