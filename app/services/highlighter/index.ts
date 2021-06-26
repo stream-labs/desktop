@@ -658,7 +658,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
             if (this.views.transition.type === 'Random') {
               const type = sample(
                 availableTransitions.filter(t => !['None', 'Random'].includes(t.type)),
-              ).type;
+              )!.type;
               transitioner = new Transitioner(type, preview, transitionParams[type]);
             } else {
               transitioner = new Transitioner(
