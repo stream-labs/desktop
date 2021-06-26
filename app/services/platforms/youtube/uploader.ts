@@ -84,7 +84,14 @@ export class YoutubeUploader {
       );
 
       const locationHeader = result.headers.get('Location');
-      if (!locationHeader) throw new Error('Did not receive upload location header!');
+      if (!locationHeader) {
+        result.text().then(text => {
+          console.log(`Got ${result.status} response from YT Upload`);
+          console.log(text);
+        });
+
+        throw new Error('Did not receive upload location header!');
+      }
       const uploadLocation = locationHeader;
 
       let currentByteIndex = 0;

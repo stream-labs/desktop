@@ -2,7 +2,7 @@ import { useVuex } from 'components-react/hooks';
 import React, { useEffect, useState } from 'react';
 import { Services } from 'components-react/service-provider';
 import styles from './Highlighter.m.less';
-import { IClip } from 'services/highlighter';
+import { IClip, TTransitionType } from 'services/highlighter';
 import ClipPreview from 'components-react/highlighter/ClipPreview';
 import ClipTrimmer from 'components-react/highlighter/ClipTrimmer';
 import { ReactSortable } from 'react-sortablejs';
@@ -84,14 +84,14 @@ export default function Highlighter() {
   }
 
   function getControls() {
-    const transitionTypes = HighlighterService.views.transitionsTypes.map(t => {
+    const transitionTypes = HighlighterService.views.availableTransitions.map(t => {
       return {
-        label: t,
-        value: t,
+        label: t.displayName,
+        value: t.type,
       };
     });
 
-    function setTransitionType(type: string) {
+    function setTransitionType(type: TTransitionType) {
       HighlighterService.actions.setTransition({ type });
     }
 

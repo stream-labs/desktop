@@ -86,7 +86,9 @@ export default function createTransition(
       let unit = 2;
       for (const key in transition.paramsTypes) {
         const value = key in params ? params[key] : transition.defaultParams[key];
-        if (transition.paramsTypes[key] === 'sampler2D') {
+        const type = transition.paramsTypes[key];
+
+        if (type === 'sampler2D') {
           if (!value) {
             console.warn(
               'uniform[' + key + ']: A texture MUST be defined for uniform sampler2D of a texture',
@@ -96,8 +98,51 @@ export default function createTransition(
           } else {
             gl.uniform1i(gl.getUniformLocation(program, key), value.bind(unit++));
           }
-        } else {
+        } else if (['bool', 'int'].includes(type)) {
+          gl.uniform1i(gl.getUniformLocation(program, key), value);
+        } else if (type === 'float') {
           gl.uniform1f(gl.getUniformLocation(program, key), value);
+        } else if (type.indexOf('vec') > -1) {
+          const d = parseInt(type.charAt(type.length - 1), 10);
+          const dataType = type.charAt(0);
+
+          if (['b', 'i'].includes(dataType)) {
+            if (d === 2) {
+              gl.uniform2iv(gl.getUniformLocation(program, key), value);
+            } else if (d === 3) {
+              gl.uniform3iv(gl.getUniformLocation(program, key), value);
+            } else if (d === 4) {
+              gl.uniform4iv(gl.getUniformLocation(program, key), value);
+            } else {
+              throw new Error(`Vector dimension for type ${type} is outside valid range`);
+            }
+          } else if (dataType === 'v') {
+            if (d === 2) {
+              gl.uniform2fv(gl.getUniformLocation(program, key), value);
+            } else if (d === 3) {
+              gl.uniform3fv(gl.getUniformLocation(program, key), value);
+            } else if (d === 4) {
+              gl.uniform4fv(gl.getUniformLocation(program, key), value);
+            } else {
+              throw new Error(`Vector dimension for type ${type} is outside valid range`);
+            }
+          } else {
+            throw new Error(`Unrecognized vector data type ${type}`);
+          }
+        } else if (type.indexOf('mat') > -1) {
+          const d = parseInt(type.charAt(type.length - 1), 10);
+
+          if (d === 2) {
+            gl.uniformMatrix2fv(gl.getUniformLocation(program, key), false, value);
+          } else if (d === 3) {
+            gl.uniformMatrix3fv(gl.getUniformLocation(program, key), false, value);
+          } else if (d === 4) {
+            gl.uniformMatrix4fv(gl.getUniformLocation(program, key), false, value);
+          } else {
+            throw new Error(`Matrix dimension for type ${type} is outside valid range`);
+          }
+        } else {
+          throw new Error(`Unrecognized uniform type ${type}`);
         }
       }
       gl.enableVertexAttribArray(positionLocation);
