@@ -69,7 +69,10 @@ export async function platformRequest<T = unknown>(
     if (useJfetch) {
       return jfetch(request) as Promise<T>;
     } else {
-      return fetch(request);
+      return fetch(request).then(response => {
+        if (!response.ok) throw response;
+        return response;
+      });
     }
   };
 
