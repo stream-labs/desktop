@@ -21,7 +21,11 @@ export class Transitioner {
 
   private transitionSrc: any;
 
-  constructor(public readonly transitionType: string, public readonly preview: boolean) {
+  constructor(
+    public readonly transitionType: string,
+    public readonly preview: boolean,
+    public readonly params: { [key: string]: any } = {},
+  ) {
     this.canvas.width = this.width;
     this.canvas.height = this.height;
     this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
@@ -49,6 +53,7 @@ export class Transitioner {
       toTexture,
       this.gl.drawingBufferWidth,
       this.gl.drawingBufferHeight,
+      this.params,
     );
 
     fromTexture.dispose();
