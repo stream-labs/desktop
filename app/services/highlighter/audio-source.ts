@@ -30,7 +30,7 @@ export class AudioSource {
       '-ar', '48000',
       '-map', 'a:0',
       '-c:a', 'flac',
-      '-filter:a', 'apad,loudnorm',
+      '-filter:a', 'apad',
       '-y',
       this.outPath,
     ];
