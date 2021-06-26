@@ -1,6 +1,5 @@
 import { mutation, StatefulService, ViewHandler, Inject, InitAfter } from 'services/core';
 import path from 'path';
-import transitions from 'gl-transitions';
 import Vue from 'vue';
 import fs from 'fs-extra';
 import url from 'url';
@@ -21,6 +20,7 @@ import { AudioCrossfader } from './audio-crossfader';
 import { FrameWriter } from './frame-writer';
 import { Transitioner } from './transitioner';
 import { throttle } from 'lodash-decorators';
+import sample from 'lodash/sample';
 import { HighlighterError } from './errors';
 import { AudioMixer } from './audio-mixer';
 
@@ -69,7 +69,7 @@ export interface IUploadInfo {
 }
 
 export interface ITransitionInfo {
-  type: string;
+  type: TTransitionType;
   duration: number;
 }
 
@@ -88,6 +88,89 @@ interface IHighligherState {
   upload: IUploadInfo;
   dismissedTutorial: boolean;
 }
+
+export type TTransitionType =
+  | 'None'
+  | 'Random'
+  | 'fade'
+  | 'Directional'
+  | 'cube'
+  | 'crosswarp'
+  | 'wind'
+  | 'DoomScreenTransition'
+  | 'GridFlip'
+  | 'Dreamy'
+  | 'SimpleZoom'
+  | 'pixelize';
+
+interface IAvailableTransition {
+  displayName: string;
+  type: TTransitionType;
+  params?: { [key: string]: any };
+}
+
+const availableTransitions: IAvailableTransition[] = [
+  {
+    displayName: 'None',
+    type: 'None',
+  },
+  {
+    displayName: 'Random',
+    type: 'Random',
+  },
+  {
+    displayName: 'Fade',
+    type: 'fade',
+  },
+  {
+    displayName: 'Slide',
+    type: 'Directional',
+    params: { direction: [1, 0] },
+  },
+  {
+    displayName: 'Cube',
+    type: 'cube',
+  },
+  {
+    displayName: 'Warp',
+    type: 'crosswarp',
+  },
+  {
+    displayName: 'Wind',
+    type: 'wind',
+  },
+  {
+    displayName: "90's Game",
+    type: 'DoomScreenTransition',
+    params: { bars: 100 },
+  },
+  {
+    displayName: 'Grid Flip',
+    type: 'GridFlip',
+  },
+  {
+    displayName: 'Dreamy',
+    type: 'Dreamy',
+  },
+  {
+    displayName: 'Zoom',
+    type: 'SimpleZoom',
+  },
+  {
+    displayName: 'Pixelize',
+    type: 'pixelize',
+  },
+];
+
+// Avoid having to loop over every time for fast access
+const transitionParams: {
+  [type in TTransitionType]?: { [key: string]: any };
+} = availableTransitions.reduce((params, transition) => {
+  return {
+    ...params,
+    [transition.type]: transition.params,
+  };
+}, {});
 
 class HighligherViews extends ViewHandler<IHighligherState> {
   /**
@@ -138,8 +221,8 @@ class HighligherViews extends ViewHandler<IHighligherState> {
     return this.transitionDuration * FPS;
   }
 
-  get transitionsTypes() {
-    return ['None', ...transitions.map((t: { name: string }) => t.name)];
+  get availableTransitions() {
+    return availableTransitions;
   }
 
   get dismissedTutorial() {
@@ -296,8 +379,8 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-23.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-51.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-18.mp4'),
-        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-30.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-44.mp4'),
+        path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-30.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-44.mp4'),
 
         // Spoken Audio
         // path.join(CLIP_DIR, '2021-06-24 13-59-58.mp4'),
@@ -571,7 +654,20 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         if (inTransition && toClip && transitionFrames !== 0) {
           await toClip.frameSource.readNextFrame();
 
-          if (!transitioner) transitioner = new Transitioner(this.state.transition.type, preview);
+          if (!transitioner) {
+            if (this.views.transition.type === 'Random') {
+              const type = sample(
+                availableTransitions.filter(t => !['None', 'Random'].includes(t.type)),
+              ).type;
+              transitioner = new Transitioner(type, preview, transitionParams[type]);
+            } else {
+              transitioner = new Transitioner(
+                this.state.transition.type,
+                preview,
+                transitionParams[this.state.transition.type],
+              );
+            }
+          }
 
           transitioner.renderTransition(
             fromClip.frameSource.readBuffer,
@@ -595,6 +691,8 @@ export class HighlighterService extends StatefulService<IHighligherState> {
 
         // Check if the currently playing clip ended
         if (fromClip.frameSource.currentFrame === fromClip.frameSource.nFrames || !frameToRender) {
+          // Reset the transitioner so a new one is selected at random
+          if (this.views.transition.type === 'Random') transitioner = null;
           fromClip.frameSource.end();
           fromClip = toClip!;
           toClip = clips.shift();
