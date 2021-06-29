@@ -8,12 +8,11 @@ import {
 } from '.';
 import { HostsService } from 'services/hosts';
 import { Inject } from 'services/core/injector';
-import { authorizedHeaders, handleResponse, jfetch } from 'util/requests';
+import { authorizedHeaders, jfetch } from 'util/requests';
 import { UserService } from 'services/user';
 import { getAllTags, getStreamTags, TTwitchTag, updateTags } from './twitch/tags';
 import { TTwitchOAuthScope } from './twitch/scopes';
 import { platformAuthorizedRequest, platformRequest } from './utils';
-import { StreamSettingsService } from 'services/settings/streaming';
 import { CustomizationService } from 'services/customization';
 import { assertIsDefined } from 'util/properties-type-guards';
 import { IGoLiveSettings } from 'services/streaming';
@@ -242,12 +241,10 @@ export class TwitchService
     }
   }
 
-  private fetchRawChannelInfo(): Promise<ITWitchChannelResponse> {
-    return this.requestTwitch<ITWitchChannelResponse>(`${this.apiBase}/kraken/channel`);
-  }
-
   fetchStreamKey(): Promise<string> {
-    return this.fetchRawChannelInfo().then(json => json.stream_key);
+    return this.requestTwitch<{ data: { stream_key: string }[] }>(
+      `${this.apiBase}/helix/streams/key?broadcaster_id=${this.twitchId}`,
+    ).then(json => json.data[0].stream_key);
   }
 
   /**
@@ -255,9 +252,11 @@ export class TwitchService
    */
   async prepopulateInfo(): Promise<void> {
     const [channelInfo, hasUpdateTagsPermission] = await Promise.all([
-      this.fetchRawChannelInfo().then(json => ({
-        title: json.status,
-        game: json.game,
+      this.requestTwitch<{ data: { title: string; game_name: string }[] }>(
+        `${this.apiBase}/helix/channels?broadcaster_id=${this.twitchId}`,
+      ).then(json => ({
+        title: json.data[0].title,
+        game: json.data[0].game_name,
       })),
       this.getHasUpdateTagsPermission(),
     ]);
@@ -284,10 +283,10 @@ export class TwitchService
   }
 
   fetchViewerCount(): Promise<number> {
-    return platformRequest<{ stream?: { viewers: number } }>(
+    return platformRequest<{ data?: { viewer_count: number }[] }>(
       'twitch',
-      `${this.apiBase}/kraken/streams/${this.twitchId}`,
-    ).then(json => (json.stream ? json.stream.viewers : 0));
+      `${this.apiBase}/helix/streams?user_id=${this.twitchId}`,
+    ).then(json => (json.data ? json.data[0].viewer_count : 0));
   }
 
   fetchFollowers(): Promise<number> {
@@ -297,11 +296,14 @@ export class TwitchService
   }
 
   async putChannelInfo({ title, game, tags = [] }: ITwitchStartStreamOptions): Promise<void> {
+    const gameId = await this.requestTwitch<{ data: { id: string }[] }>(
+      `${this.apiBase}/helix/games?name=${game}`,
+    ).then(json => json.data[0].id);
     await Promise.all([
       this.requestTwitch({
-        url: `${this.apiBase}/kraken/channels/${this.twitchId}`,
-        method: 'PUT',
-        body: JSON.stringify({ channel: { game, status: title } }),
+        url: `${this.apiBase}/helix/channels?broadcaster_id=${this.twitchId}`,
+        method: 'PATCH',
+        body: JSON.stringify({ game_id: gameId, title }),
       }),
       this.setStreamTags(tags),
     ]);
