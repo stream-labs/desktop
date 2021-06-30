@@ -151,7 +151,10 @@ export function useForceUpdate() {
   return forceUpdate;
 }
 
-export function useInterval(callback: () => void, delay: number) {
+/**
+ * Sets a function that guarantees a re-render and fresh state on every tick of the delay
+ */
+export function useRenderInterval(callback: () => void, delay: number) {
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
