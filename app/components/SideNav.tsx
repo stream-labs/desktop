@@ -15,6 +15,8 @@ import { NavTools } from 'components/shared/ReactComponent';
 import styles from './SideNav.m.less';
 import { LayoutService } from 'services/layout';
 import { getPlatformService } from '../services/platforms';
+import { getOS, OS } from 'util/operating-systems';
+import Utils from 'services/utils';
 
 interface IPageData {
   target: TAppPage;
@@ -123,6 +125,21 @@ export default class SideNav extends Vue {
         title: $t('Grow'),
         trackingTarget: 'grow-tab',
         newBadge: true,
+      });
+    }
+
+    if (
+      getOS() === OS.Windows &&
+      this.userService.isLoggedIn &&
+      this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.highlighter) &&
+      // TODO: Remove via bundle when v1 is complete and ready to start rolling out
+      (Utils.isPreview() || Utils.isDevMode())
+    ) {
+      pageData.push({
+        target: 'Highlighter',
+        icon: 'fab fa-youtube',
+        title: 'Highlighter',
+        trackingTarget: 'highlighter',
       });
     }
 

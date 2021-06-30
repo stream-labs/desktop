@@ -2,6 +2,9 @@ import { Singleton, Fallback } from 'services/api/external-api';
 import { Inject } from 'services/core/injector';
 import { PerformanceService as InternalPerformanceService } from 'services/performance';
 
+/**
+ * Serialized representation of the performance values.
+ */
 interface IPerformanceState {
   CPU: number;
   numberDroppedFrames: number;
@@ -11,7 +14,8 @@ interface IPerformanceState {
 }
 
 /**
- * Api for performance monitoring
+ * API for performance monitoring. Provides basic information about the current
+ * performance sate.
  */
 @Singleton()
 export class PerformanceService {
@@ -19,6 +23,9 @@ export class PerformanceService {
   @Inject()
   private performanceService: InternalPerformanceService;
 
+  /**
+   * @returns A serialized representation of the current performance state
+   */
   getModel(): IPerformanceState {
     return {
       CPU: this.performanceService.state.CPU,

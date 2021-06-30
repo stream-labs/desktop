@@ -25,6 +25,7 @@
   "Configure Default Devices": "Configurar dispositivos predeterminados",
   "OBS Import": "Importación de OBS",
   "Confirm stream title and game before going live": "Confirmar título de stream y juego antes de emitir en directo",
+  "Enable reporting additional information on a crash (requires restart)": "Enable reporting additional information on a crash (requires restart)",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "¡ADVERTENCIA! Perderá todas las escenas, fuentes y ajustes. ¡Esta operación no se puede deshacer!",
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Su directorio de caché se ha cargado correctamente. El nombre de archivo %{file} se ha copiado al portapapeles.",
   "Stream Labels session has been successfully restarted!": "Stream Labels session has been successfully restarted!",
@@ -138,5 +139,6 @@
   "Virtual Webcam allows you to display your scenes from Streamlabs OBS in video conferencing software. Streamlabs OBS will appear as a Webcam that can be selected in most video conferencing apps.": "Virtual Webcam allows you to display your scenes from Streamlabs OBS in video conferencing software. Streamlabs OBS will appear as a Webcam that can be selected in most video conferencing apps.",
   "Uninstalling Virtual Webcam will remove it as a device option in other applications.": "Uninstalling Virtual Webcam will remove it as a device option in other applications.",
   "Uninstall Virtual Webcam": "Uninstall Virtual Webcam",
-  "Use custom resolution": "Use custom resolution"
+  "Use custom resolution": "Use custom resolution",
+  "Enable Designer Mode": "Enable Designer Mode"
 }

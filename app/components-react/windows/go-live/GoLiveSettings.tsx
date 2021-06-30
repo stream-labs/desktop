@@ -45,7 +45,11 @@ export default function GoLiveSettings() {
   const shouldShowAddDestButton = canAddDestinations;
 
   function addDestination() {
-    SettingsService.actions.showSettings('Stream');
+    if (UserService.views.isPrime) {
+      SettingsService.actions.showSettings('Stream');
+    } else {
+      MagicLinkService.linkToPrime('slobs-multistream');
+    }
   }
 
   return (

@@ -1,7 +1,8 @@
 import { remote } from 'electron';
 import React, { useEffect, useState, useRef } from 'react';
 import shuffle from 'lodash/shuffle';
-import { Button, Modal, Form } from 'antd';
+import { Button, Modal } from 'antd';
+import Form, { useForm } from '../../shared/inputs/Form';
 import { $t } from '../../../services/i18n';
 import styles from './Grow.m.less';
 import { useVuex } from '../../hooks';
@@ -32,7 +33,7 @@ export default function Grow() {
   function fetchApiData() {
     GrowService.actions.fetchGoals();
     GrowService.actions.fetchAnalytics();
-    GrowService.actions.fetchUniversityProgress();
+    // GrowService.actions.fetchUniversityProgress();
     GrowService.actions.fetchPlatformFollowers();
   }
 
@@ -74,16 +75,22 @@ function MyGoals(p: { goals: Dictionary<IGoal> }) {
           <GoalCard goal={goal} key={goal.type} showGoalModal={() => setShowGoalModal(true)} />
         ))}
       </div>
-      <AddGoalModal visible={showGoalModal} setShowGoalModal={setShowGoalModal} />
+      <AddGoalModal visible={showGoalModal} setShowGoalModal={setShowGoalModal} goals={p.goals} />
     </div>
   );
 }
 
-function AddGoalModal(p: { visible: boolean; setShowGoalModal: Function }) {
-  const { GrowService } = Services;
+function AddGoalModal(p: {
+  visible: boolean;
+  setShowGoalModal: Function;
+  goals: Dictionary<IGoal>;
+}) {
+  const { GrowService, UsageStatisticsService } = Services;
   const [goalTotal, setGoalTotal] = useState(10);
   const [goalTitle, setGoalTitle] = useState('');
   const [goalType, setGoalType] = useState('custom');
+
+  const form = useForm();
 
   useEffect(() => {
     const goalOption = GrowService.views.goalOptions.find(goal => goal.type === goalType);
@@ -94,11 +101,21 @@ function AddGoalModal(p: { visible: boolean; setShowGoalModal: Function }) {
   }, [goalType]);
 
   function addGoal() {
+    if (GrowService.views.goals[goalType] && goalType !== 'custom') return;
+    UsageStatisticsService.recordFeatureUsage('GrowTabGoal');
     const image = GrowService.views.goalOptions.find(goal => goal.type === goalType)?.image || '';
     GrowService.actions.addGoal({ title: goalTitle, total: goalTotal, type: goalType, image });
     setGoalTitle('');
     setGoalTotal(10);
     p.setShowGoalModal(false);
+  }
+
+  function uniqueGoalValidator(rule: unknown, value: string, callback: Function) {
+    if (value !== 'custom' && p.goals[value]) {
+      callback($t('There is already a goal of this type'));
+    } else {
+      callback();
+    }
   }
 
   const goalTypes = GrowService.views.goalOptions.map(option => ({
@@ -114,13 +131,14 @@ function AddGoalModal(p: { visible: boolean; setShowGoalModal: Function }) {
       onCancel={() => p.setShowGoalModal(false)}
       title={$t('Add Goal')}
     >
-      <Form>
+      <Form form={form}>
         <ListInput
           label={$t('Goal Type')}
           options={goalTypes}
           value={goalType}
           defaultValue="custom"
           onChange={setGoalType}
+          rules={[{ validator: uniqueGoalValidator }]}
         />
         {goalType === 'custom' && (
           <TextInput
@@ -128,10 +146,21 @@ function AddGoalModal(p: { visible: boolean; setShowGoalModal: Function }) {
             value={goalTitle}
             onChange={setGoalTitle}
             uncontrolled={false}
+            placeholder={'My Goal'}
+            rules={[{ max: 32 }]}
+            required
           />
         )}
         {goalType === 'custom' && (
-          <NumberInput label={$t('Goal Total')} value={goalTotal} min={0} onChange={setGoalTotal} />
+          <NumberInput
+            label={$t('Goal Total')}
+            value={goalTotal}
+            onChange={setGoalTotal}
+            defaultValue={10}
+            uncontrolled={false}
+            rules={[{ min: 1, max: 50 }]}
+            required
+          />
         )}
       </Form>
     </Modal>
@@ -214,7 +243,7 @@ function ResourceFooter(p: { universityProgress: IUniversityProgress }) {
       <span>{$t('')}</span>
 
       <div className={styles.resourcesContainer}>
-        <UniversityCard progress={p.universityProgress} />
+        {/* <UniversityCard progress={p.universityProgress} /> */}
         <ContentHubCard />
       </div>
     </div>
@@ -232,7 +261,7 @@ function GrowthTips() {
       remote.shell.openExternal(url);
     } else {
       try {
-        const link = await MagicLinkService.getDashboardMagicLink(url);
+        const link = await MagicLinkService.getDashboardMagicLink(url, 'slobs-grow-tab');
         remote.shell.openExternal(link);
       } catch (e: unknown) {
         console.error('Error generating dashboard magic link', e);

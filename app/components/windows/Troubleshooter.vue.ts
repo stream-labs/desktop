@@ -12,7 +12,7 @@ import { WindowsService } from 'services/windows';
 import { StreamingService } from 'services/streaming';
 import { TObsFormData } from '../obs/inputs/ObsInput';
 import GenericFormGroups from '../obs/inputs/GenericFormGroups.vue';
-import StartStreamingButton from '../StartStreamingButton.vue';
+import { StartStreamingButton } from 'components/shared/ReactComponent';
 
 @Component({
   components: { ModalLayout, GenericFormGroups, StartStreamingButton },

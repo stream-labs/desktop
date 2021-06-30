@@ -1,11 +1,16 @@
+import moment from 'moment';
 import { ViewHandler } from '../core';
-import { IGoLiveSettings, IStreamingServiceState, IStreamSettings } from './streaming-api';
+import {
+  IGoLiveSettings,
+  IStreamingServiceState,
+  IStreamSettings,
+  EStreamingState,
+} from './streaming-api';
 import { StreamSettingsService } from '../settings/streaming';
 import { UserService } from '../user';
 import { RestreamService } from '../restream';
 import { getPlatformService, TPlatform, TPlatformCapability } from '../platforms';
 import { IncrementalRolloutService, TwitterService } from '../../app-services';
-import { EAvailableFeatures } from '../incremental-rollout';
 import cloneDeep from 'lodash/cloneDeep';
 import difference from 'lodash/difference';
 
@@ -360,5 +365,13 @@ export class StreamInfoView extends ViewHandler<IStreamingServiceState> {
       useCustomFields,
       enabled: enabled || this.checkPrimaryPlatform(platform),
     };
+  }
+
+  get delayEnabled() {
+    return this.streamSettingsView.settings.delayEnable;
+  }
+
+  get delaySeconds() {
+    return this.streamSettingsView.settings.delaySec;
   }
 }

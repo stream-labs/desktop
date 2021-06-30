@@ -11,6 +11,7 @@
   "Settings": "Paramètres",
   "That name is already taken": "Ce nom est déjà pris",
   "Search": "Rechercher",
+  "Searching...": "Searching...",
   "Create New": "Créer une nouvelle collection",
   "Language": "Langue",
   "Name is required": "Le nom est requis",
@@ -32,7 +33,7 @@
   "Submit": "Envoyer",
   "Save": "Enregistrer",
   "Edit": "Modifier",
-  "Log In": "Log In",
+  "Log In": "Se connecter",
   "Yes": "Oui",
   "No": "Non",
   "OK": "OK",
@@ -129,5 +130,6 @@
   "Height": "Hauteur",
   "Use Custom": "Use Custom",
   "Apply": "Poser une candidature",
-  "Do not show this message again": "Do not show this message again"
+  "Do not show this message again": "Do not show this message again",
+  "You can only select up to %{max} items": "You can only select up to %{max} items"
 }
