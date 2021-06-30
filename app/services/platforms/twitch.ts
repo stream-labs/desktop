@@ -283,7 +283,7 @@ export class TwitchService
   }
 
   fetchViewerCount(): Promise<number> {
-    return platformAuthorizedRequest<{ data?: { viewer_count: number }[] }>(
+    return platformAuthorizedRequest<{ data: { viewer_count: number }[] }>(
       'twitch',
       `${this.apiBase}/helix/streams?user_id=${this.twitchId}`,
     ).then(json => json.data[0]?.viewer_count ?? 0);
