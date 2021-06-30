@@ -89,6 +89,8 @@ interface IHighligherState {
   dismissedTutorial: boolean;
 }
 
+// Capitalization is not consistent because it matches with the
+// gl-transitions library.
 export type TTransitionType =
   | 'None'
   | 'Random'
@@ -103,7 +105,7 @@ export type TTransitionType =
   | 'SimpleZoom'
   | 'pixelize';
 
-interface IAvailableTransition {
+export interface IAvailableTransition {
   displayName: string;
   type: TTransitionType;
   params?: { [key: string]: any };
