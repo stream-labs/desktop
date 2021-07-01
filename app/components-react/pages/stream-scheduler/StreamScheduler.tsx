@@ -18,13 +18,14 @@ import {
   IYoutubeStartStreamOptions,
 } from '../../../services/platforms/youtube';
 import {
+  FacebookService,
   IFacebookLiveVideo,
   IFacebookLiveVideoExtended,
   IFacebookStartStreamOptions,
   IFacebookUpdateVideoOptions,
 } from '../../../services/platforms/facebook';
 import { assertIsDefined, getDefined } from '../../../util/properties-type-guards';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, pick } from 'lodash';
 import { FormInstance } from 'antd/lib/form';
 import { confirm } from '../../modals';
 import { IStreamError } from '../../../services/streaming/stream-error';
@@ -233,10 +234,19 @@ class StreamSchedulerModule {
       this.handleError(e as IStreamError);
       return;
     }
-    const event =
-      selectedPlatform === 'youtube'
-        ? convertYTBroadcastToEvent(video as IYoutubeLiveBroadcast)
-        : convertFBLiveVideoToEvent(video as IFacebookLiveVideoExtended);
+    let event: IStreamEvent;
+    if (selectedPlatform === 'youtube') {
+      event = convertYTBroadcastToEvent(video as IYoutubeLiveBroadcast);
+    } else {
+      assertIsDefined(this.fbSettings);
+      const fbSettings = getDefined(this.fbSettings);
+      const destinationId = (service as FacebookService).views.getDestinationId(fbSettings);
+      event = convertFBLiveVideoToEvent({
+        ...video,
+        destinationType: fbSettings.destinationType,
+        destinationId,
+      } as IFacebookLiveVideoExtended);
+    }
     this.setEvent(video.id, event);
     this.closeModal();
   }
