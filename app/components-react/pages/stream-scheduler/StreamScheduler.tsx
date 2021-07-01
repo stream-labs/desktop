@@ -1,7 +1,6 @@
 import React, { MouseEvent } from 'react';
-import { IGoLiveSettings, IStreamEvent } from '../../../services/streaming';
+import { IStreamEvent } from '../../../services/streaming';
 import moment, { Moment } from 'moment';
-import Spinner from '../../shared/Spinner';
 import css from './StreamScheduler.m.less';
 import cx from 'classnames';
 import { Button, Calendar, message, Modal, Row, Col, Spin } from 'antd';
@@ -27,8 +26,6 @@ import {
 import { assertIsDefined, getDefined } from '../../../util/properties-type-guards';
 import { cloneDeep } from 'lodash';
 import { FormInstance } from 'antd/lib/form';
-import { useWindowSize } from '../../hooks/useWindowSize';
-import styles from '../grow/Grow.m.less';
 import { confirm } from '../../modals';
 import { IStreamError } from '../../../services/streaming/stream-error';
 
@@ -77,31 +74,6 @@ class StreamSchedulerModule {
   get selectedEvent() {
     return this.state.events.find(ev => this.state.selectedEventId === ev.id);
   }
-
-  // bindPlatform = {
-  //   youtube: this.createPlatformBinding('youtube'),
-  //   facebook: this.createPlatformBinding('facebook'),
-  // };
-  //
-  // private createPlatformBinding<T extends TPlatform>(platform: T) {
-  //   const getValue = () =>
-  //     this.state.platformSettings[platform] as Required<ISchedulerPlatformSettings[T]>;
-  //   const getIsUpdateMode = () => this.isUpdate;
-  //
-  //   return {
-  //     isScheduleMode: true,
-  //     layoutMode: 'singlePlatform' as TLayoutMode,
-  //     get isUpdateMode() {
-  //       return getIsUpdateMode();
-  //     },
-  //     get value() {
-  //       return getValue();
-  //     },
-  //     onChange: (newSettings: ISchedulerPlatformSettings[T]) => {
-  //       this.updatePlatform(platform, newSettings);
-  //     },
-  //   };
-  // }
 
   private async loadEvents() {
     this.reset();
@@ -375,43 +347,23 @@ function useStreamScheduler() {
  * StreamScheduler page
  */
 export default function StreamScheduler() {
-  const {
-    isLoading,
-    events,
-    showNewEventModal,
-    showEditEventModal,
-    closeModal,
-    isModalVisible,
-    submit,
-    remove,
-    selectedEventId,
-    selectedPlatform,
-    getPlatformDisplayName,
-    platforms,
-    time,
-    isUpdateMode,
-    isEventsLoaded,
-    setForm,
-    fbSettings,
-    ytSettings,
-    updatePlatform,
-    setTime,
-  } = useStreamScheduler();
+  const { isEventsLoaded, setForm } = useStreamScheduler();
 
   const form = useForm();
   setForm(form);
 
-  const { height } = useWindowSize();
+  return (
+    <div className={cx(css.streamSchedulerPage)}>
+      <Spin tip="Loading..." spinning={!isEventsLoaded}>
+        <SchedulerCalendar />
+      </Spin>
+      <EventSettingsModal />
+    </div>
+  );
+}
 
-  // function showScheduleNewDialog(date: number) {
-  //   const today = new Date().setHours(0, 0, 0, 0);
-  //   const isPastDate = new Date(date).getTime() < today;
-  //   if (isPastDate) {
-  //     // WindowsService.showMessageBox(this, () => $t('You can not schedule to this date'));
-  //   } else {
-  //     // WindowsService.showModalDialog(this, () => <EditScheduledStream date={date} />);
-  //   }
-  // }
+function SchedulerCalendar() {
+  const { showEditEventModal, showNewEventModal, selectedPlatform, events } = useStreamScheduler();
 
   function renderEvent(event: IStreamEvent) {
     const time = moment(event.date).format('hh:mma');
@@ -434,7 +386,17 @@ export default function StreamScheduler() {
     );
   }
 
-  function dateFullCellRender(date: Moment) {
+  function onDaySelectHandler(date: Moment) {
+    showNewEventModal(selectedPlatform, date);
+  }
+
+  function onClick(event: MouseEvent) {
+    const $td = event.target!['closest']('td');
+    if (!$td) return;
+    $td.querySelector('[data-role="day"]')!['click']();
+  }
+
+  function dateCellRender(date: Moment) {
     const start = moment(date).startOf('day');
     const end = moment(date).endOf('day');
 
@@ -449,88 +411,36 @@ export default function StreamScheduler() {
         {dayEvents.map(renderEvent)}
       </div>
     );
-
-    // return (
-    //   <div
-    //     onClick={() => onDaySelectHandler(date)}
-    //     style={{ height: `${cellHeight}px`, margin: '0' }}
-    //     className={cx({
-    //       'ant-picker-cell-inner': true,
-    //       'ant-picker-calendar-date': true,
-    //       'ant-picker-calendar-date-today': isToday,
-    //     })}
-    //   >
-    //     <div className="ant-picker-calendar-date-value">{date.date()}</div>
-    //     <div className="ant-picker-calendar-date-content">{dayEvents.map(renderEvent)}</div>
-    //
-    //     {/*<Row align="top" wrap={false}>*/}
-    //     {/*  <Col*/}
-    //     {/*    flex="auto"*/}
-    //     {/*    style={{*/}
-    //     {/*      maxHeight: `${cellHeight - 8}px`,*/}
-    //     {/*      overflowX: 'hidden',*/}
-    //     {/*      overflowY: 'auto',*/}
-    //     {/*      minWidth: '1px',*/}
-    //     {/*    }}*/}
-    //     {/*  >*/}
-    //     {/*    {dayEvents.map(renderEvent)}*/}
-    //     {/*  </Col>*/}
-    //     {/*  <Col flex="25px">*/}
-    //     {/*    <div className="ant-picker-calendar-date-value">{date.date()}</div>*/}
-    //     {/*  </Col>*/}
-    //     {/*</Row>*/}
-    //   </div>
-    // );
   }
 
-  function onDaySelectHandler(date: Moment) {
-    showNewEventModal(selectedPlatform, date);
-  }
+  return (
+    <div onClick={onClick}>
+      <Calendar
+        dateCellRender={dateCellRender}
+        validRange={[moment().subtract(12, 'month'), moment().add(1, 'month')]}
+      />
+    </div>
+  );
+}
 
-  function onClick(event: MouseEvent) {
-    const $td = event.target!['closest']('td');
-    if (!$td) return;
-    $td.querySelector('[data-role="day"]')!['click']();
-  }
-
-  function renderFooter() {
-    const shouldShowGoLive = true;
-    const shouldShowSave = !!selectedEventId;
-    const shouldShowSchedule = !selectedEventId;
-
-    async function onDeleteClick() {
-      if (await confirm($t('Delete the event?'))) remove();
-    }
-
-    return (
-      <Row>
-        <Col flex={'50%'} style={{ textAlign: 'left' }}>
-          {/* DELETE BUTTON */}
-          <Button danger onClick={onDeleteClick}>
-            {$t('Delete')}
-          </Button>
-        </Col>
-        <Col flex={'50%'}>
-          {/*/!* GO LIVE BUTTON *!/*/}
-          {/*{shouldShowGoLive && <Button type="primary">{$t('Go Live')}</Button>}*/}
-
-          {/* SAVE BUTTON */}
-          {shouldShowSave && (
-            <Button type="primary" onClick={submit} disabled={isLoading}>
-              {$t('Save')}
-            </Button>
-          )}
-
-          {/* SCHEDULE BUTTON */}
-          {shouldShowSchedule && (
-            <Button type="primary" onClick={submit} disabled={isLoading}>
-              {$t('Schedule')}
-            </Button>
-          )}
-        </Col>
-      </Row>
-    );
-  }
+function EventSettingsModal() {
+  const {
+    isUpdateMode,
+    time,
+    isModalVisible,
+    submit,
+    closeModal,
+    form,
+    isLoading,
+    selectedPlatform,
+    platforms,
+    getPlatformDisplayName,
+    showNewEventModal,
+    setTime,
+    ytSettings,
+    fbSettings,
+    updatePlatform,
+  } = useStreamScheduler();
 
   const canChangePlatform = !isUpdateMode;
   const date = moment(time).calendar();
@@ -539,69 +449,95 @@ export default function StreamScheduler() {
     : $t('Schedule Stream for %{date}', { date });
 
   return (
-    <div className={cx(css.streamSchedulerPage)} onClick={onClick}>
-      <Spin tip="Loading..." spinning={!isEventsLoaded}>
-        <Calendar
-          dateCellRender={dateFullCellRender}
-          validRange={[moment().subtract(12, 'month'), moment().add(1, 'month')]}
-        />
-      </Spin>
+    <Modal
+      title={title}
+      visible={isModalVisible}
+      onOk={submit}
+      onCancel={closeModal}
+      afterClose={closeModal}
+      destroyOnClose={true}
+      footer={<EventButtons />}
+      getContainer={`.${css.streamSchedulerPage}`}
+    >
+      <Form form={form}>
+        <Spin spinning={isLoading}>
+          {canChangePlatform && (
+            <ListInput
+              label={$t('Platform')}
+              value={selectedPlatform}
+              options={platforms.map(platform => ({
+                value: platform,
+                label: getPlatformDisplayName(platform),
+              }))}
+              onChange={platform => showNewEventModal(platform)}
+            />
+          )}
 
-      {/*<Calendar />*/}
-      <Modal
-        title={title}
-        visible={isModalVisible}
-        onOk={submit}
-        onCancel={closeModal}
-        afterClose={closeModal}
-        destroyOnClose={true}
-        footer={renderFooter()}
-        getContainer={`.${css.streamSchedulerPage}`}
-      >
-        <Form form={form}>
-          <Spin spinning={isLoading}>
-            {canChangePlatform && (
-              <ListInput
-                label={$t('Platform')}
-                value={selectedPlatform}
-                options={platforms.map(platform => ({
-                  value: platform,
-                  label: getPlatformDisplayName(platform),
-                }))}
-                onChange={platform => showNewEventModal(platform)}
-              />
-            )}
+          <TimeInput label={$t('Time')} value={time} onChange={setTime} />
 
-            <TimeInput label={$t('Time')} value={time} onChange={setTime} />
+          {selectedPlatform === 'youtube' && (
+            <YoutubeEditStreamInfo
+              layoutMode="singlePlatform"
+              isUpdateMode={isUpdateMode}
+              isScheduleMode={true}
+              value={ytSettings}
+              onChange={newSettings => updatePlatform('youtube', newSettings)}
+            />
+          )}
+          {selectedPlatform === 'facebook' && (
+            <FacebookEditStreamInfo
+              layoutMode="singlePlatform"
+              isUpdateMode={isUpdateMode}
+              isScheduleMode={true}
+              value={fbSettings}
+              onChange={newSettings => updatePlatform('facebook', newSettings)}
+            />
+          )}
+        </Spin>
+      </Form>
+    </Modal>
+  );
+}
 
-            {selectedPlatform === 'youtube' && (
-              <YoutubeEditStreamInfo
-                layoutMode="singlePlatform"
-                isUpdateMode={isUpdateMode}
-                isScheduleMode={true}
-                value={ytSettings}
-                onChange={newSettings => updatePlatform('youtube', newSettings)}
-              />
-            )}
-            {selectedPlatform === 'facebook' && (
-              <FacebookEditStreamInfo
-                layoutMode="singlePlatform"
-                isUpdateMode={isUpdateMode}
-                isScheduleMode={true}
-                value={fbSettings}
-                onChange={newSettings => updatePlatform('facebook', newSettings)}
-              />
-            )}
-          </Spin>
-        </Form>
-      </Modal>
-      {/*{isLoading && (*/}
-      {/*  <div className={css.loadingFader}>*/}
-      {/*    <div className={css.loadingShadow}></div>*/}
-      {/*    <Spinner className={css.spinner} />*/}
-      {/*  </div>*/}
-      {/*)}*/}
-    </div>
+function EventButtons() {
+  const { selectedEventId, remove, submit, isLoading } = useStreamScheduler();
+  const shouldShowSave = !!selectedEventId;
+  const shouldShowRemove = !!selectedEventId;
+  const shouldShowSchedule = !selectedEventId;
+
+  async function onDeleteClick() {
+    if (await confirm($t('Delete the event?'))) remove();
+  }
+
+  return (
+    <Row>
+      <Col flex={'50%'} style={{ textAlign: 'left' }}>
+        {/* DELETE BUTTON */}
+        {shouldShowRemove && (
+          <Button danger onClick={onDeleteClick}>
+            {$t('Delete')}
+          </Button>
+        )}
+      </Col>
+      <Col flex={'50%'}>
+        {/*/!* GO LIVE BUTTON *!/*/}
+        {/*{shouldShowGoLive && <Button type="primary">{$t('Go Live')}</Button>}*/}
+
+        {/* SAVE BUTTON */}
+        {shouldShowSave && (
+          <Button type="primary" onClick={submit} disabled={isLoading}>
+            {$t('Save')}
+          </Button>
+        )}
+
+        {/* SCHEDULE BUTTON */}
+        {shouldShowSchedule && (
+          <Button type="primary" onClick={submit} disabled={isLoading}>
+            {$t('Schedule')}
+          </Button>
+        )}
+      </Col>
+    </Row>
   );
 }
 
