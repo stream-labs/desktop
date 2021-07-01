@@ -107,6 +107,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         // disable deprecation warning and waiting for better docs now
         deprecationWarnings: false,
       },
+      chromeDriverArgs: ['--remote-debugging-port=12209'],
     });
 
     if (options.beforeAppStartCb) await options.beforeAppStartCb(t);
@@ -132,7 +133,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
 
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
-    //await waitForLoader(t);
+    await waitForLoader(t);
     if (options.skipOnboarding) {
       await t.context.app.client.waitForExist('.onboarding-step', 10000);
       await t.context.app.client.click('[data-test="Skip"]');
