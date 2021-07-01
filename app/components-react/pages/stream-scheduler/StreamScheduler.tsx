@@ -311,6 +311,7 @@ class StreamSchedulerModule {
 
   @mutation()
   private setEvents(events: IStreamEvent[]) {
+    console.log('events are loaded', events);
     this.state.isEventsLoaded = true;
     this.state.events = events;
   }
@@ -503,10 +504,10 @@ function EventSettingsModal() {
 }
 
 function EventButtons() {
-  const { selectedEventId, remove, submit, isLoading } = useStreamScheduler();
-  const shouldShowSave = !!selectedEventId;
-  const shouldShowRemove = !!selectedEventId;
-  const shouldShowSchedule = !selectedEventId;
+  const { selectedEvent, remove, submit, isLoading } = useStreamScheduler();
+  const shouldShowSave = !!selectedEvent;
+  const shouldShowRemove = selectedEvent && selectedEvent.status === 'scheduled';
+  const shouldShowSchedule = !selectedEvent;
 
   async function onDeleteClick() {
     if (await confirm($t('Delete the event?'))) remove();
@@ -545,6 +546,14 @@ function EventButtons() {
 }
 
 function convertYTBroadcastToEvent(ytBroadcast: IYoutubeLiveBroadcast): IStreamEvent {
+  let status: IStreamEvent['status'] = 'completed';
+  if (
+    ytBroadcast.status.lifeCycleStatus === 'created' ||
+    ytBroadcast.status.lifeCycleStatus === 'ready'
+  ) {
+    status = 'scheduled';
+  }
+
   return {
     platform: 'youtube',
     id: ytBroadcast.id,
@@ -552,7 +561,7 @@ function convertYTBroadcastToEvent(ytBroadcast: IYoutubeLiveBroadcast): IStreamE
       ytBroadcast.snippet.scheduledStartTime || ytBroadcast.snippet.actualStartTime,
     ).valueOf(),
     title: ytBroadcast.snippet.title,
-    status: ytBroadcast.status.lifeCycleStatus === 'complete' ? 'completed' : 'scheduled',
+    status,
   };
 }
 
