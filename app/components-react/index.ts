@@ -14,6 +14,7 @@ import Loader from './pages/Loader';
 import NavTools from './sidebar/NavTools';
 import PlatformLogo from './shared/PlatformLogo';
 import RenameSource from './windows/RenameSource';
+import AdvancedStatistics from './windows/AdvancedStatistics';
 import StartStreamingButton from './root/StartStreamingButton';
 import TestWidgets from './root/TestWidgets';
 
@@ -35,6 +36,7 @@ export const components = {
   NavTools,
   PlatformLogo,
   RenameSource,
+  AdvancedStatistics,
   StartStreamingButton,
   TestWidgets,
 };
