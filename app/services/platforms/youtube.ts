@@ -132,6 +132,7 @@ export interface IYoutubeVideo {
     description: string;
     categoryId: string;
     tags: string[];
+    scheduledStartTime: string;
   };
 }
 
@@ -215,9 +216,6 @@ export class YoutubeService
   };
 
   readonly apiBase = 'https://www.googleapis.com/youtube/v3';
-
-  streamScheduled = new Subject<IYoutubeLiveBroadcast>();
-  streamRemoved = new Subject<string>();
 
   protected init() {
     this.syncSettingsWithLocalStorage();
@@ -379,11 +377,11 @@ export class YoutubeService
   private async updateCategory(broadcastId: string, categoryId: string) {
     const video = await this.fetchVideo(broadcastId);
     const endpoint = 'videos?part=snippet';
-    const { title, description, tags } = video.snippet;
+    const { title, description, tags, scheduledStartTime } = video.snippet;
     await this.requestYoutube({
       body: JSON.stringify({
         id: broadcastId,
-        snippet: { categoryId, title, description, tags },
+        snippet: { categoryId, title, description, tags, scheduledStartTime },
       }),
       method: 'PUT',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
@@ -419,7 +417,7 @@ export class YoutubeService
   async scheduleStream(
     scheduledStartTime: number,
     options: IYoutubeStartStreamOptions,
-  ): Promise<void> {
+  ): Promise<IYoutubeLiveBroadcast> {
     let broadcast: IYoutubeLiveBroadcast;
     if (!options.broadcastId) {
       // create an new event
@@ -431,7 +429,7 @@ export class YoutubeService
         scheduledStartTime,
       });
     }
-    this.streamScheduled.next(broadcast);
+    return broadcast;
   }
 
   async fetchNewToken(): Promise<void> {
@@ -573,7 +571,6 @@ export class YoutubeService
       method: 'DELETE',
       url: `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
     });
-    this.streamRemoved.next(id);
   }
 
   /**

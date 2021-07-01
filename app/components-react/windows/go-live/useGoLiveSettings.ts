@@ -12,6 +12,10 @@ import { getDefined } from '../../../util/properties-type-guards';
 
 type TCommonFieldName = 'title' | 'description';
 
+interface IWindowOptions {
+  ytEventId?: string;
+}
+
 /**
  * Extend GoLiveSettingsFeature from StreamInfoView
  * So all getters from StreamInfoView will be available in GoLiveSettingsFeature
@@ -32,10 +36,16 @@ export class GoLiveSettingsFeature extends StreamInfoView<IGoLiveSettingsState> 
   };
 
   // initial setup
-  init(params: { isUpdateMode: boolean; form: FormInstance }) {
+  async init(params: { isUpdateMode: boolean; form: FormInstance }) {
     this.form = params.form;
     this.state.isUpdateMode = params.isUpdateMode;
-    this.prepopulate();
+    await this.prepopulate();
+
+    // preselect the eventId if provided
+    const options = (Services.WindowsService.state.child.queryParams as unknown) as IWindowOptions;
+    if (options.ytEventId) {
+      this.updatePlatform('youtube', { broadcastId: options.ytEventId });
+    }
   }
 
   /**
