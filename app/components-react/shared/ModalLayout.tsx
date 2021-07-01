@@ -9,7 +9,7 @@ import { Button } from 'antd';
 import { ModalProps } from 'antd/lib/modal';
 
 // use props of Modal from the antd lib
-type TProps = { children: ReactNode; fixedChild?: ReactNode; hideFooter?: boolean } & Pick<
+type TProps = { children: ReactNode; fixedChild?: ReactNode } & Pick<
   ModalProps,
   'footer' | 'onOk' | 'okText'
 >;
@@ -73,7 +73,7 @@ export function ModalLayout(p: TProps) {
       <div className="ant-modal-body" style={bodyStyles}>
         {p.children}
       </div>
-      {!p.hideFooter && <div className="ant-modal-footer">{p.footer || <DefaultFooter />}</div>}
+      <div className="ant-modal-footer">{p.footer || <DefaultFooter />}</div>
     </div>
   );
 }
