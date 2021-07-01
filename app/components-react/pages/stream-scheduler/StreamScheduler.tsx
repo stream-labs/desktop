@@ -487,7 +487,7 @@ function EventSettingsModal() {
             />
           )}
 
-          <TimeInput label={$t('Time')} value={time} onChange={setTime} />
+          <TimeInput name="time" label={$t('Time')} value={time} onChange={setTime} />
 
           {selectedPlatform === 'youtube' && (
             <YoutubeEditStreamInfo
