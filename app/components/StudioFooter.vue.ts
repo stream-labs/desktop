@@ -97,7 +97,8 @@ export default class StudioFooterComponent extends Vue {
   }
 
   get canSchedule() {
-    return this.streamingService.views.supports('stream-schedule');
+    const streamingView = this.streamingService.views;
+    return streamingView.supports('stream-schedule', streamingView.linkedPlatforms);
   }
 
   get youtubeEnabled() {

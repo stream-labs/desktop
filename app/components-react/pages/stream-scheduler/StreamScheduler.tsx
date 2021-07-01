@@ -96,12 +96,16 @@ class StreamSchedulerModule {
 
   private async loadYTBEvents() {
     if (!this.platforms.includes('youtube')) return [];
-    return await Services.YoutubeService.actions.return.fetchBroadcasts();
+    const ytActions = Services.YoutubeService.actions;
+    await ytActions.return.prepopulateInfo();
+    return await ytActions.return.fetchBroadcasts();
   }
 
   private async loadFbEvents() {
     if (!this.platforms.includes('facebook')) return [];
-    return await Services.FacebookService.actions.return.fetchAllVideos();
+    const fbActions = Services.FacebookService.actions;
+    await fbActions.return.prepopulateInfo();
+    return fbActions.return.fetchAllVideos();
   }
 
   get platforms(): TPlatform[] {
