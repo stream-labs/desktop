@@ -135,8 +135,9 @@ import { GrowService } from './services/grow/grow';
 import { TransitionsService } from './services/transitions';
 import { MagicLinkService } from './services/magic-link';
 import { UsageStatisticsService } from './services/usage-statistics';
-import { HotkeysService } from './services/hotkeys';
+import { NotificationsService } from './services/notifications';
 import { MediaBackupService } from './services/media-backup';
+import { HotkeysService } from './services/hotkeys';
 import { WidgetsService } from './services/widgets';
 
 export const AppServices = {
@@ -167,7 +168,8 @@ export const AppServices = {
   TransitionsService,
   MagicLinkService,
   UsageStatisticsService,
-  HotkeysService,
+  NotificationsService,
   MediaBackupService,
+  HotkeysService,
   WidgetsService,
 };
