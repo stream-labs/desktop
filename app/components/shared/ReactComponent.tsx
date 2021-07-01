@@ -164,10 +164,6 @@ export class PlatformLogo extends ReactComponent<{
   color?: string;
   unwrapped?: boolean;
 }> {}
-@Component({
-  props: { name: { default: 'AdvancedStatistics' } },
-})
-export class AdvancedStatistics extends ReactComponent {}
 @Component({ props: { name: { default: 'StartStreamingButton' } } })
 export class StartStreamingButton extends ReactComponent {}
 @Component({
