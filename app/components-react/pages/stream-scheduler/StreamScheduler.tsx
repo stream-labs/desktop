@@ -77,7 +77,6 @@ class StreamSchedulerModule {
 
   private async loadEvents() {
     this.reset();
-    await Services.StreamingService.actions.return.prepopulateInfo();
 
     // load fb and yt events simultaneously
     const events: IStreamEvent[] = [];
