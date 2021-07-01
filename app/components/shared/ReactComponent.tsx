@@ -165,13 +165,6 @@ export class PlatformLogo extends ReactComponent<{
   unwrapped?: boolean;
 }> {}
 @Component({
-  props: {
-    name: { default: 'RenameSource' },
-    wrapperStyles: { default: () => ({ height: '100%' }) },
-  },
-})
-export class RenameSource extends ReactComponent {}
-@Component({
   props: { name: { default: 'AdvancedStatistics' } },
 })
 export class AdvancedStatistics extends ReactComponent {}
