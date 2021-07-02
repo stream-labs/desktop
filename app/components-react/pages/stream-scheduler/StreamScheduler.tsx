@@ -185,13 +185,13 @@ class StreamSchedulerModule {
     this.showLoader();
 
     if (this.isUpdateMode) {
-      this.saveExistingStream();
+      this.saveExistingEvent();
     } else {
-      this.saveNewStream();
+      this.saveNewEvent();
     }
   }
 
-  private async saveExistingStream() {
+  private async saveExistingEvent() {
     const { selectedPlatform, selectedEventId } = this.state;
     const streamSettings = getDefined(this.state.platformSettings[selectedPlatform]);
 
@@ -221,7 +221,7 @@ class StreamSchedulerModule {
     this.closeModal();
   }
 
-  private async saveNewStream() {
+  private async saveNewEvent() {
     const { selectedPlatform, time } = this.state;
     const streamSettings = getDefined(this.state.platformSettings[selectedPlatform]);
     const service = getPlatformService(selectedPlatform);
@@ -247,7 +247,7 @@ class StreamSchedulerModule {
         destinationId,
       } as IFacebookLiveVideoExtended);
     }
-    this.setEvent(video.id, event);
+    this.addEvent(event);
     this.closeModal();
   }
 
