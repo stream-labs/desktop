@@ -18,6 +18,7 @@ export default function TransitionSelector() {
       <div
         style={{ textAlign: 'center', fontSize: 11, cursor: 'pointer' }}
         onClick={() => HighlighterService.actions.setTransition({ type: transition.type })}
+        key={transition.type}
       >
         <div
           style={{
