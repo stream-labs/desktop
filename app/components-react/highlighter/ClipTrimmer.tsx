@@ -30,6 +30,8 @@ export default function ClipTrimmer(props: { clip: IClip }) {
   const { HighlighterService } = Services;
   const videoRef = useRef<HTMLVideoElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
+  const startDragRef = useRef<HTMLDivElement>(null);
+  const endDragRef = useRef<HTMLDivElement>(null);
   const [currentTime, setCurrentTime] = useState(props.clip.startTrim);
   const [scrubFrames, setScrubFrames] = useState<number[]>([]);
   const [localStartTrim, setLocalStartTrim] = useState(props.clip.startTrim);
@@ -89,7 +91,10 @@ export default function ClipTrimmer(props: { clip: IClip }) {
 
   function startDragging(e: React.MouseEvent, type: TDragType) {
     isDragging.current = type;
-    dragOffset.current = e.clientX - (e.target as HTMLDivElement).getBoundingClientRect().left;
+    dragOffset.current =
+      type === 'start'
+        ? startDragRef.current!.getBoundingClientRect().right - e.clientX
+        : e.clientX - endDragRef.current!.getBoundingClientRect().left;
   }
 
   function onMouseDown() {
@@ -256,6 +261,7 @@ export default function ClipTrimmer(props: { clip: IClip }) {
               alignItems: 'center',
             }}
             onMouseDown={e => startDragging(e, 'start')}
+            ref={startDragRef}
           >
             <i className="fas fa-chevron-left" />
           </div>
@@ -286,6 +292,7 @@ export default function ClipTrimmer(props: { clip: IClip }) {
               alignItems: 'center',
             }}
             onMouseDown={e => startDragging(e, 'end')}
+            ref={endDragRef}
           >
             <i className="fas fa-chevron-right" />
           </div>
