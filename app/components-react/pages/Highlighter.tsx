@@ -21,6 +21,7 @@ import Scrollable from 'components-react/shared/Scrollable';
 import { IHotkey } from 'services/hotkeys';
 import { getBindingString } from 'components-react/shared/HotkeyBinding';
 import Animate from 'rc-animate';
+import TransitionSelector from 'components-react/highlighter/TransitionSelector';
 
 type TModal = 'trim' | 'export' | 'preview' | 'remove';
 
@@ -91,10 +92,6 @@ export default function Highlighter() {
       };
     });
 
-    function setTransitionType(type: TTransitionType) {
-      HighlighterService.actions.setTransition({ type });
-    }
-
     function setTransitionDuration(duration: number) {
       HighlighterService.actions.setTransition({ duration });
     }
@@ -114,7 +111,7 @@ export default function Highlighter() {
     }
 
     return (
-      <div
+      <Scrollable
         style={{
           width: '300px',
           flexShrink: 0,
@@ -124,12 +121,7 @@ export default function Highlighter() {
         }}
       >
         <Form layout="vertical">
-          <ListInput
-            label="Transition Type"
-            value={v.transition.type}
-            options={transitionTypes}
-            onChange={setTransitionType}
-          />
+          <TransitionSelector />
           <SliderInput
             label="Transition Duration"
             value={v.transition.duration}
@@ -181,7 +173,7 @@ export default function Highlighter() {
         <Button type="primary" style={{ marginTop: '16px' }} onClick={() => setShowModal('export')}>
           Export
         </Button>
-      </div>
+      </Scrollable>
     );
   }
 
