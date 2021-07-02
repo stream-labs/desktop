@@ -75,19 +75,16 @@ export abstract class RpcApi extends Service {
     errors: (string | Error)[],
   ): IJsonRpcResponse<any> {
     // send all errors messages as an response
-    return this.jsonrpc.createError(
-      {
-        code: E_JSON_RPC_ERROR.INTERNAL_SERVER_ERROR,
-        message: errors
-          .map(e => {
-            // errors with stack are uncaught errors
-            // send the error's stack as a response
-            return e instanceof Error ? `${e.message} ${e.stack.toString()}` : e;
-          })
-          .join(';'),
-      },
-      request,
-    );
+    return this.jsonrpc.createError(request, {
+      code: E_JSON_RPC_ERROR.INTERNAL_SERVER_ERROR,
+      message: errors
+        .map(e => {
+          // errors with stack are uncaught errors
+          // send the error's stack as a response
+          return e instanceof Error ? `${e.message} ${e.stack.toString()}` : e;
+        })
+        .join(';'),
+    });
   }
 
   protected get jsonrpc(): typeof JsonrpcService {
@@ -107,21 +104,15 @@ export abstract class RpcApi extends Service {
     const resource = this.getResource(resourceId);
     let errorResponse: IJsonRpcResponse<any>;
     if (!resource) {
-      errorResponse = this.jsonrpc.createError(
-        {
-          code: E_JSON_RPC_ERROR.INVALID_PARAMS,
-          message: `resource not found: ${resourceId}`,
-        },
-        request,
-      );
+      errorResponse = this.jsonrpc.createError(request, {
+        code: E_JSON_RPC_ERROR.INVALID_PARAMS,
+        message: `resource not found: ${resourceId}`,
+      });
     } else if (resource[methodName] === void 0) {
-      errorResponse = this.jsonrpc.createError(
-        {
-          code: E_JSON_RPC_ERROR.METHOD_NOT_FOUND,
-          message: methodName,
-        },
-        request,
-      );
+      errorResponse = this.jsonrpc.createError(request, {
+        code: E_JSON_RPC_ERROR.METHOD_NOT_FOUND,
+        message: methodName,
+      });
     }
     if (errorResponse) return errorResponse;
 
@@ -158,7 +149,7 @@ export abstract class RpcApi extends Service {
   ): IJsonRpcResponse<any> {
     // primitive types are serializable so send them as is
     if (!(responsePayload instanceof Object)) {
-      return this.jsonrpc.createResponse(request, responsePayload);
+      return this.jsonrpc.createResponse(request.id, responsePayload);
     }
 
     // if response is RxJs Observable then subscribe to it and return subscription
@@ -177,7 +168,7 @@ export abstract class RpcApi extends Service {
       }
       // return subscription
       // the API client can use subscriptionId to listen events from this subscription
-      return this.jsonrpc.createResponse(request, {
+      return this.jsonrpc.createResponse(request.id, {
         _type: 'SUBSCRIPTION',
         resourceId: subscriptionId,
         emitter: 'STREAM',
@@ -197,7 +188,7 @@ export abstract class RpcApi extends Service {
       );
 
       // notify the API client that the Promise is created
-      return this.jsonrpc.createResponse(request, {
+      return this.jsonrpc.createResponse(request.id, {
         _type: 'SUBSCRIPTION',
         resourceId: promiseId,
         emitter: 'PROMISE',
@@ -206,7 +197,7 @@ export abstract class RpcApi extends Service {
 
     // if responsePayload is a Service then serialize it
     if (responsePayload instanceof Service) {
-      return this.jsonrpc.createResponse(request, {
+      return this.jsonrpc.createResponse(request.id, {
         _type: 'SERVICE',
         resourceId: responsePayload.serviceName,
         ...(!request.params.compactMode ? this.getResourceModel(responsePayload) : {}),
@@ -215,7 +206,7 @@ export abstract class RpcApi extends Service {
 
     // if responsePayload is a ServiceHelper then serialize it
     if (responsePayload._isHelper === true) {
-      return this.jsonrpc.createResponse(request, {
+      return this.jsonrpc.createResponse(request.id, {
         _type: 'HELPER',
         resourceId: responsePayload._resourceId,
         ...(!request.params.compactMode ? this.getResourceModel(responsePayload) : {}),
@@ -234,7 +225,7 @@ export abstract class RpcApi extends Service {
         };
       }
     });
-    return this.jsonrpc.createResponse(request, responsePayload);
+    return this.jsonrpc.createResponse(request.id, responsePayload);
   }
 
   /**
