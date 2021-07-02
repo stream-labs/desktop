@@ -193,7 +193,7 @@ export default function ClipTrimmer(props: { clip: IClip }) {
         ref={timelineRef}
         style={{
           width: '100%',
-          height: 100,
+          height: scrubHeight,
           position: 'relative',
           background: 'var(--section)',
           marginTop: 10,
