@@ -31,5 +31,5 @@ test('Clicking notifications', async t => {
 
   await (await app.client.$('.has-action')).click();
 
-  t.true(await (await app.client.$('div=Troubleshooter')).isExisting());
+  t.true(await (await app.client.$('h4=What does this mean?')).isExisting());
 })
