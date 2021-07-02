@@ -158,14 +158,14 @@ export default function ClipTrimmer(props: { clip: IClip }) {
     playAt(localStartTrim);
   }
 
-  const scrubHeight = 80;
+  const scrubHeight = 100;
   const scrubWidth = scrubHeight * (SCRUB_WIDTH / SCRUB_HEIGHT);
 
   // TODO: React to window size change
   useEffect(() => {
     const timelineWidth = timelineRef.current!.offsetWidth - 40;
-    // Always subtract 1 frame so it isn't too squished in
-    const nFrames = Math.floor(timelineWidth / scrubWidth) - 1;
+    // Always add 1 frame so it fully covers
+    const nFrames = Math.floor(timelineWidth / scrubWidth) + 1;
     setScrubFrames(
       times(nFrames).map(n => {
         return Math.floor((n / (nFrames - 1)) * (SCRUB_FRAMES - 1));
@@ -197,9 +197,6 @@ export default function ClipTrimmer(props: { clip: IClip }) {
           position: 'relative',
           background: 'var(--section)',
           marginTop: 10,
-          display: 'flex',
-          justifyContent: 'space-around',
-          alignItems: 'center',
           borderRadius: 5,
           borderLeft: '20px solid transparent',
           borderRight: '20px solid transparent',
@@ -209,24 +206,25 @@ export default function ClipTrimmer(props: { clip: IClip }) {
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
       >
-        {scrubFrames.map(frame => {
-          return (
-            <img
-              key={frame}
-              src={props.clip.scrubSprite}
-              width={SCRUB_WIDTH}
-              height={SCRUB_HEIGHT}
-              style={{
-                height: scrubHeight,
-                width: scrubWidth,
-                objectFit: 'cover',
-                objectPosition: `-${frame * SCRUB_WIDTH * (scrubHeight / SCRUB_HEIGHT)}px`,
-                borderRadius: 5,
-                pointerEvents: 'none',
-              }}
-            ></img>
-          );
-        })}
+        <div style={{ display: 'flex', overflow: 'hidden', position: 'absolute' }}>
+          {scrubFrames.map(frame => {
+            return (
+              <img
+                key={frame}
+                src={props.clip.scrubSprite}
+                width={SCRUB_WIDTH}
+                height={SCRUB_HEIGHT}
+                style={{
+                  height: scrubHeight,
+                  width: scrubWidth,
+                  objectFit: 'cover',
+                  objectPosition: `-${frame * SCRUB_WIDTH * (scrubHeight / SCRUB_HEIGHT)}px`,
+                  pointerEvents: 'none',
+                }}
+              ></img>
+            );
+          })}
+        </div>
         <div
           style={{
             left: `${(currentTime / props.clip.duration!) * 100}%`,
