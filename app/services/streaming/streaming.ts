@@ -15,7 +15,6 @@ import {
   IStreamInfo,
   IStreamingServiceApi,
   IStreamingServiceState,
-  IStreamSettings,
   TGoLiveChecklistItemState,
 } from './streaming-api';
 import { UsageStatisticsService } from 'services/usage-statistics';
@@ -33,9 +32,6 @@ import { CustomizationService } from 'services/customization';
 import { EAvailableFeatures, IncrementalRolloutService } from 'services/incremental-rollout';
 import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService } from 'services/restream';
-import {
-  TDestinationType,
-} from 'services/platforms/facebook';
 
 import Utils from 'services/utils';
 import cloneDeep from 'lodash/cloneDeep';
@@ -72,21 +68,6 @@ interface IOBSOutputSignalInfo {
   signal: EOBSOutputSignal;
   code: obs.EOutputCode;
   error: string;
-}
-
-export interface IStreamEvent {
-  id: string;
-  platform: TPlatform;
-  status: 'completed' | 'scheduled';
-  title: string;
-  date: number;
-  /**
-   * We need additional fields for FB
-   */
-  facebook?: {
-    destinationType: TDestinationType;
-    destinationId: string;
-  };
 }
 
 export class StreamingService
@@ -143,9 +124,7 @@ export class StreamingService
         startVideoTransmission: 'not-started',
         postTweet: 'not-started',
       },
-    },
-    streamEventsLoaded: false,
-    streamEvents: [],
+    }
   };
 
   init() {
@@ -1231,20 +1210,6 @@ export class StreamingService
   @mutation()
   private SET_WARNING(warningType: 'YT_AUTO_START_IS_DISABLED') {
     this.state.info.warning = warningType;
-  }
-
-  @mutation()
-  private SET_STREAM_EVENTS(loaded: boolean, events?: IStreamEvent[]) {
-    if (!loaded) this.state.streamEvents = [];
-    this.state.streamEventsLoaded = loaded;
-    if (events) this.state.streamEvents = events;
-  }
-
-  @mutation()
-  private REMOVE_STREAM_EVENT(eventId: string) {
-    const ind = this.state.streamEvents.findIndex(ev => ev.id === eventId);
-    if (ind === -1) return;
-    Vue.delete(this.state.streamEvents, ind);
   }
 
   @mutation()

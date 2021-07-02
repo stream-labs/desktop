@@ -162,6 +162,6 @@
   "Stream scheduled": "Stream scheduled",
   "Invalid settings. Please check the form": "Invalid settings. Please check the form",
   "Common Stream Settings": "Common Stream Settings",
-  "Schedule Stream for %{date}": "Schedule Stream for %{date}",
-  "Update Scheduled Stream for %{date}": "Update Scheduled Stream for %{date}"
+  "Schedule Stream for %{formattedDate}": "Schedule Stream for %{formattedDate}",
+  "Update Scheduled Stream for %{formattedDate}": "Update Scheduled Stream for %{formattedDate}"
 }

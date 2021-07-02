@@ -5,7 +5,6 @@ import { IYoutubeStartStreamOptions } from '../platforms/youtube';
 import { IFacebookStartStreamOptions } from '../platforms/facebook';
 import { IStreamError } from './stream-error';
 import { ICustomStreamDestination } from '../settings/streaming';
-import { IStreamEvent } from './streaming';
 import { ITiktokStartStreamOptions } from '../platforms/tiktok';
 
 export enum EStreamingState {
@@ -84,8 +83,6 @@ export interface IStreamingServiceState {
   replayBufferStatusTime: string;
   selectiveRecording: boolean;
   info: IStreamInfo;
-  streamEventsLoaded: boolean;
-  streamEvents: IStreamEvent[];
 }
 
 export interface IStreamingServiceApi {
