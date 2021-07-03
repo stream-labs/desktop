@@ -396,7 +396,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-44.mp4'),
 
         // Spoken Audio
-        // path.join(CLIP_DIR, '2021-06-24 13-59-58.mp4'),
+        path.join(CLIP_DIR, '2021-06-24 13-59-58.mp4'),
         // path.join(CLIP_DIR, '2021-06-24 14-00-26.mp4'),
         // path.join(CLIP_DIR, '2021-06-24 14-00-52.mp4'),
 
@@ -633,7 +633,12 @@ export class HighlighterService extends StatefulService<IHighligherState> {
 
       let transitioner: Transitioner | null = null;
       const exportPath = preview ? this.views.exportInfo.previewFile : this.views.exportInfo.file;
-      const writer = new FrameWriter(exportPath, audioMix, preview);
+      const writer = new FrameWriter(
+        exportPath,
+        audioMix,
+        preview,
+        totalFramesAfterTransitions / FPS,
+      );
 
       while (true) {
         if (this.views.exportInfo.cancelRequested) {

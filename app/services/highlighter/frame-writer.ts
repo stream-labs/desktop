@@ -1,5 +1,13 @@
 import execa from 'execa';
-import { FFMPEG_EXE, FPS, HEIGHT, PREVIEW_HEIGHT, PREVIEW_WIDTH, WIDTH } from './constants';
+import {
+  FADE_OUT_DURATION,
+  FFMPEG_EXE,
+  FPS,
+  HEIGHT,
+  PREVIEW_HEIGHT,
+  PREVIEW_WIDTH,
+  WIDTH,
+} from './constants';
 import { FrameWriteError } from './errors';
 
 export class FrameWriter {
@@ -7,6 +15,7 @@ export class FrameWriter {
     public readonly outputPath: string,
     public readonly audioInput: string,
     public readonly preview: boolean,
+    public readonly duration: number,
   ) {}
 
   readonly width = this.preview ? PREVIEW_WIDTH : WIDTH;
@@ -34,8 +43,11 @@ export class FrameWriter {
       '-map', '0:v:0',
       '-map', '1:a:0',
 
+      // Filters
+      '-af', `afade=type=out:duration=${FADE_OUT_DURATION}:start_time=${this.duration - (FADE_OUT_DURATION + 0.2)}`,
+      '-vf', `format=yuv420p,fade=type=out:duration=${FADE_OUT_DURATION}:start_time=${this.duration - (FADE_OUT_DURATION + 0.2)}`,
+
       // Video Output
-      '-vf', 'format=yuv420p',
       '-vcodec', 'libx264',
       '-profile:v', 'high',
       '-preset:v', 'ultrafast',
