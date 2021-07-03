@@ -4,7 +4,7 @@
       <div class="top-settings" v-if="properties">
         <generic-form :value="topProperties" @input="onPropsInputHandler" />
         <div v-if="apiSettings.testers" class="button button--action test-button">
-          <test-widgets :testers="apiSettings.testers" />
+          <test-widgets :componentProps="{ testers: apiSettings.testers }" />
         </div>
       </div>
 
@@ -56,7 +56,7 @@
               <h2 class="subsection__title">{{ $t('Sources and Settings') }}</h2>
               <scrollable
                 class="os-host-flexbox"
-                style="margin: 0;"
+                style="margin: 0"
                 :isResizable="false"
                 :autoSizeCapable="true"
               >
@@ -119,8 +119,8 @@
             <custom-fields-editor
               v-if="
                 canShowEditor &&
-                  apiSettings.customFieldsAllowed &&
-                  currentCodeTab === 'customFields'
+                apiSettings.customFieldsAllowed &&
+                currentCodeTab === 'customFields'
               "
               key="customFields"
               class="code-tab"
@@ -128,7 +128,7 @@
               :metadata="{ selectedId, selectedAlert }"
             />
           </div>
-          <div v-else-if="customCodeIsEnabled && loadingFailed" style="padding: 8px;">
+          <div v-else-if="customCodeIsEnabled && loadingFailed" style="padding: 8px">
             <div>{{ $t('Failed to load settings') }}</div>
             <button class="button button--warn retry-button" @click="retryDataFetch()">
               {{ $t('Retry') }}

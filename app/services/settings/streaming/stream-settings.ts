@@ -67,6 +67,7 @@ interface IStreamSettings extends IStreamSettingsState {
   platform: TPlatform;
   key: string;
   server: string;
+  service: string;
   streamType: 'rtmp_common' | 'rtmp_custom';
   warnBeforeStartingStream: boolean;
   recordWhenStreaming: boolean;
@@ -211,6 +212,7 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
       platform: invert(platformToServiceNameMap)[obsStreamSettings.service] as TPlatform,
       key: obsStreamSettings.key,
       server: obsStreamSettings.server,
+      service: obsStreamSettings.service,
       streamType: obsStreamSettings.streamType as IStreamSettings['streamType'],
       warnBeforeStartingStream: obsGeneralSettings.WarnBeforeStartingStream,
       recordWhenStreaming: obsGeneralSettings.RecordWhenStreaming,
@@ -325,7 +327,42 @@ export class StreamSettingsService extends PersistentStatefulService<IStreamSett
 }
 
 class StreamSettingsView extends ViewHandler<IStreamSettingsState> {
+  private get settingsViews() {
+    return this.getServiceViews(SettingsService);
+  }
+
   get obsStreamSettings(): ISettingsSubCategory[] {
     return this.getServiceViews(SettingsService).state.Stream.formData;
+  }
+
+  /**
+   * obtain stream settings in a single object
+   */
+  get settings(): IStreamSettings {
+    const obsStreamSettings = this.settingsViews.values.Stream;
+    const obsGeneralSettings = this.settingsViews.values.General;
+    const obsAdvancedSettings = this.settingsViews.values.Advanced;
+
+    return {
+      protectedModeEnabled: this.state.protectedModeEnabled,
+      title: this.state.title,
+      description: this.state.description,
+      warnNoVideoSources: this.state.warnNoVideoSources,
+      protectedModeMigrationRequired: this.state.protectedModeMigrationRequired,
+      goLiveSettings: this.state.goLiveSettings,
+      platform: invert(platformToServiceNameMap)[obsStreamSettings.service] as TPlatform,
+      key: obsStreamSettings.key,
+      server: obsStreamSettings.server,
+      service: obsStreamSettings.service,
+      streamType: obsStreamSettings.streamType as IStreamSettings['streamType'],
+      warnBeforeStartingStream: obsGeneralSettings.WarnBeforeStartingStream,
+      recordWhenStreaming: obsGeneralSettings.RecordWhenStreaming,
+      replayBufferWhileStreaming: obsGeneralSettings.ReplayBufferWhileStreaming,
+      warnBeforeStoppingStream: obsGeneralSettings.WarnBeforeStoppingStream,
+      keepRecordingWhenStreamStops: obsGeneralSettings.KeepRecordingWhenStreamStops,
+      keepReplayBufferStreamStops: obsGeneralSettings.KeepReplayBufferStreamStops,
+      delayEnable: obsAdvancedSettings.DelayEnable,
+      delaySec: obsAdvancedSettings.DelaySec,
+    };
   }
 }

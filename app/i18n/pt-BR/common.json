@@ -11,6 +11,7 @@
   "Settings": "Configurações",
   "That name is already taken": "Esse nome já existe",
   "Search": "Procurar",
+  "Searching...": "Searching...",
   "Create New": "Criar nova",
   "Language": "Idioma",
   "Name is required": "É obrigatório escolher um nome",
@@ -32,7 +33,7 @@
   "Submit": "Enviar",
   "Save": "Salvar",
   "Edit": "Editar",
-  "Log In": "Log In",
+  "Log In": "Registrar",
   "Yes": "Sim",
   "No": "Não",
   "OK": "Ok",
@@ -129,5 +130,6 @@
   "Height": "Altura",
   "Use Custom": "Use Custom",
   "Apply": "Solicite",
-  "Do not show this message again": "Do not show this message again"
+  "Do not show this message again": "Do not show this message again",
+  "You can only select up to %{max} items": "You can only select up to %{max} items"
 }

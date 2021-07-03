@@ -5,10 +5,26 @@ import { IInputMetadata } from './index';
 import styles from './BoolButtonInput.m.less';
 
 @Component({})
-export default class BoolInput extends BaseInput<boolean, IInputMetadata> {
+export default class BoolInput extends BaseInput<
+  boolean,
+  IInputMetadata,
+  { checkboxStyles?: Dictionary<any>; checkboxActiveStyles?: Dictionary<any> }
+> {
   @Prop() readonly value: boolean;
   @Prop() readonly title: string;
   @Prop() readonly metadata: IInputMetadata;
+  @Prop({
+    default: () => {
+      return {};
+    },
+  })
+  readonly checkboxStyles: Dictionary<any>;
+  @Prop({
+    default: () => {
+      return {};
+    },
+  })
+  readonly checkboxActiveStyles: Dictionary<any>;
 
   handleClick(e?: MouseEvent) {
     if (this.options.disabled) return;
@@ -16,6 +32,15 @@ export default class BoolInput extends BaseInput<boolean, IInputMetadata> {
   }
 
   render() {
+    let customStyles = { ...this.checkboxStyles };
+
+    if (this.value) {
+      customStyles = {
+        ...customStyles,
+        ...this.checkboxActiveStyles,
+      };
+    }
+
     return (
       <div
         class={cx('input-wrapper', { disabled: this.options.disabled })}
@@ -26,9 +51,10 @@ export default class BoolInput extends BaseInput<boolean, IInputMetadata> {
       >
         <div
           class={cx(styles.boolButton, { [styles.active]: !!this.value })}
+          style={customStyles}
           onClick={() => this.handleClick()}
         >
-          {this.options.title || '\u00A0' /* nbsp */}
+          {this.options.title ?? (this.value && <i class="fa fa-check"></i>)}
         </div>
         {this.options.tooltip && (
           <i

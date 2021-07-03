@@ -125,6 +125,14 @@ export class Chat extends ReactComponent {}
 export class Loader extends ReactComponent {}
 @Component({
   props: {
+    name: { default: 'Highlighter' },
+    componentProps: { default: () => ({}) },
+  },
+})
+export class Highlighter extends ReactComponent {}
+
+@Component({
+  props: {
     name: { default: 'GoLiveWindow' },
     wrapperStyles: { default: () => ({ height: '100%' }) },
   },
@@ -144,7 +152,6 @@ export class EditStreamWindow extends ReactComponent {}
   },
 })
 export class Grow extends ReactComponent {}
-
 @Component({
   props: {
     name: { default: 'PlatformLogo' },
@@ -157,3 +164,12 @@ export class PlatformLogo extends ReactComponent<{
   color?: string;
   unwrapped?: boolean;
 }> {}
+@Component({ props: { name: { default: 'StartStreamingButton' } } })
+export class StartStreamingButton extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'TestWidgets' },
+    componentProps: { default: () => ({ testers: null as string[] }) },
+  },
+})
+export class TestWidgets extends ReactComponent<{ testers: string[] }> {}

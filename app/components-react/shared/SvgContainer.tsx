@@ -5,7 +5,7 @@ const SVG_ATTRS_REGEX = /(\S+)=["']?((?:.(?!["']?\s+(?:\S+)=|[>"']))+.)["']?/gm;
 export default function SvgContainer(p: {
   src: string;
   className?: string;
-  style?: Dictionary<string | number>;
+  style?: React.CSSProperties;
 }) {
   function svgAttrs() {
     const svgMatch = p.src.match(/<svg\w?([^<]+)/);

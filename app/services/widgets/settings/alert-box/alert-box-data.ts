@@ -55,7 +55,6 @@ export const conditions = () => ({
     { value: 'MIN_DONATION_AMOUNT', title: $t('Donation amount is at least <amount>') },
     { value: 'EXACT_DONATION_AMOUNT', title: $t('Donation amount is exactly <amount>') },
     { value: 'LARGEST_OF_STREAM', title: $t('Donation is the largest this stream') },
-    { value: 'CRYPTO_CURRENCY_DONATION', title: $t('Donation is in Crypto currency') },
   ],
   subs: [
     { value: 'MIN_MONTHS_SUBSCRIBED', title: $t('Months subscribed is at least <months>') },
@@ -126,10 +125,32 @@ export const conditions = () => ({
     { value: 'LOYALTY_STORE_REDEMPTION_ITEM_TYPE', title: $t('Item type is <type>') },
     { value: 'LOYALTY_STORE_REDEMPTION_ITEM_NAME', title: $t('Item name is <name>') },
   ],
+  support: [
+    { value: 'SUPPORT_GIFT_REDEEMED', title: $t('Viewer redeemed a gifted Support') },
+    { value: 'MIN_MONTHS_SUPPORTED', title: $t('Months supported is at least <months>') },
+    { value: 'EXACT_MONTHS_SUPPORTED', title: $t('Months supported is exactly <months>') },
+  ],
+  giftSupport: [
+    { value: 'MIN_SUPPORT_GIFTS', title: $t('Gifted at least <amount> Supports') },
+    { value: 'EXACT_SUPPORT_GIFTS', title: $t('Gifted exactly <amount> Supports') },
+  ],
+  stars: [
+    { value: 'MIN_STARS_USED', title: $t('Stars used is at least <amount>') },
+    { value: 'EXACT_STARS_USED', title: $t('Stars used is exactly <amount>') },
+  ],
 });
 
 export const conditionData = () => ({
   RANDOM: metadata.frequency({ title: $t('Variation Frequency') }),
+  SUBSCRIPTION_GIFT: metadata.frequency({ title: $t('Variation Frequency') }),
+  SUBSCRIPTION_PRIME: metadata.frequency({ title: $t('Variation Frequency') }),
+  SUBTEMBER: metadata.frequency({ title: $t('Variation Frequency') }),
+  ANON_SUBSCRIPTION_GIFT: metadata.frequency({ title: $t('Variation Frequency') }),
+  SUB_EXTENDED: metadata.frequency({ title: $t('Variation Frequency') }),
+  SUPPORT_GIFT_REDEEMED: metadata.frequency({ title: $t('Variation Frequency') }),
+  LARGEST_OF_STREAM: {},
+  MERCH_PRODUCT: {},
+  MERCH_PREORDER: {},
   LOYALTY_STORE_REDEMPTION_ITEM_TYPE: metadata.list({
     title: $t('Item Type'),
     options: [
