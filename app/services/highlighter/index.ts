@@ -89,6 +89,8 @@ interface IHighligherState {
   dismissedTutorial: boolean;
 }
 
+// Capitalization is not consistent because it matches with the
+// gl-transitions library.
 export type TTransitionType =
   | 'None'
   | 'Random'
@@ -103,7 +105,7 @@ export type TTransitionType =
   | 'SimpleZoom'
   | 'pixelize';
 
-interface IAvailableTransition {
+export interface IAvailableTransition {
   displayName: string;
   type: TTransitionType;
   params?: { [key: string]: any };
@@ -259,7 +261,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       totalFrames: 0,
       step: EExportStep.AudioMix,
       cancelRequested: false,
-      file: path.join(electron.remote.app.getPath('videos'), 'Output.mp4'),
+      file: '',
       previewFile: path.join(os.tmpdir(), 'highlighter-preview.mp4'),
       exported: false,
       error: null,
@@ -360,6 +362,17 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   }
 
   init() {
+    try {
+      // On some very very small number of systems, we won't be able to fetch
+      // the videos path from the system.
+      // TODO: Add a fallback directory?
+      this.SET_EXPORT_INFO({
+        file: path.join(electron.remote.app.getPath('videos'), 'Output.mp4'),
+      });
+    } catch (e: unknown) {
+      console.error('Got error fetching videos directory', e);
+    }
+
     if (TEST_MODE) {
       const clipsToLoad = [
         // Aero 15 test clips
