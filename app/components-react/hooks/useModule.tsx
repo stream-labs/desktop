@@ -1,34 +1,29 @@
-import { useEffect, useRef } from 'react';
-import { StatefulService } from '../../services';
+import { useRef } from 'react';
 import { createBinding, TBindings } from '../shared/inputs';
-import { assertIsDefined } from '../../util/properties-type-guards';
 import { useOnCreate, useOnDestroy } from '../hooks';
-import { IStatefulModule, getModuleManager, useSelector, createDependencyWatcher } from '../store';
-import isPlainObject from 'lodash/isPlainObject';
+import { ReduxModule, getModuleManager, useSelector, createDependencyWatcher } from '../store';
 import { useComponentId } from './useComponentId';
 import { lockThis, merge, TMerge } from '../../util/merge';
 
+/**
+ * A hoo for using ReduxModules in components
+ * @param ModuleClass
+ * @param initParams
+ */
 export function useModule<
   TInitParams,
   TState,
-  TControllerClass extends new (...args: any[]) => IStatefulModule<TInitParams, TState>,
+  TControllerClass extends new (...args: any[]) => ReduxModule<TInitParams, TState>,
   TBindingState,
   TBindingExtraProps,
   TReturnType extends InstanceType<TControllerClass> & {
-    select: () => InstanceType<TControllerClass> & InstanceType<TControllerClass>['state']; // SelectCreator<InstanceType<TControllerClass>>['select'] & TState; // () => InstanceType<TControllerClass>;
+    select: () => InstanceType<TControllerClass> &
+      InstanceType<TControllerClass>['state'] & { module: InstanceType<TControllerClass> };
 
     selectExtra: <TComputedProps>(
       fn: (module: InstanceType<TControllerClass>) => TComputedProps,
-    ) => InstanceType<TControllerClass> & TComputedProps;
-
-    // SelectCreator<InstanceType<TControllerClass>>['select'];
-    // select:
-    //   | (() => InstanceType<TControllerClass>)
-    //   | (<TComputedProps>(
-    //       fn: (module: InstanceType<TControllerClass>) => TComputedProps,
-    //     ) => InstanceType<TControllerClass> & TComputedProps);
-
-    useBinding: BindingCreator<InstanceType<TControllerClass>>['createBinding'];
+    ) => InstanceType<TControllerClass> &
+      TComputedProps & { module: InstanceType<TControllerClass> };
   }
 >(ModuleClass: TControllerClass, initParams?: TInitParams): TReturnType {
   const computedPropsFnRef = useRef<null | Function>(null);
@@ -63,6 +58,7 @@ export function useModule<
           () => lockedModule,
           () => module.state,
           () => computedPropsRef.current,
+          () => ({ module }),
         );
         dependencyWatcherRef.current = createDependencyWatcher(mergedModule);
       }
@@ -120,66 +116,4 @@ class SelectCreator<TModule> {
     let module!: TModule;
     return {} as any;
   }
-}
-// type fooType = {
-//   foo: string;
-// };
-//
-// let select!: SelectCreator<fooType>['select'];
-//
-// const foo = select();
-// foo.foo;
-//
-// const fooBar = select(foo => ({ bar: 1 }));
-// fooBar.bar;
-
-// function select<
-//   TModule,
-//   TComputedPropsCb,
-//   TComputedProps = TComputedPropsCb extends Function ? ReturnType<TComputedPropsCb> : {}
-//
-//   // TComputedPropsCb, // = ((module: TModule) => any) | null, // function for calculating the computed props
-//   // TComputedProps = TComputedPropsCb extends (...args: [TModule]) => infer R ? R : {} // computed props type
-// >(fn: TComputedPropsCb): TModule & TComputedProps {
-//   return ({} as unknown) as TModule & TComputedProps;
-// }
-
-// function select<TModule, TComputedProps>(
-//   cb: (module: TModule) => TComputedProps,
-// ): TModule & TComputedProps {
-//   return ({} as unknown) as TModule & TComputedProps;
-// }
-
-// function select<TModule>(cb?: (module: TModule) => any) {
-//   let module!: TModule;
-//   return Object.assign(cb() || {}, module);
-// }
-
-// function select<TModule, TComputed>(module: TModule): TModule;
-// function select<TModule, TComputed>(
-//   module: TModule,
-//   selector: (module: TModule) => TComputed,
-// ): TModule & TComputed {
-//   return Object.assign(selector(), module);
-// }
-//
-// // const st: typeof select;
-//
-// type fooType = {
-//   foo: string;
-// };
-//
-// // const fooObj = select<fooType>();
-// const fooAndBarObj = select({ foo: 'foo' }, module => ({ bar: 1 }));
-// fooAndBarObj.bar;
-/**
- * Returns a new object without function props
- * @param obj
- */
-function removeFunctions(obj: Record<string, any>): Record<string, any> {
-  const result = {};
-  Object.keys(obj).forEach(key => {
-    if (typeof obj[key] !== 'function') result[key] = obj[key];
-  });
-  return result;
 }

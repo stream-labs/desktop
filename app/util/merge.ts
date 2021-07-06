@@ -32,9 +32,15 @@ export function merge<
   T1 extends Object,
   T2 extends Object,
   T3 extends Object,
+  T4 extends Object,
   FN3 extends () => T3,
-  TReturnType = FN3 extends undefined ? TMerge<T1, T2> : TMerge3<T1, T2, T3>
->(...functions: [() => T1, () => T2, FN3?]): TReturnType {
+  FN4 extends () => T4,
+  TReturnType = FN4 extends undefined
+    ? FN3 extends undefined
+      ? TMerge<T1, T2>
+      : TMerge3<T1, T2, T3>
+    : TMerge4<T1, T2, T3, T4>
+>(...functions: [() => T1, () => T2, FN3?, FN4?]): TReturnType {
   const result = functions.reduce((a, val) => mergeTwo(a as unknown, val as unknown));
   return (result as unknown) as TReturnType;
 }
@@ -48,6 +54,7 @@ export type TMerge<
 > = R;
 
 export type TMerge3<T1, T2, T3> = TMerge<TMerge<T1, T2>, T3>;
+export type TMerge4<T1, T2, T3, T4> = TMerge<TMerge3<T1, T2, T3>, T4>;
 //
 // export function mergeTwo<T1 extends object, T2 extends object, TReturnType = TMerge<T1, T2>>(
 //   obj1: T1,
