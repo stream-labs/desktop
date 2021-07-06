@@ -5,6 +5,7 @@ import { IHotkey } from 'services/hotkeys';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import { Button } from 'antd';
+import { SUPPORTED_FILE_TYPES } from 'services/highlighter/constants';
 
 export default function BlankSlate(p: { close: () => void }) {
   const { HotkeysService, SettingsService, StreamingService } = Services;
@@ -19,7 +20,8 @@ export default function BlankSlate(p: { close: () => void }) {
     v.settingsValues.Output.RecRB &&
     v.settingsValues.Output.RecRBTime === 20 &&
     v.settingsValues.General.ReplayBufferWhileStreaming &&
-    !v.settingsValues.General.KeepReplayBufferStreamStops;
+    !v.settingsValues.General.KeepReplayBufferStreamStops &&
+    SUPPORTED_FILE_TYPES.includes(v.settingsValues.Output.RecFormat);
 
   function configure() {
     SettingsService.actions.setSettingsPatch({
@@ -32,6 +34,13 @@ export default function BlankSlate(p: { close: () => void }) {
         RecRBTime: 20,
       },
     });
+
+    // We will only set recording format to mp4 if the user isn't already on
+    // a supported format. i.e. don't switch them from mov to mp4, but we will
+    // switch from flv to mp4.
+    if (!SUPPORTED_FILE_TYPES.includes(v.settingsValues.Output.RecFormat)) {
+      SettingsService.actions.setSettingsPatch({ Output: { RecFormat: 'mp4' } });
+    }
   }
 
   useEffect(() => {

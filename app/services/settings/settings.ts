@@ -50,6 +50,7 @@ export interface ISettingsValues {
   Output: {
     RecRB?: boolean;
     RecRBTime?: number;
+    RecFormat: string;
   };
   Video: {
     Base: string;
