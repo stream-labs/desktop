@@ -2,19 +2,18 @@ import { useVuex } from 'components-react/hooks';
 import React, { useEffect, useState } from 'react';
 import { Services } from 'components-react/service-provider';
 import styles from './Highlighter.m.less';
-import { IClip, TTransitionType } from 'services/highlighter';
+import { IClip } from 'services/highlighter';
 import ClipPreview from 'components-react/highlighter/ClipPreview';
 import ClipTrimmer from 'components-react/highlighter/ClipTrimmer';
 import { ReactSortable } from 'react-sortablejs';
-import { ListInput } from 'components-react/shared/inputs/ListInput';
 import Form from 'components-react/shared/inputs/Form';
 import isEqual from 'lodash/isEqual';
 import { SliderInput, FileInput, SwitchInput } from 'components-react/shared/inputs';
-import { Modal, Button } from 'antd';
+import { Modal, Button, Alert } from 'antd';
 import ExportModal from 'components-react/highlighter/ExportModal';
 import PreviewModal from 'components-react/highlighter/PreviewModal';
 import BlankSlate from 'components-react/highlighter/BlankSlate';
-import { SCRUB_HEIGHT, SCRUB_WIDTH } from 'services/highlighter/constants';
+import { SCRUB_HEIGHT, SCRUB_WIDTH, SUPPORTED_FILE_TYPES } from 'services/highlighter/constants';
 import electron from 'electron';
 import path from 'path';
 import Scrollable from 'components-react/shared/Scrollable';
@@ -36,6 +35,7 @@ export default function Highlighter() {
     transition: HighlighterService.views.transition,
     dismissedTutorial: HighlighterService.views.dismissedTutorial,
     audio: HighlighterService.views.audio,
+    error: HighlighterService.views.error,
   }));
 
   const [showModal, rawSetShowModal] = useState<TModal | null>(null);
@@ -203,14 +203,15 @@ export default function Highlighter() {
 
     setInspectedClipPath(null);
     setShowModal(null);
+
+    if (v.error) HighlighterService.actions.dismissError();
   }
 
   function getClipsView() {
     const clipList = [{ id: 'add', filtered: true }, ...v.clips.map(c => ({ id: c.path }))];
 
     function onDrop(e: React.DragEvent<HTMLDivElement>) {
-      // TODO: Figure out what extensions we support
-      const extensions = ['.mp4', '.webm', '.flv'];
+      const extensions = SUPPORTED_FILE_TYPES.map(e => `.${e}`);
       const files: string[] = [];
       let fi = e.dataTransfer.files.length;
       while (fi--) {
@@ -291,9 +292,10 @@ export default function Highlighter() {
           footer={null}
           width={modalWidth}
           closable={false}
-          visible={!!showModal}
+          visible={!!showModal || !!v.error}
           destroyOnClose={true}
         >
+          {!!v.error && <Alert message={v.error} type="error" showIcon />}
           {inspectedClip && showModal === 'trim' && <ClipTrimmer clip={inspectedClip} />}
           {showModal === 'export' && <ExportModal close={closeModal} />}
           {showModal === 'preview' && <PreviewModal close={closeModal} />}
@@ -305,7 +307,7 @@ export default function Highlighter() {
     );
   }
 
-  if ((!v.clips.length && !v.dismissedTutorial) || showTutorial) {
+  if ((!v.clips.length && !v.dismissedTutorial && !v.error) || showTutorial) {
     return (
       <BlankSlate
         close={() => {
@@ -328,7 +330,7 @@ function AddClip() {
       electron.remote.getCurrentWindow(),
       {
         properties: ['openFile', 'multiSelections'],
-        filters: [{ name: 'Video Files', extensions: ['mp4', 'webm', 'flv'] }],
+        filters: [{ name: 'Video Files', extensions: SUPPORTED_FILE_TYPES }],
       },
     );
 

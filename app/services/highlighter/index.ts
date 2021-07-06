@@ -13,7 +13,13 @@ import {
 } from 'services/platforms/youtube/uploader';
 import { YoutubeService } from 'services/platforms/youtube';
 import os from 'os';
-import { CLIP_DIR, FPS, SCRUB_SPRITE_DIRECTORY, TEST_MODE } from './constants';
+import {
+  CLIP_DIR,
+  FPS,
+  SCRUB_SPRITE_DIRECTORY,
+  SUPPORTED_FILE_TYPES,
+  TEST_MODE,
+} from './constants';
 import { pmap } from 'util/pmap';
 import { Clip } from './clip';
 import { AudioCrossfader } from './audio-crossfader';
@@ -87,6 +93,7 @@ interface IHighligherState {
   export: IExportInfo;
   upload: IUploadInfo;
   dismissedTutorial: boolean;
+  error: string;
 }
 
 // Capitalization is not consistent because it matches with the
@@ -231,6 +238,10 @@ class HighligherViews extends ViewHandler<IHighligherState> {
     return this.state.dismissedTutorial;
   }
 
+  get error() {
+    return this.state.error;
+  }
+
   /**
    * Takes a filepath to a video and returns a file:// url with a random
    * component to prevent the browser from caching it and missing changes.
@@ -275,6 +286,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       error: false,
     },
     dismissedTutorial: false,
+    error: '',
   };
 
   @Inject() streamingService: StreamingService;
@@ -355,6 +367,11 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   @mutation()
   DISMISS_TUTORIAL() {
     this.state.dismissedTutorial = true;
+  }
+
+  @mutation()
+  SET_ERROR(error: string) {
+    this.state.error = error;
   }
 
   get views() {
@@ -490,6 +507,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   dismissError() {
     if (this.state.export.error) this.SET_EXPORT_INFO({ error: null });
     if (this.state.upload.error) this.SET_UPLOAD_INFO({ error: false });
+    if (this.state.error) this.SET_ERROR('');
   }
 
   dismissTutorial() {
@@ -500,7 +518,15 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     await this.ensureScrubDirectory();
 
     // Ensure we have a Clip class for every clip in the store
+    // Also make sure they are the correct format
     this.views.clips.forEach(c => {
+      if (!SUPPORTED_FILE_TYPES.map(e => `.${e}`).includes(path.parse(c.path).ext)) {
+        this.REMOVE_CLIP(c.path);
+        this.SET_ERROR(
+          'One or more clips could not be imported because they were not recorded in a supported file format.',
+        );
+      }
+
       this.clips[c.path] = this.clips[c.path] ?? new Clip(c.path);
     });
 
