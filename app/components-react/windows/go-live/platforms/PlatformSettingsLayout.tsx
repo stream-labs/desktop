@@ -1,6 +1,9 @@
 import React from 'react';
 import { TPlatform } from '../../../../services/platforms';
-import { IGoLiveSettings } from '../../../../services/streaming';
+import { ITwitchStartStreamOptions } from '../../../../services/platforms/twitch';
+import { IYoutubeStartStreamOptions } from '../../../../services/platforms/youtube';
+import { IFacebookStartStreamOptions } from '../../../../services/platforms/facebook';
+import { ITiktokStartStreamOptions } from '../../../../services/platforms/tiktok';
 
 export type TLayoutMode = 'singlePlatform' | 'multiplatformAdvanced' | 'multiplatformSimple';
 
@@ -26,9 +29,16 @@ export default function PlatformSettingsLayout(p: {
   return <>{layoutItems.map(item => item)}</>;
 }
 
+export interface IPlatformSettings extends Partial<Record<TPlatform, any>> {
+  twitch?: ITwitchStartStreamOptions;
+  youtube?: IYoutubeStartStreamOptions;
+  facebook?: IFacebookStartStreamOptions;
+  tiktok?: ITiktokStartStreamOptions;
+}
+
 export interface IPlatformComponentParams<T extends TPlatform> {
-  onChange(newSettings: NonNullable<IGoLiveSettings['platforms'][T]>): unknown;
-  value: NonNullable<IGoLiveSettings['platforms'][T]>;
+  onChange(newSettings: NonNullable<IPlatformSettings[T]>): unknown;
+  value: NonNullable<IPlatformSettings[T]>;
   layoutMode: TLayoutMode;
   isUpdateMode?: boolean;
   isScheduleMode?: boolean;

@@ -25,7 +25,7 @@ import { TwitchTagsInput } from './TwitchTagsInput';
 
 export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'facebook'>) {
   const fbSettings = p.value;
-  const isUpdateMode = p.isUpdateMode;
+  const { isUpdateMode, isScheduleMode } = p;
 
   // inject services
   const {
@@ -75,7 +75,7 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
 
   const shouldShowGroups = fbSettings.destinationType === 'group' && !isUpdateMode;
   const shouldShowPages = fbSettings.destinationType === 'page' && !isUpdateMode;
-  const shouldShowEvents = !isUpdateMode;
+  const shouldShowEvents = !isUpdateMode && !isScheduleMode;
   const shouldShowPrivacy = fbSettings.destinationType === 'me';
   const shouldShowPrivacyWarn =
     (!fbSettings.liveVideoId && fbSettings.privacy?.value !== 'SELF') ||

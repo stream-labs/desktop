@@ -24,6 +24,7 @@ export default function PlatformSettings() {
     commonFields,
     updateCommonFields,
     descriptionIsRequired,
+    getPlatformSettings,
   } = useGoLiveSettings().selectExtra(settings => {
     const fbSettings = settings.platforms['facebook'];
     const descriptionIsRequired = fbSettings && fbSettings.enabled && !fbSettings.useCustomFields;
@@ -42,14 +43,15 @@ export default function PlatformSettings() {
   function createPlatformBinding<T extends TPlatform>(platform: T): IPlatformComponentParams<T> {
     return {
       layoutMode,
-      value: getDefined(platforms[platform]),
+      get value() {
+        return getDefined(getPlatformSettings(platform));
+      },
       onChange(newSettings) {
         updatePlatform(platform, newSettings);
       },
     };
   }
 
-  console.log('re-render platforms');
   return (
     // minHeight is required for the loading spinner
     <div style={{ minHeight: '150px' }}>
