@@ -55,6 +55,10 @@ export interface IFacebookLiveVideo {
   };
 }
 
+/**
+ * Facebook doesn't provide us destinationType and destinationId when we fetch the video
+ * So we should additionally save this info in the `IFacebookLiveVideoExtended` object
+ */
 export interface IFacebookLiveVideoExtended extends IFacebookLiveVideo {
   destinationType: TDestinationType;
   destinationId: string;
