@@ -6,6 +6,9 @@ import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import { Button } from 'antd';
 import { SUPPORTED_FILE_TYPES } from 'services/highlighter/constants';
+import { SliderInput } from 'components-react/shared/inputs';
+import Form from 'components-react/shared/inputs/Form';
+import Scrollable from 'components-react/shared/Scrollable';
 
 export default function BlankSlate(p: { close: () => void }) {
   const { HotkeysService, SettingsService, StreamingService } = Services;
@@ -18,7 +21,6 @@ export default function BlankSlate(p: { close: () => void }) {
 
   const correctlyConfigured =
     v.settingsValues.Output.RecRB &&
-    v.settingsValues.Output.RecRBTime === 20 &&
     v.settingsValues.General.ReplayBufferWhileStreaming &&
     !v.settingsValues.General.KeepReplayBufferStreamStops &&
     SUPPORTED_FILE_TYPES.includes(v.settingsValues.Output.RecFormat);
@@ -31,7 +33,6 @@ export default function BlankSlate(p: { close: () => void }) {
       },
       Output: {
         RecRB: true,
-        RecRBTime: 20,
       },
     });
 
@@ -82,58 +83,85 @@ export default function BlankSlate(p: { close: () => void }) {
     );
   }
 
+  function setReplayTime(time: number) {
+    SettingsService.actions.setSettingsPatch({ Output: { RecRBTime: time } });
+  }
+
   return (
-    <div style={{ padding: 24 }}>
-      <h1>Highlighter</h1>
-      <p>
-        The highlighter allows you to edit together replays you capture during your stream and
-        upload them to YouTube.
-      </p>
-      <h2>Get Started</h2>
-      {!v.isStreaming && (
-        <div className="section">
-          {correctlyConfigured
-            ? completedStepHeading('Configure the replay buffer')
-            : incompleteStepHeading('Configure the replay buffer')}
-          {correctlyConfigured ? (
-            <div>The replay buffer is correctly configured</div>
-          ) : (
-            <Button onClick={configure}>Configure</Button>
-          )}
-        </div>
-      )}
-      {!v.isStreaming && (
-        <div className="section">
-          {hotkey?.bindings.length
-            ? completedStepHeading('Set a hotkey to capture replays')
-            : incompleteStepHeading('Set a hotkey to capture replays')}
-          {hotkey && (
-            <HotkeyBinding
-              hotkey={hotkey}
-              binding={hotkey.bindings[0] ?? null}
-              onBind={binding => {
-                const newHotkey = { ...hotkey };
-                newHotkey.bindings.splice(0, 1, binding);
-                setHotkey(newHotkey);
-                hotkeyRef.current = newHotkey;
-              }}
-            />
-          )}
-        </div>
-      )}
-      <div className="section">
-        {incompleteStepHeading('Capture a replay')}
-        {!!hotkey?.bindings.length && (
-          <div>
-            Start streaming and press <b>{getBindingString(hotkey.bindings[0])}</b> to capture a
-            replay. Check back here after your stream.
+    <Scrollable style={{ padding: 24, width: '100%' }}>
+      <div style={{ width: 700 }}>
+        <h1>Highlighter</h1>
+        <p>
+          The highlighter allows you to edit together replays you capture during your stream and
+          upload them to YouTube.
+        </p>
+        <h2>Get Started</h2>
+        {!v.isStreaming && (
+          <div className="section">
+            {correctlyConfigured
+              ? completedStepHeading('Configure the replay buffer')
+              : incompleteStepHeading('Configure the replay buffer')}
+            {correctlyConfigured ? (
+              <div>The replay buffer is correctly configured</div>
+            ) : (
+              <Button onClick={configure}>Configure</Button>
+            )}
           </div>
         )}
-        {!hotkey?.bindings.length && (
-          <div>Start streaming and capture a replay. Check back here after your stream.</div>
+        {!v.isStreaming && (
+          <div className="section">
+            {completedStepHeading('Adjust replay duration')}
+            <div>Set the duration of captured replays. You can always trim them down later.</div>
+            <Form layout="inline">
+              <SliderInput
+                style={{ width: 400, marginTop: 8 }}
+                label="Replay Duration"
+                value={v.settingsValues.Output.RecRBTime}
+                onChange={setReplayTime}
+                min={1}
+                max={120}
+                step={1}
+                debounce={200}
+                hasNumberInput={false}
+                tooltipPlacement="top"
+                tipFormatter={v => `${v}s`}
+              />
+            </Form>
+          </div>
         )}
+        {!v.isStreaming && (
+          <div className="section">
+            {hotkey?.bindings.length
+              ? completedStepHeading('Set a hotkey to capture replays')
+              : incompleteStepHeading('Set a hotkey to capture replays')}
+            {hotkey && (
+              <HotkeyBinding
+                hotkey={hotkey}
+                binding={hotkey.bindings[0] ?? null}
+                onBind={binding => {
+                  const newHotkey = { ...hotkey };
+                  newHotkey.bindings.splice(0, 1, binding);
+                  setHotkey(newHotkey);
+                  hotkeyRef.current = newHotkey;
+                }}
+              />
+            )}
+          </div>
+        )}
+        <div className="section">
+          {incompleteStepHeading('Capture a replay')}
+          {!!hotkey?.bindings.length && (
+            <div>
+              Start streaming and press <b>{getBindingString(hotkey.bindings[0])}</b> to capture a
+              replay. Check back here after your stream.
+            </div>
+          )}
+          {!hotkey?.bindings.length && (
+            <div>Start streaming and capture a replay. Check back here after your stream.</div>
+          )}
+        </div>
+        <a onClick={p.close}>Or, import a clip from your computer</a>
       </div>
-      <a onClick={p.close}>Or, import a clip from your computer</a>
-    </div>
+    </Scrollable>
   );
 }
