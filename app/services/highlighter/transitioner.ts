@@ -1,33 +1,23 @@
 import createTransition from './create-transition';
 import transitions from 'gl-transitions';
 import { Texture2D } from './texture-2d';
-import {
-  FRAME_BYTE_SIZE,
-  HEIGHT,
-  PREVIEW_FRAME_BYTE_SIZE,
-  PREVIEW_HEIGHT,
-  PREVIEW_WIDTH,
-  WIDTH,
-} from './constants';
+import { IExportOptions } from '.';
 
 export class Transitioner {
   private canvas = document.createElement('canvas');
   private gl = this.canvas.getContext('webgl')!;
 
-  readonly width = this.preview ? PREVIEW_WIDTH : WIDTH;
-  readonly height = this.preview ? PREVIEW_HEIGHT : HEIGHT;
-
-  private readBuffer = Buffer.allocUnsafe(this.preview ? PREVIEW_FRAME_BYTE_SIZE : FRAME_BYTE_SIZE);
+  private readBuffer = Buffer.allocUnsafe(this.options.width * this.options.height * 4);
 
   private transitionSrc: any;
 
   constructor(
     public readonly transitionType: string,
-    public readonly preview: boolean,
     public readonly params: { [key: string]: any } = {},
+    public readonly options: IExportOptions,
   ) {
-    this.canvas.width = this.width;
-    this.canvas.height = this.height;
+    this.canvas.width = this.options.width;
+    this.canvas.height = this.options.height;
     this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
     this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
 
@@ -36,8 +26,8 @@ export class Transitioner {
 
   renderTransition(fromFrame: Buffer, toFrame: Buffer, progress: number) {
     const transition = createTransition(this.gl, this.transitionSrc);
-    const fromTexture = new Texture2D(this.gl, this.width, this.height, fromFrame);
-    const toTexture = new Texture2D(this.gl, this.width, this.height, toFrame);
+    const fromTexture = new Texture2D(this.gl, this.options.width, this.options.height, fromFrame);
+    const toTexture = new Texture2D(this.gl, this.options.width, this.options.height, toFrame);
     const buffer = this.gl.createBuffer();
 
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
@@ -64,8 +54,8 @@ export class Transitioner {
     this.gl.readPixels(
       0,
       0,
-      this.width,
-      this.height,
+      this.options.width,
+      this.options.height,
       this.gl.RGBA,
       this.gl.UNSIGNED_BYTE,
       this.readBuffer,

@@ -13,6 +13,7 @@ import Grow from './pages/Grow/Grow';
 import Loader from './pages/Loader';
 import NavTools from './sidebar/NavTools';
 import PlatformLogo from './shared/PlatformLogo';
+import AdvancedStatistics from './windows/AdvancedStatistics';
 import StartStreamingButton from './root/StartStreamingButton';
 import TestWidgets from './root/TestWidgets';
 import RenameSource from './windows/RenameSource';
@@ -34,6 +35,7 @@ export const components = {
   Loader,
   NavTools,
   PlatformLogo,
+  AdvancedStatistics,
   StartStreamingButton,
   TestWidgets,
   RenameSource,

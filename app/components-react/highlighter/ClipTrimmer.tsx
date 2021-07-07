@@ -30,12 +30,15 @@ export default function ClipTrimmer(props: { clip: IClip }) {
   const { HighlighterService } = Services;
   const videoRef = useRef<HTMLVideoElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
+  const startDragRef = useRef<HTMLDivElement>(null);
+  const endDragRef = useRef<HTMLDivElement>(null);
   const [currentTime, setCurrentTime] = useState(props.clip.startTrim);
   const [scrubFrames, setScrubFrames] = useState<number[]>([]);
   const [localStartTrim, setLocalStartTrim] = useState(props.clip.startTrim);
   const [localEndTrim, setLocalEndTrim] = useState(props.clip.endTrim);
   const playPastEnd = useRef(false);
   const isDragging = useRef<TDragType | null>(null);
+  const dragOffset = useRef(0);
   const isScrubbing = useRef(false);
   const [isPlaying, setIsPlaying] = useStateRef(false);
 
@@ -87,11 +90,15 @@ export default function ClipTrimmer(props: { clip: IClip }) {
   }, []);
 
   function startDragging(e: React.MouseEvent, type: TDragType) {
-    e.stopPropagation();
     isDragging.current = type;
+    dragOffset.current =
+      type === 'start'
+        ? startDragRef.current!.getBoundingClientRect().right - e.clientX
+        : e.clientX - endDragRef.current!.getBoundingClientRect().left;
   }
 
   function onMouseDown() {
+    if (isDragging.current) return;
     stopPlaying();
     isScrubbing.current = true;
   }
@@ -101,28 +108,32 @@ export default function ClipTrimmer(props: { clip: IClip }) {
       stopDragging();
     } else {
       isScrubbing.current = false;
-      const timelineWidth = timelineRef.current!.offsetWidth;
+      const timelineWidth = timelineRef.current!.offsetWidth - 40;
       const timelineOffset = timelineRef.current!.getBoundingClientRect().left;
       playAt(((e.clientX - timelineOffset) / timelineWidth) * props.clip.duration!);
     }
   }
 
   function onMouseMove(e: React.MouseEvent) {
-    const timelineWidth = timelineRef.current!.offsetWidth;
+    const timelineWidth = timelineRef.current!.offsetWidth - 40;
 
     if (isDragging.current) {
       if (isDragging.current === 'start') {
-        const timelineOffset = timelineRef.current!.getBoundingClientRect().left;
-        const time = ((e.clientX - timelineOffset) / timelineWidth) * props.clip.duration!;
-        setLocalStartTrim(Math.min(time, endTime));
+        const timelineOffset = timelineRef.current!.getBoundingClientRect().left + 20;
+        const time =
+          ((e.clientX + dragOffset.current - timelineOffset) / timelineWidth) *
+          props.clip.duration!;
+        setLocalStartTrim(Math.max(Math.min(time, endTime), 0));
       } else {
-        const timelineOffset = timelineRef.current!.getBoundingClientRect().right;
-        const time = ((timelineOffset - e.clientX) / timelineWidth) * props.clip.duration!;
-        setLocalEndTrim(Math.min(time, props.clip.duration! - localStartTrim));
+        const timelineOffset = timelineRef.current!.getBoundingClientRect().right - 20;
+        const time =
+          ((timelineOffset + dragOffset.current - e.clientX) / timelineWidth) *
+          props.clip.duration!;
+        setLocalEndTrim(Math.max(Math.min(time, props.clip.duration! - localStartTrim), 0));
       }
     } else if (isScrubbing.current) {
       if (!videoRef.current) return;
-      const timelineOffset = timelineRef.current!.getBoundingClientRect().left;
+      const timelineOffset = timelineRef.current!.getBoundingClientRect().left + 20;
       const time = ((e.clientX - timelineOffset) / timelineWidth) * props.clip.duration!;
 
       videoRef.current.currentTime = time;
@@ -131,8 +142,9 @@ export default function ClipTrimmer(props: { clip: IClip }) {
   }
 
   function onMouseLeave() {
-    isDragging.current = null;
     isScrubbing.current = false;
+
+    if (isDragging.current) stopDragging();
   }
 
   function stopDragging() {
@@ -144,17 +156,16 @@ export default function ClipTrimmer(props: { clip: IClip }) {
 
     isDragging.current = null;
     playAt(localStartTrim);
-    // TODO - dispatch action to highlighter service
   }
 
-  const scrubHeight = 80;
+  const scrubHeight = 100;
   const scrubWidth = scrubHeight * (SCRUB_WIDTH / SCRUB_HEIGHT);
 
   // TODO: React to window size change
   useEffect(() => {
-    const timelineWidth = timelineRef.current!.offsetWidth;
-    // Always subtract 1 frame so it isn't too squished in
-    const nFrames = Math.floor(timelineWidth / scrubWidth) - 1;
+    const timelineWidth = timelineRef.current!.offsetWidth - 40;
+    // Always add 1 frame so it fully covers
+    const nFrames = Math.floor(timelineWidth / scrubWidth) + 1;
     setScrubFrames(
       times(nFrames).map(n => {
         return Math.floor((n / (nFrames - 1)) * (SCRUB_FRAMES - 1));
@@ -162,89 +173,136 @@ export default function ClipTrimmer(props: { clip: IClip }) {
     );
   }, []);
 
+  const startTrimPct = (localStartTrim / props.clip.duration!) * 100;
+  const endTrimPct = (localEndTrim / props.clip.duration!) * 100;
+
   return (
     <div>
       <video
         ref={videoRef}
         src={props.clip.path}
+        style={{ borderRadius: 5 }}
         width="100%"
         onEnded={() => {
           setIsPlaying(false);
         }}
         onClick={togglePlayPause}
       />
+      <h3 style={{ margin: '6px 0 10px' }}>Trim Clip</h3>
       <div
         ref={timelineRef}
         style={{
           width: '100%',
-          height: 100,
+          height: scrubHeight,
           position: 'relative',
           background: 'var(--section)',
           marginTop: 10,
-          display: 'flex',
-          justifyContent: 'space-around',
-          alignItems: 'center',
           borderRadius: 5,
+          borderLeft: '20px solid transparent',
+          borderRight: '20px solid transparent',
         }}
         onMouseDown={onMouseDown}
         onMouseUp={onMouseUp}
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
       >
-        {scrubFrames.map(frame => {
-          return (
-            <img
-              key={frame}
-              src={props.clip.scrubSprite}
-              width={SCRUB_WIDTH}
-              height={SCRUB_HEIGHT}
-              style={{
-                height: scrubHeight,
-                width: scrubWidth,
-                objectFit: 'cover',
-                objectPosition: `-${frame * SCRUB_WIDTH * (scrubHeight / SCRUB_HEIGHT)}px`,
-                borderRadius: 5,
-                pointerEvents: 'none',
-              }}
-            ></img>
-          );
-        })}
+        <div style={{ display: 'flex', overflow: 'hidden', position: 'absolute' }}>
+          {scrubFrames.map(frame => {
+            return (
+              <img
+                key={frame}
+                src={props.clip.scrubSprite}
+                width={SCRUB_WIDTH}
+                height={SCRUB_HEIGHT}
+                style={{
+                  height: scrubHeight,
+                  width: scrubWidth,
+                  objectFit: 'cover',
+                  objectPosition: `-${frame * SCRUB_WIDTH * (scrubHeight / SCRUB_HEIGHT)}px`,
+                  pointerEvents: 'none',
+                }}
+              ></img>
+            );
+          })}
+        </div>
         <div
           style={{
             left: `${(currentTime / props.clip.duration!) * 100}%`,
           }}
           className={cx(styles.clipPlayhead, { [styles.clipPlayheadPlaying]: isPlaying.current })}
         ></div>
-        <div
-          style={{
-            position: 'absolute',
-            left: 0,
-            width: `${(localStartTrim / props.clip.duration!) * 100}%`,
-            height: 100,
-            backgroundColor: 'black',
-            opacity: 0.9,
-            borderRadius: 5,
-          }}
-        >
+        <div style={{ position: 'absolute', width: '100%', height: '100%' }}>
           <div
-            className={styles.clipResizeHandle}
-            onMouseDown={e => startDragging(e, 'start')}
+            style={{
+              width: `calc(${startTrimPct}% + 20px)`,
+              height: '100%',
+              position: 'absolute',
+              left: -20,
+              background: 'rgba(0,0,0,0.9)',
+              borderRadius: 5,
+            }}
           ></div>
-        </div>
-        <div
-          style={{
-            position: 'absolute',
-            right: 0,
-            width: `${(localEndTrim / props.clip.duration!) * 100}%`,
-            height: 100,
-            backgroundColor: 'black',
-            opacity: 0.9,
-            borderRadius: 5,
-          }}
-        >
           <div
-            className={cx(styles.clipResizeHandle, styles.clipResizeHandleRight)}
+            style={{
+              position: 'absolute',
+              left: `calc(${startTrimPct}% - 20px)`,
+              width: 20,
+              height: '100%',
+              background: 'var(--teal)',
+              borderTopLeftRadius: 5,
+              borderBottomLeftRadius: 5,
+              zIndex: 100,
+              cursor: 'pointer',
+              color: 'var(--title)',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+            onMouseDown={e => startDragging(e, 'start')}
+            ref={startDragRef}
+          >
+            <i className="fas fa-chevron-left" />
+          </div>
+          <div
+            style={{
+              position: 'absolute',
+              width: `${100 - startTrimPct - endTrimPct}%`,
+              height: '100%',
+              left: `${startTrimPct}%`,
+              borderTop: '5px solid var(--teal)',
+              borderBottom: '5px solid var(--teal)',
+            }}
+          ></div>
+          <div
+            style={{
+              position: 'absolute',
+              right: `calc(${endTrimPct}% - 20px)`,
+              width: 20,
+              height: '100%',
+              background: 'var(--teal)',
+              borderTopRightRadius: 5,
+              borderBottomRightRadius: 5,
+              zIndex: 100,
+              cursor: 'pointer',
+              color: 'var(--title)',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
             onMouseDown={e => startDragging(e, 'end')}
+            ref={endDragRef}
+          >
+            <i className="fas fa-chevron-right" />
+          </div>
+          <div
+            style={{
+              width: `calc(${endTrimPct}% + 20px)`,
+              height: '100%',
+              position: 'absolute',
+              right: -20,
+              background: 'rgba(0,0,0,0.9)',
+              borderRadius: 5,
+            }}
           ></div>
         </div>
       </div>
