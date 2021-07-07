@@ -78,13 +78,13 @@ export function useModule<
         // we have several sources of data to select from
         // use `merge` function to join them into a single object
         const mergedModule = merge(
-          // allows to select getters and actions from the module
+          // allow to select getters and actions from the module
           () => lockedModule,
-          // allows to select variables from the module's state
+          // allow to select variables from the module's state
           () => module.state,
-          // allows to select computed props
+          // allow to select computed props
           () => computedPropsRef.current,
-          // allows to select the whole module itself
+          // allow to select the whole module itself
           () => ({ module }),
         );
         dependencyWatcherRef.current = createDependencyWatcher(mergedModule);
