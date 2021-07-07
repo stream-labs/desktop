@@ -1,4 +1,4 @@
-import { WIDTH, HEIGHT } from './constants';
+import { IExportOptions } from '.';
 
 /**
  * Performs 2d compositing on a frame.
@@ -8,16 +8,17 @@ export class Compositor2D {
   private canvas = document.createElement('canvas');
   private ctx = this.canvas.getContext('2d')!;
 
-  readonly width = WIDTH;
-  readonly height = HEIGHT;
-
-  constructor() {
-    this.canvas.width = this.width;
-    this.canvas.height = this.height;
+  constructor(public readonly options: IExportOptions) {
+    this.canvas.width = this.options.width;
+    this.canvas.height = this.options.height;
   }
 
   drawFrame(frame: Buffer) {
-    const data = new ImageData(Uint8ClampedArray.from(frame), this.width, this.height);
+    const data = new ImageData(
+      Uint8ClampedArray.from(frame),
+      this.options.width,
+      this.options.height,
+    );
     this.ctx.putImageData(data, 0, 0);
   }
 
@@ -27,6 +28,6 @@ export class Compositor2D {
   }
 
   getFrame(): Buffer {
-    return Buffer.from(this.ctx.getImageData(0, 0, this.width, this.height).data);
+    return Buffer.from(this.ctx.getImageData(0, 0, this.options.width, this.options.height).data);
   }
 }
