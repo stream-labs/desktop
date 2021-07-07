@@ -12,6 +12,8 @@ export const TimeInput = InputComponent((p: TTimeInputProps) => {
   const value = getAntdValue(inputAttrs.value);
   const inputRef = useRef<Element>(null);
 
+  // By some unknown reason the Ant TimePicker renders the input in the `readonly` state
+  // Add a dirty fix here
   useEffect(() => {
     const $input: Element = findDOMNode(inputRef.current);
     $input.querySelector('input')!.removeAttribute('readonly');
