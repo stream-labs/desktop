@@ -398,8 +398,7 @@ function SettingsPanel() {
 }
 
 export function useSharedComponentsLibrary() {
-  const selectResult = useModule(SharedComponentsModule).select();
-  return selectResult;
+  return useModule(SharedComponentsModule).select();
 }
 
 class SharedComponentsModule {
