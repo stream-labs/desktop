@@ -513,7 +513,7 @@ export class FacebookService
 
     if (onlyUpcoming) {
       videos = videos.filter(v => {
-        // videos created in the new Live Producer don't have `planned_start_time`
+        // some videos created in the new Live Producer don't have `planned_start_time`
         if (!v.planned_start_time) return true;
 
         const videoDate = new Date(v.planned_start_time).valueOf();
