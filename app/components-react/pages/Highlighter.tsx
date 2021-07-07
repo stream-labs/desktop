@@ -301,6 +301,7 @@ export default function Highlighter() {
           closable={false}
           visible={!!showModal || !!v.error}
           destroyOnClose={true}
+          keyboard={false}
         >
           {!!v.error && <Alert message={v.error} type="error" showIcon />}
           {inspectedClip && showModal === 'trim' && <ClipTrimmer clip={inspectedClip} />}
