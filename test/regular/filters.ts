@@ -241,13 +241,161 @@ test('Adding and removing a Chroma Key filter', async t => {
 });
 
 test('Adding and removing a Invert Polarity filter', async t => {
+  const app = t.context.app;
   const sourceName = 'Audio Input Capture';
   const filterName = 'Invert Polarity';
 
   await addSource(t, 'Audio Input Capture', sourceName);
   await addFilter(t, sourceName, filterName, filterName);
-
-  // this filter does't have settings. Just check we have no errors
   await openFiltersWindow(t, sourceName);
-  t.pass();
+  await focusChild(t);
+
+  t.true(await (await app.client.$('div=No settings are available for this filter')).isExisting());
+
+  await removeFilter(t, sourceName, filterName);
+  await openFiltersWindow(t, sourceName);
+
+  t.false(await (await app.client.$('div=No settings are available for this filter')).isExisting());
 });
+
+test('Adding and removing a Gain filter', async t => {
+  const app = t.context.app;
+  const sourceName = 'Audio Input Capture 1';
+  const filterName = 'Gain';
+
+  await addSource(t, 'Audio Input Capture', sourceName);
+  await addFilter(t, sourceName, filterName, filterName);
+  await openFiltersWindow(t, sourceName);
+  await focusChild(t);
+
+  t.true(await (await app.client.$('label=Gain')).isExisting());
+
+  await removeFilter(t, sourceName, filterName);
+  await openFiltersWindow(t, sourceName);
+
+  t.false(await (await app.client.$('label=Gain')).isExisting());
+})
+
+test('Adding and removing a Noise Suppression filter', async t => {
+  const app = t.context.app;
+  const sourceName = 'Audio Input Capture 2';
+  const filterName = 'Noise Suppression';
+
+  await addSource(t, 'Audio Input Capture', sourceName);
+  await addFilter(t, sourceName, filterName, filterName);
+  await openFiltersWindow(t, sourceName);
+  await focusChild(t);
+
+  t.true(await (await app.client.$('label=Method')).isExisting());
+  t.true(await (await app.client.$('label=Suppression Level')).isExisting());
+
+  await removeFilter(t, sourceName, filterName);
+  await openFiltersWindow(t, sourceName);
+
+  t.false(await (await app.client.$('label=Method')).isExisting());
+  t.false(await (await app.client.$('label=Suppression Level')).isExisting());
+})
+
+test('Adding and removing a Noise Gate filter', async t => {
+  const app = t.context.app;
+  const sourceName = 'Audio Input Capture 3';
+  const filterName = 'Noise Gate';
+
+  await addSource(t, 'Audio Input Capture', sourceName);
+  await addFilter(t, sourceName, filterName, filterName);
+  await openFiltersWindow(t, sourceName);
+  await focusChild(t);
+
+  t.true(await (await app.client.$('label=Close Threshold')).isExisting());
+  t.true(await (await app.client.$('label=Open Threshold')).isExisting());
+  t.true(await (await app.client.$('label=Attack Time')).isExisting());
+  t.true(await (await app.client.$('label=Hold Time')).isExisting());
+  t.true(await (await app.client.$('label=Release Time')).isExisting());
+
+  await removeFilter(t, sourceName, filterName);
+  await openFiltersWindow(t, sourceName);
+
+  t.false(await (await app.client.$('label=Close Threshold')).isExisting());
+  t.false(await (await app.client.$('label=Open Threshold')).isExisting());
+  t.false(await (await app.client.$('label=Attack Time')).isExisting());
+  t.false(await (await app.client.$('label=Hold Time')).isExisting());
+  t.false(await (await app.client.$('label=Release Time')).isExisting());
+})
+
+test('Adding and removing a Compressor filter', async t => {
+  const app = t.context.app;
+  const sourceName = 'Audio Input Capture 4';
+  const filterName = 'Compressor';
+
+  await addSource(t, 'Audio Input Capture', sourceName);
+  await addFilter(t, sourceName, filterName, filterName);
+  await openFiltersWindow(t, sourceName);
+  await focusChild(t);
+
+  t.true(await (await app.client.$('label=Ratio')).isExisting());
+  t.true(await (await app.client.$('label=Threshold')).isExisting());
+  t.true(await (await app.client.$('label=Attack')).isExisting());
+  t.true(await (await app.client.$('label=Release')).isExisting());
+  t.true(await (await app.client.$('label=Output Gain')).isExisting());
+  t.true(await (await app.client.$('label=Sidechain/Ducking Source')).isExisting());
+
+  await removeFilter(t, sourceName, filterName);
+  await openFiltersWindow(t, sourceName);
+
+  t.false(await (await app.client.$('label=Ratio')).isExisting());
+  t.false(await (await app.client.$('label=Threshold')).isExisting());
+  t.false(await (await app.client.$('label=Attack')).isExisting());
+  t.false(await (await app.client.$('label=Release')).isExisting());
+  t.false(await (await app.client.$('label=Output Gain')).isExisting());
+  t.false(await (await app.client.$('label=Sidechain/Ducking Source')).isExisting());
+})
+
+test('Adding and removing a Limiter filter', async t => {
+  const app = t.context.app;
+  const sourceName = 'Audio Input Capture 5';
+  const filterName = 'Limiter';
+
+  await addSource(t, 'Audio Input Capture', sourceName);
+  await addFilter(t, sourceName, filterName, filterName);
+  await openFiltersWindow(t, sourceName);
+  await focusChild(t);
+
+  t.true(await (await app.client.$('label=Threshold')).isExisting());
+  t.true(await (await app.client.$('label=Release')).isExisting());
+
+  await removeFilter(t, sourceName, filterName);
+  await openFiltersWindow(t, sourceName);
+
+  t.false(await (await app.client.$('label=Threshold')).isExisting());
+  t.false(await (await app.client.$('label=Release')).isExisting());
+})
+
+test('Adding and removing an Expander filter', async t => {
+  const app = t.context.app;
+  const sourceName = 'Audio Input Capture 6';
+  const filterName = 'Expander';
+
+  await addSource(t, 'Audio Input Capture', sourceName);
+  await addFilter(t, sourceName, filterName, filterName);
+  await openFiltersWindow(t, sourceName);
+  await focusChild(t);
+
+  t.true(await (await app.client.$('label=Presets')).isExisting());
+  t.true(await (await app.client.$('label=Ratio')).isExisting());
+  t.true(await (await app.client.$('label=Threshold')).isExisting());
+  t.true(await (await app.client.$('label=Attack')).isExisting());
+  t.true(await (await app.client.$('label=Release')).isExisting());
+  t.true(await (await app.client.$('label=Output Gain')).isExisting());
+  t.true(await (await app.client.$('label=Detection')).isExisting());
+
+  await removeFilter(t, sourceName, filterName);
+  await openFiltersWindow(t, sourceName);
+
+  t.false(await (await app.client.$('label=Presets')).isExisting());
+  t.false(await (await app.client.$('label=Ratio')).isExisting());
+  t.false(await (await app.client.$('label=Threshold')).isExisting());
+  t.false(await (await app.client.$('label=Attack')).isExisting());
+  t.false(await (await app.client.$('label=Release')).isExisting());
+  t.false(await (await app.client.$('label=Output Gain')).isExisting());
+  t.false(await (await app.client.$('label=Detection')).isExisting());
+})
