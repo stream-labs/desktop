@@ -16,6 +16,7 @@ import PlatformLogo from './shared/PlatformLogo';
 import AdvancedStatistics from './windows/AdvancedStatistics';
 import StartStreamingButton from './root/StartStreamingButton';
 import TestWidgets from './root/TestWidgets';
+import RenameSource from './windows/RenameSource';
 
 // list of React components for usage inside Vue components
 export const components = {
@@ -37,4 +38,5 @@ export const components = {
   AdvancedStatistics,
   StartStreamingButton,
   TestWidgets,
+  RenameSource,
 };
