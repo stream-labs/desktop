@@ -424,7 +424,9 @@ class SharedComponentsModule {
       return I18nService.instance.state.locale;
     },
     set locale(locale: string) {
-      I18nService.instance.actions.setLocale(locale, false);
+      // TODO: change locale dynamically
+      alert('Not implemented');
+      // I18nService.instance.actions.setLocale(locale);
     },
   };
 

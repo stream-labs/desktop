@@ -4,13 +4,13 @@ import { Inject } from './core/injector';
 
 // Hands out hostnames to the rest of the app. Eventually
 // we should allow overriding this value. But for now we
-// are just keeping the value in one pla
+// are just keeping the value in one place.
 export class HostsService extends Service {
   get streamlabs() {
     if (Util.shouldUseLocalHost()) {
       return 'streamlabs.site';
     }
-    return 'beta.streamlabs.com';
+    return 'streamlabs.com';
   }
 
   get overlays() {
