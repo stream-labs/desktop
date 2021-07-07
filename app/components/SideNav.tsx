@@ -127,7 +127,6 @@ export default class SideNav extends Vue {
         icon: 'icon-graph',
         title: $t('Grow'),
         trackingTarget: 'grow-tab',
-        newBadge: true,
       });
     }
 
@@ -143,6 +142,7 @@ export default class SideNav extends Vue {
         icon: 'fab fa-youtube',
         title: 'Highlighter',
         trackingTarget: 'highlighter',
+        newBadge: true,
       });
     }
 
