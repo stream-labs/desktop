@@ -43,6 +43,8 @@ interface IRGBColor {
   b: number;
 }
 
+type DeepPartial<T> = Partial<{ [P in keyof T]: DeepPartial<T[P]> }>;
+
 /**
  * This is a much more typesafe type for json to return,
  * as it requires declaring its type before use.
@@ -84,6 +86,7 @@ declare module 'vuejs-datepicker';
 declare module 'vuejs-datepicker/dist/locale';
 declare module 'color-picker';
 declare module 'overlayscrollbars-vue';
+declare module 'gl-transitions';
 
 // React modules
 declare module 'rc-animate';

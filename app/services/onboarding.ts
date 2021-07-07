@@ -10,6 +10,7 @@ import { $t } from './i18n';
 import { handleResponse } from 'util/requests';
 import { getPlatformService, IPlatformCapabilityResolutionPreset } from './platforms';
 import { OutputSettingsService } from './settings';
+import { ObsImporterService } from './obs-importer';
 
 enum EOnboardingSteps {
   MacPermissions = 'MacPermissions',
@@ -137,6 +138,7 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
   get steps() {
     const steps: IOnboardingStep[] = [];
     const userViews = this.getServiceViews(UserService);
+    const isOBSinstalled = this.getServiceViews(ObsImporterService).isOBSinstalled();
 
     if (process.platform === OS.Mac) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.MacPermissions]);
@@ -148,9 +150,11 @@ class OnboardingViews extends ViewHandler<IOnboardingServiceState> {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.Prime]);
     }
 
-    steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ChooseYourAdventure]);
+    if (isOBSinstalled) {
+      steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ChooseYourAdventure]);
+    }
 
-    if (this.state.importedFromObs) {
+    if (this.state.importedFromObs && isOBSinstalled) {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.ObsImport]);
     } else {
       steps.push(ONBOARDING_STEPS()[EOnboardingSteps.HardwareSetup]);

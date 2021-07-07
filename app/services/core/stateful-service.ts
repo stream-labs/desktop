@@ -116,26 +116,11 @@ export abstract class StatefulService<TState extends object> extends Service {
     return this.store;
   }
 
-  static watchReadOperations(fn: Function) {
-    this.isWatchingReadOperations = true;
-    fn();
-    const readOperations = this.readOperations;
-    this.isWatchingReadOperations = false;
-    this.readOperations = [];
-    return readOperations;
-  }
-
-  private static isWatchingReadOperations = false;
-  private static readOperations: string[] = [];
-
   get store(): Store<any> {
     return StatefulService.store;
   }
 
   get state(): TState {
-    if (StatefulService.isWatchingReadOperations) {
-      StatefulService.readOperations.push(this.serviceName);
-    }
     return this.store.state[this.serviceName];
   }
 

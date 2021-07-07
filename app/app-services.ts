@@ -53,6 +53,7 @@ export { ApplicationMenuService } from 'services/application-menu';
 export { MacPermissionsService } from 'services/mac-permissions';
 export { VirtualWebcamService } from 'services/virtual-webcam';
 export { MetricsService } from 'services/metrics';
+export { HighlighterService } from 'services/highlighter';
 
 // ONLINE SERVICES
 export { UserService } from './services/user';
@@ -129,10 +130,14 @@ import { AnnouncementsService } from './services/announcements';
 import { PatchNotesService } from './services/patch-notes';
 import { VideoService } from './services/video';
 import { ChatService } from './services/chat';
+import { HighlighterService } from './services/highlighter';
 import { GrowService } from './services/grow/grow';
 import { TransitionsService } from './services/transitions';
 import { MagicLinkService } from './services/magic-link';
 import { UsageStatisticsService } from './services/usage-statistics';
+import { HotkeysService } from './services/hotkeys';
+import { MediaBackupService } from './services/media-backup';
+import { WidgetsService } from './services/widgets';
 
 export const AppServices = {
   WindowsService,
@@ -157,8 +162,12 @@ export const AppServices = {
   UserService,
   TwitchService,
   DismissablesService,
+  HighlighterService,
   GrowService,
   TransitionsService,
   MagicLinkService,
   UsageStatisticsService,
+  HotkeysService,
+  MediaBackupService,
+  WidgetsService,
 };

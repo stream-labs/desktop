@@ -8,7 +8,7 @@ import { SwitchProps } from 'antd/lib/switch';
 const ANT_SWITCH_FEATURES = ['checkedChildren', 'unCheckedChildren'] as const;
 
 export type TSwitchInputProps = TSlobsInputProps<
-  {},
+  { inputRef?: React.Ref<HTMLInputElement> },
   boolean,
   SwitchProps,
   ValuesOf<typeof ANT_SWITCH_FEATURES>
@@ -18,7 +18,7 @@ export const SwitchInput = InputComponent((p: TSwitchInputProps) => {
   const { wrapperAttrs, inputAttrs } = useInput('switch', p, ANT_SWITCH_FEATURES);
   return (
     <InputWrapper {...wrapperAttrs}>
-      <Switch checked={inputAttrs.value} size="small" {...inputAttrs} />
+      <Switch checked={inputAttrs.value} size="small" {...inputAttrs} ref={p.inputRef} />
     </InputWrapper>
   );
 });

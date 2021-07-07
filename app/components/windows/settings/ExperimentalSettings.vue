@@ -3,9 +3,7 @@
     <div class="section">
       <div class="section-content">
         <GenericForm v-model="settingsFormData" @input="saveSettings" />
-        <button class="button button--action" @click="repairSceneCollection()">
-          Repair Scene Collection
-        </button>
+        <button class="button" @click="repairSceneCollection()">Repair Scene Collection</button>
         <br />
         <br />
         <br />

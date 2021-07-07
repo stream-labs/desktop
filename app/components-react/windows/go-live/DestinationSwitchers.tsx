@@ -80,8 +80,6 @@ function DestinationSwitcher(p: IDestinationSwitcherProps) {
   const platform = typeof p.destination === 'string' ? (p.destination as TPlatform) : null;
   const { RestreamService, MagicLinkService } = Services;
 
-  console.log('Render switcher', platform, p.enabled);
-
   function onClickHandler(ev: MouseEvent) {
     if (p.isPrimary) {
       alertAsync(

@@ -3,7 +3,6 @@ import { Inject } from 'services/core/injector';
 import { Fallback, Singleton } from 'services/api/external-api';
 import { Observable } from 'rxjs';
 import { Expensive } from 'services/api/external-api-limits';
-import { createProgram } from '../../../../util/webgl/utils';
 
 /**
  * Representation of a scene collection.

@@ -1,5 +1,5 @@
 import { ViewHandler } from '../core';
-import { IGoLiveSettings, IStreamingServiceState, IStreamSettings } from './streaming-api';
+import { IGoLiveSettings, IStreamSettings } from './streaming-api';
 import { StreamSettingsService } from '../settings/streaming';
 import { UserService } from '../user';
 import { RestreamService } from '../restream';
@@ -8,11 +8,6 @@ import { IncrementalRolloutService, TwitterService } from '../../app-services';
 import cloneDeep from 'lodash/cloneDeep';
 import difference from 'lodash/difference';
 import { Services } from '../../components-react/service-provider';
-
-
-export type TModificators = { isUpdateMode?: boolean; isScheduleMode?: boolean };
-export type IGoLiveSettingsState = IGoLiveSettings & TModificators & { needPrepopulate: boolean };
-
 
 /**
  * The stream info view is responsible for keeping
@@ -361,5 +356,13 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
       useCustomFields,
       enabled: enabled || this.checkPrimaryPlatform(platform),
     };
+  }
+
+  get delayEnabled() {
+    return this.streamSettingsView.settings.delayEnable;
+  }
+
+  get delaySeconds() {
+    return this.streamSettingsView.settings.delaySec;
   }
 }

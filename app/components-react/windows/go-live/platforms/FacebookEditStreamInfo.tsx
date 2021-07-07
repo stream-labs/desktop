@@ -1,11 +1,10 @@
 import electron from 'electron';
 import css from './FacebookEditStreamInfo.m.less';
-import { useGoLiveSettings } from '../useGoLiveSettings';
 import { CommonPlatformFields } from '../CommonPlatformFields';
 import React from 'react';
 import { Services } from '../../../service-provider';
 import Form from '../../../shared/inputs/Form';
-import { useOnCreate, useFormState, useVuex } from '../../../hooks';
+import { useOnCreate, useFormState } from '../../../hooks';
 import { EDismissable } from '../../../../services/dismissables';
 import { $t } from '../../../../services/i18n';
 import { createBinding, ListInput } from '../../../shared/inputs';
@@ -21,7 +20,7 @@ import Translate from '../../../shared/Translate';
 import { IListOption } from '../../../shared/inputs/ListInput';
 import MessageLayout from '../MessageLayout';
 import PlatformSettingsLayout, { IPlatformComponentParams } from './PlatformSettingsLayout';
-import { TwitchTagsInput } from './TwitchTagsInput';
+import { useSelector } from '../../../store';
 
 export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'facebook'>) {
   const fbSettings = p.value;
@@ -37,14 +36,6 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
     WindowsService,
   } = Services;
 
-  // const {
-  //   useSelector,
-  //   updatePlatform,
-  //   isUpdateMode,
-  //   useBinding,
-  //   renderPlatformSettings,
-  // } = useGoLiveSettings();
-
   const {
     pages,
     groups,
@@ -53,7 +44,7 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
     isPrimary,
     shouldShowGamingWarning,
     shouldShowPermissionWarn,
-  } = useVuex(() => {
+  } = useSelector(() => {
     const fbState = FacebookService.state;
     const hasPages = !!fbState.facebookPages.length;
     const canStreamToTimeline = fbState.grantedPermissions.includes('publish_video');
