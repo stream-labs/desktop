@@ -537,6 +537,10 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     this.DISMISS_TUTORIAL();
   }
 
+  fileExists(file: string) {
+    return fs.existsSync(file);
+  }
+
   async loadClips() {
     await this.ensureScrubDirectory();
 
