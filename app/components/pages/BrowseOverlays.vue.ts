@@ -94,11 +94,16 @@ export default class BrowseOverlays extends Vue {
       });
     } else {
       this.downloadInProgress = true;
-      const sub = this.sceneCollectionsService.downloadProgress.subscribe(progressCallback);
-      await this.sceneCollectionsService.installOverlay(url, name);
-      sub.unsubscribe();
-      this.downloadInProgress = false;
-      this.navigationService.navigate('Studio');
+      try {
+        const sub = this.sceneCollectionsService.downloadProgress.subscribe(progressCallback);
+        await this.sceneCollectionsService.installOverlay(url, name);
+        sub.unsubscribe();
+        this.downloadInProgress = false;
+        this.navigationService.navigate('Studio');
+      } catch (e: unknown) {
+        this.downloadInProgress = false;
+        throw e;
+      }
     }
   }
 
