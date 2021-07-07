@@ -19,7 +19,7 @@ import { throwStreamError } from 'services/streaming/stream-error';
 import { BasePlatformService } from './base-platform';
 import electron from 'electron';
 import { WindowsService } from '../windows';
-import {assertIsDefined, getDefined} from '../../util/properties-type-guards';
+import { assertIsDefined, getDefined } from '../../util/properties-type-guards';
 
 interface IFacebookPage {
   access_token: string;

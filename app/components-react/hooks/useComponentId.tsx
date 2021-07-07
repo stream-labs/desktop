@@ -20,7 +20,7 @@ export function useComponentId() {
 function getComponentName(): string {
   try {
     throw new Error();
-  } catch (e) {
+  } catch (e: unknown) {
     return e.stack.split('\n')[10].split('at ')[1].split('(')[0].trim();
   }
 }

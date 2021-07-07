@@ -41,7 +41,7 @@ import { createStreamError, IStreamError, StreamError, TStreamErrorType } from '
 import { authorizedHeaders } from 'util/requests';
 import { HostsService } from '../hosts';
 import { TwitterService } from '../integrations/twitter';
-import {assertIsDefined, getDefined} from 'util/properties-type-guards';
+import { assertIsDefined, getDefined } from 'util/properties-type-guards';
 import { StreamInfoView } from './streaming-view';
 import { GrowService } from 'services/grow/grow';
 

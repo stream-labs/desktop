@@ -3,7 +3,7 @@ import { BasePlatformService } from './base-platform';
 import { IPlatformCapabilityResolutionPreset, IPlatformState, TPlatformCapability } from './index';
 import { IGoLiveSettings } from '../streaming';
 import { WidgetType } from '../widgets';
-import {getDefined} from "../../util/properties-type-guards";
+import { getDefined } from '../../util/properties-type-guards';
 
 export interface ITiktokStartStreamOptions {
   serverUrl: string;
