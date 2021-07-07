@@ -5,6 +5,11 @@ import isPlainObject from 'lodash/isPlainObject';
 import { useOnCreate } from '../hooks';
 import { useEffect, useRef } from 'react';
 
+/*
+ * This file provides Redux integration in a modular way
+ */
+
+
 /**
  * Creates reducer manager that allows using dynamic reducers
  * Code example from https://redux.js.org/recipes/code-splitting#using-a-reducer-manager
