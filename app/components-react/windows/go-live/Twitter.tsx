@@ -4,36 +4,45 @@ import { Services } from '../../service-provider';
 import cx from 'classnames';
 import { $t } from '../../../services/i18n';
 import css from './Twitter.m.less';
-import { SwitchInput, TextAreaInput, TextInput } from '../../shared/inputs';
+import { SwitchInput, TextAreaInput, CheckboxInput } from '../../shared/inputs';
 import { Row, Col, Button } from 'antd';
 import { useGoLiveSettings } from './useGoLiveSettings';
 import { useVuex } from '../../hooks';
 
 export default function TwitterInput() {
-  const { TwitterService } = Services;
+  const { TwitterService, UserService } = Services;
   const { tweetText, updateSettings, getTweetText, streamTitle } = useGoLiveSettings(view => ({
     streamTitle: view.commonFields.title,
   }));
 
-  const { tweetWhenGoingLive, linked, screenName } = useVuex(() => {
-    const state = TwitterService.state;
-    return {
-      tweetWhenGoingLive: state.tweetWhenGoingLive,
-      linked: state.linked,
-      screenName: state.screenName,
-    };
-  });
+  const { tweetWhenGoingLive, linked, screenName, useStreamlabsUrl, platform, url } = useVuex(
+    () => {
+      const state = TwitterService.state;
+      return {
+        tweetWhenGoingLive: state.tweetWhenGoingLive,
+        useStreamlabsUrl: state.creatorSiteOnboardingComplete,
+        linked: state.linked,
+        screenName: state.screenName,
+        platform: UserService.views.platform?.type,
+        url: TwitterService.views.url,
+      };
+    },
+  );
 
   useEffect(() => {
     console.log('update tweet text');
     const tweetText = getTweetText(streamTitle);
     updateSettings({ tweetText });
-  }, [streamTitle]);
+  }, [streamTitle, url]);
 
   function unlink() {
     TwitterService.actions.return
       .unlinkTwitter()
       .then(() => TwitterService.actions.getTwitterStatus());
+  }
+
+  function setUseStreamlabsUrl(value: boolean) {
+    TwitterService.actions.setStreamlabsUrl(value);
   }
 
   function renderLinkedView() {
@@ -65,6 +74,13 @@ export default function TwitterInput() {
           rows={5}
           disabled={!tweetWhenGoingLive}
         />
+        {platform === 'twitch' && (
+          <CheckboxInput
+            value={useStreamlabsUrl}
+            onInput={setUseStreamlabsUrl}
+            label={$t('Use Streamlabs URL')}
+          />
+        )}
         <div style={{ marginTop: '30px', textAlign: 'right' }}>
           <Button onClick={unlink}>{$t('Unlink Twitter')}</Button>
         </div>
