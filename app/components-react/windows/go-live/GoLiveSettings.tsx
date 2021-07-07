@@ -23,7 +23,6 @@ const PlusIcon = PlusOutlined as Function;
  * - Extras settings
  **/
 export default function GoLiveSettings() {
-  console.log('re-render settings');
   const { RestreamService, SettingsService, UserService, MagicLinkService } = Services;
 
   const {
@@ -39,14 +38,6 @@ export default function GoLiveSettings() {
       canAddDestinations: linkedPlatforms.length + customDestinations.length < 5,
     };
   });
-
-  // const { canAddDestinations } = useSelector(() => {
-  //   const linkedPlatforms = controller.linkedPlatforms;
-  //   const customDestinations = controller.customDestinations;
-  //   return {
-  //     canAddDestinations: linkedPlatforms.length + customDestinations.length < 5,
-  //   };
-  // });
 
   const shouldShowSettings = !error && !isLoading;
   const shouldShowPrimeLabel = !RestreamService.state.grandfathered;

@@ -1,10 +1,9 @@
 import React from 'react';
 import { TPlatform } from '../../../../services/platforms';
-import { IGoLiveSettings } from '../../../../services/streaming';
-import {ITwitchStartStreamOptions} from "../../../../services/platforms/twitch";
-import {IYoutubeStartStreamOptions} from "../../../../services/platforms/youtube";
-import {IFacebookStartStreamOptions} from "../../../../services/platforms/facebook";
-import {ITiktokStartStreamOptions} from "../../../../services/platforms/tiktok";
+import { ITwitchStartStreamOptions } from '../../../../services/platforms/twitch';
+import { IYoutubeStartStreamOptions } from '../../../../services/platforms/youtube';
+import { IFacebookStartStreamOptions } from '../../../../services/platforms/facebook';
+import { ITiktokStartStreamOptions } from '../../../../services/platforms/tiktok';
 
 export type TLayoutMode = 'singlePlatform' | 'multiplatformAdvanced' | 'multiplatformSimple';
 

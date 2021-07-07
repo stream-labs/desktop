@@ -36,30 +36,6 @@ type TCustomFieldName = 'title' | 'description';
 export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
   const defaultProps = { layoutMode: 'singlePlatform' as TLayoutMode };
   const p: IProps = { ...defaultProps, ...rawProps };
-  // const {
-  //   updatePlatform,
-  //   isAdvancedMode,
-  //   getPlatformSettings,
-  //   commonFields,
-  //   updateCommonFields,
-  //   toggleCustomFields,
-  //   isMultiplatformMode,
-  //   supports,
-  //   descriptionIsRequired,
-  //   shouldShowPropsForSinglePlatform,
-  //   platformSettings,
-  // } = useGoLiveSettings().selectExtra(module => {
-  //   // description is required for Facebook
-  //   const fbSettings = module.platforms.facebook;
-  //   const descriptionIsRequired =
-  //     p.platform === 'facebook' ||
-  //     (!p.platform && fbSettings && fbSettings.enabled && !fbSettings.useCustomFields);
-  //   const shouldShowPropsForSinglePlatform = !!p.platform;
-  //   const platformSettings = shouldShowPropsForSinglePlatform
-  //     ? module.getPlatformSettings(p.platform!)
-  //     : null;
-  //   return { descriptionIsRequired, shouldShowPropsForSinglePlatform, platformSettings };
-  // });
 
   function updatePlatform(patch: Partial<ICommonPlatformSettings>) {
     const platformSettings = p.value;
@@ -81,8 +57,6 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
 
   const view = Services.StreamingService.views;
   const hasCustomCheckbox = p.layoutMode === 'multiplatformAdvanced';
-
-  //   shouldShowPropsForSinglePlatform && isAdvancedMode && isMultiplatformMode;
   const fieldsAreVisible = !hasCustomCheckbox || p.value.useCustomFields;
   const descriptionIsRequired =
     typeof p.descriptionIsRequired === 'boolean'

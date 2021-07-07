@@ -1,53 +1,65 @@
-import { useEffect, useRef } from 'react';
-import { StatefulService } from '../../services';
-import { createBinding, TBindings } from '../shared/inputs';
-import { assertIsDefined } from '../../util/properties-type-guards';
+import { useRef } from 'react';
 import { useOnCreate, useOnDestroy } from '../hooks';
-import { IStatefulModule, getModuleManager, useSelector, createDependencyWatcher } from '../store';
-import isPlainObject from 'lodash/isPlainObject';
+import { IReduxModule, getModuleManager, useSelector, createDependencyWatcher } from '../store';
 import { useComponentId } from './useComponentId';
-import { lockThis, merge, TMerge } from '../../util/merge';
+import { merge } from '../../util/merge';
+import { lockThis } from '../../util/lockThis';
 
+/**
+ * A hook for using ReduxModules in components
+ *
+ * @example 1
+ * // get module instance in the component
+ * const myModule = useModule(MyModule)
+ *
+ * // use Redux to select reactive props from the module
+ * const { foo } = useSelector(() => ({ foo: myModule.foo }))
+ *
+ * @example 2
+ * // same as example 1 but with one-liner syntax
+ * const { foo } = useModule(MyModule).select()
+ *
+ * @example 3
+ * // same as example 2 but with a computed prop
+ * const { foo, fooBar } = useModule(MyModule)
+ *  .selectExtra(module => { fooBar: myModule.foo + module.bar  }))
+ */
 export function useModule<
   TInitParams,
   TState,
-  TControllerClass extends new (...args: any[]) => IStatefulModule<TInitParams, TState>,
-  TBindingState,
-  TBindingExtraProps,
-  TReturnType extends InstanceType<TControllerClass> & {
-    select: () => InstanceType<TControllerClass> &
-      InstanceType<TControllerClass>['state'] & { module: InstanceType<TControllerClass> }; // SelectCreator<InstanceType<TControllerClass>>['select'] & TState; // () => InstanceType<TControllerClass>;
+  TModuleClass extends new (...args: any[]) => IReduxModule<TInitParams, TState>,
+  TReturnType extends InstanceType<TModuleClass> & {
+    select: () => InstanceType<TModuleClass> &
+      InstanceType<TModuleClass>['state'] & { module: InstanceType<TModuleClass> };
 
     selectExtra: <TComputedProps>(
-      fn: (module: InstanceType<TControllerClass>) => TComputedProps,
-    ) => InstanceType<TControllerClass> &
-      TComputedProps & { module: InstanceType<TControllerClass> };
-
-    // SelectCreator<InstanceType<TControllerClass>>['select'];
-    // select:
-    //   | (() => InstanceType<TControllerClass>)
-    //   | (<TComputedProps>(
-    //       fn: (module: InstanceType<TControllerClass>) => TComputedProps,
-    //     ) => InstanceType<TControllerClass> & TComputedProps);
-
-    // useBinding: BindingCreator<InstanceType<TControllerClass>>['createBinding'];
+      fn: (module: InstanceType<TModuleClass>) => TComputedProps,
+    ) => InstanceType<TModuleClass> & TComputedProps & { module: InstanceType<TModuleClass> };
   }
->(ModuleClass: TControllerClass, initParams?: TInitParams): TReturnType {
+>(ModuleClass: TModuleClass, initParams?: TInitParams): TReturnType {
   const computedPropsFnRef = useRef<null | Function>(null);
   const computedPropsRef = useRef<any>({});
   const dependencyWatcherRef = useRef<any>(null);
   const moduleName = ModuleClass.name;
   const componentId = useComponentId();
 
+  // register the component in the ModuleManager on component create
   const { module, select, selector } = useOnCreate(() => {
+    // get existing module's instance or create a new one
     const moduleManager = getModuleManager();
     let module = moduleManager.getModule(moduleName);
     if (!module) {
       module = moduleManager.registerModule(new ModuleClass(), initParams);
     }
+    // register the component in the module
     moduleManager.registerComponent(moduleName, componentId);
+
+    // lockedModule is a copy of the module where all methods have a persistent `this`
+    // like if we called `module.methodName = module.methodName.bind(this)` for each method
     const lockedModule = lockThis(module);
 
+    // calculate computed props that was passed via `.selectExtra()` call
+    // and save them in `computedPropsRef`
     function calculateComputedProps() {
       const compute = computedPropsFnRef.current;
       if (!compute) return;
@@ -56,15 +68,23 @@ export function useModule<
       return computedPropsRef.current;
     }
 
+    // Create a public `.select()` method that allows to select reactive state for the component
     function select<TComputedProps>(
-      fn?: (module: InstanceType<TControllerClass>) => TComputedProps,
-    ): InstanceType<TControllerClass> & TComputedProps {
+      fn?: (module: InstanceType<TModuleClass>) => TComputedProps,
+    ): InstanceType<TModuleClass> & TComputedProps {
+      // create DependencyWatcher as a source of state to select from
       if (!dependencyWatcherRef.current) {
         if (fn) computedPropsFnRef.current = fn;
+        // we have several sources of data to select from
+        // use `merge` function to join them into a single object
         const mergedModule = merge(
+          // allow to select getters and actions from the module
           () => lockedModule,
+          // allow to select variables from the module's state
           () => module.state,
+          // allow to select computed props
           () => computedPropsRef.current,
+          // allow to select the whole module itself
           () => ({ module }),
         );
         dependencyWatcherRef.current = createDependencyWatcher(mergedModule);
@@ -72,8 +92,12 @@ export function useModule<
       return dependencyWatcherRef.current.watcherProxy;
     }
 
+    // Create a Redux selector.
+    // Redux calls this method every time when component's dependencies have been changed
     function selector() {
+      // recalculate computed props
       calculateComputedProps();
+      // select component's dependencies
       return dependencyWatcherRef.current?.getDependentValues();
     }
 
@@ -84,105 +108,21 @@ export function useModule<
     };
   });
 
+  // unregister the component from the module onDestroy
   useOnDestroy(() => {
     getModuleManager().unRegisterComponent(moduleName, componentId);
   });
 
+  // call Redux selector to make selected props reactive
   useSelector(selector);
 
+  // return Module with extra `select` method
+  // TODO: `.selectExtra()` is the same method as `.select()`
+  //  and it added here only because of typing issues related to multiple tsconfings in the project.
+  //  We should use only the `.select` after resolving typing issues
   const mergeResult = merge(
     () => module,
     () => ({ select, selectExtra: select }),
   );
   return (mergeResult as unknown) as TReturnType;
-}
-
-export type TUseBinding<TView extends Object, TState extends Object, TExtraProps = {}> = (
-  stateGetter: (view: TView) => TState,
-  stateSetter: (patch: TState) => unknown,
-) => TBindings<TState, keyof TState, TExtraProps>;
-
-class BindingCreator<TView> {
-  createBinding<TState extends Object, TExtraProps extends Object = {}>(
-    getter: (view: TView) => TState,
-    setter: (newState: TState) => unknown,
-    extraPropsGenerator?: (fieldName: keyof TState) => TExtraProps,
-  ) {
-    let view: TView;
-
-    return createBinding(() => getter(view), setter, extraPropsGenerator);
-  }
-}
-
-class SelectCreator<TModule> {
-  select(): TModule;
-  select<TComputedFn extends (module: TModule) => any, TComputedProps = ReturnType<TComputedFn>>(
-    fn: TComputedFn,
-  ): TModule & TComputedProps;
-  select(...args: any[]): any {
-    let module!: TModule;
-    return {} as any;
-  }
-}
-// type fooType = {
-//   foo: string;
-// };
-//
-// let select!: SelectCreator<fooType>['select'];
-//
-// const foo = select();
-// foo.foo;
-//
-// const fooBar = select(foo => ({ bar: 1 }));
-// fooBar.bar;
-
-// function select<
-//   TModule,
-//   TComputedPropsCb,
-//   TComputedProps = TComputedPropsCb extends Function ? ReturnType<TComputedPropsCb> : {}
-//
-//   // TComputedPropsCb, // = ((module: TModule) => any) | null, // function for calculating the computed props
-//   // TComputedProps = TComputedPropsCb extends (...args: [TModule]) => infer R ? R : {} // computed props type
-// >(fn: TComputedPropsCb): TModule & TComputedProps {
-//   return ({} as unknown) as TModule & TComputedProps;
-// }
-
-// function select<TModule, TComputedProps>(
-//   cb: (module: TModule) => TComputedProps,
-// ): TModule & TComputedProps {
-//   return ({} as unknown) as TModule & TComputedProps;
-// }
-
-// function select<TModule>(cb?: (module: TModule) => any) {
-//   let module!: TModule;
-//   return Object.assign(cb() || {}, module);
-// }
-
-// function select<TModule, TComputed>(module: TModule): TModule;
-// function select<TModule, TComputed>(
-//   module: TModule,
-//   selector: (module: TModule) => TComputed,
-// ): TModule & TComputed {
-//   return Object.assign(selector(), module);
-// }
-//
-// // const st: typeof select;
-//
-// type fooType = {
-//   foo: string;
-// };
-//
-// // const fooObj = select<fooType>();
-// const fooAndBarObj = select({ foo: 'foo' }, module => ({ bar: 1 }));
-// fooAndBarObj.bar;
-/**
- * Returns a new object without function props
- * @param obj
- */
-function removeFunctions(obj: Record<string, any>): Record<string, any> {
-  const result = {};
-  Object.keys(obj).forEach(key => {
-    if (typeof obj[key] !== 'function') result[key] = obj[key];
-  });
-  return result;
 }

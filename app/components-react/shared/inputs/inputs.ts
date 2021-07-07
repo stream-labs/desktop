@@ -10,8 +10,6 @@ import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import { $t } from '../../../services/i18n';
 import pick from 'lodash/pick';
 import isEqual from 'lodash/isEqual';
-import * as InputComponents from './index';
-import { camelize, pascalize } from 'humps';
 
 type TInputType =
   | 'text'
@@ -22,9 +20,7 @@ type TInputType =
   | 'tags'
   | 'switch'
   | 'slider'
-  | 'image'
-  | 'date'
-  | 'time';
+  | 'image';
 
 export type TInputLayout = 'horizontal' | 'vertical' | 'inline';
 
@@ -123,7 +119,7 @@ export function useInput<
 
   const inputId = useOnCreate(() => {
     // generate an unique id
-    const id = `${type}-${name}-${uuid()}`;
+    const id = `${name}-${uuid()}`;
     return id;
   });
 
@@ -149,16 +145,7 @@ export function useInput<
 
     // if the input is inside the form
     // then we need to setup it's value via Form API
-    if (form && value !== emptyVal) {
-      // get the component class
-      const Component = getInputComponentByType(type);
-      // antd components may have another format than SLOBS wrapper components
-      // for example TimerInput requires dates to be in the Moment format
-      // meanwhile SLOBS services works with timestamps only
-      // call `Component.getAntdValue()` to make a conversion for this case
-      const newVal = Component.getAntdValue ? Component.getAntdValue(value) : value;
-      form.setFieldsValue({ [inputId]: newVal });
-    }
+    if (form && value !== emptyVal) form.setFieldsValue({ [inputId]: value });
   }, [value]);
 
   const forceUpdate = useForceUpdate();
@@ -325,6 +312,10 @@ export function useTextInput<
  *   </form>
  *  }
  * </pre>
+ *
+ * @param stateGetter an object or function to read the field value from
+ * @param stateSetter a function that changes the field given field
+ * @param extraPropsGenerator a function that returns extra attributes for the input element (like disabled, placeholder,...)
  */
 export function createBinding<
   TState extends object,
@@ -346,9 +337,6 @@ export function createBinding<
     _binding: {
       id: `binding__${uuid()}`,
       dependencies: {} as Record<string, unknown>,
-      clone() {
-        return createBinding(stateGetter, stateSetter);
-      },
     },
   };
 
@@ -356,6 +344,8 @@ export function createBinding<
     get(t, fieldName: string) {
       if (fieldName in metadata) return metadata[fieldName];
       const fieldValue = getState()[fieldName];
+      // register the fieldName in the dependencies list
+      // that helps keep this binding up to date when use it inside ReduxModules
       metadata._binding.dependencies[fieldName] = fieldValue;
       const extraProps = extraPropsGenerator ? extraPropsGenerator(fieldName as keyof TState) : {};
       return {
@@ -363,6 +353,7 @@ export function createBinding<
         value: fieldValue,
         onChange(newVal: unknown) {
           const state = getState();
+          // if the state object has a defined setter than use the local setter
           if (Object.getOwnPropertyDescriptor(state, fieldName)?.set) {
             state[fieldName] = newVal;
           } else {
@@ -429,11 +420,4 @@ export function InputComponent<T extends Function>(f: T): T {
     }
     return true;
   }) as any) as T;
-}
-
-export function getInputComponentByType(
-  type: TInputType,
-): JSX.Element & { getAntdValue?: (value: unknown) => unknown } {
-  const componentName = pascalize(`${type}Input`);
-  return InputComponents[componentName];
 }
