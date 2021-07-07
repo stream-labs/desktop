@@ -2,13 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Tooltip } from 'antd';
 import moment from 'moment';
 import cx from 'classnames';
-import { useVuex } from '../hooks';
+import { useVuex, useRenderInterval } from '../hooks';
 import cloneDeep from 'lodash/cloneDeep';
 import { Services } from '../service-provider';
 import { ENotificationType, INotification, ENotificationSubType } from 'services/notifications';
 import { $t } from 'services/i18n';
 import styles from './NotificationsArea.m.less';
-const notificationAudio = require('../../media/sound/ding.wav');
+const notificationAudio = require('../../../media/sound/ding.wav');
 
 interface IUiNotification extends INotification {
   outdated?: boolean;
@@ -32,18 +32,18 @@ export default function NotificationsArea() {
     settings: NotificationsService.state.settings,
   }));
 
-  const notificationsContainer = useRef(null);
+  const notificationsContainer = useRef<HTMLDivElement>(null);
 
   const notifyAudio = useRef(new Audio(notificationAudio));
 
   const showNotificationsTooltip = $t('Click to open your Notifications window');
   const showUnreadNotificationsTooltip = $t('Click to read your unread Notifications');
 
-  // useInterval(checkQueue, 5000);
-  // useInterval(() => {
-  //   if (!notificationsContainer.current) return;
-  //   setShowExtendedNotifications(notificationsContainer?.current?.offsetWidth >= 150);
-  // }, 1000);
+  useRenderInterval(checkQueue, 5000);
+  useRenderInterval(() => {
+    if (!notificationsContainer.current) return;
+    setShowExtendedNotifications(notificationsContainer.current?.offsetWidth >= 150);
+  }, 1000);
 
   useEffect(() => {
     if (notificationQueue) {

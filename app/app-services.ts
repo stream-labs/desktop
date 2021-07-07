@@ -139,7 +139,6 @@ import { NotificationsService } from './services/notifications';
 import { MediaBackupService } from './services/media-backup';
 import { HotkeysService } from './services/hotkeys';
 import { WidgetsService } from './services/widgets';
-import { NotificationsService } from './services/notifications';
 
 export const AppServices = {
   WindowsService,
@@ -173,5 +172,4 @@ export const AppServices = {
   MediaBackupService,
   HotkeysService,
   WidgetsService,
-  NotificationsService,
 };
