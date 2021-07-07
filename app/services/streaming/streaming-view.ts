@@ -4,11 +4,11 @@ import { StreamSettingsService } from '../settings/streaming';
 import { UserService } from '../user';
 import { RestreamService } from '../restream';
 import { getPlatformService, TPlatform, TPlatformCapability } from '../platforms';
-import { IncrementalRolloutService, TwitterService } from '../../app-services';
+import { TwitterService } from '../../app-services';
 import cloneDeep from 'lodash/cloneDeep';
 import difference from 'lodash/difference';
 import { Services } from '../../components-react/service-provider';
-import {getDefined} from "../../util/properties-type-guards";
+import { getDefined } from '../../util/properties-type-guards';
 
 /**
  * The stream info view is responsible for keeping
@@ -37,12 +37,12 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     return this.getServiceViews(TwitterService);
   }
 
-  private get incrementalRolloutView() {
-    return this.getServiceViews(IncrementalRolloutService);
-  }
-
   private get streamingState() {
     return Services.StreamingService.state;
+  }
+
+  get streamingStatus() {
+    return this.streamingState.streamingStatus;
   }
 
   get info() {
