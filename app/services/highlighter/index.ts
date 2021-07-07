@@ -836,6 +836,8 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   // We throttle because this can go extremely fast, especially on previews
   @throttle(100)
   private setCurrentFrame(frame: number) {
+    // Avoid a race condition where we reset the exported flag
+    if (this.views.exportInfo.exported) return;
     this.SET_EXPORT_INFO({ currentFrame: frame });
   }
 
