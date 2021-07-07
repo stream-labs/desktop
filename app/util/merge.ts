@@ -1,6 +1,6 @@
 /**
- * Merges multiple source of data into a single Proxy object
- * The result object is read-only
+ * Merges multiple sources of data into a single Proxy object
+ * The result: object is read-only
  *
  * @example
  *
@@ -31,7 +31,7 @@ export function merge<
 }
 
 /**
- * This function is using by the `.merge()` function to merge 2 sources of data
+ * This function is used by the `.merge()` function to merge 2 sources of data
  */
 function mergeTwo<T1 extends Object, T2 extends Object, TReturnType = TMerge<T1, T2>>(
   target1: (() => T1) | T1,
