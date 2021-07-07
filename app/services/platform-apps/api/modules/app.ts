@@ -29,12 +29,12 @@ export class AppModule extends Module {
     super();
     this.navigationService.navigated.subscribe(nav => {
       if (nav.currentPage === 'PlatformAppMainPage') {
-        if (this.callbacks[nav.params.appId]) {
+        if (this.callbacks[nav.params.appId as string]) {
           const data: INavigation = {};
 
-          if (nav.params.sourceId) data.sourceId = nav.params.sourceId;
+          if (nav.params.sourceId) data.sourceId = nav.params.sourceId as string;
 
-          this.callbacks[nav.params.appId](data);
+          this.callbacks[nav.params.appId as string](data);
         }
       }
     });

@@ -99,6 +99,7 @@ export default function ClipPreview(props: {
           padding: '2px 8px 0',
           borderRadius: '5px',
           background: 'rgba(0,0,0,0.5)',
+          color: 'var(--highlighter-icon)',
         }}
       >
         {/* TODO: Let's not use the same icon as studio mode */}
@@ -121,6 +122,7 @@ export default function ClipPreview(props: {
           width: '100%',
           padding: '0 10px',
           borderRadius: '0 0 10px 10px',
+          color: 'var(--highlighter-icon)',
         }}
       >
         {`${props.clip.deleted ? '[DELETED] ' : ''}${filename}`}
