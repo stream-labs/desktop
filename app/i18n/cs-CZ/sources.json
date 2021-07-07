@@ -44,7 +44,6 @@
   "Follower Goal": "Cíl pro sledující",
   "Twitch Follows": "Sledování na Twitchi",
   "YouTube Follows": "Sledování na YouTube",
-  "Mixer Follows": "Sledování na Mixeru",
   "Bit Goal": "Cílové bity",
   "Twitch Bits": "Bity na Twitchi",
   "Subscription Goal": "Cíl předplatného",
@@ -145,7 +144,6 @@
   "Cloud Backup: All media and sources are backed up in the cloud": "Zálohování v cloudu: všechna média a zdroje jsou zálohovány v cloudu.",
   "Cloud Backup: Your media and sources are being synced with the cloud": "Zálohování v cloudu: vaše média a zdroje jsou synchronizovány v cloudu.",
   "The streamer manually adds images of sponsors.": "Streamer přidává obrázky sponzorů ručně.",
-  "Mixer chat": "Chat Mixeru",
   "Edit Transform": "Upravit transformaci",
   "There are no existing sources of this type.": "Nenalezeny žádné zdroje tohoto typu.",
   "Instant Replay": "Okamžité spuštění záznamu",
@@ -185,5 +183,8 @@
   "JACK Input Client": "JACK – vstupní klient",
   "Motion": "Motion",
   "Twitch Soundtrack": "Twitch Soundtrack",
-  "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.": "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs."
+  "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.": "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.",
+  "Custom Icon": "Custom Icon",
+  "Displays an icon from one of many selections": "Displays an icon from one of many selections",
+  "An error has occured, please try re-opening this window": "An error has occured, please try re-opening this window"
 }

@@ -2,15 +2,16 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from '../services/core/injector';
 import { StreamingService, EReplayBufferState, EStreamingState } from '../services/streaming';
-import StartStreamingButton from './StartStreamingButton.vue';
-import TestWidgets from './TestWidgets.vue';
-import { PerformanceMetrics } from 'components/shared/ReactComponent';
+import {
+  PerformanceMetrics,
+  StartStreamingButton,
+  TestWidgets,
+} from 'components/shared/ReactComponent';
 import NotificationsArea from './NotificationsArea.vue';
 import { UserService } from '../services/user';
 import { getPlatformService } from 'services/platforms';
 import { YoutubeService } from 'services/platforms/youtube';
 import { PerformanceService, EStreamQuality } from 'services/performance';
-import electron from 'electron';
 import { CustomizationService } from 'services/customization';
 import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';

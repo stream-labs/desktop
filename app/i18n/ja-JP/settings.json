@@ -25,6 +25,7 @@
   "Configure Default Devices": "デフォルト デバイスを構成",
   "OBS Import": "OBS インポート",
   "Confirm stream title and game before going live": "ライブ配信を開始する前に、ストリーム タイトルとゲームを確認",
+  "Enable reporting additional information on a crash (requires restart)": "Enable reporting additional information on a crash (requires restart)",
   "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "警告！すべてのシーン、ソース、および設定が失われます。これは取り消すことはできません！",
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "キャッシュディレクトリが正常にアップロードされました。ファイル名 %{file} がクリップボードにコピーされました。",
   "Stream Labels session has been successfully restarted!": "Stream Labels session has been successfully restarted!",
@@ -138,5 +139,6 @@
   "Virtual Webcam allows you to display your scenes from Streamlabs OBS in video conferencing software. Streamlabs OBS will appear as a Webcam that can be selected in most video conferencing apps.": "Virtual Webcam allows you to display your scenes from Streamlabs OBS in video conferencing software. Streamlabs OBS will appear as a Webcam that can be selected in most video conferencing apps.",
   "Uninstalling Virtual Webcam will remove it as a device option in other applications.": "Uninstalling Virtual Webcam will remove it as a device option in other applications.",
   "Uninstall Virtual Webcam": "Uninstall Virtual Webcam",
-  "Use custom resolution": "Use custom resolution"
+  "Use custom resolution": "Use custom resolution",
+  "Enable Designer Mode": "Enable Designer Mode"
 }
