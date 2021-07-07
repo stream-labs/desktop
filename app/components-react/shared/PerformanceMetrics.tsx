@@ -65,7 +65,7 @@ export default function PerformanceMetrics(props: { mode: TPerformanceMetricsMod
   }
 
   return (
-    <div className={cx(styles.performanceMetrics, 'flex flex--center')}>
+    <div className={cx(styles.performanceMetrics, 'performance-metrics', 'flex flex--center')}>
       {shownCells.map(attribute => {
         const data = metadata[attribute];
         return (

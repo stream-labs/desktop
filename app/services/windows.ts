@@ -23,6 +23,7 @@ import {
   EditStreamWindow,
   IconLibraryProperties,
   PerformanceMetrics,
+  AdvancedStatistics,
 } from 'components/shared/ReactComponent';
 
 import GoLiveWindowDeprecated from 'components/windows/go-live/GoLiveWindow';
@@ -42,7 +43,6 @@ import MediaGallery from 'components/windows/MediaGallery.vue';
 import PlatformAppPopOut from 'components/windows/PlatformAppPopOut.vue';
 import EditTransform from 'components/windows/EditTransform';
 import EventFilterMenu from 'components/windows/EventFilterMenu';
-import AdvancedStatistics from 'components/windows/AdvancedStatistics';
 import OverlayWindow from 'components/windows/OverlayWindow.vue';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
