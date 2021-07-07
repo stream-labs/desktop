@@ -31,7 +31,7 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
   const [description, setDescription] = useState('');
   const [privacy, setPrivacy] = useState('private');
   const [urlCopied, setUrlCopied] = useState(false);
-  const { UserService, HighlighterService } = Services;
+  const { UserService, HighlighterService, NavigationService } = Services;
   const v = useVuex(() => ({
     youtubeLinked: !!UserService.state.auth?.platforms.youtube,
     uploadInfo: HighlighterService.views.uploadInfo,
@@ -80,7 +80,19 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
           )}
           {!v.youtubeLinked && (
             <div style={{ flexGrow: 1 }}>
-              Please connect your YouTube account to upload your video to YouTube.
+              <div>Please connect your YouTube account to upload your video to YouTube.</div>
+              <button
+                style={{ marginTop: 8 }}
+                className="button button--youtube"
+                onClick={() =>
+                  NavigationService.actions.navigate('PlatformMerge', {
+                    platform: 'youtube',
+                    highlighter: true,
+                  })
+                }
+              >
+                Connect
+              </button>
             </div>
           )}
           <div

@@ -16,7 +16,7 @@ export const CLIP_DIR = path.resolve('C:/', 'Users', 'acree', 'Videos');
  * Enable to use predefined clips instead of pulling from
  * the replay buffer.
  */
-export const TEST_MODE = true;
+export const TEST_MODE = false;
 
 export const SCRUB_WIDTH = 320;
 export const SCRUB_HEIGHT = 180;
