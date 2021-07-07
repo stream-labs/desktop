@@ -48,7 +48,7 @@ export default function StartStreamingButton(p: { disabled?: boolean }) {
     if (StreamingService.isStreaming) {
       StreamingService.toggleStreaming();
     } else {
-      if (MediaBackupService.globalSyncStatus === EGlobalSyncStatus.Syncing) {
+      if (MediaBackupService.views.globalSyncStatus === EGlobalSyncStatus.Syncing) {
         const goLive = await electron.remote.dialog
           .showMessageBox(electron.remote.getCurrentWindow(), {
             title: $t('Cloud Backup'),

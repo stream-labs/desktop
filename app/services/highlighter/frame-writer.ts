@@ -1,16 +1,15 @@
 import execa from 'execa';
-import { FFMPEG_EXE, FPS, HEIGHT, PREVIEW_HEIGHT, PREVIEW_WIDTH, WIDTH } from './constants';
+import { IExportOptions } from '.';
+import { FADE_OUT_DURATION, FFMPEG_EXE } from './constants';
 import { FrameWriteError } from './errors';
 
 export class FrameWriter {
   constructor(
     public readonly outputPath: string,
     public readonly audioInput: string,
-    public readonly preview: boolean,
+    public readonly duration: number,
+    public readonly options: IExportOptions,
   ) {}
-
-  readonly width = this.preview ? PREVIEW_WIDTH : WIDTH;
-  readonly height = this.preview ? PREVIEW_HEIGHT : HEIGHT;
 
   private ffmpeg: execa.ExecaChildProcess<Buffer | string>;
 
@@ -23,8 +22,8 @@ export class FrameWriter {
       '-f', 'rawvideo',
       '-vcodec', 'rawvideo',
       '-pix_fmt', 'rgba',
-      '-s', `${this.width}x${this.height}`,
-      '-r', `${FPS}`,
+      '-s', `${this.options.width}x${this.options.height}`,
+      '-r', `${this.options.fps}`,
       '-i', '-',
 
       // Audio Input
@@ -34,11 +33,14 @@ export class FrameWriter {
       '-map', '0:v:0',
       '-map', '1:a:0',
 
+      // Filters
+      '-af', `afade=type=out:duration=${FADE_OUT_DURATION}:start_time=${this.duration - (FADE_OUT_DURATION + 0.2)}`,
+      '-vf', `format=yuv420p,fade=type=out:duration=${FADE_OUT_DURATION}:start_time=${this.duration - (FADE_OUT_DURATION + 0.2)}`,
+
       // Video Output
-      '-vf', 'format=yuv420p',
       '-vcodec', 'libx264',
       '-profile:v', 'high',
-      '-preset:v', 'ultrafast',
+      '-preset:v', this.options.preset,
       '-crf', '18',
       '-movflags', 'faststart',
 

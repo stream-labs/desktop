@@ -238,13 +238,13 @@ export class TouchBarService extends Service {
 
     this.perfPopover = new TB.TouchBarPopover({ items: this.perfBar, icon: goodIcon });
 
-    let status = this.performanceService.streamQuality;
+    let status = this.performanceService.views.streamQuality;
 
     setInterval(() => {
-      if (status !== this.performanceService.streamQuality) {
+      if (status !== this.performanceService.views.streamQuality) {
         // Update this as infrequently as possible, as electron is changing references underneath
         // and our stats stop updating until the popover is re-opened.
-        status = this.performanceService.streamQuality;
+        status = this.performanceService.views.streamQuality;
 
         if (status === EStreamQuality.POOR) {
           this.perfPopover.icon = poorIcon;
