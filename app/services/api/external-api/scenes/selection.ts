@@ -12,6 +12,7 @@ import { Scene } from './scene';
 import { SceneItem } from './scene-item';
 import { SceneItemFolder } from './scene-item-folder';
 import { SceneNode } from './scene-node';
+import { ISerializable } from '../../rpc-api';
 
 /**
  * Serialized representation of a {@link Selection}.
@@ -28,7 +29,7 @@ export interface ISelectionModel {
  * Use {@link Scene.getSelection} to fetch a new {@link Selection} object.
  */
 @ServiceHelper()
-export class Selection implements ISceneItemActions {
+export class Selection implements ISceneItemActions, ISerializable {
   @InjectFromExternalApi() private sourcesService: SourcesService;
   @InjectFromExternalApi() private scenesService: ScenesService;
   @Fallback() private internalSelection: InternalSelection;
