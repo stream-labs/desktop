@@ -2,29 +2,20 @@ import path from 'path';
 import execa from 'execa';
 import {
   FFMPEG_EXE,
-  FPS,
-  FRAME_BYTE_SIZE,
-  HEIGHT,
-  PREVIEW_FRAME_BYTE_SIZE,
-  PREVIEW_HEIGHT,
-  PREVIEW_WIDTH,
   SCRUB_FRAMES,
   SCRUB_HEIGHT,
   SCRUB_SPRITE_DIRECTORY,
   SCRUB_WIDTH,
-  WIDTH,
 } from './constants';
 import { FrameReadError } from './errors';
+import { IExportOptions } from '.';
 
 export class FrameSource {
-  writeBuffer = Buffer.allocUnsafe(this.preview ? PREVIEW_FRAME_BYTE_SIZE : FRAME_BYTE_SIZE);
-  readBuffer = Buffer.allocUnsafe(this.preview ? PREVIEW_FRAME_BYTE_SIZE : FRAME_BYTE_SIZE);
+  writeBuffer = Buffer.allocUnsafe(this.options.width * this.options.height * 4);
+  readBuffer = Buffer.allocUnsafe(this.options.width * this.options.height * 4);
   private byteIndex = 0;
 
   scrubJpg: string;
-
-  readonly width = this.preview ? PREVIEW_WIDTH : WIDTH;
-  readonly height = this.preview ? PREVIEW_HEIGHT : HEIGHT;
 
   private ffmpeg: execa.ExecaChildProcess<Buffer | string>;
 
@@ -36,7 +27,7 @@ export class FrameSource {
   currentFrame = 0;
 
   get nFrames() {
-    return Math.round(this.trimmedDuration * FPS);
+    return Math.round(this.trimmedDuration * this.options.fps);
   }
 
   get trimmedDuration() {
@@ -48,7 +39,7 @@ export class FrameSource {
     public readonly duration: number,
     public readonly startTrim: number,
     public readonly endTrim: number,
-    public readonly preview: boolean,
+    public readonly options: IExportOptions,
   ) {}
 
   async exportScrubbingSprite() {
@@ -74,7 +65,7 @@ export class FrameSource {
       '-ss', this.startTrim.toString(),
       '-i', this.sourcePath,
       '-t', (this.duration - this.startTrim - this.endTrim).toString(),
-      '-vf', `fps=${FPS},scale=${this.width}:${this.height}`,
+      '-vf', `fps=${this.options.fps},scale=${this.options.width}:${this.options.height}`,
       '-map', 'v:0',
       '-vcodec', 'rawvideo',
       '-pix_fmt', 'rgba',
@@ -151,7 +142,7 @@ export class FrameSource {
   }
 
   private handleChunk(chunk: Buffer) {
-    const frameByteSize = this.preview ? PREVIEW_FRAME_BYTE_SIZE : FRAME_BYTE_SIZE;
+    const frameByteSize = this.options.width * this.options.height * 4;
 
     // If the chunk is larger than what's needed to fill the rest of the frame buffer,
     // only copy enough to fill the buffer.
