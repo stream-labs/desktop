@@ -9,7 +9,6 @@ import { useEffect, useRef } from 'react';
  * This file provides Redux integration in a modular way
  */
 
-
 /**
  * Creates reducer manager that allows using dynamic reducers
  * Code example from https://redux.js.org/recipes/code-splitting#using-a-reducer-manager
@@ -152,7 +151,7 @@ class ReduxModuleManager {
 
     // Re-define the `state` variable of the module
     // It should be linked to the global Redux sate after module initialization
-    // But mutation is running it should be linked to a special Proxy from the Immer library
+    // But when mutation is running it should be linked to a special Proxy from the Immer library
     Object.defineProperty(module, 'state', {
       get: () => {
         if (this.immerState) return this.immerState;
@@ -255,13 +254,11 @@ class BatchedUpdatesModule {
     // if rendering is already disabled just ignore
     if (this.state.isRenderingDisabled) return;
 
-    console.log('DISABLE rendering');
     // disable rendering
     this.setIsRenderingDisabled(true);
 
     // enable rendering again when Javascript processes the current task queue
     setTimeout(() => {
-      console.log('ENABLE rendering');
       this.setIsRenderingDisabled(false);
     });
   }
@@ -330,8 +327,6 @@ function registerMutation(target: any, mutationName: string, fn: Function) {
   // Transform the original function into the Redux Action handler
   // So we can use this method in the Redux's `createReducer()` call
   target.mutations[mutationName] = (state: unknown, action: { payload: unknown[] }) => {
-    console.log('call mutation', mutationName, action.payload);
-
     // Redux passing us an State and Action into arguments
     // transform the Action call to the Redux Reducer call
     const module = moduleManager.getModule(moduleName);
@@ -344,8 +339,6 @@ function registerMutation(target: any, mutationName: string, fn: Function) {
   Object.defineProperty(target, mutationName, {
     configurable: true,
     value(...args: any[]) {
-      console.log('dispatch mutation', mutationName);
-
       const module = moduleManager.getModule(moduleName);
 
       // if this method was called from another mutation
