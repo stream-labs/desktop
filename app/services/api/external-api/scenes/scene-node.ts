@@ -11,6 +11,7 @@ import { Scene } from './scene';
 import { SceneItemFolder } from './scene-item-folder';
 import { SceneItem } from './scene-item';
 import { ServiceHelper } from 'services';
+import { ISerializable } from '../../rpc-api';
 
 /**
  * Available scene node types.
@@ -32,7 +33,7 @@ export interface ISceneNodeModel {
  * API for scene node operations. Provides basic actions for modification,
  * selection and reordering of a specific scene node.
  */
-export abstract class SceneNode {
+export abstract class SceneNode implements ISerializable {
   @Inject('ScenesService') protected internalScenesService: InternalScenesService;
   @InjectFromExternalApi() protected scenesService: ScenesService;
   @Fallback() protected sceneNode: InternalSceneNode;
