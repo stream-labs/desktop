@@ -13,13 +13,7 @@ import {
 } from 'services/platforms/youtube/uploader';
 import { YoutubeService } from 'services/platforms/youtube';
 import os from 'os';
-import {
-  CLIP_DIR,
-  FPS,
-  SCRUB_SPRITE_DIRECTORY,
-  SUPPORTED_FILE_TYPES,
-  TEST_MODE,
-} from './constants';
+import { CLIP_DIR, SCRUB_SPRITE_DIRECTORY, SUPPORTED_FILE_TYPES, TEST_MODE } from './constants';
 import { pmap } from 'util/pmap';
 import { Clip } from './clip';
 import { AudioCrossfader } from './audio-crossfader';
@@ -46,6 +40,10 @@ export enum EExportStep {
   FrameRender = 'frames',
 }
 
+export type TFPS = 30 | 60;
+export type TResolution = 720 | 1080;
+export type TPreset = 'ultrafast' | 'fast' | 'slow';
+
 export interface IExportInfo {
   exporting: boolean;
   currentFrame: number;
@@ -63,6 +61,10 @@ export interface IExportInfo {
   exported: boolean;
 
   error: string | null;
+
+  fps: TFPS;
+  resolution: TResolution;
+  preset: TPreset;
 }
 
 export interface IUploadInfo {
@@ -181,6 +183,13 @@ const transitionParams: {
   };
 }, {});
 
+export interface IExportOptions {
+  fps: TFPS;
+  width: number;
+  height: number;
+  preset: TPreset;
+}
+
 class HighligherViews extends ViewHandler<IHighligherState> {
   /**
    * Returns an array of clips in their display order
@@ -224,10 +233,6 @@ class HighligherViews extends ViewHandler<IHighligherState> {
 
   get transitionDuration() {
     return this.transition.type === 'None' ? 0 : this.state.transition.duration;
-  }
-
-  get transitionFrames() {
-    return this.transitionDuration * FPS;
   }
 
   get availableTransitions() {
@@ -276,6 +281,9 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       previewFile: path.join(os.tmpdir(), 'highlighter-preview.mp4'),
       exported: false,
       error: null,
+      fps: 30,
+      resolution: 720,
+      preset: 'ultrafast',
     },
     upload: {
       uploading: false,
@@ -409,13 +417,16 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-23.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-35-51.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-18.mp4'),
-        path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-30.mp4'),
+        // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-30.mp4'),
         // path.join(CLIP_DIR, 'Replay 2021-03-30 14-36-44.mp4'),
 
         // Spoken Audio
         path.join(CLIP_DIR, '2021-06-24 13-59-58.mp4'),
         // path.join(CLIP_DIR, '2021-06-24 14-00-26.mp4'),
         // path.join(CLIP_DIR, '2021-06-24 14-00-52.mp4'),
+
+        // 60 FPS
+        path.join(CLIP_DIR, '2021-07-06 15-14-22.mp4'),
 
         // Razer blade test clips
         // path.join(CLIP_DIR, '2021-05-25 08-55-13.mp4'),
@@ -504,6 +515,18 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     this.SET_EXPORT_INFO({ file });
   }
 
+  setFps(fps: TFPS) {
+    this.SET_EXPORT_INFO({ fps });
+  }
+
+  setResolution(resolution: TResolution) {
+    this.SET_EXPORT_INFO({ resolution });
+  }
+
+  setPreset(preset: TPreset) {
+    this.SET_EXPORT_INFO({ preset });
+  }
+
   dismissError() {
     if (this.state.export.error) this.SET_EXPORT_INFO({ error: null });
     if (this.state.upload.error) this.SET_UPLOAD_INFO({ error: false });
@@ -584,8 +607,17 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         return clip;
       });
 
+    const exportOptions: IExportOptions = preview
+      ? { width: 1280 / 4, height: 720 / 4, fps: 30, preset: 'ultrafast' }
+      : {
+          width: this.views.exportInfo.resolution === 720 ? 1280 : 1920,
+          height: this.views.exportInfo.resolution === 720 ? 720 : 1080,
+          fps: this.views.exportInfo.fps,
+          preset: this.views.exportInfo.preset,
+        };
+
     // Reset all clips
-    await pmap(clips, c => c.reset(preview), {
+    await pmap(clips, c => c.reset(exportOptions), {
       onProgress: c => {
         if (c.deleted) {
           this.UPDATE_CLIP({ path: c.sourcePath, deleted: true });
@@ -607,7 +639,8 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       return count + clip.frameSource.nFrames;
     }, 0);
     const numTransitions = clips.length - 1;
-    const totalFramesAfterTransitions = totalFrames - numTransitions * this.views.transitionFrames;
+    const transitionFrames = this.views.transitionDuration * exportOptions.fps;
+    const totalFramesAfterTransitions = totalFrames - numTransitions * transitionFrames;
 
     this.SET_EXPORT_INFO({
       exporting: true,
@@ -662,8 +695,8 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       const writer = new FrameWriter(
         exportPath,
         audioMix,
-        preview,
-        totalFramesAfterTransitions / FPS,
+        totalFramesAfterTransitions / exportOptions.fps,
+        exportOptions,
       );
 
       while (true) {
@@ -685,17 +718,17 @@ export class HighlighterService extends StatefulService<IHighligherState> {
           fromClip.frameSource.currentFrame++;
         }
 
-        const transitionFrames = Math.min(
-          this.views.transitionFrames,
-          (fromClip.frameSource.trimmedDuration / 2) * FPS,
-          toClip ? (toClip.frameSource.trimmedDuration / 2) * FPS : Infinity,
+        const actualTransitionFrames = Math.min(
+          transitionFrames,
+          (fromClip.frameSource.trimmedDuration / 2) * exportOptions.fps,
+          toClip ? (toClip.frameSource.trimmedDuration / 2) * exportOptions.fps : Infinity,
         );
 
         const inTransition =
-          fromClip.frameSource.currentFrame > fromClip.frameSource.nFrames - transitionFrames;
+          fromClip.frameSource.currentFrame > fromClip.frameSource.nFrames - actualTransitionFrames;
         let frameToRender: Buffer | null;
 
-        if (inTransition && toClip && transitionFrames !== 0) {
+        if (inTransition && toClip && actualTransitionFrames !== 0) {
           await toClip.frameSource.readNextFrame();
 
           if (!transitioner) {
@@ -703,12 +736,12 @@ export class HighlighterService extends StatefulService<IHighligherState> {
               const type = sample(
                 availableTransitions.filter(t => !['None', 'Random'].includes(t.type)),
               )!.type;
-              transitioner = new Transitioner(type, preview, transitionParams[type]);
+              transitioner = new Transitioner(type, transitionParams[type], exportOptions);
             } else {
               transitioner = new Transitioner(
                 this.state.transition.type,
-                preview,
                 transitionParams[this.state.transition.type],
+                exportOptions,
               );
             }
           }
@@ -719,7 +752,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
 
             // Frame counter refers to next frame we will read
             // Subtract 1 to get the frame we just read
-            (toClip.frameSource.currentFrame - 1) / this.views.transitionFrames,
+            (toClip.frameSource.currentFrame - 1) / actualTransitionFrames,
           );
           frameToRender = transitioner.getFrame();
         } else {
