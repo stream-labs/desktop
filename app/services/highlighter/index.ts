@@ -557,18 +557,22 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       this.clips[c.path] = this.clips[c.path] ?? new Clip(c.path);
     });
 
-    await pmap(this.views.clips, c => this.clips[c.path].init(), {
-      concurrency: 5, // TODO
-      onProgress: completed => {
-        this.UPDATE_CLIP({
-          path: completed.path,
-          loaded: true,
-          scrubSprite: this.clips[completed.path].frameSource?.scrubJpg,
-          duration: this.clips[completed.path].duration,
-          deleted: this.clips[completed.path].deleted,
-        });
+    await pmap(
+      this.views.clips.filter(c => !c.loaded),
+      c => this.clips[c.path].init(),
+      {
+        concurrency: 5, // TODO
+        onProgress: completed => {
+          this.UPDATE_CLIP({
+            path: completed.path,
+            loaded: true,
+            scrubSprite: this.clips[completed.path].frameSource?.scrubJpg,
+            duration: this.clips[completed.path].duration,
+            deleted: this.clips[completed.path].deleted,
+          });
+        },
       },
-    });
+    );
   }
 
   private async ensureScrubDirectory() {
