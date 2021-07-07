@@ -202,6 +202,7 @@ export function useInput<
       'disabled',
       'nowrap',
       'layout',
+      'rules',
       'tooltip',
     ]),
     rules,
