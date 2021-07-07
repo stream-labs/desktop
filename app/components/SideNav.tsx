@@ -127,22 +127,20 @@ export default class SideNav extends Vue {
         icon: 'icon-graph',
         title: $t('Grow'),
         trackingTarget: 'grow-tab',
-        newBadge: true,
       });
     }
 
     if (
       getOS() === OS.Windows &&
       this.userService.isLoggedIn &&
-      this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.highlighter) &&
-      // TODO: Remove via bundle when v1 is complete and ready to start rolling out
-      (Utils.isPreview() || Utils.isDevMode())
+      this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.highlighter)
     ) {
       pageData.push({
         target: 'Highlighter',
         icon: 'fab fa-youtube',
         title: 'Highlighter',
         trackingTarget: 'highlighter',
+        newBadge: true,
       });
     }
 

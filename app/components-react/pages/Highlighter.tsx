@@ -25,7 +25,7 @@ import TransitionSelector from 'components-react/highlighter/TransitionSelector'
 type TModal = 'trim' | 'export' | 'preview' | 'remove';
 
 export default function Highlighter() {
-  const { HighlighterService, HotkeysService } = Services;
+  const { HighlighterService, HotkeysService, UsageStatisticsService } = Services;
   const v = useVuex(() => ({
     clips: HighlighterService.views.clips as IClip[],
     exportInfo: HighlighterService.views.exportInfo,
@@ -55,6 +55,8 @@ export default function Highlighter() {
       if (hotkey) setHotkey(hotkey);
     });
   }, []);
+
+  useEffect(() => UsageStatisticsService.actions.recordFeatureUsage('Highlighter'), []);
 
   // This is kind of weird, but ensures that modals stay the right
   // size while the closing animation is played. This is why modal
@@ -237,7 +239,12 @@ export default function Highlighter() {
         <Scrollable style={{ flexGrow: 1, padding: '20px 0 20px 20px' }}>
           <div style={{ display: 'flex', paddingRight: 20 }}>
             <div style={{ flexGrow: 1 }}>
-              <h1>Highlighter</h1>
+              <h1>
+                Highlighter{' '}
+                <span style={{ fontSize: 12, verticalAlign: 'top', color: 'var(--beta-text)' }}>
+                  Beta
+                </span>
+              </h1>
               <p>{'Drag & drop to reorder clips.'}</p>
             </div>
             <div>
@@ -294,6 +301,7 @@ export default function Highlighter() {
           closable={false}
           visible={!!showModal || !!v.error}
           destroyOnClose={true}
+          keyboard={false}
         >
           {!!v.error && <Alert message={v.error} type="error" showIcon />}
           {inspectedClip && showModal === 'trim' && <ClipTrimmer clip={inspectedClip} />}
