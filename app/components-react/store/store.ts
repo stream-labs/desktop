@@ -163,7 +163,7 @@ class ReduxModuleManager {
     store.reducerManager.add(moduleName, reducer);
     // call the `initState` mutation to initialize the module's initial state
     store.dispatch({ type: 'initState', payload: { moduleName, initialState } });
-    // create a record in `registeredModules` with the just created module
+    // create a record in `registeredModules` with the newly created module
     this.registeredModules[moduleName] = {
       componentIds: [],
       module,
@@ -204,8 +204,8 @@ class ReduxModuleManager {
   }
 
   /**
-   * When Redux is running mutation it replace the state object with a special Proxy object from
-   * the Immer library. Keep this object in the `mutationState` property
+   * When Redux is running mutation it replaces the state object with a special Proxy object from
+   * the Immer library. Keep this object in the `immerState` property
    */
   setImmerState(immerState: unknown) {
     this.immerState = immerState;
@@ -234,11 +234,11 @@ export function getModuleManager() {
 
 /**
  * This module introduces a simple implementation of batching updates for the performance optimization
- * It prevents components to be re-rendered in the not-ready state
- * and reduces the overall amount of redundant re-renderings
+ * It prevents components from being re-rendered in a not-ready state
+ * and reduces an overall amount of redundant re-renderings
  *
  * React 18 introduced automated batched updates.
- * So most likely we can remove this module after the migration to the new version
+ * So most likely we can remove this module after the migration to the new version of React
  * https://github.com/reactwg/react-18/discussions/21
  */
 class BatchedUpdatesModule {
@@ -247,7 +247,7 @@ class BatchedUpdatesModule {
   };
 
   /**
-   * Temporary disables rendering for components when multiple mutations are applying
+   * Temporary disables rendering for components when multiple mutations are being applied
    */
   temporaryDisableRendering() {
     // if rendering is already disabled just ignore
@@ -256,7 +256,7 @@ class BatchedUpdatesModule {
     // disable rendering
     this.setIsRenderingDisabled(true);
 
-    // enable rendering again when Javascript processes the current task queue
+    // enable rendering again when Javascript processes the current queue of tasks
     setTimeout(() => {
       this.setIsRenderingDisabled(false);
     });
@@ -270,7 +270,7 @@ class BatchedUpdatesModule {
 
 /**
  * This module adds reactivity support from Vuex
- * It ensures React components should be re-rendered when Vuex updates their dependencies
+ * It ensures that React components are be re-rendered when Vuex updates their dependencies
  *
  * We should remove this module after we fully migrate our components to Redux
  */
@@ -281,7 +281,7 @@ class VuexModule {
   state: Record<string, number> = {};
 
   init() {
-    // listen mutations from the global Vuex store
+    // watch for mutations from the global Vuex store
     // and increment the revision number for affected StatefulService
     StatefulService.store.subscribe(mutation => {
       const serviceName = mutation.type.split('.')[0];
@@ -300,7 +300,7 @@ class VuexModule {
 }
 
 /**
- * A decorator that register the object method as an mutation
+ * A decorator that registers the object method as an mutation
  */
 export function mutation() {
   return function (target: any, methodName: string, descriptor: PropertyDescriptor) {
@@ -326,8 +326,6 @@ function registerMutation(target: any, mutationName: string, fn: Function) {
   // Transform the original function into the Redux Action handler
   // So we can use this method in the Redux's `createReducer()` call
   target.mutations[mutationName] = (state: unknown, action: { payload: unknown[] }) => {
-    // Redux passing us an State and Action into arguments
-    // transform the Action call to the Redux Reducer call
     const module = moduleManager.getModule(moduleName);
     moduleManager.setImmerState(state);
     originalMethod.apply(module, action.payload);
@@ -378,7 +376,7 @@ export function useSelector<T extends Object>(fn: () => T): T {
   // create the selector function
   const selector = useOnCreate(() => {
     return () => {
-      // if `isRenderingDisabled` selector will return previously cached values
+      // if `isRenderingDisabled=true` selector will return previously cached values
       if (batchedUpdatesModule.state.isRenderingDisabled && isMountedRef.current) {
         return cachedSelectedResult.current;
       }
@@ -447,7 +445,7 @@ export function createDependencyWatcher<T extends object>(watchedObject: T) {
     const values: Partial<T> = {};
     Object.keys(dependencies).forEach(propName => {
       const value = dependencies[propName];
-      // if one of dependencies is a binding then expose its internal dependencies
+      // if one of the dependencies is a Binding then expose its internal dependencies
       if (value && value._proxyName === 'Binding') {
         const bindingMetadata = value._binding;
         Object.keys(bindingMetadata.dependencies).forEach(bindingPropName => {
@@ -456,7 +454,7 @@ export function createDependencyWatcher<T extends object>(watchedObject: T) {
         });
         return;
       }
-      // if it's not a binding then just take the value from the watchedObject
+      // if it's not a Binding then just take the value from the watchedObject
       values[propName] = watchedObject[propName];
     });
     return values;
@@ -491,7 +489,7 @@ function isSimilar(obj1: any, obj2: any) {
 }
 
 /**
- * Shallow compare 2 arrays
+ * Shallow comparison of 2 arrays
  */
 function isArrayEqual(a: any[], b: any[]) {
   if (a === b) return true;
