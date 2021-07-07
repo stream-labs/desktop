@@ -82,9 +82,7 @@ type TCreateSlobsInputProps<
   TAntProps,
   TFeatures extends keyof Partial<TAntProps> = never,
   // generate helper props:
-  TGeneratedProps = Pick<TAntProps, TFeatures> &
-    FormItemProps &
-    IInputCommonProps<TValue> & { inputRef?: React.Ref<HTMLInputElement> }
+  TGeneratedProps = Pick<TAntProps, TFeatures> & FormItemProps & IInputCommonProps<TValue>
 > = Omit<TGeneratedProps, keyof TCustomProps> & TCustomProps; // join generated props with custom props
 
 /**
@@ -210,7 +208,6 @@ export function useInput<
     'data-role': 'input',
     name: inputId,
     value: localValueRef.current,
-    ref: inputProps.inputRef as any,
     onChange,
   };
 

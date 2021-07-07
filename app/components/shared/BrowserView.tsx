@@ -72,14 +72,22 @@ export default class BrowserView extends TsxComponent<BrowserViewProps> {
     }, 100);
 
     this.shutdownSubscription = this.appService.shutdownStarted.subscribe(() => {
-      // Prevent zombie processes by destroying the browser view
-      if (this.browserView && !this.browserView.isDestroyed()) this.browserView.destroy();
+      this.destroyBrowserView();
     });
   }
 
+  destroyBrowserView() {
+    if (this.browserView) {
+      electron.remote.getCurrentWindow().removeBrowserView(this.browserView);
+      // See: https://github.com/electron/electron/issues/26929
+      // @ts-ignore
+      this.browserView.webContents.destroy();
+      this.browserView = null;
+    }
+  }
+
   destroyed() {
-    electron.remote.getCurrentWindow().removeBrowserView(this.browserView);
-    this.browserView.destroy();
+    this.destroyBrowserView();
     clearInterval(this.resizeInterval);
     this.shutdownSubscription && this.shutdownSubscription.unsubscribe();
   }

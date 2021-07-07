@@ -12,8 +12,10 @@ import { lazyModule } from 'util/lazy-module';
 import { GuestApiHandler } from 'util/guest-api-handler';
 import { BehaviorSubject } from 'rxjs';
 import { IBrowserViewTransform } from './api/modules/module';
+import uuid from 'uuid/v4';
 
 interface IContainerInfo {
+  id: string;
   appId: string;
   slot: EAppPageSlot;
   persistent: boolean;
@@ -92,7 +94,7 @@ export class PlatformContainerManager {
   unregisterApp(app: ILoadedApp) {
     this.containers.forEach(cont => {
       if (cont.appId === app.id) {
-        this.destroyContainer(cont.container.id);
+        this.destroyContainer(cont.id);
       }
     });
   }
@@ -117,11 +119,11 @@ export class PlatformContainerManager {
       mounted: true,
     });
 
-    return containerInfo.container.id;
+    return containerInfo.id;
   }
 
-  setContainerBounds(containerId: number, pos: IVec2, size: IVec2) {
-    const info = this.containers.find(cont => cont.container.id === containerId);
+  setContainerBounds(containerId: string, pos: IVec2, size: IVec2) {
+    const info = this.containers.find(cont => cont.id === containerId);
 
     if (!info) return;
 
@@ -139,8 +141,8 @@ export class PlatformContainerManager {
     });
   }
 
-  unmountContainer(containerId: number, electronWindowId: number) {
-    const info = this.containers.find(cont => cont.container.id === containerId);
+  unmountContainer(containerId: string, electronWindowId: number) {
+    const info = this.containers.find(cont => cont.id === containerId);
 
     if (!info) return;
 
@@ -200,6 +202,7 @@ export class PlatformContainerManager {
     });
 
     const info: IContainerInfo = {
+      id: uuid(),
       slot,
       persistent,
       container: view,
@@ -240,13 +243,13 @@ export class PlatformContainerManager {
     return info;
   }
 
-  private destroyContainer(containerId: number) {
-    const info = this.containers.find(cont => cont.container.id === containerId);
+  private destroyContainer(containerId: string) {
+    const info = this.containers.find(cont => cont.id === containerId);
 
     if (!info) return;
 
     // Remove the container from the list of containers
-    this.containers = this.containers.filter(c => c.container.id !== containerId);
+    this.containers = this.containers.filter(c => c.id !== containerId);
 
     // Unmount from all windows first (prevents crashes)
     info.mountedWindows.forEach(winId => {
@@ -254,9 +257,11 @@ export class PlatformContainerManager {
       if (win && !win.isDestroyed()) win.removeBrowserView(info.container);
     });
 
-    // Electron types are incorrect here.  This method exists and is documented, but
-    // does not appear in the type definitions.
-    info.container.destroy();
+    // This method is undocumented, but it's the only way to force a
+    // browser view to immediately be destroyed.
+    // See: https://github.com/electron/electron/issues/26929
+    // @ts-ignore
+    info.container.webContents.destroy();
   }
 
   private getPageUrlForSlot(app: ILoadedApp, slot: EAppPageSlot) {

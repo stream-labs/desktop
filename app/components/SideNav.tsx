@@ -15,6 +15,8 @@ import { NavTools } from 'components/shared/ReactComponent';
 import styles from './SideNav.m.less';
 import { LayoutService } from 'services/layout';
 import { getPlatformService } from '../services/platforms';
+import { getOS, OS } from 'util/operating-systems';
+import Utils from 'services/utils';
 
 interface IPageData {
   target: TAppPage;
@@ -71,9 +73,12 @@ export default class SideNav extends Vue {
   }
 
   get studioTabs() {
-    return Object.keys(this.layoutService.state.tabs).map(tab => ({
+    return Object.keys(this.layoutService.state.tabs).map((tab, i) => ({
       target: tab,
-      title: this.layoutService.state.tabs[tab].name || $t('Editor'),
+      title:
+        i === 0 || !this.layoutService.state.tabs[tab].name
+          ? $t('Editor')
+          : this.layoutService.state.tabs[tab].name,
       icon: this.layoutService.state.tabs[tab].icon,
       trackingTarget: tab === 'default' ? 'editor' : 'custom',
     }));
@@ -122,6 +127,19 @@ export default class SideNav extends Vue {
         icon: 'icon-graph',
         title: $t('Grow'),
         trackingTarget: 'grow-tab',
+      });
+    }
+
+    if (
+      getOS() === OS.Windows &&
+      this.userService.isLoggedIn &&
+      this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.highlighter)
+    ) {
+      pageData.push({
+        target: 'Highlighter',
+        icon: 'fab fa-youtube',
+        title: 'Highlighter',
+        trackingTarget: 'highlighter',
         newBadge: true,
       });
     }
