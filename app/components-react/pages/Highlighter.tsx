@@ -237,7 +237,12 @@ export default function Highlighter() {
         <Scrollable style={{ flexGrow: 1, padding: '20px 0 20px 20px' }}>
           <div style={{ display: 'flex', paddingRight: 20 }}>
             <div style={{ flexGrow: 1 }}>
-              <h1>Highlighter</h1>
+              <h1>
+                Highlighter{' '}
+                <span style={{ fontSize: 12, verticalAlign: 'top', color: 'var(--beta-text)' }}>
+                  Beta
+                </span>
+              </h1>
               <p>{'Drag & drop to reorder clips.'}</p>
             </div>
             <div>
