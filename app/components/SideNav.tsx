@@ -133,9 +133,7 @@ export default class SideNav extends Vue {
     if (
       getOS() === OS.Windows &&
       this.userService.isLoggedIn &&
-      this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.highlighter) &&
-      // TODO: Remove via bundle when v1 is complete and ready to start rolling out
-      (Utils.isPreview() || Utils.isDevMode())
+      this.incrementalRolloutService.views.featureIsEnabled(EAvailableFeatures.highlighter)
     ) {
       pageData.push({
         target: 'Highlighter',
