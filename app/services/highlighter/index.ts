@@ -23,6 +23,7 @@ import { throttle } from 'lodash-decorators';
 import sample from 'lodash/sample';
 import { HighlighterError } from './errors';
 import { AudioMixer } from './audio-mixer';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 export interface IClip {
   path: string;
@@ -299,6 +300,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
 
   @Inject() streamingService: StreamingService;
   @Inject() userService: UserService;
+  @Inject() usageStatisticsService: UsageStatisticsService;
 
   /**
    * A dictionary of actual clip classes.
@@ -789,15 +791,36 @@ export class HighlighterService extends StatefulService<IHighligherState> {
           console.debug(
             `Export complete - Expected Frames: ${this.views.exportInfo.totalFrames} Actual Frames: ${currentFrame}`,
           );
+
+          if (!preview) {
+            this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+              type: 'ExportComplete',
+              numClips: clips.length,
+              transition: this.views.transition.type,
+              transitionDuration: this.views.transition.duration,
+              resolution: this.views.exportInfo.resolution,
+              fps: this.views.exportInfo.fps,
+              preset: this.views.exportInfo.preset,
+              duration: totalFramesAfterTransitions / exportOptions.fps,
+            });
+          }
           break;
         }
       }
     } catch (e: unknown) {
       if (e instanceof HighlighterError) {
         this.SET_EXPORT_INFO({ error: e.userMessage });
+        this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+          type: 'ExportError',
+          error: e.constructor.name,
+        });
       } else {
         console.error('Highlighter export error', e);
         this.SET_EXPORT_INFO({ error: 'An error occurred while exporting the video' });
+        this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+          type: 'ExportError',
+          error: 'Unknown',
+        });
       }
     }
 
@@ -866,6 +889,21 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       cancelRequested: false,
       videoId: result ? result.id : null,
     });
+
+    if (result) {
+      this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+        type: 'UploadSuccess',
+        privacy: options.privacyStatus,
+        videoLink:
+          options.privacyStatus === 'public'
+            ? `https://youtube.com/watch?v=${result.id}`
+            : undefined,
+      });
+    } else {
+      this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+        type: 'UploadError',
+      });
+    }
   }
 
   /**

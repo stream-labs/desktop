@@ -11,7 +11,7 @@ import { RadioInput } from 'components-react/shared/inputs/RadioInput';
 import { confirm } from 'components-react/modals';
 
 export default function ExportModal(p: { close: () => void }) {
-  const { HighlighterService } = Services;
+  const { HighlighterService, UsageStatisticsService } = Services;
   const v = useVuex(() => ({
     exportInfo: HighlighterService.views.exportInfo,
   }));
@@ -128,6 +128,8 @@ export default function ExportModal(p: { close: () => void }) {
                     return;
                   }
                 }
+
+                UsageStatisticsService.actions.recordFeatureUsage('HighlighterExport');
 
                 HighlighterService.actions.setExportFile(exportFile);
                 HighlighterService.actions.export();

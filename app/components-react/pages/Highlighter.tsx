@@ -25,7 +25,7 @@ import TransitionSelector from 'components-react/highlighter/TransitionSelector'
 type TModal = 'trim' | 'export' | 'preview' | 'remove';
 
 export default function Highlighter() {
-  const { HighlighterService, HotkeysService } = Services;
+  const { HighlighterService, HotkeysService, UsageStatisticsService } = Services;
   const v = useVuex(() => ({
     clips: HighlighterService.views.clips as IClip[],
     exportInfo: HighlighterService.views.exportInfo,
@@ -55,6 +55,8 @@ export default function Highlighter() {
       if (hotkey) setHotkey(hotkey);
     });
   }, []);
+
+  useEffect(() => UsageStatisticsService.actions.recordFeatureUsage('Highlighter'), []);
 
   // This is kind of weird, but ensures that modals stay the right
   // size while the closing animation is played. This is why modal

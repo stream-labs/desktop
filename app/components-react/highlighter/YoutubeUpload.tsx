@@ -31,7 +31,7 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
   const [description, setDescription] = useState('');
   const [privacy, setPrivacy] = useState('private');
   const [urlCopied, setUrlCopied] = useState(false);
-  const { UserService, HighlighterService, NavigationService } = Services;
+  const { UserService, HighlighterService, NavigationService, UsageStatisticsService } = Services;
   const v = useVuex(() => ({
     youtubeLinked: !!UserService.state.auth?.platforms.youtube,
     uploadInfo: HighlighterService.views.uploadInfo,
@@ -153,6 +153,7 @@ export default function YoutubeUpload(props: { defaultTitle: string; close: () =
             <Button
               type="primary"
               onClick={() => {
+                UsageStatisticsService.actions.recordFeatureUsage('HighlighterUpload');
                 HighlighterService.actions.upload({
                   title,
                   description,
