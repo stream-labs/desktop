@@ -3,7 +3,7 @@ import { useOnCreate } from '../hooks';
 let nextComponentId = 1;
 
 /**
- * Returns an unique component id
+ * Returns a unique component id
  * If DEBUG=true then the componentId includes a component name
  */
 export function useComponentId() {

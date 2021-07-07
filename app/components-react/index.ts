@@ -19,7 +19,7 @@ import StartStreamingButton from './root/StartStreamingButton';
 import TestWidgets from './root/TestWidgets';
 import RenameSource from './windows/RenameSource';
 
-// list of React components for usage inside Vue components
+// list of React components to be used inside Vue components
 export const components = {
   NameFolder,
   GoLiveWindow: createRoot(GoLiveWindow),
