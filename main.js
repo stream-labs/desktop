@@ -245,10 +245,9 @@ let appShutdownTimeout;
 global.indexUrl = `file://${__dirname}/index.html`;
 
 function openDevTools() {
-  console.log('Open dev tools');
-  childWindow.webContents.openDevTools({ mode: 'detach' });
-  mainWindow.webContents.openDevTools({ mode: 'detach' });
-  workerWindow.webContents.openDevTools({ mode: 'detach' });
+  childWindow.webContents.openDevTools({ mode: 'undocked' });
+  mainWindow.webContents.openDevTools({ mode: 'undocked' });
+  workerWindow.webContents.openDevTools({ mode: 'undocked' });
 }
 
 // TODO: Clean this up

@@ -32,7 +32,6 @@ import { CustomizationService } from 'services/customization';
 import { EAvailableFeatures, IncrementalRolloutService } from 'services/incremental-rollout';
 import { StreamSettingsService } from '../settings/streaming';
 import { RestreamService } from 'services/restream';
-
 import Utils from 'services/utils';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
@@ -42,8 +41,6 @@ import { HostsService } from '../hosts';
 import { TwitterService } from '../integrations/twitter';
 import { assertIsDefined } from 'util/properties-type-guards';
 import { StreamInfoView } from './streaming-view';
-import Vue from 'vue';
-
 import { GrowService } from 'services/grow/grow';
 
 enum EOBSOutputType {
@@ -153,30 +150,7 @@ export class StreamingService
         deep: true,
       },
     );
-
-    // // sync scheduled streams with store
-    // this.youtubeService.streamScheduled.subscribe(scheduledLiveStream =>
-    //   this.onStreamScheduledHandler('youtube', scheduledLiveStream),
-    // );
-    // this.facebookService.streamScheduled.subscribe(scheduledLiveStream =>
-    //   this.onStreamScheduledHandler('facebook', scheduledLiveStream),
-    // );
-    // this.youtubeService.streamRemoved.subscribe(id => this.REMOVE_STREAM_EVENT(id));
-    // this.facebookService.streamRemoved.subscribe(id => this.REMOVE_STREAM_EVENT(id));
   }
-
-  // private onStreamScheduledHandler(
-  //   platform: TPlatform,
-  //   scheduledLiveStream: IYoutubeLiveBroadcast | IFacebookLiveVideo,
-  // ) {
-  //   const event =
-  //     platform === 'youtube'
-  //       ? this.convertYTBroadcastToEvent(scheduledLiveStream as IYoutubeLiveBroadcast)
-  //       : this.convertFBLiveVideoToEvent(scheduledLiveStream as IFacebookLiveVideoExtended);
-  //
-  //   this.REMOVE_STREAM_EVENT(event.id);
-  //   this.SET_STREAM_EVENTS(true, [...this.state.streamEvents, event]);
-  // }
 
   get views() {
     return new StreamInfoView(this.state);
@@ -471,21 +445,6 @@ export class StreamingService
     this.UPDATE_STREAM_INFO({ lifecycle });
     return true;
   }
-
-  // /**
-  //  * Schedule stream for eligible platforms
-  //  */
-  // async scheduleStream(settings: IStreamSettings, time: number) {
-  //   const destinations = settings.platforms;
-  //   const platforms = (Object.keys(destinations) as TPlatform[]).filter(
-  //     dest => destinations[dest].enabled && this.views.supports('stream-schedule', [dest]),
-  //   ) as ('facebook' | 'youtube')[];
-  //   for (const platform of platforms) {
-  //     const service = getPlatformService(platform);
-  //     assertIsDefined(service.scheduleStream);
-  //     await service.scheduleStream(time, destinations[platform]);
-  //   }
-  // }
 
   /**
    * Run task and update the checklist item status based on task result

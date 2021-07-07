@@ -484,18 +484,6 @@ export class FacebookService
     if (game) data.game_specs = { name: game };
     const body = JSON.stringify(data);
     return await this.requestFacebook({ url, body, method: 'POST' }, token);
-
-    // try {
-    //   return await platformRequest('facebook', { url, body, method: 'POST' }, token);
-    // } catch (e: unknown) {
-    //   if (e && (e as any).result?.error?.code === 100) {
-    //     throw new Error(
-    //       $t(
-    //         'Please schedule no further than 7 days in advance and no sooner than 10 minutes in advance.',
-    //       ),
-    //     );
-    //   }
-    // }
   }
 
   async fetchScheduledVideos(
@@ -532,16 +520,6 @@ export class FacebookService
         return videoDate >= minDate && videoDate <= maxDate;
       });
     }
-
-    let destName: string;
-    if (destinationType === 'me') {
-      destName = 'timeline';
-    } else if (destinationType === 'page') {
-      destName = `page ${this.views.getPage(destinationId).name}`;
-    } else {
-      destName = `group ${this.views.getGroup(destinationId).name}`;
-    }
-    console.log(`fetched videos for ${destName}`, videos);
     return videos;
   }
 

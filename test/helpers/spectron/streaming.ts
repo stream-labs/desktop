@@ -94,34 +94,6 @@ export async function waitForStreamStop(t: TExecutionContext) {
   }
 }
 
-/**
- * Schedule stream for platforms that supports scheduling
- */
-export async function scheduleStream(
-  t: TExecutionContext,
-  date: number,
-  channelInfo?: Dictionary<string>,
-) {
-  const app = t.context.app;
-  await focusMain(t);
-  await click(t, 'button .icon-date');
-
-  // wait for the calendar loading
-  await app.client.waitForExist('div.s-spinner', 30000, true);
-
-  // click to the day
-  const day = new Date(date).getDate();
-  await click(t, `.day-${day}`);
-  // wait fields to be shown
-  await (await app.client.$('[data-name=title]')).waitForDisplayed();
-
-  await fillForm(t, null, channelInfo);
-  await click(t, 'button=Schedule');
-
-  // the success message should be shown
-  await (await app.client.$('.toast-success')).waitForDisplayed({ timeout: 20000 });
-}
-
 export async function chatIsVisible(t: TExecutionContext) {
   await focusMain(t);
   return (await t.context.app.client.$('a=Refresh Chat')).isDisplayed(); // TODO: it's better to check the content of the chat browser-view

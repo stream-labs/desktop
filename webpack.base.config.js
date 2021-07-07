@@ -167,11 +167,6 @@ module.exports = {
         test: /\.js$/,
         loader: 'babel-loader',
         exclude: /node_modules/,
-
-        // v-calendar has modern js features in compiled code
-        // we need to transpile them via babel
-        // https://github.com/nathanreyes/v-calendar/issues/683
-        include: /node_modules\/v-calendar/,
       },
       {
         test: /(?<!\.[mg])\.less$/, // Vue style tags
