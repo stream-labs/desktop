@@ -1,5 +1,5 @@
 import { combineReducers, createAction, createReducer, createStore, Store } from '@reduxjs/toolkit';
-import { batch, shallowEqual, useSelector as useReduxSelector } from 'react-redux';
+import { batch, useSelector as useReduxSelector } from 'react-redux';
 import { StatefulService } from '../../services';
 import isPlainObject from 'lodash/isPlainObject';
 import { useOnCreate } from '../hooks';
@@ -113,15 +113,15 @@ export const store = configureStore();
  *  - You need generate documentation from jsdoc
  */
 class ReduxModuleManager {
-  public mutationState: unknown;
-  private registeredModules: Record<string, IReduxMetadata> = {};
+  public immerState: unknown;
+  private registeredModules: Record<string, IReduxModuleMetadata> = {};
 
   /**
    * Register a new Redux Module and initialize it
    * @param module the module object
    * @param initParams params that will be passed in the `.init()` handler after module initialization
    */
-  registerModule<TInitParams, TModule extends ReduxModule<any, any>>(
+  registerModule<TInitParams, TModule extends IReduxModule<any, any>>(
     module: TModule,
     initParams?: TInitParams,
   ): TModule {
@@ -150,7 +150,7 @@ class ReduxModuleManager {
     // But mutation is running it should be linked to a special Proxy from the Immer library
     Object.defineProperty(module, 'state', {
       get: () => {
-        if (this.mutationState) return this.mutationState;
+        if (this.immerState) return this.immerState;
         const globalState = store.getState() as any;
         return globalState[moduleName];
       },
@@ -179,7 +179,7 @@ class ReduxModuleManager {
   /**
    * Get the Module by name
    */
-  getModule<TModule extends ReduxModule<any, any>>(moduleName: string): TModule {
+  getModule<TModule extends IReduxModule<any, any>>(moduleName: string): TModule {
     return this.registeredModules[moduleName]?.module as TModule;
   }
 
@@ -204,8 +204,8 @@ class ReduxModuleManager {
    * When Redux is running mutation it replace the state object with a special Proxy object from
    * the Immer library. Keep this object in the `mutationState` property
    */
-  setMutationState(mutationState: unknown) {
-    this.mutationState = mutationState;
+  setImmerState(immerState: unknown) {
+    this.immerState = immerState;
   }
 }
 
@@ -220,10 +220,10 @@ export function getModuleManager() {
     // automatically register some additional modules
     moduleManager = new ReduxModuleManager();
 
-    // add a module for rendering optimizations
+    // add a BatchedUpdatesModule for rendering optimizations
     moduleManager.registerModule(new BatchedUpdatesModule());
 
-    // add a module that adds Vuex support
+    // add a VuexModule for Vuex support
     moduleManager.registerModule(new VuexModule());
   }
   return moduleManager;
@@ -269,7 +269,7 @@ class BatchedUpdatesModule {
 
 /**
  * This module adds reactivity support from Vuex
- * It ensures React components should be re-rendered when Vuex mutate their dependencies
+ * It ensures React components should be re-rendered when Vuex updates their dependencies
  *
  * We should remove this module after we fully migrate our components to Redux
  */
@@ -286,11 +286,6 @@ class VuexModule {
       const serviceName = mutation.type.split('.')[0];
       this.incrementRevision(serviceName);
     });
-  }
-
-  // TODO: remove
-  watchReadOperations(fn: Function) {
-    return StatefulService.watchReadOperations(fn);
   }
 
   @mutation()
@@ -335,9 +330,9 @@ function registerMutation(target: any, mutationName: string, fn: Function) {
     // Redux passing us an State and Action into arguments
     // transform the Action call to the Redux Reducer call
     const module = moduleManager.getModule(moduleName);
-    moduleManager.setMutationState(state);
+    moduleManager.setImmerState(state);
     originalMethod.apply(module, action.payload);
-    moduleManager.setMutationState(null);
+    moduleManager.setImmerState(null);
   };
 
   // Redirect the call of original method to the Redux`s reducer
@@ -351,7 +346,7 @@ function registerMutation(target: any, mutationName: string, fn: Function) {
       // if this method was called from another mutation
       // we don't need to dispatch a new mutation again
       // just call the original method
-      const mutationIsRunning = !!moduleManager.mutationState;
+      const mutationIsRunning = !!moduleManager.immerState;
       if (mutationIsRunning) return originalMethod.apply(module, args);
 
       const batchedUpdatesModule = moduleManager.getModule<BatchedUpdatesModule>(
@@ -369,23 +364,6 @@ function registerMutation(target: any, mutationName: string, fn: Function) {
 
   return Object.getOwnPropertyDescriptor(target, mutationName);
 }
-
-export interface ReduxModule<TInitParams, TState> {
-  state: TState;
-  init?: (initParams: TInitParams) => unknown;
-}
-
-interface IReduxMetadata {
-  componentIds: string[];
-  module: ReduxModule<any, any>;
-}
-
-type TStore = Store & {
-  reducerManager: {
-    add: (key: string, reducer: any) => unknown;
-    remove: (key: string) => unknown;
-  };
-};
 
 /**
  * This `useSelector` is a wrapper for the original `useSelector` method from Redux
@@ -491,13 +469,6 @@ export function createDependencyWatcher<T extends object>(watchedObject: T) {
 }
 
 /**
- * consider isSimilar as isDeepEqual with depth 2
- */
-function isSimilar(obj1: any, obj2: any) {
-  return isDeepEqual(obj1, obj2, 0, 2);
-}
-
-/**
  * Compare 2 object with limited depth
  */
 function isDeepEqual(obj1: any, obj2: any, currentDepth: number, maxDepth: number): boolean {
@@ -516,6 +487,13 @@ function isDeepEqual(obj1: any, obj2: any, currentDepth: number, maxDepth: numbe
 }
 
 /**
+ * consider isSimilar as isDeepEqual with depth 2
+ */
+function isSimilar(obj1: any, obj2: any) {
+  return isDeepEqual(obj1, obj2, 0, 2);
+}
+
+/**
  * Shallow compare 2 arrays
  */
 function isArrayEqual(a: any[], b: any[]) {
@@ -526,3 +504,20 @@ function isArrayEqual(a: any[], b: any[]) {
   }
   return true;
 }
+
+export interface IReduxModule<TInitParams, TState> {
+  state: TState;
+  init?: (initParams: TInitParams) => unknown;
+}
+
+interface IReduxModuleMetadata {
+  componentIds: string[];
+  module: IReduxModule<any, any>;
+}
+
+type TStore = Store & {
+  reducerManager: {
+    add: (key: string, reducer: any) => unknown;
+    remove: (key: string) => unknown;
+  };
+};
