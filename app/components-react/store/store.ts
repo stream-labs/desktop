@@ -20,7 +20,6 @@ function createReducerManager() {
   };
 
   // Create the initial combinedReducer
-  // let combinedReducer = combineReducers(reducers);
   let combinedReducer = combineReducers(reducers);
 
   // An array which is used to delete state keys when reducers are removed
@@ -90,31 +89,31 @@ function configureStore() {
 export const store = configureStore();
 
 /**
- * ReduxModuleManager controls Redux modules
+ * ReduxModuleManager helps to organize code splitting with help of Redux Modules
  * Each Redux Module controls its own chunk of state in the global Redux store
- * Flux Modules are objects that contain initialState, actions, mutations and getters
- * They could be dynamically created and destroyed
+ * Redux Modules are objects that contain initialState, actions, mutations and getters
  *
- * Use Redux Modules than you need share some logic or state between several React components,
- * Or when you have a single React component that has not-trivial logic that is better to encapsulate
- * into a different file. So you can keep this component lightweight and responsible for rendering only
+ * Use Redux Modules when you need share some logic or state between several React components
  *
- * Alternative to modules could be using StatefulServices. The difference between Redux Modules and StatefulServices:
+ * StatefulServices could be used as an alternative to Redux Modules
+ * However, there are some significant differences between Redux Modules and StatefulServices:
  * - StatefulServices are singleton objects. Redux Modules could have multiple instances
- * - StatefulServices always exists after initialization. Redux Modules exist only while components use them
- * - StatefulServices exist in the Worker window only and reachable from other windows by IPC only. Redux Modules exist in the same window they were created.
+ * - StatefulServices always exist after initialization. Redux Modules exist only while components that are using them are mounted
+ * - StatefulServices exist in the Worker window only and are reachable from other windows by IPC only. Redux Modules could exist in any window .
  *
  * Redux Modules are perfect for situations where:
- *  - You need share some logic or state between several React components
- *  - You want your complex React component be lightweight and responsible only for rendering
- *  - You have performance issues in your React component. React Modules use multiple optimisation technics
+ *  - You want to share some logic or state between several React components that are intended to work together
+ *  - You want to simplify a complex React component so it should be responsible only for rendering, and you extract everything unrelated to rendering to a module
+ *  - You have performance issues in your React component related to a redundant re-renderings
  *
  * StatefulServices and Services are perfect for situations where:
- *  - You need to have some global reactive state across multiple windows
- *  - You need a place for `http` data fetching, like API calls. So you can monitor all your http requests in the dev-tools window
- *  - You need some polling/watching code in the constantly existing object
- *  - You need to expose some API for external usage
- *  - You need generate documentation from jsdoc
+ *  - You want to have some global reactive state across multiple windows
+ *  - You need a place for `http` data fetching, like API calls. So you can monitor all your http requests in the same dev-tools window
+ *  - You need some polling/watching code that should work across the entire app
+ *  - You need to expose some API for external usage and generate jsdoc documentation
+ *
+ *  With further migration to Redux we probably want StatefulServices to be a slightly modified version
+ *  of ReduxModules because they use similar concepts
  */
 class ReduxModuleManager {
   public immerState: unknown;
@@ -132,7 +131,7 @@ class ReduxModuleManager {
     // use constructor name as a module name
     const moduleName = module.constructor.name;
 
-    // collect mutations from the module prototype
+    // collect mutations from the module's prototype
     const mutations = Object.getPrototypeOf(module).mutations;
 
     // call `init()` method of module if exist
@@ -140,7 +139,7 @@ class ReduxModuleManager {
     const initialState = module.state;
 
     // Use Redux API to create Redux reducers from our mutation functions
-    // this step adding the support of `Immer` library in reducers
+    // this step is adding the support of `Immer` library in reducers
     // https://redux-toolkit.js.org/usage/immer-reducers
     const reducer = createReducer(initialState, builder => {
       Object.keys(mutations).forEach(mutationName => {
