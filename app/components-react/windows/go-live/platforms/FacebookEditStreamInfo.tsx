@@ -21,7 +21,6 @@ import Translate from '../../../shared/Translate';
 import { IListOption } from '../../../shared/inputs/ListInput';
 import MessageLayout from '../MessageLayout';
 import PlatformSettingsLayout, { IPlatformComponentParams } from './PlatformSettingsLayout';
-import { TwitchTagsInput } from './TwitchTagsInput';
 
 export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'facebook'>) {
   const fbSettings = p.value;
@@ -36,14 +35,6 @@ export default function FacebookEditStreamInfo(p: IPlatformComponentParams<'face
     NavigationService,
     WindowsService,
   } = Services;
-
-  // const {
-  //   useSelector,
-  //   updatePlatform,
-  //   isUpdateMode,
-  //   useBinding,
-  //   renderPlatformSettings,
-  // } = useGoLiveSettings();
 
   const {
     pages,

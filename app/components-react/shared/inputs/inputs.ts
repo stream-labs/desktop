@@ -20,8 +20,7 @@ type TInputType =
   | 'tags'
   | 'switch'
   | 'slider'
-  | 'image'
-  | 'date';
+  | 'image';
 
 export type TInputLayout = 'horizontal' | 'vertical' | 'inline';
 
@@ -313,6 +312,10 @@ export function useTextInput<
  *   </form>
  *  }
  * </pre>
+ *
+ * @param stateGetter an object or function to read the field value from
+ * @param stateSetter a function that changes the field given field
+ * @param extraPropsGenerator a function that returns extra attributes for the input element (like disabled, placeholder,...)
  */
 export function createBinding<
   TState extends object,
@@ -334,9 +337,6 @@ export function createBinding<
     _binding: {
       id: `binding__${uuid()}`,
       dependencies: {} as Record<string, unknown>,
-      clone() {
-        return createBinding(stateGetter, stateSetter);
-      },
     },
   };
 
@@ -344,6 +344,8 @@ export function createBinding<
     get(t, fieldName: string) {
       if (fieldName in metadata) return metadata[fieldName];
       const fieldValue = getState()[fieldName];
+      // register the fieldName in the dependencies list
+      // that helps keep this binding up to date when use it inside ReduxModules
       metadata._binding.dependencies[fieldName] = fieldValue;
       const extraProps = extraPropsGenerator ? extraPropsGenerator(fieldName as keyof TState) : {};
       return {
@@ -351,6 +353,7 @@ export function createBinding<
         value: fieldValue,
         onChange(newVal: unknown) {
           const state = getState();
+          // if the state object has a defined setter than use the local setter
           if (Object.getOwnPropertyDescriptor(state, fieldName)?.set) {
             state[fieldName] = newVal;
           } else {

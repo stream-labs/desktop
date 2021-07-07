@@ -7,6 +7,22 @@ import { lockThis } from '../../util/lockThis';
 
 /**
  * A hook for using ReduxModules in components
+ *
+ * @example 1
+ * // get module instance in the component
+ * const myModule = useModule(MyModule)
+ *
+ * // use Redux to select reactive props from the module
+ * const { foo } = useSelector(() => ({ foo: myModule.foo }))
+ *
+ * @example 2
+ * // same as example 1 but with one-liner syntax
+ * const { foo } = useModule(MyModule).select()
+ *
+ * @example 3
+ * // same as example 2 but with a computed prop
+ * const { foo, fooBar } = useModule(MyModule)
+ *  .selectExtra(module => { fooBar: myModule.foo + module.bar  }))
  */
 export function useModule<
   TInitParams,

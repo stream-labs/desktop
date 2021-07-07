@@ -1,4 +1,4 @@
-import { IGoLiveSettings, IGoLiveSettingsState, StreamInfoView } from '../../../services/streaming';
+import { IGoLiveSettings, StreamInfoView } from '../../../services/streaming';
 import { TPlatform } from '../../../services/platforms';
 import { Services } from '../../service-provider';
 import cloneDeep from 'lodash/cloneDeep';
@@ -12,11 +12,14 @@ import { getDefined } from '../../../util/properties-type-guards';
 
 type TCommonFieldName = 'title' | 'description';
 
+export type TModificators = { isUpdateMode?: boolean; isScheduleMode?: boolean };
+export type IGoLiveSettingsState = IGoLiveSettings & TModificators & { needPrepopulate: boolean };
+
 /**
- * Extend GoLiveSettingsFeature from StreamInfoView
- * So all getters from StreamInfoView will be available in GoLiveSettingsFeature
+ * Extend GoLiveSettingsModule from StreamInfoView
+ * So all getters from StreamInfoView will be available in GoLiveSettingsModule
  */
-export class GoLiveSettingsFeature extends StreamInfoView<IGoLiveSettingsState> {
+export class GoLiveSettingsModule extends StreamInfoView<IGoLiveSettingsState> {
   // antd form instance
   public form: FormInstance;
 
@@ -146,16 +149,6 @@ export class GoLiveSettingsFeature extends StreamInfoView<IGoLiveSettingsState> 
       });
     });
   }
-  // /**
-  //  * Enable/disable custom common fields for a platform
-  //  **/
-  //
-  // @mutation()
-  // toggleCustomFields(platform: TPlatform) {
-  //   const platformSettings = getDefined(this.state.platforms[platform]);
-  //   const enabled = platformSettings.useCustomFields;
-  //   return this.updatePlatform(platform, { useCustomFields: !enabled });
-  // }
 
   /**
    * Save current settings so we can use it next time we open the GoLiveWindow
@@ -213,7 +206,7 @@ export class GoLiveSettingsFeature extends StreamInfoView<IGoLiveSettingsState> 
 export function useGoLiveSettings(params?: { isUpdateMode: boolean }) {
   const form = useForm();
 
-  return useModule(GoLiveSettingsFeature, {
+  return useModule(GoLiveSettingsModule, {
     form,
     isUpdateMode: params?.isUpdateMode,
   });
