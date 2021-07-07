@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { EExportStep } from 'services/highlighter';
+import { EExportStep, TFPS, TResolution, TPreset } from 'services/highlighter';
 import { Services } from 'components-react/service-provider';
 import { useVuex } from 'components-react/hooks';
 import { FileInput, TextInput } from 'components-react/shared/inputs';
@@ -7,6 +7,7 @@ import Form from 'components-react/shared/inputs/Form';
 import path from 'path';
 import { Button, Progress, Alert } from 'antd';
 import YoutubeUpload from './YoutubeUpload';
+import { RadioInput } from 'components-react/shared/inputs/RadioInput';
 
 export default function ExportModal(p: { close: () => void }) {
   const { HighlighterService } = Services;
@@ -58,6 +59,43 @@ export default function ExportModal(p: { close: () => void }) {
               setExportFile(file);
               setVideoName(getVideoNameFromExportFile(file));
             }}
+          />
+          <RadioInput
+            label="Resolution"
+            value={v.exportInfo.resolution.toString()}
+            options={[
+              { value: '720', label: '720p' },
+              { value: '1080', label: '1080p' },
+            ]}
+            onChange={val => {
+              HighlighterService.actions.setResolution(parseInt(val, 10) as TResolution);
+            }}
+            buttons={true}
+          />
+          <RadioInput
+            label="Frame Rate"
+            value={v.exportInfo.fps.toString()}
+            options={[
+              { value: '30', label: '30 FPS' },
+              { value: '60', label: '60 FPS' },
+            ]}
+            onChange={val => {
+              HighlighterService.actions.setFps(parseInt(val, 10) as TFPS);
+            }}
+            buttons={true}
+          />
+          <RadioInput
+            label="File Size"
+            value={v.exportInfo.preset}
+            options={[
+              { value: 'ultrafast', label: 'Faster Export' },
+              { value: 'fast', label: 'Balanced' },
+              { value: 'slow', label: 'Smaller File' },
+            ]}
+            onChange={val => {
+              HighlighterService.actions.setPreset(val as TPreset);
+            }}
+            buttons={true}
           />
           {v.exportInfo.error && (
             <Alert
