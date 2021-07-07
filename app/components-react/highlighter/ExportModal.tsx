@@ -8,9 +8,10 @@ import path from 'path';
 import { Button, Progress, Alert } from 'antd';
 import YoutubeUpload from './YoutubeUpload';
 import { RadioInput } from 'components-react/shared/inputs/RadioInput';
+import { confirm } from 'components-react/modals';
 
 export default function ExportModal(p: { close: () => void }) {
-  const { HighlighterService } = Services;
+  const { HighlighterService, UsageStatisticsService } = Services;
   const v = useVuex(() => ({
     exportInfo: HighlighterService.views.exportInfo,
   }));
@@ -22,7 +23,7 @@ export default function ExportModal(p: { close: () => void }) {
 
   function getExportFileFromVideoName(videoName: string) {
     const parsed = path.parse(v.exportInfo.file);
-    return path.join(parsed.dir, `${videoName}${parsed.ext}`);
+    return path.join(parsed.dir, `${path.basename(videoName)}${parsed.ext}`);
   }
 
   function getVideoNameFromExportFile(exportFile: string) {
@@ -113,7 +114,23 @@ export default function ExportModal(p: { close: () => void }) {
             </Button>
             <Button
               type="primary"
-              onClick={() => {
+              onClick={async () => {
+                if (await HighlighterService.actions.return.fileExists(exportFile)) {
+                  if (
+                    !(await confirm({
+                      title: 'Overwite File?',
+                      content: `${path.basename(
+                        exportFile,
+                      )} already exists. Would you like to overwrite it?`,
+                      okText: 'Overwrite',
+                    }))
+                  ) {
+                    return;
+                  }
+                }
+
+                UsageStatisticsService.actions.recordFeatureUsage('HighlighterExport');
+
                 HighlighterService.actions.setExportFile(exportFile);
                 HighlighterService.actions.export();
               }}

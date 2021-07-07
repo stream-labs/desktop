@@ -33,7 +33,8 @@ type TAnalyticsEvent =
   | 'Click'
   | 'Session'
   | 'Shown'
-  | 'AppStart';
+  | 'AppStart'
+  | 'Highlighter';
 
 interface IAnalyticsEvent {
   product: string;
