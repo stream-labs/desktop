@@ -13,6 +13,7 @@ export type TAppPage =
   | 'PrimeExpiration'
   | 'AlertboxLibrary'
   | 'StreamScheduler'
+  | 'Highlighter'
   | 'Grow';
 
 interface INavigationState {

@@ -8,12 +8,15 @@ import PatchNotes from './pages/PatchNotes';
 import Display from './shared/Display';
 import TitleBar from './shared/TitleBar';
 import Chat from './root/Chat';
+import Highlighter from './pages/Highlighter';
 import Grow from './pages/Grow/Grow';
 import Loader from './pages/Loader';
 import NavTools from './sidebar/NavTools';
 import PlatformLogo from './shared/PlatformLogo';
 import StreamScheduler from './pages/stream-scheduler/StreamScheduler';
 import { createRoot } from './root/ReactRoot';
+import StartStreamingButton from './root/StartStreamingButton';
+import TestWidgets from './root/TestWidgets';
 
 // list of React components for usage inside Vue components
 export const components = {
@@ -27,9 +30,12 @@ export const components = {
   Display,
   TitleBar,
   Chat,
+  Highlighter,
   Grow,
   Loader,
   NavTools,
   PlatformLogo,
   StreamScheduler: createRoot(StreamScheduler),
+  StartStreamingButton,
+  TestWidgets,
 };

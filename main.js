@@ -412,6 +412,7 @@ async function startApp() {
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
+      backgroundThrottling: false,
     },
   });
 

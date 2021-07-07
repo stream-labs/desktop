@@ -119,6 +119,7 @@ export interface IMediaGalleryMetadata extends IInputMetadata {
 export interface IFileMetadata extends IInputMetadata {
   filters?: Electron.FileFilter[];
   directory?: boolean;
+  save?: boolean;
 }
 
 export interface ITextAreaMetadata extends IInputMetadata {

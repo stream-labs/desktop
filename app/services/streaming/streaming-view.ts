@@ -357,4 +357,12 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
       enabled: enabled || this.checkPrimaryPlatform(platform),
     };
   }
+
+  get delayEnabled() {
+    return this.streamSettingsView.settings.delayEnable;
+  }
+
+  get delaySeconds() {
+    return this.streamSettingsView.settings.delaySec;
+  }
 }

@@ -44,7 +44,6 @@
   "Follower Goal": "Følgermål",
   "Twitch Follows": "Twitch følgere",
   "YouTube Follows": "YouTube-følgere",
-  "Mixer Follows": "Mixerfølgere",
   "Bit Goal": "Bit-mål",
   "Twitch Bits": "Twitch-bits",
   "Subscription Goal": "Abonnementmål",
@@ -145,7 +144,6 @@
   "Cloud Backup: All media and sources are backed up in the cloud": "Cloudbackup: Der tages cloudbackup af alle medier og kilder",
   "Cloud Backup: Your media and sources are being synced with the cloud": "Cloudbackup: Dine medier og kilder er ved at blive synkroniseret med skyen",
   "The streamer manually adds images of sponsors.": "Streameren tilføjer manuelt billeder af sponsorer.",
-  "Mixer chat": "Mixer-chat",
   "Edit Transform": "Rediger transformering",
   "There are no existing sources of this type.": "Der er ingen eksisterende kilder af denne type.",
   "Instant Replay": "Øjeblikkelig replay",
@@ -185,5 +183,8 @@
   "JACK Input Client": "JACK Input Client",
   "Motion": "Motion",
   "Twitch Soundtrack": "Twitch Soundtrack",
-  "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.": "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs."
+  "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.": "Audio source working with the Twitch Soundtrack music application. Add this source to be able to filter out the music from your Twitch VODs.",
+  "Custom Icon": "Custom Icon",
+  "Displays an icon from one of many selections": "Displays an icon from one of many selections",
+  "An error has occured, please try re-opening this window": "An error has occured, please try re-opening this window"
 }

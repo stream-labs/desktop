@@ -11,6 +11,7 @@
   "Settings": "Настройки",
   "That name is already taken": "Это имя уже занято",
   "Search": "Поиск",
+  "Searching...": "Searching...",
   "Create New": "Создать",
   "Language": "Язык",
   "Name is required": "Укажите имя",
@@ -32,7 +33,7 @@
   "Submit": "Отправить",
   "Save": "Сохранить",
   "Edit": "Изменить",
-  "Log In": "Log In",
+  "Log In": "Вход",
   "Yes": "Да",
   "No": "Нет",
   "OK": "ОК",
@@ -129,5 +130,6 @@
   "Height": "Высота",
   "Use Custom": "Use Custom",
   "Apply": "Применить",
-  "Do not show this message again": "Do not show this message again"
+  "Do not show this message again": "Do not show this message again",
+  "You can only select up to %{max} items": "You can only select up to %{max} items"
 }

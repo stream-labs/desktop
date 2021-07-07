@@ -11,6 +11,7 @@
   "Settings": "Instellingen",
   "That name is already taken": "De naam is al in gebruik",
   "Search": "Zoeken",
+  "Searching...": "Searching...",
   "Create New": "Creëer nieuw",
   "Language": "Taal",
   "Name is required": "Naam is vereist",
@@ -129,5 +130,6 @@
   "Height": "Hoogte",
   "Use Custom": "Use Custom",
   "Apply": "Apply",
-  "Do not show this message again": "Do not show this message again"
+  "Do not show this message again": "Do not show this message again",
+  "You can only select up to %{max} items": "You can only select up to %{max} items"
 }

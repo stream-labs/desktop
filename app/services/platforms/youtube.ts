@@ -19,6 +19,8 @@ import { assertIsDefined } from 'util/properties-type-guards';
 import electron from 'electron';
 import { Subject } from 'rxjs';
 import Utils from '../utils';
+import { YoutubeUploader } from './youtube/uploader';
+import { lazyModule } from 'util/lazy-module';
 
 interface IYoutubeServiceState extends IPlatformState {
   liveStreamingEnabled: boolean;
@@ -163,6 +165,8 @@ export class YoutubeService
   @Inject() private customizationService: CustomizationService;
   @Inject() private windowsService: WindowsService;
   @Inject() private i18nService: I18nService;
+
+  @lazyModule(YoutubeUploader) uploader: YoutubeUploader;
 
   readonly capabilities = new Set<TPlatformCapability>([
     'title',
