@@ -131,7 +131,7 @@
 
 .transition-settings-modal {
   padding: 20px;
-  height: 480px;
+  height: 100%;
 }
 
 .connection-settings-modal {
