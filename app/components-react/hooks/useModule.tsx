@@ -43,7 +43,7 @@ export function useModule<
   const moduleName = ModuleClass.name;
   const componentId = useComponentId();
 
-  // register the component in the ModuleManager on component create
+  // register the component in the ModuleManager upon component creation
   const { module, select, selector } = useOnCreate(() => {
     // get existing module's instance or create a new one
     const moduleManager = getModuleManager();
@@ -55,10 +55,10 @@ export function useModule<
     moduleManager.registerComponent(moduleName, componentId);
 
     // lockedModule is a copy of the module where all methods have a persistent `this`
-    // like if we called `module.methodName = module.methodName.bind(this)` for each method
+    // as if we called `module.methodName = module.methodName.bind(this)` for each method
     const lockedModule = lockThis(module);
 
-    // calculate computed props that was passed via `.selectExtra()` call
+    // calculate computed props that were passed via `.selectExtra()` call
     // and save them in `computedPropsRef`
     function calculateComputedProps() {
       const compute = computedPropsFnRef.current;
@@ -118,7 +118,7 @@ export function useModule<
 
   // return Module with extra `select` method
   // TODO: `.selectExtra()` is the same method as `.select()`
-  //  and it added here only because of typing issues related to multiple tsconfings in the project.
+  //  and it was added here only because of typing issues related to multiple tsconfings in the project.
   //  We should use only the `.select` after resolving typing issues
   const mergeResult = merge(
     () => module,

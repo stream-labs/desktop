@@ -1,4 +1,4 @@
-import { skipCheckingErrorsInLog, test, useSpectron } from '../../helpers/spectron';
+import { focusChild, skipCheckingErrorsInLog, test, useSpectron } from '../../helpers/spectron';
 import { logIn } from '../../helpers/spectron/user';
 import {
   chatIsVisible,

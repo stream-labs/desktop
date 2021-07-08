@@ -164,6 +164,20 @@ export class PlatformLogo extends ReactComponent<{
   color?: string;
   unwrapped?: boolean;
 }> {}
+@Component({
+  props: {
+    name: { default: 'RenameSource' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class RenameSource extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'AdvancedStatistics' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class AdvancedStatistics extends ReactComponent {}
 
 @Component({ props: { name: { default: 'StreamScheduler' } } })
 export class StreamScheduler extends ReactComponent {}

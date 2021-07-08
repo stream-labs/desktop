@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import { mutation, StatefulService } from 'services/core/stateful-service';
 import * as obs from '../../../obs-api';
 import { Inject } from 'services/core/injector';
@@ -15,6 +16,7 @@ import {
   IStreamInfo,
   IStreamingServiceApi,
   IStreamingServiceState,
+  IStreamSettings,
   TGoLiveChecklistItemState,
 } from './streaming-api';
 import { UsageStatisticsService } from 'services/usage-statistics';
@@ -39,7 +41,7 @@ import { createStreamError, IStreamError, StreamError, TStreamErrorType } from '
 import { authorizedHeaders } from 'util/requests';
 import { HostsService } from '../hosts';
 import { TwitterService } from '../integrations/twitter';
-import { assertIsDefined } from 'util/properties-type-guards';
+import { assertIsDefined, getDefined } from 'util/properties-type-guards';
 import { StreamInfoView } from './streaming-view';
 import { GrowService } from 'services/grow/grow';
 
@@ -121,7 +123,7 @@ export class StreamingService
         startVideoTransmission: 'not-started',
         postTweet: 'not-started',
       },
-    }
+    },
   };
 
   init() {
@@ -420,7 +422,7 @@ export class StreamingService
 
     for (const platform of platforms) {
       const service = getPlatformService(platform);
-      const newSettings = settings.platforms[platform];
+      const newSettings = getDefined(settings.platforms[platform]);
       try {
         await this.runCheck(platform, () => service.putChannelInfo(newSettings));
       } catch (e: unknown) {

@@ -1,8 +1,7 @@
 import { TPlatform } from '../../../services/platforms';
 import { $t } from '../../../services/i18n';
 import React from 'react';
-import {CheckboxInput, InputComponent, TextAreaInput, TextInput} from '../../shared/inputs';
-import { useGoLiveSettings } from './useGoLiveSettings';
+import { CheckboxInput, InputComponent, TextAreaInput, TextInput } from '../../shared/inputs';
 import { assertIsDefined } from '../../../util/properties-type-guards';
 import InputWrapper from '../../shared/inputs/InputWrapper';
 import Animate from 'rc-animate';
@@ -116,4 +115,4 @@ export const CommonPlatformFields = InputComponent((rawProps: IProps) => {
       </Animate>
     </div>
   );
-})
+});
