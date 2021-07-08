@@ -527,7 +527,7 @@ export class FacebookService
    * Fetch all scheduled videos from the timeline pages and groups
    */
   async fetchAllVideos(): Promise<IFacebookLiveVideoExtended[]> {
-    // perform all request simultaneously
+    // perform all requests simultaneously
     const requests: Promise<IFacebookLiveVideoExtended[]>[] = [];
 
     // fetch videos from the timeline and groups
@@ -580,7 +580,7 @@ export class FacebookService
       );
     });
 
-    // wait for all request
+    // wait for all requests
     const videoCollections = await Promise.all(requests);
 
     // return a joined list of all videos

@@ -128,7 +128,7 @@ function EventSettingsModal() {
   // we only can change the platform when creating a new event
   const canChangePlatform = !isUpdateMode;
 
-  // create a title with a human-readable date
+  // create a title with a legible date
   const formattedDate = moment(time).calendar();
   const title = isUpdateMode
     ? $t('Update Scheduled Stream for %{formattedDate}', { formattedDate })
@@ -198,8 +198,8 @@ function ModalButtons() {
   const shouldShowSave = !!selectedEvent;
   const shouldShowSchedule = !selectedEvent;
 
-  // allow to remove only events that the user has not streamed to
-  // removing the event with the finished stream causes the deletion of recorded video too
+  // allow removing only those events which the user has not streamed to
+  // removing the event with the finished stream leads to deletion of recorded video too
   const shouldShowRemove = selectedEvent && selectedEvent.status === 'scheduled';
 
   /**
