@@ -1,6 +1,7 @@
 import { Singleton, Fallback } from 'services/api/external-api';
 import { Inject } from 'services/core/injector';
 import { PerformanceService as InternalPerformanceService } from 'services/performance';
+import { ISerializable } from '../../rpc-api';
 
 /**
  * Serialized representation of the performance values.
@@ -18,7 +19,7 @@ interface IPerformanceState {
  * performance sate.
  */
 @Singleton()
-export class PerformanceService {
+export class PerformanceService implements ISerializable {
   @Fallback()
   @Inject()
   private performanceService: InternalPerformanceService;

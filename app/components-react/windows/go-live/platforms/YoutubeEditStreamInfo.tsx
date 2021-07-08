@@ -4,7 +4,7 @@ import {
   createBinding,
   ImageInput,
   InputComponent,
-  ListInput
+  ListInput,
 } from '../../../shared/inputs';
 import React, { useEffect } from 'react';
 import { Services } from '../../../service-provider';
