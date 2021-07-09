@@ -1,6 +1,6 @@
 /**
  * Merges multiple sources of data into a single Proxy object
- * The result: object is read-only
+ * The result object is read-only
  *
  * @example
  *

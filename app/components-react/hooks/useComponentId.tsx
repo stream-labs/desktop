@@ -7,7 +7,7 @@ let nextComponentId = 1;
  * If DEBUG=true then the componentId includes a component name
  */
 export function useComponentId() {
-  const DEBUG = true;
+  const DEBUG = false;
   return useOnCreate(() => {
     return DEBUG ? `${nextComponentId++}_${getComponentName()}` : `${nextComponentId++}`;
   });

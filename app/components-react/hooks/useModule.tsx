@@ -22,7 +22,7 @@ import { lockThis } from '../../util/lockThis';
  * @example 3
  * // same as example 2 but with a computed prop
  * const { foo, fooBar } = useModule(MyModule)
- *  .selectExtra(module => { fooBar: myModule.foo + module.bar  }))
+ *  .selectExtra(module => { fooBar: module.foo + module.bar  }))
  */
 export function useModule<
   TInitParams,
@@ -78,10 +78,10 @@ export function useModule<
         // we have several sources of data to select from
         // use `merge` function to join them into a single object
         const mergedModule = merge(
-          // allow to select getters and actions from the module
-          () => lockedModule,
           // allow to select variables from the module's state
           () => module.state,
+          // allow to select getters and actions from the module
+          () => lockedModule,
           // allow to select computed props
           () => computedPropsRef.current,
           // allow to select the whole module itself

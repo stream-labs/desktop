@@ -148,8 +148,7 @@ export class AppService extends StatefulService<IAppState> {
       this.shutdownHandler();
     });
 
-    // TODO: enable
-    // this.performanceService.startMonitoringPerformance();
+    this.performanceService.startMonitoringPerformance();
 
     this.ipcServerService.listen();
     this.tcpServerService.listen();

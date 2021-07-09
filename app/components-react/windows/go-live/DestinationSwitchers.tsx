@@ -1,4 +1,4 @@
-import React, { useRef, MouseEvent, useEffect } from 'react';
+import React, { useRef, MouseEvent } from 'react';
 import { getPlatformService, TPlatform } from '../../../services/platforms';
 import cx from 'classnames';
 import { $t } from '../../../services/i18n';
