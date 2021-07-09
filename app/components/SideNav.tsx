@@ -20,7 +20,8 @@ import Utils from 'services/utils';
 
 interface IPageData {
   target: TAppPage;
-  icon: string;
+  icon?: string;
+  svgIcon?: JSX.Element;
   title: string;
   trackingTarget: string;
   newBadge?: boolean;
@@ -137,7 +138,7 @@ export default class SideNav extends Vue {
     ) {
       pageData.push({
         target: 'Highlighter',
-        icon: 'fab fa-youtube',
+        svgIcon: <HighlighterIcon />,
         title: 'Highlighter',
         trackingTarget: 'highlighter',
         newBadge: true,
@@ -215,7 +216,8 @@ export default class SideNav extends Vue {
             vTrackClick={{ component: 'SideNav', target: page.trackingTarget }}
             title={page.title}
           >
-            <i class={page.icon} />
+            {!!page.icon && <i class={page.icon} />}
+            {!!page.svgIcon && page.svgIcon}
             {page.newBadge && <div class={cx(styles.badge, styles.newBadge)}>{$t('New')}</div>}
           </div>
         ))}
@@ -225,3 +227,32 @@ export default class SideNav extends Vue {
     );
   }
 }
+
+// TODO: Replace with a font icon
+const HighlighterIcon = () => (
+  <svg
+    width="512"
+    height="512"
+    viewBox="0 0 512 512"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <g clip-path="url(#clip0)">
+      <path d="M20.949 298.483V458.483C20.949 487.902 44.885 511.816 74.282 511.816H458.282C487.701 511.816 511.615 487.901 511.615 458.483V298.483H20.949V298.483Z" />
+      <path d="M252.757 48.776L172.927 67.72L239.807 166.131L326.271 146.462L252.757 48.776Z" />
+      <path d="M150.741 72.99L64.703 93.384L128.5 192L217.471 171.187L150.741 72.99Z" />
+      <path d="M511.274 93.086L493.119 24.222C488.938 7.47499 471.786 -3.06301 454.868 0.797987L383.188 17.822L451.199 118.089L503.316 106.228C506.153 105.588 508.585 103.817 510.079 101.343C511.573 98.869 511.999 95.902 511.274 93.086Z" />
+      <path d="M360.981 23.091L275.413 43.4L349.055 141.299L428.863 123.144L360.981 23.091Z" />
+      <path d="M128.5 192L94.314 277.15H178.005L212.138 191.838L128.5 192Z" />
+      <path d="M235.114 191.838L200.981 277.15H284.671L318.805 191.838H235.114Z" />
+      <path d="M500.949 191.838H448.448L414.315 277.171H511.616V202.504C511.615 196.595 506.858 191.838 500.949 191.838Z" />
+      <path d="M341.781 191.838L307.647 277.15H391.317L425.471 191.838H341.781Z" />
+      <path d="M42.517 98.675L25.13 102.792C16.661 104.712 9.493 109.853 4.949 117.235C0.405001 124.638 -0.938999 133.342 1.173 141.768L20.949 219.933V277.149H71.338L103.359 195.5L42.517 98.675Z" />
+    </g>
+    <defs>
+      <clipPath id="clip0">
+        <rect width="511.816" height="511.816" fill="white" />
+      </clipPath>
+    </defs>
+  </svg>
+);
