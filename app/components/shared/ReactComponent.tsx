@@ -178,8 +178,8 @@ export class RenameSource extends ReactComponent {}
   },
 })
 export class AdvancedStatistics extends ReactComponent {}
-@Component({ props: { name: { default: 'StartStreamingButton' } } })
-export class StartStreamingButton extends ReactComponent {}
+@Component({ props: { name: { default: 'StudioFooter' } } })
+export class StudioFooter extends ReactComponent {}
 @Component({
   props: {
     name: { default: 'TestWidgets' },
@@ -187,5 +187,3 @@ export class StartStreamingButton extends ReactComponent {}
   },
 })
 export class TestWidgets extends ReactComponent<{ testers: string[] }> {}
-@Component({ props: { name: { default: 'NotificationsArea' } } })
-export class NotificationsArea extends ReactComponent {}
