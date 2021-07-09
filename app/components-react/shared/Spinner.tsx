@@ -13,8 +13,6 @@ export default function Spinner(
   const p = { ...defaultProps, ...props };
   const timeoutRef = useRef(0);
 
-  p.visible = true;
-
   const [visibility, setVisibility] = useState({
     isContainerVisible: p.visible,
     isSpinnerVisible: p.visible,
