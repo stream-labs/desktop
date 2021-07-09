@@ -97,8 +97,8 @@ export default function BlankSlate(p: { close: () => void }) {
           </span>
         </h1>
         <p>
-          The highlighter allows you to edit together replays you capture during your stream and
-          upload them to YouTube.
+          The highlighter allows you to clip the best moments from your livestream and edit them
+          together into an exciting highlight video you can upload directly to YouTube.
         </p>
         <h2>Get Started</h2>
         {!v.isStreaming && (
