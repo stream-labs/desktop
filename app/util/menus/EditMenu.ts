@@ -16,6 +16,7 @@ import { $t } from 'services/i18n';
 import { EditorCommandsService } from 'services/editor-commands';
 import { ERenderingMode } from '../../../obs-api';
 import { StreamingService } from 'services/streaming';
+import Utils from 'services/utils';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;
@@ -335,11 +336,13 @@ export class EditMenu extends Menu {
     this.append({
       label: $t('Create Stream Output Projector'),
       click: () => this.projectorService.createProjector(ERenderingMode.OBS_STREAMING_RENDERING),
+      enabled: this.streamingService.state.selectiveRecording || Utils.isDevMode(),
     });
 
     this.append({
       label: $t('Create Recording Output Projector'),
       click: () => this.projectorService.createProjector(ERenderingMode.OBS_RECORDING_RENDERING),
+      enabled: this.streamingService.state.selectiveRecording || Utils.isDevMode(),
     });
 
     this.append({ type: 'separator' });
