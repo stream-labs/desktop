@@ -68,7 +68,7 @@ export class FrameWriter {
     });
 
     this.ffmpeg.catch(e => {
-      console.error('ffmpeg:', e);
+      console.log('ffmpeg:', e);
     });
 
     this.ffmpeg.stderr?.on('data', (data: Buffer) => {

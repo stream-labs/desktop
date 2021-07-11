@@ -24,6 +24,7 @@ import sample from 'lodash/sample';
 import { HighlighterError } from './errors';
 import { AudioMixer } from './audio-mixer';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import * as Sentry from '@sentry/browser';
 
 export interface IClip {
   path: string;
@@ -808,6 +809,11 @@ export class HighlighterService extends StatefulService<IHighligherState> {
         }
       }
     } catch (e: unknown) {
+      Sentry.withScope(scope => {
+        scope.setTag('feature', 'highlighter');
+        console.error('Highlighter export error', e);
+      });
+
       if (e instanceof HighlighterError) {
         this.SET_EXPORT_INFO({ error: e.userMessage });
         this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
@@ -815,7 +821,6 @@ export class HighlighterService extends StatefulService<IHighligherState> {
           error: e.constructor.name,
         });
       } else {
-        console.error('Highlighter export error', e);
         this.SET_EXPORT_INFO({ error: 'An error occurred while exporting the video' });
         this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
           type: 'ExportError',
