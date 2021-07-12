@@ -694,6 +694,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       }
 
       await Promise.all(clips.map(clip => clip.audioSource.cleanup()));
+      const nClips = clips.length;
 
       this.SET_EXPORT_INFO({ step: EExportStep.FrameRender });
 
@@ -793,18 +794,17 @@ export class HighlighterService extends StatefulService<IHighligherState> {
             `Export complete - Expected Frames: ${this.views.exportInfo.totalFrames} Actual Frames: ${currentFrame}`,
           );
 
-          if (!preview) {
-            this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
-              type: 'ExportComplete',
-              numClips: clips.length,
-              transition: this.views.transition.type,
-              transitionDuration: this.views.transition.duration,
-              resolution: this.views.exportInfo.resolution,
-              fps: this.views.exportInfo.fps,
-              preset: this.views.exportInfo.preset,
-              duration: totalFramesAfterTransitions / exportOptions.fps,
-            });
-          }
+          this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+            type: 'ExportComplete',
+            numClips: nClips,
+            transition: this.views.transition.type,
+            transitionDuration: this.views.transition.duration,
+            resolution: this.views.exportInfo.resolution,
+            fps: this.views.exportInfo.fps,
+            preset: this.views.exportInfo.preset,
+            duration: totalFramesAfterTransitions / exportOptions.fps,
+            isPreview: preview,
+          });
           break;
         }
       }
