@@ -669,7 +669,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       let currentFrame = 0;
 
       // Mix audio first
-      await Promise.all(clips.map(clip => clip.audioSource.extract()));
+      await Promise.all(clips.filter(c => c.hasAudio).map(clip => clip.audioSource.extract()));
       const parsed = path.parse(this.views.exportInfo.file);
       const audioConcat = path.join(parsed.dir, `${parsed.name}-concat.flac`);
       let audioMix = path.join(parsed.dir, `${parsed.name}-mix.flac`);
