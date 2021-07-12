@@ -297,7 +297,7 @@ export class TwitchService
 
   async putChannelInfo({ title, game, tags = [] }: ITwitchStartStreamOptions): Promise<void> {
     const gameId = await this.requestTwitch<{ data: { id: string }[] }>(
-      `${this.apiBase}/helix/games?name=${game}`,
+      `${this.apiBase}/helix/games?name=${encodeURIComponent(game)}`,
     ).then(json => json.data[0].id);
     await Promise.all([
       this.requestTwitch({
@@ -321,7 +321,7 @@ export class TwitchService
   async fetchGame(name: string): Promise<IGame> {
     const gamesResponse = await platformAuthorizedRequest<{
       data: { id: string; name: string; box_art_url: string }[];
-    }>('twitch', `${this.apiBase}/helix/games?name=${name}`);
+    }>('twitch', `${this.apiBase}/helix/games?name=${encodeURIComponent(name)}`);
     return gamesResponse.data.map(g => {
       const imageTemplate = g.box_art_url;
       const imageSize = this.gameImageSize;
