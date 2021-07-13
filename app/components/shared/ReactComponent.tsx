@@ -138,7 +138,6 @@ export class Highlighter extends ReactComponent {}
   },
 })
 export class GoLiveWindow extends ReactComponent {}
-
 @Component({
   props: {
     name: { default: 'EditStreamWindow' },
@@ -174,6 +173,20 @@ export class PlatformLogo extends ReactComponent<{
 })
 export class SharedComponentsLibrary extends ReactComponent {}
 
+@Component({
+  props: {
+    name: { default: 'RenameSource' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class RenameSource extends ReactComponent {}
+@Component({
+  props: {
+    name: { default: 'AdvancedStatistics' },
+    wrapperStyles: { default: () => ({ height: '100%' }) },
+  },
+})
+export class AdvancedStatistics extends ReactComponent {}
 @Component({ props: { name: { default: 'StartStreamingButton' } } })
 export class StartStreamingButton extends ReactComponent {}
 @Component({
@@ -183,4 +196,3 @@ export class StartStreamingButton extends ReactComponent {}
   },
 })
 export class TestWidgets extends ReactComponent<{ testers: string[] }> {}
-

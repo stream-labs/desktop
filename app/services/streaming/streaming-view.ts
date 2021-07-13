@@ -4,10 +4,11 @@ import { StreamSettingsService } from '../settings/streaming';
 import { UserService } from '../user';
 import { RestreamService } from '../restream';
 import { getPlatformService, TPlatform, TPlatformCapability } from '../platforms';
-import { IncrementalRolloutService, TwitterService } from '../../app-services';
+import { TwitterService } from '../../app-services';
 import cloneDeep from 'lodash/cloneDeep';
 import difference from 'lodash/difference';
 import { Services } from '../../components-react/service-provider';
+import { getDefined } from '../../util/properties-type-guards';
 
 /**
  * The stream info view is responsible for keeping
@@ -36,12 +37,12 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
     return this.getServiceViews(TwitterService);
   }
 
-  private get incrementalRolloutView() {
-    return this.getServiceViews(IncrementalRolloutService);
-  }
-
   private get streamingState() {
     return Services.StreamingService.state;
+  }
+
+  get streamingStatus() {
+    return this.streamingState.streamingStatus;
   }
 
   get info() {
@@ -115,7 +116,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
    * Returns a list of enabled platforms with useCustomFields==false
    */
   get platformsWithoutCustomFields(): TPlatform[] {
-    return this.enabledPlatforms.filter(platform => !this.platforms[platform].useCustomFields);
+    return this.enabledPlatforms.filter(platform => !this.platforms[platform]!.useCustomFields);
   }
 
   checkEnabled(platform: TPlatform) {
@@ -128,7 +129,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
   getEnabledPlatforms(platforms: IStreamSettings['platforms']): TPlatform[] {
     return Object.keys(platforms).filter(
       (platform: TPlatform) =>
-        this.linkedPlatforms.includes(platform) && platforms[platform].enabled,
+        this.linkedPlatforms.includes(platform) && platforms[platform]?.enabled,
     ) as TPlatform[];
   }
 
@@ -203,9 +204,9 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
       game: '',
     };
     const destinations = Object.keys(platforms) as TPlatform[];
-    const enabledDestinations = destinations.filter(dest => platforms[dest].enabled);
+    const enabledDestinations = destinations.filter(dest => platforms[dest]?.enabled);
     const destinationsWithCommonSettings = enabledDestinations.filter(
-      dest => !platforms[dest].useCustomFields,
+      dest => !platforms[dest]!.useCustomFields,
     );
     const destinationWithCustomSettings = difference(
       enabledDestinations,
@@ -214,7 +215,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
 
     // search fields in platforms that don't use custom settings first
     destinationsWithCommonSettings.forEach(platform => {
-      const destSettings = platforms[platform];
+      const destSettings = getDefined(platforms[platform]);
       Object.keys(commonFields).forEach(fieldName => {
         if (commonFields[fieldName] || !destSettings[fieldName]) return;
         commonFields[fieldName] = destSettings[fieldName];
@@ -223,7 +224,7 @@ export class StreamInfoView<T extends Object> extends ViewHandler<T> {
 
     // search fields in platforms that have custom fields
     destinationWithCustomSettings.forEach(platform => {
-      const destSettings = platforms[platform];
+      const destSettings = getDefined(platforms[platform]);
       Object.keys(commonFields).forEach(fieldName => {
         if (commonFields[fieldName] || !destSettings[fieldName]) return;
         commonFields[fieldName] = destSettings[fieldName];

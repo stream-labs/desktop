@@ -15,7 +15,6 @@ import FFZSettings from 'components/windows/FFZSettings.vue';
 import SourcesShowcase from 'components/windows/SourcesShowcase.vue';
 import SceneTransitions from 'components/windows/SceneTransitions.vue';
 import AddSource from 'components/windows/AddSource.vue';
-import RenameSource from 'components/windows/RenameSource.vue';
 import NameScene from 'components/windows/NameScene.vue';
 import {
   NameFolder,
@@ -24,6 +23,8 @@ import {
   IconLibraryProperties,
   SharedComponentsLibrary,
   PerformanceMetrics,
+  RenameSource,
+  AdvancedStatistics,
 } from 'components/shared/ReactComponent';
 
 import GoLiveWindowDeprecated from 'components/windows/go-live/GoLiveWindow';
@@ -43,7 +44,6 @@ import MediaGallery from 'components/windows/MediaGallery.vue';
 import PlatformAppPopOut from 'components/windows/PlatformAppPopOut.vue';
 import EditTransform from 'components/windows/EditTransform';
 import EventFilterMenu from 'components/windows/EventFilterMenu';
-import AdvancedStatistics from 'components/windows/AdvancedStatistics';
 import OverlayWindow from 'components/windows/OverlayWindow.vue';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';

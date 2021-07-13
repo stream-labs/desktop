@@ -10,7 +10,6 @@ import MessageLayout from './MessageLayout';
 import { Timeline } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import Utils from '../../../services/utils';
-import {useSelector} from "../../store";
 
 /**
  * Shows transition to live progress and helps troubleshoot related problems

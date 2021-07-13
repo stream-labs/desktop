@@ -4,6 +4,7 @@ import { StatefulService } from '../../services';
 import isPlainObject from 'lodash/isPlainObject';
 import { useOnCreate } from '../hooks';
 import { useEffect, useRef } from 'react';
+import { isSimilar } from '../../util/isDeepEqual';
 
 /*
  * This file provides Redux integration in a modular way
@@ -20,7 +21,6 @@ function createReducerManager() {
   };
 
   // Create the initial combinedReducer
-  // let combinedReducer = combineReducers(reducers);
   let combinedReducer = combineReducers(reducers);
 
   // An array which is used to delete state keys when reducers are removed
@@ -90,31 +90,31 @@ function configureStore() {
 export const store = configureStore();
 
 /**
- * ReduxModuleManager controls Redux modules
+ * ReduxModuleManager helps to organize code splitting with help of Redux Modules
  * Each Redux Module controls its own chunk of state in the global Redux store
- * Flux Modules are objects that contain initialState, actions, mutations and getters
- * They could be dynamically created and destroyed
+ * Redux Modules are objects that contain initialState, actions, mutations and getters
  *
- * Use Redux Modules than you need share some logic or state between several React components,
- * Or when you have a single React component that has not-trivial logic that is better to encapsulate
- * into a different file. So you can keep this component lightweight and responsible for rendering only
+ * Use Redux Modules when you need share some logic or state between several React components
  *
- * Alternative to modules could be using StatefulServices. The difference between Redux Modules and StatefulServices:
+ * StatefulServices could be used as an alternative to Redux Modules
+ * However, there are some significant differences between Redux Modules and StatefulServices:
  * - StatefulServices are singleton objects. Redux Modules could have multiple instances
- * - StatefulServices always exists after initialization. Redux Modules exist only while components use them
- * - StatefulServices exist in the Worker window only and reachable from other windows by IPC only. Redux Modules exist in the same window they were created.
+ * - StatefulServices always exist after initialization. Redux Modules exist only while components that are using them are mounted
+ * - StatefulServices exist in the Worker window only and are reachable from other windows by IPC only. Redux Modules could exist in any window .
  *
  * Redux Modules are perfect for situations where:
- *  - You need share some logic or state between several React components
- *  - You want your complex React component be lightweight and responsible only for rendering
- *  - You have performance issues in your React component. React Modules use multiple optimisation technics
+ *  - You want to share some logic or state between several React components that are intended to work together
+ *  - You want to simplify a complex React component so it should be responsible only for rendering, and you extract everything unrelated to rendering to a module
+ *  - You have performance issues in your React component related to a redundant re-renderings or multiple IPC calls to Services
  *
  * StatefulServices and Services are perfect for situations where:
- *  - You need to have some global reactive state across multiple windows
- *  - You need a place for `http` data fetching, like API calls. So you can monitor all your http requests in the dev-tools window
- *  - You need some polling/watching code in the constantly existing object
- *  - You need to expose some API for external usage
- *  - You need generate documentation from jsdoc
+ *  - You want to have some global reactive state across multiple windows
+ *  - You need a place for `http` data fetching, like API calls. So you can monitor all your http requests in the same dev-tools window
+ *  - You need some polling/watching code that should work across the entire app
+ *  - You need to expose some API for external usage and generate jsdoc documentation
+ *
+ *  With further migration to Redux we probably want StatefulServices to be a slightly modified version
+ *  of ReduxModules because they use similar concepts
  */
 class ReduxModuleManager {
   public immerState: unknown;
@@ -132,7 +132,7 @@ class ReduxModuleManager {
     // use constructor name as a module name
     const moduleName = module.constructor.name;
 
-    // collect mutations from the module prototype
+    // collect mutations from the module's prototype
     const mutations = Object.getPrototypeOf(module).mutations;
 
     // call `init()` method of module if exist
@@ -140,7 +140,7 @@ class ReduxModuleManager {
     const initialState = module.state;
 
     // Use Redux API to create Redux reducers from our mutation functions
-    // this step adding the support of `Immer` library in reducers
+    // this step is adding the support of `Immer` library in reducers
     // https://redux-toolkit.js.org/usage/immer-reducers
     const reducer = createReducer(initialState, builder => {
       Object.keys(mutations).forEach(mutationName => {
@@ -164,7 +164,7 @@ class ReduxModuleManager {
     store.reducerManager.add(moduleName, reducer);
     // call the `initState` mutation to initialize the module's initial state
     store.dispatch({ type: 'initState', payload: { moduleName, initialState } });
-    // create a record in `registeredModules` with the just created module
+    // create a record in `registeredModules` with the newly created module
     this.registeredModules[moduleName] = {
       componentIds: [],
       module,
@@ -205,8 +205,8 @@ class ReduxModuleManager {
   }
 
   /**
-   * When Redux is running mutation it replace the state object with a special Proxy object from
-   * the Immer library. Keep this object in the `mutationState` property
+   * When Redux is running mutation it replaces the state object with a special Proxy object from
+   * the Immer library. Keep this object in the `immerState` property
    */
   setImmerState(immerState: unknown) {
     this.immerState = immerState;
@@ -235,11 +235,11 @@ export function getModuleManager() {
 
 /**
  * This module introduces a simple implementation of batching updates for the performance optimization
- * It prevents components to be re-rendered in the not-ready state
- * and reduces the overall amount of redundant re-renderings
+ * It prevents components from being re-rendered in a not-ready state
+ * and reduces an overall amount of redundant re-renderings
  *
  * React 18 introduced automated batched updates.
- * So most likely we can remove this module after the migration to the new version
+ * So most likely we can remove this module after the migration to the new version of React
  * https://github.com/reactwg/react-18/discussions/21
  */
 class BatchedUpdatesModule {
@@ -248,7 +248,7 @@ class BatchedUpdatesModule {
   };
 
   /**
-   * Temporary disables rendering for components when multiple mutations are applying
+   * Temporary disables rendering for components when multiple mutations are being applied
    */
   temporaryDisableRendering() {
     // if rendering is already disabled just ignore
@@ -257,7 +257,7 @@ class BatchedUpdatesModule {
     // disable rendering
     this.setIsRenderingDisabled(true);
 
-    // enable rendering again when Javascript processes the current task queue
+    // enable rendering again when Javascript processes the current queue of tasks
     setTimeout(() => {
       this.setIsRenderingDisabled(false);
     });
@@ -271,7 +271,7 @@ class BatchedUpdatesModule {
 
 /**
  * This module adds reactivity support from Vuex
- * It ensures React components should be re-rendered when Vuex updates their dependencies
+ * It ensures that React components are be re-rendered when Vuex updates their dependencies
  *
  * We should remove this module after we fully migrate our components to Redux
  */
@@ -282,7 +282,7 @@ class VuexModule {
   state: Record<string, number> = {};
 
   init() {
-    // listen mutations from the global Vuex store
+    // watch for mutations from the global Vuex store
     // and increment the revision number for affected StatefulService
     StatefulService.store.subscribe(mutation => {
       const serviceName = mutation.type.split('.')[0];
@@ -301,7 +301,7 @@ class VuexModule {
 }
 
 /**
- * A decorator that register the object method as an mutation
+ * A decorator that registers the object method as an mutation
  */
 export function mutation() {
   return function (target: any, methodName: string, descriptor: PropertyDescriptor) {
@@ -327,8 +327,6 @@ function registerMutation(target: any, mutationName: string, fn: Function) {
   // Transform the original function into the Redux Action handler
   // So we can use this method in the Redux's `createReducer()` call
   target.mutations[mutationName] = (state: unknown, action: { payload: unknown[] }) => {
-    // Redux passing us an State and Action into arguments
-    // transform the Action call to the Redux Reducer call
     const module = moduleManager.getModule(moduleName);
     moduleManager.setImmerState(state);
     originalMethod.apply(module, action.payload);
@@ -379,7 +377,7 @@ export function useSelector<T extends Object>(fn: () => T): T {
   // create the selector function
   const selector = useOnCreate(() => {
     return () => {
-      // if `isRenderingDisabled` selector will return previously cached values
+      // if `isRenderingDisabled=true` selector will return previously cached values
       if (batchedUpdatesModule.state.isRenderingDisabled && isMountedRef.current) {
         return cachedSelectedResult.current;
       }
@@ -448,7 +446,7 @@ export function createDependencyWatcher<T extends object>(watchedObject: T) {
     const values: Partial<T> = {};
     Object.keys(dependencies).forEach(propName => {
       const value = dependencies[propName];
-      // if one of dependencies is a binding then expose its internal dependencies
+      // if one of the dependencies is a Binding then expose its internal dependencies
       if (value && value._proxyName === 'Binding') {
         const bindingMetadata = value._binding;
         Object.keys(bindingMetadata.dependencies).forEach(bindingPropName => {
@@ -457,50 +455,13 @@ export function createDependencyWatcher<T extends object>(watchedObject: T) {
         });
         return;
       }
-      // if it's not a binding then just take the value from the watchedObject
+      // if it's not a Binding then just take the value from the watchedObject
       values[propName] = watchedObject[propName];
     });
     return values;
   }
 
   return { watcherProxy, getDependentFields, getDependentValues };
-}
-
-/**
- * Compare 2 object with limited depth
- */
-function isDeepEqual(obj1: any, obj2: any, currentDepth: number, maxDepth: number): boolean {
-  if (obj1 === obj2) return true;
-  if (currentDepth === maxDepth) return false;
-  if (Array.isArray(obj1) && Array.isArray(obj2)) return isArrayEqual(obj1, obj2);
-  if (isPlainObject(obj1) && isPlainObject(obj2)) {
-    const [keys1, keys2] = [Object.keys(obj1), Object.keys(obj2)];
-    if (keys1.length !== keys2.length) return false;
-    for (const key of keys1) {
-      if (!isDeepEqual(obj1[key], obj2[key], currentDepth + 1, maxDepth)) return false;
-    }
-    return true;
-  }
-  return false;
-}
-
-/**
- * consider isSimilar as isDeepEqual with depth 2
- */
-function isSimilar(obj1: any, obj2: any) {
-  return isDeepEqual(obj1, obj2, 0, 2);
-}
-
-/**
- * Shallow compare 2 arrays
- */
-function isArrayEqual(a: any[], b: any[]) {
-  if (a === b) return true;
-  if (a.length !== b.length) return false;
-  for (let i = 0; i < a.length; i++) {
-    if (a[i] !== b[i]) return false;
-  }
-  return true;
 }
 
 export interface IReduxModule<TInitParams, TState> {
