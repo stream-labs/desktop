@@ -7,6 +7,8 @@ import {
 } from 'services/widgets';
 import { WIDGET_INITIAL_STATE } from './widget-settings';
 import { InheritMutations } from 'services/core/stateful-service';
+import { formMetadata, metadata } from 'components/shared/inputs';
+import { $t } from 'services/i18n';
 
 export interface IPollSettings extends IWidgetSettings {
   background_color_primary: string;
@@ -49,5 +51,42 @@ export class PollService extends WidgetSettingsService<IPollData> {
       customFieldsAllowed: true,
       hasTestButtons: true,
     };
+  }
+
+  getMetadata() {
+    return formMetadata({
+      showOnClosed: metadata.bool({
+        title: $t('Show Closed Poll'),
+        tooltip: $t('Show/hide poll widget on closed poll'),
+      }),
+      backgroundPrimary: metadata.color({ title: $t('Primary Background Color') }),
+      backgroundSecondary: metadata.color({ title: $t('Secondary Background Color') }),
+      fadeTime: metadata.slider({
+        title: $t('Fade Time'),
+        min: 0,
+        max: 60,
+        tooltip: $t('Hide wigdet after X seconds of event'),
+      }),
+      font: metadata.fontFamily({ title: $t('Font') }),
+      fontPrimary: metadata.color({ title: $t('Header Text Color') }),
+      fontSecondary: metadata.color({ title: $t('Option Text Color') }),
+      titleSize: metadata.slider({ title: $t('Title Font Size'), min: 12, max: 48, interval: 2 }),
+      optionSize: metadata.slider({ title: $t('Option Font Size'), min: 12, max: 48, interval: 2 }),
+      titleWeight: metadata.slider({
+        title: $t('Title Font Weight'),
+        min: 300,
+        max: 900,
+        interval: 100,
+      }),
+      optionWeight: metadata.slider({
+        title: $t('Option Font Weight'),
+        min: 300,
+        max: 900,
+        interval: 100,
+      }),
+      thinBar: metadata.bool({ title: $t('Thin Bar'), tooltip: $t('Display thin/thick Bar') }),
+      barBackground: metadata.color({ title: $t('Bar Background Color') }),
+      barColor: metadata.color({ title: $t('Bar Color') }),
+    });
   }
 }
