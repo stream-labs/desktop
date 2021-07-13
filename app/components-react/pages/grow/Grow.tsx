@@ -101,7 +101,6 @@ function AddGoalModal(p: {
   }, [goalType]);
 
   function addGoal() {
-    if (GrowService.views.goals[goalType] && goalType !== 'custom') return;
     UsageStatisticsService.recordFeatureUsage('GrowTabGoal');
     const image = GrowService.views.goalOptions.find(goal => goal.type === goalType)?.image || '';
     GrowService.actions.addGoal({ title: goalTitle, total: goalTotal, type: goalType, image });
@@ -127,11 +126,11 @@ function AddGoalModal(p: {
     <Modal
       visible={p.visible}
       getContainer={`.${styles.goalTabContainer}`}
-      onOk={addGoal}
+      onOk={form.submit}
       onCancel={() => p.setShowGoalModal(false)}
       title={$t('Add Goal')}
     >
-      <Form form={form}>
+      <Form form={form} onFinish={addGoal}>
         <ListInput
           label={$t('Goal Type')}
           options={goalTypes}
