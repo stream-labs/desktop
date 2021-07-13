@@ -3,11 +3,11 @@ import { useOnCreate } from '../hooks';
 let nextComponentId = 1;
 
 /**
- * Returns an unique component id
+ * Returns a unique component id
  * If DEBUG=true then the componentId includes a component name
  */
 export function useComponentId() {
-  const DEBUG = true;
+  const DEBUG = false;
   return useOnCreate(() => {
     return DEBUG ? `${nextComponentId++}_${getComponentName()}` : `${nextComponentId++}`;
   });
@@ -20,7 +20,8 @@ export function useComponentId() {
 function getComponentName(): string {
   try {
     throw new Error();
-  } catch (e) {
-    return e.stack.split('\n')[10].split('at ')[1].split('(')[0].trim();
+  } catch (e: unknown) {
+    const error = e as Error;
+    return error.stack!.split('\n')[10].split('at ')[1].split('(')[0].trim();
   }
 }

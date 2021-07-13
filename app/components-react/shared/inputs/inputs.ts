@@ -98,8 +98,8 @@ export function useInput<
 >(type: TInputType, inputProps: TInputProps, antFeatures?: readonly string[]) {
   const { name, value, label } = inputProps;
 
-  // save input props to ref
-  // so it should always be updated in `useCallback` calls
+  // save input props to Ref
+  // so it will always be updated in `useCallback` calls
   const inputPropsRef = useRef(inputProps);
   inputPropsRef.current = inputProps;
 
@@ -203,6 +203,7 @@ export function useInput<
       'disabled',
       'nowrap',
       'layout',
+      'rules',
       'tooltip',
     ]),
     rules,

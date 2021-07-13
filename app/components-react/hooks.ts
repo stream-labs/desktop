@@ -150,3 +150,19 @@ export function useForceUpdate() {
   const [, forceUpdate] = React.useReducer(x => x + 1, 0);
   return forceUpdate;
 }
+
+/**
+ * Sets a function that guarantees a re-render and fresh state on every tick of the delay
+ */
+export function useRenderInterval(callback: () => void, delay: number) {
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      callback();
+      setTick(tick + 1);
+    }, delay);
+
+    return () => clearTimeout(timeout);
+  }, [tick]);
+}

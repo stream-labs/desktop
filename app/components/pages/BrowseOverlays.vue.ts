@@ -36,6 +36,8 @@ export default class BrowseOverlays extends Vue {
     id?: string;
   };
 
+  downloadInProgress = false;
+
   onBrowserViewReady(view: Electron.BrowserView) {
     new GuestApiHandler().exposeApi(view.webContents.id, {
       installOverlay: this.installOverlay,
@@ -71,6 +73,11 @@ export default class BrowseOverlays extends Vue {
       return;
     }
 
+    if (this.downloadInProgress) {
+      console.error('Already installing a theme');
+      return;
+    }
+
     // Handle exclusive theme that requires enabling multistream first
     // User should be eligible to enable restream for this behavior to work.
     // If restream is already set up, then just install as normal.
@@ -86,10 +93,17 @@ export default class BrowseOverlays extends Vue {
         overlayName: name,
       });
     } else {
-      const sub = this.sceneCollectionsService.downloadProgress.subscribe(progressCallback);
-      await this.sceneCollectionsService.installOverlay(url, name);
-      sub.unsubscribe();
-      this.navigationService.navigate('Studio');
+      this.downloadInProgress = true;
+      try {
+        const sub = this.sceneCollectionsService.downloadProgress.subscribe(progressCallback);
+        await this.sceneCollectionsService.installOverlay(url, name);
+        sub.unsubscribe();
+        this.downloadInProgress = false;
+        this.navigationService.navigate('Studio');
+      } catch (e: unknown) {
+        this.downloadInProgress = false;
+        throw e;
+      }
     }
   }
 

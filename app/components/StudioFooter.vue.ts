@@ -71,12 +71,12 @@ export default class StudioFooterComponent extends Vue {
 
     if (
       this.streamingStatus === EStreamingState.Reconnecting ||
-      this.performanceService.streamQuality === EStreamQuality.POOR
+      this.performanceService.views.streamQuality === EStreamQuality.POOR
     ) {
       return 'warning';
     }
 
-    if (this.performanceService.streamQuality === EStreamQuality.FAIR) {
+    if (this.performanceService.views.streamQuality === EStreamQuality.FAIR) {
       return 'info';
     }
 
