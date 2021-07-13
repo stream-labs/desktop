@@ -296,9 +296,12 @@ export class TwitchService
   }
 
   async putChannelInfo({ title, game, tags = [] }: ITwitchStartStreamOptions): Promise<void> {
-    const gameId = await this.requestTwitch<{ data: { id: string }[] }>(
-      `${this.apiBase}/helix/games?name=${encodeURIComponent(game)}`,
-    ).then(json => json.data[0].id);
+    let gameId;
+    if (game) {
+      gameId = await this.requestTwitch<{ data: { id: string }[] }>(
+        `${this.apiBase}/helix/games?name=${encodeURIComponent(game)}`,
+      ).then(json => json.data[0].id);
+    }
     await Promise.all([
       this.requestTwitch({
         url: `${this.apiBase}/helix/channels?broadcaster_id=${this.twitchId}`,
