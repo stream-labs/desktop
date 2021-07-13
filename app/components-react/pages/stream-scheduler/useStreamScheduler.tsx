@@ -33,7 +33,7 @@ export interface IStreamEvent {
    */
   id: string;
   /**
-   * The platform event is belong to
+   * The platform event belongs to
    */
   platform: TPlatform;
   /**
@@ -80,7 +80,7 @@ export function useStreamScheduler() {
 class StreamSchedulerModule {
   state = {
     /**
-     * `true` if should show loader for the modal window
+     * `true` if should show a spinner in the modal window
      */
     isLoading: false,
     /**
@@ -88,7 +88,7 @@ class StreamSchedulerModule {
      */
     isEventsLoaded: false,
     /**
-     * Keep here loaded events in the unified `IStreamEvent` format
+     * Keep loaded events here in the unified `IStreamEvent` format
      */
     events: [] as IStreamEvent[],
     /**
@@ -96,7 +96,7 @@ class StreamSchedulerModule {
      */
     isModalVisible: false,
     /**
-     * Keeps selected event id
+     * Keeps the selected event id
      */
     selectedEventId: '',
     /**
@@ -104,7 +104,7 @@ class StreamSchedulerModule {
      */
     time: 0,
     /**
-     * The platform that will selected in the modal
+     * The platform that will be selected in the modal
      */
     selectedPlatform: this.platforms[0],
     /**
@@ -115,7 +115,7 @@ class StreamSchedulerModule {
   };
 
   /**
-   * Load all event into state on module init
+   * Load all events into state on module init
    */
   init() {
     this.loadEvents();
