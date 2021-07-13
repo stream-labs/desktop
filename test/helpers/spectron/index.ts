@@ -201,7 +201,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     const disableTransitionsCode = `
       const disableAnimationsEl = document.createElement('style');
       disableAnimationsEl.textContent =
-        '*{ transition: none !important; transition-property: none !important; animation: none !important }';
+        '*{ transition: none !important; transition-property: none !important; animation-duration: 0 !important }';
       document.head.appendChild(disableAnimationsEl);
       0; // Prevent returning a value that cannot be serialized
     `;

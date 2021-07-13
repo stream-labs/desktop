@@ -127,7 +127,7 @@
     "@vue/babel-preset-jsx": "1.2.4",
     "@xkeshi/vue-qrcode": "0.3.0",
     "amazon-s3-uri": "0.0.3",
-    "antd": "^4.10.3",
+    "antd": "^4.16.7",
     "ava": "3.12.1",
     "babel-helper-vue-jsx-merge-props": "2.0.3",
     "babel-loader": "8.2.2",
