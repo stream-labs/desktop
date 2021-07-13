@@ -269,9 +269,11 @@ class StreamSchedulerModule {
 
     if (selectedPlatform === 'youtube') {
       // update YT event
+      const ytSettings = cloneDeep(streamSettings) as IYoutubeStartStreamOptions;
+      ytSettings.scheduledStartTime = this.state.time;
       const video = await Services.YoutubeService.actions.return.updateBroadcast(
         selectedEventId,
-        streamSettings as IYoutubeStartStreamOptions,
+        ytSettings,
       );
       this.setEvent(video.id, convertYTBroadcastToEvent(video));
     } else {
