@@ -83,4 +83,7 @@ export default class StudioFooterComponent extends Vue {
   }
 
   recordTooltip = $t('streaming.recordTooltip');
+  startReplayBufferTooltip = $t('streaming.startReplayBuffer');
+  stopReplayBufferTooltip = $t('streaming.stopReplayBuffer');
+  saveReplayTooltip = $t('streaming.saveReplay');
 }
