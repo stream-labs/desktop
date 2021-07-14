@@ -113,7 +113,7 @@ export default class SceneSelector extends Vue {
     if (this.searchQuery) {
       const fuse = new Fuse(list, {
         shouldSort: true,
-        keys: ['name']
+        keys: ['name'],
       });
 
       return fuse.search(this.searchQuery);

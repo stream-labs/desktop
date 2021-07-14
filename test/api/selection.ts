@@ -20,8 +20,8 @@ async function afterStart() {
   selectionService = client.getResource('SelectionService');
   sceneBuilder = new SceneBuilder(client);
   scene = sceneBuilder.scene;
-  getNode = (name) => scene.getNodeByName(name);
-  getNodeId = (name) => scene.getNodeByName(name).id;
+  getNode = name => scene.getNodeByName(name);
+  getNodeId = name => scene.getNodeByName(name).id;
 }
 
 test('Selection', async t => {

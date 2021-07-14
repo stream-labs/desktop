@@ -536,7 +536,8 @@ function* iterateAllKeyDescriptions(keyDescriptionis: KeyDescription[]): Iterabl
     }
 }
 
-// items の中のいずれかの要素を values が保持しているかを確認する
+/** items の中のいずれかの要素を values が保持しているかを確認する
+ */
 function isDependOnItems(values: OptimizeSettings, items: KeyDescription[]): boolean {
     for (const item of items) {
         if (values.hasOwnProperty(item.key)) {
@@ -591,7 +592,8 @@ export function filterKeyDescriptions(keysNeeded: OptimizeSettings, source: KeyD
     return result;
 }
 
-// params の中に、 OptimizationKey 型の全ての値を key として保持しているかどうかを確認する。
+/** params の中に、 OptimizationKey 型の全ての値を key として保持しているかどうかを確認する。
+ */
 function validateKeyDescriptions(params: KeyDescription[]) {
     // ここは全ての枝を列挙する
     const actual = new Set<string>(Array.from(iterateAllKeyDescriptions(params)).map(d => d.key));

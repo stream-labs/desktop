@@ -10,7 +10,9 @@ export default class Utils {
     Object.keys(source).forEach(propName => {
       Object.defineProperty(target, propName, {
         configurable: true,
-        get() { return source[propName]; }
+        get() {
+          return source[propName];
+        }
       });
     });
   }

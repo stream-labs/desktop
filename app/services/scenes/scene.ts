@@ -267,15 +267,17 @@ export class Scene implements ISceneApi {
       sourceNode.setParent(destFolderId);
     }
 
-
-    const itemsToMove: SceneItem[] = sourceNode.isFolder() ? sourceNode.getNestedItems() : [sourceNode];
+    const itemsToMove: SceneItem[] = sourceNode.isFolder()
+      ? sourceNode.getNestedItems()
+      : [sourceNode];
 
     // move nodes
 
     const sceneNodesIds = this.getNodesIds();
-    const nodesToMoveIds: string[] = sourceNode.sceneNodeType === 'folder' ?
-      [sourceNode.id].concat((sourceNode as SceneItemFolder).getNestedNodesIds()) :
-      [sourceNode.id];
+    const nodesToMoveIds: string[] =
+      sourceNode.sceneNodeType === 'folder'
+        ?  [sourceNode.id].concat((sourceNode as SceneItemFolder).getNestedNodesIds())
+        : [sourceNode.id];
     const firstNodeIndex = this.getNode(nodesToMoveIds[0]).getNodeIndex();
 
     let newNodeIndex = 0;
@@ -474,11 +476,7 @@ export class Scene implements ISceneApi {
   }
 
   @mutation()
-  private ADD_SOURCE_TO_SCENE(
-    sceneItemId: string,
-    sourceId: string,
-    obsSceneItemId: number
-  ) {
+  private ADD_SOURCE_TO_SCENE(sceneItemId: string, sourceId: string, obsSceneItemId: number) {
     this.sceneState.nodes.unshift({
       // This is information that belongs to a scene/source pair
 

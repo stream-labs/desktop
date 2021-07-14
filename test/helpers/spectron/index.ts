@@ -48,7 +48,7 @@ interface ITestRunnerOptions {
 
 const DEFAULT_OPTIONS: ITestRunnerOptions = {
   skipOnboarding: true,
-  restartAppAfterEachTest: true
+  restartAppAfterEachTest: true,
 };
 
 export function useSpectron(options: ITestRunnerOptions = {}) {
@@ -66,7 +66,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
         path.join(__dirname, 'context-menu-injected.js'),
         '--require',
         path.join(__dirname, 'dialog-injected.js'),
-        '.'
+        '.',
       ],
       env: {
         NODE_ENV: 'test',

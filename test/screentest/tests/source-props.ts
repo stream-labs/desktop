@@ -5,7 +5,6 @@ import { ISourcesServiceApi, TSourceType } from '../../../app/services/sources/s
 import { useScreentest } from '../screenshoter';
 import { IScenesServiceApi } from '../../../app/services/scenes/scenes-api';
 
-
 let showSourceProps: (name: string) => void;
 
 useSpectron({ restartAppAfterEachTest: false, afterStartCb: async t => {
@@ -23,9 +22,8 @@ useSpectron({ restartAppAfterEachTest: false, afterStartCb: async t => {
     'dshow_input',
     'wasapi_input_capture',
     'wasapi_output_capture',
-    'ndi_source'
+    'ndi_source',
   ];
-
 
   const client = await getClient();
   const scenesService = client.getResource<IScenesServiceApi>('ScenesService');

@@ -4,7 +4,7 @@ import {
   inputValuesToObsValues,
   TObsValue,
   TObsFormData,
-  IObsListInput
+  IObsListInput,
 } from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../obs-api';
 import { SourcesService } from 'services/sources';
@@ -683,7 +683,6 @@ export class SettingsService extends StatefulService<ISettingsState>
           return;
         }
       } else if (deviceForm.value !== null) {
-
         const device = audioDevices.find(device => device.id === deviceForm.value);
         if (device === undefined) {
           this.sourcesService.removeSource(source.sourceId);

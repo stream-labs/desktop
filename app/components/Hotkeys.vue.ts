@@ -7,7 +7,7 @@ import { SourcesService } from '../services/sources';
 import HotkeyGroup from './HotkeyGroup.vue';
 
 @Component({
-  components: { HotkeyGroup }
+  components: { HotkeyGroup },
 })
 export default class Hotkeys extends Vue {
 

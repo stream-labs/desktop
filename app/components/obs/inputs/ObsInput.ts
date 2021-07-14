@@ -368,7 +368,7 @@ export function getPropertiesFormData(obsSource: obs.ISource): TObsFormData {
       ),
       enabled: obsProp.enabled,
       visible: obsProp.visible,
-      type: obsType
+      type: obsType,
     };
 
     // handle property details
@@ -380,7 +380,7 @@ export function getPropertiesFormData(obsSource: obs.ISource): TObsFormData {
           description: $t(
             `source-props.${sourceType}['${obsProp.name}']['${option.value}']`,
             { fallback: option.name }
-          )
+          ),
         };
       });
       (formItem as IObsListInput<TObsValue>).options = options;

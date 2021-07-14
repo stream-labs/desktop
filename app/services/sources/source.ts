@@ -52,7 +52,6 @@ export class Source implements ISourceApi {
     this.sourcesService.sourceUpdated.next(this.sourceState);
   }
 
-
   getSettings(): Dictionary<any> {
     return this.getObsInput().settings;
   }
@@ -77,16 +76,13 @@ export class Source implements ISourceApi {
     return details;
   }
 
-
   getPropertiesManagerType(): TPropertiesManager {
     return this.sourcesService.propertiesManagers[this.sourceId].type;
   }
 
-
   getPropertiesManagerSettings(): Dictionary<any> {
     return this.sourcesService.propertiesManagers[this.sourceId].manager.settings;
   }
-
 
   getPropertiesManagerUI(): string {
     return this.sourcesService.propertiesManagers[this.sourceId].manager.customUIComponent;
@@ -102,29 +98,27 @@ export class Source implements ISourceApi {
     oldManager.destroy();
 
     const managerKlass = PROPERTIES_MANAGER_TYPES[type];
-    this.sourcesService.propertiesManagers[this.sourceId].manager =
-      new managerKlass(this.getObsInput(), settings);
+    this.sourcesService.propertiesManagers[this.sourceId].manager = new managerKlass(
+      this.getObsInput(),
+      settings,
+    );
     this.sourcesService.propertiesManagers[this.sourceId].type = type;
   }
-
 
   setPropertiesManagerSettings(settings: Dictionary<any>) {
     this.sourcesService.propertiesManagers[this.sourceId].manager.applySettings(settings);
   }
-
 
   getPropertiesFormData(): TObsFormData {
     const manager = this.sourcesService.propertiesManagers[this.sourceId].manager;
     return manager.getPropertiesFormData();
   }
 
-
   setPropertiesFormData(properties: TObsFormData) {
     const manager = this.sourcesService.propertiesManagers[this.sourceId].manager;
     manager.setPropertiesFormData(properties);
     this.sourcesService.sourceUpdated.next(this.sourceState);
   }
-
 
   duplicate(): Source {
     if (this.doNotDuplicate) return null;
@@ -138,7 +132,6 @@ export class Source implements ISourceApi {
       }
     );
   }
-
 
   remove() {
     this.sourcesService.removeSource(this.sourceId);
@@ -173,7 +166,6 @@ export class Source implements ISourceApi {
     (obsInput.properties.get('refreshnocache') as obs.IButtonProperty)
       .buttonClicked(obsInput);
   }
-
 
   @Inject()
   protected sourcesService: SourcesService;

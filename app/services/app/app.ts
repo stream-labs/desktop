@@ -43,7 +43,7 @@ export class AppService extends StatefulService<IAppState> {
 
   static initialState: IAppState = {
     loading: true,
-    argv: electron.remote.process.argv
+    argv: electron.remote.process.argv,
   };
 
   private autosaveInterval: number;

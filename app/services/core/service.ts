@@ -26,9 +26,7 @@ export abstract class Service {
   serviceName = this.constructor.name;
 
   static get instance() {
-    const instance = !this.hasInstance
-      ? Service.createInstance(this)
-      : this[singleton];
+    const instance = !this.hasInstance ? Service.createInstance(this) : this[singleton];
     return this.proxyFn ? this.proxyFn(instance) : instance;
   }
 

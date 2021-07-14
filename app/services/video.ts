@@ -33,7 +33,7 @@ export class Display {
     x: 0,
     y: 0,
     width: 0,
-    height: 0
+    height: 0,
   };
 
   windowId: string;
@@ -99,10 +99,12 @@ export class Display {
     const trackingFun = () => {
       const rect = this.getScaledRectangle(element.getBoundingClientRect());
 
-      if ((rect.x !== this.currentPosition.x) ||
-        (rect.y !== this.currentPosition.y) ||
-        (rect.width !== this.currentPosition.width) ||
-        (rect.height !== this.currentPosition.height)) {
+      if (
+        rect.x !== this.currentPosition.x ||
+        rect.y !== this.currentPosition.y ||
+        rect.width !== this.currentPosition.width ||
+        rect.height !== this.currentPosition.height
+      ) {
 
         this.move(rect.x, rect.y);
         this.resize(rect.width, rect.height);
@@ -120,7 +122,7 @@ export class Display {
       x: rect.left * factor,
       y: rect.top * factor,
       width: rect.width * factor,
-      height: rect.height * factor
+      height: rect.height * factor,
     };
   }
 
@@ -161,7 +163,7 @@ export class Display {
 
     this.outputRegion = {
       ...position,
-      ...size
+      ...size,
     };
 
     this.outputRegionCallbacks.forEach(cb => {
@@ -184,9 +186,7 @@ export class Display {
 }
 
 export class VideoService extends Service {
-
-  @Inject()
-  settingsService: SettingsService;
+  @Inject() settingsService: SettingsService;
 
   activeDisplays: Dictionary<Display> = {};
 
@@ -210,8 +210,14 @@ export class VideoService extends Service {
   // Generates a random string:
   // https://gist.github.com/6174/6062387
   getRandomDisplayId() {
-    return Math.random().toString(36).substring(2, 15) +
-      Math.random().toString(36).substring(2, 15);
+    return (
+      Math.random()
+        .toString(36)
+        .substring(2, 15) +
+      Math.random()
+        .toString(36)
+        .substring(2, 15)
+    );
   }
 
   getScreenRectangle() {
@@ -219,7 +225,7 @@ export class VideoService extends Service {
       x: 0,
       y: 0,
       width: this.baseWidth,
-      height: this.baseHeight
+      height: this.baseHeight,
     });
   }
 
@@ -238,7 +244,7 @@ export class VideoService extends Service {
 
     return {
       width,
-      height
+      height,
     };
   }
 

@@ -7,26 +7,19 @@ import path from 'path';
 import electron from 'electron';
 import { authorizedHeaders } from 'util/requests';
 
-export type TUsageEvent =
-  'stream_start' |
-  'stream_end' |
-  'app_start' |
-  'app_close' |
-  'crash';
+export type TUsageEvent = 'stream_start' | 'stream_end' | 'app_start' | 'app_close' | 'crash';
 
 export function track(event: TUsageEvent) {
   return (target: any, methodName: string, descriptor: PropertyDescriptor) => {
-
     return {
       ...descriptor,
       value(...args: any[]): any {
         UsageStatisticsService.instance.recordEvent(event);
         descriptor.value.apply(this, args);
-      }
+      },
     };
   };
 }
-
 
 export class UsageStatisticsService extends Service {
   @Inject() userService: UserService;

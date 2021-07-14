@@ -17,7 +17,6 @@ import { ISceneItemFolder } from './scenes-api';
 
 @ServiceHelper()
 export class SceneItemFolder extends SceneItemNode implements ISceneItemFolderApi {
-
   name: string;
 
   private sceneFolderState: ISceneItemFolder;
@@ -26,7 +25,6 @@ export class SceneItemFolder extends SceneItemNode implements ISceneItemFolderAp
   @Inject() protected selectionService: SelectionService;
 
   constructor(sceneId: string, id: string) {
-
     super();
 
     this.id = id;

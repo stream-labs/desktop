@@ -13,8 +13,7 @@ export abstract class PersistentStatefulService<
   static defaultState = {};
 
   static get initialState() {
-    const persisted =
-      JSON.parse(localStorage.getItem(this.localStorageKey)) || {};
+    const persisted = JSON.parse(localStorage.getItem(this.localStorageKey)) || {};
 
     return merge({}, this.defaultState, persisted);
   }
@@ -25,24 +24,19 @@ export abstract class PersistentStatefulService<
 
   init() {
     super.init();
-
     this.store.watch(
       () => {
         return JSON.stringify(this.state);
       },
       val => {
         // save only non-default values to the localStorage
-        const PersistentService = this
-          .constructor as typeof PersistentStatefulService;
+        const PersistentService = this.constructor as typeof PersistentStatefulService;
         const valueToSave = Utils.getDeepChangedParams(
           PersistentService.defaultState,
-          JSON.parse(val)
+          JSON.parse(val),
         );
-        localStorage.setItem(
-          PersistentService.localStorageKey,
-          JSON.stringify(valueToSave)
-        );
-      }
+        localStorage.setItem(PersistentService.localStorageKey, JSON.stringify(valueToSave));
+      },
     );
   }
 }

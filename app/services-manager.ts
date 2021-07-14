@@ -1,7 +1,7 @@
 import electron from 'electron';
 import uuid from 'uuid/v4';
 import 'reflect-metadata';
-import { Service } from './services/core/service';
+import { Service } from 'services/core/service';
 import { ObsImporterService } from './services/obs-importer';
 import { ScenesService, SceneItem, SceneItemFolder, Scene, SceneItemNode } from './services/scenes';
 import { ClipboardService } from './services/clipboard';
@@ -170,7 +170,6 @@ export class ServicesManager extends Service {
   subscriptions: Dictionary<Subscription> = {};
 
   init() {
-
     // this helps to debug services from the console
     if (Utils.isDevMode()) {
       window['sm'] = this;
@@ -185,7 +184,6 @@ export class ServicesManager extends Service {
     }
 
     Service.serviceAfterInit.subscribe(service => this.initObservers(service));
-
   }
 
   private initObservers(observableService: Service): Service[] {
@@ -193,9 +191,7 @@ export class ServicesManager extends Service {
     const items = observeList.observations.filter(item => {
       return item.observableServiceName === observableService.serviceName;
     });
-    return items.map(
-      item => this.getService(item.observerServiceName).instance
-    );
+    return items.map(item => this.getService(item.observerServiceName).instance);
   }
 
   getService(serviceName: string) {
@@ -419,9 +415,7 @@ export class ServicesManager extends Service {
 
     const helperName = resourceId.split('[')[0];
     const constructorArgsStr = resourceId.substr(helperName.length);
-    const constructorArgs = constructorArgsStr
-      ? JSON.parse(constructorArgsStr)
-      : void 0;
+    const constructorArgs = constructorArgsStr ? JSON.parse(constructorArgsStr) : void 0;
     return this.getHelper(helperName, constructorArgs);
   }
 

@@ -2,11 +2,7 @@ import { Service } from 'services/core/service';
 import { ServicesManager } from 'services-manager';
 import electron from 'electron';
 import { Subscription } from 'rxjs';
-import {
-  IJsonRpcRequest,
-  IJsonRpcResponse,
-  IJsonRpcEvent
-} from 'services/api/jsonrpc';
+import { IJsonRpcRequest, IJsonRpcResponse, IJsonRpcEvent } from 'services/api/jsonrpc';
 
 const { ipcRenderer } = electron;
 
@@ -21,16 +17,14 @@ export class IpcServerService extends Service {
 
   listen() {
     this.requestHandler = (event: Electron.Event, request: IJsonRpcRequest) => {
-      const response: IJsonRpcResponse<
-        any
-      > = this.servicesManager.executeServiceRequest(request);
+      const response: IJsonRpcResponse<any> = this.servicesManager.executeServiceRequest(request);
       ipcRenderer.send('services-response', response);
     };
     ipcRenderer.on('services-request', this.requestHandler);
     ipcRenderer.send('services-ready');
 
-    this.servicesEventsSubscription = this.servicesManager.serviceEvent.subscribe(
-      event => this.sendEvent(event)
+    this.servicesEventsSubscription = this.servicesManager.serviceEvent.subscribe(event =>
+      this.sendEvent(event),
     );
   }
 

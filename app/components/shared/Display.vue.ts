@@ -35,7 +35,7 @@ export default class Display extends Vue {
     const displayId = this.videoService.getRandomDisplayId();
     this.display = new OBSDisplay(displayId, {
       sourceId: this.sourceId,
-      paddingSize: this.paddingSize
+      paddingSize: this.paddingSize,
     });
     this.display.setShoulddrawUI(this.drawUI);
 

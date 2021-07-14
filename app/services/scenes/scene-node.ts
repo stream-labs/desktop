@@ -9,7 +9,6 @@ import { SelectionService } from 'services/selection';
 
 @ServiceHelper()
 export abstract class SceneItemNode implements ISceneItemNode {
-
   id: string;
   parentId: string;
   childrenIds: string[];
@@ -78,7 +77,6 @@ export abstract class SceneItemNode implements ISceneItemNode {
     if (childInd !== 0) return this.getScene().getNode(siblingsIds[childInd - 1]);
   }
 
-
   getNextSiblingNode(): TSceneNode {
     const siblingsIds = this.parentId ?
       this.getParent().getNestedNodesIds() :
@@ -145,7 +143,6 @@ export abstract class SceneItemNode implements ISceneItemNode {
   protected abstract get state(): ISceneItemNode;
   protected abstract remove(): void;
 
-
   @mutation()
   protected SET_PARENT(parentId?: string) {
     const nodeState = this.state;
@@ -161,5 +158,4 @@ export abstract class SceneItemNode implements ISceneItemNode {
     const newParent = sceneState.nodes.find(node => node.id === parentId);
     newParent.childrenIds.unshift(this.id);
   }
-
 }

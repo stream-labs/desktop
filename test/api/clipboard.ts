@@ -30,8 +30,8 @@ async function afterStart() {
   sceneCollectionsService = client.getResource('SceneCollectionsService');
   sourceFiltersService = client.getResource('SourceFiltersService');
   sceneBuilder = new SceneBuilder(client);
-  getNode = (name) => sceneBuilder.scene.getNodeByName(name);
-  getNodeId = (name) => sceneBuilder.scene.getNodeByName(name).id;
+  getNode = name => sceneBuilder.scene.getNodeByName(name);
+  getNodeId = name => sceneBuilder.scene.getNodeByName(name).id;
 }
 
 test('Simple copy/paste', async t => {

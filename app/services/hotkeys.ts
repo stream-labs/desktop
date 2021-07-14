@@ -26,7 +26,6 @@ function getTransitionsService(): TransitionsService {
 
 type THotkeyType = 'GENERAL' | 'SCENE' | 'SCENE_ITEM' | 'SOURCE';
 
-
 /**
  * Represents the key bound to a hotkey action
  */
@@ -40,20 +39,21 @@ export interface IBinding {
   };
 }
 
-
 interface IHotkeyAction {
   name: string;
   description(entityId: string): string;
+
   down(entityId: string): void;
+
   isActive?(entityId: string): boolean;
   shouldApply?(entityId: string): boolean;
+
   up?(entityId: string): void;
 
   // These are injected dynamically
   downHandler?(): void;
   upHandler?(): void;
 }
-
 
 /**
  * All possible hotkeys should be defined in this object.
@@ -115,7 +115,7 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
       name: 'TRANSITION_STUDIO_MODE',
       description: () => $t('hotkeys.studioModeTransition'),
       down: () => getTransitionsService().executeStudioModeTransition()
-    }
+    },
   ],
 
   SCENE: [
@@ -182,7 +182,6 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
   ]
 };
 
-
 /**
  * Represents a serialized Hotkey
  */
@@ -204,16 +203,13 @@ export interface IHotkeysSet {
   scenes: Dictionary<IHotkey[]>;
 }
 
-
 interface IHotkeysServiceState {
   hotkeys: IHotkey[]; // only bound hotkeys are stored
 }
 
-
 export class HotkeysService extends StatefulService<IHotkeysServiceState> {
-
   static initialState: IHotkeysServiceState = {
-    hotkeys: []
+    hotkeys: [],
   };
 
   @Inject()
@@ -230,7 +226,6 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
    */
   private registeredHotkeys: Hotkey[];
 
-
   init() {
     this.scenesService.sceneAdded.subscribe(() => this.invalidate());
     this.scenesService.sceneRemoved.subscribe(() => this.invalidate());
@@ -240,11 +235,9 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     this.sourcesService.sourceRemoved.subscribe(() => this.invalidate());
   }
 
-
   addHotkey(hotkeyModel: IHotkey) {
     this.ADD_HOTKEY(hotkeyModel);
   }
-
 
   private invalidate() {
     this.registeredHotkeys = null;
@@ -256,10 +249,9 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     HOTKEY_ACTIONS.GENERAL.forEach(action => {
       hotkeys.push({
         actionName: action.name,
-        bindings: []
+        bindings: [],
       });
     });
-
 
     this.scenesService.scenes.forEach(scene => {
       scene.getItems().forEach(sceneItem => {
@@ -267,7 +259,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
           hotkeys.push({
             actionName: action.name,
             bindings: [],
-            sceneItemId: sceneItem.sceneItemId
+            sceneItemId: sceneItem.sceneItemId,
           });
         });
       });
@@ -276,11 +268,10 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
         hotkeys.push({
           actionName: action.name,
           bindings: [],
-          sceneId: scene.id
+          sceneId: scene.id,
         });
       });
     });
-
 
     this.sourcesService.getSources().forEach(source => {
       HOTKEY_ACTIONS.SOURCE.forEach(action => {
@@ -305,20 +296,16 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     this.registeredHotkeys = hotkeys.map(hotkeyModel => this.getHotkey(hotkeyModel));
   }
 
-
   getHotkey(obj: IHotkey): Hotkey {
     return new Hotkey(obj);
   }
-
 
   getHotkeys(): Hotkey[] {
     if (!this.registeredHotkeys) this.updateRegisteredHotkeys();
     return this.registeredHotkeys.filter(hotkey => hotkey.shouldApply);
   }
 
-
   getHotkeysSet(): IHotkeysSet {
-
     const sourcesHotkeys: Dictionary<Hotkey[]> = {};
     this.sourcesService.getSources().forEach(source => {
       const sourceHotkeys = this.getSourceHotkeys(source.sourceId);
@@ -339,40 +326,36 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     };
   }
 
-
   clearAllHotkeys() {
     this.applyHotkeySet({
       general: [],
       sources: {},
-      scenes: {}
+      scenes: {},
     });
   }
-
 
   applyHotkeySet(hotkeySet: IHotkeysSet) {
     const hotkeys: IHotkey[] = [];
     hotkeys.push(...hotkeySet.general);
     Object.keys(hotkeySet.scenes).forEach(sceneId => hotkeys.push(...hotkeySet.scenes[sceneId]));
-    Object.keys(hotkeySet.sources).forEach(sourceId => hotkeys.push(...hotkeySet.sources[sourceId]));
+    Object.keys(hotkeySet.sources).forEach(sourceId =>
+      hotkeys.push(...hotkeySet.sources[sourceId]),
+    );
     this.setHotkeys(hotkeys);
     this.bindHotkeys();
   }
-
 
   getGeneralHotkeys(): Hotkey[] {
     return this.getHotkeys().filter(hotkey => hotkey.type === 'GENERAL');
   }
 
-
   getSourceHotkeys(sourceId: string): Hotkey[] {
     return this.getHotkeys().filter(hotkey => hotkey.sourceId === sourceId);
   }
 
-
   getSceneHotkeys(sceneId: string): Hotkey[] {
     return this.getHotkeys().filter(hotkey => hotkey.sceneId === sceneId);
   }
-
 
   getSceneItemsHotkeys(sceneId: string): Hotkey[] {
     const scene = this.scenesService.getScene(sceneId);
@@ -380,16 +363,13 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     return this.getHotkeys().filter(hotkey => sceneItemsIds.includes(hotkey.sceneItemId));
   }
 
-
   getSceneItemHotkeys(sceneItemId: string): Hotkey[] {
     return this.getHotkeys().filter(hotkey => hotkey.sceneItemId === sceneItemId);
   }
 
-
   unregisterAll() {
     this.keyListenerService.unregisterAll();
   }
-
 
   private setHotkeys(hotkeys: IHotkey[]) {
     this.CLEAR_HOTKEYS();
@@ -398,7 +378,6 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     });
     this.invalidate();
   }
-
 
   bindHotkeys() {
     this.unregisterAll();
@@ -428,7 +407,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
       this.keyListenerService.register({
         ...binding,
         eventType: 'registerKeydown',
-        callback: () => hotkeys.forEach(hotkey => hotkey.action.downHandler())
+        callback: () => hotkeys.forEach(hotkey => hotkey.action.downHandler()),
       });
     });
 
@@ -438,23 +417,20 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
       this.keyListenerService.register({
         ...binding,
         eventType: 'registerKeyup',
-        callback: () => hotkeys.forEach(hotkey => hotkey.action.upHandler())
+        callback: () => hotkeys.forEach(hotkey => hotkey.action.upHandler()),
       });
     });
   }
-
 
   @mutation()
   private ADD_HOTKEY(hotkeyObj: IHotkey) {
     this.state.hotkeys.push(hotkeyObj);
   }
 
-
   @mutation()
   private SET_BINDINGS(hotkeyInd: number, bindings: IBinding[]) {
     this.state.hotkeys[hotkeyInd].bindings = bindings;
   }
-
 
   @mutation()
   private CLEAR_HOTKEYS() {
@@ -482,7 +458,6 @@ export class Hotkey implements IHotkey {
 
   private hotkeyModel: IHotkey;
 
-
   constructor(hotkeyModel: IHotkey) {
     Object.assign(this, hotkeyModel);
     this.hotkeyModel = hotkeyModel;
@@ -493,7 +468,7 @@ export class Hotkey implements IHotkey {
       this.type = 'SCENE_ITEM';
     } else if (this.sceneId) {
       this.type = 'SCENE';
-    } else  {
+    } else {
       this.type = 'GENERAL';
     }
 
@@ -504,7 +479,6 @@ export class Hotkey implements IHotkey {
     this.shouldApply = this.action.shouldApply(entityId);
   }
 
-
   isSameHotkey(other: IHotkey) {
     return (this.actionName === other.actionName) &&
       (this.sceneId === other.sceneId) &&
@@ -512,11 +486,9 @@ export class Hotkey implements IHotkey {
       (this.sceneItemId === other.sceneItemId);
   }
 
-
   getModel(): IHotkey {
     return { ...this.hotkeyModel };
   }
-
 
   private getAction(entityId: string): IHotkeyAction {
     const action = { ...HOTKEY_ACTIONS[this.type].find(action => {
@@ -529,18 +501,21 @@ export class Hotkey implements IHotkey {
     if (!action.isActive) action.isActive = () => false;
     if (!action.shouldApply) action.shouldApply = () => true;
 
-
     // We defer the actions until after we've decided whether
     // or not to execute each action.
     if (up) {
       action.upHandler = () => {
-        if (!action.isActive(entityId)) defer(() => up(entityId));
+        if (!action.isActive(entityId)) {
+          defer(() => up(entityId));
+        }
       };
     }
 
     if (down) {
       action.downHandler = () => {
-        if (!action.isActive(entityId)) defer(() => down(entityId));
+        if (!action.isActive(entityId)) {
+          defer(() => down(entityId));
+        }
       };
     }
 

@@ -9,16 +9,13 @@ const path = require('path');
 
 useSpectron({ restartAppAfterEachTest: false });
 
-
 test('The default scene exists', async t => {
   const client = await getClient();
   const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
   const scenes = scenesService.getScenes();
 
   t.true(scenes.length === 1);
-
 });
-
 
 test('Creating, fetching and removing scenes', async t => {
   const client = await getClient();
@@ -42,7 +39,6 @@ test('Creating, fetching and removing scenes', async t => {
   t.deepEqual(scenesNames, [scene1name]);
 });
 
-
 test('Switching between scenes', async t => {
   const client = await getClient();
   const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
@@ -51,7 +47,6 @@ test('Switching between scenes', async t => {
 
   const scene = scenesService.getSceneByName(scene1name);
   const scene2 = scenesService.createScene('Scene2');
-
 
   t.is(scene.id, scenesService.activeSceneId);
 
@@ -64,7 +59,6 @@ test('Switching between scenes', async t => {
   t.is(scene.id, scenesService.activeSceneId);
 
 });
-
 
 test('Creating, fetching and removing scene-items', async t => {
   const client = await getClient();
@@ -80,14 +74,11 @@ test('Creating, fetching and removing scene-items', async t => {
   let itemsNames = items.map(item => item['name']);
   t.deepEqual(itemsNames, ['Image2', 'Image1']);
 
-
   scene.removeItem(image2.sceneItemId);
   items = scene.getItems().filter(i => !presetItemIds.includes(i.id));
   itemsNames = items.map(item => item['name']);
   t.deepEqual(itemsNames, ['Image1']);
-
 });
-
 
 test('Scenes events', async t => {
   const client = await getClient();
@@ -117,23 +108,18 @@ test('Scenes events', async t => {
   eventData = await client.fetchNextEvent();
   t.is(eventData.name, 'Scene3');
 
-
   const image = scene2.createAndAddSource('image', 'image_source');
   eventData = await client.fetchNextEvent();
   t.is(eventData.sceneItemId, image.sceneItemId);
-
 
   image.setVisibility(false);
   eventData = await client.fetchNextEvent();
   t.is(eventData.visible, false);
 
-
   image.remove();
   eventData = await client.fetchNextEvent();
   t.is(eventData.sceneItemId, image.sceneItemId);
-
 });
-
 
 test('Creating nested scenes', async t => {
   const client = await getClient();
@@ -161,9 +147,7 @@ test('Creating nested scenes', async t => {
   itemsANames = sceneAItems.map(item => item['name']);
 
   t.deepEqual(itemsANames, ['SceneB']);
-
 });
-
 
 test('SceneItem.setSettings()', async t => {
   const client = await getClient();
@@ -196,10 +180,7 @@ test('SceneItem.setSettings()', async t => {
     left: 7,
     right: 10,
   });
-
-
 });
-
 
 test('SceneItem.resetTransform()', async t => {
   const client = await getClient();
@@ -223,8 +204,6 @@ test('SceneItem.resetTransform()', async t => {
     crop: { top: 0, right: 0, bottom: 0, left: 0 },
     rotation: 0,
   });
-
-
 });
 
 test('SceneItem.addFile()', async t => {
@@ -251,6 +230,4 @@ test('SceneItem.addFile()', async t => {
       text
         hello.txt: text_gdiplus
   `));
-
-
 });

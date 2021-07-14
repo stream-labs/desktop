@@ -232,9 +232,9 @@ export class SourcesNode extends Node<ISchema, {}> {
             name: filter.name,
             type: filter.type,
             settings: filter.settings,
-            enabled: filter.enabled === void 0 ? true : filter.enabled
+            enabled: filter.enabled === void 0 ? true : filter.enabled,
           };
-        })
+        }),
       };
     });
 
@@ -247,7 +247,7 @@ export class SourcesNode extends Node<ISchema, {}> {
       this.sourcesService.addSource(source, this.data.items[index].name, {
         channel: sourceInfo.channel,
         propertiesManager: sourceInfo.propertiesManager,
-        propertiesManagerSettings: sourceInfo.propertiesManagerSettings || {}
+        propertiesManagerSettings: sourceInfo.propertiesManagerSettings || {},
       });
 
       let newSource = this.sourcesService.getSource(sourceInfo.id);
@@ -266,23 +266,17 @@ export class SourcesNode extends Node<ISchema, {}> {
           .setMul(sourceInfo.volume != null ? sourceInfo.volume : 1);
         this.audioService.getSource(sourceInfo.id).setSettings({
           forceMono: sourceInfo.forceMono,
-          syncOffset: sourceInfo.syncOffset
-            ? AudioService.timeSpecToMs(sourceInfo.syncOffset)
-            : 0,
+          syncOffset: sourceInfo.syncOffset ? AudioService.timeSpecToMs(sourceInfo.syncOffset) : 0,
           audioMixers: sourceInfo.audioMixers,
-          monitoringType: sourceInfo.monitoringType
+          monitoringType: sourceInfo.monitoringType,
         });
-        this.audioService
-          .getSource(sourceInfo.id)
-          .setHidden(!!sourceInfo.mixerHidden);
+        this.audioService.getSource(sourceInfo.id).setHidden(!!sourceInfo.mixerHidden);
       }
 
       this.checkTextSourceValidity(sourceInfo);
 
       if (sourceInfo.hotkeys) {
-        promises.push(
-          this.data.items[index].hotkeys.load({ sourceId: sourceInfo.id })
-        );
+        promises.push(this.data.items[index].hotkeys.load({ sourceId: sourceInfo.id }));
       }
     });
 

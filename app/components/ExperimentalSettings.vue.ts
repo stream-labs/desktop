@@ -6,7 +6,7 @@ import { TObsFormData, TObsValue } from 'components/obs/inputs/ObsInput';
 import { ICustomizationServiceApi } from 'services/customization';
 
 @Component({
-  components: { GenericForm }
+  components: { GenericForm },
 })
 export default class ExperimentalSettings extends Vue {
 
