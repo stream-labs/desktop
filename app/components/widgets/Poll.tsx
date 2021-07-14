@@ -27,7 +27,7 @@ export default class Poll extends WidgetSettings<IPollData, PollService> {
   get form() {
     return (
       this.loaded && (
-        <>
+        <div>
           <ValidatedForm slot="poll" onInput={() => this.save()}>
             <VFormGroup
               vModel={this.wData.settings.show_on_closed}
@@ -78,7 +78,7 @@ export default class Poll extends WidgetSettings<IPollData, PollService> {
             />
             <VFormGroup vModel={this.wData.settings.bar_color} metadata={this.metadata.barColor} />
           </ValidatedForm>
-        </>
+        </div>
       )
     );
   }

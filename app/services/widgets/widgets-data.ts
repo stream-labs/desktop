@@ -581,7 +581,7 @@ export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisp
     name: $t('Poll'),
     description: $t('Let your viewers vote on a result'),
     demoVideo: false,
-    demoFilename: 'source-sponsor-banner.png',
+    demoFilename: 'poll.png',
     supportList: [],
   },
 });
