@@ -16,7 +16,7 @@ import {
   TextInput,
   TInputLayout,
 } from '../shared/inputs';
-import { Alert, Button, Col, Row, Space, Tag, Timeline } from 'antd';
+import { Alert, Button, Col, Row, Space, Tag, Timeline, Tabs } from 'antd';
 import { Services } from '../service-provider';
 import InputWrapper from '../shared/inputs/InputWrapper';
 import Scrollable from '../shared/Scrollable';
@@ -28,6 +28,7 @@ import { mutation } from '../store';
 import { pick } from 'lodash';
 import { useModule } from '../hooks/useModule';
 import { merge } from '../../util/merge';
+const { TabPane } = Tabs;
 
 export default function SharedComponentsLibrary() {
   return (
@@ -35,7 +36,14 @@ export default function SharedComponentsLibrary() {
       <Row gutter={16} style={{ height: 'calc(100% + 24px)' }}>
         <Col flex="auto" style={{ height: '100%' }}>
           <Scrollable style={{ maxHeight: '100%' }}>
-            <Examples />
+            <Tabs defaultActiveKey="1">
+              <TabPane tab="Shared Components" key="1">
+                <Examples />
+              </TabPane>
+              <TabPane tab="Demo Form" key="2">
+                <DemoForm />
+              </TabPane>
+            </Tabs>
           </Scrollable>
         </Col>
         <Col flex={'300px'}>
@@ -393,6 +401,54 @@ function SettingsPanel() {
         <CheckboxInput label={'Required'} {...bind.required} />
         <CheckboxInput label={'Disabled'} {...bind.disabled} />
       </InputWrapper>
+    </Form>
+  );
+}
+
+/**
+ * A component that renders a form for our automated tests
+ */
+export function DemoForm() {
+  const { layout } = useSharedComponentsLibrary();
+  const { s, bind } = useFormState({
+    name: '',
+    gender: '',
+    age: 0,
+    addIntroduction: false,
+    introduction: '',
+    plusOneName: '',
+    confirm1: false,
+    confirm2: false,
+    colors: [] as number[],
+  });
+
+  const genderOptions = [
+    { value: 'male', label: 'Male' },
+    { value: 'female', label: 'Female' },
+    { value: 'other', label: 'other' },
+  ];
+
+  const colorOptions = [
+    { value: 1, label: 'Red' },
+    { value: 2, label: 'Green' },
+    { value: 3, label: 'Blue' },
+    { value: 4, label: 'Orange' },
+  ];
+
+  return (
+    <Form layout={layout} name="demo-form">
+      <Example title="Demo Form">
+        <TextInput {...bind.name} label={'Name'} required />
+        <ListInput {...bind.gender} label={'Gender'} options={genderOptions} />
+        <NumberInput {...bind.age} label={'Age'} />
+        <TagsInput label="Pick your favorite colors" {...bind.colors} options={colorOptions} />
+        <SwitchInput {...bind.addIntroduction} label={'Add Introduction'} />
+        {s.addIntroduction && <TextAreaInput {...bind.introduction} label={'Introduction'} />}
+        <InputWrapper>
+          <CheckboxInput {...bind.confirm1} label={'Confirm you allow processing your data'} />
+          <CheckboxInput {...bind.confirm2} required label={'Confirm you love Streamlabs OBS'} />
+        </InputWrapper>
+      </Example>
     </Form>
   );
 }
