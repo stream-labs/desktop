@@ -129,7 +129,7 @@ function renderOptionWithImage<T>(opt: IListOption<T>, inputProps: ICustomListPr
     height: `${height}px`,
   };
   return (
-    <Row gutter={8} align="middle">
+    <Row gutter={8} align="middle" wrap={false}>
       <Col>
         {src && <img src={src} alt="" style={imageStyle} />}
         {!src && <div style={imageStyle} />}
