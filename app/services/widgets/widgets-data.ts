@@ -409,7 +409,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
   [WidgetType.Poll]: {
     name: 'Poll',
     url(host, token) {
-      return `https://${host}/widgets/poll/v1/${token}`;
+      return `https://${host}/widgets/poll/${token}`;
     },
 
     width: 800,

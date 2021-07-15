@@ -43,9 +43,9 @@ export class PollService extends WidgetSettingsService<IPollData> {
     return {
       type: WidgetType.Poll,
       url: WidgetDefinitions[WidgetType.Poll].url(this.getHost(), this.getWidgetToken()),
-      previewUrl: `https://${this.getHost()}/widgets/poll?token=${this.getWidgetToken()}&simulate=1`,
-      dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/poll`,
-      settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/poll`,
+      previewUrl: `https://${this.getHost()}/widgets/poll/${this.getWidgetToken()}?simulate=1`,
+      dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/polls`,
+      settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/polls`,
       settingsUpdateEvent: 'pollSettingsUpdate',
       customCodeAllowed: true,
       customFieldsAllowed: true,

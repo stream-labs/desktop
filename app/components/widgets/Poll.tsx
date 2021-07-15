@@ -24,11 +24,12 @@ export default class Poll extends WidgetSettings<IPollData, PollService> {
     ];
   }
 
-  get form() {
+  render() {
+    console.log(this.metadata);
     return (
-      this.loaded && (
-        <div>
-          <ValidatedForm slot="poll" onInput={() => this.save()}>
+      this.wData && (
+        <WidgetEditor navItems={this.navItems}>
+          <ValidatedForm slot="poll-properties" onInput={() => this.save()}>
             <VFormGroup
               vModel={this.wData.settings.show_on_closed}
               metadata={this.metadata.showOnClosed}
@@ -43,7 +44,7 @@ export default class Poll extends WidgetSettings<IPollData, PollService> {
             />
             <VFormGroup vModel={this.wData.settings.fade_time} metadata={this.metadata.fadeTime} />
           </ValidatedForm>
-          <ValidatedForm slot="font" onInput={() => this.save()}>
+          <ValidatedForm slot="font-properties" onInput={() => this.save()}>
             <VFormGroup vModel={this.wData.settings.font} metadata={this.metadata.font} />
             <VFormGroup
               vModel={this.wData.settings.font_color_primary}
@@ -70,7 +71,7 @@ export default class Poll extends WidgetSettings<IPollData, PollService> {
               metadata={this.metadata.optionWeight}
             />
           </ValidatedForm>
-          <ValidatedForm slot="bar" onInput={() => this.save()}>
+          <ValidatedForm slot="bar-properties" onInput={() => this.save()}>
             <VFormGroup metadata={this.metadata.thinBar} vModel={this.wData.settings.thin_bar} />
             <VFormGroup
               vModel={this.wData.settings.bar_background_color}
@@ -78,12 +79,8 @@ export default class Poll extends WidgetSettings<IPollData, PollService> {
             />
             <VFormGroup vModel={this.wData.settings.bar_color} metadata={this.metadata.barColor} />
           </ValidatedForm>
-        </div>
+        </WidgetEditor>
       )
     );
-  }
-
-  render() {
-    return this.wData && <WidgetEditor navItems={this.navItems}>{this.form}</WidgetEditor>;
   }
 }
