@@ -1,12 +1,11 @@
 import { ApiClient } from './api-client';
 import {
-  ISceneApi,
-  ISceneItemApi,
-  IScenesServiceApi,
-  TSceneNode,
-  TSceneNodeApi,
+  ScenesService,
+  Scene,
   TSceneNodeType,
-} from '../../app/services/scenes';
+  SceneItem,
+  SceneItemNode,
+} from 'services/scenes';
 import { TSourceType } from '../../app/services/sources';
 
 interface ISceneBuilderNode {
@@ -42,7 +41,7 @@ interface ISceneBuilderNode {
  *
  */
 export class SceneBuilder {
-  private scenesService: IScenesServiceApi;
+  private scenesService: ScenesService;
 
   /**
    * `Item:` will be converted to this default type
@@ -55,10 +54,10 @@ export class SceneBuilder {
   private offsetSize = 2;
 
   constructor(api: ApiClient) {
-    this.scenesService = api.getResource<IScenesServiceApi>('ScenesService');
+    this.scenesService = api.getResource<ScenesService>('ScenesService');
   }
 
-  get scene(): ISceneApi {
+  get scene(): Scene {
     return this.scenesService.activeScene;
   }
 
@@ -165,7 +164,7 @@ export class SceneBuilder {
         name: sceneNode.name,
         id: sceneNode.id,
         type: 'item' as TSceneNodeType,
-        sourceType: (sceneNode as ISceneItemApi).getSource().type,
+        sourceType: (sceneNode as SceneItem).getSource().type,
       };
     });
   }
@@ -193,7 +192,7 @@ export class SceneBuilder {
 
   private buildNodes(nodes: ISceneBuilderNode[], parentId?: string): ISceneBuilderNode[] {
     nodes.reverse().forEach(node => {
-      let sceneNode: TSceneNodeApi;
+      let sceneNode: SceneItemNode;
 
       if (node.type === 'item') {
         sceneNode = this.scene.createAndAddSource(node.name, node.sourceType);

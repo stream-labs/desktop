@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from '../../services/core/injector';
 import ModalLayout from '../ModalLayout.vue';
 import { WindowsService } from '../../services/windows';
-import { IScenesServiceApi } from '../../services/scenes';
+import { ScenesService } from '../../services/scenes';
 import { ISourcesServiceApi } from '../../services/sources';
 import { SelectionService } from '../../services/selection';
 import { $t } from 'services/i18n';
@@ -17,7 +17,7 @@ export default class NameScene extends Vue {
   error = '';
 
   @Inject()
-  scenesService: IScenesServiceApi;
+  scenesService: ScenesService;
 
   @Inject()
   sourcesService: ISourcesServiceApi;

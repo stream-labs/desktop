@@ -2,7 +2,7 @@ import test from 'ava';
 import { useSpectron } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { SceneBuilder } from '../helpers/scene-builder';
-import { ISceneItemApi, ISceneNodeApi, IScenesServiceApi } from 'services/scenes';
+import { SceneItem, SceneItemNode, ScenesService } from 'services/scenes';
 import { SelectionService } from 'services/selection';
 import { IClipboardServiceApi } from 'services/clipboard';
 import { ISceneCollectionsServiceApi } from 'services/scene-collections';
@@ -12,14 +12,14 @@ import { SourceFiltersService } from 'services/source-filters';
 useSpectron({ restartAppAfterEachTest: false, afterStartCb: afterStart });
 
 let sceneBuilder: SceneBuilder;
-let getNode: (name: string) => ISceneNodeApi;
+let getNode: (name: string) => SceneItemNode;
 let getNodeId: (name: string) => string;
 let selectionService: SelectionService;
 let clipboardService: IClipboardServiceApi;
 let sourceFiltersService: SourceFiltersService;
 let sceneCollectionsService: ISceneCollectionsServiceApi;
 let sourcesService: ISourcesServiceApi;
-let scenesService: IScenesServiceApi;
+let scenesService: ScenesService;
 
 async function afterStart() {
   const client = await getClient();
@@ -132,7 +132,7 @@ test('Copy/paste filters between scene collections', async t => {
   `);
 
   sourceFiltersService.add(
-    (getNode('Item1') as ISceneItemApi).sourceId,
+    (getNode('Item1') as SceneItem).sourceId,
     'chroma_key_filter',
     'MyFilter'
   );
@@ -147,7 +147,7 @@ test('Copy/paste filters between scene collections', async t => {
   `);
 
 
-  const sourceId = (getNode('Item1') as ISceneItemApi).sourceId;
+  const sourceId = (getNode('Item1') as SceneItem).sourceId;
 
   selectionService.selectAll();
   clipboardService.pasteFilters();

@@ -16,9 +16,7 @@ import {
   ScenesService,
   Scene,
   ISceneItem,
-  ISceneItemApi,
   ISceneItemInfo,
-  TSceneNodeType
 } from './index';
 import { SceneItemNode } from './scene-node';
 /**
@@ -27,7 +25,7 @@ import { SceneItemNode } from './scene-node';
  * how it fits in to the given scene
  */
 @ServiceHelper()
-export class SceneItem extends SceneItemNode implements ISceneItemApi {
+export class SceneItem extends SceneItemNode {
 
   sourceId: string;
   name: string;

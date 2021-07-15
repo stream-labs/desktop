@@ -5,7 +5,6 @@ import {
   ISceneItem,
   SceneItem,
   IScene,
-  ISceneApi,
   ISceneNodeAddOptions,
   ISceneItemInfo,
   ISceneItemFolder,
@@ -30,7 +29,7 @@ export interface ISceneHierarchy extends ISceneItemNode {
 }
 
 @ServiceHelper()
-export class Scene implements ISceneApi {
+export class Scene {
   id: string;
   name: string;
   nodes: (ISceneItem | ISceneItemFolder)[];

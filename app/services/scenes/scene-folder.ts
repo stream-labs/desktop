@@ -13,7 +13,7 @@ import {
 
 
 import { SceneItemNode } from './scene-node';
-import { ISceneItemFolder } from './scenes-api';
+import { ISceneItemFolder } from '.';
 
 @ServiceHelper()
 export class SceneItemFolder extends SceneItemNode implements ISceneItemFolderApi {
