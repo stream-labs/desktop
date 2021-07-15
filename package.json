@@ -42,6 +42,7 @@
       "test-dist/test/e2e/*.js",
       "test-dist/test/api/*.js"
     ],
+    "timeout": "2min",
     "serial": true
   },
   "cmake-js": {

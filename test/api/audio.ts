@@ -1,5 +1,4 @@
-import test from 'ava';
-import { useSpectron } from '../helpers/spectron';
+import { useSpectron, test } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { IAudioServiceApi } from 'services/audio';
 import { ScenesService } from 'services/scenes';
@@ -68,9 +67,8 @@ test('Events are emitted when the audio source is updated', async t => {
   const sceneItem = scene.createAndAddSource('MyAudio', 'wasapi_output_capture');
   const sourceId = sceneItem.getSource().sourceId;
 
-  audioService.audioSourceUpdated.subscribe();
+  const watcher = client.watchForEvents(['AudioService.audioSourceUpdated']);
   audioService.getSource(sourceId).setDeflection(0.5);
-
-  const event = await client.fetchNextEvent();
-  t.is(event.fader.deflection, 0.5);
+  await watcher.waitForAll();
+  t.is(watcher.receivedEvents[0].data.fader.deflection, 0.5);
 });
