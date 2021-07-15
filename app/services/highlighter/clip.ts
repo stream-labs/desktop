@@ -11,6 +11,8 @@ export class Clip {
 
   duration: number;
 
+  hasAudio: boolean | null = null;
+
   // TODO: Trim validation
   startTrim: number;
   endTrim: number;
@@ -46,6 +48,7 @@ export class Clip {
     if (this.deleted) return;
 
     if (!this.duration) await this.readDuration();
+    if (this.hasAudio == null) await this.readAudio();
 
     this.frameSource = new FrameSource(
       this.sourcePath,
@@ -96,5 +99,19 @@ export class Clip {
       this.sourcePath,
     ]);
     this.duration = parseFloat(stdout);
+  }
+
+  private async readAudio() {
+    const { stdout } = await execa(FFPROBE_EXE, [
+      '-v',
+      'error',
+      '-show_streams',
+      '-select_streams',
+      'a',
+      '-of',
+      'default=noprint_wrappers=1:nokey=1',
+      this.sourcePath,
+    ]);
+    this.hasAudio = stdout.length > 0;
   }
 }

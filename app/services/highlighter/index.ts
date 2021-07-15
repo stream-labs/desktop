@@ -23,6 +23,8 @@ import { throttle } from 'lodash-decorators';
 import sample from 'lodash/sample';
 import { HighlighterError } from './errors';
 import { AudioMixer } from './audio-mixer';
+import { UsageStatisticsService } from 'services/usage-statistics';
+import * as Sentry from '@sentry/browser';
 
 export interface IClip {
   path: string;
@@ -299,6 +301,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
 
   @Inject() streamingService: StreamingService;
   @Inject() userService: UserService;
+  @Inject() usageStatisticsService: UsageStatisticsService;
 
   /**
    * A dictionary of actual clip classes.
@@ -537,6 +540,10 @@ export class HighlighterService extends StatefulService<IHighligherState> {
     this.DISMISS_TUTORIAL();
   }
 
+  fileExists(file: string) {
+    return fs.existsSync(file);
+  }
+
   async loadClips() {
     await this.ensureScrubDirectory();
 
@@ -553,18 +560,22 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       this.clips[c.path] = this.clips[c.path] ?? new Clip(c.path);
     });
 
-    await pmap(this.views.clips, c => this.clips[c.path].init(), {
-      concurrency: 5, // TODO
-      onProgress: completed => {
-        this.UPDATE_CLIP({
-          path: completed.path,
-          loaded: true,
-          scrubSprite: this.clips[completed.path].frameSource?.scrubJpg,
-          duration: this.clips[completed.path].duration,
-          deleted: this.clips[completed.path].deleted,
-        });
+    await pmap(
+      this.views.clips.filter(c => !c.loaded),
+      c => this.clips[c.path].init(),
+      {
+        concurrency: 5, // TODO
+        onProgress: completed => {
+          this.UPDATE_CLIP({
+            path: completed.path,
+            loaded: true,
+            scrubSprite: this.clips[completed.path].frameSource?.scrubJpg,
+            duration: this.clips[completed.path].duration,
+            deleted: this.clips[completed.path].deleted,
+          });
+        },
       },
-    });
+    );
   }
 
   private async ensureScrubDirectory() {
@@ -658,7 +669,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       let currentFrame = 0;
 
       // Mix audio first
-      await Promise.all(clips.map(clip => clip.audioSource.extract()));
+      await Promise.all(clips.filter(c => c.hasAudio).map(clip => clip.audioSource.extract()));
       const parsed = path.parse(this.views.exportInfo.file);
       const audioConcat = path.join(parsed.dir, `${parsed.name}-concat.flac`);
       let audioMix = path.join(parsed.dir, `${parsed.name}-mix.flac`);
@@ -683,6 +694,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       }
 
       await Promise.all(clips.map(clip => clip.audioSource.cleanup()));
+      const nClips = clips.length;
 
       this.SET_EXPORT_INFO({ step: EExportStep.FrameRender });
 
@@ -781,15 +793,39 @@ export class HighlighterService extends StatefulService<IHighligherState> {
           console.debug(
             `Export complete - Expected Frames: ${this.views.exportInfo.totalFrames} Actual Frames: ${currentFrame}`,
           );
+
+          this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+            type: 'ExportComplete',
+            numClips: nClips,
+            transition: this.views.transition.type,
+            transitionDuration: this.views.transition.duration,
+            resolution: this.views.exportInfo.resolution,
+            fps: this.views.exportInfo.fps,
+            preset: this.views.exportInfo.preset,
+            duration: totalFramesAfterTransitions / exportOptions.fps,
+            isPreview: preview,
+          });
           break;
         }
       }
     } catch (e: unknown) {
+      Sentry.withScope(scope => {
+        scope.setTag('feature', 'highlighter');
+        console.error('Highlighter export error', e);
+      });
+
       if (e instanceof HighlighterError) {
         this.SET_EXPORT_INFO({ error: e.userMessage });
+        this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+          type: 'ExportError',
+          error: e.constructor.name,
+        });
       } else {
-        console.error('Highlighter export error', e);
         this.SET_EXPORT_INFO({ error: 'An error occurred while exporting the video' });
+        this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+          type: 'ExportError',
+          error: 'Unknown',
+        });
       }
     }
 
@@ -805,6 +841,8 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   // We throttle because this can go extremely fast, especially on previews
   @throttle(100)
   private setCurrentFrame(frame: number) {
+    // Avoid a race condition where we reset the exported flag
+    if (this.views.exportInfo.exported) return;
     this.SET_EXPORT_INFO({ currentFrame: frame });
   }
 
@@ -858,6 +896,21 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       cancelRequested: false,
       videoId: result ? result.id : null,
     });
+
+    if (result) {
+      this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+        type: 'UploadSuccess',
+        privacy: options.privacyStatus,
+        videoLink:
+          options.privacyStatus === 'public'
+            ? `https://youtube.com/watch?v=${result.id}`
+            : undefined,
+      });
+    } else {
+      this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+        type: 'UploadError',
+      });
+    }
   }
 
   /**

@@ -90,10 +90,15 @@ export default function BlankSlate(p: { close: () => void }) {
   return (
     <Scrollable style={{ padding: 24, width: '100%' }}>
       <div style={{ width: 700 }}>
-        <h1>Highlighter</h1>
+        <h1>
+          Highlighter{' '}
+          <span style={{ fontSize: 12, verticalAlign: 'top', color: 'var(--beta-text)' }}>
+            Beta
+          </span>
+        </h1>
         <p>
-          The highlighter allows you to edit together replays you capture during your stream and
-          upload them to YouTube.
+          The highlighter allows you to clip the best moments from your livestream and edit them
+          together into an exciting highlight video you can upload directly to YouTube.
         </p>
         <h2>Get Started</h2>
         {!v.isStreaming && (
