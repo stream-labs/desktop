@@ -1,10 +1,9 @@
 import { merge } from 'lodash';
-import { mutation, ServiceHelper } from '../core/stateful-service';
+import { mutation, ServiceHelper, Inject } from '../core';
 import Utils from '../utils';
 import { SourcesService, TSourceType, ISource } from 'services/sources';
 import { VideoService } from 'services/video';
 import { ScalableRectangle, CenteringAxis } from 'util/ScalableRectangle';
-import { Inject } from 'services/core/injector';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../obs-api';
 

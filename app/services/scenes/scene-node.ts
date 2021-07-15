@@ -1,7 +1,7 @@
 /**
  * abstract class for representing scene's folders and items
  */
-import { ServiceHelper, mutation } from '../core/stateful-service';
+import { ServiceHelper, mutation } from '../core';
 import { TSceneNodeType } from './scenes';
 import { Inject } from '../core/injector';
 import { ScenesService, Scene, ISceneItemNode, SceneItemFolder, SceneItem, TSceneNode } from './index';

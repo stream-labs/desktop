@@ -1,4 +1,4 @@
-import { ServiceHelper, mutation } from 'services/core/stateful-service';
+import { ServiceHelper, mutation } from 'services/core';
 import { ScenesService } from './scenes';
 import { Source, SourcesService, TSourceType } from 'services/sources';
 import {
