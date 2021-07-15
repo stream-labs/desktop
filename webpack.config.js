@@ -29,7 +29,7 @@ module.exports = {
     filename: '[name].js'
   },
 
-  devtool: 'sourcemap',
+  devtool: 'source-map',
 
   target: 'electron-renderer',
 
