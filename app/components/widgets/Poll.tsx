@@ -6,13 +6,20 @@ import WidgetSettings from './WidgetSettings.vue';
 
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm';
+import { Services } from 'components-react/service-provider';
 
 import { $t } from 'services/i18n';
 
 @Component({})
 export default class Poll extends WidgetSettings<IPollData, PollService> {
+  UserService = Services.UserService;
+
   get metadata() {
     return this.service.getMetadata();
+  }
+
+  get isTwitchAuthed() {
+    return this.UserService.views.isTwitchAuthed;
   }
 
   get navItems() {
@@ -30,6 +37,12 @@ export default class Poll extends WidgetSettings<IPollData, PollService> {
       this.wData && (
         <WidgetEditor navItems={this.navItems}>
           <ValidatedForm slot="poll-properties" onInput={() => this.save()}>
+            {this.isTwitchAuthed && (
+              <VFormGroup
+                vModel={this.wData.settings.poll_type}
+                metadata={this.metadata.pollType}
+              />
+            )}
             <VFormGroup
               vModel={this.wData.settings.show_on_closed}
               metadata={this.metadata.showOnClosed}

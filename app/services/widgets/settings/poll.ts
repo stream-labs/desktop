@@ -29,6 +29,7 @@ export interface IPollSettings extends IWidgetSettings {
   thin_bar: boolean;
   title_font_size: number;
   title_font_weight: number;
+  poll_type: 'cloudbot' | 'twitch';
 }
 
 export interface IPollData extends IWidgetData {
@@ -55,6 +56,13 @@ export class PollService extends WidgetSettingsService<IPollData> {
 
   getMetadata() {
     return formMetadata({
+      pollType: metadata.list({
+        title: $t('Poll Type'),
+        options: [
+          { title: 'Cloudbot', value: 'cloudbot' },
+          { title: 'Twitch', value: 'twitch' },
+        ],
+      }),
       showOnClosed: metadata.bool({
         title: $t('Show Closed Poll'),
         tooltip: $t('Show/hide poll widget on closed poll'),
