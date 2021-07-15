@@ -346,6 +346,8 @@ test('Rename source', async t => {
   await addSource(t, 'Color Source', sourceName);
 
   await openRenameWindow(t, sourceName);
+
+  await focusChild(t);
   const form = new FormMonkey(t);
   await form.setInputValue('[data-name=sourceName]', newSourceName);
   await (await app.client.$('button=Done')).click();
