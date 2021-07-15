@@ -1,10 +1,15 @@
-import { ISettingsSubCategory } from 'services/settings';
+import { ISettingsSubCategory } from '../../settings';
 
 export interface ITcpServersSettings {
   token: string;
   namedPipe: {
     enabled: boolean;
     pipeName: string;
+  };
+  websockets: {
+    enabled: boolean;
+    port: number;
+    allowRemote: boolean;
   };
 }
 
@@ -15,7 +20,9 @@ export interface ITcpServerServiceApi {
   getDefaultSettings(): ITcpServersSettings;
   listen(): void;
   stopListening(): void;
+  enableWebsoketsRemoteConnections(): void;
   getIPAddresses(): IIPAddressDescription[];
+  generateToken(): string;
   state: ITcpServersSettings;
 }
 

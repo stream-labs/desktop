@@ -276,7 +276,7 @@ export class ApiClient {
 
     if (!this.resourceSchemes[resourceTypeName]) {
       this.resourceSchemes[resourceTypeName] = this.requestSync(
-        'ServicesManager',
+        'ExternalApiService',
         'getResourceScheme',
         resourceId,
       );
