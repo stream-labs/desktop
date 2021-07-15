@@ -885,8 +885,15 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       if (this.views.uploadInfo.cancelRequested) {
         console.log('The upload was canceled');
       } else {
-        console.error('Got error uploading YT video', e);
+        Sentry.withScope(scope => {
+          scope.setTag('feature', 'highlighter');
+          console.error('Got error uploading YT video', e);
+        });
+
         this.SET_UPLOAD_INFO({ error: true });
+        this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+          type: 'UploadError',
+        });
       }
     }
 
@@ -905,10 +912,6 @@ export class HighlighterService extends StatefulService<IHighligherState> {
           options.privacyStatus === 'public'
             ? `https://youtube.com/watch?v=${result.id}`
             : undefined,
-      });
-    } else {
-      this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
-        type: 'UploadError',
       });
     }
   }
