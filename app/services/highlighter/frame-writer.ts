@@ -34,8 +34,8 @@ export class FrameWriter {
       '-map', '1:a:0',
 
       // Filters
-      '-af', `afade=type=out:duration=${FADE_OUT_DURATION}:start_time=${this.duration - (FADE_OUT_DURATION + 0.2)}`,
-      '-vf', `format=yuv420p,fade=type=out:duration=${FADE_OUT_DURATION}:start_time=${this.duration - (FADE_OUT_DURATION + 0.2)}`,
+      '-af', `afade=type=out:duration=${FADE_OUT_DURATION}:start_time=${Math.max(this.duration - (FADE_OUT_DURATION + 0.2), 0)}`,
+      '-vf', `format=yuv420p,fade=type=out:duration=${FADE_OUT_DURATION}:start_time=${Math.max(this.duration - (FADE_OUT_DURATION + 0.2), 0)}`,
 
       // Video Output
       '-vcodec', 'libx264',
