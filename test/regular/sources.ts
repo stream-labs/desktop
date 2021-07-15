@@ -287,7 +287,7 @@ test('Create/Remove Video Capture Device and view Source Properties', async t =>
   t.true(await (await app.client.$('label=Buffering')).isExisting());
   t.true(await (await app.client.$('label=Audio Output Mode')).isExisting());
 
-  await (await (await app.client.$('[data-name=use_custom_audio_device')).$('[type=checkbox]')).click();
+  await (await app.client.$('[data-name=use_custom_audio_device] input')).click();
   t.true(await (await app.client.$('label=Audio Device')).isExisting());
 
   await focusMain(t);
