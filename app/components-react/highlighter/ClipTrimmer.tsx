@@ -180,7 +180,7 @@ export default function ClipTrimmer(props: { clip: IClip }) {
     <div>
       <video
         ref={videoRef}
-        src={props.clip.path}
+        src={props.clip.path.replace('#', '%23')}
         style={{ borderRadius: 5 }}
         width="100%"
         onEnded={() => {
@@ -211,7 +211,7 @@ export default function ClipTrimmer(props: { clip: IClip }) {
             return (
               <img
                 key={frame}
-                src={props.clip.scrubSprite}
+                src={props.clip.scrubSprite?.replace('#', '%23')}
                 width={SCRUB_WIDTH}
                 height={SCRUB_HEIGHT}
                 style={{
