@@ -2,7 +2,7 @@ import test from 'ava';
 import { useSpectron } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { IScenesServiceApi } from '../../app/services/scenes/scenes-api';
-import { ISelectionServiceApi } from '../../app/services/selection';
+import { SelectionService } from 'services/selection';
 import { ICustomizationServiceApi } from '../../app/services/customization';
 import { SceneBuilder } from '../helpers/scene-builder';
 import { ISceneApi, ISceneNodeApi } from '../../app/services/scenes';
@@ -13,7 +13,7 @@ let sceneBuilder: SceneBuilder;
 let scene: ISceneApi;
 let getNode: (name: string) => ISceneNodeApi;
 let getNodeId: (name: string) => string;
-let selectionService: ISelectionServiceApi;
+let selectionService: SelectionService;
 
 async function afterStart() {
   const client = await getClient();
@@ -27,7 +27,7 @@ async function afterStart() {
 test('Selection', async t => {
   const client = await getClient();
   const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
-  const selection = client.getResource<ISelectionServiceApi>('SelectionService');
+  const selection = client.getResource<SelectionService>('SelectionService');
   const scene = scenesService.activeScene;
   selection.selectAll();
   const numPresetItems = selection.getSize();
@@ -74,7 +74,7 @@ test('Selection', async t => {
 test('Selection actions', async t => {
   const client = await getClient();
   const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
-  const selection = client.getResource<ISelectionServiceApi>('SelectionService');
+  const selection = client.getResource<SelectionService>('SelectionService');
   const scene = scenesService.activeScene;
 
   let [color1, color2, color3] = scene.getItems();
@@ -94,7 +94,7 @@ test('Selection actions', async t => {
 test('Invalid selection', async t => {
   const client = await getClient();
   const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
-  const selection = client.getResource<ISelectionServiceApi>('SelectionService');
+  const selection = client.getResource<SelectionService>('SelectionService');
   const anotherScene = scenesService.createScene('Another scene');
   const colorFromAnotherScene = anotherScene.createAndAddSource('MyColor', 'color_source');
   const [colorSource] = scenesService.activeScene.getItems();

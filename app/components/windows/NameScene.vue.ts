@@ -5,7 +5,7 @@ import ModalLayout from '../ModalLayout.vue';
 import { WindowsService } from '../../services/windows';
 import { IScenesServiceApi } from '../../services/scenes';
 import { ISourcesServiceApi } from '../../services/sources';
-import { ISelectionServiceApi } from '../../services/selection';
+import { SelectionService } from '../../services/selection';
 import { $t } from 'services/i18n';
 
 @Component({
@@ -26,7 +26,7 @@ export default class NameScene extends Vue {
   windowsService: WindowsService;
 
   @Inject()
-  selectionService: ISelectionServiceApi;
+  selectionService: SelectionService;
 
   options: {
     sceneToDuplicate?: string, // id of scene
