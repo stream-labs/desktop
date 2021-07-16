@@ -105,6 +105,7 @@ export default function Highlighter() {
     const musicExtensions = ['mp3', 'wav', 'flac'];
 
     function setMusicFile(file: string) {
+      if (!musicExtensions.map(e => `.${e}`).includes(path.parse(file).ext)) return;
       HighlighterService.actions.setAudio({ musicPath: file });
     }
 
