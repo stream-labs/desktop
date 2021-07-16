@@ -2,47 +2,15 @@ import electron from 'electron';
 import uuid from 'uuid/v4';
 import 'reflect-metadata';
 import { Service } from 'services/core/service';
-import { ObsImporterService } from './services/obs-importer';
-import { ScenesService, SceneItem, SceneItemFolder, Scene, SceneItemNode } from './services/scenes';
-import { ClipboardService } from './services/clipboard';
-import { AudioService, AudioSource } from './services/audio';
-import { CustomizationService } from './services/customization';
-import { HostsService } from './services/hosts';
-import { Hotkey, HotkeysService } from './services/hotkeys';
-import { KeyListenerService } from './services/key-listener';
-import { NavigationService } from './services/navigation';
-import { NotificationsService } from './services/notifications';
-import { OnboardingService } from './services/onboarding';
-import { PerformanceService } from './services/performance';
-import { PerformanceMonitorService } from './services/performance-monitor';
-import { PersistentStatefulService } from './services/core/persistent-stateful-service';
-import { SettingsService } from './services/settings';
-import { SourcesService, Source } from './services/sources';
-import { UserService } from './services/user';
-import { VideoService } from './services/video';
-import { WindowsService } from './services/windows';
+
+import * as appServices from './app-services';
+
 import { StatefulService } from './services/core/stateful-service';
-import { TransitionsService } from 'services/transitions';
-import { FontLibraryService } from './services/font-library';
-import { SourceFiltersService } from './services/source-filters';
-import { AppService } from './services/app';
-import { ShortcutsService } from './services/shortcuts';
-import { TcpServerService } from './services/api/tcp-server';
-import { IpcServerService } from './services/api/ipc-server/ipc-server';
-import { UsageStatisticsService } from './services/usage-statistics';
-import { StreamingService } from './services/streaming';
 import Utils from './services/utils';
 import { commitMutation } from './store';
 import traverse from 'traverse';
 import { ObserveList } from './services/core/service-initialization-observer';
 import { Subject, Subscription, Observable } from 'rxjs';
-import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
-import { DismissablesService } from 'services/dismissables';
-import { SceneCollectionsService } from 'services/scene-collections';
-import { TroubleshooterService } from 'services/troubleshooter';
-import { SelectionService, Selection } from 'services/selection';
-import { SceneCollectionsStateService } from 'services/scene-collections/state';
-import { IncrementalRolloutService } from 'services/incremental-rollout';
 import {
   IJsonRpcResponse,
   IJsonRpcEvent,
@@ -51,24 +19,6 @@ import {
   IMutation,
   JsonrpcService
 } from 'services/api/jsonrpc';
-import { FileManagerService } from 'services/file-manager';
-import { CrashReporterService } from 'services/crash-reporter';
-import { PatchNotesService } from 'services/patch-notes';
-import { ProtocolLinksService } from 'services/protocol-links';
-import { ProjectorService } from 'services/projector';
-import { ProfanityFilterService } from 'util/profanity';
-import { I18nService } from 'services/i18n';
-import { QuestionaireService } from 'services/questionaire';
-import { MonitorCaptureCroppingService } from 'services/sources/monitor-capture-cropping';
-import { InformationsService } from 'services/informations';
-import { InformationsStateService } from 'services/informations/state';
-import { NicoliveProgramService } from 'services/nicolive-program/nicolive-program';
-import { NicoliveProgramStateService } from 'services/nicolive-program/state';
-import { NicoliveProgramSelectorService } from 'services/nicolive-program/nicolive-program-selector';
-import { NicoliveCommentViewerService } from 'services/nicolive-program/nicolive-comment-viewer';
-import { NicoliveCommentFilterService } from 'services/nicolive-program/nicolive-comment-filter';
-import { NicoliveCommentLocalFilterService } from 'services/nicolive-program/nicolive-comment-local-filter';
-import { NicoliveCommentSynthesizerService } from 'services/nicolive-program/nicolive-comment-synthesizer';
 
 const { ipcRenderer } = electron;
 
@@ -76,71 +26,10 @@ export class ServicesManager extends Service {
   serviceEvent = new Subject<IJsonRpcResponse<IJsonRpcEvent>>();
 
   /**
-   * list of used application services
+   * List of used application services
    */
-  private services: Dictionary<any> = {
-    ScenesService,
-    SceneItemNode,
-    SceneItem,
-    SceneItemFolder,
-    Scene,
-    ClipboardService,
-    AudioService,
-    AudioSource,
-    CustomizationService,
-    HostsService,
-    HotkeysService,
-    Hotkey,
-    KeyListenerService,
-    NavigationService,
-    NotificationsService,
-    OnboardingService,
-    PerformanceService,
-    PerformanceMonitorService,
-    PersistentStatefulService,
-    SettingsService,
-    SourceFiltersService,
-    SourcesService,
-    Source,
-    StreamingService,
-    UserService,
-    VideoService,
-    WindowsService,
-    FontLibraryService,
-    ObsImporterService,
-    AppService,
-    ShortcutsService,
-    UsageStatisticsService,
-    IpcServerService,
-    TcpServerService,
-    VideoEncodingOptimizationService,
-    CrashReporterService,
-    DismissablesService,
-    SceneCollectionsService,
-    SceneCollectionsStateService,
-    TroubleshooterService,
-    JsonrpcService,
-    SelectionService,
-    Selection,
-    FileManagerService,
-    PatchNotesService,
-    ProtocolLinksService,
-    ProjectorService,
-    TransitionsService,
-    ProfanityFilterService,
-    I18nService,
-    QuestionaireService,
-    MonitorCaptureCroppingService,
-    InformationsService,
-    InformationsStateService,
-    NicoliveProgramService,
-    NicoliveProgramStateService,
-    NicoliveProgramSelectorService,
-    IncrementalRolloutService,
-    NicoliveCommentViewerService,
-    NicoliveCommentFilterService,
-    NicoliveCommentLocalFilterService,
-    NicoliveCommentSynthesizerService,
+  services: Dictionary<any> = {
+    ...appServices,
   };
 
   private instances: Dictionary<Service> = {};
