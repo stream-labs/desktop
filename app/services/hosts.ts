@@ -10,7 +10,7 @@ export class HostsService extends Service {
     if (Util.shouldUseLocalHost()) {
       return 'streamlabs.site';
     }
-    return 'beta.streamlabs.com';
+    return 'streamlabs.com';
   }
 
   get overlays() {
