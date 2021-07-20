@@ -21,7 +21,6 @@ import {
   GoLiveWindow,
   EditStreamWindow,
   IconLibraryProperties,
-  PerformanceMetrics,
   RenameSource,
   AdvancedStatistics,
 } from 'components/shared/ReactComponent';
@@ -43,7 +42,6 @@ import MediaGallery from 'components/windows/MediaGallery.vue';
 import PlatformAppPopOut from 'components/windows/PlatformAppPopOut.vue';
 import EditTransform from 'components/windows/EditTransform';
 import EventFilterMenu from 'components/windows/EventFilterMenu';
-import OverlayWindow from 'components/windows/OverlayWindow.vue';
 import OverlayPlaceholder from 'components/windows/OverlayPlaceholder';
 import BrowserSourceInteraction from 'components/windows/BrowserSourceInteraction';
 import WelcomeToPrime from 'components/windows/WelcomeToPrime';
@@ -105,9 +103,7 @@ export function getComponents() {
     MediaGallery,
     PlatformAppPopOut,
     EditTransform,
-    OverlayWindow,
     OverlayPlaceholder,
-    PerformanceMetrics,
     BrowserSourceInteraction,
     EventFilterMenu,
     GameOverlayEventFeed,
