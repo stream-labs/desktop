@@ -772,7 +772,7 @@ function measure(msg, time) {
 }
 
 app.on('session-created', session => {
-  const directory = path.join(__dirname, 'extensions');
+  const directory = path.join(app.getAppPath(), 'extensions');
   if (!fs.existsSync(directory)) return;
   fs.readdir(directory, { withFileTypes: true }, (err, dirs) => {
     if (err) return;
