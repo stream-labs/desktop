@@ -13,6 +13,15 @@ import { $t } from 'services/i18n';
 @Component({})
 export default class Poll extends WidgetSettings<IPollData, PollService> {
   UserService = Services.UserService;
+  TwitchService = Services.TwitchService;
+  OnboardingService = Services.OnboardingService;
+  WindowsService = Services.WindowsService;
+
+  hasPollScopes = false;
+
+  async mounted() {
+    this.hasPollScopes = await this.TwitchService.hasScope('channel:manage:polls');
+  }
 
   get metadata() {
     return this.service.getMetadata();
@@ -31,13 +40,22 @@ export default class Poll extends WidgetSettings<IPollData, PollService> {
     ];
   }
 
+  reauth() {
+    this.OnboardingService.actions.start({ isLogin: true });
+    this.WindowsService.closeChildWindow();
+  }
+
   render() {
-    console.log(this.metadata);
     return (
       this.wData && (
         <WidgetEditor navItems={this.navItems}>
           <ValidatedForm slot="poll-properties" onInput={() => this.save()}>
-            {this.isTwitchAuthed && (
+            {!this.hasPollScopes && (
+              <a onClick={() => this.reauth()} style="margin-bottom: 8px; display: block;">
+                {$t('You need to re-login to access Twitch chat polls')}
+              </a>
+            )}
+            {this.isTwitchAuthed && this.hasPollScopes && (
               <VFormGroup
                 vModel={this.wData.settings.poll_type}
                 metadata={this.metadata.pollType}
