@@ -2,7 +2,6 @@ import URI from 'urijs';
 import isEqual from 'lodash/isEqual';
 import electron from 'electron';
 import cloneDeep from 'lodash/cloneDeep';
-import { Services } from 'components-react/service-provider';
 
 export const enum EBit {
   ZERO,
@@ -264,11 +263,10 @@ export function keys<T>(target: T) {
  * @param path The path structure to retrieve the image from the media folders
  */
 export function $i(path: string) {
-  const { HostsService } = Services;
   try {
     const localMediaPath = require(`../../media/${path}`);
     return localMediaPath;
   } catch (e: unknown) {
-    return `https://${HostsService.cdn}/media/${path}`;
+    return `https://cdn.streamlabs.com/media/${path}`;
   }
 }
