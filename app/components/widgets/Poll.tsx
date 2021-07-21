@@ -50,7 +50,7 @@ export default class Poll extends WidgetSettings<IPollData, PollService> {
       this.wData && (
         <WidgetEditor navItems={this.navItems}>
           <ValidatedForm slot="poll-properties" onInput={() => this.save()}>
-            {!this.hasPollScopes && (
+            {this.isTwitchAuthed && !this.hasPollScopes && (
               <a onClick={() => this.reauth()} style="margin-bottom: 8px; display: block;">
                 {$t('You need to re-login to access Twitch chat polls')}
               </a>
