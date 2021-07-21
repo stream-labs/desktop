@@ -7,4 +7,5 @@ test('PhraseDictionary', async () => {
   expect(dictionary.process('ww')).toBe('ワラワラ');
   expect(dictionary.process('テストw')).toBe('テスト、ワラ');
   expect(dictionary.process('複数行は\nすべて無視')).toBe('');
+  expect(dictionary.process('初見')).toBe('しょけん');
 });
