@@ -20,7 +20,7 @@
         </button>
       </div>
 
-      <div class="nav-item replay-button-group" :class="{ 'is-replay-start' : !replayBufferOffline }">
+      <div class="nav-item replay-button-group" :class="{ 'is-replay-start' : !replayBufferOffline }" v-if="replayBufferEnabled">
         <button
           class="button--replay-buffer button--replay-start"
           @click="toggleReplayBuffer"
