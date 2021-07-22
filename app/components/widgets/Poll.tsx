@@ -18,6 +18,7 @@ export default class Poll extends WidgetSettings<IPollData, PollService> {
   WindowsService = Services.WindowsService;
 
   get hasPollScopes() {
+    if (!this.isTwitchAuthed) return;
     return this.TwitchService.state.hasPollsPermission;
   }
 

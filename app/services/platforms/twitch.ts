@@ -114,10 +114,12 @@ export class TwitchService
   init() {
     // prepopulate data to make chat available after app start
     this.userService.userLogin.subscribe(_ => {
-      if (this.userService.platform?.type === 'twitch') this.prepopulateInfo();
+      if (this.userService.platform?.type === 'twitch') {
+        this.prepopulateInfo();
 
-      // Check for updated polls scopes
-      this.validatePollsScope();
+        // Check for updated polls scopes
+        this.validatePollsScope();
+      }
     });
   }
 
