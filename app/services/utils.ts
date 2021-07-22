@@ -267,6 +267,6 @@ export function $i(path: string) {
     const localMediaPath = require(`../../media/${path}`);
     return localMediaPath;
   } catch (e: unknown) {
-    return `https://cdn.streamlabs.com/media/${path}`;
+    return `https://slobs-cdn.streamlabs.com/media/${path}`;
   }
 }
