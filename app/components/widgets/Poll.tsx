@@ -17,10 +17,8 @@ export default class Poll extends WidgetSettings<IPollData, PollService> {
   OnboardingService = Services.OnboardingService;
   WindowsService = Services.WindowsService;
 
-  hasPollScopes = false;
-
-  async mounted() {
-    this.hasPollScopes = await this.TwitchService.hasScope('channel:manage:polls');
+  get hasPollScopes() {
+    return this.TwitchService.state.hasPollsPermission;
   }
 
   get metadata() {
