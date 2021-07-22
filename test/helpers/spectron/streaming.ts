@@ -1,11 +1,11 @@
 import { click, focusChild, focusMain, TExecutionContext } from './index';
-import { setOutputResolution } from './output';
 import { fillForm, FormMonkey, TFormMonkeyData } from '../form-monkey';
 import { getClient } from '../api-client';
 import moment = require('moment');
 import { StreamSettingsService } from '../../../app/services/settings/streaming';
 import { sleep } from '../sleep';
-import { showSettings } from "./settings";
+import { showSettings } from './settings';
+import { setOutputResolution } from '../modules/settings/settings';
 /**
  * Go live and wait for stream start
  */
@@ -19,7 +19,7 @@ export async function goLive(t: TExecutionContext, prefillData?: TFormMonkeyData
  */
 export async function prepareToGoLive(t: TExecutionContext) {
   // set low resolution to prevent intensive CPU usage
-  await setOutputResolution(t, '100x100');
+  await setOutputResolution('100x100');
 
   // use legacy goLive components
   await showSettings(t, 'Experimental');

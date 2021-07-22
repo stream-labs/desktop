@@ -9,7 +9,6 @@ import { logIn } from '../../helpers/spectron/user';
 import { fillForm, selectTitle } from '../../helpers/form-monkey';
 import { makeScreenshots, useScreentest } from '../screenshoter';
 import { TPlatform } from '../../../app/services/platforms';
-import { setOutputResolution } from '../../helpers/spectron/output';
 import { fetchMock, resetFetchMock } from '../../helpers/spectron/network';
 import { getClient } from '../../helpers/api-client';
 import { ScenesService } from 'services/api/external-api/scenes';

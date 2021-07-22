@@ -1,4 +1,4 @@
-import React, { HTMLAttributes } from 'react';
+import React, { HTMLAttributes, useState } from 'react';
 import { useFormState } from '../hooks';
 import { ModalLayout } from '../shared/ModalLayout';
 import Form from '../shared/inputs/Form';
@@ -28,6 +28,8 @@ import { mutation } from '../store';
 import { pick } from 'lodash';
 import { useModule } from '../hooks/useModule';
 import { merge } from '../../util/merge';
+import { IListOption } from '../shared/inputs/ListInput';
+import Utils from '../../services/utils';
 const { TabPane } = Tabs;
 
 export default function SharedComponentsLibrary() {
@@ -414,12 +416,13 @@ export function DemoForm() {
     name: '',
     gender: '',
     age: 0,
+    colors: [] as number[],
+    city: '',
     addIntroduction: false,
     introduction: '',
     plusOneName: '',
     confirm1: false,
     confirm2: false,
-    colors: [] as number[],
   });
 
   const genderOptions = [
@@ -435,12 +438,32 @@ export function DemoForm() {
     { value: 4, label: 'Orange' },
   ];
 
+  const availableCities = ['Tokyo', 'Delhi', 'Shanghai', 'MexicoCity', 'Cairo'];
+  const [cityOptions, setCityOptions] = useState<IListOption<string>[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
+  async function onCitySearch(searchStr: string) {
+    setIsSearching(true);
+    await Utils.sleep(1000);
+    const cities = availableCities.filter(cityName => cityName.startsWith(searchStr));
+    setCityOptions(cities.map(cityName => ({ value: cityName.charAt(0), label: cityName })));
+    setIsSearching(false);
+  }
+
   return (
     <Form layout={layout} name="demo-form">
       <Example title="Demo Form">
         <TextInput {...bind.name} label={'Name'} required />
         <ListInput {...bind.gender} label={'Gender'} options={genderOptions} />
         <NumberInput {...bind.age} label={'Age'} />
+        <ListInput
+          {...bind.city}
+          label={'City'}
+          options={cityOptions}
+          showSearch
+          onSearch={onCitySearch}
+          loading={isSearching}
+        />
         <TagsInput label="Pick your favorite colors" {...bind.colors} options={colorOptions} />
         <SwitchInput {...bind.addIntroduction} label={'Add Introduction'} />
         {s.addIntroduction && <TextAreaInput {...bind.introduction} label={'Introduction'} />}

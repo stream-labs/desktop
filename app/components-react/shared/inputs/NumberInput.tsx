@@ -11,6 +11,7 @@ type TProps = TSlobsInputProps<{}, number, InputNumberProps, ValuesOf<typeof ANT
 
 export const NumberInput = React.memo((p: TProps) => {
   const { inputAttrs, wrapperAttrs, originalOnChange } = useTextInput<typeof p, number>(
+    'number',
     p,
     ANT_NUMBER_FEATURES,
   );

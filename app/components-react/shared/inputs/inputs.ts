@@ -14,6 +14,7 @@ import isEqual from 'lodash/isEqual';
 type TInputType =
   | 'text'
   | 'textarea'
+  | 'number'
   | 'toggle'
   | 'checkbox'
   | 'list'
@@ -239,7 +240,7 @@ export function useInput<
 }
 
 /**
- * Hook for text fields: input, textarea, password, number
+ * Hook for text fields: text, textarea, password, number
  */
 export function useTextInput<
   TProps extends TSlobsInputProps<
@@ -247,11 +248,11 @@ export function useTextInput<
     TValue
   >,
   TValue extends string | number = string
->(p: TProps, antFeatures?: Parameters<typeof useInput>[2]) {
+>(type: 'text' | 'textarea' | 'number', p: TProps, antFeatures?: Parameters<typeof useInput>[2]) {
   // Text inputs are uncontrolled by default for better performance
   const uncontrolled = p.uncontrolled === true || p.uncontrolled !== false;
   const { inputAttrs, wrapperAttrs, forceUpdate, setLocalValue, emitChange } = useInput(
-    'text',
+    type,
     { uncontrolled, ...p },
     antFeatures,
   );

@@ -88,6 +88,14 @@ export async function waitForLoader(t: TExecutionContext) {
   });
 }
 
+let testContext: TExecutionContext;
+export function setContext(t: TExecutionContext) {
+  testContext = t;
+}
+export function getContext(): TExecutionContext {
+  return testContext;
+}
+
 interface ITestRunnerOptions {
   skipOnboarding?: boolean;
   restartAppAfterEachTest?: boolean;
@@ -326,6 +334,7 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
       // Set the cache dir to what it previously was, since we are re-using it
       t.context.cacheDir = lastCacheDir;
     }
+    setContext(t);
     testStartTime = Date.now();
   });
 

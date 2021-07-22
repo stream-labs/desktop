@@ -22,7 +22,7 @@ interface ITestUser {
   streamKey?: string; // A valid streaming key for Twitch
 }
 
-interface ITestUserFeatures {
+export interface ITestUserFeatures {
   /**
    * Streaming is disabled for YT account
    */

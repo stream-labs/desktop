@@ -2,7 +2,7 @@ import { focusChild, focusMain, test, useSpectron } from '../../helpers/spectron
 import { getFormInput } from '../../helpers/spectron/forms';
 import { sleep } from '../../helpers/sleep';
 import { logIn } from '../../helpers/spectron/user';
-import { setOutputResolution } from '../../helpers/spectron/output';
+import { setOutputResolution } from '../../helpers/modules/settings/settings';
 
 useSpectron();
 
@@ -12,7 +12,7 @@ test.skip('Shows optimized encoder for specific games', async t => {
   await logIn(t);
 
   // decrease resolution to reduce CPU usage
-  await setOutputResolution(t, '100x100');
+  await setOutputResolution('100x100');
 
   await focusMain(t);
   await (await app.client.$('button=Go Live')).waitForExist();

@@ -21,7 +21,7 @@ export type TTextInputProps = TSlobsInputProps<
 >;
 
 export const TextInput = InputComponent((p: TTextInputProps) => {
-  const { inputAttrs, wrapperAttrs } = useTextInput(p, ANT_INPUT_FEATURES);
+  const { inputAttrs, wrapperAttrs } = useTextInput('text', p, ANT_INPUT_FEATURES);
   return (
     <InputWrapper {...wrapperAttrs}>
       <Input {...inputAttrs} onFocus={p.onFocus} onKeyDown={p.onKeyDown} ref={p.inputRef} />
