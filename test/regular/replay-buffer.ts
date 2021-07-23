@@ -13,6 +13,7 @@ test('Replay Buffer', async t => {
   await setOutputResolution('100x100');
   const { client } = t.context.app;
 
+  await focusMain(t);
   await (await client.$('button .icon-replay-buffer')).click();
   await (await client.$('button .icon-save')).click();
   await (await client.$('button .fa.fa-stop')).click();
