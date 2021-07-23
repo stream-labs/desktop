@@ -1,7 +1,7 @@
-import React, { HTMLAttributes, useState } from 'react';
-import { useFormState } from '../hooks';
-import { ModalLayout } from '../shared/ModalLayout';
-import Form from '../shared/inputs/Form';
+import React, { HTMLAttributes } from 'react';
+import { useFormState } from '../../hooks';
+import { ModalLayout } from '../../shared/ModalLayout';
+import Form from '../../shared/inputs/Form';
 import {
   CheckboxInput,
   createBinding,
@@ -15,21 +15,20 @@ import {
   TextAreaInput,
   TextInput,
   TInputLayout,
-} from '../shared/inputs';
+} from '../../shared/inputs';
 import { Alert, Button, Col, Row, Space, Tag, Timeline, Tabs } from 'antd';
-import { Services } from '../service-provider';
-import InputWrapper from '../shared/inputs/InputWrapper';
-import Scrollable from '../shared/Scrollable';
-import PlatformLogo from '../shared/PlatformLogo';
+import { Services } from '../../service-provider';
+import InputWrapper from '../../shared/inputs/InputWrapper';
+import Scrollable from '../../shared/Scrollable';
+import PlatformLogo from '../../shared/PlatformLogo';
 import { DownloadOutlined } from '@ant-design/icons';
-import { alertAsync, confirmAsync } from '../modals';
-import { I18nService, WHITE_LIST } from '../../services/i18n';
-import { mutation } from '../store';
+import { alertAsync, confirmAsync } from '../../modals';
+import { I18nService, WHITE_LIST } from '../../../services/i18n';
+import { mutation } from '../../store';
 import { pick } from 'lodash';
-import { useModule } from '../hooks/useModule';
-import { merge } from '../../util/merge';
-import { IListOption } from '../shared/inputs/ListInput';
-import Utils from '../../services/utils';
+import { useModule } from '../../hooks/useModule';
+import { merge } from '../../../util/merge';
+import { DemoForm } from './DemoForm';
 const { TabPane } = Tabs;
 
 export default function SharedComponentsLibrary() {
@@ -319,7 +318,7 @@ function Examples() {
   );
 }
 
-function Example(p: { title: string } & HTMLAttributes<unknown>) {
+export function Example(p: { title: string } & HTMLAttributes<unknown>) {
   const { background } = useSharedComponentsLibrary();
 
   return (
@@ -403,75 +402,6 @@ function SettingsPanel() {
         <CheckboxInput label={'Required'} {...bind.required} />
         <CheckboxInput label={'Disabled'} {...bind.disabled} />
       </InputWrapper>
-    </Form>
-  );
-}
-
-/**
- * A component that renders a form for our automated tests
- */
-export function DemoForm() {
-  const { layout } = useSharedComponentsLibrary();
-  const { s, bind } = useFormState({
-    name: '',
-    gender: '',
-    age: 0,
-    colors: [] as number[],
-    city: '',
-    addIntroduction: false,
-    introduction: '',
-    plusOneName: '',
-    confirm1: false,
-    confirm2: false,
-  });
-
-  const genderOptions = [
-    { value: 'male', label: 'Male' },
-    { value: 'female', label: 'Female' },
-    { value: 'other', label: 'other' },
-  ];
-
-  const colorOptions = [
-    { value: 1, label: 'Red' },
-    { value: 2, label: 'Green' },
-    { value: 3, label: 'Blue' },
-    { value: 4, label: 'Orange' },
-  ];
-
-  const availableCities = ['Tokyo', 'Delhi', 'Shanghai', 'MexicoCity', 'Cairo'];
-  const [cityOptions, setCityOptions] = useState<IListOption<string>[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-
-  async function onCitySearch(searchStr: string) {
-    setIsSearching(true);
-    await Utils.sleep(1000);
-    const cities = availableCities.filter(cityName => cityName.startsWith(searchStr));
-    setCityOptions(cities.map(cityName => ({ value: cityName.charAt(0), label: cityName })));
-    setIsSearching(false);
-  }
-
-  return (
-    <Form layout={layout} name="demo-form">
-      <Example title="Demo Form">
-        <TextInput {...bind.name} label={'Name'} required />
-        <ListInput {...bind.gender} label={'Gender'} options={genderOptions} />
-        <NumberInput {...bind.age} label={'Age'} />
-        <ListInput
-          {...bind.city}
-          label={'City'}
-          options={cityOptions}
-          showSearch
-          onSearch={onCitySearch}
-          loading={isSearching}
-        />
-        <TagsInput label="Pick your favorite colors" {...bind.colors} options={colorOptions} />
-        <SwitchInput {...bind.addIntroduction} label={'Add Introduction'} />
-        {s.addIntroduction && <TextAreaInput {...bind.introduction} label={'Introduction'} />}
-        <InputWrapper>
-          <CheckboxInput {...bind.confirm1} label={'Confirm you allow processing your data'} />
-          <CheckboxInput {...bind.confirm2} required label={'Confirm you love Streamlabs OBS'} />
-        </InputWrapper>
-      </Example>
     </Form>
   );
 }

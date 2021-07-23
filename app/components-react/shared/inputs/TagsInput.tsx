@@ -77,6 +77,7 @@ export const TagsInput = InputComponent(<T extends any[]>(p: TTagsInputProps<T>)
         dropdownRender={dropdownRender}
         data-value={JSON.stringify(inputAttrs.value)}
         data-display-value={JSON.stringify(displayValue)}
+        data-show-search={inputAttrs['showSearch']}
       >
         {options && options.map((opt, ind) => renderOption(opt, ind, p))}
       </Select>

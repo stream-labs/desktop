@@ -1,5 +1,6 @@
 import { BaseInputController } from './base';
-import { select } from '../core';
+import { clickIfDisplayed, select } from '../core';
+import { sleep } from '../../sleep';
 
 export class TagsInputController extends BaseInputController<(string | number)[]> {
   async setValue(values: (string | number)[]) {
@@ -33,10 +34,26 @@ export class TagsInputController extends BaseInputController<(string | number)[]
     const $el = await this.getElement();
     await $el.click();
 
+    // clear tags
+    await clickIfDisplayed(await $el.$('.ant-select-clear'));
+
+    // open dropdown
+    await $el.click();
+
+    // check if the component has a search input
+    const hasSearch = (await $el.getAttribute('class')).match('ant-select-show-search');
+
     // click options
     for (const value of values) {
+      // try search if searching is available
+      if (hasSearch) {
+        const $input = await $el.$('input');
+        await $input.setValue(value);
+        await sleep(100);
+      }
+
       const $option = await select(`.ant-select-dropdown [data-option-${target}="${value}"]`);
-      await $option.waitForClickable();
+      await $option.waitForExist();
       await $option.click();
     }
 

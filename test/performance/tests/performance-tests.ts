@@ -6,7 +6,7 @@ import { ScenesService } from '../../../app/services/api/external-api/scenes';
 import { getMeter } from '../meter';
 import { spawnSync } from 'child_process';
 import { sleep } from '../../helpers/sleep';
-import { startRecording, stopRecording } from '../../helpers/spectron/streaming';
+import { startRecording, stopRecording } from '../../helpers/modules/streaming';
 import { getCPUUsage, getMemoryUsage, logTiming, usePerformanceTest } from '../tools';
 import { logIn } from '../../helpers/spectron/user';
 import { ExecutionContext } from 'ava';
@@ -140,9 +140,9 @@ test('Recording', async t => {
   const scenesService = api.getResource<ScenesService>('ScenesService');
   scenesService.activeScene.createAndAddSource('Color', 'color_source');
 
-  await startRecording(t);
+  await startRecording();
   await measureMemoryAndCPU(t);
-  await stopRecording(t);
+  await stopRecording();
 
   t.pass();
 });

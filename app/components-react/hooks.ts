@@ -92,7 +92,7 @@ export function useFormState<T extends object>(initializer: T | (() => T)): TUse
   // use isDestroyed flag to prevent updating state on destroyed components
   const isDestroyedRef = useRef(false);
   useOnDestroy(() => {
-    isDestroyedRef.current = false;
+    isDestroyedRef.current = true;
   });
 
   // create a reference to AntForm

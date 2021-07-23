@@ -1,9 +1,12 @@
 import { readdir } from 'fs-extra';
 import { focusChild, focusMain, test, useSpectron } from '../helpers/spectron';
 import { sleep } from '../helpers/sleep';
-import { startRecording, stopRecording } from '../helpers/spectron/streaming';
+import { startRecording, stopRecording } from '../helpers/modules/streaming';
 import { FormMonkey } from '../helpers/form-monkey';
-import {setOutputResolution, setTemporaryRecordingPath} from "../helpers/modules/settings/settings";
+import {
+  setOutputResolution,
+  setTemporaryRecordingPath,
+} from '../helpers/modules/settings/settings';
 
 useSpectron();
 
@@ -28,9 +31,9 @@ test('Recording', async t => {
     await (await app.client.$('button=Done')).click();
     await focusMain(t);
 
-    await startRecording(t);
+    await startRecording();
     await sleep(2000);
-    await stopRecording(t);
+    await stopRecording();
 
     // Wait to ensure that output setting are editable
     await sleep(2000);

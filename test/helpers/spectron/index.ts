@@ -15,6 +15,7 @@ import {
   saveTestStatsToFile,
   testFn,
 } from './runner-utils';
+import { skipOnboarding } from '../modules/onboarding';
 export const test = testFn; // the overridden "test" function
 
 const path = require('path');
@@ -101,6 +102,7 @@ interface ITestRunnerOptions {
   restartAppAfterEachTest?: boolean;
   pauseIfFailed?: boolean;
   appArgs?: string;
+  implicitTimeout?: number;
 
   /**
    * disable synchronisation of scene-collections and media-backup
@@ -127,6 +129,7 @@ const DEFAULT_OPTIONS: ITestRunnerOptions = {
   noSync: true,
   networkLogging: false,
   pauseIfFailed: false,
+  implicitTimeout: 0,
 };
 
 export interface ITestContext {
@@ -223,34 +226,13 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     // Wait up to 2 seconds before giving up looking for an element.
     // This will slightly slow down negative assertions, but makes
     // the tests much more stable, especially on slow systems.
-    await t.context.app.client.setTimeout({ implicit: 2000 });
+    await t.context.app.client.setTimeout({ implicit: options.implicitTimeout });
 
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
     await waitForLoader(t);
 
-    const $skip = await t.context.app.client.$('span=Skip');
-
-    if (await $skip.isExisting()) {
-      if (options.skipOnboarding) {
-        await $skip.click();
-
-        const $chooseStarter = await t.context.app.client.$('div=Choose Starter');
-
-        if (await $chooseStarter.isDisplayed()) {
-          await $chooseStarter.click();
-        }
-
-        if (await (await t.context.app.client.$('div=Start Fresh')).isExisting()) {
-          await (await t.context.app.client.$('div=Start Fresh')).click();
-        }
-        await (await t.context.app.client.$('button=Skip')).click();
-        await (await t.context.app.client.$('button=Skip')).click();
-      } else {
-        // Wait for the connect screen before moving on
-        await (await t.context.app.client.$('button=Twitch')).isExisting();
-      }
-    }
+    if (options.skipOnboarding) await skipOnboarding();
 
     // disable the popups that prevents context menu to be shown
     const client = await getClient();
@@ -328,13 +310,13 @@ export function useSpectron(options: ITestRunnerOptions = {}) {
     skipCheckingErrorsInLogFlag = false;
 
     t.context.app = app;
+    setContext(t);
     if (options.restartAppAfterEachTest || !appIsRunning) {
       await startAppFn(t);
     } else {
       // Set the cache dir to what it previously was, since we are re-using it
       t.context.cacheDir = lastCacheDir;
     }
-    setContext(t);
     testStartTime = Date.now();
   });
 

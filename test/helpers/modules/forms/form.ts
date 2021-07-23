@@ -4,9 +4,10 @@ import { BaseInputController } from './base';
 import { pascalize } from 'humps';
 import { difference, keyBy, isEqual, mapValues } from 'lodash';
 import { getClient, waitForDisplayed } from '../core';
-import {sleep} from "../../sleep";
+import { sleep } from '../../sleep';
 
 const DEFAULT_FORM_SELECTOR = 'body';
+export type TFormData = Record<string, unknown>;
 
 export function useForm(name?: string) {
   const client = getClient();
@@ -47,20 +48,15 @@ export function useForm(name?: string) {
     return mapValues(fieldsMap, 'displayValue');
   }
 
-  async function fillForm(formData: Record<string, any>, useDisplayValue = true) {
+  async function fillForm(formData: TFormData) {
     // traverse form and fill inputs
     const filledFields: string[] = [];
-    await traverseForm(async input => {
+    await traverseForm(async (input, stopTraverse) => {
       const name = input.name;
       if (!(name in formData)) return;
       const value = formData[name];
-      console.log(`Fill ${input.name} with value ${value}`);
       try {
-        if (useDisplayValue) {
-          await input.setDisplayValue(formData[name]);
-        } else {
-          await input.setValue(formData[name]);
-        }
+        await input.setDisplayValue(formData[name]);
       } catch (e: unknown) {
         console.log(
           `Input element found but failed to set the value "${value}" for the field "${name}"`,
@@ -68,7 +64,7 @@ export function useForm(name?: string) {
         throw e;
       }
       filledFields.push(name);
-      console.log(`Fill success`);
+      if (filledFields.length === Object.keys(formData).length) stopTraverse();
     }, true);
 
     // check that we filled out all requested fields
@@ -86,27 +82,31 @@ export function useForm(name?: string) {
    * `refetchControllersAfterEachStep` flag should be set to `true`
    */
   async function traverseForm<T>(
-    cb: (inputController: BaseInputController<any>) => Promise<T>,
+    cb: (inputController: BaseInputController<any>, stopTraverse: Function) => Promise<T>,
     refetchControllersAfterEachStep = false,
   ): Promise<T[]> {
     let controllers = await getInputControllers();
     const results: T[] = [];
     const visitedFields: string[] = [];
+    let isTraverseStopped = false;
+
+    function stopTraverse() {
+      isTraverseStopped = true;
+    }
 
     for (let ind = 0; ind < controllers.length; ind++) {
       const inputController = controllers[ind];
+      if (visitedFields.includes(inputController.name)) continue;
+
+      visitedFields.push(inputController.name);
+      results.push(await cb(inputController, stopTraverse));
+      if (isTraverseStopped) break;
+
       if (refetchControllersAfterEachStep) {
-        if (visitedFields.includes(inputController.name)) continue;
-        visitedFields.push(inputController.name);
-        results.push(await cb(inputController));
         await sleep(100);
-        console.log(`Refetch`);
         controllers = await getInputControllers();
-        console.log(`Refetch success`);
         ind = 0;
-        continue;
       }
-      results.push(await cb(inputController));
     }
 
     return results;
@@ -118,8 +118,6 @@ export function useForm(name?: string) {
   async function getInputControllers() {
     // wait for form to be visible
     await waitFormForDisplayed();
-    // wait for at least one input to be visible
-    await waitForDisplayed(`${formSelector} [data-role="input"]`);
     const $inputs = await getInputElements();
     const controllers: BaseInputController<any>[] = [];
     for (const $input of $inputs) {
@@ -135,12 +133,7 @@ export function useForm(name?: string) {
     return controllers;
   }
 
-  async function getInput(inputName: string) {
-    const controllers = await getInputControllers();
-    return controllers.find(c => c.name === inputName);
-  }
-
-  async function assertFormContains(expectedFormData: Record<string, unknown>) {
+  async function assertFormContains(expectedFormData: TFormData) {
     const actualFormData = await readFields();
     const expectedFieldNames = Object.keys(expectedFormData);
     for (const fieldName of expectedFieldNames) {
@@ -170,7 +163,39 @@ export function useForm(name?: string) {
     return String(value);
   }
 
-  return { readForm, fillForm, getInput, assertFormContains };
+  return { readForm, fillForm, assertFormContains };
+}
+
+/**
+ * A shortcut for useForm().fillForm()
+ */
+export async function fillForm(formData: TFormData): Promise<unknown>;
+export async function fillForm(formName: string, formData: TFormData): Promise<unknown>;
+export async function fillForm(...args: unknown[]): Promise<unknown> {
+  if (typeof args[0] === 'string') {
+    const formName = args[0];
+    const formData = args[1] as TFormData;
+    return useForm(formName).fillForm(formData);
+  } else {
+    const formData = args[0] as TFormData;
+    return useForm().fillForm(formData);
+  }
+}
+
+/**
+ * A shortcut for useForm().assertFormContains()
+ */
+export async function assertFormContains(formData: TFormData): Promise<unknown>;
+export async function assertFormContains(formName: string, formData: TFormData): Promise<unknown>;
+export async function assertFormContains(...args: unknown[]): Promise<unknown> {
+  if (typeof args[0] === 'string') {
+    const formName = args[0];
+    const formData = args[1] as TFormData;
+    return useForm(formName).assertFormContains(formData);
+  } else {
+    const formData = args[0] as TFormData;
+    return useForm().assertFormContains(formData);
+  }
 }
 
 function getInputControllerForType<

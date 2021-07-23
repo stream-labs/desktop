@@ -2,10 +2,10 @@ import { getClient } from '../api-client';
 import {
   click,
   clickButton,
-  focusChild, isDisplayed,
+  focusChild, isDisplayed, select,
   selectButton, useChildWindow,
   useMainWindow,
-  waitForDisplayed
+  waitForDisplayed, waitForEnabled
 } from './core';
 import { sleep } from '../sleep';
 import { useForm } from './forms';
@@ -52,7 +52,7 @@ export async function tryToGoLive(prefillData?: Record<string, unknown>) {
   const { fillForm } = useForm('editStreamForm');
 
   await useChildWindow(async () => {
-    await waitForDisplayed('[data-type="text"]');
+    await waitForSettingsWindowLoaded();
     if (prefillData) await fillForm(prefillData);
     await submit();
   });
@@ -112,6 +112,19 @@ export async function startRecording() {
 export async function stopRecording() {
   await click('.record-button');
   await waitForDisplayed('.record-button:not(.active)', { timeout: 15000 });
+}
+
+export async function waitForSettingsWindowLoaded() {
+  // the spinner can take some time to appear
+  await sleep(500);
+  // wait for at least one input to be displayed
+  return waitForDisplayed('[data-role="input"][data-type="text"]', { timeout: 15000 });
+}
+
+export async function switchAdvancedMode() {
+  await waitForDisplayed('[data-name="advancedMode"]');
+  await waitForEnabled('[data-name=advancedMode]', { timeout: 15000 });
+  await click('[data-name=advancedMode]');
 }
 
 /**

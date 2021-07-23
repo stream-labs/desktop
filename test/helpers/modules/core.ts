@@ -1,73 +1,7 @@
 import { getContext } from '../spectron';
+import { sleep } from '../sleep';
 
-// export function useContext(t: TExecutionContext) {
-//
-//   // CLICK SHORTCUTS
-//
-//   async function click(selector: string) {
-//     await (await t.context.app.client.$(selector)).click();
-//   }
-//
-//   async function clickButton(buttonText: string) {
-//     await click(`button=${buttonText}`);
-//   }
-//
-//   async function clickTab(tabText: string) {
-//     await click(`div[role="tab"]=${tabText}`);
-//   }
-//
-//   const client = t.context.app.client;
-//
-//   async function getFocusedWindowId(): Promise<string> {
-//     const url = await t.context.app.client.getUrl();
-//     return url.match(/windowId=main$/) ? 'main' : 'child';
-//   }
-//
-//   async function focusWindow(winId: string): Promise<boolean> {
-//     const count = await t.context.app.client.getWindowCount();
-//     for (let i = 0; i < count; i++) {
-//       await t.context.app.client.windowByIndex(i);
-//       const url = await t.context.app.client.getUrl();
-//       if (url.includes(`windowId=${winId}`)) return true;
-//     }
-//     return false;
-//   }
-//
-//   async function focusChild() {
-//     return focusWindow('child');
-//   }
-//
-//   async function focusMain() {
-//     return focusWindow('main');
-//   }
-//
-//   async function useWindow(targetWinId: string, cb: () => Promise<unknown>) {
-//     const currentWinId = await getFocusedWindowId();
-//     const shouldChangeFocus = currentWinId !== targetWinId;
-//     if (shouldChangeFocus) await focusWindow(targetWinId);
-//     await cb();
-//     if (shouldChangeFocus) await focusWindow(currentWinId);
-//   }
-//
-//   async function useMainWindow(cb: () => Promise<unknown>) {
-//     return useWindow('main', cb);
-//   }
-//
-//   async function useChildWindow(cb: () => Promise<unknown>) {
-//     return useWindow('child', cb);
-//   }
-//
-//   return {
-//     click,
-//     clickButton,
-//     clickTab,
-//     client,
-//     focusMain,
-//     focusChild,
-//     useMainWindow,
-//     useChildWindow,
-//   };
-// }
+export type TSelectorOrEl = string | WebdriverIO.Element;
 
 export function getClient() {
   return getContext().context.app.client;
@@ -75,8 +9,14 @@ export function getClient() {
 
 // SELECT SHORTCUTS
 
-export function select(selector: string) {
-  return getContext().context.app.client.$(selector);
+/**
+ * A shortcut for client.$()
+ */
+export async function select(selectorOrEl: TSelectorOrEl): Promise<WebdriverIO.Element> {
+  if (typeof selectorOrEl === 'string') {
+    return getClient().$(selectorOrEl);
+  }
+  return selectorOrEl;
 }
 
 export function selectButton(buttonText: string) {
@@ -85,8 +25,19 @@ export function selectButton(buttonText: string) {
 
 // CLICK SHORTCUTS
 
-export async function click(selector: string) {
-  await (await select(selector)).click();
+export async function click(selectorOrEl: TSelectorOrEl) {
+  await (await select(selectorOrEl)).click();
+}
+
+export async function clickIfDisplayed(selectorOrEl: TSelectorOrEl) {
+  await sleep(500);
+  if (await isDisplayed(selectorOrEl)) {
+    await click(selectorOrEl);
+  }
+}
+
+export async function clickText(text: string) {
+  await (await select(`*=${text}`)).click();
 }
 
 export async function clickButton(buttonText: string) {
@@ -100,12 +51,22 @@ export async function clickTab(tabText: string) {
 
 // OTHER SHORTCUTS
 
-export async function isDisplayed(selector: string) {
-  return await (await select(selector)).isDisplayed();
+export async function isDisplayed(selectorOrEl: TSelectorOrEl) {
+  return await (await select(selectorOrEl)).isDisplayed();
 }
 
-export async function waitForDisplayed(selector: string, options?: WebdriverIO.WaitForOptions) {
-  await (await select(selector)).waitForDisplayed(options);
+export async function waitForDisplayed(
+  selectorOrEl: TSelectorOrEl,
+  options?: WebdriverIO.WaitForOptions,
+) {
+  await (await select(selectorOrEl)).waitForDisplayed(options);
+}
+
+export async function waitForEnabled(
+  selectorOrEl: TSelectorOrEl,
+  options?: WebdriverIO.WaitForOptions,
+) {
+  await (await select(selectorOrEl)).waitForEnabled(options);
 }
 
 // WINDOW FOCUS

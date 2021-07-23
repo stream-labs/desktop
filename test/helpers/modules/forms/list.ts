@@ -23,24 +23,21 @@ export class ListInputController<TValue> extends BaseInputController<TValue> {
     // open dropdown
     const $el = await this.getElement();
     await $el.click();
-    await sleep(500);
-    console.log('Dropdown opened');
+    await sleep(100);
 
     // try search if searching is available
     const hasSearch = (await $el.getAttribute('data-show-search')) === 'true';
     if (hasSearch) {
-      console.log('Has search opened');
       const $input = await $el.$('input');
-      await setInputValue($input, value);
-      console.log('Search applied');
+      await $input.setValue(value);
+      await sleep(100);
     }
 
     // click option
     const $option = await select(`.ant-select-dropdown [data-option-label="${value}"]`);
+    await $option.waitForDisplayed();
     await $option.waitForClickable();
-    console.log('Is clickable');
     await $option.click();
-    console.log('click');
   }
 
   async getDisplayValue() {
