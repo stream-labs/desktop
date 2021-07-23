@@ -164,7 +164,7 @@ if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
         event.request.url = normalize(event.request.url);
       }
 
-      return isSampled ? event : null;
+      return isSampled || event.tags?.feature === 'highlighter' ? event : null;
     },
     integrations: [new Integrations.Vue({ Vue })],
   });

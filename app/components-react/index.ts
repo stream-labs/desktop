@@ -38,4 +38,5 @@ export const components = {
   TestWidgets,
   RenameSource,
   StudioFooter,
+  StartStreamingButton,
 };

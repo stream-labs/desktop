@@ -24,6 +24,7 @@ import sample from 'lodash/sample';
 import { HighlighterError } from './errors';
 import { AudioMixer } from './audio-mixer';
 import { UsageStatisticsService } from 'services/usage-statistics';
+import * as Sentry from '@sentry/browser';
 
 export interface IClip {
   path: string;
@@ -668,7 +669,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       let currentFrame = 0;
 
       // Mix audio first
-      await Promise.all(clips.map(clip => clip.audioSource.extract()));
+      await Promise.all(clips.filter(c => c.hasAudio).map(clip => clip.audioSource.extract()));
       const parsed = path.parse(this.views.exportInfo.file);
       const audioConcat = path.join(parsed.dir, `${parsed.name}-concat.flac`);
       let audioMix = path.join(parsed.dir, `${parsed.name}-mix.flac`);
@@ -693,6 +694,7 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       }
 
       await Promise.all(clips.map(clip => clip.audioSource.cleanup()));
+      const nClips = clips.length;
 
       this.SET_EXPORT_INFO({ step: EExportStep.FrameRender });
 
@@ -792,22 +794,26 @@ export class HighlighterService extends StatefulService<IHighligherState> {
             `Export complete - Expected Frames: ${this.views.exportInfo.totalFrames} Actual Frames: ${currentFrame}`,
           );
 
-          if (!preview) {
-            this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
-              type: 'ExportComplete',
-              numClips: clips.length,
-              transition: this.views.transition.type,
-              transitionDuration: this.views.transition.duration,
-              resolution: this.views.exportInfo.resolution,
-              fps: this.views.exportInfo.fps,
-              preset: this.views.exportInfo.preset,
-              duration: totalFramesAfterTransitions / exportOptions.fps,
-            });
-          }
+          this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+            type: 'ExportComplete',
+            numClips: nClips,
+            transition: this.views.transition.type,
+            transitionDuration: this.views.transition.duration,
+            resolution: this.views.exportInfo.resolution,
+            fps: this.views.exportInfo.fps,
+            preset: this.views.exportInfo.preset,
+            duration: totalFramesAfterTransitions / exportOptions.fps,
+            isPreview: preview,
+          });
           break;
         }
       }
     } catch (e: unknown) {
+      Sentry.withScope(scope => {
+        scope.setTag('feature', 'highlighter');
+        console.error('Highlighter export error', e);
+      });
+
       if (e instanceof HighlighterError) {
         this.SET_EXPORT_INFO({ error: e.userMessage });
         this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
@@ -815,7 +821,6 @@ export class HighlighterService extends StatefulService<IHighligherState> {
           error: e.constructor.name,
         });
       } else {
-        console.error('Highlighter export error', e);
         this.SET_EXPORT_INFO({ error: 'An error occurred while exporting the video' });
         this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
           type: 'ExportError',
@@ -836,6 +841,8 @@ export class HighlighterService extends StatefulService<IHighligherState> {
   // We throttle because this can go extremely fast, especially on previews
   @throttle(100)
   private setCurrentFrame(frame: number) {
+    // Avoid a race condition where we reset the exported flag
+    if (this.views.exportInfo.exported) return;
     this.SET_EXPORT_INFO({ currentFrame: frame });
   }
 
@@ -878,8 +885,15 @@ export class HighlighterService extends StatefulService<IHighligherState> {
       if (this.views.uploadInfo.cancelRequested) {
         console.log('The upload was canceled');
       } else {
-        console.error('Got error uploading YT video', e);
+        Sentry.withScope(scope => {
+          scope.setTag('feature', 'highlighter');
+          console.error('Got error uploading YT video', e);
+        });
+
         this.SET_UPLOAD_INFO({ error: true });
+        this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
+          type: 'UploadError',
+        });
       }
     }
 
@@ -898,10 +912,6 @@ export class HighlighterService extends StatefulService<IHighligherState> {
           options.privacyStatus === 'public'
             ? `https://youtube.com/watch?v=${result.id}`
             : undefined,
-      });
-    } else {
-      this.usageStatisticsService.recordAnalyticsEvent('Highlighter', {
-        type: 'UploadError',
       });
     }
   }

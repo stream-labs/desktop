@@ -155,7 +155,7 @@ export default function NotificationsArea() {
 
   return (
     <div className={cx(styles.notificationsArea, 'flex--grow')}>
-      {unreadCount && (
+      {unreadCount > 0 && (
         <Tooltip placement="right" title={showUnreadNotificationsTooltip}>
           <div
             className={cx(styles.notificationsCounter, styles.notificationsCounterWarning)}

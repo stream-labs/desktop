@@ -37,7 +37,7 @@ export default function ClipPreview(props: {
     <div style={{ height: `${SCRUB_HEIGHT}px`, position: 'relative' }}>
       {!props.clip.deleted && (
         <img
-          src={props.clip.scrubSprite}
+          src={props.clip.scrubSprite?.replace('#', '%23')}
           style={{
             width: `${SCRUB_WIDTH}px`,
             height: `${SCRUB_HEIGHT}px`,

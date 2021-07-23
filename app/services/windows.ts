@@ -66,6 +66,7 @@ import SponsorBanner from 'components/widgets/SponsorBanner.vue';
 import MediaShare from 'components/widgets/MediaShare';
 import AlertBox from 'components/widgets/AlertBox.vue';
 import SpinWheel from 'components/widgets/SpinWheel.vue';
+import Poll from 'components/widgets/Poll';
 
 import { byOS, OS } from 'util/operating-systems';
 import { UsageStatisticsService } from './usage-statistics';
@@ -127,6 +128,7 @@ export function getComponents() {
     MediaShare,
     AlertBox,
     SpinWheel,
+    Poll,
     WelcomeToPrime,
     GoLiveWindow,
     EditStreamWindow,
@@ -245,6 +247,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.windows.worker = BrowserWindow.fromId(windowIds.worker);
     this.windows.main = BrowserWindow.fromId(windowIds.main);
     this.windows.child = BrowserWindow.fromId(windowIds.child);
+
+    // Background throttling can produce freezing on certain parts of the UI
+    this.windows.worker.webContents.setBackgroundThrottling(false);
+    this.windows.main.webContents.setBackgroundThrottling(false);
 
     this.updateScaleFactor('main');
     this.updateScaleFactor('child');

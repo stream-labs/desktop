@@ -9,6 +9,7 @@ import { SUPPORTED_FILE_TYPES } from 'services/highlighter/constants';
 import { SliderInput } from 'components-react/shared/inputs';
 import Form from 'components-react/shared/inputs/Form';
 import Scrollable from 'components-react/shared/Scrollable';
+import styles from '../pages/Highlighter.m.less';
 
 export default function BlankSlate(p: { close: () => void }) {
   const { HotkeysService, SettingsService, StreamingService } = Services;
@@ -88,8 +89,8 @@ export default function BlankSlate(p: { close: () => void }) {
   }
 
   return (
-    <Scrollable style={{ padding: 24, width: '100%' }}>
-      <div style={{ width: 700 }}>
+    <div className={styles.clipsViewRoot} style={{ width: '100%', display: 'flex' }}>
+      <Scrollable style={{ padding: 24, width: '100%' }}>
         <h1>
           Highlighter{' '}
           <span style={{ fontSize: 12, verticalAlign: 'top', color: 'var(--beta-text)' }}>
@@ -97,76 +98,93 @@ export default function BlankSlate(p: { close: () => void }) {
           </span>
         </h1>
         <p>
-          The highlighter allows you to edit together replays you capture during your stream and
-          upload them to YouTube.
+          The highlighter allows you to clip the best moments from your livestream and edit them
+          together into an exciting highlight video you can upload directly to YouTube.
         </p>
-        <h2>Get Started</h2>
-        {!v.isStreaming && (
-          <div className="section">
-            {correctlyConfigured
-              ? completedStepHeading('Configure the replay buffer')
-              : incompleteStepHeading('Configure the replay buffer')}
-            {correctlyConfigured ? (
-              <div>The replay buffer is correctly configured</div>
-            ) : (
-              <Button onClick={configure}>Configure</Button>
+        <div style={{ display: 'flex' }}>
+          <div style={{ width: 600, flexShrink: 0 }}>
+            <h2>Get Started</h2>
+            {!v.isStreaming && (
+              <div className="section">
+                {correctlyConfigured
+                  ? completedStepHeading('Configure the replay buffer')
+                  : incompleteStepHeading('Configure the replay buffer')}
+                {correctlyConfigured ? (
+                  <div>The replay buffer is correctly configured</div>
+                ) : (
+                  <Button onClick={configure}>Configure</Button>
+                )}
+              </div>
             )}
-          </div>
-        )}
-        {!v.isStreaming && (
-          <div className="section">
-            {completedStepHeading('Adjust replay duration')}
-            <div>Set the duration of captured replays. You can always trim them down later.</div>
-            <Form layout="inline">
-              <SliderInput
-                style={{ width: 400, marginTop: 8 }}
-                label="Replay Duration"
-                value={v.settingsValues.Output.RecRBTime}
-                onChange={setReplayTime}
-                min={1}
-                max={120}
-                step={1}
-                debounce={200}
-                hasNumberInput={false}
-                tooltipPlacement="top"
-                tipFormatter={v => `${v}s`}
-              />
-            </Form>
-          </div>
-        )}
-        {!v.isStreaming && (
-          <div className="section">
-            {hotkey?.bindings.length
-              ? completedStepHeading('Set a hotkey to capture replays')
-              : incompleteStepHeading('Set a hotkey to capture replays')}
-            {hotkey && (
-              <HotkeyBinding
-                hotkey={hotkey}
-                binding={hotkey.bindings[0] ?? null}
-                onBind={binding => {
-                  const newHotkey = { ...hotkey };
-                  newHotkey.bindings.splice(0, 1, binding);
-                  setHotkey(newHotkey);
-                  hotkeyRef.current = newHotkey;
-                }}
-              />
+            {!v.isStreaming && (
+              <div className="section">
+                {completedStepHeading('Adjust replay duration')}
+                <div>
+                  Set the duration of captured replays. You can always trim them down later.
+                </div>
+                <Form layout="inline">
+                  <SliderInput
+                    style={{ width: 400, marginTop: 8 }}
+                    label="Replay Duration"
+                    value={v.settingsValues.Output.RecRBTime}
+                    onChange={setReplayTime}
+                    min={1}
+                    max={120}
+                    step={1}
+                    debounce={200}
+                    hasNumberInput={false}
+                    tooltipPlacement="top"
+                    tipFormatter={v => `${v}s`}
+                  />
+                </Form>
+              </div>
             )}
-          </div>
-        )}
-        <div className="section">
-          {incompleteStepHeading('Capture a replay')}
-          {!!hotkey?.bindings.length && (
-            <div>
-              Start streaming and press <b>{getBindingString(hotkey.bindings[0])}</b> to capture a
-              replay. Check back here after your stream.
+            {!v.isStreaming && (
+              <div className="section">
+                {hotkey?.bindings.length
+                  ? completedStepHeading('Set a hotkey to capture replays')
+                  : incompleteStepHeading('Set a hotkey to capture replays')}
+                {hotkey && (
+                  <HotkeyBinding
+                    hotkey={hotkey}
+                    binding={hotkey.bindings[0] ?? null}
+                    onBind={binding => {
+                      const newHotkey = { ...hotkey };
+                      newHotkey.bindings.splice(0, 1, binding);
+                      setHotkey(newHotkey);
+                      hotkeyRef.current = newHotkey;
+                    }}
+                  />
+                )}
+              </div>
+            )}
+            <div className="section">
+              {incompleteStepHeading('Capture a replay')}
+              {!!hotkey?.bindings.length && (
+                <div>
+                  Start streaming and press <b>{getBindingString(hotkey.bindings[0])}</b> to capture
+                  a replay. Check back here after your stream.
+                </div>
+              )}
+              {!hotkey?.bindings.length && (
+                <div>Start streaming and capture a replay. Check back here after your stream.</div>
+              )}
             </div>
-          )}
-          {!hotkey?.bindings.length && (
-            <div>Start streaming and capture a replay. Check back here after your stream.</div>
-          )}
+            <a onClick={p.close}>Or, import a clip from your computer</a>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', paddingLeft: 24 }}>
+            <video
+              style={{
+                width: '100%',
+                outline: 'none',
+              }}
+              controls
+              src="https://slobs-cdn.streamlabs.com/media/highlighter+promo+2.mp4"
+              poster="https://slobs-cdn.streamlabs.com/media/highlighter-video-thumbnail.png"
+            />
+          </div>
         </div>
-        <a onClick={p.close}>Or, import a clip from your computer</a>
-      </div>
-    </Scrollable>
+      </Scrollable>
+    </div>
   );
 }
