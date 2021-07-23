@@ -8,7 +8,7 @@ import {
   stopStream,
 } from '../../helpers/modules/streaming';
 
-import { isDisplayed } from '../../helpers/modules/core';
+import {focusChild, isDisplayed, waitForDisplayed} from '../../helpers/modules/core';
 
 useSpectron({ implicitTimeout: 0 });
 
@@ -54,8 +54,6 @@ test('Youtube streaming is disabled', async t => {
   );
   await prepareToGoLive();
   await clickGoLive();
-  t.true(
-    await isDisplayed('button=Enable Live Streaming'),
-    'The enable livestreaming button should be visible',
-  );
+  await focusChild();
+  await waitForDisplayed('button=Enable Live Streaming');
 });
