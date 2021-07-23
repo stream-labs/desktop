@@ -27,7 +27,7 @@ export async function showSettingsWindow(category: string, cb?: () => Promise<un
 export async function setTemporaryRecordingPath(): Promise<string> {
   const tmpDir = await mkdtemp(path.join(tmpdir(), 'slobs-recording-'));
   await showSettingsWindow('Output', async () => {
-    await setInputValue('[data-role="input"][data-name="Recording Path"]', tmpDir);
+    await setInputValue('[data-name="FilePath"] input', tmpDir);
     await clickButton('Done');
   });
   return tmpDir;
