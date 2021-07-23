@@ -2,7 +2,7 @@ import { useSpectron, focusChild, test } from '../helpers/spectron';
 import { addFilter, openFiltersWindow, removeFilter } from '../helpers/spectron/filters';
 import { addSource } from '../helpers/spectron/sources';
 
-useSpectron({ restartAppAfterEachTest: false, implicitTimeout: 2000 });
+useSpectron({ restartAppAfterEachTest: false });
 
 test('Adding and removing a Color Correction filter', async t => {
   const app = t.context.app;

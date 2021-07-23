@@ -129,7 +129,7 @@ const DEFAULT_OPTIONS: ITestRunnerOptions = {
   noSync: true,
   networkLogging: false,
   pauseIfFailed: false,
-  implicitTimeout: 0,
+  implicitTimeout: 2000,
 };
 
 export interface ITestContext {

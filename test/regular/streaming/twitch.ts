@@ -19,7 +19,7 @@ import { StreamSettingsService } from '../../../app/services/settings/streaming'
 import { assertFormContains, fillForm } from '../../helpers/modules/forms';
 import { logIn } from '../../helpers/modules/user';
 
-useSpectron();
+useSpectron({ implicitTimeout: 0 });
 
 test('Streaming to Twitch', async t => {
   await logIn('twitch', { multistream: false });

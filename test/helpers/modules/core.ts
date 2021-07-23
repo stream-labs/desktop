@@ -30,7 +30,6 @@ export async function click(selectorOrEl: TSelectorOrEl) {
 }
 
 export async function clickIfDisplayed(selectorOrEl: TSelectorOrEl) {
-  await sleep(500);
   if (await isDisplayed(selectorOrEl)) {
     await click(selectorOrEl);
   }

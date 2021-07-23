@@ -10,7 +10,7 @@ import {
 
 import { isDisplayed } from '../../helpers/modules/core';
 
-useSpectron();
+useSpectron({ implicitTimeout: 0 });
 
 test('Streaming to Youtube', async t => {
   await logIn('youtube', { multistream: false });

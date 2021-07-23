@@ -1,4 +1,4 @@
-import {click, clickButton, clickIfDisplayed, isDisplayed, select, useMainWindow} from './core';
+import { click, clickButton, clickIfDisplayed, isDisplayed, useMainWindow } from './core';
 
 export async function skipOnboarding() {
   await useMainWindow(async () => {
